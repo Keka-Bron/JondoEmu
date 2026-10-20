@@ -9267,6 +9267,15 @@ namespace Jondo.Unity.Server.Handlers
             if (suyo != null)
             {
                 xpGained = suyo.Xp;
+                if (suyo.Sharing is { Applied: true, Notified: false } sharing)
+                {
+                    if (sharing.Amounts.Mount > 0 && sharing.Mount != null)
+                        await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Iuj,
+                            AlterationProtocol.BuildSlotItemChanged(sharing.Mount)));
+                    if (sharing.Amounts.Guild > 0)
+                        await GuildHandler.ExperienceChangedAsync(sharing.GuildId, GameState.CharacterId);
+                    sharing.Notified = true;
+                }
                 kamas = suyo.Kamas;
                 loot = suyo.Loot;
                 EntregarBotin(Managers.GuildRaidManager.ForTheBag(GameState.CharacterId, loot), out caidos, suyo.Perfect);

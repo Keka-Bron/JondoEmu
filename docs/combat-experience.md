@@ -71,6 +71,68 @@ ones cut: fights against monsters (each winner by his own limit, after the chall
 the server's bonus), dreams, Koliseo victories and quests. Achievements, guild raid
 rewards and experience scrolls carry no warning, and are paid whole.
 
-## Not done
+## Mount and guild donations
 
-* **Experience given to a mount or a guild.** The client has the settings, its guild member card and the mount's experience share, but no capture shows how much of the given experience reaches the guild or the mount. Until one does, the character keeps all of it.
+Ordinary PvM victories can now donate XP. This is a server rule requested for Jondo:
+Giny 2.68's guild conversion (`Guild.AdjustGivenExperience`) with its double-deduction
+bug removed, and Stump 2.71's mount-first ordering. These donations do not claim to
+reproduce the official Unity server. The existing combat formula, shared challenges,
+character bonus and server bonus are unchanged.
+
+1. Take the full mount percentage from the player's combat reward, only when a real
+   ride is equipped in slot 8 (the riding state in this emulator).
+2. Convert that amount according to character level minus mount level and credit
+   the ride. Its existing item effects carry its XP and level; its characteristics
+   grow with the level using the breeding catalogue. Pets, petsmounts, cosmetic
+   mounts and rides in the bag or stable receive nothing.
+3. Take the full guild percentage from what remains after the mount deduction.
+4. Convert that amount by character level minus guild level and credit the guild
+   and the member's contribution counter. There is no extra x10.
+5. Apply the character's own earned-XP limit to his remaining XP, last. It does not
+   reduce the recipients' credits a second time.
+
+Each taken amount is truncated to whole XP **before** it is subtracted. Recipient
+credits are truncated independently. Conversion uses the actual character level,
+including Omega levels, as the reference donation methods do; it does not change
+the combat formula's level cap of 200.
+
+| Level gap | Percentage of the taken amount credited |
+| --- | --- |
+| <= 10 | 10% |
+| 11–20 | 8% |
+| 21–30 | 6% |
+| 31–40 | 4% |
+| 41–50 | 3% |
+| 51–60 | 2% |
+| 61–70 | 1.5% |
+| > 70 | 1% |
+
+For example, 100,000 XP with a 20% mount donation and a 10% guild donation leaves
+72,000 XP for the character before his own XP limit. The mount receives the
+conversion of 20,000 XP, and the guild the conversion of 8,000 XP. If both level
+gaps are <= 10, the credits are 2,000 and 800 XP. The unconverted portion is not
+returned to the character. A ride's credit is capped at its existing maximum XP;
+the full chosen donation is still taken even if the ride reaches its cap.
+
+All participants' donations are prepared before any recipient levels up, so the
+order in which teammates are processed does not affect their conversion rate.
+Mount and guild credits are persisted together in a transaction, once per reward
+plan. A mount's effects and the equipment-stat cache are refreshed after the
+commit; the client receives its updated item. The guild header is refreshed too.
+
+### Choosing the rates
+
+The player commands `.xpmonture 20` and `.xpguilde 10` set their respective rates
+(0–90%). Without an argument they display the current setting; `0` disables a
+donation. Both defaults are zero and both settings survive reconnects/restarts.
+The guild percentage belongs to the membership and resets when leaving/rejoining.
+The mount percentage belongs to the character and applies to whichever real ride
+he is riding. Native `jgv` contribution requests (field 3) also update guild rates,
+independently of rank changes (field 4); a member changes his own rate and the
+leader may change another member's rate. An unrelated guild cannot be targeted.
+
+The member's converted contribution is stored in `GuildMembers.Experience`, his
+rate in `GuildMembers.ExperiencePercent`, and the mount rate in
+`CharacterMountExperienceShare`. Mount XP uses `CharacterItems.Effects`, not a
+parallel mount-XP table. Dreams, quests, scrolls, achievements, raids and Koliseo
+retain their existing payout rules.

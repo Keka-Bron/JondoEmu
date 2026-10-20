@@ -40,6 +40,7 @@ namespace Jondo.Unity.Server.Handlers
         internal sealed class Reward
         {
             public long Xp { get; set; }
+            internal ExperienceSharing.Plan? Sharing { get; set; }
             public long Kamas { get; set; }
             public Dictionary<int, int> Loot { get; set; } = new();
 
@@ -162,11 +163,15 @@ namespace Jondo.Unity.Server.Handlers
                         xp = CombatExperience.WithCharacterBonus(xp, CombatExperience.AlliancePrismBonusPercent);
                     xp = ServerSettings.WithBonus(ConElExtra(xp, extra), ServerSettings.Current.ExperienceBonusPercent);
                 }
-                // And last, as the client cuts its tooltip: the limit he set on what he earns.
+                // Take the full donations before converting their recipient credits. The character's
+                // own XP limit remains last and does not cut the recipients' donations a second time.
+                var sharing = dream == null ? ExperienceSharing.Prepare(session, xp) : null;
+                if (sharing != null) xp = sharing.Amounts.Character;
                 xp = ExperienceLimit.ApplyFor(fighter.Id, xp);
                 plan[fighter.Id] = new Reward
                 {
                     Xp = xp,
+                    Sharing = sharing,
                     Kamas = dream != null ? 0 : shared ? KamasShare(kamasAlone, prospectings[i], prospectings) : kamasAlone,
                     Loot = loot,
                     Perfect = perfect,
@@ -174,6 +179,8 @@ namespace Jondo.Unity.Server.Handlers
             }
             // A Gigalodón fight's salt goes into the raid's pool, the same amount for every winner.
             if (dream == null) GuildRaidManager.ShareFightSalt(fight.FightId, plan.ToDictionary(p => p.Key, p => p.Value.Loot));
+            // Every player's conversion used the recipient's level before this batch of credits.
+            ExperienceSharing.Credit(plan.Values.Where(r => r.Sharing != null).Select(r => r.Sharing!));
             _rewards[fight.FightId] = plan;
 
             if (dream != null)

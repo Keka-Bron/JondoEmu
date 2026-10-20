@@ -52,7 +52,10 @@ namespace Jondo.Unity.Server.Managers
             public long JoinedUtcMs { get; init; }
             public long Experience { get; set; }
 
-            /// <summary>The note in the «Nota» column and when it was written. Measured on the jgz of «hola».</summary>
+            /// <summary>The percentage of combat XP given to this guild membership.</summary>
+            public int ExperiencePercent { get; set; }
+
+            /// <summary>The note in the members window.</summary>
             public string Note { get; set; } = "";
             public long NoteMs { get; set; }
         }
@@ -211,7 +214,8 @@ namespace Jondo.Unity.Server.Managers
             create.ExecuteNonQuery();
 
             // The members' notes, in the table that already existed.
-            foreach (string column in new[] { "Note TEXT NOT NULL DEFAULT ''", "NoteMs INTEGER NOT NULL DEFAULT 0" })
+            foreach (string column in new[] { "Note TEXT NOT NULL DEFAULT ''", "NoteMs INTEGER NOT NULL DEFAULT 0",
+                                              "ExperiencePercent INTEGER NOT NULL DEFAULT 0" })
             {
                 try
                 {
@@ -408,7 +412,7 @@ namespace Jondo.Unity.Server.Managers
             using var conexion = Open();
             var query = conexion.CreateCommand();
             query.CommandText = @"
-                SELECT CharacterId, GuildId, Rank, JoinedUtcMs, Experience, Note, NoteMs
+                SELECT CharacterId, GuildId, Rank, JoinedUtcMs, Experience, Note, NoteMs, ExperiencePercent
                 FROM GuildMembers WHERE GuildId = $g ORDER BY Rank, CharacterId;";
             query.Parameters.AddWithValue("$g", guildId);
             using var lector = query.ExecuteReader();
@@ -422,6 +426,7 @@ namespace Jondo.Unity.Server.Managers
                     Experience = lector.GetInt64(4),
                     Note = lector.IsDBNull(5) ? "" : lector.GetString(5),
                     NoteMs = lector.IsDBNull(6) ? 0 : lector.GetInt64(6),
+                    ExperiencePercent = lector.GetInt32(7),
                 });
             }
             return fuera;
@@ -463,7 +468,7 @@ namespace Jondo.Unity.Server.Managers
             using var conexion = Open();
             var query = conexion.CreateCommand();
             query.CommandText = @"
-                SELECT CharacterId, GuildId, Rank, JoinedUtcMs, Experience, Note, NoteMs
+                SELECT CharacterId, GuildId, Rank, JoinedUtcMs, Experience, Note, NoteMs, ExperiencePercent
                 FROM GuildMembers WHERE CharacterId = $c;";
             query.Parameters.AddWithValue("$c", characterId);
             using var lector = query.ExecuteReader();
@@ -475,7 +480,20 @@ namespace Jondo.Unity.Server.Managers
                 Experience = lector.GetInt64(4),
                 Note = lector.IsDBNull(5) ? "" : lector.GetString(5),
                 NoteMs = lector.IsDBNull(6) ? 0 : lector.GetInt64(6),
+                ExperiencePercent = lector.GetInt32(7),
             };
+        }
+
+        /// <summary>A member's combat XP donation. Membership owns the setting, so it resets on leaving.</summary>
+        public static bool SetExperiencePercent(long characterId, int percent)
+        {
+            if (percent < 0 || percent > 90) return false;
+            using var connection = Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "UPDATE GuildMembers SET ExperiencePercent = $p WHERE CharacterId = $c;";
+            command.Parameters.AddWithValue("$p", percent);
+            command.Parameters.AddWithValue("$c", characterId);
+            return command.ExecuteNonQuery() == 1;
         }
 
         /// <summary>The note the leader puts on a member (jjj). Returns the member brought up to date.</summary>

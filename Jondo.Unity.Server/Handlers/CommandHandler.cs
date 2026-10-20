@@ -62,6 +62,8 @@ namespace Jondo.Unity.Server.Handlers
                 [".receta"] = "usage.recipe",
                 [".packets"] = "usage.packets",
                 [".gremio"] = "usage.guild",
+                [".xpguilde"] = "usage.guildxp",
+                [".xpmonture"] = "usage.mountxp",
                 [".oficio"] = "usage.job",
                 [".oficios"] = "usage.jobs",
                 [".forjadios"] = "usage.forgegod",
@@ -104,6 +106,8 @@ namespace Jondo.Unity.Server.Handlers
                 [".size"] = Roles.GameMaster,
                 [".shop"] = Roles.GameMaster,
                 [".gremio"] = Roles.Jugador,
+                [".xpguilde"] = Roles.Jugador,
+                [".xpmonture"] = Roles.Jugador,
             };
 
         /// <summary>
@@ -186,6 +190,8 @@ namespace Jondo.Unity.Server.Handlers
             {
                 switch (command)
                 {
+                    case ".xpguilde": await ExperienceShareAsync(stream, rest, true, channel, accountId); break;
+                    case ".xpmonture": await ExperienceShareAsync(stream, rest, false, channel, accountId); break;
                     case ".kamas": await KamasAsync(stream, rest, channel, accountId); break;
                     case ".level": await LevelAsync(stream, rest, channel, accountId); break;
                     case ".teleport": await TeleportAsync(stream, rest, channel, accountId); break;
@@ -218,6 +224,31 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             return true;
+        }
+
+        private static async Task ExperienceShareAsync(NetworkStream stream, string rest, bool guild,
+                                                       int channel, long accountId)
+        {
+            long character = GameState.CharacterId;
+            var member = guild ? GuildStore.MemberOf(character) : null;
+            if (guild && member == null)
+            {
+                await NotifyAsync(stream, T("guild.noguild"), channel, accountId);
+                return;
+            }
+            int percent = guild ? member!.ExperiencePercent : ExperienceSharing.MountPercent(character);
+            if (rest.Length > 0)
+            {
+                if (!int.TryParse(rest, out percent) || percent < 0 || percent > 90)
+                {
+                    await NotifyAsync(stream, T(guild ? "usage.guildxp" : "usage.mountxp"), channel, accountId);
+                    return;
+                }
+                bool saved = guild ? await GuildHandler.SetExperienceShareAsync(character, character, percent)
+                                   : ExperienceSharing.SetMountPercent(character, percent);
+                if (!saved) return;
+            }
+            await NotifyAsync(stream, T(guild ? "xp.guildshare" : "xp.mountshare", percent), channel, accountId);
         }
 
         // ─── .kamas ─────────────────────────────────────────────────────────────

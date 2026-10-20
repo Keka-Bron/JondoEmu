@@ -508,6 +508,13 @@ namespace Jondo.Unity.Server.Handlers
         {
             byte[] jgv = ConnectionProtocol.ReadPayload(frame, Op.Jgv);
             if (jgv == null) return;
+            // The legacy contribution field is independent of rank. A contribution-only request
+            // must never turn an absent rank into rank zero.
+            var fields = ProtoMessage.Parse(jgv).Fields;
+            bool hasRank = fields.Exists(f => f.FieldNumber == 4 && f.WireType == 0);
+            if (!hasRank || fields.Exists(f => f.FieldNumber == 3 && f.WireType == 0))
+                await SetExperienceShareAsync(SessionContext.State.CharacterId, FieldValue(jgv, 2), (int)FieldValue(jgv, 3));
+            if (!hasRank) return;
             string error = await SetMemberRankAsync(SessionContext.State.CharacterId, FieldValue(jgv, 2), (int)FieldValue(jgv, 4));
             if (error == "guild.rank.toosoon")
             {
@@ -591,6 +598,30 @@ namespace Jondo.Unity.Server.Handlers
                                                 character.Breed, Achievements.PointsOf(member.CharacterId),
                                                 GuildStore.ContributedBy(member.CharacterId),
                                                 SessionRegistry.FindByCharacter(member.CharacterId) != null);
+
+        /// <summary>A member sets his own contribution; the leader can set that of another member.</summary>
+        public static async Task<bool> SetExperienceShareAsync(long actor, long target, int percent)
+        {
+            if (percent < 0 || percent > 90) return false;
+            var own = GuildStore.MemberOf(actor);
+            var member = GuildStore.MemberOf(target);
+            if (own == null || member == null || own.GuildId != member.GuildId) return false;
+            if (actor != target && own.Rank != GuildStore.RankLeader) return false;
+            if (!GuildStore.SetExperiencePercent(target, percent)) return false;
+            await ExperienceChangedAsync(own.GuildId, target);
+            return true;
+        }
+
+        internal static async Task ExperienceChangedAsync(long guildId, long characterId)
+        {
+            var guild = GuildStore.GuildOf(characterId);
+            if (guild == null || guild.Id != guildId) return;
+            await TellEveryoneAsync(guild, HeaderFrame(guild));
+            var member = GuildStore.MemberOf(characterId);
+            var character = DatabaseManager.GetCharacterById(characterId);
+            if (member != null && character != null)
+                await TellEveryoneAsync(guild, ConnectionProtocol.Push(Op.Jgz, MemberUpdated(member, character)));
+        }
 
         /// <summary>
         /// A line said on the guild channel (2) by a member: to the other members connected. It went

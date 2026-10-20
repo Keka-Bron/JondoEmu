@@ -14,6 +14,10 @@ namespace Jondo.Unity.Server.Handlers
     {
         private static readonly IReadOnlyDictionary<string, string> Es = new Dictionary<string, string>
         {
+            ["usage.guildxp"] = "Uso: .xpguilde [porcentaje de 0 a 90] — sin argumento muestra tu donación.",
+            ["usage.mountxp"] = "Uso: .xpmonture [porcentaje de 0 a 90] — sin argumento muestra tu donación.",
+            ["xp.guildshare"] = "Donación de experiencia al gremio: {0}% de lo restante después de la montura.",
+            ["xp.mountshare"] = "Donación de experiencia a la montura: {0}% al montarla.",
             ["usage.kamas"] = "Uso: .kamas <cantidad> — por ejemplo .kamas 10000 (con menos delante, resta)",
             ["usage.level"] = "Uso: .level <nivel> — por ejemplo .level 200",
             ["usage.teleport"] = "Uso: .teleport [x,y] | .teleport <id de mapa> — por ejemplo .teleport [-1,0]",
@@ -136,6 +140,10 @@ namespace Jondo.Unity.Server.Handlers
 
         private static readonly IReadOnlyDictionary<string, string> En = new Dictionary<string, string>
         {
+            ["usage.guildxp"] = "Usage: .xpguilde [percentage from 0 to 90] — without an argument, shows your donation.",
+            ["usage.mountxp"] = "Usage: .xpmonture [percentage from 0 to 90] — without an argument, shows your donation.",
+            ["xp.guildshare"] = "Guild XP donation: {0}% of what remains after the mount donation.",
+            ["xp.mountshare"] = "Mount XP donation: {0}% while riding.",
             ["usage.kamas"] = "Usage: .kamas <amount> — for example .kamas 10000 (a negative amount removes kamas)",
             ["usage.level"] = "Usage: .level <level> — for example .level 200",
             ["usage.teleport"] = "Usage: .teleport [x,y] | .teleport <map id> — for example .teleport [-1,0]",
@@ -258,6 +266,10 @@ namespace Jondo.Unity.Server.Handlers
 
         private static readonly IReadOnlyDictionary<string, string> Fr = new Dictionary<string, string>
         {
+            ["usage.guildxp"] = "Utilisation : .xpguilde [pourcentage de 0 à 90] — sans argument, affiche le don actuel.",
+            ["usage.mountxp"] = "Utilisation : .xpmonture [pourcentage de 0 à 90] — sans argument, affiche le don actuel.",
+            ["xp.guildshare"] = "Don d'expérience à la guilde : {0}% de ce qui reste après le don à la monture.",
+            ["xp.mountshare"] = "Don d'expérience à la monture : {0}% lorsqu'elle est chevauchée.",
             ["usage.kamas"] = "Utilisation : .kamas <quantité> — exemple : .kamas 10000 (une valeur négative en retire)",
             ["usage.level"] = "Utilisation : .level <niveau> — exemple : .level 200",
             ["usage.teleport"] = "Utilisation : .teleport [x,y] | .teleport <id de carte> — exemple : .teleport [-1,0]",
