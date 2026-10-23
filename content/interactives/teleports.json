@@ -6,6 +6,9 @@
     "  { map, element, cell, gfx, type, skill, toMap, toCell }   declare or re-point one",
     "  { map, element, remove: true }                            take one out",
     "",
+    "With npc set, element identifies an actor-owned route referenced by a dialogue's passage.",
+    "The actor uses its NPC template's actions; type and skill are not emitted as an interactive.",
+    "",
     "THE ASTRAL PLANE. The four arches of the Well of Dreams map and the way back from",
     "Draconiros' room. They are not neighbours on the world grid - (0,0) and (1,-1) with",
     "nothing between them - so without these the room is placed and unreachable, which for a",
@@ -277,6 +280,17 @@
       "skill": 184,
       "toMap": 196084736,
       "toCell": 67
+    },
+    {
+      "map": 153880835,
+      "element": 806080,
+      "npc": 4398,
+      "cell": 430,
+      "gfx": 806080,
+      "type": -1,
+      "skill": 339,
+      "toMap": 192416776,
+      "toCell": 483
     }
   ]
 }

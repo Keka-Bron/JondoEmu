@@ -558,7 +558,7 @@ namespace Jondo.Unity.Server
             }
         }
 
-                        private static void AssertInteractiveRegistry()
+        internal static void AssertInteractiveRegistry()
         {
             var expected = new HashSet<(long MapId, int ElementId)>();
             foreach (long mapId in Managers.Interactives.MapIds)
@@ -591,6 +591,7 @@ namespace Jondo.Unity.Server
 
                 foreach (var teleport in Managers.TeleportManager.On(mapId))
                 {
+                    if (teleport.NpcId != 0) continue;
                     expected.Add((mapId, teleport.ElementId));
                     if (Managers.Houses.TryGetDoor(mapId, teleport.ElementId, out _))
                         throw new InvalidOperationException(
@@ -632,11 +633,36 @@ namespace Jondo.Unity.Server
                     expected.Add((interior, exit.ElementId));
             }
 
-            // Giny's rule: every passage can be resolved as a USE114 element and by its cell.
+            // Giny's rule: every interactive passage resolves by its element and by its cell.
             // The second way covers the suns and floor exits that end with jrw/jqi without an iwo,
             // and the index also spots two routes placed by mistake on the same cell.
             foreach (var teleport in Managers.TeleportManager.All)
             {
+                // Actor-owned passages (Incarnam's portal) run through a dialogue. Their route
+                // key is neither an f11 element nor a floor trigger; check the actor and reply
+                // instead, without relaxing the interactive checks for other passages.
+                if (teleport.NpcId != 0)
+                {
+                    var dialogue = Managers.NpcDialogues.For(teleport.NpcId, teleport.SourceMapId);
+                    if (!Managers.Npcs.OnMap(teleport.SourceMapId).Any(n =>
+                            n.NpcId == teleport.NpcId && n.Cell == teleport.SourceCellId) ||
+                        Managers.Npcs.TemplateOf(teleport.NpcId)?.Actions.Contains(Managers.Npcs.Talk) != true ||
+                        dialogue == null || !dialogue.Lines.Any(line =>
+                            line.Choices.Any(choice => choice.TeleportPassage == teleport.ElementId)) ||
+                        Managers.InteractiveRegistry.OnMap(teleport.SourceMapId).Any(i =>
+                            i.Element.Id == teleport.ElementId) ||
+                        (Managers.TeleportManager.TryGetCellTrigger(
+                            teleport.SourceMapId, teleport.SourceCellId, out var actorCellRoute) &&
+                            ReferenceEquals(teleport, actorCellRoute)))
+                    {
+                        throw new InvalidOperationException(
+                            $"[RegressionGuard FAILED] Actor passage {teleport.SourceMapId}/" +
+                            $"{teleport.ElementId} must belong to a placed talking NPC with a passage reply, " +
+                            "outside the interactive and floor-trigger registries.");
+                    }
+                    continue;
+                }
+
                 if (!Managers.InteractiveRegistry.TryResolveUse(
                         teleport.SourceMapId, teleport.ElementId,
                         Managers.Interactives.SkillInstanceOf(teleport.ElementId),

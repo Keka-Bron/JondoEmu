@@ -1114,6 +1114,26 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // PortailIncarnam.pcapng: actor 4398, not Anemo, owns the crossing. Keep its destination
+            // and exact landing cell in teleports.json, without declaring a fake map interactive.
+            if (elegidaAhora != null && elegidaAhora.TeleportPassage != 0)
+            {
+                if (SessionContext.State.IsInFight || SessionContext.State.MapId != dondeHabla ||
+                    !TeleportManager.TryGetNpcPassage(dondeHabla, elegidaAhora.TeleportPassage,
+                        SessionContext.State.OpenDialogueNpcId, out var passage))
+                {
+                    Console.WriteLine($"[NPC] Passage {elegidaAhora.TeleportPassage} does not belong to this dialogue.");
+                    return;
+                }
+
+                CerrarConversacion();
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                        ConnectionProtocol.NpcDialogCloseReason)));
+                await TeleportHandler.ToMapAsync(stream, passage.DestinationMapId, passage.DestinationCellId);
+                return;
+            }
+
             // Does this answer move the player? It goes BEFORE following the conversation because an
             // answer that teleports ends it: in the capture the server sends the kld and right after
             // the jru, without another sentence in between.
