@@ -88,6 +88,9 @@ namespace Jondo.Unity.World.Content
         /// </remarks>
         public long TeleportsTo { get; init; }
 
+        /// <summary>A passage key in interactives/teleports.json, owned by this dialogue's NPC on this map.</summary>
+        public int TeleportPassage { get; init; }
+
         /// <summary>
         /// The numbers this reply carries inside its own message, for the client to read into
         /// its text. Empty for almost every reply.
@@ -426,6 +429,7 @@ namespace Jondo.Unity.World.Content
                             BuysCount = (int)Math.Max(1, Number(choice, "buyCount")),
                             BuysPrice = Number(choice, "buyPrice"),
                             TeleportsTo = Number(choice, "teleport"),
+                            TeleportPassage = (int)Number(choice, "passage"),
                             Parameters = Numbers(choice, "params"),
                             DreamPointsPercent = (int)Number(choice, "dreamPointsPercent"),
                             DreamFavor = choice.TryGetProperty("dreamFavor", out var favor)
@@ -532,6 +536,8 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.TeleportsTo != 0)
                                 writer.WriteNumber("teleport", choice.TeleportsTo);
+                            if (choice.TeleportPassage != 0)
+                                writer.WriteNumber("passage", choice.TeleportPassage);
                             if (choice.DreamPointsPercent != 0)
                                 writer.WriteNumber("dreamPointsPercent", choice.DreamPointsPercent);
                             if (choice.DreamFavor) writer.WriteBoolean("dreamFavor", true);

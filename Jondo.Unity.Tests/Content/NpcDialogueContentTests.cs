@@ -38,6 +38,17 @@ namespace Jondo.Unity.Tests.Content
         private static NpcDialogue Tree(int npc, long opening, params DialogueLine[] lines)
             => new NpcDialogue { NpcId = npc, MapId = 0, Opening = opening, Lines = lines };
 
+        [Fact]
+        public void A_passage_reference_survives_saving_the_dialogue()
+        {
+            NpcDialogueContent.Save(_path, new[]
+            {
+                Tree(4398, 30638, Line(30638, new DialogueChoice { Reply = 36977, TeleportPassage = 806080 })),
+            });
+            var tree = NpcDialogueContent.For(NpcDialogueContent.Load(_path), 4398, 0);
+            Assert.Equal(806080, tree!.Line(30638)!.Choice(36977)!.TeleportPassage);
+        }
+
         // ─── Round trip ───────────────────────────────────────────────────────────
 
         [Fact]

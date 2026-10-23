@@ -488,6 +488,7 @@ namespace Jondo.Unity.Server.Managers
             // staircase or a door. All are declared alike and resolved by their ElementId.
             foreach (var route in TeleportManager.All)
             {
+                if (route.NpcId != 0) continue;
                 Declared(route.SourceMapId, new Interactives.Element(route.ElementId, route.SourceCellId, route.GfxId),
                          route.InteractiveType).AddNamed(InteractiveActionKind.Teleport, route.SkillId, route.SkillNameId);
             }

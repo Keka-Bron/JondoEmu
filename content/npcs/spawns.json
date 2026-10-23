@@ -51,6 +51,13 @@
   ],
   "spawns": [
     {
+      "map": 153880835,
+      "npc": 4398,
+      "cell": 430,
+      "orientation": 3,
+      "why": "PortailIncarnam.pcapng (official 3.7.12.12), frames 22 and 169: Portail vers Astrub, actor -20001, template 4398, look {4892}, cell 430, facing 3. The same template and look already exist in the 3.6 client. This is the portal's clickable actor, separate from Anemo and the map's decorative sprites."
+    },
+    {
       "map": 128452097,
       "npc": 2345,
       "cell": 305,

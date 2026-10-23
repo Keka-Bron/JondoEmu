@@ -82,7 +82,20 @@ it checks the minimum level, looks for the key in the bag —its own key first, 
 and teleports to the first room. 53 of the 187 entrances already have a guardian placed, and
 the names give it away: «Guawdia wabbit», «Guardián koalak», «Discípulo de Ugah».
 
-**Moving on.** Winning a fight in a room moves to the next one. In the last one, to the exit.
+**Moving on.** Winning a fight in a room moves to the next one. In the last one, to the exit,
+except for Kardorim's post-boss room described below.
+
+**Kardorim (23 October 2026).** Victory in his boss room `152834048` loads the post-boss
+room `152835072` on cell **382**, before the fight's return-map message is sent. This
+room is not added to `DungeonRooms`: it has no fight group and is not another boss room.
+The catalogue's exterior exit stays **`153881600`**. Talking to Kardorim (NPC **2936**)
+there and choosing **"Quitter la crypte de Kardorim"** closes the conversation, then
+loads that exterior map. All four exit reply ids declared by his template are handled:
+`24994`, `24997`, `25000`, `25001` (client text ids `555709`–`555712`). His other quest
+and Milimilou replies keep their existing behaviour. The map panel's leave option also
+recognises this post-boss room. Other dungeons retain their existing victory routes
+and default arrival cell. `KardorimExitTests` checks the victory's map/cell and load
+message, the NPC's exit replies, the panel exit and unchanged routes.
 
 **The groups.** Each room has ONE group of eight, built at startup from the monsters belonging
 to the room's subarea (`Subareas.Monsters`, without the dungeon's bosses), and the fight takes the

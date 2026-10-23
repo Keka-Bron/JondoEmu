@@ -39,6 +39,20 @@ namespace Jondo.Unity.Tests.Content
             };
 
         [Fact]
+        public void An_actor_owned_passage_keeps_its_owner_when_saved()
+        {
+            TeleportContent.Save(_path, new[] { new Passage
+            {
+                SourceMapId = 153880835, ElementId = 806080, NpcId = 4398,
+                SourceCell = 430, DestinationMapId = 192416776, DestinationCell = 483,
+            } }, Array.Empty<PassageKey>());
+
+            Assert.True(TeleportContent.Load(_path).TryGet(new PassageKey(153880835, 806080), out var row));
+            Assert.Equal(4398, row.Value.NpcId);
+            Assert.Equal(483, row.Value.DestinationCell);
+        }
+
+        [Fact]
         public void A_passage_survives_a_round_trip()
         {
             TeleportContent.Save(_path, new[] { A() }, Array.Empty<PassageKey>());

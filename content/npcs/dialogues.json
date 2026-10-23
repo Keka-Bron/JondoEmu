@@ -40,6 +40,22 @@
     "  endsMutation  the reply takes the player's mutation away after its teleport."
   ],
   "dialogues": [
+    {
+      "npc": 4398,
+      "map": 153880835,
+      "opening": 30637,
+      "lines": [
+        {
+          "message": 30637,
+          "choices": [{ "reply": 36979, "next": 30638 }]
+        },
+        {
+          "message": 30638,
+          "choices": [{ "reply": 36977, "passage": 806080 }, { "reply": 36978 }]
+        }
+      ],
+      "why": "PortailIncarnam.pcapng, frames 106-125: click portal actor -20001 (template 4398); question 30637, reply 36979; question 30638, reply 36977 closes the dialogue and loads Astrub 192416776. The destination cell remains configured in interactives/teleports.json."
+    },
   {"npc": 2345, "map": 0, "opening": 59923, "lines": [{"message": 59923, "choices": [{"reply": 82197, "startsQuest": 2539, "next": 59925}, {"reply": 82220, "startsQuest": 2538, "next": 59937}, {"reply": 82222, "startsQuest": 2540, "next": 59938}, {"reply": 82224, "startsQuest": 2541, "next": 59939}, {"reply": 82226, "startsQuest": 2542, "next": 59940}, {"reply": 82228, "startsQuest": 2543, "next": 59941}, {"reply": 82203, "next": 59928}, {"reply": 82212, "next": 59927}, {"reply": 82206, "next": 59930}, {"reply": 82207, "next": 59931}, {"reply": 82199}]}, {"message": 59925, "choices": [{"reply": 82196}]}, {"message": 59937, "choices": [{"reply": 82219}]}, {"message": 59938, "choices": [{"reply": 82221}]}, {"message": 59939, "choices": [{"reply": 82223}]}, {"message": 59940, "choices": [{"reply": 82225}]}, {"message": 59941, "choices": [{"reply": 82227}]}, {"message": 59928, "choices": [{"reply": 82201, "next": 59929}, {"reply": 82205}]}, {"message": 59927, "choices": [{"reply": 82209, "next": 59929}, {"reply": 82210}]}, {"message": 59929, "choices": [{"reply": 82200}, {"reply": 82202}]}, {"message": 59930, "choices": [{"reply": 82216}]}, {"message": 59931, "choices": [{"reply": 82218}]}], "_byHand": true},
     {
       "npc": 4355,
