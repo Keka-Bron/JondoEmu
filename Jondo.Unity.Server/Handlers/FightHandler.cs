@@ -9787,8 +9787,8 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            // Was the fight inside a dungeon? Then winning moves: to the next room, or out if it
-            // was the last. It is decided HERE and not after this is over, because the jru below
+            // Was the fight inside a dungeon? Winning moves to the next room, its post-boss room,
+            // or outside. It is decided HERE and not after this is over, because the jru below
             // already names a map and the client answers that one: a later teleport would be eaten
             // by the kkr that comes back.
             //
@@ -9797,14 +9797,14 @@ namespace Jondo.Unity.Server.Handlers
             // map and the server believing it is on another.
             if (alliesAlive && fight.Reglas.AvanzaDeSala)
             {
-                long enLaMazmorra = DungeonHandler.AfterAWinIn(back);
+                var (enLaMazmorra, casillaDeLlegada) = DungeonHandler.AfterAWinIn(back);
                 if (enLaMazmorra != 0 && enLaMazmorra != back &&
                     MapManager.GetMapInfo(enLaMazmorra) != null)
                 {
                     back = enLaMazmorra;
                     Network.SessionContext.State.MapId = enLaMazmorra;
                     Network.SessionContext.State.CellId =
-                        MapManager.GetNearestWalkableCell(enLaMazmorra, TeleportHandler.MapCentre);
+                        MapManager.GetNearestWalkableCell(enLaMazmorra, casillaDeLlegada);
                     DatabaseManager.SaveCurrentCharacter();
                 }
             }

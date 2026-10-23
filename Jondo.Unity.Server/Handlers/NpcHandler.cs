@@ -985,6 +985,21 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // Kardorim's post-boss room: only his explicit exit replies leave the dungeon.
+            var dialogueState = SessionContext.State;
+            long dungeonExit = !dialogueState.IsInFight && dialogueState.OpenDialogueMapId == dialogueState.MapId
+                ? DungeonHandler.ExitForReply(dialogueState.OpenDialogueNpcId, dialogueState.MapId, reply)
+                : 0;
+            if (dungeonExit != 0)
+            {
+                CerrarConversacion();
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                        ConnectionProtocol.NpcDialogCloseReason)));
+                await TeleportHandler.ToMapAsync(stream, dungeonExit);
+                return;
+            }
+
             // Does the sentence he is on hand out a quest? It is checked BEFORE going on, because
             // going on changes OpenDialogueMessage, and before CerrarConversacion, which sets it to zero.
             //
