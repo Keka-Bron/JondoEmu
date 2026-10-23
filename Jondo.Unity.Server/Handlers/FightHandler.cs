@@ -6328,6 +6328,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             var anunciados = new HashSet<(int, int, long)>();
             var forgelanceRolls = new Dictionary<Managers.SpellEffect, int>();
+            bool forgelanceEffects = Managers.ForgelanceCombat.IsActor(fight, quienLanza);
 
             // Whoever this cast has moved, so that his ground is stepped on once they are all
             // in place. Not during the walk: a glyph can move whoever steps on it again,
@@ -6336,6 +6337,15 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (var c in consecuencias)
             {
+                // Forgelance rows are prepared before their damage is applied. A preceding
+                // lethal hit invalidates later rows on that victim: its client sprite is gone.
+                // Remove a prepared buff too; death hooks targeting living fighters still run.
+                if (forgelanceEffects && c.Sobre is { IsAlive: false }
+                    && !c.ForgelanceCast && c.Revive == 0)
+                {
+                    if (c.Buff != null) c.Sobre.Buffs.QuitarFila(c.Buff);
+                    continue;
+                }
                 if (c.ForgelanceCast)
                 {
                     await AnnounceForgelanceChildAsync(fight, c);
@@ -7103,12 +7113,13 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             foreach (var cambiado in vidasCambiadas.Values)
-                await RefrescarLaVidaAsync(stream, fight, cambiado, quienLanza);
+                if (!forgelanceEffects || cambiado.IsAlive)
+                    await RefrescarLaVidaAsync(stream, fight, cambiado, quienLanza);
 
             foreach (var (quien, caracteristica) in fichas)
             {
                 var ficha = fight.Buscar(quien);
-                if (ficha == null) continue;
+                if (ficha == null || (forgelanceEffects && !ficha.IsAlive)) continue;
                 var refresco = Refresco(ficha, caracteristica, fight.RoundNumber, fight.CurrentFighter == ficha);
 
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
@@ -7119,6 +7130,7 @@ namespace Jondo.Unity.Server.Handlers
                                                            Network.FightProtocol.SheetSequence)));
             }
 
+            if (forgelanceEffects) consecuencias.RemoveAll(c => c.Sobre is { IsAlive: false });
             await AnunciarElAlcanceAsync(stream, fight, consecuencias);
 
             await RedibujarLasBombasAsync(fight, tamanosAntes);

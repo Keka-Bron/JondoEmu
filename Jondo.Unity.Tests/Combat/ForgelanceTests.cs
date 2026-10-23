@@ -209,6 +209,96 @@ namespace Jondo.Unity.Tests.Combat
             Assert.InRange(1000 - enemy.CurrentHP, min, max);
         }
 
+        [Theory]
+        [InlineData(23393, true)]
+        [InlineData(23393, false)]
+        [InlineData(23754, true)]
+        [InlineData(23754, false)]
+        public async Task A_lethal_hit_drops_the_remaining_target_effects_but_survivors_still_move(int spell, bool lethal)
+        {
+            var owner = Person(); owner.Buffs.PonerEstado(3360);
+            var enemy = Person(-1, 0, 327); enemy.IsMonster = true; enemy.TeamId = 1;
+            enemy.CurrentHP = lethal ? 1 : 1000;
+            var fight = Board(owner, enemy);
+            await using var wire = await PortalTests.Wire.Open(Player);
+
+            // Cell 314 is free between caster 300 and target 327, so Trident can pull.
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, spell, 1, enemy,
+                EffectEngine.AlLanzar, 327, orderedForgelance: true);
+            var frames = await wire.Drain();
+            var moves = frames.Where(f => f.Op == "jwe" && Value(f.Payload, 14) == 5
+                && Value(Sub(f.Payload, 38), 2) == enemy.Id).ToList();
+
+            Assert.Equal(!lethal, enemy.IsAlive);
+            if (!lethal)
+            {
+                Assert.Single(moves);
+                Assert.DoesNotContain(frames, f => f.Op == "jwe" && Value(f.Payload, 14) == 103);
+                return;
+            }
+
+            Assert.Empty(moves);
+            int death = frames.FindIndex(f => f.Op == "jwe" && Value(f.Payload, 14) == 103
+                && Value(Sub(f.Payload, 4), 1) == enemy.Id);
+            Assert.True(death >= 0);
+            Assert.DoesNotContain(frames.Skip(death + 1), f => f.Op == "jxm"
+                && Value(Sub(Sub(f.Payload, 1), 1), 2) == enemy.Id);
+            if (spell == 23754)
+                Assert.False(enemy.Buffs.TieneEstado(6032)); // Estoc's state follows its damage.
+        }
+
+        [Fact]
+        public async Task An_area_kill_does_not_drop_the_surviving_targets_effects()
+        {
+            var owner = Person(); owner.Buffs.PonerEstado(3360);
+            var dead = Person(-1, 0, 328); dead.IsMonster = true; dead.TeamId = 1; dead.CurrentHP = 1;
+            var alive = Person(-2, 0, 329); alive.IsMonster = true; alive.TeamId = 1;
+            var fight = Board(owner, dead, alive);
+            var effects = new[]
+            {
+                new SpellEffect { EffectId = 96, DiceNum = 10, DiceSide = 10, TargetMask = "A", Forma = 'C', Tamano = 2 },
+                new SpellEffect { EffectId = 950, Value = 6032, Duration = 1, TargetMask = "A", Forma = 'C', Tamano = 2 },
+                new SpellEffect { EffectId = 5, DiceNum = 1, Value = 1, TargetMask = "A", Forma = 'C', Tamano = 2 },
+            };
+            await using var wire = await PortalTests.Wire.Open(Player);
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 23754, 1, dead,
+                EffectEngine.AlLanzar, 328, tirada: effects, orderedForgelance: true);
+            var frames = await wire.Drain();
+
+            Assert.False(dead.IsAlive);
+            Assert.True(alive.IsAlive);
+            Assert.False(dead.Buffs.TieneEstado(6032));
+            Assert.True(alive.Buffs.TieneEstado(6032));
+            var moved = frames.Where(f => f.Op == "jwe" && Value(f.Payload, 14) == 5)
+                .Select(f => Value(Sub(f.Payload, 38), 2)).ToList();
+            Assert.DoesNotContain(dead.Id, moved);
+            Assert.Contains(alive.Id, moved);
+        }
+
+        [Fact]
+        public async Task A_child_cast_keeps_its_cell_without_naming_a_target_killed_by_the_parent()
+        {
+            var owner = Person(); owner.Buffs.PonerEstado(3360);
+            var enemy = Person(-1, 0, 328); enemy.IsMonster = true; enemy.TeamId = 1; enemy.CurrentHP = 1;
+            var fight = Board(owner, enemy);
+            var effects = new[]
+            {
+                new SpellEffect { EffectId = 96, DiceNum = 10, DiceSide = 10, TargetMask = "A" },
+                new SpellEffect { EffectId = 2960, DiceNum = 30711, DiceSide = 1, TargetMask = "A" },
+            };
+            await using var wire = await PortalTests.Wire.Open(Player);
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 23736, 1, enemy,
+                EffectEngine.AlLanzar, 328, tirada: effects, orderedForgelance: true);
+            var frames = await wire.Drain();
+
+            Assert.False(enemy.IsAlive);
+            var cast = Assert.Single(frames, f => f.Op == "jwe" && Value(f.Payload, 14) == 300);
+            var detail = Sub(cast.Payload, 7);
+            Assert.Equal(30711, Value(Sub(detail, 7), 2));
+            Assert.Equal(328, Value(detail, 6));
+            Assert.DoesNotContain(ProtoMessage.Parse(detail).Fields, f => f.FieldNumber == 2);
+        }
+
         [Fact]
         public async Task Throwing_and_retrieving_own_lance_restore_the_armed_state_and_power()
         {
