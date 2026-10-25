@@ -17,11 +17,12 @@ namespace Jondo.Unity.Server.Handlers
             if (limits.LevelId <= 0) return;
             int cell = outcome.CeldaDelLanzamiento >= 0 ? outcome.CeldaDelLanzamiento
                 : outcome.Sobre?.CellId ?? caster.CellId;
+            var target = outcome.Sobre is { IsAlive: true } ? outcome.Sobre : null;
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 FightProtocol.BuildAction(caster.Id, FightProtocol.Cast,
-                    FightProtocol.CastAt(caster.Id, outcome.Sobre?.Id ?? 0, cell,
+                    FightProtocol.CastAt(caster.Id, target?.Id ?? 0, cell,
                         outcome.HechizoOrigen, limits.LevelId, critical: false,
-                        noTarget: outcome.Sobre == null, chained: true), FightProtocol.CastDetail)));
+                        noTarget: target == null, chained: true), FightProtocol.CastDetail)));
         }
 
         /// <summary>

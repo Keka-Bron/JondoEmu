@@ -1,6 +1,6 @@
 # Forgelance combat visuals and the Immortal Lance
 
-Updated 21 October 2026. Evidence: the 45 files under
+Updated 22 October 2026. Evidence: the 45 files under
 `SpellBySpellWrireshark-3-6-10-10/Forgelance/NonVariants` and `Variants`, supplied outside
 the repository. TCP streams were reassembled without missing segments or undecoded bytes.
 The low-level comparison covers 22 official casts of Trident de la mer, Effondrement,
@@ -59,6 +59,23 @@ bones lookup: abandoning that update left the client stuck on guard bones. The n
 Forgelance builder preserves all the other look fields and broadcasts the result to the fight.
 The on-foot character look is used so the lance skeleton is not applied to a mount.
 
+## Lethal hits and remaining target effects
+
+The ordered Forgelance pipeline prepares its outcomes before applying damage. A target
+that was alive during preparation can die before its remaining state or displacement
+outcomes are announced. Recheck the target's life for every outcome: discard later
+target effects, remove their prepared buff rows, and omit deferred life/stat/range
+refreshes for dead targets. Living targets and death hooks affecting the living owner
+continue normally, including retrieving the Immortal Lance. A child cast whose parent
+killed its target still announces its aimed cell, but no longer names the dead actor.
+
+The 22 October Kardorim-room report exposed this sequence in the preceding fight:
+at 14:31:46.409 monster -3 died to Estoc brulant, then at 14:31:46.410 Jondo still sent
+its displacement from 369 to 396. The client subsequently failed repeatedly in
+`EntityPhysics` / `EntityDisplay` while accessing an invalid `EntitySprite` transform.
+That packet order is a confirmed server defect; the log does not identify the invalid
+client entity, so the direct link to the rendering failure remains unconfirmed.
+
 ## Lance indicators and lifecycle
 
 The server sends state buffs; the client supplies the lance icon artwork. The disarmed
@@ -87,6 +104,12 @@ appearance round trips, broadcasts to both fighters, the three low-level marker 
 before a single damage line, Effondrement at an empty cell, diagonal proximity and icon
 removal, another player's lance, and the throw/retrieval lifecycle. Existing combat and
 protocol tests cover the unchanged paths of the other classes.
+
+Lethal and nonlethal Trident de la mer / Estoc brulant casts check that survivors still
+move, while a killed target receives no subsequent displacement or state buff. Estoc's
+prepared post-damage state is also removed from the dead fighter's server-side buffs.
+Mixed-area and child-cast tests also cover surviving targets and an aimed cell left empty
+by a lethal parent hit.
 
 Packet and state tests verify what is transmitted. The final artwork and animation playback
 are rendered by the Dofus client and should be checked in game after restarting the server.

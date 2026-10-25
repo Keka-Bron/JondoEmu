@@ -14,13 +14,18 @@ namespace Jondo.Unity.World.Content
     /// its own map data, so a passage can only hang off an element that is already standing there —
     /// 46,309 of them across 9,840 maps. Writing a passage on a cell with no element gives a door
     /// nobody can see or click.
+    /// An actor-owned passage sets <see cref="NpcId"/>: ElementId then only identifies the route
+    /// referenced by the actor's dialogue and is never declared as a map interactive.
     /// </remarks>
     public readonly struct Passage
     {
         public long SourceMapId { get; init; }
 
-        /// <summary>The element on the source map. It has to be one the map already has.</summary>
+        /// <summary>The native map element, or a route key when <see cref="NpcId"/> is set.</summary>
         public long ElementId { get; init; }
+
+        /// <summary>An actor that owns this passage, instead of a map interactive. Zero for normal passages.</summary>
+        public int NpcId { get; init; }
 
         public int SourceCell { get; init; }
 
@@ -114,6 +119,7 @@ namespace Jondo.Unity.World.Content
                     {
                         SourceMapId = map,
                         ElementId = element,
+                        NpcId = (int)Long(entry, "npc"),
                         SourceCell = (int)Long(entry, "cell"),
                         GfxId = (int)Long(entry, "gfx"),
                         InteractiveType = (int)Long(entry, "type"),
@@ -209,6 +215,7 @@ namespace Jondo.Unity.World.Content
                     writer.WriteStartObject();
                     writer.WriteNumber("map", passage.SourceMapId);
                     writer.WriteNumber("element", passage.ElementId);
+                    if (passage.NpcId != 0) writer.WriteNumber("npc", passage.NpcId);
                     writer.WriteNumber("cell", passage.SourceCell);
                     if (passage.GfxId != 0) writer.WriteNumber("gfx", passage.GfxId);
                     writer.WriteNumber("type", passage.InteractiveType);

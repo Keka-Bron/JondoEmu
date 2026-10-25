@@ -15,6 +15,7 @@ namespace Jondo.Unity.Server.Managers
     {
         public long SourceMapId { get; init; }
         public int ElementId { get; init; }
+        public int NpcId { get; init; }
         public int SourceCellId { get; init; }
         public int GfxId { get; init; }
         public int InteractiveType { get; init; }
@@ -98,6 +99,9 @@ namespace Jondo.Unity.Server.Managers
 
         public static bool TryGet(long mapId, int elementId, out InteractiveTeleport route)
             => _byElement.TryGetValue((mapId, elementId), out route!);
+
+        public static bool TryGetNpcPassage(long mapId, int routeId, int npcId, out InteractiveTeleport route)
+            => TryGet(mapId, routeId, out route) && npcId > 0 && route.NpcId == npcId;
 
         public static bool TryGetCellTrigger(long mapId, int cellId, out InteractiveTeleport route)
             => _byCell.TryGetValue((mapId, cellId), out route!);
@@ -471,6 +475,7 @@ namespace Jondo.Unity.Server.Managers
                 {
                     SourceMapId = passage.SourceMapId,
                     ElementId = elemento,
+                    NpcId = passage.NpcId,
                     SourceCellId = passage.SourceCell,
                     GfxId = passage.GfxId,
                     InteractiveType = passage.InteractiveType,
@@ -492,7 +497,9 @@ namespace Jondo.Unity.Server.Managers
 
                 // Another element on the same cell is left without its per-cell shortcut, and that is
                 // right: the one that rules is the one decided by hand.
-                byCell[(ruta.SourceMapId, ruta.SourceCellId)] = ruta;
+                // An actor's cell can be unwalkable: Incarnam's portal stands on 430. Only its
+                // dialogue may take the passage; it is neither an iwo target nor a floor trigger.
+                if (ruta.NpcId == 0) byCell[(ruta.SourceMapId, ruta.SourceCellId)] = ruta;
                 puestos++;
             }
 

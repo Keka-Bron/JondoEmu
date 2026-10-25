@@ -6328,6 +6328,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             var anunciados = new HashSet<(int, int, long)>();
             var forgelanceRolls = new Dictionary<Managers.SpellEffect, int>();
+            bool forgelanceEffects = Managers.ForgelanceCombat.IsActor(fight, quienLanza);
 
             // Whoever this cast has moved, so that his ground is stepped on once they are all
             // in place. Not during the walk: a glyph can move whoever steps on it again,
@@ -6336,6 +6337,15 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (var c in consecuencias)
             {
+                // Forgelance rows are prepared before their damage is applied. A preceding
+                // lethal hit invalidates later rows on that victim: its client sprite is gone.
+                // Remove a prepared buff too; death hooks targeting living fighters still run.
+                if (forgelanceEffects && c.Sobre is { IsAlive: false }
+                    && !c.ForgelanceCast && c.Revive == 0)
+                {
+                    if (c.Buff != null) c.Sobre.Buffs.QuitarFila(c.Buff);
+                    continue;
+                }
                 if (c.ForgelanceCast)
                 {
                     await AnnounceForgelanceChildAsync(fight, c);
@@ -7103,12 +7113,13 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             foreach (var cambiado in vidasCambiadas.Values)
-                await RefrescarLaVidaAsync(stream, fight, cambiado, quienLanza);
+                if (!forgelanceEffects || cambiado.IsAlive)
+                    await RefrescarLaVidaAsync(stream, fight, cambiado, quienLanza);
 
             foreach (var (quien, caracteristica) in fichas)
             {
                 var ficha = fight.Buscar(quien);
-                if (ficha == null) continue;
+                if (ficha == null || (forgelanceEffects && !ficha.IsAlive)) continue;
                 var refresco = Refresco(ficha, caracteristica, fight.RoundNumber, fight.CurrentFighter == ficha);
 
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
@@ -7119,6 +7130,7 @@ namespace Jondo.Unity.Server.Handlers
                                                            Network.FightProtocol.SheetSequence)));
             }
 
+            if (forgelanceEffects) consecuencias.RemoveAll(c => c.Sobre is { IsAlive: false });
             await AnunciarElAlcanceAsync(stream, fight, consecuencias);
 
             await RedibujarLasBombasAsync(fight, tamanosAntes);
@@ -9775,8 +9787,8 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            // Was the fight inside a dungeon? Then winning moves: to the next room, or out if it
-            // was the last. It is decided HERE and not after this is over, because the jru below
+            // Was the fight inside a dungeon? Winning moves to the next room, its post-boss room,
+            // or outside. It is decided HERE and not after this is over, because the jru below
             // already names a map and the client answers that one: a later teleport would be eaten
             // by the kkr that comes back.
             //
@@ -9785,14 +9797,14 @@ namespace Jondo.Unity.Server.Handlers
             // map and the server believing it is on another.
             if (alliesAlive && fight.Reglas.AvanzaDeSala)
             {
-                long enLaMazmorra = DungeonHandler.AfterAWinIn(back);
+                var (enLaMazmorra, casillaDeLlegada) = DungeonHandler.AfterAWinIn(back);
                 if (enLaMazmorra != 0 && enLaMazmorra != back &&
                     MapManager.GetMapInfo(enLaMazmorra) != null)
                 {
                     back = enLaMazmorra;
                     Network.SessionContext.State.MapId = enLaMazmorra;
                     Network.SessionContext.State.CellId =
-                        MapManager.GetNearestWalkableCell(enLaMazmorra, TeleportHandler.MapCentre);
+                        MapManager.GetNearestWalkableCell(enLaMazmorra, casillaDeLlegada);
                     DatabaseManager.SaveCurrentCharacter();
                 }
             }

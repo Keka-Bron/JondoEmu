@@ -210,6 +210,12 @@ namespace Jondo.Unity.Server.Handlers
                 var item = DatabaseManager.AddItemToInventory(characterId, resource.ItemId, cuantos);
                 bool pilaNueva = item.Quantity == cuantos;
 
+                // Full inventory refreshes (including workshops) read Equipment, while other
+                // handlers read the session inventory. Keep both in step with the stored total.
+                SessionContext.State.SetInventory(DatabaseManager.LoadInventory(characterId));
+                Equipment.Remove(item.Uid, int.MaxValue);
+                Equipment.Add(item.Uid, item.ItemId, item.Quantity, item.Position, item.RawEffects);
+
                 if (pilaNueva)
                 {
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

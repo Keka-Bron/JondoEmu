@@ -53,6 +53,10 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         public const int Keyring = 10207;
 
+        private const int KardorimDungeon = 90;
+        private const long KardorimBossRoom = 152834048;
+        private const long KardorimExitRoom = 152835072;
+
         /// <summary>"No tienes el nivel requerido." (You do not have the required level.)</summary>
         /// <remarks>
         /// This used to be <c>InfoMessages.JobLevelTooLow</c>, which is a different sentence: "No
@@ -215,7 +219,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Where a fight in a dungeon room should leave the winner: the next room, or the way out.
+        /// Where a fight in a dungeon room should leave the winner, including its arrival cell.
         /// </summary>
         /// <remarks>
         /// Answered rather than acted on, because the one safe place to move a player at the end
@@ -223,31 +227,50 @@ namespace Jondo.Unity.Server.Handlers
         /// A teleport issued after that returns is undone: the client answers the fight's own map
         /// message and the handler for that answer writes the old map back over this one.
         ///
-        /// Zero means "not in a dungeon, or not somewhere this should interfere with", and the
+        /// A zero map means "not in a dungeon, or not somewhere this should interfere with", and the
         /// fight goes on doing what it did before.
         /// </remarks>
-        public static long AfterAWinIn(long roomMapId)
+        public static (long Map, int Cell) AfterAWinIn(long roomMapId)
         {
             var dungeon = DungeonManager.OfRoom(roomMapId);
-            if (dungeon == null) return 0;
+            if (dungeon == null) return (0, TeleportHandler.MapCentre);
+
+            // The catalogue's exit is outside. Kardorim first leaves winners in the room
+            // where his NPC offers the actual way out; that room is not a combat room.
+            if (dungeon.Id == KardorimDungeon && roomMapId == KardorimBossRoom)
+                return (KardorimExitRoom, 382);
 
             long next = DungeonManager.NextRoom(dungeon, roomMapId);
-            if (next != 0) return next;
+            if (next != 0) return (next, TeleportHandler.MapCentre);
 
             // The last room. Out through the exit, which for most of them is the door they came
             // in by.
-            return DungeonManager.WayOut(dungeon);
+            return (DungeonManager.WayOut(dungeon), TeleportHandler.MapCentre);
+        }
+
+        /// <summary>The exit offered by Kardorim's NPC, separate from the boss's victory room.</summary>
+        internal static long ExitForReply(int npcId, long mapId, long reply)
+        {
+            // All four template replies say "Quitter la crypte de Kardorim" (text ids
+            // 555709..555712). His Milimilou and quest replies must keep their own behaviour.
+            if (npcId != 2936 || mapId != KardorimExitRoom ||
+                reply is not (24994 or 24997 or 25000 or 25001)) return 0;
+
+            var dungeon = DungeonManager.Get(KardorimDungeon);
+            return dungeon == null ? 0 : DungeonManager.WayOut(dungeon);
         }
 
         /// <summary>
         /// «Salir de la mazmorra», the map panel's option inside a dungeon (kjw, empty:
-        /// MapInfoUI.ExitDungeon): out through its exit, as after the boss. False, and nothing
-        /// done, when the map is no dungeon's room or the player is fighting.
+        /// MapInfoUI.ExitDungeon): out through its exterior exit. False, and nothing
+        /// done, when the map has no dungeon exit or the player is fighting.
         /// </summary>
         public static async Task<bool> LeaveAsync(NetworkStream stream)
         {
             if (SessionContext.State.IsInFight) return false;
             var dungeon = DungeonManager.OfRoom(SessionContext.State.MapId);
+            if (dungeon == null && SessionContext.State.MapId == KardorimExitRoom)
+                dungeon = DungeonManager.Get(KardorimDungeon);
             long exit = dungeon == null ? 0 : DungeonManager.WayOut(dungeon);
             if (exit == 0) return false;
             return await TeleportHandler.ToMapAsync(stream, exit) >= 0;
