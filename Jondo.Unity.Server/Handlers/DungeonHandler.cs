@@ -53,10 +53,6 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         public const int Keyring = 10207;
 
-        private const int KardorimDungeon = 90;
-        private const long KardorimBossRoom = 152834048;
-        private const long KardorimExitRoom = 152835072;
-
         /// <summary>"No tienes el nivel requerido." (You do not have the required level.)</summary>
         /// <remarks>
         /// This used to be <c>InfoMessages.JobLevelTooLow</c>, which is a different sentence: "No
@@ -235,10 +231,10 @@ namespace Jondo.Unity.Server.Handlers
             var dungeon = DungeonManager.OfRoom(roomMapId);
             if (dungeon == null) return (0, TeleportHandler.MapCentre);
 
-            // The catalogue's exit is outside. Kardorim first leaves winners in the room
-            // where his NPC offers the actual way out; that room is not a combat room.
-            if (dungeon.Id == KardorimDungeon && roomMapId == KardorimBossRoom)
-                return (KardorimExitRoom, 382);
+            // The catalogue's exit is outside. Some dungeons -- Kardorim's -- first leave their
+            // winners in a room of their own where an NPC offers the way out (DungeonExitRooms).
+            if (DungeonExitRooms.AfterBoss(roomMapId) is { } after && after.Dungeon == dungeon.Id)
+                return (after.MapId, after.Cell);
 
             long next = DungeonManager.NextRoom(dungeon, roomMapId);
             if (next != 0) return (next, TeleportHandler.MapCentre);
@@ -248,15 +244,17 @@ namespace Jondo.Unity.Server.Handlers
             return (DungeonManager.WayOut(dungeon), TeleportHandler.MapCentre);
         }
 
-        /// <summary>The exit offered by Kardorim's NPC, separate from the boss's victory room.</summary>
+        /// <summary>
+        /// The way out a post-boss room's NPC offers with one of its exit replies -- Kardorim's
+        /// four «Quitter la crypte de Kardorim» --; zero for any other NPC, room or reply, whose
+        /// own behaviour stays.
+        /// </summary>
         internal static long ExitForReply(int npcId, long mapId, long reply)
         {
-            // All four template replies say "Quitter la crypte de Kardorim" (text ids
-            // 555709..555712). His Milimilou and quest replies must keep their own behaviour.
-            if (npcId != 2936 || mapId != KardorimExitRoom ||
-                reply is not (24994 or 24997 or 25000 or 25001)) return 0;
+            var room = DungeonExitRooms.At(mapId);
+            if (room == null || room.Npc != npcId || !room.Replies.Contains(reply)) return 0;
 
-            var dungeon = DungeonManager.Get(KardorimDungeon);
+            var dungeon = DungeonManager.Get(room.Dungeon);
             return dungeon == null ? 0 : DungeonManager.WayOut(dungeon);
         }
 
@@ -269,8 +267,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (SessionContext.State.IsInFight) return false;
             var dungeon = DungeonManager.OfRoom(SessionContext.State.MapId);
-            if (dungeon == null && SessionContext.State.MapId == KardorimExitRoom)
-                dungeon = DungeonManager.Get(KardorimDungeon);
+            if (dungeon == null && DungeonExitRooms.At(SessionContext.State.MapId) is { } room)
+                dungeon = DungeonManager.Get(room.Dungeon);
             long exit = dungeon == null ? 0 : DungeonManager.WayOut(dungeon);
             if (exit == 0) return false;
             return await TeleportHandler.ToMapAsync(stream, exit) >= 0;

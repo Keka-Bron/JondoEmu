@@ -85,6 +85,11 @@ the names give it away: «Guawdia wabbit», «Guardián koalak», «Discípulo d
 **Moving on.** Winning a fight in a room moves to the next one. In the last one, to the exit,
 except for Kardorim's post-boss room described below.
 
+**Rooms after the boss (`content/world/dungeon_exits.json`).** A dungeon can leave its
+winners in a room of its own before the way out: one row per dungeon names the boss room,
+the post-boss room and its cell, the NPC there and his replies that leave. Kardorim's is
+the only one so far.
+
 **Kardorim (23 October 2026).** Victory in his boss room `152834048` loads the post-boss
 room `152835072` on cell **382**, before the fight's return-map message is sent. This
 room is not added to `DungeonRooms`: it has no fight group and is not another boss room.

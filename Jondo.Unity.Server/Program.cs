@@ -160,6 +160,7 @@ namespace Jondo.Unity.Server
             // Ankama's and does not change: it is read once and all the sessions share it.
             Managers.Quests.Load();
             Managers.Readables.Load();
+            Managers.DungeonExitRooms.Load();
             // After the quests: 259 achievements are earned by finishing one, and the catalogue is indexed
             // by quest when loaded.
             Managers.Achievements.Load();

@@ -1,0 +1,27 @@
+{
+  "_comment": [
+    "Dungeons whose boss room leaves the winners in a room of its own before the way out: a room",
+    "with no fight, where an NPC offers to leave. Winning the boss room loads that room on its",
+    "cell instead of the catalogue's exit, and leaving goes out through the dungeon's own exit",
+    "(DungeonManager.WayOut) -- from the NPC's exit replies or the map panel's «Salir de la",
+    "mazmorra».",
+    "",
+    "  dungeon   the dungeon's id",
+    "  bossRoom  the room whose win leads here",
+    "  room      the post-boss room, not one of the dungeon's fight rooms",
+    "  cell      where the winners stand in it",
+    "  npc       the NPC that offers the way out there",
+    "  replies   his replies that leave; his others keep their own behaviour"
+  ],
+  "exits": [
+    {
+      "dungeon": 90,
+      "bossRoom": 152834048,
+      "room": 152835072,
+      "cell": 382,
+      "npc": 2936,
+      "replies": [24994, 24997, 25000, 25001],
+      "why": "Kardorim's crypt (PR #75, 23 October 2026): the win in his room loads the post-boss room on cell 382; his four template replies «Quitter la crypte de Kardorim» (texts 555709-555712) leave; his quest and Milimilou replies do not."
+    }
+  ]
+}

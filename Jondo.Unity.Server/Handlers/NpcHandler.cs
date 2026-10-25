@@ -985,7 +985,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // Kardorim's post-boss room: only his explicit exit replies leave the dungeon.
+            // A post-boss room's NPC (DungeonExitRooms): only his exit replies leave the dungeon.
             var dialogueState = SessionContext.State;
             long dungeonExit = !dialogueState.IsInFight && dialogueState.OpenDialogueMapId == dialogueState.MapId
                 ? DungeonHandler.ExitForReply(dialogueState.OpenDialogueNpcId, dialogueState.MapId, reply)
