@@ -467,7 +467,12 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     var (characteristic, sign) = DatabaseManager.EffectMeta(effectId);
                     if (characteristic == statId && sign != 0) bonus += value * sign;
-                    else if (characteristic == 0 && effectId == legacyEffect) bonus += value;
+                    // Not a weapon's damage, which describes the weapon and moves nothing: effect 96,
+                    // the Hacha Jazo's «46 a 60 de daños de agua», shares its number with characteristic
+                    // 96, the shield, and the character started every fight behind 60 points of it.
+                    else if (characteristic == 0 && effectId == legacyEffect
+                             && DatabaseManager.EffectFamily(effectId).Category != DatabaseManager.WeaponDamageCategory)
+                        bonus += value;
                 }
             }
             bonus += GetSetBonus(statId);

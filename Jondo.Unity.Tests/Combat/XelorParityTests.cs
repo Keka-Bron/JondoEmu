@@ -17,10 +17,9 @@ namespace Jondo.Unity.Tests.Combat
     /// Xelor's that the sub-spell giving them checks («*e») as the cast began.
     /// </summary>
     /// <remarks>
-    /// Two known gaps, both on purpose: Arenas del Tiempo's bounce «desde la posición inicial de cada
-    /// objetivo» to the nearest entity is not played on the copy; and El Tiempo Vuela's teleport,
-    /// «en el siguiente turno», waits on the copy while the engine still plays it at once -- the
-    /// engine's own gap.
+    /// One known gap, on purpose: Arenas del Tiempo's bounce «desde la posición inicial de cada
+    /// objetivo» to the nearest entity is not played on the copy. El Tiempo Vuela's teleport, «en el
+    /// siguiente turno», waits on both now.
     /// </remarks>
     [Collection("MapManager")]
     public class XelorParityTests
@@ -66,8 +65,8 @@ namespace Jondo.Unity.Tests.Combat
                 .Select(f => $"{f!.Id}@{f.CellId}[{string.Join(",", f.Buffs.Estados.Where(s => s is 251 or 244 or 2328 or 3622).OrderBy(s => s))}]"))
                + $" AP+{w.Xelor.CurrentAP - 12 + given}";
 
-        /// <summary>Arenas del Tiempo (bounce) and El Tiempo Vuela (delayed teleport): see the remarks.</summary>
-        private static readonly HashSet<int> KnownGaps = new() { 13292, 13251 };
+        /// <summary>Arenas del Tiempo (bounce): see the remarks.</summary>
+        private static readonly HashSet<int> KnownGaps = new() { 13292 };
 
         [Fact]
         public void The_copy_of_the_fight_teleports_as_the_engine_does()

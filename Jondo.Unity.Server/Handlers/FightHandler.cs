@@ -2324,8 +2324,12 @@ namespace Jondo.Unity.Server.Handlers
                 ? DatabaseManager.GetEquippedWeaponAsSpell(caster.Id)
                 : null;
             if (arma == null) return LimitesDe(0, caster.Level);
+            // And its diagonal: the Hacha Jazo's 1 to 1 "en línea" and "en diagonal" takes in the four
+            // diagonal neighbours, which the client offers and the range check refused at two steps.
+            int flags = arma.CastInDiagonal ? Managers.SpellLevelFlags.CastInDiagonal : 0;
             return new LimitesDelHechizo(arma.APCost, 0, 1, arma.MaxCastPerTurn, 0, 0, 0,
-                                         arma.CriticalHitProbability, arma.MinRange, arma.MaxRange);
+                                         arma.CriticalHitProbability, arma.MinRange, arma.MaxRange,
+                                         Flags: flags);
         }
 
         /// <summary>The fight this character is in, or null. Anybody may ask, not only his session.</summary>
@@ -4138,20 +4142,27 @@ namespace Jondo.Unity.Server.Handlers
                 await HurtAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, quien,
                                 celdaApuntada: celda, tirada: tirada);
 
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
-                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
-                                                           Network.FightProtocol.GlyphSequence)));
-                if (!quien.IsAlive) return;
-
-                await AplicarEfectosAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado,
-                                          quien, Managers.EffectEngine.AlLanzar,
-                                          celdaApuntada: celda, tirada: tirada);
+                // And the rest of what it does INSIDE the same sequence, as the blows: in the
+                // captures every row a trap sets off -- its sub-casts, its rows, its pushes -- comes
+                // between the 306 and the sequence's end. Closed before them, Desincronización's
+                // three teleports went out loose, the client applied none and the fight hung.
+                if (quien.IsAlive)
+                {
+                    await AplicarEfectosAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado,
+                                              quien, Managers.EffectEngine.AlLanzar,
+                                              celdaApuntada: celda, tirada: tirada);
+                }
             }
             finally
             {
                 fight.CurrentDamageSource = antes;
                 fight.CurrentGlyphType = tipoAntes;
             }
+
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
+                                                       Network.FightProtocol.GlyphSequence)));
+            if (!quien.IsAlive) return;
 
             if (glifo.SeGastaAlDispararse) glifo.Gastado = true;
             if ((EsAuraDeMonstruo(glifo) || Managers.ForgelanceCombat.IsAura(fight, glifo)) && quien.IsAlive)

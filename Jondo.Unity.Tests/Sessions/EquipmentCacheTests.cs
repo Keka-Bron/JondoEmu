@@ -40,6 +40,23 @@ namespace Jondo.Unity.Tests.Sessions
         }
 
         [Fact]
+        public void A_weapon_s_damage_is_no_characteristic_of_the_same_number()
+        {
+            // Effect 96 is a weapon's water damage and characteristic 96 the shield: the Hacha Jazo's
+            // «46 a 60 de daños de agua» put its wearer behind 60 points of shield every fight.
+            var session = GameSession.SinSocket();
+            using (SessionContext.Push(session))
+            {
+                const long uid = 888_096;
+                Equipment.Add(uid, template: 14289, quantity: 1, 1, "[[96,0,46,60],[125,350,0,0]]");
+                Equipment.RememberWorn(uid, 1, Equipment.ByUid(uid)!.Effects);
+
+                Assert.Equal(0, Jondo.Unity.Server.Handlers.StatsHandler.GetEquipBonus(EffectEngine.ShieldCharacteristic));
+                Assert.Equal(350, Jondo.Unity.Server.Handlers.StatsHandler.GetEquipBonus(11));
+            }
+        }
+
+        [Fact]
         public void A_slot_in_the_bag_is_not_worn_however_low_its_number()
         {
             // The rule the three writers of this cache used to disagree on. Two of them called

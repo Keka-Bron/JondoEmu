@@ -4372,6 +4372,7 @@ namespace Jondo.Unity.Server
                 if (root.TryGetProperty("criticalHitBonus", out var cb)) data.CriticalHitBonus = cb.GetInt32();
                 if (root.TryGetProperty("maxCastPerTurn", out var pt)) data.MaxCastPerTurn = pt.GetInt32();
                 if (root.TryGetProperty("castInLine", out var line)) data.CastInLine = line.GetInt32() != 0;
+                if (root.TryGetProperty("castInDiagonal", out var diagonal)) data.CastInDiagonal = diagonal.GetInt32() != 0;
                 if (root.TryGetProperty("castTestLos", out var los)) data.NeedsLineOfSight = los.GetInt32() != 0;
             }
             catch { }
@@ -6058,6 +6059,9 @@ namespace Jondo.Unity.Server
 
         /// <summary>Can only be cast in a straight line.</summary>
         public bool CastInLine { get; set; }
+
+        /// <summary>Can be cast along a diagonal, each diagonal step counting one (a weapon's castInDiagonal).</summary>
+        public bool CastInDiagonal { get; set; }
 
         public int MaxCastPerTurn { get; set; }
 

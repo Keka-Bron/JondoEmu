@@ -311,6 +311,12 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>A waiting blow: its round has come and it is dealt now (see EffectEngine.IsDelayedBlow).</summary>
         public bool Hits => EffectEngine.EsDeDano(Waiting.EffectId);
+
+        /// <summary>
+        /// A waiting move back to a cell the target stood on: its round has come and the target
+        /// goes now -- El Tiempo Vuela's «a su posición anterior en el siguiente turno».
+        /// </summary>
+        public bool MovesBack => EffectEngine.EsVueltaAtras(Waiting.EffectId);
     }
 
     /// <summary>
@@ -1483,6 +1489,10 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«Teletransporta a la posición de inicio de turno».</summary>
         private const int AlInicioDelTurno = 1099;
 
+        /// <summary>Back to a cell the fighter stood on: before his last move, at his turn's start, at the fight's.</summary>
+        internal static bool EsVueltaAtras(int effectId)
+            => effectId is ALaPosicionAnterior or AlInicioDelTurno or AlInicioDelCombate;
+
         /// <summary>«Teletransporta a la posición de inicio de combate».</summary>
         private const int AlInicioDelCombate = 784;
 
@@ -1608,7 +1618,6 @@ namespace Jondo.Unity.Server.Managers
         // sets them off has just killed it.
         private const int OuginakRageManager = 13745;
         private const int OuginakRageRelay = 24128;
-        private const int OuginakBestialFormEnd = 13747;
 
         private static bool IsOuginakRageChain(SpellEffect efecto)
             => (efecto.EffectId == LanzarHechizo
@@ -1616,9 +1625,6 @@ namespace Jondo.Unity.Server.Managers
                 || efecto.EffectId == NearestTargetExecuteSpell)
                && (efecto.DiceNum == OuginakRageManager
                    || efecto.DiceNum == OuginakRageRelay);
-
-        private static bool IsDelayedOuginakBestialFormEnd(SpellEffect efecto)
-            => efecto.DiceNum == OuginakBestialFormEnd;
 
         private const int QuitarEfectosDeHechizo = EffectSupport.RemoveSpellEffects;
         private const int CambiarApariencia = EffectSupport.ChangeLook;
@@ -2930,14 +2936,15 @@ namespace Jondo.Unity.Server.Managers
                     // capture: "jwe 300 f3=-16" -- the bomb -- casts 20497 on cell 274, its own.
                     if (hecho.HechizoEncadenado != 0)
                     {
-                        // Delayed sub-casts wait like the rest of the family. Most cases in this
-                        // old path are monster spells (Conflicto Eterno's imp), but Ouginak Rage
-                        // also schedules 13747 one round later: it arms the turn-end removal only
-                        // for the following turn, so beast form survives the turn in which it was
-                        // gained and the whole next turn.
-                        if (efecto.Delay > 0 && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
-                            && (!PlayerSpells.Contains(spell)
-                                || IsDelayedOuginakBestialFormEnd(efecto)))
+                        // Delayed sub-casts wait like the rest of the family: monster spells
+                        // (Conflicto Eterno's imp), Ouginak Rage's 13747 one round later -- it arms
+                        // the turn-end removal only for the following turn, so beast form survives
+                        // the turn in which it was gained and the whole next turn --, and the
+                        // classes' too. El Tiempo Vuela's 13268, which takes its target back, waits
+                        // for the caster's next turn: in its capture the three casts of one turn
+                        // come out as three 13268 and their jwe 4 right behind his next jzc. Cast
+                        // at once, the target went back the moment the spell was cast.
+                        if (efecto.Delay > 0 && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase))
                         {
                             var quienLoLanzaraLuego = Familia.TryGetValue(efecto.EffectId, out var comoEsperara)
                                                       && comoEsperara.LanzaElCandidato ? sobre : caster;
@@ -4428,9 +4435,13 @@ namespace Jondo.Unity.Server.Managers
             // Back to a cell the fighter stood on: before his last move (1100), when his turn
             // began (1099), when the fight began (784). Kontatrás's Contratiempo sends its target
             // back to its turn-start cell once he is vulnerable ("A,*e56").
-            if (efecto.EffectId == ALaPosicionAnterior || efecto.EffectId == AlInicioDelTurno
-                || efecto.EffectId == AlInicioDelCombate)
+            if (EsVueltaAtras(efecto.EffectId))
             {
+                // With a delay it waits for its round, and the cell is the one he stands before
+                // when it comes: El Tiempo Vuela's 1100 carries a delay of one, «en el siguiente
+                // turno», and went off at the cast (FightHandler.ApplyDuePendingAsync plays it).
+                if (efecto.Delay > 0) return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda);
+
                 // Without a memory of where he was there is nothing to undo, and sending him anywhere
                 // would be worse than doing nothing.
                 int antes = efecto.EffectId switch
@@ -5362,6 +5373,7 @@ namespace Jondo.Unity.Server.Managers
 
             if (waiting.EffectId != MataAlObjetivo && waiting.EffectId != MarcadorDeGuion
                 && !EsDeLaFamiliaDeSublanzar(waiting.EffectId) && !EsDeDano(waiting.EffectId)
+                && !EsVueltaAtras(waiting.EffectId)
                 && target.IsAlive)
             {
                 live = target.Buffs.Poner(new Buff
