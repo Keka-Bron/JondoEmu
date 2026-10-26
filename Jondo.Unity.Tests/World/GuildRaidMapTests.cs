@@ -81,7 +81,7 @@ namespace Jondo.Unity.Tests.World
         /// <summary>
         /// A floor's map whose written groups were all beaten stays empty -- it was refilled with the
         /// subarea's monsters on the next look, and floor -1 could never be cleared -- and a floor's
-        /// groups are counted on its world maps only, not on its arenas, which the base also fills.
+        /// groups are counted on its world maps only, not on its arenas, which the base fills and the spawner vetoes.
         /// </summary>
         [Fact]
         public void A_cleared_raid_map_stays_cleared_and_arenas_do_not_count()
@@ -102,7 +102,8 @@ namespace Jondo.Unity.Tests.World
                 var maps = DatabaseManager.MapsOfSubArea(floor);
                 var (loaded, _) = GuildRaidManager.GroupsOn(floor);
                 Assert.Equal(maps.Where(m => !GuildRaidManager.IsArena(m)).Sum(MobSpawnManager.LoadedGroups), loaded);
-                Assert.True(loaded < maps.Sum(MobSpawnManager.LoadedGroups));
+                // And the arenas hold none: the base fills them, the spawner vetoes them.
+                Assert.Equal(0, maps.Where(GuildRaidManager.IsArena).Sum(MobSpawnManager.LoadedGroups));
             }
             finally
             {

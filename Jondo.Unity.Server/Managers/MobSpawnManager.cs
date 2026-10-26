@@ -79,6 +79,21 @@ namespace Jondo.Unity.Server.Managers
                 Program.LogDebug($"[MobSpawnManager] Could not read the zaaps: {ex.Message}");
             }
 
+            // And the arenas: a fight's board, no position and the arena flags (MapManager.IsArena).
+            // The seeding put 5,803 groups on 1,950 of them, and they came out around whoever was
+            // left standing on one. Read off the templates here: MapManager loads after the spawner.
+            try
+            {
+                Recoger("SELECT Id FROM MapTemplates WHERE json_extract(Data, '$.posX') = 0 " +
+                        "AND json_extract(Data, '$.posY') = 0 " +
+                        $"AND json_extract(Data, '$.m_flags') IN ({MapManager.ArenaFlags}, {MapManager.RaidArenaFlags});",
+                        vetados);
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[MobSpawnManager] Could not read the arenas: {ex.Message}");
+            }
+
             // And the dungeon rules over everything else.
             vetados.ExceptWith(salas);
             return vetados;
@@ -159,7 +174,7 @@ namespace Jondo.Unity.Server.Managers
         /// Whether this is one of the maps where no monster may be planted.
         /// </summary>
         /// <remarks>
-        /// Indoors, and on top of a zaap. 3,472 maps, and 7,214 groups from the database are
+        /// Indoors, on top of a zaap, and the arenas. 6,228 maps, and 13,017 groups from the database are
         /// dropped for them at boot. Public because the answer is worth being able to ask: the bug
         /// this exposes was that two different places had to agree about it and only one did.
         /// </remarks>
@@ -259,7 +274,7 @@ namespace Jondo.Unity.Server.Managers
                 {
                     long mapId = reader.GetInt64(0);
 
-                    // Not in a house, not in a bank, not in a shop, not on top of a zaap.
+                    // Not in a house, not in a bank, not in a shop, not on top of a zaap, not on an arena.
                     if (vetados.Contains(mapId)) { bajoTecho++; continue; }
 
                     long mobId = reader.GetInt64(1);
@@ -354,8 +369,8 @@ namespace Jondo.Unity.Server.Managers
             Console.WriteLine($"[MobSpawnManager] Loaded {count} persistent mobs across {_mapMobs.Count} maps from database.");
             if (bajoTecho > 0)
             {
-                Console.WriteLine($"[MobSpawnManager] {bajoTecho} groups discarded for being indoors " +
-                                  $"or on top of a zaap; {vetados.Count} maps vetoed.");
+                Console.WriteLine($"[MobSpawnManager] {bajoTecho} groups discarded for being indoors, " +
+                                  $"on top of a zaap or on an arena; {vetados.Count} maps vetoed.");
             }
             Console.WriteLine($"[MobSpawnManager] Group ids handed out down to {menor}; " +
                               "the ones spawned on the fly carry on below.");

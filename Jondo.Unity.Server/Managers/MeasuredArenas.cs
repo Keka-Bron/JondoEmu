@@ -31,6 +31,19 @@ namespace Jondo.Unity.Server.Managers
             return _arenas!.TryGetValue(roleplayMapId, out long arena) ? arena : 0;
         }
 
+        /// <summary>
+        /// The roleplay map a measured arena is fought from -- the lowest, should two share it --,
+        /// or zero: where to put back somebody left standing on it.
+        /// </summary>
+        public static long MapOf(long arenaMapId)
+        {
+            Load();
+            long found = 0;
+            foreach (var pair in _arenas!)
+                if (pair.Value == arenaMapId && (found == 0 || pair.Key < found)) found = pair.Key;
+            return found;
+        }
+
         /// <summary>How many pairs are written.</summary>
         public static int Count
         {

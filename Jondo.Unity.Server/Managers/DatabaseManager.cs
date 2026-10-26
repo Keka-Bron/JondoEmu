@@ -2549,6 +2549,24 @@ namespace Jondo.Unity.Server
                     Jondo.Unity.Server.Network.SessionContext.State.CellId = StartingCell;
                 }
 
+                // Nor is an arena a place to come back to: a sheet saved on one before the fight
+                // kept the map it was left from (PlaceToSave) stands on a board with no way out.
+                // Back to the map the arena is fought from when a capture measured it -- the
+                // Kanojedo's --, to his save point otherwise. A fight he goes back into puts him on
+                // its arena again (FightHandler.RejoinState).
+                if (MapManager.IsArena(Jondo.Unity.Server.Network.SessionContext.State.MapId))
+                {
+                    var sheet = Jondo.Unity.Server.Network.SessionContext.State;
+                    long arena = sheet.MapId;
+                    long from = Managers.MeasuredArenas.MapOf(arena);
+                    var (map, cell) = from != 0 && MapManager.GetMapInfo(from) != null
+                        ? (from, MapManager.GetNearestWalkableCell(from, Handlers.TeleportHandler.MapCentre))
+                        : Handlers.FightHandler.SavePointOf(characterId);
+                    sheet.MapId = map;
+                    sheet.CellId = cell;
+                    Console.WriteLine($"[SQLite] {sheet.CharacterName} was saved on arena {arena}; back to map {map}, cell {cell}.");
+                }
+
                 // And the cell, for the same reason and for a specific one: until it was fixed, the end
                 // of a fight stored the ARENA's cell as if it were the roleplay map's. In the Incarnam
                 // workshop that was 189 on a map whose 34 cells go from 244 to 414, that is a cell that
@@ -2622,10 +2640,30 @@ namespace Jondo.Unity.Server
             return false;
         }
 
+        /// <summary>
+        /// Where the sheet says a character stands: where he is, or -- while a fight keeps him on
+        /// its arena -- the map he left to fight, which the fight noted on entering it
+        /// (<see cref="SessionState.RoleplayMapId"/>).
+        /// </summary>
+        /// <remarks>
+        /// An arena is an instance with no way out. Whatever saved the character in the middle of
+        /// a fight -- a level, kamas, an achievement, the server closing -- wrote the arena, and if
+        /// the fight was not there to end the next login stood him on the Kanojedo's tactical map,
+        /// monsters around him and only the haven bag to leave by.
+        /// </remarks>
+        internal static (long Map, int Cell) PlaceToSave(SessionState state)
+        {
+            if (state.RoleplayMapId == 0 || state.MapId == state.RoleplayMapId)
+                return (state.MapId, state.CellId);
+            int cell = state.RoleplayCellId > 0 ? state.RoleplayCellId : Handlers.TeleportHandler.MapCentre;
+            return (state.RoleplayMapId, MapManager.GetNearestWalkableCell(state.RoleplayMapId, cell));
+        }
+
         public static void SaveCurrentCharacter()
         {
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
+            var (savedMap, savedCell) = PlaceToSave(Jondo.Unity.Server.Network.SessionContext.State);
 
             var command = connection.CreateCommand();
             command.CommandText = @"
@@ -2639,8 +2677,8 @@ namespace Jondo.Unity.Server
                 WHERE Id = $charId;
             ";
             command.Parameters.AddWithValue("$charId", Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
-            command.Parameters.AddWithValue("$mapId", Jondo.Unity.Server.Network.SessionContext.State.MapId);
-            command.Parameters.AddWithValue("$cellId", Jondo.Unity.Server.Network.SessionContext.State.CellId);
+            command.Parameters.AddWithValue("$mapId", savedMap);
+            command.Parameters.AddWithValue("$cellId", savedCell);
             command.Parameters.AddWithValue("$orientation", Jondo.Unity.Server.Network.SessionContext.State.Orientation);
             command.Parameters.AddWithValue("$pts", Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints);
             command.Parameters.AddWithValue("$vit", Jondo.Unity.Server.Network.SessionContext.State.StatVitality);

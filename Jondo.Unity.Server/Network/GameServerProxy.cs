@@ -154,50 +154,9 @@ namespace Jondo.Unity.Server.Network
             }
             finally
             {
-                if (session.IsInWorld)
-                {
-                    try
-                    {
-                        await SessionRegistry.RemoveFromMapAsync(
-                            session.MapId, session.CharacterId, session.Id);
-                    }
-                    catch { }
-
-                    // And out of the party, if he was in one: the ones who stay have to be told,
-                    // because otherwise they see a member who no longer exists.
-                    try
-                    {
-                        using (SessionContext.Push(session))
-                            await Handlers.PartyHandler.DisconnectedAsync(session.CharacterId);
-                    }
-                    catch { }
-
-                    // And his alliance sees him disconnected.
-                    try
-                    {
-                        await Handlers.AllianceHandler.DisconnectedAsync(session.CharacterId);
-                    }
-                    catch { }
-
-                    session.LeaveWorld();
-                }
-
-                if (session.State.CharacterId > 0)
-                {
-                    try
-                    {
-                        using (SessionContext.Push(session)) DatabaseManager.SaveCurrentCharacter();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[Game Server] Could not save session {session.Id}: {ex.Message}");
-                    }
-                }
-
-                try { Handlers.RecycleHandler.Abandon(session); } catch { }
-                Handlers.ConquestHandler.Forget(session.State.CharacterId);
-                SessionRegistry.Unregister(session);
-                await Handlers.FriendsHandler.LeftAsync(session.AccountId);
+                // The same way out as the Game Node's: off a fight's arena before saving, and out
+                // of whatever was left half done (SessionTeardown).
+                await SessionTeardown.LeaveAsync(session, "Game Server");
                 Console.WriteLine($"[Game Server] Session {session.Id} released.");
             }
         }

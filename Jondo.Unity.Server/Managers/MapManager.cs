@@ -291,6 +291,15 @@ namespace Jondo.Unity.Server
         /// <summary>A raid floor's arenas: <see cref="ArenaFlags"/> plus bit 17.</summary>
         public const int RaidArenaFlags = 69393661;
 
+        /// <summary>
+        /// Whether a map is a fight's arena: no position and the arena flags, a raid floor's
+        /// included. A tactical board with no way out, never a place to stand outside a fight.
+        /// </summary>
+        public static bool IsArena(long mapId) => Maps.TryGetValue(mapId, out var info) && IsArena(info);
+
+        private static bool IsArena(MapInfo info)
+            => info.PosX == 0 && info.PosY == 0 && (info.Flags == ArenaFlags || info.Flags == RaidArenaFlags);
+
         public static long ResolveArenaMapId(long roleplayMapId) => ResolveArenaMapId(roleplayMapId, Maps);
 
         /// <summary>The same, over a given set of maps: the tests' own, never the world's swapped under the others.</summary>
@@ -309,7 +318,7 @@ namespace Jondo.Unity.Server
             if (!maps.TryGetValue(roleplayMapId, out var info)) return roleplayMapId;
 
             // A map that is an arena already is fought on as it is.
-            if (info.PosX == 0 && info.PosY == 0 && (info.Flags == ArenaFlags || info.Flags == RaidArenaFlags))
+            if (IsArena(info))
                 return roleplayMapId;
 
             // A raid floor's own arenas: its maps without a position and with the arena flags plus

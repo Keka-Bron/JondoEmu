@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
@@ -71,6 +72,17 @@ namespace Jondo.Unity.Tests.World
         public void Dispose() { }
 
         [Fact]
+        public void An_arena_is_vetoed_and_the_map_it_is_fought_from_is_not()
+        {
+            if (!World()) return;
+
+            // The Kanojedo fights on 99222029; somebody left standing on it found monsters there.
+            Assert.True(MobSpawnManager.IsVetoed(99222029), "an arena is a fight's board, not a place for monsters");
+            Assert.True(MapManager.IsArena(99222029));
+            Assert.False(MapManager.IsArena(99090957));
+        }
+
+        [Fact]
         public void The_smithy_is_vetoed_and_the_map_outside_it_is_not()
         {
             if (!World()) return;
@@ -121,10 +133,11 @@ namespace Jondo.Unity.Tests.World
 
             // The other half of the deal, and worth an assertion of its own: a veto that swallowed
             // the whole world would pass every test above and leave a game with no monsters in it.
-            Assert.True(MobSpawnManager.VetoedCount > 3000,
-                        $"only {MobSpawnManager.VetoedCount} maps vetoed, some 3,472 were expected");
-            Assert.True(MobSpawnManager.VetoedCount < 6000,
-                        $"{MobSpawnManager.VetoedCount} vetoed maps is too much world without creatures");
+            // The arenas are vetoed too, but they are fights' boards and no world to walk.
+            int arenas = MapManager.Maps.Keys.Count(m => MapManager.IsArena(m) && MobSpawnManager.IsVetoed(m));
+            int world = MobSpawnManager.VetoedCount - arenas;
+            Assert.True(world > 3000, $"only {world} world maps vetoed, some 3,472 were expected");
+            Assert.True(world < 6000, $"{world} vetoed maps is too much world without creatures");
         }
 
         [Fact]

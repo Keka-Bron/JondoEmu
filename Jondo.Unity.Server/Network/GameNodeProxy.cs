@@ -103,62 +103,9 @@ namespace Jondo.Unity.Server.Network
                     }
                     finally
                     {
-                        if (sesion.IsInWorld)
-                        {
-                            try
-                            {
-                                await SessionRegistry.RemoveFromMapAsync(
-                                    sesion.MapId, sesion.CharacterId, sesion.Id);
-                            }
-                            catch { }
-                            sesion.LeaveWorld();
-                        }
-
-                        // A tax collector's items left in the recycling window go to the bag.
-                        try { RecycleHandler.Abandon(sesion); } catch { }
-                        ConquestHandler.Forget(sesion.State.CharacterId);
-
-                        // A commission half done ends for the one left behind too.
-                        try { await CommissionHandler.AbandonAsync(sesion); } catch { }
-                        try { await TradeHandler.AbandonAsync(sesion); } catch { }
-                        try { await ArtisanHandler.LeftAsync(sesion); } catch { }
-
-                        // Saving on close, which was not done anywhere: until now the
-                        // character was only written when something triggered it in passing, so
-                        // closing the client outright lost the last position and the kamas.
-                        if (sesion.State.CharacterId > 0)
-                        {
-                            try
-                            {
-                                using (SessionContext.Push(sesion))
-                                {
-                                    // Off the arena first. A client closed in the middle of a
-                                    // fight was being saved on the tactical map, and came back
-                                    // to it on the next login, fight music and all. A spectator
-                                    // too: he keeps his roleplay map where a fighter does.
-                                    FightHandler.ForgetSpectator(sesion);
-                                    FightHandler.BackToRoleplayMap();
-                                    DatabaseManager.SaveCurrentCharacter();
-                                }
-                                Console.WriteLine($"[Game Node] {sesion.State.CharacterName} saved on the " +
-                                                  $"way out: map {sesion.State.MapId}, cell {sesion.State.CellId}.");
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"[Game Node] Could not save on disconnect: {ex.Message}");
-                            }
-                        }
-
-                        long gone = sesion.State.CharacterId;
-                        SessionRegistry.Unregister(sesion);
-                        await Handlers.FriendsHandler.LeftAsync(sesion.AccountId);
-                        if (gone != 0)
-                        {
-                            try { await Handlers.GuildRaidHandler.OnLeaveWorldAsync(gone); }
-                            catch (Exception ex) { Console.WriteLine($"[Raids] Could not tell the raid {gone} left: {ex.Message}"); }
-                            try { await Handlers.GuildHandler.TellConnectionAsync(gone, online: false); }
-                            catch (Exception ex) { Console.WriteLine($"[Guild] Could not tell the guild {gone} left: {ex.Message}"); }
-                        }
+                        // Saving on close, off a fight's arena, out of whatever was left half
+                        // done: the same way out as port 5555's (SessionTeardown).
+                        await SessionTeardown.LeaveAsync(sesion, "Game Node");
                         Console.WriteLine($"[Game Node] Session {sesion.Id} closed; " +
                                           $"{SessionRegistry.Count} still connected.");
                     }
