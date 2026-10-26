@@ -291,9 +291,10 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static byte[] BuildFighter(int cell, int orientation, long fighterId,
                                           IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
-                                          byte[] look, Pb identity, bool isMonster)
+                                          byte[] look, Pb identity, bool isMonster, long summoner = 0)
             => Pb.New()
-                .Msg(2, FighterBlock(cell, orientation, fighterId, sheet, look, identity, isMonster))
+                .Msg(2, FighterBlock(cell, orientation, fighterId, sheet, look, identity, isMonster,
+                                     summoner: summoner))
                 .Build();
 
         /// <summary>
@@ -385,6 +386,13 @@ namespace Jondo.Unity.Server.Network
 
             if (isMonster)
             {
+                // The life a creature is missing does not travel: its 97 goes empty in every
+                // monster block of the captures' jxb, "08611200", whatever its life. The monster
+                // mould would add the missing life and the erosion into one number, and a summon
+                // sent again on reconnecting -- the Xelor's Syncro, eroded 126 -- was drawn at
+                // "-126 / 1.134" and «0 (0%)».
+                if (characteristic == TemporaryLifeMalus) return entry.EmptyMsg(2);
+
                 long total = baseValue + fromGear + delEmbrujo;
                 if (total == 0) entry.EmptyMsg(2);
                 else entry.Msg(2, Pb.New().Var(2, total));
@@ -435,12 +443,20 @@ namespace Jondo.Unity.Server.Network
         /// Its side, f2 of the place block: 1 for the monsters' and nothing for the players'. A
         /// monster gone over to the players (the Flor Maldita) goes with nothing. Null: by its kind.
         /// </param>
+        /// <param name="summoner">
+        /// Whose summon it is: the sheet's f1, with its f4 set, as the summon's own jwe 181 carries
+        /// them (<see cref="BuildSummon"/>). Without them a summon sent again whole -- a
+        /// reconnection's jxb -- came back as a monster of nobody's.
+        /// </param>
         public static Pb FighterBlock(int cell, int orientation, long fighterId,
                                       IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
                                       byte[] look, Pb identity, bool isMonster, int wave = 0,
-                                      bool alive = true, int? team = null)
+                                      bool alive = true, int? team = null, long summoner = 0)
         {
-            var stats = Pb.New().Var(3, SheetKind);
+            var stats = Pb.New()
+                .VarIfNotZero(1, summoner)
+                .Var(3, SheetKind)
+                .VarIfNotZero(4, summoner != 0 ? 1 : 0);
             foreach (var (characteristic, baseValue, gear) in sheet)
             {
                 stats.Msg(5, SheetEntry(characteristic, baseValue, gear, isMonster));
@@ -487,6 +503,40 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static byte[] BuildSurrenderUnlocked(bool unlocked)
             => Pb.New().VarIfNotZero(2, unlocked ? 1 : 0).Build();
+
+        /// <summary>
+        /// Giving up in a Koliseo fight of people (ltm): <c>f1</c>, the surrender window -- the
+        /// 2v2 capture's "0801" before the first round --, and <c>f2</c>, the leave button that
+        /// opens it.
+        /// </summary>
+        public static byte[] BuildSurrenderOpen()
+            => Pb.New().Var(1, 1).Var(2, 1).Build();
+
+        /// <summary>
+        /// What the surrender window offers (luw): leaving (f3, lui's f1 case) and voting to give
+        /// up (f4, luu's f1 case), with no sanction (f1) on either.
+        /// </summary>
+        public static byte[] BuildSurrenderOptions()
+            => Pb.New()
+                .Msg(3, Pb.New().EmptyMsg(1))
+                .Msg(4, Pb.New().EmptyMsg(1))
+                .Build();
+
+        /// <summary>A ballot of the give-up vote (lsp): whether its f2 says yes.</summary>
+        public static bool ReadSurrenderBallot(byte[] payload)
+        {
+            byte[]? lsp = ConnectionProtocol.ReadPayload(payload, Op.Lsp);
+            return lsp != null && ProtoMessage.Parse(lsp).Fields
+                .Any(f => f.FieldNumber == 2 && f.WireType == 0 && f.VarIntValue != 0);
+        }
+
+        /// <summary>A give-up vote open (lsq): f2 how many vote, f3 how many said yes already.</summary>
+        public static byte[] BuildSurrenderVote(int voters, int yes)
+            => Pb.New().VarIfNotZero(2, voters).VarIfNotZero(3, yes).Build();
+
+        /// <summary>The give-up vote over (ltn): f1 whether the team gave up.</summary>
+        public static byte[] BuildSurrenderResult(bool gaveUp)
+            => Pb.New().VarIfNotZero(1, gaveUp ? 1 : 0).Build();
 
         /// <summary>Which round we are on (jxz). <c>f2</c> is the round number, starting at 1.</summary>
         public static byte[] BuildRound(int round) => Pb.New().Var(2, round).Build();

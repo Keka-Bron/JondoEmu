@@ -17,6 +17,15 @@
     /// </remarks>
     public static class SpellLevelFlags
     {
+        /// <summary>It can be cast along a diagonal (the client's CastInDiagonal, 2).</summary>
+        public const int CastInDiagonal = 1 << 1;
+
+        /// <summary>
+        /// Its diagonal counts as far as walking it (the client's ProportionalDiagonal, 8192): two
+        /// steps for each diagonal cell, not one. See MapGeometry.CastDistance.
+        /// </summary>
+        public const int ProportionalDiagonal = 1 << 13;
+
         /// <summary>
         /// The caster's range adds to the spell's: Casca's 1-6 reaches farther with +6 range, Ira de
         /// Yopuka's 1-1 and Conquista's 1-6 do not.

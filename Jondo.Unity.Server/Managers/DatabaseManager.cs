@@ -2953,6 +2953,41 @@ namespace Jondo.Unity.Server
         /// <summary>«Gana x#2 #3» with the item rolled: a box's, a candy's.</summary>
         private const int GainsOneItem = 193;
 
+        /// <summary>
+        /// One factory effect as a brand-new item carries it, in the shape CharacterItems stores:
+        /// for every item born from its template -- a command, a reward, a purchase from an NPC.
+        /// </summary>
+        /// <param name="category">The effect's category in the Effects table.</param>
+        internal static string FreshEffect(int id, int diceNum, int diceSide, int value, int category)
+        {
+            // A weapon's damage keeps its range, as a crafted one does (Forgemagic.Roll):
+            // it is a range on the wire, and as a lone number the client drew the Arco de
+            // vueloceronte's four lines as "0 de daños" three times and "15" once -- and the Hacha
+            // Jazo bought from an NPC as "0 de daños de agua", hitting for nothing.
+            if (category == WeaponDamageCategory && diceSide > diceNum)
+                return $"[{id},0,{diceNum},{diceSide}]";
+
+            // The compound ones the captures show whole keep their three numbers: a job
+            // scroll's job is in the third, and a single number lost it (EffectFields.TravelsWhole).
+            if (Managers.EffectFields.TravelsWhole(id))
+                return $"[{id},{value},{diceNum},{diceSide}]";
+
+            // The brand-new value: the die's top if there is one, and if not, the fixed one.
+            int fijo = value != 0 ? value : (diceSide != 0 ? diceSide : diceNum);
+
+            // «Recibido el #1» (805): the moment it is received, in seconds -- what the
+            // criterion «DD>7,31582» counts the days from and what travels as its date.
+            if (id == Managers.Equipment.ReceivedOn)
+                return $"[{id},{DateTimeOffset.UtcNow.ToUnixTimeSeconds()},0,0]";
+
+            // «Gana x#2 #3» rolled (193): the item in the first number and the one it gives in
+            // the third, «f6 { f1: the item, f3: 1 }» in the eight captured.
+            if (id == GainsOneItem)
+                return $"[{id},{fijo},0,1]";
+
+            return $"[{id},{fijo},0,0]";
+        }
+
         private static string EffectsOfTemplate(SqliteConnection connection, int gid)
         {
             // A ride is born at level 1, its sex and serenity drawn, its characteristics those of its
@@ -2985,47 +3020,8 @@ namespace Jondo.Unity.Server
                     if (!reader.Read()) continue;
 
                     int id = reader.GetInt32(0);
-                    int diceNum = reader.GetInt32(1);
-                    int diceSide = reader.GetInt32(2);
-                    int value = reader.GetInt32(3);
                     if (id == 0) continue;
-
-                    // A weapon's damage keeps its range, as a crafted one does (Forgemagic.Roll):
-                    // it is a range on the wire, and as a lone number the client drew the Arco de
-                    // vueloceronte's four lines as "0 de daños" three times and "15" once.
-                    if (reader.GetInt32(4) == WeaponDamageCategory && diceSide > diceNum)
-                    {
-                        salida.Add($"[{id},0,{diceNum},{diceSide}]");
-                        continue;
-                    }
-
-                    // The compound ones the captures show whole keep their three numbers: a job
-                    // scroll's job is in the third, and a single number lost it (EffectFields.TravelsWhole).
-                    if (Managers.EffectFields.TravelsWhole(id))
-                    {
-                        salida.Add($"[{id},{value},{diceNum},{diceSide}]");
-                        continue;
-                    }
-
-                    // The brand-new value: the die's top if there is one, and if not, the fixed one.
-                    int fijo = value != 0 ? value : (diceSide != 0 ? diceSide : diceNum);
-
-                    // «Recibido el #1» (805): the moment it is received, in seconds -- what the
-                    // criterion «DD>7,31582» counts the days from and what travels as its date.
-                    if (id == Managers.Equipment.ReceivedOn)
-                    {
-                        salida.Add($"[{id},{DateTimeOffset.UtcNow.ToUnixTimeSeconds()},0,0]");
-                        continue;
-                    }
-
-                    // «Gana x#2 #3» rolled (193): the item in the first number and the one it gives in
-                    // the third, «f6 { f1: the item, f3: 1 }» in the eight captured.
-                    if (id == GainsOneItem)
-                    {
-                        salida.Add($"[{id},{fijo},0,1]");
-                        continue;
-                    }
-                    salida.Add($"[{id},{fijo},0,0]");
+                    salida.Add(FreshEffect(id, reader.GetInt32(1), reader.GetInt32(2), reader.GetInt32(3), reader.GetInt32(4)));
                 }
                 return salida.Count > 0 ? "[" + string.Join(",", salida) + "]" : "[]";
             }

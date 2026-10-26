@@ -15,7 +15,36 @@
     "THE GM PRISON'S DUNGEON, 105120002, has no element at all. The cage hanging from its",
     "rope, at the right of the big room, stands on cell 333: stepping into it lifts you to",
     "the island, 105119744, on 342 in front of its chest. The rest of the round is in",
-    "teleports.json."
+    "teleports.json.",
+    "",
+    "«removed» lists the cells whose passage from the 2.73 world graph is left out:",
+    "",
+    "  { \"map\", \"cell\", \"why\" }",
+    "",
+    "The graph is Dofus 2's, and where a place was rebuilt since its old stairs still fire",
+    "under the new one."
+  ],
+  "removed": [
+    {
+      "map": 130023937,
+      "cell": 493,
+      "why": "Travelers' Tower, Prisión: the cell its teleporter is used from. Dofus 2's way down to 130155009 moved whoever went to use it there, and the teleporter's choice arrived on the wrong map."
+    },
+    {
+      "map": 130155009,
+      "cell": 493,
+      "why": "Travelers' Tower: Dofus 2's way back up to the Prisión, on the same cell as its teleporter's."
+    },
+    {
+      "map": 130023937,
+      "cell": 486,
+      "why": "Travelers' Tower, Prisión: Dofus 2's stairs to the Sala de información, a room its teleporters join in Dofus 3."
+    },
+    {
+      "map": 130025987,
+      "cell": 228,
+      "why": "Travelers' Tower, Sala de información: Dofus 2's stairs to the Prisión, a room its teleporters join in Dofus 3."
+    }
   ],
   "passages": [
     {

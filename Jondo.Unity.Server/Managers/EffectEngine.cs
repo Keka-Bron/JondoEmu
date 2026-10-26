@@ -1502,12 +1502,13 @@ namespace Jondo.Unity.Server.Managers
         private static Outcome TeletransportarConTelefrag(FightInstance combate, Fighter quienLanza, Fighter sobre,
                                                           int destino, int hechizo, int grado, SpellEffect efecto)
         {
-            // Undoing the last move does not count as a move of its own: a second 1100 does not
-            // bounce back to where the first one started.
+            // Undoing the last move does not count as a move of its own: it takes that move off his
+            // history, so a second 1100 goes one cell further back and not to where the first one
+            // started -- «xelor-recuerdo»'s 287 → 300 → 314 (Fighter.CasillaAnterior).
             bool deshace = efecto.EffectId == ALaPosicionAnterior;
             void Llevar(Fighter quien, int casilla)
             {
-                if (deshace && quien == sobre) quien.CellId = casilla; else quien.MoverA(casilla);
+                if (deshace && quien == sobre) quien.VolverALaAnterior(casilla); else quien.MoverA(casilla);
             }
 
             if (!sobre.IsAlive || destino == sobre.CellId) return null;

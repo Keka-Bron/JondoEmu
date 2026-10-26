@@ -797,6 +797,7 @@ Ranked PvP through a queue. Open the window, pick a format, get matched, fight, 
   the Tymador's bombs and walls, the Steamer's turrets, the Selatrop's portals, and the rest of the
   classes' states
 - ✅ Giving up a fight against JondoBots
+- ✅ Giving up a fight of people: leave alone, or vote with your team to surrender
 - ✅ Matchmaking by rating, with levels kept apart and parties kept together
 - ✅ Leaving the queue
 - ✅ The winner is paid — kamas, Kolichas, Vitorichas and experience

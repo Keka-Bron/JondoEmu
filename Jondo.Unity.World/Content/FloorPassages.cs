@@ -81,6 +81,35 @@ namespace Jondo.Unity.World.Content
             return passages;
         }
 
+        /// <summary>
+        /// The cells whose passage from the 2.73 world graph is left out, the file's «removed»
+        /// list: { "map", "cell", "why" }. The graph is Dofus 2's, and where a place was rebuilt
+        /// since its old stairs still fire under the new one.
+        /// </summary>
+        public static IReadOnlySet<(long MapId, int Cell)> LoadRemoved(string? path, Action<string>? report = null)
+        {
+            var removed = new HashSet<(long, int)>();
+            if (string.IsNullOrEmpty(path) || !File.Exists(path)) return removed;
+
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("removed", out var list)) return removed;
+                foreach (var entry in list.EnumerateArray())
+                {
+                    long map = Long(entry, "map");
+                    int cell = (int)Long(entry, "cell");
+                    if (map > 0 && OnTheBoard(cell)) removed.Add((map, cell));
+                    else report?.Invoke($"[Content] {Path.GetFileName(path)}: {map}@{cell} is not a cell to remove; left out.");
+                }
+            }
+            catch (Exception ex)
+            {
+                report?.Invoke($"[Content] {Path.GetFileName(path)} is unreadable: {ex.Message}");
+            }
+            return removed;
+        }
+
         private static bool OnTheBoard(int cell) => cell >= 0 && cell < 560;
 
         /// <summary>The number, or -1 when it is not there: cell 0 is a cell.</summary>

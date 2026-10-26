@@ -2129,6 +2129,7 @@ namespace Jondo.Unity.Server.Network
                          || payloadStr.Contains(Op.Uri(Op.Jwn))
                          || payloadStr.Contains(Op.Uri(Op.Jti))
                          || payloadStr.Contains(Op.Uri(Op.Kme))
+                         || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp))
                          || payloadStr.Contains(Op.Uri(Op.Hoy))
                          || payloadStr.Contains(Op.Uri(Op.Kwr)) || payloadStr.Contains(Op.Uri(Op.Kwj))
                          || payloadStr.Contains(Op.Uri(Op.Kwv)) || payloadStr.Contains(Op.Uri(Op.Kwi))

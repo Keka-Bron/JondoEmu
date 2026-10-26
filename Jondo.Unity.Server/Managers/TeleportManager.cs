@@ -571,12 +571,17 @@ namespace Jondo.Unity.Server.Managers
         private static void AddFloorPassages(Dictionary<(long, int), InteractiveTeleport> byCell)
         {
             Action<string> report = message => Console.WriteLine("[Teleports] " + message);
-            int authored = AddFloorPassages(byCell, FloorPassages.Load(Paths.ContentFile(FloorPassages.AuthoredFile), report),
+            string authoredFile = Paths.ContentFile(FloorPassages.AuthoredFile);
+            int authored = AddFloorPassages(byCell, FloorPassages.Load(authoredFile, report),
                                             "authored", loud: true);
             // Then the 2.73 graph's, the dungeons' and caves' stairs and holes: an authored one or an
-            // element's passage on the same cell wins.
-            int graph = AddFloorPassages(byCell, FloorPassages.Load(Paths.WorldGraphFloorPassagesJson, report),
-                                         "graph-2.73-approx", loud: false);
+            // element's passage on the same cell wins, and the cells the authored file removes --
+            // a place rebuilt since -- keep none.
+            var removed = FloorPassages.LoadRemoved(authoredFile, report);
+            var fromGraph = FloorPassages.Load(Paths.WorldGraphFloorPassagesJson, report)
+                                         .Where(p => !removed.Contains((p.SourceMapId, p.SourceCell)))
+                                         .ToList();
+            int graph = AddFloorPassages(byCell, fromGraph, "graph-2.73-approx", loud: false);
 
             if (authored + graph > 0)
                 Console.WriteLine($"[Teleports] {authored} floor passage(s) from content/interactives/floor_passages.json, " +

@@ -81,6 +81,27 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
+        public void The_removed_cells_are_read_and_a_bad_one_is_said()
+        {
+            File.WriteAllText(_path, @"{ ""passages"": [], ""removed"": [ { ""map"": 130023937, ""cell"": 493, ""why"": ""x"" },
+                                                                         { ""map"": 100, ""cell"": 900 } ] }");
+            int said = 0;
+            var removed = FloorPassages.LoadRemoved(_path, _ => said++);
+            Assert.Equal(new[] { (130023937L, 493) }, removed.ToArray());
+            Assert.Equal(1, said);
+        }
+
+        [Fact]
+        public void The_shipped_file_takes_the_tower_s_old_stairs_away()
+        {
+            // The Travelers' Tower's rooms are joined by teleporters in Dofus 3; the 2.73 graph's
+            // stairs in the Prisión stood on the cell its teleporter is used from.
+            var removed = FloorPassages.LoadRemoved(Jondo.Unity.Launcher.Paths.ContentFile(FloorPassages.AuthoredFile));
+            Assert.Contains((130023937L, 493), removed);
+            Assert.Contains((130155009L, 493), removed);
+        }
+
+        [Fact]
         public void The_shipped_file_reads_whole()
         {
             int said = 0;

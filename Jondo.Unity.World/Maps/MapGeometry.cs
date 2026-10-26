@@ -112,6 +112,27 @@ namespace Jondo.Unity.World.Maps
         }
 
         /// <summary>
+        /// The distance a spell's range is counted in: <see cref="Distance"/>, except on a diagonal
+        /// for a spell cast diagonally, where each diagonal step counts one unless its diagonal is
+        /// proportional.
+        /// </summary>
+        /// <remarks>
+        /// The client draws the range of a spell cast in line and diagonally as a star ('*'), of one
+        /// cast only diagonally as a diagonal cross ('+'), and hands either shape the level's
+        /// proportionalDiagonal (flh.bgic). Without it a range of one takes in the four diagonal
+        /// neighbours, two steps away: the Gatito rabioso's «Alma Felina» (1 to 1, line and
+        /// diagonal) was offered on them and refused here.
+        /// </remarks>
+        public static int CastDistance(int cellA, int cellB, bool diagonal, bool proportionalDiagonal)
+        {
+            int distance = Distance(cellA, cellB);
+            if (!diagonal || proportionalDiagonal || distance == 999) return distance;
+            int dx = Math.Abs(PointX[cellA] - PointX[cellB]);
+            int dy = Math.Abs(PointY[cellA] - PointY[cellB]);
+            return dx == dy ? dx : distance;
+        }
+
+        /// <summary>
         /// Is there line of sight between two cells? Walks the segment joining their centers and
         /// fails if it crosses any cell flagged as opaque. The endpoints do not count: caster and
         /// target never block themselves.

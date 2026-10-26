@@ -105,7 +105,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (shares.Count > 0) _rewards[fight.FightId] = shares.ToDictionary(s => s.Key, s => new Reward { Loot = s.Value });
                 return;
             }
-            if (!fight.Reglas.ReparteBotin || fight.Reglas.PagaElKoliseo) return;
+            if (fight.Reglas.PagaElKoliseo)
+            {
+                PlanKoliseo(fight);
+                return;
+            }
+            if (!fight.Reglas.ReparteBotin) return;
 
             bool won = fight.Azul.Concat(fight.Rojo).Any(f => !f.IsMonster && !f.EsInvocado && fight.HaGanado(f.Id));
             var dream = DreamHandler.PayOf(fight, won);
@@ -196,6 +201,43 @@ namespace Jondo.Unity.Server.Handlers
                                  string.Join(", ", plan.Select(p => $"{p.Key} {p.Value.Xp} xp {p.Value.Kamas} kamas " +
                                                                     $"{p.Value.Loot.Sum(l => l.Value)} item(s)")));
             }
+        }
+
+        /// <summary>
+        /// What a won Koliseo pays each of its winners, planned for all of them before anybody is
+        /// shown the end: the capture's jyg lists both winners' kamas, kolichas, vitorichas and
+        /// experience to all four players. Paid on its own, each winner's end screen showed his
+        /// partner with nothing.
+        /// </summary>
+        /// <remarks>
+        /// No monsters pay here (see <see cref="KoliseoRewards"/>): the experience is a part of each
+        /// winner's own level band, under the limit he set, and today's Almanax raises the Koliseo's
+        /// experience (type 28) and its tokens (type 25).
+        /// </remarks>
+        private static void PlanKoliseo(FightInstance fight)
+        {
+            var plan = new Dictionary<long, Reward>();
+            foreach (var fighter in fight.Azul.Concat(fight.Rojo))
+            {
+                if (fighter.IsMonster || fighter.EsInvocado || fighter.EsIlusion) continue;
+                if (fight.Gone.Contains(fighter.Id) || !fight.HaGanado(fighter.Id)) continue;
+                var session = SessionRegistry.FindByCharacter(fighter.Id);
+                if (session == null) continue;
+
+                var anywhere = Almanax.Where.Anywhere;
+                var loot = KoliseoRewards.Botin();
+                long xp;
+                using (SessionContext.Push(session))
+                {
+                    xp = ExperienceLimit.ApplyFor(fighter.Id,
+                        Almanax.WithBonus(Almanax.BonusType.KoliseoExperience,
+                            KoliseoRewards.Experiencia(session.State.CharacterLevel), anywhere));
+                    loot[KoliseoRewards.Kolicha] = (int)Almanax.WithBonus(Almanax.BonusType.KoliseoTokens,
+                        loot[KoliseoRewards.Kolicha], anywhere);
+                }
+                plan[fighter.Id] = new Reward { Xp = xp, Kamas = KoliseoRewards.KamasPorVictoria, Loot = loot };
+            }
+            if (plan.Count > 0) _rewards[fight.FightId] = plan;
         }
 
         /// <summary>

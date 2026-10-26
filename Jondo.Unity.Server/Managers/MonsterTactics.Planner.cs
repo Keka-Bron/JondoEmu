@@ -837,10 +837,11 @@ namespace Jondo.Unity.Server.Managers
 
             private void Moved(Fighter who, int cell, bool remember = true)
             {
-                int was = who.CellId, before = who.CasillaAnterior;
-                if (remember) who.CasillaAnterior = was;
-                who.CellId = cell;
-                _undo.Push(() => { who.CellId = was; who.CasillaAnterior = before; });
+                int was = who.CellId;
+                int[] before = who.CellHistory();
+                if (remember) who.MoverA(cell);
+                else who.VolverALaAnterior(cell);
+                _undo.Push(() => { who.CellId = was; who.RestoreCellHistory(before); });
                 RefreshPortals();
             }
 

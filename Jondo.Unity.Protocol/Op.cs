@@ -2547,9 +2547,45 @@ public static class Op
     /// The Koliseo's giving up, locked or not: { f1 bool, f2 bool, f3 bool, f4 bool }. The client's
     /// surrender service keeps f1 and f2 and enables the leave button with f2
     /// (EndTurnWidgetUI.OnUnlockSurrender); in an arena fight it stays greyed out until f2 comes.
-    /// Read off the client: no capture holds one.
+    /// With f1 that button asks for the surrender window (ltf) instead of leaving outright. The
+    /// 2v2 koliseo capture holds one, "0801", sent before the first round.
     /// </summary>
     public const string Ltm = "ltm";
+
+    /// <summary>
+    /// C→S: the arena leave button pressed with giving up open (ltm f1): what may be done, empty.
+    /// The surrender service (flu) sends it; the answer is a <see cref="Luw"/>.
+    /// </summary>
+    public const string Ltf = "ltf";
+
+    /// <summary>
+    /// S→C: what the surrender window offers: { f1 bool sanctioned, f2 bool, f3 lui leaving,
+    /// f4 luu voting }. Each of f3 and f4 is a oneof whose case enables its button: lui's f1 (lue)
+    /// lets him leave, luu's f1 (lun) lets him vote; luu's f3 (luq { f2 turn }) says not before
+    /// that turn. The client raises bpd with it, which opens the SurrenderPopup.
+    /// </summary>
+    public const string Luw = "luw";
+
+    /// <summary>C→S: a ballot of the team's give-up vote: { f2 bool yes }. Its first yes opens the vote.</summary>
+    public const string Lsp = "lsp";
+
+    /// <summary>
+    /// S→C: a give-up vote is open: { f2 voters, f3 yes so far }. The client shows "Rendirse (yes/voters
+    /// jugadores)" and, to whoever has not voted, a notification with its two buttons.
+    /// </summary>
+    public const string Lsq = "lsq";
+
+    /// <summary>S→C: one more yes in the open vote, empty: the client adds one to its count.</summary>
+    public const string Lto = "lto";
+
+    /// <summary>
+    /// S→C: the vote is over: { f1 bool }. True, the team gave up («Te has rendido»); false, it did not
+    /// («No te has rendido»).
+    /// </summary>
+    public const string Ltn = "ltn";
+
+    /// <summary>S→C: the other team gave up, empty: «El equipo contrario se ha rendido».</summary>
+    public const string Lss = "lss";
 
     // ─── Breeding, read off the client (eqa sends, eqc handles); no capture holds them ───
 

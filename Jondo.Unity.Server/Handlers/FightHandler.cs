@@ -623,9 +623,10 @@ namespace Jondo.Unity.Server.Handlers
             {
                 return Network.FightProtocol.FighterBlock(
                     fighter.CellId, FacingOf(fight, fighter), fighter.Id, FullSheetOf(fighter),
-                    MonsterLook(fighter),
+                    NormalFightLook(fighter),
                     IdentityOf(fighter),
-                    isMonster: true, wave: fighter.Wave, alive: fighter.IsAlive, team: fighter.TeamId);
+                    isMonster: true, wave: fighter.Wave, alive: fighter.IsAlive, team: fighter.TeamId,
+                    summoner: SummonerOf(fighter));
             }
 
             var (look, breed, sex) = CharacterLookOf(fighter);
@@ -1611,21 +1612,41 @@ namespace Jondo.Unity.Server.Handlers
         /// server sends it in jxg and jxb, 213 times with the scale in the fight captures --, the
         /// bones alone otherwise.
         /// </summary>
+        /// <remarks>
+        /// A summon goes by its bone, as its jwe 181 draws it (<see cref="Managers.Summon.PlantillaDelAspecto"/>):
+        /// its look string is the one its template's referral leads to, and that can be another
+        /// creature altogether -- the Syncro's «{8139}» leads to the Cuadrabz solitario's, the
+        /// Cómplice's «{8146}» to the Ídolo tecnomágico's --, which is what a reconnection drew.
+        /// </remarks>
         private static byte[] MonsterLook(Fighter fighter)
-            => string.IsNullOrEmpty(fighter.Look)
+            => string.IsNullOrEmpty(fighter.Look) || (fighter.EsInvocado && fighter.DoubleOf == 0 && fighter.LookBoneId > 0)
                 ? Network.Pb.New().Var(2, 3).VarIfNotZero(3, fighter.LookBoneId).Build()
                 : ConnectionProtocol.MonsterLook(fighter.Look,
                       ServerSettings.Current.Hardcore && fighter.TaxCollectorFirstName == 0).Build();
 
         /// <summary>
         /// Who a monster-side fighter is: a tax collector by its names, any other monster by its
-        /// grade, its template and its level.
+        /// grade, its template and its level. A monster's grade is kept from zero and a summon's
+        /// from one, as its template's grades number them (Summons.Characteristics).
         /// </summary>
         private static Network.Pb IdentityOf(Fighter fighter)
             => fighter.TaxCollectorFirstName > 0
                 ? Network.FightProtocol.TaxCollectorIdentity(fighter.TaxCollectorFirstName,
                                                              fighter.TaxCollectorLastName, fighter.MonsterId)
-                : Network.FightProtocol.MonsterIdentity(fighter.GradeIndex + 1, fighter.MonsterId, fighter.Level);
+                : Network.FightProtocol.MonsterIdentity(fighter.EsInvocado ? fighter.GradeIndex : fighter.GradeIndex + 1,
+                                                        fighter.MonsterId, fighter.Level);
+
+        /// <summary>Whose summon a fighter is, for its sheet's f1; zero for anybody else.</summary>
+        private static long SummonerOf(Fighter fighter) => fighter.EsInvocado ? fighter.Invocador : 0;
+
+        /// <summary>
+        /// A creature's jxg in a fight already running -- a reconnection's, a spectator's --, its
+        /// summon's owner and look with it.
+        /// </summary>
+        private static byte[] CreatureFighter(FightInstance fight, Fighter fighter)
+            => Network.FightProtocol.BuildFighter(
+                fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter),
+                NormalFightLook(fighter), IdentityOf(fighter), isMonster: true, summoner: SummonerOf(fighter));
 
         /// <summary>
         /// The normal look the fighter had on entering this fight; <paramref name="onFoot"/>, the
@@ -1983,6 +2004,15 @@ namespace Jondo.Unity.Server.Handlers
             else if (payloadStr.Contains(Op.Uri(Op.Kme)))
             {
                 await AbandonAsync(stream);
+            }
+            else if (payloadStr.Contains(Op.Uri(Op.Ltf)))
+            {
+                // The Koliseo's surrender window, and the team's vote to give up (KoliseoSurrender).
+                await SurrenderOptionsAsync(stream, GetCurrentFight());
+            }
+            else if (payloadStr.Contains(Op.Uri(Op.Lsp)))
+            {
+                await SurrenderBallotAsync(stream, GetCurrentFight(), payload);
             }
             else if (payloadStr.Contains(Op.Uri(Op.Hoy)))
             {
@@ -2525,11 +2555,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
                     fighter.IsMonster
-                        ? Network.FightProtocol.BuildFighter(
-                              fighter.CellId, FacingOf(fight, fighter), fighter.Id,
-                              PlacementSheetOf(fighter), MonsterLook(fighter),
-                              IdentityOf(fighter),
-                              isMonster: true)
+                        ? CreatureFighter(fight, fighter)
                         : BuildPlayerAppearance(fight, fighter)));
             }
 
@@ -2539,6 +2565,18 @@ namespace Jondo.Unity.Server.Handlers
                                                                  SessionContext.Current.AccountId);
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
                 Network.FightProtocol.BuildSpellBar(me, spellLayout.Spells, spellLayout.Bar, spellLayout.WithWeapon)));
+
+            // And the bar of every summon of his he plays, as on summoning it: without it his
+            // client no longer had them in hand.
+            foreach (var summon in TodosLosCombatientes(fight))
+            {
+                if (summon == null || !summon.IsAlive || !summon.EsInvocado || !summon.JuegaTurno
+                    || !summon.ControlledBy(me)) continue;
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
+                    Network.FightProtocol.BuildCooldowns(summon.Id, RecargasDe(summon))));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
+                    Network.FightProtocol.BuildSummonSpellBar(summon.Id, me, summon.HechizosDeInvocado)));
+            }
 
             var spots = new List<(int Cell, int Orientation, long Fighter)>();
             foreach (var fighter in TodosLosCombatientes(fight))
@@ -2581,6 +2619,9 @@ namespace Jondo.Unity.Server.Handlers
             var yoMismo = fight.Buscar(me);
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                 Network.FightProtocol.BuildCooldowns(me, RecargasDe(yoMismo))));
+
+            // And the Koliseo's leave button, which a new client has greyed out again.
+            await SendSurrenderStateAsync(stream, fight, me);
 
             if (fight.TurnAwaitingConfirmation)
             {
@@ -2927,12 +2968,11 @@ namespace Jondo.Unity.Server.Handlers
             // In an arena fight the client greys its leave button out until the server unlocks
             // giving up, and nothing did: against JondoBots there was no way out but losing. The
             // kme it then sends is the one AbandonAsync already answers.
-            if (CanGiveUpAtOnce(fight, me))
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ltm,
-                    Network.FightProtocol.BuildSurrenderUnlocked(true)));
-                Program.LogDebug($"[Koliseo] {me} may give up fight #{fight.FightId}.");
-            }
+            // And in one of people the same button opens the surrender window -- leave alone, or
+            // vote with the team to give up (KoliseoSurrender) --: the 2v2 capture's ltm "0801"
+            // before the first round, with the button's f2 on top. Without it the button stayed
+            // grey the whole fight and there was no way out.
+            await SendSurrenderStateAsync(stream, fight, me);
 
             // The board's own start -- the passives, the raids' and the first turn -- follows
             // everybody's burst, once (BoardStartsAsync).
@@ -2952,6 +2992,16 @@ namespace Jondo.Unity.Server.Handlers
         {
             var player = TodosLosCombatientes(fight).FirstOrDefault(f => f != null && !f.IsMonster && !f.EsInvocado);
             var side = player == null ? new List<Fighter>() : players ? fight.Aliados(player.Id) : fight.Enemigos(player.Id);
+            await FallTogetherAsync(stream, fight, side, players ? "players'" : "other");
+        }
+
+        /// <summary>
+        /// A side falls at once, inside one sequence as giving up does: everyone of it still
+        /// standing dies, and the result screen follows the client's acknowledgement.
+        /// </summary>
+        private static async Task FallTogetherAsync(NetworkStream stream, FightInstance fight, List<Fighter> side,
+                                                    string which)
+        {
             var losers = side.Where(f => f.IsAlive).ToList();
             if (losers.Count == 0) return;
             var author = (fight.CurrentFighter ?? losers[0]).Id;
@@ -2970,7 +3020,7 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(closure, author, Network.FightProtocol.SurrenderSequence)));
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxh, Network.FightProtocol.BuildConfirmTurn(author)));
-            Program.LogDebug($"[Fight] Fight #{fight.FightId}: the {(players ? "players'" : "other")} side falls at once.");
+            Program.LogDebug($"[Fight] Fight #{fight.FightId}: the {which} side falls at once.");
             await CheckFightOverAsync(stream, fight, closure, alreadyAsked: true);
         }
 
@@ -4380,7 +4430,10 @@ namespace Jondo.Unity.Server.Handlers
             // piece of data must not prevent casting.
             if (limites.AlcanceMaximo > 0)
             {
-                int lejos = Jondo.Unity.World.Maps.MapGeometry.Distance(caster.CellId, cell);
+                // Along a diagonal, as the client counts it for a spell cast diagonally.
+                int lejos = Jondo.Unity.World.Maps.MapGeometry.CastDistance(caster.CellId, cell,
+                    (limites.Flags & Managers.SpellLevelFlags.CastInDiagonal) != 0,
+                    (limites.Flags & Managers.SpellLevelFlags.ProportionalDiagonal) != 0);
 
                 int minimo = limites.AlcanceMinimo
                            + caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo,
@@ -4860,7 +4913,11 @@ namespace Jondo.Unity.Server.Handlers
             // jyy carries the summon in f3 and the owner in f4, the spells at their grades,
             // and no melee entry. Without it the owner's client has nothing to cast with when
             // the summon's turn comes.
-            if (invocado.JuegaTurno && receta.Hechizos.Count > 0)
+            // And a summon of his with steps but no spell gets them too, the bar empty: the
+            // Xelor's Cómplice, "jxc f4=-5" and "jyy f3=-5 f4=owner" in its capture. Without
+            // them the owner's client did not take it in hand, and its turn ran its fifteen
+            // seconds out with nobody able to move it or pass it.
+            if (invocado.JuegaTurno && !invocado.PlaysOnItsOwn)
             {
                 await ACadaUnoAsync(fight, async sesion =>
                 {
@@ -9373,6 +9430,7 @@ namespace Jondo.Unity.Server.Handlers
                                             fight.HaGanado(sesion.State.CharacterId), azulGana);
             });
             ForgetRewards(fight);
+            ForgetSurrenderVotes(fight);
             ChallengeWatcher.Forget(fight);
 
             // And the map: the people drawn again where they came back -- they went off it with
@@ -9536,24 +9594,12 @@ namespace Jondo.Unity.Server.Handlers
                 loot = won ? RollFightLoot(fight, extraDeRetos, out caidos) : new Dictionary<int, int>();
             }
 
-            // The koliseo pays ITS OWN. It does not come in through the above because there are no
-            // monsters in front to get experience, kamas or a loot table from: the koliseo pays for
-            // winning, and it is kolichas and vitorichas. The loser gets nothing, not even experience
-            // -- in the capture's jyg his block goes WITHOUT the won field, not with a zero --.
-            if (won && fight.Reglas.PagaElKoliseo)
+            // The koliseo pays ITS OWN, planned with the rest (PlanKoliseo): there are no monsters in
+            // front to get experience, kamas or a loot table from, the koliseo pays for winning, and
+            // it is kolichas and vitorichas. The loser gets nothing, not even experience -- in the
+            // capture's jyg his block goes WITHOUT the won field, not with a zero --.
+            if (won && fight.Reglas.PagaElKoliseo && suyo != null)
             {
-                // Under the limit he set, as the client warns beside the Koliseo's experience.
-                // And today's Almanax: the Koliseo's experience (type 28) and its tokens (type 25).
-                var anywhere = Managers.Almanax.Where.Anywhere;
-                xpGained = Managers.ExperienceLimit.ApplyFor(GameState.CharacterId,
-                    Managers.Almanax.WithBonus(Managers.Almanax.BonusType.KoliseoExperience,
-                        Managers.KoliseoRewards.Experiencia(GameState.CharacterLevel), anywhere));
-                kamas = Managers.KoliseoRewards.KamasPorVictoria;
-                loot = Managers.KoliseoRewards.Botin();
-                loot[Managers.KoliseoRewards.Kolicha] = (int)Managers.Almanax.WithBonus(Managers.Almanax.BonusType.KoliseoTokens,
-                    loot[Managers.KoliseoRewards.Kolicha], anywhere);
-                EntregarBotin(loot, out caidos);
-
                 Program.LogDebug($"[Koliseo] Victory: {kamas} kamas, " +
                                  $"{Managers.KoliseoRewards.KolichasPorVictoria} kolicha(s), " +
                                  $"{Managers.KoliseoRewards.VitorichasPorVictoria} vitoricha(s) and " +

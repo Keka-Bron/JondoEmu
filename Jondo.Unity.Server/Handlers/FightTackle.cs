@@ -170,12 +170,13 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (stretch.Count > 1) await AnnounceStretchAsync(fight, mover, stretch, facing);
 
-            // Once for the whole walk, so that effect 1100 -- back to the previous position --
-            // undoes the walk and not only its last stretch. And a portal he has walked onto
-            // takes him on inside the walk's own sequence, after its 129: "pegar a traves de
-            // diferentes portales", frames 185-190.
+            // Every cell walked noted, so that effect 1100 -- back to the previous position -- takes
+            // him back along the walk one cell at a time, as «xelor-recuerdo» measures (see
+            // Fighter.CasillaAnterior). And a portal he has walked onto takes him on inside the
+            // walk's own sequence, after its 129: "pegar a traves de diferentes portales", frames
+            // 185-190.
             bool onAPortal = walked.Count > 1 && PortalCatches(fight, mover, walked[walked.Count - 1]);
-            mover.MoverA(walked[walked.Count - 1]);
+            mover.Andar(walked);
             CarriedFollows(fight, mover);
             if (onAPortal) await CrossPortalAsync(stream, fight, mover, walkedIn: true);
             else if (walked.Count > 1) await RefreshPortalsAsync(fight);

@@ -146,9 +146,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
                     fighter.IsMonster
-                        ? FightProtocol.BuildFighter(fighter.CellId, FacingOf(fight, fighter), fighter.Id,
-                                                     PlacementSheetOf(fighter), MonsterLook(fighter),
-                                                     IdentityOf(fighter), isMonster: true)
+                        ? CreatureFighter(fight, fighter)
                         : BuildPlayerAppearance(fight, fighter)));
             }
 

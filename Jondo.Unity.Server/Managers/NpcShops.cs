@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
@@ -31,7 +32,7 @@ namespace Jondo.Unity.Server.Managers
 
         private static readonly Dictionary<int, int[]> _byNpc = new();
         private static readonly Dictionary<int, long> _prices = new();
-        private static readonly Dictionary<int, string> _effects = new();
+        private static readonly Dictionary<int, List<(int Id, int DiceNum, int DiceSide, int Value, int Category)>> _effects = new();
 
         public static int Count => _byNpc.Count;
 
@@ -156,8 +157,10 @@ namespace Jondo.Unity.Server.Managers
         /// each one has its effects, so going to the database for each one would be thousands of queries
         /// every time someone opens a shop. Here it is two whole reads and then memory.
         ///
-        /// The brand-new value is the top of the die, just as character creation does with the
-        /// adventurer's set: a freshly bought item comes out with the best of its range.
+        /// The rows are kept as the template has them and made into a brand-new item's at the sale
+        /// (DatabaseManager.FreshEffect), the same as every other item born from its template: the
+        /// top of the die, a weapon's damage as its range, «Recibido el» the moment it is bought.
+        /// Rolled here on their own, every weapon sold came out with its damage as a lone number.
         /// </summary>
         private static void LoadEffects(HashSet<int> gids)
         {
@@ -166,23 +169,20 @@ namespace Jondo.Unity.Server.Managers
             using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
             connection.Open();
 
-            // Rid -> "[effect,value,0,0]", in a single pass over ItemEffects.
-            var byRid = new Dictionary<long, string>();
+            // Rid -> the row with its effect's category, in a single pass over ItemEffects.
+            var byRid = new Dictionary<long, (int, int, int, int, int)>();
             var effects = connection.CreateCommand();
-            effects.CommandText = "SELECT Rid, EffectId, DiceNum, DiceSide, Value FROM ItemEffects;";
+            effects.CommandText = "SELECT ie.Rid, ie.EffectId, ie.DiceNum, ie.DiceSide, ie.Value, " +
+                                  "COALESCE(e.Category, 0) FROM ItemEffects ie " +
+                                  "LEFT JOIN Effects e ON e.Id = ie.EffectId;";
             using (var reader = effects.ExecuteReader())
             {
                 while (reader.Read())
                 {
                     int id = reader.GetInt32(1);
                     if (id == 0) continue;
-
-                    int diceNum = reader.GetInt32(2);
-                    int diceSide = reader.GetInt32(3);
-                    int value = reader.GetInt32(4);
-                    int fixed_ = value != 0 ? value : (diceSide != 0 ? diceSide : diceNum);
-
-                    byRid[reader.GetInt64(0)] = $"[{id},{fixed_},0,0]";
+                    byRid[reader.GetInt64(0)] = (id, reader.GetInt32(2), reader.GetInt32(3),
+                                                 reader.GetInt32(4), reader.GetInt32(5));
                 }
             }
 
@@ -201,14 +201,14 @@ namespace Jondo.Unity.Server.Managers
                     if (!possible.TryGetProperty("Array", out var list)) continue;
                     if (list.ValueKind != JsonValueKind.Array) continue;
 
-                    var pieces = new List<string>();
+                    var pieces = new List<(int, int, int, int, int)>();
                     foreach (var entry in list.EnumerateArray())
                     {
                         if (!entry.TryGetProperty("rid", out var rid)) continue;
-                        if (byRid.TryGetValue(rid.GetInt64(), out string? piece)) pieces.Add(piece);
+                        if (byRid.TryGetValue(rid.GetInt64(), out var piece)) pieces.Add(piece);
                     }
 
-                    if (pieces.Count > 0) _effects[gid] = "[" + string.Join(",", pieces) + "]";
+                    if (pieces.Count > 0) _effects[gid] = pieces;
                 }
                 catch { }
             }
@@ -278,9 +278,11 @@ namespace Jondo.Unity.Server.Managers
             _effects.Clear();
         }
 
-        /// <summary>The factory effects of an item that is sold, or "[]" if it has none.</summary>
+        /// <summary>The factory effects of an item sold now, or "[]" if it has none.</summary>
         public static string EffectsOf(int gid)
-            => _effects.TryGetValue(gid, out string? json) ? json : "[]";
+            => _effects.TryGetValue(gid, out var rows)
+                ? "[" + string.Join(",", rows.Select(r => DatabaseManager.FreshEffect(r.Id, r.DiceNum, r.DiceSide, r.Value, r.Category))) + "]"
+                : "[]";
 
         /// <summary>What that NPC has for sale, in the order the real server sent it.</summary>
         public static IReadOnlyList<int> CatalogueOf(int npcId)

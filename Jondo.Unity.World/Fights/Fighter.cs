@@ -432,12 +432,64 @@ namespace Jondo.Unity.World.Fights
         /// Effect 1100 asks for it, «teletransporta a la posición anterior», which undoes the last
         /// displacement. Without this memory the effect has nowhere to send anyone back to, and sending
         /// them to some random place would be worse than doing nothing.
-        /// </remarks>
         /// <para>
-        /// Settable from outside only to put it back as it was: the bots' plans play their moves on
-        /// the fighters themselves and take them back (MonsterTactics.Simulation).
+        /// It is the top of a history, not one cell. In «xelor-recuerdo» the Cómplice walks
+        /// 327 → 314 → 300 → 287, and two Recuerdo take it to 300 and then to 314: every cell walked
+        /// is one more back, and a return takes its cell off without noting the one it leaves. On
+        /// the next turn it walks 314 → 300 → 287, and Recuerdo, Recuerdo, Congelación take it to
+        /// 300, 314 and 327 -- the history outlives the turn --, and a second Congelación, with
+        /// nothing left, leaves it where it is.
         /// </para>
-        public int CasillaAnterior { get; set; } = -1;
+        /// <para>
+        /// Settable from outside only to start it with that one cell: a test's board. The bots'
+        /// plans, which play moves on the fighters and take them back, keep and restore the whole
+        /// history (<see cref="CellHistory"/>, <see cref="RestoreCellHistory"/>).
+        /// </para>
+        /// </remarks>
+        public int CasillaAnterior
+        {
+            get => _casillasAnteriores.Count > 0 ? _casillasAnteriores[^1] : -1;
+            set
+            {
+                _casillasAnteriores.Clear();
+                if (value >= 0) _casillasAnteriores.Add(value);
+            }
+        }
+
+        private readonly List<int> _casillasAnteriores = new();
+
+        /// <summary>The cells it stood on before its moves, oldest first: for a plan to put back.</summary>
+        public int[] CellHistory() => _casillasAnteriores.ToArray();
+
+        /// <summary>The history as a plan kept it (<see cref="CellHistory"/>).</summary>
+        public void RestoreCellHistory(int[] history)
+        {
+            _casillasAnteriores.Clear();
+            _casillasAnteriores.AddRange(history);
+        }
+
+        /// <summary>
+        /// Back to the cell before the last move (1100): that cell taken off the history, and the
+        /// cell it leaves not noted.
+        /// </summary>
+        public void VolverALaAnterior(int casilla)
+        {
+            if (_casillasAnteriores.Count > 0 && _casillasAnteriores[^1] == casilla)
+                _casillasAnteriores.RemoveAt(_casillasAnteriores.Count - 1);
+            CellId = casilla;
+        }
+
+        /// <summary>A walk: every cell of the path but its end noted, one move each.</summary>
+        public void Andar(IReadOnlyList<int> camino)
+        {
+            if (camino == null || camino.Count == 0) return;
+            for (int i = 0; i < camino.Count - 1; i++)
+            {
+                if (camino[i] == camino[i + 1]) continue;
+                _casillasAnteriores.Add(camino[i]);
+            }
+            CellId = camino[^1];
+        }
 
         /// <summary>
         /// A monster's behaviour spell -- its grade's startingSpellId -- cast when the fight
@@ -459,7 +511,7 @@ namespace Jondo.Unity.World.Fights
         public void MoverA(int casilla)
         {
             if (casilla == CellId) return;
-            CasillaAnterior = CellId;
+            _casillasAnteriores.Add(CellId);
             CellId = casilla;
         }
 
