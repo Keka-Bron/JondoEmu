@@ -317,6 +317,12 @@ namespace Jondo.Unity.Server.Managers
         /// goes now -- El Tiempo Vuela's «a su posición anterior en el siguiente turno».
         /// </summary>
         public bool MovesBack => EffectEngine.EsVueltaAtras(Waiting.EffectId);
+
+        // These effects change the fighter itself, not just a characteristic in its buff list.
+        public bool Replays => Waiting.EffectId is 405 or 2796
+            or EffectSupport.ChangeLook or EffectSupport.ChangeAppearance
+            or EffectSupport.VitalityPercentBonus or EffectSupport.VitalityPercentMalus
+            or EffectSupport.VitalityPercentBoost;
     }
 
     /// <summary>
@@ -987,10 +993,14 @@ namespace Jondo.Unity.Server.Managers
             if (sobre == null || subcast.DiceNum <= 0) return null;
             if (!PlayerSpells.Contains(subcast.DiceNum)) return null;
             int grado = Math.Max(1, subcast.DiceSide);
-            bool espera = SpellEffects.De(subcast.DiceNum, grado).Any(e =>
+            var pendingRows = SpellEffects.De(subcast.DiceNum, grado).Where(e =>
                 e.Disparadores().Any(d => !string.Equals(d, AlLanzar, StringComparison.OrdinalIgnoreCase))
-                && !EsFilaQueLeeElGolpe(e.EffectId));
-            if (!espera) return null;
+                && !EsFilaQueLeeElGolpe(e.EffectId)).ToList();
+            if (pendingRows.Count == 0) return null;
+            // Target-turn rows are armed on their actual recipients by ResolveEffects, even
+            // inside an area sub-cast. Hooking them on the area anchor would fire twice,
+            // and on the anchor's turn instead of the poisoned enemy's (Miasmes).
+            if (pendingRows.All(e => WaitsOnATurn(e) && e.TargetMask is not ("C" or "c"))) return null;
             return new Outcome
             {
                 Sobre = sobre, Caster = lanzaElHijo, Efecto = subcast,
@@ -2411,7 +2421,7 @@ namespace Jondo.Unity.Server.Managers
                     });
                 }
 
-                // A player spell's own row that waits on a TURN of its target -- a poison or a heal
+                // A player spell's row, including a nested area spell, that waits on a TURN of its target -- a poison or a heal
                 // at the start or the end of it -- hooks the spell on whoever its mask and zone
                 // name at the cast, although nothing it did stayed on them. Extinción's "99 under
                 // TE on a,A,R": in its capture the real server puts its 3793 and its 99 on -1 at
@@ -2419,7 +2429,7 @@ namespace Jondo.Unity.Server.Managers
                 // nothing -- its blow stays on nobody -- the poison never went off. The row's
                 // conditions are read when it goes off, the R with the cast's portals, which the
                 // hook keeps.
-                if (!leToca && depth == 0
+                if (!leToca
                     && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
                     && PlayerSpells.Contains(spell) && WaitsOnATurn(efecto)
                     && !EsFilaQueLeeElGolpe(efecto.EffectId)
@@ -2430,12 +2440,14 @@ namespace Jondo.Unity.Server.Managers
                     foreach (var bearer in AQuien(combat, caster, target, onTheirTurn, aimedCell,
                                                   estadosAlEmpezar, celdasAlEmpezar, soloAlObjetivo: soloAlObjetivo))
                     {
-                        if (bearer == null || !bearer.IsAlive || !hookedForTheirTurn.Add(bearer)) continue;
+                        if (bearer == null || !bearer.IsAlive
+                            || (depth == 0 && !hookedForTheirTurn.Add(bearer))) continue;
                         fuera.Add(new Outcome
                         {
                             Sobre = bearer, Caster = caster, Efecto = efecto,
                             HechizoOrigen = spell, NivelOrigen = grade,
                             EnganchePendiente = true,
+                            FilaArmada = depth > 0,
                             HookUntil = UntilTheirNextTurn(combat, bearer, round),
                         });
                     }
@@ -2459,7 +2471,7 @@ namespace Jondo.Unity.Server.Managers
                 // back, and is not a second wait. Klim's "952 under PPD, delay 2" is "not before
                 // turn 3", not "two turns after the push".
                 if (efecto.Delay > 0 && !string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
-                    && (!PlayerSpells.Contains(spell) || delayHoldsBackOnly))
+                    && (rondaDelEnganche >= 0 || !PlayerSpells.Contains(spell) || delayHoldsBackOnly))
                 {
                     efecto = efecto.Copia();
                     efecto.Delay = 0;
@@ -2632,6 +2644,22 @@ namespace Jondo.Unity.Server.Managers
                         ? efecto.CeldasFijas[0] : aimedCell;
                     if (aDonde < 0) continue;
                     if (!CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar)) continue;
+
+                    // Rempotage's sub-cast is cast by the doll towards its owner. Mode 63
+                    // picks the first free cell from that owner towards the doll, rather
+                    // than attempting to occupy the owner's cell (capture: 286 -> 272,
+                    // owner on 259; then 273 -> 244, owner on 230).
+                    if (efecto.DiceNum == 63)
+                    {
+                        var walkable = MapManager.GetFightWalkable(combat.ArenaMapId);
+                        int ownerCell = aDonde;
+                        int span = Jondo.Unity.World.Maps.MapGeometry.Distance(ownerCell, caster.CellId);
+                        aDonde = Jondo.Unity.World.Maps.Zone.FirstCellOnTheLine(ownerCell, caster.CellId, false,
+                            cell => Jondo.Unity.World.Maps.MapGeometry.Distance(ownerCell, cell)
+                                    + Jondo.Unity.World.Maps.MapGeometry.Distance(cell, caster.CellId) == span
+                                    && (walkable == null || walkable.Contains(cell)) && EnLaCasilla(combat, cell) == null);
+                        if (aDonde < 0) continue;
+                    }
 
                     var saltado = Aplicar(combat, caster, caster, spell, grade, efecto, round,
                                           aDonde, sharedHealRoll);
@@ -2948,7 +2976,8 @@ namespace Jondo.Unity.Server.Managers
                         {
                             var quienLoLanzaraLuego = Familia.TryGetValue(efecto.EffectId, out var comoEsperara)
                                                       && comoEsperara.LanzaElCandidato ? sobre : caster;
-                            fuera.Add(Pendiente(combat, quienLoLanzaraLuego, sobre, spell, grade, efecto, round));
+                            var delayedTarget = comoEsperara.Apunta == Apunta.AlLanzadorPadre ? caster : sobre;
+                            fuera.Add(Pendiente(combat, quienLoLanzaraLuego, delayedTarget, spell, grade, efecto, round));
                             continue;
                         }
 
@@ -3021,6 +3050,7 @@ namespace Jondo.Unity.Server.Managers
                 ? alEmpezar
                 : quienLanza.Buffs.Estados as IReadOnlySet<int> ?? new HashSet<int>(quienLanza.Buffs.Estados);
 
+            bool hasTemplate = false, matchesTemplate = false;
             foreach (var trozo in mascara.Split(','))
             {
                 string t = trozo.Trim();
@@ -3031,13 +3061,16 @@ namespace Jondo.Unity.Server.Managers
                 {
                     case 'E': if (!delLanzador.Contains(numero)) return false; break;
                     case 'e': if (delLanzador.Contains(numero)) return false; break;
-                    case 'F': if (!quienLanza.IsMonster || quienLanza.MonsterId != numero) return false; break;
+                    case 'F':
+                        hasTemplate = true;
+                        matchesTemplate |= quienLanza.IsMonster && quienLanza.MonsterId == numero;
+                        break;
                     case 'f': if (quienLanza.IsMonster && quienLanza.MonsterId == numero) return false; break;
                     case 'V': if (!LifeUnder(quienLanza, numero)) return false; break;
                     case 'v': if (LifeUnder(quienLanza, numero)) return false; break;
                 }
             }
-            return true;
+            return !hasTemplate || matchesTemplate;
         }
 
         /// <summary>
@@ -4088,6 +4121,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (!sobre.IsAlive) return null;
                 if (efecto.DiceNum <= 0) return null;
+                if (efecto.Delay > 0) return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda);
 
                 return new Outcome
                 {
@@ -4314,6 +4348,7 @@ namespace Jondo.Unity.Server.Managers
                 || efecto.EffectId == EffectSupport.VitalityPercentBonus
                 || efecto.EffectId == EffectSupport.VitalityPercentBoost)
             {
+                if (efecto.Delay > 0) return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda);
                 int porciento = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (porciento <= 0) return null;
 
@@ -4326,7 +4361,14 @@ namespace Jondo.Unity.Server.Managers
                 // gets the vitality hole; the buff carries the points on characteristic 11 so
                 // that the sheet refresh finds them, and the handler moves the maximum with it
                 // and moves it back when the buff falls.
-                int puntos = sobre.MaxHP * porciento / 100;
+                // Percentage bonuses use life before combat vitality buffs. In Arbre de vie's
+                // capture both successive +100% rows add 630, not 630 then 1260. Likewise
+                // the Sacrifiée's +50% and +100% growth must not compound each other.
+                int baseLife = efecto.EffectId == EffectSupport.VitalityPercentBonus
+                    ? sobre.MaxHP - sobre.Buffs.Puestos.Where(b => !b.Pendiente && b.Caracteristica == VitalityCharacteristic)
+                                                     .Sum(b => b.Cuanto)
+                    : sobre.MaxHP;
+                int puntos = Math.Max(1, baseLife) * porciento / 100;
                 if (puntos <= 0) return null;
                 if (efecto.EffectId == EffectSupport.VitalityPercentMalus) puntos = -puntos;
 
@@ -4675,9 +4717,9 @@ namespace Jondo.Unity.Server.Managers
                 int estado = efecto.Value != 0 ? efecto.Value : efecto.DiceNum;
                 if (estado == 0) return null;
 
-                // A monster's state with a delay goes on -- or comes off -- when its round comes:
-                // Miauvizor's Inquebrantable (157) at turn 21, not from turn 1.
-                if (efecto.Delay > 0 && !PlayerSpells.Contains(hechizo))
+                // A delayed state goes on -- or comes off -- when its round comes, including
+                // the successive growth stages of a player's Sacrifiée.
+                if (efecto.Delay > 0)
                     return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda);
                 var barridos = new List<Buff>();
 
@@ -4856,6 +4898,7 @@ namespace Jondo.Unity.Server.Managers
 
             if (efecto.EffectId == CambiarApariencia || efecto.EffectId == EffectSupport.ChangeAppearance)
             {
+                if (efecto.Delay > 0) return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda);
                 int apariencia = efecto.Value != 0 ? efecto.Value : efecto.DiceNum;
                 if (apariencia <= 0) return null;
 
@@ -5103,11 +5146,10 @@ namespace Jondo.Unity.Server.Managers
             // Now the one that cannot be applied is noted and SENT all the same, with what it carries.
             bool soloPanel = caracteristica == 0 || signo == 0 || cantidad == 0;
 
-            // Points that come LATER wait: "aumenta los PM del lanzador en el siguiente turno"
+            // Characteristics that come LATER wait: "aumenta los PM del lanzador en el siguiente turno"
             // is a 128 with a delay of one, and applied now it was one more step in the turn
             // of the cast and none in the next.
-            if (!soloPanel && efecto.Delay > 0
-                && (caracteristica == PuntosDeAccion || caracteristica == PuntosDeMovimiento))
+            if (!soloPanel && efecto.Delay > 0)
             {
                 return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda,
                                  caracteristica, cantidad);
@@ -5360,6 +5402,8 @@ namespace Jondo.Unity.Server.Managers
         private static PendingActivation Activate(FightInstance combat, Fighter target, Buff waiting, int round)
         {
             Buff live = null;
+            var activation = new PendingActivation { Target = target, CasterId = waiting.Quien, Waiting = waiting };
+            if (activation.Replays) return activation;
             if (waiting.EffectId == QuitarEstado)
             {
                 return new PendingActivation
@@ -5402,6 +5446,29 @@ namespace Jondo.Unity.Server.Managers
             {
                 Target = target, CasterId = waiting.Quien, Waiting = waiting, Live = live,
             };
+        }
+
+        /// <summary>Apply a waiting mutation to its original bearer, without selecting an area again.</summary>
+        internal static Outcome ResolvePending(FightInstance combat, Fighter caster, PendingActivation activation, int round)
+        {
+            if (!activation.Target.IsAlive) return null;
+            var waiting = activation.Waiting;
+            var row = new SpellEffect
+            {
+                EffectId = waiting.EffectId, EffectUid = waiting.EffectUid,
+                DiceNum = waiting.Dado, DiceSide = waiting.Cara, Value = waiting.Valor,
+                Duration = waiting.Duracion, Dispellable = waiting.Dispellable, MaxStack = waiting.MaxStacks,
+                Triggers = Esperando,
+            };
+            var result = Aplicar(combat, caster, activation.Target, waiting.HechizoOrigen,
+                                 waiting.NivelOrigen, row, round, activation.Target.CellId);
+            if (result != null) result.Critico = waiting.Critico;
+            if (result?.Buff != null)
+            {
+                result.Buff.Padre = waiting.Numero;
+                result.Buff.Disparador = Esperando;
+            }
+            return result;
         }
 
         /// <summary>

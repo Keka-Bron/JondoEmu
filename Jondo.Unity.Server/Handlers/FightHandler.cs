@@ -3648,7 +3648,15 @@ namespace Jondo.Unity.Server.Handlers
                 var caster = fight.Buscar(result.CasterId) ?? result.Target;
                 var waiting = result.Waiting;
 
-                if (result.Kills)
+                if (result.Replays)
+                {
+                    var applied = Managers.EffectEngine.ResolvePending(fight, caster, result, fight.RoundNumber);
+                    if (applied != null)
+                        await AplicarEfectosAsync(stream, fight, caster, waiting.HechizoOrigen, waiting.NivelOrigen,
+                            result.Target, Managers.EffectEngine.Esperando, result.Target.CellId,
+                            preparedEffects: new List<Managers.Outcome> { applied });
+                }
+                else if (result.Kills)
                 {
                     if (!result.Target.IsAlive) continue;
                     Program.LogDebug($"[Fight] The delay is up: {caster.Id} strikes down {result.Target.Id} " +
@@ -4959,8 +4967,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 // From this round: what it waits on with a delay counts its turns from here.
                 invocado.Buffs.PonerActitud(receta.HechizoPropio,
-                    grado: plantilla == Managers.ForgelanceCombat.Lance && Managers.ForgelanceCombat.Is(quienInvoca)
-                        ? receta.GradoDelHechizoPropio : 1,
+                    grado: receta.GradoDelHechizoPropio,
                     givenInRound: fight.RoundNumber);
                 await AplicarEfectosAsync(stream, fight, invocado, receta.HechizoPropio,
                                           receta.GradoDelHechizoPropio,
@@ -5144,6 +5151,7 @@ namespace Jondo.Unity.Server.Handlers
                     int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda, deConducta);
                     if (suya < 0) { hasta = -1; break; }
                     hasta = Math.Max(hasta, suya);
+                    if (c.HookUntil is { } targetTurn) hasta = Math.Max(hasta, targetTurn);
                 }
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico);
@@ -5187,7 +5195,7 @@ namespace Jondo.Unity.Server.Handlers
             // for as long as its waiting rows say.
             foreach (var marca in consecuencias)
             {
-                if (!marca.EnganchePendiente || marca.Sobre == null) continue;
+                if (!marca.EnganchePendiente || marca.FilaArmada || marca.Sobre == null) continue;
                 if (!conAlgoPendiente.Contains((marca.HechizoOrigen, marca.NivelOrigen))) continue;
                 bool yaTieneFilas = consecuencias.Any(c => c.Buff != null && c.Sobre == marca.Sobre
                                                         && c.HechizoOrigen == marca.HechizoOrigen
@@ -6309,7 +6317,8 @@ namespace Jondo.Unity.Server.Handlers
                                                       int rondaDelEnganche = -1,
                                                       bool armar = true, bool soloAlObjetivo = false,
                                                       bool conducta = false, bool delayHoldsBackOnly = false,
-                                                      bool orderedForgelance = false)
+                                                      bool orderedForgelance = false,
+                                                      List<Managers.Outcome> preparedEffects = null)
         {
             if (hechizo == 0) return;
 
@@ -6327,7 +6336,7 @@ namespace Jondo.Unity.Server.Handlers
             List<Managers.Outcome> consecuencias;
             try
             {
-                consecuencias = Managers.EffectEngine.Resolver(fight, quienLanza, hechizo, grado,
+                consecuencias = preparedEffects ?? Managers.EffectEngine.Resolver(fight, quienLanza, hechizo, grado,
                                                                  objetivo, disparador, fight.RoundNumber,
                                                                  hondo: 0,
                                                                  celdaApuntada: celdaApuntada,
@@ -7120,7 +7129,7 @@ namespace Jondo.Unity.Server.Handlers
                             c.Sobre.Id, quienLanza.Id, c.Buff.Numero, efectoAnunciado,
                             c.Efecto.EffectUid, c.Efecto.Value, dadoAnunciado, caraAnunciada,
                             c.HechizoOrigen, d, rondas, c.Efecto.Dispellable, familia,
-                            c.NivelOrigen, c.Critico)));
+                            c.NivelOrigen, c.Critico, padre: c.Buff.Padre)));
                 }
                 // An invisibility row goes with the switch, to everybody, right behind it: "jxm
                 // 150, jwe 150 f34{f1=1 f4=Sram}" at frames 10-11 of "sram-invisibilidad", and a
