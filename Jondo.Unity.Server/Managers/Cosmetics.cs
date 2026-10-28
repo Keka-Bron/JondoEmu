@@ -125,6 +125,7 @@ namespace Jondo.Unity.Server.Managers
         private static readonly List<int> _titles = new List<int>();
         private static readonly List<int> _ornaments = new List<int>();
         private static readonly Dictionary<int, int> _appearanceBones = new Dictionary<int, int>();
+        private static readonly Dictionary<int, string> _appearanceLooks = new();
 
         /// <summary>
         /// Whether the tables are filled in and safe to read. Volatile, and raised LAST: see
@@ -159,6 +160,7 @@ namespace Jondo.Unity.Server.Managers
                 try
                 {
                     LoadCatalogue();
+                    LoadFightAppearances();
                     LoadLooks();
                     LoadRealLooks();
 
@@ -509,6 +511,30 @@ namespace Jondo.Unity.Server.Managers
         {
             Ensure();
             return _pets.TryGetValue(gid, out var p) ? p : null;
+        }
+
+        private static void LoadFightAppearances()
+        {
+            string path = Paths.ContentFile("fights/appearances.json");
+            if (!File.Exists(path)) return;
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                foreach (var entry in doc.RootElement.GetProperty("looks").EnumerateObject())
+                    if (int.TryParse(entry.Name, out int id) && entry.Value.ValueKind == JsonValueKind.String)
+                        _appearanceLooks[id] = entry.Value.GetString() ?? "";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Appearances] Could not read fight transformations: {ex.Message}");
+            }
+        }
+
+        /// <summary>A measured full transformation, including its scale; empty for bone-only appearances.</summary>
+        public static string AppearanceLook(int appearanceId)
+        {
+            Ensure();
+            return _appearanceLooks.TryGetValue(appearanceId, out var look) ? look : "";
         }
 
         /// <summary>A type 5 appearance's bones, or zero if it is not compatible.</summary>

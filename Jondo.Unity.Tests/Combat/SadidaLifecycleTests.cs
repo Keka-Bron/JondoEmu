@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using Xunit;
 
@@ -19,11 +20,11 @@ public class SadidaLifecycleTests
         Otras = { [26] = 20 },
     };
 
-    private static (FightInstance Fight, Fighter Sadida, Fighter Enemy) Scene(int cell = 300, int enemyCell = 314)
+    private static (FightInstance Fight, Fighter Sadida, Fighter Enemy) Scene(int cell = 300, int enemyCell = 314, long firstId = 100)
     {
         var fight = new FightInstance(1, 1) { Reglas = FightRules.Desafio };
-        var sadida = Person(100, 0, cell);
-        var enemy = Person(200, 1, enemyCell);
+        var sadida = Person(firstId, 0, cell);
+        var enemy = Person(firstId + 100, 1, enemyCell);
         fight.AddPlayer(sadida); fight.AddOpponent(enemy);
         fight.StartFight();
         return (fight, sadida, enemy);
@@ -71,6 +72,92 @@ public class SadidaLifecycleTests
         var (fight, sadida, _) = Scene();
         await Cast(fight, sadida, 13560, sadida, cell: 330);
         Assert.Contains(256, SummonOf(fight, 5894).Buffs.Estados);
+    }
+
+    private static byte[] At(byte[] payload, params int[] path)
+    {
+        foreach (int field in path)
+            payload = ProtoMessage.Parse(payload).Fields.Single(f => f.FieldNumber == field).BytesValue;
+        return payload;
+    }
+
+    private static bool Action(byte[] payload, int action)
+        => ProtoMessage.Parse(payload).Fields.Any(f => f.FieldNumber == 14 && f.VarIntValue == action);
+
+    private static void Look(byte[] payload, int bones, int scale)
+    {
+        var fields = ProtoMessage.Parse(payload).Fields;
+        Assert.Equal(bones, fields.Single(f => f.FieldNumber == 3).VarIntValue);
+        Assert.Equal(new byte[] { (byte)scale }, fields.Single(f => f.FieldNumber == 5).BytesValue);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Tree_growth_sends_the_captured_look_to_both_players(bool useLarme)
+    {
+        var (fight, sadida, enemy) = Scene(enemyCell: 500, firstId: 8_510_000);
+        await using var ownerWire = await PortalTests.Wire.Open(sadida.Id);
+        await using var opponentWire = await PortalTests.Wire.Open(enemy.Id);
+        await Cast(fight, sadida, 13519, sadida, cell: 330);
+        var tree = SummonOf(fight, 5894);
+        var birth = await ownerWire.Drain();
+        await opponentWire.Drain();
+        var summon = Assert.Single(birth, f => f.Op == "jwe" && Action(f.Payload, 181));
+        Look(At(summon.Payload, 1, 1, 1, 3), 3163, 60); // Arbre packet 15.
+        Assert.DoesNotContain(birth, f => f.Op == "jwe" && Action(f.Payload, 149));
+        Assert.DoesNotContain(256, tree.Buffs.Estados);
+        Look(FightHandler.CurrentFightLook(fight, tree), 3163, 60);
+
+        if (useLarme) await Cast(fight, sadida, 13528, tree);
+        else await Advance(fight, 2);
+
+        Assert.Contains(256, tree.Buffs.Estados);
+        Assert.DoesNotContain(tree.Buffs.Puestos, b => b.Pendiente && b.HechizoOrigen == 14700);
+        foreach (var frames in new[] { await ownerWire.Drain(), await opponentWire.Drain() })
+        {
+            var change = Assert.Single(frames, f => f.Op == "jwe" && Action(f.Payload, 149));
+            Look(At(change.Payload, 26, 3), 3164, 70); // Arbre packet 58; Larme packet 57.
+        }
+        Look(FightHandler.CurrentFightLook(fight, tree), 3164, 70);
+        if (useLarme)
+        {
+            await Advance(fight, 2);
+            Assert.DoesNotContain(await ownerWire.Drain(), f => f.Op == "jwe" && Action(f.Payload, 149));
+        }
+    }
+
+    [Fact]
+    public async Task The_leafy_variant_sends_its_mature_look_immediately()
+    {
+        var (fight, sadida, _) = Scene(enemyCell: 500, firstId: 8_520_000);
+        await using var wire = await PortalTests.Wire.Open(sadida.Id);
+        await Cast(fight, sadida, 13560, sadida, cell: 330);
+        var tree = SummonOf(fight, 5894);
+        var frames = await wire.Drain();
+        var change = Assert.Single(frames, f => f.Op == "jwe" && Action(f.Payload, 149));
+        Look(At(change.Payload, 26, 3), 3164, 70);
+        Assert.Contains(256, tree.Buffs.Estados);
+        Look(FightHandler.CurrentFightLook(fight, tree), 3164, 70);
+        Assert.Equal(0, SpellTable.GradeFor(13560, 114));
+        Assert.Equal(1, SpellTable.GradeFor(13560, 115));
+    }
+
+    [Theory]
+    [InlineData(13519, false)]
+    [InlineData(13528, true)]
+    [InlineData(13560, true)]
+    [InlineData(14700, true)]
+    public async Task Ronce_only_hits_enemies_around_a_leafy_tree(int maturation, bool relays)
+    {
+        var (fight, sadida, enemy) = Scene(enemyCell: 344);
+        await Cast(fight, sadida, maturation == 13560 ? 13560 : 13519, sadida, cell: 330);
+        var tree = SummonOf(fight, 5894);
+        if (maturation == 13528) await Cast(fight, sadida, 13528, tree);
+        if (maturation == 14700) await Advance(fight, 2);
+        int before = enemy.CurrentHP;
+        await Cast(fight, sadida, 13516, tree);
+        Assert.Equal(relays, enemy.CurrentHP < before);
     }
 
     [Fact]

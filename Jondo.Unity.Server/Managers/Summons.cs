@@ -33,6 +33,8 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The look string, and which template it was taken from.</summary>
         public string Look { get; init; } = "";
         public int PlantillaDelAspecto { get; init; }
+        /// <summary>The scale explicitly set by this summon template, before following any referral.</summary>
+        public int LookScale { get; init; }
 
         public int Vida { get; init; }
 
@@ -276,6 +278,7 @@ namespace Jondo.Unity.Server.Managers
                     Nivel = Math.Max(1, Entero(gr, "level")),
                     Look = look,
                     PlantillaDelAspecto = deQuien,
+                    LookScale = ScaleIn(TextoDe(conexion, "SELECT Look FROM MonsterTemplates WHERE Id = $id;", plantilla)),
                     // The life is left raw: the summoner knows his level and scales the part that
                     // scales. The fixed one scales with nobody.
                     Vida = bonusVida,
@@ -419,6 +422,12 @@ namespace Jondo.Unity.Server.Managers
                 return (cadena, otra);
             }
             return (look, plantilla);
+        }
+
+        private static int ScaleIn(string look)
+        {
+            string[] parts = (look ?? "").Trim().Trim('{', '}').Split('|');
+            return parts.Length > 3 && int.TryParse(parts[3], out int scale) && scale > 0 ? scale : 0;
         }
 
         /// <summary>Whether this look string sends to another template, and which one.</summary>

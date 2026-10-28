@@ -1715,7 +1715,7 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildSummon(long quienInvoca, long quienEs, int celda, int orientacion,
                                          int plantillaDelAspecto, int plantillaDelBicho, int grado,
                                          IEnumerable<(int Characteristic, long Base, long Gear)> ficha,
-                                         int efecto = Invoca)
+                                         int efecto = Invoca, byte[] look = null)
         {
             var stats = Pb.New()
                 .Var(1, quienInvoca)
@@ -1733,7 +1733,7 @@ namespace Jondo.Unity.Server.Network
                         .Msg(1, Pb.New().Var(1, celda).VarIfNotZero(2, orientacion).Var(4, 0))
                         .Var(3, quienEs)))
                 .Var(2, 0)
-                .Msg(3, Pb.New().Var(2, 3).Var(3, plantillaDelAspecto))
+                .Bytes(3, look ?? Pb.New().Var(2, 3).Var(3, plantillaDelAspecto).Build())
                 .Msg(5, Pb.New().Msg(3, Pb.New().Var(2, plantillaDelBicho).Var(3, grado)))
                 .Msg(6, stats);
 
