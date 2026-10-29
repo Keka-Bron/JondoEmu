@@ -30,7 +30,7 @@ namespace Jondo.Unity.Server.Managers
         internal readonly record struct Line(int Effect, int Element, int Min, int Max);
 
         /// <summary>The steal effects, 91 to 95, which give way to a damage line with the same dice.</summary>
-        internal static bool IsSteal(int effect) => effect >= 91 && effect <= 95;
+        internal static bool IsSteal(int effect) => (effect >= 91 && effect <= 95) || effect == 2828;
 
         /// <summary>
         /// The lines a hit deals, in the order the weapon carries them.

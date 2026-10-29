@@ -32,6 +32,7 @@ namespace Jondo.Unity.Server.Managers
             DiceNum = DiceNum,
             DiceSide = DiceSide,
             Duration = Duration,
+            TriggerDuration = TriggerDuration,
             Delay = Delay,
             Element = Element,
             Dispellable = Dispellable,
@@ -55,6 +56,13 @@ namespace Jondo.Unity.Server.Managers
         public int DiceNum { get; init; }
         public int DiceSide { get; init; }
         public int Duration { get; init; }
+
+        /// <summary>
+        /// How many rounds a row waiting on a trigger stays on its bearer when it has no duration
+        /// of its own (<c>effectTriggerDuration</c>): Blakjak's "curas recibidas" under H is
+        /// "duration 0, trigger duration 2", and its capture's row cast in round 5 drops in 7.
+        /// </summary>
+        public int TriggerDuration { get; init; }
 
         /// <summary>
         /// The DELAY in turns: the effect does not start on casting, but that many rounds later.
@@ -294,6 +302,7 @@ namespace Jondo.Unity.Server.Managers
                         DiceNum = Entero(e, "diceNum"),
                         DiceSide = Entero(e, "diceSide"),
                         Duration = Entero(e, "duration"),
+                        TriggerDuration = Entero(e, "effectTriggerDuration"),
                         Delay = Entero(e, "delay"),
                         Dispellable = Entero(e, "dispellable"),
                         Element = e.TryGetProperty("effectElement", out var el) && el.TryGetInt32(out int v) ? v : -1,

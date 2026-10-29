@@ -586,7 +586,8 @@ namespace Jondo.Unity.Server.Managers
         {
             int elemento = efecto.Element >= 0 ? efecto.Element
                                                : DatabaseManager.EffectElement(efecto.EffectId);
-            if (efecto.EffectId == DanoDelMejorElemento || elemento == ElementoMejor)
+            // Its steal as well: Tijeras del destino's "robo del mejor elemento" (2828).
+            if (efecto.EffectId == DanoDelMejorElemento || efecto.EffectId == 2828 || elemento == ElementoMejor)
                 return MejorElementoDe(quienLanza, ronda);
             if (efecto.EffectId == DanoDelPeorElemento)
                 return PeorElementoDe(quienLanza, ronda);
@@ -1442,7 +1443,10 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         internal static bool EsFilaQueLeeElGolpe(int efecto)
             => EsReduccionDeDanoRecibido(efecto) || efecto == Buffs.DanoSufridoPorCiento
-               || efecto == InterceptaLosDanos || efecto == ComparteLosDanos;
+               || efecto == InterceptaLosDanos || efecto == ComparteLosDanos
+               // And the heal's: Blakjak's "curas recibidas 94%" under H waits on its target for a
+               // heal, as the jxm 1159 of its capture shows (frames 4586 and 4953).
+               || efecto == ReceivedHealingPercent;
 
         /// <summary>
         /// «Intercepta los daños» (765): a row on the bearer, under the blows it names -- "D"
@@ -2406,7 +2410,12 @@ namespace Jondo.Unity.Server.Managers
                             NivelOrigen = grade,
                             Quien = caster.Id,
                             Disparador = efecto.Triggers,
-                            CaducaEnRonda = Caduca(efecto, round),
+                            // A heal's row with no duration lasts its trigger's: Blakjak's, cast in
+                            // round 5, drops in 7 (its capture's f6). The blows' rows keep theirs.
+                            CaducaEnRonda = efecto.EffectId == ReceivedHealingPercent && efecto.Duration == 0
+                                            && efecto.TriggerDuration > 0
+                                ? round + efecto.Delay + efecto.TriggerDuration
+                                : Caduca(efecto, round),
                             EmpiezaEnRonda = Empieza(efecto, round),
                         }, combat.SiguienteEmbrujo);
                         fuera.Add(new Outcome
@@ -5665,7 +5674,7 @@ namespace Jondo.Unity.Server.Managers
         /// and the steals (84, 77). The plain "-N PA/PM" boosts (168, 169) are not rolled: they
         /// are what a spell does to its own caster or what nothing avoids.
         /// </summary>
-        private static bool EsRetiradaEsquivable(int efecto)
+        internal static bool EsRetiradaEsquivable(int efecto)
             => efecto is 1079 or 1080 or 101 or 127 or 84 or 77;
 
         /// <summary>The removal effect a landed "retira" is announced as: -N PA (168) or -N PM (169).</summary>

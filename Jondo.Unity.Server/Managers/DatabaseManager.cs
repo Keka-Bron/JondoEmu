@@ -4316,6 +4316,9 @@ namespace Jondo.Unity.Server
         /// <summary>«#1 a #2 de daños del peor elemento».</summary>
         private const int WorstElementDamage = 2832;
 
+        /// <summary>«#1 a #2 de robo del mejor elemento»: Tijeras del destino's hit.</summary>
+        private const int BestElementSteal = 2828;
+
         /// <summary>
         /// The equipped weapon, expressed as if it were a spell, so that a weapon hit goes down
         /// the same path as a regular cast.
@@ -4408,8 +4411,23 @@ namespace Jondo.Unity.Server
                 // 91 to 100, and the best and worst element's damage, which Cocobur, Garra de
                 // Gargandias and Fervor de Amayiro hit with: left out, they had no damage at all.
                 bool deDano = (efecto.Effect >= 91 && efecto.Effect <= 100)
-                              || efecto.Effect == BestElementDamage || efecto.Effect == WorstElementDamage;
-                if (!deDano) continue;
+                              || efecto.Effect == BestElementDamage || efecto.Effect == WorstElementDamage
+                              || efecto.Effect == BestElementSteal;
+
+                // The rest of what the weapon does on a hit -- the catalogue's weapon category: its
+                // AP or MP taken (101, 127), its MP stolen (77), its push or pull (5, 6), its heal
+                // (108), its step forward (1042). 116 of the 767 weapons carry one, and none of them
+                // did anything: the Kaiser's "-1 a -2 PA" took nobody's.
+                if (!deDano)
+                {
+                    if (EffectFamily(efecto.Effect).Category == WeaponDamageCategory)
+                    {
+                        int desde = (int)(efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value);
+                        int hasta = (int)(efecto.DiceSide != 0 ? efecto.DiceSide : desde);
+                        if (desde > 0 || hasta > 0) data.WeaponSideLines.Add((efecto.Effect, desde, Math.Max(desde, hasta)));
+                    }
+                    continue;
+                }
 
                 int minimo = (int)(efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value);
                 int maximo = (int)(efecto.DiceSide != 0 ? efecto.DiceSide : minimo);
@@ -6040,6 +6058,12 @@ namespace Jondo.Unity.Server
         /// A weapon hits once PER LINE, and the real server sends one hit for each with its own effect number.
         /// The loose fields down here carry the biggest line, which is what the AI needs to estimate.
         /// </summary>
+        /// <summary>
+        /// The rest of a weapon's hit, one entry per line: the effect and its dice. Points taken or
+        /// stolen, a push, a pull, a heal -- what is not damage. Empty for a spell.
+        /// </summary>
+        public List<(int Effect, int Min, int Max)> WeaponSideLines { get; } = new();
+
         public List<(int Effect, int Element, int Min, int Max)> WeaponLines { get; } =
             new List<(int, int, int, int)>();
 

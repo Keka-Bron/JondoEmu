@@ -3575,6 +3575,16 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A kanojedo's puch is a dummy and plays nothing: its one spell is the client's debug
+            // Matanza, "matar a todo el mundo", kept out of reach by its zero AP. A Zurcarák's
+            // "+3 PA" to everybody gave one the points, and it killed the player.
+            if (fighter.IsMonster && !fighter.EsInvocado && Managers.Kanojedo.IsPuch(fighter.MonsterId))
+            {
+                Program.LogDebug($"[Fight] {fighter.Id} is a kanojedo puch: it plays nothing.");
+                await PassTurnAsync(stream);
+                return;
+            }
+
             // A monster's summon plays itself, as its summoner does: nobody's client plays it.
             // Handed on at once before, whatever it could do.
             var invocador = fighter.EsInvocado ? fight.Buscar(fighter.Invocador) : null;
@@ -3936,11 +3946,7 @@ namespace Jondo.Unity.Server.Handlers
             // And whatever reacts to walking, ONCE PER CELL. The Sentinel takes one range and two
             // percent of ranged damage on every step, not on every move: walking three cells at
             // once costs three, not one.
-            for (int paso = 0; paso < steps; paso++)
-            {
-                await EngancheAsync(stream, fight, walker, Managers.EffectEngine.AlAndar);
-                await EngancheAsync(stream, fight, walker, Managers.EffectEngine.AlUsarUnPM);
-            }
+            await StepsWalkedAsync(stream, fight, walker, steps);
 
             // And whatever was put on the ground where he ended up. It goes AFTER walking and the
             // triggers: first he arrives, and once on his new cell whatever was there goes off.
@@ -4088,6 +4094,23 @@ namespace Jondo.Unity.Server.Handlers
             if (caidos.Count > 0)
             {
                 Program.LogDebug($"[Fight] {caidos.Count} glyph(s) swept away.");
+            }
+        }
+
+        /// <summary>
+        /// What reacts to <paramref name="steps"/> cells walked, once per cell: the attitudes as
+        /// well as the hooks. The gear's Guarda Campestre is an attitude -- its "+8 potencia por
+        /// cada PM" under CCMPARR and its "used MP this turn" state under CMPARR --, and with only
+        /// the hooks fired the turn-end heal of one who had not moved came to whoever had walked.
+        /// </summary>
+        internal static async Task StepsWalkedAsync(NetworkStream stream, FightInstance fight, Fighter walker, int steps)
+        {
+            for (int paso = 0; paso < steps; paso++)
+            {
+                await ActitudesAsync(stream, fight, walker, Managers.EffectEngine.AlAndar);
+                await ActitudesAsync(stream, fight, walker, Managers.EffectEngine.AlUsarUnPM);
+                await EngancheAsync(stream, fight, walker, Managers.EffectEngine.AlAndar);
+                await EngancheAsync(stream, fight, walker, Managers.EffectEngine.AlUsarUnPM);
             }
         }
 
@@ -4780,6 +4803,9 @@ namespace Jondo.Unity.Server.Handlers
                     // its three turns of basic damage, Disparos Lejanos's range...
                     await AplicarEfectosAsync(stream, fight, caster, spell, grade, victim,
                                               Managers.EffectEngine.AlLanzar, cell, critico, tirada);
+
+                    // A weapon's own: what its hit does besides the damage.
+                    if (spell == 0) await WeaponSideLinesAsync(stream, fight, caster, victim, cell, critico);
                 }
             }
             finally
@@ -6436,7 +6462,8 @@ namespace Jondo.Unity.Server.Handlers
                                                       bool orderedForgelance = false,
                                                       List<Managers.Outcome> preparedEffects = null)
         {
-            if (hechizo == 0) return;
+            // A weapon's hit has no spell, only the rows it is handed (WeaponSideLinesAsync).
+            if (hechizo == 0 && tirada == null) return;
 
             // The size of every bomb before anything happens, so that a combo granted from
             // inside a spell -- Mosquete, Kabúm, Último Aliento, a Detonador -- redraws the bomb
@@ -7924,11 +7951,47 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (caster.Id != GameState.CharacterId) return 0;
 
-            // The same slot GetEquippedWeaponAsSpell looks at: 1 is the hand.
+            // The same slot GetEquippedWeaponAsSpell looks at: 1 is the hand. Out of the live
+            // inventory (Equipment), which every equip goes through, and the login's list only
+            // when that one does not have it: a hammer equipped after logging in was missing
+            // from the second, and its hit went out as «Puñetazo» with the hammer's damage.
             const int CasillaDelArma = 1;
+            var enLaMano = Managers.Equipment.InSlot(CasillaDelArma);
+            if (enLaMano != null) return enLaMano.Template;
             foreach (var pieza in GameState.GetInventoryCopy())
                 if (pieza.Position == CasillaDelArma) return pieza.ItemId;
             return 0;
+        }
+
+        /// <summary>
+        /// What the weapon's hit does besides the damage (SpellCombatData.WeaponSideLines), on
+        /// everybody in its type's zone but its wielder, through the effects engine like any
+        /// spell's row: the points it takes or steals for the target's turn, its push or pull, its
+        /// heal.
+        /// </summary>
+        private static async Task WeaponSideLinesAsync(NetworkStream stream, FightInstance fight, Fighter caster,
+                                                       Fighter target, int celdaApuntada, bool critico)
+        {
+            if (caster.Id != GameState.CharacterId) return;
+            var arma = DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId);
+            if (arma == null || arma.WeaponSideLines.Count == 0) return;
+            var zona = Managers.WeaponZones.Of(arma.WeaponType);
+            int cual = 0;
+            var filas = arma.WeaponSideLines.Select(linea => new Managers.SpellEffect
+            {
+                EffectId = linea.Effect,
+                EffectUid = -100 - (++cual),
+                DiceNum = linea.Min,
+                DiceSide = linea.Max,
+                // Points taken or stolen hold for the target's coming turn, as a spell's do.
+                Duration = Managers.EffectEngine.EsRetiradaEsquivable(linea.Effect) ? 1 : 0,
+                TargetMask = "g,A",
+                Forma = zona.Shape,
+                Tamano = zona.Size,
+                TamanoMinimo = zona.MinSize,
+            }).ToList();
+            await AplicarEfectosAsync(stream, fight, caster, 0, 0, target, Managers.EffectEngine.AlLanzar,
+                                      celdaApuntada, critico, filas);
         }
 
         /// <summary>The equipped weapon's hit, which still comes from the usual summary.</summary>

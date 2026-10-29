@@ -52,6 +52,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The race every puch belongs to, "Puchs" in the client's catalogue.</summary>
         public const int PuchRace = 250;
 
+        /// <summary>Whether a monster is one of the kanojedo's puchs.</summary>
+        public static bool IsPuch(int monsterId) => Puchs.Any(p => p.MonsterId == monsterId);
+
         /// <summary>The first screen, and the one the master's bubble shows.</summary>
         public const long FirstMessage = 54965;
 
