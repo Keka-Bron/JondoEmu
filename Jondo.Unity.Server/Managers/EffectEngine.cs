@@ -955,7 +955,8 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// Whether a row waits on its bearer being swapped or teleported (MS, TP): Premonición's
         /// "1160 13314-2 under MS|TP on g,A", which its capture registers on the target at the cast
-        /// (frames 193-194) and the swap right behind sets off -- the telefrag (196-200).
+        /// (frames 193-194) and the swap right behind sets off -- the telefrag (196-200). Only a
+        /// root's: Astrolabio's and Permutación's sit in a sub-cast, which is hooked as a child.
         /// </summary>
         private static bool WaitsOnBeingMoved(SpellEffect effect)
             => effect.Disparadores().Any(d => string.Equals(d, AlSerIntercambiado, StringComparison.OrdinalIgnoreCase)
@@ -2450,7 +2451,7 @@ namespace Jondo.Unity.Server.Managers
                 // hook keeps.
                 if (!leToca
                     && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
-                    && PlayerSpells.Contains(spell) && (WaitsOnATurn(efecto) || WaitsOnBeingMoved(efecto))
+                    && PlayerSpells.Contains(spell) && (WaitsOnATurn(efecto) || (depth == 0 && WaitsOnBeingMoved(efecto)))
                     && !EsFilaQueLeeElGolpe(efecto.EffectId)
                     && efecto.TargetMask is not ("C" or "c"))
                 {
