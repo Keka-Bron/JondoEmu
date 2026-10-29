@@ -73,7 +73,10 @@ namespace Jondo.Unity.Server.Managers
                         if (initial == entry.Passive || initial == spell) continue;
                         if (initialIcon != icon) continue;
                         if (fuera.Any(f => f.Item1 == initial)) continue;
-                        fuera.Add((initial, Math.Max(1, grade)));
+                        // Variant initialization can have a single rank even when the playable
+                        // spell has several. Keep the matching rank where it exists (bombs).
+                        int available = SpellTable.GradeFor(initial, int.MaxValue);
+                        fuera.Add((initial, Math.Clamp(grade, 1, Math.Max(1, available))));
                     }
                 }
             }

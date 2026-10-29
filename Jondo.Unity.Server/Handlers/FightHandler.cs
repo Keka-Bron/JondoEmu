@@ -1619,10 +1619,18 @@ namespace Jondo.Unity.Server.Handlers
         /// Cómplice's «{8146}» to the Ídolo tecnomágico's --, which is what a reconnection drew.
         /// </remarks>
         private static byte[] MonsterLook(Fighter fighter)
-            => string.IsNullOrEmpty(fighter.Look) || (fighter.EsInvocado && fighter.DoubleOf == 0 && fighter.LookBoneId > 0)
-                ? Network.Pb.New().Var(2, 3).VarIfNotZero(3, fighter.LookBoneId).Build()
-                : ConnectionProtocol.MonsterLook(fighter.Look,
-                      ServerSettings.Current.Hardcore && fighter.TaxCollectorFirstName == 0).Build();
+        {
+            if (string.IsNullOrEmpty(fighter.Look) || (fighter.EsInvocado && fighter.DoubleOf == 0 && fighter.LookBoneId > 0))
+            {
+                var look = Network.Pb.New().Var(2, 3).VarIfNotZero(3, fighter.LookBoneId);
+                int scale = fighter.EsInvocado && fighter.DoubleOf == 0
+                    ? Managers.Summons.De(fighter.MonsterId, fighter.GradeIndex)?.LookScale ?? 0 : 0;
+                if (scale > 0) look.Packed(5, new long[] { scale });
+                return look.Build();
+            }
+            return ConnectionProtocol.MonsterLook(fighter.Look,
+                ServerSettings.Current.Hardcore && fighter.TaxCollectorFirstName == 0).Build();
+        }
 
         /// <summary>
         /// Who a monster-side fighter is: a tax collector by its names, any other monster by its
@@ -1646,7 +1654,23 @@ namespace Jondo.Unity.Server.Handlers
         private static byte[] CreatureFighter(FightInstance fight, Fighter fighter)
             => Network.FightProtocol.BuildFighter(
                 fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter),
-                NormalFightLook(fighter), IdentityOf(fighter), isMonster: true, summoner: SummonerOf(fighter));
+                CurrentFightLook(fight, fighter), IdentityOf(fighter), isMonster: true, summoner: SummonerOf(fighter));
+
+        /// <summary>The current transformation also travels on reconnection and spectator snapshots.</summary>
+        internal static byte[] CurrentFightLook(FightInstance fight, Fighter fighter)
+        {
+            byte[] normal = NormalFightLook(fighter);
+            return AppearanceLook(normal, fighter.Buffs.AparienciaEn(fight.RoundNumber)) ?? normal;
+        }
+
+        private static byte[] AppearanceLook(byte[] normal, int appearance)
+        {
+            if (appearance == 0) return normal;
+            string full = Managers.Cosmetics.AppearanceLook(appearance);
+            if (!string.IsNullOrEmpty(full)) return ConnectionProtocol.MonsterLook(full, false).Build();
+            int bones = Managers.Cosmetics.AppearanceBones(appearance);
+            return bones > 0 ? Network.FightProtocol.WithRootBones(normal, bones) : null;
+        }
 
         /// <summary>
         /// The normal look the fighter had on entering this fight; <paramref name="onFoot"/>, the
@@ -1695,26 +1719,26 @@ namespace Jondo.Unity.Server.Handlers
 
             if (appearance != 0)
             {
-                int bones = Managers.Cosmetics.AppearanceBones(appearance);
-                if (bones <= 0 && !string.IsNullOrEmpty(fighter.IncarnationLook))
+                byte[] transformed = AppearanceLook(look, appearance);
+                if (transformed == null && !string.IsNullOrEmpty(fighter.IncarnationLook))
                 {
                     // A trial's guardian or hero, an appearance the client's data does not have: the
                     // look its choice found, which the normal look already is.
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
-                        Network.FightProtocol.BuildLookChanged(fighter.Id, look)));
-                    return;
+                    transformed = look;
                 }
-                if (bones <= 0)
+                if (transformed == null)
                 {
                     Program.LogDebug($"[Fight] Appearance {appearance} has no compatible " +
                                      "bones; the look is not changed.");
                     return;
                 }
-                look = Network.FightProtocol.WithRootBones(look, bones);
+                look = transformed;
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwe,
-                Network.FightProtocol.BuildLookChanged(fighter.Id, look)));
+            var currentFight = appearanceFight ?? GetCurrentFight();
+            var packet = ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildLookChanged(fighter.Id, look));
+            if (currentFight != null) await ATodosAsync(currentFight, packet);
+            else await WriteFrameAsync(stream, packet);
             Program.LogDebug($"[Fight] Look of {fighter.Id}: " +
                              (appearance == 0 ? "normal" : $"appearance {appearance}"));
         }
@@ -3648,7 +3672,15 @@ namespace Jondo.Unity.Server.Handlers
                 var caster = fight.Buscar(result.CasterId) ?? result.Target;
                 var waiting = result.Waiting;
 
-                if (result.Kills)
+                if (result.Replays)
+                {
+                    var applied = Managers.EffectEngine.ResolvePending(fight, caster, result, fight.RoundNumber);
+                    if (applied != null)
+                        await AplicarEfectosAsync(stream, fight, caster, waiting.HechizoOrigen, waiting.NivelOrigen,
+                            result.Target, Managers.EffectEngine.Esperando, result.Target.CellId,
+                            preparedEffects: new List<Managers.Outcome> { applied });
+                }
+                else if (result.Kills)
                 {
                     if (!result.Target.IsAlive) continue;
                     Program.LogDebug($"[Fight] The delay is up: {caster.Id} strikes down {result.Target.Id} " +
@@ -4971,7 +5003,7 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSummon(
                     quienInvoca.Id, invocado.Id, celda, FacingOf(fight, invocado),
                     receta.PlantillaDelAspecto, plantilla, receta.Grado, FullSheetOf(invocado),
-                    efectoQueInvoca)));
+                    efectoQueInvoca, look: MonsterLook(invocado))));
 
             // And after it, the list of fighters again: it is what registers the summon in the
             // client and puts it in the carousel.
@@ -5017,8 +5049,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 // From this round: what it waits on with a delay counts its turns from here.
                 invocado.Buffs.PonerActitud(receta.HechizoPropio,
-                    grado: plantilla == Managers.ForgelanceCombat.Lance && Managers.ForgelanceCombat.Is(quienInvoca)
-                        ? receta.GradoDelHechizoPropio : 1,
+                    grado: receta.GradoDelHechizoPropio,
                     givenInRound: fight.RoundNumber);
                 await AplicarEfectosAsync(stream, fight, invocado, receta.HechizoPropio,
                                           receta.GradoDelHechizoPropio,
@@ -5216,6 +5247,7 @@ namespace Jondo.Unity.Server.Handlers
                     int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda, deConducta);
                     if (suya < 0) { hasta = -1; break; }
                     hasta = Math.Max(hasta, suya);
+                    if (c.HookUntil is { } targetTurn) hasta = Math.Max(hasta, targetTurn);
                 }
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico);
@@ -5259,7 +5291,7 @@ namespace Jondo.Unity.Server.Handlers
             // for as long as its waiting rows say.
             foreach (var marca in consecuencias)
             {
-                if (!marca.EnganchePendiente || marca.Sobre == null) continue;
+                if (!marca.EnganchePendiente || marca.FilaArmada || marca.Sobre == null) continue;
                 if (!conAlgoPendiente.Contains((marca.HechizoOrigen, marca.NivelOrigen))) continue;
                 bool yaTieneFilas = consecuencias.Any(c => c.Buff != null && c.Sobre == marca.Sobre
                                                         && c.HechizoOrigen == marca.HechizoOrigen
@@ -5472,7 +5504,8 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildSummon(
                     quien.Id, muerto.Id, donde, FacingOf(fight, muerto),
-                    muerto.MonsterId, muerto.MonsterId, muerto.GradeIndex + 1, FullSheetOf(muerto), efecto)));
+                    muerto.MonsterId, muerto.MonsterId, muerto.GradeIndex + 1, FullSheetOf(muerto), efecto,
+                    look: MonsterLook(muerto))));
             await ReenviarLaListaAsync(stream, fight);
 
             var zombi = muerto.Buffs.Poner(new Jondo.Unity.World.Fights.Buff
@@ -6400,7 +6433,8 @@ namespace Jondo.Unity.Server.Handlers
                                                       int rondaDelEnganche = -1,
                                                       bool armar = true, bool soloAlObjetivo = false,
                                                       bool conducta = false, bool delayHoldsBackOnly = false,
-                                                      bool orderedForgelance = false)
+                                                      bool orderedForgelance = false,
+                                                      List<Managers.Outcome> preparedEffects = null)
         {
             if (hechizo == 0) return;
 
@@ -6418,7 +6452,7 @@ namespace Jondo.Unity.Server.Handlers
             List<Managers.Outcome> consecuencias;
             try
             {
-                consecuencias = Managers.EffectEngine.Resolver(fight, quienLanza, hechizo, grado,
+                consecuencias = preparedEffects ?? Managers.EffectEngine.Resolver(fight, quienLanza, hechizo, grado,
                                                                  objetivo, disparador, fight.RoundNumber,
                                                                  hondo: 0,
                                                                  celdaApuntada: celdaApuntada,
@@ -7262,7 +7296,7 @@ namespace Jondo.Unity.Server.Handlers
                             c.Sobre.Id, quienLanza.Id, c.Buff.Numero, efectoAnunciado,
                             c.Efecto.EffectUid, c.Efecto.Value, dadoAnunciado, caraAnunciada,
                             c.HechizoOrigen, d, rondas, c.Efecto.Dispellable, familia,
-                            c.NivelOrigen, c.Critico)));
+                            c.NivelOrigen, c.Critico, padre: c.Buff.Padre)));
                 }
                 // An invisibility row goes with the switch, to everybody, right behind it: "jxm
                 // 150, jwe 150 f34{f1=1 f4=Sram}" at frames 10-11 of "sram-invisibilidad", and a
