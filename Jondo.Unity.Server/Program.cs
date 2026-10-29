@@ -1,6 +1,7 @@
 ﻿using Jondo.Unity.Launcher;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Network;
@@ -227,6 +228,13 @@ namespace Jondo.Unity.Server
                 e.Cancel = true;
                 RequestShutdown("Ctrl+C");
             };
+#if !WINDOWS
+            using var sigterm = PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
+            {
+                context.Cancel = true;
+                RequestShutdown("SIGTERM");
+            });
+#endif
 
             // The launches that are left hanging.
             //
@@ -268,7 +276,9 @@ namespace Jondo.Unity.Server
             // And its window: the log and the figures. If it could not be opened —no desktop, for
             // example— the server keeps working the same: the window is for looking, not for
             // things to happen.
+#if WINDOWS
             UI.ServerWindow.Abrir();
+#endif
 
             // Here «el servidor está en marcha, Ctrl+C para pararlo» and «cerrar el
             // lanzador ya no apaga esto» used to be announced. They were notices for whoever watched a text console:
