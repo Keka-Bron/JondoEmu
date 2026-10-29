@@ -3673,8 +3673,22 @@ namespace Jondo.Unity.Server.Handlers
                                      $"{waiting.HechizoOrigen}, in round {fight.RoundNumber}.");
                     if (Managers.PlayerSpells.Contains(waiting.Dado))
                     {
-                        await AplicarEfectosAsync(stream, fight, caster, waiting.Dado, Math.Max(1, waiting.Cara),
-                                                  result.Target, Managers.EffectEngine.AlLanzar, result.Target.CellId);
+                        // Its blows in their order with the rest, as a hook's: handed whole to the
+                        // engine they were taken for the root's blows, dealt already, and dropped --
+                        // Reloj de Arena's 99 in a circle of 2, two rounds on, hit nobody.
+                        int cara = Math.Max(1, waiting.Cara);
+                        var filas = Managers.EffectEngine.EfectosDeLaTirada(waiting.Dado, cara, waiting.Critico);
+                        if (filas.Any(f => Managers.EffectEngine.EsDeDano(f.EffectId)))
+                        {
+                            await LanzarPorOrdenAsync(stream, fight, caster, waiting.Dado, cara, result.Target,
+                                                      result.Target.CellId, Managers.EffectEngine.AlLanzar, filas,
+                                                      waiting.Critico);
+                        }
+                        else
+                        {
+                            await AplicarEfectosAsync(stream, fight, caster, waiting.Dado, cara,
+                                                      result.Target, Managers.EffectEngine.AlLanzar, result.Target.CellId);
+                        }
                     }
                     else
                     {
@@ -4076,6 +4090,41 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// A class spell's aura (<see cref="Jondo.Unity.World.Fights.Disparo.AlPonerse"/>) applied
+        /// once, as it is laid: its caster's own rows on him -- Reloj de Bolsillo's turn-end 2794 on
+        /// the Xelor, frame 2216 of its capture --, and the rest from its centre when the glyph's
+        /// mask names anybody in it -- Inestabilidad's state 96 on the allies inside, frames 44-45.
+        /// Premonición's and Reloj de Bolsillo's "a,A,F50000" name nobody: they mark the ground.
+        /// </summary>
+        private static async Task ApplyTheLaidAuraAsync(NetworkStream stream, FightInstance fight, Fighter dueno,
+                                                        Jondo.Unity.World.Fights.Glifo glifo)
+        {
+            var filas = Managers.SpellEffects.De(glifo.Hechizo, glifo.Grado);
+            if (filas.Count == 0 || !dueno.IsAlive) return;
+
+            bool nombraAAlguien = TodosLosCombatientes(fight).Any(f => f != null && f.IsAlive && glifo.Cubre(f.CellId)
+                && Managers.EffectEngine.CumpleLaMascara(dueno, f, glifo.Mascara));
+            var tirada = nombraAAlguien ? filas : filas.Where(EsDelLanzador).ToList();
+            if (tirada.Count == 0) return;
+
+            int centro = glifo.Centro >= 0 ? glifo.Centro : glifo.Casillas.FirstOrDefault();
+            await AplicarEfectosAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, dueno,
+                                      Managers.EffectEngine.AlLanzar, celdaApuntada: centro, tirada: tirada);
+        }
+
+        /// <summary>A row for the caster himself: "C" and no other kind letter beside it.</summary>
+        private static bool EsDelLanzador(Managers.SpellEffect fila)
+        {
+            var trozos = (fila.TargetMask ?? "").Split(',').Select(t => t.Trim()).ToList();
+            return trozos.Contains("C") && !trozos.Any(t => t.Length == 1 && t != "C");
+        }
+
+        /// <summary>A class spell's turn glyph (401, 402): it takes whoever it caught, alone.</summary>
+        private static bool EsGlifoDeTurnoDeClase(Jondo.Unity.World.Fights.Glifo glifo)
+            => (glifo.Tipo == 401 || glifo.Tipo == 402) && !Managers.BombWalls.IsWall(glifo)
+               && Managers.PlayerSpells.Contains(glifo.HechizoQueLoPuso);
+
+        /// <summary>
         /// Fires ONE glyph on ONE fighter: tells the client, hits, and applies the rest.
         /// </summary>
         /// <remarks>
@@ -4139,8 +4188,17 @@ namespace Jondo.Unity.Server.Handlers
                 var tirada = Managers.EffectEngine.EfectosSorteados(glifo.Hechizo, glifo.Grado, false);
                 tirada = await BoostsFirstAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, quien,
                                                 celda, false, tirada);
+
+                // A class spell's turn glyph takes the one it caught and nobody else, however wide
+                // its rows' zones, and its caster's own rows only when he is that one: in
+                // Inestabilidad's capture the enemy starting his turn on it goes back alone (frames
+                // 354-355) and no 3620 reaches the Xelor, whose own trigger of it sends him back and
+                // puts the 3620 that keeps it from going off again (frames 101-122).
+                bool soloElQueCae = EsGlifoDeTurnoDeClase(glifo);
+                if (soloElQueCae && quien != dueno) tirada = tirada.Where(f => !EsDelLanzador(f)).ToList();
+
                 await HurtAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, quien,
-                                celdaApuntada: celda, tirada: tirada);
+                                celdaApuntada: celda, tirada: tirada, soloAlObjetivo: soloElQueCae);
 
                 // And the rest of what it does INSIDE the same sequence, as the blows: in the
                 // captures every row a trap sets off -- its sub-casts, its rows, its pushes -- comes
@@ -4150,7 +4208,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     await AplicarEfectosAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado,
                                               quien, Managers.EffectEngine.AlLanzar,
-                                              celdaApuntada: celda, tirada: tirada);
+                                              celdaApuntada: celda, tirada: tirada, soloAlObjetivo: soloElQueCae);
                 }
             }
             finally
@@ -5125,11 +5183,25 @@ namespace Jondo.Unity.Server.Handlers
         /// <param name="incluirElPropio">Whether the spell fired itself is hooked, or only what it chained.</param>
         /// <param name="critico">Whether the cast was critical: the hook fires with the critical lists.</param>
         /// <param name="throughPortal">Whether the cast went through portals: the hook's rows go off as its rows would.</param>
+        /// <param name="offATrigger">Whether this ran off a trigger: each occurrence hooks once more, up to the spell's cap.</param>
         internal static void EngancharLoPendiente(List<Managers.Outcome> consecuencias,
                                                   int hechizo, int grado, long lanzador, int ronda,
                                                   bool incluirElPropio = true, bool critico = false,
-                                                  bool conducta = false, bool throughPortal = false)
+                                                  bool conducta = false, bool throughPortal = false,
+                                                  bool offATrigger = false, int celda = -1)
         {
+            // Off a trigger, every occurrence is a cast of its own, and what it hooks piles up to
+            // the spell's maxStack (-1: no cap) once per bearer: Remanencia's "por cada PM que
+            // utilice" hooks 30846 at grade 2 on every step, and five steps walked are five
+            // returns at the end of the turn. Refreshed instead, the five were one.
+            var apilados = new HashSet<(Fighter, int)>();
+            int ApilarHasta(Fighter quien, int cual, int enGrado)
+            {
+                if (!offATrigger || !apilados.Add((quien, cual))) return 0;
+                var filas = Managers.SpellEffects.De(cual, enGrado);
+                return filas.Count > 0 ? filas[0].MaxStack : 0;
+            }
+
             // A monster spell's rows armed by the engine, one hook per bearer, caster and spell,
             // holding just those rows. The behaviour spell's rows are the monster's for good, and
             // so are those of the spells it chains: the Princesa's Aura (32010, chained by her
@@ -5198,7 +5270,8 @@ namespace Jondo.Unity.Server.Handlers
                     ? Math.Max(untilTheirTurn, byItsRows)
                     : byItsRows;
                 marca.Sobre.Buffs.Enganchar(marca.HechizoOrigen, marca.NivelOrigen, until,
-                    marca.Caster?.Id ?? lanzador, ronda, critico, throughPortal);
+                    marca.Caster?.Id ?? lanzador, ronda, critico, throughPortal,
+                    ApilarHasta(marca.Sobre, marca.HechizoOrigen, marca.NivelOrigen), celda);
             }
 
             foreach (var (cual, enGrado) in conAlgoPendiente)
@@ -5222,7 +5295,8 @@ namespace Jondo.Unity.Server.Handlers
                     {
                         if (c.HechizoOrigen == cual && c.NivelOrigen == enGrado && c.Sobre == quien && c.Caster != null) { quienLoLanzo = c.Caster.Id; break; }
                     }
-                    quien.Buffs.Enganchar(cual, enGrado, cuando, quienLoLanzo, ronda, critico, throughPortal);
+                    quien.Buffs.Enganchar(cual, enGrado, cuando, quienLoLanzo, ronda, critico, throughPortal,
+                                          ApilarHasta(quien, cual, enGrado), celda);
                 }
             }
         }
@@ -5563,6 +5637,18 @@ namespace Jondo.Unity.Server.Handlers
                                           conducta: suyoParaSiempre);
                 return;
             }
+            // Once for every time it was hooked in its round (ActiveSpell.Veces), while it is still on.
+            for (int vez = 0; vez < Math.Max(1, enganche.Veces); vez++)
+            {
+                if (vez > 0 && !quien.Buffs.ActiveSpells.Contains(enganche)) break;
+                await FireClassHookOnceAsync(stream, fight, quien, disparador, enganche);
+            }
+        }
+
+        /// <summary>A class spell's hook going off once: its rows under the trigger, re-aimed at its bearer.</summary>
+        private static async Task FireClassHookOnceAsync(NetworkStream stream, FightInstance fight, Fighter quien,
+                                                         string disparador, Jondo.Unity.World.Fights.Buffs.ActiveSpell enganche)
+        {
             var lanzador = (enganche.Lanzador != 0 ? fight.Buscar(enganche.Lanzador) : null) ?? quien;
 
             // Its rows under this trigger, in their order: the blows through HurtAsync, the
@@ -5583,8 +5669,13 @@ namespace Jondo.Unity.Server.Handlers
                                           rondaDelEnganche: enganche.PuestoEnRonda);
                 return;
             }
+            // What it casts "at the parent's cell" goes where the spell was hooked, not where its
+            // bearer stands now: Reloj de Bolsillo's 2794 burns the glyph's circle (frame 2327).
+            int celda = enganche.Celda >= 0 && suyas.All(f => Managers.EffectEngine.CastsAtTheParentCell(f.EffectId))
+                ? enganche.Celda
+                : quien.CellId;
             await AplicarEfectosAsync(stream, fight, lanzador, enganche.Hechizo, enganche.Grado,
-                                      quien, disparador, quien.CellId, critico: enganche.Critico,
+                                      quien, disparador, celda, critico: enganche.Critico,
                                       rondaDelEnganche: enganche.PuestoEnRonda);
         }
 
@@ -6183,7 +6274,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>The moves that travel as a jwe 4: the plain teleport and the symmetric ones.</summary>
         private static bool EsTeletransporte(int efecto)
-            => efecto is Jondo.Unity.World.Combat.EffectSupport.Teleport or 1099 or 1100 or 1104 or 1105 or 1106
+            => efecto is Jondo.Unity.World.Combat.EffectSupport.Teleport or 1099 or 1100 or 1101 or 1104 or 1105 or 1106
                       or Jondo.Unity.World.Combat.EffectSupport.OutOfPrison;
 
         /// <summary>
@@ -6364,7 +6455,8 @@ namespace Jondo.Unity.Server.Handlers
 
             EngancharLoPendiente(consecuencias, hechizo, grado, quienLanza.Id, fight.RoundNumber,
                                  incluirElPropio: alLanzar, critico: critico, conducta: conducta,
-                                 throughPortal: fight.CastThroughPortal);
+                                 throughPortal: fight.CastThroughPortal, offATrigger: !alLanzar,
+                                 celda: celdaApuntada);
 
             var fichas = new HashSet<(long Quien, int Caracteristica)>();
             var vidasCambiadas = new Dictionary<long, Fighter>();
@@ -6395,6 +6487,7 @@ namespace Jondo.Unity.Server.Handlers
                     conDano.Add((c.HechizoOrigen, c.NivelOrigen, (c.Caster ?? quienLanza).Id));
             }
             var anunciados = new HashSet<(int, int, long)>();
+            var activados = new HashSet<(long, int, int)>();
             var forgelanceRolls = new Dictionary<Managers.SpellEffect, int>();
             bool forgelanceEffects = Managers.ForgelanceCombat.IsActor(fight, quienLanza);
 
@@ -6447,16 +6540,38 @@ namespace Jondo.Unity.Server.Handlers
 
                 if (c.ActivaSuelo != 0)
                 {
-                    var suyos = fight.Glifos.Where(g => g.Dueno == (c.Caster ?? quienLanza).Id
-                        && (c.ActivaSuelo == Managers.EffectEngine.ActivaLasRunas ? g.Tipo == 2022 : g.Tipo != 2022 && g.Tipo != 400))
-                        .ToList();
+                    var activador = c.Caster ?? quienLanza;
+                    // Once per cast, however many its zone named: Inestabilidad's 1026 is "a,A" on
+                    // the whole board, and run for each fighter it set the glyphs off again and again.
+                    if (!activados.Add((activador.Id, c.ActivaSuelo, c.Efecto.Value))) continue;
+                    if (c.ActivaSuelo == Managers.EffectEngine.ActivaLasRunas)
+                    {
+                        var runas = fight.Glifos.Where(g => g.Dueno == activador.Id && g.Tipo == 2022).ToList();
+                        foreach (var glifo in runas)
+                        {
+                            foreach (var quien in TodosLosCombatientes(fight).Where(f => f != null && f.IsAlive && glifo.Cubre(f.CellId)).ToList())
+                            {
+                                if (!GlyphCatches(fight, glifo, quien, false)) continue;
+                                await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar: false);
+                            }
+                        }
+                        continue;
+                    }
+
+                    // "Activa los glifos": the ones the spell in its value laid (any of his with
+                    // none), and not an aura, which only goes off as it is laid. Each goes off once,
+                    // on its activator standing in it and from its centre -- Inestabilidad's capture,
+                    // frame 101: "307 {f1 290, f2 the Xelor, f4 7}", the Xelor alone sent back, with
+                    // the enemy on the glyph's very centre left where he was.
+                    var suyos = fight.Glifos.Where(g => g.Dueno == activador.Id && g.Tipo != 2022 && g.Tipo != 400
+                                                        && g.Cuando != Jondo.Unity.World.Fights.Disparo.AlPonerse
+                                                        && (c.Efecto.Value == 0 || g.HechizoQueLoPuso == c.Efecto.Value))
+                                            .ToList();
                     foreach (var glifo in suyos)
                     {
-                        foreach (var quien in TodosLosCombatientes(fight).Where(f => f != null && f.IsAlive && glifo.Cubre(f.CellId)).ToList())
-                        {
-                            if (!GlyphCatches(fight, glifo, quien, false)) continue;
-                            await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar: false);
-                        }
+                        if (!activador.IsAlive || !glifo.Cubre(activador.CellId)) continue;
+                        await FireOneGlyphAsync(stream, fight, glifo, activador, alPisar: false,
+                                                celda: glifo.Centro >= 0 ? glifo.Centro : activador.CellId);
                     }
                     continue;
                 }
@@ -6482,6 +6597,8 @@ namespace Jondo.Unity.Server.Handlers
                                                               c.Glifo.Color)));
                     Program.LogDebug($"[Fight] Glyph {c.Glifo.Id} of {dueno.Id}: {c.Glifo.Casillas.Count} cell(s), " +
                                      $"casts {c.Glifo.Hechizo}, colour {c.Glifo.Color:X6}, drops in round {c.Glifo.CaducaEnRonda}.");
+                    if (c.Glifo.Cuando == Jondo.Unity.World.Fights.Disparo.AlPonerse)
+                        await ApplyTheLaidAuraAsync(stream, fight, dueno, c.Glifo);
                     continue;
                 }
 
@@ -6577,6 +6694,20 @@ namespace Jondo.Unity.Server.Handlers
                                      $"({leQuedaba} -> {c.Sobre.CurrentHP}) to effect " +
                                      $"{c.Efecto.EffectId}.");
                     await RefrescarLaVidaAsync(stream, fight, c.Sobre, quienLanza);
+                    continue;
+                }
+
+                // "Duración de los efectos: -N" (1075): the server shortened the rows already, and
+                // the client shortens its panel off this frame -- f19 {f1: -N, f2: whose} (every
+                // Eniripsa capture). Untold, Regulador's two-round poison lasted one and still
+                // read two.
+                if (c.RondasAcortadas > 0)
+                {
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildEffectsDuration((c.Caster ?? quienLanza).Id, c.Sobre.Id,
+                                                                   -c.RondasAcortadas)));
+                    Program.LogDebug($"[Fight] {c.Sobre.Id}'s buffs lose {c.RondasAcortadas} round(s) " +
+                                     $"to spell {c.HechizoOrigen}; {c.EmbrujosCaidos} drop.");
                     continue;
                 }
 
@@ -6896,6 +7027,28 @@ namespace Jondo.Unity.Server.Handlers
                     continue;
                 }
 
+                // A teleport onto somebody is a swap on the wire: ONE jwe 8, "f2 {the teleported
+                // one's old cell, the other, the other's old cell}" -- Premonición's frame 195,
+                // Péndulo's 24, Astrolabio's 21 --, and both were moved by a swap (MS): that is
+                // what sets off Premonición's "1160 under MS|TP" on its target, its telefrag.
+                if (c.Mueve && EsTeletransporte(c.Efecto.EffectId) && c.Tambien != null)
+                {
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildSwap(c.Sobre.Id, c.CasillaDesde, c.Tambien.Id, c.CasillaDesdeDelOtro)));
+                    Program.LogDebug($"[Fight] Spell {hechizo} teleports {c.Sobre.Id} from cell {c.CasillaDesde} " +
+                                     $"to {c.CasillaHasta}, onto {c.Tambien.Id}, who goes to {c.CasillaHastaDelOtro}.");
+                    movidos.Add(c.Sobre);
+                    movidos.Add(c.Tambien);
+                    foreach (var movido in new[] { c.Sobre, c.Tambien })
+                    {
+                        Disparo(movido, Managers.EffectEngine.AlSerTeletransportado, quienLanza);
+                        Disparo(movido, Managers.EffectEngine.AlSerIntercambiado, quienLanza);
+                        Disparo(movido, Managers.EffectEngine.AlSerMovido, quienLanza);
+                    }
+                    await RefreshPortalsAsync(fight);
+                    continue;
+                }
+
                 if (c.Mueve && EsTeletransporte(c.Efecto.EffectId))
                 {
                     // A teleport is a jwe 4 with where and who, in the 581 of the captures; a
@@ -6910,17 +7063,6 @@ namespace Jondo.Unity.Server.Handlers
                     Disparo(c.Sobre, Managers.EffectEngine.AlSerTeletransportado, quienLanza);
                     Disparo(c.Sobre, Managers.EffectEngine.AlSerMovido, quienLanza);
 
-                    // A telefrag: the one who stood there goes to the cell the other left.
-                    if (c.Tambien != null)
-                    {
-                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                            Network.FightProtocol.BuildTeleport(c.Tambien.Id, c.Tambien.Id, c.CasillaHastaDelOtro)));
-                        Program.LogDebug($"[Fight] Telefrag: {c.Tambien.Id} goes from {c.CasillaDesdeDelOtro} " +
-                                         $"to {c.CasillaHastaDelOtro}.");
-                        movidos.Add(c.Tambien);
-                        Disparo(c.Tambien, Managers.EffectEngine.AlSerTeletransportado, quienLanza);
-                        Disparo(c.Tambien, Managers.EffectEngine.AlSerMovido, quienLanza);
-                    }
                     // A portal he has left comes back on: Estela's, frame 15.
                     await RefreshPortalsAsync(fight);
                     continue;

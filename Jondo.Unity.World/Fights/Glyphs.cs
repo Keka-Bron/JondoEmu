@@ -17,6 +17,12 @@ namespace Jondo.Unity.World.Fights
 
         /// <summary>At the end of the turn of whoever stands on it: the turn-end glyph (402).</summary>
         AlAcabarElTurno,
+
+        /// <summary>
+        /// Only as it is laid: a class spell's aura (1091). In the 429 aura glyphs of the captures
+        /// not one 306 or 307 names one; what they do arrives right behind the 1091 itself.
+        /// </summary>
+        AlPonerse,
     }
 
     /// <summary>

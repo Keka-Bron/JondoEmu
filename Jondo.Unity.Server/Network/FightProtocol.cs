@@ -1689,6 +1689,22 @@ namespace Jondo.Unity.Server.Network
         public const int Curacion = 3001;
 
         /// <summary>
+        /// The target's buffs gain or lose rounds (jwe 1075, "Duración de los efectos").
+        ///
+        ///   f3: who      f14: 1075      f19 { f1: the rounds, negative to shorten, f2: whose }
+        ///
+        /// As every Eniripsa capture sends it: "f3 me, f14 1075, f19 { f1 -1, f2 -1 }".
+        /// </summary>
+        public static byte[] BuildEffectsDuration(long author, long target, int rounds)
+            => Pb.New()
+                .Var(3, author)
+                .Var(14, EffectsDuration)
+                .Msg(19, Pb.New().Var(1, rounds).Var(2, target))
+                .Build();
+
+        public const int EffectsDuration = 1075;
+
+        /// <summary>
         /// A summon comes out onto the board (jwe with f14 = 181, "Invoca: #1").
         ///
         /// The effect does not carry a number: it carries A WHOLE FIGHTER, with three f1 wrappers

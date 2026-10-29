@@ -304,6 +304,20 @@ namespace Jondo.Unity.World.Fights
             public bool Vivo(int ronda) => CaducaEnRonda < 0 || ronda < CaducaEnRonda;
 
             /// <summary>
+            /// How many times it goes off when its trigger comes: once per occurrence of the
+            /// trigger that hooked it in its round. Remanencia's "por cada PM que utilice" hooks
+            /// its turn-end return once per step, and five steps are five returns.
+            /// </summary>
+            public int Veces { get; set; } = 1;
+
+            /// <summary>
+            /// The cell the cast that hooked it was aimed at, minus one when unknown. What its
+            /// rows cast "at the parent's cell" (2794, 2960) lands there: Reloj de Bolsillo's
+            /// turn-end blow on the glyph it laid, not on wherever the Xelor ends his turn.
+            /// </summary>
+            public int Celda { get; set; } = -1;
+
+            /// <summary>
             /// The rows of the spell this hook holds for its bearer, by effect uid -- a monster
             /// spell's triggered rows are armed one by one on the fighters their mask and zone
             /// named, and only those go off, on him. Null: every row of the spell, re-aimed each
@@ -355,23 +369,31 @@ namespace Jondo.Unity.World.Fights
 
         /// <summary>Records that this spell is still on, or extends the one already there.</summary>
         public void Enganchar(int hechizo, int grado, int caducaEnRonda, long lanzador = 0, int puestoEnRonda = 0,
-                              bool critico = false, bool throughPortal = false)
+                              bool critico = false, bool throughPortal = false, int apilarHasta = 0,
+                              int celda = -1)
         {
             var ya = _enganchesPorHechizo(hechizo);
             if (ya != null)
             {
+                // Hooked again off another occurrence of its trigger, in the same round and at the
+                // same grade, it piles on top up to the cap (negative: no cap). Anything else
+                // refreshes it, and a hook spent or from another round starts over at one.
+                bool deEstaRonda = ya.Grado == grado && ya.Vivo(puestoEnRonda) && ya.PuestoEnRonda == puestoEnRonda;
+                bool seApila = apilarHasta != 0 && deEstaRonda && (apilarHasta < 0 || ya.Veces < apilarHasta);
+                ya.Veces = !deEstaRonda ? 1 : seApila ? ya.Veces + 1 : ya.Veces;
                 ya.Grado = grado;
                 ya.CaducaEnRonda = caducaEnRonda;
                 ya.Lanzador = lanzador;
                 ya.PuestoEnRonda = puestoEnRonda;
                 ya.Critico = critico;
                 ya.ThroughPortal = throughPortal;
+                if (celda >= 0) ya.Celda = celda;
                 return;
             }
             ActiveSpells.Add(new ActiveSpell
             {
                 Hechizo = hechizo, Grado = grado, CaducaEnRonda = caducaEnRonda, Lanzador = lanzador,
-                PuestoEnRonda = puestoEnRonda, Critico = critico, ThroughPortal = throughPortal,
+                PuestoEnRonda = puestoEnRonda, Critico = critico, ThroughPortal = throughPortal, Celda = celda,
             });
         }
 
@@ -435,6 +457,12 @@ namespace Jondo.Unity.World.Fights
             }
 
             foreach (var muerto in caidos) _puestos.Remove(muerto);
+            // And the states only they held go with them, as when a fighter's rows go.
+            foreach (var muerto in caidos)
+            {
+                if (muerto.Estado == 0 || muerto.EffectId == Jondo.Unity.World.Combat.EffectSupport.DisableState) continue;
+                if (!SigueHabiendo(muerto.Estado)) _estados.Remove(muerto.Estado);
+            }
             return caidos.Count;
         }
 

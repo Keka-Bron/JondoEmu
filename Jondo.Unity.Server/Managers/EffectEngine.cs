@@ -211,6 +211,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>How many buffs an effect that shortens durations has taken down.</summary>
         public int EmbrujosCaidos { get; init; }
 
+        /// <summary>
+        /// The rounds an effect that shortens durations (1075) took off the target's buffs, told
+        /// to the client so its panel shortens them too.
+        /// </summary>
+        public int RondasAcortadas { get; init; }
+
         /// <summary>That the summon comes out where the one who has just died was, and not beside him.</summary>
         public bool EnLaCasillaDelMuerto { get; init; }
 
@@ -846,6 +852,10 @@ namespace Jondo.Unity.Server.Managers
             public bool YaLoHaceElCaminoViejo { get; }
         }
 
+        /// <summary>Whether this effect casts its child at the cell its parent was aimed at (2794, 2960).</summary>
+        internal static bool CastsAtTheParentCell(int effectId)
+            => Familia.TryGetValue(effectId, out var sub) && sub.Apunta == Apunta.ALaCasillaDelPadre;
+
         /// <summary>
         /// The whole «make another spell be cast» family, in a single table.
         /// </summary>
@@ -935,6 +945,15 @@ namespace Jondo.Unity.Server.Managers
         private static bool WaitsOnATurn(SpellEffect effect)
             => effect.Disparadores().Any(d => string.Equals(d, AlEmpezarElTurno, StringComparison.OrdinalIgnoreCase)
                                            || string.Equals(d, AlAcabarElTurno, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
+        /// Whether a row waits on its bearer being swapped or teleported (MS, TP): Premonición's
+        /// "1160 13314-2 under MS|TP on g,A", which its capture registers on the target at the cast
+        /// (frames 193-194) and the swap right behind sets off -- the telefrag (196-200).
+        /// </summary>
+        private static bool WaitsOnBeingMoved(SpellEffect effect)
+            => effect.Disparadores().Any(d => string.Equals(d, AlSerIntercambiado, StringComparison.OrdinalIgnoreCase)
+                                           || string.Equals(d, AlSerTeletransportado, StringComparison.OrdinalIgnoreCase));
 
         /// <summary>
         /// The round a hook for <paramref name="bearer"/>'s next turn lasts to: the next one when he
@@ -2421,7 +2440,7 @@ namespace Jondo.Unity.Server.Managers
                 // hook keeps.
                 if (!leToca && depth == 0
                     && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
-                    && PlayerSpells.Contains(spell) && WaitsOnATurn(efecto)
+                    && PlayerSpells.Contains(spell) && (WaitsOnATurn(efecto) || WaitsOnBeingMoved(efecto))
                     && !EsFilaQueLeeElGolpe(efecto.EffectId)
                     && efecto.TargetMask is not ("C" or "c"))
                 {
@@ -2697,10 +2716,15 @@ namespace Jondo.Unity.Server.Managers
                     fuera.Add(chained);
                     if (chained.HechizoEncadenado != 0)
                     {
+                        // A bounce is a chained cast however near the root it starts: its blows
+                        // are nested ones. Desecamiento's 2160 sits in the root, and resolved at
+                        // depth 0 its 30962's "98 de daños de aire" was taken for a root blow and
+                        // dropped -- the bounces marked their enemies and burnt none. The budget,
+                        // not the depth, bounds the chain.
                         fuera.AddRange(Resolver(
                             combat, caster, chained.HechizoEncadenado,
                             chained.GradoEncadenado, nearest, AlLanzar, round,
-                            depth, nearest.CellId, critical, nearestChainBudget - 1,
+                            Math.Max(depth, 1), nearest.CellId, critical, nearestChainBudget - 1,
                             // Keep damage attribution on the Cra while drawing the next spell
                             // from the previous victim's cell.
                             target));
@@ -3990,6 +4014,11 @@ namespace Jondo.Unity.Server.Managers
 
                 var cuando = efecto.EffectId switch
                 {
+                    // A class spell's aura is applied as it is laid and goes off no more: fired at
+                    // every turn start, Premonición's swapped its target on the target's turn and
+                    // back again on the Xelor's. The monsters' and the Forgelance's keep theirs.
+                    GlifoDeAura when PlayerSpells.Contains(hechizo) && !ForgelanceCombat.IsActor(combate, quienLanza)
+                        => Jondo.Unity.World.Fights.Disparo.AlPonerse,
                     Trampa => Jondo.Unity.World.Fights.Disparo.AlPisar,
                     GlifoDeInicioDeTurno => Jondo.Unity.World.Fights.Disparo.AlEmpezarElTurno,
                     GlifoDeFinDeTurno => Jondo.Unity.World.Fights.Disparo.AlAcabarElTurno,
@@ -4068,16 +4097,16 @@ namespace Jondo.Unity.Server.Managers
             if (efecto.EffectId == AcortaLosEfectos)
             {
                 int rondas = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
-                if (rondas <= 0) return null;
+                if (rondas <= 0 || sobre == null || !sobre.IsAlive) return null;
 
+                // Told whether anything fell or not: the real server sends its jwe 1075 at every
+                // cast that carries it, and the client takes the rounds off its own panel.
                 int caidos = sobre.Buffs.Acortar(rondas, ronda);
-                if (caidos == 0) return null;
-
                 return new Outcome
                 {
                     Sobre = sobre, Caster = quienLanza, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
-                    EmbrujosCaidos = caidos,
+                    EmbrujosCaidos = caidos, RondasAcortadas = rondas,
                 };
             }
 
