@@ -131,16 +131,17 @@ namespace Jondo.Unity.Server.Handlers
 
         private static void ProcessEquipmentChange(long itemUid, int newPosition)
         {
+            // Both lists and the base, whichever of the two knows the item: one the login's list
+            // did not have was never written, and the live one never moved.
             var item = Jondo.Unity.Server.Network.SessionContext.State.GetInventoryItem(itemUid);
-            if (item != null)
-            {
-                item.Position = newPosition;
-                DatabaseManager.SaveItemPosition(itemUid, newPosition,
-                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
+            bool live = Managers.Equipment.Move(itemUid, newPosition);
+            if (item == null && !live) return;
+            DatabaseManager.SaveItemPosition(itemUid, newPosition,
+                Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
 
-                // The cache of what is worn, through the only place that writes it.
-                Managers.Equipment.RememberWorn(itemUid, newPosition, item.RawEffects);
-            }
+            // The cache of what is worn, through the only place that writes it.
+            if (item != null) Managers.Equipment.RememberWorn(itemUid, newPosition, item.RawEffects);
+            else Managers.Equipment.RememberWorn(itemUid, newPosition, Managers.Equipment.ByUid(itemUid)?.Effects);
         }
 
         // ─── Appearance ─────────────────────────────────────────────────────────────

@@ -349,6 +349,11 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Moves an item, and says whether we knew about it at all.</summary>
         public static bool Move(long uid, int position)
         {
+            // The session's older list follows, which some readers still go by: an equip from the
+            // client moved this one and the base only, and the hammer put in the hand after
+            // logging in was still in the bag there -- its hit went out as «Puñetazo».
+            var legacy = GameState.GetInventoryItem(uid);
+            if (legacy != null) legacy.Position = position;
             if (!Items.TryGetValue(uid, out var item)) return false;
             item.Position = position;
             return true;
@@ -439,7 +444,7 @@ namespace Jondo.Unity.Server.Managers
             var moved = Items.Values.Where(i => IsWorn(i.Position) && IsTaxCollectorPiece(i.Template)).ToList();
             foreach (var item in moved)
             {
-                item.Position = Bag;
+                Move(item.Uid, Bag);
                 DatabaseManager.SaveItemPosition(item.Uid, Bag, SessionContext.State.CharacterId);
                 RememberWorn(item.Uid, Bag, (string?)null);
             }
@@ -461,7 +466,10 @@ namespace Jondo.Unity.Server.Managers
             }
 
             foreach (var item in moved)
+            {
+                Move(item.Uid, Bag);
                 DatabaseManager.SaveItemPosition(item.Uid, Bag, SessionContext.State.CharacterId);
+            }
             return moved;
         }
 

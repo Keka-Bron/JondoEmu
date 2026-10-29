@@ -57,6 +57,25 @@ namespace Jondo.Unity.Tests.Sessions
         }
 
         [Fact]
+        public void Moving_an_item_moves_it_in_the_session_s_older_list_too()
+        {
+            // An equip from the client went through Equipment and the base only, and the login's
+            // list kept the hammer in the bag: the hit read the hand off it and went out as a punch.
+            var session = GameSession.SinSocket();
+            using (SessionContext.Push(session))
+            {
+                const long uid = 555_001;
+                Equipment.Add(uid, template: 18018, quantity: 1, Equipment.Bag, "[[100,0,52,60]]");
+                session.State.AddInventoryItem(new Jondo.Unity.Server.PlayerItem { Uid = uid, ItemId = 18018, Quantity = 1, Position = Equipment.Bag });
+
+                Assert.True(Equipment.Move(uid, 1));
+
+                Assert.Equal(1, session.State.GetInventoryItem(uid)!.Position);
+                Assert.Equal(18018, Equipment.InSlot(1)!.Template);
+            }
+        }
+
+        [Fact]
         public void A_slot_in_the_bag_is_not_worn_however_low_its_number()
         {
             // The rule the three writers of this cache used to disagree on. Two of them called

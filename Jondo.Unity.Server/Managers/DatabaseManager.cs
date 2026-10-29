@@ -3026,6 +3026,14 @@ namespace Jondo.Unity.Server
             return $"[{id},{fijo},0,0]";
         }
 
+        /// <summary>The effects an item of this template is born with, as every road that makes one rolls them.</summary>
+        internal static string FreshEffectsOf(int gid)
+        {
+            using var connection = new SqliteConnection(WorldConnectionString);
+            connection.Open();
+            return EffectsOfTemplate(connection, gid);
+        }
+
         private static string EffectsOfTemplate(SqliteConnection connection, int gid)
         {
             // A ride is born at level 1, its sex and serenity drawn, its characteristics those of its
@@ -4331,14 +4339,23 @@ namespace Jondo.Unity.Server
         {
             const int WeaponSlot = 1;
             var weapon = LoadInventory(characterId).FirstOrDefault(i => i.Position == WeaponSlot);
-            if (weapon == null) return null;
+            return weapon == null ? null : WeaponFromTemplate(weapon.ItemId, weapon.RawEffects);
+        }
 
+        /// <summary>
+        /// A weapon as a spell, out of its template and the effects one instance of it rolled:
+        /// what <see cref="GetEquippedWeaponAsSpell"/> reads for the hand, and what every weapon of
+        /// the catalogue is checked through (WeaponCatalogueTests). Null when the template is not a
+        /// weapon or carries nothing a hit does.
+        /// </summary>
+        internal static SpellCombatData? WeaponFromTemplate(int templateId, string? rawEffects)
+        {
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
 
             var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT Data, Type FROM ItemTemplates WHERE Id = $id;";
-            cmd.Parameters.AddWithValue("$id", weapon.ItemId);
+            cmd.Parameters.AddWithValue("$id", templateId);
             string? json = null;
             int weaponType = 0;
             using (var template = cmd.ExecuteReader())
@@ -4406,7 +4423,7 @@ namespace Jondo.Unity.Server
             // The loose fields -- Element, BaseDamageMin and BaseDamageMax -- are still filled with
             // the biggest line, because they are the ones the AI looks at to estimate damage and the
             // largest is fine for that.
-            foreach (var efecto in Managers.Equipment.ParseEffects(weapon.RawEffects))
+            foreach (var efecto in Managers.Equipment.ParseEffects(rawEffects))
             {
                 // 91 to 100, and the best and worst element's damage, which Cocobur, Garra de
                 // Gargandias and Fervor de Amayiro hit with: left out, they had no damage at all.
@@ -4449,7 +4466,9 @@ namespace Jondo.Unity.Server
                 data.BaseDamageMax = maximo;
             }
 
-            return data.BaseDamageMin > 0 ? data : null;
+            // A weapon that only heals or only takes points is a weapon still: read as the bare
+            // hand, its hit was a punch and its lines did nothing.
+            return data.BaseDamageMin > 0 || data.WeaponSideLines.Count > 0 ? data : null;
         }
 
         /// <summary>

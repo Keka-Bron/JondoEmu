@@ -1315,9 +1315,10 @@ namespace Jondo.Unity.Server.Handlers
             int tokenLeft = 0;
             if (tokenShop != null)
             {
-                foreach (var item in GameState.GetInventoryCopy())
+                // Out of the live inventory: tokens won after logging in were not in the login's list.
+                foreach (var item in Equipment.All)
                 {
-                    if (item.ItemId != tokenShop.TokenGid || item.Position != Equipment.Bag) continue;
+                    if (item.Template != tokenShop.TokenGid || item.Position != Equipment.Bag) continue;
                     tokenUid = item.Uid;
                     tokenLeft = item.Quantity;
                     break;

@@ -160,7 +160,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var evicted in Managers.Equipment.Occupants(position, uid))
             {
                 evictedUids.Add(evicted.Uid);
-                evicted.Position = Bag;
+                Managers.Equipment.Move(evicted.Uid, Bag);
                 DatabaseManager.SaveItemPosition(evicted.Uid, Bag, SessionContext.State.CharacterId);
                 Managers.Equipment.RememberWorn(evicted.Uid, Bag, evicted.Effects);
 

@@ -2344,9 +2344,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static LimitesDelHechizo WeaponLimits(Fighter caster)
         {
-            var arma = caster.Id == GameState.CharacterId
-                ? DatabaseManager.GetEquippedWeaponAsSpell(caster.Id)
-                : null;
+            var arma = ArmaDe(caster);
             if (arma == null) return LimitesDe(0, caster.Level);
             // And its diagonal: the Hacha Jazo's 1 to 1 "en línea" and "en diagonal" takes in the four
             // diagonal neighbours, which the client offers and the range check refused at two steps.
@@ -7969,20 +7967,21 @@ namespace Jondo.Unity.Server.Handlers
         /// spell's row: the points it takes or steals for the target's turn, its push or pull, its
         /// heal.
         /// </summary>
-        private static async Task WeaponSideLinesAsync(NetworkStream stream, FightInstance fight, Fighter caster,
+        internal static async Task WeaponSideLinesAsync(NetworkStream stream, FightInstance fight, Fighter caster,
                                                        Fighter target, int celdaApuntada, bool critico)
         {
-            if (caster.Id != GameState.CharacterId) return;
-            var arma = DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId);
+            var arma = ArmaDe(caster);
             if (arma == null || arma.WeaponSideLines.Count == 0) return;
             var zona = Managers.WeaponZones.Of(arma.WeaponType);
+            // A critical hit's bonus goes on the heals too, as on the damage.
+            int bonus = critico ? arma.CriticalHitBonus : 0;
             int cual = 0;
             var filas = arma.WeaponSideLines.Select(linea => new Managers.SpellEffect
             {
                 EffectId = linea.Effect,
                 EffectUid = -100 - (++cual),
-                DiceNum = linea.Min,
-                DiceSide = linea.Max,
+                DiceNum = linea.Min + (linea.Effect == HealingWeaponLine ? bonus : 0),
+                DiceSide = linea.Max + (linea.Effect == HealingWeaponLine ? bonus : 0),
                 // Points taken or stolen hold for the target's coming turn, as a spell's do.
                 Duration = Managers.EffectEngine.EsRetiradaEsquivable(linea.Effect) ? 1 : 0,
                 TargetMask = "g,A",
@@ -7993,6 +7992,19 @@ namespace Jondo.Unity.Server.Handlers
             await AplicarEfectosAsync(stream, fight, caster, 0, 0, target, Managers.EffectEngine.AlLanzar,
                                       celdaApuntada, critico, filas);
         }
+
+        /// <summary>«#1 a #2 de curas de fuego» (108), a healing weapon's line.</summary>
+        private const int HealingWeaponLine = 108;
+
+        /// <summary>
+        /// The weapon in a fighter's hand, as a spell: the character in session's, out of the base
+        /// (DatabaseManager.GetEquippedWeaponAsSpell). Nobody else fights with one. One source for
+        /// the hit's limits, its damage and the rest of its lines.
+        /// </summary>
+        internal static Func<long, SpellCombatData?> ArmaEnLaMano = DatabaseManager.GetEquippedWeaponAsSpell;
+
+        private static SpellCombatData? ArmaDe(Fighter caster)
+            => caster != null && caster.Id == GameState.CharacterId ? ArmaEnLaMano(caster.Id) : null;
 
         /// <summary>The equipped weapon's hit, which still comes from the usual summary.</summary>
         /// <remarks>
@@ -8005,7 +8017,7 @@ namespace Jondo.Unity.Server.Handlers
             GolpeDelArma(FightInstance fight, Fighter caster, Fighter target, int celdaApuntada, bool critico)
         {
             var fuera = new List<(Managers.SpellEffect, int, Fighter, int)>();
-            var arma = DatabaseManager.GetEquippedWeaponAsSpell(GameState.CharacterId);
+            var arma = ArmaDe(caster);
             if (arma == null || (arma.BaseDamageMin <= 0 && arma.BaseDamageMax <= 0)) return fuera;
 
             int centro = celdaApuntada >= 0 ? celdaApuntada : target?.CellId ?? -1;

@@ -212,9 +212,20 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static byte[] BuildIsfPacket()
         {
+            // Out of the live inventory, which every item that comes, goes or is spent goes
+            // through; the login's list only when that one is empty.
             int currentWeight = 0;
-            foreach (var item in GameState.GetInventoryCopy())
-                currentWeight += DatabaseManager.GetItemRealWeight(item.ItemId) * item.Quantity;
+            var live = Managers.Equipment.All.ToList();
+            if (live.Count > 0)
+            {
+                foreach (var item in live)
+                    currentWeight += DatabaseManager.GetItemRealWeight(item.Template) * item.Quantity;
+            }
+            else
+            {
+                foreach (var item in GameState.GetInventoryCopy())
+                    currentWeight += DatabaseManager.GetItemRealWeight(item.ItemId) * item.Quantity;
+            }
 
             int maxWeight = 1000 + GameState.TotalStrength * 5;
 
