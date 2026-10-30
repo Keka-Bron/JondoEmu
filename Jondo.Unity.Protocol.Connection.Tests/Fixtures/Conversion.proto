@@ -1,0 +1,29 @@
+syntax = "proto3";
+package fixture;
+option csharp_namespace = "Jondo.Unity.Protocol.Connection.Tests.Fixtures.Wire";
+
+// Two invented builds of the same stable protocol. No production aliases/tags.
+enum mode { ZERO = 0; ALLOWED = 3; UNMAPPED = 7; }
+message a_root {
+  oneof choice { a_payload item = 7; a_empty empty = 8; a_empty unmapped = 13; }
+}
+message a_payload {
+  optional int32 count = 2;
+  repeated sint64 ids = 4;
+  mode state = 5;
+  a_empty child = 6;
+  string decoy = 9;
+  a_empty required_child = 10;
+}
+message a_empty {}
+message b_root {
+  oneof another_choice { b_payload other_item = 11; a_empty other_empty = 12; }
+}
+message b_payload {
+  optional int32 other_count = 3;
+  repeated sint64 other_ids = 5;
+  mode other_state = 6;
+  a_empty other_child = 7;
+  string other_decoy = 10;
+  a_empty other_required_child = 11;
+}

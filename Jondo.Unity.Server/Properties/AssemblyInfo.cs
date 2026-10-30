@@ -5,3 +5,4 @@ using System.Runtime.CompilerServices;
 // surface just so a test can see it would be worse; the leak this guards against is exactly the
 // kind of thing that has no business being public.
 [assembly: InternalsVisibleTo("Jondo.Unity.Tests")]
+[assembly: InternalsVisibleTo("Jondo.Unity.Server.Tests")]

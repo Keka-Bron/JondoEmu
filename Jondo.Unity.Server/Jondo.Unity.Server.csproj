@@ -1,6 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework Condition="'$(TargetFramework)' == '' And $(RuntimeIdentifier.StartsWith('win-'))">net10.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(TargetFramework)' == '' And '$(RuntimeIdentifier)' == '' And '$(OS)' == 'Windows_NT'">net10.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
     <!-- The server's window: the log and the figures. It is ITS window, not the launcher's. -->
     <UseWindowsForms>true</UseWindowsForms>
     <NoWarn>$(NoWarn);WFO1000</NoWarn>
@@ -14,16 +20,17 @@
   <PropertyGroup>
     <!-- THE SERVER. A console, not a window: since the launcher is another executable, not a
          single line of WinForms is left in here. -->
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <OutputType Condition="'$(TargetFramework)' == 'net10.0-windows'">WinExe</OutputType>
     <AssemblyName>Jondo Server</AssemblyName>
     <RootNamespace>Jondo.Unity.Launcher</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
-    <ApplicationIcon>icono_servidor.ico</ApplicationIcon>
+    <ApplicationIcon Condition="'$(TargetFramework)' == 'net10.0-windows'">icono_servidor.ico</ApplicationIcon>
     <!-- A single file: the twelve dlls (Google.Protobuf, Thrift, Sqlite and company) are put inside
          the .exe, and the native e_sqlite3.dll too. It still depends on the .NET 10 runtime. -->
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' And '$(TargetFramework)' == 'net10.0-windows'">win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -33,10 +40,6 @@
   <ItemGroup>
     <PackageReference Include="ApacheThrift" Version="0.23.0" />
     <PackageReference Include="Google.Protobuf" Version="3.35.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.81.1">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
     <!-- Microsoft.Data.Sqlite 10.0.9 drags in SQLitePCLRaw 2.1.11, and that carries a SQLite
          with CVE-2025-6965: high severity, range «<= 2.1.11». There is no newer stable Microsoft.Data.Sqlite
@@ -44,10 +47,6 @@
          underneath is pinned here, which is what really brings the native library. When 11 stable comes out this
          can be removed, checking that NU1903 still does not appear. -->
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="Protocol\GameProtocol.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -60,8 +59,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Protocol\Jondo.Unity.Protocol.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Protocol.Connection.Wire\Jondo.Unity.Protocol.Connection.Wire.csproj" />
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
-    <ProjectReference Include="..\Jondo.Unity.Contract.WinForms\Jondo.Unity.Contract.WinForms.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Contract.WinForms\Jondo.Unity.Contract.WinForms.csproj" Condition="'$(TargetFramework)' == 'net10.0-windows'" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0-windows'">
+    <Compile Remove="UI\**\*.cs" />
   </ItemGroup>
 
   <!-- NOTHING GETS PUBLISHED WITH A RED TEST.
@@ -81,15 +85,17 @@
 
        In an emergency: dotnet publish -p:SkipTests=true. That is the whole escape hatch, and it
        leaves a trace in the command line rather than in a config file nobody reads. -->
-  <Target Name="RunTestsBeforePublish" BeforeTargets="Publish" Condition="'$(SkipTests)' != 'true'">
+  <Target Name="RunTestsBeforePublish" BeforeTargets="Publish" Condition="'$(TargetFramework)' == 'net10.0-windows' And '$(SkipTests)' != 'true'">
     <Message Text="[Tests] Running Jondo.Unity.Tests before publishing..." Importance="high" />
     <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Tests\Jondo.Unity.Tests.csproj&quot; --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
+    <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Protocol.Connection.Tests\Jondo.Unity.Protocol.Connection.Tests.csproj&quot; --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
+    <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Server.Tests\Jondo.Unity.Server.Tests.csproj&quot; --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
     <Message Text="[Tests] Green. Publishing." Importance="high" />
   </Target>
 
   <!-- Auto-deploy: only the .exe to the root. If some loose dll was left from an earlier
        publish, it is deleted so that the folder is not left half done. -->
-  <Target Name="DeployServer" AfterTargets="Publish" Condition="'$(SkipRootDeploy)' != 'true'">
+  <Target Name="DeployServer" AfterTargets="Publish" Condition="'$(TargetFramework)' == 'net10.0-windows' And '$(SkipRootDeploy)' != 'true'">
     <ItemGroup>
       <SueltasDeAntes Include="$(MSBuildProjectDirectory)\..\Google.Protobuf.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Thrift.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Microsoft.Data.Sqlite.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.core.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.provider.e_sqlite3.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\SQLitePCLRaw.batteries_v2.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\System.Net.Http.WinHttpHandler.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\e_sqlite3.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Core.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Core.pdb;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Protocol.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.Protocol.pdb;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.World.dll;&#xD;&#xA;                               $(MSBuildProjectDirectory)\..\Jondo.Unity.World.pdb" />
     </ItemGroup>
