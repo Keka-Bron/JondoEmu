@@ -40,10 +40,6 @@
   <ItemGroup>
     <PackageReference Include="ApacheThrift" Version="0.23.0" />
     <PackageReference Include="Google.Protobuf" Version="3.35.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.81.1">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
     <!-- Microsoft.Data.Sqlite 10.0.9 drags in SQLitePCLRaw 2.1.11, and that carries a SQLite
          with CVE-2025-6965: high severity, range «<= 2.1.11». There is no newer stable Microsoft.Data.Sqlite
@@ -51,10 +47,6 @@
          underneath is pinned here, which is what really brings the native library. When 11 stable comes out this
          can be removed, checking that NU1903 still does not appear. -->
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="Protocol\GameProtocol.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +59,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Protocol\Jondo.Unity.Protocol.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Protocol.Connection.Wire\Jondo.Unity.Protocol.Connection.Wire.csproj" />
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Contract.WinForms\Jondo.Unity.Contract.WinForms.csproj" Condition="'$(TargetFramework)' == 'net10.0-windows'" />
   </ItemGroup>
@@ -95,6 +88,8 @@
   <Target Name="RunTestsBeforePublish" BeforeTargets="Publish" Condition="'$(TargetFramework)' == 'net10.0-windows' And '$(SkipTests)' != 'true'">
     <Message Text="[Tests] Running Jondo.Unity.Tests before publishing..." Importance="high" />
     <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Tests\Jondo.Unity.Tests.csproj&quot; --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
+    <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Protocol.Connection.Tests\Jondo.Unity.Protocol.Connection.Tests.csproj&quot; --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
+    <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)\..\Jondo.Unity.Server.Tests\Jondo.Unity.Server.Tests.csproj&quot; --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
     <Message Text="[Tests] Green. Publishing." Importance="high" />
   </Target>
 

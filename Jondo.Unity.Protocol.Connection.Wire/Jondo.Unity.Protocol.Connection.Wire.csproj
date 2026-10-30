@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Jondo.Unity.Protocol.Connection\Jondo.Unity.Protocol.Connection.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.ProtocolGenerator\Jondo.Unity.ProtocolGenerator.csproj"
+                      ReferenceOutputAssembly="false" OutputItemType="ConnectionGenerator" PrivateAssets="all" />
+    <PackageReference Include="Google.Protobuf" Version="3.35.1" />
+    <PackageReference Include="Grpc.Tools" Version="2.81.1" PrivateAssets="all" />
+    <Protobuf Include="Schemas/connection-3.6.10.11.proto" GrpcServices="None"
+              AdditionalProtocArguments="--descriptor_set_out=$(IntermediateOutputPath)connection.pb" />
+    <Compile Include="$(IntermediateOutputPath)ConnectionBindings.g.cs" />
+  </ItemGroup>
+  <Target Name="GenerateConnectionBindings" BeforeTargets="CoreCompile" DependsOnTargets="Protobuf_Compile;ResolveReferences"
+          Inputs="$(IntermediateOutputPath)connection.pb;Mappings/connection-3.6.10.11.json;@(ConnectionGenerator);@(ReferencePath)"
+          Outputs="$(IntermediateOutputPath)ConnectionBindings.g.cs">
+    <ItemGroup>
+      <_StableProtocol Include="@(ReferencePath)" Condition="'%(Filename)' == 'Jondo.Unity.Protocol.Connection'" />
+    </ItemGroup>
+    <Exec Command="dotnet &quot;@(ConnectionGenerator)&quot; &quot;$(IntermediateOutputPath)connection.pb&quot; &quot;$(MSBuildProjectDirectory)/Mappings/connection-3.6.10.11.json&quot; &quot;@(_StableProtocol)&quot; &quot;$(IntermediateOutputPath)ConnectionBindings.g.cs&quot;" />
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateOutputPath)ConnectionBindings.g.cs;$(IntermediateOutputPath)connection.pb" />
+    </ItemGroup>
+  </Target>
+</Project>

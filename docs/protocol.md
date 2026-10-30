@@ -22,9 +22,9 @@ four of them.
 | 5556 | `GameNodeProxy` | Same | Listener only. Nothing is ever sent there |
 | 6337 | `ChatServer` | TLS over TCP | Accepts the handshake, logs what arrives, answers `{"success":true}` to anything carrying a `token` |
 
-Port 5556 is dead weight. `GameServerProxy` hands the ticket reply to
-`ConnectionProtocol.BuildServerSelected(lang, ticket, "127.0.0.1", Program.gamePort, Program.gamePort)`
-— both port slots are 5555 — so the client reconnects to 5555 and `GameNodeProxy.Start(5556)`
+Port 5556 is dead weight. `ConnectionBackend.IssueTicket` creates the stable redirect
+with host `127.0.0.1` and `Program.gamePort` in both port slots — both are 5555 —
+so the client reconnects to 5555 and `GameNodeProxy.Start(5556)`
 never sees a connection. The session logic still lives in `GameNodeProxy`; only its listener is
 unused.
 
@@ -258,18 +258,24 @@ The client opens a fresh connection for each phase, so one port serves both.
 `type.ankama.com` it is a game session and goes to `GameNodeProxy`; otherwise it is the connection
 server.
 
-The connection server does not use the envelope at all. It speaks a small, ordinary protobuf schema
-— `Jondo.Unity.Launcher/Protocol/GameProtocol.proto`:
+The connection server uses a separate protobuf envelope and no `Any` type URLs.
+Its codec now uses the pinned 3.6.10.11 schema and generated conversions to
+hand-written stable types; see [connection-protocol.md](connection-protocol.md).
+The root shape, using stable names, is:
 
 ```proto
-message GameMessage {
-    AuthenticationTicketMessage       auth       = 1;   // client -> server
-    AuthenticationTicketResultMessage authResult = 2;   // server -> client
+message Message {
+    oneof content {
+        Request  request  = 1;
+        Response response = 2;
+        Event    event    = 3;
+    }
 }
 ```
 
-So here the root field means something else entirely: field 1 is the client and field 2 is the
-server, and there is no request id. Picking a server is 11 bytes:
+Here the root field identifies a request, response or event. Requests and responses
+carry an opaque correlation string in their own field 1, which the service echoes
+per request. It was previously mislabelled as a language. Picking a server is 11 bytes:
 
 ```
 0a 0a 08 0a 01 31 22 03 08 a2 02
@@ -278,8 +284,8 @@ server, and there is no request id. Picking a server is 11 bytes:
 | Bytes | Meaning |
 |---|---|
 | `0a` | varint 10 — body length |
-| `0a 08` | field 1, length 8 — `auth` |
-| `0a 01 31` | `lang` = `"1"` |
+| `0a 08` | field 1, length 8 — request |
+| `0a 01 31` | correlation id = `"1"` |
 | `22 03` | field 4, length 3 — `selectedServer` |
 | `08 a2 02` | `serverId` = 290 |
 
