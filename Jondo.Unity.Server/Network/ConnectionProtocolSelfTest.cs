@@ -6,7 +6,7 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// Check that the connection-phase messages come out with the exact shape they have in the
+    /// Check that game-phase messages come out with the exact shape they have in the
     /// real 3.6.10.10 client captures.
     ///
     /// It runs at startup. The point is that a change in the builders that alters the structure
@@ -243,8 +243,6 @@ namespace Jondo.Unity.Server.Network
             var failures = new List<string>();
 
             CheckCharactersList(failures);
-            CheckAuthenticationAccepted(failures);
-            CheckServerSelection(failures);
             CheckEnvelope(failures);
             CheckWorldMessages(failures);
             CheckFightPreparation(failures);
@@ -258,16 +256,16 @@ namespace Jondo.Unity.Server.Network
                 // screen, with no message, no log and nothing to look at. Starting like that does not
                 // help anyone; the failures are shown and it stops.
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[Protocol] The connection message check failed:");
+                Console.WriteLine("[Protocol] The game message check failed:");
                 foreach (string f in failures) Console.WriteLine("    - " + f);
                 Console.ResetColor();
 
                 throw new InvalidOperationException(
-                    $"[Protocol] {failures.Count} connection message(s) do not match the capture. " +
+                    $"[Protocol] {failures.Count} game message(s) do not match the capture. " +
                     "They are written above, each with the capture's bytes and ours.");
             }
 
-            Console.WriteLine("[Protocol] The connection messages match the captured shape.");
+            Console.WriteLine("[Protocol] The game messages match the captured shape.");
         }
 
         /// <summary>
@@ -455,124 +453,6 @@ namespace Jondo.Unity.Server.Network
                 if (Varint(lookMsg, 3) == 0) failures.Add("look: the bonesId (f3) is missing");
                 if (Field(lookMsg, 6, 2) == null) failures.Add("look: the skins (f6) are missing");
             }
-        }
-
-        /// <summary>
-        /// f2 { f1: language, f3 { f1 { f1: account, f2: nickname, f3: tag, f4: servers, f5: date, f6: {} } } }
-        /// </summary>
-        private static void CheckAuthenticationAccepted(List<string> failures)
-        {
-            var servers = new[]
-            {
-                new DatabaseManager.DbServer { Id = DatabaseManager.DefaultServerId, Name = "Test", Status = 1 }
-            };
-
-            byte[] msg = ConnectionProtocol.BuildAuthenticationAccepted(
-                "0", 12345L, "Nickname", "0001", "2099-01-01T00:00:00Z", servers, new[] { TestCharacter });
-
-            var result = Field(ProtoMessage.Parse(msg), 2, 2);
-            if (result == null) { failures.Add("authentication: the message must travel in f2"); return; }
-
-            var resultMsg = ProtoMessage.Parse(result.BytesValue);
-            var wrapper = Field(resultMsg, 3, 2);
-            if (wrapper == null) { failures.Add("authentication: the result (f3) is missing"); return; }
-
-            var accepted = Field(ProtoMessage.Parse(wrapper.BytesValue), 1, 2);
-            if (accepted == null) { failures.Add("authentication: the accepted block (f3.f1) is missing"); return; }
-
-            var acceptedMsg = ProtoMessage.Parse(accepted.BytesValue);
-            if (Varint(acceptedMsg, 1) != 12345L) failures.Add("authentication: the account is not in f1");
-            if (Text(acceptedMsg, 2) != "Nickname") failures.Add("authentication: the nickname is not in f2");
-
-            var list = Field(acceptedMsg, 4, 2);
-            if (list == null) { failures.Add("authentication: the server list (f4) is missing"); return; }
-
-            var listMsg = ProtoMessage.Parse(list.BytesValue);
-            int slots = 0;
-            foreach (var f in listMsg.Fields) if (f.FieldNumber == 2) slots++;
-            if (slots != 7) failures.Add($"authentication: expected 7 slot blocks but found {slots}");
-
-            var server = Field(listMsg, 1, 2);
-            if (server == null) { failures.Add("authentication: the server (f1) is missing"); return; }
-
-            var serverMsg = ProtoMessage.Parse(server.BytesValue);
-            var header = Field(serverMsg, 1, 2);
-            if (header == null) failures.Add("server: the header (f1) is missing");
-            else if (Varint(ProtoMessage.Parse(header.BytesValue), 1) != DatabaseManager.DefaultServerId)
-                failures.Add("server: the id is not in f1 of the header");
-
-            var summary = Field(serverMsg, 3, 2);
-            if (summary == null) { failures.Add("server: the character summary (f3) is missing"); return; }
-
-            var summaryMsg = ProtoMessage.Parse(summary.BytesValue);
-            if (Text(summaryMsg, 1) != TestCharacter.Name) failures.Add("summary: the name is not in f1");
-            // Here the breed is zero-based, a detail you only spot by comparing with the capture.
-            if (Varint(summaryMsg, 2) != TestCharacter.Breed - 1) failures.Add("summary: the breed must be zero-based in f2");
-            if (Varint(summaryMsg, 3) != TestCharacter.Sex) failures.Add("summary: the sex is not in f3");
-            if (Varint(summaryMsg, 4) != TestCharacter.Level) failures.Add("summary: the level is not in f4");
-            if (string.IsNullOrEmpty(Text(summaryMsg, 5)))
-                failures.Add("summary: the connection date (f5) is missing");
-
-            // A character that has never played must still carry a date. Without it the client
-            // draws an empty server-selection screen and gives no clue why.
-            var neverPlayed = new DatabaseManager.DbCharacter
-            {
-                Id = TestCharacter.Id,
-                Name = TestCharacter.Name,
-                Breed = TestCharacter.Breed,
-                Sex = TestCharacter.Sex,
-                Level = TestCharacter.Level,
-                ServerId = TestCharacter.ServerId,
-                LastConnection = ""
-            };
-
-            byte[] withoutDate = ConnectionProtocol.BuildAuthenticationAccepted(
-                "0", 12345L, "Nickname", "0001", "2099-01-01T00:00:00Z", servers, new[] { neverPlayed });
-
-            if (!FindsConnectionDate(withoutDate))
-                failures.Add("summary: a character with no stored date must still get one");
-        }
-
-        /// <summary>Walks down to the summary and says whether it carries the date (f5).</summary>
-        private static bool FindsConnectionDate(byte[] authenticationAccepted)
-        {
-            var result = Field(ProtoMessage.Parse(authenticationAccepted), 2, 2);
-            if (result == null) return false;
-            var wrapper = Field(ProtoMessage.Parse(result.BytesValue), 3, 2);
-            if (wrapper == null) return false;
-            var accepted = Field(ProtoMessage.Parse(wrapper.BytesValue), 1, 2);
-            if (accepted == null) return false;
-            var list = Field(ProtoMessage.Parse(accepted.BytesValue), 4, 2);
-            if (list == null) return false;
-            var server = Field(ProtoMessage.Parse(list.BytesValue), 1, 2);
-            if (server == null) return false;
-            var summary = Field(ProtoMessage.Parse(server.BytesValue), 3, 2);
-            if (summary == null) return false;
-            return !string.IsNullOrEmpty(Text(ProtoMessage.Parse(summary.BytesValue), 5));
-        }
-
-        /// <summary>f2 { f1: language, f4 { f1 { f1: ticket, f2: address, f3: ports } } }</summary>
-        private static void CheckServerSelection(List<string> failures)
-        {
-            byte[] msg = ConnectionProtocol.BuildServerSelected("0", "abc123", "127.0.0.1", 5555, 5555);
-
-            var root = Field(ProtoMessage.Parse(msg), 2, 2);
-            if (root == null) { failures.Add("selection: the message must travel in f2"); return; }
-
-            var selection = Field(ProtoMessage.Parse(root.BytesValue), 4, 2);
-            if (selection == null) { failures.Add("selection: the redirect block (f4) is missing"); return; }
-
-            var info = Field(ProtoMessage.Parse(selection.BytesValue), 1, 2);
-            if (info == null) { failures.Add("selection: the server info (f4.f1) is missing"); return; }
-
-            var infoMsg = ProtoMessage.Parse(info.BytesValue);
-            if (Text(infoMsg, 1) != "abc123") failures.Add("selection: the ticket is not in f1");
-            if (Text(infoMsg, 2) != "127.0.0.1") failures.Add("selection: the address is not in f2");
-
-            var ports = Field(infoMsg, 3, 2);
-            // Port 5555 twice, as concatenated varints: b3 2b b3 2b.
-            if (ports == null || ports.BytesValue.Length != 4)
-                failures.Add("selection: the ports must go as concatenated varints in f3");
         }
 
         /// <summary>The messages pushed by the server travel in field 1 of the frame.</summary>

@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
+using Jondo.Unity.Protocol.Connection.Wire;
+using Jondo.Unity.Server.Network.Connection;
 
 namespace Jondo.Unity.Server.Network
 {
@@ -163,160 +165,9 @@ namespace Jondo.Unity.Server.Network
 
         private static async Task HandleConnectionServerSessionAsync(NetworkStream clientStream, byte[] firstPayload)
         {
-            byte[] payload = firstPayload;
-
-            // The account is resolved when the token is presented and remembered for the rest
-            // of the connection, because the server-selection message no longer carries it.
-            long accountId = 0;
-            string lang = "0";
-
-            while (_isRunning)
-            {
-                try
-                {
-                    var req = Jondo.Protocol.GameMessage.Parser.ParseFrom(payload);
-                    if (req.Auth != null)
-                    {
-                        if (!string.IsNullOrEmpty(req.Auth.Lang)) lang = req.Auth.Lang;
-
-                        if (req.Auth.Ticket != null)
-                        {
-                            accountId = ResolveAccount(req.Auth.Ticket.TokenData?.Token);
-                            if (accountId <= 0)
-                            {
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("[Connection Server] Could not identify the account from the " +
-                                                  "token. Closing the connection.");
-                                Console.ResetColor();
-                                return;
-                            }
-
-                            byte[] accepted = BuildAuthenticationAccepted(accountId, lang);
-                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(clientStream, accepted);
-                        }
-                        else if (req.Auth.SelectedServer != null)
-                        {
-                            int selectedServerId = req.Auth.SelectedServer.ServerId;
-
-                            if (accountId <= 0)
-                            {
-                                Console.WriteLine("[Connection Server] Server selection with no identified " +
-                                                  "account. Closing the connection.");
-                                return;
-                            }
-
-                            // Closed servers still show up in the list but do not accept players.
-                            // We check it here as well, in case the client lets it through.
-                            if (!DatabaseManager.IsServerJoinable(selectedServerId))
-                            {
-                                Console.WriteLine($"[Connection Server] Server {selectedServerId} is not " +
-                                                  "accepting connections. No ticket issued.");
-                                return;
-                            }
-
-                            // The ticket is single-use and binds the next connection to this
-                            // account and this server. Without it, the game session would have
-                            // no idea who it is serving.
-                            // THE LANGUAGE COMES FROM THE LAUNCH, NOT FROM THIS MESSAGE.
-                            //
-                            // `lang` here is whatever the client put in its authentication
-                            // request, and it starts at the string "0": a session issued from it
-                            // fell through the normaliser to Spanish every time, so the whole
-                            // translation did nothing.
-                            //
-                            // The real code is two doors back. The launcher starts the client with
-                            // --langCode and registers that in ClientLaunchRegistry, keyed by
-                            // account, which is the same account we are issuing this ticket for.
-                            // Measured in the nine authentication captures: the client does send
-                            // its two-letter code, but in kqz field 3 -"es" in all six that carry
-                            // it- and not in the field this proxy reads.
-                            string idioma = ClientLaunchRegistry.TryGetByAccount(accountId, out var lanzamiento)
-                                          && lanzamiento != null
-                                ? lanzamiento.Language
-                                : lang;
-
-                            var ticket = SessionRegistry.Issue(accountId, selectedServerId, idioma);
-
-                            byte[] response = ConnectionProtocol.BuildServerSelected(
-                                lang, ticket.Value, "127.0.0.1", Program.gamePort, Program.gamePort);
-
-                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(clientStream, response);
-                            Console.WriteLine($"[Connection Server] Account {accountId} is joining server " +
-                                              $"{selectedServerId}. Ticket issued; the client will reconnect " +
-                                              $"to port {Program.gamePort}.");
-
-                            // The client closes this connection and opens another one with the ticket.
-                            return;
-                        }
-                    }
-                }
-                catch (Exception protoEx)
-                {
-                    Program.LogDebug($"[Connection Server] Unrecognized frame: {protoEx.Message}");
-                }
-
-                payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(clientStream);
-                if (payload == null) break;
-                LogTraffic("C->S", payload, payload.Length);
-            }
-            Console.WriteLine("[-] Connection Server session closed.");
-        }
-
-        /// <summary>
-        /// Resolves the account from the game token the client presents. The token is issued by
-        /// the launcher on login and stored on the account.
-        /// </summary>
-        private static long ResolveAccount(string? token)
-        {
-            if (!string.IsNullOrWhiteSpace(token))
-            {
-                long byToken = ClientLaunchRegistry.ResolveToken(token);
-                if (byToken > 0)
-                {
-                    Console.WriteLine($"[Connection Server] Token recognized: account {byToken}.");
-                    return byToken;
-                }
-                Console.WriteLine("[Connection Server] The presented token does not match any account.");
-            }
-
-            // Never fall back to another launcher's account: an unidentified socket is rejected.
-            return 0;
-        }
-
-        /// <summary>
-        /// Builds the authentication response from the servers in the database and the account's
-        /// real characters, each one hanging off its own server.
-        /// </summary>
-        private static byte[] BuildAuthenticationAccepted(long accountId, string lang)
-        {
-            var account = DatabaseManager.GetAccountById(accountId);
-            string nickname = account?.Nickname ?? "Jondo";
-
-            var servers = DatabaseManager.GetServers();
-            var characters = DatabaseManager.GetCharactersByAccountId(accountId);
-
-            byte[] message = ConnectionProtocol.BuildAuthenticationAccepted(
-                lang,
-                accountId,
-                nickname,
-                BuildAccountTag(accountId),
-                Subscription.EndDateFor(accountId),
-                servers,
-                characters);
-
-            Console.WriteLine($"[Connection Server] Account {accountId} ({nickname}): " +
-                              $"{servers.Count} server(s), {characters.Count} character(s).");
-            foreach (var server in servers)
-            {
-                int onThisServer = 0;
-                foreach (var c in characters)
-                {
-                    if (c.ServerId == server.Id) onThisServer++;
-                }
-                Console.WriteLine($"    server {server.Id} ({server.Name}): {onThisServer} character(s)");
-            }
-
-            return message;
+            await ConnectionTransport.RunAsync(clientStream, firstPayload,
+                new ConnectionService(new ConnectionBackend()), new ConnectionCodec(),
+                () => _isRunning, Program.LogDebug);
         }
 
         /// <summary>
@@ -324,43 +175,6 @@ namespace Jondo.Unity.Server.Network
         /// it stays stable across sessions. A house's plaque names its owner with the same pair.
         /// </summary>
         internal static string BuildAccountTag(long accountId) => (accountId % 10000).ToString("D4");
-
-        /// <summary>
-        /// End of the subscription: a year from now.
-        /// </summary>
-        /// <remarks>
-        /// The format had already been fixed once and the symptom was still there, and this comment
-        /// told half the story. The good half: if the client CANNOT READ this date, it treats the
-        /// account as if it had no subscription, and an account without a subscription has A SINGLE character
-        /// slot —hence the create button greyed out saying it is already full, with one character—. That
-        /// time the reason was the Z; the real server sends a numeric offset, 25 characters,
-        /// "####-##-##T##:##:##+##:##".
-        ///
-        /// The other half is the YEAR, which was left at 2099 and cannot be read either:
-        ///
-        ///   2026-09-06  from the real capture    1,788,645,600 s   fits
-        ///   2099-01-01  ours                     4,070,901,600 s   OVERFLOWS
-        ///   limit of a 32-bit integer            2,147,483,647 s = 19 January 2038
-        ///
-        /// That is the good old 2038 problem. All the subscription dates in the captures fall
-        /// about eight days ahead, or are the "1970-01-01T00:00Z" sentinel of the account without a subscription;
-        /// none comes near 2038.
-        ///
-        /// A year from now, and not a constant: it is far from any session, far from 2038
-        /// and nobody has to remember to touch it. It has been checked in our own log that the
-        /// number of slots we send is NOT what greys out the button —at 10:50 it went out with a hundred
-        /// slots and zero characters and the client let one be created; with one already created it is still greyed
-        /// with a hundred as with five—, so what decides is the subscription.
-        ///
-        /// One inference remains and it is stated: that 2099 cannot be read is measured, that THAT is
-        /// what greys out the button no capture proves. Trying it proves it.
-        /// </remarks>
-        /// <remarks>
-        /// Moved to <see cref="Subscription"/>: the launcher answers the same question over Thrift
-        /// and the two have to agree. See that file for why the Z at the end of the launcher's copy
-        /// mattered.
-        /// </remarks>
-
 
         /// <summary>
         /// A frame, raw, to the traffic log.

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.Server.Network.Connection;
+using Jondo.Unity.Protocol.Connection;
+using Jondo.Unity.Protocol.Connection.Wire;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Protocol
@@ -26,6 +29,10 @@ namespace Jondo.Unity.Tests.Protocol
     ///    99 -> 4    50 -> 5
     ///   slot table: (0,5) (1,5) (2,5) (3,5) (4,5) (5,5) (6,5)
     /// </code>
+    ///
+    /// Client behavior names these categories MonoAccount=0, Classic=1,
+    /// PioneerMonoAccount=2, PioneerClassic=3, Tournament=4, Epic=5, Temporis=6.
+    /// Mono-account limits concurrent accounts, not the number of character slots.
     ///
     /// 290 is Tal Kasha, the one open server here, and it is category 1 in both. So the category is
     /// right and the slot table is right, and neither is what darkens that button.
@@ -97,11 +104,10 @@ namespace Jondo.Unity.Tests.Protocol
                 new() { Id = 99, Type = 4 }, new() { Id = 50, Type = 5 },
             };
 
-            return ConnectionProtocol.BuildAuthenticationAccepted(
-                // Filler account, nickname and tag: none of this is checked here, and those of a
-                // real account have no business in a public repository.
-                "es", 100_000_001, "Cuenta", "0001", "2027-08-29T15:54:43+02:00",
-                servers, new List<DatabaseManager.DbCharacter>());
+            var list = ConnectionAccountProjection.ServerList(servers, new List<DatabaseManager.DbCharacter>(), DateTimeOffset.Now);
+            return new ConnectionCodec().Encode(new ConnectionResponse("es", new IdentificationResponse(
+                new IdentificationSuccess(100_000_001, "Cuenta", "0001", list, "2027-08-29T15:54:43+02:00",
+                    new AccountRights(false, false, false, false), null, null, null))));
         }
 
         /// <summary>Server id to category, read back out of the bytes we would put on the wire.</summary>

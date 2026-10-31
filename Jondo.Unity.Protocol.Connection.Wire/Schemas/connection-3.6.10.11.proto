@@ -1,0 +1,264 @@
+syntax = "proto3";
+package dofus;
+option csharp_namespace = "Jondo.Unity.Protocol.Connection.Wire.Messages";
+
+// Connection protocol for Dofus 3.6.10.11, shared with client 3.6.10.10.
+
+enum mhf {
+  fggi = 0;
+  fggj = 1;
+  fggk = 2;
+  fggl = 3;
+  fggm = 4;
+  fggn = 5;
+  fggo = 6;
+}
+enum mib {
+  fglp = 0;
+  fglq = 1;
+  fglr = 2;
+  fgls = 3;
+  fglt = 4;
+  fglu = 5;
+  fglv = 6;
+  fglw = 7;
+  fglx = 8;
+  fgly = 9;
+  fglz = 10;
+  fgma = 11;
+  fgmb = 12;
+  fgmc = 13;
+  fgmd = 14;
+}
+enum mij {
+  fgnb = 0;
+  fgnc = 1;
+  fgnd = 2;
+  fgne = 3;
+}
+enum mir {
+  fgok = 0;
+  fgol = 1;
+  fgom = 2;
+  fgon = 3;
+}
+enum miu {
+  fgox = 0;
+  fgoy = 1;
+}
+enum mjd {
+  fgqk = 0;
+  fgql = 1;
+}
+enum mje {
+  fgqm = 0;
+  fgqn = 1;
+  fgqo = 2;
+  fgqp = 3;
+  fgqq = 4;
+  fgqr = 5;
+  fgqs = 6;
+  fgqt = 7;
+  fgqu = 8;
+  fgqv = 9;
+  fgqw = 10;
+  fgqx = 11;
+  fgqy = 12;
+  fgqz = 13;
+  fgra = 14;
+  fgrb = 15;
+  fgrc = 16;
+  fgrd = 17;
+  fgre = 18;
+}
+enum mjj {
+  fgrw = 0;
+  fgrx = 1;
+}
+enum mjs {
+  fgtg = 0;
+  fgth = 1;
+  fgti = 2;
+  fgtj = 3;
+}
+message mhh {
+  oneof gfcg {
+    mhj gfcd = 1;
+    mhl gfce = 2;
+    mhn gfcf = 3;
+  }
+}
+message mhj {
+  string gfck = 1;
+  oneof gfcs {
+    mho gfcl = 2;
+    mhs gfcm = 3;
+    mih gfcn = 4;
+    mix gfco = 5;
+    mjc gfcp = 6;
+    mjh gfcq = 7;
+    mjp gfcr = 8;
+  }
+}
+message mhl {
+  string gfcw = 1;
+  oneof gfdd {
+    mhp gfcx = 2;
+    mig gfcy = 3;
+    mim gfcz = 4;
+    miz gfda = 5;
+    mjo gfdb = 6;
+    mjw gfdc = 7;
+  }
+}
+message mhn {
+  oneof gfdi {
+    mhq gfdh = 1;
+  }
+}
+message mho {}
+message mhp {}
+message mhq {
+  mit gfds = 1;
+}
+message mhs {
+  string gfdw = 1;
+  string gfdz = 5;
+  oneof gfea {
+    mhv gfdx = 3;
+    mhw gfdy = 4;
+  }
+}
+message mhv {
+  string gfej = 1;
+  mht gfek = 2;
+}
+message mht {
+  int64 gfee = 1;
+  string gfef = 2;
+}
+message mhw {
+  string gfeo = 1;
+}
+message mig {
+  oneof gffw {
+    mia gffu = 1;
+    mie gffv = 2;
+  }
+}
+message mia {
+  int64 gfez = 1;
+  string gffa = 2;
+  string gffb = 3;
+  miq gffc = 4;
+  string gffd = 5;
+  mhy gffe = 6;
+  optional int32 gfff = 7;
+  mja gffh = 8;
+  mjx gffi = 9;
+}
+message mhy {
+  bool gfes = 1;
+  bool gfet = 2;
+  bool gfeu = 3;
+  bool gfev = 4;
+}
+message mie {
+  mib gffm = 1;
+  string gffn = 2;
+  string gffp = 3;
+}
+message mih {
+  int32 gfga = 1;
+}
+message mim {
+  oneof gfgn {
+    mik gfgk = 1;
+    mij gfgl = 2;
+  }
+}
+message mik {
+  string gfge = 1;
+  string gfgf = 2;
+  repeated int32 gfgg = 3;
+}
+message miq {
+  repeated mit gfgw = 1;
+  repeated mio gfgx = 2;
+  bool gfgy = 3;
+}
+message mio {
+  mhf gfgr = 1;
+  int32 gfgs = 2;
+}
+message mit {
+  miw gfhc = 1;
+  mir gfhd = 2;
+  repeated mjg gfhe = 3;
+}
+message miw {
+  int32 gfhi = 1;
+  miu gfhj = 2;
+  mhf gfhk = 3;
+}
+message mix {
+  int64 gfho = 1;
+}
+message miz {
+  oneof gfhu {
+    mja gfhs = 2;
+    mjb gfht = 3;
+  }
+}
+message mja {
+  bool gfhy = 1;
+  int64 gfhz = 2;
+  string gfia = 3;
+  string gfib = 4;
+  miq gfic = 5;
+}
+message mjb {}
+message mjc {}
+message mjg {
+  string gfim = 1;
+  mje gfin = 2;
+  mjd gfio = 3;
+  int32 gfip = 4;
+  string gfiq = 5;
+}
+message mjh {}
+message mjo {
+  oneof gfjk {
+    mjm gfjh = 1;
+    mjj gfji = 2;
+  }
+}
+message mjm {
+  repeated mjk gfjd = 1;
+}
+message mjk {
+  string gfix = 1;
+  string gfiy = 2;
+  repeated int32 gfiz = 3;
+}
+message mjp {
+  string gfjo = 1;
+  string gfjp = 2;
+}
+message mjw {
+  oneof gfkd {
+    mjr gfkb = 1;
+    mju gfkc = 2;
+  }
+}
+message mjr {
+  repeated int32 gfjt = 1;
+}
+message mju {
+  mjs gfjx = 1;
+}
+message mjx {
+  string gfkh = 1;
+  string gfki = 2;
+  repeated int32 gfkj = 3;
+}

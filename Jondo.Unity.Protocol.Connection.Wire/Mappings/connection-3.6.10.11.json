@@ -1,0 +1,148 @@
+{
+  "stableNamespace": "Jondo.Unity.Protocol.Connection",
+  "generatedNamespace": "Jondo.Unity.Protocol.Connection.Wire",
+  "className": "ConnectionBindings",
+  "root": "ConnectionMessage",
+  "messages": {
+    "mhh": {
+      "name": "ConnectionMessage",
+      "oneofs": { "gfcg": { "member": "$self", "cases": {
+        "gfcd": { "type": "ConnectionRequest" },
+        "gfce": { "type": "ConnectionResponse" },
+        "gfcf": { "type": "ConnectionEvent" }
+      } } }
+    },
+    "mhj": {
+      "name": "ConnectionRequest",
+      "fields": { "gfck": "CorrelationId" },
+      "oneofs": { "gfcs": { "member": "Content", "cases": {
+        "gfcl": { "type": "Ping" },
+        "gfcm": { "type": "IdentificationRequest" },
+        "gfcn": { "type": "SelectServerRequest" },
+        "gfco": { "type": "ForceAccountRequest" },
+        "gfcp": { "type": "ReleaseAccountRequest" },
+        "gfcq": { "type": "FriendListRequest" },
+        "gfcr": { "type": "AcquaintanceServersRequest" }
+      } } }
+    },
+    "mhl": {
+      "name": "ConnectionResponse",
+      "fields": { "gfcw": "CorrelationId" },
+      "oneofs": { "gfdd": { "member": "Content", "cases": {
+        "gfcx": { "type": "Pong" },
+        "gfcy": { "type": "IdentificationResponse" },
+        "gfcz": { "type": "SelectServerResponse" },
+        "gfda": { "type": "ForceAccountResponse" },
+        "gfdb": { "type": "FriendListResponse" },
+        "gfdc": { "type": "AcquaintanceServersResponse" }
+      } } }
+    },
+    "mhn": {
+      "name": "ConnectionEvent",
+      "oneofs": { "gfdi": { "member": "Content", "cases": {
+        "gfdh": { "type": "UpdateServerEvent" }
+      } } }
+    },
+    "mho": { "name": "Ping" },
+    "mhp": { "name": "Pong" },
+    "mhq": { "name": "UpdateServerEvent", "fields": { "gfds": "ServerInformation" } },
+    "mhs": {
+      "name": "IdentificationRequest",
+      "fields": { "gfdw": "DeviceIdentifier" },
+      "ignoredWireFields": [ "gfdz" ],
+      "oneofs": { "gfea": { "member": "Method", "cases": {
+        "gfdx": { "type": "TokenIdentification" },
+        "gfdy": { "type": "LoginIdentification" }
+      } } }
+    },
+    "mhv": { "name": "TokenIdentification", "fields": { "gfej": "Token", "gfek": "Shield" } },
+    "mht": { "name": "ShieldCertificate", "fields": { "gfee": "CertificateId", "gfef": "CertificateHash" } },
+    "mhw": { "name": "LoginIdentification", "fields": { "gfeo": "Login" } },
+    "mig": {
+      "name": "IdentificationResponse",
+      "oneofs": { "gffw": { "member": "Result", "cases": {
+        "gffu": { "type": "IdentificationSuccess" },
+        "gffv": { "type": "IdentificationError" }
+      } } }
+    },
+    "mia": { "name": "IdentificationSuccess", "fields": {
+      "gfez": "AccountId", "gffa": "Nickname", "gffb": "Tag", "gffc": "ServerList",
+      "gffd": "SubscriptionEndDate", "gffe": "Rights", "gfff": "FightReconnectionServerId",
+      "gffh": "ForceAccount", "gffi": "Maintenance"
+    } },
+    "mhy": { "name": "AccountRights", "fields": {
+      "gfes": "ShowForceAccount", "gfet": "ShowConsole", "gfeu": "UnlimitedAccess", "gfev": "InfiniteSubscription"
+    } },
+    "mie": { "name": "IdentificationError", "fields": { "gffm": "Reason", "gffn": "BanEndDate" }, "ignoredWireFields": [ "gffp" ] },
+    "mih": { "name": "SelectServerRequest", "fields": { "gfga": "ServerId" } },
+    "mim": {
+      "name": "SelectServerResponse",
+      "oneofs": { "gfgn": { "member": "Result", "cases": {
+        "gfgk": { "type": "SelectServerSuccess" },
+        "gfgl": { "type": "SelectServerError", "member": "Reason" }
+      } } }
+    },
+    "mik": { "name": "SelectServerSuccess", "fields": { "gfge": "Ticket", "gfgf": "Host", "gfgg": "Ports" } },
+    "miq": { "name": "ServerList", "fields": { "gfgw": "Servers", "gfgx": "Slots" }, "ignoredWireFields": [ "gfgy" ] },
+    "mio": { "name": "ServerSlots", "fields": { "gfgr": "Category", "gfgs": "MaxSlots" } },
+    "mit": { "name": "ServerInformation", "fields": { "gfhc": "Server", "gfhd": "Accessibility", "gfhe": "Characters" } },
+    "miw": { "name": "Server", "fields": { "gfhi": "Id", "gfhj": "Status", "gfhk": "Category" } },
+    "mix": { "name": "ForceAccountRequest", "fields": { "gfho": "AccountId" } },
+    "miz": {
+      "name": "ForceAccountResponse",
+      "oneofs": { "gfhu": { "member": "Result", "cases": {
+        "gfhs": { "type": "ForceAccountSuccess", "member": "Status" },
+        "gfht": { "type": "ForceAccountError" }
+      } } }
+    },
+    "mja": { "name": "ForceAccountStatus", "fields": {
+      "gfhy": "IsForced", "gfhz": "AccountId", "gfia": "Nickname", "gfib": "Tag", "gfic": "ServerList"
+    } },
+    "mjb": { "name": "ForceAccountError" },
+    "mjc": { "name": "ReleaseAccountRequest" },
+    "mjg": { "name": "CharacterSummary", "fields": { "gfim": "Name", "gfin": "Breed", "gfio": "Gender", "gfip": "Level", "gfiq": "LastConnectionDate" } },
+    "mjh": { "name": "FriendListRequest" },
+    "mjo": {
+      "name": "FriendListResponse",
+      "oneofs": { "gfjk": { "member": "Result", "cases": {
+        "gfjh": { "type": "FriendListSuccess" },
+        "gfji": { "type": "FriendListError", "member": "Reason" }
+      } } }
+    },
+    "mjm": { "name": "FriendListSuccess", "fields": { "gfjd": "Friends" } },
+    "mjk": { "name": "ConnectionFriend", "fields": { "gfix": "Name", "gfiy": "Tag", "gfiz": "Servers" } },
+    "mjp": { "name": "AcquaintanceServersRequest", "fields": { "gfjo": "Name", "gfjp": "Tag" } },
+    "mjw": {
+      "name": "AcquaintanceServersResponse",
+      "oneofs": { "gfkd": { "member": "Result", "cases": {
+        "gfkb": { "type": "AcquaintanceServersSuccess" },
+        "gfkc": { "type": "AcquaintanceServersError" }
+      } } }
+    },
+    "mjr": { "name": "AcquaintanceServersSuccess", "fields": { "gfjt": "Servers" } },
+    "mju": { "name": "AcquaintanceServersError", "fields": { "gfjx": "Reason" } },
+    "mjx": { "name": "MaintenanceWindow", "fields": { "gfkh": "Start", "gfki": "End", "gfkj": "ServerIds" } }
+  },
+  "enums": {
+    "mhf": { "name": "ServerCategory", "values": {
+      "fggi": "MonoAccount", "fggj": "Classic", "fggk": "PioneerMonoAccount", "fggl": "PioneerClassic", "fggm": "Tournament", "fggn": "Epic", "fggo": "Temporis"
+    } },
+    "mib": { "name": "IdentificationErrorReason", "values": {
+      "fglp": "UnknownAuthError", "fglq": "AlreadyConnected", "fglr": "OtpTimeout", "fgls": "Banned",
+      "fglt": "InvalidShieldCertificate", "fglu": "Locked", "fglv": "CredentialsReset", "fglw": "WrongCredentials",
+      "fglx": "EmailUnvalidated", "fgly": "AnonymousIpForbidden", "fglz": "NicknameRegistration", "fgma": "Unauthorized",
+      "fgmb": "Unknown12", "fgmc": "Unknown13", "fgmd": "Unknown14"
+    } },
+    "mij": { "name": "SelectServerErrorReason", "values": { "fgnb": "Refused", "fgnc": "SubscriberOnly", "fgnd": "SingleAccountVerifiedOnly", "fgne": "Maintenance" } },
+    "mir": { "name": "ServerAccessibility", "values": { "fgok": "Accessible", "fgol": "SubscribeRestriction", "fgom": "MonoAccountRestriction", "fgon": "Unknown3" } },
+    "miu": { "name": "ConnectionServerStatus", "values": { "fgox": "Online", "fgoy": "Offline" } },
+    "mjd": { "name": "CharacterGender", "values": { "fgqk": "Male", "fgql": "Female" } },
+    "mje": { "name": "CharacterBreed", "values": {
+      "fgqm": "Feca", "fgqn": "Osamodas", "fgqo": "Enutrof", "fgqp": "Sram", "fgqq": "Xelor", "fgqr": "Ecaflip",
+      "fgqs": "Eniripsa", "fgqt": "Iop", "fgqu": "Cra", "fgqv": "Sadida", "fgqw": "Sacrier", "fgqx": "Pandawa",
+      "fgqy": "Rogue", "fgqz": "Masqueraider", "fgra": "Foggernaut", "fgrb": "Eliotrope", "fgrc": "Huppermage", "fgrd": "Ouginak", "fgre": "Forgelance"
+    } },
+    "mjj": { "name": "FriendListErrorReason", "values": { "fgrw": "Unknown", "fgrx": "Flooding" } },
+    "mjs": { "name": "AcquaintanceErrorReason", "values": { "fgtg": "Unknown", "fgth": "NoResult", "fgti": "Flood", "fgtj": "InvalidAccount" } }
+  }
+}

@@ -49,20 +49,26 @@ jobs:
       - name: Test
         run: dotnet test Jondo.Unity.Tests/Jondo.Unity.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=tests.trx" --results-directory TestResults
 
+      - name: Test connection protocol
+        run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=connection-protocol.trx" --results-directory TestResults
+
+      - name: Test connection server
+        run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
+
       # Each failed test as an annotation, readable without signing in -- the log and the trx are
       # not: the run's page and its API show the annotations to anybody.
       - name: Annotate failed tests
         if: failure()
         shell: pwsh
         run: |
-          $trx = Get-ChildItem TestResults -Filter *.trx -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $trx) { exit 0 }
-          [xml]$doc = Get-Content $trx.FullName
-          $failed = $doc.TestRun.Results.UnitTestResult | Where-Object { $_.outcome -eq 'Failed' }
-          foreach ($t in $failed) {
-            $message = ($t.Output.ErrorInfo.Message -replace "`r?`n", ' | ')
-            if ($message.Length -gt 600) { $message = $message.Substring(0, 600) }
-            Write-Output "::error title=Failed test::$($t.testName): $message"
+          foreach ($trx in Get-ChildItem TestResults -Filter *.trx -ErrorAction SilentlyContinue) {
+            [xml]$doc = Get-Content $trx.FullName
+            $failed = $doc.TestRun.Results.UnitTestResult | Where-Object { $_.outcome -eq 'Failed' }
+            foreach ($t in $failed) {
+              $message = ($t.Output.ErrorInfo.Message -replace "`r?`n", ' | ')
+              if ($message.Length -gt 600) { $message = $message.Substring(0, 600) }
+              Write-Output "::error title=Failed test::$($t.testName): $message"
+            }
           }
 
       - name: Upload test results
@@ -72,3 +78,16 @@ jobs:
           name: test-results
           path: TestResults/*.trx
           if-no-files-found: ignore
+
+  connection-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - name: Test generated protocol and mappings
+        run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --nologo
+      - name: Test connection server over TCP
+        run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --nologo

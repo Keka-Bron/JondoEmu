@@ -480,7 +480,7 @@ namespace Jondo.Unity.Server
                         "UPDATE Characters SET LastConnection = $now " +
                         "WHERE LastConnection IS NULL OR LastConnection = '';";
                     fillLastConn.Parameters.AddWithValue("$now",
-                        DateTimeOffset.Now.ToString(Network.ConnectionProtocol.ConnectionDateFormat));
+                        DateTimeOffset.Now.ToString(Network.Connection.ConnectionAccountProjection.DateFormat));
                     int filled = fillLastConn.ExecuteNonQuery();
                     if (filled > 0)
                     {
@@ -2186,7 +2186,7 @@ namespace Jondo.Unity.Server
                 command.CommandText =
                     "UPDATE Characters SET LastConnection = $now, LastIp = $ip WHERE Id = $id;";
                 command.Parameters.AddWithValue("$now",
-                    DateTimeOffset.Now.ToString(Network.ConnectionProtocol.ConnectionDateFormat));
+                    DateTimeOffset.Now.ToString(Network.Connection.ConnectionAccountProjection.DateFormat));
                 command.Parameters.AddWithValue("$ip", ip ?? "");
                 command.Parameters.AddWithValue("$id", characterId);
                 command.ExecuteNonQuery();

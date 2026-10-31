@@ -7,6 +7,7 @@
 [Oo]bj/
 publish/
 runtimes/
+/host-artifacts/
 *.pdb
 *.deps.json
 *.runtimeconfig.json
@@ -86,6 +87,7 @@ scratch_*
 .vscode/
 *.user
 *.suo
+*.swp
 
 # ─── Deobfuscator ───────────────────────────────────────────────────────────
 # The model's answers are a cache: they can be asked for again, they take a file per question and
