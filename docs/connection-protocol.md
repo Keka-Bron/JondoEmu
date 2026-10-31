@@ -212,8 +212,9 @@ failures are not swallowed as decoder errors.
 The request/response string previously labelled `Lang` is an opaque correlation
 ID and is echoed per request. The launch registry supplies ticket language, with
 Spanish as the normal fallback. Subscription formatting, the seven categories of
-five character slots, character-date fallback, zero-based wire breeds, ticket
-binding and the duplicate game-port redirect are preserved. Database HTTP status
+five character slots, character-date fallback, zero-based wire breeds (the
+Forgelance, breed 20, travels as 18), ticket binding and the duplicate game-port
+redirect are preserved. Database HTTP status
 values are not cast into connection enums: connection replies retain their former
 default Online/Accessible representation, while HTTP reports availability and the
 backend enforces `Joinable` before issuing tickets.

@@ -65,6 +65,8 @@ internal static class ConnectionAccountProjection
         _ => throw new InvalidOperationException($"Unknown database character gender: {value}.")
     };
 
+    // There is no breed 19: the Forgelance is 20, and the client reads wire value 18 back as 20
+    // (gr's constructor; anything past 18 is no breed at all).
     private static CharacterBreed Breed(int value) => value switch
     {
         1 => CharacterBreed.Feca, 2 => CharacterBreed.Osamodas, 3 => CharacterBreed.Enutrof,
@@ -73,7 +75,7 @@ internal static class ConnectionAccountProjection
         10 => CharacterBreed.Sadida, 11 => CharacterBreed.Sacrier, 12 => CharacterBreed.Pandawa,
         13 => CharacterBreed.Rogue, 14 => CharacterBreed.Masqueraider, 15 => CharacterBreed.Foggernaut,
         16 => CharacterBreed.Eliotrope, 17 => CharacterBreed.Huppermage, 18 => CharacterBreed.Ouginak,
-        19 => CharacterBreed.Forgelance,
+        20 => CharacterBreed.Forgelance,
         _ => throw new InvalidOperationException($"Unknown database character breed: {value}.")
     };
 }

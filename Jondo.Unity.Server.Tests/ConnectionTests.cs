@@ -131,7 +131,7 @@ public sealed class ConnectionTests
         var list = ConnectionAccountProjection.ServerList(
             new[] { new DatabaseManager.DbServer { Id = 290, Type = 1, Joinable = true }, new DatabaseManager.DbServer { Id = 291, Type = 0 } },
             new[] { new DatabaseManager.DbCharacter { AccountId = 7, ServerId = 290, Name = "Dummy", Breed = 1, Sex = 0, Level = 1, LastConnection = "" },
-                new DatabaseManager.DbCharacter { AccountId = 7, ServerId = 291, Name = "Other", Breed = 19, Sex = 1, Level = 201, LastConnection = "2026-08-01T12:00:00.000+02:00" } }, now);
+                new DatabaseManager.DbCharacter { AccountId = 7, ServerId = 291, Name = "Other", Breed = 20, Sex = 1, Level = 201, LastConnection = "2026-08-01T12:00:00.000+02:00" } }, now);
         var response = new ConnectionResponse("0", new IdentificationResponse(new IdentificationSuccess(7, "Dummy", "0007", list,
             "2027-08-11T12:00:00+02:00", new AccountRights(false, false, false, false), null, null, null)));
         byte[] encoded = Codec.Encode(response);
