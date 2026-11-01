@@ -9,12 +9,7 @@ namespace Jondo.Unity.Server
 {
     public static class ConsoleLogBuffer
     {
-        private class LogEntry
-        {
-            public long Id { get; set; }
-            public string Message { get; set; } = "";
-            public string Time { get; set; } = "";
-        }
+        internal sealed record LogEntry(long Id, string Message, string Time);
 
         private static readonly ConcurrentQueue<LogEntry> _logs = new ConcurrentQueue<LogEntry>();
         private static long _sequence = 0;
@@ -53,19 +48,18 @@ namespace Jondo.Unity.Server
             if (string.IsNullOrWhiteSpace(text)) return;
 
             ToFile(text);
-            long id = System.Threading.Interlocked.Increment(ref _sequence);
-            var entry = new LogEntry
+            // Assign IDs and enqueue under one lock: otherwise a GUI cursor can pass an entry
+            // whose writer has an ID but has not yet enqueued it.
+            lock (_logs)
             {
-                Id = id,
-                Message = text,
-                Time = DateTime.Now.ToString("HH:mm:ss")
-            };
-
-            _logs.Enqueue(entry);
-            while (_logs.Count > MaxLogs)
-            {
-                _logs.TryDequeue(out _);
+                _logs.Enqueue(new LogEntry(++_sequence, text, DateTime.Now.ToString("HH:mm:ss")));
+                while (_logs.Count > MaxLogs) _logs.TryDequeue(out _);
             }
+        }
+
+        internal static IReadOnlyList<LogEntry> ReadSince(long sinceId)
+        {
+            lock (_logs) return _logs.Where(log => log.Id > sinceId).ToArray();
         }
 
         public static string GetLogsJson(long sinceId)

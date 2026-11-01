@@ -148,6 +148,12 @@ Built with **Avalonia**, the same toolkit as the Studio.
 
 `Jondo Server.exe`. The launcher starts it, but it can be run on its own — or on another machine.
 
+The server uses one **Avalonia GUI on Windows and Linux**, including the live log, counters,
+settings and restart controls. On Linux, run `sh Jondo.Unity.Server/run.sh` from a source checkout,
+or `./"Jondo Server"` from an unpacked server package. Use `--headless` for a terminal/service;
+Linux sessions without a display select headless mode automatically.
+See [Server desktop and Linux deployment](docs/server-desktop.md) for requirements and publishing.
+
 - ✅ Four listeners in one process — Zaap (`8888`), game (`5555`), chat (`6337`) and HAAPI (`15881`)
 - ✅ One session per socket: eight clients on one machine never see each other's state
 - ✅ Its own window with the live log, the counters and the connected clients
@@ -1003,14 +1009,23 @@ The full plan is in **`docs/world-editor.md`**.
 
 ## 🧪 Tests
 
-`Jondo.Unity.Tests` — **2,370 xUnit tests**, grouped by domain. They run in about a minute.
+All three xUnit suites target portable .NET 10 and run in CI on Linux and Windows.
+`Jondo.Unity.Tests` contains the general tests grouped by domain, including headless
+Avalonia rendering. The focused suites cover connection conversion/codec behavior and
+server transport/desktop behavior.
 
 ```bash
 dotnet test Jondo.Unity.Tests
+dotnet test Jondo.Unity.Protocol.Connection.Tests
+dotnet test Jondo.Unity.Server.Tests
 ```
 
 **Publishing the server runs them first and fails if any is red.** The escape hatch is
-`-p:SkipTests=true`.
+`-p:SkipTests=true`; the Linux `run.sh` script uses it for normal development launches.
+
+For database-backed general tests, extract `datos/world.zip` into `bases/` first,
+as both CI platforms do. Those tests use writable database fixtures. Cases requiring
+optional installed-client assets still return early when those assets are absent.
 
 The server also checks its shipped data at startup and refuses to boot when it is inconsistent.
 
@@ -1044,7 +1059,7 @@ The three executables:
 
 Shared:
 * **`Jondo.Unity.Contract`** — paths, settings and the shared palette
-* **`Jondo.Unity.Contract.WinForms`** — the Windows Forms shell of the server window
+* **`Jondo.Unity.Contract.WinForms`** — Windows Forms controls still used by the deobfuscator
 * **`Jondo.Unity.Core`** — the file lookup: `datos/`, then `bases/`, then the root
 * **`Jondo.Unity.Protocol`** — message definitions and the generated `Op` layer
 * **`Jondo.Unity.World`** — world and fight logic, buffs, areas, geometry and criteria

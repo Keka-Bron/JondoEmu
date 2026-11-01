@@ -17,15 +17,9 @@ namespace Jondo.Unity.Server
         public static readonly int gameNodePort = 5556;
 
 
-        /// <summary>
-        /// The server. No windows: since the launcher is another executable, not a single
-        /// line of WinForms is left in here.
-        ///
-        /// Before, this started the five services and then opened the launcher window, and the
-        /// process's life was plugged into a Form's life cycle: closing the window
-        /// called RequestShutdown and everything shut down, with whatever players were inside.
-        /// </summary>
-        static async Task Main(string[] args)
+        /// <summary>The desktop owns the main thread; the same server can run without a desktop.</summary>
+        [STAThread]
+        static void Main(string[] args)
         {
             ConsoleLogBuffer.Initialize();
 
@@ -35,13 +29,27 @@ namespace Jondo.Unity.Server
             if (!Contract.CogerElSitio("JondoEmuServidor"))
             {
                 Console.WriteLine("[!] There is already a Jondo server running in this session. This one closes.");
-                await Task.Delay(2500);
+                Thread.Sleep(2500);
                 return;
             }
 
             try
             {
-                await ArrancarTodoYEsperar();
+                _headless = UI.ServerLaunch.Headless(args);
+                AppDomain.CurrentDomain.ProcessExit += (_, _) => StopServices();
+                Console.CancelKeyPress += (_, e) =>
+                {
+                    e.Cancel = true;
+                    RequestShutdown("Ctrl+C");
+                };
+                using var sigterm = OperatingSystem.IsWindows() ? null :
+                    PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
+                    {
+                        context.Cancel = true;
+                        RequestShutdown("SIGTERM");
+                    });
+                if (_headless) RunServerAsync().GetAwaiter().GetResult();
+                else UI.ServerApp.Run(args);
             }
             catch (Exception ex)
             {
@@ -52,15 +60,44 @@ namespace Jondo.Unity.Server
             }
             finally
             {
+                if (UI.ServerApp.BackendTask is { IsCompleted: false } backend)
+                {
+                    RequestShutdown("desktop ended");
+                    backend.GetAwaiter().GetResult();
+                }
                 Contract.SoltarElSitio();
             }
+        }
+
+        private static bool _headless;
+        private static volatile bool _ready;
+        private static volatile string _failure;
+        internal static bool Ready => _ready;
+        internal static string Failure => _failure;
+
+        internal static async Task RunServerAsync()
+        {
+            try { await StartServicesAndWaitAsync(); }
+            catch (Exception ex)
+            {
+                Environment.ExitCode = 1;
+                _failure = StartupFailure(ex);
+                Console.WriteLine(Failure);
+                LogFile.Debug.WriteLine(Failure);
+            }
+            finally
+            {
+                _ready = false;
+                StopServices();
+            }
+            if (_restartRequested != 0 && Failure == null) StartTheNextRun();
         }
 
         /// <summary>The complete failure written before a WinExe exits during startup.</summary>
         internal static string StartupFailure(Exception error)
             => $"[!] Fatal error while starting Jondo Server:{Environment.NewLine}{error}";
 
-        private static async Task ArrancarTodoYEsperar()
+        private static async Task StartServicesAndWaitAsync()
         {
             try { Console.Clear(); } catch { }
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -82,6 +119,8 @@ namespace Jondo.Unity.Server
             // 0. Resolved data paths. Everything the emulator needs now lives inside its own
             //    folder; the root is derived from the assembly location, not hardcoded.
             Paths.LogResolvedPaths();
+            // Freeze this run's settings before the desktop can save edits for the next run.
+            _ = ServerSettings.Current;
 
             // 1. Initialize Database and Map Manager
             Console.WriteLine("[+] Initializing Database...");
@@ -186,6 +225,7 @@ namespace Jondo.Unity.Server
 
 
             // 3. Start Emulation Servers
+            if (IsShuttingDown) return;
             Console.WriteLine("[+] Starting services...");
             try
             {
@@ -210,7 +250,7 @@ namespace Jondo.Unity.Server
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"[!] Critical Error starting servers: {ex.Message}");
                 Console.ResetColor();
-                return;
+                throw;
             }
 
             Console.ForegroundColor = ConsoleColor.Green;
@@ -222,33 +262,19 @@ namespace Jondo.Unity.Server
             // server—. The real commands are those of the game chat, and
             // CommandHandler hands them out according to the role of whoever types them.
 
-            AppDomain.CurrentDomain.ProcessExit += (s, e) => StopServices();
-            Console.CancelKeyPress += (s, e) =>
-            {
-                e.Cancel = true;
-                RequestShutdown("Ctrl+C");
-            };
-#if !WINDOWS
-            using var sigterm = PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
-            {
-                context.Cancel = true;
-                RequestShutdown("SIGTERM");
-            });
-#endif
-
             // The launches that are left hanging.
             //
             // A client that starts and never gets to connect to 5555 —or a launcher that closes
             // right in the middle— left the account marked as busy FOREVER, and the registry
             // rejected it on every later attempt. CreatedAtUtc had been set from the start
             // without anyone reading it; now it is what releases them.
-            var barrendero = new System.Threading.Timer(
+            using var launchCleanup = new System.Threading.Timer(
                 _ => { try { Network.ClientLaunchRegistry.SoltarLosCaducados(TimeSpan.FromMinutes(5)); } catch { } },
                 null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 
             // The Koliseo's queues, looked at again every few seconds: the rating window widens
             // with the wait, so a match that was not possible at enrolment may be now.
-            var koliseo = new System.Threading.Timer(
+            using var matchmaking = new System.Threading.Timer(
                 _ =>
                 {
                     if (Interlocked.Exchange(ref _koliseoTicking, 1) != 0) return;
@@ -260,7 +286,7 @@ namespace Jondo.Unity.Server
 
             // The prisms' clock: weakened ones turning vulnerable, the conquests' minutes, the
             // pacified going back to normal (Handlers.ConquestHandler).
-            var conquests = new System.Threading.Timer(
+            using var conquests = new System.Threading.Timer(
                 _ =>
                 {
                     if (Interlocked.Exchange(ref _conquestTicking, 1) != 0) return;
@@ -288,28 +314,15 @@ namespace Jondo.Unity.Server
                 },
                 null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
 
-            // And its window: the log and the figures. If it could not be opened —no desktop, for
-            // example— the server keeps working the same: the window is for looking, not for
-            // things to happen.
-#if WINDOWS
-            UI.ServerWindow.Abrir();
-#endif
-
-            // Here «el servidor está en marcha, Ctrl+C para pararlo» and «cerrar el
-            // lanzador ya no apaga esto» used to be announced. They were notices for whoever watched a text console:
-            // now there is a window with a stop button, and what the log has to tell
-            // is what happens on the server, not how it is operated.
+            _ready = true;
 
             await _shutdown.Task;
-            await barrendero.DisposeAsync();
-            await koliseo.DisposeAsync();
+            await launchCleanup.DisposeAsync();
+            await matchmaking.DisposeAsync();
             await conquests.DisposeAsync();
             await headHunts.DisposeAsync();
 
             StopServices();
-
-            // A restart asked for from the Settings window: the next run starts as this one ends.
-            if (_restartRequested != 0) StartTheNextRun();
 
             // Safety net: if something gets stuck and the process does not end on its own, force
             // the exit. It used to have to be killed by hand from the task manager.
@@ -323,11 +336,12 @@ namespace Jondo.Unity.Server
 
         private static readonly TaskCompletionSource _shutdown =
             new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal static Task ShutdownRequested => _shutdown.Task;
 
         /// <summary>Whether shutdown has already been asked for, so the window does not ask again.</summary>
-        public static bool ApagandoYa => _shutdownRequested != 0;
+        public static bool IsShuttingDown => Volatile.Read(ref _shutdownRequested) != 0;
 
-    private static int _shutdownRequested;
+        private static int _shutdownRequested;
         private static int _servicesStopped;
 
         /// <summary>
@@ -357,13 +371,9 @@ namespace Jondo.Unity.Server
         {
             try
             {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = Environment.ProcessPath!,
-                    Arguments = $"{RestartAfter} {Environment.ProcessId}",
-                    UseShellExecute = false,
-                    WorkingDirectory = Environment.CurrentDirectory,
-                });
+                var start = UI.ServerLaunch.Restart(Environment.ProcessPath!,
+                    Environment.GetCommandLineArgs()[0], Environment.ProcessId, _headless);
+                System.Diagnostics.Process.Start(start);
                 Console.WriteLine("[+] The server starts again with its new settings.");
             }
             catch (Exception ex)
@@ -387,7 +397,7 @@ namespace Jondo.Unity.Server
         }
 
         /// <summary>
-        /// Requests a graceful shutdown of the emulator. The launcher window calls it when closing.
+        /// Requests a graceful shutdown of the emulator. The server window calls it when closing.
         /// It is idempotent: it does not matter how many times it is called.
         /// </summary>
         public static void RequestShutdown(string reason)

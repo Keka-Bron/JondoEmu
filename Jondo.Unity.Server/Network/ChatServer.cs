@@ -186,25 +186,32 @@ namespace Jondo.Unity.Server.Network
             }
         }
 
-        private static async Task HandleClientAsync(TcpClient client)
+        private static Task HandleClientAsync(TcpClient client)
+            => HandleClientAsync(client, _certificate, Console.WriteLine);
+
+        internal static async Task HandleClientAsync(TcpClient client, X509Certificate2? certificate, Action<string> log)
         {
             using (client)
             {
-                if (_certificate == null)
+                if (certificate == null)
                 {
-                    Console.WriteLine("[-] Chat Server: no certificate, the connection is closed.");
+                    log("[-] Chat Server: no certificate, the connection is closed.");
                     return;
                 }
 
+                string peer = "unknown";
                 try
                 {
+                    // Disposing TLS closes its underlying socket before the catch block runs.
+                    // Keep diagnostics independent of that socket, including early disposal races.
+                    peer = client.Client?.RemoteEndPoint?.ToString() ?? peer;
                     using var tls = new SslStream(client.GetStream(), false, (sender, cert, chain, errors) => true);
-                    await tls.AuthenticateAsServerAsync(_certificate);
+                    await tls.AuthenticateAsServerAsync(certificate);
                     await ServeAsync(tls);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[Chat Server] Connection from {client.Client.RemoteEndPoint} ended: {ex.Message}");
+                    log($"[Chat Server] Connection from {peer} ended: {ex.Message}");
                 }
             }
         }

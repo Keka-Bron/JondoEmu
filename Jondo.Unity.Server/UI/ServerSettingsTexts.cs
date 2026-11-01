@@ -1,0 +1,92 @@
+using Jondo.Unity.Launcher.UI;
+
+namespace Jondo.Unity.Server.UI;
+
+/// <summary>Server-only strings. Shared dashboard labels remain in LauncherTexts.</summary>
+internal static class ServerSettingsTexts
+{
+    private static readonly Dictionary<string, (string Es, string En, string Fr)> Words = new()
+    {
+        ["Caption"] = ("Ajustes del servidor", "Server settings", "Réglages du serveur"),
+        ["Subtitle"] = ("Se guardan en config/server_settings.json y se aplican al reiniciar. Se avisa antes a los jugadores por el chat.", "Saved to config/server_settings.json and applied on restart. Players are told in the chat first.", "Enregistrés dans config/server_settings.json et appliqués au redémarrage. Les joueurs sont prévenus dans le chat."),
+        ["Rates"] = ("TASAS", "RATES", "TAUX"),
+        ["Xp"] = ("Bonus de experiencia", "Experience bonus", "Bonus d'expérience"),
+        ["Drop"] = ("Bonus de botín", "Drop bonus", "Bonus de butin"),
+        ["Kamas"] = ("Bonus de kamas", "Kamas bonus", "Bonus de kamas"),
+        ["RatesHint"] = ("Un porcentaje extra para todos. 0 = sin bonus.", "An extra percent for everybody. 0 = no bonus.", "Un pourcentage en plus pour tous. 0 = sans bonus."),
+        ["Characters"] = ("PERSONAJES", "CHARACTERS", "PERSONNAGES"),
+        ["MaxAp"] = ("PA máximos", "Maximum action points", "PA maximum"),
+        ["MaxMp"] = ("PM máximos", "Maximum movement points", "PM maximum"),
+        ["CapHint"] = ("0 = sin tope (oficiales: 12 PA y 6 PM).", "0 = no cap (official: 12 AP and 6 MP).", "0 = sans plafond (officiels : 12 PA et 6 PM)."),
+        ["NoEnergy"] = ("Morir no cuesta energía", "Dying costs no energy", "Mourir ne coûte pas d'énergie"),
+        ["NoEnergyHint"] = ("Perder un combate no gasta energía.", "A lost fight spends no energy.", "Perdre un combat ne dépense pas d'énergie."),
+        ["Raids"] = ("RAIDS Y BÚSQUEDA DE GRUPO", "RAIDS AND PARTY SEARCH", "RAIDS ET RECHERCHE DE GROUPE"),
+        ["RaidMin"] = ("Jugadores mínimos para iniciar una raid", "Fewest players to start a raid", "Joueurs minimum pour lancer un raid"),
+        ["RaidMinHint"] = ("0 = los del juego (8).", "0 = the game's (8).", "0 = ceux du jeu (8)."),
+        ["Matchmaking"] = ("Jugadores de la búsqueda de mazmorras", "Players in the automatic dungeon search", "Joueurs de la recherche automatique de donjon"),
+        ["MatchmakingHint"] = ("0 = los del juego (4).", "0 = the game's (4).", "0 = ceux du jeu (4)."),
+        ["Conquests"] = ("CONQUISTAS DE ALIANZA", "ALLIANCE CONQUESTS", "CONQUÊTES D'ALLIANCE"),
+        ["Weakened"] = ("Horas de prisma debilitado", "Hours a prism stays weakened", "Heures de prisme affaibli"),
+        ["WeakenedHint"] = ("Hasta que se vuelve vulnerable. 0 = enseguida.", "Until it turns vulnerable. 0 = at once.", "Avant qu'il devienne vulnérable. 0 = tout de suite."),
+        ["ConquestMax"] = ("Duración máxima de una conquista", "Longest a conquest lasts", "Durée maximale d'une conquête"),
+        ["ConquestMaxHint"] = ("En minutos. Si nadie gana, la defensa conserva el prisma.", "Minutes. If nobody wins, the defence keeps the prism.", "Minutes. Si personne ne gagne, la défense garde le prisme."),
+        ["Invulnerable"] = ("Horas de invulnerabilidad", "Hours of invulnerability", "Heures d'invulnérabilité"),
+        ["InvulnerableHint"] = ("Divididas por los prismas de su alianza.", "Divided by the prisms its alliance holds.", "Divisées par les prismes de son alliance."),
+        ["Protection"] = ("Protección de un prisma nuevo", "Protection of a new prism", "Protection d'un prisme neuf"),
+        ["ProtectionHint"] = ("Minutos sin poder atacarlo tras ponerlo. 0 = ninguna.", "Minutes without attacks after placement. 0 = none.", "Minutes sans pouvoir l'attaquer après sa pose. 0 = aucune."),
+        ["Loot"] = ("BOTÍN ALEATORIO", "RANDOM LOOT", "BUTIN ALÉATOIRE"),
+        ["RandomLoot"] = ("Botín aleatorio", "Random loot", "Butin aléatoire"),
+        ["RandomLootHint"] = ("Cada monstruo puede soltar de 2 a 5 objetos al azar además de su tabla.", "Each monster can drop 2 to 5 random items besides its table.", "Chaque monstre peut lâcher 2 à 5 objets au hasard en plus de sa table."),
+        ["Chance"] = ("Probabilidad por monstruo", "Chance per monster", "Chance par monstre"),
+        ["ChanceHint"] = ("Los retos y el bonus de botín la suben.", "Challenges and the drop bonus raise it.", "Les défis et le bonus de butin l'augmentent."),
+        ["LootLevels"] = ("Equipo y consumibles a ±10 niveles del monstruo y dofus a ±20; monturas, mascotas y apariencia, hasta 10 por encima.", "Equipment and consumables within 10 levels of the monster, dofus within 20; mounts, pets and cosmetics up to 10 above.", "Équipement et consommables à 10 niveaux du monstre, dofus à 20 ; montures, familiers et apparat jusqu'à 10 au-dessus."),
+        ["Consumables"] = ("Consumibles", "Consumables", "Consommables"),
+        ["Equipment"] = ("Equipo", "Equipment", "Équipement"),
+        ["Cosmetics"] = ("Apariencia", "Cosmetics", "Apparat"),
+        ["Creatures"] = ("Monturas y mascotas", "Mounts and pets", "Montures et familiers"),
+        ["Dofus"] = ("Dofus", "Dofus", "Dofus"),
+        ["Legendary"] = ("Legendario", "Legendary", "Légendaire"),
+        ["Perfect"] = ("Perfecto + exo PA/PM", "Perfect + AP/MP exo", "Parfait + exo PA/PM"),
+        ["Modes"] = ("MODOS DE JUEGO", "GAME MODES", "MODES DE JEU"),
+        ["Hardcore"] = ("Modo hardcore", "Hardcore mode", "Mode hardcore"),
+        ["HardcoreHint"] = ("Monstruos al doble de tamaño, con el triple de vida y características.", "Monsters at twice their size, with three times their life and characteristics.", "Monstres deux fois plus grands, avec trois fois leur vie et leurs caractéristiques."),
+        ["Welcome"] = ("BIENVENIDA", "WELCOME", "BIENVENUE"),
+        ["WelcomeHint"] = ("Una línea en el chat al entrar al mundo. Vacío = ninguna.", "A chat line on entering the world. Empty = none.", "Une ligne dans le chat en entrant dans le monde. Vide = aucune."),
+        ["WelcomePlaceholder"] = ("Sin mensaje", "No message", "Aucun message"),
+        ["Bots"] = ("JUGADORES SIMULADOS", "SIMULATED PLAYERS", "JOUEURS SIMULÉS"),
+        ["BotsOn"] = ("Simular jugadores", "Simulate players", "Simuler des joueurs"),
+        ["BotsOnHint"] = ("Bots JondoBot-XXX de clase aleatoria, cada uno con su conexión: caminan, combaten monstruos, recolectan, van al Koliseo y aceptan todos los desafíos.", "JondoBot-XXX bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel.", "Des bots JondoBot-XXX de classe aléatoire, chacun avec sa propre connexion : ils marchent, combattent des monstres, récoltent, vont au Kolizéum et acceptent tous les défis."),
+        ["BotsMax"] = ("Máximo a la vez", "Most at once", "Maximum en même temps"),
+        ["BotsMaxHint"] = ("Cuántos están conectados varía por debajo de este número, como en un servidor real.", "How many are connected varies below this number, as on a real server.", "Le nombre de connectés varie sous ce nombre, comme sur un vrai serveur."),
+        ["HuntersOn"] = ("Cazacabezas", "Head hunters", "Chasseurs de têtes"),
+        ["HuntersOnHint"] = ("Órdenes de caza contra la otra ciudad, pagadas en chapas. Con el mod Cazacabezas (F7).", "Hunt orders on the other city, paid in chapeuvepés. With the Cazacabezas mod (F7).", "Des ordres de traque contre l'autre cité, payés en pévétons. Avec le mod Cazacabezas (F7)."),
+        ["HuntMinutes"] = ("Minutos de una caza", "Minutes of a hunt", "Minutes d'une traque"),
+        ["RestMinutes"] = ("Minutos de descanso entre cazas", "Minutes of respite between hunts", "Minutes de répit entre traques"),
+        ["Close"] = ("CERRAR", "CLOSE", "FERMER"),
+        ["Cancel"] = ("CANCELAR", "CANCEL", "ANNULER"),
+        ["Back"] = ("VOLVER", "BACK", "RETOUR"),
+        ["Save"] = ("GUARDAR", "SAVE", "ENREGISTRER"),
+        ["SaveRestart"] = ("GUARDAR Y REINICIAR", "SAVE AND RESTART", "ENREGISTRER ET REDÉMARRER"),
+        ["ConfirmRestart"] = ("SÍ, REINICIAR", "YES, RESTART", "OUI, REDÉMARRER"),
+        ["Unsaved"] = ("Hay cambios sin guardar.", "There are unsaved changes.", "Des changements ne sont pas enregistrés."),
+        ["Pending"] = ("Guardado. Se aplicará al reiniciar.", "Saved. It applies when the server restarts.", "Enregistré. Cela s'appliquera au redémarrage."),
+        ["RestartAsk"] = ("Hay {0} jugador(es): se les avisará y se reiniciará en {1} segundos.", "There are {0} player(s): they will be told before restarting in {1} seconds.", "Il y a {0} joueur(s) : ils seront prévenus avant le redémarrage dans {1} secondes."),
+        ["RestartAskEmpty"] = ("No hay nadie en el mundo: se reiniciará en {0} segundos.", "Nobody is in the world: restarting in {0} seconds.", "Personne n'est dans le monde : redémarrage dans {0} secondes."),
+        ["Counting"] = ("Ya hay un reinicio en cuenta atrás.", "A restart is already counting down.", "Un redémarrage est déjà en cours de décompte."),
+        ["SaveError"] = ("No se pudo guardar: ", "Could not save: ", "Impossible d'enregistrer : "),
+        ["Starting"] = ("Iniciando los servicios…", "Starting services…", "Démarrage des services…"),
+        ["Stopping"] = ("Apagando…", "Shutting down…", "Arrêt en cours…"),
+        ["Failed"] = ("Error al iniciar. Consulta el registro.", "Startup failed. See the log below.", "Échec du démarrage. Consultez le journal."),
+        ["Yes"] = ("SÍ", "YES", "OUI"),
+        ["Name"] = ("Nombre del mensaje", "Message name", "Nom du message"),
+        ["Filter"] = ("Filtrar nombres…", "Filter names…", "Filtrer les noms…"),
+        ["Bind"] = ("LIGAR", "BIND", "ASSOCIER"),
+        ["Unbind"] = ("SOLTAR", "UNBIND", "DISSOCIER"),
+    };
+
+    internal static string Get(Language language, string key)
+    {
+        var words = Words[key];
+        return language switch { Language.En => words.En, Language.Fr => words.Fr, _ => words.Es };
+    }
+}

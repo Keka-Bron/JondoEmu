@@ -8,6 +8,7 @@ cd "$ROOT"
 dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj \
     -c Release \
     -r linux-x64 \
+    -p:SkipTests=true \
     --artifacts-path "$ROOT/host-artifacts" \
     --nologo
 

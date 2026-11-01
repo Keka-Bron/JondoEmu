@@ -120,7 +120,7 @@ namespace Jondo.Unity.Server.Network
             return totalRead;
         }
 
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             int totalRead = 0;
             if (_position < _prefix.Length)
@@ -135,10 +135,12 @@ namespace Jondo.Unity.Server.Network
 
             if (count > 0)
             {
-                return _baseStream.ReadAsync(buffer, offset, count, cancellationToken).ContinueWith(t => totalRead + t.Result);
+                // Await preserves cancellation and the original I/O exception. Reading Task.Result
+                // in a continuation turned shutdown cancellation into an AggregateException fault.
+                return totalRead + await _baseStream.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
             }
 
-            return Task.FromResult(totalRead);
+            return totalRead;
         }
 
         public override void Write(byte[] buffer, int offset, int count) => _baseStream.Write(buffer, offset, count);
@@ -158,6 +160,7 @@ namespace Jondo.Unity.Server.Network
         {
             if (_isRunning) return;
             _cts = new CancellationTokenSource();
+            var cancellationToken = _cts.Token;
 
             // The flag is raised AFTER the port is really taken. It was before,
             // so if the bind failed —the normal case when another server is already up—
@@ -176,8 +179,8 @@ namespace Jondo.Unity.Server.Network
                 {
                     try
                     {
-                        var client = await _tcpListener.AcceptTcpClientAsync(_cts.Token);
-                        _ = Task.Run(() => HandleTcpClient(client));
+                        var client = await _tcpListener.AcceptTcpClientAsync(cancellationToken);
+                        _ = Task.Run(() => HandleTcpClient(client, cancellationToken));
                     }
                     catch (Exception ex)
                     {
@@ -196,7 +199,7 @@ namespace Jondo.Unity.Server.Network
                     while (_isRunning)
                     {
                         var pipeServer = new NamedPipeServerStream(port.ToString(), PipeDirection.InOut, 10, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-                        await pipeServer.WaitForConnectionAsync(_cts.Token);
+                        await pipeServer.WaitForConnectionAsync(cancellationToken);
                         Console.WriteLine("[+] Client connected to Zaap via Named Pipe!");
 
                         _ = Task.Run(async () =>
@@ -211,9 +214,13 @@ namespace Jondo.Unity.Server.Network
                                 Console.WriteLine("[Zaap Pipe] Processing Thrift connection...");
                                 while (pipeServer.IsConnected && _isRunning)
                                 {
-                                    bool result = await processor.ProcessAsync(protocol, protocol, _cts.Token);
+                                    bool result = await processor.ProcessAsync(protocol, protocol, cancellationToken);
                                     if (!result) break;
                                 }
+                            }
+                            catch (Exception ex) when (IsShutdownCancellation(ex, cancellationToken))
+                            {
+                                // Expected while stopping the service.
                             }
                             catch (Exception ex)
                             {
@@ -245,7 +252,16 @@ namespace Jondo.Unity.Server.Network
             _tcpListener = null;
         }
 
-        private static async Task HandleTcpClient(TcpClient client)
+        internal static bool IsShutdownCancellation(Exception error, CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.IsCancellationRequested) return false;
+            if (error is OperationCanceledException) return true;
+            return error is AggregateException aggregate &&
+                aggregate.Flatten().InnerExceptions is { Count: > 0 } errors &&
+                errors.All(inner => inner is OperationCanceledException);
+        }
+
+        private static async Task HandleTcpClient(TcpClient client, CancellationToken cancellationToken)
         {
             try
             {
@@ -387,7 +403,7 @@ namespace Jondo.Unity.Server.Network
                                             var outProtocol = new TBinaryProtocol(outTransport);
                                             var processor = new ZaapService.AsyncProcessor(new ZaapHandler());
 
-                                            bool result = await processor.ProcessAsync(inProtocol, outProtocol, _cts?.Token ?? CancellationToken.None);
+                                            bool result = await processor.ProcessAsync(inProtocol, outProtocol, cancellationToken);
 
                                             if (outStream.Length > 0)
                                             {
@@ -413,6 +429,10 @@ namespace Jondo.Unity.Server.Network
                                                 Console.WriteLine($"[Zaap WS] >>> Sent THRIFT BINARY reply! Length: {respLen}");
                                             }
                                         }
+                                        catch (Exception ex) when (IsShutdownCancellation(ex, cancellationToken))
+                                        {
+                                            // Expected while stopping the service.
+                                        }
                                         catch (Exception thriftEx)
                                         {
                                             Console.WriteLine($"[Zaap WS] Thrift parsing error: {thriftEx}");
@@ -436,6 +456,10 @@ namespace Jondo.Unity.Server.Network
                                         Console.WriteLine($"[Zaap WS] <<< Received OPCODE {opcode}, length {length}");
                                     }
                                 }
+                            }
+                            catch (Exception ex) when (IsShutdownCancellation(ex, cancellationToken))
+                            {
+                                // Expected while stopping the service.
                             }
                             catch (Exception wsEx)
                             {
@@ -465,14 +489,22 @@ namespace Jondo.Unity.Server.Network
                         Console.WriteLine("[Zaap] Processing Thrift request...");
                         while (_isRunning)
                         {
-                            if (!await processor.ProcessAsync(protocol, protocol, _cts?.Token ?? CancellationToken.None)) break;
+                            if (!await processor.ProcessAsync(protocol, protocol, cancellationToken)) break;
                         }
+                    }
+                    catch (Exception ex) when (IsShutdownCancellation(ex, cancellationToken))
+                    {
+                        // Expected while stopping the service.
                     }
                     catch (Exception thriftEx)
                     {
                         Console.WriteLine($"[Zaap] Thrift processing error: {thriftEx.GetType().Name}: {thriftEx.Message}");
                     }
                 }
+            }
+            catch (Exception ex) when (IsShutdownCancellation(ex, cancellationToken))
+            {
+                // Expected while stopping the service.
             }
             catch (Exception e)
             {

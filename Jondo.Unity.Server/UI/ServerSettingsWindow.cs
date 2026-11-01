@@ -1,782 +1,275 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Jondo.Unity.Launcher.UI;
 using Jondo.Unity.Server.Managers;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
-namespace Jondo.Unity.Server.UI
+namespace Jondo.Unity.Server.UI;
+
+internal sealed class ServerSettingsWindow : Window
 {
-    /// <summary>
-    /// The server's Settings window: rates, caps and modes the operator chooses. They are saved to
-    /// config\server_settings.json and apply when the server starts again, which the window offers
-    /// to do at once -- telling the players in the world first, with a countdown.
-    /// </summary>
-    /// <remarks>
-    /// Drawn like the main window rather than with Windows' grey controls: gold-titled cards in
-    /// columns that scroll when the screen is short, switches, steppers, and a footer that never
-    /// scrolls away, with the buttons and what state the settings are in. It opens two columns wide;
-    /// widened or maximized it takes as many columns as fit, so that every setting is in sight.
-    /// </remarks>
-    internal sealed class ServerSettingsWindow : Form
+    internal const int CountdownWithPlayers = 60, CountdownEmpty = 3;
+    private readonly Language _language;
+    internal readonly ServerSettingsEditor Editor;
+    private readonly TextBlock _status = ServerTheme.Text("");
+    private readonly Button _save, _restart, _close;
+    private readonly List<NumericUpDown> _numbers = new();
+    private readonly SettingsCardsPanel _cards = new() { Name = "SettingsCards", Margin = new Thickness(24, 0, 24, 16) };
+    private bool _confirming, _building = true;
+    private int _restartSeconds;
+    private string T(string key) => ServerSettingsTexts.Get(_language, key);
+    private System.Globalization.CultureInfo Culture => System.Globalization.CultureInfo.GetCultureInfo(
+        _language switch { Language.En => "en-GB", Language.Fr => "fr-FR", _ => "es-ES" });
+
+    internal ServerSettingsWindow(Language language) : this(language, ServerSettings.Load(), ServerSettings.Current) { }
+
+    // The second constructor permits desktop tests without touching the real settings/database.
+    internal ServerSettingsWindow(Language language, ServerSettings saved, ServerSettings running)
     {
-        private ServerSettings _saved;
-        private readonly Texts _t;
-        private readonly float _escala;
-        private int E(int px) => (int)Math.Round(px * _escala);
+        _language = language;
+        Editor = new(saved, running);
+        Title = T("Caption"); Width = 1000; Height = 800; MinWidth = 360; MinHeight = 420;
+        ShowInTaskbar = false; WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        ServerTheme.Window(this);
+        var layout = new Grid { RowDefinitions = new RowDefinitions("Auto,*,Auto") };
+        var header = new StackPanel { Margin = new Thickness(24, 20), Spacing = 8 };
+        header.Children.Add(ServerTheme.Text(T("Caption").ToUpperInvariant(), 24, LauncherPalette.LightGold));
+        header.Children.Add(Note("Subtitle"));
+        layout.Children.Add(header);
+        var s = Editor.Edited;
+        var rates = Card("Rates",
+            Number("Xp", null, s.ExperienceBonusPercent, 0, 1000, 10, "%", v => s.ExperienceBonusPercent = (int)v),
+            Number("Drop", null, s.DropBonusPercent, 0, 1000, 10, "%", v => s.DropBonusPercent = (int)v),
+            Number("Kamas", null, s.KamasBonusPercent, 0, 1000, 10, "%", v => s.KamasBonusPercent = (int)v), Note("RatesHint"));
+        var characters = Card("Characters",
+            Number("MaxAp", null, s.MaxActionPoints, 0, 30, 1, "", v => s.MaxActionPoints = (int)v),
+            Number("MaxMp", "CapHint", s.MaxMovementPoints, 0, 20, 1, "", v => s.MaxMovementPoints = (int)v),
+            Toggle("NoEnergy", "NoEnergyHint", s.NoEnergyLoss, v => s.NoEnergyLoss = v));
+        var conquests = Card("Conquests",
+            Number("Weakened", "WeakenedHint", s.PrismWeakenedHours, 0, 168, 1, "h", v => s.PrismWeakenedHours = (int)v),
+            Number("ConquestMax", "ConquestMaxHint", s.ConquestMaxMinutes, 20, 1440, 10, "min", v => s.ConquestMaxMinutes = (int)v),
+            Number("Invulnerable", "InvulnerableHint", s.ConquestInvulnerabilityHours, 0, 168, 1, "h", v => s.ConquestInvulnerabilityHours = (int)v),
+            Number("Protection", "ProtectionHint", s.PrismProtectionMinutes, 0, 1440, 10, "min", v => s.PrismProtectionMinutes = (int)v));
+        var welcome = new TextBox { Name = "WelcomeMessage", Text = s.WelcomeMessage, Watermark = T("WelcomePlaceholder"), MaxLength = 300 };
+        welcome.TextChanged += (_, _) => { s.WelcomeMessage = welcome.Text ?? ""; Changed(); };
+        var welcomeCard = Card("Welcome", Note("WelcomeHint"), welcome);
+        var botsMax = Number("BotsMax", "BotsMaxHint", s.SimulatedPlayersMax, 1, Bots.SimulatedPlayers.Most, 5, "", v => s.SimulatedPlayersMax = (int)v);
+        var bots = Card("Bots", Toggle("BotsOn", "BotsOnHint", s.SimulatedPlayers, v => { s.SimulatedPlayers = v; botsMax.IsEnabled = v; }), botsMax);
+        botsMax.IsEnabled = s.SimulatedPlayers;
+        var huntMinutes = Number("HuntMinutes", null, s.HeadHuntWindowMinutes, 1, 120, 5, "min", v => s.HeadHuntWindowMinutes = (int)v);
+        var restMinutes = Number("RestMinutes", null, s.HeadHuntRestMinutes, 0, 600, 5, "min", v => s.HeadHuntRestMinutes = (int)v);
+        void HuntersState(bool on) { huntMinutes.IsEnabled = on; restMinutes.IsEnabled = on; }
+        var hunters = Toggle("HuntersOn", "HuntersOnHint", s.HeadHunters, v => { s.HeadHunters = v; HuntersState(v); });
+        HuntersState(s.HeadHunters);
 
-        private readonly NumberStepper _raidMin, _matchmaking, _maxAp, _maxMp, _xp, _drop, _kamas, _randomLootChance;
-        private readonly NumberStepper _weakenedHours, _conquestMinutes, _invulnerableHours, _protectionMinutes;
-        private readonly NumberStepper _botsMax, _huntMinutes, _restMinutes;
-        private readonly ToggleSwitch _hardcore, _noEnergy, _randomLoot, _bots, _hunters;
-        private readonly LauncherField _welcome;
-        private readonly RarityTable _rarities;
-        private readonly SettingNote _lootLevels;
-        private readonly Body _body;
-        private readonly SettingsCard[] _cards;
-        private readonly LauncherButton _restart, _save, _close;
-        private readonly Font _titleFont, _subtitleFont, _statusFont;
-
-        private string _status = "";
-        private Color _statusTone = LauncherTheme.MutedGold;
-        private bool _confirming;
-        private int _restartSeconds;
-
-        /// <summary>The countdown when there are players in the world, and when there are none.</summary>
-        public const int CountdownWithPlayers = 60;
-        public const int CountdownEmpty = 3;
-
-        private int HeaderHeight => E(78);
-        private int FooterHeight => E(64);
-
-        // ─── The words ─────────────────────────────────────────────────────────────────────
-
-        /// <summary>The window's words, in the server window's three languages.</summary>
-        private sealed class Texts
+        var chance = Number("Chance", "ChanceHint", (decimal)Math.Clamp(double.IsFinite(s.RandomLootChancePercent) ? s.RandomLootChancePercent : 10, 0, 100),
+            0, 100, 1, "%", v => s.RandomLootChancePercent = (double)v, 2);
+        var rarities = Rarities();
+        var levels = Note("LootLevels");
+        void LootState(bool on) { chance.IsEnabled = on; rarities.IsEnabled = on; levels.IsEnabled = on; }
+        var loot = Toggle("RandomLoot", "RandomLootHint", s.RandomLoot, v => { s.RandomLoot = v; LootState(v); });
+        LootState(s.RandomLoot);
+        var lootCard = Card("Loot", loot, chance, rarities, levels);
+        var modes = Card("Modes", Toggle("Hardcore", "HardcoreHint", s.Hardcore, v => s.Hardcore = v), hunters, huntMinutes, restMinutes);
+        var raids = Card("Raids",
+            Number("RaidMin", "RaidMinHint", s.RaidMinPlayers, 0, 16, 1, "", v => s.RaidMinPlayers = (int)v),
+            Number("Matchmaking", "MatchmakingHint", s.MatchmakingGroupSize, 0, 4, 1, "", v => s.MatchmakingGroupSize = (int)v));
+        foreach (var card in new[] { rates, lootCard, characters, modes, conquests, raids, bots, welcomeCard })
+            _cards.Children.Add(card);
+        var scroll = new ScrollViewer { Name = "SettingsScroll", Content = _cards, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
+        scroll.SizeChanged += (_, _) =>
         {
-            public string Culture, Caption, Title, Subtitle;
-            public string Rates, Xp, Drop, Kamas, RatesHint;
-            public string Characters, MaxAp, MaxMp, CapHint, NoEnergy, NoEnergyHint;
-            public string Raids, RaidMin, RaidMinHint, Matchmaking, MatchmakingHint;
-            public string Conquests, Weakened, WeakenedHint, ConquestMax, ConquestMaxHint, Invulnerable, InvulnerableHint;
-            public string Protection, ProtectionHint;
-            public string Loot, RandomLoot, RandomLootHint, Chance, ChanceHint, LootLevels;
-            public string Consumables, Equipment, Cosmetics, Creatures, Dofus, Legendary, Perfect, Percent;
-            public string Modes, Hardcore, HardcoreHint;
-            public string Welcome, WelcomeHint, WelcomePlaceholder;
-            public string Bots, BotsOn, BotsOnHint, BotsMax, BotsMaxHint;
-            public string HuntersOn, HuntersOnHint, HuntMinutes, HuntMinutesHint, RestMinutes, RestMinutesHint;
-            public string Close, Cancel, Back, Save, SaveRestart, ConfirmRestart;
-            public string Unsaved, Pending, RestartAsk, RestartAskEmpty, Counting;
-        }
-
-        private static readonly Dictionary<Language, Texts> All = new()
-        {
-            [Language.Es] = new Texts
-            {
-                Culture = "es-ES",
-                Caption = "Ajustes del servidor",
-                Title = "AJUSTES DEL SERVIDOR",
-                Subtitle = "Se guardan en config\\server_settings.json y se aplican al reiniciar el servidor. " +
-                           "A quien esté en el mundo se le avisa antes por el chat.",
-                Rates = "TASAS",
-                Xp = "Bonus de experiencia", Drop = "Bonus de botín", Kamas = "Bonus de kamas",
-                RatesHint = "Un porcentaje extra para todos. 0 = sin bonus.",
-                Characters = "PERSONAJES",
-                MaxAp = "PA máximos", MaxMp = "PM máximos",
-                CapHint = "0 = sin tope (los oficiales: 12 PA y 6 PM).",
-                NoEnergy = "Morir no cuesta energía", NoEnergyHint = "Perder un combate no gasta energía.",
-                Raids = "RAIDS Y BÚSQUEDA DE GRUPO",
-                RaidMin = "Jugadores mínimos para iniciar una raid", RaidMinHint = "0 = los del juego (8).",
-                Matchmaking = "Jugadores de la búsqueda automática de mazmorras", MatchmakingHint = "0 = los del juego (4).",
-                Conquests = "CONQUISTAS DE ALIANZA",
-                Weakened = "Horas de prisma debilitado", WeakenedHint = "Hasta que se vuelve vulnerable. 0 = enseguida.",
-                ConquestMax = "Duración máxima de una conquista",
-                ConquestMaxHint = "En minutos. Si nadie gana antes, la defensa conserva el prisma.",
-                Invulnerable = "Horas de invulnerabilidad",
-                InvulnerableHint = "Las del prisma conquistado, divididas por los prismas de su alianza.",
-                Protection = "Protección de un prisma nuevo",
-                ProtectionHint = "Minutos sin poder atacarlo tras ponerlo. 0 = ninguna.",
-                Loot = "BOTÍN ALEATORIO",
-                RandomLoot = "Botín aleatorio",
-                RandomLootHint = "Además de su tabla, cada monstruo puede soltar de 2 a 5 objetos al azar.",
-                Chance = "Probabilidad por monstruo", ChanceHint = "Los retos y el bonus de botín la suben.",
-                LootLevels = "Equipo y consumibles a ±10 niveles del monstruo y dofus a ±20; monturas, mascotas " +
-                             "y apariencia, hasta 10 por encima.",
-                Consumables = "Consumibles", Equipment = "Equipo", Cosmetics = "Apariencia",
-                Creatures = "Monturas y mascotas", Dofus = "Dofus", Legendary = "Legendario",
-                Perfect = "Perfecto + exo PA/PM", Percent = "{0} %",
-                Modes = "MODOS DE JUEGO",
-                Hardcore = "Modo hardcore",
-                HardcoreHint = "Monstruos al doble de tamaño, con el triple de vida y características.",
-                Welcome = "BIENVENIDA",
-                WelcomeHint = "Una línea en el chat al entrar al mundo. Vacío = ninguna.",
-                WelcomePlaceholder = "Sin mensaje",
-                Bots = "JUGADORES SIMULADOS",
-                BotsOn = "Simular jugadores",
-                BotsOnHint = "Bots JondoBot-XXX de clase al azar, cada uno con su propia conexión: andan, pelean " +
-                             "contra monstruos, recolectan, van al koliseo y aceptan todos los desafíos.",
-                BotsMax = "Máximo a la vez",
-                BotsMaxHint = "Cuántos hay conectados varía por debajo de este número, como en un servidor de verdad.",
-                HuntersOn = "Cazacabezas",
-                HuntersOnHint = "Órdenes de caza contra la otra ciudad, pagadas en chapeuvepés. Con el mod Cazacabezas (F7).",
-                HuntMinutes = "Minutos de cada caza", HuntMinutesHint = null,
-                RestMinutes = "Minutos de respiro entre cazas", RestMinutesHint = null,
-                Close = "CERRAR", Cancel = "CANCELAR", Back = "VOLVER", Save = "GUARDAR",
-                SaveRestart = "GUARDAR Y REINICIAR", ConfirmRestart = "SÍ, REINICIAR",
-                Unsaved = "Hay cambios sin guardar.",
-                Pending = "Guardado. Se aplicará cuando el servidor se reinicie.",
-                RestartAsk = "Hay {0} jugador(es) en el mundo: se les avisará por el chat y el servidor se reiniciará en {1} segundos.",
-                RestartAskEmpty = "No hay nadie en el mundo: el servidor se reiniciará ahora.",
-                Counting = "Ya hay un reinicio en cuenta atrás.",
-            },
-            [Language.En] = new Texts
-            {
-                Culture = "en-GB",
-                Caption = "Server settings",
-                Title = "SERVER SETTINGS",
-                Subtitle = "Saved to config\\server_settings.json and applied when the server restarts. " +
-                           "Anyone in the world is told in the chat first.",
-                Rates = "RATES",
-                Xp = "Experience bonus", Drop = "Drop bonus", Kamas = "Kamas bonus",
-                RatesHint = "An extra percent for everybody. 0 = no bonus.",
-                Characters = "CHARACTERS",
-                MaxAp = "Most action points", MaxMp = "Most movement points",
-                CapHint = "0 = no cap (the official ones: 12 AP and 6 MP).",
-                NoEnergy = "Dying costs no energy", NoEnergyHint = "A lost fight spends no energy.",
-                Raids = "RAIDS AND PARTY SEARCH",
-                RaidMin = "Fewest players to start a raid", RaidMinHint = "0 = the game's (8).",
-                Matchmaking = "Players in the automatic dungeon search", MatchmakingHint = "0 = the game's (4).",
-                Conquests = "ALLIANCE CONQUESTS",
-                Weakened = "Hours a prism stays weakened", WeakenedHint = "Until it turns vulnerable. 0 = at once.",
-                ConquestMax = "Longest a conquest lasts",
-                ConquestMaxHint = "In minutes. If nobody wins by then, the defence keeps the prism.",
-                Invulnerable = "Hours of invulnerability",
-                InvulnerableHint = "A conquered prism's, divided by its alliance's prisms.",
-                Protection = "Protection of a new prism",
-                ProtectionHint = "Minutes it cannot be attacked after it is placed. 0 = none.",
-                Loot = "RANDOM LOOT",
-                RandomLoot = "Random loot",
-                RandomLootHint = "Besides its table, each monster can drop 2 to 5 random items.",
-                Chance = "Chance per monster", ChanceHint = "Challenges and the drop bonus raise it.",
-                LootLevels = "Equipment and consumables within 10 levels of the monster, dofus within 20; mounts, " +
-                             "pets and cosmetics up to 10 above.",
-                Consumables = "Consumables", Equipment = "Equipment", Cosmetics = "Cosmetics",
-                Creatures = "Mounts and pets", Dofus = "Dofus", Legendary = "Legendary",
-                Perfect = "Perfect + AP/MP exo", Percent = "{0}%",
-                Modes = "GAME MODES",
-                Hardcore = "Hardcore mode",
-                HardcoreHint = "Monsters at twice their size, with three times their life and characteristics.",
-                Welcome = "WELCOME",
-                WelcomeHint = "A line in the chat on coming into the world. Empty = none.",
-                WelcomePlaceholder = "No message",
-                Bots = "SIMULATED PLAYERS",
-                BotsOn = "Simulate players",
-                BotsOnHint = "JondoBot-XXX bots of a random class, each over its own connection: they walk, fight " +
-                             "monsters, gather, go to the Koliseo and accept every duel.",
-                BotsMax = "Most at once",
-                BotsMaxHint = "How many are connected varies below this number, as on a real server.",
-                HuntersOn = "Head hunters",
-                HuntersOnHint = "Hunt orders on the other city, paid in chapeuvepés. With the Cazacabezas mod (F7).",
-                HuntMinutes = "Minutes of a hunt", HuntMinutesHint = null,
-                RestMinutes = "Minutes of respite between hunts", RestMinutesHint = null,
-                Close = "CLOSE", Cancel = "CANCEL", Back = "BACK", Save = "SAVE",
-                SaveRestart = "SAVE AND RESTART", ConfirmRestart = "YES, RESTART",
-                Unsaved = "There are unsaved changes.",
-                Pending = "Saved. It applies when the server restarts.",
-                RestartAsk = "There are {0} player(s) in the world: they will be told in the chat and the server restarts in {1} seconds.",
-                RestartAskEmpty = "Nobody is in the world: the server restarts now.",
-                Counting = "A restart is already counting down.",
-            },
-            [Language.Fr] = new Texts
-            {
-                Culture = "fr-FR",
-                Caption = "Réglages du serveur",
-                Title = "RÉGLAGES DU SERVEUR",
-                Subtitle = "Enregistrés dans config\\server_settings.json et appliqués au redémarrage du serveur. " +
-                           "Les joueurs dans le monde sont prévenus dans le chat avant.",
-                Rates = "TAUX",
-                Xp = "Bonus d'expérience", Drop = "Bonus de butin", Kamas = "Bonus de kamas",
-                RatesHint = "Un pourcentage en plus pour tous. 0 = sans bonus.",
-                Characters = "PERSONNAGES",
-                MaxAp = "PA maximum", MaxMp = "PM maximum",
-                CapHint = "0 = sans plafond (les officiels : 12 PA et 6 PM).",
-                NoEnergy = "Mourir ne coûte pas d'énergie", NoEnergyHint = "Perdre un combat ne dépense pas d'énergie.",
-                Raids = "RAIDS ET RECHERCHE DE GROUPE",
-                RaidMin = "Joueurs minimum pour lancer un raid", RaidMinHint = "0 = ceux du jeu (8).",
-                Matchmaking = "Joueurs de la recherche automatique de donjon", MatchmakingHint = "0 = ceux du jeu (4).",
-                Conquests = "CONQUÊTES D'ALLIANCE",
-                Weakened = "Heures de prisme affaibli", WeakenedHint = "Avant qu'il devienne vulnérable. 0 = tout de suite.",
-                ConquestMax = "Durée maximale d'une conquête",
-                ConquestMaxHint = "En minutes. Si personne ne gagne avant, la défense garde le prisme.",
-                Invulnerable = "Heures d'invulnérabilité",
-                InvulnerableHint = "Celles du prisme conquis, divisées par les prismes de son alliance.",
-                Protection = "Protection d'un prisme neuf",
-                ProtectionHint = "Minutes sans pouvoir l'attaquer après sa pose. 0 = aucune.",
-                Loot = "BUTIN ALÉATOIRE",
-                RandomLoot = "Butin aléatoire",
-                RandomLootHint = "En plus de sa table, chaque monstre peut lâcher 2 à 5 objets au hasard.",
-                Chance = "Chance par monstre", ChanceHint = "Les défis et le bonus de butin l'augmentent.",
-                LootLevels = "Équipement et consommables à 10 niveaux du monstre, dofus à 20 ; montures, familiers " +
-                             "et apparat jusqu'à 10 au-dessus.",
-                Consumables = "Consommables", Equipment = "Équipement", Cosmetics = "Apparat",
-                Creatures = "Montures et familiers", Dofus = "Dofus", Legendary = "Légendaire",
-                Perfect = "Parfait + exo PA/PM", Percent = "{0} %",
-                Modes = "MODES DE JEU",
-                Hardcore = "Mode hardcore",
-                HardcoreHint = "Monstres deux fois plus grands, avec trois fois leur vie et leurs caractéristiques.",
-                Welcome = "BIENVENUE",
-                WelcomeHint = "Une ligne dans le chat en entrant dans le monde. Vide = aucune.",
-                WelcomePlaceholder = "Aucun message",
-                Bots = "JOUEURS SIMULÉS",
-                BotsOn = "Simuler des joueurs",
-                BotsOnHint = "Des bots JondoBot-XXX de classe aléatoire, chacun avec sa propre connexion : ils marchent, " +
-                             "combattent des monstres, récoltent, vont au Kolizéum et acceptent tous les défis.",
-                BotsMax = "Maximum en même temps",
-                BotsMaxHint = "Le nombre de connectés varie sous ce nombre, comme sur un vrai serveur.",
-                HuntersOn = "Chasseurs de têtes",
-                HuntersOnHint = "Des ordres de traque contre l'autre cité, payés en pévétons. Avec le mod Cazacabezas (F7).",
-                HuntMinutes = "Minutes d'une traque", HuntMinutesHint = null,
-                RestMinutes = "Minutes de répit entre traques", RestMinutesHint = null,
-                Close = "FERMER", Cancel = "ANNULER", Back = "RETOUR", Save = "ENREGISTRER",
-                SaveRestart = "ENREGISTRER ET REDÉMARRER", ConfirmRestart = "OUI, REDÉMARRER",
-                Unsaved = "Des changements ne sont pas enregistrés.",
-                Pending = "Enregistré. Cela s'appliquera au redémarrage du serveur.",
-                RestartAsk = "Il y a {0} joueur(s) dans le monde : ils seront prévenus dans le chat et le serveur redémarre dans {1} secondes.",
-                RestartAskEmpty = "Personne n'est dans le monde : le serveur redémarre maintenant.",
-                Counting = "Un redémarrage est déjà en cours de décompte.",
-            },
+            _cards.ViewportHeight = Math.Max(0, scroll.Bounds.Height - _cards.Margin.Top - _cards.Margin.Bottom);
+            _cards.InvalidateMeasure();
         };
+        Grid.SetRow(scroll, 1); layout.Children.Add(scroll);
 
-        // ─── Building it ────────────────────────────────────────────────────────────────────
-
-        public ServerSettingsWindow(Language language)
+        var footer = new StackPanel { Margin = new Thickness(24, 12, 24, 18), Spacing = 12 };
+        _status.TextWrapping = TextWrapping.Wrap;
+        footer.Children.Add(_status);
+        var buttons = new WrapPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+        _close = ServerTheme.Button(T("Close"), CloseClicked);
+        _save = ServerTheme.Button(T("Save"), SaveClicked);
+        _restart = ServerTheme.Button(T("SaveRestart"), RestartClicked, LauncherPalette.OnlineGreen);
+        _close.Name = "CloseSettings"; _save.Name = "SaveSettings"; _restart.Name = "RestartServer";
+        foreach (var b in new[] { _close, _save, _restart }) { b.Margin = new Thickness(6, 0, 0, 6); buttons.Children.Add(b); }
+        footer.Children.Add(buttons);
+        Grid.SetRow(footer, 2); layout.Children.Add(footer);
+        Content = layout;
+        Opened += (_, _) =>
         {
-            _escala = DeviceDpi / 96f;
-            _t = All.TryGetValue(language, out var texts) ? texts : All[Language.Es];
-            _saved = ServerSettings.Load();
+            var screen = Screens.ScreenFromWindow(this);
+            if (screen == null) return;
+            MaxHeight = Math.Max(MinHeight, screen.WorkingArea.Height / screen.Scaling - 40);
+            MaxWidth = Math.Max(MinWidth, screen.WorkingArea.Width / screen.Scaling - 40);
+            Height = Math.Min(Height, MaxHeight);
+            Width = Math.Min(Width, MaxWidth);
+        };
+        AddHandler(KeyDownEvent, (_, e) =>
+        {
+            if (e.Key == Key.Escape) { CloseClicked(); e.Handled = true; }
+            if (e.Key == Key.S && e.KeyModifiers.HasFlag(KeyModifiers.Control)) { SaveClicked(); e.Handled = true; }
+        }, RoutingStrategies.Bubble, handledEventsToo: true);
+        _building = false;
+        Changed();
+    }
 
-            Text = _t.Caption;
-            StartPosition = FormStartPosition.CenterParent;
-            // Resizable, and maximized it spreads the cards over the whole screen.
-            FormBorderStyle = FormBorderStyle.Sizable;
-            MaximizeBox = true;
-            MinimizeBox = false;
-            ShowInTaskbar = false;
-            KeyPreview = true;
-            DoubleBuffered = true;
-            BackColor = LauncherTheme.Background;
-            ForeColor = LauncherTheme.BaseText;
-            AutoScaleMode = AutoScaleMode.None;
+    private TextBlock Note(string key)
+    {
+        var note = ServerTheme.Text(T(key), 12, LauncherPalette.MutedGold);
+        note.TextWrapping = TextWrapping.Wrap;
+        return note;
+    }
 
-            _titleFont = LauncherTheme.CreateFont(19f, FontStyle.Bold);
-            _subtitleFont = LauncherTheme.CreateFont(12f);
-            _statusFont = LauncherTheme.CreateFont(12.5f);
+    private Border Card(string title, params Control[] children)
+    {
+        var stack = new StackPanel { Spacing = 14 };
+        var heading = ServerTheme.Text(T(title), 14, LauncherPalette.LightGold);
+        heading.FontWeight = FontWeight.Bold; heading.TextWrapping = TextWrapping.Wrap;
+        stack.Children.Add(heading);
+        foreach (var child in children) stack.Children.Add(child);
+        return ServerTheme.Card(stack);
+    }
 
-            // The inputs.
-            _xp = Stepper(_saved.ExperienceBonusPercent, 0, 1000, 10, 0, "%");
-            _drop = Stepper(_saved.DropBonusPercent, 0, 1000, 10, 0, "%");
-            _kamas = Stepper(_saved.KamasBonusPercent, 0, 1000, 10, 0, "%");
-            _maxAp = Stepper(_saved.MaxActionPoints, 0, 30, 1, 0, "");
-            _maxMp = Stepper(_saved.MaxMovementPoints, 0, 20, 1, 0, "");
-            _noEnergy = Toggle(_saved.NoEnergyLoss);
-            _raidMin = Stepper(_saved.RaidMinPlayers, 0, 16, 1, 0, "");
-            _matchmaking = Stepper(_saved.MatchmakingGroupSize, 0, 4, 1, 0, "");
-            _weakenedHours = Stepper(_saved.PrismWeakenedHours, 0, 168, 1, 0, "h");
-            _conquestMinutes = Stepper(_saved.ConquestMaxMinutes, 20, 1440, 10, 0, "min");
-            _invulnerableHours = Stepper(_saved.ConquestInvulnerabilityHours, 0, 168, 1, 0, "h");
-            _protectionMinutes = Stepper(_saved.PrismProtectionMinutes, 0, 1440, 10, 0, "min");
-            _randomLoot = Toggle(_saved.RandomLoot);
-            _randomLootChance = Stepper((decimal)_saved.RandomLootChancePercent, 0, 100, 1, 2, "%");
-            _hardcore = Toggle(_saved.Hardcore);
-            _bots = Toggle(_saved.SimulatedPlayers);
-            _botsMax = Stepper(_saved.SimulatedPlayersMax, 1, Bots.SimulatedPlayers.Most, 5, 0, "");
-            _hunters = Toggle(_saved.HeadHunters);
-            _huntMinutes = Stepper(_saved.HeadHuntWindowMinutes, 1, 120, 5, 0, "min");
-            _restMinutes = Stepper(_saved.HeadHuntRestMinutes, 0, 600, 5, 0, "min");
-            _welcome = new LauncherField
-            {
-                Value = _saved.WelcomeMessage ?? "",
-                Placeholder = _t.WelcomePlaceholder,
-                MaxLength = 300,
-                Height = E(38),
-            };
-            _welcome.ValueChanged += (s, e) => Changed();
+    private Control Row(string label, string hint, Control input)
+    {
+        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+        input.Margin = new Thickness(12, 0, 0, 0);
+        var labels = new StackPanel { Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
+        var text = ServerTheme.Text(T(label)); text.TextWrapping = TextWrapping.Wrap;
+        labels.Children.Add(text);
+        if (hint != null)
+        {
+            var note = Note(hint);
+            labels.Children.Add(note);
+            _cards.Hints.Add(note);
+            ToolTip.SetTip(row, T(hint));
+        }
+        row.Children.Add(labels); Grid.SetColumn(input, 1); row.Children.Add(input);
+        return row;
+    }
 
-            _rarities = new RarityTable(RarityLines(), _escala);
-            _lootLevels = new SettingNote(_t.LootLevels);
-
-            // The cards, in the order the columns take them.
-            var rates = Card(_t.Rates,
-                             Row(_t.Xp, null, _xp), Row(_t.Drop, null, _drop), Row(_t.Kamas, null, _kamas),
-                             new SettingNote(_t.RatesHint));
-            var characters = Card(_t.Characters,
-                                  Row(_t.MaxAp, null, _maxAp), Row(_t.MaxMp, _t.CapHint, _maxMp),
-                                  Row(_t.NoEnergy, _t.NoEnergyHint, _noEnergy));
-            var raids = Card(_t.Raids, Row(_t.RaidMin, _t.RaidMinHint, _raidMin),
-                             Row(_t.Matchmaking, _t.MatchmakingHint, _matchmaking));
-            var conquests = Card(_t.Conquests,
-                                 Row(_t.Weakened, _t.WeakenedHint, _weakenedHours),
-                                 Row(_t.ConquestMax, _t.ConquestMaxHint, _conquestMinutes),
-                                 Row(_t.Invulnerable, _t.InvulnerableHint, _invulnerableHours),
-                                 Row(_t.Protection, _t.ProtectionHint, _protectionMinutes));
-            var loot = Card(_t.Loot,
-                            Row(_t.RandomLoot, _t.RandomLootHint, _randomLoot),
-                            Row(_t.Chance, _t.ChanceHint, _randomLootChance),
-                            _rarities, _lootLevels);
-            // The head hunters are a way of playing too: in the same card, which saves a header.
-            var modes = Card(_t.Modes, Row(_t.Hardcore, _t.HardcoreHint, _hardcore),
-                             Row(_t.HuntersOn, _t.HuntersOnHint, _hunters),
-                             Row(_t.HuntMinutes, _t.HuntMinutesHint, _huntMinutes),
-                             Row(_t.RestMinutes, _t.RestMinutesHint, _restMinutes));
-            var welcome = Card(_t.Welcome, new SettingNote(_t.WelcomeHint), _welcome);
-            var bots = Card(_t.Bots, Row(_t.BotsOn, _t.BotsOnHint, _bots), Row(_t.BotsMax, _t.BotsMaxHint, _botsMax));
-            _cards = new[] { rates, loot, characters, modes, conquests, raids, bots, welcome };
-
-            _body = new Body { BackColor = LauncherTheme.Background, AutoScroll = true };
-            _body.HandleCreated += (s, e) => DarkScrollBars(_body);
-            foreach (var card in _cards) _body.Controls.Add(card);
-            Controls.Add(_body);
-
-            _randomLoot.CheckedChanged += (s, e) => ShowLootState();
-            ShowLootState();
-            _bots.CheckedChanged += (s, e) => _botsMax.Enabled = _bots.Checked;
-            _botsMax.Enabled = _bots.Checked;
-            _hunters.CheckedChanged += (s, e) => ShowHuntersState();
-            ShowHuntersState();
-
-            // The footer's buttons.
-            _restart = Button(_t.SaveRestart, primary: true, E(250));
-            _restart.Click += (s, e) => RestartClicked();
-            _save = Button(_t.Save, primary: false, E(150));
-            _save.Click += (s, e) => SaveClicked();
-            _close = Button(_t.Close, primary: false, E(140));
-            _close.TextColor = LauncherTheme.MutedGold;
-            _close.Click += (s, e) => CloseClicked();
-            Controls.Add(_restart);
-            Controls.Add(_save);
-            Controls.Add(_close);
-
-            LayOut();
+    private Control Number(string label, string hint, decimal value, decimal min, decimal max, decimal step,
+        string unit, Action<decimal> set, int decimals = 0)
+    {
+        var number = new NumericUpDown
+        {
+            Name = label, Minimum = min, Maximum = max, Increment = step, Value = Math.Clamp(value, min, max),
+            FormatString = decimals == 0 ? "0" : "0.##", Width = 114,
+            NumberFormat = Culture.NumberFormat,
+        };
+        _numbers.Add(number);
+        // Clamped legacy file values must agree with what is displayed and will be saved.
+        set(number.Value.Value);
+        number.ValueChanged += (_, _) =>
+        {
+            if (number.Value is decimal v) set(v);
             Changed();
-        }
-
-        private NumberStepper Stepper(decimal value, decimal min, decimal max, decimal step, int decimals, string suffix)
-        {
-            var stepper = new NumberStepper(value, min, max, step, decimals, suffix, _escala);
-            stepper.ValueChanged += (s, e) => Changed();
-            return stepper;
-        }
-
-        private ToggleSwitch Toggle(bool value)
-        {
-            var toggle = new ToggleSwitch(value, _escala);
-            toggle.CheckedChanged += (s, e) => Changed();
-            return toggle;
-        }
-
-        private SettingRow Row(string label, string hint, Control input) => new SettingRow(label, hint, input, _escala);
-
-        private SettingsCard Card(string title, params Control[] rows)
-        {
-            var card = new SettingsCard(title, _escala);
-            foreach (var row in rows) card.Add(row);
-            return card;
-        }
-
-        /// <summary>The rarity table, from the random loot's own odds, commonest first.</summary>
-        private IReadOnlyList<(string, string, Color)> RarityLines()
-        {
-            string Percent(double value)
-                => string.Format(_t.Percent, value.ToString("0.##", CultureInfo.GetCultureInfo(_t.Culture)));
-            double OddsOf(RandomLoot.Rarity rarity) => RandomLoot.Odds.First(o => o.Rarity == rarity).Percent;
-            double consumables = 100.0 - RandomLoot.Odds.Sum(o => o.Percent);
-            return new List<(string, string, Color)>
-            {
-                (_t.Consumables, Percent(consumables), LauncherTheme.MutedGold),
-                (_t.Equipment, Percent(OddsOf(RandomLoot.Rarity.Equipment)), LauncherTheme.CardText),
-                (_t.Cosmetics, Percent(OddsOf(RandomLoot.Rarity.Cosmetic)), Color.FromArgb(120, 190, 255)),
-                (_t.Creatures, Percent(OddsOf(RandomLoot.Rarity.Creature)), LauncherTheme.OnlineGreen),
-                (_t.Dofus, Percent(OddsOf(RandomLoot.Rarity.Dofus)), LauncherTheme.LightGold),
-                (_t.Legendary, Percent(OddsOf(RandomLoot.Rarity.Legendary)), Color.FromArgb(255, 140, 58)),
-                (_t.Perfect, Percent(OddsOf(RandomLoot.Rarity.Perfect)), LauncherTheme.PurpleBorder),
-            };
-        }
-
-        private LauncherButton Button(string text, bool primary, int width) => new LauncherButton
-        {
-            Text = text,
-            Font = LauncherTheme.CreateFont(13f, FontStyle.Bold),
-            Height = E(38),
-            Width = width,
-            LetterSpacing = 1f,
-            CornerRadius = E(6),
-            BorderWidth = Math.Max(1, E(1)),
-            BackgroundTop = primary ? LauncherTheme.GreenTop : Color.FromArgb(48, 30, 16),
-            BackgroundBottom = primary ? LauncherTheme.GreenBottom : Color.FromArgb(30, 18, 10),
-            BackgroundTopHighlight = primary ? LauncherTheme.GreenTopHover : LauncherTheme.LightBrown,
-            BackgroundBottomHighlight = primary ? LauncherTheme.GreenBottomHover : Color.FromArgb(110, 65, 30),
-            BorderColor = primary ? LauncherTheme.GreenBorder : LauncherTheme.BorderBrown,
-            BorderColorHighlight = primary ? Color.FromArgb(200, 255, 120) : LauncherTheme.GoldBorder,
-            TextColor = primary ? Color.White : LauncherTheme.SoftGold,
-            TextColorHighlight = Color.White,
-            BackgroundTopDisabled = Color.FromArgb(34, 22, 13),
-            BackgroundBottomDisabled = Color.FromArgb(24, 15, 9),
-            BorderColorDisabled = LauncherTheme.DisabledFieldBorder,
-            TextColorDisabled = LauncherTheme.DisabledFieldText,
-            TextShadow = true,
-            Cursor = Cursors.Hand,
         };
+        number.PropertyChanged += (_, e) => { if (e.Property == NumericUpDown.TextProperty) Changed(); };
+        var input = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
+        input.Children.Add(number);
+        if (unit.Length > 0) input.Children.Add(ServerTheme.Text(unit, 12, LauncherPalette.MutedGold));
+        return Row(label, hint, input);
+    }
 
-        // ─── The layout ─────────────────────────────────────────────────────────────────────
+    private Control Toggle(string label, string hint, bool value, Action<bool> set)
+    {
+        var toggle = new ToggleSwitch { Name = label, IsChecked = value, OnContent = "", OffContent = "", VerticalAlignment = VerticalAlignment.Center };
+        toggle.IsCheckedChanged += (_, _) => { set(toggle.IsChecked == true); Changed(); };
+        return Row(label, hint, toggle);
+    }
 
-        /// <summary>The narrowest a column of cards goes; below it the window takes one column fewer.</summary>
-        private int NarrowestColumn => E(280);
-
-        private int Pad => E(24);
-        private int Gap => E(14);
-
-        /// <summary>How many columns of the narrowest fit across <paramref name="usable"/> pixels.</summary>
-        private int MostColumns(int usable) => Math.Max(1, (usable - Pad * 2 + Gap) / (NarrowestColumn + Gap));
-
-        /// <summary>The window as it opens: two columns, as tall as they need, up to the screen.</summary>
-        private void LayOut()
+    private Control Rarities()
+    {
+        var table = new StackPanel { Spacing = 6 };
+        void Add(string key, double percent, uint color)
         {
-            int width = E(960);
-            int content = Columns(width, Math.Min(2, MostColumns(width)));
-            var screen = Screen.FromPoint(Cursor.Position).WorkingArea;
-            int chrome = Height - ClientSize.Height;
-            int tallest = screen.Height - chrome - E(40);
-            ClientSize = new Size(width, Math.Min(HeaderHeight + content + FooterHeight, tallest));
-            MinimumSize = new Size(NarrowestColumn + Pad * 2 + (Width - ClientSize.Width),
-                                   HeaderHeight + FooterHeight + E(160) + chrome);
-            Reflow();
+            var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+            row.Children.Add(ServerTheme.Text(T(key), 12, color));
+            var value = ServerTheme.Text(percent.ToString("0.##", Culture) + " %", 12, color);
+            Grid.SetColumn(value, 1); row.Children.Add(value); table.Children.Add(row);
         }
-
-        /// <summary>
-        /// The cards over the window as it is now: the fewest columns that show every card at once,
-        /// each card to the shortest column, so that a maximized window needs no scrolling; when not
-        /// even the most that fit its width do, the most it is, and the body scrolls.
-        /// </summary>
-        private void Reflow()
+        Add("Consumables", 100 - RandomLoot.Odds.Sum(o => o.Percent), LauncherPalette.MutedGold);
+        foreach (var (rarity, key, color) in new[]
         {
-            int width = ClientSize.Width;
-            int bodyHeight = Math.Max(0, ClientSize.Height - HeaderHeight - FooterHeight);
-            _body.SetBounds(0, HeaderHeight, width, bodyHeight);
+            (RandomLoot.Rarity.Equipment, "Equipment", LauncherPalette.CardText),
+            (RandomLoot.Rarity.Cosmetic, "Cosmetics", 0xFF78BEFFu),
+            (RandomLoot.Rarity.Creature, "Creatures", LauncherPalette.OnlineGreen),
+            (RandomLoot.Rarity.Dofus, "Dofus", LauncherPalette.LightGold),
+            (RandomLoot.Rarity.Legendary, "Legendary", 0xFFFF8C3Au),
+            (RandomLoot.Rarity.Perfect, "Perfect", LauncherPalette.PurpleBorder),
+        }) Add(key, RandomLoot.Odds.First(o => o.Rarity == rarity).Percent, color);
+        return table;
+    }
 
-            int most = MostColumns(width);
-            bool fits = false;
-            // Every hint under its setting when that fits; when not, the hints go into tooltips
-            // before a scroll bar comes in, so that maximized every setting is in sight.
-            foreach (bool compact in new[] { false, true })
+    private void Changed()
+    {
+        if (_building) return;
+        _confirming = false;
+        _restart.Content = T("SaveRestart"); _save.IsVisible = true;
+        bool valid = ValidInputs();
+        _save.IsEnabled = Editor.Dirty && valid;
+        _restart.IsEnabled = (Editor.Dirty || Editor.Pending) && valid;
+        _close.Content = T(Editor.Dirty ? "Cancel" : "Close");
+        Status(Editor.Dirty ? T("Unsaved") : Editor.Pending ? T("Pending") : "");
+    }
+
+    private bool ValidInputs() => _numbers.All(n => n.Value != null &&
+        decimal.TryParse(n.Text, System.Globalization.NumberStyles.Number, n.NumberFormat, out var parsed) &&
+        parsed >= n.Minimum && parsed <= n.Maximum &&
+        (n.FormatString != "0" || parsed == decimal.Truncate(parsed)));
+
+    private void Status(string text, bool error = false)
+    {
+        _status.Text = text;
+        _status.Foreground = ServerTheme.Brush(error ? LauncherPalette.Red : LauncherPalette.HighlightText);
+    }
+
+    private bool Save()
+    {
+        try
+        {
+            Editor.Save(settings =>
             {
-                foreach (var card in _cards) card.Compact = compact;
-                for (int count = 1; count <= most && !fits; count++) fits = Columns(width, count) <= bodyHeight;
-                if (fits) break;
-            }
-            // Short of room even so it scrolls, with the hints back, and the scroll bar takes its
-            // width from the columns.
-            if (!fits)
-            {
-                foreach (var card in _cards) card.Compact = false;
-                Columns(width - SystemInformation.VerticalScrollBarWidth, MostColumns(width - SystemInformation.VerticalScrollBarWidth));
-            }
-
-            int y = ClientSize.Height - FooterHeight + (FooterHeight - _restart.Height) / 2 + Math.Max(1, E(1));
-            _restart.Location = new Point(width - Pad - _restart.Width, y);
-            _save.Location = new Point(_restart.Left - E(10) - _save.Width, y);
-            _close.Location = new Point((_save.Visible ? _save.Left : _restart.Left) - E(10) - _close.Width, y);
-            Invalidate();
-        }
-
-        /// <summary>Lays the cards out in <paramref name="count"/> columns over <paramref name="usable"/> pixels; the height they take.</summary>
-        private int Columns(int usable, int count)
-        {
-            int column = (usable - Pad * 2 - Gap * (count - 1)) / count;
-            var heights = Enumerable.Repeat(E(16), count).ToArray();
-            foreach (var card in _cards)
-            {
-                int shortest = Array.IndexOf(heights, heights.Min());
-                int h = card.Arrange(column);
-                card.SetBounds(Pad + shortest * (column + Gap), heights[shortest] + _body.AutoScrollPosition.Y, column, h);
-                heights[shortest] += h + Gap;
-            }
-            return heights.Max() - Gap + E(16);
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-            // Not while it is being built: the first layout is LayOut's.
-            if (_cards != null && _restart != null && _body != null) Reflow();
-        }
-
-        // ─── Painting the header and the footer ─────────────────────────────────────────────
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-            var g = e.Graphics;
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            int pad = E(24);
-
-            int titleHeight = TextRenderer.MeasureText("W", _titleFont).Height;
-            SettingsPaint.Text(g, _t.Title, _titleFont, LauncherTheme.LightGold,
-                               new Rectangle(pad, E(14), ClientSize.Width - pad * 2, titleHeight), wrap: false);
-            SettingsPaint.Text(g, _t.Subtitle, _subtitleFont, LauncherTheme.MutedGold,
-                               new Rectangle(pad, E(14) + titleHeight + E(4), ClientSize.Width - pad * 2,
-                                             HeaderHeight - titleHeight - E(20)));
-
-            // A gold line under the header, fading at both ends, and a plain one over the footer.
-            var under = new Rectangle(0, HeaderHeight - Math.Max(1, E(1)), ClientSize.Width, Math.Max(1, E(1)));
-            using (var fade = new LinearGradientBrush(under, Color.Transparent, Color.Transparent, 0f))
-            {
-                fade.InterpolationColors = new ColorBlend
-                {
-                    Colors = new[] { Color.FromArgb(0, LauncherTheme.GoldBorder), Color.FromArgb(170, LauncherTheme.GoldBorder),
-                                     Color.FromArgb(0, LauncherTheme.GoldBorder) },
-                    Positions = new[] { 0f, 0.5f, 1f },
-                };
-                g.FillRectangle(fade, under);
-            }
-            int footerTop = ClientSize.Height - FooterHeight;
-            using (var footer = new SolidBrush(Color.FromArgb(20, 12, 6)))
-                g.FillRectangle(footer, 0, footerTop, ClientSize.Width, FooterHeight);
-            using (var line = new Pen(LauncherTheme.BorderBrown, Math.Max(1f, _escala)))
-                g.DrawLine(line, 0, footerTop, ClientSize.Width, footerTop);
-
-            // What state the settings are in, or the question before a restart.
-            if (_status.Length > 0)
-            {
-                int left = pad, right = (_close.Visible ? _close.Left : _save.Left) - E(16);
-                int h = SettingsPaint.HeightOf(_status, _statusFont, right - left);
-                SettingsPaint.Text(g, _status, _statusFont, _statusTone,
-                                   new Rectangle(left, footerTop + (FooterHeight - h) / 2, right - left, h));
-            }
-        }
-
-        // ─── What it does ───────────────────────────────────────────────────────────────────
-
-        /// <summary>The settings as the window has them now.</summary>
-        private ServerSettings Edited()
-        {
-            var edited = _saved.Copy();
-            edited.ExperienceBonusPercent = (int)_xp.Value;
-            edited.DropBonusPercent = (int)_drop.Value;
-            edited.KamasBonusPercent = (int)_kamas.Value;
-            edited.MaxActionPoints = (int)_maxAp.Value;
-            edited.MaxMovementPoints = (int)_maxMp.Value;
-            edited.NoEnergyLoss = _noEnergy.Checked;
-            edited.RaidMinPlayers = (int)_raidMin.Value;
-            edited.MatchmakingGroupSize = (int)_matchmaking.Value;
-            edited.PrismWeakenedHours = (int)_weakenedHours.Value;
-            edited.ConquestMaxMinutes = (int)_conquestMinutes.Value;
-            edited.ConquestInvulnerabilityHours = (int)_invulnerableHours.Value;
-            edited.PrismProtectionMinutes = (int)_protectionMinutes.Value;
-            edited.RandomLoot = _randomLoot.Checked;
-            edited.RandomLootChancePercent = (double)_randomLootChance.Value;
-            edited.Hardcore = _hardcore.Checked;
-            edited.SimulatedPlayers = _bots.Checked;
-            edited.SimulatedPlayersMax = (int)_botsMax.Value;
-            edited.HeadHunters = _hunters.Checked;
-            edited.HeadHuntWindowMinutes = (int)_huntMinutes.Value;
-            edited.HeadHuntRestMinutes = (int)_restMinutes.Value;
-            edited.WelcomeMessage = _welcome.Value.Trim();
-            return edited;
-        }
-
-        private bool Dirty => Edited().DiffersFrom(_saved);
-
-        /// <summary>Saved but not running yet: the server started with other settings.</summary>
-        private bool Pending => _saved.DiffersFrom(ServerSettings.Current);
-
-        /// <summary>Anything touched: the footer says where things stand, and a pending question is dropped.</summary>
-        private void Changed()
-        {
-            if (_close == null) return;
-            if (_confirming) LeaveConfirmation();
-            bool dirty = Dirty;
-            _save.Enabled = dirty;
-            _restart.Enabled = dirty || Pending;
-            _close.Text = dirty ? _t.Cancel : _t.Close;
-            if (dirty) Status(_t.Unsaved, LauncherTheme.HighlightText);
-            else if (Pending) Status(_t.Pending, LauncherTheme.OnlineGreen);
-            else Status("", LauncherTheme.MutedGold);
-        }
-
-        private void Status(string text, Color tone)
-        {
-            _status = text;
-            _statusTone = tone;
-            Invalidate(new Rectangle(0, ClientSize.Height - FooterHeight, ClientSize.Width, FooterHeight));
-        }
-
-        /// <summary>The hunts' clock only means something with the head hunters on.</summary>
-        private void ShowHuntersState()
-        {
-            _huntMinutes.Enabled = _hunters.Checked;
-            _restMinutes.Enabled = _hunters.Checked;
-        }
-
-        /// <summary>The loot's chance and table only mean something with the loot on.</summary>
-        private void ShowLootState()
-        {
-            bool on = _randomLoot.Checked;
-            _randomLootChance.Enabled = on;
-            _rarities.Enabled = on;
-            _lootLevels.Enabled = on;
-        }
-
-        private void Save()
-        {
-            var edited = Edited();
-            edited.Save();
-            _saved = edited;
+                // Preserve immediate language changes independently of game settings edits.
+                settings.WindowLanguage = ServerSettings.Load().WindowLanguage;
+                settings.Save();
+            });
             Console.WriteLine($"[Settings] Saved to {Jondo.Unity.Launcher.Paths.ServerSettingsFile}; they apply at the next start.");
+            return true;
         }
+        catch (Exception ex) { Status(T("SaveError") + ex.Message, true); return false; }
+    }
 
-        private void SaveClicked()
+    private void SaveClicked()
+    {
+        if (_save.IsEnabled && ValidInputs() && Editor.Dirty && Save()) Changed();
+    }
+
+    private void RestartClicked()
+    {
+        if (!_restart.IsEnabled || !ValidInputs()) return;
+        if (ServerRestart.Counting) { Status(T("Counting"), true); return; }
+        if (!_confirming)
         {
-            if (!Dirty) return;
-            Save();
-            Changed();
+            int players = ServerRestart.PlayersInside;
+            _restartSeconds = players > 0 ? CountdownWithPlayers : CountdownEmpty;
+            _confirming = true; _restart.Content = T("ConfirmRestart"); _close.Content = T("Back"); _save.IsVisible = false;
+            Status(players > 0 ? string.Format(T("RestartAsk"), players, _restartSeconds) : string.Format(T("RestartAskEmpty"), _restartSeconds));
+            return;
         }
+        if (Editor.Dirty && !Save()) return;
+        ServerRestart.Begin(_restartSeconds);
+        Close();
+    }
 
-        /// <summary>The first click asks, in the footer; the second restarts.</summary>
-        private void RestartClicked()
-        {
-            if (ServerRestart.Counting)
-            {
-                Status(_t.Counting, LauncherTheme.Red);
-                return;
-            }
-            if (!_confirming)
-            {
-                int players = ServerRestart.PlayersInside;
-                _restartSeconds = players > 0 ? CountdownWithPlayers : CountdownEmpty;
-                _confirming = true;
-                _restart.Text = _t.ConfirmRestart;
-                _close.Text = _t.Back;
-                _save.Visible = false;
-                _close.Location = new Point(_restart.Left - E(10) - _close.Width, _close.Top);
-                Status(players > 0 ? string.Format(_t.RestartAsk, players, _restartSeconds) : _t.RestartAskEmpty,
-                       LauncherTheme.HighlightText);
-                return;
-            }
-            if (Dirty) Save();
-            ServerRestart.Begin(_restartSeconds);
-            Close();
-        }
-
-        private void LeaveConfirmation()
-        {
-            _confirming = false;
-            _restart.Text = _t.SaveRestart;
-            _save.Visible = true;
-            _close.Location = new Point(_save.Left - E(10) - _close.Width, _close.Top);
-        }
-
-        private void CloseClicked()
-        {
-            if (!_confirming)
-            {
-                Close();
-                return;
-            }
-            LeaveConfirmation();
-            Changed();
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-            if (e.KeyCode == Keys.Escape)
-            {
-                CloseClicked();
-                e.Handled = true;
-            }
-            else if (e.Control && e.KeyCode == Keys.S)
-            {
-                SaveClicked();
-                e.Handled = true;
-                e.SuppressKeyPress = true;
-            }
-        }
-
-        // ─── A dark title bar ───────────────────────────────────────────────────────────────
-
-        [DllImport("dwmapi.dll")]
-        private static extern int DwmSetWindowAttribute(IntPtr window, int attribute, ref int value, int size);
-
-        private const int DarkMode = 20, BorderColour = 34, CaptionColour = 35, CaptionTextColour = 36;
-
-        /// <summary>Windows' title bar in the window's own browns instead of white (Windows 11; older ones ignore it).</summary>
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            base.OnHandleCreated(e);
-            try
-            {
-                int on = 1;
-                DwmSetWindowAttribute(Handle, DarkMode, ref on, sizeof(int));
-                int caption = ColourRef(Color.FromArgb(20, 12, 6));
-                DwmSetWindowAttribute(Handle, CaptionColour, ref caption, sizeof(int));
-                int text = ColourRef(LauncherTheme.SoftGold);
-                DwmSetWindowAttribute(Handle, CaptionTextColour, ref text, sizeof(int));
-                int border = ColourRef(LauncherTheme.BorderBrown);
-                DwmSetWindowAttribute(Handle, BorderColour, ref border, sizeof(int));
-            }
-            catch (DllNotFoundException) { }
-            catch (EntryPointNotFoundException) { }
-        }
-
-        private static int ColourRef(Color c) => c.R | (c.G << 8) | (c.B << 16);
-
-        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
-        private static extern int SetWindowTheme(IntPtr window, string subApp, string idList);
-
-        /// <summary>Windows' own dark scroll bars, the ones Explorer uses, instead of the white ones.</summary>
-        private static void DarkScrollBars(Control control)
-        {
-            try { SetWindowTheme(control.Handle, "DarkMode_Explorer", null); }
-            catch (DllNotFoundException) { }
-            catch (EntryPointNotFoundException) { }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _titleFont.Dispose();
-                _subtitleFont.Dispose();
-                _statusFont.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
-        /// <summary>The scrolling body, double-buffered so the cards do not flicker as it moves.</summary>
-        private sealed class Body : Panel
-        {
-            public Body()
-            {
-                DoubleBuffered = true;
-                SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
-            }
-
-            protected override void OnScroll(ScrollEventArgs se)
-            {
-                base.OnScroll(se);
-                Invalidate(true);
-            }
-
-            protected override void OnMouseWheel(MouseEventArgs e)
-            {
-                base.OnMouseWheel(e);
-                Invalidate(true);
-            }
-        }
+    private void CloseClicked()
+    {
+        if (_confirming) Changed();
+        else Close();
     }
 }

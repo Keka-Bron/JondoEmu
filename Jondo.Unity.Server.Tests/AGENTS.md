@@ -1,9 +1,10 @@
-# Connection server integration tests
+# Server integration and desktop tests
 
 This xUnit project tests the connection service and framed transport against the
-actual server assembly. It targets `net10.0` on Linux and `net10.0-windows` on Windows
-to match the server. See `../docs/connection-protocol.md` for architecture and test
-coverage. Commands below run from the repository root.
+actual server assembly. It also checks the server's Avalonia desktop, settings editor,
+log presentation and process-lifetime coordination. It targets `net10.0` on Linux and
+Windows. See `../docs/connection-protocol.md` and `../docs/server-desktop.md` for
+architecture and coverage. Commands below run from the repository root.
 
 ## Test ownership and isolation
 
@@ -24,6 +25,10 @@ coverage. Commands below run from the repository root.
 - Keep service/storage failure assertions distinct from codec failure assertions.
 - Use independent legacy-byte construction to pin reply compatibility. Schema and
   generic generator tests belong in `Jondo.Unity.Protocol.Connection.Tests`.
+- Desktop tests use Avalonia.Headless with real Skia drawing and an application that
+  loads the production Fluent theme without starting world services. Inject settings
+  snapshots and shutdown callbacks; do not write real operator configuration or call
+  `Program.Main` from a desktop test.
 
 ## Verification
 
@@ -37,5 +42,6 @@ For changes spanning the codec boundary, also run:
 dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj
 ```
 
-Both suites run in Linux and Windows CI. The larger `Jondo.Unity.Tests` suite is a
-separate Windows-only check.
+Both suites and the larger `Jondo.Unity.Tests` suite run in Linux and Windows CI.
+The general suite additionally needs the world database extracted from `datos/world.zip`
+into `bases/` for database-backed coverage; these focused suites do not.

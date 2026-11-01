@@ -52,7 +52,7 @@ jobs:
       - name: Test connection protocol
         run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=connection-protocol.trx" --results-directory TestResults
 
-      - name: Test connection server
+      - name: Test server transport and desktop
         run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
 
       # Each failed test as an annotation, readable without signing in -- the log and the trx are
@@ -79,15 +79,30 @@ jobs:
           path: TestResults/*.trx
           if-no-files-found: ignore
 
-  connection-linux:
+  build-and-test-linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+      - name: Unpack world.db
+        run: unzip -o datos/world.zip -d bases
+      - name: Test general suite
+        run: dotnet test Jondo.Unity.Tests/Jondo.Unity.Tests.csproj --configuration Release --nologo --logger "trx;LogFileName=tests.trx" --results-directory TestResults
       - name: Test generated protocol and mappings
-        run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --nologo
-      - name: Test connection server over TCP
-        run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --nologo
+        run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --nologo --logger "trx;LogFileName=connection-protocol.trx" --results-directory TestResults
+      - name: Test server transport and headless desktop rendering
+        run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --nologo --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
+      - name: Publish Linux server desktop
+        run: dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj --configuration Release -r linux-x64 -p:SkipTests=true -p:SkipRootDeploy=true --nologo
+      - name: Cross-publish Windows server desktop
+        run: dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj --configuration Release -r win-x64 -p:SkipTests=true -p:SkipRootDeploy=true --nologo
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: linux-test-results
+          path: TestResults/*.trx
+          if-no-files-found: ignore

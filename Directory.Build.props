@@ -4,15 +4,15 @@
     <!--
       Lets the projects that target Windows be RESTORED on Linux.
 
-      Five of ours are net10.0-windows -the server, the tests, the launcher, the
-      deobfuscator and the Windows Forms contract- and that is fine: they run on Windows and that
-      is where they run. What is not fine is that they cannot even be RESTORED elsewhere, because
+      The deobfuscator and Windows Forms contract still target Windows.
+      The server desktop and all test suites are portable net10.0. Windows-only projects
+      must also be restorable elsewhere, because
       GitHub runs a job of its own over the repo -the dependency graph one, submit-nuget- that
       runs on Linux and restores the whole solution. Without this it stops at the first Windows
       project with NETSDK1100 and the check goes red even though nothing is broken.
 
-      This does NOT build Windows Forms on Linux nor does it try to: it only allows resolving the
-      framework references so as to be able to restore. Really building still wants Windows.
+      This allows restoring and cross-compiling Windows-targeted projects on Linux;
+      running their Windows desktop code still requires Windows.
     -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>

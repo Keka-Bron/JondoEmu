@@ -8,6 +8,7 @@
 publish/
 runtimes/
 /host-artifacts/
+.avalonia-build-tasks/
 *.pdb
 *.deps.json
 *.runtimeconfig.json

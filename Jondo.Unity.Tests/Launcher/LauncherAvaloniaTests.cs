@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using System.Text;
 using Jondo.Unity.Launcher.Security;
 using Jondo.Unity.Launcher.UI;
@@ -8,50 +7,15 @@ using Xunit;
 namespace Jondo.Unity.Tests.Launcher
 {
     /// <summary>
-    /// The launcher after moving it to Avalonia.
+    /// Portable launcher palette, credential storage and OAuth behavior.
     /// </summary>
     /// <remarks>
-    /// Two things that have to be held by tests and that did not exist before:
-    ///
-    ///   - <b>The palette is a single one.</b> The launcher draws with Avalonia and the server with Windows
-    ///     Forms, and both read from LauncherPalette. If someone writes a colour by hand on
-    ///     either side, this test catches it; without it, the two executables keep
-    ///     drifting apart and nobody notices until they are seen together.
-    ///
-    ///   - <b>What is stored is encrypted.</b> Before, the credentials of the eight accounts were stored
-    ///     run through Base64, which is not encrypting. Encryption without tests is a promise.
+    /// Credentials must remain encrypted at rest, preserve legacy migration, and discard invalid
+    /// stored data. Actual Avalonia resources and rendering are checked in LauncherRenderTests.
     /// </remarks>
     public class LauncherAvaloniaTests
     {
         // ─────────────────────────────────────────────────── the shared palette
-
-        [Fact]
-        public void El_tema_de_windows_forms_no_tiene_ni_un_color_propio()
-        {
-            // Each public colour of the Windows Forms theme has to come, byte for byte, from the
-            // constant of the same name in the palette.
-            var tema = typeof(global::Jondo.Unity.Launcher.UI.LauncherTheme);   // the Windows Forms one
-            var paleta = typeof(LauncherPalette);
-
-            int comprobados = 0;
-            foreach (var campo in tema.GetFields(BindingFlags.Public | BindingFlags.Static))
-            {
-                if (campo.FieldType != typeof(System.Drawing.Color)) continue;
-
-                var suyo = paleta.GetField(campo.Name, BindingFlags.Public | BindingFlags.Static);
-                Assert.True(suyo != null,
-                    $"{campo.Name} is in the Windows Forms theme and not in the palette: it is a loose colour.");
-
-                var pintado = (System.Drawing.Color)campo.GetValue(null)!;
-                uint esperado = (uint)suyo!.GetValue(null)!;
-
-                Assert.Equal(unchecked((int)esperado), pintado.ToArgb());
-                comprobados++;
-            }
-
-            // That it does not stay at zero for having renamed the type: the test would pass without looking at anything.
-            Assert.Equal(45, comprobados);
-        }
 
         [Fact]
         public void La_paleta_guarda_el_alfa_de_las_tarjetas()
