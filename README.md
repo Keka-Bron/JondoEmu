@@ -174,7 +174,8 @@ Built with **Avalonia**, the same toolkit as the Studio.
 
 - ✅ Zaap, HAAPI and connection server emulation
 - ✅ Account creation and login, with hashed passwords and rate-limited attempts
-- ✅ Server and character selection, showing the mount being ridden and each character's equipment
+- ✅ Server and character selection, showing the mount being ridden and each character's equipment,
+  with the character played last at the top
 <img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/c4c194ad-dcd1-407f-a3f1-b44c8f4baed2" />
 <img width="2558" height="1504" alt="image" src="https://github.com/user-attachments/assets/70d02ad2-8fc0-4ec8-b836-1dda959ed271" />
 

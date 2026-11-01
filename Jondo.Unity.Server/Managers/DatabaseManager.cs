@@ -2913,11 +2913,11 @@ namespace Jondo.Unity.Server
                          Vitality, Wisdom, Strength, Intelligence, Chance, Agility,
                          ScrolledVitality, ScrolledWisdom, ScrolledStrength,
                          ScrolledIntelligence, ScrolledChance, ScrolledAgility,
-                         Look, Orientation, Kamas)
+                         Look, Orientation, Kamas, LastConnection)
                     VALUES ($id, $acc, $name, $breed, $sex, $level, $map, $cell, 0,
                             0, 0, 0, 0, 0, 0,
                             $stat, $stat, $stat, $stat, $stat, $stat,
-                            $look, 1, $kamas);";
+                            $look, 1, $kamas, $now);";
                 insertar.Parameters.AddWithValue("$id", id);
                 insertar.Parameters.AddWithValue("$acc", accountId);
                 insertar.Parameters.AddWithValue("$name", name);
@@ -2931,6 +2931,10 @@ namespace Jondo.Unity.Server
                 // chokes: "Additional non-parsable characters are at the end of the string".
                 insertar.Parameters.AddWithValue("$look", Convert.ToHexString(look));
                 insertar.Parameters.AddWithValue("$kamas", kamas);
+                // Dated at its creation, as the real server's are: it is the newest, and so the
+                // first of the character list.
+                insertar.Parameters.AddWithValue("$now",
+                    DateTimeOffset.Now.ToString(Network.Connection.ConnectionAccountProjection.DateFormat));
                 insertar.ExecuteNonQuery();
 
                 SetServerAndHead(connection, id, serverId, headId);

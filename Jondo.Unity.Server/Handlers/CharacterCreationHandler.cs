@@ -192,28 +192,16 @@ namespace Jondo.Unity.Server.Handlers
 
             // The whole list again, and WITH THE FRESHLY CREATED ONE FIRST.
             //
-            // Both halves are needed and the second is the one that was missing. Sending only the kvi
-            // left the client with the list from BEFORE the creation; that was already fixed. But the old
-            // character still went into the world, and the log shows it beyond doubt:
+            // Both halves are needed. Sending only the kvi left the client with the list from BEFORE
+            // the creation. And the client does not choose afterwards: it takes THE FIRST one on the
+            // list and sends its selection at once, five milliseconds later in the log -- with the
+            // list in id order, the old character went into the world.
             //
-            //   00:16:05.798  Creado Illusion-1 (id 13825564)
-            //   00:16:05.803  Selected character 13825558     <- five milliseconds later
-            //
-            // So the client does not choose: it takes THE FIRST one on the list and sends its selection
-            // at once. And our list comes from an ORDER BY Id, so the freshly created one, which has the
-            // highest id, went last.
-            //
-            // That the new one goes first is measured in «crear personaje - borrar personaje»: the kvi
-            // that follows the kvb carries «Gone-1», the one just created, ahead of «Elder», who was
-            // already there. It is reordered only here and not in GetCharactersByAccountId, because the
-            // order of the normal selection screen is something else and has not been measured.
+            // The list goes the one played last first (ConnectionProtocol.MostRecentFirst) and the
+            // new one is dated at its creation, so it heads it, as in «crear personaje - borrar
+            // personaje»: the kvi that follows the kvb carries the one just created ahead of the
+            // one already there.
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
-            var elNuevo = characters.Find(c => c.Id == id);
-            if (elNuevo != null)
-            {
-                characters.Remove(elNuevo);
-                characters.Insert(0, elNuevo);
-            }
 
             foreach (byte[] frame in ConnectionProtocol.CharacterListFrames(characters))
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);

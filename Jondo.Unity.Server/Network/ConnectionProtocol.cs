@@ -213,7 +213,7 @@ namespace Jondo.Unity.Server.Network
         // ─── Character list (kvi) ───────────────────────────────────────────────
 
         /// <summary>
-        /// List of the account's characters on the chosen server.
+        /// List of the account's characters on the chosen server, the one played last first.
         ///
         ///   f1 (repeated) { f1 { f2: name
         ///                        f3: level
@@ -226,7 +226,7 @@ namespace Jondo.Unity.Server.Network
         {
             var kvi = Pb.New();
 
-            foreach (var character in characters)
+            foreach (var character in MostRecentFirst(characters))
             {
                 kvi.Msg(1, Pb.New()
                     .Msg(1, BuildCharacterDetails(character))
@@ -235,6 +235,22 @@ namespace Jondo.Unity.Server.Network
 
             return kvi.Build();
         }
+
+        /// <summary>
+        /// The order the real server sends the list in, which the client shows as it comes.
+        /// </summary>
+        /// <remarks>
+        /// Measured in «desde eleccion servidor a eleccion personaje»: the four characters of a
+        /// server come out by their last connection, newest first, while the server-selection reply
+        /// carries the same four in another order. In «crear personaje - borrar personaje» the one
+        /// just created, already dated, heads the list. A character with no date goes last; equal
+        /// dates keep the order they came in.
+        /// </remarks>
+        internal static List<DatabaseManager.DbCharacter> MostRecentFirst(IEnumerable<DatabaseManager.DbCharacter> characters)
+            => characters.OrderByDescending(c => System.DateTimeOffset.TryParse(c.LastConnection,
+                       System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None,
+                       out var at) ? at : System.DateTimeOffset.MinValue)
+                   .ToList();
 
         /// <summary>
         /// The character block shared by the character list and the selection reply.
