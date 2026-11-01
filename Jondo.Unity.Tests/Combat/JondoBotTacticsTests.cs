@@ -146,6 +146,39 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(0, MonsterTactics.ValueOfRows(board, state, bot, bot.CellId, bot.CellId, new List<Fighter> { enemy }));
         }
 
+        /// <summary>
+        /// Starred conditions belong to the caster, even when the board supplies the engine's
+        /// target selection. Ignoring them expanded every branch of the Zurcarák's card draws.
+        /// </summary>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Rows_require_the_casters_state_before_their_targets_are_weighed(bool engineReach)
+        {
+            var (bot, enemy, board) = Duel();
+            if (engineReach)
+            {
+                var fight = new FightInstance(9_991_022, 1, 1);
+                fight.AddPlayer(enemy);
+                fight.AddOpponent(bot);
+                bot.CellId = Centre;
+                enemy.CellId = InLineAt(Centre, 4);
+                board = board with { Reach = (row, caster, from, aim) => EffectEngine.ReachOf(fight, caster, row, from, aim) };
+            }
+            var requires = Made(new SpellEffect { EffectId = 100, DiceNum = 30, TargetMask = "A,*E5601" });
+            var excludes = Made(new SpellEffect { EffectId = 100, DiceNum = 30, TargetMask = "A,*e5601" });
+            double Worth(MonsterTactics.Spell spell)
+                => MonsterTactics.ValueOfRows(board, spell, bot, bot.CellId, enemy.CellId, new List<Fighter> { enemy });
+
+            Assert.Equal(0, Worth(requires));
+            double withoutState = Worth(excludes);
+            Assert.True(withoutState > 0);
+
+            bot.Buffs.PonerEstado(5601);
+            Assert.Equal(withoutState, Worth(requires));
+            Assert.Equal(0, Worth(excludes));
+        }
+
         /// <summary>Influencia's "-100 MP" takes the six he has, not a hundred.</summary>
         [Fact]
         public void Taking_points_takes_only_the_ones_he_has()

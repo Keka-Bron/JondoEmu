@@ -28,7 +28,8 @@ namespace Jondo.Unity.Tests.Social
             Assert.True(target > 0);
             try
             {
-                await using var asker = await ClientPipe.OpenAsync(AskerAccount, 8_900_100_073, 191105026, "Pregunta-Uno");
+                // A map of our own: parallel map-transition tests broadcast kmu on the real map.
+                await using var asker = await ClientPipe.OpenAsync(AskerAccount, 8_900_100_073, 990_100_173, "Pregunta-Uno");
                 byte[] ask = ConnectionProtocol.Push("lqw", Pb.New()
                     .Msg(2, Pb.New().Msg(4, Pb.New().Str(1, "quien-soy"))).Var(3, 1).Build());
 

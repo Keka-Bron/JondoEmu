@@ -1976,6 +1976,8 @@ namespace Jondo.Unity.Server.Managers
         private static IReadOnlyList<Fighter> ReachOf(Board board, SpellEffect row, Fighter caster, int from, int aim)
         {
             if (board.Reach != null) return board.Reach(row, caster, from, aim);
+            // A starred mask gates the whole row, including any sub-casts it would expand.
+            if (!EffectEngine.CasterMeets(caster, row)) return Array.Empty<Fighter>();
 
             var cells = EffectEngine.CasillasDelEfecto(row, from, aim);
             var inside = cells.Count > 0 ? new HashSet<int>(cells) : new HashSet<int> { aim };
