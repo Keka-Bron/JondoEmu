@@ -163,37 +163,39 @@ namespace Jondo.Unity.Server.UI
         private int TextWidth(int width) => Math.Max(E(80), width - _input.Width - E(16));
         private int LabelHeight(int width) => SettingsPaint.HeightOf(Text, _labelFont, TextWidth(width));
 
-        /// <summary>The name and its hint, one under the other.</summary>
-        private int TextHeight(int width)
-        {
-            int text = LabelHeight(width);
-            if (!string.IsNullOrEmpty(_hint)) text += E(3) + SettingsPaint.HeightOf(_hint, _hintFont, TextWidth(width));
-            return text;
-        }
+        /// <summary>The name beside the input: the row's first line.</summary>
+        private int HeadHeight(int width) => Math.Max(_input.Height, LabelHeight(width));
 
-        public int HeightFor(int width) => Math.Max(_input.Height, TextHeight(width));
+        /// <summary>
+        /// The hint, under the name and the input and as wide as the row. Beside the input it was a
+        /// narrow strip that wrapped into five lines, and the window could not show every setting
+        /// at once even maximized.
+        /// </summary>
+        private int HintHeight(int width)
+            => string.IsNullOrEmpty(_hint) ? 0 : E(3) + SettingsPaint.HeightOf(_hint, _hintFont, width);
+
+        public int HeightFor(int width) => HeadHeight(width) + HintHeight(width);
 
         protected override void OnLayout(LayoutEventArgs e)
         {
             base.OnLayout(e);
             if (_input == null) return;
-            _input.Location = new Point(Width - _input.Width, Math.Max(0, (Height - _input.Height) / 2));
+            _input.Location = new Point(Width - _input.Width, Math.Max(0, (HeadHeight(Width) - _input.Height) / 2));
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
-            int width = TextWidth(Width);
+            int head = HeadHeight(Width);
             int label = LabelHeight(Width);
-            int top = Math.Max(0, (Height - TextHeight(Width)) / 2);
             bool on = _input.Enabled;
             SettingsPaint.Text(g, Text, _labelFont, on ? LauncherTheme.CardText : LauncherTheme.DisabledFieldText,
-                               new Rectangle(0, top, width, label));
+                               new Rectangle(0, Math.Max(0, (head - label) / 2), TextWidth(Width), label));
             if (!string.IsNullOrEmpty(_hint))
             {
-                int hint = SettingsPaint.HeightOf(_hint, _hintFont, width);
+                int hint = SettingsPaint.HeightOf(_hint, _hintFont, Width);
                 SettingsPaint.Text(g, _hint, _hintFont, on ? LauncherTheme.MutedGold : LauncherTheme.DisabledFieldText,
-                                   new Rectangle(0, top + label + E(3), width, hint));
+                                   new Rectangle(0, head + E(3), Width, hint));
             }
         }
 

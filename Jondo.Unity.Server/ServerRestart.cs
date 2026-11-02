@@ -22,8 +22,9 @@ namespace Jondo.Unity.Server
         /// <summary>Whether a restart is already counting down.</summary>
         public static bool Counting => _counting != 0;
 
-        /// <summary>How many characters are in the world now.</summary>
-        public static int PlayersInside => SessionRegistry.All().Count(s => s.HasCharacter);
+        /// <summary>How many characters are in the world now; the simulated players do not wait for a countdown.</summary>
+        public static int PlayersInside
+            => SessionRegistry.All().Count(s => s.HasCharacter && !Bots.SimulatedPlayers.IsSimulated(s.AccountId));
 
         /// <summary>Starts the countdown; the server restarts when it ends. A second call changes nothing.</summary>
         public static void Begin(int seconds)

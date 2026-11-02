@@ -273,6 +273,10 @@ namespace Jondo.Unity.Server
             // Osavora's seasons, one a week (OsavoraSeasonHandler).
             Handlers.OsavoraSeasonHandler.Start();
 
+            // The simulated players, when the settings ask for them: they come in through the
+            // ports just opened, as clients do (Bots.SimulatedPlayers).
+            Bots.SimulatedPlayers.Start(ServerSettings.Current);
+
             // And its window: the log and the figures. If it could not be opened —no desktop, for
             // example— the server keeps working the same: the window is for looking, not for
             // things to happen.
@@ -384,6 +388,7 @@ namespace Jondo.Unity.Server
         {
             if (Interlocked.Exchange(ref _servicesStopped, 1) != 0) return;
             Console.WriteLine("[+] Stopping services...");
+            try { Bots.SimulatedPlayers.Stop(); } catch { }
             try { HaapiServer.Stop(); } catch { }
             try { ZaapServer.Stop(); } catch { }
             try { GameServerProxy.Stop(); } catch { }

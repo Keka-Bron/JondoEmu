@@ -386,6 +386,19 @@ namespace Jondo.Unity.Server.Handlers
         /// what makes it useful: it settles the corners, where the cell alone cannot say whether
         /// the character is leaving sideways or downwards. Otherwise the cell decides.
         /// </summary>
+        /// <summary>
+        /// The map past the border <paramref name="cell"/> stands on, as a map change from there
+        /// would take a player, or 0 when there is none to walk into. A simulated player picks its
+        /// way out with it (Bots.SimulatedPlayer) and then asks for that map with the jqk.
+        /// </summary>
+        internal static long NeighbourPast(long from, int cell)
+        {
+            int row = cell / 14, column = cell % 14;
+            if (column != 0 && column != 13 && row > 1 && row < 38) return 0;
+            long target = Neighbour(from, FromEdge(cell), 0, quiet: true);
+            return target > 0 && target != from && MapManager.GetMapInfo(target) != null ? target : 0;
+        }
+
         private static Way WayOut(long from, int cell, long asked)
         {
             var scroll = MapManager.GetScrollAction(from);
@@ -442,7 +455,7 @@ namespace Jondo.Unity.Server.Handlers
         /// than one map sits on a square the outdoor one wins, and within that the one in the same
         /// subarea: at [5,-17] there are four, one out in the open and three interiors.
         /// </summary>
-        private static long Neighbour(long from, Way way, long asked)
+        private static long Neighbour(long from, Way way, long asked, bool quiet = false)
         {
             if (way == Way.None) return 0;
 
@@ -461,7 +474,7 @@ namespace Jondo.Unity.Server.Handlers
             };
             if (written != 0)
             {
-                Console.WriteLine($"[Move] The client asked for {asked}; the world data says " +
+                if (!quiet) Console.WriteLine($"[Move] The client asked for {asked}; the world data says " +
                                   $"{way} of {from} is {written}.");
                 return written;
             }
@@ -470,7 +483,7 @@ namespace Jondo.Unity.Server.Handlers
             long found = ByCoordinates(here, way);
             if (found != 0)
             {
-                Console.WriteLine($"[Move] The client asked for {asked}; the map {way} of {from} " +
+                if (!quiet) Console.WriteLine($"[Move] The client asked for {asked}; the map {way} of {from} " +
                                   $"is {found} by its coordinates.");
             }
             return found;

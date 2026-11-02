@@ -85,6 +85,17 @@ namespace Jondo.Unity.Server
         /// </summary>
         public int PrismProtectionMinutes { get; set; } = 60;
 
+        /// <summary>
+        /// Simulated players: accounts the server plays itself (<see cref="Bots.SimulatedPlayers"/>),
+        /// each over a connection of its own like any client's. They walk, fight monsters, gather,
+        /// enrol in the Koliseo and accept every duel, so the world feels inhabited and the server
+        /// carries the load of that many players.
+        /// </summary>
+        public bool SimulatedPlayers { get; set; }
+
+        /// <summary>The most simulated players in the world at once; how many are in varies under it.</summary>
+        public int SimulatedPlayersMax { get; set; } = 20;
+
         /// <summary>The server window's language: es, en or fr.</summary>
         public string WindowLanguage { get; set; } = "es";
 

@@ -124,6 +124,14 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>Whether that head is one of that breed and sex, creation one or not.</summary>
+        /// <summary>The heads the creation screen offers a class and sex, in id order.</summary>
+        public static IReadOnlyList<int> OfferedAtCreation(int breedId, int sex)
+        {
+            Ensure();
+            return _heads.Where(h => h.Value.Creation && h.Value.Breed == breedId && h.Value.Gender == (sex == 1 ? 1 : 0))
+                         .Select(h => h.Key).OrderBy(id => id).ToList();
+        }
+
         public static bool Fits(int headId, int breedId, int sex)
         {
             Ensure();

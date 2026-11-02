@@ -1486,6 +1486,17 @@ namespace Jondo.Unity.Server
             return (long)(command.ExecuteScalar() ?? 0L) > 0;
         }
 
+        /// <summary>The id of the account with that login, whatever its case; 0 when there is none.</summary>
+        public static long AccountIdOf(string login)
+        {
+            using var connection = new SqliteConnection(AuthConnectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT Id FROM Accounts WHERE LOWER(Login) = $login;";
+            command.Parameters.AddWithValue("$login", (login ?? "").Trim().ToLowerInvariant());
+            return command.ExecuteScalar() is long id ? id : 0;
+        }
+
         /// <param name="id">
         /// The account's id, for the test account only: its characters in the shipped world.db
         /// belong to it. Zero, as for anybody who signs up, lets the table pick; one already taken
@@ -2657,6 +2668,25 @@ namespace Jondo.Unity.Server
                 return (state.MapId, state.CellId);
             int cell = state.RoleplayCellId > 0 ? state.RoleplayCellId : Handlers.TeleportHandler.MapCentre;
             return (state.RoleplayMapId, MapManager.GetNearestWalkableCell(state.RoleplayMapId, cell));
+        }
+
+        /// <summary>
+        /// A character out of the world put at a level: its experience at that level's floor and
+        /// the capital the level gives, unspent. A simulated player is born at its level so
+        /// (Bots.SimulatedPlayers) and spends the capital itself once in the world, as a player does.
+        /// </summary>
+        public static void SetLevelOffline(long characterId, int level)
+        {
+            using var connection = new SqliteConnection(WorldConnectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "UPDATE Characters SET Level = $level, Experience = $xp, RemainingPoints = $points " +
+                                  "WHERE Id = $id;";
+            command.Parameters.AddWithValue("$level", level);
+            command.Parameters.AddWithValue("$xp", ExperienceTable.IsLoaded ? ExperienceTable.LevelFloor(level) : 0L);
+            command.Parameters.AddWithValue("$points", Handlers.StatsHandler.TotalCapitalForLevel(level));
+            command.Parameters.AddWithValue("$id", characterId);
+            command.ExecuteNonQuery();
         }
 
         public static void SaveCurrentCharacter()

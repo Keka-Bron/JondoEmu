@@ -17,9 +17,10 @@ namespace Jondo.Unity.Server.UI
     /// to do at once -- telling the players in the world first, with a countdown.
     /// </summary>
     /// <remarks>
-    /// Drawn like the main window rather than with Windows' grey controls: gold-titled cards in two
+    /// Drawn like the main window rather than with Windows' grey controls: gold-titled cards in
     /// columns that scroll when the screen is short, switches, steppers, and a footer that never
-    /// scrolls away, with the buttons and what state the settings are in.
+    /// scrolls away, with the buttons and what state the settings are in. It opens two columns wide;
+    /// widened or maximized it takes as many columns as fit, so that every setting is in sight.
     /// </remarks>
     internal sealed class ServerSettingsWindow : Form
     {
@@ -30,12 +31,13 @@ namespace Jondo.Unity.Server.UI
 
         private readonly NumberStepper _raidMin, _matchmaking, _maxAp, _maxMp, _xp, _drop, _kamas, _randomLootChance;
         private readonly NumberStepper _weakenedHours, _conquestMinutes, _invulnerableHours, _protectionMinutes;
-        private readonly ToggleSwitch _hardcore, _noEnergy, _randomLoot;
+        private readonly NumberStepper _botsMax;
+        private readonly ToggleSwitch _hardcore, _noEnergy, _randomLoot, _bots;
         private readonly LauncherField _welcome;
         private readonly RarityTable _rarities;
         private readonly SettingNote _lootLevels;
         private readonly Body _body;
-        private readonly SettingsCard[] _left, _right;
+        private readonly SettingsCard[] _cards;
         private readonly LauncherButton _restart, _save, _close;
         private readonly Font _titleFont, _subtitleFont, _statusFont;
 
@@ -66,6 +68,7 @@ namespace Jondo.Unity.Server.UI
             public string Consumables, Equipment, Cosmetics, Creatures, Dofus, Legendary, Perfect, Percent;
             public string Modes, Hardcore, HardcoreHint;
             public string Welcome, WelcomeHint, WelcomePlaceholder;
+            public string Bots, BotsOn, BotsOnHint, BotsMax, BotsMaxHint;
             public string Close, Cancel, Back, Save, SaveRestart, ConfirmRestart;
             public string Unsaved, Pending, RestartAsk, RestartAskEmpty, Counting;
         }
@@ -112,6 +115,12 @@ namespace Jondo.Unity.Server.UI
                 Welcome = "BIENVENIDA",
                 WelcomeHint = "Una línea en el chat al entrar al mundo. Vacío = ninguna.",
                 WelcomePlaceholder = "Sin mensaje",
+                Bots = "JUGADORES SIMULADOS",
+                BotsOn = "Simular jugadores",
+                BotsOnHint = "Bots JondoBot-XXX de clase al azar, cada uno con su propia conexión: andan, pelean " +
+                             "contra monstruos, recolectan, van al koliseo y aceptan todos los desafíos.",
+                BotsMax = "Máximo a la vez",
+                BotsMaxHint = "Cuántos hay conectados varía por debajo de este número, como en un servidor de verdad.",
                 Close = "CERRAR", Cancel = "CANCELAR", Back = "VOLVER", Save = "GUARDAR",
                 SaveRestart = "GUARDAR Y REINICIAR", ConfirmRestart = "SÍ, REINICIAR",
                 Unsaved = "Hay cambios sin guardar.",
@@ -160,6 +169,12 @@ namespace Jondo.Unity.Server.UI
                 Welcome = "WELCOME",
                 WelcomeHint = "A line in the chat on coming into the world. Empty = none.",
                 WelcomePlaceholder = "No message",
+                Bots = "SIMULATED PLAYERS",
+                BotsOn = "Simulate players",
+                BotsOnHint = "JondoBot-XXX bots of a random class, each over its own connection: they walk, fight " +
+                             "monsters, gather, go to the Koliseo and accept every duel.",
+                BotsMax = "Most at once",
+                BotsMaxHint = "How many are connected varies below this number, as on a real server.",
                 Close = "CLOSE", Cancel = "CANCEL", Back = "BACK", Save = "SAVE",
                 SaveRestart = "SAVE AND RESTART", ConfirmRestart = "YES, RESTART",
                 Unsaved = "There are unsaved changes.",
@@ -208,6 +223,12 @@ namespace Jondo.Unity.Server.UI
                 Welcome = "BIENVENUE",
                 WelcomeHint = "Une ligne dans le chat en entrant dans le monde. Vide = aucune.",
                 WelcomePlaceholder = "Aucun message",
+                Bots = "JOUEURS SIMULÉS",
+                BotsOn = "Simuler des joueurs",
+                BotsOnHint = "Des bots JondoBot-XXX de classe aléatoire, chacun avec sa propre connexion : ils marchent, " +
+                             "combattent des monstres, récoltent, vont au Kolizéum et acceptent tous les défis.",
+                BotsMax = "Maximum en même temps",
+                BotsMaxHint = "Le nombre de connectés varie sous ce nombre, comme sur un vrai serveur.",
                 Close = "FERMER", Cancel = "ANNULER", Back = "RETOUR", Save = "ENREGISTRER",
                 SaveRestart = "ENREGISTRER ET REDÉMARRER", ConfirmRestart = "OUI, REDÉMARRER",
                 Unsaved = "Des changements ne sont pas enregistrés.",
@@ -228,8 +249,9 @@ namespace Jondo.Unity.Server.UI
 
             Text = _t.Caption;
             StartPosition = FormStartPosition.CenterParent;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
+            // Resizable, and maximized it spreads the cards over the whole screen.
+            FormBorderStyle = FormBorderStyle.Sizable;
+            MaximizeBox = true;
             MinimizeBox = false;
             ShowInTaskbar = false;
             KeyPreview = true;
@@ -258,6 +280,8 @@ namespace Jondo.Unity.Server.UI
             _randomLoot = Toggle(_saved.RandomLoot);
             _randomLootChance = Stepper((decimal)_saved.RandomLootChancePercent, 0, 100, 1, 2, "%");
             _hardcore = Toggle(_saved.Hardcore);
+            _bots = Toggle(_saved.SimulatedPlayers);
+            _botsMax = Stepper(_saved.SimulatedPlayersMax, 1, Bots.SimulatedPlayers.Most, 5, 0, "");
             _welcome = new LauncherField
             {
                 Value = _saved.WelcomeMessage ?? "",
@@ -270,7 +294,7 @@ namespace Jondo.Unity.Server.UI
             _rarities = new RarityTable(RarityLines(), _escala);
             _lootLevels = new SettingNote(_t.LootLevels);
 
-            // The cards, in two columns.
+            // The cards, in the order the columns take them.
             var rates = Card(_t.Rates,
                              Row(_t.Xp, null, _xp), Row(_t.Drop, null, _drop), Row(_t.Kamas, null, _kamas),
                              new SettingNote(_t.RatesHint));
@@ -290,16 +314,18 @@ namespace Jondo.Unity.Server.UI
                             _rarities, _lootLevels);
             var modes = Card(_t.Modes, Row(_t.Hardcore, _t.HardcoreHint, _hardcore));
             var welcome = Card(_t.Welcome, new SettingNote(_t.WelcomeHint), _welcome);
-            _left = new[] { rates, characters, conquests, welcome };
-            _right = new[] { loot, modes, raids };
+            var bots = Card(_t.Bots, Row(_t.BotsOn, _t.BotsOnHint, _bots), Row(_t.BotsMax, _t.BotsMaxHint, _botsMax));
+            _cards = new[] { rates, loot, characters, modes, conquests, raids, bots, welcome };
 
             _body = new Body { BackColor = LauncherTheme.Background, AutoScroll = true };
             _body.HandleCreated += (s, e) => DarkScrollBars(_body);
-            foreach (var card in _left.Concat(_right)) _body.Controls.Add(card);
+            foreach (var card in _cards) _body.Controls.Add(card);
             Controls.Add(_body);
 
             _randomLoot.CheckedChanged += (s, e) => ShowLootState();
             ShowLootState();
+            _bots.CheckedChanged += (s, e) => _botsMax.Enabled = _bots.Checked;
+            _botsMax.Enabled = _bots.Checked;
 
             // The footer's buttons.
             _restart = Button(_t.SaveRestart, primary: true, E(250));
@@ -386,45 +412,73 @@ namespace Jondo.Unity.Server.UI
 
         // ─── The layout ─────────────────────────────────────────────────────────────────────
 
-        /// <summary>The cards in their columns, and the window as tall as they need, up to the screen.</summary>
+        /// <summary>The narrowest a column of cards goes; below it the window takes one column fewer.</summary>
+        private int NarrowestColumn => E(280);
+
+        private int Pad => E(24);
+        private int Gap => E(14);
+
+        /// <summary>How many columns of the narrowest fit across <paramref name="usable"/> pixels.</summary>
+        private int MostColumns(int usable) => Math.Max(1, (usable - Pad * 2 + Gap) / (NarrowestColumn + Gap));
+
+        /// <summary>The window as it opens: two columns, as tall as they need, up to the screen.</summary>
         private void LayOut()
         {
             int width = E(960);
-            int pad = E(24), gap = E(14);
-
-            int Columns(int usable)
-            {
-                int column = (usable - pad * 2 - gap) / 2;
-                int Stack(SettingsCard[] cards, int x)
-                {
-                    int y = E(16);
-                    foreach (var card in cards)
-                    {
-                        int h = card.Arrange(column);
-                        card.SetBounds(x, y + _body.AutoScrollPosition.Y, column, h);
-                        y += h + gap;
-                    }
-                    return y - gap + E(16);
-                }
-                return Math.Max(Stack(_left, pad), Stack(_right, pad + column + gap));
-            }
-
-            int content = Columns(width);
+            int content = Columns(width, Math.Min(2, MostColumns(width)));
             var screen = Screen.FromPoint(Cursor.Position).WorkingArea;
             int chrome = Height - ClientSize.Height;
             int tallest = screen.Height - chrome - E(40);
-            int client = Math.Min(HeaderHeight + content + FooterHeight, tallest);
-            ClientSize = new Size(width, client);
+            ClientSize = new Size(width, Math.Min(HeaderHeight + content + FooterHeight, tallest));
+            MinimumSize = new Size(NarrowestColumn + Pad * 2 + (Width - ClientSize.Width),
+                                   HeaderHeight + FooterHeight + E(160) + chrome);
+            Reflow();
+        }
 
-            int bodyHeight = client - HeaderHeight - FooterHeight;
+        /// <summary>
+        /// The cards over the window as it is now: the fewest columns that show every card at once,
+        /// each card to the shortest column, so that a maximized window needs no scrolling; when not
+        /// even the most that fit its width do, the most it is, and the body scrolls.
+        /// </summary>
+        private void Reflow()
+        {
+            int width = ClientSize.Width;
+            int bodyHeight = Math.Max(0, ClientSize.Height - HeaderHeight - FooterHeight);
             _body.SetBounds(0, HeaderHeight, width, bodyHeight);
-            // Short of room it scrolls, and the scroll bar takes its width from the columns.
-            if (content > bodyHeight) Columns(width - SystemInformation.VerticalScrollBarWidth);
 
-            int y = client - FooterHeight + (FooterHeight - _restart.Height) / 2 + Math.Max(1, E(1));
-            _restart.Location = new Point(width - pad - _restart.Width, y);
+            int most = MostColumns(width);
+            bool fits = false;
+            for (int count = 1; count <= most && !fits; count++) fits = Columns(width, count) <= bodyHeight;
+            // Short of room it scrolls, and the scroll bar takes its width from the columns.
+            if (!fits) Columns(width - SystemInformation.VerticalScrollBarWidth, MostColumns(width - SystemInformation.VerticalScrollBarWidth));
+
+            int y = ClientSize.Height - FooterHeight + (FooterHeight - _restart.Height) / 2 + Math.Max(1, E(1));
+            _restart.Location = new Point(width - Pad - _restart.Width, y);
             _save.Location = new Point(_restart.Left - E(10) - _save.Width, y);
-            _close.Location = new Point(_save.Left - E(10) - _close.Width, y);
+            _close.Location = new Point((_save.Visible ? _save.Left : _restart.Left) - E(10) - _close.Width, y);
+            Invalidate();
+        }
+
+        /// <summary>Lays the cards out in <paramref name="count"/> columns over <paramref name="usable"/> pixels; the height they take.</summary>
+        private int Columns(int usable, int count)
+        {
+            int column = (usable - Pad * 2 - Gap * (count - 1)) / count;
+            var heights = Enumerable.Repeat(E(16), count).ToArray();
+            foreach (var card in _cards)
+            {
+                int shortest = Array.IndexOf(heights, heights.Min());
+                int h = card.Arrange(column);
+                card.SetBounds(Pad + shortest * (column + Gap), heights[shortest] + _body.AutoScrollPosition.Y, column, h);
+                heights[shortest] += h + Gap;
+            }
+            return heights.Max() - Gap + E(16);
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            // Not while it is being built: the first layout is LayOut's.
+            if (_cards != null && _restart != null && _body != null) Reflow();
         }
 
         // ─── Painting the header and the footer ─────────────────────────────────────────────
@@ -492,6 +546,8 @@ namespace Jondo.Unity.Server.UI
             edited.RandomLoot = _randomLoot.Checked;
             edited.RandomLootChancePercent = (double)_randomLootChance.Value;
             edited.Hardcore = _hardcore.Checked;
+            edited.SimulatedPlayers = _bots.Checked;
+            edited.SimulatedPlayersMax = (int)_botsMax.Value;
             edited.WelcomeMessage = _welcome.Value.Trim();
             return edited;
         }

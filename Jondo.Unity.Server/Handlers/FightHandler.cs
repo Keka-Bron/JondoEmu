@@ -9075,11 +9075,20 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static List<Managers.MonsterTactics.Spell> TacticsOf(Fighter monster)
         {
-            var spells = new List<Managers.MonsterTactics.Spell>();
             // A monster's attacks, or a summon's own spells when it is one.
             var suyos = monster.SpellIds.Count > 0 || monster.HechizosDeInvocado == null
                 ? monster.SpellIds.Select(s => (Spell: s, Grade: monster.SpellGrades.TryGetValue(s, out int g) ? g : 1)).ToList()
                 : monster.HechizosDeInvocado.Select(h => (h.Spell, h.Grade)).ToList();
+            return TacticsFor(monster, suyos);
+        }
+
+        /// <summary>
+        /// The same for spells given rather than the fighter's own: a character's, whose spells are
+        /// his class's at his level and not a list on the fighter (a simulated player's turn).
+        /// </summary>
+        internal static List<Managers.MonsterTactics.Spell> TacticsFor(Fighter monster, IEnumerable<(int Spell, int Grade)> suyos)
+        {
+            var spells = new List<Managers.MonsterTactics.Spell>();
             foreach (var (spell, grade) in suyos)
             {
                 var data = DatabaseManager.GetSpellCombatData(spell, grade);

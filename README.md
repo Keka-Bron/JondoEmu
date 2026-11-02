@@ -153,6 +153,7 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ A **Settings** window (the *SETTINGS* button) for what the game itself does not decide, stored in
   `config\server_settings.json`. *SAVE AND RESTART* warns every player, counts down a minute and
   restarts the server with the new values. Every setting at its default leaves the game as it is.
+  Maximized, it spreads its cards over the whole screen.
 
   | Setting | What it does |
   |:---|:---|
@@ -163,6 +164,7 @@ Built with **Avalonia**, the same toolkit as the Studio.
   | Dying costs no energy | A lost fight keeps the energy |
   | Random loot | See below |
   | Welcome message | A line in the chat on coming into the world |
+  | Simulate players | JondoBot-XXX bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel; how many are in varies under the maximum chosen |
 
   **Random loot.** Besides its own table, each monster beaten has a chance (10 % by default, raised
   by challenges and the drop bonus) of dropping two to five items around its level: ordinary
