@@ -477,6 +477,15 @@ namespace Jondo.Unity.Server.Handlers
             var mine = AllianceStore.AllianceOf(myId);
             if (mine == null || !AllianceStore.TakesPartInAva(myId) || !IsWarZone(SubAreaOf(me.State.MapId)) || !FightsInAWar(myId))
             {
+                // The cities' war is fought where the map allows an aggression -- not in Astrub, nor
+                // inside the cities -- which is also where the client offers «Agredir».
+                if (Alignments.MayAggress(myId, me.State.CharacterLevel, targetId, target.State.CharacterLevel)
+                    && !Alignments.MapAllowsAggression(me.State.MapId))
+                {
+                    await SendAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                        ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.RequirementsNotMet)));
+                    return;
+                }
                 if (Alignments.MayAggress(myId, me.State.CharacterLevel, targetId, target.State.CharacterLevel))
                 {
                     Program.LogDebug($"[Alignment] {myId} attacks {targetId} of the other city.");

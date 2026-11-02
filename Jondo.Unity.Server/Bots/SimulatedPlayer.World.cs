@@ -15,7 +15,8 @@ namespace Jondo.Unity.Server.Bots
     /// <summary>
     /// What a simulated player does in the world, a thing at a time with pauses between, as a
     /// player does: walk about its map, go to the next one, attack a group of monsters it can beat,
-    /// gather a resource of its professions, enrol in the Koliseo, or challenge another of the bots.
+    /// gather a resource of its professions, enrol in the Koliseo, challenge another of the bots --
+    /// and, at war, aggress an enemy or hunt its prey (SimulatedPlayer.War).
     /// </summary>
     internal sealed partial class SimulatedPlayer
     {
@@ -76,6 +77,14 @@ namespace Jondo.Unity.Server.Bots
 
             int roll = _dice.Next(100);
             bool free = _queuedSince == null;
+            if (_atWar && free)
+            {
+                if (await HuntAsync(session, stop)) return;
+                if (await BackToTheFrontAsync(session, stop)) return;
+                if (_dice.Next(100) < 4) TakeAnOrder(session);
+                if (_dice.Next(100) < 70 && await AggressAsync(session, stop)) return;
+                if (_dice.Next(100) < 50 && await SeekAsync(session, stop)) return;
+            }
             if (roll < 22 && free && await FightMonstersAsync(session, stop)) return;
             if (roll < 40 && await GatherAsync(session, stop)) return;
             if (roll < 45 && free && await EnrolAsync()) return;
@@ -165,15 +174,21 @@ namespace Jondo.Unity.Server.Bots
         }
 
         /// <summary>
-        /// To the next map: a border with a map past it in the bots' area, walked to, and the jqk
-        /// that asks for that map; the server answers with the map to load (jru).
+        /// To the next map: a border with a map past it in the bot's area, walked to, and the jqk
+        /// that asks for that map; the server answers with the map to load (jru). Out of its area
+        /// -- after a hunt -- any way out, until it is back.
         /// </summary>
         private async Task<bool> ChangeMapAsync(GameSession session, CancellationToken stop)
         {
-            long map = session.State.MapId;
-            var ways = Exits.GetOrAdd(map, WaysOut).Where(w => AreaOf(w.To) == HomeArea.Value).ToList();
+            var exits = Exits.GetOrAdd(session.State.MapId, WaysOut);
+            var ways = exits.Where(w => AreaOf(w.To) == _range).ToList();
+            if (ways.Count == 0 && AreaOf(session.State.MapId) != _range) ways = exits;
             if (ways.Count == 0) return false;
-            var way = ways[_dice.Next(ways.Count)];
+            return await TakeTheWayAsync(session, ways[_dice.Next(ways.Count)], stop);
+        }
+
+        private async Task<bool> TakeTheWayAsync(GameSession session, (long To, int[] Cells) way, CancellationToken stop)
+        {
             int here = session.State.CellId;
             int door = way.Cells.OrderBy(c => MapGeometry.Distance(here, c)).First();
             if (!await WalkToAsync(session, door, stop)) return false;

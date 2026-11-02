@@ -80,6 +80,15 @@ namespace Jondo.Unity.Server.UI
             Controls.Add(row);
         }
 
+        /// <summary>Its rows' hints under them, or, short of room, in a tooltip (<see cref="SettingRow.Compact"/>).</summary>
+        public bool Compact
+        {
+            set
+            {
+                foreach (var row in _rows.OfType<SettingRow>()) row.Compact = value;
+            }
+        }
+
         private int TitleHeight => E(12) + TextRenderer.MeasureText("W", _titleFont).Height + E(12);
 
         /// <summary>Lays the rows out in this width and gives the height they need.</summary>
@@ -143,7 +152,11 @@ namespace Jondo.Unity.Server.UI
         private readonly Control _input;
         private readonly Font _labelFont, _hintFont;
         private readonly string _hint;
+        private bool _compact;
         private int E(int px) => (int)Math.Round(px * _scale);
+
+        /// <summary>The tooltip a compact row's hint goes to; one for all of them.</summary>
+        private static readonly ToolTip Tips = new() { AutoPopDelay = 20000, InitialDelay = 300 };
 
         public SettingRow(string label, string hint, Control input, float scale)
         {
@@ -172,7 +185,23 @@ namespace Jondo.Unity.Server.UI
         /// at once even maximized.
         /// </summary>
         private int HintHeight(int width)
-            => string.IsNullOrEmpty(_hint) ? 0 : E(3) + SettingsPaint.HeightOf(_hint, _hintFont, width);
+            => string.IsNullOrEmpty(_hint) || _compact ? 0 : E(3) + SettingsPaint.HeightOf(_hint, _hintFont, width);
+
+        /// <summary>
+        /// The hint out of the row and into a tooltip on it: what lets a maximized window on a small
+        /// screen still show every setting at once.
+        /// </summary>
+        public bool Compact
+        {
+            get => _compact;
+            set
+            {
+                if (_compact == value) return;
+                _compact = value;
+                if (!string.IsNullOrEmpty(_hint)) Tips.SetToolTip(this, value ? _hint : null);
+                Invalidate();
+            }
+        }
 
         public int HeightFor(int width) => HeadHeight(width) + HintHeight(width);
 
@@ -191,7 +220,7 @@ namespace Jondo.Unity.Server.UI
             bool on = _input.Enabled;
             SettingsPaint.Text(g, Text, _labelFont, on ? LauncherTheme.CardText : LauncherTheme.DisabledFieldText,
                                new Rectangle(0, Math.Max(0, (head - label) / 2), TextWidth(Width), label));
-            if (!string.IsNullOrEmpty(_hint))
+            if (!string.IsNullOrEmpty(_hint) && !_compact)
             {
                 int hint = SettingsPaint.HeightOf(_hint, _hintFont, Width);
                 SettingsPaint.Text(g, _hint, _hintFont, on ? LauncherTheme.MutedGold : LauncherTheme.DisabledFieldText,

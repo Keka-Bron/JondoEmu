@@ -1225,6 +1225,30 @@ namespace Jondo.Unity.Server.Handlers
                 if (next == 0) return false;
             }
 
+            // A trade of chapeuvepés (the Sacres): paid, then handed over; without enough, the line
+            // that says so.
+            if (elegida.Chapeuvepes > 0)
+            {
+                if (!Managers.HeadHunts.Pay(GameState.CharacterId, -elegida.Chapeuvepes))
+                {
+                    next = elegida.RefusedNext;
+                    if (next == 0) return false;
+                }
+                else if (elegida.Trades != 0)
+                {
+                    if (!await Managers.Equipment.GiveAsync(stream, elegida.Trades, elegida.TradeCount))
+                    {
+                        Managers.HeadHunts.Pay(GameState.CharacterId, elegida.Chapeuvepes);
+                        Console.WriteLine($"[NPC] {elegida.TradeCount}x{elegida.Trades} could not be handed over; " +
+                                          $"the {elegida.Chapeuvepes} chapeuvepés are given back.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[NPC] Traded {elegida.TradeCount}x{elegida.Trades} for {elegida.Chapeuvepes} chapeuvepés.");
+                    }
+                }
+            }
+
             var siguiente = conversacion!.Line(next);
             if (siguiente == null)
             {

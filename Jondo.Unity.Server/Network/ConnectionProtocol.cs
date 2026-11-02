@@ -642,13 +642,20 @@ namespace Jondo.Unity.Server.Network
         /// The sheet's alignment block (f9, Alignments): { f2: 2, f3 { f3: 500 }, f5: 1 } on a brand
         /// new character, { f1: 100, f2: 3, f3 { f3: 500 }, f5: 200 } on the level 200 Bontarian --
         /// the alignment level its quests raised, the side, the next grade's honour, the level.
+        /// The honour block is { f1 the honour, f2 the aggression status, f3 the grade's ceiling, f4
+        /// its floor }: the alignment tab's bar is drawn between the last two. Its 500 with no
+        /// honour is the first grade's ceiling (<see cref="Managers.Honour"/>).
         /// </summary>
         private static byte[] AlignmentSheet()
         {
             var state = Jondo.Unity.Server.Network.SessionContext.State;
             var alignment = Managers.Alignments.Of(state.CharacterId);
+            int grade = Math.Max(1, alignment.HonourGrade);
             return Pb.New().VarIfNotZero(1, Managers.Alignments.Level())
-                     .Var(2, alignment.Side).Msg(3, Pb.New().VarIfNotZero(2, alignment.AggressionStatus).Var(3, 500))
+                     .Var(2, alignment.Side).Msg(3, Pb.New().VarIfNotZero(1, alignment.Honour)
+                                                           .VarIfNotZero(2, alignment.AggressionStatus)
+                                                           .Var(3, Managers.Honour.CeilingOf(grade))
+                                                           .VarIfNotZero(4, Managers.Honour.FloorOf(grade)))
                      .VarIfNotZero(4, alignment.ShownGrade)
                      .Var(5, Math.Max(1, Handlers.StatsHandler.StatLevel(state.CharacterLevel))).Build();
         }

@@ -25,8 +25,9 @@ namespace Jondo.Unity.Server.Managers
     /// Swearing is Chantal Inea's, in Incarnam: «No puedes dirigirte al Mundo de los Doce sin jurar
     /// lealtad a una ciudad o a otra.». Becoming neutral again is Morry Gann's, in Amakna's militia:
     /// «entre los 500 y los 256 000 kamas, según tu implicación con la milicia» -- ten steps, each
-    /// double the last -- and never twice within «dos semanas» (AlignmentHandler). No grade is
-    /// earned on this server: there are no honour points to earn it with.
+    /// double the last -- and never twice within «dos semanas» (AlignmentHandler). Swearing, or
+    /// leaving, starts the honour again from nothing. The grade is earned in aggressions
+    /// (<see cref="Managers.Honour"/>, AlignmentWar).
     /// </para>
     /// <para>
     /// The alignment's level and rank are the quests' (<see cref="Progression"/>).
@@ -41,7 +42,8 @@ namespace Jondo.Unity.Server.Managers
     /// </para>
     /// <para>
     /// Kept in world.db, in a table of its own created at first use:
-    /// <c>CharacterAlignments (CharacterId, Side, Grade, ChangedMs, Pvp)</c>.
+    /// <c>CharacterAlignments (CharacterId, Side, Grade, ChangedMs, Pvp, Honour, Dishonour)</c>.
+    /// The grade is the honour's (<see cref="Managers.Honour"/>); its column keeps the last one.
     /// </para>
     /// </remarks>
     public static class Alignments
@@ -55,15 +57,18 @@ namespace Jondo.Unity.Server.Managers
         public const long FirstLeaveCost = 500;
         public const int LeaveSteps = 10;
 
-        public sealed record Alignment(int Side, int Grade, long ChangedMs, bool Pvp = false)
+        public sealed record Alignment(int Side, int Grade, long ChangedMs, bool Pvp = false, int Honour = 0, int Dishonour = 0)
         {
             public bool Sworn => Side == Bonta || Side == Brakmar;
 
             /// <summary>Whether his PvP is on: the sworn's only.</summary>
             public bool PvpOn => Sworn && Pvp;
 
-            /// <summary>The grade the wings show: none with PvP off, the first at least with it on.</summary>
-            public int ShownGrade => PvpOn ? Math.Max(1, Grade) : 0;
+            /// <summary>His honour's grade, 1 to 10, the sworn's only.</summary>
+            public int HonourGrade => Sworn ? Managers.Honour.GradeOf(Honour) : 0;
+
+            /// <summary>The grade the wings show: none with PvP off, his honour's with it on.</summary>
+            public int ShownGrade => PvpOn ? HonourGrade : 0;
 
             /// <summary>The honour block's aggression status: 1 with PvP on, else nothing.</summary>
             public int AggressionStatus => PvpOn ? PvpAggressable : 0;
@@ -119,6 +124,36 @@ namespace Jondo.Unity.Server.Managers
             return mine.PvpOn && theirs.Sworn && theirs.ShownGrade > 0 && mine.Side != theirs.Side
                    && Math.Min(attackerLevel, 200) + 50 >= Math.Min(targetLevel, 200);
         }
+
+        /// <summary>
+        /// Honour and dishonour won or lost, neither below nothing nor honour over its most; a
+        /// neutral one has none. The grade is the new honour's.
+        /// </summary>
+        public static Alignment AddHonour(long characterId, int honour, int dishonour = 0)
+        {
+            var alignment = Of(characterId);
+            if (!alignment.Sworn || (honour == 0 && dishonour == 0)) return alignment;
+            int kept = Math.Clamp(alignment.Honour + honour, 0, Managers.Honour.Most);
+            alignment = alignment with
+            {
+                Honour = kept,
+                Dishonour = Math.Max(0, alignment.Dishonour + dishonour),
+                Grade = Managers.Honour.GradeOf(kept),
+            };
+            _known[characterId] = alignment;
+            Store(characterId, alignment);
+            return alignment;
+        }
+
+        /// <summary>The map flag that allows aggressions there (the client's CapabilityAllowAggression).</summary>
+        public const long AllowAggressionFlag = 2;
+
+        /// <summary>
+        /// Whether a map allows an aggression: its flag, which 8,296 of the 15,360 maps carry --
+        /// none of Astrub, its fields or the cities' streets.
+        /// </summary>
+        public static bool MapAllowsAggression(long mapId)
+            => ((MapManager.GetMapInfo(mapId)?.Flags ?? 0) & AllowAggressionFlag) != 0;
 
         /// <summary>PvP switched on or off; a neutral one has none to switch.</summary>
         public static Alignment SetPvp(long characterId, bool on)
@@ -293,11 +328,12 @@ namespace Jondo.Unity.Server.Managers
                         Pvp         INTEGER NOT NULL DEFAULT 0);";
                 command.ExecuteNonQuery();
 
-                // A table made before PvP gets its column.
-                command.CommandText = "SELECT COUNT(*) FROM pragma_table_info('CharacterAlignments') WHERE name = 'Pvp';";
-                if (Convert.ToInt64(command.ExecuteScalar()) == 0)
+                // A table made before PvP, or before honour, gets its columns.
+                foreach (string column in new[] { "Pvp", "Honour", "Dishonour" })
                 {
-                    command.CommandText = "ALTER TABLE CharacterAlignments ADD COLUMN Pvp INTEGER NOT NULL DEFAULT 0;";
+                    command.CommandText = $"SELECT COUNT(*) FROM pragma_table_info('CharacterAlignments') WHERE name = '{column}';";
+                    if (Convert.ToInt64(command.ExecuteScalar()) != 0) continue;
+                    command.CommandText = $"ALTER TABLE CharacterAlignments ADD COLUMN {column} INTEGER NOT NULL DEFAULT 0;";
                     command.ExecuteNonQuery();
                 }
                 _tableReady = true;
@@ -312,11 +348,12 @@ namespace Jondo.Unity.Server.Managers
                 connection.Open();
                 EnsureTable(connection);
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Side, Grade, ChangedMs, Pvp FROM CharacterAlignments WHERE CharacterId = $id;";
+                command.CommandText = "SELECT Side, Grade, ChangedMs, Pvp, Honour, Dishonour FROM CharacterAlignments WHERE CharacterId = $id;";
                 command.Parameters.AddWithValue("$id", characterId);
                 using var reader = command.ExecuteReader();
                 return reader.Read()
-                    ? new Alignment(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt64(2), reader.GetInt64(3) != 0)
+                    ? new Alignment(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt64(2), reader.GetInt64(3) != 0,
+                                    reader.GetInt32(4), reader.GetInt32(5))
                     : Unsworn;
             }
             catch (Exception ex)
@@ -334,9 +371,12 @@ namespace Jondo.Unity.Server.Managers
                 connection.Open();
                 EnsureTable(connection);
                 var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO CharacterAlignments (CharacterId, Side, Grade, ChangedMs, Pvp) " +
-                                      "VALUES ($id, $side, $grade, $when, $pvp) ON CONFLICT(CharacterId) DO UPDATE SET " +
-                                      "Side = excluded.Side, Grade = excluded.Grade, ChangedMs = excluded.ChangedMs, Pvp = excluded.Pvp;";
+                command.CommandText = "INSERT INTO CharacterAlignments (CharacterId, Side, Grade, ChangedMs, Pvp, Honour, Dishonour) " +
+                                      "VALUES ($id, $side, $grade, $when, $pvp, $honour, $dishonour) ON CONFLICT(CharacterId) DO UPDATE SET " +
+                                      "Side = excluded.Side, Grade = excluded.Grade, ChangedMs = excluded.ChangedMs, Pvp = excluded.Pvp, " +
+                                      "Honour = excluded.Honour, Dishonour = excluded.Dishonour;";
+                command.Parameters.AddWithValue("$honour", alignment.Honour);
+                command.Parameters.AddWithValue("$dishonour", alignment.Dishonour);
                 command.Parameters.AddWithValue("$id", characterId);
                 command.Parameters.AddWithValue("$side", alignment.Side);
                 command.Parameters.AddWithValue("$grade", alignment.Grade);

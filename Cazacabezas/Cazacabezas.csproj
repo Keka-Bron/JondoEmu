@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <!-- Where the Dofus client is. It used to carry the absolute path of one specific machine,
+         so here it finds itself and can be passed from outside:
+
+           dotnet build Cazacabezas -p:DofusClientDir="D:\whatever\Dofus"
+
+         or with the DOFUS_CLIENT_DIR environment variable. If nothing is said the known
+         names next to the repository are tried; the first is this project's. -->
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And '$(DOFUS_CLIENT_DIR)' != ''">$(DOFUS_CLIENT_DIR)</DofusClientDir>
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.11')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.11'))</DofusClientDir>
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.10')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.10'))</DofusClientDir>
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\DofusClient-3.6.10.10')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\DofusClient-3.6.10.10'))</DofusClientDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference all assemblies in MelonLoader net6 folder for 3.6.10.10 -->
+    <Reference Include="$(DofusClientDir)\MelonLoader\net6\*.dll">
+      <Private>false</Private>
+    </Reference>
+    <!-- Reference all compiled Il2Cpp assemblies for 3.6.10.10 -->
+    <Reference Include="$(DofusClientDir)\MelonLoader\Il2CppAssemblies\*.dll">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- The mod is of no use in bin/: MelonLoader loads it from the client's Mods folder. It is
+       copied on its own when building, just as the server's .exe goes on its own to the root. It is skipped with
+       -p:SkipModDeploy=true, and if there is no client at hand nothing happens either. -->
+  <!-- And beside the project, where it is kept in the repository: the launcher installs that one
+       in every client's Mods (LauncherService.InstallMod), so whoever has a client with
+       MelonLoader gets the mod's changes with the emulator, not with a new client. -->
+  <Target Name="GuardarMod" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)" OverwriteReadOnlyFiles="true" />
+  </Target>
+
+  <Target Name="DesplegarMod" AfterTargets="Build"
+          Condition="'$(SkipModDeploy)' != 'true' And Exists('$(DofusClientDir)\Mods')">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DofusClientDir)\Mods"
+          OverwriteReadOnlyFiles="true" />
+    <Message Text="[Deploy] Cazacabezas.dll en $(DofusClientDir)\Mods." Importance="high" />
+  </Target>
+</Project>

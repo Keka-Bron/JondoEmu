@@ -141,6 +141,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             Alignments.Set(Me, side, Now);
+            HeadHunts.Forget(Me);
             await SlotLookHandler.RedrawAsync(stream);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hod, BuildRank(Alignments.Rank())));
@@ -164,6 +165,15 @@ namespace Jondo.Unity.Server.Handlers
             byte[]? hnu = ConnectionProtocol.ReadPayload(payload, "hnu");
             if (hnu == null || !Alignments.Of(Me).Sworn) return;
             bool on = ProtoMessage.Parse(hnu).Fields.Any(f => f.FieldNumber == 1 && f.WireType == 0 && f.VarIntValue != 0);
+            // A prey whose hunt is open cannot fold his wings: «No puedes ocultar tu alineamiento en
+            // una zona de agresión», and the sheet puts the switch back on.
+            if (!on && HeadHunts.HuntedNow(Me))
+            {
+                await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, HeadHunts.CannotHide)));
+                await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                return;
+            }
 
             Alignments.SetPvp(Me, on);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));

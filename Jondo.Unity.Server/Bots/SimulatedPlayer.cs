@@ -125,6 +125,7 @@ namespace Jondo.Unity.Server.Bots
         {
             string token = Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant();
             ClientLaunchRegistry.RegisterToken(_accountId, token);
+            _token = token;
 
             using var tcp = new TcpClient { NoDelay = true };
             await tcp.ConnectAsync(IPAddress.Loopback, Program.gamePort, stop);
@@ -199,12 +200,14 @@ namespace Jondo.Unity.Server.Bots
 
             // Born at a level drawn from the whole range, so that there is somebody for every
             // Koliseo bracket; the capital it brings is spent in the world, as a player does.
+            int level = DatabaseManager.GetCharacterById(_characterId)?.Level ?? 1;
             if (born)
             {
-                int level = _dice.Next(1, 201);
+                level = _dice.Next(1, 201);
                 DatabaseManager.SetLevelOffline(_characterId, level);
                 Console.WriteLine($"[Bots] {_name} is born at level {level}.");
             }
+            JoinTheWar(level);
 
             // A character still in a fight is not selected: the kvd's «go on» (kwb) put it back already.
             if (!_selected.Task.IsCompleted) await SendAsync(Op.Kvw, Pb.New().Var(1, _characterId).Build());
@@ -219,6 +222,7 @@ namespace Jondo.Unity.Server.Bots
             if (Session?.IsInWorld != true) return false;
 
             await SpendCapitalAsync();
+            await WingsAsync();
             return true;
         }
 

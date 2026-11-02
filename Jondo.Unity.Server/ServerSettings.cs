@@ -96,6 +96,18 @@ namespace Jondo.Unity.Server
         /// <summary>The most simulated players in the world at once; how many are in varies under it.</summary>
         public int SimulatedPlayersMax { get; set; } = 20;
 
+        /// <summary>
+        /// The Cazacabezas, the head hunters (<see cref="Managers.HeadHunts"/>): orders on the other
+        /// city's players, hunts while they are in the world, and chapeuvepés for their heads.
+        /// </summary>
+        public bool HeadHunters { get; set; }
+
+        /// <summary>How long a hunt lasts once the prey is in the world, in minutes.</summary>
+        public int HeadHuntWindowMinutes { get; set; } = 15;
+
+        /// <summary>The prey's respite between two hunts, in minutes.</summary>
+        public int HeadHuntRestMinutes { get; set; } = 30;
+
         /// <summary>The server window's language: es, en or fr.</summary>
         public string WindowLanguage { get; set; } = "es";
 

@@ -9694,6 +9694,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var gente = Publico(fight);
             PlanRewards(fight);
+            AlignmentWar.Plan(fight, azulGana);
             RecordLadder(fight);
             await ACadaUnoAsync(fight, sesion =>
             {
@@ -9718,7 +9719,11 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static async Task FightOverForTheWorldAsync(FightInstance fight, bool attackersWon)
         {
-            if (fight.Reglas == FightRules.Agresion) await ConquestHandler.AggressionEndedAsync(fight, attackersWon);
+            if (fight.Reglas == FightRules.Agresion)
+            {
+                await ConquestHandler.AggressionEndedAsync(fight, attackersWon);
+                await AlignmentWar.AnnounceAsync(fight, attackersWon);
+            }
             var defence = await AllianceFights.CloseAsync(fight);
             if (defence == null)
             {
@@ -9932,6 +9937,9 @@ namespace Jondo.Unity.Server.Handlers
                 if (f.EsInvocado || f.EsIlusion) continue;
                 results.Add(FinDe(f, !azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }
+
+            // An aggression between the cities: each one's honour, in the end screen's honour column.
+            foreach (var result in results) result.Pvp = AlignmentWar.ResultOf(fight, result.Fighter);
 
             // A tax collector is listed with its alliance, the f4 of its entry: without it the end
             // screen drew it among the enemies as «???», a monster it did not know.

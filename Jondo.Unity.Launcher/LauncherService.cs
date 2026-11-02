@@ -392,7 +392,7 @@ namespace Jondo.Unity.Launcher
 
                 string arguments = ClientArguments(area.Width, area.Height, instanceId, hash, language, packFlags);
 
-                // The client's mod, as the emulator ships it.
+                // The client's mods, as the emulator ships them.
                 InstallMod(clientPath);
 
                 var startInfo = new System.Diagnostics.ProcessStartInfo
@@ -417,6 +417,9 @@ namespace Jondo.Unity.Launcher
                 // server still checks token and role on every request.
                 if (Roles.AlMenos(accountRole, Roles.Administrador))
                     startInfo.Environment["JONDO_CONTROL_TOKEN"] = token ?? "";
+                // To every player, the same session for the Cazacabezas mod: what it asks is about
+                // the account's own character, and the server answers nothing else with it.
+                startInfo.Environment["JONDO_PLAYER_TOKEN"] = token ?? "";
 
                 System.Diagnostics.Process? client;
                 try
@@ -479,34 +482,42 @@ namespace Jondo.Unity.Launcher
             return packFlags.Length > 0 ? arguments + " " + packFlags : arguments;
         }
 
+        /// <summary>The mods the emulator ships, each in its own folder of the repository.</summary>
+        internal static readonly string[] ShippedMods = { "JondoFix", "Cazacabezas" };
+
         /// <summary>
-        /// The emulator's JondoFix into the client's Mods, when it differs from the one there.
+        /// The emulator's mods into the client's Mods, each when it differs from the one there.
         /// </summary>
         /// <remarks>
-        /// What the mod changes in the client -- the Koliseo window with the JondoBots' card, among
-        /// the rest -- comes with the emulator, not with a new client: whoever has a client with
-        /// MelonLoader gets it at the next launch. A client without MelonLoader is left alone. A
-        /// client already open holds the file; it is then updated at the next launch.
+        /// What the mods change in the client -- the Koliseo window with the JondoBots' card, the
+        /// head hunters' window, among the rest -- comes with the emulator, not with a new client:
+        /// whoever has a client with MelonLoader gets it at the next launch. A client without
+        /// MelonLoader is left alone. A client already open holds the file; it is then updated at
+        /// the next launch.
         /// </remarks>
         internal static void InstallMod(string clientPath)
         {
-            try
+            string clientDir = Path.GetDirectoryName(clientPath) ?? "";
+            if (!Directory.Exists(Path.Combine(clientDir, "MelonLoader"))) return;
+            string mods = Path.Combine(clientDir, "Mods");
+            foreach (string mod in ShippedMods)
             {
-                string shipped = Path.Combine(Paths.Root, "JondoFix", "JondoFix.dll");
-                string clientDir = Path.GetDirectoryName(clientPath) ?? "";
-                if (!File.Exists(shipped) || !Directory.Exists(Path.Combine(clientDir, "MelonLoader"))) return;
+                try
+                {
+                    string shipped = Path.Combine(Paths.Root, mod, mod + ".dll");
+                    if (!File.Exists(shipped)) continue;
 
-                string mods = Path.Combine(clientDir, "Mods");
-                string installed = Path.Combine(mods, "JondoFix.dll");
-                if (File.Exists(installed) && SameContent(installed, shipped)) return;
+                    string installed = Path.Combine(mods, mod + ".dll");
+                    if (File.Exists(installed) && SameContent(installed, shipped)) continue;
 
-                Directory.CreateDirectory(mods);
-                File.Copy(shipped, installed, overwrite: true);
-                Console.WriteLine($"[Launcher] JondoFix updated in {mods}.");
-            }
-            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
-            {
-                Console.WriteLine($"[Launcher] JondoFix could not be updated now (is a client open?): {ex.Message}");
+                    Directory.CreateDirectory(mods);
+                    File.Copy(shipped, installed, overwrite: true);
+                    Console.WriteLine($"[Launcher] {mod} updated in {mods}.");
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                {
+                    Console.WriteLine($"[Launcher] {mod} could not be updated now (is a client open?): {ex.Message}");
+                }
             }
         }
 

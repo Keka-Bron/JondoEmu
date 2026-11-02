@@ -31,8 +31,8 @@ namespace Jondo.Unity.Server.UI
 
         private readonly NumberStepper _raidMin, _matchmaking, _maxAp, _maxMp, _xp, _drop, _kamas, _randomLootChance;
         private readonly NumberStepper _weakenedHours, _conquestMinutes, _invulnerableHours, _protectionMinutes;
-        private readonly NumberStepper _botsMax;
-        private readonly ToggleSwitch _hardcore, _noEnergy, _randomLoot, _bots;
+        private readonly NumberStepper _botsMax, _huntMinutes, _restMinutes;
+        private readonly ToggleSwitch _hardcore, _noEnergy, _randomLoot, _bots, _hunters;
         private readonly LauncherField _welcome;
         private readonly RarityTable _rarities;
         private readonly SettingNote _lootLevels;
@@ -69,6 +69,7 @@ namespace Jondo.Unity.Server.UI
             public string Modes, Hardcore, HardcoreHint;
             public string Welcome, WelcomeHint, WelcomePlaceholder;
             public string Bots, BotsOn, BotsOnHint, BotsMax, BotsMaxHint;
+            public string HuntersOn, HuntersOnHint, HuntMinutes, HuntMinutesHint, RestMinutes, RestMinutesHint;
             public string Close, Cancel, Back, Save, SaveRestart, ConfirmRestart;
             public string Unsaved, Pending, RestartAsk, RestartAskEmpty, Counting;
         }
@@ -121,6 +122,10 @@ namespace Jondo.Unity.Server.UI
                              "contra monstruos, recolectan, van al koliseo y aceptan todos los desafíos.",
                 BotsMax = "Máximo a la vez",
                 BotsMaxHint = "Cuántos hay conectados varía por debajo de este número, como en un servidor de verdad.",
+                HuntersOn = "Cazacabezas",
+                HuntersOnHint = "Órdenes de caza contra la otra ciudad, pagadas en chapeuvepés. Con el mod Cazacabezas (F7).",
+                HuntMinutes = "Minutos de cada caza", HuntMinutesHint = null,
+                RestMinutes = "Minutos de respiro entre cazas", RestMinutesHint = null,
                 Close = "CERRAR", Cancel = "CANCELAR", Back = "VOLVER", Save = "GUARDAR",
                 SaveRestart = "GUARDAR Y REINICIAR", ConfirmRestart = "SÍ, REINICIAR",
                 Unsaved = "Hay cambios sin guardar.",
@@ -175,6 +180,10 @@ namespace Jondo.Unity.Server.UI
                              "monsters, gather, go to the Koliseo and accept every duel.",
                 BotsMax = "Most at once",
                 BotsMaxHint = "How many are connected varies below this number, as on a real server.",
+                HuntersOn = "Head hunters",
+                HuntersOnHint = "Hunt orders on the other city, paid in chapeuvepés. With the Cazacabezas mod (F7).",
+                HuntMinutes = "Minutes of a hunt", HuntMinutesHint = null,
+                RestMinutes = "Minutes of respite between hunts", RestMinutesHint = null,
                 Close = "CLOSE", Cancel = "CANCEL", Back = "BACK", Save = "SAVE",
                 SaveRestart = "SAVE AND RESTART", ConfirmRestart = "YES, RESTART",
                 Unsaved = "There are unsaved changes.",
@@ -229,6 +238,10 @@ namespace Jondo.Unity.Server.UI
                              "combattent des monstres, récoltent, vont au Kolizéum et acceptent tous les défis.",
                 BotsMax = "Maximum en même temps",
                 BotsMaxHint = "Le nombre de connectés varie sous ce nombre, comme sur un vrai serveur.",
+                HuntersOn = "Chasseurs de têtes",
+                HuntersOnHint = "Des ordres de traque contre l'autre cité, payés en pévétons. Avec le mod Cazacabezas (F7).",
+                HuntMinutes = "Minutes d'une traque", HuntMinutesHint = null,
+                RestMinutes = "Minutes de répit entre traques", RestMinutesHint = null,
                 Close = "FERMER", Cancel = "ANNULER", Back = "RETOUR", Save = "ENREGISTRER",
                 SaveRestart = "ENREGISTRER ET REDÉMARRER", ConfirmRestart = "OUI, REDÉMARRER",
                 Unsaved = "Des changements ne sont pas enregistrés.",
@@ -282,6 +295,9 @@ namespace Jondo.Unity.Server.UI
             _hardcore = Toggle(_saved.Hardcore);
             _bots = Toggle(_saved.SimulatedPlayers);
             _botsMax = Stepper(_saved.SimulatedPlayersMax, 1, Bots.SimulatedPlayers.Most, 5, 0, "");
+            _hunters = Toggle(_saved.HeadHunters);
+            _huntMinutes = Stepper(_saved.HeadHuntWindowMinutes, 1, 120, 5, 0, "min");
+            _restMinutes = Stepper(_saved.HeadHuntRestMinutes, 0, 600, 5, 0, "min");
             _welcome = new LauncherField
             {
                 Value = _saved.WelcomeMessage ?? "",
@@ -312,7 +328,11 @@ namespace Jondo.Unity.Server.UI
                             Row(_t.RandomLoot, _t.RandomLootHint, _randomLoot),
                             Row(_t.Chance, _t.ChanceHint, _randomLootChance),
                             _rarities, _lootLevels);
-            var modes = Card(_t.Modes, Row(_t.Hardcore, _t.HardcoreHint, _hardcore));
+            // The head hunters are a way of playing too: in the same card, which saves a header.
+            var modes = Card(_t.Modes, Row(_t.Hardcore, _t.HardcoreHint, _hardcore),
+                             Row(_t.HuntersOn, _t.HuntersOnHint, _hunters),
+                             Row(_t.HuntMinutes, _t.HuntMinutesHint, _huntMinutes),
+                             Row(_t.RestMinutes, _t.RestMinutesHint, _restMinutes));
             var welcome = Card(_t.Welcome, new SettingNote(_t.WelcomeHint), _welcome);
             var bots = Card(_t.Bots, Row(_t.BotsOn, _t.BotsOnHint, _bots), Row(_t.BotsMax, _t.BotsMaxHint, _botsMax));
             _cards = new[] { rates, loot, characters, modes, conquests, raids, bots, welcome };
@@ -326,6 +346,8 @@ namespace Jondo.Unity.Server.UI
             ShowLootState();
             _bots.CheckedChanged += (s, e) => _botsMax.Enabled = _bots.Checked;
             _botsMax.Enabled = _bots.Checked;
+            _hunters.CheckedChanged += (s, e) => ShowHuntersState();
+            ShowHuntersState();
 
             // The footer's buttons.
             _restart = Button(_t.SaveRestart, primary: true, E(250));
@@ -448,9 +470,21 @@ namespace Jondo.Unity.Server.UI
 
             int most = MostColumns(width);
             bool fits = false;
-            for (int count = 1; count <= most && !fits; count++) fits = Columns(width, count) <= bodyHeight;
-            // Short of room it scrolls, and the scroll bar takes its width from the columns.
-            if (!fits) Columns(width - SystemInformation.VerticalScrollBarWidth, MostColumns(width - SystemInformation.VerticalScrollBarWidth));
+            // Every hint under its setting when that fits; when not, the hints go into tooltips
+            // before a scroll bar comes in, so that maximized every setting is in sight.
+            foreach (bool compact in new[] { false, true })
+            {
+                foreach (var card in _cards) card.Compact = compact;
+                for (int count = 1; count <= most && !fits; count++) fits = Columns(width, count) <= bodyHeight;
+                if (fits) break;
+            }
+            // Short of room even so it scrolls, with the hints back, and the scroll bar takes its
+            // width from the columns.
+            if (!fits)
+            {
+                foreach (var card in _cards) card.Compact = false;
+                Columns(width - SystemInformation.VerticalScrollBarWidth, MostColumns(width - SystemInformation.VerticalScrollBarWidth));
+            }
 
             int y = ClientSize.Height - FooterHeight + (FooterHeight - _restart.Height) / 2 + Math.Max(1, E(1));
             _restart.Location = new Point(width - Pad - _restart.Width, y);
@@ -548,6 +582,9 @@ namespace Jondo.Unity.Server.UI
             edited.Hardcore = _hardcore.Checked;
             edited.SimulatedPlayers = _bots.Checked;
             edited.SimulatedPlayersMax = (int)_botsMax.Value;
+            edited.HeadHunters = _hunters.Checked;
+            edited.HeadHuntWindowMinutes = (int)_huntMinutes.Value;
+            edited.HeadHuntRestMinutes = (int)_restMinutes.Value;
             edited.WelcomeMessage = _welcome.Value.Trim();
             return edited;
         }
@@ -576,6 +613,13 @@ namespace Jondo.Unity.Server.UI
             _status = text;
             _statusTone = tone;
             Invalidate(new Rectangle(0, ClientSize.Height - FooterHeight, ClientSize.Width, FooterHeight));
+        }
+
+        /// <summary>The hunts' clock only means something with the head hunters on.</summary>
+        private void ShowHuntersState()
+        {
+            _huntMinutes.Enabled = _hunters.Checked;
+            _restMinutes.Enabled = _hunters.Checked;
         }
 
         /// <summary>The loot's chance and table only mean something with the loot on.</summary>

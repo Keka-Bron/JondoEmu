@@ -36,6 +36,28 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
+        public void Three_bots_of_five_swear_to_a_city_and_both_cities_get_some()
+        {
+            var sides = Enumerable.Range(0, 20).Select(SimulatedPlayer.SideOf).ToList();
+            Assert.Equal(12, sides.Count(s => s != Alignments.Neutral));
+            Assert.Equal(6, sides.Count(s => s == Alignments.Bonta));
+            Assert.Equal(6, sides.Count(s => s == Alignments.Brakmar));
+        }
+
+        [Fact]
+        public void The_war_ground_is_the_next_area_where_aggressions_are_allowed()
+        {
+            // Astrub allows none: the bots at war go next door, where most maps do.
+            Maps();
+            int home = SimulatedPlayer.HomeArea.Value;
+            int war = SimulatedPlayer.WarGround.Value;
+            Assert.NotEqual(home, war);
+            var maps = MapManager.Maps.Values.Where(m => Interactives.AreaOfSubArea(m.SubAreaId) == war).ToList();
+            Assert.True(maps.Count(m => Alignments.MapAllowsAggression(m.MapId)) * 2 > maps.Count);
+            Assert.False(Alignments.MapAllowsAggression(CharacterCreationHandler.StartingMap));
+        }
+
+        [Fact]
         public void A_path_travels_as_its_corners_each_facing_its_way()
         {
             // Five steps one way and three another: the start, the turn and the end, as the client

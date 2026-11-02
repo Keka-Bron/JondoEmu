@@ -153,9 +153,20 @@ namespace Jondo.Unity.World.Content
         /// <summary>
         /// Where a <see cref="KothRole"/> reply leads when the role cannot be changed yet -- «Lo
         /// siento, aún no estás listo para cambiar de rol. Vuelve a verme dentro de unos minutos.»
-        /// --, or zero to end the conversation.
+        /// --, or where a <see cref="Chapeuvepes"/> trade leads when they are not enough -- «No
+        /// tienes chapeuvepés suficientes para que podamos hacer un intercambio.» --, or zero to
+        /// end the conversation.
         /// </summary>
         public long RefusedNext { get; init; }
+
+        /// <summary>
+        /// The chapeuvepés this reply costs (Managers.HeadHunts), or zero: Ema and Tomás Sacre's
+        /// trades, «Tomar una gema que contiene el alma del Escarajefe Dorado a cambio de 8
+        /// chapeuvepés.». It hands over <see cref="Trades"/>, <see cref="TradeCount"/> of them.
+        /// </summary>
+        public int Chapeuvepes { get; init; }
+        public int Trades { get; init; }
+        public int TradeCount { get; init; } = 1;
 
         public bool Ends => Next == 0;
 
@@ -440,6 +451,9 @@ namespace Jondo.Unity.World.Content
                                          && after.ValueKind == JsonValueKind.True,
                             KothRole = (int)Number(choice, "kothRole"),
                             RefusedNext = Number(choice, "refused"),
+                            Chapeuvepes = (int)Number(choice, "chapeuvepes"),
+                            Trades = (int)Number(choice, "trade"),
+                            TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
                             GivesMutation = (int)Number(choice, "mutation"),
                             EndsMutation = choice.TryGetProperty("endsMutation", out var ends)
                                            && ends.ValueKind == JsonValueKind.True,
@@ -550,6 +564,12 @@ namespace Jondo.Unity.World.Content
                             if (choice.ReturnsHome) writer.WriteBoolean("teleportBack", true);
                             if (choice.KothRole != 0) writer.WriteNumber("kothRole", choice.KothRole);
                             if (choice.RefusedNext != 0) writer.WriteNumber("refused", choice.RefusedNext);
+                            if (choice.Chapeuvepes != 0) writer.WriteNumber("chapeuvepes", choice.Chapeuvepes);
+                            if (choice.Trades != 0)
+                            {
+                                writer.WriteNumber("trade", choice.Trades);
+                                if (choice.TradeCount != 1) writer.WriteNumber("tradeCount", choice.TradeCount);
+                            }
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
                             if (choice.EndsMutation) writer.WriteBoolean("endsMutation", true);
                             writer.WriteEndObject();

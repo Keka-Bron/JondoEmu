@@ -121,9 +121,9 @@ jobs:
       # so that only what is versioned goes in and nothing the tests wrote (bases/, logs/):
       #
       #   Full      the three .exe and everything the server reads next to it: datos/ (world.zip
-      #             among it), content/, launcher_assets/, JondoFix.dll and the root marker.
+      #             among it), content/, launcher_assets/, the two mods (JondoFix, Cazacabezas) and the root marker.
       #   Launcher  only what a player needs to open the game against a server elsewhere: the
-      #             launcher, its artwork, the JondoFix.dll it copies into the client, and the
+      #             launcher, its artwork, the two mods it copies into the client, and the
       #             vendor names the mod reads from datos/ inside the client.
       #
       # The folder is called JondoEmu because that is one of the names JondoFix looks for beside
@@ -147,11 +147,11 @@ jobs:
 
           New-ReleaseZip "Jondo-Full-$tag-win-x64" `
             -exes 'Jondo Emulator Launcher.exe', 'Jondo Server.exe', 'Jondo Studio.exe' `
-            -data '.jondo-root', 'datos', 'content', 'launcher_assets', 'JondoFix/JondoFix.dll'
+            -data '.jondo-root', 'datos', 'content', 'launcher_assets', 'JondoFix/JondoFix.dll', 'Cazacabezas/Cazacabezas.dll'
 
           New-ReleaseZip "Jondo-Launcher-$tag-win-x64" `
             -exes 'Jondo Emulator Launcher.exe' `
-            -data '.jondo-root', 'launcher_assets', 'JondoFix/JondoFix.dll', 'datos/vendedores_jondo.json'
+            -data '.jondo-root', 'launcher_assets', 'JondoFix/JondoFix.dll', 'Cazacabezas/Cazacabezas.dll', 'datos/vendedores_jondo.json'
 
           Get-ChildItem release | Select-Object Name,Length
 

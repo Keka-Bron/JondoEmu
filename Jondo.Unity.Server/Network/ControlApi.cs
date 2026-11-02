@@ -111,6 +111,11 @@ namespace Jondo.Unity.Server.Network
                     case Prefijo + "lanzamiento": return ConSesion(cuerpo, cuenta => Lanzamiento(cuerpo, cuenta, ip));
                     case Prefijo + "fin-de-lanzamiento":
                         return ConSesion(cuerpo, cuenta => FinDeLanzamiento(cuenta));
+                    // The Cazacabezas mod's window: his own hunter's record, board and order.
+                    case Prefijo + "headhunts/status": return ConSesion(cuerpo, HeadHuntStatus);
+                    case Prefijo + "headhunts/board": return ConSesion(cuerpo, HeadHuntBoard);
+                    case Prefijo + "headhunts/take": return ConSesion(cuerpo, cuenta => HeadHuntTake(cuerpo, cuenta));
+                    case Prefijo + "headhunts/abandon": return ConSesion(cuerpo, HeadHuntAbandon);
 
                     // ─── Administration ─────────────────────────────────────────────────────
                     // They command the server, not an account. Role 4 and it is checked here,

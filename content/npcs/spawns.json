@@ -710,6 +710,20 @@
       "cell": 372,
       "orientation": 3,
       "why": "Fée Valentine, Bonta's jailer of the alignment wanted (DPLN, «On recherche Sam Sagaz»: «ou à Fée Valentine (si vous êtes Bontarien)»). INFERRED: the delivery objectives name no map, so she stands in the militia's wanted room [-32,-57]. INFERRED: the cell, the walkable one nearest the room's middle that no interactive or NPC takes (372), facing 3, as the bankers."
+    },
+    {
+      "map": 217317376,
+      "npc": 6402,
+      "cell": 301,
+      "orientation": 3,
+      "why": "Tomás Sacre, who trades the head hunters' chapeuvepés (Managers.HeadHunts). In 1.29 the Bontarians' hunts were his, at the militia. INFERRED: the militia's first room [-32,-57], on the walkable cell nearest the room's middle, facing 3."
+    },
+    {
+      "map": 216530944,
+      "npc": 6379,
+      "cell": 302,
+      "orientation": 3,
+      "why": "Ema Sacre, who trades the head hunters' chapeuvepés (Managers.HeadHunts). In 1.29 the Brakmarians' hunts were hers, at the militia, with Oto Mustam on 371 of this same room. INFERRED: the walkable cell nearest the room's middle, facing 3."
     }
   ]
 }

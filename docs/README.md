@@ -141,6 +141,11 @@ Why it is grouped by message shape rather than by opcode, the measured field-num
 keeps a byte blob from posing as a structure, and the `.packets` command.
 *Go there* before hunting for a missing feature: the list says where to look.
 
+**`cities-war.md`** — Bonta against Brakmar, and the head hunters.
+Who may attack whom and where, how honour, grades and dishonour are settled, the hunt orders and
+their chapeuvepés, the Cazacabezas mod's routes, and how the JondoBots join the war.
+*Go there* when tuning the honour numbers, or when an aggression pays what it should not.
+
 **`jondo-coin.md`** — The server's own currency.
 Which Ankama item it reuses and why, how much each monster drops, how the client is made to call it
 "Jondo Coin", and how to point an NPC shop at it so it charges coins instead of kamas.

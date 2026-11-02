@@ -6,8 +6,9 @@ using Xunit;
 namespace Jondo.Unity.Tests.Launcher
 {
     /// <summary>
-    /// The client's mod comes with the emulator: the launcher puts the JondoFix it ships into
-    /// the client's Mods on its own, when it differs, and leaves a client without MelonLoader alone.
+    /// The client's mods come with the emulator: the launcher puts the JondoFix and the Cazacabezas
+    /// it ships into the client's Mods on its own, when they differ, and leaves a client without
+    /// MelonLoader alone.
     /// </summary>
     public class ModInstallTests : IDisposable
     {
@@ -33,6 +34,18 @@ namespace Jondo.Unity.Tests.Launcher
             LauncherService.InstallMod(Path.Combine(_client, "Dofus.exe"));
 
             Assert.True(LauncherService.SameContent(installed, Shipped));
+        }
+
+        [Fact]
+        public void The_head_hunters_mod_goes_in_beside_it()
+        {
+            string shipped = Path.Combine(Paths.Root, "Cazacabezas", "Cazacabezas.dll");
+            if (!File.Exists(shipped)) return;
+            Directory.CreateDirectory(Path.Combine(_client, "MelonLoader"));
+
+            LauncherService.InstallMod(Path.Combine(_client, "Dofus.exe"));
+
+            Assert.True(LauncherService.SameContent(Path.Combine(_client, "Mods", "Cazacabezas.dll"), shipped));
         }
 
         [Fact]

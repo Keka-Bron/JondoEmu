@@ -11,7 +11,8 @@ namespace Jondo.Unity.Tests.Launcher
 {
     /// <summary>
     /// The server's Settings window laid out at a size: opened, it is two columns that scroll on a
-    /// short screen; maximized, every card is in sight at once.
+    /// short screen; maximized, every card is in sight at once -- on a small screen with the hints in
+    /// tooltips.
     /// </summary>
     public class ServerSettingsWindowTests
     {
@@ -60,7 +61,24 @@ namespace Jondo.Unity.Tests.Launcher
             {
                 Assert.Single(cards.Select(c => c.Left).Distinct());
                 Assert.True(cards.Max(c => c.Bottom) > body.ClientSize.Height);
+                // Scrolling, the hints stay under their settings.
+                Assert.DoesNotContain(Rows(cards), r => r.Compact);
             });
         }
+
+        [Fact]
+        public void On_a_big_screen_the_hints_stay_under_their_settings()
+        {
+            // 1920 x 1080 at 100 % maximized: room for every card with its hints; the tooltips are
+            // only for a small screen.
+            At(new Size(1904, 1001), (body, cards) =>
+            {
+                Assert.True(cards.Max(c => c.Bottom) <= body.ClientSize.Height);
+                Assert.DoesNotContain(Rows(cards), r => r.Compact);
+            });
+        }
+
+        private static SettingRow[] Rows(SettingsCard[] cards)
+            => cards.SelectMany(c => c.Controls.OfType<SettingRow>()).ToArray();
     }
 }

@@ -26,7 +26,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 - 📚 &nbsp;**Content** &nbsp;— &nbsp;[NPCs and monsters](#-npcs-and-monsters) · [Quests](#-quests) · [Achievements](#-achievements) · [Almanax](#-almanax) · [Dungeons](#-dungeons) · [Infinite Dreams](#-infinite-dreams) · [Jondo Coin](#-jondo-coin)
 
-- ⚔️ &nbsp;**Combat** &nbsp;— &nbsp;[One engine, four rulebooks](#%EF%B8%8F-one-engine-four-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#%EF%B8%8F-koliseo) · [Spell effect engine](#-spell-effect-engine) · [Spell check-list](#-spell-check-list) · [Combat challenges](#-combat-challenges)
+- ⚔️ &nbsp;**Combat** &nbsp;— &nbsp;[One engine, four rulebooks](#%EF%B8%8F-one-engine-four-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#%EF%B8%8F-koliseo) · [Cities' war](#%EF%B8%8F-cities-war) · [Head hunters](#-head-hunters) · [Spell effect engine](#-spell-effect-engine) · [Spell check-list](#-spell-check-list) · [Combat challenges](#-combat-challenges)
 
 - 🔎 &nbsp;**Tools** &nbsp;— &nbsp;[Admin window (F10)](#-admin-window-f10) · [Jondo Studio](#%EF%B8%8F-jondo-studio) · [Surviving the next patch](#-surviving-the-next-patch)
 
@@ -71,13 +71,13 @@ The official client talks to Ankama's servers and checks their SSL certificates.
 
 1. Get **MelonLoader 0.7.x** from [its releases page](https://github.com/LavaGang/MelonLoader/releases). 0.7.x is published as *Open-Beta*, so it shows up as a **pre-release** and the page's "Latest" tag points at 0.6.x. **0.6.x does not work with this client** — tick *show pre-releases* and take 0.7.x. This repository is tested against **0.7.3**.
 2. Run the installer and point it at your **`Dofus.exe`**. MelonLoader detects the rest (`Game Type: Il2cpp`, `Game Arch: x64`, `Runtime Type: net6`, Unity `6000.3.16f1`).
-3. Nothing to copy: every time the **launcher** starts the client it puts this repository's **`JondoFix/JondoFix.dll`** into the client's **`Mods/`** folder if the one there differs. Only if you start the client some other way, copy that file into `Mods/` yourself (next to `Dofus.exe`; create the folder if it is not there).
+3. Nothing to copy: every time the **launcher** starts the client it puts this repository's **`JondoFix/JondoFix.dll`** and **`Cazacabezas/Cazacabezas.dll`** into the client's **`Mods/`** folder if the ones there differ. Only if you start the client some other way, copy those files into `Mods/` yourself (next to `Dofus.exe`; create the folder if it is not there).
 
 Afterwards:
 * The installer drops a **`version.dll`** next to `Dofus.exe`, which loads MelonLoader. Renaming it to `version.dll.disabled` turns the whole thing off so you can play the official game; renaming it back turns it on again.
 * MelonLoader writes a log per run under **`MelonLoader/Logs/`**. If the client starts but never reaches the emulator, look there first.
 
-What JondoFix does: sends the client's sockets, Named Pipes and DNS queries to `localhost` (ports `8888`, `5555`, `15881`, `6337`), accepts the local self-signed certificate, and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window and the [admin window (F10)](#-admin-window-f10).
+What JondoFix does: sends the client's sockets, Named Pipes and DNS queries to `localhost` (ports `8888`, `5555`, `15881`, `6337`), accepts the local self-signed certificate, and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window and the [admin window (F10)](#-admin-window-f10). The second mod, **Cazacabezas**, is the [head hunters' window](#-head-hunters).
 
 ### Step 4 — Run it
 
@@ -114,6 +114,7 @@ bases/                        writable databases and backups
 docs/                         technical documentation
 launcher_assets/              launcher artwork and music
 JondoFix/                     the MelonLoader mod, source and compiled dll
+Cazacabezas/                  the head hunters' mod, source and compiled dll
 Jondo.Unity.*/                source code
 ```
 
@@ -153,7 +154,8 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ A **Settings** window (the *SETTINGS* button) for what the game itself does not decide, stored in
   `config\server_settings.json`. *SAVE AND RESTART* warns every player, counts down a minute and
   restarts the server with the new values. Every setting at its default leaves the game as it is.
-  Maximized, it spreads its cards over the whole screen.
+  Maximized, it spreads its cards over the whole screen; on a small screen the hints move into tooltips
+  so that every setting is still in sight.
 
   | Setting | What it does |
   |:---|:---|
@@ -164,7 +166,8 @@ Built with **Avalonia**, the same toolkit as the Studio.
   | Dying costs no energy | A lost fight keeps the energy |
   | Random loot | See below |
   | Welcome message | A line in the chat on coming into the world |
-  | Simulate players | JondoBot-XXX bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel; how many are in varies under the maximum chosen |
+  | Simulate players | JondoBot-XXX bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel; how many are in varies under the maximum chosen. Three of every five go to the [cities' war](#%EF%B8%8F-cities-war) |
+  | Head hunters | The [Cazacabezas](#-head-hunters): hunt orders on players of the other city, with how long a hunt stays open and how long the prey rests between two |
 
   **Random loot.** Besides its own table, each monster beaten has a chance (10 % by default, raised
   by challenges and the drop bonus) of dropping two to five items around its level: ordinary
@@ -476,7 +479,7 @@ An alliance is made of characters, not guilds.
 - ✅ Alignment level and order: each of your city's hundred alignment quests raises your level, and the
   orders' apprenticeships give their ranks, from Néophyte to Héros Légendaire; leaving the city loses them
 - ✅ PvP switch in the alignment tab: on, your wings show to everybody, and you may attack the other
-  city's winged players up to fifty levels above you
+  city's winged players up to fifty levels above you — see [Cities' war](#%EF%B8%8F-cities-war)
 - ✅ **21,748 item templates** — spawning, equipping, bags, destruction, persistence
 - ✅ **929 item sets** with their bonuses
 - ✅ Boxes that open with a double click, by their own drop tables
@@ -653,7 +656,7 @@ Full workings in **`docs/quests.md`**.
   tallies and the guild hall's achievements
 - ✅ Players nearby read in their chat the achievements one unlocks
 - ✅ Incarnam's maps, the Infinite Dreams' fragments, monsters and guardians, and the dream trials
-- 🟡 Alignment achievements: the level and the order are earned, but no grade nor honour
+- 🟡 Alignment achievements: the level and the order are earned
 
 Full workings in **`docs/achievements.md`**.
 
@@ -810,6 +813,43 @@ Ranked PvP through a queue. Open the window, pick a format, get matched, fight, 
 - 🟡 The rating curve and the season length are this server's own
 - ✅ The *match found* popup with accept and refuse, and the sanction for letting it run out
 - ✅ The ranking lists, per mode, class and level band, in the ladders window
+
+### 🛡️ Cities' war
+
+Bonta against Brakmar, wherever the map allows it.
+
+- ✅ **Aggressions**: with your wings out, *Attack* a winged player of the other city on any map that
+  allows it — not in Astrub, its fields or the cities' streets
+- ✅ **Honour and ten grades**, up to 20,000 honour; the alignment tab shows your grade and its bar
+- ✅ Winning pays honour by how even the fight was: beating someone stronger, or more of them, is
+  worth more, up to 300; the losers lose six tenths of it
+- ✅ Beating the same player again within the hour pays nothing
+- ✅ **Dishonour**: attackers who beat someone under half their level get dishonour instead of honour;
+  each even win washes a point of it away, and while you have any you cannot hunt heads
+- ✅ The results screen shows the honour won or lost on the grade's bar
+- ✅ JondoBots go to war: three of every five swear to a city, and from level 20 they wear their wings
+  on Amakna's edge beside Astrub, look for the enemy and attack someone their size
+
+### 🪓 Head hunters
+
+The *Cazacabezas* mod: hunt a player of the other city for a bounty. **F7**, or the *HEAD HUNTERS*
+button beside the honour bar in the alignment tab, opens its window.
+
+- ✅ **Board**: the enemies within reach — winged, level 30 or more, from 20 levels below you to 50
+  above — online first, each with its bounty and its hunters (three at most)
+- ✅ **Hunt order**: from level 50, sworn, wings out and no dishonour; one at a time, for three days;
+  giving it up costs ten minutes
+- ✅ The hunt opens when both of you are in the world: 15 minutes, then the prey rests 30 before it
+  can open again (both in the server's settings)
+- ✅ While it is open, the hunter is told where the prey was seen every 45 seconds, with a map link,
+  and a strip at the top of the screen counts down; the prey is warned and cannot fold their wings
+- ✅ Beat your prey in an aggression: 3 to 13 **chapeuvepés**, by its grade, its kill streak and its
+  level, and 50 honour
+- ✅ The prey who beats their hunter gets a chapeuvepé and 50 honour, and the hunter waits an hour
+- ✅ Chapeuvepés buy scrolls, Alicha and gems from Tomás Sacre in Bonta's militia and Ema Sacre in
+  Brakmar's
+- ✅ *My hunt*: grade, honour, dishonour, chapeuvepés, kills, survivals and streak
+- ✅ JondoBots at war take orders too, and come after their prey
 
 ### ✨ Spell effect engine
 
@@ -1013,6 +1053,7 @@ Shared:
 The protocol toolchain, which the emulator does not depend on:
 * **`Jondo.Unity.Reversing`**, **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder`, **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`
 * **`JondoFix`** — the MelonLoader client mod, source plus the compiled dll
+* **`Cazacabezas`** — the head hunters' client mod, source plus the compiled dll
 
 Documentation index in `docs/README.md`.
 

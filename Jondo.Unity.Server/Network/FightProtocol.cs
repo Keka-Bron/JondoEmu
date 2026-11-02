@@ -2051,7 +2051,24 @@ namespace Jondo.Unity.Server.Network
             /// fighter's oneof (lmk: f2 a person, f4 a tax collector, f5 a monster's number).
             /// </summary>
             public byte[] TaxCollectorAlliance { get; set; }
+
+            /// <summary>His honour after an aggression between the cities, or null for any other fight.</summary>
+            public HonourResult Pvp { get; set; }
         }
+
+        /// <summary>
+        /// The end screen's honour column: the grade, its bar's floor and ceiling, the honour now and
+        /// what the fight moved it by.
+        /// </summary>
+        /// <remarks>
+        /// The person's additional data (lmg f1, lme) is a oneof of two: f2 the experience block
+        /// (llz), measured, and f1 lmc -- a block of its own and five numbers, the old game's
+        /// FightResultPvpData in its order: grade, minHonorForGrade, maxHonorForGrade, honor,
+        /// honorDelta. The client reads it for the fights it calls honour fights, the aggression's
+        /// type 1 among them (FightResultCharacterTab.m_isHonorFight). No aggression is captured:
+        /// the order is the old game's.
+        /// </remarks>
+        public sealed record HonourResult(int Grade, int Floor, int Ceiling, int Honour, int Delta);
 
         /// <summary>
         /// How each one ended (jyg), which is what fills the end-of-fight screen.
@@ -2123,9 +2140,17 @@ namespace Jondo.Unity.Server.Network
                         .Var(8, 1)
                         .Var(9, 1);
 
-                    quien.Msg(2, Pb.New()
-                        .Msg(1, Pb.New().Msg(2, experiencia))
-                        .Var(2, result.Level));
+                    var persona = Pb.New().Msg(1, Pb.New().Msg(2, experiencia));
+                    if (result.Pvp is { } pvp)
+                    {
+                        persona.Msg(1, Pb.New().Msg(1, Pb.New()
+                            .Var(2, pvp.Grade)
+                            .VarIfNotZero(3, pvp.Floor)
+                            .Var(4, pvp.Ceiling)
+                            .VarIfNotZero(5, pvp.Honour)
+                            .VarIfNotZero(6, pvp.Delta)));
+                    }
+                    quien.Msg(2, persona.Var(2, result.Level));
                 }
                 // This f3 ALWAYS goes, win or lose.
                 //
