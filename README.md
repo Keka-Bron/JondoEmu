@@ -40,7 +40,7 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 **Linux source users:** all four desktop tools have a native Linux workflow. See
 [Linux desktop setup](docs/linux-desktop.md) for building, configuring `Dofus.x64`
-without a mod loader, and desktop verification. The download steps below describe Windows releases.
+without a mod loader, and desktop verification. Linux players can also take the Linux zip below.
 
 **Nothing has to be compiled.** The launcher ships as a single ready-to-run executable with every dependency inside it, and the world database ships compressed and extracts itself on first run.
 
@@ -48,6 +48,7 @@ without a mod loader, and desktop verification. The download steps below describ
 
 * **`Jondo-Full-vX.Y.Z-win-x64.zip`**: the whole emulator, with the launcher, the server, Jondo Studio and the data they read. Take this one to run a server.
 * **`Jondo-Launcher-vX.Y.Z-win-x64.zip`**: only the launcher, for a player whose server runs on another machine. Point the launcher at it with a `servidor=<address>` line in `%APPDATA%\Jondo\lanzador.cfg`.
+* **`Jondo-Full-vX.Y.Z-linux-x64.zip`**: the same as the Windows Full zip, built for Linux, without the two mods (the native Linux client has none). It needs the .NET 10 runtime and the native `Dofus.x64`; see its `README-linux.md`.
 
 Either one unpacks as a **`JondoEmu`** folder. Keep that name and put it beside the client's folder from Step 2: that is where JondoFix looks for it.
 

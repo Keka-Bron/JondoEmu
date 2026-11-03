@@ -61,14 +61,14 @@ dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj \
 The executable is at
 `host-artifacts/publish/Jondo.Unity.Server/release_linux-x64/Jondo Server`.
 Place it in the emulator root next to `.jondo-root`, `datos/` and `content/`, or use
-the standalone Linux server archive from a release. A Windows publish uses `-r win-x64`.
+the Linux zip from a release. A Windows publish uses `-r win-x64`.
 Publishing runs the general, server/desktop and connection-protocol tests on both Linux
 and Windows. `-p:SkipRootDeploy=true` prevents
 a Windows publish from copying the executable to the checkout root.
 
-The release workflow supplies a server-only `Jondo-Server-<tag>-linux-x64.tar.gz` with
-the server executable and its data. It requires the .NET runtime. The Windows release
-continues to include the shared server desktop.
+Each release carries `Jondo-Full-<tag>-linux-x64.zip`: the server, the launcher and Studio
+built for Linux, with the data they read. It requires the .NET runtime. The Windows zip
+carries the same three for Windows.
 
 ## Settings and restart
 

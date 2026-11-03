@@ -1,6 +1,7 @@
 name: Release
 
-# Builds the Windows applications and native Linux server, runs tests and creates a draft release.
+# Builds the Windows and Linux applications, runs the tests on both and creates a draft release
+# with a zip for each.
 # The .exe are not versioned in git any more: this is where they come from.
 
 on:
@@ -170,10 +171,14 @@ jobs:
           artifacts: release/*.zip,TestResults/tests.trx
           artifactErrorsFailBuild: true
 
-  linux-server:
+  # The Linux zip: the same folder as the Windows Full zip, with the three tools built for
+  # linux-x64 and without the two mods (the native Linux client has no mod loader). The server's
+  # publish runs the whole test suite first, here on Linux. zip keeps the executables' Unix
+  # permissions, so they run as unpacked.
+  linux:
     needs: release
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
         with:
@@ -183,23 +188,32 @@ jobs:
           dotnet-version: 10.0.x
       - name: Unpack world.db
         run: unzip -o datos/world.zip -d bases
-      - name: Publish and test Linux server
-        run: >-
-          dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj
-          --configuration Release -r linux-x64 --artifacts-path host-artifacts
-          -p:Version=${{ needs.release.outputs.version }} -p:SkipRootDeploy=true --nologo
-      - name: Package standalone server
+      - name: Publish and test the Linux tools
+        run: |
+          dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj --configuration Release -r linux-x64 \
+            --artifacts-path host-artifacts -p:Version=${{ needs.release.outputs.version }} -p:SkipRootDeploy=true --nologo
+          for project in Jondo.Unity.Launcher Jondo.Unity.Studio; do
+            dotnet publish "$project/$project.csproj" --configuration Release -r linux-x64 \
+              --artifacts-path host-artifacts -p:Version=${{ needs.release.outputs.version }} \
+              -p:SkipTests=true -p:SkipRootDeploy=true --nologo
+          done
+      - name: Package
         env:
           TAG: ${{ needs.release.outputs.tag }}
         run: |
           stage="host-artifacts/stage/JondoEmu"
           mkdir -p "$stage" host-artifacts/release
-          git archive HEAD -- .jondo-root datos content | tar -xf - -C "$stage"
-          cp 'host-artifacts/publish/Jondo.Unity.Server/release_linux-x64/Jondo Server' "$stage/"
-          cp docs/server-desktop.md "$stage/README-server.md"
-          tar -czf "host-artifacts/release/Jondo-Server-$TAG-linux-x64.tar.gz" -C host-artifacts/stage JondoEmu
-      - name: Attach Linux server to draft release
+          git archive HEAD -- .jondo-root datos content launcher_assets | tar -xf - -C "$stage"
+          cp 'host-artifacts/publish/Jondo.Unity.Server/release_linux-x64/Jondo Server' \
+             'host-artifacts/publish/Jondo.Unity.Launcher/release_linux-x64/Jondo Emulator Launcher' \
+             'host-artifacts/publish/Jondo.Unity.Studio/release_linux-x64/Jondo Studio' "$stage/"
+          chmod +x "$stage/Jondo Server" "$stage/Jondo Emulator Launcher" "$stage/Jondo Studio"
+          cp docs/linux-desktop.md "$stage/README-linux.md"
+          command -v zip >/dev/null || sudo apt-get install -y zip
+          (cd host-artifacts/stage && zip -qr "../release/Jondo-Full-$TAG-linux-x64.zip" JondoEmu)
+          ls -l host-artifacts/release
+      - name: Attach the Linux zip to the draft release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.release.outputs.tag }}
-        run: gh release upload "$TAG" "host-artifacts/release/Jondo-Server-$TAG-linux-x64.tar.gz"
+        run: gh release upload "$TAG" "host-artifacts/release/Jondo-Full-$TAG-linux-x64.zip"
