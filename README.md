@@ -840,7 +840,7 @@ Bonta against Brakmar, wherever the map allows it.
   each even win washes a point of it away, and while you have any you cannot hunt heads
 - ✅ The results screen shows the honour won or lost on the grade's bar
 - ✅ JondoBots go to war: three of every five swear to a city, and from level 20 they wear their wings
-  on Amakna's edge beside Astrub, look for the enemy and attack someone their size
+  on the Cania Plains beside Astrub, look for the enemy and attack someone their size
 
 ### 🪓 Head hunters
 

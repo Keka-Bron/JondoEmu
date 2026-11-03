@@ -14,8 +14,8 @@ namespace Jondo.Unity.Server.Bots
     /// <summary>
     /// The bots in the cities' war. Three of every five swear to a city -- Bonta the even numbers,
     /// Brakmar the odd --; from level 20 they wear their wings and live on the war ground, the
-    /// area next to the home one with the most maps that allow an aggression (Amakna, beside
-    /// Astrub), coming in on its front, the stretch nearest to the home area. There they look for
+    /// area next to the home one with the most maps that allow an aggression (the Cania
+    /// Plains, beside Astrub), coming in on its front, the stretch nearest to the home area. There they look for
     /// the enemy and aggress one of their size, and from the hunters' level they take an order
     /// from the Cazacabezas board, through the mod's own door, and go after their prey while its
     /// hunt is open.

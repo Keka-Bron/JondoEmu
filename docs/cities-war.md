@@ -105,7 +105,7 @@ the client's `Mods/` with JondoFix.
 With *Simulate players* on, three bots of every five swear to a city — Bonta the even numbers,
 Brakmar the odd. From level 20 they wear their wings (with the sheet's switch, `hnu`) and come in on
 the front: the 40 maps of the war ground nearest to Astrub's start, the war ground being the area
-next door with the most maps that allow an aggression (Amakna). There they aggress an enemy of their
+next door with the most maps that allow an aggression (the Cania Plains). There they aggress an enemy of their
 size — three fifths of their level at least, so they never earn dishonour — and nobody twice within
 five minutes, walk towards the nearest enemy within eight maps, and from level 50 take hunt orders
 through the same routes the mod uses and chase their prey map by map.
