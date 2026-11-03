@@ -27,6 +27,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
     <ApplicationIcon Condition="'$(TargetFramework)' == 'net10.0-windows'">icono_servidor.ico</ApplicationIcon>
+    <!-- It runs as whoever starts it, never as administrator, on Windows 10 and 11. -->
+    <ApplicationManifest Condition="'$(TargetFramework)' == 'net10.0-windows'">app.manifest</ApplicationManifest>
+    <AssemblyTitle>Jondo Server</AssemblyTitle>
     <!-- A single file: the twelve dlls (Google.Protobuf, Thrift, Sqlite and company) are put inside
          the .exe, and the native e_sqlite3.dll too. It still depends on the .NET 10 runtime. -->
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' And '$(TargetFramework)' == 'net10.0-windows'">win-x64</RuntimeIdentifier>

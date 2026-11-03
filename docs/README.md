@@ -94,6 +94,11 @@ the client's own version, and how the Jondo launcher downloads, verifies and pas
 *Go there* when an installed HD pack is not offered, when changing the client's launch arguments,
 or when a pack download misbehaves.
 
+**`antivirus.md`** — Why some engines flag the launcher, and what to do.
+What VirusTotal showed for the first release, why the launcher's habits look like a loader's to a
+heuristic, what the build does about it, and where each engine takes false-positive reports.
+*Go there* when a player reports a trojan warning, or after publishing a release.
+
 **`remote-server.md`** — Running the server on another machine.
 How `JONDO_PUBLIC_BIND` opens all server services consistently, how the launcher's managed loopback
 relay bridges JondoFix to the configured host, which ports are involved and what the relay does not

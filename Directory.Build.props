@@ -17,4 +17,18 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!--
+      Who made each executable, in its Windows file properties (Details tab). Left out, the SDK
+      put the assembly's own name as company and product and no copyright at all, which is how an
+      anonymous binary looks to an antivirus's heuristics. The version comes from the release
+      (-p:Version in release.yml).
+    -->
+    <Company>Jondo</Company>
+    <Product>Jondo Emulator</Product>
+    <Authors>Jondo contributors</Authors>
+    <Copyright>Copyright (c) Jondo contributors</Copyright>
+    <NeutralLanguage>en</NeutralLanguage>
+  </PropertyGroup>
+
 </Project>

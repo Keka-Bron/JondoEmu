@@ -47,6 +47,8 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 Either one unpacks as a **`JondoEmu`** folder. Keep that name and put it beside the client's folder from Step 2: that is where JondoFix looks for it.
 
+> **Antivirus warnings.** A few engines flag the launcher as a generic trojan (`Gen:Variant.Midie`, `Malware-gen`). It is a false positive: the release is built by GitHub Actions from this repository's source, and Microsoft Defender, Kaspersky and ESET find nothing. Why it happens and how it is reported: **[`docs/antivirus.md`](docs/antivirus.md)**.
+
 ### Step 1 — Install the .NET 10 runtime
 
 Download it from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/10.0). The *Desktop Runtime* is the one you want.

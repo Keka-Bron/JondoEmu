@@ -20,6 +20,7 @@
     <Nullable>annotations</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyTitle>Jondo Studio</AssemblyTitle>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 
     <!-- The same egg the launcher wears, in bronze. Three executables of one family, told apart

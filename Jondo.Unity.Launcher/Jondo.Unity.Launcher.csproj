@@ -12,6 +12,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
     <ApplicationIcon>..\Jondo.Unity.Server\icon.ico</ApplicationIcon>
+    <!-- It runs as the player, never as administrator, on Windows 10 and 11, aware of each
+         screen's scale: said in its manifest, as Studio's. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyTitle>Jondo Emulator Launcher</AssemblyTitle>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <!-- THIS is the one handed out to the players. It references the contract and NOTHING ELSE: no
          database, no maps, no protocol handlers, no effects catalogue. A single file,
