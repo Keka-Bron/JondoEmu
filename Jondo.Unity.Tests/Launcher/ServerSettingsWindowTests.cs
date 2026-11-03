@@ -26,6 +26,10 @@ namespace Jondo.Unity.Tests.Launcher
                 {
                     using var window = new ServerSettingsWindow(Language.Es);
                     window.ClientSize = client;
+                    // Windows makes no window larger than its screen: on a smaller one -- GitHub's
+                    // runners have 1024 x 768 -- the size asked for cannot be laid out, and there is
+                    // nothing to measure.
+                    if (window.ClientSize != client) return;
                     var body = window.Controls.OfType<Panel>().Single();
                     check(body, body.Controls.OfType<SettingsCard>().ToArray());
                 }
