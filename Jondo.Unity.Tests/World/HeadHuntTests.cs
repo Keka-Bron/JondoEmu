@@ -164,14 +164,14 @@ namespace Jondo.Unity.Tests.World
                 string Body(string more = "") => "{\"token\":\"" + token + "\"" + more + "}";
                 JsonElement Ask(string route, string more = "", int expected = 200)
                 {
-                    var answer = ControlApi.Responder("/api/headhunts/" + route, "POST", Body(more), null);
+                    var answer = ControlApi.Responder("/api/headhunts/" + route, "POST", Body(more));
                     Assert.NotNull(answer);
                     Assert.Equal(expected, answer!.Value.Codigo);
                     return JsonDocument.Parse(answer.Value.Json).RootElement.Clone();
                 }
 
                 // Without a session, nothing; without a character in the world, nothing either.
-                Assert.Equal(401, ControlApi.Responder("/api/headhunts/status", "POST", "{\"token\":\"nobody\"}", null)!.Value.Codigo);
+                Assert.Equal(401, ControlApi.Responder("/api/headhunts/status", "POST", "{\"token\":\"nobody\"}")!.Value.Codigo);
                 Assert.Equal("world", Ask("status", expected: 409).GetProperty("error").GetString());
 
                 await using var h = await ClientPipe.OpenAsync(HunterAccount, hunter, Map, "Cazador-D");

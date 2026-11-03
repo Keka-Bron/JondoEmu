@@ -220,7 +220,7 @@ namespace Jondo.Unity.Server.Bots
         /// <summary>One of the mod's requests, answered as the mod is answered; null unless it went well.</summary>
         private JsonElement? Ask(string route, string more = "")
         {
-            var answer = ControlApi.Responder("/api/headhunts/" + route, "POST", "{\"token\":\"" + _token + "\"" + more + "}", null);
+            var answer = ControlApi.Responder("/api/headhunts/" + route, "POST", "{\"token\":\"" + _token + "\"" + more + "}");
             if (answer is not { Codigo: 200 } ok) return null;
             return JsonDocument.Parse(ok.Json).RootElement.Clone();
         }
