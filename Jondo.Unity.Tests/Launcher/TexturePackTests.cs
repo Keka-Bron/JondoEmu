@@ -286,8 +286,10 @@ namespace Jondo.Unity.Tests.Launcher
             string real = Path.Combine(_root, "real client");
             string alias = Path.Combine(_root, "selected client");
             Directory.CreateDirectory(real);
+            // A shell, which runs under any name. Newer coreutils (uutils) are one program that picks
+            // the tool by the name it is started with, and started as "Dofus.x64" it is none.
             string binary = Path.Combine(real, "harmless-sleeper");
-            File.Copy("/bin/sleep", binary);
+            File.Copy("/bin/bash", binary);
             File.SetUnixFileMode(binary, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
             File.CreateSymbolicLink(Path.Combine(real, "Dofus.x64"), binary);
             Directory.CreateSymbolicLink(alias, real);
@@ -301,10 +303,15 @@ namespace Jondo.Unity.Tests.Launcher
             using var http = new HttpClient(cdn);
             var service = new TexturePackService(alias, Path.Combine(_root, "cache"), http);
             var start = new ProcessStartInfo(Path.Combine(alias, "Dofus.x64")) { UseShellExecute = false };
-            start.ArgumentList.Add("30");
+            // Two commands, so that the shell stays the process and waits instead of becoming sleep.
+            start.ArgumentList.Add("-c");
+            start.ArgumentList.Add("sleep 30; true");
             using var process = Process.Start(start)!;
             try
             {
+                // Started is not yet listed: a few seconds at the most for /proc to show it.
+                for (int i = 0; i < 50 && !process.HasExited && !service.IsClientRunning(alias); i++) await Task.Delay(100);
+                Assert.False(process.HasExited, "the stand-in client exited at once");
                 Assert.True(service.IsClientRunning(alias));
                 Assert.Equal(PackError.ClientRunning, Assert.Throws<PackException>(() => service.Remove(TexturePack.Hd)).Error);
                 var error = await Assert.ThrowsAsync<PackException>(() => service.InstallAsync(TexturePack.Hd, null, CancellationToken.None));
@@ -314,7 +321,7 @@ namespace Jondo.Unity.Tests.Launcher
             }
             finally
             {
-                if (!process.HasExited) process.Kill();
+                if (!process.HasExited) process.Kill(entireProcessTree: true);
                 await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
             }
             Assert.False(service.IsClientRunning(alias));
