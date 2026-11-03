@@ -1,0 +1,26 @@
+syntax = "proto3";
+import "google/protobuf/any.proto";
+option csharp_namespace = "GameFixture.Wire";
+message source_root {
+  oneof route { source_event notice = 4; source_request ask = 6; source_response reply = 9; }
+}
+message source_event { google.protobuf.Any item = 5; }
+message source_request { int32 id = 7; google.protobuf.Any item = 8; }
+message source_response { google.protobuf.Any item = 3; int32 id = 4; }
+message source_payload {
+  string text = 11;
+  string diagnostic = 20;
+  oneof extra { int32 reason = 21; bytes opaque = 22; }
+}
+
+message rotated_root {
+  oneof other_route { rotated_event other_notice = 12; rotated_request other_ask = 13; rotated_response other_reply = 14; }
+}
+message rotated_event { google.protobuf.Any other_item = 2; }
+message rotated_request { google.protobuf.Any other_item = 3; int32 other_id = 10; }
+message rotated_response { int32 other_id = 1; google.protobuf.Any other_item = 6; }
+message rotated_payload {
+  string other_text = 5;
+  string other_diagnostic = 6;
+  oneof other_extra { int32 other_reason = 7; bytes other_opaque = 8; }
+}

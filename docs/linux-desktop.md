@@ -82,7 +82,7 @@ output outside the repository. That directory must contain `.jondo-root`.
    MelonLoader arguments. Each launch gets a separate Unity `player.log` under
    `<emulator-root>/logs/client-<instance>-<unique-id>/`.
 
-Jondo's endpoints differ from Unemu's: HTTP/config/control uses `8888`, TCP Zaap
+Jondo's HTTP/config/control endpoint uses `8888`, TCP Zaap
 uses `15881`, connection/game uses `5555`, and the dedicated game node uses `5556`.
 The Linux remote relay forwards these four ports. Set `servidor=<host>` in launcher
 preferences to use a remote server; client configuration stays on loopback.
@@ -103,11 +103,6 @@ Saved account credentials and model-provider keys use AES-GCM on Linux, with a
 separate owner-only `clave.bin` in the configuration directory. Windows retains
 DPAPI and reads older Deobfuscator settings. Keep Linux preference files and their
 key together when moving a profile.
-
-If character selection has a blank background, test with a new, empty client
-preferences directory. The Unemu upgrade notes record stale client configuration
-causing that symptom. Keep the original directory and switch back after diagnosis;
-do not delete the emulator's databases to reset client preferences.
 
 ## Local publishing
 

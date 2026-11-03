@@ -144,7 +144,7 @@ namespace Jondo.Unity.Tests.World
             gm.Session.State.PendingMovementCellId = Cage;
 
             using (SessionContext.Push(gm.Session))
-                await WorldMoveHandler.AllowMapExitAsync(gm.ToClient, ConnectionProtocol.Push("jqi"));
+                await WorldMoveHandler.AllowMapExitAsync(gm.Session, 0);
 
             Assert.Equal((Island, 342), (gm.Session.State.MapId, gm.Session.State.CellId));
         }

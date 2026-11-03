@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -13,7 +14,7 @@ namespace Jondo.Unity.Server.Handlers
     /// The four Movimiento captures spell the whole exchange out. Nothing here is guessed:
     ///
     ///   C  jrw { f1: map, f2: the path }      the client asks to walk
-    ///   S  jsj { f1: cells, f2: facing, f5: who }
+    ///   S  jsj { f1: cells, f5: who, f6: cautious } through the typed Game API
     ///   C  jqi {}                             it reached the edge and wants out
     ///   S  jsq {}                             go ahead      <- on root field 3, not 1
     ///   C  jqk { f2: the map it wants }
@@ -52,7 +53,8 @@ namespace Jondo.Unity.Server.Handlers
         /// The client says where it is walking to, and gets its movement back.
         ///
         ///   jrw { f1: map id, f2: the path, packed, each entry facing &lt;&lt; 12 | cell }
-        ///   jsj { f1: the cells, packed, f2: how it ends up facing, f5: whose it is }
+        /// The mapped movement event carries cells, actor ID and cautious movement.
+        /// Facing remains server state; the old wire-only field 2 is not a semantic binding.
         ///
         /// This went unanswered for a while, on the grounds that the jsj is how every OTHER client
         /// learns about the movement and there is nobody else here. That was wrong in a way that
@@ -66,21 +68,22 @@ namespace Jondo.Unity.Server.Handlers
         /// own keyframes, and since the client has already walked them it has nothing left to
         /// interpolate.
         /// </summary>
-        public static async Task ConfirmMovementAsync(NetworkStream stream, byte[] payload)
+        public static async Task ConfirmMovementAsync(GameSession session, MapMovementRequest request)
         {
-            var (cells, facing) = Remember(payload);
+            if (session.State.IsInFight) return;
+            using var context = SessionContext.Push(session);
+            var map = session.Map;
+            var cells = Remember(session, request);
             if (cells.Count == 0) return;
 
-            byte[] moved = ConnectionProtocol.BuildActorMoved(
-                Jondo.Unity.Server.Network.SessionContext.State.CharacterId, cells, facing);
-            await SessionRegistry.BroadcastToMapAsync(SessionContext.State.MapId, moved);
+            await map.SendAsync(new GameMapMovementEvent(cells, session.CharacterId, request.Cautious));
 
             // If he leads a party, the ones following him learn where the walk ends, right behind
             // the jsj: that ikv is what makes their clients walk after him (PartyFollowHandler).
-            await PartyFollowHandler.LeaderMovedAsync(SessionContext.Current);
+            await PartyFollowHandler.LeaderMovedAsync(session);
 
             // And in a conquest's zone, a sentinel on guard may fall on him.
-            await ConquestHandler.OnWalkedAsync(SessionContext.Current);
+            await ConquestHandler.OnWalkedAsync(session);
         }
 
         /// <summary>
@@ -88,72 +91,37 @@ namespace Jondo.Unity.Server.Handlers
         /// until this was recorded the character was still officially standing wherever it logged
         /// in.
         /// </summary>
-        private static (List<long> Cells, int Facing) Remember(byte[] payload)
+        private static List<int> Remember(GameSession session, MapMovementRequest request)
         {
-            var nothing = (new List<long>(), Jondo.Unity.Server.Network.SessionContext.State.Orientation);
+            var state = session.State;
+            var steps = request.KeyCells;
+            if (steps.Count == 0) return new();
 
-            byte[]? jrw = ConnectionProtocol.ReadPayload(payload, Op.Jrw);
-            if (jrw == null || jrw.Length == 0) return nothing;
-
-            long mapId = 0;
-            var steps = new List<long>();
-
-            foreach (var f in ProtoMessage.Parse(jrw).Fields)
-            {
-                if (f.FieldNumber == 1 && f.WireType == 0) mapId = f.VarIntValue;
-                else if (f.FieldNumber == 2 && f.WireType == 2) steps = Unpack(f.BytesValue);
-            }
-
-            if (steps.Count == 0) return nothing;
-
-            if (mapId > 0 && mapId != Jondo.Unity.Server.Network.SessionContext.State.MapId)
+            if (request.MapId > 0 && request.MapId != state.MapId)
             {
                 // The client believes it is on another map. Trusting it here would let a stray
                 // message move the character anywhere, so it is only logged.
-                var current = SessionContext.Current;
-                Console.WriteLine($"[Move] jrw says map {mapId} but socket-session {current.Id} " +
-                                  $"is {current.State.CharacterName} ({current.CharacterId}) on " +
-                                  $"{current.State.MapId}. Ignored.");
-                return nothing;
+                Console.WriteLine($"[Move] MapMovementRequest says map {request.MapId} but socket-session {session.Id} " +
+                                  $"is {state.CharacterName} ({session.CharacterId}) on {state.MapId}. Ignored.");
+                return new();
             }
 
             // Each step carries its cell in the low twelve bits and the way the character is
             // facing on that step above them.
-            var cells = new List<long>();
-            foreach (long step in steps) cells.Add(step & 0xFFF);
+            var cells = new List<int>();
+            foreach (int step in steps) cells.Add(step & 0xFFF);
 
             long last = steps[steps.Count - 1];
             int cell = (int)(last & 0xFFF);
             int facing = (int)(last >> 12);
 
-            Jondo.Unity.Server.Network.SessionContext.State.CellId = cell;
-            if (facing >= 0 && facing <= 7) Jondo.Unity.Server.Network.SessionContext.State.Orientation = facing;
-            Jondo.Unity.Server.Network.SessionContext.State.PendingMovementMapId =
-                Jondo.Unity.Server.Network.SessionContext.State.MapId;
-            Jondo.Unity.Server.Network.SessionContext.State.PendingMovementCellId = cell;
+            state.CellId = cell;
+            if (facing >= 0 && facing <= 7) state.Orientation = facing;
+            state.PendingMovementMapId = state.MapId;
+            state.PendingMovementCellId = cell;
             DatabaseManager.SaveCurrentCharacter();
 
-            return (cells, Jondo.Unity.Server.Network.SessionContext.State.Orientation);
-        }
-
-        private static List<long> Unpack(byte[] packed)
-        {
-            var values = new List<long>();
-            int i = 0;
-            while (i < packed.Length)
-            {
-                long value = 0;
-                int shift = 0;
-                while (i < packed.Length)
-                {
-                    byte b = packed[i++];
-                    value |= (long)(b & 0x7F) << shift;
-                    if ((b & 0x80) == 0) break;
-                    shift += 7;
-                }
-                values.Add(value);
-            }
-            return values;
+            return cells;
         }
 
         // ─── jqe: stopped on the way ────────────────────────────────────────────
@@ -165,15 +133,12 @@ namespace Jondo.Unity.Server.Handlers
         /// stands there and not where the cut walk was going: until this it was left at the old
         /// end, and a passage on that cell would still have fired at the next jqi.
         /// </summary>
-        public static void StopMovement(byte[] payload)
+        public static void StopMovement(GameSession session, MapMovementCancelRequest request)
         {
-            byte[]? jqe = ConnectionProtocol.ReadPayload(payload, "jqe");
-            if (jqe == null) return;
-            int cell = -1;
-            foreach (var f in ProtoMessage.Parse(jqe).Fields)
-                if (f.FieldNumber == 1 && f.WireType == 0) cell = (int)f.VarIntValue;
-
-            var state = SessionContext.State;
+            if (session.State.IsInFight) return;
+            using var context = SessionContext.Push(session);
+            int cell = request.CellId;
+            var state = session.State;
             if (cell < 0 || !MapManager.WalkableCells.TryGetValue(state.MapId, out var walkable) || !walkable.Contains(cell))
                 return;
             state.CellId = cell;
@@ -192,16 +157,29 @@ namespace Jondo.Unity.Server.Handlers
         /// Without it the client never sends the jqk that names the map it wants, and the
         /// character stands on the border for good.
         /// </summary>
-        public static async Task AllowMapExitAsync(NetworkStream stream, byte[] payload)
+        public static async Task AllowMapExitAsync(GameSession session, int uid)
+        {
+            if (session.State.IsInFight) return;
+            using var context = SessionContext.Push(session);
+            await session.SendAsync(new MapMovementConfirmedResponse(), uid);
+            await CompleteMovementAsync(session, session.Stream);
+        }
+
+        // Combat retains its current byte-based confirmation entry point until its migration.
+        internal static async Task AllowLegacyMapExitAsync(NetworkStream stream, byte[] payload)
         {
             long request = ConnectionProtocol.RequestId(payload);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Jsq, null, request));
+            await CompleteMovementAsync(SessionContext.Current, stream);
+        }
 
+        private static async Task CompleteMovementAsync(GameSession session, NetworkStream? stream)
+        {
             // Always answer before changing map. The old branch returned as soon as it found a route
             // on the cell and so deprived edge exits of their jsq. Here a cell without a passage
             // goes on exactly to the usual jqk.
-            if (!TryTakeCompletedMovement(SessionContext.State, out long mapId, out int cellId))
+            if (!TryTakeCompletedMovement(session.State, out long mapId, out int cellId) || stream == null)
                 return;
             if (await AlmanaxTempleHandler.WalkAsync(stream, mapId, cellId))
                 return;

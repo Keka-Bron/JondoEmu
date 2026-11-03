@@ -2,13 +2,32 @@ using System;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>One connected game client and all state that belongs exclusively to it.</summary>
     public sealed class GameSession
     {
-        public GameSession(NetworkStream stream) => Stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        private static readonly IGameCodec DefaultCodec = new GameCodec();
+        private readonly IGameCodec _codec = DefaultCodec;
+        private readonly Func<byte[], Task>? _sendPacket;
+
+        public GameSession(NetworkStream stream) : this(stream, DefaultCodec) { }
+
+        public GameSession(NetworkStream stream, IGameCodec codec)
+        {
+            Stream = stream ?? throw new ArgumentNullException(nameof(stream));
+            _codec = codec ?? throw new ArgumentNullException(nameof(codec));
+        }
+
+        // An isolated transport sink for tests; production sends still use the framed socket writer.
+        internal GameSession(IGameCodec codec, Func<byte[], Task> sendPacket)
+        {
+            _codec = codec ?? throw new ArgumentNullException(nameof(codec));
+            _sendPacket = sendPacket ?? throw new ArgumentNullException(nameof(sendPacket));
+        }
 
         private GameSession() { }
 
@@ -67,12 +86,24 @@ namespace Jondo.Unity.Server.Network
         public bool HasCharacter => CharacterId > 0;
         public bool IsInWorld { get; private set; }
 
+        /// <summary>Captures this session's current map instance. Safe to retain across an await or map change.</summary>
+        public GameMapAudience Map => new(MapAudienceScope.Capture(State), _codec);
+
+        public Task SendAsync(GameEvent message)
+            => SendAsync(_codec.Encode(new GameFrame(message ?? throw new ArgumentNullException(nameof(message)))));
+
+        public Task SendAsync(GameResponse message, int uid)
+            => SendAsync(_codec.Encode(new GameFrame(message ?? throw new ArgumentNullException(nameof(message)), uid)));
+
+        internal GameFrame Decode(ReadOnlySpan<byte> payload) => _codec.Decode(payload);
+
         /// <summary>
         /// Sends a packet to this client. If the session has no socket —the fallback one— it does
         /// nothing, instead of blowing up.
         /// </summary>
         public Task SendAsync(byte[] packet)
         {
+            if (_sendPacket != null) return _sendPacket(packet);
             if (Stream != null) return Jondo.Protocol.NetworkMessage.WriteFrameAsync(Stream, packet);
             Jondo.Protocol.NetworkMessage.FrameTap?.Invoke(packet);
             return Task.CompletedTask;

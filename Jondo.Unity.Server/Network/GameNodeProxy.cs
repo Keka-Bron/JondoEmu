@@ -539,9 +539,13 @@ namespace Jondo.Unity.Server.Network
                     Console.WriteLine("[Game Node] Client confirmed with lqc.");
                     if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, Op.Lqc)) hasSentMapBlock = true;
                 }
+                else if (await WorldMovementDispatch.TryHandleAsync(session, payload, payloadStr))
+                {
+                    // Typed world movement has been handled (or rejected). Combat falls through.
+                }
                 // ─── 3.6.10.10 world messages. The joi/jos/jpp branches further down belong to
                 // an earlier version of the protocol and this client never sends them.
-                else if (payloadStr.Contains(Op.Uri(Op.Jrw)))
+                else if (GameState.IsInFight && payloadStr.Contains(Op.Uri(Op.Jrw)))
                 {
                     // Walking is the same message inside and outside a fight. While fighting the
                     // fight handler resolves it, which also spends movement points; if it fell here,
@@ -553,13 +557,7 @@ namespace Jondo.Unity.Server.Network
                     // clock —which also touches the fight and writes to the socket— and leave the state
                     // half done. And on top of that it made unreachable the jrw branch that already existed inside
                     // the fight handler.
-                    if (GameState.IsInFight) await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
-                    else
-                    {
-                        // What «desaparece al desplazarse» goes with the first step (SlotLookHandler).
-                        await SlotLookHandler.OnMovingAsync(stream);
-                        await WorldMoveHandler.ConfirmMovementAsync(stream, payload);
-                    }
+                    await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/hir"))
                 {
@@ -667,11 +665,11 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains("type.ankama.com/jqe"))
                 {
-                    if (!GameState.IsInFight) WorldMoveHandler.StopMovement(payload);
+                    // Combat ignores cancellation; world cancellation uses the typed dispatch above.
                 }
-                else if (payloadStr.Contains("type.ankama.com/jqi"))
+                else if (GameState.IsInFight && payloadStr.Contains("type.ankama.com/jqi"))
                 {
-                    await WorldMoveHandler.AllowMapExitAsync(stream, payload);
+                    await WorldMoveHandler.AllowLegacyMapExitAsync(stream, payload);
 
                     // A party member whose leader opened a fight while he was walking goes in
                     // when his walk ends, as the follow capture does.

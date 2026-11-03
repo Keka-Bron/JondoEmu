@@ -49,7 +49,6 @@
     "mhs": {
       "name": "IdentificationRequest",
       "fields": { "gfdw": "DeviceIdentifier" },
-      "ignoredWireFields": [ "gfdz" ],
       "oneofs": { "gfea": { "member": "Method", "cases": {
         "gfdx": { "type": "TokenIdentification" },
         "gfdy": { "type": "LoginIdentification" }
@@ -73,7 +72,7 @@
     "mhy": { "name": "AccountRights", "fields": {
       "gfes": "ShowForceAccount", "gfet": "ShowConsole", "gfeu": "UnlimitedAccess", "gfev": "InfiniteSubscription"
     } },
-    "mie": { "name": "IdentificationError", "fields": { "gffm": "Reason", "gffn": "BanEndDate" }, "ignoredWireFields": [ "gffp" ] },
+    "mie": { "name": "IdentificationError", "fields": { "gffm": "Reason", "gffn": "BanEndDate" } },
     "mih": { "name": "SelectServerRequest", "fields": { "gfga": "ServerId" } },
     "mim": {
       "name": "SelectServerResponse",
@@ -83,7 +82,7 @@
       } } }
     },
     "mik": { "name": "SelectServerSuccess", "fields": { "gfge": "Ticket", "gfgf": "Host", "gfgg": "Ports" } },
-    "miq": { "name": "ServerList", "fields": { "gfgw": "Servers", "gfgx": "Slots" }, "ignoredWireFields": [ "gfgy" ] },
+    "miq": { "name": "ServerList", "fields": { "gfgw": "Servers", "gfgx": "Slots" } },
     "mio": { "name": "ServerSlots", "fields": { "gfgr": "Category", "gfgs": "MaxSlots" } },
     "mit": { "name": "ServerInformation", "fields": { "gfhc": "Server", "gfhd": "Accessibility", "gfhe": "Characters" } },
     "miw": { "name": "Server", "fields": { "gfhi": "Id", "gfhj": "Status", "gfhk": "Category" } },

@@ -47,6 +47,8 @@ DofusClient/
 # run the emulator.
 tools/
 *.py
+!Jondo.Unity.Protocol.Game.Wire/Import/import-game.py
+!Jondo.Unity.Protocol.Game.Wire/Import/test_import.py
 __pycache__/
 
 # ─── Logs and captures ──────────────────────────────────────────────────────

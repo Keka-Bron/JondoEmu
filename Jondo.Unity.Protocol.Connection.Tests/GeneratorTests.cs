@@ -27,7 +27,7 @@ public sealed class GeneratorTests
             } },
             "a_payload": { "name": "FixturePayload", "fields": {
               "count": "Count", "ids": "Ids", "state": "State", "child": "Child", "required_child": "RequiredChild"
-            }, "ignoredWireFields": ["decoy"] },
+            } },
             "a_empty": { "name": "FixtureEmpty" }
           },
           "enums": { "mode": { "name": "FixtureMode", "values": { "ZERO": "Default", "ALLOWED": "Allowed" } } }
@@ -64,6 +64,8 @@ public sealed class GeneratorTests
     }
 
     private delegate FixtureMessage Decoder(ReadOnlySpan<byte> payload);
+    private delegate FixtureAdvanced AdvancedDecoder(ReadOnlySpan<byte> payload);
+    private delegate IMessage RawDecoder(ReadOnlySpan<byte> payload);
     private static FixtureMessage Decode(Type bindings, byte[] bytes)
         => bindings.GetMethod("Decode")!.CreateDelegate<Decoder>()(bytes);
 
@@ -94,7 +96,7 @@ public sealed class GeneratorTests
         string rotated = Mapping.Replace("a_root", "b_root").Replace("a_payload", "b_payload")
             .Replace("\"choice\"", "\"another_choice\"").Replace("\"item\"", "\"other_item\"")
             .Replace("\"empty\"", "\"other_empty\"");
-        foreach (string field in new[] { "count", "ids", "state", "child", "decoy", "required_child" })
+        foreach (string field in new[] { "count", "ids", "state", "child", "required_child" })
             rotated = rotated.Replace($"\"{field}\"", $"\"other_{field}\"");
         var bindings = Compile(rotated);
         var bytes = (byte[])Invoke(bindings, "Encode", new FixtureEmpty());
@@ -130,7 +132,9 @@ public sealed class GeneratorTests
     [InlineData("presence")]
     [InlineData("cases")]
     [InlineData("enum")]
-    [InlineData("ignored")]
+    [InlineData("missing-member")]
+    [InlineData("missing-oneof")]
+    [InlineData("unknown-oneof")]
     [InlineData("policy")]
     public void Invalid_bindings_fail_before_any_code_is_emitted(string mutation)
     {
@@ -149,7 +153,10 @@ public sealed class GeneratorTests
                 break;
             case "cases": mapping["messages"]!["a_root"]!["oneofs"]!["choice"]!["cases"]!.AsObject().Remove("empty"); break;
             case "enum": mapping["enums"]!["mode"]!["values"]!.AsObject().Remove("ALLOWED"); break;
-            case "ignored": payload.AsObject().Remove("ignoredWireFields"); break;
+            case "missing-member": payload["fields"]!.AsObject().Remove("count"); break;
+            case "missing-oneof": mapping["messages"]!["a_root"]!["oneofs"]!.AsObject().Remove("choice"); break;
+            case "unknown-oneof": mapping["messages"]!["a_root"]!["oneofs"]!["not_a_group"] =
+                mapping["messages"]!["a_root"]!["oneofs"]!["choice"]!.DeepClone(); break;
             case "policy": payload["obsoletePolicy"] = true; break;
         }
         if (mutation == "policy")
@@ -161,5 +168,125 @@ public sealed class GeneratorTests
     [Fact]
     public void Duplicate_mapping_keys_are_rejected()
         => Assert.Throws<InvalidOperationException>(() => BindingGenerator.Generate(Schema(),
-            Mapping.Replace("\"count\": \"Count\"", "\"count\": \"Count\", \"count\": \"Count\""), Compilation()));
+             Mapping.Replace("\"count\": \"Count\"", "\"count\": \"Count\", \"count\": \"Count\""), Compilation()));
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Unmapped_fields_and_whole_oneofs_need_no_bindings_and_remain_available_raw(bool messageCase)
+    {
+        var bindings = Compile();
+        var rawDecode = bindings.GetMethod("DecodeWire")!.CreateDelegate<RawDecoder>();
+        var detail = new wire_only_detail { Data = ByteString.CopyFrom([0, 255]) };
+        var payload = new a_payload { RequiredChild = new a_empty(), Decoy = "raw-only", Telemetry = 0,
+            Opaque = detail.Data, Samples = { detail }, Attributes = { ["entry"] = detail },
+            WireState = (wire_only_mode)99 };
+        if (messageCase) payload.Detail = detail;
+        else payload.Flag = false; // A present zero-valued branch must still be raw-only.
+        byte[] bytes = new a_root { Item = payload }.ToByteArray().Concat(new byte[] { 0x98, 0x06, 1 }).ToArray();
+        var raw = Assert.IsType<a_root>(rawDecode(bytes));
+        Assert.Equal(bytes, raw.ToByteArray()); // Includes unknown tag 99 as well as declared unmapped fields.
+        Assert.True(raw.Item.HasTelemetry);
+        Assert.Equal(99, (int)raw.Item.WireState);
+        Assert.Equal(detail, raw.Item.Attributes["entry"]);
+        Assert.Equal(messageCase ? a_payload.WireOnlyChoiceOneofCase.Detail : a_payload.WireOnlyChoiceOneofCase.Flag,
+            raw.Item.WireOnlyChoiceCase);
+
+        var stable = Assert.IsType<FixturePayload>(Decode(bindings, bytes));
+        Assert.Equal(FixtureMode.Default, stable.State);
+        var encoded = a_root.Parser.ParseFrom((byte[])Invoke(bindings, "Encode", stable));
+        Assert.Equal("", encoded.Item.Decoy);
+        Assert.False(encoded.Item.HasTelemetry);
+        Assert.Empty(encoded.Item.Opaque);
+        Assert.Empty(encoded.Item.Samples);
+        Assert.Empty(encoded.Item.Attributes);
+        Assert.Equal(0, (int)encoded.Item.WireState);
+        Assert.Equal(a_payload.WireOnlyChoiceOneofCase.None, encoded.Item.WireOnlyChoiceCase);
+    }
+
+    private const string AdvancedMapping = """
+        {
+          "stableNamespace": "Jondo.Unity.Protocol.Connection", "generatedNamespace": "Fixture.Generated",
+          "className": "Bindings", "root": "FixtureAdvanced",
+          "messages": {
+            "advanced": { "name": "FixtureAdvanced",
+              "fields": { "data": "Data", "title": "Title", "blob": "Blob", "state": "State",
+                "children": "Children", "missing_default": "Defaulted" },
+              "defaultOnAbsence": ["missing_default"], "ignoredStableMembers": ["Ignored"],
+              "defaultOneofs": { "construction": "default_branch" },
+              "oneofs": { "choice": { "member": "Choice", "noneType": "FixtureChoiceNone", "cases": {
+                "number": { "type": "FixtureChoiceNumber", "member": "Value" },
+                "empty": { "type": "FixtureChoiceEmpty", "member": "Value" }
+              } } }
+            },
+            "defaults_payload": { "name": "FixtureDefaults", "fields": { "count": "Count", "text": "Text" } },
+            "a_empty": { "name": "FixtureEmpty" }
+          },
+          "enums": { "mode": { "name": "FixtureMode", "values": { "ZERO": "Default", "ALLOWED": "Allowed" } } }
+        }
+        """;
+
+    [Fact]
+    public void Maps_bytes_optional_references_and_explicit_absence_policies_execute()
+    {
+        var bindings = Compile(AdvancedMapping);
+        var decode = bindings.GetMethod("Decode")!.CreateDelegate<AdvancedDecoder>();
+        var absent = decode([]);
+        Assert.Empty(absent.Data);
+        Assert.Null(absent.Title);
+        Assert.Null(absent.Blob);
+        Assert.Null(absent.State);
+        Assert.IsType<FixtureChoiceNone>(absent.Choice);
+        Assert.Equal(new FixtureDefaults(0, ""), absent.Defaulted);
+        Assert.Equal("", absent.Ignored);
+
+        var wire = new advanced { Title = "", Blob = ByteString.Empty, Data = ByteString.CopyFrom([0, 255]),
+            State = (mode)0, Number = 0, Children = { [-42] = new defaults_payload { Count = 7, Text = "child" } } };
+        var stable = decode(wire.ToByteArray());
+        Assert.Equal("", stable.Title);
+        Assert.Empty(stable.Blob!);
+        Assert.Equal(new byte[] { 0, 255 }, stable.Data);
+        Assert.Equal(FixtureMode.Default, stable.State);
+        Assert.Equal(0, Assert.IsType<FixtureChoiceNumber>(stable.Choice).Value);
+        Assert.Equal(new FixtureDefaults(7, "child"), stable.Children[-42]);
+        var back = advanced.Parser.ParseFrom((byte[])Invoke(bindings, "Encode", stable));
+        Assert.True(back.HasBlob);
+        Assert.True(back.HasTitle);
+        Assert.True(back.HasState);
+        Assert.Equal(advanced.ChoiceOneofCase.Number, back.ChoiceCase);
+        Assert.Equal(advanced.ConstructionOneofCase.DefaultBranch, back.ConstructionCase);
+        Assert.Equal(7, back.Children[-42].Count);
+        wire.Unsupported = false;
+        Assert.Throws<ConnectionConversionException>(() => decode(wire.ToByteArray()));
+        wire.ClearChoice();
+        wire.State = (mode)7;
+        Assert.Throws<ConnectionConversionException>(() => decode(wire.ToByteArray()));
+    }
+
+    [Theory]
+    [InlineData("none")]
+    [InlineData("default")]
+    [InlineData("ignored")]
+    public void Invalid_absence_policies_are_rejected(string mutation)
+    {
+        var mapping = JsonNode.Parse(AdvancedMapping)!;
+        var message = mapping["messages"]!["advanced"]!;
+        if (mutation == "none") message["oneofs"]!["choice"]!["noneType"] = "FixtureChoiceNumber";
+        if (mutation == "default") message["defaultOneofs"]!["construction"] = "number";
+        if (mutation == "ignored") message["ignoredStableMembers"] = new JsonArray("Data");
+        Assert.Throws<InvalidOperationException>(() => BindingGenerator.Generate(Schema(), mapping.ToJsonString(), Compilation()));
+    }
+
+    [Fact]
+    public void Unmapped_whole_oneof_is_unset_without_an_explicit_default_policy()
+    {
+        var mapping = JsonNode.Parse(AdvancedMapping)!;
+        mapping["messages"]!["advanced"]!.AsObject().Remove("defaultOneofs");
+        var bindings = Compile(mapping.ToJsonString());
+        var decode = bindings.GetMethod("Decode")!.CreateDelegate<AdvancedDecoder>();
+        var stable = decode(new advanced { OtherBranch = "wire-only" }.ToByteArray());
+        Assert.IsType<FixtureChoiceNone>(stable.Choice);
+        var encoded = advanced.Parser.ParseFrom((byte[])Invoke(bindings, "Encode", stable));
+        Assert.Equal(advanced.ConstructionOneofCase.None, encoded.ConstructionCase);
+    }
 }

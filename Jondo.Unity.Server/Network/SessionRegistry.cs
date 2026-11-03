@@ -262,6 +262,12 @@ namespace Jondo.Unity.Server.Network
                 .Where(s => speakerAccountId == 0 || !Managers.Contacts.Shuts(s.AccountId, speakerAccountId))
                 .ToArray();
 
+            return await SendToAsync(targets, packet);
+        }
+
+        /// <summary>Fans out already encoded bytes without acquiring recipients' gameplay locks.</summary>
+        internal static async Task<int> SendToAsync(IReadOnlyList<GameSession> targets, byte[] packet)
+        {
             var results = await Task.WhenAll(targets.Select(async target =>
             {
                 try

@@ -52,6 +52,12 @@ jobs:
       - name: Test connection protocol
         run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=connection-protocol.trx" --results-directory TestResults
 
+      - name: Test game protocol
+        run: dotnet test Jondo.Unity.Protocol.Game.Tests/Jondo.Unity.Protocol.Game.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=game-protocol.trx" --results-directory TestResults
+
+      - name: Test game source import
+        run: python Jondo.Unity.Protocol.Game.Wire/Import/test_import.py
+
       - name: Test server transport and desktop
         run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
 
@@ -99,6 +105,10 @@ jobs:
         run: dotnet test Jondo.Unity.Tests/Jondo.Unity.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=tests.trx" --results-directory TestResults
       - name: Test generated protocol and mappings
         run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=connection-protocol.trx" --results-directory TestResults
+      - name: Test game protocol
+        run: dotnet test Jondo.Unity.Protocol.Game.Tests/Jondo.Unity.Protocol.Game.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=game-protocol.trx" --results-directory TestResults
+      - name: Test game source import
+        run: python3 Jondo.Unity.Protocol.Game.Wire/Import/test_import.py
       - name: Test server transport and headless desktop rendering
         run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
       - name: Publish Linux desktop tools locally

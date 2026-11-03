@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <JondoVersion Condition="'$(JondoVersion)' == ''">3.6.10.10</JondoVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Jondo.Unity.Protocol.Game/Jondo.Unity.Protocol.Game.csproj" />
+    <ProjectReference Include="../Jondo.Unity.ProtocolGenerator/Jondo.Unity.ProtocolGenerator.csproj"
+                      ReferenceOutputAssembly="false" OutputItemType="GameGenerator" PrivateAssets="all" />
+    <PackageReference Include="Google.Protobuf" Version="3.35.1" />
+    <PackageReference Include="Grpc.Tools" Version="2.81.1" PrivateAssets="all" />
+    <Protobuf Include="Schemas/game-$(JondoVersion).proto" GrpcServices="None"
+              AdditionalProtocArguments="--descriptor_set_out=$(IntermediateOutputPath)game-$(JondoVersion).pb;--include_imports" />
+    <Compile Include="$(IntermediateOutputPath)GameBindings-$(JondoVersion).g.cs" />
+  </ItemGroup>
+  <Target Name="ValidateGameVersion" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(JondoVersion)' != '3.6.10.10'" Text="Unsupported JondoVersion '$(JondoVersion)'. Use the 3.6.10.10 Game profile for both 3.6.10.10 and 3.6.10.11 clients." />
+  </Target>
+  <Target Name="GenerateGameBindings" BeforeTargets="CoreCompile" DependsOnTargets="Protobuf_Compile;ResolveReferences"
+          Inputs="$(IntermediateOutputPath)game-$(JondoVersion).pb;Mappings/game-$(JondoVersion).json;@(GameGenerator);@(ReferencePath)"
+          Outputs="$(IntermediateOutputPath)GameBindings-$(JondoVersion).g.cs">
+    <ItemGroup>
+      <_StableGame Include="@(ReferencePath)" Condition="'%(Filename)' == 'Jondo.Unity.Protocol.Game'" />
+    </ItemGroup>
+    <Exec Command="dotnet &quot;@(GameGenerator)&quot; &quot;$(IntermediateOutputPath)game-$(JondoVersion).pb&quot; &quot;$(MSBuildProjectDirectory)/Mappings/game-$(JondoVersion).json&quot; &quot;@(_StableGame)&quot; &quot;$(IntermediateOutputPath)GameBindings-$(JondoVersion).g.cs&quot;" />
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateOutputPath)GameBindings-$(JondoVersion).g.cs;$(IntermediateOutputPath)game-$(JondoVersion).pb" />
+    </ItemGroup>
+  </Target>
+</Project>

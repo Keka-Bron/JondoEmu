@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Protocol provenance hashes refer to canonical LF bytes on every platform.
+/Jondo.Unity.Protocol.Game.Wire/Schemas/*.proto text eol=lf
+/Jondo.Unity.Protocol.Game.Wire/Mappings/*.json text eol=lf
+/Jondo.Unity.Protocol.Game.Wire/Import/*.provenance.json text eol=lf

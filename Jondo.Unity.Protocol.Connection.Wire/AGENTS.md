@@ -24,8 +24,9 @@ Commands below run from the repository root.
 
 ## Conversion semantics
 
-- Map all stable constructor members and concrete cases. Explicitly list omitted
-  declared wire fields in `ignoredWireFields`; they retain protobuf defaults on output.
+- Map all stable constructor members and concrete cases. Unmapped wire fields
+  and whole oneofs remain raw-only without ignore lists; they retain protobuf
+  defaults/unset cases on output unless explicitly defaulted by the mapping.
 - Bind enum values explicitly. For example, wire status 0 is `Online`, regardless
   of the stable enum's numeric ordering.
 - Preserve optional zero versus absence and present-empty message versus absence.

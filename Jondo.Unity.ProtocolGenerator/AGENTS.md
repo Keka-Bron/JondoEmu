@@ -18,10 +18,14 @@ examples. Commands below run from the repository root.
 - Check aliases, stable identities/members, constructor shape, type compatibility,
   repetition, optional presence, case coverage, and enum bindings. Reject duplicate
   keys, unknown policies, and unsupported shapes rather than guessing.
-- Declared unmapped wire enum values/cases may remain in the raw layer; semantic
-  conversion must reject them. Missing required messages/oneofs also fail conversion.
-- Ignored wire fields are explicit and default on output. Never infer semantic
-  enum values from their numeric order or invent a required case.
+- Unmapped wire fields and whole oneofs remain raw-only without explicit ignore
+  lists. They retain protobuf defaults/unset cases on output unless a mapping
+  explicitly supplies a default oneof branch.
+- Within mapped enums/oneofs, unmapped wire values/cases must fail semantic
+  conversion. Missing required messages/oneofs also fail conversion.
+- All stable constructor members and cases still require bindings or explicit
+  stable default/ignore policies. Never infer semantic enum values from their
+  numeric order or invent a required case.
 - The current supported shapes are documented in `docs/connection-protocol.md`.
   Extend support with executable synthetic-fixture tests when a real schema needs it.
 

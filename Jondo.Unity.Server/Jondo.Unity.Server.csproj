@@ -53,6 +53,7 @@
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Protocol\Jondo.Unity.Protocol.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Protocol.Connection.Wire\Jondo.Unity.Protocol.Connection.Wire.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Protocol.Game.Wire\Jondo.Unity.Protocol.Game.Wire.csproj" />
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
   </ItemGroup>
 
@@ -86,6 +87,7 @@
     <Message Text="[Tests] Running general, server and protocol tests before publishing..." Importance="high" />
     <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)/../Jondo.Unity.Tests/Jondo.Unity.Tests.csproj&quot; $(TestArtifactsArgument) --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
     <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)/../Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj&quot; $(TestArtifactsArgument) --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
+    <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)/../Jondo.Unity.Protocol.Game.Tests/Jondo.Unity.Protocol.Game.Tests.csproj&quot; $(TestArtifactsArgument) --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
     <Exec Command="dotnet test &quot;$(MSBuildProjectDirectory)/../Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj&quot; $(TestArtifactsArgument) --nologo --verbosity quiet" IgnoreStandardErrorWarningFormat="true" ContinueOnError="false" />
     <Message Text="[Tests] Green. Publishing." Importance="high" />
   </Target>

@@ -1,0 +1,5811 @@
+{
+  "stableNamespace": "Jondo.Unity.Protocol.Game",
+  "generatedNamespace": "Jondo.Unity.Protocol.Game.Wire",
+  "className": "GameBindings",
+  "conversionException": "GameConversionException",
+  "messages": {
+    "hms": {
+      "name": "SpellsEvent",
+      "fields": {
+        "fmse": "HumanSpells",
+        "fmsg": "MutantSpells"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "hmw": {
+      "name": "SpellItem",
+      "fields": {
+        "fmsp": "SpellLevel",
+        "fmss": "SpellId",
+        "fmst": "SpellType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "hnn": {
+      "name": "ForgettableSpellActionRequest",
+      "fields": {
+        "fmuf": "SpellId",
+        "fmug": "Action"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "hos": {
+      "name": "ChatCommunitySelectionRequest",
+      "fields": {
+        "fmzs": "Community"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "hoy": {
+      "name": "ServerSettingsEvent",
+      "fields": {
+        "fnat": "ArenaLeaveBanTime",
+        "fnau": "GameType",
+        "fnav": "HasFreeAutopilot",
+        "fnaw": "IsMonoAccount",
+        "fnax": "Community",
+        "fnay": "Language"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "hpd": {
+      "name": "TrustStatusEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "hph": {
+      "name": "PlayerFightRequest",
+      "fields": {
+        "fnbz": "TargetId",
+        "fnca": "Friendly",
+        "fncb": "TargetCellId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "hpu": {
+      "name": "PlayerFightFriendlyAnswerRequest",
+      "fields": {
+        "fneo": "FightId",
+        "fnep": "Accept"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "hpv": {
+      "name": "PlayerFightFriendlyAnsweredEvent",
+      "fields": {
+        "fneu": "FightId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "hqc": {
+      "name": "PlayerFightFriendlyRequestedEvent",
+      "fields": {
+        "fnfu": "SourceId",
+        "fnfv": "TargetId",
+        "fnfw": "FightId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ijm": {
+      "name": "FightMapRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ijq": {
+      "name": "FightPingsEvent",
+      "fields": {
+        "fpso": "PingsByCells",
+        "fpsq": "PingsByEntities"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "itg": {
+      "name": "ShortcutBarContentEvent",
+      "fields": {
+        "fred": "Shortcuts",
+        "fref": "BarType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "itq": {
+      "name": "ObjectErrorEvent",
+      "fields": {
+        "frgi": "Reason"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "itr": {
+      "name": "InventorySourceSelectionRequest",
+      "fields": {
+        "frgn": "AdditionalSources",
+        "frgo": "Context"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "itz": {
+      "name": "ShortcutBarAddRequest",
+      "fields": {
+        "frhv": "Shortcut",
+        "frhw": "BarType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "iua": {
+      "name": "ObjectAddedEvent",
+      "fields": {
+        "fria": "Origin",
+        "fric": "Object"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "iuk": {
+      "name": "ObjectSetPositionRequest",
+      "fields": {
+        "frjr": "Quantity",
+        "frjs": "ObjectUid",
+        "frjt": "Position"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "iul": {
+      "name": "ShortcutBarRemoveRequest",
+      "fields": {
+        "frjx": "BarType",
+        "frjy": "SlotId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ium": {
+      "name": "ObjectDeletedEvent",
+      "fields": {
+        "frkc": "ObjectUid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "iun": {
+      "name": "InventoryWeightEvent",
+      "fields": {
+        "frkg": "InventoryWeight",
+        "frki": "WeightMax"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "iuq": {
+      "name": "ShortcutBarReplacedEvent",
+      "fields": {
+        "frkn": "Shortcut",
+        "frko": "BarType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "iuv": {
+      "name": "ShortcutBarSwapRequest",
+      "fields": {
+        "frlm": "FirstSlotId",
+        "frln": "SecondSlotId",
+        "frlo": "BarType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "iuw": {
+      "name": "ObjectDeleteRequest",
+      "fields": {
+        "frlt": "Object"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ivf": {
+      "name": "KamasUpdateEvent",
+      "fields": {
+        "frmv": "Quantity"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ivi": {
+      "name": "ObjectAveragePricesEvent",
+      "fields": {
+        "frnf": "ObjectsAveragePrices"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ivg": {
+      "name": "ObjectAveragePrice",
+      "fields": {
+        "frmz": "ObjectGid",
+        "frna": "AveragePrice"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ivj": {
+      "name": "ObjectQuantityEvent",
+      "fields": {
+        "frnj": "Origin",
+        "frnl": "Object"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ivk": {
+      "name": "ShortcutBarRefreshEvent",
+      "fields": {
+        "frnq": "Shortcut",
+        "frnr": "BarType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ivp": {
+      "name": "ObjectAveragePricesRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ivq": {
+      "name": "ObjectMovementEvent",
+      "fields": {
+        "frop": "ObjectUid",
+        "froq": "Position"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ivr": {
+      "name": "ShortcutBarRemovedEvent",
+      "fields": {
+        "frou": "BarType",
+        "frov": "SlotId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ivx": {
+      "name": "InventoryContentEvent",
+      "fields": {
+        "frpu": "Kamas",
+        "frpw": "Objects"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jew": {
+      "name": "ProbableGuildMissionStateRefreshRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jha": {
+      "name": "GuildMemberWarnOnConnectionStopRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jhf": {
+      "name": "GuildMemberWarnOnConnectionStartRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jiy": {
+      "name": "GuildInformationRequest",
+      "fields": {
+        "ftpb": "InformationType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jqd": {
+      "name": "MapComplementaryHavenBagInformation",
+      "fields": {
+        "fuok": "Theme",
+        "fuol": "RoomId",
+        "fuoo": "OwnerInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jqe": {
+      "name": "MapMovementCancelRequest",
+      "fields": {
+        "fuos": "CellId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jqi": {
+      "name": "MapMovementConfirmRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jqj": {
+      "name": "UnknownJqj",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jqk": {
+      "name": "MapChangeRequest",
+      "fields": {
+        "fupk": "MapId",
+        "fupl": "AutoPilot"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jqr": {
+      "name": "MapComplementaryGuildHallInformation",
+      "fields": {
+        "fuqh": "ThemeInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jqp": {
+      "name": "GuildHallThemeInformation",
+      "fields": {
+        "fuqc": "ThemeId",
+        "fuqd": "AvailableThemeIds"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jqs": {
+      "name": "MapChangeOrientationRequest",
+      "fields": {
+        "fuqm": "Direction"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jqt": {
+      "name": "MapMovementRefusedEvent",
+      "fields": {
+        "fuqr": "CellX",
+        "fuqs": "CellY"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jra": {
+      "name": "MapComplementaryInHouseInformation",
+      "fields": {
+        "furr": "CurrentHouse"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jrh": {
+      "name": "MapInformationRequest",
+      "fields": {
+        "fusg": "MapId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jrk": {
+      "name": "FightMapInformation",
+      "fields": {
+        "fuss": "Param",
+        "fust": "MapId"
+      },
+      "oneofs": {
+        "fusx": {
+          "member": "PositionCase",
+          "cases": {
+            "fusv": {
+              "type": "FightMapInformationPositionCaseAnomaly",
+              "member": "Value"
+            },
+            "fusw": {
+              "type": "FightMapInformationPositionCaseCoords",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jrn": {
+      "name": "UnknownJrn",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jru": {
+      "name": "MapCurrentEvent",
+      "fields": {
+        "fuud": "MapId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jrw": {
+      "name": "MapMovementRequest",
+      "fields": {
+        "fuuk": "MapId",
+        "fuul": "KeyCells",
+        "fuum": "Cautious"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jry": {
+      "name": "MapComplementaryGuildInformation",
+      "fields": {},
+      "oneofs": {
+        "fuut": {
+          "member": "ComplementaryInformationCase",
+          "cases": {
+            "fuuq": {
+              "type": "MapComplementaryGuildInformationCaseGuildHallInformation",
+              "member": "Value"
+            },
+            "fuur": {
+              "type": "MapComplementaryGuildInformationCaseUnknownFuur",
+              "member": "Value"
+            },
+            "fuus": {
+              "type": "MapComplementaryGuildInformationCaseUnknownFuus",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jsd": {
+      "name": "MapChangeOrientationEvent",
+      "fields": {
+        "fuvt": "ActorId",
+        "fuvu": "Direction"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jsj": {
+      "name": "GameMapMovementEvent",
+      "fields": {
+        "fuwy": "Cells",
+        "fuxd": "CharacterId",
+        "fuxe": "Cautious"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jsk": {
+      "name": "MapComplementaryAnomalyInformation",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jsn": {
+      "name": "GameRolePlayShowActorsEvent",
+      "fields": {
+        "fuxz": "Actors"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jsq": {
+      "name": "MapMovementConfirmedResponse",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "response"
+    },
+    "jss": {
+      "name": "MapComplementaryInformationEvent",
+      "fields": {
+        "fuyi": "MapId",
+        "fuyk": "Actors",
+        "fuyl": "SubareaId"
+      },
+      "oneofs": {
+        "fuyx": {
+          "member": "SpecificCase",
+          "cases": {
+            "fuys": {
+              "type": "MapSpecificComplementaryInformationCaseAnomaly",
+              "member": "Value"
+            },
+            "fuyt": {
+              "type": "MapSpecificComplementaryInformationCaseGuildInformation",
+              "member": "Value"
+            },
+            "fuyu": {
+              "type": "MapSpecificComplementaryInformationCaseInHouseInformation",
+              "member": "Value"
+            },
+            "fuyv": {
+              "type": "MapSpecificComplementaryInformationCaseHavenBagInformation",
+              "member": "Value"
+            },
+            "fuyw": {
+              "type": "MapSpecificComplementaryInformationCaseCoords",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jtc": {
+      "name": "EntitySpawnInformation",
+      "fields": {},
+      "oneofs": {
+        "fvaa": {
+          "member": "SpawnInformationCase",
+          "cases": {
+            "fuzx": {
+              "type": "EntitySpawnInformationCaseCompanion",
+              "member": "Value"
+            },
+            "fuzy": {
+              "type": "EntitySpawnInformationCaseCharacter",
+              "member": "Value"
+            },
+            "fuzz": {
+              "type": "EntitySpawnInformationCaseMonster",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jsy": {
+      "name": "EntitySpawnMonsterInformation",
+      "fields": {
+        "fuzc": "MonsterGid"
+      },
+      "oneofs": {
+        "fuzh": {
+          "member": "InvocationInformationCase",
+          "cases": {
+            "fuzd": {
+              "type": "EntitySpawnMonsterInformationCaseLevel",
+              "member": "Value"
+            },
+            "fuzf": {
+              "type": "EntitySpawnMonsterInformationCaseGrade",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jsz": {
+      "name": "EntitySpawnCharacter",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jta": {
+      "name": "EntitySpawnCompanion",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jti": {
+      "name": "GameActionAcknowledgementRequest",
+      "fields": {
+        "fvbd": "Valid",
+        "fvbe": "ActionId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jto": {
+      "name": "SequenceStartEvent",
+      "fields": {
+        "fvcd": "SequenceType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jwe": {
+      "name": "GameActionFightEvent",
+      "fields": {
+        "fvnt": "SourceId",
+        "fvnu": "ActionType"
+      },
+      "oneofs": {
+        "fvpf": {
+          "member": "Payload",
+          "cases": {
+            "fvnv": {
+              "type": "FightActionCaseSummons",
+              "member": "Value"
+            },
+            "fvnw": {
+              "type": "FightActionCaseExchangePositions",
+              "member": "Value"
+            },
+            "fvnx": {
+              "type": "FightActionCaseDeath",
+              "member": "Value"
+            },
+            "fvny": {
+              "type": "FightActionCaseLifePointsGain",
+              "member": "Value"
+            },
+            "fvnz": {
+              "type": "FightActionCaseTargetedAbility",
+              "member": "Value"
+            },
+            "fvoa": {
+              "type": "FightActionCaseTriggerGlyphTrap",
+              "member": "Value"
+            },
+            "fvob": {
+              "type": "FightActionCaseVanish",
+              "member": "Value"
+            },
+            "fvoc": {
+              "type": "FightActionCaseTackled",
+              "member": "Value"
+            },
+            "fvod": {
+              "type": "FightActionCaseReduceDamages",
+              "member": "Value"
+            },
+            "fvoe": {
+              "type": "FightActionCaseKill",
+              "member": "Value"
+            },
+            "fvof": {
+              "type": "FightActionCasePlaySequence",
+              "member": "Value"
+            },
+            "fvog": {
+              "type": "FightActionCaseStealKama",
+              "member": "Value"
+            },
+            "fvoh": {
+              "type": "FightActionCaseActivateGlyphTrap",
+              "member": "Value"
+            },
+            "fvoi": {
+              "type": "FightActionCaseCarryCharacter",
+              "member": "Value"
+            },
+            "fvoj": {
+              "type": "FightActionCaseModifyEffectsDuration",
+              "member": "Value"
+            },
+            "fvok": {
+              "type": "FightActionCasePointsVariation",
+              "member": "Value"
+            },
+            "fvol": {
+              "type": "FightActionCaseNoChange",
+              "member": "Value"
+            },
+            "fvom": {
+              "type": "FightActionCaseUnmarkCells",
+              "member": "Value"
+            },
+            "fvon": {
+              "type": "FightActionCaseSpellRemove",
+              "member": "Value"
+            },
+            "fvoo": {
+              "type": "FightActionCaseThrowCharacter",
+              "member": "Value"
+            },
+            "fvop": {
+              "type": "FightActionCaseExecuteScript",
+              "member": "Value"
+            },
+            "fvoq": {
+              "type": "FightActionCaseChangeLook",
+              "member": "Value"
+            },
+            "fvor": {
+              "type": "FightActionCaseDropCharacter",
+              "member": "Value"
+            },
+            "fvos": {
+              "type": "FightActionCaseDodgePointLoss",
+              "member": "Value"
+            },
+            "fvot": {
+              "type": "FightActionCaseRemoveHitbox",
+              "member": "Value"
+            },
+            "fvou": {
+              "type": "FightActionCaseCreateHitbox",
+              "member": "Value"
+            },
+            "fvov": {
+              "type": "FightActionCaseReflectSpell",
+              "member": "Value"
+            },
+            "fvow": {
+              "type": "FightActionCaseMarkCells",
+              "member": "Value"
+            },
+            "fvox": {
+              "type": "FightActionCaseDispelSpell",
+              "member": "Value"
+            },
+            "fvoy": {
+              "type": "FightActionCaseInvisibility",
+              "member": "Value"
+            },
+            "fvoz": {
+              "type": "FightActionCaseTeleportOnSameMap",
+              "member": "Value"
+            },
+            "fvpa": {
+              "type": "FightActionCaseInvisibleDetected",
+              "member": "Value"
+            },
+            "fvpb": {
+              "type": "FightActionCaseReflectDamages",
+              "member": "Value"
+            },
+            "fvpc": {
+              "type": "FightActionCaseSlide",
+              "member": "Value"
+            },
+            "fvpd": {
+              "type": "FightActionCaseChangeTeam",
+              "member": "Value"
+            },
+            "fvpe": {
+              "type": "FightActionCaseLifePointsLost",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jtq": {
+      "name": "FightActionPlaySequence",
+      "fields": {
+        "fvch": "IntensityMultiplier",
+        "fvci": "IsBlocking",
+        "fvcj": "SequenceId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jtr": {
+      "name": "FightActionCarryCharacter",
+      "fields": {
+        "fvcn": "Cell",
+        "fvcp": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jts": {
+      "name": "FightActionDropCharacter",
+      "fields": {
+        "fvcu": "TargetId",
+        "fvcv": "Cell"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jtv": {
+      "name": "FightActionThrowCharacter",
+      "fields": {
+        "fvda": "TargetId",
+        "fvdb": "Cell"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jtw": {
+      "name": "FightActionExecuteScript",
+      "fields": {
+        "fvdf": "Critical",
+        "fvdg": "SpellRank",
+        "fvdh": "Cell",
+        "fvdi": "SpellId",
+        "fvdj": "ScriptUsageId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jtx": {
+      "name": "FightActionUnmarkCells",
+      "fields": {
+        "fvdn": "MarkId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jty": {
+      "name": "FightActionTriggerGlyphTrap",
+      "fields": {
+        "fvdr": "MarkImpactCell",
+        "fvds": "TriggeringCharacterId",
+        "fvdu": "MarkId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jtz": {
+      "name": "FightActionActivateGlyphTrap",
+      "fields": {
+        "fvdy": "MarkId",
+        "fvdz": "Active"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "juc": {
+      "name": "FightActionInvisibility",
+      "fields": {
+        "fvel": "InvisibilityState",
+        "fveo": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "juk": {
+      "name": "FightActionSummons",
+      "fields": {},
+      "oneofs": {
+        "fvfz": {
+          "member": "SummonsCase",
+          "cases": {
+            "fvfx": {
+              "type": "FightActionSummonsCaseSummonsByContextInformation",
+              "member": "Value"
+            },
+            "fvfy": {
+              "type": "FightActionSummonsCaseSummonsByActor",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jue": {
+      "name": "FightActionSummonsByActor",
+      "fields": {
+        "fvet": "Actors"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jui": {
+      "name": "FightActionSummonsByContextInformation",
+      "fields": {
+        "fvfs": "Summons"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jug": {
+      "name": "FightSummonContextInformation",
+      "fields": {
+        "fvfi": "Summons",
+        "fvfl": "Look",
+        "fvfn": "SpawnInformation",
+        "fvfo": "Characteristics"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jun": {
+      "name": "FightActionMarkCells",
+      "fields": {
+        "fvgd": "Mark"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "juo": {
+      "name": "FightActionModifyEffectsDuration",
+      "fields": {
+        "fvgi": "Delta",
+        "fvgj": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jur": {
+      "name": "FightActionStealKama",
+      "fields": {
+        "fvhb": "TargetId",
+        "fvhd": "Amount"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jus": {
+      "name": "FightActionChangeLook",
+      "fields": {
+        "fvhh": "TargetId",
+        "fvhj": "Look"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jut": {
+      "name": "FightActionTeleportOnSameMap",
+      "fields": {
+        "fvhn": "Cell",
+        "fvho": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "juu": {
+      "name": "FightActionExchangePositions",
+      "fields": {
+        "fvhs": "TargetCellId",
+        "fvht": "TargetId",
+        "fvhu": "CasterCellId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jux": {
+      "name": "FightActionDispelSpell",
+      "fields": {
+        "fvhz": "SpellId",
+        "fvia": "SpellRank",
+        "fvib": "TargetId",
+        "fvic": "VerboseCast"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "juz": {
+      "name": "FightActionSpellRemove",
+      "fields": {
+        "fvii": "TargetId"
+      },
+      "oneofs": {
+        "fvin": {
+          "member": "ComplementCase",
+          "cases": {
+            "fvij": {
+              "type": "FightActionSpellRemoveComplementCaseBuffId",
+              "member": "Value"
+            },
+            "fvil": {
+              "type": "FightActionSpellRemoveComplementCaseEffectUid",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jva": {
+      "name": "FightActionTackled",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvb": {
+      "name": "FightActionPointsVariation",
+      "fields": {
+        "fviv": "Delta",
+        "fviw": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvc": {
+      "name": "FightActionInvisibleDetected",
+      "fields": {
+        "fvja": "Cell",
+        "fvjb": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvi": {
+      "name": "FightActionTargetedAbility",
+      "fields": {
+        "fvjy": "SilentCast",
+        "fvjz": "TargetId",
+        "fvkb": "SpellCastCounts",
+        "fvkc": "Critical",
+        "fvkd": "DestinationCell",
+        "fvke": "VerboseCast",
+        "fvkf": "GlobalCastCount"
+      },
+      "oneofs": {
+        "fvkj": {
+          "member": "FightCase",
+          "cases": {
+            "fvkg": {
+              "type": "FightActionTargetedAbilityCaseSpellCast",
+              "member": "Value"
+            },
+            "fvkh": {
+              "type": "FightActionTargetedAbilityCaseWeaponGenericId",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jve": {
+      "name": "FightActionSpellCast",
+      "fields": {
+        "fvjf": "PortalsId",
+        "fvjg": "SpellId",
+        "fvjh": "SpellLevel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvf": {
+      "name": "SpellCastCount",
+      "fields": {
+        "fvjl": "PerTargetCounts",
+        "fvjm": "Count",
+        "fvjo": "EntityId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvg": {
+      "name": "SpellGlobalCastCount",
+      "fields": {
+        "fvjt": "PerTargetCounts",
+        "fvju": "Count"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvj": {
+      "name": "FightActionVanish",
+      "fields": {
+        "fvkn": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvk": {
+      "name": "FightActionKill",
+      "fields": {
+        "fvkt": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvn": {
+      "name": "FightActionDeath",
+      "fields": {
+        "fvle": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvo": {
+      "name": "FightActionNoChange",
+      "fields": {
+        "fvlj": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvp": {
+      "name": "FightActionLifePointsLost",
+      "fields": {
+        "fvlr": "TargetId",
+        "fvls": "Loss",
+        "fvlt": "ElementId",
+        "fvlu": "PermanentDamages"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvs": {
+      "name": "FightActionLifePointsGain",
+      "fields": {
+        "fvly": "Delta",
+        "fvmb": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvt": {
+      "name": "FightActionSlide",
+      "fields": {
+        "fvmf": "StartCell",
+        "fvmg": "TargetId",
+        "fvmh": "EndCell"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvu": {
+      "name": "FightActionDodgePointLoss",
+      "fields": {
+        "fvml": "Amount",
+        "fvmn": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvv": {
+      "name": "FightActionReflectDamages",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvw": {
+      "name": "FightActionReduceDamages",
+      "fields": {
+        "fvmx": "Amount",
+        "fvmy": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jvz": {
+      "name": "FightActionReflectSpell",
+      "fields": {
+        "fvnd": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jwa": {
+      "name": "FightActionCreateHitbox",
+      "fields": {
+        "fvnh": "Cell"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jwb": {
+      "name": "FightActionRemoveHitbox",
+      "fields": {
+        "fvnl": "Cell"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jwc": {
+      "name": "FightActionChangeTeam",
+      "fields": {
+        "fvnp": "Team"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jwh": {
+      "name": "GameActionFightCastRequest",
+      "fields": {
+        "fvpu": "Cell",
+        "fvpx": "SpellId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jwi": {
+      "name": "SequenceEndEvent",
+      "fields": {
+        "fvqb": "ActionId",
+        "fvqc": "AuthorId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jwq": {
+      "name": "FightEffectsRefreshEvent",
+      "fields": {
+        "fvrg": "Effects"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jww": {
+      "name": "BaseFightStatistics",
+      "fields": {
+        "fvsk": "KillCount",
+        "fvsl": "BlockedDamage",
+        "fvsm": "DamageTaken",
+        "fvsn": "HealDone",
+        "fvso": "DamageDone",
+        "fvsq": "HealTaken",
+        "fvsr": "AppliedShield"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jwz": {
+      "name": "FightTurnReadyRequest",
+      "fields": {
+        "fvsz": "IsReady"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jxb": {
+      "name": "FightSynchronizeEvent",
+      "fields": {
+        "fvth": "Fighters"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jxc": {
+      "name": "FightSpellCooldownEvent",
+      "fields": {
+        "fvtl": "Cooldowns",
+        "fvto": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jxg": {
+      "name": "FightFighterShowEvent",
+      "fields": {
+        "fvuf": "Information"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jxh": {
+      "name": "FightIsTurnReadyEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jxm": {
+      "name": "FightEffectAddedEvent",
+      "fields": {
+        "fvvi": "Effect"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jxo": {
+      "name": "FightStatisticsEvent",
+      "fields": {
+        "fvvr": "StatisticsByFighter",
+        "fvvs": "BaseFightStatistics"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jxw": {
+      "name": "FightRefreshCharacterStatsEvent",
+      "fields": {
+        "fvwz": "FighterId",
+        "fvxb": "Stats"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jxy": {
+      "name": "FightTurnFinishRequest",
+      "fields": {
+        "fvxo": "IsAfk"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "jxz": {
+      "name": "FightNewRoundEvent",
+      "fields": {
+        "fvxs": "TurnOrder",
+        "fvxt": "RoundNumber"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jya": {
+      "name": "FightEffectRemovedEvent",
+      "fields": {
+        "fvxx": "TargetId",
+        "fvxy": "EffectUid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jyg": {
+      "name": "FightEndEvent",
+      "fields": {
+        "fvyw": "Budget",
+        "fvyy": "Results",
+        "fvyz": "NamedPartyTeamsOutcomes",
+        "fvza": "Duration",
+        "fvzd": "RewardRate",
+        "fvze": "Score",
+        "fvzg": "LootShareLimitMalus"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jyj": {
+      "name": "FightTurnStartPlayingEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jys": {
+      "name": "FightStatisticsFighterInformation",
+      "fields": {
+        "fwah": "Team",
+        "fwai": "FighterId"
+      },
+      "oneofs": {
+        "fwan": {
+          "member": "FighterKind",
+          "cases": {
+            "fwaj": {
+              "type": "FightStatisticsFighterKindCasePlayer",
+              "member": "Value"
+            },
+            "fwak": {
+              "type": "FightStatisticsFighterKindCaseMonster",
+              "member": "Value"
+            },
+            "fwal": {
+              "type": "FightStatisticsFighterKindCaseSummon",
+              "member": "Value"
+            },
+            "fwam": {
+              "type": "FightStatisticsFighterKindCaseCompanion",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jyn": {
+      "name": "FightStatisticsPlayerInformation",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jyo": {
+      "name": "FightStatisticsMonsterInformation",
+      "fields": {
+        "fvzt": "MonsterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jyp": {
+      "name": "FightStatisticsCompanionInformation",
+      "fields": {
+        "fvzx": "Owner",
+        "fvzy": "CompanionId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jyq": {
+      "name": "FightStatisticsSummonInformation",
+      "fields": {
+        "fwac": "Owner",
+        "fwad": "MonsterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jyt": {
+      "name": "FightTurnEndEvent",
+      "fields": {
+        "fwar": "SavedDeciseconds",
+        "fwas": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jyy": {
+      "name": "FightActorContextEvent",
+      "fields": {
+        "fwbp": "ActorId",
+        "fwbq": "ContextId",
+        "fwbt": "Spells",
+        "fwbu": "Shortcuts"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jzc": {
+      "name": "FightTurnEvent",
+      "fields": {
+        "fwcl": "CharacterId",
+        "fwcm": "WaitDeciseconds"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jzo": {
+      "name": "FighterFightStatistics",
+      "fields": {
+        "fwfr": "FighterInformation",
+        "fwfs": "Kills",
+        "fwft": "ActionPoints",
+        "fwfu": "HealingReceived",
+        "fwfv": "DamageTaken",
+        "fwfw": "ShieldingApplied",
+        "fwfz": "MovementPoints",
+        "fwga": "ShieldingReceived",
+        "fwgb": "HealingDone",
+        "fwgc": "DamageDone"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzd": {
+      "name": "FightDamageDoneStatistics",
+      "fields": {
+        "fwcy": "PoisonDamage",
+        "fwcz": "SummonDamage",
+        "fwda": "DamagePerActionPoint",
+        "fwdb": "Total",
+        "fwdc": "PushDamage",
+        "fwdd": "DamagePerTurn",
+        "fwde": "ObjectDamage",
+        "fwdf": "ShieldDamage",
+        "fwdg": "DirectDamage",
+        "fwdh": "ErosionDone"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jze": {
+      "name": "FightDamageTakenStatistics",
+      "fields": {
+        "fwdl": "ObjectDamage",
+        "fwdm": "ErosionTaken",
+        "fwdn": "DamagePerTurn",
+        "fwdo": "SummonDamage",
+        "fwdp": "ShieldDamage",
+        "fwdq": "PushDamage",
+        "fwdr": "PoisonDamage",
+        "fwdt": "Total"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzh": {
+      "name": "FightHealingDoneStatistics",
+      "fields": {
+        "fwdx": "HealingPerActionPoint",
+        "fwdz": "HealingPerTurn",
+        "fwea": "SummonHealing",
+        "fweb": "Total"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzi": {
+      "name": "FightHealingReceivedStatistics",
+      "fields": {
+        "fwef": "HealingPerTurn",
+        "fweg": "Total",
+        "fweh": "SummonHealing"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzj": {
+      "name": "FightShieldingAppliedStatistics",
+      "fields": {
+        "fwel": "Total",
+        "fwem": "SummonShielding",
+        "fwen": "ShieldingPerTurn"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzk": {
+      "name": "FightShieldingReceivedStatistics",
+      "fields": {
+        "fwer": "Total",
+        "fwes": "ShieldingPerTurn",
+        "fwet": "SummonShielding"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzl": {
+      "name": "FightPointStatistics",
+      "fields": {
+        "fwex": "Removed",
+        "fwey": "RemovedPerTurn",
+        "fwez": "DodgedPerTurn",
+        "fwfa": "SpentPerTurn",
+        "fwfb": "RemovedByTackle",
+        "fwfc": "Dodged",
+        "fwfd": "NotDodged",
+        "fwfe": "NotDodgedPerTurn"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzm": {
+      "name": "FightKillStatistics",
+      "fields": {
+        "fwfk": "Total",
+        "fwfm": "EnemiesKilled",
+        "fwfn": "SummonsKilled"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzu": {
+      "name": "FightTurnListEvent",
+      "fields": {
+        "fwgy": "Turns"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jzq": {
+      "name": "FightTurnEntity",
+      "fields": {},
+      "oneofs": {
+        "fwgj": {
+          "member": "$self",
+          "cases": {
+            "fwgh": {
+              "type": "FightTurnEntityCaseWithAdditionalId",
+              "member": "Value"
+            },
+            "fwgi": {
+              "type": "FightTurnEntityCaseWithFlag",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzr": {
+      "name": "FightTurnWithFlag",
+      "fields": {
+        "fwgn": "UndefinedFlags",
+        "fwgo": "EntityId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzs": {
+      "name": "FightTurnWithAdditionalId",
+      "fields": {
+        "fwgs": "EntityId",
+        "fwgt": "AdditionalTurnId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "jzy": {
+      "name": "FightPlacementPositionRequest",
+      "fields": {
+        "fwho": "EntityId",
+        "fwhp": "CellId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kaa": {
+      "name": "FightJoinEvent",
+      "fields": {
+        "fwhw": "IsTeamPhase",
+        "fwhz": "IsFightStarted",
+        "fwia": "TimeMaxBeforeFightStart",
+        "fwib": "FightType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kae": {
+      "name": "FightTeamUpdateEvent",
+      "fields": {
+        "fwiy": "Team",
+        "fwiz": "FightId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kah": {
+      "name": "FightHumanReadyStateEvent",
+      "fields": {
+        "fwjd": "CharacterId",
+        "fwjf": "IsReady"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kai": {
+      "name": "FightStartEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kam": {
+      "name": "FightStartingEvent",
+      "fields": {
+        "fwjt": "ContainBoss",
+        "fwju": "FightType",
+        "fwjw": "MonsterIds",
+        "fwjx": "FightId",
+        "fwjy": "AttackerId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kaq": {
+      "name": "FightReadyRequest",
+      "fields": {
+        "fwkq": "IsReady"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kau": {
+      "name": "FightOptionUpdateEvent",
+      "fields": {
+        "fwky": "Team",
+        "fwla": "Option",
+        "fwlb": "State",
+        "fwlc": "FightId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kba": {
+      "name": "FightPlacementPossiblePositionsEvent",
+      "fields": {
+        "fwmd": "StartingPositions",
+        "fwme": "Team"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kbd": {
+      "name": "ExchangeNpcShopStartedEvent",
+      "fields": {
+        "fwmn": "Objects",
+        "fwmo": "SellerId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kbt": {
+      "name": "ExchangeBidHouseItemListEvent",
+      "fields": {
+        "fwph": "ObjectType",
+        "fwpi": "ObjectGid",
+        "fwpj": "ItemDescriptions"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kbr": {
+      "name": "BidExchangerObject",
+      "fields": {
+        "fwow": "ObjectUid",
+        "fwoz": "Effects",
+        "fwpa": "ObjectGid",
+        "fwpb": "Prices"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kdg": {
+      "name": "ExchangeBoughtEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kdr": {
+      "name": "ExchangeCraftResultEvent",
+      "fields": {
+        "fwxu": "Result"
+      },
+      "oneofs": {
+        "fwxy": {
+          "member": "ComplementCase",
+          "cases": {
+            "fwxv": {
+              "type": "ExchangeCraftResultEventComplementCaseObjectGid",
+              "member": "Value"
+            },
+            "fwxx": {
+              "type": "ExchangeCraftResultEventComplementCaseObject",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kdp": {
+      "name": "ExchangeCraftResultWithObjectDescription",
+      "fields": {
+        "fwxl": "MagicPoolStatus",
+        "fwxp": "FmPower",
+        "fwxq": "Object"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kdw": {
+      "name": "ExchangeBidBuyerStartedEvent",
+      "fields": {
+        "fwyl": "SellingConditions"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kea": {
+      "name": "ExchangeBuyRequest",
+      "fields": {
+        "fwzd": "ObjectGid",
+        "fwze": "Quantity"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "keo": {
+      "name": "ExchangeObjectRemovedFromBagEvent",
+      "fields": {
+        "fxbj": "ObjectUid",
+        "fxbk": "Remote"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kfb": {
+      "name": "ExchangeObjectsAddedEvent",
+      "fields": {
+        "fxea": "Objects",
+        "fxeb": "Remote",
+        "fxec": "FmPower"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kfs": {
+      "name": "ExchangeObjectRemovedEvent",
+      "fields": {
+        "fxgs": "ObjectUid",
+        "fxgt": "Remote"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kfw": {
+      "name": "SellingConditions",
+      "fields": {
+        "fxhd": "NpcContextualId",
+        "fxhe": "MaxItemLevel",
+        "fxhf": "MaxItemPerAccount",
+        "fxhg": "BidId",
+        "fxhh": "TaxPercentage",
+        "fxhi": "UnsoldDelay",
+        "fxhj": "TaxModificationPercentage",
+        "fxhl": "Types",
+        "fxhm": "Quantities"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kgp": {
+      "name": "ExchangeBidHouseInListUpdatedEvent",
+      "fields": {
+        "fxky": "Prices",
+        "fxkz": "ObjectUid",
+        "fxla": "Effects",
+        "fxlb": "ObjectGid",
+        "fxlc": "ObjectType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kgq": {
+      "name": "ExchangeCraftStartedEvent",
+      "fields": {
+        "fxlg": "SkillId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "khd": {
+      "name": "ExchangeLeaveEvent",
+      "fields": {
+        "fxnn": "Success",
+        "fxnp": "DialogType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kla": {
+      "name": "DialogLeaveRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kme": {
+      "name": "ContextQuitRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kmk": {
+      "name": "EntitiesDispositionEvent",
+      "fields": {
+        "fyes": "Added"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kml": {
+      "name": "ContextDestroyEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kmp": {
+      "name": "ContextCreationEvent",
+      "fields": {
+        "fyfd": "Context"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kmr": {
+      "name": "ContextCreationRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kmu": {
+      "name": "ContextRemoveElementEvent",
+      "fields": {
+        "fyfr": "ElementId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kmv": {
+      "name": "ContextReadyRequest",
+      "fields": {
+        "fyfw": "MapId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "knc": {
+      "name": "FriendSetWarnOnLevelGainRequest",
+      "fields": {
+        "fygl": "Enable"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "koc": {
+      "name": "ContactWarnOnPermanentDeathSetRequest",
+      "fields": {
+        "fyjf": "Enable"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "koe": {
+      "name": "FriendSetWarnOnConnectionRequest",
+      "fields": {
+        "fyjo": "Enable"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kon": {
+      "name": "FriendSetStatusShareRequest",
+      "fields": {
+        "fylc": "Share"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kpb": {
+      "name": "ContactWarnOnAchievementCompleteSetRequest",
+      "fields": {
+        "fymm": "Enable"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kqo": {
+      "name": "PingRequest",
+      "fields": {
+        "fyrp": "Quiet"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kqp": {
+      "name": "QueueStatusEvent",
+      "fields": {
+        "fyrt": "Position",
+        "fyru": "Total"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kqu": {
+      "name": "OptionalFeaturesEvent",
+      "fields": {
+        "fysp": "Features"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kqy": {
+      "name": "PongEvent",
+      "fields": {
+        "fytd": "Quiet"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kqz": {
+      "name": "IdentificationRequest",
+      "fields": {
+        "fytk": "TicketKey",
+        "fytl": "LanguageCode"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kra": {
+      "name": "AuthenticationTicketAcceptedEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "krs": {
+      "name": "AccountSubscriptionElapsedDurationUpdateEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "krv": {
+      "name": "TokenValidationRequest",
+      "fields": {
+        "fywt": "Token"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kti": {
+      "name": "ChatChannelMessageEvent",
+      "fields": {
+        "fzci": "OriginServerId",
+        "fzck": "SenderPrefix",
+        "fzcl": "Date",
+        "fzcm": "SenderName",
+        "fzcn": "SenderCharacterId",
+        "fzco": "SenderAccountId",
+        "fzcp": "Content",
+        "fzcr": "Channel",
+        "fzcs": "FromAdmin"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ktm": {
+      "name": "ChatChannelMessageRequest",
+      "fields": {
+        "fzdc": "Content",
+        "fzdd": "Channel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ktn": {
+      "name": "ChatChannelSubscriptionRequest",
+      "fields": {
+        "fzdh": "ActiveChannels",
+        "fzdi": "DisabledChannels"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ktq": {
+      "name": "ChannelUpdateEvent",
+      "fields": {
+        "fzdz": "Enable",
+        "fzea": "Channel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kua": {
+      "name": "CharacterLevelUpEvent",
+      "fields": {
+        "fzfr": "NewLevel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kub": {
+      "name": "CharacterCharacteristicsEvent",
+      "fields": {
+        "fzfw": "Stats"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kuh": {
+      "name": "ResetCharacterCharacteristicsRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kum": {
+      "name": "CharacterCharacteristicUpgradeRequest",
+      "fields": {
+        "fzgy": "Intelligence",
+        "fzgz": "Chance",
+        "fzha": "Vitality",
+        "fzhb": "Wisdom",
+        "fzhc": "Agility",
+        "fzhd": "Strength"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kuq": {
+      "name": "UpdateLifePointsEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kva": {
+      "name": "CharacterSelectionEvent",
+      "fields": {},
+      "oneofs": {
+        "fzio": {
+          "member": "$self",
+          "cases": {
+            "fzim": {
+              "type": "CharacterSelectionEventCaseSuccess",
+              "member": "Value"
+            },
+            "fzin": {
+              "type": "CharacterSelectionEventCaseError",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kux": {
+      "name": "CharacterSelectionError",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kuy": {
+      "name": "CharacterSelectionSuccess",
+      "fields": {
+        "fzii": "Character"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kvb": {
+      "name": "CharacterCreationResultEvent",
+      "fields": {
+        "fzis": "Reason",
+        "fzit": "Result"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kvc": {
+      "name": "CharacterListRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kvi": {
+      "name": "CharacterListEvent",
+      "fields": {
+        "fzjm": "Characters"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kvk": {
+      "name": "CharacterNameSuggestionEvent",
+      "fields": {
+        "fzjv": "Suggestion"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kvl": {
+      "name": "CharacterFirstSelectionRequest",
+      "fields": {
+        "fzjz": "DoTutorial",
+        "fzka": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kvw": {
+      "name": "CharacterSelectionRequest",
+      "fields": {
+        "fzln": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kvz": {
+      "name": "CharacterCreationRequest",
+      "fields": {
+        "fzly": "ModelingInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kwd": {
+      "name": "CharacterNameSuggestionRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "lcf": {
+      "name": "CharacterStatus",
+      "fields": {
+        "gabr": "Status",
+        "gabs": "Message"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lcr": {
+      "name": "CharacterCharacteristicValue",
+      "fields": {
+        "gadk": "Total"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lcu": {
+      "name": "FightTeamLightInformation",
+      "fields": {
+        "gadu": "HasFriend",
+        "gadv": "HasAllianceMember",
+        "gadw": "TeamMembersCount",
+        "gady": "HasMyTaxCollector",
+        "gadz": "HasGuildMember",
+        "gaea": "HasGroupMember",
+        "gaeb": "AverageLevel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lde": {
+      "name": "SpellModifier",
+      "fields": {
+        "gafi": "Equipment",
+        "gafj": "ActionType",
+        "gafk": "Context",
+        "gafl": "ModifierType",
+        "gafm": "SpellId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ldm": {
+      "name": "ItemMinimalInformation",
+      "fields": {
+        "gagf": "ObjectGid",
+        "gagg": "Effects"
+      },
+      "oneofs": {
+        "gagl": {
+          "member": "ComplementCase",
+          "cases": {
+            "gagi": {
+              "type": "ItemMinimalInformationComplementCaseQuantity",
+              "member": "Value"
+            },
+            "gagk": {
+              "type": "ItemMinimalInformationComplementCaseItemToSellInNpcShop",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ldk": {
+      "name": "ItemToSellInNpcShop",
+      "fields": {
+        "gafy": "Price",
+        "gafz": "Quantity",
+        "gaga": "BuyCriterion"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ldn": {
+      "name": "CharacterCharacteristics",
+      "fields": {
+        "gagp": "ExperienceNextLevelFloor",
+        "gagq": "GlobalSpellModifiers",
+        "gagr": "ExperienceBonusLimit",
+        "gags": "CriticalHitWeapon",
+        "gagu": "SpellModifiers",
+        "gagv": "ExperienceLevelFloor",
+        "gagw": "Experience",
+        "gagx": "AlignmentInformation",
+        "gagy": "Kamas",
+        "gagz": "Characteristics"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ldt": {
+      "name": "RankInformation",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ldz": {
+      "name": "FightMark",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lec": {
+      "name": "ObjectItemInventory",
+      "fields": {
+        "gakd": "Position",
+        "gake": "Favorite",
+        "gakh": "Item"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "led": {
+      "name": "MonsterInGroupInformation",
+      "fields": {
+        "gakl": "Gid",
+        "gakm": "Level",
+        "gakn": "Look",
+        "gako": "Grade"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lef": {
+      "name": "CharacterCharacteristicDetailedUsable",
+      "fields": {
+        "gakx": "Base",
+        "galb": "Context",
+        "galc": "Equipment",
+        "gald": "Used",
+        "gale": "Temporary",
+        "galf": "Additional",
+        "galg": "Alignment"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lej": {
+      "name": "FightTeamMemberEntity",
+      "fields": {
+        "gals": "EntityModelId",
+        "galt": "Level",
+        "galu": "MasterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "len": {
+      "name": "AllianceInformation",
+      "fields": {
+        "gamo": "Name"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "les": {
+      "name": "GuildInformation",
+      "fields": {
+        "ganp": "Id",
+        "ganq": "Name",
+        "ganr": "Level"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ley": {
+      "name": "PrismInformation",
+      "fields": {
+        "gaom": "CristalNumberLeft",
+        "gaoo": "NextEvolutionDate",
+        "gaop": "State",
+        "gaoq": "PlacementDate",
+        "gaor": "AllianceInformation",
+        "gaos": "Cristal"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfe": {
+      "name": "MapCoordinates",
+      "fields": {
+        "gapw": "X",
+        "gapx": "Y"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lff": {
+      "name": "FightRemovableEffectExtendedInformation",
+      "fields": {
+        "gaqb": "Effect",
+        "gaqc": "SourceId",
+        "gaqd": "ActionId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfg": {
+      "name": "FightStartingPositions",
+      "fields": {
+        "gaqh": "ChallengersPositions",
+        "gaqi": "DefendersPositions"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfh": {
+      "name": "ShortcutSmiley",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfj": {
+      "name": "ShortcutOutfit",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfx": {
+      "name": "PartyEntity",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfz": {
+      "name": "FightTeamMemberMonster",
+      "fields": {
+        "gaub": "MonsterId",
+        "gauc": "Grade"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lgi": {
+      "name": "FightTeamMemberCharacterInformation",
+      "fields": {
+        "gave": "BreedOrLevel",
+        "gavf": "Name"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lgl": {
+      "name": "MapExtendedCoordinates",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lgs": {
+      "name": "EntityDisposition",
+      "fields": {
+        "gaxe": "CellId",
+        "gaxg": "Direction",
+        "gaxh": "EntityId",
+        "gaxj": "CarryingCharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lgt": {
+      "name": "SpellCastPerTargetCount",
+      "fields": {
+        "gaxo": "Count",
+        "gaxp": "TargetId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lgw": {
+      "name": "FightTeamInformation",
+      "fields": {
+        "gaxz": "TeamType",
+        "gaya": "LeaderId",
+        "gayb": "Side",
+        "gayc": "Team",
+        "gayd": "Waves"
+      },
+      "oneofs": {
+        "gayg": {
+          "member": "TeamInformationCase",
+          "cases": {
+            "gaye": {
+              "type": "FightTeamInformationCaseLightInformation",
+              "member": "Value"
+            },
+            "gayf": {
+              "type": "FightTeamInformationCaseMembers",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lgx": {
+      "name": "MonsterGroupStaticInformation",
+      "fields": {
+        "gayk": "Underlings",
+        "gayl": "MainCreature",
+        "gaym": "Alternatives"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhd": {
+      "name": "FightRemovableEffect",
+      "fields": {
+        "gaze": "Param1",
+        "gazf": "TargetId",
+        "gazg": "BuffId",
+        "gazh": "SpellGrade",
+        "gazj": "EndTurn",
+        "gazk": "Trigger",
+        "gazl": "SpellEffectUid",
+        "gazm": "Critical",
+        "gazn": "Param3",
+        "gazp": "StartTurn",
+        "gazq": "Param2",
+        "gazr": "SpellId",
+        "gazs": "Kind",
+        "gazt": "DissipationState"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhg": {
+      "name": "EntityLook",
+      "fields": {
+        "gbaf": "Colors",
+        "gbag": "LookType",
+        "gbah": "Bones",
+        "gbaj": "Scales",
+        "gbak": "Skins"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhh": {
+      "name": "ShortcutEmote",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhn": {
+      "name": "FightSpellCooldown",
+      "fields": {
+        "gbbx": "SpellId",
+        "gbby": "Cooldown"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lho": {
+      "name": "MonstersInGroupAlternativeInformation",
+      "fields": {
+        "gbcd": "Monsters",
+        "gbce": "PlayerCount"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhq": {
+      "name": "GlobalSpellModifier",
+      "fields": {
+        "gbcp": "Context",
+        "gbcq": "ModifierType",
+        "gbcr": "ActionType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhs": {
+      "name": "Shortcut",
+      "fields": {
+        "gbcv": "SlotId"
+      },
+      "oneofs": {
+        "gbde": {
+          "member": "ShortcutCase",
+          "cases": {
+            "gbcx": {
+              "type": "ShortcutCaseShortcutEmote",
+              "member": "Value"
+            },
+            "gbcy": {
+              "type": "ShortcutCaseShortcutCosmeticObject",
+              "member": "Value"
+            },
+            "gbcz": {
+              "type": "ShortcutCaseShortcutPreset",
+              "member": "Value"
+            },
+            "gbda": {
+              "type": "ShortcutCaseShortcutSpell",
+              "member": "Value"
+            },
+            "gbdb": {
+              "type": "ShortcutCaseShortcutSmiley",
+              "member": "Value"
+            },
+            "gbdc": {
+              "type": "ShortcutCaseShortcutOutfit",
+              "member": "Value"
+            },
+            "gbdd": {
+              "type": "ShortcutCaseShortcutObjectItem",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljx": {
+      "name": "ActorPositionInformation",
+      "fields": {
+        "gbmh": "Disposition",
+        "gbmi": "ActorInformation",
+        "gbmj": "ActorId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljv": {
+      "name": "ActorInformation",
+      "fields": {
+        "gbma": "Look"
+      },
+      "oneofs": {
+        "gbmd": {
+          "member": "ActorCase",
+          "cases": {
+            "gbmb": {
+              "type": "ActorInformationCaseRolePlayActor",
+              "member": "Value"
+            },
+            "gbmc": {
+              "type": "ActorInformationCaseFightActor",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lja": {
+      "name": "RolePlayActor",
+      "fields": {},
+      "oneofs": {
+        "gbjj": {
+          "member": "ActorCase",
+          "cases": {
+            "gbjb": {
+              "type": "RolePlayActorCaseTreasureHuntNpcId",
+              "member": "Value"
+            },
+            "gbjd": {
+              "type": "RolePlayActorCasePrismActor",
+              "member": "Value"
+            },
+            "gbje": {
+              "type": "RolePlayActorCasePortalActor",
+              "member": "Value"
+            },
+            "gbjf": {
+              "type": "RolePlayActorCaseMonsterGroupActor",
+              "member": "Value"
+            },
+            "gbjg": {
+              "type": "RolePlayActorCaseNamedActor",
+              "member": "Value"
+            },
+            "gbjh": {
+              "type": "RolePlayActorCaseTaxCollectorActor",
+              "member": "Value"
+            },
+            "gbji": {
+              "type": "RolePlayActorCaseNpcStaticInformation",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lip": {
+      "name": "NamedActor",
+      "fields": {
+        "gbhd": "Name"
+      },
+      "oneofs": {
+        "gbhg": {
+          "member": "ActorCase",
+          "cases": {
+            "gbhe": {
+              "type": "NamedActorCaseMountInformation",
+              "member": "Value"
+            },
+            "gbhf": {
+              "type": "NamedActorCaseHumanoidInformation",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lim": {
+      "name": "HumanoidInformation",
+      "fields": {
+        "gbgp": "AlignmentInformation",
+        "gbgq": "MutantInformation",
+        "gbgr": "AccountId",
+        "gbgt": "Options",
+        "gbgu": "Role",
+        "gbgv": "Restrictions",
+        "gbgw": "Gender"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lij": {
+      "name": "HumanOption",
+      "fields": {},
+      "oneofs": {
+        "gbgg": {
+          "member": "OptionCase",
+          "cases": {
+            "gbfw": {
+              "type": "HumanOptionCaseEmoteOption",
+              "member": "Value"
+            },
+            "gbfx": {
+              "type": "HumanOptionCaseTitleOption",
+              "member": "Value"
+            },
+            "gbfy": {
+              "type": "HumanOptionCaseObjectUseOption",
+              "member": "Value"
+            },
+            "gbfz": {
+              "type": "HumanOptionCaseGuildInformation",
+              "member": "Value"
+            },
+            "gbga": {
+              "type": "HumanOptionCaseAllianceInformation",
+              "member": "Value"
+            },
+            "gbgb": {
+              "type": "HumanOptionCaseFollowers",
+              "member": "Value"
+            },
+            "gbgc": {
+              "type": "HumanOptionCaseSpeedMultiplier",
+              "member": "Value"
+            },
+            "gbge": {
+              "type": "HumanOptionCaseSkillUseOption",
+              "member": "Value"
+            },
+            "gbgf": {
+              "type": "HumanOptionCaseOrnamentOption",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhz": {
+      "name": "HumanFollowingCharactersOption",
+      "fields": {
+        "gbdq": "FollowingCharactersLooks"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhx": {
+      "name": "HumanIndexedEntityLook",
+      "fields": {
+        "gbdi": "Look",
+        "gbdj": "Index"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lia": {
+      "name": "HumanAllianceOption",
+      "fields": {
+        "gbdu": "AttackableStatus",
+        "gbdv": "AllianceInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lib": {
+      "name": "HumanEmoteOption",
+      "fields": {
+        "gbdz": "EmoteId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lic": {
+      "name": "HumanTitleOption",
+      "fields": {
+        "gbed": "TitleParameter",
+        "gbef": "TitleId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lid": {
+      "name": "HumanOrnamentOption",
+      "fields": {
+        "gbek": "PlayerLevel",
+        "gbel": "LeagueId",
+        "gben": "LadderPosition",
+        "gbep": "OrnamentId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lie": {
+      "name": "HumanObjectUseOption",
+      "fields": {
+        "gbeu": "ObjectGid",
+        "gbew": "DelayedActionType",
+        "gbex": "EndDelay"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lih": {
+      "name": "HumanSkillUseOption",
+      "fields": {
+        "gbfp": "SkillEndTime",
+        "gbfq": "SkillId",
+        "gbfr": "ElementId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lik": {
+      "name": "MutantInformation",
+      "fields": {
+        "gbgk": "PowerLevel",
+        "gbgl": "MonsterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lin": {
+      "name": "Mount",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "liq": {
+      "name": "TaxCollectorActor",
+      "fields": {
+        "gbhk": "Identification",
+        "gbhl": "Attack"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lit": {
+      "name": "MonsterGroupActor",
+      "fields": {
+        "gbhw": "Alignment",
+        "gbhx": "Identification",
+        "gbhy": "WaveInformation",
+        "gbia": "LootShare"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lir": {
+      "name": "MonsterGroupWaveInformation",
+      "fields": {
+        "gbhp": "Alternatives",
+        "gbhr": "WaveCount"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "liy": {
+      "name": "NpcStaticInformation",
+      "fields": {
+        "gbir": "Name",
+        "gbit": "Quests",
+        "gbiu": "Gender",
+        "gbiv": "SpecialArtworkId",
+        "gbiw": "NpcId",
+        "gbix": "Actions"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "liw": {
+      "name": "NpcQuests",
+      "fields": {
+        "gbil": "QuestsToValid",
+        "gbin": "QuestsToStart"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljt": {
+      "name": "FightFighterInformation",
+      "fields": {
+        "gblm": "FighterId",
+        "gblo": "FightCharacteristics",
+        "gblr": "SpawnInformation"
+      },
+      "oneofs": {
+        "gblw": {
+          "member": "FighterCase",
+          "cases": {
+            "gblt": {
+              "type": "FightFighterInformationCaseAiFighter",
+              "member": "Value"
+            },
+            "gblu": {
+              "type": "FightFighterInformationCaseNamedFighter",
+              "member": "Value"
+            },
+            "gblv": {
+              "type": "FightFighterInformationCaseEntityFighter",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljj": {
+      "name": "FightNamedFighterInformation",
+      "fields": {
+        "gbkb": "Status",
+        "gbke": "Name",
+        "gbkf": "StatusInformation"
+      },
+      "oneofs": {
+        "gbki": {
+          "member": "CharacterCase",
+          "cases": {
+            "gbkg": {
+              "type": "FightNamedFighterInformationCharacterCaseCharacter",
+              "member": "Value"
+            },
+            "gbkh": {
+              "type": "FightNamedFighterInformationCharacterCaseMutantInformation",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljg": {
+      "name": "FightNamedFighterCharacterInformation",
+      "fields": {
+        "gbjn": "BreedId",
+        "gbjo": "Gender",
+        "gbjp": "Level",
+        "gbjq": "AlignmentInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljh": {
+      "name": "FightMutantInformation",
+      "fields": {
+        "gbjv": "MonsterId",
+        "gbjw": "PowerLevel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljq": {
+      "name": "FightAIFighterInformation",
+      "fields": {},
+      "oneofs": {
+        "gblb": {
+          "member": "FighterCase",
+          "cases": {
+            "gbkz": {
+              "type": "FightAIFighterInformationCaseTaxCollector",
+              "member": "Value"
+            },
+            "gbla": {
+              "type": "FightAIFighterInformationCaseMonster",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljl": {
+      "name": "FightMonsterInformation",
+      "fields": {
+        "gbkm": "CreatureGrade",
+        "gbkn": "MonsterGid",
+        "gbko": "CreatureLevel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljo": {
+      "name": "FightTaxCollectorInformation",
+      "fields": {
+        "gbks": "FirstNameId",
+        "gbkt": "LastNameId",
+        "gbku": "MonsterGid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ljr": {
+      "name": "EntityFighterInformation",
+      "fields": {
+        "gblf": "MasterId",
+        "gblg": "MasterName",
+        "gblh": "EntityModelId",
+        "gbli": "Level"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "llg": {
+      "name": "ObjectUidWithQuantity",
+      "fields": {
+        "gbsw": "ObjectUid",
+        "gbsx": "Quantity"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "llj": {
+      "name": "ObjectStorageQuantity",
+      "fields": {
+        "gbtn": "Quantity",
+        "gbto": "Storage"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "llk": {
+      "name": "ObjectItem",
+      "fields": {
+        "gbts": "Gid",
+        "gbtt": "Effects",
+        "gbtu": "Quantity",
+        "gbtv": "Uid",
+        "gbtw": "StorageQuantities"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lll": {
+      "name": "TaxCollectorStaticInformation",
+      "fields": {
+        "gbua": "Alliance",
+        "gbub": "LastNameId",
+        "gbuc": "Uid",
+        "gbud": "CallerId",
+        "gbue": "FirstNameId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "llp": {
+      "name": "AlignmentInformation",
+      "fields": {
+        "gbux": "AlignmentQuestNumber",
+        "gbuy": "Alignment",
+        "gbuz": "ExtendedInformation",
+        "gbva": "AlignmentGrade",
+        "gbvb": "CharacterLevel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lln": {
+      "name": "AlignmentExtendedInformation",
+      "fields": {
+        "gbuq": "Honor",
+        "gbur": "Attackable"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmm": {
+      "name": "FightResultListEntry",
+      "fields": {
+        "gbyo": "Rewards",
+        "gbyp": "Fighter",
+        "gbyq": "Outcome"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "llq": {
+      "name": "FightLoot",
+      "fields": {
+        "gbvf": "Kamas",
+        "gbvg": "LootGroups"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "llw": {
+      "name": "FightLootGroup",
+      "fields": {
+        "gbvy": "Objects",
+        "gbwa": "InventoryObjects",
+        "gbwc": "MonsterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "llu": {
+      "name": "FightLootObject",
+      "fields": {
+        "gbvr": "PriorityHint",
+        "gbvs": "Quantity",
+        "gbvu": "Id"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmk": {
+      "name": "FighterListEntry",
+      "fields": {
+        "gbye": "FighterId",
+        "gbyf": "Alive"
+      },
+      "oneofs": {
+        "gbyj": {
+          "member": "FighterCase",
+          "cases": {
+            "gbyg": {
+              "type": "FighterListEntryCaseCharacter",
+              "member": "Value"
+            },
+            "gbyh": {
+              "type": "FighterListEntryCaseTaxCollector",
+              "member": "Value"
+            },
+            "gbyi": {
+              "type": "FighterListEntryCaseMutant",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmg": {
+      "name": "FightCharacterResult",
+      "fields": {
+        "gbxq": "Additional",
+        "gbxr": "Level"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lme": {
+      "name": "FightResultAdditionalData",
+      "fields": {},
+      "oneofs": {
+        "gbxm": {
+          "member": "AdditionalData",
+          "cases": {
+            "gbxk": {
+              "type": "FightResultAdditionalDataCasePvpData",
+              "member": "Value"
+            },
+            "gbxl": {
+              "type": "FightResultAdditionalDataCaseExperienceData",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "llz": {
+      "name": "FightExperienceData",
+      "fields": {
+        "gbwg": "ExperienceFightDelta",
+        "gbwh": "ExperienceNextLevelFloor",
+        "gbwi": "ReRollExperienceMultiplier",
+        "gbwj": "ShowExperience",
+        "gbwk": "Experience",
+        "gbwl": "ExperienceLevelFloor",
+        "gbwm": "ShowExperienceFightDelta"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmc": {
+      "name": "FightPvpData",
+      "fields": {
+        "gbxe": "UnknownResultValue",
+        "gbxg": "ArenaLeagueId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmh": {
+      "name": "FightMutantResult",
+      "fields": {
+        "gbxw": "Level"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmi": {
+      "name": "FightTaxCollectorResult",
+      "fields": {
+        "gbya": "AllianceInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmq": {
+      "name": "ShortcutSpell",
+      "fields": {
+        "gbzt": "SpellId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmt": {
+      "name": "FightTeamMembersInformation",
+      "fields": {
+        "gcai": "Members"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lng": {
+      "name": "ObjectEffect",
+      "fields": {
+        "gcbz": "Action"
+      },
+      "oneofs": {
+        "gcco": {
+          "member": "EffectCase",
+          "cases": {
+            "gcca": {
+              "type": "ObjectEffectCaseValueString",
+              "member": "Value"
+            },
+            "gccc": {
+              "type": "ObjectEffectCaseValueDate",
+              "member": "Value"
+            },
+            "gccd": {
+              "type": "ObjectEffectCaseValueDurationMinutes",
+              "member": "Value"
+            },
+            "gccf": {
+              "type": "ObjectEffectCaseValueInt",
+              "member": "Value"
+            },
+            "gcch": {
+              "type": "ObjectEffectCaseValueMinMax",
+              "member": "Value"
+            },
+            "gcci": {
+              "type": "ObjectEffectCaseValueDice",
+              "member": "Value"
+            },
+            "gccj": {
+              "type": "ObjectEffectCaseValueRideParents",
+              "member": "Value"
+            },
+            "gcck": {
+              "type": "ObjectEffectCaseValuePaddockGauge",
+              "member": "Value"
+            },
+            "gccl": {
+              "type": "ObjectEffectCaseValueCreatureFamily",
+              "member": "Value"
+            },
+            "gccn": {
+              "type": "ObjectEffectCaseValueMonsterCount",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmv": {
+      "name": "ObjectEffectDateValue",
+      "fields": {
+        "gcao": "Day",
+        "gcap": "Year",
+        "gcaq": "Month",
+        "gcar": "Minute",
+        "gcas": "Hour"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmw": {
+      "name": "ObjectEffectMinMaxValue",
+      "fields": {
+        "gcaw": "Max",
+        "gcax": "Min"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmx": {
+      "name": "ObjectEffectDiceValue",
+      "fields": {
+        "gcbb": "Const",
+        "gcbc": "Num",
+        "gcbd": "Side"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmy": {
+      "name": "ObjectEffectMonsterCount",
+      "fields": {
+        "gcbi": "CreatureFamily",
+        "gcbj": "Count"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lnb": {
+      "name": "ObjectEffectRideParentsValue",
+      "fields": {
+        "gcbn": "FirstParent",
+        "gcbp": "SecondParent"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lne": {
+      "name": "ObjectEffectPaddockGaugeValue",
+      "fields": {
+        "gcbt": "Cap",
+        "gcbu": "GaugeValue"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lnh": {
+      "name": "PortalInformation",
+      "fields": {
+        "gcct": "PortalId",
+        "gccu": "AreaId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lni": {
+      "name": "FightTurn",
+      "fields": {
+        "gccz": "Round",
+        "gcda": "Order"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lnj": {
+      "name": "SpawnInformation",
+      "fields": {
+        "gcdf": "Team",
+        "gcdg": "Alive",
+        "gcdh": "Position"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lnk": {
+      "name": "PartyUpdateCommonsInformation",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lno": {
+      "name": "PrismCristal",
+      "fields": {
+        "gcdw": "CristalObject",
+        "gcdx": "Type"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lnq": {
+      "name": "FightTeamMemberInformation",
+      "fields": {
+        "gceb": "CharacterId"
+      },
+      "oneofs": {
+        "gcei": {
+          "member": "MemberCase",
+          "cases": {
+            "gcee": {
+              "type": "FightTeamMemberInformationCaseCharacter",
+              "member": "Value"
+            },
+            "gcef": {
+              "type": "FightTeamMemberInformationCaseTaxCollectorMember",
+              "member": "Value"
+            },
+            "gceg": {
+              "type": "FightTeamMemberInformationCaseMonsterMember",
+              "member": "Value"
+            },
+            "gceh": {
+              "type": "FightTeamMemberInformationCaseEntityMember",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lns": {
+      "name": "CharacterCharacteristic",
+      "fields": {
+        "gcem": "CharacteristicId"
+      },
+      "oneofs": {
+        "gcer": {
+          "member": "CharacteristicCase",
+          "cases": {
+            "gceo": {
+              "type": "CharacterCharacteristicCaseValue",
+              "member": "Value"
+            },
+            "gcep": {
+              "type": "CharacterCharacteristicCaseDetailed",
+              "member": "Value"
+            },
+            "gceq": {
+              "type": "CharacterCharacteristicCaseUsable",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lnw": {
+      "name": "ShortcutPreset",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "loa": {
+      "name": "CharacterCharacteristicDetailed",
+      "fields": {
+        "gcgk": "Base",
+        "gcgl": "Additional",
+        "gcgn": "Temporary",
+        "gcgo": "Alignment",
+        "gcgp": "Equipment",
+        "gcgq": "Context"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lob": {
+      "name": "ShortcutCosmeticObject",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "loc": {
+      "name": "NamedPartyTeamWithOutcome",
+      "fields": {
+        "gchc": "NamedPartyTeam",
+        "gchd": "Outcome"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpg": {
+      "name": "Character",
+      "fields": {
+        "gcli": "Id"
+      },
+      "oneofs": {
+        "gcll": {
+          "member": "ComplementCase",
+          "cases": {
+            "gclj": {
+              "type": "CharacterComplementCaseCharacterBasicInformation",
+              "member": "Value"
+            },
+            "gclk": {
+              "type": "CharacterComplementCaseCharacterRemodelingInformation",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpe": {
+      "name": "CharacterBasicInformation",
+      "fields": {
+        "gcky": "Name",
+        "gckz": "Level"
+      },
+      "oneofs": {
+        "gcle": {
+          "member": "ComplementCase",
+          "cases": {
+            "gclb": {
+              "type": "CharacterBasicInformationComplementCaseCharacterLook",
+              "member": "Value"
+            },
+            "gclc": {
+              "type": "CharacterBasicInformationComplementCaseSocialMember",
+              "member": "Value"
+            },
+            "gcld": {
+              "type": "CharacterBasicInformationComplementCaseRank",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lon": {
+      "name": "SocialMember",
+      "fields": {
+        "gcib": "HoursSinceLastConnection",
+        "gcic": "RankId",
+        "gcid": "State",
+        "gcie": "AccountId",
+        "gcih": "BreedId",
+        "gcii": "GuildMember",
+        "gcij": "Status",
+        "gcik": "Gender",
+        "gcil": "EnrollmentDate"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lol": {
+      "name": "GuildMember",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpc": {
+      "name": "CharacterLook",
+      "fields": {
+        "gcko": "Look",
+        "gckp": "BreedId"
+      },
+      "oneofs": {
+        "gckt": {
+          "member": "ComplementCase",
+          "cases": {
+            "gckq": {
+              "type": "CharacterLookComplementCaseBaseInformation",
+              "member": "Value"
+            },
+            "gckr": {
+              "type": "CharacterLookComplementCaseGuild",
+              "member": "Value"
+            },
+            "gcks": {
+              "type": "CharacterLookComplementCaseGrade",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpa": {
+      "name": "CharacterBaseInformation",
+      "fields": {
+        "gcke": "Gender"
+      },
+      "oneofs": {
+        "gcki": {
+          "member": "ComplementCase",
+          "cases": {
+            "gckf": {
+              "type": "CharacterBaseInformationComplementCasePartyMemberInformation",
+              "member": "Value"
+            },
+            "gckg": {
+              "type": "CharacterBaseInformationComplementCaseEpicInformation",
+              "member": "Value"
+            },
+            "gckh": {
+              "type": "CharacterBaseInformationComplementCasePartyInvitationMemberInformation",
+              "member": "Value"
+            }
+          },
+          "noneType": "CharacterBaseInformationComplementCaseNone"
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lot": {
+      "name": "CharacterEpicInformation",
+      "fields": {
+        "gcip": "DeathCount",
+        "gcis": "DeathState",
+        "gcit": "DeathMaxLevel"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lou": {
+      "name": "PartyMemberInformation",
+      "fields": {
+        "gciy": "Status",
+        "gciz": "Entities",
+        "gcja": "Coordinates",
+        "gcjc": "Rank",
+        "gcje": "CommonsInformation",
+        "gcjf": "Initiative"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "loy": {
+      "name": "PartyInvitationMemberInformation",
+      "fields": {
+        "gcjx": "Entities",
+        "gcjy": "Coordinates"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpj": {
+      "name": "CharacterRemodelingInformation",
+      "fields": {
+        "gclu": "Name",
+        "gclv": "Head",
+        "gclw": "Colors",
+        "gclx": "CharacterToRemodelInformation",
+        "gcly": "BodyId",
+        "gclz": "Gender",
+        "gcma": "BreedId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lph": {
+      "name": "CharacterToRemodelInformation",
+      "fields": {
+        "gclp": "MandatoryChangeMask",
+        "gclq": "PossibleChangeMask"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpk": {
+      "name": "FightCharacteristics",
+      "fields": {
+        "gcme": "Summoner",
+        "gcmg": "InvisibilityState",
+        "gcmh": "Summoned",
+        "gcmi": "Characteristics"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpl": {
+      "name": "NamedPartyTeam",
+      "fields": {
+        "gcmm": "Team",
+        "gcmn": "Name"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpp": {
+      "name": "ShortcutObjectItem",
+      "fields": {
+        "gcmz": "ItemGid",
+        "gcna": "ItemUid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpx": {
+      "name": "House",
+      "fields": {},
+      "oneofs": {
+        "gcon": {
+          "member": "InformationCase",
+          "cases": {
+            "gcoj": {
+              "type": "HouseInformationCaseHouseInside",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpu": {
+      "name": "HouseInside",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpz": {
+      "name": "FightTeamMemberTaxCollector",
+      "fields": {
+        "gcow": "FirstNameId",
+        "gcox": "LastNameId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lqc": {
+      "name": "SequenceNumberRequest",
+      "fields": {
+        "gcpg": "Number"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "lqg": {
+      "name": "SequenceNumberEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lqn": {
+      "name": "TextInformationEvent",
+      "fields": {
+        "gcqu": "MessageType",
+        "gcqv": "MessageId",
+        "gcqx": "Parameters"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lqu": {
+      "name": "TimeEvent",
+      "fields": {
+        "gcsc": "TimezoneOffset",
+        "gcsd": "Timestamp"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lrd": {
+      "name": "BakApiTokenRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "lrl": {
+      "name": "BakApiKeyTwinEvent",
+      "fields": {
+        "gcty": "Token"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lru": {
+      "name": "BakApiKeyEvent",
+      "fields": {
+        "gcvl": "Token"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lva": {
+      "name": "AreaFightModifierUpdateEvent",
+      "fields": {
+        "gdgr": "SpellPairs"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lzh": {
+      "name": "AnomalySubareaInformationRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "lzn": {
+      "name": "AlterationsUpdateEvent",
+      "fields": {
+        "gdzr": "Alterations"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lzp": {
+      "name": "AlterationsEvent",
+      "fields": {
+        "gdzz": "Alterations"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lzv": {
+      "name": "Alteration",
+      "fields": {
+        "geao": "CreationTime",
+        "geap": "AlterationId",
+        "geaq": "Effects",
+        "gear": "ExpirationType",
+        "geas": "ExpirationValue"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "mgq": {
+      "name": "AccountCapabilitiesEvent",
+      "fields": {
+        "gfaj": "AccountType",
+        "gfak": "IsSubscribed",
+        "gfal": "SubscriptionType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "mgt": {
+      "name": "AccountRightsEvent",
+      "fields": {
+        "gfay": "Rights"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "mgr": {
+      "name": "AccountRights",
+      "fields": {
+        "gfap": "ShowConsole",
+        "gfaq": "UnlimitedAccess",
+        "gfas": "InfiniteSubscription",
+        "gfat": "UnknownFlag"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "mgz": {
+      "name": "ServerSelectionStatusEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    }
+  },
+  "enums": {
+    "hmu": {
+      "name": "SpellType",
+      "values": {
+        "eddy": "Unknown0",
+        "eddz": "Unknown1",
+        "edea": "Unknown2",
+        "edeb": "Unknown3",
+        "edec": "Unknown4",
+        "eded": "Unknown5",
+        "edee": "Unknown6",
+        "edef": "Unknown7",
+        "edeg": "Unknown8",
+        "edeh": "Unknown9"
+      }
+    },
+    "hnl": {
+      "name": "ForgettableSpellAction",
+      "values": {
+        "edhg": "Forget",
+        "edhh": "Equip",
+        "edhi": "Remove"
+      }
+    },
+    "itb": {
+      "name": "InventorySourceContext",
+      "values": {
+        "eket": "Unknown0",
+        "ekeu": "BidHouse",
+        "ekev": "Craft"
+      }
+    },
+    "jiw": {
+      "name": "GuildInformationType",
+      "values": {
+        "enwm": "InfoGeneral",
+        "enwn": "InfoMembers",
+        "enwo": "InfoBoosts",
+        "enwp": "InfoPaddocks",
+        "enwq": "InfoHouses",
+        "enwr": "InfoRecruitment",
+        "enws": "InfoLogbook"
+      }
+    },
+    "jsu": {
+      "name": "FightSpellCastCritical",
+      "values": {
+        "eqbo": "Normal",
+        "eqbp": "CriticalHit",
+        "eqbq": "CriticalFail"
+      }
+    },
+    "jsv": {
+      "name": "SequenceType",
+      "values": {
+        "eqbr": "Spell",
+        "eqbs": "Weapon",
+        "eqbt": "GlyphTrap",
+        "eqbu": "Triggered",
+        "eqbv": "Move",
+        "eqbw": "CharacterDeath",
+        "eqbx": "TurnStart",
+        "eqby": "TurnEnd",
+        "eqbz": "FightStart",
+        "eqca": "Unknown9",
+        "eqcb": "Unknown10"
+      }
+    },
+    "kdm": {
+      "name": "CraftResult",
+      "values": {
+        "etat": "Impossible",
+        "etau": "Failed",
+        "etav": "Success",
+        "etaw": "Neutral",
+        "etax": "Forbidden"
+      }
+    },
+    "kdn": {
+      "name": "MagicPoolStatus",
+      "values": {
+        "etay": "NoChange",
+        "etaz": "Increase",
+        "etba": "Loss"
+      }
+    },
+    "kmm": {
+      "name": "GameContext",
+      "values": {
+        "evby": "RolePlay",
+        "evbz": "Fight"
+      }
+    },
+    "ksz": {
+      "name": "ChatChannel",
+      "values": {
+        "ewhz": "General",
+        "ewia": "Team",
+        "ewib": "Guild",
+        "ewic": "Alliance",
+        "ewid": "Group",
+        "ewie": "Trade",
+        "ewif": "Recruitment",
+        "ewig": "Noob",
+        "ewih": "Admin",
+        "ewii": "Private",
+        "ewij": "Information",
+        "ewik": "Fight",
+        "ewil": "Promotional",
+        "ewim": "Arena",
+        "ewin": "Community",
+        "ewio": "Unknown15",
+        "ewip": "Unknown16",
+        "ewiq": "Unknown17",
+        "ewir": "Unknown18",
+        "ewis": "Unknown19"
+      }
+    },
+    "kuu": {
+      "name": "NameCompliance",
+      "values": {
+        "ewuk": "NameOk",
+        "ewul": "NameErrorServiceUnavailable",
+        "ewum": "NameErrorAlreadyExists",
+        "ewun": "NameErrorBadAlphabet",
+        "ewuo": "NameErrorBadLength",
+        "ewup": "NameErrorBadChar",
+        "ewuq": "NameErrorInvalidDashPosition",
+        "ewur": "NameErrorNameWithBadCase",
+        "ewus": "NameErrorTooManyConsecutiveIdentical",
+        "ewut": "NameErrorTooManySpecial",
+        "ewuu": "NameErrorForbidden",
+        "ewuv": "NameErrorReserved"
+      }
+    },
+    "kuv": {
+      "name": "CharacterCreationResult",
+      "values": {
+        "ewuw": "CreateOk",
+        "ewux": "CreateErrorNoReason",
+        "ewuy": "CreateErrorInvalidName",
+        "ewuz": "CreateErrorTooManyCharacters",
+        "ewva": "CreateErrorNotAllowed",
+        "ewvb": "CreateErrorNewPlayerNotAllowed",
+        "ewvc": "Fallback6",
+        "ewvd": "Fallback7",
+        "ewve": "Fallback8"
+      }
+    },
+    "lau": {
+      "name": "DelayedActionType",
+      "values": {
+        "exyv": "Disconnect",
+        "exyw": "ObjectUse",
+        "exyx": "JoinCharacter",
+        "exyy": "AggressionImmune"
+      }
+    },
+    "lay": {
+      "name": "CharacterState",
+      "values": {
+        "exzk": "NotConnected",
+        "exzl": "InRolePlay",
+        "exzm": "InFight",
+        "exzn": "UnknownState"
+      }
+    },
+    "laz": {
+      "name": "Alignment",
+      "values": {
+        "exzo": "Unknown",
+        "exzp": "Without",
+        "exzq": "Neutral",
+        "exzr": "Angel",
+        "exzs": "Evil"
+      }
+    },
+    "lba": {
+      "name": "Gender",
+      "values": {
+        "exzt": "Male",
+        "exzu": "Female"
+      }
+    },
+    "lbb": {
+      "name": "Hierarchy",
+      "values": {
+        "exzv": "RoleUnavailable",
+        "exzw": "RolePlayer",
+        "exzx": "RoleModerator",
+        "exzy": "RoleGameMasterPadawan",
+        "exzz": "RoleGameMaster",
+        "eyaa": "RoleAdmin",
+        "eyab": "RoleUnknownSpecialUser"
+      }
+    },
+    "lbc": {
+      "name": "AttackableStatus",
+      "values": {
+        "eyac": "NonAttackable",
+        "eyad": "PvpEnabledAttackable",
+        "eyae": "PvpEnabledNonAttackable",
+        "eyaf": "AvaEnabledAttackable",
+        "eyag": "AvaEnabledNonAttackable",
+        "eyah": "AvaDisqualified",
+        "eyai": "AvaPrequalifiedAttackable"
+      }
+    },
+    "lbd": {
+      "name": "Restriction",
+      "values": {
+        "eyaj": "CannotBeAttacked",
+        "eyak": "CannotBeChallenged",
+        "eyal": "CannotTrade",
+        "eyam": "CannotBeAttackedByMutant",
+        "eyan": "CannotRun",
+        "eyao": "ForceSlowWalk",
+        "eyap": "CannotMinimize",
+        "eyaq": "CannotMove",
+        "eyar": "CannotAttack",
+        "eyas": "CannotChallenge",
+        "eyat": "CannotExchange",
+        "eyau": "CannotAttackAsMutant",
+        "eyav": "CannotChat",
+        "eyaw": "CannotUseObject",
+        "eyax": "CannotUseTaxCollector",
+        "eyay": "CannotUseInteractive",
+        "eyaz": "CannotSpeakToNpc",
+        "eyba": "CannotChangeZone",
+        "eybb": "CannotAttackMonster"
+      }
+    },
+    "lbe": {
+      "name": "DialogType",
+      "values": {
+        "eybc": "DialogBook",
+        "eybd": "DialogDialog",
+        "eybe": "DialogLockable",
+        "eybf": "DialogPurchasable",
+        "eybg": "DialogGuildInvitation",
+        "eybh": "DialogGuildCreate",
+        "eybi": "DialogGuildRename",
+        "eybj": "DialogMarriage",
+        "eybk": "DialogDungeonMeeting",
+        "eybl": "DialogSpellForget",
+        "eybm": "DialogTeleporter",
+        "eybn": "DialogExchange",
+        "eybo": "DialogAllianceInvitation",
+        "eybp": "DialogAllianceCreate",
+        "eybq": "DialogAllianceRename",
+        "eybr": "DialogHavenbagMeeting"
+      }
+    },
+    "lbg": {
+      "name": "FightType",
+      "values": {
+        "eycq": "Challenge",
+        "eycr": "Aggression",
+        "eycs": "PvMa",
+        "eyct": "MxvM",
+        "eycu": "PvM",
+        "eycv": "PvT",
+        "eycw": "PvMu",
+        "eycx": "PvpArena",
+        "eycy": "Koh",
+        "eycz": "PvPr",
+        "eyda": "Breach"
+      }
+    },
+    "lbh": {
+      "name": "TeamType",
+      "values": {
+        "eydb": "Player",
+        "eydc": "Monster",
+        "eydd": "Mutant",
+        "eyde": "TaxCollector",
+        "eydf": "BadPlayer",
+        "eydg": "Prism"
+      }
+    },
+    "lbi": {
+      "name": "FightOption",
+      "values": {
+        "eydh": "Unknown0",
+        "eydi": "Unknown1",
+        "eydj": "Unknown2",
+        "eydk": "Unknown3"
+      }
+    },
+    "lbj": {
+      "name": "FightOutcome",
+      "values": {
+        "eydl": "ResultLost",
+        "eydm": "ResultDraw",
+        "eydn": "ResultVictory",
+        "eydo": "ResultTax",
+        "eydp": "ResultDefenderGroup"
+      }
+    },
+    "lbk": {
+      "name": "FightInvisibilityState",
+      "values": {
+        "eydq": "Invisible",
+        "eydr": "Detected",
+        "eyds": "Visible"
+      }
+    },
+    "lbl": {
+      "name": "Team",
+      "values": {
+        "eydt": "Challenger",
+        "eydu": "Defender",
+        "eydv": "Spectator",
+        "eydw": "Unknown3"
+      }
+    },
+    "lbm": {
+      "name": "ShortcutBar",
+      "values": {
+        "eydx": "General",
+        "eydy": "Spell"
+      }
+    },
+    "lbo": {
+      "name": "Direction",
+      "values": {
+        "eyeb": "East",
+        "eyec": "SouthEast",
+        "eyed": "South",
+        "eyee": "SouthWest",
+        "eyef": "West",
+        "eyeg": "NorthWest",
+        "eyeh": "North",
+        "eyei": "NorthEast"
+      }
+    },
+    "lbp": {
+      "name": "ObjectStorage",
+      "values": {
+        "eyej": "Unknown0",
+        "eyek": "Inventory",
+        "eyel": "Bank",
+        "eyem": "HavenBag"
+      }
+    },
+    "lbq": {
+      "name": "ObjectError",
+      "values": {
+        "eyen": "InventoryFull",
+        "eyeo": "CannotEquipTwice",
+        "eyep": "NotTradable",
+        "eyeq": "CannotDrop",
+        "eyer": "CannotDropNoPlace",
+        "eyes": "CannotDestroy",
+        "eyet": "LevelTooLow",
+        "eyeu": "CannotUnequip",
+        "eyev": "CannotEquipHere",
+        "eyew": "Criterions",
+        "eyex": "SymbioticObjectError",
+        "eyey": "EvolutiveObjectRefusedFood"
+      }
+    },
+    "lbr": {
+      "name": "ObjectOrigin",
+      "values": {
+        "eyez": "OriginUndefined",
+        "eyfa": "OriginQuest",
+        "eyfb": "Unknown2",
+        "eyfc": "Unknown3"
+      }
+    },
+    "lbu": {
+      "name": "ServerType",
+      "values": {
+        "eyfj": "Undefined",
+        "eyfk": "Classical",
+        "eyfl": "Kolizeum",
+        "eyfm": "Tournament",
+        "eyfn": "Epic",
+        "eyfo": "Temporis"
+      }
+    },
+    "lbz": {
+      "name": "SpellModifierActionType",
+      "values": {
+        "eygk": "ActionInvalid",
+        "eygl": "ActionBoost",
+        "eygm": "ActionRemoveBoost",
+        "eygn": "ActionSet"
+      }
+    },
+    "lca": {
+      "name": "SpellModifierType",
+      "values": {
+        "eygo": "InvalidModification",
+        "eygp": "Range",
+        "eygq": "Damage",
+        "eygr": "BaseDamage",
+        "eygs": "HealBonus",
+        "eygt": "ApCost",
+        "eygu": "CastInterval",
+        "eygv": "CriticalHitBonus",
+        "eygw": "CastLine",
+        "eygx": "Los",
+        "eygy": "MaxCastPerTurn",
+        "eygz": "MaxCastPerTarget",
+        "eyha": "RangeMax",
+        "eyhb": "RangeMin",
+        "eyhc": "OccupiedCell",
+        "eyhd": "FreeCell",
+        "eyhe": "VisibleTarget",
+        "eyhf": "PortalFreeCell",
+        "eyhg": "PortalProjection",
+        "eyhh": "Unknown19",
+        "eyhi": "Unknown20"
+      }
+    },
+    "lcd": {
+      "name": "CharacterStatusStatus",
+      "values": {
+        "eyhs": "Offline",
+        "eyht": "Available",
+        "eyhu": "Idle",
+        "eyhv": "Afk",
+        "eyhw": "Private",
+        "eyhx": "Solo",
+        "eyhy": "Unknown"
+      }
+    },
+    "lew": {
+      "name": "PrismState",
+      "values": {
+        "ezdr": "Normal",
+        "ezds": "Weakened",
+        "ezdt": "Vulnerable",
+        "ezdu": "Protected"
+      }
+    },
+    "lha": {
+      "name": "FightEffectKind",
+      "values": {
+        "ezuq": "Unknown0",
+        "ezur": "Unknown1",
+        "ezus": "State",
+        "ezut": "WorldBossPhase",
+        "ezuu": "Unknown4",
+        "ezuv": "NoFlags",
+        "ezuw": "FightLog",
+        "ezux": "Triggered"
+      }
+    },
+    "lhb": {
+      "name": "EffectDissipationState",
+      "values": {
+        "ezuy": "Dissipated",
+        "ezuz": "DissipatedByDeath",
+        "ezva": "DissipatedByStrongDispel",
+        "ezvb": "ReallyNotDissipated"
+      }
+    },
+    "lnl": {
+      "name": "PrismCristalType",
+      "values": {
+        "fbsm": "NoCristal",
+        "fbsn": "Protective"
+      }
+    },
+    "loq": {
+      "name": "EpicDeathState",
+      "values": {
+        "fcbi": "DeathStateAlive",
+        "fcbj": "DeathStateDead",
+        "fcbk": "DeathStateWaitingConfirmation"
+      }
+    },
+    "lqk": {
+      "name": "TextInformationType",
+      "values": {
+        "fcoh": "TextInformationMessage",
+        "fcoi": "TextInformationError",
+        "fcoj": "TextInformationPvp",
+        "fcok": "TextInformationFightLog",
+        "fcol": "TextInformationPopup",
+        "fcom": "TextLivingObject",
+        "fcon": "TextEntityTalk",
+        "fcoo": "TextInformationFight",
+        "fcop": "TextInformationEvent",
+        "fcoq": "TextInformationWorldEventUpcoming",
+        "fcor": "TextInformationWorldEventStarted",
+        "fcos": "TextInformationWorldEventEnded",
+        "fcot": "Unknown13"
+      }
+    },
+    "lzt": {
+      "name": "AlterationExpirationType",
+      "values": {
+        "fesh": "Unknown",
+        "fesi": "Infinite",
+        "fesj": "Date",
+        "fesk": "FightCount",
+        "fesl": "FightsWonCount",
+        "fesm": "FightsLostCount"
+      }
+    },
+    "mgo": {
+      "name": "CharacterCreationRights",
+      "values": {
+        "fgdf": "Allowed",
+        "fgdg": "TooManyCharacters",
+        "fgdh": "CreationDisabled"
+      }
+    }
+  },
+  "gameEnvelope": {
+    "Response": {
+      "alias": "hdw",
+      "fields": {
+        "flkw": "content",
+        "flkx": "uid"
+      }
+    },
+    "Event": {
+      "alias": "hdx",
+      "fields": {
+        "fllb": "content"
+      }
+    },
+    "Request": {
+      "alias": "hdy",
+      "fields": {
+        "fllg": "content",
+        "fllh": "uid"
+      }
+    },
+    "Message": {
+      "alias": "hea",
+      "fields": {
+        "flll": "event",
+        "fllm": "request",
+        "flln": "response"
+      }
+    }
+  },
+  "wireAliases": {
+    "hem": "hex.hew.hem",
+    "hek": "hex.hew.hem.hel.hek",
+    "hen": "hex.hew.hen",
+    "heq": "hex.hew.heq",
+    "heo": "hex.hew.heq.hep.heo",
+    "her": "hex.hew.her",
+    "hev": "hex.hew.hev",
+    "het": "hex.hew.hev.heu.het",
+    "hfa": "hfd.hfc.hfa",
+    "hfb": "hfd.hfc.hfb",
+    "hff": "hfh.hfg.hff",
+    "hfp": "hfr.hfq.hfp",
+    "hft": "hfv.hfu.hft",
+    "hgx": "hhf.hhe.hgx",
+    "hgp": "hhf.hhe.hgx.hgw.hgp",
+    "hgq": "hhf.hhe.hgx.hgw.hgq",
+    "hgr": "hhf.hhe.hgx.hgw.hgr",
+    "hgu": "hhf.hhe.hgx.hgw.hgu",
+    "hgv": "hhf.hhe.hgx.hgw.hgv",
+    "hha": "hhf.hhe.hha",
+    "hhd": "hhf.hhe.hhd",
+    "hhl": "hhn.hhm.hhl",
+    "hiy": "hja.hiz.hiy",
+    "hje": "hjg.hjf.hje",
+    "hjh": "hjj.hji.hjh",
+    "hjr": "hjt.hjs.hjr",
+    "hju": "hjw.hjv.hju",
+    "hjz": "hkb.hka.hjz",
+    "hkf": "hkh.hkg.hkf",
+    "hkm": "hko.hkn.hkm",
+    "hln": "hlp.hlo.hln",
+    "hnz": "hob.hoa.hnz",
+    "hof": "hoh.hog.hof",
+    "hoj": "hol.hok.hoj",
+    "hop": "hor.hoq.hop",
+    "hqr": "hqu.hqt.hqr",
+    "hqs": "hqu.hqt.hqs",
+    "hra": "hrc.hrb.hra",
+    "hrf": "hrh.hrg.hrf",
+    "hrj": "hrl.hrk.hrj",
+    "hrq": "hrz.hry.hrq",
+    "hro": "hrz.hry.hrq.hrp.hro",
+    "hrt": "hrz.hry.hrt",
+    "hrr": "hrz.hry.hrt.hrs.hrr",
+    "hru": "hrz.hry.hru",
+    "hrx": "hrz.hry.hrx",
+    "hsc": "hse.hsd.hsc",
+    "hsk": "hsm.hsl.hsk",
+    "hss": "hsu.hst.hss",
+    "hsw": "hsy.hsx.hsw",
+    "htd": "htf.hte.htd",
+    "hto": "htr.htq.hto",
+    "htp": "htr.htq.htp",
+    "htw": "hty.htx.htw",
+    "huc": "hue.hud.huc",
+    "huk": "hum.hul.huk",
+    "hup": "hur.huq.hup",
+    "hux": "huz.huy.hux",
+    "hvf": "hvk.hvj.hvf",
+    "hvi": "hvk.hvj.hvi",
+    "hwp": "hwr.hwq.hwp",
+    "hwx": "hxd.hxc.hwx",
+    "hxb": "hxd.hxc.hxb",
+    "hwz": "hxd.hxc.hxb.hxa.hwz",
+    "hxe": "hxm.hxl.hxe",
+    "hxi": "hxm.hxl.hxi",
+    "hxg": "hxm.hxl.hxi.hxh.hxg",
+    "hxj": "hxm.hxl.hxj",
+    "hxk": "hxm.hxl.hxk",
+    "hxp": "hxt.hxs.hxp",
+    "hxq": "hxt.hxs.hxq",
+    "hxr": "hxt.hxs.hxr",
+    "hyk": "hym.hyl.hyk",
+    "hyp": "hyr.hyq.hyp",
+    "hyz": "hzb.hza.hyz",
+    "iaa": "iac.iab.iaa",
+    "ias": "iau.iat.ias",
+    "iam": "iau.iat.ias.iar.iam",
+    "iap": "iau.iat.ias.iar.iap",
+    "ian": "iau.iat.ias.iar.iap.iao.ian",
+    "iaq": "iau.iat.ias.iar.iaq",
+    "ibh": "ibj.ibi.ibh",
+    "ibp": "ibr.ibq.ibp",
+    "icc": "ice.icd.icc",
+    "ich": "icj.ici.ich",
+    "icp": "icz.icy.icp",
+    "icq": "icz.icy.icq",
+    "icr": "icz.icy.icr",
+    "icu": "icz.icy.icu",
+    "icx": "icz.icy.icx",
+    "idp": "idr.idq.idp",
+    "iep": "ier.ieq.iep",
+    "ifb": "ifd.ifc.ifb",
+    "ifl": "ifp.ifo.ifl",
+    "ifm": "ifp.ifo.ifm",
+    "ifn": "ifp.ifo.ifn",
+    "ifr": "ify.ifx.ifr",
+    "ifu": "ify.ifx.ifu",
+    "ifs": "ify.ifx.ifu.ift.ifs",
+    "ifv": "ify.ifx.ifv",
+    "ifw": "ify.ifx.ifw",
+    "igi": "igk.igj.igi",
+    "igl": "ign.igm.igl",
+    "iho": "ihq.ihp.iho",
+    "ihm": "ihq.ihp.iho.ihn.ihm",
+    "iia": "iic.iib.iia",
+    "iif": "iih.iig.iif",
+    "iij": "iil.iik.iij",
+    "iiv": "iix.iiw.iiv",
+    "iky": "ila.ikz.iky",
+    "ild": "ilf.ile.ild",
+    "ine": "ing.inf.ine",
+    "int_": "int",
+    "ioa": "ioc.iob.ioa",
+    "iog": "iom.iol.iog",
+    "iok": "iom.iol.iok",
+    "ioi": "iom.iol.iok.ioj.ioi",
+    "ioq": "ios.ior.ioq",
+    "ioo": "ios.ior.ioq.iop.ioo",
+    "ipt": "ipv.ipu.ipt",
+    "irm": "iro.irn.irm",
+    "iry": "isa.irz.iry",
+    "irs": "isa.irz.iry.irx.irs",
+    "irv": "isa.irz.iry.irx.irv",
+    "irt": "isa.irz.iry.irx.irv.iru.irt",
+    "irw": "isa.irz.iry.irx.irw",
+    "isl": "isn.ism.isl",
+    "isj": "isn.ism.isl.isk.isj",
+    "isx": "isz.isy.isx",
+    "ith": "itj.iti.ith",
+    "its": "itu.itt.its",
+    "itx": "itz.ity.itx",
+    "iuc": "iue.iud.iuc",
+    "iug": "iuj.iuh.iug",
+    "ius": "iuu.iut.ius",
+    "ivc": "ive.ivd.ivc",
+    "ivg": "ivi.ivh.ivg",
+    "ivm": "ivo.ivn.ivm",
+    "ivv": "ivx.ivw.ivv",
+    "ivy": "iwa.ivz.ivy",
+    "iwg": "iwi.iwh.iwg",
+    "ixc": "ixf.ixe.ixc",
+    "ixd": "ixf.ixe.ixd",
+    "ixh": "ixj.ixi.ixh",
+    "ixw": "iya.ixz.ixw",
+    "ixx": "iya.ixz.ixx",
+    "ixy": "iya.ixz.ixy",
+    "iyh": "iyj.iyi.iyh",
+    "iyk": "iym.iyl.iyk",
+    "iyr": "iyw.iyv.iyr",
+    "iyu": "iyw.iyv.iyu",
+    "izd": "izg.izf.izd",
+    "izb": "izg.izf.izd.izc.izb",
+    "ize": "izg.izf.ize",
+    "izm": "izo.izn.izm",
+    "izk": "izo.izn.izm.izl.izk",
+    "izs": "izu.izt.izs",
+    "izw": "izy.izx.izw",
+    "jag": "jai.jah.jag",
+    "jbd": "jbf.jbe.jbd",
+    "jbq": "jbs.jbr.jbq",
+    "jcl": "jcn.jcm.jcl",
+    "jcq": "jcs.jcr.jcq",
+    "jcy": "jdb.jda.jcy",
+    "jcz": "jdb.jda.jcz",
+    "jdh": "jdk.jdj.jdh",
+    "jdi": "jdk.jdj.jdi",
+    "jdu": "jdx.jdw.jdu",
+    "jdm": "jdx.jdw.jdu.jdt.jdm",
+    "jdp": "jdx.jdw.jdu.jdt.jdp",
+    "jds": "jdx.jdw.jdu.jdt.jds",
+    "jdv": "jdx.jdw.jdv",
+    "jdz": "jed.jec.jdz",
+    "jea": "jed.jec.jea",
+    "jeb": "jed.jec.jeb",
+    "jef": "jei.jeh.jef",
+    "jeg": "jei.jeh.jeg",
+    "jek": "jem.jel.jek",
+    "jeo": "jeq.jep.jeo",
+    "jfb": "jff.jfe.jfb",
+    "jfc": "jff.jfe.jfc",
+    "jfd": "jff.jfe.jfd",
+    "jfh": "jfk.jfj.jfh",
+    "jfi": "jfk.jfj.jfi",
+    "jfm": "jfo.jfn.jfm",
+    "jft": "jfv.jfu.jft",
+    "jgi": "jgl.jgk.jgi",
+    "jgj": "jgl.jgk.jgj",
+    "jgn": "jgq.jgp.jgn",
+    "jgo": "jgq.jgp.jgo",
+    "jgx": "jgz.jgy.jgx",
+    "jhw": "jhy.jhx.jhw",
+    "jib": "jid.jic.jib",
+    "jio": "jiq.jip.jio",
+    "jit": "jiv.jiu.jit",
+    "jja": "jjc.jjb.jja",
+    "jke": "jkh.jkg.jke",
+    "jkf": "jkh.jkg.jkf",
+    "jkl": "jkq.jkp.jkl",
+    "jko": "jkq.jkp.jko",
+    "jkr": "jkt.jks.jkr",
+    "jlm": "jlo.jln.jlm",
+    "jmc": "jme.jmd.jmc",
+    "jms": "jmu.jmt.jms",
+    "jmz": "jnc.jnb.jmz",
+    "jmx": "jnc.jnb.jmz.jmy.jmx",
+    "jna": "jnc.jnb.jna",
+    "jnp": "jnr.jnq.jnp",
+    "jnw": "jny.jnx.jnw",
+    "jod": "jof.joe.jod",
+    "joj": "jol.jok.joj",
+    "jon": "jop.joo.jon",
+    "jot": "jov.jou.jot",
+    "joy": "jpb.jpa.joy",
+    "joz": "jpb.jpa.joz",
+    "jpg": "jpi.jph.jpg",
+    "jpv": "jpx.jpw.jpv",
+    "jqb": "jqd.jqc.jqb",
+    "jql": "jqn.jqm.jql",
+    "jqp": "jqr.jqq.jqp",
+    "jrl": "jrn.jrm.jrl",
+    "jro": "jrq.jrp.jro",
+    "jsa": "jsc.jsb.jsa",
+    "jsh": "jsj.jsi.jsh",
+    "jsl": "jsn.jsm.jsl",
+    "jsy": "jtc.jtb.jsy",
+    "jsz": "jtc.jtb.jsz",
+    "jta": "jtc.jtb.jta",
+    "jtd": "jtg.jtf.jtd",
+    "jte": "jtg.jtf.jte",
+    "jtl": "jtn.jtm.jtl",
+    "jtj": "jtn.jtm.jtl.jtk.jtj",
+    "jtq": "jwe.jwd.jtq",
+    "jtr": "jwe.jwd.jtr",
+    "jts": "jwe.jwd.jts",
+    "jtv": "jwe.jwd.jtv",
+    "jtw": "jwe.jwd.jtw",
+    "jtx": "jwe.jwd.jtx",
+    "jty": "jwe.jwd.jty",
+    "jtz": "jwe.jwd.jtz",
+    "juc": "jwe.jwd.juc",
+    "jua": "jwe.jwd.juc.jub.jua",
+    "juk": "jwe.jwd.juk",
+    "jue": "jwe.jwd.juk.juj.jue",
+    "jui": "jwe.jwd.juk.juj.jui",
+    "juf": "jwe.jwd.juk.juj.jui.juh.juf",
+    "jug": "jwe.jwd.juk.juj.jui.juh.jug",
+    "jun": "jwe.jwd.jun",
+    "juo": "jwe.jwd.juo",
+    "jur": "jwe.jwd.jur",
+    "jup": "jwe.jwd.jur.juq.jup",
+    "jus": "jwe.jwd.jus",
+    "jut": "jwe.jwd.jut",
+    "juu": "jwe.jwd.juu",
+    "jux": "jwe.jwd.jux",
+    "juz": "jwe.jwd.juz",
+    "jva": "jwe.jwd.jva",
+    "jvb": "jwe.jwd.jvb",
+    "jvc": "jwe.jwd.jvc",
+    "jvi": "jwe.jwd.jvi",
+    "jve": "jwe.jwd.jvi.jvh.jve",
+    "jvf": "jwe.jwd.jvi.jvh.jvf",
+    "jvg": "jwe.jwd.jvi.jvh.jvg",
+    "jvj": "jwe.jwd.jvj",
+    "jvk": "jwe.jwd.jvk",
+    "jvn": "jwe.jwd.jvn",
+    "jvl": "jwe.jwd.jvn.jvm.jvl",
+    "jvo": "jwe.jwd.jvo",
+    "jvp": "jwe.jwd.jvp",
+    "jvs": "jwe.jwd.jvs",
+    "jvt": "jwe.jwd.jvt",
+    "jvu": "jwe.jwd.jvu",
+    "jvv": "jwe.jwd.jvv",
+    "jvw": "jwe.jwd.jvw",
+    "jvz": "jwe.jwd.jvz",
+    "jwa": "jwe.jwd.jwa",
+    "jwb": "jwe.jwd.jwb",
+    "jwc": "jwe.jwd.jwc",
+    "jwf": "jwh.jwg.jwf",
+    "jwt": "jwv.jwu.jwt",
+    "jwx": "jwz.jwy.jwx",
+    "jyd": "jyf.jye.jyd",
+    "jyn": "jys.jyr.jyn",
+    "jyo": "jys.jyr.jyo",
+    "jyp": "jys.jyr.jyp",
+    "jyq": "jys.jyr.jyq",
+    "jyw": "jyy.jyx.jyw",
+    "jyz": "jzb.jza.jyz",
+    "jzd": "jzo.jzn.jzd",
+    "jze": "jzo.jzn.jze",
+    "jzh": "jzo.jzn.jzh",
+    "jzi": "jzo.jzn.jzi",
+    "jzj": "jzo.jzn.jzj",
+    "jzk": "jzo.jzn.jzk",
+    "jzl": "jzo.jzn.jzl",
+    "jzm": "jzo.jzn.jzm",
+    "jzq": "jzu.jzt.jzq",
+    "jzr": "jzu.jzt.jzr",
+    "jzs": "jzu.jzt.jzs",
+    "kan": "kap.kao.kan",
+    "kaw": "kay.kax.kaw",
+    "kbr": "kbt.kbs.kbr",
+    "kbw": "kby.kbx.kbw",
+    "kco": "kcq.kcp.kco",
+    "kcs": "kcu.kct.kcs",
+    "kcv": "kcx.kcw.kcv",
+    "kde": "kdg.kdf.kde",
+    "kdp": "kdr.kdq.kdp",
+    "kej": "kem.kel.kej",
+    "kek": "kem.kel.kek",
+    "kfc": "kfe.kfd.kfc",
+    "kfn": "kfp.kfo.kfn",
+    "kfk": "kfp.kfo.kfn.kfm.kfk",
+    "kfl": "kfp.kfo.kfn.kfm.kfl",
+    "kfx": "kfz.kfy.kfx",
+    "kgb": "kgd.kgc.kgb",
+    "kgf": "kgh.kgg.kgf",
+    "kgr": "kgt.kgs.kgr",
+    "kid": "kif.kie.kid",
+    "kih": "kij.kii.kih",
+    "kip": "kis.kir.kip",
+    "kil": "kis.kir.kip.kio.kil",
+    "kim": "kis.kir.kip.kio.kim",
+    "kin": "kis.kir.kip.kio.kin",
+    "kiq": "kis.kir.kiq",
+    "kiv": "kjb.kja.kiv",
+    "kiy": "kjb.kja.kiy",
+    "kiw": "kjb.kja.kiy.kix.kiw",
+    "kiz": "kjb.kja.kiz",
+    "kji": "kjl.kjk.kji",
+    "kjg": "kjl.kjk.kji.kjh.kjg",
+    "kjj": "kjl.kjk.kjj",
+    "kka": "kke.kkd.kka",
+    "kkb": "kke.kkd.kkb",
+    "kkc": "kke.kkd.kkc",
+    "kkg": "kkk.kkj.kkg",
+    "kkh": "kkk.kkj.kkh",
+    "kki": "kkk.kkj.kki",
+    "kko": "kkq.kkp.kko",
+    "klb": "kld.klc.klb",
+    "klk": "klm.kll.klk",
+    "klx": "klz.kly.klx",
+    "kmc": "kme.kmd.kmc",
+    "kmn": "kmp.kmo.kmn",
+    "knf": "knk.knj.knf",
+    "kni": "knk.knj.kni",
+    "kns": "knv.knu.kns",
+    "knt": "knv.knu.knt",
+    "knw": "kny.knx.knw",
+    "kol": "kon.kom.kol",
+    "koo": "koq.kop.koo",
+    "kou": "kox.kow.kou",
+    "kov": "kox.kow.kov",
+    "kpj": "kpl.kpk.kpj",
+    "kpm": "kpr.kpq.kpm",
+    "kpp": "kpr.kpq.kpp",
+    "kpv": "kpy.kpx.kpv",
+    "kpw": "kpy.kpx.kpw",
+    "kqk": "kqm.kql.kqk",
+    "kqi": "kqm.kql.kqk.kqj.kqi",
+    "kqw": "kqy.kqx.kqw",
+    "krc": "krh.krg.krc",
+    "krf": "krh.krg.krf",
+    "krd": "krh.krg.krf.kre.krd",
+    "krq": "krs.krr.krq",
+    "krz": "ksb.ksa.krz",
+    "ksf": "ksh.ksg.ksf",
+    "ktc": "kte.ktd.ktc",
+    "ktf": "kth.ktg.ktf",
+    "ktu": "ktw.ktv.ktu",
+    "kuj": "kul.kuk.kuj",
+    "kux": "kva.kuz.kux",
+    "kuy": "kva.kuz.kuy",
+    "kxj": "kxm.kxl.kxj",
+    "kxk": "kxm.kxl.kxk",
+    "kxo": "kxr.kxq.kxo",
+    "kxp": "kxr.kxq.kxp",
+    "kxv": "kyb.kya.kxv",
+    "kxw": "kyb.kya.kxw",
+    "kxz": "kyb.kya.kxz",
+    "kyc": "kye.kyd.kyc",
+    "kyi": "kzl.kzk.kyi",
+    "kyl": "kzl.kzk.kyl",
+    "kyr": "kzl.kzk.kyr",
+    "kym": "kzl.kzk.kyr.kyq.kym",
+    "kyn": "kzl.kzk.kyr.kyq.kyn",
+    "kyo": "kzl.kzk.kyr.kyq.kyo",
+    "kyp": "kzl.kzk.kyr.kyq.kyp",
+    "kyu": "kzl.kzk.kyu",
+    "kys": "kzl.kzk.kyu.kyt.kys",
+    "kzi": "kzl.kzk.kzi",
+    "kzg": "kzl.kzk.kzi.kzh.kzg",
+    "kyw": "kzl.kzk.kzi.kzh.kzg.kzf.kyw",
+    "kyx": "kzl.kzk.kzi.kzh.kzg.kzf.kyx",
+    "kyy": "kzl.kzk.kzi.kzh.kzg.kzf.kyy",
+    "kze": "kzl.kzk.kzi.kzh.kzg.kzf.kze",
+    "kyz": "kzl.kzk.kzi.kzh.kzg.kzf.kze.kzd.kyz",
+    "kzc": "kzl.kzk.kzi.kzh.kzg.kzf.kze.kzd.kzc",
+    "kza": "kzl.kzk.kzi.kzh.kzg.kzf.kze.kzd.kzc.kzb.kza",
+    "kzj": "kzl.kzk.kzj",
+    "kzn": "kzs.kzr.kzn",
+    "kzq": "kzs.kzr.kzq",
+    "kzy": "lad.lac.kzy",
+    "lab": "lad.lac.lab",
+    "lao": "laq.lap.lao",
+    "lcp": "lcr.lcq.lcp",
+    "lcs": "lcu.lct.lcs",
+    "lcy": "lda.lcz.lcy",
+    "ldk": "ldm.ldl.ldk",
+    "ldq": "ldt.lds.ldq",
+    "ldo": "ldt.lds.ldq.ldp.ldo",
+    "ldr": "ldt.lds.ldr",
+    "ldx": "ldz.ldy.ldx",
+    "lek": "len.lem.lek",
+    "lel": "len.lem.lel",
+    "leq": "les.ler.leq",
+    "leo": "les.ler.leq.lep.leo",
+    "let": "lev.leu.let",
+    "lfa": "lfc.lfb.lfa",
+    "lfm": "lfo.lfn.lfm",
+    "lfk": "lfo.lfn.lfm.lfl.lfk",
+    "lfq": "lft.lfs.lfq",
+    "lfr": "lft.lfs.lfr",
+    "lfu": "lfx.lfw.lfu",
+    "lfv": "lfx.lfw.lfv",
+    "lgc": "lgf.lge.lgc",
+    "lgd": "lgf.lge.lgd",
+    "lgg": "lgi.lgh.lgg",
+    "lgj": "lgl.lgk.lgj",
+    "lhe": "lhg.lhf.lhe",
+    "lhi": "lhk.lhj.lhi",
+    "ljv": "ljx.ljw.ljv",
+    "lja": "ljx.ljw.ljv.lju.lja",
+    "lip": "ljx.ljw.ljv.lju.lja.liz.lip",
+    "lim": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim",
+    "lij": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij",
+    "lhz": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lhz",
+    "lhx": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lhz.lhy.lhx",
+    "lia": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lia",
+    "lib": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lib",
+    "lic": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lic",
+    "lid": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lid",
+    "lie": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lie",
+    "lih": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lih",
+    "lif": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lij.lii.lih.lig.lif",
+    "lik": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lim.lil.lik",
+    "lin": "ljx.ljw.ljv.lju.lja.liz.lip.lio.lin",
+    "liq": "ljx.ljw.ljv.lju.lja.liz.liq",
+    "lit": "ljx.ljw.ljv.lju.lja.liz.lit",
+    "lir": "ljx.ljw.ljv.lju.lja.liz.lit.lis.lir",
+    "liy": "ljx.ljw.ljv.lju.lja.liz.liy",
+    "liw": "ljx.ljw.ljv.lju.lja.liz.liy.lix.liw",
+    "liu": "ljx.ljw.ljv.lju.lja.liz.liy.lix.liw.liv.liu",
+    "ljt": "ljx.ljw.ljv.lju.ljt",
+    "ljj": "ljx.ljw.ljv.lju.ljt.ljs.ljj",
+    "ljg": "ljx.ljw.ljv.lju.ljt.ljs.ljj.lji.ljg",
+    "ljh": "ljx.ljw.ljv.lju.ljt.ljs.ljj.lji.ljh",
+    "ljq": "ljx.ljw.ljv.lju.ljt.ljs.ljq",
+    "ljl": "ljx.ljw.ljv.lju.ljt.ljs.ljq.ljp.ljl",
+    "ljo": "ljx.ljw.ljv.lju.ljt.ljs.ljq.ljp.ljo",
+    "ljr": "ljx.ljw.ljv.lju.ljt.ljs.ljr",
+    "lkc": "llc.llb.lkc",
+    "lkg": "llc.llb.lkg",
+    "lkh": "llc.llb.lkh",
+    "lki": "llc.llb.lki",
+    "lkm": "llc.llb.lkm",
+    "lkn": "llc.llb.lkn",
+    "lko": "llc.llb.lko",
+    "lkp": "llc.llb.lkp",
+    "lkq": "llc.llb.lkq",
+    "lkr": "llc.llb.lkr",
+    "lks": "llc.llb.lks",
+    "lkt": "llc.llb.lkt",
+    "lku": "llc.llb.lku",
+    "lkx": "llc.llb.lkx",
+    "lkv": "llc.llb.lkx.lkw.lkv",
+    "lky": "llc.llb.lky",
+    "lkz": "llc.llb.lkz",
+    "lla": "llc.llb.lla",
+    "lln": "llp.llo.lln",
+    "llq": "lmm.lml.llq",
+    "llw": "lmm.lml.llw",
+    "llu": "lmm.lml.llw.llv.llu",
+    "lls": "lmm.lml.llw.llv.llu.llt.lls",
+    "lmk": "lmm.lml.lmk",
+    "lmg": "lmm.lml.lmk.lmj.lmg",
+    "lme": "lmm.lml.lmk.lmj.lmg.lmf.lme",
+    "llz": "lmm.lml.lmk.lmj.lmg.lmf.lme.lmd.llz",
+    "lmc": "lmm.lml.lmk.lmj.lmg.lmf.lme.lmd.lmc",
+    "lma": "lmm.lml.lmk.lmj.lmg.lmf.lme.lmd.lmc.lmb.lma",
+    "lmh": "lmm.lml.lmk.lmj.lmh",
+    "lmi": "lmm.lml.lmk.lmj.lmi",
+    "lmo": "lmq.lmp.lmo",
+    "lmv": "lng.lnf.lmv",
+    "lmw": "lng.lnf.lmw",
+    "lmx": "lng.lnf.lmx",
+    "lmy": "lng.lnf.lmy",
+    "lnb": "lng.lnf.lnb",
+    "lne": "lng.lnf.lne",
+    "lpe": "lpg.lpf.lpe",
+    "lon": "lpg.lpf.lpe.lpd.lon",
+    "lol": "lpg.lpf.lpe.lpd.lon.lom.lol",
+    "loi": "lpg.lpf.lpe.lpd.lon.lom.lol.lok.loi",
+    "loj": "lpg.lpf.lpe.lpd.lon.lom.lol.lok.loj",
+    "lpc": "lpg.lpf.lpe.lpd.lpc",
+    "lpa": "lpg.lpf.lpe.lpd.lpc.lpb.lpa",
+    "lot": "lpg.lpf.lpe.lpd.lpc.lpb.lpa.loz.lot",
+    "lou": "lpg.lpf.lpe.lpd.lpc.lpb.lpa.loz.lou",
+    "loy": "lpg.lpf.lpe.lpd.lpc.lpb.lpa.loz.loy",
+    "lov": "lpg.lpf.lpe.lpd.lpc.lpb.lpa.loz.loy.lox.lov",
+    "lph": "lpj.lpi.lph",
+    "lps": "lpx.lpw.lps",
+    "lpt": "lpx.lpw.lpt",
+    "lpu": "lpx.lpw.lpu",
+    "lpv": "lpx.lpw.lpv",
+    "lqo": "lqq.lqp.lqo",
+    "lsa": "lsd.lsc.lsa",
+    "lry": "lsd.lsc.lsa.lrz.lry",
+    "lsb": "lsd.lsc.lsb",
+    "ltb": "ltd.ltc.ltb",
+    "lsz": "ltd.ltc.ltb.lta.lsz",
+    "ltq": "lty.ltx.ltq",
+    "ltw": "lty.ltx.ltw",
+    "ltr": "lty.ltx.ltw.ltv.ltr",
+    "ltu": "lty.ltx.ltw.ltv.ltu",
+    "lui": "luw.luv.lui",
+    "lua": "luw.luv.lui.luh.lua",
+    "lud": "luw.luv.lui.luh.lud",
+    "lue": "luw.luv.lui.luh.lue",
+    "luf": "luw.luv.lui.luh.luf",
+    "lug": "luw.luv.lui.luh.lug",
+    "luu": "luw.luv.luu",
+    "luk": "luw.luv.luu.lut.luk",
+    "lun": "luw.luv.luu.lut.lun",
+    "luq": "luw.luv.luu.lut.luq",
+    "luo": "luw.luv.luu.lut.luq.lup.luo",
+    "lur": "luw.luv.luu.lut.lur",
+    "lus": "luw.luv.luu.lut.lus",
+    "lvf": "lvi.lvh.lvf",
+    "lvg": "lvi.lvh.lvg",
+    "lvm": "lvo.lvn.lvm",
+    "lvt": "lvv.lvu.lvt",
+    "lvx": "lvz.lvy.lvx",
+    "lwr": "lwt.lws.lwr",
+    "lxp": "lxr.lxq.lxp",
+    "lxu": "lxw.lxv.lxu",
+    "lxy": "lya.lxz.lxy",
+    "lyc": "lye.lyd.lyc",
+    "lyh": "lyj.lyi.lyh",
+    "lza": "lzc.lzb.lza",
+    "lzj": "lzl.lzk.lzj",
+    "lzq": "lzs.lzr.lzq",
+    "lzz": "mab.maa.lzz",
+    "mak": "mam.mal.mak",
+    "mbe": "mbg.mbf.mbe",
+    "mdh": "mdj.mdi.mdh",
+    "mee": "meg.mef.mee",
+    "men": "mep.meo.men",
+    "mei": "mep.meo.men.mem.mei",
+    "mel": "mep.meo.men.mem.mel",
+    "mfj": "mfl.mfk.mfj",
+    "mfq": "mfs.mfr.mfq",
+    "mfv": "mfx.mfw.mfv",
+    "mfy": "mga.mfz.mfy",
+    "mgf": "mgh.mgg.mgf",
+    "mgl": "mgn.mgm.mgl",
+    "mgr": "mgt.mgs.mgr",
+    "mgv": "mgx.mgw.mgv"
+  }
+}

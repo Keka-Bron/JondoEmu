@@ -1,5 +1,5 @@
 using System.Linq;
-using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
@@ -33,12 +33,12 @@ namespace Jondo.Unity.Tests.Movement
             session.State.PendingMovementCellId = 414;
             using (SessionContext.Push(session))
             {
-                WorldMoveHandler.StopMovement(ConnectionProtocol.Push("jqe", Pb.New().Var(1, stop).Build()));
+                WorldMoveHandler.StopMovement(session, new MapMovementCancelRequest(stop));
                 Assert.Equal(stop, session.State.CellId);
                 Assert.False(WorldMoveHandler.TryTakeCompletedMovement(session.State, out _, out _));
 
                 // A cell the map does not walk on changes nothing.
-                WorldMoveHandler.StopMovement(ConnectionProtocol.Push("jqe", Pb.New().Var(1, 9999).Build()));
+                WorldMoveHandler.StopMovement(session, new MapMovementCancelRequest(9999));
                 Assert.Equal(stop, session.State.CellId);
             }
         }

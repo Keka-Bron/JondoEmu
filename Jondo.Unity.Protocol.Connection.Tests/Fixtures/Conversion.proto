@@ -14,7 +14,15 @@ message a_payload {
   a_empty child = 6;
   string decoy = 9;
   a_empty required_child = 10;
+  optional uint32 telemetry = 11;
+  bytes opaque = 12;
+  repeated wire_only_detail samples = 13;
+  map<string, wire_only_detail> attributes = 14;
+  wire_only_mode wire_state = 15;
+  oneof wire_only_choice { wire_only_detail detail = 16; bool flag = 17; }
 }
+message wire_only_detail { bytes data = 1; }
+enum wire_only_mode { INITIAL = 0; OTHER = 1; }
 message a_empty {}
 message b_root {
   oneof another_choice { b_payload other_item = 11; a_empty other_empty = 12; }
@@ -27,3 +35,15 @@ message b_payload {
   string other_decoy = 10;
   a_empty other_required_child = 11;
 }
+
+message advanced {
+  bytes data = 1;
+  optional string title = 2;
+  optional bytes blob = 3;
+  optional mode state = 4;
+  map<int32, defaults_payload> children = 5;
+  defaults_payload missing_default = 6;
+  oneof choice { int64 number = 7; a_empty empty = 8; bool unsupported = 9; }
+  oneof construction { a_empty default_branch = 10; string other_branch = 11; }
+}
+message defaults_payload { int32 count = 1; string text = 2; }

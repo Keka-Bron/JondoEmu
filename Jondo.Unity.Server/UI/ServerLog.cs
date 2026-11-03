@@ -13,7 +13,7 @@ internal sealed class ServerLog
     internal const int Capacity = 4000;
     internal long LastId { get; private set; }
     private static readonly Regex Packet = new(
-        @"^(\s*\d+) (\[(?:client>server|server>client)\]) ([a-z]{3})( \([A-Za-z0-9_]+\))?(.*?)(\s+\d+ B)\s*$",
+        @"^(\s*\d+) (\[(?:client>server|server>client)\]) ([a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)*)( \([A-Za-z0-9_.]+\))?(.*?)(\s+\d+ B)\s*$",
         RegexOptions.Compiled);
 
     internal void Append(IEnumerable<ConsoleLogBuffer.LogEntry> entries)

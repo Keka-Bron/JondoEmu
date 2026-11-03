@@ -97,21 +97,26 @@ schema, mapping, stable assembly or generator invalidates conversion generation.
   single-member stable record.
 - `enums` bind wire value names to stable enum members explicitly. Stable enum
   numeric values are not protobuf values (`Online`, for example, maps to wire 0).
-- `ignoredWireFields` deliberately omits declared, unmapped fields from stable
-  objects and leaves them at protobuf defaults on output. The 3.6.10.11 mapping omits
-  identification field 5, authentication-error field 3 and server-list field 3.
+- Wire fields and whole oneofs without semantic bindings remain raw-only by
+  default; no ignore list is needed. Encoding leaves them at protobuf defaults
+  or with no selected branch unless `defaultOneofs` explicitly selects one.
+  The 3.6.10.11 mapping omits identification field 5, authentication-error field 3
+  and server-list field 3 this way. Unmapped does not imply unused or decoy.
 - All stable constructor members and concrete case types need bindings. Missing
   aliases/members, type or repetition mismatches, lost optional presence,
   duplicate identities/keys, unknown policies and incomplete cases/enums fail generation.
 
-The current generator supports the connection schema's messages, enums, repeated
-`IReadOnlyList<T>` values, required/nullable messages, optional value scalars and
-required oneofs. Unsupported shapes such as maps are reported, not guessed.
+The shared generator supports messages, enums, repeated `IReadOnlyList<T>` values,
+required/nullable messages, optional scalars/strings/bytes, `byte[]`, and
+`IReadOnlyDictionary<TKey, TValue>` maps. Mapped Connection oneofs remain required. The
+Game profile also uses explicit absent-case and default-construction policies;
+see [game-protocol.md](game-protocol.md). Unsupported shapes are reported, not guessed.
 
 Wire parsing uses standard protobuf unknown-field retention. Raw messages remain
 available in `Wire.Messages` and through `ConnectionBindings.DecodeWire`. Stable
-conversion ignores explicitly unmapped fields and rejects missing required cases
-or unmapped enum values. Projection to stable types is intentionally not a
+conversion omits unbound fields/groups and rejects missing required cases or
+unmapped values/branches within mapped enums/oneofs. Stable members still require
+bindings or explicit stable default/ignore policies. Projection is intentionally not a
 lossless wire round trip.
 
 ### Worked field and enum mapping

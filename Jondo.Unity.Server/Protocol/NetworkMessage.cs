@@ -100,8 +100,9 @@ namespace Jondo.Protocol
                 {
                     LogTrafficEnriched("Server -> Client", typeUrl, payload);
                 }
-                Jondo.Unity.Server.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length);
             }
+            catch { }
+            try { Jondo.Unity.Server.Network.GameServerProxy.LogTraffic("S->C", payload, payload.Length); }
             catch { }
             
             byte[] frame = new byte[lenBytes.Length + payload.Length];
@@ -226,18 +227,18 @@ namespace Jondo.Protocol
         /// is still in <c>ProtoMessage.DumpFieldsToString</c> to look at a specific packet.
         /// What changes is what is shown LIVE, which is something else.
         ///
-        /// The name comes first from the Op layer, which is generated from the measured anchors, and only if it is not
-        /// there does it fall back to the hand-written table. That order matters: a hand-written table goes
-        /// stale as soon as Ankama rotates the names and the generated one does not.
+        /// Reviewed Game mappings supply semantic names and typed fields first. Unsupported
+        /// payloads retain the legacy name lookup and compact raw-field presentation.
         /// </summary>
         private static void LogTrafficEnriched(string direction, string typeUrl, byte[] payload)
         {
             string opcode = typeUrl.Replace("type.ankama.com/", "").Trim();
             int number = System.Threading.Interlocked.Increment(ref _packetCount);
 
-            // First what someone has bound by hand, which is the only verified thing. Op.Label stays
-            // as a backup and today it is empty on purpose: the invented names were removed.
-            string name = Jondo.Unity.Server.Managers.NameBinding.Of(opcode);
+            // Use a diagnostic copy; neither projection nor redaction changes dispatched bytes.
+            byte[] shown = Jondo.Unity.Server.Diagnostics.TrafficRedaction.Scrub(payload, payload.Length);
+            bool mapped = Jondo.Unity.Server.Diagnostics.GameTrafficFormatter.TryFormat(shown, out string name, out string fields);
+            if (name.Length == 0) name = Jondo.Unity.Server.Managers.NameBinding.Of(opcode);
             if (name.Length == 0) name = Op.Label(opcode);
             if (name.Length == 0)
             {
@@ -261,12 +262,12 @@ namespace Jondo.Protocol
             // ReadPayload looks for the url inside the frame and returns what is behind it, which is the
             // real message. The size shown is also its own and not the frame's:
             // with the envelope's, an empty message seemed to weigh thirty-six bytes.
-            byte[] dentro = Jondo.Unity.Server.Network.ConnectionProtocol.ReadPayload(payload, opcode)
-                            ?? payload;
-
-            string fields = "";
-            try { fields = Jondo.Unity.Server.Network.ProtoMessage.Parse(dentro).Compact(); }
-            catch { }
+            if (!mapped)
+            {
+                byte[] dentro = Jondo.Unity.Server.Network.ConnectionProtocol.ReadPayload(shown, opcode) ?? shown;
+                try { fields = Jondo.Unity.Server.Network.ProtoMessage.Parse(dentro).Compact(); }
+                catch { }
+            }
 
             string where = direction.StartsWith("Client", StringComparison.Ordinal)
                 ? "client>server" : "server>client";

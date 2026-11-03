@@ -11,14 +11,17 @@ namespace Jondo.Unity.ProtocolGenerator;
 /// Generates direct, typed conversions. Descriptors own protobuf structure; Roslyn
 /// symbols own stable construction. The mapping contains semantic bindings only.
 /// </summary>
-public sealed class BindingGenerator
+public sealed partial class BindingGenerator
 {
     private sealed class Mapping
     {
         public required string StableNamespace { get; init; }
         public required string GeneratedNamespace { get; init; }
         public required string ClassName { get; init; }
-        public required string Root { get; init; }
+        public string? Root { get; init; }
+        public string ConversionException { get; init; } = "ConnectionConversionException";
+        public Dictionary<string, EnvelopeBinding>? GameEnvelope { get; init; }
+        public Dictionary<string, string> WireAliases { get; init; } = new();
         public Dictionary<string, MessageBinding> Messages { get; init; } = new();
         public Dictionary<string, EnumBinding> Enums { get; init; } = new();
     }
@@ -26,14 +29,18 @@ public sealed class BindingGenerator
     private sealed class MessageBinding
     {
         public required string Name { get; init; }
+        public string? Kind { get; init; }
         public Dictionary<string, string> Fields { get; init; } = new();
         public Dictionary<string, OneofBinding> Oneofs { get; init; } = new();
-        public string[] IgnoredWireFields { get; init; } = [];
+        public string[] IgnoredStableMembers { get; init; } = [];
+        public string[] DefaultOnAbsence { get; init; } = [];
+        public Dictionary<string, string> DefaultOneofs { get; init; } = new();
     }
 
     private sealed class OneofBinding
     {
         public required string Member { get; init; }
+        public string? NoneType { get; init; }
         public Dictionary<string, CaseBinding> Cases { get; init; } = new();
     }
 
@@ -108,7 +115,9 @@ public sealed class BindingGenerator
         if (!SyntaxFacts.IsValidIdentifier(_mapping.ClassName)) throw Error("Invalid generated class name.");
         var identities = _messageBindings.Values.Select(b => b.Name).Concat(_enumBindings.Values.Select(b => b.Name)).ToArray();
         if (identities.Distinct().Count() != identities.Length) throw Error("Duplicate stable type bindings.");
-        if (_messageBindings.Values.Count(b => b.Name == _mapping.Root) != 1)
+        if (!SyntaxFacts.IsValidIdentifier(_mapping.ConversionException)) throw Error("Invalid conversion exception name.");
+        if (_mapping.GameEnvelope is not null) ValidateGame();
+        else if (_messageBindings.Values.Count(b => b.Name == _mapping.Root) != 1)
             throw Error($"Root {_mapping.Root} needs exactly one message binding.");
 
         foreach (var (wire, binding) in _enumBindings)
@@ -140,19 +149,23 @@ public sealed class BindingGenerator
                 var field = Field(wire, name);
                 if (RealOneof(field)) throw Error($"{wire.Descriptor.Name}.{name} must be bound through its oneof.");
                 if (!members.Add(member)) throw Error($"Duplicate stable member: {binding.Name}.{member}.");
-                ValidateValue(field, Parameter(parameters, member).Type);
+                ValidateValue(field, Parameter(parameters, member).Type, binding.DefaultOnAbsence.Contains(name));
             }
-            foreach (string name in binding.IgnoredWireFields)
+            foreach (string name in binding.DefaultOnAbsence)
             {
                 var field = Field(wire, name);
-                if (RealOneof(field) || binding.Fields.ContainsKey(name)) throw Error($"Invalid ignored field: {wire.Descriptor.Name}.{name}.");
+                if (!binding.Fields.ContainsKey(name) || (!field.Proto3Optional && field.Type != FieldDescriptorProto.Types.Type.Message) ||
+                    field.Label == FieldDescriptorProto.Types.Label.Repeated)
+                    throw Error($"Invalid default-on-absence policy: {wire.Descriptor.Name}.{name}.");
+                _ = DefaultValue(Parameter(parameters, binding.Fields[name]).Type);
             }
-            if (binding.IgnoredWireFields.Distinct().Count() != binding.IgnoredWireFields.Length)
-                throw Error($"Duplicate ignored field in {wire.Descriptor.Name}.");
-            foreach (var field in wire.Descriptor.Field.Where(f => !RealOneof(f)))
-                if (!binding.Fields.ContainsKey(field.Name) && !binding.IgnoredWireFields.Contains(field.Name))
-                    throw Error($"Unbound wire field {wire.Descriptor.Name}.{field.Name}; bind it or explicitly ignore it.");
-
+            foreach (string member in binding.IgnoredStableMembers)
+            {
+                if (!members.Add(member)) throw Error($"Duplicate stable member: {binding.Name}.{member}.");
+                _ = DefaultValue(Parameter(parameters, member).Type);
+            }
+            // Bindings define the semantic surface, not exhaustive wire coverage.
+            // Unmapped fields/groups remain raw-only and default on output.
             foreach (var (name, oneof) in binding.Oneofs)
             {
                 int index = wire.Descriptor.OneofDecl.ToList().FindIndex(o => o.Name == name);
@@ -163,6 +176,13 @@ public sealed class BindingGenerator
                 if (union is null || !union.IsAbstract || union.NullableAnnotation == NullableAnnotation.Annotated)
                     throw Error($"{binding.Name}.{oneof.Member} must be a required abstract case type.");
                 var cases = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+                if (oneof.NoneType is not null)
+                {
+                    var none = Stable(oneof.NoneType);
+                    if (!Inherits(none, union) || Constructor(none).Parameters.Length != 0)
+                        throw Error($"Invalid absent case: {oneof.NoneType}.");
+                    cases.Add(none);
+                }
                 foreach (var (alias, branch) in oneof.Cases)
                 {
                     var field = Field(wire, alias);
@@ -182,16 +202,29 @@ public sealed class BindingGenerator
                 var descendants = Types(union.ContainingAssembly.GlobalNamespace).Where(t => !t.IsAbstract && Inherits(t, union));
                 if (!cases.SetEquals(descendants)) throw Error($"Incomplete stable cases for {union.Name} in {wire.Descriptor.Name}.{name}.");
             }
-            foreach (var field in wire.Descriptor.Field.Where(RealOneof))
-                if (!binding.Oneofs.ContainsKey(wire.Descriptor.OneofDecl[field.OneofIndex].Name))
-                    throw Error($"Unbound wire oneof in {wire.Descriptor.Name}: {field.Name}.");
+            foreach (var (group, branch) in binding.DefaultOneofs)
+            {
+                var field = Field(wire, branch);
+                if (!RealOneof(field) || wire.Descriptor.OneofDecl[field.OneofIndex].Name != group || binding.Oneofs.ContainsKey(group))
+                    throw Error($"Invalid default oneof: {wire.Descriptor.Name}.{group}.");
+            }
             if (!self && !members.SetEquals(parameters.Select(p => p.Name)))
                 throw Error($"Incomplete stable construction for {binding.Name}.");
         }
     }
 
-    private void ValidateValue(FieldDescriptorProto field, ITypeSymbol target)
+    private void ValidateValue(FieldDescriptorProto field, ITypeSymbol target, bool defaultOnAbsence = false)
     {
+        if (MapEntry(field) is { } map)
+        {
+            if (target is not INamedTypeSymbol { Name: "IReadOnlyDictionary", TypeArguments.Length: 2 } dict ||
+                dict.ContainingNamespace.ToDisplayString() != "System.Collections.Generic" || target.NullableAnnotation == NullableAnnotation.Annotated)
+                throw Error($"Map {field.Name} requires IReadOnlyDictionary<TKey, TValue>.");
+            if (dict.TypeArguments.Any(IsNullable)) throw Error($"Map {field.Name} cannot contain nullable keys or values.");
+            ValidateValue(map.Descriptor.Field[0], dict.TypeArguments[0]);
+            ValidateValue(map.Descriptor.Field[1], dict.TypeArguments[1]);
+            return;
+        }
         bool repeated = field.Label == FieldDescriptorProto.Types.Label.Repeated;
         var element = Element(target);
         if (repeated != (element is not null)) throw Error($"Repetition mismatch for {field.Name} -> {target}.");
@@ -202,9 +235,12 @@ public sealed class BindingGenerator
         }
         if (field.Proto3Optional)
         {
-            if (target is not INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } nullable)
+            if (target is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } nullable)
+                target = nullable.TypeArguments[0];
+            else if (target.IsReferenceType && target.NullableAnnotation == NullableAnnotation.Annotated)
+                target = target.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+            else if (!defaultOnAbsence)
                 throw Error($"Optional scalar {field.Name} needs a nullable stable value.");
-            target = nullable.TypeArguments[0];
         }
         else if (target is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T })
             throw Error($"{field.Name} has no optional scalar presence.");
@@ -224,6 +260,11 @@ public sealed class BindingGenerator
             var wire = Enum(field.TypeName);
             if (!_enumBindings.TryGetValue(wire, out var binding)) throw Error($"Missing enum binding for {field.TypeName}.");
             expected = Stable(binding.Name);
+        }
+        else if (field.Type == FieldDescriptorProto.Types.Type.Bytes)
+        {
+            if (target.NullableAnnotation == NullableAnnotation.Annotated) throw Error($"{field.Name} has no nullable bytes representation.");
+            expected = _stable.CreateArrayTypeSymbol(_stable.GetSpecialType(SpecialType.System_Byte));
         }
         else
         {
@@ -255,12 +296,16 @@ public sealed class BindingGenerator
         Line($"namespace {_mapping.GeneratedNamespace};");
         Line($"public static class {_mapping.ClassName}");
         Line("{");
-        var root = _messageBindings.Single(p => p.Value.Name == _mapping.Root).Key;
-        string stableRoot = Type(Stable(_mapping.Root));
-        Line($"    public static {stableRoot} Decode(ReadOnlySpan<byte> payload) => ToStable({root.CSharpType}.Parser.ParseFrom(payload));");
-        Line($"    public static byte[] Encode({stableRoot} value) => ToWire(value).ToByteArray();");
-        Line($"    public static IMessage DecodeWire(ReadOnlySpan<byte> payload) => {root.CSharpType}.Parser.ParseFrom(payload);");
-        Line($"    private static Exception Invalid(string path) => new global::{_mapping.StableNamespace}.ConnectionConversionException(\"Unsupported or missing protocol value: \" + path);");
+        if (_mapping.GameEnvelope is not null) EmitGame();
+        else
+        {
+            var root = _messageBindings.Single(p => p.Value.Name == _mapping.Root).Key;
+            string stableRoot = Type(Stable(_mapping.Root!));
+            Line($"    public static {stableRoot} Decode(ReadOnlySpan<byte> payload) => ToStable({root.CSharpType}.Parser.ParseFrom(payload));");
+            Line($"    public static byte[] Encode({stableRoot} value) => ToWire(value).ToByteArray();");
+            Line($"    public static IMessage DecodeWire(ReadOnlySpan<byte> payload) => {root.CSharpType}.Parser.ParseFrom(payload);");
+        }
+        Line($"    private static Exception Invalid(string path) => new global::{_mapping.StableNamespace}.{_mapping.ConversionException}(\"Unsupported or missing protocol value: \" + path);");
         foreach (var (wire, binding) in _enumBindings) EmitEnum(wire, binding);
         foreach (var (wire, binding) in _messageBindings) EmitMessage(wire, binding);
         Line("}");
@@ -293,7 +338,9 @@ public sealed class BindingGenerator
         Line("    {");
         Line($"        if (value is null) throw Invalid(\"{wire.Descriptor.Name}\");");
         foreach (var (name, member) in binding.Fields)
-            args.Add(member, ReadValue(Field(wire, name), Constructor(stable).Parameters.Single(p => p.Name == member).Type, $"value.{Pascal(name)}"));
+            args.Add(member, ReadValue(Field(wire, name), Constructor(stable).Parameters.Single(p => p.Name == member).Type, $"value.{Pascal(name)}", defaultOnAbsence: binding.DefaultOnAbsence.Contains(name)));
+        foreach (string member in binding.IgnoredStableMembers)
+            args.Add(member, DefaultValue(Constructor(stable).Parameters.Single(p => p.Name == member).Type));
         foreach (var (name, oneof) in binding.Oneofs)
         {
             string expression = $"value.{Pascal(name)}Case switch\n        {{\n";
@@ -305,6 +352,8 @@ public sealed class BindingGenerator
                 if (branch.Member is not null) value = $"new {Type(target)}({value})";
                 expression += $"            {wire.CSharpType}.{Pascal(name)}OneofCase.{Pascal(alias)} => ({Type(self ? stable : Constructor(stable).Parameters.Single(p => p.Name == oneof.Member).Type)}){value},\n";
             }
+            if (oneof.NoneType is not null)
+                expression += $"            {wire.CSharpType}.{Pascal(name)}OneofCase.None => new {Type(Stable(oneof.NoneType))}(),\n";
             expression += $"            _ => throw Invalid(\"{wire.Descriptor.Name}.{name}\")\n        }}";
             args.Add(oneof.Member, expression);
         }
@@ -322,7 +371,7 @@ public sealed class BindingGenerator
             var type = Constructor(stable).Parameters.Single(p => p.Name == member).Type;
             string expression = WriteValue(field, type, $"value.{member}");
             if (field.Label == FieldDescriptorProto.Types.Label.Repeated) Line($"        result.{Pascal(name)}.Add({expression});");
-            else if (field.Proto3Optional) Line($"        if (value.{member}.HasValue) result.{Pascal(name)} = {expression};");
+            else if (field.Proto3Optional && IsNullable(type)) Line($"        if (value.{member} is not null) result.{Pascal(name)} = {expression};");
             else if (field.Type == FieldDescriptorProto.Types.Type.Message && type.NullableAnnotation == NullableAnnotation.Annotated)
                 Line($"        if (value.{member} is not null) result.{Pascal(name)} = {expression};");
             else Line($"        result.{Pascal(name)} = {expression};");
@@ -331,6 +380,8 @@ public sealed class BindingGenerator
         {
             Line($"        switch ({(self ? "value" : "value." + oneof.Member)})");
             Line("        {");
+            if (oneof.NoneType is not null)
+                Line($"            case {Type(Stable(oneof.NoneType))}: break;");
             foreach (var (alias, branch) in oneof.Cases)
             {
                 var target = Stable(branch.Type);
@@ -341,20 +392,34 @@ public sealed class BindingGenerator
             Line($"            default: throw Invalid(\"{binding.Name}.{oneof.Member}\");");
             Line("        }");
         }
+        foreach (var (_, branch) in binding.DefaultOneofs)
+        {
+            var field = Field(wire, branch);
+            string value = field.Type switch
+            {
+                FieldDescriptorProto.Types.Type.Message => $"new {Message(field.TypeName).CSharpType}()",
+                FieldDescriptorProto.Types.Type.String => "string.Empty",
+                FieldDescriptorProto.Types.Type.Bytes => "ByteString.Empty",
+                _ => "default"
+            };
+            Line($"        result.{Pascal(branch)} = {value};");
+        }
         Line("        return result;");
         Line("    }");
     }
 
-    private string ReadValue(FieldDescriptorProto field, ITypeSymbol type, string value, bool element = false)
+    private string ReadValue(FieldDescriptorProto field, ITypeSymbol type, string value, bool element = false, bool defaultOnAbsence = false)
     {
+        if (MapEntry(field) is { } map && type is INamedTypeSymbol dict)
+            return $"{value}.ToDictionary(entry => {ReadValue(map.Descriptor.Field[0], dict.TypeArguments[0], "entry.Key")}, entry => {ReadValue(map.Descriptor.Field[1], dict.TypeArguments[1], "entry.Value")})";
         if (!element && field.Label == FieldDescriptorProto.Types.Label.Repeated)
             return $"{value}.Select(item => {ReadValue(field, Element(type)!, "item", true)}).ToArray()";
         string converted = field.Type is FieldDescriptorProto.Types.Type.Message or FieldDescriptorProto.Types.Type.Enum
-            ? $"ToStable({value})" : value;
+            ? $"ToStable({value})" : field.Type == FieldDescriptorProto.Types.Type.Bytes ? $"{value}.ToByteArray()" : value;
         if (field.Proto3Optional)
-            return $"value.Has{Pascal(field.Name)} ? ({Type(type)}){converted} : null";
+            return $"value.Has{Pascal(field.Name)} ? ({Type(type)}){converted} : {(defaultOnAbsence ? DefaultValue(type) : "null")}";
         if (field.Type == FieldDescriptorProto.Types.Type.Message)
-            return type.NullableAnnotation == NullableAnnotation.Annotated
+            return defaultOnAbsence ? $"{value} is null ? {DefaultValue(type)} : {converted}" : type.NullableAnnotation == NullableAnnotation.Annotated
                 ? $"{value} is null ? null : {converted}"
                 : $"{converted}";
         return converted;
@@ -362,10 +427,29 @@ public sealed class BindingGenerator
 
     private string WriteValue(FieldDescriptorProto field, ITypeSymbol type, string value, bool element = false)
     {
+        if (MapEntry(field) is { } map && type is INamedTypeSymbol dict)
+            return $"{value}.ToDictionary(entry => {WriteValue(map.Descriptor.Field[0], dict.TypeArguments[0], "entry.Key")}, entry => {WriteValue(map.Descriptor.Field[1], dict.TypeArguments[1], "entry.Value")})";
         if (!element && field.Label == FieldDescriptorProto.Types.Label.Repeated)
             return $"{value}.Select(item => {WriteValue(field, Element(type)!, "item", true)})";
-        if (field.Proto3Optional) value += ".Value";
-        return field.Type is FieldDescriptorProto.Types.Type.Message or FieldDescriptorProto.Types.Type.Enum ? $"ToWire({value})" : value;
+        if (field.Proto3Optional && type is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T }) value += ".Value";
+        return field.Type is FieldDescriptorProto.Types.Type.Message or FieldDescriptorProto.Types.Type.Enum ? $"ToWire({value})" :
+            field.Type == FieldDescriptorProto.Types.Type.Bytes ? $"ByteString.CopyFrom({value})" : value;
+    }
+
+    private WireMessage? MapEntry(FieldDescriptorProto field) => field.Type == FieldDescriptorProto.Types.Type.Message &&
+        Message(field.TypeName).Descriptor.Options?.MapEntry == true ? Message(field.TypeName) : null;
+    private static bool IsNullable(ITypeSymbol type) => type.NullableAnnotation == NullableAnnotation.Annotated ||
+        type is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T };
+    private string DefaultValue(ITypeSymbol type, int depth = 0)
+    {
+        if (depth > 32) throw Error($"Recursive default construction for {type}.");
+        if (IsNullable(type)) return "null";
+        if (type.SpecialType == SpecialType.System_String) return "string.Empty";
+        if (Element(type) is not null || type is IArrayTypeSymbol) return "[]";
+        if (type.IsValueType && type.TypeKind != TypeKind.Enum) return "default";
+        if (type is not INamedTypeSymbol named || type.TypeKind == TypeKind.Enum || named.IsAbstract)
+            throw Error($"No explicit stable default for {type}.");
+        return $"new {Type(type)}({string.Join(", ", Constructor(named).Parameters.Select(p => DefaultValue(p.Type, depth + 1)))})";
     }
 
     private INamedTypeSymbol Stable(string name) => _stable.GetTypeByMetadataName(_mapping.StableNamespace + "." + name)
