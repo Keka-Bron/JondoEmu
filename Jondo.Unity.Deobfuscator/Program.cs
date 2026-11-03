@@ -1,22 +1,33 @@
-using System.Windows.Forms;
-using Jondo.Unity.Deobfuscator;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Styling;
+using Avalonia.Themes.Fluent;
 using Jondo.Unity.Deobfuscator.UI;
 
-// ─── The deobfuscator ───────────────────────────────────────────────────────────────────
-//
-// The face of what until now were nine commands in an order one had to know by heart. It guides step by
-// step: it asks for the new client, asks for the version already known, reads the game's code, matches
-// the two, asks a model about whatever remains in doubt and lets one review proposal by proposal.
-//
-// The command line still exists and does exactly the same calling the same classes of
-// Jondo.Unity.Reversing: whoever prefers a script loses nothing, and what is measured one way holds
-// the other.
-//
-// Unlike the server and the launcher, here there is nothing else to attend to: there is no need to open
-// the window on a separate thread, the main thread is the interface's and that is it.
+namespace Jondo.Unity.Deobfuscator;
 
-ApplicationConfiguration.Initialize();
-Application.SetHighDpiMode(HighDpiMode.SystemAware);
+internal static class Program
+{
+    [STAThread]
+    public static int Main(string[] args)
+        => BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
 
-var settings = Settings.Load();
-Application.Run(new MapperWindow(settings));
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<DeobfuscatorApp>().UsePlatformDetect().LogToTrace();
+}
+
+public sealed class DeobfuscatorApp : Application
+{
+    public override void Initialize()
+    {
+        Styles.Add(new FluentTheme());
+        RequestedThemeVariant = ThemeVariant.Dark;
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            desktop.MainWindow = new MapperWindow(Settings.Load());
+        base.OnFrameworkInitializationCompleted();
+    }
+}

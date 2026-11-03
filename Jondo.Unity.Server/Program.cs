@@ -235,10 +235,6 @@ namespace Jondo.Unity.Server
                     Console.WriteLine("[!] Public binding does not encrypt traffic. Use it only on " +
                                       "a trusted network or behind a VPN/tunnel.");
                 }
-                // The key the launcher will be able to talk to this server with. One per start:
-                // that way a launcher from a previous session does not keep a key to the current one.
-                ControlApi.NuevoSecreto();
-                Console.WriteLine($"[+] Command channel key in {Contract.FicheroDelSecreto}");
                 HaapiServer.Start(haapiPort);
                 ZaapServer.Start(port);
                 GameServerProxy.Start(gamePort);

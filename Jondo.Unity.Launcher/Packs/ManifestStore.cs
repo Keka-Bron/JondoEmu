@@ -22,19 +22,20 @@ namespace Jondo.Unity.Launcher.Packs
     {
         public const string Game = "dofus";
         public const string Release = "dofus3";
-        public const string Platform = "windows";
+        private readonly string _platform;
 
         private readonly HttpClient _http;
         private readonly string _folder;
 
-        public ManifestStore(HttpClient http, string folder)
+        public ManifestStore(HttpClient http, string folder, string platform = "windows")
         {
             _http = http;
-            _folder = folder;
+            _folder = Path.Combine(folder, platform);
+            _platform = platform;
         }
 
         public static string DefaultFolder { get; } = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Jondo", "cytrus");
+            UserDirectories.Data, "Jondo", "cytrus");
 
         /// <summary>How long a transfer may go without a single byte before it is abandoned.</summary>
         public TimeSpan StallTimeout { get; init; } = TimeSpan.FromSeconds(60);
@@ -42,8 +43,8 @@ namespace Jondo.Unity.Launcher.Packs
         /// <summary>The CDN's name for a client version: 3.6.10.11 is <c>6.0_3.6.10.11</c>.</summary>
         public static string ReleaseName(string version) => CytrusCdn.ReleasePrefix + version;
 
-        public static string UrlFor(string version)
-            => CytrusCdn.ManifestUrl(Game, Release, Platform, ReleaseName(version));
+        public static string UrlFor(string version, string platform = "windows")
+            => CytrusCdn.ManifestUrl(Game, Release, platform, ReleaseName(version));
 
         public string PathFor(string version) => Path.Combine(_folder, ReleaseName(version) + ".manifest");
 
@@ -65,7 +66,7 @@ namespace Jondo.Unity.Launcher.Packs
             }
 
             Directory.CreateDirectory(_folder);
-            string url = UrlFor(version);
+            string url = UrlFor(version, _platform);
             string half = file + ".download";
 
             try

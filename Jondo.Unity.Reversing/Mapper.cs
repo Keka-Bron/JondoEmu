@@ -83,7 +83,8 @@ public sealed class Mapper
     /// is two and a half seconds for two thousand messages.
     /// </summary>
     public void Build(string oldPath, string newPath, string dataFolder,
-                      IReadOnlyCollection<string> mine, Action<string>? report = null)
+                      IReadOnlyCollection<string> mine, Action<string>? report = null,
+                      CancellationToken cancellationToken = default)
     {
         // The version comes from what the user wrote —«Cliente 3.6.10.10»— and not from the
         // already resolved assembly path, which ends in «Ankama.Dofus.Protocol.Game.dll» and carries no
@@ -94,9 +95,11 @@ public sealed class Mapper
         NewVersion = VersionOf(newPath);
 
         report?.Invoke("reading the old protocol...");
+        cancellationToken.ThrowIfCancellationRequested();
         _old = ProtoWriter.Model(ProtocolDll(oldPath));
 
         report?.Invoke("reading the new protocol...");
+        cancellationToken.ThrowIfCancellationRequested();
         _new = ProtoWriter.Model(ProtocolDll(newPath));
         _newParents = Dossier.Parents(_new);
 
@@ -125,7 +128,7 @@ public sealed class Mapper
             : $"{_old.Messages.Count:N0} old messages, {_new.Messages.Count:N0} new. " +
               "the names have NOT rotated in this patch; checking...");
 
-        var result = Matcher.Match(_old, _new);
+        var result = Matcher.Match(_old, _new, cancellationToken: cancellationToken);
 
         // The identity is not taken as good just because the name is still there: it is also required that the
         // message has the same shape. A name surviving with other content behind it would be
@@ -137,6 +140,7 @@ public sealed class Mapper
         Rows.Clear();
         foreach (var message in _old.Messages.OrderBy(m => m.Name, StringComparer.Ordinal))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var row = new Row { Old = message.Name, Mine = mine.Contains(message.Name) };
 
             if (_anchors.TryGetValue(message.Name, out var anchor))
@@ -260,7 +264,7 @@ public sealed class Mapper
                                   row.Meaning.Replace('\t', ' '), row.Mine ? "sí" : ""));
         }
 
-        File.WriteAllLines(path, lines);
+        WriteExport(path, writer => { foreach (string line in lines) writer.WriteLine(line); });
         return path;
     }
 
@@ -288,8 +292,23 @@ public sealed class Mapper
         }
 
         sb.AppendLine("}");
-        File.WriteAllText(path, sb.ToString());
+        WriteExport(path, writer => writer.Write(sb.ToString()));
         return path;
+    }
+
+    /// <summary>Readers see either the previous export or the complete replacement.</summary>
+    internal static void WriteExport(string path, Action<TextWriter> write)
+    {
+        string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            using (var writer = new StreamWriter(new FileStream(temporary, FileMode.CreateNew,
+                       FileAccess.Write, FileShare.None), new UTF8Encoding(false)))
+                write(writer);
+            // The temporary is alongside the destination so replacement stays on one filesystem.
+            File.Move(temporary, path, overwrite: true);
+        }
+        finally { File.Delete(temporary); }
     }
 
     // ─── The figures ────────────────────────────────────────────────────────────────────
@@ -345,6 +364,12 @@ public sealed class Mapper
     public static string ProtocolDll(string path)
     {
         if (File.Exists(path)) return path;
+        // Standalone Cpp2IL exports work without a MelonLoader installation, including on Linux.
+        foreach (string directory in new[] { path, Path.Combine(path, "cpp2il_out"), Path.Combine(path, "Cpp2IL", "cpp2il_out") })
+        {
+            string exported = Path.Combine(directory, "Ankama.Dofus.Protocol.Game.dll");
+            if (File.Exists(exported)) return exported;
+        }
         return Path.Combine(path, "MelonLoader", "Dependencies", "Il2CppAssemblyGenerator",
                             "Cpp2IL", "cpp2il_out", "Ankama.Dofus.Protocol.Game.dll");
     }

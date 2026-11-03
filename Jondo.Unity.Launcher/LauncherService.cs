@@ -8,10 +8,8 @@ namespace Jondo.Unity.Launcher
     /// <summary>
     /// Launcher logic, independent of the user interface.
     ///
-    /// It used to live inside <see cref="HaapiServer"/> and could only be reached over HTTP from
-    /// the web interface. The native desktop window now calls these methods directly, so the HTTP
-    /// route in front of them has been removed: the only thing still speaking HTTP to that server
-    /// is the Dofus client, and it does not use any of this.
+    /// The desktop window calls these methods; server operations go through ControlClient's HTTP
+    /// control channel. Database state and launch registration belong to the server process.
     /// </summary>
     public static class LauncherService
     {
@@ -179,7 +177,7 @@ namespace Jondo.Unity.Launcher
         /// one sends the user round in circles:
         ///
         ///   401  the session is no longer valid: one has to log in again
-        ///   403  the secret does not match: it is fixed by restarting the launcher
+        ///   403  the account does not have permission for the operation
         ///   none nobody is listening: one has to wait for the server to start
         ///
         /// The 401 came out as «el servidor no responde», which was false and misleading too: the
@@ -189,7 +187,7 @@ namespace Jondo.Unity.Launcher
             => respuesta.Llego && respuesta.Codigo == 401
                 ? UI.LauncherPreferences.Textos.SessionExpiredError
                 : respuesta.Llego && respuesta.Codigo == 403
-                    ? UI.LauncherPreferences.Textos.ControlRechazado
+                    ? UI.LauncherPreferences.Textos.PermissionDenied
                     : UI.LauncherPreferences.Textos.ServidorSinResponder;
 
         /// <summary>Creates a new account with its nickname. The server writes it, not the launcher.</summary>
@@ -314,8 +312,10 @@ namespace Jondo.Unity.Launcher
         /// The token identifies the account that has just logged in; if it is not recognized we
         /// reject the launch instead of silently using another account.
         /// </summary>
-        public static Result LaunchClient(string token)
+        public static Result LaunchClient(string? token)
         {
+            if (string.IsNullOrWhiteSpace(token))
+                return new Result { Success = false, Message = UI.LauncherPreferences.Textos.SessionExpiredError };
             try
             {
                 string clientPath = ResolveClient();
@@ -327,6 +327,7 @@ namespace Jondo.Unity.Launcher
                         Message = UI.LauncherPreferences.Textos.ClientNotFound
                     };
                 }
+                if (OperatingSystem.IsLinux()) new ClientInstallation(clientPath).ValidateNativeLaunch();
 
                 // BEFORE anything, that the server is really answering.
                 //
@@ -368,95 +369,63 @@ namespace Jondo.Unity.Launcher
                     ? roleValue.GetInt32()
                     : Roles.Jugador;
 
-                // Unity is told the size up front. Maximizing afterwards is not enough on its own:
-                // the client rebuilds its window when it moves between screens (server choice,
-                // character choice, world) and reapplies its own saved resolution, so it drops out
-                // of the maximized state and part of the interface ends up off screen.
-                //
-                // The measure is now given by Avalonia and not System.Windows.Forms.Screen: it was the last thing
-                // tying this file to the Windows desktop. The WORKING area is asked for, without
-                // the taskbar, which is what WorkingArea did; if there is no screen to
-                // ask —started without a graphical session— it falls back to 1920 by 1080, which is what
-                // there was before as a fallback.
-                var area = PantallaDeTrabajo();
-
-                // The optional HD/4K scenery packs: a flag only for a pack the player turned on
-                // AND that is installed and verified for the client's current version.
-                string packFlags = Packs.TexturePackService.ForClient(clientPath)
-                    .LaunchFlags(UI.LauncherPreferences.PackHd, UI.LauncherPreferences.Pack4k);
-                if ((UI.LauncherPreferences.PackHd || UI.LauncherPreferences.Pack4k) && packFlags.Length == 0)
-                {
-                    Console.WriteLine("[Launcher] A texture pack is turned on but not installed and verified " +
-                                      "for this client version; starting without it.");
-                }
-
-                string arguments = ClientArguments(area.Width, area.Height, instanceId, hash, language, packFlags);
-
-                // The client's mods, as the emulator ships them.
-                InstallMod(clientPath);
-
-                var startInfo = new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = clientPath,
-                    Arguments = arguments,
-                    WorkingDirectory = Path.GetDirectoryName(clientPath) ?? "",
-                    UseShellExecute = false
-                };
-
-                startInfo.Environment["ZAAP_PORT"] = "15881";
-                startInfo.Environment["ZAAP_HASH"] = hash;
-                startInfo.Environment["ZAAP_GAME"] = "dofus";
-                startInfo.Environment["ZAAP_RELEASE"] = "dofus3";
-                startInfo.Environment["ZAAP_INSTANCE_ID"] = instanceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                startInfo.Environment["ZAAP_CAN_AUTH"] = "true";
-                // JondoFix uses this only to decide whether item ids may be shown in the client.
-                // It is cosmetic: every administration command is still authorized by the server.
-                startInfo.Environment["JONDO_ACCOUNT_ROLE"] = accountRole.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                // And, to an administrator only, the token the mod's give-item panel presents to
-                // the control API. It is the account's own session, in its own process, and the
-                // server still checks token and role on every request.
-                if (Roles.AlMenos(accountRole, Roles.Administrador))
-                    startInfo.Environment["JONDO_CONTROL_TOKEN"] = token ?? "";
-                // To every player, the same session for the Cazacabezas mod: what it asks is about
-                // the account's own character, and the server answers nothing else with it.
-                startInfo.Environment["JONDO_PLAYER_TOKEN"] = token ?? "";
-
-                System.Diagnostics.Process? client;
+                Action release = LaunchCleanup(accountId, instanceId, token, hash, Devolver);
                 try
                 {
-                    client = System.Diagnostics.Process.Start(startInfo);
+                    // Unity rebuilds its window between screens and reapplies saved dimensions,
+                    // so give it the working area up front as well as maximizing on Windows.
+                    var area = PantallaDeTrabajo();
+
+                    // A flag only for a pack the player enabled and verified for this client.
+                    string packFlags = Packs.TexturePackService.ForClient(clientPath)
+                        .LaunchFlags(UI.LauncherPreferences.PackHd, UI.LauncherPreferences.Pack4k);
+                    if ((UI.LauncherPreferences.PackHd || UI.LauncherPreferences.Pack4k) && packFlags.Length == 0)
+                    {
+                        Console.WriteLine("[Launcher] A texture pack is turned on but not installed and verified " +
+                                          "for this client version; starting without it.");
+                    }
+
+                    if (OperatingSystem.IsWindows()) InstallMod(clientPath);
+
+                    var startInfo = ClientStartInfo(clientPath, area.Width, area.Height, instanceId,
+                        hash, language, packFlags, UI.LauncherPreferences.ClientConfigDirectory, Paths.LogsDir);
+                    if (OperatingSystem.IsWindows())
+                    {
+                        // The shipped mods consume these; Linux uses the unmodified native client.
+                        startInfo.Environment["JONDO_ACCOUNT_ROLE"] = accountRole.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        if (Roles.AlMenos(accountRole, Roles.Administrador))
+                            startInfo.Environment["JONDO_CONTROL_TOKEN"] = token ?? "";
+                        // Cazacabezas can only query the account's own hunter through this session.
+                        startInfo.Environment["JONDO_PLAYER_TOKEN"] = token ?? "";
+                    }
+
+                    var client = System.Diagnostics.Process.Start(startInfo);
+
+                    if (client == null)
+                    {
+                        release();
+                        return new Result { Success = false, Message = UI.LauncherPreferences.Textos.ClientStartFailed };
+                    }
+
+                    // Track before enabling exit notifications, including an already-exited client.
+                    // The server's stale-launch sweep covers a launcher that closes before the client.
+                    _arrancadosAqui[accountId] = hash;
+                    client.Exited += (s, e) => release();
+                    client.EnableRaisingEvents = true;
+                    if (client.HasExited)
+                    {
+                        release();
+                        return new Result { Success = false, Message = UI.LauncherPreferences.Textos.ClientStartFailed };
+                    }
+                    MaximizeWhenReady(client);
+                    Console.WriteLine($"[Launcher] Client {instanceId} launched for account {accountId} (PID {client.Id}).");
+                    return new Result { Success = true };
                 }
                 catch
                 {
-                    _arrancadosAqui.TryRemove(accountId, out _);
-                    Devolver(accountId);
+                    release();
                     throw;
                 }
-
-                if (client == null)
-                {
-                    _arrancadosAqui.TryRemove(accountId, out _);
-                    Devolver(accountId);
-                    return new Result { Success = false, Message = UI.LauncherPreferences.Textos.ClientStartFailed };
-                }
-
-                // When the client closes the server has to be told, which is what keeps
-                // count of who is playing. And even if this notice gets lost —because the
-                // launcher is closed first— the server has two nets underneath: the game session's leaving
-                // and the expiry of launches that never got to connect.
-                // Recorded before anything, which is what keeps the second click from asking
-                // the server for anything.
-                _arrancadosAqui[accountId] = 0;
-
-                client.EnableRaisingEvents = true;
-                client.Exited += (s, e) =>
-                {
-                    _arrancadosAqui.TryRemove(accountId, out _);
-                    Devolver(accountId);
-                };
-                MaximizeWhenReady(client);
-                Console.WriteLine($"[Launcher] Client {instanceId} launched for account {accountId} (PID {client.Id}).");
-                return new Result { Success = true };
             }
             catch (Exception ex)
             {
@@ -464,22 +433,53 @@ namespace Jondo.Unity.Launcher
             }
         }
 
-        /// <summary>The Dofus client's command line.</summary>
+        /// <summary>The Dofus client's process settings and platform-specific arguments.</summary>
         /// <param name="packFlags">From <see cref="Packs.TexturePackService.LaunchFlags"/>; may be empty.</param>
-        internal static string ClientArguments(int width, int height, int instanceId, string hash, string language, string packFlags)
+        internal static System.Diagnostics.ProcessStartInfo ClientStartInfo(string executable, int width,
+            int height, int instanceId, string hash, string language, string packFlags,
+            string configDirectory, string logRoot)
         {
-            // MelonLoader opens its own black console and its splash screen in front of the
-            // game. It is told not to on the command line as well as in Loader.cfg: the command
-            // rules over the file, so it does not matter if someone rewrites it.
-            string arguments =
-                $"-force-d3d11 -screen-fullscreen 0 -screen-width {width} -screen-height {height} " +
-                "--melonloader.hideconsole --melonloader.disablestartscreen " +
-                $"--port 15881 --gameName dofus --gameRelease dofus3 --instanceId {instanceId} --hash {hash} " +
-                $"--canLogin true --langCode {language} " +
-                "--autoConnectType 1 --connectionPort 5555";
-
-            // Same place as in Ankama's zaap.yml: after the connection arguments, with no value.
-            return packFlags.Length > 0 ? arguments + " " + packFlags : arguments;
+            var installation = new ClientInstallation(executable);
+            var start = new System.Diagnostics.ProcessStartInfo(installation.Executable)
+            {
+                WorkingDirectory = installation.Root,
+                UseShellExecute = false,
+            };
+            start.Environment["ZAAP_PORT"] = "15881";
+            start.Environment["ZAAP_HASH"] = hash;
+            start.Environment["ZAAP_GAME"] = "dofus";
+            start.Environment["ZAAP_RELEASE"] = "dofus3";
+            start.Environment["ZAAP_INSTANCE_ID"] = instanceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            start.Environment["ZAAP_CAN_AUTH"] = "true";
+            start.Environment.Remove("JONDO_CONTROL_TOKEN");
+            start.Environment.Remove("JONDO_ACCOUNT_ROLE");
+            start.Environment.Remove("JONDO_PLAYER_TOKEN");
+            if (installation.IsWindows) start.ArgumentList.Add("-force-d3d11");
+            foreach (string argument in new[] { "-screen-fullscreen", "0", "-screen-width",
+                width.ToString(System.Globalization.CultureInfo.InvariantCulture), "-screen-height",
+                height.ToString(System.Globalization.CultureInfo.InvariantCulture) }) start.ArgumentList.Add(argument);
+            if (installation.IsWindows)
+            {
+                start.ArgumentList.Add("--melonloader.hideconsole");
+                start.ArgumentList.Add("--melonloader.disablestartscreen");
+            }
+            foreach (string argument in new[] { "--port", "15881", "--gameName", "dofus", "--gameRelease", "dofus3",
+                "--instanceId", instanceId.ToString(System.Globalization.CultureInfo.InvariantCulture), "--hash", hash,
+                "--canLogin", "true", "--langCode", language, "--autoConnectType", "1", "--connectionPort", "5555" })
+                start.ArgumentList.Add(argument);
+            foreach (string flag in packFlags.Split(' ', StringSplitOptions.RemoveEmptyEntries)) start.ArgumentList.Add(flag);
+            if (!installation.IsWindows)
+            {
+                string config = Path.GetFullPath(configDirectory);
+                string logs = Path.GetFullPath(Path.Combine(logRoot, $"client-{instanceId}-{Guid.NewGuid():N}"));
+                Directory.CreateDirectory(config);
+                Directory.CreateDirectory(logs);
+                start.Environment["XDG_CONFIG_HOME"] = config;
+                start.Environment["ZAAP_LOGS_PATH"] = logs;
+                start.ArgumentList.Add("-logFile");
+                start.ArgumentList.Add(Path.Combine(logs, "player.log"));
+            }
+            return start;
         }
 
         /// <summary>The mods the emulator ships, each in its own folder of the repository.</summary>
@@ -533,7 +533,7 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>
-        /// Where Dofus.exe is, or an empty string if it does not show up.
+        /// Where the Dofus client executable is, or an empty string if it does not show up.
         ///
         /// What has been chosen by hand rules, because the client need not be next to the
         /// emulator: whoever has it on another disk points to it once and that is it. If nothing is
@@ -541,11 +541,7 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static string ResolveClient()
         {
-            string elegido = UI.LauncherPreferences.ClientExecutable;
-            if (elegido.Length > 0) return elegido;
-
-            string alLado = Path.Combine(Paths.ClientDir, "Dofus.exe");
-            return File.Exists(alLado) ? alLado : "";
+            return ClientInstallation.Find()?.Executable ?? "";
         }
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
@@ -563,6 +559,7 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         private static void MaximizeWhenReady(System.Diagnostics.Process client)
         {
+            if (!OperatingSystem.IsWindows()) return;
             System.Threading.Tasks.Task.Run(async () =>
             {
                 try
@@ -595,10 +592,23 @@ namespace Jondo.Unity.Launcher
             });
         }
 
-        /// <summary>Tells the server that the client of that account is no longer there.</summary>
-        private static void Devolver(long accountId)
+        /// <summary>Failure and exit notifications share one cleanup for this specific launch.</summary>
+        internal static Action LaunchCleanup(long accountId, int instanceId, string token, string hash,
+            Action<string, int, string> release)
         {
-            try { ControlClient.Pedir("fin-de-lanzamiento", new { cuenta = accountId }); }
+            int released = 0;
+            return () =>
+            {
+                if (System.Threading.Interlocked.Exchange(ref released, 1) != 0) return;
+                _arrancadosAqui.TryRemove(new KeyValuePair<long, string>(accountId, hash));
+                release(token, instanceId, hash);
+            };
+        }
+
+        /// <summary>Release with the launched account's token, never the window's current account.</summary>
+        private static void Devolver(string token, int instanceId, string hash)
+        {
+            try { ControlClient.Pedir("fin-de-lanzamiento", new { token, instancia = instanceId, hash }); }
             catch { }
         }
 
@@ -628,8 +638,8 @@ namespace Jondo.Unity.Launcher
         /// This knows it on the spot and without asking anyone: it is recorded on starting the process and
         /// removed when the process dies, which is the same event that already told the server.
         /// </remarks>
-        private static readonly System.Collections.Concurrent.ConcurrentDictionary<long, byte> _arrancadosAqui
-            = new System.Collections.Concurrent.ConcurrentDictionary<long, byte>();
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<long, string> _arrancadosAqui
+            = new System.Collections.Concurrent.ConcurrentDictionary<long, string>();
 
         /// <summary>Whether that account has a client open: what the probe said, or what we already know.</summary>
         public static bool IsActive(long accountId)

@@ -12,7 +12,8 @@
        domain objects and only one paints pixels, so an HTTP layer would be a lot of machinery for
        one module out of eight. See docs/world-editor.md. -->
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
+    <OutputType Condition="$(RuntimeIdentifier.StartsWith('win-')) Or ('$(RuntimeIdentifier)' == '' And '$(OS)' == 'Windows_NT')">WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Jondo Studio</AssemblyName>
     <RootNamespace>Jondo.Unity.Studio</RootNamespace>
@@ -27,10 +28,8 @@
          at a glance in a taskbar: green the launcher, and this one bronze. -->
     <ApplicationIcon>icon_studio.ico</ApplicationIcon>
 
-    <!-- Published as one file, like the server, so the root stays clean. The RuntimeIdentifier
-         only decides what `dotnet publish` produces here; the project still targets plain net10.0,
-         so publishing it for macOS or Linux is a flag away and nothing in the code cares. -->
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Default to the build host; explicit -r selects a cross-publish. -->
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -40,6 +39,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.2.3" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Headless" Version="11.2.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
     <!-- Avalonia drags in Tmds.DBus.Protocol 0.20.0, which carries GHSA-xrw6-gwf8-vvr9 (high
          severity). It is Linux's DBus piece and it is not used here, but it travels in the package all the same, so
@@ -77,16 +77,16 @@
        existed the only way it showed up was somebody clicking that section. Same escape hatch as
        the server's test gate, -p:SkipTests=true, which leaves its trace on the command line
        rather than in a config file nobody reads. -->
-  <Target Name="StudioSelfTest" AfterTargets="Publish" Condition="'$(SkipTests)' != 'true'">
+  <Target Name="StudioSelfTest" AfterTargets="Publish" Condition="'$(SkipTests)' != 'true' And '$(RuntimeIdentifier)' == '$(NETCoreSdkRuntimeIdentifier)'">
     <Message Text="[Studio] Construyendo todas las secciones contra los datos de verdad..." Importance="high" />
-    <Exec Command="&quot;$(PublishDir)$(AssemblyName).exe&quot; --selftest" IgnoreStandardErrorWarningFormat="true" />
+    <Exec Command="&quot;$(PublishDir)$(AssemblyName)$(_NativeExecutableExtension)&quot; --selftest" IgnoreStandardErrorWarningFormat="true" />
   </Target>
 
   <!-- Auto-deploy: to the root, next to the launcher and the server. Same reasoning as the
        server's own target — what a person double-clicks lives in the root, and everything else
        stays inside a folder. -->
   <Target Name="DeployStudio" AfterTargets="Publish" DependsOnTargets="StudioSelfTest" Condition="'$(SkipRootDeploy)' != 'true'">
-    <Copy SourceFiles="$(PublishDir)$(AssemblyName).exe" DestinationFiles="$(MSBuildProjectDirectory)\..\$(AssemblyName).exe" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(PublishDir)$(AssemblyName)$(_NativeExecutableExtension)" DestinationFiles="$(MSBuildProjectDirectory)/../$(AssemblyName)$(_NativeExecutableExtension)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
     <Message Text="[Deploy] Studio en la raiz." Importance="high" />
   </Target>
 

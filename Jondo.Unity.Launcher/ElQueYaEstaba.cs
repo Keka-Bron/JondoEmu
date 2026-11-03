@@ -14,9 +14,8 @@ namespace Jondo.Unity.Launcher
     /// of the first one hidden behind the browser, the result is «the launcher does not start».
     ///
     /// What anyone expects on opening a second time something already open is that it gets
-    /// brought to the front, so that is what is done. Outside Windows it is not attempted —this is
-    /// user32— and then indeed only the log line remains, which is the honest thing: there is nothing better
-    /// to do without adding a dependency for a convenience.
+    /// brought to the front, so that is what is done. This is the Windows fallback if the portable
+    /// LauncherActivation pipe cannot notify the existing application.
     /// </remarks>
     internal static class ElQueYaEstaba
     {

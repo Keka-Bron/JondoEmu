@@ -8,6 +8,10 @@
 > server, our layer is **text files in `content/`**, and the **launcher inherits that
 > same framework**.
 
+> Historical planning notes: descriptions of a Windows-only WinForms launcher below refer to the
+> pre-migration implementation. Launcher, Server, Studio and Deobfuscator now use Avalonia on
+> Windows and Linux. See [launcher.md](launcher.md) and [linux-desktop.md](linux-desktop.md) for setup.
+
 ---
 
 ## 1. What is wanted

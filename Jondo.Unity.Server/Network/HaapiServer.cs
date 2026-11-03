@@ -170,12 +170,8 @@ namespace Jondo.Unity.Server.Network
             // window —"dead weight with an open door on top"— and come back now that the launcher
             // is another process and cannot call anyone through memory.
             //
-            // What closes the door is ConRol, inside ControlApi: a token the database recognises plus
-            // the administrator role, checked server-side on every request. It is NOT the secret --
-            // the header is passed along and ControlApi never looks at it, see ControlApi.Autorizada
-            // for why. This comment used to say "without the secret this answers 403", and that was
-            // simply untrue.
-            var deControl = ControlApi.Responder(path, req.HttpMethod, body, req.Headers[Contract.Cabecera], clientIp);
+            // Account tokens authorize session routes; ConRol also checks the administrator role.
+            var deControl = ControlApi.Responder(path, req.HttpMethod, body, clientIp);
             if (deControl != null)
             {
                 byte[] cuerpo = System.Text.Encoding.UTF8.GetBytes(deControl.Value.Json);

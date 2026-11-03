@@ -1,9 +1,10 @@
 # Native launcher and eight-client teams
 
-How the WinForms launcher stores a team of accounts, starts up to eight independent Dofus
+How the Avalonia launcher stores a team of accounts, starts up to eight independent Dofus
 processes and preserves account identity through Zaap, authentication and the game socket.
 
-The game-session implementation is documented in `sessions.md`.
+It runs on Windows and Linux. See [Linux desktop setup](linux-desktop.md) for native-client
+configuration, and `sessions.md` for the game-session implementation.
 
 ---
 
@@ -33,41 +34,44 @@ removal until their client process exits.
 
 File: `Jondo.Unity.Launcher/UI/LauncherPreferences.cs`
 
-Preferences live outside the emulator installation at:
+Preferences live outside the emulator installation:
 
-```text
-%APPDATA%\Jondo\lanzador.cfg
-```
+- Windows: `%APPDATA%\Jondo\lanzador.cfg`.
+- Linux: `$XDG_CONFIG_HOME/Jondo/lanzador.cfg`, normally `~/.config/Jondo/lanzador.cfg`.
 
 The file remembers:
 
 - launcher/game language (`es`, `en` or `fr`);
-- an explicitly selected `Dofus.exe` path;
+- an explicitly selected client executable (`Dofus.exe` on Windows, `Dofus.x64` on Linux);
+- the Linux client's shared preferences directory (`clientConfig`, passed as `XDG_CONFIG_HOME`);
 - at most eight account profiles;
 - each profile's account id, login, nickname, token and selection state.
 
-The account list is serialized as JSON and Base64-encoded into the `cuentas` setting. Base64 is a
-storage encoding, not encryption. Passwords are not stored, but saved tokens must still be treated
-as private user data.
+The account list is serialized as JSON and encrypted into the `cuentas` setting by the shared
+`Jondo.Unity.Contract/Security/SecretStore.cs`: DPAPI on Windows, AES-GCM with a separate owner-only
+`clave.bin` in the configuration directory on Linux. Older Base64-only account lists are read and
+rewritten encrypted. Passwords are not stored; saved session and refresh tokens remain private user data.
 
-On startup, valid profiles are restored and their tokens are registered with
-`ClientLaunchRegistry`. A malformed account payload is ignored rather than preventing the launcher
-from opening. A stored client path is used only while the file still exists.
+After the window opens, saved profiles are restored and their tokens checked with the server through
+`LauncherService.RememberSession`. Expired sessions are marked for sign-in. A malformed account payload
+is ignored rather than preventing the launcher from opening. A stored client path is used only while
+the file still exists; `JONDO_CLIENT_EXECUTABLE` can override discovery for all desktop tools.
 
 ---
 
 ## 3. Team UI state
 
-File: `Jondo.Unity.Launcher/UI/LauncherWindow.cs`
+Files: `Jondo.Unity.Launcher/UI/MainWindow.axaml` and `MainWindow.axaml.cs`.
 
 Each row displays the nickname and account id, its selection checkbox and an `in game` marker when
-`ClientLaunchRegistry.IsActive(accountId)` is true. The summary distinguishes saved accounts,
+`LauncherService.IsActive(accountId)` is true. This combines the server's latest active-account
+response with processes started by this launcher. The summary distinguishes saved accounts,
 selected accounts and active Dofus processes.
 
 The maximum is checked while adding a profile and while launching. Re-authenticating an account
 already in the list refreshes its token instead of creating a duplicate row.
 
-`LaunchGame` takes a snapshot of the selected rows and calls `LauncherService.LaunchClient` once
+`JugarAsync` takes a snapshot of the selected rows and calls `LauncherService.LaunchClient` once
 for each inactive account. A failure for one account is reported with that nickname and does not
 erase or silently substitute the other accounts.
 
@@ -77,18 +81,19 @@ erase or silently substitute the other accounts.
 
 File: `Jondo.Unity.Launcher/LauncherService.cs`
 
-`SignIn` validates credentials against `auth.db`. On success it:
+`SignIn` sends the `entrar` operation through `Jondo.Unity.Launcher/ControlClient.cs` to the server's
+HTTP control API on port 8888. `Jondo.Unity.Server/Network/ControlApi.cs` owns credential validation,
+database updates and registration of the account's session token. On success the launcher:
 
-1. generates a random launcher token;
-2. persists the game token for that account;
-3. registers `token -> accountId` in `ClientLaunchRegistry`;
-4. returns the account id, nickname and token to the native UI.
+1. receives the account id, nickname, token and role;
+2. sets the control session token used by subsequent window operations;
+3. returns the account details to the UI, which adds or refreshes that account's team row.
 
 There is deliberately no `ActiveAccount` field. Every later operation starts from the token of the
 specific team row being launched.
 
-Account creation is also called directly through `LauncherService`. The old web-launcher login,
-register and launch HTTP routes have been removed from `HaapiServer`.
+Account creation uses the same boundary: `LauncherService.RegisterAccount` sends `crear-cuenta` to
+the control API. The launcher does not read `auth.db` or reference the server implementation.
 
 ---
 
@@ -96,13 +101,17 @@ register and launch HTTP routes have been removed from `HaapiServer`.
 
 `LauncherService.LaunchClient(token)`:
 
-1. resolves the token to one account id;
-2. finds the configured `Dofus.exe`;
-3. rejects a duplicate active account or a ninth active client;
-4. generates a fresh random hash;
-5. registers a `ClientLaunchRegistry.Launch` with a unique `InstanceId`;
-6. starts Dofus with that instance and hash;
-7. removes the launch if process creation fails or when the process exits.
+1. resolves the configured client executable and validates native Linux client settings;
+2. checks that the server is answering;
+3. sends `lanzamiento` with the selected row's token and language to the control API;
+4. receives an account id, unique `InstanceId`, hash and role from the server, which owns registration
+   and rejects duplicate active accounts or the address's ninth active client;
+5. builds the platform-specific `ProcessStartInfo` and starts Dofus;
+6. reports release once if launch preparation/process creation fails or when the process exits,
+   using that account's token, the allocated instance ID and the random launch hash. A delayed
+   notification cannot release a replacement launch, including after a server restart reuses an
+   instance number. `fin-de-lanzamiento` requires `token`, `instancia` and `hash`; account IDs
+   supplied by callers do not authorize a release.
 
 Important arguments include:
 
@@ -114,16 +123,20 @@ Important arguments include:
 --langCode <es|en|fr>
 ```
 
-The texture-pack arguments (`--hdReady`, `--4kReady`) come last, and only for a pack the player
-turned on in Settings → Graphics that is installed and verified for the client's own version. How
-the packs are downloaded from Ankama's CDN and verified is in `client-graphics.md`.
+The texture-pack arguments (`--hdReady`, `--4kReady`) follow the connection arguments, and only for a
+pack the player turned on in Settings → Graphics that is installed and verified for the client's
+own version and platform. How the packs are downloaded from Ankama's CDN and verified is in
+`client-graphics.md`.
 
 Equivalent `ZAAP_PORT`, `ZAAP_HASH`, `ZAAP_GAME`, `ZAAP_RELEASE`, `ZAAP_INSTANCE_ID` and
 `ZAAP_CAN_AUTH` environment variables are set for the child. Every client receives its own hash
 and instance id even though all clients use the same local listeners.
 
-The process starts with the primary screen's working dimensions. Once Unity creates its window,
-the launcher waits briefly and maximizes it. Launching a game client also stops launcher music.
+The process starts with the launcher screen's working dimensions, falling back to 1920×1080 when
+no screen is available. On Windows it retains Direct3D/MelonLoader options, installs the shipped
+JondoFix when MelonLoader is present, and waits briefly to maximize the client window. Linux uses
+the native client without those options or a mod loader; each launch has a unique `player.log`
+directory and shares the configured client preferences directory. Launching stops launcher music.
 
 ---
 
@@ -150,7 +163,7 @@ in".
 
 ### Local Zaap service
 
-File: `Jondo.Unity.Launcher/Network/ZaapServer.cs`
+File: `Jondo.Unity.Server/Network/ZaapServer.cs`
 
 `connect` accepts only a registered `(InstanceId, Hash)` pair and creates a random `gameSession`.
 `auth_getGameToken`, `userInfo_get` and language settings resolve that session back to the same
@@ -158,7 +171,7 @@ launch and account.
 
 ### Connection and game service
 
-File: `Jondo.Unity.Launcher/Network/GameServerProxy.cs`
+File: `Jondo.Unity.Server/Network/GameServerProxy.cs`
 
 Port 5555 auto-detects two phases. The first connection authenticates and issues the single-use
 ticket. The second contains wrapped game messages; it creates a `GameSession`, binds it to that
@@ -168,12 +181,13 @@ socket and passes both to the game dispatcher. See `sessions.md` for state and p
 
 ## 7. Limits and lifecycles
 
-Eight is a hard maximum:
+The profile and per-address launch limits are eight:
 
 - `LauncherPreferences` stores no more than eight profiles;
-- `LauncherWindow` refuses a ninth profile;
-- `ClientLaunchRegistry` refuses a ninth active process and a duplicate active account;
-- `SessionRegistry` refuses a ninth registered game socket.
+- `MainWindow` refuses a ninth profile;
+- the server's `ClientLaunchRegistry` refuses a ninth active launch per address and a duplicate active account.
+
+`SessionRegistry` separately enforces the server-wide game-session capacity (`Contract.ClientesEnTotal`).
 
 The profile list and active connection list are different. A profile survives launcher restarts;
 an active launch exists while its Dofus process runs; a game session exists while its game socket
@@ -185,7 +199,7 @@ is connected. Closing one client does not alter the other seven profiles, proces
 
 ### A selected account does not launch
 
-- Confirm that the server status is online and `Dofus.exe` still exists.
+- Confirm that the server status is online and the selected client executable still exists.
 - If the account is marked `in game`, close its existing process first.
 - Sign in to that profile again if its stored token no longer resolves.
 
@@ -208,7 +222,9 @@ This is expected. Close one active Dofus process before launching another accoun
 ### A closed client remains marked active briefly
 
 The launcher marker follows the process exit event, while the world session follows the TCP
-connection. They normally disappear together but are intentionally independent.
+connection. They normally disappear together but are intentionally independent. Closing the launcher
+leaves the server and client processes running; a remote relay ends with the launcher, so remote
+clients depend on it remaining open.
 
 ---
 

@@ -1,5 +1,3 @@
-using System;
-
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
@@ -7,14 +5,9 @@ namespace Jondo.Unity.Launcher.UI
     /// </summary>
     /// <remarks>
     /// All the values come from the original web interface's style sheet
-    /// (launcher_assets/index.html) and were written as <c>Color.FromArgb</c> inside
-    /// LauncherTheme, which is Windows Forms. On migrating the launcher to Avalonia they would have had
-    /// to be copied, and a copy drifts from the original as soon as someone touches one of the two.
-    ///
-    /// Here they are <c>uint</c> in 0xAARRGGBB format, which is what both understand: Windows Forms
-    /// does <c>Color.FromArgb((int)value)</c> and Avalonia <c>Color.FromUInt32(value)</c>. The
-    /// server and the launcher keep painting the same because they paint with the same thing, which was exactly the
-    /// idea of having it shared.
+    /// (launcher_assets/index.html). They are shared as <c>uint</c> in 0xAARRGGBB format;
+    /// Avalonia converts them with <c>Color.FromUInt32(value)</c>. The desktop applications
+    /// keep the same colours without copying values or coupling this contract to a UI toolkit.
     /// </remarks>
     public static class LauncherPalette
     {
@@ -25,8 +18,6 @@ namespace Jondo.Unity.Launcher.UI
         public const uint ConsoleFill = 0x8C0C0704;
 
         public const uint BarFill = 0xBF1A0F08;
-
-        public const uint ConsoleBackground = 0xFF18100A;
 
         /// <summary>#e6b800</summary>
         public const uint GoldBorder = 0xFFE6B800;
@@ -96,14 +87,6 @@ namespace Jondo.Unity.Launcher.UI
 
         /// <summary>#d070d0</summary>
         public const uint PurpleBorder = 0xFFD070D0;
-
-        public const uint GrayTop = 0xFF444444;
-
-        public const uint GrayBottom = 0xFF222222;
-
-        public const uint GrayBorder = 0xFF555555;
-
-        public const uint GrayText = 0xFF888888;
 
         /// <summary>#ff4d4d</summary>
         public const uint Red = 0xFFFF4D4D;

@@ -1,13 +1,12 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Jondo.Unity.Launcher.Security
 {
     /// <summary>
-    /// Encrypts at rest what the launcher stores on disk.
+    /// Encrypts the desktop tools' saved credentials and provider keys at rest.
     /// </summary>
     /// <remarks>
     /// <b>What there was before.</b> The stored accounts -- with their session credential inside -- went to
@@ -28,7 +27,7 @@ namespace Jondo.Unity.Launcher.Security
     /// it is discarded and one starts from scratch, which is also what Bubble's client does with its
     /// session. Trying to rescue it ends in a half state nobody knows how to interpret.
     /// </remarks>
-    internal static class SecretStore
+    public static class SecretStore
     {
         /// <summary>Mark saying the content is encrypted and with what.</summary>
         private const string DpapiPrefix = "dpapi:";
@@ -56,7 +55,7 @@ namespace Jondo.Unity.Launcher.Security
                 // Without encryption it is NOT stored. Before, this ended up in Base64 and it looked like something was
                 // protected; returning empty makes the session not be remembered, which is worse to use
                 // and much better to defend.
-                Program.LogDebug($"[Launcher] Could not encrypt what was about to be saved: {ex.Message}");
+                Console.Error.WriteLine($"[Secrets] Could not encrypt preferences: {ex.Message}");
                 return "";
             }
         }
@@ -85,7 +84,7 @@ namespace Jondo.Unity.Launcher.Security
             }
             catch (Exception ex)
             {
-                Program.LogDebug($"[Launcher] Discarding a saved session that does not decrypt: {ex.Message}");
+                Console.Error.WriteLine($"[Secrets] Discarding preferences that do not decrypt: {ex.Message}");
                 return "";
             }
 
@@ -110,7 +109,7 @@ namespace Jondo.Unity.Launcher.Security
         // ─── The fallback outside Windows ───────────────────────────────────────
 
         private static string KeyPath => System.IO.Path.Combine(
-            System.IO.Path.GetDirectoryName(UI.LauncherPreferences.Path) ?? ".", "clave.bin");
+            System.IO.Path.GetDirectoryName(ClientInstallation.PreferencesFile) ?? ".", "clave.bin");
 
         private static byte[] LlaveDeRespaldo()
         {
@@ -118,26 +117,24 @@ namespace Jondo.Unity.Launcher.Security
             {
                 byte[] guardada = File.ReadAllBytes(KeyPath);
                 if (guardada.Length == 32) return guardada;
+                throw new CryptographicException("The preferences key must contain exactly 32 bytes.");
             }
 
             byte[] nueva = RandomNumberGenerator.GetBytes(32);
             string? carpeta = System.IO.Path.GetDirectoryName(KeyPath);
             if (!string.IsNullOrEmpty(carpeta)) Directory.CreateDirectory(carpeta);
-            File.WriteAllBytes(KeyPath, nueva);
-
-            // Only the owner. Without this the key stays readable for any account on the machine
-            // and the encryption defends against nothing. Windows has no POSIX permissions to set.
-            if (!OperatingSystem.IsWindows())
+            // Publish a complete private key atomically. Two desktop tools starting together
+            // must neither overwrite the winning key nor read an only partially written one.
+            string temporary = KeyPath + "." + Guid.NewGuid().ToString("N");
+            try
             {
-                try
-                {
-                    File.SetUnixFileMode(KeyPath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
-                }
-                catch
-                {
-                    // A file system without POSIX permissions: nothing to adjust.
-                }
+                var options = new FileStreamOptions { Mode = FileMode.CreateNew, Access = FileAccess.Write };
+                if (!OperatingSystem.IsWindows()) options.UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+                using (var file = new FileStream(temporary, options)) file.Write(nueva);
+                File.Move(temporary, KeyPath, overwrite: false);
             }
+            catch (IOException) when (File.Exists(KeyPath)) { return File.ReadAllBytes(KeyPath); }
+            finally { if (File.Exists(temporary)) File.Delete(temporary); }
 
             return nueva;
         }

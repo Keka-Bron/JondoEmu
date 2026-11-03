@@ -69,10 +69,10 @@ namespace Jondo.Unity.Server.Network
             return Task.FromResult(json);
         }
 
-        public Task<string> updater_isUpdateAvailable(string gameSession, CancellationToken cancellationToken = default)
+        public Task<bool> updater_isUpdateAvailable(string gameSession, CancellationToken cancellationToken = default)
         {
             Console.WriteLine($"[Thrift] updater_isUpdateAvailable(gameSession: {Censura.Valor(gameSession)})");
-            return Task.FromResult("");
+            return Task.FromResult(false);
         }
     }
 

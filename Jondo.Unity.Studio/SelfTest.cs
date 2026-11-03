@@ -3,6 +3,9 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using Avalonia.Controls;
+using Avalonia;
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using Jondo.Unity.Studio.Data;
 using Jondo.Unity.World.Quests;
 
@@ -19,12 +22,11 @@ namespace Jondo.Unity.Studio
     /// showing up was somebody clicking that section.
     ///
     /// <c>Jondo Studio.exe --selftest</c> constructs all of them against the real data on this
-    /// machine and exits non-zero if any threw. It does not show a window and it does not touch a
-    /// file.
+    /// machine and exits non-zero if any threw. It attaches sections to headless windows and
+    /// renders them with Skia. Reports and a sample sprite are written under logs/.
     ///
-    /// What it does not cover, and should be said out loud: nothing here is attached to a visual
-    /// tree, so anything that only happens once a section is on screen — the traffic view's poll,
-    /// for one — is not exercised.
+    /// This checks attachment, layout and rendering, not a long-running desktop session or native
+    /// dialogs.
     /// </remarks>
     internal static class SelfTest
     {
@@ -205,6 +207,16 @@ namespace Jondo.Unity.Studio
                     try
                     {
                         Control built = page.Build();
+                        var window = new Window { Width = 1200, Height = 800, Content = built };
+                        try
+                        {
+                            window.Show();
+                            window.UpdateLayout();
+                            Dispatcher.UIThread.RunJobs();
+                            using var rendered = new RenderTargetBitmap(new PixelSize(1200, 800));
+                            rendered.Render(window);
+                        }
+                        finally { window.Close(); }
                         report.AppendLine($"[selftest] ok    {tag}  {page.Title} ({built.GetType().Name})");
                     }
                     catch (Exception ex)

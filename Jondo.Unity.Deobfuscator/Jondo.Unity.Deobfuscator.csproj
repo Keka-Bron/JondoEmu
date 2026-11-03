@@ -3,29 +3,33 @@
   <PropertyGroup>
     <!-- The deobfuscator's face. A workshop tool, not something handed out: it stays in
          bin\ and is not copied to the root like the server and the launcher, which people do open. -->
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <OutputType Condition="$(RuntimeIdentifier.StartsWith('win-')) Or ('$(RuntimeIdentifier)' == '' And '$(OS)' == 'Windows_NT')">WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Jondo Desofuscador</AssemblyName>
     <RootNamespace>Jondo.Unity.Deobfuscator</RootNamespace>
-    <UseWindowsForms>true</UseWindowsForms>
-    <NoWarn>$(NoWarn);WFO1000</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
-    <Using Remove="System.Windows.Forms" />
-    <Using Remove="System.Drawing" />
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The look comes from the contract, as in the other two executables. The stages come from
+    <InternalsVisibleTo Include="Jondo.Unity.Tests" />
+    <!-- The palette comes from the contract, as in the other desktop applications. The stages come from
          Reversing, called in process: that way progress is seen while they run, instead of launching an
          .exe and reading its output. The console (protocolbuilder) uses exactly the same ones. -->
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Reversing\Jondo.Unity.Reversing.csproj" />
-    <ProjectReference Include="..\Jondo.Unity.Contract.WinForms\Jondo.Unity.Contract.WinForms.csproj" />
   </ItemGroup>
 
 </Project>

@@ -47,8 +47,14 @@ namespace Jondo.Unity.Launcher.UI
             public long ExpiresAtUnix { get; set; }
         }
 
-        public static string Path { get; } = System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Jondo", "lanzador.cfg");
+        public static string Path => ClientInstallation.PreferencesFile;
+
+        public static string ClientConfigDirectory
+        {
+            get => Leer().GetValueOrDefault("clientConfig", System.IO.Path.Combine(
+                UserDirectories.Data, "Jondo", "client-config"));
+            set => Escribir("clientConfig", value);
+        }
 
         private static Dictionary<string, string> Leer()
         {
@@ -101,22 +107,8 @@ namespace Jondo.Unity.Launcher.UI
 
         // ─── Where the client is ────────────────────────────────────────────────
 
-        /// <summary>
-        /// The Dofus.exe chosen by hand, or an empty string if none has been chosen.
-        ///
-        /// It is checked that it still exists every time: if someone moves or deletes the client, what was
-        /// stored stops being valid and it is looked for again in the default place, instead of failing
-        /// with a path that no longer leads anywhere.
-        /// </summary>
-        public static string ClientExecutable
-        {
-            get
-            {
-                string ruta = Leer().TryGetValue(ClaveCliente, out string? v) ? v : "";
-                return (!string.IsNullOrWhiteSpace(ruta) && File.Exists(ruta)) ? ruta : "";
-            }
-            set => Escribir(ClaveCliente, value ?? "");
-        }
+        /// <summary>Save the chosen executable; ClientInstallation owns validation and discovery.</summary>
+        public static void SetClientExecutable(string executable) => Escribir(ClaveCliente, executable ?? "");
 
         /// <summary>What is stored as is, whether it exists or not. To be able to warn that it is no longer there.</summary>
         public static string ClientExecutableRaw

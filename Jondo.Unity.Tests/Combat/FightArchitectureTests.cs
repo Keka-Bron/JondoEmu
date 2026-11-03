@@ -26,7 +26,7 @@ namespace Jondo.Unity.Tests.Combat
     {
         private static string Fuente(string ruta)
         {
-            var carpeta = new DirectoryInfo(AppContext.BaseDirectory);
+            var carpeta = new DirectoryInfo(Jondo.Unity.Launcher.Paths.Root);
             while (carpeta != null && !File.Exists(Path.Combine(carpeta.FullName, "Jondo.Unity.sln")))
             {
                 carpeta = carpeta.Parent;

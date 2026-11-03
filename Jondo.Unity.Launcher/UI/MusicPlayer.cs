@@ -13,6 +13,7 @@ namespace Jondo.Unity.Launcher.UI
     /// with Opus audio: the browser detected that from the content, but the classic Windows APIs
     /// (MCI) cannot open it. MCI stays as a fallback in case the theme is ever replaced by a real
     /// MP3 or WAV and Media Foundation is not available.
+    /// Linux uses libmpv's native container detection, decoding and looping instead.
     /// </summary>
     internal sealed class MusicPlayer : IDisposable
     {
@@ -51,11 +52,12 @@ namespace Jondo.Unity.Launcher.UI
         private delegate int MethodWithOutput(IntPtr instance, out int value);
 
         private IntPtr _player;
+        private IntPtr _mpv;
         private bool _mciOpen;
         private bool _disposed;
 
         /// <summary>Tells whether there is any audio engine able to play the theme.</summary>
-        public bool Available => _player != IntPtr.Zero || _mciOpen;
+        public bool Available => _mpv != IntPtr.Zero || _player != IntPtr.Zero || _mciOpen;
 
         /// <summary>Tells whether the music is supposed to be playing right now.</summary>
         public bool Playing { get; private set; }
@@ -63,6 +65,11 @@ namespace Jondo.Unity.Launcher.UI
         public MusicPlayer(string path)
         {
             if (string.IsNullOrEmpty(path) || !File.Exists(path)) return;
+            if (OperatingSystem.IsLinux())
+            {
+                OpenWithMpv(path);
+                return;
+            }
 
             try
             {
@@ -105,7 +112,11 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Starts or resumes playback.</summary>
         public void Play()
         {
-            if (_player != IntPtr.Zero)
+            if (_mpv != IntPtr.Zero)
+            {
+                Playing = MpvSetProperty(_mpv, "pause", "no") >= 0;
+            }
+            else if (_player != IntPtr.Zero)
             {
                 Invoke(SlotPlay);
                 Playing = true;
@@ -123,7 +134,8 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Pauses without losing the current position.</summary>
         public void Pause()
         {
-            if (_player != IntPtr.Zero) Invoke(SlotPause);
+            if (_mpv != IntPtr.Zero) MpvSetProperty(_mpv, "pause", "yes");
+            else if (_player != IntPtr.Zero) Invoke(SlotPause);
             else if (_mciOpen) mciSendString($"pause {MciAlias}", null, 0, IntPtr.Zero);
             Playing = false;
         }
@@ -131,7 +143,12 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Stops the music and rewinds it (used when launching the game client).</summary>
         public void Stop()
         {
-            if (_player != IntPtr.Zero)
+            if (_mpv != IntPtr.Zero)
+            {
+                MpvSetProperty(_mpv, "pause", "yes");
+                MpvCommand(_mpv, new string?[] { "seek", "0", "absolute", null });
+            }
+            else if (_player != IntPtr.Zero)
             {
                 Invoke(SlotStop);
             }
@@ -181,6 +198,11 @@ namespace Jondo.Unity.Launcher.UI
             if (_disposed) return;
             _disposed = true;
             Playing = false;
+            if (_mpv != IntPtr.Zero)
+            {
+                MpvDestroy(_mpv);
+                _mpv = IntPtr.Zero;
+            }
 
             if (_player != IntPtr.Zero)
             {
@@ -215,6 +237,48 @@ namespace Jondo.Unity.Launcher.UI
             IntPtr table = Marshal.ReadIntPtr(_player);
             IntPtr function = Marshal.ReadIntPtr(table, slot * IntPtr.Size);
             return Marshal.GetDelegateForFunctionPointer<T>(function);
+        }
+
+        // libmpv detects the actual container (the shipped theme is WebM/Opus despite its name).
+        // Playback stays in process: pause/resume preserves position and shutdown owns no child process.
+        [DllImport("libmpv.so.2", EntryPoint = "mpv_create")]
+        private static extern IntPtr MpvCreate();
+        [DllImport("libmpv.so.2", EntryPoint = "mpv_initialize")]
+        private static extern int MpvInitialize(IntPtr player);
+        [DllImport("libmpv.so.2", EntryPoint = "mpv_set_option_string")]
+        private static extern int MpvOption(IntPtr player,
+            [MarshalAs(UnmanagedType.LPUTF8Str)] string name, [MarshalAs(UnmanagedType.LPUTF8Str)] string value);
+        [DllImport("libmpv.so.2", EntryPoint = "mpv_set_property_string")]
+        private static extern int MpvSetProperty(IntPtr player,
+            [MarshalAs(UnmanagedType.LPUTF8Str)] string name, [MarshalAs(UnmanagedType.LPUTF8Str)] string value);
+        [DllImport("libmpv.so.2", EntryPoint = "mpv_command")]
+        private static extern int MpvCommand(IntPtr player,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string?[] arguments);
+        [DllImport("libmpv.so.2", EntryPoint = "mpv_terminate_destroy")]
+        private static extern void MpvDestroy(IntPtr player);
+
+        private void OpenWithMpv(string path)
+        {
+            try
+            {
+                _mpv = MpvCreate();
+                if (_mpv == IntPtr.Zero) return;
+                MpvOption(_mpv, "vid", "no");
+                MpvOption(_mpv, "terminal", "no");
+                MpvOption(_mpv, "loop-file", "inf");
+                MpvOption(_mpv, "pause", "yes");
+                if (MpvInitialize(_mpv) < 0 || MpvCommand(_mpv, new string?[] { "loadfile", Path.GetFullPath(path), null }) < 0)
+                {
+                    MpvDestroy(_mpv);
+                    _mpv = IntPtr.Zero;
+                }
+            }
+            catch (Exception error) when (error is DllNotFoundException or EntryPointNotFoundException)
+            {
+                Console.Error.WriteLine("[Music] Install libmpv2 for launcher audio: " + error.Message);
+                if (_mpv != IntPtr.Zero) MpvDestroy(_mpv);
+                _mpv = IntPtr.Zero;
+            }
         }
     }
 }

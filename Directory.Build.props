@@ -2,23 +2,6 @@
 
   <PropertyGroup>
     <!--
-      Lets the projects that target Windows be RESTORED on Linux.
-
-      The deobfuscator and Windows Forms contract still target Windows.
-      The server desktop and all test suites are portable net10.0. Windows-only projects
-      must also be restorable elsewhere, because
-      GitHub runs a job of its own over the repo -the dependency graph one, submit-nuget- that
-      runs on Linux and restores the whole solution. Without this it stops at the first Windows
-      project with NETSDK1100 and the check goes red even though nothing is broken.
-
-      This allows restoring and cross-compiling Windows-targeted projects on Linux;
-      running their Windows desktop code still requires Windows.
-    -->
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <!--
       Who made each executable, in its Windows file properties (Details tab). Left out, the SDK
       put the assembly's own name as company and product and no copyright at all, which is how an
       anonymous binary looks to an antivirus's heuristics. The version comes from the release

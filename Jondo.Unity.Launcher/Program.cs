@@ -28,7 +28,7 @@ namespace Jondo.Unity.Launcher
     internal static class Program
     {
         /// <summary>What the server's executable, which lives alongside, is called.</summary>
-        public const string EjecutableDelServidor = "Jondo Server.exe";
+        public static string EjecutableDelServidor => OperatingSystem.IsWindows() ? "Jondo Server.exe" : "Jondo Server";
 
         [STAThread]
         private static int Main(string[] args)
@@ -38,7 +38,7 @@ namespace Jondo.Unity.Launcher
                 // And it is brought to the front, which is what whoever has just double-clicked expects.
                 // Writing to a console that does not exist -- this is a WinExe -- was the same as
                 // closing without a word.
-                bool traido = ElQueYaEstaba.PonerloDelante();
+                bool traido = LauncherActivation.Notify() || ElQueYaEstaba.PonerloDelante();
                 Console.WriteLine(traido
                     ? "[Launcher] One was already open; it is brought to the front."
                     : "[Launcher] A Jondo launcher is already open.");
@@ -47,6 +47,7 @@ namespace Jondo.Unity.Launcher
 
             try
             {
+                using var activation = new LauncherActivation();
                 if (!UI.LauncherPreferences.ServerIsLocal)
                 {
                     try
@@ -64,8 +65,8 @@ namespace Jondo.Unity.Launcher
                 }
 
                 // Only when the server is this machine's. In remote mode the relay is already
-                // listening on 5555, 6337, 8888 and 15881, so starting a local server here
-                // leaves both fighting over the same four ports: whichever binds second
+                // listening on the client's loopback ports, so starting a local server here
+                // leaves both fighting over those ports: whichever binds second
                 // fails, and which of the two it is depends on the clock.
                 if (UI.LauncherPreferences.ServerIsLocal) AsegurarQueHayServidor().GetAwaiter().GetResult();
 
@@ -104,6 +105,7 @@ namespace Jondo.Unity.Launcher
 
             string? aquí = Path.GetDirectoryName(Environment.ProcessPath ?? "");
             string servidor = Path.Combine(aquí ?? "", EjecutableDelServidor);
+            if (!File.Exists(servidor)) servidor = Path.Combine(Paths.Root, EjecutableDelServidor);
             if (!File.Exists(servidor))
             {
                 // That it is not there is not an error to die of: a player with only the

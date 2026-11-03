@@ -8,16 +8,17 @@ using System.Threading.Tasks;
 namespace Jondo.Unity.Launcher.Network
 {
     /// <summary>
-    /// Relays the loopback endpoints expected by JondoFix to a server on another machine.
+    /// Relays the client's loopback endpoints to a server on another machine.
     ///
-    /// Dofus still talks to 127.0.0.1: that is an invariant of the client mod and keeps the local
-    /// setup unchanged. In remote mode these four listeners bridge those connections to the host
+    /// Dofus still talks to 127.0.0.1, through JondoFix on Windows or the native Linux configuration.
+    /// In remote mode five Windows listeners or four Linux listeners bridge those connections to the host
     /// stored in the launcher preferences. This is ordinary in-process TCP forwarding; it needs
     /// neither administrator rights nor persistent netsh port-proxy rules.
     /// </summary>
     internal static class RemoteRelay
     {
-        private static readonly int[] Ports = { 5555, 6337, 8888, 15881 };
+        private static readonly int[] Ports = OperatingSystem.IsWindows()
+            ? new[] { 5555, 5556, 6337, 8888, 15881 } : new[] { 5555, 5556, 8888, 15881 };
         private static readonly object Gate = new object();
         private static readonly List<TcpListener> Listeners = new List<TcpListener>();
         private static CancellationTokenSource? _stop;

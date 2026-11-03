@@ -8,8 +8,7 @@ namespace Jondo.Unity.Launcher.UI
     /// launcher and the server, and putting texts in it that only one launcher screen uses would
     /// fatten it for nobody. The day one of them is needed in both places, it moves.
     ///
-    /// No dictionaries nor files: it is twelve strings per language and a <c>switch</c> reads at a
-    /// glance and cannot be left half done in one language without the compiler saying so.
+    /// No dictionaries nor files: each label has a <c>switch</c> that keeps the three translations together.
     /// </remarks>
     internal static class Textos
     {
@@ -53,6 +52,20 @@ namespace Jondo.Unity.Launcher.UI
             Language.En => "Dofus client",
             Language.Fr => "Client Dofus",
             _ => "Cliente de Dofus",
+        };
+
+        public static string ConfigurarCliente(Language i) => i switch
+        {
+            Language.En => "Configure client for Jondo",
+            Language.Fr => "Configurer le client pour Jondo",
+            _ => "Configurar cliente para Jondo",
+        };
+
+        public static string DirectorioPreferenciasCliente(Language i) => i switch
+        {
+            Language.En => "Client preferences directory (XDG_CONFIG_HOME)",
+            Language.Fr => "Dossier des préférences du client (XDG_CONFIG_HOME)",
+            _ => "Directorio de preferencias del cliente (XDG_CONFIG_HOME)",
         };
 
         public static string CuentasGuardadas(Language i) => i switch
@@ -317,9 +330,9 @@ namespace Jondo.Unity.Launcher.UI
         {
             Packs.PackError.NoClient => i switch
             {
-                Language.En => "Dofus.exe was not found. Choose where the client is first.",
-                Language.Fr => "Dofus.exe est introuvable. Indique d'abord où est le client.",
-                _ => "No se encuentra Dofus.exe. Elige primero dónde está el cliente.",
+                Language.En => $"{ClientInstallation.ExecutableName} was not found. Choose where the client is first.",
+                Language.Fr => $"{ClientInstallation.ExecutableName} est introuvable. Indique d'abord où est le client.",
+                _ => $"No se encuentra {ClientInstallation.ExecutableName}. Elige primero dónde está el cliente.",
             },
             Packs.PackError.NoVersion => i switch
             {
@@ -375,16 +388,16 @@ namespace Jondo.Unity.Launcher.UI
 
         public static string ClientMoved(Language i) => i switch
         {
-            Language.En => "Dofus.exe is no longer where it was left — choose where it is",
-            Language.Fr => "Dofus.exe n'est plus là où il était — indique où il est",
-            _ => "Dofus.exe ya no está donde se dejó — elige dónde está",
+            Language.En => $"{ClientInstallation.ExecutableName} is no longer where it was left — choose where it is",
+            Language.Fr => $"{ClientInstallation.ExecutableName} n'est plus là où il était — indique où il est",
+            _ => $"{ClientInstallation.ExecutableName} ya no está donde se dejó — elige dónde está",
         };
 
         public static string ClientNotFound(Language i) => i switch
         {
-            Language.En => "Dofus.exe cannot be found — choose where it is",
-            Language.Fr => "Dofus.exe est introuvable — indique où il est",
-            _ => "No se encuentra Dofus.exe — elige dónde está",
+            Language.En => $"{ClientInstallation.ExecutableName} cannot be found — choose where it is",
+            Language.Fr => $"{ClientInstallation.ExecutableName} est introuvable — indique où il est",
+            _ => $"No se encuentra {ClientInstallation.ExecutableName} — elige dónde está",
         };
 
         public static string WhereIsTheClient(Language i) => i switch

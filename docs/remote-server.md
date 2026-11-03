@@ -1,23 +1,22 @@
 # Remote server and launcher relay
 
-Jondo can run the server on another Windows machine while the launcher and Dofus stay on the
-player's PC. The launcher creates an in-process TCP relay because JondoFix deliberately redirects
-the client's emulator traffic to `127.0.0.1`.
+Jondo can run the server on another Windows or Linux machine while the launcher and Dofus stay on
+the player's PC. The launcher creates an in-process TCP relay for traffic addressed to `127.0.0.1`:
+JondoFix redirects it on Windows, and the native client configuration selects it on Linux.
 
 Local installations do not change: every server listener remains loopback-only and the launcher
 starts no relay unless a remote host is configured.
 
 ## Server machine
 
-Set `JONDO_PUBLIC_BIND=1` in the environment that starts `Jondo Server.exe`. The existing
-`ServerBinding` switch then applies consistently to all five services instead of only chat and the
-game node:
+Set `JONDO_PUBLIC_BIND=1` in the environment that starts `Jondo Server.exe` on Windows or `Jondo Server`
+on Linux. The `ServerBinding` switch applies to the server listeners:
 
 | Port | Service |
 |---:|---|
 | 5555 | connection and game server |
 | 5556 | game node compatibility listener |
-| 6337 | chat |
+| 6337 | chat (Windows; unsupported in the native Linux workflow) |
 | 8888 | HAAPI and launcher control API |
 | 15881 | Zaap TCP, HTTP and WebSocket |
 
@@ -33,19 +32,26 @@ client and does not need to be exposed unless a separate compatibility setup use
 
 ## Player machine
 
-Set the server in `%APPDATA%\Jondo\lanzador.cfg`:
+Set the server in `%APPDATA%\Jondo\lanzador.cfg` on Windows or
+`$XDG_CONFIG_HOME/Jondo/lanzador.cfg` on Linux (normally `~/.config/Jondo/lanzador.cfg`):
 
 ```text
 servidor=server.example.net
 ```
 
 An IPv4 address can be used instead of a DNS name. On its next start, the launcher listens only on
-the player's loopback interface on ports 5555, 6337, 8888 and 15881, and forwards each connection
-to the same port on that host. It does not install a Windows service, modify `netsh`, require
+the player's loopback interface and forwards each connection to the same port on that host:
+
+- Windows: 5555, 5556, 6337, 8888 and 15881.
+- Linux: 5555, 5556, 8888 and 15881.
+
+It does not install a Windows service, modify `netsh`, require
 administrator rights or leave forwarding rules behind after it exits.
 
 The launcher itself continues to call the control API directly on the configured host. The relay
-exists for Dofus and JondoFix, whose local-address contract stays unchanged.
+exists for the client's loopback traffic and runs only while the launcher remains open.
+
+See [Linux desktop setup](linux-desktop.md) for configuring the native client's `ConfigUrl`.
 
 ## Transport security
 

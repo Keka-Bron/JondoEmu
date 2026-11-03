@@ -27,6 +27,7 @@
          either way. Nothing here constructs a control. -->
     <ProjectReference Include="..\Jondo.Unity.Studio\Jondo.Unity.Studio.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Launcher\Jondo.Unity.Launcher.csproj" />
+    <ProjectReference Include="..\Jondo.Unity.Deobfuscator\Jondo.Unity.Deobfuscator.csproj" />
   </ItemGroup>
 
 </Project>

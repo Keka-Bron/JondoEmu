@@ -8,7 +8,7 @@ namespace Jondo.Unity.Launcher.Network
     /// <summary>
     /// The launcher's side of the control channel: it talks to the server over HTTP.
     ///
-    /// Everything goes through here, even when the server is this same process. A single path instead of
+    /// Everything goes through here, even when the server is on this same machine. A single path instead of
     /// two —«if it is local I call the method, and if not, over the wire»— because the path only
     /// used sometimes is the one that breaks without anyone noticing.
     ///
@@ -56,8 +56,6 @@ namespace Jondo.Unity.Launcher.Network
         /// <summary>The verbs that only ask, and that is why they go with the short timeout.</summary>
         private static readonly System.Collections.Generic.HashSet<string> SóloPreguntan =
             new(StringComparer.OrdinalIgnoreCase) { "estado", "recordar-token" };
-
-        private static string _secreto = "";
 
         /// <summary>
         /// The session one talks with, or an empty string if nobody has logged in yet.
@@ -111,28 +109,9 @@ namespace Jondo.Unity.Launcher.Network
         }
 
         /// <summary>
-        /// Sends an order. If it is rejected because of the secret, it reads it again from the file and
-        /// tries once more: the server hands out a new secret on each start, so a
-        /// launcher that had been open for a while keeps the old one as soon as the server restarts.
+        /// Sends an order using the supplied account token or the window's current session.
         /// </summary>
         public static Respuesta Pedir(string verbo, object? cuerpo = null)
-        {
-            if (_secreto.Length == 0) _secreto = Contract.LeerSecreto();
-
-            var salida = Intentar(verbo, cuerpo);
-            if (salida.Llego && salida.Codigo == 403)
-            {
-                string releido = Contract.LeerSecreto();
-                if (releido.Length > 0 && releido != _secreto)
-                {
-                    _secreto = releido;
-                    salida = Intentar(verbo, cuerpo);
-                }
-            }
-            return salida;
-        }
-
-        private static Respuesta Intentar(string verbo, object? cuerpo)
         {
             if (Offline) return new Respuesta(false, 0, "");
             try
@@ -142,8 +121,6 @@ namespace Jondo.Unity.Launcher.Network
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 };
-                if (_secreto.Length > 0) peticion.Headers.Add(Contract.Cabecera, _secreto);
-
                 var cliente = SóloPreguntan.Contains(verbo) ? ClienteDeSondeo : ClienteDeOrden;
                 using var respuesta = cliente.Send(peticion);
                 string texto = respuesta.Content.ReadAsStringAsync().GetAwaiter().GetResult();

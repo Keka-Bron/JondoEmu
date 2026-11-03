@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -50,6 +51,30 @@ namespace Jondo.Unity.Tests.Launcher
 
         private static PackDownloader Downloader(FakeCdn cdn, int concurrency = 4)
             => new(new HttpClient(cdn)) { Concurrency = concurrency, Backoff = _ => TimeSpan.Zero, Attempts = 3 };
+
+        [Fact]
+        public void Free_space_follows_a_linux_mount_even_through_a_symlink()
+        {
+            if (!OperatingSystem.IsLinux() || !Directory.Exists("/dev/shm")) return;
+            string mounted = Path.Combine("/dev/shm", "jondo-packs-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(mounted);
+            try
+            {
+                string linked = Path.Combine(_root, "mounted-client");
+                Directory.CreateSymbolicLink(linked, mounted);
+                var service = new TexturePackService(linked, Path.Combine(_root, "cache"));
+                var mount = new DriveInfo("/dev/shm");
+                long before = mount.AvailableFreeSpace;
+                long? available = service.FreeSpace(linked);
+                long after = mount.AvailableFreeSpace;
+
+                Assert.NotNull(available);
+                // Allow a little concurrent activity on the shared-memory mount.
+                Assert.InRange(available.Value, Math.Max(0, Math.Min(before, after) - (1L << 20)),
+                    Math.Max(before, after) + (1L << 20));
+            }
+            finally { Directory.Delete(mounted); }
+        }
 
         private void AssertInstalled(SyntheticPack data)
         {
@@ -185,6 +210,22 @@ namespace Jondo.Unity.Tests.Launcher
         }
 
         [Fact]
+        public void A_windows_verification_marker_cannot_enable_a_native_linux_pack()
+        {
+            WriteVersion("3.6.10.11");
+            InstallVerified(SyntheticPack.Build(), "3.6.10.11");
+            File.Move(Path.Combine(_root, "Dofus.exe"), Path.Combine(_root, "Dofus.x64"));
+            var service = new TexturePackService(_root, Path.Combine(_root, "cache"));
+            Assert.Equal(PackState.Unverified, service.Status(TexturePack.Hd).State);
+            Assert.Equal("", service.LaunchFlags(true, true));
+            Assert.Contains("/linux/", service.ManifestUrl);
+            using var http = new HttpClient();
+            var windows = new ManifestStore(http, Path.Combine(_root, "cache"), "windows");
+            var linux = new ManifestStore(http, Path.Combine(_root, "cache"), "linux");
+            Assert.NotEqual(windows.PathFor("3.6.10.11"), linux.PathFor("3.6.10.11"));
+        }
+
+        [Fact]
         public void The_real_clients_url_is_pinned_to_its_own_version_file()
         {
             // The client next to the emulator, if there is one. Its version file is read here
@@ -239,6 +280,49 @@ namespace Jondo.Unity.Tests.Launcher
         }
 
         [Fact]
+        public async Task A_client_running_through_symlinked_directories_and_files_blocks_pack_changes()
+        {
+            if (!OperatingSystem.IsLinux()) return;
+            string real = Path.Combine(_root, "real client");
+            string alias = Path.Combine(_root, "selected client");
+            Directory.CreateDirectory(real);
+            string binary = Path.Combine(real, "harmless-sleeper");
+            File.Copy("/bin/sleep", binary);
+            File.SetUnixFileMode(binary, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+            File.CreateSymbolicLink(Path.Combine(real, "Dofus.x64"), binary);
+            Directory.CreateSymbolicLink(alias, real);
+            string version = Path.Combine(real, ClientVersion.RelativePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(version)!);
+            File.WriteAllText(version, "Version=3.6.10.11\n");
+            string folder = Path.Combine(real, TexturePack.Hd.RelativeFolder);
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(Path.Combine(folder, "keep.bundle"), "existing pack");
+            var cdn = new FakeCdn(SyntheticPack.Build());
+            using var http = new HttpClient(cdn);
+            var service = new TexturePackService(alias, Path.Combine(_root, "cache"), http);
+            var start = new ProcessStartInfo(Path.Combine(alias, "Dofus.x64")) { UseShellExecute = false };
+            start.ArgumentList.Add("30");
+            using var process = Process.Start(start)!;
+            try
+            {
+                Assert.True(service.IsClientRunning(alias));
+                Assert.Equal(PackError.ClientRunning, Assert.Throws<PackException>(() => service.Remove(TexturePack.Hd)).Error);
+                var error = await Assert.ThrowsAsync<PackException>(() => service.InstallAsync(TexturePack.Hd, null, CancellationToken.None));
+                Assert.Equal(PackError.ClientRunning, error.Error);
+                Assert.True(File.Exists(Path.Combine(folder, "keep.bundle")));
+                Assert.Empty(cdn.Others);
+            }
+            finally
+            {
+                if (!process.HasExited) process.Kill();
+                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
+            }
+            Assert.False(service.IsClientRunning(alias));
+            service.Remove(TexturePack.Hd);
+            Assert.False(Directory.Exists(folder));
+        }
+
+        [Fact]
         public async Task A_running_client_is_not_written_under()
         {
             WriteVersion("3.6.10.11");
@@ -278,8 +362,9 @@ namespace Jondo.Unity.Tests.Launcher
             File.WriteAllText(Path.Combine(PackFolder, TexturePackService.MarkerName), JsonSerializer.Serialize(marker));
         }
 
-        private string Arguments(TexturePackService service, bool hd, bool fourK)
-            => LauncherService.ClientArguments(1920, 1080, 1, "hash", "es", service.LaunchFlags(hd, fourK));
+        private string[] Arguments(TexturePackService service, bool hd, bool fourK)
+            => LauncherService.ClientStartInfo(Path.Combine(_root, "Dofus.exe"), 1920, 1080, 1,
+                "hash", "es", service.LaunchFlags(hd, fourK), "", "").ArgumentList.ToArray();
 
         [Fact]
         public void The_flag_is_passed_only_when_wanted_and_the_pack_is_verified_for_this_version()
@@ -289,12 +374,14 @@ namespace Jondo.Unity.Tests.Launcher
 
             // Nothing on disk: wanting it changes nothing.
             Assert.Equal(PackState.Missing, service.Status(TexturePack.Hd).State);
-            Assert.DoesNotContain("Ready", Arguments(service, hd: true, fourK: true));
+            Assert.DoesNotContain("--hdReady", Arguments(service, hd: true, fourK: true));
+            Assert.DoesNotContain("--4kReady", Arguments(service, hd: true, fourK: true));
 
             InstallVerified(SyntheticPack.Build(), "3.6.10.11");
             Assert.Equal(PackState.Installed, service.Status(TexturePack.Hd).State);
 
-            Assert.EndsWith("--connectionPort 5555 --hdReady", Arguments(service, hd: true, fourK: true));
+            Assert.Equal(new[] { "--connectionPort", "5555", "--hdReady" },
+                Arguments(service, hd: true, fourK: true).TakeLast(3));
             Assert.DoesNotContain("--hdReady", Arguments(service, hd: false, fourK: true));
             Assert.DoesNotContain("--4kReady", Arguments(service, hd: true, fourK: true));
         }

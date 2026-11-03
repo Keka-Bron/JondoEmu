@@ -45,7 +45,7 @@ namespace Zaap
 
       global::System.Threading.Tasks.Task<string> userInfo_get(string gameSession, CancellationToken cancellationToken = default);
 
-      global::System.Threading.Tasks.Task<string> updater_isUpdateAvailable(string gameSession, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<bool> updater_isUpdateAvailable(string gameSession, CancellationToken cancellationToken = default);
 
     }
 
@@ -225,7 +225,7 @@ namespace Zaap
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "userInfo_get failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<string> updater_isUpdateAvailable(string gameSession, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<bool> updater_isUpdateAvailable(string gameSession, CancellationToken cancellationToken = default)
       {
         await send_updater_isUpdateAvailable(gameSession, cancellationToken);
         return await recv_updater_isUpdateAvailable(cancellationToken);
@@ -244,7 +244,7 @@ namespace Zaap
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<string> recv_updater_isUpdateAvailable(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<bool> recv_updater_isUpdateAvailable(CancellationToken cancellationToken = default)
       {
         
         var tmp17 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -2028,9 +2028,11 @@ namespace Zaap
 
       public partial class updater_isUpdateAvailable_result : TBase
       {
-        private string _success;
+        // Corrected from the historical generated string result: the August client's
+        // updater RPC returns a Thrift BOOL, including an explicitly present false.
+        private bool _success;
 
-        public string Success
+        public bool Success
         {
           get
           {
@@ -2057,7 +2059,7 @@ namespace Zaap
         public updater_isUpdateAvailable_result DeepCopy()
         {
           var tmp90 = new updater_isUpdateAvailable_result();
-          if((Success != null) && __isset.@success)
+          if(__isset.@success)
           {
             tmp90.Success = this.Success;
           }
@@ -2083,9 +2085,9 @@ namespace Zaap
               switch (field.ID)
               {
                 case 0:
-                  if (field.Type == TType.String)
+                  if (field.Type == TType.Bool)
                   {
-                    Success = await iprot.ReadStringAsync(cancellationToken);
+                    Success = await iprot.ReadBoolAsync(cancellationToken);
                   }
                   else
                   {
@@ -2119,15 +2121,12 @@ namespace Zaap
 
             if(this.__isset.@success)
             {
-              if (Success != null)
-              {
                 tmp92.Name = "Success";
-                tmp92.Type = TType.String;
+                tmp92.Type = TType.Bool;
                 tmp92.ID = 0;
                 await oprot.WriteFieldBeginAsync(tmp92, cancellationToken);
-                await oprot.WriteStringAsync(Success, cancellationToken);
+                await oprot.WriteBoolAsync(Success, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
-              }
             }
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
@@ -2148,7 +2147,7 @@ namespace Zaap
         public override int GetHashCode() {
           int hashcode = 157;
           unchecked {
-            if((Success != null) && __isset.@success)
+            if(__isset.@success)
             {
               hashcode = (hashcode * 397) + Success.GetHashCode();
             }
@@ -2160,11 +2159,11 @@ namespace Zaap
         {
           var tmp93 = new StringBuilder("updater_isUpdateAvailable_result(");
           int tmp94 = 0;
-          if((Success != null) && __isset.@success)
+          if(__isset.@success)
           {
             if(0 < tmp94++) { tmp93.Append(", "); }
             tmp93.Append("Success: ");
-            Success.ToString(tmp93);
+            tmp93.Append(Success);
           }
           tmp93.Append(')');
           return tmp93.ToString();

@@ -6,4 +6,8 @@
     <Nullable>annotations</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Jondo.Unity.Tests" />
+  </ItemGroup>
+
 </Project>

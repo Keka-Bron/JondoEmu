@@ -227,6 +227,11 @@
                   </StackPanel>
                 </Button>
                 <TextBlock x:Name="PieCliente" Classes="pie" />
+                <StackPanel x:Name="NativeClientSettings" Spacing="8" IsVisible="False">
+                  <Button x:Name="ConfigureClient" Classes="chip" Click="ConfigureNativeClient" />
+                  <TextBlock x:Name="ClientConfigLabel" Classes="label" />
+                  <TextBox x:Name="ClientConfigPath" Classes="field" LostFocus="SaveClientConfigPath" />
+                </StackPanel>
               </StackPanel>
 
               <!-- The optional HD and 4K scenery packs. The rows are built in MainWindow.Packs.cs,

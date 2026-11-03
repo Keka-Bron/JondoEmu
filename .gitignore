@@ -19,6 +19,9 @@ runtimes/
 # Publishing still copies Jondo Server.exe, Jondo Studio.exe and Jondo Emulator Launcher.exe to the
 # root so they run against this checkout, but they are build output, not source.
 *.exe
+/Jondo Server
+/Jondo Studio
+/Jondo Emulator Launcher
 
 # ─── Server settings ────────────────────────────────────────────────────────
 # What each server sets in its Settings window: its own, not the repository's.

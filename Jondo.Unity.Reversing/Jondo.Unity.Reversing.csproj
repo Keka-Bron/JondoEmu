@@ -7,9 +7,7 @@
          model. Not a single line of Console or WinForms, and that is why both the
          command line (Jondo.Unity.ProtocolBuilder) and the window (Jondo.Unity.Deobfuscator) can drive it the same.
 
-         It stays plain net10.0, without -windows: the only thing tied to Windows is DPAPI, and that lives
-         in the window. If some day a platform warning comes up, the cure is to annotate the method, not
-         to drag in the whole framework. -->
+         It stays plain net10.0, without desktop or platform dependencies. -->
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
@@ -17,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Jondo.Unity.Tests" />
     <PackageReference Include="Google.Protobuf" Version="3.35.1" />
     <PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.0" />
     <PackageReference Include="Samboy063.Cpp2IL.Core" Version="2022.1.0-pre-release.21" />

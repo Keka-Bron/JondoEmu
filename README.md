@@ -38,6 +38,10 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 ## 🚀 Quick Start
 
+**Linux source users:** all four desktop tools have a native Linux workflow. See
+[Linux desktop setup](docs/linux-desktop.md) for building, configuring `Dofus.x64`
+without a mod loader, and desktop verification. The download steps below describe Windows releases.
+
 **Nothing has to be compiled.** The launcher ships as a single ready-to-run executable with every dependency inside it, and the world database ships compressed and extracts itself on first run.
 
 **⬇️ Download a zip from the [Releases page](../../releases)** and unpack it anywhere. No need to clone this repository to play.
@@ -1059,7 +1063,6 @@ The three executables:
 
 Shared:
 * **`Jondo.Unity.Contract`** — paths, settings and the shared palette
-* **`Jondo.Unity.Contract.WinForms`** — Windows Forms controls still used by the deobfuscator
 * **`Jondo.Unity.Core`** — the file lookup: `datos/`, then `bases/`, then the root
 * **`Jondo.Unity.Protocol`** — message definitions and the generated `Op` layer
 * **`Jondo.Unity.World`** — world and fight logic, buffs, areas, geometry and criteria

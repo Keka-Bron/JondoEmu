@@ -12,9 +12,7 @@ namespace Jondo.Unity.Launcher
     /// </summary>
     /// <remarks>
     /// The colours are put in here from <see cref="LauncherPalette"/> instead of writing them in the
-    /// XAML. It is more roundabout, but it is the only way for the launcher and the server to keep painting
-    /// with the same numbers: as soon as a colour is written by hand in an .axaml, that copy and the
-    /// Windows Forms one start drifting apart and nobody notices until the two are seen together.
+    /// XAML, so the launcher and the other desktop applications share the same colour values.
     /// </remarks>
     public sealed class App : Application
     {

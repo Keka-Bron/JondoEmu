@@ -576,44 +576,56 @@ bit by bit, and it turns "porting the emulator to the next patch" into changing 
 
 ## 7. The interface
 
-A WinForms window with the look of the rest (it reuses `LauncherTheme`, `LauncherPanel`, `LauncherButton`
-from `Jondo.Unity.Contract`). Four areas:
+The deobfuscator is a single-screen Avalonia workshop on Windows and Linux. It uses the shared
+`LauncherPalette` from `Jondo.Unity.Contract`, with the two-line gold sign, translucent cards,
+gradient buttons and monospaced results. It starts maximized. Optional artwork is loaded from
+`launcher_assets/servidor_fondo.jpg`, falling back to `bg.jpg` and then the plain background color.
 
-```
-┌───────────────────────────────────────────────────────────────────────────┐
-│  JONDO — DEOBFUSCATOR                                    [3.6.4.3 ▾]      │
-│                                                          [3.6.10.10 ▾]    │
-├──────────────────┬────────────────────────────────────────────────────────┤
-│ MESSAGES         │  DETAIL                                                │
-│                  │                                                        │
-│ ▸ sure      245  │   old: hez                new: les        92 %         │
-│ ▸ likely    610  │   ┌──────────────────┬──────────────────┐              │
-│ ▸ by hand 1,314  │   │ hex  f1          │ leq  f1          │              │
-│ ▸ new       ...  │   │ int32 f2         │ int32 f2         │              │
-│                  │   │ string f3        │ string f3        │              │
-│ [search...]      │   │ int32 f4         │ int32 f4         │              │
-│                  │   └──────────────────┴──────────────────┘              │
-│ hez → les    92% │                                                        │
-│ hee → jlm    61% │   WHAT IT IS BASED ON                                  │
-│ hhs → mah    54% │   · identical shape, 4 fields, same types              │
-│ ...              │   · the parent hdw is already paired with jkq (fld 7)  │
-│                  │   · appears in «usar zaap» after the iwo [see capture] │
-│                  │                                                        │
-│                  │   [ACCEPT]  [REJECT]  [FIND ANOTHER]                   │
-├──────────────────┴────────────────────────────────────────────────────────┤
-│  1,235 of 2,169 resolved   ·   of the 104 the emulator uses: 98           │
-│  [EXTRACT]  [MATCH]  [ASK THE LLM]  [VERIFY]  [EXPORT]                    │
-└───────────────────────────────────────────────────────────────────────────┘
-```
+### Mapping workflow
 
-What makes it useful and not an ornament:
+1. Enter the old and new client folders, or paste their protocol DLL paths. **Browse** opens at
+   the field's existing directory (the parent for a DLL), falling back to the discovered client.
+   Standalone Cpp2IL output directories are supported as well as MelonLoader client installations.
+2. **Build the mapping** calls `Mapper.Build` in the background. The results show old → new names,
+   the origin of the match and the known name or meaning. Structure matches are green, model
+   choices gold, and unresolved candidates muted. Messages used by the emulator come first and
+   carry a gold marker; within each group, non-structural rows precede structural matches.
+3. **Ask the AI** appears when there are ambiguous rows with enough known meaning to ask about.
+   Answers are cached by the shared `Llm` implementation. Tooltips show the meaning, the model's
+   explanation when present, and candidate names. A model choice must be one of those candidates.
+4. **Export** writes `datos/mapeo_<old>_a_<new>.tsv` and `datos/mapping_<new>.json` for the sniffer,
+   then opens the output folder. **Open the folder** remains available afterwards. If the desktop
+   cannot open a file manager, the status still reports the saved files and explains the problem.
 
-- **The bottom bar counts what matters**: not "1,235 of 2,169", but **"of the 104 the
-  emulator uses, 98"**. That is the number that decides whether the emulator starts with the new patch.
-- **"What it is based on"** with the evidence for each proposal, and the button to open the capture where
-  it appears.
-- **Accept / reject** one by one, because the doubtful ones are decided by a person.
-- The buttons at the bottom are the five stages, in order, and they can be repeated separately.
+The bottom status counts all mappings and, when an `opcodes_emulador_<old>.tsv` inventory exists,
+the subset used by the emulator. Retired rows are omitted from the displayed/exported table.
+Mapping and AI resolution can be cancelled. Conflicting actions and path edits are disabled during
+work; closing requests cancellation and waits for completion. Export is non-cancellable: closing
+waits for it and skips opening a file manager. Each output is replaced atomically using a temporary
+file in the same directory; the two output files are not a single transaction.
+
+### Model settings
+
+**The model** opens the provider dialog. Provider presets fill the endpoint and dialect; the URL
+and model name remain editable. **Test** checks the connection and loads a sorted, complete model
+dropdown next to the editable name. The dropdown is not filtered by the current name, so another
+model can be chosen without clearing it. A custom name remains valid even if absent from the list.
+Switching providers clears the previous catalogue and retains each provider's separate API key.
+Keys are masked in the dialog and encrypted in the user's configuration directory. Closing a
+dialog cancels an outstanding catalogue request.
+
+The UI labels support Spanish, English and French, selected by `idioma=es|en|fr` in
+`Jondo/desofuscador.cfg` under the user's configuration directory. Progress messages from the
+analysis library are not all localized.
+
+### Scope and history
+
+The committed WinForms tool already used this single-screen workflow. Its catalogue retained
+unused text for a former wizard; the Avalonia migration removed those unused keys. The earlier
+four-area mockup in this document was a design proposal: neither committed UI implements
+accept/reject editing, search/filter panes, capture navigation, or separate buttons for every
+analysis stage. Model-selected mappings are exportable without an in-app approval step, with their
+origin recorded in the TSV. The command-line tools below expose the separate analysis stages.
 
 ---
 

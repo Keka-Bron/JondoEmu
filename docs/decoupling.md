@@ -1,9 +1,15 @@
 # Splitting the server from the launcher
 
-Being able to open the launcher, use it and close it without the server noticing. Today they are the same
-process and closing the window kills everybody's game.
+> Historical design analysis of the former combined Windows Forms process. The split is implemented:
+> Server and Launcher are separate executables, and all four desktop applications now use Avalonia.
+> File names, line numbers and present-tense descriptions below refer to that earlier snapshot.
+> For the current implementation, see [launcher.md](launcher.md), [server-desktop.md](server-desktop.md)
+> and [linux-desktop.md](linux-desktop.md).
 
-It is written from what there is in the code TODAY. Each statement carries its file and its line.
+The goal was being able to open the launcher, use it and close it without the server noticing. At the
+time they were the same process and closing the window killed everybody's game.
+
+It was written from the code at that time. Each statement carries its file and its line.
 What is my opinion is marked as such.
 
 ---

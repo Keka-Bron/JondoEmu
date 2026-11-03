@@ -47,13 +47,14 @@ public static class Matcher
         Dictionary<string, List<string>> Candidates);
 
     /// <summary>Matches the messages of the two versions.</summary>
-    public static Result Match(Model a, Model b, int rounds = 5)
+    public static Result Match(Model a, Model b, int rounds = 5, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var pairs = new Dictionary<string, string>(StringComparer.Ordinal);
         var takenB = new HashSet<string>(StringComparer.Ordinal);
 
-        var signA = Signatures(a, rounds);
-        var signB = Signatures(b, rounds);
+        var signA = Signatures(a, rounds, cancellationToken);
+        var signB = Signatures(b, rounds, cancellationToken);
 
         // ─── The seeds: a unique fingerprint on both sides ──────────────────────────────
         //
@@ -61,6 +62,7 @@ public static class Matcher
         // inside, the less of a coincidence it is that it matches.
         for (int round = rounds; round >= 0; round--)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var byA = Group(signA, round);
             var byB = Group(signB, round);
 
@@ -94,6 +96,7 @@ public static class Matcher
 
         for (int round = 0; round < 12; round++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             // ─── Dragging through the parents ───────────────────────────────────────────
             //
             // This is the part that really moves the needle, and the one that was missing. If a and b are the
@@ -110,6 +113,7 @@ public static class Matcher
                 dragged = false;
                 foreach (var (from, to) in pairs.ToList())
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     if (!messagesA.TryGetValue(from, out var parentA)) continue;
                     if (!messagesB.TryGetValue(to, out var parentB)) continue;
 
@@ -138,6 +142,7 @@ public static class Matcher
 
             foreach (var one in a.Messages)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 if (pairs.ContainsKey(one.Name)) continue;
 
                 double best = 0, second = 0;
@@ -270,7 +275,7 @@ public static class Matcher
         => Signatures(model, 0).ToDictionary(p => p.Key, p => p.Value[0], StringComparer.Ordinal);
 
     /// <summary>Each message's fingerprint in each round.</summary>
-    private static Dictionary<string, string[]> Signatures(Model model, int rounds)
+    private static Dictionary<string, string[]> Signatures(Model model, int rounds, CancellationToken cancellationToken = default)
     {
         var messages = model.Messages.ToDictionary(m => m.Name, StringComparer.Ordinal);
         var enums = model.Enums.ToDictionary(e => e.Name, StringComparer.Ordinal);
@@ -297,6 +302,7 @@ public static class Matcher
 
         for (int round = 1; round <= rounds; round++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             foreach (var message in model.Messages)
             {
                 var neighbours = message.Fields

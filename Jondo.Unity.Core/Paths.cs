@@ -29,52 +29,10 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static string Root { get; } = ResolveRoot();
 
-        /// <summary>
-        /// The client versions this emulator speaks to, FROM THE NEWEST TO THE
-        /// OLDEST. The first one that exists is taken.
-        ///
-        /// It is a hand-written list on purpose, and not «the highest version folder
-        /// there is»: the emulator is tied to a specific shape of the protocol, and if someone leaves
-        /// alongside a client we do not yet know how to speak to, taking it on its own would be starting against an
-        /// incompatible client without a word. Adding a version is one line.
-        ///
-        /// 3.6.10.11 is fine because it IS NOT ANOTHER PROTOCOL: its GameAssembly.dll and its
-        /// global-metadata.dat are byte for byte the same as 3.6.10.10's —same SHA-256,
-        /// both files— and the structural matcher confirms it on its own: 2,169
-        /// messages against 2,169, identity mapping, zero doubts. That patch only moved data: 182
-        /// bundles of Content/Data.
-        /// </summary>
-        private static readonly string[] ClientesQueValen =
-        {
-            "Cliente 3.6.10.11",
-            "Cliente 3.6.10.10",
-        };
-
         /// <summary>Dofus client folder (it lives outside the emulator root).</summary>
         public static string ClientDir
         {
-            get
-            {
-                // Next to the emulator first, and the historical path after: a half-moved
-                // installation still starts the same.
-                foreach (string donde in new[]
-                         {
-                             Path.GetFullPath(Path.Combine(Root, "..")),
-                             LegacyRoot,
-                         })
-                {
-                    foreach (string version in ClientesQueValen)
-                    {
-                        string candidato = Path.Combine(donde, version);
-
-                        // That the folder exists is not enough: it has to carry the executable inside.
-                        // A half-downloaded folder exists and is of no use.
-                        if (File.Exists(Path.Combine(candidato, "Dofus.exe"))) return candidato;
-                    }
-                }
-
-                return Path.Combine(@"C:\Jondo", "DofusClient");
-            }
+            get => ClientInstallation.Find()?.Root ?? ClientInstallation.DefaultDirectory;
         }
 
         /// <summary>
@@ -523,6 +481,14 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         private static string ResolveRoot()
         {
+            string configured = Environment.GetEnvironmentVariable("JONDO_EMULATOR_ROOT");
+            if (!string.IsNullOrWhiteSpace(configured))
+            {
+                string root = Path.GetFullPath(configured);
+                if (!File.Exists(Path.Combine(root, RootMarker)))
+                    throw new DirectoryNotFoundException($"JONDO_EMULATOR_ROOT has no {RootMarker}: {root}");
+                return root;
+            }
             foreach (string start in new[] { SafeBaseDirectory(), SafeCurrentDirectory() })
             {
                 string found = SearchUpwards(start);

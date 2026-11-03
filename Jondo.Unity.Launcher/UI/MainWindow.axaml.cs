@@ -97,6 +97,8 @@ namespace Jondo.Unity.Launcher.UI
             _textos = LauncherTexts.Get(_idioma);
 
             InitializeComponent();
+            NativeClientSettings.IsVisible = OperatingSystem.IsLinux();
+            ClientConfigPath.Text = LauncherPreferences.ClientConfigDirectory;
 
             Fondo.Source = LauncherSkin.LoadImage("bg.jpg");
             _reloj.Tick += (_, _) => MirarElEstado();
@@ -263,11 +265,8 @@ namespace Jondo.Unity.Launcher.UI
             Recolocar();
 
             // The music starts on its own, just like the web interface's autoplay.
-            if (OperatingSystem.IsWindows())
-            {
-                _musica = new MusicPlayer(Path.Combine(LauncherSkin.AssetsFolder, "theme.mp3"));
-                if (_musica.Available) _musica.Play();
-            }
+            _musica = new MusicPlayer(Path.Combine(LauncherSkin.AssetsFolder, "theme.mp3"));
+            if (_musica.Available) _musica.Play();
             RefrescarBotonDeMusica();
 
             MirarElEstado();
@@ -424,6 +423,8 @@ namespace Jondo.Unity.Launcher.UI
 
             PieIdioma.Text = Textos.PieIdioma(_idioma);
             PieCliente.Text = Textos.PieCliente(_idioma);
+            ConfigureClient.Content = Textos.ConfigurarCliente(_idioma);
+            ClientConfigLabel.Text = Textos.DirectorioPreferenciasCliente(_idioma);
             PieCuentasGuardadas.Text = Textos.PieCuentasGuardadas(_idioma);
 
             TextoEquipoVacio.Text = Textos.EquipoVacio(_idioma);
@@ -826,8 +827,8 @@ namespace Jondo.Unity.Launcher.UI
                 AllowMultiple = false,
                 FileTypeFilter = new[]
                 {
-                    new FilePickerFileType("Dofus.exe") { Patterns = new[] { "Dofus.exe" } },
-                    new FilePickerFileType("Ejecutables") { Patterns = new[] { "*.exe" } },
+                    new FilePickerFileType(ClientInstallation.ExecutableName) { Patterns = new[] { ClientInstallation.ExecutableName } },
+                    FilePickerFileTypes.All,
                 },
             };
 
@@ -853,9 +854,34 @@ namespace Jondo.Unity.Launcher.UI
             string? ruta = elegidos.Count > 0 ? elegidos[0].TryGetLocalPath() : null;
             if (string.IsNullOrEmpty(ruta)) return;
 
-            LauncherPreferences.ClientExecutable = ruta;
+            LauncherPreferences.SetClientExecutable(ruta);
             RefrescarRutaDelCliente();
             RefrescarPacks();
+        }
+
+        private async void ConfigureNativeClient(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            string executable = LauncherService.ResolveClient();
+            if (executable.Length == 0) { Avisar(Textos.ClientNotFound(_idioma)); return; }
+            try
+            {
+                await Task.Run(() => new ClientInstallation(executable).Configure());
+                Avisar("ConfigUrl=" + ClientInstallation.ConfigUrl);
+            }
+            catch (Exception error) { Avisar(error.Message); }
+        }
+
+        private void SaveClientConfigPath(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            string path = ClientConfigPath.Text?.Trim() ?? "";
+            if (path.Length == 0) return;
+            try
+            {
+                LauncherPreferences.ClientConfigDirectory = Path.GetFullPath(path);
+                ClientConfigPath.Text = LauncherPreferences.ClientConfigDirectory;
+            }
+            catch (Exception error) when (error is ArgumentException or NotSupportedException)
+            { Avisar(error.Message); }
         }
 
         // ═══════════════════════════════════════════════════════════════════════

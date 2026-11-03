@@ -82,6 +82,10 @@ jobs:
   build-and-test-linux:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      JONDO_EMULATOR_ROOT: ${{ github.workspace }}
+      XDG_CONFIG_HOME: ${{ github.workspace }}/host-artifacts/test-profile/config
+      XDG_DATA_HOME: ${{ github.workspace }}/host-artifacts/test-profile/data
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
@@ -89,16 +93,28 @@ jobs:
           dotnet-version: 10.0.x
       - name: Unpack world.db
         run: unzip -o datos/world.zip -d bases
+      - name: Build solution on Linux
+        run: dotnet build Jondo.Unity.sln --configuration Release --artifacts-path host-artifacts --nologo
       - name: Test general suite
-        run: dotnet test Jondo.Unity.Tests/Jondo.Unity.Tests.csproj --configuration Release --nologo --logger "trx;LogFileName=tests.trx" --results-directory TestResults
+        run: dotnet test Jondo.Unity.Tests/Jondo.Unity.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=tests.trx" --results-directory TestResults
       - name: Test generated protocol and mappings
-        run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --nologo --logger "trx;LogFileName=connection-protocol.trx" --results-directory TestResults
+        run: dotnet test Jondo.Unity.Protocol.Connection.Tests/Jondo.Unity.Protocol.Connection.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=connection-protocol.trx" --results-directory TestResults
       - name: Test server transport and headless desktop rendering
-        run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --nologo --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
+        run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
+      - name: Publish Linux desktop tools locally
+        run: |
+          for project in Jondo.Unity.Launcher Jondo.Unity.Studio Jondo.Unity.Deobfuscator; do
+            dotnet publish "$project/$project.csproj" --configuration Release -r linux-x64 --artifacts-path host-artifacts -p:SkipRootDeploy=true --nologo
+          done
       - name: Publish Linux server desktop
-        run: dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj --configuration Release -r linux-x64 -p:SkipTests=true -p:SkipRootDeploy=true --nologo
+        run: dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj --configuration Release -r linux-x64 --artifacts-path host-artifacts -p:SkipTests=true -p:SkipRootDeploy=true --nologo
       - name: Cross-publish Windows server desktop
-        run: dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj --configuration Release -r win-x64 -p:SkipTests=true -p:SkipRootDeploy=true --nologo
+        run: dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj --configuration Release -r win-x64 --artifacts-path host-artifacts/windows-check -p:SkipTests=true -p:SkipRootDeploy=true --nologo
+      - name: Cross-publish Windows desktop tools
+        run: |
+          for project in Jondo.Unity.Launcher Jondo.Unity.Studio Jondo.Unity.Deobfuscator; do
+            dotnet publish "$project/$project.csproj" --configuration Release -r win-x64 --artifacts-path host-artifacts/windows-check -p:SkipTests=true -p:SkipRootDeploy=true --nologo
+          done
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v6

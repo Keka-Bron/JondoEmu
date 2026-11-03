@@ -69,7 +69,7 @@ namespace Jondo.Unity.Launcher.UI
         public string ClientNotFound { get; init; } = "";
         public string AccountCreated { get; init; } = "";
         public string ServidorSinResponder { get; init; } = "";
-        public string ControlRechazado { get; init; } = "";
+        public string PermissionDenied { get; init; } = "";
 
         // The server window. The launcher does not use them, but the catalogue is a single one: that way both
         // speak the same three languages without two tables getting out of sync.
@@ -146,10 +146,10 @@ namespace Jondo.Unity.Launcher.UI
                 ClientStartFailed = "No se ha podido arrancar el cliente de Dofus.",
                 AccountAlreadyRunning = "Esta cuenta ya tiene un cliente abierto.",
                 MaxClientsError = "Ya hay 8 clientes abiertos, que es el máximo.",
-                ClientNotFound = "No se encuentra Dofus.exe. Elige dónde está con el botón de la ruta del cliente.",
+                ClientNotFound = "No se encuentra el ejecutable del cliente de Dofus. Elige dónde está con el botón de la ruta del cliente.",
                 AccountCreated = "Cuenta creada.",
                 ServidorSinResponder = "El servidor no responde. Espera a que termine de arrancar o vuelve a abrirlo.",
-                ControlRechazado = "El servidor ha rearrancado. Cierra el lanzador y vuelve a abrirlo.",
+                PermissionDenied = "Esta cuenta no tiene permiso para realizar esta operación.",
                 StatPlayers = "Jugadores",
                 StatClients = "Clientes",
                 StatFights = "Combates",
@@ -219,10 +219,10 @@ namespace Jondo.Unity.Launcher.UI
                 ClientStartFailed = "The Dofus client could not be started.",
                 AccountAlreadyRunning = "This account already has a client running.",
                 MaxClientsError = "There are already 8 clients running, which is the maximum.",
-                ClientNotFound = "Dofus.exe was not found. Point at it with the client path button.",
+                ClientNotFound = "The Dofus client executable was not found. Select it with the client path button.",
                 AccountCreated = "Account created.",
                 ServidorSinResponder = "The server is not responding. Wait for it to finish starting, or open it again.",
-                ControlRechazado = "The server has restarted. Close the launcher and open it again.",
+                PermissionDenied = "This account does not have permission for this operation.",
                 StatPlayers = "Players",
                 StatClients = "Clients",
                 StatFights = "Fights",
@@ -292,10 +292,10 @@ namespace Jondo.Unity.Launcher.UI
                 ClientStartFailed = "Le client Dofus n'a pas pu démarrer.",
                 AccountAlreadyRunning = "Ce compte possède déjà un client actif.",
                 MaxClientsError = "Il y a déjà 8 clients actifs, ce qui est le maximum.",
-                ClientNotFound = "Dofus.exe est introuvable. Indique son emplacement avec le bouton du chemin du client.",
+                ClientNotFound = "L'exécutable du client Dofus est introuvable. Indique son emplacement avec le bouton du chemin du client.",
                 AccountCreated = "Compte créé.",
                 ServidorSinResponder = "Le serveur ne répond pas. Attends la fin du démarrage ou relance-le.",
-                ControlRechazado = "Le serveur a redémarré. Ferme le lanceur et rouvre-le.",
+                PermissionDenied = "Ce compte n'a pas l'autorisation d'effectuer cette opération.",
                 StatPlayers = "Joueurs",
                 StatClients = "Clients",
                 StatFights = "Combats",

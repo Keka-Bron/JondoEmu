@@ -5,18 +5,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
     <!-- The little the server and the launcher have to know about each other. No database,
-         no protocol, no windows: file paths, the control channel's contract, the texts and
-         the palette. It is the only piece that travels in BOTH executables, so the less it has,
+         no protocol, no windows: file paths, portable preference encryption, the control channel's
+         contract, the texts and the palette. It travels in the desktop executables, so the less it has,
          the better.
 
-         It NO longer carries Windows Forms. The hand-painted controls went to
-         Jondo.Unity.Contract.WinForms, which is what needs them; that way the launcher and Studio, which
-         are Avalonia, do not drag in the Windows desktop just for sharing the texts. What
-         does stay is LauncherPalette: colours are numbers and do not depend on what they are
-         painted with. -->
+         The desktop applications use Avalonia; this contract stays independent of the UI toolkit.
+         LauncherPalette stores colours as numbers, without depending on what they are painted with. -->
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
     <ProjectReference Include="..\Jondo.Unity.Core\Jondo.Unity.Core.csproj" />
   </ItemGroup>
 

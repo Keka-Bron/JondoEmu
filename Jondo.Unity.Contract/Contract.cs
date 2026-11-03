@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Security.Cryptography;
 using System.Threading;
 
 namespace Jondo.Unity.Launcher
@@ -12,7 +10,7 @@ namespace Jondo.Unity.Launcher
     /// database, nor the maps, nor the protocol handlers, nor the effects catalogue.
     /// They are two real executables and this library is the only piece that travels in both.
     ///
-    /// That is why there is no logic here: route names, where the secret lives and the codes with which
+    /// That is why it stays small: route names, process guards and the codes with which
     /// the server says what happened. Everything added to this file ends up on
     /// every player's computer, so it had better be little.
     /// </summary>
@@ -55,9 +53,6 @@ namespace Jondo.Unity.Launcher
         /// <summary>Connected players the server admits in total.</summary>
         public const int ClientesEnTotal = 500;
 
-        /// <summary>The header the secret travels in.</summary>
-        public const string Cabecera = "X-Jondo-Control";
-
         // ─── The codes ──────────────────────────────────────────────────────────────────────
         //
         // The server says WHAT happened; the launcher decides HOW to tell the person and in which
@@ -67,60 +62,6 @@ namespace Jondo.Unity.Launcher
         public const string MotivoSesionCaducada = "sesion-caducada";
         public const string MotivoCuentaYaAbierta = "cuenta-ya-abierta";
         public const string MotivoTopeDeClientes = "tope-de-clientes";
-
-        // ─── The secret ─────────────────────────────────────────────────────────────────────
-        //
-        // The channel is on localhost, but on localhost is anything that runs on the
-        // machine, and through here accounts are created and clients started. Whoever deleted these routes the
-        // first time spoke of «una puerta abierta encima», and was right.
-        //
-        // The server invents a secret on each start and leaves it written in the user's
-        // profile; the launcher reads it from there. Nobody types it and it does not leave the machine.
-        //
-        // CAREFUL: this is NOT checked today. The launcher sends the header and ControlApi never
-        // reads it -- see ControlApi.Autorizada, which is written and has no callers -- so the two
-        // paragraphs above describe an intention, not what happens. What actually closes the admin
-        // routes is ConRol: a token the database recognises plus the administrator role. Spelled out
-        // because taking this section at its word led to believing the channel was shut when what
-        // shuts it is something else entirely.
-
-        /// <summary>Where the secret lives: in the profile, next to the launcher's preferences.</summary>
-        public static string FicheroDelSecreto => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "Jondo", "control.secreto");
-
-        /// <summary>Hands out a new secret and leaves it written. The server calls it on starting.</summary>
-        public static string NuevoSecreto()
-        {
-            string secreto = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
-            try
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(FicheroDelSecreto)!);
-                File.WriteAllText(FicheroDelSecreto, secreto);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Control] Could not write the secret: {ex.Message}");
-            }
-            return secreto;
-        }
-
-        /// <summary>The secret the server left written, or an empty string if there is none.</summary>
-        public static string LeerSecreto()
-        {
-            try
-            {
-                return File.Exists(FicheroDelSecreto) ? File.ReadAllText(FicheroDelSecreto).Trim() : "";
-            }
-            catch { return ""; }
-        }
-
-        /// <summary>Compares two secrets without the comparison's timing saying anything.</summary>
-        public static bool MismoSecreto(string? uno, string? otro)
-            => !string.IsNullOrEmpty(uno) && !string.IsNullOrEmpty(otro) &&
-               CryptographicOperations.FixedTimeEquals(
-                   System.Text.Encoding.UTF8.GetBytes(uno),
-                   System.Text.Encoding.UTF8.GetBytes(otro));
 
         // ─── One of each, and only one ──────────────────────────────────────────────────────
         //

@@ -110,31 +110,41 @@ namespace Jondo.Unity.Server.Network
         }
 
         public static bool TryConnect(int instanceId, string hash, out string gameSession)
+            => TryConnect(instanceId, hash, out gameSession,
+                () => Convert.ToHexString(RandomNumberGenerator.GetBytes(24)).ToLowerInvariant());
+
+        internal static bool TryConnect(int instanceId, string hash, out string gameSession, Func<string> createSession)
         {
             gameSession = "";
-            if (string.IsNullOrWhiteSpace(hash) || !ByHash.TryGetValue(hash, out var launch)) return false;
-            if (launch.InstanceId != instanceId) return false;
+            lock (RegistrationGate)
+            {
+                if (string.IsNullOrWhiteSpace(hash) || !ByHash.TryGetValue(hash, out var launch)) return false;
+                if (launch.InstanceId != instanceId || !IsCurrent(launch)) return false;
 
-            gameSession = Convert.ToHexString(RandomNumberGenerator.GetBytes(24)).ToLowerInvariant();
-            ByGameSession[gameSession] = launch;
-            launch.LastSeenUtc = DateTime.UtcNow;
-            return true;
+                // Publish the session while the launch is still registered. Removal shares this gate.
+                gameSession = createSession();
+                ByGameSession[gameSession] = launch;
+                launch.LastSeenUtc = DateTime.UtcNow;
+                return true;
+            }
         }
 
         public static bool TryGetByGameSession(string gameSession, out Launch? launch)
         {
-            if (string.IsNullOrWhiteSpace(gameSession))
+            lock (RegistrationGate)
             {
                 launch = null;
-                return false;
-            }
-            if (!ByGameSession.TryGetValue(gameSession, out launch)) return false;
+                if (string.IsNullOrWhiteSpace(gameSession) || !ByGameSession.TryGetValue(gameSession, out var found)
+                    || !IsCurrent(found)) return false;
 
-            // Sign of life. A live client goes through here again and again -every time it has to
-            // be resolved whose session this is-, and a dead one never comes back.
-            if (launch != null) launch.LastSeenUtc = DateTime.UtcNow;
-            return true;
+                found.LastSeenUtc = DateTime.UtcNow;
+                launch = found;
+                return true;
+            }
         }
+
+        private static bool IsCurrent(Launch launch)
+            => ByAccount.TryGetValue(launch.AccountId, out var current) && ReferenceEquals(current, launch);
 
         public static void RegisterToken(long accountId, string? token)
         {
@@ -187,11 +197,16 @@ namespace Jondo.Unity.Server.Network
 
         public static void Remove(Launch launch)
         {
-            ByHash.TryRemove(launch.Hash, out _);
-            ByAccount.TryRemove(launch.AccountId, out _);
-            foreach (var pair in ByGameSession)
+            lock (RegistrationGate)
             {
-                if (ReferenceEquals(pair.Value, launch)) ByGameSession.TryRemove(pair.Key, out _);
+                // A delayed exit or sweep must not remove a newer launch of the same account.
+                if (!IsCurrent(launch)) return;
+                ByHash.TryRemove(launch.Hash, out _);
+                ByAccount.TryRemove(launch.AccountId, out _);
+                foreach (var pair in ByGameSession)
+                {
+                    if (ReferenceEquals(pair.Value, launch)) ByGameSession.TryRemove(pair.Key, out _);
+                }
             }
         }
 
@@ -201,21 +216,25 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         internal static void ForgetEverything()
         {
-            ByHash.Clear();
-            ByAccount.Clear();
-            ByGameSession.Clear();
-            Tokens.Clear();
+            lock (RegistrationGate)
+            {
+                ByHash.Clear();
+                ByAccount.Clear();
+                ByGameSession.Clear();
+                Tokens.Clear();
+            }
         }
 
         /// <summary>
-        /// Removes an account's launch without having the object at hand.
-        ///
-        /// It is needed since the launcher is another process: the one that sees the client process die
-        /// is the launcher, and over the wire it can only send the account number.
+        /// Releases only the reported launch of the authenticated account, even across server restarts.
         /// </summary>
-        public static void RemoveByAccount(long accountId)
+        public static void RemoveByAccount(long accountId, int instanceId, string hash)
         {
-            if (ByAccount.TryGetValue(accountId, out var launch)) Remove(launch);
+            lock (RegistrationGate)
+            {
+                if (ByAccount.TryGetValue(accountId, out var launch) && launch.InstanceId == instanceId
+                    && string.Equals(launch.Hash, hash, StringComparison.Ordinal)) Remove(launch);
+            }
         }
 
         /// <summary>The accounts that have a client open right now.</summary>
@@ -247,20 +266,19 @@ namespace Jondo.Unity.Server.Network
                 // -it is the back arrow, not quitting- so releasing there allows relaunching the same
                 // account with the previous client still alive, as many times as one likes, and on top of that
                 // the per-IP count never goes above one and the cap of eight stops existing.
-                var visto = launch.LastSeenUtc == default ? launch.CreatedAtUtc : launch.LastSeenUtc;
-                if (ahora - visto < cuanto) continue;
+                lock (RegistrationGate)
+                {
+                    if (!IsCurrent(launch)) continue;
+                    var visto = launch.LastSeenUtc == default ? launch.CreatedAtUtc : launch.LastSeenUtc;
+                    if (ahora - visto < cuanto) continue;
+                    // An idle connected account remains active even without a recent Zaap call.
+                    if (SessionRegistry.HasConnected(launch.AccountId)) continue;
 
-                // And the sign that really settles it: there is a socket of that account connected right
-                // now. It is needed ON TOP of the timestamp because an idle player can
-                // spend the five minutes without anyone resolving his session, and releasing his
-                // launch would leave the account free for another client to open it with his
-                // still playing.
-                if (SessionRegistry.HasConnected(launch.AccountId)) continue;
-
-                Remove(launch);
-                soltados++;
-                Console.WriteLine($"[Launches] Account {launch.AccountId} has gone " +
-                                  $"{(ahora - visto).TotalMinutes:0} min without a sign of life. It is released.");
+                    Remove(launch);
+                    soltados++;
+                    Console.WriteLine($"[Launches] Account {launch.AccountId} has gone " +
+                                      $"{(ahora - visto).TotalMinutes:0} min without a sign of life. It is released.");
+                }
             }
             return soltados;
         }

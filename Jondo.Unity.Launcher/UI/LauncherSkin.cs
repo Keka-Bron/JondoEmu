@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using Avalonia.Media;
@@ -10,20 +9,8 @@ namespace Jondo.Unity.Launcher.UI
     /// The launcher's look, in Avalonia.
     /// </summary>
     /// <remarks>
-    /// It is the twin of the Windows Forms LauncherSkin the server still uses, and both
-    /// read the SAME numbers from <see cref="LauncherPalette"/>. Here there is not a single colour written by
-    /// hand on purpose: as soon as there were one, the launcher and the server would start drifting apart.
-    ///
-    /// What does change from the Windows Forms version is everything that one had to
-    /// do by hand and here is not needed:
-    ///
-    ///   - The transparency is real. Windows Forms does not compose with alpha, so each panel
-    ///     cut from the already painted background the piece that belonged to it -- that was IBackgroundWindow and its
-    ///     ComposedBackground -- to fake it. Avalonia composes, so the panels carry a
-    ///     colour with alpha and that is it.
-    ///   - The gradients, the rounded corners and the shadows are properties, not hand drawing.
-    ///   - DPI scaling is handled by Avalonia itself, so the Px() that
-    ///     multiplied each measure disappears.
+    /// Colours come from <see cref="LauncherPalette"/> so the desktop applications share the same values.
+    /// Avalonia handles alpha composition, gradients, rounded corners, shadows and DPI scaling.
     /// </remarks>
     internal static class LauncherSkin
     {
@@ -31,11 +18,7 @@ namespace Jondo.Unity.Launcher.UI
 
         public static Color Of(uint argb) => Color.FromUInt32(argb);
 
-        public static SolidColorBrush Brush(uint argb) => new SolidColorBrush(Of(argb));
-
-        public static readonly Color Background = Of(LauncherPalette.Background);
         public static readonly Color CardFill = Of(LauncherPalette.CardFill);
-        public static readonly Color BarFill = Of(LauncherPalette.BarFill);
         public static readonly Color GoldBorder = Of(LauncherPalette.GoldBorder);
         public static readonly Color LightGold = Of(LauncherPalette.LightGold);
         public static readonly Color Gold = Of(LauncherPalette.Gold);
@@ -45,7 +28,6 @@ namespace Jondo.Unity.Launcher.UI
         public static readonly Color BorderBrown = Of(LauncherPalette.BorderBrown);
         public static readonly Color BaseText = Of(LauncherPalette.BaseText);
         public static readonly Color CardText = Of(LauncherPalette.CardText);
-        public static readonly Color HighlightText = Of(LauncherPalette.HighlightText);
         public static readonly Color Red = Of(LauncherPalette.Red);
         public static readonly Color OnlineGreen = Of(LauncherPalette.OnlineGreen);
         public static readonly Color DotGreen = Of(LauncherPalette.DotGreen);
@@ -57,23 +39,9 @@ namespace Jondo.Unity.Launcher.UI
         /// the system uses for its interface.
         /// </summary>
         /// <remarks>
-        /// Avalonia accepts the whole list in a single comma-separated FontFamily and picks the
-        /// first installed, so here the detour of asking
-        /// InstalledFontCollection that the Windows Forms version made is not needed.
+        /// Avalonia accepts the whole list in a single comma-separated FontFamily and picks the first installed.
         /// </remarks>
         public static readonly FontFamily Title = new FontFamily("Cinzel, Trebuchet MS, Segoe UI, sans-serif");
-
-        public static readonly FontFamily Mono = new FontFamily("Consolas, Courier New, monospace");
-
-        /// <summary>
-        /// From the style sheet's pixels to Avalonia's.
-        /// </summary>
-        /// <remarks>
-        /// The Windows Forms version converted to points -- times 0.75 -- because GDI+ measures
-        /// fonts in points. Avalonia measures in device-independent pixels, which is the
-        /// same unit the style sheet used, so the measure goes through as is.
-        /// </remarks>
-        public static double Font(double cssPixels) => cssPixels;
 
         // ─── Files ──────────────────────────────────────────────────────────────
 

@@ -27,7 +27,7 @@ namespace Jondo.Unity.Launcher.Packs
     /// <summary>What is on disk for a pack.</summary>
     internal enum PackState
     {
-        /// <summary>No Dofus.exe, so no folder to look in.</summary>
+        /// <summary>No client executable, so no folder to look in.</summary>
         NoClient,
 
         /// <summary>The client's version file is missing or unreadable: nothing can be matched.</summary>

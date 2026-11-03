@@ -1,5 +1,6 @@
 using System;
 using Avalonia;
+using Avalonia.Headless;
 
 namespace Jondo.Unity.Studio
 {
@@ -29,7 +30,8 @@ namespace Jondo.Unity.Studio
             // through the desktop lifetime and shutting it down without ever giving it a window
             // exits through the back door with 0xE0434352, which reads as "the self test crashed"
             // even when every section built.
-            BuildAvaloniaApp().SetupWithoutStarting();
+            AppBuilder.Configure<StudioApp>().UseSkia()
+                .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false }).SetupWithoutStarting();
             return SelfTest.Run();
         }
 

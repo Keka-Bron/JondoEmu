@@ -1,283 +1,147 @@
-using System.Drawing;
-using System.Windows.Forms;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Jondo.Unity.Launcher;
-using Jondo.Unity.Launcher.UI;
 using Jondo.Unity.Reversing;
 
 namespace Jondo.Unity.Deobfuscator.UI;
 
-/// <summary>
-/// Which model is asked, and with what key.
-///
-/// It is behind a button and not on the main screen because most of the work does not
-/// need it: the structure resolves the bulk without connecting to anything. The model is only needed for
-/// the doubts, and some will prefer not to spend on that.
-///
-/// ─── Three decisions that show when using it ────────────────────────────────────────────
-///
-/// The providers are shortcuts, not a closed list: choosing «Claude» fills in address and dialect,
-/// but both fields are still editable, and «Otro» accepts any server that speaks like
-/// OpenAI, which by now is almost any.
-///
-/// The model is NOT typed by hand if it can be avoided. <b>Probar</b> asks the provider which
-/// models it has and fills the list, which checks in one go the address, the key and the
-/// model's name —the three places where things fail— here and not in the middle of a sweep.
-///
-/// The key is stored per provider and encrypted against the Windows account, in
-/// <c>%APPDATA%\Jondo\</c>. Never in the repository: there is no code path that writes it
-/// inside the emulator's folder.
-/// </summary>
-internal sealed class ModelDialog : Form, IBackgroundWindow
+internal sealed class ModelDialog : Window
 {
     private readonly Settings _settings;
-    private readonly float _scale;
-    private readonly List<LauncherButton> _providers = new();
-    private readonly LauncherField _url;
-    private readonly ComboBox _model;
-    private readonly LauncherField _key;
+    private readonly TextBox _url;
+    private readonly TextBox _model;
+    private readonly ComboBox _catalogue;
+    private readonly TextBox _key;
     private readonly NumericUpDown _atOnce;
-    private readonly LauncherButton _test;
-    private readonly Label _keyLabel;
-    private readonly Label _hint;
-    private readonly Label _verdict;
-
-    // This fixed dialog uses a solid background; transparent child controls therefore have no
-    // composed image to crop, unlike MapperWindow and the launcher.
-    public Image? ComposedBackground => null;
-
-    private int E(int pixels) => (int)Math.Round(pixels * _scale);
-    private Font Letter(float pixels, FontStyle style = FontStyle.Regular)
-        => LauncherTheme.CreateFont(pixels, style);
+    private readonly Button _test;
+    private readonly TextBlock _keyLabel;
+    private readonly TextBlock _hint = new() { TextWrapping = TextWrapping.Wrap };
+    private readonly TextBlock _verdict = new() { TextWrapping = TextWrapping.Wrap };
+    private readonly List<Button> _providers = new();
+    private CancellationTokenSource? _testing;
     private Texts Texts => Texts.Get(_settings.Language);
 
-    public ModelDialog(Settings settings, float scale)
+    public ModelDialog(Settings settings)
     {
         _settings = settings;
-        _scale = scale;
-
-        Text = Texts.ModelTitle;
-        FormBorderStyle = FormBorderStyle.FixedDialog;
-        StartPosition = FormStartPosition.CenterParent;
-        MaximizeBox = false;
-        MinimizeBox = false;
-        ShowInTaskbar = false;
-        ClientSize = new Size(E(980), E(400));
-        BackColor = LauncherTheme.Background;
-        DoubleBuffered = true;
-
-        int y = E(16);
-        Controls.Add(Caption(Texts.ModelProvider, E(24), y));
-        y += E(24);
-
-        int x = E(24);
-        foreach (var provider in Provider.All)
+        DesktopTheme.Apply(this);
+        Title = Texts.ModelTitle; Width = 900; Height = 610; MinWidth = 560; MinHeight = 400;
+        _url = new TextBox { Name = "ProviderUrl", Text = settings.Url };
+        _model = new TextBox { Name = "ProviderModel", Text = settings.Model };
+        _catalogue = new ComboBox { Name = "ProviderCatalogue", PlaceholderText = Texts.ModelCatalogue,
+            HorizontalAlignment = HorizontalAlignment.Stretch, IsEnabled = false };
+        _catalogue.SelectionChanged += (_, _) =>
         {
-            var button = new LauncherButton
-            {
-                Text = provider.Name.ToUpperInvariant(),
-                Bounds = new Rectangle(x, y, E(126), E(34)),
-                Font = Letter(10f, FontStyle.Bold),
-                CornerRadius = E(5),
-                BackgroundTop = Color.FromArgb(200, 34, 21, 12),
-                BackgroundBottom = Color.FromArgb(200, 22, 13, 8),
-                BackgroundTopHighlight = LauncherTheme.LightBrown,
-                BackgroundBottomHighlight = Color.FromArgb(130, 75, 35),
-                BackgroundTopActive = LauncherTheme.LightBrown,
-                BackgroundBottomActive = Color.FromArgb(130, 75, 35),
-                BorderColor = LauncherTheme.BorderBrown,
-                BorderColorHighlight = LauncherTheme.GoldBorder,
-                BorderColorActive = LauncherTheme.LightGold,
-                TextColor = provider.Local ? LauncherTheme.OnlineGreen : LauncherTheme.SoftGold,
-                TextColorHighlight = Color.White,
-                Cursor = Cursors.Hand,
-                Tag = provider,
-            };
-            button.Click += (s, _) => Pick((Provider)((LauncherButton)s!).Tag!);
-            _providers.Add(button);
-            Controls.Add(button);
-            x += E(132);
-        }
-        y += E(48);
-
-        Controls.Add(Caption(Texts.ModelUrl, E(24), y));
-        Controls.Add(Caption(Texts.ModelName, E(500), y));
-        y += E(22);
-
-        _url = new LauncherField
-        {
-            Bounds = new Rectangle(E(24), y, E(450), E(34)),
-            Font = Letter(10.5f),
-            Value = settings.Url,
+            if (_catalogue.SelectedItem is string model) _model.Text = model;
         };
-        _model = new ComboBox
+        _model.PropertyChanged += (_, change) =>
         {
-            Bounds = new Rectangle(E(500), y, E(450), E(34)),
-            Font = Letter(10.5f),
-            FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(13, 7, 4),
-            ForeColor = LauncherTheme.FieldText,
-            DropDownStyle = ComboBoxStyle.DropDown,
-            Text = settings.Model,
+            if (change.Property == TextBox.TextProperty)
+                _catalogue.SelectedItem = _catalogue.Items.Cast<string>().FirstOrDefault(name => name == _model.Text);
         };
-        y += E(46);
-
-        _keyLabel = Caption(Texts.ModelKey, E(24), y);
-        Controls.Add(Caption(Texts.ModelAtOnce, E(700), y));
-        y += E(22);
-
-        _key = new LauncherField
-        {
-            Bounds = new Rectangle(E(24), y, E(450), E(34)),
-            Font = Letter(10.5f),
-            IsPassword = true,
-            Value = settings.Key,
-        };
-        _test = new LauncherButton
-        {
-            Text = Texts.ModelTest,
-            Bounds = new Rectangle(E(500), y, E(170), E(34)),
-            Font = Letter(10.5f, FontStyle.Bold),
-            CornerRadius = E(5),
-            BackgroundTop = LauncherTheme.GreenTop,
-            BackgroundBottom = LauncherTheme.GreenBottom,
-            BackgroundTopHighlight = LauncherTheme.GreenTopHover,
-            BackgroundBottomHighlight = LauncherTheme.GreenBottomHover,
-            BorderColor = LauncherTheme.GreenBorder,
-            BorderColorHighlight = LauncherTheme.GreenBorder,
-            TextColor = Color.White,
-            TextColorHighlight = Color.White,
-            Cursor = Cursors.Hand,
-        };
+        _key = new TextBox { Name = "ProviderKey", Text = settings.Key, PasswordChar = '•' };
+        _atOnce = new NumericUpDown { Minimum = 1, Maximum = 32, Value = Math.Clamp(settings.AtOnce, 1, 32) };
+        _keyLabel = DesktopTheme.Caption(Texts.ModelKey);
+        _test = DesktopTheme.Button(Texts.ModelTest, primary: true);
         _test.Click += async (_, _) => await TestAsync();
-
-        _atOnce = new NumericUpDown
-        {
-            Bounds = new Rectangle(E(700), y, E(90), E(34)),
-            Minimum = 1,
-            Maximum = 32,
-            Value = Math.Clamp(settings.AtOnce, 1, 32),
-            Font = Letter(10.5f),
-            BackColor = Color.FromArgb(13, 7, 4),
-            ForeColor = LauncherTheme.FieldText,
-            BorderStyle = BorderStyle.None,
-        };
-        y += E(42);
-
-        _hint = new Label
-        {
-            Bounds = new Rectangle(E(24), y, E(930), E(20)),
-            BackColor = Color.Transparent,
-            ForeColor = LauncherTheme.LightBrownText,
-            Font = Letter(9.5f),
-        };
-        y += E(24);
-
-        _verdict = new Label
-        {
-            Bounds = new Rectangle(E(24), y, E(930), E(44)),
-            BackColor = Color.Transparent,
-            ForeColor = LauncherTheme.LightBrownText,
-            Font = Letter(10.5f),
-        };
-
-        var close = new LauncherButton
-        {
-            Text = Texts.Close,
-            Bounds = new Rectangle(ClientSize.Width - E(200), ClientSize.Height - E(52), E(176), E(38)),
-            Font = Letter(11f, FontStyle.Bold),
-            CornerRadius = E(5),
-            BackgroundTop = Color.FromArgb(200, 34, 21, 12),
-            BackgroundBottom = Color.FromArgb(200, 22, 13, 8),
-            BackgroundTopHighlight = LauncherTheme.LightBrown,
-            BackgroundBottomHighlight = Color.FromArgb(130, 75, 35),
-            BorderColor = LauncherTheme.BorderBrown,
-            BorderColorHighlight = LauncherTheme.GoldBorder,
-            TextColor = LauncherTheme.LightGold,
-            TextColorHighlight = Color.White,
-            Cursor = Cursors.Hand,
-        };
+        var close = DesktopTheme.Button(Texts.Close);
         close.Click += (_, _) => Close();
 
-        Controls.AddRange(new Control[] { _keyLabel, _url, _model, _key, _test, _atOnce, _hint, _verdict, close });
-        Show(settings.Provider);
+        var panel = new StackPanel { Spacing = 10, Margin = new Thickness(24) };
+        panel.Children.Add(DesktopTheme.Caption(Texts.ModelProvider));
+        var providers = new WrapPanel { Orientation = Orientation.Horizontal };
+        foreach (var provider in Provider.All)
+        {
+            var button = DesktopTheme.Button(provider.Name);
+            button.Tag = provider; button.Margin = new Thickness(0, 0, 6, 6);
+            button.Click += (_, _) => Pick(provider);
+            _providers.Add(button); providers.Children.Add(button);
+        }
+        panel.Children.Add(providers);
+        panel.Children.Add(DesktopTheme.Caption(Texts.ModelUrl)); panel.Children.Add(_url);
+        panel.Children.Add(DesktopTheme.Caption(Texts.ModelName));
+        var models = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*") };
+        _catalogue.Margin = new Thickness(10, 0, 0, 0); Grid.SetColumn(_catalogue, 1);
+        models.Children.Add(_model); models.Children.Add(_catalogue);
+        panel.Children.Add(models);
+        ToolTip.SetTip(models, Texts.ModelPickFromList);
+        panel.Children.Add(_keyLabel); panel.Children.Add(_key);
+        panel.Children.Add(DesktopTheme.Caption(Texts.ModelAtOnce)); panel.Children.Add(_atOnce);
+        panel.Children.Add(_hint); panel.Children.Add(_test); panel.Children.Add(_verdict); panel.Children.Add(close);
+        Content = new ScrollViewer { Content = panel };
+        ShowProvider(settings.Provider);
+        Closing += (_, _) => { _testing?.Cancel(); Keep(); };
     }
 
     private void Pick(Provider provider)
     {
-        // What is typed in the key is stored BEFORE changing: the key is per provider, and otherwise
-        // Claude's would be lost as soon as one tried Gemini for a while.
-        _settings.Key = _key.Value;
+        Keep();
         _settings.Use(provider);
-
-        _url.Value = _settings.Url;
-        _model.Text = _settings.Model;
-        _key.Value = _settings.Key;
-        _model.Items.Clear();
+        _url.Text = _settings.Url; _model.Text = _settings.Model; _key.Text = _settings.Key;
+        _catalogue.ItemsSource = Array.Empty<string>();
+        _catalogue.IsEnabled = false;
         _verdict.Text = "";
-        Show(provider);
+        ShowProvider(provider);
     }
 
-    private void Show(Provider provider)
+    private void ShowProvider(Provider provider)
     {
-        foreach (var button in _providers) button.Active = ((Provider)button.Tag!).Name == provider.Name;
-
-        _key.Visible = provider.NeedsKey;
-        _keyLabel.Visible = provider.NeedsKey;
+        foreach (var button in _providers)
+        {
+            button.Classes.Set("selected", ((Provider)button.Tag!).Name == provider.Name);
+            button.Foreground = ((Provider)button.Tag!).Name == provider.Name ? DesktopTheme.Green : DesktopTheme.Gold;
+        }
+        _key.IsVisible = _keyLabel.IsVisible = provider.NeedsKey;
         _hint.Text = provider.NeedsKey ? Texts.ModelKeyHint : Texts.ModelLocalNote;
-        _test.Left = provider.NeedsKey ? E(500) : E(24);
         if (provider.Hint.Length > 0) _verdict.Text = provider.Hint;
     }
 
-    private async Task TestAsync()
+    internal async Task TestAsync(Func<CancellationToken, Task<IReadOnlyList<string>>>? catalogue = null)
     {
+        if (_testing != null) return;
         Keep();
-        _test.Enabled = false;
-        _verdict.ForeColor = LauncherTheme.LightBrownText;
-        _verdict.Text = Texts.ModelTesting;
-
+        _testing = new CancellationTokenSource();
+        _test.IsEnabled = false;
+        _url.IsEnabled = _model.IsEnabled = _key.IsEnabled = _catalogue.IsEnabled = false;
+        foreach (var button in _providers) button.IsEnabled = false;
+        _verdict.Foreground = DesktopTheme.Muted; _verdict.Text = Texts.ModelTesting;
         try
         {
-            using var llm = new Llm(Path.Combine(Paths.Root, "datos", "respuestas"), _settings.Endpoint());
-            var models = await llm.CatalogueAsync();
-
-            string chosen = _model.Text;
-            _model.Items.Clear();
-            foreach (string name in models.OrderBy(m => m, StringComparer.OrdinalIgnoreCase)) _model.Items.Add(name);
-            _model.Text = chosen.Length > 0 ? chosen : models.FirstOrDefault() ?? "";
-
-            _verdict.ForeColor = LauncherTheme.OnlineGreen;
+            using var llm = catalogue == null
+                ? new Llm(Path.Combine(Paths.Root, "datos", "respuestas"), _settings.Endpoint()) : null;
+            var models = await (catalogue?.Invoke(_testing.Token) ?? llm!.CatalogueAsync(_testing.Token));
+            _testing.Token.ThrowIfCancellationRequested();
+            _catalogue.ItemsSource = models.OrderBy(name => name, StringComparer.OrdinalIgnoreCase).ToArray();
+            if (string.IsNullOrWhiteSpace(_model.Text)) _model.Text = models.FirstOrDefault() ?? "";
+            _catalogue.SelectedItem = models.FirstOrDefault(name => name == _model.Text);
+            _verdict.Foreground = DesktopTheme.Green;
             _verdict.Text = string.Format(Texts.ModelTestOkFormat, models.Count) +
-                            (models.Count > 0 ? "  " + Texts.ModelPickFromList : "");
+                (models.Count > 0 ? "  " + Texts.ModelPickFromList : "");
         }
-        catch (Exception e)
+        catch (OperationCanceledException) when (_testing.IsCancellationRequested) { }
+        catch (Exception error)
         {
-            _verdict.ForeColor = LauncherTheme.Red;
-            _verdict.Text = string.Format(Texts.ModelTestFailFormat, e.Message);
+            _verdict.Foreground = DesktopTheme.Red;
+            _verdict.Text = string.Format(Texts.ModelTestFailFormat, error.Message);
         }
-        finally { _test.Enabled = true; }
+        finally
+        {
+            _testing.Dispose(); _testing = null;
+            _test.IsEnabled = true;
+            _url.IsEnabled = _model.IsEnabled = _key.IsEnabled = true;
+            _catalogue.IsEnabled = _catalogue.ItemCount > 0;
+            foreach (var button in _providers) button.IsEnabled = true;
+        }
     }
 
     private void Keep()
     {
-        _settings.Url = _url.Value.Trim();
-        _settings.Model = _model.Text.Trim();
-        _settings.Key = _key.Value;
-        _settings.AtOnce = (int)_atOnce.Value;
+        _settings.Url = _url.Text?.Trim() ?? "";
+        _settings.Model = _model.Text?.Trim() ?? "";
+        _settings.Key = _key.Text ?? "";
+        _settings.AtOnce = (int)(_atOnce.Value ?? 4);
         _settings.Save();
     }
-
-    protected override void OnFormClosing(FormClosingEventArgs e)
-    {
-        Keep();
-        base.OnFormClosing(e);
-    }
-
-    private Label Caption(string text, int x, int y) => new()
-    {
-        Text = text,
-        Bounds = new Rectangle(x, y, E(400), E(18)),
-        BackColor = Color.Transparent,
-        ForeColor = LauncherTheme.MutedGold,
-        Font = Letter(10f, FontStyle.Bold),
-    };
 }

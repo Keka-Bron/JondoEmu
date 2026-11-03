@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text.Json;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Handlers;
@@ -33,38 +32,8 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     public static partial class ControlApi
     {
-        /// <summary>The routes and the header come from the contract, which is what both share.</summary>
+        /// <summary>The route prefix comes from the shared contract.</summary>
         public const string Prefijo = Jondo.Unity.Launcher.Contract.Prefijo;
-
-        // ─── The secret ─────────────────────────────────────────────────────────────────────
-        //
-        // One per start: that way a launcher from a previous session does not keep a key to the
-        // current one. The contract keeps it, which is what knows where it is written and who reads it.
-
-        private static string _secreto = "";
-
-        /// <summary>Hands out a new secret and leaves it written. The server calls it on starting.</summary>
-        public static void NuevoSecreto() => _secreto = Contract.NuevoSecreto();
-
-        /// <summary>
-        /// Whether the request carries the secret this startup handed out.
-        /// </summary>
-        /// <remarks>
-        /// <b>Nothing calls this today</b>, and it is worth saying here because three places claimed
-        /// otherwise: HaapiServer said "without the secret this answers 403", Contract described it
-        /// as what protects these routes, and Program prints its file on every startup. None of them
-        /// reached this method, so the header the launcher sends was decoration.
-        ///
-        /// It stays unwired because enforcing it would close the remote-launcher mode, which is
-        /// supported: the launcher only sends the header if it can READ the file, and on another
-        /// machine it cannot. And it is not what matters — the admin routes go through ConRol, which
-        /// wants a token the database recognises plus the administrator role, checked server-side on
-        /// every request.
-        ///
-        /// Kept for the day this channel stops being local-only. If that day does not come, the
-        /// honest move is to delete this, _secreto, NuevoSecreto and the line in Program.
-        /// </remarks>
-        private static bool Autorizada(string? traido) => Contract.MismoSecreto(traido, _secreto);
 
         // ─── The responses ──────────────────────────────────────────────────────────────────
 
@@ -86,8 +55,7 @@ namespace Jondo.Unity.Server.Network
         /// Answers a control request. Returns null if the route is not from here, so that the
         /// HAAPI carries on with its own.
         /// </summary>
-        public static Respuesta? Responder(string ruta, string metodo, string cuerpo, string? secreto,
-                                           string ip = "")
+        public static Respuesta? Responder(string ruta, string metodo, string cuerpo, string ip = "")
         {
             if (!ruta.StartsWith(Prefijo, StringComparison.Ordinal)) return null;
 
@@ -110,7 +78,7 @@ namespace Jondo.Unity.Server.Network
                     case Prefijo + "recordar-token": return RecordarToken(cuerpo);
                     case Prefijo + "lanzamiento": return ConSesion(cuerpo, cuenta => Lanzamiento(cuerpo, cuenta, ip));
                     case Prefijo + "fin-de-lanzamiento":
-                        return ConSesion(cuerpo, cuenta => FinDeLanzamiento(cuenta));
+                        return ConSesion(cuerpo, cuenta => FinDeLanzamiento(cuerpo, cuenta));
                     // The Cazacabezas mod's window: his own hunter's record, board and order.
                     case Prefijo + "headhunts/status": return ConSesion(cuerpo, HeadHuntStatus);
                     case Prefijo + "headhunts/board": return ConSesion(cuerpo, HeadHuntBoard);
@@ -633,11 +601,15 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>The launcher reports that the client of that account has closed.</summary>
-        private static Respuesta FinDeLanzamiento(long cuenta)
+        private static Respuesta FinDeLanzamiento(string cuerpo, long cuenta)
         {
             // The account comes from the token, not from the body: if it came in the body, anyone could
             // throw someone else's account out of the registry just by writing its number.
-            if (cuenta > 0) ClientLaunchRegistry.RemoveByAccount(cuenta);
+            long instanceId = Numero(cuerpo, "instancia");
+            if (instanceId <= 0 || instanceId > int.MaxValue) return Mal(400, "instancia");
+            string hash = Texto(cuerpo, "hash");
+            if (string.IsNullOrWhiteSpace(hash)) return Mal(400, "hash");
+            ClientLaunchRegistry.RemoveByAccount(cuenta, (int)instanceId, hash);
             return Bien(new { bien = true });
         }
 

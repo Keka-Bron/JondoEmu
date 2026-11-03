@@ -1,5 +1,4 @@
-using System.Security.Cryptography;
-using System.Text;
+using Jondo.Unity.Launcher.Security;
 using Jondo.Unity.Launcher.UI;
 using Jondo.Unity.Reversing;
 
@@ -8,27 +7,26 @@ namespace Jondo.Unity.Deobfuscator;
 /// <summary>
 /// What the deobfuscator remembers from one time to the next.
 ///
-/// It lives in <c>%APPDATA%\Jondo\desofuscador.cfg</c>, in the same place and with the same
+/// It lives in the user's configuration directory, next to <c>Jondo/lanzador.cfg</c>, with the same
 /// <c>key=value</c> format as the launcher's preferences: outside the emulator's folder, because
 /// they are the user's preferences and not the emulator's data, and in text so it can be opened and
 /// fixed by hand if something goes wrong.
 ///
 /// ─── The API keys ───────────────────────────────────────────────────────────────────────
 ///
-/// With two exceptions. The first: the keys do NOT go in the clear. They are encrypted with DPAPI tied to the
-/// Windows account, so the file can only be decrypted from the session of whoever
-/// wrote them. It is not a safe —whoever can run code as you can read them— but it closes
-/// the two accidents that really happen: that they slip into a screenshot and that they leave
-/// in a zip for another machine.
+/// Keys use the desktop tools' shared secret store: DPAPI on Windows, and AES-GCM
+/// with an owner-only key file on Linux. Provider keys are never written in clear text.
 ///
-/// The second: ONE PER PROVIDER is kept. Trying Gemini for a while and going back to Claude cannot
+/// One key per provider is kept. Trying Gemini for a while and going back to Claude cannot
 /// cost going to fetch Claude's key again; whoever has three has all three set.
 /// </summary>
 public sealed class Settings
 {
+    private readonly string _path;
+    public Settings(string? preferencesFile = null) => _path = preferencesFile ?? Path;
     /// <summary>Where it lives, next to the launcher's.</summary>
     public static string Path { get; } = System.IO.Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Jondo", "desofuscador.cfg");
+        Jondo.Unity.Launcher.UserDirectories.Configuration, "Jondo", "desofuscador.cfg");
 
     // ─── The model ──────────────────────────────────────────────────────────────────────
 
@@ -74,9 +72,6 @@ public sealed class Settings
     /// <summary>The protocol assembly of the OLD version, the one already known.</summary>
     public string OldProtocolDll { get; set; } = "";
 
-    /// <summary>Which wizard step it was on, to be able to close and come back.</summary>
-    public int Step { get; set; }
-
     /// <summary>The window's language, of the three the emulator speaks.</summary>
     public Language Language { get; set; } = Language.Es;
 
@@ -85,10 +80,10 @@ public sealed class Settings
 
     // ─── To and from disk ───────────────────────────────────────────────────────────────
 
-    public static Settings Load()
+    public static Settings Load(string? preferencesFile = null)
     {
-        var settings = new Settings();
-        var values = Read();
+        var settings = new Settings(preferencesFile);
+        var values = Read(settings._path);
 
         settings.ProviderName = values.GetValueOrDefault("proveedor", settings.ProviderName);
         settings.Url = values.GetValueOrDefault("url", settings.Url);
@@ -111,8 +106,6 @@ public sealed class Settings
 
         if (int.TryParse(values.GetValueOrDefault("a.la.vez"), out int atOnce) && atOnce > 0)
             settings.AtOnce = Math.Min(32, atOnce);
-        if (int.TryParse(values.GetValueOrDefault("paso"), out int step) && step >= 0)
-            settings.Step = step;
 
         foreach (var (name, guarded) in values)
         {
@@ -129,8 +122,7 @@ public sealed class Settings
     {
         var lines = new List<string>
         {
-            "# Jondo deobfuscator preferences. The keys are encrypted against this Windows",
-            "# account: copying the file to another machine leaves them unreadable, and that is what is wanted.",
+            "# Jondo deobfuscator preferences. Keys use DPAPI on Windows, AES-GCM with a private key file on Linux.",
             "# The rest is text and can be edited by hand.",
             "proveedor=" + ProviderName,
             "url=" + Url,
@@ -144,38 +136,37 @@ public sealed class Settings
             "a.la.vez=" + AtOnce,
             "cliente=" + ClientFolder,
             "protocolo.viejo=" + OldProtocolDll,
-            "paso=" + Step,
             "idioma=" + LauncherTexts.Code(Language),
         };
 
         foreach (var (provider, clear) in _keys.OrderBy(p => p.Key, StringComparer.OrdinalIgnoreCase))
         {
             if (clear.Length == 0) continue;
-            string guarded = Cipher(clear);
+            string guarded = SecretStore.Protect(clear);
             if (guarded.Length > 0) lines.Add($"clave.{provider}={guarded}");
         }
 
         try
         {
-            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path)!);
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(_path)!);
 
             // It is written alongside and moved on top: if it is cut halfway, what is lost is the
             // new and not what was already there, which includes the keys.
-            string half = Path + ".escribiendo";
+            string half = _path + ".escribiendo";
             File.WriteAllLines(half, lines);
-            File.Move(half, Path, overwrite: true);
+            File.Move(half, _path, overwrite: true);
         }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
     }
 
-    private static Dictionary<string, string> Read()
+    private static Dictionary<string, string> Read(string path)
     {
         var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         try
         {
-            if (!File.Exists(Path)) return values;
-            foreach (string line in File.ReadAllLines(Path))
+            if (!File.Exists(path)) return values;
+            foreach (string line in File.ReadAllLines(path))
             {
                 if (line.Length == 0 || line[0] == '#') continue;
                 int equals = line.IndexOf('=');
@@ -187,37 +178,10 @@ public sealed class Settings
         return values;
     }
 
-    /// <summary>
-    /// A key, encrypted against the Windows account.
-    ///
-    /// If the encryption fails —which it should not, but it happens on system accounts and in some roaming
-    /// profiles— it is stored EMPTY on purpose. Asking for it again is annoying; leaving it in the clear in a
-    /// configuration file is worse.
-    /// </summary>
-    private static string Cipher(string clear)
-    {
-        if (clear.Length == 0) return "";
-        try
-        {
-            byte[] guarded = ProtectedData.Protect(
-                Encoding.UTF8.GetBytes(clear), null, DataProtectionScope.CurrentUser);
-            return Convert.ToBase64String(guarded);
-        }
-        catch (CryptographicException) { return ""; }
-        catch (PlatformNotSupportedException) { return ""; }
-    }
-
     private static string Decipher(string guarded)
     {
         if (guarded.Length == 0) return "";
-        try
-        {
-            byte[] clear = ProtectedData.Unprotect(
-                Convert.FromBase64String(guarded), null, DataProtectionScope.CurrentUser);
-            return Encoding.UTF8.GetString(clear);
-        }
-        catch (CryptographicException) { return ""; }
-        catch (FormatException) { return ""; }
-        catch (PlatformNotSupportedException) { return ""; }
+        // Older Deobfuscator settings contain unprefixed DPAPI ciphertext, never plain Base64.
+        return SecretStore.Unprotect(guarded.Contains(':') ? guarded : "dpapi:" + guarded);
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,8 +63,9 @@ namespace Jondo.Unity.Launcher.Packs
         public string ClientRoot { get; }
 
         public string CacheFolder { get; }
+        public string Platform => ClientInstallation.InDirectory(ClientRoot)?.Platform ?? "windows";
 
-        /// <summary>Whether a Dofus.exe from this folder is running. Replaceable for tests.</summary>
+        /// <summary>Whether the client executable from this folder is running. Replaceable for tests.</summary>
         public Func<string, bool> IsClientRunning { get; init; } = ClientRunningFrom;
 
         /// <summary>Free bytes on the disk holding a path, or null if unknown. Replaceable for tests.</summary>
@@ -82,7 +84,7 @@ namespace Jondo.Unity.Launcher.Packs
             get
             {
                 string version = ClientVersion;
-                return version.Length == 0 ? "" : ManifestStore.UrlFor(version);
+                return version.Length == 0 ? "" : ManifestStore.UrlFor(version, Platform);
             }
         }
 
@@ -93,7 +95,7 @@ namespace Jondo.Unity.Launcher.Packs
         /// </summary>
         public PackStatus Status(TexturePack pack)
         {
-            if (ClientRoot.Length == 0 || !File.Exists(Path.Combine(ClientRoot, "Dofus.exe")))
+            if (ClientRoot.Length == 0 || ClientInstallation.InDirectory(ClientRoot) == null)
                 return new PackStatus(pack, PackState.NoClient, "", "", null);
 
             string version = ClientVersion;
@@ -109,6 +111,7 @@ namespace Jondo.Unity.Launcher.Packs
                                || Directory.EnumerateFiles(folder, "*" + PackDownloader.PartSuffix).Any();
             bool markerForThisVersion = marker != null
                                         && marker.Version == version
+                                        && marker.Platform == Platform
                                         && marker.Fragment == pack.Fragment
                                         && marker.Files.Count > 0;
             bool allThere = markerForThisVersion && marker!.Files.All(f =>
@@ -153,7 +156,7 @@ namespace Jondo.Unity.Launcher.Packs
             string version = RequireVersion();
             RequireClientClosed();
 
-            var manifest = await new ManifestStore(_http, CacheFolder).GetAsync(version, meter, cancel);
+            var manifest = await new ManifestStore(_http, CacheFolder, Platform).GetAsync(version, meter, cancel);
             var fragment = manifest.Fragment(pack.Fragment)
                            ?? throw new PackException(PackError.FragmentMissing, pack.Fragment + " in " + ManifestStore.ReleaseName(version));
 
@@ -163,7 +166,7 @@ namespace Jondo.Unity.Launcher.Packs
             {
                 // The names come from the network; none may land outside the pack folder.
                 string path = Path.GetFullPath(Path.Combine(ClientRoot, file.Name.Replace('/', Path.DirectorySeparatorChar)));
-                if (!path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                if (!path.StartsWith(prefix, ClientInstallation.PathComparison))
                     throw new PackException(PackError.BadManifest, file.Name + " is outside " + pack.RelativeFolder);
             }
 
@@ -191,6 +194,7 @@ namespace Jondo.Unity.Launcher.Packs
             WriteMarker(folder, new PackMarker
             {
                 Version = version,
+                Platform = Platform,
                 Fragment = pack.Fragment,
                 Files = fragment.Files.Select(f => new PackMarker.Entry { Name = f.Name, Size = f.Size, Sha1 = f.Hash.ToString() }).ToList(),
             });
@@ -219,7 +223,7 @@ namespace Jondo.Unity.Launcher.Packs
 
         private string RequireVersion()
         {
-            if (ClientRoot.Length == 0 || !File.Exists(Path.Combine(ClientRoot, "Dofus.exe")))
+            if (ClientRoot.Length == 0 || ClientInstallation.InDirectory(ClientRoot) == null)
                 throw new PackException(PackError.NoClient, ClientRoot);
 
             string version = ClientVersion;
@@ -254,8 +258,9 @@ namespace Jondo.Unity.Launcher.Packs
         {
             try
             {
-                string? root = Path.GetPathRoot(Path.GetFullPath(path));
-                return string.IsNullOrEmpty(root) ? null : new DriveInfo(root).AvailableFreeSpace;
+                // Unix queries the filesystem at this path, including mounts and symlinks.
+                // Reducing it to '/' would measure the system disk instead of the client's disk.
+                return new DriveInfo(Path.GetFullPath(path)).AvailableFreeSpace;
             }
             catch (Exception ex) when (ex is IOException or ArgumentException or UnauthorizedAccessException)
             {
@@ -266,16 +271,20 @@ namespace Jondo.Unity.Launcher.Packs
         private static bool ClientRunningFrom(string root)
         {
             if (root.Length == 0) return false;
-            string wanted = Path.GetFullPath(Path.Combine(root, "Dofus.exe"));
+            var installation = ClientInstallation.InDirectory(root);
+            if (installation == null) return false;
+            // Linux reports the resolved executable through /proc, even when launched through
+            // a symlinked file or directory. Normalize the selected installation the same way.
+            string wanted = CanonicalExecutable(installation.Executable);
 
-            foreach (var process in Process.GetProcessesByName("Dofus"))
+            foreach (var process in Process.GetProcesses())
             {
                 using (process)
                 {
                     try
                     {
                         string? path = process.MainModule?.FileName;
-                        if (path != null && string.Equals(Path.GetFullPath(path), wanted, StringComparison.OrdinalIgnoreCase))
+                        if (path != null && string.Equals(Path.GetFullPath(path), wanted, ClientInstallation.PathComparison))
                             return true;
                     }
                     catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
@@ -288,11 +297,30 @@ namespace Jondo.Unity.Launcher.Packs
             return false;
         }
 
+        private static string CanonicalExecutable(string path)
+        {
+            if (!OperatingSystem.IsLinux()) return Path.GetFullPath(path);
+            IntPtr resolved = RealPath(path, IntPtr.Zero);
+            if (resolved == IntPtr.Zero)
+                throw new IOException("Cannot resolve client executable: " + path,
+                    new System.ComponentModel.Win32Exception(Marshal.GetLastPInvokeError()));
+            try { return Marshal.PtrToStringUTF8(resolved)!; }
+            finally { Free(resolved); }
+        }
+
+        [DllImport("libc", EntryPoint = "realpath", SetLastError = true)]
+        private static extern IntPtr RealPath([MarshalAs(UnmanagedType.LPUTF8Str)] string path, IntPtr buffer);
+
+        [DllImport("libc", EntryPoint = "free")]
+        private static extern void Free(IntPtr pointer);
+
         // ─── The marker ──────────────────────────────────────────────────────────────────
 
         /// <summary>What was verified, for which client version.</summary>
         internal sealed class PackMarker
         {
+            // Old markers were written only for Windows clients.
+            public string Platform { get; set; } = "windows";
             public string Version { get; set; } = "";
             public string Fragment { get; set; } = "";
             public List<Entry> Files { get; set; } = new();

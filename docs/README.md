@@ -87,6 +87,11 @@ and where the independent process and socket limits are enforced.
 *Go there* when changing the team UI, the launch arguments, account-token resolution or the path
 from a launcher row to its game socket.
 
+**[`linux-desktop.md`](linux-desktop.md)** — Building and running all four desktop tools on Linux.
+Native client discovery and configuration, XDG profile paths, optional audio, local publishing and
+the normal test commands.
+*Go there* when setting up a Linux checkout or selecting a native `Dofus.x64` installation.
+
 **`client-graphics.md`** — The HD and 4K scenery packs and the Windows renderer.
 What makes a pack show (on disk, `--hdReady` / `--4kReady` saying so, the player's pick in the
 game's options), why `-force-d3d11` is a separate choice, where the packs are on Ankama's CDN for
@@ -101,8 +106,8 @@ heuristic, what the build does about it, and where each engine takes false-posit
 
 **`remote-server.md`** — Running the server on another machine.
 How `JONDO_PUBLIC_BIND` opens all server services consistently, how the launcher's managed loopback
-relay bridges JondoFix to the configured host, which ports are involved and what the relay does not
-provide in terms of transport security.
+relay bridges Windows and native Linux clients to the configured host, which ports are involved and
+what the relay does not provide in terms of transport security.
 *Go there* when moving the server to a LAN host or VPS.
 
 **`data.md`** — Where each number comes from.
@@ -176,17 +181,20 @@ message changed since the previous version.
 
 | What | Where |
 |---|---|
-| The whole server: proxies, handlers, managers, database and launcher UI | `Jondo.Unity.Launcher/` (78 C# files, ~28,200 lines) |
-| Message handlers, one per subject | `Jondo.Unity.Launcher/Handlers/` (21 files) |
-| In-memory tables: cosmetics, mounts, spells, dungeons, mobs… | `Jondo.Unity.Launcher/Managers/` (21 files) |
-| Envelope, framing and the per-port servers | `Jondo.Unity.Launcher/Network/` and `Zaap/ZaapService.cs`; `Program.cs` starts five listeners: 5555 game, 5556 game node, 6337 chat, 8888 HAAPI, 15881 Zaap |
+| Server processes, handlers, managers, database and server UI | `Jondo.Unity.Server/` |
+| Launcher UI, client processes, texture packs and HTTP control client | `Jondo.Unity.Launcher/` |
+| Shared settings, control contract, palette and credential encryption | `Jondo.Unity.Contract/` |
+| Message handlers, one per subject | `Jondo.Unity.Server/Handlers/` |
+| In-memory tables: cosmetics, mounts, spells, dungeons, mobs… | `Jondo.Unity.Server/Managers/` |
+| Envelope, framing and the per-port servers | `Jondo.Unity.Server/Network/` and `Jondo.Unity.Server/Zaap/ZaapService.cs` |
 | The generated protobuf message classes | `Jondo.Unity.Protocol/Messages/Protocol.proto` |
-| The opcodes themselves, as three-letter literals | `Network/ConnectionProtocol.cs`, `Network/WorldEntry.cs`, `Network/GameNodeProxy.cs` and the handlers; the console labels are in `Protocol/NetworkMessage.cs` |
-| Fight state, monster AI, damage and isometric geometry | `Jondo.Unity.World/Fights/`, `Jondo.Unity.World/Maps/MapGeometry.cs`; the packet side of a fight is `Handlers/FightHandler.cs` |
+| The game opcodes | `Jondo.Unity.Protocol/Op.cs`; used by server network code and handlers |
+| Fight state, monster AI, damage and isometric geometry | `Jondo.Unity.World/Fights/`, `Jondo.Unity.World/Maps/MapGeometry.cs`; the packet side of a fight is `Jondo.Unity.Server/Handlers/FightHandler.cs` |
 | File lookup order: `datos/`, then `bases/`, then the root | `Jondo.Unity.Core/Paths.cs` |
 | The MelonLoader mod that redirects the client | `JondoFix/` |
 
-`Jondo.Unity.Core` holds only `Paths.cs`. Authentication and HAAPI live in
+`Jondo.Unity.Core` holds file lookup (`Paths`), shared client discovery (`ClientInstallation`) and
+platform profile directories (`UserDirectories`). Authentication and HAAPI live in
 `Jondo.Unity.Server/Network/` (`HaapiServer.cs` and the login path of the game server).
 
 The opcodes are the constants of `Jondo.Unity.Protocol/Op.cs`. The old `OpcodeRegistry.cs` and
