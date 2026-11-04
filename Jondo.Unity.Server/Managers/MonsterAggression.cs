@@ -154,6 +154,8 @@ namespace Jondo.Unity.Server.Managers
         public static Threat Find(long characterId, int playerLevel, long mapId, int cell)
         {
             if (!Applies(mapId) || !MapAllows(mapId)) return null;
+            // Nor on a hunt's prey: no fight but against his hunter while it lasts.
+            if (HeadHunts.HuntedNow(characterId)) return null;
             var groups = MobSpawnManager.GetMobsForMap(mapId).Where(g => !FightHandler.IsGroupFighting(g.MobId));
             return Nearest(groups, GuildRaidManager.ResolverFor(characterId), playerLevel, cell);
         }

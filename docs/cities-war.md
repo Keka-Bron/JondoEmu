@@ -60,12 +60,19 @@ reach: the other city, PvP on, level 30 or more, from 20 levels below the hunter
 in the last two weeks; the online ones first. Three hunters at most per prey, one order per hunter,
 three days per order. Giving one up costs ten minutes; failing one costs an hour.
 
-**The hunt.** It opens when hunter and prey are both in the world, for 15 minutes; when it closes the
-prey rests 30 minutes before it can open again (both minutes are server settings). While it is open:
+**The hunt.** It opens when hunter and prey are both in the world and the prey is out of a fight on
+the world map, for 15 minutes; when it closes the prey rests 30 minutes before it can open again
+(both minutes are server settings). While it is open:
 
 - the prey cannot fold his wings — the client's own *cannot hide your alignment in an aggression
   zone* (317) — and is told so;
-- the hunter is told where the prey was seen, at once and every 45 seconds, with a map link;
+- the prey fights nobody but his hunter: no monsters (aggressive ones leave him alone), no duel, no
+  aggression from or on anybody else, no joining a fight; and he goes into no place the hunter cannot
+  follow him into — the Koliseo (he is taken out of its queue as the hunt opens), a Merkasako, a
+  dungeon, a house, his own or anybody's;
+- the hunter is told where the prey was seen, at once and every 45 seconds, with a map link — or,
+  if the prey stands on a map with no place on the world map, that he is away from it and where he
+  was last seen;
 - the mod draws a strip on top of the screen: the prey and the time left for the hunter, a warning for
   the prey;
 - it closes early if the prey leaves the world.

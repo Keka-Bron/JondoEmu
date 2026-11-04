@@ -35,7 +35,7 @@ namespace Jondo.Unity.Server.Network
             {
                 var prey = DatabaseManager.GetCharacterById(order.Target);
                 var preySession = SessionRegistry.FindByCharacter(order.Target);
-                var preyMap = preySession != null && order.Open(now) ? MapManager.GetMapInfo(preySession.State.MapId) : null;
+                var seen = order.Open(now) ? HeadHunts.SeenAt(order, preySession) : null;
                 hunt = new
                 {
                     target = order.Target,
@@ -48,8 +48,8 @@ namespace Jondo.Unity.Server.Network
                     openSeconds = order.Open(now) ? (int)((order.OpenUntilMs - now) / 1000) : 0,
                     restSeconds = order.RestUntilMs > now ? (int)((order.RestUntilMs - now) / 1000) : 0,
                     expiresSeconds = (int)Math.Max(0, (order.TakenMs + (long)HeadHunts.OrderLife.TotalMilliseconds - now) / 1000),
-                    seenX = preyMap?.PosX,
-                    seenY = preyMap?.PosY,
+                    seenX = seen?.X,
+                    seenY = seen?.Y,
                     bounty = HeadHunts.Bounty(order.Target, prey?.Level ?? 1, level),
                 };
             }

@@ -2084,6 +2084,7 @@ namespace Jondo.Unity.Server.Handlers
             long groupId = Network.FightProtocol.ReadFightRequest(payload);
             if (groupId == 0) return;
             if (await DreamHandler.GuestMayNotFightAsync(stream)) return;
+            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Fight)) return;
 
             long here = GameState.MapId;
             var group = MobSpawnManager.GetMobsForMap(here).Find(g => g.MobId == groupId);

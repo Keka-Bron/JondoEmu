@@ -78,6 +78,7 @@ namespace Jondo.Unity.Server.Handlers
             byte[]? jbn = ConnectionProtocol.ReadPayload(payload, Op.Jbn);
             if (jbn == null) return;
             if (await Managers.Jail.KeepsInAsync(stream)) return;
+            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Merkasako)) return;
 
             long owner = 0;
             foreach (var field in ProtoMessage.Parse(jbn).Fields)
@@ -214,6 +215,8 @@ namespace Jondo.Unity.Server.Handlers
             bool accepted = false;
             foreach (var field in ProtoMessage.Parse(jas).Fields)
                 if (field.FieldNumber == 2 && field.WireType == 0) accepted = field.VarIntValue != 0;
+            // A hunted guest declines: a Merkasako is no place the hunter can follow him into.
+            if (accepted && await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Merkasako)) accepted = false;
 
             var host = SessionRegistry.FindByCharacter(invitation.Host);
             if (host != null)

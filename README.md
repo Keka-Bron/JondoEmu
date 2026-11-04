@@ -855,6 +855,8 @@ button beside the honour bar in the alignment tab, opens its window.
   can open again (both in the server's settings)
 - ✅ While it is open, the hunter is told where the prey was seen every 45 seconds, with a map link,
   and a strip at the top of the screen counts down; the prey is warned and cannot fold their wings
+- ✅ While it is open, the prey fights nobody but the hunter and cannot hide: no monsters, no duels,
+  no Koliseo, no Merkasako, no dungeon, no house
 - ✅ Beat your prey in an aggression: 3 to 13 **chapeuvepés**, by its grade, its kill streak and its
   level, and 50 honour
 - ✅ The prey who beats their hunter gets a chapeuvepé and 50 honour, and the hunter waits an hour

@@ -120,6 +120,37 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal("locked", HeadHunts.CannotHunt(hunter, 100));
             }, "B");
 
+        /// <summary>
+        /// While the hunt is open the prey fights nobody but his hunter, and goes into no place the
+        /// hunter cannot follow him into: the Koliseo, a Merkasako, a dungeon, a house.
+        /// </summary>
+        [Fact]
+        public Task The_prey_is_held_out_in_the_open_while_the_hunt_lasts()
+            => WithHunt(async (hunter, prey, h, p) =>
+            {
+                const long Somebody = 8_980_000_099;
+                using (SessionContext.Push(p.Session))
+                {
+                    foreach (var hold in Enum.GetValues<HeadHunts.Hold>())
+                        Assert.True(await HeadHunts.HoldsAsync(p.ToClient, hold));
+                    Assert.False(await HeadHunts.RefusesFightAsync(p.ToClient, prey, hunter));
+                    Assert.True(await HeadHunts.RefusesFightAsync(p.ToClient, prey, Somebody));
+                }
+                using (SessionContext.Push(h.Session))
+                {
+                    // The hunter himself goes where he likes; and nobody else takes his prey.
+                    Assert.False(await HeadHunts.HoldsAsync(h.ToClient, HeadHunts.Hold.Dungeon));
+                    Assert.False(await HeadHunts.RefusesFightAsync(h.ToClient, hunter, prey));
+                }
+                Assert.False(HeadHunts.MayFight(Somebody, prey));
+                Assert.True(HeadHunts.MayFight(Somebody, hunter));
+
+                // The hunt over, the prey is free again.
+                await HeadHunts.AggressionEndedAsync(Aggression(hunter, 100, prey, 110), attackersWon: false);
+                using (SessionContext.Push(p.Session))
+                    Assert.False(await HeadHunts.HoldsAsync(p.ToClient, HeadHunts.Hold.Koliseo));
+            }, "D");
+
         [Fact]
         public Task The_hunt_closes_when_its_time_is_up_and_the_prey_rests()
             => WithHunt(async (hunter, prey, h, p) =>

@@ -103,6 +103,7 @@ namespace Jondo.Unity.Server.Handlers
             if (dungeon == null || dungeon.FirstRoom == 0) return false;
             // Before the key is spent.
             if (await Managers.Jail.KeepsInAsync(stream)) return false;
+            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Dungeon)) return false;
 
             var state = SessionContext.State;
 

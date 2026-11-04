@@ -276,6 +276,28 @@ namespace Jondo.Unity.Server
             }
         }
 
+        /// <summary>
+        /// Whether a map's coordinates are a place on the world map, which a [x,y] link can point at.
+        /// </summary>
+        /// <remarks>
+        /// [0,0] is a real square -- Amakna's village -- and also what 3,357 maps carry for having
+        /// none: the Koliseo's arenas («Ecaflip City (Duel)», 233313286), instances, houses. A real
+        /// [0,0] has a neighbour one step away with the coordinates that go with it; of the 3,357,
+        /// eleven do. The arenas have neighbours too, at [0,0] as well.
+        /// </remarks>
+        public static bool OnTheWorldMap(long mapId)
+        {
+            var map = GetMapInfo(mapId);
+            if (map == null) return false;
+            if (map.PosX != 0 || map.PosY != 0) return true;
+            if (!ScrollActions.TryGetValue(mapId, out var scroll)) return false;
+            return OneStep(scroll.RightMapId, 1, 0) || OneStep(scroll.BottomMapId, 0, 1)
+                   || OneStep(scroll.LeftMapId, -1, 0) || OneStep(scroll.TopMapId, 0, -1);
+
+            static bool OneStep(long next, int x, int y)
+                => next > 0 && GetMapInfo(next) is { } there && there.PosX == x && there.PosY == y;
+        }
+
         public static MapInfo GetMapInfo(long mapId)
         {
             if (Maps.TryGetValue(mapId, out var info))

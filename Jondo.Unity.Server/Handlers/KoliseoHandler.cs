@@ -137,8 +137,10 @@ namespace Jondo.Unity.Server.Handlers
         {
             byte[]? lsm = ConnectionProtocol.ReadPayload(payload, Op.Lsm);
             if (lsm == null) return;
-            // A Koliseo fight is a trip to an arena: none for a prisoner, nor in a conquest.
+            // A Koliseo fight is a trip to an arena: none for a prisoner, nor in a conquest, nor
+            // for a hunt's prey.
             if (await Managers.Jail.KeepsInAsync(stream)) return;
+            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Koliseo)) return;
             if (await ConquestHandler.HoldsInAsync(stream, ConquestHandler.NoKoliseoInAWar)) return;
 
             int indice = IndiceDeModalidad(lsm, 1);
@@ -228,6 +230,9 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (field.FieldNumber == 2 && field.WireType == 0) acepta = field.VarIntValue != 0;
             }
+
+            // Enrolled before the hunt opened: the match is declined for him.
+            if (acepta && await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Koliseo)) acepta = false;
 
             // The acknowledgement always goes, yes or no: it is the answer to HIS request.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

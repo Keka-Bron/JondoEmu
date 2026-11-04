@@ -50,6 +50,9 @@ namespace Jondo.Unity.Server.Handlers
             long challengerId = GameState.CharacterId;
             if (targetId == 0 || challengerId == 0 || targetId == challengerId) return;
 
+            // A hunt's prey fights nobody but his hunter, and nobody but the hunter fights him.
+            if (await Managers.HeadHunts.RefusesFightAsync(stream, challengerId, targetId)) return;
+
             // Without its f2 it is no challenge but «Agredir» (PlayerMenuMaker.OnAttack): an
             // aggression, in a conquest's zone.
             if (!friendly)
@@ -120,6 +123,9 @@ namespace Jondo.Unity.Server.Handlers
                 Console.WriteLine($"[Duel] #{id}: {GameState.CharacterId} answers and it is not their turn to.");
                 return;
             }
+
+            // Challenged before the hunt opened: declined, if it would be a fight the hunt forbids.
+            if (accepted && await Managers.HeadHunts.RefusesFightAsync(stream, desafio.TargetId, desafio.ChallengerId)) accepted = false;
 
             byte[] resultado = ConnectionProtocol.Push(Op.Hpv,
                 FightProtocol.BuildChallengeAnswered(

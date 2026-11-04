@@ -468,6 +468,9 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A hunt's prey joins nobody's fight.
+            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Fight)) return;
+
             // The check and the join under the fight's turn: two coming in for its last place at
             // once both found it free.
             if (fight != null) await InTurnAsync(fight, () => JoinCheckedAsync(me, fight, named, fightId));

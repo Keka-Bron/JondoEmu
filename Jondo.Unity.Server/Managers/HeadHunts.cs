@@ -77,6 +77,9 @@ namespace Jondo.Unity.Server.Managers
             public long OpenUntilMs { get; set; }
             public long RestUntilMs { get; set; }
             public long LastSightingMs { get; set; }
+
+            /// <summary>The last place on the world map the prey was seen at, kept while he is somewhere that has none.</summary>
+            public (int X, int Y)? LastSeen { get; set; }
             public bool Open(long now) => OpenUntilMs > now;
         }
 
@@ -114,6 +117,58 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>Whether a hunt on him is open right now: his wings cannot be folded.</summary>
         public static bool HuntedNow(long target) => On && OrdersOn(target).Any(o => o.Open(Now));
+
+        /// <summary>Whether that hunter's hunt on that prey is open right now.</summary>
+        public static bool HuntsNow(long hunter, long prey) => On && OrdersOn(prey).Any(o => o.Hunter == hunter && o.Open(Now));
+
+        // ─── What the prey may not do while the hunt is open ───────────────────────────────
+
+        /// <summary>
+        /// The ways out of the hunt a prey is denied while it is open: any fight but against his
+        /// hunter, and every place the hunter cannot follow him into -- the Koliseo, a Merkasako,
+        /// a dungeon, a house, his own or a friend's or the guild's. The server's rule: a hunt that
+        /// could be waited out in a house or an arena is no hunt.
+        /// </summary>
+        public enum Hold { Fight, Koliseo, Merkasako, Dungeon, House }
+
+        /// <summary>
+        /// Whether the character in session is held by an open hunt from doing that; he is told so.
+        /// Asked where the jail asks (<see cref="Jail.KeepsInAsync"/>), and before every fight.
+        /// </summary>
+        public static async Task<bool> HoldsAsync(System.Net.Sockets.NetworkStream? stream, Hold what)
+        {
+            long me = SessionContext.State.CharacterId;
+            if (me == 0 || !HuntedNow(me)) return false;
+            if (stream != null)
+            {
+                string language = SessionContext.State.Language;
+                string doing = CommandTexts.Get(language, "hunt.held." + what.ToString().ToLowerInvariant());
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildNotice(CommandTexts.Get(language, "hunt.held", (object)doing))));
+            }
+            Console.WriteLine($"[Head hunts] {me} is hunted and may not go into a {what}.");
+            return true;
+        }
+
+        /// <summary>Whether these two may fight each other: neither is a prey under an open hunt, or the other is his hunter.</summary>
+        public static bool MayFight(long one, long other)
+            => (!HuntedNow(one) || HuntsNow(other, one)) && (!HuntedNow(other) || HuntsNow(one, other));
+
+        /// <summary>
+        /// A fight between these two refused, and why, to the one in session: he is the prey, or the
+        /// other one is somebody else's. True when it was refused.
+        /// </summary>
+        public static async Task<bool> RefusesFightAsync(System.Net.Sockets.NetworkStream stream, long me, long other)
+        {
+            if (MayFight(me, other)) return false;
+            if (HuntedNow(me) && !HuntsNow(other, me)) return await HoldsAsync(stream, Hold.Fight);
+
+            string language = SessionContext.State.Language;
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                ConnectionProtocol.BuildNotice(CommandTexts.Get(language, "hunt.taken", (object)NameOf(other)))));
+            Console.WriteLine($"[Head hunts] {me} may not fight {other}, whom somebody else is hunting.");
+            return true;
+        }
 
         /// <summary>Chapeuvepés given, or taken back; false when he has not that many to give back.</summary>
         public static bool Pay(long characterId, int chapeuvepes)
@@ -323,11 +378,25 @@ namespace Jondo.Unity.Server.Managers
                 {
                     await CloseAsync(order, now, "hunt.closed");
                 }
-                else if (preyIn && hunterIn && now >= order.RestUntilMs && Alignments.Of(order.Target).Sworn)
+                else if (preyIn && hunterIn && now >= order.RestUntilMs && Alignments.Of(order.Target).Sworn
+                         && OutInTheOpen(prey!))
                 {
                     await OpenAsync(order, prey!, now);
                 }
             }
+        }
+
+        /// <summary>
+        /// Whether the prey stands where a hunt can open: out of a fight, on the world map. A hunt
+        /// opened on him in the Koliseo or in a house had him somewhere the hunter cannot follow,
+        /// from where all there was to say was [0,0]. A map the server knows nothing of is taken as
+        /// open ground.
+        /// </summary>
+        private static bool OutInTheOpen(GameSession prey)
+        {
+            if (prey.State.IsInFight) return false;
+            long map = prey.State.MapId;
+            return MapManager.GetMapInfo(map) == null || MapManager.OnTheWorldMap(map);
         }
 
         /// <summary>
@@ -351,6 +420,10 @@ namespace Jondo.Unity.Server.Managers
                     await SlotLookHandler.RedrawAsync(prey.Stream);
                 }
             }
+            // Out of the Koliseo's queue: a match would take him to an arena the hunter cannot reach.
+            if (KoliseoQueue.Waits(order.Target) && prey.Stream != null)
+                using (SessionContext.Push(prey))
+                    await KoliseoHandler.LeaveQueueAsync(prey.Stream);
             await SightedAsync(order, prey);
             Console.WriteLine($"[Head hunts] The hunt of {order.Hunter} on {order.Target} opens for {minutes} minutes.");
         }
@@ -364,14 +437,41 @@ namespace Jondo.Unity.Server.Managers
             if (why == "hunt.closed") await NoticeAsync(order.Target, "hunt.respite");
         }
 
-        /// <summary>Where the prey was seen: his map's coordinates, a link the client sets a flag with.</summary>
+        /// <summary>
+        /// Where the prey was seen: his map's coordinates, a link the client sets a flag with -- or,
+        /// when his map has none (the Koliseo's arenas, an instance, a house: [0,0] for having no
+        /// place), that he is away from the world map and where he was last seen on it. Pointing at
+        /// [0,0] sent the hunter to Amakna's village after a prey fighting in the Koliseo.
+        /// </summary>
         private static async Task SightedAsync(Order order, GameSession prey)
         {
-            var map = MapManager.GetMapInfo(prey.State.MapId);
-            if (map == null) return;
-            string place = $"{{{{map,{map.PosX},{map.PosY},1::[{map.PosX},{map.PosY}]}}}}";
-            await NoticeAsync(order.Hunter, "hunt.seen", NameOf(order.Target), place);
+            string name = NameOf(order.Target);
+            var here = PlaceOf(prey);
+            if (here == null)
+            {
+                if (order.LastSeen is { } last) await NoticeAsync(order.Hunter, "hunt.away.last", name, Link(last));
+                else await NoticeAsync(order.Hunter, "hunt.away", name);
+                return;
+            }
+
+            order.LastSeen = here;
+            await NoticeAsync(order.Hunter, prey.State.IsInFight ? "hunt.seen.fighting" : "hunt.seen", name, Link(here.Value));
         }
+
+        private static string Link((int X, int Y) at) => $"{{{{map,{at.X},{at.Y},1::[{at.X},{at.Y}]}}}}";
+
+        /// <summary>The prey's place on the world map, or null when where he is has none.</summary>
+        public static (int X, int Y)? PlaceOf(GameSession prey)
+        {
+            long mapId = prey.State.MapId;
+            if (!MapManager.OnTheWorldMap(mapId)) return null;
+            var map = MapManager.GetMapInfo(mapId);
+            return (map.PosX, map.PosY);
+        }
+
+        /// <summary>Where the mod's strip says the prey is: where he is on the world map, else where he was last.</summary>
+        public static (int X, int Y)? SeenAt(Order order, GameSession? prey)
+            => (prey == null ? null : PlaceOf(prey)) ?? order.LastSeen;
 
         // ─── The end of an aggression ──────────────────────────────────────────────────────
 

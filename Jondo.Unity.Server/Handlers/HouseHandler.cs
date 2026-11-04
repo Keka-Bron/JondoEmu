@@ -184,6 +184,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
             if (await Managers.Jail.KeepsInAsync(stream)) return;
+            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.House)) return;
             if (stream != null && await ConquestHandler.HoldsInAsync(stream, ConquestHandler.NoTeleportInAWar)) return;
             await GoHomeAsync(stream, door, instance);
         }
@@ -198,6 +199,7 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task EnterAsync(NetworkStream? stream, int elementId, int skillId, int instance)
         {
             if (await Managers.Jail.KeepsInAsync(stream)) return;
+            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.House)) return;
             long here = SessionContext.State.MapId;
             if (!Houses.TryGetDoor(here, elementId, out var door) || !door.HasCopy(instance))
             {
