@@ -156,6 +156,64 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>A client request on root 2, with its id beside the message.</summary>
+        private static byte[] Request(string op, byte[] body, long id)
+            => Pb.New().Msg(2, Pb.New().Bytes(1, Pb.New().Str(1, "type.ankama.com/" + op).Bytes(2, body).Build())
+                                       .Var(2, id)).Build();
+
+        /// <summary>The root field a frame goes in, and the request id beside it.</summary>
+        private static (int Root, long Id) Envelope(byte[] frame)
+        {
+            var root = Fields(frame).Single();
+            return (root.FieldNumber, (long)Fields(root.BytesValue).First(f => f.FieldNumber == 2).VarIntValue);
+        }
+
+        /// <summary>
+        /// The new name and the new icon answered under the id they were asked with, as the capture
+        /// answers ihf's 40 with igc: the client keeps the icon beside that id, and only then counts
+        /// the build as changed and lights «Guardar».
+        /// </summary>
+        [Fact]
+        public async Task The_new_name_and_icon_are_answered_under_their_request()
+        {
+            long character = DatabaseManager.CreateCharacter(Account, 1, "Conjunto-Dos", 8, 0, 1,
+                new long[] { -1, -1, -1, -1, -1 }, 191105026, 200, 0, 0, Array.Empty<(int, int)>());
+            Assert.True(character > 0);
+            CharacterPresets.Forget(character);
+            try
+            {
+                await using var pipe = await ClientPipe.OpenAsync(Account, character, 990_100_043, "Conjunto-Dos");
+                using (SessionContext.Push(pipe.Session))
+                {
+                    pipe.Session.State.CharacterLevel = 200;
+                    pipe.Session.State.Breed = 8;
+                    await PresetHandler.CreateAsync(pipe.ToClient, Request("igp",
+                        Pb.New().Msg(1, Pb.New().EmptyMsg(2)).Var(2, 4).Str(4, "Conjunto (1)").Build(), -1));
+                    var made = Sub(Sub(await pipe.Next("igk"), 1), 1);
+                    string uuid = Text(made, 10);
+
+                    await PresetHandler.RenameAsync(pipe.ToClient, Request("ihf", Pb.New().Str(3, uuid).Str(4, "Fuerza").Build(), 40));
+                    Assert.Equal((3, 40L), Envelope(await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer)));
+
+                    await PresetHandler.IconAsync(pipe.ToClient, Request("iid", Pb.New().Str(2, uuid).Var(4, 7).Build(), 41));
+                    byte[] iir = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer);
+                    Assert.Equal((3, 41L), Envelope(iir));
+                    Assert.Equal("iir", ConnectionProtocol.ReadOpcode(iir));
+                    Assert.Equal(1, Fields(ConnectionProtocol.ReadPayload(iir, "iir")!).First(f => f.FieldNumber == 1).VarIntValue);
+
+                    await PresetHandler.SaveAsync(pipe.ToClient, Request("ihs", Pb.New().Str(2, uuid).Build(), 42));
+                    Assert.Equal((3, 42L), Envelope(await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer)));
+                    Assert.Equal(7, CharacterPresets.Find(character, uuid)!.Icon);
+                    Assert.Equal("Fuerza", CharacterPresets.Find(character, uuid)!.Name);
+                }
+            }
+            finally
+            {
+                CharacterPresets.Forget(character);
+                DatabaseManager.DeleteCharacter(character, Account);
+            }
+        }
+
         /// <summary>The item bar keeps what is dragged onto it: a build in slot 18, as in the capture.</summary>
         [Fact]
         public async Task The_item_bar_keeps_a_build_until_it_is_taken_off()

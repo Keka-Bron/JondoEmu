@@ -11,7 +11,8 @@ namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// The «Conjuntos» window (CharacterPresets, PresetProtocol). Each button of the client's
-    /// CharacterPresetUi goes out through the eql frame as one message, read there:
+    /// CharacterPresetUi goes out through the eql frame as one request, answered under its id
+    /// (<see cref="AnswerAsync"/>):
     /// <code>
     ///   ifg            the character's own state            -> ifz { 1 build }
     ///   igp            a new build: 1 { 1 copy of a uuid | 2 empty | 3 the character's state },
@@ -44,6 +45,17 @@ namespace Jondo.Unity.Server.Handlers
 
         private static Task SendAsync(NetworkStream stream, string op, byte[] body)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(op, body));
+
+        /// <summary>
+        /// The answer to one of the window's requests, under the id the request came with: the
+        /// capture answers every one of them so (igc under ihf's 40, the ija under igy's 42 to 52),
+        /// and the client finds what it asked by that id -- the icon and the build it was for, kept
+        /// beside the iid it sent. Sent loose, the new icon never reached the build, nothing was
+        /// left to save and «Guardar» stayed grey.
+        /// </summary>
+        private static Task AnswerAsync(NetworkStream stream, byte[]? request, string op, byte[] body)
+            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Answer(op, body, request == null ? -1 : ConnectionProtocol.RequestId(request)));
 
         private static List<ProtoField> Fields(byte[] payload, string op)
         {
@@ -97,11 +109,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>ifg: the window's first card.</summary>
-        public static async Task PlayerStateAsync(NetworkStream stream)
+        public static async Task PlayerStateAsync(NetworkStream stream, byte[]? request = null)
         {
             var character = Character();
             if (character == null) return;
-            await SendAsync(stream, "ifz", Pb.New().Bytes(1,
+            await AnswerAsync(stream, request, "ifz", Pb.New().Bytes(1,
                 PresetProtocol.BuildPreset(character, CurrentState(), playerState: true)).Build());
         }
 
@@ -159,7 +171,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            await SendAsync(stream, "igk", Pb.New().Msg(1, Pb.New().Bytes(1,
+            await AnswerAsync(stream, payload, "igk", Pb.New().Msg(1, Pb.New().Bytes(1,
                 PresetProtocol.BuildPreset(character, created))).Build());
             Console.WriteLine($"[Presets] {SessionContext.State.CharacterName} made «{created.Name}» ({created.Uuid}).");
         }
@@ -176,7 +188,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             string uuid = Text(Fields(payload, "ihs"), 2);
             bool saved = CharacterPresets.Save(Me, uuid);
-            await SendAsync(stream, "iim", Pb.New().VarIfNotZero(2, saved ? 1 : 0).Build());
+            await AnswerAsync(stream, payload, "iim", Pb.New().VarIfNotZero(2, saved ? 1 : 0).Build());
         }
 
         /// <summary>igo: the window's edits thrown away; ign carries the build as it was.</summary>
@@ -187,7 +199,7 @@ namespace Jondo.Unity.Server.Handlers
             var character = Character();
             var saved = CharacterPresets.Find(Me, uuid);
             if (character == null || saved == null) return;
-            await SendAsync(stream, "ign", Pb.New().Var(1, 1).Bytes(2, PresetProtocol.BuildPreset(character, saved)).Build());
+            await AnswerAsync(stream, payload, "ign", Pb.New().Var(1, 1).Bytes(2, PresetProtocol.BuildPreset(character, saved)).Build());
         }
 
         /// <summary>iin: the build becomes what the character wears now, with his points and bar.</summary>
@@ -204,7 +216,7 @@ namespace Jondo.Unity.Server.Handlers
             now.Icon = saved.Icon;
             now.Position = saved.Position;
             if (!CharacterPresets.Replace(Me, now)) return;
-            await SendAsync(stream, "ihz", Pb.New().Var(1, 1).Bytes(4, PresetProtocol.BuildPreset(character, now)).Build());
+            await AnswerAsync(stream, payload, "ihz", Pb.New().Var(1, 1).Bytes(4, PresetProtocol.BuildPreset(character, now)).Build());
         }
 
         /// <summary>iiy: a build deleted.</summary>
@@ -212,7 +224,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             string uuid = Text(Fields(payload, "iiy"), 1);
             bool deleted = CharacterPresets.Delete(Me, uuid);
-            await SendAsync(stream, "ihc", Pb.New().VarIfNotZero(1, deleted ? 1 : 0).Build());
+            await AnswerAsync(stream, payload, "ihc", Pb.New().VarIfNotZero(1, deleted ? 1 : 0).Build());
         }
 
         // ─── Editing ────────────────────────────────────────────────────────────
@@ -224,7 +236,7 @@ namespace Jondo.Unity.Server.Handlers
             var draft = CharacterPresets.ForEdit(Me, Text(fields, 3));
             if (draft == null) return;
             draft.Name = NameOrDefault(Text(fields, 4));
-            await SendAsync(stream, "igc", Array.Empty<byte>());
+            await AnswerAsync(stream, payload, "igc", Array.Empty<byte>());
         }
 
         /// <summary>iid: the icon, on the draft.</summary>
@@ -232,9 +244,9 @@ namespace Jondo.Unity.Server.Handlers
         {
             var fields = Fields(payload, "iid");
             var draft = CharacterPresets.ForEdit(Me, Text(fields, 2));
-            if (draft == null) return;
-            draft.Icon = (int)Number(fields, 4);
-            await SendAsync(stream, "iir", Pb.New().Var(1, 1).Build());
+            if (draft != null) draft.Icon = (int)Number(fields, 4);
+            // Refused, the client puts the selector back on the icon the build has.
+            await AnswerAsync(stream, payload, "iir", Pb.New().VarIfNotZero(1, draft != null ? 1 : 0).Build());
         }
 
         /// <summary>igy: the spells and their slots, the whole map each time.</summary>
@@ -245,7 +257,7 @@ namespace Jondo.Unity.Server.Handlers
             var spells = fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
             if (draft == null || spells == null) return;
             draft.Spells = PresetProtocol.ReadSpells(spells.BytesValue);
-            await SendAsync(stream, "ija", Pb.New().Var(1, 1).Build());
+            await AnswerAsync(stream, payload, "ija", Pb.New().Var(1, 1).Build());
         }
 
         /// <summary>
@@ -271,7 +283,7 @@ namespace Jondo.Unity.Server.Handlers
             if (fits) draft.Points = wanted;
             var sheet = PresetProtocol.Sheet(character.Level, draft.Points,
                                              Equipment.BonusesOf(PresetProtocol.Placed(draft)));
-            await SendAsync(stream, "ijd", Pb.New().Msg(1, sheet).VarIfNotZero(3, fits ? 1 : 0).Build());
+            await AnswerAsync(stream, payload, "ijd", Pb.New().Msg(1, sheet).VarIfNotZero(3, fits ? 1 : 0).Build());
         }
 
         /// <summary>Whether a distribution costs no more than the level's capital.</summary>
@@ -322,7 +334,7 @@ namespace Jondo.Unity.Server.Handlers
             var body = Pb.New()
                 .Msg(2, PresetProtocol.Sheet(character.Level, draft.Points, Equipment.BonusesOf(worn)))
                 .Bytes(3, PresetProtocol.Looks(character, worn));
-            await SendAsync(stream, "iic", Pb.New().Msg(2, body).VarIfNotZero(4, placed ? 1 : 0).Build());
+            await AnswerAsync(stream, payload, "iic", Pb.New().Msg(2, body).VarIfNotZero(4, placed ? 1 : 0).Build());
         }
 
         /// <summary>
@@ -343,8 +355,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var ihu = Pb.New();
             if (character != null && preset != null) ihu.Var(1, 1).Bytes(2, PresetProtocol.BuildPreset(character, preset));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer("ihu", ihu.Build(), ConnectionProtocol.RequestId(payload)));
+            await AnswerAsync(stream, payload, "ihu", ihu.Build());
         }
 
         // ─── Putting a build on ─────────────────────────────────────────────────
@@ -429,7 +440,7 @@ namespace Jondo.Unity.Server.Handlers
                 await SlotLookHandler.RedrawAsync(stream);
             }
 
-            await SendAsync(stream, "ihq", PresetProtocol.BuildEquipped());
+            await AnswerAsync(stream, payload, "ihq", PresetProtocol.BuildEquipped());
             Console.WriteLine($"[Presets] {state.CharacterName} put on «{preset.Name}»: {changed} variant(s), {moved} item move(s).");
         }
     }
