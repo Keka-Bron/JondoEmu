@@ -2629,7 +2629,7 @@ namespace Jondo.Unity.Server.Network
         {
             // The aura worn, before everything: f5 { f1 { f1 aura } }, an aura emote's id, which is
             // how the others' clients draw it -- 140 actors of the captures carry it, always first.
-            int aura = Managers.Wardrobe.AuraOf(characterId);
+            int aura = Managers.Wardrobe.ShownBy(characterId);
             if (aura != Managers.Wardrobe.None)
             {
                 humanoidBody.Msg(5, Pb.New().Msg(1, Pb.New().Var(1, aura)));

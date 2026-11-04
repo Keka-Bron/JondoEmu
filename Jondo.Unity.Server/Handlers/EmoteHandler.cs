@@ -18,7 +18,7 @@ namespace Jondo.Unity.Server.Handlers
             byte[]? khl = ConnectionProtocol.ReadPayload(payload, Op.Khl);
             if (khl == null) return;
 
-            await Emotes.PlayAsync(stream, EmoteProtocol.ReadPlay(khl));
+            await Emotes.PlayAsync(stream, EmoteProtocol.ReadPlay(khl), EmoteProtocol.ReadAutomatic(khl));
         }
 
         /// <summary>A smiley over the head (hov): f2 the smiley.</summary>

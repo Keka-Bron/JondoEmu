@@ -65,6 +65,13 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The emote asked for (khl): f1.</summary>
         public static int ReadPlay(byte[] khl) => (int)First(khl, 1);
 
+        /// <summary>
+        /// Whether the khl is the client's own, f2 set: the main aura it shows by itself when the
+        /// character faces the screen («Activar automáticamente mi aura de cara»), sent after every
+        /// walk of the captures that wear one. A click on the attitude comes without it.
+        /// </summary>
+        public static bool ReadAutomatic(byte[] khl) => First(khl, 2) != 0;
+
         /// <summary>The smiley asked for (hov): f2.</summary>
         public static int ReadSmiley(byte[] hov) => (int)First(hov, 2);
 

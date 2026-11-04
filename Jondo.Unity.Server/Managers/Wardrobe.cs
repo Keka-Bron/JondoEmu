@@ -209,6 +209,19 @@ namespace Jondo.Unity.Server.Managers
             => Save(characterId, "IdleId", idleId);
 
         /// <summary>The aura worn, an aura emote's id; 0 for none.</summary>
+        /// <summary>The aura shown from the attitudes, until the next step; the worn one otherwise.</summary>
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<long, int> _shown = new();
+
+        /// <summary>An aura played from the attitudes: drawn on the character until he moves.</summary>
+        public static void Show(long characterId, int auraId) => _shown[characterId] = auraId;
+
+        /// <summary>The aura shown taken off, on a step. True when there was one.</summary>
+        public static bool StopShowing(long characterId) => _shown.TryRemove(characterId, out _);
+
+        /// <summary>The aura his look carries: the one shown from the attitudes, else the one worn.</summary>
+        public static int ShownBy(long characterId)
+            => _shown.TryGetValue(characterId, out int shown) ? shown : AuraOf(characterId);
+
         public static int AuraOf(long characterId)
         {
             try

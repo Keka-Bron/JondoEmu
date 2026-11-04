@@ -44,9 +44,16 @@ namespace Jondo.Unity.Server.Handlers
             var gone = Equipment.All.Where(i => BonusSlots.IsBonusSlot(i.Position)
                                                 && i.Effects.Any(e => e.Effect == SlotLooks.DisappearsOnMoving))
                                     .ToList();
-            if (gone.Count == 0) return;
-
             long me = SessionContext.State.CharacterId;
+
+            // And an aura shown from the attitudes: the step takes it off, as in the capture.
+            bool auraGone = Wardrobe.StopShowing(me);
+            if (gone.Count == 0)
+            {
+                if (auraGone) await RedrawAsync(stream);
+                return;
+            }
+
             foreach (var item in gone) await AlterationHandler.RemoveSlotItemAsync(stream, me, item);
             await RedrawAsync(stream);
         }

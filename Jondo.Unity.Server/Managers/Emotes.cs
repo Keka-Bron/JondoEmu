@@ -76,12 +76,26 @@ namespace Jondo.Unity.Server.Managers
         /// The player asks to play an emote (khl). Played for everybody on the map, or refused in
         /// silence, as the real server does.
         /// </summary>
-        public static async Task PlayAsync(NetworkStream stream, int emoteId)
+        public static async Task PlayAsync(NetworkStream stream, int emoteId, bool automatic = false)
         {
             var state = SessionContext.State;
             if (state.IsInFight) return;
 
             var emote = _book?.Of(emoteId);
+
+            // An aura is not played but shown: «Activar mi aura». Clicked in the attitudes, the real
+            // server redraws the character with it -- jsn with the aura's option f5 { f1 { f1 aura } }
+            // and its subentity, «utilizar aura de septango-luego cancelarla caminando un paso» --
+            // and takes it off with the next step. The client's own khl for the main aura, f2 set,
+            // is answered by nobody: it draws that one itself. Refusing both, an aura never showed.
+            if (emote?.Aura == true)
+            {
+                if (automatic || !state.Emotes.Contains(emoteId)) return;
+                Wardrobe.Show(state.CharacterId, emoteId);
+                await Handlers.SlotLookHandler.RedrawAsync(stream);
+                Program.LogDebug($"[Attitudes] {state.CharacterName} shows aura {emoteId}.");
+                return;
+            }
             bool mounted = Mounts.Ridden() != null;
             var now = DateTime.UtcNow;
 

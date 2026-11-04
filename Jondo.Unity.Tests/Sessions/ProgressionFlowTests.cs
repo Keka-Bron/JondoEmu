@@ -367,5 +367,54 @@ namespace Jondo.Unity.Tests.Sessions
                 Forget();
             }
         }
+
+        /// <summary>
+        /// An aura clicked in the attitudes is shown, not played: the character redrawn with it (jsn,
+        /// its option f5 { f1 { f1 aura } }), and taken off with the next step --
+        /// «Apariencias\utilizar aura de septango-luego cancelarla caminando un paso». The client's
+        /// own khl for the main aura (f2 set) gets no answer, as in the captures.
+        /// </summary>
+        [Fact]
+        public async Task An_aura_from_the_attitudes_shows_until_the_next_step()
+        {
+            if (!Available) return;
+            Emotes.Load();
+            const long Account = 8_900_000_042;
+            const int Septango = 206;
+            long character = DatabaseManager.CreateCharacter(Account, 1, "Aura-Uno", 8, 0, 1,
+                new long[] { -1, -1, -1, -1, -1 }, 191105026, 200, 0, 0, Array.Empty<(int, int)>());
+            Assert.True(character > 0);
+            byte[] option = Pb.New().Msg(5, Pb.New().Msg(1, Pb.New().Var(1, Septango))).Build();
+            bool Carries(byte[] jsn) => Convert.ToHexString(jsn).Contains(Convert.ToHexString(option));
+
+            try
+            {
+                await using var pipe = await Jondo.Unity.Tests.Economy.ClientPipe.OpenAsync(Account, character, 191105026, "Aura-Uno");
+                using (SessionContext.Push(pipe.Session))
+                {
+                    Emotes.LoadFrom(character);
+                    // Owned already when the account is the server's administrator, who has them all.
+                    if (await Emotes.LearnAsync(pipe.ToClient, Septango)) await pipe.Next(Op.Khi);
+                    Assert.Contains(Septango, pipe.Session.State.Emotes);
+
+                    // The client's own, f2 set: it draws that one itself, and nothing is shown for it.
+                    await EmoteHandler.PlayAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Khl, Hex("08ce011001")));
+                    Assert.Equal(Wardrobe.None, Wardrobe.ShownBy(character));
+
+                    // Clicked: the character with the aura.
+                    await EmoteHandler.PlayAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Khl, Hex("08ce01")));
+                    Assert.True(Carries(await pipe.Next(Op.Jsn)));
+
+                    // A step: without it.
+                    await SlotLookHandler.OnMovingAsync(pipe.ToClient);
+                    Assert.False(Carries(await pipe.Next(Op.Jsn)));
+                }
+            }
+            finally
+            {
+                Wardrobe.StopShowing(character);
+                DatabaseManager.DeleteCharacter(character, Account);
+            }
+        }
     }
 }

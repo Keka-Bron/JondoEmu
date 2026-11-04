@@ -141,8 +141,9 @@ namespace Jondo.Unity.World.Emotes
         /// </summary>
         /// <remarks>
         /// Auras are refused as well: in eleven captures the client sends khl for an aura (171,
-        /// 206, 22) and not one of them gets a khh back. What the server does with them instead
-        /// is not in the captures.
+        /// 206, 22) and not one of them gets a khh back. An aura is shown rather than played --
+        /// the character redrawn with it, until the next step -- which the server does before it
+        /// gets here (Emotes.PlayAsync).
         /// </remarks>
         public static EmoteRefusal Check(Emote? emote, bool owned, bool mounted,
                                          DateTime now, DateTime lastPlayed)

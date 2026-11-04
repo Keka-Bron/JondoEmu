@@ -272,7 +272,7 @@ namespace Jondo.Unity.Server.Managers
             var cuerpo = BuildBodyLook(breedId, sex, headId, customColors, montado, prendas, quien);
 
             // The aura, on the map look only: no preview (lxc) of the captures carries it.
-            int auraBones = paraLaVentana ? 0 : Cosmetics.AuraBones(Wardrobe.AuraOf(quien));
+            int auraBones = paraLaVentana ? 0 : Cosmetics.AuraBones(Wardrobe.ShownBy(quien));
 
             // On foot the root is the character himself, so the pet hangs off him, and the aura after it.
             if (!montado)
