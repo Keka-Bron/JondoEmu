@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
@@ -33,6 +34,9 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static volatile QuestCatalogue? _book;
         private static readonly object _loadLock = new object();
+
+        /// <summary>«Misión terminada»: the lqn every finished quest of the captures opens its close with, the quest as its parameter.</summary>
+        public const int QuestFinishedMessage = 56;
 
         /// <summary>Line of dialogue to the steps it hands over.</summary>
         /// <remarks>
@@ -977,16 +981,18 @@ namespace Jondo.Unity.Server.Managers
             // And the followed quests' box, which the client fills from its own message (iel), in
             // the order they were taken up. Only those still in progress: a finished one leaves it.
             var followed = new List<(int, int, IReadOnlyList<int>, IReadOnlyCollection<int>)>();
-            foreach (int questId in FollowedQuests.Of(SessionContext.State.CharacterId))
+            long me = SessionContext.State.CharacterId;
+            foreach (int questId in new List<int>(FollowedQuests.Of(me)))
             {
                 int at = doing.FindIndex(d => d.Item1 == questId);
                 if (at >= 0) followed.Add(doing[at]);
+                // Finished before quests closed with their ied, and still kept as followed.
+                else FollowedQuests.Unfollow(me, questId);
             }
-            if (followed.Count > 0)
-            {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Iel, QuestProtocol.BuildFollowed(followed)));
-            }
+            // Always, even empty: iel replaces the client's box, and a box the client still held
+            // went on asking for an objective long done.
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iel, QuestProtocol.BuildFollowed(followed)));
         }
 
         /// <summary>
@@ -1033,6 +1039,18 @@ namespace Jondo.Unity.Server.Managers
             else
             {
                 Console.WriteLine($"[Quests] Quest {questId} finished.");
+
+                // As every finished quest of the captures closes: «misión terminada» (lqn 56 with
+                // the quest) and ied, which takes it out of the client's quests under way and out
+                // of its followed box -- without it the box went on asking for an objective long
+                // done. Then the marks, which the quest done may change.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                        InfoMessages.Info, QuestFinishedMessage, questId.ToString(CultureInfo.InvariantCulture))));
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+                FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
+                await SendMarksAsync(stream, SessionContext.State.MapId);
 
                 // An Almanax offering is made once a day: the day is written down, so the same
                 // quest is not handed out again until the saint comes round next year.

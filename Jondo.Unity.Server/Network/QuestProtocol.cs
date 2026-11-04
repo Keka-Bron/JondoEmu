@@ -34,6 +34,19 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Var(1, questId).Build();
 
         /// <summary>
+        /// A quest is done (ied).
+        ///
+        ///   f1: quest id
+        ///
+        /// Measured: every quest finished in the captures (the rat quest's 1633, the tutorial's 1629,
+        /// 1630, 2502, 2511 and 2545, Vulkania's 724) closes with the lqn 56 naming it and then
+        /// this. The client's quest frame (eps) takes the quest out of those under way and out of
+        /// the followed box on it, and files it with the finished ones.
+        /// </summary>
+        public static byte[] BuildQuestValidated(int questId)
+            => Pb.New().Var(1, questId).Build();
+
+        /// <summary>
         /// The whole journal in one message (idr): what is under way and what is done.
         ///
         ///   f1 (repeated) { f2: the objectives and the step, f3: quest id }   under way

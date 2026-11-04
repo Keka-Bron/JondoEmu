@@ -4327,6 +4327,128 @@
           ]
         }
       ]
+    },
+    {
+      "npc": 735,
+      "map": 0,
+      "opening": 30425,
+      "lines": [
+        {
+          "message": 30425,
+          "choices": [
+            {
+              "reply": 36690,
+              "next": 30426
+            }
+          ]
+        },
+        {
+          "message": 30426,
+          "choices": [
+            {
+              "reply": 36689,
+              "next": 30427
+            }
+          ]
+        },
+        {
+          "message": 30427,
+          "choices": [
+            {
+              "reply": 36688,
+              "next": 30428
+            }
+          ]
+        },
+        {
+          "message": 30428,
+          "choices": [
+            {
+              "reply": 36687,
+              "next": 30429
+            }
+          ]
+        },
+        {
+          "message": 30429,
+          "choices": [
+            {
+              "reply": 36686,
+              "next": 30430
+            }
+          ]
+        },
+        {
+          "message": 30430,
+          "choices": [
+            {
+              "reply": 36686
+            }
+          ]
+        }
+      ],
+      "why": "No capture. The recruiter's six lines and five replies, in the order their texts follow one another: the muse on the militia, «Hablar de la milicia», the creed, the interrupted tirade, two «Seguir escuchando», «Gracias por la explicación» and the send-off. They are the lines of «Vaya par» (quest 1994), whose step asks to come and see both recruiters; without a tree the template's opening went out with the chain's last reply."
+    },
+    {
+      "npc": 734,
+      "map": 0,
+      "opening": 30431,
+      "lines": [
+        {
+          "message": 30431,
+          "choices": [
+            {
+              "reply": 36695,
+              "next": 30432
+            }
+          ]
+        },
+        {
+          "message": 30432,
+          "choices": [
+            {
+              "reply": 36694,
+              "next": 30433
+            }
+          ]
+        },
+        {
+          "message": 30433,
+          "choices": [
+            {
+              "reply": 36693,
+              "next": 30434
+            }
+          ]
+        },
+        {
+          "message": 30434,
+          "choices": [
+            {
+              "reply": 36692,
+              "next": 30435
+            }
+          ]
+        },
+        {
+          "message": 30435,
+          "choices": [
+            {
+              "reply": 36691,
+              "next": 30436
+            }
+          ]
+        },
+        {
+          "message": 30436,
+          "choices": [
+            {
+              "reply": 36691
+            }
+          ]
+        }
+      ],
+      "why": "No capture. The recruiter's six lines and five replies, in the order their texts follow one another: the muse on the militia, «Hablar de la milicia», the creed, the interrupted tirade, two «Seguir escuchando», «Gracias por la explicación» and the send-off. They are the lines of «Vaya par» (quest 1994), whose step asks to come and see both recruiters; without a tree the template's opening went out with the chain's last reply."
     }
   ]
 }
