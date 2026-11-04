@@ -89,7 +89,7 @@ internal sealed class ServerWindow : Window
         Grid.SetRow(footer, 2);
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
         DockPanel.SetDock(actions, Dock.Right);
-        _settings = ServerTheme.Button("", async () => await new ServerSettingsWindow(_language).ShowDialog(this), LauncherPalette.LightGold);
+        _settings = ServerTheme.Button("", async () => await new ServerSettingsWindow(_language) { WindowState = WindowState.Maximized }.ShowDialog(this), LauncherPalette.LightGold);
         _clear = ServerTheme.Button("", _log.Clear);
         _stop = ServerTheme.Button("", async () => await Stop(), LauncherPalette.Red);
         _stop.Name = "StopServer";

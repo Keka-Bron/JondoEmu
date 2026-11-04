@@ -101,6 +101,9 @@ internal sealed class ServerSettingsWindow : Window
         Content = layout;
         Opened += (_, _) =>
         {
+            // Opened maximized from the server window, it fills the screen as that one does: the
+            // limits below would hold a maximized window to the screen less 40.
+            if (WindowState == WindowState.Maximized) return;
             var screen = Screens.ScreenFromWindow(this);
             if (screen == null) return;
             MaxHeight = Math.Max(MinHeight, screen.WorkingArea.Height / screen.Scaling - 40);
