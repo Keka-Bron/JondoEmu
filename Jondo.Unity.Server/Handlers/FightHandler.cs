@@ -3467,6 +3467,9 @@ namespace Jondo.Unity.Server.Handlers
                 if (!await CheckFightOverAsync(stream, fight)) await PassTurnAsync(stream);
                 return;
             }
+            // The glyph under him may have killed others in its area, the last of a side among
+            // them.
+            if (await CheckFightOverAsync(stream, fight)) return;
 
             await GivePointsBackAsync(stream, fight, fighter);
 
@@ -3964,7 +3967,10 @@ namespace Jondo.Unity.Server.Handlers
             await ReconciliarLosMurosAsync(stream, fight);
             await DispararLosGlifosAsync(stream, fight, walker, alPisar: true, skipWalls: true);
             if (await EffectEndedTheFightAsync(stream, fight)) return;
-            if (!walker.IsAlive) await CheckFightOverAsync(stream, fight);
+            // Not only his own death: the trap he walked into hits its whole area, and a Sram
+            // stepping on his own trap killed the last enemy with the fight still waiting for
+            // the end of his turn to notice.
+            await CheckFightOverAsync(stream, fight);
         }
 
         /// <summary>
@@ -9184,7 +9190,8 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// A monster walks a path: the move announced, and what lies on the ground where it ends.
-        /// False when the ground killed it -- the turn is over then, and has been ended.
+        /// False when the ground killed it or ended the fight -- the turn is over then, and has
+        /// been ended or the fight's end is under way.
         /// </summary>
         private static async Task<bool> MonsterWalkAsync(NetworkStream stream, FightInstance fight, Fighter monster,
                                                          List<int> planned)
@@ -9240,6 +9247,9 @@ namespace Jondo.Unity.Server.Handlers
                 await EndMonsterTurnAsync(stream, fight);
                 return false;
             }
+            // A trap goes off on its whole area: the last player standing in it ends the fight
+            // although the monster that walked in lives.
+            if (await CheckFightOverAsync(stream, fight)) return false;
             return true;
         }
 
