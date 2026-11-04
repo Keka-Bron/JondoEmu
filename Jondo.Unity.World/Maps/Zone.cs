@@ -619,8 +619,8 @@ namespace Jondo.Unity.World.Maps
             Fighter,
 
             /// <summary>
-            /// A bomb wall. It ENTERS the cell and stops there, and there is no collision damage:
-            /// the wall has its own.
+            /// A bomb wall, or a trap. It ENTERS the cell and stops there, and there is no collision
+            /// damage: the wall and the trap have their own.
             /// </summary>
             /// <remarks>
             /// From the class sheet: "Desplazar una entidad a un muro detendra su desplazamiento y

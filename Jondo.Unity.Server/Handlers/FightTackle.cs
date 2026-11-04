@@ -137,8 +137,10 @@ namespace Jondo.Unity.Server.Handlers
         {
             var walked = new List<int> { path[0] };
             if (path.Count < 2) return walked;
-            // A walk ends on the first portal of it that takes him on (FightPortals.cs).
+            // A walk ends on the first portal of it that takes him on (FightPortals.cs), and on
+            // the first trap that catches him.
             path = StopAtThePortal(fight, mover, path);
+            path = StopAtTheTrap(fight, mover, path);
             if (facing < 0) facing = StepOrientation(path[path.Count - 2], path[path.Count - 1]);
             mover.LastFacing = facing;
 

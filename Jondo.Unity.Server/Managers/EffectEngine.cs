@@ -758,6 +758,18 @@ namespace Jondo.Unity.Server.Managers
             return cell => Handlers.FightHandler.PortalCatches(fight, moved, cell);
         }
 
+        /// <summary>
+        /// The cells a push or a pull of <paramref name="moved"/> stops on once it enters them: the
+        /// bomb walls that catch him, and the traps that do (FightHandler.TrapCells) -- pushed into
+        /// the first trap of a network, he stops there and it goes off.
+        /// </summary>
+        private static HashSet<int> StoppingCells(FightInstance fight, Fighter moved)
+        {
+            var cells = BombWalls.StoppingCells(fight, moved);
+            cells.UnionWith(Handlers.FightHandler.TrapCells(fight, moved));
+            return cells;
+        }
+
         /// <summary>What a push that stopped on a portal has left to do from the way out, or null.</summary>
         private static (int Cells, int Dx, int Dy)? LeftPastThePortal(Jondo.Unity.World.Maps.Zone.PushResult push)
             => push.Stop == Jondo.Unity.World.Maps.Zone.PushStop.Portal
@@ -784,7 +796,7 @@ namespace Jondo.Unity.Server.Managers
             var push = Jondo.Unity.World.Maps.Zone.PushAlong(
                 from, rest.Dx, rest.Dy, rest.Cells,
                 MapManager.GetFightWalkable(fight.ArenaMapId), occupied,
-                BombWalls.StoppingCells(fight, moved), PortalStops(fight, moved, leg.Efecto));
+                StoppingCells(fight, moved), PortalStops(fight, moved, leg.Efecto));
             moved.MoverA(push.ToCell);
 
             // A rest that is blocked crashes as a blocked push would: the cells it could not
@@ -4657,11 +4669,12 @@ namespace Jondo.Unity.Server.Managers
                 // desplazamiento y le infligira danos", says the class sheet; it steps onto the
                 // wall cell and goes no further. Which walls count for THIS fighter is the whole
                 // rule -- Kabum, its own bombs, once a turn -- and that lives in BombWalls.
-                // And so does a portal that is on, which takes him (PortalStops).
+                // And so does a trap that catches him (StoppingCells), and a portal that is on,
+                // which takes him (PortalStops).
                 var empujon = Jondo.Unity.World.Maps.Zone.Push(
                     centroDelEmpuje, castFrom, desde, cuantas,
                     pisables: pisables, ocupadas: ocupadas,
-                    paran: BombWalls.StoppingCells(combate, sobre),
+                    paran: StoppingCells(combate, sobre),
                     judgedFrom: judgedFrom, portal: PortalStops(combate, sobre, efecto));
 
                 sobre.MoverA(empujon.ToCell);

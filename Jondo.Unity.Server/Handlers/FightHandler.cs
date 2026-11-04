@@ -4149,6 +4149,40 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// The cells of the traps that would go off under <paramref name="who"/>. Walked or pushed,
+        /// he stops on the first of them he enters and the trap goes off there: «el efecto se
+        /// interrumpe si se activa una trampa, un glifo o un portal durante el desplazamiento», as
+        /// the client words it, and the Sram's sheet builds its trap networks on it -- a push into
+        /// the first trap sets off the next. Checked only where the walk ended, a trap crossed on
+        /// the way went off on nobody.
+        /// </summary>
+        internal static HashSet<int> TrapCells(FightInstance fight, Fighter who)
+        {
+            var cells = new HashSet<int>();
+            if (fight == null || who == null) return cells;
+            foreach (var glifo in fight.Glifos)
+            {
+                if (glifo.Cuando != Jondo.Unity.World.Fights.Disparo.AlPisar || !glifo.SeDisparaAlPisar) continue;
+                if (Managers.BombWalls.IsWall(glifo) || !GlyphCatches(fight, glifo, who, byDisplacement: false)) continue;
+                cells.UnionWith(glifo.Casillas);
+            }
+            return cells;
+        }
+
+        /// <summary>A walk cut on the first cell of it that a trap catching the walker covers.</summary>
+        internal static IReadOnlyList<int> StopAtTheTrap(FightInstance fight, Fighter walker, IReadOnlyList<int> path)
+        {
+            if (fight.Glifos.Count == 0 || path == null) return path;
+            var traps = TrapCells(fight, walker);
+            if (traps.Count == 0) return path;
+            for (int i = 1; i < path.Count; i++)
+            {
+                if (traps.Contains(path[i])) return path.Take(i + 1).ToList();
+            }
+            return path;
+        }
+
+        /// <summary>
         /// A class spell's aura (<see cref="Jondo.Unity.World.Fights.Disparo.AlPonerse"/>) applied
         /// once, as it is laid: its caster's own rows on him -- Reloj de Bolsillo's turn-end 2794 on
         /// the Xelor, frame 2216 of its capture --, and the rest from its centre when the glyph's
