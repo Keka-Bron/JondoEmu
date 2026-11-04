@@ -1121,6 +1121,32 @@ namespace Jondo.Unity.Server.Network
 
             AddQuestElements(jss, mapId);
             AddReadableElements(jss, mapId);
+            AddAltar(jss, mapId);
+        }
+
+        /// <summary>
+        /// The day's room's altar, pressable for whoever has made his offering and has still to pray:
+        /// «Ahora puedes rezar ante el altar que se encuentra en la sala de las estaciones», says
+        /// Ontoral. Declared like a quest's element, skill 114 «Utiliser» and type -1, and for the
+        /// same reason: it belongs to one player's offering, not to the world.
+        /// </summary>
+        private static void AddAltar(Pb jss, long mapId)
+        {
+            int altar = Handlers.AlmanaxOfferingHandler.AltarOn(mapId);
+            if (altar == 0 || !Handlers.AlmanaxOfferingHandler.MayPray()) return;
+
+            var element = Managers.Interactives.ByElementId(mapId, altar);
+            if (element.Id == 0) return;
+
+            jss.Msg(11, Pb.New()
+                .Var(1, 1)
+                .Msg(4, Pb.New()
+                    .Var(1, Managers.Interactives.SkillInstanceOf(altar))
+                    .Var(2, Jondo.Unity.World.Quests.QuestBinding.DefaultSkill))
+                .Var(5, altar)
+                .Var(6, Jondo.Unity.World.Quests.QuestBinding.DefaultType));
+
+            DeclarePlacement(jss, element, Managers.ResourceState.Full);
         }
 
         /// <summary>
@@ -2183,6 +2209,26 @@ namespace Jondo.Unity.Server.Network
                 ios.Msg(2, una);
             }
             return ios.Build();
+        }
+
+        /// <summary>
+        /// The same question, with the texts its own line fills in: f3, one string per «#n». The
+        /// banker's greeting is the measured one -- «te costará #1 kamas» goes with f3 "1397",
+        /// frame 74 of the bank capture --, and Ontoral's «Haré esta ofrenda en tu nombre, #1»
+        /// goes the same way with the character's name.
+        /// </summary>
+        public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies,
+                                              IReadOnlyDictionary<long, IReadOnlyList<long>>? parametros,
+                                              IEnumerable<string> lineParameters)
+        {
+            var ios = Pb.New();
+            foreach (string parameter in lineParameters) ios.Str(3, parameter ?? "");
+            byte[] question = BuildNpcQuestion(messageId, replies, parametros!);
+            byte[] tail = ios.Build();
+            var both = new byte[question.Length + tail.Length];
+            Buffer.BlockCopy(question, 0, both, 0, question.Length);
+            Buffer.BlockCopy(tail, 0, both, question.Length, tail.Length);
+            return both;
         }
 
         /// <summary>

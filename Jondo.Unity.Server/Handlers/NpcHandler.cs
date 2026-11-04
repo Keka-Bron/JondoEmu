@@ -236,6 +236,22 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // Ontoral Zo: what he offers is the day's offering as the character has it
+            // (AlmanaxOfferingHandler). Other quests that only ask to come and see him still close.
+            if (AlmanaxOfferingHandler.Owns(npc.NpcId))
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
+                var (question, replies, texts) = AlmanaxOfferingHandler.Opening();
+                SessionContext.State.OpenDialogueNpcId = npc.NpcId;
+                SessionContext.State.OpenDialogueMapId = mapId;
+                SessionContext.State.OpenDialogueMessage = question;
+                await PreguntarAsync(stream, question, replies, lineParameters: texts);
+                await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
+                Console.WriteLine($"[NPC] Dialog of {npc.NpcId}: question {question}, {replies.Length} replies (the Almanax).");
+                return;
+            }
+
             // The Dispensador de favores of a dream favour opens on what the favour is at.
             if (npc.NpcId == Managers.Dreams.FavorNpc)
             {
@@ -681,7 +697,8 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task PreguntarAsync(NetworkStream stream, long pregunta, long[] respuestas,
                                                  Npcs.Template? plantilla = null,
                                                  Jondo.Unity.World.Content.DialogueLine? frase = null,
-                                                 Bankers.Banker? banker = null)
+                                                 Bankers.Banker? banker = null,
+                                                 IReadOnlyList<string>? lineParameters = null)
         {
             if (respuestas.Length == 0)
             {
@@ -729,9 +746,11 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ios,
-                    ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros)));
+            // A line that names somebody -- «Haré esta ofrenda en tu nombre, #1» -- carries the name.
+            byte[] ios = lineParameters is { Count: > 0 }
+                ? ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros, lineParameters)
+                : ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros);
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ios, ios));
         }
 
         /// <summary>
@@ -954,6 +973,22 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 SessionContext.State.OpenDialogueMessage = question;
                 await PreguntarAsync(stream, question, replies);
+                return;
+            }
+
+            // Ontoral Zo's (AlmanaxOfferingHandler).
+            if (AlmanaxOfferingHandler.Owns(SessionContext.State.OpenDialogueNpcId))
+            {
+                var (question, replies, texts) = await AlmanaxOfferingHandler.ReplyAsync(stream, reply);
+                if (question == 0)
+                {
+                    CerrarConversacion();
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(ConnectionProtocol.NpcDialogCloseReason)));
+                    return;
+                }
+                SessionContext.State.OpenDialogueMessage = question;
+                await PreguntarAsync(stream, question, replies, lineParameters: texts);
                 return;
             }
 

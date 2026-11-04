@@ -56,6 +56,13 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public const int SaintCell = 302, SaintFacing = 3;
 
+        /// <summary>
+        /// Where a room's altar stands: «Reza ante el altar de otoño» is said there. Measured on the
+        /// client's maps: each of the sixteen rooms has one element besides its two ways out, on this
+        /// cell, drawn with its season's altar (38616 to 38619).
+        /// </summary>
+        public const int AltarCell = 384;
+
         private static readonly (Season Season, int Month, int Day)[] Starts =
         {
             (Season.Spring, 3, 20), (Season.Summer, 6, 21), (Season.Autumn, 9, 22), (Season.Winter, 12, 21),
@@ -139,6 +146,15 @@ namespace Jondo.Unity.Server.Managers
         public static bool IsHall(long mapId) => AllSeasons.Any(s => HallOf(s) == mapId);
 
         public static bool IsRoom(long mapId) => SeasonOfRoom(mapId) != null;
+
+        /// <summary>A room's altar: its element on <see cref="AltarCell"/>. Zero when the map is no room or has none.</summary>
+        public static int AltarOf(long mapId)
+        {
+            if (!IsRoom(mapId)) return 0;
+            foreach (var element in Interactives.ElementsOf(mapId))
+                if (element.Cell == AltarCell) return element.Id;
+            return 0;
+        }
 
         /// <summary>
         /// Where a way of the temple leads today: the element on that cell clicked, or the cell

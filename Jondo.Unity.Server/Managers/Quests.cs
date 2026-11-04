@@ -210,19 +210,8 @@ namespace Jondo.Unity.Server.Managers
                 await StartAsync(stream, step.QuestId);
             }
 
-            // The Almanax offering names no line to be handed over on, so the rule for an NPC with
-            // no written tree is applied to the one who gives them all: his opening conversation
-            // hands over today's. INFERRED, see Almanax.
-            if (Almanax.Giver != 0 && SessionContext.State.OpenDialogueNpcId == Almanax.Giver)
-            {
-                int today = Almanax.TodaysOffering();
-                if (today != 0 && log.Run(today) is not { Finished: false }) await StartAsync(stream, today);
-
-                // And «El año del dragón», which no line of his hands over either: the year of
-                // offerings that ends in the Dolmanax. Once only; its own condition says from when.
-                int dragon = Almanax.Dragon.Quest;
-                if (dragon != 0 && log.Run(dragon) == null) await StartAsync(stream, dragon);
-            }
+            // The Almanax offering and «El año del dragón» are Ontoral's own replies now
+            // (Handlers.AlmanaxOfferingHandler): any reply of his used to take them, his farewell too.
         }
 
         /// <summary>
@@ -247,9 +236,18 @@ namespace Jondo.Unity.Server.Managers
                 var step = _book.Step(run.StepId);
                 if (step == null) continue;
 
+                // The offering goes in its order and through Ontoral's replies: the item handed
+                // over with «Entregarle la ofrenda», the coming back with «Responderle que has
+                // hablado con el espíritu del día», the 365 pages with their own reply. On a hello
+                // the whole offering closed at once, the prayer still to say. Only the saint is
+                // seen by talking to him, and only once the prayer has been said.
+                bool offering = Almanax.IsOffering(run.QuestId);
+                if (run.QuestId == Almanax.Dragon.Quest) continue;
+
                 foreach (var objective in step.Objectives)
                 {
                     if (objective.NpcId != npcId) continue;
+                    if (offering && (npcId == Almanax.Giver || !Handlers.AlmanaxOfferingHandler.MaySeeTheSaint(run.QuestId))) continue;
                     if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId) continue;
 
                     // "Bring me five ortie" and "show me the ring" name the same NPC as "come and
@@ -764,6 +762,14 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static bool OfferedAlreadyToday(int questId)
             => Almanax.IsOffering(questId) && Almanax.OfferedToday(SessionContext.State.AchievementTallies, questId);
+
+        /// <summary>Whether this character may take that quest now: not in hand, allowed, and not an offering already made today.</summary>
+        public static bool MayTake(int questId)
+        {
+            var log = Log;
+            return log != null && questId != 0 && log.Run(questId) is not { Finished: false }
+                   && !OfferedAlreadyToday(questId) && log.CanStart(questId, out _);
+        }
 
         /// <summary>
         /// Quests already in hand whose current step wants something from this NPC here.

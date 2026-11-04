@@ -223,12 +223,14 @@ namespace Jondo.Unity.Tests.Sessions
                     QuestEngine.LoadFrom(Character);
                     Achievements.LoadFrom(Character);
 
-                    // INFERRED: no capture visits the sanctuary. Talking to Ontoral Zo (NPC 1625)
-                    // and answering his opening line hands over the day's offering: quest 965,
-                    // "PL>19&Ad=11", on 26 September.
+                    // INFERRED: no capture visits the sanctuary. Ontoral Zo (NPC 1625) hands over the
+                    // day's offering when told «Decirle que estás dispuesto a hacer una ofrenda»:
+                    // quest 965, "PL>19&Ad=11", on 26 September. His other replies take nothing.
                     Assert.Equal(1625, Almanax.Giver);
                     at.Player.State.OpenDialogueNpcId = 1625;
                     await QuestEngine.OnReplyAsync(at.ToClient, 12047);
+                    Assert.Null(QuestEngine.Log!.Run(965));
+                    await AlmanaxOfferingHandler.ReplyAsync(at.ToClient, AlmanaxOfferingHandler.WillingToOffer);
                     Assert.Equal(QuestProtocol.BuildQuestStarted(965), await at.NextAsync(Op.Ief));
                     Assert.True(QuestEngine.Log!.Active(965));
 
@@ -292,8 +294,8 @@ namespace Jondo.Unity.Tests.Sessions
                     // Read off the data: quest 954, 365 of item 13345.
                     Assert.Equal((954, 13345, 365), Almanax.Dragon);
 
-                    at.Player.State.OpenDialogueNpcId = 1625;
-                    await QuestEngine.OnReplyAsync(at.ToClient, 12047);
+                    // «Decirle que estás dispuesto a hacer una ofrenda»: the day's and the year's.
+                    await AlmanaxOfferingHandler.ReplyAsync(at.ToClient, AlmanaxOfferingHandler.WillingToOffer);
                     Assert.True(QuestEngine.Log!.Active(965));
                     Assert.True(QuestEngine.Log!.Active(954));
 
@@ -306,6 +308,12 @@ namespace Jondo.Unity.Tests.Sessions
                     // A year of them, brought to Ontoral: the pages go, the Dolmanax comes.
                     Assert.True(await Equipment.GiveAsync(at.ToClient, 13345, 364));
                     await QuestEngine.OnTalkingToAsync(at.ToClient, 1625);
+                    Assert.True(QuestEngine.Log!.Active(954));   // a hello hands nothing over
+                    Assert.Contains(AlmanaxOfferingHandler.ShowThePages, AlmanaxOfferingHandler.Opening().Replies);
+                    Assert.Equal(AlmanaxOfferingHandler.Proud,
+                                 (await AlmanaxOfferingHandler.ReplyAsync(at.ToClient, AlmanaxOfferingHandler.ShowThePages)).Question);
+                    Assert.Equal(AlmanaxOfferingHandler.DolmanaxGiven,
+                                 (await AlmanaxOfferingHandler.ReplyAsync(at.ToClient, AlmanaxOfferingHandler.Accept)).Question);
                     Assert.False(QuestEngine.Log!.Active(954));
                     Assert.Equal(0, Equipment.HowMany(13345));
                     Assert.Equal(1, Equipment.HowMany(Almanax.Dolmanax));

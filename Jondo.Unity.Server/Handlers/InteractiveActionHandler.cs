@@ -95,6 +95,9 @@ namespace Jondo.Unity.Server.Handlers
             // until now a click like that fell into the «unknown use» branch.
             if (await Managers.Quests.OnInteractiveUsedAsync(stream, mapId, elementId)) return;
 
+            // The day's room's altar: the offering's prayer.
+            if (await AlmanaxOfferingHandler.OnAltarUsedAsync(stream, mapId, elementId)) return;
+
             if (!InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId,
                                                    out var interactive, out var action))
             {

@@ -86,12 +86,7 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildQuestion(long messageId, IEnumerable<long> replies,
                                            IReadOnlyDictionary<long, IReadOnlyList<long>>? replyParameters,
                                            IEnumerable<string> messageParameters)
-        {
-            byte[] question = ConnectionProtocol.BuildNpcQuestion(messageId, replies, replyParameters!);
-            var tail = Pb.New();
-            foreach (string parameter in messageParameters) tail.Str(3, parameter ?? "");
-            return Join(question, tail.Build());
-        }
+            => ConnectionProtocol.BuildNpcQuestion(messageId, replies, replyParameters, messageParameters);
 
         /// <summary>The fee paid, as the server says it: lqn { f2: 20, f4: fee }, frame 81.</summary>
         public static byte[] BuildFeePaid(long fee)
