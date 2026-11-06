@@ -161,6 +161,9 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public bool Pendiente { get; set; }
 
+        // A delayed sub-cast fixed to the original aimed cell rather than its buff bearer.
+        public int? PendingCastCell { get; init; }
+
         /// <summary>
         /// A wait born of a monster's behaviour -- its starting spell, or what its hooks for good
         /// fire --: when its round comes, what it casts is the monster's behaviour still, its hooks

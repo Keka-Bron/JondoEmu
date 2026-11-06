@@ -300,6 +300,99 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         [Fact]
+        public async Task Eclipse_uses_its_original_empty_cell_after_the_caster_moves()
+        {
+            var owner = Person(cell: 303);
+            var enemy = Person(-1, 0, 260); enemy.IsMonster = true; enemy.TeamId = 1;
+            var fight = Board(owner, enemy);
+            fight.StartFight();
+            await using var wire = await PortalTests.Wire.Open(Player);
+
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 23834, 2, null,
+                EffectEngine.AlLanzar, 246, critico: true, orderedForgelance: true);
+            Assert.Null(ForgelanceCombat.OwnLance(fight, owner));
+            Assert.Equal(1000, enemy.CurrentHP);
+            await wire.Drain();
+
+            owner.CellId = 330;
+            Assert.NotNull(fight.NextTurn());
+            Assert.NotNull(fight.NextTurn());
+            Assert.Equal(2, fight.RoundNumber);
+            await FightHandler.ApplyDuePendingAsync(wire.Session.Stream, fight);
+
+            Assert.Equal(246, ForgelanceCombat.OwnLance(fight, owner)?.CellId);
+            Assert.InRange(enemy.CurrentHP, 1, 999);
+            var frames = await wire.Drain();
+            var impact = frames.Where(f => f.Op == "jwe" && Value(f.Payload, 14) == 300)
+                .Select(f => Sub(f.Payload, 7))
+                .Where(f => Value(Sub(f, 7), 2) is 23835 or 23836).ToArray();
+            Assert.Equal(new long[] { 61895, 61893, 61973, 61974 }, impact.Select(f => Value(Sub(f, 7), 3)));
+            Assert.All(impact, f => Assert.Equal(246, Value(f, 6)));
+            Assert.Equal(new long[] { 0, 0, 0, 1 }, impact.Select(f => Value(f, 8)));
+        }
+
+        [Fact]
+        public async Task Holmgang_applies_its_first_aura_before_the_second_is_announced()
+        {
+            var owner = Person(cell: 425); owner.Buffs.PonerEstado(ForgelanceCombat.Armed);
+            var enemy = Person(-1, 0, 410); enemy.IsMonster = true; enemy.TeamId = 1;
+            var fight = Board(owner, enemy);
+            await using var wire = await PortalTests.Wire.Open(Player);
+
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 23846, 1, owner,
+                EffectEngine.AlLanzar, owner.CellId, orderedForgelance: true);
+
+            Assert.True(enemy.Buffs.TieneEstado(5736));
+            Assert.True(enemy.Buffs.TieneEstado(5744));
+            Assert.All(fight.Glifos, g => Assert.Equal(Disparo.AlPonerse, g.Cuando));
+            var actions = (await wire.Drain()).Where(f => f.Op == "jwe").Select(f => f.Payload).ToList();
+            int first = actions.FindIndex(f => Value(f, 14) == 1091 && Value(Sub(Sub(f, 32), 1), 3) == 30131);
+            int cast = actions.FindIndex(f => Value(f, 14) == 300 && Value(Sub(Sub(f, 7), 7), 3) == 80100);
+            int second = actions.FindIndex(f => Value(f, 14) == 1091 && Value(Sub(Sub(f, 32), 1), 3) == 23847);
+            Assert.True(first >= 0 && first < cast && cast < second);
+            Assert.Equal(410, Value(Sub(actions[cast], 7), 6));
+        }
+
+        [Fact]
+        public async Task A_second_lance_requires_the_first_to_be_recalled()
+        {
+            var owner = Person(); owner.Buffs.PonerActitud(24387);
+            var ally = Person(Player + 1, 9, 302);
+            var fight = Board(owner, ally);
+            await using var wire = await PortalTests.Wire.Open(Player);
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 24387, 1, owner,
+                EffectEngine.AlLanzar, owner.CellId);
+
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 23719, 1, null,
+                EffectEngine.AlLanzar, 344, orderedForgelance: true);
+            var first = ForgelanceCombat.OwnLance(fight, owner);
+            Assert.NotNull(first);
+            Assert.False(ForgelanceCombat.IsNear(owner, first));
+
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 23719, 1, null,
+                EffectEngine.AlLanzar, 316, orderedForgelance: true);
+            Assert.Same(first, Assert.Single(fight.Todos, f => f.IsAlive && f.MonsterId == 7139));
+            Assert.Equal(2, fight.Glifos.Count);
+
+            owner.CellId = 330;
+            await FightHandler.SyncForgelanceProximityAsync(wire.Session.Stream, fight);
+            Assert.True(owner.Buffs.TieneEstado(3589));
+            await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 23719, 1, null,
+                EffectEngine.AlLanzar, 316, orderedForgelance: true);
+            Assert.False(first.IsAlive);
+            var replacement = Assert.Single(fight.Todos, f => f.IsAlive && f.MonsterId == 7139);
+            Assert.Equal(316, replacement.CellId);
+            Assert.DoesNotContain(fight.Glifos, g => g.Dueno == first.Id);
+            Assert.Contains(ally.Buffs.Puestos, b => b.Quien == replacement.Id && b.EffectId == 1163);
+
+            owner.CurrentHP = 0;
+            await FightHandler.CaenSusInvocadosAsync(wire.Session.Stream, fight, owner);
+            Assert.False(replacement.IsAlive);
+            Assert.Empty(fight.Glifos);
+            Assert.DoesNotContain(ally.Buffs.Puestos, b => b.Quien == replacement.Id && b.EffectId == 1163);
+        }
+
+        [Fact]
         public async Task Throwing_and_retrieving_own_lance_restore_the_armed_state_and_power()
         {
             var owner = Person(); owner.Buffs.PonerActitud(24387);
@@ -317,10 +410,42 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(owner.Buffs.TieneEstado(3361));
             Assert.False(owner.Buffs.TieneEstado(3360));
             Assert.True(owner.Buffs.TieneEstado(3589));
-            await wire.Drain();
+            var marks = fight.Glifos.Where(g => g.Dueno == lance.Id).ToArray();
+            Assert.Equal(new[] { 1, 9 }, marks.Select(g => g.Casillas.Count).OrderBy(count => count));
+            Assert.All(marks, mark => Assert.Equal(Disparo.AlPonerse, mark.Cuando));
+            Assert.True(lance.Buffs.TieneEstado(4071));
+            var protection = Assert.Single(owner.Buffs.Puestos, b => b.HechizoOrigen == 24391 && b.EffectId == 1163);
+            Assert.Equal(90, protection.Cuanto);
+            Assert.Equal(-1, protection.CaducaEnRonda);
+
+            var laid = (await wire.Drain()).Where(f => f.Op == "jwe" && Value(f.Payload, 14) == 1091)
+                .Select(f => Sub(Sub(f.Payload, 32), 1)).ToArray();
+            Assert.Equal(new long[] { 2, 3 }, laid.Select(f => Value(f, 2)));
+            Assert.Equal(9, ProtoMessage.Parse(laid[0]).Fields.Count(f => f.FieldNumber == 1));
+            Assert.DoesNotContain(ProtoMessage.Parse(laid[1]).Fields, f => f.FieldNumber == 1);
+            Assert.All(laid, f => Assert.Equal(314, Value(f, 10)));
+
+            owner.CellId = 260;
+            await FightHandler.SyncForgelanceProximityAsync(wire.Session.Stream, fight);
+            Assert.DoesNotContain(protection, owner.Buffs.Puestos);
+            Assert.False(owner.Buffs.TieneEstado(3589));
+            owner.CellId = 300;
+            await FightHandler.SyncForgelanceProximityAsync(wire.Session.Stream, fight);
+            await FightHandler.SyncForgelanceProximityAsync(wire.Session.Stream, fight);
+            Assert.True(owner.Buffs.TieneEstado(3589));
+            Assert.Single(owner.Buffs.Puestos, b => b.HechizoOrigen == 24391 && b.EffectId == 1163);
+            Assert.DoesNotContain(await wire.Drain(), f => f.Op == "jwe" && Value(f.Payload, 14) is 306 or 307);
+
             await FightHandler.AplicarEfectosAsync(wire.Session.Stream, fight, owner, 23393, 1, enemy,
                 EffectEngine.AlLanzar, enemy.CellId, orderedForgelance: true);
             Assert.False(lance.IsAlive);
+            Assert.DoesNotContain(fight.Glifos, g => g.Dueno == lance.Id);
+            var frames = await wire.Drain();
+            foreach (var mark in marks)
+            {
+                var removal = FightProtocol.BuildGlyphGone(lance.Id, mark.Id);
+                Assert.Single(frames, f => f.Op == "jwe" && f.Payload.SequenceEqual(removal));
+            }
             Assert.True(owner.Buffs.TieneEstado(3360));
             Assert.False(owner.Buffs.TieneEstado(3361));
             Assert.False(owner.Buffs.TieneEstado(3589));

@@ -2666,7 +2666,23 @@ namespace Jondo.Unity.Server.Managers
                     {
                         var puesta = Aplicar(combat, caster, caster, spell, grade, efecto,
                                              round, alSuelo, sharedHealRoll);
-                        if (puesta != null) fuera.Add(puesta);
+                        if (puesta == null) continue;
+                        fuera.Add(puesta);
+
+                        // Holmgang's aura reads its guard state before the later row removes it.
+                        // The pose announces the aura itself; only its chained casts need a cast message.
+                        if (puesta.Glifo is { } aura && spell == ForgelanceCombat.Holmgang
+                            && ForgelanceCombat.Is(caster) && depth < HondoMaximo)
+                        {
+                            var victims = Todos(combat).Where(f => f.IsAlive && aura.Cubre(f.CellId)
+                                && CumpleLaMascara(caster, f, aura.Mascara)).ToList();
+                            foreach (var victim in victims)
+                            {
+                                var auraEffects = Resolver(combat, caster, aura.Hechizo, aura.Grado, victim,
+                                    AlLanzar, round, depth + 1, victim.CellId, critico: critical, soloAlObjetivo: true);
+                                fuera.AddRange(auraEffects.Skip(1));
+                            }
+                        }
                     }
                     continue;
                 }
@@ -2947,7 +2963,11 @@ namespace Jondo.Unity.Server.Managers
                         // instant until the chain ran out of depth.
                         if (efecto.Delay > 0 && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase))
                         {
-                            fuera.Add(Pendiente(combat, lanzaElHijo, aQuien ?? candidato, spell, grade, efecto, round));
+                            int? fixedCell = comoVa.Apunta == Apunta.ALaCasillaDelPadre && aimedCell >= 0
+                                && ForgelanceCombat.Is(caster) ? aQueCasilla : null;
+                            fuera.Add(Pendiente(combat, lanzaElHijo,
+                                fixedCell.HasValue ? lanzaElHijo : aQuien ?? candidato,
+                                spell, grade, efecto, round, castCell: fixedCell));
                             continue;
                         }
 
@@ -3744,7 +3764,7 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         private static Outcome Pendiente(FightInstance combate, Fighter quienLanza, Fighter sobre,
                                          int hechizo, int grado, SpellEffect efecto, int ronda,
-                                         int caracteristica = 0, int cuanto = 0)
+                                         int caracteristica = 0, int cuanto = 0, int? castCell = null)
         {
             int cuando = Empieza(efecto, ronda);
             var espera = sobre.Buffs.Poner(new Buff
@@ -3753,6 +3773,7 @@ namespace Jondo.Unity.Server.Managers
                 EffectUid = efecto.EffectUid,
                 MaxStacks = efecto.MaxStack,
                 Pendiente = true,
+                PendingCastCell = castCell,
                 Caracteristica = caracteristica,
                 Cuanto = cuanto,
                 Dado = efecto.DiceNum,
@@ -4065,14 +4086,17 @@ namespace Jondo.Unity.Server.Managers
                 if (efecto.DiceNum <= 0) return null;
 
                 var huella = CasillasDelEfecto(efecto, quienLanza.CellId, celdaApuntada);
+                if (hechizo == ForgelanceCombat.LanceAura && efecto.DiceSide == 2
+                    && ForgelanceCombat.IsActor(combate, quienLanza)
+                    && MapManager.GetFightWalkable(combate.ArenaMapId) is { } walkable)
+                    huella.RemoveAll(cell => !walkable.Contains(cell));
                 if (huella.Count == 0) huella = new List<int> { celdaApuntada };
 
                 var cuando = efecto.EffectId switch
                 {
-                    // A class spell's aura is applied as it is laid and goes off no more: fired at
-                    // every turn start, Premonición's swapped its target on the target's turn and
-                    // back again on the Xelor's. The monsters' and the Forgelance's keep theirs.
-                    GlifoDeAura when PlayerSpells.Contains(hechizo) && !ForgelanceCombat.IsActor(combate, quienLanza)
+                    // Class auras are applied as they are laid. The lance's blue aura then
+                    // updates its buffs on movement without firing a trap sequence.
+                    GlifoDeAura when PlayerSpells.Contains(hechizo) || ForgelanceCombat.IsActor(combate, quienLanza)
                         => Jondo.Unity.World.Fights.Disparo.AlPonerse,
                     Trampa => Jondo.Unity.World.Fights.Disparo.AlPisar,
                     GlifoDeInicioDeTurno => Jondo.Unity.World.Fights.Disparo.AlEmpezarElTurno,
