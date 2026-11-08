@@ -422,6 +422,7 @@ namespace JondoFix
 
         public override void OnInitializeMelon()
         {
+            TestInput.Start(LoggerInstance);
             LoadItemNames();
             LoadVendorNames();
             UseLocalRedirect = IsEmulatorActive();
@@ -754,6 +755,9 @@ namespace JondoFix
 
         public override void OnUpdate()
         {
+            // The test harness's pointer and keyboard, when the client was started for it.
+            TestInput.Tick();
+
             // The administrator's item window: its key, and what the server answered it.
             if (IsJondoAdministrator)
             {

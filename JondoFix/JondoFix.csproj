@@ -4,6 +4,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- Where the Dofus client is. It used to carry the absolute path of one specific machine,
          so here it finds itself and can be passed from outside:
 
