@@ -256,6 +256,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Waits for the deadline and, if not everybody has said yes, undoes it.</summary>
         private static async Task VencerAsync(KoliseoOffers.Offer oferta)
         {
+            using var quiet = ConsoleLogBuffer.QuietWhile(Bots.SimulatedPlayers.OnlyBots(oferta.Everybody));
             await Task.Delay(TimeSpan.FromSeconds(KoliseoOffers.Segundos + 1));
 
             // If somebody accepted it in full by a hair, Close returns false and it is not touched here.
@@ -480,6 +481,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             var pareja = KoliseoQueue.TryMatch(mode, teamSize);
             if (pareja == null) return;
+            using var quiet = ConsoleLogBuffer.QuietWhile(
+                Bots.SimulatedPlayers.OnlyBots(pareja.Value.Blue.Concat(pareja.Value.Red)));
 
             var azul = new List<GameSession>();
             var rojo = new List<GameSession>();

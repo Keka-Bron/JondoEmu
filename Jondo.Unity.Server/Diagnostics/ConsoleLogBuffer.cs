@@ -16,6 +16,51 @@ namespace Jondo.Unity.Server
         private static readonly int MaxLogs = 1000;
         private static TextWriter? _originalOut;
 
+        /// <summary>A flow whose lines go nowhere: a simulated player's, and its connection's.</summary>
+        private static readonly System.Threading.AsyncLocal<bool> QuietFlow = new();
+
+        /// <summary>
+        /// From here on, in this flow and whatever it starts, nothing written reaches the window or
+        /// the file. For the simulated players: with a hundred and fifty of them in, every one of
+        /// their packets, steps and blows filled the window and half a gigabyte of log.
+        /// </summary>
+        /// <remarks>Called at the start of an async method, it lasts as long as that method.</remarks>
+        public static void QuietFromHere() => QuietFlow.Value = true;
+
+        /// <summary>
+        /// Quiet until disposed, when <paramref name="quiet"/>: for what a timer does among the bots
+        /// alone -- a Koliseo match of theirs, a hunt of one on another --, which runs on no
+        /// connection of theirs and so is not quiet by itself.
+        /// </summary>
+        public static IDisposable QuietWhile(bool quiet)
+        {
+            bool before = QuietFlow.Value;
+            if (quiet) QuietFlow.Value = true;
+            return new Restore(before);
+        }
+
+        private sealed class Restore : IDisposable
+        {
+            private readonly bool _before;
+            public Restore(bool before) => _before = before;
+            public void Dispose() => QuietFlow.Value = _before;
+        }
+
+        /// <summary>
+        /// Whether what is written now is to be dropped: a quiet flow's, or a quiet session's -- unless
+        /// that session is fighting somebody real, whose fight is told whole.
+        /// </summary>
+        internal static bool Quiet
+        {
+            get
+            {
+                var session = Network.SessionContext.Actual;
+                if (!QuietFlow.Value && session?.Quiet != true) return false;
+                long fight = session?.State.FightId ?? 0;
+                return fight == 0 || !Handlers.FightHandler.HasPeople(fight);
+            }
+        }
+
         public static void Initialize()
         {
             if (_originalOut != null) return;
@@ -168,6 +213,7 @@ namespace Jondo.Unity.Server
 
             public override void WriteLine(string? value)
             {
+                if (Quiet) return;
                 _underlying.WriteLine(value);
 
                 string line;
@@ -182,6 +228,7 @@ namespace Jondo.Unity.Server
 
             public override void Write(string? value)
             {
+                if (Quiet) return;
                 _underlying.Write(value);
                 if (string.IsNullOrEmpty(value)) return;
 

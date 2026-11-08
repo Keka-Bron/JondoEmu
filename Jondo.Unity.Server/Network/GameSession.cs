@@ -86,6 +86,12 @@ namespace Jondo.Unity.Server.Network
         public bool HasCharacter => CharacterId > 0;
         public bool IsInWorld { get; private set; }
 
+        /// <summary>
+        /// A simulated player's: what is logged while serving it goes nowhere
+        /// (ConsoleLogBuffer.Quiet), wherever it is served from -- its socket, a fight's clock.
+        /// </summary>
+        public bool Quiet { get; set; }
+
         /// <summary>Captures this session's current map instance. Safe to retain across an await or map change.</summary>
         public GameMapAudience Map => new(MapAudienceScope.Capture(State), _codec);
 

@@ -77,6 +77,9 @@ namespace Jondo.Unity.Server.Network
             {
                 try
                 {
+                    // A simulated player's connection says nothing (ConsoleLogBuffer.QuietFromHere).
+                    if (Bots.SimulatedPlayers.IsBotSocket(client.Client.RemoteEndPoint))
+                        ConsoleLogBuffer.QuietFromHere();
                     Console.WriteLine($"[+] Client connected to Game Server ({client.Client.RemoteEndPoint})");
                     var clientStream = client.GetStream();
 
@@ -134,7 +137,10 @@ namespace Jondo.Unity.Server.Network
                                                               byte[] firstPayload,
                                                               string firstPayloadStr)
         {
-            var session = new GameSession(stream);
+            var session = new GameSession(stream)
+            {
+                Quiet = Bots.SimulatedPlayers.IsBotSocket(stream.Socket?.RemoteEndPoint),
+            };
             if (!SessionRegistry.Register(session))
             {
                 Console.WriteLine("[Game Server] Rejected game connection: the 8-client limit is reached.");

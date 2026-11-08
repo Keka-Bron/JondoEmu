@@ -2373,6 +2373,32 @@ namespace Jondo.Unity.Server.Handlers
                                          Flags: flags);
         }
 
+        private static readonly ConcurrentDictionary<long, (bool People, long Until)> _peopleIn = new();
+
+        /// <summary>
+        /// Whether somebody real -- not a monster, not a simulated player -- fights in this fight:
+        /// then its lines are logged even when a bot's turn writes them (ConsoleLogBuffer.Quiet).
+        /// Asked on every line, so it is known for a couple of seconds at a time.
+        /// </summary>
+        internal static bool HasPeople(long fightId)
+        {
+            long now = Environment.TickCount64;
+            if (_peopleIn.TryGetValue(fightId, out var known) && known.Until > now) return known.People;
+            bool people;
+            try
+            {
+                people = _activeFights.TryGetValue(fightId, out var fight)
+                    && fight.Todos.Any(f => !f.IsMonster && SessionRegistry.FindByCharacter(f.Id) is { Quiet: false });
+            }
+            catch (InvalidOperationException)
+            {
+                people = true;   // its teams were changing: better a line too many than one missing
+            }
+            if (_peopleIn.Count > 1000) _peopleIn.Clear();
+            _peopleIn[fightId] = (people, now + 2000);
+            return people;
+        }
+
         /// <summary>The fight this character is in, or null. Anybody may ask, not only his session.</summary>
         public static FightInstance? FightOf(long characterId)
         {

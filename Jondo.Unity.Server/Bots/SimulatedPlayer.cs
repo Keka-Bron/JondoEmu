@@ -75,13 +75,14 @@ namespace Jondo.Unity.Server.Bots
         /// <summary>Its life: in, a while in the world, out.</summary>
         public async Task RunAsync(CancellationToken stop)
         {
+            // What it does is not logged: a hundred and fifty of them filled the window.
+            ConsoleLogBuffer.QuietFromHere();
             try
             {
                 string? ticket = await TicketAsync(stop);
                 if (ticket == null) return;
 
-                _tcp = new TcpClient { NoDelay = true };
-                await _tcp.ConnectAsync(IPAddress.Loopback, Program.gamePort, stop);
+                _tcp = await SimulatedPlayers.DialAsync(stop);
                 _stream = _tcp.GetStream();
                 _ = Task.Run(() => ReadAsync(stop));
 
@@ -112,7 +113,7 @@ namespace Jondo.Unity.Server.Bots
         public void Disconnect()
         {
             _closed = true;
-            try { _tcp?.Close(); } catch { }
+            SimulatedPlayers.Hangup(_tcp);
         }
 
         // ─── The way in ──────────────────────────────────────────────────────────────────────
@@ -127,9 +128,20 @@ namespace Jondo.Unity.Server.Bots
             ClientLaunchRegistry.RegisterToken(_accountId, token);
             _token = token;
 
-            using var tcp = new TcpClient { NoDelay = true };
-            await tcp.ConnectAsync(IPAddress.Loopback, Program.gamePort, stop);
-            var stream = tcp.GetStream();
+            var tcp = await SimulatedPlayers.DialAsync(stop);
+            try
+            {
+                return await TicketOverAsync(tcp.GetStream(), token);
+            }
+            finally
+            {
+                SimulatedPlayers.Hangup(tcp);
+            }
+        }
+
+        /// <summary>The connection server's exchange, over its socket.</summary>
+        private async Task<string?> TicketOverAsync(NetworkStream stream, string token)
+        {
             var codec = new ConnectionCodec();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, codec.Encode(new ConnectionRequest("1",

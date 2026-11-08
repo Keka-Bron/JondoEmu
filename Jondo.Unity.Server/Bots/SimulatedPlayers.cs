@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using Jondo.Unity.Server.Network;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,7 +45,11 @@ namespace Jondo.Unity.Server.Bots
 
         private static readonly ConcurrentDictionary<int, SimulatedPlayer> _online = new();
         private static readonly ConcurrentDictionary<long, int> _accounts = new();
+        private static readonly ConcurrentDictionary<int, byte> _ports = new();
         private static CancellationTokenSource? _stop;
+
+        /// <summary>How often the window hears how many are in, at most.</summary>
+        private static readonly TimeSpan Summary = TimeSpan.FromMinutes(5);
 
         /// <summary>How many are connected now.</summary>
         public static int Online => _online.Count;
@@ -50,6 +58,56 @@ namespace Jondo.Unity.Server.Bots
         public static bool IsSimulated(long accountId) => _accounts.ContainsKey(accountId);
 
         internal static string NameOf(int number) => $"{NamePrefix}{number:D3}";
+
+        /// <summary>
+        /// A socket to the server for a bot, its local port known before it connects: the server
+        /// recognises the connection from its first line, and logs nothing of it
+        /// (<see cref="IsBotSocket"/>). The port is let go with <see cref="Hangup"/>.
+        /// </summary>
+        internal static async Task<TcpClient> DialAsync(CancellationToken stop)
+        {
+            var tcp = new TcpClient(new IPEndPoint(IPAddress.Loopback, 0)) { NoDelay = true };
+            int port = ((IPEndPoint)tcp.Client.LocalEndPoint!).Port;
+            _ports[port] = 0;
+            try
+            {
+                await tcp.ConnectAsync(IPAddress.Loopback, Program.gamePort, stop);
+                return tcp;
+            }
+            catch
+            {
+                Hangup(tcp, port);
+                throw;
+            }
+        }
+
+        /// <summary>Closes a bot's socket and forgets its port, which the system may give anybody next.</summary>
+        internal static void Hangup(TcpClient? tcp, int port = 0)
+        {
+            try
+            {
+                if (port == 0 && tcp?.Client?.LocalEndPoint is IPEndPoint local) port = local.Port;
+            }
+            catch (ObjectDisposedException) { }
+            try { tcp?.Close(); } catch { }
+            if (port != 0) _ports.TryRemove(port, out _);
+        }
+
+        /// <summary>Whether these characters are all bots: what happens among them alone is not logged.</summary>
+        internal static bool OnlyBots(IEnumerable<long> characters)
+        {
+            bool any = false;
+            foreach (long character in characters)
+            {
+                any = true;
+                if (SessionRegistry.FindByCharacter(character) is not { Quiet: true }) return false;
+            }
+            return any;
+        }
+
+        /// <summary>Whether the other end of a server socket is one of the bots'.</summary>
+        internal static bool IsBotSocket(EndPoint? remote)
+            => remote is IPEndPoint ip && IPAddress.IsLoopback(ip.Address) && _ports.ContainsKey(ip.Port);
 
         /// <summary>Starts them, if the settings say so. Called once the services are listening.</summary>
         public static void Start(ServerSettings settings)
@@ -81,12 +139,22 @@ namespace Jondo.Unity.Server.Bots
             var dice = new Random();
             int fewest = Math.Max(1, (most + 1) / 2);
             int wanted = dice.Next(fewest, most + 1);
+            int told = -1;
+            var toldAt = DateTime.MinValue;
             while (!token.IsCancellationRequested)
             {
                 try
                 {
                     foreach (var (number, gone) in _online.Where(b => b.Value.Finished).ToList())
                         _online.TryRemove(number, out _);
+
+                    // Their own lines say nothing (ConsoleLogBuffer.QuietFromHere): a count, now and then.
+                    if (_online.Count != told && DateTime.UtcNow - toldAt >= Summary)
+                    {
+                        told = _online.Count;
+                        toldAt = DateTime.UtcNow;
+                        Console.WriteLine($"[Bots] {told} simulated players in the world.");
+                    }
 
                     if (dice.Next(8) == 0) wanted = Math.Clamp(wanted + dice.Next(-2, 3), fewest, most);
 

@@ -405,6 +405,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static async Task OpenAsync(Order order, GameSession prey, long now)
         {
+            using var quiet = ConsoleLogBuffer.QuietWhile(Bots.SimulatedPlayers.OnlyBots(new[] { order.Hunter, order.Target }));
             order.OpenUntilMs = now + (long)Window.TotalMilliseconds;
             order.LastSightingMs = now;
             Keep(order);
@@ -509,6 +510,7 @@ namespace Jondo.Unity.Server.Managers
 
         private static async Task KilledAsync(Order order, FightInstance fight)
         {
+            using var quiet = ConsoleLogBuffer.QuietWhile(Bots.SimulatedPlayers.OnlyBots(new[] { order.Hunter, order.Target }));
             int hunterLevel = fight.Buscar(order.Hunter)?.Level ?? 1;
             int targetLevel = fight.Buscar(order.Target)?.Level ?? 1;
             int bounty = Bounty(order.Target, targetLevel, hunterLevel);
@@ -526,6 +528,7 @@ namespace Jondo.Unity.Server.Managers
 
         private static async Task SurvivedAsync(Order order)
         {
+            using var quiet = ConsoleLogBuffer.QuietWhile(Bots.SimulatedPlayers.OnlyBots(new[] { order.Hunter, order.Target }));
             Drop(order);
             var hunter = Of(order.Hunter);
             Keep(hunter with { Failures = hunter.Failures + 1, LockedUntilMs = Now + (long)FailedLock.TotalMilliseconds });
