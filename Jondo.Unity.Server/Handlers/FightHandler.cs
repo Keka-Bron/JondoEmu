@@ -3759,7 +3759,15 @@ namespace Jondo.Unity.Server.Handlers
                     Program.LogDebug($"[Fight] The delay is up: {caster.Id} casts {waiting.Dado} " +
                                      $"(grade {Math.Max(1, waiting.Cara)}) on {result.Target.Id}, from spell " +
                                      $"{waiting.HechizoOrigen}, in round {fight.RoundNumber}.");
-                    if (Managers.PlayerSpells.Contains(waiting.Dado))
+                    if (waiting.PendingCastCell is int cell)
+                    {
+                        var target = VictimAt(fight, caster, cell);
+                        int grade = Math.Max(1, waiting.Cara);
+                        await AnnounceForgelanceChildAsync(fight, caster, waiting.Dado, grade, cell, target);
+                        await AplicarEfectosAsync(stream, fight, caster, waiting.Dado, grade, target,
+                            Managers.EffectEngine.AlLanzar, cell, waiting.Critico, orderedForgelance: true);
+                    }
+                    else if (Managers.PlayerSpells.Contains(waiting.Dado))
                     {
                         // Its blows in their order with the rest, as a hook's: handed whole to the
                         // engine they were taken for the root's blows, dealt already, and dropped --
@@ -4073,7 +4081,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task SalirDeLasAurasAsync(NetworkStream stream, FightInstance fight, Fighter quien)
         {
-            foreach (var aura in fight.Glifos.Where(g => (EsAuraDeMonstruo(g) || Managers.ForgelanceCombat.IsAura(fight, g))
+            foreach (var aura in fight.Glifos.Where(g => EsAuraDeMonstruo(g)
                                                          && g.Dentro.Contains(quien.Id)
                                                          && !g.Cubre(quien.CellId)).ToList())
             {
@@ -4366,7 +4374,7 @@ namespace Jondo.Unity.Server.Handlers
             if (!quien.IsAlive) return;
 
             if (glifo.SeGastaAlDispararse) glifo.Gastado = true;
-            if ((EsAuraDeMonstruo(glifo) || Managers.ForgelanceCombat.IsAura(fight, glifo)) && quien.IsAlive)
+            if (EsAuraDeMonstruo(glifo) && quien.IsAlive)
                 glifo.Dentro.Add(quien.Id);
         }
 
@@ -5039,6 +5047,14 @@ namespace Jondo.Unity.Server.Handlers
             if (Managers.TreasureFight.AlreadyOut(fight, quienInvoca, plantilla))
             {
                 Program.LogDebug($"[Fight] Chest {plantilla} already stands; the Treasure summons it no more.");
+                return null;
+            }
+
+            // A replacement can still summon: its recall runs before this effect is applied.
+            if (plantilla == Managers.ForgelanceCombat.Lance && Managers.ForgelanceCombat.Is(quienInvoca)
+                && Managers.ForgelanceCombat.OwnLance(fight, quienInvoca) != null)
+            {
+                Program.LogDebug($"[Fight] Fighter {quienInvoca.Id} still has an Immortal Lance on the board.");
                 return null;
             }
 
@@ -6667,7 +6683,9 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 if (c.ForgelanceCast)
                 {
-                    await AnnounceForgelanceChildAsync(fight, c);
+                    int cell = c.CeldaDelLanzamiento >= 0 ? c.CeldaDelLanzamiento : c.Sobre?.CellId ?? c.Caster.CellId;
+                    await AnnounceForgelanceChildAsync(fight, c.Caster, c.HechizoOrigen, c.NivelOrigen,
+                        cell, c.Sobre is { IsAlive: true } ? c.Sobre : null);
                     continue;
                 }
                 if (!Managers.ForgelanceCombat.IsActor(fight, c.Caster ?? quienLanza)
@@ -6748,28 +6766,34 @@ namespace Jondo.Unity.Server.Handlers
                 if (c.Glifo != null)
                 {
                     var dueno = c.Caster ?? quienLanza;
-                    int apuntada = c.Glifo.Centro >= 0 ? c.Glifo.Centro : c.Glifo.Casillas.FirstOrDefault();
-                    if (c.Glifo.Tipo == Managers.EffectEngine.ColocaUnaTrampa)
+                    var glyph = c.Glifo;
+                    bool lanceAura = Managers.ForgelanceCombat.IsAura(fight, glyph);
+                    bool holmgang = glyph.Tipo == GlifoDeAura && c.HechizoOrigen == Managers.ForgelanceCombat.Holmgang
+                        && Managers.ForgelanceCombat.Is(dueno);
+                    int apuntada = glyph.Centro >= 0 ? glyph.Centro : glyph.Casillas.FirstOrDefault();
+                    if (glyph.Tipo == Managers.EffectEngine.ColocaUnaTrampa)
                     {
                         // A trap: its own jwe 400, and only for its owner's side -- «los adversarios
                         // podrán ver… casillas donde se active una trampa», the Sram's sheet says:
                         // before that they do not see it.
                         await ASuBandoAsync(fight, dueno.TeamId, ConnectionProtocol.Push(Op.Jwe,
-                            Network.FightProtocol.BuildTrap(dueno.Id, c.Glifo.Id,
-                                Network.FightProtocol.TrapCells(c.Glifo.ZoneShape, c.Glifo.ZoneSize, apuntada, c.Glifo.Casillas),
-                                apuntada, c.Glifo.Hechizo, c.HechizoOrigen, c.NivelOrigen, c.Glifo.Color)));
+                            Network.FightProtocol.BuildTrap(dueno.Id, glyph.Id,
+                                Network.FightProtocol.TrapCells(glyph.ZoneShape, glyph.ZoneSize, apuntada, glyph.Casillas),
+                                apuntada, glyph.Hechizo, c.HechizoOrigen, c.NivelOrigen, glyph.Color)));
                     }
                     else
                     {
-                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                            Network.FightProtocol.BuildSpellGlyph(dueno.Id, c.Glifo.Id, c.Glifo.Casillas, apuntada,
-                                                                  c.Glifo.Hechizo, c.HechizoOrigen, c.NivelOrigen,
-                                                                  c.Glifo.Color)));
+                        byte[] packet = lanceAura || holmgang
+                            ? Network.ForgelanceProtocol.Aura(glyph, c.NivelOrigen)
+                            : Network.FightProtocol.BuildSpellGlyph(dueno.Id, glyph.Id, glyph.Casillas, apuntada,
+                                glyph.Hechizo, c.HechizoOrigen, c.NivelOrigen, glyph.Color);
+                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, packet));
                     }
                     Program.LogDebug($"[Fight] Glyph {c.Glifo.Id} of {dueno.Id}: {c.Glifo.Casillas.Count} cell(s), " +
                                      $"casts {c.Glifo.Hechizo}, colour {c.Glifo.Color:X6}, drops in round {c.Glifo.CaducaEnRonda}.");
-                    if (c.Glifo.Cuando == Jondo.Unity.World.Fights.Disparo.AlPonerse)
-                        await ApplyTheLaidAuraAsync(stream, fight, dueno, c.Glifo);
+                    if (glyph.Cuando == Jondo.Unity.World.Fights.Disparo.AlPonerse && !holmgang
+                        && (!lanceAura || glyph.Grado == 3))
+                        await ApplyTheLaidAuraAsync(stream, fight, dueno, glyph);
                     continue;
                 }
 
@@ -7107,6 +7131,8 @@ namespace Jondo.Unity.Server.Handlers
                     {
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                             Network.FightProtocol.BuildGlyphGone(g.Dueno, g.Id)));
+                        if (g.Grado == 2 && Managers.ForgelanceCombat.IsAura(fight, g))
+                            await SyncLanceProtectionAsync(stream, fight, fight.Buscar(g.Dueno));
                     }
                     Program.LogDebug($"[Fight] {quienLanza.Id} dispels {c.GlifosQuitados.Count} glyph(s) of {c.Sobre.Id}.");
                     continue;
@@ -9009,7 +9035,10 @@ namespace Jondo.Unity.Server.Handlers
 
             if (muerto is { MonsterId: Managers.ForgelanceCombat.Lance, EsInvocado: true }
                 && Managers.ForgelanceCombat.Is(fight.Buscar(muerto.Invocador)))
+            {
+                await RemoveLanceMarksAsync(stream, fight, muerto);
                 await SyncForgelanceProximityAsync(stream, fight);
+            }
 
             // The last of the Reina's jail monsters opens her jails.
             await Managers.GuildRaidReina.OnDeathAsync(stream, fight, muerto);
@@ -9026,6 +9055,8 @@ namespace Jondo.Unity.Server.Handlers
                 invocado.CurrentHP = 0;
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDeath(muerto.Id, invocado.Id)));
+                if (invocado.MonsterId == Managers.ForgelanceCombat.Lance && Managers.ForgelanceCombat.Is(muerto))
+                    await RemoveLanceMarksAsync(stream, fight, invocado);
             }
 
             // And out of the carousel, so that their turn never comes.

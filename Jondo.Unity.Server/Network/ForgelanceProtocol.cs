@@ -15,6 +15,27 @@ namespace Jondo.Unity.Server.Network
                 .Msg(25, Pb.New().VarIfNotZero(1, critical ? 1 : 0).Var(2, grade)
                     .Var(3, cell).Var(4, spell).Var(5, marker)).Build();
 
+        // LanceDuLac packets 26/27 and Holmgang packets 5/6 use distinct aura footprints.
+        internal static byte[] Aura(Glifo glyph, int grade)
+        {
+            var body = Pb.New();
+            bool lance = glyph.HechizoQueLoPuso == ForgelanceCombat.LanceAura;
+            if (lance && glyph.Grado == 2)
+            {
+                foreach (int cell in glyph.Casillas)
+                    body.Msg(1, Pb.New().Var(2, glyph.Color).Var(3, cell));
+            }
+            else if (!lance && glyph.Hechizo == 23847)
+            {
+                body.Msg(1, Pb.New().Var(1, 2).Var(2, glyph.Color).Var(3, glyph.Centro));
+            }
+
+            body.Var(2, lance ? glyph.Grado : 1).Var(3, glyph.Hechizo).Var(4, glyph.Id)
+                .Var(6, grade).Var(7, glyph.Color).Var(9, glyph.HechizoQueLoPuso)
+                .Var(10, glyph.Centro).Var(11, 1).Var(12, glyph.Dueno);
+            return FightProtocol.BuildAction(glyph.Dueno, 1091, Pb.New().Msg(1, body), detailField: 32);
+        }
+
         // LancePierre packets 20/55: disarming removes skin 3650; arming restores it.
         // Effondrement packets 22/49: guard uses bones 7156, returning to the turn uses bones 1.
         internal static byte[] Look(byte[] normal, Fighter fighter, int appearance)

@@ -10,6 +10,9 @@ namespace Jondo.Unity.Server.Managers
     {
         internal const int Breed = 20;
         internal const int Lance = 7139;
+        internal const int LanceAura = 24391;
+        internal const int Holmgang = 23846;
+        internal const int SigelDisc = 23836;
         internal const int Armed = 3360;
         internal const int Disarmed = 3361;
         internal const int NearLance = 3589;
@@ -39,7 +42,7 @@ namespace Jondo.Unity.Server.Managers
         }
 
         internal static bool IsAura(FightInstance fight, Glifo glyph)
-            => glyph.Tipo == 1091 && glyph.HechizoQueLoPuso == 24391
+            => glyph.Tipo == 1091 && glyph.HechizoQueLoPuso == LanceAura
                && IsActor(fight, fight.Buscar(glyph.Dueno));
     }
 }
