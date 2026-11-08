@@ -2026,6 +2026,14 @@ namespace Jondo.Unity.Server.Managers
         public const string AlMorir = "X";
 
         /// <summary>
+        /// When the bearer stops being invisible (IOFF): its row ran out, a dispel or a reveal took
+        /// it, or he dealt direct damage. The Sram's passive, La Sombra de Sram (21978), casts
+        /// 21979 under it -- the class sheet's "cuando el sram pierde su invisibilidad ... gana un
+        /// bonus de golpe crítico durante 1 turno" -- and nothing else in the data waits on it.
+        /// </summary>
+        public const string AlVolverseVisible = "IOFF";
+
+        /// <summary>
         /// When one WALKS, per cell. It is the trigger of the Cra's Centinela, which gives range and ranged damage
         /// in exchange for standing still: each step takes one range and two per cent of damage.
         ///

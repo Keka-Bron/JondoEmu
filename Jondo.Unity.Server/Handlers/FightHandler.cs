@@ -1656,7 +1656,9 @@ namespace Jondo.Unity.Server.Handlers
         /// from one, as its template's grades number them (Summons.Characteristics).
         /// </summary>
         private static Network.Pb IdentityOf(Fighter fighter, bool collectorAsMonster = false)
-            => fighter.TaxCollectorFirstName > 0 && !collectorAsMonster
+            => fighter.DoubleOf != 0
+                ? Network.FightProtocol.DoubleIdentity(fighter.Name, fighter.Level)
+                : fighter.TaxCollectorFirstName > 0 && !collectorAsMonster
                 ? Network.FightProtocol.TaxCollectorIdentity(fighter.TaxCollectorFirstName,
                                                              fighter.TaxCollectorLastName, fighter.MonsterId)
                 : Network.FightProtocol.MonsterIdentity(fighter.EsInvocado ? fighter.GradeIndex : fighter.GradeIndex + 1,
@@ -2362,7 +2364,10 @@ namespace Jondo.Unity.Server.Handlers
             int maximo = spell == 0 ? limites.AlcanceMaximo
                        : ReachBeforeModifiers(caster, spell, limites.AlcanceMaximo, limites.Flags, fight.RoundNumber);
             var (min, max) = Managers.SpellModifiers.Range(caster, spell, minimo, maximo, fight.RoundNumber);
-            return (min, max, limites.NeedFreeCell);
+            // The cell as the cast will judge it: a modifier can ask for a free cell (299), as the
+            // Sram's traps do.
+            var (needFree, _) = Managers.SpellModifiers.Cells(caster, spell, limites.NeedFreeCell, limites.NeedTakenCell, fight.RoundNumber);
+            return (min, max, needFree);
         }
 
         private static LimitesDelHechizo LimitesDelQueLanza(Fighter caster, int spell)
@@ -3310,9 +3315,11 @@ namespace Jondo.Unity.Server.Handlers
                 : fighter.IsMonster
                     ? Network.FightProtocol.MonsterTurnDeciseconds
                     : fight.Reglas.PlayerTurn > 0 ? fight.Reglas.PlayerTurn : Network.FightProtocol.PlayerTurnDeciseconds;
-            // On a server started for the test harness, a player's turn waits ten minutes for it: it
-            // looks, thinks and clicks far slower than a person (ControlApiTest.cs).
-            if (Network.ControlApi.TestKey.Length > 0 && !fighter.IsMonster && !fighter.EsInvocado) duration = 6000;
+            // On a server started for the test harness, a player's turn waits an hour for it: it
+            // looks, thinks and clicks far slower than a person, and a whole class is tried in the
+            // one turn (ControlApiTest.cs). Ten minutes ran out on the slower classes, and the
+            // client put up its «Inactividad» notice.
+            if (Network.ControlApi.TestKey.Length > 0 && !fighter.IsMonster && !fighter.EsInvocado) duration = 36000;
 
             // A turn of his, or of a summon he drives, for the per-turn averages of the end.
             if (!fighter.IsMonster || Dueno(fight, fighter) != null)
@@ -3431,8 +3438,9 @@ namespace Jondo.Unity.Server.Handlers
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
                         Network.FightProtocol.BuildBuffGone(quien.Id, caido.Numero)));
 
-                    if (caido.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility)
-                        await VisibleOtraVezAsync(fight, quien, quien);
+                    if (caido.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility
+                        && await VisibleOtraVezAsync(fight, quien, quien))
+                        await DispararAsync(stream, fight, quien, Managers.EffectEngine.AlVolverseVisible);
 
                     if (caido.Apariencia != 0)
                     {
@@ -4682,8 +4690,11 @@ namespace Jondo.Unity.Server.Handlers
             // pointing at THIS spell in particular, which is what Disparos Lejanos does.
             //
             // If the spell carries no maximum range in the database, nothing is checked: a missing
-            // piece of data must not prevent casting.
-            if (limites.AlcanceMaximo > 0)
+            // piece of data must not prevent casting. But a spell whose level row is there and says
+            // 0 has a range: its own cell, the self spells' (Vellocino de Oro, a circle around the
+            // caster). Taking that 0 for "no data" let them be cast at any distance -- the harness
+            // set one off from a cell away.
+            if (limites.AlcanceMaximo > 0 || spell != 0 && limites.LevelId > 0)
             {
                 // Along a diagonal, as the client counts it for a spell cast diagonally.
                 int lejos = Jondo.Unity.World.Maps.MapGeometry.CastDistance(caster.CellId, cell,
@@ -5368,8 +5379,38 @@ namespace Jondo.Unity.Server.Handlers
         /// For the test harness (ControlApiTest.cs): a fighter's turn as it began -- every point
         /// back, every spell ready again, each told to the board -- and the other side whole again.
         /// </summary>
-        internal static async Task FreshTurnAsync(NetworkStream stream, FightInstance fight, Fighter who)
-            => await InASequenceAsync(fight, who.Id, () => FreshTurnStepsAsync(stream, fight, who));
+        internal static async Task FreshTurnAsync(NetworkStream stream, FightInstance fight, Fighter who, bool keepBoard = false,
+                                                  bool withoutSummons = false)
+            => await InASequenceAsync(fight, who.Id, async () =>
+            {
+                if (withoutSummons) await DismissSummonsAsync(stream, fight, who);
+                await FreshTurnStepsAsync(stream, fight, who, keepBoard);
+            });
+
+        /// <summary>
+        /// For the test harness: the fighter's summons taken off the board as the engine takes off
+        /// any that die -- told dead, their rows and states gone with them -- so that a scenario
+        /// starts from none (a Tymador's three bombs, an Osamodas's creatures).
+        /// </summary>
+        private static async Task DismissSummonsAsync(NetworkStream stream, FightInstance fight, Fighter who)
+        {
+            var mine = TodosLosCombatientes(fight).Where(f => f.EsInvocado && f.IsAlive && f.Invocador == who.Id).ToList();
+            foreach (var summon in mine)
+            {
+                // Its own "on dying" first, as any death runs it: the Forgelance's lance gives its
+                // owner back Armado that way (Lanza Mortal, 23279), a bomb does nothing.
+                await AlMorirAsync(stream, fight, summon, who);
+                if (!summon.IsAlive) continue;
+                summon.CurrentHP = 0;
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(who.Id, summon.Id)));
+                await CaenSusInvocadosAsync(stream, fight, summon);
+            }
+            if (mine.Count > 0)
+            {
+                fight.RebuildTurnOrderOnFighterDeath();
+                await ReenviarLaListaAsync(stream, fight);
+            }
+        }
 
         /// <summary>
         /// Work told to the board inside a sequence of its own (jto ... jwi): the client plays a
@@ -5384,24 +5425,34 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), author, Network.FightProtocol.ActionSequence)));
         }
 
-        private static async Task FreshTurnStepsAsync(NetworkStream stream, FightInstance fight, Fighter who)
+        private static async Task FreshTurnStepsAsync(NetworkStream stream, FightInstance fight, Fighter who, bool keepBoard)
         {
             // A clean board: what earlier spells left -- effects, states, a range moved, marks on
-            // the ground -- would judge the next spell by the last one's doing.
+            // the ground -- would judge the next spell by the last one's doing. Unless the board
+            // is kept on purpose, for the spells that answer to it.
+            // The rows of the fighters' attitudes stay: a class passive's, the initial spells', a
+            // summon's own spell's -- rules of the fight, not what a spell left. Wiped, the Xelor
+            // lost the telefrag states his passive gives (24941) and his syncro never grew.
+            if (!keepBoard)
             foreach (var fighter in fight.Todos.Where(f => f.IsAlive).ToList())
-                foreach (var row in fighter.Buffs.Puestos.ToList())
+                foreach (var row in fighter.Buffs.Puestos.Where(r => !fighter.Buffs.Actitudes.Contains(r.HechizoOrigen)).ToList())
                     if (fighter.Buffs.QuitarFila(row))
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya, Network.FightProtocol.BuildBuffGone(fighter.Id, row.Numero)));
-            foreach (var mark in fight.Glifos.ToList())
+            foreach (var mark in keepBoard ? new List<Glifo>() : fight.Glifos.ToList())
             {
                 fight.Glifos.Remove(mark);
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildGlyphGone(mark.Dueno, mark.Id)));
             }
+            // The character whole again too: between turns the Puchs hit back.
+            await HealFullyAsync(stream, fight, who, who);
             int ap = who.MaxAP - who.CurrentAP, mp = who.MaxMP - who.CurrentMP;
             who.CurrentAP = who.MaxAP;
             who.CurrentMP = who.MaxMP;
             if (ap > 0) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPointsGiven(who.Id, 111, who.Id, ap)));
             if (mp > 0) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPointsGiven(who.Id, 128, who.Id, mp)));
+            // Room for every summon the class has: a bare test character holds one, and the
+            // Osamodas' grown creatures take two places each (summonCost 2).
+            who.Otras[CaracteristicaDeInvocaciones] = Math.Max(who.Otra(CaracteristicaDeInvocaciones), 30);
             foreach (int spell in who.Recarga.Keys.ToList()) who.Recarga[spell] = 0;
             who.LanzadosEsteTurno.Clear();
             who.LanzadosPorObjetivo.Clear();
@@ -5418,6 +5469,10 @@ namespace Jondo.Unity.Server.Handlers
                 if (gainAp > 0) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPointsGiven(other.Id, 111, other.Id, gainAp)));
                 if (gainMp > 0) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPointsGiven(other.Id, 128, other.Id, gainMp)));
             }
+            // The fighters' sheets again: points given to a fighter outside its turn do not move
+            // what the client shows of it (its panel kept a Puch's 0 AP and -1 MP), and the client
+            // rebuilds each fighter's info from a jxb.
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxb, Network.FightProtocol.BuildAllFighters(FighterBlocksInPlayOrder(fight))));
         }
 
         private static IEnumerable<(int Spell, int Rounds)> RecargasDe(Fighter quien)
@@ -6592,12 +6647,30 @@ namespace Jondo.Unity.Server.Handlers
         /// "jya 275, jwe 150 f34{f1=2 f4=Sram}" at frames 316-317 of "sram-invisibilidad", when
         /// the row ran out. Nothing goes out while another row still hides him.
         /// </summary>
-        private static async Task VisibleOtraVezAsync(FightInstance fight, Fighter author, Fighter quien)
+        private static async Task<bool> VisibleOtraVezAsync(FightInstance fight, Fighter author, Fighter quien)
         {
-            if (quien == null) return;
-            if (quien.Buffs.Puestos.Any(b => b.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility && !b.Pendiente)) return;
+            if (quien == null) return false;
+            if (quien.Buffs.Puestos.Any(b => b.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility && !b.Pendiente)) return false;
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildVisibility((author ?? quien).Id, quien.Id, Network.FightProtocol.Visible)));
+            return true;
+        }
+
+        /// <summary>
+        /// Direct damage takes the dealer's invisibility off, at once: "Infligir daños directos
+        /// disipará inmediatamente la invisibilidad. Por otra parte, los daños de trampas, veneno y
+        /// empuje permiten infligir daños sin perder la invisibilidad" (class sheet 1084674). His
+        /// invisibility rows go, everybody is told he shows again, and what waits on it (IOFF:
+        /// the Sram's critical bonus) goes off.
+        /// </summary>
+        private static async Task DisipaLaInvisibilidadAsync(NetworkStream stream, FightInstance fight, Fighter quien)
+        {
+            foreach (var row in quien.Buffs.Puestos.Where(b => b.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility).ToList())
+                if (quien.Buffs.QuitarFila(row))
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya, Network.FightProtocol.BuildBuffGone(quien.Id, row.Numero)));
+            Program.LogDebug($"[Fight] {quien.Id} deals direct damage and shows again.");
+            if (await VisibleOtraVezAsync(fight, quien, quien))
+                await DispararAsync(stream, fight, quien, Managers.EffectEngine.AlVolverseVisible);
         }
 
         /// <summary>
@@ -7443,8 +7516,8 @@ namespace Jondo.Unity.Server.Handlers
                 // Invisible no more -- a 202 revealed him, a 406 or a dispel took the row -- and
                 // everybody is told so behind the jya, as when the row runs out. The author is
                 // the one whose effect did it: an inference, no capture has a reveal.
-                if (quitaInvisibilidad)
-                    await VisibleOtraVezAsync(fight, quienLanza, c.Sobre);
+                if (quitaInvisibilidad && await VisibleOtraVezAsync(fight, quienLanza, c.Sobre))
+                    Disparo(c.Sobre, Managers.EffectEngine.AlVolverseVisible, quienLanza);
 
                 // Dispelled (DIS): the Feca's Barricada "aumenta sus PM si es atacado a distancia
                 // o desembrujado"; the Aniripsa's Crioterapia goes off "si el objetivo pierde el
@@ -8760,6 +8833,12 @@ namespace Jondo.Unity.Server.Handlers
                                                        escudoPerdido)));
             }
 
+            // Dealt by somebody invisible, direct damage shows him: a poison comes on a turn
+            // trigger, a trap's or a glyph's blow is the glyph source, and a push's goes elsewhere.
+            if (aplicado > 0 && !fromTurnTrigger && fight.CurrentDamageSource != Jondo.Unity.World.Fights.DamageSource.Glyph
+                && caster != null && caster.IsAlive && Managers.MonsterTactics.IsInvisible(caster))
+                await DisipaLaInvisibilidadAsync(stream, fight, caster);
+
             // LIFE STEAL. Effects 91 to 95 are not plain damage: they are «water steal», «earth
             // steal», «air steal», «fire steal» and «neutral steal», and 82 is the fixed neutral
             // steal. All six hit like normal damage and ALSO heal the caster for half of what they
@@ -9217,7 +9296,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 Program.LogDebug($"[AI] {monster.Id} casts {action.Spell.Id} at {action.Target.Id} " +
                                  $"(cell {action.TargetCell}) from {monster.CellId}, score {action.Score:0.0}.");
-                await MonsterCastAsync(stream, fight, monster, action.Spell, action.Target, action.TargetCell);
+                await WatchedMonsterCastAsync(stream, fight, monster, action.Spell, action.Target, action.TargetCell);
                 if (await EffectEndedTheFightAsync(stream, fight)) return;
                 // What the cast changed -- a creature summoned, someone pushed or dead -- is on the
                 // board the next step is weighed on.
@@ -9486,6 +9565,23 @@ namespace Jondo.Unity.Server.Handlers
         /// the fight's limits counted -- per turn, per target, and the cooldown, which monsters
         /// never had, so a spell meant for every third turn came out every turn.
         /// </summary>
+        /// <summary>
+        /// For the test harness alone (ControlApiTest's endturn): told before and after every cast
+        /// a monster or a summon makes, with the fight, the caster, the spell, its grade and the
+        /// cell, so that a summon's spells are judged as the player's are. Nobody listens on a
+        /// server that is not started for the harness.
+        /// </summary>
+        internal static event Action<FightInstance, Fighter, int, int, int>? CastWatchBefore;
+        internal static event Action<FightInstance, Fighter, int, int, int>? CastWatchAfter;
+
+        private static async Task WatchedMonsterCastAsync(NetworkStream stream, FightInstance fight, Fighter monster,
+                                                          Managers.MonsterTactics.Spell chosen, Fighter objetivo, int aim)
+        {
+            CastWatchBefore?.Invoke(fight, monster, chosen.Id, chosen.Grade, aim);
+            try { await MonsterCastAsync(stream, fight, monster, chosen, objetivo, aim); }
+            finally { CastWatchAfter?.Invoke(fight, monster, chosen.Id, chosen.Grade, aim); }
+        }
+
         private static async Task MonsterCastAsync(NetworkStream stream, FightInstance fight, Fighter monster,
                                                    Managers.MonsterTactics.Spell chosen, Fighter objetivo, int aim)
         {

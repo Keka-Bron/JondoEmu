@@ -79,7 +79,10 @@ namespace Jondo.Unity.Server.Network
                 "walk" => TestWalk(cuerpo),
                 "stage" => TestStage(cuerpo),
                 "spell" => TestSpell(cuerpo),
-                "refresh" => TestRefresh(),
+                "refresh" => TestRefresh(cuerpo),
+                "endturn" => TestEndTurn(),
+                "scenario" => TestScenario(cuerpo),
+                "scenarios" => TestScenarios(cuerpo),
                 _ => Mal(404, "ruta"),
             };
         }
@@ -186,6 +189,11 @@ namespace Jondo.Unity.Server.Network
         {
             f.Id, f.Name, team = f.TeamId, cell = f.CellId, monster = f.IsMonster ? f.MonsterId : 0, f.Breed, f.Level,
             hp = f.CurrentHP, maxHp = f.MaxHP, ap = f.CurrentAP, maxAp = f.MaxAP, mp = f.CurrentMP, maxMp = f.MaxMP,
+            // The points as the client shows them: in hand for whoever is playing; for anybody
+            // else, what the next turn starts with (the maximum and the rows on top), as the
+            // fight sheet tells it (FightHandler.HuecosDeFicha).
+            apShown = fight.CurrentFighter == f ? f.CurrentAP : Math.Max(0, f.MaxAP + f.Buffs.De(1, fight.RoundNumber)),
+            mpShown = fight.CurrentFighter == f ? f.CurrentMP : Math.Max(0, f.MaxMP + f.Buffs.De(23, fight.RoundNumber)),
             alive = f.IsAlive, summon = f.EsInvocado,
             buffs = f.Buffs.Puestos.Select(b => new { b.Numero, effect = b.EffectId, spell = b.HechizoOrigen, by = b.Quien,
                                                       value = b.Valor, state = b.Estado, untilRound = b.CaducaEnRonda }).ToList(),
@@ -213,7 +221,7 @@ namespace Jondo.Unity.Server.Network
             if (session == null) return Mal(404, "offline");
             return Bien(MobSpawnManager.GetMobsForMap(session.State.MapId).Select(g => new
             {
-                id = g.MobId, cell = g.CellId,
+                id = g.MobId, cell = g.CellId, fighting = FightHandler.IsGroupFighting(g.MobId),
                 members = g.Members.Select(m => new { monster = m.Monster?.Id ?? 0, grade = m.GradeIndex }).ToList(),
             }).ToList());
         }
@@ -272,7 +280,8 @@ namespace Jondo.Unity.Server.Network
                     try
                     {
                         var stream = session.Stream!;
-                        if (FightOps.Contains(op)) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
+                        // kme: giving the fight up, so that a harness closing its client leaves no fight behind.
+                        if (FightOps.Contains(op) || op == Op.Kme) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
                         else if (op == Op.Hqa) await FightHandler.AttackAsync(stream, frame);
                         else if (op == Op.Hmt) await SpellHandler.HandleVariantAsync(stream, frame);
                         else throw new InvalidOperationException($"op {op} is not one the harness sends");
@@ -338,11 +347,19 @@ namespace Jondo.Unity.Server.Network
 
             var board = FightHandler.BoardOf(fight);
             var reach = FightHandler.ReachOf(fight, me, spell);
+            // A spell with no reach (0 to 0) is cast on the caster's own cell: nothing to stage.
+            if (reach.Max <= 0)
+                return Bien(new { cell = me.CellId, target = me.CellId, range = new[] { 0, 0 }, lines = new List<string>() });
             // A spell that wants a free cell -- a jump, a summon, a beacon -- aims beside the target.
+            // The nearest free cell, beside it when one is: with the Puchs bunched and the earlier
+            // summons around them, every neighbour can be taken.
             if (reach.FreeCell)
             {
-                int free = Jondo.Unity.World.Maps.MapGeometry.GetNeighbors(target)
-                    .Where(c => board.Walkable(c) && !fight.Todos.Any(f => f.IsAlive && f.CellId == c))
+                int aimed = target;
+                int free = Enumerable.Range(0, 560)
+                    .Where(c => c != aimed && c != me.CellId && board.Walkable(c) && !fight.Todos.Any(f => f.IsAlive && f.CellId == c)
+                                && !fight.Glifos.Any(g => g.Casillas.Contains(c)))
+                    .OrderBy(c => Jondo.Unity.World.Maps.MapGeometry.Distance(c, aimed))
                     .DefaultIfEmpty(-1).First();
                 if (free >= 0) target = free;
             }
@@ -458,16 +475,28 @@ namespace Jondo.Unity.Server.Network
             return Bien(new { walked, cell = who.CellId, changes, marksGone = spent, lines });
         }
 
-        /// <summary>The character's turn as it began -- its points, its spells ready -- and its foes' life whole.</summary>
-        private static Respuesta TestRefresh()
+        /// <summary>
+        /// The character's turn as it began -- its points, its spells ready -- and its foes' life
+        /// whole. With keep, the board stays as the last spells left it (rows, states, marks,
+        /// summons): the context a class's spells answer to, as in a real fight.
+        /// </summary>
+        private static Respuesta TestRefresh(string cuerpo)
         {
+            bool keep, noSummons;
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(string.IsNullOrEmpty(cuerpo) ? "{}" : cuerpo);
+                keep = doc.RootElement.TryGetProperty("keep", out var k) && k.ValueKind == System.Text.Json.JsonValueKind.True;
+                noSummons = doc.RootElement.TryGetProperty("noSummons", out var n) && n.ValueKind == System.Text.Json.JsonValueKind.True;
+            }
+            catch (System.Text.Json.JsonException) { keep = false; noSummons = false; }
             var session = TestSessionOnline();
             var fight = session == null ? null : FightHandler.FightOf(session.State.CharacterId);
             if (session == null || fight == null) return Mal(409, "no-fight");
             var me = fight.Buscar(session.State.CharacterId);
             if (me == null) return Mal(404, "fighter");
-            var lines = RunInSession(session, stream => FightHandler.FreshTurnAsync(stream, fight, me));
-            return Bien(new { ap = me.CurrentAP, mp = me.CurrentMP, lines });
+            var lines = RunInSession(session, stream => FightHandler.FreshTurnAsync(stream, fight, me, keep, noSummons));
+            return Bien(new { ap = me.CurrentAP, mp = me.CurrentMP, kept = keep, lines });
         }
 
         /// <summary>
@@ -487,6 +516,94 @@ namespace Jondo.Unity.Server.Network
             }
             var lines = RunAsClient(session, op, body.Build());
             return Bien(new { lines, fight = FightView(session) });
+        }
+
+        /// <summary>
+        /// The character's turn given up (jxy) and waited for until it comes back: the summons and
+        /// the monsters play in between, and every spell they cast is judged as the player's are
+        /// -- effect by effect against the board -- through FightHandler's cast watch.
+        /// </summary>
+        private static Respuesta TestEndTurn()
+        {
+            var session = TestSessionOnline();
+            if (session == null || session.Stream == null) return Mal(404, "offline");
+            var fight = FightHandler.FightOf(session.State.CharacterId);
+            if (fight == null) return Mal(409, "no-fight");
+            var me = fight.Buscar(session.State.CharacterId);
+            if (me == null) return Mal(404, "fighter");
+
+            var casts = new List<object>();
+            var gate = new object();
+            (Dictionary<long, (int CurrentHP, int CurrentAP, int CurrentMP, int CellId, int Count, bool IsAlive)> Before,
+             HashSet<(long, int)> Rows, Dictionary<long, HashSet<int>> States, HashSet<int> Glyphs, int Round)? snap = null;
+            void OnBefore(FightInstance f, Fighter caster, int spell, int grade, int cell)
+            {
+                if (f != fight) return;
+                lock (gate)
+                    snap = (f.Todos.ToDictionary(x => x.Id, x => (x.CurrentHP, x.CurrentAP, x.CurrentMP, x.CellId, x.Buffs.Puestos.Count, x.IsAlive)),
+                            f.Todos.SelectMany(x => x.Buffs.Puestos.Select(r => (x.Id, r.Numero))).ToHashSet(),
+                            f.Todos.ToDictionary(x => x.Id, x => x.Buffs.Puestos.Where(r => r.Estado != 0).Select(r => r.Estado).ToHashSet()),
+                            f.Glifos.Select(g => g.Id).ToHashSet(), f.RoundNumber);
+            }
+            void OnAfter(FightInstance f, Fighter caster, int spell, int grade, int cell)
+            {
+                if (f != fight) return;
+                lock (gate)
+                {
+                    if (snap is not { } s) return;
+                    snap = null;
+                    var newRows = f.Todos.SelectMany(x => x.Buffs.Puestos.Where(r => !s.Rows.Contains((x.Id, r.Numero))).Select(r => (Who: x, Row: r))).ToList();
+                    var newGlyphs = f.Glifos.Where(g => !s.Glyphs.Contains(g.Id)).ToList();
+                    string RoleOf(Fighter x) => x.Id == caster.Id ? "caster" : x.TeamId == caster.TeamId ? "ally" : "foe";
+                    var aimed = f.Todos.FirstOrDefault(x => x.IsAlive && x.CellId == cell);
+                    List<object> effects;
+                    try
+                    {
+                        effects = VerifyEffects(f, caster, spell, Math.Max(1, grade), s.Round, s.Before, s.States, newRows, newGlyphs, RoleOf,
+                                                aimed == null ? null : RoleOf(aimed));
+                    }
+                    catch (Exception ex) { effects = new List<object> { new { error = ex.Message } }; }
+                    var changes = f.Todos.Select(x =>
+                    {
+                        s.Before.TryGetValue(x.Id, out var b);
+                        return new
+                        {
+                            x.Id, x.Name, hp = x.CurrentHP - b.CurrentHP, moved = b.CellId != x.CellId ? $"{b.CellId}->{x.CellId}" : null,
+                            buffs = x.Buffs.Puestos.Count - b.Count, died = b.IsAlive && !x.IsAlive, isNew = !s.Before.ContainsKey(x.Id),
+                        };
+                    }).Where(c => c.hp != 0 || c.moved != null || c.buffs != 0 || c.died || c.isNew).ToList();
+                    casts.Add(new
+                    {
+                        caster = caster.Id, name = caster.Name, monster = caster.MonsterId, summon = caster.EsInvocado,
+                        ours = caster.TeamId == me.TeamId, spell, grade, cell, changes, effects,
+                    });
+                }
+            }
+
+            FightHandler.CastWatchBefore += OnBefore;
+            FightHandler.CastWatchAfter += OnAfter;
+            List<string> lines;
+            bool back = false;
+            int roundBefore = fight.RoundNumber;
+            try
+            {
+                lines = RunAsClient(session, "jxy", Pb.New().Build());
+                var until = DateTime.UtcNow.AddSeconds(150);
+                while (DateTime.UtcNow < until)
+                {
+                    System.Threading.Thread.Sleep(300);
+                    if (FightHandler.FightOf(session.State.CharacterId) != fight || !me.IsAlive) break;
+                    if (fight.RoundNumber > roundBefore && fight.CurrentFighter?.Id == me.Id) { back = true; break; }
+                }
+            }
+            finally
+            {
+                FightHandler.CastWatchBefore -= OnBefore;
+                FightHandler.CastWatchAfter -= OnAfter;
+            }
+            List<object> found;
+            lock (gate) found = casts.ToList();
+            return Bien(new { back, round = fight.RoundNumber, alive = me.IsAlive, casts = found, lines });
         }
 
         /// <summary>
@@ -510,6 +627,7 @@ namespace Jondo.Unity.Server.Network
             var glyphsBefore = fight.Glifos.Select(g => g.Id).ToHashSet();
             int round = fight.RoundNumber;
             int grade = FightHandler.CastingGradeOf(me, spell);
+            var aimedAt = fight.Todos.FirstOrDefault(f => f.IsAlive && f.CellId == cell);
             var lines = RunAsClient(session, Op.Jwh, Pb.New().Var(1, cell).Var(4, spell).Build());
 
             var changes = fight.Todos.Select(f =>
@@ -528,7 +646,8 @@ namespace Jondo.Unity.Server.Network
             var newRows = fight.Todos.SelectMany(f => f.Buffs.Puestos.Where(r => !rowsBefore.Contains((f.Id, r.Numero))).Select(r => (Who: f, Row: r))).ToList();
             var newGlyphs = fight.Glifos.Where(g => !glyphsBefore.Contains(g.Id)).ToList();
             string RoleOf(Fighter f) => f.Id == me.Id ? "caster" : f.TeamId == me.TeamId ? "ally" : "foe";
-            var effects = cast ? VerifyEffects(fight, me, spell, grade, round, before, statesBefore, newRows, newGlyphs, RoleOf) : new List<object>();
+            var effects = cast ? VerifyEffects(fight, me, spell, grade, round, before, statesBefore, newRows, newGlyphs, RoleOf,
+                                               aimedAt == null ? null : RoleOf(aimedAt), lines) : new List<object>();
             return Bien(new { spell, grade, cell, cast, changes, glyphs = newGlyphs.Count, effects, lines });
         }
 
@@ -565,11 +684,34 @@ namespace Jondo.Unity.Server.Network
         /// changed; a summon by a new fighter; a mark by a new glyph or trap; a state by its row.
         /// What goes off later (another trigger, a delay) or by chance is said so, to be tried apart.
         /// </summary>
+        /// <summary>
+        /// The effects the engine keeps as rows of other numbers: a steal as the target's loss and
+        /// the caster's gain, a shield in a share of the level as the shield's points.
+        /// </summary>
+        private static readonly Dictionary<int, int[]> KeptAs = new()
+        {
+            [266] = new[] { 152, 123 }, // chance stolen
+            [267] = new[] { 153, 125 }, // vitality
+            [268] = new[] { 154, 119 }, // agility
+            [269] = new[] { 155, 126 }, // intelligence
+            [270] = new[] { 156, 124 }, // wisdom
+            [271] = new[] { 157, 118 }, // strength
+            [77] = new[] { 169, 128 },  // MP stolen
+            [84] = new[] { 168, 111 },  // AP stolen
+            [320] = new[] { 116, 117 }, // range stolen
+            [1020] = new[] { 1040 },    // shield, % of the level
+        };
+
+        /// <summary>Whether a mask holds a condition (a token with a number, or T, a telefrag) and not only kinds of fighter.</summary>
+        private static bool Gated(string? mask)
+            => (mask ?? "").Split(',').Select(k => k.Trim().TrimStart('*')).Any(k => k.Length > 1 && k.Skip(1).Any(char.IsDigit) || k is "T" or "t");
+
         private static List<object> VerifyEffects(FightInstance fight, Fighter me, int spell, int grade, int round,
             Dictionary<long, (int CurrentHP, int CurrentAP, int CurrentMP, int CellId, int Count, bool IsAlive)> before,
             Dictionary<long, HashSet<int>> statesBefore, List<(Fighter Who, Buff Row)> newRows, List<Glifo> newGlyphs,
-            Func<Fighter, string> roleOf)
+            Func<Fighter, string> roleOf, string? aimedRole = null, IReadOnlyList<string>? lines = null)
         {
+            var castLines = lines ?? Array.Empty<string>();
             var result = new List<object>();
             var catalogue = EffectCatalogue.Value;
             var lostLife = fight.Todos.Where(f => before.TryGetValue(f.Id, out var b) && f.CurrentHP < b.CurrentHP).ToList();
@@ -580,8 +722,14 @@ namespace Jondo.Unity.Server.Network
                                                     && (f.CurrentAP < b.CurrentAP || f.CurrentMP < b.CurrentMP)).ToList();
             string Names(IEnumerable<Fighter> fs) => string.Join(", ", fs.Select(f => $"{roleOf(f)} {f.Id}"));
 
-            foreach (var e in SpellEffects.De(spell, grade))
+            // The spell's effects, and those of the spells it casts at once (1160, 792, 2160), two deep.
+            // The states the spell takes off again itself (951): a marker it sets for its own
+            // effects -- Posición Defensiva's 5260 and 5373 -- is gone by the end of the cast.
+            var takenOffAgain = SpellEffects.De(spell, grade).Where(x => x.EffectId == 951).Select(x => x.Value).ToHashSet();
+            var pending = new Queue<(SpellEffect E, int Depth, int From, string? Gate)>(SpellEffects.De(spell, grade).Select(x => (x, 0, spell, (string?)null)));
+            while (pending.Count > 0)
             {
+                var (e, depth, from, gate) = pending.Dequeue();
                 catalogue.TryGetValue(e.EffectId, out var row);
                 string text = row.Text ?? "";
                 string lower = text.ToLowerInvariant();
@@ -592,8 +740,35 @@ namespace Jondo.Unity.Server.Network
                 string verdict, observed;
                 int expectedEnd = e.Duration < 0 ? -1 : round + e.Delay + Math.Max(1, e.Duration);
                 var rows = newRows.Where(r => r.Row.EffectId == e.EffectId).ToList();
+                // A characteristic steal leaves no row of its own: the engine splits it into a
+                // loss on the target and a gain on the caster (271 strength -> 157 and 118).
+                // A modifier of one spell (293, 280, 285...): the rows on that spell only.
+                if (Enum.IsDefined(typeof(SpellAspect), e.EffectId) && e.DiceNum > 0)
+                    rows = rows.Where(r => r.Row.HechizoAfectado == e.DiceNum).ToList();
+                if (rows.Count == 0 && KeptAs.TryGetValue(e.EffectId, out var keptAs))
+                    rows = newRows.Where(r => keptAs.Contains(r.Row.EffectId)).ToList();
 
-                if (!string.Equals(e.Triggers, "I", StringComparison.OrdinalIgnoreCase) && e.Triggers.Length > 0)
+                bool immediate = string.Equals(e.Triggers, "I", StringComparison.OrdinalIgnoreCase) || e.Triggers.Length == 0;
+                if (immediate && e.Delay == 0 && e.Duration == 0
+                    && e.EffectId is Jondo.Unity.World.Combat.EffectSupport.TriggerSpell or Jondo.Unity.World.Combat.EffectSupport.CastSpell
+                                  or Jondo.Unity.World.Combat.EffectSupport.NearestTargetExecuteSpell)
+                {
+                    int sub = e.DiceNum, subGrade = Math.Max(1, e.DiceSide);
+                    verdict = "sub-spell";
+                    observed = $"casts spell {sub} grade {subGrade}: its effects follow";
+                    // A sub-spell cast only on a condition (a state, a kind of monster, a telefrag:
+                    // anything in its mask beyond the plain kinds) hands that condition down.
+                    string? passOn = gate ?? (Gated(e.TargetMask) ? e.TargetMask : null);
+                    if (depth < 2 && sub > 0)
+                        foreach (var inner in SpellEffects.De(sub, subGrade)) pending.Enqueue((inner, depth + 1, sub, passOn));
+                }
+                else if (e.EffectId == Jondo.Unity.World.Combat.EffectSupport.RemoveSpellEffects)
+                {
+                    var left = fight.Todos.Where(f => f.Buffs.Puestos.Any(r => r.HechizoOrigen == e.DiceNum)).ToList();
+                    verdict = left.Count == 0 ? "applied" : "missing";
+                    observed = left.Count == 0 ? $"nobody keeps effects of spell {e.DiceNum}" : $"effects of spell {e.DiceNum} still on {Names(left)}";
+                }
+                else if (!immediate)
                 {
                     verdict = rows.Count > 0 ? "armed" : "deferred";
                     observed = rows.Count > 0 ? $"waiting on {Names(rows.Select(r => r.Who))} for trigger {e.Triggers}"
@@ -611,7 +786,8 @@ namespace Jondo.Unity.Server.Network
                     observed = moved.Count > 0 ? "moved: " + string.Join(", ", moved.Select(f => $"{roleOf(f)} {f.Id} {before[f.Id].CellId}->{f.CellId}"))
                                                : "nobody moved";
                 }
-                else if (e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Summon || lower.Contains("invoca"))
+                // A summon, not "+N invocaciones" (182), which is a characteristic and lands as a row.
+                else if (e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Summon || lower.Contains("invoca") && e.EffectId != 182)
                 {
                     verdict = born.Count > 0 ? "applied" : "missing";
                     observed = born.Count > 0 ? "new: " + string.Join(", ", born.Select(f => $"{f.Id} monster {f.MonsterId} on {f.CellId}")) + $" (expected monster {e.DiceNum})"
@@ -626,7 +802,8 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (e.EffectId == Jondo.Unity.World.Combat.EffectSupport.AddState || e.EffectId == Jondo.Unity.World.Combat.EffectSupport.DisableState)
                 {
-                    var states = rows.Where(r => r.Row.Estado != 0).ToList();
+                    // This effect's state only: a spell sets several, each with its own length.
+                    var states = rows.Where(r => r.Row.Estado != 0 && r.Row.Estado == e.Value).ToList();
                     verdict = states.Count > 0 ? (states.All(r => r.Row.CaducaEnRonda == expectedEnd) ? "applied" : "duration") : "missing";
                     observed = states.Count > 0 ? string.Join(", ", states.Select(r => $"state {r.Row.Estado} on {roleOf(r.Who)} {r.Who.Id} until round {r.Row.CaducaEnRonda}")) + $" (expected until {expectedEnd})"
                                                 : $"no state {e.Value} row";
@@ -665,8 +842,10 @@ namespace Jondo.Unity.Server.Network
                 else if (row.Characteristic > 0 || e.Duration != 0)
                 {
                     bool points = lostPoints.Count > 0 && (lower.Contains("pa") || lower.Contains("pm"));
-                    verdict = points ? "applied" : "missing";
-                    observed = points ? "no row, but points lost: " + Names(lostPoints) : "no row on anybody";
+                    // A loss of AP or MP the target dodged whole leaves no row: the engine says so.
+                    bool dodged = castLines.Any(l => l.Contains(" dodges ") && l.Contains($"effect {e.EffectId} of spell"));
+                    verdict = points ? "applied" : dodged ? "dodged" : "missing";
+                    observed = points ? "no row, but points lost: " + Names(lostPoints) : dodged ? "dodged by the target" : "no row on anybody";
                 }
                 else
                 {
@@ -674,7 +853,58 @@ namespace Jondo.Unity.Server.Network
                     observed = "the harness has no check for this effect yet";
                 }
                 if (e.Probabilidad > 0 && e.Probabilidad < 100 && verdict == "missing") verdict = "chance";
-                result.Add(new { effect = e.EffectId, text, dice = new[] { min, max }, e.Duration, e.Delay, e.TargetMask, zone = $"{(char)e.Forma}{e.Tamano}", chance = e.Probabilidad, verdict, observed });
+                // An effect whose mask asks for a state (E, *E: the target's or the caster's) that
+                // nobody had did right not to go off.
+                if (verdict == "missing" && System.Text.RegularExpressions.Regex.IsMatch(e.TargetMask ?? "", @"(^|,)\*?[Ee]\d"))
+                {
+                    verdict = "conditional";
+                    observed += $" (mask {e.TargetMask})";
+                }
+                // A ring (O) or a hollow cross (Q) misses the cell it is aimed at: the harness aims
+                // at a fighter, who is in the zone's empty middle, so a miss there says nothing.
+                if (verdict == "missing" && (char)e.Forma is 'O' or 'Q')
+                {
+                    verdict = "hollow-zone";
+                    observed += $" (zone {(char)e.Forma}{e.Tamano}, aimed at its empty middle)";
+                }
+                // A mask that asks for one kind of monster (F, f and a number) on a Puch: nothing was due.
+                if (verdict == "missing" && System.Text.RegularExpressions.Regex.IsMatch(e.TargetMask ?? "", @"(^|,)\*?[Ff]\d"))
+                {
+                    verdict = "conditional";
+                    observed += $" (mask {e.TargetMask})";
+                }
+                if (verdict == "missing" && e.EffectId == 950 && takenOffAgain.Contains(e.Value))
+                {
+                    verdict = "transient";
+                    observed += " (the spell takes the state off again itself)";
+                }
+                // Several variants of one effect, each on its own condition (Marca Mortuoria's 776
+                // at 10, 15, 20, 25 or 30 by the caster's state): the rows are the variant that
+                // applied, and a conditioned one does not answer for them.
+                if (verdict is "value" or "duration" && Gated(e.TargetMask)
+                    && SpellEffects.De(from, from == spell ? grade : 1).Count(x => x.EffectId == e.EffectId) > 1)
+                {
+                    verdict = "variant";
+                    observed += $" (another variant of {e.EffectId} applied; this one asks {e.TargetMask})";
+                }
+                if (verdict == "missing" && gate != null)
+                {
+                    verdict = "conditional";
+                    observed += $" (its sub-spell is cast on a condition: {gate})";
+                }
+                // A single-cell effect whose mask names only friends (lower case) or only foes
+                // (upper case), the cast aimed at the other kind: nothing was due to land.
+                var kinds = (e.TargetMask ?? "").Split(',').Select(k => k.Trim()).Where(k => k.Length == 1 && char.IsLetter(k[0])).ToList();
+                if (verdict == "missing" && aimedRole != null && kinds.Count > 0 && (char)e.Forma == 'P' && e.Tamano <= 1)
+                {
+                    bool forFoes = kinds.Any(k => char.IsUpper(k[0])), forFriends = kinds.Any(k => char.IsLower(k[0]));
+                    if (aimedRole == "foe" ? !forFoes : !forFriends)
+                    {
+                        verdict = "not-for-target";
+                        observed += $" (mask {e.TargetMask}, aimed at the {aimedRole})";
+                    }
+                }
+                result.Add(new { effect = e.EffectId, via = depth == 0 ? 0 : from, text, dice = new[] { min, max }, e.Duration, e.Delay, e.TargetMask, zone = $"{(char)e.Forma}{e.Tamano}", chance = e.Probabilidad, verdict, observed });
             }
             return result;
         }

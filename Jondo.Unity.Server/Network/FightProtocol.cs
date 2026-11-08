@@ -1861,7 +1861,7 @@ namespace Jondo.Unity.Server.Network
                         .Var(3, quienEs)))
                 .Var(2, 0)
                 .Bytes(3, look ?? Array.Empty<byte>())
-                .Msg(5, Pb.New().Msg(2, Pb.New().Str(1, nombre ?? "").Var(2, nivel)))
+                .Msg(5, DoubleIdentity(nombre, nivel))
                 .Msg(6, stats);
 
             return Pb.New()
@@ -1873,6 +1873,16 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>"Invoca un doble del lanzador".</summary>
         public const int InvocaUnDoble = 180;
+
+        /// <summary>
+        /// Who a double is: <c>f2 { f1: the character's name, f2: his level }</c>, where a monster
+        /// names its grade and template ("sram-doble", frame 16). Every block that lists the double
+        /// again -- the jxb of a reconnection or a wave, a spectator's -- has to say the same:
+        /// told as a monster it is template 0, and the client's turn line and its distances
+        /// (TimelineFighterUI.RefreshSpriteForMonsterId, fjc.bfqd) fall on a null.
+        /// </summary>
+        public static Pb DoubleIdentity(string nombre, int nivel)
+            => Pb.New().Msg(2, Pb.New().Str(1, nombre ?? "").Var(2, nivel));
 
         /// <summary>The two numbers a displacement travels with.</summary>
         public const int Alejarse = 5;
