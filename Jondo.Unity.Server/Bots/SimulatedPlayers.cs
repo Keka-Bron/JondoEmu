@@ -93,6 +93,25 @@ namespace Jondo.Unity.Server.Bots
             if (port != 0) _ports.TryRemove(port, out _);
         }
 
+        private static readonly object JournalLock = new();
+
+        /// <summary>
+        /// A line of the bots' own journal, logs/simulated_players.log: an errand done, a bot that
+        /// broke. The window hears nothing of them; this is where to look when one misbehaves.
+        /// </summary>
+        internal static void Journal(string text)
+        {
+            lock (JournalLock)
+            {
+                try
+                {
+                    System.IO.File.AppendAllText(System.IO.Path.Combine(Jondo.Unity.Launcher.Paths.LogsDir, "simulated_players.log"),
+                                                 $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {text}{Environment.NewLine}");
+                }
+                catch { }
+            }
+        }
+
         /// <summary>Whether these characters are all bots: what happens among them alone is not logged.</summary>
         internal static bool OnlyBots(IEnumerable<long> characters)
         {

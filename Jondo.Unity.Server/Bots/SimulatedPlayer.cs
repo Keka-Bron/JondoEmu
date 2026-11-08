@@ -100,7 +100,7 @@ namespace Jondo.Unity.Server.Bots
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Bots] {_name} stopped: {ex.Message}");
+                SimulatedPlayers.Journal($"{_name} stopped: {ex}");
             }
             finally
             {
@@ -220,6 +220,7 @@ namespace Jondo.Unity.Server.Bots
                 Console.WriteLine($"[Bots] {_name} is born at level {level}.");
             }
             JoinTheWar(level);
+            RaiseTradesOffline(_characterId, level);
 
             // A character still in a fight is not selected: the kvd's «go on» (kwb) put it back already.
             if (!_selected.Task.IsCompleted) await SendAsync(Op.Kvw, Pb.New().Var(1, _characterId).Build());

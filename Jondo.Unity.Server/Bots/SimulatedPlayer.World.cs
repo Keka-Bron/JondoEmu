@@ -77,6 +77,8 @@ namespace Jondo.Unity.Server.Bots
 
             int roll = _dice.Next(100);
             bool free = _queuedSince == null;
+            // Its outfit, now and then and after every level (SimulatedPlayer.Gear).
+            if (free && await GearUpAsync(session, stop)) return;
             if (_atWar && free)
             {
                 if (await HuntAsync(session, stop)) return;
@@ -190,8 +192,13 @@ namespace Jondo.Unity.Server.Bots
         private async Task<bool> TakeTheWayAsync(GameSession session, (long To, int[] Cells) way, CancellationToken stop)
         {
             int here = session.State.CellId;
-            int door = way.Cells.OrderBy(c => MapGeometry.Distance(here, c)).First();
-            if (!await WalkToAsync(session, door, stop)) return false;
+            // The nearest of the border's cells it can walk to: not every one is reached from every cell.
+            bool there = false;
+            foreach (int door in way.Cells.OrderBy(c => MapGeometry.Distance(here, c)).Take(3))
+            {
+                if (await WalkToAsync(session, door, stop)) { there = true; break; }
+            }
+            if (!there) return false;
 
             _arrived = new TaskCompletionSource<long>(TaskCreationOptions.RunContinuationsAsynchronously);
             await SendAsync(Op.Jqk, Pb.New().Var(2, way.To).Build());
