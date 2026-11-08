@@ -459,27 +459,20 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// A tax collector's end-of-fight entry carries its alliance in the f4 of the fighter's oneof
-        /// (lmk), where fkv.bgdw looks for it; without it the screen drew «???».
+        /// A tax collector's end-of-fight entry is a monster's: no alliance in the f4 of the
+        /// fighter's oneof (lmk). With it, fkv.bgdw made it a «tax collector» line, and the end
+        /// screen drew an empty head, «?», among the enemies (TaxCollectorEndScreenTests).
         /// </summary>
         [Fact]
-        public void A_tax_collector_ends_the_fight_with_its_alliance()
+        public void A_tax_collector_ends_the_fight_as_a_monster()
         {
-            byte[] block = AllianceProtocol.Block(AllianceThree).Build();
             var jyg = FightProtocol.BuildFightResults(new[]
             {
-                new FightProtocol.FightResult { Fighter = -1, TaxCollectorAlliance = block },
-                new FightProtocol.FightResult { Fighter = -2 },
+                new FightProtocol.FightResult { Fighter = -1 },
             }, 1000);
 
-            var lines = Fields(jyg).Blocks[2];
-            var (_, first) = Fields(lines[0]);
-            var (_, firstFighter) = Fields(Assert.Single(first[3]));
-            var (_, taxCollector) = Fields(Assert.Single(firstFighter[4]));
-            Assert.Equal(block, Assert.Single(taxCollector[1]));
-
-            var (_, second) = Fields(lines[1]);
-            Assert.False(Fields(Assert.Single(second[3])).Blocks.ContainsKey(4));
+            var (_, first) = Fields(Assert.Single(Fields(jyg).Blocks[2]));
+            Assert.False(Fields(Assert.Single(first[3])).Blocks.ContainsKey(4));
         }
 
         /// <summary>

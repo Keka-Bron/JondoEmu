@@ -2094,12 +2094,6 @@ namespace Jondo.Unity.Server.Network
 
             public Spoils Spoils { get; set; }
 
-            /// <summary>
-            /// A tax collector's alliance (its block, len), or null. It goes as the f4 of the
-            /// fighter's oneof (lmk: f2 a person, f4 a tax collector, f5 a monster's number).
-            /// </summary>
-            public byte[] TaxCollectorAlliance { get; set; }
-
             /// <summary>His honour after an aggression between the cities, or null for any other fight.</summary>
             public HonourResult Pvp { get; set; }
         }
@@ -2211,10 +2205,6 @@ namespace Jondo.Unity.Server.Network
                 // captures contradicting each other under my reading, the reading that has to go is mine: it is
                 // left as it was, which is the only thing measured end to end.
                 quien.Var(3, 1);
-                if (result.TaxCollectorAlliance != null)
-                {
-                    quien.Msg(4, Pb.New().Bytes(1, result.TaxCollectorAlliance));
-                }
                 entrada.Msg(3, quien);
 
                 if (result.Winner) entrada.Var(4, Victory);

@@ -617,14 +617,14 @@ namespace Jondo.Unity.Server.Handlers
         /// placement jxg and this one the jxb block, which is the same content with the sheet filled
         /// in. Both read the FIGHTER's sheet and not the watcher's, which was the bug.
         /// </remarks>
-        private static Network.Pb BloqueDe(FightInstance fight, Fighter fighter)
+        private static Network.Pb BloqueDe(FightInstance fight, Fighter fighter, bool collectorAsMonster = false)
         {
             if (fighter.IsMonster)
             {
                 return Network.FightProtocol.FighterBlock(
                     fighter.CellId, FacingOf(fight, fighter), fighter.Id, FullSheetOf(fighter),
                     NormalFightLook(fighter),
-                    IdentityOf(fighter),
+                    IdentityOf(fighter, collectorAsMonster),
                     isMonster: true, wave: fighter.Wave, alive: fighter.IsAlive, team: fighter.TeamId,
                     summoner: SummonerOf(fighter));
             }
@@ -641,17 +641,35 @@ namespace Jondo.Unity.Server.Handlers
         /// client's carousel is indexed against -- and then whoever the turn order has not caught
         /// up with. The list of the fight-start jxb, sent again on reconnecting and when a wave comes on.
         /// </summary>
-        private static List<Network.Pb> FighterBlocksInPlayOrder(FightInstance fight)
+        private static List<Network.Pb> FighterBlocksInPlayOrder(FightInstance fight, bool collectorAsMonster = false)
         {
             var blocks = new List<Network.Pb>();
             var listed = new HashSet<long>();
             foreach (var fighter in fight.TurnOrder.Concat(TodosLosCombatientes(fight)))
             {
                 if (fighter == null || !listed.Add(fighter.Id)) continue;
-                blocks.Add(BloqueDe(fight, fighter));
+                blocks.Add(BloqueDe(fight, fighter, collectorAsMonster));
             }
             return blocks;
         }
+
+        /// <summary>
+        /// The fighters again, a tax collector among them as the monster it is (3859), for the end
+        /// screen; null when no tax collector fought.
+        /// </summary>
+        /// <remarks>
+        /// The end screen draws an enemy's icon only for a monster: its report (fkv.bgdv) reads the
+        /// fighter's entity info, and takes a creature's number and face only if the info is a
+        /// monster's. A tax collector's info comes from its names, so it got nothing, and its entry's
+        /// alliance (the f4 of the jyg) made it a «tax collector» line with an empty head -- the
+        /// «?» among the enemies. The client rebuilds a fighter's info from every jxb (eid.yfq), so
+        /// one more just before the end, inside a sequence of its own as the waves send theirs,
+        /// lists it as monster 3859: «Recaudador», with its face and its level.
+        /// </remarks>
+        internal static byte[] CollectorAsMonsterRefresh(FightInstance fight)
+            => fight.Todos.Any(f => f.TaxCollectorFirstName > 0)
+                ? Network.FightProtocol.BuildAllFighters(FighterBlocksInPlayOrder(fight, collectorAsMonster: true))
+                : null;
 
         /// <summary>
         /// The fighter of WHOEVER is talking right now, read from his own session.
@@ -1637,8 +1655,8 @@ namespace Jondo.Unity.Server.Handlers
         /// grade, its template and its level. A monster's grade is kept from zero and a summon's
         /// from one, as its template's grades number them (Summons.Characteristics).
         /// </summary>
-        private static Network.Pb IdentityOf(Fighter fighter)
-            => fighter.TaxCollectorFirstName > 0
+        private static Network.Pb IdentityOf(Fighter fighter, bool collectorAsMonster = false)
+            => fighter.TaxCollectorFirstName > 0 && !collectorAsMonster
                 ? Network.FightProtocol.TaxCollectorIdentity(fighter.TaxCollectorFirstName,
                                                              fighter.TaxCollectorLastName, fighter.MonsterId)
                 : Network.FightProtocol.MonsterIdentity(fighter.EsInvocado ? fighter.GradeIndex : fighter.GradeIndex + 1,
@@ -10021,19 +10039,6 @@ namespace Jondo.Unity.Server.Handlers
             // An aggression between the cities: each one's honour, in the end screen's honour column.
             foreach (var result in results) result.Pvp = AlignmentWar.ResultOf(fight, result.Fighter);
 
-            // A tax collector is listed with its alliance, the f4 of its entry: without it the end
-            // screen drew it among the enemies as «???», a monster it did not know.
-            if (fight.Reglas == FightRules.ContraRecaudador
-                && Managers.AllianceStore.ById(fight.DefendingAllianceId) is { } defending)
-            {
-                byte[] block = Network.AllianceProtocol.Block(defending).Build();
-                foreach (var result in results)
-                {
-                    if (fight.Todos.Any(f => f.Id == result.Fighter && f.MonsterId == Network.TaxCollectorProtocol.Monster))
-                        result.TaxCollectorAlliance = block;
-                }
-            }
-
             int duration = (int)Math.Max(0, (DateTime.UtcNow - fight.StartedAt).TotalMilliseconds);
             ActivityJournal.Current.Write("fight.ended", SessionContext.Current.AccountId,
                 GameState.CharacterId,
@@ -10047,6 +10052,18 @@ namespace Jondo.Unity.Server.Handlers
                     itemKinds = loot.Count,
                     itemQuantity = loot.Sum(item => item.Value),
                 });
+
+            // A tax collector, told again as the monster it is, so that the end screen lists it
+            // among the enemies with its face (CollectorAsMonsterRefresh).
+            if (CollectorAsMonsterRefresh(fight) is { } unmasked)
+            {
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
+                    Network.FightProtocol.BuildSequenceStart(yo, Network.FightProtocol.ActionSequence)));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxb, unmasked));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
+                    Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), yo,
+                                                           Network.FightProtocol.ActionSequence)));
+            }
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kuf,
                 Network.FightProtocol.BuildFightOver()));
