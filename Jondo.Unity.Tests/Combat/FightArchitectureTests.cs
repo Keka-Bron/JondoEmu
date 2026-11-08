@@ -144,6 +144,8 @@ namespace Jondo.Unity.Tests.Combat
             // party window's switch of the one who clicked it, and the way back of the one who
             // leaves the placement -- all three are one person's own view.
             "SendFightCountAsync", "AutoOptionAsync", "LeavePlacementAsync",
+            // The test harness's fresh turn: the caster's own cooldowns, to his own client.
+            "FreshTurnStepsAsync",
         };
 
         [Fact]

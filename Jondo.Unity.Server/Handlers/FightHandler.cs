@@ -2333,6 +2333,38 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The cast limits of whoever is casting: a summon's own grade, a player's by level.</summary>
+        /// <summary>
+        /// Where a fighter reaches with a spell now, as the cast measures it: its grade's range,
+        /// the buffs aimed at the spell, the equipment and characteristic when the range can be
+        /// boosted, and the spell's modifiers; and whether it wants a free cell. For the test
+        /// harness, to stage a cast where it is legal (ControlApiTest.cs).
+        /// </summary>
+        /// <summary>
+        /// For the test harness: a fighter walked to a cell by the fight's own walk, as a monster
+        /// walks -- tackles, and whatever lies on the ground it crosses: traps, glyphs, bomb walls.
+        /// </summary>
+        internal static Task<bool> TestWalkAsync(NetworkStream stream, FightInstance fight, Fighter who, int to)
+        {
+            var walkable = MapManager.GetFightWalkable(fight.ArenaMapId) ?? new HashSet<int>();
+            var occupied = fight.Todos.Where(f => f.IsAlive && f != who).Select(f => f.CellId).ToHashSet();
+            var path = Jondo.Unity.World.Maps.MapGeometry.FindShortestPath(who.CellId, to, walkable, occupied);
+            return path.Count < 2 ? Task.FromResult(false) : MonsterWalkAsync(stream, fight, who, path);
+        }
+
+        /// <summary>The grade a fighter casts a spell at, as the cast reads it (for the test harness).</summary>
+        internal static int CastingGradeOf(Fighter caster, int spell) => LimitesDelQueLanza(caster, spell).Grade;
+
+        internal static (int Min, int Max, bool FreeCell) ReachOf(FightInstance fight, Fighter caster, int spell)
+        {
+            var limites = LimitesDelQueLanza(caster, spell);
+            int minimo = limites.AlcanceMinimo
+                       + caster.Buffs.DelHechizo(spell, Jondo.Unity.World.Fights.SpellAspect.AlcanceMinimo, fight.RoundNumber);
+            int maximo = spell == 0 ? limites.AlcanceMaximo
+                       : ReachBeforeModifiers(caster, spell, limites.AlcanceMaximo, limites.Flags, fight.RoundNumber);
+            var (min, max) = Managers.SpellModifiers.Range(caster, spell, minimo, maximo, fight.RoundNumber);
+            return (min, max, limites.NeedFreeCell);
+        }
+
         private static LimitesDelHechizo LimitesDelQueLanza(Fighter caster, int spell)
         {
             if (spell == 0) return WeaponLimits(caster);
@@ -5375,7 +5407,17 @@ namespace Jondo.Unity.Server.Handlers
             who.LanzadosPorObjetivo.Clear();
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc, Network.FightProtocol.BuildCooldowns(who.Id, RecargasDe(who))));
             foreach (var other in fight.Todos.Where(f => f.TeamId != who.TeamId && f.IsAlive).ToList())
+            {
                 await HealFullyAsync(stream, fight, other, other);
+                // Points to lose: a Puch has none, and a spell that takes AP or MP had nothing to take.
+                int gainAp = Math.Max(6, other.MaxAP) - other.CurrentAP, gainMp = Math.Max(3, other.MaxMP) - other.CurrentMP;
+                other.MaxAP = Math.Max(6, other.MaxAP);
+                other.MaxMP = Math.Max(3, other.MaxMP);
+                other.CurrentAP = other.MaxAP;
+                other.CurrentMP = other.MaxMP;
+                if (gainAp > 0) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPointsGiven(other.Id, 111, other.Id, gainAp)));
+                if (gainMp > 0) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPointsGiven(other.Id, 128, other.Id, gainMp)));
+            }
         }
 
         private static IEnumerable<(int Spell, int Rounds)> RecargasDe(Fighter quien)
