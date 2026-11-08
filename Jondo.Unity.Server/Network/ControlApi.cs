@@ -61,6 +61,9 @@ namespace Jondo.Unity.Server.Network
 
             try
             {
+                // The test harness's routes, only on a server started for it (ControlApiTest.cs).
+                if (TestRoute(ruta, cuerpo) is { } test) return test;
+
                 switch (ruta)
                 {
                     // ─── Open ───────────────────────────────────────────────────────────────

@@ -92,6 +92,12 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public bool Quiet { get; set; }
 
+        /// <summary>
+        /// Where what is logged while serving it goes as well, line by line, while the test harness
+        /// acts in its name (ControlApiTest.cs); null otherwise.
+        /// </summary>
+        internal List<string>? Capture { get; set; }
+
         /// <summary>Captures this session's current map instance. Safe to retain across an await or map change.</summary>
         public GameMapAudience Map => new(MapAudienceScope.Capture(State), _codec);
 

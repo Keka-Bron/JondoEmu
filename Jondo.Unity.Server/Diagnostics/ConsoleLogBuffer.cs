@@ -223,6 +223,8 @@ namespace Jondo.Unity.Server
                     line = _pending.ToString();
                     _pending.Clear();
                 }
+                if (Network.SessionContext.Actual?.Capture is { } capture)
+                    lock (capture) capture.Add(line);
                 AddLog(line);
             }
 

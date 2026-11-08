@@ -3278,6 +3278,9 @@ namespace Jondo.Unity.Server.Handlers
                 : fighter.IsMonster
                     ? Network.FightProtocol.MonsterTurnDeciseconds
                     : fight.Reglas.PlayerTurn > 0 ? fight.Reglas.PlayerTurn : Network.FightProtocol.PlayerTurnDeciseconds;
+            // On a server started for the test harness, a player's turn waits ten minutes for it: it
+            // looks, thinks and clicks far slower than a person (ControlApiTest.cs).
+            if (Network.ControlApi.TestKey.Length > 0 && !fighter.IsMonster && !fighter.EsInvocado) duration = 6000;
 
             // A turn of his, or of a summon he drives, for the per-turn averages of the end.
             if (!fighter.IsMonster || Dueno(fight, fighter) != null)
@@ -5329,6 +5332,52 @@ namespace Jondo.Unity.Server.Handlers
         /// it is what the real server does, whose jxc keeps listing the same spells round after round
         /// with a zero next to them.
         /// </summary>
+        /// <summary>
+        /// For the test harness (ControlApiTest.cs): a fighter's turn as it began -- every point
+        /// back, every spell ready again, each told to the board -- and the other side whole again.
+        /// </summary>
+        internal static async Task FreshTurnAsync(NetworkStream stream, FightInstance fight, Fighter who)
+            => await InASequenceAsync(fight, who.Id, () => FreshTurnStepsAsync(stream, fight, who));
+
+        /// <summary>
+        /// Work told to the board inside a sequence of its own (jto ... jwi): the client plays a
+        /// fight's actions only inside one, and a lone teleport or heal was never drawn.
+        /// </summary>
+        internal static async Task InASequenceAsync(FightInstance fight, long author, Func<Task> work)
+        {
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(author, Network.FightProtocol.ActionSequence)));
+            await work();
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), author, Network.FightProtocol.ActionSequence)));
+        }
+
+        private static async Task FreshTurnStepsAsync(NetworkStream stream, FightInstance fight, Fighter who)
+        {
+            // A clean board: what earlier spells left -- effects, states, a range moved, marks on
+            // the ground -- would judge the next spell by the last one's doing.
+            foreach (var fighter in fight.Todos.Where(f => f.IsAlive).ToList())
+                foreach (var row in fighter.Buffs.Puestos.ToList())
+                    if (fighter.Buffs.QuitarFila(row))
+                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya, Network.FightProtocol.BuildBuffGone(fighter.Id, row.Numero)));
+            foreach (var mark in fight.Glifos.ToList())
+            {
+                fight.Glifos.Remove(mark);
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildGlyphGone(mark.Dueno, mark.Id)));
+            }
+            int ap = who.MaxAP - who.CurrentAP, mp = who.MaxMP - who.CurrentMP;
+            who.CurrentAP = who.MaxAP;
+            who.CurrentMP = who.MaxMP;
+            if (ap > 0) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPointsGiven(who.Id, 111, who.Id, ap)));
+            if (mp > 0) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPointsGiven(who.Id, 128, who.Id, mp)));
+            foreach (int spell in who.Recarga.Keys.ToList()) who.Recarga[spell] = 0;
+            who.LanzadosEsteTurno.Clear();
+            who.LanzadosPorObjetivo.Clear();
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc, Network.FightProtocol.BuildCooldowns(who.Id, RecargasDe(who))));
+            foreach (var other in fight.Todos.Where(f => f.TeamId != who.TeamId && f.IsAlive).ToList())
+                await HealFullyAsync(stream, fight, other, other);
+        }
+
         private static IEnumerable<(int Spell, int Rounds)> RecargasDe(Fighter quien)
         {
             if (quien == null) yield break;
