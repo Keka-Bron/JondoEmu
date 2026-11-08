@@ -468,6 +468,11 @@ namespace Jondo.Unity.Server.Managers
             => (efecto >= DanoPrimero && efecto <= DanoUltimo)
                || efecto == DanoDelMejorElemento
                || efecto == DanoDelPeorElemento
+               // And the two steals that pick their element at the blow: Concentración de Chakra's
+               // 24003 «roba vida con el mejor elemento» went to the panel unapplied, as did
+               // every 2828 of the monsters'.
+               || efecto == RoboDelMejorElemento
+               || efecto == RoboDelPeorElemento
                || PegaSegunLoErosionado(efecto)
                || PorLosPMRestantes.Contains(efecto)
                || ModoDe(efecto) != ModoDeDano.Normal;
@@ -586,10 +591,10 @@ namespace Jondo.Unity.Server.Managers
         {
             int elemento = efecto.Element >= 0 ? efecto.Element
                                                : DatabaseManager.EffectElement(efecto.EffectId);
-            // Its steal as well: Tijeras del destino's "robo del mejor elemento" (2828).
-            if (efecto.EffectId == DanoDelMejorElemento || efecto.EffectId == 2828 || elemento == ElementoMejor)
+            // Its steal as well: Tijeras del destino's "robo del mejor elemento" (2828), and the worst's.
+            if (efecto.EffectId == DanoDelMejorElemento || efecto.EffectId == RoboDelMejorElemento || elemento == ElementoMejor)
                 return MejorElementoDe(quienLanza, ronda);
-            if (efecto.EffectId == DanoDelPeorElemento)
+            if (efecto.EffectId == DanoDelPeorElemento || efecto.EffectId == RoboDelPeorElemento)
                 return PeorElementoDe(quienLanza, ronda);
             return elemento;
         }
@@ -1438,6 +1443,9 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private const int DanoDelPeorElemento = 2832;
 
+        /// <summary>«Robo de vida del mejor elemento» and «del peor»: steals whose element is the caster's best or worst.</summary>
+        private const int RoboDelMejorElemento = 2828, RoboDelPeorElemento = 2890;
+
         /// <summary>Effects.ElementId's 5: «the best», which is not an element but a question.</summary>
         private const int ElementoMejor = 5;
 
@@ -1972,7 +1980,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static readonly HashSet<int> RobosDeVida = new HashSet<int>
         {
-            82, 91, 92, 93, 94, 95, 2828, 2890
+            82, 91, 92, 93, 94, 95, RoboDelMejorElemento, RoboDelPeorElemento
         };
 
         public static bool EsRoboDeVida(int efecto) => RobosDeVida.Contains(efecto);
@@ -4086,6 +4094,8 @@ namespace Jondo.Unity.Server.Managers
                 puesto.Centro = celdaApuntada;
                 puesto.HechizoQueLoPuso = hechizo;
                 puesto.Tipo = efecto.EffectId;
+                puesto.ZoneShape = efecto.Forma;
+                puesto.ZoneSize = efecto.Tamano;
 
                 return new Outcome
                 {

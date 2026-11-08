@@ -1142,6 +1142,54 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
+        /// A TRAP laid: not the glyphs' 401 but a jwe 400 of its own, its mark a trap's.
+        ///
+        ///   f1 { f1 (repeated) { f1: zone size, f2: colour, f3: cell, f4: zone kind }
+        ///        f2: 3      f3: the spell it casts     f4: the trap's number
+        ///        f5: 1      f6: grade     f7: colour     f9: the spell that laid it
+        ///        f10: the aimed cell     f11: 1     f12: whose it is }
+        /// </summary>
+        /// <remarks>
+        /// Measured on the twelve traps of «sram-trampa funesta» and those of the other Sram
+        /// captures -- not one 401 among them. The zone goes as the client's marked cell: a circle
+        /// or a cross is ONE cell, the centre, with its size and kind -- Inmovilización's
+        /// <c>{ f1: 3, f2: 3222918, f3: 215 }</c>, Repulsiva's <c>{ f1: 1, f2: …, f3: 229, f4: 1 }</c>
+        /// --, and any other shape its cells one by one, Deriva's diagonal cross as five. Sent as a
+        /// 401, the client took a trap for a glyph: it neither showed it going off nor took it away.
+        /// </remarks>
+        public static byte[] BuildTrap(long owner, int trapId, IEnumerable<(int Cell, int Size, int Kind)> cells,
+                                       int aimedCell, int castSpell, int layingSpell, int grade, int colour)
+        {
+            var body = Pb.New();
+            foreach (var (cell, size, kind) in cells)
+                body.Msg(1, Pb.New().VarIfNotZero(1, size).VarIfNotZero(2, colour).Var(3, cell).VarIfNotZero(4, kind));
+            body.Var(2, TrapMarkTeam)
+                .Var(3, castSpell)
+                .Var(4, trapId)
+                .Var(5, TrapMark)
+                .Var(6, grade)
+                .VarIfNotZero(7, colour)
+                .Var(9, layingSpell)
+                .Var(10, aimedCell)
+                .Var(11, 1)
+                .Var(12, owner);
+            return BuildAction(owner, PlacedTrap, Pb.New().Msg(1, body), detailField: 32);
+        }
+
+        /// <summary>A trap's cells as its jwe 400 lists them: circle (C) and cross (X) as their centre, any other shape cell by cell.</summary>
+        public static List<(int Cell, int Size, int Kind)> TrapCells(int shape, int size, int centre, IEnumerable<int> footprint)
+        {
+            if (shape == 'C' && size > 0) return new() { (centre, size, 0) };
+            if (shape == 'X' && size > 0) return new() { (centre, size, 1) };
+            return footprint.Select(cell => (cell, 0, 0)).ToList();
+        }
+
+        public const int PlacedTrap = 400;
+
+        /// <summary>A trap's f5 and f2: 1 and 3 on every trap of the Sram captures, where a glyph carries no f5 and an f2 of 1.</summary>
+        public const int TrapMark = 1, TrapMarkTeam = 3;
+
+        /// <summary>
         /// And how one GOES OFF (a jwe with f14 = 306 or 307):
         ///
         ///   f3: whose glyph it is

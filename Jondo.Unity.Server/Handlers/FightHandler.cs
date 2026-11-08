@@ -4157,18 +4157,23 @@ namespace Jondo.Unity.Server.Handlers
         /// the first trap sets off the next. Checked only where the walk ended, a trap crossed on
         /// the way went off on nobody.
         /// </summary>
-        internal static HashSet<int> TrapCells(FightInstance fight, Fighter who)
+        internal static HashSet<int> TrapCells(FightInstance fight, Fighter? who)
         {
             var cells = new HashSet<int>();
-            if (fight == null || who == null) return cells;
+            if (fight == null) return cells;
             foreach (var glifo in fight.Glifos)
             {
                 if (glifo.Cuando != Jondo.Unity.World.Fights.Disparo.AlPisar || !glifo.SeDisparaAlPisar) continue;
-                if (Managers.BombWalls.IsWall(glifo) || !GlyphCatches(fight, glifo, who, byDisplacement: false)) continue;
+                // Nobody named: every live trap's cells, whoever they would catch.
+                if (Managers.BombWalls.IsWall(glifo) || who != null && !GlyphCatches(fight, glifo, who, byDisplacement: false)) continue;
                 cells.UnionWith(glifo.Casillas);
             }
             return cells;
         }
+
+        /// <summary>Whether a spell's rows at this grade lay a trap (effect 400).</summary>
+        internal static bool LaysATrap(int spell, int grade)
+            => Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.ColocaUnaTrampa);
 
         /// <summary>A walk cut on the first cell of it that a trap catching the walker covers.</summary>
         internal static IReadOnlyList<int> StopAtTheTrap(FightInstance fight, Fighter walker, IReadOnlyList<int> path)
@@ -4656,6 +4661,15 @@ namespace Jondo.Unity.Server.Handlers
             if ((limites.Flags & Managers.SpellLevelFlags.NeedCellWithoutPortal) != 0 && fight.Portales.At(cell) != null)
             {
                 Program.LogDebug($"[Fight] Spell {spell} wants a cell without a portal and cell {cell} has one.");
+                return;
+            }
+
+            // Nor a trap on a cell a trap already holds: «solo en las casillas libres», says the
+            // Sram's sheet, and the portals' and the runes' «sin trampas» read the same. Laid
+            // there, two traps stood one on top of the other.
+            if (LaysATrap(spell, grade) && TrapCells(fight, null).Contains(cell))
+            {
+                Program.LogDebug($"[Fight] Spell {spell} lays a trap and cell {cell} already holds one.");
                 return;
             }
 
@@ -6691,10 +6705,23 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     var dueno = c.Caster ?? quienLanza;
                     int apuntada = c.Glifo.Centro >= 0 ? c.Glifo.Centro : c.Glifo.Casillas.FirstOrDefault();
-                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                        Network.FightProtocol.BuildSpellGlyph(dueno.Id, c.Glifo.Id, c.Glifo.Casillas, apuntada,
-                                                              c.Glifo.Hechizo, c.HechizoOrigen, c.NivelOrigen,
-                                                              c.Glifo.Color)));
+                    if (c.Glifo.Tipo == Managers.EffectEngine.ColocaUnaTrampa)
+                    {
+                        // A trap: its own jwe 400, and only for its owner's side -- «los adversarios
+                        // podrán ver… casillas donde se active una trampa», the Sram's sheet says:
+                        // before that they do not see it.
+                        await ASuBandoAsync(fight, dueno.TeamId, ConnectionProtocol.Push(Op.Jwe,
+                            Network.FightProtocol.BuildTrap(dueno.Id, c.Glifo.Id,
+                                Network.FightProtocol.TrapCells(c.Glifo.ZoneShape, c.Glifo.ZoneSize, apuntada, c.Glifo.Casillas),
+                                apuntada, c.Glifo.Hechizo, c.HechizoOrigen, c.NivelOrigen, c.Glifo.Color)));
+                    }
+                    else
+                    {
+                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                            Network.FightProtocol.BuildSpellGlyph(dueno.Id, c.Glifo.Id, c.Glifo.Casillas, apuntada,
+                                                                  c.Glifo.Hechizo, c.HechizoOrigen, c.NivelOrigen,
+                                                                  c.Glifo.Color)));
+                    }
                     Program.LogDebug($"[Fight] Glyph {c.Glifo.Id} of {dueno.Id}: {c.Glifo.Casillas.Count} cell(s), " +
                                      $"casts {c.Glifo.Hechizo}, colour {c.Glifo.Color:X6}, drops in round {c.Glifo.CaducaEnRonda}.");
                     if (c.Glifo.Cuando == Jondo.Unity.World.Fights.Disparo.AlPonerse)
@@ -9300,6 +9327,14 @@ namespace Jondo.Unity.Server.Handlers
             int monsterGrade = chosen.Grade;
             var data = DatabaseManager.GetSpellCombatData(spell, monsterGrade);
             if (data == null) return;
+
+            // The same «casillas libres» as a player's trap (CastAsync): a JondoBot Sram does not
+            // see the other side's traps and may aim at one.
+            if (LaysATrap(spell, monsterGrade) && TrapCells(fight, null).Contains(aim))
+            {
+                Program.LogDebug($"[Fight] {monster.Id}'s spell {spell} lays a trap and cell {aim} already holds one.");
+                return;
+            }
 
             // A class spell -- a JondoBot's -- lands on whoever stands on the aimed cell, as a
             // player's does (CastAsync's VictimAt), and on nobody when it is aimed at an empty

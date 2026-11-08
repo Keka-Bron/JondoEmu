@@ -100,6 +100,10 @@ namespace Jondo.Unity.World.Fights
         /// <summary>The spell that laid it, which a 2018 "Disipa los glifos" names in its die.</summary>
         public int HechizoQueLoPuso { get; set; }
 
+        /// <summary>The laying row's zone, shape (its letter) and size: how a trap's jwe 400 draws it.</summary>
+        public int ZoneShape { get; set; } = 'P';
+        public int ZoneSize { get; set; }
+
         /// <summary>The trap is spent; the glyph stays until it expires.</summary>
         public bool SeGastaAlDispararse => Cuando == Disparo.AlPisar;
 

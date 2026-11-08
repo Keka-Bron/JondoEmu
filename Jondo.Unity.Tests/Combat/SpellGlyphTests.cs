@@ -58,5 +58,42 @@ namespace Jondo.Unity.Tests.Combat
             Assert.All(cells, c => Assert.DoesNotContain(ProtoMessage.Parse(c.BytesValue).Fields, f => f.FieldNumber == 2));
             Assert.DoesNotContain(fields, f => f.FieldNumber == 7);
         }
+
+        /// <summary>
+        /// A trap is no glyph: jwe 400, f2 3 and f5 1, as all the traps of the Sram captures
+        /// («sram-trampa de inmovilizacion»: Inmovilización 12923 laid by 12910 at grade 3 on 215,
+        /// colour 3222918, trap 8). Its circle of three goes as one cell, the centre, size 3.
+        /// </summary>
+        [Fact]
+        public void A_trap_is_a_jwe_400_and_its_circle_is_its_centre()
+        {
+            const long owner = 53000000025;
+            var cells = FightProtocol.TrapCells('C', 3, 215, Enumerable.Range(0, 25).Select(i => 200 + i));
+            byte[] jwe = FightProtocol.BuildTrap(owner, 8, cells, 215, 12923, 12910, 3, 3222918);
+
+            Assert.Equal(400, (int)Field(jwe, 14).VarIntValue);
+            var fields = ProtoMessage.Parse(Field(Field(jwe, 32).BytesValue, 1).BytesValue).Fields;
+            int Var(int n) => (int)fields.Single(f => f.FieldNumber == n).VarIntValue;
+            Assert.Equal(3, Var(2));
+            Assert.Equal(12923, Var(3));
+            Assert.Equal(8, Var(4));
+            Assert.Equal(1, Var(5));
+            Assert.Equal(3, Var(6));
+            Assert.Equal(12910, Var(9));
+            Assert.Equal(215, Var(10));
+
+            // { f1: 3, f2: 3222918, f3: 215 }, byte for byte the capture's marked cell.
+            var cell = Assert.Single(fields, f => f.FieldNumber == 1);
+            Assert.Equal("08031086dbc40118d701", System.Convert.ToHexString(cell.BytesValue).ToLowerInvariant());
+        }
+
+        /// <summary>A cross (Repulsiva's X1) is its centre with f4 1; Deriva's diagonal cross goes cell by cell.</summary>
+        [Fact]
+        public void A_cross_is_kind_one_and_any_other_shape_goes_cell_by_cell()
+        {
+            Assert.Equal(new[] { (229, 1, 1) }, FightProtocol.TrapCells('X', 1, 229, new[] { 229, 215, 243, 228, 230 }));
+            Assert.Equal(5, FightProtocol.TrapCells('+', 1, 217, new[] { 245, 216, 217, 218, 189 }).Count);
+            Assert.Equal(new[] { (144, 0, 0) }, FightProtocol.TrapCells('P', 1, 144, new[] { 144 }));
+        }
     }
 }
