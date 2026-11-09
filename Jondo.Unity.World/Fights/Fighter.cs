@@ -419,9 +419,9 @@ namespace Jondo.Unity.World.Fights
             Buffs.AlIrse = fila =>
             {
                 if (fila.EffectId == ShieldRow) Desescudar(fila.Cuanto);
-                if (IsVitalityRow(fila)) MoveLife(-fila.Cuanto, fila.Quien);
+                if (IsVitalityRow(fila)) MoveLife(-fila.Cuanto, fila.Quien, canKill: true);
             };
-            Buffs.AlPonerse = fila => { if (IsVitalityRow(fila)) MoveLife(fila.Cuanto, fila.Quien); };
+            Buffs.AlPonerse = fila => { if (IsVitalityRow(fila)) MoveLife(fila.Cuanto, fila.Quien, canKill: false); };
         }
 
         /// <summary>The characteristic vitality is.</summary>
@@ -466,13 +466,19 @@ namespace Jondo.Unity.World.Fights
         /// moved only the maximum, held 9,939). Going, it takes them both back -- and a Yopuka
         /// at 100 who had 1,000 of it and then lost 150 of life dies when it goes.
         /// </summary>
-        private void MoveLife(int delta, long by)
+        /// <remarks>
+        /// A malus put on him never kills: Último Aliento's "-50% de vitalidad máxima" is a share
+        /// of a life above zero, and leaves him at one point at the least. Only life he was given
+        /// and loses again can take more than he has.
+        /// </remarks>
+        private void MoveLife(int delta, long by, bool canKill)
         {
             MaxHP = Math.Max(1, MaxHP + delta);
             if (CurrentHP <= 0) return;
             CurrentHP = Math.Min(MaxHP, CurrentHP + delta);
             if (CurrentHP > 0) return;
             CurrentHP = 1;
+            if (!canKill) return;
             PendingDeath = true;
             PendingDeathBy = by;
         }

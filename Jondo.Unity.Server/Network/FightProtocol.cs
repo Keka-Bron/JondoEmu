@@ -291,10 +291,11 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static byte[] BuildFighter(int cell, int orientation, long fighterId,
                                           IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
-                                          byte[] look, Pb identity, bool isMonster, long summoner = 0)
+                                          byte[] look, Pb identity, bool isMonster, long summoner = 0,
+                                          int? team = null)
             => Pb.New()
                 .Msg(2, FighterBlock(cell, orientation, fighterId, sheet, look, identity, isMonster,
-                                     summoner: summoner))
+                                     team: team, summoner: summoner))
                 .Build();
 
         /// <summary>

@@ -592,7 +592,7 @@ namespace Jondo.Unity.Server.Handlers
             return Network.FightProtocol.BuildFighter(
                 fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter), look,
                 Network.FightProtocol.PlayerIdentity(breed, fighter.Name, sex, fighter.Level),
-                isMonster: false);
+                isMonster: false, team: fighter.TeamId);
         }
 
         /// <summary>
@@ -634,7 +634,7 @@ namespace Jondo.Unity.Server.Handlers
             return Network.FightProtocol.FighterBlock(
                 fighter.CellId, FacingOf(fight, fighter), fighter.Id, FullSheetOf(fighter), look,
                 Network.FightProtocol.PlayerIdentity(breed, fighter.Name, sex, fighter.Level),
-                isMonster: false, alive: fighter.IsAlive);
+                isMonster: false, alive: fighter.IsAlive, team: fighter.TeamId);
         }
 
         /// <summary>
@@ -7473,6 +7473,9 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     Disparo(c.Sobre, "V", quienLanza);
                     Disparo(c.Sobre, (c.Buff?.Cuanto ?? c.Cuanto) > 0 ? "VA" : "VM", quienLanza);
+                    // The client moves the life with the vitality itself; told the life the server
+                    // holds, it draws a malus that stopped at one point as one point.
+                    if (c.Sobre.IsAlive) await RefrescarLaVidaAsync(stream, fight, c.Sobre, quienLanza);
                 }
 
                 if (c.Caracteristica == ActionPointsCharacteristic || c.Caracteristica == MovementPointsCharacteristic)
@@ -9516,19 +9519,24 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (c.CollisionDamage <= 0) return;
 
-            await UnEstampadoAsync(stream, fight, quienEmpuja, c.Sobre, c.CollisionDamage);
+            // Pushed and stopped where he stood -- a wall or a fighter right behind him -- the crash
+            // is a blow from next door; pushed a cell or more and then stopped, it lands away from
+            // whoever pushed him: a blow from afar. Bastión's ranged invulnerability spares the
+            // second, Barricada's melee one the first.
+            bool desdeLejos = c.CasillaDesde >= 0 && c.CasillaHasta >= 0 && c.CasillaDesde != c.CasillaHasta;
+            await UnEstampadoAsync(stream, fight, quienEmpuja, c.Sobre, c.CollisionDamage, desdeLejos: desdeLejos);
 
             if (c.Blocker != null && c.CollisionDamageToBlocker > 0)
             {
                 await UnEstampadoAsync(stream, fight, quienEmpuja, c.Blocker,
-                                       c.CollisionDamageToBlocker, indirecto: true);
+                                       c.CollisionDamageToBlocker, indirecto: true, desdeLejos: desdeLejos);
             }
         }
 
         /// <summary>A single collision hit, against a single target.</summary>
         internal static async Task UnEstampadoAsync(NetworkStream stream, FightInstance fight,
                                                    Fighter quienEmpuja, Fighter quien, int dano,
-                                                   bool indirecto = false)
+                                                   bool indirecto = false, bool desdeLejos = false)
         {
             if (quien == null || !quien.IsAlive || dano <= 0) return;
 
@@ -9557,8 +9565,9 @@ namespace Jondo.Unity.Server.Handlers
                 if (!quien.IsAlive) return;
             }
 
-            // And an invulnerable one loses nothing to it, the same as to a spell's blow.
-            if (Managers.SpellStates.ShieldsFromBlow(quien, 1))
+            // And an invulnerable one loses nothing to it, the same as to a spell's blow: from next
+            // door when the pushed one never moved, from afar when he travelled before the crash.
+            if (Managers.SpellStates.ShieldsFromBlow(quien, desdeLejos ? 2 : 1))
             {
                 Program.LogDebug($"[Fight] {quien.Id} is invulnerable: the crash takes nothing from it.");
                 return;
