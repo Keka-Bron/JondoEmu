@@ -9857,6 +9857,12 @@ namespace Jondo.Unity.Server.Handlers
             // as it holds people (the collector and the Dopeul are tackled in their captures).
             var walked = await WalkPathAsync(fight, monster, planned, stream: stream);
 
+            // And what reacts to every cell walked, as after a player's walk: a summon's or a
+            // monster's own "per MP used" (CMPARR), a JondoBot's Centinela, the gear's Guarda
+            // Campestre on anybody whose walk the server makes. Only a player's walk, sent by his
+            // client, went through it.
+            if (walked.Count > 1 && monster.IsAlive) await StepsWalkedAsync(stream, fight, monster, walked.Count - 1);
+
             // And whatever was on the ground where it ended up. This was NOT there: the
             // monster changed cell and was announced, and that was the end of it. Neither
             // the bomb walls nor the traps nor the Feca glyphs ever went off on anybody

@@ -723,6 +723,9 @@ namespace Jondo.Unity.Server.Network
             var lines = RunInSession(session, stream => FightHandler.FreshTurnAsync(stream, fight, me, keep, noSummons));
             // A heal to try: everybody down to 70% of his life first, or it has nothing to heal.
             if (cuerpo.Contains("\"hurt\":true")) lines.AddRange(RunInSession(session, stream => FightHandler.TestHurtAsync(stream, fight, 70)));
+            // Or down to the share asked ("hurtTo"): a blow that kills, to try what answers a death.
+            int hurtTo = (int)Numero(cuerpo, "hurtTo");
+            if (hurtTo is > 0 and < 100) lines.AddRange(RunInSession(session, stream => FightHandler.TestHurtAsync(stream, fight, hurtTo)));
             return Bien(new { ap = me.CurrentAP, mp = me.CurrentMP, kept = keep, lines });
         }
 
