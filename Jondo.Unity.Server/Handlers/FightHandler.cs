@@ -820,7 +820,12 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     playerFighter.Buffs.PonerActitud(hechizo);
                 }
-                if (pasivo != 0) playerFighter.Buffs.PonerActitud(pasivo);
+                // At the grade his level gives it: the passives grow with the character -- the
+                // Pandawa's power when carrying is +10% at grade 1 and +50% at grade 6, from level
+                // 187 ("este bonus cambia con el nivel del pandawa"). Put at grade 1, every
+                // character fought with his first passive.
+                if (pasivo != 0)
+                    playerFighter.Buffs.PonerActitud(pasivo, Math.Max(1, Managers.SpellTable.GradeFor(pasivo, GameState.CharacterLevel)));
             }
 
             // And the dream's passives, cast on him the same way (see Dreams.PassiveEffect).
@@ -4741,6 +4746,17 @@ namespace Jondo.Unity.Server.Handlers
             cost = Managers.SpellModifiers.ApCost(caster, spell, cost, fight.RoundNumber);
             if (cost > caster.CurrentAP) return;
 
+            // The level's condition on the caster's states, and the states that keep him from
+            // casting at all (preventsSpellCast): a carrying Pandawa throws and does nothing else,
+            // «excepto los que le permiten lanzar a la entidad». Only the monsters' and the
+            // JondoBots' casts asked this; a player's went through whatever he carried.
+            if (spell != 0 && !Managers.SpellCriteria.Allows(caster, spell, grade))
+            {
+                Program.LogDebug($"[Fight] Spell {spell} is not for the caster's states now " +
+                                 $"(condition \"{Managers.SpellCriteria.Of(spell, grade)}\", states {string.Join(",", caster.Buffs.Estados)}).");
+                return;
+            }
+
             // Aimed at a portal that is on, the spell comes out of the network's last portal and
             // lands where the caster's aim leads from there (FightPortals.cs): whoever stands THERE
             // is its target, and what the cell has to be is judged there too.
@@ -5425,6 +5441,9 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), author, Network.FightProtocol.ActionSequence)));
         }
 
+        /// <summary>For the harness's refreshes: the rows every fighter held the first time the fight was refreshed.</summary>
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<FightInstance, HashSet<(long, int)>> RowsAtTheStart = new();
+
         private static async Task FreshTurnStepsAsync(NetworkStream stream, FightInstance fight, Fighter who, bool keepBoard)
         {
             // A clean board: what earlier spells left -- effects, states, a range moved, marks on
@@ -5432,10 +5451,14 @@ namespace Jondo.Unity.Server.Handlers
             // is kept on purpose, for the spells that answer to it.
             // The rows of the fighters' attitudes stay: a class passive's, the initial spells', a
             // summon's own spell's -- rules of the fight, not what a spell left. Wiped, the Xelor
-            // lost the telefrag states his passive gives (24941) and his syncro never grew.
+            // lost the telefrag states his passive gives (24941) and his syncro never grew. And so
+            // do the rows the fight started with, which the passives' chains leave under their
+            // children's names: the Pandawa's Sobrio is 24037's, cast by La Jarrita de Pandawa.
+            var atTheStart = RowsAtTheStart.GetValue(fight, f => f.Todos.SelectMany(x => x.Buffs.Puestos.Select(r => (x.Id, r.Numero))).ToHashSet());
             if (!keepBoard)
             foreach (var fighter in fight.Todos.Where(f => f.IsAlive).ToList())
-                foreach (var row in fighter.Buffs.Puestos.Where(r => !fighter.Buffs.Actitudes.Contains(r.HechizoOrigen)).ToList())
+                foreach (var row in fighter.Buffs.Puestos.Where(r => !fighter.Buffs.Actitudes.Contains(r.HechizoOrigen)
+                                                                     && !atTheStart.Contains((fighter.Id, r.Numero))).ToList())
                     if (fighter.Buffs.QuitarFila(row))
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya, Network.FightProtocol.BuildBuffGone(fighter.Id, row.Numero)));
             foreach (var mark in keepBoard ? new List<Glifo>() : fight.Glifos.ToList())
@@ -7355,6 +7378,14 @@ namespace Jondo.Unity.Server.Handlers
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildCarry(quienLanza.Id, c.CasillaDesde, c.Sobre.Id)));
                     Program.LogDebug($"[Fight] {quienLanza.Id} carries {c.Sobre.Id} from cell {c.CasillaDesde}.");
+                    // Carrying and being carried are states (3, 8) the engine sets by itself, and
+                    // what waits on them goes off as for any state put: the Pandawa's passive gives
+                    // him power on EON3, his bamboo or barrel hands him an AP back on EON8 («si el
+                    // pandawa porta uno de sus toneles o bambús, recupera inmediatamente 1 PA»).
+                    Disparo(quienLanza, Managers.EffectEngine.AlPonerseElEstado(Jondo.Unity.World.Combat.EffectSupport.CarryingState), quienLanza);
+                    Disparo(quienLanza, Managers.EffectEngine.AlActivarseElEstado(Jondo.Unity.World.Combat.EffectSupport.CarryingState), quienLanza);
+                    Disparo(c.Sobre, Managers.EffectEngine.AlPonerseElEstado(Jondo.Unity.World.Combat.EffectSupport.CarriedState), quienLanza);
+                    Disparo(c.Sobre, Managers.EffectEngine.AlActivarseElEstado(Jondo.Unity.World.Combat.EffectSupport.CarriedState), quienLanza);
                     continue;
                 }
                 if (c.Lanza)
@@ -7362,6 +7393,9 @@ namespace Jondo.Unity.Server.Handlers
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildThrow(quienLanza.Id, c.Sobre.Id, c.CasillaHasta)));
                     Program.LogDebug($"[Fight] {quienLanza.Id} throws {c.Sobre.Id} to cell {c.CasillaHasta}.");
+                    // And the two states go: what waits on their going goes off.
+                    Disparo(quienLanza, Managers.EffectEngine.AlQuitarseElEstado(Jondo.Unity.World.Combat.EffectSupport.CarryingState), quienLanza);
+                    Disparo(c.Sobre, Managers.EffectEngine.AlQuitarseElEstado(Jondo.Unity.World.Combat.EffectSupport.CarriedState), quienLanza);
                     movidos.Add(c.Sobre);
                     await RefreshPortalsAsync(fight);
                     continue;

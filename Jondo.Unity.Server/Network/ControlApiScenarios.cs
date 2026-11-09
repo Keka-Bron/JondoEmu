@@ -56,6 +56,9 @@ namespace Jondo.Unity.Server.Network
                     case "steamer.turrets": SteamerTurrets(session, fight, me, sc); break;
                     case "forgelance.lance": ForgelanceLance(session, fight, me, sc); break;
                     case "sram.invisibility": SramInvisibility(session, fight, me, sc); break;
+                    case "pandawa.drunk_and_carry": PandawaDrunkAndCarry(session, fight, me, sc); break;
+                    case "uginak.rage": UginakRage(session, fight, me, sc); break;
+                    case "ocra.charges": OcraCharges(session, fight, me, sc); break;
                     default: return Mal(404, "scenario");
                 }
             }
@@ -71,6 +74,9 @@ namespace Jondo.Unity.Server.Network
             [15] = new[] { "steamer.turrets" },
             [20] = new[] { "forgelance.lance" },
             [4] = new[] { "sram.invisibility" },
+            [12] = new[] { "pandawa.drunk_and_carry" },
+            [18] = new[] { "uginak.rage" },
+            [9] = new[] { "ocra.charges" },
         };
 
         private static Respuesta TestScenarios(string cuerpo)
@@ -525,6 +531,213 @@ namespace Jondo.Unity.Server.Network
                 sc.Check("and no spell to cast", doble.HechizosDeInvocado == null || doble.HechizosDeInvocado.Count == 0,
                          $"{doble.HechizosDeInvocado?.Count ?? 0} spell(s)");
             }
+        }
+
+        // ─── The Pandawa (class sheet 969387, «Los estados Sobrio y Borracho») ──────
+
+        private static void PandawaDrunkAndCarry(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int Tranka = 12780, Karcham = 12787, Pandikulacion = 12793, Pandatak = 12797, Bambu = 12824;
+            const int Sobrio = 3531, Borracho = 498;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 4);
+            string Mood() => me.Buffs.TieneEstado(Borracho) ? "Borracho" : me.Buffs.TieneEstado(Sobrio) ? "Sobrio" : "neither";
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe to carry", false, "none"); return; }
+            int Beside() => MapGeometry.GetNeighbors(me.CellId).Where(c => FreeCell(fight, c) || c == foe.CellId).DefaultIfEmpty(-1).First();
+
+            // The fight starts him Sobrio: his passive (La Jarrita de Pandawa, 12830) casts Sobrio
+            // (24037) at the start. Earlier tries may have left him either way: Sobrio again, as
+            // the passive puts it.
+            bool started = Mood() == "Sobrio";
+            if (!started)
+            {
+                RunInSession(session, stream => FightHandler.AplicarEfectosAsync(stream, fight, me, 24037, 1, me, Managers.EffectEngine.AlLanzar, me.CellId));
+                Pause();
+            }
+            sc.Check("the Pandawa is Sobrio (as his passive starts him)", Mood() == "Sobrio", Mood() + (started ? "" : " (set as the passive does)"));
+
+            // «El estado Borracho reduce la movilidad del pandawa retirándole un PM.»
+            int mp = me.MaxMP + me.Buffs.De(23, fight.RoundNumber);
+            CastAt(session, Tranka, me.CellId);
+            sc.Check("Tranka makes the Pandawa Borracho", Mood() == "Borracho", Mood());
+            int drunkMp = me.MaxMP + me.Buffs.De(23, fight.RoundNumber);
+            sc.Check("Borracho takes a movement point off him", drunkMp == mp - 1, $"MP {mp} -> {drunkMp}");
+
+            // «Estar en el estado Borracho impide portar a los aliados o los enemigos.»
+            FreshTurn(session, fight, me, keep: true);
+            PutAll(session, fight, (foe, Beside()));
+            CastAt(session, Karcham, foe.CellId);
+            sc.Check("Borracho, Karcham does not carry", me.Carrying == 0, me.Carrying == 0 ? "carries nobody" : $"carries {me.Carrying}");
+
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Tranka, me.CellId);
+            sc.Check("Tranka again makes him Sobrio", Mood() == "Sobrio", Mood());
+
+            // «El objetivo solo puede ser portado en cuerpo a cuerpo.»
+            FreshTurn(session, fight, me, keep: true);
+            PutAll(session, fight, (foe, Beside()));
+            CastAt(session, Karcham, foe.CellId);
+            sc.Check("Sobrio, Karcham carries the foe beside him", me.Carrying == foe.Id && foe.CarriedBy == me.Id,
+                     $"carrying {me.Carrying}, foe carried by {foe.CarriedBy}");
+            // «Cuando portan a una entidad, ganan potencia. Este bonus cambia con el nivel del pandawa.»
+            var power = me.Buffs.Puestos.Where(b => b.EffectId == 138).ToList();
+            sc.Check("carrying gives him power", me.Carrying == foe.Id && power.Count > 0,
+                     power.Count == 0 ? "no power row" : string.Join(", ", power.Select(b => $"+{b.Cuanto} until round {b.CaducaEnRonda}")));
+            // The passive's grade by level (12830: grade 6 from level 187) casts 24040 at grade 10: +50.
+            if (me.Level >= 187)
+                sc.Check("at his level the power is the passive's highest (+50)", power.Any(b => b.Cuanto == 50),
+                         string.Join(", ", power.Select(b => $"+{b.Cuanto}")));
+
+            if (me.Carrying == foe.Id)
+            {
+                // «Cuando un pandawa porta una entidad, ya no puede utilizar sus hechizos, excepto los
+                //  que le permiten lanzar a la entidad en cuestión.»
+                FreshTurn(session, fight, me, keep: true);
+                var other = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && f != foe && !f.EsInvocado)
+                                       .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+                if (other != null)
+                {
+                    int spot = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 3).DefaultIfEmpty(-1).First();
+                    PutAll(session, fight, (other, spot));
+                    int life = other.CurrentHP, ap = me.CurrentAP;
+                    CastAt(session, Pandatak, other.CellId);
+                    sc.Check("carrying, he cannot cast Pandatak", other.CurrentHP == life && me.CurrentAP == ap,
+                             $"foe life {life} -> {other.CurrentHP}, AP {ap} -> {me.CurrentAP}");
+                }
+                // «...después puede ser lanzado a mayor o menor distancia.»
+                FreshTurn(session, fight, me, keep: true);
+                int landing = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 3).DefaultIfEmpty(-1).First();
+                CastAt(session, Pandikulacion, landing);
+                sc.Check("Pandikulación throws the carried foe onto its cell", foe.CellId == landing && foe.CarriedBy == 0 && me.Carrying == 0,
+                         $"foe on {foe.CellId} (aimed {landing}), carried by {foe.CarriedBy}, Pandawa carrying {me.Carrying}");
+            }
+
+            // «Si el pandawa porta uno de sus toneles o bambús, recupera inmediatamente 1 PA.»
+            FreshTurn(session, fight, me, keep: true, withoutSummons: true);
+            int bambooCell = Beside();
+            CastAt(session, Bambu, bambooCell);
+            var bamboo = fight.Todos.FirstOrDefault(f => f.IsAlive && f.EsInvocado && f.Invocador == me.Id && f.CellId == bambooCell);
+            sc.Check("Bambú puts a bamboo beside him", bamboo != null, bamboo == null ? $"nothing on {bambooCell}" : $"bamboo {bamboo.Id} ({bamboo.MonsterId})");
+            if (bamboo != null)
+            {
+                FreshTurn(session, fight, me, keep: true);
+                int apBefore = me.CurrentAP, cost = DatabaseManager.GetSpellCombatData(Karcham, FightHandler.CastingGradeOf(me, Karcham))?.APCost ?? 1;
+                CastAt(session, Karcham, bamboo.CellId);
+                sc.Check("carrying his own bamboo gives the AP back at once", me.Carrying == bamboo.Id && me.CurrentAP == apBefore - cost + 1,
+                         $"carrying {me.Carrying}, AP {apBefore} -> {me.CurrentAP}, Karcham costs {cost}");
+            }
+        }
+
+        // ─── The Uginak (class sheet 1010381, «El estado Presa») ─────────────────────
+
+        private static void UginakRage(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int Presa = 13748, Mandibula = 13787, Calcaneo = 13788;
+            const int PresaState = 516, Rage1 = 513, Rage2 = 514, Raging = 515, Beast = 517;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 5);
+            string Rage() => me.Buffs.TieneEstado(Beast) ? "beast" : me.Buffs.TieneEstado(Rage2) ? "rage 2" : me.Buffs.TieneEstado(Rage1) ? "rage 1" : "none";
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            int At(int distance) => Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == distance).DefaultIfEmpty(-1).First();
+
+            // «El estado Presa puede aplicarse mediante los hechizos Presa y Animal de Caza.»
+            PutAll(session, fight, (foe, At(3)));
+            CastAt(session, Presa, foe.CellId);
+            sc.Check("Presa puts the foe in the Presa state", foe.Buffs.TieneEstado(PresaState), foe.Buffs.TieneEstado(PresaState) ? "Presa" : "no Presa");
+            sc.Check("the scenario starts with no rage", Rage() == "none", Rage());
+
+            // «La rabia es un indicador que puede ir del 1 al 3 ... Cuando llega al estado de rabia 3,
+            //  el uginak se transforma y pasa a la Forma Bestial.»
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Mandibula, me.CellId);
+            sc.Check("a rage spell (Mandíbula) puts him at rage 1", Rage() == "rage 1", Rage());
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Mandibula, me.CellId);
+            sc.Check("a second one at rage 2", Rage() == "rage 2", Rage());
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Mandibula, me.CellId);
+            sc.Check("a third one turns him into the beast", Rage() == "beast", Rage());
+            sc.Check("and the beast holds no rage state any more", !me.Buffs.TieneEstado(Rage1) && !me.Buffs.TieneEstado(Rage2) && !me.Buffs.TieneEstado(Raging),
+                     $"513 {me.Buffs.TieneEstado(Rage1)}, 514 {me.Buffs.TieneEstado(Rage2)}, 515 {me.Buffs.TieneEstado(Raging)}");
+            if (Rage() != "beast") return;
+
+            // «...solo puede atacar hasta 2 AL máximo. Sus hechizos elementales con los que puede
+            //  desplazarse o desplazar a un objetivo no pierden alcance con esta transformación.»
+            // Despiece (1-4) is pinned to 2 by the beast's rows; Calcáneo pulls, and keeps its 12.
+            const int Despiece = 13804;
+            FreshTurn(session, fight, me, keep: true);
+            PutAll(session, fight, (foe, At(4)));
+            int life = foe.CurrentHP, ap = me.CurrentAP;
+            CastAt(session, Despiece, foe.CellId);
+            sc.Check("the beast cannot hit four cells away with Despiece (range 4 pinned to 2)", foe.CurrentHP == life && me.CurrentAP == ap,
+                     $"life {life} -> {foe.CurrentHP}, AP {ap} -> {me.CurrentAP}");
+            FreshTurn(session, fight, me, keep: true);
+            PutAll(session, fight, (foe, At(2)));
+            life = foe.CurrentHP;
+            CastAt(session, Despiece, foe.CellId);
+            sc.Check("but hits two cells away", foe.CurrentHP < life, $"life {life} -> {foe.CurrentHP}");
+            FreshTurn(session, fight, me, keep: true);
+            PutAll(session, fight, (foe, At(5)));
+            life = foe.CurrentHP;
+            CastAt(session, Calcaneo, foe.CellId);
+            sc.Check("Calcáneo, which pulls, keeps its range: it hits five cells away", foe.CurrentHP < life, $"life {life} -> {foe.CurrentHP}");
+
+            // «La transformación en bestia dura dos turnos ... Al acabar el segundo turno de
+            //  transformación, retoma su forma normal y pierde todos sus estados de rabia.»
+            bool back = PassTurn(session, fight, me) && PassTurn(session, fight, me);
+            sc.Check("two turns on, the turns came back to him", back, $"round {fight.RoundNumber}");
+            if (back)
+                sc.Check("and he is himself again, with no rage", Rage() == "none", Rage());
+        }
+
+        // ─── The Ocra (class sheet 1010304, «Los hechizos con carga») ──────────────────
+
+        private static void OcraCharges(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int FlechaInmovilizadora = 32436;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 5);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            int At(int distance) => Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == distance).DefaultIfEmpty(-1).First();
+            int Charge(int spell) => me.Buffs.DelHechizo(spell, SpellAspect.DanoBase, fight.RoundNumber);
+
+            // «Algunos hechizos se cargan cuando se lanzan a un objetivo ... sucesivamente.»
+            PutAll(session, fight, (foe, At(3)));
+            int before = Charge(FlechaInmovilizadora);
+            CastAt(session, FlechaInmovilizadora, foe.CellId);
+            int once = Charge(FlechaInmovilizadora);
+            sc.Check("Flecha Inmovilizadora charges itself when cast", once > before, $"base damage bonus {before} -> {once}");
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, FlechaInmovilizadora, foe.CellId);
+            int twice = Charge(FlechaInmovilizadora);
+            sc.Check("cast again it charges further", twice > once, $"base damage bonus {once} -> {twice}");
+
+            // «...muchos de sus hechizos tienen un alcance mínimo, es decir, solo pueden lanzarse si
+            //  el lanzador está lo bastante alejado de sus objetivos.»
+            var spells = Managers.SpellTable.PairsOf(me.Breed).SelectMany(p => new[] { p.Base, p.Variant })
+                                   .Where(sp => sp != 0 && Managers.SpellTable.GradeFor(sp, me.Level) > 0).ToList();
+            int withMinimum = spells.FirstOrDefault(sp => FightHandler.ReachOf(fight, me, sp).Min >= 2
+                                                          && Managers.SpellEffects.De(sp, FightHandler.CastingGradeOf(me, sp)).Any(e => e.EffectId >= 91 && e.EffectId <= 100));
+            if (withMinimum == 0) { sc.Note("no damage spell with a minimum range of two or more"); return; }
+            var reach = FightHandler.ReachOf(fight, me, withMinimum);
+            FreshTurn(session, fight, me, keep: true);
+            int beside = MapGeometry.GetNeighbors(me.CellId).Where(c => FreeCell(fight, c)).DefaultIfEmpty(-1).First();
+            PutAll(session, fight, (foe, beside));
+            int life = foe.CurrentHP, ap = me.CurrentAP;
+            CastAt(session, withMinimum, foe.CellId);
+            sc.Check($"spell {withMinimum} (range {reach.Min}-{reach.Max}) cannot be cast at a foe beside him", foe.CurrentHP == life && me.CurrentAP == ap,
+                     $"life {life} -> {foe.CurrentHP}, AP {ap} -> {me.CurrentAP}");
+            FreshTurn(session, fight, me, keep: true);
+            PutAll(session, fight, (foe, At(Math.Min(reach.Max, Math.Max(reach.Min, 3)))));
+            life = foe.CurrentHP;
+            CastAt(session, withMinimum, foe.CellId);
+            sc.Check("but can within its range", foe.CurrentHP < life, $"foe {MapGeometry.Distance(foe.CellId, me.CellId)} cells away: life {life} -> {foe.CurrentHP}");
         }
 
         // ─── The Tymador's bombs (class sheet 1010378, «Las bombas») ──────────────────
