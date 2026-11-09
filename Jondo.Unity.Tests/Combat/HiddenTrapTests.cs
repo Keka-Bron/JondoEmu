@@ -89,6 +89,37 @@ namespace Jondo.Unity.Tests.Combat
         /// A cast that leaves him invisible -- a trap laid -- shows his foes a silhouette on the
         /// cell he cast from (jwe f36), and his own side nothing new.
         /// </summary>
+        /// <summary>The Sram's own cast, as the client asks for it (jwh), on his turn.</summary>
+        private static async Task CastAsHim(FightInstance fight, PortalTests.Wire mine, int spell, int cell)
+        {
+            var active = (System.Collections.Concurrent.ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
+                .GetField("_activeFights", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!.GetValue(null)!;
+            active[fight.FightId] = fight;
+            try
+            {
+                using (SessionContext.Push(mine.Session))
+                    await FightHandler.CastAsync(mine.Session.Stream, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, cell).Var(4, spell).Build()));
+            }
+            finally { active.TryRemove(fight.FightId, out _); }
+        }
+
+        private static int? Silhouette(List<(string Op, byte[] Payload)> frames)
+        {
+            var jwe = frames.Where(f => f.Op == "jwe").Select(f => ProtoMessage.Parse(f.Payload).Fields)
+                            .FirstOrDefault(fields => fields.Any(x => x.FieldNumber == 36));
+            return jwe == null ? null : (int)ProtoMessage.Parse(jwe.Single(x => x.FieldNumber == 36).BytesValue).Fields.Single(x => x.FieldNumber == 1).VarIntValue;
+        }
+
+        /// <summary>The cell a cast was told on (the f6 of its f7), and whether it was told silent (f1).</summary>
+        private static (long Cell, bool Silent) CastTold(List<(string Op, byte[] Payload)> frames)
+        {
+            var cast = frames.Where(f => f.Op == "jwe" && Action(f.Payload) == FightProtocol.Cast)
+                             .Select(f => ProtoMessage.Parse(ProtoMessage.Parse(f.Payload).Fields.Single(x => x.FieldNumber == 7).BytesValue).Fields)
+                             .Single();
+            return (cast.Single(x => x.FieldNumber == 6).VarIntValue,
+                    cast.FirstOrDefault(x => x.FieldNumber == 1)?.VarIntValue == 1);
+        }
+
         [Fact]
         public async Task A_trap_laid_unseen_shows_his_foes_where_he_stood()
         {
@@ -99,24 +130,63 @@ namespace Jondo.Unity.Tests.Combat
             await using var theirs = await PortalTests.Wire.Open(Foe);
             Assert.Same(sram, fight.CurrentFighter);
 
-            var active = (System.Collections.Concurrent.ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
-                .GetField("_activeFights", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!.GetValue(null)!;
-            active[fight.FightId] = fight;
-            try
-            {
-                using (SessionContext.Push(mine.Session))
-                    await FightHandler.CastAsync(mine.Session.Stream, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, trap).Var(4, TrampaMiserable).Build()));
-            }
-            finally { active.TryRemove(fight.FightId, out _); }
+            await CastAsHim(fight, mine, TrampaMiserable, trap);
 
-            int? Silhouette(List<(string Op, byte[] Payload)> frames)
-            {
-                var jwe = frames.Where(f => f.Op == "jwe").Select(f => ProtoMessage.Parse(f.Payload).Fields)
-                                .FirstOrDefault(fields => fields.Any(x => x.FieldNumber == 36));
-                return jwe == null ? null : (int)ProtoMessage.Parse(jwe.Single(x => x.FieldNumber == 36).BytesValue).Fields.Single(x => x.FieldNumber == 1).VarIntValue;
-            }
-            Assert.Equal(sram.CellId, Silhouette(await theirs.Drain()));
-            Assert.Null(Silhouette(await mine.Drain()));
+            var theirFrames = await theirs.Drain();
+            var myFrames = await mine.Drain();
+            Assert.Equal(sram.CellId, Silhouette(theirFrames));
+            Assert.Null(Silhouette(myFrames));
+            // Where the trap went is his side's: the other is told a silent cast on no cell.
+            Assert.Equal((-1L, true), CastTold(theirFrames));
+            Assert.Equal(((long)trap, false), CastTold(myFrames));
+        }
+
+        /// <summary>His foes saw him cast his invisibility: that cast shows them no silhouette.</summary>
+        [Fact]
+        public async Task The_cast_that_hides_him_gives_nothing_away()
+        {
+            var (fight, sram, _, _) = Board();
+            fight.StartFight();
+            await using var mine = await PortalTests.Wire.Open(Sram);
+            await using var theirs = await PortalTests.Wire.Open(Foe);
+
+            await CastAsHim(fight, mine, Invisibilidad, sram.CellId);
+
+            var theirFrames = await theirs.Drain();
+            Assert.True(MonsterTactics.IsInvisible(sram), "Invisibilidad did not hide him");
+            Assert.Null(Silhouette(theirFrames));
+            Assert.Equal(((long)sram.CellId, false), CastTold(theirFrames));
+        }
+
+        /// <summary>
+        /// Unseen, his steps go to his own side alone: told them, the other side's client drew its
+        /// turn marker on his true cell. Shown again, the other side is told where he stands.
+        /// </summary>
+        [Fact]
+        public async Task His_steps_unseen_are_his_side_s_and_showing_again_tells_where_he_is()
+        {
+            var (fight, sram, _, _) = Board();
+            await using var mine = await PortalTests.Wire.Open(Sram);
+            await using var theirs = await PortalTests.Wire.Open(Foe);
+            await FightHandler.CastEffectsAsync(null, fight, sram, Invisibilidad, 1, sram, sram.CellId, false,
+                                                EffectEngine.EfectosSorteados(Invisibilidad, 1, false));
+            await mine.Drain(); await theirs.Drain();
+
+            var (x, y) = MapGeometry.CellToPoint(sram.CellId);
+            int to = MapGeometry.PointToCell(x, y + 1);
+            await FightHandler.WalkPathAsync(fight, sram, new[] { sram.CellId, to });
+            Assert.Contains(mine.Session == null ? "" : "jsj", (await mine.Drain()).Select(f => f.Op));
+            Assert.DoesNotContain("jsj", (await theirs.Drain()).Select(f => f.Op));
+
+            // His invisibility rows go: the other side is shown his true cell, then he shows.
+            foreach (var row in sram.Buffs.Puestos.Where(r => r.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility).ToList())
+                row.CaducaEnRonda = fight.RoundNumber + 1;
+            await FightHandler.CastEffectsAsync(null, fight, sram, 13336, 3, sram, sram.CellId, false,
+                                                EffectEngine.EfectosSorteados(13336, 3, false));
+            var told = (await theirs.Drain()).Where(f => f.Op == "jwe").Select(f => ProtoMessage.Parse(f.Payload).Fields).ToList();
+            var shown = told.FirstOrDefault(fields => fields.Any(x => x.FieldNumber == 36));
+            Assert.True(shown != null, "the other side was not shown where he stands");
+            Assert.Equal(to, (int)ProtoMessage.Parse(shown.Single(x => x.FieldNumber == 36).BytesValue).Fields.Single(x => x.FieldNumber == 1).VarIntValue);
         }
 
         [Fact]

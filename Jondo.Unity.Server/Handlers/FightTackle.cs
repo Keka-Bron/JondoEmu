@@ -195,8 +195,12 @@ namespace Jondo.Unity.Server.Handlers
             int steps = stretch.Count - 1;
             mover.CurrentMP -= steps;
 
-            await ATodosAsync(fight, ConnectionProtocol.BuildActorMoved(mover.Id,
-                stretch.Select(c => (long)c).ToList(), facing));
+            // Unseen, his steps go to his own side alone: told them, the other side's client kept
+            // him hidden on his true cell and drew its turn marker there, for anybody to see
+            // where the invisible Sram was walking. They know where he was last seen.
+            var moved = ConnectionProtocol.BuildActorMoved(mover.Id, stretch.Select(c => (long)c).ToList(), facing);
+            if (Managers.MonsterTactics.IsInvisible(mover)) await ASuBandoAsync(fight, mover.TeamId, moved);
+            else await ATodosAsync(fight, moved);
             await AnnouncePointsAsync(fight, mover, MovementPointsCharacteristic, mover.CurrentMP);
             // The 129 in the shape of any row of points, f3 / f14 / f20 in that order: byte for
             // byte the tutorial's frame 491, which BuildAction's f20-before-f14 is not.

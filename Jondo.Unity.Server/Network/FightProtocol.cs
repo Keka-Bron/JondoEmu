@@ -1465,6 +1465,22 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
+        /// An unseen caster's cast as the other side is told it: silent (f1), on no cell (f6 = -1),
+        /// at himself, without counters -- "f7{f1=1 f2=him f4{f4=him} f6=-1 f7{spell}}" for each of
+        /// the twelve casts of an invisible fighter in a capture of a duel, and only for those.
+        /// </summary>
+        public static Pb UnseenCastAt(long caster, int spell, int spellLevel, int arma = 0, bool chained = false)
+        {
+            var detalle = Pb.New().Var(1, 1).Var(2, caster).Msg(4, Pb.New().Var(4, caster)).Var(6, -1);
+            if (spell != 0)
+            {
+                detalle.Msg(7, Pb.New().Var(2, spell).VarIfNotZero(3, spellLevel));
+                return chained ? detalle : detalle.Var(8, 1);
+            }
+            return detalle.Var(8, 1).Var(10, arma);
+        }
+
+        /// <summary>
         /// One's sheet, to refresh it on its own (jxw).
         ///
         ///   f1: who        f3 { f3: 2, f5 x N: the characteristics }

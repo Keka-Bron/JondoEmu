@@ -224,6 +224,20 @@ namespace Jondo.Unity.World.Fights
         public int LastSeenCell { get; set; } = -1;
 
         /// <summary>
+        /// Whether the clients were told he went invisible and not yet that he shows again: what
+        /// takes his invisibility away -- its rounds cut short, a dispel, its spell's effects
+        /// taken off -- has to tell them, or both sides kept him hidden.
+        /// </summary>
+        public bool ToldInvisible { get; set; }
+
+        /// <summary>
+        /// Where his foes' clients hold him while he is unseen: the cell he vanished on. They are
+        /// never told his steps, and a silhouette does not move him -- their turn marker stays
+        /// there.
+        /// </summary>
+        public int HeldByFoesAt { get; set; } = -1;
+
+        /// <summary>
         /// The tenths of a second this fighter kept from the turn he passed, for his next one
         /// (FightProtocol.SavedAfter). Only a character keeps any.
         /// </summary>

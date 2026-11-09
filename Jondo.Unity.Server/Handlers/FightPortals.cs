@@ -359,8 +359,10 @@ namespace Jondo.Unity.Server.Handlers
             int facing = leader.LastFacing >= 0 ? leader.LastFacing : StepOrientation(best[best.Count - 2], best[best.Count - 1]);
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
                 FightProtocol.BuildSequenceStart(follower.Id, FightProtocol.WalkSequence)));
-            await ATodosAsync(fight, ConnectionProtocol.BuildActorMoved(follower.Id,
-                best.Select(c => (long)c).ToList(), facing));
+            // Unseen, to his own side alone, as his own steps (AnnounceStretchAsync).
+            var followed = ConnectionProtocol.BuildActorMoved(follower.Id, best.Select(c => (long)c).ToList(), facing);
+            if (MonsterTactics.IsInvisible(follower)) await ASuBandoAsync(fight, follower.TeamId, followed);
+            else await ATodosAsync(fight, followed);
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
                 FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), follower.Id, FightProtocol.WalkSequence)));
             follower.MoverA(best[best.Count - 1]);

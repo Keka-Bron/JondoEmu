@@ -4979,7 +4979,8 @@ namespace Jondo.Unity.Server.Handlers
             // A weapon's blow always counts its hits this turn (f4 f2, 1 or 2 in every capture); a
             // punch counts nothing.
             int armaDelGolpe = spell == 0 ? ArmaEquipada(caster) : 0;
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+            await CastToAllAsync(fight, caster, spell == 0 ? Network.FightProtocol.WeaponCast : Network.FightProtocol.Cast,
+                spell, spellLevel, armaDelGolpe, chained: false,
                 Network.FightProtocol.BuildAction(
                     caster.Id,
                     spell == 0 ? Network.FightProtocol.WeaponCast : Network.FightProtocol.Cast,
@@ -4993,7 +4994,7 @@ namespace Jondo.Unity.Server.Handlers
                         arma: armaDelGolpe,
                         noTarget: victim == null,
                         portals: proyeccion?.Chain.Select(p => p.Id).ToList()),
-                    Network.FightProtocol.CastDetail)));
+                    Network.FightProtocol.CastDetail));
 
             // The sheet goes in its own sequence, as in the capture, not loose in the middle.
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
@@ -5021,6 +5022,7 @@ namespace Jondo.Unity.Server.Handlers
             // Through a portal the cast says so to its masks' R and r, and its damage and healing
             // grow with the network it crossed.
             int castFrom = caster.CellId;
+            bool unseenBefore = Managers.MonsterTactics.IsInvisible(caster);
             fight.CastThroughPortal = proyeccion != null;
             fight.PortalBonusPercent = proyeccion is { } porElPortal ? Jondo.Unity.World.Fights.PortalNetwork.BonusPercent(porElPortal.Chain) : 0;
             fight.ProjectedFrom = proyeccion is { } throughThePortals ? throughThePortals.Chain[throughThePortals.Chain.Count - 1].Cell : -1;
@@ -5049,7 +5051,7 @@ namespace Jondo.Unity.Server.Handlers
                 fight.CastLanded = null;
             }
 
-            await GivenAwayAsync(fight, caster, castFrom);
+            await GivenAwayAsync(fight, caster, castFrom, unseenBefore);
 
             // Cast through a portal (PST): the Selatrop's passive gives him its +2% after every one,
             // behind what the spell did -- Extinción's capture, frame 13.
@@ -5414,7 +5416,8 @@ namespace Jondo.Unity.Server.Handlers
                     Network.FightProtocol.CastAt(quien.Id, sobre.Id, celda >= 0 ? celda : sobre.CellId, hechizo,
                                                  limites.LevelId, critical: false, chained: true),
                     Network.FightProtocol.CastDetail);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, trama));
+            if (quien.EsInvocado) await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, trama));
+            else await CastToAllAsync(fight, quien, Network.FightProtocol.Cast, hechizo, limites.LevelId, 0, chained: true, trama);
         }
 
         /// <summary>
@@ -6359,14 +6362,53 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// A cast that left its caster invisible -- a push with Miedo, a trap laid -- gives him away
-        /// for a moment: his foes see a dark silhouette on the cell he cast from, as in the game.
+        /// A cast made unseen that left its caster so -- a push with Miedo, a trap laid -- gives him
+        /// away for a moment: his foes see a dark silhouette on the cell he cast from, as in the
+        /// game. The cast that hid him gives nothing away: they saw him cast it.
         /// </summary>
-        private static async Task GivenAwayAsync(FightInstance fight, Fighter caster, int castFrom)
+        private static async Task GivenAwayAsync(FightInstance fight, Fighter caster, int castFrom, bool unseenBefore)
         {
-            if (caster == null || !caster.IsAlive || !Managers.MonsterTactics.IsInvisible(caster) || castFrom < 0) return;
+            if (!unseenBefore || caster == null || !caster.IsAlive || !Managers.MonsterTactics.IsInvisible(caster) || castFrom < 0) return;
+            // The silhouette carries its own cell; his body stays off their board.
+            caster.LastSeenCell = castFrom;
             await SalvoASuBandoAsync(fight, caster.TeamId, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildInvisibleDetected(caster.Id, castFrom)));
+        }
+
+        /// <summary>
+        /// The other side shown where a fighter who was unseen stands, as he shows again: his body
+        /// put on his cell -- they were never told his steps, and their client held him where he
+        /// vanished --, then a silhouette there.
+        /// </summary>
+        private static async Task ShownWhereHeIsAsync(FightInstance fight, Fighter quien, int celda)
+        {
+            if (celda != quien.HeldByFoesAt)
+                await SalvoASuBandoAsync(fight, quien.TeamId, ConnectionProtocol.Push(Op.Jwe,
+                    Network.FightProtocol.BuildTeleport(quien.Id, quien.Id, celda)));
+            quien.LastSeenCell = celda;
+            quien.HeldByFoesAt = celda;
+            await SalvoASuBandoAsync(fight, quien.TeamId, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildInvisibleDetected(quien.Id, celda)));
+        }
+
+        /// <summary>
+        /// A cast told to everybody, unless its caster is unseen: then his side is told it as it is
+        /// and the rest a silent cast on no cell (<see cref="Network.FightProtocol.UnseenCastAt"/>).
+        /// Told the cell, the other side learned where an invisible Sram's trap went.
+        /// </summary>
+        private static async Task CastToAllAsync(FightInstance fight, Fighter caster, int action, int spell,
+                                                 int spellLevel, int arma, bool chained, byte[] seen)
+        {
+            if (caster == null || !Managers.MonsterTactics.IsInvisible(caster))
+            {
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, seen));
+                return;
+            }
+            await ASuBandoAsync(fight, caster.TeamId, ConnectionProtocol.Push(Op.Jwe, seen));
+            await SalvoASuBandoAsync(fight, caster.TeamId, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildAction(caster.Id, action,
+                    Network.FightProtocol.UnseenCastAt(caster.Id, spell, spellLevel, arma, chained),
+                    Network.FightProtocol.CastDetail)));
         }
 
         /// <summary>What one side must not be told the way it is told: to everybody else -- the other side and the spectators.</summary>
@@ -6937,6 +6979,12 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (quien == null) return false;
             if (quien.Buffs.Puestos.Any(b => b.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility && !b.Pendiente)) return false;
+            // Moved unseen since he was last seen: the other side is shown where he really stands
+            // before he shows -- they were never told his steps.
+            if (quien.CellId != quien.HeldByFoesAt) await ShownWhereHeIsAsync(fight, quien, quien.CellId);
+            quien.LastSeenCell = quien.CellId;
+            quien.HeldByFoesAt = quien.CellId;
+            quien.ToldInvisible = false;
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildVisibility((author ?? quien).Id, quien.Id, Network.FightProtocol.Visible)));
             return true;
@@ -7045,6 +7093,10 @@ namespace Jondo.Unity.Server.Handlers
             // And whoever a row of vitality left with no life -- a dispel, a cut duration, a 406 --
             // falls now, his death's own doings first.
             await PendingDeathsAsync(stream, fight);
+            // And whoever the cast took the invisibility from, whichever way -- Pala Fantomática
+            // cutting its rounds short sent the 1075 and nothing more --, shows again.
+            foreach (var shown in fight.Todos.Where(f => f.ToldInvisible && f.IsAlive && !Managers.MonsterTactics.IsInvisible(f)).ToList())
+                await VisibleOtraVezAsync(fight, quienLanza, shown);
         }
 
         /// <summary>
@@ -8070,6 +8122,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (c.Efecto.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility)
                 {
                     c.Sobre.LastSeenCell = c.Sobre.CellId;
+                    c.Sobre.HeldByFoesAt = c.Sobre.CellId;
+                    c.Sobre.ToldInvisible = true;
                     // A ghost to his own side, nothing at all to the rest: told the ghost too, the
                     // enemy's client drew the invisible Sram walking about.
                     await ASuBandoAsync(fight, c.Sobre.TeamId, ConnectionProtocol.Push(Op.Jwe,
@@ -8411,12 +8465,12 @@ namespace Jondo.Unity.Server.Handlers
 
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(caster.Id, Network.FightProtocol.SpellSequence)));
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+            await CastToAllAsync(fight, caster, Network.FightProtocol.Cast, spell, levelId, 0, chained: false,
                 Network.FightProtocol.BuildAction(
                     caster.Id, Network.FightProtocol.Cast,
                     Network.FightProtocol.CastAt(caster.Id, target?.Id ?? 0, cell, spell, levelId, critical: false,
                                                  noTarget: target == null),
-                    Network.FightProtocol.CastDetail)));
+                    Network.FightProtocol.CastDetail));
             await AplicarEfectosAsync(stream, fight, caster, spell, grade, target, Managers.EffectEngine.AlLanzar,
                                       cell, armar: false);
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
@@ -10187,13 +10241,13 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(monster.Id,
                                                          Network.FightProtocol.SpellSequence)));
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+            await CastToAllAsync(fight, monster, Network.FightProtocol.Cast, spell, spellLevel, 0, chained: false,
                 Network.FightProtocol.BuildAction(
                     monster.Id, Network.FightProtocol.Cast,
                     Network.FightProtocol.CastAt(monster.Id, objetivo?.Id ?? 0, aim,
                                                  spell, spellLevel, critical: critico,
                                                  portals: proyeccion?.Chain.Select(p => p.Id).ToList()),
-                    Network.FightProtocol.CastDetail)));
+                    Network.FightProtocol.CastDetail));
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildAction(monster.Id,
                                                   Network.FightProtocol.SpentActionPoints,
@@ -10202,6 +10256,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var tirada = Managers.EffectEngine.EfectosSorteados(spell, monsterGrade, critico);
             int castFrom = monster.CellId;
+            bool unseenBefore = Managers.MonsterTactics.IsInvisible(monster);
             if (!Managers.PlayerSpells.Contains(spell))
             {
                 // A monster's own spell: its rows in the order they are written.
@@ -10249,7 +10304,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (proyeccion != null && monster.IsAlive)
                     await DispararAsync(stream, fight, monster, Managers.EffectEngine.AlProyectarPorUnPortal);
             }
-            await GivenAwayAsync(fight, monster, castFrom);
+            await GivenAwayAsync(fight, monster, castFrom, unseenBefore);
 
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
