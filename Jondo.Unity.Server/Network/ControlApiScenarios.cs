@@ -55,6 +55,8 @@ namespace Jondo.Unity.Server.Network
                 switch (name)
                 {
                     case "tymador.bombs": TymadorBombs(session, fight, me, sc); break;
+                    case "tymador.walls": TymadorWalls(session, fight, me, sc); break;
+                    case "tymador.combos": TymadorCombos(session, fight, me, sc); break;
                     case "xelor.telefrag": XelorTelefrag(session, fight, me, sc); break;
                     case "steamer.turrets": SteamerTurrets(session, fight, me, sc); break;
                     case "forgelance.lance": ForgelanceLance(session, fight, me, sc); break;
@@ -86,7 +88,7 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The scenarios there are, by class.</summary>
         private static readonly Dictionary<int, string[]> ScenariosByBreed = new()
         {
-            [13] = new[] { "tymador.bombs" },
+            [13] = new[] { "tymador.bombs", "tymador.walls", "tymador.combos" },
             [5] = new[] { "xelor.telefrag" },
             [15] = new[] { "steamer.turrets" },
             [20] = new[] { "forgelance.lance" },
@@ -1531,25 +1533,42 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
             // the bombs' reach (1 to 6) from the Tymador and in his sight -- the second one past
             // the first bomb as well: a bomb, like any fighter, blocks the line.
             var opaque = MapManager.GetLosBlockers(fight.ArenaMapId);
-            bool Sees(int to, int alsoBlocking = -1) => MapGeometry.HasLineOfSight(me.CellId, to,
-                c => c == alsoBlocking || (opaque?.Contains(c) ?? false) || fight.Todos.Any(f => f.IsAlive && f != me && f.CellId == c));
-            (int A, int B, int Dx, int Dy)? line = null;
-            foreach (int a in Enumerable.Range(0, 560).Where(c => FreeCell(fight, c))
-                                        .OrderBy(c => Math.Abs(MapGeometry.Distance(c, me.CellId) - 2)))
+            (int A, int B, int Dx, int Dy)? RowFrom(int from)
             {
-                int da = MapGeometry.Distance(a, me.CellId);
-                if (da < 1 || da > 4 || !Sees(a)) continue;
-                foreach (var (dx, dy) in Rows)
+                bool Sees(int to, int alsoBlocking = -1) => MapGeometry.HasLineOfSight(from, to,
+                    c => c == alsoBlocking || (opaque?.Contains(c) ?? false) || fight.Todos.Any(f => f.IsAlive && f != me && f.CellId == c));
+                foreach (int a in Enumerable.Range(0, 560).Where(c => c != from && FreeCell(fight, c))
+                                            .OrderBy(c => Math.Abs(MapGeometry.Distance(c, from) - 2)))
                 {
-                    int b = Along(a, dx, dy, 4);
-                    if (b < 0 || !FreeCell(fight, b) || !Sees(b, a)) continue;
-                    int db = MapGeometry.Distance(b, me.CellId);
-                    if (db < 1 || db > 6) continue;
-                    if (!Enumerable.Range(1, 3).All(k => Along(a, dx, dy, k) is int c && c >= 0 && FightHandler.BoardOf(fight).Walkable(c))) continue;
-                    line = (a, b, dx, dy);
-                    break;
+                    int da = MapGeometry.Distance(a, from);
+                    if (da < 1 || da > 4 || !Sees(a)) continue;
+                    foreach (var (dx, dy) in Rows)
+                    {
+                        int b = Along(a, dx, dy, 4);
+                        if (b < 0 || b == from || !FreeCell(fight, b) || !Sees(b, a)) continue;
+                        int db = MapGeometry.Distance(b, from);
+                        if (db < 1 || db > 6) continue;
+                        if (!Enumerable.Range(1, 3).All(k => Along(a, dx, dy, k) is int c && c >= 0 && c != from
+                                                             && FightHandler.BoardOf(fight).Walkable(c))) continue;
+                        return (a, b, dx, dy);
+                    }
                 }
-                if (line != null) break;
+                return null;
+            }
+            var line = RowFrom(me.CellId);
+            // None from where he stands -- a team fight's board, with its walls and its people in the
+            // way --: the nearest free cell that has one, and he is put there.
+            if (line == null)
+            {
+                int stand = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c))
+                                      .OrderBy(c => MapGeometry.Distance(c, me.CellId))
+                                      .Take(120).FirstOrDefault(c => RowFrom(c) != null, -1);
+                if (stand >= 0)
+                {
+                    PutAt(session, fight, me, stand);
+                    sc.Note($"no row from where he stood: the Tymador put on {me.CellId}");
+                    line = RowFrom(me.CellId);
+                }
             }
             if (line is not { } l)
             {
