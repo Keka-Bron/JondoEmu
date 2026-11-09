@@ -1584,28 +1584,33 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
             // «Una entidad que se desplace en el muro o entre en él sufrirá daños.»
             var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
                                  .OrderBy(f => MapGeometry.Distance(f.CellId, between[1])).FirstOrDefault();
-            if (wall && foe != null)
+            // Onto a cell of the wall nobody stands on: the Tymador may stand in its middle.
+            int into = between.Where(c => FreeCell(fight, c)).OrderBy(c => MapGeometry.Distance(c, between[1])).DefaultIfEmpty(-1).First();
+            if (wall && foe != null && into >= 0)
             {
-                // The foe beside the wall, then walked onto its middle. Not beside the Tymador: leaving
+                // The foe beside the wall, then walked onto it. Not beside the Tymador: leaving
                 // his side the foe is tackled, loses his MP and walks nowhere.
-                int beside = between.SelectMany(MapGeometry.GetNeighbors).Where(c => FreeCell(fight, c) && !between.Contains(c)
-                                                                                     && MapGeometry.Distance(c, me.CellId) > 1)
-                                    .OrderBy(c => MapGeometry.Distance(c, between[1])).DefaultIfEmpty(-1).First();
+                int beside = MapGeometry.GetNeighbors(into).Where(c => FreeCell(fight, c) && !between.Contains(c)
+                                                                       && MapGeometry.Distance(c, me.CellId) > 1)
+                                    .DefaultIfEmpty(-1).First();
                 if (beside >= 0)
                 {
                     PutAt(session, fight, foe, beside);
                     int life = foe.CurrentHP;
-                    RunInSession(session, async stream => await FightHandler.TestWalkAsync(stream, fight, foe, between[1]));
+                    RunInSession(session, async stream => await FightHandler.TestWalkAsync(stream, fight, foe, into));
                     sc.Check("a foe walking into the wall is hurt", foe.CurrentHP < life,
                              $"foe {foe.Id} from {beside} to {foe.CellId}: life {life} -> {foe.CurrentHP}");
                 }
                 else sc.Note("no free cell beside the wall to walk a foe from");
             }
+            else if (wall) sc.Note(foe == null ? "no foe left alive to walk into the wall" : "no free cell of the wall to walk a foe onto");
 
             // «Un tymador puede colocar hasta un máximo de tres bombas en el terreno simultáneamente, ya sean del mismo elemento o no.»
             FreshTurn(session, fight, me, keep: true);
+            // A cell he sees: a bomb or a fighter between stops the cast, as in the game.
+            var sight = FightHandler.BoardOf(fight);
             int third = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && !between.Contains(c))
-                                  .Where(c => MapGeometry.Distance(c, me.CellId) is >= 1 and <= 6)
+                                  .Where(c => MapGeometry.Distance(c, me.CellId) is >= 1 and <= 6 && sight.Sees(me.CellId, c))
                                   .Where(c => MapGeometry.Distance(c, l.A) > 1 && MapGeometry.Distance(c, l.B) > 1)
                                   .DefaultIfEmpty(-1).First();
             if (third >= 0) CastAt(session, Tornabombas, third);
@@ -1613,8 +1618,9 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
             sc.Check("a Tornabombas puts an air bomb (3113) as the third", bombC?.MonsterId == TornabombaTemplate,
                      bombC == null ? $"no bomb on {third}" : $"bomb {bombC.Id}, template {bombC.MonsterId}");
             FreshTurn(session, fight, me, keep: true);
+            sight = FightHandler.BoardOf(fight);
             int fourth = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && !between.Contains(c))
-                                   .Where(c => MapGeometry.Distance(c, me.CellId) is >= 1 and <= 6)
+                                   .Where(c => MapGeometry.Distance(c, me.CellId) is >= 1 and <= 6 && sight.Sees(me.CellId, c))
                                    .DefaultIfEmpty(-1).First();
             int countBefore = Bombs().Count;
             if (fourth >= 0) CastAt(session, Explobomba, fourth);

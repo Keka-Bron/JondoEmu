@@ -1196,6 +1196,41 @@ namespace Jondo.Unity.Server.Network
                             observed = $"the cell ahead of the caster toward {castCell}, {ahead}, is taken or no ground";
                         }
                     }
+                    // Pushed or pulled «hasta la casilla objetivo» (783, 1043: the Tymobot's
+                    // Empujoncito and Aspirador): the aimed cell is where the one moved ends, and
+                    // the one moved is the first on the caster's line before it (the push) or past
+                    // it (the pull). Aimed at somebody, off the line, or with nobody on that stretch
+                    // of it, nobody was due to move.
+                    if (moved.Count == 0 && verdict == "missing" && castCell >= 0 && before.TryGetValue(me.Id, out var lineFrom)
+                        && e.EffectId is Jondo.Unity.World.Combat.EffectSupport.PushToTargetCell or Jondo.Unity.World.Combat.EffectSupport.PullToTargetCell)
+                    {
+                        var (ax, ay) = MapGeometry.CellToPoint(lineFrom.CellId);
+                        var (bx, by) = MapGeometry.CellToPoint(castCell);
+                        int dx = bx - ax, dy = by - ay;
+                        bool aligned = (dx != 0 || dy != 0) && (dx == 0 || dy == 0 || Math.Abs(dx) == Math.Abs(dy));
+                        bool Standing(int cell) => fight.Todos.Any(f => f.IsAlive && before.TryGetValue(f.Id, out var at) && at.CellId == cell);
+                        var stretch = new List<int>();
+                        if (aligned)
+                        {
+                            int sx = Math.Sign(dx), sy = Math.Sign(dy);
+                            for (int k = 1; k < 64; k++)
+                            {
+                                int cell = e.EffectId == Jondo.Unity.World.Combat.EffectSupport.PushToTargetCell
+                                    ? MapGeometry.PointToCell(ax + sx * k, ay + sy * k)
+                                    : MapGeometry.PointToCell(bx + sx * k, by + sy * k);
+                                if (cell < 0 || cell == castCell) break;
+                                stretch.Add(cell);
+                            }
+                        }
+                        bool aimTaken = Standing(castCell);
+                        if (aimTaken || !aligned || !stretch.Any(Standing))
+                        {
+                            verdict = "blocked";
+                            observed = aimTaken ? $"somebody stands on the aimed cell {castCell}, where the one moved would end"
+                                     : !aligned ? $"the aimed cell {castCell} is off the caster's lines"
+                                     : $"nobody on the caster's line {(e.EffectId == Jondo.Unity.World.Combat.EffectSupport.PushToTargetCell ? "before" : "past")} cell {castCell}";
+                        }
+                    }
                     // Drawn toward the middle of its zone (Parafuso's cross): the one standing on the
                     // middle goes nowhere, and one beside him has the middle taken. Nothing could
                     // move when nobody else in the zone had a free cell toward the middle.
@@ -1516,7 +1551,11 @@ namespace Jondo.Unity.Server.Network
                     // Palabra Entretenida's "g,A" pull leaves him out ("no afecta al lanzador").
                     bool foes = kinds.Any(k => char.IsUpper(k[0]) && k != "C"), friends = kinds.Any(k => char.IsLower(k[0]) && k != "c"),
                          caster = kinds.Any(k => k is "C" or "c" or "a");
+                    // A move round the zone's middle (a pull to it, a teleport mirrored on it --
+                    // Sextante's on the turret) takes nobody standing on the middle anywhere.
+                    bool moves = MovementEffects.Contains(e.EffectId);
                     bool anybody = fight.Todos.Any(f => before.TryGetValue(f.Id, out var then) && then.IsAlive && zone.Contains(then.CellId)
+                                                        && !(moves && then.CellId == castCell)
                                                         && (f.Id == me.Id ? caster : f.TeamId == me.TeamId ? friends : foes));
                     if (!anybody)
                     {
