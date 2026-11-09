@@ -30,12 +30,26 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         [Fact]
-        public void A_creature_s_missing_life_goes_empty_as_in_every_captured_jxb()
+        public void A_whole_creature_s_missing_life_goes_empty_as_in_every_captured_jxb()
         {
+            // Eroded but not hurt: nothing missing, the erosion being off its top.
             Assert.Equal(new byte[] { 0x08, 0x61, 0x12, 0x00 },
                 FightProtocol.SheetEntry(FightProtocol.TemporaryLifeMalus, 0, -126, isMonster: true).Build());
             Assert.NotEqual(new byte[] { 0x08, 0x61, 0x22, 0x00 },
                 FightProtocol.SheetEntry(FightProtocol.TemporaryLifeMalus, -104, -208, isMonster: false).Build());
+        }
+
+        /// <summary>
+        /// A hurt one's goes in its mould, f2 { f2 }: the client draws life as top + 97 + 102
+        /// (hl.ndt), and a list sent again mid-fight with it empty drew every hurt creature whole.
+        /// </summary>
+        [Fact]
+        public void A_hurt_creature_s_missing_life_goes_in_its_sheet()
+        {
+            var entry = ProtoMessage.Parse(FightProtocol.SheetEntry(FightProtocol.TemporaryLifeMalus, -698, -6, isMonster: true).Build());
+            Assert.Equal(97, entry.Fields.Single(f => f.FieldNumber == 1).VarIntValue);
+            var mould = ProtoMessage.Parse(entry.Fields.Single(f => f.FieldNumber == 2).BytesValue);
+            Assert.Equal(-698, mould.Fields.Single(f => f.FieldNumber == 2).VarIntValue);
         }
 
         [Fact]

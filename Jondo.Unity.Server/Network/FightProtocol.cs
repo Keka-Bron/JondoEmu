@@ -387,14 +387,15 @@ namespace Jondo.Unity.Server.Network
 
             if (isMonster)
             {
-                // The life a creature is missing does not travel: its 97 goes empty in every
-                // monster block of the captures' jxb, "08611200", whatever its life. The monster
-                // mould would add the missing life and the erosion into one number, and a summon
-                // sent again on reconnecting -- the Xelor's Syncro, eroded 126 -- was drawn at
-                // "-126 / 1.134" and «0 (0%)».
-                if (characteristic == TemporaryLifeMalus) return entry.EmptyMsg(2);
-
-                long total = baseValue + fromGear + delEmbrujo;
+                // The life a creature is missing travels in its 97 as any other of its numbers: the
+                // client draws a fighter's life as its top (0, plus the erosion in 102) plus 97 plus
+                // 102 (hl.ndt / hl.ndu), whatever the mould. Every monster block of the captures'
+                // jxb has it empty, "08611200", because they are fight starts and reconnections
+                // with nobody hurt; sent empty for a hurt one, a list sent again mid-fight -- a
+                // reconnection, a wave, a spectator coming in -- drew it whole: the Iop's
+                // Estratega at 2,094 where the server held 1,402. The erosion stays out of it (it
+                // is off the top already), or the sum takes it off twice.
+                long total = characteristic == TemporaryLifeMalus ? baseValue : baseValue + fromGear + delEmbrujo;
                 if (total == 0) entry.EmptyMsg(2);
                 else entry.Msg(2, Pb.New().Var(2, total));
                 return entry;
