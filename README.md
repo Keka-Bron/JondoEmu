@@ -9,31 +9,32 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 Every class spell is tried in real fights with the game client: alone against Puchs, in 2v2 and 3v3
 team fights against bots of every class, and in scenarios that replay each class mechanic from its
-in-game sheet. A spell passes when every effect it declares shows on the board.
+in-game sheet. A spell passes when every effect it declares shows on the board. Each summon is
+brought out too: it must take its own turn (or none, if it is static) and its spells must pass.
 
 <!-- class-status:start -->
-| Class | Debug level | Spells passing | Mechanic checks |
-|---|:---|:---:|:---:|
-| Feca | `█████████░` **98%** | 43/44 | 23/23 |
-| Osamodas | `█████████░` **98%** | 43/44 | 8/8 |
-| Anutrof | `██████████` **100%** | 44/44 | 13/13 |
-| Sram | `██████████` **100%** | 44/44 | 31/31 |
-| Xelor | `██████████` **100%** | 44/44 | 14/14 |
-| Zurcarák | `█████████░` **95%** | 42/44 | 19/19 |
-| Aniripsa | `██████████` **100%** | 44/44 | 14/14 |
-| Yopuka | `█████████░` **98%** | 43/44 | 18/18 |
-| Ocra | `█████████░` **95%** | 42/44 | 12/12 |
-| Sadida | `██████████` **100%** | 44/44 | 18/18 |
-| Sacrógrito | `█████████░` **95%** | 42/44 | 13/13 |
-| Pandawa | `██████████` **100%** | 44/44 | 13/13 |
-| Tymador | `██████████` **100%** | 44/44 | 29/29 |
-| Zobal | `████████░░` **89%** | 39/44 | 17/17 |
-| Steamer | `█████████░` **98%** | 43/44 | 25/25 |
-| Selatrop | `████████░░` **82%** | 36/44 | 13/13 |
-| Hipermago | `████████░░` **86%** | 38/44 | 25/25 |
-| Uginak | `█████████░` **95%** | 42/44 | 29/29 |
-| Forjalanza | `███████░░░` **75%** | 33/44 | 21/21 |
-| **All** | **95%** | **794/836** | **355/355** |
+| Class | Debug level | Spells passing | Mechanic checks | Summons: own turn | Summons' spells |
+|---|:---|:---:|:---:|:---:|:---:|
+| Feca | `██████████` **100%** | 44/44 | 23/23 | 4/4 | — |
+| Osamodas | `██████████` **100%** | 44/44 | 8/8 | 14/14 | 34/34 |
+| Enutrof | `██████████` **100%** | 44/44 | 13/13 | 7/7 | 4/4 |
+| Sram | `██████████` **100%** | 44/44 | 31/31 | — | — |
+| Xelor | `██████████` **100%** | 44/44 | 14/14 | 3/3 | — |
+| Ecaflip | `██████████` **100%** | 44/44 | 19/19 | 2/2 | 4/4 |
+| Eniripsa | `██████████` **100%** | 44/44 | 19/19 | 10/10 | 29/29 |
+| Iop | `██████████` **100%** | 44/44 | 18/18 | 1/1 | — |
+| Cra | `██████████` **100%** | 44/44 | 12/12 | 2/2 | — |
+| Sadida | `██████████` **100%** | 44/44 | 18/18 | 6/6 | 9/9 |
+| Sacrier | `██████████` **100%** | 44/44 | 13/13 | 2/2 | 4/4 |
+| Pandawa | `██████████` **100%** | 44/44 | 13/13 | 4/4 | — |
+| Rogue | `██████████` **100%** | 44/44 | 19/20 | 7/7 | 8/8 |
+| Masqueraider | `██████████` **100%** | 44/44 | 15/15 | 1/1 | — |
+| Foggernaut | `██████████` **100%** | 44/44 | 25/25 | 6/6 | 12/12 |
+| Eliotrope | `██████████` **100%** | 44/44 | 20/20 | 1/1 | — |
+| Huppermage | `██████████` **100%** | 44/44 | 30/30 | 1/1 | 3/3 |
+| Ouginak | `██████████` **100%** | 44/44 | 24/24 | 1/1 | 1/1 |
+| Forgelance | `██████████` **100%** | 44/44 | 21/21 | 1/1 | — |
+| **All** | **100%** | **836/836** | **355/356** | **73/73** | **108/108** |
 <!-- class-status:end -->
 
 - ✅ Legendary items, Dofus and prismaradites: all 74 answer every trigger the fights provoke
@@ -274,7 +275,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
 - ✅ A nod to the old days: the portals to Anutropía, Sramvil, Xelorium and Zurcalia, gone from the game
   since version 3.2, stand for good in the Amakna village square by the vendors — anybody can talk to
   them or cross them, as often as they like
-- ✅ Zurcarák's herald at Zurcalia's entry
+- ✅ Ecaflip's herald at Zurcalia's entry
 - ✅ Osavora's seasons — Naissance, Chasse and Repos, one a week from Monday 8:00 — change the look of
   the dimension's maps
 - ✅ Osavora's weekly quests come with their season, once a week each: the season is the game's world
@@ -679,7 +680,7 @@ An alliance is made of characters, not guilds.
   quests by job level, the Almanax's by the day, Osavora's weekly ones by the season and their marker's week
 - ✅ Items that validate a quest objective when used (316 of them)
 - ✅ Treasure hunts at the Malle aux trésors: Cano Dhain hands out the daily, archaeological and
-  saints' hunts, the Anutrof box draws the map — three or four stages, flags, digs, four tries —
+  saints' hunts, the Enutrof box draws the map — three or four stages, flags, digs, four tries —
   and the Treasure is fought at the end, hitting the chest on legs among its four Vigicofres; its
   chest closes the quest, one hunt a day from 7:00
 - ✅ Legendary hunts: put a criminal's map together from its fragments at the Pupitre, start it at
@@ -844,8 +845,8 @@ Ranked PvP through a queue. Open the window, pick a format, get matched, fight, 
 <img width="2560" height="1500" alt="image" src="https://github.com/user-attachments/assets/71b362a6-6893-4652-ad38-e4073343ddb1" />
 
 - ✅ A JondoBot plans its whole turn, trying sequences of casts on a copy of the fight, and plays its
-  class: the Xelor's telefrags, the Pandawa's drink and throws, the Zobal's masks, the Sadida's dolls,
-  the Tymador's bombs and walls, the Steamer's turrets, the Selatrop's portals, and the rest of the
+  class: the Xelor's telefrags, the Pandawa's drink and throws, the Masqueraider's masks, the Sadida's dolls,
+  the Rogue's bombs and walls, the Foggernaut's turrets, the Eliotrope's portals, and the rest of the
   classes' states
 - ✅ Giving up a fight against JondoBots
 - ✅ Giving up a fight of people: leave alone, or vote with your team to surrender
@@ -919,26 +920,26 @@ game; the list is generated by `tools/spell_checklist.py`.
 
 | Class | Seen working | Resolve on paper | Spells |
 |---|:---:|:---:|:---:|
-| Feca | 43 | 44 | 44 |
-| Osamodas | 43 | 44 | 44 |
-| Anutrof | 44 | 44 | 44 |
+| Feca | 44 | 44 | 44 |
+| Osamodas | 44 | 44 | 44 |
+| Enutrof | 44 | 44 | 44 |
 | Sram | 44 | 44 | 44 |
 | Xelor | 44 | 44 | 44 |
-| Zurcarák | 42 | 44 | 44 |
-| Aniripsa | 44 | 44 | 44 |
-| Yopuka | 44 | 44 | 44 |
-| Ocra | 42 | 44 | 44 |
+| Ecaflip | 44 | 44 | 44 |
+| Eniripsa | 44 | 44 | 44 |
+| Iop | 44 | 44 | 44 |
+| Cra | 44 | 44 | 44 |
 | Sadida | 44 | 44 | 44 |
-| Sacrógrito | 42 | 44 | 44 |
+| Sacrier | 44 | 44 | 44 |
 | Pandawa | 44 | 44 | 44 |
-| Tymador | 44 | 44 | 44 |
-| Zobal | 39 | 44 | 44 |
-| Steamer | 43 | 44 | 44 |
-| Selatrop | 36 | 44 | 44 |
-| Hipermago | 38 | 44 | 44 |
-| Uginak | 42 | 44 | 44 |
-| Forjalanza | 33 | 44 | 44 |
-| **All** | **795** | **836** | **836** |
+| Rogue | 44 | 44 | 44 |
+| Masqueraider | 44 | 44 | 44 |
+| Foggernaut | 44 | 44 | 44 |
+| Eliotrope | 44 | 44 | 44 |
+| Huppermage | 44 | 44 | 44 |
+| Ouginak | 44 | 44 | 44 |
+| Forgelance | 44 | 44 | 44 |
+| **All** | **836** | **836** | **836** |
 
 ### 🎯 Combat challenges
 
