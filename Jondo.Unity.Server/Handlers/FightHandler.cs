@@ -5718,7 +5718,12 @@ namespace Jondo.Unity.Server.Handlers
                 // out after it. The attitudes' and the start's stay, as their rows do.
                 var hooked = hooksAtTheStart.TryGetValue(fighter.Id, out var hisHooks) ? hisHooks : new List<Jondo.Unity.World.Fights.Buffs.ActiveSpell>();
                 fighter.Buffs.ActiveSpells.RemoveAll(h => !fighter.Buffs.Actitudes.Contains(h.Hechizo) && !hooked.Contains(h));
-                foreach (var row in fighter.Buffs.Puestos.Where(r => !fighter.Buffs.Actitudes.Contains(r.HechizoOrigen) && !started.Contains(r)).ToList())
+                // A bomb left on the board keeps its combo -- its rung's state, the rung's % and
+                // size, the tier's look --: what it is, not what a spell left. Wiped, it stood
+                // on with no rung and no «Combo I» drawn over it.
+                bool bomb = fighter.EsInvocado && EsBomba(fighter.MonsterId);
+                foreach (var row in fighter.Buffs.Puestos.Where(r => !fighter.Buffs.Actitudes.Contains(r.HechizoOrigen) && !started.Contains(r)
+                                                                     && !(bomb && Managers.Combo.HoldsTheCombo(r.HechizoOrigen))).ToList())
                     if (fighter.Buffs.QuitarFila(row))
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya, Network.FightProtocol.BuildBuffGone(fighter.Id, row.Numero)));
                 // And what he started with and a spell took off -- Tranka's Borracho putting the
@@ -6307,7 +6312,8 @@ namespace Jondo.Unity.Server.Handlers
                 : quien.CellId;
             await AplicarEfectosAsync(stream, fight, lanzador, enganche.Hechizo, enganche.Grado,
                                       quien, disparador, celda, critico: enganche.Critico,
-                                      rondaDelEnganche: enganche.PuestoEnRonda);
+                                      rondaDelEnganche: enganche.PuestoEnRonda,
+                                      soloAlObjetivo: suyas.All(Managers.EffectEngine.ActsOnItsBearer));
         }
 
         /// <summary>

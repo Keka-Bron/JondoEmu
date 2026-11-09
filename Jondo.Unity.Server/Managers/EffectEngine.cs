@@ -999,9 +999,30 @@ namespace Jondo.Unity.Server.Managers
         /// (frames 193-194) and the swap right behind sets off -- the telefrag (196-200). Only a
         /// root's: Astrolabio's and Permutación's sit in a sub-cast, which is hooked as a child.
         /// </summary>
+        /// <summary>
+        /// Whether a hooked row, gone off, acts on its bearer alone: one that waited on the bearer
+        /// being pulled, swapped or teleported was hooked on him because the cast reached him, and
+        /// what it does is his. Imantación's cross has a hole in its middle -- the Tymador's cell
+        /// at the cast --, and read again round the bomb the hook was on, the bomb fell in the
+        /// hole and got no combo.
+        /// </summary>
+        internal static bool ActsOnItsBearer(SpellEffect effect) => WaitsOnBeingMoved(effect);
+
         private static bool WaitsOnBeingMoved(SpellEffect effect)
             => effect.Disparadores().Any(d => string.Equals(d, AlSerIntercambiado, StringComparison.OrdinalIgnoreCase)
-                                           || string.Equals(d, AlSerTeletransportado, StringComparison.OrdinalIgnoreCase));
+                                           || string.Equals(d, AlSerTeletransportado, StringComparison.OrdinalIgnoreCase))
+               || WaitsOnBeingDrawnIn(effect);
+
+        /// <summary>
+        /// Whether a root's sub-cast waits on its bearer being pulled (MA): Imantación's and
+        /// Cruce's "1160 20676/20677 under MA on the bombs", the combo «solo si las bombas son
+        /// desplazadas», which the capture registers on the bomb at the cast (a 1160 buff with
+        /// the 2136 state) whether it moves or not. Only a cast: Flecha Tiránica's "98 under P|MA"
+        /// is a blow its own state carries.
+        /// </summary>
+        private static bool WaitsOnBeingDrawnIn(SpellEffect effect)
+            => CastsASpell(effect) && effect.Duration == 0
+               && effect.Disparadores().Any(d => string.Equals(d, AlSerAtraido, StringComparison.OrdinalIgnoreCase));
 
         /// <summary>
         /// The round a hook for <paramref name="bearer"/>'s next turn lasts to: the next one when he

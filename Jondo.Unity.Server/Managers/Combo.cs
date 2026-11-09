@@ -74,6 +74,14 @@ namespace Jondo.Unity.Server.Managers
             return _percentByLevel.TryGetValue(level, out int percent) ? percent : 0;
         }
 
+        /// <summary>
+        /// Whether a row of this spell is part of a bomb's combo: the ladder's state, the bonus
+        /// spell's % and size, and the look of the tier (30671 to 30673, which 20500 casts at
+        /// rungs IV, V, IX and X).
+        /// </summary>
+        public static bool HoldsTheCombo(int spell)
+            => spell is LadderSpell or BonusSpell or 30671 or 30672 or 30673;
+
         /// <summary>Whether this fighter is carrying a combo at all.</summary>
         public static bool Carries(Fighter who) => LevelOf(who) > 0;
 
