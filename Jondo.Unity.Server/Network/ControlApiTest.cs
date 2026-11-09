@@ -270,9 +270,11 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static void WaitTillItBegins(FightInstance fight, Fighter? current, int seconds = 10)
         {
+            // Only a character with a client of his own confirms his turn; the server starts the rest.
+            if (current == null || current.IsMonster || current.EsInvocado || current.DrivenBy != 0) return;
             var until = DateTime.UtcNow.AddSeconds(seconds);
             while (DateTime.UtcNow < until && fight.State == FightState.Ongoing && fight.CurrentFighter == current
-                   && fight.TurnAwaitingConfirmation)
+                   && fight.LastTurnBegun != (fight.RoundNumber, current.Id))
                 System.Threading.Thread.Sleep(100);
         }
 

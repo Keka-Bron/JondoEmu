@@ -107,6 +107,7 @@ namespace Jondo.Unity.World.Fights
             {
                 if (_turnoAtendido == (round, turnIndex, fighterId)) return false;
                 _turnoAtendido = (round, turnIndex, fighterId);
+                LastTurnBegun = (round, fighterId);
                 return true;
             }
         }
@@ -116,6 +117,12 @@ namespace Jondo.Unity.World.Fights
         /// confirm it (jxh sent, jwz not back). A fight whose only human closed the game parks
         /// here, and somebody reconnecting needs to know which of the two he is walking into.
         /// </summary>
+        /// <summary>
+        /// The round and the fighter of the last turn whose start was confirmed, whatever its index
+        /// has become since: summons put on or taken off during a turn move the index, not this.
+        /// </summary>
+        public (int Round, long Fighter) LastTurnBegun { get; private set; }
+
         public bool TurnAwaitingConfirmation
         {
             get { lock (_candadoDelTurno) return _turnoAtendido != (RoundNumber, TurnSlot, CurrentFighter?.Id ?? 0); }
