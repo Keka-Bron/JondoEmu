@@ -3897,8 +3897,11 @@ namespace Jondo.Unity.Server.Managers
                                                 int celdaApuntada = -1,
                                                 int sharedHealRoll = int.MinValue)
         {
-            // The damage is carried by whoever already carried it; it is not touched here.
-            if (efecto.EffectId >= DanoPrimero && efecto.EffectId <= DanoUltimo) return null;
+            // The damage is carried by whoever already carried it; it is not touched here. All of
+            // it, not the 91-100 alone: the best element's blow (2822) and the steals (2828,
+            // 2890) are dealt by the blows too, and here they also left an empty row on the one
+            // hit -- Latigo's "2822 until round 4" on its target's panel.
+            if (EsDeDano(efecto.EffectId)) return null;
 
             if (efecto.EffectId == MataAlObjetivo)
             {
