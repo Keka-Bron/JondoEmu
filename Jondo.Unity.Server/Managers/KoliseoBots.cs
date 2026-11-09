@@ -374,7 +374,9 @@ namespace Jondo.Unity.Server.Managers
             int passive = ClassPassives.PassiveOf(spec.Breed);
             foreach (var (spell, grade) in ClassPassives.ForFight(spec.Breed, spells))
                 if (spell != passive) fighter.Buffs.PonerActitud(spell, grade);
-            if (passive != 0) fighter.Buffs.PonerActitud(passive);
+            // At the grade its level gives it, as a character's (SpellTable.PassiveGrade): put at
+            // grade 1, a level-200 Pandawa carried for +10 power instead of his +50.
+            if (passive != 0) fighter.Buffs.PonerActitud(passive, SpellTable.PassiveGrade(passive, fighter.Level));
             return fighter;
         }
     }

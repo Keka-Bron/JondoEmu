@@ -5534,12 +5534,18 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static async Task TestFinishAsync(NetworkStream stream, FightInstance fight, int winners)
         {
-            foreach (var loser in fight.Todos.Where(f => f.IsAlive && f.TeamId != winners && !f.EsInvocado).ToList())
+            // Inside a sequence: a death told outside one is a NullReference in the client (its
+            // fight sequence handler has nothing open to put it in).
+            await InASequenceAsync(fight, fight.CurrentFighter?.Id ?? 0, async () =>
             {
-                loser.CurrentHP = 0;
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(loser.Id, loser.Id)));
-                await CaenSusInvocadosAsync(stream, fight, loser);
-            }
+                foreach (var loser in fight.Todos.Where(f => f.IsAlive && f.TeamId != winners && !f.EsInvocado).ToList())
+                {
+                    loser.CurrentHP = 0;
+                    CarriedFollows(fight, loser);
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(loser.Id, loser.Id)));
+                    await CaenSusInvocadosAsync(stream, fight, loser);
+                }
+            });
             fight.RebuildTurnOrderOnFighterDeath();
             await CheckFightOverAsync(stream, fight);
         }
