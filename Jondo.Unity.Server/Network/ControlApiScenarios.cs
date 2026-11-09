@@ -67,6 +67,8 @@ namespace Jondo.Unity.Server.Network
                     case "sadida.trees": SadidaTrees(session, fight, me, sc); break;
                     case "eniripsa.words": EniripsaWords(session, fight, me, sc); break;
                     case "huppermage.elements": HuppermageElements(session, fight, me, sc); break;
+                    case "huppermage.runes": HuppermageRunes(session, fight, me, sc); break;
+                    case "selatrop.triggers": SelatropTriggers(session, fight, me, sc); break;
                     case "selatrop.portals": SelatropPortals(session, fight, me, sc); break;
                     case "zurcarak.poker": ZurcarakPoker(session, fight, me, sc); break;
                     case "yopuka.furor": YopukaFuror(session, fight, me, sc); break;
@@ -96,8 +98,8 @@ namespace Jondo.Unity.Server.Network
             [14] = new[] { "zobal.masks" },
             [10] = new[] { "sadida.trees" },
             [7] = new[] { "eniripsa.words" },
-            [17] = new[] { "huppermage.elements" },
-            [16] = new[] { "selatrop.portals" },
+            [17] = new[] { "huppermage.elements", "huppermage.runes" },
+            [16] = new[] { "selatrop.portals", "selatrop.triggers" },
             [6] = new[] { "zurcarak.poker" },
             [8] = new[] { "yopuka.furor" },
         };
@@ -979,7 +981,7 @@ namespace Jondo.Unity.Server.Network
             int treeCell = tree.CellId;
             CastAt(session, LaLoca, treeCell);
             var doll = fight.Todos.FirstOrDefault(f => f.IsAlive && f.EsInvocado && f.Invocador == me.Id && f.CellId == treeCell && f.MonsterId != Tree);
-            if (sc.Check("La Loca cast on the tree replaces it with the doll", doll != null && !tree.IsAlive,
+            if (sc.Check($"spell {LaLoca} (La Loca) cast on the tree replaces it with the doll", doll != null && !tree.IsAlive,
                          doll == null ? $"no doll on {treeCell}; tree alive {tree.IsAlive}" : $"monster {doll.MonsterId} on {treeCell} (La Loca is {Doll}); tree alive {tree.IsAlive}"))
             {
                 RunInSession(session, stream => FightHandler.TestKillAsync(stream, fight, doll!, me));
@@ -1179,6 +1181,105 @@ namespace Jondo.Unity.Server.Network
             CastAt(session, Lanzallamas, foe.CellId);
             power = me.Buffs.Puestos.Count(r => r.HechizoOrigen == Erupcion && r.EffectId == 138);
             sc.Check("the same combination again gives no more power", power == 1, $"{power} power row(s) of Erupción");
+        }
+
+        /// <summary>
+        /// The spells that set the Huppermage's runes off, each as its sheet words it: a rune of his
+        /// under a foe, and Runificación and Manifestación «para robar vida al enemigo... que la
+        /// ocupe», Prisma Rúnico's earth rune leaving the earth state on the foes round it,
+        /// Sobrecarga Rúnica «ocasiona daños al enemigo objetivo por cada runa activada», and
+        /// Contribución giving the ally the earth's movement for a foe in the earth state.
+        /// </summary>
+        private static void HuppermageRunes(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int OndaSismica = 13668, Runificacion = 13670, Manifestacion = 13710, PrismaRunico = 13719,
+                      SobrecargaRunica = 13724, Contribucion = 13701, Earth = 292;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 4);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            int spot = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 3).DefaultIfEmpty(-1).First();
+            PutAll(session, fight, (foe, spot));
+            bool RuneUnder(Fighter f) => fight.Glifos.Any(g => g.Dueno == me.Id && g.Tipo == 2022 && g.Cubre(f.CellId));
+
+            // A rune under him, and each activation in a fresh turn of its own.
+            void RuneOnHim()
+            {
+                FreshTurn(session, fight, me, keep: true);
+                if (!RuneUnder(foe)) { CastAt(session, OndaSismica, foe.CellId); FreshTurn(session, fight, me, keep: true); }
+            }
+            foreach (var (spell, name) in new[] { (Runificacion, "Runificación"), (Manifestacion, "Manifestación") })
+            {
+                RuneOnHim();
+                bool under = RuneUnder(foe);
+                int life = foe.CurrentHP;
+                CastAt(session, spell, foe.CellId);
+                sc.Check($"spell {spell} ({name}) sets off the rune under the foe and steals his life", under && foe.CurrentHP < life,
+                         $"rune under him {under}, life {life} -> {foe.CurrentHP}");
+            }
+
+            RuneOnHim();
+            foe.Buffs.QuitarEstado(Earth);
+            CastAt(session, PrismaRunico, foe.CellId);
+            sc.Check($"spell {PrismaRunico} (Prisma Rúnico) on an earth rune leaves the earth state on the foe round it", foe.Buffs.TieneEstado(Earth),
+                     foe.Buffs.TieneEstado(Earth) ? "earth" : "no earth state");
+
+            RuneOnHim();
+            int before = foe.CurrentHP;
+            CastAt(session, SobrecargaRunica, foe.CellId);
+            sc.Check($"spell {SobrecargaRunica} (Sobrecarga Rúnica) hurts its target for the runes it sets off", foe.CurrentHP < before,
+                     $"life {before} -> {foe.CurrentHP}");
+
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, OndaSismica, foe.CellId);
+            FreshTurn(session, fight, me, keep: true);
+            bool earth = foe.Buffs.TieneEstado(Earth);
+            int mpRows = me.Buffs.Puestos.Count(r => r.EffectId == 128);
+            CastAt(session, Contribucion, me.CellId);
+            sc.Check($"spell {Contribucion} (Contribución) on himself, a foe in the earth state: more MP, and the state used up",
+                     earth && me.Buffs.Puestos.Count(r => r.EffectId == 128) > mpRows && !foe.Buffs.TieneEstado(Earth),
+                     $"foe in earth {earth}, MP rows {mpRows} -> {me.Buffs.Puestos.Count(r => r.EffectId == 128)}, earth left {foe.Buffs.TieneEstado(Earth)}");
+        }
+
+        /// <summary>
+        /// The Selatrop's spells that wait on something: Distribución «cura a los aliados una parte
+        /// de los daños ocasionados al objetivo en zona a su alrededor» -- the Selatrop himself,
+        /// hurt and beside the foe, when the foe is hit --, and Conjuro «reduce la duración de los
+        /// efectos en el objetivo».
+        /// </summary>
+        private static void SelatropTriggers(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int Distribucion = 14577, Conjuro = 14622, PunoRelampago = 14576, Insulto = 14575;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
+            ToOpenGround(session, fight, me, 3);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            int spot = MapGeometry.GetNeighbors(me.CellId).Where(c => FreeCell(fight, c)).DefaultIfEmpty(-1).First();
+            if (spot < 0) { sc.Check("a free cell beside the Selatrop for the foe", false, "none"); return; }
+            PutAll(session, fight, (foe, spot));
+
+            RunInSession(session, stream => FightHandler.TestHurtAsync(stream, fight, 50));
+            CastAt(session, Distribucion, foe.CellId);
+            FreshTurn(session, fight, me, keep: true);
+            RunInSession(session, stream => FightHandler.TestHurtAsync(stream, fight, 50));
+            int mine = me.CurrentHP, his = foe.CurrentHP;
+            CastAt(session, PunoRelampago, foe.CellId);
+            if (foe.CurrentHP >= his) CastAt(session, Insulto, foe.CellId);
+            sc.Check($"spell {Distribucion} (Distribución): a blow on its target heals the Selatrop beside him", foe.CurrentHP < his && me.CurrentHP > mine,
+                     $"foe {his} -> {foe.CurrentHP}, Selatrop {mine} -> {me.CurrentHP}");
+
+            // A row of two rounds on him to shorten (a state, as the harness gives one).
+            FreshTurn(session, fight, me, keep: true);
+            RunInSession(session, _ => FightHandler.GiveStateAsync(fight, foe, 7, 3));
+            var rows = foe.Buffs.Puestos.Where(r => r.CaducaEnRonda > fight.RoundNumber).ToDictionary(r => r, r => r.CaducaEnRonda);
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Conjuro, foe.CellId);
+            var shortened = rows.Where(kv => !foe.Buffs.Puestos.Contains(kv.Key) || kv.Key.CaducaEnRonda < kv.Value).ToList();
+            sc.Check($"spell {Conjuro} (Conjuro) shortens the effects on its target", rows.Count > 0 && shortened.Count > 0,
+                     rows.Count == 0 ? "the foe held no effect to shorten" : $"{shortened.Count} of {rows.Count} row(s) shortened or gone");
         }
 
         // ─── The Selatrop (class sheet 1172961, «Los portales») ──────────────────────

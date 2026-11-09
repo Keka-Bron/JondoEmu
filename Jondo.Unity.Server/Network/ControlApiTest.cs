@@ -542,12 +542,13 @@ namespace Jondo.Unity.Server.Network
             // The nearest free cell, beside it when one is: with the Puchs bunched and the earlier
             // summons around them, every neighbour can be taken.
             // A ring that leaves its centre out (O, Q): aimed at a free cell with the target on
-            // the ring, or the target is the one fighter it never hits.
+            // the ring, or the target is the one fighter it never hits -- unless the spell wants
+            // somebody on the cell it is cast at (Palabra Entretenida's attracting cross).
             var hollow = SpellEffects.De(spell, FightHandler.CastingGradeOf(me, spell))
                 .Where(e => e.Forma is 'O' or 'Q' or '#' && e.Tamano > 0 && e.TargetMask.Contains('A'))
                 .Select(e => ((char)e.Forma, e.Tamano)).DefaultIfEmpty((' ', 0)).First();
             int ring = hollow.Item2;
-            if (ring != 0 && !reach.FreeCell)
+            if (ring != 0 && !reach.FreeCell && !reach.TakenCell)
             {
                 int aimed = target;
                 // On the zone's edge, seen from the aimed cell: a ring (O) by distance, a straight
@@ -827,7 +828,7 @@ namespace Jondo.Unity.Server.Network
                     try
                     {
                         effects = VerifyEffects(f, caster, spell, Math.Max(1, grade), s.Round, s.Before, s.States, newRows, newGlyphs, RoleOf,
-                                                aimed == null ? null : RoleOf(aimed));
+                                                aimed == null ? null : RoleOf(aimed), castCell: cell);
                     }
                     catch (Exception ex) { effects = new List<object> { new { error = ex.Message } }; }
                     var changes = f.Todos.Select(x =>
@@ -1179,6 +1180,44 @@ namespace Jondo.Unity.Server.Network
                         bool blocked = toward < 0 || !board.Walkable(toward) || fight.Todos.Any(f => f.IsAlive && f.CellId == toward);
                         if (blocked) { verdict = "blocked"; observed = $"{roleOf(pulled)} {pulled.Id} has cell {toward} taken or no ground in front of him"; }
                     }
+                    // The caster stepping toward his target (1042, Jalatodo's «acerca el jalató al
+                    // objetivo») with the cell in front of him taken -- the target himself, a cell
+                    // or a diagonal away --: nowhere to step.
+                    if (moved.Count == 0 && verdict == "missing" && e.EffectId == Jondo.Unity.World.Combat.EffectSupport.StepForward
+                        && castCell >= 0 && before.TryGetValue(me.Id, out var stepperAt))
+                    {
+                        var (sx, sy) = MapGeometry.CellToPoint(stepperAt.CellId);
+                        var (tx, ty) = MapGeometry.CellToPoint(castCell);
+                        int ahead = MapGeometry.PointToCell(sx + Math.Sign(tx - sx), sy + Math.Sign(ty - sy));
+                        var board = FightHandler.BoardOf(fight);
+                        if (ahead < 0 || ahead == castCell || !board.Walkable(ahead) || fight.Todos.Any(f => f.IsAlive && f.CellId == ahead))
+                        {
+                            verdict = "blocked";
+                            observed = $"the cell ahead of the caster toward {castCell}, {ahead}, is taken or no ground";
+                        }
+                    }
+                    // Drawn toward the middle of its zone (Parafuso's cross): the one standing on the
+                    // middle goes nowhere, and one beside him has the middle taken. Nothing could
+                    // move when nobody else in the zone had a free cell toward the middle.
+                    if (moved.Count == 0 && verdict == "missing" && e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Pull && castCell >= 0
+                        && !((char)e.Forma == 'P' && e.Tamano <= 1) && before.TryGetValue(me.Id, out var pullerAt))
+                    {
+                        var zone = Managers.EffectEngine.CasillasDelEfecto(e, pullerAt.CellId, castCell);
+                        var board = FightHandler.BoardOf(fight);
+                        var (mx, my) = MapGeometry.CellToPoint(castCell);
+                        bool couldMove = fight.Todos.Any(f =>
+                        {
+                            if (!f.IsAlive || f.CellId == castCell || !zone.Contains(f.CellId)) return false;
+                            var (fx, fy) = MapGeometry.CellToPoint(f.CellId);
+                            int toward = MapGeometry.PointToCell(fx + Math.Sign(mx - fx), fy + Math.Sign(my - fy));
+                            return toward >= 0 && board.Walkable(toward) && !fight.Todos.Any(o => o.IsAlive && o.CellId == toward);
+                        });
+                        if (!couldMove)
+                        {
+                            verdict = "blocked";
+                            observed = $"nobody in its zone {(char)e.Forma}{e.Tamano} around cell {castCell} had a free cell toward its middle";
+                        }
+                    }
                     // Teleported to the aimed cell when somebody stands on it: nowhere to land. The
                     // Gatito rabioso's Desplazamiento Felino "aumenta los PM del objetivo o
                     // teletransporta al gatito": aimed at a fighter, the MP are the half that goes.
@@ -1362,6 +1401,21 @@ namespace Jondo.Unity.Server.Network
                     bool value = keptAsPoints || rows.All(r => min == 0 && max == 0 || Math.Abs(r.Row.Cuanto) >= (dodgeable ? 0 : min) && Math.Abs(r.Row.Cuanto) <= Math.Max(max, min)
                                               || Math.Abs(r.Row.Valor) >= min && Math.Abs(r.Row.Valor) <= Math.Max(max, min) || r.Row.Cuanto == 0
                                               || ShieldOfAnotherLevel(r.Row));
+                    // Two rows of one effect told apart by whom they land on -- Coraza's 600% of the
+                    // level on characters, 300% on summons --: a row another one's amount fits is
+                    // that one's.
+                    if (!value && depth == 0)
+                    {
+                        var siblings = RowsOf(spell, Math.Max(1, grade)).Where(o => o.EffectId == e.EffectId && o.EffectUid != e.EffectUid).ToList();
+                        bool Fits(Buff b, SpellEffect x)
+                        {
+                            int lo = byValue ? x.Value : Math.Min(x.DiceNum, x.DiceSide == 0 ? x.DiceNum : x.DiceSide);
+                            int hi = byValue ? x.Value : Math.Max(x.DiceNum, x.DiceSide);
+                            if (x.EffectId == 1020) { lo = lo * me.StatLevel / 100; hi = hi * me.StatLevel / 100; }
+                            return Math.Abs(b.Cuanto) >= (dodgeable ? 0 : lo) && Math.Abs(b.Cuanto) <= Math.Max(hi, lo);
+                        }
+                        value = siblings.Count > 0 && rows.All(r => Fits(r.Row, e) || siblings.Any(x => Fits(r.Row, x)) || ShieldOfAnotherLevel(r.Row));
+                    }
                     verdict = !duration ? "duration" : !value ? "value" : "applied";
                     observed = string.Join(", ", rows.Select(r => $"{roleOf(r.Who)} {r.Who.Id}: {r.Row.Cuanto:+0;-0;0} until round {r.Row.CaducaEnRonda}"))
                                + $" (dice {min}-{max}, expected until {expectedEnd})";
@@ -1443,6 +1497,33 @@ namespace Jondo.Unity.Server.Network
                 // A single-cell effect whose mask names only friends (lower case) or only foes
                 // (upper case), the cast aimed at the other kind: nothing was due to land.
                 var kinds = (e.TargetMask ?? "").Split(',').Select(k => k.Trim()).Where(k => k.Length == 1 && char.IsLetter(k[0])).ToList();
+                // An area whose cells held, when it was cast, nobody of the kinds its mask names --
+                // a cross around the caster with no foe in it, Disparos Lejanos' range for the
+                // allies two cells round him --: nothing was due to land. A sub-spell's area is
+                // round the aimed cell, the caster or one of his summons (an Ocra's beacon).
+                if (verdict == "missing" && castCell >= 0 && kinds.Count > 0
+                    && !((char)e.Forma == 'P' && e.Tamano <= 1) && before.TryGetValue(me.Id, out var casterThen))
+                {
+                    var centres = new List<int> { castCell };
+                    if (depth > 0)
+                    {
+                        centres.Add(casterThen.CellId);
+                        centres.AddRange(fight.Todos.Where(f => f.EsInvocado && f.Invocador == me.Id && before.TryGetValue(f.Id, out var at) && at.IsAlive)
+                                                   .Select(f => before[f.Id].CellId));
+                    }
+                    var zone = centres.SelectMany(c => Managers.EffectEngine.CasillasDelEfecto(e, casterThen.CellId, c)).ToHashSet();
+                    // The caster is one of them only by name (c, C) or as one of all the allies (a):
+                    // Palabra Entretenida's "g,A" pull leaves him out ("no afecta al lanzador").
+                    bool foes = kinds.Any(k => char.IsUpper(k[0]) && k != "C"), friends = kinds.Any(k => char.IsLower(k[0]) && k != "c"),
+                         caster = kinds.Any(k => k is "C" or "c" or "a");
+                    bool anybody = fight.Todos.Any(f => before.TryGetValue(f.Id, out var then) && then.IsAlive && zone.Contains(then.CellId)
+                                                        && (f.Id == me.Id ? caster : f.TeamId == me.TeamId ? friends : foes));
+                    if (!anybody)
+                    {
+                        verdict = "empty-zone";
+                        observed += $" (nobody its mask {e.TargetMask} names stood in its zone {(char)e.Forma}{e.Tamano})";
+                    }
+                }
                 if (verdict == "missing" && aimedRole != null && kinds.Count > 0 && (char)e.Forma == 'P' && e.Tamano <= 1)
                 {
                     bool forFoes = kinds.Any(k => char.IsUpper(k[0])), forFriends = kinds.Any(k => char.IsLower(k[0]));
