@@ -957,6 +957,7 @@ namespace Jondo.Unity.Server.Network
             [320] = new[] { 116, 117 }, // range stolen
             [1020] = new[] { 1040 },    // shield, % of the level
             [1078] = new[] { 125 },     // vitality in %, as its flat amount (Vitalidad's capture: jxm 125)
+            [1033] = new[] { 153 },     // vitality lost in %, as its flat amount (Ultimo Aliento)
         };
 
         /// <summary>

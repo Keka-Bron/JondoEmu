@@ -143,7 +143,9 @@ namespace Jondo.Unity.Server.Network
                     if (lines.Any(l => l.Contains("Casts spell"))) done++;
                 }
                 if (done < casts) { sc.Note($"spell {spell}: cast {done} of {casts} times"); if (done < 2) continue; expected = cap > 1 ? Math.Min(cap, done) : cap is 0 or 1 ? 1 : done; }
-                var rows = target.Buffs.Puestos.Where(r => r.HechizoOrigen == spell && r.EffectId == lasting.EffectId && r.Quien == me.Id).ToList();
+                var keptAs = KeptAs.TryGetValue(lasting.EffectId, out var kept) ? kept : Array.Empty<int>();
+                var rows = target.Buffs.Puestos.Where(r => r.HechizoOrigen == spell && (r.EffectId == lasting.EffectId || keptAs.Contains(r.EffectId))
+                                                           && r.Quien == me.Id).ToList();
                 sc.Check($"spell {spell}'s {lasting.EffectId} cast {done} times on the {(onFoe ? "foe" : "caster")} keeps {expected} row(s) (maxStack {cap})",
                          rows.Count == expected,
                          $"{rows.Count} row(s): {string.Join(", ", rows.Select(r => $"{r.Cuanto:+0;-0;0} until {r.CaducaEnRonda}"))}");
