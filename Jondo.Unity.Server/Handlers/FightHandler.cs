@@ -617,8 +617,9 @@ namespace Jondo.Unity.Server.Handlers
         /// placement jxg and this one the jxb block, which is the same content with the sheet filled
         /// in. Both read the FIGHTER's sheet and not the watcher's, which was the bug.
         /// </remarks>
-        private static Network.Pb BloqueDe(FightInstance fight, Fighter fighter, bool collectorAsMonster = false)
+        internal static Network.Pb BloqueDe(FightInstance fight, Fighter fighter, bool collectorAsMonster = false)
         {
+            if (fighter.DoubleOf != 0) return DoubleBlock(fight, fighter, CurrentFightLook(fight, fighter));
             if (fighter.IsMonster)
             {
                 return Network.FightProtocol.FighterBlock(
@@ -1667,9 +1668,7 @@ namespace Jondo.Unity.Server.Handlers
         /// from one, as its template's grades number them (Summons.Characteristics).
         /// </summary>
         private static Network.Pb IdentityOf(Fighter fighter, bool collectorAsMonster = false)
-            => fighter.DoubleOf != 0
-                ? Network.FightProtocol.DoubleIdentity(fighter.Name, fighter.Level)
-                : fighter.TaxCollectorFirstName > 0 && !collectorAsMonster
+            => fighter.TaxCollectorFirstName > 0 && !collectorAsMonster
                 ? Network.FightProtocol.TaxCollectorIdentity(fighter.TaxCollectorFirstName,
                                                              fighter.TaxCollectorLastName, fighter.MonsterId)
                 : Network.FightProtocol.MonsterIdentity(fighter.EsInvocado ? fighter.GradeIndex : fighter.GradeIndex + 1,
@@ -1682,10 +1681,36 @@ namespace Jondo.Unity.Server.Handlers
         /// A creature's jxg in a fight already running -- a reconnection's, a spectator's --, its
         /// summon's owner and look with it.
         /// </summary>
-        private static byte[] CreatureFighter(FightInstance fight, Fighter fighter)
-            => Network.FightProtocol.BuildFighter(
-                fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter),
-                CurrentFightLook(fight, fighter), IdentityOf(fighter), isMonster: true, summoner: SummonerOf(fighter));
+        internal static byte[] CreatureFighter(FightInstance fight, Fighter fighter)
+            => fighter.DoubleOf != 0
+                ? Network.Pb.New().Msg(2, DoubleBlock(fight, fighter, CurrentFightLook(fight, fighter))).Build()
+                : Network.FightProtocol.BuildFighter(
+                    fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter),
+                    CurrentFightLook(fight, fighter), IdentityOf(fighter), isMonster: true, summoner: SummonerOf(fighter));
+
+        /// <summary>
+        /// A double (180) in a fighter block -- a jxb's, a reconnection's or a spectator's jxg --:
+        /// dressed as the character it copies, as an illusion is for the other side
+        /// (<see cref="Network.FightProtocol.BuildIllusion"/>), and its owner's summon by the sheet.
+        /// </summary>
+        /// <remarks>
+        /// Not the jwe 180's named identity (<see cref="Network.FightProtocol.DoubleIdentity"/>):
+        /// the block's creature case has room only for a tax collector (f1) and a monster (f2 {
+        /// grade, template, level }), and the double's f2 { name, level } read there made its
+        /// level the template -- a level-200 Sram's double came back from a jxb as monster 200,
+        /// the «Dragopavo pelirrojo salvaje», in the turn bar and on hovering it.
+        /// </remarks>
+        private static Network.Pb DoubleBlock(FightInstance fight, Fighter doble, byte[] look)
+        {
+            var original = fight.Todos.FirstOrDefault(f => f.Id == doble.DoubleOf);
+            var ficha = original != null && original.IsBot ? null : DatabaseManager.GetCharacterById(doble.DoubleOf);
+            int breed = ficha?.Breed ?? original?.Breed ?? 0;
+            int sex = ficha?.Sex ?? original?.Sex ?? 0;
+            return Network.FightProtocol.FighterBlock(
+                doble.CellId, FacingOf(fight, doble), doble.Id, FullSheetOf(doble), look,
+                Network.FightProtocol.PlayerIdentity(breed, doble.Name, sex, doble.Level),
+                isMonster: false, alive: doble.IsAlive, team: doble.TeamId, summoner: SummonerOf(doble));
+        }
 
         /// <summary>The current transformation also travels on reconnection and spectator snapshots.</summary>
         internal static byte[] CurrentFightLook(FightInstance fight, Fighter fighter)
@@ -3476,15 +3501,6 @@ namespace Jondo.Unity.Server.Handlers
                             quien.Buffs.AparienciaEn(fight.RoundNumber), fight);
                     }
 
-                    // A vitality percentage moved the maximum when it went on; it moves back.
-                    if (caido.EffectId is Jondo.Unity.World.Combat.EffectSupport.VitalityFlatMalus
-                                         or Jondo.Unity.World.Combat.EffectSupport.VitalityFlatBonus
-                        && caido.Caracteristica == VitalityCharacteristicId)
-                    {
-                        quien.MaxHP = Math.Max(1, quien.MaxHP - caido.Cuanto);
-                        if (quien.CurrentHP > quien.MaxHP) quien.CurrentHP = quien.MaxHP;
-                    }
-
                     // A shield row gone means the points are gone: the fighter drops them by the
                     // round, and the sheet says so.
                     if (caido.EffectId == Managers.EffectEngine.ShieldPanelEffect)
@@ -3543,6 +3559,10 @@ namespace Jondo.Unity.Server.Handlers
                     await DispararAsync(stream, fight, quien, Managers.EffectEngine.AlQuitarseElEstado(caido.Estado));
                 }
             }
+
+            // A row of vitality that ran out may have taken more life than was left.
+            await PendingDeathsAsync(stream, fight);
+            if (await CheckFightOverAsync(stream, fight)) return;
 
             fighter.StartTurn(fight.RoundNumber);
 
@@ -5006,13 +5026,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 else
                 {
-                    tirada = await BoostsFirstAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
-                    await HurtAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
-
-                    // And what the spell leaves behind, which is not only damage: the AP Flecha Helada steals,
-                    // its three turns of basic damage, Disparos Lejanos's range...
-                    await AplicarEfectosAsync(stream, fight, caster, spell, grade, victim,
-                                              Managers.EffectEngine.AlLanzar, cell, critico, tirada);
+                    await CastEffectsAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
 
                     // A weapon's own: what its hit does besides the damage.
                     if (spell == 0) await WeaponSideLinesAsync(stream, fight, caster, victim, cell, critico);
@@ -5147,6 +5161,12 @@ namespace Jondo.Unity.Server.Handlers
                 Program.LogDebug($"[Fight] There is no template {plantilla} grade {grado}; nothing is summoned.");
                 return null;
             }
+
+            // A summon that summons once it has fallen does so in its owner's name: Jamamutación
+            // "mata al jamajam para reemplazarlo por la invocación osamodas del invocador", and the
+            // creature came out as the dead jamajam's, nobody's.
+            if (quienInvoca.EsInvocado && !quienInvoca.IsAlive && fight.Buscar(quienInvoca.Invocador) is { IsAlive: true } dueno)
+                quienInvoca = dueno;
 
             // The Treasure summons each of its chests once (Managers.TreasureFight).
             if (Managers.TreasureFight.AlreadyOut(fight, quienInvoca, plantilla))
@@ -5577,6 +5597,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>For the harness's refreshes: the rows every fighter held the first time the fight was refreshed.</summary>
         private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<FightInstance, Dictionary<long, List<Buff>>> RowsAtTheStart = new();
 
+        /// <summary>For the harness's refreshes: the hooks every fighter held the first time the fight was refreshed.</summary>
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<FightInstance, Dictionary<long, List<Jondo.Unity.World.Fights.Buffs.ActiveSpell>>> HooksAtTheStart = new();
+
         private static async Task FreshTurnStepsAsync(NetworkStream stream, FightInstance fight, Fighter who, bool keepBoard)
         {
             // A clean board: what earlier spells left -- effects, states, a range moved, marks on
@@ -5588,6 +5611,7 @@ namespace Jondo.Unity.Server.Handlers
             // do the rows the fight started with, which the passives' chains leave under their
             // children's names: the Pandawa's Sobrio is 24037's, cast by La Jarrita de Pandawa.
             var atTheStart = RowsAtTheStart.GetValue(fight, f => f.Todos.ToDictionary(x => x.Id, x => x.Buffs.Puestos.ToList()));
+            var hooksAtTheStart = HooksAtTheStart.GetValue(fight, f => f.Todos.ToDictionary(x => x.Id, x => x.Buffs.ActiveSpells.ToList()));
             // Whoever is carried is set down beside his carrier, as a throw: a Pandawa left
             // carrying by an earlier try can cast nothing but his throws.
             if (!keepBoard)
@@ -5609,6 +5633,11 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var fighter in fight.Todos.Where(f => f.IsAlive).ToList())
             {
                 var started = atTheStart.TryGetValue(fighter.Id, out var his) ? his : new List<Buff>();
+                // And what an earlier try left waiting on a trigger goes with its rows: Pacto
+                // Bestial's "on summoning" sacrificed every creature the summons' tries brought
+                // out after it. The attitudes' and the start's stay, as their rows do.
+                var hooked = hooksAtTheStart.TryGetValue(fighter.Id, out var hisHooks) ? hisHooks : new List<Jondo.Unity.World.Fights.Buffs.ActiveSpell>();
+                fighter.Buffs.ActiveSpells.RemoveAll(h => !fighter.Buffs.Actitudes.Contains(h.Hechizo) && !hooked.Contains(h));
                 foreach (var row in fighter.Buffs.Puestos.Where(r => !fighter.Buffs.Actitudes.Contains(r.HechizoOrigen) && !started.Contains(r)).ToList())
                     if (fighter.Buffs.QuitarFila(row))
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya, Network.FightProtocol.BuildBuffGone(fighter.Id, row.Numero)));
@@ -5821,6 +5850,21 @@ namespace Jondo.Unity.Server.Handlers
             return lista.Where(f => enganche.Filas.Contains(ClaveDeFila(f))
                                  && f.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)))
                         .ToList();
+        }
+
+        /// <summary>
+        /// What a cast does, once paid and announced: the rows that raise the spell first, then
+        /// its blows, then what it leaves behind -- the AP Flecha Helada steals, its three turns
+        /// of basic damage, Disparos Lejanos's range... The tests cast through it as a player does.
+        /// </summary>
+        internal static async Task CastEffectsAsync(NetworkStream stream, FightInstance fight, Fighter caster,
+                                                    int spell, int grade, Fighter victim, int cell, bool critico,
+                                                    IReadOnlyList<Managers.SpellEffect> tirada)
+        {
+            tirada = await BoostsFirstAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
+            await HurtAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
+            await AplicarEfectosAsync(stream, fight, caster, spell, grade, victim,
+                                      Managers.EffectEngine.AlLanzar, cell, critico, tirada);
         }
 
         /// <summary>
@@ -6942,6 +6986,55 @@ namespace Jondo.Unity.Server.Handlers
                                                       bool orderedForgelance = false,
                                                       List<Managers.Outcome> preparedEffects = null)
         {
+            await AplicarEfectosSinMuertesAsync(stream, fight, quienLanza, hechizo, grado, objetivo, disparador,
+                                                celdaApuntada, critico, tirada, rondaDelEnganche, armar, soloAlObjetivo,
+                                                conducta, delayHoldsBackOnly, orderedForgelance, preparedEffects);
+            // And whoever a row of vitality left with no life -- a dispel, a cut duration, a 406 --
+            // falls now, his death's own doings first.
+            await PendingDeathsAsync(stream, fight);
+        }
+
+        /// <summary>
+        /// The ones life that went with no blow took more from than they had
+        /// (<see cref="Fighter.PendingDeath"/>) -- a row of vitality going, a sacrifice, life
+        /// given away --: what waits on their death goes off with them still standing at one
+        /// point, and they fall as a blow's victim does, put down to whoever took that life. A
+        /// Yopuka at 100 under Vitalidad's +1,000, struck for 150 and then stripped of it, is
+        /// at -50: dead.
+        /// </summary>
+        internal static async Task PendingDeathsAsync(NetworkStream stream, FightInstance fight)
+        {
+            foreach (var quien in fight.Todos.Where(f => f.PendingDeath).ToList())
+            {
+                quien.PendingDeath = false;
+                if (!quien.IsAlive) continue;
+                var killer = fight.Buscar(quien.PendingDeathBy) ?? quien;
+                if (!await AlMorirAsync(stream, fight, quien, killer) || !quien.IsAlive) continue;
+                quien.CurrentHP = 0;
+                CarriedFollows(fight, quien);
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                    Network.FightProtocol.BuildDeath(killer.Id, quien.Id)));
+                Program.LogDebug($"[Fight] {quien.Id} runs out of life: what went with no blow took more than he had.");
+                await ChallengeWatcher.DiedAsync(stream, fight, quien, false, killer);
+                await ChallengeWatcher.AllyDiedAsync(stream, fight, quien);
+                await CaenSusInvocadosAsync(stream, fight, quien);
+                await ReenviarLaListaAsync(stream, fight);
+                await ReconciliarLosMurosAsync(stream, fight);
+                await AlMatarAsync(stream, fight, killer, quien);
+            }
+        }
+
+        private static async Task AplicarEfectosSinMuertesAsync(NetworkStream stream, FightInstance fight,
+                                                      Fighter quienLanza, int hechizo, int grado,
+                                                      Fighter objetivo, string disparador,
+                                                      int celdaApuntada, bool critico,
+                                                      IReadOnlyList<Managers.SpellEffect> tirada,
+                                                      int rondaDelEnganche,
+                                                      bool armar, bool soloAlObjetivo,
+                                                      bool conducta, bool delayHoldsBackOnly,
+                                                      bool orderedForgelance,
+                                                      List<Managers.Outcome> preparedEffects)
+        {
             // A weapon's hit has no spell, only the rows it is handed (WeaponSideLinesAsync).
             if (hechizo == 0 && tirada == null) return;
 
@@ -6974,6 +7067,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 Program.LogDebug($"[Fight] The effects engine choked on spell " +
                                  $"{hechizo}: {ex.Message}");
+                Managers.FightInvariants.Choked(fight, hechizo, ex);
                 return;
             }
             if (consecuencias.Count == 0) return;
@@ -7279,7 +7373,10 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     int leQuedaba = c.Sobre.CurrentHP;
                     var absorcion = await AbsorberElGolpeAsync(fight, c.Sobre, c.VidaQueSeVa);
-                    c.Sobre.TakeDamage(absorcion.Remaining);
+                    // Worked out when the spell was resolved, and the life may have gone down since:
+                    // Libación's 30% of 1,280 landed on 281, its own 1075 having taken a vitality
+                    // bonus away in between. More than he has, and he falls with the cast.
+                    c.Sobre.LoseLife(absorcion.Remaining, (c.Caster ?? quienLanza).Id);
                     Program.LogDebug($"[Fight] {c.Sobre.Id} loses {c.VidaQueSeVa} life " +
                                      $"({leQuedaba} -> {c.Sobre.CurrentHP}) to effect " +
                                      $"{c.Efecto.EffectId}.");
@@ -7308,9 +7405,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (c.VidaTransferida > 0)
                 {
                     var daLaVida = c.Caster ?? quienLanza;
-                    daLaVida.TakeDamage(c.VidaTransferida);
-                    c.Sobre.CurrentHP = Math.Min(c.Sobre.MaxHP,
-                                                 c.Sobre.CurrentHP + c.VidaTransferida);
+                    daLaVida.LoseLife(c.VidaTransferida, daLaVida.Id);
+                    // Given life is healing: an incurable one takes none of it, though the giver
+                    // has still given it.
+                    if (!Managers.SpellStates.IsIncurable(c.Sobre))
+                        c.Sobre.CurrentHP = Math.Min(c.Sobre.MaxHP,
+                                                     c.Sobre.CurrentHP + c.VidaTransferida);
 
                     Program.LogDebug($"[Fight] {daLaVida.Id} passes {c.VidaTransferida} life " +
                                      $"to {c.Sobre.Id}.");
@@ -7401,10 +7501,17 @@ namespace Jondo.Unity.Server.Handlers
                         Disparo(quienQuita, deAccion ? Managers.EffectEngine.AlQuitarPA : Managers.EffectEngine.AlQuitarPM,
                                 c.Sobre, unaVezPorFuente: true);
                     int antes = deAccion ? c.Sobre.CurrentAP : c.Sobre.CurrentMP;
+                    // A row that replaced older ones of its entry (the level's maxStack) gives
+                    // only the difference: what they gave goes with them. Pacto Bestial's +2 AP
+                    // "se prolonga" with each creature it sacrifices, it does not pile up -- and
+                    // the four it ate on being cast took the Osamodas from 7 AP to 15 with one
+                    // +2 row on him.
+                    int yaDado = c.Relevados?.Where(r => r.Caracteristica == c.Caracteristica && r.Vivo(fight.RoundNumber))
+                                             .Sum(r => r.Cuanto) ?? 0;
                     if (enSuTurno)
                     {
-                        if (deAccion) c.Sobre.CurrentAP = Math.Max(0, c.Sobre.CurrentAP + c.Cuanto);
-                        else c.Sobre.CurrentMP = Math.Max(0, c.Sobre.CurrentMP + c.Cuanto);
+                        if (deAccion) c.Sobre.CurrentAP = Math.Max(0, c.Sobre.CurrentAP + c.Cuanto - yaDado);
+                        else c.Sobre.CurrentMP = Math.Max(0, c.Sobre.CurrentMP + c.Cuanto - yaDado);
                     }
                     Program.LogDebug($"[POINTS] {(deAccion ? "AP" : "MP")} of {c.Sobre.Id}: {antes} -> " +
                                      $"{(deAccion ? c.Sobre.CurrentAP : c.Sobre.CurrentMP)} ({c.Cuanto:+#;-#;0}) from " +
@@ -9353,6 +9460,15 @@ namespace Jondo.Unity.Server.Handlers
                                                         int efecto, int elemento, Fighter quien, int dano)
         {
             if (quien == null || !quien.IsAlive || dano <= 0) return;
+            // Still a blow of the caster's: an invulnerable one takes nothing of it, as of the
+            // blow itself -- an invulnerable summon took half of a Steamer's spell through a link.
+            if (Managers.SpellStates.ShieldsFromBlow(quien, Jondo.Unity.World.Maps.MapGeometry.Distance(caster.CellId, quien.CellId)))
+            {
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                    Network.FightProtocol.BuildDamage(caster.Id, efecto, quien.Id, 0, elemento)));
+                Program.LogDebug($"[Fight] {quien.Id} is invulnerable: its share of the blow takes nothing from it.");
+                return;
+            }
             var absorcion = await AbsorberElGolpeAsync(fight, quien, dano);
             dano = absorcion.Remaining;
 
@@ -9557,27 +9673,42 @@ namespace Jondo.Unity.Server.Handlers
             // The last of the Reina's jail monsters opens her jails.
             await Managers.GuildRaidReina.OnDeathAsync(stream, fight, muerto);
 
-            if (muerto == null || muerto.EsInvocado) return;
+            if (muerto == null) return;
+            if (await SusInvocadosCaenAsync(stream, fight, muerto))
+            {
+                // And out of the carousel, so that their turn never comes.
+                fight.RebuildTurnOrderOnFighterDeath();
+            }
+        }
 
+        /// <summary>
+        /// The summons of one who has died fall with him, and theirs with them: a summon's own
+        /// summons too -- the Treant's Zarza, La Superpoderosa's La Falsa --, which stood on with
+        /// their owner sacrificed by Don Natural or Altruismo Vegetal, nobody's. Each is told dead
+        /// and counted among the dead.
+        /// </summary>
+        /// <returns>Whether anybody fell.</returns>
+        private static async Task<bool> SusInvocadosCaenAsync(NetworkStream stream, FightInstance fight, Fighter muerto)
+        {
             var suyos = new List<Fighter>();
             foreach (var f in fight.Azul) if (f.EsInvocado && f.IsAlive && f.Invocador == muerto.Id) suyos.Add(f);
             foreach (var f in fight.Rojo) if (f.EsInvocado && f.IsAlive && f.Invocador == muerto.Id) suyos.Add(f);
-            if (suyos.Count == 0) return;
+            if (suyos.Count == 0) return false;
 
             foreach (var invocado in suyos)
             {
                 invocado.CurrentHP = 0;
+                if (!fight.Muertos.Contains(invocado)) fight.Muertos.Add(invocado);
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDeath(muerto.Id, invocado.Id)));
                 if (invocado.MonsterId == Managers.ForgelanceCombat.Lance && Managers.ForgelanceCombat.Is(muerto))
                     await RemoveLanceMarksAsync(stream, fight, invocado);
             }
 
-            // And out of the carousel, so that their turn never comes.
-            fight.RebuildTurnOrderOnFighterDeath();
-
             Program.LogDebug($"[Fight] With {muerto.Id} its {suyos.Count} summon(s) fall: " +
                              $"{string.Join(", ", suyos.ConvertAll(f => f.Id.ToString()))}.");
+            foreach (var invocado in suyos) await SusInvocadosCaenAsync(stream, fight, invocado);
+            return true;
         }
 
         /// <summary>

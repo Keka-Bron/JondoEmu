@@ -208,7 +208,7 @@ namespace Jondo.Unity.Server.Network
             // A summon's own spells, each at its grade, and whether it plays on its own (nothing
             // to play: no step, no spell) or is its owner's to play by hand.
             summonSpells = f.HechizosDeInvocado.Select(s => new { spell = s.Spell, grade = s.Grade }).ToList(),
-            playsOnItsOwn = f.PlaysOnItsOwn, template = f.MonsterId,
+            playsOnItsOwn = f.PlaysOnItsOwn, template = f.MonsterId, playsTurns = f.JuegaTurno,
             buffs = f.Buffs.Puestos.Select(b => new { b.Numero, effect = b.EffectId, spell = b.HechizoOrigen, by = b.Quien,
                                                       value = b.Valor, state = b.Estado, untilRound = b.CaducaEnRonda }).ToList(),
         };
@@ -888,7 +888,9 @@ namespace Jondo.Unity.Server.Network
             }
             List<object> found;
             lock (gate) found = casts.ToList();
-            return Bien(new { back, round = fight.RoundNumber, alive = me.IsAlive, casts = found, lines });
+            // And the rules every fight keeps, after the turns everybody else played.
+            var invariants = Managers.FightInvariants.Check(fight, withTime: true).Select(v => v.ToString()).ToList();
+            return Bien(new { back, round = fight.RoundNumber, alive = me.IsAlive, casts = found, invariants, lines });
         }
 
         /// <summary>
@@ -915,7 +917,12 @@ namespace Jondo.Unity.Server.Network
             int round = fight.RoundNumber;
             int grade = FightHandler.CastingGradeOf(me, spell);
             var aimedAt = fight.Todos.FirstOrDefault(f => f.IsAlive && f.CellId == cell);
+            var snapshot = Managers.FightInvariants.Snapshot(fight, me, spell);
             var lines = RunAsClient(driver, Op.Jwh, Pb.New().Var(1, cell).Var(4, spell).Build());
+            // The rules every fight keeps, after this cast: a corpse left standing, a life over its
+            // maximum, an unmovable one moved, an invulnerable one hurt...
+            var invariants = Managers.FightInvariants.Check(fight, withTime: true)
+                .Concat(Managers.FightInvariants.AfterCast(fight, snapshot)).Select(v => v.ToString()).ToList();
 
             var changes = fight.Todos.Select(f =>
             {
@@ -938,7 +945,7 @@ namespace Jondo.Unity.Server.Network
             string RoleOf(Fighter f) => f.Id == me.Id ? "caster" : f.TeamId == me.TeamId ? "ally" : "foe";
             var effects = cast ? VerifyEffects(fight, me, spell, grade, round, before, statesBefore, newRows, newGlyphs, RoleOf,
                                                aimedAt == null ? null : RoleOf(aimedAt), lines, cell) : new List<object>();
-            return Bien(new { spell, grade, cell, caster = me.Id, cast, changes, glyphs = newGlyphs.Count, effects, lines });
+            return Bien(new { spell, grade, cell, caster = me.Id, cast, changes, glyphs = newGlyphs.Count, effects, invariants, lines });
         }
 
         // ─── What each effect should have done, against what it did ─────────────────────────
@@ -1172,6 +1179,15 @@ namespace Jondo.Unity.Server.Network
                         bool blocked = toward < 0 || !board.Walkable(toward) || fight.Todos.Any(f => f.IsAlive && f.CellId == toward);
                         if (blocked) { verdict = "blocked"; observed = $"{roleOf(pulled)} {pulled.Id} has cell {toward} taken or no ground in front of him"; }
                     }
+                    // Teleported to the aimed cell when somebody stands on it: nowhere to land. The
+                    // Gatito rabioso's Desplazamiento Felino "aumenta los PM del objetivo o
+                    // teletransporta al gatito": aimed at a fighter, the MP are the half that goes.
+                    if (moved.Count == 0 && e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Teleport && castCell >= 0
+                        && fight.Todos.FirstOrDefault(f => f.IsAlive && f.CellId == castCell) is { } standing)
+                    {
+                        verdict = "blocked";
+                        observed = $"{roleOf(standing)} {standing.Id} stands on the aimed cell {castCell}";
+                    }
                     var crashed = moved.Count > 0 ? new List<Fighter>()
                         : fight.Todos.Where(f => castLines.Any(l => l.Contains($"[Fight] {f.Id} crashes on being pushed"))).ToList();
                     if (crashed.Count > 0)
@@ -1370,6 +1386,14 @@ namespace Jondo.Unity.Server.Network
                 {
                     verdict = "conditional";
                     observed += $" (mask {e.TargetMask})";
+                }
+                // Only through a portal (R) -- Aplomo's MP, Desden's damage cut --, or only not (r):
+                // a cast that went one way leaves the other's rows out.
+                var portalWay = (e.TargetMask ?? "").Split(',').Select(k => k.Trim()).FirstOrDefault(k => k is "R" or "r");
+                if (verdict == "missing" && portalWay != null)
+                {
+                    verdict = "conditional";
+                    observed += portalWay == "R" ? " (only through a portal)" : " (only not through a portal)";
                 }
                 // A ring (O) or a hollow cross (Q) misses the cell it is aimed at: the harness aims
                 // at a fighter, who is in the zone's empty middle, so a miss there says nothing.

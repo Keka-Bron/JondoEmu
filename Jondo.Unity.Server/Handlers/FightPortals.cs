@@ -336,6 +336,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (follower == null || leader == null || !follower.IsAlive || !leader.IsAlive) return;
             if (MapGeometry.Distance(follower.CellId, leader.CellId) <= 1) return;
+            // Made to walk by another's spell: an Indesplazable one, or one rooted, stays put.
+            if (EffectEngine.NoSeDejaMover(follower)) return;
 
             var walkable = MapManager.GetFightWalkable(fight.ArenaMapId);
             var occupied = new HashSet<int>();

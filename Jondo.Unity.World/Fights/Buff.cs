@@ -520,6 +520,12 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public Action<Buff>? AlIrse { get; set; }
 
+        /// <summary>
+        /// Told of each row that comes onto the list, put or put back: a row of vitality moves
+        /// the fighter's life with it (Fighter), as <see cref="AlIrse"/> moves it back.
+        /// </summary>
+        public Action<Buff>? AlPonerse { get; set; }
+
         private void SeVan(IEnumerable<Buff> filas)
         {
             var aviso = AlIrse;
@@ -535,6 +541,7 @@ namespace Jondo.Unity.World.Fights
         {
             if (_puestos.Contains(fila)) return;
             _puestos.Add(fila);
+            AlPonerse?.Invoke(fila);
             if (fila.Estado != 0 && fila.EffectId != Jondo.Unity.World.Combat.EffectSupport.DisableState) _estados.Add(fila.Estado);
         }
 
@@ -692,6 +699,7 @@ namespace Jondo.Unity.World.Fights
 
             embrujo.Numero = siguienteNumero();
             _puestos.Add(embrujo);
+            AlPonerse?.Invoke(embrujo);
             return embrujo;
         }
 

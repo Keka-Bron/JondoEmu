@@ -416,7 +416,65 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public Fighter()
         {
-            Buffs.AlIrse = fila => { if (fila.EffectId == ShieldRow) Desescudar(fila.Cuanto); };
+            Buffs.AlIrse = fila =>
+            {
+                if (fila.EffectId == ShieldRow) Desescudar(fila.Cuanto);
+                if (IsVitalityRow(fila)) MoveLife(-fila.Cuanto, fila.Quien);
+            };
+            Buffs.AlPonerse = fila => { if (IsVitalityRow(fila)) MoveLife(fila.Cuanto, fila.Quien); };
+        }
+
+        /// <summary>The characteristic vitality is.</summary>
+        private const int VitalityCharacteristic = 11;
+
+        /// <summary>
+        /// A row of vitality: the flat 125 and 153, which the percentages (1078, 1033, 2844) are
+        /// put as too. Not one still waiting for its round: that one holds no life yet.
+        /// </summary>
+        public static bool IsVitalityRow(Buff fila)
+            => !fila.Pendiente && fila.Caracteristica == VitalityCharacteristic && fila.Cuanto != 0
+               && fila.EffectId is Combat.EffectSupport.VitalityFlatBonus or Combat.EffectSupport.VitalityFlatMalus;
+
+        /// <summary>
+        /// Whether life that went with no blow -- a row of vitality going, a sacrifice, life
+        /// given away -- took more than he had: he is held at one point until the server has run
+        /// what goes off on his death and takes him down (FightHandler.PendingDeathsAsync), as a
+        /// blow would. Left at zero, he stood on the board dead with nobody told.
+        /// </summary>
+        public bool PendingDeath { get; set; }
+
+        /// <summary>Who that life went to: the death is put down to him.</summary>
+        public long PendingDeathBy { get; set; }
+
+        /// <summary>
+        /// Life lost with no blow, to <paramref name="by"/>'s doing: all of it, or down to one
+        /// point and the death left pending when it was more than he had.
+        /// </summary>
+        public void LoseLife(int amount, long by)
+        {
+            if (amount <= 0 || CurrentHP <= 0) return;
+            if (CurrentHP > amount) { CurrentHP -= amount; return; }
+            CurrentHP = 1;
+            PendingDeath = true;
+            PendingDeathBy = by;
+        }
+
+        /// <summary>
+        /// Vitality moves the maximum life AND the life he has: the client counts life as the
+        /// maximum less what he has lost, so +230 of vitality on a fighter at 1,150 draws
+        /// 1,380 / 1,380 (the Puch under Vitalidad drew 10,932 / 10,932 where the server, which
+        /// moved only the maximum, held 9,939). Going, it takes them both back -- and a Yopuka
+        /// at 100 who had 1,000 of it and then lost 150 of life dies when it goes.
+        /// </summary>
+        private void MoveLife(int delta, long by)
+        {
+            MaxHP = Math.Max(1, MaxHP + delta);
+            if (CurrentHP <= 0) return;
+            CurrentHP = Math.Min(MaxHP, CurrentHP + delta);
+            if (CurrentHP > 0) return;
+            CurrentHP = 1;
+            PendingDeath = true;
+            PendingDeathBy = by;
         }
 
         /// <summary>The row the client draws for a shield, "#1 de escudo", worth its points.</summary>

@@ -1622,7 +1622,7 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>Whether a fighter stays where he is whatever moves him: Indesplazable, or a flagged state.</summary>
-        private static bool NoSeDejaMover(Fighter quien)
+        internal static bool NoSeDejaMover(Fighter quien)
         {
             if (quien.Buffs.TieneEstado(IndesplazableEstado)) return true;
             foreach (int estado in quien.Buffs.Estados)
@@ -2768,6 +2768,10 @@ namespace Jondo.Unity.Server.Managers
                         ? efecto.CeldasFijas[0] : aimedCell;
                     if (aDonde < 0) continue;
                     if (!CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar)) continue;
+                    // Made to cast it by somebody else's spell -- the Steamer's Asistencia has the
+                    // ally cast the teleport that brings him over --, he is being moved: an
+                    // Indesplazable one stays where he is.
+                    if (combat.RootCaster != null && combat.RootCaster != caster && NoSeDejaMover(caster)) continue;
 
                     // Rempotage's sub-cast is cast by the doll towards its owner. Mode 63
                     // picks the first free cell from that owner towards the doll, rather
@@ -4540,10 +4544,7 @@ namespace Jondo.Unity.Server.Managers
                 if (puntos <= 0) return null;
                 if (efecto.EffectId == EffectSupport.VitalityPercentMalus) puntos = -puntos;
 
-                sobre.MaxHP = Math.Max(1, sobre.MaxHP + puntos);
-                if (efecto.EffectId == EffectSupport.VitalityPercentBoost) sobre.CurrentHP += puntos;
-                if (sobre.CurrentHP > sobre.MaxHP) sobre.CurrentHP = sobre.MaxHP;
-
+                // The row moves his maximum and his life with it, and back when it goes (Fighter.MoveLife).
                 int comoSePinta = puntos < 0 ? EffectSupport.VitalityFlatMalus : EffectSupport.VitalityFlatBonus;
                 var embrujoDeVida = sobre.Buffs.Poner(new Buff
                 {
