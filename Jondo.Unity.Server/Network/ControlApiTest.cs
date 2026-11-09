@@ -270,8 +270,9 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static void WaitTillItBegins(FightInstance fight, Fighter? current, int seconds = 10)
         {
-            // Only a character with a client of his own confirms his turn; the server starts the rest.
-            if (current == null || current.IsMonster || current.EsInvocado || current.DrivenBy != 0) return;
+            // Every turn starts on a client's confirmation, a JondoBot's and a summon's too: passed
+            // before it, a foe's "at the start of its turn" -- a Feca glyph's blow -- never went off.
+            if (current == null) return;
             var until = DateTime.UtcNow.AddSeconds(seconds);
             while (DateTime.UtcNow < until && fight.State == FightState.Ongoing && fight.CurrentFighter == current
                    && fight.LastTurnBegun != (fight.RoundNumber, current.Id))
@@ -817,6 +818,12 @@ namespace Jondo.Unity.Server.Network
             List<string> lines;
             bool back = false;
             int roundBefore = fight.RoundNumber;
+            // Back when the turn comes to him after somebody else's: from his own turn that is the
+            // next round, from a JondoBot's or a summon's of his it is later in this one. Waiting
+            // for the next round there let his own turn -- an hour long on a test server -- run
+            // out the whole patience.
+            var startedOn = fight.CurrentFighter;
+            bool leftIt = false;
             try
             {
                 WaitTillItBegins(fight, me);
@@ -827,7 +834,8 @@ namespace Jondo.Unity.Server.Network
                 {
                     System.Threading.Thread.Sleep(300);
                     if (FightHandler.FightOf(session.State.CharacterId) != fight || !me.IsAlive) break;
-                    if (fight.RoundNumber > roundBefore && fight.CurrentFighter?.Id == me.Id) { back = true; WaitTillItBegins(fight, me); break; }
+                    if (fight.CurrentFighter != startedOn || fight.RoundNumber > roundBefore) leftIt = true;
+                    if (leftIt && fight.CurrentFighter?.Id == me.Id) { back = true; WaitTillItBegins(fight, me); break; }
                     // A turn this slot plays and nobody else would -- its summons', a team test's
                     // JondoBots' -- is handed on at once, as their player would, not left to its clock.
                     var current = fight.CurrentFighter;
@@ -1137,6 +1145,13 @@ namespace Jondo.Unity.Server.Network
                             return there != null ? (f, Free: false, What: $"{roleOf(there)} {there.Id} on cell {behind} behind")
                                                  : (f, Free: true, What: $"cell {behind} behind stood free");
                         }).ToList();
+                        // One pushed into another fighter: the one hit takes his share of the crash
+                        // and the log says he "crashes" too, standing where the other was sent.
+                        // Silbo pushes one foe into the next; the second was judged pushed into nothing.
+                        var hitCells = judged.Where(j => !j.Free).Select(j => j.What).ToList();
+                        judged = judged.Select(j => j.Free && hitCells.Any(w => w.Contains($" {j.f.Id} on cell {j.f.CellId} behind"))
+                                                        ? (j.f, Free: false, What: "hit by another pushed into him")
+                                                        : j).ToList();
                         verdict = judged.Any(j => j.Free) ? "wrong" : "blocked";
                         observed = "crashed: " + string.Join(", ", judged.Select(j => $"{roleOf(j.f)} {j.f.Id} ({j.What})"));
                     }

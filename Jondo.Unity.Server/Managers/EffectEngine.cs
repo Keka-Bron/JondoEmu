@@ -3243,6 +3243,17 @@ namespace Jondo.Unity.Server.Managers
                                                    bool includeDeadTarget = false)
         {
             var mascara = efecto.TargetMask ?? "";
+
+            // Setting one's own glyphs or runes off is the caster's doing, wherever the zone was
+            // aimed and wherever he stood as the spell landed: Trashumancia teleports the Feca onto
+            // the aimed cell and then sets off the glyphs he lands in, on "a,A" at that cell.
+            // Judged where he stood before the jump, it found nobody and no glyph ever went off.
+            if (efecto.EffectId is ActivaLosGlifos or ActivaLasRunas)
+            {
+                if (CasterQualifies(quienLanza, mascara, estados)) yield return quienLanza;
+                yield break;
+            }
+
             bool alLanzador = false, aLosMios = false, aLosDeEnfrente = false, aLosOtrosAliados = false;
             bool ownSummonsOnly = false, notOwnSummons = false, alInvocador = false;
             bool alAtacante = false;

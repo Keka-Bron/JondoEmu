@@ -4376,7 +4376,8 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         private static async Task FireOneGlyphAsync(NetworkStream stream, FightInstance fight,
                                                     Jondo.Unity.World.Fights.Glifo glifo,
-                                                    Fighter quien, bool alPisar, int celda = -1)
+                                                    Fighter quien, bool alPisar, int celda = -1,
+                                                    bool setOffByItsOwner = false)
         {
             var dueno = fight.Buscar(glifo.Dueno) ?? quien;
 
@@ -4427,6 +4428,13 @@ namespace Jondo.Unity.Server.Handlers
                 // 354-355) and no 3620 reaches the Xelor, whose own trigger of it sends him back and
                 // puts the 3620 that keeps it from going off again (frames 101-122).
                 bool soloElQueCae = EsGlifoDeTurnoDeClase(glifo);
+                // Set off by its owner (Trashumancia, Posicion Defensiva), a glyph that hurts goes off
+                // over its ground: "danos inmediatos a todos los enemigos en su interior". Cast on the
+                // Feca alone it hurt the Feca, and nobody inside. A glyph that only moves (the
+                // Xelor's) still takes its activator alone, as its capture has it.
+                if (soloElQueCae && setOffByItsOwner
+                    && Managers.SpellEffects.De(glifo.Hechizo, glifo.Grado).Any(e => Managers.EffectEngine.EsDeDano(e.EffectId)))
+                    soloElQueCae = false;
                 if (soloElQueCae && quien != dueno) tirada = tirada.Where(f => !EsDelLanzador(f)).ToList();
 
                 await HurtAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, quien,
@@ -7106,7 +7114,8 @@ namespace Jondo.Unity.Server.Handlers
                     {
                         if (!activador.IsAlive || !glifo.Cubre(activador.CellId)) continue;
                         await FireOneGlyphAsync(stream, fight, glifo, activador, alPisar: false,
-                                                celda: glifo.Centro >= 0 ? glifo.Centro : activador.CellId);
+                                                celda: glifo.Centro >= 0 ? glifo.Centro : activador.CellId,
+                                                setOffByItsOwner: true);
                     }
                     continue;
                 }
