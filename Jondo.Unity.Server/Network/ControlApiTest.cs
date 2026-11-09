@@ -205,6 +205,10 @@ namespace Jondo.Unity.Server.Network
             mpShown = fight.CurrentFighter == f ? f.CurrentMP : Math.Max(0, f.MaxMP + f.Buffs.De(23, fight.RoundNumber)),
             alive = f.IsAlive, summon = f.EsInvocado, bot = f.IsBot, drivenBy = f.DrivenBy, owner = f.Invocador,
             attitudes = f.Buffs.Actitudes.ToList(),
+            // A summon's own spells, each at its grade, and whether it plays on its own (nothing
+            // to play: no step, no spell) or is its owner's to play by hand.
+            summonSpells = f.HechizosDeInvocado.Select(s => new { spell = s.Spell, grade = s.Grade }).ToList(),
+            playsOnItsOwn = f.PlaysOnItsOwn, template = f.MonsterId,
             buffs = f.Buffs.Puestos.Select(b => new { b.Numero, effect = b.EffectId, spell = b.HechizoOrigen, by = b.Quien,
                                                       value = b.Valor, state = b.Estado, untilRound = b.CaducaEnRonda }).ToList(),
         };
@@ -541,7 +545,7 @@ namespace Jondo.Unity.Server.Network
             // the ring, or the target is the one fighter it never hits.
             var hollow = SpellEffects.De(spell, FightHandler.CastingGradeOf(me, spell))
                 .Where(e => e.Forma is 'O' or 'Q' or '#' && e.Tamano > 0 && e.TargetMask.Contains('A'))
-                .Select(e => ((char)e.Forma, e.Tamano)).DefaultIfEmpty((' ', 0)).First();
+                .Select(e => ((char)e.Forma, e.Tamano)).DefaultIfEmpty((' ', 0)).First();
             int ring = hollow.Item2;
             if (ring != 0 && !reach.FreeCell)
             {
@@ -643,6 +647,8 @@ namespace Jondo.Unity.Server.Network
             int level = (int)Numero(cuerpo, "level");
             if (level <= 0) level = TestSessionOnline()?.State.CharacterLevel ?? 200;
             int grade = SpellTable.GradeFor(spell, level);
+            // A summon's spell is read at the summon's grade of it, when asked for one.
+            if (Numero(cuerpo, "grade") is var asked and > 0) grade = (int)asked;
             if (grade <= 0) grade = 1;
             var limits = FightHandler.LimitesDeGrado(spell, grade);
             var catalogue = new Dictionary<int, (int Characteristic, int Category, string Text)>();
