@@ -989,6 +989,34 @@ namespace Jondo.Unity.Server.Network
                 if (again != null) sc.Check("a Frondoso one, as the tree was", again.Buffs.TieneEstado(Frondoso), again.Buffs.TieneEstado(Frondoso) ? "Frondoso" : "not Frondoso");
             }
 
+            // «Remplaza un árbol frondoso por un árbol frondoso controlable ... El árbol controlable se
+            //  sustituye por un árbol frondoso 2 turnos después de su invocación.» Potencia Silvestre
+            // and Influencia Vegetal, each on a tree Lágrima de Sadida has just made leafy.
+            const int Lagrima = 13528;
+            foreach (var (spell, controllable) in new[] { (13530, 5901), (13566, 5900) })
+            {
+                FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+                int spot = Spot();
+                CastAt(session, Arbol, spot);
+                var young = Trees().FirstOrDefault(t => t.CellId == spot);
+                if (young == null) { sc.Note($"spell {spell}: no tree planted on {spot}"); continue; }
+                FreshTurn(session, fight, me, keep: true);
+                CastAt(session, Lagrima, spot);
+                if (!sc.Check($"Lágrima de Sadida makes a new tree Frondoso at once (for spell {spell})", young.Buffs.TieneEstado(Frondoso),
+                              young.Buffs.TieneEstado(Frondoso) ? "Frondoso" : "not Frondoso")) continue;
+                FreshTurn(session, fight, me, keep: true);
+                CastAt(session, spell, spot);
+                Fighter? On() => fight.Todos.FirstOrDefault(f => f.IsAlive && f.EsInvocado && f.Invocador == me.Id && f.CellId == spot);
+                var ctrl = On();
+                if (!sc.Check($"spell {spell} replaces the leafy tree with its controllable one ({controllable})",
+                              ctrl != null && ctrl.MonsterId == controllable && !young.IsAlive,
+                              ctrl == null ? $"nothing on {spot}" : $"monster {ctrl.MonsterId} on {spot}; the tree alive {young.IsAlive}")) continue;
+                bool twoTurns = PassTurn(session, fight, me) && PassTurn(session, fight, me);
+                var after = On();
+                sc.Check($"two turns later spell {spell}'s tree is a leafy tree again", twoTurns && after != null && after.MonsterId == Tree && after.Buffs.TieneEstado(Frondoso),
+                         after == null ? $"nothing on {spot} (turns back {twoTurns})" : $"monster {after.MonsterId}, Frondoso {after.Buffs.TieneEstado(Frondoso)} (turns back {twoTurns})");
+            }
+
             // «...solo pueden tener como máximo 6 árboles en el terreno. Cuando alguno de ellos planta
             // un séptimo árbol, este provoca la muerte del primero.»
             FreshTurn(session, fight, me, keep: false, withoutSummons: true);
@@ -1457,8 +1485,10 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
                                  .OrderBy(f => MapGeometry.Distance(f.CellId, between[1])).FirstOrDefault();
             if (wall && foe != null)
             {
-                // The foe beside the wall, then walked onto its middle.
-                int beside = between.SelectMany(MapGeometry.GetNeighbors).Where(c => FreeCell(fight, c) && !between.Contains(c))
+                // The foe beside the wall, then walked onto its middle. Not beside the Tymador: leaving
+                // his side the foe is tackled, loses his MP and walks nowhere.
+                int beside = between.SelectMany(MapGeometry.GetNeighbors).Where(c => FreeCell(fight, c) && !between.Contains(c)
+                                                                                     && MapGeometry.Distance(c, me.CellId) > 1)
                                     .OrderBy(c => MapGeometry.Distance(c, between[1])).DefaultIfEmpty(-1).First();
                 if (beside >= 0)
                 {

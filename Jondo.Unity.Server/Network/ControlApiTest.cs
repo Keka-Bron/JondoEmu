@@ -511,29 +511,57 @@ namespace Jondo.Unity.Server.Network
 
             var board = FightHandler.BoardOf(fight);
             var reach = FightHandler.ReachOf(fight, me, spell);
-            // A spell with no reach (0 to 0) is cast on the caster's own cell: nothing to stage.
+            // A spell with no reach (0 to 0) is cast on the caster's own cell. Its blow around him --
+            // Palabra Entretenida's cross of three -- wants a foe inside: the nearest one is put
+            // on the nearest free cell of that zone, or the blow is never seen.
             if (reach.Max <= 0)
-                return Bien(new { cell = me.CellId, target = me.CellId, range = new[] { 0, 0 }, lines = new List<string>() });
+            {
+                var stageLines = new List<string>();
+                var blow = SpellEffects.De(spell, FightHandler.CastingGradeOf(me, spell))
+                    .FirstOrDefault(e => Managers.EffectEngine.EsDeDano(e.EffectId) && e.TargetMask.Split(',').Contains("A"));
+                var nearestFoe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                            .OrderBy(f => Jondo.Unity.World.Maps.MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+                if (blow != null && nearestFoe != null)
+                {
+                    var zone = Managers.EffectEngine.CasillasDelEfecto(blow, me.CellId, me.CellId);
+                    if (!zone.Contains(nearestFoe.CellId))
+                    {
+                        int into = zone.Where(c => c != me.CellId && board.Walkable(c) && !fight.Todos.Any(f => f.IsAlive && f.CellId == c))
+                                       .OrderBy(c => Jondo.Unity.World.Maps.MapGeometry.Distance(c, me.CellId)).DefaultIfEmpty(-1).First();
+                        if (into >= 0)
+                            stageLines = RunInSession(session, _ => FightHandler.InASequenceAsync(fight, me.Id, () => FightHandler.TeleportNearAsync(fight, nearestFoe, into)));
+                    }
+                }
+                return Bien(new { cell = me.CellId, target = me.CellId, range = new[] { 0, 0 }, lines = stageLines });
+            }
             // A spell that wants a free cell -- a jump, a summon, a beacon -- aims beside the target.
             // The nearest free cell, beside it when one is: with the Puchs bunched and the earlier
             // summons around them, every neighbour can be taken.
             // A ring that leaves its centre out (O, Q): aimed at a free cell with the target on
             // the ring, or the target is the one fighter it never hits.
-            int ring = SpellEffects.De(spell, FightHandler.CastingGradeOf(me, spell))
-                .Where(e => e.Forma is 'O' or 'Q' && e.Tamano > 0 && e.TargetMask.Contains('A'))
-                .Select(e => e.Forma == 'Q' ? -e.Tamano : e.Tamano).DefaultIfEmpty(0).First();
+            var hollow = SpellEffects.De(spell, FightHandler.CastingGradeOf(me, spell))
+                .Where(e => e.Forma is 'O' or 'Q' or '#' && e.Tamano > 0 && e.TargetMask.Contains('A'))
+                .Select(e => ((char)e.Forma, e.Tamano)).DefaultIfEmpty((' ', 0)).First();
+            int ring = hollow.Item2;
             if (ring != 0 && !reach.FreeCell)
             {
                 int aimed = target;
-                int Apart(int c)
+                // On the zone's edge, seen from the aimed cell: a ring (O) by distance, a straight
+                // cross (Q) along a row, a diagonal one (#, Flecha Impactante's push) along a diagonal.
+                bool OnEdge(int c)
                 {
-                    if (ring > 0) return Jondo.Unity.World.Maps.MapGeometry.Distance(c, aimed);
                     var (ax, ay) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(aimed);
                     var (cx, cy) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(c);
-                    return Math.Max(Math.Abs(ax - cx), Math.Abs(ay - cy));
+                    int dx = Math.Abs(ax - cx), dy = Math.Abs(ay - cy);
+                    return hollow.Item1 switch
+                    {
+                        'O' => Jondo.Unity.World.Maps.MapGeometry.Distance(c, aimed) == ring,
+                        'Q' => Math.Max(dx, dy) == ring && (dx == 0 || dy == 0),
+                        _ => dx == ring && dy == ring,
+                    };
                 }
                 int onRing = Enumerable.Range(0, 560)
-                    .Where(c => c != me.CellId && board.Walkable(c) && !fight.Todos.Any(f => f.IsAlive && f.CellId == c) && Apart(c) == Math.Abs(ring))
+                    .Where(c => c != me.CellId && board.Walkable(c) && !fight.Todos.Any(f => f.IsAlive && f.CellId == c) && OnEdge(c))
                     .OrderBy(c => Jondo.Unity.World.Maps.MapGeometry.Distance(c, me.CellId)).DefaultIfEmpty(-1).First();
                 if (onRing >= 0) target = onRing;
             }
@@ -1067,8 +1095,13 @@ namespace Jondo.Unity.Server.Network
                 // A modifier of one spell (293, 280, 285...): the rows on that spell only.
                 if (Enum.IsDefined(typeof(SpellAspect), e.EffectId) && e.DiceNum > 0)
                     rows = rows.Where(r => r.Row.HechizoAfectado == e.DiceNum).ToList();
+                bool keptAsPoints = false;
                 if (rows.Count == 0 && KeptAs.TryGetValue(e.EffectId, out var keptAs))
+                {
                     rows = newRows.Where(r => keptAs.Contains(r.Row.EffectId)).ToList();
+                    // A percentage kept as the points it came to (vitality in %): no dice to hold them to.
+                    keptAsPoints = e.EffectId is 1078 or 1033;
+                }
 
                 bool immediate = string.Equals(e.Triggers, "I", StringComparison.OrdinalIgnoreCase) || e.Triggers.Length == 0;
                 if (immediate && e.Delay == 0 && e.Duration == 0 && SubCasts.Contains(e.EffectId))
@@ -1092,9 +1125,12 @@ namespace Jondo.Unity.Server.Network
                 {
                     // The spell is the text's #2: in the value when the dice say nothing.
                     int which = e.DiceNum != 0 ? e.DiceNum : e.Value;
-                    var left = fight.Todos.Where(f => f.Buffs.Puestos.Any(r => r.HechizoOrigen == which)).ToList();
+                    // On the spell being cast it takes away what its earlier casts left, and keeps
+                    // what this one has just put (Centinela): only the older rows count.
+                    var justPut = newRows.Select(r => r.Row).ToHashSet();
+                    var left = fight.Todos.Where(f => f.Buffs.Puestos.Any(r => r.HechizoOrigen == which && !(which == spell && justPut.Contains(r)))).ToList();
                     verdict = left.Count == 0 ? "applied" : "missing";
-                    observed = left.Count == 0 ? $"nobody keeps effects of spell {which}" : $"effects of spell {which} still on {Names(left)}";
+                    observed = left.Count == 0 ? $"nobody keeps older effects of spell {which}" : $"effects of spell {which} still on {Names(left)}";
                 }
                 else if (!immediate)
                 {
@@ -1258,8 +1294,14 @@ namespace Jondo.Unity.Server.Network
                     bool duration = rows.All(r => r.Row.CaducaEnRonda == expectedEnd || e.Duration == 0);
                     // A loss of AP or MP can be dodged in part: anything from none to the roll.
                     bool dodgeable = text.Contains("PA") || text.Contains("PM");
-                    bool value = rows.All(r => min == 0 && max == 0 || Math.Abs(r.Row.Cuanto) >= (dodgeable ? 0 : min) && Math.Abs(r.Row.Cuanto) <= Math.Max(max, min)
-                                              || Math.Abs(r.Row.Valor) >= min && Math.Abs(r.Row.Valor) <= Math.Max(max, min) || r.Row.Cuanto == 0);
+                    // A shield in a share of the level (1020) cast by a summon -- a 792's "the target
+                    // casts" -- is a share of the summon's level, not the character's.
+                    bool ShieldOfAnotherLevel(Buff row) => e.EffectId == 1020 && fight.Buscar(row.Quien) is { } by && by != me
+                                                           && Math.Abs(row.Cuanto) >= e.DiceNum * by.StatLevel / 100 * 9 / 10
+                                                           && Math.Abs(row.Cuanto) <= Math.Max(e.DiceNum, e.DiceSide) * by.StatLevel / 100 * 11 / 10;
+                    bool value = keptAsPoints || rows.All(r => min == 0 && max == 0 || Math.Abs(r.Row.Cuanto) >= (dodgeable ? 0 : min) && Math.Abs(r.Row.Cuanto) <= Math.Max(max, min)
+                                              || Math.Abs(r.Row.Valor) >= min && Math.Abs(r.Row.Valor) <= Math.Max(max, min) || r.Row.Cuanto == 0
+                                              || ShieldOfAnotherLevel(r.Row));
                     verdict = !duration ? "duration" : !value ? "value" : "applied";
                     observed = string.Join(", ", rows.Select(r => $"{roleOf(r.Who)} {r.Who.Id}: {r.Row.Cuanto:+0;-0;0} until round {r.Row.CaducaEnRonda}"))
                                + $" (dice {min}-{max}, expected until {expectedEnd})";
@@ -1287,7 +1329,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 // A ring (O) or a hollow cross (Q) misses the cell it is aimed at: the harness aims
                 // at a fighter, who is in the zone's empty middle, so a miss there says nothing.
-                if (verdict == "missing" && (char)e.Forma is 'O' or 'Q')
+                if (verdict == "missing" && (char)e.Forma is 'O' or 'Q' or '#')
                 {
                     verdict = "hollow-zone";
                     observed += $" (zone {(char)e.Forma}{e.Tamano}, aimed at its empty middle)";
