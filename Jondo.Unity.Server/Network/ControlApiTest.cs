@@ -1118,6 +1118,9 @@ namespace Jondo.Unity.Server.Network
                     // A sub-spell cast only on a condition (a state, a kind of monster, a telefrag:
                     // anything in its mask beyond the plain kinds) hands that condition down.
                     string? passOn = gate ?? (Gated(e.TargetMask) ? e.TargetMask : null);
+                    // A sub-spell cast by chance -- one card of Tarot's twenty-two -- hands the chance
+                    // down: its effects are there only when it was the one drawn.
+                    if (passOn == null && e.Probabilidad > 0 && e.Probabilidad < 100) passOn = "chance";
                     // Cast on one cell for friends only (or foes only), the spell aimed at the other
                     // kind: the sub-spell never went off (Explosión de Grisú's "1160 on g").
                     var castKinds = (e.TargetMask ?? "").Split(',').Select(k => k.Trim()).Where(k => k.Length == 1 && char.IsLetter(k[0])).ToList();
@@ -1243,6 +1246,7 @@ namespace Jondo.Unity.Server.Network
                 {
                     // This effect's state only: a spell sets several, each with its own length.
                     var states = rows.Where(r => r.Row.Estado != 0 && r.Row.Estado == e.Value).ToList();
+                    verdict = "";
                     // Rows of this spell's, when there are: the same state from another spell --
                     // a summon born with it from its own spell -- is not this effect's doing.
                     // On whom the mask puts it: the caster (C, c), friends (lower case) or foes (upper
@@ -1250,19 +1254,38 @@ namespace Jondo.Unity.Server.Network
                     var stateKinds = (e.TargetMask ?? "").Split(',').Select(k => k.Trim()).Where(k => k.Length == 1 && char.IsLetter(k[0])).ToList();
                     if (stateKinds.Count > 0)
                     {
+                        // And of which kind: i/j the summons, h the caster's summoner, l the
+                        // players, m the monsters; a and g anybody of the side. Jamansedumbre puts
+                        // 583 on its summoner for one turn ("h") and on allied summons for two ("j").
+                        bool OfKind(Fighter who, string k) => k.ToLowerInvariant() switch
+                        {
+                            "i" or "j" => who.EsInvocado,
+                            "h" => me.EsInvocado ? who.Id == me.Invocador : !who.IsMonster && !who.EsInvocado,
+                            "l" => !who.IsMonster && !who.EsInvocado,
+                            "m" => who.IsMonster && !who.EsInvocado,
+                            _ => true,
+                        };
                         bool Fits(Fighter who)
                         {
                             string role = roleOf(who);
                             return role == "caster" ? stateKinds.Any(k => k is "C" or "c" or "a" or "l")
-                                 : role == "ally" ? stateKinds.Any(k => char.IsLower(k[0]) && k != "c")
-                                 : stateKinds.Any(k => char.IsUpper(k[0]) && k != "C");
+                                 : role == "ally" ? stateKinds.Any(k => char.IsLower(k[0]) && k != "c" && OfKind(who, k))
+                                 : stateKinds.Any(k => char.IsUpper(k[0]) && k != "C" && OfKind(who, k));
                         }
                         var fitting = states.Where(r => Fits(r.Who)).ToList();
                         if (fitting.Count > 0) states = fitting;
+                        else if (states.Count > 0)
+                        {
+                            // Rows of the state there are, but on nobody this effect's kinds name: another
+                            // row of the spell put them.
+                            states = new();
+                            verdict = "not-for-target";
+                        }
                     }
                     var others = states.Where(r => r.Row.HechizoOrigen != from).ToList();
                     states = states.Where(r => r.Row.HechizoOrigen == from).ToList();
-                    verdict = states.Count > 0 ? (states.All(r => r.Row.CaducaEnRonda == expectedEnd) ? "applied" : "duration") : "missing";
+                    if (verdict != "not-for-target")
+                        verdict = states.Count > 0 ? (states.All(r => r.Row.CaducaEnRonda == expectedEnd) ? "applied" : "duration") : "missing";
                     observed = states.Count > 0 ? string.Join(", ", states.Select(r => $"state {r.Row.Estado} on {roleOf(r.Who)} {r.Who.Id} until round {r.Row.CaducaEnRonda}")) + $" (expected until {expectedEnd})"
                                                 : $"no state {e.Value} row";
                     // Only another spell's row of that state -- a summon born with it from its
@@ -1297,6 +1320,21 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (rows.Count > 0)
                 {
+                    // When the spell has another row of this effect with another length, the rows of
+                    // this one are on whom its mask's side names: Rueda de la Fortuna minimises the
+                    // foes' dice now (781 on "A") and the allies' next turn (781 on "a", delay 1).
+                    if (RowsOf(spell, Math.Max(1, grade)).Count(o => o.EffectId == e.EffectId && (o.Delay != e.Delay || o.Duration != e.Duration)) > 0)
+                    {
+                        var sides = (e.TargetMask ?? "").Split(',').Select(k => k.Trim()).Where(k => k.Length == 1 && char.IsLetter(k[0])).ToList();
+                        bool OnItsSide(Fighter who) => roleOf(who) switch
+                        {
+                            "caster" => sides.Any(k => k is "C" or "c" or "a"),
+                            "ally" => sides.Any(k => char.IsLower(k[0]) && k != "c"),
+                            _ => sides.Any(k => char.IsUpper(k[0]) && k != "C"),
+                        };
+                        var onSide = rows.Where(r => OnItsSide(r.Who)).ToList();
+                        if (onSide.Count > 0) rows = onSide;
+                    }
                     bool duration = rows.All(r => r.Row.CaducaEnRonda == expectedEnd || e.Duration == 0);
                     // A loss of AP or MP can be dodged in part: anything from none to the roll.
                     bool dodgeable = text.Contains("PA") || text.Contains("PM");
@@ -1325,7 +1363,7 @@ namespace Jondo.Unity.Server.Network
                     verdict = "no-rule";
                     observed = "the harness has no check for this effect yet";
                 }
-                if (e.Probabilidad > 0 && e.Probabilidad < 100 && verdict == "missing") verdict = "chance";
+                if ((e.Probabilidad > 0 && e.Probabilidad < 100 || gate == "chance") && verdict == "missing") verdict = "chance";
                 // An effect whose mask asks for a state (E, *E: the target's or the caster's) that
                 // nobody had did right not to go off.
                 if (verdict == "missing" && System.Text.RegularExpressions.Regex.IsMatch(e.TargetMask ?? "", @"(^|,)\*?[Ee]\d"))
