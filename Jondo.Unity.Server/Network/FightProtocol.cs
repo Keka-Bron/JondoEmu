@@ -2501,6 +2501,16 @@ namespace Jondo.Unity.Server.Network
         /// Returns whether the player declares himself ready. In the captures it always arrives with 1; zero
         /// would be withdrawing ready, but that is not measured.
         /// </summary>
+        /// <summary>A jxy's "IsAfk" (f1): the client passing the turn on its own, its player idle.</summary>
+        public static bool ReadIdlePass(byte[] payload)
+        {
+            byte[]? jxy = ConnectionProtocol.ReadPayload(payload, "jxy");
+            if (jxy == null) return false;
+            foreach (var field in ProtoMessage.Parse(jxy).Fields)
+                if (field.FieldNumber == 1 && field.WireType == 0) return field.VarIntValue != 0;
+            return false;
+        }
+
         public static bool ReadReady(byte[] payload)
         {
             byte[]? kaq = ConnectionProtocol.ReadPayload(payload, Op.Kaq);

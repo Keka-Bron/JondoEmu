@@ -316,7 +316,15 @@ namespace Jondo.Unity.World.Fights
         /// turn comes, and the owner's jrw and jwh then move and cast it.
         /// </summary>
         public bool ControlledBy(long characterId)
-            => Id == characterId || (EsInvocado && Invocador == characterId && !PlaysOnItsOwn);
+            => Id == characterId || (EsInvocado && Invocador == characterId && !PlaysOnItsOwn)
+               || (DrivenBy != 0 && DrivenBy == characterId);
+
+        /// <summary>
+        /// For the test harness only: the character whose session plays this fighter by hand --
+        /// a JondoBot ally or foe of a team test, and its summons -- through the same jwh and jxy
+        /// as his own turns, instead of its own wits. 0 for every fighter of a real fight.
+        /// </summary>
+        public long DrivenBy { get; set; }
 
         /// <summary>
         /// A summon with NOTHING TO PLAY: no step to take and no spell of its own. Its turn is
@@ -401,6 +409,18 @@ namespace Jondo.Unity.World.Fights
         /// What it carries on it: buffs, states and the attitudes its items give it.
         /// </summary>
         public Buffs Buffs { get; } = new Buffs();
+
+        /// <summary>
+        /// A fighter whose shield rows take their points with them when they go, whichever way
+        /// they go (Buffs.AlIrse): only a recast that replaced one did, before.
+        /// </summary>
+        public Fighter()
+        {
+            Buffs.AlIrse = fila => { if (fila.EffectId == ShieldRow) Desescudar(fila.Cuanto); };
+        }
+
+        /// <summary>The row the client draws for a shield, "#1 de escudo", worth its points.</summary>
+        public const int ShieldRow = 1040;
 
         /// <summary>
         /// Whether it has been hit since its previous turn. The attitudes' "DBE" trigger looks at it,

@@ -2248,7 +2248,13 @@ namespace Jondo.Unity.Server.Managers
             if (hondo > HondoMaximo) return new List<Outcome>();
             if (!armar) combate.SinArmar++;
             var raizDeFuera = combate.RootCaster;
-            if (hondo == 0) combate.RootCaster = quienLanza;
+            int hechizoRaizDeFuera = combate.CastRootSpell, filasDeFuera = combate.CastRowsAfter;
+            if (hondo == 0)
+            {
+                combate.RootCaster = quienLanza;
+                combate.CastRootSpell = hechizo;
+                combate.CastRowsAfter = combate.UltimoEmbrujo;
+            }
             try
             {
             if (nearestChainBudget < 0)
@@ -2271,6 +2277,8 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (!armar) combate.SinArmar--;
                 combate.RootCaster = raizDeFuera;
+                combate.CastRootSpell = hechizoRaizDeFuera;
+                combate.CastRowsAfter = filasDeFuera;
             }
         }
 
@@ -3631,6 +3639,11 @@ namespace Jondo.Unity.Server.Managers
                     if (ownSummonsOnly && !delLanzador) vale = false;
                     if (notOwnSummons && delLanzador) vale = false;
                 }
+                // A character and P: only the summoner of the summon casting -- Encendimiento's
+                // "h,P" from a bomb lands on its Tymador. Anybody else is not the caster's, and
+                // let through, he met both of the Eniripsa's ánimo branches, "a,p" for the
+                // characters and "a,P,f7371,f7370" for her summons: the bonus twice, +4 AP.
+                else if (ownSummonsOnly && !(quienLanza.EsInvocado && quien.Id == quienLanza.Invocador)) vale = false;
                 foreach (int estado in pideEstado) if (!susEstados.Contains(estado)) vale = false;
                 foreach (int estado in pideNoEstado) if (susEstados.Contains(estado)) vale = false;
                 foreach (int pct in lifeBelow) if (!LifeUnder(quien, pct)) vale = false;
@@ -4533,7 +4546,7 @@ namespace Jondo.Unity.Server.Managers
                     CaducaEnRonda = caduca,
                     EmpiezaEnRonda = Empieza(efecto, ronda),
                 }, combate.SiguienteEmbrujo);
-                foreach (var relevado in sobre.Buffs.Relevados) sobre.Desescudar(relevado.Cuanto);
+                // A replaced row's points went with it (Buffs.AlIrse, on the fighter).
 
                 return new Outcome
                 {
@@ -4619,6 +4632,12 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (sobre == quienLanza) return null;
                 if (sobre.CellId == quienLanza.CellId) return null;
+
+                // Nobody pinned changes places: either side Indesplazable, Pesante or Arraigado
+                // (cantBeMoved / cantSwitchPosition) and the swap does not happen, as the
+                // teleports' and telefrags' already did not. The Anutrof's Subterráneo swapped
+                // with an Indesplazable foe all the same. A forced swap is a boss's: it stays so.
+                if (efecto.EffectId == IntercambiarPosiciones && (NoSeDejaMover(sobre) || NoSeDejaMover(quienLanza))) return null;
 
                 // The ground is not looked at here: both cells are already being stood on by somebody,
                 // so by definition they can be stood on. And whether they are taken is not looked at
@@ -4944,7 +4963,14 @@ namespace Jondo.Unity.Server.Managers
                     Efecto = efecto,
                     HechizoOrigen = hechizo,
                     NivelOrigen = grado,
-                    BuffsQuitados = sobre.Buffs.QuitarDelHechizo(hechizoQuitado),
+                    // A 406 on the very spell being cast takes away what its earlier casts left, not
+                    // what this cast has just put: Centinela ends on "406 32475" after its +range
+                    // and +damage, and took them away again at once -- its sheet's buff never stayed.
+                    // On another spell -- a child of the cast, Flecha Masacrante's 32461 -- it is the
+                    // cast clearing its own rows, and they go.
+                    BuffsQuitados = hechizoQuitado == combate.CastRootSpell && combate.CastRowsAfter != int.MaxValue
+                        ? sobre.Buffs.QuitarDelHechizoAntesDe(hechizoQuitado, combate.CastRowsAfter)
+                        : sobre.Buffs.QuitarDelHechizo(hechizoQuitado),
                 };
             }
 

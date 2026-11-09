@@ -204,6 +204,22 @@ namespace Jondo.Unity.Server.Managers
 
         private static readonly object _candado = new object();
 
+        /// <summary>A critical effect's uid -> the uid of the same effect in the normal list.</summary>
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, int> _normalDelCritico = new();
+
+        /// <summary>
+        /// The uid a row piles up under: a critical effect's, its normal twin's. The critical
+        /// list carries its own uids (Lanzamiento de Pala's -4 range is 211001, critical 211002),
+        /// and a maxStack of one let a critical row live beside the normal one -- two of a spell
+        /// that holds one.
+        /// </summary>
+        public static int StackUidOf(int effectUid) => _normalDelCritico.TryGetValue(effectUid, out int normal) ? normal : effectUid;
+
+        static SpellEffects()
+        {
+            Jondo.Unity.World.Fights.Buffs.UidDeLaPila = StackUidOf;
+        }
+
         public static IReadOnlyList<SpellEffect> De(int hechizo, int grado)
             => Leer(hechizo, grado).Normales;
 
@@ -248,6 +264,10 @@ namespace Jondo.Unity.Server.Managers
 
                 _cache[clave] = normales;
                 _criticos[clave] = criticos;
+                // Each critical row to its normal twin: the same place in the list, the same effect.
+                for (int i = 0; i < Math.Min(normales.Count, criticos.Count); i++)
+                    if (criticos[i].EffectId == normales[i].EffectId && criticos[i].EffectUid != 0 && normales[i].EffectUid != 0)
+                        _normalDelCritico[criticos[i].EffectUid] = normales[i].EffectUid;
                 return (normales, criticos);
             }
         }

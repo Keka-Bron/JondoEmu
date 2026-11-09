@@ -24,6 +24,17 @@ namespace Jondo.Unity.World.Fights
         /// <summary>Whose network it belongs to: the fighter that laid it.</summary>
         public long Owner { get; init; }
 
+        /// <summary>
+        /// The side whose portal it is: «cada equipo tiene un límite de cuatro portales, aunque haya
+        /// varios selotropes en el equipo», and «las redes de dos selotropes enemigos no se
+        /// comunican entre sí» -- two allies' are one network. -1 when unknown: then by owner.
+        /// </summary>
+        public int Team { get; init; } = -1;
+
+        /// <summary>Whether two portals are of one network: the same side, or the same owner when the side is not known.</summary>
+        public bool SameNetwork(Portal other)
+            => other != null && (Team >= 0 && other.Team >= 0 ? Team == other.Team : Owner == other.Owner);
+
         public int Cell { get; init; }
 
         /// <summary>The spell that laid it and its grade, the f9 and f6 of its jwe 401.</summary>
@@ -101,9 +112,10 @@ namespace Jondo.Unity.World.Fights
         public Portal ById(int id) => _portals.FirstOrDefault(p => p.Id == id);
 
         /// <summary>The portal a new one of this owner pushes out, or null while he keeps fewer than four.</summary>
-        public Portal Displaced(long owner)
+        public Portal Displaced(long owner, int team = -1)
         {
-            var his = _portals.Where(p => p.Owner == owner).OrderBy(p => p.Id).ToList();
+            // Four a side, whichever of its Selatrops laid them; four an owner when the side is not known.
+            var his = _portals.Where(p => team >= 0 && p.Team >= 0 ? p.Team == team : p.Owner == owner).OrderBy(p => p.Id).ToList();
             return his.Count >= PerOwner ? his[0] : null;
         }
 
@@ -126,7 +138,7 @@ namespace Jondo.Unity.World.Fights
         public bool ShouldBeActive(Portal portal, Func<int, long> occupantOf, long ignoring = 0)
         {
             if (!Usable(portal, occupantOf, ignoring)) return false;
-            return _portals.Any(p => p != portal && p.Owner == portal.Owner && Usable(p, occupantOf));
+            return _portals.Any(p => p != portal && p.SameNetwork(portal) && Usable(p, occupantOf));
         }
 
         /// <summary>
@@ -178,7 +190,7 @@ namespace Jondo.Unity.World.Fights
                 int best = int.MaxValue;
                 foreach (var candidate in _portals)
                 {
-                    if (candidate.Owner != entry.Owner || chain.Contains(candidate)) continue;
+                    if (!candidate.SameNetwork(entry) || chain.Contains(candidate)) continue;
                     if (!Usable(candidate, occupantOf)) continue;
                     int distance = MapGeometry.Distance(current.Cell, candidate.Cell);
                     if (distance < best || (distance == best && next != null && candidate.Id > next.Id))

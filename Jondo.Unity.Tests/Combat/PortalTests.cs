@@ -231,6 +231,39 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// «Cada equipo tiene un límite de cuatro portales, aunque haya varios selotropes en el
+        /// equipo»: two allies' portals count together, and are one network; «las redes de dos
+        /// selotropes enemigos no se comunican entre sí».
+        /// </summary>
+        [Fact]
+        public void Four_portals_a_side_and_one_network_for_allies()
+        {
+            const long Ally = Selatrop + 1, Foe = Selatrop + 2;
+            var network = new PortalNetwork();
+            network.Add(new Portal { Id = 1, Owner = Selatrop, Team = 0, Cell = 301 });
+            network.Add(new Portal { Id = 2, Owner = Selatrop, Team = 0, Cell = 302 });
+            network.Add(new Portal { Id = 3, Owner = Ally, Team = 0, Cell = 303 });
+            Assert.Null(network.Displaced(Ally, 0));
+            network.Add(new Portal { Id = 4, Owner = Ally, Team = 0, Cell = 304 });
+            // The side's fifth pushes out the side's oldest, whoever laid it.
+            Assert.Equal(1, network.Displaced(Ally, 0).Id);
+            // The other side has its own four.
+            network.Add(new Portal { Id = 5, Owner = Foe, Team = 1, Cell = 305 });
+            Assert.Null(network.Displaced(Foe, 1));
+
+            // An ally's portal makes a network with the other's; a foe's does not.
+            var lone = new PortalNetwork();
+            var mine = new Portal { Id = 1, Owner = Selatrop, Team = 0, Cell = 301 };
+            var his = new Portal { Id = 2, Owner = Ally, Team = 0, Cell = 320 };
+            var theirs = new Portal { Id = 3, Owner = Foe, Team = 1, Cell = 340 };
+            lone.Add(mine); lone.Add(theirs);
+            Assert.False(lone.ShouldBeActive(mine, _ => 0));
+            lone.Add(his);
+            Assert.True(lone.ShouldBeActive(mine, _ => 0));
+            Assert.False(lone.ShouldBeActive(theirs, _ => 0));
+        }
+
+        /// <summary>
         /// Through a chain the blow and the heal grow by the entry's value and its die per cell
         /// between two portals: 2% a cell, "+#3% daños, +#1% por casilla". Inferred.
         /// </summary>

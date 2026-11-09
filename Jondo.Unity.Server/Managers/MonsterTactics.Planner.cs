@@ -1499,15 +1499,15 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var p in current?.All ?? Array.Empty<Portal>())
                     network.Add(new Portal
                     {
-                        Id = p.Id, Owner = p.Owner, Cell = p.Cell, LayingSpell = p.LayingSpell, Grade = p.Grade,
+                        Id = p.Id, Owner = p.Owner, Team = p.Team, Cell = p.Cell, LayingSpell = p.LayingSpell, Grade = p.Grade,
                         DiceNum = p.DiceNum, DiceSide = p.DiceSide, Value = p.Value,
                         Used = p.Used, NeutralisedBy = p.NeutralisedBy, Active = p.Active,
                     });
-                var displaced = network.Displaced(caster.Id);
+                var displaced = network.Displaced(caster.Id, caster.TeamId);
                 if (displaced != null) network.Remove(displaced);
                 network.Add(new Portal
                 {
-                    Id = (network.All.Count == 0 ? 0 : network.All.Max(p => p.Id)) + 1, Owner = caster.Id, Cell = cell,
+                    Id = (network.All.Count == 0 ? 0 : network.All.Max(p => p.Id)) + 1, Owner = caster.Id, Team = caster.TeamId, Cell = cell,
                     LayingSpell = spellId, DiceNum = row.DiceNum, DiceSide = row.DiceSide, Value = row.Value,
                 });
                 network.Refresh(OccupantOf);
@@ -1611,7 +1611,7 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var p in current.All)
                     network.Add(new Portal
                     {
-                        Id = p.Id, Owner = p.Owner, Cell = p.Cell, LayingSpell = p.LayingSpell, Grade = p.Grade,
+                        Id = p.Id, Owner = p.Owner, Team = p.Team, Cell = p.Cell, LayingSpell = p.LayingSpell, Grade = p.Grade,
                         DiceNum = p.DiceNum, DiceSide = p.DiceSide, Value = p.Value,
                         Used = p.Used, NeutralisedBy = p.NeutralisedBy, Active = p.Active,
                     });

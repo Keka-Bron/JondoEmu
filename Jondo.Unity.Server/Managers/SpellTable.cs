@@ -354,6 +354,21 @@ namespace Jondo.Unity.Server.Managers
             return best;
         }
 
+        /// <summary>
+        /// A class passive's grade at a level: the level's when its grades are spread over
+        /// levels (the Pandawa's 12830, grade 6 from level 187; the Xelor's 24941, thirteen),
+        /// one when they all open at the same level -- then they are the spell's own hooks, not
+        /// ranks: the Sram's 21978 holds its "on showing again" on grade 1 and its "on a kill"
+        /// on grade 2, and put at grade 2 his critical bonus never came.
+        /// </summary>
+        public static int PassiveGrade(int spellId, int level)
+        {
+            Ensure();
+            if (!_grades.TryGetValue(spellId, out var grades) || grades.Count == 0) return 1;
+            bool spread = grades.TryGetValue(1, out int first) && grades.Where(g => g.Key > 1).All(g => g.Value > first);
+            return spread ? Math.Max(1, HighestGrade(spellId, level)) : 1;
+        }
+
         /// <summary>The pair a spell belongs to, or null if it belongs to none.</summary>
         public static Pair? PairOf(int spellId)
         {

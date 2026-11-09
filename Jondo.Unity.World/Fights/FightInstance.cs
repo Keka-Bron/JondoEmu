@@ -344,6 +344,16 @@ namespace Jondo.Unity.World.Fights
         private int _ultimoEmbrujo;
         public int SiguienteEmbrujo() => ++_ultimoEmbrujo;
 
+        /// <summary>The number the last buff got.</summary>
+        public int UltimoEmbrujo => _ultimoEmbrujo;
+
+        /// <summary>
+        /// The spell being cast at the top of the resolution now, and the last buff number
+        /// before it began: what its own 406 on itself must leave alone (EffectEngine).
+        /// </summary>
+        public int CastRootSpell { get; set; }
+        public int CastRowsAfter { get; set; } = int.MaxValue;
+
         public CancellationTokenSource PlacementTimerCts { get; set; }
         public CancellationTokenSource TurnTimerCts { get; set; }
 
@@ -550,6 +560,7 @@ namespace Jondo.Unity.World.Fights
         {
             invocado.Invocador = dueno.Id;
             invocado.TeamId = dueno.TeamId;
+            invocado.DrivenBy = dueno.DrivenBy;
             (dueno.TeamId == 0 ? Azul : Rojo).Add(invocado);
 
             // The one playing right now keeps playing: the list is rebuilt but whose turn it is

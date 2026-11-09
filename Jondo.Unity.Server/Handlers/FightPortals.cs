@@ -40,6 +40,16 @@ namespace Jondo.Unity.Server.Handlers
     {
         // ─── Laying and switching off ─────────────────────────────────────────────────────────
 
+        /// <summary>For the test harness: every portal off the board, each told gone, so a scenario starts from none.</summary>
+        internal static async Task TestClearPortalsAsync(FightInstance fight)
+        {
+            foreach (var portal in fight.Portales.All.ToList())
+            {
+                fight.Portales.Remove(portal);
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, FightProtocol.BuildGlyphGone(portal.Owner, portal.Id)));
+            }
+        }
+
         /// <summary>A portal laid by a 1181: see the remarks of the class.</summary>
         internal static async Task LayPortalAsync(FightInstance fight, Fighter owner, Outcome c)
         {
@@ -47,7 +57,7 @@ namespace Jondo.Unity.Server.Handlers
             // One portal a cell. INFERRED: no capture lays one on another.
             if (owner == null || fight.Portales.At(cell) != null) return;
 
-            var displaced = fight.Portales.Displaced(owner.Id);
+            var displaced = fight.Portales.Displaced(owner.Id, owner.TeamId);
             if (displaced != null)
             {
                 fight.Portales.Remove(displaced);
@@ -59,6 +69,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 Id = fight.SiguienteMarca(),
                 Owner = owner.Id,
+                Team = owner.TeamId,
                 Cell = cell,
                 LayingSpell = c.HechizoOrigen,
                 Grade = c.NivelOrigen,

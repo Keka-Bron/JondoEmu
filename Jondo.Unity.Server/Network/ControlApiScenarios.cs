@@ -49,6 +49,9 @@ namespace Jondo.Unity.Server.Network
             var sc = new Scenario();
             try
             {
+                // In a team fight the turn may be a JondoBot's: the character's own first.
+                if (fight.CurrentFighter != me && !TurnTo(session, fight, me))
+                    return Bien(new { name, passed = false, failed = 1, steps = new[] { new { rule = "the turn comes to the character", ok = false, observed = $"turn of {fight.CurrentFighter?.Id}" } } });
                 switch (name)
                 {
                     case "tymador.bombs": TymadorBombs(session, fight, me, sc); break;
@@ -59,6 +62,18 @@ namespace Jondo.Unity.Server.Network
                     case "pandawa.drunk_and_carry": PandawaDrunkAndCarry(session, fight, me, sc); break;
                     case "uginak.rage": UginakRage(session, fight, me, sc); break;
                     case "ocra.charges": OcraCharges(session, fight, me, sc); break;
+                    case "feca.glyphs": FecaGlyphs(session, fight, me, sc); break;
+                    case "zobal.masks": ZobalMasks(session, fight, me, sc); break;
+                    case "sadida.trees": SadidaTrees(session, fight, me, sc); break;
+                    case "eniripsa.words": EniripsaWords(session, fight, me, sc); break;
+                    case "huppermage.elements": HuppermageElements(session, fight, me, sc); break;
+                    case "selatrop.portals": SelatropPortals(session, fight, me, sc); break;
+                    case "zurcarak.poker": ZurcarakPoker(session, fight, me, sc); break;
+                    case "yopuka.furor": YopukaFuror(session, fight, me, sc); break;
+                    case "sram.trap_chain": SramTrapChain(session, fight, me, sc, pinned: false); break;
+                    case "sram.trap_chain_pinned": SramTrapChain(session, fight, me, sc, pinned: true); break;
+                    case "cross.unmovable": CrossUnmovable(session, fight, me, sc); break;
+                    case "cross.stacking": CrossStacking(session, fight, me, sc); break;
                     default: return Mal(404, "scenario");
                 }
             }
@@ -73,16 +88,25 @@ namespace Jondo.Unity.Server.Network
             [5] = new[] { "xelor.telefrag" },
             [15] = new[] { "steamer.turrets" },
             [20] = new[] { "forgelance.lance" },
-            [4] = new[] { "sram.invisibility" },
+            [4] = new[] { "sram.invisibility", "sram.trap_chain", "sram.trap_chain_pinned" },
             [12] = new[] { "pandawa.drunk_and_carry" },
             [18] = new[] { "uginak.rage" },
             [9] = new[] { "ocra.charges" },
+            [1] = new[] { "feca.glyphs" },
+            [14] = new[] { "zobal.masks" },
+            [10] = new[] { "sadida.trees" },
+            [7] = new[] { "eniripsa.words" },
+            [17] = new[] { "huppermage.elements" },
+            [16] = new[] { "selatrop.portals" },
+            [6] = new[] { "zurcarak.poker" },
+            [8] = new[] { "yopuka.furor" },
         };
 
         private static Respuesta TestScenarios(string cuerpo)
         {
             int breed = (int)Numero(cuerpo, "breed");
-            return Bien(ScenariosByBreed.TryGetValue(breed, out var names) ? names : Array.Empty<string>());
+            var own = ScenariosByBreed.TryGetValue(breed, out var names) ? names : Array.Empty<string>();
+            return Bien(own.Concat(CrossScenarios).ToArray());
         }
 
         // ─── What a scenario plays with ───────────────────────────────────────────────
@@ -138,14 +162,8 @@ namespace Jondo.Unity.Server.Network
         {
             int round = fight.RoundNumber;
             RunAsClient(session, "jxy", Pb.New().Build());
-            var until = DateTime.UtcNow.AddSeconds(150);
-            while (DateTime.UtcNow < until)
-            {
-                System.Threading.Thread.Sleep(300);
-                if (FightHandler.FightOf(session.State.CharacterId) != fight || !me.IsAlive) return false;
-                if (fight.RoundNumber > round && fight.CurrentFighter?.Id == me.Id) return true;
-            }
-            return false;
+            // The turns between, the JondoBots' of a team fight handed on as their player would.
+            return TurnTo(session, fight, me) && fight.RoundNumber > round && FightHandler.FightOf(session.State.CharacterId) == fight;
         }
 
         private static bool FreeCell(FightInstance fight, int cell)
@@ -165,6 +183,9 @@ namespace Jondo.Unity.Server.Network
         private static readonly (int Dx, int Dy)[] Rows = { (1, 0), (-1, 0), (0, 1), (0, -1) };
 
         private static string Cells(IEnumerable<int> cells) => string.Join(", ", cells);
+
+        /// <summary>The text, or the given one when it is empty.</summary>
+        private static string DefaultIfEmptyText(this string text, string instead) => text.Length == 0 ? instead : text;
 
         /// <summary>A state put on a fighter for a scenario's setup, as a spell's 950 would leave it.</summary>
         private static void GiveState(FightInstance fight, Fighter caster, Fighter who, int state, int rounds)
@@ -206,6 +227,29 @@ namespace Jondo.Unity.Server.Network
             if (open < 0) return false;
             if (open != me.CellId) PutAt(session, fight, me, open);
             return me.CellId == open;
+        }
+
+        /// <summary>
+        /// The caster on a cell from which one row of the grid runs <paramref name="length"/>
+        /// cells walkable and free (the given fighters may stand on it): that row, or null.
+        /// </summary>
+        private static List<int>? ToRow(GameSession session, FightInstance fight, Fighter me, int length, params Fighter[] movable)
+        {
+            var board = FightHandler.BoardOf(fight);
+            bool Usable(int c) => c >= 0 && MapGeometry.IsValid(c) && board.Walkable(c)
+                                  && (FreeCell(fight, c) || movable.Any(f => f.CellId == c) || c == me.CellId);
+            foreach (int start in Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) || c == me.CellId)
+                                            .OrderBy(c => MapGeometry.Distance(c, me.CellId)))
+                foreach (var (dx, dy) in Rows)
+                {
+                    var cells = Enumerable.Range(1, length).Select(k => Along(start, dx, dy, k)).ToList();
+                    if (!cells.All(Usable)) continue;
+                    if (start != me.CellId) PutAt(session, fight, me, start);
+                    if (me.CellId != start) continue;
+                    // Whoever stood on it out of the way, but the given ones.
+                    return cells;
+                }
+            return null;
         }
 
         // ─── The Xelor's teleports (class sheet 1010380, «Las teletransportaciones») ──
@@ -738,6 +782,572 @@ namespace Jondo.Unity.Server.Network
             life = foe.CurrentHP;
             CastAt(session, withMinimum, foe.CellId);
             sc.Check("but can within its range", foe.CurrentHP < life, $"foe {MapGeometry.Distance(foe.CellId, me.CellId)} cells away: life {life} -> {foe.CurrentHP}");
+        }
+
+        // ─── The Feca (class sheet 1076523, «Las protecciones») ───────────────────────
+
+        private static void FecaGlyphs(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int TierraQuemada = 12985, TierraBatida = 12987, Trashumancia = 12986;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 4);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            int At(int distance, int from) => Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, from) == distance).DefaultIfEmpty(-1).First();
+
+            // «Los glifos elementales: glifos aura ... También infligen daños a los enemigos que
+            //  empiecen su turno en su interior.» Tierra Quemada on the foe, the Feca within reach of it.
+            PutAll(session, fight, (foe, At(2, me.CellId)));
+            var marks = fight.Glifos.Select(g => g.Id).ToHashSet();
+            CastAt(session, TierraQuemada, foe.CellId);
+            var laid = fight.Glifos.Where(g => !marks.Contains(g.Id)).ToList();
+            sc.Check("Tierra Quemada lays its glyphs over the foe", laid.Any(g => g.Cubre(foe.CellId)),
+                     laid.Count == 0 ? "no new mark" : string.Join(" | ", laid.Select(g => $"mark {g.Id} on {g.Casillas.Count} cells, covers the foe {g.Cubre(foe.CellId)}, the Feca {g.Cubre(me.CellId)}")));
+
+            // «Cada tipo de glifo puede ponerse una vez por turno como máximo.» No refresh: the same turn.
+            marks = fight.Glifos.Select(g => g.Id).ToHashSet();
+            int ap = me.CurrentAP;
+            int other = At(3, me.CellId);
+            CastAt(session, TierraBatida, other);
+            sc.Check("a second elemental glyph does not go down the same turn", !fight.Glifos.Any(g => !marks.Contains(g.Id)),
+                     $"AP {ap} -> {me.CurrentAP}, new marks {fight.Glifos.Count(g => !marks.Contains(g.Id))}");
+
+            // «Mientras un feca esté en sus glifos elementales, gana resistencias en el elemento del glifo.»
+            bool inside = laid.Any(g => g.Cubre(me.CellId));
+            if (inside)
+            {
+                // The aura's armour: Tierra Quemada's Armadura Incandescente, fire resistance.
+                var armour = me.Buffs.Puestos.Where(b => b.EffectId is >= 210 and <= 214 && b.Cuanto > 0).ToList();
+                sc.Check("standing in his elemental glyph the Feca gains resistance of its element", armour.Count > 0,
+                         armour.Count == 0 ? "no resistance row" : string.Join(", ", armour.Select(b => $"{b.EffectId} +{b.Cuanto}% (spell {b.HechizoOrigen})")));
+            }
+            else sc.Note("the Feca does not stand inside the glyph");
+
+            // «Utilizar los hechizos Trashumancia o Posición Defensiva para activar los glifos
+            //  elementales ocasiona daños inmediatos a todos los enemigos en su interior.»
+            FreshTurn(session, fight, me, keep: true);
+            int life = foe.CurrentHP;
+            // Into the glyph: what activates is what the Feca lands in (the capture of the
+            // Xelor's Inestabilidad: the glyphs its activator stands in).
+            var board = FightHandler.BoardOf(fight);
+            int hop = Enumerable.Range(0, 560).Where(c => board.Walkable(c) && !fight.Todos.Any(f => f.IsAlive && f.CellId == c)
+                                                           && MapGeometry.Distance(c, me.CellId) is >= 1 and <= 6 && laid.Any(g => g.Cubre(c)))
+                                     .OrderBy(c => MapGeometry.Distance(c, me.CellId)).DefaultIfEmpty(-1).First();
+            CastAt(session, Trashumancia, hop);
+            sc.Check("Trashumancia into the glyph sets it off: the foe inside is hurt at once", foe.CurrentHP < life,
+                     $"Feca on {me.CellId} (aimed {hop}); foe life {life} -> {foe.CurrentHP}");
+
+            // And a foe that starts its turn inside it.
+            if (foe.IsAlive && laid.Any(g => g.Cubre(foe.CellId)))
+            {
+                life = foe.CurrentHP;
+                bool back = PassTurn(session, fight, me);
+                sc.Check("the foe starting its turn inside the glyph is hurt", back && foe.CurrentHP < life || !foe.IsAlive,
+                         $"life {life} -> {foe.CurrentHP} (turn back {back})");
+            }
+        }
+
+        // ─── The Sram's traps, one pushing into the next ─────────────────────────────
+
+        /// <summary>
+        /// Two Trampas Repulsivas, the second beside the row the first pushes along: a foe walking
+        /// onto the first's arm is pushed two cells away from its centre, lands on the second's
+        /// side arm, which goes off in turn and pushes him two cells away from ITS centre --
+        /// sideways. The displacements pile up: two along, two across, each trap's blow dealt.
+        /// Pinned (Indesplazable, 97), the first only hurts him: he stays on its arm and the
+        /// second waits untouched.
+        /// </summary>
+        private static void SramTrapChain(GameSession session, FightInstance fight, Fighter me, Scenario sc, bool pinned)
+        {
+            const int TrampaRepulsiva = 12914, Indesplazable = 97;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderByDescending(f => f.CurrentHP).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            var board = FightHandler.BoardOf(fight);
+            bool Room(int c) => c >= 0 && MapGeometry.IsValid(c) && board.Walkable(c) && (FreeCell(fight, c) || c == foe.CellId);
+            // A row of six from the Sram, and a side of it with room: the first trap's centre on
+            // 2 (arms 1 and 3), the foe on 4 walking onto 3, pushed to 5; the second's centre
+            // beside 5, its arm on 5; the foe pushed from 5 two cells the other way.
+            List<int>? row = null;
+            (int Dx, int Dy) side = (0, 0);
+            for (int tries = 0; tries < 3 && row == null; tries++)
+            {
+                var candidate = ToRow(session, fight, me, 6, foe);
+                if (candidate == null) break;
+                var (rx, ry) = MapGeometry.CellToPoint(candidate[0]);
+                var (sx, sy) = MapGeometry.CellToPoint(me.CellId);
+                var along = (Dx: Math.Sign(rx - sx), Dy: Math.Sign(ry - sy));
+                foreach (var s2 in new[] { (along.Dy, along.Dx), (-along.Dy, -along.Dx) })
+                {
+                    int r5 = candidate[4];
+                    if (Room(Along(r5, s2.Item1, s2.Item2, 1)) && Room(Along(r5, -s2.Item1, -s2.Item2, 1)) && Room(Along(r5, -s2.Item1, -s2.Item2, 2)))
+                    { row = candidate; side = s2; break; }
+                }
+                if (row == null) { var away = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) > 4).FirstOrDefault(); PutAt(session, fight, me, away); }
+            }
+            if (row == null) { sc.Check("a free row of six cells with room on a side", false, "none on this board"); return; }
+            int Cell(int k) => row[k - 1];
+            int secondCentre = Along(Cell(5), side.Dx, side.Dy, 1);
+            int landing = Along(Cell(5), -side.Dx, -side.Dy, 2);
+            var reach = FightHandler.ReachOf(fight, me, TrampaRepulsiva);
+            int sram = me.CellId;
+            foreach (int centre in new[] { Cell(2), secondCentre })
+            {
+                int d = MapGeometry.Distance(me.CellId, centre);
+                if (d < reach.Min || d > reach.Max || !board.Sees(me.CellId, centre))
+                {
+                    int beside = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && !row.Contains(c) && c != landing && c != secondCentre
+                                     && MapGeometry.Distance(c, centre) >= Math.Max(1, reach.Min) && MapGeometry.Distance(c, centre) <= reach.Max
+                                     && board.Sees(c, centre))
+                                 .OrderBy(c => MapGeometry.Distance(c, centre)).DefaultIfEmpty(-1).First();
+                    if (beside >= 0) PutAt(session, fight, me, beside);
+                }
+                FreshTurn(session, fight, me, keep: true);
+                var marks = fight.Glifos.Select(g => g.Id).ToHashSet();
+                CastAt(session, TrampaRepulsiva, centre);
+                var laid = fight.Glifos.FirstOrDefault(g => !marks.Contains(g.Id));
+                if (!sc.Check($"Trampa Repulsiva lays a trap centred on cell {centre}", laid != null,
+                              laid == null ? "no new mark" : $"mark {laid.Id} on {Cells(laid.Casillas.OrderBy(c => c))}")) return;
+            }
+            var first = fight.Glifos.First(g => g.Cubre(Cell(2)));
+            var second = fight.Glifos.First(g => g.Cubre(secondCentre));
+            sc.Check("the second trap's arm lies where the first one's push ends", second.Cubre(Cell(5)) && !second.Cubre(Cell(4)),
+                     $"second trap on {Cells(second.Casillas.OrderBy(c => c))}; the push goes through {Cell(4)} to {Cell(5)}");
+            // The Sram off the foe's way, the foe at 4, walking onto the first trap's arm at 3.
+            var path = new HashSet<int> { Cell(3), Cell(4), Cell(5), landing, Along(Cell(5), -side.Dx, -side.Dy, 1) };
+            if (path.Contains(me.CellId) || fight.Glifos.Any(g => g.Cubre(me.CellId)))
+            {
+                int aside = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && !path.Contains(c) && !fight.Glifos.Any(g => g.Cubre(c)))
+                                      .OrderBy(c => MapGeometry.Distance(c, me.CellId)).DefaultIfEmpty(-1).First();
+                if (aside >= 0) PutAt(session, fight, me, aside);
+            }
+            if (!PutAll(session, fight, (foe, Cell(4)))) { sc.Check("the foe on the row by the first trap", false, $"foe on {foe.CellId}"); return; }
+            if (pinned) GiveState(fight, me, foe, Indesplazable, 2);
+            int life = foe.CurrentHP;
+            RunInSession(session, async stream => await FightHandler.TestWalkAsync(stream, fight, foe, Cell(3)));
+            Pause();
+            bool firstGone = !fight.Glifos.Contains(first), secondGone = !fight.Glifos.Contains(second);
+            sc.Check("walking onto the first trap's arm sets it off and hurts him", firstGone && foe.CurrentHP < life,
+                     $"first trap {(firstGone ? "gone" : "still there")}, life {life} -> {foe.CurrentHP}");
+            if (pinned)
+            {
+                sc.Check("pinned, he stays on the cell he walked onto", foe.CellId == Cell(3), $"on cell {foe.CellId} (walked onto {Cell(3)})");
+                sc.Check("and the second trap waits, untouched", !secondGone, secondGone ? "gone" : "still there");
+                return;
+            }
+            sc.Check("pushed two cells along the row onto the second trap's arm, it goes off too", secondGone,
+                     $"second trap {(secondGone ? "gone" : "still there")}");
+            sc.Check("and it pushes him two cells away from its own centre: sideways, the two moves piled up", foe.CellId == landing,
+                     $"on cell {foe.CellId} (expected {landing}: two along from {Cell(3)} to {Cell(5)}, two across)");
+            sc.Note($"life {life} -> {foe.CurrentHP}: two traps' blows");
+        }
+
+        // ─── The Sadida (class sheet 1087857, «Los árboles», «Las muñecas», «La infección») ──
+
+        private static void SadidaTrees(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int Arbol = 13519, LaLoca = 13564, Zarza = 13516;
+            const int Tree = 5894, Doll = 5896, Frondoso = 256, Infectado = 263;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 4);
+            List<Fighter> Trees() => fight.Todos.Where(f => f.IsAlive && f.EsInvocado && f.Invocador == me.Id && f.MonsterId == Tree).ToList();
+            int Spot() => Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) is >= 2 and <= 4)
+                                    .OrderBy(c => MapGeometry.Distance(c, me.CellId)).DefaultIfEmpty(-1).First();
+
+            // «Un árbol se convierte naturalmente en Frondoso un turno después de su invocación.»
+            int at = Spot();
+            CastAt(session, Arbol, at);
+            var tree = Trees().FirstOrDefault(t => t.CellId == at);
+            if (!sc.Check("Árbol summons a tree on a free cell", tree != null, tree == null ? $"nothing on {at}" : $"tree {tree.Id} on {at}, {tree.MaxHP} life")) return;
+            sc.Check("a new tree is not Frondoso yet", !tree!.Buffs.TieneEstado(Frondoso), tree.Buffs.TieneEstado(Frondoso) ? "Frondoso already" : "not Frondoso");
+            int life = tree.MaxHP;
+            bool back = PassTurn(session, fight, me);
+            sc.Check("a turn later it is Frondoso", back && tree.IsAlive && tree.Buffs.TieneEstado(Frondoso), $"turn back {back}, Frondoso {tree.Buffs.TieneEstado(Frondoso)}");
+            // «Cuando un árbol se vuelve frondoso, su vitalidad se duplica, pero ya no puede ser atraído ni empujado.»
+            sc.Check("Frondoso, its life doubles", tree.MaxHP == life * 2, $"maximum life {life} -> {tree.MaxHP}");
+            sc.Check("and it can no longer be pushed or pulled", Managers.SpellStates.Of(Frondoso)?.CantBePushed == true && tree.Buffs.TieneEstado(Frondoso),
+                     $"state {Frondoso} cantBePushed {Managers.SpellStates.Of(Frondoso)?.CantBePushed}");
+
+            // A doll from a tree: «Las muñecas invocadas a partir de un árbol se volverán a convertir
+            // en árbol cuando mueran. Si el árbol era frondoso, el resultante ... también lo será.»
+            FreshTurn(session, fight, me, keep: true);
+            int treeCell = tree.CellId;
+            CastAt(session, LaLoca, treeCell);
+            var doll = fight.Todos.FirstOrDefault(f => f.IsAlive && f.EsInvocado && f.Invocador == me.Id && f.CellId == treeCell && f.MonsterId != Tree);
+            if (sc.Check("La Loca cast on the tree replaces it with the doll", doll != null && !tree.IsAlive,
+                         doll == null ? $"no doll on {treeCell}; tree alive {tree.IsAlive}" : $"monster {doll.MonsterId} on {treeCell} (La Loca is {Doll}); tree alive {tree.IsAlive}"))
+            {
+                RunInSession(session, stream => FightHandler.TestKillAsync(stream, fight, doll!, me));
+                Pause();
+                var again = Trees().FirstOrDefault(t => t.CellId == treeCell);
+                sc.Check("the doll dying turns back into a tree", again != null, again == null ? $"nothing on {treeCell}" : $"tree {again.Id}");
+                if (again != null) sc.Check("a Frondoso one, as the tree was", again.Buffs.TieneEstado(Frondoso), again.Buffs.TieneEstado(Frondoso) ? "Frondoso" : "not Frondoso");
+            }
+
+            // «...solo pueden tener como máximo 6 árboles en el terreno. Cuando alguno de ellos planta
+            // un séptimo árbol, este provoca la muerte del primero.»
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            Fighter? firstTree = null;
+            for (int k = 0; k < 7; k++)
+            {
+                FreshTurn(session, fight, me, keep: true);
+                int cell = Spot();
+                if (cell < 0) cell = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c)).OrderBy(c => MapGeometry.Distance(c, me.CellId)).First();
+                CastAt(session, Arbol, cell);
+                firstTree ??= Trees().FirstOrDefault();
+            }
+            var trees = Trees();
+            sc.Check("seven planted, six stand", trees.Count == 6, $"{trees.Count} tree(s)");
+            sc.Check("and the first one is the one gone", firstTree != null && !firstTree.IsAlive, firstTree == null ? "no first tree" : $"first tree {firstTree.Id} alive {firstTree.IsAlive}");
+
+            // «Cuando un hechizo monobjetivo del sadida alcanza a un enemigo infectado, los efectos del
+            // hechizo afectan también a los demás enemigos infectados.»
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            var foes = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado).OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).Take(2).ToList();
+            if (foes.Count < 2) { sc.Note("one foe only: infection's spread not tried"); return; }
+            // Zarza infects whom it hits (its 950 263 on A); each foe hit once.
+            int a = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 3).DefaultIfEmpty(-1).First();
+            PutAll(session, fight, (foes[0], a));
+            int b = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 3 && MapGeometry.Distance(c, a) >= 3).DefaultIfEmpty(-1).First();
+            PutAll(session, fight, (foes[1], b));
+            foreach (var foe in foes)
+            {
+                FreshTurn(session, fight, me, keep: true);
+                CastAt(session, Zarza, foe.CellId);
+            }
+            sc.Check("Zarza leaves each foe it hits infected", foes.All(f => f.Buffs.TieneEstado(Infectado)),
+                     string.Join(", ", foes.Select(f => $"{f.Id} infected {f.Buffs.TieneEstado(Infectado)}")));
+            // A single-target spell on one: the other infected one, three cells away, takes it too.
+            FreshTurn(session, fight, me, keep: true);
+            int other = foes[1].CurrentHP;
+            CastAt(session, Zarza, foes[0].CellId);
+            sc.Check("a single-target spell on one infected foe reaches the other infected one", foes[1].CurrentHP < other,
+                     $"the other's life {other} -> {foes[1].CurrentHP}");
+        }
+
+
+        // ─── The Eniripsa (class sheet 1063431, «Los ánimos y las burlas») ──────────
+
+        /// <summary>
+        /// «No se puede acumular más de 1 ánimo por aliado: si se aplica un nuevo ánimo a un objetivo
+        /// ya Animado, entonces el nuevo bonus remplaza al antiguo. También sucede igual con las
+        /// burlas.» And «cuando se usan estos hechizos en espacio vacío, sirven para invocar hadas
+        /// (ánimos) y fuegos fatuos (burlas)».
+        /// </summary>
+        private static void EniripsaWords(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int Estimulante = 25742, Revitalizante = 25744, Declive = 25746, Deprimente = 25748;
+            const int Animado = 4157, Burlado = 4163, Fairy = 7372;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 4);
+            string RowsOf(Fighter who, int spell) => string.Join(", ", who.Buffs.Puestos.Where(r => r.HechizoOrigen == spell)
+                                                                       .Select(r => r.Estado != 0 ? $"state {r.Estado}" : $"{r.EffectId} {r.Cuanto:+0;-0;0}"));
+            bool Has(Fighter who, int spell) => who.Buffs.Puestos.Any(r => r.HechizoOrigen == spell);
+
+            // An ánimo on himself, then another: the first one's bonus goes.
+            CastAt(session, Estimulante, me.CellId);
+            sc.Check("Palabra Estimulante leaves him Animado with its bonus", me.Buffs.TieneEstado(Animado) && Has(me, Estimulante),
+                     $"Animado {me.Buffs.TieneEstado(Animado)}; its rows: {RowsOf(me, Estimulante)}");
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Revitalizante, me.CellId);
+            sc.Check("Palabra Revitalizante gives its own bonus", Has(me, Revitalizante), $"its rows: {RowsOf(me, Revitalizante)}");
+            sc.Check("and Palabra Estimulante's is gone: one ánimo at a time", !Has(me, Estimulante),
+                     Has(me, Estimulante) ? $"still: {RowsOf(me, Estimulante)}" : "gone");
+            sc.Check("he stays Animado", me.Buffs.TieneEstado(Animado), me.Buffs.TieneEstado(Animado) ? "Animado" : "not Animado");
+
+            // The same with the burlas, on a foe.
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            if (foe != null)
+            {
+                FreshTurn(session, fight, me, keep: true);
+                int spot = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 2).DefaultIfEmpty(-1).First();
+                PutAll(session, fight, (foe, spot));
+                CastAt(session, Declive, foe.CellId);
+                sc.Check("Palabra de Declive leaves the foe Burlado", foe.Buffs.TieneEstado(Burlado) && Has(foe, Declive),
+                         $"Burlado {foe.Buffs.TieneEstado(Burlado)}; its rows: {RowsOf(foe, Declive)}");
+                FreshTurn(session, fight, me, keep: true);
+                CastAt(session, Deprimente, foe.CellId);
+                sc.Check("Palabra Deprimente puts its own", Has(foe, Deprimente), $"its rows: {RowsOf(foe, Deprimente)}");
+                sc.Check("and Palabra de Declive's is gone: one burla at a time", !Has(foe, Declive),
+                         Has(foe, Declive) ? $"still: {RowsOf(foe, Declive)}" : "gone");
+            }
+
+            // On an empty cell, an ánimo summons its fairy.
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            int empty = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 2).DefaultIfEmpty(-1).First();
+            CastAt(session, Estimulante, empty);
+            var born = fight.Todos.FirstOrDefault(f => f.IsAlive && f.EsInvocado && f.Invocador == me.Id && f.CellId == empty);
+            sc.Check("Palabra Estimulante on an empty cell summons its fairy", born != null && born.MonsterId == Fairy,
+                     born == null ? $"nothing on {empty}" : $"monster {born.MonsterId} (the fairy is {Fairy})");
+        }
+
+        // ─── The Huppermage (class sheet 1057739, «Los estados elementales», «Las runas») ──
+
+        /// <summary>
+        /// «Los hechizos elementales ... aplican estados elementales cuando alcanzan a un enemigo»,
+        /// with a rune of that element under him; «solo puede haber una runa por casilla»; two
+        /// different states make a combination -- earth and fire, «bonus de daños finales recibidos»
+        /// on the target for a turn, power for the Huppermage «una vez máximo por combinación».
+        /// </summary>
+        private static void HuppermageElements(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int OndaSismica = 13668, Lanzallamas = 13666, Erupcion = 13707;
+            const int Fire = 290, Water = 291, Earth = 292, Air = 293;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 4);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            int spot = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 3).DefaultIfEmpty(-1).First();
+            PutAll(session, fight, (foe, spot));
+            string Elements(Fighter f) => string.Join(" ", new[] { (Fire, "fire"), (Water, "water"), (Earth, "earth"), (Air, "air") }
+                                                            .Where(e => f.Buffs.TieneEstado(e.Item1)).Select(e => e.Item2).DefaultIfEmpty("none"));
+            List<Glifo> RunesOn(int cell) => fight.Glifos.Where(g => g.Cubre(cell) && g.Dueno == me.Id).ToList();
+
+            CastAt(session, OndaSismica, foe.CellId);
+            sc.Check("an earth spell leaves the foe in the earth state", foe.Buffs.TieneEstado(Earth), Elements(foe));
+            var first = RunesOn(foe.CellId);
+            sc.Check("and an earth rune under him", first.Count == 1, first.Count == 0 ? "no rune" : string.Join(", ", first.Select(g => $"mark {g.Id} casting {g.Hechizo}")));
+
+            // Fire on the same foe: earth + fire, Erupción.
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Lanzallamas, foe.CellId);
+            sc.Check("a fire spell on him makes the earth/fire combination: his elemental states go", !foe.Buffs.TieneEstado(Earth) && !foe.Buffs.TieneEstado(Fire),
+                     $"states left: {Elements(foe)}");
+            sc.Check("the combination leaves him taking more damage", foe.Buffs.Puestos.Any(r => r.HechizoOrigen == Erupcion),
+                     string.Join(", ", foe.Buffs.Puestos.Where(r => r.HechizoOrigen == Erupcion).Select(r => $"{r.EffectId} {r.Valor}")).DefaultIfEmptyText("no row of Erupción"));
+            int power = me.Buffs.Puestos.Count(r => r.HechizoOrigen == Erupcion && r.EffectId == 138);
+            sc.Check("and gives the Huppermage power", power == 1, $"{power} power row(s) of Erupción");
+            var runes = RunesOn(foe.CellId);
+            sc.Check("one rune per cell: the fire rune replaced the earth one", runes.Count == 1 && first.All(f => !fight.Glifos.Contains(f)),
+                     string.Join(", ", runes.Select(g => $"mark {g.Id} casting {g.Hechizo}")).DefaultIfEmptyText("no rune"));
+
+            // The same combination again: its power does not pile up.
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, OndaSismica, foe.CellId);
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Lanzallamas, foe.CellId);
+            power = me.Buffs.Puestos.Count(r => r.HechizoOrigen == Erupcion && r.EffectId == 138);
+            sc.Check("the same combination again gives no more power", power == 1, $"{power} power row(s) of Erupción");
+        }
+
+        // ─── The Selatrop (class sheet 1172961, «Los portales») ──────────────────────
+
+        /// <summary>
+        /// «Se colocan en casillas del terreno libres»; «hace falta un mínimo de dos portales
+        /// activos para formar una red»; «no se puede colocar un portal en una casilla donde ya
+        /// haya otro portal»; walking onto one, «la entidad llega a la casilla del portal de
+        /// destino»; «los portales pueden cerrarse con los hechizos Neutral e Interrupción»; «cada
+        /// equipo tiene un límite de cuatro portales».
+        /// </summary>
+        private static void SelatropPortals(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int PortalSpell = 14574, Neutral = 14582;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            // The portals of this fight's earlier spells off the board: a scenario starts from none.
+RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
+            ToOpenGround(session, fight, me, 4);
+            var reach = FightHandler.ReachOf(fight, me, PortalSpell);
+            int Free(int distance, params int[] not) => Enumerable.Range(0, 560)
+                .Where(c => FreeCell(fight, c) && fight.Portales.At(c) == null && !not.Contains(c) && MapGeometry.Distance(c, me.CellId) == distance)
+                .DefaultIfEmpty(-1).First();
+            int far = Math.Clamp(3, Math.Max(1, reach.Min), Math.Max(1, reach.Max));
+
+            int a = Free(far);
+            CastAt(session, PortalSpell, a);
+            var first = fight.Portales.At(a);
+            if (!sc.Check("Portal lays a portal on a free cell", first != null, first == null ? $"no portal on {a}" : first.ToString())) return;
+            sc.Check("alone, it is no network: off", !first!.Active, first.Active ? "on" : "off");
+
+            FreshTurn(session, fight, me, keep: true);
+            int b = Free(far, a);
+            CastAt(session, PortalSpell, b);
+            var second = fight.Portales.At(b);
+            sc.Check("a second one makes the network: both on", second != null && second.Active && first.Active,
+                     $"first {(first.Active ? "on" : "off")}, second {(second == null ? "none" : second.Active ? "on" : "off")}");
+
+            FreshTurn(session, fight, me, keep: true);
+            int count = fight.Portales.Count;
+            CastAt(session, PortalSpell, a);
+            sc.Check("no portal goes on a cell that has one", fight.Portales.Count == count && fight.Portales.At(a) == first,
+                     $"{count} -> {fight.Portales.Count} portal(s), on {a}: {fight.Portales.At(a)}");
+
+            // A foe walking onto the first comes out on the second's cell.
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, a)).FirstOrDefault();
+            if (foe != null && second != null)
+            {
+                int beside = MapGeometry.GetNeighbors(a).Where(c => FreeCell(fight, c) && fight.Portales.At(c) == null).DefaultIfEmpty(-1).First();
+                if (beside >= 0 && PutAll(session, fight, (foe, beside)))
+                {
+                    RunInSession(session, async stream => await FightHandler.TestWalkAsync(stream, fight, foe, a));
+                    Pause();
+                    sc.Check("walking onto a portal, he comes out on the other's cell", foe.CellId == b,
+                             $"on {foe.CellId} (walked onto {a}, the other portal on {b})");
+                }
+                else sc.Note("no free cell beside the first portal for the foe");
+            }
+
+            // Neutral closes the one it aims at: out of the network until the Selatrop's next turn.
+            FreshTurn(session, fight, me, keep: true);
+            var target = second != null && fight.Todos.All(f => !f.IsAlive || f.CellId != b) ? second : first;
+            int aimed = target.Cell;
+            if (fight.Todos.Any(f => f.IsAlive && f.CellId == aimed)) aimed = target == first ? b : a;
+            CastAt(session, Neutral, aimed);
+            var closed = fight.Portales.At(aimed);
+            sc.Check("Neutral closes the portal it aims at", closed != null && (!closed.Active || closed.NeutralisedBy != 0),
+                     closed == null ? $"no portal on {aimed}" : $"{closed}: {(closed.Active ? "on" : "off")}, closed by {closed.NeutralisedBy}");
+
+            // Four a side: the fifth takes the oldest away.
+            FreshTurn(session, fight, me, keep: true);
+RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
+            var laid = new List<int>();
+            for (int k = 0; k < 5; k++)
+            {
+                FreshTurn(session, fight, me, keep: true);
+                int cell = Enumerable.Range(Math.Max(1, reach.Min), Math.Max(1, reach.Max)).Select(d => Free(d, laid.ToArray())).FirstOrDefault(c => c >= 0, -1);
+                if (cell < 0) break;
+                CastAt(session, PortalSpell, cell);
+                if (fight.Portales.At(cell) != null) laid.Add(cell);
+            }
+            var mine = fight.Portales.All.Where(p => p.Owner == me.Id).ToList();
+            sc.Check("five laid, four stand", laid.Count == 5 && mine.Count == 4, $"{laid.Count} laid, {mine.Count} on the board");
+            if (laid.Count == 5) sc.Check("and the first one is the one gone", fight.Portales.At(laid[0]) == null, $"on {laid[0]}: {fight.Portales.At(laid[0])?.ToString() ?? "none"}");
+        }
+
+        // ─── The Zurcarák (class sheet 1086903, «El póquer de Zurcarák») ─────────────
+
+        /// <summary>
+        /// «Todos los hechizos elementales del zurcarák ... le permiten robar cartas. Solo puede
+        /// haber un ejemplar de cada carta en la mano, y una mano puede componerse de 4 cartas como
+        /// máximo. Una vez llena, la mano ya no se puede modificar.» A card is a state on him (Kraps
+        /// and Baraka, 3 AP of water, both the queen of clubs, 5446); the hand counts itself in
+        /// 5461..5464.
+        /// </summary>
+        private static void ZurcarakPoker(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int Kraps = 12883, Baraka = 12848, Reflejos = 12857, GarraJuguetona = 12849, Jass = 12864, Topkaj = 12846;
+            int[] hand = { 5461, 5462, 5463, 5464 };
+            var cardOf = new Dictionary<int, int> { [Kraps] = 5446, [Baraka] = 5446, [Reflejos] = 5440, [GarraJuguetona] = 5447, [Jass] = 5442, [Topkaj] = 5448 };
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderByDescending(f => f.CurrentHP).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            int Size() => hand.Select((s, i) => me.Buffs.TieneEstado(s) ? i + 1 : 0).DefaultIfEmpty(0).Max();
+            string Cards() => string.Join(", ", cardOf.Values.Distinct().Where(me.Buffs.TieneEstado)).DefaultIfEmptyText("none");
+            bool Play(int spell)
+            {
+                FreshTurn(session, fight, me, keep: true);
+                if (!StageForMove(session, fight, me, foe, spell, Displacement.Push)) return false;
+                return CastAt(session, spell, foe.CellId).Any(l => l.Contains("Casts spell"));
+            }
+            sc.Check("the hand starts empty", Size() == 0 && Cards() == "none", $"hand {Size()}, cards {Cards()}");
+
+            Play(Kraps);
+            sc.Check("Kraps (3 AP, water) draws the queen of clubs", me.Buffs.TieneEstado(cardOf[Kraps]) && Size() == 1, $"hand {Size()}, cards {Cards()}");
+            Play(Baraka);
+            sc.Check("Baraka, the same card, draws nothing more: one of each card", Size() == 1, $"hand {Size()}, cards {Cards()}");
+
+            foreach (int spell in new[] { Reflejos, GarraJuguetona, Jass }) Play(spell);
+            sc.Check("three other cards fill the hand: four", Size() == 4 && new[] { Kraps, Reflejos, GarraJuguetona, Jass }.All(s => me.Buffs.TieneEstado(cardOf[s])),
+                     $"hand {Size()}, cards {Cards()}");
+            Play(Topkaj);
+            sc.Check("a full hand takes no fifth card", !me.Buffs.TieneEstado(cardOf[Topkaj]) && Size() == 4, $"hand {Size()}, cards {Cards()}");
+        }
+
+        // ─── The Yopuka's Furor (its description: «los daños del hechizo aumentan después de cada
+        //     lanzamiento ... los bonus disminuyen si el hechizo no se vuelve a lanzar») ─────
+
+        private static void YopukaFuror(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int Furor = 13156;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderByDescending(f => f.CurrentHP).FirstOrDefault();
+            if (foe == null) { sc.Check("a foe", false, "none"); return; }
+            int Bonus() => me.Buffs.DelHechizo(Furor, SpellAspect.DanoBase, fight.RoundNumber);
+            bool Strike()
+            {
+                var reach = FightHandler.ReachOf(fight, me, Furor);
+                int at = Math.Clamp(1, Math.Max(1, reach.Min), Math.Max(1, reach.Max));
+                int spot = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == at).DefaultIfEmpty(-1).First();
+                if (spot >= 0) PutAll(session, fight, (foe, spot));
+                return CastAt(session, Furor, foe.CellId).Any(l => l.Contains("Casts spell"));
+            }
+            int start = Bonus();
+            sc.Check("the scenario starts with no Furor bonus", start == 0, $"+{start}");
+            Strike();
+            int first = Bonus();
+            sc.Check("the first cast leaves a bonus on Furor's damage", first > 0, $"+{first}");
+            bool back = PassTurn(session, fight, me);
+            FreshTurn(session, fight, me, keep: true);
+            Strike();
+            int second = Bonus();
+            sc.Check("cast again the next turn, the bonus grows", back && second > first, $"+{first} -> +{second} (turn back {back})");
+            back = PassTurn(session, fight, me);
+            FreshTurn(session, fight, me, keep: true);
+            Strike();
+            int third = Bonus();
+            sc.Check("a third time it stays at its cap", back && third == second, $"+{second} -> +{third}");
+            // A turn without casting it: the bonus goes down.
+            back = PassTurn(session, fight, me) && PassTurn(session, fight, me);
+            int after = Bonus();
+            sc.Check("not cast again, the bonus goes down", back && after < third, $"+{third} -> +{after} (turns back {back})");
+        }
+
+        // ─── The Zobal (class sheet 888304, «Las máscaras») ─────────────────────────
+
+        private static void ZobalMasks(GameSession session, FightInstance fight, Fighter me, Scenario sc)
+        {
+            const int Intrepido = 13386, Saikopat = 13388, Coraza = 13397;
+            const int Tank = 98, Damage = 99, Mobility = 100;
+            FreshTurn(session, fight, me, keep: false, withoutSummons: true);
+            ToOpenGround(session, fight, me, 3);
+            string Mask() => me.Buffs.TieneEstado(Tank) ? "tank (98)" : me.Buffs.TieneEstado(Damage) ? "damage (99)" : me.Buffs.TieneEstado(Mobility) ? "mobility (100)" : "none";
+            var reach = FightHandler.ReachOf(fight, me, Coraza);
+            var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
+                                 .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
+            int CorazaCell()
+            {
+                if (reach.Min == 0) return me.CellId;
+                int spot = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == Math.Max(1, reach.Min)).DefaultIfEmpty(-1).First();
+                if (foe != null) PutAll(session, fight, (foe, spot));
+                return foe?.CellId ?? spot;
+            }
+            // From the damage mask, whatever the earlier spells left on: a mask stays until another
+            // takes its place.
+            CastAt(session, Saikopat, me.CellId);
+            sc.Check("Máscara Sáikopat puts the damage mask on", Mask() == "damage (99)", Mask());
+
+            // «Cuando una máscara está activa, bloquea la utilización de ciertos hechizos y desbloquea otros.»
+            int ap = me.CurrentAP;
+            CastAt(session, Coraza, CorazaCell());
+            sc.Check("without the tank mask Coraza (which asks for it) cannot be cast", me.CurrentAP == ap, $"AP {ap} -> {me.CurrentAP}");
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Intrepido, me.CellId);
+            sc.Check("Máscara de Intrépido puts the tank mask on", Mask() == "tank (98)", Mask());
+            sc.Check("and Sáikopat's effects go with the damage mask", !me.Buffs.Puestos.Any(b => b.HechizoOrigen == Saikopat),
+                     string.Join(", ", me.Buffs.Puestos.Where(b => b.HechizoOrigen == Saikopat).Select(b => $"{b.EffectId}")).DefaultIfEmptyText("none left"));
+            var tankRows = me.Buffs.Puestos.Where(b => b.HechizoOrigen == Intrepido).Select(b => b.Numero).ToList();
+            ap = me.CurrentAP;
+            CastAt(session, Coraza, CorazaCell());
+            sc.Check("with it Coraza is cast", me.CurrentAP < ap, $"AP {ap} -> {me.CurrentAP}");
+
+            // «Los zobals solo pueden usar una máscara cada vez ... Utilizar una máscara nueva retira
+            //  los efectos de la máscara utilizada anteriormente y fija su intervalo de lanzamiento en 1 turno.»
+            CastAt(session, Saikopat, me.CellId);
+            sc.Check("Máscara Sáikopat swaps it for the damage mask", Mask() == "damage (99)", Mask());
+            var left = me.Buffs.Puestos.Where(b => tankRows.Contains(b.Numero)).ToList();
+            sc.Check("and the tank mask's effects go with it", left.Count == 0, left.Count == 0 ? "none left" : $"{left.Count} row(s) of Intrépido left");
+            ap = me.CurrentAP;
+            CastAt(session, Coraza, CorazaCell());
+            sc.Check("Coraza is locked again", me.CurrentAP == ap, $"AP {ap} -> {me.CurrentAP}");
+            ap = me.CurrentAP;
+            CastAt(session, Intrepido, me.CellId);
+            sc.Check("the mask just taken off cannot be put back the same turn", Mask() == "damage (99)" && me.CurrentAP == ap, $"{Mask()}, AP {ap} -> {me.CurrentAP}");
         }
 
         // ─── The Tymador's bombs (class sheet 1010378, «Las bombas») ──────────────────

@@ -825,7 +825,7 @@ namespace Jondo.Unity.Server.Handlers
                 // 187 ("este bonus cambia con el nivel del pandawa"). Put at grade 1, every
                 // character fought with his first passive.
                 if (pasivo != 0)
-                    playerFighter.Buffs.PonerActitud(pasivo, Math.Max(1, Managers.SpellTable.GradeFor(pasivo, GameState.CharacterLevel)));
+                    playerFighter.Buffs.PonerActitud(pasivo, Managers.SpellTable.PassiveGrade(pasivo, GameState.CharacterLevel));
             }
 
             // And the dream's passives, cast on him the same way (see Dreams.PassiveEffect).
@@ -2025,7 +2025,14 @@ namespace Jondo.Unity.Server.Handlers
             }
             else if (payloadStr.Contains("type.ankama.com/jxy"))
             {
-                // Pass turn. It comes empty.
+                // Pass turn. It comes empty -- or, on a test server, with the client's "IsAfk":
+                // the harness plays the character from the server, the client sees its player
+                // do nothing and passes his turns on its own, mid-scenario. Those are not his.
+                if (Network.ControlApi.TestKey.Length > 0 && Network.FightProtocol.ReadIdlePass(payload))
+                {
+                    Program.LogDebug("[Fight] The client passes the turn as idle; on a test server the harness plays it: kept.");
+                    return;
+                }
                 await PassTurnAsync(stream);
             }
             else if (payloadStr.Contains(Op.Uri(Op.Jrw)))
@@ -2766,9 +2773,11 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     if (!buff.Vivo(fight.RoundNumber)) continue;
                     var (categoria, boost) = DatabaseManager.EffectFamily(buff.EffectId);
+                    // A state's row keeps its state and no amount: its number is the value the
+                    // client describes it by ("Estado #3"), and with none it threw on the panel.
                     yield return Network.FightProtocol.BuildBuff(
                         quien.Id, buff.Quien, buff.Numero, buff.EffectId, buff.EffectUid,
-                        buff.Cuanto, 0, 0, buff.HechizoOrigen, buff.Disparador, buff.CaducaEnRonda,
+                        buff.Estado != 0 && buff.Cuanto == 0 ? buff.Estado : buff.Cuanto, 0, 0, buff.HechizoOrigen, buff.Disparador, buff.CaducaEnRonda,
                         0, Network.FightProtocol.FamiliaDelEmbrujo(buff.EffectId, categoria, boost),
                         buff.NivelOrigen, buff.Critico);
                 }
@@ -3628,8 +3637,13 @@ namespace Jondo.Unity.Server.Handlers
             var owner = fighter.PlaysOnItsOwn ? null : Dueno(fight, fighter);
             if (!fighter.IsMonster)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jyj,
-                    Network.FightProtocol.BuildYourTurn()));
+                // To his own client alone. Sent to everybody, every other person in a fight of
+                // several -- a koliseo, a duel, a group against monsters -- and every spectator
+                // got "you can play now" on somebody else's turn, its "pass your turn" button
+                // with it. A JondoBot has no client.
+                var his = fighter.IsBot ? null : SessionRegistry.FindByCharacter(fighter.Id);
+                if (his != null)
+                    await his.SendAsync(ConnectionProtocol.Push(Op.Jyj, Network.FightProtocol.BuildYourTurn()));
             }
             else if (owner != null)
             {
@@ -3683,7 +3697,12 @@ namespace Jondo.Unity.Server.Handlers
             // Handed on at once before, whatever it could do.
             var invocador = fighter.EsInvocado ? fight.Buscar(fighter.Invocador) : null;
             bool deUnMonstruo = invocador is { IsMonster: true } || invocador is { IsBot: true };
-            if (fighter.IsBot || (fighter.IsMonster && (!fighter.EsInvocado || fighter.PlaysOnItsOwn || deUnMonstruo)))
+            if (fighter.DrivenBy != 0 && !fighter.PlaysOnItsOwn)
+            {
+                // A team test's JondoBot, or a summon of one: the harness plays it through its
+                // session's jwh and jxy, as a player plays his turn. Nothing to do until it does.
+            }
+            else if (fighter.IsBot || (fighter.IsMonster && (!fighter.EsInvocado || fighter.PlaysOnItsOwn || deUnMonstruo)))
             {
                 // A Koliseo JondoBot plays like a monster: nobody's client plays it, and neither
                 // its summons.
@@ -4850,7 +4869,7 @@ namespace Jondo.Unity.Server.Handlers
             int probabilidadCritico = limites.CriticoPropio +
                 ConBonos(caster, CriticoCaracteristica, caster.CriticalBonus, fight.RoundNumber) +
                 Managers.SpellModifiers.Critical(caster, spell, fight.RoundNumber);
-            bool critico = TirarCritico(probabilidadCritico);
+            bool critico = AlwaysCritical.ContainsKey(caster.Id) || TirarCritico(probabilidadCritico);
             if (critico)
             {
                 Program.LogDebug($"[Fight] CRITICAL! with spell {spell} " +
@@ -5151,7 +5170,13 @@ namespace Jondo.Unity.Server.Handlers
                 return null;
             }
 
-            int celda = CasillaLibreCerca(fight, celdaApuntada >= 0 ? celdaApuntada : quienInvoca.CellId);
+            // Whoever is dying on the aimed cell leaves it: what his death summons takes his
+            // place -- a Sadida's doll turns back into its tree where it stood, «se volverán a
+            // convertir en árbol cuando mueran». Counted there, the tree came out next door.
+            int deseada = celdaApuntada >= 0 ? celdaApuntada : quienInvoca.CellId;
+            bool soloElQueMuere = TodosLosCombatientes(fight).Where(f => f != null && f.IsAlive && f.Occupies(deseada)).All(f => f.Muriendo)
+                                  && MapGeometry.IsValid(deseada);
+            int celda = soloElQueMuere ? deseada : CasillaLibreCerca(fight, deseada);
             if (celda < 0)
             {
                 Program.LogDebug($"[Fight] There is no free place to summon {plantilla}.");
@@ -5441,8 +5466,83 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), author, Network.FightProtocol.ActionSequence)));
         }
 
+        /// <summary>
+        /// For the test harness: one fighter struck down as a blow strikes down -- its "on dying"
+        /// first (a Sadida's doll turns back into its tree), told dead, its summons with it.
+        /// </summary>
+        internal static async Task TestKillAsync(NetworkStream stream, FightInstance fight, Fighter victim, Fighter killer)
+        {
+            await InASequenceAsync(fight, killer.Id, async () =>
+            {
+                if (!await AlMorirAsync(stream, fight, victim, killer) || !victim.IsAlive) return;
+                victim.CurrentHP = 0;
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(killer.Id, victim.Id)));
+                await CaenSusInvocadosAsync(stream, fight, victim);
+            });
+            fight.RebuildTurnOrderOnFighterDeath();
+            await ReenviarLaListaAsync(stream, fight);
+        }
+
+        /// <summary>
+        /// For the test harness: every fighter down to a share of his life, told as a blow the
+        /// board sees -- a heal tried on a board at full life shows nothing.
+        /// </summary>
+        internal static async Task TestHurtAsync(NetworkStream stream, FightInstance fight, int percent)
+        {
+            await InASequenceAsync(fight, fight.CurrentFighter?.Id ?? 0, async () =>
+            {
+                foreach (var f in fight.Todos.Where(x => x.IsAlive).ToList())
+                {
+                    int target = Math.Max(1, f.MaxHP * percent / 100);
+                    int amount = f.CurrentHP - target;
+                    if (amount <= 0) continue;
+                    f.CurrentHP = target;
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildPushDamage(f.Id, f.Id, amount)));
+                    await RefrescarLaVidaAsync(stream, fight, f, f);
+                }
+            });
+        }
+
+        /// <summary>«Coloca una runa»: a Huppermage's rune on the ground.</summary>
+        private const int RunaDelSuelo = 2022;
+
+        /// <summary>For the test harness: the fighters whose every cast is critical (an item's "on a critical" trigger to provoke).</summary>
+        internal static readonly System.Collections.Concurrent.ConcurrentDictionary<long, bool> AlwaysCritical = new();
+
+        /// <summary>
+        /// For the test harness: the fight ended as a win of the given team -- every fighter of
+        /// the other side down, told dead as any death, and the fight closed the way it closes.
+        /// </summary>
+        internal static async Task TestFinishAsync(NetworkStream stream, FightInstance fight, int winners)
+        {
+            foreach (var loser in fight.Todos.Where(f => f.IsAlive && f.TeamId != winners && !f.EsInvocado).ToList())
+            {
+                loser.CurrentHP = 0;
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(loser.Id, loser.Id)));
+                await CaenSusInvocadosAsync(stream, fight, loser);
+            }
+            fight.RebuildTurnOrderOnFighterDeath();
+            await CheckFightOverAsync(stream, fight);
+        }
+
+        /// <summary>For the test harness: a state on a fighter as a spell's 950 leaves it, its row told to the board.</summary>
+        internal static async Task GiveStateAsync(FightInstance fight, Fighter who, int state, int rounds)
+        {
+            var row = who.Buffs.Poner(new Buff
+            {
+                EffectId = Jondo.Unity.World.Combat.EffectSupport.AddState, Estado = state, Cuanto = state, Quien = who.Id,
+                Disparador = Managers.EffectEngine.AlLanzar, CaducaEnRonda = fight.RoundNumber + rounds, EmpiezaEnRonda = fight.RoundNumber,
+            }, fight.SiguienteEmbrujo);
+            who.Buffs.PonerEstado(state);
+            var (categoria, boost) = DatabaseManager.EffectFamily(row.EffectId);
+            await InASequenceAsync(fight, who.Id, () => ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxm, Network.FightProtocol.BuildBuff(
+                who.Id, who.Id, row.Numero, row.EffectId, row.EffectUid, state, 0, 0, 0, row.Disparador, row.CaducaEnRonda, 0,
+                Network.FightProtocol.FamiliaDelEmbrujo(row.EffectId, categoria, boost), 1, false))));
+            Program.LogDebug($"[Fight] Harness: state {state} on {who.Id} until round {row.CaducaEnRonda}.");
+        }
+
         /// <summary>For the harness's refreshes: the rows every fighter held the first time the fight was refreshed.</summary>
-        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<FightInstance, HashSet<(long, int)>> RowsAtTheStart = new();
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<FightInstance, Dictionary<long, List<Buff>>> RowsAtTheStart = new();
 
         private static async Task FreshTurnStepsAsync(NetworkStream stream, FightInstance fight, Fighter who, bool keepBoard)
         {
@@ -5454,13 +5554,46 @@ namespace Jondo.Unity.Server.Handlers
             // lost the telefrag states his passive gives (24941) and his syncro never grew. And so
             // do the rows the fight started with, which the passives' chains leave under their
             // children's names: the Pandawa's Sobrio is 24037's, cast by La Jarrita de Pandawa.
-            var atTheStart = RowsAtTheStart.GetValue(fight, f => f.Todos.SelectMany(x => x.Buffs.Puestos.Select(r => (x.Id, r.Numero))).ToHashSet());
+            var atTheStart = RowsAtTheStart.GetValue(fight, f => f.Todos.ToDictionary(x => x.Id, x => x.Buffs.Puestos.ToList()));
+            // Whoever is carried is set down beside his carrier, as a throw: a Pandawa left
+            // carrying by an earlier try can cast nothing but his throws.
+            if (!keepBoard)
+                foreach (var carrier in fight.Todos.Where(f => f.IsAlive && f.Carrying != 0).ToList())
+                {
+                    var carried = fight.Buscar(carrier.Carrying);
+                    int down = MapGeometry.GetNeighbors(carrier.CellId).Where(c => !Occupied(fight, c) && MapGeometry.IsValid(c)
+                                                                                  && (MapManager.GetFightWalkable(fight.ArenaMapId)?.Contains(c) ?? true))
+                                          .DefaultIfEmpty(-1).First();
+                    if (carried == null || down < 0) continue;
+                    carrier.Carrying = 0;
+                    carried.CarriedBy = 0;
+                    carrier.Buffs.QuitarEstado(Jondo.Unity.World.Combat.EffectSupport.CarryingState);
+                    carried.Buffs.QuitarEstado(Jondo.Unity.World.Combat.EffectSupport.CarriedState);
+                    carried.MoverA(down);
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildThrow(carrier.Id, carried.Id, down)));
+                }
             if (!keepBoard)
             foreach (var fighter in fight.Todos.Where(f => f.IsAlive).ToList())
-                foreach (var row in fighter.Buffs.Puestos.Where(r => !fighter.Buffs.Actitudes.Contains(r.HechizoOrigen)
-                                                                     && !atTheStart.Contains((fighter.Id, r.Numero))).ToList())
+            {
+                var started = atTheStart.TryGetValue(fighter.Id, out var his) ? his : new List<Buff>();
+                foreach (var row in fighter.Buffs.Puestos.Where(r => !fighter.Buffs.Actitudes.Contains(r.HechizoOrigen) && !started.Contains(r)).ToList())
                     if (fighter.Buffs.QuitarFila(row))
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya, Network.FightProtocol.BuildBuffGone(fighter.Id, row.Numero)));
+                // And what he started with and a spell took off -- Tranka's Borracho putting the
+                // Pandawa's Sobrio away -- back as it was: a clean board is the fight's start.
+                foreach (var row in started.Where(r => !fighter.Buffs.Puestos.Contains(r) && (r.CaducaEnRonda < 0 || r.CaducaEnRonda >= fight.RoundNumber)))
+                {
+                    fighter.Buffs.Restaurar(row);
+                    var (categoria, boost) = DatabaseManager.EffectFamily(row.EffectId);
+                    // As the row was first told: the effect's value and dice -- a state's number is
+                    // its value, and a row told without one broke the client's description of it.
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxm, Network.FightProtocol.BuildBuff(
+                        fighter.Id, row.Quien, row.Numero, row.EffectId, row.EffectUid,
+                        row.Valor != 0 || row.Dado != 0 ? row.Valor : row.Estado != 0 ? row.Estado : row.Cuanto, row.Dado, row.Cara, row.HechizoOrigen,
+                        row.Disparador, row.CaducaEnRonda, row.Dispellable, Network.FightProtocol.FamiliaDelEmbrujo(row.EffectId, categoria, boost),
+                        row.NivelOrigen, row.Critico)));
+                }
+            }
             foreach (var mark in keepBoard ? new List<Glifo>() : fight.Glifos.ToList())
             {
                 fight.Glifos.Remove(mark);
@@ -6954,6 +7087,19 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     var dueno = c.Caster ?? quienLanza;
                     var glyph = c.Glifo;
+                    // «Solo puede haber una runa por casilla. Si se lanzan dos hechizos elementales
+                    // diferentes sobre la misma casilla, la primera runa será reemplazada por la
+                    // segunda» (the Huppermage's sheet): the runes already on its cell go.
+                    if (glyph.Tipo == RunaDelSuelo)
+                    {
+                        int donde = glyph.Centro >= 0 ? glyph.Centro : glyph.Casillas.FirstOrDefault();
+                        foreach (var vieja in fight.Glifos.Where(g => g != glyph && g.Tipo == RunaDelSuelo && g.Cubre(donde)).ToList())
+                        {
+                            fight.Glifos.Remove(vieja);
+                            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildGlyphGone(vieja.Dueno, vieja.Id)));
+                            Program.LogDebug($"[Fight] Rune {vieja.Id} on {donde} replaced by rune {glyph.Id}.");
+                        }
+                    }
                     bool lanceAura = Managers.ForgelanceCombat.IsAura(fight, glyph);
                     bool holmgang = glyph.Tipo == GlifoDeAura && c.HechizoOrigen == Managers.ForgelanceCombat.Holmgang
                         && Managers.ForgelanceCombat.Is(dueno);
@@ -7286,6 +7432,18 @@ namespace Jondo.Unity.Server.Handlers
                     // Owned by whoever cast the spell that summons -- a sub-cast's own caster -- at
                     // the grade its row names; and what the spell writes for it ("U") done on it.
                     var invoca = c.Caster ?? quienLanza;
+                    // A character's summon of one cell aimed at a taken one is not born: an
+                    // Eniripsa's ánimo on an ally gives its bonus and no fairy -- «cuando se usan
+                    // estos hechizos en espacio vacío, sirven para invocar hadas». It looked for the
+                    // nearest free cell and a fairy came out beside every ánimo.
+                    int aimedForIt = c.CasillaDeLaInvocacion >= 0 ? c.CasillaDeLaInvocacion : celdaApuntada;
+                    if (!invoca.IsMonster && aimedForIt >= 0 && c.Efecto.CeldasFijas.Count == 0
+                        && (c.Efecto.Forma == 'P' || c.Efecto.Forma == 'C' && c.Efecto.Tamano == 0)
+                        && TodosLosCombatientes(fight).Any(f => f != null && f.IsAlive && !f.Muriendo && f.CellId == aimedForIt))
+                    {
+                        Program.LogDebug($"[Fight] {invoca.Id} summons {c.Invoca} on cell {aimedForIt}, which is taken: nothing is born.");
+                        continue;
+                    }
                     var nuevo = await InvocarAsync(stream, fight, invoca, c.Invoca,
                                                    GradoDeLaInvocacion(c, hechizo, grado),
                                                    c.CasillaDeLaInvocacion >= 0 ? c.CasillaDeLaInvocacion : celdaApuntada,
@@ -8070,6 +8228,10 @@ namespace Jondo.Unity.Server.Handlers
                 // named by the hook itself. The one exception is an initial spell of the character's
                 // own choices, held at his grade of the choice (see Buffs.GradoDeActitud).
                 int grado = quien.Buffs.GradoDeActitud(actitud);
+                // For the test harness: which attitude answered which trigger, to check an item's.
+                if (Network.ControlApi.TestKey.Length > 0
+                    && Managers.SpellEffects.De(actitud, grado).Any(e => e.Triggers.Split('|').Contains(disparador)))
+                    Program.LogDebug($"[Fight] Attitude {actitud} of {quien.Id} answers {disparador}.");
 
                 // One given during the fight -- a summon's own spell -- holds its delayed rows back
                 // from the round it was given in, as a hooked spell does: the fairy's "141 under

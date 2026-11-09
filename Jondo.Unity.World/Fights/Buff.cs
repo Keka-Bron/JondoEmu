@@ -361,6 +361,7 @@ namespace Jondo.Unity.World.Fights
         {
             var quitados = _puestos.FindAll(e => e.Quien == quien && !e.Pendiente);
             _puestos.RemoveAll(e => e.Quien == quien && !e.Pendiente);
+            SeVan(quitados);
             ActiveSpells.RemoveAll(e => e.Lanzador == quien);
             foreach (var quitado in quitados)
             {
@@ -460,6 +461,7 @@ namespace Jondo.Unity.World.Fights
             }
 
             foreach (var muerto in caidos) _puestos.Remove(muerto);
+            SeVan(caidos);
             // And the states only they held go with them, as when a fighter's rows go.
             foreach (var muerto in caidos)
             {
@@ -478,6 +480,7 @@ namespace Jondo.Unity.World.Fights
             _estados.Remove(estado);
             var quitados = _puestos.FindAll(e => e.Estado == estado);
             _puestos.RemoveAll(e => e.Estado == estado);
+            SeVan(quitados);
             return quitados;
         }
 
@@ -489,6 +492,7 @@ namespace Jondo.Unity.World.Fights
         {
             var quitados = _puestos.FindAll(e => e.Dispellable == 1 && !e.Pendiente);
             _puestos.RemoveAll(e => e.Dispellable == 1 && !e.Pendiente);
+            SeVan(quitados);
             foreach (var quitado in quitados)
             {
                 if (quitado.Estado == 0 || quitado.EffectId == Jondo.Unity.World.Combat.EffectSupport.DisableState) continue;
@@ -498,12 +502,59 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>Takes one row off, and the state only it held. False when it was not here.</summary>
+        /// <summary>
+        /// Told of each row that leaves the list, whichever way it goes -- run out, dispelled,
+        /// taken off with its spell or its state, replaced by a recast. A shield's points are
+        /// kept on the fighter and not in its row (1040), so the fighter takes them off by this:
+        /// a dispelled shield kept its points, untouchable, for the rest of the fight.
+        /// </summary>
+        public Action<Buff>? AlIrse { get; set; }
+
+        private void SeVan(IEnumerable<Buff> filas)
+        {
+            var aviso = AlIrse;
+            if (aviso == null) return;
+            foreach (var fila in filas) aviso(fila);
+        }
+
+        /// <summary>
+        /// A row put back as it was, its number and its state with it -- for the test harness,
+        /// whose clean board gives each fighter back the rows he started the fight with.
+        /// </summary>
+        public void Restaurar(Buff fila)
+        {
+            if (_puestos.Contains(fila)) return;
+            _puestos.Add(fila);
+            if (fila.Estado != 0 && fila.EffectId != Jondo.Unity.World.Combat.EffectSupport.DisableState) _estados.Add(fila.Estado);
+        }
+
         public bool QuitarFila(Buff fila)
         {
             if (!_puestos.Remove(fila)) return false;
+            SeVan(new[] { fila });
             if (fila.Estado != 0 && fila.EffectId != Jondo.Unity.World.Combat.EffectSupport.DisableState
                 && !SigueHabiendo(fila.Estado)) _estados.Remove(fila.Estado);
             return true;
+        }
+
+        /// <summary>
+        /// What a spell left before the given row number -- its earlier casts' rows, not the ones
+        /// the cast under way has just put.
+        /// </summary>
+        public List<Buff> QuitarDelHechizoAntesDe(int hechizo, int numero)
+        {
+            bool antes(Buff e) => e.HechizoOrigen == hechizo && e.Numero <= numero;
+            var quitados = _puestos.FindAll(antes);
+            _puestos.RemoveAll(antes);
+            SeVan(quitados);
+            // Its hooks all go: the cast under way arms its own once it is resolved.
+            ActiveSpells.RemoveAll(e => e.Hechizo == hechizo);
+            foreach (var quitado in quitados)
+            {
+                if (quitado.Estado == 0 || quitado.EffectId == Jondo.Unity.World.Combat.EffectSupport.DisableState) continue;
+                if (!SigueHabiendo(quitado.Estado)) _estados.Remove(quitado.Estado);
+            }
+            return quitados;
         }
 
         /// <summary>Removes everything a spell left, including its states and its hooks.</summary>
@@ -516,6 +567,7 @@ namespace Jondo.Unity.World.Fights
         {
             var quitados = _puestos.FindAll(e => e.HechizoOrigen == hechizo);
             _puestos.RemoveAll(e => e.HechizoOrigen == hechizo);
+            SeVan(quitados);
             ActiveSpells.RemoveAll(e => e.Hechizo == hechizo);
 
             foreach (var quitado in quitados)
@@ -536,6 +588,7 @@ namespace Jondo.Unity.World.Fights
             var quitados = _puestos.FindAll(e => e.EffectUid == effectUid);
             if (effectUid == 0 || quitados.Count == 0) return new List<Buff>();
             _puestos.RemoveAll(e => e.EffectUid == effectUid);
+            SeVan(quitados);
             foreach (var quitado in quitados)
             {
                 if (quitado.Estado == 0 || quitado.EffectId == Jondo.Unity.World.Combat.EffectSupport.DisableState) continue;
@@ -553,6 +606,7 @@ namespace Jondo.Unity.World.Fights
             bool delGrado(Buff e) => e.HechizoOrigen == hechizo && e.NivelOrigen == grado;
             var quitados = _puestos.FindAll(delGrado);
             _puestos.RemoveAll(delGrado);
+            SeVan(quitados);
             ActiveSpells.RemoveAll(e => e.Hechizo == hechizo && e.Grado == grado);
 
             foreach (var quitado in quitados)
@@ -593,6 +647,12 @@ namespace Jondo.Unity.World.Fights
         /// each time something happens -- a combo rung, a hooked "-N de daños recibidos", a
         /// per-step malus -- and stays so unless the level writes a cap above one.
         /// </remarks>
+        /// <summary>
+        /// The uid a row piles up under, set by the server's spell catalogue: a critical
+        /// effect's is its normal twin's, so a critical cast does not escape its spell's cap.
+        /// </summary>
+        public static Func<int, int> UidDeLaPila { get; set; } = uid => uid;
+
         public Buff Poner(Buff embrujo, Func<int> siguienteNumero)
         {
             Relevados.Clear();
@@ -603,8 +663,9 @@ namespace Jondo.Unity.World.Fights
             if (tope >= 0)
             {
                 int cabe = Math.Max(1, tope);
+                int pila = UidDeLaPila(embrujo.EffectUid);
                 var equivalentes = _puestos.FindAll(e => e.EffectId == embrujo.EffectId
-                                                      && e.EffectUid == embrujo.EffectUid
+                                                      && UidDeLaPila(e.EffectUid) == pila
                                                       && e.HechizoOrigen == embrujo.HechizoOrigen
                                                       && e.HechizoAfectado == embrujo.HechizoAfectado
                                                       && e.Quien == embrujo.Quien
@@ -615,6 +676,7 @@ namespace Jondo.Unity.World.Fights
                     equivalentes.RemoveAt(0);
                     _puestos.Remove(relevado);
                     Relevados.Add(relevado);
+                    SeVan(new[] { relevado });
                 }
             }
 
@@ -790,6 +852,7 @@ namespace Jondo.Unity.World.Fights
             bool cae(Buff e) => Caducado(e, ronda) && (leTocaCaer == null || leTocaCaer(e));
             var caidos = _puestos.FindAll(cae);
             _puestos.RemoveAll(cae);
+            SeVan(caidos);
 
             // A temporary state cannot outlive the buff that set it. It is kept if
             // there is still another live buff representing the same state.
