@@ -4216,7 +4216,12 @@ namespace Jondo.Unity.Server.Managers
 
                 // On the MAXIMUM, not on what he has left: if it were on what he has left, ninety per
                 // cent would never kill anybody however many times it was cast.
-                int quita = Math.Max(1, sobre.MaxHP * porciento / 100);
+                // Except one's own sacrifice, on what one has left: the Sacrogito's spells
+                // "sacrifican una parte de la vida del lanzador" -- Berserker 70%, Corte 10% -- and
+                // on the maximum Berserker killed him whenever he stood under 70% of his life.
+                int quita = sobre == quienLanza
+                    ? Math.Max(1, sobre.CurrentHP * porciento / 100)
+                    : Math.Max(1, sobre.MaxHP * porciento / 100);
 
                 return new Outcome
                 {

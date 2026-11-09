@@ -1042,9 +1042,25 @@ namespace Jondo.Unity.Server.Network
             const int Animado = 4157, Burlado = 4163, Fairy = 7372;
             FreshTurn(session, fight, me, keep: false, withoutSummons: true);
             ToOpenGround(session, fight, me, 4);
-            string RowsOf(Fighter who, int spell) => string.Join(", ", who.Buffs.Puestos.Where(r => r.HechizoOrigen == spell)
-                                                                       .Select(r => r.Estado != 0 ? $"state {r.Estado}" : $"{r.EffectId} {r.Cuanto:+0;-0;0}"));
-            bool Has(Fighter who, int spell) => who.Buffs.Puestos.Any(r => r.HechizoOrigen == spell);
+            // A word's rows are its children's -- Palabra Estimulante's bonus is 25761's --: the
+            // spell and every spell it casts, down its chain.
+            HashSet<int> Family(int spell)
+            {
+                var family = new HashSet<int> { spell };
+                var queue = new Queue<(int Spell, int Grade)>();
+                queue.Enqueue((spell, FightHandler.CastingGradeOf(me, spell)));
+                while (queue.Count > 0 && family.Count < 40)
+                {
+                    var (s1, g1) = queue.Dequeue();
+                    foreach (var e in Managers.SpellEffects.De(s1, g1))
+                        if (Managers.EffectEngine.CastsASpell(e) && e.DiceNum > 0 && family.Add(e.DiceNum))
+                            queue.Enqueue((e.DiceNum, e.DiceSide > 0 ? e.DiceSide : 1));
+                }
+                return family;
+            }
+            string RowsOf(Fighter who, int spell) { var f = Family(spell); return string.Join(", ", who.Buffs.Puestos.Where(r => f.Contains(r.HechizoOrigen))
+                                                                       .Select(r => r.Estado != 0 ? $"state {r.Estado}" : $"{r.EffectId} {r.Cuanto:+0;-0;0}")); }
+            bool Has(Fighter who, int spell) { var f = Family(spell); return who.Buffs.Puestos.Any(r => f.Contains(r.HechizoOrigen) && r.Estado == 0); }
 
             // An ánimo on himself, then another: the first one's bonus goes.
             CastAt(session, Estimulante, me.CellId);
