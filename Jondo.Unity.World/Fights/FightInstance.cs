@@ -352,6 +352,12 @@ namespace Jondo.Unity.World.Fights
         /// before it began: what its own 406 on itself must leave alone (EffectEngine).
         /// </summary>
         public int CastRootSpell { get; set; }
+
+        /// <summary>
+        /// The kinds of the blow that is killing somebody right now (D, DR, DS, DE...), for his
+        /// death's "X" triggers -- XD, XDS, XDR... --, or null: a death not by a blow.
+        /// </summary>
+        public IReadOnlyCollection<string>? GolpeMortal { get; set; }
         public int CastRowsAfter { get; set; } = int.MaxValue;
 
         public CancellationTokenSource PlacementTimerCts { get; set; }

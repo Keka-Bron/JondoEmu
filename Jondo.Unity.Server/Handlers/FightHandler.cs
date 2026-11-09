@@ -811,9 +811,15 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     if (hechizo != pasivo) playerFighter.Buffs.PonerActitud(hechizo, grado);
                 }
+                // From the first round: what an item's spell waits on with a delay is "not before
+                // round 1 + delay". Prismausente "se vuelve invisible ... al principio de su primer
+                // turno" and its "406 under TB, delay 1" takes the item away at the second; Amarillo
+                // Ocre's AP "si no ha sufrido ningun ataque desde su turno anterior" waits on the
+                // second turn too. Read as no wait at all, Prismausente was gone at once and
+                // Prismapoyo's three turns -- 10%, 35%, 50% -- all went off on the first.
                 foreach (int hechizo in Managers.SpellEffects.ActitudesDelEquipo(GameState.CharacterId))
                 {
-                    playerFighter.Buffs.PonerActitud(hechizo);
+                    playerFighter.Buffs.PonerActitud(hechizo, givenInRound: 1);
                 }
                 // And his alterations' (an uchronic elixir's state for the anomalies).
                 foreach (int hechizo in Managers.Alterations.FightAttitudes(GameState.CharacterId))
@@ -2275,6 +2281,14 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await ActitudesAsync(stream, fight, quien, Managers.EffectEngine.AlMorir);
                 await EngancheAsync(stream, fight, quien, Managers.EffectEngine.AlMorir);
+                // And the death by this kind of blow: "D|XD" is how the data writes "on a blow,
+                // the last one too" -- Perfusion's heal, the Xelor sphere's riposte (DS|XDS).
+                if (fight.GolpeMortal is { } clases)
+                    foreach (var clase in clases.ToList())
+                    {
+                        if (!quien.IsAlive) break;
+                        await DispararAsync(stream, fight, quien, "X" + clase);
+                    }
             }
             finally
             {
@@ -4890,6 +4904,8 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             caster.LanzadosEsteTurno[spell] = esteTurno + 1;
+            // He spent AP (CAP): Rey del Silencio's "792 on A" waits on its bearer doing so.
+            if (cost > 0) await DispararAsync(stream, fight, caster, "CAP");
             // A capture net's spell spends the net and marks the wild rides it reaches (RideCapture).
             if (Managers.RideCapture.IsDomestication(spell))
                 await Managers.RideCapture.CastAsync(stream, fight, caster, spell, cell);
@@ -5441,8 +5457,9 @@ namespace Jondo.Unity.Server.Handlers
                 // Its own "on dying" first, as any death runs it: the Forgelance's lance gives its
                 // owner back Armado that way (Lanza Mortal, 23279), a bomb does nothing.
                 await AlMorirAsync(stream, fight, summon, who);
-                if (!summon.IsAlive) continue;
+                if (!summon.IsAlive) { CarriedFollows(fight, summon); continue; }
                 summon.CurrentHP = 0;
+                CarriedFollows(fight, summon);
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(who.Id, summon.Id)));
                 await CaenSusInvocadosAsync(stream, fight, summon);
             }
@@ -5476,11 +5493,13 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (!await AlMorirAsync(stream, fight, victim, killer) || !victim.IsAlive) return;
                 victim.CurrentHP = 0;
+                CarriedFollows(fight, victim);
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(killer.Id, victim.Id)));
                 await CaenSusInvocadosAsync(stream, fight, victim);
             });
             fight.RebuildTurnOrderOnFighterDeath();
             await ReenviarLaListaAsync(stream, fight);
+            await AlMatarAsync(stream, fight, killer, victim);
         }
 
         /// <summary>
@@ -6853,6 +6872,20 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static void CarriedFollows(FightInstance fight, Fighter carrier)
         {
+            // And one carried who has just died is nobody's load any more: a Pandawa whose bamboo
+            // was struck down in his arms was left "carrying" it, and the next list of the
+            // fighters had the client make him carry an entity no longer there (FightCarryStep).
+            if (carrier != null && !carrier.IsAlive && carrier.CarriedBy != 0)
+            {
+                var holder = fight.Buscar(carrier.CarriedBy);
+                carrier.CarriedBy = 0;
+                carrier.Buffs.QuitarEstado(Jondo.Unity.World.Combat.EffectSupport.CarriedState);
+                if (holder != null && holder.Carrying == carrier.Id)
+                {
+                    holder.Carrying = 0;
+                    holder.Buffs.QuitarEstado(Jondo.Unity.World.Combat.EffectSupport.CarryingState);
+                }
+            }
             if (carrier == null || carrier.Carrying == 0) return;
             var carried = fight.Buscar(carrier.Carrying);
             if (carried == null) { carrier.Carrying = 0; return; }
@@ -7165,7 +7198,21 @@ namespace Jondo.Unity.Server.Handlers
                             c.Sobre.Id, c.PuntosEsquivados)));
                     Program.LogDebug($"[POINTS] {c.Sobre.Id} dodges {c.PuntosEsquivados} point(s) of effect " +
                                      $"{c.Efecto.EffectId} of spell {hechizo}.");
-                    if (c.Buff == null && c.Caracteristica == 0) continue;
+                    if (c.Buff == null && c.Caracteristica == 0)
+                    {
+                        // Dodged whole, it was still an attempt, and the attempt is what the items
+                        // wait on: Rey Bajo la Montana "cuando el portador realiza o sufre un intento
+                        // de retirada de PA o PM", Sabiduria Wabbit, Prueba de la Balanza, Puntualidad
+                        // de Henual. Read off the removal only, they missed every blow dodged in full.
+                        var intenta = c.Caster ?? quienLanza;
+                        if (intenta.TeamId != c.Sobre.TeamId)
+                        {
+                            bool deAccion = c.Efecto.EffectId is 1079 or 101 or 84 or 440;
+                            Disparo(c.Sobre, deAccion ? Managers.EffectEngine.AlPerderPA : Managers.EffectEngine.AlPerderPM, quienLanza);
+                            Disparo(intenta, deAccion ? "CAPA" : "CMPA", c.Sobre, unaVezPorFuente: true);
+                        }
+                        continue;
+                    }
                 }
 
                 // The 3793 going off now: an action on the target's cell, and nothing kept.
@@ -7222,6 +7269,10 @@ namespace Jondo.Unity.Server.Handlers
                                      $"({leQuedaba} -> {c.Sobre.CurrentHP}) to effect " +
                                      $"{c.Efecto.EffectId}.");
                     await RefrescarLaVidaAsync(stream, fight, c.Sobre, quienLanza);
+                    // Life gone that was no blow (DV), and life changed (LPU): what the Sacrogito's
+                    // Sufrimiento is worked out again on -- his own spells' "-N% PdV".
+                    Disparo(c.Sobre, "DV", quienLanza);
+                    Disparo(c.Sobre, "LPU", quienLanza);
                     continue;
                 }
 
@@ -7251,6 +7302,9 @@ namespace Jondo.Unity.Server.Handlers
 
                     await RefrescarLaVidaAsync(stream, fight, daLaVida, quienLanza);
                     await RefrescarLaVidaAsync(stream, fight, c.Sobre, quienLanza);
+                    Disparo(daLaVida, "DV", quienLanza);
+                    Disparo(daLaVida, "LPU", quienLanza);
+                    Disparo(c.Sobre, "LPU", quienLanza);
                     continue;
                 }
 
@@ -7291,10 +7345,19 @@ namespace Jondo.Unity.Server.Handlers
                         stream, fight, c.Caster ?? quienLanza, c.HechizoOrigen, c.Efecto,
                         c.DamageElement, c.Sobre, damageRoll, c.DamageDistance,
                         c.CriticalDamage, c.DamageSpellBonus,
-                        fromTurnTrigger: disparador != Managers.EffectEngine.AlLanzar);
+                        fromTurnTrigger: disparador != Managers.EffectEngine.AlLanzar,
+                        turnTrigger: disparador);
                     if (c.Sobre.IsAlive && c.Sobre.CurrentHP != lifeBefore)
                         await RefrescarLaVidaAsync(stream, fight, c.Sobre, quienLanza);
                     continue;
+                }
+
+                // His vitality moved (V), up (VA) or down (VM): the same items' life read again.
+                if ((c.Caracteristica == VitalityCharacteristicId || c.Buff?.Caracteristica == VitalityCharacteristicId)
+                    && (c.Buff?.Cuanto ?? c.Cuanto) != 0 && c.Sobre != null)
+                {
+                    Disparo(c.Sobre, "V", quienLanza);
+                    Disparo(c.Sobre, (c.Buff?.Cuanto ?? c.Cuanto) > 0 ? "VA" : "VM", quienLanza);
                 }
 
                 if (c.Caracteristica == ActionPointsCharacteristic || c.Caracteristica == MovementPointsCharacteristic)
@@ -7310,7 +7373,12 @@ namespace Jondo.Unity.Server.Handlers
                     bool deAccion = c.Caracteristica == ActionPointsCharacteristic;
                     bool enSuTurno = fight.CurrentFighter == c.Sobre;
                     if (c.Cuanto < 0 && quienLanza.TeamId != c.Sobre.TeamId)
+                    {
                         Disparo(c.Sobre, deAccion ? Managers.EffectEngine.AlPerderPA : Managers.EffectEngine.AlPerderPM, quienLanza);
+                        // And the one who tried (CAPA / CMPA): when the bearer makes or suffers an
+                        // attempt to take AP or MP away (Rey Bajo la Montana's sheet).
+                        Disparo(c.Caster ?? quienLanza, deAccion ? "CAPA" : "CMPA", c.Sobre, unaVezPorFuente: true);
+                    }
                     // And the one who took them (CAPAS/CMPAS), once for each fighter who lost
                     // some: Zarzas Agresivas gives "1 PM al lanzador por enemigo alcanzado".
                     var quienQuita = c.Caster ?? quienLanza;
@@ -8086,6 +8154,9 @@ namespace Jondo.Unity.Server.Handlers
                                                          nivelId, critical: false),
                             Network.FightProtocol.CastDetail)));
 
+                    if (Network.ControlApi.TestKey.Length > 0
+                        && Managers.SpellEffects.De(actitud, grado).Any(e => e.Triggers.Split('|').Contains(Managers.EffectEngine.AlLanzar)))
+                        Program.LogDebug($"[Fight] Attitude {actitud} of {quien.Id} answers {Managers.EffectEngine.AlLanzar}.");
                     await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien,
                                               Managers.EffectEngine.AlLanzar, quien.CellId, armar: false);
 
@@ -8246,12 +8317,31 @@ namespace Jondo.Unity.Server.Handlers
                 // start of the turn and gives the action point on the spot, but it also carries inside
                 // a "remove the state" with an END of turn trigger, and that one has to be fetched
                 // when the turn ends.
-                foreach (var efecto in Managers.SpellEffects.De(actitud, grado))
+                //
+                // Down the whole chain, not one level: the Burlador de la Muerte's grade 1 casts
+                // 11468, whose 1160s cast its grade 2 or 3 by the bearer's life, and it is grade 2
+                // that holds "loses 10% of his life at the start of each turn" -- one level down,
+                // it never went off. And only the grades he has cast (Buffs.GradosLanzados): a
+                // grade never cast, or taken away by a 406 since, has left no hook on him.
+                var vistos = new HashSet<(int, int)> { (actitud, grado) };
+                var porVer = new Queue<(int Spell, int Grade, int Depth)>();
+                void Encadenados(int spell, int grade, int depth)
                 {
-                    if (efecto.EffectId != Managers.EffectEngine.EfectoQueLanzaHechizo) continue;
-                    if (efecto.DiceNum <= 0) continue;
-                    await AplicarEfectosAsync(stream, fight, quien, efecto.DiceNum,
-                                              efecto.DiceSide > 0 ? efecto.DiceSide : 1,
+                    if (depth > 4) return;
+                    foreach (var efecto in Managers.SpellEffects.De(spell, grade))
+                    {
+                        if (!Managers.EffectEngine.CastsASpell(efecto) || efecto.DiceNum <= 0) continue;
+                        var hijo = (efecto.DiceNum, efecto.DiceSide > 0 ? efecto.DiceSide : 1);
+                        if (vistos.Add(hijo)) porVer.Enqueue((hijo.Item1, hijo.Item2, depth + 1));
+                    }
+                }
+                Encadenados(actitud, grado, 0);
+                while (porVer.Count > 0)
+                {
+                    var (spell, grade, depth) = porVer.Dequeue();
+                    Encadenados(spell, grade, depth);
+                    if (!quien.Buffs.GradosLanzados.Contains((spell, grade))) continue;
+                    await AplicarEfectosAsync(stream, fight, quien, spell, grade,
                                               quien, disparador, quien.CellId, armar: false,
                                               rondaDelEnganche: givenIn, delayHoldsBackOnly: givenIn >= 0);
                 }
@@ -8340,6 +8430,13 @@ namespace Jondo.Unity.Server.Handlers
                 fight.TriggeringAttacker = target;
                 await DispararAsync(stream, fight, caster, Managers.EffectEngine.CausaDanoDeElemento(elemento));
                 if (deCerca) await DispararAsync(stream, fight, caster, Managers.EffectEngine.CausaDanoDeCerca);
+                else await DispararAsync(stream, fight, caster, Managers.EffectEngine.CausaDanoDeLejos);
+                // Any blow dealt (CD), a spell's (CDS), next door (CDCAC), to a foe (CDBE) or to
+                // an ally (CDBA): Cronoensanamiento's "CDS|CDM", Brutalitis's "CDCAC|CDS".
+                if (caster.IsAlive) await DispararAsync(stream, fight, caster, "CD");
+                if (deHechizo && caster.IsAlive) await DispararAsync(stream, fight, caster, "CDS");
+                if (deCerca && caster.IsAlive) await DispararAsync(stream, fight, caster, "CDCAC");
+                if (caster.IsAlive) await DispararAsync(stream, fight, caster, caster.TeamId == target.TeamId ? "CDBA" : "CDBE");
             }
             fight.TriggeringAttacker = antes;
             fight.DanoDelDisparo = danoAntes;
@@ -8410,7 +8507,8 @@ namespace Jondo.Unity.Server.Handlers
                 await UnGolpeAsync(stream, fight, caster, spell, efecto, elementoDelGolpe, aQuien,
                                    sacado, lejos, critico,
                                    fromTurnTrigger: !string.Equals(disparador, Managers.EffectEngine.AlLanzar,
-                                                                   StringComparison.OrdinalIgnoreCase));
+                                                                   StringComparison.OrdinalIgnoreCase),
+                                   turnTrigger: disparador);
             }
 
             foreach (var estado in vidasAntes.Values)
@@ -8608,7 +8706,8 @@ namespace Jondo.Unity.Server.Handlers
                                                Managers.SpellEffect efecto, int elemento,
                                                Fighter target, int sacadoDelDado, int lejosDelCentro,
                                                bool critical, int? capturedSpellBonus = null,
-                                               bool fulmina = false, bool fromTurnTrigger = false)
+                                               bool fulmina = false, bool fromTurnTrigger = false,
+                                               string turnTrigger = null)
         {
             // A copy goes at the first point of damage and takes none; a poison, which arrives
             // on a turn trigger, does not count. And the original's copies all go when HE is
@@ -8980,7 +9079,10 @@ namespace Jondo.Unity.Server.Handlers
             // the death has been announced in there and this blow has nothing left to take.
             if (aplicado >= target.CurrentHP && !target.Muriendo)
             {
-                if (!await AlMorirAsync(stream, fight, target, caster)) return;
+                // What kind of blow kills him, for his death's own triggers: XD, XDS, XDR...
+                fight.GolpeMortal = KindsOfTheBlow(fight, caster, target, elemento, spell != 0, fromTurnTrigger);
+                try { if (!await AlMorirAsync(stream, fight, target, caster)) return; }
+                finally { fight.GolpeMortal = null; }
                 aplicado = Math.Min(damage, target.CurrentHP);
             }
 
@@ -9089,6 +9191,12 @@ namespace Jondo.Unity.Server.Handlers
                 await EngancheAsync(stream, fight, target, alcance);
                 await DispararLosDelGolpeAsync(stream, fight, caster, target, elemento, deCerca, damage,
                                                deHechizo: spell != 0);
+                // A turn's poison (DTB at the start, DTE at the end) and the maximum life the blow
+                // eroded (VE): what the items that read their bearer's life again wait on -- the
+                // Silver Dofus's and the Burlador de la Muerte's "V|VA|VM|VE|TB|TE|D|H|PD|DTB|DTE|DV".
+                if (turnTrigger is Managers.EffectEngine.AlEmpezarElTurno or Managers.EffectEngine.AlAcabarElTurno && target.IsAlive)
+                    await DispararAsync(stream, fight, target, "D" + turnTrigger);
+                if (erosionado > 0 && target.IsAlive) await DispararAsync(stream, fight, target, "VE");
             }
             if (umbralCruzado != null && target.IsAlive && target.Buffs.QuitarFila(umbralCruzado))
             {
@@ -9143,7 +9251,30 @@ namespace Jondo.Unity.Server.Handlers
             var antes = fight.TriggeringAttacker;
             fight.TriggeringAttacker = dead;
             await DispararAsync(stream, fight, killer, Managers.EffectEngine.AlMatar);
+            // And by whom he killed: K, then H (a character), M (a monster) or I (a summon), then
+            // E (a foe) or A (an ally) -- La Sombra de Sram's "KHA|KHE|KMA|KME", Frio de
+            // Novimiembro's "KHE|KME": when an enemy fighter is eliminated.
+            string side = dead.TeamId != killer.TeamId ? "E" : "A";
+            string kind = dead.EsInvocado ? "I" : dead.IsMonster ? "M" : "H";
+            if (killer.IsAlive) await DispararAsync(stream, fight, killer, "K" + kind + side);
+            if (killer.IsAlive) await DispararAsync(stream, fight, killer, "K" + side);
             fight.TriggeringAttacker = antes;
+        }
+
+        /// <summary>
+        /// Every kind a blow is of, as the triggers name them: D; DM or DR and DCAC by the
+        /// distance; its element (DE, DF, DW, DA, DN); DS a spell's; DT a trap's, DG a glyph's;
+        /// DTB and DTE a turn's poison; DBA from his own side, DBE from the other.
+        /// </summary>
+        private static List<string> KindsOfTheBlow(FightInstance fight, Fighter caster, Fighter target, int elemento, bool deHechizo, bool fromTurnTrigger)
+        {
+            var clases = ClasesDelGolpe(caster, target, fromTurnTrigger);
+            clases.Add(Managers.EffectEngine.DanoDeElemento(elemento));
+            if (deHechizo) clases.Add(Managers.EffectEngine.AlRecibirDanoDeHechizo);
+            if (fight.CurrentGlyphType == Managers.EffectEngine.ColocaUnaTrampa) clases.Add(Managers.EffectEngine.AlSufrirDanoDeTrampa);
+            else if (fight.CurrentGlyphType != 0) clases.Add("DG");
+            clases.Add(caster.TeamId == target.TeamId ? Managers.EffectEngine.DanoDeAliado : Managers.EffectEngine.CuandoMePegan);
+            return clases.Distinct().ToList();
         }
 
         /// <summary>The kinds of a blow, as the rows under a damage trigger name them.</summary>
@@ -9310,7 +9441,9 @@ namespace Jondo.Unity.Server.Handlers
             int aplicado = Math.Min(dano, quien.CurrentHP);
             if (aplicado >= quien.CurrentHP && !quien.Muriendo)
             {
-                if (!await AlMorirAsync(stream, fight, quien, quienEmpuja)) return;
+                fight.GolpeMortal = new[] { Managers.EffectEngine.AlChocarEmpujado };
+                try { if (!await AlMorirAsync(stream, fight, quien, quienEmpuja)) return; }
+                finally { fight.GolpeMortal = null; }
                 aplicado = Math.Min(dano, quien.CurrentHP);
             }
             quien.TakeDamage(aplicado);

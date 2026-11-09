@@ -1673,6 +1673,25 @@ namespace Jondo.Unity.Server.Managers
         private const int OuginakRageManager = 13745;
         private const int OuginakRageRelay = 24128;
 
+        /// <summary>
+        /// The delay of the first script marker (3793) listed after a row with a longer delay than
+        /// its own: the round, counted from the first, its stretch of an item's spell ends. Null
+        /// when no marker closes it.
+        /// </summary>
+        internal static int? EndOfItsStretch(IReadOnlyList<SpellEffect> effects, SpellEffect row)
+        {
+            bool after = false;
+            foreach (var other in effects)
+            {
+                if (ReferenceEquals(other, row)) { after = true; continue; }
+                if (after && other.EffectId == MarcadorDeGuion && other.Delay > row.Delay) return other.Delay;
+            }
+            return null;
+        }
+
+        /// <summary>Whether a row casts another spell (792, 1160, 2160 and the rest of the family).</summary>
+        public static bool CastsASpell(SpellEffect efecto) => efecto != null && Familia.ContainsKey(efecto.EffectId);
+
         private static bool IsOuginakRageChain(SpellEffect efecto)
             => (efecto.EffectId == LanzarHechizo
                 || efecto.EffectId == DispararHechizo
@@ -2080,6 +2099,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The bearer deals damage in melee.</summary>
         public const string CausaDanoDeCerca = "CDM";
 
+        /// <summary>
+        /// The bearer dealt a blow from further than next door: Clarividencia de Mériana's spell
+        /// (31858) waits on it next to the elements' and the melee one, and it never went off.
+        /// </summary>
+        public const string CausaDanoDeLejos = "CDR";
+
         /// <summary>The bearer is healed (H); the bearer heals somebody (CH).</summary>
         public const string AlSerCurado = "H";
         public const string AlCurar = "CH";
@@ -2276,6 +2301,11 @@ namespace Jondo.Unity.Server.Managers
             finally
             {
                 if (!armar) combate.SinArmar--;
+                // Cast: from now on its triggered rows can answer for an attitude (see
+                // Buffs.GradosLanzados). After its rows, so a 406 of its own clears the older
+                // grades' marks and not this one's.
+                if (string.Equals(disparador, AlLanzar, StringComparison.OrdinalIgnoreCase))
+                    quienLanza?.Buffs.GradosLanzados.Add((hechizo, grado));
                 combate.RootCaster = raizDeFuera;
                 combate.CastRootSpell = hechizoRaizDeFuera;
                 combate.CastRowsAfter = filasDeFuera;
@@ -2528,6 +2558,19 @@ namespace Jondo.Unity.Server.Managers
                 if (rondaDelEnganche >= 0 && efecto.Delay > 0
                     && !string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
                     && round < rondaDelEnganche + efecto.Delay)
+                {
+                    continue;
+                }
+
+                // And an item's is over once a later script marker's round has come. Prisanacion
+                // "cura un 60% de los danos enemigos sufridos en el primer turno, un 30% en el
+                // segundo turno y un 10% en el tercer turno": three casts under D, of delay 0, 1
+                // and 2, with a 3793 of delay 1 and one of delay 2 between them -- each turn's row
+                // is the one before its marker. Held back only, from the third turn all three
+                // answered every blow.
+                if (rondaDelEnganche >= 0 && !PlayerSpells.Contains(spell)
+                    && !string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
+                    && EndOfItsStretch(effects, filaLeida) is int fin && round >= rondaDelEnganche + fin)
                 {
                     continue;
                 }
@@ -4956,6 +4999,9 @@ namespace Jondo.Unity.Server.Managers
                     Program.LogDebug($"[Fight] {sobre.Id} loses attitude {hechizoQuitado}: " +
                                      $"effect 406 of spell {hechizo} disarms it.");
                 }
+                // Its grades cast before are gone with their effects: the Burlador de la Muerte's
+                // grade 3 (under half his life) takes grade 2's "lose 10% at the turn start" away.
+                sobre.Buffs.GradosLanzados.RemoveWhere(g => g.Spell == hechizoQuitado);
 
                 return new Outcome
                 {

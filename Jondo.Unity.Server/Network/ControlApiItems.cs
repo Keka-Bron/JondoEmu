@@ -148,6 +148,20 @@ namespace Jondo.Unity.Server.Network
             return Bien(new { over = FightHandler.FightOf(session.State.CharacterId) == null, lines });
         }
 
+        /// <summary>{ fighter, by? }: a fighter struck down as a blow strikes down, by the slot's character or the one given.</summary>
+        private static Respuesta TestKill(string cuerpo)
+        {
+            var session = TestSessionOnline();
+            var fight = session == null ? null : FightHandler.FightOf(session.State.CharacterId);
+            if (session == null || fight == null) return Mal(409, "no-fight");
+            var victim = fight.Buscar(Numero(cuerpo, "fighter"));
+            long by = Numero(cuerpo, "by");
+            var killer = fight.Buscar(by != 0 ? by : session.State.CharacterId);
+            if (victim == null || killer == null || !victim.IsAlive) return Mal(404, "fighter");
+            var lines = RunInSession(session, stream => FightHandler.TestKillAsync(stream, fight, victim, killer));
+            return Bien(new { dead = !victim.IsAlive, lines });
+        }
+
         /// <summary>{ as?, on }: every cast of the fighter critical, or back to the dice.</summary>
         private static Respuesta TestCrit(string cuerpo)
         {

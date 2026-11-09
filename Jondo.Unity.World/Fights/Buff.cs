@@ -256,6 +256,16 @@ namespace Jondo.Unity.World.Fights
             => _gradosDeActitud.TryGetValue(hechizo, out int grado) ? grado : 1;
 
         /// <summary>
+        /// The grades this fighter has cast in the fight -- marked once the cast is over -- since
+        /// a 406 last took that spell's effects away. An attitude's chained grade only answers its
+        /// own triggers once it has been cast, as the hook it would leave on him: Prismausente's
+        /// grade 2, cast at the start of his first turn, makes him invisible and holds the "on a
+        /// blow, it goes" (D). Read before it was ever cast, the first blow he took before his
+        /// first turn took the whole item away, and he never went invisible.
+        /// </summary>
+        public HashSet<(int Spell, int Grade)> GradosLanzados { get; } = new HashSet<(int Spell, int Grade)>();
+
+        /// <summary>
         /// The spells one has on that STILL HAVE SOMETHING TO DO later.
         ///
         /// A spell does not end on being cast: its effects with a trigger other than "I" stay

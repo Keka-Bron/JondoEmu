@@ -91,6 +91,7 @@ namespace Jondo.Unity.Server.Network
                 "equip" => TestEquip(cuerpo),
                 "finish" => TestFinish(cuerpo),
                 "crit" => TestCrit(cuerpo),
+                "kill" => TestKill(cuerpo),
                 _ => Mal(404, "ruta"),
             };
         }
@@ -262,16 +263,30 @@ namespace Jondo.Unity.Server.Network
         /// Turns handed on, each by whoever plays it (jxy), until it is <paramref name="fighter"/>'s:
         /// true when it is. A turn nobody here plays -- a monster's -- is waited for.
         /// </summary>
+        /// <summary>
+        /// Until the turn at hand has begun. A character's turn starts when his client confirms it
+        /// (jxh, jwz back), and passed before that it ended without ever starting: his "at the start
+        /// of the turn" never went off -- the Cocobur's self-blow, every item's TB.
+        /// </summary>
+        private static void WaitTillItBegins(FightInstance fight, Fighter? current, int seconds = 10)
+        {
+            var until = DateTime.UtcNow.AddSeconds(seconds);
+            while (DateTime.UtcNow < until && fight.State == FightState.Ongoing && fight.CurrentFighter == current
+                   && fight.TurnAwaitingConfirmation)
+                System.Threading.Thread.Sleep(100);
+        }
+
         private static bool TurnTo(GameSession session, FightInstance fight, Fighter fighter, int most = 40)
         {
             for (int turns = 0; turns <= most; turns++)
             {
                 if (fight.State != FightState.Ongoing || !fighter.IsAlive) return false;
                 var current = fight.CurrentFighter;
-                if (current == fighter) return true;
+                if (current == fighter) { WaitTillItBegins(fight, fighter); return true; }
                 var mark = (fight.RoundNumber, fight.CurrentTurnIndex, current);
                 var driver = current == null ? null : DriverOf(session, current);
-                if (driver != null) RunAsClient(driver, "jxy", Pb.New().Build());
+                WaitTillItBegins(fight, current);
+                if (driver != null && fight.CurrentFighter == current) RunAsClient(driver, "jxy", Pb.New().Build());
                 var until = DateTime.UtcNow.AddSeconds(90);
                 while (DateTime.UtcNow < until && fight.State == FightState.Ongoing
                        && (fight.RoundNumber, fight.CurrentTurnIndex, fight.CurrentFighter) == mark)
@@ -799,6 +814,7 @@ namespace Jondo.Unity.Server.Network
             int roundBefore = fight.RoundNumber;
             try
             {
+                WaitTillItBegins(fight, me);
                 lines = RunAsClient(session, "jxy", Pb.New().Build());
                 var until = DateTime.UtcNow.AddSeconds(150);
                 var handedOn = new HashSet<(int, int)>();
@@ -806,13 +822,16 @@ namespace Jondo.Unity.Server.Network
                 {
                     System.Threading.Thread.Sleep(300);
                     if (FightHandler.FightOf(session.State.CharacterId) != fight || !me.IsAlive) break;
-                    if (fight.RoundNumber > roundBefore && fight.CurrentFighter?.Id == me.Id) { back = true; break; }
+                    if (fight.RoundNumber > roundBefore && fight.CurrentFighter?.Id == me.Id) { back = true; WaitTillItBegins(fight, me); break; }
                     // A turn this slot plays and nobody else would -- its summons', a team test's
                     // JondoBots' -- is handed on at once, as their player would, not left to its clock.
                     var current = fight.CurrentFighter;
                     if (current != null && current != me && handedOn.Add((fight.RoundNumber, fight.CurrentTurnIndex))
                         && DriverOf(session, current) is { } driver)
+                    {
+                        WaitTillItBegins(fight, current);
                         lines.AddRange(RunAsClient(driver, "jxy", Pb.New().Build()));
+                    }
                 }
             }
             finally
