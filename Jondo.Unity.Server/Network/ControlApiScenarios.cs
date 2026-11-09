@@ -323,6 +323,9 @@ namespace Jondo.Unity.Server.Network
             boosts = Boosts(syncro);
             if (TelefragWithTeleport(foes[0], foes[1]))
                 sc.Check("a second telefrag of the same spell in the same turn gives it nothing more", Boosts(syncro) == boosts, Fd(syncro));
+            // Grown, the syncro is in state 306 for a turn, which its growth asks it not to be in
+            // ("e306"): once a turn, whatever the spell. Another spell grows it on the next one.
+            bool turnBack = PassTurn(session, fight, me);
             FreshTurn(session, fight, me, keep: true);
             boosts = Boosts(syncro);
             // Perturbación: the target to the cell symmetric about the Xelor, onto the other foe.
@@ -336,7 +339,7 @@ namespace Jondo.Unity.Server.Network
                 CastAt(session, Perturbacion, row2[1]);
                 sc.Check("Perturbación swaps its target with whoever stands opposite the Xelor", foes[0].CellId == back2[1] && foes[1].CellId == row2[1],
                          $"foe {foes[0].Id} on {foes[0].CellId}, foe {foes[1].Id} on {foes[1].CellId}");
-                sc.Check("a telefrag of another spell grows the syncro again", Boosts(syncro) == boosts + 1, Fd(syncro));
+                sc.Check("next turn, a telefrag of another spell grows the syncro again", Boosts(syncro) == boosts + 1, $"{Fd(syncro)} (turn back {turnBack})");
             }
             else sc.Note("no row for Perturbación's telefrag");
 
@@ -1185,11 +1188,15 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
             sc.Check("a second one makes the network: both on", second != null && second.Active && first.Active,
                      $"first {(first.Active ? "on" : "off")}, second {(second == null ? "none" : second.Active ? "on" : "off")}");
 
+            // Aimed at a portal, Portal goes through the network -- its level forbids no projection,
+            // and the client draws it so -- and lays its own where it comes out: never a second one
+            // on the aimed cell.
             FreshTurn(session, fight, me, keep: true);
             int count = fight.Portales.Count;
             CastAt(session, PortalSpell, a);
-            sc.Check("no portal goes on a cell that has one", fight.Portales.Count == count && fight.Portales.At(a) == first,
-                     $"{count} -> {fight.Portales.Count} portal(s), on {a}: {fight.Portales.At(a)}");
+            var onA = fight.Portales.All.Where(p => p.Cell == a).ToList();
+            sc.Check("no portal goes on a cell that has one", onA.Count == 1 && onA[0] == first && fight.Portales.Count <= count + 1,
+                     $"{count} -> {fight.Portales.Count} portal(s), on {a}: {string.Join(", ", onA)}");
 
             // A foe walking onto the first comes out on the second's cell.
             var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
@@ -1199,10 +1206,14 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
                 int beside = MapGeometry.GetNeighbors(a).Where(c => FreeCell(fight, c) && fight.Portales.At(c) == null).DefaultIfEmpty(-1).First();
                 if (beside >= 0 && PutAll(session, fight, (foe, beside)))
                 {
+                    // He comes out of the chain's last portal: the second one, or the one Portal
+                    // laid through it just now.
+                    var chain = fight.Portales.Chain(first, fight.OccupantOf);
+                    int exit = chain.Count > 1 ? chain[chain.Count - 1].Cell : b;
                     RunInSession(session, async stream => await FightHandler.TestWalkAsync(stream, fight, foe, a));
                     Pause();
-                    sc.Check("walking onto a portal, he comes out on the other's cell", foe.CellId == b,
-                             $"on {foe.CellId} (walked onto {a}, the other portal on {b})");
+                    sc.Check("walking onto a portal, he comes out of the chain's last one", foe.CellId == exit,
+                             $"on {foe.CellId} (walked onto {a}, the chain ends on {exit})");
                 }
                 else sc.Note("no free cell beside the first portal for the foe");
             }
@@ -1245,9 +1256,11 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
         /// </summary>
         private static void ZurcarakPoker(GameSession session, FightInstance fight, Fighter me, Scenario sc)
         {
-            const int Kraps = 12883, Baraka = 12848, Reflejos = 12857, GarraJuguetona = 12849, Jass = 12864, Topkaj = 12846;
+            // Spells that only draw: Baraka, Jass, Belote and Blakjak draw their queen or, holding
+            // it, take it away again (their 29927, 29926, 29929, 29928 under "E" of the queen).
+            const int Kraps = 12883, Reflejos = 12857, Topkaj = 12846, Almohadillas = 12875, CaraOCruz = 12841, Baraka = 12848;
             int[] hand = { 5461, 5462, 5463, 5464 };
-            var cardOf = new Dictionary<int, int> { [Kraps] = 5446, [Baraka] = 5446, [Reflejos] = 5440, [GarraJuguetona] = 5447, [Jass] = 5442, [Topkaj] = 5448 };
+            var cardOf = new Dictionary<int, int> { [Kraps] = 5446, [Reflejos] = 5440, [Topkaj] = 5448, [Almohadillas] = 5443, [CaraOCruz] = 5452 };
             FreshTurn(session, fight, me, keep: false, withoutSummons: true);
             var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
                                  .OrderByDescending(f => f.CurrentHP).FirstOrDefault();
@@ -1264,14 +1277,16 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
 
             Play(Kraps);
             sc.Check("Kraps (3 AP, water) draws the queen of clubs", me.Buffs.TieneEstado(cardOf[Kraps]) && Size() == 1, $"hand {Size()}, cards {Cards()}");
-            Play(Baraka);
-            sc.Check("Baraka, the same card, draws nothing more: one of each card", Size() == 1, $"hand {Size()}, cards {Cards()}");
+            Play(Kraps);
+            sc.Check("the same card again draws nothing more: one of each card", Size() == 1, $"hand {Size()}, cards {Cards()}");
 
-            foreach (int spell in new[] { Reflejos, GarraJuguetona, Jass }) Play(spell);
-            sc.Check("three other cards fill the hand: four", Size() == 4 && new[] { Kraps, Reflejos, GarraJuguetona, Jass }.All(s => me.Buffs.TieneEstado(cardOf[s])),
+            foreach (int spell in new[] { Reflejos, Topkaj, Almohadillas }) Play(spell);
+            sc.Check("three other cards fill the hand: four", Size() == 4 && new[] { Kraps, Reflejos, Topkaj, Almohadillas }.All(s => me.Buffs.TieneEstado(cardOf[s])),
                      $"hand {Size()}, cards {Cards()}");
-            Play(Topkaj);
-            sc.Check("a full hand takes no fifth card", !me.Buffs.TieneEstado(cardOf[Topkaj]) && Size() == 4, $"hand {Size()}, cards {Cards()}");
+            Play(CaraOCruz);
+            sc.Check("a full hand takes no fifth card", !me.Buffs.TieneEstado(cardOf[CaraOCruz]) && Size() == 4, $"hand {Size()}, cards {Cards()}");
+            Play(Baraka);
+            sc.Check("Baraka, holding the queen of clubs, takes it away", !me.Buffs.TieneEstado(cardOf[Kraps]) && Size() == 3, $"hand {Size()}, cards {Cards()}");
         }
 
         // ─── The Yopuka's Furor (its description: «los daños del hechizo aumentan después de cada
@@ -1354,8 +1369,15 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
 
             // «Los zobals solo pueden usar una máscara cada vez ... Utilizar una máscara nueva retira
             //  los efectos de la máscara utilizada anteriormente y fija su intervalo de lanzamiento en 1 turno.»
+            // ...which is why Sáikopat, the mask Intrépido took off, waits for the next turn.
+            ap = me.CurrentAP;
             CastAt(session, Saikopat, me.CellId);
-            sc.Check("Máscara Sáikopat swaps it for the damage mask", Mask() == "damage (99)", Mask());
+            sc.Check("the mask just taken off waits a turn: Sáikopat cannot come back yet", Mask() == "tank (98)" && me.CurrentAP == ap,
+                     $"{Mask()}, AP {ap} -> {me.CurrentAP}");
+            bool back = PassTurn(session, fight, me);
+            FreshTurn(session, fight, me, keep: true);
+            CastAt(session, Saikopat, me.CellId);
+            sc.Check("Máscara Sáikopat swaps it for the damage mask", Mask() == "damage (99)", $"{Mask()} (turn back {back})");
             var left = me.Buffs.Puestos.Where(b => tankRows.Contains(b.Numero)).ToList();
             sc.Check("and the tank mask's effects go with it", left.Count == 0, left.Count == 0 ? "none left" : $"{left.Count} row(s) of Intrépido left");
             ap = me.CurrentAP;
