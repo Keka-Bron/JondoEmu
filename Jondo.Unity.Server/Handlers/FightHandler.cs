@@ -1181,7 +1181,7 @@ namespace Jondo.Unity.Server.Handlers
         /// game does not use it.
         /// </summary>
         public static List<(int Characteristic, long Base, long Gear)> FichaParaLaGuardia(Fighter fighter)
-            => FullSheetOf(fighter);
+            => FullSheetOf(fighter, told: false);
 
         /// <summary>"Daños sufridos x#1%" (damage taken x#1%), the multiplier Represalias sets.</summary>
         private const int DanoSufridoPorCiento = 1163;
@@ -1246,7 +1246,7 @@ namespace Jondo.Unity.Server.Handlers
             // Now the value is looked up in THE SAME sheet that was sent, so the two cannot drift apart
             // again: whatever is added there is covered here without touching anything.
             long baseDelPersonaje = 0, delEquipo = 0;
-            foreach (var (cual, suBase, suEquipo) in FullSheetOf(ficha, conTraza: false))
+            foreach (var (cual, suBase, suEquipo) in FullSheetOf(ficha, conTraza: false, told: false))
             {
                 if (cual != caracteristica) continue;
                 baseDelPersonaje = suBase;
@@ -1534,11 +1534,15 @@ namespace Jondo.Unity.Server.Handlers
         /// once for each characteristic a buff moves: with the trace on it filled the log with copies of
         /// the same sheet several times per turn.
         /// </param>
+        /// <param name="told">
+        /// Whether the sheet goes out whole: then its life top is the one the clients hold from now
+        /// on (see RefrescarLaVidaAsync). A lookup of one of its numbers sends none of it.
+        /// </param>
         private static List<(int Characteristic, long Base, long Gear)> FullSheetOf(Fighter fighter,
-                                                                                   bool conTraza = true)
+                                                                                   bool conTraza = true,
+                                                                                   bool told = true)
         {
-            // The top of his bar as the clients will hold it from this sheet on (see RefrescarLaVidaAsync).
-            fighter.LifeTopTold = fighter.MaxHP;
+            if (told) fighter.LifeTopTold = fighter.MaxHP;
             var summonCharacteristic = SummonCharacteristicFor(fighter);
             var ficha = new List<(int, long, long)>
             {
@@ -1609,8 +1613,11 @@ namespace Jondo.Unity.Server.Handlers
                 // of the character it controls: it works out the others' by itself from the hits.
                 // It was nailed at zero, so the player's bar stayed full the whole fight.
                 // It also goes here so that a reconnection to a fight in progress draws the right life.
+                // Against the top in the 0 above, and its f8 empty: the client takes that one off
+                // the life itself, not off the top -- with the erosion in it, every list sent again
+                // mid-fight (a summon, a death, a refresh) drew each bar that much under the server's.
                 (Network.FightProtocol.TemporaryLifeMalus,
-                 fighter.CurrentHP - fighter.MaxHP, -fighter.VidaErosionada),
+                 fighter.CurrentHP - fighter.MaxHP, 0),
                 (102, 0, fighter.Otra(102)),
             };
 
