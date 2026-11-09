@@ -130,5 +130,69 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(Zone.Push(target, caster, target, 2, Everywhere(), new HashSet<int>()).ToCell,
                          destination);
         }
+
+        /// <summary>A push down a diagonal, from a caster one diagonal step behind the target.</summary>
+        private static (int Caster, int Target, int X, int Y) ADiagonal()
+        {
+            var (x, y) = MapGeometry.CellToPoint(288);
+            return (MapGeometry.PointToCell(x - 1, y - 1), 288, x, y);
+        }
+
+        [Fact]
+        public void A_diagonal_with_open_corners_goes_the_whole_way()
+        {
+            var (caster, target, x, y) = ADiagonal();
+
+            var push = Zone.Push(target, caster, target, 2, Everywhere(), new HashSet<int>());
+
+            Assert.Equal(Zone.PushStop.None, push.Stop);
+            Assert.Equal(MapGeometry.PointToCell(x + 2, y + 2), push.ToCell);
+        }
+
+        [Theory]
+        [InlineData(1, 0)]
+        [InlineData(0, 1)]
+        public void One_wall_beside_a_diagonal_step_cuts_it(int sideX, int sideY)
+        {
+            // Violencia pushed a Puch down the screen between two stone blocks; one of them is
+            // enough to stop it, on either side of the step.
+            var (caster, target, x, y) = ADiagonal();
+            var walkable = Everywhere();
+            walkable.Remove(MapGeometry.PointToCell(x + sideX, y + sideY));
+
+            var push = Zone.Push(target, caster, target, 3, walkable, new HashSet<int>());
+
+            Assert.Equal(target, push.ToCell);
+            Assert.Equal(Zone.PushStop.Obstacle, push.Stop);
+            Assert.Equal(3, push.BlockedCells);
+        }
+
+        [Fact]
+        public void A_wall_beside_a_later_diagonal_step_lets_the_first_ones_through()
+        {
+            var (caster, target, x, y) = ADiagonal();
+            var walkable = Everywhere();
+            walkable.Remove(MapGeometry.PointToCell(x + 2, y + 1));
+
+            var push = Zone.Push(target, caster, target, 3, walkable, new HashSet<int>());
+
+            Assert.Equal(MapGeometry.PointToCell(x + 1, y + 1), push.ToCell);
+            Assert.Equal(Zone.PushStop.Obstacle, push.Stop);
+            Assert.Equal(2, push.BlockedCells);
+        }
+
+        [Fact]
+        public void A_pull_down_a_diagonal_is_cut_by_a_wall_beside_it_too()
+        {
+            var (_, target, x, y) = ADiagonal();
+            int puller = MapGeometry.PointToCell(x - 3, y - 3);
+            var walkable = Everywhere();
+            walkable.Remove(MapGeometry.PointToCell(x - 1, y));
+
+            var pull = Zone.Push(puller, puller, target, -2, walkable, new HashSet<int>());
+
+            Assert.Equal(target, pull.ToCell);
+            Assert.Equal(Zone.PushStop.Obstacle, pull.Stop);
+        }
     }
 }

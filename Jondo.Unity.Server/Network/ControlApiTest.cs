@@ -1275,6 +1275,11 @@ namespace Jondo.Unity.Server.Network
                             int dx = Math.Sign(tx - fx), dy = Math.Sign(ty - fy);
                             bool aligned = tx - fx == 0 || ty - fy == 0 || Math.Abs(tx - fx) == Math.Abs(ty - fy);
                             if (!aligned || dx == 0 && dy == 0) return (f, Free: false, What: "not in line with the push");
+                            // Down a diagonal, one wall beside the step cuts it (Zone.PushAlong).
+                            if (dx != 0 && dy != 0)
+                                foreach (int side in new[] { MapGeometry.PointToCell(tx + dx, ty), MapGeometry.PointToCell(tx, ty + dy) })
+                                    if (side < 0 || !MapGeometry.IsValid(side) || !board.Walkable(side))
+                                        return (f, Free: false, What: $"cell {side} beside the diagonal is no ground");
                             int behind = MapGeometry.PointToCell(tx + dx, ty + dy);
                             if (behind < 0 || !MapGeometry.IsValid(behind) || !board.Walkable(behind)) return (f, Free: false, What: $"cell {behind} behind is no ground");
                             var there = fight.Todos.FirstOrDefault(x => x.IsAlive && x.CellId == behind);

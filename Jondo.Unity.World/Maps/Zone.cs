@@ -746,6 +746,18 @@ namespace Jondo.Unity.World.Maps
 
             for (int i = 0; i < cells; i++)
             {
+                // A DIAGONAL STEP SQUEEZES BETWEEN TWO CORNERS, and one wall on either side is
+                // enough to cut it: the step from (x, y) to (x+dx, y+dy) brushes the cells
+                // (x+dx, y) and (x, y+dy), and a block on one of them stops the push short, as an
+                // obstacle would. Violencia pushed a Puch straight down the screen between two
+                // stone blocks, where the real game stops it against them.
+                if (dx != 0 && dy != 0 && walkable != null
+                    && (!walkable.Contains(MapGeometry.PointToCell(x + dx, y))
+                        || !walkable.Contains(MapGeometry.PointToCell(x, y + dy))))
+                {
+                    freno = PushStop.Obstacle; break;
+                }
+
                 x += dx; y += dy;
                 int siguiente = MapGeometry.PointToCell(x, y);
 
