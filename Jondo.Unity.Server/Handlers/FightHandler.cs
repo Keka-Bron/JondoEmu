@@ -1537,6 +1537,8 @@ namespace Jondo.Unity.Server.Handlers
         private static List<(int Characteristic, long Base, long Gear)> FullSheetOf(Fighter fighter,
                                                                                    bool conTraza = true)
         {
+            // The top of his bar as the clients will hold it from this sheet on (see RefrescarLaVidaAsync).
+            fighter.LifeTopTold = fighter.MaxHP;
             var summonCharacteristic = SummonCharacteristicFor(fighter);
             var ficha = new List<(int, long, long)>
             {
@@ -1571,6 +1573,7 @@ namespace Jondo.Unity.Server.Handlers
                 // items and the bar came out doubled. With the full sheet it no longer mixes: it keeps
                 // ours, and sending only the level's left the character with 1,050 life in the middle
                 // of the fight.
+                // The maximum he has now; the life refresh is told against it (LifeTopTold).
                 (LifeCharacteristic, fighter.MaxHP, 0),
 
                 (10, 0, fighter.Strength),
@@ -6919,17 +6922,30 @@ namespace Jondo.Unity.Server.Handlers
             // The parameter is kept for the log and for the day the real rule is understood.
             _ = porQuien;
 
+            // A JondoBot has no client of his own: told to nobody, his bar moved only with the
+            // blows and heals each client saw, and drifted from the server by whatever moved his
+            // life without one -- erosion, vitality, a shield's share -- hundreds of points in a
+            // team fight. His sheet goes to every client: they read any fighter's sheet (the AP
+            // and MP ones go to all), and the real server has no JondoBots to measure.
             await ACadaUnoAsync(fight, async sesion =>
             {
-                if (sesion.State.CharacterId != quien.Id) return;
+                if (sesion.State.CharacterId != quien.Id && !quien.IsBot) return;
 
                 await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jto,
                     Network.FightProtocol.BuildSequenceStart(quien.Id,
                                                              Network.FightProtocol.SheetSequence)));
+                // The life he is missing against the maximum he started with (the sheet's 0, see
+                // FullSheetOf). Its f8 stays empty: the client takes it off the life itself, not
+                // off the top of the bar -- sent the erosion, every bar sat that much under.
+                // Against the top his full sheet last gave the clients (its characteristic 0): the
+                // client draws the life as that top plus this number, and takes each blow's
+                // erosion off its bar's top by itself until the next sheet. Against the fight's
+                // starting top, every bar sat what had been eroded under the server's once a sheet
+                // had gone out mid-fight (54 under after 54 eroded); against the top of now, over
+                // it by whatever was eroded since that sheet. Before any, the starting top.
+                int topTold = quien.LifeTopTold >= 0 ? quien.LifeTopTold : quien.MaxHP + quien.VidaErosionada;
                 await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jxw,
-                    Network.FightProtocol.BuildLifeSheet(quien.Id,
-                                                         quien.CurrentHP - (quien.MaxHP + quien.VidaErosionada),
-                                                         0)));
+                    Network.FightProtocol.BuildLifeSheet(quien.Id, quien.CurrentHP - topTold, 0)));
                 await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
                                                            Network.FightProtocol.SheetSequence)));

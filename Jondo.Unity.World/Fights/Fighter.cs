@@ -238,6 +238,12 @@ namespace Jondo.Unity.World.Fights
         public int HeldByFoesAt { get; set; } = -1;
 
         /// <summary>
+        /// The maximum life the clients were last given in his full sheet (its characteristic 0),
+        /// or -1 before any: the life refresh is told against it, as the client reads it.
+        /// </summary>
+        public int LifeTopTold { get; set; } = -1;
+
+        /// <summary>
         /// The tenths of a second this fighter kept from the turn he passed, for his next one
         /// (FightProtocol.SavedAfter). Only a character keeps any.
         /// </summary>

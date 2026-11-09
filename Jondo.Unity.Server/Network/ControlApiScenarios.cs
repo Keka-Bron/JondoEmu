@@ -1528,17 +1528,21 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
             sc.Check("the scenario starts with no bomb of the Tymador's", Bombs().Count == 0, $"{Bombs().Count} bomb(s)");
 
             // Two free cells on one row of the grid, three cells of ground between them, both in
-            // the bombs' reach (1 to 6) from the Tymador.
+            // the bombs' reach (1 to 6) from the Tymador and in his sight -- the second one past
+            // the first bomb as well: a bomb, like any fighter, blocks the line.
+            var opaque = MapManager.GetLosBlockers(fight.ArenaMapId);
+            bool Sees(int to, int alsoBlocking = -1) => MapGeometry.HasLineOfSight(me.CellId, to,
+                c => c == alsoBlocking || (opaque?.Contains(c) ?? false) || fight.Todos.Any(f => f.IsAlive && f != me && f.CellId == c));
             (int A, int B, int Dx, int Dy)? line = null;
             foreach (int a in Enumerable.Range(0, 560).Where(c => FreeCell(fight, c))
                                         .OrderBy(c => Math.Abs(MapGeometry.Distance(c, me.CellId) - 2)))
             {
                 int da = MapGeometry.Distance(a, me.CellId);
-                if (da < 1 || da > 4) continue;
+                if (da < 1 || da > 4 || !Sees(a)) continue;
                 foreach (var (dx, dy) in Rows)
                 {
                     int b = Along(a, dx, dy, 4);
-                    if (b < 0 || !FreeCell(fight, b)) continue;
+                    if (b < 0 || !FreeCell(fight, b) || !Sees(b, a)) continue;
                     int db = MapGeometry.Distance(b, me.CellId);
                     if (db < 1 || db > 6) continue;
                     if (!Enumerable.Range(1, 3).All(k => Along(a, dx, dy, k) is int c && c >= 0 && FightHandler.BoardOf(fight).Walkable(c))) continue;
@@ -1584,8 +1588,10 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
             // «Una entidad que se desplace en el muro o entre en él sufrirá daños.»
             var foe = fight.Todos.Where(f => f.IsAlive && f.TeamId != me.TeamId && !f.EsInvocado)
                                  .OrderBy(f => MapGeometry.Distance(f.CellId, between[1])).FirstOrDefault();
-            // Onto a cell of the wall nobody stands on: the Tymador may stand in its middle.
-            int into = between.Where(c => FreeCell(fight, c)).OrderBy(c => MapGeometry.Distance(c, between[1])).DefaultIfEmpty(-1).First();
+            // Onto a cell of the wall nobody stands on: the Tymador may stand in its middle. (Not
+            // FreeCell, which leaves out every cell a mark covers -- the whole wall.)
+            int into = between.Where(c => !fight.Todos.Any(f => f.IsAlive && f.CellId == c) && FightHandler.BoardOf(fight).Walkable(c))
+                              .OrderBy(c => MapGeometry.Distance(c, between[1])).DefaultIfEmpty(-1).First();
             if (wall && foe != null && into >= 0)
             {
                 // The foe beside the wall, then walked onto it. Not beside the Tymador: leaving
@@ -1666,10 +1672,14 @@ RunInSession(session, _ => FightHandler.TestClearPortalsAsync(fight));
                                     .OrderBy(f => MapGeometry.Distance(f.CellId, me.CellId)).FirstOrDefault();
             if (target != null && Bombs().Count < 3)
             {
-                if (MapGeometry.Distance(target.CellId, me.CellId) > 6 || MapGeometry.Distance(target.CellId, me.CellId) < 1)
+                // In reach and in his sight: a fighter or a bomb between stops the cast.
+                if (MapGeometry.Distance(target.CellId, me.CellId) > 6 || MapGeometry.Distance(target.CellId, me.CellId) < 1
+                    || !FightHandler.BoardOf(fight).Sees(me.CellId, target.CellId))
                 {
-                    int spot = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) == 3)
-                                         .DefaultIfEmpty(-1).First();
+                    var seen = FightHandler.BoardOf(fight);
+                    int spot = Enumerable.Range(0, 560).Where(c => FreeCell(fight, c) && MapGeometry.Distance(c, me.CellId) is >= 2 and <= 4
+                                                                   && seen.Sees(me.CellId, c))
+                                         .OrderBy(c => Math.Abs(MapGeometry.Distance(c, me.CellId) - 3)).DefaultIfEmpty(-1).First();
                     if (spot >= 0) PutAt(session, fight, target, spot);
                 }
                 int life = target.CurrentHP, count = Bombs().Count;
