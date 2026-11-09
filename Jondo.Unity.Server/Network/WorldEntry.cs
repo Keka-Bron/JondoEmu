@@ -44,6 +44,12 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The three blocks, with the name content/world/entry.json gives them.</summary>
         public const string BlockAfterCharacter = "afterCharacter";
         public const string BlockAfterConfirm = "afterConfirm";
+
+        /// <summary>jby: a number of the session's, ten digits as text, once the character is chosen.</summary>
+        private const string SessionNumberOp = "jby";
+
+        /// <summary>lru: a uuid of the session's, on entering the map.</summary>
+        private const string SessionUuidOp = "lru";
         public const string BlockMap = "map";
 
         /// <summary>
@@ -434,6 +440,30 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         internal static byte[]? Rebuilt(byte[] frame, string built, DatabaseManager.DbCharacter character)
         {
+            // The shop gifts waiting for the account, told again once the character is chosen, as
+            // the character list tells them.
+            if (ConnectionProtocol.ReadPayload(frame, Op.Jtg) != null)
+            {
+                return ConnectionProtocol.Push(Op.Jtg, Handlers.GiftHandler.BuildList(character.AccountId));
+            }
+
+            // The character's look as the appearance window holds it, under its look id.
+            if (ConnectionProtocol.ReadPayload(frame, Op.Lxc) != null)
+            {
+                return ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character));
+            }
+
+            // Two ids of the session's, new for each one: jby's ten digits and lru's uuid.
+            if (ConnectionProtocol.ReadPayload(frame, SessionNumberOp) != null)
+            {
+                return ConnectionProtocol.Push(SessionNumberOp,
+                    Pb.New().Str(1, Random.Shared.NextInt64(1_000_000_000, 10_000_000_000).ToString()).Build());
+            }
+            if (ConnectionProtocol.ReadPayload(frame, SessionUuidOp) != null)
+            {
+                return ConnectionProtocol.Push(SessionUuidOp, Pb.New().Str(1, Guid.NewGuid().ToString()).Build());
+            }
+
             if (ConnectionProtocol.ReadPayload(frame, Op.Kva) != null)
             {
                 return ConnectionProtocol.Push(Op.Kva,
@@ -511,8 +541,21 @@ namespace Jondo.Unity.Server.Network
             // The last connection notice. The recorded block brings that of whoever captured —9
             // August at 18:53— and that is someone else's. It is swapped for this character's, with his
             // date and the address he logged in from last time, read from the base before
-            // overwriting them. The block's other lqn are let through as is.
+            // overwriting them.
+            //
+            // And «Tienes {0} contacto(s) recíproco(s) conectado(s)»: the account's mutual friends
+            // playing, and no notice when none of them plays.
+            //
+            // The block's other lqn are let through as is.
             byte[]? lqn = ConnectionProtocol.ReadPayload(frame, Op.Lqn);
+            if (lqn != null && MessageOf(lqn) == ConnectionProtocol.MutualFriendsPlayingMessage)
+            {
+                int playing = Handlers.FriendsHandler.MutualPlaying(SessionContext.Current?.AccountId ?? 0);
+                if (playing == 0) return Array.Empty<byte>();
+                return ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(Managers.InfoMessages.Info,
+                        ConnectionProtocol.MutualFriendsPlayingMessage, playing.ToString()));
+            }
             if (lqn != null && MessageOf(lqn) == ConnectionProtocol.LastConnectionMessage)
             {
                 var anterior = SessionContext.State.PreviousVisit;
@@ -843,7 +886,7 @@ namespace Jondo.Unity.Server.Network
 
         public static async Task<int> SendAfterConfirmAsync(NetworkStream stream, DatabaseManager.DbCharacter character)
         {
-            return await SendRewrittenAsync(stream, BlockAfterConfirm, "Block 2", IdentityFor(character));
+            return await SendRewrittenAsync(stream, BlockAfterConfirm, "Block 2", IdentityFor(character), character);
         }
 
         /// <summary>
@@ -933,13 +976,17 @@ namespace Jondo.Unity.Server.Network
         }
 
         private static async Task<int> SendRewrittenAsync(NetworkStream stream, string block,
-                                                          string name, CaptureRewriter.Identity identity)
+                                                          string name, CaptureRewriter.Identity identity,
+                                                          DatabaseManager.DbCharacter? character = null)
         {
             int sent = 0;
-            foreach (byte[] frame in WorldEntryContent.Frames(block))
+            foreach (var row in WorldEntryContent.Rows(block))
             {
+                byte[] frame = row.Frame;
                 if (ShouldSkip(frame)) continue;
-                await EnviarAsync(stream, CaptureRewriter.Rewrite(frame, identity));
+                byte[]? rebuilt = character != null ? Rebuilt(frame, row.Built, character) : null;
+                if (rebuilt != null && rebuilt.Length == 0) continue;
+                await EnviarAsync(stream, rebuilt ?? CaptureRewriter.Rewrite(frame, identity));
                 sent++;
             }
 

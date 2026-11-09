@@ -324,6 +324,14 @@ namespace Jondo.Unity.Server.Handlers
         private static GameSession? Playing(long accountId)
             => SessionRegistry.InWorld().FirstOrDefault(s => s.AccountId == accountId);
 
+        /// <summary>
+        /// How many of the account's mutual friends are playing: the figure of «Tienes {0}
+        /// contacto(s) recíproco(s) conectado(s)», told on entering the world.
+        /// </summary>
+        public static int MutualPlaying(long accountId)
+            => accountId <= 0 ? 0
+               : Contacts.ContactsOf(accountId).Count(other => Contacts.IsContact(other, accountId) && Playing(other) != null);
+
         // ─── reading the requests ────────────────────────────────────────────────────────────
 
         /// <summary>

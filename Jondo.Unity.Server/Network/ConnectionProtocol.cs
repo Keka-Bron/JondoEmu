@@ -2385,6 +2385,9 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The same, «… mediante la dirección IP {5}».</summary>
         public const int LastConnectionWithIpMessage = 152;
 
+        /// <summary>«Tienes {0} contacto(s) recíproco(s) conectado(s)», on entering the world.</summary>
+        public const int MutualFriendsPlayingMessage = 197;
+
         /// <summary>The "you have received kamas" message, with the figure as a parameter.</summary>
         public const int KamasReceivedMessage = 45;
 
