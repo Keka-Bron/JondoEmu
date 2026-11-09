@@ -123,6 +123,20 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>2023 or 1026: the caster's runes or glyphs go off now.</summary>
         public int ActivaSuelo { get; init; }
 
+        /// <summary>
+        /// Everybody's states when the spell reached its 2023 or 1026, by fighter: the runes and
+        /// glyphs read them as they go off (<see cref="ActivaSuelo"/>) -- the caster's markers,
+        /// the target's (Sobrecarga Rúnica's 6980) -- though the spell's later rows take them off.
+        /// </summary>
+        public IReadOnlyDictionary<long, HashSet<int>> EstadosAlActivar { get; init; }
+
+        /// <summary>
+        /// The cells whose runes a 2023 sets off: its zone round the aimed cell -- Runificación's
+        /// one rune, the one under each fighter its sub-cast reaches --, or null for every rune of
+        /// the caster's (a zone over the whole map: Sobrecarga Rúnica's «todas las runas»).
+        /// </summary>
+        public IReadOnlyCollection<int> CeldasActivadas { get; init; }
+
         /// <summary>The life, in percent, the last ally to fall comes back with (780, 1034); zero for any other outcome.</summary>
         public int Revive { get; init; }
 
@@ -969,6 +983,15 @@ namespace Jondo.Unity.Server.Managers
         private static bool WaitsOnATurn(SpellEffect effect)
             => effect.Disparadores().Any(d => string.Equals(d, AlEmpezarElTurno, StringComparison.OrdinalIgnoreCase)
                                            || string.Equals(d, AlAcabarElTurno, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
+        /// Whether a root's sub-cast waits on its bearer being hurt (D), with no row of its own to
+        /// stay on him: Distribución's "1160 14578-3 under D|XD on a,A", which heals the allies
+        /// round the target for a share of each blow he takes. Hooked on nobody, it never went off.
+        /// </summary>
+        private static bool WaitsOnBeingHit(SpellEffect effect)
+            => CastsASpell(effect) && effect.Duration == 0
+               && effect.Disparadores().Any(d => string.Equals(d, AlRecibirDano, StringComparison.OrdinalIgnoreCase));
 
         /// <summary>
         /// Whether a row waits on its bearer being swapped or teleported (MS, TP): Premonición's
@@ -2424,6 +2447,13 @@ namespace Jondo.Unity.Server.Managers
             // Who this cast has already hooked the spell on for a row that waits on their turn.
             var hookedForTheirTurn = new HashSet<Fighter>();
 
+            // Whether a row of the cast stays on whoever it lands on, hooking the spell there by
+            // itself (Resonancia's state of one round): only a spell with none needs its "when
+            // hurt" sub-cast hooked on purpose (Distribución).
+            bool algoSeQueda = effects.Any(x => x.Duration != 0
+                                                && x.Disparadores().Any(d => string.Equals(d, AlLanzar, StringComparison.OrdinalIgnoreCase))
+                                                && !(x.TargetMask ?? "").Split(',').Any(t => t.Trim() is "C" or "c"));
+
             foreach (var filaLeida in effects)
             {
                 if (descartados.Contains(filaLeida)) continue;
@@ -2526,7 +2556,9 @@ namespace Jondo.Unity.Server.Managers
                 // hook keeps.
                 if (!leToca
                     && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
-                    && PlayerSpells.Contains(spell) && (WaitsOnATurn(efecto) || (depth == 0 && WaitsOnBeingMoved(efecto)))
+                    && PlayerSpells.Contains(spell) && (WaitsOnATurn(efecto) || (depth == 0 && WaitsOnBeingMoved(efecto))
+                                                        || (depth == 0 && !algoSeQueda && WaitsOnBeingHit(efecto)
+                                                            && !(efecto.TargetMask ?? "").Split(',').Any(t => t.Trim() is "C" or "c")))
                     && !EsFilaQueLeeElGolpe(efecto.EffectId)
                     && efecto.TargetMask is not ("C" or "c"))
                 {
@@ -2786,6 +2818,18 @@ namespace Jondo.Unity.Server.Managers
                             cell => Jondo.Unity.World.Maps.MapGeometry.Distance(ownerCell, cell)
                                     + Jondo.Unity.World.Maps.MapGeometry.Distance(cell, caster.CellId) == span
                                     && (walkable == null || walkable.Contains(cell)) && EnLaCasilla(combat, cell) == null);
+                        if (aDonde < 0) continue;
+                    }
+                    // Along the line from the caster (zone 'l') -- Fulgor, Balestra, Cartílago --:
+                    // «a la primera casilla disponible entre el objetivo y él», the first free cell
+                    // from the aimed one back towards him. Aimed at a fighter, he lands beside him.
+                    else if (efecto.Forma == Jondo.Unity.World.Maps.Zone.Segmento)
+                    {
+                        var walkable = MapManager.GetFightWalkable(combat.ArenaMapId);
+                        var line = CasillasDelEfecto(efecto, caster.CellId, aDonde);
+                        line.Reverse();
+                        aDonde = line.FirstOrDefault(cell => cell != caster.CellId && (walkable == null || walkable.Contains(cell))
+                                                             && EnLaCasilla(combat, cell) == null, -1);
                         if (aDonde < 0) continue;
                     }
 
@@ -4082,6 +4126,12 @@ namespace Jondo.Unity.Server.Managers
                 {
                     Sobre = quienLanza, Caster = quienLanza, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado, ActivaSuelo = efecto.EffectId,
+                    EstadosAlActivar = Todos(combate).Where(f => f != null)
+                                                     .ToDictionary(f => f.Id, f => new HashSet<int>(f.Buffs.Estados)),
+                    CeldasActivadas = efecto.EffectId != ActivaLasRunas
+                                      || efecto.Forma is Jondo.Unity.World.Maps.Zone.TodoElMapa or Jondo.Unity.World.Maps.Zone.WholeMap
+                        ? null
+                        : CasillasDelEfecto(efecto, quienLanza.CellId, celdaApuntada >= 0 ? celdaApuntada : quienLanza.CellId),
                 };
             }
 

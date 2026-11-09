@@ -2407,7 +2407,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The grade a fighter casts a spell at, as the cast reads it (for the test harness).</summary>
         internal static int CastingGradeOf(Fighter caster, int spell) => LimitesDelQueLanza(caster, spell).Grade;
 
-        internal static (int Min, int Max, bool FreeCell) ReachOf(FightInstance fight, Fighter caster, int spell)
+        internal static (int Min, int Max, bool FreeCell, bool TakenCell) ReachOf(FightInstance fight, Fighter caster, int spell)
         {
             var limites = LimitesDelQueLanza(caster, spell);
             int minimo = limites.AlcanceMinimo
@@ -2417,8 +2417,8 @@ namespace Jondo.Unity.Server.Handlers
             var (min, max) = Managers.SpellModifiers.Range(caster, spell, minimo, maximo, fight.RoundNumber);
             // The cell as the cast will judge it: a modifier can ask for a free cell (299), as the
             // Sram's traps do.
-            var (needFree, _) = Managers.SpellModifiers.Cells(caster, spell, limites.NeedFreeCell, limites.NeedTakenCell, fight.RoundNumber);
-            return (min, max, needFree);
+            var (needFree, needTaken) = Managers.SpellModifiers.Cells(caster, spell, limites.NeedFreeCell, limites.NeedTakenCell, fight.RoundNumber);
+            return (min, max, needFree, needTaken);
         }
 
         private static LimitesDelHechizo LimitesDelQueLanza(Fighter caster, int spell)
@@ -4366,6 +4366,40 @@ namespace Jondo.Unity.Server.Handlers
             return trozos.Contains("C") && !trozos.Any(t => t.Length == 1 && t != "C");
         }
 
+        /// <summary>
+        /// A rune set off with nobody on it: its spell cast by its owner on its own cell, in a
+        /// sequence of his. What it does to whoever stands there finds nobody; what it does over
+        /// the whole map or round the cell still lands.
+        /// </summary>
+        private static async Task FireEmptyRuneAsync(NetworkStream stream, FightInstance fight,
+                                                     Jondo.Unity.World.Fights.Glifo glifo, Fighter dueno)
+        {
+            int celda = glifo.Centro >= 0 ? glifo.Centro : glifo.Casillas.FirstOrDefault();
+            Program.LogDebug($"[Fight] Empty rune {glifo.Id} of {glifo.Dueno} on {celda} goes off: casts spell " +
+                             $"{glifo.Hechizo} grade {glifo.Grado}.");
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(dueno.Id, Network.FightProtocol.GlyphSequence)));
+            var antes = fight.CurrentDamageSource;
+            var tipoAntes = fight.CurrentGlyphType;
+            fight.CurrentDamageSource = Jondo.Unity.World.Fights.DamageSource.Glyph;
+            fight.CurrentGlyphType = glifo.Tipo;
+            try
+            {
+                var tirada = Managers.EffectEngine.EfectosSorteados(glifo.Hechizo, glifo.Grado, false);
+                tirada = await BoostsFirstAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, null, celda, false, tirada);
+                await HurtAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, null, celdaApuntada: celda, tirada: tirada);
+                await AplicarEfectosAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, null,
+                                          Managers.EffectEngine.AlLanzar, celdaApuntada: celda, tirada: tirada);
+            }
+            finally
+            {
+                fight.CurrentDamageSource = antes;
+                fight.CurrentGlyphType = tipoAntes;
+            }
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), dueno.Id, Network.FightProtocol.GlyphSequence)));
+        }
+
         /// <summary>A class spell's turn glyph (401, 402): it takes whoever it caught, alone.</summary>
         private static bool EsGlifoDeTurnoDeClase(Jondo.Unity.World.Fights.Glifo glifo)
             => (glifo.Tipo == 401 || glifo.Tipo == 402) && !Managers.BombWalls.IsWall(glifo)
@@ -4808,6 +4842,19 @@ namespace Jondo.Unity.Server.Handlers
                                      $"and its range is {minimo} to {maximo}.");
                     return;
                 }
+            }
+
+            // And it must SEE the cell when its level says so (CastTestLos), the weapon always: the
+            // client never offers a cell behind a wall or a fighter, and nothing here stopped a
+            // jwh that asked for one -- a driven JondoBot, the harness, a forged message cast
+            // straight through walls. A 289 on the spell switches the test off (Epílogo, unarmed).
+            bool needsSight = spell == 0 || (limites.Flags & Managers.SpellLevelFlags.CastTestLos) != 0;
+            if (needsSight && cell != caster.CellId
+                && !Managers.SpellModifiers.Holds(caster, spell, Jondo.Unity.World.Fights.SpellAspect.LineOfSightOff, fight.RoundNumber)
+                && !BoardOf(fight).Sees(caster.CellId, cell))
+            {
+                Program.LogDebug($"[Fight] Spell {spell}: cell {cell} is out of sight from {caster.CellId}.");
+                return;
             }
             if (cost <= 0) cost = DefaultCastCost;
             // The spell's own modifiers of its AP cost: 285 takes off, 296 adds -- the weapon's too, a
@@ -5491,9 +5538,11 @@ namespace Jondo.Unity.Server.Handlers
         /// any that die -- told dead, their rows and states gone with them -- so that a scenario
         /// starts from none (a Tymador's three bombs, an Osamodas's creatures).
         /// </summary>
-        private static async Task DismissSummonsAsync(NetworkStream stream, FightInstance fight, Fighter who)
+        private static async Task DismissSummonsAsync(NetworkStream stream, FightInstance fight, Fighter who,
+                                                      Func<Fighter, bool> which = null)
         {
-            var mine = TodosLosCombatientes(fight).Where(f => f.EsInvocado && f.IsAlive && f.Invocador == who.Id).ToList();
+            var mine = TodosLosCombatientes(fight).Where(f => f.EsInvocado && f.IsAlive && f.Invocador == who.Id
+                                                             && (which == null || which(f))).ToList();
             foreach (var summon in mine)
             {
                 // Its own "on dying" first, as any death runs it: the Forgelance's lance gives its
@@ -5643,6 +5692,13 @@ namespace Jondo.Unity.Server.Handlers
                     carried.MoverA(down);
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildThrow(carrier.Id, carried.Id, down)));
                 }
+            // A clean board is the fight's start, when no Forgelance has his lance out: one an
+            // earlier try left goes as a death takes it -- its "on dying" gives him back Armado --,
+            // or the Armado restored below stands beside a lance on the ground, every throw is
+            // let through and its lance refused ("still has an Immortal Lance on the board").
+            if (!keepBoard)
+                foreach (var owner in fight.Todos.Where(f => f.IsAlive && Managers.ForgelanceCombat.Is(f)).ToList())
+                    await DismissSummonsAsync(stream, fight, owner, f => f.MonsterId == Managers.ForgelanceCombat.Lance);
             if (!keepBoard)
             foreach (var fighter in fight.Todos.Where(f => f.IsAlive).ToList())
             {
@@ -6882,10 +6938,10 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>Absorbs damage with shield points, reports how much was consumed and refreshes the total.</summary>
         private static async Task<(int Remaining, int ShieldLoss)> AbsorberElGolpeAsync(
-            FightInstance fight, Fighter target, int damage)
+            FightInstance fight, Fighter target, int damage, int notTheseShieldPoints = 0)
         {
             int before = target.PuntosDeEscudo;
-            int remaining = target.PasarPorElEscudo(damage);
+            int remaining = target.PasarPorElEscudo(damage, notTheseShieldPoints);
             int shieldLoss = before - target.PuntosDeEscudo;
             if (shieldLoss == 0) return (remaining, 0);
 
@@ -7228,6 +7284,8 @@ namespace Jondo.Unity.Server.Handlers
             }
             var anunciados = new HashSet<(int, int, long)>();
             var activados = new HashSet<(long, int, int)>();
+            // Each rune goes off once per cast, however many of its 2023 rows reach it.
+            var runasDisparadas = new HashSet<int>();
             var forgelanceRolls = new Dictionary<Managers.SpellEffect, int>();
             bool forgelanceEffects = Managers.ForgelanceCombat.IsActor(fight, quienLanza);
 
@@ -7285,36 +7343,74 @@ namespace Jondo.Unity.Server.Handlers
                     var activador = c.Caster ?? quienLanza;
                     // Once per cast, however many its zone named: Inestabilidad's 1026 is "a,A" on
                     // the whole board, and run for each fighter it set the glyphs off again and again.
-                    if (!activados.Add((activador.Id, c.ActivaSuelo, c.Efecto.Value))) continue;
-                    if (c.ActivaSuelo == Managers.EffectEngine.ActivaLasRunas)
+                    // The runes are counted one by one below, each where its row reached.
+                    if (c.ActivaSuelo != Managers.EffectEngine.ActivaLasRunas
+                        && !activados.Add((activador.Id, c.ActivaSuelo, c.Efecto.Value))) continue;
+                    // The states he held as the spell reached this row: Runificación puts 296 and
+                    // 6971 on him, sets the runes off and takes them away again in its later rows,
+                    // which the engine has already resolved. The rune's rows ask for them ("A,*E296,
+                    // *E6971"): read without them, no rune ever did anything. Back on him while they
+                    // go off, and off again after.
+                    var devueltos = new List<(Fighter Who, int State)>();
+                    foreach (var (id, estados) in c.EstadosAlActivar ?? new Dictionary<long, HashSet<int>>())
                     {
-                        var runas = fight.Glifos.Where(g => g.Dueno == activador.Id && g.Tipo == 2022).ToList();
-                        foreach (var glifo in runas)
+                        if (fight.Buscar(id) is not { } quienEra) continue;
+                        foreach (int estado in estados.Where(e => !quienEra.Buffs.TieneEstado(e)).ToList())
                         {
-                            foreach (var quien in TodosLosCombatientes(fight).Where(f => f != null && f.IsAlive && glifo.Cubre(f.CellId)).ToList())
-                            {
-                                if (!GlyphCatches(fight, glifo, quien, false)) continue;
-                                await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar: false);
-                            }
+                            quienEra.Buffs.PonerEstado(estado);
+                            devueltos.Add((quienEra, estado));
                         }
-                        continue;
                     }
-
-                    // "Activa los glifos": the ones the spell in its value laid (any of his with
-                    // none), and not an aura, which only goes off as it is laid. Each goes off once,
-                    // on its activator standing in it and from its centre -- Inestabilidad's capture,
-                    // frame 101: "307 {f1 290, f2 the Xelor, f4 7}", the Xelor alone sent back, with
-                    // the enemy on the glyph's very centre left where he was.
-                    var suyos = fight.Glifos.Where(g => g.Dueno == activador.Id && g.Tipo != 2022 && g.Tipo != 400
-                                                        && g.Cuando != Jondo.Unity.World.Fights.Disparo.AlPonerse
-                                                        && (c.Efecto.Value == 0 || g.HechizoQueLoPuso == c.Efecto.Value))
-                                            .ToList();
-                    foreach (var glifo in suyos)
+                    try
                     {
-                        if (!activador.IsAlive || !glifo.Cubre(activador.CellId)) continue;
-                        await FireOneGlyphAsync(stream, fight, glifo, activador, alPisar: false,
-                                                celda: glifo.Centro >= 0 ? glifo.Centro : activador.CellId,
-                                                setOffByItsOwner: true);
+                        if (c.ActivaSuelo == Managers.EffectEngine.ActivaLasRunas)
+                        {
+                            // The runes in its zone (all of them over the whole map), each once: on
+                            // whoever stands on it, or, with nobody there, on its own cell -- what it
+                            // does over the whole map (Sobrecarga Rúnica's blow on its target, «por
+                            // cada runa activada») or round an empty cell (Manifestación's push)
+                            // needs nobody on it.
+                            var runas = fight.Glifos.Where(g => g.Dueno == activador.Id && g.Tipo == 2022
+                                                                && (c.CeldasActivadas == null || g.Casillas.Any(c.CeldasActivadas.Contains)))
+                                                    .ToList();
+                            foreach (var glifo in runas)
+                            {
+                                if (!runasDisparadas.Add(glifo.Id)) continue;
+                                var encima = TodosLosCombatientes(fight).Where(f => f != null && f.IsAlive && glifo.Cubre(f.CellId)).ToList();
+                                if (encima.Count == 0)
+                                {
+                                    await FireEmptyRuneAsync(stream, fight, glifo, activador);
+                                    continue;
+                                }
+                                foreach (var quien in encima)
+                                {
+                                    if (!GlyphCatches(fight, glifo, quien, false)) continue;
+                                    await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar: false);
+                                }
+                            }
+                            continue;
+                        }
+
+                        // "Activa los glifos": the ones the spell in its value laid (any of his with
+                        // none), and not an aura, which only goes off as it is laid. Each goes off once,
+                        // on its activator standing in it and from its centre -- Inestabilidad's capture,
+                        // frame 101: "307 {f1 290, f2 the Xelor, f4 7}", the Xelor alone sent back, with
+                        // the enemy on the glyph's very centre left where he was.
+                        var suyos = fight.Glifos.Where(g => g.Dueno == activador.Id && g.Tipo != 2022 && g.Tipo != 400
+                                                            && g.Cuando != Jondo.Unity.World.Fights.Disparo.AlPonerse
+                                                            && (c.Efecto.Value == 0 || g.HechizoQueLoPuso == c.Efecto.Value))
+                                                .ToList();
+                        foreach (var glifo in suyos)
+                        {
+                            if (!activador.IsAlive || !glifo.Cubre(activador.CellId)) continue;
+                            await FireOneGlyphAsync(stream, fight, glifo, activador, alPisar: false,
+                                                    celda: glifo.Centro >= 0 ? glifo.Centro : activador.CellId,
+                                                    setOffByItsOwner: true);
+                        }
+                    }
+                    finally
+                    {
+                        foreach (var (who, estado) in devueltos) who.Buffs.QuitarEstado(estado);
                     }
                     continue;
                 }
@@ -7479,7 +7575,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (c.VidaQueSeVa > 0)
                 {
                     int leQuedaba = c.Sobre.CurrentHP;
-                    var absorcion = await AbsorberElGolpeAsync(fight, c.Sobre, c.VidaQueSeVa);
+                    // A spell's life cost is not soaked up by the shield it buys: Trance's "-70% PdV"
+                    // on the Zobal and its shield on him resolve together, and the shield, already
+                    // on him, took the whole cost -- the spell was free.
+                    int deEsteHechizo = consecuencias.Where(o => o.Sobre == c.Sobre && o.Escudo > 0 && o.HechizoOrigen == c.HechizoOrigen)
+                                                     .Sum(o => o.Escudo);
+                    var absorcion = await AbsorberElGolpeAsync(fight, c.Sobre, c.VidaQueSeVa, deEsteHechizo);
                     // Worked out when the spell was resolved, and the life may have gone down since:
                     // Libación's 30% of 1,280 landed on 281, its own 1075 having taken a vitality
                     // bonus away in between. More than he has, and he falls with the cast.

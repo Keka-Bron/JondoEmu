@@ -662,11 +662,13 @@ namespace Jondo.Unity.World.Fights
         /// <summary>
         /// Puts a hit into the shield first and returns what reaches life.
         /// </summary>
-        public int PasarPorElEscudo(int dano)
+        public int PasarPorElEscudo(int dano, int noCuentan = 0)
         {
             if (dano <= 0 || PuntosDeEscudo <= 0) return dano;
 
-            int aguanta = Math.Min(PuntosDeEscudo, dano);
+            // The points that may not take this one: the shield the same cast has just given
+            // (Trance's, paid for with the very life it would soak up).
+            int aguanta = Math.Min(Math.Max(0, PuntosDeEscudo - noCuentan), dano);
             PuntosDeEscudo -= aguanta;
             return dano - aguanta;
         }

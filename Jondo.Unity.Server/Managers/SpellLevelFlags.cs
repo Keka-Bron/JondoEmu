@@ -21,6 +21,12 @@
         public const int CastInDiagonal = 1 << 1;
 
         /// <summary>
+        /// Its cell must be in the caster's line of sight (the client's CastTestLos, 4): the same
+        /// bit as the SpellLevels.CastTestLos column -- Refuerzo, cast through anybody, has neither.
+        /// </summary>
+        public const int CastTestLos = 1 << 2;
+
+        /// <summary>
         /// Its diagonal counts as far as walking it (the client's ProportionalDiagonal, 8192): two
         /// steps for each diagonal cell, not one. See MapGeometry.CastDistance.
         /// </summary>
