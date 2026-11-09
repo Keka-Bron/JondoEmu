@@ -1931,7 +1931,12 @@ namespace Jondo.Unity.Server.Network
                 .Var(14, Jondo.Unity.World.Combat.EffectSupport.SwapPositions)
                 .Build();
 
-        /// <summary>The visibility switch (jwe 150): f34 { f1: state, f4: who }. 1 as the illusions appear, 2 as they go.</summary>
+        /// <summary>
+        /// The visibility switch (jwe 150): f34 { f1: state, f4: who }. The client's states are
+        /// 0, 1 and 2 -- the old invisible, detected and visible, one lower --: 0 not drawn at all,
+        /// 1 drawn as a ghost, 2 drawn. The Sram's own capture has his 1 and his 2; his foes are
+        /// sent the 0, or their client draws him as the ghost his own side sees.
+        /// </summary>
         public static byte[] BuildVisibility(long author, long quien, int state)
             => Pb.New()
                 .Var(3, author)
@@ -1939,6 +1944,23 @@ namespace Jondo.Unity.Server.Network
                 .Msg(34, Pb.New().Var(1, state).Var(4, quien))
                 .Build();
 
+        /// <summary>
+        /// One unseen given away for a moment (jwe f36 { f1: the cell, f2: who }, author in f3):
+        /// his foes' client draws a dark silhouette on that cell -- its own
+        /// FightInvisibleTemporarilyDetectedStep, which the client picks by the f36 itself. Read
+        /// from the client; no capture has an invisible foe's cast.
+        /// </summary>
+        public static byte[] BuildInvisibleDetected(long quien, int celda)
+            => Pb.New()
+                .Var(3, quien)
+                .Var(14, InvisibleDetected)
+                .Msg(36, Pb.New().Var(1, celda).Var(2, quien))
+                .Build();
+
+        /// <summary>The action number of the silhouette, the one after the visibility switch's (150).</summary>
+        public const int InvisibleDetected = 151;
+
+        public const int Unseen = 0;
         public const int Hidden = 1;
         public const int Visible = 2;
 

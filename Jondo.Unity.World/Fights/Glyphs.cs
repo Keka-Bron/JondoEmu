@@ -100,6 +100,16 @@ namespace Jondo.Unity.World.Fights
         /// <summary>The spell that laid it, which a 2018 "Disipa los glifos" names in its die.</summary>
         public int HechizoQueLoPuso { get; set; }
 
+        /// <summary>The grade of the spell that laid it, as its jwe 400 names it.</summary>
+        public int GradoQueLoPuso { get; set; }
+
+        /// <summary>
+        /// Known to its owner's side alone: a trap, until it goes off -- «los adversarios podrán
+        /// ver… casillas donde se active una trampa», the Sram's sheet. Its going off, and its
+        /// going, are told only to whoever knows it.
+        /// </summary>
+        public bool SoloParaSuBando { get; set; }
+
         /// <summary>The laying row's zone, shape (its letter) and size: how a trap's jwe 400 draws it.</summary>
         public int ZoneShape { get; set; } = 'P';
         public int ZoneSize { get; set; }

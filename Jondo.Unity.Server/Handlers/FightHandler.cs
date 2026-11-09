@@ -4163,8 +4163,7 @@ namespace Jondo.Unity.Server.Handlers
             var caidos = fight.QuitarLosGlifosCaducados(g => !Managers.BombWalls.IsWall(g) && EsSuTiempo(g), SinDueno);
             foreach (var caido in caidos)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    Network.FightProtocol.BuildGlyphGone(caido.Dueno, caido.Id)));
+                await MarcaQuitadaAsync(fight, caido);
                 Program.LogDebug($"[Fight] Glyph {caido.Id} of {caido.Dueno} drops at the start of {quienEmpieza.Id}'s turn.");
             }
         }
@@ -4216,7 +4215,7 @@ namespace Jondo.Unity.Server.Handlers
         /// the end, not during the walk, because firing a glyph can move whoever stepped on it and leave
         /// him on top of another.
         /// </remarks>
-        private static async Task DispararLosGlifosAsync(NetworkStream stream, FightInstance fight,
+        internal static async Task DispararLosGlifosAsync(NetworkStream stream, FightInstance fight,
                                                          Fighter quien, bool alPisar,
                                                          bool byDisplacement = false,
                                                          bool skipWalls = false)
@@ -4244,11 +4243,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             var caidos = fight.BarrerLosGlifos();
-            foreach (var caido in caidos)
-            {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    Network.FightProtocol.BuildGlyphGone(caido.Dueno, caido.Id)));
-            }
+            foreach (var caido in caidos) await MarcaQuitadaAsync(fight, caido);
             if (caidos.Count > 0)
             {
                 Program.LogDebug($"[Fight] {caidos.Count} glyph(s) swept away.");
@@ -4426,6 +4421,19 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSequenceStart(quien.Id,
                                                          Network.FightProtocol.GlyphSequence)));
 
+            // A trap the other side never saw: shown to it now, where it goes off, before it does
+            // -- told to go off unseen, the client "tries to trigger an unknown mark" and to remove
+            // one it never had.
+            if (glifo.SoloParaSuBando)
+            {
+                int centro = glifo.Centro >= 0 ? glifo.Centro : glifo.Casillas.FirstOrDefault();
+                int otro = dueno.TeamId == FightInstance.Azules ? FightInstance.Rojos : FightInstance.Azules;
+                await ASuBandoAsync(fight, otro, ConnectionProtocol.Push(Op.Jwe,
+                    Network.FightProtocol.BuildTrap(dueno.Id, glifo.Id,
+                        Network.FightProtocol.TrapCells(glifo.ZoneShape, glifo.ZoneSize, centro, glifo.Casillas),
+                        centro, glifo.Hechizo, glifo.HechizoQueLoPuso, glifo.GradoQueLoPuso, glifo.Color)));
+                glifo.SoloParaSuBando = false;
+            }
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildGlyphTriggered(dueno.Id, glifo.Id, celda,
                                                           quien.Id, walkedIn: alPisar)));
@@ -5012,6 +5020,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // Through a portal the cast says so to its masks' R and r, and its damage and healing
             // grow with the network it crossed.
+            int castFrom = caster.CellId;
             fight.CastThroughPortal = proyeccion != null;
             fight.PortalBonusPercent = proyeccion is { } porElPortal ? Jondo.Unity.World.Fights.PortalNetwork.BonusPercent(porElPortal.Chain) : 0;
             fight.ProjectedFrom = proyeccion is { } throughThePortals ? throughThePortals.Chain[throughThePortals.Chain.Count - 1].Cell : -1;
@@ -5039,6 +5048,8 @@ namespace Jondo.Unity.Server.Handlers
                 fight.ProjectedFrom = -1;
                 fight.CastLanded = null;
             }
+
+            await GivenAwayAsync(fight, caster, castFrom);
 
             // Cast through a portal (PST): the Selatrop's passive gives him its +2% after every one,
             // behind what the spell did -- Extinción's capture, frame 13.
@@ -5659,7 +5670,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var mark in keepBoard ? new List<Glifo>() : fight.Glifos.ToList())
             {
                 fight.Glifos.Remove(mark);
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildGlyphGone(mark.Dueno, mark.Id)));
+                await MarcaQuitadaAsync(fight, mark);
             }
             // The character whole again too: between turns the Puchs hit back.
             await HealFullyAsync(stream, fight, who, who);
@@ -6335,6 +6346,48 @@ namespace Jondo.Unity.Server.Handlers
         /// A frame for the people of ONE side: whoever is looking from the other side does
         /// not get it. What the Tymadura's visibility switch needs -- see the cast below.
         /// </summary>
+        /// <summary>
+        /// A mark off the board, told to whoever knows it: a trap nobody of the other side has
+        /// seen go off, to its owner's side alone (<see cref="Glifo.SoloParaSuBando"/>).
+        /// </summary>
+        private static Task MarcaQuitadaAsync(FightInstance fight, Glifo mark)
+        {
+            var frame = ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildGlyphGone(mark.Dueno, mark.Id));
+            return mark.SoloParaSuBando && fight.Buscar(mark.Dueno) is { } dueno
+                ? ASuBandoAsync(fight, dueno.TeamId, frame)
+                : ATodosAsync(fight, frame);
+        }
+
+        /// <summary>
+        /// A cast that left its caster invisible -- a push with Miedo, a trap laid -- gives him away
+        /// for a moment: his foes see a dark silhouette on the cell he cast from, as in the game.
+        /// </summary>
+        private static async Task GivenAwayAsync(FightInstance fight, Fighter caster, int castFrom)
+        {
+            if (caster == null || !caster.IsAlive || !Managers.MonsterTactics.IsInvisible(caster) || castFrom < 0) return;
+            await SalvoASuBandoAsync(fight, caster.TeamId, ConnectionProtocol.Push(Op.Jwe,
+                Network.FightProtocol.BuildInvisibleDetected(caster.Id, castFrom)));
+        }
+
+        /// <summary>What one side must not be told the way it is told: to everybody else -- the other side and the spectators.</summary>
+        private static async Task SalvoASuBandoAsync(FightInstance fight, int teamId, byte[] frame)
+        {
+            await AbrirLoDebidoAsync(fight);
+            foreach (var sesion in Publico(fight))
+            {
+                var suyo = fight.Buscar(sesion.State.CharacterId);
+                if (suyo != null && suyo.TeamId == teamId) continue;
+                try
+                {
+                    await sesion.SendAsync(frame);
+                }
+                catch (Exception ex)
+                {
+                    Program.LogDebug($"[Fight] Could not write to {sesion.Id}: {ex.Message}");
+                }
+            }
+        }
+
         private static async Task ASuBandoAsync(FightInstance fight, int teamId, byte[] frame)
         {
             await AbrirLoDebidoAsync(fight);
@@ -7251,6 +7304,8 @@ namespace Jondo.Unity.Server.Handlers
                         // A trap: its own jwe 400, and only for its owner's side -- «los adversarios
                         // podrán ver… casillas donde se active una trampa», the Sram's sheet says:
                         // before that they do not see it.
+                        glyph.SoloParaSuBando = true;
+                        glyph.GradoQueLoPuso = c.NivelOrigen;
                         await ASuBandoAsync(fight, dueno.TeamId, ConnectionProtocol.Push(Op.Jwe,
                             Network.FightProtocol.BuildTrap(dueno.Id, glyph.Id,
                                 Network.FightProtocol.TrapCells(glyph.ZoneShape, glyph.ZoneSize, apuntada, glyph.Casillas),
@@ -7667,8 +7722,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     foreach (var g in c.GlifosQuitados)
                     {
-                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                            Network.FightProtocol.BuildGlyphGone(g.Dueno, g.Id)));
+                        await MarcaQuitadaAsync(fight, g);
                         if (g.Grado == 2 && Managers.ForgelanceCombat.IsAura(fight, g))
                             await SyncLanceProtectionAsync(stream, fight, fight.Buscar(g.Dueno));
                     }
@@ -8016,8 +8070,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (c.Efecto.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility)
                 {
                     c.Sobre.LastSeenCell = c.Sobre.CellId;
-                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                    // A ghost to his own side, nothing at all to the rest: told the ghost too, the
+                    // enemy's client drew the invisible Sram walking about.
+                    await ASuBandoAsync(fight, c.Sobre.TeamId, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildVisibility(quienLanza.Id, c.Sobre.Id, Network.FightProtocol.Hidden)));
+                    await SalvoASuBandoAsync(fight, c.Sobre.TeamId, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildVisibility(quienLanza.Id, c.Sobre.Id, Network.FightProtocol.Unseen)));
                 }
                 if (c.Buff.Estado != 0 && c.Efecto.EffectId == Jondo.Unity.World.Combat.EffectSupport.AddState
                     && !(c.Relevados?.Any(r => r.Estado == c.Buff.Estado) ?? false)
@@ -10143,6 +10201,7 @@ namespace Jondo.Unity.Server.Handlers
                                                   Network.FightProtocol.PointsDetail)));
 
             var tirada = Managers.EffectEngine.EfectosSorteados(spell, monsterGrade, critico);
+            int castFrom = monster.CellId;
             if (!Managers.PlayerSpells.Contains(spell))
             {
                 // A monster's own spell: its rows in the order they are written.
@@ -10190,6 +10249,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (proyeccion != null && monster.IsAlive)
                     await DispararAsync(stream, fight, monster, Managers.EffectEngine.AlProyectarPorUnPortal);
             }
+            await GivenAwayAsync(fight, monster, castFrom);
 
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), monster.Id,
