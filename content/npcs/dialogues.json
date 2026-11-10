@@ -464,22 +464,24 @@
         {
           "message": 30718,
           "choices": [
-            {
-              "reply": 37088,
-              "next": 26692
-            }
+            { "reply": 37088, "next": 30720, "completes": 13897, "params": [[30, 13897]] }
           ]
         },
         {
           "message": 26692,
           "choices": [
-            {
-              "reply": 37090,
-              "startsQuest": 1841
-            }
+            { "reply": 37090, "startsQuest": 1841 }
+          ]
+        },
+        {
+          "message": 30720,
+          "names": true,
+          "choices": [
+            { "reply": 37090, "startsQuest": 1841 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37088) is this class's objective (13897, effect 30), and leads to his greeting, 30720, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4313,
@@ -489,22 +491,24 @@
         {
           "message": 30730,
           "choices": [
-            {
-              "reply": 37102,
-              "next": 22251
-            }
+            { "reply": 37102, "next": 30732, "completes": 13896, "params": [[30, 13896]] }
           ]
         },
         {
           "message": 22251,
           "choices": [
-            {
-              "reply": 37103,
-              "startsQuest": 1677
-            }
+            { "reply": 37103, "startsQuest": 1677 }
+          ]
+        },
+        {
+          "message": 30732,
+          "names": true,
+          "choices": [
+            { "reply": 37103, "startsQuest": 1677 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37102) is this class's objective (13896, effect 30), and leads to his greeting, 30732, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4315,
@@ -514,28 +518,27 @@
         {
           "message": 30758,
           "choices": [
-            {
-              "reply": 37138,
-              "next": 11844
-            },
-            {
-              "reply": 38050
-            }
+            { "reply": 37138, "next": 30760, "completes": 13894, "params": [[30, 13894]] },
+            { "reply": 38050 }
           ]
         },
         {
           "message": 11844,
           "choices": [
-            {
-              "reply": 37141,
-              "startsQuest": 938
-            },
-            {
-              "reply": 38050
-            }
+            { "reply": 37141, "startsQuest": 938 },
+            { "reply": 38050 }
+          ]
+        },
+        {
+          "message": 30760,
+          "names": true,
+          "choices": [
+            { "reply": 37141, "startsQuest": 938 },
+            { "reply": 38050 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4317,
@@ -545,28 +548,27 @@
         {
           "message": 30773,
           "choices": [
-            {
-              "reply": 37160,
-              "next": 8766
-            },
-            {
-              "reply": 37179
-            }
+            { "reply": 37160, "next": 30775, "completes": 13893, "params": [[30, 13893]] },
+            { "reply": 37179 }
           ]
         },
         {
           "message": 8766,
           "choices": [
-            {
-              "reply": 37181,
-              "startsQuest": 716
-            },
-            {
-              "reply": 37179
-            }
+            { "reply": 37181, "startsQuest": 716 },
+            { "reply": 37179 }
+          ]
+        },
+        {
+          "message": 30775,
+          "names": true,
+          "choices": [
+            { "reply": 37181, "startsQuest": 716 },
+            { "reply": 37179 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37160) is this class's objective (13893, effect 30), and leads to his greeting, 30775, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4318,
@@ -576,28 +578,27 @@
         {
           "message": 30801,
           "choices": [
-            {
-              "reply": 37199,
-              "next": 8677
-            },
-            {
-              "reply": 37205
-            }
+            { "reply": 37199, "next": 30804, "completes": 13892, "params": [[30, 13892]] },
+            { "reply": 37205 }
           ]
         },
         {
           "message": 8677,
           "choices": [
-            {
-              "reply": 37212,
-              "startsQuest": 704
-            },
-            {
-              "reply": 37205
-            }
+            { "reply": 37212, "startsQuest": 704 },
+            { "reply": 37205 }
+          ]
+        },
+        {
+          "message": 30804,
+          "names": true,
+          "choices": [
+            { "reply": 37212, "startsQuest": 704 },
+            { "reply": 37205 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37199) is this class's objective (13892, effect 30), and leads to his greeting, 30804, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4319,
@@ -607,28 +608,27 @@
         {
           "message": 30817,
           "choices": [
-            {
-              "reply": 37219,
-              "next": 31615
-            },
-            {
-              "reply": 38048
-            }
+            { "reply": 37219, "next": 30819, "completes": 13891, "params": [[30, 13891]] },
+            { "reply": 38048 }
           ]
         },
         {
           "message": 31615,
           "choices": [
-            {
-              "reply": 38202,
-              "startsQuest": 1974
-            },
-            {
-              "reply": 38048
-            }
+            { "reply": 38202, "startsQuest": 1974 },
+            { "reply": 38048 }
+          ]
+        },
+        {
+          "message": 30819,
+          "names": true,
+          "choices": [
+            { "reply": 38202, "startsQuest": 1974 },
+            { "reply": 38048 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4321,
@@ -709,22 +709,25 @@
         {
           "message": 30861,
           "choices": [
-            {
-              "reply": 37523,
-              "next": 31076
-            }
+            { "reply": 37268, "next": 30862, "quest": 2009, "beforeObjective": 13882, "completes": 13882, "params": [[30, 13882]] },
+            { "reply": 37523, "next": 31076 }
           ]
         },
         {
           "message": 31076,
           "choices": [
-            {
-              "reply": 38299,
-              "startsQuest": 1965
-            }
+            { "reply": 38299, "startsQuest": 1965 }
+          ]
+        },
+        {
+          "message": 30862,
+          "names": true,
+          "choices": [
+            { "reply": 37523, "next": 31076 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37268) is this class's objective (13882, effect 30), and leads to his greeting, 30862, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4326,
@@ -734,22 +737,24 @@
         {
           "message": 30864,
           "choices": [
-            {
-              "reply": 37272,
-              "next": 31642
-            }
+            { "reply": 37272, "next": 30873, "completes": 13881, "params": [[30, 13881]] }
           ]
         },
         {
           "message": 31642,
           "choices": [
-            {
-              "reply": 38245,
-              "startsQuest": 1964
-            }
+            { "reply": 38245, "startsQuest": 1964 }
+          ]
+        },
+        {
+          "message": 30873,
+          "names": true,
+          "choices": [
+            { "reply": 38245, "startsQuest": 1964 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37272) is this class's objective (13881, effect 30), and leads to his greeting, 30873, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4327,
@@ -759,22 +764,25 @@
         {
           "message": 30826,
           "choices": [
-            {
-              "reply": 37412,
-              "next": 30978
-            }
+            { "reply": 37228, "next": 30828, "quest": 2009, "beforeObjective": 13889, "completes": 13889, "params": [[30, 13889]] },
+            { "reply": 37412, "next": 30978 }
           ]
         },
         {
           "message": 30978,
           "choices": [
-            {
-              "reply": 38292,
-              "startsQuest": 1972
-            }
+            { "reply": 38292, "startsQuest": 1972 }
+          ]
+        },
+        {
+          "message": 30828,
+          "names": true,
+          "choices": [
+            { "reply": 37412, "next": 30978 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37228) is this class's objective (13889, effect 30), and leads to his greeting, 30828, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4328,
@@ -784,22 +792,24 @@
         {
           "message": 30671,
           "choices": [
-            {
-              "reply": 37248,
-              "next": 31762
-            }
+            { "reply": 37248, "next": 30845, "completes": 13885, "params": [[30, 13885]] }
           ]
         },
         {
           "message": 31762,
           "choices": [
-            {
-              "reply": 38396,
-              "startsQuest": 1968
-            }
+            { "reply": 38396, "startsQuest": 1968 }
+          ]
+        },
+        {
+          "message": 30845,
+          "names": true,
+          "choices": [
+            { "reply": 38396, "startsQuest": 1968 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37248) is this class's objective (13885, effect 30), and leads to his greeting, 30845, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4329,
@@ -809,22 +819,25 @@
         {
           "message": 30834,
           "choices": [
-            {
-              "reply": 37568,
-              "next": 31114
-            }
+            { "reply": 37237, "next": 30836, "quest": 2009, "beforeObjective": 13887, "completes": 13887, "params": [[30, 13887]] },
+            { "reply": 37568, "next": 31114 }
           ]
         },
         {
           "message": 31114,
           "choices": [
-            {
-              "reply": 38304,
-              "startsQuest": 1970
-            }
+            { "reply": 38304, "startsQuest": 1970 }
+          ]
+        },
+        {
+          "message": 30836,
+          "names": true,
+          "choices": [
+            { "reply": 37568, "next": 31114 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37237) is this class's objective (13887, effect 30), and leads to his greeting, 30836, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4333,
@@ -834,22 +847,25 @@
         {
           "message": 30830,
           "choices": [
-            {
-              "reply": 38063,
-              "next": 31506
-            }
+            { "reply": 37233, "next": 30832, "quest": 2009, "beforeObjective": 13888, "completes": 13888, "params": [[30, 13888]] },
+            { "reply": 38063, "next": 31506 }
           ]
         },
         {
           "message": 31506,
           "choices": [
-            {
-              "reply": 38059,
-              "startsQuest": 1971
-            }
+            { "reply": 38059, "startsQuest": 1971 }
+          ]
+        },
+        {
+          "message": 30832,
+          "names": true,
+          "choices": [
+            { "reply": 38063, "next": 31506 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37233) is this class's objective (13888, effect 30), and leads to his greeting, 30832, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4334,
@@ -859,22 +875,24 @@
         {
           "message": 30838,
           "choices": [
-            {
-              "reply": 37241,
-              "next": 31715
-            }
+            { "reply": 37241, "next": 30841, "completes": 13886, "params": [[30, 13886]] }
           ]
         },
         {
           "message": 31715,
           "choices": [
-            {
-              "reply": 38341,
-              "startsQuest": 1969
-            }
+            { "reply": 38341, "startsQuest": 1969 }
+          ]
+        },
+        {
+          "message": 30841,
+          "names": true,
+          "choices": [
+            { "reply": 38341, "startsQuest": 1969 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4335,
@@ -884,22 +902,24 @@
         {
           "message": 30857,
           "choices": [
-            {
-              "reply": 37264,
-              "next": 31402
-            }
+            { "reply": 37264, "next": 30859, "completes": 13883, "params": [[30, 13883]] }
           ]
         },
         {
           "message": 31402,
           "choices": [
-            {
-              "reply": 37954,
-              "startsQuest": 1966
-            }
+            { "reply": 37954, "startsQuest": 1966 }
+          ]
+        },
+        {
+          "message": 30859,
+          "names": true,
+          "choices": [
+            { "reply": 37954, "startsQuest": 1966 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37264) is this class's objective (13883, effect 30), and leads to his greeting, 30859, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4337,
@@ -909,22 +929,25 @@
         {
           "message": 30846,
           "choices": [
-            {
-              "reply": 37875,
-              "next": 31357
-            }
+            { "reply": 37252, "next": 30856, "quest": 2009, "beforeObjective": 13884, "completes": 13884, "params": [[30, 13884]] },
+            { "reply": 37875, "next": 31357 }
           ]
         },
         {
           "message": 31357,
           "choices": [
-            {
-              "reply": 37872,
-              "startsQuest": 1967
-            }
+            { "reply": 37872, "startsQuest": 1967 }
+          ]
+        },
+        {
+          "message": 30856,
+          "names": true,
+          "choices": [
+            { "reply": 37875, "next": 31357 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37252) is this class's objective (13884, effect 30), and leads to his greeting, 30856, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4338,
@@ -934,22 +957,24 @@
         {
           "message": 30876,
           "choices": [
-            {
-              "reply": 37285,
-              "next": 31532
-            }
+            { "reply": 37285, "next": 30880, "completes": 13880, "params": [[30, 13880]] }
           ]
         },
         {
           "message": 31532,
           "choices": [
-            {
-              "reply": 38095,
-              "startsQuest": 1963
-            }
+            { "reply": 38095, "startsQuest": 1963 }
+          ]
+        },
+        {
+          "message": 30880,
+          "names": true,
+          "choices": [
+            { "reply": 38095, "startsQuest": 1963 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37285) is this class's objective (13880, effect 30), and leads to his greeting, 30880, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4339,
@@ -1015,22 +1040,25 @@
         {
           "message": 30821,
           "choices": [
-            {
-              "reply": 37626,
-              "next": 31158
-            }
+            { "reply": 37223, "next": 30823, "quest": 2009, "beforeObjective": 13890, "completes": 13890, "params": [[30, 13890]] },
+            { "reply": 37626, "next": 31158 }
           ]
         },
         {
           "message": 31158,
           "choices": [
-            {
-              "reply": 37619,
-              "startsQuest": 1973
-            }
+            { "reply": 37619, "startsQuest": 1973 }
+          ]
+        },
+        {
+          "message": 30823,
+          "names": true,
+          "choices": [
+            { "reply": 37626, "next": 31158 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37223) is this class's objective (13890, effect 30), and leads to his greeting, 30823, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4356,
@@ -1339,26 +1367,26 @@
         {
           "message": 30748,
           "choices": [
-            {
-              "reply": 37127,
-              "next": 20180
-            },
-            {
-              "reply": 37134,
-              "quest": 1615
-            }
+            { "reply": 37126, "next": 30750, "quest": 2009, "beforeObjective": 13895, "completes": 13895, "params": [[30, 13895]] },
+            { "reply": 37127, "next": 20180 },
+            { "reply": 37134, "quest": 1615 }
           ]
         },
         {
           "message": 20180,
           "choices": [
-            {
-              "reply": 37128,
-              "startsQuest": 1615
-            }
+            { "reply": 37128, "startsQuest": 1615 }
+          ]
+        },
+        {
+          "message": 30750,
+          "names": true,
+          "choices": [
+            { "reply": 37127, "next": 20180 }
           ]
         }
-      ]
+      ],
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37126) is this class's objective (13895, effect 30), and leads to his greeting, 30750, «La consejera Archi me ha hablado de ti», then to his class quest."
     },
     {
       "npc": 4412,
