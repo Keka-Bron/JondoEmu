@@ -614,11 +614,7 @@ namespace Jondo.Unity.Server.Managers
 
             // And what is required is spent, if the row says so. After handing out and before marking,
             // for the same reason: spending the lemonade and then having the rest fail would be the worst of all.
-            if (binding.SpendsRequired)
-            {
-                foreach (var (item, count) in binding.Requires)
-                    await Equipment.TakeAsync(stream, item, count);
-            }
+            if (binding.SpendsRequired) await SpendAsync(stream, binding);
 
             if (!talkFirst) await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
 
@@ -885,12 +881,24 @@ namespace Jondo.Unity.Server.Managers
                         InfoMessages.Warning, InfoMessages.MissingItem)));
                 return false;
             }
-            if (binding.SpendsRequired)
-            {
-                foreach (var (item, count) in binding.Requires)
-                    await Equipment.TakeAsync(stream, item, count);
-            }
+            if (binding.SpendsRequired) await SpendAsync(stream, binding);
             return true;
+        }
+
+        /// <summary>
+        /// Takes what a binding spends, each with the «Has perdido» the client words (lqn 22),
+        /// as when a conversation takes an item: the Bonta honey left in the bear-man's barrels.
+        /// </summary>
+        private static async Task SpendAsync(NetworkStream stream, QuestBinding binding)
+        {
+            foreach (var (item, count) in binding.Requires)
+            {
+                if (!await Equipment.TakeAsync(stream, item, count)) continue;
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        InfoMessages.ItemLost, count.ToString(CultureInfo.InvariantCulture),
+                        item.ToString(CultureInfo.InvariantCulture))));
+            }
         }
 
         /// <summary>

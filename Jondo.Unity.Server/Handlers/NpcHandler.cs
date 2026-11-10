@@ -1539,7 +1539,12 @@ namespace Jondo.Unity.Server.Handlers
 
             if (completesAfterClosing != 0
                 && await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora!.Quest, completesAfterClosing))
+            {
                 await GiveFromReplyAsync(stream, elegidaAhora);
+                // Whoever comes in once it is said and the window is shut: Selim Llenneb back in
+                // the vault on «Respaldar a Becky y dirigirte hacia la puerta».
+                if (elegidaAhora.ShowsNpc != 0) await ComesInAsync(stream, elegidaAhora.ShowsNpc);
+            }
 
             if (startsAfterClosing != 0)
             {
