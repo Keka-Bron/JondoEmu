@@ -45,6 +45,12 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>The one that leaves without accepting. Optional.</summary>
             public int Decline { get; init; }
 
+            /// <summary>
+            /// The element type it is declared with, when it has one of its own: the Dofusarium's
+            /// six statues are 465 to 470 in the tutorial capture's jss. Zero for the quest default, -1.
+            /// </summary>
+            public int Type { get; init; }
+
             public bool Asks => Question != 0 && Accept != 0;
         }
 
@@ -113,6 +119,7 @@ namespace Jondo.Unity.Server.Managers
                         Question = (int)Number(row, "question"),
                         Accept = (int)Number(row, "accept"),
                         Decline = (int)Number(row, "decline"),
+                        Type = (int)Number(row, "type"),
                     };
                 }
 

@@ -4849,6 +4849,42 @@
         }
       ],
       "why": "Ganymed coming into the combat room after the chafers, as the tutorial capture has him: 57149 «¡Bravo, #1!», 57220 on changing class while a novice, 57221 «Antes de que abandones el templo...» with «Seguir a Ganymed» (31 naming step 2250, 777), which takes the player to the Dofusarium (jru 241443329)."
+    },
+    {
+      "npc": 7581,
+      "map": 241443329,
+      "opening": 57150,
+      "openings": [
+        { "before": 1631, "message": 57150 },
+        { "quest": 1631, "pending": 9738, "message": 57150 },
+        { "quest": 1631, "pending": 9739, "message": 60427 },
+        { "quest": 1631, "message": 57151 },
+        { "after": 1631, "message": 57154 }
+      ],
+      "lines": [
+        {
+          "message": 57150,
+          "choices": [{ "reply": 77751, "startsQuest": 1631, "params": [[34, 1631], 3010] }]
+        },
+        {
+          "message": 60427,
+          "choices": [{ "reply": 83200, "next": 60428 }]
+        },
+        {
+          "message": 60428,
+          "choices": [{ "reply": 83193 }]
+        },
+        {
+          "message": 57151,
+          "choices": [{ "reply": 77755 }]
+        },
+        {
+          "message": 57154,
+          "names": true,
+          "choices": [{ "reply": 77754 }]
+        }
+      ],
+      "why": "Ganymed in the Dofusarium. The tutorial capture ends on his 57150 «Aquel que quiere ver cumplido su destino...» with «Inspeccionar las seis estatuas de dofus» (34 naming 1631, then 3010), the reply that starts 1631. The rest is his own lines in the order Dofus pour les noobs gives the quest: once the statues are read, 60427 on the Dofus and the hint to the book (60428, «Consultar el libro del templo», «Ir a la próxima sala»); once the book is read, 57151 «Ha llegado el momento de que comiences tu gran viaje» with «Dirigirte a la salida del Templo Celeste»; afterwards, his farewell 57154 with the name."
     }
   ]
 }

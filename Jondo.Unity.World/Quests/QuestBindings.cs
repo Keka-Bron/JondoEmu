@@ -53,6 +53,12 @@ namespace Jondo.Unity.World.Quests
         /// closes on the wheat of the jobs room (iwo 541424, iua 289, then ieb 1629 9657).
         /// </summary>
         Gather,
+
+        /// <summary>
+        /// Every element of <see cref="QuestBinding.Elements"/> read: «Averigua más información
+        /// sobre tu objetivo: los dofus», the Dofusarium's six statues, each a document.
+        /// </summary>
+        Read,
     }
 
     /// <summary>
@@ -222,6 +228,10 @@ namespace Jondo.Unity.World.Quests
         {
             _byObjective[binding.ObjectiveId] = binding;
 
+            // Only an element to click is the quest's own, drawn and pressed as such; the elements
+            // of a «read» binding are the world's readables (the Dofusarium's statues), already there.
+            if (binding.Kind != QuestBindingKind.Click) return;
+
             foreach (var (mapId, elementId) in binding.Elements)
             {
                 if (!_byElement.TryGetValue((mapId, elementId), out var here))
@@ -374,6 +384,7 @@ namespace Jondo.Unity.World.Quests
                 "walk" => QuestBindingKind.Walk,
                 "objectives" => QuestBindingKind.Objectives,
                 "gather" => QuestBindingKind.Gather,
+                "read" => QuestBindingKind.Read,
                 _ => QuestBindingKind.Click,
             };
         }

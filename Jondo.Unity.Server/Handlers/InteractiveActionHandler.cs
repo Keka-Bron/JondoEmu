@@ -85,6 +85,9 @@ namespace Jondo.Unity.Server.Handlers
 
                 Console.WriteLine($"[Readables] Document {lectura.Document} of element " +
                                   $"{elementId} is read{(lectura.Asks ? ", with a question" : "")}.");
+
+                // And a quest that asked to read it (the Dofusarium's statues, the temple's book).
+                if (!lectura.Asks) await Managers.Quests.OnReadAsync(stream, mapId);
                 return;
             }
 

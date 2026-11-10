@@ -261,7 +261,8 @@ namespace Jondo.Unity.Server.Managers
                     if (objective.NpcId != npcId) continue;
                     if (!Revealed(step, objective, run)) continue;
                     if (offering && (npcId == Almanax.Giver || !Handlers.AlmanaxOfferingHandler.MaySeeTheSaint(run.QuestId))) continue;
-                    if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId) continue;
+                    if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId
+                        && StandsOn(npcId, objective.MapId)) continue;
 
                     // "Bring me five ortie" and "show me the ring" name the same NPC as "come and
                     // see me", and turning up empty-handed must not tick them off.
@@ -285,6 +286,20 @@ namespace Jondo.Unity.Server.Managers
                     await CloseAsync(stream, binding);
                 }
             }
+        }
+
+        /// <summary>
+        /// Whether the NPC stands on that map at all. A conversation objective naming a map he is
+        /// never on -- 1631's «go back and see Ganymed» on the temple's book room -- is the catalogue
+        /// being older than the world, and talking to him wherever he stands does it.
+        /// </summary>
+        private static bool StandsOn(int npcId, long mapId)
+        {
+            foreach (var spawn in Npcs.Of(mapId))
+            {
+                if (spawn.NpcId == npcId) return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -657,6 +672,34 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Walk || binding.MapId != mapId) continue;
                     await CloseAsync(stream, binding);
+                }
+            }
+        }
+
+        /// <summary>
+        /// A document has been read: an objective bound to reading every one of its elements closes
+        /// once the last is read (the Dofusarium's statues, the temple's book).
+        /// </summary>
+        public static async Task OnReadAsync(NetworkStream stream, long mapId)
+        {
+            var log = Log;
+            if (log == null || _book == null) return;
+            var used = SessionContext.State.ElementsUsed;
+            foreach (var run in new List<QuestRun>(log.Doing()))
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    var binding = Bindings.Of(objective.Id);
+                    if (binding == null || binding.Kind != QuestBindingKind.Read || binding.Elements.Count == 0) continue;
+                    if (run.Done.Contains(objective.Id)) continue;
+                    bool all = true;
+                    foreach (var (_, element) in binding.Elements)
+                    {
+                        if (!used.Contains(element)) { all = false; break; }
+                    }
+                    if (all) await CloseAsync(stream, binding);
                 }
             }
         }
@@ -1113,7 +1156,7 @@ namespace Jondo.Unity.Server.Managers
                     if (run.Done.Contains(objective.Id)) continue;
 
                     if (objective.NpcId == npcId
-                        && (objective.MapId == 0 || objective.MapId == mapId)
+                        && (objective.MapId == 0 || objective.MapId == mapId || !StandsOn(npcId, objective.MapId))
                         && Revealed(step, objective, run))
                     {
                         wants = true;

@@ -1193,7 +1193,8 @@ namespace Jondo.Unity.Server.Network
                         .Var(1, Managers.Interactives.SkillInstanceOf(elementId))
                         .Var(2, Managers.Readables.Skill))
                     .Var(5, elementId)
-                    .Var(6, Jondo.Unity.World.Quests.QuestBinding.DefaultType));
+                    .Var(6, Managers.Readables.Of(mapId, elementId)?.Type is int own && own != 0
+                        ? own : Jondo.Unity.World.Quests.QuestBinding.DefaultType));
 
                 DeclarePlacement(jss, element, Managers.ResourceState.Full);
             }

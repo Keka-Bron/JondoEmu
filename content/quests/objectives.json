@@ -351,6 +351,20 @@
    "kind": "enter",
    "map": 241443329,
    "why": "«Habla con el maestro Darmas y vuelve a ver a Ganymed». The tutorial capture closes 2502 (ied) right after the jru to the Dofusarium that Ganymed's «Seguir a Ganymed» makes."
+  },
+  {
+   "objective": 9738,
+   "quest": 1631,
+   "kind": "read",
+   "elements": [{"map": 241443329, "element": 541698}, {"map": 241443329, "element": 541699}, {"map": 241443329, "element": 541700}, {"map": 241443329, "element": 541701}, {"map": 241443329, "element": 541702}, {"map": 241443329, "element": 541703}],
+   "why": "«Averigua más información sobre tu objetivo: los dofus»: the six statues of the Dofusarium, each read (Dofus pour les noobs: «consultez les statues de chacun des Dofus»)."
+  },
+  {
+   "objective": 9739,
+   "quest": 1631,
+   "kind": "read",
+   "elements": [{"map": 241444353, "element": 541709}],
+   "why": "«Averigua más cosas sobre tu destino»: the Celestial Temple's book on the next room (Dofus pour les noobs: «direction la map sur la droite. Inspectez le Livre du Temple Céleste»)."
   }
  ]
 }
