@@ -700,6 +700,17 @@ namespace Jondo.Unity.Server.Handlers
                                                  Bankers.Banker? banker = null,
                                                  IReadOnlyList<string>? lineParameters = null)
         {
+            // A written line that ends the conversation on purpose gets the client's own «Marcharte.»:
+            // his last reply would be somebody else's words -- Otomai's apprentice saying «Ir a ver al
+            // maestro cazador» when the beast is coming.
+            if (respuestas.Length == 0 && frase != null && frase.Choices.Count == 0)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(pregunta,
+                        Array.Empty<long>())));
+                return;
+            }
+
             if (respuestas.Length == 0)
             {
                 // One of his own, if he has any. The client resolves an answer's text from the template
@@ -1112,7 +1123,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (group == null) return;
                 await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
                     arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),
-                    alliesMustLive: npcFight.AlliesMustLive);
+                    alliesMustLive: npcFight.AlliesMustLive,
+                    winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId);
                 return;
             }
 

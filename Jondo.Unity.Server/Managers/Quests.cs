@@ -264,6 +264,7 @@ namespace Jondo.Unity.Server.Managers
 
                     // Done by one of his replies, not by hello (DialogueChoice.Completes).
                     if (tree != null && tree.HasReplyFor(objective.Id)) continue;
+                    if (NpcDialogues.AnyHasReplyFor(npcId, objective.Id)) continue;
                     if (offering && (npcId == Almanax.Giver || !Handlers.AlmanaxOfferingHandler.MaySeeTheSaint(run.QuestId))) continue;
                     if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId
                         && StandsOn(npcId, objective.MapId)) continue;

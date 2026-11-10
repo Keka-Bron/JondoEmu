@@ -33,6 +33,12 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>Whether the fight is lost when one of the allies falls («alliesMustLive»).</summary>
             public bool AlliesMustLive { get; init; }
+
+            /// <summary>Where a win leaves the character, if not where it fought («winMap», «winCell»).</summary>
+            public long WinMapId { get; init; }
+
+            /// <summary>The cell of <see cref="WinMapId"/>.</summary>
+            public int WinCellId { get; init; }
         }
 
         private static List<Fight>? _fights;
@@ -78,6 +84,8 @@ namespace Jondo.Unity.Server.Managers
                                 Monsters = Members(row, "monsters"),
                                 Allies = Members(row, "allies"),
                                 AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
+                                WinMapId = Long(row, "winMap"),
+                                WinCellId = (int)Long(row, "winCell"),
                             });
                         }
                     }

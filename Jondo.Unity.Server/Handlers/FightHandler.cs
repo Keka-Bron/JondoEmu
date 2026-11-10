@@ -38,7 +38,8 @@ namespace Jondo.Unity.Server.Handlers
                                                                long mobContextId = 0, FightRules rules = null,
                                                                long arenaMapId = 0,
                                                                IReadOnlyList<MobSpawnManager.MobMember>? allies = null,
-                                                               bool alliesMustLive = false)
+                                                               bool alliesMustLive = false,
+                                                               long winMapId = 0, int winCellId = 0)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
@@ -130,6 +131,8 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var ally in allies ?? Array.Empty<MobSpawnManager.MobMember>())
                 fight.AddPlayer(BuildMonsterFighter(ally, monsterSeqId--, 0));
             fight.AlliesMustLive = alliesMustLive && allies is { Count: > 0 };
+            fight.WinMapId = winMapId;
+            fight.WinCellId = winCellId;
 
             // All of an ordinary group; of a dungeon room's, the first clamp(players, 4, 8).
             int players = fight.Azul.Count(f => !f.IsMonster);
@@ -11205,6 +11208,18 @@ namespace Jondo.Unity.Server.Handlers
                     Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(top, TeleportHandler.MapCentre);
                     DatabaseManager.SaveCurrentCharacter();
                 }
+            }
+
+            // An NPC's fight that is won somewhere else: the trap room whose floor gave way. Decided
+            // here, before the jru names the map, for the same reason as a dungeon's below.
+            if (alliesAlive && fight.WinMapId != 0 && fight.WinMapId != back &&
+                MapManager.GetMapInfo(fight.WinMapId) != null)
+            {
+                back = fight.WinMapId;
+                Network.SessionContext.State.MapId = fight.WinMapId;
+                Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(fight.WinMapId,
+                    fight.WinCellId != 0 ? fight.WinCellId : TeleportHandler.MapCentre);
+                DatabaseManager.SaveCurrentCharacter();
             }
 
             // Was the fight inside a dungeon? Winning moves to the next room, its post-boss room,

@@ -89,5 +89,20 @@ namespace Jondo.Unity.Server.Managers
             Ensure();
             return NpcDialogueContent.For(_dialogues, npcId, mapId);
         }
+
+        /// <summary>
+        /// Whether one of this NPC's conversations, on any map, has a reply that does the
+        /// objective: Otomai's apprentice closes «¡Cuidado con la bestia!» in Jykel's cave, and
+        /// talking to him by the pit must not do it on a hello.
+        /// </summary>
+        public static bool AnyHasReplyFor(int npcId, int objectiveId)
+        {
+            Ensure();
+            foreach (var row in _dialogues.Rows)
+            {
+                if (row.Key.NpcId == npcId && row.Value.Value.HasReplyFor(objectiveId)) return true;
+            }
+            return false;
+        }
     }
 }

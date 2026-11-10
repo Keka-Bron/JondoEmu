@@ -965,6 +965,16 @@ namespace Jondo.Unity.World.Fights
         public bool AlliesMustLive { get; set; }
 
         /// <summary>
+        /// Where winning leaves the players, when not the map they fought from: the trap room of
+        /// «¡Cuidado con la bestia!», whose false floor has given way once the creature is down
+        /// (content/fights/npc_fights.json, «winMap»). Zero for every other fight.
+        /// </summary>
+        public long WinMapId { get; set; }
+
+        /// <summary>The cell <see cref="WinMapId"/> is reached on.</summary>
+        public int WinCellId { get; set; }
+
+        /// <summary>
         /// How deep the triggers set off by other triggers go right now. A hit fires "D", "D"
         /// casts a spell that hits, and that hit fires "D" again: past a few levels it is a loop
         /// in the data, not a mechanic, and it stops there.
