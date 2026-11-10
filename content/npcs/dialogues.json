@@ -5668,7 +5668,7 @@
         {
           "message": 20905,
           "choices": [
-            { "reply": 25091, "quest": 1642, "completes": 9828, "params": [[30, 9828]], "next": 20906 },
+            { "reply": 25091, "quest": 1642, "completes": 9828, "params": [[30, 9828]], "next": 20906, "beforeObjective": 9828 },
             { "reply": 25093, "next": 20908, "quest": 1642, "afterObjective": 9828, "beforeObjective": 9829 },
             { "reply": 25095, "next": 20909, "quest": 1642, "afterObjective": 9829, "beforeObjective": 9830 }
           ]
