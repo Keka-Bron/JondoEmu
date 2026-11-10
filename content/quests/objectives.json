@@ -1938,6 +1938,147 @@
    "requires": [{"item": 8548, "count": 1}],
    "spawns": {"monster": 1014, "count": 3, "attacks": true},
    "why": "«Ve al castillo y hazte pasar por el príncipe»: the castle of Amakna [4,-6] reached as a wabbit; «à l'entrée du château vous êtes attaqué par 3 srams. Si vous perdez le combat, la quête se met tout de même à jour» (Dofus pour les noobs)."
+  },
+  {
+   "objective": 636,
+   "quest": 158,
+   "kind": "talk",
+   "npc": 822,
+   "map": 68551168,
+   "why": "One of the people of the village to ask, in this order (Dofus pour les noobs: «respectez cet ordre !»). María Zoto at [6,-7]."
+  },
+  {
+   "objective": 637,
+   "quest": 158,
+   "kind": "talk",
+   "npc": 823,
+   "map": 68552193,
+   "afterObjectives": [636],
+   "why": "One of the people of the village to ask, in this order (Dofus pour les noobs: «respectez cet ordre !»). Fred Austero at [4,-6]."
+  },
+  {
+   "objective": 638,
+   "quest": 158,
+   "kind": "talk",
+   "npc": 824,
+   "map": 88080663,
+   "afterObjectives": [637],
+   "why": "One of the people of the village to ask, in this order (Dofus pour les noobs: «respectez cet ordre !»). Jorg Dy at [1,0]."
+  },
+  {
+   "objective": 639,
+   "quest": 158,
+   "kind": "enter",
+   "map": 84935177,
+   "why": "«entrez dans la maison en pain d'épice» of the wild dragoturkeys' territory [-12,8] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 661,
+   "quest": 158,
+   "kind": "order",
+   "gives": [{"item": 8508, "count": 1}, {"item": 8507, "count": 1}],
+   "why": "«retournez auprès de Bol Pokuz pour récupérer le Plat de Filtounga Tiède (vous obtiendrez aussi 1 x Plat de Filtounga pour vous)» (Dofus pour les noobs)."
+  },
+  {
+   "objective": 9543,
+   "quest": 1618,
+   "kind": "enter",
+   "map": 147981314,
+   "afterObjectives": [9542],
+   "why": "«Continúa siguiéndole la pista a Arbracillo»: [-16,-13], where Manzanillo is in trouble (Dofus pour les noobs)."
+  },
+  {
+   "objective": 9544,
+   "quest": 1618,
+   "kind": "beat",
+   "monsters": [3993, 3994, 3995, 3998],
+   "map": 147981314,
+   "why": "«Derrota a las arak-hais que amenazan a Manzanillo»: the fight his «Voy volando a ayudar» starts, he beside the character."
+  },
+  {
+   "objective": 9546,
+   "quest": 1618,
+   "kind": "enter",
+   "map": 183768078,
+   "afterObjectives": [9545],
+   "requires": [{"item": 16198, "count": 1}],
+   "spends": true,
+   "why": "«Escolta a Manzanillo hasta el templo de Sadida»: the temple [-1,9] reached with him walking behind; he stays there."
+  },
+  {
+   "objective": 9554,
+   "quest": 1619,
+   "kind": "beat",
+   "monsters": [3992, 3993, 3994, 3995],
+   "map": 147853317,
+   "why": "«Défendez-vous de l'embuscade»: the arakhais that fall on the character and Cornelia at the forest's edge (Dofus pour les noobs)."
+  },
+  {
+   "objective": 9556,
+   "quest": 1619,
+   "kind": "enter",
+   "map": 149165056,
+   "why": "«Encuentra a la reina de las arak-hais»: the fifth room of her lair [-6,-15]."
+  },
+  {
+   "objective": 9563,
+   "quest": 1620,
+   "kind": "click",
+   "elements": [{"map": 149946368, "element": 488201}],
+   "onlyGives": true,
+   "gives": [{"item": 16227, "count": 1}],
+   "afterObjectives": [9562],
+   "why": "«prendre la Potion Magique que vous trouverez dans son atelier» (Dofus pour les noobs): the jar 488201 (graphic 46468) on cell 346 of the workshop hands it over; the objective is done handing it to Hel Munster. INFERRED element."
+  },
+  {
+   "objective": 9564,
+   "quest": 1620,
+   "kind": "click",
+   "elements": [{"map": 149159936, "element": 504667}, {"map": 149159936, "element": 504668}],
+   "onlyGives": true,
+   "gives": [{"item": 16201, "count": 1}],
+   "requires": [{"item": 16197, "count": 1}],
+   "afterObjectives": [9563],
+   "why": "«Cliquez sur les barreaux permettant d'accéder à la cave du Sadida mort. Enfin prenez un Oeuf d'Arak-haï» (Dofus pour les noobs): the cellar bars before Sauce's house [-6,-15] (504667, 504668, graphic 3518), only as an arakhai."
+  },
+  {
+   "objective": 9565,
+   "quest": 1620,
+   "kind": "enter",
+   "map": 149688320,
+   "why": "«Acude al corazón del Territorio Ancestral»: the fifth room of the Ancestral Domain [-9,-14]."
+  },
+  {
+   "objective": 9570,
+   "quest": 1620,
+   "kind": "click",
+   "elements": [{"map": 147850754, "element": 488208}],
+   "showsNpc": 2854,
+   "why": "«Cliquez alors sur la statue présente au milieu de la clairière afin de faire apparaitre Silvosse» (Dofus pour les noobs): the statue 488208 (graphic 48804) on cell 271 of [-11,-13]."
+  },
+  {
+   "objective": 9579,
+   "quest": 1621,
+   "kind": "enter",
+   "map": 149427200,
+   "why": "«Entra en el Claro del Roble Blando y preséntate ante el amo del lugar»: the fifth room of the Soft Oak Clearing."
+  },
+  {
+   "objective": 9583,
+   "quest": 1621,
+   "kind": "click",
+   "elements": [{"map": 147850756, "element": 488215}],
+   "requires": [{"item": 16206, "count": 1}],
+   "spends": true,
+   "why": "«Deposita la piedra encantada en el cubo del pozo del Bosque Oscuro»: the bucket 488215 (graphic 33165) on cell 373."
+  },
+  {
+   "objective": 9584,
+   "quest": 1621,
+   "kind": "enter",
+   "map": 147850756,
+   "afterObjectives": [9583],
+   "why": "«Aléjate del pozo y vuelve para sorprender a la muñeca»: back on the well's map once the stone is in the bucket."
   }
  ]
 }

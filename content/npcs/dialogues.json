@@ -16241,6 +16241,1496 @@
         }
       ],
       "why": "Bob Zollo, the zollo mercenary (4098). «Qui veut la peau du Wabbit ?» of Dofus pour les noobs: at the wedding, «death to the wabbit!» (10748), «Proteger al príncipe Wey»: the fight against him (932). «Trouble-fête»: kill a wabbit prince at his wedding? dangerous (3976, «Répondre que ce maliage va souder Amakna et les Wabbits, ses ennemis julés»), his people's former glory (3977), «you will not do it all alone», how to get close? (3978, «Dire que vous allez entler dans le château poul qu'il puisse se télépolter sur vous»), possible, he will come too (3980), a deal, shake on it (3979: 881)."
+    },
+    {
+      "npc": 2274,
+      "map": 0,
+      "opening": 16985,
+      "lines": [
+        {
+          "message": 16985,
+          "choices": [
+            { "reply": 20260, "next": 16986 },
+            { "reply": 20258, "next": 16987 },
+            { "reply": 70750, "next": 52740, "beforeQuest": 2483 },
+            { "reply": 20259 }
+          ]
+        },
+        {
+          "message": 16986,
+          "choices": [
+            { "reply": 20257 }
+          ]
+        },
+        {
+          "message": 16987,
+          "choices": [
+            { "reply": 20257 }
+          ]
+        },
+        {
+          "message": 52740,
+          "choices": [
+            { "reply": 70748, "startsQuest": 2483, "params": [[34, 2483]] },
+            { "reply": 70749 }
+          ]
+        }
+      ],
+      "why": "A knight of Astrub before the bank [4,-18]: the city of mercenaries, Amakna and the companions' inn (16985), the order founded by Josán Martín (16986), deeds to earn a knight's help (16987). «Le cœur d'un compagnon est fait comme une auberge...» (2483) of Dofus pour les noobs: «L'interroger à propos de l'Auberge des compagnons», a resting place for the warriors who help adventurers, meet its owner (52740, «Suivre sa suggestion»)."
+    },
+    {
+      "npc": 7037,
+      "map": 0,
+      "opening": 52704,
+      "lines": [
+        {
+          "message": 52704,
+          "choices": [
+            { "reply": 70666, "next": 52705 },
+            { "reply": 70785, "next": 52767 },
+            { "reply": 70787, "next": 52769 }
+          ]
+        },
+        {
+          "message": 52767,
+          "choices": [
+            { "reply": 70784, "next": 52768 }
+          ]
+        },
+        {
+          "message": 52768,
+          "choices": [
+            { "reply": 70782 }
+          ]
+        },
+        {
+          "message": 52769,
+          "choices": [
+            { "reply": 70786 }
+          ]
+        },
+        {
+          "message": 52705,
+          "choices": [
+            { "reply": 70665, "next": 52766 },
+            { "reply": 70788, "next": 52770 },
+            { "reply": 70786 }
+          ]
+        },
+        {
+          "message": 52766,
+          "choices": [
+            { "reply": 70783, "next": 52706 }
+          ]
+        },
+        {
+          "message": 52770,
+          "choices": [
+            { "reply": 70786 }
+          ]
+        },
+        {
+          "message": 52706,
+          "choices": [
+            { "reply": 70664, "next": 52707 },
+            { "reply": 70670, "next": 52708 },
+            { "reply": 70676, "next": 52711 },
+            { "reply": 70679, "next": 52712 },
+            { "reply": 70683, "next": 52713 }
+          ]
+        },
+        {
+          "message": 52708,
+          "choices": [
+            { "reply": 70669, "next": 52709 },
+            { "reply": 70673, "next": 52710 }
+          ]
+        },
+        {
+          "message": 52713,
+          "choices": [
+            { "reply": 70682, "next": 52714 },
+            { "reply": 70686, "next": 52715 },
+            { "reply": 70689, "next": 52716 },
+            { "reply": 70692, "next": 52717 },
+            { "reply": 70695, "next": 52718 },
+            { "reply": 70698, "next": 52719 },
+            { "reply": 70701, "next": 52720 },
+            { "reply": 70704, "next": 52721 },
+            { "reply": 70707, "next": 52722 },
+            { "reply": 70710, "next": 52723 },
+            { "reply": 70713, "next": 52724 },
+            { "reply": 70716, "next": 52725 },
+            { "reply": 70719, "next": 52726 },
+            { "reply": 70722, "next": 52727 },
+            { "reply": 70725, "next": 52728 },
+            { "reply": 70728, "next": 52729 },
+            { "reply": 70731, "next": 52730 },
+            { "reply": 70734, "next": 52731 },
+            { "reply": 70737, "next": 52732 }
+          ]
+        },
+        {
+          "message": 52707,
+          "choices": [
+            { "reply": 70663, "next": 52706 },
+            { "reply": 70662 }
+          ]
+        },
+        {
+          "message": 52711,
+          "choices": [
+            { "reply": 70675, "next": 52706 },
+            { "reply": 70674 }
+          ]
+        },
+        {
+          "message": 52712,
+          "choices": [
+            { "reply": 70678, "next": 52706 },
+            { "reply": 70677 }
+          ]
+        },
+        {
+          "message": 52709,
+          "choices": [
+            { "reply": 70668, "next": 52706 },
+            { "reply": 70667 }
+          ]
+        },
+        {
+          "message": 52710,
+          "choices": [
+            { "reply": 70672, "next": 52706 },
+            { "reply": 70671 }
+          ]
+        },
+        {
+          "message": 52714,
+          "choices": [
+            { "reply": 70681, "next": 52706 },
+            { "reply": 70680 }
+          ]
+        },
+        {
+          "message": 52715,
+          "choices": [
+            { "reply": 70685, "next": 52706 },
+            { "reply": 70684 }
+          ]
+        },
+        {
+          "message": 52716,
+          "choices": [
+            { "reply": 70688, "next": 52706 },
+            { "reply": 70687 }
+          ]
+        },
+        {
+          "message": 52717,
+          "choices": [
+            { "reply": 70691, "next": 52706 },
+            { "reply": 70690 }
+          ]
+        },
+        {
+          "message": 52718,
+          "choices": [
+            { "reply": 70694, "next": 52706 },
+            { "reply": 70693 }
+          ]
+        },
+        {
+          "message": 52719,
+          "choices": [
+            { "reply": 70697, "next": 52706 },
+            { "reply": 70696 }
+          ]
+        },
+        {
+          "message": 52720,
+          "choices": [
+            { "reply": 70700, "next": 52706 },
+            { "reply": 70699 }
+          ]
+        },
+        {
+          "message": 52721,
+          "choices": [
+            { "reply": 70703, "next": 52706 },
+            { "reply": 70702 }
+          ]
+        },
+        {
+          "message": 52722,
+          "choices": [
+            { "reply": 70706, "next": 52706 },
+            { "reply": 70705 }
+          ]
+        },
+        {
+          "message": 52723,
+          "choices": [
+            { "reply": 70709, "next": 52706 },
+            { "reply": 70708 }
+          ]
+        },
+        {
+          "message": 52724,
+          "choices": [
+            { "reply": 70712, "next": 52706 },
+            { "reply": 70711 }
+          ]
+        },
+        {
+          "message": 52725,
+          "choices": [
+            { "reply": 70715, "next": 52706 },
+            { "reply": 70714 }
+          ]
+        },
+        {
+          "message": 52726,
+          "choices": [
+            { "reply": 70718, "next": 52706 },
+            { "reply": 70717 }
+          ]
+        },
+        {
+          "message": 52727,
+          "choices": [
+            { "reply": 70721, "next": 52706 },
+            { "reply": 70720 }
+          ]
+        },
+        {
+          "message": 52728,
+          "choices": [
+            { "reply": 70724, "next": 52706 },
+            { "reply": 70723 }
+          ]
+        },
+        {
+          "message": 52729,
+          "choices": [
+            { "reply": 70727, "next": 52706 },
+            { "reply": 70726 }
+          ]
+        },
+        {
+          "message": 52730,
+          "choices": [
+            { "reply": 70730, "next": 52706 },
+            { "reply": 70729 }
+          ]
+        },
+        {
+          "message": 52731,
+          "choices": [
+            { "reply": 70733, "next": 52706 },
+            { "reply": 70732 }
+          ]
+        },
+        {
+          "message": 52732,
+          "choices": [
+            { "reply": 70736, "next": 52706 },
+            { "reply": 70735 }
+          ]
+        }
+      ],
+      "why": "Clionora, owner of the companions' inn of the Amakna village tavern [0,6]: good company is less dangerous (52704); «Dire que vous êtes toujours à la recherche d'alliés prêts à se joindre à vous» (Dofus pour les noobs, «Le cœur d'un compagnon...»): a group, or a companion (52705); her childhood dreams, the old house renovated (52767, 52768); adventure is not for everyone (52769); how to get some companions' help: her anecdotes (52766), who interests you (52706): the dark artisans (52707), the chafers and the undead pirates (52708: 52709, 52710), the knight of Astrub (52711), the tormented knights (52712), embodied companions (52713: nineteen, 52714-52732); embodied souls (52770)."
+    },
+    {
+      "npc": 819,
+      "map": 0,
+      "opening": 3426,
+      "openings": [
+        { "quest": 158, "message": 3431 },
+        { "canStart": 158, "message": 3430 }
+      ],
+      "lines": [
+        {
+          "message": 3426,
+          "choices": []
+        },
+        {
+          "message": 3430,
+          "choices": [
+            { "reply": 3039, "startsQuest": 158, "params": [[34, 158]], "next": 3431 },
+            { "reply": 3040 }
+          ]
+        },
+        {
+          "message": 3431,
+          "choices": []
+        }
+      ],
+      "why": "Don El, above the castle's zaap [3,-6]: his wife looks after the children while he works (3426). «Ça est frugal, une fois» (158) of Dofus pour les noobs: their children gone two days (3430, «Proposer de partir à la recherche des enfants disparus»), talk to his wife (3431)."
+    },
+    {
+      "npc": 820,
+      "map": 0,
+      "opening": 3425,
+      "openings": [
+        { "quest": 158, "step": 308, "message": 3432 },
+        { "quest": 158, "message": 3433 }
+      ],
+      "lines": [
+        {
+          "message": 3425,
+          "choices": []
+        },
+        {
+          "message": 3432,
+          "choices": [
+            { "reply": 3041, "quest": 158, "completes": 635, "params": [[30, 635]], "next": 3433 }
+          ]
+        },
+        {
+          "message": 3433,
+          "choices": []
+        }
+      ],
+      "why": "Doña El, above the castle's zaap [3,-6]: have you seen her children? (3425). «Ça est frugal, une fois»: Hans and Gret (3432, «I can help you find them»: 635), playing around the village fountain (3433)."
+    },
+    {
+      "npc": 822,
+      "map": 0,
+      "opening": 3437,
+      "openings": [
+        { "quest": 158, "step": 309, "message": 3434 }
+      ],
+      "lines": [
+        {
+          "message": 3437,
+          "choices": []
+        },
+        {
+          "message": 3434,
+          "choices": []
+        }
+      ],
+      "why": "María Zoto [6,-7]: the village market (3437). «Ça est frugal, une fois»: the El children? not seen (3434: 636)."
+    },
+    {
+      "npc": 823,
+      "map": 0,
+      "opening": 3436,
+      "openings": [
+        { "quest": 158, "step": 309, "objective": 636, "message": 3435 }
+      ],
+      "lines": [
+        {
+          "message": 3436,
+          "choices": []
+        },
+        {
+          "message": 3435,
+          "choices": []
+        }
+      ],
+      "why": "Fred Austero [4,-6]: one day he will go adventuring (3436). «Ça est frugal, une fois»: Hans and Gret playing with little Jorg Dy (3435: 637)."
+    },
+    {
+      "npc": 824,
+      "map": 0,
+      "opening": 3439,
+      "openings": [
+        { "quest": 158, "objective": 638, "pending": 639, "message": 3438 }
+      ],
+      "lines": [
+        {
+          "message": 3439,
+          "choices": []
+        },
+        {
+          "message": 3438,
+          "choices": []
+        }
+      ],
+      "why": "Jorg Dy [1,0]: play with me? (3439). «Ça est frugal, une fois»: Hans wanted to catch a dragoturkey, a cabin in the woods nobody knows (3438: 638)."
+    },
+    {
+      "npc": 4563,
+      "map": 0,
+      "opening": 32258,
+      "openings": [
+        { "quest": 158, "step": 316, "message": 32262 },
+        { "quest": 158, "step": 310, "message": 32258 },
+        { "after": 158, "message": 32263 }
+      ],
+      "lines": [
+        {
+          "message": 32258,
+          "choices": [
+            { "reply": 39111, "next": 32259, "quest": 158, "beforeObjective": 643 }
+          ]
+        },
+        {
+          "message": 32259,
+          "choices": [
+            { "reply": 39117, "next": 32260 }
+          ]
+        },
+        {
+          "message": 32260,
+          "choices": [
+            { "reply": 39116, "next": 32261 }
+          ]
+        },
+        {
+          "message": 32261,
+          "choices": [
+            { "reply": 39112, "quest": 158, "completes": 643, "params": [[30, 643]] },
+            { "reply": 39115, "next": 32262 }
+          ]
+        },
+        {
+          "message": 32262,
+          "choices": [
+            { "reply": 39113 }
+          ]
+        },
+        {
+          "message": 32263,
+          "choices": [
+            { "reply": 39118 }
+          ]
+        }
+      ],
+      "why": "Pandep, in the gingerbread house of the wild dragoturkeys' territory [-12,8]: she likes children... a lot (32258). «Ça est frugal, une fois» of Dofus pour les noobs: «I am looking for children», none seen for so long (32259), «they must have come hunting here», no two little devils (32260), «I never said there were two», she shut them away, something to eat (32261, «Dire que vous ferez ce qu'il faudra pour libérer les enfants»: 643), «not very bright», a dish to fill her (32262); the filtunga, the best she ever ate, she keeps her word (32263: 662)."
+    },
+    {
+      "npc": 825,
+      "map": 0,
+      "opening": 3444,
+      "openings": [
+        { "quest": 158, "step": 316, "message": 3452 },
+        { "quest": 158, "step": 314, "message": 3449 },
+        { "quest": 158, "step": 313, "message": 3448 },
+        { "quest": 158, "step": 311, "message": 3443 }
+      ],
+      "lines": [
+        {
+          "message": 3444,
+          "choices": []
+        },
+        {
+          "message": 3443,
+          "choices": []
+        },
+        {
+          "message": 3448,
+          "choices": []
+        },
+        {
+          "message": 3449,
+          "choices": []
+        },
+        {
+          "message": 3452,
+          "choices": []
+        }
+      ],
+      "why": "Argui Ñaño, cook of the Amakna tavern [-2,-1]: want something to eat? (3444). «Ça est frugal, une fois» of Dofus pour les noobs: a unique dish, the filtunga, Mus Buf has the recipe (3443: 640), the recipe, find the ingredients (3448), he cooks, wait (3449), the filtunga done (3452: the warm dish 8508, and one for the character)."
+    },
+    {
+      "npc": 826,
+      "map": 0,
+      "opening": 3447,
+      "openings": [
+        { "quest": 158, "step": 315, "message": 3450 },
+        { "quest": 158, "step": 311, "message": 3445 }
+      ],
+      "lines": [
+        {
+          "message": 3447,
+          "choices": []
+        },
+        {
+          "message": 3445,
+          "choices": [
+            { "reply": 3047, "quest": 158, "completes": 641, "params": [[30, 641]], "next": 3446, "gives": 8497 }
+          ]
+        },
+        {
+          "message": 3446,
+          "choices": []
+        },
+        {
+          "message": 3450,
+          "choices": []
+        }
+      ],
+      "why": "Mus Buf of Bonta [-31,-52]: the filtunga, heavy but exquisite (3447). «Ça est frugal, une fois»: why give the book? (3445, «to save children from a horrible witch»: 641), use it and bring it back (3446: the recipe 8497), the book back (3450: 660)."
+    },
+    {
+      "npc": 53,
+      "map": 0,
+      "opening": 30,
+      "openings": [
+        { "quest": 245, "message": 4258 },
+        { "canStart": 245, "message": 4256 },
+        { "after": 245, "message": 4260 }
+      ],
+      "lines": [
+        {
+          "message": 30,
+          "choices": []
+        },
+        {
+          "message": 4256,
+          "choices": [
+            { "reply": 3759, "startsQuest": 245, "params": [[34, 245]], "next": 4257 }
+          ]
+        },
+        {
+          "message": 4257,
+          "choices": []
+        },
+        {
+          "message": 4258,
+          "choices": []
+        },
+        {
+          "message": 4260,
+          "choices": []
+        }
+      ],
+      "why": "Farle Ingals of the Ingals fields [5,6], busy with the harvest (30). «La faux Maudite» (245) of Dofus pour les noobs, to whoever carries the warrior lord's cursed sword (8993): a fine cursed sword, it could become a scythe (4256), a good handle, an attractive root and the sword (4257: the Huzohide root, 7183), «have you got them?» (4258), the scythe ready, do not cut wheat with it (4260)."
+    },
+    {
+      "npc": 2845,
+      "map": 0,
+      "opening": 20453,
+      "openings": [
+        { "quest": 1618, "message": 20490 }
+      ],
+      "lines": [
+        {
+          "message": 20453,
+          "choices": [
+            { "reply": 24507, "next": 20487, "beforeQuest": 1618 }
+          ]
+        },
+        {
+          "message": 20487,
+          "choices": [
+            { "reply": 24506, "next": 20488 }
+          ]
+        },
+        {
+          "message": 20488,
+          "choices": [
+            { "reply": 24504, "next": 20489 },
+            { "reply": 24505 }
+          ]
+        },
+        {
+          "message": 20489,
+          "choices": [
+            { "reply": 24503, "startsQuest": 1618, "params": [[34, 1618]], "next": 20490 }
+          ]
+        },
+        {
+          "message": 20490,
+          "choices": [
+            { "reply": 24502 }
+          ]
+        }
+      ],
+      "why": "Sauce, the dead sadida before the Lair of the Rac Queen [-6,-15], who keeps its door (20453). «C'est tout simple» (1618) of Dofus pour les noobs: «what happened?», a huge arakna nested in his house (20487), he fought to protect his son, who fled (20488, «I can help you look for him»), his son Manzanillo, a healer, always with a little treechnid (20489, «Haré todo lo que esté en mi mano»), the wizard's house or one of the mines (20490)."
+    },
+    {
+      "npc": 2851,
+      "map": 147981057,
+      "opening": 20483,
+      "lines": [
+        {
+          "message": 20483,
+          "choices": [
+            { "reply": 24508, "quest": 1618, "completes": 9541, "params": [[30, 9541]] },
+            { "reply": 24509 }
+          ]
+        }
+      ],
+      "why": "Arbracillo, Manzanillo's little treechnid, before the abandoned house [-15,-16]: he hops and beckons (20483, «Seguir al pequeño abráknido»: 9541; Dofus pour les noobs: «Celui-ci semble vouloir vous montrer quelque chose»)."
+    },
+    {
+      "npc": 2851,
+      "map": 147980801,
+      "opening": 20483,
+      "lines": [
+        {
+          "message": 20483,
+          "choices": [
+            { "reply": 24510, "quest": 1618, "completes": 9542, "params": [[30, 9542]] },
+            { "reply": 24509 }
+          ]
+        }
+      ],
+      "why": "Arbracillo at [-15,-14], where he waits to be followed again (20483, «Continuar siguiendo al abráknido»: 9542)."
+    },
+    {
+      "npc": 2850,
+      "map": 147981314,
+      "opening": 20491,
+      "openings": [
+        { "quest": 1618, "objective": 9544, "message": 20494 }
+      ],
+      "lines": [
+        {
+          "message": 20491,
+          "choices": [
+            { "reply": 24511, "quest": 1618, "beforeObjective": 9544 },
+            { "reply": 24512 }
+          ]
+        },
+        {
+          "message": 20494,
+          "choices": [
+            { "reply": 24521, "next": 20495, "quest": 1618, "beforeObjective": 9545 }
+          ]
+        },
+        {
+          "message": 20495,
+          "choices": [
+            { "reply": 24520, "next": 20496 }
+          ]
+        },
+        {
+          "message": 20496,
+          "choices": [
+            { "reply": 24519, "next": 20497 }
+          ]
+        },
+        {
+          "message": 20497,
+          "choices": [
+            { "reply": 24518, "quest": 1618, "completes": 9545, "params": [[30, 9545]], "next": 20498, "gives": 16198 }
+          ]
+        },
+        {
+          "message": 20498,
+          "choices": [
+            { "reply": 24517 }
+          ]
+        }
+      ],
+      "why": "Manzanillo (Simple), cornered by arak-hais at [-16,-13], by «C'est tout simple» of Dofus pour les noobs: «help, they want to eat me!» (20491, «Voy volando a ayudar»: the fight, he beside the character); saved (20494), «your father sends me», he saw them fall on him (20495), «his spirit came to me», still protecting him (20496), «come with me to the Sadida temple», the arakna poison, he heals the character (20497), he follows (20498: 9545, the follower 16198)."
+    },
+    {
+      "npc": 2850,
+      "map": 183768078,
+      "opening": 20499,
+      "lines": [
+        {
+          "message": 20499,
+          "choices": []
+        }
+      ],
+      "why": "Manzanillo at the Sadida temple, escorted there: never been here, the Tree of Life's magic (20499)."
+    },
+    {
+      "npc": 43,
+      "map": 0,
+      "opening": 20484,
+      "openings": [
+        { "quest": 1618, "objective": 9547, "message": 20485 }
+      ],
+      "lines": [
+        {
+          "message": 20484,
+          "choices": []
+        },
+        {
+          "message": 20485,
+          "choices": []
+        }
+      ],
+      "why": "Etenipse Tik of the Sadida temple [-1,9]: leather braces for his loincloth (20484). «C'est tout simple»: Manzanillo welcome to rest, the Soft Oak's magic in him (20485: 9547)."
+    },
+    {
+      "npc": 2847,
+      "map": 0,
+      "opening": 20481,
+      "lines": [
+        {
+          "message": 20481,
+          "choices": [
+            { "reply": 24530, "quest": 1618, "completes": 9548, "params": [[30, 9548]], "next": 20501 },
+            { "reply": 24497, "next": 20482 },
+            { "reply": 24496 }
+          ]
+        },
+        {
+          "message": 20482,
+          "choices": [
+            { "reply": 24496 }
+          ]
+        },
+        {
+          "message": 20501,
+          "choices": [
+            { "reply": 24529, "next": 20502 }
+          ]
+        },
+        {
+          "message": 20502,
+          "choices": [
+            { "reply": 24531, "next": 20503, "beforeQuest": 1619 }
+          ]
+        },
+        {
+          "message": 20503,
+          "choices": [
+            { "reply": 24533, "startsQuest": 1619, "params": [[34, 1619]], "next": 20504 }
+          ]
+        },
+        {
+          "message": 20504,
+          "choices": [
+            { "reply": 24532 }
+          ]
+        }
+      ],
+      "why": "Colonel Rumo of the Amakna militia [5,-6]: war to impose peace (20481), the gangs raiding the temples (20482). «C'est tout simple»: «arakhais invaded part of the treechnid forest» (9548), rumours, anything more precise? (20501), «Sauce's tragic story», worse than he thought, his best scout (20502); «Arak-haï en pagaille» (1619): «ready to work with the foresters», fight the arakhais to watch them (20503, «Luchar no me da ningún miedo»), report to Cornelia, his fastest forester, at the forest's edge (20504)."
+    },
+    {
+      "npc": 2852,
+      "map": 0,
+      "opening": 20507,
+      "openings": [
+        { "after": 1620, "before": 1621, "message": 20549 },
+        { "quest": 1619, "objective": 9553, "pending": 9554, "message": 20510 },
+        { "after": 1619, "before": 1620, "message": 20519 }
+      ],
+      "lines": [
+        {
+          "message": 20507,
+          "choices": [
+            { "reply": 24593, "quest": 1620, "completes": 9572, "params": [[30, 9572]], "next": 20548, "afterObjective": 9571 },
+            { "reply": 24534, "quest": 1619, "completes": 9553, "params": [[30, 9553]], "next": 20508 },
+            { "reply": 24542, "next": 20511, "quest": 1619, "afterObjective": 9554 }
+          ]
+        },
+        {
+          "message": 20508,
+          "choices": [
+            { "reply": 24537, "next": 20509 },
+            { "reply": 24536 }
+          ]
+        },
+        {
+          "message": 20509,
+          "choices": [
+            { "reply": 24538, "quest": 1619, "beforeObjective": 9554 },
+            { "reply": 24539 }
+          ]
+        },
+        {
+          "message": 20510,
+          "choices": [
+            { "reply": 24535, "quest": 1619, "beforeObjective": 9554 },
+            { "reply": 24539 }
+          ]
+        },
+        {
+          "message": 20511,
+          "choices": [
+            { "reply": 24541, "quest": 1619, "completes": 9555, "params": [[30, 9555]], "next": 20512 }
+          ]
+        },
+        {
+          "message": 20512,
+          "choices": [
+            { "reply": 24540 }
+          ]
+        },
+        {
+          "message": 20519,
+          "names": true,
+          "choices": [
+            { "reply": 24552, "next": 20520 }
+          ]
+        },
+        {
+          "message": 20520,
+          "choices": [
+            { "reply": 24551, "startsQuest": 1620, "params": [[34, 1620]] }
+          ]
+        },
+        {
+          "message": 20548,
+          "names": true,
+          "choices": [
+            { "reply": 24592, "next": 20549 }
+          ]
+        },
+        {
+          "message": 20549,
+          "choices": [
+            { "reply": 24591 }
+          ]
+        }
+      ],
+      "why": "Cornelia Trancos, the colonel's fastest forester, at the forest's edge [-6,-10]: shadows hide her steps (20507). «Arak-haï en pagaille» (1619) of Dofus pour les noobs: «what you know of the arakhais» (9553), sent by the colonel, so much noise (20508), «my mission is not to go unnoticed», company coming (20509, «Desenvainar el arma»: the ambush, she beside the character; «fuir lâchement» and back: 20510); «are you not hurt?», where did those executioners come from (20511), «they hide in Sauce's house» (9555), the lair, find their mother (20512). Afterwards: Lasoberaña wants the forest (20519), Hel Munster, ask him about the arakhais (20520: «Munster lève le mystère», 1620). «Munster lève le mystère»: «Transmitir el mensaje de Silvosse», the Master of Cuttings seen, off to the colonel, a seal for a true forester (20548: 9572, the sylvan seal), «may the trees never hide the forest» (20549)."
+    },
+    {
+      "npc": 2846,
+      "map": 149166080,
+      "opening": 20518,
+      "openings": [
+        { "quest": 1619, "objective": 9557, "pending": 9558, "message": 20457 }
+      ],
+      "lines": [
+        {
+          "message": 20457,
+          "choices": [
+            { "reply": 24550, "next": 20515 }
+          ]
+        },
+        {
+          "message": 20515,
+          "choices": [
+            { "reply": 24549, "next": 20516 }
+          ]
+        },
+        {
+          "message": 20516,
+          "choices": [
+            { "reply": 24548, "next": 20517 }
+          ]
+        },
+        {
+          "message": 20517,
+          "choices": [
+            { "reply": 24547, "quest": 1619, "completes": 9558, "params": [[30, 9558]], "next": 20518 },
+            { "reply": 24546, "quest": 1619, "completes": 9558, "params": [[30, 9558]], "next": 20518 }
+          ]
+        },
+        {
+          "message": 20518,
+          "choices": [
+            { "reply": 24545 }
+          ]
+        }
+      ],
+      "why": "Lasoberaña, the Rac Queen, in her lair's exit room [-6,-15], by «Arak-haï en pagaille» of Dofus pour les noobs: your flesh for her subjects (20457), «a talking arakna», not a simple arakna, the first arakhai (20515), «where from? why this house?» (20516), «the foresters of Amakna, king Allister's», the forest will be the arakhais' (20517: 9558), go before her executioners are loosed (20518); «Abandonar la guarida» leaves."
+    },
+    {
+      "npc": 176,
+      "map": 0,
+      "opening": 664,
+      "openings": [
+        { "quest": 1620, "objective": 9568, "pending": 9569, "message": 20537 },
+        { "quest": 1620, "objective": 9564, "pending": 9565, "message": 20535 },
+        { "quest": 1620, "objective": 9563, "pending": 9564, "message": 20527 },
+        { "quest": 1620, "objective": 9562, "pending": 9563, "message": 20526 }
+      ],
+      "lines": [
+        {
+          "message": 664,
+          "choices": [
+            { "reply": 24524, "next": 20500, "quest": 1618, "beforeObjective": 9536 },
+            { "reply": 24560, "next": 20523, "quest": 1620, "beforeObjective": 9560 }
+          ]
+        },
+        {
+          "message": 20500,
+          "choices": []
+        },
+        {
+          "message": 20523,
+          "choices": [
+            { "reply": 24559, "quest": 1620, "completes": 9560, "params": [[30, 9560]], "next": 20524, "gives": 16199 }
+          ]
+        },
+        {
+          "message": 20524,
+          "choices": [
+            { "reply": 24558, "next": 20525 }
+          ]
+        },
+        {
+          "message": 20525,
+          "choices": [
+            { "reply": 24557 }
+          ]
+        },
+        {
+          "message": 20526,
+          "choices": [
+            { "reply": 24561 }
+          ]
+        },
+        {
+          "message": 20527,
+          "choices": [
+            { "reply": 24577, "next": 20528 }
+          ]
+        },
+        {
+          "message": 20528,
+          "choices": [
+            { "reply": 24571, "next": 20529 },
+            { "reply": 24563 }
+          ]
+        },
+        {
+          "message": 20529,
+          "choices": [
+            { "reply": 24575, "next": 20530, "takes": 16215, "takesCount": 6 },
+            { "reply": 24572 }
+          ]
+        },
+        {
+          "message": 20530,
+          "choices": [
+            { "reply": 24574, "next": 20531, "gives": 16197 }
+          ]
+        },
+        {
+          "message": 20531,
+          "choices": [
+            { "reply": 24573 }
+          ]
+        },
+        {
+          "message": 20535,
+          "choices": [
+            { "reply": 24578, "next": 20536 }
+          ]
+        },
+        {
+          "message": 20536,
+          "choices": [
+            { "reply": 24576 }
+          ]
+        },
+        {
+          "message": 20537,
+          "choices": [
+            { "reply": 24581, "next": 20538 }
+          ]
+        },
+        {
+          "message": 20538,
+          "choices": [
+            { "reply": 24580, "next": 20539 }
+          ]
+        },
+        {
+          "message": 20539,
+          "choices": [
+            { "reply": 24579 }
+          ]
+        }
+      ],
+      "why": "Hel Munster, in his smithmagic workshop of the treechnid forest [-5,-13] (664). «C'est tout simple»: a little sadida eyeing his metaria jars (20500). «Munster lève le mystère» (1620) of Dofus pour les noobs: the araknas? never looked into it (20523, «Te imploro que me ayudes»: 9560, the magic cage 16199), a specimen with long teeth (20524, 20525); the cage on the table, a sleeping spell (20526, «Buscar la pócima»: the jar in his workshop); the potion poured, a magical origin, an egg of the queen (20527, 20528), an illusion to get in unseen, six arakhai glands (20529), the black mud, swallow it (20530: the arakhai disguise 16197), no fighting or the illusion goes (20531); the egg, an ancient spell, the Ancestral Treechnid (20535, 20536); «it was an accident», somebody wants to meet you in the Dark Forest's clearing (20537-20539)."
+    },
+    {
+      "npc": 2876,
+      "map": 0,
+      "opening": 20540,
+      "lines": [
+        {
+          "message": 20540,
+          "choices": [
+            { "reply": 24584, "quest": 1620, "completes": 9561, "params": [[30, 9561]], "takes": 16199, "gives": 16200 }
+          ]
+        }
+      ],
+      "why": "A lone gargantula near the forest's edge [-10,-6]: an enormous mouth full of fangs (20540). «Munster lève le mystère»: «Utilizar la jaula mágica», the gargantula in its cage (9561, item 16200)."
+    },
+    {
+      "npc": 2863,
+      "map": 149689344,
+      "opening": 50637,
+      "openings": [
+        { "quest": 1620, "objective": 9566, "pending": 9567, "message": 20543 }
+      ],
+      "lines": [
+        {
+          "message": 50637,
+          "choices": []
+        },
+        {
+          "message": 20543,
+          "choices": [
+            { "reply": 67915, "next": 20544 }
+          ]
+        },
+        {
+          "message": 20544,
+          "choices": [
+            { "reply": 67914, "next": 20545 }
+          ]
+        },
+        {
+          "message": 20545,
+          "choices": [
+            { "reply": 67913, "next": 20546 }
+          ]
+        },
+        {
+          "message": 20546,
+          "choices": [
+            { "reply": 67912, "quest": 1620, "completes": 9567, "params": [[30, 9567]], "next": 20547 }
+          ]
+        },
+        {
+          "message": 20547,
+          "choices": []
+        }
+      ],
+      "why": "The Ancestral Treechnid in his domain's exit room [-9,-14]: the way out, Tronky will show it (50637). «Munster lève le mystère» of Dofus pour les noobs: why pick on him, the Soft Oak rules here (20543), «what do you know of the arakhais?», he prefers his cuerboks (20544), «menacez-le de plumer ses tendres corbacs» (20545), «the truth», an accident during a ritual (20546: 9567), Lasoberaña grew proud and took the woods (20547)."
+    },
+    {
+      "npc": 1619,
+      "map": 0,
+      "opening": 11970,
+      "lines": [
+        {
+          "message": 11970,
+          "choices": []
+        }
+      ],
+      "why": "Tronky Tranky before the Ancestral Domain [-9,-14]: dry wood for winter nights, the Ancestral Treechnid will not mind a few branches (11970). The door replies (key, keyring) are the dungeon's (DungeonHandler)."
+    },
+    {
+      "npc": 1619,
+      "map": 149689344,
+      "opening": 11972,
+      "lines": [
+        {
+          "message": 11972,
+          "choices": [
+            { "reply": 13466 }
+          ]
+        }
+      ],
+      "why": "Tronky Tranky in the Ancestral Domain's exit room: well done against the drowsy Ancestral Treechnid (11972); «Salir del Territorio Ancestral» leaves (dungeon_exits.json)."
+    },
+    {
+      "npc": 2854,
+      "map": 0,
+      "opening": 20550,
+      "openings": [
+        { "after": 1621, "holds": 16206, "message": 20595 },
+        { "quest": 1621, "objective": 9582, "pending": 9583, "message": 20592 },
+        { "quest": 1621, "objective": 9578, "pending": 9579, "message": 20563 },
+        { "canStart": 1621, "message": 20558 }
+      ],
+      "lines": [
+        {
+          "message": 20550,
+          "choices": [
+            { "reply": 24601, "next": 20551, "quest": 1620, "beforeObjective": 9571 },
+            { "reply": 24610, "next": 20562, "quest": 1621, "beforeObjective": 9578, "gives": 16334 }
+          ]
+        },
+        {
+          "message": 20551,
+          "choices": [
+            { "reply": 24600, "next": 20552 }
+          ]
+        },
+        {
+          "message": 20552,
+          "names": true,
+          "choices": [
+            { "reply": 24598, "next": 20553 }
+          ]
+        },
+        {
+          "message": 20553,
+          "choices": [
+            { "reply": 24599, "next": 20554 }
+          ]
+        },
+        {
+          "message": 20554,
+          "names": true,
+          "choices": [
+            { "reply": 24597, "quest": 1620, "completes": 9571, "params": [[30, 9571]], "next": 20555 }
+          ]
+        },
+        {
+          "message": 20555,
+          "choices": [
+            { "reply": 24596 }
+          ]
+        },
+        {
+          "message": 20558,
+          "choices": [
+            { "reply": 24606, "next": 20559 }
+          ]
+        },
+        {
+          "message": 20559,
+          "choices": [
+            { "reply": 24607, "next": 20560 }
+          ]
+        },
+        {
+          "message": 20560,
+          "choices": [
+            { "reply": 24605, "startsQuest": 1621, "params": [[34, 1621]], "next": 20561, "gives": 16334 },
+            { "reply": 24603, "startsQuest": 1621, "params": [[34, 1621]], "next": 20562, "gives": 16334 },
+            { "reply": 24608 }
+          ]
+        },
+        {
+          "message": 20561,
+          "choices": [
+            { "reply": 24604 }
+          ]
+        },
+        {
+          "message": 20562,
+          "choices": [
+            { "reply": 24602 }
+          ]
+        },
+        {
+          "message": 20563,
+          "choices": [
+            { "reply": 24613, "next": 20564 }
+          ]
+        },
+        {
+          "message": 20564,
+          "choices": [
+            { "reply": 24612, "next": 20565 }
+          ]
+        },
+        {
+          "message": 20565,
+          "choices": [
+            { "reply": 24611 }
+          ]
+        },
+        {
+          "message": 20592,
+          "names": true,
+          "choices": [
+            { "reply": 24647, "next": 20593 }
+          ]
+        },
+        {
+          "message": 20593,
+          "choices": [
+            { "reply": 24642, "next": 20594, "gives": 16206 }
+          ]
+        },
+        {
+          "message": 20594,
+          "choices": [
+            { "reply": 24641 }
+          ]
+        },
+        {
+          "message": 20595,
+          "choices": [
+            { "reply": 24649, "next": 20596 }
+          ]
+        },
+        {
+          "message": 20596,
+          "choices": [
+            { "reply": 24648, "next": 20597, "takes": 16206 }
+          ]
+        },
+        {
+          "message": 20597,
+          "choices": [
+            { "reply": 24646, "next": 20598 }
+          ]
+        },
+        {
+          "message": 20598,
+          "names": true,
+          "choices": [
+            { "reply": 24645 }
+          ]
+        }
+      ],
+      "why": "Silvosse, protector of the month of Flovor, in the Dark Forest's clearing [-11,-13]: this forest was here before the twelvers (20550). «Munster lève le mystère» of Dofus pour les noobs: «was it you who asked to meet me?», it was (20551, «Presentarte»), he knows who you are (20552), Lasoberaña will never leave the forest, no soldiers (20553), he keeps the arakhais from Amakna if Allister keeps away (20554, «Sí, les transmitiré el mensaje»: 9571), the Tree of Life's sap protect you (20555). «L'art de la langue de bois» (1621) of Dofus pour les noobs: a war avoided, the forest no battlefield (20558), the plants no longer talk to him (20559), they would open up to a stranger (20560), a touch on the forehead, the wood tongue (20561, 20562: the roleplay enchantment 16334, lost in a fight; «La verdad es que he perdido la labia palítica» gives it again); a bwork mage around, does the Soft Oak bear a grudge? (20563), fight the forest's guardian (20564, 20565); a pact with the bontarians? a doll sent by Sadida (20592), this stone to lure her into the Dark Forest's well bucket (20593: the enchanted stone 16206), friends to help (20594); «she attacked me», the stone? (20595), one of the most fearsome foes he knows (20596: 9587), a fragment for you (20597), «may the Tree of Life protect you» (20598). «L'art de la langue de bois» (1621) of Dofus pour les noobs: a war avoided, the forest no battlefield (20558), the plants no longer talk to him (20559), they would open up to a stranger (20560), a touch on the forehead, the wood tongue (20561, 20562: the roleplay enchantment 16334, lost in a fight; «La verdad es que he perdido la labia palítica» gives it again); a bwork mage around, does the Soft Oak bear a grudge? (20563), fight the forest's guardian (20564, 20565); a pact with the bontarians? a doll sent by Sadida (20592), this stone to lure her into the Dark Forest's well bucket (20593: the enchanted stone 16206), friends to help (20594); «she attacked me», the stone? (20595), one of the most fearsome foes he knows (20596: 9587), a fragment for you (20597), «may the Tree of Life protect you» (20598)."
+    },
+    {
+      "npc": 2855,
+      "map": 0,
+      "opening": 20566,
+      "lines": [
+        {
+          "message": 20566,
+          "choices": [
+            { "reply": 24618, "quest": 1621, "holds": 16334, "beforeObjective": 9573, "next": 20567 }
+          ]
+        },
+        {
+          "message": 20567,
+          "choices": [
+            { "reply": 24617, "next": 20568 }
+          ]
+        },
+        {
+          "message": 20568,
+          "choices": [
+            { "reply": 24616, "quest": 1621, "completes": 9573, "params": [[30, 9573]], "next": 20569 }
+          ]
+        },
+        {
+          "message": 20569,
+          "choices": [
+            { "reply": 24615 }
+          ]
+        }
+      ],
+      "why": "A bush of the Dark Forest [-13,-13]: an adventurer who speaks the wood tongue (20566, «présentez des excuses», Dofus pour les noobs), trampled but sowing again (20567), news? (20568), «Silvosse promised to step in», distrust him, he plans a blow (20569: 9573)."
+    },
+    {
+      "npc": 2856,
+      "map": 0,
+      "opening": 20570,
+      "lines": [
+        {
+          "message": 20570,
+          "choices": [
+            { "reply": 24622, "quest": 1621, "holds": 16334, "beforeObjective": 9574, "next": 20571 },
+            { "reply": 24619 }
+          ]
+        },
+        {
+          "message": 20571,
+          "choices": [
+            { "reply": 24621, "next": 20572 }
+          ]
+        },
+        {
+          "message": 20572,
+          "choices": [
+            { "reply": 24620, "quest": 1621, "completes": 9574, "params": [[30, 9574]], "next": 20573 }
+          ]
+        },
+        {
+          "message": 20573,
+          "choices": [
+            { "reply": 24619 }
+          ]
+        }
+      ],
+      "why": "A bulb of the Dark Forest [-12,-15]: rustling leaves (20570), «you speak? like Silvosse, liked him, no more» (20571), friends? (20572, «Sería un honor»), the Soft Oak has a new friend too (20573: 9574)."
+    },
+    {
+      "npc": 2857,
+      "map": 0,
+      "opening": 20574,
+      "lines": [
+        {
+          "message": 20574,
+          "choices": [
+            { "reply": 24626, "quest": 1621, "holds": 16334, "beforeObjective": 9575, "next": 20575 },
+            { "reply": 24623 }
+          ]
+        },
+        {
+          "message": 20575,
+          "choices": [
+            { "reply": 24625, "next": 20576 }
+          ]
+        },
+        {
+          "message": 20576,
+          "choices": [
+            { "reply": 24624, "quest": 1621, "completes": 9575, "params": [[30, 9575]], "next": 20577 }
+          ]
+        },
+        {
+          "message": 20577,
+          "choices": [
+            { "reply": 24623 }
+          ]
+        }
+      ],
+      "why": "A mushroom of the Dark Forest [-10,-15], forgetting its formula (20574): magic, it must work since it understands you (20575), more powerful than Rasamun the Green (20576), «is Rasamun around?», gone to Gisgul, back to see Lasoberaña (20577: 9575)."
+    },
+    {
+      "npc": 2858,
+      "map": 0,
+      "opening": 20578,
+      "lines": [
+        {
+          "message": 20578,
+          "choices": [
+            { "reply": 24629, "quest": 1621, "holds": 16334, "beforeObjective": 9576, "next": 20579 },
+            { "reply": 24627 }
+          ]
+        },
+        {
+          "message": 20579,
+          "choices": [
+            { "reply": 24628, "quest": 1621, "completes": 9576, "params": [[30, 9576]], "next": 20580 },
+            { "reply": 24627 }
+          ]
+        },
+        {
+          "message": 20580,
+          "choices": [
+            { "reply": 24627 }
+          ]
+        }
+      ],
+      "why": "A bramble of the Dark Forest [-9,-12]: no reaction (20578), its thorns pointed (20579, «Intentar comunicarte por última vez»), it tries to prick you (20580: 9576; «la ronce ne semble pas disposée à parler mais plutôt à vous piquer»)."
+    },
+    {
+      "npc": 2859,
+      "map": 0,
+      "opening": 20581,
+      "lines": [
+        {
+          "message": 20581,
+          "choices": [
+            { "reply": 24632, "quest": 1621, "holds": 16334, "beforeObjective": 9577, "next": 20582 },
+            { "reply": 24630 }
+          ]
+        },
+        {
+          "message": 20582,
+          "choices": [
+            { "reply": 24631, "quest": 1621, "completes": 9577, "params": [[30, 9577]], "next": 20583 }
+          ]
+        },
+        {
+          "message": 20583,
+          "choices": [
+            { "reply": 24630 }
+          ]
+        }
+      ],
+      "why": "A stump of the Dark Forest [-14,-12]: a twelver talking like a forest spirit (20581), the big oak asked them to distrust Silvosse (20582), not its business, a woodcutter nearly shaved it (20583: 9577)."
+    },
+    {
+      "npc": 2864,
+      "map": 149428224,
+      "opening": 20584,
+      "lines": [
+        {
+          "message": 20584,
+          "choices": [
+            { "reply": 24640, "next": 20585, "quest": 1621, "beforeObjective": 9581 }
+          ]
+        },
+        {
+          "message": 20585,
+          "choices": [
+            { "reply": 24639, "next": 20586 }
+          ]
+        },
+        {
+          "message": 20586,
+          "choices": [
+            { "reply": 24638, "next": 20587 }
+          ]
+        },
+        {
+          "message": 20587,
+          "choices": [
+            { "reply": 24637, "next": 20588 }
+          ]
+        },
+        {
+          "message": 20588,
+          "choices": [
+            { "reply": 24636, "next": 20589 }
+          ]
+        },
+        {
+          "message": 20589,
+          "choices": [
+            { "reply": 24635, "next": 20590 }
+          ]
+        },
+        {
+          "message": 20590,
+          "choices": [
+            { "reply": 24634, "quest": 1621, "completes": 9581, "params": [[30, 9581]], "next": 20591 }
+          ]
+        },
+        {
+          "message": 20591,
+          "choices": [
+            { "reply": 24633 }
+          ]
+        }
+      ],
+      "why": "The Soft Oak, beaten, in his clearing's exit room [-14,-13], by «L'art de la langue de bois» of Dofus pour les noobs: a brave foe but not welcome, the woodcutters (20584), «the legends say they were punished», what do you want? (20585), «the king has doubts about a protector», the Master of Cuttings? (20586), Silvosse about to sign with the bontarians (20587), she who told them has no reason to lie (20588), what would it cost (20589), they will think about it (20590), sent by the god Sadida, a doll's body (20591: 9581)."
+    },
+    {
+      "npc": 797,
+      "map": 149428224,
+      "opening": 3278,
+      "lines": [
+        {
+          "message": 3278,
+          "choices": [
+            { "reply": 2932 }
+          ]
+        }
+      ],
+      "why": "Josefa Taplana in the Soft Oak Clearing's exit room: the Soft Oak beaten, the mythical living tree (3278); «Salir del claro» leaves (dungeon_exits.json)."
+    },
+    {
+      "npc": 2860,
+      "map": 0,
+      "opening": 20599,
+      "lines": [
+        {
+          "message": 20599,
+          "choices": [
+            { "reply": 24652, "quest": 1621, "completes": 9585, "params": [[30, 9585]], "next": 20600 },
+            { "reply": 24651 }
+          ]
+        },
+        {
+          "message": 20600,
+          "choices": [
+            { "reply": 24650 },
+            { "reply": 24651 }
+          ]
+        }
+      ],
+      "why": "The Plotter, the doll come for the enchanted stone at the Dark Forest's well, by «L'art de la langue de bois» of Dofus pour les noobs: mad eyes (20599, «Intentar iniciar una conversación»: 9585), plant spirits, she charges (20600, «Defender tu vida»: the fight)."
+    },
+    {
+      "npc": 119,
+      "map": 0,
+      "opening": 386,
+      "openings": [
+        { "quest": 827, "message": 15981 }
+      ],
+      "lines": [
+        {
+          "message": 386,
+          "names": true,
+          "choices": [
+            { "reply": 18890, "startsQuest": 827, "params": [[34, 827]], "next": 15981 },
+            { "reply": 18889, "next": 15982, "quest": 827, "afterQuest": true }
+          ]
+        },
+        {
+          "message": 15981,
+          "choices": []
+        },
+        {
+          "message": 15982,
+          "choices": []
+        }
+      ],
+      "why": "An assistant of Otomai in the Amakna village [-2,-4], studying the local artisans' preparations (386). «Intrusion chez les wabbits» (827) of Dofus pour les noobs: a remedy for the myxomawosis, a pair of wings of each colour of leafbeetle (15981, the four wings on a hello); asked again, its effects are permanent, go to the wabbit archipelago (15982)."
     }
   ]
 }

@@ -210,6 +210,8 @@ namespace Jondo.Unity.Tests.Quests
                         // sur un bec» and its fat tofu).
                         bool bringsOut = binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0
                                          && binding.Elements.Count > 0;
+                        // Nor a click that only hands its item over (Hel Munster's jar of magic potion).
+                        bringsOut |= binding.Kind == QuestBindingKind.Click && binding.OnlyGives;
                         if (objective.TypeId != QuestCatalogue.FreeText && !namelessMap && !bringsOut
                             && binding.Kind != QuestBindingKind.Order)
                         {

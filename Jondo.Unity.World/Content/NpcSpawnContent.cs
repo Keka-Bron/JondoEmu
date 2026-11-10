@@ -156,6 +156,11 @@ namespace Jondo.Unity.World.Content
                         Cell = cell,
                         Orientation = entry.TryGetProperty("orientation", out var o) && o.TryGetInt32(out int f)
                             ? f : DefaultOrientation,
+                        // A quest giver stands there only once one of its quests is open to the
+                        // character, under way or done (tools/derived_npc_criteria.py).
+                        Criterion = entry.TryGetProperty("criterion", out var shown) && shown.ValueKind == JsonValueKind.String
+                            ? shown.GetString() ?? ""
+                            : "",
                     }, from);
                 }
             }

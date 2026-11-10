@@ -173,12 +173,6 @@
       "orientation": 3
     },
     {
-      "map": 147851777,
-      "npc": 1619,
-      "cell": 370,
-      "orientation": 3
-    },
-    {
       "map": 149422080,
       "npc": 797,
       "cell": 343,
@@ -2232,6 +2226,118 @@
       "orientation": 1,
       "criterion": "(Qa=224&Qo=911)|Qf=224|(Qa=220&Qo=881)",
       "why": "The prince of Wey at the gate of Amakna castle [4,-6] once the bride's dress is brought («Allez à la rencontre du Prince d'Wa à l'entrée du Château», Dofus pour les noobs); and for the traitors of «Trouble-fête», on the verge of marrying, once Bob Zollo is hired. INFERRED cell."
+    },
+    {
+      "map": 68551168,
+      "npc": 822,
+      "cell": 300,
+      "orientation": 3,
+      "why": "María Zoto at [6,-7], the first of the villagers «Ça est frugal, une fois» asks (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 68552193,
+      "npc": 823,
+      "cell": 373,
+      "orientation": 1,
+      "why": "Fred Austero before Amakna castle [4,-6] («Ça est frugal, une fois», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 88080663,
+      "npc": 824,
+      "cell": 244,
+      "orientation": 3,
+      "why": "Little Jorg Dy at [1,0] («Ça est frugal, une fois», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 147981057,
+      "npc": 2851,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1618&Qo!9541",
+      "why": "Arbracillo before the abandoned house [-15,-16] («parlez au petit Arbabra devant la maison abandonnée», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 147980801,
+      "npc": 2851,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1618&Qo=9541&Qo!9542",
+      "why": "Arbracillo waiting at [-15,-14] («En [-15,-14] reparlez à Arbabra», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 147981314,
+      "npc": 2850,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1618&Qo=9542&Qo!9545",
+      "why": "Manzanillo in trouble at [-16,-13] («vous trouverez Simple qui semble être en difficulté», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 183768078,
+      "npc": 2850,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qo=9546|Qf=1618",
+      "why": "Manzanillo resting at the Sadida temple once escorted there. INFERRED cell."
+    },
+    {
+      "map": 147851777,
+      "npc": 1619,
+      "cell": 328,
+      "orientation": 1,
+      "why": "Tronky Tranky, who keeps the door of the Ancestral Domain [-9,-14] (dungeon 9's entrance). INFERRED cell."
+    },
+    {
+      "map": 149689344,
+      "npc": 1619,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Tronky Tranky in the Ancestral Domain's exit room, who takes the winners out. INFERRED cell."
+    },
+    {
+      "map": 149689344,
+      "npc": 2863,
+      "cell": 330,
+      "orientation": 3,
+      "why": "The Ancestral Treechnid in his domain's exit room, beaten, where «Munster lève le mystère» questions him. INFERRED cell."
+    },
+    {
+      "map": 147850754,
+      "npc": 2854,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "(Qa=1620&Qo=9570)|Qf=1620",
+      "why": "Silvosse in the Dark Forest's clearing [-11,-13], brought by the statue («faire apparaitre Silvosse»), and there from then on (he gives «L'art de la langue de bois»). INFERRED cell."
+    },
+    {
+      "map": 147851273,
+      "npc": 2876,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1620&Qo=9560&Qo!9561",
+      "why": "A lone gargantula at the forest's edge [-10,-6] («Parlez au Gargantûl Solitaire et capturez le», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 147850756,
+      "npc": 2860,
+      "cell": 330,
+      "orientation": 3,
+      "criterion": "Qa=1621&Qo=9584&Qo!9586",
+      "why": "The Plotter at the Dark Forest's well, come for the stone once the character is back. INFERRED cell."
+    },
+    {
+      "map": 149428224,
+      "npc": 797,
+      "cell": 340,
+      "orientation": 1,
+      "why": "Josefa Taplana in the Soft Oak Clearing's exit room, who takes the winners out. INFERRED cell."
+    },
+    {
+      "map": 185862149,
+      "npc": 119,
+      "cell": 300,
+      "orientation": 3,
+      "why": "An assistant of Otomai in the Amakna village [-2,-4] («Parlez à l'assistant d'Otomaï en [-2,-4]», Dofus pour les noobs). INFERRED cell."
     }
   ]
 }

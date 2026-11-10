@@ -49,6 +49,33 @@
       "npc": 1384,
       "replies": [8307, 8308],
       "why": "The Kanniboul village: after Kanniboul Ebil the winners are in the village's exit room [29,9] («Kanniball Village - Exit»), which «T'as les boules» asks to discover (4113), and the kanniboul host takes them out («reparlez au Gentil Organisateur pour sortir du donjon», Dofus pour les noobs); his two «Salir» replies leave."
+    },
+    {
+      "dungeon": 89,
+      "bossRoom": 149165056,
+      "room": 149166080,
+      "cell": 300,
+      "npc": 2846,
+      "replies": [24545, 24478],
+      "why": "The Lair of the Rac Queen: after Lasoberaña's fight the winners are in the lair's exit room [-6,-15], where «Arak-haï en pagaille» has her talk (9558); her «Abandonar la guarida de Lasoberaña» replies leave."
+    },
+    {
+      "dungeon": 9,
+      "bossRoom": 149688320,
+      "room": 149689344,
+      "cell": 300,
+      "npc": 1619,
+      "replies": [13466],
+      "why": "The Ancestral Domain: after the Ancestral Treechnid the winners are in the domain's exit room [-9,-14], where «Munster lève le mystère» questions him (9567), and Tronky Tranky takes them out; his «Salir del Territorio Ancestral» leaves."
+    },
+    {
+      "dungeon": 10,
+      "bossRoom": 149427200,
+      "room": 149428224,
+      "cell": 300,
+      "npc": 797,
+      "replies": [2932, 2929],
+      "why": "The Soft Oak Clearing: after the Soft Oak the winners are in the clearing's exit room [-14,-13], where «L'art de la langue de bois» questions him (9581), and Josefa Taplana takes them out; her «Salir del claro» leaves."
     }
   ]
 }

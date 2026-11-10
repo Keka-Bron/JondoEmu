@@ -11,7 +11,8 @@
 "This is the Base layer: a captured placement beats it, an authored one beats both.",
 "NPCs named on more than one map are left out rather than cloned.",
 "",
-"why: which quest put the NPC here, so the row can be argued with."
+"why: which quest put the NPC here, so the row can be argued with.",
+"criterion: when a quest giver stands there -- one of its quests can be started, is under way or is done (tools/derived_npc_criteria.py); none, always."
 ],
 "spawns": [
 {
@@ -68,35 +69,40 @@
 "npc": 939,
 "cell": 273,
 "orientation": 1,
-"why": "gives quest 242"
+"why": "gives quest 242",
+"criterion": "(Qf=232)|Qa=242|Qf=242"
 },
 {
 "map": 159236,
 "npc": 930,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 237"
+"why": "gives quest 237",
+"criterion": "(Qf=232)|Qa=237|Qf=237"
 },
 {
 "map": 159744,
 "npc": 928,
 "cell": 372,
 "orientation": 1,
-"why": "gives quest 230"
+"why": "gives quest 230",
+"criterion": "(Qf=232)|Qa=230|Qf=230"
 },
 {
 "map": 159766,
 "npc": 936,
 "cell": 258,
 "orientation": 1,
-"why": "gives quest 240"
+"why": "gives quest 240",
+"criterion": "(Qf=232)|Qa=240|Qf=240"
 },
 {
 "map": 160260,
 "npc": 940,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 243"
+"why": "gives quest 243",
+"criterion": "(Qf=232)|Qa=243|Qf=243"
 },
 {
 "map": 160268,
@@ -110,14 +116,16 @@
 "npc": 3001,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1662"
+"why": "gives quest 1662",
+"criterion": "(Qa=1659&Qo>10037)|Qa=1662|Qf=1662"
 },
 {
 "map": 161029,
 "npc": 927,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 233"
+"why": "gives quest 233",
+"criterion": "(Qf=232)|Qa=233|Qf=233"
 },
 {
 "map": 161295,
@@ -173,7 +181,8 @@
 "npc": 935,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 239"
+"why": "gives quest 239",
+"criterion": "(Qf=232)|Qa=239|Qf=239"
 },
 {
 "map": 21498882,
@@ -201,7 +210,8 @@
 "npc": 933,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 238"
+"why": "gives quest 238",
+"criterion": "(Qf=232)|Qa=238|Qf=238"
 },
 {
 "map": 25952256,
@@ -229,7 +239,8 @@
 "npc": 1326,
 "cell": 342,
 "orientation": 1,
-"why": "gives quest 639"
+"why": "gives quest 639",
+"criterion": "(PL>129&PO!32167&PO!11381)|Qa=639|Qf=639"
 },
 {
 "map": 54160716,
@@ -243,7 +254,8 @@
 "npc": 1998,
 "cell": 200,
 "orientation": 1,
-"why": "gives quest 1288"
+"why": "gives quest 1288",
+"criterion": "(Qf=1287)|Qa=1288|Qf=1288|Qa=1287|Qf=1287"
 },
 {
 "map": 54163252,
@@ -278,7 +290,8 @@
 "npc": 1357,
 "cell": 399,
 "orientation": 1,
-"why": "gives quest 621"
+"why": "gives quest 621",
+"criterion": "(PL>49)|Qa=621|Qf=621"
 },
 {
 "map": 54164282,
@@ -306,21 +319,24 @@
 "npc": 1299,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 618"
+"why": "gives quest 618",
+"criterion": "(PL>99&Qf=617)|Qa=618|Qf=618"
 },
 {
 "map": 54165811,
 "npc": 1297,
 "cell": 344,
 "orientation": 1,
-"why": "gives quest 617"
+"why": "gives quest 617",
+"criterion": "(PL>99)|Qa=617|Qf=617|Qa=595|Qf=595|Qa=631|Qf=631"
 },
 {
 "map": 54165815,
 "npc": 1273,
 "cell": 329,
 "orientation": 1,
-"why": "gives quest 578"
+"why": "gives quest 578",
+"criterion": "(PL>109&Qf=577&Qa!579&Qf!579)|Qa=578|Qf=578|(PL>109&Qf=577)|Qa=579|Qf=579|Qa=583|Qf=583|Qa=591|Qf=591"
 },
 {
 "map": 54165823,
@@ -334,7 +350,8 @@
 "npc": 1298,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 616"
+"why": "gives quest 616",
+"criterion": "(PL>99)|Qa=616|Qf=616|Qa=595|Qf=595|Qa=674|Qf=674|Qa=2053|Qf=2053"
 },
 {
 "map": 54166332,
@@ -348,14 +365,16 @@
 "npc": 1323,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 635"
+"why": "gives quest 635",
+"criterion": "(PL>139)|Qa=635|Qf=635|Qa=664|Qf=664"
 },
 {
 "map": 54167339,
 "npc": 1337,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 643"
+"why": "gives quest 643",
+"criterion": "(PL>89)|Qa=643|Qf=643"
 },
 {
 "map": 54167355,
@@ -390,7 +409,8 @@
 "npc": 1270,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 554"
+"why": "gives quest 554",
+"criterion": "(PL>89)|Qa=554|Qf=554|(PL>134&Qf=594&Qf=622&Qf=543)|Qa=595|Qf=595|Qa=674|Qf=674|Qa=677|Qf=677"
 },
 {
 "map": 54168390,
@@ -404,7 +424,8 @@
 "npc": 2981,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 1661"
+"why": "gives quest 1661",
+"criterion": "(Qa=1658&Qo>10033)|Qa=1661|Qf=1661"
 },
 {
 "map": 54168877,
@@ -432,14 +453,16 @@
 "npc": 1327,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 640"
+"why": "gives quest 640",
+"criterion": "(PL>139)|Qa=640|Qf=640"
 },
 {
 "map": 54169887,
 "npc": 1241,
 "cell": 230,
 "orientation": 1,
-"why": "gives quest 566"
+"why": "gives quest 566",
+"criterion": "(PL>89&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=566|Qf=566|(PL>99&Qf=566&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=567|Qf=567|(PL>109&Qf=567&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=568|Qf=568|(PL>129&Qf=568&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=569|Qf=569|(PL>139&Qf=569&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=570|Qf=570|(PL>139&Qf=570&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=571|Qf=571|Qa=660|Qf=660|Qa=674|Qf=674|Qa=1319|Qf=1319"
 },
 {
 "map": 54170452,
@@ -453,7 +476,8 @@
 "npc": 1351,
 "cell": 271,
 "orientation": 1,
-"why": "gives quest 634"
+"why": "gives quest 634",
+"criterion": "(PL>109)|Qa=634|Qf=634"
 },
 {
 "map": 54170953,
@@ -509,14 +533,16 @@
 "npc": 4216,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1943"
+"why": "gives quest 1943",
+"criterion": "(PL>179)|Qa=1943|Qf=1943|(Qf=1943)|Qa=1944|Qf=1944"
 },
 {
 "map": 54172488,
 "npc": 1369,
 "cell": 229,
 "orientation": 1,
-"why": "gives quest 1330"
+"why": "gives quest 1330",
+"criterion": "(PL>139&Qf=651)|Qa=1330|Qf=1330|Qa=597|Qf=597|Qa=677|Qf=677|Qa=683|Qf=683|Qa=1318|Qf=1318"
 },
 {
 "map": 54172489,
@@ -530,7 +556,8 @@
 "npc": 1320,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 543"
+"why": "gives quest 543",
+"criterion": "(PL>99&Qa!631)|Qa=543|Qf=543|Qa=595|Qf=595|Qa=631|Qf=631"
 },
 {
 "map": 54174023,
@@ -558,7 +585,8 @@
 "npc": 1328,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 641"
+"why": "gives quest 641",
+"criterion": "(PL>149)|Qa=641|Qf=641"
 },
 {
 "map": 54174510,
@@ -572,21 +600,24 @@
 "npc": 1339,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 644"
+"why": "gives quest 644",
+"criterion": "(PL>149)|Qa=644|Qf=644"
 },
 {
 "map": 54175012,
 "npc": 1264,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 613"
+"why": "gives quest 613",
+"criterion": "(PL>49)|Qa=613|Qf=613"
 },
 {
 "map": 54175024,
 "npc": 1239,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 556"
+"why": "gives quest 556",
+"criterion": "(PL>89&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=556|Qf=556|(PL>99&Qf=556&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=557|Qf=557|(PL>109&Qf=557&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=558|Qf=558|(PL>129&Qf=558&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=559|Qf=559|(PL>139&Qf=559&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=560|Qf=560|(PL>139&Qf=560&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=561|Qf=561|Qa=674|Qf=674"
 },
 {
 "map": 54176042,
@@ -600,7 +631,8 @@
 "npc": 1285,
 "cell": 454,
 "orientation": 1,
-"why": "gives quest 619"
+"why": "gives quest 619",
+"criterion": "(PL>49)|Qa=619|Qf=619"
 },
 {
 "map": 54531089,
@@ -670,7 +702,8 @@
 "npc": 1253,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 536"
+"why": "gives quest 536",
+"criterion": "(PL>89&Qa!537&Qa!538&Qa!539&Qa!540&Qa!541)|Qa=536|Qf=536|(PL>89&Qa!536&Qa!538&Qa!539&Qa!540&Qa!541)|Qa=537|Qf=537|(PL>89&Qa!536&Qa!537&Qa!539&Qa!540&Qa!541)|Qa=538|Qf=538|(PL>139&Qa!540&Qa!541&Qa!536&Qa!537&Qa!538)|Qa=539|Qf=539|(PL>139&Qa!539&Qa!541&Qa!536&Qa!537&Qa!538)|Qa=540|Qf=540|(PL>139&Qa!539&Qa!540&Qa!536&Qa!537&Qa!538)|Qa=541|Qf=541|(PL>114&Qf=590)|Qa=591|Qf=591|Qa=595|Qf=595|Qa=614|Qf=614|Qa=1288|Qf=1288"
 },
 {
 "map": 54534167,
@@ -726,21 +759,24 @@
 "npc": 1247,
 "cell": 398,
 "orientation": 1,
-"why": "gives quest 593"
+"why": "gives quest 593",
+"criterion": "(PL>124&Qf=592&Qf=621)|Qa=593|Qf=593|Qa=614|Qf=614|Qa=1287|Qf=1287|Qa=1719|Qf=1719|Qa=1720|Qf=1720|Qa=1723|Qf=1723|Qa=1724|Qf=1724"
 },
 {
 "map": 54536217,
 "npc": 1257,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 592"
+"why": "gives quest 592",
+"criterion": "(PL>119&Qf=591&Qf=619&Qf=620)|Qa=592|Qf=592|Qa=614|Qf=614|Qa=665|Qf=665|Qa=1321|Qf=1321"
 },
 {
 "map": 54536225,
 "npc": 1283,
 "cell": 357,
 "orientation": 1,
-"why": "gives quest 542"
+"why": "gives quest 542",
+"criterion": "(PL>79)|Qa=542|Qf=542|Qa=674|Qf=674"
 },
 {
 "map": 54789135,
@@ -859,7 +895,8 @@
 "npc": 1416,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 849"
+"why": "gives quest 849",
+"criterion": "(PL>19&(Qa=878|Qf=878))|Qa=849|Qf=849|(PL>80&(Qa=878|Qf=878))|Qa=850|Qf=850|(PL>110&(Qa=878|Qf=878))|Qa=851|Qf=851|(PL>140&(Qa=878|Qf=878))|Qa=852|Qf=852|(PL>110&Qf=865&(Qa=878|Qf=878))|Qa=866|Qf=866|(PL>19&Qa=878)|Qa=877|Qf=877|(Qf=2052)|Qa=2053|Qf=2053|(Qf=2053)|Qa=2054|Qf=2054|(Qf=2054)|Qa=2055|Qf=2055|Qa=853|Qf=853|Qa=854|Qf=854|Qa=855|Qf=855|Qa=856|Qf=856|Qa=2052|Qf=2052"
 },
 {
 "map": 66061569,
@@ -873,21 +910,24 @@
 "npc": 1418,
 "cell": 273,
 "orientation": 1,
-"why": "gives quest 871"
+"why": "gives quest 871",
+"criterion": "(PL>19&Qa=878)|Qa=871|Qf=871|(PL>19&Qa=878)|Qa=872|Qf=872|Qa=2055|Qf=2055"
 },
 {
 "map": 66062340,
 "npc": 1545,
 "cell": 215,
 "orientation": 1,
-"why": "gives quest 878"
+"why": "gives quest 878",
+"criterion": "(PL>19)|Qa=878|Qf=878"
 },
 {
 "map": 66062340,
 "npc": 1540,
 "cell": 230,
 "orientation": 1,
-"why": "gives quest 864"
+"why": "gives quest 864",
+"criterion": "(PL>80&Qf=862&Qf=863&(Qa=878|Qf=878))|Qa=864|Qf=864|(PL>110&Qf=865&Qf=866&(Qa=878|Qf=878))|Qa=867|Qf=867|Qa=868|Qf=868"
 },
 {
 "map": 66063617,
@@ -901,7 +941,8 @@
 "npc": 1419,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 880"
+"why": "gives quest 880",
+"criterion": "(Qf=879&Qa=878)|Qa=880|Qf=880|Qa=879|Qf=879"
 },
 {
 "map": 67108864,
@@ -922,7 +963,8 @@
 "npc": 743,
 "cell": 354,
 "orientation": 1,
-"why": "gives quest 134"
+"why": "gives quest 134",
+"criterion": "(PL>10)|Qa=134|Qf=134|Qa=133|Qf=133"
 },
 {
 "map": 68420101,
@@ -936,7 +978,8 @@
 "npc": 745,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 135"
+"why": "gives quest 135",
+"criterion": "(Qf=134)|Qa=135|Qf=135|Qa=134|Qf=134"
 },
 {
 "map": 68420613,
@@ -950,7 +993,8 @@
 "npc": 744,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 136"
+"why": "gives quest 136",
+"criterion": "(PL>19)|Qa=136|Qf=136|Qa=133|Qf=133"
 },
 {
 "map": 68421122,
@@ -992,7 +1036,8 @@
 "npc": 742,
 "cell": 246,
 "orientation": 1,
-"why": "gives quest 137"
+"why": "gives quest 137",
+"criterion": "(Qf=135&Qf=133)|Qa=137|Qf=137"
 },
 {
 "map": 68422664,
@@ -1013,14 +1058,16 @@
 "npc": 803,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 143"
+"why": "gives quest 143",
+"criterion": "(PL>59&Ps!1&Ps!2)|Qa=143|Qf=143"
 },
 {
 "map": 68551683,
 "npc": 740,
 "cell": 229,
 "orientation": 1,
-"why": "gives quest 139"
+"why": "gives quest 139",
+"criterion": "(PL>49)|Qa=139|Qf=139|Qa=135|Qf=135"
 },
 {
 "map": 68552193,
@@ -1034,7 +1081,8 @@
 "npc": 819,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 158"
+"why": "gives quest 158",
+"criterion": "(PL>79)|Qa=158|Qf=158"
 },
 {
 "map": 68552705,
@@ -1076,14 +1124,16 @@
 "npc": 808,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 148"
+"why": "gives quest 148",
+"criterion": "(PL>49)|Qa=148|Qf=148|(PL>49)|Qa=149|Qf=149|(PL>69)|Qa=150|Qf=150"
 },
 {
 "map": 73402891,
 "npc": 1219,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 485"
+"why": "gives quest 485",
+"criterion": "(PL>29)|Qa=485|Qf=485"
 },
 {
 "map": 73533448,
@@ -1097,7 +1147,8 @@
 "npc": 1461,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 720"
+"why": "gives quest 720",
+"criterion": "(PL<51)|Qa=720|Qf=720|(PL>50&PL<101)|Qa=721|Qf=721|(PL>100&PL<151)|Qa=722|Qf=722|(PL>150)|Qa=723|Qf=723"
 },
 {
 "map": 74977795,
@@ -1111,7 +1162,8 @@
 "npc": 1449,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 753"
+"why": "gives quest 753",
+"criterion": "(Qa=747)|Qa=753|Qf=753|Qa=750|Qf=750|Qa=754|Qf=754"
 },
 {
 "map": 76284416,
@@ -1125,14 +1177,16 @@
 "npc": 1450,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 752"
+"why": "gives quest 752",
+"criterion": "(Qa=747)|Qa=752|Qf=752|Qa=750|Qf=750|Qa=758|Qf=758"
 },
 {
 "map": 76285958,
 "npc": 1467,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 731"
+"why": "gives quest 731",
+"criterion": "(Qf=741)|Qa=731|Qf=731|(Qf=741)|Qa=924|Qf=924|Qa=741|Qf=741|Qa=758|Qf=758"
 },
 {
 "map": 76285963,
@@ -1146,7 +1200,8 @@
 "npc": 1448,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 754"
+"why": "gives quest 754",
+"criterion": "(Qa=747)|Qa=754|Qf=754|Qa=750|Qf=750"
 },
 {
 "map": 76286989,
@@ -1160,7 +1215,8 @@
 "npc": 1458,
 "cell": 357,
 "orientation": 1,
-"why": "gives quest 742"
+"why": "gives quest 742",
+"criterion": "(BT=1&Qf=724)|Qa=742|Qf=742|(PL<51&Qf=724)|Qa=743|Qf=743|(PL>50&PL<101&Qf=724)|Qa=744|Qf=744|(PL>100&PL<151&Qf=724)|Qa=745|Qf=745|(PL>150&Qf=724)|Qa=746|Qf=746|Qa=737|Qf=737|Qa=738|Qf=738|Qa=739|Qf=739|Qa=740|Qf=740|Qa=751|Qf=751|Qa=758|Qf=758|Qa=1853|Qf=1853"
 },
 {
 "map": 76288522,
@@ -1174,14 +1230,16 @@
 "npc": 1446,
 "cell": 369,
 "orientation": 1,
-"why": "gives quest 751"
+"why": "gives quest 751",
+"criterion": "(Qa=747)|Qa=751|Qf=751|Qa=750|Qf=750"
 },
 {
 "map": 78644736,
 "npc": 929,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 235"
+"why": "gives quest 235",
+"criterion": "(Qf=232)|Qa=235|Qf=235"
 },
 {
 "map": 81789952,
@@ -1195,7 +1253,8 @@
 "npc": 894,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 209"
+"why": "gives quest 209",
+"criterion": "(Qf=208)|Qa=209|Qf=209|Qa=208|Qf=208"
 },
 {
 "map": 82314240,
@@ -1265,21 +1324,24 @@
 "npc": 1531,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 860"
+"why": "gives quest 860",
+"criterion": "(PL>19&Qf=859&(Qa=878|Qf=878))|Qa=860|Qf=860|(PL>19&Qf=859&Qf=860&(Qa=878|Qf=878))|Qa=861|Qf=861|(Qf=871&Qa=878)|Qa=879|Qf=879|Qa=859|Qf=859|Qa=871|Qf=871"
 },
 {
 "map": 85986816,
 "npc": 1415,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 858"
+"why": "gives quest 858",
+"criterion": "(PL>19)|Qa=858|Qf=858|Qa=2055|Qf=2055"
 },
 {
 "map": 85986816,
 "npc": 1522,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 848"
+"why": "gives quest 848",
+"criterion": "(PL>19&(Qa=878|Qf=878))|Qa=848|Qf=848|(PL>19&Qa=878)|Qa=875|Qf=875|Qa=2055|Qf=2055"
 },
 {
 "map": 87032320,
@@ -1314,7 +1376,8 @@
 "npc": 2596,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1561"
+"why": "gives quest 1561",
+"criterion": "(PL>179&Qf=1547)|Qa=1561|Qf=1561"
 },
 {
 "map": 88080387,
@@ -1356,7 +1419,8 @@
 "npc": 6710,
 "cell": 286,
 "orientation": 1,
-"why": "gives quest 2453"
+"why": "gives quest 2453",
+"criterion": "(PL>129)|Qa=2453|Qf=2453"
 },
 {
 "map": 88081168,
@@ -1454,7 +1518,8 @@
 "npc": 3668,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1822"
+"why": "gives quest 1822",
+"criterion": "(PL>39)|Qa=1822|Qf=1822"
 },
 {
 "map": 88083207,
@@ -1503,7 +1568,8 @@
 "npc": 297,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2073"
+"why": "gives quest 2073",
+"criterion": "(PL>189)|Qa=2073|Qf=2073|Qa=296|Qf=296|Qa=308|Qf=308|Qa=326|Qf=326|Qa=554|Qf=554"
 },
 {
 "map": 88084749,
@@ -1524,7 +1590,8 @@
 "npc": 153,
 "cell": 258,
 "orientation": 1,
-"why": "gives quest 1666"
+"why": "gives quest 1666",
+"criterion": "(PL>29)|Qa=1666|Qf=1666|Qa=673|Qf=673"
 },
 {
 "map": 88086786,
@@ -1566,7 +1633,8 @@
 "npc": 806,
 "cell": 273,
 "orientation": 1,
-"why": "gives quest 146"
+"why": "gives quest 146",
+"criterion": "(PL>29)|Qa=146|Qf=146"
 },
 {
 "map": 88212749,
@@ -1601,14 +1669,16 @@
 "npc": 1601,
 "cell": 246,
 "orientation": 1,
-"why": "gives quest 949"
+"why": "gives quest 949",
+"criterion": "(PL>29)|Qa=949|Qf=949|Qa=1746|Qf=1746|Qa=1749|Qf=1749|Qa=1751|Qf=1751|Qa=1756|Qf=1756"
 },
 {
 "map": 90704643,
 "npc": 3664,
 "cell": 313,
 "orientation": 1,
-"why": "gives quest 1821"
+"why": "gives quest 1821",
+"criterion": "(PL>19)|Qa=1821|Qf=1821|(PL>19&Qf=1821)|Qa=1823|Qf=1823"
 },
 {
 "map": 90704899,
@@ -1629,7 +1699,8 @@
 "npc": 1605,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 951"
+"why": "gives quest 951",
+"criterion": "(PL>29)|Qa=951|Qf=951"
 },
 {
 "map": 90705412,
@@ -1643,21 +1714,24 @@
 "npc": 3300,
 "cell": 257,
 "orientation": 1,
-"why": "gives quest 1753"
+"why": "gives quest 1753",
+"criterion": "(PL>179)|Qa=1753|Qf=1753"
 },
 {
 "map": 90707715,
 "npc": 3326,
 "cell": 215,
 "orientation": 1,
-"why": "gives quest 1752"
+"why": "gives quest 1752",
+"criterion": "(PL>179)|Qa=1752|Qf=1752"
 },
 {
 "map": 90708227,
 "npc": 2186,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1433"
+"why": "gives quest 1433",
+"criterion": "(PL>179)|Qa=1433|Qf=1433|Qa=1717|Qf=1717|Qa=1718|Qf=1718"
 },
 {
 "map": 90833409,
@@ -1671,7 +1745,8 @@
 "npc": 3667,
 "cell": 203,
 "orientation": 1,
-"why": "gives quest 1825"
+"why": "gives quest 1825",
+"criterion": "(PL>19)|Qa=1825|Qf=1825"
 },
 {
 "map": 91750917,
@@ -1685,21 +1760,24 @@
 "npc": 1589,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 925"
+"why": "gives quest 925",
+"criterion": "(Qf=894)|Qa=925|Qf=925"
 },
 {
 "map": 91750919,
 "npc": 1597,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 1442"
+"why": "gives quest 1442",
+"criterion": "(PL>179)|Qa=1442|Qf=1442|Qa=1443|Qf=1443|Qa=1444|Qf=1444|Qa=1608|Qf=1608|Qa=1748|Qf=1748"
 },
 {
 "map": 91751941,
 "npc": 3666,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 1824"
+"why": "gives quest 1824",
+"criterion": "(PL>9)|Qa=1824|Qf=1824"
 },
 {
 "map": 91751941,
@@ -1727,14 +1805,16 @@
 "npc": 1596,
 "cell": 467,
 "orientation": 1,
-"why": "gives quest 1439"
+"why": "gives quest 1439",
+"criterion": "(PL>179)|Qa=1439|Qf=1439|(PL>179)|Qa=1748|Qf=1748|Qa=1444|Qf=1444"
 },
 {
 "map": 91752967,
 "npc": 2187,
 "cell": 470,
 "orientation": 1,
-"why": "gives quest 1438"
+"why": "gives quest 1438",
+"criterion": "(PL>179)|Qa=1438|Qf=1438"
 },
 {
 "map": 91753989,
@@ -1797,7 +1877,8 @@
 "npc": 897,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 215"
+"why": "gives quest 215",
+"criterion": "(PL>29&Qf=211&PO!8576&Qa!216&Qf!216)|Qa=215|Qf=215|(Qf=222&PL>59)|Qa=224|Qf=224|Qa=222|Qf=222|Qa=225|Qf=225|Qa=337|Qf=337|Qa=343|Qf=343|Qa=891|Qf=891|Qa=1479|Qf=1479"
 },
 {
 "map": 95685123,
@@ -1818,7 +1899,8 @@
 "npc": 2847,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1619"
+"why": "gives quest 1619",
+"criterion": "(Qf=1618)|Qa=1619|Qf=1619|Qa=1618|Qf=1618|Qa=2115|Qf=2115"
 },
 {
 "map": 95685125,
@@ -1895,7 +1977,8 @@
 "npc": 1578,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 904"
+"why": "gives quest 904",
+"criterion": "(Qf=2505&PL>39)|Qa=904|Qf=904|(Qf=904&PL>39)|Qa=905|Qf=905|(Qf=899&PL>39)|Qa=2505|Qf=2505|(Qf=906&PL>49)|Qa=2506|Qf=2506|Qa=899|Qf=899|Qa=906|Qf=906|Qa=907|Qf=907"
 },
 {
 "map": 99091977,
@@ -1909,7 +1992,8 @@
 "npc": 839,
 "cell": 357,
 "orientation": 1,
-"why": "gives quest 161"
+"why": "gives quest 161",
+"criterion": "(PL>20)|Qa=161|Qf=161"
 },
 {
 "map": 99092993,
@@ -2063,7 +2147,8 @@
 "npc": 57,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1464"
+"why": "gives quest 1464",
+"criterion": "(Qf=1463)|Qa=1464|Qf=1464|Qa=258|Qf=258|Qa=678|Qf=678|Qa=1461|Qf=1461|Qa=1463|Qf=1463|Qa=1893|Qf=1893|Qa=1894|Qf=1894|Qa=1895|Qf=1895|Qa=1896|Qf=1896"
 },
 {
 "map": 99357702,
@@ -2105,14 +2190,16 @@
 "npc": 139,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 828"
+"why": "gives quest 828",
+"criterion": "(Qf=827&PL>29)|Qa=828|Qf=828|(Qf=828)|Qa=829|Qf=829|(Qf=829)|Qa=830|Qf=830|(Qf=830)|Qa=831|Qf=831|(Qf=831)|Qa=832|Qf=832"
 },
 {
 "map": 99614727,
 "npc": 140,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 836"
+"why": "gives quest 836",
+"criterion": "(Qf=827&PL>29)|Qa=836|Qf=836|(Qf=836)|Qa=837|Qf=837|(Qf=837)|Qa=838|Qf=838|(Qf=838)|Qa=839|Qf=839|(Qf=839)|Qa=840|Qf=840|(Qf=843)|Qa=844|Qf=844|Qa=70|Qf=70|Qa=390|Qf=390|Qa=843|Qf=843"
 },
 {
 "map": 99614728,
@@ -2126,21 +2213,24 @@
 "npc": 136,
 "cell": 374,
 "orientation": 3,
-"why": "placed by hand in Giny; gives quest 952"
+"why": "placed by hand in Giny; gives quest 952",
+"criterion": "(Qf=827&PL>39)|Qa=952|Qf=952|Qa=839|Qf=839|Qa=840|Qf=840"
 },
 {
 "map": 99614979,
 "npc": 1439,
 "cell": 371,
 "orientation": 3,
-"why": "placed by hand in Giny; gives quest 834"
+"why": "placed by hand in Giny; gives quest 834",
+"criterion": "(Qf=833)|Qa=834|Qf=834|Qa=833|Qf=833"
 },
 {
 "map": 99615238,
 "npc": 145,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 846"
+"why": "gives quest 846",
+"criterion": "(Qf=831&Qf=835&Qf=843)|Qa=846|Qf=846|(Qf=846)|Qa=847|Qf=847|Qa=296|Qf=296|Qa=839|Qf=839"
 },
 {
 "map": 99616513,
@@ -2154,7 +2244,8 @@
 "npc": 640,
 "cell": 274,
 "orientation": 1,
-"why": "gives quest 833"
+"why": "gives quest 833",
+"criterion": "(Qf=827&Qf=1962&Qf=2193&PL>29)|Qa=833|Qf=833|(Qf=834&Qf=843)|Qa=835|Qf=835|Qa=834|Qf=834|Qa=2193|Qf=2193"
 },
 {
 "map": 99746821,
@@ -2168,7 +2259,8 @@
 "npc": 1103,
 "cell": 273,
 "orientation": 1,
-"why": "gives quest 841"
+"why": "gives quest 841",
+"criterion": "(Qf=840)|Qa=841|Qf=841|Qa=308|Qf=308|Qa=840|Qf=840"
 },
 {
 "map": 101187584,
@@ -2812,14 +2904,16 @@
 "npc": 844,
 "cell": 288,
 "orientation": 1,
-"why": "gives quest 169"
+"why": "gives quest 169",
+"criterion": "(PL>30)|Qa=169|Qf=169"
 },
 {
 "map": 104071680,
 "npc": 832,
 "cell": 259,
 "orientation": 1,
-"why": "gives quest 165"
+"why": "gives quest 165",
+"criterion": "(PL>9)|Qa=165|Qf=165"
 },
 {
 "map": 104071684,
@@ -2840,35 +2934,40 @@
 "npc": 842,
 "cell": 285,
 "orientation": 1,
-"why": "gives quest 168"
+"why": "gives quest 168",
+"criterion": "(PL>30)|Qa=168|Qf=168"
 },
 {
 "map": 104072450,
 "npc": 6696,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 2455"
+"why": "gives quest 2455",
+"criterion": "(PL>29)|Qa=2455|Qf=2455"
 },
 {
 "map": 104072452,
 "npc": 853,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 177"
+"why": "gives quest 177",
+"criterion": "(PL>20)|Qa=177|Qf=177"
 },
 {
 "map": 104072452,
 "npc": 845,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 170"
+"why": "gives quest 170",
+"criterion": "(PL>29)|Qa=170|Qf=170"
 },
 {
 "map": 104072706,
 "npc": 834,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 163"
+"why": "gives quest 163",
+"criterion": "(PL>20)|Qa=163|Qf=163"
 },
 {
 "map": 104598019,
@@ -2896,14 +2995,16 @@
 "npc": 835,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 162"
+"why": "gives quest 162",
+"criterion": "(PL>30)|Qa=162|Qf=162"
 },
 {
 "map": 104862209,
 "npc": 837,
 "cell": 342,
 "orientation": 1,
-"why": "gives quest 167"
+"why": "gives quest 167",
+"criterion": "(PL>30)|Qa=167|Qf=167"
 },
 {
 "map": 106694158,
@@ -2917,7 +3018,8 @@
 "npc": 2147,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 845"
+"why": "gives quest 845",
+"criterion": "(Qf=843)|Qa=845|Qf=845"
 },
 {
 "map": 106695186,
@@ -3148,21 +3250,24 @@
 "npc": 2019,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1912"
+"why": "gives quest 1912",
+"criterion": "(Qa=1909&Qo=13096)|Qa=1912|Qf=1912|Qa=1317|Qf=1317"
 },
 {
 "map": 111673344,
 "npc": 2018,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1911"
+"why": "gives quest 1911",
+"criterion": "(Qa=1909&Qo=13095)|Qa=1911|Qf=1911|Qa=1317|Qf=1317"
 },
 {
 "map": 111673344,
 "npc": 2020,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 1913"
+"why": "gives quest 1913",
+"criterion": "(Qa=1909&Qo=13097)|Qa=1913|Qf=1913|(Qa=1909&Qo=13159)|Qa=1914|Qf=1914|Qa=1317|Qf=1317"
 },
 {
 "map": 111675392,
@@ -3246,21 +3351,24 @@
 "npc": 2190,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1441"
+"why": "gives quest 1441",
+"criterion": "(PL>179)|Qa=1441|Qf=1441"
 },
 {
 "map": 117706767,
 "npc": 2196,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1443"
+"why": "gives quest 1443",
+"criterion": "(Qf=1442)|Qa=1443|Qf=1443|Qa=1442|Qf=1442|Qa=1444|Qf=1444"
 },
 {
 "map": 117707777,
 "npc": 2189,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1440"
+"why": "gives quest 1440",
+"criterion": "(PL>179)|Qa=1440|Qf=1440"
 },
 {
 "map": 117964800,
@@ -3288,7 +3396,8 @@
 "npc": 4365,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1982"
+"why": "gives quest 1982",
+"criterion": "(Qa=1979&PL>19)|Qa=1982|Qf=1982"
 },
 {
 "map": 121636870,
@@ -3302,7 +3411,8 @@
 "npc": 2575,
 "cell": 370,
 "orientation": 1,
-"why": "gives quest 1560"
+"why": "gives quest 1560",
+"criterion": "(Qf=1559)|Qa=1560|Qf=1560"
 },
 {
 "map": 121896960,
@@ -3323,7 +3433,8 @@
 "npc": 2202,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1445"
+"why": "gives quest 1445",
+"criterion": "(Qf=29|Qf=30|Qf=32|Qf=33|Qf=34|Qf=35|Qf=115|Qf=116|Qf=117|Qf=118|Qf=119|Qf=544|Qf=545|Qf=546|Qf=547|Qf=548|Qf=549|Qf=550|Qf=551|Qf=552|Qf=553|Qf=1289|Qf=1290|Qf=1291|Qf=1292|Qf=1293|Qf=1332|Qf=1430|Qf=1434|Qf=1435|Qf=1436|Qf=1437|Qf=1518|Qf=1519|Qf=1520)|Qa=1445|Qf=1445|Qa=1446|Qf=1446|Qa=1447|Qf=1447|Qa=1448|Qf=1448|Qa=1449|Qf=1449|Qa=1450|Qf=1450|Qa=1451|Qf=1451|Qa=1452|Qf=1452|Qa=1453|Qf=1453|Qa=1454|Qf=1454|Qa=1455|Qf=1455"
 },
 {
 "map": 121899010,
@@ -3428,7 +3539,8 @@
 "npc": 2320,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1480"
+"why": "gives quest 1480",
+"criterion": "(Qf=1477&Qf=1479)|Qa=1480|Qf=1480"
 },
 {
 "map": 126093596,
@@ -3442,14 +3554,16 @@
 "npc": 2303,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1476"
+"why": "gives quest 1476",
+"criterion": "(PL>134)|Qa=1476|Qf=1476|Qa=1477|Qf=1477"
 },
 {
 "map": 126223135,
 "npc": 2307,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1477"
+"why": "gives quest 1477",
+"criterion": "(Qf=1476)|Qa=1477|Qf=1477|Qa=1476|Qf=1476"
 },
 {
 "map": 126615552,
@@ -3463,7 +3577,8 @@
 "npc": 2315,
 "cell": 399,
 "orientation": 1,
-"why": "gives quest 1478"
+"why": "gives quest 1478",
+"criterion": "(PL>134)|Qa=1478|Qf=1478|(Qf=1478&Qf=1473)|Qa=1479|Qf=1479|Qa=1480|Qf=1480"
 },
 {
 "map": 126617600,
@@ -3477,7 +3592,8 @@
 "npc": 3374,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1769"
+"why": "gives quest 1769",
+"criterion": "(PL>129)|Qa=1769|Qf=1769"
 },
 {
 "map": 128452097,
@@ -3540,14 +3656,16 @@
 "npc": 2397,
 "cell": 412,
 "orientation": 1,
-"why": "gives quest 1507"
+"why": "gives quest 1507",
+"criterion": "(PL>129)|Qa=1507|Qf=1507|Qa=1508|Qf=1508|Qa=1513|Qf=1513"
 },
 {
 "map": 128977922,
 "npc": 2402,
 "cell": 427,
 "orientation": 1,
-"why": "gives quest 1509"
+"why": "gives quest 1509",
+"criterion": "(PL>129&Qf=1508)|Qa=1509|Qf=1509|Qa=1507|Qf=1507"
 },
 {
 "map": 129236994,
@@ -3645,7 +3763,8 @@
 "npc": 2424,
 "cell": 299,
 "orientation": 1,
-"why": "gives quest 1510"
+"why": "gives quest 1510",
+"criterion": "(PL>179&Qf=1506&Qf=1507)|Qa=1510|Qf=1510|Qa=1511|Qf=1511|Qa=1512|Qf=1512|Qa=1513|Qf=1513|Qa=1516|Qf=1516"
 },
 {
 "map": 129763330,
@@ -3680,21 +3799,24 @@
 "npc": 2352,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1498"
+"why": "gives quest 1498",
+"criterion": "(Qf=1497)|Qa=1498|Qf=1498|(Qf=1498)|Qa=1499|Qf=1499|(Qf=1499)|Qa=1500|Qf=1500"
 },
 {
 "map": 131597312,
 "npc": 2342,
 "cell": 286,
 "orientation": 1,
-"why": "gives quest 1492"
+"why": "gives quest 1492",
+"criterion": "(PL>179&Qf=1500)|Qa=1492|Qf=1492|(PL>129&Qf=1506)|Qa=1497|Qf=1497|(PL>79)|Qa=1504|Qf=1504|(PL>79&Qf=1504)|Qa=1505|Qf=1505|(PL>79&Qf=1505)|Qa=1506|Qf=1506|Qa=1488|Qf=1488|Qa=1496|Qf=1496|Qa=1500|Qf=1500"
 },
 {
 "map": 131597312,
 "npc": 2341,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1501"
+"why": "gives quest 1501",
+"criterion": "(PL>79)|Qa=1501|Qf=1501|(PL>129&Qf=1501)|Qa=1502|Qf=1502|(PL>179&Qf=1502)|Qa=1503|Qf=1503|(PL>179&Qf=1512)|Qa=1513|Qf=1513|Qa=1485|Qf=1485|Qa=1512|Qf=1512"
 },
 {
 "map": 131597312,
@@ -3757,14 +3879,16 @@
 "npc": 2430,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 1511"
+"why": "gives quest 1511",
+"criterion": "(PL>179&Qf=1510)|Qa=1511|Qf=1511|Qa=1510|Qf=1510"
 },
 {
 "map": 131863044,
 "npc": 2432,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1512"
+"why": "gives quest 1512",
+"criterion": "(PL>179&Qf=1511)|Qa=1512|Qf=1512"
 },
 {
 "map": 131863044,
@@ -3785,7 +3909,8 @@
 "npc": 3418,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1778"
+"why": "gives quest 1778",
+"criterion": "(PL>110)|Qa=1778|Qf=1778"
 },
 {
 "map": 134218754,
@@ -3813,7 +3938,8 @@
 "npc": 2503,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 1542"
+"why": "gives quest 1542",
+"criterion": "(Qf=1541)|Qa=1542|Qf=1542|Qa=1541|Qf=1541"
 },
 {
 "map": 134219778,
@@ -3834,7 +3960,8 @@
 "npc": 2495,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 1543"
+"why": "gives quest 1543",
+"criterion": "(Qf=1542)|Qa=1543|Qf=1543|Qa=1542|Qf=1542"
 },
 {
 "map": 134220034,
@@ -3939,7 +4066,8 @@
 "npc": 2565,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 1558"
+"why": "gives quest 1558",
+"criterion": "(Qf=1557)|Qa=1558|Qf=1558|Qa=1557|Qf=1557"
 },
 {
 "map": 134350082,
@@ -3995,7 +4123,8 @@
 "npc": 2511,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1546"
+"why": "gives quest 1546",
+"criterion": "(Qf=1545)|Qa=1546|Qf=1546|Qa=1545|Qf=1545|Qa=1547|Qf=1547"
 },
 {
 "map": 135268869,
@@ -4009,7 +4138,8 @@
 "npc": 2561,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 1555"
+"why": "gives quest 1555",
+"criterion": "(PL>159)|Qa=1555|Qf=1555"
 },
 {
 "map": 135397891,
@@ -4030,7 +4160,8 @@
 "npc": 2534,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1553"
+"why": "gives quest 1553",
+"criterion": "(PL>159)|Qa=1553|Qf=1553"
 },
 {
 "map": 136052998,
@@ -4079,7 +4210,8 @@
 "npc": 2560,
 "cell": 368,
 "orientation": 1,
-"why": "gives quest 1562"
+"why": "gives quest 1562",
+"criterion": "(PL>179&Qf=1555)|Qa=1562|Qf=1562|Qa=1555|Qf=1555"
 },
 {
 "map": 136055044,
@@ -4093,7 +4225,8 @@
 "npc": 2613,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1549"
+"why": "gives quest 1549",
+"criterion": "(Qf=1548)|Qa=1549|Qf=1549|(Qf=1549)|Qa=1550|Qf=1550|Qa=1548|Qf=1548|Qa=1551|Qf=1551"
 },
 {
 "map": 136056070,
@@ -4114,7 +4247,8 @@
 "npc": 2462,
 "cell": 370,
 "orientation": 1,
-"why": "gives quest 1556"
+"why": "gives quest 1556",
+"criterion": "(PL>179&PO=15555&PO=15556)|Qa=1556|Qf=1556"
 },
 {
 "map": 136316416,
@@ -4128,7 +4262,8 @@
 "npc": 2464,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 1524"
+"why": "gives quest 1524",
+"criterion": "(Qa=1523&Qo>8635)|Qa=1524|Qf=1524|(Qf=1528)|Qa=1529|Qf=1529|Qa=1522|Qf=1522|Qa=1528|Qf=1528"
 },
 {
 "map": 136316674,
@@ -4142,7 +4277,8 @@
 "npc": 2333,
 "cell": 329,
 "orientation": 1,
-"why": "gives quest 1525"
+"why": "gives quest 1525",
+"criterion": "(Qa=1523&Qo>8635)|Qa=1525|Qf=1525"
 },
 {
 "map": 136446464,
@@ -4191,7 +4327,8 @@
 "npc": 2438,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1541"
+"why": "gives quest 1541",
+"criterion": "(PL>109)|Qa=1541|Qf=1541|(PL>159&Qf=1539&Qf=1543)|Qa=1544|Qf=1544|(Qf=1544)|Qa=1545|Qf=1545|(Qf=1546)|Qa=1547|Qf=1547|(PL>179&Qf=1547)|Qa=1548|Qf=1548|Qa=1542|Qf=1542|Qa=1543|Qf=1543|Qa=1546|Qf=1546|Qa=1552|Qf=1552"
 },
 {
 "map": 137363456,
@@ -4205,7 +4342,8 @@
 "npc": 2437,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1538"
+"why": "gives quest 1538",
+"criterion": "(PL>109)|Qa=1538|Qf=1538|(PL>159&Qf=1538)|Qa=1539|Qf=1539|(PL>179&Qf=1539)|Qa=1540|Qf=1540|Qa=1530|Qf=1530|Qa=1535|Qf=1535|Qa=1541|Qf=1541|Qa=1544|Qf=1544|Qa=1546|Qf=1546|Qa=1547|Qf=1547|Qa=1557|Qf=1557"
 },
 {
 "map": 137363456,
@@ -4219,7 +4357,8 @@
 "npc": 2571,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 1559"
+"why": "gives quest 1559",
+"criterion": "(PL>179)|Qa=1559|Qf=1559|Qa=1560|Qf=1560"
 },
 {
 "map": 137364480,
@@ -4373,7 +4512,8 @@
 "npc": 2456,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1554"
+"why": "gives quest 1554",
+"criterion": "(PL>159)|Qa=1554|Qf=1554|Qa=1531|Qf=1531|Qa=1538|Qf=1538"
 },
 {
 "map": 137369604,
@@ -4541,21 +4681,24 @@
 "npc": 2634,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1568"
+"why": "gives quest 1568",
+"criterion": "(PL>179)|Qa=1568|Qf=1568"
 },
 {
 "map": 140509443,
 "npc": 2633,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 1570"
+"why": "gives quest 1570",
+"criterion": "(PL>179)|Qa=1570|Qf=1570|Qa=1569|Qf=1569|Qa=1889|Qf=1889|Qa=1890|Qf=1890"
 },
 {
 "map": 140510209,
 "npc": 2632,
 "cell": 187,
 "orientation": 1,
-"why": "gives quest 1569"
+"why": "gives quest 1569",
+"criterion": "(PL>179)|Qa=1569|Qf=1569"
 },
 {
 "map": 140775424,
@@ -4576,7 +4719,8 @@
 "npc": 3402,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1772"
+"why": "gives quest 1772",
+"criterion": "(PL>49)|Qa=1772|Qf=1772"
 },
 {
 "map": 142085640,
@@ -4660,14 +4804,16 @@
 "npc": 2757,
 "cell": 370,
 "orientation": 1,
-"why": "gives quest 1602"
+"why": "gives quest 1602",
+"criterion": "(PL>179&Qf=1594)|Qa=1602|Qf=1602|Qa=1594|Qf=1594"
 },
 {
 "map": 144442368,
 "npc": 2725,
 "cell": 342,
 "orientation": 1,
-"why": "gives quest 1599"
+"why": "gives quest 1599",
+"criterion": "(PL>179&Qf=1598)|Qa=1599|Qf=1599"
 },
 {
 "map": 144442626,
@@ -4793,14 +4939,16 @@
 "npc": 2647,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1596"
+"why": "gives quest 1596",
+"criterion": "(PL>149&Qf=1595)|Qa=1596|Qf=1596|(PL>179&Qf=1589)|Qa=1597|Qf=1597|Qa=1594|Qf=1594|Qa=1595|Qf=1595"
 },
 {
 "map": 145228299,
 "npc": 2707,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1598"
+"why": "gives quest 1598",
+"criterion": "(PL>179&Qf=1597)|Qa=1598|Qf=1598|Qa=1594|Qf=1594"
 },
 {
 "map": 145228303,
@@ -4835,7 +4983,8 @@
 "npc": 2646,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1588"
+"why": "gives quest 1588",
+"criterion": "(PL>99)|Qa=1588|Qf=1588|(PL>149&Qf=1588)|Qa=1589|Qf=1589|(PL>179&Qf=1589)|Qa=1590|Qf=1590|Qa=1575|Qf=1575|Qa=1577|Qf=1577|Qa=1581|Qf=1581|Qa=1595|Qf=1595|Qa=1597|Qf=1597"
 },
 {
 "map": 145229323,
@@ -4849,21 +4998,24 @@
 "npc": 2652,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1573"
+"why": "gives quest 1573",
+"criterion": "(Qf=1572)|Qa=1573|Qf=1573|(PL>179&Qf=1586)|Qa=1579|Qf=1579|(Qf=1579)|Qa=1580|Qf=1580|(Qf=1580)|Qa=1581|Qf=1581|(Qf=1581)|Qa=1582|Qf=1582|(PL>149&Qf=1593)|Qa=1583|Qf=1583|(Qf=1583)|Qa=1584|Qf=1584|(Qf=1584)|Qa=1585|Qf=1585|(Qf=1585)|Qa=1586|Qf=1586|(PL>99)|Qa=1591|Qf=1591|(PL>99&Qf=1591)|Qa=1592|Qf=1592|(PL>99&Qf=1592&Qf=1588)|Qa=1593|Qf=1593|(Qf=2078)|Qa=2079|Qf=2079|Qa=1589|Qf=1589|Qa=1597|Qf=1597|Qa=1599|Qf=1599|Qa=2078|Qf=2078|Qa=2111|Qf=2111"
 },
 {
 "map": 145229323,
 "npc": 2693,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 1601"
+"why": "gives quest 1601",
+"criterion": "(PL>179&Qf=1596)|Qa=1601|Qf=1601"
 },
 {
 "map": 145491968,
 "npc": 2763,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1594"
+"why": "gives quest 1594",
+"criterion": "(PL>149)|Qa=1594|Qf=1594"
 },
 {
 "map": 145752577,
@@ -4961,7 +5113,8 @@
 "npc": 2853,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2486"
+"why": "gives quest 2486",
+"criterion": "(Qf=2445&Qf=1621&PL>159)|Qa=2486|Qf=2486"
 },
 {
 "map": 147850756,
@@ -4989,7 +5142,8 @@
 "npc": 2852,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1620"
+"why": "gives quest 1620",
+"criterion": "(Qf=1619)|Qa=1620|Qf=1620|Qa=1619|Qf=1619|Qa=1793|Qf=1793"
 },
 {
 "map": 147981314,
@@ -5031,7 +5185,8 @@
 "npc": 2845,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1618"
+"why": "gives quest 1618",
+"criterion": "(PL>79)|Qa=1618|Qf=1618"
 },
 {
 "map": 149166080,
@@ -5108,7 +5263,8 @@
 "npc": 1515,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1634"
+"why": "gives quest 1634",
+"criterion": "(Qf=1632)|Qa=1634|Qf=1634|(Qf=1634)|Qa=1635|Qf=1635|(Qf=1635)|Qa=2004|Qf=2004|Qa=1632|Qf=1632"
 },
 {
 "map": 153356296,
@@ -5332,14 +5488,16 @@
 "npc": 3022,
 "cell": 327,
 "orientation": 1,
-"why": "gives quest 1669"
+"why": "gives quest 1669",
+"criterion": "(Qf=1668)|Qa=1669|Qf=1669|(Qf=1669)|Qa=1670|Qf=1670|Qa=1668|Qf=1668"
 },
 {
 "map": 156501510,
 "npc": 3035,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 1673"
+"why": "gives quest 1673",
+"criterion": "(PL>29)|Qa=1673|Qf=1673"
 },
 {
 "map": 156502274,
@@ -5353,14 +5511,16 @@
 "npc": 3028,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 1671"
+"why": "gives quest 1671",
+"criterion": "(PL>29)|Qa=1671|Qf=1671"
 },
 {
 "map": 156893704,
 "npc": 3015,
 "cell": 245,
 "orientation": 1,
-"why": "gives quest 1667"
+"why": "gives quest 1667",
+"criterion": "(Qf=1666)|Qa=1667|Qf=1667|Qa=1666|Qf=1666"
 },
 {
 "map": 156894215,
@@ -5381,14 +5541,16 @@
 "npc": 151,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 1668"
+"why": "gives quest 1668",
+"criterion": "(Qf=1667)|Qa=1668|Qf=1668|Qa=1667|Qf=1667"
 },
 {
 "map": 157029376,
 "npc": 3017,
 "cell": 370,
 "orientation": 1,
-"why": "gives quest 1676"
+"why": "gives quest 1676",
+"criterion": "(PL>29)|Qa=1676|Qf=1676|Qa=1669|Qf=1669"
 },
 {
 "map": 157291520,
@@ -5423,7 +5585,8 @@
 "npc": 161,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1675"
+"why": "gives quest 1675",
+"criterion": "(PL>29)|Qa=1675|Qf=1675"
 },
 {
 "map": 158078210,
@@ -5472,7 +5635,8 @@
 "npc": 3146,
 "cell": 259,
 "orientation": 1,
-"why": "gives quest 1698"
+"why": "gives quest 1698",
+"criterion": "(PL>139)|Qa=1698|Qf=1698|Qa=1709|Qf=1709"
 },
 {
 "map": 160956417,
@@ -5493,7 +5657,8 @@
 "npc": 3104,
 "cell": 273,
 "orientation": 1,
-"why": "gives quest 1694"
+"why": "gives quest 1694",
+"criterion": "(Qf=1693)|Qa=1694|Qf=1694|Qa=1693|Qf=1693"
 },
 {
 "map": 160956930,
@@ -5514,14 +5679,16 @@
 "npc": 3139,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1697"
+"why": "gives quest 1697",
+"criterion": "(PL>139)|Qa=1697|Qf=1697|Qa=1711|Qf=1711"
 },
 {
 "map": 160957442,
 "npc": 3151,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1708"
+"why": "gives quest 1708",
+"criterion": "(PL>139&Qf=1705)|Qa=1708|Qf=1708|Qa=1711|Qf=1711"
 },
 {
 "map": 160957954,
@@ -5563,7 +5730,8 @@
 "npc": 3103,
 "cell": 355,
 "orientation": 1,
-"why": "gives quest 1711"
+"why": "gives quest 1711",
+"criterion": "(Qf=1710)|Qa=1711|Qf=1711"
 },
 {
 "map": 161218564,
@@ -5577,14 +5745,16 @@
 "npc": 3093,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1689"
+"why": "gives quest 1689",
+"criterion": "(PL>79)|Qa=1689|Qf=1689|(PL>139&Qf=1689)|Qa=1690|Qf=1690|(PL>179&Qf=1690)|Qa=1691|Qf=1691|(Qf=1694)|Qa=1695|Qf=1695|Qa=1693|Qf=1693|Qa=1694|Qf=1694|Qa=1698|Qf=1698|Qa=1711|Qf=1711"
 },
 {
 "map": 161218564,
 "npc": 3109,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 1703"
+"why": "gives quest 1703",
+"criterion": "(PL>79&Qf=1695)|Qa=1703|Qf=1703|(Qf=1703)|Qa=1704|Qf=1704|(Qf=1704)|Qa=1705|Qf=1705|(Qf=1708)|Qa=1709|Qf=1709|Qa=1691|Qf=1691|Qa=1695|Qf=1695|Qa=1700|Qf=1700|Qa=1708|Qf=1708|Qa=1711|Qf=1711|Qa=1712|Qf=1712"
 },
 {
 "map": 161220622,
@@ -5598,7 +5768,8 @@
 "npc": 3134,
 "cell": 327,
 "orientation": 1,
-"why": "gives quest 1706"
+"why": "gives quest 1706",
+"criterion": "(PL>139)|Qa=1706|Qf=1706"
 },
 {
 "map": 161351680,
@@ -5619,14 +5790,16 @@
 "npc": 3117,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1700"
+"why": "gives quest 1700",
+"criterion": "(PL>179&Qf=1711)|Qa=1700|Qf=1700"
 },
 {
 "map": 161481986,
 "npc": 3124,
 "cell": 273,
 "orientation": 1,
-"why": "gives quest 1701"
+"why": "gives quest 1701",
+"criterion": "(Qf=1700)|Qa=1701|Qf=1701"
 },
 {
 "map": 161481988,
@@ -5640,7 +5813,8 @@
 "npc": 3167,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1712"
+"why": "gives quest 1712",
+"criterion": "(PL>179)|Qa=1712|Qf=1712"
 },
 {
 "map": 161483012,
@@ -5745,7 +5919,8 @@
 "npc": 3107,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1710"
+"why": "gives quest 1710",
+"criterion": "(Qf=1709)|Qa=1710|Qf=1710|Qa=1709|Qf=1709"
 },
 {
 "map": 163317762,
@@ -5759,7 +5934,8 @@
 "npc": 3732,
 "cell": 302,
 "orientation": 1,
-"why": "gives quest 1851"
+"why": "gives quest 1851",
+"criterion": "(PL>29)|Qa=1851|Qf=1851"
 },
 {
 "map": 164102668,
@@ -5794,7 +5970,8 @@
 "npc": 3403,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 1771"
+"why": "gives quest 1771",
+"criterion": "(PL>50)|Qa=1771|Qf=1771"
 },
 {
 "map": 164365319,
@@ -5808,14 +5985,16 @@
 "npc": 2822,
 "cell": 344,
 "orientation": 1,
-"why": "gives quest 1609"
+"why": "gives quest 1609",
+"criterion": "(Qf=1608)|Qa=1609|Qf=1609"
 },
 {
 "map": 164496396,
 "npc": 2357,
 "cell": 358,
 "orientation": 1,
-"why": "gives quest 1484"
+"why": "gives quest 1484",
+"criterion": "(PL>79)|Qa=1484|Qf=1484|Qa=657|Qf=657"
 },
 {
 "map": 164496397,
@@ -5836,14 +6015,16 @@
 "npc": 3412,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1777"
+"why": "gives quest 1777",
+"criterion": "(PL>39)|Qa=1777|Qf=1777"
 },
 {
 "map": 165153296,
 "npc": 3369,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1768"
+"why": "gives quest 1768",
+"criterion": "(PL>40)|Qa=1768|Qf=1768|Qa=1788|Qf=1788"
 },
 {
 "map": 165154311,
@@ -5948,7 +6129,8 @@
 "npc": 3301,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 1754"
+"why": "gives quest 1754",
+"criterion": "(Qf=1751)|Qa=1754|Qf=1754"
 },
 {
 "map": 168559616,
@@ -5962,14 +6144,16 @@
 "npc": 3350,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1766"
+"why": "gives quest 1766",
+"criterion": "(Qf=1757)|Qa=1766|Qf=1766"
 },
 {
 "map": 168560656,
 "npc": 3349,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1765"
+"why": "gives quest 1765",
+"criterion": "(PL>179&PO>17968,0)|Qa=1765|Qf=1765"
 },
 {
 "map": 168820736,
@@ -6004,7 +6188,8 @@
 "npc": 3297,
 "cell": 258,
 "orientation": 1,
-"why": "gives quest 1750"
+"why": "gives quest 1750",
+"criterion": "(PL>179)|Qa=1750|Qf=1750"
 },
 {
 "map": 168821762,
@@ -6039,21 +6224,24 @@
 "npc": 3268,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1741"
+"why": "gives quest 1741",
+"criterion": "(Qf=1740)|Qa=1741|Qf=1741|Qa=1731|Qf=1731|Qa=1738|Qf=1738|Qa=1740|Qf=1740|Qa=1742|Qf=1742"
 },
 {
 "map": 168822786,
 "npc": 3279,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1737"
+"why": "gives quest 1737",
+"criterion": "(Qf=1731)|Qa=1737|Qf=1737"
 },
 {
 "map": 168822786,
 "npc": 3269,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 1739"
+"why": "gives quest 1739",
+"criterion": "(Qf=1738)|Qa=1739|Qf=1739|(Qf=1739)|Qa=1740|Qf=1740|(Qf=1741)|Qa=1742|Qf=1742"
 },
 {
 "map": 168822794,
@@ -6081,14 +6269,16 @@
 "npc": 3252,
 "cell": 245,
 "orientation": 1,
-"why": "gives quest 1734"
+"why": "gives quest 1734",
+"criterion": "(Qf=1733)|Qa=1734|Qf=1734|(PL>179)|Qa=1755|Qf=1755|Qa=1733|Qf=1733|Qa=1748|Qf=1748"
 },
 {
 "map": 169082888,
 "npc": 3264,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1764"
+"why": "gives quest 1764",
+"criterion": "(PL>179&PO>17963,0)|Qa=1764|Qf=1764"
 },
 {
 "map": 169083906,
@@ -6186,7 +6376,8 @@
 "npc": 3261,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1758"
+"why": "gives quest 1758",
+"criterion": "(Qf=1756)|Qa=1758|Qf=1758|Qa=1756|Qf=1756"
 },
 {
 "map": 170133512,
@@ -6305,7 +6496,8 @@
 "npc": 3906,
 "cell": 286,
 "orientation": 1,
-"why": "gives quest 1871"
+"why": "gives quest 1871",
+"criterion": "(PL>79)|Qa=1871|Qf=1871|(Qf=1871)|Qa=1872|Qf=1872|Qa=1868|Qf=1868"
 },
 {
 "map": 171706881,
@@ -6410,7 +6602,8 @@
 "npc": 3876,
 "cell": 398,
 "orientation": 1,
-"why": "gives quest 1862"
+"why": "gives quest 1862",
+"criterion": "(PL>169)|Qa=1862|Qf=1862"
 },
 {
 "map": 172752904,
@@ -6424,7 +6617,8 @@
 "npc": 3988,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1882"
+"why": "gives quest 1882",
+"criterion": "(PL>179)|Qa=1882|Qf=1882|Qa=1893|Qf=1893|Qa=1894|Qf=1894"
 },
 {
 "map": 173015560,
@@ -6494,14 +6688,16 @@
 "npc": 3869,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 1950"
+"why": "gives quest 1950",
+"criterion": "(Qf=1949)|Qa=1950|Qf=1950|Qa=1868|Qf=1868|Qa=2097|Qf=2097"
 },
 {
 "map": 173277186,
 "npc": 3551,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 1802"
+"why": "gives quest 1802",
+"criterion": "(PL>109)|Qa=1802|Qf=1802"
 },
 {
 "map": 173277186,
@@ -6515,14 +6711,16 @@
 "npc": 3552,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1811"
+"why": "gives quest 1811",
+"criterion": "(PL>109)|Qa=1811|Qf=1811"
 },
 {
 "map": 173277700,
 "npc": 3538,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 1797"
+"why": "gives quest 1797",
+"criterion": "(PL>59)|Qa=1797|Qf=1797|Qa=1812|Qf=1812|Qa=1817|Qf=1817|Qa=1818|Qf=1818"
 },
 {
 "map": 173277700,
@@ -6536,7 +6734,8 @@
 "npc": 3533,
 "cell": 329,
 "orientation": 1,
-"why": "gives quest 1798"
+"why": "gives quest 1798",
+"criterion": "(PL>59)|Qa=1798|Qf=1798"
 },
 {
 "map": 173277700,
@@ -6550,7 +6749,8 @@
 "npc": 3511,
 "cell": 190,
 "orientation": 1,
-"why": "gives quest 1804"
+"why": "gives quest 1804",
+"criterion": "(PL>59)|Qa=1804|Qf=1804|(Qf=1804)|Qa=1805|Qf=1805|(Qf=1807&PL>149)|Qa=1829|Qf=1829|Qa=1796|Qf=1796|Qa=1803|Qf=1803|Qa=1807|Qf=1807"
 },
 {
 "map": 173277701,
@@ -6578,7 +6778,8 @@
 "npc": 3630,
 "cell": 329,
 "orientation": 1,
-"why": "gives quest 1819"
+"why": "gives quest 1819",
+"criterion": "(PL>59)|Qa=1819|Qf=1819"
 },
 {
 "map": 173278209,
@@ -6613,7 +6814,8 @@
 "npc": 3635,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1818"
+"why": "gives quest 1818",
+"criterion": "(Qf=1815&Qf=1817&Qf=1796)|Qa=1818|Qf=1818|Qa=1814|Qf=1814|Qa=1817|Qf=1817"
 },
 {
 "map": 173278212,
@@ -6627,7 +6829,8 @@
 "npc": 3557,
 "cell": 342,
 "orientation": 1,
-"why": "gives quest 1814"
+"why": "gives quest 1814",
+"criterion": "(PL>59&((Qa=1804&Qo>11754)|Qf=1804))|Qa=1814|Qf=1814|(PL>59&((Qa=1804&Qo>11754)|Qf=1804))|Qa=1816|Qf=1816|Qa=1804|Qf=1804|Qa=1817|Qf=1817|Qa=1818|Qf=1818"
 },
 {
 "map": 173278722,
@@ -6641,7 +6844,8 @@
 "npc": 3522,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1803"
+"why": "gives quest 1803",
+"criterion": "(PL>109)|Qa=1803|Qf=1803"
 },
 {
 "map": 173278723,
@@ -6662,7 +6866,8 @@
 "npc": 3548,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1810"
+"why": "gives quest 1810",
+"criterion": "(PL>59)|Qa=1810|Qf=1810"
 },
 {
 "map": 173279744,
@@ -6690,7 +6895,8 @@
 "npc": 3547,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1813"
+"why": "gives quest 1813",
+"criterion": "(PL>109)|Qa=1813|Qf=1813"
 },
 {
 "map": 173539841,
@@ -6774,7 +6980,8 @@
 "npc": 3544,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 1812"
+"why": "gives quest 1812",
+"criterion": "(PL>109)|Qa=1812|Qf=1812"
 },
 {
 "map": 173934080,
@@ -6795,7 +7002,8 @@
 "npc": 3555,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 1806"
+"why": "gives quest 1806",
+"criterion": "(Qf=1805&PL>109)|Qa=1806|Qf=1806|(Qf=1832)|Qa=1833|Qf=1833|Qa=1804|Qf=1804|Qa=1805|Qf=1805|Qa=1807|Qf=1807|Qa=1818|Qf=1818|Qa=1832|Qf=1832"
 },
 {
 "map": 173936130,
@@ -6823,7 +7031,8 @@
 "npc": 3534,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 1799"
+"why": "gives quest 1799",
+"criterion": "(PL>59)|Qa=1799|Qf=1799|Qa=1807|Qf=1807"
 },
 {
 "map": 173937152,
@@ -6879,7 +7088,8 @@
 "npc": 3527,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1795"
+"why": "gives quest 1795",
+"criterion": "(PL>59)|Qa=1795|Qf=1795"
 },
 {
 "map": 173938178,
@@ -6914,14 +7124,16 @@
 "npc": 3670,
 "cell": 288,
 "orientation": 1,
-"why": "gives quest 1827"
+"why": "gives quest 1827",
+"criterion": "(PL>179)|Qa=1827|Qf=1827"
 },
 {
 "map": 174588929,
 "npc": 3707,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 1839"
+"why": "gives quest 1839",
+"criterion": "(PL>149)|Qa=1839|Qf=1839"
 },
 {
 "map": 174852100,
@@ -6935,7 +7147,8 @@
 "npc": 3709,
 "cell": 357,
 "orientation": 1,
-"why": "gives quest 1840"
+"why": "gives quest 1840",
+"criterion": "(PL>179)|Qa=1840|Qf=1840"
 },
 {
 "map": 174853124,
@@ -6956,14 +7169,16 @@
 "npc": 3678,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1831"
+"why": "gives quest 1831",
+"criterion": "(Qf=1829)|Qa=1831|Qf=1831|(Qf=1831&PL>179)|Qa=1832|Qf=1832|Qa=1829|Qf=1829|Qa=1833|Qf=1833"
 },
 {
 "map": 175112192,
 "npc": 3597,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1838"
+"why": "gives quest 1838",
+"criterion": "(PL>59)|Qa=1838|Qf=1838|Qa=1817|Qf=1817"
 },
 {
 "map": 175112194,
@@ -6977,7 +7192,8 @@
 "npc": 3691,
 "cell": 357,
 "orientation": 1,
-"why": "gives quest 1835"
+"why": "gives quest 1835",
+"criterion": "(PL>149)|Qa=1835|Qf=1835"
 },
 {
 "map": 175112198,
@@ -7145,7 +7361,8 @@
 "npc": 3944,
 "cell": 399,
 "orientation": 1,
-"why": "gives quest 1873"
+"why": "gives quest 1873",
+"criterion": "(PL>159)|Qa=1873|Qf=1873"
 },
 {
 "map": 178784256,
@@ -7215,7 +7432,8 @@
 "npc": 3779,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 1848"
+"why": "gives quest 1848",
+"criterion": "(PL>169)|Qa=1848|Qf=1848"
 },
 {
 "map": 179307011,
@@ -7243,7 +7461,8 @@
 "npc": 3767,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1847"
+"why": "gives quest 1847",
+"criterion": "(PL>169)|Qa=1847|Qf=1847"
 },
 {
 "map": 179307525,
@@ -7271,7 +7490,8 @@
 "npc": 3793,
 "cell": 273,
 "orientation": 1,
-"why": "gives quest 1850"
+"why": "gives quest 1850",
+"criterion": "(PL>169)|Qa=1850|Qf=1850"
 },
 {
 "map": 179308034,
@@ -7292,7 +7512,8 @@
 "npc": 3733,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1853"
+"why": "gives quest 1853",
+"criterion": "(Qf=1845)|Qa=1853|Qf=1853|Qa=1845|Qf=1845|Qa=1854|Qf=1854|Qa=1911|Qf=1911|Qa=1936|Qf=1936"
 },
 {
 "map": 179308546,
@@ -7313,7 +7534,8 @@
 "npc": 3826,
 "cell": 286,
 "orientation": 1,
-"why": "gives quest 1849"
+"why": "gives quest 1849",
+"criterion": "(PL>169&Qf=1848)|Qa=1849|Qf=1849"
 },
 {
 "map": 179309059,
@@ -7460,7 +7682,8 @@
 "npc": 3875,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1861"
+"why": "gives quest 1861",
+"criterion": "(Qf=1860)|Qa=1861|Qf=1861"
 },
 {
 "map": 181141510,
@@ -7495,7 +7718,8 @@
 "npc": 3895,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1865"
+"why": "gives quest 1865",
+"criterion": "(Qf=1864)|Qa=1865|Qf=1865|Qa=1864|Qf=1864"
 },
 {
 "map": 181146624,
@@ -7635,7 +7859,8 @@
 "npc": 4053,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1906"
+"why": "gives quest 1906",
+"criterion": "(Qf=1905)|Qa=1906|Qf=1906|(Qf=1908)|Qa=1909|Qf=1909|Qa=1905|Qf=1905|Qa=1908|Qf=1908"
 },
 {
 "map": 183242244,
@@ -7866,7 +8091,8 @@
 "npc": 4057,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1907"
+"why": "gives quest 1907",
+"criterion": "(Qf=1906)|Qa=1907|Qf=1907|Qa=1901|Qf=1901|Qa=1902|Qf=1902|Qa=1906|Qf=1906|Qa=1908|Qf=1908|Qa=2480|Qf=2480"
 },
 {
 "map": 184811521,
@@ -7936,7 +8162,8 @@
 "npc": 4072,
 "cell": 412,
 "orientation": 1,
-"why": "gives quest 1908"
+"why": "gives quest 1908",
+"criterion": "(Qf=1907)|Qa=1908|Qf=1908|Qa=1907|Qf=1907"
 },
 {
 "map": 185861122,
@@ -7971,7 +8198,8 @@
 "npc": 4246,
 "cell": 274,
 "orientation": 1,
-"why": "gives quest 1947"
+"why": "gives quest 1947",
+"criterion": "(Qf=1942&Qf=1945&Qf=1946)|Qa=1947|Qf=1947"
 },
 {
 "map": 186385924,
@@ -8118,28 +8346,32 @@
 "npc": 4247,
 "cell": 286,
 "orientation": 1,
-"why": "gives quest 1940"
+"why": "gives quest 1940",
+"criterion": "(Qa=1954&Qo>13590)|Qa=1940|Qf=1940|Qa=1954|Qf=1954"
 },
 {
 "map": 188219392,
 "npc": 4250,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1956"
+"why": "gives quest 1956",
+"criterion": "(Qa=1954&Qo>13694)|Qa=1956|Qf=1956|Qa=1954|Qf=1954"
 },
 {
 "map": 188219392,
 "npc": 4197,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1954"
+"why": "gives quest 1954",
+"criterion": "(Qf=1938&PL>179)|Qa=1954|Qf=1954|Qa=1936|Qf=1936|Qa=1938|Qf=1938"
 },
 {
 "map": 188219392,
 "npc": 4207,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1948"
+"why": "gives quest 1948",
+"criterion": "(PL>179&Qf=1939)|Qa=1948|Qf=1948|Qa=1938|Qf=1938"
 },
 {
 "map": 188219392,
@@ -8153,7 +8385,8 @@
 "npc": 4199,
 "cell": 369,
 "orientation": 1,
-"why": "gives quest 1939"
+"why": "gives quest 1939",
+"criterion": "(Qf=1938&PL>179)|Qa=1939|Qf=1939|Qa=1936|Qf=1936"
 },
 {
 "map": 188220416,
@@ -8174,7 +8407,8 @@
 "npc": 4249,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 1955"
+"why": "gives quest 1955",
+"criterion": "(Qa=1954&Qo>13592)|Qa=1955|Qf=1955|Qa=1954|Qf=1954"
 },
 {
 "map": 188483076,
@@ -8272,7 +8506,8 @@
 "npc": 1577,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 896"
+"why": "gives quest 896",
+"criterion": "(PL>19&PZ=1)|Qa=896|Qf=896|(Qf=2003&PL>29&PZ=1)|Qa=897|Qf=897|(Qf=2504&PL>29)|Qa=898|Qf=898|(Qf=898&PL>29)|Qa=899|Qf=899|(Qf=896&PL>29&PZ=1)|Qa=2003|Qf=2003|(Qf=897&PL>29)|Qa=2504|Qf=2504|Qa=918|Qf=918"
 },
 {
 "map": 188744193,
@@ -8433,7 +8668,8 @@
 "npc": 4467,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1992"
+"why": "gives quest 1992",
+"criterion": "(PL>9)|Qa=1992|Qf=1992"
 },
 {
 "map": 188746756,
@@ -8454,7 +8690,8 @@
 "npc": 3426,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 1780"
+"why": "gives quest 1780",
+"criterion": "(PL>39&PZ=1)|Qa=1780|Qf=1780"
 },
 {
 "map": 189530125,
@@ -8482,7 +8719,8 @@
 "npc": 4311,
 "cell": 344,
 "orientation": 1,
-"why": "gives quest 2000"
+"why": "gives quest 2000",
+"criterion": "(PL>19)|Qa=2000|Qf=2000"
 },
 {
 "map": 189531147,
@@ -8538,7 +8776,8 @@
 "npc": 4362,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1980"
+"why": "gives quest 1980",
+"criterion": "(Qa=1979&PL>14)|Qa=1980|Qf=1980"
 },
 {
 "map": 190056961,
@@ -8671,7 +8910,8 @@
 "npc": 4321,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 2008"
+"why": "gives quest 2008",
+"criterion": "(PL>29)|Qa=2008|Qf=2008|Qa=1467|Qf=1467|Qa=1974|Qf=1974|Qa=1991|Qf=1991"
 },
 {
 "map": 190843393,
@@ -8713,7 +8953,8 @@
 "npc": 3731,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 1845"
+"why": "gives quest 1845",
+"criterion": "(Qf=1607&PL>29)|Qa=1845|Qf=1845"
 },
 {
 "map": 191102980,
@@ -8748,7 +8989,8 @@
 "npc": 4962,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 2085"
+"why": "gives quest 2085",
+"criterion": "(PL>49&PZ=1)|Qa=2085|Qf=2085"
 },
 {
 "map": 191105026,
@@ -8790,14 +9032,16 @@
 "npc": 4356,
 "cell": 400,
 "orientation": 1,
-"why": "gives quest 1984"
+"why": "gives quest 1984",
+"criterion": "((Qa=1960&Qo>13932)|Qf=1960)|Qa=1984|Qf=1984|(Qf=1984)|Qa=1985|Qf=1985|(Qf=1985)|Qa=1986|Qf=1986|(Qf=1986)|Qa=1987|Qf=1987|Qa=1615|Qf=1615|Qa=1960|Qf=1960"
 },
 {
 "map": 192413702,
 "npc": 1502,
 "cell": 413,
 "orientation": 1,
-"why": "gives quest 1959"
+"why": "gives quest 1959",
+"criterion": "(Qf=1958&PL>9)|Qa=1959|Qf=1959|(Qf=1958)|Qa=1975|Qf=1975|(Qf=1959)|Qa=2009|Qf=2009|Qa=1677|Qf=1677|Qa=1725|Qf=1725|Qa=1728|Qf=1728|Qa=1958|Qf=1958|Qa=1960|Qf=1960"
 },
 {
 "map": 192413704,
@@ -8825,7 +9069,8 @@
 "npc": 4323,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 1978"
+"why": "gives quest 1978",
+"criterion": "((Qa=1959&Qo>13855)|Qf=1959)|Qa=1978|Qf=1978|(Qf=1978)|Qa=1979|Qf=1979|Qa=716|Qf=716|Qa=718|Qf=718|Qa=1725|Qf=1725|Qa=1962|Qf=1962|Qa=1986|Qf=1986|Qa=1987|Qf=1987"
 },
 {
 "map": 192414724,
@@ -8881,14 +9126,16 @@
 "npc": 4420,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 1962"
+"why": "gives quest 1962",
+"criterion": "(Qf=1960)|Qa=1962|Qf=1962|Qa=1960|Qf=1960"
 },
 {
 "map": 192415748,
 "npc": 4412,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 1976"
+"why": "gives quest 1976",
+"criterion": "(Qf=1975)|Qa=1976|Qf=1976|Qa=1975|Qf=1975"
 },
 {
 "map": 192415750,
@@ -8923,7 +9170,8 @@
 "npc": 4339,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1993"
+"why": "gives quest 1993",
+"criterion": "(PL>9)|Qa=1993|Qf=1993|Qa=327|Qf=327|Qa=1972|Qf=1972"
 },
 {
 "map": 192415754,
@@ -9098,7 +9346,8 @@
 "npc": 5604,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 2149"
+"why": "gives quest 2149",
+"criterion": "(PZ=1)|Qa=2149|Qf=2149"
 },
 {
 "map": 193332228,
@@ -9294,7 +9543,8 @@
 "npc": 4896,
 "cell": 357,
 "orientation": 1,
-"why": "gives quest 2074"
+"why": "gives quest 2074",
+"criterion": "(Qf=2073)|Qa=2074|Qf=2074|(Qf=2074)|Qa=2075|Qf=2075|Qa=2073|Qf=2073"
 },
 {
 "map": 196215818,
@@ -9315,14 +9565,16 @@
 "npc": 4885,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2071"
+"why": "gives quest 2071",
+"criterion": "((PL>109&Qf=2066))|Qa=2071|Qf=2071|Qa=2077|Qf=2077"
 },
 {
 "map": 196608004,
 "npc": 4810,
 "cell": 357,
 "orientation": 1,
-"why": "gives quest 2067"
+"why": "gives quest 2067",
+"criterion": "(PL>19&Qf=2066)|Qa=2067|Qf=2067"
 },
 {
 "map": 196608006,
@@ -9350,7 +9602,8 @@
 "npc": 4803,
 "cell": 429,
 "orientation": 1,
-"why": "gives quest 2068"
+"why": "gives quest 2068",
+"criterion": "(PL>19&Qf=2066)|Qa=2068|Qf=2068|(PL>19&Qf=2066)|Qa=2072|Qf=2072|(PL>179&Qf=2066)|Qa=2076|Qf=2076|Qa=2056|Qf=2056|Qa=2066|Qf=2066"
 },
 {
 "map": 196870146,
@@ -9364,14 +9617,16 @@
 "npc": 4816,
 "cell": 259,
 "orientation": 1,
-"why": "gives quest 2061"
+"why": "gives quest 2061",
+"criterion": "(PL>19&Qf=2066)|Qa=2061|Qf=2061"
 },
 {
 "map": 196870156,
 "npc": 4880,
 "cell": 244,
 "orientation": 1,
-"why": "gives quest 2070"
+"why": "gives quest 2070",
+"criterion": "((PL>19&Qf=2066))|Qa=2070|Qf=2070"
 },
 {
 "map": 196871168,
@@ -9406,14 +9661,16 @@
 "npc": 4839,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 2077"
+"why": "gives quest 2077",
+"criterion": "(PL>19&Qf=2066)|Qa=2077|Qf=2077"
 },
 {
 "map": 197264388,
 "npc": 4813,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 2059"
+"why": "gives quest 2059",
+"criterion": "(Qf=2058)|Qa=2059|Qf=2059"
 },
 {
 "map": 197918724,
@@ -9427,7 +9684,8 @@
 "npc": 5011,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2088"
+"why": "gives quest 2088",
+"criterion": "(Qf=2085&PL>179)|Qa=2088|Qf=2088"
 },
 {
 "map": 197920770,
@@ -9462,7 +9720,8 @@
 "npc": 4948,
 "cell": 342,
 "orientation": 1,
-"why": "gives quest 2080"
+"why": "gives quest 2080",
+"criterion": "(Qf=2079)|Qa=2080|Qf=2080|(Qf=2080)|Qa=2081|Qf=2081|(Qf=2081)|Qa=2082|Qf=2082|(Qf=2082)|Qa=2083|Qf=2083|Qa=2079|Qf=2079"
 },
 {
 "map": 197921792,
@@ -9490,14 +9749,16 @@
 "npc": 5030,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 2090"
+"why": "gives quest 2090",
+"criterion": "(PL>179)|Qa=2090|Qf=2090"
 },
 {
 "map": 198575110,
 "npc": 5029,
 "cell": 385,
 "orientation": 1,
-"why": "gives quest 2089"
+"why": "gives quest 2089",
+"criterion": "(PL>179)|Qa=2089|Qf=2089"
 },
 {
 "map": 198709250,
@@ -9679,7 +9940,8 @@
 "npc": 5357,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2117"
+"why": "gives quest 2117",
+"criterion": "(PL>179&Qa=2122&Qo>15974)|Qa=2117|Qf=2117|Qa=2118|Qf=2118"
 },
 {
 "map": 201852419,
@@ -9693,7 +9955,8 @@
 "npc": 5361,
 "cell": 313,
 "orientation": 1,
-"why": "gives quest 2118"
+"why": "gives quest 2118",
+"criterion": "(Qf=2117)|Qa=2118|Qf=2118|Qa=2117|Qf=2117"
 },
 {
 "map": 201852420,
@@ -9742,14 +10005,16 @@
 "npc": 5309,
 "cell": 286,
 "orientation": 1,
-"why": "gives quest 2113"
+"why": "gives quest 2113",
+"criterion": "(Qf=2112)|Qa=2113|Qf=2113|Qa=2112|Qf=2112"
 },
 {
 "map": 202244616,
 "npc": 5303,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2112"
+"why": "gives quest 2112",
+"criterion": "(PL>179&Qa=2122&Qo>15974)|Qa=2112|Qf=2112"
 },
 {
 "map": 202244616,
@@ -9770,7 +10035,8 @@
 "npc": 5343,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2132"
+"why": "gives quest 2132",
+"criterion": "(PL>179&Qf=2131)|Qa=2132|Qf=2132|Qa=2131|Qf=2131"
 },
 {
 "map": 202899464,
@@ -9784,7 +10050,8 @@
 "npc": 5316,
 "cell": 344,
 "orientation": 1,
-"why": "gives quest 2114"
+"why": "gives quest 2114",
+"criterion": "(Qf=2113)|Qa=2114|Qf=2114|Qa=2113|Qf=2113"
 },
 {
 "map": 204210180,
@@ -9812,7 +10079,8 @@
 "npc": 6058,
 "cell": 329,
 "orientation": 1,
-"why": "gives quest 2204"
+"why": "gives quest 2204",
+"criterion": "(PL>179&Qf=2149)|Qa=2204|Qf=2204"
 },
 {
 "map": 204997634,
@@ -9826,7 +10094,8 @@
 "npc": 5581,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2170"
+"why": "gives quest 2170",
+"criterion": "(PL>109&Qf=2149)|Qa=2170|Qf=2170"
 },
 {
 "map": 205258752,
@@ -9840,7 +10109,8 @@
 "npc": 5705,
 "cell": 330,
 "orientation": 1,
-"why": "gives quest 2168"
+"why": "gives quest 2168",
+"criterion": "(PL>109&Qf=2149)|Qa=2168|Qf=2168"
 },
 {
 "map": 205258753,
@@ -9875,7 +10145,8 @@
 "npc": 5701,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 2167"
+"why": "gives quest 2167",
+"criterion": "(PL>109&Qf=2149)|Qa=2167|Qf=2167"
 },
 {
 "map": 205259266,
@@ -9924,7 +10195,8 @@
 "npc": 2218,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 1465"
+"why": "gives quest 1465",
+"criterion": "(Qf=1464)|Qa=1465|Qf=1465|Qa=1464|Qf=1464|Qa=1791|Qf=1791"
 },
 {
 "map": 205261570,
@@ -9938,7 +10210,8 @@
 "npc": 6686,
 "cell": 383,
 "orientation": 1,
-"why": "gives quest 2446"
+"why": "gives quest 2446",
+"criterion": "(PL>129&Qf=2445)|Qa=2446|Qf=2446"
 },
 {
 "map": 205520899,
@@ -9966,7 +10239,8 @@
 "npc": 2980,
 "cell": 271,
 "orientation": 1,
-"why": "gives quest 1660"
+"why": "gives quest 1660",
+"criterion": "(Qa=1657&Qo>10011)|Qa=1660|Qf=1660"
 },
 {
 "map": 206045184,
@@ -10015,7 +10289,8 @@
 "npc": 5814,
 "cell": 342,
 "orientation": 1,
-"why": "gives quest 2166"
+"why": "gives quest 2166",
+"criterion": "(Qf=2149&PL>79)|Qa=2166|Qf=2166|Qa=2162|Qf=2162"
 },
 {
 "map": 206307844,
@@ -10050,7 +10325,8 @@
 "npc": 1543,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 870"
+"why": "gives quest 870",
+"criterion": "(PL>140&Qf=868&Qf=869&(Qa=878|Qf=878))|Qa=870|Qf=870|Qa=868|Qf=868|Qa=869|Qf=869"
 },
 {
 "map": 206831618,
@@ -10064,7 +10340,8 @@
 "npc": 5895,
 "cell": 260,
 "orientation": 1,
-"why": "gives quest 2176"
+"why": "gives quest 2176",
+"criterion": "(PL>149&Qf=2149)|Qa=2176|Qf=2176|Qa=2487|Qf=2487"
 },
 {
 "map": 206832130,
@@ -10176,7 +10453,8 @@
 "npc": 5670,
 "cell": 412,
 "orientation": 1,
-"why": "gives quest 2163"
+"why": "gives quest 2163",
+"criterion": "(PL>89&Qf=2149)|Qa=2163|Qf=2163"
 },
 {
 "map": 207619076,
@@ -10211,14 +10489,16 @@
 "npc": 5583,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 2181"
+"why": "gives quest 2181",
+"criterion": "(Qf=2156&PL>99)|Qa=2181|Qf=2181|(Qf=2181&PL>109)|Qa=2182|Qf=2182|(Qf=2182&PL>119)|Qa=2183|Qf=2183|(Qf=2183&PL>129)|Qa=2184|Qf=2184|(Qf=2184&PL>139)|Qa=2185|Qf=2185|(Qf=2185&PL>149)|Qa=2186|Qf=2186|(Qf=2186&PL>159)|Qa=2187|Qf=2187|(Qf=2187&PL>169)|Qa=2188|Qf=2188|(Qf=2188&PL>179)|Qa=2189|Qf=2189|(Qf=2189&PL>189)|Qa=2190|Qf=2190|(Qf=2190&PL>199)|Qa=2191|Qf=2191"
 },
 {
 "map": 207622146,
 "npc": 1544,
 "cell": 398,
 "orientation": 1,
-"why": "gives quest 869"
+"why": "gives quest 869",
+"criterion": "(PL>140&Qf=868&(Qa=878|Qf=878))|Qa=869|Qf=869|Qa=868|Qf=868"
 },
 {
 "map": 207622146,
@@ -10344,7 +10624,8 @@
 "npc": 5813,
 "cell": 386,
 "orientation": 1,
-"why": "gives quest 2178"
+"why": "gives quest 2178",
+"criterion": "(PL>119&Qf=2149)|Qa=2178|Qf=2178"
 },
 {
 "map": 209193219,
@@ -10393,7 +10674,8 @@
 "npc": 5558,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 2164"
+"why": "gives quest 2164",
+"criterion": "(PL>89&Qf=2149)|Qa=2164|Qf=2164"
 },
 {
 "map": 209457152,
@@ -10421,7 +10703,8 @@
 "npc": 5837,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 2165"
+"why": "gives quest 2165",
+"criterion": "(PL>139&Qf=2149)|Qa=2165|Qf=2165|Qa=2179|Qf=2179|Qa=2188|Qf=2188|Qa=2415|Qf=2415"
 },
 {
 "map": 209458186,
@@ -10435,7 +10718,8 @@
 "npc": 5830,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 2198"
+"why": "gives quest 2198",
+"criterion": "(PL>149&Qa=2180&Qo>16870)|Qa=2198|Qf=2198"
 },
 {
 "map": 210501635,
@@ -10463,7 +10747,8 @@
 "npc": 5990,
 "cell": 344,
 "orientation": 1,
-"why": "gives quest 2203"
+"why": "gives quest 2203",
+"criterion": "(Qf=2149&PL>179&PO=23556&Qf=2159)|Qa=2203|Qf=2203"
 },
 {
 "map": 210765573,
@@ -10512,14 +10797,16 @@
 "npc": 5954,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 2158"
+"why": "gives quest 2158",
+"criterion": "(PO=23735&Qf=2149&PL>179)|Qa=2158|Qf=2158"
 },
 {
 "map": 211293186,
 "npc": 5949,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 2408"
+"why": "gives quest 2408",
+"criterion": "(PL>179&Qa=2406)|Qa=2408|Qf=2408"
 },
 {
 "map": 211293186,
@@ -10547,14 +10834,16 @@
 "npc": 5796,
 "cell": 399,
 "orientation": 1,
-"why": "gives quest 2201"
+"why": "gives quest 2201",
+"criterion": "(PL>179&Qa=2200&Qo>16993&PO=23237&PO=23408)|Qa=2201|Qf=2201|Qa=2200|Qf=2200"
 },
 {
 "map": 211294208,
 "npc": 5962,
 "cell": 412,
 "orientation": 1,
-"why": "gives quest 2202"
+"why": "gives quest 2202",
+"criterion": "(PL>179&Qf=2200)|Qa=2202|Qf=2202|Qa=2200|Qf=2200"
 },
 {
 "map": 211294214,
@@ -10771,7 +11060,8 @@
 "npc": 3926,
 "cell": 327,
 "orientation": 1,
-"why": "gives quest 1870"
+"why": "gives quest 1870",
+"criterion": "(PL>69)|Qa=1870|Qf=1870"
 },
 {
 "map": 212863491,
@@ -10785,7 +11075,8 @@
 "npc": 6617,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 2432"
+"why": "gives quest 2432",
+"criterion": "(PL>89)|Qa=2432|Qf=2432"
 },
 {
 "map": 212864000,
@@ -11086,14 +11377,16 @@
 "npc": 6212,
 "cell": 259,
 "orientation": 1,
-"why": "gives quest 2424"
+"why": "gives quest 2424",
+"criterion": "(PL>49&PZ=1&Qf=2149&PO=25275)|Qa=2424|Qf=2424"
 },
 {
 "map": 214959104,
 "npc": 6236,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 2414"
+"why": "gives quest 2414",
+"criterion": "(PL>179)|Qa=2414|Qf=2414"
 },
 {
 "map": 214962688,
@@ -11128,14 +11421,16 @@
 "npc": 6219,
 "cell": 215,
 "orientation": 1,
-"why": "gives quest 2412"
+"why": "gives quest 2412",
+"criterion": "(PL>179&Qf=2411)|Qa=2412|Qf=2412|(PL>179&Qf=2411)|Qa=2418|Qf=2418|Qa=2411|Qf=2411"
 },
 {
 "map": 215089922,
 "npc": 6233,
 "cell": 203,
 "orientation": 1,
-"why": "gives quest 2415"
+"why": "gives quest 2415",
+"criterion": "(PL>179)|Qa=2415|Qf=2415"
 },
 {
 "map": 215220226,
@@ -11156,7 +11451,8 @@
 "npc": 6215,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 2422"
+"why": "gives quest 2422",
+"criterion": "(PL>179&Qf=2421)|Qa=2422|Qf=2422|Qa=2412|Qf=2412|Qa=2421|Qf=2421"
 },
 {
 "map": 215744514,
@@ -11198,14 +11494,16 @@
 "npc": 6628,
 "cell": 258,
 "orientation": 1,
-"why": "gives quest 2434"
+"why": "gives quest 2434",
+"criterion": "(PL>89&((PO!26207&PO!26208)|(PO=26207&PO=26208)))|Qa=2434|Qf=2434"
 },
 {
 "map": 216400648,
 "npc": 6608,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 2434"
+"why": "gives quest 2434",
+"criterion": "(PL>89&((PO!26207&PO!26208)|(PO=26207&PO=26208)))|Qa=2434|Qf=2434"
 },
 {
 "map": 216402698,
@@ -11233,7 +11531,8 @@
 "npc": 805,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 145"
+"why": "gives quest 145",
+"criterion": "(PL>59&Ps=2)|Qa=145|Qf=145|Qa=252|Qf=252|Qa=278|Qf=278"
 },
 {
 "map": 216531204,
@@ -11289,7 +11588,8 @@
 "npc": 3855,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 1859"
+"why": "gives quest 1859",
+"criterion": "(Qf=1858)|Qa=1859|Qf=1859|Qa=1858|Qf=1858"
 },
 {
 "map": 216663046,
@@ -11303,7 +11603,8 @@
 "npc": 6625,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 2436"
+"why": "gives quest 2436",
+"criterion": "(PL>89)|Qa=2436|Qf=2436"
 },
 {
 "map": 216795141,
@@ -11317,7 +11618,8 @@
 "npc": 6597,
 "cell": 202,
 "orientation": 1,
-"why": "gives quest 2435"
+"why": "gives quest 2435",
+"criterion": "(PL>89)|Qa=2435|Qf=2435"
 },
 {
 "map": 216926723,
@@ -11457,7 +11759,8 @@
 "npc": 6633,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 2433"
+"why": "gives quest 2433",
+"criterion": "(PL>89)|Qa=2433|Qf=2433"
 },
 {
 "map": 217064456,
@@ -11569,7 +11872,8 @@
 "npc": 6576,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 2431"
+"why": "gives quest 2431",
+"criterion": "(PL>89)|Qa=2431|Qf=2431"
 },
 {
 "map": 219284482,
@@ -11583,7 +11887,8 @@
 "npc": 6371,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 2439"
+"why": "gives quest 2439",
+"criterion": "(PL>179&Qf=2424)|Qa=2439|Qf=2439"
 },
 {
 "map": 219416064,
@@ -11604,7 +11909,8 @@
 "npc": 258,
 "cell": 302,
 "orientation": 1,
-"why": "gives quest 2427"
+"why": "gives quest 2427",
+"criterion": "(PL>179&Qf=2424)|Qa=2427|Qf=2427"
 },
 {
 "map": 219938819,
@@ -11618,14 +11924,16 @@
 "npc": 6584,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 2428"
+"why": "gives quest 2428",
+"criterion": "(PL>179&Qf=2424)|Qa=2428|Qf=2428"
 },
 {
 "map": 219938819,
 "npc": 6444,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 2440"
+"why": "gives quest 2440",
+"criterion": "(PL>179&Qf=2424)|Qa=2440|Qf=2440"
 },
 {
 "map": 219938822,
@@ -11646,7 +11954,8 @@
 "npc": 6636,
 "cell": 327,
 "orientation": 1,
-"why": "gives quest 2441"
+"why": "gives quest 2441",
+"criterion": "(PL>179&Qf=2424)|Qa=2441|Qf=2441"
 },
 {
 "map": 220468224,
@@ -11681,7 +11990,8 @@
 "npc": 6685,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 2447"
+"why": "gives quest 2447",
+"criterion": "(PL>149&Qf=2446)|Qa=2447|Qf=2447|Qa=2446|Qf=2446"
 },
 {
 "map": 221251586,
@@ -11702,7 +12012,8 @@
 "npc": 6709,
 "cell": 345,
 "orientation": 1,
-"why": "gives quest 2195"
+"why": "gives quest 2195",
+"criterion": "(Qf=2194)|Qa=2195|Qf=2195|(PL>19)|Qa=2450|Qf=2450|Qa=2194|Qf=2194"
 },
 {
 "map": 221778434,
@@ -11744,7 +12055,8 @@
 "npc": 6947,
 "cell": 329,
 "orientation": 1,
-"why": "gives quest 2481"
+"why": "gives quest 2481",
+"criterion": "(Qf=2480&(Qa=2477|Qf=2477))|Qa=2481|Qf=2481"
 },
 {
 "map": 223217173,
@@ -11758,7 +12070,8 @@
 "npc": 6803,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 2463"
+"why": "gives quest 2463",
+"criterion": "(PL>39)|Qa=2463|Qf=2463|(PL>39&Qf=2464)|Qa=2465|Qf=2465|Qa=2474|Qf=2474"
 },
 {
 "map": 223350028,
@@ -11821,7 +12134,8 @@
 "npc": 6954,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 2482"
+"why": "gives quest 2482",
+"criterion": "(PL>179)|Qa=2482|Qf=2482"
 },
 {
 "map": 224919558,
@@ -11947,7 +12261,8 @@
 "npc": 6842,
 "cell": 369,
 "orientation": 1,
-"why": "gives quest 2475"
+"why": "gives quest 2475",
+"criterion": "(PL>179&Qf=2474)|Qa=2475|Qf=2475|Qa=2471|Qf=2471|Qa=2474|Qf=2474|Qa=2479|Qf=2479"
 },
 {
 "map": 225968899,
@@ -11996,7 +12311,8 @@
 "npc": 6922,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 2479"
+"why": "gives quest 2479",
+"criterion": "(Qf=2478)|Qa=2479|Qf=2479|(Qf=2479)|Qa=2480|Qf=2480"
 },
 {
 "map": 227278850,
@@ -12017,7 +12333,8 @@
 "npc": 6849,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 2474"
+"why": "gives quest 2474",
+"criterion": "(Qf=2473)|Qa=2474|Qf=2474"
 },
 {
 "map": 227279878,
@@ -12073,7 +12390,8 @@
 "npc": 7641,
 "cell": 258,
 "orientation": 1,
-"why": "gives quest 2516"
+"why": "gives quest 2516",
+"criterion": "(PL>149&Qf=2515&Qf=2520)|Qa=2516|Qf=2516|(PL>179&Qf=2516)|Qa=2517|Qf=2517|(PL>179&Qf=2517)|Qa=2518|Qf=2518|(PL>179&Qf=2518)|Qa=2519|Qf=2519|Qa=2515|Qf=2515"
 },
 {
 "map": 234751491,
@@ -12115,14 +12433,16 @@
 "npc": 7717,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 2536"
+"why": "gives quest 2536",
+"criterion": "(PL>179&Qf=2515)|Qa=2536|Qf=2536"
 },
 {
 "map": 235146497,
 "npc": 7715,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 2531"
+"why": "gives quest 2531",
+"criterion": "(PL>179&Qa=2517&Qo>19391)|Qa=2531|Qf=2531"
 },
 {
 "map": 235405573,
@@ -12150,42 +12470,48 @@
 "npc": 7803,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 2535"
+"why": "gives quest 2535",
+"criterion": "(PL>179&Qf=2515&Qf=2518)|Qa=2535|Qf=2535"
 },
 {
 "map": 235536897,
 "npc": 7769,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2532"
+"why": "gives quest 2532",
+"criterion": "(PL>179&Qa=2518&Qo>19394)|Qa=2532|Qf=2532"
 },
 {
 "map": 235536897,
 "npc": 7758,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 2532"
+"why": "gives quest 2532",
+"criterion": "(PL>179&Qa=2518&Qo>19394)|Qa=2532|Qf=2532"
 },
 {
 "map": 235799552,
 "npc": 7698,
 "cell": 314,
 "orientation": 1,
-"why": "gives quest 2523"
+"why": "gives quest 2523",
+"criterion": "(Qa=2516&Qo>19312)|Qa=2523|Qf=2523"
 },
 {
 "map": 235799811,
 "npc": 7666,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 2521"
+"why": "gives quest 2521",
+"criterion": "(Qa=2516&Qo>19299)|Qa=2521|Qf=2521|(Qa=2516&Qo>19304)|Qa=2522|Qf=2522|Qa=2516|Qf=2516"
 },
 {
 "map": 235929600,
 "npc": 7762,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 2533"
+"why": "gives quest 2533",
+"criterion": "(PL>179&Qa=2518&Qo>19403)|Qa=2533|Qf=2533"
 },
 {
 "map": 236453888,

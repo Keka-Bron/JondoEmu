@@ -61,6 +61,22 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
+        public void A_derived_quest_giver_keeps_the_condition_it_stands_there_under()
+        {
+            // tools/derived_npc_criteria.py: the giver of a quest twenty levels away is not on the
+            // map until the quest is open to the character, under way or done.
+            string path = Derived("{\"map\":1,\"npc\":7,\"cell\":100,\"why\":\"gives quest 42\"," +
+                                  "\"criterion\":\"(PL>49)|Qa=42|Qf=42\"},{\"map\":2,\"npc\":8,\"cell\":100}");
+
+            var store = NpcSpawnContent.Load(null, null, null, path);
+
+            Assert.True(store.TryGet(new NpcSpawnKey(1, 7, 100), out var giver));
+            Assert.Equal("(PL>49)|Qa=42|Qf=42", giver.Value.Criterion);
+            Assert.True(store.TryGet(new NpcSpawnKey(2, 8, 100), out var plain));
+            Assert.Equal("", plain.Value.Criterion);
+        }
+
+        [Fact]
         public void The_extra_why_field_is_ignored_rather_than_fatal()
         {
             // The generator writes `why` and `weak` for a person to read. A loader that fell over
