@@ -25,6 +25,7 @@ namespace Jondo.Unity.Tests.Quests
         private const int Pair = 1994;
         private const int BontaRecruiter = 735, BrakmarRecruiter = 734;
         private const long BontaRecruiterMap = 188743684, BrakmarRecruiterMap = 188746757;
+        private const int BontaObjective = 13793, BrakmarObjective = 13794;
 
         private static void Clean()
         {
@@ -56,11 +57,13 @@ namespace Jondo.Unity.Tests.Quests
                     Assert.True(await QuestEngine.StartAsync(pipe.ToClient, Pair));
                     FollowedQuests.Follow(Character, Pair);
 
-                    await QuestEngine.OnTalkingToAsync(pipe.ToClient, BontaRecruiter);
+                    // Each recruiter's objective is done by her talk's last reply («Gracias por la
+                    // explicación»), as content/npcs/dialogues.json writes it.
+                    await QuestEngine.CompleteByReplyAsync(pipe.ToClient, Pair, BontaObjective);
                     Assert.True(QuestEngine.Log!.Active(Pair));
 
                     pipe.Session.State.MapId = BrakmarRecruiterMap;
-                    await QuestEngine.OnTalkingToAsync(pipe.ToClient, BrakmarRecruiter);
+                    await QuestEngine.CompleteByReplyAsync(pipe.ToClient, Pair, BrakmarObjective);
                     Assert.False(QuestEngine.Log!.Active(Pair));
                     Assert.DoesNotContain(Pair, FollowedQuests.Of(Character));
                 }
