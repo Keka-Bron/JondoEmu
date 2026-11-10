@@ -21,6 +21,7 @@ namespace Jondo.Unity.World.Quests
         public const string AuthoredFile = "quests/criteria.json";
 
         private static Dictionary<int, string>? _criteria;
+        private static Dictionary<int, string>? _objectives;
         private static readonly object _lock = new();
 
         /// <summary>The criterion of a quest: the authored one when there is one, else the catalogue's.</summary>
@@ -30,10 +31,20 @@ namespace Jondo.Unity.World.Quests
             return _criteria!.TryGetValue(questId, out string? written) ? written : catalogue;
         }
 
+        /// <summary>
+        /// The condition an objective holds for, or empty: «Consejo de clase» lists the nineteen
+        /// class masters and each character has only his own to see (PG, the class).
+        /// </summary>
+        public static string OfObjective(int objectiveId)
+        {
+            Load();
+            return _objectives!.TryGetValue(objectiveId, out string? written) ? written : "";
+        }
+
         /// <summary>For the tests: read the file again.</summary>
         public static void Forget()
         {
-            lock (_lock) _criteria = null;
+            lock (_lock) { _criteria = null; _objectives = null; }
         }
 
         private static void Load()
@@ -42,6 +53,7 @@ namespace Jondo.Unity.World.Quests
             {
                 if (_criteria != null) return;
                 var criteria = new Dictionary<int, string>();
+                var objectives = new Dictionary<int, string>();
                 try
                 {
                     string path = Paths.ContentFile(AuthoredFile);
@@ -54,6 +66,15 @@ namespace Jondo.Unity.World.Quests
                             string criterion = row.GetProperty("criterion").GetString() ?? "";
                             if (quest > 0) criteria[quest] = criterion;
                         }
+                        if (doc.RootElement.TryGetProperty("objectives", out var rows))
+                        {
+                            foreach (var row in rows.EnumerateArray())
+                            {
+                                int objective = row.GetProperty("objective").GetInt32();
+                                string criterion = row.GetProperty("criterion").GetString() ?? "";
+                                if (objective > 0) objectives[objective] = criterion;
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -61,6 +82,7 @@ namespace Jondo.Unity.World.Quests
                     Console.WriteLine($"[Content] {AuthoredFile} is unreadable: {ex.Message}");
                 }
                 _criteria = criteria;
+                _objectives = objectives;
             }
         }
     }

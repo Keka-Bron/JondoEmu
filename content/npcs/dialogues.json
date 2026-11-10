@@ -100,7 +100,7 @@
         {
           "message": 30468,
           "choices": [
-            { "reply": 36741, "startsQuest": 1958 },
+            { "reply": 36741, "startsQuest": 1958, "completes": 14257, "params": [[34, 1958], [30, 14257]] },
             { "reply": 36743, "completes": 13768, "params": [[30, 13768]] }
           ]
         }
@@ -110,62 +110,153 @@
       "npc": 1502,
       "map": 0,
       "opening": 9707,
+      "_byHand": true,
       "lines": [
         {
           "message": 9707,
           "choices": [
-            {
-              "reply": 36872,
-              "next": 30552,
-              "quest": 1958
-            },
-            {
-              "reply": 37294,
-              "next": 30884,
-              "quest": 1958,
-              "afterQuest": true
-            },
-            {
-              "reply": 36990,
-              "quest": 1959,
-              "afterQuest": true,
-              "startsQuest": 2009
-            },
-            {
-              "reply": 36985
-            },
-            {
-              "reply": 36987
-            }
+            { "reply": 36861, "next": 30545, "quest": 1958, "beforeObjective": 13850 },
+            { "reply": 36872, "next": 30558, "quest": 1958, "afterQuest": true, "beforeQuest": 1959 },
+            { "reply": 36986, "quest": 1959, "completes": 13856, "params": [[30, 13856]], "next": 30640, "afterObjective": 13855 },
+            { "reply": 36990, "next": 30641, "quest": 1959, "afterQuest": true, "beforeQuest": 2009 },
+            { "reply": 37294, "next": 30884, "quest": 1958, "afterQuest": true, "beforeQuest": 1975 },
+            { "reply": 36987 }
+          ]
+        },
+        {
+          "message": 30545,
+          "choices": [
+            { "reply": 36860, "next": 30546 },
+            { "reply": 36862, "next": 30553 }
+          ]
+        },
+        {
+          "message": 30546,
+          "choices": [
+            { "reply": 36859, "next": 30547 }
+          ]
+        },
+        {
+          "message": 30547,
+          "choices": [
+            { "reply": 36858, "quest": 1958, "completes": 13850, "params": [[30, 13850]], "next": 30548 }
+          ]
+        },
+        {
+          "message": 30548,
+          "choices": [
+            { "reply": 36857, "next": 30549 }
+          ]
+        },
+        {
+          "message": 30549,
+          "choices": [
+            { "reply": 36855, "next": 30550 },
+            { "reply": 36856 }
+          ]
+        },
+        {
+          "message": 30550,
+          "choices": [
+            { "reply": 36854, "next": 30551 }
+          ]
+        },
+        {
+          "message": 30551,
+          "choices": [
+            { "reply": 36853, "next": 30552 },
+            { "reply": 71415, "next": 53186 }
           ]
         },
         {
           "message": 30552,
           "choices": [
-            {
-              "reply": 36869,
-              "startsQuest": 1959
-            },
-            {
-              "reply": 36987
-            }
+            { "reply": 36852, "startsQuest": 1959, "params": [[34, 1959]] }
+          ]
+        },
+        {
+          "message": 53186,
+          "choices": [
+            { "reply": 71414 }
+          ]
+        },
+        {
+          "message": 30553,
+          "choices": [
+            { "reply": 36868, "quest": 1958, "completes": 13850, "params": [[30, 13850]], "next": 30554 }
+          ]
+        },
+        {
+          "message": 30554,
+          "choices": [
+            { "reply": 36866, "next": 30555 },
+            { "reply": 36867 }
+          ]
+        },
+        {
+          "message": 30555,
+          "choices": [
+            { "reply": 36865, "next": 30556 }
+          ]
+        },
+        {
+          "message": 30556,
+          "choices": [
+            { "reply": 36864, "next": 30557 },
+            { "reply": 71417, "next": 53187 }
+          ]
+        },
+        {
+          "message": 30557,
+          "choices": [
+            { "reply": 36863, "startsQuest": 1959, "params": [[34, 1959]] }
+          ]
+        },
+        {
+          "message": 53187,
+          "choices": [
+            { "reply": 71416 }
+          ]
+        },
+        {
+          "message": 30558,
+          "choices": [
+            { "reply": 36871, "next": 30559 }
+          ]
+        },
+        {
+          "message": 30559,
+          "choices": [
+            { "reply": 36870, "next": 30560 }
+          ]
+        },
+        {
+          "message": 30560,
+          "choices": [
+            { "reply": 36869, "startsQuest": 1959, "params": [[34, 1959]] }
+          ]
+        },
+        {
+          "message": 30640,
+          "choices": [
+            { "reply": 36985, "next": 30641 }
+          ]
+        },
+        {
+          "message": 30641,
+          "choices": [
+            { "reply": 36983, "startsQuest": 2009, "params": [[34, 2009]] }
           ]
         },
         {
           "message": 30884,
           "choices": [
-            {
-              "reply": 37292,
-              "startsQuest": 1975
-            },
-            {
-              "reply": 37293
-            }
+            { "reply": 37292, "startsQuest": 1975, "params": [[34, 1975]] },
+            { "reply": 37293 }
           ]
         }
       ],
-      "_byHand": true,
-      "_note2": "«Consejo de clase» (2009). The guide gives it to the Conseillere Archie at [4,-19] with the requirement «On marche sur des oeufs», which is our 1959. Its step 2631 carries dialogId 0, so there is NO measured hand-over line: it hangs off her opening line with reply 36990 «Demander la raison de sa convocation», which is the only one of her 59 that talks about a summons and fits a class council. The reconstruction is ours; the requirement and the NPC are the guide's."
+      "why": "Councillor Archi, from her own lines and replies, by Dofus pour les noobs («Les principes d'Archie m'aident», «On marche sur des œufs», «Conseil de classe»): «Quiero descubrir la ciudad.» (30545), the city (30546, 30547), «Estoy totalmente de acuerdo.» with her discipline (the visit of 1958, 13850; or «soy un poco anarquista» and «Así es.», 30553), the false dofus and «Aceptar sin dudar.» (30549-30551), and «Vale, voy en dirección a la taberna.» on 30552, the line 1959 names; under level 10, «Aún no me noto con fuerzas» and her advice to go back to Incarnam (53186). Back with the trafficker behind bars (36986, 13856), she has spoken of the character to his class's representative (30641) and hands «Consejo de clase» over. «¿Dónde puede uno descansar tranquilo?» is «Esto hace aguas» (30884, the line 1975 names)."
     },
     {
       "npc": 1088,

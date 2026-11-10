@@ -1044,6 +1044,13 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
+        /// <summary>Whether an objective is this character's (QuestCriteria.OfObjective).</summary>
+        private static bool AppliesTo(QuestLog log, int objectiveId)
+        {
+            string criterion = QuestCriteria.OfObjective(objectiveId);
+            return criterion.Length == 0 || QuestCriterion.Judge(criterion, log).Met;
+        }
+
         /// <summary>
         /// Tells the client where a quest has got to (idu), which is what the ieo asks for.
         /// </summary>
@@ -1056,8 +1063,20 @@ namespace Jondo.Unity.Server.Managers
             var step = _book.Step(run.StepId);
             if (step == null) return;
 
+            // The ones that are not this character's are out of his step, done without a word:
+            // «Consejo de clase» asks each class for its own master.
             var objectives = new List<int>(step.Objectives.Count);
-            foreach (var objective in step.Objectives) objectives.Add(objective.Id);
+            bool settled = false;
+            foreach (var objective in step.Objectives)
+            {
+                if (!AppliesTo(log, objective.Id))
+                {
+                    settled |= run.Done.Add(objective.Id);
+                    continue;
+                }
+                objectives.Add(objective.Id);
+            }
+            if (settled) Save(questId, run);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Idu,

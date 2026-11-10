@@ -1,13 +1,95 @@
 {
   "_": [
     "Start conditions the catalogue leaves out and the game has. A criterion here replaces the",
-    "catalogue's, in the client's own syntax (Qf=<quest> finished, & and |)."
+    "catalogue's, in the client's own syntax (Qf=<quest> finished, & and |).",
+    "",
+    "objectives: the condition an objective holds for; one that does not is out of the character's step.",
+    "«Consejo de clase» (2009) lists every class master: each is its class's, PG=<class>, by the maps «Aquí",
+    "huele a gas» (1960) gives each class in its own criterion, (Qf=<class quest>&PG=<class>&Pm=<map>)."
   ],
   "criteria": [
     {
       "quest": 1632,
       "criterion": "Qf=1631",
       "why": "«Un pueblo sobre las nubes» is handed over at the village gate, past the end of the celestial temple; the catalogue says BT=1, and Dofus pour les noobs gives «Réponses à tout» as the quest to have done first."
+    }
+  ],
+  "objectives": [
+    {
+      "objective": 13880,
+      "criterion": "PG=1"
+    },
+    {
+      "objective": 13881,
+      "criterion": "PG=2"
+    },
+    {
+      "objective": 13882,
+      "criterion": "PG=3"
+    },
+    {
+      "objective": 13883,
+      "criterion": "PG=4"
+    },
+    {
+      "objective": 13884,
+      "criterion": "PG=5"
+    },
+    {
+      "objective": 13885,
+      "criterion": "PG=6"
+    },
+    {
+      "objective": 13886,
+      "criterion": "PG=7"
+    },
+    {
+      "objective": 13887,
+      "criterion": "PG=8"
+    },
+    {
+      "objective": 13888,
+      "criterion": "PG=9"
+    },
+    {
+      "objective": 13889,
+      "criterion": "PG=10"
+    },
+    {
+      "objective": 13890,
+      "criterion": "PG=11"
+    },
+    {
+      "objective": 13891,
+      "criterion": "PG=12"
+    },
+    {
+      "objective": 13892,
+      "criterion": "PG=13"
+    },
+    {
+      "objective": 13893,
+      "criterion": "PG=14"
+    },
+    {
+      "objective": 13894,
+      "criterion": "PG=15"
+    },
+    {
+      "objective": 13895,
+      "criterion": "PG=16"
+    },
+    {
+      "objective": 13896,
+      "criterion": "PG=17"
+    },
+    {
+      "objective": 13897,
+      "criterion": "PG=18"
+    },
+    {
+      "objective": 18751,
+      "criterion": "PG=20"
     }
   ]
 }

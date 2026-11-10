@@ -1283,7 +1283,7 @@ namespace Jondo.Unity.Server.Handlers
             // after the window closes when it ends it -- «He neutralizado a la rata.» is kld, then
             // lqn 56 and ied 1633 in the capture.
             int completesAfterClosing = 0;
-            if (elegidaAhora != null && elegidaAhora.Completes != 0)
+            if (elegidaAhora != null && elegidaAhora.Completes != 0 && elegidaAhora.StartsQuest == 0)
             {
                 if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
                     completesAfterClosing = elegidaAhora.Completes;
@@ -1301,7 +1301,13 @@ namespace Jondo.Unity.Server.Handlers
                 bool closesHere = elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && !elegidaAhora.ReturnsHome
                                   && elegidaAhora.TeleportPassage == 0;
                 if (closesHere) startsAfterClosing = elegidaAhora.StartsQuest;
-                else await Managers.Quests.StartAsync(stream, elegidaAhora.StartsQuest);
+                else
+                {
+                    await Managers.Quests.StartAsync(stream, elegidaAhora.StartsQuest);
+                    // And its first objective, when it is talking to whoever hands it over.
+                    if (elegidaAhora.Completes != 0)
+                        await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.StartsQuest, elegidaAhora.Completes);
+                }
             }
             else if (frase == null)
             {
@@ -1391,6 +1397,8 @@ namespace Jondo.Unity.Server.Handlers
             if (startsAfterClosing != 0)
             {
                 await Managers.Quests.StartAsync(stream, startsAfterClosing);
+                if (elegidaAhora!.Completes != 0)
+                    await Managers.Quests.CompleteByReplyAsync(stream, startsAfterClosing, elegidaAhora.Completes);
                 return;
             }
 
