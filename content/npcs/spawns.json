@@ -755,6 +755,14 @@
       "orientation": 1,
       "criterion": "Qo=9785|Qf=1635",
       "why": "Likantrabioso, where the Minilubo stood: «Une fois le combat terminé, Hargnok qui avait disparu apparaît. Il semblerait que le Milimilou n'était autre que lui» (Dofus pour les noobs). The derived layer had him here from the start; he is the Minilubo, so he only shows once it is beaten."
+    },
+    {
+      "map": 153358340,
+      "npc": 2912,
+      "cell": 385,
+      "orientation": 5,
+      "criterion": "Qa=1633&Qo=9769&Qo!9770",
+      "why": "The Rata Nsiosa, out of the tap: template 2912 on cell 385 facing 5 in the jsn of «mision matarratas completa», once the lemonade is poured (9769) and until it is beaten (9770)."
     }
   ]
 }

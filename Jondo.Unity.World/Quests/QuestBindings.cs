@@ -200,6 +200,18 @@ namespace Jondo.Unity.World.Quests
         /// </summary>
         public bool OverridesMap { get; init; }
 
+        /// <summary>
+        /// An NPC of the map who comes in once it is done: «Haz salir a la rata de su escondite»
+        /// brings the Rata Nsiosa (2912) out, a jsn right after the ieb in «Matarratas»' capture.
+        /// </summary>
+        public int ShowsNpc { get; init; }
+
+        /// <summary>
+        /// The info line the client prints when it is done, or zero: the tavern's cellar says 591
+        /// on the first look at the tap and 592 when the lemonade is poured (lqn before the ieb).
+        /// </summary>
+        public int Says { get; init; }
+
         /// <summary>Why this row says what it says. Never read by the server; read by people.</summary>
         public string Why { get; init; } = "";
 
@@ -376,6 +388,8 @@ namespace Jondo.Unity.World.Quests
                 ThenStarts = Int(row, "thenStarts"),
                 AfterObjectives = Ints(row, "afterObjectives"),
                 Replies = Ints(row, "replies"),
+                ShowsNpc = Int(row, "showsNpc"),
+                Says = Int(row, "says"),
                 OverridesMap = row.TryGetProperty("overridesMap", out var overrides)
                                && overrides.ValueKind == JsonValueKind.True,
                 ItemId = Int(row, "item"),

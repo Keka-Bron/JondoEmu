@@ -209,6 +209,17 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public int ThenNpc { get; init; }
 
+        /// <summary>
+        /// The conversation objective of <see cref="Quest"/> this reply does, or zero. «Matarratas»'
+        /// capture: Grobid's «He neutralizado a la rata.» carries effect 30 with objective 9771,
+        /// «go back and see Grobid», and the quest ends when it is chosen, not on hello. An
+        /// objective a reply does is not done on opening the conversation.
+        /// </summary>
+        public int Completes { get; init; }
+
+        /// <summary>Whether any reply of this tree does that objective.</summary>
+        internal bool Does(int objectiveId) => Completes != 0 && Completes == objectiveId;
+
         public bool Ends => Next == 0;
 
         /// <summary>Whether this reply is offered to nobody in particular.</summary>
@@ -433,6 +444,19 @@ namespace Jondo.Unity.World.Content
         public long Opening { get; init; }
 
         public IReadOnlyList<DialogueLine> Lines { get; init; } = Array.Empty<DialogueLine>();
+
+        /// <summary>Whether a reply of this tree does that objective (<see cref="DialogueChoice.Completes"/>).</summary>
+        public bool HasReplyFor(int objectiveId)
+        {
+            foreach (var line in Lines)
+            {
+                foreach (var choice in line.Choices)
+                {
+                    if (choice.Does(objectiveId)) return true;
+                }
+            }
+            return false;
+        }
 
         public NpcDialogueKey Key => new NpcDialogueKey(NpcId, MapId);
 
@@ -731,6 +755,7 @@ namespace Jondo.Unity.World.Content
                             TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
                             GivesMutation = (int)Number(choice, "mutation"),
                             ThenNpc = (int)Number(choice, "thenNpc"),
+                            Completes = (int)Number(choice, "completes"),
                             EndsMutation = choice.TryGetProperty("endsMutation", out var ends)
                                            && ends.ValueKind == JsonValueKind.True,
                         });
@@ -890,6 +915,7 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
+                            if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);
                             if (choice.EndsMutation) writer.WriteBoolean("endsMutation", true);
                             writer.WriteEndObject();
                         }

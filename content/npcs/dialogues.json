@@ -88,33 +88,23 @@
       "npc": 4355,
       "map": 0,
       "opening": 30467,
+      "_byHand": true,
       "lines": [
         {
           "message": 30467,
           "choices": [
-            {
-              "reply": 36744,
-              "next": 30468
-            },
-            {
-              "reply": 36743
-            }
+            { "reply": 36744, "next": 30468, "completes": 13768, "params": [[30, 13768]] },
+            { "reply": 36743, "completes": 13768, "params": [[30, 13768]] }
           ]
         },
         {
           "message": 30468,
           "choices": [
-            {
-              "reply": 36741,
-              "startsQuest": 1958
-            },
-            {
-              "reply": 36743
-            }
+            { "reply": 36741, "startsQuest": 1958 },
+            { "reply": 36743, "completes": 13768, "params": [[30, 13768]] }
           ]
         }
-      ],
-      "_byHand": true
+      ]
     },
     {
       "npc": 1502,
@@ -1195,17 +1185,14 @@
       "opening": 20864,
       "_byHand": true,
       "_source": "written from the NPC own conversation in the client; see tools/npc_conversation.py",
-      "_note": "«He visto el anuncio que has puesto» requires having clicked 489412, the tavern building on the outdoor map 153878787. The guide says «Cliquez pour accepter l offre», and the element carries the SAME id on the two adjacent maps [0,-3] and [1,-3], which is what a building that spans both does. It is the oddest one on the map that is not the door: the other two candidates were discarded because 32613 is the phoenix rocks and 42509 is the entrance door.",
       "lines": [
         {
           "message": 20864,
           "choices": [
-            { "reply": 25029, "next": 20865, "quest": 1632, "beforeObjective": 9764 },
-            { "reply": 25031, "startsQuest": 1633, "afterElement": 489412 },
-            { "reply": 25033, "quest": 1633, "afterObjective": 9770 },
-            { "reply": 25034, "buyItem": 8543, "buyPrice": 1 },
-            { "reply": 25035, "buyItem": 6765, "buyPrice": 4 },
-            { "reply": 25023 }
+            { "reply": 25029, "next": 20865, "quest": 1632, "beforeObjective": 9764, "completes": 9764, "params": [[30, 9764]] },
+            { "reply": 25031, "next": 20869, "quest": 1633, "beforeObjective": 9770 },
+            { "reply": 25033, "next": 20870, "quest": 1633, "afterObjective": 9770 },
+            { "reply": 25036, "next": 20871 }
           ]
         },
         {
@@ -1220,8 +1207,28 @@
           "choices": [
             { "reply": 25023 }
           ]
+        },
+        {
+          "message": 20869,
+          "choices": [
+            { "reply": 25030 }
+          ]
+        },
+        {
+          "message": 20870,
+          "choices": [
+            { "reply": 25032, "quest": 1633, "completes": 9771, "params": [[30, 9771], 193] }
+          ]
+        },
+        {
+          "message": 20871,
+          "choices": [
+            { "reply": 25034, "buyItem": 8543, "buyPrice": 1, "params": [195, 193] },
+            { "reply": 25035, "buyItem": 6765, "buyPrice": 4, "params": [195, 193] }
+          ]
         }
-      ]
+      ],
+      "why": "Grobid, as the capture «mision matarratas completa» has him: while «Matarratas» is under way his opening offers «He visto el anuncio que has puesto.» (to 20869, «De acuerdo. Voy a la bodega.») and «¿Qué tienes de beber?» (to 20871, the lemonade for 1 kama and the leleche for 4, effects 195 and 193); with the rat beaten, «He neutralizado a la rata.» (to 20870), whose «Embolsarte la recompensa y saborear la limonada.» carries effect 30 with 9771 and ends the quest after the window closes. «Presentarte.» is «Un pueblo sobre las nubes»' visit."
     },
     {
       "npc": 4314,
@@ -1320,11 +1327,11 @@
         {
           "message": 20915,
           "choices": [
-            { "reply": 25108, "next": 20916, "quest": 1632, "afterObjective": 9767, "beforeObjective": 9768 },
+            { "reply": 25108, "next": 20916, "quest": 1632, "afterObjective": 9767, "beforeObjective": 9768, "completes": 9768, "params": [[30, 9768]] },
             { "reply": 25109, "next": 20921, "quest": 1634, "beforeObjective": 9772 },
-            { "reply": 25113, "next": 20922, "quest": 1634, "afterObjective": 9772, "beforeObjective": 9773 },
-            { "reply": 25118, "next": 20924, "quest": 1634, "afterObjectives": [9774, 9775, 9776], "beforeObjective": 9777 },
-            { "reply": 25124, "next": 20928, "quest": 1635, "afterObjectives": [9783, 9784, 9785, 9786], "beforeObjective": 9787 },
+            { "reply": 25113, "next": 20922, "quest": 1634, "afterObjective": 9772, "beforeObjective": 9773, "completes": 9773, "params": [[30, 9773]] },
+            { "reply": 25118, "next": 20924, "quest": 1634, "afterObjectives": [9774, 9775, 9776], "beforeObjective": 9777, "completes": 9777, "params": [[30, 9777]] },
+            { "reply": 25124, "next": 20928, "quest": 1635, "afterObjectives": [9783, 9784, 9785, 9786], "beforeObjective": 9787, "completes": 9787, "params": [[30, 9787]] },
             { "reply": 25119, "startsQuest": 2004, "params": [[34, 2004]], "quest": 1635, "afterQuest": true, "beforeQuest": 2004 }
           ]
         },
@@ -1428,7 +1435,7 @@
         {
           "message": 20873,
           "choices": [
-            { "reply": 25044, "next": 20874, "quest": 1632, "beforeObjective": 9765 },
+            { "reply": 25044, "next": 20874, "quest": 1632, "beforeObjective": 9765, "completes": 9765, "params": [[30, 9765]] },
             { "reply": 25048, "next": 20878, "beforeQuest": 1642 },
             { "reply": 25054, "next": 20881, "quest": 1642, "afterQuest": true },
             { "reply": 25061, "next": 20887, "quest": 1643, "afterQuest": true },
@@ -1732,7 +1739,7 @@
         {
           "message": 20861,
           "choices": [
-            { "reply": 25022, "next": 20862, "quest": 1632, "beforeObjective": 9763 },
+            { "reply": 25022, "next": 20862, "quest": 1632, "beforeObjective": 9763, "completes": 9763, "params": [[30, 9763]] },
             { "reply": 25295, "next": 21043 },
             { "reply": 25311, "next": 57160, "quest": 1649 },
             { "reply": 77764, "next": 57160, "quest": 1649, "afterQuest": true },
@@ -1799,14 +1806,14 @@
         {
           "message": 20795,
           "choices": [
-            { "reply": 24919, "next": 20796, "quest": 1632, "beforeObjective": 9762 },
-            { "reply": 24930, "next": 20803, "quest": 1632, "afterObjectives": [9762, 9763, 9764, 9765, 9766], "beforeObjective": 9767 },
+            { "reply": 24919, "next": 20796, "quest": 1632, "beforeObjective": 9762, "completes": 9762, "params": [[30, 9762]] },
+            { "reply": 24930, "next": 20803, "quest": 1632, "afterObjectives": [9762, 9763, 9764, 9765, 9766], "beforeObjective": 9767, "completes": 9767, "params": [[30, 9767]] },
             { "reply": 24936, "next": 20805, "beforeQuest": 1639 },
-            { "reply": 24940, "next": 20810, "quest": 1639, "afterObjectives": [9814, 9815], "beforeObjective": 9816 },
+            { "reply": 24940, "next": 20810, "quest": 1639, "afterObjectives": [9814, 9815], "beforeObjective": 9816, "completes": 9816, "params": [[30, 9816]] },
             { "reply": 24943, "next": 20813, "quest": 1639, "afterQuest": true, "beforeQuest": 1640 },
-            { "reply": 24947, "next": 20815, "quest": 1640, "afterObjectives": [9817, 9818, 9819, 9820, 9821], "beforeObjective": 9822 },
+            { "reply": 24947, "next": 20815, "quest": 1640, "afterObjectives": [9817, 9818, 9819, 9820, 9821], "beforeObjective": 9822, "completes": 9822, "params": [[30, 9822]] },
             { "reply": 24950, "next": 20818, "quest": 1640, "afterQuest": true, "beforeQuest": 1641 },
-            { "reply": 24952, "next": 20820, "quest": 1641, "afterObjectives": [9823, 9824, 9825, 9826], "beforeObjective": 9827 },
+            { "reply": 24952, "next": 20820, "quest": 1641, "afterObjectives": [9823, 9824, 9825, 9826], "beforeObjective": 9827, "completes": 9827, "params": [[30, 9827]] },
             { "reply": 24951 }
           ]
         },
@@ -1976,7 +1983,7 @@
         {
           "message": 20830,
           "choices": [
-            { "reply": 24989, "next": 20839, "quest": 1635, "beforeObjective": 9784 },
+            { "reply": 24989, "next": 20839, "quest": 1635, "beforeObjective": 9784, "completes": 9783, "params": [[30, 9783]] },
             { "reply": 24970, "startsQuest": 1638 },
             { "reply": 24986 }
           ]
@@ -5089,7 +5096,7 @@
         {
           "message": 20910,
           "choices": [
-            { "reply": 25098, "next": 20911, "quest": 1632, "beforeObjective": 9766 },
+            { "reply": 25098, "next": 20911, "quest": 1632, "beforeObjective": 9766, "completes": 9766, "params": [[30, 9766]] },
             { "reply": 25096 }
           ]
         },
@@ -5301,7 +5308,7 @@
         {
           "message": 20853,
           "choices": [
-            { "reply": 25013, "next": 20854 },
+            { "reply": 25013, "next": 20854, "completes": 9786, "params": [[30, 9786]] },
             { "reply": 25014, "passage": 25014 }
           ]
         },
@@ -5329,8 +5336,8 @@
         {
           "message": 30374,
           "choices": [
-            { "reply": 36613, "next": 30375 },
-            { "reply": 36620, "next": 30376 },
+            { "reply": 36613, "next": 30375, "completes": 13767, "params": [[30, 13767]] },
+            { "reply": 36620, "next": 30376, "completes": 13767, "params": [[30, 13767]] },
             { "reply": 36615 }
           ]
         },
@@ -5365,7 +5372,7 @@
         {
           "message": 20856,
           "choices": [
-            { "reply": 25020, "next": 20857 }
+            { "reply": 25020, "next": 20857, "completes": 9814, "params": [[30, 9814]] }
           ]
         },
         {
@@ -5403,7 +5410,7 @@
         {
           "message": 20821,
           "choices": [
-            { "reply": 24957, "next": 20823, "quest": 1641, "beforeObjective": 9824 },
+            { "reply": 24957, "next": 20823, "quest": 1641, "beforeObjective": 9824, "completes": 9823, "params": [[30, 9823]] },
             { "reply": 24959, "next": 20822 }
           ]
         },
@@ -5436,7 +5443,7 @@
         {
           "message": 20826,
           "choices": [
-            { "reply": 24963, "next": 20828, "quest": 1641, "beforeObjective": 9826 },
+            { "reply": 24963, "next": 20828, "quest": 1641, "beforeObjective": 9826, "completes": 9825, "params": [[30, 9825]] },
             { "reply": 24965, "next": 20827 }
           ]
         },
@@ -5454,6 +5461,20 @@
         }
       ],
       "why": "Galilea and her telescope, from her own lines and replies. «Me envía Ternauta.» while «Vistas celestes» wants her telescope: the Unin family helped her build it (20828); anyone else may ask to use it (20827)."
+    },
+    {
+      "npc": 2912,
+      "map": 0,
+      "opening": 20872,
+      "lines": [
+        {
+          "message": 20872,
+          "choices": [
+            { "reply": 25037, "params": [905] }
+          ]
+        }
+      ],
+      "why": "The Rata Nsiosa of the tavern's cellar, out of the tap once the lemonade has been poured (jsn of template 2912 on cell 385, facing 5, right after ieb 9769 in «mision matarratas completa»). Its only line, 20872, and «Atacar a la rata.» with effect 905, which starts the fight on 153486338 (npc_fights.json)."
     }
   ]
 }

@@ -256,10 +256,14 @@ namespace Jondo.Unity.Server.Managers
                 bool offering = Almanax.IsOffering(run.QuestId);
                 if (run.QuestId == Almanax.Dragon.Quest) continue;
 
+                var tree = NpcDialogues.For(npcId, SessionContext.State.MapId);
                 foreach (var objective in step.Objectives)
                 {
                     if (objective.NpcId != npcId) continue;
                     if (!Revealed(step, objective, run)) continue;
+
+                    // Done by one of his replies, not by hello (DialogueChoice.Completes).
+                    if (tree != null && tree.HasReplyFor(objective.Id)) continue;
                     if (offering && (npcId == Almanax.Giver || !Handlers.AlmanaxOfferingHandler.MaySeeTheSaint(run.QuestId))) continue;
                     if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId
                         && StandsOn(npcId, objective.MapId)) continue;
@@ -413,10 +417,12 @@ namespace Jondo.Unity.Server.Managers
             if (log == null || _book == null) return false;
 
             bool moved = false;
+            // One objective per press: the cellar's tap is looked at first and filled with lemonade
+            // on a second press, two iwo in «Matarratas»' capture.
             foreach (var binding in Bindings.At(mapId, elementId))
             {
                 if (binding.Kind != QuestBindingKind.Click) continue;
-                if (await CloseAsync(stream, binding)) moved = true;
+                if (await CloseAsync(stream, binding)) { moved = true; break; }
             }
 
             return moved;
@@ -485,6 +491,12 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
+            if (binding.Says != 0)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(0, binding.Says)));
+            }
+
             // What it puts in the bag, before the tick: the item is the reason the objective is
             // finished, so a hand-out that fails must not leave it marked done. Not so for a
             // conversation that hands things over: the conversation is the reason, and the
@@ -520,6 +532,9 @@ namespace Jondo.Unity.Server.Managers
 
             if (binding.SpawnsMonster != 0)
                 await SpawnAsync(stream, binding);
+
+            if (binding.ShowsNpc != 0)
+                await Handlers.NpcHandler.ComesInAsync(stream, binding.ShowsNpc);
 
             if (binding.ThenStarts != 0 && log.Run(binding.ThenStarts) == null)
                 await StartAsync(stream, binding.ThenStarts);
@@ -710,6 +725,44 @@ namespace Jondo.Unity.Server.Managers
                     }
                     if (all) await CloseAsync(stream, binding);
                 }
+            }
+        }
+
+        /// <summary>
+        /// A reply that does a conversation objective (DialogueChoice.Completes) has been chosen:
+        /// it is done if it is in hand and has come up, and what it asks to be handed over is.
+        /// </summary>
+        public static async Task CompleteByReplyAsync(NetworkStream stream, int questId, int objectiveId)
+        {
+            var log = Log;
+            if (log == null || _book == null || objectiveId == 0) return;
+
+            // A reply everyone is offered names no quest: the one in hand that has the objective.
+            if (questId == 0)
+            {
+                foreach (var doing in log.Doing())
+                {
+                    if (_book.Step(doing.StepId)?.Objectives.Any(o => o.Id == objectiveId) == true)
+                    {
+                        questId = doing.QuestId;
+                        break;
+                    }
+                }
+                if (questId == 0) return;
+            }
+
+            var run = log.Run(questId);
+            if (run == null || run.Finished || run.Done.Contains(objectiveId)) return;
+            var step = _book.Step(run.StepId);
+            if (step == null) return;
+            foreach (var objective in step.Objectives)
+            {
+                if (objective.Id != objectiveId) continue;
+                if (!Revealed(step, objective, run)) return;
+                if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) return;
+                if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) return;
+                await TickAsync(stream, questId, objectiveId);
+                return;
             }
         }
 
@@ -1435,7 +1488,10 @@ namespace Jondo.Unity.Server.Managers
                         QuestProtocol.BuildObjectiveValidated(questId, move.TickedObjective)));
             }
 
-            if (move.StepFinished) await PayAsync(stream, move.FinishedStep);
+            // A step that leaves the quest under way pays before the next step goes out; the quest's
+            // last one pays after «misión terminada» and ied, as «Matarratas»' capture closes:
+            // lqn 56, ied 1633, then lqn 45 with the kamas and lqn 21 with the items.
+            if (move.StepFinished && !move.QuestFinished) await PayAsync(stream, move.FinishedStep);
 
             if (!move.QuestFinished)
             {
@@ -1454,6 +1510,7 @@ namespace Jondo.Unity.Server.Managers
                         InfoMessages.Info, QuestFinishedMessage, questId.ToString(CultureInfo.InvariantCulture))));
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+                if (move.StepFinished) await PayAsync(stream, move.FinishedStep);
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
                 await SendMarksAsync(stream, SessionContext.State.MapId);
 
@@ -1519,6 +1576,7 @@ namespace Jondo.Unity.Server.Managers
 
             int level = SessionContext.State.CharacterLevel;
             long experience = 0, kamas = 0;
+            var items = new List<(int Item, int Count)>();
 
             foreach (var reward in step.Rewards)
             {
@@ -1528,8 +1586,21 @@ namespace Jondo.Unity.Server.Managers
                                                        step.Duration);
                 kamas += RewardFormula.Kamas(reward.KamasScale ? level : step.OptimalLevel,
                                              reward.KamasRatio, step.Duration);
+                items.AddRange(reward.Items);
+                foreach (int emote in reward.Emotes) await Emotes.LearnAsync(stream, emote);
+            }
 
-                foreach (var (item, count) in reward.Items)
+            // The Almanax days that raise what quests pay, when they do so unconditionally.
+            experience = Almanax.WithBonus(Almanax.BonusType.QuestExperience, experience);
+            kamas = Almanax.WithBonus(Almanax.BonusType.QuestKamas, kamas);
+
+            bool paid = await CharacterRewards.GiveKamasAsync(stream, kamas);
+            // Under the player's limit: the client warns about it beside a quest's experience.
+            bool levelled = await CharacterRewards.GiveExperienceAsync(stream, experience, limited: true);
+            paid |= experience > 0;
+
+            {
+                foreach (var (item, count) in items)
                 {
                     bool given = await Equipment.GiveAsync(stream, item, Math.Max(1, count));
                     if (!given)
@@ -1545,18 +1616,7 @@ namespace Jondo.Unity.Server.Managers
                             InfoMessages.ItemGained, Math.Max(1, count).ToString(CultureInfo.InvariantCulture),
                             item.ToString(CultureInfo.InvariantCulture))));
                 }
-
-                foreach (int emote in reward.Emotes) await Emotes.LearnAsync(stream, emote);
             }
-
-            // The Almanax days that raise what quests pay, when they do so unconditionally.
-            experience = Almanax.WithBonus(Almanax.BonusType.QuestExperience, experience);
-            kamas = Almanax.WithBonus(Almanax.BonusType.QuestKamas, kamas);
-
-            bool paid = await CharacterRewards.GiveKamasAsync(stream, kamas);
-            // Under the player's limit: the client warns about it beside a quest's experience.
-            bool levelled = await CharacterRewards.GiveExperienceAsync(stream, experience, limited: true);
-            paid |= experience > 0;
 
             if (paid)
             {

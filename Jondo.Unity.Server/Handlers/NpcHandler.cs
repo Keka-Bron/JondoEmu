@@ -860,6 +860,16 @@ namespace Jondo.Unity.Server.Handlers
         /// An NPC of the map who walks in now (jsn) and opens his conversation (ioc, ios), as
         /// Ganymed does in the combat room once Master Darmas has been told the fight is won.
         /// </summary>
+        /// <summary>An NPC of this map comes in, for this character (jsn), without a word.</summary>
+        public static async Task ComesInAsync(NetworkStream stream, int npcId)
+        {
+            long mapId = SessionContext.State.MapId;
+            var spawn = Npcs.OnMap(mapId).FirstOrDefault(s => s.NpcId == npcId);
+            if (spawn == null) return;
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildNpcShown(spawn, mapId)));
+        }
+
         private static async Task ComesInAndSpeaksAsync(NetworkStream stream, int npcId)
         {
             long mapId = SessionContext.State.MapId;
@@ -1241,6 +1251,18 @@ namespace Jondo.Unity.Server.Handlers
             // A reply that hands a quest over and ends the conversation closes it first: the
             // tutorial capture has kld, then lqn 54 and ief (60352's «Desplazarte.», 60411's
             // «Unirte al maestro Curro»). One that goes on starts it before the next line.
+            // A reply that does a conversation objective: before the next line when it goes on,
+            // after the window closes when it ends it -- «He neutralizado a la rata.» is kld, then
+            // lqn 56 and ied 1633 in the capture.
+            int completesAfterClosing = 0;
+            if (elegidaAhora != null && elegidaAhora.Completes != 0)
+            {
+                if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
+                    completesAfterClosing = elegidaAhora.Completes;
+                else
+                    await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.Quest, elegidaAhora.Completes);
+            }
+
             int startsAfterClosing = 0;
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
             {
@@ -1327,6 +1349,9 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                     ConnectionProtocol.NpcDialogCloseReason)));
+
+            if (completesAfterClosing != 0)
+                await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora!.Quest, completesAfterClosing);
 
             if (startsAfterClosing != 0)
             {

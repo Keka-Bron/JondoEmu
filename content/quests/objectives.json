@@ -45,11 +45,10 @@
     }
    ],
    "spends": true,
-   "spawns": {
-    "monster": 4113,
-    "count": 1
-   },
-   "why": "«Haz salir a la rata de su escondite». The same element as 9895, the cellar's only prop; the order is imposed by the lemonade, which this one asks for and that one does not. The Limonada de Incarnam is item 8543 and texts 534963 and 534964 tell the scene: tooth marks on the tap, and the glass set on top of the barrel. The Rata Nsiosa (4113) is in ZERO groups of the world because this is its place."
+   "showsNpc": 2912,
+   "says": 592,
+   "afterObjectives": [9895],
+   "why": "«Haz salir a la rata de su escondite». The same element as 9895, the cellar's only prop; the order is imposed by the lemonade, which this one asks for and that one does not. The Limonada de Incarnam is item 8543 and texts 534963 and 534964 tell the scene: tooth marks on the tap, and the glass set on top of the barrel. The Rata Nsiosa (4113) is in ZERO groups of the world because this is its place. The rat that comes out is an NPC, the Rata Nsiosa (2912), not a group: the capture has its jsn right after ieb 9769, and «Atacar a la rata.» starts the fight on 153486338."
   },
   {
    "objective": 9895,
@@ -61,6 +60,7 @@
      "element": 489505
     }
    ],
+   "says": 591,
    "why": "«Inspecciona el sotano». The cellar has two elements and the other one, 488963, is the STAIRS: the teleports dump declares it as a passage to 153357316, so tying it here would have closed the objective on going up. 489505 is the only real prop, and its drawing (701195) does not appear on any other map of the game."
   },
   {

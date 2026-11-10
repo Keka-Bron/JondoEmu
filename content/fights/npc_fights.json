@@ -23,6 +23,8 @@
     { "npc": 2911, "map": 152836096, "reply": 25004,
       "monsters": [ { "monster": 4102, "grade": 0 } ] },
     { "npc": 2911, "map": 152836096, "reply": 25007,
-      "monsters": [ { "monster": 4102, "grade": 0 } ] }
+      "monsters": [ { "monster": 4102, "grade": 0 } ] },
+    { "npc": 2912, "map": 153358340, "reply": 25037, "arena": 153486338,
+      "monsters": [ { "monster": 4113, "grade": 0 } ] }
   ]
 }
