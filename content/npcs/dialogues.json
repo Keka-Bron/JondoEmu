@@ -15228,6 +15228,10 @@
       "map": 0,
       "opening": 3880,
       "openings": [
+        { "quest": 218, "step": 404, "message": 3958 },
+        { "quest": 218, "message": 3957 },
+        { "canStart": 218, "message": 3957 },
+        { "after": 218, "before": 219, "message": 3959 },
         { "quest": 217, "message": 3941 },
         { "canStart": 217, "message": 3941 },
         { "after": 211, "before": 216, "message": 3921 },
@@ -15277,9 +15281,24 @@
           "choices": [
             { "reply": 3460, "startsQuest": 217, "params": [[34, 217]] }
           ]
+        },
+        {
+          "message": 3957,
+          "choices": [
+            { "reply": 3467, "startsQuest": 218, "params": [[34, 218]] },
+            { "reply": 3466 }
+          ]
+        },
+        {
+          "message": 3958,
+          "choices": []
+        },
+        {
+          "message": 3959,
+          "choices": []
         }
       ],
-      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857). «Usuwpation d'identité» (217) of Dofus pour les noobs: the plan, pass for the prince, a potion to look like a wabbit, then the castle (3941, «Bien sûr que je suis prêt»)."
+      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857). «Usuwpation d'identité» (217) of Dofus pour les noobs: the plan, pass for the prince, a potion to look like a wabbit, then the castle (3941, «Bien sûr que je suis prêt»). «Tomber sur un bec» (218) of Dofus pour les noobs: another plan, a fat tofu's nest, an egg (3957, «Euh, d'accord !»); only a baby, a breeder to fatten it (3958); the egg and the potion, before the prince (3959: 878, both handed over)."
     },
     {
       "npc": 1404,
@@ -15972,6 +15991,45 @@
         }
       ],
       "why": "Benn Zin listening to the water under the bridge [1,31] (628); «Usuwpation d'identité»: sent by Uba, a pleasure to give you this scroll (3956)."
+    },
+    {
+      "npc": 54,
+      "map": 0,
+      "opening": 32,
+      "openings": [
+        { "quest": 218, "step": 403, "message": 3982 }
+      ],
+      "lines": [
+        {
+          "message": 32,
+          "choices": []
+        },
+        {
+          "message": 3982,
+          "choices": []
+        }
+      ],
+      "why": "Shika Ingals of the Ingals farm [5,6]: another hard day's work (32). «Tomber sur un bec»: a fat tofu escaped from the tofu coop, its nest in the cart over there (3982: 874)."
+    },
+    {
+      "npc": 771,
+      "map": 0,
+      "opening": 3160,
+      "openings": [
+        { "quest": 218, "step": 404, "message": 3960 }
+      ],
+      "lines": [
+        {
+          "message": 3160,
+          "names": true,
+          "choices": []
+        },
+        {
+          "message": 3960,
+          "choices": []
+        }
+      ],
+      "why": "Klako, dragoturkey hunter [-16,1] (3160). «Tomber sur un bec»: a fattening potion, he just made a new one, the first to try it (3960: 877, the potion 8597)."
     }
   ]
 }

@@ -1864,11 +1864,46 @@
    "why": "«Vuelve a hablar con la persona que te pidió completar su fórmula»: back to Uba Teseo with the three parts."
   },
   {
+   "objective": 874,
+   "quest": 218,
+   "kind": "talk",
+   "npc": 54,
+   "map": 88082705,
+   "why": "«Encuentra a alguien que te pueda decir dónde encontrar un Tofu obeso»: Shika Ingals at [5,6] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 875,
+   "quest": 218,
+   "kind": "beat",
+   "monsters": [1013],
+   "map": 88082705,
+   "elements": [{"map": 88082705, "element": 473027}],
+   "spawns": {"monster": 1013, "count": 1, "attacks": true},
+   "afterObjectives": [874],
+   "why": "«cliquez sur la charrette blanche. Un combat se lance contre 1 x Papa Tofu obèse» (Dofus pour les noobs): the white cart, element 473027 (graphic 13112) on cell 460; the fat tofu's egg (8595) is his quest loot."
+  },
+  {
    "objective": 10162,
    "quest": 1666,
    "kind": "enter",
    "map": 156762120,
-   "why": "«Utiliza el cañón para ir a la isla de Moon»: where the Turist-A cannon of [11,10] lands, on the isle of Moon."
+   "overridesMap": true,
+   "why": "«Utiliza el cañón para ir a la isla de Moon»: where the Turist-A cannon of [11,10] lands, on the isle of Moon; the catalogue gives the cannon's map, the objective is done on arriving."
+  },
+  {
+   "objective": 877,
+   "quest": 218,
+   "kind": "order",
+   "gives": [{"item": 8597, "count": 1}],
+   "why": "«Allez donc voir Klako en [-16,1] qui vous confiera une Potion de Gavage» (Dofus pour les noobs): the hello does the objective, the potion goes with it."
+  },
+  {
+   "objective": 878,
+   "quest": 218,
+   "kind": "order",
+   "requires": [{"item": 8595, "count": 1}, {"item": 8597, "count": 1}],
+   "spends": true,
+   "why": "«Retournez voir Vil Smisse pour lui confier l'œuf et la potion de gavage» (Dofus pour les noobs): the hello does the objective, the egg and the potion stay with him."
   }
  ]
 }

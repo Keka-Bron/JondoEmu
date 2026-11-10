@@ -1652,6 +1652,9 @@ namespace Jondo.Unity.Server.Managers
             var binding = Bindings.Of(objectiveId);
             if (!move.Nothing && binding?.Kind == QuestBindingKind.Order)
             {
+                // What it hands over is taken, when the row says so: the fat tofu's egg and the
+                // fattening potion left with Vil Smis («Tomber sur un bec»).
+                if (binding.SpendsRequired) await SpendAsync(stream, binding);
                 foreach (var (item, count) in binding.Gives)
                 {
                     if (!await QuestFollowers.GiveAsync(stream, item, count)) continue;
