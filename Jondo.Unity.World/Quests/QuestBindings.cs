@@ -165,6 +165,15 @@ namespace Jondo.Unity.World.Quests
         public int SpawnsMonster { get; init; }
         public int SpawnsCount { get; init; } = 1;
 
+        /// <summary>A monster of another kind that comes out with them («spawns»'s «with»), or zero.</summary>
+        public int SpawnsWith { get; init; }
+
+        /// <summary>
+        /// How many fights against <see cref="MonsterId"/> a beat binding asks for: the three
+        /// library rats of «Verdaderas ratas de biblioteca», one objective written as prose.
+        /// </summary>
+        public int Times { get; init; } = 1;
+
         /// <summary>The quest this element HANDS OUT, when an NPC does not give it.</summary>
         /// <remarks>
         /// There are quests that start by pressing something, not by talking: «Mort au rat» starts at the
@@ -268,7 +277,9 @@ namespace Jondo.Unity.World.Quests
 
             // Only an element to click is the quest's own, drawn and pressed as such; the elements
             // of a «read» binding are the world's readables (the Dofusarium's statues), already there.
-            if (binding.Kind != QuestBindingKind.Click) return;
+            // A beat binding's element brings its monsters out (the old stump of «Restauración rápida»).
+            if (binding.Kind != QuestBindingKind.Click
+                && !(binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0)) return;
 
             foreach (var (mapId, elementId) in binding.Elements)
             {
@@ -365,11 +376,12 @@ namespace Jondo.Unity.World.Quests
                 }
             }
 
-            int spawnMonster = 0, spawnCount = 0;
+            int spawnMonster = 0, spawnCount = 0, spawnWith = 0;
             if (row.TryGetProperty("spawns", out var spawn) && spawn.ValueKind == JsonValueKind.Object)
             {
                 spawnMonster = Int(spawn, "monster");
                 spawnCount = Math.Max(1, Int(spawn, "count"));
+                spawnWith = Int(spawn, "with");
             }
 
             int skill = Int(row, "skill");
@@ -390,6 +402,8 @@ namespace Jondo.Unity.World.Quests
                                  && spends.ValueKind == JsonValueKind.True,
                 SpawnsMonster = spawnMonster,
                 SpawnsCount = spawnCount,
+                SpawnsWith = spawnWith,
+                Times = Math.Max(1, Int(row, "times")),
                 Starts = Int(row, "starts"),
                 ThenStarts = Int(row, "thenStarts"),
                 AfterObjectives = Ints(row, "afterObjectives"),

@@ -352,14 +352,9 @@
           "message": 11408,
           "choices": [
             { "reply": 37912, "next": 31387, "quest": 1977, "beforeObjective": 14111 },
-            { "reply": 12619, "next": 31196 },
-            { "reply": 12620 }
-          ]
-        },
-        {
-          "message": 31196,
-          "choices": [
-            { "reply": 37672, "startsQuest": 1991 },
+            { "reply": 37674, "quest": 1990, "completes": 14009, "params": [[30, 14009]], "next": 31196, "afterObjective": 14008 },
+            { "reply": 37677, "next": 31198, "quest": 1991, "afterObjective": 14069 },
+            { "reply": 37670, "quest": 1989, "completes": 14004, "params": [[30, 14004]], "next": 31195 },
             { "reply": 12620 }
           ]
         },
@@ -374,9 +369,34 @@
           "choices": [
             { "reply": 12620 }
           ]
+        },
+        {
+          "message": 31195,
+          "choices": [
+            { "reply": 37669 }
+          ]
+        },
+        {
+          "message": 31196,
+          "choices": [
+            { "reply": 37672, "startsQuest": 1991, "params": [[34, 1991]], "next": 31197 },
+            { "reply": 37673 }
+          ]
+        },
+        {
+          "message": 31197,
+          "choices": [
+            { "reply": 37671, "quest": 1991, "completes": 14069, "params": [[30, 14069]] }
+          ]
+        },
+        {
+          "message": 31198,
+          "choices": [
+            { "reply": 37676 }
+          ]
         }
       ],
-      "why": "«Tel est pris qui croyait prendre»: «Explicar la necesidad de carteles y folletos» (31387), and Kerubim's purse handed over (14111, 19728): he prints them at once (31388)."
+      "why": "«Tel est pris qui croyait prendre»: «Explicar la necesidad de carteles y folletos» (31387), and Kerubim's purse handed over (14111, 19728): he prints them at once (31388). «Restauration rapide»: the enchanted bark with the old text on it (14004), copied before the magic fades (31195), and Aisling has news of the dragon. «De vrais rats de bibliothèque»: what was engraved on the bark (14009): a first copy printed, about wars before the dofus, with a dragon (31196, the line «Légende d'automne» names); he keeps it for now and it is read there (31197, 14069; again later, 31198)."
     },
     {
       "npc": 1901,
@@ -544,7 +564,7 @@
         {
           "message": 31255,
           "choices": [
-            { "reply": 37755, "next": 31256 }
+            { "reply": 37755, "next": 31256, "takes": 19690 }
           ]
         },
         {
@@ -7400,7 +7420,8 @@
       "map": 0,
       "opening": 30966,
       "openings": [
-        { "quest": 1960, "objective": 13934, "pending": 13935, "message": 30967 }
+        { "quest": 1960, "objective": 13934, "pending": 13935, "message": 30967 },
+        { "quest": 1990, "objective": 14006, "pending": 14007, "message": 31236 }
       ],
       "lines": [
         {
@@ -7450,9 +7471,33 @@
           "choices": [
             { "reply": 37399 }
           ]
+        },
+        {
+          "message": 31236,
+          "choices": [
+            { "reply": 37731, "quest": 1990, "completes": 14007, "params": [[30, 14007]], "next": 31237 }
+          ]
+        },
+        {
+          "message": 31237,
+          "choices": [
+            { "reply": 37730, "next": 31238 }
+          ]
+        },
+        {
+          "message": 31238,
+          "choices": [
+            { "reply": 37729, "next": 31239, "gives": 19690 }
+          ]
+        },
+        {
+          "message": 31239,
+          "choices": [
+            { "reply": 37728 }
+          ]
         }
       ],
-      "why": "Ramán Hitu, chief of the Strubian rats, from his own lines and replies, by «Ça sent le gaz»: once his rats are beaten, his apologies (30967); the crate from Fallanster (13935, taken), the rats' innocence (30969, 30970), the grey hairs on an old grate (30971), móguiz hair (30972), and the quarry mine to explore (30973)."
+      "why": "Ramán Hitu, chief of the Strubian rats, from his own lines and replies, by «Ça sent le gaz»: once his rats are beaten, his apologies (30967); the crate from Fallanster (13935, taken), the rats' innocence (30969, 30970), the grey hairs on an old grate (30971), móguiz hair (30972), and the quarry mine to explore (30973). «De vrais rats de bibliothèque»: back after beating three of his library rats (31236), the stolen document (14007): rats steal everything (31237), but he owes the character for the móguices' quarry (31238) and gives the tooled leather case back (19690); back to the surface (31239)."
     },
     {
       "npc": 4416,
@@ -8589,6 +8634,211 @@
         }
       ],
       "why": "Latem Odasep, the smiths' young apprentice [7,-16]: by «L'histoire en mouvement», the old book bought from Nacf Virgilio, just put in the fire (31182); «Abalanzarte hacia el fogón de la forja» is the fight against the forge's fire (npc_fights.json), and the burnt book comes out of it."
+    },
+    {
+      "npc": 726,
+      "map": 0,
+      "opening": 2967,
+      "lines": [
+        {
+          "message": 2967,
+          "choices": [
+            { "reply": 37658, "quest": 1989, "completes": 14000, "params": [[30, 14000]], "next": 31186 },
+            { "reply": 37668, "next": 31190, "quest": 1989, "afterObjectives": [14001, 14002], "completesAll": [14003], "params": [[30, 14003]], "takesAll": [19684, 19685] },
+            { "reply": 50443 }
+          ]
+        },
+        {
+          "message": 31186,
+          "choices": [
+            { "reply": 37662, "next": 31187 }
+          ]
+        },
+        {
+          "message": 31187,
+          "choices": [
+            { "reply": 37661, "next": 31188 }
+          ]
+        },
+        {
+          "message": 31188,
+          "choices": [
+            { "reply": 37660, "next": 31189 }
+          ]
+        },
+        {
+          "message": 31189,
+          "choices": [
+            { "reply": 37659 }
+          ]
+        },
+        {
+          "message": 31190,
+          "choices": [
+            { "reply": 37667, "next": 31191 }
+          ]
+        },
+        {
+          "message": 31191,
+          "choices": [
+            { "reply": 37666, "next": 31192, "takes": 19681 }
+          ]
+        },
+        {
+          "message": 31192,
+          "choices": [
+            { "reply": 37665, "next": 31193 }
+          ]
+        },
+        {
+          "message": 31193,
+          "choices": [
+            { "reply": 37664, "next": 31194 }
+          ]
+        },
+        {
+          "message": 31194,
+          "choices": [
+            { "reply": 37663, "gives": 19686 }
+          ]
+        }
+      ],
+      "why": "The Mage of Zo, creator of the Almanax, in the alchemists' workshop [3,-21], from his own lines and replies, by «Restauration rapide» of Dofus pour les noobs: the burnt book shown (14000), a bibliomancy spell of three weeks (31186, 31187) or the short one with century-old bark and gobbly milk (31188), the stump south of Tainela and the gobball farm (31189); the milk and the bark handed over (14003), the disguise he took them for (31190, 31191), the book given, the spell (31192, 31193) and the enchanted bark for Primir (31194, 19686)."
+    },
+    {
+      "npc": 4442,
+      "map": 101715463,
+      "opening": 31233,
+      "lines": [
+        {
+          "message": 31233,
+          "choices": [
+            { "reply": 37725, "params": [905], "quest": 1990 }
+          ]
+        }
+      ],
+      "why": "A library rat in Astrub's sewers, by «De vrais rats de bibliothèque» of Dofus pour les noobs (the three at [4,-12], [5,-11] and [2,-13]): «Atacar a la rata» is a fight against it, alone (npc_fights.json)."
+    },
+    {
+      "npc": 4442,
+      "map": 101715465,
+      "opening": 31234,
+      "lines": [
+        {
+          "message": 31234,
+          "choices": [
+            { "reply": 37726, "params": [905], "quest": 1990 }
+          ]
+        }
+      ],
+      "why": "A library rat in Astrub's sewers, by «De vrais rats de bibliothèque» of Dofus pour les noobs (the three at [4,-12], [5,-11] and [2,-13]): «Atacar a la rata» is a fight against it, alone (npc_fights.json)."
+    },
+    {
+      "npc": 4442,
+      "map": 101713415,
+      "opening": 31235,
+      "lines": [
+        {
+          "message": 31235,
+          "choices": [
+            { "reply": 37727, "params": [905], "quest": 1990 }
+          ]
+        }
+      ],
+      "why": "A library rat in Astrub's sewers, by «De vrais rats de bibliothèque» of Dofus pour les noobs (the three at [4,-12], [5,-11] and [2,-13]): «Atacar a la rata» is a fight against it, alone (npc_fights.json)."
+    },
+    {
+      "npc": 4467,
+      "map": 0,
+      "opening": 31502,
+      "lines": [
+        {
+          "message": 31502,
+          "choices": [
+            { "reply": 38174, "next": 31594, "beforeQuest": 1992 },
+            { "reply": 38177, "quest": 1992, "completes": 14154, "params": [[30, 14154]], "next": 31596, "takesAll": [6765, 1782], "beforeObjective": 14154 },
+            { "reply": 38182, "quest": 1992, "completes": 14206, "params": [[30, 14206]], "next": 31598, "afterObjective": 14205, "beforeObjective": 14206 },
+            { "reply": 38183, "quest": 1992, "completes": 14208, "params": [[30, 14208]], "next": 31601 },
+            { "reply": 38184 }
+          ]
+        },
+        {
+          "message": 31594,
+          "choices": [
+            { "reply": 38173, "next": 31595 }
+          ]
+        },
+        {
+          "message": 31595,
+          "choices": [
+            { "reply": 38171, "startsQuest": 1992, "params": [[34, 1992]] },
+            { "reply": 38172 }
+          ]
+        },
+        {
+          "message": 31596,
+          "choices": [
+            { "reply": 38176, "next": 31597 }
+          ]
+        },
+        {
+          "message": 31597,
+          "choices": [
+            { "reply": 38175, "gives": 6768 }
+          ]
+        },
+        {
+          "message": 31598,
+          "choices": [
+            { "reply": 38181, "next": 31599 }
+          ]
+        },
+        {
+          "message": 31599,
+          "choices": [
+            { "reply": 38180, "next": 31600 }
+          ]
+        },
+        {
+          "message": 31600,
+          "choices": [
+            { "reply": 38179 }
+          ]
+        },
+        {
+          "message": 31601,
+          "choices": [
+            { "reply": 38184 }
+          ]
+        }
+      ],
+      "why": "Soki, a sad miaumiau at [7,-20], by «Chacha Blues» of Dofus pour les noobs: stroked (31594), sad (31595), maybe hungry or thirsty: gudgeon and milk; given them (14154, both taken), still moaning (31596): a walk in town («Llevarte al miaumiau a dar una vuelta», Soki follows, 6768); back, still depressed (14206), an eye on the pink miaumiau (31598), a clumsy hunter (31599, 31600); the mouse given (14208) to win her (31601)."
+    },
+    {
+      "npc": 4468,
+      "map": 0,
+      "opening": 31501,
+      "lines": [
+        {
+          "message": 31501,
+          "choices": []
+        }
+      ],
+      "why": "Aida, the pink miaumiau Soki has an eye on, a little further on (31501)."
+    },
+    {
+      "npc": 4465,
+      "map": 192676864,
+      "opening": 31491,
+      "lines": [
+        {
+          "message": 31491,
+          "choices": [
+            { "reply": 38192, "params": [905], "quest": 1992, "afterObjective": 14206 }
+          ]
+        }
+      ],
+      "why": "The mice in the cellar of the house on the left at [7,-19] («descendez à la cave. Parlez à l'une des Sousouris pour les attaquer»): «Atacar la horda de raratones» is the fight (npc_fights.json); one of them comes out of it for Soki (the client's loot row, 19763)."
     }
   ]
 }

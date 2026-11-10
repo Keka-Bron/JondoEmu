@@ -109,6 +109,10 @@ namespace Jondo.Unity.Server.Handlers
                     if (binding.AfterObjectives.Any(before => !run.Done.Contains(before) && !log.ObjectiveDone(before)))
                         continue;
 
+                    // Several fights for one objective: each one counted, the last one ticks it.
+                    if (binding.Times > 1 && !Quests.CountTowards(run, objective.Id, binding.Times))
+                        continue;
+
                     await Quests.TickAsync(stream, run.QuestId, objective.Id);
                 }
             }

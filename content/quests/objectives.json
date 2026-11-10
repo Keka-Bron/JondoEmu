@@ -655,6 +655,86 @@
    "afterObjectives": [13997],
    "gives": [{"item": 19681, "count": 1}],
    "why": "«Consigue el manuscrito antes de que sea destruido»: the forge's fire (5256) beaten, the burnt book (19681) saved from it; «Un combat se lance alors contre le Feu de la force... vous récupérez le livre calciné»."
+  },
+  {
+   "objective": 14001,
+   "quest": 1989,
+   "kind": "beat",
+   "monster": 5282,
+   "map": 189531649,
+   "elements": [{"map": 189531649, "element": 515988}],
+   "spawns": {"monster": 5282, "count": 2},
+   "why": "«Consigue un trozo de corteza centenaria»: the old stump south of Tainela [1,-28] (element 515988, graphic 47541, cell 190) brings out two marauding milimulous (5282), whose loot holds the bark while this objective is in hand (the client's row, «Qa=1989&Qo=14001&PO!19685»); «cliquez sur le tronc d'arbre au sol. Un combat se lance contre 2 x Milimulou en maraude»."
+  },
+  {
+   "objective": 14002,
+   "quest": 1989,
+   "elements": [{"map": 122946049, "element": 515989}],
+   "gives": [{"item": 19684, "count": 1}],
+   "why": "«Consigue leleche de jalalínea»: the baby bottle in the gobball farm [0,-32] (element 515989, graphic 63533, cell 371); «entrez dans la ferme et cliquez sur le biberon»."
+  },
+  {
+   "objective": 14006,
+   "quest": 1990,
+   "kind": "beat",
+   "monster": 5263,
+   "times": 3,
+   "why": "«Enfréntate a las ratas de biblioteca para encontrar el pergamino»: the three library rats of the sewers (5263), one fight each; «Une fois les trois combats effectués»."
+  },
+  {
+   "objective": 14201,
+   "quest": 1992,
+   "kind": "enter",
+   "map": 191106048,
+   "afterObjectives": [14154],
+   "requires": [{"item": 6768, "count": 1}],
+   "why": "«Pasea a Soki»: the temple of the Twelve's square [6,-19], with Soki following (the follower item 6768 he gives on going for a walk)."
+  },
+  {
+   "objective": 14202,
+   "quest": 1992,
+   "kind": "enter",
+   "map": 191102976,
+   "afterObjectives": [14154],
+   "requires": [{"item": 6768, "count": 1}],
+   "why": "«Pasea a Soki»: the consumables market [3,-19], with Soki following (the follower item 6768 he gives on going for a walk)."
+  },
+  {
+   "objective": 14203,
+   "quest": 1992,
+   "kind": "enter",
+   "map": 191102980,
+   "afterObjectives": [14154],
+   "requires": [{"item": 6768, "count": 1}],
+   "why": "«Pasea a Soki»: before Kerubim's shop [3,-17], with Soki following (the follower item 6768 he gives on going for a walk)."
+  },
+  {
+   "objective": 14204,
+   "quest": 1992,
+   "kind": "enter",
+   "map": 191106052,
+   "afterObjectives": [14154],
+   "requires": [{"item": 6768, "count": 1}],
+   "why": "«Pasea a Soki»: the equipment market [6,-17], with Soki following (the follower item 6768 he gives on going for a walk)."
+  },
+  {
+   "objective": 14205,
+   "quest": 1992,
+   "kind": "enter",
+   "map": 188746754,
+   "afterObjectives": [14201, 14202, 14203, 14204],
+   "requires": [{"item": 6768, "count": 1}],
+   "spends": true,
+   "why": "«Lleva a Soki al norte de la biblioteca»: back at [7,-20] after the four places, where he stops following (6768 taken back) and is there again."
+  },
+  {
+   "objective": 14207,
+   "quest": 1992,
+   "kind": "beat",
+   "monster": 5296,
+   "map": 192676864,
+   "afterObjectives": [14206],
+   "why": "«Encuentra raratones en los alrededores de la biblioteca»: the mice of the cellar (5296)."
   }
  ]
 }

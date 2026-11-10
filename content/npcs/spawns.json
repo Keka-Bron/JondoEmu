@@ -1225,6 +1225,60 @@
       "cell": 356,
       "orientation": 1,
       "why": "Neria, Aisling's owl, on her perch beside her. INFERRED: the library's first floor, by Aisling (371)."
+    },
+    {
+      "map": 192937988,
+      "npc": 726,
+      "cell": 273,
+      "orientation": 1,
+      "why": "The Mage of Zo, «when he is not on an astral journey, he works in the alchemists' workshop» (Aisling, 31241): there, across the room from Nibe Lula. INFERRED cell."
+    },
+    {
+      "map": 101715463,
+      "npc": 4442,
+      "cell": 284,
+      "orientation": 1,
+      "criterion": "Qa=1990&Qo!14006",
+      "why": "A library rat in Astrub's sewers, while «De vrais rats de bibliothèque» has the three to beat. INFERRED cell, on the sewer's walkway."
+    },
+    {
+      "map": 101715465,
+      "npc": 4442,
+      "cell": 372,
+      "orientation": 1,
+      "criterion": "Qa=1990&Qo!14006",
+      "why": "A library rat in Astrub's sewers, while «De vrais rats de bibliothèque» has the three to beat. INFERRED cell, on the sewer's walkway."
+    },
+    {
+      "map": 101713415,
+      "npc": 4442,
+      "cell": 412,
+      "orientation": 1,
+      "criterion": "Qa=1990&Qo!14006",
+      "why": "A library rat in Astrub's sewers, while «De vrais rats de bibliothèque» has the three to beat. INFERRED cell, on the sewer's walkway."
+    },
+    {
+      "map": 188746754,
+      "npc": 4467,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa!1992|Qo!14154|Qo=14205",
+      "why": "Soki at [7,-20], except while he follows the character on his walk (fed, 14154, until back, 14205). The cell is the derived layer's."
+    },
+    {
+      "map": 188746754,
+      "npc": 4468,
+      "cell": 347,
+      "orientation": 5,
+      "why": "Aida, the pink miaumiau «un poco más allá» (31598). INFERRED, a few cells from Soki."
+    },
+    {
+      "map": 192676864,
+      "npc": 4465,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa=1992&Qo=14206&Qo!14207",
+      "why": "The mice in the cellar, from when Soki needs one (14206) until beaten (14207). INFERRED: the middle of the cellar."
     }
   ]
 }

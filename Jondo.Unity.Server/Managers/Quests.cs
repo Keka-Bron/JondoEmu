@@ -448,6 +448,13 @@ namespace Jondo.Unity.Server.Managers
             // on a second press, two iwo in «Matarratas»' capture.
             foreach (var binding in Bindings.At(mapId, elementId))
             {
+                // A fight's element: pressing it brings the monsters out, and beating them is what
+                // does the objective (the old stump of «Restauración rápida» and its two milimulous).
+                if (binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0)
+                {
+                    if (await BringOutAsync(stream, binding)) { moved = true; break; }
+                    continue;
+                }
                 if (binding.Kind != QuestBindingKind.Click) continue;
                 if (await CloseAsync(stream, binding)) { moved = true; break; }
             }
@@ -464,6 +471,27 @@ namespace Jondo.Unity.Server.Managers
         /// the quest would finish an objective of it by walking past a stele, and one who finished
         /// it last week would do it again.
         /// </remarks>
+        /// <summary>
+        /// Brings out a beat binding's monsters, when its objective is the character's to do now:
+        /// nothing is marked, the fight does it.
+        /// </summary>
+        private static async Task<bool> BringOutAsync(NetworkStream stream, QuestBinding binding)
+        {
+            var log = Log;
+            if (log == null || _book == null) return false;
+            var run = log.Run(binding.QuestId);
+            if (run == null || run.Finished || run.Done.Contains(binding.ObjectiveId)) return false;
+            var step = _book.Step(run.StepId);
+            var objective = step?.Objectives.FirstOrDefault(o => o.Id == binding.ObjectiveId);
+            if (step == null || objective == null || !Revealed(step, objective, run)) return false;
+            foreach (int before in binding.AfterObjectives)
+            {
+                if (!run.Done.Contains(before) && !log.ObjectiveDone(before)) return false;
+            }
+            await SpawnAsync(stream, binding);
+            return true;
+        }
+
         private static async Task<bool> CloseAsync(NetworkStream stream, QuestBinding binding)
         {
             var log = Log;
@@ -600,7 +628,7 @@ namespace Jondo.Unity.Server.Managers
         private static async Task SpawnAsync(NetworkStream stream, QuestBinding binding)
         {
             long mapId = SessionContext.State.MapId;
-            var grupo = MobSpawnManager.SpawnNamed(mapId, binding.SpawnsMonster, binding.SpawnsCount);
+            var grupo = MobSpawnManager.SpawnNamed(mapId, binding.SpawnsMonster, binding.SpawnsCount, binding.SpawnsWith);
 
             if (grupo == null)
             {
@@ -1516,6 +1544,23 @@ namespace Jondo.Unity.Server.Managers
         /// One method for both ways an objective can be finished — the client saying so, and the
         /// server working it out — so that the packets that follow cannot differ between them.
         /// </remarks>
+        /// <summary>
+        /// One more towards an objective that wants several of something its catalogue does not
+        /// count (a beat binding's «times»): saved, and true once it is the last one.
+        /// </summary>
+        public static bool CountTowards(QuestRun run, int objectiveId, int needed)
+        {
+            run.Counted.TryGetValue(objectiveId, out int already);
+            if (already + 1 >= needed)
+            {
+                run.Counted.Remove(objectiveId);
+                return true;
+            }
+            run.Counted[objectiveId] = already + 1;
+            Save(run.QuestId, run);
+            return false;
+        }
+
         public static async Task TickAsync(NetworkStream stream, int questId, int objectiveId,
                                            int amount = 0)
         {

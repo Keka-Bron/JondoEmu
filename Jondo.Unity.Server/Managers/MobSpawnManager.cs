@@ -1053,7 +1053,7 @@ namespace Jondo.Unity.Server.Managers
         /// and the caller has to report it: an objective that says «make it come out» and does not bring it out leaves
         /// the quest stuck without saying why.
         /// </remarks>
-        public static MobGroup? SpawnNamed(long mapId, int monsterId, int howMany)
+        public static MobGroup? SpawnNamed(long mapId, int monsterId, int howMany, int alsoMonster = 0)
         {
             if (!_monsters.TryGetValue(monsterId, out var datos)) return null;
 
@@ -1087,6 +1087,18 @@ namespace Jondo.Unity.Server.Managers
                         Monster = datos,
                         GradeIndex = grado,
                         Level = grado < datos.Grades.Count ? datos.Grades[grado].Level : 1,
+                    });
+                }
+
+                // And one of another kind with them: the granary's larva comes with a moskito.
+                if (alsoMonster != 0 && _monsters.TryGetValue(alsoMonster, out var otro))
+                {
+                    int suyo = Math.Clamp(otro.Grades.Count - 1, 0, MobMember.MaxGradesPerMonster - 1);
+                    miembros.Add(new MobMember
+                    {
+                        Monster = otro,
+                        GradeIndex = suyo,
+                        Level = suyo < otro.Grades.Count ? otro.Grades[suyo].Level : 1,
                     });
                 }
 
