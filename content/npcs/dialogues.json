@@ -2278,14 +2278,14 @@
         {
           "message": 30571,
           "choices": [
-            { "reply": 36886, "startsQuest": 2007, "params": [[34, 2007]], "next": 30572 },
+            { "reply": 36886, "next": 30572 },
             { "reply": 36887 }
           ]
         },
         {
           "message": 30572,
           "choices": [
-            { "reply": 36889 }
+            { "reply": 36889, "startsQuest": 2007, "params": [[34, 2007]] }
           ]
         },
         {
@@ -2346,7 +2346,7 @@
           ]
         }
       ],
-      "why": "Becky Gorr, keeper of Astrub's cemetery [-1,-13], by «L'invasion des profanateurs de sépulture» of Dofus pour les noobs: the half-dead and her work, look but do not touch (30570), «réprimer un frisson», the creatures guarding the graves and a hand wanted (30571), «Accepter de l'aider»: the gargrouilles and stropajos attacking tourists (30572); the creatures calmed (13909), graves robbed (30624, 30625), the torn cloth shown proudly and Finney lent to follow the trail (30626); the suspicious vault (13918), Finney left behind to meet her there (30627); before the vault the gate shuts between them (31411), the trap and her lock-picking tools in her cabin (31412: 13920); bound inside the vault (30631), untied, the looters coming back (30632: 13926, Selim comes in); all over, thanks (30633: 13930)."
+      "why": "Becky Gorr, keeper of Astrub's cemetery [-1,-13], by «L'invasion des profanateurs de sépulture» of Dofus pour les noobs: the half-dead and her work, look but do not touch (30570), «réprimer un frisson», the creatures guarding the graves and a hand wanted (30571), «Accepter de l'aider»: the gargrouilles and stropajos attacking tourists, and on her way (30572, the line the step declares); the creatures calmed (13909), graves robbed (30624, 30625), the torn cloth shown proudly and Finney lent to follow the trail (30626); the suspicious vault (13918), Finney left behind to meet her there (30627); before the vault the gate shuts between them (31411), the trap and her lock-picking tools in her cabin (31412: 13920); bound inside the vault (30631), untied, the looters coming back (30632: 13926, Selim comes in); all over, thanks (30633: 13930)."
     },
     {
       "npc": 4469,
