@@ -161,7 +161,11 @@ namespace Jondo.Unity.Server.Network
         {
             var session = TestSessionOnline();
             if (session == null) return Mal(404, "offline");
-            var lines = RunInSession(session, stream => NpcHandler.CloseAsync(stream));
+            // The X closes whatever is open, as the client's kla does (GameNodeProxy): a workshop too,
+            // whose closing is what marks a quest's «Fabricar … y cerrar la interfaz».
+            var lines = RunInSession(session, stream => WorkshopHandler.IsOpen
+                ? WorkshopHandler.CloseAsync(stream)
+                : NpcHandler.CloseAsync(stream));
             return Bien(DialogueNow(session, lines));
         }
 
@@ -226,6 +230,9 @@ namespace Jondo.Unity.Server.Network
             Managers.NpcFights.Forget();
             Managers.HarvestDrops.Forget();
             Managers.TeleportManager.Initialize();
+            // The passages are declared to the client from here: a door written since the start was
+            // reloaded above and still answered «Unknown use» until this was built again.
+            Managers.InteractiveRegistry.Initialize();
             Console.WriteLine($"[Content] Reloaded in {watch.ElapsedMilliseconds} ms.");
             return Bien(new { reloaded = true, ms = watch.ElapsedMilliseconds });
         }

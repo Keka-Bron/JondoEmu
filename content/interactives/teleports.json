@@ -95,7 +95,11 @@
     "THE ROGUES' LAIR UNDER [5,-15], 67372032. The left edge of the sewer room 101716489 leads",
     "there (its map change cells 280, 294 and 308), and the lair has no way out at all in the",
     "catalogues. Its wooden door under the candlelit arch, 458840 on 241 (gfx 29474), leads back to",
-    "that sewer room, landing on 338 by the edge it came through."
+    "that sewer room, landing on 338 by the edge it came through.",
+    "",
+    "ERTY TRAPCHET'S HOUSE, [1,-21], 192675844. The street's door (516016 on 283) leads in and the",
+    "stairs down to the cellar work, but nothing led back out: the door mat at the front of the room,",
+    "515271 on 374 (gfx 33069), leads to the street, landing on 297 before the door."
   ],
   "passages": [
     {
@@ -337,6 +341,7 @@
     {"map": 188745735, "element": 37075, "npc": 4351, "cell": 217, "gfx": 0, "type": -1, "skill": 0, "toMap": 192414728, "toCell": 438},
     {"map": 192414728, "element": 515319, "cell": 437, "gfx": 3507, "type": -1, "skill": 339, "toMap": 188745735, "toCell": 232},
     {"map": 192414728, "element": 515331, "cell": 452, "gfx": 3507, "type": -1, "skill": 339, "toMap": 188745735, "toCell": 232},
-    {"map": 67372032, "element": 458840, "cell": 241, "gfx": 29474, "type": -1, "skill": 184, "toMap": 101716489, "toCell": 338}
+    {"map": 67372032, "element": 458840, "cell": 241, "gfx": 29474, "type": -1, "skill": 184, "toMap": 101716489, "toCell": 338},
+    {"map": 192675844, "element": 515271, "cell": 374, "gfx": 33069, "type": -1, "skill": 339, "toMap": 188743681, "toCell": 297}
   ]
 }

@@ -461,6 +461,10 @@ namespace Jondo.Unity.Server.Network
                         if (FightOps.Contains(op) || op == Op.Kme) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
                         else if (op == Op.Hqa) await FightHandler.AttackAsync(stream, frame);
                         else if (op == Op.Hmt) await SpellHandler.HandleVariantAsync(stream, frame);
+                        // A workshop's recipe chosen and crafted, as the craft window sends them: a
+                        // quest's «Fabricar» objective played without dragging items about the screen.
+                        else if (op == Op.Kew) await WorkshopHandler.SelectRecipeAsync(stream, frame);
+                        else if (op == Op.Kep) await WorkshopHandler.CraftAsync(stream, frame);
                         else throw new InvalidOperationException($"op {op} is not one the harness sends");
                     }
                     finally

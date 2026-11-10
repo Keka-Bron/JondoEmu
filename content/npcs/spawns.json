@@ -1286,6 +1286,21 @@
       "cell": 217,
       "orientation": 1,
       "why": "The mercenary guarding the old chapel's door [5,-15] (its wooden door on cells 204-232). INFERRED cell: the walkable one at the left of the door."
+    },
+    {
+      "map": 189531146,
+      "npc": 4342,
+      "cell": 273,
+      "orientation": 7,
+      "why": "Erty Trapchet at [0,-19], where Dofus pour les noobs starts «Qui sème le vent récolte l'Artempeth»: by the flowering bush he studies. INFERRED cell, the clearing south of it."
+    },
+    {
+      "map": 192676868,
+      "npc": 598,
+      "cell": 355,
+      "orientation": 3,
+      "criterion": "Qa=1998&Qo=13874&Qo!13876",
+      "why": "The Artempeth rose in Erty's cellar, from when he sends the character for his notebook (13874) until beaten (13876). INFERRED cell, the middle of the cellar."
     }
   ]
 }

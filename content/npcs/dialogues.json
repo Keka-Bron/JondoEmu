@@ -1473,32 +1473,141 @@
       "npc": 4342,
       "map": 0,
       "opening": 30574,
+      "openings": [
+        { "quest": 1998, "objective": 13859, "pending": 13860, "message": 30582 },
+        { "quest": 1998, "objective": 13873, "pending": 13874, "message": 30594 }
+      ],
       "lines": [
         {
           "message": 30574,
           "choices": [
-            {
-              "reply": 36896,
-              "next": 30575
-            },
-            {
-              "reply": 36901
-            }
+            { "reply": 36898, "next": 30575, "beforeQuest": 1998 },
+            { "reply": 36902, "next": 30578, "quest": 1998, "beforeObjective": 13859 },
+            { "reply": 36939, "quest": 1998, "completes": 13877, "params": [[30, 13877]], "next": 30603 },
+            { "reply": 36947, "quest": 1998, "completes": 13879, "params": [[30, 13879]], "next": 30609 },
+            { "reply": 36901 }
           ]
         },
         {
           "message": 30575,
           "choices": [
-            {
-              "reply": 36902,
-              "startsQuest": 1998
-            },
-            {
-              "reply": 36901
-            }
+            { "reply": 36896, "startsQuest": 1998, "params": [[34, 1998]], "next": 30576 },
+            { "reply": 36897 }
+          ]
+        },
+        {
+          "message": 30576,
+          "choices": [
+            { "reply": 36894, "next": 30577 },
+            { "reply": 36893 }
+          ]
+        },
+        {
+          "message": 30577,
+          "choices": [
+            { "reply": 36891 },
+            { "reply": 36892 }
+          ]
+        },
+        {
+          "message": 30578,
+          "choices": [
+            { "reply": 36899 },
+            { "reply": 36900 }
+          ]
+        },
+        {
+          "message": 30582,
+          "choices": [
+            { "reply": 36908, "quest": 1998, "completes": 13860, "params": [[30, 13860]], "next": 30583 }
+          ]
+        },
+        {
+          "message": 30583,
+          "choices": [
+            { "reply": 36907 }
+          ]
+        },
+        {
+          "message": 30594,
+          "choices": [
+            { "reply": 36935, "quest": 1998, "completes": 13874, "params": [[30, 13874]], "next": 30595 }
+          ]
+        },
+        {
+          "message": 30595,
+          "choices": [
+            { "reply": 36934, "next": 30596 }
+          ]
+        },
+        {
+          "message": 30596,
+          "choices": [
+            { "reply": 36933, "next": 30597 }
+          ]
+        },
+        {
+          "message": 30597,
+          "choices": [
+            { "reply": 36932, "next": 30598 }
+          ]
+        },
+        {
+          "message": 30598,
+          "choices": [
+            { "reply": 36931, "next": 30599 }
+          ]
+        },
+        {
+          "message": 30599,
+          "choices": [
+            { "reply": 36930, "next": 30600 }
+          ]
+        },
+        {
+          "message": 30600,
+          "choices": [
+            { "reply": 36929, "next": 30601 }
+          ]
+        },
+        {
+          "message": 30601,
+          "choices": [
+            { "reply": 36928, "next": 30602 }
+          ]
+        },
+        {
+          "message": 30602,
+          "choices": [
+            { "reply": 36927 }
+          ]
+        },
+        {
+          "message": 30603,
+          "choices": [
+            { "reply": 36938, "next": 30604 }
+          ]
+        },
+        {
+          "message": 30604,
+          "choices": [
+            { "reply": 36937 }
+          ]
+        },
+        {
+          "message": 30609,
+          "choices": [
+            { "reply": 36946, "next": 30610 }
+          ]
+        },
+        {
+          "message": 30610,
+          "choices": [
+            { "reply": 36945 }
           ]
         }
-      ]
+      ],
+      "why": "Erty Trapchet, the botanist writer at [0,-19], by «Qui sème le vent récolte l'Artempeth» of Dofus pour les noobs: the plants he lectures on (30574, 30575), his house's plants and the beds to water with drinking water from the well or the market (30576-30578); watered (13860), the peasants' complaints about parasites, Mawy Ingals (30583); the experiment's results and the Bonta link (13874, 30595-30602), the notebook left at home; the Artempeth rose given (13877), the notebook forgotten, Ramón Santo (30603, 30604); what Ramón said (13879), a collaboration with Nibe Lula (30609, 30610)."
     },
     {
       "npc": 4347,
@@ -8167,6 +8276,8 @@
           "message": 30499,
           "choices": [
             { "reply": 36790, "quest": 1984, "completes": 13818, "params": [[30, 13818]], "next": 30500 },
+            { "reply": 36913, "quest": 1998, "completes": 13862, "params": [[30, 13862]], "next": 30585 },
+            { "reply": 36924, "quest": 1998, "completes": 13869, "params": [[30, 13869]], "next": 30592, "afterObjective": 13868 },
             { "reply": 37778 }
           ]
         },
@@ -8181,9 +8292,21 @@
           "choices": [
             { "reply": 36788 }
           ]
+        },
+        {
+          "message": 30585,
+          "choices": [
+            { "reply": 36912 }
+          ]
+        },
+        {
+          "message": 30592,
+          "choices": [
+            { "reply": 36923 }
+          ]
         }
       ],
-      "why": "Megustam Laspelas (Emia Elliesol), at the peasants' workshop [7,-24], by «Crise sanitaire»: the bread (13818), the contaminated consumables (30500), every plant and the animals too (30501): «Ir a visitar a Unterix Unter»."
+      "why": "Megustam Laspelas (Emia Elliesol), at the peasants' workshop [7,-24], by «Crise sanitaire»: the bread (13818), the contaminated consumables (30500), every plant and the animals too (30501): «Ir a visitar a Unterix Unter». «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592)."
     },
     {
       "npc": 564,
@@ -8222,6 +8345,10 @@
           "choices": [
             { "reply": 36794, "next": 30502, "quest": 1984, "afterObjective": 13819, "beforeObjective": 13821, "completesAll": [13820, 13821], "params": [[30, 13821]], "takesAll": [19646, 19647, 19648, 19649, 19650], "refused": 30504 },
             { "reply": 36797, "quest": 1984, "completes": 13828, "params": [[30, 13828]], "next": 30505, "afterObjective": 13827 },
+            { "reply": 36915, "quest": 1998, "completes": 13863, "params": [[30, 13863]], "next": 30586 },
+            { "reply": 36919, "next": 30590, "quest": 1998, "afterObjective": 13863, "completesAll": [13864, 13865, 13866, 13867], "params": [[30, 13867]] },
+            { "reply": 36922, "next": 30591, "quest": 1998, "afterObjective": 13867, "beforeObjective": 13868 },
+            { "reply": 36926, "quest": 1998, "completes": 13873, "params": [[30, 13873]], "next": 30593, "afterObjective": 13872 },
             { "reply": 54280 }
           ]
         },
@@ -8254,9 +8381,40 @@
           "choices": [
             { "reply": 36795 }
           ]
+        },
+        {
+          "message": 30586,
+          "choices": [
+            { "reply": 36914, "next": 30587 }
+          ]
+        },
+        {
+          "message": 30587,
+          "choices": [
+            { "reply": 54280 }
+          ]
+        },
+        {
+          "message": 30590,
+          "choices": [
+            { "reply": 36918, "gives": 19656 }
+          ]
+        },
+        {
+          "message": 30591,
+          "choices": [
+            { "reply": 36920, "buyItem": 19656, "buyPrice": 500 },
+            { "reply": 36921 }
+          ]
+        },
+        {
+          "message": 30593,
+          "choices": [
+            { "reply": 36925 }
+          ]
         }
       ],
-      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506)."
+      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593)."
     },
     {
       "npc": 596,
@@ -8869,6 +9027,78 @@
         }
       ],
       "why": "The Astrub mercenary at the door of the old chapel [5,-15], the rogues' sanctuary: no entry by the Council's order (30706), the tymadores who used to meet there (30707); 50 kamas pocketed for a look inside (30708) and the card of an Astrub association (19657) whose description says it lets its holder into the building, shown on later visits (37075). Dofus pour les noobs, «Braquage à la Roublard»: «nécessite de parler au Mercenaire d'Astrub et de payer 50 kamas pour entrer»."
+    },
+    {
+      "npc": 780,
+      "map": 0,
+      "opening": 3178,
+      "lines": [
+        {
+          "message": 3178,
+          "choices": [
+            { "reply": 36911, "quest": 1998, "completes": 13861, "params": [[30, 13861]], "next": 30584 },
+            { "reply": 10474, "next": 9795 }
+          ]
+        },
+        {
+          "message": 30584,
+          "choices": [
+            { "reply": 36910 }
+          ]
+        },
+        {
+          "message": 9795,
+          "choices": []
+        }
+      ],
+      "why": "Mawy Ingals at the peasants' workshop [7,-24]: the surge of parasites (13861, 30584), Megustam Laspelas has new seeds; the surroundings (9795). The Fields dungeon's key replies come in front of these by themselves (DungeonHandler)."
+    },
+    {
+      "npc": 1042,
+      "map": 0,
+      "opening": 5546,
+      "lines": [
+        {
+          "message": 5546,
+          "choices": [
+            { "reply": 36942, "quest": 1998, "completes": 13878, "params": [[30, 13878]], "next": 30606 },
+            { "reply": 17172 }
+          ]
+        },
+        {
+          "message": 30606,
+          "choices": [
+            { "reply": 36943, "next": 30607 }
+          ]
+        },
+        {
+          "message": 30607,
+          "choices": [
+            { "reply": 36944, "next": 30608 }
+          ]
+        },
+        {
+          "message": 30608,
+          "choices": [
+            { "reply": 36941 }
+          ]
+        }
+      ],
+      "why": "Ramón Santo, the Bontarian merchant [5,-21], by «Qui sème le vent récolte l'Artempeth»: the parasites (13878), his network of producers (30606), Bonta's agriculture (30607), solutions already offered to the farmers (30608). His other quests' replies are not written yet."
+    },
+    {
+      "npc": 598,
+      "map": 192676868,
+      "opening": 4108,
+      "lines": [
+        {
+          "message": 4108,
+          "choices": [
+            { "reply": 12967, "params": [905], "quest": 1998, "afterObjective": 13874 }
+          ]
+        }
+      ],
+      "why": "The Artempeth rose in Erty's cellar [1,-21]: «Hacer como si fueras un horticultor» is the fight against it, alone (npc_fights.json); its flower (19655) comes out of the client's loot row."
     }
   ]
 }

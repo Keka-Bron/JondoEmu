@@ -916,8 +916,20 @@ namespace Jondo.Unity.Server.Handlers
             if (!choice.ForLevel(SessionContext.State.CharacterLevel)) return false;
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
             if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
+            if (NotItsTurnYet(choice)) return false;
             if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
             return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) >= choice.TakesCount;
+        }
+
+        /// <summary>
+        /// Whether a reply does an objective its quest has not come to yet: of the objectives it does,
+        /// the first (the rest of a «completesAll» open one after another as it marks them).
+        /// </summary>
+        private static bool NotItsTurnYet(Jondo.Unity.World.Content.DialogueChoice choice)
+        {
+            int first = choice.Completes != 0 ? choice.Completes
+                        : choice.CompletesAll.Count > 0 ? choice.CompletesAll[0] : 0;
+            return Managers.Quests.NotYetRevealed(first);
         }
 
         private static long[] LasQueTocan(DialogueLine linea)
@@ -943,6 +955,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
                 // A reply that hands over what an objective asks for, only to whoever carries it.
                 if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
+                if (NotItsTurnYet(choice)) return false;
                 if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
                 return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) >= choice.TakesCount;
             }).ToArray();

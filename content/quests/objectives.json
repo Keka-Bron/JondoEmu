@@ -735,6 +735,49 @@
    "map": 192676864,
    "afterObjectives": [14206],
    "why": "«Encuentra raratones en los alrededores de la biblioteca»: the mice of the cellar (5296)."
+  },
+  {
+   "objective": 13858,
+   "quest": 1998,
+   "elements": [{"map": 192675844, "element": 515578}, {"map": 192675844, "element": 515511}],
+   "requires": [{"item": 311, "count": 1}],
+   "spends": true,
+   "why": "«Riega las plantas»: the plant at the bottom of Erty's room (cell 385), with one drinking water; «arrosez la plante au fond de la pièce (1 eau)»."
+  },
+  {
+   "objective": 13859,
+   "quest": 1998,
+   "elements": [{"map": 192676868, "element": 515579}, {"map": 192676868, "element": 515580}],
+   "requires": [{"item": 311, "count": 4}],
+   "spends": true,
+   "afterObjectives": [13858],
+   "why": "«Riega las plantas»: the cellar's beds right of the stairs, four drinking waters; «la plante à droite de l'escalier (4 eaux)»."
+  },
+  {
+   "objective": 13870,
+   "quest": 1998,
+   "elements": [{"map": 119015426, "element": 515877}],
+   "requires": [{"item": 19654, "count": 1}],
+   "spawns": {"monster": 5274, "count": 1, "with": 5275},
+   "afterObjectives": [13869],
+   "why": "«Utiliza el vermicida en el granero»: the wheat silo of the granary [5,-26] (element 515877), the vermicide carried, not spent; the parasites come out of it, a larva and a moskito («un combat se lance»)."
+  },
+  {
+   "objective": 13871,
+   "quest": 1998,
+   "kind": "beat",
+   "monster": 5274,
+   "map": 119015426,
+   "afterObjectives": [13870],
+   "why": "«Vence a los parásitos»: the larva and moskito the silo let out."
+  },
+  {
+   "objective": 13872,
+   "quest": 1998,
+   "elements": [{"map": 119016454, "element": 515876}],
+   "requires": [{"item": 19654, "count": 1}],
+   "afterObjectives": [13871],
+   "why": "«Utiliza el vermicida en el granero»: the bag of oranges of the granary [6,-23] (element 515876)."
   }
  ]
 }

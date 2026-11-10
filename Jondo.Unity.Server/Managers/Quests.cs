@@ -344,6 +344,26 @@ namespace Jondo.Unity.Server.Managers
         /// of every quest that ends at an NPC.
         /// </remarks>
         /// <summary>
+        /// Whether an objective of a quest in hand is still behind others of its step: a reply
+        /// that does it is not offered yet. Erty's «Hablarle de la conversación con Ramón Santo»
+        /// showed from the first talk and did nothing. False for an objective of no quest in hand,
+        /// so the replies written to be always there keep their old behaviour.
+        /// </summary>
+        public static bool NotYetRevealed(int objectiveId)
+        {
+            var log = Log;
+            if (log == null || _book == null || objectiveId == 0) return false;
+            foreach (var run in log.Doing())
+            {
+                var step = _book.Step(run.StepId);
+                var objective = step?.Objectives.FirstOrDefault(o => o.Id == objectiveId);
+                if (step == null || objective == null) continue;
+                return !run.Done.Contains(objectiveId) && !Revealed(step, objective, run);
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Whether what an objective asks to hand over is carried: true for one that asks for no
         /// item. A reply that does a «bring» objective is offered only then -- Cindy Cato's fifteen
         /// boxes, Kerubim's purse for Primir.
@@ -721,7 +741,10 @@ namespace Jondo.Unity.Server.Managers
                         bool here = objective.DiscoverMapId == mapId
                                     || (subAreaId != 0 && objective.DiscoverAreaId == subAreaId);
 
-                        if (here)
+                        // Only once it is the character's to do: Erty's cellar, «Quien siembra vientos
+                        // recoge Artempestad», is watered at the start and must be gone down to again
+                        // for the rose much later -- it used to tick on the first visit.
+                        if (here && !run.Done.Contains(objective.Id) && Revealed(step, objective, run))
                         {
                             await TickAsync(stream, run.QuestId, objective.Id);
                             advanced = true;

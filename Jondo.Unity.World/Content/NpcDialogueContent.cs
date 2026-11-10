@@ -375,6 +375,12 @@ namespace Jondo.Unity.World.Content
             if (choice.Step != 0 && !onStep(choice.Quest, choice.Step)) return false;
             if (choice.BeforeObjective != 0 && objectiveDone != null && objectiveDone(choice.Quest, choice.BeforeObjective))
                 return false;
+            // What it does is done: Erty's «Darle la flor» kept coming back after the flower was his.
+            if (objectiveDone != null && choice.Completes != 0 && objectiveDone(choice.Quest, choice.Completes))
+                return false;
+            if (objectiveDone != null && choice.CompletesAll.Count > 0
+                && choice.CompletesAll.All(o => objectiveDone(choice.Quest, o)))
+                return false;
             if (choice.AfterObjective != 0
                 && (objectiveDone == null || !objectiveDone(choice.Quest, choice.AfterObjective)))
                 return false;
