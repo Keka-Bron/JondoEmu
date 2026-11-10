@@ -1295,6 +1295,17 @@ namespace Jondo.Unity.Server.Handlers
             if (elegidaAhora != null && elegidaAhora.BuysItem != 0)
             {
                 sinPagar = !await ComprarAsync(stream, elegidaAhora);
+                // Unpaid, the conversation stops here: its next line is the one that takes the money
+                // («*se embolsa discretamente tu dinero y te indica que pases*»), and following it
+                // would hand over for nothing what the reply was buying -- the old chapel's way in.
+                if (sinPagar)
+                {
+                    CerrarConversacion();
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
+                            ConnectionProtocol.NpcDialogCloseReason)));
+                    return;
+                }
             }
 
             // Does the answer touch the dream points? It is the fountain's shop, which has no protocol

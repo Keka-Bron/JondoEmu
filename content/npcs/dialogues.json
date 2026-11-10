@@ -8839,6 +8839,36 @@
         }
       ],
       "why": "The mice in the cellar of the house on the left at [7,-19] («descendez à la cave. Parlez à l'une des Sousouris pour les attaquer»): «Atacar la horda de raratones» is the fight (npc_fights.json); one of them comes out of it for Soki (the client's loot row, 19763)."
+    },
+    {
+      "npc": 4351,
+      "map": 188745735,
+      "opening": 30706,
+      "lines": [
+        {
+          "message": 30706,
+          "choices": [
+            { "reply": 37075, "holds": 19657, "passage": 37075 },
+            { "reply": 37074, "next": 30707 },
+            { "reply": 37073, "next": 30708, "buyItem": 19657, "buyPrice": 50 },
+            { "reply": 37071 }
+          ]
+        },
+        {
+          "message": 30707,
+          "choices": [
+            { "reply": 37073, "next": 30708, "buyItem": 19657, "buyPrice": 50 },
+            { "reply": 37076 }
+          ]
+        },
+        {
+          "message": 30708,
+          "choices": [
+            { "reply": 37072, "passage": 37072 }
+          ]
+        }
+      ],
+      "why": "The Astrub mercenary at the door of the old chapel [5,-15], the rogues' sanctuary: no entry by the Council's order (30706), the tymadores who used to meet there (30707); 50 kamas pocketed for a look inside (30708) and the card of an Astrub association (19657) whose description says it lets its holder into the building, shown on later visits (37075). Dofus pour les noobs, «Braquage à la Roublard»: «nécessite de parler au Mercenaire d'Astrub et de payer 50 kamas pour entrer»."
     }
   ]
 }

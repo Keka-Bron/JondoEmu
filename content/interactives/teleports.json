@@ -75,7 +75,27 @@
     "hideouts. The holes (gfx 47284) are in the client's maps of the houses at [6,-15], [4,-19] (the",
     "Council Tower) and Kerubim's shop; the graph has only the shop's, with the criterion",
     "«POE15990,1», the rikiki wand worn, which the others are given too. The hideouts' own holes",
-    "(47359, 47343) lead back."
+    "(47359, 47343) lead back.",
+    "",
+    "THE COUNCIL TOWER, [4,-19]. Its ground floor, 192413702, has two staircases the map data hangs",
+    "elements on and the catalogues give no way: 515861 on 272, behind Archi (gfx 63669), and 515862",
+    "on 380, on the left (gfx 63670). Both go up to the hall, 192545798, landing on 386 beside its",
+    "stairs down (515860 on 401), which the graph already took back to 380. Dofus pour les noobs, «Ça",
+    "sent le gaz»: «Empruntez donc les escaliers situés derrière Archie afin de monter à l'étage».",
+    "Without them the hall, the Council's room and the knights' room (the forgelancers' class master)",
+    "were only reached from the vilinsekts' hideout. Type -1 and skill 184, the measured doors' pair.",
+    "",
+    "THE OLD CHAPEL, [5,-15], the rogues' sanctuary 192414728. Its door on the street, 188745735, is",
+    "no element: the Astrub mercenary guarding it lets in, «Entrar en el edificio» after 50 kamas",
+    "(37072) or «Enseñarle tu carné de miembro y entrar» with the card he hands over (37075), landing",
+    "on 438 beside the two door mats. The mats, 515319 on 437 and 515331 on 452 (gfx 3507), lead back",
+    "out in front of the door, 232 -- the graph's own way out of 437 landed on 280, a cell nobody can",
+    "stand on. Skill 339, «Indicar una salida», as the bank's mats.",
+    "",
+    "THE ROGUES' LAIR UNDER [5,-15], 67372032. The left edge of the sewer room 101716489 leads",
+    "there (its map change cells 280, 294 and 308), and the lair has no way out at all in the",
+    "catalogues. Its wooden door under the candlelit arch, 458840 on 241 (gfx 29474), leads back to",
+    "that sewer room, landing on 338 by the edge it came through."
   ],
   "passages": [
     {
@@ -310,6 +330,13 @@
     {"map": 192545798, "element": 515384, "cell": 311, "gfx": 47284, "type": 0, "skill": 114, "toMap": 147063810, "toCell": 394, "criterion": "POE15990,1"},
     {"map": 147063810, "element": 507618, "cell": 393, "gfx": 47343, "type": 0, "skill": 114, "toMap": 192545798, "toCell": 325},
     {"map": 103547392, "element": 516612, "cell": 319, "gfx": 47284, "type": 0, "skill": 114, "toMap": 195300356, "toCell": 163, "criterion": "POE15990,1"},
-    {"map": 188484106, "element": 516095, "cell": 555, "gfx": 57416, "type": 0, "skill": 114, "toMap": 188483082, "toCell": 215, "criterion": "Qo=13825|Qf=1984"}
+    {"map": 188484106, "element": 516095, "cell": 555, "gfx": 57416, "type": 0, "skill": 114, "toMap": 188483082, "toCell": 215, "criterion": "Qo=13825|Qf=1984"},
+    {"map": 192413702, "element": 515861, "cell": 272, "gfx": 63669, "type": -1, "skill": 184, "toMap": 192545798, "toCell": 386},
+    {"map": 192413702, "element": 515862, "cell": 380, "gfx": 63670, "type": -1, "skill": 184, "toMap": 192545798, "toCell": 386},
+    {"map": 188745735, "element": 37072, "npc": 4351, "cell": 217, "gfx": 0, "type": -1, "skill": 0, "toMap": 192414728, "toCell": 438},
+    {"map": 188745735, "element": 37075, "npc": 4351, "cell": 217, "gfx": 0, "type": -1, "skill": 0, "toMap": 192414728, "toCell": 438},
+    {"map": 192414728, "element": 515319, "cell": 437, "gfx": 3507, "type": -1, "skill": 339, "toMap": 188745735, "toCell": 232},
+    {"map": 192414728, "element": 515331, "cell": 452, "gfx": 3507, "type": -1, "skill": 339, "toMap": 188745735, "toCell": 232},
+    {"map": 67372032, "element": 458840, "cell": 241, "gfx": 29474, "type": -1, "skill": 184, "toMap": 101716489, "toCell": 338}
   ]
 }
