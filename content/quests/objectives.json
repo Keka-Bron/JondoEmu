@@ -2079,6 +2079,86 @@
    "map": 147850756,
    "afterObjectives": [9583],
    "why": "«Aléjate del pozo y vuelve para sorprender a la muñeca»: back on the well's map once the stone is in the bucket."
+  },
+  {
+   "objective": 5468,
+   "quest": 891,
+   "kind": "talk",
+   "npc": 1470,
+   "map": 69995522,
+   "why": "«Encuentra a la dama vestida de negwo»: Captain Ligna aboard her ship at [13,0] («Elle se trouve en [13,0]», Dofus pour les noobs)."
+  },
+  {
+   "objective": 5287,
+   "quest": 836,
+   "kind": "click",
+   "elements": [{"map": 99614723, "element": 481756}],
+   "gives": [{"item": 12828, "count": 1}],
+   "anyOrder": true,
+   "why": "«Sauvegarder l'espèce» (Dofus pour les noobs): the wood for the fire in the island's centre [24,-7]: the pile of logs at the bottom of the map (481756, graphic 331, cell 468; «Cliquez sur le tas de bois en bas de la map»). INFERRED element."
+  },
+  {
+   "objective": 5289,
+   "quest": 836,
+   "kind": "click",
+   "elements": [{"map": 99614720, "element": 481740}],
+   "gives": [{"item": 12829, "count": 1}],
+   "anyOrder": true,
+   "why": "«Sauvegarder l'espèce» (Dofus pour les noobs): an earthworm north of the island [24,-10]: in the earth beside the cawotte (481740, graphic 38985, cell 320). INFERRED element."
+  },
+  {
+   "objective": 5291,
+   "quest": 836,
+   "kind": "click",
+   "elements": [{"map": 99615745, "element": 481741}],
+   "gives": [{"item": 12830, "count": 1}],
+   "anyOrder": true,
+   "why": "«Sauvegarder l'espèce» (Dofus pour les noobs): sweet berries north-east of the island [26,-9]: hidden behind a cawotte (481741, graphic 14297, cell 216). INFERRED element."
+  },
+  {
+   "objective": 5293,
+   "quest": 836,
+   "kind": "click",
+   "elements": [{"map": 116918284, "element": 482659}],
+   "gives": [{"item": 12831, "count": 1}],
+   "anyOrder": true,
+   "why": "«Sauvegarder l'espèce» (Dofus pour les noobs): a wabbit carpet in the island's underground [24,-6]: the orange carpet in the pile of cawottes (482659, graphic 41354, cell 340). INFERRED element."
+  },
+  {
+   "objective": 5288,
+   "quest": 836,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four things hidden on the island, handed to Emilia in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5290,
+   "quest": 836,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four things hidden on the island, handed to Emilia in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5292,
+   "quest": 836,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four things hidden on the island, handed to Emilia in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5294,
+   "quest": 836,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four things hidden on the island, handed to Emilia in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5473,
+   "quest": 892,
+   "kind": "talk",
+   "npc": 1567,
+   "map": 99615236,
+   "why": "«Encuentra al enviado del rey Allister»: lost at [25,-6] («Allez en [25,-6] et parlez à l'Envoyé du roi Allister», Dofus pour les noobs)."
   }
  ]
 }

@@ -15228,6 +15228,7 @@
       "map": 0,
       "opening": 3880,
       "openings": [
+        { "after": 892, "message": 10798 },
         { "quest": 220, "message": 3966 },
         { "canStart": 220, "message": 3966 },
         { "after": 220, "before": 892, "message": 10752 },
@@ -15362,9 +15363,13 @@
         {
           "message": 10788,
           "choices": []
+        },
+        {
+          "message": 10798,
+          "choices": []
         }
       ],
-      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857). «Usuwpation d'identité» (217) of Dofus pour les noobs: the plan, pass for the prince, a potion to look like a wabbit, then the castle (3941, «Bien sûr que je suis prêt»). «Tomber sur un bec» (218) of Dofus pour les noobs: another plan, a fat tofu's nest, an egg (3957, «Euh, d'accord !»); only a baby, a breeder to fatten it (3958); the egg and the potion, before the prince (3959: 878, both handed over). «À roublard, roublard et demi» (219) of Dofus pour les noobs: the tofu failed, poison the «quewido pwíncipe», a poisoned blopicero (3961, «Bien sûr !»), where is it, no baker? (3962), it will not do, the prince has a taster, kamas to hire assassins, 25000 (3963: 880, «Reparlez donc à Vil Smisse pour lui donner les 25 000 kamas»), «are you bringing them or not?» when short (3964), enough for now, he recruits (3965). «Trouble-fête» (220) of Dofus pour les noobs: the assassins cannot pass the prince's security, a zollo mercenary who could teleport into the throne room on the wedding day (3966, «Bien sûr !»). Afterwards: the wedding did not go as planned (10752), Bob and you made a mess of it, it is cancelled (10753), «another mission?», the wabbit family's relic (10787, «Accepter cette dernière mission»: «À la barbe du roi», 892), intercept the intendant's emissary (10788)."
+      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857). «Usuwpation d'identité» (217) of Dofus pour les noobs: the plan, pass for the prince, a potion to look like a wabbit, then the castle (3941, «Bien sûr que je suis prêt»). «Tomber sur un bec» (218) of Dofus pour les noobs: another plan, a fat tofu's nest, an egg (3957, «Euh, d'accord !»); only a baby, a breeder to fatten it (3958); the egg and the potion, before the prince (3959: 878, both handed over). «À roublard, roublard et demi» (219) of Dofus pour les noobs: the tofu failed, poison the «quewido pwíncipe», a poisoned blopicero (3961, «Bien sûr !»), where is it, no baker? (3962), it will not do, the prince has a taster, kamas to hire assassins, 25000 (3963: 880, «Reparlez donc à Vil Smisse pour lui donner les 25 000 kamas»), «are you bringing them or not?» when short (3964), enough for now, he recruits (3965). «Trouble-fête» (220) of Dofus pour les noobs: the assassins cannot pass the prince's security, a zollo mercenary who could teleport into the throne room on the wedding day (3966, «Bien sûr !»). Afterwards: the wedding did not go as planned (10752), Bob and you made a mess of it, it is cancelled (10753), «another mission?», the wabbit family's relic (10787, «Accepter cette dernière mission»: «À la barbe du roi», 892), intercept the intendant's emissary (10788). «À la barbe du roi»: this is the wey family's treasure? so absurd it must be true, the rogues' strongroom (10798: 5478)."
     },
     {
       "npc": 1404,
@@ -15415,7 +15420,8 @@
         { "quest": 224, "objective": 911, "pending": 5466, "message": 4040 },
         { "quest": 224, "pending": 909, "message": 4036 },
         { "after": 222, "before": 224, "canStart": 224, "message": 4035 },
-        { "quest": 215, "objective": 927, "pending": 5463, "message": 4057 }
+        { "quest": 215, "objective": 927, "pending": 5463, "message": 4057 },
+        { "after": 891, "message": 10784 }
       ],
       "lines": [
         {
@@ -15490,16 +15496,20 @@
         {
           "message": 10777,
           "choices": [
-            { "reply": 11864, "startsQuest": 891, "params": [[34, 891]], "next": 10778 },
+            { "reply": 11864, "startsQuest": 891, "params": [[34, 891]], "next": 10778, "gives": 13055 },
             { "reply": 11865 }
           ]
         },
         {
           "message": 10778,
           "choices": []
+        },
+        {
+          "message": 10784,
+          "choices": []
         }
       ],
-      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911). «Usuwpation d'identité»: «hello, master wabbit» to the transformed character (3950), «I am the prince!», not expected so soon (3951), «I had to hurry to stop this horrible wedding!», no wabbit accent, «to me, my faithful jalató!» (3953: 873, «Me han descubierto», the jalató war chief fought). After «Qui veut la peau du Wabbit ?» (5457 on a hello): here you are, the wedding did not go as planned (10750, «Preguntarle lo que ha pasado»), while you fought the assassin everyone hid, the ceremony suspended (10751); another mission? the prince's family sends a relic (10777, «À un poil près», 891), a first emissary without news, a member of the wey's family in a cawotte field, Allister's signed document (10778)."
+      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911). «Usuwpation d'identité»: «hello, master wabbit» to the transformed character (3950), «I am the prince!», not expected so soon (3951), «I had to hurry to stop this horrible wedding!», no wabbit accent, «to me, my faithful jalató!» (3953: 873, «Me han descubierto», the jalató war chief fought). After «Qui veut la peau du Wabbit ?» (5457 on a hello): here you are, the wedding did not go as planned (10750, «Preguntarle lo que ha pasado»), while you fought the assassin everyone hid, the ceremony suspended (10751); another mission? the prince's family sends a relic (10777, «À un poil près», 891), a first emissary without news, a member of the wey's family in a cawotte field, Allister's signed document (10778). The start of «À un poil près» hands over Allister's signed document (13055). After «À un poil près»: he knew he could count on you, the relic goes to the castle's dining room (10784)."
     },
     {
       "npc": 307,
@@ -15695,17 +15705,42 @@
     {
       "npc": 134,
       "map": 0,
-      "opening": 3935,
+      "opening": 460,
       "openings": [
         { "quest": 216, "step": 396, "message": 3935 }
       ],
       "lines": [
         {
+          "message": 460,
+          "choices": [
+            { "reply": 18888, "next": 15980, "quest": 827, "afterQuest": true },
+            { "reply": 18886, "next": 15979, "beforeQuest": 827 },
+            { "reply": 19419 }
+          ]
+        },
+        {
+          "message": 15979,
+          "choices": [
+            { "reply": 19417 }
+          ]
+        },
+        {
+          "message": 15980,
+          "choices": [
+            { "reply": 18887, "buyPrice": 500, "teleport": 99614726, "refused": 147 },
+            { "reply": 5625 }
+          ]
+        },
+        {
+          "message": 147,
+          "choices": []
+        },
+        {
           "message": 3935,
           "choices": []
         }
       ],
-      "why": "«Info pour un vrai traître»: carrots from the island, a wabbit prince coming to Amakna (3935: 856, on a hello)."
+      "why": "Captain Lily of Madrestam port [9,-2], whose boat goes to the wabbit archipelago (460): not without a remedy for the myxomawosis, an assistant of Otomai in the Amakna village (15979; «Intrusion chez les wabbits», 827); with it, 500 kamas and she takes you (15980, «Pagarle 500 kamas»: the island's coast [24,-4], INFERRED landing map), stowaways go overboard (147, not enough kamas). «Info pour un vrai traître»: carrots from the island, a wabbit prince coming to Amakna (3935: 856, on a hello)."
     },
     {
       "npc": 153,
@@ -17731,6 +17766,273 @@
         }
       ],
       "why": "An assistant of Otomai in the Amakna village [-2,-4], studying the local artisans' preparations (386). «Intrusion chez les wabbits» (827) of Dofus pour les noobs: a remedy for the myxomawosis, a pair of wings of each colour of leafbeetle (15981, the four wings on a hello); asked again, its effects are permanent, go to the wabbit archipelago (15982)."
+    },
+    {
+      "npc": 1568,
+      "map": 0,
+      "opening": 10779,
+      "openings": [
+        { "quest": 892, "objective": 5476, "pending": 5477, "message": 10797 },
+        { "quest": 891, "objective": 5467, "pending": 5469, "message": 10780 }
+      ],
+      "lines": [
+        {
+          "message": 10779,
+          "choices": []
+        },
+        {
+          "message": 10780,
+          "choices": [
+            { "reply": 11866, "next": 10781 }
+          ]
+        },
+        {
+          "message": 10781,
+          "choices": []
+        },
+        {
+          "message": 10797,
+          "choices": [
+            { "reply": 11887, "quest": 892, "afterObjective": 5476, "beforeObjective": 5477, "gives": 13056 }
+          ]
+        }
+      ],
+      "why": "The wey's father-in-law in the cawotte fields of the wabbit island [24,-4]: may cawottes never be missing (10779). «À un poil près» of Dofus pour les noobs: the document shown (5467), another one? other emissaries came with such a paper (10780), «what did they look like?», a lady all in black with a pirate's hat and her own ship, gone to Madrestam (10781). «À la barbe du roi»: the document shown (5476), sent by Allister, the treasure meant for your king, a sacred relic (10797, «Darle las gracias y agarrar la reliquia»: 13056)."
+    },
+    {
+      "npc": 1470,
+      "map": 69995522,
+      "opening": 10783,
+      "lines": [
+        {
+          "message": 10783,
+          "choices": [
+            { "reply": 11870, "quest": 891, "beforeObjective": 5469 },
+            { "reply": 11869 }
+          ]
+        }
+      ],
+      "why": "Captain Ligna, the lady in black, aboard her ship at Madrestam [13,0], by «À un poil près» of Dofus pour les noobs: «what are you doing here? off before I throw you in the sea» (10783), «Forzarle a que te dé la reliquia»: the fight, the relic (13056) her loot."
+    },
+    {
+      "npc": 139,
+      "map": 0,
+      "opening": 464,
+      "openings": [
+        { "quest": 828, "message": 10408 },
+        { "quest": 829, "message": 10408 },
+        { "quest": 830, "message": 10408 },
+        { "quest": 831, "message": 10408 },
+        { "quest": 832, "message": 10408 },
+        { "canStart": 829, "message": 10403 },
+        { "canStart": 830, "message": 10405 },
+        { "canStart": 831, "message": 10407 },
+        { "canStart": 832, "message": 10409 },
+        { "after": 832, "message": 10410 }
+      ],
+      "lines": [
+        {
+          "message": 464,
+          "choices": [
+            { "reply": 11371, "next": 10401, "beforeQuest": 828 }
+          ]
+        },
+        {
+          "message": 10401,
+          "choices": [
+            { "reply": 11370, "startsQuest": 828, "params": [[34, 828]] }
+          ]
+        },
+        {
+          "message": 10408,
+          "choices": [
+            { "reply": 11373, "quest": 828, "completes": 5257, "params": [[30, 5257]], "next": 10402 },
+            { "reply": 11376, "quest": 829, "completes": 5260, "params": [[30, 5260]], "next": 10404 },
+            { "reply": 11380, "quest": 830, "completes": 5262, "params": [[30, 5262]], "next": 10406 },
+            { "reply": 11384, "quest": 831, "completes": 5265, "params": [[30, 5265]], "next": 10409 },
+            { "reply": 11388, "quest": 832, "completes": 5273, "params": [[30, 5273]], "next": 10410 }
+          ]
+        },
+        {
+          "message": 10402,
+          "choices": [
+            { "reply": 11374, "startsQuest": 829, "params": [[34, 829]] }
+          ]
+        },
+        {
+          "message": 10403,
+          "choices": [
+            { "reply": 11378, "startsQuest": 829, "params": [[34, 829]] }
+          ]
+        },
+        {
+          "message": 10404,
+          "choices": [
+            { "reply": 11381, "startsQuest": 830, "params": [[34, 830]] }
+          ]
+        },
+        {
+          "message": 10405,
+          "choices": [
+            { "reply": 11383, "startsQuest": 830, "params": [[34, 830]] }
+          ]
+        },
+        {
+          "message": 10406,
+          "choices": [
+            { "reply": 11385, "startsQuest": 831, "params": [[34, 831]] }
+          ]
+        },
+        {
+          "message": 10407,
+          "choices": [
+            { "reply": 11372, "startsQuest": 831, "params": [[34, 831]] }
+          ]
+        },
+        {
+          "message": 10409,
+          "choices": [
+            { "reply": 11387, "startsQuest": 832, "params": [[34, 832]] }
+          ]
+        },
+        {
+          "message": 10410,
+          "choices": []
+        }
+      ],
+      "why": "Logel the zollo on the Cawotte island [24,-3], his land invaded by terrible creatures (464, «¿Cómo puedo salvaros?»), by the zollo chain of Dofus pour les noobs: «Timassacre entre wabbits» (828: the pekewabbits, 10401), «Comme d'wabbitude» (829: black wabbits and wabbits, 10402/10403), «Vade Retro Wabbitas» (830: the skeleton wabbits of the north-west island, 10404/10405), «Chasse aux wabbits» (831: the wabbit guards, the grandpas and the wo wabbits, 10406/10407), «Un peu de wab» (832: a bit of everything, 10409); while one is under way he wants more (10408) and each report closes it and offers the next; thanks, the zollo god's spirit (10410)."
+    },
+    {
+      "npc": 140,
+      "map": 0,
+      "opening": 465,
+      "openings": [
+        { "quest": 836, "message": 10430 }
+      ],
+      "lines": [
+        {
+          "message": 465,
+          "choices": [
+            { "reply": 11426, "next": 10429, "beforeQuest": 836 }
+          ]
+        },
+        {
+          "message": 10429,
+          "choices": [
+            { "reply": 11425, "startsQuest": 836, "params": [[34, 836]] }
+          ]
+        },
+        {
+          "message": 10430,
+          "choices": []
+        }
+      ],
+      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello)."
+    },
+    {
+      "npc": 1470,
+      "map": 68422663,
+      "opening": 9552,
+      "lines": [
+        {
+          "message": 9552,
+          "choices": [
+            { "reply": 11878, "next": 10790, "quest": 892, "beforeObjective": 5471 }
+          ]
+        },
+        {
+          "message": 10790,
+          "choices": [
+            { "reply": 11881, "next": 10791, "quest": 827, "afterQuest": true },
+            { "reply": 11891, "next": 10799, "beforeQuest": 827 }
+          ]
+        },
+        {
+          "message": 10791,
+          "choices": [
+            { "reply": 11879, "quest": 892, "completes": 5471, "params": [[30, 5471]], "buyPrice": 200, "teleport": 99615239, "refused": 10789 },
+            { "reply": 11880 }
+          ]
+        },
+        {
+          "message": 10789,
+          "choices": []
+        },
+        {
+          "message": 10799,
+          "choices": [
+            { "reply": 11890, "next": 10800 }
+          ]
+        },
+        {
+          "message": 10800,
+          "choices": []
+        }
+      ],
+      "why": "Captain Ligna on Madrestam's quay [13,0]: who goes there, can't you read the signs? (9552). «À la barbe du roi» (892) of Dofus pour les noobs: «Lui demander si ça boume», Smis hired you? ready, the precautions taken? (10790), 200 kamas, no philanthropy (10791, «Embarcar hacia el archipiélago wabbit»: the island; 10789 when short); without the remedy, hurry and get it (10799), a pandawa in the Amakna village (10800)."
+    },
+    {
+      "npc": 1470,
+      "map": 99615239,
+      "opening": 10794,
+      "openings": [
+        { "quest": 892, "objective": 5472, "pending": 5474, "message": 10792 }
+      ],
+      "lines": [
+        {
+          "message": 10794,
+          "choices": []
+        },
+        {
+          "message": 10792,
+          "choices": [
+            { "reply": 11883 }
+          ]
+        }
+      ],
+      "why": "Captain Ligna landed on the wabbit island [25,-3]: discretion, dispersion if trouble (10794). «À la barbe du roi»: intercept the king's envoy in the cawotte fields, she watches the coast (10792: 5472)."
+    },
+    {
+      "npc": 1470,
+      "map": 99614726,
+      "opening": 10795,
+      "openings": [
+        { "quest": 892, "objective": 5477, "message": 10793 }
+      ],
+      "lines": [
+        {
+          "message": 10795,
+          "choices": [
+            { "reply": 11885, "quest": 892, "completes": 5475, "params": [[30, 5475]], "next": 10796, "afterObjective": 5474 },
+            { "reply": 11886 }
+          ]
+        },
+        {
+          "message": 10796,
+          "choices": []
+        },
+        {
+          "message": 10793,
+          "choices": [
+            { "reply": 11884, "teleport": 68422663 }
+          ]
+        }
+      ],
+      "why": "Captain Ligna in the cawotte fields [24,-4]: got the envoy? (10795, «Mostrar con orgullo el documento»: 5475), the wey's family found, the honour is yours (10796); mission accomplished, a boat back to Amakna, the final delivery to the big boss (10793: 5477, «Embarcar hacia Madrestam»)."
+    },
+    {
+      "npc": 1567,
+      "map": 0,
+      "opening": 10803,
+      "lines": [
+        {
+          "message": 10803,
+          "choices": [
+            { "reply": 11896, "quest": 892, "afterObjective": 5472, "beforeObjective": 5474 }
+          ]
+        }
+      ],
+      "why": "King Allister's envoy, lost on the wabbit island [25,-6]: wabbits are not kind to travellers (10803). «À la barbe du roi»: «Ofrecerle tu ayuda antes de atacarle a traición», the fight, Allister's signed document his loot (13055)."
     }
   ]
 }

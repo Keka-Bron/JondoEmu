@@ -2338,6 +2338,46 @@
       "cell": 300,
       "orientation": 3,
       "why": "An assistant of Otomai in the Amakna village [-2,-4] («Parlez à l'assistant d'Otomaï en [-2,-4]», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 69995522,
+      "npc": 1470,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=891&Qo=5467&Qo!5469",
+      "why": "Captain Ligna aboard her ship at Madrestam [13,0], with the relic, once the father-in-law has spoken of her. INFERRED cell."
+    },
+    {
+      "map": 68422663,
+      "npc": 1470,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=892&Qo!5471",
+      "why": "Captain Ligna on Madrestam's quay [13,0], waiting for Vil Smis's hire («rencontrer la Capitaine Hébreuze», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 99615239,
+      "npc": 1470,
+      "cell": 272,
+      "orientation": 3,
+      "criterion": "Qa=892&Qo=5471&Qo!5474",
+      "why": "Captain Ligna landed with the character on the wabbit island [25,-3]. INFERRED cell."
+    },
+    {
+      "map": 99614726,
+      "npc": 1470,
+      "cell": 330,
+      "orientation": 3,
+      "criterion": "Qa=892&Qo=5474&Qo!5478",
+      "why": "Captain Ligna at the cawotte fields [24,-4] beside the wey's father-in-law («Retournez en [24,-4] et parlez à Capitaine Hébreuze»). INFERRED cell."
+    },
+    {
+      "map": 99615236,
+      "npc": 1567,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=892&Qo=5472&Qo!5474",
+      "why": "King Allister's envoy lost at [25,-6] of the wabbit island. INFERRED cell."
     }
   ]
 }
