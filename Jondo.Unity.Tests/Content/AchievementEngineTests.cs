@@ -303,11 +303,15 @@ namespace Jondo.Unity.Tests.Content
             log.Restore(423, claimed: true);
             log.Restore(307, claimed: false);
 
-            var list = Jondo.Unity.Server.Managers.Achievements.ListOf(log, 57);
-            Assert.Equal(new[] { (307, 57), (423, 0) }, list);
+            var list = Jondo.Unity.Server.Managers.Achievements.ListOf(log, 11, 57);
+            Assert.Equal(new[] { (307, 11L, 57), (423, 11L, 0) }, list);
 
             // An omega character is 200 on the wire, as all fifteen mfu of the route captures are.
-            Assert.Equal(new[] { (307, 200), (423, 0) }, Jondo.Unity.Server.Managers.Achievements.ListOf(log, 354));
+            Assert.Equal(new[] { (307, 11L, 200), (423, 11L, 0) }, Jondo.Unity.Server.Managers.Achievements.ListOf(log, 11, 354));
+
+            // The account's list: what another character of the account did names that character.
+            log.Restore(3, claimed: true, achievedBy: 22);
+            Assert.Contains((3, 22L, 0), Jondo.Unity.Server.Managers.Achievements.ListOf(log, 11, 57));
         }
 
         // ─── Paying ───────────────────────────────────────────────────────────────

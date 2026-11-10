@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -101,7 +102,7 @@ namespace Jondo.Unity.Tests.Protocol
 
             Assert.Equal(66, entries.Count);
             Assert.Equal(53000000027, character);
-            Assert.Equal(captured, Hex(AchievementProtocol.BuildList(character, entries)));
+            Assert.Equal(captured, Hex(AchievementProtocol.BuildList(entries.Select(e => (e.Item1, character, e.Item2)))));
         }
 
         [Fact]
@@ -110,7 +111,7 @@ namespace Jondo.Unity.Tests.Protocol
             // INFERRED: the one thing that tells an unpaid entry apart. It is the same record as
             // mfu's, level first.
             Assert.Equal("0a0c08021091c0fc82aa0218c742",
-                Hex(AchievementProtocol.BuildList(80000000017, new[] { (8519, 2) })));
+                Hex(AchievementProtocol.BuildList(new[] { (8519, 80000000017L, 2) })));
         }
 
         // ─── The window ───────────────────────────────────────────────────────────
