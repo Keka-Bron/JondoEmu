@@ -1670,6 +1670,11 @@ namespace Jondo.Unity.Server.Network
                     // Destroying an inventory item.
                     await DestroyItemHandler.DestroyAsync(stream, payload);
                 }
+                else if (payloadStr.Contains(Op.Uri(Op.Itm)))
+                {
+                    // An item used on another character: the scissors of «Los mechones de la gloria».
+                    await ItemOnCharacterHandler.UseAsync(stream, payload);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Iuu)))
                 {
                     // Using an item: a box, an alliance's potion or prism, a travel item.

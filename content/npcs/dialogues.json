@@ -1615,22 +1615,61 @@
         {
           "message": 30982,
           "choices": [
-            {
-              "reply": 37421,
-              "next": 31415
-            }
+            { "reply": 37945, "next": 31413, "beforeQuest": 1993 },
+            { "reply": 37947, "next": 31416, "quest": 1993, "afterObjective": 14127, "completes": 14128, "params": [[30, 14128]], "takesAll": [6679, 6680, 6681, 6682, 6683, 6684, 6685, 6686, 6687, 6688, 6689, 19741, 19742, 19743, 19744, 19745, 19746, 19747, 27703] },
+            { "reply": 37421, "next": 30983, "quest": 1972 }
+          ]
+        },
+        {
+          "message": 30983,
+          "choices": [
+            { "reply": 37420, "next": 30984 }
+          ]
+        },
+        {
+          "message": 30984,
+          "choices": [
+            { "reply": 37419, "quest": 1972, "completes": 13983, "params": [[30, 13983]] }
+          ]
+        },
+        {
+          "message": 31413,
+          "choices": [
+            { "reply": 37944, "next": 31414 }
+          ]
+        },
+        {
+          "message": 31414,
+          "choices": [
+            { "reply": 37942, "next": 31415 },
+            { "reply": 37943 }
           ]
         },
         {
           "message": 31415,
           "choices": [
-            {
-              "reply": 37942,
-              "startsQuest": 1993
-            }
+            { "reply": 37941, "startsQuest": 1993, "params": [[34, 1993]], "next": 59669 }
+          ]
+        },
+        {
+          "message": 59669,
+          "choices": [
+            { "reply": 81606, "next": 59670 },
+            { "reply": 81604 }
+          ]
+        },
+        {
+          "message": 59670,
+          "choices": []
+        },
+        {
+          "message": 31416,
+          "choices": [
+            { "reply": 37946 }
           ]
         }
-      ]
+      ],
+      "why": "«Les touffes des héros» of Dofus pour les noobs: business (37945), wigs that do not suit her clients (31413), an inventory of every kind of hair (31414), «Proposer de l'aider»: a lock of each of the Twelve's disciples, and scissors to cut them (31415, the line the step declares), the size of the task on her fingers, giving up or not (59669, 59670); the nineteen locks handed over (14128), a depilation offered and turned down (31416). Quest 1972: Cirle Drawde's bilis (37421), the poor thing who will hate her (30983), Nacf Virgilio and his tail (30984: 13983)."
     },
     {
       "npc": 4342,

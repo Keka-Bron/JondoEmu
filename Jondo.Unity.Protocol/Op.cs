@@ -834,6 +834,12 @@ public static class Op
     /// <summary>Using an item from the bag, a double click: { f3: uid }. ItemUseHandler.</summary>
     public const string Iuu = "iuu";
 
+    /// <summary>
+    /// Using an item of the shortcut bar on another character: { f1: the target's character id,
+    /// f2: the item's uid }. Read from the real client with the iron scissors. ItemOnCharacterHandler.
+    /// </summary>
+    public const string Itm = "itm";
+
     /// <summary>Destroying an item; the client removes nothing on its own and without an answer the item stays. Observed against the real client in the emulator's traffic log, not in the pcapng set.</summary>
     public const string Iuw = "iuw";
 
