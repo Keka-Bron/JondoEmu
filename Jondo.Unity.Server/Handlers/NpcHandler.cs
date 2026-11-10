@@ -700,10 +700,11 @@ namespace Jondo.Unity.Server.Handlers
                                                  Bankers.Banker? banker = null,
                                                  IReadOnlyList<string>? lineParameters = null)
         {
-            // A written line that ends the conversation on purpose gets the client's own «Marcharte.»:
-            // his last reply would be somebody else's words -- Otomai's apprentice saying «Ir a ver al
-            // maestro cazador» when the beast is coming.
-            if (respuestas.Length == 0 && frase != null && frase.Choices.Count == 0)
+            // A written line with nothing to offer this character -- none written, or none his -- gets
+            // the client's own «Marcharte.»: his last reply would be somebody else's words, Otomai's
+            // apprentice saying «Ir a ver al maestro cazador» when the beast is coming, Chronokwartz
+            // «Aceptar el trato» to a Xelor with her cards still to find.
+            if (respuestas.Length == 0 && frase != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(pregunta,
