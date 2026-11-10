@@ -1808,6 +1808,14 @@
       "orientation": 3,
       "criterion": "Qa=1966&Qo=14122&Qo!14124",
       "why": "Kaba as a hurried traveller waiting for the coach at [0,-18], once Shani has named him (14122). INFERRED cell."
+    },
+    {
+      "map": 188746756,
+      "npc": 4452,
+      "cell": 330,
+      "orientation": 3,
+      "criterion": "Qa=1967&Qo=14097&Qo!14098",
+      "why": "The knave of spades on the market square once Agry Kultora has pointed at it (14097), until beaten (14098). INFERRED cell."
     }
   ]
 }

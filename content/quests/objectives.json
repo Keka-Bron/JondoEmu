@@ -1315,6 +1315,14 @@
    "map": 189531147,
    "afterObjectives": [14123],
    "why": "«Vence a Kaba»: the swindler (476), whose drop is the box of diamonds (19737)."
+  },
+  {
+   "objective": 14101,
+   "quest": 1967,
+   "elements": [{"map": 189792258, "element": 515868}],
+   "afterObjectives": [14100],
+   "gives": [{"item": 19712, "count": 1}],
+   "why": "«Busca el origen de la sequía»: the sunflowers in the middle of [3,-29] (element 515868, cell 246), where the Sun card lies."
   }
  ]
 }

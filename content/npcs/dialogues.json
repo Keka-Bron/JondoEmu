@@ -1430,6 +1430,7 @@
         {
           "message": 30671,
           "choices": [
+            { "reply": 37882, "next": 31358, "quest": 1967, "beforeObjective": 14095 },
             { "reply": 37248, "next": 30845, "completes": 13885, "params": [[30, 13885]] }
           ]
         },
@@ -1451,9 +1452,46 @@
           "choices": [
             { "reply": 37249, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31358,
+          "choices": [
+            { "reply": 37881, "next": 31359 },
+            { "reply": 37880, "next": 31359 }
+          ]
+        },
+        {
+          "message": 31359,
+          "choices": [
+            { "reply": 37880, "next": 31360 }
+          ]
+        },
+        {
+          "message": 31360,
+          "choices": [
+            { "reply": 37879, "next": 31361 }
+          ]
+        },
+        {
+          "message": 31361,
+          "choices": [
+            { "reply": 37878, "next": 31362 }
+          ]
+        },
+        {
+          "message": 31362,
+          "choices": [
+            { "reply": 37877, "next": 31363 }
+          ]
+        },
+        {
+          "message": 31363,
+          "choices": [
+            { "reply": 37876, "quest": 1967, "completes": 14095, "params": [[30, 14095]], "gives": 19710 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37248) is this class's objective (13885, effect 30), and leads to his greeting, 30845, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1968) is done, he greets the character with Archi's summons (30843) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37248) is this class's objective (13885, effect 30), and leads to his greeting, 30845, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1968) is done, he greets the character with Archi's summons (30843) and «Ir a la Torre del Consejo» hands it over. «Tarot, t'es très fort»: Chronokwartz's problem (37882), his bad luck to blame on something (31358), games he keeps losing (31359, 31360), a card with an hourglass and an owl won in a bet (31361, 31362), the hanged man, his to give back (31363: 14095, item 19710). «Tarot, t'es très fort»: Chronokwartz's problem (37882), his bad luck to blame on something (31358), games he keeps losing (31359, 31360), a card with an hourglass and an owl won in a bet (31361, 31362), the hanged man, his to give back (31363: 14095, item 19710)."
     },
     {
       "npc": 4329,
@@ -1780,21 +1818,16 @@
         {
           "message": 30846,
           "choices": [
-            { "reply": 37252, "next": 30856, "quest": 2009, "beforeObjective": 13884, "completes": 13884, "params": [[30, 13884]] },
-            { "reply": 37875, "next": 31357 }
-          ]
-        },
-        {
-          "message": 31357,
-          "choices": [
-            { "reply": 37872, "startsQuest": 1967 }
+            { "reply": 37875, "next": 31355, "beforeQuest": 1967 },
+            { "reply": 37902, "quest": 1967, "completes": 14105, "params": [[30, 14105]], "next": 31376, "takesAll": [19710, 19711, 19712, 19713] },
+            { "reply": 37252, "next": 30856, "quest": 2009, "beforeObjective": 13884, "completes": 13884, "params": [[30, 13884]] }
           ]
         },
         {
           "message": 30856,
           "names": true,
           "choices": [
-            { "reply": 37875, "next": 31357 }
+            { "reply": 37875, "next": 31355, "beforeQuest": 1967 }
           ]
         },
         {
@@ -1802,9 +1835,34 @@
           "choices": [
             { "reply": 37253, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31355,
+          "choices": [
+            { "reply": 37874, "next": 31356 }
+          ]
+        },
+        {
+          "message": 31356,
+          "choices": [
+            { "reply": 37872, "next": 31357 },
+            { "reply": 37873 }
+          ]
+        },
+        {
+          "message": 31357,
+          "choices": [
+            { "reply": 37871, "startsQuest": 1967, "params": [[34, 1967]] }
+          ]
+        },
+        {
+          "message": 31376,
+          "choices": [
+            { "reply": 37901 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37252) is this class's objective (13884, effect 30), and leads to his greeting, 30856, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1967) is done, he greets the character with Archi's summons (30847) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37252) is this class's objective (13884, effect 30), and leads to his greeting, 30856, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1967) is done, he greets the character with Archi's summons (30847) and «Ir a la Torre del Consejo» hands it over. «Tarot, t'es très fort» of Dofus pour les noobs: counting her divination cards while keeping time (37875, 31355), enchanted cards scattered about the city (31356), «Se porter volontaire»: Meow Moew the collector (31357, the line the step declares); the four cards handed back, her deck complete (14105, 31376). «Tarot, t'es très fort» of Dofus pour les noobs: counting her divination cards while keeping time (37875, 31355), enchanted cards scattered about the city (31356), «Se porter volontaire»: Meow Moew the collector (31357, the line the step declares); the four cards handed back, her deck complete (14105, 31376)."
     },
     {
       "npc": 4338,
@@ -9010,6 +9068,8 @@
         {
           "message": 30499,
           "choices": [
+            { "reply": 37891, "quest": 1967, "completes": 14100, "params": [[30, 14100]], "next": 31369 },
+            { "reply": 37893, "quest": 1967, "completes": 14102, "params": [[30, 14102]], "next": 31370 },
             { "reply": 36790, "quest": 1984, "completes": 13818, "params": [[30, 13818]], "next": 30500 },
             { "reply": 36913, "quest": 1998, "completes": 13862, "params": [[30, 13862]], "next": 30585 },
             { "reply": 36924, "quest": 1998, "completes": 13869, "params": [[30, 13869]], "next": 30592, "afterObjective": 13868 },
@@ -9039,9 +9099,21 @@
           "choices": [
             { "reply": 36923 }
           ]
+        },
+        {
+          "message": 31369,
+          "choices": [
+            { "reply": 37890 }
+          ]
+        },
+        {
+          "message": 31370,
+          "choices": [
+            { "reply": 37892 }
+          ]
         }
       ],
-      "why": "Megustam Laspelas (Emia Elliesol), at the peasants' workshop [7,-24], by «Crise sanitaire»: the bread (13818), the contaminated consumables (30500), every plant and the animals too (30501): «Ir a visitar a Unterix Unter». «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592)."
+      "why": "Megustam Laspelas (Emia Elliesol), at the peasants' workshop [7,-24], by «Crise sanitaire»: the bread (13818), the contaminated consumables (30500), every plant and the animals too (30501): «Ir a visitar a Unterix Unter». «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Tarot, t'es très fort»: the drought growing (37891, 31369: 14100), off to the fields; the Sun card shown (37893: 14102), Nibe Lula had a card like it, a strange wheel (31370). «Tarot, t'es très fort»: the drought growing (37891, 31369: 14100), off to the fields; the Sun card shown (37893: 14102), Nibe Lula had a card like it, a strange wheel (31370)."
     },
     {
       "npc": 564,
@@ -9107,6 +9179,9 @@
       "npc": 4344,
       "map": 0,
       "opening": 30478,
+      "openings": [
+        { "quest": 1967, "objective": 14103, "pending": 14104, "message": 31374 }
+      ],
       "lines": [
         {
           "message": 30478,
@@ -9118,7 +9193,9 @@
             { "reply": 36922, "next": 30591, "quest": 1998, "afterObjective": 13867, "beforeObjective": 13868 },
             { "reply": 36926, "quest": 1998, "completes": 13873, "params": [[30, 13873]], "next": 30593, "afterObjective": 13872 },
             { "reply": 36755, "quest": 1999, "completes": 13805, "params": [[30, 13805]], "next": 30479 },
-            { "reply": 54280 }
+            { "reply": 54280 },
+            { "reply": 37899, "next": 31374, "quest": 1967, "afterObjective": 14103, "beforeObjective": 14104 },
+            { "reply": 37897, "next": 31371, "quest": 1967, "afterObjective": 14102, "beforeObjective": 14103 }
           ]
         },
         {
@@ -9187,9 +9264,39 @@
           "choices": [
             { "reply": 36754 }
           ]
+        },
+        {
+          "message": 31371,
+          "choices": [
+            { "reply": 37896, "next": 31372 }
+          ]
+        },
+        {
+          "message": 31372,
+          "choices": [
+            { "reply": 37895, "next": 31373 }
+          ]
+        },
+        {
+          "message": 31373,
+          "choices": [
+            { "reply": 37894, "quest": 1967, "completes": 14103, "params": [[30, 14103]], "teleport": 188746759 }
+          ]
+        },
+        {
+          "message": 31374,
+          "choices": [
+            { "reply": 37899, "next": 31375 }
+          ]
+        },
+        {
+          "message": 31375,
+          "choices": [
+            { "reply": 37898, "quest": 1967, "completes": 14104, "params": [[30, 14104]], "gives": 19713 }
+          ]
         }
       ],
-      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479)."
+      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713)."
     },
     {
       "npc": 596,
@@ -11868,6 +11975,54 @@
         }
       ],
       "why": "A hurried traveller at the coach stop [0,-18], by «Crime et châtiment»: the driver late (31474); a bag of gold for a certain Kaba (31476, «it's me!») or the militia's business (31475): the swindler attacked (14123; npc_fights.json), the box of diamonds his drop."
+    },
+    {
+      "npc": 4451,
+      "map": 0,
+      "opening": 31364,
+      "lines": [
+        {
+          "message": 31364,
+          "choices": [
+            { "reply": 37884, "next": 31365, "quest": 1967, "afterObjective": 14096, "beforeObjective": 14097 },
+            { "reply": 37889, "next": 31367, "quest": 1967, "afterObjective": 14098, "beforeObjective": 14099 }
+          ]
+        },
+        {
+          "message": 31365,
+          "choices": [
+            { "reply": 37883, "quest": 1967, "completes": 14097, "params": [[30, 14097]] }
+          ]
+        },
+        {
+          "message": 31367,
+          "choices": [
+            { "reply": 37888, "next": 31368 }
+          ]
+        },
+        {
+          "message": 31368,
+          "choices": [
+            { "reply": 37887, "quest": 1967, "completes": 14099, "params": [[30, 14099]] }
+          ]
+        }
+      ],
+      "why": "«Tarot, t'es très fort»: small producers kept off the market (31364), a monster out of a card game (31365: 14097); the mercenaries in the big families' pay, and a drought on the small ones' fields (31367), not natural, says Megustam Laspelas (31368: 14099). «Tarot, t'es très fort»: small producers kept off the market (31364), a monster out of a card game (31365: 14097); the mercenaries in the big families' pay, and a drought on the small ones' fields (31367), not natural, says Megustam Laspelas (31368: 14099)."
+    },
+    {
+      "npc": 4452,
+      "map": 0,
+      "opening": 31366,
+      "lines": [
+        {
+          "message": 31366,
+          "choices": [
+            { "reply": 37885, "quest": 1967, "afterObjective": 14097, "beforeObjective": 14098 },
+            { "reply": 37886 }
+          ]
+        }
+      ],
+      "why": "The knave of spades wreaking havoc on the market square [7,-18], by «Tarot, t'es très fort»: stopped by force (npc_fights.json), its card the drop."
     }
   ]
 }
