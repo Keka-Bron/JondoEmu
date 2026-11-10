@@ -677,7 +677,11 @@ namespace Jondo.Unity.Server
                     action.SkillId != teleport.SkillId ||
                     !Managers.TeleportManager.TryGetCellTrigger(
                         teleport.SourceMapId, teleport.SourceCellId, out var cellRoute) ||
-                    !ReferenceEquals(teleport, cellRoute))
+                    // Two elements of one picture on one cell may both lead the same way -- the book
+                    // under the tent of [-2,-18], drawn in two parts --: the cell keeps one of them.
+                    !(ReferenceEquals(teleport, cellRoute) ||
+                      (cellRoute.DestinationMapId == teleport.DestinationMapId &&
+                       cellRoute.DestinationCellId == teleport.DestinationCellId)))
                 {
                     throw new InvalidOperationException(
                         $"[RegressionGuard FAILED] Passage {teleport.SourceMapId}/" +
