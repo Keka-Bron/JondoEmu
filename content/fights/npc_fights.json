@@ -55,6 +55,20 @@
       "monsters": [ { "monster": 5251, "grade": 0 }, { "monster": 5251, "grade": 0 } ],
       "allies": [ { "monster": 5252, "grade": 0 } ] },
     { "npc": 4421, "map": 189530630, "reply": 37499,
-      "monsters": [ { "monster": 5253, "grade": 0 }, { "monster": 5254, "grade": 0 }, { "monster": 5255, "grade": 0 } ] }
+      "monsters": [ { "monster": 5253, "grade": 0 }, { "monster": 5254, "grade": 0 }, { "monster": 5255, "grade": 0 } ] },
+    { "npc": 4408, "map": 191104004, "reply": 37327,
+      "monsters": [ { "monster": 5249, "grade": 0 }, { "monster": 5250, "grade": 0 }, { "monster": 5250, "grade": 0 } ] },
+    { "npc": 4424, "map": 101713413, "reply": 37366,
+      "monsters": [ { "monster": 5281, "grade": 0 }, { "monster": 5280, "grade": 0 }, { "monster": 5279, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 5278, "grade": 0 }, { "monster": 5276, "grade": 0 }, { "monster": 5277, "grade": 0 } ] },
+    { "npc": 4422, "map": 101713413, "reply": 37356,
+      "monsters": [ { "monster": 5281, "grade": 0 }, { "monster": 5280, "grade": 0 }, { "monster": 5279, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 5278, "grade": 0 }, { "monster": 5276, "grade": 0 }, { "monster": 5277, "grade": 0 } ] },
+    { "npc": 4423, "map": 101713413, "reply": 37361,
+      "monsters": [ { "monster": 5281, "grade": 0 }, { "monster": 5280, "grade": 0 }, { "monster": 5279, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 5278, "grade": 0 }, { "monster": 5276, "grade": 0 }, { "monster": 5277, "grade": 0 } ] }
   ]
 }

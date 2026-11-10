@@ -218,6 +218,13 @@ namespace Jondo.Unity.World.Content
         public int Completes { get; init; }
 
         /// <summary>
+        /// An NPC who comes into the map once <see cref="Completes"/> is done, or zero: Al Etsop
+        /// breaks off at «¿Qué pasa, Abel?» and Abel Hoz is there («Ça tombe à l'eau»). His own
+        /// placement holds the criterion that keeps him there afterwards.
+        /// </summary>
+        public int ShowsNpc { get; init; }
+
+        /// <summary>
         /// An item the NPC hands over with this reply, or zero; when the reply also does an
         /// objective, only once it is done: Kotorra's jam for the five nettles.
         /// </summary>
@@ -786,6 +793,7 @@ namespace Jondo.Unity.World.Content
                             GivesMutation = (int)Number(choice, "mutation"),
                             ThenNpc = (int)Number(choice, "thenNpc"),
                             Completes = (int)Number(choice, "completes"),
+                            ShowsNpc = (int)Number(choice, "showsNpc"),
                             Gives = (int)Number(choice, "gives"),
                             MinLevel = (int)Number(choice, "minLevel"),
                             BelowLevel = (int)Number(choice, "belowLevel"),
@@ -951,6 +959,7 @@ namespace Jondo.Unity.World.Content
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);
+                            if (choice.ShowsNpc != 0) writer.WriteNumber("showsNpc", choice.ShowsNpc);
                             if (choice.Gives != 0) writer.WriteNumber("gives", choice.Gives);
                             if (choice.MinLevel != 0) writer.WriteNumber("minLevel", choice.MinLevel);
                             if (choice.BelowLevel != 0) writer.WriteNumber("belowLevel", choice.BelowLevel);

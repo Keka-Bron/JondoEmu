@@ -192,29 +192,6 @@
    "why": "«Entrer dans le repaire du maître des Srams». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
   },
   {
-   "objective": 13953,
-   "quest": 1975,
-   "kind": "talk",
-   "npc": 4402,
-   "map": 188744194,
-   "why": "Busca el origen de los problemas. It is Didier Jean, at the pond: the guide puts him as the second step and objective 13955 already places him on map 188744194."
-  },
-  {
-   "objective": 13954,
-   "quest": 1975,
-   "kind": "talk",
-   "npc": 4405,
-   "map": 188744194,
-   "why": "Charla con los mercenarios. The Mercenaire agace is NPC 4405, and his only three replies belong to this quest."
-  },
-  {
-   "objective": 13959,
-   "quest": 1975,
-   "kind": "talk",
-   "npc": 4407,
-   "why": "Busca a Camilo Demolinos. It is NPC 4407, Camille Demouleur, whom objective 13961 names next. No map because the catalogue gives him none."
-  },
-  {
    "objective": 13960,
    "quest": 1975,
    "kind": "beat",
@@ -549,6 +526,31 @@
    "map": 189530630,
    "afterObjectives": [13947],
    "why": "«Vence a los pandawas en el bosque de Astrub»: the three Recrue Mercenaire (5253-5255) of the cart's trap; Dofus pour les noobs: «Un combat se lance contre trois Recrue Mercenaire»."
+  },
+  {
+   "objective": 13969,
+   "quest": 1976,
+   "kind": "enter",
+   "map": 101713413,
+   "afterObjectives": [13968],
+   "why": "«Busca a los turistas»: they are on this underground map, the one objective 13971 (Luci) names; found on reaching it («Entrez à votre tour les souterrains», Dofus pour les noobs)."
+  },
+  {
+   "objective": 13970,
+   "quest": 1976,
+   "kind": "beat",
+   "monster": 5281,
+   "map": 101713413,
+   "afterObjectives": [13971],
+   "why": "«Defiende a los turistas»: the famished Ramán, Milirrata and Miserata (5281, 5280, 5279; Dofus pour les noobs names their spells: Roblochon ancestral and Trou d'Emmental, Lancer de Lance, Coup de dents and Mordillage), the Ramán leading."
+  },
+  {
+   "objective": 13972,
+   "quest": 1976,
+   "kind": "enter",
+   "map": 188743685,
+   "afterObjectives": [13970],
+   "why": "«Escolta a los turistas hacia el exterior»: out of the underground at [1,-17], the map objective 13973 gives Luci («Sortez donc des souterrains en allant en [1,-17] puis reparlez à Joséphine»)."
   }
  ]
 }

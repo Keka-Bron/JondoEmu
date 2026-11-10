@@ -809,14 +809,6 @@
       "why": "Fallanster in the council chamber upstairs of the Council Tower, the map his objectives name (192414726). No capture places him: INFERRED, a walkable cell by the middle of the chamber, beside the one Rathrosk takes later (370)."
     },
     {
-      "map": 192415748,
-      "npc": 4420,
-      "cell": 384,
-      "orientation": 3,
-      "criterion": "Qo=13945",
-      "why": "The mercenary recruit, who comes into the library once Aisling has heard of Rathrosk (13945). The cell is the derived layer's."
-    },
-    {
       "map": 101717512,
       "npc": 4415,
       "cell": 288,
@@ -871,6 +863,204 @@
       "orientation": 1,
       "criterion": "Qa=1962&Qo!13948",
       "why": "The false recruit at the meeting point of «Balade en forêt» ([-1,-23]), there only until the ambush is beaten (13948). The cell is the derived layer's."
+    },
+    {
+      "map": 188744194,
+      "npc": 4402,
+      "cell": 357,
+      "remove": true
+    },
+    {
+      "map": 188744194,
+      "npc": 4402,
+      "cell": 328,
+      "orientation": 1,
+      "criterion": "Qa=1975",
+      "why": "Dani Tanor, in front of the squatters' tent at the pond, there while «Ça tombe à l'eau» lasts. No capture places the three: INFERRED, on the shore by their tent and cart."
+    },
+    {
+      "map": 188744194,
+      "npc": 4403,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1975",
+      "why": "Jeisi Kotsapilos, by the tent: INFERRED, as Dani Tanor."
+    },
+    {
+      "map": 188744194,
+      "npc": 4404,
+      "cell": 288,
+      "orientation": 7,
+      "criterion": "Qa=1975",
+      "why": "Jouy Glaston, at the water's edge where he wants to bathe: INFERRED, as Dani Tanor."
+    },
+    {
+      "map": 188744194,
+      "npc": 4405,
+      "cell": 358,
+      "orientation": 5,
+      "criterion": "Qa=1975",
+      "why": "The angry mercenary, facing the squatters: INFERRED."
+    },
+    {
+      "map": 188744194,
+      "npc": 4406,
+      "cell": 345,
+      "orientation": 5,
+      "criterion": "Qa=1975",
+      "why": "The angry mercenary woman, facing the squatters: INFERRED."
+    },
+    {
+      "map": 191104004,
+      "npc": 4407,
+      "cell": 233,
+      "remove": true
+    },
+    {
+      "map": 191104004,
+      "npc": 4407,
+      "cell": 397,
+      "orientation": 1,
+      "criterion": "Qa=1975",
+      "why": "Camilo Demolinos at the market [4,-17]: the derived cell 233 is inside the workshop's machinery; on the open paving in front of it instead. INFERRED."
+    },
+    {
+      "map": 191104004,
+      "npc": 4408,
+      "cell": 383,
+      "orientation": 3,
+      "criterion": "Qa=1975&Qo!13960",
+      "why": "The Cra rascal pressing Camilo Demolinos, until they are beaten (13960). INFERRED."
+    },
+    {
+      "map": 191104004,
+      "npc": 4409,
+      "cell": 411,
+      "orientation": 5,
+      "criterion": "Qa=1975&Qo!13960",
+      "why": "The Iop rascal, on Camilo's other side, until they are beaten (13960). INFERRED."
+    },
+    {
+      "map": 192415750,
+      "npc": 4410,
+      "cell": 370,
+      "remove": true
+    },
+    {
+      "map": 192415750,
+      "npc": 4410,
+      "cell": 344,
+      "orientation": 7,
+      "criterion": "Qa=1975&Qo=13962",
+      "why": "Abel Hoz, who comes into the bank while Al Etsop talks of the duke (13962), in front of the counter. INFERRED."
+    },
+    {
+      "map": 192415748,
+      "npc": 4411,
+      "cell": 357,
+      "remove": true
+    },
+    {
+      "map": 192415748,
+      "npc": 4411,
+      "cell": 402,
+      "orientation": 5,
+      "criterion": "Qa=1975&Qo=13964",
+      "why": "Nosbro Mah, the stranger Aisling has just spoken to (13964). INFERRED, clear of the tables."
+    },
+    {
+      "map": 192415748,
+      "npc": 4412,
+      "cell": 385,
+      "remove": true
+    },
+    {
+      "map": 192415748,
+      "npc": 4412,
+      "cell": 397,
+      "orientation": 1,
+      "criterion": "Qo=13964&Qa!1976&Qf!1976",
+      "why": "Hupe Esse, who delivered the books, from Aisling's complaint on (13964) until «Six pieds sous terre» is taken. INFERRED."
+    },
+    {
+      "map": 192415748,
+      "npc": 4420,
+      "cell": 384,
+      "remove": true
+    },
+    {
+      "map": 192415748,
+      "npc": 4420,
+      "cell": 345,
+      "orientation": 3,
+      "criterion": "Qo=13945&Qa!1962&Qf!1962",
+      "why": "The mercenary recruit who takes the character to the meeting point of «Balade en forêt» (4420), sent by Aisling at the end of «Ça sent le gaz» (13945), until that quest is taken. The cell is clear of Aisling's (the derived 384 stood next to her). INFERRED."
+    },
+    {
+      "map": 191105026,
+      "npc": 4464,
+      "cell": 260,
+      "orientation": 1,
+      "criterion": "Qa=1976",
+      "why": "The experienced adventurer idling by Astrub's zaap ([5,-18]), there while «Six pieds sous terre» lasts, her only conversation. INFERRED: below the zaap's arch."
+    },
+    {
+      "map": 101713413,
+      "npc": 4424,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=1976&Qo!13972",
+      "why": "Luci, lost with the two others in the underground until the character takes them up (13972). INFERRED, in the middle of the cave."
+    },
+    {
+      "map": 101713413,
+      "npc": 4422,
+      "cell": 290,
+      "orientation": 3,
+      "criterion": "Qa=1976&Qo!13972",
+      "why": "Bom, by Luci. INFERRED."
+    },
+    {
+      "map": 101713413,
+      "npc": 4423,
+      "cell": 358,
+      "orientation": 7,
+      "criterion": "Qa=1976&Qo!13972",
+      "why": "Pepi, by Luci. INFERRED."
+    },
+    {
+      "map": 188743685,
+      "npc": 4424,
+      "cell": 397,
+      "orientation": 1,
+      "criterion": "Qa=1976&Qo=13972",
+      "why": "Luci at the surface, once taken up (13972), until «Six pieds sous terre» is over. INFERRED, on the square below the mine."
+    },
+    {
+      "map": 188743685,
+      "npc": 4324,
+      "cell": 272,
+      "remove": true
+    },
+    {
+      "map": 188743685,
+      "npc": 4324,
+      "cell": 357,
+      "orientation": 1,
+      "why": "Gasdora, head of the enutrofs of Astrub, by the mine's mouth. The derived cells put her, Clint Pot (244) and Dan Gevo (258) in one line, each touching the next. INFERRED."
+    },
+    {
+      "map": 188743685,
+      "npc": 1443,
+      "cell": 258,
+      "remove": true
+    },
+    {
+      "map": 188743685,
+      "npc": 1443,
+      "cell": 341,
+      "orientation": 1,
+      "why": "Dan Gevo, off Clint Pot's side (see Gasdora). INFERRED."
     }
   ]
 }

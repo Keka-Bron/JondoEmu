@@ -959,6 +959,12 @@ namespace Jondo.Unity.World.Fights
         public int WonByEffect { get; set; } = -1;
 
         /// <summary>
+        /// The monsters fighting on the players' side must all live: one of them falling loses the
+        /// fight. The tourists of «Six pieds sous terre» (content/fights/npc_fights.json).
+        /// </summary>
+        public bool AlliesMustLive { get; set; }
+
+        /// <summary>
         /// How deep the triggers set off by other triggers go right now. A hit fires "D", "D"
         /// casts a spell that hits, and that hit fires "D" again: past a few levels it is a loop
         /// in the data, not a mechanic, and it stops there.

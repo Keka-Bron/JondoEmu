@@ -123,6 +123,7 @@
             { "reply": 36872, "next": 30558, "quest": 1958, "afterQuest": true, "beforeQuest": 1959 },
             { "reply": 36986, "quest": 1959, "completes": 13856, "params": [[30, 13856]], "next": 30640, "afterObjective": 13855 },
             { "reply": 37294, "next": 30884, "quest": 1958, "afterQuest": true, "beforeQuest": 1975 },
+            { "reply": 37317, "quest": 1975, "completes": 13956, "params": [[30, 13956]], "next": 30903, "afterObjective": 13955 },
             { "reply": 36987 }
           ]
         },
@@ -270,9 +271,21 @@
           "choices": [
             { "reply": 36989 }
           ]
+        },
+        {
+          "message": 30903,
+          "choices": [
+            { "reply": 37316, "next": 30904 }
+          ]
+        },
+        {
+          "message": 30904,
+          "choices": [
+            { "reply": 37315 }
+          ]
         }
       ],
-      "why": "Councillor Archi, from her own lines and replies, by Dofus pour les noobs («Les principes d'Archie m'aident», «On marche sur des œufs», «Conseil de classe»): «Quiero descubrir la ciudad.» (30545), the city (30546, 30547), «Estoy totalmente de acuerdo.» with her discipline (the visit of 1958, 13850; or «soy un poco anarquista» and «Así es.», 30553), the false dofus and «Aceptar sin dudar.» (30549-30551), and «Vale, voy en dirección a la taberna.» on 30552, the line 1959 names; under level 10, «Aún no me noto con fuerzas» and her advice to go back to Incarnam (53186). Back with the trafficker behind bars (36986, 13856), she has spoken of the character to his class's representative (30641) and hands «Consejo de clase» over. «¿Dónde puede uno descansar tranquilo?» is «Esto hace aguas» (30884, the line 1975 names)."
+      "why": "Councillor Archi, from her own lines and replies, by Dofus pour les noobs («Les principes d'Archie m'aident», «On marche sur des œufs», «Conseil de classe»): «Quiero descubrir la ciudad.» (30545), the city (30546, 30547), «Estoy totalmente de acuerdo.» with her discipline (the visit of 1958, 13850; or «soy un poco anarquista» and «Así es.», 30553), the false dofus and «Aceptar sin dudar.» (30549-30551), and «Vale, voy en dirección a la taberna.» on 30552, the line 1959 names; under level 10, «Aún no me noto con fuerzas» and her advice to go back to Incarnam (53186). Back with the trafficker behind bars (36986, 13856), she has spoken of the character to his class's representative (30641) and hands «Consejo de clase» over. «¿Dónde puede uno descansar tranquilo?» is «Esto hace aguas» (30884, the line 1975 names). «Ça tombe à l'eau»: «Exponer el problema de la privatización del lago.» (13956); she knows no notary Fer Liz and the pond is public (30903); the squatters are to come and see her (30904)."
     },
     {
       "npc": 1088,
@@ -369,28 +382,50 @@
         {
           "message": 12877,
           "choices": [
-            {
-              "reply": 27365,
-              "next": 31386
-            },
-            {
-              "reply": 26687
-            }
+            { "reply": 37379, "quest": 1976, "completes": 13974, "params": [[30, 13974]], "next": 30947, "afterObjective": 13973 },
+            { "reply": 37908, "next": 31384, "quest": 1976, "afterQuest": true, "beforeQuest": 1977 },
+            { "reply": 26687 }
+          ]
+        },
+        {
+          "message": 30947,
+          "choices": [
+            { "reply": 37378, "next": 30948 }
+          ]
+        },
+        {
+          "message": 30948,
+          "choices": [
+            { "reply": 37377, "next": 30949 }
+          ]
+        },
+        {
+          "message": 30949,
+          "choices": [
+            { "reply": 37376, "next": 31384 }
+          ]
+        },
+        {
+          "message": 31384,
+          "choices": [
+            { "reply": 37907, "next": 31385 }
+          ]
+        },
+        {
+          "message": 31385,
+          "choices": [
+            { "reply": 37907, "next": 31386 }
           ]
         },
         {
           "message": 31386,
           "choices": [
-            {
-              "reply": 37906,
-              "startsQuest": 1977
-            },
-            {
-              "reply": 26687
-            }
+            { "reply": 37906, "startsQuest": 1977, "params": [[34, 1977]], "gives": 19728 },
+            { "reply": 37910 }
           ]
         }
-      ]
+      ],
+      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again."
     },
     {
       "npc": 4310,
@@ -401,10 +436,10 @@
           "message": 30925,
           "choices": [
             { "reply": 37492, "quest": 1960, "completes": 13945, "params": [[30, 13945]], "next": 31053, "afterObjective": 13944 },
+            { "reply": 37342, "next": 30926, "quest": 1975, "afterObjective": 13963, "beforeObjective": 13964, "params": [[30, 13964]], "completes": 13964, "showsNpc": 4411 },
             { "reply": 37740, "next": 31246 },
             { "reply": 37601, "next": 31241 },
-            { "reply": 37753, "next": 31252 },
-            { "reply": 37342, "quest": 1975 }
+            { "reply": 37753, "next": 31252 }
           ]
         },
         {
@@ -442,9 +477,15 @@
           "choices": [
             { "reply": 37489, "thenNpc": 4420 }
           ]
+        },
+        {
+          "message": 30926,
+          "choices": [
+            { "reply": 37341, "thenNpc": 4411 }
+          ]
         }
       ],
-      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks)."
+      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it."
     },
     {
       "npc": 4311,
@@ -800,6 +841,7 @@
         {
           "message": 30861,
           "choices": [
+            { "reply": 37352, "quest": 1976, "completes": 13968, "params": [[30, 13968]], "next": 30936, "afterObjective": 13967 },
             { "reply": 37268, "next": 30862, "quest": 2009, "beforeObjective": 13882, "completes": 13882, "params": [[30, 13882]] },
             { "reply": 37523, "next": 31076 }
           ]
@@ -822,9 +864,15 @@
           "choices": [
             { "reply": 37269, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 30936,
+          "choices": [
+            { "reply": 37543 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37268) is this class's objective (13882, effect 30), and leads to his greeting, 30862, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1965) is done, he greets the character with Archi's summons (30863) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37268) is this class's objective (13882, effect 30), and leads to his greeting, 30862, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1965) is done, he greets the character with Archi's summons (30863) and «Ir a la Torre del Consejo» hands it over. «Six pieds sous terre»: «¿Ha pasado por aquí un grupo de turistas en compañía de un guía?» (13968): they went down into the underground and only the guide came out (30936)."
     },
     {
       "npc": 4326,
@@ -1616,27 +1664,22 @@
       "map": 0,
       "opening": 30933,
       "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 30933,
           "choices": [
-            {
-              "reply": 37349,
-              "next": 30935
-            }
+            { "reply": 37349, "quest": 1975, "completes": 13966, "params": [[30, 13966]], "next": 30935, "afterObjective": 13965 },
+            { "reply": 37351, "next": 30935, "quest": 1975, "afterQuest": true, "beforeQuest": 1976 }
           ]
         },
         {
           "message": 30935,
           "choices": [
-            {
-              "reply": 37348,
-              "startsQuest": 1976
-            }
+            { "reply": 37348, "startsQuest": 1976, "params": [[34, 1976]] }
           ]
         }
-      ]
+      ],
+      "why": "Hupe Esse (Kaulysse Himo), who delivered the books, by «Ça tombe à l'eau»: where the books came from (13966, the last objective), the goods received at the zaap and the money to the dealer there (30935, the line «Six pieds sous terre» names), and «me voy al zaap de Astrub» hands that quest over."
     },
     {
       "npc": 4420,
@@ -2813,100 +2856,148 @@
       "npc": 4402,
       "map": 0,
       "opening": 30885,
-      "_byHand": true,
-      "_source": "ca-tombe-a-l-eau.html, steps 2 to 6",
+      "openings": [
+        { "quest": 1975, "objective": 13954, "pending": 13955, "message": 57258 }
+      ],
       "lines": [
         {
           "message": 30885,
           "choices": [
-            {
-              "reply": 37298,
-              "quest": 1975
-            },
-            {
-              "reply": 37295,
-              "quest": 1975
-            },
-            {
-              "reply": 37320,
-              "quest": 1975
-            },
-            {
-              "reply": 37319,
-              "quest": 1975
-            },
-            {
-              "reply": 37314
-            }
+            { "reply": 37298, "quest": 1975, "completes": 13953, "params": [[30, 13953]], "next": 30886, "afterObjective": 13952, "beforeObjective": 13954 },
+            { "reply": 37320, "quest": 1975, "completes": 13957, "params": [[30, 13957]], "next": 30905, "afterObjective": 13956 }
+          ]
+        },
+        {
+          "message": 30886,
+          "choices": [
+            { "reply": 37297, "next": 30887 }
+          ]
+        },
+        {
+          "message": 30887,
+          "choices": [
+            { "reply": 37295, "thenNpc": 4405 },
+            { "reply": 37296 }
+          ]
+        },
+        {
+          "message": 57258,
+          "choices": [
+            { "reply": 77920, "quest": 1975, "completes": 13955, "params": [[30, 13955]], "next": 57259 }
+          ]
+        },
+        {
+          "message": 57259,
+          "choices": [
+            { "reply": 77919, "next": 57260 }
+          ]
+        },
+        {
+          "message": 57260,
+          "choices": [
+            { "reply": 77918, "next": 57261 }
+          ]
+        },
+        {
+          "message": 57261,
+          "choices": [
+            { "reply": 77917 }
+          ]
+        },
+        {
+          "message": 30905,
+          "choices": [
+            { "reply": 37319, "next": 30906 }
+          ]
+        },
+        {
+          "message": 30906,
+          "choices": [
+            { "reply": 37318 }
           ]
         }
-      ]
+      ],
+      "why": "Dani Tanor (Didier Jean in French), one of the three claiming Astrub's pond, by «Ça tombe à l'eau» of Dofus pour les noobs: the trouble with the mercenaries (13953, 30886, 30887) and, sent to talk to them, «Charlar con los mercenarios»; turned to after the mercenary's threat (77921), his deeds, the plan and the notary Fer Liz (57258-57261, 13955: the client's later lines for that talk, which replace 30900-30902); and, back from Archi, «Explicarle el problema y sugerirle que vaya a hablar con la consejera Archi» (13957), and the notary's description (30906)."
     },
     {
       "npc": 4405,
       "map": 0,
       "opening": 30894,
-      "_byHand": true,
-      "_source": "ca-tombe-a-l-eau.html, step 3",
       "lines": [
         {
           "message": 30894,
           "choices": [
-            {
-              "reply": 37308,
-              "quest": 1975
-            },
-            {
-              "reply": 37307,
-              "quest": 1975
-            },
-            {
-              "reply": 77921
-            }
+            { "reply": 37308, "next": 30895, "quest": 1975, "beforeObjective": 13955 }
+          ]
+        },
+        {
+          "message": 30895,
+          "choices": [
+            { "reply": 37307, "quest": 1975, "completes": 13954, "params": [[30, 13954]], "next": 30896 }
+          ]
+        },
+        {
+          "message": 30896,
+          "choices": [
+            { "reply": 77921, "thenNpc": 4402 }
           ]
         }
-      ]
+      ],
+      "why": "The angry mercenary at the pond («Ça tombe à l'eau», «Sur la même map, parlez au Mercenaire agacé»): the three individuals (30895), «Voy a tratar de solucionar el problema con calma.» (13954), and if that fails they will be put out by force (30896); «Volverte hacia Dani Tanor» (the client's later reply for it)."
     },
     {
       "npc": 4407,
       "map": 0,
       "opening": 30910,
-      "_byHand": true,
-      "_source": "ca-tombe-a-l-eau.html, steps 8 to 10",
+      "openings": [
+        { "quest": 1975, "objective": 13960, "message": 30915 }
+      ],
       "lines": [
         {
           "message": 30910,
           "choices": [
-            {
-              "reply": 37325,
-              "quest": 1975
-            },
-            {
-              "reply": 37326,
-              "quest": 1975
-            },
-            {
-              "reply": 37335,
-              "quest": 1975
-            },
-            {
-              "reply": 37334
-            },
-            {
-              "reply": 37333
-            },
-            {
-              "reply": 37332
-            },
-            {
-              "reply": 37331
-            },
-            {
-              "reply": 37330
-            }
+            { "reply": 37326, "next": 30911, "quest": 1975, "afterObjective": 13958 }
+          ]
+        },
+        {
+          "message": 30911,
+          "choices": [
+            { "reply": 37325, "quest": 1975, "completes": 13959, "params": [[30, 13959]] }
+          ]
+        },
+        {
+          "message": 30915,
+          "choices": [
+            { "reply": 37334, "quest": 1975, "completes": 13961, "params": [[30, 13961]], "next": 30916 },
+            { "reply": 37335, "quest": 1975, "completes": 13961, "params": [[30, 13961]], "next": 30918 }
+          ]
+        },
+        {
+          "message": 30916,
+          "choices": [
+            { "reply": 37333, "next": 30917 }
+          ]
+        },
+        {
+          "message": 30917,
+          "choices": [
+            { "reply": 37332, "next": 30918 }
+          ]
+        },
+        {
+          "message": 30918,
+          "choices": [
+            { "reply": 37331, "next": 30919 }
+          ]
+        },
+        {
+          "message": 30919,
+          "choices": [
+            { "reply": 37330 }
           ]
         }
-      ]
+      ],
+      "why": "Camilo Demolinos (Camille Démouleur), the false duke's servant, at the market [4,-17], by «Ça tombe à l'eau»: questioned, he has to wait his turn with the rascals bothering him (30911, «Encargarte de los canallas», 13959); after the fight his thanks (30915), how he came into the duke's service (30916, 30917), his work for him (30918) and the bankers (30919, 13961)."
     },
     {
       "npc": 4638,
@@ -6322,6 +6413,7 @@
         {
           "message": 30384,
           "choices": [
+            { "reply": 37324, "quest": 1975, "completes": 13958, "params": [[30, 13958]], "next": 30907, "afterObjective": 13957 },
             { "reply": 36993, "next": 30645, "quest": 1959, "beforeObjective": 13852 },
             { "reply": 36873, "next": 30385 }
           ]
@@ -6351,9 +6443,28 @@
           "choices": [
             { "reply": 36633 }
           ]
+        },
+        {
+          "message": 30907,
+          "choices": [
+            { "reply": 37323, "next": 30908 },
+            { "reply": 37322, "next": 30909 }
+          ]
+        },
+        {
+          "message": 30908,
+          "choices": [
+            { "reply": 37322, "next": 30909 }
+          ]
+        },
+        {
+          "message": 30909,
+          "choices": [
+            { "reply": 37321 }
+          ]
         }
       ],
-      "why": "Tek Abir, the tavern keeper of Astrub, from his own lines and replies. «On marche sur des œufs» per Dofus pour les noobs: «Commander une bière» for 40 kamas (30385, «Son 40 kamas y aquí no se fía.»), the Cerveza de Astrub; asked about the dofus, the rumour of pandawas (30645, 30646)."
+      "why": "Tek Abir, the tavern keeper of Astrub, from his own lines and replies. «On marche sur des œufs» per Dofus pour les noobs: «Commander une bière» for 40 kamas (30385, «Son 40 kamas y aquí no se fía.»), the Cerveza de Astrub; asked about the dofus, the rumour of pandawas (30645, 30646). «Ça tombe à l'eau»: the notary's description without naming him (13958): the Duke of Sidimote, gone, but his servant Camilo Demolinos is still around (30907-30909), at the markets."
     },
     {
       "npc": 4322,
@@ -7006,6 +7117,338 @@
         }
       ],
       "why": "The mercenary recruit at the meeting point in Astrub's forest, from her own lines and replies, by «Balade en forêt» of Dofus pour les noobs: she shows the cart (31061); looking inside it, or seeing the silhouettes in the bushes and stepping back, is the talk (13947), and «¡Por la gloria perdida de Pandala!» (31062) opens the fight against three recruits (npc_fights.json)."
+    },
+    {
+      "npc": 4403,
+      "map": 0,
+      "opening": 30888,
+      "lines": [
+        {
+          "message": 30888,
+          "choices": [
+            { "reply": 37302, "quest": 1975, "completes": 13953, "params": [[30, 13953]], "next": 30889, "afterObjective": 13952, "beforeObjective": 13954 }
+          ]
+        },
+        {
+          "message": 30889,
+          "choices": [
+            { "reply": 37301, "next": 30890 }
+          ]
+        },
+        {
+          "message": 30890,
+          "choices": [
+            { "reply": 37299, "thenNpc": 4405 },
+            { "reply": 37300 }
+          ]
+        }
+      ],
+      "why": "Jeisi Kotsapilos, the second squatter of the pond («Ça tombe à l'eau»): a private property (30888), and the character taken for one of the mercenaries' side (30889, 30890)."
+    },
+    {
+      "npc": 4404,
+      "map": 0,
+      "opening": 30891,
+      "lines": [
+        {
+          "message": 30891,
+          "choices": [
+            { "reply": 37306, "quest": 1975, "completes": 13953, "params": [[30, 13953]], "next": 30892, "afterObjective": 13952, "beforeObjective": 13954 }
+          ]
+        },
+        {
+          "message": 30892,
+          "choices": [
+            { "reply": 37305, "next": 30893 }
+          ]
+        },
+        {
+          "message": 30893,
+          "choices": [
+            { "reply": 37303, "thenNpc": 4405 },
+            { "reply": 37304 }
+          ]
+        }
+      ],
+      "why": "Jouy Glaston, the third squatter, who wants to bathe and wash his socks in the pond («Ça tombe à l'eau»): forbidden (30892), and the character as much of a killjoy as the mercenaries (30893)."
+    },
+    {
+      "npc": 4406,
+      "map": 0,
+      "opening": 30897,
+      "lines": [
+        {
+          "message": 30897,
+          "choices": [
+            { "reply": 37310, "next": 30898, "quest": 1975, "beforeObjective": 13955 }
+          ]
+        },
+        {
+          "message": 30898,
+          "choices": [
+            { "reply": 37309, "quest": 1975, "completes": 13954, "params": [[30, 13954]], "next": 30899 }
+          ]
+        },
+        {
+          "message": 30899,
+          "choices": [
+            { "reply": 37309, "thenNpc": 4402 }
+          ]
+        }
+      ],
+      "why": "The angry mercenary woman at the pond: the fishermen pushed into it (30898), and «Voy a tratar de solucionar el problema con calma.» (13954): a waste of effort, in her view (30899). The character then turns to Dani Tanor."
+    },
+    {
+      "npc": 4408,
+      "map": 0,
+      "opening": 30912,
+      "lines": [
+        {
+          "message": 30912,
+          "choices": [
+            { "reply": 37329, "next": 30913, "quest": 1975, "afterObjective": 13959 }
+          ]
+        },
+        {
+          "message": 30913,
+          "choices": [
+            { "reply": 37327, "params": [905] },
+            { "reply": 37328 }
+          ]
+        }
+      ],
+      "why": "The Cra rascal bothering Camilo Demolinos («Parlez donc au Gredin Crâ pour «S'interposer»»): «Interponerte» opens the fight against him and two Iop rascals (npc_fights.json); «Comprobar el equipo antes de intervenir» leaves it for later."
+    },
+    {
+      "npc": 4409,
+      "map": 0,
+      "opening": 30914,
+      "lines": [
+        {
+          "message": 30914,
+          "choices": []
+        }
+      ],
+      "why": "The Iop rascal: his only line, glad of the resistance (30914). The Cra one is who is talked to."
+    },
+    {
+      "npc": 522,
+      "map": 0,
+      "opening": 318,
+      "lines": [
+        {
+          "message": 318,
+          "names": true,
+          "choices": [
+            { "reply": 37338, "next": 30920, "quest": 1975, "afterObjective": 13961, "beforeObjective": 13962 },
+            { "reply": 329, "next": 410 }
+          ]
+        },
+        {
+          "message": 410,
+          "choices": []
+        },
+        {
+          "message": 30920,
+          "choices": [
+            { "reply": 37337, "next": 30921 }
+          ]
+        },
+        {
+          "message": 30921,
+          "choices": [
+            { "reply": 37336, "next": 30922, "params": [[30, 13962]], "quest": 1975, "afterObjective": 13961, "completes": 13962, "showsNpc": 4410 }
+          ]
+        },
+        {
+          "message": 30922,
+          "choices": [
+            { "reply": 64350, "thenNpc": 4410 }
+          ]
+        }
+      ],
+      "why": "Al Etsop, banker of Astrub, from his own lines and replies: his greeting and the bank (BankHandler adds «Quiero consultar mi cofre.»), how an account works (410); and by «Ça tombe à l'eau» («Poser des questions sur le Duc de Sidimote»), a theft (30920), the Sidimote mines (30921) and the real duke long dead, when Abel comes in (30922, 13962: «showsNpc» brings him in); «Seguir escuchando.» turns to him."
+    },
+    {
+      "npc": 4410,
+      "map": 0,
+      "opening": 30923,
+      "lines": [
+        {
+          "message": 30923,
+          "choices": [
+            { "reply": 37340, "quest": 1975, "completes": 13963, "params": [[30, 13963]], "next": 30924, "afterObjective": 13962 }
+          ]
+        },
+        {
+          "message": 30924,
+          "choices": [
+            { "reply": 37339 }
+          ]
+        }
+      ],
+      "why": "Abel Hoz (Delcour Vitt), who comes into the bank as the banker talks: the librarian swindled by an old antique dealer (30924, 13963), and «Dejarles hablar e ir a la biblioteca»."
+    },
+    {
+      "npc": 4411,
+      "map": 0,
+      "opening": 30927,
+      "lines": [
+        {
+          "message": 30927,
+          "choices": [
+            { "reply": 37347, "quest": 1975, "completes": 13965, "params": [[30, 13965]], "next": 30928, "afterObjective": 13964 }
+          ]
+        },
+        {
+          "message": 30928,
+          "choices": [
+            { "reply": 37346, "next": 30929 }
+          ]
+        },
+        {
+          "message": 30929,
+          "choices": [
+            { "reply": 37345, "next": 30930 }
+          ]
+        },
+        {
+          "message": 30930,
+          "choices": [
+            { "reply": 37344, "next": 30931 }
+          ]
+        },
+        {
+          "message": 30931,
+          "choices": [
+            { "reply": 37343, "next": 30932 }
+          ]
+        },
+        {
+          "message": 30932,
+          "choices": [
+            { "reply": 37345, "thenNpc": 4412 }
+          ]
+        }
+      ],
+      "why": "Nosbro Mah (Rodrigue Olpa), sent by the intendant of Amakna, by «Ça tombe à l'eau»: the ambassador of the golden rocks he is after (30928-30930), his description (30931), the same man as the notary and the duke (30932, 13965). Hupe Esse, who delivered the books, breaks in after it («Seguir escuchando.»)."
+    },
+    {
+      "npc": 4464,
+      "map": 0,
+      "opening": 31479,
+      "lines": [
+        {
+          "message": 31479,
+          "choices": [
+            { "reply": 38030, "quest": 1976, "completes": 13967, "params": [[30, 13967]], "next": 31480 }
+          ]
+        },
+        {
+          "message": 31480,
+          "choices": [
+            { "reply": 38029 }
+          ]
+        }
+      ],
+      "why": "The experienced adventurer idling at Astrub's zaap, by «Six pieds sous terre» of Dofus pour les noobs («interroger l'Aventurière expérimentée»): asked about Hupe Esse's delivery (13967), she saw the antique dealer go by with a group of enutrofs, and Gasdora is who to ask (31480)."
+    },
+    {
+      "npc": 4424,
+      "map": 101713413,
+      "opening": 30941,
+      "lines": [
+        {
+          "message": 30941,
+          "choices": [
+            { "reply": 37365, "next": 30942, "quest": 1976, "afterObjective": 13969, "beforeObjective": 13970, "completes": 13971, "params": [[30, 13971]] },
+            { "reply": 37370, "next": 30943, "quest": 1976, "afterObjective": 13970, "beforeObjective": 13972 },
+            { "reply": 37371, "quest": 1976, "afterObjective": 13970, "beforeObjective": 13972 }
+          ]
+        },
+        {
+          "message": 30942,
+          "choices": [
+            { "reply": 37366, "params": [905] },
+            { "reply": 37367 }
+          ]
+        },
+        {
+          "message": 30943,
+          "choices": [
+            { "reply": 37369, "next": 30944 }
+          ]
+        },
+        {
+          "message": 30944,
+          "choices": [
+            { "reply": 37368 }
+          ]
+        }
+      ],
+      "why": "Luci (Joséphine in French), one of the three enutrof tourists left in the underground by their guide, by «Six pieds sous terre»: the guide's game of hide-and-seek and the cheese that brought the rats (30942, 13971), «Defender a las turistas de las ratas» (the fight, with the three on the character's side, lost if one of them falls: npc_fights.json), then «¿Estáis bien?» and the promise to take them up (30943, 30944). The way up is walked: the step closes on reaching [1,-17] (13972)."
+    },
+    {
+      "npc": 4424,
+      "map": 188743685,
+      "opening": 30945,
+      "lines": [
+        {
+          "message": 30945,
+          "choices": [
+            { "reply": 37373, "quest": 1976, "completes": 13973, "params": [[30, 13973]], "next": 30946, "afterObjective": 13972 }
+          ]
+        },
+        {
+          "message": 30946,
+          "choices": [
+            { "reply": 37372 }
+          ]
+        }
+      ],
+      "why": "Luci at the surface ([1,-17]), «Six pieds sous terre»: the fresh air (30945), and the guide, met at Kerubim Crepin's shop (30946, 13973): «Ir a casa de Kerubim Crepin»."
+    },
+    {
+      "npc": 4422,
+      "map": 0,
+      "opening": 30937,
+      "lines": [
+        {
+          "message": 30937,
+          "choices": [
+            { "reply": 37355, "next": 30938, "quest": 1976, "afterObjective": 13969, "beforeObjective": 13970 }
+          ]
+        },
+        {
+          "message": 30938,
+          "choices": [
+            { "reply": 37356, "params": [905], "quest": 1976, "afterObjective": 13971 },
+            { "reply": 37357 }
+          ]
+        }
+      ],
+      "why": "Bom, the second tourist, in the underground: no cheese left (30937), the guide gone to hide and the rats drawn by the cheese (30938). Her «Defender a las turistas de las ratas» is the same fight as Luci's, once Luci has been talked to (13971)."
+    },
+    {
+      "npc": 4423,
+      "map": 0,
+      "opening": 30939,
+      "lines": [
+        {
+          "message": 30939,
+          "choices": [
+            { "reply": 37360, "next": 30940, "quest": 1976, "afterObjective": 13969, "beforeObjective": 13970 }
+          ]
+        },
+        {
+          "message": 30940,
+          "choices": [
+            { "reply": 37361, "params": [905], "quest": 1976, "afterObjective": 13971 },
+            { "reply": 37362 }
+          ]
+        }
+      ],
+      "why": "Pepi, the third tourist, in the underground: how hide-and-seek works (30939), and the rats (30940), the same fight as Luci's once she has been talked to (13971)."
     }
   ]
 }

@@ -1054,7 +1054,8 @@ namespace Jondo.Unity.Server.Handlers
                 var group = MobSpawnManager.ComposeOffMap(npcFight.Monsters);
                 if (group == null) return;
                 await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
-                    arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies));
+                    arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),
+                    alliesMustLive: npcFight.AlliesMustLive);
                 return;
             }
 
@@ -1310,7 +1311,11 @@ namespace Jondo.Unity.Server.Handlers
                 if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
                     completesAfterClosing = elegidaAhora.Completes;
                 else if (await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.Quest, elegidaAhora.Completes))
+                {
                     await GiveFromReplyAsync(stream, elegidaAhora);
+                    // And whoever comes in as it is said (Abel Hoz at the bank).
+                    if (elegidaAhora.ShowsNpc != 0) await ComesInAsync(stream, elegidaAhora.ShowsNpc);
+                }
             }
             else if (elegidaAhora != null && elegidaAhora.Gives != 0)
             {

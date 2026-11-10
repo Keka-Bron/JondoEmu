@@ -37,7 +37,8 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task InitiateFightFromMobCollision(NetworkStream stream, MobSpawnManager.MobGroup mobGroup, long mapId,
                                                                long mobContextId = 0, FightRules rules = null,
                                                                long arenaMapId = 0,
-                                                               IReadOnlyList<MobSpawnManager.MobMember>? allies = null)
+                                                               IReadOnlyList<MobSpawnManager.MobMember>? allies = null,
+                                                               bool alliesMustLive = false)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
@@ -128,6 +129,7 @@ namespace Jondo.Unity.Server.Handlers
             // Master Darmas, fighter -1 before the chafers in the capture.
             foreach (var ally in allies ?? Array.Empty<MobSpawnManager.MobMember>())
                 fight.AddPlayer(BuildMonsterFighter(ally, monsterSeqId--, 0));
+            fight.AlliesMustLive = alliesMustLive && allies is { Count: > 0 };
 
             // All of an ordinary group; of a dungeon room's, the first clamp(players, 4, 8).
             int players = fight.Azul.Count(f => !f.IsMonster);
@@ -9930,6 +9932,14 @@ namespace Jondo.Unity.Server.Handlers
 
             // The last of the Reina's jail monsters opens her jails.
             await Managers.GuildRaidReina.OnDeathAsync(stream, fight, muerto);
+
+            // An ally the players were there to protect has fallen: the fight is lost.
+            if (fight.AlliesMustLive && muerto is { IsMonster: true, EsInvocado: false }
+                && muerto.TeamId == FightInstance.Azules && fight.WonByEffect < 0)
+            {
+                fight.WonByEffect = FightInstance.Rojos;
+                Program.LogDebug($"[Fight] Fight #{fight.FightId}: ally {muerto.Id} fell, and it had to live; the fight is lost.");
+            }
 
             if (muerto == null) return;
             if (await SusInvocadosCaenAsync(stream, fight, muerto))

@@ -30,6 +30,9 @@ namespace Jondo.Unity.Server.Managers
             public long ArenaMapId { get; init; }
             public IReadOnlyList<(int Monster, int Grade)> Monsters { get; init; } = Array.Empty<(int, int)>();
             public IReadOnlyList<(int Monster, int Grade)> Allies { get; init; } = Array.Empty<(int, int)>();
+
+            /// <summary>Whether the fight is lost when one of the allies falls («alliesMustLive»).</summary>
+            public bool AlliesMustLive { get; init; }
         }
 
         private static List<Fight>? _fights;
@@ -74,6 +77,7 @@ namespace Jondo.Unity.Server.Managers
                                 ArenaMapId = Long(row, "arena"),
                                 Monsters = Members(row, "monsters"),
                                 Allies = Members(row, "allies"),
+                                AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
                             });
                         }
                     }
