@@ -1816,6 +1816,14 @@
       "orientation": 3,
       "criterion": "Qa=1967&Qo=14097&Qo!14098",
       "why": "The knave of spades on the market square once Agry Kultora has pointed at it (14097), until beaten (14098). INFERRED cell."
+    },
+    {
+      "map": 192413696,
+      "npc": 4490,
+      "cell": 401,
+      "orientation": 5,
+      "criterion": "Qa=1968&Qo=14253&Qo!14254",
+      "why": "The petty leprechaun showing up in the tavern by Meow Moew (14253) until beaten (14254). INFERRED cell."
     }
   ]
 }

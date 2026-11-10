@@ -1323,6 +1323,55 @@
    "afterObjectives": [14100],
    "gives": [{"item": 19712, "count": 1}],
    "why": "«Busca el origen de la sequía»: the sunflowers in the middle of [3,-29] (element 515868, cell 246), where the Sun card lies."
+  },
+  {
+   "objective": 14159,
+   "quest": 1968,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the seven unlucky deeds, done in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14249,
+   "quest": 1968,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the seven unlucky deeds, done in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14252,
+   "quest": 1968,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the seven unlucky deeds, done in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14247,
+   "quest": 1968,
+   "elements": [{"map": 192415748, "element": 516204}],
+   "anyOrder": true,
+   "why": "«Pasa bajo la escalera»: the library's tall ladder upstairs (element 516204, cell 258)."
+  },
+  {
+   "objective": 14248,
+   "quest": 1968,
+   "elements": [{"map": 192675846, "element": 516205}],
+   "anyOrder": true,
+   "why": "«Rompe un espejo»: the mirror in the left house of [5,-17] (element 516205, cell 273)."
+  },
+  {
+   "objective": 14250,
+   "quest": 1968,
+   "elements": [{"map": 192675840, "element": 516206}],
+   "anyOrder": true,
+   "why": "«Pon un sombrero sobre una cama»: the bed in the left house of [7,-19] (element 516206, cell 258)."
+  },
+  {
+   "objective": 14251,
+   "quest": 1968,
+   "elements": [{"map": 192939008, "element": 516207}],
+   "anyOrder": true,
+   "why": "«Pon el pan boca abajo sobre la mesa»: the table in the middle of the peasants' workshop [5,-21] (element 516207, cell 372)."
   }
  ]
 }

@@ -1430,21 +1430,18 @@
         {
           "message": 30671,
           "choices": [
+            { "reply": 38395, "next": 31757, "beforeQuest": 1968 },
+            { "reply": 38404, "quest": 1968, "completes": 14253, "params": [[30, 14253]], "next": 31763, "afterObjectives": [14159, 14247, 14248, 14249, 14250, 14251, 14252] },
+            { "reply": 38405, "quest": 1968, "completes": 14255, "params": [[30, 14255]], "next": 31764 },
             { "reply": 37882, "next": 31358, "quest": 1967, "beforeObjective": 14095 },
             { "reply": 37248, "next": 30845, "completes": 13885, "params": [[30, 13885]] }
-          ]
-        },
-        {
-          "message": 31762,
-          "choices": [
-            { "reply": 38396, "startsQuest": 1968 }
           ]
         },
         {
           "message": 30845,
           "names": true,
           "choices": [
-            { "reply": 38396, "startsQuest": 1968 }
+            { "reply": 38395, "next": 31757, "beforeQuest": 1968 }
           ]
         },
         {
@@ -1489,9 +1486,59 @@
           "choices": [
             { "reply": 37876, "quest": 1967, "completes": 14095, "params": [[30, 14095]], "gives": 19710 }
           ]
+        },
+        {
+          "message": 31757,
+          "choices": [
+            { "reply": 38401, "next": 31758 }
+          ]
+        },
+        {
+          "message": 31758,
+          "choices": [
+            { "reply": 38400, "next": 31759 }
+          ]
+        },
+        {
+          "message": 31759,
+          "choices": [
+            { "reply": 38399, "next": 31760 }
+          ]
+        },
+        {
+          "message": 31760,
+          "choices": [
+            { "reply": 38398, "next": 31761 }
+          ]
+        },
+        {
+          "message": 31761,
+          "choices": [
+            { "reply": 38396, "next": 31762 },
+            { "reply": 38397 }
+          ]
+        },
+        {
+          "message": 31762,
+          "choices": [
+            { "reply": 38402, "startsQuest": 1968, "params": [[34, 1968]] }
+          ]
+        },
+        {
+          "message": 31763,
+          "choices": [
+            { "reply": 38403, "showsNpc": 4490 }
+          ]
+        },
+        {
+          "message": 31764,
+          "names": true,
+          "choices": [
+            { "reply": 38406 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37248) is this class's objective (13885, effect 30), and leads to his greeting, 30845, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1968) is done, he greets the character with Archi's summons (30843) and «Ir a la Torre del Consejo» hands it over. «Tarot, t'es très fort»: Chronokwartz's problem (37882), his bad luck to blame on something (31358), games he keeps losing (31359, 31360), a card with an hourglass and an owl won in a bet (31361, 31362), the hanged man, his to give back (31363: 14095, item 19710). «Tarot, t'es très fort»: Chronokwartz's problem (37882), his bad luck to blame on something (31358), games he keeps losing (31359, 31360), a card with an hourglass and an owl won in a bet (31361, 31362), the hanged man, his to give back (31363: 14095, item 19710)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37248) is this class's objective (13885, effect 30), and leads to his greeting, 30845, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1968) is done, he greets the character with Archi's summons (30843) and «Ir a la Torre del Consejo» hands it over. «Tarot, t'es très fort»: Chronokwartz's problem (37882), his bad luck to blame on something (31358), games he keeps losing (31359, 31360), a card with an hourglass and an owl won in a bet (31361, 31362), the hanged man, his to give back (31363: 14095, item 19710). «Tarot, t'es très fort»: Chronokwartz's problem (37882), his bad luck to blame on something (31358), games he keeps losing (31359, 31360), a card with an hourglass and an owl won in a bet (31361, 31362), the hanged man, his to give back (31363: 14095, item 19710). «Au petit malheur la chance» of Dofus pour les noobs: a favour only a trusty Ecaflip can do (31757), the leprechaun he stripped at cards and his curse (31758), luck that is no blessing (31759), ill luck to gather (31760), a ladder, a black cat, a mirror (31761), «Accepter de l'aider», a ring and a list (31762, the line the step declares); unlucky enough (14253), the leprechaun shows up (31763); relieved (14255, 31764)."
     },
     {
       "npc": 4329,
@@ -9852,6 +9899,7 @@
         {
           "message": 31502,
           "choices": [
+            { "reply": 38408, "quest": 1968, "completes": 14159, "params": [[30, 14159]] },
             { "reply": 38174, "next": 31594, "beforeQuest": 1992 },
             { "reply": 38177, "quest": 1992, "completes": 14154, "params": [[30, 14154]], "next": 31596, "takesAll": [6765, 1782], "beforeObjective": 14154 },
             { "reply": 38182, "quest": 1992, "completes": 14206, "params": [[30, 14206]], "next": 31598, "afterObjective": 14205, "beforeObjective": 14206 },
@@ -9909,7 +9957,7 @@
           ]
         }
       ],
-      "why": "Soki, a sad miaumiau at [7,-20], by «Chacha Blues» of Dofus pour les noobs: stroked (31594), sad (31595), maybe hungry or thirsty: gudgeon and milk; given them (14154, both taken), still moaning (31596): a walk in town («Llevarte al miaumiau a dar una vuelta», Soki follows, 6768); back, still depressed (14206), an eye on the pink miaumiau (31598), a clumsy hunter (31599, 31600); the mouse given (14208) to win her (31601)."
+      "why": "Soki, a sad miaumiau at [7,-20], by «Chacha Blues» of Dofus pour les noobs: stroked (31594), sad (31595), maybe hungry or thirsty: gudgeon and milk; given them (14154, both taken), still moaning (31596): a walk in town («Llevarte al miaumiau a dar una vuelta», Soki follows, 6768); back, still depressed (14206), an eye on the pink miaumiau (31598), a clumsy hunter (31599, 31600); the mouse given (14208) to win her (31601). «Au petit malheur la chance»: the black cat stroked (14159)."
     },
     {
       "npc": 4468,
@@ -12023,6 +12071,75 @@
         }
       ],
       "why": "The knave of spades wreaking havoc on the market square [7,-18], by «Tarot, t'es très fort»: stopped by force (npc_fights.json), its card the drop."
+    },
+    {
+      "npc": 4425,
+      "map": 0,
+      "opening": 31071,
+      "lines": [
+        {
+          "message": 31071,
+          "choices": [
+            { "reply": 37515, "next": 31072 }
+          ]
+        },
+        {
+          "message": 31072,
+          "choices": [
+            { "reply": 38410, "quest": 1968, "completes": 14249, "params": [[30, 14249]], "next": 31766 },
+            { "reply": 37514, "next": 31073 }
+          ]
+        },
+        {
+          "message": 31766,
+          "choices": [
+            { "reply": 38409 }
+          ]
+        }
+      ],
+      "why": "«Au petit malheur la chance»: greeted (37515), a drink with him without looking him in the eye (14249), «you want to draw bad luck?» (31766)."
+    },
+    {
+      "npc": 4353,
+      "map": 0,
+      "opening": 31528,
+      "lines": [
+        {
+          "message": 31528,
+          "choices": [
+            { "reply": 38411, "next": 31767, "quest": 1968, "beforeObjective": 14252 },
+            { "reply": 38414, "quest": 1968, "completes": 14252, "params": [[30, 14252]], "next": 31768, "takes": 19775 }
+          ]
+        },
+        {
+          "message": 31767,
+          "choices": [
+            { "reply": 38412, "buyItem": 19775, "buyPrice": 50 },
+            { "reply": 38413 }
+          ]
+        },
+        {
+          "message": 31768,
+          "choices": [
+            { "reply": 38415 }
+          ]
+        }
+      ],
+      "why": "«Au petit malheur la chance»: a bunch of chrysanthemums, fifty kamas (31767, item 19775), given back to her, flowers for the dead (31768: 14252)."
+    },
+    {
+      "npc": 4490,
+      "map": 0,
+      "opening": 31769,
+      "lines": [
+        {
+          "message": 31769,
+          "choices": [
+            { "reply": 38416, "quest": 1968, "afterObjective": 14253, "beforeObjective": 14254 }
+          ]
+        }
+      ],
+      "why": "The petty leprechaun come to stop his curse being undone, by «Au petit malheur la chance»: attacked (npc_fights.json)."
     }
   ]
 }
