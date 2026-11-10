@@ -1671,6 +1671,84 @@
       "orientation": 3,
       "criterion": "Qa=1970&Qo=14042&Qo!14049",
       "why": "The experienced Iops Rok Elreuss sends, top left of the ground, as Dofus pour les noobs places them."
+    },
+    {
+      "map": 188744199,
+      "npc": 4476,
+      "cell": 287,
+      "orientation": 3,
+      "criterion": "Qf!1964&Qo!14162",
+      "why": "Abrazolargo's digging boar beside him at [2,-15] until taken into the mine. INFERRED cell."
+    },
+    {
+      "map": 188744199,
+      "npc": 4477,
+      "cell": 243,
+      "orientation": 3,
+      "criterion": "Qf!1964&Qo!14226",
+      "why": "The troglodyte gobball eating by Abrazolargo until it heads for the mine. INFERRED cell."
+    },
+    {
+      "map": 188744199,
+      "npc": 4478,
+      "cell": 271,
+      "orientation": 3,
+      "criterion": "Qa=1964&Qo=14229&Qo!14230",
+      "why": "Lasy Lap's wauwau, lent once the gobball has failed (14229). INFERRED cell."
+    },
+    {
+      "map": 192416772,
+      "npc": 4477,
+      "cell": 313,
+      "orientation": 5,
+      "criterion": "Qa=1964&Qo=14226&Qo!14229",
+      "why": "The troglodyte gobball stuffing itself in the grocery after running off (14226). INFERRED cell."
+    },
+    {
+      "map": 188482052,
+      "npc": 541,
+      "cell": 288,
+      "orientation": 3,
+      "why": "Sniffing tofus of Astrub's mine, whose coughs warn the miners of the fumes (Abrazolargo, 31640). INFERRED cells."
+    },
+    {
+      "map": 188482052,
+      "npc": 541,
+      "cell": 330,
+      "orientation": 5,
+      "why": "The same tofus."
+    },
+    {
+      "map": 101712387,
+      "npc": 4479,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qa=1964&Qo=14231&Qo!14235",
+      "why": "Timy, fallen into the sewers, while «Série animalière» has him there."
+    },
+    {
+      "map": 101712387,
+      "npc": 4480,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=1964&Qo=14231&Qo!14233",
+      "why": "Young milirats around Timy until put to flight (14233). INFERRED cells."
+    },
+    {
+      "map": 101712387,
+      "npc": 4480,
+      "cell": 357,
+      "orientation": 7,
+      "criterion": "Qa=1964&Qo=14231&Qo!14233",
+      "why": "The same rats."
+    },
+    {
+      "map": 101712387,
+      "npc": 4478,
+      "cell": 303,
+      "orientation": 3,
+      "criterion": "Qa=1964&Qo=14231&Qo!14235",
+      "why": "The wauwau defending Timy, until led back (14235). INFERRED cell."
     }
   ]
 }

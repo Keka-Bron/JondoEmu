@@ -1262,20 +1262,19 @@
         {
           "message": 30864,
           "choices": [
-            { "reply": 37272, "next": 30873, "completes": 13881, "params": [[30, 13881]] }
-          ]
-        },
-        {
-          "message": 31642,
-          "choices": [
-            { "reply": 38245, "startsQuest": 1964 }
+            { "reply": 37272, "next": 30873, "completes": 13881, "params": [[30, 13881]] },
+            { "reply": 38245, "next": 31638, "beforeQuest": 1964 },
+            { "reply": 38256, "quest": 1964, "completes": 14225, "params": [[30, 14225]], "next": 31649, "takes": 19771 },
+            { "reply": 38265, "quest": 1964, "completes": 14229, "params": [[30, 14229]], "next": 31653, "takes": 19772 },
+            { "reply": 38338, "quest": 1964, "completes": 14235, "params": [[30, 14235]], "next": 31708, "takes": 19773 }
           ]
         },
         {
           "message": 30873,
           "names": true,
           "choices": [
-            { "reply": 38245, "startsQuest": 1964 }
+            { "reply": 38245, "next": 31638, "beforeQuest": 1964 },
+            { "reply": 38248 }
           ]
         },
         {
@@ -1283,9 +1282,70 @@
           "choices": [
             { "reply": 37273, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31638,
+          "choices": [
+            { "reply": 38247, "next": 31639 },
+            { "reply": 38246 }
+          ]
+        },
+        {
+          "message": 31639,
+          "choices": [
+            { "reply": 38244, "next": 31640 }
+          ]
+        },
+        {
+          "message": 31640,
+          "choices": [
+            { "reply": 38243, "next": 31641 }
+          ]
+        },
+        {
+          "message": 31641,
+          "choices": [
+            { "reply": 38244, "next": 31642 }
+          ]
+        },
+        {
+          "message": 31642,
+          "choices": [
+            { "reply": 38241, "startsQuest": 1964, "params": [[34, 1964]], "next": 31643 },
+            { "reply": 38242 }
+          ]
+        },
+        {
+          "message": 31643,
+          "choices": []
+        },
+        {
+          "message": 31649,
+          "choices": [
+            { "reply": 38255 }
+          ]
+        },
+        {
+          "message": 31653,
+          "choices": [
+            { "reply": 38264, "next": 31654 }
+          ]
+        },
+        {
+          "message": 31654,
+          "choices": [
+            { "reply": 38263 }
+          ]
+        },
+        {
+          "message": 31708,
+          "names": true,
+          "choices": [
+            { "reply": 38337 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37272) is this class's objective (13881, effect 30), and leads to his greeting, 30873, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1964) is done, he greets the character with Archi's summons (30865) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37272) is this class's objective (13881, effect 30), and leads to his greeting, 30873, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1964) is done, he greets the character with Archi's summons (30865) and «Ir a la Torre del Consejo» hands it over. «Série animalière» of Dofus pour les noobs: an Osamodas wanted for the mines (31638), the Dofus (31639), the sniffing tofus and the toxic fumes (31640), an animal to stand them (31641), a digging boar and a troglodyte gobball, «Accepter» (31642, the line the step declares), the boar first (31643); the boar too aggressive (14225, 31649), the gobball a stomach on legs (14229, 31653), Lasy Lap's wauwau (31654), and the wauwau's exemplary behaviour and Timy saved (14235, 31708)."
     },
     {
       "npc": 4327,
@@ -10981,6 +11041,156 @@
         }
       ],
       "why": "An experienced Iop sent by Rok Elreuss, by «Iop et hop»: taking blows needs self-control (31143), the plan, the recruits brought into line without losing a limb (31144: 14046); afterwards, the doppel taken to Badufron's prison (31147: 14048)."
+    },
+    {
+      "npc": 4476,
+      "map": 0,
+      "opening": 31644,
+      "lines": [
+        {
+          "message": 31644,
+          "choices": [
+            { "reply": 38249, "quest": 1964, "beforeObjective": 14162, "gives": 19771 }
+          ]
+        }
+      ],
+      "why": "Abrazolargo's digging boar, by «Série animalière»: «¡Oiiiiiink!», taken along (follower 19771)."
+    },
+    {
+      "npc": 4477,
+      "map": 0,
+      "opening": 31646,
+      "openings": [
+        { "quest": 1964, "objective": 14226, "pending": 14228, "message": 31645 },
+        { "quest": 1964, "objective": 14228, "pending": 14229, "message": 31647 }
+      ],
+      "lines": [
+        {
+          "message": 31646,
+          "choices": [
+            { "reply": 38251, "quest": 1964, "afterObjective": 14225, "beforeObjective": 14226, "gives": 19772 }
+          ]
+        },
+        {
+          "message": 31645,
+          "choices": [
+            { "reply": 38250, "quest": 1964, "completes": 14227, "params": [[30, 14227]] },
+            { "reply": 38250, "quest": 1964, "afterObjective": 14227, "beforeObjective": 14228 }
+          ]
+        },
+        {
+          "message": 31647,
+          "choices": [
+            { "reply": 38252 }
+          ]
+        }
+      ],
+      "why": "The troglodyte gobball, by «Série animalière»: chewing by Abrazolargo, taken along (31646, follower 19772); run off to the grocery, stuffing itself (31645: 14227), its appetite calmed by a fight (npc_fights.json); sheepish afterwards, following again (31647)."
+    },
+    {
+      "npc": 4478,
+      "map": 0,
+      "opening": 31670,
+      "openings": [
+        { "quest": 1964, "objective": 14232, "pending": 14233, "message": 31671 }
+      ],
+      "lines": [
+        {
+          "message": 31670,
+          "choices": [
+            { "reply": 38291, "quest": 1964, "afterObjective": 14229, "beforeObjective": 14230, "gives": 19773 },
+            { "reply": 38291, "quest": 1964, "afterObjective": 14234, "beforeObjective": 14235, "gives": 19773 }
+          ]
+        },
+        {
+          "message": 31671,
+          "choices": []
+        }
+      ],
+      "why": "Lasy Lap's faithful wauwau, by «Série animalière»: «¡Guau!», taken along (follower 19773); in the sewers, growling at the young milirats around Timy (31671); following again once Timy is safe."
+    },
+    {
+      "npc": 541,
+      "map": 188482052,
+      "opening": 2307,
+      "openings": [
+        { "quest": 1964, "objective": 14162, "pending": 14224, "message": 31661 },
+        { "quest": 1964, "objective": 14230, "pending": 14231, "message": 31663 }
+      ],
+      "lines": [
+        {
+          "message": 2307,
+          "choices": []
+        },
+        {
+          "message": 31663,
+          "choices": [
+            { "reply": 38280, "next": 31661 }
+          ]
+        },
+        {
+          "message": 31661,
+          "choices": [
+            { "reply": 38277, "next": 31662, "quest": 1964, "afterObjective": 14162, "beforeObjective": 14224 },
+            { "reply": 38279, "next": 31662, "quest": 1964, "afterObjective": 14230, "beforeObjective": 14231 }
+          ]
+        },
+        {
+          "message": 31662,
+          "choices": [
+            { "reply": 38276, "quest": 1964, "completes": 14224, "params": [[30, 14224]] },
+            { "reply": 38278, "quest": 1964, "completes": 14231, "params": [[30, 14231]], "takes": 19773 }
+          ]
+        }
+      ],
+      "why": "A sniffing tofu of Astrub's mine [1,-17], by «Série animalière»: coughing (31661, 31662); the boar staring at it and about to charge: the fight against the sniffers (npc_fights.json, 14224); the wauwau unmoved, then pricking its ears and running off into the sewers (31663: 14231)."
+    },
+    {
+      "npc": 4479,
+      "map": 0,
+      "opening": 31703,
+      "openings": [
+        { "quest": 1964, "objective": 14233, "pending": 14234, "message": 31704 }
+      ],
+      "lines": [
+        {
+          "message": 31703,
+          "choices": []
+        },
+        {
+          "message": 31704,
+          "choices": [
+            { "reply": 38335, "next": 31705 }
+          ]
+        },
+        {
+          "message": 31705,
+          "choices": [
+            { "reply": 38334, "next": 31706 }
+          ]
+        },
+        {
+          "message": 31706,
+          "choices": [
+            { "reply": 38333, "quest": 1964, "completes": 14234, "params": [[30, 14234]] }
+          ]
+        }
+      ],
+      "why": "Timy in the sewers, by «Série animalière»: help (31703); thanks (31704), fallen in a hole near the zaap (31705), the rats and the wauwau (31706: 14234)."
+    },
+    {
+      "npc": 4480,
+      "map": 0,
+      "opening": 31707,
+      "lines": [
+        {
+          "message": 31707,
+          "choices": [
+            { "reply": 38336, "quest": 1964, "afterObjective": 14232, "beforeObjective": 14233 }
+          ]
+        }
+      ],
+      "why": "The young milirats around Timy, by «Série animalière»: attacked (npc_fights.json)."
     }
   ]
 }
