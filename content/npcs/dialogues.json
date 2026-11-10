@@ -17907,6 +17907,12 @@
       "map": 0,
       "opening": 465,
       "openings": [
+        { "quest": 839, "message": 10440 },
+        { "canStart": 839, "message": 10439 },
+        { "quest": 837, "message": 10433 },
+        { "canStart": 837, "message": 10432 },
+        { "quest": 838, "message": 10438 },
+        { "canStart": 838, "message": 10437 },
         { "quest": 836, "message": 10430 }
       ],
       "lines": [
@@ -17925,9 +17931,54 @@
         {
           "message": 10430,
           "choices": []
+        },
+        {
+          "message": 10432,
+          "choices": [
+            { "reply": 11430, "startsQuest": 837, "params": [[34, 837]] },
+            { "reply": 11434 }
+          ]
+        },
+        {
+          "message": 10433,
+          "choices": []
+        },
+        {
+          "message": 10437,
+          "choices": [
+            { "reply": 11436, "startsQuest": 838, "params": [[34, 838]], "gives": 12880 }
+          ]
+        },
+        {
+          "message": 10438,
+          "choices": []
+        },
+        {
+          "message": 10439,
+          "choices": [
+            { "reply": 11439, "startsQuest": 839, "params": [[34, 839]] },
+            { "reply": 11441 }
+          ]
+        },
+        {
+          "message": 10440,
+          "choices": [
+            { "reply": 18865, "quest": 839, "completes": 5311, "params": [[30, 5311]], "next": 15962, "afterObjective": 5310 },
+            { "reply": 18868, "quest": 839, "completes": 5315, "params": [[30, 5315]], "next": 15963, "afterObjective": 5314 }
+          ]
+        },
+        {
+          "message": 15962,
+          "choices": [
+            { "reply": 18866 }
+          ]
+        },
+        {
+          "message": 15963,
+          "choices": []
         }
       ],
-      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello)."
+      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello). «Faites l'amour, pas la guerre» (837) of Dofus pour les noobs: part of her plan, a brew to calm the wabbits' warlike ardour (10432, «Vale, te ayudo»), bring everything at once (10433: the egg, a ripe cawotte, the grated cawotte juice, a squashed black wabbit and Patxi Fista's blood, on a hello). «Ça sent la cawotte» (838): the potion done, a few drops in growing cawottes with a syringe (10437, «¡Sí, señor!»: the syringe 12880), the island's cawottes (10438). «Il y a un os, de Wabbit» (839) of Dofus pour les noobs: skeleton wabbits eat no cawottes, the tombs' islet (10439, «Vale, te ayudaré»); Eliebwe Palp Atynte's information, ask the zollo of the ancient times (15962: 5311); Wob's words, the wabbits themselves must be asked (15963: 5315)."
     },
     {
       "npc": 1470,
@@ -18033,6 +18084,104 @@
         }
       ],
       "why": "King Allister's envoy, lost on the wabbit island [25,-6]: wabbits are not kind to travellers (10803). «À la barbe du roi»: «Ofrecerle tu ayuda antes de atacarle a traición», the fight, Allister's signed document his loot (13055)."
+    },
+    {
+      "npc": 1586,
+      "map": 0,
+      "opening": 11561,
+      "lines": [
+        {
+          "message": 11561,
+          "choices": [
+            { "reply": 12939, "next": 11616, "quest": 837, "completes": 5610, "params": [[30, 5610]], "gives": 13205 }
+          ]
+        },
+        {
+          "message": 11616,
+          "choices": []
+        }
+      ],
+      "why": "Patxi Fista, the peaceful wabbit of the cawotte fields [24,-4]: peace and love (11561). «Faites l'amour, pas la guerre»: «prélever du sang à Xiap», thrown upon him for a blood sample, «you are completely mad!» (11616: 5610, the sample 13205)."
+    },
+    {
+      "npc": 1103,
+      "map": 0,
+      "opening": 4664,
+      "openings": [
+        { "quest": 839, "pending": 5310, "message": 15966 }
+      ],
+      "lines": [
+        {
+          "message": 4664,
+          "choices": []
+        },
+        {
+          "message": 15966,
+          "choices": [
+            { "reply": 18871, "quest": 839, "completes": 5310, "params": [[30, 5310]] }
+          ]
+        }
+      ],
+      "why": "Eliebwe Palp Atynte, the wabbit of the tombs' islet [21,-12] (4664). «Il y a un os, de Wabbit»: the mysteries of anti-life, fallen wabbits all around (15966, «the origin of the skeleton wabbits interests me more»: 5310)."
+    },
+    {
+      "npc": 145,
+      "map": 0,
+      "opening": 471,
+      "openings": [
+        { "quest": 839, "objective": 5312, "pending": 5313, "message": 15968 }
+      ],
+      "lines": [
+        {
+          "message": 471,
+          "choices": []
+        },
+        {
+          "message": 15968,
+          "choices": []
+        }
+      ],
+      "why": "The zollo of the ancient times by the zaap [25,-4]: welcome, stranger (471). «Il y a un os, de Wabbit»: not much known, Lily's crew spoke of a wabbit feared by its kind, shut in an underground cave (15968: 5312, on a hello)."
+    },
+    {
+      "npc": 136,
+      "map": 0,
+      "opening": 462,
+      "lines": [
+        {
+          "message": 462,
+          "choices": [
+            { "reply": 388, "teleport": 68420613 },
+            { "reply": 18874, "quest": 839, "completes": 5313, "params": [[30, 5313]], "next": 15969 }
+          ]
+        },
+        {
+          "message": 15969,
+          "choices": []
+        }
+      ],
+      "why": "Captain Lily on the wabbit island's shore [24,-2]: done here? then back (462, «Volver a Amakna»: Madrestam). «Il y a un os, de Wabbit»: «the wabbit shut in by its own kind?», her sailors' story (15969: 5313)."
+    },
+    {
+      "npc": 146,
+      "map": 0,
+      "opening": 472,
+      "openings": [
+        { "quest": 839, "pending": 5314, "message": 472 }
+      ],
+      "lines": [
+        {
+          "message": 472,
+          "choices": [
+            { "reply": 18872, "quest": 839, "completes": 5314, "params": [[30, 5314]], "next": 15967 }
+          ]
+        },
+        {
+          "message": 15967,
+          "choices": []
+        }
+      ],
+      "why": "Wob, the wabbit his brothers fear, shut in the underground of [22,-7]: a deal, a hundred cawottes for a spell of his own (472). «Il y a un os, de Wabbit» of Dofus pour les noobs: «questions about the skeleton wabbits», three princes who lost their title for plotting against the impostor king (15967: 5314)."
     }
   ]
 }

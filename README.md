@@ -677,11 +677,11 @@ played through.
 | Area | Played | Quests |
 |---|:---|:---:|
 | Astrub | `██████████` **100%** | 51/51 |
-| Kingdom of Amakna | `█████████░` **87%** | 33/38 |
+| Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Incarnam | `██████████` **100%** | 24/24 |
+| Wabbit Islands | `████░░░░░░` **39%** | 9/23 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
-| Wabbit Islands | `█░░░░░░░░░` **13%** | 3/23 |
-| **All quests** | **5.9%** | **116/1976** |
+| **All quests** | **6.2%** | **123/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

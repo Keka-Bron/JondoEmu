@@ -2378,6 +2378,13 @@
       "orientation": 3,
       "criterion": "Qa=892&Qo=5472&Qo!5474",
       "why": "King Allister's envoy lost at [25,-6] of the wabbit island. INFERRED cell."
+    },
+    {
+      "map": 106694152,
+      "npc": 146,
+      "cell": 300,
+      "orientation": 3,
+      "why": "Wob, shut in the underground of the wabbit island [22,-7] («Retrouvez le Wabbit enfermé en [22,-7]», Dofus pour les noobs). INFERRED cell."
     }
   ]
 }

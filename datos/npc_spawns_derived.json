@@ -461,8 +461,7 @@
 "npc": 1241,
 "cell": 230,
 "orientation": 1,
-"why": "gives quest 566",
-"criterion": "(PL>89&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=566|Qf=566|(PL>99&Qf=566&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=567|Qf=567|(PL>109&Qf=567&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=568|Qf=568|(PL>129&Qf=568&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=569|Qf=569|(PL>139&Qf=569&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=570|Qf=570|(PL>139&Qf=570&Qa!556&Qa!557&Qa!558&Qa!559&Qa!560&Qa!561&Qa!562&Qa!563&Qa!564&Qa!565&Qf!556&Qf!557&Qf!558&Qf!559&Qf!560&Qf!561&Qf!562&Qf!563&Qf!564&Qf!565)|Qa=571|Qf=571|Qa=660|Qf=660|Qa=674|Qf=674|Qa=1319|Qf=1319"
+"why": "gives quest 566"
 },
 {
 "map": 54170452,
@@ -616,8 +615,7 @@
 "npc": 1239,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 556",
-"criterion": "(PL>89&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=556|Qf=556|(PL>99&Qf=556&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=557|Qf=557|(PL>109&Qf=557&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=558|Qf=558|(PL>129&Qf=558&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=559|Qf=559|(PL>139&Qf=559&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=560|Qf=560|(PL>139&Qf=560&Qa!566&Qa!567&Qa!568&Qa!569&Qa!570&Qa!571&Qa!572&Qa!573&Qa!574&Qa!575&Qf!566&Qf!567&Qf!568&Qf!569&Qf!570&Qf!571&Qf!572&Qf!573&Qf!574&Qf!575)|Qa=561|Qf=561|Qa=674|Qf=674"
+"why": "gives quest 556"
 },
 {
 "map": 54176042,
@@ -702,8 +700,7 @@
 "npc": 1253,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 536",
-"criterion": "(PL>89&Qa!537&Qa!538&Qa!539&Qa!540&Qa!541)|Qa=536|Qf=536|(PL>89&Qa!536&Qa!538&Qa!539&Qa!540&Qa!541)|Qa=537|Qf=537|(PL>89&Qa!536&Qa!537&Qa!539&Qa!540&Qa!541)|Qa=538|Qf=538|(PL>139&Qa!540&Qa!541&Qa!536&Qa!537&Qa!538)|Qa=539|Qf=539|(PL>139&Qa!539&Qa!541&Qa!536&Qa!537&Qa!538)|Qa=540|Qf=540|(PL>139&Qa!539&Qa!540&Qa!536&Qa!537&Qa!538)|Qa=541|Qf=541|(PL>114&Qf=590)|Qa=591|Qf=591|Qa=595|Qf=595|Qa=614|Qf=614|Qa=1288|Qf=1288"
+"why": "gives quest 536"
 },
 {
 "map": 54534167,
@@ -895,8 +892,7 @@
 "npc": 1416,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 849",
-"criterion": "(PL>19&(Qa=878|Qf=878))|Qa=849|Qf=849|(PL>80&(Qa=878|Qf=878))|Qa=850|Qf=850|(PL>110&(Qa=878|Qf=878))|Qa=851|Qf=851|(PL>140&(Qa=878|Qf=878))|Qa=852|Qf=852|(PL>110&Qf=865&(Qa=878|Qf=878))|Qa=866|Qf=866|(PL>19&Qa=878)|Qa=877|Qf=877|(Qf=2052)|Qa=2053|Qf=2053|(Qf=2053)|Qa=2054|Qf=2054|(Qf=2054)|Qa=2055|Qf=2055|Qa=853|Qf=853|Qa=854|Qf=854|Qa=855|Qf=855|Qa=856|Qf=856|Qa=2052|Qf=2052"
+"why": "gives quest 849"
 },
 {
 "map": 66061569,
@@ -1037,7 +1033,7 @@
 "cell": 246,
 "orientation": 1,
 "why": "gives quest 137",
-"criterion": "(Qf=135&Qf=133)|Qa=137|Qf=137"
+"criterion": "(Qf=135&Qf=133)|Qa=137|Qf=137|Qa=133|Qf=133|Qa=135|Qf=135"
 },
 {
 "map": 68422664,
@@ -1124,8 +1120,7 @@
 "npc": 808,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 148",
-"criterion": "(PL>49)|Qa=148|Qf=148|(PL>49)|Qa=149|Qf=149|(PL>69)|Qa=150|Qf=150"
+"why": "gives quest 148"
 },
 {
 "map": 73402891,
@@ -1147,8 +1142,7 @@
 "npc": 1461,
 "cell": 272,
 "orientation": 1,
-"why": "gives quest 720",
-"criterion": "(PL<51)|Qa=720|Qf=720|(PL>50&PL<101)|Qa=721|Qf=721|(PL>100&PL<151)|Qa=722|Qf=722|(PL>150)|Qa=723|Qf=723"
+"why": "gives quest 720"
 },
 {
 "map": 74977795,
@@ -1215,8 +1209,7 @@
 "npc": 1458,
 "cell": 357,
 "orientation": 1,
-"why": "gives quest 742",
-"criterion": "(BT=1&Qf=724)|Qa=742|Qf=742|(PL<51&Qf=724)|Qa=743|Qf=743|(PL>50&PL<101&Qf=724)|Qa=744|Qf=744|(PL>100&PL<151&Qf=724)|Qa=745|Qf=745|(PL>150&Qf=724)|Qa=746|Qf=746|Qa=737|Qf=737|Qa=738|Qf=738|Qa=739|Qf=739|Qa=740|Qf=740|Qa=751|Qf=751|Qa=758|Qf=758|Qa=1853|Qf=1853"
+"why": "gives quest 742"
 },
 {
 "map": 76288522,
@@ -1324,8 +1317,7 @@
 "npc": 1531,
 "cell": 328,
 "orientation": 1,
-"why": "gives quest 860",
-"criterion": "(PL>19&Qf=859&(Qa=878|Qf=878))|Qa=860|Qf=860|(PL>19&Qf=859&Qf=860&(Qa=878|Qf=878))|Qa=861|Qf=861|(Qf=871&Qa=878)|Qa=879|Qf=879|Qa=859|Qf=859|Qa=871|Qf=871"
+"why": "gives quest 860"
 },
 {
 "map": 85986816,
@@ -1877,8 +1869,7 @@
 "npc": 897,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 215",
-"criterion": "(PL>29&Qf=211&PO!8576&Qa!216&Qf!216)|Qa=215|Qf=215|(Qf=222&PL>59)|Qa=224|Qf=224|Qa=222|Qf=222|Qa=225|Qf=225|Qa=337|Qf=337|Qa=343|Qf=343|Qa=891|Qf=891|Qa=1479|Qf=1479"
+"why": "gives quest 215"
 },
 {
 "map": 95685123,
@@ -1977,8 +1968,7 @@
 "npc": 1578,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 904",
-"criterion": "(Qf=2505&PL>39)|Qa=904|Qf=904|(Qf=904&PL>39)|Qa=905|Qf=905|(Qf=899&PL>39)|Qa=2505|Qf=2505|(Qf=906&PL>49)|Qa=2506|Qf=2506|Qa=899|Qf=899|Qa=906|Qf=906|Qa=907|Qf=907"
+"why": "gives quest 904"
 },
 {
 "map": 99091977,
@@ -2190,16 +2180,14 @@
 "npc": 139,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 828",
-"criterion": "(Qf=827&PL>29)|Qa=828|Qf=828|(Qf=828)|Qa=829|Qf=829|(Qf=829)|Qa=830|Qf=830|(Qf=830)|Qa=831|Qf=831|(Qf=831)|Qa=832|Qf=832"
+"why": "gives quest 828"
 },
 {
 "map": 99614727,
 "npc": 140,
 "cell": 315,
 "orientation": 1,
-"why": "gives quest 836",
-"criterion": "(Qf=827&PL>29)|Qa=836|Qf=836|(Qf=836)|Qa=837|Qf=837|(Qf=837)|Qa=838|Qf=838|(Qf=838)|Qa=839|Qf=839|(Qf=839)|Qa=840|Qf=840|(Qf=843)|Qa=844|Qf=844|Qa=70|Qf=70|Qa=390|Qf=390|Qa=843|Qf=843"
+"why": "gives quest 836"
 },
 {
 "map": 99614728,
@@ -2260,7 +2248,7 @@
 "cell": 273,
 "orientation": 1,
 "why": "gives quest 841",
-"criterion": "(Qf=840)|Qa=841|Qf=841|Qa=308|Qf=308|Qa=840|Qf=840"
+"criterion": "(Qf=840)|Qa=841|Qf=841|Qa=308|Qf=308|Qa=839|Qf=839|Qa=840|Qf=840"
 },
 {
 "map": 101187584,
@@ -3397,7 +3385,7 @@
 "cell": 287,
 "orientation": 1,
 "why": "gives quest 1982",
-"criterion": "(Qa=1979&PL>19)|Qa=1982|Qf=1982"
+"criterion": "(Qa=1979&PL>19)|Qa=1982|Qf=1982|Qa=1979|Qf=1979"
 },
 {
 "map": 121636870,
@@ -3799,24 +3787,21 @@
 "npc": 2352,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1498",
-"criterion": "(Qf=1497)|Qa=1498|Qf=1498|(Qf=1498)|Qa=1499|Qf=1499|(Qf=1499)|Qa=1500|Qf=1500"
+"why": "gives quest 1498"
 },
 {
 "map": 131597312,
 "npc": 2342,
 "cell": 286,
 "orientation": 1,
-"why": "gives quest 1492",
-"criterion": "(PL>179&Qf=1500)|Qa=1492|Qf=1492|(PL>129&Qf=1506)|Qa=1497|Qf=1497|(PL>79)|Qa=1504|Qf=1504|(PL>79&Qf=1504)|Qa=1505|Qf=1505|(PL>79&Qf=1505)|Qa=1506|Qf=1506|Qa=1488|Qf=1488|Qa=1496|Qf=1496|Qa=1500|Qf=1500"
+"why": "gives quest 1492"
 },
 {
 "map": 131597312,
 "npc": 2341,
 "cell": 300,
 "orientation": 1,
-"why": "gives quest 1501",
-"criterion": "(PL>79)|Qa=1501|Qf=1501|(PL>129&Qf=1501)|Qa=1502|Qf=1502|(PL>179&Qf=1502)|Qa=1503|Qf=1503|(PL>179&Qf=1512)|Qa=1513|Qf=1513|Qa=1485|Qf=1485|Qa=1512|Qf=1512"
+"why": "gives quest 1501"
 },
 {
 "map": 131597312,
@@ -4327,8 +4312,7 @@
 "npc": 2438,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1541",
-"criterion": "(PL>109)|Qa=1541|Qf=1541|(PL>159&Qf=1539&Qf=1543)|Qa=1544|Qf=1544|(Qf=1544)|Qa=1545|Qf=1545|(Qf=1546)|Qa=1547|Qf=1547|(PL>179&Qf=1547)|Qa=1548|Qf=1548|Qa=1542|Qf=1542|Qa=1543|Qf=1543|Qa=1546|Qf=1546|Qa=1552|Qf=1552"
+"why": "gives quest 1541"
 },
 {
 "map": 137363456,
@@ -4342,8 +4326,7 @@
 "npc": 2437,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1538",
-"criterion": "(PL>109)|Qa=1538|Qf=1538|(PL>159&Qf=1538)|Qa=1539|Qf=1539|(PL>179&Qf=1539)|Qa=1540|Qf=1540|Qa=1530|Qf=1530|Qa=1535|Qf=1535|Qa=1541|Qf=1541|Qa=1544|Qf=1544|Qa=1546|Qf=1546|Qa=1547|Qf=1547|Qa=1557|Qf=1557"
+"why": "gives quest 1538"
 },
 {
 "map": 137363456,
@@ -4983,8 +4966,7 @@
 "npc": 2646,
 "cell": 356,
 "orientation": 1,
-"why": "gives quest 1588",
-"criterion": "(PL>99)|Qa=1588|Qf=1588|(PL>149&Qf=1588)|Qa=1589|Qf=1589|(PL>179&Qf=1589)|Qa=1590|Qf=1590|Qa=1575|Qf=1575|Qa=1577|Qf=1577|Qa=1581|Qf=1581|Qa=1595|Qf=1595|Qa=1597|Qf=1597"
+"why": "gives quest 1588"
 },
 {
 "map": 145229323,
@@ -4998,8 +4980,7 @@
 "npc": 2652,
 "cell": 371,
 "orientation": 1,
-"why": "gives quest 1573",
-"criterion": "(Qf=1572)|Qa=1573|Qf=1573|(PL>179&Qf=1586)|Qa=1579|Qf=1579|(Qf=1579)|Qa=1580|Qf=1580|(Qf=1580)|Qa=1581|Qf=1581|(Qf=1581)|Qa=1582|Qf=1582|(PL>149&Qf=1593)|Qa=1583|Qf=1583|(Qf=1583)|Qa=1584|Qf=1584|(Qf=1584)|Qa=1585|Qf=1585|(Qf=1585)|Qa=1586|Qf=1586|(PL>99)|Qa=1591|Qf=1591|(PL>99&Qf=1591)|Qa=1592|Qf=1592|(PL>99&Qf=1592&Qf=1588)|Qa=1593|Qf=1593|(Qf=2078)|Qa=2079|Qf=2079|Qa=1589|Qf=1589|Qa=1597|Qf=1597|Qa=1599|Qf=1599|Qa=2078|Qf=2078|Qa=2111|Qf=2111"
+"why": "gives quest 1573"
 },
 {
 "map": 145229323,
@@ -5263,8 +5244,7 @@
 "npc": 1515,
 "cell": 343,
 "orientation": 1,
-"why": "gives quest 1634",
-"criterion": "(Qf=1632)|Qa=1634|Qf=1634|(Qf=1634)|Qa=1635|Qf=1635|(Qf=1635)|Qa=2004|Qf=2004|Qa=1632|Qf=1632"
+"why": "gives quest 1634"
 },
 {
 "map": 153356296,
@@ -5745,16 +5725,14 @@
 "npc": 3093,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 1689",
-"criterion": "(PL>79)|Qa=1689|Qf=1689|(PL>139&Qf=1689)|Qa=1690|Qf=1690|(PL>179&Qf=1690)|Qa=1691|Qf=1691|(Qf=1694)|Qa=1695|Qf=1695|Qa=1693|Qf=1693|Qa=1694|Qf=1694|Qa=1698|Qf=1698|Qa=1711|Qf=1711"
+"why": "gives quest 1689"
 },
 {
 "map": 161218564,
 "npc": 3109,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 1703",
-"criterion": "(PL>79&Qf=1695)|Qa=1703|Qf=1703|(Qf=1703)|Qa=1704|Qf=1704|(Qf=1704)|Qa=1705|Qf=1705|(Qf=1708)|Qa=1709|Qf=1709|Qa=1691|Qf=1691|Qa=1695|Qf=1695|Qa=1700|Qf=1700|Qa=1708|Qf=1708|Qa=1711|Qf=1711|Qa=1712|Qf=1712"
+"why": "gives quest 1703"
 },
 {
 "map": 161220622,
@@ -6240,8 +6218,7 @@
 "npc": 3269,
 "cell": 301,
 "orientation": 1,
-"why": "gives quest 1739",
-"criterion": "(Qf=1738)|Qa=1739|Qf=1739|(Qf=1739)|Qa=1740|Qf=1740|(Qf=1741)|Qa=1742|Qf=1742"
+"why": "gives quest 1739"
 },
 {
 "map": 168822794,
@@ -6749,8 +6726,7 @@
 "npc": 3511,
 "cell": 190,
 "orientation": 1,
-"why": "gives quest 1804",
-"criterion": "(PL>59)|Qa=1804|Qf=1804|(Qf=1804)|Qa=1805|Qf=1805|(Qf=1807&PL>149)|Qa=1829|Qf=1829|Qa=1796|Qf=1796|Qa=1803|Qf=1803|Qa=1807|Qf=1807"
+"why": "gives quest 1804"
 },
 {
 "map": 173277701,
@@ -8506,8 +8482,7 @@
 "npc": 1577,
 "cell": 287,
 "orientation": 1,
-"why": "gives quest 896",
-"criterion": "(PL>19&PZ=1)|Qa=896|Qf=896|(Qf=2003&PL>29&PZ=1)|Qa=897|Qf=897|(Qf=2504&PL>29)|Qa=898|Qf=898|(Qf=898&PL>29)|Qa=899|Qf=899|(Qf=896&PL>29&PZ=1)|Qa=2003|Qf=2003|(Qf=897&PL>29)|Qa=2504|Qf=2504|Qa=918|Qf=918"
+"why": "gives quest 896"
 },
 {
 "map": 188744193,
@@ -8669,7 +8644,7 @@
 "cell": 300,
 "orientation": 1,
 "why": "gives quest 1992",
-"criterion": "(PL>9)|Qa=1992|Qf=1992"
+"criterion": "(PL>9)|Qa=1992|Qf=1992|Qa=1968|Qf=1968"
 },
 {
 "map": 188746756,
@@ -8777,7 +8752,7 @@
 "cell": 300,
 "orientation": 1,
 "why": "gives quest 1980",
-"criterion": "(Qa=1979&PL>14)|Qa=1980|Qf=1980"
+"criterion": "(Qa=1979&PL>14)|Qa=1980|Qf=1980|Qa=1979|Qf=1979"
 },
 {
 "map": 190056961,
@@ -9032,16 +9007,14 @@
 "npc": 4356,
 "cell": 400,
 "orientation": 1,
-"why": "gives quest 1984",
-"criterion": "((Qa=1960&Qo>13932)|Qf=1960)|Qa=1984|Qf=1984|(Qf=1984)|Qa=1985|Qf=1985|(Qf=1985)|Qa=1986|Qf=1986|(Qf=1986)|Qa=1987|Qf=1987|Qa=1615|Qf=1615|Qa=1960|Qf=1960"
+"why": "gives quest 1984"
 },
 {
 "map": 192413702,
 "npc": 1502,
 "cell": 413,
 "orientation": 1,
-"why": "gives quest 1959",
-"criterion": "(Qf=1958&PL>9)|Qa=1959|Qf=1959|(Qf=1958)|Qa=1975|Qf=1975|(Qf=1959)|Qa=2009|Qf=2009|Qa=1677|Qf=1677|Qa=1725|Qf=1725|Qa=1728|Qf=1728|Qa=1958|Qf=1958|Qa=1960|Qf=1960"
+"why": "gives quest 1959"
 },
 {
 "map": 192413704,
@@ -9070,7 +9043,7 @@
 "cell": 384,
 "orientation": 1,
 "why": "gives quest 1978",
-"criterion": "((Qa=1959&Qo>13855)|Qf=1959)|Qa=1978|Qf=1978|(Qf=1978)|Qa=1979|Qf=1979|Qa=716|Qf=716|Qa=718|Qf=718|Qa=1725|Qf=1725|Qa=1962|Qf=1962|Qa=1986|Qf=1986|Qa=1987|Qf=1987"
+"criterion": "((Qa=1959&Qo>13855)|Qf=1959)|Qa=1978|Qf=1978|(Qf=1978)|Qa=1979|Qf=1979|Qa=716|Qf=716|Qa=718|Qf=718|Qa=1725|Qf=1725|Qa=1959|Qf=1959|Qa=1962|Qf=1962|Qa=1977|Qf=1977|Qa=1986|Qf=1986|Qa=1987|Qf=1987"
 },
 {
 "map": 192414724,
@@ -9602,8 +9575,7 @@
 "npc": 4803,
 "cell": 429,
 "orientation": 1,
-"why": "gives quest 2068",
-"criterion": "(PL>19&Qf=2066)|Qa=2068|Qf=2068|(PL>19&Qf=2066)|Qa=2072|Qf=2072|(PL>179&Qf=2066)|Qa=2076|Qf=2076|Qa=2056|Qf=2056|Qa=2066|Qf=2066"
+"why": "gives quest 2068"
 },
 {
 "map": 196870146,
@@ -9720,8 +9692,7 @@
 "npc": 4948,
 "cell": 342,
 "orientation": 1,
-"why": "gives quest 2080",
-"criterion": "(Qf=2079)|Qa=2080|Qf=2080|(Qf=2080)|Qa=2081|Qf=2081|(Qf=2081)|Qa=2082|Qf=2082|(Qf=2082)|Qa=2083|Qf=2083|Qa=2079|Qf=2079"
+"why": "gives quest 2080"
 },
 {
 "map": 197921792,
@@ -10489,8 +10460,7 @@
 "npc": 5583,
 "cell": 384,
 "orientation": 1,
-"why": "gives quest 2181",
-"criterion": "(Qf=2156&PL>99)|Qa=2181|Qf=2181|(Qf=2181&PL>109)|Qa=2182|Qf=2182|(Qf=2182&PL>119)|Qa=2183|Qf=2183|(Qf=2183&PL>129)|Qa=2184|Qf=2184|(Qf=2184&PL>139)|Qa=2185|Qf=2185|(Qf=2185&PL>149)|Qa=2186|Qf=2186|(Qf=2186&PL>159)|Qa=2187|Qf=2187|(Qf=2187&PL>169)|Qa=2188|Qf=2188|(Qf=2188&PL>179)|Qa=2189|Qf=2189|(Qf=2189&PL>189)|Qa=2190|Qf=2190|(Qf=2190&PL>199)|Qa=2191|Qf=2191"
+"why": "gives quest 2181"
 },
 {
 "map": 207622146,
@@ -12390,8 +12360,7 @@
 "npc": 7641,
 "cell": 258,
 "orientation": 1,
-"why": "gives quest 2516",
-"criterion": "(PL>149&Qf=2515&Qf=2520)|Qa=2516|Qf=2516|(PL>179&Qf=2516)|Qa=2517|Qf=2517|(PL>179&Qf=2517)|Qa=2518|Qf=2518|(PL>179&Qf=2518)|Qa=2519|Qf=2519|Qa=2515|Qf=2515"
+"why": "gives quest 2516"
 },
 {
 "map": 234751491,

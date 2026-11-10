@@ -2159,6 +2159,138 @@
    "npc": 1567,
    "map": 99615236,
    "why": "«Encuentra al enviado del rey Allister»: lost at [25,-6] («Allez en [25,-6] et parlez à l'Envoyé du roi Allister», Dofus pour les noobs)."
+  },
+  {
+   "objective": 5295,
+   "quest": 837,
+   "kind": "click",
+   "elements": [{"map": 106695176, "element": 482405}],
+   "gives": [{"item": 12874, "count": 1}],
+   "anyOrder": true,
+   "why": "«Cliquez sur le cadre pour récupérer l'œuf» at [22,-7]: the cawotte picture 482405 (graphic 39188, cell 339). One of the things Emilia's brew needs, gathered in any order (Dofus pour les noobs). INFERRED element."
+  },
+  {
+   "objective": 5297,
+   "quest": 837,
+   "kind": "click",
+   "elements": [{"map": 99614722, "element": 481745}, {"map": 99614722, "element": 481743}, {"map": 99614722, "element": 481742}, {"map": 99614722, "element": 481744}],
+   "gives": [{"item": 12875, "count": 1}],
+   "anyOrder": true,
+   "why": "«Cliquez sur la cawotte pour la déterrer» at [24,-8]: one of the map's four cawottes. One of the things Emilia's brew needs, gathered in any order (Dofus pour les noobs). INFERRED element."
+  },
+  {
+   "objective": 5299,
+   "quest": 837,
+   "kind": "click",
+   "elements": [{"map": 106695170, "element": 482650}],
+   "gives": [{"item": 12877, "count": 1}],
+   "anyOrder": true,
+   "why": "«Cliquez sur le pot pour le voler» at [26,-11]: the pot 482650 (graphic 34897, cell 254). One of the things Emilia's brew needs, gathered in any order (Dofus pour les noobs). INFERRED element."
+  },
+  {
+   "objective": 5296,
+   "quest": 837,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Handed to Emilia with the rest, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5298,
+   "quest": 837,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Handed to Emilia with the rest, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5300,
+   "quest": 837,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Handed to Emilia with the rest, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5301,
+   "quest": 837,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Handed to Emilia with the rest, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5611,
+   "quest": 837,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Handed to Emilia with the rest, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5610,
+   "quest": 837,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Patxi Fista's blood, taken in any order among the rest (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5302,
+   "quest": 838,
+   "kind": "click",
+   "elements": [{"map": 99614724, "element": 482548}, {"map": 99614724, "element": 481759}],
+   "requires": [{"item": 12880, "count": 1}],
+   "anyOrder": true,
+   "why": "«Pincha una zanahowia en pleno crecimiento con una jeringuilla de Emilia» (Dofus pour les noobs: «piquer plusieurs cawottes réparties un peu partout sur l'île»): a growing cawotte of the map, the syringe carried. INFERRED element."
+  },
+  {
+   "objective": 5303,
+   "quest": 838,
+   "kind": "click",
+   "elements": [{"map": 99615235, "element": 481747}],
+   "requires": [{"item": 12880, "count": 1}],
+   "anyOrder": true,
+   "why": "«Pincha una zanahowia en pleno crecimiento con una jeringuilla de Emilia» (Dofus pour les noobs: «piquer plusieurs cawottes réparties un peu partout sur l'île»): a growing cawotte of the map, the syringe carried. INFERRED element."
+  },
+  {
+   "objective": 5304,
+   "quest": 838,
+   "kind": "click",
+   "elements": [{"map": 99614721, "element": 482651}],
+   "requires": [{"item": 12880, "count": 1}],
+   "anyOrder": true,
+   "why": "«Pincha una zanahowia en pleno crecimiento con una jeringuilla de Emilia» (Dofus pour les noobs: «piquer plusieurs cawottes réparties un peu partout sur l'île»): a growing cawotte of the map, the syringe carried. INFERRED element."
+  },
+  {
+   "objective": 5305,
+   "quest": 838,
+   "kind": "click",
+   "elements": [{"map": 99615234, "element": 481746}, {"map": 99615234, "element": 481743}, {"map": 99615234, "element": 481742}, {"map": 99615234, "element": 481744}],
+   "requires": [{"item": 12880, "count": 1}],
+   "anyOrder": true,
+   "why": "«Pincha una zanahowia en pleno crecimiento con una jeringuilla de Emilia» (Dofus pour les noobs: «piquer plusieurs cawottes réparties un peu partout sur l'île»): a growing cawotte of the map, the syringe carried. INFERRED element."
+  },
+  {
+   "objective": 5306,
+   "quest": 838,
+   "kind": "click",
+   "elements": [{"map": 99614722, "element": 481745}, {"map": 99614722, "element": 481743}, {"map": 99614722, "element": 481742}, {"map": 99614722, "element": 481744}],
+   "requires": [{"item": 12880, "count": 1}],
+   "anyOrder": true,
+   "why": "«Pincha una zanahowia en pleno crecimiento con una jeringuilla de Emilia» (Dofus pour les noobs: «piquer plusieurs cawottes réparties un peu partout sur l'île»): a growing cawotte of the map, the syringe carried. INFERRED element."
+  },
+  {
+   "objective": 5307,
+   "quest": 838,
+   "kind": "click",
+   "elements": [{"map": 99746305, "element": 482652}],
+   "requires": [{"item": 12880, "count": 1}],
+   "anyOrder": true,
+   "why": "«Pincha una zanahowia en pleno crecimiento con una jeringuilla de Emilia» (Dofus pour les noobs: «piquer plusieurs cawottes réparties un peu partout sur l'île»): a growing cawotte of the map, the syringe carried. INFERRED element."
+  },
+  {
+   "objective": 5308,
+   "quest": 838,
+   "kind": "click",
+   "elements": [{"map": 99746820, "element": 482831}],
+   "requires": [{"item": 12880, "count": 1}],
+   "anyOrder": true,
+   "why": "«Pincha una zanahowia en pleno crecimiento con una jeringuilla de Emilia» (Dofus pour les noobs: «piquer plusieurs cawottes réparties un peu partout sur l'île»): a growing cawotte of the map, the syringe carried. INFERRED element."
   }
  ]
 }
