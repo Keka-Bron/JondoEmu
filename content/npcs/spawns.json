@@ -763,6 +763,13 @@
       "orientation": 5,
       "criterion": "Qa=1633&Qo=9769&Qo!9770",
       "why": "The Rata Nsiosa, out of the tap: template 2912 on cell 385 facing 5 in the jsn of «mision matarratas completa», once the lemonade is poured (9769) and until it is beaten (9770)."
+    },
+    {
+      "map": 152835072,
+      "npc": 2936,
+      "cell": 262,
+      "orientation": 3,
+      "why": "Chadalid in the room past his own, where the winners land on 382 (dungeon_exits.json). INFERRED from the room's own floor (tools/dibujar_mapa.py): the open flagstones at the back right, clear of the tombs and of the way in, facing 3, toward the landing."
     }
   ]
 }

@@ -217,6 +217,15 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public int Completes { get; init; }
 
+        /// <summary>
+        /// An item the NPC hands over with this reply, or zero; when the reply also does an
+        /// objective, only once it is done: Kotorra's jam for the five nettles.
+        /// </summary>
+        public int Gives { get; init; }
+
+        /// <summary>How many of <see cref="Gives"/>.</summary>
+        public int GivesCount { get; init; } = 1;
+
         /// <summary>Whether any reply of this tree does that objective.</summary>
         internal bool Does(int objectiveId) => Completes != 0 && Completes == objectiveId;
 
@@ -756,6 +765,8 @@ namespace Jondo.Unity.World.Content
                             GivesMutation = (int)Number(choice, "mutation"),
                             ThenNpc = (int)Number(choice, "thenNpc"),
                             Completes = (int)Number(choice, "completes"),
+                            Gives = (int)Number(choice, "gives"),
+                            GivesCount = Math.Max(1, (int)Number(choice, "givesCount")),
                             EndsMutation = choice.TryGetProperty("endsMutation", out var ends)
                                            && ends.ValueKind == JsonValueKind.True,
                         });
@@ -916,6 +927,8 @@ namespace Jondo.Unity.World.Content
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);
+                            if (choice.Gives != 0) writer.WriteNumber("gives", choice.Gives);
+                            if (choice.Gives != 0 && choice.GivesCount != 1) writer.WriteNumber("givesCount", choice.GivesCount);
                             if (choice.EndsMutation) writer.WriteBoolean("endsMutation", true);
                             writer.WriteEndObject();
                         }

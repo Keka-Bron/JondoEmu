@@ -23,7 +23,9 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(217, ReadingItemHandler.DocumentOf(new[] { Effect(620, 217) }.ToList()));
             Assert.Equal(17, ReadingItemHandler.DocumentOf(new[] { Effect(620, 17), Effect(981) }.ToList()));
 
-            Assert.Equal(0, ReadingItemHandler.DocumentOf(new[] { Effect(30, 1), Effect(620, 40) }.ToList()));
+            // Effect 30 validates an objective (327 of 327 items carry an objective id in it): the
+            // recipe of Incarnam's cake opens document 437 and does 9805. It no longer stops a book.
+            Assert.Equal(40, ReadingItemHandler.DocumentOf(new[] { Effect(30, 1), Effect(620, 40) }.ToList()));
             Assert.Equal(0, ReadingItemHandler.DocumentOf(new[] { Effect(110, 30) }.ToList()));
         }
 

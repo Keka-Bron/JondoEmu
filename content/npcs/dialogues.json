@@ -1522,41 +1522,68 @@
       "npc": 2886,
       "map": 0,
       "opening": 20974,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20974,
           "choices": [
-            {
-              "reply": 25216,
-              "next": 20976
-            },
-            {
-              "reply": 25224,
-              "quest": 1637
-            },
-            {
-              "reply": 25234
-            },
-            {
-              "reply": 25222
-            }
+            { "reply": 25216, "next": 20975, "beforeQuest": 1637 },
+            { "reply": 25218, "next": 20978, "quest": 1637, "completes": 9807, "params": [[30, 9807]] },
+            { "reply": 25224, "next": 20979, "quest": 1637, "completes": 9810, "params": [[30, 9810]] },
+            { "reply": 25222 }
+          ]
+        },
+        {
+          "message": 20975,
+          "choices": [
+            { "reply": 25214, "next": 20976 },
+            { "reply": 25215 }
           ]
         },
         {
           "message": 20976,
           "choices": [
-            {
-              "reply": 25213,
-              "startsQuest": 1637
-            },
-            {
-              "reply": 25215
-            }
+            { "reply": 25213, "startsQuest": 1637, "params": [[34, 1637]], "next": 20977, "gives": 16517 }
+          ]
+        },
+        {
+          "message": 20977,
+          "choices": [
+            { "reply": 25212 }
+          ]
+        },
+        {
+          "message": 20978,
+          "choices": [
+            { "reply": 25217 }
+          ]
+        },
+        {
+          "message": 20979,
+          "choices": [
+            { "reply": 25221, "next": 20980 },
+            { "reply": 25223, "next": 20981 }
+          ]
+        },
+        {
+          "message": 20980,
+          "choices": [
+            { "reply": 25220, "next": 20982 }
+          ]
+        },
+        {
+          "message": 20982,
+          "choices": [
+            { "reply": 25219 }
+          ]
+        },
+        {
+          "message": 20981,
+          "choices": [
+            { "reply": 25222 }
           ]
         }
-      ]
+      ],
+      "why": "Anta Brok, from her own lines and replies, by «La galette secrète» of Dofus pour les noobs. Asked for work (25216), she asks whether the character can cook (20975) and tells of the dessert her sister dared her to make (20976, the line the catalogue names); «Yo puedo hacer la torta por ti.» hands the quest over with the secret recipe (16517), whose reading is 9805. The cake shown (25218) does 9807 and sends the character to Kotorra for jam (20978); cake and jam handed over (25224) do 9810, and Anta tastes the jam (20979): «Probar la mermelada» or not, and she keeps the cake (20981, 20982)."
     },
     {
       "npc": 2888,
@@ -1983,8 +2010,9 @@
         {
           "message": 20830,
           "choices": [
+            { "reply": 24973, "startsQuest": 1638, "params": [[34, 1638]] },
+            { "reply": 24970, "startsQuest": 1638, "params": [[34, 1638]] },
             { "reply": 24989, "next": 20839, "quest": 1635, "beforeObjective": 9784, "completes": 9783, "params": [[30, 9783]] },
-            { "reply": 24970, "startsQuest": 1638 },
             { "reply": 24986 }
           ]
         },
@@ -2007,7 +2035,7 @@
           ]
         }
       ],
-      "why": "Klasmor the gravedigger, keeper of Chadalid's crypt. «Dans la gueule du Milimilou»: asked about the Minilubo (24989), he would rather the character faced flesh than the walking dead (20839), tells where the beast lives (20840) and the two ways in, past Chadalid or by the rusty grate to the west (20841, the line 9784 names)."
+      "why": "Klasmor the gravedigger, keeper of Chadalid's crypt. «Dans la gueule du Milimilou»: asked about the Minilubo (24989), he would rather the character faced flesh than the walking dead (20839), tells where the beast lives (20840) and the two ways in, past Chadalid or by the rusty grate to the west (20841, the line 9784 names). «Cryptologie» is handed over on his opening (20830, the line the catalogue names) by going into the crypt, with the bunch of keys (24973) or a key (24970); the door itself is DungeonHandler's."
     },
     {
       "npc": 7581,
@@ -5475,6 +5503,98 @@
         }
       ],
       "why": "The Rata Nsiosa of the tavern's cellar, out of the tap once the lemonade has been poured (jsn of template 2912 on cell 385, facing 5, right after ieb 9769 in «mision matarratas completa»). Its only line, 20872, and «Atacar a la rata.» with effect 905, which starts the fight on 153486338 (npc_fights.json)."
+    },
+    {
+      "npc": 2881,
+      "map": 0,
+      "opening": 20983,
+      "lines": [
+        {
+          "message": 20983,
+          "names": true,
+          "choices": [
+            { "reply": 25228, "next": 20985, "quest": 1637, "completes": 9808, "params": [[30, 9808]] },
+            { "reply": 25227, "next": 20986, "quest": 1637, "afterObjective": 9808, "completes": 9809, "gives": 16509, "params": [[30, 9809]] },
+            { "reply": 25229, "next": 20984 },
+            { "reply": 25226 }
+          ]
+        },
+        {
+          "message": 20985,
+          "choices": [
+            { "reply": 25225 }
+          ]
+        },
+        {
+          "message": 20986,
+          "choices": [
+            { "reply": 25226 }
+          ]
+        },
+        {
+          "message": 20984,
+          "choices": [
+            { "reply": 25226 }
+          ]
+        }
+      ],
+      "why": "Kotorra (Pipelette), in the library, from her own lines and replies. «¿Tienes por ahí un tarro de mermelada para mí?» while «La torta secreta» sends the character to her (9808): her jam for nettles (20985). «Aquí tienes algunas ortigas.» hands over the five nettles (9809) and, once they are taken, her home-made jam (16509, 20986)."
+    },
+    {
+      "npc": 2936,
+      "map": 0,
+      "opening": 20842,
+      "lines": [
+        {
+          "message": 20842,
+          "choices": [
+            { "reply": 24993, "next": 20843, "completes": 9813, "params": [[30, 9813]] },
+            { "reply": 24991, "next": 20847 },
+            { "reply": 24994 }
+          ]
+        },
+        {
+          "message": 20843,
+          "choices": [
+            { "reply": 24992, "next": 20844 }
+          ]
+        },
+        {
+          "message": 20844,
+          "choices": [
+            { "reply": 24999, "next": 20845 },
+            { "reply": 24997 }
+          ]
+        },
+        {
+          "message": 20847,
+          "choices": [
+            { "reply": 24990, "passage": 24990 },
+            { "reply": 24995, "next": 20846 }
+          ]
+        },
+        {
+          "message": 20845,
+          "choices": [
+            { "reply": 24996, "passage": 24996 },
+            { "reply": 24998, "next": 20848 }
+          ]
+        },
+        {
+          "message": 20846,
+          "choices": [
+            { "reply": 25015, "passage": 25015 },
+            { "reply": 25000 }
+          ]
+        },
+        {
+          "message": 20848,
+          "choices": [
+            { "reply": 25001 }
+          ]
+        }
+      ],
+      "why": "Chadalid (Kardorim), in the room past his own, from his own lines and replies. «Cryptologie» per Dofus pour les noobs: «demandez à Kardorim qui il est» -- «Háblame de ti.» (24993) is the visit, 9813 --; once captain of the celestial militia, raised by the graveyard's curse (20843), he tries to discipline the chafers (20844). Asked about the Minilubo (24991, 24999), he offers the way to its lair (24990, 24996, 25015, passages in teleports.json); his «Salir de la Cripta de Chadalid» replies leave the dungeon (dungeon_exits.json)."
     }
   ]
 }

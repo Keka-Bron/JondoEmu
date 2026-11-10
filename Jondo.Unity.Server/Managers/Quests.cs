@@ -732,10 +732,10 @@ namespace Jondo.Unity.Server.Managers
         /// A reply that does a conversation objective (DialogueChoice.Completes) has been chosen:
         /// it is done if it is in hand and has come up, and what it asks to be handed over is.
         /// </summary>
-        public static async Task CompleteByReplyAsync(NetworkStream stream, int questId, int objectiveId)
+        public static async Task<bool> CompleteByReplyAsync(NetworkStream stream, int questId, int objectiveId)
         {
             var log = Log;
-            if (log == null || _book == null || objectiveId == 0) return;
+            if (log == null || _book == null || objectiveId == 0) return false;
 
             // A reply everyone is offered names no quest: the one in hand that has the objective.
             if (questId == 0)
@@ -748,22 +748,23 @@ namespace Jondo.Unity.Server.Managers
                         break;
                     }
                 }
-                if (questId == 0) return;
+                if (questId == 0) return false;
             }
 
             var run = log.Run(questId);
-            if (run == null || run.Finished || run.Done.Contains(objectiveId)) return;
+            if (run == null || run.Finished || run.Done.Contains(objectiveId)) return false;
             var step = _book.Step(run.StepId);
-            if (step == null) return;
+            if (step == null) return false;
             foreach (var objective in step.Objectives)
             {
                 if (objective.Id != objectiveId) continue;
-                if (!Revealed(step, objective, run)) return;
-                if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) return;
-                if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) return;
+                if (!Revealed(step, objective, run)) return false;
+                if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) return false;
+                if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) return false;
                 await TickAsync(stream, questId, objectiveId);
-                return;
+                return true;
             }
+            return false;
         }
 
         /// <summary>
@@ -824,6 +825,9 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var objective in step.Objectives)
                 {
                     if (objective.TypeId != QuestCatalogue.CraftItem) continue;
+                    // After what comes before it: the cake made before the recipe is read does not
+                    // count (Dofus pour les noobs warns of exactly that).
+                    if (!Revealed(step, objective, run)) continue;
                     if (!made.TryGetValue(objective.ItemId, out int count) || count < objective.ItemCount) continue;
                     await TickAsync(stream, run.QuestId, objective.Id);
                 }

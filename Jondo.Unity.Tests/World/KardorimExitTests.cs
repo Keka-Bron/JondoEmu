@@ -74,7 +74,7 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public async Task The_npcs_explicit_exit_reply_closes_the_dialogue_then_loads_the_outside()
         {
-            const long reply = 24997; // The farewell currently offered without a written tree.
+            const long reply = 24994; // The way out his written opening offers.
             Load();
             Npcs.Initialize();
             var npc = Assert.Single(Npcs.OnMap(ExitRoom), n => n.NpcId == 2936);

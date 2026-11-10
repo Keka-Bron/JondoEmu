@@ -970,8 +970,36 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // What the chat says, as Grobid's lemonade in «Matarratas»' capture: after the kld,
+            // lqn 46 with the kamas and lqn 21 with the item.
+            if (choice.BuysPrice > 0)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        Managers.InfoMessages.KamasLost, choice.BuysPrice.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+            }
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                    Managers.InfoMessages.ItemGained, choice.BuysCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    choice.BuysItem.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+
             Console.WriteLine($"[NPC] Sold {choice.BuysCount}x{choice.BuysItem} for " +
                               $"{choice.BuysPrice} kamas; {GameState.Kamas} left.");
+        }
+
+        /// <summary>What a reply hands over (DialogueChoice.Gives), with the chat's line.</summary>
+        private static async Task GiveFromReplyAsync(NetworkStream stream, DialogueChoice choice)
+        {
+            if (choice.Gives == 0) return;
+            if (!await Managers.Equipment.GiveAsync(stream, choice.Gives, choice.GivesCount))
+            {
+                Console.WriteLine($"[NPC] Reply {choice.Reply} could not hand over {choice.GivesCount}x{choice.Gives}.");
+                return;
+            }
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                    Managers.InfoMessages.ItemGained, choice.GivesCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    choice.Gives.ToString(System.Globalization.CultureInfo.InvariantCulture))));
         }
 
         /// <summary>There stops being an open conversation.</summary>
@@ -1259,8 +1287,12 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
                     completesAfterClosing = elegidaAhora.Completes;
-                else
-                    await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.Quest, elegidaAhora.Completes);
+                else if (await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.Quest, elegidaAhora.Completes))
+                    await GiveFromReplyAsync(stream, elegidaAhora);
+            }
+            else if (elegidaAhora != null && elegidaAhora.Gives != 0)
+            {
+                await GiveFromReplyAsync(stream, elegidaAhora);
             }
 
             int startsAfterClosing = 0;
@@ -1350,8 +1382,9 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                     ConnectionProtocol.NpcDialogCloseReason)));
 
-            if (completesAfterClosing != 0)
-                await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora!.Quest, completesAfterClosing);
+            if (completesAfterClosing != 0
+                && await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora!.Quest, completesAfterClosing))
+                await GiveFromReplyAsync(stream, elegidaAhora);
 
             if (startsAfterClosing != 0)
             {

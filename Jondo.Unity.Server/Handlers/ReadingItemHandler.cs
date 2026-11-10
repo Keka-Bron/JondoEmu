@@ -23,6 +23,12 @@ namespace Jondo.Unity.Server.Handlers
     {
         public const int ReadEffect = 620;
 
+        /// <summary>
+        /// «Valida un objetivo»: the recipe of Incarnam's cake (16517) carries it with 9805, «Lee la
+        /// receta de la torta de Incarnam», beside its 620 with document 437.
+        /// </summary>
+        public const int ObjectiveEffect = 30;
+
         /// <summary>Effects that say something of the item and do nothing on use.</summary>
         private static readonly HashSet<int> Markers = new() { 981, 983, 2818 };
 
@@ -30,19 +36,25 @@ namespace Jondo.Unity.Server.Handlers
         internal static int DocumentOf(IReadOnlyList<DatabaseManager.ItemEffectData> effects)
         {
             var read = effects.FirstOrDefault(e => e.EffectId == ReadEffect);
-            if (read == null || !effects.All(e => e.EffectId == ReadEffect || Markers.Contains(e.EffectId))) return 0;
+            if (read == null || !effects.All(e => e.EffectId == ReadEffect || e.EffectId == ObjectiveEffect
+                                                  || Markers.Contains(e.EffectId))) return 0;
             return read.DiceNum;
         }
 
         /// <summary>A book used: its document opens. False when the item is no such thing.</summary>
         public static async Task<bool> TryReadAsync(NetworkStream stream, Equipment.Item item)
         {
-            int document = DocumentOf(DatabaseManager.GetItemEffectsData(
-                DatabaseManager.GetItemTemplatePossibleEffects(item.Template)));
+            var effects = DatabaseManager.GetItemEffectsData(
+                DatabaseManager.GetItemTemplatePossibleEffects(item.Template));
+            int document = DocumentOf(effects);
             if (document == 0) return false;
             if (!await ItemUseHandler.CriterionHoldsAsync(stream, item)) return true;
 
             await OpenAsync(stream, document);
+
+            // And the objective it validates, when the quest is in hand: reading the recipe.
+            foreach (var effect in effects.Where(e => e.EffectId == ObjectiveEffect && e.Value != 0))
+                await Quests.CompleteByReplyAsync(stream, 0, effect.Value);
             return true;
         }
 
