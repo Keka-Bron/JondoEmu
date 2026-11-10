@@ -2393,6 +2393,13 @@
       "orientation": 3,
       "criterion": "Qa=841&Qo=7875&Qo!7876",
       "why": "An aggressive skeleton wabbit in the underground room of [23,-12], while «Expédition culinaire» searches it. INFERRED cell."
+    },
+    {
+      "map": 160695296,
+      "npc": 196,
+      "cell": 300,
+      "orientation": 3,
+      "why": "Wogew the hermit in his burrow [-1,-39], who gives «Wogew l'hewmite» (the quest's giver map). INFERRED cell."
     }
   ]
 }

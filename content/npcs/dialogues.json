@@ -17745,6 +17745,7 @@
       "map": 0,
       "opening": 386,
       "openings": [
+        { "quest": 18, "step": 58, "message": 1227 },
         { "quest": 827, "message": 15981 }
       ],
       "lines": [
@@ -17763,9 +17764,13 @@
         {
           "message": 15982,
           "choices": []
+        },
+        {
+          "message": 1227,
+          "choices": []
         }
       ],
-      "why": "An assistant of Otomai in the Amakna village [-2,-4], studying the local artisans' preparations (386). «Intrusion chez les wabbits» (827) of Dofus pour les noobs: a remedy for the myxomawosis, a pair of wings of each colour of leafbeetle (15981, the four wings on a hello); asked again, its effects are permanent, go to the wabbit archipelago (15982)."
+      "why": "An assistant of Otomai in the Amakna village [-2,-4], studying the local artisans' preparations (386). «Intrusion chez les wabbits» (827) of Dofus pour les noobs: a remedy for the myxomawosis, a pair of wings of each colour of leafbeetle (15981, the four wings on a hello); asked again, its effects are permanent, go to the wabbit archipelago (15982). «Wogew l'hewmite»: blood so genetically modified, here is the analysis (1227: the GM's blood handed on a hello, the analysis 1747 given)."
     },
     {
       "npc": 1568,
@@ -18181,7 +18186,9 @@
           "choices": [
             { "reply": 388, "teleport": 68420613 },
             { "reply": 18874, "quest": 839, "completes": 5313, "params": [[30, 5313]], "next": 15969 },
-            { "reply": 18880, "quest": 840, "completes": 7860, "params": [[30, 7860]], "next": 15973 }
+            { "reply": 18880, "quest": 840, "completes": 7860, "params": [[30, 7860]], "next": 15973 },
+            { "reply": 13537, "next": 12035, "beforeQuest": 952 },
+            { "reply": 13540, "next": 12037, "quest": 952, "completes": 5759, "params": [[30, 5759]] }
           ]
         },
         {
@@ -18197,9 +18204,25 @@
         {
           "message": 15974,
           "choices": []
+        },
+        {
+          "message": 12035,
+          "choices": [
+            { "reply": 13539, "next": 12036 }
+          ]
+        },
+        {
+          "message": 12036,
+          "choices": [
+            { "reply": 13538, "startsQuest": 952, "params": [[34, 952]] }
+          ]
+        },
+        {
+          "message": 12037,
+          "choices": []
         }
       ],
-      "why": "Captain Lily on the wabbit island's shore [24,-2]: done here? then back (462, «Volver a Amakna»: Madrestam). «Il y a un os, de Wabbit»: «the wabbit shut in by its own kind?», her sailors' story (15969: 5313). «Art gastronomique»: «may I question the wabbits your crew caught?», too late, eaten, one left too thin (15973: 7860), do not ill-treat it, it spoils the meat (15974)."
+      "why": "Captain Lily on the wabbit island's shore [24,-2]: done here? then back (462, «Volver a Amakna»: Madrestam). «Il y a un os, de Wabbit»: «the wabbit shut in by its own kind?», her sailors' story (15969: 5313). «Art gastronomique»: «may I question the wabbits your crew caught?», too late, eaten, one left too thin (15973: 7860), do not ill-treat it, it spoils the meat (15974). «La chasse de Lily» (952): «will the ship hold?», a few holes in the hull, wabbits gnawing the wood (12035), «what must I do?», a fortnight of wabbits and pekewabbits, a cawotte for it (12036, «Vale»), «the hunt is over», they leave us alone now (12037: 5759)."
     },
     {
       "npc": 146,
@@ -18293,6 +18316,53 @@
         }
       ],
       "why": "An aggressive skeleton wabbit in the tombs' islet underground [23,-12]: fresh blood on its teeth and hands (15984). «Expédition culinaire» of Dofus pour les noobs: «parlez à l'un des Wabbit Squelette agressif afin de les attaquer»: the fight against four (7876); the damaged travel journal (14486) their loot."
+    },
+    {
+      "npc": 196,
+      "map": 0,
+      "opening": 2154,
+      "openings": [
+        { "quest": 18, "step": 58, "message": 987 },
+        { "quest": 18, "step": 57, "message": 988 },
+        { "quest": 18, "message": 11404 }
+      ],
+      "lines": [
+        {
+          "message": 2154,
+          "choices": [
+            { "reply": 68350, "next": 985, "beforeQuest": 18 },
+            { "reply": 68349 }
+          ]
+        },
+        {
+          "message": 985,
+          "choices": [
+            { "reply": 68348, "next": 986 },
+            { "reply": 68349 }
+          ]
+        },
+        {
+          "message": 986,
+          "choices": [
+            { "reply": 68346, "startsQuest": 18, "params": [[34, 18]], "gives": 1745 }
+          ]
+        },
+        {
+          "message": 11404,
+          "choices": [
+            { "reply": 68347, "next": 986 }
+          ]
+        },
+        {
+          "message": 988,
+          "choices": []
+        },
+        {
+          "message": 987,
+          "choices": []
+        }
+      ],
+      "why": "Wogew the hermit in his burrow [-1,-39]: brave to come in, he likes solitude but does not bite (2154). «Wogew l'hewmite» (18) of Dofus pour les noobs: «congratulations on the decoration», a little job, too old for the wabbit archipelago (985, «Te ayudaré»), the syringe, the wabbit GM's blood once knocked out (986: the vet's syringe 1745, «Agarrar la jeringuilla»), the wabbit GM in a laboratory under the Cawotte island (11404); the blood, but an analysis, ask Otomai (988), «found what I asked?» (987: the analysis handed on a hello)."
     }
   ]
 }

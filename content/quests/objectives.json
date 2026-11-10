@@ -2373,6 +2373,20 @@
    "map": 106693132,
    "afterObjectives": [7874],
    "why": "«Poursuivez votre chemin à la recherche d'autres indices»: the room of the aggressive skeleton wabbits [23,-12]."
+  },
+  {
+   "objective": 102,
+   "quest": 18,
+   "kind": "enter",
+   "map": 106697220,
+   "why": "«Découvrez le laboratoire»: the wabbit GM's laboratory under the Cawotte island [25,-7] (Wogew: «un labowatowio en los subtewáneos de la isla Zanahowia»)."
+  },
+  {
+   "objective": 104,
+   "quest": 18,
+   "kind": "order",
+   "gives": [{"item": 1747, "count": 1}],
+   "why": "The assistant of Otomai analyses the blood once handed over and gives the analysis (1227)."
   }
  ]
 }
