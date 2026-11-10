@@ -1318,6 +1318,8 @@ namespace Jondo.Unity.Server.Handlers
             if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla, reply))
             {
                 CerrarConversacion();
+                // Going in can be what hands a quest over: Klasmor's «Criptología».
+                if (startsAfterClosing != 0) await Managers.Quests.StartAsync(stream, startsAfterClosing);
                 return;
             }
 
