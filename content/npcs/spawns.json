@@ -2385,6 +2385,14 @@
       "cell": 300,
       "orientation": 3,
       "why": "Wob, shut in the underground of the wabbit island [22,-7] («Retrouvez le Wabbit enfermé en [22,-7]», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 106693132,
+      "npc": 2145,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=841&Qo=7875&Qo!7876",
+      "why": "An aggressive skeleton wabbit in the underground room of [23,-12], while «Expédition culinaire» searches it. INFERRED cell."
     }
   ]
 }

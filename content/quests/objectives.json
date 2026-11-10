@@ -2291,6 +2291,88 @@
    "requires": [{"item": 12880, "count": 1}],
    "anyOrder": true,
    "why": "«Pincha una zanahowia en pleno crecimiento con una jeringuilla de Emilia» (Dofus pour les noobs: «piquer plusieurs cawottes réparties un peu partout sur l'île»): a growing cawotte of the map, the syringe carried. INFERRED element."
+  },
+  {
+   "objective": 7864,
+   "quest": 840,
+   "kind": "click",
+   "elements": [{"map": 99614724, "element": 482548}, {"map": 99614724, "element": 481759}],
+   "gives": [{"item": 14480, "count": 1}],
+   "anyOrder": true,
+   "why": "«Consigue 1 zanaholia del mediodía ladiante»: a cawotte of [24,-6]. INFERRED element (Dofus pour les noobs: «Vous trouverez les 3 premières en [24,-6]»)."
+  },
+  {
+   "objective": 7865,
+   "quest": 840,
+   "kind": "click",
+   "elements": [{"map": 99614724, "element": 482784}, {"map": 99614724, "element": 482782}],
+   "gives": [{"item": 14481, "count": 1}],
+   "anyOrder": true,
+   "why": "«Consigue 1 champiñón del mediodía ladiante» at [24,-6]. INFERRED element (Dofus pour les noobs: «Vous trouverez les 3 premières en [24,-6]»)."
+  },
+  {
+   "objective": 7866,
+   "quest": 840,
+   "kind": "click",
+   "elements": [{"map": 99614724, "element": 482550}, {"map": 99614724, "element": 482549}],
+   "gives": [{"item": 14482, "count": 1}],
+   "anyOrder": true,
+   "why": "«Consigue 1 mala hielba del mediodía ladiante» at [24,-6]. INFERRED element (Dofus pour les noobs: «Vous trouverez les 3 premières en [24,-6]»)."
+  },
+  {
+   "objective": 7867,
+   "quest": 840,
+   "kind": "click",
+   "elements": [{"map": 99617026, "element": 482551}],
+   "anyOrder": true,
+   "requires": [{"item": 2288, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 14483, "count": 1}],
+   "why": "«Vous voilà devant un barbecue. Faites y griller une patte de Wabbit» at [28,-12]: the grill 482551 (graphic 41763, cell 292)."
+  },
+  {
+   "objective": 7868,
+   "quest": 840,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Handed to Césal with the rest, in any order."
+  },
+  {
+   "objective": 7869,
+   "quest": 840,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Handed to Césal with the rest, in any order."
+  },
+  {
+   "objective": 7870,
+   "quest": 840,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Handed to Césal with the rest, in any order."
+  },
+  {
+   "objective": 7871,
+   "quest": 840,
+   "kind": "order",
+   "anyOrder": true,
+   "gives": [{"item": 14484, "count": 1}],
+   "why": "The last ingredient handed to Césal: he makes the midday salad for Eliebwe Palp Atynte (Dofus pour les noobs)."
+  },
+  {
+   "objective": 7874,
+   "quest": 841,
+   "kind": "click",
+   "elements": [{"map": 106697226, "element": 482567}, {"map": 106697226, "element": 482565}, {"map": 106697226, "element": 482566}],
+   "why": "«Examina las huellas del paso de la expedición»: «Cliquez sur une des 3 tombes» of the underground [21,-12] (482567, 482565, 482566; graphics 38973, 38061, 38060)."
+  },
+  {
+   "objective": 7875,
+   "quest": 841,
+   "kind": "enter",
+   "map": 106693132,
+   "afterObjectives": [7874],
+   "why": "«Poursuivez votre chemin à la recherche d'autres indices»: the room of the aggressive skeleton wabbits [23,-12]."
   }
  ]
 }

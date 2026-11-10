@@ -520,22 +520,28 @@ namespace Jondo.Unity.Server.Managers
             var log = Log;
             if (log == null || _book == null) return false;
 
-            // What has to be carried. It goes first of all: if it is not met, the element does
-            // NOTHING -- neither hands out, nor marks, nor brings out the creature --, which is the difference between
-            // «pressing the tap with the lemonade» and «pressing the tap».
-            foreach (var (item, count) in binding.Requires)
+            // What has to be carried: if it is not met, the element does NOTHING -- neither hands out,
+            // nor marks, nor brings out the creature --, which is the difference between «pressing the
+            // tap with the lemonade» and «pressing the tap». Asked only once the objective is this
+            // character's to do: a cawotte clicked long after «Ça sent la cawotte» says nothing about
+            // the syringe.
+            async Task<bool> CarriesWhatItAsksAsync()
             {
-                if (Equipment.HowMany(item) >= count) continue;
+                foreach (var (item, count) in binding.Requires)
+                {
+                    if (Equipment.HowMany(item) >= count) continue;
 
-                Console.WriteLine($"[Quests] Objective {binding.ObjectiveId} asks for {count}x{item} " +
-                                  $"and it is not being carried.");
-                // A hello says nothing about it: valet Doz greeted before the livery is sewn is not
-                // a tap pressed without the lemonade.
-                if (binding.Kind != QuestBindingKind.Talk && binding.Kind != QuestBindingKind.Enter)
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
-                            InfoMessages.Warning, InfoMessages.MissingItem)));
-                return false;
+                    Console.WriteLine($"[Quests] Objective {binding.ObjectiveId} asks for {count}x{item} " +
+                                      $"and it is not being carried.");
+                    // A hello says nothing about it: valet Doz greeted before the livery is sewn is not
+                    // a tap pressed without the lemonade.
+                    if (binding.Kind != QuestBindingKind.Talk && binding.Kind != QuestBindingKind.Enter)
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                            ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                                InfoMessages.Warning, InfoMessages.MissingItem)));
+                    return false;
+                }
+                return true;
             }
 
             // An element that hands out the quest: it is taken here and that is it: there is no objective to
@@ -543,6 +549,7 @@ namespace Jondo.Unity.Server.Managers
             if (binding.Starts != 0)
             {
                 if (log.Run(binding.Starts) != null) return false;
+                if (!await CarriesWhatItAsksAsync()) return false;
 
                 Console.WriteLine($"[Quests] Quest {binding.Starts} starts on clicking an element.");
                 return await StartAsync(stream, binding.Starts);
@@ -571,6 +578,8 @@ namespace Jondo.Unity.Server.Managers
                     if (!run.Done.Contains(before) && !log.ObjectiveDone(before)) return false;
                 }
             }
+
+            if (!await CarriesWhatItAsksAsync()) return false;
 
             if (binding.Says != 0)
             {

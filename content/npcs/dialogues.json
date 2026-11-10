@@ -17913,7 +17913,8 @@
         { "canStart": 837, "message": 10432 },
         { "quest": 838, "message": 10438 },
         { "canStart": 838, "message": 10437 },
-        { "quest": 836, "message": 10430 }
+        { "quest": 836, "message": 10430 },
+        { "canStart": 840, "message": 15964 }
       ],
       "lines": [
         {
@@ -17975,10 +17976,24 @@
         },
         {
           "message": 15963,
-          "choices": []
+          "choices": [
+            { "reply": 18867, "next": 15965, "beforeQuest": 840 }
+          ]
+        },
+        {
+          "message": 15965,
+          "choices": [
+            { "reply": 18870, "startsQuest": 840, "params": [[34, 840]] }
+          ]
+        },
+        {
+          "message": 15964,
+          "choices": [
+            { "reply": 18870, "startsQuest": 840, "params": [[34, 840]] }
+          ]
         }
       ],
-      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello). «Faites l'amour, pas la guerre» (837) of Dofus pour les noobs: part of her plan, a brew to calm the wabbits' warlike ardour (10432, «Vale, te ayudo»), bring everything at once (10433: the egg, a ripe cawotte, the grated cawotte juice, a squashed black wabbit and Patxi Fista's blood, on a hello). «Ça sent la cawotte» (838): the potion done, a few drops in growing cawottes with a syringe (10437, «¡Sí, señor!»: the syringe 12880), the island's cawottes (10438). «Il y a un os, de Wabbit» (839) of Dofus pour les noobs: skeleton wabbits eat no cawottes, the tombs' islet (10439, «Vale, te ayudaré»); Eliebwe Palp Atynte's information, ask the zollo of the ancient times (15962: 5311); Wob's words, the wabbits themselves must be asked (15963: 5315)."
+      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello). «Faites l'amour, pas la guerre» (837) of Dofus pour les noobs: part of her plan, a brew to calm the wabbits' warlike ardour (10432, «Vale, te ayudo»), bring everything at once (10433: the egg, a ripe cawotte, the grated cawotte juice, a squashed black wabbit and Patxi Fista's blood, on a hello). «Ça sent la cawotte» (838): the potion done, a few drops in growing cawottes with a syringe (10437, «¡Sí, señor!»: the syringe 12880), the island's cawottes (10438). «Il y a un os, de Wabbit» (839) of Dofus pour les noobs: skeleton wabbits eat no cawottes, the tombs' islet (10439, «Vale, te ayudaré»); Eliebwe Palp Atynte's information, ask the zollo of the ancient times (15962: 5311); Wob's words, the wabbits themselves must be asked (15963: 5315). «Art gastronomique» (840): «what if we caught some wabbits?», sailors came by with live wabbits for a barbecue (15965, 15964; «Vale, voy a capturar algunos wabbits»)."
     },
     {
       "npc": 1470,
@@ -18108,6 +18123,7 @@
       "map": 0,
       "opening": 4664,
       "openings": [
+        { "after": 840, "before": 841, "message": 15978 },
         { "quest": 839, "pending": 5310, "message": 15966 }
       ],
       "lines": [
@@ -18120,9 +18136,21 @@
           "choices": [
             { "reply": 18871, "quest": 839, "completes": 5310, "params": [[30, 5310]] }
           ]
+        },
+        {
+          "message": 15978,
+          "choices": [
+            { "reply": 18892, "next": 15983, "beforeQuest": 841 }
+          ]
+        },
+        {
+          "message": 15983,
+          "choices": [
+            { "reply": 18891, "startsQuest": 841, "params": [[34, 841]] }
+          ]
         }
       ],
-      "why": "Eliebwe Palp Atynte, the wabbit of the tombs' islet [21,-12] (4664). «Il y a un os, de Wabbit»: the mysteries of anti-life, fallen wabbits all around (15966, «the origin of the skeleton wabbits interests me more»: 5310)."
+      "why": "Eliebwe Palp Atynte, the wabbit of the tombs' islet [21,-12] (4664). «Il y a un os, de Wabbit»: the mysteries of anti-life, fallen wabbits all around (15966, «the origin of the skeleton wabbits interests me more»: 5310). «Art gastronomique»: the salad, a masterpiece, a true artist (15978: 7872). «Expédition culinaire» (841): the fallen princes? the answer in this islet's underground, an expedition went first (15983, «Seguir la dirección indicada»)."
     },
     {
       "npc": 145,
@@ -18152,15 +18180,26 @@
           "message": 462,
           "choices": [
             { "reply": 388, "teleport": 68420613 },
-            { "reply": 18874, "quest": 839, "completes": 5313, "params": [[30, 5313]], "next": 15969 }
+            { "reply": 18874, "quest": 839, "completes": 5313, "params": [[30, 5313]], "next": 15969 },
+            { "reply": 18880, "quest": 840, "completes": 7860, "params": [[30, 7860]], "next": 15973 }
           ]
         },
         {
           "message": 15969,
           "choices": []
+        },
+        {
+          "message": 15973,
+          "choices": [
+            { "reply": 18879, "next": 15974 }
+          ]
+        },
+        {
+          "message": 15974,
+          "choices": []
         }
       ],
-      "why": "Captain Lily on the wabbit island's shore [24,-2]: done here? then back (462, «Volver a Amakna»: Madrestam). «Il y a un os, de Wabbit»: «the wabbit shut in by its own kind?», her sailors' story (15969: 5313)."
+      "why": "Captain Lily on the wabbit island's shore [24,-2]: done here? then back (462, «Volver a Amakna»: Madrestam). «Il y a un os, de Wabbit»: «the wabbit shut in by its own kind?», her sailors' story (15969: 5313). «Art gastronomique»: «may I question the wabbits your crew caught?», too late, eaten, one left too thin (15973: 7860), do not ill-treat it, it spoils the meat (15974)."
     },
     {
       "npc": 146,
@@ -18182,6 +18221,78 @@
         }
       ],
       "why": "Wob, the wabbit his brothers fear, shut in the underground of [22,-7]: a deal, a hundred cawottes for a spell of his own (472). «Il y a un os, de Wabbit» of Dofus pour les noobs: «questions about the skeleton wabbits», three princes who lost their title for plotting against the impostor king (15967: 5314)."
+    },
+    {
+      "npc": 2144,
+      "map": 0,
+      "opening": 15970,
+      "lines": [
+        {
+          "message": 15970,
+          "choices": [
+            { "reply": 18878, "next": 15971 }
+          ]
+        },
+        {
+          "message": 15971,
+          "choices": [
+            { "reply": 18877, "quest": 840, "completes": 7861, "params": [[30, 7861]], "next": 15972, "holds": 361 }
+          ]
+        },
+        {
+          "message": 15972,
+          "choices": [
+            { "reply": 18875, "takes": 361 },
+            { "reply": 18876 }
+          ]
+        }
+      ],
+      "why": "A super-hungry pekewabbit, the last of Lily's catch [24,-2]: bwaaaah (15970), cawotte! (15971), «*shows a cawotte* what do you know of the fallen princes?», Eliebwe Palp Atynte knows, a great art lover who stole from the king (15972: 7861; «Interrogez-le en le soudoyant avec une cawotte», Dofus pour les noobs)."
+    },
+    {
+      "npc": 1517,
+      "map": 0,
+      "opening": 10431,
+      "openings": [
+        { "quest": 840, "objective": 7871, "pending": 7872, "message": 15977 }
+      ],
+      "lines": [
+        {
+          "message": 10431,
+          "choices": [
+            { "reply": 18881, "next": 15975, "quest": 840, "beforeObjective": 7863 }
+          ]
+        },
+        {
+          "message": 15975,
+          "choices": [
+            { "reply": 18882, "quest": 840, "completes": 7863, "params": [[30, 7863]], "next": 15976 }
+          ]
+        },
+        {
+          "message": 15976,
+          "choices": []
+        },
+        {
+          "message": 15977,
+          "choices": []
+        }
+      ],
+      "why": "Césal, the zollo artist of the cawotte fields [24,-4], his realist works ruined by the wabbits (10431). «Art gastronomique» of Dofus pour les noobs: «Emilia's plan», a work of art for the invader? (15975), «one for Eliebwe Palp Atynte», what his genius needs (15976: 7863), the midday salad ready (15977: the salad 14484)."
+    },
+    {
+      "npc": 2145,
+      "map": 0,
+      "opening": 15984,
+      "lines": [
+        {
+          "message": 15984,
+          "choices": [
+            { "reply": 18893, "quest": 841, "beforeObjective": 7876 }
+          ]
+        }
+      ],
+      "why": "An aggressive skeleton wabbit in the tombs' islet underground [23,-12]: fresh blood on its teeth and hands (15984). «Expédition culinaire» of Dofus pour les noobs: «parlez à l'un des Wabbit Squelette agressif afin de les attaquer»: the fight against four (7876); the damaged travel journal (14486) their loot."
     }
   ]
 }
