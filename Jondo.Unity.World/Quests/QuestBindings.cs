@@ -115,6 +115,16 @@ namespace Jondo.Unity.World.Quests
         public int MonsterId { get; init; }
 
         /// <summary>
+        /// For a fight, any of these monsters beaten does it («monsters»): a group of pious of any
+        /// colour, «Muéstrale al mercenario que los píos no son peligrosos».
+        /// </summary>
+        public IReadOnlyList<int> AnyOfMonsters { get; init; } = System.Array.Empty<int>();
+
+        /// <summary>Whether one of the monsters this fight objective names is among those beaten.</summary>
+        public bool NamesOneOf(System.Func<int, bool> beaten)
+            => MonsterId != 0 ? beaten(MonsterId) : System.Linq.Enumerable.Any(AnyOfMonsters, beaten);
+
+        /// <summary>
         /// The elements that finish it. Any one of them, not all.
         /// </summary>
         /// <remarks>
@@ -209,6 +219,12 @@ namespace Jondo.Unity.World.Quests
 
         /// <summary>The replies that close it, for <see cref="QuestBindingKind.Reply"/>.</summary>
         public IReadOnlyList<int> Replies { get; init; } = Array.Empty<int>();
+
+        /// <summary>
+        /// Done in any order with the other objectives of its step marked the same («anyOrder»): the
+        /// five mercenaries of «Visita de inspección» are visited as the player likes.
+        /// </summary>
+        public bool AnyOrder { get; init; }
 
         /// <summary>
         /// The row's map is not the one the objective carries, on purpose: «Entra en el antro de
@@ -403,6 +419,11 @@ namespace Jondo.Unity.World.Quests
                 NpcId = Int(row, "npc"),
                 MapId = Long(row, "map"),
                 MonsterId = Int(row, "monster"),
+                AnyOfMonsters = row.TryGetProperty("monsters", out var anyOf) && anyOf.ValueKind == JsonValueKind.Array
+                    ? System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(
+                        System.Linq.Enumerable.Where(anyOf.EnumerateArray(), m => m.ValueKind == JsonValueKind.Number),
+                        m => m.GetInt32()))
+                    : System.Array.Empty<int>(),
                 Elements = elements,
                 Gives = gives,
                 Requires = requires,
@@ -416,6 +437,7 @@ namespace Jondo.Unity.World.Quests
                 ThenStarts = Int(row, "thenStarts"),
                 AfterObjectives = Ints(row, "afterObjectives"),
                 Replies = Ints(row, "replies"),
+                AnyOrder = row.TryGetProperty("anyOrder", out var anyOrder) && anyOrder.ValueKind == JsonValueKind.True,
                 ShowsNpc = Int(row, "showsNpc"),
                 Says = Int(row, "says"),
                 OnlyGives = row.TryGetProperty("onlyGives", out var only) && only.ValueKind == JsonValueKind.True,

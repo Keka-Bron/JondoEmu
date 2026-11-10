@@ -106,7 +106,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     var binding = Quests.Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Beat) continue;
-                    if (binding.MonsterId == 0 || !beaten.ContainsKey(binding.MonsterId)) continue;
+                    if (!binding.NamesOneOf(beaten.ContainsKey)) continue;
                     if (binding.MapId != 0 && binding.MapId != mapId &&
                         !SameDungeonRoom(binding.MapId, mapId))
                         continue;

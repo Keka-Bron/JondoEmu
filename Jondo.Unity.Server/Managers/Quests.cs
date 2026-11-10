@@ -321,10 +321,12 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         private static bool Revealed(QuestStep step, QuestObjective objective, QuestRun run)
         {
+            bool anyOrder = Bindings.Of(objective.Id)?.AnyOrder == true;
             foreach (var before in step.Objectives)
             {
                 if (before.Id == objective.Id) return true;
                 if (run.Done.Contains(before.Id)) continue;
+                if (anyOrder && Bindings.Of(before.Id)?.AnyOrder == true) continue;
                 if (objective.TypeId == QuestCatalogue.GoBackToSee) return false;
                 if (before.TypeId != QuestCatalogue.GoToSee) return false;
             }
