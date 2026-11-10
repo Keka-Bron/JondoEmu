@@ -459,6 +459,29 @@
    "afterObjectives": [9856],
    "showsNpc": 2938,
    "why": "«Registra la tumba»: the tomb in the middle of the vault, element 489506 (graphic 49357) on cell 343, the only element of the map that is not the way out. Percy Klópeo comes out of it (showsNpc)."
+  },
+  {
+   "objective": 14169,
+   "quest": 1971,
+   "kind": "enter",
+   "map": 190580740,
+   "afterObjectives": [14168],
+   "why": "«Sigue las huellas en dirección a la entrada de la cloaca, en la pradera»: the trail ends on the meadow where the apple thieves are, the map 14170 and 14171 name ([7,-10] per Dofus pour les noobs)."
+  },
+  {
+   "objective": 14172,
+   "quest": 1971,
+   "elements": [{"map": 190580740, "element": 516185}],
+   "afterObjectives": [14171],
+   "gives": [{"item": 19751, "count": 1}],
+   "why": "«Registra la carreta»: the thieves' cart, element 516185 (graphic 13112, the only one of its kind on the map) on cell 423; it holds the apples saved (19751). Dofus pour les noobs: «Une fois le combat gagné, cliquez sur la charrette pour récupérer les marchandises»."
+  },
+  {
+   "objective": 14174,
+   "quest": 1971,
+   "elements": [{"map": 192415754, "element": 516184}],
+   "afterObjectives": [14173],
+   "why": "«Entrénate»: «cliquez sur le gros tronc en bois au centre de la pièce» (Dofus pour les noobs), element 516184 (graphic 32053) on cell 330, the middle of the instructress's room."
   }
  ]
 }

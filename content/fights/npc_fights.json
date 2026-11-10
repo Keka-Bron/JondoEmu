@@ -39,6 +39,10 @@
     { "npc": 4379, "map": 188744199, "reply": 37057,
       "monsters": [ { "monster": 5240, "grade": 0 } ] },
     { "npc": 4379, "map": 188744199, "reply": 37051,
-      "monsters": [ { "monster": 5240, "grade": 0 } ] }
+      "monsters": [ { "monster": 5240, "grade": 0 } ] },
+    { "npc": 4472, "map": 190580740, "reply": 38085,
+      "monsters": [ { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 } ] },
+    { "npc": 4472, "map": 190580740, "reply": 38089,
+      "monsters": [ { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 } ] }
   ]
 }

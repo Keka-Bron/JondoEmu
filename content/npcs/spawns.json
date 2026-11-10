@@ -792,6 +792,14 @@
       "cell": 426,
       "orientation": 1,
       "why": "Sus Belli, «*bebe en silencio mirándote por el rabillo del ojo*», upstairs at Astrub's tavern («Montez au premier étage», Dofus pour les noobs); the objective she is for, 13852, names this map. No capture places her: INFERRED, at a table of the room."
+    },
+    {
+      "map": 190580740,
+      "npc": 4472,
+      "cell": 287,
+      "orientation": 3,
+      "criterion": "Qa=1971&Qo!14171",
+      "why": "The apple thieves, at the meadow only while «C'est pour ta pomme» has them still to beat (14171). The cell is the derived layer's."
     }
   ]
 }

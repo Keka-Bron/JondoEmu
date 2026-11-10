@@ -848,24 +848,65 @@
           "message": 30830,
           "choices": [
             { "reply": 37233, "next": 30832, "quest": 2009, "beforeObjective": 13888, "completes": 13888, "params": [[30, 13888]] },
-            { "reply": 38063, "next": 31506 }
-          ]
-        },
-        {
-          "message": 31506,
-          "choices": [
-            { "reply": 38059, "startsQuest": 1971 }
+            { "reply": 38332, "next": 31700, "quest": 2009, "afterQuest": true, "beforeQuest": 1971 },
+            { "reply": 38091, "quest": 1971, "completes": 14175, "params": [[30, 14175]], "next": 31526, "afterObjective": 14174 }
           ]
         },
         {
           "message": 30832,
           "names": true,
           "choices": [
-            { "reply": 38063, "next": 31506 }
+            { "reply": 38063, "next": 31504 }
+          ]
+        },
+        {
+          "message": 31504,
+          "choices": [
+            { "reply": 38061, "next": 31506 },
+            { "reply": 38062, "next": 31505 }
+          ]
+        },
+        {
+          "message": 31505,
+          "choices": [
+            { "reply": 38061, "next": 31506 }
+          ]
+        },
+        {
+          "message": 31506,
+          "choices": [
+            { "reply": 38059, "startsQuest": 1971, "params": [[34, 1971]] },
+            { "reply": 38060 }
+          ]
+        },
+        {
+          "message": 31700,
+          "choices": [
+            { "reply": 38330, "next": 31702 },
+            { "reply": 38331, "next": 31701 }
+          ]
+        },
+        {
+          "message": 31701,
+          "choices": [
+            { "reply": 38330, "next": 31702 }
+          ]
+        },
+        {
+          "message": 31702,
+          "choices": [
+            { "reply": 38328, "startsQuest": 1971, "params": [[34, 1971]] },
+            { "reply": 38329 }
+          ]
+        },
+        {
+          "message": 31526,
+          "choices": [
+            { "reply": 38090 }
           ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37233) is this class's objective (13888, effect 30), and leads to his greeting, 30832, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37233) is this class's objective (13888, effect 30), and leads to his greeting, 30832, «La consejera Archi me ha hablado de ti», then to his class quest. «C'est pour ta pomme»: how he keeps fit (38063), Ocra's blessings (31504), and the apples on the heads of people one is fond of (31506, the line the catalogue names); «El entrenamiento no ha sido nada difícil.» ends it (14175, 31526)."
     },
     {
       "npc": 4334,
@@ -6281,6 +6322,179 @@
         }
       ],
       "why": "Nowa, the pandawa who sells false dofus, from his own lines and replies, by «On marche sur des œufs» of Dofus pour les noobs: the password «La tortilla ya está lista para servirse.» (the visit, 13853), ten thousand kamas for a shining egg (30690, 30691), the threat with the weapon (37054), his ten-kama bribe and «Soy incorruptible.» (30693), and he runs: the fight (npc_fights.json). Beaten, he gives himself up (30687) and «Escoltar al pandawa hasta el jefe de la milicia»; still standing, «¿Otra vez tú?» (30688); afterwards, his trafficking days are over (30686)."
+    },
+    {
+      "npc": 4470,
+      "map": 0,
+      "opening": 31507,
+      "lines": [
+        {
+          "message": 31507,
+          "choices": [
+            { "reply": 38066, "quest": 1971, "completes": 14157, "params": [[30, 14157]], "next": 31508, "beforeObjective": 14157 },
+            { "reply": 38068, "quest": 1971, "completes": 14164, "params": [[30, 14164]], "next": 31510, "afterObjective": 14163 },
+            { "reply": 38070, "quest": 1971, "completes": 14173, "params": [[30, 14173]], "next": 31511, "afterObjective": 14172 },
+            { "reply": 38069, "quest": 1971, "afterObjective": 14173, "beforeObjective": 14174 }
+          ]
+        },
+        {
+          "message": 31508,
+          "choices": [
+            { "reply": 38065, "next": 31509 }
+          ]
+        },
+        {
+          "message": 31509,
+          "choices": [
+            { "reply": 38064 }
+          ]
+        },
+        {
+          "message": 31510,
+          "choices": [
+            { "reply": 38067 }
+          ]
+        },
+        {
+          "message": 31511,
+          "choices": [
+            { "reply": 38069 }
+          ]
+        }
+      ],
+      "why": "The mercenary instructress of the militia's second room, from her own lines and replies, by «C'est pour ta pomme» of Dofus pour les noobs: sent by Setsinbol (14157), out of apples (31508) and off to the grocer's (31509); the rotten apples handed over (14164) make her angry and send the character to the market (31510); the apples saved from the thieves (14173) and she lets him train (31511), on the trunk in the middle of the room."
+    },
+    {
+      "npc": 502,
+      "map": 0,
+      "opening": 2168,
+      "lines": [
+        {
+          "message": 2168,
+          "choices": [
+            { "reply": 38074, "quest": 1971, "completes": 14163, "params": [[30, 14163]], "next": 31512, "afterObjective": 14157 }
+          ]
+        },
+        {
+          "message": 31512,
+          "choices": [
+            { "reply": 38073, "next": 31513 }
+          ]
+        },
+        {
+          "message": 31513,
+          "choices": [
+            { "reply": 38071, "gives": 19750 },
+            { "reply": 38072, "next": 31514 }
+          ]
+        },
+        {
+          "message": 31514,
+          "choices": [
+            { "reply": 38071, "gives": 19750 }
+          ]
+        }
+      ],
+      "why": "«C'est pour ta pomme»: no fresh apples, they were stolen (31512); a crate of rotten ones instead (31513, 19750), the ones he keeps for Tek Abir (31514)."
+    },
+    {
+      "npc": 4378,
+      "map": 0,
+      "opening": 30563,
+      "lines": [
+        {
+          "message": 30563,
+          "choices": [
+            { "reply": 38078, "quest": 1971, "completes": 14165, "params": [[30, 14165]], "next": 31516, "afterObjective": 14164 }
+          ]
+        },
+        {
+          "message": 31516,
+          "choices": [
+            { "reply": 38076, "next": 31517 }
+          ]
+        },
+        {
+          "message": 31517,
+          "choices": [
+            { "reply": 38075, "quest": 1971, "completes": 14166, "params": [[30, 14166]] }
+          ]
+        }
+      ],
+      "why": "«C'est pour ta pomme»: his crates of apples stolen, and a basket of tomatoes with them (31516); a free crate for whoever brings them back (31517), «Seguir el rastro de tomates.» (14166)."
+    },
+    {
+      "npc": 4471,
+      "map": 0,
+      "opening": 31518,
+      "lines": [
+        {
+          "message": 31518,
+          "choices": [
+            { "reply": 38081, "quest": 1971, "completes": 14167, "params": [[30, 14167]], "next": 31519, "afterObjective": 14166 }
+          ]
+        },
+        {
+          "message": 31519,
+          "choices": [
+            { "reply": 38079 }
+          ]
+        }
+      ],
+      "why": "A tomato thief at [2,-17], knocked out (31518): asked for the crates, they were stolen from her too (31519, 14167); «Llamar a un mercenario para que las conduzca a la celda.»"
+    },
+    {
+      "npc": 4351,
+      "map": 188744197,
+      "opening": 31521,
+      "lines": [
+        {
+          "message": 31521,
+          "choices": [
+            { "reply": 38083, "quest": 1971, "completes": 14168, "params": [[30, 14168]], "next": 31522, "afterObjective": 14167 }
+          ]
+        },
+        {
+          "message": 31522,
+          "choices": [
+            { "reply": 38082 }
+          ]
+        }
+      ],
+      "why": "The Astrub mercenary at [2,-17]: told where the thieves are (14168), he takes them in charge (31522), and the character follows the trail to the meadow («Voy a seguir el rastro de tomates en la pradera de nuevo.»)."
+    },
+    {
+      "npc": 4472,
+      "map": 0,
+      "opening": 31523,
+      "openings": [
+        { "quest": 1971, "objective": 14170, "message": 31525 }
+      ],
+      "lines": [
+        {
+          "message": 31523,
+          "choices": [
+            { "reply": 38087, "quest": 1971, "completes": 14170, "params": [[30, 14170]], "next": 31524, "afterObjective": 14169 },
+            { "reply": 38088 }
+          ]
+        },
+        {
+          "message": 31524,
+          "choices": [
+            { "reply": 38086, "next": 31525 },
+            { "reply": 38085, "params": [905] },
+            { "reply": 38084 }
+          ]
+        },
+        {
+          "message": 31525,
+          "choices": [
+            { "reply": 38089, "params": [905] },
+            { "reply": 38088 }
+          ]
+        }
+      ],
+      "why": "The apple thieves loading the stolen crates near the sewer's entrance, from their own lines and replies, by Dofus pour les noobs («Flanquer une correction aux voleurs»): seen loading the crates (14170), told to go back to Astrub (31524) or mocked (31525), and the fight against three of them (npc_fights.json)."
     }
   ]
 }
