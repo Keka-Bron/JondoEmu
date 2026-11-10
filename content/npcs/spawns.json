@@ -1527,6 +1527,70 @@
       "orientation": 3,
       "criterion": "Qa=2007&Qo!13907",
       "why": "The angry stropajo among the crosses of [0,-13] until calmed (13907). INFERRED cell."
+    },
+    {
+      "map": 188744193,
+      "npc": 1441,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa!718|Qo!4665",
+      "why": "Otomai's apprentice at [2,-21], until he leaves for the mine (4665). INFERRED cell."
+    },
+    {
+      "map": 188484108,
+      "npc": 1441,
+      "cell": 231,
+      "orientation": 3,
+      "criterion": "Qa=718&Qo=4665&Qo!4680",
+      "why": "The apprentice beside the slab and the gallery of the trap, clear of it, in the mine's entrance hall, until the beast comes (4680). INFERRED cell."
+    },
+    {
+      "map": 188482060,
+      "npc": 1441,
+      "cell": 243,
+      "orientation": 3,
+      "criterion": "Qa=718&Qo=4680&Qo!4673",
+      "why": "The apprentice hidden in the trap room until the creature is down (4673). INFERRED cell."
+    },
+    {
+      "map": 188482060,
+      "npc": 1444,
+      "cell": 314,
+      "orientation": 5,
+      "criterion": "Qa=718&Qo=4681&Qo!4673",
+      "why": "Otomai's creature on the false floor, drawn in (4681) until beaten (4673)."
+    },
+    {
+      "map": 188482058,
+      "npc": 1441,
+      "cell": 285,
+      "orientation": 1,
+      "criterion": "Qa=718&Qo=4673&Qo!4671",
+      "why": "The apprentice by the sprung trap until Jykel leads them away (4671). INFERRED cell."
+    },
+    {
+      "map": 188482058,
+      "npc": 1442,
+      "cell": 314,
+      "orientation": 7,
+      "criterion": "Qa=718&Qo=4673&Qo!4671",
+      "why": "Jykel at the bottom of the pit, until pulled out (4671)."
+    },
+    {
+      "map": 188482056,
+      "npc": 1441,
+      "cell": 299,
+      "orientation": 3,
+      "criterion": "Qa=718&Qo=4671|Qf=718",
+      "why": "The apprentice in Jykel's cave, there with his way out for whoever is in it. INFERRED cell."
+    },
+    {
+      "map": 188482056,
+      "npc": 1442,
+      "cell": 330,
+      "orientation": 5,
+      "criterion": "Qa=718&Qo=4671|Qf=718",
+      "why": "Jykel in his robbed cave. INFERRED cell."
     }
   ]
 }

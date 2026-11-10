@@ -1033,6 +1033,7 @@
             { "reply": 36645, "quest": 1979, "completes": 13775, "params": [[30, 13775]], "next": 30393, "afterObjectives": [13771, 13772, 13773, 13774] },
             { "reply": 36850, "quest": 1986, "completes": 13847, "params": [[30, 13847]], "next": 30543 },
             { "reply": 37987, "quest": 1987, "completes": 14129, "params": [[30, 14129]], "next": 31446 },
+            { "reply": 37066, "next": 30700, "quest": 718, "beforeObjective": 4660 },
             { "reply": 66930 }
           ]
         },
@@ -1171,9 +1172,27 @@
           "choices": [
             { "reply": 37986 }
           ]
+        },
+        {
+          "message": 30700,
+          "choices": [
+            { "reply": 37065, "next": 30701 }
+          ]
+        },
+        {
+          "message": 30701,
+          "choices": [
+            { "reply": 37064, "next": 30702 }
+          ]
+        },
+        {
+          "message": 30702,
+          "choices": [
+            { "reply": 37067, "quest": 718, "completes": 4660, "params": [[30, 4660]] }
+          ]
         }
       ],
-      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394). «Golémancien»: the animated quintain given (13847), ugly but good for the mercenaries (30543). «Le rebelle de la forêt»: where the ruffians were seen, east of the forest's paths (14129, 31446), and Hel Munster's workshop noted."
+      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394). «Golémancien»: the animated quintain given (13847), ugly but good for the mercenaries (30543). «Le rebelle de la forêt»: where the ruffians were seen, east of the forest's paths (14129, 31446), and Hel Munster's workshop noted. «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660)."
     },
     {
       "npc": 4324,
@@ -7334,6 +7353,7 @@
           "choices": [
             { "reply": 37025, "next": 30666, "quest": 1959, "beforeObjective": 13852 },
             { "reply": 37024, "next": 30667, "quest": 1959, "takes": 6857 },
+            { "reply": 36998, "next": 30648, "quest": 718, "beforeObjective": 4661 },
             { "reply": 37009 }
           ]
         },
@@ -7360,9 +7380,29 @@
           "choices": [
             { "reply": 37021 }
           ]
+        },
+        {
+          "message": 30648,
+          "choices": [
+            { "reply": 36997, "quest": 718, "completes": 4661, "params": [[30, 4661]], "next": 30649, "takes": 6857 },
+            { "reply": 36994 }
+          ]
+        },
+        {
+          "message": 30649,
+          "choices": [
+            { "reply": 37002 },
+            { "reply": 36996, "next": 30650 }
+          ]
+        },
+        {
+          "message": 30650,
+          "choices": [
+            { "reply": 36995 }
+          ]
         }
       ],
-      "why": "Acidrik Rasgapanza, the haruspex of the tavern, from his own lines and replies: «Busco los dofus.» (Dofus pour les noobs: «Dire que vous êtes à la recherche des Dofus»), a beer for the stars (30666), and «Darle una cerveza a Acidrik.», which takes the Cerveza de Astrub and has him dance with the stars (30667-30669)."
+      "why": "Acidrik Rasgapanza, the haruspex of the tavern, from his own lines and replies: «Busco los dofus.» (Dofus pour les noobs: «Dire que vous êtes à la recherche des Dofus»), a beer for the stars (30666), and «Darle una cerveza a Acidrik.», which takes the Cerveza de Astrub and has him dance with the stars (30667-30669). «Attention à la Bête !»: investigating the beast (36998), a cold beer to see where it hides (30648), the beer given (4661) and what its foam shows (30649), no more details (30650). «Attention à la Bête !»: investigating the beast (36998), a cold beer to see where it hides (30648), the beer given (4661) and what its foam shows (30649), no more details (30650). «Attention à la Bête !»: investigating the beast (36998), a cold beer to see where it hides (30648), the beer given (4661) and what its foam shows (30649), no more details (30650). «Attention à la Bête !»: investigating the beast (36998), a cold beer to see where it hides (30648), the beer given (4661) and what its foam shows (30649), no more details (30650)."
     },
     {
       "npc": 4401,
@@ -8666,6 +8706,7 @@
             { "reply": 25507, "quest": 1984, "completes": 13819, "params": [[30, 13819]], "next": 21221, "afterObjective": 13818 },
             { "reply": 36764, "quest": 1999, "completes": 13810, "params": [[30, 13810]], "next": 30485 },
             { "reply": 37855, "quest": 2000, "completes": 14086, "params": [[30, 14086]], "next": 31340, "holds": 19707 },
+            { "reply": 9056, "next": 8950, "quest": 718, "afterObjective": 4665, "beforeObjective": 4664 },
             { "reply": 8834 }
           ]
         },
@@ -8704,9 +8745,15 @@
           "choices": [
             { "reply": 37852 }
           ]
+        },
+        {
+          "message": 8950,
+          "choices": [
+            { "reply": 9055, "quest": 718, "completes": 4664, "params": [[30, 4664]], "gives": 12399 }
+          ]
         }
       ],
-      "why": "Unterix Unter, the hunter of Astrub's outskirts [1,-23], by «Crise sanitaire» («Parler des problèmes avec le bétail»): hunting banned until the game is safe (13819, 21221), and a sample of each resource for Nibe Lula -- wheat, nettle, ash, pío meat with a hunting weapon, gudgeon (21222). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Bûcherons en détresse»: the claw shown and the attacks on the woodcutters (14086): a big bear, rare around here (31340), honey to draw it out, sold by the grocer of Astrub (31341), and a bear trained to kill, so maybe not alone (31342)."
+      "why": "Unterix Unter, the hunter of Astrub's outskirts [1,-23], by «Crise sanitaire» («Parler des problèmes avec le bétail»): hunting banned until the game is safe (13819, 21221), and a sample of each resource for Nibe Lula -- wheat, nettle, ash, pío meat with a hunting weapon, gudgeon (21222). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Bûcherons en détresse»: the claw shown and the attacks on the woodcutters (14086): a big bear, rare around here (31340), honey to draw it out, sold by the grocer of Astrub (31341), and a bear trained to kill, so maybe not alone (31342). «Attention à la Bête !»: the camouflage for the beast's trap (9056), Otomai's apprentice has found help, here it is (8950: 4664, the master hunter's trap 12399). «Attention à la Bête !»: the camouflage for the beast's trap (9056), Otomai's apprentice has found help, here it is (8950: 4664, the master hunter's trap 12399). «Attention à la Bête !»: the camouflage for the beast's trap (9056), Otomai's apprentice has found help, here it is (8950: 4664, the master hunter's trap 12399). «Attention à la Bête !»: the camouflage for the beast's trap (9056), Otomai's apprentice has found help, here it is (8950: 4664, the master hunter's trap 12399)."
     },
     {
       "npc": 4344,
@@ -10240,6 +10287,350 @@
         }
       ],
       "why": "An angry creature of Astrub's cemetery, by «L'invasion des profanateurs de sépulture»: it comes up growling (30623); trying to calm it is the fight (npc_fights.json; again after a lost one), or backing away carefully."
+    },
+    {
+      "npc": 1441,
+      "map": 188744193,
+      "opening": 8916,
+      "openings": [
+        { "quest": 718, "step": 1339, "message": 8917 },
+        { "after": 718, "message": 8930 }
+      ],
+      "lines": [
+        {
+          "message": 8916,
+          "choices": [
+            { "reply": 9041, "next": 8931, "beforeQuest": 718 },
+            { "reply": 9022, "next": 8911, "beforeQuest": 718, "holds": 12401 }
+          ]
+        },
+        {
+          "message": 8931,
+          "choices": [
+            { "reply": 9039, "next": 8932 },
+            { "reply": 9040 }
+          ]
+        },
+        {
+          "message": 8932,
+          "choices": [
+            { "reply": 9038, "next": 8933 }
+          ]
+        },
+        {
+          "message": 8933,
+          "choices": [
+            { "reply": 9037, "next": 8934 }
+          ]
+        },
+        {
+          "message": 8934,
+          "choices": [
+            { "reply": 9036, "startsQuest": 718, "params": [[34, 718]] }
+          ]
+        },
+        {
+          "message": 8911,
+          "choices": [
+            { "reply": 9021, "next": 8912 }
+          ]
+        },
+        {
+          "message": 8912,
+          "choices": [
+            { "reply": 9019, "next": 8913 },
+            { "reply": 9020 }
+          ]
+        },
+        {
+          "message": 8913,
+          "choices": [
+            { "reply": 9018, "next": 8914 }
+          ]
+        },
+        {
+          "message": 8914,
+          "choices": [
+            { "reply": 9017, "next": 8915 }
+          ]
+        },
+        {
+          "message": 8915,
+          "choices": [
+            { "reply": 9016, "startsQuest": 718, "params": [[34, 718]] }
+          ]
+        },
+        {
+          "message": 8917,
+          "choices": [
+            { "reply": 9026, "quest": 718, "completes": 4665, "params": [[30, 4665]], "next": 8918, "afterObjectives": [4660, 4661, 4662] },
+            { "reply": 9023 }
+          ]
+        },
+        {
+          "message": 8918,
+          "choices": [
+            { "reply": 9025, "next": 8919 }
+          ]
+        },
+        {
+          "message": 8919,
+          "choices": [
+            { "reply": 9027 }
+          ]
+        },
+        {
+          "message": 8930,
+          "choices": []
+        }
+      ],
+      "why": "Otomai's apprentice at [2,-21], by «Attention à la Bête !» of Dofus pour les noobs: someone brave wanted (8916), a fierce beast terrorising Astrub (8931), «Accepter de l'aider», only damage and a search (8932), the creature escaped from his master's laboratory after plasmogrine (8933), a trap and some of Astrub's people to ask (8934); the same said to one showing the plasmogrine box (8911-8915, 8915 the line the step declares); all of them asked (4665): the mine it keeps going back to (8918), a master hunter's camouflage from Unterix Unter (8919); afterwards, «Que tus frascos...» (8930)."
+    },
+    {
+      "npc": 1441,
+      "map": 188484108,
+      "opening": 8920,
+      "openings": [
+        { "quest": 718, "objective": 4679, "pending": 4680, "message": 8922 },
+        { "quest": 718, "objective": 4666, "pending": 4680, "message": 8955 }
+      ],
+      "lines": [
+        {
+          "message": 8920,
+          "choices": [
+            { "reply": 9029, "quest": 718, "completes": 4666, "params": [[30, 4666]], "next": 8921 }
+          ]
+        },
+        {
+          "message": 8921,
+          "choices": [
+            { "reply": 9028, "gives": 12400, "givesCount": 6 }
+          ]
+        },
+        {
+          "message": 8955,
+          "choices": []
+        },
+        {
+          "message": 8922,
+          "choices": [
+            { "reply": 9031, "quest": 718, "completes": 4680, "params": [[30, 4680]], "next": 8923 }
+          ]
+        },
+        {
+          "message": 8923,
+          "choices": []
+        }
+      ],
+      "why": "Otomai's apprentice in the entrance hall of the mine [10,-19], by «Attention à la Bête !»: the camouflage (8920), given (4666), the pit the miners dug and the plasmogrine baits to lay (8921, six); baits to lay near a rock or under a bush (8955); all in place (8922), rock-paper-scissors to pass the time (4680), and the beast is coming: into the trap room (8923)."
+    },
+    {
+      "npc": 1441,
+      "map": 188482060,
+      "opening": 8957,
+      "openings": [
+        { "quest": 718, "step": 1341, "message": 8956 }
+      ],
+      "lines": [
+        {
+          "message": 8956,
+          "choices": [
+            { "reply": 9035, "quest": 718, "completes": 4681, "params": [[30, 4681]], "showsNpc": 1444 },
+            { "reply": 9062, "teleport": 193200131 }
+          ]
+        },
+        {
+          "message": 8957,
+          "choices": [
+            { "reply": 9062, "teleport": 193200131 }
+          ]
+        }
+      ],
+      "why": "Otomai's apprentice in the trap room, by «Attention à la Bête !»: the trap not working as planned, draw the creature's attention (8956: 4681, it comes in); and the way back out of the mine (9062)."
+    },
+    {
+      "npc": 1441,
+      "map": 188482058,
+      "opening": 8925,
+      "openings": [
+        { "quest": 718, "objective": 4669, "pending": 4670, "message": 8958 },
+        { "quest": 718, "objective": 4668, "pending": 4669, "message": 8959 }
+      ],
+      "lines": [
+        {
+          "message": 8925,
+          "choices": [
+            { "reply": 9033, "quest": 718, "completes": 4668, "params": [[30, 4668]] },
+            { "reply": 9062, "teleport": 193200131 }
+          ]
+        },
+        {
+          "message": 8959,
+          "choices": [
+            { "reply": 9062, "teleport": 193200131 }
+          ]
+        },
+        {
+          "message": 8958,
+          "choices": [
+            { "reply": 9060, "quest": 718, "completes": 4670, "params": [[30, 4670]] },
+            { "reply": 9062, "teleport": 193200131 }
+          ]
+        }
+      ],
+      "why": "Otomai's apprentice by the sprung trap, by «Attention à la Bête !»: no creature of Otomai in the pit but Jykel (8925: 4668), talk to Jykel (8959), the goblin is telling the truth and the plasmogrine question for him (8958: 4670); the way out (9062)."
+    },
+    {
+      "npc": 1441,
+      "map": 188482056,
+      "opening": 8927,
+      "openings": [
+        { "after": 718, "message": 8930 }
+      ],
+      "lines": [
+        {
+          "message": 8927,
+          "choices": [
+            { "reply": 9035, "next": 8928, "quest": 718, "beforeObjective": 4672 },
+            { "reply": 9062, "teleport": 193200131 }
+          ]
+        },
+        {
+          "message": 8928,
+          "choices": [
+            { "reply": 9025, "next": 8929 }
+          ]
+        },
+        {
+          "message": 8929,
+          "choices": [
+            { "reply": 9061, "quest": 718, "completes": 4672, "params": [[30, 4672]], "teleport": 193200131 }
+          ]
+        },
+        {
+          "message": 8930,
+          "choices": [
+            { "reply": 9062, "teleport": 193200131 }
+          ]
+        }
+      ],
+      "why": "Otomai's apprentice in Jykel's cave, by «Attention à la Bête !»: no plasmogrine (8927), someone able to bore holes in rock came first (8928), thanks and the apprentice's cape (8929), out into the open air (4672); afterwards the same way out (8930, 9062)."
+    },
+    {
+      "npc": 1442,
+      "map": 188482058,
+      "opening": 8953,
+      "openings": [
+        { "quest": 718, "objective": 4668, "pending": 4669, "message": 8935 },
+        { "quest": 718, "objective": 4670, "pending": 4671, "message": 8939 }
+      ],
+      "lines": [
+        {
+          "message": 8935,
+          "choices": [
+            { "reply": 9045, "next": 8936 }
+          ]
+        },
+        {
+          "message": 8936,
+          "choices": [
+            { "reply": 9044, "next": 8937 }
+          ]
+        },
+        {
+          "message": 8937,
+          "choices": [
+            { "reply": 9044, "next": 8938 }
+          ]
+        },
+        {
+          "message": 8938,
+          "choices": [
+            { "reply": 9042, "quest": 718, "completes": 4669, "params": [[30, 4669]] }
+          ]
+        },
+        {
+          "message": 8939,
+          "choices": [
+            { "reply": 9046, "quest": 718, "completes": 4671, "params": [[30, 4671]], "teleport": 188482056 }
+          ]
+        },
+        {
+          "message": 8953,
+          "choices": []
+        }
+      ],
+      "why": "Jykel the goblin at the bottom of the pit, by «Attention à la Bête !»: himself again (8935), not his fault, the potion (8936), stolen from Otomai's shelf (8937), improved to show his master and drunk (8938: 4669); plenty of plasmogrine hidden in a cave nearby (8939), pulled out of the pit to lead the way there (4671)."
+    },
+    {
+      "npc": 1442,
+      "map": 188482056,
+      "opening": 8940,
+      "openings": [
+        { "after": 718, "message": 8954 }
+      ],
+      "lines": [
+        {
+          "message": 8940,
+          "choices": [
+            { "reply": 9047 }
+          ]
+        },
+        {
+          "message": 8954,
+          "choices": []
+        }
+      ],
+      "why": "Jykel in his cave, by «Attention à la Bête !»: the plasmogrine gone, a hole, robbed (8940); afterwards (8954)."
+    },
+    {
+      "npc": 1443,
+      "map": 0,
+      "opening": 8952,
+      "openings": [
+        { "quest": 718, "step": 1339, "message": 8947 }
+      ],
+      "lines": [
+        {
+          "message": 8947,
+          "choices": [
+            { "reply": 9054, "next": 8948, "quest": 718, "beforeObjective": 4662 },
+            { "reply": 9059 }
+          ]
+        },
+        {
+          "message": 8948,
+          "choices": [
+            { "reply": 9053, "next": 8949 }
+          ]
+        },
+        {
+          "message": 8949,
+          "choices": [
+            { "reply": 9059, "quest": 718, "completes": 4662, "params": [[30, 4662]] }
+          ]
+        },
+        {
+          "message": 8952,
+          "choices": []
+        }
+      ],
+      "why": "Dan Gevo the miner, by «Attention à la Bête !»: the beast among us (8947), seen when it burst into his gallery (8948), what it stole, he does not know (8949: 4662)."
+    },
+    {
+      "npc": 1444,
+      "map": 0,
+      "opening": 8951,
+      "lines": [
+        {
+          "message": 8951,
+          "choices": [
+            { "reply": 9057, "quest": 718, "afterObjective": 4681, "beforeObjective": 4673 },
+            { "reply": 9058 }
+          ]
+        }
+      ],
+      "why": "Otomai's creature on the false floor, by «Attention à la Bête !»: «¡Buaj!», attacked (npc_fights.json) or reinforcements awaited."
     }
   ]
 }

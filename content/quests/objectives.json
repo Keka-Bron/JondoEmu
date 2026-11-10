@@ -1049,6 +1049,60 @@
    "afterObjectives": [13924],
    "overridesMap": true,
    "why": "«Trata de forzar la cerradura de la reja con las herramientas»: the gate forced and the vault entered (193463296); the gate's route opens once Finney has led the character to it (Qo>13924, the client's own)."
+  },
+  {
+   "objective": 4674,
+   "quest": 718,
+   "elements": [{"map": 193332227, "element": 516092}],
+   "afterObjectives": [4666],
+   "requires": [{"item": 12400, "count": 1}],
+   "spends": true,
+   "why": "A plasmogrine bait on the clovers of [8,-19] (cell 144), as Dofus pour les noobs places it."
+  },
+  {
+   "objective": 4675,
+   "quest": 718,
+   "elements": [{"map": 193331715, "element": 516093}],
+   "afterObjectives": [4666],
+   "requires": [{"item": 12400, "count": 1}],
+   "spends": true,
+   "why": "A plasmogrine bait on the stake at the top of the quarry, [9,-19] (cell 155), as Dofus pour les noobs places it."
+  },
+  {
+   "objective": 4676,
+   "quest": 718,
+   "elements": [{"map": 193331714, "element": 516094}],
+   "afterObjectives": [4666],
+   "requires": [{"item": 12400, "count": 1}],
+   "spends": true,
+   "why": "A plasmogrine bait on the white flowers of [9,-20] (cell 317), as Dofus pour les noobs places it."
+  },
+  {
+   "objective": 4677,
+   "quest": 718,
+   "elements": [{"map": 193200130, "element": 516096}],
+   "afterObjectives": [4666],
+   "requires": [{"item": 12400, "count": 1}],
+   "spends": true,
+   "why": "A plasmogrine bait on the ferns of [10,-20] (cell 410), as Dofus pour les noobs places it."
+  },
+  {
+   "objective": 4678,
+   "quest": 718,
+   "elements": [{"map": 193200131, "element": 516098}],
+   "afterObjectives": [4666],
+   "requires": [{"item": 12400, "count": 1}],
+   "spends": true,
+   "why": "A plasmogrine bait on the bone at the foot of the ladder, [10,-19] (cell 205), as Dofus pour les noobs places it."
+  },
+  {
+   "objective": 4679,
+   "quest": 718,
+   "elements": [{"map": 188484108, "element": 516099}],
+   "afterObjectives": [4674, 4675, 4676, 4677, 4678],
+   "requires": [{"item": 12400, "count": 1}],
+   "spends": true,
+   "why": "The last bait, inside the mine: the heap of grass at the foot of the TNT barrel (516099, cell 232), once the other five lead the beast here."
   }
  ]
 }

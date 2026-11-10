@@ -121,6 +121,9 @@
       "allies": [ { "monster": 5243, "grade": 0 }, { "monster": 5242, "grade": 0 }, { "monster": 5244, "grade": 0 } ] },
     { "npc": 4382, "map": 193463296, "reply": 81594,
       "monsters": [ { "monster": 5246, "grade": 0 }, { "monster": 5245, "grade": 0 }, { "monster": 5245, "grade": 0 } ],
-      "allies": [ { "monster": 5243, "grade": 0 }, { "monster": 5242, "grade": 0 }, { "monster": 5244, "grade": 0 } ] }
+      "allies": [ { "monster": 5243, "grade": 0 }, { "monster": 5242, "grade": 0 }, { "monster": 5244, "grade": 0 } ] },
+    { "npc": 1444, "map": 188482060, "reply": 9057,
+      "monsters": [ { "monster": 3140, "grade": 0 } ],
+      "winMap": 188482058, "winCell": 410 }
   ]
 }

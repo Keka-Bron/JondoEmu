@@ -52,6 +52,14 @@
       "cell": 333,
       "toMap": 105119744,
       "toCell": 342
+    },
+    {
+      "map": 188484108,
+      "cell": 188,
+      "toMap": 188482060,
+      "toCell": 410,
+      "criterion": "Qa=718&Qo=4680&Qo!4673",
+      "why": "Dyna Mine [10,-19], «Attention à la Bête !»: the slab before the trap's gallery opens its grille once the six baits are laid (4680), and the character hides in the trap room until the creature is down (4673); Dofus pour les noobs: «placez votre personnage sur la dalle pour ouvrir la grille et entrez dans la pièce»."
     }
   ]
 }
