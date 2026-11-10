@@ -188,8 +188,8 @@ namespace Jondo.Unity.World.Content
         /// Where a <see cref="KothRole"/> reply leads when the role cannot be changed yet -- «Lo
         /// siento, aún no estás listo para cambiar de rol. Vuelve a verme dentro de unos minutos.»
         /// --, or where a <see cref="Chapeuvepes"/> trade leads when they are not enough -- «No
-        /// tienes chapeuvepés suficientes para que podamos hacer un intercambio.» --, or zero to
-        /// end the conversation.
+        /// tienes chapeuvepés suficientes para que podamos hacer un intercambio.» --, or where a
+        /// purchase leads when the kamas are not enough, or zero to end the conversation.
         /// </summary>
         public long RefusedNext { get; init; }
 
@@ -488,13 +488,29 @@ namespace Jondo.Unity.World.Content
         /// <summary>Only once this quest is finished.</summary>
         public int After { get; init; }
 
+        /// <summary>
+        /// Only to somebody who may start this quest now, its criterion met: the prince of Wey's
+        /// «ya ewes suficientemente fuewte» for «Suite Woyale» (PL>49), his «vuélvete un poco más
+        /// fuewte» for anyone else after «Le Pwince Monseigneuw».
+        /// </summary>
+        public int CanStart { get; init; }
+
+        /// <summary>
+        /// Only to somebody carrying this item: valet Doz's «Oh, ¡una librea! ¡Gracias!» once Pako
+        /// Rábano has sewn it, his «no tengo librea adecuada» before.
+        /// </summary>
+        public int HoldsItem { get; init; }
+
         /// <summary>The line for a character of this class.</summary>
         public long MessageFor(int breed) => ByBreed.TryGetValue(breed, out long line) ? line : Message;
 
         /// <summary>Whether it holds for a character, his quests read through the callbacks.</summary>
         public bool Holds(Func<int, bool> active, Func<int, bool> finished, Func<int, int, bool> onStep,
-                          Func<int, int, bool> objectiveDone)
+                          Func<int, int, bool> objectiveDone, Func<int, bool>? canStart = null,
+                          Func<int, bool>? carries = null)
         {
+            if (CanStart != 0 && (canStart == null || !canStart(CanStart))) return false;
+            if (HoldsItem != 0 && (carries == null || !carries(HoldsItem))) return false;
             if (Before != 0 && (active(Before) || finished(Before))) return false;
             if (After != 0 && !finished(After)) return false;
             if (Quest != 0 && !active(Quest)) return false;
@@ -534,11 +550,12 @@ namespace Jondo.Unity.World.Content
         /// with no replies -- the client draws its Leave.
         /// </summary>
         public DialogueLine? OpeningFor(int breed, Func<int, bool> active, Func<int, bool> finished,
-                                        Func<int, int, bool> onStep, Func<int, int, bool> objectiveDone)
+                                        Func<int, int, bool> onStep, Func<int, int, bool> objectiveDone,
+                                        Func<int, bool>? canStart = null, Func<int, bool>? carries = null)
         {
             foreach (var opening in Openings)
             {
-                if (!opening.Holds(active, finished, onStep, objectiveDone)) continue;
+                if (!opening.Holds(active, finished, onStep, objectiveDone, canStart, carries)) continue;
                 long message = opening.MessageFor(breed);
                 if (message == 0) continue;
                 return Line(message) ?? new DialogueLine { Message = message };
@@ -715,6 +732,8 @@ namespace Jondo.Unity.World.Content
                 Pending = (int)Number(entry, "pending"),
                 Before = (int)Number(entry, "before"),
                 After = (int)Number(entry, "after"),
+                CanStart = (int)Number(entry, "canStart"),
+                HoldsItem = (int)Number(entry, "holds"),
             };
         }
 
@@ -752,6 +771,8 @@ namespace Jondo.Unity.World.Content
             if (opening.Objective != 0) writer.WriteNumber("objective", opening.Objective);
             if (opening.Pending != 0) writer.WriteNumber("pending", opening.Pending);
             if (opening.After != 0) writer.WriteNumber("after", opening.After);
+            if (opening.CanStart != 0) writer.WriteNumber("canStart", opening.CanStart);
+            if (opening.HoldsItem != 0) writer.WriteNumber("holds", opening.HoldsItem);
             if (opening.ByBreed.Count > 0)
             {
                 writer.WriteStartObject("byBreed");

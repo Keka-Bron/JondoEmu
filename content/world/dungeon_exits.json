@@ -40,6 +40,15 @@
       "npc": 1404,
       "replies": [8555],
       "why": "The Kwakwa's nest: after the Kwakwa the winners are in the nest's exit room [-4,-7] («The Kwakwa's Nest - Exit»), which «L'Ascension» asks to discover (4329), and the Kwakerback host takes them out; his «Salir» leaves."
+    },
+    {
+      "dungeon": 27,
+      "bossRoom": 157552640,
+      "room": 157553664,
+      "cell": 241,
+      "npc": 1384,
+      "replies": [8307, 8308],
+      "why": "The Kanniboul village: after Kanniboul Ebil the winners are in the village's exit room [29,9] («Kanniball Village - Exit»), which «T'as les boules» asks to discover (4113), and the kanniboul host takes them out («reparlez au Gentil Organisateur pour sortir du donjon», Dofus pour les noobs); his two «Salir» replies leave."
     }
   ]
 }

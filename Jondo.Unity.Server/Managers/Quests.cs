@@ -529,9 +529,12 @@ namespace Jondo.Unity.Server.Managers
 
                 Console.WriteLine($"[Quests] Objective {binding.ObjectiveId} asks for {count}x{item} " +
                                   $"and it is not being carried.");
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
-                        InfoMessages.Warning, InfoMessages.MissingItem)));
+                // A hello says nothing about it: valet Doz greeted before the livery is sewn is not
+                // a tap pressed without the lemonade.
+                if (binding.Kind != QuestBindingKind.Talk)
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                            InfoMessages.Warning, InfoMessages.MissingItem)));
                 return false;
             }
 
@@ -586,7 +589,7 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var (item, count) in binding.Gives)
                 {
                     if (Equipment.HowMany(item) > 0) continue;
-                    if (!await Equipment.GiveAsync(stream, item, count)) continue;
+                    if (!await QuestFollowers.GiveAsync(stream, item, count)) continue;
                     gave = true;
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
@@ -600,7 +603,7 @@ namespace Jondo.Unity.Server.Managers
             if (talkFirst) await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
             foreach (var (item, count) in binding.Gives)
             {
-                if (await Equipment.GiveAsync(stream, item, count))
+                if (await QuestFollowers.GiveAsync(stream, item, count))
                 {
                     // «Has conseguido 1 '...'», after each one, as the capture has it (lqn 21).
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -901,7 +904,7 @@ namespace Jondo.Unity.Server.Managers
         {
             foreach (var (item, count) in binding.Requires)
             {
-                if (!await Equipment.TakeAsync(stream, item, count)) continue;
+                if (!await QuestFollowers.TakeAsync(stream, item, count)) continue;
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
                         InfoMessages.ItemLost, count.ToString(CultureInfo.InvariantCulture),
@@ -1342,7 +1345,9 @@ namespace Jondo.Unity.Server.Managers
 
             var start = tree.OpeningFor(SessionContext.State.Breed, log.Active, log.Finished,
                 (quest, step) => log.Run(quest)?.StepId == step,
-                (quest, objective) => log.ObjectiveDone(objective));
+                (quest, objective) => log.ObjectiveDone(objective),
+                quest => log.CanStart(quest, out _),
+                item => Equipment.HowMany(item) > 0);
             var found = new HashSet<int>();
             var seen = new HashSet<long>();
             var queue = new Queue<Jondo.Unity.World.Content.DialogueLine>();
@@ -1649,7 +1654,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 foreach (var (item, count) in binding.Gives)
                 {
-                    if (!await Equipment.GiveAsync(stream, item, count)) continue;
+                    if (!await QuestFollowers.GiveAsync(stream, item, count)) continue;
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
                             InfoMessages.ItemGained, count.ToString(CultureInfo.InvariantCulture),

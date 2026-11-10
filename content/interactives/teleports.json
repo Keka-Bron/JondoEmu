@@ -121,7 +121,11 @@
     "",
     "THE HIDEOUT UNDER THE QUARRY [10,-19]. Éric's old gang keeps Hicha in a room whose entrance is hidden in",
     "the quarry (20206): element 516145 on cell 60 of 188484104, the same graphic as the room's way out",
-    "(516147, in the graph), opens into 188483080 for «Un rayon de soleil» only."
+    "(516147, in the graph), opens into 188483080 for «Un rayon de soleil» only.",
+    "",
+    "THE TURIST-A CANNON, [11,10]. Element 473019 fires the character to the isle of Moon (156762120), only with",
+    "the ticket the promoter sells for 1000 kamas (1089) and wearing a helmet (1019) and wooden wings (1021):",
+    "«il faudra vous équiper de : 1 x Ailes en bois, 1 x Casque. Ensuite, cliquez sur le canon» (Dofus pour les noobs)."
   ],
   "passages": [
     {
@@ -367,6 +371,7 @@
     {"map": 188483076, "element": 515969, "cell": 476, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188482052, "toCell": 193},
     {"map": 188483076, "element": 515967, "cell": 362, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188484100, "toCell": 170},
     {"map": 188484100, "element": 515966, "cell": 155, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188483076, "toCell": 361},
+    {"map": 88085773, "element": 473019, "cell": 355, "gfx": 38088, "type": 0, "skill": 114, "toMap": 156762120, "toCell": 171, "criterion": "PO=1089&POE1019,1&POE1021,1"},
     {"map": 192413702, "element": 515861, "cell": 272, "gfx": 63669, "type": -1, "skill": 184, "toMap": 192545798, "toCell": 386},
     {"map": 192413702, "element": 515862, "cell": 380, "gfx": 63670, "type": -1, "skill": 184, "toMap": 192545798, "toCell": 386},
     {"map": 188745735, "element": 37072, "npc": 4351, "cell": 217, "gfx": 0, "type": -1, "skill": 0, "toMap": 192414728, "toCell": 438},

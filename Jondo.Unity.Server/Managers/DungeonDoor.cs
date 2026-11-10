@@ -47,6 +47,9 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public const string UseKeyWording = "Utilizar la llave";
 
+        /// <summary>And as the kanniboul host of the isle of Moon words it: «Toma la llave.»</summary>
+        public const string TakeKeyWording = "Toma la llave";
+
         /// <summary>
         /// Reply ids at or above this belong to the Expedición generation, not the base dungeon.
         /// </summary>
@@ -95,6 +98,7 @@ namespace Jondo.Unity.Server.Managers
             var keyring = TextKeysSaying(KeyringWording);
             var key = TextKeysSaying(KeyWording);
             key.UnionWith(TextKeysSaying(UseKeyWording));
+            key.UnionWith(TextKeysSaying(TakeKeyWording));
 
             if (keyring.Count == 0 && key.Count == 0)
             {

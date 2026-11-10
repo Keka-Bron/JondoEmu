@@ -2161,7 +2161,7 @@
       "npc": 893,
       "cell": 299,
       "orientation": 3,
-      "criterion": "(Qa=209&Qo=839)|Qa=211",
+      "criterion": "(Qa=209&Qo=839)|(Qf=209&Qf!211)",
       "why": "Counsellor Ys Vewybad at the meeting place with Vil Smis [7,-5], his intentions plain (Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2176,8 +2176,47 @@
       "npc": 904,
       "cell": 297,
       "orientation": 1,
-      "criterion": "Qa=215|Qf=215",
+      "criterion": "Qa=215|(Qf=215&Qf!222)",
       "why": "The prince of Wey hunting south of Cania [-23,-1], from «Émissaire du roi» on (he gives «Le Pwince Monseigneuw»). INFERRED cell."
+    },
+    {
+      "map": 3845,
+      "npc": 84,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "(Qf=211&PO=8576)|Qa=216|Qf=216",
+      "why": "Vil Smis at the meeting place [7,-5] with the counsellor, for the traitors (scroll 8576) from «Traître ou pas traître» on. INFERRED cell."
+    },
+    {
+      "map": 217056260,
+      "npc": 315,
+      "cell": 370,
+      "orientation": 3,
+      "why": "Pako Rábano, Bonta's tailor [-33,-54], in her workshop (Dofus pour les noobs, «Info pour un vrai traître»). INFERRED cell."
+    },
+    {
+      "map": 217055234,
+      "npc": 911,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=222",
+      "why": "Valet Lelisdanla in the Alakarte inn of Bonta [-36,-58], while «Suite Woyale» looks for the prince's retinue. INFERRED cell."
+    },
+    {
+      "map": 217058304,
+      "npc": 907,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=222",
+      "why": "Valet Doz in the Bagrutte inn of Bonta [-29,-59], while «Suite Woyale» looks for the prince's retinue. INFERRED cell."
+    },
+    {
+      "map": 95683075,
+      "npc": 904,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "(Qa=224&Qo=911)|Qf=224",
+      "why": "The prince of Wey at the gate of Amakna castle [4,-6] once the bride's dress is brought («Allez à la rencontre du Prince d'Wa à l'entrée du Château», Dofus pour les noobs). INFERRED cell."
     }
   ]
 }

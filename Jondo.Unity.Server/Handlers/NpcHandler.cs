@@ -824,7 +824,13 @@ namespace Jondo.Unity.Server.Handlers
         /// and by his class (see <see cref="Jondo.Unity.World.Content.DialogueOpening"/>).
         /// </summary>
         private static DialogueLine? OpeningFor(Jondo.Unity.World.Content.NpcDialogue escrito)
-            => LineFor(escrito, escrito.OpeningFor);
+        {
+            var diario = SessionContext.State.Quests;
+            return LineFor(escrito, (breed, active, finished, onStep, objectiveDone) =>
+                escrito.OpeningFor(breed, active, finished, onStep, objectiveDone,
+                                   quest => diario != null && diario.CanStart(quest, out _),
+                                   item => Managers.Equipment.HowMany(item) > 0));
+        }
 
         /// <summary>The line of an opening or a push, for this character, with his journal asked.</summary>
         private static DialogueLine? LineFor(Jondo.Unity.World.Content.NpcDialogue escrito,
@@ -1093,7 +1099,7 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task GiveFromReplyAsync(NetworkStream stream, DialogueChoice choice)
         {
             if (choice.Gives == 0) return;
-            if (!await Managers.Equipment.GiveAsync(stream, choice.Gives, choice.GivesCount))
+            if (!await Managers.QuestFollowers.GiveAsync(stream, choice.Gives, choice.GivesCount))
             {
                 Console.WriteLine($"[NPC] Reply {choice.Reply} could not hand over {choice.GivesCount}x{choice.Gives}.");
                 return;
@@ -1155,6 +1161,11 @@ namespace Jondo.Unity.Server.Handlers
                 // ver a Klaus Konbah» is done by choosing to defend oneself.
                 if (fightChoice != null && fightChoice.Completes != 0)
                     await Managers.Quests.CompleteByReplyAsync(stream, fightChoice.Quest, fightChoice.Completes);
+                // And the quest it hands over, first: the prince of Wey's «À votre service» starts
+                // «Le Pwince Monseigneuw» and the fight against the fat tofu at once, and the fight's
+                // first objective has to be in hand when the fight ends.
+                if (fightChoice != null && fightChoice.StartsQuest != 0)
+                    await Managers.Quests.StartAsync(stream, fightChoice.StartsQuest);
                 CerrarConversacion();
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(ConnectionProtocol.NpcDialogCloseReason)));
@@ -1378,6 +1389,19 @@ namespace Jondo.Unity.Server.Handlers
                 // Unpaid, the conversation stops here: its next line is the one that takes the money
                 // («*se embolsa discretamente tu dinero y te indica que pases*»), and following it
                 // would hand over for nothing what the reply was buying -- the old chapel's way in.
+                // With a refusal line written, it is that line instead: the Turist-A promoter's «no
+                // puedo venderte un billete por menos 1000 kamas», with its own replies.
+                var unpaidLine = !sinPagar || elegidaAhora.RefusedNext == 0 ? null
+                    : NpcDialogues.For(SessionContext.State.OpenDialogueNpcId, SessionContext.State.OpenDialogueMapId)
+                                  ?.Line(elegidaAhora.RefusedNext);
+                if (unpaidLine != null)
+                {
+                    SessionContext.State.OpenDialogueMessage = unpaidLine.Message;
+                    await PreguntarAsync(stream, unpaidLine.Message, LasQueTocan(unpaidLine),
+                                         Npcs.TemplateOf(SessionContext.State.OpenDialogueNpcId), unpaidLine);
+                    Console.WriteLine($"[NPC] Reply {reply}: not enough kamas; line {unpaidLine.Message}.");
+                    return;
+                }
                 if (sinPagar)
                 {
                     CerrarConversacion();
@@ -1454,7 +1478,7 @@ namespace Jondo.Unity.Server.Handlers
             if (elegidaAhora != null && elegidaAhora.Takes != 0)
             {
                 if (Managers.Equipment.HowMany(elegidaAhora.Takes) < elegidaAhora.TakesCount) return;
-                await Managers.Equipment.TakeAsync(stream, elegidaAhora.Takes, elegidaAhora.TakesCount);
+                await Managers.QuestFollowers.TakeAsync(stream, elegidaAhora.Takes, elegidaAhora.TakesCount);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
                         Managers.InfoMessages.ItemLost, elegidaAhora.TakesCount.ToString(System.Globalization.CultureInfo.InvariantCulture),

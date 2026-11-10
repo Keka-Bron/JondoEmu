@@ -1763,6 +1763,60 @@
    "npc": 307,
    "map": 217058304,
    "why": "«Encuentra informaciones en el castillo o en los albergues»: Tabach in Bonta's Bagrutte inn [-29,-59], who crossed the prince of Wey (Dofus pour les noobs)."
+  },
+  {
+   "objective": 856,
+   "quest": 216,
+   "kind": "talk",
+   "npc": 134,
+   "why": "«Encuentra a la persona que te pueda informar sobre la identidad del príncipe»: Captain Lily at Madrestam port [9,-2] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 4110,
+   "quest": 673,
+   "kind": "enter",
+   "map": 156762120,
+   "why": "«Utiliza el cañón para ir a la isla de Moon»: where the cannon of [11,10] lands, on the isle of Moon [35,12] (Dofus pour les noobs: «cliquez sur le canon pour être téléporté sur l'île»)."
+  },
+  {
+   "objective": 887,
+   "quest": 222,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four people to win over for the prince of Wey's retinue, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 889,
+   "quest": 222,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four people to win over for the prince of Wey's retinue, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 888,
+   "quest": 222,
+   "kind": "beat",
+   "monster": 6380,
+   "anyOrder": true,
+   "why": "The Pandawushu master pays homage to the prince once one of his most promising disciples is beaten («Battez le disciple puis reparlez au Maître», Dofus pour les noobs)."
+  },
+  {
+   "objective": 890,
+   "quest": 222,
+   "kind": "talk",
+   "npc": 907,
+   "map": 217058304,
+   "anyOrder": true,
+   "requires": [{"item": 8603, "count": 1}],
+   "spends": true,
+   "why": "Valet Doz joins the retinue once Pako Rábano's livery is brought (Dofus pour les noobs)."
+  },
+  {
+   "objective": 910,
+   "quest": 224,
+   "kind": "order",
+   "gives": [{"item": 8606, "count": 1}],
+   "why": "Pako Rábano finishes the bride's dress with the four wabbit fabrics and hands it over («récupérer la robe de la mariée en échange de 4 x Étoffe du Wabbit», Dofus pour les noobs)."
   }
  ]
 }

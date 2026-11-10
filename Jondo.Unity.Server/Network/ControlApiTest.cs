@@ -466,6 +466,9 @@ namespace Jondo.Unity.Server.Network
                         // quest's «Fabricar» objective played without dragging items about the screen.
                         else if (op == Op.Kew) await WorkshopHandler.SelectRecipeAsync(stream, frame);
                         else if (op == Op.Kep) await WorkshopHandler.CraftAsync(stream, frame);
+                        // An item put on or taken off, as dragging it to its slot sends: a quest's cannon
+                        // that asks for a helmet and wings worn.
+                        else if (op == Op.Iuk) await EquipmentHandler.MoveAsync(stream, frame);
                         else throw new InvalidOperationException($"op {op} is not one the harness sends");
                     }
                     finally

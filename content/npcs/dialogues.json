@@ -14806,19 +14806,47 @@
       "map": 0,
       "opening": 3093,
       "openings": [
+        { "quest": 136, "step": 245, "message": 3093 },
+        { "quest": 136, "step": 243, "message": 3096 },
+        { "quest": 136, "step": 244, "message": 3097 },
+        { "canStart": 136, "message": 3092 },
+        { "after": 136, "message": 3098 },
         { "after": 133, "message": 3073 }
       ],
       "lines": [
+        {
+          "message": 3073,
+          "choices": []
+        },
+        {
+          "message": 3092,
+          "choices": [
+            { "reply": 2735, "startsQuest": 136, "params": [[34, 136]], "next": 3093 },
+            { "reply": 2736, "next": 3099 }
+          ]
+        },
         {
           "message": 3093,
           "choices": []
         },
         {
-          "message": 3073,
+          "message": 3096,
+          "choices": []
+        },
+        {
+          "message": 3097,
+          "choices": []
+        },
+        {
+          "message": 3098,
+          "choices": []
+        },
+        {
+          "message": 3099,
           "choices": []
         }
       ],
-      "why": "Eloko Osopeloso, docker of Madrestam port: «a good warm beer» (3093). «Kartier Tremai se met à table»: another good drinking bout (3073: 483)."
+      "why": "Eloko Osopeloso, docker of Madrestam port: «a good warm beer» (3093). «Kartier Tremai se met à table»: another good drinking bout (3073: 483). «Comment mettre un requin en bière» (136) of Dofus pour les noobs: a shark that never takes its eye off him, something to forget it (3092, «De la bière j'imagine ?»), a good warm beer (3093: three Amakna beers), comparing several kinds (3096: Feubuk, Gatokemao, Almenú, bwórkbol, Astrub), drunk too fast, some water (3097: ten), ready to face the shark (3098); «you will find it, smart one» (3099)."
     },
     {
       "npc": 745,
@@ -14877,6 +14905,9 @@
       "map": 0,
       "opening": 3056,
       "openings": [
+        { "quest": 139, "message": 3055 },
+        { "canStart": 139, "message": 3053 },
+        { "after": 139, "message": 3054 },
         { "quest": 135, "objective": 506, "pending": 507, "message": 3090 }
       ],
       "lines": [
@@ -14887,9 +14918,30 @@
         {
           "message": 3090,
           "choices": []
+        },
+        {
+          "message": 3053,
+          "choices": [
+            { "reply": 83199, "next": 60431 }
+          ]
+        },
+        {
+          "message": 60431,
+          "choices": [
+            { "reply": 83197, "startsQuest": 139, "params": [[34, 139]] },
+            { "reply": 83198 }
+          ]
+        },
+        {
+          "message": 3054,
+          "choices": []
+        },
+        {
+          "message": 3055,
+          "choices": []
         }
       ],
-      "why": "Haraquiri, the king's butcher [5,-4], hungry for a steak (3056). «La potion de lèche-bottes»: the potion bought (3090: 506)."
+      "why": "Haraquiri, the king's butcher [5,-4], hungry for a steak (3056). «La potion de lèche-bottes»: the potion bought (3090: 506). «De la viande pour la tablée d'Allister» (139, daily) of Dofus pour les noobs: the king needs meat (3053, «Se renseigner sur la qualité exigée»), urgent, rancid meat will do with his seasoning (60431, «Accepter cette mission»), the king is hungry (3055), enough, this is for you (3054: ten rancid meats)."
     },
     {
       "npc": 893,
@@ -15120,16 +15172,16 @@
     {
       "npc": 1387,
       "map": 163583488,
-      "opening": 8319,
+      "opening": 8320,
       "lines": [
         {
-          "message": 8319,
+          "message": 8320,
           "choices": [
-            { "reply": 8356 }
+            { "reply": 8355 }
           ]
         }
       ],
-      "why": "The chafer host in the Haunted Mansion's last room: back from the dead? (8319), «Salir» takes the winners out (dungeon_exits.json)."
+      "why": "The chafer host in the Haunted Mansion's last room [-13,-41]: back from the dead, come and see us again (8320); his «Salir» leaves (dungeon_exits.json)."
     },
     {
       "npc": 900,
@@ -15175,6 +15227,11 @@
       "npc": 84,
       "map": 0,
       "opening": 3880,
+      "openings": [
+        { "after": 211, "before": 216, "message": 3921 },
+        { "quest": 216, "step": 396, "message": 3923 },
+        { "after": 216, "message": 3924 }
+      ],
       "lines": [
         {
           "message": 3880,
@@ -15197,9 +15254,24 @@
         {
           "message": 3883,
           "choices": []
+        },
+        {
+          "message": 3921,
+          "choices": [
+            { "reply": 3467, "startsQuest": 216, "params": [[34, 216]] },
+            { "reply": 3466 }
+          ]
+        },
+        {
+          "message": 3923,
+          "choices": []
+        },
+        {
+          "message": 3924,
+          "choices": []
         }
       ],
-      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882)."
+      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857)."
     },
     {
       "npc": 1404,
@@ -15238,13 +15310,16 @@
           ]
         }
       ],
-      "why": "The Kwakerback host in the Kwakwa's nest exit room: how were the kwaks? (8507), «Salir» takes the winners out (dungeon_exits.json)."
+      "why": "The Kwakerback host in the Kwakwa's nest exit room [-4,-7]: how were the kwaks, any eggs? (8507); his «Salir» leaves (dungeon_exits.json)."
     },
     {
       "npc": 897,
       "map": 0,
       "opening": 3909,
       "openings": [
+        { "quest": 224, "objective": 911, "pending": 5466, "message": 4040 },
+        { "quest": 224, "pending": 909, "message": 4036 },
+        { "after": 222, "before": 224, "canStart": 224, "message": 4035 },
         { "quest": 215, "objective": 927, "pending": 5463, "message": 4057 }
       ],
       "lines": [
@@ -15268,9 +15343,26 @@
         {
           "message": 4057,
           "choices": []
+        },
+        {
+          "message": 4035,
+          "choices": [
+            { "reply": 3513, "next": 4036 },
+            { "reply": 3514 }
+          ]
+        },
+        {
+          "message": 4036,
+          "choices": [
+            { "reply": 3515, "startsQuest": 224, "params": [[34, 224]] }
+          ]
+        },
+        {
+          "message": 4040,
+          "choices": []
         }
       ],
-      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927)."
+      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911)."
     },
     {
       "npc": 307,
@@ -15296,6 +15388,15 @@
       "map": 0,
       "opening": 3983,
       "openings": [
+        { "after": 224, "before": 225, "message": 4019 },
+        { "quest": 222, "objective": 5465, "pending": 5464, "message": 4018 },
+        { "quest": 222, "step": 409, "message": 3992 },
+        { "canStart": 222, "message": 3992 },
+        { "after": 221, "before": 222, "message": 3991 },
+        { "after": 215, "before": 221, "message": 3984 },
+        { "quest": 221, "objective": 883, "pending": 884, "message": 3986 },
+        { "quest": 221, "objective": 884, "pending": 885, "message": 3987 },
+        { "after": 221, "message": 3990 },
         { "quest": 215, "objective": 927, "pending": 5463, "message": 3984 }
       ],
       "lines": [
@@ -15307,21 +15408,437 @@
           ]
         },
         {
-          "message": 3987,
-          "choices": []
-        },
-        {
           "message": 3984,
           "choices": [
-            { "reply": 3482, "quest": 215, "completes": 5463, "params": [[30, 5463]], "next": 3988 }
+            { "reply": 3482, "quest": 215, "completes": 5463, "params": [[30, 5463]], "next": 3988 },
+            { "reply": 3485, "next": 3985, "beforeQuest": 221 }
           ]
         },
         {
           "message": 3988,
           "choices": []
+        },
+        {
+          "message": 3985,
+          "choices": [
+            { "reply": 3487, "startsQuest": 221, "params": [[34, 221]] },
+            { "reply": 3486 }
+          ]
+        },
+        {
+          "message": 3986,
+          "choices": [
+            { "reply": 3481, "quest": 221, "completes": 884, "params": [[30, 884]], "next": 3987 }
+          ]
+        },
+        {
+          "message": 3987,
+          "choices": [
+            { "reply": 3519, "quest": 221, "afterObjective": 884, "beforeObjective": 885 }
+          ]
+        },
+        {
+          "message": 3990,
+          "choices": []
+        },
+        {
+          "message": 3991,
+          "choices": []
+        },
+        {
+          "message": 3992,
+          "choices": [
+            { "reply": 3509, "startsQuest": 222, "params": [[34, 222]] }
+          ]
+        },
+        {
+          "message": 4018,
+          "choices": []
+        },
+        {
+          "message": 4019,
+          "choices": [
+            { "reply": 31726, "startsQuest": 225, "params": [[34, 225]], "next": 10772 }
+          ]
+        },
+        {
+          "message": 10772,
+          "choices": [
+            { "reply": 11858, "quest": 225, "beforeObjective": 913 },
+            { "reply": 11859, "quest": 225, "beforeObjective": 913 }
+          ]
         }
       ],
-      "why": "The prince of Wey, hunting south of Cania [-23,-1], by «Émissaire du roi» of Dofus pour les noobs: «what do you want? a creature worthy of my lineage» (3983), a princess to marry, «I am your prince» (3987: 860); what a lovely land (3984), where are your people? «followers then» (3988: 5463)."
+      "why": "The prince of Wey, hunting south of Cania [-23,-1], by «Émissaire du roi» of Dofus pour les noobs: «what do you want? a creature worthy of my lineage» (3983), a princess to marry, «I am your prince» (3987: 860); what a lovely land (3984), where are your people? «followers then» (3988: 5463). «Le Pwince Monseigneuw» (221): «haven't you heard?», the monster coming, «you shall be my squire» (3985, «À votre service»), the fat tofu fought at his side; victorious, what brought you here? (3986), a princess to marry (3987: 884), «I am ready», the mother tofu attacks; what kind of monster was that? (3990). «Suite Woyale» (222): stronger now, recruit others, a superb trophy (3992, «Je me mets en route»), a bit stronger first (3991, under level 50); «so that is my retinue?», a walk before the castle (4018: 5465). At the castle's gate [4,-6], «Un mawiage pwincier» ends on a hello (5466): «ah, my kind squire, I wanted to ask you...» (4019), «beware the threatening sram behind you», «Qui veut la peau du Wabbit ?» (225) starts, «they are back, these srams attack me!» (10772), the two sram assassins fought."
+    },
+    {
+      "npc": 315,
+      "map": 0,
+      "opening": 1245,
+      "openings": [
+        { "quest": 224, "objective": 910, "pending": 911, "message": 4039 },
+        { "quest": 224, "pending": 910, "message": 4038 },
+        { "quest": 216, "objective": 854, "pending": 855, "message": 3934 },
+        { "quest": 216, "objective": 853, "pending": 854, "message": 3933 },
+        { "quest": 216, "step": 395, "message": 3931 },
+        { "quest": 222, "pending": 890, "message": 4016 }
+      ],
+      "lines": [
+        {
+          "message": 1245,
+          "choices": []
+        },
+        {
+          "message": 3931,
+          "choices": [
+            { "reply": 3455, "next": 3932, "quest": 216, "beforeObjective": 853 },
+            { "reply": 3456, "next": 4054 }
+          ]
+        },
+        {
+          "message": 3932,
+          "choices": [
+            { "reply": 3457, "quest": 216, "completes": 853, "params": [[30, 853]], "next": 3933 },
+            { "reply": 3458 }
+          ]
+        },
+        {
+          "message": 3933,
+          "choices": []
+        },
+        {
+          "message": 3934,
+          "choices": []
+        },
+        {
+          "message": 4054,
+          "choices": []
+        },
+        {
+          "message": 4016,
+          "choices": [
+            { "reply": 3516, "next": 4017, "takes": 643, "takesCount": 3, "takesAll": [2273], "gives": 8603 }
+          ]
+        },
+        {
+          "message": 4017,
+          "choices": []
+        },
+        {
+          "message": 4038,
+          "choices": []
+        },
+        {
+          "message": 4039,
+          "choices": []
+        }
+      ],
+      "why": "Pako Rábano, Bonta's tailor [-33,-54]. «Info pour un vrai traître» of Dofus pour les noobs: even the king orders from her (3931, «Dire qu'elle est aussi fameuse pour ses prédictions...»), what she was asked, for three silk threads (3932: 853), the threads (3933), Allisteria's wedding dress (3934: 854); an affront (4054). «Suite Woyale»: a valet's livery for a wabbit prince, a purple fabric like the eztrambworks' and three silk threads (4016), «here they are», the livery (4017: item 8603). «Un mawiage pwincier»: the bride's dress is ready but not the opaque veil the intendant asked for, four wabbit fabrics (4038); a moment, her masterpiece done (4039: 910 on a hello, the dress 8606 handed over)."
+    },
+    {
+      "npc": 134,
+      "map": 0,
+      "opening": 3935,
+      "openings": [
+        { "quest": 216, "step": 396, "message": 3935 }
+      ],
+      "lines": [
+        {
+          "message": 3935,
+          "choices": []
+        }
+      ],
+      "why": "«Info pour un vrai traître»: carrots from the island, a wabbit prince coming to Amakna (3935: 856, on a hello)."
+    },
+    {
+      "npc": 153,
+      "map": 0,
+      "opening": 21835,
+      "lines": [
+        {
+          "message": 21835,
+          "choices": [
+            { "reply": 26258, "buyItem": 1089, "buyPrice": 1000, "next": 21839, "refused": 21840 },
+            { "reply": 26260, "next": 21836 },
+            { "reply": 26270, "next": 21843 },
+            { "reply": 26267, "next": 21842, "holds": 1089 },
+            { "reply": 26268 }
+          ]
+        },
+        {
+          "message": 21836,
+          "choices": [
+            { "reply": 26261, "next": 21837 },
+            { "reply": 26263, "buyItem": 1089, "buyPrice": 1000, "next": 21844, "refused": 21845 }
+          ]
+        },
+        {
+          "message": 21837,
+          "choices": [
+            { "reply": 26259, "next": 21838 }
+          ]
+        },
+        {
+          "message": 21838,
+          "choices": [
+            { "reply": 26271, "buyItem": 1089, "buyPrice": 1000, "next": 21839, "refused": 21840 },
+            { "reply": 26262 }
+          ]
+        },
+        {
+          "message": 21839,
+          "choices": [
+            { "reply": 26254 },
+            { "reply": 26255 },
+            { "reply": 26256 }
+          ]
+        },
+        {
+          "message": 21844,
+          "choices": [
+            { "reply": 26264 },
+            { "reply": 26265 },
+            { "reply": 26266 }
+          ]
+        },
+        {
+          "message": 21840,
+          "choices": [
+            { "reply": 26257 }
+          ]
+        },
+        {
+          "message": 21845,
+          "choices": [
+            { "reply": 26275 }
+          ]
+        },
+        {
+          "message": 21842,
+          "choices": [
+            { "reply": 26272 },
+            { "reply": 26273 },
+            { "reply": 26274 }
+          ]
+        },
+        {
+          "message": 21843,
+          "choices": [
+            { "reply": 26269 }
+          ]
+        }
+      ],
+      "why": "The promoter of the Equipo Turist-A by the cannon [11,10], by «T'as les boules» of Dofus pour les noobs: tired of fighting? (21835), today's offer, the isle of Moon at half price (21836), a dream island (21837), 1000 kamas with a helmet and a pair of wings (21838); the ticket bought (21839, 21844: item 1089) or not enough kamas (21840, 21845); «what are you waiting for?» with a ticket (21842); Hannibol Smis the director (21843)."
+    },
+    {
+      "npc": 1384,
+      "map": 0,
+      "opening": 8317,
+      "openings": [
+        { "quest": 673, "message": 8271 }
+      ],
+      "lines": [
+        {
+          "message": 8317,
+          "choices": [
+            { "reply": 11907, "next": 10812, "beforeQuest": 673 }
+          ]
+        },
+        {
+          "message": 8271,
+          "choices": []
+        },
+        {
+          "message": 10812,
+          "choices": [
+            { "reply": 11908 }
+          ]
+        }
+      ],
+      "why": "The kanniboul host of the Equipo Turist-A before the Kanniboul village [29,9] of the isle of Moon: visit the village, bring the key (8317); «T'as les boules»: a broken mask, the key and not the keyring the first time (8271); the village is a Destination Aventure, Hannibol Smis first (10812). The door replies (key, keyring) are the dungeon's (DungeonHandler)."
+    },
+    {
+      "npc": 1384,
+      "map": 157553664,
+      "opening": 8273,
+      "openings": [
+        { "after": 673, "message": 8272 }
+      ],
+      "lines": [
+        {
+          "message": 8273,
+          "choices": [
+            { "reply": 8307 }
+          ]
+        },
+        {
+          "message": 8272,
+          "choices": [
+            { "reply": 8307 }
+          ]
+        }
+      ],
+      "why": "The kanniboul host in the village's exit room: «you did it, the Equipo Turist-A thanks you» (8273); «T'as les boules»: a present, flowers (8272, the attitude). His «Salir» leaves (dungeon_exits.json)."
+    },
+    {
+      "npc": 335,
+      "map": 0,
+      "opening": 1331,
+      "openings": [
+        { "quest": 222, "pending": 887, "message": 4003 }
+      ],
+      "lines": [
+        {
+          "message": 1331,
+          "choices": []
+        },
+        {
+          "message": 4003,
+          "choices": [
+            { "reply": 3497, "next": 4004 },
+            { "reply": 3498 },
+            { "reply": 3496 }
+          ]
+        },
+        {
+          "message": 4004,
+          "choices": [
+            { "reply": 3499, "next": 4005 },
+            { "reply": 3500, "next": 4005 },
+            { "reply": 3501, "quest": 222, "completes": 887, "params": [[30, 887]], "buyPrice": 20000, "next": 4007, "refused": 4005 },
+            { "reply": 3503, "quest": 222, "completes": 887, "params": [[30, 887]], "buyPrice": 50000, "next": 4007, "refused": 4005 }
+          ]
+        },
+        {
+          "message": 4005,
+          "choices": [
+            { "reply": 3501, "quest": 222, "completes": 887, "params": [[30, 887]], "buyPrice": 20000, "next": 4007, "refused": 4005 },
+            { "reply": 3503, "quest": 222, "completes": 887, "params": [[30, 887]], "buyPrice": 50000, "next": 4007, "refused": 4005 },
+            { "reply": 3496 }
+          ]
+        },
+        {
+          "message": 4007,
+          "choices": []
+        }
+      ],
+      "why": "Sbab, cook of the Brakmar militia, in its kitchens [-25,33]. «Suite Woyale» of Dofus pour les noobs: cook for a wabbit? motivate me (4003), «you would leave Brakmar», the pay must be worth it (4004), 5000 or 10000 are not enough (4005), «proposez lui 20 000 kamas»: a deal (4007: 887)."
+    },
+    {
+      "npc": 5583,
+      "map": 0,
+      "opening": 41060,
+      "lines": [
+        {
+          "message": 41060,
+          "choices": [
+            { "reply": 55136, "next": 42329, "quest": 222, "beforeObjective": 888 },
+            { "reply": 55138, "next": 42335, "quest": 222, "afterObjective": 888 }
+          ]
+        },
+        {
+          "message": 42329,
+          "choices": [
+            { "reply": 55132, "next": 42333 },
+            { "reply": 55134 }
+          ]
+        },
+        {
+          "message": 42333,
+          "choices": [
+            { "reply": 55186, "quest": 222, "beforeObjective": 888 }
+          ]
+        },
+        {
+          "message": 42335,
+          "choices": []
+        }
+      ],
+      "why": "The Pandawushu master in his dojo [20,-31]. «Suite Woyale» of Dofus pour les noobs: «mention the wabbit prince», serve a wabbit? they are weak (42329), the challenge, beat one of my most promising disciples (42333, «Prepararte para el duelo»: the Pandawushu disciple, 6380, level 50), «will you keep your side of the deal?», homage to your prince (42335)."
+    },
+    {
+      "npc": 911,
+      "map": 0,
+      "opening": 4013,
+      "openings": [
+        { "quest": 222, "pending": 889, "message": 4014 }
+      ],
+      "lines": [
+        {
+          "message": 4013,
+          "choices": []
+        },
+        {
+          "message": 4014,
+          "choices": [
+            { "reply": 3505, "next": 4015 }
+          ]
+        },
+        {
+          "message": 4015,
+          "choices": [
+            { "reply": 3507, "quest": 222, "completes": 889, "params": [[30, 889]], "buyPrice": 5000 }
+          ]
+        }
+      ],
+      "why": "Valet Lelisdanla, in the Alakarte inn of Bonta [-36,-58]: hired, he would at least earn some honest kamas (4013). «Suite Woyale» of Dofus pour les noobs: serve a prince, how much? (4014), 5000 kamas until the wedding, a correct sum, any clothes? (4015), «a tailor, use my kamas» («offrez lui 5 000 kamas»: 889)."
+    },
+    {
+      "npc": 907,
+      "map": 0,
+      "opening": 4010,
+      "openings": [
+        { "quest": 222, "pending": 890, "holds": 8603, "message": 4012 }
+      ],
+      "lines": [
+        {
+          "message": 4010,
+          "choices": [
+            { "reply": 3517, "next": 4042, "quest": 222, "beforeObjective": 890 }
+          ]
+        },
+        {
+          "message": 4042,
+          "choices": []
+        },
+        {
+          "message": 4012,
+          "choices": []
+        }
+      ],
+      "why": "Valet Doz, in the Bagrutte inn of Bonta [-29,-59]: serve a prince? no proper livery (4010). «Suite Woyale» of Dofus pour les noobs: «what if I get you one?», his measures (4042); the livery, he will serve (4012: 890, on a hello, the livery handed over)."
+    },
+    {
+      "npc": 803,
+      "map": 0,
+      "opening": 3313,
+      "openings": [
+        { "quest": 143, "message": 3312 },
+        { "canStart": 143, "message": 3308 },
+        { "after": 143, "message": 3311 }
+      ],
+      "lines": [
+        {
+          "message": 3313,
+          "choices": []
+        },
+        {
+          "message": 3308,
+          "choices": [
+            { "reply": 2964, "startsQuest": 143, "params": [[34, 143]] },
+            { "reply": 2965 }
+          ]
+        },
+        {
+          "message": 3311,
+          "choices": []
+        },
+        {
+          "message": 3312,
+          "choices": []
+        }
+      ],
+      "why": "Valcor of Amakna castle [5,-5], who wonders where to find fine dragoturkeys for the king (3313). «Allez hue !» (143, daily, neutral characters) of Dofus pour les noobs: the finest stud of the region, bring dragoturkeys (3308, «J'accepte cette tâche, je pars sur le champ»), a royal mission, be quicker (3312), thanks, these scrolls (3311: an almond dragoturkey, 33001)."
     }
   ]
 }
