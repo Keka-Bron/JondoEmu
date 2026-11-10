@@ -1,0 +1,13 @@
+{
+  "_": [
+    "Start conditions the catalogue leaves out and the game has. A criterion here replaces the",
+    "catalogue's, in the client's own syntax (Qf=<quest> finished, & and |)."
+  ],
+  "criteria": [
+    {
+      "quest": 1632,
+      "criterion": "Qf=1631",
+      "why": "«Un pueblo sobre las nubes» is handed over at the village gate, past the end of the celestial temple; the catalogue says BT=1, and Dofus pour les noobs gives «Réponses à tout» as the quest to have done first."
+    }
+  ]
+}

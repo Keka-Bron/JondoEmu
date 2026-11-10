@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
@@ -60,6 +61,30 @@ namespace Jondo.Unity.World.Content
         /// offered «He neutralizado a la rata» from minute one, with the rat alive.
         /// </remarks>
         public int AfterObjective { get; init; }
+
+        /// <summary>
+        /// Objectives that all have to have been met: «Ya he visitado a varios habitantes del
+        /// pueblo» once the five visits of «Un pueblo sobre las nubes» are done, in any order.
+        /// </summary>
+        public IReadOnlyList<int> AfterObjectives { get; init; } = Array.Empty<int>();
+
+        /// <summary>
+        /// The objective that must still be to do for the reply to be offered: Ternette's
+        /// «Presentarte.» is said once, while 1632's visit to her is pending.
+        /// </summary>
+        public int BeforeObjective { get; init; }
+
+        /// <summary>
+        /// A quest neither started nor finished for the reply to be offered: Ternette's «Estoy
+        /// impaciente por explorar la isla celeste» leads to 1639 only for whoever has not had it.
+        /// </summary>
+        public int BeforeQuest { get; init; }
+
+        /// <summary>
+        /// Replies of the same group are one reply, picked at random each time the line is said:
+        /// Azar's four «Lanzar los dados sobre la mesa.» each lead to a different throw.
+        /// </summary>
+        public int RandomGroup { get; init; }
 
         /// <summary>The interactive that has to have been used for the reply to be offered.</summary>
         /// <remarks>
@@ -254,6 +279,8 @@ namespace Jondo.Unity.World.Content
                 if (choice.AfterElement != 0
                     && (elementUsed == null || !elementUsed(choice.AfterElement))) continue;
 
+                if (choice.BeforeQuest != 0 && (active(choice.BeforeQuest) || finished(choice.BeforeQuest))) continue;
+
                 if (choice.Always) { replies.Add(choice.Reply); continue; }
 
                 if (choice.AfterQuest)
@@ -264,6 +291,8 @@ namespace Jondo.Unity.World.Content
 
                 if (!active(choice.Quest)) continue;
                 if (choice.Step != 0 && !onStep(choice.Quest, choice.Step)) continue;
+                if (choice.BeforeObjective != 0 && objectiveDone != null && objectiveDone(choice.Quest, choice.BeforeObjective))
+                    continue;
 
                 // And the objective, when the row asks for it. Without the call -- which is optional so as not to
                 // force whoever does not have it -- a reply tied to an objective is not offered,
@@ -271,8 +300,26 @@ namespace Jondo.Unity.World.Content
                 if (choice.AfterObjective != 0
                     && (objectiveDone == null || !objectiveDone(choice.Quest, choice.AfterObjective)))
                     continue;
+                if (choice.AfterObjectives.Count > 0
+                    && (objectiveDone == null || choice.AfterObjectives.Any(o => !objectiveDone(choice.Quest, o))))
+                    continue;
 
                 replies.Add(choice.Reply);
+            }
+
+            // One of each random group, the dice of the line.
+            if (Choices.Any(c => c.RandomGroup != 0))
+            {
+                foreach (var group in Choices.Where(c => c.RandomGroup != 0 && replies.Contains(c.Reply))
+                                             .GroupBy(c => c.RandomGroup).ToList())
+                {
+                    var members = group.ToList();
+                    var kept = members[Random.Shared.Next(members.Count)];
+                    foreach (var other in members)
+                    {
+                        if (other != kept) replies.Remove(other.Reply);
+                    }
+                }
             }
 
             return replies.ToArray();
@@ -658,6 +705,10 @@ namespace Jondo.Unity.World.Content
                             Step = (int)Number(choice, "step"),
                             StartsQuest = (int)Number(choice, "startsQuest"),
                             AfterObjective = (int)Number(choice, "afterObjective"),
+                            AfterObjectives = Numbers(choice, "afterObjectives").Select(o => (int)o).ToArray(),
+                            BeforeObjective = (int)Number(choice, "beforeObjective"),
+                            BeforeQuest = (int)Number(choice, "beforeQuest"),
+                            RandomGroup = (int)Number(choice, "random"),
                             AfterElement = (int)Number(choice, "afterElement"),
                             BuysItem = (int)Number(choice, "buyItem"),
                             BuysCount = (int)Math.Max(1, Number(choice, "buyCount")),
@@ -783,6 +834,18 @@ namespace Jondo.Unity.World.Content
                             if (choice.AfterQuest) writer.WriteBoolean("afterQuest", true);
                             if (choice.AfterObjective != 0)
                                 writer.WriteNumber("afterObjective", choice.AfterObjective);
+                            if (choice.AfterObjectives.Count > 0)
+                            {
+                                writer.WriteStartArray("afterObjectives");
+                                foreach (int o in choice.AfterObjectives) writer.WriteNumberValue(o);
+                                writer.WriteEndArray();
+                            }
+                            if (choice.BeforeObjective != 0)
+                                writer.WriteNumber("beforeObjective", choice.BeforeObjective);
+                            if (choice.BeforeQuest != 0)
+                                writer.WriteNumber("beforeQuest", choice.BeforeQuest);
+                            if (choice.RandomGroup != 0)
+                                writer.WriteNumber("random", choice.RandomGroup);
                             if (choice.AfterElement != 0)
                                 writer.WriteNumber("afterElement", choice.AfterElement);
                             if (choice.BuysItem != 0)

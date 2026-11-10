@@ -644,7 +644,9 @@ namespace Jondo.Unity.Server
                 if (teleport.NpcId != 0)
                 {
                     var dialogue = Managers.NpcDialogues.For(teleport.NpcId, teleport.SourceMapId);
-                    if (!Managers.Npcs.OnMap(teleport.SourceMapId).Any(n =>
+                    // Placed, whoever looks: Likantrabioso's way out of the lair is there only
+                    // once the Minilubo is beaten, and the guard runs with no character at all.
+                    if (!Managers.Npcs.Of(teleport.SourceMapId).Any(n =>
                             n.NpcId == teleport.NpcId && n.Cell == teleport.SourceCellId) ||
                         Managers.Npcs.TemplateOf(teleport.NpcId)?.Actions.Contains(Managers.Npcs.Talk) != true ||
                         dialogue == null || !dialogue.Lines.Any(line =>

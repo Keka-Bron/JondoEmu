@@ -725,6 +725,36 @@
       "cell": 302,
       "orientation": 3,
       "why": "Ema Sacre, who trades the head hunters' chapeuvepés (Managers.HeadHunts). In 1.29 the Brakmarians' hunts were hers, at the militia, with Oto Mustam on 371 of this same room. INFERRED: the walkable cell nearest the room's middle, facing 3."
+    },
+    {
+      "map": 153357316,
+      "npc": 2909,
+      "cell": 298,
+      "orientation": 1,
+      "why": "Azar, the Ecaflip of the tavern who would rather play cards and listen to the music (her 20932); one of the three seekers of «La esperanza y la tragedia», «à l'intérieur de la taverne» per Dofus pour les noobs. No capture places her: INFERRED, by the card table."
+    },
+    {
+      "map": 153879809,
+      "npc": 2904,
+      "cell": 272,
+      "orientation": 1,
+      "why": "Oscar Kasa, the thief's ghost waiting for the phoenix to bring him back (his 20946, 20947); «en [2,-1]» per Dofus pour les noobs, the phoenix rock. No capture places him: INFERRED, on the open ground before the phoenix."
+    },
+    {
+      "map": 152836096,
+      "npc": 2911,
+      "cell": 344,
+      "orientation": 1,
+      "criterion": "Qa=1635&Qo!9785",
+      "why": "The Minilubo Albino, in his lair, «qui se tient devant vous» (Dofus pour les noobs), facing whoever comes in from the grate's landing (373); there until he is beaten, «Vence a Minilubo Albino» (9785). No capture places him: INFERRED."
+    },
+    {
+      "map": 152836096,
+      "npc": 2898,
+      "cell": 344,
+      "orientation": 1,
+      "criterion": "Qo=9785|Qf=1635",
+      "why": "Likantrabioso, where the Minilubo stood: «Une fois le combat terminé, Hargnok qui avait disparu apparaît. Il semblerait que le Milimilou n'était autre que lui» (Dofus pour les noobs). The derived layer had him here from the start; he is the Minilubo, so he only shows once it is beaten."
     }
   ]
 }

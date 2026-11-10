@@ -476,6 +476,15 @@ namespace Jondo.Unity.Server.Managers
 
             if (!wanted) return false;
 
+            // What has to come first, for a kind that is not itself waiting on them.
+            if (binding.Kind != QuestBindingKind.Objectives)
+            {
+                foreach (int before in binding.AfterObjectives)
+                {
+                    if (!run.Done.Contains(before) && !log.ObjectiveDone(before)) return false;
+                }
+            }
+
             // What it puts in the bag, before the tick: the item is the reason the objective is
             // finished, so a hand-out that fails must not leave it marked done. Not so for a
             // conversation that hands things over: the conversation is the reason, and the
@@ -700,6 +709,27 @@ namespace Jondo.Unity.Server.Managers
                         if (!used.Contains(element)) { all = false; break; }
                     }
                     if (all) await CloseAsync(stream, binding);
+                }
+            }
+        }
+
+        /// <summary>
+        /// A reply has been chosen in a conversation: an objective bound to it closes.
+        /// </summary>
+        public static async Task OnReplyChosenAsync(NetworkStream stream, long reply)
+        {
+            var log = Log;
+            if (log == null || _book == null || reply <= 0) return;
+            foreach (var run in new List<QuestRun>(log.Doing()))
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    var binding = Bindings.Of(objective.Id);
+                    if (binding == null || binding.Kind != QuestBindingKind.Reply) continue;
+                    if (!binding.Replies.Contains((int)reply)) continue;
+                    await CloseAsync(stream, binding);
                 }
             }
         }
@@ -1506,7 +1536,14 @@ namespace Jondo.Unity.Server.Managers
                     {
                         Console.WriteLine($"[Quests] Item {item} of step {stepId} could not " +
                                           "be given.");
+                        continue;
                     }
+
+                    // «Has conseguido 5 'Cenizas eternas'», as for what a conversation hands over.
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                            InfoMessages.ItemGained, Math.Max(1, count).ToString(CultureInfo.InvariantCulture),
+                            item.ToString(CultureInfo.InvariantCulture))));
                 }
 
                 foreach (int emote in reward.Emotes) await Emotes.LearnAsync(stream, emote);

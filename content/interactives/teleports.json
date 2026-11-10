@@ -291,6 +291,9 @@
       "skill": 339,
       "toMap": 192416776,
       "toCell": 483
-    }
+    },
+    {"map": 153881088, "element": 508996, "cell": 284, "gfx": 49607, "type": -1, "skill": 184, "toMap": 152836096, "toCell": 373},
+    {"map": 152836096, "element": 25014, "npc": 2898, "cell": 344, "gfx": 0, "type": -1, "skill": 0, "toMap": 153881088, "toCell": 298},
+    {"map": 152836096, "element": 25003, "npc": 2911, "cell": 344, "gfx": 0, "type": -1, "skill": 0, "toMap": 153881088, "toCell": 298}
   ]
 }

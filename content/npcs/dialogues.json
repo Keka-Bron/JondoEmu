@@ -56,17 +56,32 @@
       "npc": 4398,
       "map": 153880835,
       "opening": 30637,
+      "openings": [
+        { "quest": 2004, "objective": 13767, "message": 30636 }
+      ],
       "lines": [
         {
           "message": 30637,
-          "choices": [{ "reply": 36979, "next": 30638 }]
+          "choices": [
+            { "reply": 36979, "next": 30638 }
+          ]
         },
         {
           "message": 30638,
-          "choices": [{ "reply": 36977, "passage": 806080 }, { "reply": 36978 }]
+          "choices": [
+            { "reply": 36977, "passage": 806080 },
+            { "reply": 36978 }
+          ]
+        },
+        {
+          "message": 30636,
+          "choices": [
+            { "reply": 36980, "passage": 806080 },
+            { "reply": 36981 }
+          ]
         }
       ],
-      "why": "PortailIncarnam.pcapng, frames 106-125: click portal actor -20001 (template 4398); question 30637, reply 36979; question 30638, reply 36977 closes the dialogue and loads Astrub 192416776. The destination cell remains configured in interactives/teleports.json."
+      "why": "PortailIncarnam.pcapng, frames 106-125: click portal actor -20001 (template 4398); question 30637, reply 36979; question 30638, reply 36977 closes the dialogue and loads Astrub 192416776. The destination cell remains configured in interactives/teleports.json. Whoever is on «Destino Astrub» and has seen Master Anemó gets the portal's other opening, 30636, with «Sí, quiero ir a Astrub.» (36980) through the same passage."
     },
   {"npc": 2345, "map": 0, "opening": 59923, "lines": [{"message": 59923, "choices": [{"reply": 82197, "startsQuest": 2539, "next": 59925}, {"reply": 82220, "startsQuest": 2538, "next": 59937}, {"reply": 82222, "startsQuest": 2540, "next": 59938}, {"reply": 82224, "startsQuest": 2541, "next": 59939}, {"reply": 82226, "startsQuest": 2542, "next": 59940}, {"reply": 82228, "startsQuest": 2543, "next": 59941}, {"reply": 82203, "next": 59928}, {"reply": 82212, "next": 59927}, {"reply": 82206, "next": 59930}, {"reply": 82207, "next": 59931}, {"reply": 82199}]}, {"message": 59925, "choices": [{"reply": 82196}]}, {"message": 59937, "choices": [{"reply": 82219}]}, {"message": 59938, "choices": [{"reply": 82221}]}, {"message": 59939, "choices": [{"reply": 82223}]}, {"message": 59940, "choices": [{"reply": 82225}]}, {"message": 59941, "choices": [{"reply": 82227}]}, {"message": 59928, "choices": [{"reply": 82201, "next": 59929}, {"reply": 82205}]}, {"message": 59927, "choices": [{"reply": 82209, "next": 59929}, {"reply": 82210}]}, {"message": 59929, "choices": [{"reply": 82200}, {"reply": 82202}]}, {"message": 59930, "choices": [{"reply": 82216}]}, {"message": 59931, "choices": [{"reply": 82218}]}], "_byHand": true},
     {
@@ -1180,37 +1195,33 @@
       "opening": 20864,
       "_byHand": true,
       "_source": "written from the NPC own conversation in the client; see tools/npc_conversation.py",
+      "_note": "«He visto el anuncio que has puesto» requires having clicked 489412, the tavern building on the outdoor map 153878787. The guide says «Cliquez pour accepter l offre», and the element carries the SAME id on the two adjacent maps [0,-3] and [1,-3], which is what a building that spans both does. It is the oddest one on the map that is not the door: the other two candidates were discarded because 32613 is the phoenix rocks and 42509 is the entrance door.",
       "lines": [
         {
           "message": 20864,
           "choices": [
-            {
-              "reply": 25031,
-              "startsQuest": 1633,
-              "afterElement": 489412
-            },
-            {
-              "reply": 25033,
-              "quest": 1633,
-              "afterObjective": 9770
-            },
-            {
-              "reply": 25034,
-              "buyItem": 8543,
-              "buyPrice": 1
-            },
-            {
-              "reply": 25035,
-              "buyItem": 6765,
-              "buyPrice": 4
-            },
-            {
-              "reply": 25023
-            }
+            { "reply": 25029, "next": 20865, "quest": 1632, "beforeObjective": 9764 },
+            { "reply": 25031, "startsQuest": 1633, "afterElement": 489412 },
+            { "reply": 25033, "quest": 1633, "afterObjective": 9770 },
+            { "reply": 25034, "buyItem": 8543, "buyPrice": 1 },
+            { "reply": 25035, "buyItem": 6765, "buyPrice": 4 },
+            { "reply": 25023 }
+          ]
+        },
+        {
+          "message": 20865,
+          "choices": [
+            { "reply": 25028, "next": 20866 },
+            { "reply": 25023 }
+          ]
+        },
+        {
+          "message": 20866,
+          "choices": [
+            { "reply": 25023 }
           ]
         }
-      ],
-      "_note": "«He visto el anuncio que has puesto» requires having clicked 489412, the tavern building on the outdoor map 153878787. The guide says «Cliquez pour accepter l offre», and the element carries the SAME id on the two adjacent maps [0,-3] and [1,-3], which is what a building that spans both does. It is the oddest one on the map that is not the door: the other two candidates were discarded because 32613 is the phoenix rocks and 42509 is the entrance door."
+      ]
     },
     {
       "npc": 4314,
@@ -1301,69 +1312,111 @@
       "npc": 1515,
       "map": 0,
       "opening": 20915,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "openings": [
+        { "after": 1632, "before": 1634, "message": 20916 },
+        { "after": 1634, "before": 1635, "message": 20925 }
+      ],
       "lines": [
         {
           "message": 20915,
           "choices": [
-            {
-              "reply": 25108,
-              "next": 20918
-            },
-            {
-              "reply": 25109,
-              "next": 20918
-            },
-            {
-              "reply": 25113,
-              "quest": 1634
-            },
-            {
-              "reply": 25118,
-              "quest": 1634
-            },
-            {
-              "reply": 25112,
-              "next": 20926,
-              "quest": 1634,
-              "afterQuest": true
-            },
-            {
-              "reply": 25124,
-              "quest": 1635
-            },
-            {
-              "reply": 25119,
-              "startsQuest": 2004,
-              "quest": 1635,
-              "afterQuest": true
-            }
+            { "reply": 25108, "next": 20916, "quest": 1632, "afterObjective": 9767, "beforeObjective": 9768 },
+            { "reply": 25109, "next": 20921, "quest": 1634, "beforeObjective": 9772 },
+            { "reply": 25113, "next": 20922, "quest": 1634, "afterObjective": 9772, "beforeObjective": 9773 },
+            { "reply": 25118, "next": 20924, "quest": 1634, "afterObjectives": [9774, 9775, 9776], "beforeObjective": 9777 },
+            { "reply": 25124, "next": 20928, "quest": 1635, "afterObjectives": [9783, 9784, 9785, 9786], "beforeObjective": 9787 },
+            { "reply": 25119, "startsQuest": 2004, "params": [[34, 2004]], "quest": 1635, "afterQuest": true, "beforeQuest": 2004 }
+          ]
+        },
+        {
+          "message": 20916,
+          "names": true,
+          "choices": [
+            { "reply": 25107, "next": 20917 }
+          ]
+        },
+        {
+          "message": 20917,
+          "choices": [
+            { "reply": 25106, "next": 20918 }
           ]
         },
         {
           "message": 20918,
           "choices": [
-            {
-              "reply": 25103,
-              "startsQuest": 1634,
-              "quest": 1632,
-              "afterQuest": true
-            }
+            { "reply": 25105, "startsQuest": 1634, "params": [[34, 1634]], "next": 20920 },
+            { "reply": 25103, "startsQuest": 1634, "params": [[34, 1634]], "next": 20919 }
+          ]
+        },
+        {
+          "message": 20920,
+          "choices": [
+            { "reply": 25104 }
+          ]
+        },
+        {
+          "message": 20919,
+          "choices": [
+            { "reply": 25102 }
+          ]
+        },
+        {
+          "message": 20921,
+          "choices": [
+            { "reply": 25110 }
+          ]
+        },
+        {
+          "message": 20922,
+          "choices": [
+            { "reply": 25112, "next": 20923 }
+          ]
+        },
+        {
+          "message": 20923,
+          "choices": [
+            { "reply": 25111 }
+          ]
+        },
+        {
+          "message": 20924,
+          "choices": [
+            { "reply": 25117, "next": 20925 }
+          ]
+        },
+        {
+          "message": 20925,
+          "choices": [
+            { "reply": 25116, "next": 20926 }
           ]
         },
         {
           "message": 20926,
           "choices": [
-            {
-              "reply": 25115,
-              "startsQuest": 1635,
-              "quest": 1634,
-              "afterQuest": true
-            }
+            { "reply": 25115, "startsQuest": 1635, "params": [[34, 1635]], "next": 20927 }
+          ]
+        },
+        {
+          "message": 20927,
+          "choices": [
+            { "reply": 25114 }
+          ]
+        },
+        {
+          "message": 20928,
+          "choices": [
+            { "reply": 25123, "next": 20929 }
+          ]
+        },
+        {
+          "message": 20929,
+          "choices": [
+            { "reply": 25121, "startsQuest": 2004, "params": [[34, 2004]] },
+            { "reply": 25122 }
           ]
         }
-      ]
+      ],
+      "why": "Fécaline the Sage, from her own lines and replies, paired by what they say and by Dofus pour les noobs («Le village dans les nuages», «Espoirs et tragédies», «Dans la gueule du Milimilou»). The catalogue names 20918 for 1634 and 20926 for 1635, the lines whose reply hands each over; «Destino Astrub» is handed over on her opening, 20915, the line the catalogue names, once the Minilubo's quest is done, and at the end of that quest's conversation (20929)."
     },
     {
       "npc": 2880,
@@ -1375,119 +1428,85 @@
         {
           "message": 20873,
           "choices": [
-            {
-              "reply": 25047,
-              "next": 20877
-            },
-            {
-              "reply": 25054,
-              "next": 20881,
-              "quest": 1642,
-              "afterQuest": true
-            },
-            {
-              "reply": 25061,
-              "next": 20887,
-              "quest": 1643,
-              "afterQuest": true
-            },
-            {
-              "reply": 25063,
-              "next": 20888,
-              "quest": 1644,
-              "afterQuest": true
-            },
-            {
-              "reply": 25065,
-              "next": 20889,
-              "quest": 1645,
-              "afterQuest": true
-            },
-            {
-              "reply": 25067,
-              "next": 20890,
-              "quest": 1646,
-              "afterQuest": true
-            },
-            {
-              "reply": 25071,
-              "next": 20893,
-              "quest": 1647,
-              "afterQuest": true
-            },
-            {
-              "reply": 25073,
-              "quest": 1648
-            },
-            {
-              "reply": 25038
-            }
+            { "reply": 25044, "next": 20874, "quest": 1632, "beforeObjective": 9765 },
+            { "reply": 25048, "next": 20878, "beforeQuest": 1642 },
+            { "reply": 25054, "next": 20881, "quest": 1642, "afterQuest": true },
+            { "reply": 25061, "next": 20887, "quest": 1643, "afterQuest": true },
+            { "reply": 25063, "next": 20888, "quest": 1644, "afterQuest": true },
+            { "reply": 25065, "next": 20889, "quest": 1645, "afterQuest": true },
+            { "reply": 25067, "next": 20890, "quest": 1646, "afterQuest": true },
+            { "reply": 25071, "next": 20893, "quest": 1647, "afterQuest": true },
+            { "reply": 25073, "quest": 1648 },
+            { "reply": 25038 }
+          ]
+        },
+        {
+          "message": 20874,
+          "names": true,
+          "choices": [
+            { "reply": 25043, "next": 20875 }
+          ]
+        },
+        {
+          "message": 20875,
+          "choices": [
+            { "reply": 25042, "next": 20876, "beforeQuest": 1642 },
+            { "reply": 25038 }
+          ]
+        },
+        {
+          "message": 20876,
+          "choices": [
+            { "reply": 25041, "next": 20877 }
           ]
         },
         {
           "message": 20877,
           "choices": [
-            {
-              "reply": 25045,
-              "startsQuest": 1642
-            },
-            {
-              "reply": 25046
-            }
+            { "reply": 25039, "startsQuest": 1642, "params": [[34, 1642]] },
+            { "reply": 25040 }
+          ]
+        },
+        {
+          "message": 20878,
+          "choices": [
+            { "reply": 25047, "next": 20877 }
           ]
         },
         {
           "message": 20881,
           "choices": [
-            {
-              "reply": 25049,
-              "startsQuest": 1643
-            }
+            { "reply": 25049, "startsQuest": 1643 }
           ]
         },
         {
           "message": 20887,
           "choices": [
-            {
-              "reply": 25060,
-              "startsQuest": 1644
-            }
+            { "reply": 25060, "startsQuest": 1644 }
           ]
         },
         {
           "message": 20888,
           "choices": [
-            {
-              "reply": 25062,
-              "startsQuest": 1645
-            }
+            { "reply": 25062, "startsQuest": 1645 }
           ]
         },
         {
           "message": 20889,
           "choices": [
-            {
-              "reply": 25064,
-              "startsQuest": 1646
-            }
+            { "reply": 25064, "startsQuest": 1646 }
           ]
         },
         {
           "message": 20890,
           "choices": [
-            {
-              "reply": 25066,
-              "startsQuest": 1647
-            }
+            { "reply": 25066, "startsQuest": 1647 }
           ]
         },
         {
           "message": 20893,
           "choices": [
-            {
-              "reply": 25068,
-              "startsQuest": 1648
-            }
+            { "reply": 25068, "startsQuest": 1648 }
           ]
         }
       ]
@@ -1561,44 +1580,147 @@
       "npc": 2892,
       "map": 0,
       "opening": 20776,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "openings": [
+        { "after": 1632, "message": 20783 },
+        { "quest": 1632, "message": 20783 }
+      ],
       "lines": [
         {
           "message": 20776,
           "choices": [
-            {
-              "reply": 24896,
-              "next": 20780
-            },
-            {
-              "reply": 38437,
-              "next": 20780
-            },
-            {
-              "reply": 24891
-            },
-            {
-              "reply": 24897
-            }
+            { "reply": 24896, "next": 20777 },
+            { "reply": 38437, "next": 31786 },
+            { "reply": 24891 }
+          ]
+        },
+        {
+          "message": 31786,
+          "choices": [
+            { "reply": 24896, "next": 20777 },
+            { "reply": 38436 }
+          ]
+        },
+        {
+          "message": 20777,
+          "choices": [
+            { "reply": 24895, "startsQuest": 1632, "params": [[34, 1632]], "next": 20778 },
+            { "reply": 24894 }
+          ]
+        },
+        {
+          "message": 20778,
+          "choices": [
+            { "reply": 24893, "next": 20779 }
+          ]
+        },
+        {
+          "message": 20779,
+          "choices": [
+            { "reply": 24892 }
           ]
         },
         {
           "message": 20780,
           "choices": [
-            {
-              "reply": 24892,
-              "startsQuest": 1632
-            },
-            {
-              "reply": 24900
-            },
-            {
-              "reply": 24902
-            }
+            { "reply": 24901, "startsQuest": 1632, "params": [[34, 1632]], "next": 20781 },
+            { "reply": 24900 },
+            { "reply": 24902 }
+          ]
+        },
+        {
+          "message": 20781,
+          "choices": [
+            { "reply": 24899, "next": 20782 }
+          ]
+        },
+        {
+          "message": 20782,
+          "choices": [
+            { "reply": 24898 }
+          ]
+        },
+        {
+          "message": 20783,
+          "choices": [
+            { "reply": 24918, "next": 20784 },
+            { "reply": 24916, "next": 20786 },
+            { "reply": 24897 }
+          ]
+        },
+        {
+          "message": 20784,
+          "choices": [
+            { "reply": 24917, "next": 20785 },
+            { "reply": 24903 }
+          ]
+        },
+        {
+          "message": 20785,
+          "choices": [
+            { "reply": 24916, "next": 20786 },
+            { "reply": 24903 }
+          ]
+        },
+        {
+          "message": 20786,
+          "choices": [
+            { "reply": 24915, "next": 20787 }
+          ]
+        },
+        {
+          "message": 20787,
+          "choices": [
+            { "reply": 24914, "next": 20789 },
+            { "reply": 24905, "next": 20788 }
+          ]
+        },
+        {
+          "message": 20788,
+          "choices": [
+            { "reply": 24913, "next": 20794 },
+            { "reply": 24904 }
+          ]
+        },
+        {
+          "message": 20794,
+          "choices": [
+            { "reply": 24906 }
+          ]
+        },
+        {
+          "message": 20789,
+          "choices": [
+            { "reply": 24911, "next": 20791 },
+            { "reply": 24907, "next": 20790 }
+          ]
+        },
+        {
+          "message": 20790,
+          "choices": [
+            { "reply": 24912 }
+          ]
+        },
+        {
+          "message": 20791,
+          "choices": [
+            { "reply": 24910, "next": 20792 }
+          ]
+        },
+        {
+          "message": 20792,
+          "choices": [
+            { "reply": 24909, "next": 20793 }
+          ]
+        },
+        {
+          "message": 20793,
+          "names": true,
+          "choices": [
+            { "reply": 24908 }
           ]
         }
-      ]
+      ],
+      "why": "Noken Okuto (Lykhen Lesurviven), at the village gate, from his own lines and replies. «Le village dans les nuages» per Dofus pour les noobs: he takes the character for a newcomer and sends him back to Master Joris (20776, a line from before 3.6), «Répondre que vous préférez apprendre par vous-même» (24896) and «Demander où trouver Ternette» (24893), whose answer, 20779, says her place is already marked in the quest journal. The catalogue hands the quest over on 20780 «¿Qué tenemos aquí? Otra alma aventurera...», on «¿Quién es Ternauta?»; 20777 is the same offer on the way Dofus pour les noobs describes, and hands it over on its own «¿Quién es Ternauta?». «Espoirs et tragédies»: he tells of his exploits and of the six dofus he nearly had, then laughs at the apocalypse story; 24909 leads to his farewell and is the veteran's objective (objectives.json). Who stares back (24911) hears the truth; who apologises (24907) or insults him (24913) is sent off."
     },
     {
       "npc": 2899,
@@ -1610,106 +1732,61 @@
         {
           "message": 20861,
           "choices": [
-            {
-              "reply": 25295,
-              "next": 21043
-            },
-            {
-              "reply": 25311,
-              "next": 57160,
-              "quest": 1649
-            },
-            {
-              "reply": 77764,
-              "next": 57160,
-              "quest": 1649,
-              "afterQuest": true
-            },
-            {
-              "reply": 77770,
-              "next": 21050,
-              "quest": 2512
-            },
-            {
-              "reply": 25312,
-              "next": 21050,
-              "quest": 2512,
-              "afterQuest": true
-            },
-            {
-              "reply": 25320,
-              "next": 21056,
-              "quest": 1650
-            },
-            {
-              "reply": 25333,
-              "next": 21056,
-              "quest": 1650,
-              "afterQuest": true
-            },
-            {
-              "reply": 25330,
-              "next": 57184,
-              "quest": 1651
-            },
-            {
-              "reply": 77804,
-              "next": 57184,
-              "quest": 1651,
-              "afterQuest": true
-            },
-            {
-              "reply": 77796,
-              "quest": 2513
-            },
-            {
-              "reply": 25299
-            }
+            { "reply": 25022, "next": 20862, "quest": 1632, "beforeObjective": 9763 },
+            { "reply": 25295, "next": 21043 },
+            { "reply": 25311, "next": 57160, "quest": 1649 },
+            { "reply": 77764, "next": 57160, "quest": 1649, "afterQuest": true },
+            { "reply": 77770, "next": 21050, "quest": 2512 },
+            { "reply": 25312, "next": 21050, "quest": 2512, "afterQuest": true },
+            { "reply": 25320, "next": 21056, "quest": 1650 },
+            { "reply": 25333, "next": 21056, "quest": 1650, "afterQuest": true },
+            { "reply": 25330, "next": 57184, "quest": 1651 },
+            { "reply": 77804, "next": 57184, "quest": 1651, "afterQuest": true },
+            { "reply": 77796, "quest": 2513 },
+            { "reply": 25299 }
           ]
         },
         {
           "message": 21043,
           "choices": [
-            {
-              "reply": 25292,
-              "startsQuest": 1649
-            }
+            { "reply": 25292, "startsQuest": 1649 }
           ]
         },
         {
           "message": 57160,
           "choices": [
-            {
-              "reply": 77774,
-              "startsQuest": 2512
-            }
+            { "reply": 77774, "startsQuest": 2512 }
           ]
         },
         {
           "message": 21050,
           "choices": [
-            {
-              "reply": 25307,
-              "startsQuest": 1650
-            }
+            { "reply": 25307, "startsQuest": 1650 }
           ]
         },
         {
           "message": 21056,
           "choices": [
-            {
-              "reply": 25323,
-              "startsQuest": 1651
-            }
+            { "reply": 25323, "startsQuest": 1651 }
           ]
         },
         {
           "message": 57184,
           "choices": [
-            {
-              "reply": 77800,
-              "startsQuest": 2513
-            }
+            { "reply": 77800, "startsQuest": 2513 }
+          ]
+        },
+        {
+          "message": 20862,
+          "choices": [
+            { "reply": 25021, "next": 20863 },
+            { "reply": 25290 }
+          ]
+        },
+        {
+          "message": 20863,
+          "choices": [
+            { "reply": 25290 }
           ]
         }
       ]
@@ -1718,73 +1795,176 @@
       "npc": 2905,
       "map": 0,
       "opening": 20795,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20795,
           "choices": [
-            {
-              "reply": 24935,
-              "next": 20808
-            },
-            {
-              "reply": 24940,
-              "quest": 1639
-            },
-            {
-              "reply": 24943,
-              "next": 20814,
-              "quest": 1639,
-              "afterQuest": true
-            },
-            {
-              "reply": 24947,
-              "quest": 1640
-            },
-            {
-              "reply": 24950,
-              "next": 20819,
-              "quest": 1640,
-              "afterQuest": true
-            },
-            {
-              "reply": 24952,
-              "quest": 1641
-            },
-            {
-              "reply": 24951
-            }
+            { "reply": 24919, "next": 20796, "quest": 1632, "beforeObjective": 9762 },
+            { "reply": 24930, "next": 20803, "quest": 1632, "afterObjectives": [9762, 9763, 9764, 9765, 9766], "beforeObjective": 9767 },
+            { "reply": 24936, "next": 20805, "beforeQuest": 1639 },
+            { "reply": 24940, "next": 20810, "quest": 1639, "afterObjectives": [9814, 9815], "beforeObjective": 9816 },
+            { "reply": 24943, "next": 20813, "quest": 1639, "afterQuest": true, "beforeQuest": 1640 },
+            { "reply": 24947, "next": 20815, "quest": 1640, "afterObjectives": [9817, 9818, 9819, 9820, 9821], "beforeObjective": 9822 },
+            { "reply": 24950, "next": 20818, "quest": 1640, "afterQuest": true, "beforeQuest": 1641 },
+            { "reply": 24952, "next": 20820, "quest": 1641, "afterObjectives": [9823, 9824, 9825, 9826], "beforeObjective": 9827 },
+            { "reply": 24951 }
+          ]
+        },
+        {
+          "message": 20796,
+          "names": true,
+          "choices": [
+            { "reply": 24927, "next": 20797 }
+          ]
+        },
+        {
+          "message": 20797,
+          "choices": [
+            { "reply": 24920 },
+            { "reply": 24926, "next": 20798, "beforeQuest": 1639 }
+          ]
+        },
+        {
+          "message": 20803,
+          "choices": [
+            { "reply": 24929, "next": 20804 }
+          ]
+        },
+        {
+          "message": 20804,
+          "choices": [
+            { "reply": 24928 }
+          ]
+        },
+        {
+          "message": 20798,
+          "choices": [
+            { "reply": 24925, "next": 20799 }
+          ]
+        },
+        {
+          "message": 20799,
+          "choices": [
+            { "reply": 24924, "next": 20800 }
+          ]
+        },
+        {
+          "message": 20800,
+          "choices": [
+            { "reply": 24923, "next": 20801 }
+          ]
+        },
+        {
+          "message": 20801,
+          "choices": [
+            { "reply": 24922, "startsQuest": 1639, "params": [[34, 1639]], "next": 20802 }
+          ]
+        },
+        {
+          "message": 20802,
+          "choices": [
+            { "reply": 24921 }
+          ]
+        },
+        {
+          "message": 20805,
+          "choices": [
+            { "reply": 24935, "next": 20806 }
+          ]
+        },
+        {
+          "message": 20806,
+          "choices": [
+            { "reply": 24934, "next": 20807 }
+          ]
+        },
+        {
+          "message": 20807,
+          "choices": [
+            { "reply": 24933, "next": 20808 }
           ]
         },
         {
           "message": 20808,
           "choices": [
-            {
-              "reply": 24931,
-              "startsQuest": 1639
-            }
+            { "reply": 24932, "startsQuest": 1639, "params": [[34, 1639]], "next": 20809 }
+          ]
+        },
+        {
+          "message": 20809,
+          "choices": [
+            { "reply": 24931 }
+          ]
+        },
+        {
+          "message": 20810,
+          "choices": [
+            { "reply": 24939, "next": 20811 }
+          ]
+        },
+        {
+          "message": 20811,
+          "choices": [
+            { "reply": 24938, "next": 20812 }
+          ]
+        },
+        {
+          "message": 20812,
+          "choices": [
+            { "reply": 24937, "startsQuest": 1640, "params": [[34, 1640]] }
+          ]
+        },
+        {
+          "message": 20813,
+          "choices": [
+            { "reply": 24942, "next": 20814 }
           ]
         },
         {
           "message": 20814,
           "choices": [
-            {
-              "reply": 24941,
-              "startsQuest": 1640
-            }
+            { "reply": 24941, "startsQuest": 1640, "params": [[34, 1640]] }
+          ]
+        },
+        {
+          "message": 20815,
+          "choices": [
+            { "reply": 24946, "next": 20816 }
+          ]
+        },
+        {
+          "message": 20816,
+          "choices": [
+            { "reply": 24945, "next": 20817 }
+          ]
+        },
+        {
+          "message": 20817,
+          "choices": [
+            { "reply": 24944, "startsQuest": 1641, "params": [[34, 1641]] }
+          ]
+        },
+        {
+          "message": 20818,
+          "choices": [
+            { "reply": 24949, "next": 20819 }
           ]
         },
         {
           "message": 20819,
           "choices": [
-            {
-              "reply": 24948,
-              "startsQuest": 1641
-            }
+            { "reply": 24948, "startsQuest": 1641, "params": [[34, 1641]] }
+          ]
+        },
+        {
+          "message": 20820,
+          "names": true,
+          "choices": [
+            { "reply": 24951 }
           ]
         }
-      ]
+      ],
+      "why": "Ternette, the mayor, from her own lines and replies in the client, paired by what they say and by Dofus pour les noobs. Her replies come in pairs of chains: one said on the way (back from the previous errand: «He hablado con Xelora», «He conseguido encontrar cinco vestigios») and one for another day («Cuéntame más cosas sobre los dioses», «Háblame del Mundo de los Doce»); the catalogue names the second chain's line for each quest (20808, 20814, 20819). «Transporte único» is also offered from the welcome of «Un pueblo sobre las nubes», «Estoy impaciente por explorar la isla celeste» next to «Daré una vuelta por el pueblo», which is where Dofus pour les noobs has it."
     },
     {
       "npc": 2907,
@@ -1796,16 +1976,31 @@
         {
           "message": 20830,
           "choices": [
-            {
-              "reply": 24970,
-              "startsQuest": 1638
-            },
-            {
-              "reply": 24986
-            }
+            { "reply": 24989, "next": 20839, "quest": 1635, "beforeObjective": 9784 },
+            { "reply": 24970, "startsQuest": 1638 },
+            { "reply": 24986 }
+          ]
+        },
+        {
+          "message": 20839,
+          "choices": [
+            { "reply": 24988, "next": 20840 }
+          ]
+        },
+        {
+          "message": 20840,
+          "choices": [
+            { "reply": 24987, "next": 20841 }
+          ]
+        },
+        {
+          "message": 20841,
+          "choices": [
+            { "reply": 24986 }
           ]
         }
-      ]
+      ],
+      "why": "Klasmor the gravedigger, keeper of Chadalid's crypt. «Dans la gueule du Milimilou»: asked about the Minilubo (24989), he would rather the character faced flesh than the walking dead (20839), tells where the beast lives (20840) and the two ways in, past Chadalid or by the rusty grate to the west (20841, the line 9784 names)."
     },
     {
       "npc": 7581,
@@ -4885,6 +5080,380 @@
         }
       ],
       "why": "Ganymed in the Dofusarium. The tutorial capture ends on his 57150 «Aquel que quiere ver cumplido su destino...» with «Inspeccionar las seis estatuas de dofus» (34 naming 1631, then 3010), the reply that starts 1631. The rest is his own lines in the order Dofus pour les noobs gives the quest: once the statues are read, 60427 on the Dofus and the hint to the book (60428, «Consultar el libro del templo», «Ir a la próxima sala»); once the book is read, 57151 «Ha llegado el momento de que comiences tu gran viaje» with «Dirigirte a la salida del Templo Celeste»; afterwards, his farewell 57154 with the name."
+    },
+    {
+      "npc": 2910,
+      "map": 0,
+      "opening": 20910,
+      "lines": [
+        {
+          "message": 20910,
+          "choices": [
+            { "reply": 25098, "next": 20911, "quest": 1632, "beforeObjective": 9766 },
+            { "reply": 25096 }
+          ]
+        },
+        {
+          "message": 20911,
+          "choices": [
+            { "reply": 25097, "next": 20912 }
+          ]
+        },
+        {
+          "message": 20912,
+          "choices": [
+            { "reply": 25101, "next": 20913 }
+          ]
+        },
+        {
+          "message": 20913,
+          "choices": [
+            { "reply": 25100, "next": 20914 }
+          ]
+        },
+        {
+          "message": 20914,
+          "choices": [
+            { "reply": 25099 }
+          ]
+        }
+      ]
+    },
+    {
+      "npc": 2909,
+      "map": 0,
+      "opening": 20931,
+      "lines": [
+        {
+          "message": 20931,
+          "choices": [
+            { "reply": 25128, "next": 20932 },
+            { "reply": 25137, "next": 20940 },
+            { "reply": 25129 }
+          ]
+        },
+        {
+          "message": 20932,
+          "choices": [
+            { "reply": 25127, "next": 20933 }
+          ]
+        },
+        {
+          "message": 20933,
+          "choices": [
+            { "reply": 25126, "next": 20934 }
+          ]
+        },
+        {
+          "message": 20934,
+          "choices": [
+            { "reply": 25125, "next": 20935 }
+          ]
+        },
+        {
+          "message": 20935,
+          "choices": [
+            { "reply": 25130, "next": 20936, "random": 1 },
+            { "reply": 25132, "next": 20937, "random": 1 },
+            { "reply": 25134, "next": 20938, "random": 1 },
+            { "reply": 25136, "next": 20939, "random": 1 }
+          ]
+        },
+        {
+          "message": 20940,
+          "choices": [
+            { "reply": 25139, "next": 20941, "random": 1 },
+            { "reply": 25141, "next": 20942, "random": 1 },
+            { "reply": 25143, "next": 20943, "random": 1 },
+            { "reply": 25145, "next": 20944, "random": 1 }
+          ]
+        },
+        {
+          "message": 20936,
+          "choices": [
+            { "reply": 25129 }
+          ]
+        },
+        {
+          "message": 20937,
+          "choices": [
+            { "reply": 25131 }
+          ]
+        },
+        {
+          "message": 20938,
+          "choices": [
+            { "reply": 25133 }
+          ]
+        },
+        {
+          "message": 20939,
+          "choices": [
+            { "reply": 25135 }
+          ]
+        },
+        {
+          "message": 20941,
+          "choices": [
+            { "reply": 25138 }
+          ]
+        },
+        {
+          "message": 20942,
+          "choices": [
+            { "reply": 25140 }
+          ]
+        },
+        {
+          "message": 20943,
+          "choices": [
+            { "reply": 25142 }
+          ]
+        },
+        {
+          "message": 20944,
+          "choices": [
+            { "reply": 25144 }
+          ]
+        }
+      ],
+      "why": "Azar (Aléha), the Ecaflip of the tavern, from her own lines and replies. Her four «Lanzar los dados sobre la mesa.» on each of the two dice lines (20935 after her story, 20940 when asked straight away) are one throw: one is offered, at random, and each leads to its own result (20936-20939, 20941-20944) with its own farewell. Dofus pour les noobs: she came back to Incarnam, tells of the guardians of the dofus and has the character throw her dice."
+    },
+    {
+      "npc": 2904,
+      "map": 0,
+      "opening": 20946,
+      "lines": [
+        {
+          "message": 20946,
+          "choices": [
+            { "reply": 25151, "next": 20947 },
+            { "reply": 25156, "next": 20952 },
+            { "reply": 25152 }
+          ]
+        },
+        {
+          "message": 20947,
+          "choices": [
+            { "reply": 25150, "next": 20948 }
+          ]
+        },
+        {
+          "message": 20948,
+          "choices": [
+            { "reply": 25149, "next": 20949 }
+          ]
+        },
+        {
+          "message": 20949,
+          "choices": [
+            { "reply": 25148, "next": 20950 }
+          ]
+        },
+        {
+          "message": 20950,
+          "choices": [
+            { "reply": 25146 },
+            { "reply": 25147 }
+          ]
+        },
+        {
+          "message": 20952,
+          "choices": [
+            { "reply": 25153, "next": 20951 }
+          ]
+        },
+        {
+          "message": 20951,
+          "choices": [
+            { "reply": 25155, "next": 20953 }
+          ]
+        },
+        {
+          "message": 20953,
+          "choices": [
+            { "reply": 25154 }
+          ]
+        }
+      ],
+      "why": "Oscar Kasa (Oskar Khas), the thief's ghost of the phoenix rock, from his own lines and replies. «Espoirs et tragédies» per Dofus pour les noobs: asked what happened to him, he tells of the Emerald dofus he died for, smells something burning, and the evil fire that haunts him comes back; «Quedarte y luchar contra el fuego maléfico» starts the fight (npc_fights.json). The rest is his talk on death and the phoenix."
+    },
+    {
+      "npc": 2911,
+      "map": 0,
+      "opening": 20849,
+      "lines": [
+        {
+          "message": 20849,
+          "choices": [
+            { "reply": 25002 },
+            { "reply": 25003, "passage": 25003 }
+          ]
+        }
+      ],
+      "why": "The Minilubo Albino in his lair: «Atacar al monstruo» starts the fight (npc_fights.json), «Huir de la cripta» leads back out through the grate (teleports.json). The jam pot of «La torta secreta» has its own lines (20850-20852) for whoever carries it, not written yet."
+    },
+    {
+      "npc": 2898,
+      "map": 0,
+      "opening": 20853,
+      "lines": [
+        {
+          "message": 20853,
+          "choices": [
+            { "reply": 25013, "next": 20854 },
+            { "reply": 25014, "passage": 25014 }
+          ]
+        },
+        {
+          "message": 20854,
+          "choices": [
+            { "reply": 25012, "next": 20855 }
+          ]
+        },
+        {
+          "message": 20855,
+          "choices": [
+            { "reply": 25011 },
+            { "reply": 25014, "passage": 25014 }
+          ]
+        }
+      ],
+      "why": "Likantrabioso (Hargnok), once the Minilubo is beaten: he was the beast, bitten by it before he killed it, and his dofus are long gone (Dofus pour les noobs, «Dans la gueule du Milimilou»). «Salir de la Cripta del Minilubo Albino» leads back out through the grate."
+    },
+    {
+      "npc": 4360,
+      "map": 0,
+      "opening": 30374,
+      "lines": [
+        {
+          "message": 30374,
+          "choices": [
+            { "reply": 36613, "next": 30375 },
+            { "reply": 36620, "next": 30376 },
+            { "reply": 36615 }
+          ]
+        },
+        {
+          "message": 30375,
+          "choices": [
+            { "reply": 36616, "next": 30377 },
+            { "reply": 36617 }
+          ]
+        },
+        {
+          "message": 30376,
+          "choices": [
+            { "reply": 36618, "next": 30377 },
+            { "reply": 36619 }
+          ]
+        },
+        {
+          "message": 30377,
+          "choices": [
+            { "reply": 36614 }
+          ]
+        }
+      ],
+      "why": "Master Anemó, keeper of the portal to Astrub, from his own lines and replies: whether the character wants to leave Incarnam (30374), whether the island is explored (30375, 30376), and what is past the portal, the heart of Astrub and the envoy of the gods (30377). «Destino Astrub» asks to see him (13767, done on talking to him)."
+    },
+    {
+      "npc": 2882,
+      "map": 0,
+      "opening": 20856,
+      "lines": [
+        {
+          "message": 20856,
+          "choices": [
+            { "reply": 25020, "next": 20857 }
+          ]
+        },
+        {
+          "message": 20857,
+          "choices": [
+            { "reply": 25019, "next": 20858 }
+          ]
+        },
+        {
+          "message": 20858,
+          "choices": [
+            { "reply": 25018, "next": 20859 }
+          ]
+        },
+        {
+          "message": 20859,
+          "choices": [
+            { "reply": 25017, "next": 20860 }
+          ]
+        },
+        {
+          "message": 20860,
+          "choices": [
+            { "reply": 25016 }
+          ]
+        }
+      ],
+      "why": "Xelora Pañá, who mends the zaaps with her hammer, from her own lines and replies: where the zaaps come from (20857), how a hammer mends them (20858, 20859), the zaap's use (20860), and «Examinar el zaap justo al lado.», which is «Transporte único»'s 9815 (objectives.json)."
+    },
+    {
+      "npc": 2887,
+      "map": 0,
+      "opening": 20821,
+      "lines": [
+        {
+          "message": 20821,
+          "choices": [
+            { "reply": 24957, "next": 20823, "quest": 1641, "beforeObjective": 9824 },
+            { "reply": 24959, "next": 20822 }
+          ]
+        },
+        {
+          "message": 20823,
+          "choices": [
+            { "reply": 24956, "next": 20824 }
+          ]
+        },
+        {
+          "message": 20824,
+          "choices": [
+            { "reply": 24955 }
+          ]
+        },
+        {
+          "message": 20822,
+          "choices": [
+            { "reply": 24958 }
+          ]
+        }
+      ],
+      "why": "Masvisto and his astromagic telescope, from his own lines and replies. «Me envía Ternauta.» while «Vistas celestes» wants his telescope: he asks after her (20823) and lets the character to the eyepiece (20824). Anyone else may ask for a look (20822)."
+    },
+    {
+      "npc": 2906,
+      "map": 0,
+      "opening": 20826,
+      "lines": [
+        {
+          "message": 20826,
+          "choices": [
+            { "reply": 24963, "next": 20828, "quest": 1641, "beforeObjective": 9826 },
+            { "reply": 24965, "next": 20827 }
+          ]
+        },
+        {
+          "message": 20828,
+          "choices": [
+            { "reply": 24962 }
+          ]
+        },
+        {
+          "message": 20827,
+          "choices": [
+            { "reply": 24964 }
+          ]
+        }
+      ],
+      "why": "Galilea and her telescope, from her own lines and replies. «Me envía Ternauta.» while «Vistas celestes» wants her telescope: the Unin family helped her build it (20828); anyone else may ask to use it (20827)."
     }
   ]
 }

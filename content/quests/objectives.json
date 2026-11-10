@@ -67,8 +67,10 @@
    "objective": 9784,
    "quest": 1635,
    "kind": "enter",
-   "map": 153881600,
-   "why": "«Pénétrer dans l'antre du Milimilou». It closes on stepping onto the map, and the map is not guessed: the objective itself carries it."
+   "map": 152836096,
+   "afterObjectives": [9783],
+   "overridesMap": true,
+   "why": "«Entra en el antro de Minilubo Albino»: the lair is 152836096, «Snoowolf's Tomb», reached through the rusty grate west of the graves (Klasmor's 20841, the line the objective names; Dofus pour les noobs: «cliquez sur la grille du tombeau pour entrer») or past Chadalid. The catalogue gives the objective the graves' map, 153881600, where the gravedigger stands: entering it would have done it on the way to him."
   },
   {
    "objective": 9817,
@@ -365,6 +367,79 @@
    "kind": "read",
    "elements": [{"map": 241444353, "element": 541709}],
    "why": "«Averigua más cosas sobre tu destino»: the Celestial Temple's book on the next room (Dofus pour les noobs: «direction la map sur la droite. Inspectez le Livre du Temple Céleste»)."
+  },
+  {
+   "objective": 9772,
+   "quest": 1634,
+   "kind": "read",
+   "elements": [{"map": 153356296, "element": 489508}],
+   "why": "«Lee el libro de la leyenda de Rykke Errel»: the book in the library's bottom corner (readables.json)."
+  },
+  {
+   "objective": 9774,
+   "quest": 1634,
+   "kind": "reply",
+   "replies": [24909],
+   "afterObjectives": [9773],
+   "why": "«Habla con un veterano»: Noken Okuto, the old adventurer at the village gate, and his story of the six dofus; done when he wishes the character luck (24909 «Reconozco que tus palabras son bastante sabias», which leads to his 20793). After Fécaline has sent the character to the three seekers."
+  },
+  {
+   "objective": 9775,
+   "quest": 1634,
+   "kind": "reply",
+   "replies": [25130, 25132, 25134, 25136, 25139, 25141, 25143, 25145],
+   "afterObjectives": [9773],
+   "why": "«Habla con una felina casera»: Azar, the Ecaflip of the tavern, who reads the character's future in her dice (Dofus pour les noobs: «Elle vous propose alors de jeter les dés à votre tour»); done on any throw."
+  },
+  {
+   "objective": 9776,
+   "quest": 1634,
+   "kind": "beat",
+   "monster": 4114,
+   "map": 153879809,
+   "afterObjectives": [9773],
+   "why": "«Habla con un ladrón desafortunado»: Oscar Kasa, the ghost of the phoenix rock, is chased off by an evil fire and the fire turns on the character (Dofus pour les noobs: «la bête s'en prend à vous»; «Lorsque vous avez vaincu la bête et parlé aux trois quêteurs de Dofus, retournez auprès de Fécaline»). Done on beating it."
+  },
+  {
+   "objective": 9785,
+   "quest": 1635,
+   "kind": "beat",
+   "monster": 4102,
+   "map": 152836096,
+   "afterObjectives": [9784],
+   "why": "«Vence a Minilubo Albino»: monster 4102, in his lair, where the NPC Minilubo (2911) starts the fight (npc_fights.json)."
+  },
+  {
+   "objective": 13931,
+   "quest": 2004,
+   "kind": "reply",
+   "replies": [36980, 36977],
+   "afterObjectives": [13767],
+   "why": "«Utiliza el portal para ir a Astrub en el Mundo de los Doce»: the portal is an actor (4398) and crossing it is its reply that leads to Astrub (36977 in PortailIncarnam.pcapng, 36980 for whoever has seen Master Anemó). After talking to him, as the step lists it."
+  },
+  {
+   "objective": 9815,
+   "quest": 1639,
+   "kind": "reply",
+   "replies": [25016],
+   "afterObjectives": [9814],
+   "why": "«Examina el zaap del prado»: the last reply of Xelora's talk on where the zaaps come from, «Examinar el zaap justo al lado.» (25016)."
+  },
+  {
+   "objective": 9824,
+   "quest": 1641,
+   "type": -1,
+   "elements": [{"map": 154010374, "element": 489417}],
+   "afterObjectives": [9823],
+   "why": "«Utiliza el catalejo de Masvisto»: his telescope at the island's north edge, element 489417 (graphic 42502, the only one of its kind on the map, drawn by tools/dibujar_mapa.py), on cell 234. After talking to him."
+  },
+  {
+   "objective": 9826,
+   "quest": 1641,
+   "type": -1,
+   "elements": [{"map": 154010113, "element": 489418}],
+   "afterObjectives": [9825],
+   "why": "«Utiliza el catalejo de Galilea»: her telescope over the void, element 489418 (graphic 32525) on cell 369. After talking to her."
   }
  ]
 }

@@ -59,6 +59,12 @@ namespace Jondo.Unity.World.Quests
         /// sobre tu objetivo: los dofus», the Dofusarium's six statues, each a document.
         /// </summary>
         Read,
+
+        /// <summary>
+        /// One of <see cref="QuestBinding.Replies"/> chosen in a conversation: «Habla con un
+        /// veterano» is done when Noken gets to wishing the character luck, not on «hello».
+        /// </summary>
+        Reply,
     }
 
     /// <summary>
@@ -177,8 +183,22 @@ namespace Jondo.Unity.World.Quests
         /// <summary>The item gathered, for <see cref="QuestBindingKind.Gather"/>.</summary>
         public int ItemId { get; init; }
 
-        /// <summary>The objectives whose being done closes it, for <see cref="QuestBindingKind.Objectives"/>.</summary>
+        /// <summary>
+        /// The objectives whose being done closes it, for <see cref="QuestBindingKind.Objectives"/>;
+        /// for any other kind, the objectives that have to be done before it can be: the three
+        /// seekers of «La esperanza y la tragedia» come after Fécaline's book.
+        /// </summary>
         public IReadOnlyList<int> AfterObjectives { get; init; } = Array.Empty<int>();
+
+        /// <summary>The replies that close it, for <see cref="QuestBindingKind.Reply"/>.</summary>
+        public IReadOnlyList<int> Replies { get; init; } = Array.Empty<int>();
+
+        /// <summary>
+        /// The row's map is not the one the objective carries, on purpose: «Entra en el antro de
+        /// Minilubo Albino» carries the graves, where the gravedigger tells the way in, and the lair
+        /// is another map. Without the word, a different map is taken for a copying mistake.
+        /// </summary>
+        public bool OverridesMap { get; init; }
 
         /// <summary>Why this row says what it says. Never read by the server; read by people.</summary>
         public string Why { get; init; } = "";
@@ -355,6 +375,9 @@ namespace Jondo.Unity.World.Quests
                 Starts = Int(row, "starts"),
                 ThenStarts = Int(row, "thenStarts"),
                 AfterObjectives = Ints(row, "afterObjectives"),
+                Replies = Ints(row, "replies"),
+                OverridesMap = row.TryGetProperty("overridesMap", out var overrides)
+                               && overrides.ValueKind == JsonValueKind.True,
                 ItemId = Int(row, "item"),
                 SkillId = skill == 0 ? QuestBinding.DefaultSkill : skill,
 
@@ -385,6 +408,7 @@ namespace Jondo.Unity.World.Quests
                 "objectives" => QuestBindingKind.Objectives,
                 "gather" => QuestBindingKind.Gather,
                 "read" => QuestBindingKind.Read,
+                "reply" => QuestBindingKind.Reply,
                 _ => QuestBindingKind.Click,
             };
         }

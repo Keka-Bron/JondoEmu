@@ -188,27 +188,38 @@ namespace Jondo.Unity.Tests.Content
             var book = new QuestCatalogue();
             if (!book.Ready) return;
 
+            // An NPC may say the same offer twice, on two ways through his conversation: Ternette
+            // hands «Transporte único» over on 20808, the line the catalogue names, and on 20801,
+            // the same words said straight after her welcome. So the rule is that the declared line
+            // is among those that hand it over, not that it is the only one.
             var wrong = new List<string>();
             foreach (var tree in Trees())
             {
+                var handedOn = new Dictionary<int, List<long>>();
                 foreach (var line in tree.Lines)
                 {
                     foreach (var choice in line.Choices)
                     {
                         if (choice.StartsQuest == 0) continue;
+                        if (!handedOn.TryGetValue(choice.StartsQuest, out var lines))
+                            handedOn[choice.StartsQuest] = lines = new List<long>();
+                        lines.Add(line.Message);
+                    }
+                }
 
-                        var quest = book.Of(choice.StartsQuest);
-                        if (quest == null || quest.Steps.Count == 0) continue;
+                foreach (var (questId, lines) in handedOn)
+                {
+                    var quest = book.Of(questId);
+                    if (quest == null || quest.Steps.Count == 0) continue;
 
-                        long declared = quest.Steps[0].DialogId;
-                        // A line the NPC no longer says is the catalogue being older than the
-                        // game: 3.6 hands 1629 over on Ganymed's 60411 (the tutorial capture),
-                        // and the step still names 20673, which is none of his lines.
-                        if (declared != 0 && declared != line.Message && SaysLine(tree.NpcId, declared))
-                        {
-                            wrong.Add($"npc {tree.NpcId}: quest {choice.StartsQuest} is handed over on " +
-                                      $"line {line.Message}, but its first step declares {declared}");
-                        }
+                    long declared = quest.Steps[0].DialogId;
+                    // A line the NPC no longer says is the catalogue being older than the
+                    // game: 3.6 hands 1629 over on Ganymed's 60411 (the tutorial capture),
+                    // and the step still names 20673, which is none of his lines.
+                    if (declared != 0 && !lines.Contains(declared) && SaysLine(tree.NpcId, declared))
+                    {
+                        wrong.Add($"npc {tree.NpcId}: quest {questId} is handed over on " +
+                                  $"line {string.Join(", ", lines)}, but its first step declares {declared}");
                     }
                 }
             }

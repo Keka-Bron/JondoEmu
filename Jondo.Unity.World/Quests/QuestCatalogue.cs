@@ -655,6 +655,7 @@ namespace Jondo.Unity.World.Quests
                 string criterion = row.TryGetProperty("criterion", out var c) && c.ValueKind == JsonValueKind.String
                     ? c.GetString() ?? ""
                     : "";
+                criterion = QuestCriteria.Of(id, criterion);
 
                 var requires = FinishedQuests(criterion);
                 if (requires.Count > 0) GatedQuests++;

@@ -106,6 +106,8 @@ namespace Jondo.Unity.Server.Handlers
                     if (binding.MapId != 0 && binding.MapId != mapId &&
                         !SameDungeonRoom(binding.MapId, mapId))
                         continue;
+                    if (binding.AfterObjectives.Any(before => !run.Done.Contains(before) && !log.ObjectiveDone(before)))
+                        continue;
 
                     await Quests.TickAsync(stream, run.QuestId, objective.Id);
                 }

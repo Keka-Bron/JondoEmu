@@ -15,6 +15,14 @@
       "allies": [ { "monster": 8018, "grade": 0 } ] },
     { "npc": 2927, "map": 241441793, "reply": 24791, "arena": 241441797,
       "monsters": [ { "monster": 4104, "grade": 0 }, { "monster": 4111, "grade": 0 }, { "monster": 4111, "grade": 0 } ],
-      "allies": [ { "monster": 8018, "grade": 0 } ] }
+      "allies": [ { "monster": 8018, "grade": 0 } ] },
+    { "npc": 2904, "map": 153879809, "reply": 25146,
+      "monsters": [ { "monster": 4114, "grade": 0 } ] },
+    { "npc": 2911, "map": 152836096, "reply": 25002,
+      "monsters": [ { "monster": 4102, "grade": 0 } ] },
+    { "npc": 2911, "map": 152836096, "reply": 25004,
+      "monsters": [ { "monster": 4102, "grade": 0 } ] },
+    { "npc": 2911, "map": 152836096, "reply": 25007,
+      "monsters": [ { "monster": 4102, "grade": 0 } ] }
   ]
 }

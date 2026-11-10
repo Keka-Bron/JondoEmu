@@ -231,7 +231,7 @@ namespace Jondo.Unity.Tests.Quests
                         // The one an "enter" row cannot get wrong quietly: the objective carries
                         // the map itself, so a row naming a different one was copied wrong.
                         if (binding.Kind == QuestBindingKind.Enter && objective.MapId != 0
-                            && binding.MapId != objective.MapId)
+                            && binding.MapId != objective.MapId && !binding.OverridesMap)
                         {
                             wrong.Add($"objective {objective.Id} is bound to map {binding.MapId}, " +
                                       $"but the objective itself carries {objective.MapId}");

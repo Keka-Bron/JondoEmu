@@ -1254,6 +1254,9 @@ namespace Jondo.Unity.Server.Handlers
                 await Managers.Quests.OnReplyAsync(stream, SessionContext.State.OpenDialogueMessage);
             }
 
+            // And an objective that is this very reply: Noken wishing the character luck.
+            await Managers.Quests.OnReplyChosenAsync(stream, reply);
+
             // And does this NPC guard a dungeon's door? If he goes in, the conversation has ended in a
             // map change and there is nothing more to tell him.
             long dondeHabla = SessionContext.State.OpenDialogueMapId;
