@@ -727,6 +727,7 @@
       "map": 0,
       "opening": 30718,
       "openings": [
+        { "after": 2009, "before": 1841, "message": 30720 },
         { "after": 1841, "before": 1960, "message": 30728 }
       ],
       "lines": [
@@ -734,7 +735,6 @@
           "message": 30718,
           "choices": [
             { "reply": 37088, "next": 30720, "completes": 13897, "params": [[30, 13897]] },
-            { "reply": 37088, "next": 30720, "beforeQuest": 1841 },
             { "reply": 37098, "quest": 1841, "completes": 12193, "params": [[30, 12193]], "next": 30726 },
             { "reply": 37087, "next": 30721 },
             { "reply": 37086, "next": 30719 }
@@ -807,6 +807,7 @@
       "map": 0,
       "opening": 30730,
       "openings": [
+        { "after": 2009, "before": 1677, "message": 30732 },
         { "after": 1677, "before": 1960, "message": 30745 }
       ],
       "lines": [
@@ -814,7 +815,6 @@
           "message": 30730,
           "choices": [
             { "reply": 37102, "next": 30732, "completes": 13896, "params": [[30, 13896]] },
-            { "reply": 37102, "next": 30732, "beforeQuest": 1677 },
             { "reply": 37111, "quest": 1677, "completes": 10304, "params": [[30, 10304]], "next": 30737 },
             { "reply": 37117, "quest": 1677, "completes": 10308, "params": [[30, 10308]], "next": 30739 },
             { "reply": 37118, "quest": 1677, "completes": 10316, "params": [[30, 10316]], "next": 30744 },
@@ -926,6 +926,7 @@
       "map": 0,
       "opening": 30758,
       "openings": [
+        { "after": 2009, "before": 938, "message": 30760 },
         { "after": 938, "before": 1960, "message": 30768 }
       ],
       "lines": [
@@ -933,7 +934,6 @@
           "message": 30758,
           "choices": [
             { "reply": 37138, "next": 30760, "completes": 13894, "params": [[30, 13894]] },
-            { "reply": 37138, "next": 30760, "beforeQuest": 938 },
             { "reply": 37146, "quest": 938, "completes": 5702, "params": [[30, 5702]], "next": 30765 },
             { "reply": 37150, "quest": 938, "completes": 5711, "params": [[30, 5711]], "next": 30766 },
             { "reply": 37137, "next": 30759 },
@@ -1019,6 +1019,7 @@
       "map": 0,
       "opening": 30773,
       "openings": [
+        { "after": 2009, "before": 716, "message": 30775 },
         { "after": 716, "before": 1960, "message": 30800 }
       ],
       "lines": [
@@ -1026,7 +1027,6 @@
           "message": 30773,
           "choices": [
             { "reply": 37160, "next": 30775, "completes": 13893, "params": [[30, 13893]] },
-            { "reply": 37160, "next": 30775, "beforeQuest": 716 },
             { "reply": 37181, "quest": 716, "completes": 4640, "params": [[30, 4640]], "next": 30792 },
             { "reply": 37183, "quest": 716, "completes": 4644, "params": [[30, 4644]], "next": 30793, "gives": 12279 },
             { "reply": 37185, "quest": 716, "completes": 4646, "params": [[30, 4646]], "next": 30794 },
@@ -1205,6 +1205,7 @@
       "map": 0,
       "opening": 30801,
       "openings": [
+        { "after": 2009, "before": 704, "message": 30804 },
         { "after": 704, "before": 1960, "message": 30816 }
       ],
       "lines": [
@@ -1212,7 +1213,6 @@
           "message": 30801,
           "choices": [
             { "reply": 37199, "next": 30804, "completes": 13892, "params": [[30, 13892]] },
-            { "reply": 37199, "next": 30804, "beforeQuest": 704 },
             { "reply": 37212, "next": 30812, "quest": 704, "completesAll": [4559, 4560], "params": [[30, 4560]], "gives": 12123 },
             { "reply": 37213, "next": 30814, "quest": 704, "completes": 4564, "params": [[30, 4564]] },
             { "reply": 37198, "next": 30802 },
@@ -2377,7 +2377,6 @@
           "message": 30841,
           "names": true,
           "choices": [
-            { "reply": 38347, "next": 31710, "beforeQuest": 1969 },
             { "reply": 38347, "next": 31710, "beforeQuest": 1969 }
           ]
         },
@@ -13175,6 +13174,10 @@
           "choices": [
             { "reply": 38409 }
           ]
+        },
+        {
+          "message": 31073,
+          "choices": []
         }
       ],
       "why": "«Au petit malheur la chance»: greeted (37515), a drink with him without looking him in the eye (14249), «you want to draw bad luck?» (31766)."
