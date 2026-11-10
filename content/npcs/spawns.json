@@ -1749,6 +1749,34 @@
       "orientation": 3,
       "criterion": "Qa=1964&Qo=14231&Qo!14235",
       "why": "The wauwau defending Timy, until led back (14235). INFERRED cell."
+    },
+    {
+      "map": 188743686,
+      "npc": 4351,
+      "cell": 276,
+      "orientation": 3,
+      "why": "The mercenary on guard before the grocery [1,-16], reading his gazette. INFERRED cell."
+    },
+    {
+      "map": 188746759,
+      "npc": 4352,
+      "cell": 299,
+      "orientation": 1,
+      "why": "The mercenary on guard before the tailors' workshop [7,-15], asleep. INFERRED cell."
+    },
+    {
+      "map": 188743681,
+      "npc": 4352,
+      "cell": 298,
+      "orientation": 3,
+      "why": "The mercenary on guard by the pond [1,-21]. INFERRED cell."
+    },
+    {
+      "map": 188746753,
+      "npc": 4351,
+      "cell": 318,
+      "orientation": 3,
+      "why": "The mercenary on guard north of the library [7,-21], wary of the pious. INFERRED cell."
     }
   ]
 }

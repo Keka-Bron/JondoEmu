@@ -1755,20 +1755,17 @@
         {
           "message": 30876,
           "choices": [
-            { "reply": 37285, "next": 30880, "completes": 13880, "params": [[30, 13880]] }
-          ]
-        },
-        {
-          "message": 31532,
-          "choices": [
-            { "reply": 38095, "startsQuest": 1963 }
+            { "reply": 37285, "next": 30880, "completes": 13880, "params": [[30, 13880]] },
+            { "reply": 37288, "next": 31530, "beforeQuest": 1963 },
+            { "reply": 38099, "quest": 1963, "completes": 14161, "params": [[30, 14161]], "next": 31533 }
           ]
         },
         {
           "message": 30880,
           "names": true,
           "choices": [
-            { "reply": 38095, "startsQuest": 1963 }
+            { "reply": 37288, "next": 31530, "beforeQuest": 1963 },
+            { "reply": 38098 }
           ]
         },
         {
@@ -1776,9 +1773,32 @@
           "choices": [
             { "reply": 37286, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31530,
+          "choices": [
+            { "reply": 38097, "next": 31531 }
+          ]
+        },
+        {
+          "message": 31531,
+          "choices": [
+            { "reply": 38095, "next": 31532 }
+          ]
+        },
+        {
+          "message": 31532,
+          "choices": [
+            { "reply": 38094, "startsQuest": 1963, "params": [[34, 1963]] },
+            { "reply": 38096 }
+          ]
+        },
+        {
+          "message": 31533,
+          "choices": []
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37285) is this class's objective (13880, effect 30), and leads to his greeting, 30880, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1963) is done, he greets the character with Archi's summons (30877) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37285) is this class's objective (13880, effect 30), and leads to his greeting, 30880, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1963) is done, he greets the character with Archi's summons (30877) and «Ir a la Torre del Consejo» hands it over. «Tournée d'inspection» of Dofus pour les noobs: news (37288), Archi praised the character's rectitude (31530), some mangy mercenaries (31531), «Proposer de faire une inspection surprise»: the places they guard (31532, the line the step declares); the round's results (14161, 31533). «Tournée d'inspection» of Dofus pour les noobs: news (37288), Archi praised the character's rectitude (31530), some mangy mercenaries (31531), «Proposer de faire une inspection surprise»: the places they guard (31532, the line the step declares); the round's results (14161, 31533)."
     },
     {
       "npc": 4339,
@@ -11191,6 +11211,241 @@
         }
       ],
       "why": "The young milirats around Timy, by «Série animalière»: attacked (npc_fights.json)."
+    },
+    {
+      "npc": 4351,
+      "map": 188743686,
+      "opening": 31540,
+      "openings": [
+        { "quest": 1963, "objective": 14149, "pending": 14161, "message": 31539 },
+        { "after": 1963, "message": 31542 }
+      ],
+      "lines": [
+        {
+          "message": 31540,
+          "choices": [
+            { "reply": 38109, "next": 31541, "quest": 1963, "beforeObjective": 14149 }
+          ]
+        },
+        {
+          "message": 31541,
+          "choices": [
+            { "reply": 38108, "quest": 1963, "beforeObjective": 14149 }
+          ]
+        },
+        {
+          "message": 31539,
+          "choices": [
+            { "reply": 38107 }
+          ]
+        },
+        {
+          "message": 31542,
+          "choices": []
+        }
+      ],
+      "why": "The mercenary before the grocery [1,-16], by «Tournée d'inspection»: reading the Astrub gazette with a finger up his nose (31540), no orders from the character (31541), the paper snatched: the fight (npc_fights.json); back to work (31539); afterwards, a quiet city (31542)."
+    },
+    {
+      "npc": 4352,
+      "map": 188746759,
+      "opening": 31561,
+      "openings": [
+        { "after": 1963, "message": 31567 }
+      ],
+      "lines": [
+        {
+          "message": 31561,
+          "choices": [
+            { "reply": 38136, "next": 31562, "quest": 1963, "beforeObjective": 14150 }
+          ]
+        },
+        {
+          "message": 31562,
+          "choices": [
+            { "reply": 38139, "next": 31566 },
+            { "reply": 38135, "next": 31563 }
+          ]
+        },
+        {
+          "message": 31566,
+          "choices": [
+            { "reply": 38138, "quest": 1963, "completes": 14150, "params": [[30, 14150]] }
+          ]
+        },
+        {
+          "message": 31563,
+          "choices": [
+            { "reply": 38134, "next": 31564 }
+          ]
+        },
+        {
+          "message": 31564,
+          "choices": [
+            { "reply": 38137, "quest": 1963, "completes": 14150, "params": [[30, 14150]] }
+          ]
+        },
+        {
+          "message": 31567,
+          "choices": []
+        }
+      ],
+      "why": "The mercenary asleep before the tailors' workshop [7,-15], by «Tournée d'inspection»: «Zzzzzz» (31561), a tap on the shoulder, the change of shift? (31562); the sales lie, ready for the crowd (31566: 14150) or the goblin raiders (31563, 31564); afterwards, citizens may sleep in peace (31567)."
+    },
+    {
+      "npc": 4352,
+      "map": 191102978,
+      "opening": 31558,
+      "openings": [
+        { "quest": 1963, "objective": 14151, "pending": 14161, "message": 31556 },
+        { "after": 1963, "message": 31557 }
+      ],
+      "lines": [
+        {
+          "message": 31558,
+          "choices": [
+            { "reply": 38132, "next": 31559, "quest": 1963 },
+            { "reply": 38131 }
+          ]
+        },
+        {
+          "message": 31559,
+          "choices": [
+            { "reply": 38130, "quest": 1963, "beforeObjective": 14151 },
+            { "reply": 38131 }
+          ]
+        },
+        {
+          "message": 31556,
+          "choices": [
+            { "reply": 38129, "next": 31557 }
+          ]
+        },
+        {
+          "message": 31557,
+          "choices": [
+            { "reply": 38128 }
+          ]
+        }
+      ],
+      "why": "The haughty mercenary of Brutas' square [3,-18], by «Tournée d'inspection»: another bumpkin (31558), waiting for somebody worth fighting (31559), challenged: the fight (npc_fights.json); she can fight after all (31556), her job is to protect them (31557)."
+    },
+    {
+      "npc": 4352,
+      "map": 188743681,
+      "opening": 31544,
+      "lines": [
+        {
+          "message": 31544,
+          "choices": [
+            { "reply": 38120, "next": 31548, "quest": 1963, "beforeObjective": 14152 },
+            { "reply": 38123, "next": 31545 },
+            { "reply": 38117 }
+          ]
+        },
+        {
+          "message": 31545,
+          "choices": [
+            { "reply": 38122, "next": 31546 },
+            { "reply": 38124, "next": 31554 }
+          ]
+        },
+        {
+          "message": 31546,
+          "choices": [
+            { "reply": 38121, "next": 31547 }
+          ]
+        },
+        {
+          "message": 31547,
+          "choices": [
+            { "reply": 38126, "next": 31555 }
+          ]
+        },
+        {
+          "message": 31548,
+          "choices": [
+            { "reply": 38119, "next": 31549 }
+          ]
+        },
+        {
+          "message": 31549,
+          "choices": [
+            { "reply": 38118, "next": 31550 },
+            { "reply": 38127 }
+          ]
+        },
+        {
+          "message": 31550,
+          "choices": [
+            { "reply": 38116, "next": 31551 },
+            { "reply": 38125, "next": 31551 }
+          ]
+        },
+        {
+          "message": 31551,
+          "choices": [
+            { "reply": 38115, "next": 31552 }
+          ]
+        },
+        {
+          "message": 31552,
+          "choices": [
+            { "reply": 38114, "next": 31553 }
+          ]
+        },
+        {
+          "message": 31553,
+          "choices": [
+            { "reply": 38113, "quest": 1963, "completes": 14152, "params": [[30, 14152]] }
+          ]
+        },
+        {
+          "message": 31554,
+          "choices": []
+        },
+        {
+          "message": 31555,
+          "choices": []
+        }
+      ],
+      "why": "The patient mercenary by the pond [1,-21], by «Tournée d'inspection»: ten years of adventurers' questions (31544); a million kamas asked (31548), the deaf ear and the whining hand (31549), heavy insistence (31550), congratulated (31551-31553: 14152), as Dofus pour les noobs has it; or a market's way and the six Dofus, giving up too soon (31545-31547, 31554, 31555)."
+    },
+    {
+      "npc": 4351,
+      "map": 188746753,
+      "opening": 31535,
+      "openings": [
+        { "quest": 1963, "objective": 14160, "pending": 14161, "message": 31537 },
+        { "after": 1963, "message": 31538 }
+      ],
+      "lines": [
+        {
+          "message": 31535,
+          "choices": [
+            { "reply": 38103, "next": 31536, "quest": 1963, "beforeObjective": 14153 }
+          ]
+        },
+        {
+          "message": 31536,
+          "choices": [
+            { "reply": 38102, "quest": 1963, "completes": 14153, "params": [[30, 14153]] }
+          ]
+        },
+        {
+          "message": 31537,
+          "choices": [
+            { "reply": 38105, "next": 31538 }
+          ]
+        },
+        {
+          "message": 31538,
+          "choices": [
+            { "reply": 38104 }
+          ]
+        }
+      ],
+      "why": "The mercenary north of the library [7,-21], afraid of pious, by «Tournée d'inspection»: those sharp beaks (31535, 31536), pious to be fought to show him (14153); feathers everywhere, could he beat them too? (31537), heartened (31538)."
     }
   ]
 }

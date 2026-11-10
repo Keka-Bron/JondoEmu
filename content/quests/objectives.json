@@ -1154,6 +1154,57 @@
    "map": 101712387,
    "afterObjectives": [14232],
    "why": "«Haz que huyan las jóvenes milirratas que arremeten contra el pequeño Timy»: the fight against them (5303)."
+  },
+  {
+   "objective": 14150,
+   "quest": 1963,
+   "kind": "reply",
+   "replies": [38138, 38137],
+   "anyOrder": true,
+   "why": "«Habla con la mercenaria de guardia delante del taller de sastres»: woken and set on guard; any order with the other four."
+  },
+  {
+   "objective": 14152,
+   "quest": 1963,
+   "kind": "reply",
+   "replies": [38113],
+   "anyOrder": true,
+   "why": "«Habla con la mercenaria de guardia cerca del estanque»: her patience praised; any order with the other four."
+  },
+  {
+   "objective": 14153,
+   "quest": 1963,
+   "kind": "reply",
+   "replies": [38102],
+   "anyOrder": true,
+   "why": "«Habla con el mercenario al norte de la biblioteca»: pious to be fought for him; any order with the other four."
+  },
+  {
+   "objective": 14149,
+   "quest": 1963,
+   "kind": "beat",
+   "monster": 5294,
+   "map": 188743686,
+   "anyOrder": true,
+   "why": "«Habla con el mercenario de guardia delante de la tienda de comestibles»: the paper snatched, the fight won (5294)."
+  },
+  {
+   "objective": 14151,
+   "quest": 1963,
+   "kind": "beat",
+   "monster": 5295,
+   "map": 191102978,
+   "anyOrder": true,
+   "why": "«Habla con la mercenaria de guardia en la plaza de Brutas»: the challenge won (5295)."
+  },
+  {
+   "objective": 14160,
+   "quest": 1963,
+   "kind": "beat",
+   "monsters": [236, 489, 490, 491, 492, 493],
+   "map": 188746753,
+   "afterObjectives": [14153],
+   "why": "«Muéstrale al mercenario que los píos no son peligrosos»: a group of pious of any colour beaten at [7,-21]."
   }
  ]
 }
