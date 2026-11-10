@@ -295,28 +295,37 @@
         {
           "message": 6169,
           "choices": [
-            {
-              "reply": 36685,
-              "next": 30422
-            },
-            {
-              "reply": 6025
-            }
+            { "reply": 36685, "next": 30419, "beforeQuest": 1994 },
+            { "reply": 6025 }
+          ]
+        },
+        {
+          "message": 30419,
+          "choices": [
+            { "reply": 36684, "next": 30420 }
+          ]
+        },
+        {
+          "message": 30420,
+          "choices": [
+            { "reply": 36683, "next": 30421 }
+          ]
+        },
+        {
+          "message": 30421,
+          "choices": [
+            { "reply": 36682, "next": 30422 }
           ]
         },
         {
           "message": 30422,
           "choices": [
-            {
-              "reply": 36680,
-              "startsQuest": 1994
-            },
-            {
-              "reply": 6025
-            }
+            { "reply": 36680, "startsQuest": 1994, "params": [[34, 1994]] },
+            { "reply": 36681 }
           ]
         }
-      ]
+      ],
+      "why": "Snori Nairb, the guard of Astrub [4,-18], by «Les deux font l'impair»: the quarrel he broke up (36685), Bontarians and Brakmarians fighting in town (30419), the two cities (30420), Astrub's neutrality and its cells (30421), the recruiting agents (30422)."
     },
     {
       "npc": 1441,
@@ -5896,124 +5905,112 @@
     {
       "npc": 735,
       "map": 0,
-      "opening": 30425,
+      "opening": 3030,
+      "openings": [
+        { "quest": 1994, "pending": 13793, "message": 30425 }
+      ],
       "lines": [
+        {
+          "message": 3030,
+          "choices": [
+            { "reply": 2673, "next": 3031 }
+          ]
+        },
+        {
+          "message": 3031,
+          "choices": []
+        },
         {
           "message": 30425,
           "choices": [
-            {
-              "reply": 36690,
-              "next": 30426
-            }
+            { "reply": 36690, "next": 30426 }
           ]
         },
         {
           "message": 30426,
           "choices": [
-            {
-              "reply": 36689,
-              "next": 30427
-            }
+            { "reply": 36689, "next": 30427 }
           ]
         },
         {
           "message": 30427,
           "choices": [
-            {
-              "reply": 36688,
-              "next": 30428
-            }
+            { "reply": 36688, "next": 30428 }
           ]
         },
         {
           "message": 30428,
           "choices": [
-            {
-              "reply": 36687,
-              "next": 30429
-            }
+            { "reply": 36687, "next": 30429 }
           ]
         },
         {
           "message": 30429,
           "choices": [
-            {
-              "reply": 36686,
-              "next": 30430
-            }
+            { "reply": 36686, "quest": 1994, "completes": 13793, "params": [[30, 13793]], "next": 30430 }
           ]
         },
         {
           "message": 30430,
-          "choices": [
-            {
-              "reply": 36686
-            }
-          ]
+          "choices": []
         }
       ],
-      "why": "No capture. The recruiter's six lines and five replies, in the order their texts follow one another: the muse on the militia, «Hablar de la milicia», the creed, the interrupted tirade, two «Seguir escuchando», «Gracias por la explicación» and the send-off. They are the lines of «Vaya par» (quest 1994), whose step asks to come and see both recruiters; without a tree the template's opening went out with the chain's last reply."
+      "why": "The Bontarian militiawoman, recruiting in Astrub: her call to join (3030, 3031); by «Les deux font l'impair», her city's militia presented while the quest has her to see (30425-30430, 13793)."
     },
     {
       "npc": 734,
       "map": 0,
-      "opening": 30431,
+      "opening": 3027,
+      "openings": [
+        { "quest": 1994, "pending": 13794, "message": 30431 }
+      ],
       "lines": [
+        {
+          "message": 3027,
+          "choices": [
+            { "reply": 2672, "next": 3028 }
+          ]
+        },
+        {
+          "message": 3028,
+          "choices": []
+        },
         {
           "message": 30431,
           "choices": [
-            {
-              "reply": 36695,
-              "next": 30432
-            }
+            { "reply": 36695, "next": 30432 }
           ]
         },
         {
           "message": 30432,
           "choices": [
-            {
-              "reply": 36694,
-              "next": 30433
-            }
+            { "reply": 36694, "next": 30433 }
           ]
         },
         {
           "message": 30433,
           "choices": [
-            {
-              "reply": 36693,
-              "next": 30434
-            }
+            { "reply": 36693, "next": 30434 }
           ]
         },
         {
           "message": 30434,
           "choices": [
-            {
-              "reply": 36692,
-              "next": 30435
-            }
+            { "reply": 36692, "next": 30435 }
           ]
         },
         {
           "message": 30435,
           "choices": [
-            {
-              "reply": 36691,
-              "next": 30436
-            }
+            { "reply": 36691, "quest": 1994, "completes": 13794, "params": [[30, 13794]], "next": 30436 }
           ]
         },
         {
           "message": 30436,
-          "choices": [
-            {
-              "reply": 36691
-            }
-          ]
+          "choices": []
         }
       ],
-      "why": "No capture. The recruiter's six lines and five replies, in the order their texts follow one another: the muse on the militia, «Hablar de la milicia», the creed, the interrupted tirade, two «Seguir escuchando», «Gracias por la explicación» and the send-off. They are the lines of «Vaya par» (quest 1994), whose step asks to come and see both recruiters; without a tree the template's opening went out with the chain's last reply."
+      "why": "The Brakmarian militiawoman, recruiting in Astrub: her call to join (3027, 3028); by «Les deux font l'impair», her city's militia presented while the quest has her to see (30431-30436, 13794)."
     },
     {
       "npc": 8002,
