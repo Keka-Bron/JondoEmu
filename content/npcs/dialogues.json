@@ -928,6 +928,7 @@
             { "reply": 36639, "quest": 1978, "completes": 13770, "params": [[30, 13770]], "next": 30387, "afterObjective": 13769 },
             { "reply": 36642, "next": 30388, "quest": 1978, "afterQuest": true, "beforeQuest": 1979 },
             { "reply": 36645, "quest": 1979, "completes": 13775, "params": [[30, 13775]], "next": 30393, "afterObjectives": [13771, 13772, 13773, 13774] },
+            { "reply": 36850, "quest": 1986, "completes": 13847, "params": [[30, 13847]], "next": 30543 },
             { "reply": 66930 }
           ]
         },
@@ -1054,9 +1055,15 @@
           "choices": [
             { "reply": 36643 }
           ]
+        },
+        {
+          "message": 30543,
+          "choices": [
+            { "reply": 36849 }
+          ]
         }
       ],
-      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394)."
+      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394). «Golémancien»: the animated quintain given (13847), ugly but good for the mercenaries (30543)."
     },
     {
       "npc": 4324,
@@ -8881,6 +8888,7 @@
           "choices": [
             { "reply": 37658, "quest": 1989, "completes": 14000, "params": [[30, 14000]], "next": 31186 },
             { "reply": 37668, "next": 31190, "quest": 1989, "afterObjectives": [14001, 14002], "completesAll": [14003], "params": [[30, 14003]], "takesAll": [19684, 19685] },
+            { "reply": 36848, "next": 30538, "quest": 1986, "afterObjective": 13845 },
             { "reply": 50443 }
           ]
         },
@@ -8937,9 +8945,39 @@
           "choices": [
             { "reply": 37663, "gives": 19686 }
           ]
+        },
+        {
+          "message": 30538,
+          "choices": [
+            { "reply": 36847, "next": 30539 }
+          ]
+        },
+        {
+          "message": 30539,
+          "choices": [
+            { "reply": 36846, "quest": 1986, "completes": 13846, "params": [[30, 13846]], "next": 30540 }
+          ]
+        },
+        {
+          "message": 30540,
+          "choices": [
+            { "reply": 36845, "next": 30541 }
+          ]
+        },
+        {
+          "message": 30541,
+          "choices": [
+            { "reply": 36844, "next": 30542 }
+          ]
+        },
+        {
+          "message": 30542,
+          "choices": [
+            { "reply": 36843, "gives": 19645 }
+          ]
         }
       ],
-      "why": "The Mage of Zo, creator of the Almanax, in the alchemists' workshop [3,-21], from his own lines and replies, by «Restauration rapide» of Dofus pour les noobs: the burnt book shown (14000), a bibliomancy spell of three weeks (31186, 31187) or the short one with century-old bark and gobbly milk (31188), the stump south of Tainela and the gobball farm (31189); the milk and the bark handed over (14003), the disguise he took them for (31190, 31191), the book given, the spell (31192, 31193) and the enchanted bark for Primir (31194, 19686)."
+      "why": "The Mage of Zo, creator of the Almanax, in the alchemists' workshop [3,-21], from his own lines and replies, by «Restauration rapide» of Dofus pour les noobs: the burnt book shown (14000), a bibliomancy spell of three weeks (31186, 31187) or the short one with century-old bark and gobbly milk (31188), the stump south of Tainela and the gobball farm (31189); the milk and the bark handed over (14003), the disguise he took them for (31190, 31191), the book given, the spell (31192, 31193) and the enchanted bark for Primir (31194, 19686). «Golémancien»: whether the character made every part (30538), the quintain set down for its enchanting (30539, 13846), the spell (30540, 30541), animated for Badufron (30542, 19645)."
     },
     {
       "npc": 4442,
@@ -9235,6 +9273,190 @@
         }
       ],
       "why": "A Purple Dawn spectre in Astrub's cemetery [0,-12], by «Légende d'automne»: «parlez au Spectre de l'Aurore Pourpre pour les combattre»; the fight is in npc_fights.json and the relic (19703) comes out of the client's loot row while the objective is in hand."
+    },
+    {
+      "npc": 4346,
+      "map": 0,
+      "opening": 30526,
+      "lines": [
+        {
+          "message": 30526,
+          "choices": [
+            { "reply": 36822, "quest": 1986, "completes": 13836, "params": [[30, 13836]], "next": 30527 },
+            { "reply": 36825, "next": 30528, "quest": 1986, "afterObjective": 13836, "beforeObjective": 13837 }
+          ]
+        },
+        {
+          "message": 30527,
+          "choices": [
+            { "reply": 36821, "gives": 19636 }
+          ]
+        },
+        {
+          "message": 30528,
+          "choices": [
+            { "reply": 36823, "buyItem": 19636, "buyPrice": 50 },
+            { "reply": 36824 }
+          ]
+        }
+      ],
+      "why": "Dió Myo the smith [7,-16], by «Golémancien»: too busy for anything (30526); Paula Sepe said the character would come, a flail, his workshop and an enchanted ore (30527, 19636); another for 50 kamas (30528)."
+    },
+    {
+      "npc": 2958,
+      "map": 0,
+      "opening": 22039,
+      "lines": [
+        {
+          "message": 22039,
+          "choices": [
+            { "reply": 36827, "quest": 1986, "completes": 13838, "params": [[30, 13838]], "next": 30529 },
+            { "reply": 36830, "next": 30530, "quest": 1986, "afterObjective": 13838, "beforeObjective": 13839 },
+            { "reply": 26540, "next": 22040 }
+          ]
+        },
+        {
+          "message": 30529,
+          "choices": [
+            { "reply": 36826, "gives": 19638 }
+          ]
+        },
+        {
+          "message": 30530,
+          "choices": [
+            { "reply": 36828, "buyItem": 19638, "buyPrice": 50 },
+            { "reply": 36829 }
+          ]
+        },
+        {
+          "message": 22040,
+          "choices": [
+            { "reply": 26539, "next": 22041 },
+            { "reply": 26544, "next": 22043 },
+            { "reply": 26548, "next": 22045 }
+          ]
+        },
+        {
+          "message": 22041,
+          "choices": [
+            { "reply": 26538, "next": 22042 }
+          ]
+        },
+        {
+          "message": 22042,
+          "choices": []
+        },
+        {
+          "message": 22043,
+          "choices": [
+            { "reply": 26543, "next": 22044 }
+          ]
+        },
+        {
+          "message": 22044,
+          "choices": []
+        },
+        {
+          "message": 22045,
+          "choices": [
+            { "reply": 26547, "next": 22046 }
+          ]
+        },
+        {
+          "message": 22046,
+          "choices": []
+        }
+      ],
+      "why": "Diego Pavés the craftsman, by «Golémancien»: the mercenaries' chief will use the quintain a lot, a metal support for its shield (30529, 19638), another for 50 kamas (30530). His trade: idols, shields and trophies (22040-22046)."
+    },
+    {
+      "npc": 4348,
+      "map": 0,
+      "opening": 30531,
+      "lines": [
+        {
+          "message": 30531,
+          "choices": [
+            { "reply": 36832, "quest": 1986, "completes": 13840, "params": [[30, 13840]], "next": 30532 },
+            { "reply": 36835, "next": 30533, "quest": 1986, "afterObjective": 13840, "beforeObjective": 13841 }
+          ]
+        },
+        {
+          "message": 30532,
+          "choices": [
+            { "reply": 36831, "gives": 19640 }
+          ]
+        },
+        {
+          "message": 30533,
+          "choices": [
+            { "reply": 36833, "buyItem": 19640, "buyPrice": 50 },
+            { "reply": 36834 }
+          ]
+        }
+      ],
+      "why": "Alit Elfminate the tailor, by «Golémancien»: a tubarnékalo to sew in her workshop with an enchanted thread (30532, 19640), another for 50 kamas, Paula Sepe paid only one (30533)."
+    },
+    {
+      "npc": 4345,
+      "map": 0,
+      "opening": 30534,
+      "lines": [
+        {
+          "message": 30534,
+          "choices": [
+            { "reply": 36837, "quest": 1986, "completes": 13842, "params": [[30, 13842]], "next": 30535 },
+            { "reply": 36840, "next": 30536, "quest": 1986, "afterObjective": 13842, "beforeObjective": 13843 }
+          ]
+        },
+        {
+          "message": 30535,
+          "choices": [
+            { "reply": 36836, "gives": 19642 }
+          ]
+        },
+        {
+          "message": 30536,
+          "choices": [
+            { "reply": 36838, "buyItem": 19642, "buyPrice": 50 },
+            { "reply": 36839 }
+          ]
+        }
+      ],
+      "why": "Oli Venders the wood seller [2,-16], by «Golémancien»: a solid base, a board and this wood cream (30535, 19642), more at a price from now on (30536)."
+    },
+    {
+      "npc": 3042,
+      "map": 0,
+      "opening": 22047,
+      "lines": [
+        {
+          "message": 22047,
+          "choices": [
+            { "reply": 36842, "quest": 1986, "completes": 13844, "params": [[30, 13844]], "next": 30537, "afterObjective": 13843 },
+            { "reply": 26551, "next": 22048 }
+          ]
+        },
+        {
+          "message": 30537,
+          "choices": [
+            { "reply": 36841 }
+          ]
+        },
+        {
+          "message": 22048,
+          "choices": [
+            { "reply": 26550, "next": 22049 }
+          ]
+        },
+        {
+          "message": 22049,
+          "choices": [
+            { "reply": 26549 }
+          ]
+        }
+      ],
+      "why": "Lucy Goñal the handywoman, by «Golémancien»: the parts brought, her workshop to assemble the quintain (30537); her trade (22048, 22049)."
     }
   ]
 }
