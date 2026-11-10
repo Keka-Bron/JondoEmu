@@ -435,33 +435,24 @@
       "npc": 4310,
       "map": 0,
       "opening": 30925,
+      "openings": [
+        { "after": 1988, "before": 1989, "message": 31240 }
+      ],
       "lines": [
         {
           "message": 30925,
           "choices": [
             { "reply": 37492, "quest": 1960, "completes": 13945, "params": [[30, 13945]], "next": 31053, "afterObjective": 13944 },
             { "reply": 37342, "next": 30926, "quest": 1975, "afterObjective": 13963, "beforeObjective": 13964, "params": [[30, 13964]], "completes": 13964, "showsNpc": 4411 },
-            { "reply": 37740, "next": 31246 },
-            { "reply": 37601, "next": 31241 },
-            { "reply": 37753, "next": 31252 }
-          ]
-        },
-        {
-          "message": 31246,
-          "choices": [
-            { "reply": 37743, "startsQuest": 1988 }
-          ]
-        },
-        {
-          "message": 31241,
-          "choices": [
-            { "reply": 37750, "startsQuest": 1989 }
-          ]
-        },
-        {
-          "message": 31252,
-          "choices": [
-            { "reply": 37756, "startsQuest": 1990 }
+            { "reply": 37740, "next": 31246, "quest": 1960, "afterObjective": 13945, "beforeQuest": 1988 },
+            { "reply": 37740, "next": 31246, "quest": 1960, "afterQuest": true, "beforeQuest": 1988 },
+            { "reply": 37743, "quest": 1988, "completes": 13999, "params": [[30, 13999]], "next": 31247 },
+            { "reply": 37745, "next": 31241, "quest": 1988, "afterQuest": true, "beforeQuest": 1989 },
+            { "reply": 37750, "quest": 1989, "completes": 14005, "params": [[30, 14005]], "next": 31250, "afterObjective": 14004 },
+            { "reply": 37753, "next": 31254, "quest": 1989, "afterQuest": true, "beforeQuest": 1990 },
+            { "reply": 37756, "quest": 1990, "completes": 14008, "params": [[30, 14008]], "next": 31255, "afterObjective": 14007 },
+            { "reply": 37738, "next": 31243 },
+            { "reply": 37735 }
           ]
         },
         {
@@ -487,9 +478,101 @@
           "choices": [
             { "reply": 37341, "thenNpc": 4411 }
           ]
+        },
+        {
+          "message": 31246,
+          "choices": [
+            { "reply": 37739, "startsQuest": 1988, "params": [[34, 1988]] },
+            { "reply": 37744 }
+          ]
+        },
+        {
+          "message": 31247,
+          "choices": [
+            { "reply": 37742, "next": 31248 }
+          ]
+        },
+        {
+          "message": 31248,
+          "choices": [
+            { "reply": 37741, "thenNpc": 4419 }
+          ]
+        },
+        {
+          "message": 31240,
+          "choices": [
+            { "reply": 37745, "next": 31241 }
+          ]
+        },
+        {
+          "message": 31241,
+          "choices": [
+            { "reply": 37744, "startsQuest": 1989, "params": [[34, 1989]] }
+          ]
+        },
+        {
+          "message": 31250,
+          "choices": [
+            { "reply": 37749, "next": 31251 }
+          ]
+        },
+        {
+          "message": 31251,
+          "choices": [
+            { "reply": 37748, "next": 31252 }
+          ]
+        },
+        {
+          "message": 31252,
+          "choices": [
+            { "reply": 37747, "startsQuest": 1990, "params": [[34, 1990]], "next": 31253 },
+            { "reply": 37751 }
+          ]
+        },
+        {
+          "message": 31253,
+          "choices": [
+            { "reply": 37746 }
+          ]
+        },
+        {
+          "message": 31254,
+          "choices": [
+            { "reply": 37752, "startsQuest": 1990, "params": [[34, 1990]] }
+          ]
+        },
+        {
+          "message": 31255,
+          "choices": [
+            { "reply": 37755, "next": 31256 }
+          ]
+        },
+        {
+          "message": 31256,
+          "choices": [
+            { "reply": 37754 }
+          ]
+        },
+        {
+          "message": 31243,
+          "choices": [
+            { "reply": 37737, "next": 31244 }
+          ]
+        },
+        {
+          "message": 31244,
+          "choices": [
+            { "reply": 37736, "next": 31245 }
+          ]
+        },
+        {
+          "message": 31245,
+          "choices": [
+            { "reply": 37735 }
+          ]
         }
       ],
-      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it."
+      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it. «La gran biblioteca» (Dofus pour les noobs): «¿Cómo puedo ayudarte en la investigación sobre el dragón?» and Oz Dralett (31246, 1988's line); the burnt book shown (13999, 31247), Neria asked (31248); the Mage of Zo (31240, 31241, 1989's line); the restoration in Primir's hands (14005), the parchment stolen by the rats (31250-31252, 1990's line; later «Puedo ir a cazar esas sucias ratas», 31254); the parchment shown (14008), Old Strubian, and Primir (31255, 31256). The new library and her past (31243-31245)."
     },
     {
       "npc": 4311,
@@ -8418,6 +8501,94 @@
         }
       ],
       "why": "The runaway goblins at the farm [3,-9] with the eggs they take for white dofus («il faut donc retrouver les gobelins en [3,-9] pour parler à Alka Traz dans le but de les affronter»): «Dar unos toquecitos sobre los goblins para dirigirlos por el buen camino» opens the fight against the three."
+    },
+    {
+      "npc": 4419,
+      "map": 0,
+      "opening": 31050,
+      "lines": [
+        {
+          "message": 31050,
+          "choices": [
+            { "reply": 37634, "thenNpc": 4310 }
+          ]
+        }
+      ],
+      "why": "Neria, Aisling's owl, on her perch: «Huu, huuu...» (31050), which the character cannot understand and Aisling can («Parlez à Neria que vous ne réussirez pas à comprendre. Reparlez à Aisling»)."
+    },
+    {
+      "npc": 4341,
+      "map": 0,
+      "opening": 31166,
+      "lines": [
+        {
+          "message": 31166,
+          "choices": [
+            { "reply": 37638, "quest": 1988, "completes": 13996, "params": [[30, 13996]], "next": 31167 },
+            { "reply": 37640 }
+          ]
+        },
+        {
+          "message": 31167,
+          "choices": [
+            { "reply": 37637, "next": 31168 }
+          ]
+        },
+        {
+          "message": 31168,
+          "choices": [
+            { "reply": 37636, "next": 31169 }
+          ]
+        },
+        {
+          "message": 31169,
+          "choices": [
+            { "reply": 37635 }
+          ]
+        }
+      ],
+      "why": "Oz Dralett, the old bookseller in the library's store room, by «L'histoire en mouvement»: the old texts on Rathrosk (13996), a book with cracked covers (31167), gone (31168), put by mistake in the parchment seller's crate (31169)."
+    },
+    {
+      "npc": 730,
+      "map": 0,
+      "opening": 3004,
+      "lines": [
+        {
+          "message": 3004,
+          "choices": [
+            { "reply": 37652, "quest": 1988, "completes": 13997, "params": [[30, 13997]], "next": 31181, "afterObjective": 13996 },
+            { "reply": 37632 }
+          ]
+        },
+        {
+          "message": 31181,
+          "choices": [
+            { "reply": 37651 }
+          ]
+        }
+      ],
+      "why": "Nacf Virgilio, the parchment seller [3,-17]: his wares (3004); by «L'histoire en mouvement», Oz Dralett's mistake (13997): sold with a lot of damaged manuscripts to a smith's apprentice (31181)."
+    },
+    {
+      "npc": 600,
+      "map": 0,
+      "opening": 2411,
+      "lines": [
+        {
+          "message": 2411,
+          "choices": [
+            { "reply": 37654, "next": 31182, "quest": 1988, "afterObjective": 13997, "beforeObjective": 13998 }
+          ]
+        },
+        {
+          "message": 31182,
+          "choices": [
+            { "reply": 37653, "params": [905] }
+          ]
+        }
+      ],
+      "why": "Latem Odasep, the smiths' young apprentice [7,-16]: by «L'histoire en mouvement», the old book bought from Nacf Virgilio, just put in the fire (31182); «Abalanzarte hacia el fogón de la forja» is the fight against the forge's fire (npc_fights.json), and the burnt book comes out of it."
     }
   ]
 }

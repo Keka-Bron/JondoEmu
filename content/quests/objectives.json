@@ -645,6 +645,16 @@
    "map": 190578693,
    "afterObjectives": [14196],
    "why": "«Vence a los tres goblins»: Alka Traz, Guan Tánamo and Luki Lushiano as monsters (776-778)."
+  },
+  {
+   "objective": 13998,
+   "quest": 1988,
+   "kind": "beat",
+   "monster": 5256,
+   "map": 192939010,
+   "afterObjectives": [13997],
+   "gives": [{"item": 19681, "count": 1}],
+   "why": "«Consigue el manuscrito antes de que sea destruido»: the forge's fire (5256) beaten, the burnt book (19681) saved from it; «Un combat se lance alors contre le Feu de la force... vous récupérez le livre calciné»."
   }
  ]
 }

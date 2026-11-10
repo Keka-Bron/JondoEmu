@@ -218,6 +218,7 @@ namespace Jondo.Unity.Server.Network
         private static Respuesta TestReload()
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
+            Managers.NpcDialogues.Reload();
             Managers.Npcs.Initialize();
             Managers.DungeonDoor.Initialize();
             Managers.Bankers.Initialize();

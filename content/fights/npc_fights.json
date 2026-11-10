@@ -81,6 +81,8 @@
     { "npc": 750, "map": 190578693, "reply": 38163,
       "monsters": [ { "monster": 776, "grade": 0 }, { "monster": 777, "grade": 0 }, { "monster": 778, "grade": 0 } ] },
     { "npc": 751, "map": 190578693, "reply": 38161,
-      "monsters": [ { "monster": 776, "grade": 0 }, { "monster": 777, "grade": 0 }, { "monster": 778, "grade": 0 } ] }
+      "monsters": [ { "monster": 776, "grade": 0 }, { "monster": 777, "grade": 0 }, { "monster": 778, "grade": 0 } ] },
+    { "npc": 600, "map": 192939010, "reply": 37653,
+      "monsters": [ { "monster": 5256, "grade": 0 } ] }
   ]
 }

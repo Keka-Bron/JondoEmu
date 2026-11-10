@@ -1218,6 +1218,13 @@
       "orientation": 7,
       "criterion": "Qa=1996&Qo=14197",
       "why": "The mercenary come east after them, once they are beaten (14197). INFERRED."
+    },
+    {
+      "map": 192415748,
+      "npc": 4419,
+      "cell": 356,
+      "orientation": 1,
+      "why": "Neria, Aisling's owl, on her perch beside her. INFERRED: the library's first floor, by Aisling (371)."
     }
   ]
 }

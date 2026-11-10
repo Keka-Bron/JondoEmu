@@ -1234,6 +1234,15 @@ namespace Jondo.Unity.Server.Handlers
                                     ?.Line(SessionContext.State.OpenDialogueMessage);
             var elegidaAhora = frase?.Choice(reply, SeLeOfrece);
 
+            // A reply the line has but does not offer this character is not his to choose: the real
+            // client only sends what it was shown, so this is somebody sending ids by hand.
+            if (elegidaAhora != null && !SeLeOfrece(elegidaAhora))
+            {
+                Console.WriteLine($"[NPC] Reply {reply} is not offered on line {frase!.Message} to this character; ignored.");
+                await CloseAsync(stream);
+                return;
+            }
+
             // Is it the answer that accepts an offer that was read? Then there is no NPC involved:
             // the question was asked by a notice, and accepting it is what records having read it. It
             // is checked here because the ioy arrives loose, without saying where it came from.

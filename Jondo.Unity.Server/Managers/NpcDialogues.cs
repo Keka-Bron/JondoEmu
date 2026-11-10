@@ -36,6 +36,16 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static void Load() => Ensure();
 
+        /// <summary>The authored dialogues read again with the server running (the harness's «reload»).</summary>
+        public static void Reload()
+        {
+            lock (_lock)
+            {
+                Read();
+                _loaded = true;
+            }
+        }
+
         private static void Ensure()
         {
             if (_loaded) return;
