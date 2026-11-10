@@ -624,22 +624,57 @@
         {
           "message": 31327,
           "choices": [
-            {
-              "reply": 37840,
-              "next": 31331
-            }
+            { "reply": 37838, "next": 31328, "beforeQuest": 2000 },
+            { "reply": 37846, "quest": 2000, "completes": 14084, "params": [[30, 14084]], "next": 31332, "afterObjective": 14083 },
+            { "reply": 37848, "quest": 2000, "completes": 14094, "params": [[30, 14094]], "next": 31334, "afterObjective": 14093 }
+          ]
+        },
+        {
+          "message": 31328,
+          "choices": [
+            { "reply": 37843, "next": 31329 }
+          ]
+        },
+        {
+          "message": 31329,
+          "choices": [
+            { "reply": 37842, "next": 31330 }
+          ]
+        },
+        {
+          "message": 31330,
+          "choices": [
+            { "reply": 37839, "next": 31331 },
+            { "reply": 37841 }
           ]
         },
         {
           "message": 31331,
           "choices": [
-            {
-              "reply": 37846,
-              "startsQuest": 2000
-            }
+            { "reply": 37840, "startsQuest": 2000, "params": [[34, 2000]] }
+          ]
+        },
+        {
+          "message": 31332,
+          "choices": [
+            { "reply": 37845, "next": 31333 }
+          ]
+        },
+        {
+          "message": 31333,
+          "choices": [
+            { "reply": 37844 }
+          ]
+        },
+        {
+          "message": 31334,
+          "names": true,
+          "choices": [
+            { "reply": 37847 }
           ]
         }
-      ]
+      ],
+      "why": "The Disciple of Sêpt, foreman of the woodcutters at [0,-25], by «Bûcherons en détresse» of Dofus pour les noobs: Sêpt, god of plenty (31327, 31328), his worry (31329), a beast that is no milubo of Astrub's but a pack leader (31330), the minilubos to hunt to bring it out, «Accepter» (31331); the hunt done and no pack leader (14084), another woodcutter attacked and sent to the dispensary (31332, 31333); the woodcutters safe at last (14094, 31334)."
     },
     {
       "npc": 4312,
@@ -2226,26 +2261,92 @@
       "npc": 4380,
       "map": 0,
       "opening": 30570,
+      "openings": [
+        { "quest": 2007, "objective": 13919, "pending": 13920, "message": 31411 },
+        { "quest": 2007, "objective": 13925, "pending": 13926, "message": 30631 },
+        { "quest": 2007, "objective": 13929, "pending": 13930, "message": 30633 }
+      ],
       "lines": [
         {
           "message": 30570,
           "choices": [
-            {
-              "reply": 36888,
-              "next": 30572
-            }
+            { "reply": 36888, "next": 30571, "beforeQuest": 2007 },
+            { "reply": 36961, "quest": 2007, "completes": 13909, "params": [[30, 13909]], "next": 30624, "afterObjective": 13908 },
+            { "reply": 36966, "quest": 2007, "completes": 13918, "params": [[30, 13918]], "next": 30627, "afterObjective": 13917 }
+          ]
+        },
+        {
+          "message": 30571,
+          "choices": [
+            { "reply": 36886, "startsQuest": 2007, "params": [[34, 2007]], "next": 30572 },
+            { "reply": 36887 }
           ]
         },
         {
           "message": 30572,
           "choices": [
-            {
-              "reply": 36886,
-              "startsQuest": 2007
-            }
+            { "reply": 36889 }
+          ]
+        },
+        {
+          "message": 30624,
+          "names": true,
+          "choices": [
+            { "reply": 36964, "next": 30625 }
+          ]
+        },
+        {
+          "message": 30625,
+          "choices": [
+            { "reply": 36963, "next": 30626, "holds": 19659 }
+          ]
+        },
+        {
+          "message": 30626,
+          "choices": [
+            { "reply": 36962 }
+          ]
+        },
+        {
+          "message": 30627,
+          "choices": [
+            { "reply": 36965, "takes": 19658 }
+          ]
+        },
+        {
+          "message": 31411,
+          "choices": [
+            { "reply": 37940, "next": 31412 }
+          ]
+        },
+        {
+          "message": 31412,
+          "choices": [
+            { "reply": 37939, "quest": 2007, "completes": 13920, "params": [[30, 13920]] }
+          ]
+        },
+        {
+          "message": 30631,
+          "names": true,
+          "choices": [
+            { "reply": 36972, "next": 30632 }
+          ]
+        },
+        {
+          "message": 30632,
+          "choices": [
+            { "reply": 36971, "quest": 2007, "completes": 13926, "params": [[30, 13926]], "showsNpc": 4382 }
+          ]
+        },
+        {
+          "message": 30633,
+          "names": true,
+          "choices": [
+            { "reply": 36973, "quest": 2007, "completes": 13930, "params": [[30, 13930]] }
           ]
         }
-      ]
+      ],
+      "why": "Becky Gorr, keeper of Astrub's cemetery [-1,-13], by «L'invasion des profanateurs de sépulture» of Dofus pour les noobs: the half-dead and her work, look but do not touch (30570), «réprimer un frisson», the creatures guarding the graves and a hand wanted (30571), «Accepter de l'aider»: the gargrouilles and stropajos attacking tourists (30572); the creatures calmed (13909), graves robbed (30624, 30625), the torn cloth shown proudly and Finney lent to follow the trail (30626); the suspicious vault (13918), Finney left behind to meet her there (30627); before the vault the gate shuts between them (31411), the trap and her lock-picking tools in her cabin (31412: 13920); bound inside the vault (30631), untied, the looters coming back (30632: 13926, Selim comes in); all over, thanks (30633: 13930)."
     },
     {
       "npc": 4469,
@@ -7424,7 +7525,8 @@
         {
           "message": 2168,
           "choices": [
-            { "reply": 38074, "quest": 1971, "completes": 14163, "params": [[30, 14163]], "next": 31512, "afterObjective": 14157 }
+            { "reply": 38074, "quest": 1971, "completes": 14163, "params": [[30, 14163]], "next": 31512, "afterObjective": 14157 },
+            { "reply": 37859, "next": 31343, "quest": 2000, "afterObjective": 14086, "beforeObjective": 14087 }
           ]
         },
         {
@@ -7445,9 +7547,22 @@
           "choices": [
             { "reply": 38071, "gives": 19750 }
           ]
+        },
+        {
+          "message": 31343,
+          "choices": [
+            { "reply": 37858, "next": 31344 }
+          ]
+        },
+        {
+          "message": 31344,
+          "choices": [
+            { "reply": 37856, "quest": 2000, "completes": 14087, "params": [[30, 14087]], "buyItem": 19708, "buyPrice": 100 },
+            { "reply": 37857 }
+          ]
         }
       ],
-      "why": "«C'est pour ta pomme»: no fresh apples, they were stolen (31512); a crate of rotten ones instead (31513, 19750), the ones he keeps for Tek Abir (31514)."
+      "why": "«C'est pour ta pomme»: no fresh apples, they were stolen (31512); a crate of rotten ones instead (31513, 19750), the ones he keeps for Tek Abir (31514). «Bûcherons en détresse»: honey wanted (37859), a fresh batch from Bonta's fields with no price on it yet and a joke (31343), a forced laugh for a discount and a hundred kamas all the same (31344): paid and taken (14087), or off to beg by the zaap."
     },
     {
       "npc": 4378,
@@ -8550,6 +8665,7 @@
           "choices": [
             { "reply": 25507, "quest": 1984, "completes": 13819, "params": [[30, 13819]], "next": 21221, "afterObjective": 13818 },
             { "reply": 36764, "quest": 1999, "completes": 13810, "params": [[30, 13810]], "next": 30485 },
+            { "reply": 37855, "quest": 2000, "completes": 14086, "params": [[30, 14086]], "next": 31340, "holds": 19707 },
             { "reply": 8834 }
           ]
         },
@@ -8570,9 +8686,27 @@
           "choices": [
             { "reply": 36763 }
           ]
+        },
+        {
+          "message": 31340,
+          "choices": [
+            { "reply": 37854, "next": 31341 }
+          ]
+        },
+        {
+          "message": 31341,
+          "choices": [
+            { "reply": 37853, "next": 31342 }
+          ]
+        },
+        {
+          "message": 31342,
+          "choices": [
+            { "reply": 37852 }
+          ]
         }
       ],
-      "why": "Unterix Unter, the hunter of Astrub's outskirts [1,-23], by «Crise sanitaire» («Parler des problèmes avec le bétail»): hunting banned until the game is safe (13819, 21221), and a sample of each resource for Nibe Lula -- wheat, nettle, ash, pío meat with a hunting weapon, gudgeon (21222). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485)."
+      "why": "Unterix Unter, the hunter of Astrub's outskirts [1,-23], by «Crise sanitaire» («Parler des problèmes avec le bétail»): hunting banned until the game is safe (13819, 21221), and a sample of each resource for Nibe Lula -- wheat, nettle, ash, pío meat with a hunting weapon, gudgeon (21222). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Bûcherons en détresse»: the claw shown and the attacks on the woodcutters (14086): a big bear, rare around here (31340), honey to draw it out, sold by the grocer of Astrub (31341), and a bear trained to kill, so maybe not alone (31342)."
     },
     {
       "npc": 4344,
@@ -9892,6 +10026,220 @@
         }
       ],
       "why": "Khalislas Maucirio the trapper, by «Le génie se meut»: his trap nets (30487), a fork, two pairs of trousers and an adventurer caught, the rest of the thieves gone (30488, 13812); in the porkasses' cave, time to punish them (30490): the fight against two porkasses (npc_fights.json, 13814)."
+    },
+    {
+      "npc": 4450,
+      "map": 0,
+      "opening": 31337,
+      "lines": [
+        {
+          "message": 31337,
+          "choices": [
+            { "reply": 37851, "next": 31338, "quest": 2000, "afterObjective": 14084, "beforeObjective": 14085 }
+          ]
+        },
+        {
+          "message": 31338,
+          "choices": [
+            { "reply": 37850, "next": 31339 }
+          ]
+        },
+        {
+          "message": 31339,
+          "choices": [
+            { "reply": 37849, "quest": 2000, "completes": 14085, "params": [[30, 14085]], "gives": 19707 }
+          ]
+        }
+      ],
+      "why": "The traumatised woodcutter in the dispensary [3,-21], by «Bûcherons en détresse»: his nettle bandage (31337), the attack and the claw stuck in the plank he hid behind (31338), no milubo, a question for a master hunter (31339): the claw handed over (14085)."
+    },
+    {
+      "npc": 4358,
+      "map": 0,
+      "opening": 31350,
+      "openings": [
+        { "quest": 2000, "objective": 14087, "pending": 14088, "message": 31345 }
+      ],
+      "lines": [
+        {
+          "message": 31345,
+          "choices": [
+            { "reply": 37864, "next": 31346 }
+          ]
+        },
+        {
+          "message": 31346,
+          "choices": [
+            { "reply": 37863, "next": 31347 }
+          ]
+        },
+        {
+          "message": 31347,
+          "choices": [
+            { "reply": 37862, "next": 31348 }
+          ]
+        },
+        {
+          "message": 31348,
+          "choices": [
+            { "reply": 37861, "next": 31349 }
+          ]
+        },
+        {
+          "message": 31349,
+          "choices": [
+            { "reply": 37860, "quest": 2000, "completes": 14088, "params": [[30, 14088]] }
+          ]
+        },
+        {
+          "message": 31350,
+          "choices": [
+            { "reply": 37867, "next": 31351, "quest": 2000, "afterObjective": 14092, "beforeObjective": 14093 }
+          ]
+        },
+        {
+          "message": 31351,
+          "choices": [
+            { "reply": 37866, "quest": 2000, "completes": 14093, "params": [[30, 14093]], "next": 31352, "takes": 19709 }
+          ]
+        },
+        {
+          "message": 31352,
+          "names": true,
+          "choices": [
+            { "reply": 37865 }
+          ]
+        }
+      ],
+      "why": "Artand the Ecaflip, by «Bûcherons en détresse»: in the grocery once the honey is bought, he guesses the character is after a honey-loving animal (31345), introduces himself (31346), Master Zeurg's Osamodas grimoire stolen by the bear's master (31347), an alliance (31348, 31349: 14088); at the bear-man's camp his gambler's line (31350), and after the fight, whether he is well (31351), the grimoire handed over (14093, 31352)."
+    },
+    {
+      "npc": 4448,
+      "map": 0,
+      "opening": 31353,
+      "lines": [
+        {
+          "message": 31353,
+          "choices": [
+            { "reply": 37869, "quest": 2000, "completes": 14091, "params": [[30, 14091]], "next": 31354 },
+            { "reply": 37870, "quest": 2000, "completes": 14091, "params": [[30, 14091]] },
+            { "reply": 37870, "quest": 2000, "afterObjective": 14091, "beforeObjective": 14092 }
+          ]
+        },
+        {
+          "message": 31354,
+          "choices": [
+            { "reply": 37868, "quest": 2000, "afterObjective": 14091, "beforeObjective": 14092 }
+          ]
+        }
+      ],
+      "why": "The bear-man, drawn out of the barrels by the honey, by «Bûcherons en détresse»: «you want to drive me mad with your honey?» (31353), summoned to surrender the grimoire (31354), or straight away, Artand called to the rescue: the fight (npc_fights.json; again after a lost one)."
+    },
+    {
+      "npc": 4381,
+      "map": 0,
+      "opening": 31527,
+      "openings": [
+        { "quest": 2007, "objective": 13909, "pending": 13910, "message": 30630 },
+        { "quest": 2007, "objective": 13923, "pending": 13924, "message": 30573 }
+      ],
+      "lines": [
+        {
+          "message": 31527,
+          "choices": []
+        },
+        {
+          "message": 30630,
+          "choices": [
+            { "reply": 36969, "quest": 2007, "completes": 13910, "params": [[30, 13910]], "gives": 19658 }
+          ]
+        },
+        {
+          "message": 30573,
+          "choices": [
+            { "reply": 36890, "quest": 2007, "completes": 13924, "params": [[30, 13924]] }
+          ]
+        }
+      ],
+      "why": "Finney, Becky's guardian wauwau, by «L'invasion des profanateurs de sépulture»: eager to help, taken along on the trail (30630: 13910, his follower 19658); before the vault he runs up and pulls the character to the gate, Becky not answering (30573: 13924); otherwise, his big eyes (31527)."
+    },
+    {
+      "npc": 4382,
+      "map": 0,
+      "opening": 30588,
+      "openings": [
+        { "quest": 2007, "objective": 13928, "pending": 13929, "message": 30618 }
+      ],
+      "lines": [
+        {
+          "message": 30588,
+          "choices": [
+            { "reply": 36917, "quest": 2007, "completes": 13927, "params": [[30, 13927]], "next": 30589 },
+            { "reply": 81594, "quest": 2007, "afterObjective": 13927, "beforeObjective": 13928 }
+          ]
+        },
+        {
+          "message": 30589,
+          "choices": [
+            { "reply": 36916, "quest": 2007, "afterObjective": 13927, "beforeObjective": 13928 }
+          ]
+        },
+        {
+          "message": 30618,
+          "choices": [
+            { "reply": 36955, "quest": 2007, "completes": 13929, "params": [[30, 13929]] }
+          ]
+        }
+      ],
+      "why": "Selim Llenneb, the tomb looter, back in the vault, by «L'invasion des profanateurs de sépulture»: the one helping the gravedigger (30588), ransacking graves is no way to go unnoticed (13927), «this tomb will be yours» and the cemetery's creatures arriving (30589): the fight beside them (npc_fights.json; after a lost one, 81594 from the start); beaten, they will have their revenge (30618), called cowards as they run and leave their loot (13929)."
+    },
+    {
+      "npc": 4387,
+      "map": 0,
+      "opening": 30621,
+      "lines": [
+        {
+          "message": 30621,
+          "choices": [
+            { "reply": 36958, "quest": 2007, "completes": 13899, "params": [[30, 13899]] },
+            { "reply": 36958, "quest": 2007, "afterObjective": 13899, "beforeObjective": 13900 },
+            { "reply": 81591 }
+          ]
+        }
+      ],
+      "why": "An angry creature of Astrub's cemetery, by «L'invasion des profanateurs de sépulture»: it comes up growling (30621); trying to calm it is the fight (npc_fights.json; again after a lost one), or backing away carefully."
+    },
+    {
+      "npc": 4396,
+      "map": 0,
+      "opening": 30622,
+      "lines": [
+        {
+          "message": 30622,
+          "choices": [
+            { "reply": 36959, "quest": 2007, "completes": 13903, "params": [[30, 13903]] },
+            { "reply": 36959, "quest": 2007, "afterObjective": 13903, "beforeObjective": 13904 },
+            { "reply": 81592 }
+          ]
+        }
+      ],
+      "why": "An angry creature of Astrub's cemetery, by «L'invasion des profanateurs de sépulture»: it comes up growling (30622); trying to calm it is the fight (npc_fights.json; again after a lost one), or backing away carefully."
+    },
+    {
+      "npc": 4397,
+      "map": 0,
+      "opening": 30623,
+      "lines": [
+        {
+          "message": 30623,
+          "choices": [
+            { "reply": 36960, "quest": 2007, "completes": 13906, "params": [[30, 13906]] },
+            { "reply": 36960, "quest": 2007, "afterObjective": 13906, "beforeObjective": 13907 },
+            { "reply": 81593 }
+          ]
+        }
+      ],
+      "why": "An angry creature of Astrub's cemetery, by «L'invasion des profanateurs de sépulture»: it comes up growling (30623); trying to calm it is the fight (npc_fights.json; again after a lost one), or backing away carefully."
     }
   ]
 }

@@ -103,7 +103,12 @@
     "",
     "THE HIDDEN GLADE, [-2,-18], 192151552. «Le rebelle de la forêt»: the book under the tent of",
     "189530123 (515999 and 516000 on cell 153, gfx 63298 and 63300) leads into the fairy Cadabrah's",
-    "glade, landing on 459; its right edge (map change cells 461-559) is the way back to the tent."
+    "glade, landing on 459; its right edge (map change cells 461-559) is the way back to the tent.",
+    "",
+    "BECKY GORR'S CABIN [-2,-14]. Its door (514738) leads in to 193462272 by the world graph, which has no",
+    "way back: the doormat inside (514746, cell 411, gfx 3507, the same as the other houses' doormats with",
+    "skill 339) leads out onto 260, before the door. «L'invasion des profanateurs de sépulture» sends the",
+    "character in for Becky's lock-picking tools."
   ],
   "passages": [
     {
@@ -348,6 +353,7 @@
     {"map": 67372032, "element": 458840, "cell": 241, "gfx": 29474, "type": -1, "skill": 184, "toMap": 101716489, "toCell": 338},
     {"map": 192675844, "element": 515271, "cell": 374, "gfx": 33069, "type": -1, "skill": 339, "toMap": 188743681, "toCell": 297},
     {"map": 189530123, "element": 515999, "cell": 153, "gfx": 63298, "type": -1, "skill": 184, "toMap": 192151552, "toCell": 459},
-    {"map": 189530123, "element": 516000, "cell": 153, "gfx": 63300, "type": -1, "skill": 184, "toMap": 192151552, "toCell": 459}
+    {"map": 189530123, "element": 516000, "cell": 153, "gfx": 63300, "type": -1, "skill": 184, "toMap": 192151552, "toCell": 459},
+    {"map": 193462272, "element": 514746, "cell": 411, "gfx": 3507, "type": -1, "skill": 339, "toMap": 190841344, "toCell": 260}
   ]
 }

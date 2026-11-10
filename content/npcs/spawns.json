@@ -1411,6 +1411,122 @@
       "orientation": 5,
       "criterion": "Qa=1999&Qo=13813&Qo!13816",
       "why": "Leonor Mando in the porkasses' cave, come with the character (13813), until back at Tainela (13816), on the rug clear of the arch. INFERRED cell."
+    },
+    {
+      "map": 192417798,
+      "npc": 4450,
+      "cell": 318,
+      "orientation": 3,
+      "criterion": "Qa=2000&Qo=14084",
+      "why": "The traumatised woodcutter at the foot of a bed in the dispensary, once the Disciple has sent the character to him (14084). INFERRED cell."
+    },
+    {
+      "map": 192416772,
+      "npc": 4358,
+      "cell": 402,
+      "orientation": 5,
+      "criterion": "Qa=2000&Qo=14086&Qo!14088",
+      "why": "Artand in the grocery of Astrub once Unterix has spoken of honey (14086), until he joins the character (14088). INFERRED cell."
+    },
+    {
+      "map": 189530125,
+      "npc": 4358,
+      "cell": 271,
+      "orientation": 3,
+      "criterion": "Qa=2000&Qo=14088&Qo!14093",
+      "why": "Artand at the bear-man's camp from the alliance (14088) until the grimoire is his (14093)."
+    },
+    {
+      "map": 189530125,
+      "npc": 4448,
+      "cell": 327,
+      "orientation": 7,
+      "criterion": "Qa=2000&Qo=14090&Qo!14092",
+      "why": "The bear-man out of the barrels (14090) until beaten (14092)."
+    },
+    {
+      "map": 190841857,
+      "npc": 4380,
+      "cell": 303,
+      "orientation": 3,
+      "criterion": "Qa!2007|Qo!13918",
+      "why": "Becky Gorr by the fountain at the cemetery's entrance [-1,-13], except while she is at the vault (13918 on). INFERRED cell."
+    },
+    {
+      "map": 190842883,
+      "npc": 4380,
+      "cell": 296,
+      "orientation": 5,
+      "criterion": "Qa=2007&Qo=13918&Qo!13920",
+      "why": "Becky waiting before the vault's gate at [1,-11] until it shuts behind her (13920). INFERRED cell."
+    },
+    {
+      "map": 193463296,
+      "npc": 4380,
+      "cell": 299,
+      "orientation": 1,
+      "criterion": "Qa=2007&Qo=13920",
+      "why": "Becky inside the vault, trapped and then bound, until the quest is over. INFERRED cell."
+    },
+    {
+      "map": 190841857,
+      "npc": 4381,
+      "cell": 317,
+      "orientation": 3,
+      "criterion": "Qa!2007|Qo!13910|(Qo=13918&Qo!13923)",
+      "why": "Finney beside Becky, except while he follows the character (13910) and once he waits at the vault (13923). INFERRED cell."
+    },
+    {
+      "map": 190842883,
+      "npc": 4381,
+      "cell": 311,
+      "orientation": 5,
+      "criterion": "Qa=2007&Qo=13923",
+      "why": "Finney before the vault when the character comes back with the tools (13923). INFERRED cell."
+    },
+    {
+      "map": 190842883,
+      "npc": 4381,
+      "cell": 272,
+      "remove": true
+    },
+    {
+      "map": 190842883,
+      "npc": 4382,
+      "cell": 273,
+      "remove": true
+    },
+    {
+      "map": 193463296,
+      "npc": 4382,
+      "cell": 430,
+      "orientation": 5,
+      "criterion": "Qa=2007&Qo=13926&Qo!13929",
+      "why": "Selim Llenneb back in the vault, by its way out, once Becky is untied (13926) until he flees (13929). INFERRED cell."
+    },
+    {
+      "map": 190840834,
+      "npc": 4387,
+      "cell": 258,
+      "orientation": 3,
+      "criterion": "Qa=2007&Qo!13900",
+      "why": "The angry gargrouille among the graves of [-3,-12] until calmed (13900). INFERRED cell."
+    },
+    {
+      "map": 190841856,
+      "npc": 4396,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2007&Qo!13904",
+      "why": "The angry garglyph on the path of [-1,-14] until calmed (13904). INFERRED cell."
+    },
+    {
+      "map": 190842369,
+      "npc": 4397,
+      "cell": 245,
+      "orientation": 3,
+      "criterion": "Qa=2007&Qo!13907",
+      "why": "The angry stropajo among the crosses of [0,-13] until calmed (13907). INFERRED cell."
     }
   ]
 }
