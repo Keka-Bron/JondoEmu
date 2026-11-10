@@ -208,8 +208,9 @@ namespace Jondo.Unity.Tests.Quests
                         // Nor does a «beat» row whose element only brings the monsters out: the
                         // fight closes the objective as it would anyway (the white cart of «Tomber
                         // sur un bec» and its fat tofu).
+                        // Or brings them out when its map is entered (the tame trool of Raxitik's pit).
                         bool bringsOut = binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0
-                                         && binding.Elements.Count > 0;
+                                         && (binding.Elements.Count > 0 || binding.MapId != 0);
                         // Nor a click that only hands its item over (Hel Munster's jar of magic potion).
                         bringsOut |= binding.Kind == QuestBindingKind.Click && binding.OnlyGives;
                         if (objective.TypeId != QuestCatalogue.FreeText && !namelessMap && !bringsOut

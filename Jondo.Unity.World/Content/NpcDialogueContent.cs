@@ -165,6 +165,25 @@ namespace Jondo.Unity.World.Content
         /// <summary>True when the reply takes the player's mutation away: the Orbalantir's «Pensar en la casa de Meriana.».</summary>
         public bool EndsMutation { get; init; }
 
+        /// <summary>
+        /// With <see cref="CompletesAll"/>: the reply hands over whatever of its objectives' items is
+        /// carried, and is offered as soon as one of them is -- Kaponor's «Toma, esto es lo que he
+        /// encontrado», the raft's materials brought one by one.
+        /// </summary>
+        public bool Partial { get; init; }
+
+        /// <summary>
+        /// A quest the reply ends at once, started if need be, with none of its rewards: siding with
+        /// the bworks against Gobatchef in «Les Gobelins de la Manufacture».
+        /// </summary>
+        public int Forfeits { get; init; }
+
+        /// <summary>Other items the reply hands over with <see cref="Gives"/>, one of each.</summary>
+        public IReadOnlyList<int> AlsoGives { get; init; } = Array.Empty<int>();
+
+        /// <summary>Kamas the reply pays: the mulou's for the goblin of «Titi Gobelait le magobelin».</summary>
+        public long GivesKamas { get; init; }
+
         /// <summary>True when the reply puts the player back where they came in from.</summary>
         /// <remarks>
         /// Separate from <see cref="TeleportsTo"/> because there is no map to write down: the
@@ -902,6 +921,11 @@ namespace Jondo.Unity.World.Content
                             GivesCount = Math.Max(1, (int)Number(choice, "givesCount")),
                             EndsMutation = choice.TryGetProperty("endsMutation", out var ends)
                                            && ends.ValueKind == JsonValueKind.True,
+                            Partial = choice.TryGetProperty("partial", out var partial)
+                                      && partial.ValueKind == JsonValueKind.True,
+                            Forfeits = (int)Number(choice, "forfeits"),
+                            AlsoGives = Numbers(choice, "alsoGives").Select(o => (int)o).ToArray(),
+                            GivesKamas = Number(choice, "givesKamas"),
                         });
                     }
                 }

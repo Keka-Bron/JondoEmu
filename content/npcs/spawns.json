@@ -2426,6 +2426,29 @@
       "why": "Gobagrum at Ñesa's pot once handed back, the kanniboulas' kitchen boy afterwards (21994). INFERRED cell."
     },
     {
+      "map": 156762631,
+      "npc": 3028,
+      "cell": 344,
+      "orientation": 7,
+      "why": "Kaponor beside his raft and its workbench (element 500694, cell 329) on the Tortuga beach [36,11]: the derived cell (315) was on the raft's crates. INFERRED cell."
+    },
+    {
+      "map": 156500996,
+      "npc": 3031,
+      "cell": 384,
+      "orientation": 5,
+      "criterion": "Qa=1671|Qf=1671",
+      "why": "Kanniboul Khau «en [31,10] dans la Forêt des Masques» (Dofus pour les noobs), by the barrel beside the bench (370). INFERRED cell."
+    },
+    {
+      "map": 156893698,
+      "npc": 3032,
+      "cell": 174,
+      "orientation": 1,
+      "criterion": "Qa=1671|Qf=1671",
+      "why": "Issé Heau «en [34,6]» (Dofus pour les noobs), on the sand of the beach. INFERRED cell."
+    },
+    {
       "map": 158077952,
       "npc": 3024,
       "cell": 384,
@@ -2455,6 +2478,106 @@
       "orientation": 3,
       "criterion": "Qa=1669|Qf=1669",
       "why": "L'Égorgeur «En [31,4]» (Dofus pour les noobs), before his chest (271, 285). INFERRED cell."
+    },
+    {
+      "map": 156500737,
+      "npc": 3040,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qa=1676|Qf=1676",
+      "why": "«Vous trouverez le squelette de l'aventurier malheureux en [30,5]» (Dofus pour les noobs). The derived cell."
+    },
+    {
+      "map": 156502274,
+      "npc": 3041,
+      "cell": 371,
+      "orientation": 1,
+      "criterion": "Qa=1676|Qf=1676",
+      "why": "«Allez voir le Bwak Squelettique Kikoz du Chouque en [33,4]» (Dofus pour les noobs), out of the cave once the hand is his master's again (22037). The derived cell."
+    },
+    {
+      "map": 156762631,
+      "npc": 3028,
+      "cell": 315,
+      "remove": true,
+      "why": "The derived placement of Kaponor stood on the crates of his raft; he stands beside it on 344."
+    },
+    {
+      "map": 158078210,
+      "npc": 3033,
+      "cell": 355,
+      "orientation": 1,
+      "criterion": "Qa=1672|Qf=1672",
+      "why": "Ouily the One-Eyed in his cavern under the path of skulls, there for «Sur les traces des Moonies» (1672) only; the derived cell."
+    },
+    {
+      "map": 104862211,
+      "npc": 841,
+      "cell": 300,
+      "orientation": 5,
+      "criterion": "Qa=167",
+      "why": "«Vous vous retrouvez devant l'entrée du donjon où un Mulou Grankrok vous fait face et veut croquer le gobelin qui vous accompagne» (Dofus pour les noobs), in the first room of the cave [-5,10]. INFERRED cell."
+    },
+    {
+      "map": 104859141,
+      "npc": 840,
+      "cell": 314,
+      "orientation": 3,
+      "why": "«Pour le cœur de Bworkcelhaine, depuis la salle ou se trouve Bworknroll, allez à gauche pour vous retrouver devant un monstre du nom de Bworkcelhaine et parlez lui» (Dofus pour les noobs): the room the left passage (505501) leads to. INFERRED cell."
+    },
+    {
+      "map": 104861185,
+      "npc": 851,
+      "cell": 330,
+      "orientation": 3,
+      "why": "Bworkcine in her hut «en [-3,11] dans le village des bworks» (Dofus pour les noobs), beside the pious' pen. INFERRED cell."
+    },
+    {
+      "map": 104861185,
+      "npc": 852,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=177|Qf=177",
+      "why": "Gobrose with the pious she loves, inside the pen of Bworkcine's hut (fences on 299, 313, 327). INFERRED cell."
+    },
+    {
+      "map": 104860161,
+      "npc": 836,
+      "cell": 315,
+      "orientation": 3,
+      "why": "Gobiere Trokeur «dans la hutte de Gobiere Trokeur en [-6,4]» (Dofus pour les noobs), by the fire. INFERRED cell."
+    },
+    {
+      "map": 104072450,
+      "npc": 6704,
+      "cell": 300,
+      "orientation": 7,
+      "criterion": "Qo=18538&Qo!18539",
+      "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
+    },
+    {
+      "map": 104072450,
+      "npc": 6705,
+      "cell": 286,
+      "orientation": 7,
+      "criterion": "Qo=18538&Qo!18539",
+      "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
+    },
+    {
+      "map": 104072450,
+      "npc": 6706,
+      "cell": 285,
+      "orientation": 1,
+      "criterion": "Qo=18538&Qo!18539",
+      "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
+    },
+    {
+      "map": 104072450,
+      "npc": 6707,
+      "cell": 299,
+      "orientation": 1,
+      "criterion": "Qo=18538&Qo!18539",
+      "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
     }
   ]
 }

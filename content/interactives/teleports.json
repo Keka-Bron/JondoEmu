@@ -128,7 +128,12 @@
     "«il faudra vous équiper de : 1 x Ailes en bois, 1 x Casque. Ensuite, cliquez sur le canon» (Dofus pour les noobs).",
     "",
     "THE TOMBS' ISLET [21,-12]. Its hole, element 481736 (graphic 41294) on cell 154, lets the character drop into the",
-    "underground of tombs (106697226): «Laissez vous tomber dans un trou» (Dofus pour les noobs, «Expédition culinaire»)."
+    "underground of tombs (106697226): «Laissez vous tomber dans un trou» (Dofus pour les noobs, «Expédition culinaire»).",
+    "",
+    "THE ISLE OF MOON'S WRECKS AND THE ONE-EYED'S CAVERN. The ways out of Kar Ybe's wreck [35,5] (500678) and of the",
+    "wreck on the path of skulls [32,4] (500683) lead back to the sand before their doorways, which floor_passages.json",
+    "opens; the cage door on the cave's beach [33,3] (490837, cell 95) lets whoever carries Ouily's key (17396) into his",
+    "cavern (158078210): «Entrez alors dans la Caverne du Borgne à l'aide de la clef» (Dofus pour les noobs)."
   ],
   "passages": [
     {
@@ -386,6 +391,9 @@
     {"map": 192675844, "element": 515271, "cell": 374, "gfx": 33069, "type": -1, "skill": 339, "toMap": 188743681, "toCell": 297},
     {"map": 189530123, "element": 515999, "cell": 153, "gfx": 63298, "type": -1, "skill": 184, "toMap": 192151552, "toCell": 459},
     {"map": 189530123, "element": 516000, "cell": 153, "gfx": 63300, "type": -1, "skill": 184, "toMap": 192151552, "toCell": 459},
-    {"map": 193462272, "element": 514746, "cell": 411, "gfx": 3507, "type": -1, "skill": 339, "toMap": 190841344, "toCell": 260}
+    {"map": 193462272, "element": 514746, "cell": 411, "gfx": 3507, "type": -1, "skill": 339, "toMap": 190841344, "toCell": 260},
+    {"map": 157811712, "element": 500678, "cell": 430, "gfx": 39767, "type": 0, "skill": 114, "toMap": 156762113, "toCell": 298},
+    {"map": 157812736, "element": 500683, "cell": 445, "gfx": 44035, "type": 0, "skill": 114, "toMap": 156501762, "toCell": 287},
+    {"map": 158077952, "element": 490837, "cell": 95, "gfx": 0, "type": 0, "skill": 114, "toMap": 158078210, "toCell": 451, "criterion": "PO=17396"}
   ]
 }

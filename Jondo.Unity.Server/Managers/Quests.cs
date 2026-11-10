@@ -380,6 +380,23 @@ namespace Jondo.Unity.Server.Managers
             return Equipment.HowMany(objective.ItemId) >= Math.Max(1, objective.ItemCount);
         }
 
+        /// <summary>
+        /// Whether a reply that does these objectives can be offered for what is carried: all their
+        /// items, or -- a partial hand-over -- the items of one still to do.
+        /// </summary>
+        public static bool HandsOverEnough(IEnumerable<int> objectiveIds, bool partial)
+        {
+            if (!partial) return objectiveIds.All(CanHandOver);
+            var log = Log;
+            return objectiveIds.Any(id =>
+            {
+                if (log?.ObjectiveDone(id) == true) return false;
+                var objective = _book?.Objective(id);
+                return objective != null && objective.ItemId != 0
+                       && Equipment.HowMany(objective.ItemId) >= Math.Max(1, objective.ItemCount);
+            });
+        }
+
         private static async Task<bool> HandOverAsync(NetworkStream stream, QuestObjective objective)
         {
             int wanted = Math.Max(1, objective.ItemCount);
@@ -597,7 +614,18 @@ namespace Jondo.Unity.Server.Managers
                 if (!await CarriesWhatItAsksAsync()) return false;
 
                 Console.WriteLine($"[Quests] Quest {binding.Starts} starts on clicking an element.");
-                return await StartAsync(stream, binding.Starts);
+                if (!await StartAsync(stream, binding.Starts)) return false;
+                // And what it hands over with the quest: the Moonies' first parchment, found among
+                // the wreck's books.
+                foreach (var (item, count) in binding.Gives)
+                {
+                    if (Equipment.HowMany(item) > 0 || !await QuestFollowers.GiveAsync(stream, item, count)) continue;
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                            InfoMessages.ItemGained, count.ToString(CultureInfo.InvariantCulture),
+                            item.ToString(CultureInfo.InvariantCulture))));
+                }
+                return true;
             }
 
             var run = log.Run(binding.QuestId);
@@ -1084,6 +1112,29 @@ namespace Jondo.Unity.Server.Managers
         /// capture shows where the real server puts the character; the tutorial's own end is used.
         /// A character with nothing of the tutorial left to do is not touched.
         /// </remarks>
+        /// <summary>
+        /// A quest ended there and then with none of its rewards, started first if it was not in hand:
+        /// «La quête se termine dès que vous lancez le combat. Pour ce choix vous obtenez aucune
+        /// récompense» (Dofus pour les noobs, «Les Gobelins de la Manufacture»).
+        /// </summary>
+        public static async Task<bool> ForfeitAsync(NetworkStream stream, int questId)
+        {
+            var log = Log;
+            if (log == null || questId == 0 || log.Finished(questId)) return false;
+            var run = log.Run(questId) ?? log.Start(questId);
+            if (run == null) return false;
+            for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
+            Save(questId, run);
+            await TellAsync(stream, QuestFinishedMessage, questId);
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+            FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
+            await SendJournalAsync(stream);
+            await Achievements.AfterQuestAsync(stream, questId);
+            Console.WriteLine($"[Quests] Quest {questId} ends with nothing paid.");
+            return true;
+        }
+
         public static async Task LeaveTutorialAsync(NetworkStream stream)
         {
             var log = Log;

@@ -308,6 +308,9 @@ namespace Jondo.Unity.Server
         /// <summary>The trade with another player this character is in, asked or open, if any.</summary>
         public Handlers.Trade? Trade { get; set; }
 
+        /// <summary>An NPC's barter window, while it is open (NpcBarterHandler).</summary>
+        public Handlers.NpcBarterHandler.Barter? Barter { get; set; }
+
         /// <summary>The marketplace this character has open, to buy or to sell, if any.</summary>
         public Handlers.MarketplaceWindow? Marketplace { get; set; }
 

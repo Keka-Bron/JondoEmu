@@ -1453,6 +1453,7 @@ namespace Jondo.Unity.Server.Network
                         && !await PrismHandler.MoveCrystalAsync(stream, payload)
                         && !await CommissionHandler.OfferAsync(stream, payload)
                         && !await TradeHandler.MoveAsync(stream, payload)
+                        && !await NpcBarterHandler.MoveAsync(stream, payload)
                         && !await WorkshopHandler.MoveAsync(stream, payload)
                         && !await BankHandler.MoveAsync(stream, payload)
                         && !await StorageHandler.MoveAsync(stream, payload)
@@ -1508,7 +1509,8 @@ namespace Jondo.Unity.Server.Network
                 {
                     // Ready: a commission's customer, or in a workshop the craft button.
                     if (!await CommissionHandler.ReadyAsync(stream, payload)
-                        && !await TradeHandler.ReadyAsync(stream, payload))
+                        && !await TradeHandler.ReadyAsync(stream, payload)
+                        && !await NpcBarterHandler.ReadyAsync(stream, payload))
                         await WorkshopHandler.CraftAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kcj)))
@@ -1720,6 +1722,7 @@ namespace Jondo.Unity.Server.Network
                     else if (await PrismHandler.CloseCrystalWindowAsync(stream)) { }
                     else if (await CommissionHandler.CloseAsync()) { }
                     else if (await TradeHandler.CloseAsync()) { }
+                    else if (await NpcBarterHandler.CloseAsync(stream)) { }
                     else if (MarketplaceHandler.IsOpen) await MarketplaceHandler.CloseAsync();
                     else if (WorkshopHandler.IsOpen) await WorkshopHandler.CloseAsync(stream);
                     else if (BankHandler.IsOpen) await BankHandler.CloseAsync(stream);

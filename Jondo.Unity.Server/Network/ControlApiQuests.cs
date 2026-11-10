@@ -252,6 +252,7 @@ namespace Jondo.Unity.Server.Network
             Managers.Bankers.Initialize();
             Managers.Quests.ReloadContent();
             Managers.NpcFights.Forget();
+            Handlers.NpcBarterHandler.Forget();
             Managers.HarvestDrops.Forget();
             Managers.DungeonExitRooms.Forget();
             Managers.TeleportManager.Initialize();

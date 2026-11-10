@@ -18465,13 +18465,15 @@
         { "quest": 1667, "objective": 10164, "pending": 10167, "message": 21868 },
         { "quest": 1667, "objective": 10167, "pending": 10168, "message": 21868 },
         { "quest": 1667, "objective": 10168, "message": 21871 },
-        { "after": 1667, "before": 1668, "message": 21873 }
+        { "after": 1667, "before": 1668, "message": 21873 },
+        { "quest": 1668, "message": 21876 }
       ],
       "lines": [
         {
           "message": 523,
           "choices": [
             { "reply": 26312, "next": 21859, "quest": 1667, "beforeObjective": 10164 },
+            { "reply": 26327, "next": 21877 },
             { "reply": 478, "next": 567 },
             { "reply": 479, "next": 568 },
             { "reply": 480, "next": 569 },
@@ -18613,9 +18615,19 @@
           "choices": [
             { "reply": 26324, "startsQuest": 1668, "params": [[34, 1668]] }
           ]
+        },
+        {
+          "message": 21876,
+          "choices": [
+            { "reply": 26326 }
+          ]
+        },
+        {
+          "message": 21877,
+          "choices": []
         }
       ],
-      "why": "Propanzón Crizoe, the island of Moon's oldest tourist, on the Tortuga beach [33,12]: not alone any more (523); who he is, fifty years on holiday (567), the island (568), its attractions (569), its people, pirates, the tribe, the Turist-A guide (571-573), a roof from kokoteros (606), what turtles eat (6374). «Un parfum de vacances» (1667) of Dofus pour les noobs: «the oldest tourist?», his ship wrecked long ago (21859), not without his dokoko (21860, 21861), a secret (21862), the kanniboulas' magic eggs, chief Daldrrak (21863), «team up» (21864, «Estrechar la mano»: 10164), a repellent ointment, its ingredients (21866), the bushes that smell of rotten kelp (21867); «got it all?» (21868: the pulp, the turtle liver oil on a hello, «¡Traigo los tres tipos de ingredientes!» with the four leaves: 10167), an old gorkoko meanwhile (21869: 10168, 21871), at the jungle's end, three of his kind beaten first (21870, 21872); the ointment, spread it all over (21873, 21874); to find Daldrrak, the forest of masks and the host at the village (21875: «Un indigeste chez les indigènes», 1668)."
+      "why": "Propanzón Crizoe, the island of Moon's oldest tourist, on the Tortuga beach [33,12]: not alone any more (523); who he is, fifty years on holiday (567), the island (568), its attractions (569), its people, pirates, the tribe, the Turist-A guide (571-573), a roof from kokoteros (606), what turtles eat (6374). «Un parfum de vacances» (1667) of Dofus pour les noobs: «the oldest tourist?», his ship wrecked long ago (21859), not without his dokoko (21860, 21861), a secret (21862), the kanniboulas' magic eggs, chief Daldrrak (21863), «team up» (21864, «Estrechar la mano»: 10164), a repellent ointment, its ingredients (21866), the bushes that smell of rotten kelp (21867); «got it all?» (21868: the pulp, the turtle liver oil on a hello, «¡Traigo los tres tipos de ingredientes!» with the four leaves: 10167), an old gorkoko meanwhile (21869: 10168, 21871), at the jungle's end, three of his kind beaten first (21870, 21872); the ointment, spread it all over (21873, 21874); to find Daldrrak, the forest of masks and the host at the village (21875: «Un indigeste chez les indigènes», 1668). Once on his way to Daldrrak, the forest of masks and the host by the village, his dokoko soon (21876); the new visitors: the Equipo Turist-A's employee, the smuggler stranded in the north, a pirate on the southern beach (21877)."
     },
     {
       "npc": 3021,
@@ -18768,7 +18780,7 @@
           ]
         }
       ],
-      "why": "Mamie Voudou in the forest of masks [31,9]: the soup nearly ready (21887). «Un indigeste chez les indigènes» (1668) of Dofus pour les noobs: «the favour of the spirits», you stink of rotten flesh (21888), a ginsengoku seed, a fertility dance (21889), too little meat, only moon magic (21890), «how much?» (26342: 10194, the quest ends); a pirate stole her amulet (21891: «Squelettes et amulette», 1669, «¿Quién ha robado el amuleto?»), Le Chuko's boat in the cave at the end of the path of skulls (21892, 21893). «Squelettes et amulettes» (1669): «shake Le Chuko» (21893); «look, the amulet», she snatches it (21905), «was it you who turned the pirates?», Moon did, they offended him (21906: «¡Aquí tienes, el amuleto!», 17280 given back, 10204, the quest ends), the seed in a glass jar (21907), the coloured powders and the magic words (21908), «a tiny green shoot» (21909: the seed 17276 for the young plant 17281), still frail, a moon root of ginsengoku for Moon (21910: «Rendez-vous avec la lune», 1670), the great totem, the jungle's fertilizer, Moon's servant (21911, 21912)."
+      "why": "Mamie Voudou in the forest of masks [31,9]: the soup nearly ready (21887). «Un indigeste chez les indigènes» (1668) of Dofus pour les noobs: «the favour of the spirits», you stink of rotten flesh (21888), a ginsengoku seed, a fertility dance (21889), too little meat, only moon magic (21890), «how much?» (26342: 10194, the quest ends); a pirate stole her amulet (21891: «Squelettes et amulette», 1669, «¿Quién ha robado el amuleto?»), Le Chuko's boat in the cave at the end of the path of skulls (21892, 21893). «Squelettes et amulettes» (1669): «shake Le Chuko» (21893); «look, the amulet», she snatches it (21905), «was it you who turned the pirates?», Moon did, they offended him (21906: «¡Aquí tienes, el amuleto!», 17280 given back, 10204, the quest ends), the seed in a glass jar (21907), the coloured powders and the magic words (21908), «a tiny green shoot» (21909: the seed 17276 for the young plant 17281), still frail, a moon root of ginsengoku for Moon (21910: «Rendez-vous avec la lune», 1670), the great totem, the jungle's fertilizer, Moon's servant (21911, 21912). «Squelettes et amulettes» (1669): «shake Le Chuko» (21893); «look, the amulet», she snatches it (21905), «was it you who turned the pirates?», Moon did, they offended him (21906: «¡Aquí tienes, el amuleto!», 17280 given back, 10204, the quest ends), the seed in a glass jar (21907), the coloured powders and the magic words (21908), «a tiny green shoot» (21909: the seed 17276 for the young plant 17281), still frail, a moon root of ginsengoku for Moon (21910: «Rendez-vous avec la lune», 1670), the great totem, the jungle's fertilizer, Moon's servant (21911, 21912)."
     },
     {
       "npc": 161,
@@ -19129,7 +19141,7 @@
         {
           "message": 21916,
           "choices": [
-            { "reply": 26376, "next": 21917, "quest": 1669, "beforeObjective": 10197 }
+            { "reply": 26376, "next": 21917, "quest": 1669, "afterObjective": 10196, "beforeObjective": 10197 }
           ]
         },
         {
@@ -19155,7 +19167,7 @@
         {
           "message": 21923,
           "choices": [
-            { "reply": 26390, "next": 21924, "quest": 1669, "beforeObjective": 10198 },
+            { "reply": 26390, "next": 21924, "quest": 1669, "afterObjective": 10196, "beforeObjective": 10198 },
             { "reply": 26391 }
           ]
         },
@@ -19200,7 +19212,7 @@
         {
           "message": 21929,
           "choices": [
-            { "reply": 26393, "next": 21930, "quest": 1669, "beforeObjective": 10199 },
+            { "reply": 26393, "next": 21930, "quest": 1669, "afterObjective": 10196, "beforeObjective": 10199 },
             { "reply": 26394 }
           ]
         },
@@ -19221,7 +19233,7 @@
         {
           "message": 21919,
           "choices": [
-            { "reply": 26380, "next": 21921, "quest": 1669, "beforeObjective": 10200 },
+            { "reply": 26380, "next": 21921, "quest": 1669, "afterObjective": 10196, "beforeObjective": 10200 },
             { "reply": 26383, "quest": 1669, "completes": 10202, "params": [[30, 10202]], "next": 21922 },
             { "reply": 26384, "quest": 1669, "afterObjective": 10202, "beforeObjective": 10203 },
             { "reply": 26378, "next": 21920 },
@@ -19249,6 +19261,1338 @@
         }
       ],
       "why": "L'Égorgeur (Eldegollador) by his chest at [31,4]: keep off his treasures (21919); «your chest is rather empty», cut to pieces (21920: «Atacar» fights him). «Squelettes et amulettes» (1669): «where were you last night?», drinking rum with Patréfin (21921: the fourth crewman, 10200), who was with Pilpoil: «you lie about yesterday» once the alibis are checked (10202), the skeletons are Mamie's doing, he will take all she owns (21922: «Atacar», the fight; again from the greeting after a lost one)."
+    },
+    {
+      "npc": 160,
+      "map": 0,
+      "opening": 588,
+      "lines": [
+        {
+          "message": 588,
+          "choices": [
+            { "reply": 26402, "next": 21934, "quest": 1670, "completes": 10208, "params": [[30, 10208]], "takes": 17282, "afterObjective": 10207 },
+            { "reply": 494, "next": 589 },
+            { "reply": 26234 }
+          ]
+        },
+        {
+          "message": 589,
+          "choices": [
+            { "reply": 495 }
+          ]
+        },
+        {
+          "message": 21934,
+          "choices": [
+            { "reply": 26401, "next": 21935 }
+          ]
+        },
+        {
+          "message": 21935,
+          "choices": [
+            { "reply": 26400, "next": 21936, "gives": 17078 }
+          ]
+        },
+        {
+          "message": 21936,
+          "choices": [
+            { "reply": 26399, "next": 21937 }
+          ]
+        },
+        {
+          "message": 21937,
+          "choices": [
+            { "reply": 26398 }
+          ]
+        }
+      ],
+      "why": "Moon at the top of his tree, the dungeon's exit room, beaten: a great warrior, a good fight brightens the day (588), «I think so too», his hammer throw, then leave before his worshippers come (589). «Rendez-vous avec la lune» (1670) of Dofus pour les noobs: «offrez la racine lunaire de ginsengoku au Moon» (26402: the root 17282, 10208, the quest ends), he bites it and burps (21934), «I would love a dokoko», a pleasure (21935: «le Dokoko», 17078), Propanzón has looked for one for years, a dodoune will bring him one (21936), «thank you», come back for a rematch (21937). «Abandonar el Árbol de Moon» leaves (dungeon_exits.json)."
+    },
+    {
+      "npc": 3028,
+      "map": 0,
+      "opening": 21958,
+      "lines": [
+        {
+          "message": 21958,
+          "choices": [
+            { "reply": 26434, "next": 21959, "beforeQuest": 1671 },
+            { "reply": 26435, "next": 21963, "quest": 1671, "completesAll": [10212, 10213, 10214, 10210, 10211, 10215, 10216], "partial": true, "params": [[30, 10212]] },
+            { "reply": 26438, "quest": 1671, "completes": 10217, "params": [[30, 10217]], "next": 21964 }
+          ]
+        },
+        {
+          "message": 21959,
+          "choices": [
+            { "reply": 26433, "next": 21960 }
+          ]
+        },
+        {
+          "message": 21960,
+          "choices": [
+            { "reply": 26431, "startsQuest": 1671, "params": [[34, 1671]], "next": 21961 },
+            { "reply": 26432 }
+          ]
+        },
+        {
+          "message": 21961,
+          "choices": [
+            { "reply": 26430, "next": 21962 },
+            { "reply": 26429 }
+          ]
+        },
+        {
+          "message": 21962,
+          "choices": [
+            { "reply": 26429 }
+          ]
+        },
+        {
+          "message": 21963,
+          "choices": [
+            { "reply": 26436 }
+          ]
+        },
+        {
+          "message": 21964,
+          "choices": [
+            { "reply": 26437 }
+          ]
+        }
+      ],
+      "why": "Kaponor (Cabonorte), the smuggler stranded on the Tortuga beach [36,11]: captain Sonlasdiez will be angry, back to the coast (21958). «Le radeau ivre» (1671) of Dofus pour les noobs: «what is the problem?», exotic animals, a storm, overboard after a monkey (21959), the monkey clung to him, a raft short of materials, the monkey as a reward (21960, «De acuerdo»), barrels, a liana rope, planks and beams of kokoko, a trunk for the mast, a sail and a pirate flag (21961), the kanniboulas' barrels, Le Chuko's flag, Alza Belas's sail (21962); «here is what I found» (21963: whatever is carried of 10210-10216, handed over as it comes); «I gathered all you asked», without you still stuck here, the monkey is yours (21964: 10217; the Nomoon of the reward)."
+    },
+    {
+      "npc": 3031,
+      "map": 0,
+      "opening": 21965,
+      "lines": [
+        {
+          "message": 21965,
+          "choices": [
+            { "reply": 26442, "next": 21966, "quest": 1671, "beforeObjective": 10210 },
+            { "reply": 26439 }
+          ]
+        },
+        {
+          "message": 21966,
+          "choices": [
+            { "reply": 26441, "next": 21966, "takes": 1009, "takesCount": 2, "gives": 1000 },
+            { "reply": 26440 }
+          ]
+        }
+      ],
+      "why": "Kanniboul Khau (Kaníbola Rica) at [31,10]: blood for a barrel or two (21965). «Le radeau ivre» (1671): «I need empty barrels», craftwork for a tourist from far away, two pirate skulls a barrel, for decoration (21966: «Vale. Toma las calaveras», 1009 x2 for a kanniboul barrel 1000, again and again; «Parlez à Kanniboul Khau qui vous échangera 2 Crânes de pirates contre 1 Tonneau», Dofus pour les noobs)."
+    },
+    {
+      "npc": 3032,
+      "map": 0,
+      "opening": 21967,
+      "lines": [
+        {
+          "message": 21967,
+          "choices": [
+            { "reply": 26443, "next": 21968, "quest": 1671, "beforeObjective": 10215 }
+          ]
+        },
+        {
+          "message": 21968,
+          "choices": [
+            { "reply": 26447, "next": 21970, "takes": 2620, "takesCount": 6, "gives": 999 },
+            { "reply": 26445, "next": 21969 }
+          ]
+        },
+        {
+          "message": 21969,
+          "choices": [
+            { "reply": 26444 }
+          ]
+        },
+        {
+          "message": 21970,
+          "choices": [
+            { "reply": 26446 }
+          ]
+        }
+      ],
+      "why": "Issé Heau (Alza Belas), drunk on the beach [34,6]: soon nothing left to drink (21967). «Le radeau ivre» (1671): «I came for a sail», some metres of canvas for six bottles of rum (21968: «Aquí tienes las seis botellas», six Rhum de Qualité 2620 for the sail 999; «Il acceptera alors de vous en donner une contre les 6 bouteilles», Dofus pour les noobs), the toebrios for strong drink (21969), the sail as promised (21970)."
+    },
+    {
+      "npc": 3040,
+      "map": 0,
+      "opening": 22026,
+      "openings": [
+        { "quest": 1676, "objective": 10245, "pending": 10246, "message": 22027 },
+        { "quest": 1676, "objective": 10246, "pending": 10247, "message": 22028 },
+        { "quest": 1676, "objective": 10247, "pending": 10251, "message": 22029 },
+        { "quest": 1676, "objective": 10251, "pending": 10249, "message": 22033 },
+        { "quest": 1676, "objective": 10249, "message": 22036 },
+        { "after": 1676, "message": 22034 }
+      ],
+      "lines": [
+        {
+          "message": 22026,
+          "choices": [
+            { "reply": 26523, "quest": 1676, "completes": 10245, "params": [[30, 10245]], "next": 22027 }
+          ]
+        },
+        {
+          "message": 22027,
+          "choices": [
+            { "reply": 26521, "quest": 1676, "afterObjective": 10245, "beforeObjective": 10246 },
+            { "reply": 26522 }
+          ]
+        },
+        {
+          "message": 22028,
+          "choices": [
+            { "reply": 26525, "next": 22029 }
+          ]
+        },
+        {
+          "message": 22029,
+          "choices": [
+            { "reply": 26524, "quest": 1676, "completes": 10247, "params": [[30, 10247]] },
+            { "reply": 26530, "quest": 1676, "completes": 10251, "params": [[30, 10251]], "next": 22030 }
+          ]
+        },
+        {
+          "message": 22030,
+          "choices": [
+            { "reply": 26529, "next": 22031 }
+          ]
+        },
+        {
+          "message": 22031,
+          "choices": [
+            { "reply": 26528, "next": 22032 }
+          ]
+        },
+        {
+          "message": 22032,
+          "choices": [
+            { "reply": 26527, "next": 22033 }
+          ]
+        },
+        {
+          "message": 22033,
+          "choices": [
+            { "reply": 26533, "quest": 1676, "completes": 10249, "params": [[30, 10249]], "next": 22035 },
+            { "reply": 26526 }
+          ]
+        },
+        {
+          "message": 22035,
+          "choices": [
+            { "reply": 26532, "next": 22036 }
+          ]
+        },
+        {
+          "message": 22036,
+          "choices": [
+            { "reply": 26531 }
+          ]
+        },
+        {
+          "message": 22034,
+          "choices": []
+        }
+      ],
+      "why": "The cursed adventurer, a skeleton at the foot of the cliff [30,5]. «Serrons-nous la main» (1676) of Dofus pour les noobs: «get out or...» (22026), «can you repeat?» (10245, the skeleton found), «heard me?», cut in two (22027: «Defenderte del ataque», the fight, 10246); «stop, don't hurt me!» (22028), «repeat?», a jaw, a new jaw (22029: «Vaya, veo que necesita una mandíbula nueva», 10247; the pirate jaw 17406 handed over, 10251), much better (22030), «what happened?», came to get rich, the pirate chief cut his right hand and threw him off the cliff (22031), he deserved it, what he misses most is the hand (22032), «Le Chuko had a hook», he could have left it (22033: «I promise to get the hook back»; the hook 17407 handed over, 10249), useful at least (22035), «Le Chuko apologizes», accepted, the hook tried on kanniboulas (22036); not so bad a future, the Fab'hugruta otherwise (22034)."
+    },
+    {
+      "npc": 3041,
+      "map": 0,
+      "opening": 22037,
+      "lines": [
+        {
+          "message": 22037,
+          "choices": [
+            { "reply": 26535, "quest": 1676, "completes": 10250, "params": [[30, 10250]], "next": 22038, "afterObjective": 10249 }
+          ]
+        },
+        {
+          "message": 22038,
+          "choices": [
+            { "reply": 26534 }
+          ]
+        }
+      ],
+      "why": "Papalike (Kikoz), Le Chuko's skeletal bwak, out of the cave of skulls at [33,4]: claustrophobic after so long inside (22037). «Serrons-nous la main» (1676): «the cursed adventurer accepted Le Chuko's apologies», the right hand under control again, the gold, no special treatment next time on the Perluca (22038: 10250)."
+    },
+    {
+      "npc": 3033,
+      "map": 0,
+      "opening": 21974,
+      "openings": [
+        { "quest": 1672, "objective": 10227, "pending": 10226, "message": 21977 },
+        { "quest": 1672, "objective": 10226, "message": 21971 },
+        { "after": 1672, "message": 21971 }
+      ],
+      "lines": [
+        {
+          "message": 21974,
+          "choices": [
+            { "reply": 26456, "next": 21975, "quest": 1672, "beforeObjective": 10227 },
+            { "reply": 26455, "next": 21976, "quest": 1672, "beforeObjective": 10227 },
+            { "reply": 26457, "quest": 1672, "completes": 10227, "params": [[30, 10227]] }
+          ]
+        },
+        {
+          "message": 21975,
+          "choices": [
+            { "reply": 26451 },
+            { "reply": 26454, "quest": 1672, "completes": 10227, "params": [[30, 10227]], "next": 21977 }
+          ]
+        },
+        {
+          "message": 21976,
+          "choices": [
+            { "reply": 26451 },
+            { "reply": 26454, "quest": 1672, "completes": 10227, "params": [[30, 10227]], "next": 21977 }
+          ]
+        },
+        {
+          "message": 21977,
+          "choices": [
+            { "reply": 26452, "quest": 1672, "afterObjective": 10227, "beforeObjective": 10226 },
+            { "reply": 26453 }
+          ]
+        },
+        {
+          "message": 21971,
+          "choices": [
+            { "reply": 26450, "next": 21972, "quest": 1672, "beforeObjective": 10228 }
+          ]
+        },
+        {
+          "message": 21972,
+          "choices": [
+            { "reply": 26449, "next": 21973 }
+          ]
+        },
+        {
+          "message": 21973,
+          "choices": [
+            { "reply": 26448, "quest": 1672, "completes": 10228, "params": [[30, 10228]] }
+          ]
+        }
+      ],
+      "why": "Ouily the One-Eyed (Güily Eltuerto) in his cavern under the path of skulls. «Sur les traces des Moonies» (1672) of Dofus pour les noobs, «le pirate vous tend un piège en vous proposant de prendre son trésor. Il vous faudra refuser... et attaquer Ouily»: the pirate inside you and no fear of death (21974), help yourself (21975) or do not hesitate (21976), «rather poor and healthy than rich and dead» (10227), what a waste, the sabre (21977: «Enfrentarte a Güily Eltuerto», the fight, 10226; «Tomar un puñado de piezas de oro» takes nothing here); beaten, the Moonies' souls are free (21971), «I demand an explanation», a treasure map drawn to lure a new crew, the curse (21972), the Moonies' messages to bring more adventurers (21973: «Romper los pergaminos y marcharte», 10228)."
+    },
+    {
+      "npc": 832,
+      "map": 0,
+      "opening": 3495,
+      "openings": [
+        { "quest": 165, "objective": 675, "message": 3494 },
+        { "quest": 165, "message": 3493 },
+        { "after": 165, "message": 3492 }
+      ],
+      "lines": [
+        {
+          "message": 3495,
+          "choices": [
+            { "reply": 3081, "next": 3496, "beforeQuest": 165 },
+            { "reply": 3080, "next": 3496, "beforeQuest": 165 }
+          ]
+        },
+        {
+          "message": 3496,
+          "choices": [
+            { "reply": 3083, "startsQuest": 165, "params": [[34, 165]], "completes": 675 },
+            { "reply": 3082, "next": 3497 }
+          ]
+        },
+        {
+          "message": 3497,
+          "choices": [
+            { "reply": 3084, "next": 3498 }
+          ]
+        },
+        {
+          "message": 3498,
+          "choices": [
+            { "reply": 3085, "next": 3499 }
+          ]
+        },
+        {
+          "message": 3499,
+          "choices": [
+            { "reply": 3086, "next": 3500 }
+          ]
+        },
+        {
+          "message": 3500,
+          "choices": [
+            { "reply": 3087, "startsQuest": 165, "params": [[34, 165]] }
+          ]
+        },
+        {
+          "message": 3493,
+          "choices": [
+            { "reply": 3426 }
+          ]
+        },
+        {
+          "message": 3494,
+          "choices": []
+        },
+        {
+          "message": 3492,
+          "choices": []
+        }
+      ],
+      "why": "Bworkidais the pacifist in the bworks' camp [-5,6]: «Zog Zog», friend (3495). «Bworkidais le paxifik» (165) of Dofus pour les noobs: «Zog Zog aussi» or «a bwork chatting before he hits?», he is a pacifist (3496); «you must be a sage among yours», the quest taken and its fight spared (675), talk to him again to end it; or «are you mocking me?», you don't believe me (3497), too much beak (3498, 3499), he brings bworks that are not peaceful (3500: «Oye, pero...», the fight, with the quest); another lesson after a lost one (3493: «¡A tu servicio, bwork!»); you won, you are a pacifist (3494: the hello ends it, 696); a pacifist, he hits whoever disagrees (3492)."
+    },
+    {
+      "npc": 839,
+      "map": 0,
+      "opening": 3458,
+      "openings": [
+        { "quest": 161, "step": 319, "message": 3463 },
+        { "after": 161, "message": 3464 }
+      ],
+      "lines": [
+        {
+          "message": 3458,
+          "choices": [
+            { "reply": 3059, "next": 3459, "beforeQuest": 161 },
+            { "reply": 74494 }
+          ]
+        },
+        {
+          "message": 3459,
+          "choices": [
+            { "reply": 3061, "next": 3460 },
+            { "reply": 3060 }
+          ]
+        },
+        {
+          "message": 3460,
+          "choices": [
+            { "reply": 3062, "next": 3461 }
+          ]
+        },
+        {
+          "message": 3461,
+          "choices": [
+            { "reply": 3063, "startsQuest": 161, "params": [[34, 161]] },
+            { "reply": 3064 }
+          ]
+        },
+        {
+          "message": 3463,
+          "choices": []
+        },
+        {
+          "message": 3464,
+          "choices": []
+        }
+      ],
+      "why": "Pinta Gone, a tipsy eniripsa in the room on the left of Amakna's tavern [2,-1]: hey, you, not the pink minotoror (3458). «Pinta Gone veut se remplir de bière Bwork» (161) of Dofus pour les noobs: «talking to me?», a visitor of the kingdom, tell him what you see (3459), «anything for a good pay», are the bworks still in their village and is the legend true (3460), «tell me about it», giant stills, the recipe hidden somewhere (3461: «Acepto la misión», 161); the recipe, search deeper (3463, while the camp is visited); brewing or breeding pworks (3464, once the recipe is handed over on the hello: 688)."
+    },
+    {
+      "npc": 6711,
+      "map": 0,
+      "opening": 50501,
+      "lines": [
+        {
+          "message": 50502,
+          "choices": [
+            { "reply": 67698, "quest": 161, "completes": 931, "params": [[30, 931]], "gives": 8509 }
+          ]
+        },
+        {
+          "message": 50504,
+          "choices": [
+            { "reply": 67703, "quest": 167, "completes": 816, "params": [[30, 816]] }
+          ]
+        },
+        {
+          "message": 50501,
+          "choices": [
+            { "reply": 67699, "next": 50502, "quest": 161, "beforeObjective": 931 },
+            { "reply": 67704, "next": 50504, "quest": 167, "step": 376 },
+            { "reply": 67712, "next": 50506, "beforeQuest": 166 },
+            { "reply": 67714, "next": 50511, "quest": 166, "step": 324, "completesAll": [676, 677, 678], "params": [[30, 676]] },
+            { "reply": 67717, "next": 50512, "quest": 166, "step": 325, "completesAll": [680, 681, 682, 683], "params": [[30, 680]] },
+            { "reply": 67719, "next": 50514, "quest": 166, "step": 326, "completesAll": [685, 687], "params": [[30, 685]] },
+            { "reply": 67701, "next": 50503, "quest": 166 }
+          ]
+        },
+        {
+          "message": 50506,
+          "choices": [
+            { "reply": 67711, "next": 50507 },
+            { "reply": 67710, "next": 50508 },
+            { "reply": 67709 }
+          ]
+        },
+        {
+          "message": 50507,
+          "choices": [
+            { "reply": 67710, "next": 50508 },
+            { "reply": 67709 }
+          ]
+        },
+        {
+          "message": 50508,
+          "choices": [
+            { "reply": 67708, "next": 50509 },
+            { "reply": 67702, "next": 50505 }
+          ]
+        },
+        {
+          "message": 50505,
+          "choices": []
+        },
+        {
+          "message": 50509,
+          "choices": [
+            { "reply": 67707, "next": 50510 }
+          ]
+        },
+        {
+          "message": 50510,
+          "choices": [
+            { "reply": 67705, "startsQuest": 166, "params": [[34, 166]], "gives": 8513 },
+            { "reply": 67706 }
+          ]
+        },
+        {
+          "message": 50511,
+          "choices": [
+            { "reply": 67713 }
+          ]
+        },
+        {
+          "message": 50512,
+          "choices": [
+            { "reply": 67716, "next": 50513 }
+          ]
+        },
+        {
+          "message": 50513,
+          "choices": [
+            { "reply": 67715 }
+          ]
+        },
+        {
+          "message": 50514,
+          "choices": [
+            { "reply": 67718 }
+          ]
+        },
+        {
+          "message": 50503,
+          "choices": [
+            { "reply": 67700, "buyPrice": 1000, "buyItem": 8513, "quest": 166 }
+          ]
+        }
+      ],
+      "why": "Bworknroll, the bwork mage alone in his cave [-5,10] (50501). «Pinta Gone veut se remplir de bière Bwork» (161): «how is bwork beer made?», the recipe if you really want it, only bworks brew it right (50502: «Gracias, ¡hasta luego!», the recipe 8509, 931). «Titi Gobelait le magobelin» (167): «Presentarle a su nuevo alumno», a goblin disciple, why not, his brain will not take many spells (50504: «Dejar a Peke al cuidado de su profesor de magia», Titi left with him, 816). «Titi Gobelait le magobelin» (167): «Presentarle a su nuevo alumno», a goblin disciple, why not, his brain will not take many spells (50504: «Dejar a Peke al cuidado de su profesor de magia», Titi left with him, 816). «Manque de moule» (166) of Dofus pour les noobs, once Titi is his pupil: «tell me more about you», the greatest bwork mage and the only one with a brain, lonely (50506), «move house», he will not leave his village, outside they hit bworks before talking (50507), «adopt a trool», tried, it pooped everywhere, in a pit with goblins (50508), «what are you thinking of?», an intelligent creature to assemble (50509), goblin fangs, sadida tufts and trool bones, the scalpel to debone a trool (50510: «Vale, voy a echarme unas risas con tu hoja afilada», the scalpel 8513; «busy, I'll think about it», come back when you have time, 50505); «here is what you asked» (five canines, ten sadida tufts, five trool bones: 676-678), now the fresh produce, Bworkcelhaine's heart, a vampire's brain, a kanigrou eye, boo mud (50511); «what I got with the scalpel» (680-683), smells of fresh organ, something vital (50512), a mussel, without fries, on the sea Rano's beaches (50513); «carry out his wishes» (the moumoule and the scalpel: 685, 687), thanks, the happiest of bworks once it lives (50514); the scalpel lost, another for 1,000 kamas (50503)."
+    },
+    {
+      "npc": 834,
+      "map": 0,
+      "opening": 3473,
+      "openings": [
+        { "quest": 163, "message": 3476 },
+        { "after": 163, "message": 3475 },
+        { "canStart": 163, "message": 3474 }
+      ],
+      "lines": [
+        {
+          "message": 3474,
+          "choices": [
+            { "reply": 3068, "next": 3478, "beforeQuest": 163 }
+          ]
+        },
+        {
+          "message": 3478,
+          "choices": [
+            { "reply": 3069, "next": 3479 }
+          ]
+        },
+        {
+          "message": 3479,
+          "choices": [
+            { "reply": 3070, "startsQuest": 163, "params": [[34, 163]] },
+            { "reply": 3071, "next": 3481 }
+          ]
+        },
+        {
+          "message": 3481,
+          "choices": [
+            { "reply": 3072, "forfeits": 163 }
+          ]
+        },
+        {
+          "message": 3476,
+          "choices": []
+        },
+        {
+          "message": 3475,
+          "choices": []
+        },
+        {
+          "message": 3473,
+          "choices": []
+        }
+      ],
+      "why": "Gobatchef at the entrance of the bworks' camp [-3,8], who waves at you: come here (3474), not a little gob, a great goblin chief (3478); not you, he wants big muscles (3473, while the quest is not for you). «Les Gobelins de la Manufacture» (163) of Dofus pour les noobs: the oppressed goblin village, the bworks' tapestry works, spill bwork blood (3479): «C'est une faute de goût inacceptable» takes the quest (the four fights of bworks, 670-673), break bones, kill bworks (3476), a small present from a good defender of goblins (3475, once handed in on the hello: 695); or «Viens donc par là, que je me taille un morceau de tapisserie», his reinforcements (3481: «¡Qué miedo...!», the fight, and the quest over with nothing paid, «La quête se termine dès que vous lancez le combat»)."
+    },
+    {
+      "npc": 842,
+      "map": 0,
+      "opening": 3553,
+      "openings": [
+        { "quest": 168, "message": 3556 },
+        { "after": 168, "message": 3555 },
+        { "canStart": 168, "message": 3550 }
+      ],
+      "lines": [
+        {
+          "message": 3550,
+          "choices": [
+            { "reply": 3114, "next": 3551, "beforeQuest": 168 }
+          ]
+        },
+        {
+          "message": 3551,
+          "choices": [
+            { "reply": 3116, "startsQuest": 168, "params": [[34, 168]] },
+            { "reply": 3115, "next": 3552, "afterQuest": true, "quest": 163 }
+          ]
+        },
+        {
+          "message": 3552,
+          "choices": [
+            { "reply": 3117, "forfeits": 168 }
+          ]
+        },
+        {
+          "message": 3556,
+          "choices": []
+        },
+        {
+          "message": 3555,
+          "choices": []
+        },
+        {
+          "message": 3553,
+          "choices": []
+        }
+      ],
+      "why": "Bworkepik on top of the cliff of the bworks' camp [-4,6]: blood of many monsters on your hands, he needs your talents (3550); too skinny to pull goblins' teeth (3553, while the quest is not for you). «De tape et de crocs» (168) of Dofus pour les noobs: goblin fangs for the mauve hides of his harem's hut (3551: «Décider d'arracher quelques canines», three goblin canines 2264 handed over on the hello, 699), smash goblins (3556), the mauve hides make fine tapestry (3555); or «Se rendre compte que c'est ce Bwork qui écorche les pauvres Gobs», only for whoever took «Les Gobelins de la Manufacture», his females and their axes (3552: «Enfrentarte a los responsables», the fight, and the quest over: «ce combat peut être abandonné et la quête se finit tout de même»)."
+    },
+    {
+      "npc": 845,
+      "map": 0,
+      "opening": 3579,
+      "openings": [
+        { "quest": 170, "objective": 727, "pending": 728, "message": 3585 },
+        { "quest": 170, "message": 3580 },
+        { "after": 170, "message": 3581 }
+      ],
+      "lines": [
+        {
+          "message": 3579,
+          "choices": [
+            { "reply": 3165, "next": 3582, "beforeQuest": 170 }
+          ]
+        },
+        {
+          "message": 3582,
+          "choices": [
+            { "reply": 3166, "next": 3583 }
+          ]
+        },
+        {
+          "message": 3583,
+          "choices": [
+            { "reply": 3167, "startsQuest": 170, "params": [[34, 170]] }
+          ]
+        },
+        {
+          "message": 3580,
+          "choices": []
+        },
+        {
+          "message": 3585,
+          "choices": [
+            { "reply": 3168, "next": 3586 }
+          ]
+        },
+        {
+          "message": 3586,
+          "choices": [
+            { "reply": 3170, "quest": 170, "completes": 728, "params": [[30, 728]], "gives": 431, "alsoGives": [543] },
+            { "reply": 3169, "next": 3587 }
+          ]
+        },
+        {
+          "message": 3587,
+          "choices": [
+            { "reply": 3171, "quest": 170, "completes": 728, "params": [[30, 728]] }
+          ]
+        },
+        {
+          "message": 3581,
+          "choices": []
+        }
+      ],
+      "why": "Gobriel, the albino goblin at the top of the goblins' camp [-4,2], humming his song (3579). «Ange de Gobriel» (170) of Dofus pour les noobs: «a white goblin, how odd», not white, albino, the others throw stones at him (3582), «choosing one's alignment by affinity», to be an angel and fly to Bonta (3583: «Te voy a traer unas alas»), you promised (3580); the wooden wings and the two kinds of wings shown on the hello (725-727, nothing taken), but Bworknroll gave him a tame trool, no more stones (3585), «all that for nothing?», he thought it over (3586): «Tu as raison, je te souhaite une vie meilleure» ends it with a Pierre du Craqueleur and a Pierre de Diamant, or «Ah ces Gobelins, tous les mêmes !», he calls his trool (3587: the fight, the quest over); not ill (3581)."
+    },
+    {
+      "npc": 844,
+      "map": 0,
+      "opening": 3561,
+      "openings": [
+        { "quest": 169, "message": 3559 },
+        { "after": 169, "message": 3560 },
+        { "canStart": 169, "message": 3562 }
+      ],
+      "lines": [
+        {
+          "message": 3562,
+          "choices": [
+            { "reply": 3144, "next": 3564, "beforeQuest": 169 },
+            { "reply": 3143, "next": 3563, "beforeQuest": 169 }
+          ]
+        },
+        {
+          "message": 3563,
+          "choices": [
+            { "reply": 3148, "next": 3564 },
+            { "reply": 3146, "next": 3565 }
+          ]
+        },
+        {
+          "message": 3564,
+          "choices": [
+            { "reply": 3145, "startsQuest": 169, "params": [[34, 169]] }
+          ]
+        },
+        {
+          "message": 3565,
+          "choices": [
+            { "reply": 3147, "forfeits": 169 }
+          ]
+        },
+        {
+          "message": 3559,
+          "choices": [
+            { "reply": 3149, "next": 3566, "quest": 169, "completesAll": [714, 715, 716, 717, 718], "params": [[30, 714]] }
+          ]
+        },
+        {
+          "message": 3566,
+          "choices": []
+        },
+        {
+          "message": 3560,
+          "choices": []
+        },
+        {
+          "message": 3561,
+          "choices": []
+        }
+      ],
+      "why": "Chef Bworkestre in the bworks' camp [-6,8]: the chief of the bworks, a present now (3562); the chief does not talk to a whippersnapper (3561, while the quest is not for you). «Une baguette pour Chef Bworkestre» (169) of Dofus pour les noobs: «Que veux-tu ?», the prespic set and a wand (3564, «Ok.»); or «J'en ai pas sur moi», be kind, his female says he is no real chief without a present (3563): «Si je peux sauver ton couple...» comes back to the same, «Débrouille-toi !», he will give her your head (3565: «¡Ven a por ella si tienes Dofus!», the fight, and the quest over with nothing paid); hurry with the present (3559: «¡Estarás super sexy con este set!», the prespic hat, cape, ring and belt and Liriel's wand handed over, 714-718), his female will admire him (3566); the chief, not you (3560)."
+    },
+    {
+      "npc": 837,
+      "map": 0,
+      "opening": 3523,
+      "openings": [
+        { "quest": 167, "step": 328, "message": 3524 },
+        { "quest": 167, "step": 375, "message": 3526 },
+        { "quest": 167, "step": 376, "message": 3859 },
+        { "quest": 167, "step": 374, "message": 3525 },
+        { "canStart": 167, "message": 3527 }
+      ],
+      "lines": [
+        {
+          "message": 3527,
+          "choices": [
+            { "reply": 3106, "next": 3528, "beforeQuest": 167 },
+            { "reply": 3105, "next": 10754 }
+          ]
+        },
+        {
+          "message": 10754,
+          "choices": [
+            { "reply": 3409 }
+          ]
+        },
+        {
+          "message": 3528,
+          "choices": [
+            { "reply": 3107, "startsQuest": 167, "params": [[34, 167]], "gives": 8521 }
+          ]
+        },
+        {
+          "message": 3524,
+          "choices": [
+            { "reply": 3108, "next": 3859, "quest": 167, "completesAll": [689, 690, 694], "params": [[30, 689]], "gives": 8563 },
+            { "reply": 38439, "next": 31788, "quest": 167 },
+            { "reply": 11844, "quest": 167, "gives": 8521 }
+          ]
+        },
+        {
+          "message": 31788,
+          "choices": []
+        },
+        {
+          "message": 3859,
+          "choices": [
+            { "reply": 3104 }
+          ]
+        },
+        {
+          "message": 3526,
+          "choices": [
+            { "reply": 3104, "quest": 167, "gives": 8563 }
+          ]
+        },
+        {
+          "message": 3525,
+          "choices": [
+            { "reply": 3109, "quest": 167, "completes": 814, "params": [[30, 814]] }
+          ]
+        },
+        {
+          "message": 3523,
+          "choices": []
+        }
+      ],
+      "why": "Plastik Gobelait in his hut in the goblins' camp [-4,3]: he watches over Titi (3523). «Titi Gobelait le magobelin» (167) of Dofus pour les noobs: across the bworks' village and still alive, strong (3527); «Moi aider contre kamas», his son wants to be a magoblin, a gâtrool, a gratrooll, the red cape (3528: «Yo listo», the red cape 8521 given; «Yo fuerte, pero yo no ayudar a goblin», bworks in your family? 10754); help Titi become a magoblin (3524: the gâtrool 8519, the gratrooll 8520 and the cape shown, nothing taken, 689-694, and Titi given as a follower, 8563; the offerings forgotten, piou brain? 31788; another red cape), take him to Bworknroll, the offerings (3859); bring them and Titi will follow (3526: Titi again after a lost fight); his son, the best magoblin of the world (3525: «¡Enhorabuena!», 814)."
+    },
+    {
+      "npc": 841,
+      "map": 0,
+      "opening": 3595,
+      "openings": [
+        { "quest": 167, "step": 375, "message": 3529 }
+      ],
+      "lines": [
+        {
+          "message": 3529,
+          "choices": [
+            { "reply": 3111, "quest": 167, "holds": 8563 },
+            { "reply": 3110, "next": 3530, "quest": 167, "holds": 8563, "takes": 8563, "givesKamas": 10000, "forfeits": 167 }
+          ]
+        },
+        {
+          "message": 3530,
+          "choices": []
+        },
+        {
+          "message": 3595,
+          "choices": []
+        }
+      ],
+      "why": "Mulou Grankrok before the dungeon of the cave [-5,10]: he would gladly eat a gob (3595). «Titi Gobelait le magobelin» (167): travelling with a very attractive goblin (3529): «Il est sous ma protection», the fight with Titi beside you, who must not die (1006: 815); or «Tu le veux ? Je te le vends !», 10,000 kamas, stuffed with gâtrool and cooked in gratrooll (3530: Titi taken, the quest over with none of its rewards: «La quête se termine et vous ne touchez pas les récompenses»)."
+    },
+    {
+      "npc": 840,
+      "map": 0,
+      "opening": 3518,
+      "lines": [
+        {
+          "message": 3518,
+          "choices": [
+            { "reply": 3100 }
+          ]
+        },
+        {
+          "message": 3519,
+          "choices": []
+        }
+      ],
+      "why": "Bworkcelhaine in the room on the left of Bworknroll's [-5,10]: he wants to eat your heart, not his (3518). «Manque de moule» (166): «my heart is not yours, yours interests me», he will devour it (3519: the fight from the reply; his heart 8516 drops for whoever carries the scalpel)."
+    },
+    {
+      "npc": 835,
+      "map": 0,
+      "opening": 3465,
+      "openings": [
+        { "quest": 162, "objective": 669, "pending": 698, "message": 3467 },
+        { "quest": 162, "message": 3466 },
+        { "canStart": 162, "message": 3468 }
+      ],
+      "lines": [
+        {
+          "message": 3468,
+          "choices": [
+            { "reply": 3066, "next": 3469, "beforeQuest": 162 },
+            { "reply": 3065, "beforeQuest": 162, "buyPrice": 500, "teleport": 192414722 }
+          ]
+        },
+        {
+          "message": 3469,
+          "choices": [
+            { "reply": 3067, "startsQuest": 162, "params": [[34, 162]], "next": 3470 }
+          ]
+        },
+        {
+          "message": 3470,
+          "choices": []
+        },
+        {
+          "message": 3466,
+          "choices": []
+        },
+        {
+          "message": 3467,
+          "choices": []
+        },
+        {
+          "message": 3465,
+          "choices": []
+        }
+      ],
+      "why": "Raxitik in his hut in the goblins' camp [-5,3]: he does not want to become trool krotte (3465). «Un avenir de krotte de Trooll» (162) of Dofus pour les noobs: «are you brave?» (3468), «enough to venture here», the bworks want to feed him to a trool, nineteen minigobs to feed (3469: «and where is the nasty little trool?», 162), the pit over there, a strong trool (3470: the pit 104858115 found, 668; the tame trool beaten, 669); afraid of a little trool? (3466); you crushed the trool, brave (3467: the hello ends it, 698). «Je suis un pleutre»: «il vous téléporte dans les toilettes de la taverne d'Astrub en plus de vous prendre 500 kamas»."
+    },
+    {
+      "npc": 831,
+      "map": 0,
+      "opening": 3484,
+      "openings": [
+        { "quest": 164, "objective": 674, "pending": 697, "message": 3491 },
+        { "quest": 164, "message": 3483 },
+        { "after": 164, "message": 3482 }
+      ],
+      "lines": [
+        {
+          "message": 3484,
+          "choices": [
+            { "reply": 3073, "next": 3485, "beforeQuest": 164 }
+          ]
+        },
+        {
+          "message": 3485,
+          "choices": [
+            { "reply": 3074, "next": 3486 }
+          ]
+        },
+        {
+          "message": 3486,
+          "choices": [
+            { "reply": 3075, "next": 3487 }
+          ]
+        },
+        {
+          "message": 3487,
+          "choices": [
+            { "reply": 3076, "next": 3488 }
+          ]
+        },
+        {
+          "message": 3488,
+          "choices": [
+            { "reply": 3077, "next": 3489 }
+          ]
+        },
+        {
+          "message": 3489,
+          "choices": [
+            { "reply": 3078, "next": 3490 }
+          ]
+        },
+        {
+          "message": 3490,
+          "choices": [
+            { "reply": 3079, "startsQuest": 164, "params": [[34, 164]] }
+          ]
+        },
+        {
+          "message": 3483,
+          "choices": [
+            { "reply": 3425, "quest": 164, "beforeObjective": 674 }
+          ]
+        },
+        {
+          "message": 3491,
+          "choices": []
+        },
+        {
+          "message": 3482,
+          "choices": []
+        }
+      ],
+      "why": "Krazybwork in his hole under the bworks' village: what are you doing in his hole, his mother Bworkcelhaine threw him here (3484). «Bienvenue au Krazybwork saloon» (164): «you speak well for a bwork», too many red goblins eaten at the battle of Bworkdrift (3485), «so eating goblin makes one clever?», only a bwork (3486), «tell me», eight days in the blood of his mates (3487), the bworkcolonel gutted by a spell (3488), a bwork's routine, eating goblins to survive (3489: «no wonder you have nightmares»), «I could knock you on the head», an excellent idea, but his honour as a veteran (3490: «¡Allá voy!», the fight, with the quest: 674); again, harder (3483: «¡Estoy listo!», after a lost one); his head hurts, he looks for mummy (3491: the hello ends it, 697); alone in the world (3482)."
+    },
+    {
+      "npc": 853,
+      "map": 0,
+      "opening": 3617,
+      "openings": [
+        { "quest": 177, "objective": 741, "pending": 742, "message": 3615 },
+        { "quest": 177, "step": 339, "message": 3614 },
+        { "quest": 177, "objective": 737, "pending": 738, "message": 3614 },
+        { "quest": 177, "message": 3616 },
+        { "after": 177, "message": 3615 },
+        { "canStart": 177, "message": 3611 }
+      ],
+      "lines": [
+        {
+          "message": 3611,
+          "choices": [
+            { "reply": 3197, "next": 3612, "beforeQuest": 177 }
+          ]
+        },
+        {
+          "message": 3612,
+          "choices": [
+            { "reply": 3198, "startsQuest": 177, "params": [[34, 177]], "next": 3613 },
+            { "reply": 3199 }
+          ]
+        },
+        {
+          "message": 3613,
+          "choices": []
+        },
+        {
+          "message": 3616,
+          "choices": []
+        },
+        {
+          "message": 3614,
+          "choices": []
+        },
+        {
+          "message": 3615,
+          "choices": []
+        },
+        {
+          "message": 3617,
+          "choices": []
+        }
+      ],
+      "why": "Gobmichet at the top of the goblins' camp [-4,2]: his heart vibrates (3617). «Gobmichet vibre pour Gobrose» (177) of Dofus pour les noobs: «I want her!» (3611), «who are you talking about?», the beautiful Gobrose, Bworkcine's slave, can you free her (3612: «Pourquoi pas. Où est-elle ?», 177), somewhere in the bworks' village (3613); find Gobrose (3616); she will not come, kill her favourite pious and she will (3614: the hello, 738); alone, no more strength to live, his heart no longer vibrates (3615: the hello ends it, 742)."
+    },
+    {
+      "npc": 851,
+      "map": 0,
+      "opening": 3619,
+      "openings": [
+        { "quest": 177, "objective": 743, "pending": 740, "message": 3626 },
+        { "quest": 177, "step": 339, "message": 3625 },
+        { "quest": 177, "step": 338, "message": 3623 },
+        { "quest": 177, "step": 337, "message": 3624 }
+      ],
+      "lines": [
+        {
+          "message": 3619,
+          "choices": [
+            { "reply": 3201, "next": 3621, "quest": 177, "beforeObjective": 735 },
+            { "reply": 3200, "teleport": 104072709 }
+          ]
+        },
+        {
+          "message": 3621,
+          "choices": [
+            { "reply": 3204, "next": 3622, "quest": 177, "completes": 735, "params": [[30, 735]] },
+            { "reply": 3202, "next": 3622, "quest": 177, "completes": 735, "params": [[30, 735]] }
+          ]
+        },
+        {
+          "message": 3622,
+          "choices": []
+        },
+        {
+          "message": 3624,
+          "choices": []
+        },
+        {
+          "message": 3623,
+          "choices": []
+        },
+        {
+          "message": 3625,
+          "choices": []
+        },
+        {
+          "message": 3626,
+          "choices": [
+            { "reply": 3404, "quest": 177, "beforeObjective": 740 },
+            { "reply": 3405 }
+          ]
+        }
+      ],
+      "why": "Bworkcine in her hut in the bworks' village [-3,11]: you are in her lair, did you wipe your boots? (3619: «Eeeh, no» and she throws you out, «elle vous expulse en dehors de sa hutte», Dofus pour les noobs). «Gobmichet vibre pour Gobrose» (177): «yes, as mummy taught me», you want Gobrose, a goblinophile? (3621: «it is for a friend, your price?», 735), her weight in bwork piss (3622); hurry, she fattens fast (3624: the 97 bwork beers handed over on the hello, 736), you may take Gobrose (3623); you want to stamp on pious, give piou eggs (3625: the eight eggs on the hello, 739, 743), you may massacre the pious (3626: «¡Estoy listo!», the fight alone against eight of Gobrose's pious, 740)."
+    },
+    {
+      "npc": 852,
+      "map": 0,
+      "opening": 3632,
+      "openings": [
+        { "quest": 177, "step": 340, "message": 3631 },
+        { "quest": 177, "step": 338, "message": 3630 },
+        { "after": 177, "message": 3631 }
+      ],
+      "lines": [
+        {
+          "message": 3632,
+          "choices": []
+        },
+        {
+          "message": 3630,
+          "choices": []
+        },
+        {
+          "message": 3631,
+          "choices": []
+        }
+      ],
+      "why": "Gobrose in the pious' pen of Bworkcine's hut: one day a goblin will come and save her (3632). «Gobmichet vibre pour Gobrose» (177): she does not want to go, she prefers piou feathers, Gobmichet is too ugly (3630: the hello, 737); you killed pious for Gobmichet, she prefers the grey ones (3631: the hello, 741)."
+    },
+    {
+      "npc": 836,
+      "map": 0,
+      "opening": 3501,
+      "lines": [
+        {
+          "message": 3501,
+          "choices": [
+            { "reply": 3090, "next": 3502 },
+            { "reply": 3088 }
+          ]
+        },
+        {
+          "message": 3502,
+          "choices": [
+            { "reply": 3088 }
+          ]
+        },
+        {
+          "message": 3503,
+          "choices": []
+        }
+      ],
+      "why": "Gobiere Trokeur in his hut [-6,4] of the goblins' camp: two or three bwork piss for good yum-yum (3501), «anything else?», gâtrool and gratrooll for bwork piss (3502); no piss, no swap (3503). His «Intercambiar» is a barter (content/npcs/barters.json)."
+    },
+    {
+      "npc": 6696,
+      "map": 0,
+      "opening": 50443,
+      "openings": [
+        { "quest": 2455, "objective": 18539, "pending": 18540, "message": 50469 },
+        { "quest": 2455, "objective": 18538, "pending": 18539, "message": 50467 },
+        { "quest": 2455, "objective": 18554, "message": 50458 },
+        { "quest": 2455, "message": 50449 },
+        { "after": 2455, "message": 50458 }
+      ],
+      "lines": [
+        {
+          "message": 50443,
+          "choices": [
+            { "reply": 67629, "next": 50444, "beforeQuest": 2455 },
+            { "reply": 67630, "next": 50445 },
+            { "reply": 67633 }
+          ]
+        },
+        {
+          "message": 50445,
+          "choices": [
+            { "reply": 67629, "next": 50444, "beforeQuest": 2455 },
+            { "reply": 67633 }
+          ]
+        },
+        {
+          "message": 50444,
+          "choices": [
+            { "reply": 67631, "next": 50446 },
+            { "reply": 67632, "next": 50447 }
+          ]
+        },
+        {
+          "message": 50447,
+          "choices": [
+            { "reply": 67635 }
+          ]
+        },
+        {
+          "message": 50446,
+          "choices": [
+            { "reply": 67634, "next": 50448 }
+          ]
+        },
+        {
+          "message": 50448,
+          "choices": [
+            { "reply": 67636, "startsQuest": 2455, "params": [[34, 2455]], "next": 50449 }
+          ]
+        },
+        {
+          "message": 50449,
+          "choices": [
+            { "reply": 67637 }
+          ]
+        },
+        {
+          "message": 50458,
+          "choices": [
+            { "reply": 67645, "next": 50459, "quest": 2455, "completes": 18542, "params": [[30, 18542]] },
+            { "reply": 67655, "next": 50468, "quest": 2455, "completesAll": [18536, 18537, 18538], "params": [[30, 18536]] }
+          ]
+        },
+        {
+          "message": 50459,
+          "choices": [
+            { "reply": 67646, "next": 50460 }
+          ]
+        },
+        {
+          "message": 50460,
+          "choices": [
+            { "reply": 67647, "next": 50461 }
+          ]
+        },
+        {
+          "message": 50461,
+          "choices": [
+            { "reply": 67648, "next": 50462 }
+          ]
+        },
+        {
+          "message": 50462,
+          "choices": [
+            { "reply": 67649 }
+          ]
+        },
+        {
+          "message": 50468,
+          "choices": [
+            { "reply": 67654, "next": 50467 }
+          ]
+        },
+        {
+          "message": 50467,
+          "choices": []
+        },
+        {
+          "message": 50469,
+          "choices": [
+            { "reply": 67658, "next": 50470 }
+          ]
+        },
+        {
+          "message": 50470,
+          "choices": [
+            { "reply": 67657, "quest": 2455, "completes": 18540, "params": [[30, 18540]], "next": 50471 }
+          ]
+        },
+        {
+          "message": 50471,
+          "choices": [
+            { "reply": 67656 }
+          ]
+        }
+      ],
+      "why": "Gob Ross painting before his canvas in the goblins' camp [-4,4]: a second and a third happy fir (50443), «admire in silence» (50445). «De joyeux petits arbres» (2455) of Dofus pour les noobs: «what are you painting?», nature, the happy trees (50444), «surprised a goblin speaks so clearly», travels and twelvers (50446; «your bushes look like vomit», everyone his own colour, 50447), «tell me of that mysterious brush», confiscated by director Grunob (50448: «where can I find him?», 2455), in his office at the Akademia, say hello from him (50449); the brush found (50458: «Darle el pincel», 18542), how is the old grump (50459), Grunob short of teachers (50460), «why not teach drawing at the Akademia?» (50461), the ingredients first (50462: wild mint, cashew nuts, bwork mage beard hairs); «Darle los ingredientes» (18536-18538), something to calm the kids' appetite? (50468), it does not taste good! (50467); was it necessary to beat the young goblins? (50469), less painful ways (50470: «teach them drawing at the Akademia», 18540), he will talk to the director, Gob bless you (50471)."
+    },
+    {
+      "npc": 6704,
+      "map": 0,
+      "opening": 50463,
+      "lines": [
+        {
+          "message": 50463,
+          "choices": [
+            { "reply": 67650, "quest": 2455, "afterObjective": 18538, "beforeObjective": 18539 },
+            { "reply": 68165 }
+          ]
+        }
+      ],
+      "why": "A curious goblin kid at Gob Ross's canvas: strange cooking, a pretty sauce, he wants a taste (50463). «De joyeux petits arbres» (2455): «Darles tortas a los goblins», the fight with the four greedy kids (18539)."
+    },
+    {
+      "npc": 6705,
+      "map": 0,
+      "opening": 50464,
+      "lines": [
+        {
+          "message": 50464,
+          "choices": [
+            { "reply": 67651 }
+          ]
+        }
+      ],
+      "why": "One of the goblin kids gathered round Gob Ross's canvas in «De joyeux petits arbres» (2455)."
+    },
+    {
+      "npc": 6706,
+      "map": 0,
+      "opening": 50465,
+      "lines": [
+        {
+          "message": 50465,
+          "choices": [
+            { "reply": 67652 }
+          ]
+        }
+      ],
+      "why": "One of the goblin kids gathered round Gob Ross's canvas in «De joyeux petits arbres» (2455)."
+    },
+    {
+      "npc": 6707,
+      "map": 0,
+      "opening": 50466,
+      "lines": [
+        {
+          "message": 50466,
+          "choices": [
+            { "reply": 67653 }
+          ]
+        }
+      ],
+      "why": "One of the goblin kids gathered round Gob Ross's canvas in «De joyeux petits arbres» (2455)."
+    },
+    {
+      "npc": 6673,
+      "map": 0,
+      "opening": 50453,
+      "openings": [
+        { "quest": 2455, "objective": 18541, "pending": 18554, "message": 50457 }
+      ],
+      "lines": [
+        {
+          "message": 50453,
+          "choices": [
+            { "reply": 67639, "quest": 2455, "completes": 18535, "params": [[30, 18535]], "next": 50454 },
+            { "reply": 67640 }
+          ]
+        },
+        {
+          "message": 50454,
+          "choices": [
+            { "reply": 67641, "next": 50455 }
+          ]
+        },
+        {
+          "message": 50455,
+          "choices": [
+            { "reply": 67642, "next": 50456 }
+          ]
+        },
+        {
+          "message": 50456,
+          "choices": [
+            { "reply": 67643 }
+          ]
+        },
+        {
+          "message": 50457,
+          "choices": [
+            { "reply": 67678, "quest": 2455, "completes": 18554, "params": [[30, 18554]] }
+          ]
+        }
+      ],
+      "why": "Director Grunob in his office, the Akademia's last room, his poor cat Dagoberto all ruffled, go before he gets really angry (50453; «Abandonar la Akademia» leaves, dungeon_exits.json). «De joyeux petits arbres» (2455): «Gob Ross sends his regards» (18535), little Gob Ross who drew while the others fought with snot (50454), «hard to imagine goblins studying in peace», too many pupils, a teacher or two to hire (50455), «his brush», the forbidden wardrobe where he keeps what he confiscates (50456: «Ir a inspeccionar el armuario», the wardrobe 524400 gives the brush, 18541), he remembered putting it there (50457: «Gracias por el pincel», 18554, or «Meter el pincel en tu bolsa e irte de aquí»)."
     }
   ]
 }

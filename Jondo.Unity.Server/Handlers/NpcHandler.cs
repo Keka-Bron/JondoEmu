@@ -118,6 +118,13 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // «Intercambiar» on an NPC who swaps things: Gobiere Trokeur's barter, not a shop.
+            if (action == Npcs.TradeCosmetics && NpcBarterHandler.Barters(npc.NpcId))
+            {
+                await NpcBarterHandler.OpenAsync(stream, npc.NpcId, npc.ContextualId);
+                return;
+            }
+
             if (action == Npcs.Trade || action == Npcs.TradeCosmetics)
             {
                 await OpenShopAsync(stream, npc);
@@ -943,7 +950,7 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             if (!choice.ForLevel(SessionContext.State.CharacterLevel)) return false;
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
-            if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
+            if (!Managers.Quests.HandsOverEnough(choice.Objectives(), choice.Partial)) return false;
             if (NotItsTurnYet(choice)) return false;
             if (!ItsQuestIsOpenToHim(choice)) return false;
             if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
@@ -997,7 +1004,7 @@ namespace Jondo.Unity.Server.Handlers
                 // And what it hands over, which has to be carried (DialogueChoice.Takes).
                 if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
                 // A reply that hands over what an objective asks for, only to whoever carries it.
-                if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
+                if (!Managers.Quests.HandsOverEnough(choice.Objectives(), choice.Partial)) return false;
                 if (NotItsTurnYet(choice)) return false;
                 if (!ItsQuestIsOpenToHim(choice)) return false;
                 if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
@@ -1098,16 +1105,25 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>What a reply hands over (DialogueChoice.Gives), with the chat's line.</summary>
         private static async Task GiveFromReplyAsync(NetworkStream stream, DialogueChoice choice)
         {
-            if (choice.Gives == 0) return;
-            if (!await Managers.QuestFollowers.GiveAsync(stream, choice.Gives, choice.GivesCount))
+            // The reply's item, then the others it hands over with it, one of each: Gobriel's two
+            // stones for whoever wishes him a better life.
+            var items = new List<(int Item, int Count)>();
+            if (choice.Gives != 0) items.Add((choice.Gives, choice.GivesCount));
+            items.AddRange(choice.AlsoGives.Select(i => (i, 1)));
+            // And the kamas it pays: the mulou's 10,000 for a goblin.
+            if (choice.GivesKamas > 0) await Managers.CharacterRewards.GiveKamasAsync(stream, choice.GivesKamas);
+            foreach (var (item, count) in items)
             {
-                Console.WriteLine($"[NPC] Reply {choice.Reply} could not hand over {choice.GivesCount}x{choice.Gives}.");
-                return;
+                if (!await Managers.QuestFollowers.GiveAsync(stream, item, count))
+                {
+                    Console.WriteLine($"[NPC] Reply {choice.Reply} could not hand over {count}x{item}.");
+                    continue;
+                }
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        Managers.InfoMessages.ItemGained, count.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                        item.ToString(System.Globalization.CultureInfo.InvariantCulture))));
             }
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
-                    Managers.InfoMessages.ItemGained, choice.GivesCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                    choice.Gives.ToString(System.Globalization.CultureInfo.InvariantCulture))));
         }
 
         /// <summary>There stops being an open conversation.</summary>
@@ -1166,6 +1182,10 @@ namespace Jondo.Unity.Server.Handlers
                 // first objective has to be in hand when the fight ends.
                 if (fightChoice != null && fightChoice.StartsQuest != 0)
                     await Managers.Quests.StartAsync(stream, fightChoice.StartsQuest);
+                // Or the quest it ends there and then, with nothing paid: Gobatchef's goblins called
+                // in for whoever sides with the bworks.
+                if (fightChoice != null && fightChoice.Forfeits != 0)
+                    await Managers.Quests.ForfeitAsync(stream, fightChoice.Forfeits);
                 CerrarConversacion();
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(ConnectionProtocol.NpcDialogCloseReason)));
@@ -1500,7 +1520,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(stream, elegidaAhora);
                 }
             }
-            else if (elegidaAhora != null && elegidaAhora.Gives != 0)
+            else if (elegidaAhora != null && (elegidaAhora.Gives != 0 || elegidaAhora.AlsoGives.Count > 0 || elegidaAhora.GivesKamas > 0))
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
             }
@@ -1518,6 +1538,11 @@ namespace Jondo.Unity.Server.Handlers
                 await ComeInAsync(stream, elegidaAhora);
 
             int startsAfterClosing = 0;
+            // A quest the reply ends there and then, with nothing paid: the goblin sold to the mulou of
+            // «Titi Gobelait le magobelin».
+            if (elegidaAhora != null && elegidaAhora.Forfeits != 0 && !sinPagar)
+                await Managers.Quests.ForfeitAsync(stream, elegidaAhora.Forfeits);
+
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
             {
                 bool closesHere = elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && !elegidaAhora.ReturnsHome

@@ -15,6 +15,24 @@
   ],
   "exits": [
     {
+      "dungeon": 138,
+      "bossRoom": 221778432,
+      "room": 221778434,
+      "cell": 413,
+      "npc": 6673,
+      "replies": [67640, 67644, 73383],
+      "why": "The goblins' Akademia: after director Grunob the winners are in his office, where «De joyeux petits arbres» has them ask for Gob Ross's brush («Une fois le donjon terminé, parlez au Directeur Grunob», Dofus pour les noobs); «Abandonar la Akademia» leaves."
+    },
+    {
+      "dungeon": 92,
+      "bossRoom": 157290496,
+      "room": 157291520,
+      "cell": 384,
+      "npc": 160,
+      "replies": [26234, 495, 26398, 26403],
+      "why": "Moon's tree: after Moon the winners are at the top of his tree, where «Rendez-vous avec la lune» has them offer him the moon root («Une fois le combat terminé, offrez la racine lunaire de gisengoku au Moon», Dofus pour les noobs); «Abandonar el Árbol de Moon» leaves."
+    },
+    {
       "dungeon": 91,
       "bossRoom": 157028352,
       "room": 157029376,

@@ -60,6 +60,20 @@
       "toCell": 410,
       "criterion": "Qa=718&Qo=4680&Qo!4673",
       "why": "Dyna Mine [10,-19], «Attention à la Bête !»: the slab before the trap's gallery opens its grille once the six baits are laid (4680), and the character hides in the trap room until the creature is down (4673); Dofus pour les noobs: «placez votre personnage sur la dalle pour ouvrir la grille et entrez dans la pièce»."
+    },
+    {
+      "map": 156762113,
+      "cell": 284,
+      "toMap": 157811712,
+      "toCell": 415,
+      "why": "Isle of Moon, Tortuga beach [35,5]: the hole in the wrecked ship's hull (cells 255, 269), which Kar Ybe complains everybody takes for a door; the sand below it (284) lets in. The client has no element there and its graph no passage."
+    },
+    {
+      "map": 156501762,
+      "cell": 273,
+      "toMap": 157812736,
+      "toCell": 431,
+      "why": "Isle of Moon, path of skulls [32,4]: the wreck's doorway under the hanging frame (244, 258); «Entrez dans l'épave de bateau» (Dofus pour les noobs, «Sur les traces des Moonies»). No element outside and no passage in the client's graph."
     }
   ]
 }

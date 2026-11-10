@@ -1,0 +1,18 @@
+{
+  "_comment": [
+    "Workshop stations declared element by element, over what data/talleres_3.6.10.10.json says of",
+    "their graphic (measured in the captures). For an element whose station is not its graphic's.",
+    "",
+    "  { map, element, gfx, type, skills, why }"
+  ],
+  "stations": [
+    {
+      "map": 156762631,
+      "element": 500694,
+      "gfx": 49504,
+      "type": 13,
+      "skills": [110],
+      "why": "The workbench by Kaponor's raft on the Tortuga beach [36,11] of the isle of Moon: «allez crafter en [36,11] à l'aide de l'établi : 6 x Planche en bois de kokoko, 2 x Poutre en bois de kokoko» (Dofus pour les noobs, «Le radeau ivre»). Skill 110, «Utilizar banco de trabajo», has those two recipes and no other; the captures saw the graphic (49504) as a handyman's workbench elsewhere (171)."
+    }
+  ]
+}

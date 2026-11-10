@@ -1,0 +1,21 @@
+{
+  "_comment": [
+    "NPCs who barter: their «Intercambiar» opens the exchange window of type 2 (kbn), where the",
+    "player lays things and the NPC answers with what it gives for them (Handlers/NpcBarterHandler).",
+    "A recipe is taken when what lies on the table is exactly its price, or a whole multiple of it.",
+    "",
+    "  { npc, recipes: [ { gives: [ { item, count } ], takes: [ { item, count } ] } ], why }"
+  ],
+  "barters": [
+    {
+      "npc": 836,
+      "recipes": [
+        { "gives": [ { "item": 8525, "count": 1 } ], "takes": [ { "item": 8145, "count": 2 } ] },
+        { "gives": [ { "item": 2351, "count": 1 } ], "takes": [ { "item": 8145, "count": 3 } ] },
+        { "gives": [ { "item": 8520, "count": 1 } ], "takes": [ { "item": 8145, "count": 16 } ] },
+        { "gives": [ { "item": 8519, "count": 1 } ], "takes": [ { "item": 8145, "count": 20 } ] }
+      ],
+      "why": "Gobiere Trokeur in his hut [-6,4] of the goblins' camp, «Tú dar II o III meados bworks, yo dar a ti buen ñam ñam» (3501): «2 x Bière de Bwork donne 1 x Oeuf de piou, 3 x Bière de Bwork donne 1 x Pain du Pinchaut, 16 x Bière de Bwork donne 1 x Gratrooll Industriel, 20 x Bière de Bwork donne 1 x Gâtrool Industriel» (Dofus pour les noobs, «Gobmichet vibre pour Gobrose»)."
+    }
+  ]
+}

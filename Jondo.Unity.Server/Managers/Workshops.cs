@@ -43,6 +43,9 @@ namespace Jondo.Unity.Server.Managers
         {
             public readonly Dictionary<int, Station> ByGfx = new();
 
+            /// <summary>Stations a person declared for one element, over its graphic's (content/interactives/workshops.json).</summary>
+            public readonly Dictionary<(long MapId, int ElementId), Station> ByElement = new();
+
             /// <summary>The artisans' book: graphic -> (type, skill). "Consultar", skill 170.</summary>
             public readonly Dictionary<int, (int Type, int Skill)> Books = new();
 
@@ -55,6 +58,7 @@ namespace Jondo.Unity.Server.Managers
         private static Tables Current => _building ?? _published;
 
         private static Dictionary<int, Station> _byGfx => Current.ByGfx;
+        private static Dictionary<(long, int), Station> _byElement => Current.ByElement;
         private static Dictionary<int, (int Type, int Skill)> _books => Current.Books;
         private static Dictionary<long, IReadOnlyList<int>> _bookJobs => Current.BookJobs;
 
@@ -79,6 +83,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The loading proper, into the set being built (<see cref="Tables"/>).</summary>
         private static void Fill()
         {
+            FillAuthored();
             string path = Paths.WorkshopsJson;
             if (!File.Exists(path))
             {
@@ -128,6 +133,42 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// The stations declared by hand, element by element: one that offers what its graphic does
+        /// not elsewhere -- the workbench by Kaponor's raft, where the raft's planks and beams are
+        /// made («Utilizar banco de trabajo», whose only recipes they are), on a graphic the captures
+        /// saw as a handyman's.
+        /// </summary>
+        private static void FillAuthored()
+        {
+            string path = Paths.ContentFile("interactives/workshops.json");
+            if (!File.Exists(path)) return;
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("stations", out var list)) return;
+                foreach (var row in list.EnumerateArray())
+                {
+                    long map = row.GetProperty("map").GetInt64();
+                    int element = row.GetProperty("element").GetInt32();
+                    var skills = new List<int>();
+                    foreach (var s in row.GetProperty("skills").EnumerateArray()) skills.Add(s.GetInt32());
+                    _byElement[(map, element)] = new Station
+                    {
+                        Gfx = row.TryGetProperty("gfx", out var g) ? g.GetInt32() : 0,
+                        Type = row.GetProperty("type").GetInt32(),
+                        Skills = skills,
+                        Source = "content",
+                    };
+                }
+                Console.WriteLine($"[Workshops] {_byElement.Count} station(s) declared by hand.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Workshops] Could not read {Path.GetFileName(path)}: {ex.Message}");
+            }
+        }
+
         /// <summary>The station a graphic is, if it is one.</summary>
         public static bool TryGet(int gfx, out Station station) => _byGfx.TryGetValue(gfx, out station!);
 
@@ -135,9 +176,11 @@ namespace Jondo.Unity.Server.Managers
         public static IEnumerable<(Interactives.Element Element, Station Station)> On(long mapId)
         {
             var stations = _byGfx;
+            var declared = _byElement;
             foreach (var element in Interactives.ElementsOf(mapId))
             {
-                if (stations.TryGetValue(element.Gfx, out var station)) yield return (element, station);
+                if (declared.TryGetValue((mapId, element.Id), out var own)) yield return (element, own);
+                else if (stations.TryGetValue(element.Gfx, out var station)) yield return (element, station);
             }
         }
 

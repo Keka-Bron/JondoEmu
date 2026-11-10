@@ -2444,6 +2444,64 @@
    "why": "«Pour ce qui est des Œufs de Dodoune, vous les ramasserez dans la jungle interdite aux 4 positions» [30,6], [31,6], [29,7], [30,8], «1 chance sur deux de vous faire agresser par un Dostrogo Vigilant» (Dofus pour les noobs): the nests 500585, 500584, 500583, 500582, an egg each (17402-17405, which egg in which nest INFERRED). Handed to Ñesa with the bananaranjas (22003)."
   },
   {
+   "objective": 10205,
+   "quest": 1670,
+   "elements": [{"map": 156500993, "element": 499152}],
+   "requires": [{"item": 17281, "count": 1}, {"item": 17283, "count": 5}],
+   "spends": true,
+   "gives": [{"item": 17282, "count": 1}],
+   "why": "«Une fois que vous avez 5 x Engrais de Moon, allez en [31,7]. Cliquez alors sur le totem pour enterrer le pousse et récupérez une racine lunaire de ginsengoku» (Dofus pour les noobs): the great totem's foot (element 499152, graphic 49770, cell 381); the young plant 17281 and five Moon mulch 17283 (the forbidden jungle's loot, Qo=10205) buried, the moon root 17282 given."
+  },
+  {
+   "objective": 10212,
+   "quest": 1671,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the raft's materials, brought to Kaponor in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10213,
+   "quest": 1671,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the raft's materials, brought to Kaponor in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10214,
+   "quest": 1671,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the raft's materials, brought to Kaponor in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10210,
+   "quest": 1671,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the raft's materials, brought to Kaponor in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10211,
+   "quest": 1671,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the raft's materials, brought to Kaponor in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10215,
+   "quest": 1671,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the raft's materials, brought to Kaponor in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10216,
+   "quest": 1671,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the raft's materials, brought to Kaponor in any order (Dofus pour les noobs)."
+  },
+  {
    "objective": 10197,
    "quest": 1669,
    "kind": "order",
@@ -2477,6 +2535,106 @@
    "kind": "order",
    "anyOrder": true,
    "why": "One of the four crewmen, or Gros Bob's alibi, asked in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10248,
+   "quest": 1676,
+   "elements": [{"map": 158077952, "element": 538154}],
+   "afterObjectives": [10251],
+   "gives": [{"item": 17407, "count": 1}],
+   "why": "«Vous le trouverez en [33,3] sur la map juste avant le donjon du Chouque. Cliquez sur le crochet accroché au fragment d'épave afin de récupérer le Crochet du Chouque» (Dofus pour les noobs): the hook on the wreck's broken mast (element 538154, graphic 900512, cell 329); once the jaw is handed over."
+  },
+  {
+   "objective": -1672,
+   "quest": 1672,
+   "kind": "click",
+   "starts": 1672,
+   "elements": [{"map": 157811712, "element": 500679}],
+   "gives": [{"item": 17392, "count": 1}],
+   "why": "«Entrez dans le bateau échoué et fouillez les livres pour trouver une fiche sur le trésor de Ouily le Borgne» (Dofus pour les noobs): the pile of books in Kar Ybe's wreck [35,5] (element 500679, graphic 36919, cell 274) starts the quest and hands the Moonies' first parchment (17392, document 445). The quest has no giver in the client."
+  },
+  {
+   "objective": 10218,
+   "quest": 1672,
+   "kind": "beat",
+   "monsters": [4232],
+   "map": 156894212,
+   "elements": [{"map": 156894212, "element": 500260}],
+   "spawns": {"monster": 4232, "count": 1, "attacks": true},
+   "why": "«Allez en [33,8]... Cliquez sur la noix de Kokoko tranchée en deux. Un combat se lance» (Dofus pour les noobs): the split kokoko nut (element 500260, graphic 49853, cell 227) and the disturbed nodkoko (4232), whose quest loot is the second parchment (17394); reading it does 10219 (its effect 30)."
+  },
+  {
+   "objective": 10220,
+   "quest": 1672,
+   "kind": "beat",
+   "monsters": [4233],
+   "map": 156500484,
+   "elements": [{"map": 156500484, "element": 500287}],
+   "spawns": {"monster": 4233, "count": 1, "attacks": true},
+   "afterObjectives": [10219],
+   "why": "«Allez en [30,10] et cliquez sur le petit tambour. Un combat se lance» (Dofus pour les noobs): the little drum (element 500287, graphic 49886, cell 385) and the hungry tam kanniboul (4233), whose quest loot is the third parchment (17395); reading it does 10221."
+  },
+  {
+   "objective": 10222,
+   "quest": 1672,
+   "elements": [{"map": 157812736, "element": 500684}],
+   "afterObjectives": [10221],
+   "gives": [{"item": 17397, "count": 1}],
+   "why": "«Allez en [32,4]. Entrez dans l'épave de bateau et cliquez sur le coffre seulement !» (Dofus pour les noobs): the chest in the wreck (element 500684, graphic 16864, cell 201) gives the pirate hat (17397). The skeleton beside it (500685) is left alone."
+  },
+  {
+   "objective": 10224,
+   "quest": 1672,
+   "elements": [{"map": 158077186, "element": 500290}],
+   "afterObjectives": [10222],
+   "gives": [{"item": 17396, "count": 1}],
+   "why": "«Arrivez devant un puits, descendez dans celui-ci et cliquez sur le squelette pour le dépouiller de la clef» (Dofus pour les noobs): the skeleton at the bottom of the well (element 500290, graphic 49982, cell 245) gives the One-Eyed's key (17396), which opens the cage door to his cavern (teleports.json)."
+  },
+  {
+   "objective": 10225,
+   "quest": 1672,
+   "kind": "enter",
+   "map": 158078210,
+   "why": "«Caverna de Eltuerto»: the One-Eyed's cavern (158078210), entered with his key."
+  },
+  {
+   "objective": 666,
+   "quest": 161,
+   "kind": "enter",
+   "map": 104861189,
+   "why": "«Destilería bwork»: «rendez-vous en [-6,6], entrez dans la grotte, allez tout droit. Vous vous retrouvez devant un grand alambic» (Dofus pour les noobs): the cave's entrance 478898 leads to 104860165, whose passage straight on (505505) opens on the room of the great still, 104861189."
+  },
+  {
+   "objective": 734,
+   "quest": 177,
+   "kind": "enter",
+   "map": 104861185,
+   "why": "«La guarida de Bworkcina»: her hut in the bworks' village [-3,11], through its door (478512)."
+  },
+  {
+   "objective": 669,
+   "quest": 162,
+   "kind": "beat",
+   "monsters": [791],
+   "map": 104858115,
+   "spawns": {"monster": 791, "count": 1},
+   "why": "«Il faut donc aller rendre une petite visite au Trooll qui terrorise le gobelin en vous rendant dans la fosse en [-3,12]. Il faudra alors affronter le Trooll Apprivoisé qui s'y trouve» (Dofus pour les noobs): the tame trool comes out in the pit (104858115) while the quest wants him beaten; he is also in the mixed groups of the bworks' village."
+  },
+  {
+   "objective": 18534,
+   "quest": 2455,
+   "kind": "enter",
+   "map": 221774336,
+   "overridesMap": true,
+   "why": "«Entra en la Akademia»: the first room of the goblins' Akademia (221774336), through its door at [-5,3]."
+  },
+  {
+   "objective": 18541,
+   "quest": 2455,
+   "elements": [{"map": 221778434, "element": 524400}],
+   "gives": [{"item": 26665, "count": 1}],
+   "afterObjectives": [18535],
+   "why": "«Toujours dans la même salle, cliquez sur l'armoire en haut à droite pour la fouiller de fond en comble et mettre la main sur un pinceau dégarni» (Dofus pour les noobs): the wardrobe of Grunob's office (element 524400, graphic 3757, cell 203) gives the bald brush 26665."
   }
  ]
 }

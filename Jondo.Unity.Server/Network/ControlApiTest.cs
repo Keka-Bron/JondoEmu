@@ -465,7 +465,13 @@ namespace Jondo.Unity.Server.Network
                         // A workshop's recipe chosen and crafted, as the craft window sends them: a
                         // quest's «Fabricar» objective played without dragging items about the screen.
                         else if (op == Op.Kew) await WorkshopHandler.SelectRecipeAsync(stream, frame);
+                        // In an NPC's barter, the ready button makes the swap.
+                        else if (op == Op.Kep && SessionContext.State.Barter != null) await NpcBarterHandler.ReadyAsync(stream, frame);
                         else if (op == Op.Kep) await WorkshopHandler.CraftAsync(stream, frame);
+                        // An NPC clicked for one of its actions (Gobiere Trokeur's «Intercambiar»), and a
+                        // stack laid on his barter's table.
+                        else if (op == Op.Iov) await NpcHandler.InteractAsync(stream, frame);
+                        else if (op == Op.Kcr) await NpcBarterHandler.MoveAsync(stream, frame);
                         // An item put on or taken off, as dragging it to its slot sends: a quest's cannon
                         // that asks for a helmet and wings worn.
                         else if (op == Op.Iuk) await EquipmentHandler.MoveAsync(stream, frame);

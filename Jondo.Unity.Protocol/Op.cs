@@ -2137,6 +2137,12 @@ public static class Op
     public const string Kbd = "kbd";
 
     /// <summary>
+    /// Server to client: an NPC's barter window opens, the exchange of type 2 (the client's
+    /// exchange frame answers it with that type), { f1: the NPC's actor on the map }.
+    /// </summary>
+    public const string Kbn = "kbn";
+
+    /// <summary>
     /// Server to client, a marketplace: one item's offers, { f1: item type, f2: item, f3 (repeated)
     /// { f1: offer, f4: effects, f5: item, f6: packed price of each lot size, 0 where none,
     /// f8: item type } }. The answer to keh; without f3 when nothing is on sale, and bare, f1 and
