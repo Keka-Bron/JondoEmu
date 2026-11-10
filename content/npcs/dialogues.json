@@ -481,6 +481,7 @@
             { "reply": 37753, "next": 31254, "quest": 1989, "afterQuest": true, "beforeQuest": 1990 },
             { "reply": 37756, "quest": 1990, "completes": 14008, "params": [[30, 14008]], "next": 31255, "afterObjective": 14007 },
             { "reply": 37758, "next": 31257, "quest": 1991, "afterObjective": 14069, "beforeObjective": 14010 },
+            { "reply": 37602, "next": 31140, "quest": 1970, "afterObjective": 14042, "beforeObjective": 14043 },
             { "reply": 37738, "next": 31243 },
             { "reply": 37735 }
           ]
@@ -612,9 +613,21 @@
           "choices": [
             { "reply": 37759, "quest": 1991, "completes": 14010, "params": [[30, 14010]], "gives": 19691 }
           ]
+        },
+        {
+          "message": 31140,
+          "choices": [
+            { "reply": 37601, "next": 31141 }
+          ]
+        },
+        {
+          "message": 31141,
+          "choices": [
+            { "reply": 37600, "quest": 1970, "completes": 14043, "params": [[30, 14043]], "gives": 19697 }
+          ]
         }
       ],
-      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it. «La gran biblioteca» (Dofus pour les noobs): «¿Cómo puedo ayudarte en la investigación sobre el dragón?» and Oz Dralett (31246, 1988's line); the burnt book shown (13999, 31247), Neria asked (31248); the Mage of Zo (31240, 31241, 1989's line); the restoration in Primir's hands (14005), the parchment stolen by the rats (31250-31252, 1990's line; later «Puedo ir a cazar esas sucias ratas», 31254); the parchment shown (14008), Old Strubian, and Primir (31255, 31256). The new library and her past (31243-31245). «Légende d'automne»: Primir's book, Rathrosk the protector of Astrub for two centuries (31257); the sewers' parchment translated, the dragon's friendship with the knight of autumn, handed over (31258, 14010, 19691). «Légende d'automne»: Primir's book, Rathrosk the protector of Astrub for two centuries (31257); the sewers' parchment translated, the dragon's friendship with the knight of autumn, handed over (31258, 14010, 19691)."
+      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it. «La gran biblioteca» (Dofus pour les noobs): «¿Cómo puedo ayudarte en la investigación sobre el dragón?» and Oz Dralett (31246, 1988's line); the burnt book shown (13999, 31247), Neria asked (31248); the Mage of Zo (31240, 31241, 1989's line); the restoration in Primir's hands (14005), the parchment stolen by the rats (31250-31252, 1990's line; later «Puedo ir a cazar esas sucias ratas», 31254); the parchment shown (14008), Old Strubian, and Primir (31255, 31256). The new library and her past (31243-31245). «Légende d'automne»: Primir's book, Rathrosk the protector of Astrub for two centuries (31257); the sewers' parchment translated, the dragon's friendship with the knight of autumn, handed over (31258, 14010, 19691). «Légende d'automne»: Primir's book, Rathrosk the protector of Astrub for two centuries (31257); the sewers' parchment translated, the dragon's friendship with the knight of autumn, handed over (31258, 14010, 19691). «Iop et hop»: K'Norr'Ys's legacy (37602), the fab'huritu of Uk'Not'Allag's tales (31140), her notes for Rok Elreuss (31141: 14043, item 19697)."
     },
     {
       "npc": 4311,
@@ -1359,20 +1372,18 @@
           "message": 30834,
           "choices": [
             { "reply": 37237, "next": 30836, "quest": 2009, "beforeObjective": 13887, "completes": 13887, "params": [[30, 13887]] },
-            { "reply": 37568, "next": 31114 }
-          ]
-        },
-        {
-          "message": 31114,
-          "choices": [
-            { "reply": 38304, "startsQuest": 1970 }
+            { "reply": 37568, "next": 31110, "beforeQuest": 1970 },
+            { "reply": 37574, "quest": 1970, "completes": 14031, "params": [[30, 14031]], "next": 31118 },
+            { "reply": 37599, "quest": 1970, "completes": 14042, "params": [[30, 14042]], "next": 31138 },
+            { "reply": 37604, "quest": 1970, "completes": 14044, "params": [[30, 14044]], "next": 31142 },
+            { "reply": 37614, "quest": 1970, "completes": 14049, "params": [[30, 14049]], "next": 31148 }
           ]
         },
         {
           "message": 30836,
           "names": true,
           "choices": [
-            { "reply": 37568, "next": 31114 }
+            { "reply": 37568, "next": 31110, "beforeQuest": 1970 }
           ]
         },
         {
@@ -1380,9 +1391,94 @@
           "choices": [
             { "reply": 37238, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31110,
+          "choices": [
+            { "reply": 37567, "next": 31111 }
+          ]
+        },
+        {
+          "message": 31111,
+          "choices": [
+            { "reply": 37566, "next": 31112 }
+          ]
+        },
+        {
+          "message": 31112,
+          "choices": [
+            { "reply": 37565, "next": 31113 }
+          ]
+        },
+        {
+          "message": 31113,
+          "choices": [
+            { "reply": 37564, "next": 31114 }
+          ]
+        },
+        {
+          "message": 31114,
+          "choices": [
+            { "reply": 37562, "startsQuest": 1970, "params": [[34, 1970]] },
+            { "reply": 37563 }
+          ]
+        },
+        {
+          "message": 31118,
+          "choices": [
+            { "reply": 37573, "next": 31119 }
+          ]
+        },
+        {
+          "message": 31119,
+          "choices": [
+            { "reply": 37572 }
+          ]
+        },
+        {
+          "message": 31138,
+          "choices": [
+            { "reply": 37598, "next": 31139 }
+          ]
+        },
+        {
+          "message": 31139,
+          "choices": [
+            { "reply": 37597 }
+          ]
+        },
+        {
+          "message": 31142,
+          "choices": [
+            { "reply": 37603, "next": 31183 }
+          ]
+        },
+        {
+          "message": 31183,
+          "choices": [
+            { "reply": 37657, "next": 31184 }
+          ]
+        },
+        {
+          "message": 31184,
+          "choices": [
+            { "reply": 37656, "next": 31185 }
+          ]
+        },
+        {
+          "message": 31185,
+          "choices": [
+            { "reply": 37655 }
+          ]
+        },
+        {
+          "message": 31148,
+          "choices": [
+            { "reply": 37613 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37237) is this class's objective (13887, effect 30), and leads to his greeting, 30836, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1970) is done, he greets the character with Archi's summons (30837) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37237) is this class's objective (13887, effect 30), and leads to his greeting, 30836, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1970) is done, he greets the character with Archi's summons (30837) and «Ir a la Torre del Consejo» hands it over. «Iop et hop» of Dofus pour les noobs: «Noter son anxiété», the young Iops' lack of discipline (31110-31113), the Iops to find at the market, «Obéir» (31114, the line the step declares); the special training he never ordered, the injured at Nepra Lido's (31118, 31119: 14031); a doppel passing for him and the library (31138, 31139: 14042); K'Norr'Ys's notes read (31142, 31183-31185: 14044) and the way to the training ground; the disciples' future (31148: 14049)."
     },
     {
       "npc": 4333,
@@ -1473,7 +1569,8 @@
         {
           "message": 30838,
           "choices": [
-            { "reply": 37241, "next": 30841, "completes": 13886, "params": [[30, 13886]] }
+            { "reply": 37241, "next": 30841, "completes": 13886, "params": [[30, 13886]] },
+            { "reply": 37580, "next": 31123, "quest": 1970, "afterObjective": 14033, "beforeObjective": 14034 }
           ]
         },
         {
@@ -1494,9 +1591,25 @@
           "choices": [
             { "reply": 37242, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31123,
+          "choices": [
+            { "reply": 37579, "next": 31124 }
+          ]
+        },
+        {
+          "message": 31124,
+          "choices": [
+            { "reply": 37578, "quest": 1970, "completes": 14034, "params": [[30, 14034]], "next": 31125, "showsNpc": 4429 }
+          ]
+        },
+        {
+          "message": 31125,
+          "choices": []
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1969) is done, he greets the character with Archi's summons (30839) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1969) is done, he greets the character with Archi's summons (30839) and «Ir a la Torre del Consejo» hands it over. «Iop et hop»: the Iops' injuries, nobody says how (31123), rest is the cure (31124: 14034, the brash Iop comes in), an Eniripsa's calling (31125)."
     },
     {
       "npc": 4335,
@@ -9759,7 +9872,8 @@
           "message": 30531,
           "choices": [
             { "reply": 36832, "quest": 1986, "completes": 13840, "params": [[30, 13840]], "next": 30532 },
-            { "reply": 36835, "next": 30533, "quest": 1986, "afterObjective": 13840, "beforeObjective": 13841 }
+            { "reply": 36835, "next": 30533, "quest": 1986, "afterObjective": 13840, "beforeObjective": 13841 },
+            { "reply": 37588, "next": 31130, "quest": 1970, "afterObjective": 14035, "beforeObjective": 14036 }
           ]
         },
         {
@@ -9774,9 +9888,17 @@
             { "reply": 36833, "buyItem": 19640, "buyPrice": 50 },
             { "reply": 36834 }
           ]
+        },
+        {
+          "message": 31130,
+          "choices": [
+            { "reply": 37585, "quest": 1970, "completes": 14036, "params": [[30, 14036]], "buyItem": 19694, "buyPrice": 10 },
+            { "reply": 37586 },
+            { "reply": 37587 }
+          ]
         }
       ],
-      "why": "Alit Elfminate the tailor, by «Golémancien»: a tubarnékalo to sew in her workshop with an enchanted thread (30532, 19640), another for 50 kamas, Paula Sepe paid only one (30533)."
+      "why": "Alit Elfminate the tailor, by «Golémancien»: a tubarnékalo to sew in her workshop with an enchanted thread (30532, 19640), another for 50 kamas, Paula Sepe paid only one (30533). «Iop et hop»: the raw material for woollen pants (37588), stinging wool no use as it is, ten kamas (31130: 14036)."
     },
     {
       "npc": 4345,
@@ -10670,6 +10792,195 @@
         }
       ],
       "why": "Otomai's creature on the false floor, by «Attention à la Bête !»: «¡Buaj!», attacked (npc_fights.json) or reinforcements awaited."
+    },
+    {
+      "npc": 4429,
+      "map": 191106052,
+      "opening": 31115,
+      "lines": [
+        {
+          "message": 31115,
+          "choices": [
+            { "reply": 37571, "next": 31116, "quest": 1970, "beforeObjective": 14030 }
+          ]
+        },
+        {
+          "message": 31116,
+          "choices": [
+            { "reply": 37570, "next": 31117 }
+          ]
+        },
+        {
+          "message": 31117,
+          "choices": [
+            { "reply": 37569, "quest": 1970, "completes": 14030, "params": [[30, 14030]] }
+          ]
+        }
+      ],
+      "why": "A brash Iop shopping at the market [6,-17], by «Iop et hop»: shopping is an Enutrof's job (31115), the training gear to renew (31116), a special training Rok Elreuss forbids them to speak of (31117: 14030)."
+    },
+    {
+      "npc": 4429,
+      "map": 192417798,
+      "opening": 31126,
+      "lines": [
+        {
+          "message": 31126,
+          "choices": [
+            { "reply": 37584, "next": 31127, "quest": 1970, "beforeObjective": 14035 }
+          ]
+        },
+        {
+          "message": 31127,
+          "choices": [
+            { "reply": 37583, "next": 31128 }
+          ]
+        },
+        {
+          "message": 31128,
+          "choices": [
+            { "reply": 37582, "next": 31129 }
+          ]
+        },
+        {
+          "message": 31129,
+          "choices": [
+            { "reply": 37581, "quest": 1970, "completes": 14035, "params": [[30, 14035]] }
+          ]
+        }
+      ],
+      "why": "The brash Iop come to the dispensary, by «Iop et hop»: weeks to heal (31126, 31127), the injured out and the character in their place, the training ground on the map (31128), a woollen pair of pants to make with Alit Elfminate's wool (31129: 14035)."
+    },
+    {
+      "npc": 4429,
+      "map": 190582787,
+      "opening": 31131,
+      "openings": [
+        { "quest": 1970, "objective": 14038, "pending": 14039, "message": 31132 },
+        { "quest": 1970, "objective": 14040, "pending": 14041, "message": 31136 },
+        { "quest": 1970, "objective": 14046, "pending": 14047, "message": 31145 }
+      ],
+      "lines": [
+        {
+          "message": 31131,
+          "choices": []
+        },
+        {
+          "message": 31132,
+          "choices": [
+            { "reply": 37591, "next": 31133 },
+            { "reply": 37590, "next": 31133 }
+          ]
+        },
+        {
+          "message": 31133,
+          "choices": [
+            { "reply": 37589, "quest": 1970, "completes": 14039, "params": [[30, 14039]], "showsNpc": 4431 }
+          ]
+        },
+        {
+          "message": 31136,
+          "choices": [
+            { "reply": 37595, "next": 31137 }
+          ]
+        },
+        {
+          "message": 31137,
+          "choices": [
+            { "reply": 37594, "quest": 1970, "completes": 14041, "params": [[30, 14041]] }
+          ]
+        },
+        {
+          "message": 31145,
+          "choices": [
+            { "reply": 37610, "next": 31146 },
+            { "reply": 37609, "next": 31146 }
+          ]
+        },
+        {
+          "message": 31146,
+          "choices": [
+            { "reply": 37607, "quest": 1970, "afterObjective": 14046, "beforeObjective": 14047 },
+            { "reply": 37608 }
+          ]
+        }
+      ],
+      "why": "The brash Iops at the training ground [11,-11], by «Iop et hop»: no time to talk (31131); fighting with the feet only (31132), the gestures copied, then the woollen pants (31133: 14039, the doppel comes in); the training's aim, a brawl at Captain Chafer's Torn Pants party (31136, 31137: 14041); the training called off (31145), an Iop never gives up (31146): reasoned with fists (npc_fights.json)."
+    },
+    {
+      "npc": 4430,
+      "map": 0,
+      "opening": 31120,
+      "lines": [
+        {
+          "message": 31120,
+          "choices": [
+            { "reply": 37577, "next": 31121, "quest": 1970, "beforeObjective": 14033 }
+          ]
+        },
+        {
+          "message": 31121,
+          "choices": [
+            { "reply": 37576, "next": 31122 }
+          ]
+        },
+        {
+          "message": 31122,
+          "choices": [
+            { "reply": 37575, "quest": 1970, "completes": 14033, "params": [[30, 14033]] }
+          ]
+        }
+      ],
+      "why": "The moaning Iop in the dispensary, by «Iop et hop»: a thousand wauwaus' pain (31120), legs and feet (31121), do something (31122: 14033, off to Nepra Lido)."
+    },
+    {
+      "npc": 4431,
+      "map": 0,
+      "opening": 31134,
+      "lines": [
+        {
+          "message": 31134,
+          "choices": [
+            { "reply": 37593, "next": 31135, "quest": 1970, "beforeObjective": 14040 }
+          ]
+        },
+        {
+          "message": 31135,
+          "choices": [
+            { "reply": 37592, "quest": 1970, "completes": 14040, "params": [[30, 14040]] }
+          ]
+        }
+      ],
+      "why": "Rok Elreuss's doppel at the training ground, by «Iop et hop»: proud of them all (31134), K'Norr'Ys's techniques he inherited and silence (31135: 14040)."
+    },
+    {
+      "npc": 4432,
+      "map": 0,
+      "opening": 31143,
+      "openings": [
+        { "quest": 1970, "objective": 14047, "pending": 14048, "message": 31147 }
+      ],
+      "lines": [
+        {
+          "message": 31143,
+          "choices": [
+            { "reply": 37606, "next": 31144, "quest": 1970, "afterObjective": 14045, "beforeObjective": 14046 }
+          ]
+        },
+        {
+          "message": 31144,
+          "choices": [
+            { "reply": 37605, "quest": 1970, "completes": 14046, "params": [[30, 14046]] }
+          ]
+        },
+        {
+          "message": 31147,
+          "choices": [
+            { "reply": 37611, "quest": 1970, "completes": 14048, "params": [[30, 14048]] }
+          ]
+        }
+      ],
+      "why": "An experienced Iop sent by Rok Elreuss, by «Iop et hop»: taking blows needs self-control (31143), the plan, the recruits brought into line without losing a limb (31144: 14046); afterwards, the doppel taken to Badufron's prison (31147: 14048)."
     }
   ]
 }

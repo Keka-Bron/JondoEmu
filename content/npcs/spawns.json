@@ -1591,6 +1591,86 @@
       "orientation": 5,
       "criterion": "Qa=718&Qo=4671|Qf=718",
       "why": "Jykel in his robbed cave. INFERRED cell."
+    },
+    {
+      "map": 191106052,
+      "npc": 4429,
+      "cell": 395,
+      "orientation": 1,
+      "criterion": "Qa=1970&Qo!14030",
+      "why": "Brash Iops shopping at the market [6,-17] until the character has spoken to them (14030). INFERRED cells."
+    },
+    {
+      "map": 191106052,
+      "npc": 4429,
+      "cell": 399,
+      "orientation": 3,
+      "criterion": "Qa=1970&Qo!14030",
+      "why": "The same group."
+    },
+    {
+      "map": 191106052,
+      "npc": 4429,
+      "cell": 427,
+      "orientation": 7,
+      "criterion": "Qa=1970&Qo!14030",
+      "why": "The same group."
+    },
+    {
+      "map": 192417798,
+      "npc": 4429,
+      "cell": 428,
+      "orientation": 5,
+      "criterion": "Qa=1970&Qo=14034&Qo!14035",
+      "why": "The brash Iop come to see the injured, once Nepra Lido has spoken (14034). INFERRED cell."
+    },
+    {
+      "map": 192417798,
+      "npc": 4430,
+      "cell": 386,
+      "orientation": 1,
+      "criterion": "Qa=1970&Qo=14031&Qo!14049",
+      "why": "The moaning Iop at the dispensary while the quest has injured Iops there."
+    },
+    {
+      "map": 190582787,
+      "npc": 4429,
+      "cell": 200,
+      "orientation": 3,
+      "criterion": "Qa=1970&Qo=14035&Qo!14047",
+      "why": "Brash Iops training at [11,-11] until reasoned with (14047). INFERRED cells."
+    },
+    {
+      "map": 190582787,
+      "npc": 4429,
+      "cell": 203,
+      "orientation": 5,
+      "criterion": "Qa=1970&Qo=14035&Qo!14047",
+      "why": "The same group."
+    },
+    {
+      "map": 190582787,
+      "npc": 4429,
+      "cell": 230,
+      "orientation": 7,
+      "criterion": "Qa=1970&Qo=14035&Qo!14047",
+      "why": "The same group."
+    },
+    {
+      "map": 190582787,
+      "npc": 4431,
+      "cell": 187,
+      "orientation": 3,
+      "criterion": "Qa=1970&Qo=14039&Qo!14040",
+      "why": "Rok Elreuss's doppel, come in during the training (14039) until heard (14040)."
+    },
+    {
+      "map": 190582787,
+      "npc": 4432,
+      "cell": 173,
+      "orientation": 3,
+      "criterion": "Qa=1970&Qo=14042&Qo!14049",
+      "why": "The experienced Iops Rok Elreuss sends, top left of the ground, as Dofus pour les noobs places them."
     }
   ]
 }

@@ -1103,6 +1103,15 @@
    "requires": [{"item": 12400, "count": 1}],
    "spends": true,
    "why": "The last bait, inside the mine: the heap of grass at the foot of the TNT barrel (516099, cell 232), once the other five lead the beast here."
+  },
+  {
+   "objective": 14047,
+   "quest": 1970,
+   "kind": "beat",
+   "monster": 5264,
+   "map": 190582787,
+   "afterObjectives": [14046],
+   "why": "«Neutraliza a los yopukas»: the three brash Iops (5264) reasoned with fists at [11,-11]."
   }
  ]
 }
