@@ -2914,13 +2914,13 @@
             { "reply": 25298, "next": 21040, "beforeQuest": 1649 },
             { "reply": 25309, "next": 21051, "quest": 1649, "afterObjectives": [9863, 9864, 9866] },
             { "reply": 77764, "next": 57165, "quest": 1649, "afterQuest": true, "beforeQuest": 2512 },
-            { "reply": 77761, "next": 57179, "quest": 2512, "afterObjective": 19260 },
+            { "reply": 77761, "next": 57179, "quest": 2512, "afterObjective": 19260, "completesAll": [19261], "params": [[30, 19261]] },
             { "reply": 25312, "next": 21049, "quest": 2512, "afterQuest": true, "beforeQuest": 1650 },
-            { "reply": 25319, "next": 21060, "quest": 1650, "afterObjectives": [9871, 9872] },
+            { "reply": 25319, "next": 21060, "quest": 1650, "afterObjectives": [9871, 9872], "completesAll": [9873, 9874], "params": [[30, 9874]] },
             { "reply": 25333, "next": 21056, "quest": 1650, "afterQuest": true, "beforeQuest": 1651 },
-            { "reply": 25328, "next": 21067, "quest": 1651, "afterObjectives": [9875, 9877, 9878, 9879, 9880, 9881] },
+            { "reply": 25328, "next": 21067, "quest": 1651, "afterObjectives": [9875, 9877, 9878, 9879, 9880, 9881], "completesAll": [9882, 9883, 9884, 9885, 9886, 9887], "params": [[30, 9887]] },
             { "reply": 77804, "next": 57183, "quest": 1651, "afterQuest": true, "beforeQuest": 2513 },
-            { "reply": 77799, "next": 57179, "quest": 2513, "afterObjectives": [19264, 19265, 19268] },
+            { "reply": 77799, "next": 57179, "quest": 2513, "afterObjectives": [19264, 19265, 19268], "completesAll": [19266, 19267, 19269], "params": [[30, 19269]] },
             { "reply": 25299 }
           ]
         },
@@ -3166,7 +3166,7 @@
           ]
         }
       ],
-      "why": "Berbe Unin, from his own lines and replies, by Dofus pour les noobs («Produits naturels», «La hache et la pioche», «Boune un jour, boune toujours») and the catalogue's lines for each quest (21043, 57160, 21050, 21056, 57184). His trials go in pairs of chains: one said on the way back from the previous one («Ya he terminado.» then «Mira lo que he confeccionado/fabricado.») and one for another day («Estoy listo para otro trabajo.», «Ya puedo hacer otra tarea.»). 3.6 put «El oficio de los aventureros» (the meat broth, with his hunting knife, 30832) between the first two and «Preparación para el combate» after the Bun set; its last objective, seeing him again, is «Mira lo que he fabricado.» (19270), and the title of son of Incarnam (21068)."
+      "why": "Berbe Unin, from his own lines and replies, by Dofus pour les noobs («Produits naturels», «La hache et la pioche», «Boune un jour, boune toujours») and the catalogue's lines for each quest (21043, 57160, 21050, 21056, 57184). His trials go in pairs of chains: one said on the way back from the previous one («Ya he terminado.» then «Mira lo que he confeccionado/fabricado.») and one for another day («Estoy listo para otro trabajo.», «Ya puedo hacer otra tarea.»). 3.6 put «El oficio de los aventureros» (the meat broth, with his hunting knife, 30832) between the first two and «Preparación para el combate» after the Bun set; its last objective, seeing him again, is «Mira lo que he fabricado.» (19270), and the title of son of Incarnam (21068). The pieces of «El oficio de los aventureros», «A pico y hacha», «Bun empieza lo que Bun acaba» and «Preparación para el combate» are shown with the reply that shows them, not on hello, so the talk goes on to the next quest."
     },
     {
       "npc": 2905,
