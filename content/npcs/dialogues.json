@@ -1218,15 +1218,11 @@
         {
           "message": 30861,
           "choices": [
+            { "reply": 37523, "next": 31076, "beforeQuest": 1965 },
+            { "reply": 37545, "quest": 1965, "completes": 14019, "params": [[30, 14019]], "next": 31096 },
+            { "reply": 37561, "quest": 1965, "completes": 14029, "params": [[30, 14029]], "next": 31109 },
             { "reply": 37352, "quest": 1976, "completes": 13968, "params": [[30, 13968]], "next": 30936, "afterObjective": 13967 },
-            { "reply": 37268, "next": 30862, "quest": 2009, "beforeObjective": 13882, "completes": 13882, "params": [[30, 13882]] },
-            { "reply": 37523, "next": 31076 }
-          ]
-        },
-        {
-          "message": 31076,
-          "choices": [
-            { "reply": 38299, "startsQuest": 1965 }
+            { "reply": 37268, "next": 30862, "quest": 2009, "beforeObjective": 13882, "completes": 13882, "params": [[30, 13882]] }
           ]
         },
         {
@@ -1247,9 +1243,48 @@
           "choices": [
             { "reply": 37543 }
           ]
+        },
+        {
+          "message": 31076,
+          "choices": [
+            { "reply": 37519, "startsQuest": 1965, "params": [[34, 1965]] },
+            { "reply": 37522, "next": 31077 },
+            { "reply": 37520 }
+          ]
+        },
+        {
+          "message": 31077,
+          "choices": [
+            { "reply": 37521, "next": 31078 }
+          ]
+        },
+        {
+          "message": 31078,
+          "choices": [
+            { "reply": 37519, "startsQuest": 1965, "params": [[34, 1965]] },
+            { "reply": 37520 }
+          ]
+        },
+        {
+          "message": 31096,
+          "choices": [
+            { "reply": 37544, "next": 31097 }
+          ]
+        },
+        {
+          "message": 31097,
+          "choices": [
+            { "reply": 37543 }
+          ]
+        },
+        {
+          "message": 31109,
+          "choices": [
+            { "reply": 37560 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37268) is this class's objective (13882, effect 30), and leads to his greeting, 30862, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1965) is done, he greets the character with Archi's summons (30863) and «Ir a la Torre del Consejo» hands it over. «Six pieds sous terre»: «¿Ha pasado por aquí un grupo de turistas en compañía de un guía?» (13968): they went down into the underground and only the guide came out (30936)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37268) is this class's objective (13882, effect 30), and leads to his greeting, 30862, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1965) is done, he greets the character with Archi's summons (30863) and «Ir a la Torre del Consejo» hands it over. «Six pieds sous terre»: «¿Ha pasado por aquí un grupo de turistas en compañía de un guía?» (13968): they went down into the underground and only the guide came out (30936). «La fête de la chocopépite» of Dofus pour les noobs: the Enutrofs' agitation, the festival soon, the people to visit (31076, the line the step declares), Enutrof's chocolate nugget (31077) and the chocolate breads (31078); all ready, Chipo in charge of the haggling from now on, and the goods on the market square (14019, 31096, 31097); Marie-Laure's cousins as nearly free labour (14029, 31109). «La fête de la chocopépite» of Dofus pour les noobs: the Enutrofs' agitation, the festival soon, the people to visit (31076, the line the step declares), Enutrof's chocolate nugget (31077) and the chocolate breads (31078); all ready, Chipo in charge of the haggling from now on, and the goods on the market square (14019, 31096, 31097); Marie-Laure's cousins as nearly free labour (14029, 31109)."
     },
     {
       "npc": 4326,
@@ -7844,6 +7879,7 @@
         {
           "message": 30563,
           "choices": [
+            { "reply": 37540, "next": 31089, "quest": 1965, "afterObjective": 14016, "beforeObjective": 14017 },
             { "reply": 38078, "quest": 1971, "completes": 14165, "params": [[30, 14165]], "next": 31516, "afterObjective": 14164 },
             { "reply": 36880, "quest": 1985, "completes": 13834, "params": [[30, 13834]], "next": 30564 },
             { "reply": 36879, "next": 30565 }
@@ -7884,9 +7920,43 @@
           "choices": [
             { "reply": 36876 }
           ]
+        },
+        {
+          "message": 31089,
+          "choices": [
+            { "reply": 37539, "next": 31090 }
+          ]
+        },
+        {
+          "message": 31090,
+          "choices": [
+            { "reply": 37538, "next": 31091 }
+          ]
+        },
+        {
+          "message": 31091,
+          "choices": [
+            { "reply": 37537, "next": 31092 }
+          ]
+        },
+        {
+          "message": 31092,
+          "choices": [
+            { "reply": 37536, "next": 31093 }
+          ]
+        },
+        {
+          "message": 31093,
+          "choices": [
+            { "reply": 37535, "quest": 1965, "completes": 14017, "params": [[30, 14017]], "next": 31094 }
+          ]
+        },
+        {
+          "message": 31094,
+          "choices": []
         }
       ],
-      "why": "«C'est pour ta pomme»: his crates of apples stolen, and a basket of tomatoes with them (31516); a free crate for whoever brings them back (31517), «Seguir el rastro de tomates.» (14166). His talk about trade (30565-30567). «Livraison par intérim»: Estefi Dora's three crates (13834, offered once carried), at her usual rates (30564)."
+      "why": "«C'est pour ta pomme»: his crates of apples stolen, and a basket of tomatoes with them (31516); a free crate for whoever brings them back (31517), «Seguir el rastro de tomates.» (14166). His talk about trade (30565-30567). «Livraison par intérim»: Estefi Dora's three crates (13834, offered once carried), at her usual rates (30564). «La fête de la chocopépite»: the drinks renegotiated by a tantrum, beaten dog, flailing, crying, crescendo (31089-31092), 15% and the guard threatened (31093: 14017), twenty years and nobody had done that (31094). «La fête de la chocopépite»: the drinks renegotiated by a tantrum, beaten dog, flailing, crying, crescendo (31089-31092), 15% and the guard threatened (31093: 14017), twenty years and nobody had done that (31094)."
     },
     {
       "npc": 4471,
@@ -9083,6 +9153,8 @@
         {
           "message": 2399,
           "choices": [
+            { "reply": 37534, "next": 31087, "quest": 1965, "beforeObjective": 14016 },
+            { "reply": 37542, "next": 31095, "quest": 1965, "afterObjective": 14017, "beforeObjective": 14018 },
             { "reply": 25522, "quest": 1984, "completes": 13822, "params": [[30, 13822]], "next": 21251, "afterObjective": 13821 },
             { "reply": 37541 }
           ]
@@ -9092,9 +9164,33 @@
           "choices": [
             { "reply": 37541 }
           ]
+        },
+        {
+          "message": 31087,
+          "choices": [
+            { "reply": 37533, "next": 31086 }
+          ]
+        },
+        {
+          "message": 31086,
+          "choices": [
+            { "reply": 37532, "next": 31088 }
+          ]
+        },
+        {
+          "message": 31088,
+          "choices": [
+            { "reply": 37541, "quest": 1965, "completes": 14016, "params": [[30, 14016]] }
+          ]
+        },
+        {
+          "message": 31095,
+          "choices": [
+            { "reply": 37541, "quest": 1965, "completes": 14018, "params": [[30, 14018]] }
+          ]
         }
       ],
-      "why": "Chipo Atuf, the miner of Astrub's underground, by «Crise sanitaire»: angry about the subsidy but no poisoner (13822, 21251), and somebody laying in food."
+      "why": "Chipo Atuf, the miner of Astrub's underground, by «Crise sanitaire»: angry about the subsidy but no poisoner (13822, 21251), and somebody laying in food. «La fête de la chocopépite»: the drinks' discount, 8.5% of the 15% wanted (31087), lying would be worse (31086), the market is René Gociante's ground (31088: 14016); the 15% obtained (31095: 14018). «La fête de la chocopépite»: the drinks' discount, 8.5% of the 15% wanted (31087), lying would be worse (31086), the market is René Gociante's ground (31088: 14016); the 15% obtained (31095: 14018)."
     },
     {
       "npc": 830,
@@ -10016,6 +10112,7 @@
         {
           "message": 22047,
           "choices": [
+            { "reply": 37531, "quest": 1965, "completes": 14015, "params": [[30, 14015]], "next": 31085 },
             { "reply": 36842, "quest": 1986, "completes": 13844, "params": [[30, 13844]], "next": 30537, "afterObjective": 13843 },
             { "reply": 26551, "next": 22048 }
           ]
@@ -10037,9 +10134,15 @@
           "choices": [
             { "reply": 26549 }
           ]
+        },
+        {
+          "message": 31085,
+          "choices": [
+            { "reply": 37530 }
+          ]
         }
       ],
-      "why": "Lucy Goñal the handywoman, by «Golémancien»: the parts brought, her workshop to assemble the quintain (30537); her trade (22048, 22049)."
+      "why": "Lucy Goñal the handywoman, by «Golémancien»: the parts brought, her workshop to assemble the quintain (30537); her trade (22048, 22049). «La fête de la chocopépite»: the wooden crate from Father Letabouret, always finding a lackey (31085: 14015). «La fête de la chocopépite»: the wooden crate from Father Letabouret, always finding a lackey (31085: 14015)."
     },
     {
       "npc": 4456,
@@ -11446,6 +11549,145 @@
         }
       ],
       "why": "The mercenary north of the library [7,-21], afraid of pious, by «Tournée d'inspection»: those sharp beaks (31535, 31536), pious to be fought to show him (14153); feathers everywhere, could he beat them too? (31537), heartened (31538)."
+    },
+    {
+      "npc": 4354,
+      "map": 0,
+      "opening": 31079,
+      "lines": [
+        {
+          "message": 31079,
+          "choices": [
+            { "reply": 37527, "next": 31080, "quest": 1965, "beforeObjective": 14012 }
+          ]
+        },
+        {
+          "message": 31080,
+          "choices": [
+            { "reply": 37525, "next": 31081 }
+          ]
+        },
+        {
+          "message": 31081,
+          "choices": [
+            { "reply": 37526, "next": 31082 }
+          ]
+        },
+        {
+          "message": 31082,
+          "choices": [
+            { "reply": 37524, "quest": 1965, "completes": 14012, "params": [[30, 14012]] }
+          ]
+        }
+      ],
+      "why": "«La fête de la chocopépite»: the bakers' preparations (31080), why the Enutrofs love the festival (31081), the golden nugget the oldest of Astrub drops into the chocolate (31082: 14012). «La fête de la chocopépite»: the bakers' preparations (31080), why the Enutrofs love the festival (31081), the golden nugget the oldest of Astrub drops into the chocolate (31082: 14012)."
+    },
+    {
+      "npc": 4426,
+      "map": 0,
+      "opening": 31083,
+      "lines": [
+        {
+          "message": 31083,
+          "choices": [
+            { "reply": 37529, "next": 31084, "quest": 1965, "beforeObjective": 14013 }
+          ]
+        },
+        {
+          "message": 31084,
+          "choices": [
+            { "reply": 37528, "quest": 1965, "completes": 14013, "params": [[30, 14013]] }
+          ]
+        }
+      ],
+      "why": "«La fête de la chocopépite»: coffin wood from the adventurers buried here for the festival's tables, and the wood to deliver for him (31084: 14013). «La fête de la chocopépite»: coffin wood from the adventurers buried here for the festival's tables, and the wood to deliver for him (31084: 14013)."
+    },
+    {
+      "npc": 4427,
+      "map": 188744196,
+      "opening": 31098,
+      "lines": [
+        {
+          "message": 31098,
+          "choices": [
+            { "reply": 37548, "next": 31100, "quest": 1965, "afterObjective": 14021, "beforeObjective": 14022 }
+          ]
+        },
+        {
+          "message": 31100,
+          "choices": [
+            { "reply": 37547, "next": 31101 }
+          ]
+        },
+        {
+          "message": 31101,
+          "choices": [
+            { "reply": 37546, "quest": 1965, "completes": 14022, "params": [[30, 14022]] }
+          ]
+        }
+      ],
+      "why": "The guard wauwau of the market square [2,-18], by «La fête de la chocopépite»: half asleep (31098), shown the crates, sniffing the footprints (31100), set on the trail (31101: 14022), a mercenary left to watch the crates."
+    },
+    {
+      "npc": 4427,
+      "map": 191105028,
+      "opening": 31102,
+      "lines": [
+        {
+          "message": 31102,
+          "choices": [
+            { "reply": 37549, "quest": 1965, "completes": 14025, "params": [[30, 14025]] }
+          ]
+        }
+      ],
+      "why": "The guard wauwau at [5,-17], growling at somebody (31102: 14025)."
+    },
+    {
+      "npc": 4428,
+      "map": 0,
+      "opening": 31103,
+      "lines": [
+        {
+          "message": 31103,
+          "choices": [
+            { "reply": 37554, "next": 31104, "quest": 1965, "afterObjective": 14025, "beforeObjective": 14026 },
+            { "reply": 37550, "quest": 1965, "afterObjective": 14026, "beforeObjective": 14027 },
+            { "reply": 37559, "next": 31107, "quest": 1965, "afterObjective": 14027, "beforeObjective": 14028 }
+          ]
+        },
+        {
+          "message": 31104,
+          "choices": [
+            { "reply": 37553, "next": 31105 }
+          ]
+        },
+        {
+          "message": 31105,
+          "choices": [
+            { "reply": 37552, "next": 31106 }
+          ]
+        },
+        {
+          "message": 31106,
+          "choices": [
+            { "reply": 37550, "quest": 1965, "completes": 14026, "params": [[30, 14026]] },
+            { "reply": 37551 }
+          ]
+        },
+        {
+          "message": 31107,
+          "choices": [
+            { "reply": 37558, "next": 31108 }
+          ]
+        },
+        {
+          "message": 31108,
+          "choices": [
+            { "reply": 37557, "quest": 1965, "completes": 14028, "params": [[30, 14028]] }
+          ]
+        }
+      ],
+      "why": "«La fête de la chocopépite»: the chocolate breads' crates (37554), denial (31104), the crates shown (31105), put them back (31106), shadows closing in: the fight beside the wauwau (npc_fights.json, 14026); her cousins ruined by the Kanigs (31107), soup for their work (31108: 14028). «La fête de la chocopépite»: the chocolate breads' crates (37554), denial (31104), the crates shown (31105), put them back (31106), shadows closing in: the fight beside the wauwau (npc_fights.json, 14026); her cousins ruined by the Kanigs (31107), soup for their work (31108: 14028)."
     }
   ]
 }

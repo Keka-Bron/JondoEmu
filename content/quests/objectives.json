@@ -1205,6 +1205,83 @@
    "map": 188746753,
    "afterObjectives": [14153],
    "why": "«Muéstrale al mercenario que los píos no son peligrosos»: a group of pious of any colour beaten at [7,-21]."
+  },
+  {
+   "objective": 14012,
+   "quest": 1965,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Ve a ver a la Abuela» [7,-19]; the three visits of the list go in any order (Dofus pour les noobs starts with Chipo)."
+  },
+  {
+   "objective": 14013,
+   "quest": 1965,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Ve a ver al Padre Perlaburete» at the cemetery [0,-13]; any order with the other visits."
+  },
+  {
+   "objective": 14014,
+   "quest": 1965,
+   "elements": [{"map": 189531150, "element": 515404}],
+   "afterObjectives": [14013],
+   "anyOrder": true,
+   "gives": [{"item": 19692, "count": 1}],
+   "why": "«Consigue una caja de madera»: the three small crates on the right of [0,-15] (element 515404, cell 235)."
+  },
+  {
+   "objective": 14015,
+   "quest": 1965,
+   "kind": "order",
+   "afterObjectives": [14014],
+   "anyOrder": true,
+   "why": "«Lleva la caja de madera a Lucy Goñal» [3,-15]."
+  },
+  {
+   "objective": 14016,
+   "quest": 1965,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Ve a ver a Chipo Atuf» in the mine under [2,-18]; any order with the other visits."
+  },
+  {
+   "objective": 14017,
+   "quest": 1965,
+   "kind": "order",
+   "afterObjectives": [14016],
+   "anyOrder": true,
+   "why": "«Ve a ver a René Gociante» at the consumables market [3,-19]."
+  },
+  {
+   "objective": 14018,
+   "quest": 1965,
+   "kind": "order",
+   "afterObjectives": [14017],
+   "anyOrder": true,
+   "why": "«Vuelve a ver a Chipo Atuf» with the 15%."
+  },
+  {
+   "objective": 14021,
+   "quest": 1965,
+   "elements": [{"map": 188744196, "element": 515405}],
+   "afterObjectives": [14020],
+   "why": "«Comprueba la mercancía»: the wooden crate in the middle of the market square [2,-18] (element 515405, cell 272), empty."
+  },
+  {
+   "objective": 14023,
+   "quest": 1965,
+   "kind": "enter",
+   "map": 191102978,
+   "afterObjectives": [14022],
+   "why": "«Sigue al wauwau guardián»: [3,-18]."
+  },
+  {
+   "objective": 14024,
+   "quest": 1965,
+   "kind": "enter",
+   "map": 191102980,
+   "afterObjectives": [14023],
+   "why": "«Sigue al wauwau guardián»: [3,-17], then [5,-17]."
   }
  ]
 }

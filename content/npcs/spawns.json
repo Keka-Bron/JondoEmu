@@ -1777,6 +1777,22 @@
       "cell": 318,
       "orientation": 3,
       "why": "The mercenary on guard north of the library [7,-21], wary of the pious. INFERRED cell."
+    },
+    {
+      "map": 188744196,
+      "npc": 4427,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa!1965|Qo!14022",
+      "why": "The guard wauwau of the market square, except while it tracks the thief (14022 on)."
+    },
+    {
+      "map": 191105028,
+      "npc": 4427,
+      "cell": 381,
+      "orientation": 7,
+      "criterion": "Qa=1965&Qo=14024&Qo!14028",
+      "why": "The guard wauwau before Alba Surilla at [5,-17], once it has led the character there (14024). INFERRED cell."
     }
   ]
 }
