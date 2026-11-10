@@ -209,6 +209,26 @@ namespace Jondo.Unity.Server.Network
             return given ? Bien(new { item, quantity }) : Mal(422, "not given");
         }
 
+        /// <summary>
+        /// The authored content of the quests read again with the server running: the NPCs'
+        /// placements and conversations, the objectives' bindings and criteria, the fights replies
+        /// start, the gathering drops and the passages. The clients stay connected; what a map
+        /// shows changes on entering it again.
+        /// </summary>
+        private static Respuesta TestReload()
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            Managers.Npcs.Initialize();
+            Managers.DungeonDoor.Initialize();
+            Managers.Bankers.Initialize();
+            Managers.Quests.ReloadContent();
+            Managers.NpcFights.Forget();
+            Managers.HarvestDrops.Forget();
+            Managers.TeleportManager.Initialize();
+            Console.WriteLine($"[Content] Reloaded in {watch.ElapsedMilliseconds} ms.");
+            return Bien(new { reloaded = true, ms = watch.ElapsedMilliseconds });
+        }
+
         /// <summary>The character's quests: those in hand with their step and objectives, and those finished.</summary>
         private static Respuesta TestQuests()
         {

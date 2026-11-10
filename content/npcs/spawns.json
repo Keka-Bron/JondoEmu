@@ -1154,6 +1154,70 @@
       "orientation": 7,
       "criterion": "Qa=1985&Qo!13831",
       "why": "The Tymador brute, beside the Sram one. INFERRED."
+    },
+    {
+      "map": 190578688,
+      "npc": 4469,
+      "cell": 345,
+      "orientation": 3,
+      "criterion": "Qa!1996|Qo!14180|(Qo=14155&Qo!14196)",
+      "why": "The mercenary guarding the goblins at their trunk in Astrub's meadows [3,-14]; away to the workshop while the character guards them (14180 to 14155) and gone after them once they run (14196). INFERRED cell, looking over the goblins."
+    },
+    {
+      "map": 190578688,
+      "npc": 749,
+      "cell": 372,
+      "orientation": 1,
+      "criterion": "Qa!1996|Qo!14155",
+      "why": "Alka Traz at the old trunk the goblins are to cut, except while they are on the run (14155 until the quest ends). INFERRED."
+    },
+    {
+      "map": 190578688,
+      "npc": 750,
+      "cell": 388,
+      "orientation": 3,
+      "criterion": "Qa!1996|Qo!14155",
+      "why": "Luki Lushiano at the trunk (see Alka Traz). INFERRED."
+    },
+    {
+      "map": 190578688,
+      "npc": 751,
+      "cell": 430,
+      "orientation": 7,
+      "criterion": "Qa!1996|Qo!14155",
+      "why": "Guan Tánamo at the trunk (see Alka Traz). INFERRED."
+    },
+    {
+      "map": 190578693,
+      "npc": 749,
+      "cell": 242,
+      "orientation": 1,
+      "criterion": "Qa=1996&Qo=14155&Qo!14197",
+      "why": "Alka Traz run away to the farm's eggs at [3,-9], until beaten (14197). INFERRED."
+    },
+    {
+      "map": 190578693,
+      "npc": 750,
+      "cell": 229,
+      "orientation": 1,
+      "criterion": "Qa=1996&Qo=14155&Qo!14197",
+      "why": "Luki Lushiano at the farm (see Alka Traz). INFERRED."
+    },
+    {
+      "map": 190578693,
+      "npc": 751,
+      "cell": 256,
+      "orientation": 1,
+      "criterion": "Qa=1996&Qo=14155&Qo!14197",
+      "why": "Guan Tánamo at the farm (see Alka Traz). INFERRED."
+    },
+    {
+      "map": 190578693,
+      "npc": 4469,
+      "cell": 410,
+      "orientation": 7,
+      "criterion": "Qa=1996&Qo=14197",
+      "why": "The mercenary come east after them, once they are beaten (14197). INFERRED."
     }
   ]
 }

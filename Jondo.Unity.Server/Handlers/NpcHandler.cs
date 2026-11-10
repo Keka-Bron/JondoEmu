@@ -917,7 +917,7 @@ namespace Jondo.Unity.Server.Handlers
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
             if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
             if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
-            return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) > 0;
+            return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) >= choice.TakesCount;
         }
 
         private static long[] LasQueTocan(DialogueLine linea)
@@ -944,7 +944,7 @@ namespace Jondo.Unity.Server.Handlers
                 // A reply that hands over what an objective asks for, only to whoever carries it.
                 if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
                 if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
-                return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) > 0;
+                return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) >= choice.TakesCount;
             }).ToArray();
         }
 
@@ -1353,11 +1353,11 @@ namespace Jondo.Unity.Server.Handlers
             // What the reply hands to the NPC: Acidrik's beer.
             if (elegidaAhora != null && elegidaAhora.Takes != 0)
             {
-                if (Managers.Equipment.HowMany(elegidaAhora.Takes) <= 0) return;
-                await Managers.Equipment.TakeAsync(stream, elegidaAhora.Takes, 1);
+                if (Managers.Equipment.HowMany(elegidaAhora.Takes) < elegidaAhora.TakesCount) return;
+                await Managers.Equipment.TakeAsync(stream, elegidaAhora.Takes, elegidaAhora.TakesCount);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
-                        Managers.InfoMessages.ItemLost, "1",
+                        Managers.InfoMessages.ItemLost, elegidaAhora.TakesCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
                         elegidaAhora.Takes.ToString(System.Globalization.CultureInfo.InvariantCulture))));
             }
 

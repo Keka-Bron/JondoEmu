@@ -1846,26 +1846,83 @@
       "npc": 4469,
       "map": 0,
       "opening": 31503,
+      "openings": [
+        { "quest": 1996, "objective": 14197, "message": 31575 },
+        { "quest": 1996, "objective": 14155, "pending": 14196, "message": 31577 }
+      ],
       "lines": [
         {
           "message": 31503,
           "choices": [
-            {
-              "reply": 38150,
-              "next": 31581
-            }
+            { "reply": 38152, "next": 31579, "beforeQuest": 1996 },
+            { "reply": 38157, "quest": 1996, "completes": 14179, "params": [[30, 14179]], "next": 31582, "completesAll": [14180], "takes": 19756, "takesCount": 10 },
+            { "reply": 38155 }
+          ]
+        },
+        {
+          "message": 31579,
+          "choices": [
+            { "reply": 38151, "next": 31580 }
+          ]
+        },
+        {
+          "message": 31580,
+          "choices": [
+            { "reply": 38150, "next": 31581 }
           ]
         },
         {
           "message": 31581,
           "choices": [
-            {
-              "reply": 38154,
-              "startsQuest": 1996
-            }
+            { "reply": 38149, "startsQuest": 1996, "params": [[34, 1996]] },
+            { "reply": 38155 }
+          ]
+        },
+        {
+          "message": 31582,
+          "choices": [
+            { "reply": 38156, "next": 31583 }
+          ]
+        },
+        {
+          "message": 31583,
+          "choices": [
+            { "reply": 38154, "next": 31584 },
+            { "reply": 38155 }
+          ]
+        },
+        {
+          "message": 31584,
+          "choices": [
+            { "reply": 38153 }
+          ]
+        },
+        {
+          "message": 31577,
+          "choices": [
+            { "reply": 38148, "next": 31578 }
+          ]
+        },
+        {
+          "message": 31578,
+          "choices": [
+            { "reply": 38147 }
+          ]
+        },
+        {
+          "message": 31575,
+          "choices": [
+            { "reply": 38146, "quest": 1996, "completes": 14200, "params": [[30, 14200]], "next": 31576 }
+          ]
+        },
+        {
+          "message": 31576,
+          "choices": [
+            { "reply": 38158 }
           ]
         }
-      ]
+      ],
+      "why": "The Astrub mercenary guarding three goblins sentenced to a century of community work, in Astrub's meadows [3,-14], from her own lines and replies, by «La petite mission dans la prairie» of Dofus pour les noobs: their crimes (31579), their whining about the larvae (31580) and ten of them to chop (31581, the line 1996 names); the ten pieces of larva handed over (14179, 14180), the goblins set to work (31582) and «Accepter de jouer les garde-chiourme» while she goes to the workshop (31583, 31584). Back with them gone (31577) she sends the character south (31578); at [3,-9], after the fight, the goblins taken back in hand (14200, 31575, 31576)."
     },
     {
       "npc": 2885,
@@ -8247,6 +8304,120 @@
         }
       ],
       "why": "One of the two brutes extorting Estefi Dora («Parlez à la Brute Roublarde... «Employer la force pour les faire partir»»): the fight against both (npc_fights.json); «Comprobar el equipo» leaves it."
+    },
+    {
+      "npc": 750,
+      "map": 190578688,
+      "opening": 8986,
+      "openings": [
+        { "quest": 1996, "objective": 14180, "pending": 14155, "message": 31591 },
+        { "after": 1996, "message": 31589 }
+      ],
+      "lines": [
+        {
+          "message": 8986,
+          "choices": [
+            { "reply": 38166 }
+          ]
+        },
+        {
+          "message": 31591,
+          "choices": [
+            { "reply": 38164, "next": 31592 },
+            { "reply": 38165, "next": 31593 }
+          ]
+        },
+        {
+          "message": 31592,
+          "choices": [
+            { "reply": 38169, "next": 31593 },
+            { "reply": 38167, "next": 31593 }
+          ]
+        },
+        {
+          "message": 31593,
+          "choices": [
+            { "reply": 38168, "quest": 1996, "completes": 14155, "params": [[30, 14155]], "thenNpc": 4469 }
+          ]
+        },
+        {
+          "message": 31589,
+          "choices": [
+            { "reply": 38166 }
+          ]
+        }
+      ],
+      "why": "Luki Lushiano (Luki Loushiano), one of the three goblins, by «La petite mission dans la prairie»: with the mercenary away, kamas to let them go (31591, «Refuser»), then snot stew (31592, «Refuser»), and «¡Eh, mercenario volver!» (31593): the character turns, and they are gone (14155). Back at work after the quest, they have understood (31589)."
+    },
+    {
+      "npc": 749,
+      "map": 190578688,
+      "opening": 8985,
+      "lines": [
+        {
+          "message": 8985,
+          "choices": [
+            { "reply": 38159 }
+          ]
+        }
+      ],
+      "why": "Alka Traz, who does not like cutting wood (8985): «Deberías ponerte a trabajar.»"
+    },
+    {
+      "npc": 751,
+      "map": 190578688,
+      "opening": 8987,
+      "lines": [
+        {
+          "message": 8987,
+          "choices": [
+            { "reply": 38162 }
+          ]
+        }
+      ],
+      "why": "Guan Tánamo, who says they are innocent (8987): «No me creo ni una palabra.»"
+    },
+    {
+      "npc": 749,
+      "map": 190578693,
+      "opening": 31586,
+      "lines": [
+        {
+          "message": 31586,
+          "choices": [
+            { "reply": 38160, "params": [905], "quest": 1996, "afterObjective": 14196 }
+          ]
+        }
+      ],
+      "why": "The runaway goblins at the farm [3,-9] with the eggs they take for white dofus («il faut donc retrouver les gobelins en [3,-9] pour parler à Alka Traz dans le but de les affronter»): «Dar unos toquecitos sobre los goblins para dirigirlos por el buen camino» opens the fight against the three."
+    },
+    {
+      "npc": 750,
+      "map": 190578693,
+      "opening": 31590,
+      "lines": [
+        {
+          "message": 31590,
+          "choices": [
+            { "reply": 38163, "params": [905], "quest": 1996, "afterObjective": 14196 }
+          ]
+        }
+      ],
+      "why": "The runaway goblins at the farm [3,-9] with the eggs they take for white dofus («il faut donc retrouver les gobelins en [3,-9] pour parler à Alka Traz dans le but de les affronter»): «Dar unos toquecitos sobre los goblins para dirigirlos por el buen camino» opens the fight against the three."
+    },
+    {
+      "npc": 751,
+      "map": 190578693,
+      "opening": 31588,
+      "lines": [
+        {
+          "message": 31588,
+          "choices": [
+            { "reply": 38161, "params": [905], "quest": 1996, "afterObjective": 14196 }
+          ]
+        }
+      ],
+      "why": "The runaway goblins at the farm [3,-9] with the eggs they take for white dofus («il faut donc retrouver les gobelins en [3,-9] pour parler à Alka Traz dans le but de les affronter»): «Dar unos toquecitos sobre los goblins para dirigirlos por el buen camino» opens the fight against the three."
     }
   ]
 }

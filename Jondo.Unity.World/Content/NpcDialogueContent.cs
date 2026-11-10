@@ -257,6 +257,9 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public int Takes { get; init; }
 
+        /// <summary>How many of <see cref="Takes"/>: the meadow's mercenary asks for ten pieces of larva.</summary>
+        public int TakesCount { get; init; } = 1;
+
         /// <summary>
         /// Items the reply hands to the NPC, one of each, all or none: Nibe Lula's five contaminated
         /// samples. Without <see cref="RefusedNext"/> it is offered only to whoever carries them all;
@@ -858,6 +861,7 @@ namespace Jondo.Unity.World.Content
                             MinLevel = (int)Number(choice, "minLevel"),
                             BelowLevel = (int)Number(choice, "belowLevel"),
                             Takes = (int)Number(choice, "takes"),
+                            TakesCount = Math.Max(1, (int)Number(choice, "takesCount")),
                             TakesAll = Numbers(choice, "takesAll").Select(o => (int)o).ToArray(),
                             Holds = (int)Number(choice, "holds"),
                             HoldsCount = Math.Max(1, (int)Number(choice, "holdsCount")),
@@ -1033,6 +1037,7 @@ namespace Jondo.Unity.World.Content
                             if (choice.MinLevel != 0) writer.WriteNumber("minLevel", choice.MinLevel);
                             if (choice.BelowLevel != 0) writer.WriteNumber("belowLevel", choice.BelowLevel);
                             if (choice.Takes != 0) writer.WriteNumber("takes", choice.Takes);
+                            if (choice.Takes != 0 && choice.TakesCount != 1) writer.WriteNumber("takesCount", choice.TakesCount);
                             if (choice.TakesAll.Count > 0)
                             {
                                 writer.WriteStartArray("takesAll");

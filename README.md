@@ -669,6 +669,19 @@ An alliance is made of characters, not guilds.
 
 **1,976 quests**, with their 2,225 steps and 15,547 objectives.
 
+<!-- quest-status:start -->
+Quests played end to end in the game client — each step, conversation, NPC, item, interactive and
+reward checked against the guides and the client's own data. The rest are in the game but not yet
+played through.
+
+| Area | Played | Quests |
+|---|:---|:---:|
+| Astrub | `████░░░░░░` **35%** | 18/51 |
+| Incarnam | `███████░░░` **71%** | 17/24 |
+| Guided Tutorial | `██████████` **100%** | 5/5 |
+| **All quests** | **2.0%** | **40/1976** |
+<!-- quest-status:end -->
+
 - ✅ Quests handed over by NPCs
 - ✅ Objectives completed by clicking, by beating monsters and by bringing the souls they ask for in full soul stones
 - ✅ Quest items dropped by monsters to whoever is on the quest, and hunters' meat

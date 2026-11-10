@@ -101,6 +101,7 @@ namespace Jondo.Unity.Server.Network
                 "give" => TestGive(cuerpo),
                 "quests" => TestQuests(),
                 "quest" => TestQuest(cuerpo),
+                "reload" => TestReload(),
                 _ => Mal(404, "ruta"),
             };
         }

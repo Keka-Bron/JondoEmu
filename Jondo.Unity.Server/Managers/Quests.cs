@@ -412,6 +412,19 @@ namespace Jondo.Unity.Server.Managers
         public static QuestBindingBook Bindings { get; private set; } = new QuestBindingBook();
 
         /// <summary>
+        /// The quests' authored content read again -- the bindings and the criteria -- while the
+        /// server runs: the harness's «reload», so that a quest being written can be played without
+        /// a restart throwing every client out. The catalogue itself is the client's and stays.
+        /// </summary>
+        public static void ReloadContent()
+        {
+            Bindings = QuestBindingContent.Load(
+                Jondo.Unity.Launcher.Paths.ContentFile(QuestBindingContent.AuthoredFile),
+                Console.WriteLine);
+            Jondo.Unity.World.Quests.QuestCriteria.Forget();
+        }
+
+        /// <summary>
         /// The player has clicked something a quest cares about.
         /// </summary>
         /// <remarks>
