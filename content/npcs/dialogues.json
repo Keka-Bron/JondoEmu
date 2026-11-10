@@ -1527,8 +1527,8 @@
           "message": 20974,
           "choices": [
             { "reply": 25216, "next": 20975, "beforeQuest": 1637 },
-            { "reply": 25218, "next": 20978, "quest": 1637, "completes": 9807, "params": [[30, 9807]] },
-            { "reply": 25224, "next": 20979, "quest": 1637, "completes": 9810, "params": [[30, 9810]] },
+            { "reply": 25218, "next": 20978, "quest": 1637, "completes": 9807, "params": [[30, 9807]], "afterObjective": 9806, "beforeObjective": 9807 },
+            { "reply": 25224, "next": 20979, "quest": 1637, "completes": 9810, "params": [[30, 9810]], "afterObjective": 9809, "beforeObjective": 9810 },
             { "reply": 25222 }
           ]
         },
@@ -5513,8 +5513,8 @@
           "message": 20983,
           "names": true,
           "choices": [
-            { "reply": 25228, "next": 20985, "quest": 1637, "completes": 9808, "params": [[30, 9808]] },
-            { "reply": 25227, "next": 20986, "quest": 1637, "afterObjective": 9808, "completes": 9809, "gives": 16509, "params": [[30, 9809]] },
+            { "reply": 25228, "next": 20985, "quest": 1637, "completes": 9808, "params": [[30, 9808]], "beforeObjective": 9808 },
+            { "reply": 25227, "next": 20986, "quest": 1637, "afterObjective": 9808, "completes": 9809, "gives": 16509, "params": [[30, 9809]], "beforeObjective": 9809 },
             { "reply": 25229, "next": 20984 },
             { "reply": 25226 }
           ]
