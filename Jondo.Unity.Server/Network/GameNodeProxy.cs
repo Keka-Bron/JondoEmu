@@ -1980,6 +1980,11 @@ namespace Jondo.Unity.Server.Network
                     // Buying something from the NPC with the shop open.
                     await NpcHandler.BuyAsync(stream, payload);
                 }
+                else if (payloadStr == Op.Uri(Op.Idt) || payloadStr.Contains(Op.Uri(Op.Idt)))
+                {
+                    // «Abandonar el tutorial» confirmed: its quests validated, the set given.
+                    await Managers.Quests.LeaveTutorialAsync(stream);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Ieo)))
                 {
                     // Which step is this quest on? It is answered with the idu.

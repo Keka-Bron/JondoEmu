@@ -375,6 +375,12 @@ public static class Op
     public const string Iec = "iec";
 
     /// <summary>
+    /// «Abandonar el tutorial», confirmed with «Salir»: empty, from the client. Seen when the
+    /// button of the guided tutorial is pressed (the harness, 10/11/2026).
+    /// </summary>
+    public const string Idt = "idt";
+
+    /// <summary>
     /// The server considers an objective validated while its step goes on: 1:quest, 2:objective.
     /// After an lqn 55 every time in the tutorial capture (2511's 19537, 1629's 9655...).
     /// </summary>

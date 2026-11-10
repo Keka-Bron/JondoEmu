@@ -1,0 +1,48 @@
+{
+  "_": [
+    "The guided tutorial, as «Abandonar el tutorial» (idt from the client) ends it.",
+    "",
+    "The client's own confirmation says what leaving does: «Estás a punto de saltarte la fase de",
+    "aprendizaje sin posibilidad de volver a ella... Conseguirás inmediatamente el set del",
+    "intrépido.» Dofus pour les noobs adds that every quest of the tutorial is then validated in",
+    "the journal, done or not. Where the character goes is not in any capture; the tutorial's own",
+    "end is used: the Dofusarium, cell 127, where Ganymed hands over 1631.",
+    "",
+    "  quests  the tutorial's quests, validated if not already",
+    "  items   the «Set del intrépido» (the client's set: hat, cape, amulet, ring, belt, boots,",
+    "          sword and shield), each given if the character does not carry one",
+    "  map     where the character is put, and cell",
+    "",
+    "  oldCharacters  a character who did the tutorial before 3.6 (it finished 1630) validates the",
+    "                 two quests 3.6 added to it on reaching this map: «Premiers pas» and «Premières",
+    "                 armes», says Dofus pour les noobs («en allant simplement tout au fond du Temple",
+    "                 Céleste d'Incarnam sur la map du Dofusarium en [1,1]»)."
+  ],
+  "quests": [
+    2545,
+    2502,
+    2511,
+    1629,
+    1630
+  ],
+  "items": [
+    10784,
+    10785,
+    10794,
+    10797,
+    10798,
+    10799,
+    10800,
+    10801
+  ],
+  "map": 241443329,
+  "cell": 127,
+  "oldCharacters": {
+    "map": 241443329,
+    "when": "Qf=1630",
+    "quests": [
+      2545,
+      2511
+    ]
+  }
+}

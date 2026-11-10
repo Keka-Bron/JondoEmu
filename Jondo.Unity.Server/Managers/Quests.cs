@@ -595,6 +595,7 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static async Task OnMapEnteredAsync(NetworkStream stream, long mapId, int subAreaId)
         {
+            await OldCharacterReachesTheDofusariumAsync(stream, mapId);
             bool advanced = false;
             var log = Log;
             if (log != null && _book != null && mapId != 0)
@@ -726,6 +727,138 @@ namespace Jondo.Unity.Server.Managers
                         if (!log.ObjectiveDone(needed)) { all = false; break; }
                     }
                     if (all) await CloseAsync(stream, binding);
+                }
+            }
+        }
+
+        /// <summary>
+        /// «Abandonar el tutorial», confirmed (idt): every quest of the tutorial validated in the
+        /// journal, the «Set del intrépido» given, and the character put where the tutorial ends
+        /// (content/quests/tutorial.json).
+        /// </summary>
+        /// <remarks>
+        /// The client's confirmation says it: «Conseguirás inmediatamente el set del intrépido»; and
+        /// Dofus pour les noobs, that the tutorial's quests are then all validated, done or not. No
+        /// capture shows where the real server puts the character; the tutorial's own end is used.
+        /// A character with nothing of the tutorial left to do is not touched.
+        /// </remarks>
+        public static async Task LeaveTutorialAsync(NetworkStream stream)
+        {
+            var log = Log;
+            var tutorial = TutorialContent.Load();
+            if (log == null || tutorial == null) return;
+            if (tutorial.Quests.TrueForAll(log.Finished)) return;
+
+            foreach (int questId in tutorial.Quests)
+            {
+                if (log.Finished(questId)) continue;
+                var run = log.Run(questId) ?? log.Start(questId);
+                if (run == null) continue;
+                for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
+                Save(questId, run);
+                await TellAsync(stream, QuestFinishedMessage, questId);
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+                FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
+            }
+            await SendJournalAsync(stream);
+
+            foreach (int item in tutorial.Items)
+            {
+                if (Equipment.HowMany(item) > 0) continue;
+                if (await Equipment.GiveAsync(stream, item, 1))
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                            InfoMessages.ItemGained, "1", item.ToString(CultureInfo.InvariantCulture))));
+            }
+
+            foreach (int questId in tutorial.Quests)
+                await Achievements.AfterQuestAsync(stream, questId);
+
+            if (tutorial.MapId != 0)
+                await Handlers.TeleportHandler.ToMapAsync(stream, tutorial.MapId, tutorial.Cell);
+            Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} leaves the tutorial.");
+        }
+
+        /// <summary>
+        /// A character who did the tutorial before 3.6 validates the quests 3.6 added to it on
+        /// reaching the Dofusarium (content/quests/tutorial.json, «oldCharacters»).
+        /// </summary>
+        private static async Task OldCharacterReachesTheDofusariumAsync(NetworkStream stream, long mapId)
+        {
+            var log = Log;
+            if (log == null || mapId == 0) return;
+            var tutorial = TutorialContent.Load();
+            if (tutorial == null || tutorial.OldCharactersMap != mapId || tutorial.OldCharactersQuests.Count == 0) return;
+            if (tutorial.OldCharactersQuests.TrueForAll(log.Finished)) return;
+            var verdict = QuestCriterion.Judge(tutorial.OldCharactersWhen, log);
+            if (verdict.Broke || !verdict.Met) return;
+
+            foreach (int questId in tutorial.OldCharactersQuests)
+            {
+                if (log.Finished(questId)) continue;
+                var run = log.Run(questId) ?? log.Start(questId);
+                if (run == null) continue;
+                for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
+                Save(questId, run);
+                await TellAsync(stream, QuestFinishedMessage, questId);
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+                await Achievements.AfterQuestAsync(stream, questId);
+            }
+            Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} validates the tutorial's new quests in the Dofusarium.");
+        }
+
+        /// <summary>The guided tutorial as «Abandonar el tutorial» ends it (content/quests/tutorial.json).</summary>
+        public sealed class TutorialContent
+        {
+            public List<int> Quests { get; init; } = new();
+            public List<int> Items { get; init; } = new();
+            public long MapId { get; init; }
+            public int Cell { get; init; }
+
+            /// <summary>Where a character from before 3.6 validates the tutorial's new quests, when, and which.</summary>
+            public long OldCharactersMap { get; init; }
+            public string OldCharactersWhen { get; init; } = "";
+            public List<int> OldCharactersQuests { get; init; } = new();
+
+            public static TutorialContent? Load()
+            {
+                string path = Jondo.Unity.Launcher.Paths.ContentFile("quests/tutorial.json");
+                if (!System.IO.File.Exists(path)) return null;
+                try
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(path));
+                    var root = doc.RootElement;
+                    var quests = new List<int>();
+                    foreach (var q in root.GetProperty("quests").EnumerateArray()) quests.Add(q.GetInt32());
+                    var items = new List<int>();
+                    foreach (var i in root.GetProperty("items").EnumerateArray()) items.Add(i.GetInt32());
+                    var old = new List<int>();
+                    long oldMap = 0;
+                    string when = "";
+                    if (root.TryGetProperty("oldCharacters", out var o))
+                    {
+                        oldMap = o.TryGetProperty("map", out var om) ? om.GetInt64() : 0;
+                        when = o.TryGetProperty("when", out var ow) ? ow.GetString() ?? "" : "";
+                        if (o.TryGetProperty("quests", out var oq))
+                            foreach (var q in oq.EnumerateArray()) old.Add(q.GetInt32());
+                    }
+                    return new TutorialContent
+                    {
+                        Quests = quests,
+                        Items = items,
+                        MapId = root.TryGetProperty("map", out var m) ? m.GetInt64() : 0,
+                        Cell = root.TryGetProperty("cell", out var c) ? c.GetInt32() : -1,
+                        OldCharactersMap = oldMap,
+                        OldCharactersWhen = when,
+                        OldCharactersQuests = old,
+                    };
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Content] quests/tutorial.json is unreadable: {ex.Message}");
+                    return null;
                 }
             }
         }
