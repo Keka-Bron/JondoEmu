@@ -1717,20 +1717,16 @@
         {
           "message": 30857,
           "choices": [
+            { "reply": 37923, "next": 31400, "beforeQuest": 1966 },
+            { "reply": 37954, "quest": 1966, "completes": 14109, "params": [[30, 14109]], "next": 31421, "afterObjectives": [14106, 14107, 14108] },
             { "reply": 37264, "next": 30859, "completes": 13883, "params": [[30, 13883]] }
-          ]
-        },
-        {
-          "message": 31402,
-          "choices": [
-            { "reply": 37954, "startsQuest": 1966 }
           ]
         },
         {
           "message": 30859,
           "names": true,
           "choices": [
-            { "reply": 37954, "startsQuest": 1966 }
+            { "reply": 37923, "next": 31400, "beforeQuest": 1966 }
           ]
         },
         {
@@ -1738,9 +1734,40 @@
           "choices": [
             { "reply": 37265, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31400,
+          "choices": [
+            { "reply": 37924, "next": 31401 }
+          ]
+        },
+        {
+          "message": 31401,
+          "choices": [
+            { "reply": 37927, "next": 31402 }
+          ]
+        },
+        {
+          "message": 31402,
+          "choices": [
+            { "reply": 37925, "startsQuest": 1966, "params": [[34, 1966]] },
+            { "reply": 37926, "next": 31403 }
+          ]
+        },
+        {
+          "message": 31403,
+          "choices": [
+            { "reply": 37925, "startsQuest": 1966, "params": [[34, 1966]] }
+          ]
+        },
+        {
+          "message": 31421,
+          "choices": [
+            { "reply": 37953 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37264) is this class's objective (13883, effect 30), and leads to his greeting, 30859, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1966) is done, he greets the character with Archi's summons (30858) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37264) is this class's objective (13883, effect 30), and leads to his greeting, 30859, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1966) is done, he greets the character with Archi's summons (30858) and «Ir a la Torre del Consejo» hands it over. «Crime et châtiment» of Dofus pour les noobs: ready to meet his master (37923), the shadow behind all the Srams (31400), three things to steal first (31401), Ramón Santo's purse, a miliwauwau's bone and a cut diamond (31402, the line the step declares; 31403, the mastiff before Peluka's salon); the loot shown (14109, 31421) and the door."
     },
     {
       "npc": 4337,
@@ -8774,6 +8801,7 @@
         {
           "message": 31378,
           "choices": [
+            { "reply": 38021, "quest": 1966, "completes": 14122, "params": [[30, 14122]], "next": 31471 },
             { "reply": 38053, "quest": 1977, "completes": 14114, "params": [[30, 14114]], "next": 31495 },
             { "reply": 38052 }
           ]
@@ -8783,9 +8811,27 @@
           "choices": [
             { "reply": 38052 }
           ]
+        },
+        {
+          "message": 31471,
+          "choices": [
+            { "reply": 38020, "next": 31472 }
+          ]
+        },
+        {
+          "message": 31472,
+          "choices": [
+            { "reply": 38019, "next": 31473 }
+          ]
+        },
+        {
+          "message": 31473,
+          "choices": [
+            { "reply": 38018 }
+          ]
         }
       ],
-      "why": "Shani Sings, the jeweller of Astrub ([6,-15]), from her own lines and replies: her greeting (31378) and, by «Tel est pris qui croyait prendre», the rumour of the statue (14114): a waste of kamas, in her view (31495)."
+      "why": "Shani Sings, the jeweller of Astrub ([6,-15]), from her own lines and replies: her greeting (31378) and, by «Tel est pris qui croyait prendre», the rumour of the statue (14114): a waste of kamas, in her view (31495). «Crime et châtiment»: the fake diamond shown and complained of (14122, 31471), the new craftsman she gave rough diamonds to (31472), Kaba, about to travel (31473)."
     },
     {
       "npc": 4466,
@@ -9847,6 +9893,10 @@
         {
           "message": 5546,
           "choices": [
+            { "reply": 37935, "next": 31408, "quest": 1966, "beforeObjective": 14106 },
+            { "reply": 37929, "next": 31405, "quest": 1966, "beforeObjective": 14106 },
+            { "reply": 37931, "next": 31406, "quest": 1966, "beforeObjective": 14106 },
+            { "reply": 37933, "next": 31407, "quest": 1966, "beforeObjective": 14106 },
             { "reply": 36942, "quest": 1998, "completes": 13878, "params": [[30, 13878]], "next": 30606 },
             { "reply": 17172 }
           ]
@@ -9868,9 +9918,33 @@
           "choices": [
             { "reply": 36941 }
           ]
+        },
+        {
+          "message": 31408,
+          "choices": [
+            { "reply": 37934, "quest": 1966, "completes": 14106, "params": [[30, 14106]], "gives": 19729 }
+          ]
+        },
+        {
+          "message": 31405,
+          "choices": [
+            { "reply": 37930 }
+          ]
+        },
+        {
+          "message": 31406,
+          "choices": [
+            { "reply": 37932 }
+          ]
+        },
+        {
+          "message": 31407,
+          "choices": [
+            { "reply": 37930 }
+          ]
         }
       ],
-      "why": "Ramón Santo, the Bontarian merchant [5,-21], by «Qui sème le vent récolte l'Artempeth»: the parasites (13878), his network of producers (30606), Bonta's agriculture (30607), solutions already offered to the farmers (30608). His other quests' replies are not written yet."
+      "why": "Ramón Santo, the Bontarian merchant [5,-21], by «Qui sème le vent récolte l'Artempeth»: the parasites (13878), his network of producers (30606), Bonta's agriculture (30607), solutions already offered to the farmers (30608). His other quests' replies are not written yet. «Crime et châtiment»: a fake heart attack and clinging to him (31408), the purse lifted while whistling away (14106, item 19729); bowing, grabbing or pointing at a branch gets the character noticed (31405-31407)."
     },
     {
       "npc": 598,
@@ -11688,6 +11762,112 @@
         }
       ],
       "why": "«La fête de la chocopépite»: the chocolate breads' crates (37554), denial (31104), the crates shown (31105), put them back (31106), shadows closing in: the fight beside the wauwau (npc_fights.json, 14026); her cousins ruined by the Kanigs (31107), soup for their work (31108: 14028). «La fête de la chocopépite»: the chocolate breads' crates (37554), denial (31104), the crates shown (31105), put them back (31106), shadows closing in: the fight beside the wauwau (npc_fights.json, 14026); her cousins ruined by the Kanigs (31107), soup for their work (31108: 14028)."
+    },
+    {
+      "npc": 4454,
+      "map": 0,
+      "opening": 31409,
+      "lines": [
+        {
+          "message": 31409,
+          "choices": [
+            { "reply": 37938, "quest": 1966, "afterObjective": 14106, "beforeObjective": 14107 }
+          ]
+        }
+      ],
+      "why": "The miliwauwau guarding Peluka Diolobalgo's salon [2,-19], by «Crime et châtiment»: growling (31409), the bone before it grabbed: the fight (npc_fights.json), the bone its drop."
+    },
+    {
+      "npc": 4336,
+      "map": 0,
+      "opening": 31410,
+      "lines": [
+        {
+          "message": 31410,
+          "choices": [
+            { "reply": 37975, "quest": 1966, "completes": 14116, "params": [[30, 14116]], "next": 31433, "takesAll": [19729, 19730] },
+            { "reply": 38028, "quest": 1966, "completes": 14125, "params": [[30, 14125]], "next": 31477 },
+            { "reply": 37976, "next": 31438 }
+          ]
+        },
+        {
+          "message": 31433,
+          "names": true,
+          "choices": [
+            { "reply": 37974, "next": 31434 }
+          ]
+        },
+        {
+          "message": 31434,
+          "choices": [
+            { "reply": 37973, "next": 31435 }
+          ]
+        },
+        {
+          "message": 31435,
+          "choices": [
+            { "reply": 37972, "next": 31436 }
+          ]
+        },
+        {
+          "message": 31436,
+          "choices": [
+            { "reply": 37971, "next": 31437 }
+          ]
+        },
+        {
+          "message": 31437,
+          "choices": [
+            { "reply": 37970 }
+          ]
+        },
+        {
+          "message": 31477,
+          "choices": [
+            { "reply": 38027, "next": 31478 }
+          ]
+        },
+        {
+          "message": 31478,
+          "choices": [
+            { "reply": 38026 }
+          ]
+        },
+        {
+          "message": 31438,
+          "choices": []
+        }
+      ],
+      "why": "«Crime et châtiment»: the master of the Srams (31410), homage paid and the loot handed over (14116, 31433), a piece of glass (31434), somebody made it look like a diamond (31435), not Shani Sings (31436), pose as an angry customer (31437); the swindler paid dearly and the diamonds' box (14125, 31477), trust (31478); his portrait in the militia's tower (31438)."
+    },
+    {
+      "npc": 4453,
+      "map": 0,
+      "opening": 31474,
+      "lines": [
+        {
+          "message": 31474,
+          "choices": [
+            { "reply": 38023, "next": 31476, "quest": 1966, "afterObjective": 14122, "beforeObjective": 14124 },
+            { "reply": 38024, "next": 31475, "quest": 1966, "afterObjective": 14122, "beforeObjective": 14124 }
+          ]
+        },
+        {
+          "message": 31476,
+          "choices": [
+            { "reply": 38022, "quest": 1966, "completes": 14123, "params": [[30, 14123]] },
+            { "reply": 38022, "quest": 1966, "afterObjective": 14123, "beforeObjective": 14124 }
+          ]
+        },
+        {
+          "message": 31475,
+          "choices": [
+            { "reply": 38025, "quest": 1966, "completes": 14123, "params": [[30, 14123]] },
+            { "reply": 38025, "quest": 1966, "afterObjective": 14123, "beforeObjective": 14124 }
+          ]
+        }
+      ],
+      "why": "A hurried traveller at the coach stop [0,-18], by «Crime et châtiment»: the driver late (31474); a bag of gold for a certain Kaba (31476, «it's me!») or the militia's business (31475): the swindler attacked (14123; npc_fights.json), the box of diamonds his drop."
     }
   ]
 }

@@ -1282,6 +1282,39 @@
    "map": 191102980,
    "afterObjectives": [14023],
    "why": "«Sigue al wauwau guardián»: [3,-17], then [5,-17]."
+  },
+  {
+   "objective": 14106,
+   "quest": 1966,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Roba la bolsa de Ramón Santo»: the three thefts in any order, as Dofus pour les noobs lists them."
+  },
+  {
+   "objective": 14107,
+   "quest": 1966,
+   "kind": "beat",
+   "monster": 5286,
+   "map": 188744195,
+   "anyOrder": true,
+   "why": "«Roba el hueso de un miliwauwau»: the miliwauwau (5286) beaten, its bone dropped (19730)."
+  },
+  {
+   "objective": 14108,
+   "quest": 1966,
+   "elements": [{"map": 192939014, "element": 516002}],
+   "anyOrder": true,
+   "gives": [{"item": 19731, "count": 1}],
+   "why": "«Roba un diamante tallado en el taller de joyeros»: the bench full of gems upstairs (element 516002, cell 287)."
+  },
+  {
+   "objective": 14124,
+   "quest": 1966,
+   "kind": "beat",
+   "monster": 476,
+   "map": 189531147,
+   "afterObjectives": [14123],
+   "why": "«Vence a Kaba»: the swindler (476), whose drop is the box of diamonds (19737)."
   }
  ]
 }

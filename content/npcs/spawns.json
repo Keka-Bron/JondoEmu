@@ -1793,6 +1793,21 @@
       "orientation": 7,
       "criterion": "Qa=1965&Qo=14024&Qo!14028",
       "why": "The guard wauwau before Alba Surilla at [5,-17], once it has led the character there (14024). INFERRED cell."
+    },
+    {
+      "map": 188744195,
+      "npc": 4454,
+      "cell": 300,
+      "orientation": 1,
+      "why": "The mastiff Peluka keeps before her salon since the robbery (Jim Fleps, 31403). INFERRED cell."
+    },
+    {
+      "map": 189531147,
+      "npc": 4453,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1966&Qo=14122&Qo!14124",
+      "why": "Kaba as a hurried traveller waiting for the coach at [0,-18], once Shani has named him (14122). INFERRED cell."
     }
   ]
 }
