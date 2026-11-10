@@ -614,7 +614,7 @@
           ]
         }
       ],
-      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it. «La gran biblioteca» (Dofus pour les noobs): «¿Cómo puedo ayudarte en la investigación sobre el dragón?» and Oz Dralett (31246, 1988's line); the burnt book shown (13999, 31247), Neria asked (31248); the Mage of Zo (31240, 31241, 1989's line); the restoration in Primir's hands (14005), the parchment stolen by the rats (31250-31252, 1990's line; later «Puedo ir a cazar esas sucias ratas», 31254); the parchment shown (14008), Old Strubian, and Primir (31255, 31256). The new library and her past (31243-31245). «Légende d'automne»: Primir's book, Rathrosk the protector of Astrub for two centuries (31257); the sewers' parchment translated, the dragon's friendship with the knight of autumn, handed over (31258, 14010, 19691)."
+      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it. «La gran biblioteca» (Dofus pour les noobs): «¿Cómo puedo ayudarte en la investigación sobre el dragón?» and Oz Dralett (31246, 1988's line); the burnt book shown (13999, 31247), Neria asked (31248); the Mage of Zo (31240, 31241, 1989's line); the restoration in Primir's hands (14005), the parchment stolen by the rats (31250-31252, 1990's line; later «Puedo ir a cazar esas sucias ratas», 31254); the parchment shown (14008), Old Strubian, and Primir (31255, 31256). The new library and her past (31243-31245). «Légende d'automne»: Primir's book, Rathrosk the protector of Astrub for two centuries (31257); the sewers' parchment translated, the dragon's friendship with the knight of autumn, handed over (31258, 14010, 19691). «Légende d'automne»: Primir's book, Rathrosk the protector of Astrub for two centuries (31257); the sewers' parchment translated, the dragon's friendship with the knight of autumn, handed over (31258, 14010, 19691)."
     },
     {
       "npc": 4311,
@@ -892,13 +892,9 @@
           "message": 31261,
           "choices": [
             { "reply": 37829, "quest": 1991, "completes": 14075, "params": [[30, 14075]], "next": 31315 },
-            { "reply": 37962, "next": 31427 }
-          ]
-        },
-        {
-          "message": 31427,
-          "choices": [
-            { "reply": 37968, "startsQuest": 2008 }
+            { "reply": 37962, "next": 31422, "beforeQuest": 2008 },
+            { "reply": 37965, "next": 31428, "quest": 2008, "completesAll": [14177, 14176, 14146, 14147, 14148], "params": [[30, 14148]] },
+            { "reply": 37968, "next": 31430, "quest": 2008, "afterObjective": 14199 }
           ]
         },
         {
@@ -918,9 +914,72 @@
           "choices": [
             { "reply": 37826, "gives": 19705 }
           ]
+        },
+        {
+          "message": 31422,
+          "choices": [
+            { "reply": 37960, "next": 31423 },
+            { "reply": 37961 }
+          ]
+        },
+        {
+          "message": 31423,
+          "choices": [
+            { "reply": 37959, "next": 31424 }
+          ]
+        },
+        {
+          "message": 31424,
+          "choices": [
+            { "reply": 37958, "next": 31425 }
+          ]
+        },
+        {
+          "message": 31425,
+          "names": true,
+          "choices": [
+            { "reply": 37957, "next": 31426 }
+          ]
+        },
+        {
+          "message": 31426,
+          "choices": [
+            { "reply": 37956, "next": 31427 }
+          ]
+        },
+        {
+          "message": 31427,
+          "choices": [
+            { "reply": 37955, "startsQuest": 2008, "params": [[34, 2008]] }
+          ]
+        },
+        {
+          "message": 31428,
+          "names": true,
+          "choices": [
+            { "reply": 37964, "next": 31429, "gives": 19755 }
+          ]
+        },
+        {
+          "message": 31429,
+          "choices": [
+            { "reply": 37963, "gives": 19749 }
+          ]
+        },
+        {
+          "message": 31430,
+          "choices": [
+            { "reply": 37967, "next": 31431 }
+          ]
+        },
+        {
+          "message": 31431,
+          "choices": [
+            { "reply": 37966, "quest": 2008, "completes": 14192, "params": [[30, 14192]] }
+          ]
         }
       ],
-      "why": "«Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705)."
+      "why": "«Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Le repos est dans le champ»: spirits woken by the Trépamorts (31422), the holy water to call them and appease them (31423), magic powder and water (31424, 31425), the peaceful and the others (31426), sage, clover and nettles for the incense (31427); the ingredients given all at once (14177-14148), the water blessed (31428) and the censer lent (31429, 19755, 19749); back from the exorcisms (31430, 31431, 14192)."
     },
     {
       "npc": 4323,
@@ -7811,7 +7870,7 @@
           ]
         }
       ],
-      "why": "Rathrosk, the young dragon the móguices make work in the machine room. «Ça sent le gaz»: furious móguices, he does not want to go back to work (31048); the lock broken with the móguiz pickaxe, «Rathrosk, ha llegado la hora de salir de aquí.» frees him (13939, the pickaxe taken) and he follows the character (31049, the follower 19661). «Légende d'automne», at the knight of autumn's tomb [2,-10]: where the knight sleeps, too shy to speak to him (31313), the dead's voices and an old man who could help (31314, 14073); the urn buried, the autumn song heard (31307), the knight welcomed (31308), the town (31309), the necromancer and the jade sword (31310), the silver thread (31311) and a meeting to come (31312, 14082)."
+      "why": "Rathrosk, the young dragon the móguices make work in the machine room. «Ça sent le gaz»: furious móguices, he does not want to go back to work (31048); the lock broken with the móguiz pickaxe, «Rathrosk, ha llegado la hora de salir de aquí.» frees him (13939, the pickaxe taken) and he follows the character (31049, the follower 19661). «Légende d'automne», at the knight of autumn's tomb [2,-10]: where the knight sleeps, too shy to speak to him (31313), the dead's voices and an old man who could help (31314, 14073); the urn buried, the autumn song heard (31307), the knight welcomed (31308), the town (31309), the necromancer and the jade sword (31310), the silver thread (31311) and a meeting to come (31312, 14082). «Légende d'automne», at the knight of autumn's tomb [2,-10]: where the knight sleeps, too shy to speak to him (31313), the dead's voices and an old man who could help (31314, 14073); the urn buried, the autumn song heard (31307), the knight welcomed (31308), the town (31309), the necromancer and the jade sword (31310), the silver thread (31311) and a meeting to come (31312, 14082)."
     },
     {
       "npc": 4421,
@@ -9601,6 +9660,110 @@
         }
       ],
       "why": "A ruffian of Cania at Vangey's cart, by «Le rebelle de la forêt»: «¿Las bolsas o la vida?»; cutting their purses is the fight, four ruffians against the character and Vangey (npc_fights.json)."
+    },
+    {
+      "npc": 4383,
+      "map": 0,
+      "opening": 30605,
+      "lines": [
+        {
+          "message": 30605,
+          "choices": [
+            { "reply": 36940, "quest": 2008, "completes": 14193, "params": [[30, 14193]] }
+          ]
+        }
+      ],
+      "why": "Juan Arkía, the first spirit of Astrub's cemetery [0,-14], by «Le repos est dans le champ»: called up by the holy water, condolences and the incense (14193)."
+    },
+    {
+      "npc": 4384,
+      "map": 0,
+      "opening": 31417,
+      "lines": [
+        {
+          "message": 31417,
+          "choices": [
+            { "reply": 37949, "next": 31419, "quest": 2008, "afterObjective": 14188, "beforeObjective": 14194 },
+            { "reply": 37952, "next": 31420, "quest": 2008, "afterObjective": 14186 }
+          ]
+        },
+        {
+          "message": 31419,
+          "choices": [
+            { "reply": 37950, "next": 31418 }
+          ]
+        },
+        {
+          "message": 31418,
+          "choices": [
+            { "reply": 37948, "quest": 2008, "completes": 14194, "params": [[30, 14194]] }
+          ]
+        },
+        {
+          "message": 31420,
+          "names": true,
+          "choices": [
+            { "reply": 37951, "quest": 2008, "completes": 14187, "params": [[30, 14187]] }
+          ]
+        }
+      ],
+      "why": "Guy Elotro, the second spirit [-1,-11], by «Le repos est dans le champ»: sent back to the spirits' world, but the other Guy never visits his tomb (31419, 31418, 14194); told he will (31420, 14187)."
+    },
+    {
+      "npc": 4385,
+      "map": 0,
+      "opening": 30611,
+      "lines": [
+        {
+          "message": 30611,
+          "choices": [
+            { "reply": 36950, "next": 30612, "quest": 2008, "afterObjective": 14194 }
+          ]
+        },
+        {
+          "message": 30612,
+          "choices": [
+            { "reply": 36949, "next": 30613 }
+          ]
+        },
+        {
+          "message": 30613,
+          "choices": [
+            { "reply": 36948, "quest": 2008, "completes": 14186, "params": [[30, 14186]] }
+          ]
+        }
+      ],
+      "why": "Guy Ivolví by Astrub's pond [1,-20], by «Le repos est dans le champ»: but he is Guy (30612); Guy Elotro, whose tomb he has not visited for so long, he will go soon (30613, 14186)."
+    },
+    {
+      "npc": 4386,
+      "map": 0,
+      "opening": 30614,
+      "openings": [
+        { "quest": 2008, "objective": 14191, "pending": 14199, "message": 30615 }
+      ],
+      "lines": [
+        {
+          "message": 30614,
+          "choices": [
+            { "reply": 36951, "params": [905], "quest": 2008, "completes": 14195, "afterObjective": 14190 },
+            { "reply": 36952 }
+          ]
+        },
+        {
+          "message": 30615,
+          "choices": [
+            { "reply": 36954, "next": 30616 }
+          ]
+        },
+        {
+          "message": 30616,
+          "choices": [
+            { "reply": 36953, "quest": 2008, "completes": 14199, "params": [[30, 14199]] }
+          ]
+        }
+      ],
+      "why": "Klaus Konbah, the third spirit [-3,-9], by «Le repos est dans le champ»: no peaceful ghost, skeletons out of the ground (30614): the fight against him and five chafers (npc_fights.json, 14195); after it, sorry for his fury (30615, 30616), a last blow and the incense (14199)."
     }
   ]
 }

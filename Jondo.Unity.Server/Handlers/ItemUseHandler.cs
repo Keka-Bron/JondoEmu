@@ -71,15 +71,32 @@ namespace Jondo.Unity.Server.Handlers
 
             // A quest item whose use is an objective (effect 30): the signalling fairy of «Aquí
             // huele a gas» makes its noise in the mine (13995) and is gone.
-            var objectiveEffects = DatabaseManager.GetItemEffectsData(
-                DatabaseManager.GetItemTemplatePossibleEffects(item.Template))
+            var itemEffects = DatabaseManager.GetItemEffectsData(
+                DatabaseManager.GetItemTemplatePossibleEffects(item.Template));
+            var objectiveEffects = itemEffects
                 .Where(e => e.EffectId == ReadingItemHandler.ObjectiveEffect && e.Value != 0).ToList();
             if (objectiveEffects.Count > 0)
             {
+                // Its own condition first: Nistracolamus' holy waters of «Eterno descanso» call
+                // their spirit out only on its map («Qo=14181&Pm=190842368»).
+                if (!await CriterionHoldsAsync(stream, item)) return;
                 bool any = false;
                 foreach (var effect in objectiveEffects)
                     any |= await Quests.CompleteByReplyAsync(stream, 0, effect.Value);
-                if (any) await Equipment.TakeAsync(stream, item.Template, 1);
+                if (any)
+                {
+                    await Equipment.TakeAsync(stream, item.Template, 1);
+                    // And what it turns into, «Gana x#2 #3» (209): the next spirit's holy water, the
+                    // sacred urn filled.
+                    foreach (var gain in itemEffects.Where(e => e.EffectId == BonusItemHandler.GainItems && e.Value > 0))
+                    {
+                        int count = Math.Max(1, gain.DiceSide);
+                        if (!await WorkshopHandler.GiveAsync(stream, gain.Value, count)) continue;
+                        await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                            ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained,
+                                count.ToString(), gain.Value.ToString())));
+                    }
+                }
                 return;
             }
 
@@ -210,7 +227,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static async Task<bool> CriterionHoldsAsync(NetworkStream stream, Equipment.Item item)
         {
-            string criterion = DatabaseManager.GetItemTemplateCriterion(item.Template);
+            string criterion = ObjectivesAsTheClientMeansThem(DatabaseManager.GetItemTemplateCriterion(item.Template));
             if (ItemCriteria.Holds(criterion)) return true;
 
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
@@ -218,6 +235,19 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Items] {SessionContext.State.CharacterName} cannot use item {item.Template}: «{criterion}».");
             return false;
         }
+
+        /// <summary>
+        /// An item's own criterion, from the client's data, in the reading <see cref="ItemCriteria"/>
+        /// gives the written ones: the client's «Qo=X» is objective X still to do -- Nistracolamus'
+        /// holy water «Qo=14181&amp;Pm=190842368», usable while 14181 is in hand --, where a written
+        /// «Qo=X» is X done. So the two signs swap; that the objective is the one in hand is checked
+        /// when it is marked.
+        /// </summary>
+        internal static string ObjectivesAsTheClientMeansThem(string criterion)
+            => string.IsNullOrEmpty(criterion)
+                ? criterion
+                : System.Text.RegularExpressions.Regex.Replace(criterion, @"(?<=^|[&|(])Qo([=!])(?=\d)",
+                    m => m.Groups[1].Value == "=" ? "Qo!" : "Qo=");
 
         /// <summary>
         /// The bag's weight (iun), for whoever spent with <c>weigh: false</c> to put something in

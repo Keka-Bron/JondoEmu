@@ -92,6 +92,10 @@ namespace Jondo.Unity.Server.Handlers
                     // it did not. Type 14 is the one that adds up across fights.
                     if (objective.InOneFight && killed < objective.Needed) continue;
 
+                    // Not while something else of its step comes first -- a holy water to use, an
+                    // item to hand over --: fights side by side, and talks, do not hold it back.
+                    if (BehindOtherWork(step, objective, run)) continue;
+
                     await Quests.TickAsync(stream, run.QuestId, objective.Id, killed);
                 }
 
@@ -116,6 +120,22 @@ namespace Jondo.Unity.Server.Handlers
                     await Quests.TickAsync(stream, run.QuestId, objective.Id);
                 }
             }
+        }
+
+        /// <summary>
+        /// Whether a fight objective still has, before it in its step, something pending that is
+        /// neither a talk nor another fight: Klaus Konbah beaten before his holy water was used.
+        /// </summary>
+        internal static bool BehindOtherWork(QuestStep step, QuestObjective objective, QuestRun run)
+        {
+            foreach (var before in step.Objectives)
+            {
+                if (before.Id == objective.Id) return false;
+                if (run.Done.Contains(before.Id)) continue;
+                if (before.TypeId == QuestCatalogue.GoToSee || before.MonsterId != 0) continue;
+                return true;
+            }
+            return false;
         }
 
         /// <summary>Whether both maps are rooms of the same dungeon (or the same map).</summary>

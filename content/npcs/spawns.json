@@ -1295,30 +1295,6 @@
       "why": "The Artempeth rose in Erty's cellar, from when he sends the character for his notebook (13874) until beaten (13876). INFERRED cell, the middle of the cellar."
     },
     {
-      "map": 192414726,
-      "npc": 4443,
-      "cell": 370,
-      "orientation": 1,
-      "criterion": "Qo=13942&(Qa!1991|Qo!14068)",
-      "why": "Rathrosk in the Council's room, as since «Paseo por el bosque» (13942), except while he follows the character to the cemetery in «Légende d'automne» (14068 until the quest ends)."
-    },
-    {
-      "map": 190843396,
-      "npc": 4418,
-      "cell": 276,
-      "orientation": 5,
-      "criterion": "Qa=1991&Qo=14071",
-      "why": "Rathrosk at the knight of autumn's tomb [2,-10] from when he flees there (14071) until the quest ends. INFERRED cell, beside the tomb."
-    },
-    {
-      "map": 190842370,
-      "npc": 4446,
-      "cell": 328,
-      "orientation": 1,
-      "criterion": "Qa=1991&Qo=14076&Qo!14077",
-      "why": "A Purple Dawn spectre at [0,-12] while the relic is to be won. INFERRED cell."
-    },
-    {
       "map": 189661710,
       "npc": 4456,
       "cell": 300,
@@ -1348,6 +1324,61 @@
       "orientation": 7,
       "criterion": "Qa=1987&Qo=14137&Qo!14138",
       "why": "A ruffian of Cania at the cart, from the ambush (14137) until beaten (14138). INFERRED cell."
+    },
+    {
+      "map": 192414726,
+      "npc": 4443,
+      "cell": 370,
+      "orientation": 1,
+      "criterion": "Qo=13942&(Qa!1991|Qo!14068)",
+      "why": "Rathrosk in the Council's room, as since «Paseo por el bosque» (13942), except while he follows the character to the cemetery in «Légende d'automne» (14068 until the quest ends)."
+    },
+    {
+      "map": 190843396,
+      "npc": 4418,
+      "cell": 276,
+      "orientation": 5,
+      "criterion": "Qa=1991&Qo=14071",
+      "why": "Rathrosk at the knight of autumn's tomb [2,-10] from when he flees there (14071) until the quest ends. INFERRED cell, beside the tomb."
+    },
+    {
+      "map": 190842370,
+      "npc": 4446,
+      "cell": 328,
+      "orientation": 1,
+      "criterion": "Qa=1991&Qo=14076&Qo!14077",
+      "why": "A Purple Dawn spectre at [0,-12] while the relic is to be won. INFERRED cell."
+    },
+    {
+      "map": 190842368,
+      "npc": 4383,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=2008&Qo=14181&Qo!14193",
+      "why": "Juan Arkía's spirit at [0,-14] from the holy water (14181) until incensed (14193). INFERRED cell."
+    },
+    {
+      "map": 190841859,
+      "npc": 4384,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=2008&Qo=14188&Qo!14187",
+      "why": "Guy Elotro's spirit at [-1,-11] from the holy water (14188) until laid to rest (14187). INFERRED cell."
+    },
+    {
+      "map": 190840837,
+      "npc": 4386,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=2008&Qo=14190&Qo!14199",
+      "why": "Klaus Konbah's spirit at [-3,-9] from the holy water (14190) until incensed (14199). INFERRED cell."
+    },
+    {
+      "map": 188743682,
+      "npc": 4385,
+      "cell": 275,
+      "orientation": 1,
+      "why": "Guy Ivolví by Astrub's pond [1,-20] (Dofus pour les noobs: «[1,-20] Guy Al'Eudroi»). INFERRED cell."
     }
   ]
 }

@@ -1089,6 +1089,22 @@ namespace Jondo.Unity.Server.Handlers
             var npcFight = NpcFights.For(SessionContext.State.OpenDialogueNpcId, talkedOn, reply);
             if (npcFight != null)
             {
+                // Only a reply this character is offered: Klaus Konbah's fight of «Eterno descanso»
+                // started from a reply sent by hand before the holy water had called him up.
+                var fightLine = NpcDialogues.For(SessionContext.State.OpenDialogueNpcId,
+                                                 SessionContext.State.OpenDialogueMapId)
+                                            ?.Line(SessionContext.State.OpenDialogueMessage);
+                var fightChoice = fightLine?.Choice(reply, SeLeOfrece);
+                if (fightChoice != null && !SeLeOfrece(fightChoice))
+                {
+                    Console.WriteLine($"[NPC] Fight reply {reply} is not offered on line {fightLine!.Message} to this character; ignored.");
+                    await CloseAsync(stream);
+                    return;
+                }
+                // And what the reply does besides, before the fight takes the character away: «Ve a
+                // ver a Klaus Konbah» is done by choosing to defend oneself.
+                if (fightChoice != null && fightChoice.Completes != 0)
+                    await Managers.Quests.CompleteByReplyAsync(stream, fightChoice.Quest, fightChoice.Completes);
                 CerrarConversacion();
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(ConnectionProtocol.NpcDialogCloseReason)));

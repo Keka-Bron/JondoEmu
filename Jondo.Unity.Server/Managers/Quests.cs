@@ -858,6 +858,10 @@ namespace Jondo.Unity.Server.Managers
                 if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) return false;
                 if (!await UsedWithWhatItTakesAsync(stream, objectiveId)) return false;
                 await TickAsync(stream, questId, objectiveId);
+                // Whoever the use brings out: the spirit the holy water calls up.
+                var used = Bindings.Of(objectiveId);
+                if (used != null && used.Kind == QuestBindingKind.Use && used.ShowsNpc != 0)
+                    await Handlers.NpcHandler.ComesInAsync(stream, used.ShowsNpc);
                 return true;
             }
             return false;
