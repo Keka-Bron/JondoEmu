@@ -169,6 +169,26 @@ namespace Jondo.Unity.Server.Network
             return Bien(DialogueNow(session, lines));
         }
 
+        /// <summary>
+        /// { item }: an item of the bag used as its double click uses it (iuu with its uid), found by
+        /// template: a quest item whose use is an objective, the sacred urn of «Leyenda del otoño».
+        /// </summary>
+        private static Respuesta TestUseItem(string cuerpo)
+        {
+            var session = TestSessionOnline();
+            if (session == null) return Mal(404, "offline");
+            int template = (int)Numero(cuerpo, "item");
+            long uid = 0;
+            var lines = RunInSession(session, async stream =>
+            {
+                uid = Managers.Equipment.All.FirstOrDefault(i => i.Template == template && i.Quantity > 0)?.Uid ?? 0;
+                if (uid != 0)
+                    await ItemUseHandler.UseAsync(stream, ClientFrame(Op.Iuu, Pb.New().Var(3, uid).Build()));
+            });
+            if (uid == 0) return Mal(404, $"item {template} not carried");
+            return Bien(new { item = template, uid, lines = lines.Select(l => l.Length > 220 ? l[..220] : l).ToList() });
+        }
+
         /// <summary>{ element, skill }: an interactive used (iwo), with the skill instance the map gives it when none is named.</summary>
         private static Respuesta TestUse(string cuerpo)
         {

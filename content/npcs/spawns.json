@@ -841,14 +841,6 @@
       "why": "Rathrosk at the móguices' machine, until he leaves the room with the character (13940). INFERRED: the middle of the machine room."
     },
     {
-      "map": 192414726,
-      "npc": 4443,
-      "cell": 370,
-      "orientation": 3,
-      "criterion": "Qo=13942",
-      "why": "Rathrosk as a squirrel in the council chamber, once the character has brought him there (13942, «Aquí huele a gas»). The cell is the derived layer's."
-    },
-    {
       "map": 101717512,
       "npc": 4414,
       "cell": 302,
@@ -1301,6 +1293,30 @@
       "orientation": 3,
       "criterion": "Qa=1998&Qo=13874&Qo!13876",
       "why": "The Artempeth rose in Erty's cellar, from when he sends the character for his notebook (13874) until beaten (13876). INFERRED cell, the middle of the cellar."
+    },
+    {
+      "map": 192414726,
+      "npc": 4443,
+      "cell": 370,
+      "orientation": 1,
+      "criterion": "Qo=13942&(Qa!1991|Qo!14068)",
+      "why": "Rathrosk in the Council's room, as since «Paseo por el bosque» (13942), except while he follows the character to the cemetery in «Légende d'automne» (14068 until the quest ends)."
+    },
+    {
+      "map": 190843396,
+      "npc": 4418,
+      "cell": 276,
+      "orientation": 5,
+      "criterion": "Qa=1991&Qo=14071",
+      "why": "Rathrosk at the knight of autumn's tomb [2,-10] from when he flees there (14071) until the quest ends. INFERRED cell, beside the tomb."
+    },
+    {
+      "map": 190842370,
+      "npc": 4446,
+      "cell": 328,
+      "orientation": 1,
+      "criterion": "Qa=1991&Qo=14076&Qo!14077",
+      "why": "A Purple Dawn spectre at [0,-12] while the relic is to be won. INFERRED cell."
     }
   ]
 }

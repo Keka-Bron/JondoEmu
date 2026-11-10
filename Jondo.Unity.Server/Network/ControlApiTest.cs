@@ -97,6 +97,7 @@ namespace Jondo.Unity.Server.Network
                 "reply" => TestReply(cuerpo),
                 "close" => TestCloseDialogue(),
                 "use" => TestUse(cuerpo),
+                "useitem" => TestUseItem(cuerpo),
                 "goto" => TestGoto(cuerpo),
                 "give" => TestGive(cuerpo),
                 "quests" => TestQuests(),

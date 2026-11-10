@@ -471,6 +471,7 @@
             { "reply": 37750, "quest": 1989, "completes": 14005, "params": [[30, 14005]], "next": 31250, "afterObjective": 14004 },
             { "reply": 37753, "next": 31254, "quest": 1989, "afterQuest": true, "beforeQuest": 1990 },
             { "reply": 37756, "quest": 1990, "completes": 14008, "params": [[30, 14008]], "next": 31255, "afterObjective": 14007 },
+            { "reply": 37758, "next": 31257, "quest": 1991, "afterObjective": 14069, "beforeObjective": 14010 },
             { "reply": 37738, "next": 31243 },
             { "reply": 37735 }
           ]
@@ -590,9 +591,21 @@
           "choices": [
             { "reply": 37735 }
           ]
+        },
+        {
+          "message": 31257,
+          "choices": [
+            { "reply": 37757, "next": 31258 }
+          ]
+        },
+        {
+          "message": 31258,
+          "choices": [
+            { "reply": 37759, "quest": 1991, "completes": 14010, "params": [[30, 14010]], "gives": 19691 }
+          ]
         }
       ],
-      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it. «La gran biblioteca» (Dofus pour les noobs): «¿Cómo puedo ayudarte en la investigación sobre el dragón?» and Oz Dralett (31246, 1988's line); the burnt book shown (13999, 31247), Neria asked (31248); the Mage of Zo (31240, 31241, 1989's line); the restoration in Primir's hands (14005), the parchment stolen by the rats (31250-31252, 1990's line; later «Puedo ir a cazar esas sucias ratas», 31254); the parchment shown (14008), Old Strubian, and Primir (31255, 31256). The new library and her past (31243-31245)."
+      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks). «Ça tombe à l'eau»: «Hablar de la estafa de la que cree ser víctima» (13964): books that fall to pieces (30926), and «Volverte hacia el forastero», Nosbro Mah, who comes in as she says it. «La gran biblioteca» (Dofus pour les noobs): «¿Cómo puedo ayudarte en la investigación sobre el dragón?» and Oz Dralett (31246, 1988's line); the burnt book shown (13999, 31247), Neria asked (31248); the Mage of Zo (31240, 31241, 1989's line); the restoration in Primir's hands (14005), the parchment stolen by the rats (31250-31252, 1990's line; later «Puedo ir a cazar esas sucias ratas», 31254); the parchment shown (14008), Old Strubian, and Primir (31255, 31256). The new library and her past (31243-31245). «Légende d'automne»: Primir's book, Rathrosk the protector of Astrub for two centuries (31257); the sewers' parchment translated, the dragon's friendship with the knight of autumn, handed over (31258, 14010, 19691)."
     },
     {
       "npc": 4311,
@@ -869,22 +882,36 @@
         {
           "message": 31261,
           "choices": [
-            {
-              "reply": 37962,
-              "next": 31427
-            }
+            { "reply": 37829, "quest": 1991, "completes": 14075, "params": [[30, 14075]], "next": 31315 },
+            { "reply": 37962, "next": 31427 }
           ]
         },
         {
           "message": 31427,
           "choices": [
-            {
-              "reply": 37968,
-              "startsQuest": 2008
-            }
+            { "reply": 37968, "startsQuest": 2008 }
+          ]
+        },
+        {
+          "message": 31315,
+          "choices": [
+            { "reply": 37828, "next": 31316 }
+          ]
+        },
+        {
+          "message": 31316,
+          "choices": [
+            { "reply": 37827, "next": 31317 }
+          ]
+        },
+        {
+          "message": 31317,
+          "choices": [
+            { "reply": 37826, "gives": 19705 }
           ]
         }
-      ]
+      ],
+      "why": "«Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705)."
     },
     {
       "npc": 4323,
@@ -7694,7 +7721,9 @@
       "opening": 31046,
       "openings": [
         { "quest": 1960, "objective": 13938, "pending": 13939, "message": 31048 },
-        { "quest": 1960, "objective": 13939, "message": 31047 }
+        { "quest": 1960, "objective": 13939, "message": 31047 },
+        { "quest": 1991, "objective": 14072, "pending": 14081, "message": 31313 },
+        { "quest": 1991, "objective": 14081, "pending": 14082, "message": 31307 }
       ],
       "lines": [
         {
@@ -7720,9 +7749,58 @@
           "choices": [
             { "reply": 37487 }
           ]
+        },
+        {
+          "message": 31313,
+          "choices": [
+            { "reply": 37824, "next": 31314 }
+          ]
+        },
+        {
+          "message": 31314,
+          "choices": [
+            { "reply": 37823, "quest": 1991, "completes": 14073, "params": [[30, 14073]] },
+            { "reply": 37823, "quest": 1991, "afterObjective": 14073 }
+          ]
+        },
+        {
+          "message": 31307,
+          "choices": [
+            { "reply": 37820, "next": 31308 }
+          ]
+        },
+        {
+          "message": 31308,
+          "choices": [
+            { "reply": 37822, "next": 31309 }
+          ]
+        },
+        {
+          "message": 31309,
+          "choices": [
+            { "reply": 37821, "next": 31310 }
+          ]
+        },
+        {
+          "message": 31310,
+          "choices": [
+            { "reply": 37819, "next": 31311 }
+          ]
+        },
+        {
+          "message": 31311,
+          "choices": [
+            { "reply": 37818, "next": 31312 }
+          ]
+        },
+        {
+          "message": 31312,
+          "choices": [
+            { "reply": 37817, "quest": 1991, "completes": 14082, "params": [[30, 14082]] }
+          ]
         }
       ],
-      "why": "Rathrosk, the young dragon the móguices make work in the machine room. «Ça sent le gaz»: furious móguices, he does not want to go back to work (31048); the lock broken with the móguiz pickaxe, «Rathrosk, ha llegado la hora de salir de aquí.» frees him (13939, the pickaxe taken) and he follows the character (31049, the follower 19661)."
+      "why": "Rathrosk, the young dragon the móguices make work in the machine room. «Ça sent le gaz»: furious móguices, he does not want to go back to work (31048); the lock broken with the móguiz pickaxe, «Rathrosk, ha llegado la hora de salir de aquí.» frees him (13939, the pickaxe taken) and he follows the character (31049, the follower 19661). «Légende d'automne», at the knight of autumn's tomb [2,-10]: where the knight sleeps, too shy to speak to him (31313), the dead's voices and an old man who could help (31314, 14073); the urn buried, the autumn song heard (31307), the knight welcomed (31308), the town (31309), the necromancer and the jade sword (31310), the silver thread (31311) and a meeting to come (31312, 14082)."
     },
     {
       "npc": 4421,
@@ -9099,6 +9177,64 @@
         }
       ],
       "why": "The Artempeth rose in Erty's cellar [1,-21]: «Hacer como si fueras un horticultor» is the fight against it, alone (npc_fights.json); its flower (19655) comes out of the client's loot row."
+    },
+    {
+      "npc": 4443,
+      "map": 0,
+      "opening": 31266,
+      "lines": [
+        {
+          "message": 31266,
+          "choices": [
+            { "reply": 37816, "next": 31302, "quest": 1991, "afterObjective": 14011 }
+          ]
+        },
+        {
+          "message": 31302,
+          "choices": [
+            { "reply": 37815, "next": 31303 }
+          ]
+        },
+        {
+          "message": 31303,
+          "choices": [
+            { "reply": 37814, "next": 31304 }
+          ]
+        },
+        {
+          "message": 31304,
+          "choices": [
+            { "reply": 37813, "next": 31305 }
+          ]
+        },
+        {
+          "message": 31305,
+          "choices": [
+            { "reply": 37812, "next": 31306 }
+          ]
+        },
+        {
+          "message": 31306,
+          "choices": [
+            { "reply": 37811, "quest": 1991, "completes": 14068, "params": [[30, 14068]] }
+          ]
+        }
+      ],
+      "why": "Rathrosk in the Council's room [4,-19], by «Légende d'automne»: his past (31266, 31302), the knight with the golden and ruby sword and the leafy shield (31303), whom he cannot remember and would like to speak to (31304), asleep underground (31305): he follows, a squirrel (31306), to the Field of Rest (14068)."
+    },
+    {
+      "npc": 4446,
+      "map": 190842370,
+      "opening": 31325,
+      "lines": [
+        {
+          "message": 31325,
+          "choices": [
+            { "reply": 37836, "params": [905], "quest": 1991, "afterObjective": 14076 }
+          ]
+        }
+      ],
+      "why": "A Purple Dawn spectre in Astrub's cemetery [0,-12], by «Légende d'automne»: «parlez au Spectre de l'Aurore Pourpre pour les combattre»; the fight is in npc_fights.json and the relic (19703) comes out of the client's loot row while the objective is in hand."
     }
   ]
 }

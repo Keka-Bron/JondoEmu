@@ -65,6 +65,14 @@ namespace Jondo.Unity.World.Quests
         /// veterano» is done when Noken gets to wishing the character luck, not on «hello».
         /// </summary>
         Reply,
+
+        /// <summary>
+        /// An item of the bag used, the one whose effect 30 validates the objective, with what
+        /// <see cref="QuestBinding.Requires"/> carried (and spent, if it says so): the sacred urn of
+        /// «Leyenda del otoño» fills only with the crypt's earth, the spectre's relic and three
+        /// gargoyle belts, which go into it.
+        /// </summary>
+        Use,
     }
 
     /// <summary>
@@ -444,6 +452,7 @@ namespace Jondo.Unity.World.Quests
                 "gather" => QuestBindingKind.Gather,
                 "read" => QuestBindingKind.Read,
                 "reply" => QuestBindingKind.Reply,
+                "use" => QuestBindingKind.Use,
                 _ => QuestBindingKind.Click,
             };
         }

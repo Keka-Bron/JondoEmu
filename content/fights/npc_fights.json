@@ -93,6 +93,8 @@
     { "npc": 4465, "map": 192676864, "reply": 38192,
       "monsters": [ { "monster": 5296, "grade": 0 }, { "monster": 5296, "grade": 0 }, { "monster": 5296, "grade": 0 } ] },
     { "npc": 598, "map": 192676868, "reply": 12967,
-      "monsters": [ { "monster": 482, "grade": 0 } ] }
+      "monsters": [ { "monster": 482, "grade": 0 } ] },
+    { "npc": 4446, "map": 190842370, "reply": 37836,
+      "monsters": [ { "monster": 5268, "grade": 0 }, { "monster": 5268, "grade": 0 } ] }
   ]
 }

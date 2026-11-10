@@ -778,6 +778,63 @@
    "requires": [{"item": 19654, "count": 1}],
    "afterObjectives": [13871],
    "why": "«Utiliza el vermicida en el granero»: the bag of oranges of the granary [6,-23] (element 515876)."
+  },
+  {
+   "objective": 14071,
+   "quest": 1991,
+   "kind": "enter",
+   "map": 190841856,
+   "afterObjectives": [14068],
+   "why": "«Escolta al dragón hasta el cementerio de Astrub»: the cemetery's gate [-1,-14], Rathrosk following; «à peine arrivé sur la map, le dragon s'enfuit vers le sud-est»."
+  },
+  {
+   "objective": 14072,
+   "quest": 1991,
+   "kind": "enter",
+   "map": 190843396,
+   "afterObjectives": [14071],
+   "why": "«Reúnete con Rathrosk en la parte sudeste del cementerio»: [2,-10], down from [2,-11] by its bottom edge, where he has found the knight's tomb."
+  },
+  {
+   "objective": 14074,
+   "quest": 1991,
+   "kind": "enter",
+   "map": 190843392,
+   "afterObjectives": [14073],
+   "why": "«Encuentra al anciano cerca del pájaro de fuego»: Nistracolamus by the phoenix [2,-14]."
+  },
+  {
+   "objective": 14076,
+   "quest": 1991,
+   "elements": [{"map": 190842372, "element": 515993}],
+   "afterObjectives": [14075],
+   "gives": [{"item": 19702, "count": 1}],
+   "why": "«Recoge tierra cerca de la cripta de Brutas»: the bench before the crypt [0,-10] (element 515993, cell 316); «cliquez sur le banc devant la crypte»."
+  },
+  {
+   "objective": 14077,
+   "quest": 1991,
+   "kind": "beat",
+   "monster": 5268,
+   "map": 190842370,
+   "afterObjectives": [14076],
+   "why": "«Consigue una reliquia luchando contra espectros de la Aurora Púrpura»: the spectres of [0,-12], whose loot holds the relic while this is in hand."
+  },
+  {
+   "objective": 14078,
+   "quest": 1991,
+   "kind": "use",
+   "afterObjectives": [14077],
+   "requires": [{"item": 19702, "count": 1}, {"item": 19703, "count": 1}, {"item": 19704, "count": 3}],
+   "spends": true,
+   "why": "«Arranca 3 cinturones a las gárgrolas y colócalos en la urna con la tierra y la reliquia»: the sacred urn used (its effect 30 is this objective) with the earth, the relic and three belts, which go into it; «double-cliquez sur l'Urne sacrée pour faire le mélange»."
+  },
+  {
+   "objective": 14081,
+   "quest": 1991,
+   "elements": [{"map": 190843396, "element": 515994}, {"map": 190843396, "element": 517917}],
+   "afterObjectives": [14078],
+   "why": "«Entierra la urna cerca de la tumba del caballero del otoño»: the tomb [2,-10] (elements 515994 and 517917, cells 261 and 262); «cliquez sur la tombe»."
   }
  ]
 }

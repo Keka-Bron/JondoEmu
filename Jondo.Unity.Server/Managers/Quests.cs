@@ -856,10 +856,37 @@ namespace Jondo.Unity.Server.Managers
                 if (!Revealed(step, objective, run)) return false;
                 if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) return false;
                 if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) return false;
+                if (!await UsedWithWhatItTakesAsync(stream, objectiveId)) return false;
                 await TickAsync(stream, questId, objectiveId);
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// What a «use» binding asks to be carried when its item is used, checked and -- when it
+        /// says so -- spent (<see cref="QuestBindingKind.Use"/>). True when the objective has no
+        /// such binding.
+        /// </summary>
+        private static async Task<bool> UsedWithWhatItTakesAsync(NetworkStream stream, int objectiveId)
+        {
+            var binding = Bindings.Of(objectiveId);
+            if (binding == null || binding.Kind != QuestBindingKind.Use) return true;
+            foreach (var (item, count) in binding.Requires)
+            {
+                if (Equipment.HowMany(item) >= count) continue;
+                Console.WriteLine($"[Quests] Objective {objectiveId} asks for {count}x{item} and it is not being carried.");
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                        InfoMessages.Warning, InfoMessages.MissingItem)));
+                return false;
+            }
+            if (binding.SpendsRequired)
+            {
+                foreach (var (item, count) in binding.Requires)
+                    await Equipment.TakeAsync(stream, item, count);
+            }
+            return true;
         }
 
         /// <summary>
