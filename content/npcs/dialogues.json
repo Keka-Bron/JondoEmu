@@ -732,6 +732,7 @@
         {
           "message": 30380,
           "choices": [
+            { "reply": 37503, "quest": 1962, "completes": 13949, "params": [[30, 13949]], "next": 31063, "afterObjective": 13948 },
             { "reply": 37062, "quest": 1959, "completes": 13855, "params": [[30, 13855]], "next": 30696, "afterObjective": 13854 },
             { "reply": 36644, "next": 30382 },
             { "reply": 36637, "next": 30391 }
@@ -766,9 +767,27 @@
           "choices": [
             { "reply": 37059 }
           ]
+        },
+        {
+          "message": 31063,
+          "choices": [
+            { "reply": 37502, "next": 31064 }
+          ]
+        },
+        {
+          "message": 31064,
+          "choices": [
+            { "reply": 37501, "next": 31065 }
+          ]
+        },
+        {
+          "message": 31065,
+          "choices": [
+            { "reply": 37500 }
+          ]
         }
       ],
-      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698)."
+      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065)."
     },
     {
       "npc": 4324,
@@ -6674,6 +6693,8 @@
           "choices": [
             { "reply": 37077, "next": 30710, "quest": 1960, "afterObjective": 13898, "beforeObjective": 13901 },
             { "reply": 37391, "quest": 1960, "completes": 13943, "params": [[30, 13943]], "next": 30961, "afterObjective": 13942, "takes": 19661 },
+            { "reply": 37509, "quest": 1962, "completes": 13950, "params": [[30, 13950]], "next": 31066, "afterObjective": 13949 },
+            { "reply": 37517, "next": 31075, "quest": 1962, "afterQuest": true, "beforeQuest": 2192 },
             { "reply": 37078 }
           ]
         },
@@ -6732,9 +6753,41 @@
           "choices": [
             { "reply": 37381 }
           ]
+        },
+        {
+          "message": 31066,
+          "choices": [
+            { "reply": 37508, "next": 31067 },
+            { "reply": 37507, "next": 31067 },
+            { "reply": 55386 }
+          ]
+        },
+        {
+          "message": 31067,
+          "choices": [
+            { "reply": 37506, "next": 31068 }
+          ]
+        },
+        {
+          "message": 31068,
+          "choices": [
+            { "reply": 37505, "next": 31069 }
+          ]
+        },
+        {
+          "message": 31069,
+          "choices": [
+            { "reply": 37504, "startsQuest": 2192, "params": [[34, 2192]] }
+          ]
+        },
+        {
+          "message": 31075,
+          "choices": [
+            { "reply": 37518, "startsQuest": 2192, "params": [[34, 2192]] }
+          ]
         }
       ],
-      "why": "Fallanster, head of the Council of Astrub, in the council chamber upstairs (Dofus pour les noobs: «Empruntez donc les escaliers situés derrière Archie»). «Ça sent le gaz»: his welcome (30710), a neutral envoy for the Strubian rats (30957), the toxic fumes in the mines (30959), and «Estoy dispuesto a parlamentar con el jefe de las ratas.» (13901, 30960). Back with Rathrosk: «Te presento a Rathrosk.» (13943) shows him a squirrel (30961), «pedirle que se transforme» (13944) a dragon (30953); the summary (30954), the legend (30955) and Aisling at the library (30956)."
+      "why": "Fallanster, head of the Council of Astrub, in the council chamber upstairs (Dofus pour les noobs: «Empruntez donc les escaliers situés derrière Archie»). «Ça sent le gaz»: his welcome (30710), a neutral envoy for the Strubian rats (30957), the toxic fumes in the mines (30959), and «Estoy dispuesto a parlamentar con el jefe de las ratas.» (13901, 30960). Back with Rathrosk: «Te presento a Rathrosk.» (13943) shows him a squirrel (30961), «pedirle que se transforme» (13944) a dragon (30953); the summary (30954), the legend (30955) and Aisling at the library (30956). «Balade en forêt»: «Hablarle de la emboscada de los pandikazes» (13950); the support of the daimyo Hikomi (31066), the sacred place on Pandala (31067), the sealed message (31068, 31069, the line «Le réceptacle des Dofus» names). Put off for later, «Mencionar un viaje a la isla de Pandala» takes it up again (31075)."
     },
     {
       "npc": 4415,
@@ -6932,6 +6985,27 @@
         }
       ],
       "why": "Rathrosk, the young dragon the móguices make work in the machine room. «Ça sent le gaz»: furious móguices, he does not want to go back to work (31048); the lock broken with the móguiz pickaxe, «Rathrosk, ha llegado la hora de salir de aquí.» frees him (13939, the pickaxe taken) and he follows the character (31049, the follower 19661)."
+    },
+    {
+      "npc": 4421,
+      "map": 0,
+      "opening": 31061,
+      "lines": [
+        {
+          "message": 31061,
+          "choices": [
+            { "reply": 37498, "quest": 1962, "completes": 13947, "params": [[30, 13947]], "next": 31062 },
+            { "reply": 81508, "quest": 1962, "completes": 13947, "params": [[30, 13947]], "next": 31062 }
+          ]
+        },
+        {
+          "message": 31062,
+          "choices": [
+            { "reply": 37499, "params": [905] }
+          ]
+        }
+      ],
+      "why": "The mercenary recruit at the meeting point in Astrub's forest, from her own lines and replies, by «Balade en forêt» of Dofus pour les noobs: she shows the cart (31061); looking inside it, or seeing the silhouettes in the bushes and stepping back, is the talk (13947), and «¡Por la gloria perdida de Pandala!» (31062) opens the fight against three recruits (npc_fights.json)."
     }
   ]
 }

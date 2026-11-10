@@ -540,6 +540,15 @@
    "map": 192414726,
    "afterObjectives": [13941],
    "why": "«Escolta a Rathrosk hasta la sala del Consejo»: the council chamber, the map the objective carries, with Rathrosk following (19661)."
+  },
+  {
+   "objective": 13948,
+   "quest": 1962,
+   "kind": "beat",
+   "monster": 5253,
+   "map": 189530630,
+   "afterObjectives": [13947],
+   "why": "«Vence a los pandawas en el bosque de Astrub»: the three Recrue Mercenaire (5253-5255) of the cart's trap; Dofus pour les noobs: «Un combat se lance contre trois Recrue Mercenaire»."
   }
  ]
 }

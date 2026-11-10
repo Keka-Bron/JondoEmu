@@ -863,6 +863,14 @@
       "orientation": 3,
       "criterion": "Qa!1960|Qo=13934",
       "why": "Ramán Hitu, chief of the Strubian rats: during «Aquí huele a gas» he only arrives once his hungry rats are beaten (13934; Dofus pour les noobs: «parlez au chef Ramane Hitoo qui est enfin arrivé»). The cell is the derived layer's."
+    },
+    {
+      "map": 189530630,
+      "npc": 4421,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1962&Qo!13948",
+      "why": "The false recruit at the meeting point of «Balade en forêt» ([-1,-23]), there only until the ambush is beaten (13948). The cell is the derived layer's."
     }
   ]
 }
