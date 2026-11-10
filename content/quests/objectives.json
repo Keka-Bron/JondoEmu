@@ -1372,6 +1372,102 @@
    "elements": [{"map": 192939008, "element": 516207}],
    "anyOrder": true,
    "why": "«Pon el pan boca abajo sobre la mesa»: the table in the middle of the peasants' workshop [5,-21] (element 516207, cell 372)."
+  },
+  {
+   "objective": 14158,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14236,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [14158],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14237,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [14236],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14238,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14239,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [14238],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14240,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [14239],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14256,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [14240],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14241,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14242,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [14241],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14243,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14244,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [14243],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 14245,
+   "quest": 1969,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [14244],
+   "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
   }
  ]
 }

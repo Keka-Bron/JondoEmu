@@ -1749,21 +1749,19 @@
         {
           "message": 30838,
           "choices": [
+            { "reply": 38347, "next": 31710, "beforeQuest": 1969 },
+            { "reply": 38360, "quest": 1969, "completes": 14239, "params": [[30, 14239]], "next": 31726, "afterObjective": 14238 },
+            { "reply": 38361, "quest": 1969, "completes": 14246, "params": [[30, 14246]], "next": 31728 },
             { "reply": 37241, "next": 30841, "completes": 13886, "params": [[30, 13886]] },
             { "reply": 37580, "next": 31123, "quest": 1970, "afterObjective": 14033, "beforeObjective": 14034 }
-          ]
-        },
-        {
-          "message": 31715,
-          "choices": [
-            { "reply": 38341, "startsQuest": 1969 }
           ]
         },
         {
           "message": 30841,
           "names": true,
           "choices": [
-            { "reply": 38341, "startsQuest": 1969 }
+            { "reply": 38347, "next": 31710, "beforeQuest": 1969 },
+            { "reply": 38347, "next": 31710, "beforeQuest": 1969 }
           ]
         },
         {
@@ -1787,9 +1785,65 @@
         {
           "message": 31125,
           "choices": []
+        },
+        {
+          "message": 31710,
+          "choices": [
+            { "reply": 38346, "next": 31711 }
+          ]
+        },
+        {
+          "message": 31711,
+          "choices": [
+            { "reply": 38345, "next": 31712 }
+          ]
+        },
+        {
+          "message": 31712,
+          "choices": [
+            { "reply": 38344, "next": 31713 }
+          ]
+        },
+        {
+          "message": 31713,
+          "choices": [
+            { "reply": 38343, "next": 31714 }
+          ]
+        },
+        {
+          "message": 31714,
+          "choices": [
+            { "reply": 38341, "next": 31715 },
+            { "reply": 38342 }
+          ]
+        },
+        {
+          "message": 31715,
+          "choices": [
+            { "reply": 38340, "startsQuest": 1969, "params": [[34, 1969]] }
+          ]
+        },
+        {
+          "message": 31726,
+          "choices": [
+            { "reply": 38359, "next": 31727 }
+          ]
+        },
+        {
+          "message": 31727,
+          "choices": [
+            { "reply": 38358, "gives": 19776 }
+          ]
+        },
+        {
+          "message": 31728,
+          "names": true,
+          "choices": [
+            { "reply": 38363 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1969) is done, he greets the character with Archi's summons (30839) and «Ir a la Torre del Consejo» hands it over. «Iop et hop»: the Iops' injuries, nobody says how (31123), rest is the cure (31124: 14034, the brash Iop comes in), an Eniripsa's calling (31125)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1969) is done, he greets the character with Archi's summons (30839) and «Ir a la Torre del Consejo» hands it over. «Iop et hop»: the Iops' injuries, nobody says how (31123), rest is the cure (31124: 14034, the brash Iop comes in), an Eniripsa's calling (31125). «Piques de solution» of Dofus pour les noobs: examined, «saperlipopette» said right (31710, 31711), acute adventuritis (31712), a fascination for the Dofus is normal (31713), the syringe and four injections (31714, 31715, the line the step declares); the Cra turned bwork, enchanted verbena (31726, 31727: item 19776, then 14239 by the leaves taken); all cured (14246, 31728). «Piques de solution» of Dofus pour les noobs: examined, «saperlipopette» said right (31710, 31711), acute adventuritis (31712), a fascination for the Dofus is normal (31713), the syringe and four injections (31714, 31715, the line the step declares); the Cra turned bwork, enchanted verbena (31726, 31727: 14239, item 19776); all cured (14246, 31728)."
     },
     {
       "npc": 4335,
@@ -12140,6 +12194,193 @@
         }
       ],
       "why": "The petty leprechaun come to stop his curse being undone, by «Au petit malheur la chance»: attacked (npc_fights.json)."
+    },
+    {
+      "npc": 4483,
+      "map": 0,
+      "opening": 31733,
+      "openings": [
+        { "quest": 1969, "objective": 14236, "pending": 14237, "message": 31731 },
+        { "after": 1969, "message": 31730 },
+        { "after": 1969, "message": 31730 }
+      ],
+      "lines": [
+        {
+          "message": 31733,
+          "choices": [
+            { "reply": 38366, "quest": 1969, "completes": 14158, "params": [[30, 14158]] },
+            { "reply": 38366, "quest": 1969, "afterObjective": 14158, "beforeObjective": 14236 }
+          ]
+        },
+        {
+          "message": 31731,
+          "choices": [
+            { "reply": 38365, "next": 31732 }
+          ]
+        },
+        {
+          "message": 31732,
+          "choices": [
+            { "reply": 38364, "quest": 1969, "completes": 14237, "params": [[30, 14237]] }
+          ]
+        }
+      ],
+      "why": "«Piques de solution»: the belligerent Ecaflip, ready to tear out eyes (31733), stung to the quick: the fight (npc_fights.json); calmer, cured, sleepy (31731, 31732: 14237); asleep standing afterwards (31730). «Piques de solution»: the belligerent Ecaflip, ready to tear out eyes (31733), stung to the quick: the fight (npc_fights.json); calmer, cured, sleepy (31731, 31732: 14237); asleep standing afterwards (31730)."
+    },
+    {
+      "npc": 4486,
+      "map": 0,
+      "opening": 31736,
+      "openings": [
+        { "quest": 1969, "objective": 14240, "pending": 14256, "message": 31734 }
+      ],
+      "lines": [
+        {
+          "message": 31736,
+          "choices": [
+            { "reply": 38371, "next": 31737, "quest": 1969, "beforeObjective": 14238 }
+          ]
+        },
+        {
+          "message": 31737,
+          "choices": [
+            { "reply": 38370, "next": 31738 }
+          ]
+        },
+        {
+          "message": 31738,
+          "choices": [
+            { "reply": 38369, "quest": 1969, "completes": 14238, "params": [[30, 14238]], "showsNpc": 4487 }
+          ]
+        },
+        {
+          "message": 31734,
+          "choices": [
+            { "reply": 38368, "next": 31735 }
+          ]
+        },
+        {
+          "message": 31735,
+          "choices": [
+            { "reply": 38367, "quest": 1969, "completes": 14256, "params": [[30, 14256]] }
+          ]
+        }
+      ],
+      "why": "«Piques de solution»: the calculating Cra weighing the character up (31736), a substance to fight better (31737), the first dose free (31738: 14238, he turns bwork); himself again (31734, 31735: 14256). «Piques de solution»: the calculating Cra weighing the character up (31736), a substance to fight better (31737), the first dose free (31738: 14238, he turns bwork); himself again (31734, 31735: 14256)."
+    },
+    {
+      "npc": 4487,
+      "map": 0,
+      "opening": 31739,
+      "lines": [
+        {
+          "message": 31739,
+          "choices": [
+            { "reply": 38373, "next": 31740, "quest": 1969, "beforeObjective": 14239 },
+            { "reply": 38375, "quest": 1969, "completes": 14240, "params": [[30, 14240]], "next": 31741, "takes": 19776, "afterObjective": 14239 }
+          ]
+        },
+        {
+          "message": 31740,
+          "choices": [
+            { "reply": 38372 }
+          ]
+        },
+        {
+          "message": 31741,
+          "choices": [
+            { "reply": 38374 }
+          ]
+        }
+      ],
+      "why": "«Piques de solution»: the Cra as a bwork, poisoned (31739), a solution or he shoots (31740: off to Nepra); the enchanted verbena chewed (31741: 14240). «Piques de solution»: the Cra as a bwork, poisoned (31739), a solution or he shoots (31740: off to Nepra); the enchanted verbena chewed (31741: 14240)."
+    },
+    {
+      "npc": 4484,
+      "map": 0,
+      "opening": 31747,
+      "lines": [
+        {
+          "message": 31747,
+          "choices": [
+            { "reply": 38388, "next": 31748, "quest": 1969, "beforeObjective": 14241 },
+            { "reply": 38386, "next": 31751, "quest": 1969, "afterObjective": 14241, "beforeObjective": 14242, "holds": 7113 }
+          ]
+        },
+        {
+          "message": 31748,
+          "choices": [
+            { "reply": 38387, "next": 31750 }
+          ]
+        },
+        {
+          "message": 31750,
+          "choices": [
+            { "reply": 38389, "quest": 1969, "completes": 14241, "params": [[30, 14241]] }
+          ]
+        },
+        {
+          "message": 31751,
+          "choices": [
+            { "reply": 38385, "next": 31752 }
+          ]
+        },
+        {
+          "message": 31752,
+          "choices": [
+            { "reply": 38384, "next": 31753 }
+          ]
+        },
+        {
+          "message": 31753,
+          "choices": [
+            { "reply": 38383, "quest": 1969, "completes": 14242, "params": [[30, 14242]] }
+          ]
+        }
+      ],
+      "why": "«Piques de solution»: the Dofus-obsessed Xelor at [6,-20], time lost (31747), the six Dofus all wanted (31748), the syringe seen, «you want to drug me» (31750: 14241); a fine Dofawa shown, she sees only the egg (31751), injected (31752), the obsession gone (31753: 14242). «Piques de solution»: the Dofus-obsessed Xelor at [6,-20], time lost (31747), the six Dofus all wanted (31748), the syringe seen, «you want to drug me» (31750: 14241); a fine Dofawa shown, she sees only the egg (31751), injected (31752), the obsession gone (31753: 14242)."
+    },
+    {
+      "npc": 4485,
+      "map": 0,
+      "opening": 31744,
+      "openings": [
+        { "quest": 1969, "objective": 14244, "pending": 14245, "message": 31742 }
+      ],
+      "lines": [
+        {
+          "message": 31744,
+          "choices": [
+            { "reply": 38380, "next": 31745, "quest": 1969, "beforeObjective": 14244 }
+          ]
+        },
+        {
+          "message": 31745,
+          "choices": [
+            { "reply": 38379, "next": 31746 }
+          ]
+        },
+        {
+          "message": 31746,
+          "choices": [
+            { "reply": 38378, "quest": 1969, "completes": 14243, "params": [[30, 14243]] },
+            { "reply": 38378, "quest": 1969, "afterObjective": 14243, "beforeObjective": 14244 }
+          ]
+        },
+        {
+          "message": 31742,
+          "choices": [
+            { "reply": 38377, "next": 31743 }
+          ]
+        },
+        {
+          "message": 31743,
+          "choices": [
+            { "reply": 38376, "quest": 1969, "completes": 14245, "params": [[30, 14245]] }
+          ]
+        }
+      ],
+      "why": "«Piques de solution»: the Iopish Iop and his broken speech (31744, 31745), a severe case and the syringe, a duel (31746: the fight, npc_fights.json); a resounding victory (31742), revitalised, off to read (31743: 14245). «Piques de solution»: the Iopish Iop and his broken speech (31744, 31745), a severe case and the syringe, a duel (31746: the fight, npc_fights.json); a resounding victory (31742), revitalised, off to read (31743: 14245)."
     }
   ]
 }

@@ -1824,6 +1824,29 @@
       "orientation": 5,
       "criterion": "Qa=1968&Qo=14253&Qo!14254",
       "why": "The petty leprechaun showing up in the tavern by Meow Moew (14253) until beaten (14254). INFERRED cell."
+    },
+    {
+      "map": 188743683,
+      "npc": 4486,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa!1969|Qo!14238|Qo=14240",
+      "why": "The calculating Cra at [1,-19], except while the vaccine has made him a bwork."
+    },
+    {
+      "map": 188743683,
+      "npc": 4487,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=1969&Qo=14238&Qo!14240",
+      "why": "The calculating Cra as a bwork, from the injection (14238) until the verbena (14240)."
+    },
+    {
+      "map": 188746242,
+      "npc": 4484,
+      "cell": 300,
+      "orientation": 3,
+      "why": "The Dofus-obsessed Xelor at [6,-20] (Dofus pour les noobs). INFERRED cell."
     }
   ]
 }
