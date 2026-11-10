@@ -933,6 +933,29 @@
    "afterObjectives": [14189],
    "showsNpc": 4386,
    "why": "«Utiliza el agua bendita»: the third holy water, at [-3,-9]: Klaus Konbah."
+  },
+  {
+   "objective": 13807,
+   "quest": 1999,
+   "elements": [{"map": 120062470, "element": 528804}],
+   "afterObjectives": [13806],
+   "why": "«Busca pistas»: the footprints at [0,-29] (element 528804, cell 275); «cliquez sur les empreintes»."
+  },
+  {
+   "objective": 13808,
+   "quest": 1999,
+   "elements": [{"map": 189530112, "element": 515507}],
+   "afterObjectives": [13807],
+   "why": "«Sigue las pistas»: the footprints at [-2,-29] (element 515507, cell 113)."
+  },
+  {
+   "objective": 13815,
+   "quest": 1999,
+   "kind": "beat",
+   "monster": 3448,
+   "map": 192677894,
+   "afterObjectives": [13814],
+   "why": "«Vence a los ladrones puerkazos»: the two porkasses of the cave."
   }
  ]
 }

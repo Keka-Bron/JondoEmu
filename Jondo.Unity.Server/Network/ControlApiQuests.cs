@@ -199,6 +199,9 @@ namespace Jondo.Unity.Server.Network
             int skill = (int)Numero(cuerpo, "skill");
             if (skill == 0)
                 skill = InteractiveRegistry.OnMap(map).FirstOrDefault(i => i.Element.Id == element)?.Actions.FirstOrDefault()?.SkillInstanceId ?? 0;
+            // A quest's element travels in the character's own jss, not in the registry
+            // (ConnectionProtocol.AddQuestElements), with the instance every element has.
+            if (skill == 0) skill = Interactives.SkillInstanceOf(element);
             var lines = RunInSession(session, stream => InteractiveActionHandler.UseAsync(stream,
                 ClientFrame(Op.Iwo, Pb.New().Var(1, skill).Var(2, element).Build())));
             return Bien(new { element, skill, dialogue = DialogueNow(session), lines = lines.Select(l => l.Length > 220 ? l[..220] : l).ToList() });

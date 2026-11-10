@@ -1379,6 +1379,38 @@
       "cell": 275,
       "orientation": 1,
       "why": "Guy Ivolví by Astrub's pond [1,-20] (Dofus pour les noobs: «[1,-20] Guy Al'Eudroi»). INFERRED cell."
+    },
+    {
+      "map": 120062982,
+      "npc": 4372,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa!1999|Qo!13813|Qo=13816",
+      "why": "Leonor Mando at Tainela [1,-29], where Dofus pour les noobs starts «Le génie se meut», except while she is in the porkasses' cave with the character (13813 until 13816). INFERRED cell."
+    },
+    {
+      "map": 120062470,
+      "npc": 4373,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=1999&Qo=13811&Qo!13813",
+      "why": "Khalislas Maucirio at [0,-29] with his traps once the expert is announced (13811), until the hunt sets off (13813). INFERRED cell."
+    },
+    {
+      "map": 192677894,
+      "npc": 4373,
+      "cell": 345,
+      "orientation": 5,
+      "criterion": "Qa=1999&Qo=13813&Qo!13815",
+      "why": "Khalislas in the porkasses' cave until they are beaten (13815), by the junk pile and clear of the arch the character comes in by. INFERRED cell."
+    },
+    {
+      "map": 192677894,
+      "npc": 4372,
+      "cell": 386,
+      "orientation": 5,
+      "criterion": "Qa=1999&Qo=13813&Qo!13816",
+      "why": "Leonor Mando in the porkasses' cave, come with the character (13813), until back at Tainela (13816), on the rug clear of the arch. INFERRED cell."
     }
   ]
 }

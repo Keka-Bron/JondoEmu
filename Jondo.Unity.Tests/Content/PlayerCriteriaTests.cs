@@ -75,6 +75,9 @@ namespace Jondo.Unity.Tests.Content
             int held = 0;
             var facts = new PlayerCriteria.Facts(null, log, book, 0, _ => held);
             const string item = "Qs=1237&Qo>4096&Qo<4098&PO!11683";
+            // «Qo>4096» is 4096 done and «Qo<4098» is 4098 not done: before 4096 nothing drops.
+            Assert.False(Met(item, facts));
+            foreach (var objective in book.Step(1237)!.Objectives.Where(o => o.Id <= 4096)) run.Done.Add(objective.Id);
             Assert.True(Met(item, facts));
             Assert.True(Met("Qa=632&PO<2269,10", facts));
             Assert.False(Met("Qs=1238", facts));

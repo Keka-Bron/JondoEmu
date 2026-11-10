@@ -2117,26 +2117,110 @@
       "npc": 4372,
       "map": 0,
       "opening": 30473,
+      "openings": [
+        { "quest": 1999, "objective": 13815, "pending": 13816, "message": 30492 }
+      ],
       "lines": [
         {
           "message": 30473,
           "choices": [
-            {
-              "reply": 36749,
-              "next": 30476
-            }
+            { "reply": 36753, "next": 30474, "beforeQuest": 1999 },
+            { "reply": 36759, "next": 30480, "quest": 1999, "afterObjective": 13805, "beforeObjective": 13806 },
+            { "reply": 36762, "next": 30483, "quest": 1999, "afterObjective": 13808, "beforeObjective": 13809 },
+            { "reply": 36766, "next": 30486, "quest": 1999, "afterObjective": 13810, "beforeObjective": 13811 },
+            { "reply": 36771, "next": 30489, "quest": 1999, "afterObjective": 13812, "beforeObjective": 13813 },
+            { "reply": 36782, "next": 30494, "quest": 1999, "afterObjective": 13816, "beforeObjective": 13817 },
+            { "reply": 36780, "teleport": 120062982, "quest": 1999, "afterObjective": 13813, "beforeObjective": 13816 }
+          ]
+        },
+        {
+          "message": 30474,
+          "choices": [
+            { "reply": 36752, "next": 30475 }
+          ]
+        },
+        {
+          "message": 30475,
+          "choices": [
+            { "reply": 36751, "next": 30476 }
           ]
         },
         {
           "message": 30476,
           "choices": [
-            {
-              "reply": 36769,
-              "startsQuest": 1999
-            }
+            { "reply": 36749, "startsQuest": 1999, "params": [[34, 1999]], "next": 30477 },
+            { "reply": 36750 }
+          ]
+        },
+        {
+          "message": 30477,
+          "choices": []
+        },
+        {
+          "message": 30480,
+          "choices": [
+            { "reply": 36758, "next": 30481 }
+          ]
+        },
+        {
+          "message": 30481,
+          "choices": [
+            { "reply": 36757, "next": 30482 }
+          ]
+        },
+        {
+          "message": 30482,
+          "choices": [
+            { "reply": 36756, "quest": 1999, "completes": 13806, "params": [[30, 13806]] }
+          ]
+        },
+        {
+          "message": 30483,
+          "choices": [
+            { "reply": 36761, "next": 30484 }
+          ]
+        },
+        {
+          "message": 30484,
+          "choices": [
+            { "reply": 36760, "quest": 1999, "completes": 13809, "params": [[30, 13809]] }
+          ]
+        },
+        {
+          "message": 30486,
+          "choices": [
+            { "reply": 36765, "quest": 1999, "completes": 13811, "params": [[30, 13811]] }
+          ]
+        },
+        {
+          "message": 30489,
+          "choices": [
+            { "reply": 36769, "quest": 1999, "completes": 13813, "params": [[30, 13813]], "teleport": 192677894 },
+            { "reply": 36770 }
+          ]
+        },
+        {
+          "message": 30492,
+          "choices": [
+            { "reply": 36779, "next": 30493 },
+            { "reply": 36780, "teleport": 120062982 }
+          ]
+        },
+        {
+          "message": 30493,
+          "names": true,
+          "choices": [
+            { "reply": 36778, "quest": 1999, "completes": 13816, "params": [[30, 13816]], "teleport": 120062982 }
+          ]
+        },
+        {
+          "message": 30494,
+          "choices": [
+            { "reply": 36781, "quest": 1999, "completes": 13817, "params": [[30, 13817]] }
           ]
         }
-      ]
+      ],
+      "why": "Leonor Mando, gobbly breeder at Tainela [1,-29], by «Le génie se meut» of Dofus pour les noobs: her warchief gobballs and the samples for Nibe Lula (30473-30477); the extra delay, her missing gobblies (30480-30482, 13806); the tracks to the porkass plain (30483), Unterix Unter (30484, 13809); an expert on his way (30486, 13811); ready to go after the thieves, she takes the character to their cave (30489, 13813); there, the porkasses' organisation and the cave beside (30492, 30493), back to Tainela (13816) -- and back at any time from the cave, which has no other way out; all back in place, not a word to the other breeders (30494, 13817)."
     },
     {
       "npc": 4380,
@@ -8465,6 +8549,7 @@
           "message": 2357,
           "choices": [
             { "reply": 25507, "quest": 1984, "completes": 13819, "params": [[30, 13819]], "next": 21221, "afterObjective": 13818 },
+            { "reply": 36764, "quest": 1999, "completes": 13810, "params": [[30, 13810]], "next": 30485 },
             { "reply": 8834 }
           ]
         },
@@ -8479,9 +8564,15 @@
           "choices": [
             { "reply": 8834 }
           ]
+        },
+        {
+          "message": 30485,
+          "choices": [
+            { "reply": 36763 }
+          ]
         }
       ],
-      "why": "Unterix Unter, the hunter of Astrub's outskirts [1,-23], by «Crise sanitaire» («Parler des problèmes avec le bétail»): hunting banned until the game is safe (13819, 21221), and a sample of each resource for Nibe Lula -- wheat, nettle, ash, pío meat with a hunting weapon, gudgeon (21222)."
+      "why": "Unterix Unter, the hunter of Astrub's outskirts [1,-23], by «Crise sanitaire» («Parler des problèmes avec le bétail»): hunting banned until the game is safe (13819, 21221), and a sample of each resource for Nibe Lula -- wheat, nettle, ash, pío meat with a hunting weapon, gudgeon (21222). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485). «Le génie se meut»: Leonor Mando's trouble (13810), an expert in traps sent (30485)."
     },
     {
       "npc": 4344,
@@ -8497,6 +8588,7 @@
             { "reply": 36919, "next": 30590, "quest": 1998, "afterObjective": 13863, "completesAll": [13864, 13865, 13866, 13867], "params": [[30, 13867]] },
             { "reply": 36922, "next": 30591, "quest": 1998, "afterObjective": 13867, "beforeObjective": 13868 },
             { "reply": 36926, "quest": 1998, "completes": 13873, "params": [[30, 13873]], "next": 30593, "afterObjective": 13872 },
+            { "reply": 36755, "quest": 1999, "completes": 13805, "params": [[30, 13805]], "next": 30479 },
             { "reply": 54280 }
           ]
         },
@@ -8560,9 +8652,15 @@
           "choices": [
             { "reply": 36925 }
           ]
+        },
+        {
+          "message": 30479,
+          "choices": [
+            { "reply": 36754 }
+          ]
         }
       ],
-      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593)."
+      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479)."
     },
     {
       "npc": 596,
@@ -9764,6 +9862,36 @@
         }
       ],
       "why": "Klaus Konbah, the third spirit [-3,-9], by «Le repos est dans le champ»: no peaceful ghost, skeletons out of the ground (30614): the fight against him and five chafers (npc_fights.json, 14195); after it, sorry for his fury (30615, 30616), a last blow and the incense (14199)."
+    },
+    {
+      "npc": 4373,
+      "map": 0,
+      "opening": 30487,
+      "openings": [
+        { "quest": 1999, "objective": 13813, "pending": 13814, "message": 30490 }
+      ],
+      "lines": [
+        {
+          "message": 30487,
+          "choices": [
+            { "reply": 36775, "next": 30488, "quest": 1999, "afterObjective": 13811 }
+          ]
+        },
+        {
+          "message": 30488,
+          "choices": [
+            { "reply": 36767, "quest": 1999, "completes": 13812, "params": [[30, 13812]] }
+          ]
+        },
+        {
+          "message": 30490,
+          "choices": [
+            { "reply": 36773, "params": [905], "quest": 1999, "completes": 13814 },
+            { "reply": 36774 }
+          ]
+        }
+      ],
+      "why": "Khalislas Maucirio the trapper, by «Le génie se meut»: his trap nets (30487), a fork, two pairs of trousers and an adventurer caught, the rest of the thieves gone (30488, 13812); in the porkasses' cave, time to punish them (30490): the fight against two porkasses (npc_fights.json, 13814)."
     }
   ]
 }

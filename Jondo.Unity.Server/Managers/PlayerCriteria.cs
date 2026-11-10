@@ -172,8 +172,12 @@ namespace Jondo.Unity.Server.Managers
             {
                 '=' => Bool(pending.Contains((int)value)),
                 '!' => Bool(!pending.Contains((int)value)),
-                '>' => Bool(pending.Any(id => id > value)),
-                '<' => Bool(pending.Any(id => id < value)),
+                // '>' and '<' are «done» and «not done», as the client words them (its texts
+                // ui.grimoire.quest.objective done / notDone beside pending / notPending): the
+                // samples of «Genio en movimiento» drop on «Qo<13805», the step's very first
+                // objective, which no other reading lets through.
+                '>' => Bool(facts.Log.ObjectiveDone((int)value)),
+                '<' => Bool(!facts.Log.ObjectiveDone((int)value)),
                 _ => Answer.Unknown,
             };
         }
