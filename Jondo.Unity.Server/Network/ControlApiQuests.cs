@@ -253,6 +253,7 @@ namespace Jondo.Unity.Server.Network
             Managers.Quests.ReloadContent();
             Managers.NpcFights.Forget();
             Managers.HarvestDrops.Forget();
+            Managers.DungeonExitRooms.Forget();
             Managers.TeleportManager.Initialize();
             // The passages are declared to the client from here: a door written since the start was
             // reloaded above and still answered «Unknown use» until this was built again.

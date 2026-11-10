@@ -42,6 +42,12 @@ namespace Jondo.Unity.Server.Managers
         public const string KeyWording = "Darle la llave y entrar";
 
         /// <summary>
+        /// The same reply as the Equipo Turist-A hosts word it: «Utilizar la llave.» before the
+        /// Haunted Mansion and the Kwakwa's nest, where only the keyring was offered.
+        /// </summary>
+        public const string UseKeyWording = "Utilizar la llave";
+
+        /// <summary>
         /// Reply ids at or above this belong to the Expedición generation, not the base dungeon.
         /// </summary>
         /// <remarks>
@@ -88,6 +94,7 @@ namespace Jondo.Unity.Server.Managers
 
             var keyring = TextKeysSaying(KeyringWording);
             var key = TextKeysSaying(KeyWording);
+            key.UnionWith(TextKeysSaying(UseKeyWording));
 
             if (keyring.Count == 0 && key.Count == 0)
             {

@@ -262,6 +262,12 @@ namespace Jondo.Unity.Server.Handlers
             // Dhain's treasure quests done on an earlier day come back before his replies are chosen.
             TreasureHuntHandler.BeforeTalkingTo(npc.NpcId);
 
+            // What a quest in progress asked of this NPC by just coming to see him -- a «ve a ver»,
+            // an item handed over on a hello -- is done BEFORE he chooses what to say: the old
+            // quests' NPC answers the hand-over with the next step's line straight away (Guemado
+            // Elwapo's «Gracias por las patatas» as the sacks change hands).
+            await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
+
             var template = Npcs.TemplateOf(npc.NpcId);
             var escrito = NpcDialogues.For(npc.NpcId, mapId);
             var primera = escrito == null ? null : OpeningFor(escrito);
@@ -327,9 +333,6 @@ namespace Jondo.Unity.Server.Handlers
 
             await PreguntarAsync(stream, pregunta, respuestas, template,
                                  escrito?.Line(pregunta), banker);
-
-            // And if some quest in progress asked precisely to come and see this one, that is done.
-            await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
 
             Console.WriteLine($"[NPC] Dialog of {npc.NpcId}: question {pregunta}, " +
                               $"{Math.Max(respuestas.Length, 1)} replies" +

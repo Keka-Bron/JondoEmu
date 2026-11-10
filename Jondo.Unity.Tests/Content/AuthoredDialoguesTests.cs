@@ -204,6 +204,10 @@ namespace Jondo.Unity.Tests.Content
                         if (!handedOn.TryGetValue(choice.StartsQuest, out var lines))
                             handedOn[choice.StartsQuest] = lines = new List<long>();
                         lines.Add(line.Message);
+                        // The old quests' declared line is the one said once it is accepted:
+                        // Monabella's «Gracias por querer ayudar a una pobre cortesana» follows the
+                        // reply that hands «La belle ermite» over.
+                        if (choice.Next != 0) lines.Add(choice.Next);
                     }
                 }
 

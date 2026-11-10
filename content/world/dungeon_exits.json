@@ -22,6 +22,24 @@
       "npc": 2936,
       "replies": [24994, 24997, 25000, 25001],
       "why": "Kardorim's crypt (PR #75, 23 October 2026): the win in his room loads the post-boss room on cell 382; his four template replies «Quitter la crypte de Kardorim» (texts 555709-555712) leave; his quest and Milimilou replies do not."
+    },
+    {
+      "dungeon": 34,
+      "bossRoom": 163582464,
+      "room": 163583488,
+      "cell": 300,
+      "npc": 1387,
+      "replies": [8355, 8356],
+      "why": "The Haunted Mansion: after Boostache the winners are in the mansion's last room [-13,-41], which «Fantômes contre fantômes» asks to discover (4149), and the chafer host takes them out («reparlez au Gentil Organisateur Chafer pour sortir du donjon», Dofus pour les noobs); his two «Salir» replies leave."
+    },
+    {
+      "dungeon": 32,
+      "bossRoom": 64753664,
+      "room": 64754688,
+      "cell": 287,
+      "npc": 1404,
+      "replies": [8555],
+      "why": "The Kwakwa's nest: after the Kwakwa the winners are in the nest's exit room [-4,-7] («The Kwakwa's Nest - Exit»), which «L'Ascension» asks to discover (4329), and the Kwakerback host takes them out; his «Salir» leaves."
     }
   ]
 }

@@ -38,6 +38,17 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Reads the file once, at boot, with its log line.</summary>
         public static void Load() => Ensure();
 
+        /// <summary>Drops what was read, so the next question reads the file again (the content reload).</summary>
+        public static void Forget()
+        {
+            lock (_lock)
+            {
+                _afterBoss.Clear();
+                _byRoom.Clear();
+                _loaded = false;
+            }
+        }
+
         /// <summary>The post-boss room a win in that boss room leads to; null for any other room.</summary>
         public static ExitRoom? AfterBoss(long bossRoomMapId)
         {

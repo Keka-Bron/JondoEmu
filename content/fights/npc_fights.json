@@ -181,6 +181,8 @@
       "allies": [ { "monster": 4794, "grade": 0 } ] },
     { "npc": 4335, "map": 188744710, "reply": 69072,
       "monsters": [ { "monster": 7286, "grade": 0 }, { "monster": 7286, "grade": 0 } ],
-      "allies": [ { "monster": 7287, "grade": 0 } ] }
+      "allies": [ { "monster": 7287, "grade": 0 } ] },
+    { "npc": 893, "map": 3845, "reply": 11852,
+      "monsters": [ { "monster": 5441, "grade": 0 }, { "monster": 5442, "grade": 0 }, { "monster": 5441, "grade": 0 } ] }
   ]
 }

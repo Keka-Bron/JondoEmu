@@ -14538,6 +14538,707 @@
         }
       ],
       "why": "Sir André Scancio, knight of the Order of Astrub, on his routine patrol by «La routine anodine du chevalier citadin» of Dofus pour les noobs: too calm (51456), sent by Iván (51457), never left the city, useful to people (51460), south and east of the city (51461: 18678); the library and its calm (51464, 51465: 18680), the jewelers' workshop (51466: 18682), the grocery and the mercenary (51467, 51468: 18686); an orange puddle, counterfeit hydromel (51471, 51472); the Sram gang beaten (51483), Iván to be told (51484: 18689). The order (51597, 51598)."
+    },
+    {
+      "npc": 741,
+      "map": 0,
+      "opening": 3113,
+      "openings": [
+        { "quest": 138, "step": 250, "message": 3115 },
+        { "quest": 138, "step": 251, "message": 3115 },
+        { "after": 138, "message": 3114 }
+      ],
+      "lines": [
+        {
+          "message": 3113,
+          "choices": [
+            { "reply": 2739, "startsQuest": 138, "params": [[34, 138]], "gives": 8923, "givesCount": 9 },
+            { "reply": 2740, "next": 3116 }
+          ]
+        },
+        {
+          "message": 3114,
+          "choices": []
+        },
+        {
+          "message": 3115,
+          "choices": []
+        },
+        {
+          "message": 3116,
+          "choices": []
+        }
+      ],
+      "why": "Rocco Fidelio, jailer of Amakna castle [6,-5], by «Pauvre pomme (de terre)» of Dofus pour les noobs: the sacks of potatoes for Guemado Elwapo, the prisoner of Madrestam port (3113, item 8923 x9), «don't get clever» (3116), «delivering potatoes is not hard» (3115); the poor lad will not leave his prison (3114)."
+    },
+    {
+      "npc": 746,
+      "map": 0,
+      "opening": 3112,
+      "openings": [
+        { "quest": 138, "step": 251, "message": 3110 },
+        { "quest": 138, "step": 252, "message": 3111 },
+        { "quest": 137, "objective": 516, "pending": 517, "message": 3109 }
+      ],
+      "lines": [
+        {
+          "message": 3112,
+          "choices": []
+        },
+        {
+          "message": 3110,
+          "choices": []
+        },
+        {
+          "message": 3111,
+          "choices": []
+        },
+        {
+          "message": 3109,
+          "choices": []
+        }
+      ],
+      "why": "Guemado Elwapo, the prisoner who stays [13,-7], singing about potatoes (3112). «Pauvre pomme (de terre)»: the sacks taken on a hello, a wooden shovel wanted (3110: 523), the shovel, thank Rocco (3111: 524). «La belle ermite»: his old hiding place north-west of the breeders' mountain by the enchanted lakes (3109: 516)."
+    },
+    {
+      "npc": 739,
+      "map": 0,
+      "opening": 3057,
+      "openings": [
+        { "quest": 132, "step": 224, "message": 3062 },
+        { "quest": 132, "step": 225, "message": 3058 },
+        { "quest": 132, "step": 226, "message": 3059 },
+        { "quest": 132, "step": 227, "message": 3060 },
+        { "after": 132, "before": 133, "message": 3064 },
+        { "quest": 133, "step": 228, "message": 3414 },
+        { "quest": 133, "step": 229, "message": 3065 },
+        { "quest": 133, "step": 230, "message": 3066 },
+        { "quest": 133, "step": 231, "message": 3067 },
+        { "quest": 133, "objective": 482, "pending": 483, "message": 3424 },
+        { "quest": 133, "step": 232, "message": 3068 },
+        { "after": 133, "message": 3069 }
+      ],
+      "lines": [
+        {
+          "message": 3057,
+          "choices": [
+            { "reply": 2723, "startsQuest": 132, "params": [[34, 132]] },
+            { "reply": 2724 }
+          ]
+        },
+        {
+          "message": 3064,
+          "choices": [
+            { "reply": 3025, "startsQuest": 133, "params": [[34, 133]] },
+            { "reply": 2726 }
+          ]
+        },
+        {
+          "message": 3058,
+          "choices": []
+        },
+        {
+          "message": 3059,
+          "choices": []
+        },
+        {
+          "message": 3060,
+          "choices": []
+        },
+        {
+          "message": 3062,
+          "choices": []
+        },
+        {
+          "message": 3065,
+          "choices": []
+        },
+        {
+          "message": 3066,
+          "choices": []
+        },
+        {
+          "message": 3067,
+          "choices": []
+        },
+        {
+          "message": 3068,
+          "choices": []
+        },
+        {
+          "message": 3069,
+          "choices": []
+        },
+        {
+          "message": 3414,
+          "choices": []
+        },
+        {
+          "message": 3424,
+          "choices": []
+        }
+      ],
+      "why": "Kartier Tremai, master builder of Allister's castle at Madrestam port [10,-1], by «Gros œuvres au château d'Allister» (132) of Dofus pour les noobs: the royal rooms unfinished (3057), everything around here (3062), the planks, the stones, wheat and meat for the masons (3058-3060), each handed over on a hello. «Kartier Tremai se met à table» (133): a romantic dinner (3064), the red candles on the dark miners' helmets (3414), a ring (3065), Monabella (3066), Verrumacha (3067), his friend Eloko and beer (3068), «tell my friend» (3424), the evening to come (3069)."
+    },
+    {
+      "npc": 742,
+      "map": 0,
+      "opening": 3108,
+      "openings": [
+        { "after": 135, "before": 137, "message": 3101 },
+        { "quest": 137, "objective": 516, "pending": 517, "message": 3107 },
+        { "quest": 137, "step": 247, "message": 3103 },
+        { "quest": 137, "objective": 518, "pending": 519, "message": 3107 },
+        { "quest": 137, "step": 248, "message": 3104 },
+        { "quest": 137, "step": 249, "message": 3105 },
+        { "after": 137, "message": 3106 },
+        { "quest": 133, "objective": 480, "pending": 486, "message": 3070 },
+        { "quest": 135, "objective": 504, "pending": 505, "message": 3089 }
+      ],
+      "lines": [
+        {
+          "message": 3108,
+          "choices": []
+        },
+        {
+          "message": 3070,
+          "choices": []
+        },
+        {
+          "message": 3089,
+          "choices": []
+        },
+        {
+          "message": 3101,
+          "choices": [
+            { "reply": 2737, "startsQuest": 137, "params": [[34, 137]], "next": 3102 },
+            { "reply": 2738 }
+          ]
+        },
+        {
+          "message": 3102,
+          "choices": []
+        },
+        {
+          "message": 3103,
+          "choices": []
+        },
+        {
+          "message": 3104,
+          "choices": []
+        },
+        {
+          "message": 3105,
+          "choices": []
+        },
+        {
+          "message": 3106,
+          "choices": []
+        },
+        {
+          "message": 3107,
+          "choices": []
+        }
+      ],
+      "why": "Monabella, courtier of Allister's castle [11,2]: even the sirens envy her (3108). «Kartier Tremai se met à table»: dinner with that bore, let him come himself (3070: 480). «La potion de lèche-bottes»: she needs no potion (3089: 504). «La belle ermite» (137) of Dofus pour les noobs: everyone wants to sell her something, she wants a quiet little house (3101, «Oui, j'ai donné un coup de main à tous les autres...»), Guemado's old hiding place (3102); live with him in that prison? find his hideout and describe it (3103: 517); lovely, far away: a docile dragoturkey and sunflower oil (3104: 519), a dark-furred cat (3105: 520, 521), thanks for all (3106: 522); «how slow you are» (3107)."
+    },
+    {
+      "npc": 743,
+      "map": 0,
+      "opening": 3074,
+      "openings": [
+        { "quest": 133, "objective": 481, "pending": 487, "message": 3071 },
+        { "quest": 134, "step": 235, "message": 3075 },
+        { "quest": 134, "step": 236, "message": 3076 },
+        { "quest": 134, "objective": 492, "pending": 493, "message": 3077 },
+        { "quest": 134, "step": 238, "message": 3078 },
+        { "quest": 134, "step": 239, "message": 3079 },
+        { "after": 134, "message": 3080 }
+      ],
+      "lines": [
+        {
+          "message": 3074,
+          "choices": [
+            { "reply": 2729, "startsQuest": 134, "params": [[34, 134]] },
+            { "reply": 2728, "next": 3072 }
+          ]
+        },
+        {
+          "message": 3072,
+          "choices": []
+        },
+        {
+          "message": 3075,
+          "choices": [
+            { "reply": 2731, "quest": 134, "completes": 489, "params": [[30, 489]], "next": 3076 },
+            { "reply": 2730 }
+          ]
+        },
+        {
+          "message": 3076,
+          "choices": []
+        },
+        {
+          "message": 3071,
+          "choices": []
+        },
+        {
+          "message": 3077,
+          "choices": []
+        },
+        {
+          "message": 3078,
+          "choices": []
+        },
+        {
+          "message": 3079,
+          "choices": []
+        },
+        {
+          "message": 3080,
+          "choices": []
+        }
+      ],
+      "why": "Verrumacha, the king's customs officer at Madrestam port [8,-4]. «Les Dents de la Mère Verumacha» (134) of Dofus pour les noobs: a shark spreading terror in the port (3074, «Je vais le suivre au sillage»), «lout» (3072); found? by a boat with a wabbit on its sail (3075: 489), no, a crimson bandit (3076); bribed? never (3077: 492); much better, pig's milk for sweets (3078), a profitable day (3079), smugglers to the sharks (3080). «Kartier Tremai se met à table»: sick of fish, no (3071: 481)."
+    },
+    {
+      "npc": 744,
+      "map": 0,
+      "opening": 3093,
+      "openings": [
+        { "after": 133, "message": 3073 }
+      ],
+      "lines": [
+        {
+          "message": 3093,
+          "choices": []
+        },
+        {
+          "message": 3073,
+          "choices": []
+        }
+      ],
+      "why": "Eloko Osopeloso, docker of Madrestam port: «a good warm beer» (3093). «Kartier Tremai se met à table»: another good drinking bout (3073: 483)."
+    },
+    {
+      "npc": 745,
+      "map": 0,
+      "opening": 3088,
+      "openings": [
+        { "quest": 134, "step": 237, "message": 3081 },
+        { "quest": 134, "objective": 493, "pending": 494, "message": 3082 },
+        { "after": 134, "before": 135, "message": 3084 },
+        { "quest": 135, "step": 240, "message": 3164 },
+        { "quest": 135, "step": 241, "message": 3085 },
+        { "quest": 135, "step": 242, "message": 3086 },
+        { "after": 135, "message": 3087 }
+      ],
+      "lines": [
+        {
+          "message": 3088,
+          "choices": []
+        },
+        {
+          "message": 3084,
+          "choices": [
+            { "reply": 2732, "startsQuest": 135, "params": [[34, 135]] },
+            { "reply": 2733 }
+          ]
+        },
+        {
+          "message": 3081,
+          "choices": []
+        },
+        {
+          "message": 3082,
+          "choices": []
+        },
+        {
+          "message": 3164,
+          "choices": []
+        },
+        {
+          "message": 3085,
+          "choices": []
+        },
+        {
+          "message": 3086,
+          "choices": []
+        },
+        {
+          "message": 3087,
+          "choices": []
+        }
+      ],
+      "why": "Escualo El Rojo, smuggler of Madrestam port [9,-4], thinking aloud over a recipe (3088). «Les Dents de la Mère Verumacha»: give her these 1000 kamas (3081: 491), she wants more (3082: 493). «La potion de lèche-bottes» (135): boot-licking potions forbidden by Allister (3084, «J'adore porter des bottes bien brillantes»), ingredients (3164), deliver it to Monabella (3085), try Haraquiri the king's butcher (3086), one matter less (3087)."
+    },
+    {
+      "npc": 740,
+      "map": 0,
+      "opening": 3056,
+      "openings": [
+        { "quest": 135, "objective": 506, "pending": 507, "message": 3090 }
+      ],
+      "lines": [
+        {
+          "message": 3056,
+          "choices": []
+        },
+        {
+          "message": 3090,
+          "choices": []
+        }
+      ],
+      "why": "Haraquiri, the king's butcher [5,-4], hungry for a steak (3056). «La potion de lèche-bottes»: the potion bought (3090: 506)."
+    },
+    {
+      "npc": 893,
+      "map": 0,
+      "opening": 3865,
+      "openings": [
+        { "quest": 211, "step": 390, "message": 10765 },
+        { "quest": 209, "step": 388, "message": 3879 },
+        { "after": 209, "before": 211, "message": 10764 },
+        { "quest": 208, "step": 385, "message": 3871 },
+        { "quest": 208, "objective": 829, "pending": 5460, "message": 3872 },
+        { "after": 208, "before": 209, "message": 3864 }
+      ],
+      "lines": [
+        {
+          "message": 3865,
+          "choices": [
+            { "reply": 3410, "next": 3866, "beforeQuest": 208 },
+            { "reply": 3412, "next": 10810 },
+            { "reply": 3413 }
+          ]
+        },
+        {
+          "message": 10810,
+          "choices": []
+        },
+        {
+          "message": 3866,
+          "choices": [
+            { "reply": 3414, "next": 3868 },
+            { "reply": 3415, "next": 3869 }
+          ]
+        },
+        {
+          "message": 3869,
+          "choices": [
+            { "reply": 3416, "next": 3868 }
+          ]
+        },
+        {
+          "message": 3868,
+          "choices": [
+            { "reply": 3417, "startsQuest": 208, "params": [[34, 208]] },
+            { "reply": 3418 }
+          ]
+        },
+        {
+          "message": 3871,
+          "choices": []
+        },
+        {
+          "message": 3872,
+          "choices": []
+        },
+        {
+          "message": 3864,
+          "choices": []
+        },
+        {
+          "message": 3879,
+          "choices": []
+        },
+        {
+          "message": 10764,
+          "choices": [
+            { "reply": 11854, "next": 3899 }
+          ]
+        },
+        {
+          "message": 3899,
+          "choices": [
+            { "reply": 3446, "startsQuest": 211, "params": [[34, 211]], "next": 10765 },
+            { "reply": 3447 }
+          ]
+        },
+        {
+          "message": 10765,
+          "choices": [
+            { "reply": 11852, "quest": 211, "completes": 842, "params": [[30, 842]] },
+            { "reply": 11853, "quest": 211, "completes": 842, "params": [[30, 842]], "next": 3900, "gives": 8576 }
+          ]
+        },
+        {
+          "message": 3900,
+          "choices": []
+        }
+      ],
+      "why": "Counsellor Ys Vewybad in Amakna castle [4,-6], by «Le Guide du Roublard» (208) of Dofus pour les noobs: help protect Allister's throne? (3865, «Je suis prêt à servir mon roi»), a suspicious look (10810), how the rogues helped Uk'Not'Allag escape (3866, 3869), the king wants their lair watched (3868, «Accepter»); a dangerous place surrounded by water (3871: 827), loyalty shown, his man to back up (3872: 829); watching the throne (3864). «Crypte Honnie»: in touch with their chief, go and see Vil Smis, no fighting (3879: 838); at the meeting place [7,-5] the old man will not suspect a thing (10764: 5461), «you are plotting against the king», «so, will you help us or not?» (3899, the line «Traître ou pas traître» declares). «Traître ou pas traître, telle est la question...» (211): no choice but to pick a side (10765): Allister's, and three of Vil Smis' rogues attack (npc_fights.json), or Vewybad's and Vil Smis', a scroll of recommendation for their «friends» (3900, item 8576, which opens «Info pour un vrai traître» and closes «Émissaire du roi»)."
+    },
+    {
+      "npc": 45,
+      "map": 0,
+      "opening": 98,
+      "lines": [
+        {
+          "message": 98,
+          "choices": [
+            { "reply": 153, "next": 185, "quest": 208, "beforeObjective": 826 }
+          ]
+        },
+        {
+          "message": 185,
+          "choices": [
+            { "reply": 158, "quest": 208, "completes": 826, "params": [[30, 826]], "next": 191 }
+          ]
+        },
+        {
+          "message": 191,
+          "choices": []
+        }
+      ],
+      "why": "Rigal Mano Ganchuda, a sram of the rogues' brotherhood in the Sram temple [-4,0]: respected by all (98). «Le Guide du Roublard»: the vilest of beings, the brotherhood (185), its lair surrounded by water in a dangerous place, only the cruellest get in (191: 826)."
+    },
+    {
+      "npc": 894,
+      "map": 0,
+      "opening": 3876,
+      "openings": [
+        { "quest": 209, "step": 387, "message": 3877 },
+        { "quest": 209, "objective": 837, "pending": 838, "message": 3878 },
+        { "after": 208, "before": 209, "message": 3873 }
+      ],
+      "lines": [
+        {
+          "message": 3873,
+          "choices": [
+            { "reply": 3421, "next": 3874 }
+          ]
+        },
+        {
+          "message": 3874,
+          "choices": [
+            { "reply": 3423, "next": 3875 },
+            { "reply": 3422 }
+          ]
+        },
+        {
+          "message": 3875,
+          "choices": [
+            { "reply": 3423, "startsQuest": 209, "params": [[34, 209]] },
+            { "reply": 3419 }
+          ]
+        },
+        {
+          "message": 3876,
+          "choices": []
+        },
+        {
+          "message": 3877,
+          "choices": []
+        },
+        {
+          "message": 3878,
+          "choices": []
+        }
+      ],
+      "why": "Syete Zerozero (Seth Zérauséro), the counsellor's man before the Rogue temple [10,16]: tired out, a nap (3876). «Le Guide du Roublard»: the lair, late for his nap, Ys Vewybad's errand (3873, «Oui, que dois-je faire ?»), clues in the cemetery's crypts (3874), «and those crypts?» (3875: «Crypte Honnie» handed over). «Crypte Honnie» (209): nothing in the crypts, a crypt to the south (3877: 835); the badge, what Ys Vewybad wants with the rogues (3878: 837)."
+    },
+    {
+      "npc": 58,
+      "map": 0,
+      "opening": 39,
+      "lines": [
+        {
+          "message": 39,
+          "choices": [
+            { "reply": 8304, "next": 8316, "beforeQuest": 675 },
+            { "reply": 8349, "next": 8506, "beforeQuest": 681 },
+            { "reply": 8550, "next": 8269, "beforeQuest": 673 },
+            { "reply": 8303, "next": 8268 }
+          ]
+        },
+        {
+          "message": 8316,
+          "choices": [
+            { "reply": 8305, "startsQuest": 675, "params": [[34, 675]] }
+          ]
+        },
+        {
+          "message": 8506,
+          "choices": [
+            { "reply": 8350, "startsQuest": 681, "params": [[34, 681]] }
+          ]
+        },
+        {
+          "message": 8269,
+          "choices": [
+            { "reply": 8551, "startsQuest": 673, "params": [[34, 673]] }
+          ]
+        },
+        {
+          "message": 8268,
+          "choices": []
+        }
+      ],
+      "why": "Hannibol Smis, head of the Equipo Turist-A in Amakna village [-1,2] (39), by «Destinations Aventure» of Dofus pour les noobs: the first offer, the Haunted Mansion (8316: «Fantômes contre fantômes»), the second, a hike in the Crackler mountain (8506: «L'Ascension»), the third, a stay in a kaniboul village (8269: «T'as les boules»); the agency (8268)."
+    },
+    {
+      "npc": 1387,
+      "map": 0,
+      "opening": 8321,
+      "openings": [
+        { "quest": 675, "objective": 4149, "pending": 4150, "message": 8319 },
+        { "after": 675, "message": 8320 }
+      ],
+      "lines": [
+        {
+          "message": 8321,
+          "choices": [
+            { "reply": 11905, "next": 10811 }
+          ]
+        },
+        {
+          "message": 10811,
+          "choices": []
+        },
+        {
+          "message": 8320,
+          "choices": []
+        },
+        {
+          "message": 8319,
+          "choices": []
+        }
+      ],
+      "why": "The chafer host of the Equipo Turist-A before the Haunted Mansion [-13,-41]: «tremble, adventurer» (8321), the vampire experience (10811); back from the dead (8319: «Fantômes contre fantômes», 4150; 8320 afterwards). The door replies (key, keyring) are the dungeon's (DungeonHandler)."
+    },
+    {
+      "npc": 1387,
+      "map": 163583488,
+      "opening": 8319,
+      "lines": [
+        {
+          "message": 8319,
+          "choices": [
+            { "reply": 8356 }
+          ]
+        }
+      ],
+      "why": "The chafer host in the Haunted Mansion's last room: back from the dead? (8319), «Salir» takes the winners out (dungeon_exits.json)."
+    },
+    {
+      "npc": 900,
+      "map": 0,
+      "opening": 3908,
+      "openings": [
+        { "after": 209, "message": 4045 }
+      ],
+      "lines": [
+        {
+          "message": 3908,
+          "choices": []
+        },
+        {
+          "message": 4045,
+          "choices": []
+        }
+      ],
+      "why": "Al Blurrad (Al Blourrad), hidden in the blocked crypt south of the cemetery [10,17], by «Crypte Honnie» of Dofus pour les noobs: a visitor clever enough to find this hiding place, a rogue badge earned (3908: 836); «what are you standing there for?» (4045)."
+    },
+    {
+      "npc": 82,
+      "map": 0,
+      "opening": 174,
+      "lines": [
+        {
+          "message": 174,
+          "choices": [
+            { "reply": 260, "next": 3888, "quest": 209, "afterObjective": 838, "beforeObjective": 839, "holds": 8588 }
+          ]
+        },
+        {
+          "message": 3888,
+          "choices": [
+            { "reply": 3434, "teleport": 67110912 },
+            { "reply": 3433 }
+          ]
+        }
+      ],
+      "why": "Bud Spensur (Boude Spenssour), the rogues' doorkeeper at [10,16]: only the vilest are received (174). «Crypte Honnie»: the badge shown, «follow me» (3888, «Accepter»), into the lair."
+    },
+    {
+      "npc": 84,
+      "map": 0,
+      "opening": 3880,
+      "lines": [
+        {
+          "message": 3880,
+          "choices": [
+            { "reply": 3427, "next": 3881, "quest": 209, "afterObjective": 838, "beforeObjective": 839 },
+            { "reply": 3428, "next": 3882 },
+            { "reply": 3429, "next": 3882 }
+          ]
+        },
+        {
+          "message": 3881,
+          "choices": [
+            { "reply": 3430, "quest": 209, "completes": 839, "params": [[30, 839]], "next": 3883, "takes": 8588 }
+          ]
+        },
+        {
+          "message": 3882,
+          "choices": []
+        },
+        {
+          "message": 3883,
+          "choices": []
+        }
+      ],
+      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882)."
+    },
+    {
+      "npc": 1404,
+      "map": 0,
+      "opening": 8508,
+      "openings": [
+        { "after": 681, "message": 8507 }
+      ],
+      "lines": [
+        {
+          "message": 8508,
+          "choices": [
+            { "reply": 11909, "next": 10813 }
+          ]
+        },
+        {
+          "message": 10813,
+          "choices": []
+        },
+        {
+          "message": 8507,
+          "choices": []
+        }
+      ],
+      "why": "The Kwakerback host of the Equipo Turist-A before the Kwakwa's nest [-4,-7]: a new sport, sent by Hannibol Smis (8508), only a kwaks' nest behind him (10813); how were the kwaks? any eggs? (8507: «L'Ascension», 4330). The door replies are the dungeon's (DungeonHandler)."
+    },
+    {
+      "npc": 1404,
+      "map": 64754688,
+      "opening": 8507,
+      "lines": [
+        {
+          "message": 8507,
+          "choices": [
+            { "reply": 8555 }
+          ]
+        }
+      ],
+      "why": "The Kwakerback host in the Kwakwa's nest exit room: how were the kwaks? (8507), «Salir» takes the winners out (dungeon_exits.json)."
     }
   ]
 }

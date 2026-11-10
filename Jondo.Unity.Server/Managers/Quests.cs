@@ -1641,6 +1641,21 @@ namespace Jondo.Unity.Server.Managers
             if (move.Nothing) return;
 
             await AfterMoveAsync(stream, questId, move);
+
+            // What an «order» row says comes of the objective once done: Escualo El Rojo's
+            // boot-licking potion, brewed from the ingredients handed over on a hello.
+            var binding = Bindings.Of(objectiveId);
+            if (!move.Nothing && binding?.Kind == QuestBindingKind.Order)
+            {
+                foreach (var (item, count) in binding.Gives)
+                {
+                    if (!await Equipment.GiveAsync(stream, item, count)) continue;
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                            InfoMessages.ItemGained, count.ToString(CultureInfo.InvariantCulture),
+                            item.ToString(CultureInfo.InvariantCulture))));
+                }
+            }
         }
 
         private static async Task AfterMoveAsync(NetworkStream stream, int questId, QuestMove move)

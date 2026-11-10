@@ -2126,6 +2126,43 @@
       "orientation": 1,
       "criterion": "(Qa=2470&Qo=18692)|Qf=2470",
       "why": "Sir André at the hydromel cargo [3,-16], from the mercenary's confession, and afterwards watching the barrels. INFERRED cell."
+    },
+    {
+      "map": 95686145,
+      "npc": 893,
+      "cell": 258,
+      "orientation": 3,
+      "why": "Counsellor Ys Vewybad in Amakna castle [4,-6], who launches «Le Guide du Roublard» (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 163583488,
+      "npc": 1387,
+      "cell": 286,
+      "orientation": 1,
+      "why": "The chafer host in the Haunted Mansion's last room, after Boostache, who takes the winners out (content/world/dungeon_exits.json)."
+    },
+    {
+      "map": 83104256,
+      "npc": 900,
+      "cell": 300,
+      "orientation": 3,
+      "why": "Al Blurrad in the blocked crypt south of the Amakna cemetery [10,17] (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 67110912,
+      "npc": 84,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=209&Qo=838&Qo!839",
+      "why": "Vil Smis receiving the character in the rogues' lair, brought by Bud Spensur. INFERRED cell."
+    },
+    {
+      "map": 3845,
+      "npc": 893,
+      "cell": 299,
+      "orientation": 3,
+      "criterion": "(Qa=209&Qo=839)|Qa=211",
+      "why": "Counsellor Ys Vewybad at the meeting place with Vil Smis [7,-5], his intentions plain (Dofus pour les noobs). INFERRED cell."
     }
   ]
 }

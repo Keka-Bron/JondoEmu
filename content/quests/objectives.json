@@ -1683,6 +1683,78 @@
    "monsters": [4791, 4792, 4793],
    "map": 193332228,
    "why": "«Dale una buena lección a los zurcaráks con la ayuda del uginak»: the three ecaflips, with the scared ouginak beside the character."
+  },
+  {
+   "objective": 488,
+   "quest": 134,
+   "kind": "enter",
+   "map": 68420098,
+   "why": "«Trouver le territoire du requin»: the map just above Verrumacha's, [8,-5] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 503,
+   "quest": 135,
+   "kind": "order",
+   "gives": [{"item": 8480, "count": 1}],
+   "why": "«La potion de lèche-bottes»: the last ingredient handed over to Escualo El Rojo, he brews the boot-licking potion and hands it over to deliver (Dofus pour les noobs)."
+  },
+  {
+   "objective": 828,
+   "quest": 208,
+   "kind": "enter",
+   "map": 82314240,
+   "why": "«Vérifier que le lieu semble être le repaire des Roublards»: before the Rogue temple [10,16], just visited (Dofus pour les noobs)."
+  },
+  {
+   "objective": 830,
+   "quest": 209,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the five crypts of the Amakna cemetery to visit, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 831,
+   "quest": 209,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the five crypts of the Amakna cemetery to visit, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 832,
+   "quest": 209,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the five crypts of the Amakna cemetery to visit, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 833,
+   "quest": 209,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the five crypts of the Amakna cemetery to visit, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 834,
+   "quest": 209,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the five crypts of the Amakna cemetery to visit, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 836,
+   "quest": 209,
+   "kind": "talk",
+   "npc": 900,
+   "map": 83104256,
+   "gives": [{"item": 8588, "count": 1}],
+   "why": "«Encuentra una manera de entrar en la guarida de los tymadores»: Al Blurrad in the blocked crypt south of the cemetery, who hands over a rogue badge (8588)."
+  },
+  {
+   "objective": 518,
+   "quest": 137,
+   "kind": "enter",
+   "map": 75629314,
+   "why": "«Trouver la planque de Gemfé Labelle»: the Lakes Palace [-21,-5], his old hiding place by the enchanted lakes (Dofus pour les noobs)."
   }
  ]
 }
