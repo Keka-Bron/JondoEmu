@@ -128,11 +128,15 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static bool BehindOtherWork(QuestStep step, QuestObjective objective, QuestRun run)
         {
+            // Objectives a binding lets go in any order do not wait on one another: the fourth
+            // patient of «La inyección es la solución» fought before the second is cured.
+            bool anyOrder = Quests.Bindings?.Of(objective.Id)?.AnyOrder == true;
             foreach (var before in step.Objectives)
             {
                 if (before.Id == objective.Id) return false;
                 if (run.Done.Contains(before.Id)) continue;
                 if (before.TypeId == QuestCatalogue.GoToSee || before.MonsterId != 0) continue;
+                if (anyOrder && Quests.Bindings?.Of(before.Id)?.AnyOrder == true) continue;
                 return true;
             }
             return false;
