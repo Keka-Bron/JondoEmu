@@ -7007,7 +7007,9 @@
         {
           "message": 30563,
           "choices": [
-            { "reply": 38078, "quest": 1971, "completes": 14165, "params": [[30, 14165]], "next": 31516, "afterObjective": 14164 }
+            { "reply": 38078, "quest": 1971, "completes": 14165, "params": [[30, 14165]], "next": 31516, "afterObjective": 14164 },
+            { "reply": 36880, "quest": 1985, "completes": 13834, "params": [[30, 13834]], "next": 30564 },
+            { "reply": 36879, "next": 30565 }
           ]
         },
         {
@@ -7021,9 +7023,33 @@
           "choices": [
             { "reply": 38075, "quest": 1971, "completes": 14166, "params": [[30, 14166]] }
           ]
+        },
+        {
+          "message": 30564,
+          "choices": [
+            { "reply": 36876 }
+          ]
+        },
+        {
+          "message": 30565,
+          "choices": [
+            { "reply": 36878, "next": 30566 }
+          ]
+        },
+        {
+          "message": 30566,
+          "choices": [
+            { "reply": 36877, "next": 30567 }
+          ]
+        },
+        {
+          "message": 30567,
+          "choices": [
+            { "reply": 36876 }
+          ]
         }
       ],
-      "why": "«C'est pour ta pomme»: his crates of apples stolen, and a basket of tomatoes with them (31516); a free crate for whoever brings them back (31517), «Seguir el rastro de tomates.» (14166)."
+      "why": "«C'est pour ta pomme»: his crates of apples stolen, and a basket of tomatoes with them (31516); a free crate for whoever brings them back (31517), «Seguir el rastro de tomates.» (14166). His talk about trade (30565-30567). «Livraison par intérim»: Estefi Dora's three crates (13834, offered once carried), at her usual rates (30564)."
     },
     {
       "npc": 4471,
@@ -8139,6 +8165,88 @@
         }
       ],
       "why": "Fidel Gastro, settled in the abandoned gallery behind the rocks, by «Crise sanitaire»: who blew the rocks (21255), go away (21256), and the mouldy walls scrubbed and the rags washed in the underground river (13827, 21257)."
+    },
+    {
+      "npc": 4367,
+      "map": 0,
+      "opening": 30510,
+      "lines": [
+        {
+          "message": 30510,
+          "choices": [
+            { "reply": 36803, "quest": 1985, "completes": 13830, "params": [[30, 13830]], "next": 30511, "beforeObjective": 13830 },
+            { "reply": 36812, "quest": 1985, "completes": 13832, "params": [[30, 13832]], "next": 30517, "afterObjective": 13831 },
+            { "reply": 36810 }
+          ]
+        },
+        {
+          "message": 30511,
+          "choices": [
+            { "reply": 36802, "next": 30512 }
+          ]
+        },
+        {
+          "message": 30512,
+          "choices": [
+            { "reply": 36810 }
+          ]
+        },
+        {
+          "message": 30517,
+          "choices": [
+            { "reply": 36811, "next": 30518 }
+          ]
+        },
+        {
+          "message": 30518,
+          "choices": [
+            { "reply": 36810 }
+          ]
+        }
+      ],
+      "why": "Estefi Dora, who buys dragoturkeys of the koalak mountain's breeders, in Astrub's meadows [9,-11], by «Livraison par intérim» of Dofus pour les noobs: two brutes trying to extort her (13830, 30511, «Yo solucionaré esto»); after the fight, what they said is true -- farmed dragoturkeys sold as wild (13832, 30517) -- and the goods to take to the resources market (30518)."
+    },
+    {
+      "npc": 4375,
+      "map": 0,
+      "opening": 30513,
+      "lines": [
+        {
+          "message": 30513,
+          "choices": [
+            { "reply": 36806, "next": 30514, "quest": 1985, "afterObjective": 13830 }
+          ]
+        },
+        {
+          "message": 30514,
+          "choices": [
+            { "reply": 36804, "params": [905] },
+            { "reply": 36805 }
+          ]
+        }
+      ],
+      "why": "One of the two brutes extorting Estefi Dora («Parlez à la Brute Roublarde... «Employer la force pour les faire partir»»): the fight against both (npc_fights.json); «Comprobar el equipo» leaves it."
+    },
+    {
+      "npc": 4376,
+      "map": 0,
+      "opening": 30515,
+      "lines": [
+        {
+          "message": 30515,
+          "choices": [
+            { "reply": 36809, "next": 30516, "quest": 1985, "afterObjective": 13830 }
+          ]
+        },
+        {
+          "message": 30516,
+          "choices": [
+            { "reply": 36807, "params": [905] },
+            { "reply": 36808 }
+          ]
+        }
+      ],
+      "why": "One of the two brutes extorting Estefi Dora («Parlez à la Brute Roublarde... «Employer la force pour les faire partir»»): the fight against both (npc_fights.json); «Comprobar el equipo» leaves it."
     }
   ]
 }

@@ -71,6 +71,10 @@
       "alliesMustLive": true,
       "allies": [ { "monster": 5278, "grade": 0 }, { "monster": 5276, "grade": 0 }, { "monster": 5277, "grade": 0 } ] },
     { "npc": 4364, "map": 189793289, "reply": 36660,
-      "monsters": [ { "monster": 5234, "grade": 0 }, { "monster": 79, "grade": 0 }, { "monster": 78, "grade": 0 }, { "monster": 48, "grade": 0 }, { "monster": 4820, "grade": 0 } ] }
+      "monsters": [ { "monster": 5234, "grade": 0 }, { "monster": 79, "grade": 0 }, { "monster": 78, "grade": 0 }, { "monster": 48, "grade": 0 }, { "monster": 4820, "grade": 0 } ] },
+    { "npc": 4375, "map": 190581763, "reply": 36804,
+      "monsters": [ { "monster": 5238, "grade": 0 }, { "monster": 5239, "grade": 0 } ] },
+    { "npc": 4376, "map": 190581763, "reply": 36807,
+      "monsters": [ { "monster": 5238, "grade": 0 }, { "monster": 5239, "grade": 0 } ] }
   ]
 }

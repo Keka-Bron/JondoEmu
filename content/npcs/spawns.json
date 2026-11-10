@@ -1125,6 +1125,35 @@
       "orientation": 1,
       "criterion": "Qa=1981&Qo=13781&Qo=13782&Qo=13783&Qo=13784&Qo!13785",
       "why": "The country doll, out of Mawy Ingals' barn once Vey Gana has her four slobbers, until beaten (13785). INFERRED: on the grass between the barn and Vey Gana."
+    },
+    {
+      "map": 190581763,
+      "npc": 4367,
+      "cell": 287,
+      "remove": true
+    },
+    {
+      "map": 190581763,
+      "npc": 4367,
+      "cell": 262,
+      "orientation": 3,
+      "why": "Estefi Dora by her cart and its crates in Astrub's meadows. The derived cell, 287, was the middle of the path. INFERRED."
+    },
+    {
+      "map": 190581763,
+      "npc": 4375,
+      "cell": 288,
+      "orientation": 7,
+      "criterion": "Qa=1985&Qo!13831",
+      "why": "The Sram brute, threatening Estefi Dora while «Livraison par intérim» has them there, until beaten. INFERRED."
+    },
+    {
+      "map": 190581763,
+      "npc": 4376,
+      "cell": 304,
+      "orientation": 7,
+      "criterion": "Qa=1985&Qo!13831",
+      "why": "The Tymador brute, beside the Sram one. INFERRED."
     }
   ]
 }

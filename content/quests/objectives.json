@@ -611,6 +611,23 @@
    "elements": [{"map": 188484106, "element": 516095}],
    "afterObjectives": [13824],
    "why": "«Utiliza los explosivos»: the big rock on the right of the next map (element 516095, graphic 57416, cell 555), which blocks the abandoned gallery; once blown, its passage leads there (teleports.json)."
+  },
+  {
+   "objective": 13831,
+   "quest": 1985,
+   "kind": "beat",
+   "monster": 5238,
+   "map": 190581763,
+   "afterObjectives": [13830],
+   "why": "«Vence a las bestias amenazantes»: the Sram brute and the Tymador brute (5238, 5239); «Un combat se lance contre les deux Brutes»."
+  },
+  {
+   "objective": 13833,
+   "quest": 1985,
+   "elements": [{"map": 190581763, "element": 515504}],
+   "afterObjectives": [13832],
+   "gives": [{"item": 19635, "count": 3}],
+   "why": "«Toma las cajas»: the wooden crate by Estefi Dora's cart (element 515504, graphic 7565, cell 235), three crates of goods (19635, the three objective 13834 asks for); «Prenez la marchandise en cliquant sur la caisse en bois à côté d'elle»."
   }
  ]
 }
