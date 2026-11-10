@@ -551,6 +551,15 @@
    "map": 188743685,
    "afterObjectives": [13970],
    "why": "«Escolta a los turistas hacia el exterior»: out of the underground at [1,-17], the map objective 13973 gives Luci («Sortez donc des souterrains en allant en [1,-17] puis reparlez à Joséphine»)."
+  },
+  {
+   "objective": 14117,
+   "quest": 1977,
+   "kind": "enter",
+   "map": 191106048,
+   "afterObjectives": [14111, 14112, 14113, 14114, 14115],
+   "showsNpc": 4413,
+   "why": "«Espera cerca del templo»: in front of the temple of the Twelve [6,-19], once the posters, the three rumours and the investigator are done; Hipo Lítico comes then («Allez devant le temple en [6,-19] et parlez à Hippolyte Hique qui prétend être à votre recherche»)."
   }
  ]
 }

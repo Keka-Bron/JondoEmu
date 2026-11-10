@@ -351,28 +351,32 @@
         {
           "message": 11408,
           "choices": [
-            {
-              "reply": 12619,
-              "next": 31196
-            },
-            {
-              "reply": 12620
-            }
+            { "reply": 37912, "next": 31387, "quest": 1977, "beforeObjective": 14111 },
+            { "reply": 12619, "next": 31196 },
+            { "reply": 12620 }
           ]
         },
         {
           "message": 31196,
           "choices": [
-            {
-              "reply": 37672,
-              "startsQuest": 1991
-            },
-            {
-              "reply": 12620
-            }
+            { "reply": 37672, "startsQuest": 1991 },
+            { "reply": 12620 }
+          ]
+        },
+        {
+          "message": 31387,
+          "choices": [
+            { "reply": 37911, "quest": 1977, "completes": 14111, "params": [[30, 14111]], "next": 31388 }
+          ]
+        },
+        {
+          "message": 31388,
+          "choices": [
+            { "reply": 12620 }
           ]
         }
-      ]
+      ],
+      "why": "«Tel est pris qui croyait prendre»: «Explicar la necesidad de carteles y folletos» (31387), and Kerubim's purse handed over (14111, 19728): he prints them at once (31388)."
     },
     {
       "npc": 1901,
@@ -596,6 +600,7 @@
           "message": 30758,
           "choices": [
             { "reply": 37138, "next": 30760, "completes": 13894, "params": [[30, 13894]] },
+            { "reply": 38051, "quest": 1977, "completes": 14113, "params": [[30, 14113]], "next": 31494 },
             { "reply": 38050 }
           ]
         },
@@ -619,9 +624,15 @@
           "choices": [
             { "reply": 37151, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31494,
+          "choices": [
+            { "reply": 38050 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (938) is done, he greets the character with Archi's summons (30768) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (938) is done, he greets the character with Archi's summons (30768) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14113), and the answer (31494)."
     },
     {
       "npc": 4317,
@@ -713,6 +724,7 @@
           "message": 30817,
           "choices": [
             { "reply": 37219, "next": 30819, "completes": 13891, "params": [[30, 13891]] },
+            { "reply": 38049, "quest": 1977, "completes": 14112, "params": [[30, 14112]], "next": 31493 },
             { "reply": 38048 }
           ]
         },
@@ -736,9 +748,15 @@
           "choices": [
             { "reply": 37220, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31493,
+          "choices": [
+            { "reply": 38048 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1974) is done, he greets the character with Archi's summons (30820) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1974) is done, he greets the character with Archi's summons (30820) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14112), and the answer (31493)."
     },
     {
       "npc": 4321,
@@ -773,6 +791,7 @@
         {
           "message": 30380,
           "choices": [
+            { "reply": 37920, "quest": 1977, "completes": 14120, "params": [[30, 14120]], "next": 31395, "afterObjective": 14119 },
             { "reply": 37503, "quest": 1962, "completes": 13949, "params": [[30, 13949]], "next": 31063, "afterObjective": 13948 },
             { "reply": 37062, "quest": 1959, "completes": 13855, "params": [[30, 13855]], "next": 30696, "afterObjective": 13854 },
             { "reply": 36644, "next": 30382 },
@@ -826,9 +845,27 @@
           "choices": [
             { "reply": 37500 }
           ]
+        },
+        {
+          "message": 31395,
+          "choices": [
+            { "reply": 37919, "next": 31396 }
+          ]
+        },
+        {
+          "message": 31396,
+          "choices": [
+            { "reply": 37918, "next": 31397 }
+          ]
+        },
+        {
+          "message": 31397,
+          "choices": [
+            { "reply": 36637 }
+          ]
         }
       ],
-      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065)."
+      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397)."
     },
     {
       "npc": 4324,
@@ -7449,6 +7486,181 @@
         }
       ],
       "why": "Pepi, the third tourist, in the underground: how hide-and-seek works (30939), and the rats (30940), the same fight as Luci's once she has been talked to (13971)."
+    },
+    {
+      "npc": 4349,
+      "map": 0,
+      "opening": 31378,
+      "lines": [
+        {
+          "message": 31378,
+          "choices": [
+            { "reply": 38053, "quest": 1977, "completes": 14114, "params": [[30, 14114]], "next": 31495 },
+            { "reply": 38052 }
+          ]
+        },
+        {
+          "message": 31495,
+          "choices": [
+            { "reply": 38052 }
+          ]
+        }
+      ],
+      "why": "Shani Sings, the jeweller of Astrub ([6,-15]), from her own lines and replies: her greeting (31378) and, by «Tel est pris qui croyait prendre», the rumour of the statue (14114): a waste of kamas, in her view (31495)."
+    },
+    {
+      "npc": 4466,
+      "map": 0,
+      "opening": 31496,
+      "lines": [
+        {
+          "message": 31496,
+          "choices": [
+            { "reply": 38055, "next": 31497, "quest": 1977, "beforeObjective": 14117, "completes": 14115, "params": [[30, 14115]] }
+          ]
+        },
+        {
+          "message": 31497,
+          "choices": [
+            { "reply": 38054 }
+          ]
+        }
+      ],
+      "why": "An Amaknean investigator after the swindler, by «Tel est pris qui croyait prendre» of Dofus pour les noobs («Vous devez trouver un Investigateur Amaknéen qui recherche lui aussi l'escroc»): Kerubim's plan explained (14115), he doubts it but will be there (31497): «Ir al templo»."
+    },
+    {
+      "npc": 4488,
+      "map": 0,
+      "opening": 31719,
+      "lines": [
+        {
+          "message": 31719,
+          "choices": [
+            { "reply": 38352, "next": 31720, "quest": 1977, "beforeObjective": 14117, "completes": 14115, "params": [[30, 14115]] }
+          ]
+        },
+        {
+          "message": 31720,
+          "choices": [
+            { "reply": 38351 }
+          ]
+        }
+      ],
+      "why": "An Amaknean investigator after the swindler, by «Tel est pris qui croyait prendre» of Dofus pour les noobs («Vous devez trouver un Investigateur Amaknéen qui recherche lui aussi l'escroc»): Kerubim's plan explained (14115), he doubts it but will be there (31720): «Ir al templo»."
+    },
+    {
+      "npc": 4489,
+      "map": 0,
+      "opening": 31724,
+      "lines": [
+        {
+          "message": 31724,
+          "choices": [
+            { "reply": 38357, "next": 31725, "quest": 1977, "beforeObjective": 14117, "completes": 14115, "params": [[30, 14115]] }
+          ]
+        },
+        {
+          "message": 31725,
+          "choices": [
+            { "reply": 38356 }
+          ]
+        }
+      ],
+      "why": "An Amaknean investigator after the swindler, by «Tel est pris qui croyait prendre» of Dofus pour les noobs («Vous devez trouver un Investigateur Amaknéen qui recherche lui aussi l'escroc»): Kerubim's plan explained (14115), he doubts it but will be there (31725): «Ir al templo»."
+    },
+    {
+      "npc": 4466,
+      "map": 191106048,
+      "opening": 31498,
+      "lines": [
+        {
+          "message": 31498,
+          "choices": [
+            { "reply": 38057, "quest": 1977, "completes": 14119, "params": [[30, 14119]], "next": 31499 }
+          ]
+        },
+        {
+          "message": 31499,
+          "choices": [
+            { "reply": 38058, "next": 31500 }
+          ]
+        },
+        {
+          "message": 31500,
+          "choices": [
+            { "reply": 38056, "thenNpc": 4413 }
+          ]
+        }
+      ],
+      "why": "The investigator at the temple, once Hipo Lítico has talked prices: he recognises him (31498); «Propongo que lo hablemos ante la presencia de la milicia» (14119), the prison first (31500), and back to Hipo."
+    },
+    {
+      "npc": 4413,
+      "map": 191106048,
+      "opening": 31389,
+      "openings": [
+        { "quest": 1977, "objective": 14119, "message": 31394 }
+      ],
+      "lines": [
+        {
+          "message": 31389,
+          "names": true,
+          "choices": [
+            { "reply": 37916, "next": 31390, "quest": 1977, "beforeObjective": 14119 }
+          ]
+        },
+        {
+          "message": 31390,
+          "choices": [
+            { "reply": 37915, "next": 31391 }
+          ]
+        },
+        {
+          "message": 31391,
+          "choices": [
+            { "reply": 37914, "next": 31392 }
+          ]
+        },
+        {
+          "message": 31392,
+          "choices": [
+            { "reply": 37913, "quest": 1977, "completes": 14118, "params": [[30, 14118]], "next": 31393, "showsNpc": 4466 }
+          ]
+        },
+        {
+          "message": 31393,
+          "choices": [
+            { "reply": 37921, "thenNpc": 4466 }
+          ]
+        },
+        {
+          "message": 31394,
+          "choices": [
+            { "reply": 37917 }
+          ]
+        }
+      ],
+      "why": "Hipo Lítico, «responsible for Astrub's religious heritage», who comes to the temple once the rumour has run (14117), by «Tel est pris qui croyait prendre»: the character's name (31389), the card (31390), the statue (31391) and its price (31392), when the accomplices are called in (14118: the investigator comes, 31393). Told he goes to the militia, he is offended (31394): «Llevarlo por la fuerza hasta Bajofrente»."
+    },
+    {
+      "npc": 4413,
+      "map": 192414730,
+      "opening": 31398,
+      "lines": [
+        {
+          "message": 31398,
+          "choices": [
+            { "reply": 37922, "quest": 1977, "completes": 14121, "params": [[30, 14121]], "next": 31399 }
+          ]
+        },
+        {
+          "message": 31399,
+          "choices": [
+            { "reply": 37921 }
+          ]
+        }
+      ],
+      "why": "Hipo Lítico behind bars under the militia («Descendez dans le sous-sol pour parler à Hippolyte Hique qui est maintenant en prison»): how he was caught (14121), and Kerubim's miracle pills (31399)."
     }
   ]
 }

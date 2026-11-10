@@ -1061,6 +1061,62 @@
       "cell": 341,
       "orientation": 1,
       "why": "Dan Gevo, off Clint Pot's side (see Gasdora). INFERRED."
+    },
+    {
+      "map": 188746755,
+      "npc": 4466,
+      "cell": 372,
+      "orientation": 3,
+      "criterion": "Qa=1977&Qo!14117",
+      "why": "An Amaknean investigator at [7,-19], one of the four places Dofus pour les noobs gives him ([3,-21], [1,-17], [7,-15], [7,-19]), while «Tel est pris qui croyait prendre» has him searching (until 14117). INFERRED cell."
+    },
+    {
+      "map": 188743685,
+      "npc": 4466,
+      "cell": 453,
+      "orientation": 1,
+      "criterion": "Qa=1977&Qo!14117",
+      "why": "The Amaknean investigator at [1,-17] (see [7,-19]). INFERRED cell."
+    },
+    {
+      "map": 188744705,
+      "npc": 4488,
+      "cell": 338,
+      "orientation": 1,
+      "criterion": "Qa=1977&Qo!14117",
+      "why": "The Amaknean investigator at [3,-21] (see [7,-19]). INFERRED cell."
+    },
+    {
+      "map": 188746759,
+      "npc": 4489,
+      "cell": 341,
+      "orientation": 1,
+      "criterion": "Qa=1977&Qo!14117",
+      "why": "The Amaknean investigator at [7,-15] (see [7,-19]). INFERRED cell."
+    },
+    {
+      "map": 191106048,
+      "npc": 4413,
+      "cell": 411,
+      "orientation": 3,
+      "criterion": "Qa=1977&Qo=14117&Qo!14120",
+      "why": "Hipo Lítico at the foot of the temple's stairs, from the wait near the temple (14117) until he is handed to the militia (14120). INFERRED."
+    },
+    {
+      "map": 191106048,
+      "npc": 4466,
+      "cell": 438,
+      "orientation": 7,
+      "criterion": "Qa=1977&Qo=14118&Qo!14120",
+      "why": "The investigator called in by the character (14118), until the swindler is handed over. INFERRED."
+    },
+    {
+      "map": 192414730,
+      "npc": 4413,
+      "cell": 245,
+      "orientation": 1,
+      "criterion": "Qo=14120",
+      "why": "Hipo Lítico in the left cell of Astrub's prison once handed over (14120). INFERRED."
     }
   ]
 }
