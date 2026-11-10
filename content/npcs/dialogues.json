@@ -1653,26 +1653,36 @@
       "npc": 2888,
       "map": 0,
       "opening": 21196,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 21196,
           "choices": [
-            {
-              "reply": 25486,
-              "startsQuest": 1655
-            },
-            {
-              "reply": 25489,
-              "quest": 1655
-            },
-            {
-              "reply": 25488
-            }
+            { "reply": 25487, "next": 21197, "beforeQuest": 1655 },
+            { "reply": 25489, "next": 21199, "quest": 1655, "completes": 9970, "params": [[30, 9970]] },
+            { "reply": 25488 }
+          ]
+        },
+        {
+          "message": 21197,
+          "choices": [
+            { "reply": 25486, "startsQuest": 1655, "params": [[34, 1655]], "next": 21198 },
+            { "reply": 25488 }
+          ]
+        },
+        {
+          "message": 21198,
+          "choices": [
+            { "reply": 25485 }
+          ]
+        },
+        {
+          "message": 21199,
+          "choices": [
+            { "reply": 25488 }
           ]
         }
-      ]
+      ],
+      "why": "Marylork the painter, from his own lines and replies, by «Un peu de pigment» of Dofus pour les noobs: asked about himself he is out of green paint (21197), «Yo puedo ayudarte.» hands the quest over and he asks for aminite powder from the mines (21198); «Toma el polvo de amenita.» hands over the three powders (9970) and he thanks the character (21199)."
     },
     {
       "npc": 2892,
@@ -1824,54 +1834,22 @@
       "npc": 2899,
       "map": 0,
       "opening": 20861,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
       "lines": [
         {
           "message": 20861,
           "choices": [
-            { "reply": 25022, "next": 20862, "quest": 1632, "beforeObjective": 9763, "completes": 9763, "params": [[30, 9763]] },
-            { "reply": 25295, "next": 21043 },
-            { "reply": 25311, "next": 57160, "quest": 1649 },
-            { "reply": 77764, "next": 57160, "quest": 1649, "afterQuest": true },
-            { "reply": 77770, "next": 21050, "quest": 2512 },
-            { "reply": 25312, "next": 21050, "quest": 2512, "afterQuest": true },
-            { "reply": 25320, "next": 21056, "quest": 1650 },
-            { "reply": 25333, "next": 21056, "quest": 1650, "afterQuest": true },
-            { "reply": 25330, "next": 57184, "quest": 1651 },
-            { "reply": 77804, "next": 57184, "quest": 1651, "afterQuest": true },
-            { "reply": 77796, "quest": 2513 },
+            { "reply": 25022, "quest": 1632, "completes": 9763, "params": [[30, 9763]], "next": 20862, "beforeObjective": 9763 },
+            { "reply": 25298, "next": 21040, "beforeQuest": 1649 },
+            { "reply": 25309, "next": 21051, "quest": 1649, "afterObjectives": [9863, 9864, 9866] },
+            { "reply": 77764, "next": 57165, "quest": 1649, "afterQuest": true, "beforeQuest": 2512 },
+            { "reply": 77761, "next": 57179, "quest": 2512, "afterObjective": 19260 },
+            { "reply": 25312, "next": 21049, "quest": 2512, "afterQuest": true, "beforeQuest": 1650 },
+            { "reply": 25319, "next": 21060, "quest": 1650, "afterObjectives": [9871, 9872] },
+            { "reply": 25333, "next": 21056, "quest": 1650, "afterQuest": true, "beforeQuest": 1651 },
+            { "reply": 25328, "next": 21067, "quest": 1651, "afterObjectives": [9875, 9877, 9878, 9879, 9880, 9881] },
+            { "reply": 77804, "next": 57183, "quest": 1651, "afterQuest": true, "beforeQuest": 2513 },
+            { "reply": 77799, "next": 57179, "quest": 2513, "afterObjectives": [19264, 19265, 19268] },
             { "reply": 25299 }
-          ]
-        },
-        {
-          "message": 21043,
-          "choices": [
-            { "reply": 25292, "startsQuest": 1649 }
-          ]
-        },
-        {
-          "message": 57160,
-          "choices": [
-            { "reply": 77774, "startsQuest": 2512 }
-          ]
-        },
-        {
-          "message": 21050,
-          "choices": [
-            { "reply": 25307, "startsQuest": 1650 }
-          ]
-        },
-        {
-          "message": 21056,
-          "choices": [
-            { "reply": 25323, "startsQuest": 1651 }
-          ]
-        },
-        {
-          "message": 57184,
-          "choices": [
-            { "reply": 77800, "startsQuest": 2513 }
           ]
         },
         {
@@ -1884,10 +1862,239 @@
         {
           "message": 20863,
           "choices": [
+            { "reply": 25297, "next": 21035, "beforeQuest": 1649 },
             { "reply": 25290 }
           ]
+        },
+        {
+          "message": 21035,
+          "choices": [
+            { "reply": 25295, "next": 21036 },
+            { "reply": 25296 }
+          ]
+        },
+        {
+          "message": 21036,
+          "choices": [
+            { "reply": 25294, "next": 21037 }
+          ]
+        },
+        {
+          "message": 21037,
+          "choices": [
+            { "reply": 25293, "startsQuest": 1649, "params": [[34, 1649]], "next": 21038 }
+          ]
+        },
+        {
+          "message": 21038,
+          "choices": [
+            { "reply": 25292, "next": 21046 }
+          ]
+        },
+        {
+          "message": 21040,
+          "choices": [
+            { "reply": 25306, "next": 21041 }
+          ]
+        },
+        {
+          "message": 21041,
+          "choices": [
+            { "reply": 25304, "next": 21042 },
+            { "reply": 25305 }
+          ]
+        },
+        {
+          "message": 21042,
+          "choices": [
+            { "reply": 25303, "next": 21043 }
+          ]
+        },
+        {
+          "message": 21043,
+          "choices": [
+            { "reply": 25302, "startsQuest": 1649, "params": [[34, 1649]], "next": 21044 }
+          ]
+        },
+        {
+          "message": 21044,
+          "choices": [
+            { "reply": 25301, "next": 21046 }
+          ]
+        },
+        {
+          "message": 21046,
+          "choices": [
+            { "reply": 25310 }
+          ]
+        },
+        {
+          "message": 21051,
+          "choices": [
+            { "reply": 25311, "next": 57160 }
+          ]
+        },
+        {
+          "message": 57160,
+          "choices": [
+            { "reply": 77774, "startsQuest": 2512, "params": [[34, 2512]], "gives": 30832 },
+            { "reply": 77775, "next": 57166 }
+          ]
+        },
+        {
+          "message": 57166,
+          "choices": [
+            { "reply": 77772, "startsQuest": 2512, "params": [[34, 2512]], "gives": 30832 }
+          ]
+        },
+        {
+          "message": 57165,
+          "choices": [
+            { "reply": 77773, "next": 57167 }
+          ]
+        },
+        {
+          "message": 57167,
+          "choices": [
+            { "reply": 77776, "startsQuest": 2512, "params": [[34, 2512]], "gives": 30832 }
+          ]
+        },
+        {
+          "message": 57179,
+          "choices": [
+            { "reply": 77762, "next": 57164, "beforeQuest": 1650 },
+            { "reply": 77796, "quest": 2513, "completes": 19270, "params": [[30, 19270]], "next": 21068 }
+          ]
+        },
+        {
+          "message": 57164,
+          "choices": [
+            { "reply": 25308, "next": 21048 }
+          ]
+        },
+        {
+          "message": 21048,
+          "choices": [
+            { "reply": 25307, "startsQuest": 1650, "params": [[34, 1650]] }
+          ]
+        },
+        {
+          "message": 21049,
+          "choices": [
+            { "reply": 25314, "next": 21050 }
+          ]
+        },
+        {
+          "message": 21050,
+          "choices": [
+            { "reply": 25313, "startsQuest": 1650, "params": [[34, 1650]] }
+          ]
+        },
+        {
+          "message": 21060,
+          "choices": [
+            { "reply": 25320, "next": 21052 }
+          ]
+        },
+        {
+          "message": 21052,
+          "choices": [
+            { "reply": 25318, "startsQuest": 1651, "params": [[34, 1651]], "next": 21053 }
+          ]
+        },
+        {
+          "message": 21053,
+          "choices": [
+            { "reply": 25317, "next": 21054 }
+          ]
+        },
+        {
+          "message": 21054,
+          "choices": [
+            { "reply": 25316, "next": 21055 }
+          ]
+        },
+        {
+          "message": 21055,
+          "choices": [
+            { "reply": 25315 }
+          ]
+        },
+        {
+          "message": 21056,
+          "choices": [
+            { "reply": 25326, "startsQuest": 1651, "params": [[34, 1651]], "next": 21057 }
+          ]
+        },
+        {
+          "message": 21057,
+          "choices": [
+            { "reply": 25325, "next": 21058 }
+          ]
+        },
+        {
+          "message": 21058,
+          "choices": [
+            { "reply": 25324, "next": 21059 }
+          ]
+        },
+        {
+          "message": 21059,
+          "choices": [
+            { "reply": 25323 }
+          ]
+        },
+        {
+          "message": 21067,
+          "choices": [
+            { "reply": 25330, "next": 57180 }
+          ]
+        },
+        {
+          "message": 57180,
+          "choices": [
+            { "reply": 77797, "next": 57181 }
+          ]
+        },
+        {
+          "message": 57181,
+          "choices": [
+            { "reply": 77798, "startsQuest": 2513, "params": [[34, 2513]], "next": 57182 }
+          ]
+        },
+        {
+          "message": 57182,
+          "choices": [
+            { "reply": 77800 }
+          ]
+        },
+        {
+          "message": 57183,
+          "choices": [
+            { "reply": 77802, "next": 57184 }
+          ]
+        },
+        {
+          "message": 57184,
+          "choices": [
+            { "reply": 77803, "startsQuest": 2513, "params": [[34, 2513]], "next": 57185 }
+          ]
+        },
+        {
+          "message": 57185,
+          "choices": [
+            { "reply": 77801 }
+          ]
+        },
+        {
+          "message": 21068,
+          "names": true,
+          "choices": [
+            { "reply": 25338 }
+          ]
         }
-      ]
+      ],
+      "why": "Berbe Unin, from his own lines and replies, by Dofus pour les noobs («Produits naturels», «La hache et la pioche», «Boune un jour, boune toujours») and the catalogue's lines for each quest (21043, 57160, 21050, 21056, 57184). His trials go in pairs of chains: one said on the way back from the previous one («Ya he terminado.» then «Mira lo que he confeccionado/fabricado.») and one for another day («Estoy listo para otro trabajo.», «Ya puedo hacer otra tarea.»). 3.6 put «El oficio de los aventureros» (the meat broth, with his hunting knife, 30832) between the first two and «Preparación para el combate» after the Bun set; its last objective, seeing him again, is «Mira lo que he fabricado.» (19270), and the title of son of Incarnam (21068)."
     },
     {
       "npc": 2905,
