@@ -1317,6 +1317,37 @@
       "orientation": 1,
       "criterion": "Qa=1991&Qo=14076&Qo!14077",
       "why": "A Purple Dawn spectre at [0,-12] while the relic is to be won. INFERRED cell."
+    },
+    {
+      "map": 189661710,
+      "npc": 4456,
+      "cell": 300,
+      "orientation": 1,
+      "why": "The carefree children playing hide-and-seek in the forest [-3,-15] (Dofus pour les noobs: «[-3,-15] Enfant insouciant»). INFERRED cell."
+    },
+    {
+      "map": 189530117,
+      "npc": 4455,
+      "cell": 191,
+      "orientation": 3,
+      "criterion": "Qa=1987&Qo=14136&Qo!14139",
+      "why": "Vangey by the white cart [-2,-24], out of it once searched (14136) until he sets off for Astrub (14139). INFERRED cell, beside the cart."
+    },
+    {
+      "map": 192413702,
+      "npc": 4455,
+      "cell": 441,
+      "orientation": 7,
+      "criterion": "(Qa=1987&Qo=14140)|Qf=1987",
+      "why": "Vangey at the Council Tower's ground floor once brought back (14140), and after. INFERRED cell, before Archi."
+    },
+    {
+      "map": 189530117,
+      "npc": 4458,
+      "cell": 262,
+      "orientation": 7,
+      "criterion": "Qa=1987&Qo=14137&Qo!14138",
+      "why": "A ruffian of Cania at the cart, from the ambush (14137) until beaten (14138). INFERRED cell."
     }
   ]
 }

@@ -835,6 +835,54 @@
    "elements": [{"map": 190843396, "element": 515994}, {"map": 190843396, "element": 517917}],
    "afterObjectives": [14078],
    "why": "«Entierra la urna cerca de la tumba del caballero del otoño»: the tomb [2,-10] (elements 515994 and 517917, cells 261 and 262); «cliquez sur la tombe»."
+  },
+  {
+   "objective": 14132,
+   "quest": 1987,
+   "kind": "enter",
+   "map": 192151552,
+   "afterObjectives": [14131],
+   "why": "«Busca a Vangey dirigiéndote al norte»: the hidden glade [-2,-18] the book under the tent leads to («cliquez sur le livre sous la tente → map secrète»)."
+  },
+  {
+   "objective": 14134,
+   "quest": 1987,
+   "elements": [{"map": 189661703, "element": 516100}],
+   "afterObjectives": [14133],
+   "why": "«Busca a Vangey»: the bloody axe in the stump [-3,-22] (element 516100, cell 330)."
+  },
+  {
+   "objective": 14135,
+   "quest": 1987,
+   "kind": "enter",
+   "map": 189530117,
+   "afterObjectives": [14134],
+   "why": "«Sigue las pistas»: the tracks lead north-east to [-2,-24]."
+  },
+  {
+   "objective": 14136,
+   "quest": 1987,
+   "elements": [{"map": 189530117, "element": 516103}],
+   "afterObjectives": [14135],
+   "showsNpc": 4455,
+   "why": "«Registra la carreta»: the white cart [-2,-24] (element 516103, cell 206), where Vangey is hiding and comes out."
+  },
+  {
+   "objective": 14138,
+   "quest": 1987,
+   "kind": "beat",
+   "monster": 4849,
+   "map": 189530117,
+   "afterObjectives": [14137],
+   "why": "«Vence a los rufianes»: the four ruffians, fought with Vangey."
+  },
+  {
+   "objective": 14140,
+   "quest": 1987,
+   "kind": "enter",
+   "map": 192413702,
+   "afterObjectives": [14139],
+   "why": "«Acompaña a Vangey a la Torre del Consejo»: back at the Council Tower [4,-19]."
   }
  ]
 }

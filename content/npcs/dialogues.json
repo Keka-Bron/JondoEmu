@@ -929,6 +929,7 @@
             { "reply": 36642, "next": 30388, "quest": 1978, "afterQuest": true, "beforeQuest": 1979 },
             { "reply": 36645, "quest": 1979, "completes": 13775, "params": [[30, 13775]], "next": 30393, "afterObjectives": [13771, 13772, 13773, 13774] },
             { "reply": 36850, "quest": 1986, "completes": 13847, "params": [[30, 13847]], "next": 30543 },
+            { "reply": 37987, "quest": 1987, "completes": 14129, "params": [[30, 14129]], "next": 31446 },
             { "reply": 66930 }
           ]
         },
@@ -1061,9 +1062,15 @@
           "choices": [
             { "reply": 36849 }
           ]
+        },
+        {
+          "message": 31446,
+          "choices": [
+            { "reply": 37986 }
+          ]
         }
       ],
-      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394). «Golémancien»: the animated quintain given (13847), ugly but good for the mercenaries (30543)."
+      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394). «Golémancien»: the animated quintain given (13847), ugly but good for the mercenaries (30543). «Le rebelle de la forêt»: where the ruffians were seen, east of the forest's paths (14129, 31446), and Hel Munster's workshop noted."
     },
     {
       "npc": 4324,
@@ -9457,6 +9464,146 @@
         }
       ],
       "why": "Lucy Goñal the handywoman, by «Golémancien»: the parts brought, her workshop to assemble the quintain (30537); her trade (22048, 22049)."
+    },
+    {
+      "npc": 4456,
+      "map": 0,
+      "opening": 31447,
+      "lines": [
+        {
+          "message": 31447,
+          "choices": [
+            { "reply": 37992, "next": 31449, "quest": 1987, "afterObjective": 14130 }
+          ]
+        },
+        {
+          "message": 31449,
+          "choices": [
+            { "reply": 37990, "next": 31448 }
+          ]
+        },
+        {
+          "message": 31448,
+          "choices": [
+            { "reply": 37991, "next": 31450 }
+          ]
+        },
+        {
+          "message": 31450,
+          "choices": [
+            { "reply": 37989, "next": 31451 }
+          ]
+        },
+        {
+          "message": 31451,
+          "choices": [
+            { "reply": 37988, "quest": 1987, "completes": 14131, "params": [[30, 14131]] }
+          ]
+        }
+      ],
+      "why": "The carefree children playing hide-and-seek in Astrub's forest [-3,-15], by «Le rebelle de la forêt»: where they should not be (31449), the ruffians' danger, not to tell their parents (31448), nobody seen here (31450), but a mage like Vangey asking the way to Astrub, gone north (31451, 14131)."
+    },
+    {
+      "npc": 4457,
+      "map": 0,
+      "opening": 31468,
+      "lines": [
+        {
+          "message": 31468,
+          "choices": [
+            { "reply": 38016, "next": 31469, "quest": 1987, "afterObjective": 14132 }
+          ]
+        },
+        {
+          "message": 31469,
+          "choices": [
+            { "reply": 38016, "next": 31470 }
+          ]
+        },
+        {
+          "message": 31470,
+          "choices": [
+            { "reply": 38015, "quest": 1987, "completes": 14133, "params": [[30, 14133]] }
+          ]
+        }
+      ],
+      "why": "The fairy Cadabrah in the hidden glade [-2,-18], by «Le rebelle de la forêt»: what the adventurers leave after their mulou-garou games (31468), the uneasy man forced to play (31469), the players gone to kill the mulou-men's chief (31470, 14133)."
+    },
+    {
+      "npc": 4455,
+      "map": 0,
+      "opening": 31452,
+      "openings": [
+        { "quest": 1987, "objective": 14138, "pending": 14139, "message": 31461 },
+        { "quest": 1987, "objective": 14140, "pending": 14141, "message": 31462 },
+        { "quest": 1987, "objective": 14142, "pending": 14143, "message": 31463 }
+      ],
+      "lines": [
+        {
+          "message": 31452,
+          "choices": [
+            { "reply": 37997, "next": 31453, "quest": 1987, "afterObjective": 14136 }
+          ]
+        },
+        {
+          "message": 31453,
+          "choices": [
+            { "reply": 37996, "next": 31454 }
+          ]
+        },
+        {
+          "message": 31454,
+          "choices": [
+            { "reply": 37995, "next": 31455 }
+          ]
+        },
+        {
+          "message": 31455,
+          "choices": [
+            { "reply": 37994, "next": 31456 }
+          ]
+        },
+        {
+          "message": 31456,
+          "choices": [
+            { "reply": 37993, "quest": 1987, "completes": 14137, "params": [[30, 14137]], "showsNpc": 4458 }
+          ]
+        },
+        {
+          "message": 31461,
+          "choices": [
+            { "reply": 38006, "quest": 1987, "completes": 14139, "params": [[30, 14139]] }
+          ]
+        },
+        {
+          "message": 31462,
+          "choices": [
+            { "reply": 38008, "quest": 1987, "completes": 14141, "params": [[30, 14141]] }
+          ]
+        },
+        {
+          "message": 31463,
+          "choices": [
+            { "reply": 38007, "quest": 1987, "completes": 14143, "params": [[30, 14143]] }
+          ]
+        }
+      ],
+      "why": "Vangey, Hel Munster's apprentice, hiding in the white cart [-2,-24], by «Le rebelle de la forêt»: trying not to be seen (31452, 31453), a murder he was dragged into in a game of mulou-men (31454, 31455), ready to face it, but silhouettes moving (31456, 14137: the ruffians); the threat real, back to Astrub (31461, 14139); at the Council Tower, ready for the consequences (31462, 14141), to meet her and join the militia (31463, 14143)."
+    },
+    {
+      "npc": 4458,
+      "map": 0,
+      "opening": 31457,
+      "lines": [
+        {
+          "message": 31457,
+          "choices": [
+            { "reply": 37998, "params": [905], "quest": 1987, "afterObjective": 14137 },
+            { "reply": 37999 }
+          ]
+        }
+      ],
+      "why": "A ruffian of Cania at Vangey's cart, by «Le rebelle de la forêt»: «¿Las bolsas o la vida?»; cutting their purses is the fight, four ruffians against the character and Vangey (npc_fights.json)."
     }
   ]
 }

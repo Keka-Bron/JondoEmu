@@ -95,6 +95,10 @@
     { "npc": 598, "map": 192676868, "reply": 12967,
       "monsters": [ { "monster": 482, "grade": 0 } ] },
     { "npc": 4446, "map": 190842370, "reply": 37836,
-      "monsters": [ { "monster": 5268, "grade": 0 }, { "monster": 5268, "grade": 0 } ] }
+      "monsters": [ { "monster": 5268, "grade": 0 }, { "monster": 5268, "grade": 0 } ] },
+    { "npc": 4458, "map": 189530117, "reply": 37998,
+      "monsters": [ { "monster": 4849, "grade": 0 }, { "monster": 4850, "grade": 0 }, { "monster": 4851, "grade": 0 }, { "monster": 4849, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 5292, "grade": 0 } ] }
   ]
 }

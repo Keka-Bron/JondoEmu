@@ -99,7 +99,11 @@
     "",
     "ERTY TRAPCHET'S HOUSE, [1,-21], 192675844. The street's door (516016 on 283) leads in and the",
     "stairs down to the cellar work, but nothing led back out: the door mat at the front of the room,",
-    "515271 on 374 (gfx 33069), leads to the street, landing on 297 before the door."
+    "515271 on 374 (gfx 33069), leads to the street, landing on 297 before the door.",
+    "",
+    "THE HIDDEN GLADE, [-2,-18], 192151552. «Le rebelle de la forêt»: the book under the tent of",
+    "189530123 (515999 and 516000 on cell 153, gfx 63298 and 63300) leads into the fairy Cadabrah's",
+    "glade, landing on 459; its right edge (map change cells 461-559) is the way back to the tent."
   ],
   "passages": [
     {
@@ -342,6 +346,8 @@
     {"map": 192414728, "element": 515319, "cell": 437, "gfx": 3507, "type": -1, "skill": 339, "toMap": 188745735, "toCell": 232},
     {"map": 192414728, "element": 515331, "cell": 452, "gfx": 3507, "type": -1, "skill": 339, "toMap": 188745735, "toCell": 232},
     {"map": 67372032, "element": 458840, "cell": 241, "gfx": 29474, "type": -1, "skill": 184, "toMap": 101716489, "toCell": 338},
-    {"map": 192675844, "element": 515271, "cell": 374, "gfx": 33069, "type": -1, "skill": 339, "toMap": 188743681, "toCell": 297}
+    {"map": 192675844, "element": 515271, "cell": 374, "gfx": 33069, "type": -1, "skill": 339, "toMap": 188743681, "toCell": 297},
+    {"map": 189530123, "element": 515999, "cell": 153, "gfx": 63298, "type": -1, "skill": 184, "toMap": 192151552, "toCell": 459},
+    {"map": 189530123, "element": 516000, "cell": 153, "gfx": 63300, "type": -1, "skill": 184, "toMap": 192151552, "toCell": 459}
   ]
 }
