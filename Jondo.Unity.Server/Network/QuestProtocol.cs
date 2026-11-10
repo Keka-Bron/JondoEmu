@@ -134,6 +134,15 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Var(1, questId).Var(2, stepId).Build();
 
         /// <summary>
+        /// An objective has been validated and its step goes on (ieb).
+        ///
+        ///   f1: quest id
+        ///   f2: objective id
+        /// </summary>
+        public static byte[] BuildObjectiveValidated(int questId, int objectiveId)
+            => Pb.New().Var(1, questId).Var(2, objectiveId).Build();
+
+        /// <summary>
         /// Which actors on a map have a quest to hand out (iom): the green mark over an NPC.
         ///
         ///   f1 { f2 (repeated) { f2: packed quest ids, f4: actor id }

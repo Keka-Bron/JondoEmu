@@ -201,6 +201,18 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// A quest objective has just been validated: the achievements waiting on it (Qo). The
+        /// tutorial's «Primer tiempo» is earned this way, on 2502's objective 19173.
+        /// </summary>
+        public static Task AfterObjectiveAsync(NetworkStream stream, int objectiveId)
+        {
+            var book = _book;
+            if (book == null) return Task.CompletedTask;
+            var waiting = book.WaitingOn("Qo", objectiveId);
+            return waiting.Count == 0 ? Task.CompletedTask : CheckAsync(stream, waiting);
+        }
+
+        /// <summary>
         /// The character has arrived on a map: the zone it belongs to is explored, and what the
         /// level, the map and the bag now hold is looked at.
         /// </summary>

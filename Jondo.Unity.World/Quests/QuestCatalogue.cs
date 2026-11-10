@@ -300,6 +300,12 @@ namespace Jondo.Unity.World.Quests
         /// </remarks>
         public const int FreeText = 0;
 
+        /// <summary>"Aller voir #1" — go and see somebody.</summary>
+        public const int GoToSee = 1;
+
+        /// <summary>"Retourner voir #1" — go back and see somebody, once the rest is done.</summary>
+        public const int GoBackToSee = 9;
+
         /// <summary>"Montrer à #1 : #3 #2" — carry the items and show them. 323 objectives.</summary>
         public const int ShowItems = 2;
 
@@ -529,7 +535,8 @@ namespace Jondo.Unity.World.Quests
                     Id = id,
                     StepId = (int)Long(row, "step"),
                     TypeId = (int)Long(row, "type"),
-                    MapId = Long(row, "map"),
+                    // A map 3.6 moved reads as where it stands now (content/maps/moved.json).
+                    MapId = Jondo.Unity.World.Maps.MovedMaps.Now(Long(row, "map")),
                     Coords = coordinates.Count == 2 ? (coordinates[0], coordinates[1]) : null,
                     Parameters = Numbers(row, "params"),
                 };

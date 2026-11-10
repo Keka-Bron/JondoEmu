@@ -954,6 +954,39 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// Puts a group written in content/monsters/groups.json back as it was loaded -- its cell,
+        /// its members, its id -- after it has been beaten; null when it was not one of those.
+        /// </summary>
+        /// <remarks>
+        /// A group placed by hand is that group and no other: the tutorial's celestial puch is
+        /// there to be hit as often as one likes («puedes seguir entrenándote en el puch»), and the
+        /// capture's jss of the platform after the win has it again. A random group of the subarea
+        /// in its place was the generic rule's doing.
+        /// </remarks>
+        public static MobGroup? RestoreWritten(long mapId, long groupId)
+        {
+            if (groupId > WrittenGroupIds) return null;
+            lock (_candado)
+            {
+                if (!_asLoaded.TryGetValue(mapId, out var loaded)) return null;
+                var original = loaded.FirstOrDefault(g => g.MobId == groupId);
+                if (original == null) return null;
+                if (!_mapMobs.TryGetValue(mapId, out var mobs))
+                {
+                    mobs = new List<MobGroup>();
+                    _mapMobs[mapId] = mobs;
+                }
+                mobs.RemoveAll(g => g.MobId == groupId);
+                var group = CloneOf(original);
+                mobs.Add(group);
+                return group;
+            }
+        }
+
+        /// <summary>Ids of groups written by hand run from -2000000 down (see groups.json).</summary>
+        private const long WrittenGroupIds = -2000000;
+
         /// <summary>The groups each map had when the world was loaded.</summary>
         private static Dictionary<long, List<MobGroup>> _asLoaded = new Dictionary<long, List<MobGroup>>();
 

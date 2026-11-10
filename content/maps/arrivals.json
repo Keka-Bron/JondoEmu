@@ -1,0 +1,21 @@
+{
+  "_": [
+    "Where a character lands on crossing a border into a map, where a capture has measured it.",
+    "",
+    "The server mirrors the cell the character left from across the border, which holds between",
+    "maps that really touch. Where they do not, the landing is written here and wins.",
+    "",
+    "  { \"map\": 241438721, \"cell\": 84, \"orientation\": 1, \"measured\": \"...\" }",
+    "",
+    "THE GUIDED TUTORIAL. Its rooms are islands: walking off the right edge of one loads the next",
+    "(the client asks for the id beside it, 241437697, and the real server answers 241438721), and",
+    "the capture of the whole tutorial puts the character on cell 84 facing 1 in every room it",
+    "crosses into, its jss each time."
+  ],
+  "arrivals": [
+    { "map": 241438721, "cell": 84, "orientation": 1, "measured": "the tutorial capture, the jss after jru 241438721" },
+    { "map": 241439745, "cell": 84, "orientation": 1, "measured": "the tutorial capture, the jss after jru 241439745" },
+    { "map": 241440769, "cell": 84, "orientation": 1, "measured": "the tutorial capture, the jss after jru 241440769" },
+    { "map": 241441793, "cell": 84, "orientation": 1, "measured": "the tutorial capture, the jss after jru 241441793" }
+  ]
+}

@@ -57,6 +57,8 @@ namespace Jondo.Unity.Tests.Quests
 
                     pipe.Session.State.DocumentOpen = true;
                     await QuestHandler.StartFromDocumentAsync(pipe.ToClient, Ido(Poster));
+                    // «Nueva misión» (lqn 54) goes before every ief of the tutorial capture.
+                    await pipe.Next(Op.Lqn);
                     Assert.Equal(QuestProtocol.BuildQuestStarted(Poster), await pipe.Next(Op.Ief));
                     Assert.True(QuestEngine.Log!.Active(Poster));
                     await pipe.Next(Op.Idu);

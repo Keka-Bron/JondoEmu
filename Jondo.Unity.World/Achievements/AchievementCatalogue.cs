@@ -274,6 +274,7 @@ namespace Jondo.Unity.World.Achievements
                 }
 
                 var objectives = ReadObjectives(root, Say);
+                ApplyAuthoredCriteria(objectives, report);
                 var links = ReadLinks(report);
                 var rewards = ReadRewards(root);
 
@@ -463,6 +464,49 @@ namespace Jondo.Unity.World.Achievements
             }
 
             return objectives;
+        }
+
+        /// <summary>The file of criteria written by hand, relative to the content root.</summary>
+        public const string AuthoredCriteriaFile = "achievements/objectives.json";
+
+        /// <summary>
+        /// Puts the criteria written in content/achievements/objectives.json in place of the
+        /// client's, for objectives whose own the server alone can judge.
+        /// </summary>
+        /// <remarks>
+        /// 416 objectives carry «BI=1», which the client's criterion factory makes an Unusable:
+        /// Ankama's server decides them. The tutorial's «Primera parte del tutorial» (17380) is one,
+        /// and «Primer tiempo» (8518), which hands over the experience of level 2, could never be
+        /// earned. The capture says when it is: right after 2502's step 3173 is validated (idz 3173,
+        /// then mfu 8518). What it is judged by is written here, with the measurement beside it.
+        /// </remarks>
+        private static void ApplyAuthoredCriteria(Dictionary<int, AchievementObjective> objectives, Action<string>? report)
+        {
+            string path = Paths.ContentFile(AuthoredCriteriaFile);
+            if (!File.Exists(path)) return;
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("objectives", out var rows)) return;
+                foreach (var row in rows.EnumerateArray())
+                {
+                    int id = (int)Long(row, "objective");
+                    string criterion = Text(row, "criterion");
+                    if (id == 0 || criterion.Length == 0 || !objectives.TryGetValue(id, out var old)) continue;
+                    objectives[id] = new AchievementObjective
+                    {
+                        Id = old.Id,
+                        AchievementId = old.AchievementId,
+                        Name = old.Name,
+                        Criterion = criterion,
+                        Terms = QuestCriterion.Terms(criterion),
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                report?.Invoke($"{Path.GetFileName(path)} is unreadable: {ex.Message}");
+            }
         }
 
         /// <summary>The objectives the client does not describe, from the link file. Empty when it is not there.</summary>

@@ -27,8 +27,19 @@ namespace Jondo.Unity.Server.Handlers
     /// </summary>
     public static class CharacterCreationHandler
     {
-        /// <summary>Where everybody starts: the zaap of the city of Astrub.</summary>
+        /// <summary>
+        /// The zaap of the city of Astrub: where whoever has no better place goes (a defeat with
+        /// no save point, the simulated players' home), and where the tutorial ends up.
+        /// </summary>
         public const long StartingMap = 191105026L;
+
+        /// <summary>
+        /// Where a new character wakes up: before the god's statue of the guided tutorial, the
+        /// same map for every class, on cell 329 facing 1 (the capture of the whole tutorial, its
+        /// first jss; the creation capture lands there too).
+        /// </summary>
+        public const long TutorialMap = 241437185L;
+        public const int TutorialCell = 329;
 
         /// <summary>What he starts with: level, kamas and the scroll characteristics.</summary>
         public const int StartingLevel = 1;
@@ -178,8 +189,9 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             long id = DatabaseManager.CreateCharacter(accountId, serverId, name, breed, sex, head,
-                                                      colors, StartingMap, StartingLevel,
-                                                      StartingKamas, ScrolledStat, AdventurerSet);
+                                                      colors, TutorialMap, StartingLevel,
+                                                      StartingKamas, ScrolledStat, AdventurerSet,
+                                                      TutorialCell);
             if (id == 0)
             {
                 await RefuseAsync(stream, CreationRefused);
@@ -206,8 +218,8 @@ namespace Jondo.Unity.Server.Handlers
             foreach (byte[] frame in ConnectionProtocol.CharacterListFrames(characters))
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
 
-            Console.WriteLine($"[Characters] Created {name} (id {id}), breed {breed}, at the Astrub " +
-                              $"zaap, with the adventurer's set and {StartingKamas} kamas.");
+            Console.WriteLine($"[Characters] Created {name} (id {id}), breed {breed}, before the " +
+                              $"tutorial's statue, with the adventurer's set and {StartingKamas} kamas.");
         }
 
         /// <summary>The reasons the kvb carries when it says no. 3 is the limit one.</summary>

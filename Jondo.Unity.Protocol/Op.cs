@@ -374,6 +374,12 @@ public static class Op
     /// <summary>The client asks about one of its quests: 1:quest.</summary>
     public const string Iec = "iec";
 
+    /// <summary>
+    /// The server considers an objective validated while its step goes on: 1:quest, 2:objective.
+    /// After an lqn 55 every time in the tutorial capture (2511's 19537, 1629's 9655...).
+    /// </summary>
+    public const string Ieb = "ieb";
+
     /// <summary>Starts a quest: 1:quest.</summary>
     /// <remarks>
     /// The only one of the six already documented in the repository. It appears in 12 frames of 5

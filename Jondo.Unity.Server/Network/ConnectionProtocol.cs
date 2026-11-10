@@ -2195,7 +2195,27 @@ namespace Jondo.Unity.Server.Network
         /// </remarks>
         public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies,
                                               IReadOnlyDictionary<long, IReadOnlyList<long>> parametros)
+            => BuildNpcQuestion(messageId, replies, parametros, (IReadOnlyDictionary<long, IReadOnlyList<IReadOnlyList<long>>>?)null);
+
+        /// <summary>
+        /// The same question, with what each reply's effects act on: f3 { f1: effect, f2: [args] }.
+        /// </summary>
+        /// <remarks>
+        /// The guided tutorial's Ganymed hands over the starter equipment with
+        /// f2 { f1: 77737, f3 { f1: 193 } ×6, f3 { f1: 34, f2: [2511] }, f3 { f1: 2192 } }:
+        /// the 34 is «Empieza una misión» and its f2 the quest the client names beside the reply.
+        /// f2 is packed, as the capture carries it.
+        /// </remarks>
+        public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies,
+                                              IReadOnlyDictionary<long, IReadOnlyList<long>>? parametros,
+                                              IReadOnlyDictionary<long, IReadOnlyList<IReadOnlyList<long>>>? arguments)
         {
+            replies = replies.ToList();
+            if (SessionContext.Actual is { } asked)
+            {
+                asked.State.LastNpcQuestion = messageId;
+                asked.State.LastNpcReplies = (List<long>)replies;
+            }
             var ios = Pb.New().Var(1, messageId);
             foreach (long reply in replies)
             {
@@ -2203,7 +2223,14 @@ namespace Jondo.Unity.Server.Network
 
                 if (parametros != null && parametros.TryGetValue(reply, out var suyos))
                 {
-                    foreach (long valor in suyos) una.Msg(3, Pb.New().Var(1, valor));
+                    IReadOnlyList<IReadOnlyList<long>>? args = null;
+                    arguments?.TryGetValue(reply, out args);
+                    for (int i = 0; i < suyos.Count; i++)
+                    {
+                        var effect = Pb.New().Var(1, suyos[i]);
+                        if (args != null && i < args.Count && args[i].Count > 0) effect.Packed(2, args[i]);
+                        una.Msg(3, effect);
+                    }
                 }
 
                 ios.Msg(2, una);

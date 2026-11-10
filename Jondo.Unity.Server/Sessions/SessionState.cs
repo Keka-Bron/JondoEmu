@@ -344,6 +344,16 @@ namespace Jondo.Unity.Server
         /// </summary>
         public int OpenDialogueNpcId { get; set; }
 
+        /// <summary>
+        /// The last question an NPC put to this character (its ios) and the replies it offered,
+        /// as they went out: what the test harness reads back to walk a conversation and to judge
+        /// it against the quest it belongs to.
+        /// </summary>
+        public long LastNpcQuestion { get; set; }
+
+        /// <summary>See <see cref="LastNpcQuestion"/>.</summary>
+        public IReadOnlyList<long> LastNpcReplies { get; set; } = Array.Empty<long>();
+
         /// <summary>The map where it was opened, which is part of which conversation it is.</summary>
         public long OpenDialogueMapId { get; set; }
 

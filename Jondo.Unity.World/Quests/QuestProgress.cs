@@ -57,9 +57,11 @@ namespace Jondo.Unity.World.Quests
     /// </remarks>
     public readonly struct QuestMove
     {
-        public QuestMove(bool objectiveTicked, int finishedStep, int nextStep, bool questFinished)
+        public QuestMove(bool objectiveTicked, int finishedStep, int nextStep, bool questFinished,
+                         int tickedObjective = 0)
         {
             ObjectiveTicked = objectiveTicked;
+            TickedObjective = tickedObjective;
             FinishedStep = finishedStep;
             NextStep = nextStep;
             QuestFinished = questFinished;
@@ -67,6 +69,9 @@ namespace Jondo.Unity.World.Quests
 
         /// <summary>False when the objective was already done, or was not part of this step.</summary>
         public bool ObjectiveTicked { get; }
+
+        /// <summary>The objective that was just finished, when one was; zero for a partial count or a whole step.</summary>
+        public int TickedObjective { get; }
 
         /// <summary>The step that was just completed. Zero when none was.</summary>
         public int FinishedStep { get; }
@@ -157,8 +162,34 @@ namespace Jondo.Unity.World.Quests
             foreach (var run in _runs.Values)
             {
                 if (run.Done.Contains(objectiveId)) return true;
+                if (Passed(run, objectiveId)) return true;
             }
 
+            return false;
+        }
+
+        /// <summary>
+        /// Whether the objective belongs to a step the run has left behind -- or to a quest it has
+        /// finished --, which is done whatever the run's own list says.
+        /// </summary>
+        /// <remarks>
+        /// The list holds the step in hand only: it is emptied on moving on. So «Qo>19250»,
+        /// 1629's start condition, went false the moment 19250 closed its step, and the quest
+        /// could not be taken while 2502 was still under way, which is when the tutorial capture
+        /// hands it over.
+        /// </remarks>
+        private bool Passed(QuestRun run, int objectiveId)
+        {
+            var quest = _book.Of(run.QuestId);
+            if (quest == null) return false;
+            foreach (var step in quest.Steps)
+            {
+                if (!run.Finished && step.Id == run.StepId) return false;
+                foreach (var objective in step.Objectives)
+                {
+                    if (objective.Id == objectiveId) return true;
+                }
+            }
             return false;
         }
 
@@ -290,12 +321,12 @@ namespace Jondo.Unity.World.Quests
             {
                 if (!run.Done.Contains(objective.Id))
                 {
-                    return new QuestMove(true, 0, run.StepId, false);
+                    return new QuestMove(true, 0, run.StepId, false, objectiveId);
                 }
             }
 
             int finished = run.StepId;
-            return new QuestMove(true, finished, Advance(run), run.Finished);
+            return new QuestMove(true, finished, Advance(run), run.Finished, objectiveId);
         }
 
         /// <summary>

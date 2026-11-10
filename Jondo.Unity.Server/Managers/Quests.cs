@@ -38,6 +38,18 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«Misión terminada»: the lqn every finished quest of the captures opens its close with, the quest as its parameter.</summary>
         public const int QuestFinishedMessage = 56;
 
+        /// <summary>«Nueva misión»: the lqn before every ief of the tutorial capture, the quest as its parameter.</summary>
+        public const int QuestStartedMessage = 54;
+
+        /// <summary>«Misión actualizada»: the lqn before every idz and ieb of the tutorial capture.</summary>
+        public const int QuestUpdatedMessage = 55;
+
+        /// <summary>An info line naming a quest: lqn 54, 55 or 56.</summary>
+        private static Task TellAsync(NetworkStream stream, int message, int questId)
+            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                    InfoMessages.Info, message, questId.ToString(CultureInfo.InvariantCulture))));
+
         /// <summary>Line of dialogue to the steps it hands over.</summary>
         /// <remarks>
         /// Built once at load. The catalogue itself has no index from a dialogue line back to a
@@ -247,6 +259,7 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var objective in step.Objectives)
                 {
                     if (objective.NpcId != npcId) continue;
+                    if (!Revealed(step, objective, run)) continue;
                     if (offering && (npcId == Almanax.Giver || !Handlers.AlmanaxOfferingHandler.MaySeeTheSaint(run.QuestId))) continue;
                     if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId) continue;
 
@@ -272,6 +285,30 @@ namespace Jondo.Unity.Server.Managers
                     await CloseAsync(stream, binding);
                 }
             }
+        }
+
+        /// <summary>
+        /// Whether a conversation objective has come up yet in its step.
+        /// </summary>
+        /// <remarks>
+        /// The real server reveals a step's objectives as they become relevant (a growing prefix,
+        /// see QuestProtocol.BuildQuestStep), and a hello only closes the ones that are there. 1629
+        /// asks to see Master Curro twice -- 9656 on arriving, 10015 with the ring -- and one hello
+        /// closed both, the quest done before a single resource was gathered. So «go back and see
+        /// #1» (type 9) waits for everything listed before it, and «go and see #1» (type 1) for
+        /// whatever before it is not another conversation: five people to visit in one step
+        /// («Un pueblo sobre las nubes») are still visited in any order.
+        /// </remarks>
+        private static bool Revealed(QuestStep step, QuestObjective objective, QuestRun run)
+        {
+            foreach (var before in step.Objectives)
+            {
+                if (before.Id == objective.Id) return true;
+                if (run.Done.Contains(before.Id)) continue;
+                if (objective.TypeId == QuestCatalogue.GoBackToSee) return false;
+                if (before.TypeId != QuestCatalogue.GoToSee) return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -425,14 +462,26 @@ namespace Jondo.Unity.Server.Managers
             if (!wanted) return false;
 
             // What it puts in the bag, before the tick: the item is the reason the objective is
-            // finished, so a hand-out that fails must not leave it marked done.
+            // finished, so a hand-out that fails must not leave it marked done. Not so for a
+            // conversation that hands things over: the conversation is the reason, and the
+            // tutorial capture validates Ganymed's step (idz 3169) before his six items arrive.
+            bool talkFirst = binding.Kind == QuestBindingKind.Talk;
+            if (talkFirst) await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
             foreach (var (item, count) in binding.Gives)
             {
-                if (await Equipment.GiveAsync(stream, item, count)) continue;
+                if (await Equipment.GiveAsync(stream, item, count))
+                {
+                    // «Has conseguido 1 '...'», after each one, as the capture has it (lqn 21).
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                            InfoMessages.ItemGained, count.ToString(CultureInfo.InvariantCulture),
+                            item.ToString(CultureInfo.InvariantCulture))));
+                    continue;
+                }
 
                 Console.WriteLine($"[Quests] Objective {binding.ObjectiveId} had to give " +
-                                  $"{count}x{item} and could not; it is not marked.");
-                return false;
+                                  $"{count}x{item} and could not" + (talkFirst ? "." : "; it is not marked."));
+                if (!talkFirst) return false;
             }
 
             // And what is required is spent, if the row says so. After handing out and before marking,
@@ -443,10 +492,13 @@ namespace Jondo.Unity.Server.Managers
                     await Equipment.TakeAsync(stream, item, count);
             }
 
-            await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
+            if (!talkFirst) await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
 
             if (binding.SpawnsMonster != 0)
                 await SpawnAsync(stream, binding);
+
+            if (binding.ThenStarts != 0 && log.Run(binding.ThenStarts) == null)
+                await StartAsync(stream, binding.ThenStarts);
 
             return true;
         }
@@ -587,6 +639,98 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// The character has finished a walk on a map: an objective bound as «walk» there is done.
+        /// The guided tutorial's 19534 closes this way, server-side, after the client's jqi.
+        /// </summary>
+        public static async Task OnWalkedAsync(NetworkStream stream, long mapId)
+        {
+            var log = Log;
+            if (log == null || _book == null || mapId == 0) return;
+
+            foreach (var run in new List<QuestRun>(log.Doing()))
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    var binding = Bindings.Of(objective.Id);
+                    if (binding == null || binding.Kind != QuestBindingKind.Walk || binding.MapId != mapId) continue;
+                    await CloseAsync(stream, binding);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Something has been gathered on a map: an objective bound to gathering it there closes
+        /// (the tutorial's five resources of the jobs room).
+        /// </summary>
+        public static async Task OnGatheredAsync(NetworkStream stream, int itemId, long mapId)
+        {
+            var log = Log;
+            if (log == null || _book == null) return;
+            foreach (var run in new List<QuestRun>(log.Doing()))
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    var binding = Bindings.Of(objective.Id);
+                    if (binding == null || binding.Kind != QuestBindingKind.Gather || binding.ItemId != itemId) continue;
+                    if (binding.MapId != 0 && binding.MapId != mapId) continue;
+                    await CloseAsync(stream, binding);
+                }
+            }
+        }
+
+        /// <summary>
+        /// A workshop has been closed after making these items: «Fabricar #2 #1 y cerrar la
+        /// interfaz» (type 17) is done for each the bench made enough of.
+        /// </summary>
+        public static async Task OnCraftedAsync(NetworkStream stream, IReadOnlyDictionary<int, int> made)
+        {
+            var log = Log;
+            if (log == null || _book == null) return;
+            foreach (var run in new List<QuestRun>(log.Doing()))
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    if (objective.TypeId != QuestCatalogue.CraftItem) continue;
+                    if (!made.TryGetValue(objective.ItemId, out int count) || count < objective.ItemCount) continue;
+                    await TickAsync(stream, run.QuestId, objective.Id);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Closes the objectives in hand bound to others being done (QuestBindingKind.Objectives):
+        /// the tutorial's 19253, once 1629's five resources are gathered.
+        /// </summary>
+        private static async Task AfterObjectivesAsync(NetworkStream stream)
+        {
+            var log = Log;
+            if (log == null || _book == null) return;
+            foreach (var run in new List<QuestRun>(log.Doing()))
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    var binding = Bindings.Of(objective.Id);
+                    if (binding == null || binding.Kind != QuestBindingKind.Objectives || binding.AfterObjectives.Count == 0) continue;
+                    if (run.Done.Contains(objective.Id)) continue;
+                    bool all = true;
+                    foreach (int needed in binding.AfterObjectives)
+                    {
+                        if (!log.ObjectiveDone(needed)) { all = false; break; }
+                    }
+                    if (all) await CloseAsync(stream, binding);
+                }
+            }
+        }
+
+        /// <summary>
         /// Starts a quest and tells the client, if the character is allowed it.
         /// </summary>
         public static async Task<bool> StartAsync(NetworkStream stream, int questId)
@@ -621,6 +765,7 @@ namespace Jondo.Unity.Server.Managers
 
             Save(questId, run);
 
+            await TellAsync(stream, QuestStartedMessage, questId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ief, QuestProtocol.BuildQuestStarted(questId)));
 
@@ -747,12 +892,48 @@ namespace Jondo.Unity.Server.Managers
             var offers = new List<int>();
             if (log == null) return offers;
 
+            HashSet<int>? reachable = ReachableNow(npcId, mapId, log);
             foreach (int questId in QuestsOfferedBy(npcId, mapId))
             {
+                if (reachable != null && !reachable.Contains(questId)) continue;
                 if (!OfferedAlreadyToday(questId) && log.CanStart(questId, out _)) offers.Add(questId);
             }
 
             return offers;
+        }
+
+        /// <summary>
+        /// The quests the NPC's conversation can hand over right now, following it from the line
+        /// it opens on for this character; null when it opens on the same line for everybody.
+        /// </summary>
+        /// <remarks>
+        /// A tree whose opening depends on the quests marked the NPC for every quest any of its
+        /// lines hands over: the tutorial's Ganymed showed 2511's mark from the welcome on, though
+        /// only his line after the first fight gives it.
+        /// </remarks>
+        private static HashSet<int>? ReachableNow(int npcId, long mapId, QuestLog log)
+        {
+            var tree = NpcDialogues.For(npcId, mapId);
+            if (tree == null || tree.Openings.Count == 0) return null;
+
+            var start = tree.OpeningFor(SessionContext.State.Breed, log.Active, log.Finished,
+                (quest, step) => log.Run(quest)?.StepId == step,
+                (quest, objective) => log.ObjectiveDone(objective));
+            var found = new HashSet<int>();
+            var seen = new HashSet<long>();
+            var queue = new Queue<Jondo.Unity.World.Content.DialogueLine>();
+            if (start != null) queue.Enqueue(start);
+            while (queue.Count > 0)
+            {
+                var line = queue.Dequeue();
+                if (!seen.Add(line.Message)) continue;
+                foreach (var choice in line.Choices)
+                {
+                    if (choice.StartsQuest != 0) found.Add(choice.StartsQuest);
+                    if (!choice.Ends && tree.Line(choice.Next) is { } next) queue.Enqueue(next);
+                }
+            }
+            return found;
         }
 
         /// <summary>
@@ -799,7 +980,8 @@ namespace Jondo.Unity.Server.Managers
                     if (run.Done.Contains(objective.Id)) continue;
 
                     if (objective.NpcId == npcId
-                        && (objective.MapId == 0 || objective.MapId == mapId))
+                        && (objective.MapId == 0 || objective.MapId == mapId)
+                        && Revealed(step, objective, run))
                     {
                         wants = true;
                         break;
@@ -1027,16 +1209,27 @@ namespace Jondo.Unity.Server.Managers
 
             Save(questId, run);
 
-            if (move.StepFinished)
+            if (move.StepFinished && !move.QuestFinished)
             {
                 // idz names the step that WAS in hand, not the one now in hand, and it goes out
-                // before the next step does. The tutorial shows that order 21 times.
+                // before the next step does. The tutorial shows that order 21 times, each after
+                // the lqn 55 that names the quest.
+                await TellAsync(stream, QuestUpdatedMessage, questId);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Idz,
                         QuestProtocol.BuildStepValidated(questId, move.FinishedStep)));
-
-                await PayAsync(stream, move.FinishedStep);
             }
+            else if (move.ObjectiveTicked && !move.StepFinished && move.TickedObjective != 0)
+            {
+                // An objective done with more of the step to go: lqn 55 and ieb, as the tutorial's
+                // 2511 and 1629 go, objective by objective.
+                await TellAsync(stream, QuestUpdatedMessage, questId);
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ieb,
+                        QuestProtocol.BuildObjectiveValidated(questId, move.TickedObjective)));
+            }
+
+            if (move.StepFinished) await PayAsync(stream, move.FinishedStep);
 
             if (!move.QuestFinished)
             {
@@ -1082,6 +1275,18 @@ namespace Jondo.Unity.Server.Managers
                 // the tutorial's 8518 «Primer tiempo» is literally (Qf=2511).
                 await Achievements.AfterQuestAsync(stream, questId);
             }
+
+            // What a validated objective earns (Qo): the tutorial's «Primer tiempo» follows idz 3173.
+            if (move.TickedObjective != 0)
+            {
+                await Achievements.AfterObjectiveAsync(stream, move.TickedObjective);
+                await AfterObjectivesAsync(stream);
+            }
+
+            // And an NPC of the map who speaks on his own once that step is done (the tutorial's
+            // voice, idz 3226 then ioc and ios with no iov between).
+            if (move.StepFinished)
+                await Handlers.NpcHandler.PushAfterStepAsync(stream, move.FinishedStep);
         }
 
         /// <summary>

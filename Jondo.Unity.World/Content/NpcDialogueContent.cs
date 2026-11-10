@@ -103,6 +103,15 @@ namespace Jondo.Unity.World.Content
         public IReadOnlyList<long> Parameters { get; init; } = Array.Empty<long>();
 
         /// <summary>
+        /// The arguments each of <see cref="Parameters"/> carries, by position: what the client
+        /// draws beside the reply is an effect, and some name what they act on. The guided
+        /// tutorial's Ganymed offers «Recibir el equipo» with six 193 «Gana x#2 #3» and a 34
+        /// «Empieza una misión» whose f2 is the quest, 2511: f3 { f1: 34, f2: [2511] }. Written in
+        /// the file as an array, [34, 2511]; a bare number has none.
+        /// </summary>
+        public IReadOnlyList<IReadOnlyList<long>> ParameterArgs { get; init; } = Array.Empty<IReadOnlyList<long>>();
+
+        /// <summary>
         /// What this reply does to the player's dream points, as a percentage. Zero for the
         /// replies of everybody who is not inside a dream.
         /// </summary>
@@ -188,6 +197,12 @@ namespace Jondo.Unity.World.Content
     {
         public long Message { get; init; }
 
+        /// <summary>
+        /// True when the line names the character -- «¡Has trabajado muy bien, #1!» -- and the
+        /// name goes with it, as ios f3: Master Curro's 20681 in the tutorial capture.
+        /// </summary>
+        public bool NamesTheCharacter { get; init; }
+
         public IReadOnlyList<DialogueChoice> Choices { get; init; } = Array.Empty<DialogueChoice>();
 
         public DialogueChoice? Choice(long reply)
@@ -259,9 +274,102 @@ namespace Jondo.Unity.World.Content
         public override string ToString() => $"message {Message}, {Choices.Count} replies";
     }
 
+    /// <summary>
+    /// A line an NPC opens with when the character stands somewhere particular in a quest: before
+    /// it, on a step of it, after it, or with one of its objectives done -- and per class, when
+    /// the line is the god of the character's class.
+    /// </summary>
+    /// <remarks>
+    /// One opening per NPC was not enough for any NPC a quest goes through. The guided tutorial's
+    /// Ganymed opens four ways in the capture of it -- 57134 to welcome, 57133 back from the first
+    /// fight, 57132 after the second, 60411 once the level is up -- and what decided which was the
+    /// character's quests, which is server knowledge. Read in order; the first that holds wins;
+    /// none, and the NPC's <see cref="NpcDialogue.Opening"/>.
+    /// </remarks>
+    public sealed class DialogueOpening
+    {
+        /// <summary>The line, for every class but those in <see cref="ByBreed"/>.</summary>
+        public long Message { get; init; }
+
+        /// <summary>The line for a class, by breed id: the Mysterious Voice presents each class's god.</summary>
+        public IReadOnlyDictionary<int, long> ByBreed { get; init; } = new Dictionary<int, long>();
+
+        /// <summary>Only while this quest is under way.</summary>
+        public int Quest { get; init; }
+
+        /// <summary>And on this step of it.</summary>
+        public int Step { get; init; }
+
+        /// <summary>And with this objective of it done.</summary>
+        public int Objective { get; init; }
+
+        /// <summary>And with this objective of it still to do: Curro welcomes before he is talked to.</summary>
+        public int Pending { get; init; }
+
+        /// <summary>Only to somebody who has neither started nor finished this quest.</summary>
+        public int Before { get; init; }
+
+        /// <summary>Only once this quest is finished.</summary>
+        public int After { get; init; }
+
+        /// <summary>The line for a character of this class.</summary>
+        public long MessageFor(int breed) => ByBreed.TryGetValue(breed, out long line) ? line : Message;
+
+        /// <summary>Whether it holds for a character, his quests read through the callbacks.</summary>
+        public bool Holds(Func<int, bool> active, Func<int, bool> finished, Func<int, int, bool> onStep,
+                          Func<int, int, bool> objectiveDone)
+        {
+            if (Before != 0 && (active(Before) || finished(Before))) return false;
+            if (After != 0 && !finished(After)) return false;
+            if (Quest != 0 && !active(Quest)) return false;
+            if (Step != 0 && !onStep(Quest, Step)) return false;
+            if (Objective != 0 && !objectiveDone(Quest, Objective)) return false;
+            if (Pending != 0 && objectiveDone(Quest, Pending)) return false;
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// A line the NPC says without being clicked, the moment a step of a quest is done -- the
+    /// tutorial's voice presenting the class's god as soon as the first steps are taken (the
+    /// capture's idz 3226 is followed by the ioc and the ios, with no iov between).
+    /// </summary>
+    public sealed class DialoguePush
+    {
+        /// <summary>The step whose end opens it.</summary>
+        public int AfterStep { get; init; }
+
+        /// <summary>The line it opens on, per class as an opening can be.</summary>
+        public DialogueOpening Line { get; init; } = new DialogueOpening();
+    }
+
     /// <summary>A whole conversation with one NPC.</summary>
     public sealed class NpcDialogue
     {
+        /// <summary>The lines it opens with by quest, in order. See <see cref="DialogueOpening"/>.</summary>
+        public IReadOnlyList<DialogueOpening> Openings { get; init; } = Array.Empty<DialogueOpening>();
+
+        /// <summary>The lines it opens on by itself when a step ends. See <see cref="DialoguePush"/>.</summary>
+        public IReadOnlyList<DialoguePush> Pushes { get; init; } = Array.Empty<DialoguePush>();
+
+        /// <summary>
+        /// The line it opens with for this character: the first opening that holds, or else
+        /// <see cref="First"/>. A line it opens on that is not one of its lines comes back bare,
+        /// with no replies -- the client draws its Leave.
+        /// </summary>
+        public DialogueLine? OpeningFor(int breed, Func<int, bool> active, Func<int, bool> finished,
+                                        Func<int, int, bool> onStep, Func<int, int, bool> objectiveDone)
+        {
+            foreach (var opening in Openings)
+            {
+                if (!opening.Holds(active, finished, onStep, objectiveDone)) continue;
+                long message = opening.MessageFor(breed);
+                if (message == 0) continue;
+                return Line(message) ?? new DialogueLine { Message = message };
+            }
+            return First();
+        }
+
         public int NpcId { get; init; }
 
         /// <summary>Which map this is for. Zero means wherever the NPC stands.</summary>
@@ -355,9 +463,115 @@ namespace Jondo.Unity.World.Content
             var salen = new List<long>();
             foreach (var item in list.EnumerateArray())
             {
-                if (item.TryGetInt64(out long valor)) salen.Add(valor);
+                // TryGetInt64 throws on anything that is not a number, so the kind is asked first.
+                if (item.ValueKind == JsonValueKind.Number && item.TryGetInt64(out long valor)) salen.Add(valor);
+                else if (item.ValueKind == JsonValueKind.Array && item.GetArrayLength() > 0
+                         && item[0].ValueKind == JsonValueKind.Number && item[0].TryGetInt64(out long effect))
+                    salen.Add(effect);
             }
             return salen;
+        }
+
+        /// <summary>
+        /// The arguments of each entry of "params", by position: an entry written as an array,
+        /// [34, 2511], is the effect and then what it carries; a bare number carries nothing.
+        /// Empty when no entry carries anything, which is nearly always.
+        /// </summary>
+        private static IReadOnlyList<IReadOnlyList<long>> ParameterArguments(JsonElement element)
+        {
+            if (!element.TryGetProperty("params", out var list) || list.ValueKind != JsonValueKind.Array)
+                return Array.Empty<IReadOnlyList<long>>();
+
+            var args = new List<IReadOnlyList<long>>();
+            bool any = false;
+            foreach (var item in list.EnumerateArray())
+            {
+                var these = new List<long>();
+                if (item.ValueKind == JsonValueKind.Array)
+                {
+                    bool first = true;
+                    foreach (var part in item.EnumerateArray())
+                    {
+                        if (first) { first = false; continue; }
+                        if (part.ValueKind == JsonValueKind.Number && part.TryGetInt64(out long value)) these.Add(value);
+                    }
+                }
+                if (these.Count > 0) any = true;
+                args.Add(these);
+            }
+            return any ? args : Array.Empty<IReadOnlyList<long>>();
+        }
+
+        /// <summary>An opening, or a push's line: the message, per class, and the quest state it holds in.</summary>
+        private static DialogueOpening ReadOpening(JsonElement entry)
+        {
+            var byBreed = new Dictionary<int, long>();
+            if (entry.TryGetProperty("byBreed", out var breeds) && breeds.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var breed in breeds.EnumerateObject())
+                {
+                    if (int.TryParse(breed.Name, out int id) && breed.Value.ValueKind == JsonValueKind.Number
+                        && breed.Value.TryGetInt64(out long line))
+                        byBreed[id] = line;
+                }
+            }
+
+            return new DialogueOpening
+            {
+                Message = Number(entry, "message"),
+                ByBreed = byBreed,
+                Quest = (int)Number(entry, "quest"),
+                Step = (int)Number(entry, "step"),
+                Objective = (int)Number(entry, "objective"),
+                Pending = (int)Number(entry, "pending"),
+                Before = (int)Number(entry, "before"),
+                After = (int)Number(entry, "after"),
+            };
+        }
+
+        private static DialogueOpening[] ReadOpenings(JsonElement entry)
+        {
+            if (!entry.TryGetProperty("openings", out var list) || list.ValueKind != JsonValueKind.Array)
+                return Array.Empty<DialogueOpening>();
+            var read = new List<DialogueOpening>();
+            foreach (var item in list.EnumerateArray()) read.Add(ReadOpening(item));
+            return read.ToArray();
+        }
+
+        private static DialoguePush[] ReadPushes(JsonElement entry)
+        {
+            if (!entry.TryGetProperty("pushes", out var list) || list.ValueKind != JsonValueKind.Array)
+                return Array.Empty<DialoguePush>();
+            var read = new List<DialoguePush>();
+            foreach (var item in list.EnumerateArray())
+            {
+                int step = (int)Number(item, "afterStep");
+                if (step == 0) continue;
+                read.Add(new DialoguePush { AfterStep = step, Line = ReadOpening(item) });
+            }
+            return read.ToArray();
+        }
+
+        private static void WriteOpening(Utf8JsonWriter writer, DialogueOpening opening, int afterStep = 0)
+        {
+            writer.WriteStartObject();
+            if (afterStep != 0) writer.WriteNumber("afterStep", afterStep);
+            if (opening.Message != 0) writer.WriteNumber("message", opening.Message);
+            if (opening.Before != 0) writer.WriteNumber("before", opening.Before);
+            if (opening.Quest != 0) writer.WriteNumber("quest", opening.Quest);
+            if (opening.Step != 0) writer.WriteNumber("step", opening.Step);
+            if (opening.Objective != 0) writer.WriteNumber("objective", opening.Objective);
+            if (opening.Pending != 0) writer.WriteNumber("pending", opening.Pending);
+            if (opening.After != 0) writer.WriteNumber("after", opening.After);
+            if (opening.ByBreed.Count > 0)
+            {
+                writer.WriteStartObject("byBreed");
+                var breeds = new List<int>(opening.ByBreed.Keys);
+                breeds.Sort();
+                foreach (int breed in breeds) writer.WriteNumber(breed.ToString(), opening.ByBreed[breed]);
+                writer.WriteEndObject();
+            }
+            writer.WriteEndObject();
         }
 
         public static ContentStore<NpcDialogueKey, NpcDialogue> Load(string? authoredPath,
@@ -391,6 +605,8 @@ namespace Jondo.Unity.World.Content
                         NpcId = npcId,
                         MapId = mapId,
                         Opening = Number(entry, "opening"),
+                        Openings = ReadOpenings(entry),
+                        Pushes = ReadPushes(entry),
                         Lines = ReadLines(entry, report, npcId),
                     }, from);
                 }
@@ -442,6 +658,7 @@ namespace Jondo.Unity.World.Content
                             TeleportsTo = Number(choice, "teleport"),
                             TeleportPassage = (int)Number(choice, "passage"),
                             Parameters = Numbers(choice, "params"),
+                            ParameterArgs = ParameterArguments(choice),
                             DreamPointsPercent = (int)Number(choice, "dreamPointsPercent"),
                             DreamFavor = choice.TryGetProperty("dreamFavor", out var favor)
                                          && favor.ValueKind == JsonValueKind.True,
@@ -461,7 +678,12 @@ namespace Jondo.Unity.World.Content
                     }
                 }
 
-                read.Add(new DialogueLine { Message = message, Choices = choices.ToArray() });
+                read.Add(new DialogueLine
+                {
+                    Message = message,
+                    Choices = choices.ToArray(),
+                    NamesTheCharacter = line.TryGetProperty("names", out var names) && names.ValueKind == JsonValueKind.True,
+                });
             }
 
             return read.ToArray();
@@ -519,6 +741,18 @@ namespace Jondo.Unity.World.Content
                     writer.WriteNumber("npc", dialogue.NpcId);
                     writer.WriteNumber("map", dialogue.MapId);
                     if (dialogue.Opening != 0) writer.WriteNumber("opening", dialogue.Opening);
+                    if (dialogue.Openings.Count > 0)
+                    {
+                        writer.WriteStartArray("openings");
+                        foreach (var opening in dialogue.Openings) WriteOpening(writer, opening);
+                        writer.WriteEndArray();
+                    }
+                    if (dialogue.Pushes.Count > 0)
+                    {
+                        writer.WriteStartArray("pushes");
+                        foreach (var push in dialogue.Pushes) WriteOpening(writer, push.Line, push.AfterStep);
+                        writer.WriteEndArray();
+                    }
 
                     writer.WritePropertyName("lines");
                     writer.WriteStartArray();
@@ -526,6 +760,7 @@ namespace Jondo.Unity.World.Content
                     {
                         writer.WriteStartObject();
                         writer.WriteNumber("message", line.Message);
+                        if (line.NamesTheCharacter) writer.WriteBoolean("names", true);
 
                         writer.WritePropertyName("choices");
                         writer.WriteStartArray();
@@ -558,7 +793,19 @@ namespace Jondo.Unity.World.Content
                             if (choice.Parameters.Count > 0)
                             {
                                 writer.WriteStartArray("params");
-                                foreach (long valor in choice.Parameters) writer.WriteNumberValue(valor);
+                                for (int i = 0; i < choice.Parameters.Count; i++)
+                                {
+                                    var args = i < choice.ParameterArgs.Count ? choice.ParameterArgs[i] : null;
+                                    if (args == null || args.Count == 0)
+                                    {
+                                        writer.WriteNumberValue(choice.Parameters[i]);
+                                        continue;
+                                    }
+                                    writer.WriteStartArray();
+                                    writer.WriteNumberValue(choice.Parameters[i]);
+                                    foreach (long arg in args) writer.WriteNumberValue(arg);
+                                    writer.WriteEndArray();
+                                }
                                 writer.WriteEndArray();
                             }
                             if (choice.ReturnsHome) writer.WriteBoolean("teleportBack", true);
@@ -655,7 +902,8 @@ namespace Jondo.Unity.World.Content
         }
 
         private static long Number(JsonElement element, string name)
-            => element.TryGetProperty(name, out var value) && value.TryGetInt64(out long number) ? number : 0;
+            => element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number
+               && value.TryGetInt64(out long number) ? number : 0;
 
         private static readonly string[] DefaultComment =
         {

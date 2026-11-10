@@ -61,6 +61,12 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>What one character has open.</summary>
         public sealed class Bench
         {
+            /// <summary>
+            /// What has been made at this bench since it was opened, by item: «Fabricar #2 #1 y
+            /// cerrar la interfaz» (quest objective type 17) is done when it closes.
+            /// </summary>
+            public Dictionary<int, int> Made { get; } = new();
+
             public int ElementId { get; init; }
             public int SkillId { get; init; }
 
@@ -174,6 +180,11 @@ namespace Jondo.Unity.Server.Handlers
             if (bench?.Breaker == true || bench?.Book == true || bench?.Recycle != null) return;   // the grinder's close, the book's and the recycling's is the khd alone
             await SendAsync(stream, Op.Ivx, ConnectionProtocol.BuildInventory());
             await SendAsync(stream, Op.Hlm, Array.Empty<byte>());
+
+            // «Fabricar #2 #1 y cerrar la interfaz»: the tutorial's ring (9662, 19254), validated
+            // in the capture once the bench is closed.
+            if (bench != null && bench.Made.Count > 0)
+                await Managers.Quests.OnCraftedAsync(stream, bench.Made);
         }
 
         /// <summary>Nothing open survives a map change; a commission or a trade ends for both.</summary>
@@ -399,6 +410,10 @@ namespace Jondo.Unity.Server.Handlers
 
             // "Fabricar 1 objeto": the tutorial earns it right here, after the ring.
             await Managers.Achievements.AfterCraftAsync(stream, count);
+
+            // And what a quest asks to have made, once the bench is closed (CloseAsync).
+            bench.Made.TryGetValue(recipe.ResultId, out int madeHere);
+            bench.Made[recipe.ResultId] = madeHere + count + seconds;
 
             if (bench.Count > 1)
             {

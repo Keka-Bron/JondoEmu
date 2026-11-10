@@ -200,7 +200,10 @@ namespace Jondo.Unity.Tests.Quests
 
                         // Binding one the engine already closes gives it a second way to finish,
                         // which is how a player ends up clicking a stele to hand in five ortie.
-                        if (objective.TypeId != QuestCatalogue.FreeText)
+                        // A «discover the map» that names its map only as text (the tutorial's
+                        // 19536 and 19538) does not close on its own, so it may be bound.
+                        bool namelessMap = objective.TypeId == QuestCatalogue.DiscoverMap && objective.DiscoverMapId == 0;
+                        if (objective.TypeId != QuestCatalogue.FreeText && !namelessMap)
                         {
                             wrong.Add($"objective {objective.Id} is of type {objective.TypeId}, " +
                                       "which the engine already closes on its own");
@@ -213,6 +216,9 @@ namespace Jondo.Unity.Tests.Quests
                             QuestBindingKind.Click when binding.Elements.Count == 0 => "no element",
                             QuestBindingKind.Talk when binding.NpcId == 0 => "no npc",
                             QuestBindingKind.Enter when binding.MapId == 0 => "no map",
+                            QuestBindingKind.Walk when binding.MapId == 0 => "no map",
+                            QuestBindingKind.Objectives when binding.AfterObjectives.Count == 0 => "no objectives",
+                            QuestBindingKind.Gather when binding.ItemId == 0 => "no item",
                             QuestBindingKind.Beat when binding.MonsterId == 0 => "no monster",
                             _ => "",
                         };

@@ -37,6 +37,51 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
+        public void The_whole_file_loads_without_a_word_and_every_entry_is_read()
+        {
+            if (!Available) return;
+
+            // A file the loader cannot read to the end is logged and kept half-read: every tree
+            // written after the bad one went missing, and the NPC fell back to his catch-all tree
+            // without a sign anywhere but the console. This is how the tutorial's Ganymed came to
+            // open with the wrong line.
+            var said = new List<string>();
+            var store = NpcDialogueContent.Load(Path, said.Add);
+            Assert.True(said.Count == 0, string.Join("\n", said));
+
+            using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path));
+            int written = doc.RootElement.GetProperty("dialogues").EnumerateArray()
+                .Count(e => !(e.TryGetProperty("remove", out var gone) && gone.ValueKind == System.Text.Json.JsonValueKind.True));
+            Assert.Equal(written, store.Rows.Count());
+        }
+
+        [Fact]
+        public void The_tutorial_opens_by_quest_and_by_class_as_its_capture_does()
+        {
+            if (!Available) return;
+            var store = NpcDialogueContent.Load(Path);
+
+            // The voice: 60352 before 2545, the class's god pushed once step 3226 is walked.
+            var voice = NpcDialogueContent.For(store, 8002, 241437185)!;
+            Assert.Equal(60352, voice.OpeningFor(8, _ => false, _ => false, (_, _) => false, (_, _) => false)!.Message);
+            var push = Assert.Single(voice.Pushes);
+            Assert.Equal(3226, push.AfterStep);
+            Assert.Equal(60327, push.Line.MessageFor(8));   // Iop: Yopuka
+            Assert.Equal(60333, push.Line.MessageFor(11));  // Sacrier: the capture's own
+            Assert.Equal(60349, push.Line.MessageFor(20));  // Forgelance
+
+            // Ganymed on his platform: 57134 while 2545 waits on him, 57133 after the first fight,
+            // whose reply shows quest 2511 beside it (34 with 2511).
+            var ganymed = NpcDialogueContent.For(store, 7581, 241438721)!;
+            Assert.Equal(57134, ganymed.OpeningFor(8, q => q == 2545, _ => false, (_, _) => false, (_, _) => false)!.Message);
+            var welcome = ganymed.OpeningFor(8, q => q == 2502, _ => false, (q, s) => q == 2502 && s == 3169, (_, _) => false)!;
+            Assert.Equal(57133, welcome.Message);
+            var equip = welcome.Choice(77737)!;
+            Assert.Equal(new long[] { 193, 193, 193, 193, 193, 193, 34, 2192 }, equip.Parameters);
+            Assert.Equal(new long[] { 2511 }, equip.ParameterArgs[6]);
+        }
+
+        [Fact]
         public void Every_tree_that_is_written_is_coherent()
         {
             if (!Available) return;
@@ -156,7 +201,10 @@ namespace Jondo.Unity.Tests.Content
                         if (quest == null || quest.Steps.Count == 0) continue;
 
                         long declared = quest.Steps[0].DialogId;
-                        if (declared != 0 && declared != line.Message)
+                        // A line the NPC no longer says is the catalogue being older than the
+                        // game: 3.6 hands 1629 over on Ganymed's 60411 (the tutorial capture),
+                        // and the step still names 20673, which is none of his lines.
+                        if (declared != 0 && declared != line.Message && SaysLine(tree.NpcId, declared))
                         {
                             wrong.Add($"npc {tree.NpcId}: quest {choice.StartsQuest} is handed over on " +
                                       $"line {line.Message}, but its first step declares {declared}");
@@ -166,6 +214,26 @@ namespace Jondo.Unity.Tests.Content
             }
 
             Assert.True(wrong.Count == 0, string.Join("\n", wrong));
+        }
+
+        /// <summary>Whether the NPC's own template, in world.db, declares this line.</summary>
+        private static bool SaysLine(int npcId, long message)
+        {
+            if (!File.Exists(Paths.WorldDb)) return true;
+            using var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={Paths.WorldDb};Mode=ReadOnly");
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT Data FROM NpcTemplates WHERE Id = $id;";
+            command.Parameters.AddWithValue("$id", npcId);
+            if (command.ExecuteScalar() is not string data) return true;
+            using var doc = System.Text.Json.JsonDocument.Parse(data);
+            if (!doc.RootElement.TryGetProperty("dialogMessages", out var messages)) return true;
+            foreach (var pair in messages.GetProperty("Array").EnumerateArray())
+            {
+                var values = pair.GetProperty("values").GetProperty("Array");
+                if (values.GetArrayLength() > 0 && values[0].GetInt64() == message) return true;
+            }
+            return false;
         }
 
         [Fact]

@@ -92,6 +92,15 @@ namespace Jondo.Unity.Server.Network
                 "finish" => TestFinish(cuerpo),
                 "crit" => TestCrit(cuerpo),
                 "kill" => TestKill(cuerpo),
+                "world" => TestWorld(),
+                "talk" => TestTalk(cuerpo),
+                "reply" => TestReply(cuerpo),
+                "close" => TestCloseDialogue(),
+                "use" => TestUse(cuerpo),
+                "goto" => TestGoto(cuerpo),
+                "give" => TestGive(cuerpo),
+                "quests" => TestQuests(),
+                "quest" => TestQuest(cuerpo),
                 _ => Mal(404, "ruta"),
             };
         }

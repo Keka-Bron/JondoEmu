@@ -21,6 +21,18 @@
     "  step         and only while it is on that step.",
     "  afterQuest   only offered once the quest is finished.",
     "",
+    "Where the conversation opens, when it is not always the same line:",
+    "",
+    "  openings     tried in order, the first that holds wins; none, and `opening`. Each has a",
+    "               `message` or a `byBreed` table (breed id to message) and any of: `before`",
+    "               (quest neither started nor finished), `quest` (under way), `step` (and on that",
+    "               step), `objective` (and that objective done), `after` (quest finished).",
+    "  pushes       a line the NPC opens by itself, with no click, once a step of a quest ends:",
+    "               `afterStep` and a `message` or `byBreed`. The tutorial's voice does it.",
+    "  params       what a reply shows beside it, as effects: a number, or an array whose first",
+    "               number is the effect and the rest what it names, [34, 2511] for «starts quest",
+    "               2511».",
+    "",
     "  { \"npc\": 1088, \"map\": 0, \"opening\": 3312, \"lines\": [",
     "      { \"message\": 3312, \"choices\": [ { \"reply\": 6016, \"next\": 6047 }, { \"reply\": 7846 } ] },",
     "      { \"message\": 6047, \"choices\": [ { \"reply\": 7846 } ] } ] }",
@@ -4449,6 +4461,294 @@
         }
       ],
       "why": "No capture. The recruiter's six lines and five replies, in the order their texts follow one another: the muse on the militia, «Hablar de la milicia», the creed, the interrupted tirade, two «Seguir escuchando», «Gracias por la explicación» and the send-off. They are the lines of «Vaya par» (quest 1994), whose step asks to come and see both recruiters; without a tree the template's opening went out with the chain's last reply."
+    },
+    {
+      "npc": 8002,
+      "map": 241437185,
+      "opening": 60409,
+      "openings": [
+        { "before": 2545, "message": 60352 },
+        { "quest": 2545, "step": 3226, "message": 60352 },
+        { "quest": 2545, "message": 60409 }
+      ],
+      "pushes": [
+        { "afterStep": 3226, "byBreed": { "1": 60313, "2": 60315, "3": 60316, "4": 60318, "5": 60321, "6": 60323, "7": 60325, "8": 60327, "9": 60329, "10": 60331, "11": 60333, "12": 60335, "13": 60337, "14": 60339, "15": 60341, "16": 60343, "17": 60345, "18": 60347, "20": 60349 } }
+      ],
+      "lines": [
+        {
+          "message": 60352,
+          "choices": [{ "reply": 83101, "startsQuest": 2545, "params": [2192] }]
+        },
+        {
+          "message": 60313,
+          "choices": [{ "reply": 82948, "next": 60314 }]
+        },
+        {
+          "message": 60314,
+          "choices": [{ "reply": 82947, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60315,
+          "choices": [{ "reply": 82954, "next": 60320 }]
+        },
+        {
+          "message": 60320,
+          "choices": [{ "reply": 82953, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60316,
+          "choices": [{ "reply": 82950, "next": 60317 }]
+        },
+        {
+          "message": 60317,
+          "choices": [{ "reply": 82949, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60318,
+          "choices": [{ "reply": 82952, "next": 60319 }]
+        },
+        {
+          "message": 60319,
+          "choices": [{ "reply": 82951, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60321,
+          "choices": [{ "reply": 82956, "next": 60322 }]
+        },
+        {
+          "message": 60322,
+          "choices": [{ "reply": 82955, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60323,
+          "choices": [{ "reply": 82958, "next": 60324 }]
+        },
+        {
+          "message": 60324,
+          "choices": [{ "reply": 82957, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60325,
+          "choices": [{ "reply": 82960, "next": 60326 }]
+        },
+        {
+          "message": 60326,
+          "choices": [{ "reply": 82959, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60327,
+          "choices": [{ "reply": 82962, "next": 60328 }]
+        },
+        {
+          "message": 60328,
+          "choices": [{ "reply": 82961, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60329,
+          "choices": [{ "reply": 82964, "next": 60330 }]
+        },
+        {
+          "message": 60330,
+          "choices": [{ "reply": 82963, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60331,
+          "choices": [{ "reply": 82966, "next": 60332 }]
+        },
+        {
+          "message": 60332,
+          "choices": [{ "reply": 82965, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60333,
+          "choices": [{ "reply": 82968, "next": 60334 }]
+        },
+        {
+          "message": 60334,
+          "choices": [{ "reply": 82967, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60335,
+          "choices": [{ "reply": 82970, "next": 60336 }]
+        },
+        {
+          "message": 60336,
+          "choices": [{ "reply": 82969, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60337,
+          "choices": [{ "reply": 82972, "next": 60338 }]
+        },
+        {
+          "message": 60338,
+          "choices": [{ "reply": 82971, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60339,
+          "choices": [{ "reply": 82974, "next": 60340 }]
+        },
+        {
+          "message": 60340,
+          "choices": [{ "reply": 82973, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60341,
+          "choices": [{ "reply": 82976, "next": 60342 }]
+        },
+        {
+          "message": 60342,
+          "choices": [{ "reply": 82975, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60343,
+          "choices": [{ "reply": 82978, "next": 60344 }]
+        },
+        {
+          "message": 60344,
+          "choices": [{ "reply": 82977, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60345,
+          "choices": [{ "reply": 82980, "next": 60346 }]
+        },
+        {
+          "message": 60346,
+          "choices": [{ "reply": 82979, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60347,
+          "choices": [{ "reply": 82982, "next": 60348 }]
+        },
+        {
+          "message": 60348,
+          "choices": [{ "reply": 82981, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60349,
+          "choices": [{ "reply": 82984, "next": 60350 }]
+        },
+        {
+          "message": 60350,
+          "choices": [{ "reply": 82983, "params": [2192, 2192] }]
+        },
+        {
+          "message": 60409,
+          "choices": [{ "reply": 83114, "next": 60415 }]
+        },
+        {
+          "message": 60415,
+          "choices": [{ "reply": 83113, "next": 60416 }]
+        },
+        {
+          "message": 60416,
+          "choices": [{ "reply": 83115, "next": 60417 }]
+        },
+        {
+          "message": 60417,
+          "choices": [{ "reply": 83116 }]
+        }
+      ],
+      "why": "The guided tutorial's Mysterious Voice, as the capture of the whole tutorial has it: 60352 «¿Estás bien?» with «Desplazarte.» (effect 2192), which starts 2545; the first steps walked (idz 3226) and the voice opens by itself on the god of the character's class, then «Basta de cháchara» and «Ver cómo se materializa un camino» (2192 twice), and the window closes. The god's line, its reply and the next line are the class's own, in breed order. Whoever lingers gets the four lines that tell them to go, each answered by the next of its four replies."
+    },
+    {
+      "npc": 7581,
+      "map": 241438721,
+      "opening": 60414,
+      "openings": [
+        { "quest": 2545, "message": 57134 },
+        { "quest": 2502, "step": 3169, "message": 57133 },
+        { "quest": 2511, "message": 57144 },
+        { "quest": 2502, "before": 2511, "message": 57142 }
+      ],
+      "lines": [
+        {
+          "message": 57134,
+          "choices": [{ "reply": 77738, "params": [2192, 192] }]
+        },
+        {
+          "message": 57142,
+          "choices": [{ "reply": 77738 }]
+        },
+        {
+          "message": 57133,
+          "choices": [{ "reply": 77737, "startsQuest": 2511, "params": [193, 193, 193, 193, 193, 193, [34, 2511], 2192] }]
+        },
+        {
+          "message": 57144,
+          "choices": [{ "reply": 77739 }]
+        },
+        {
+          "message": 60414,
+          "choices": [{ "reply": 77739 }]
+        }
+      ],
+      "why": "Ganymed on the celestial puch's platform, as the tutorial capture has him: 57134 «Te doy la bienvenida a Incarnam» with «Dirigirte hacia el puch celestial para atacarlo» (2192, 192) while 2545 waits on him; back from the first fight (2502 on 3169) 57133 «¡Bravo! He metido algunos objetos en tu bolsa» with «Buscar en tu bolsa los objetos y equipártelos», six 193 for the six items and 34 «Empieza una misión» naming 2511. Before that fight, his «¡Adelante, sin miedo!»; with 2511 under way, «Con tu nuevo equipo...»; afterwards, the puch is there to train on."
+    },
+    {
+      "npc": 7581,
+      "map": 241439745,
+      "opening": 60411,
+      "openings": [
+        { "quest": 2502, "step": 3173, "message": 57132 },
+        { "quest": 2502, "step": 3184, "message": 60410 },
+        { "quest": 2502, "before": 1629, "message": 60411 }
+      ],
+      "lines": [
+        {
+          "message": 57132,
+          "choices": [{ "reply": 77736, "params": [[30, 19173], 1142] }]
+        },
+        {
+          "message": 60410,
+          "choices": [{ "reply": 77739 }]
+        },
+        {
+          "message": 60411,
+          "choices": [{ "reply": 83103, "params": [2192, [34, 1629]] }, { "reply": 83104, "startsQuest": 1629, "params": [2192, [34, 1629]] }]
+        }
+      ],
+      "why": "Ganymed by the jalatós' pen, as the tutorial capture has him: after the fight (2502 on 3173) 57132 «Tus oponentes han mordido el polvo» with «Dar saltitos de impaciencia» (30 naming objective 19173, then 1142); the characteristic points still to share out (3184), the line on which element each characteristic masters; then 60411 «¿Has elegido tu vía?» with «Quedarte para entrenar» and «Unirte al maestro Curro», both showing 2192 and 34 for quest 1629, the second starting it."
+    },
+    {
+      "npc": 2895,
+      "map": 241440769,
+      "opening": 20676,
+      "openings": [
+        { "quest": 1629, "pending": 9656, "message": 20676 },
+        { "quest": 1629, "objective": 9662, "message": 20681 },
+        { "after": 1629, "before": 1630, "message": 20681 },
+        { "quest": 1629, "message": 20679 },
+        { "quest": 1630, "message": 57157 },
+        { "after": 1630, "message": 57157 }
+      ],
+      "lines": [
+        {
+          "message": 20676,
+          "choices": [{ "reply": 24751, "next": 20677 }]
+        },
+        {
+          "message": 20677,
+          "choices": [{ "reply": 24750, "next": 20678, "params": [[30, 9656], 1150, 1150, 1150, 1150, 1150, 1150, 1150, 1150] }]
+        },
+        {
+          "message": 20678,
+          "choices": [{ "reply": 24770, "params": [1150, 1150, 1150, 1150, 1150, 2192] }]
+        },
+        {
+          "message": 20679,
+          "choices": [{ "reply": 24753 }]
+        },
+        {
+          "message": 20681,
+          "names": true,
+          "choices": [{ "reply": 24754, "startsQuest": 1630, "params": [[34, 1630], 2192] }]
+        },
+        {
+          "message": 57157,
+          "choices": [{ "reply": 24752 }]
+        }
+      ],
+      "why": "Master Curro in the tutorial's jobs room, as the capture of the whole tutorial has him: 20676 «¡Saludos, joven!» with «¿Cómo va eso?», then 20677 with «¿Qué materiales me van a hacer falta?» (30 naming objective 9656 and eight 1150), then 20678 with «Explorar el lugar.» (five 1150 and 2192); once the ring is made, 20681 «¡Has trabajado muy bien, #1!», his name in it, with «Dirigirte a la salida.» showing quest 1630 and starting it. In between, the reminder of what the ring needs; afterwards, his «No hay nada como la satisfacción...»."
     }
   ]
 }

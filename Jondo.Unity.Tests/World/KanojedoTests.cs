@@ -217,7 +217,9 @@ namespace Jondo.Unity.Tests.World
         public void The_measured_arenas_are_the_captures()
         {
             MeasuredArenas.Forget();
-            Assert.Equal(4, MeasuredArenas.Count);
+            // The four kanojedos, and the guided tutorial's three fights.
+            Assert.Equal(7, MeasuredArenas.Count);
+            Assert.Equal(241438725, MeasuredArenas.Of(241438721));
             Assert.Equal(99222029, MeasuredArenas.Of(99090957));
             Assert.Equal(146803972, MeasuredArenas.Of(146801922));
             Assert.Equal(146804996, MeasuredArenas.Of(146802688));

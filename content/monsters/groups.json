@@ -38,7 +38,14 @@
     "THE ORBALANTIR'S EPIC FIGHTS. Nine maps the Orbalantir de Meriana (3687) takes one to, each with",
     "one epic monster alone -- Dark Vlad (3578), the Minogólem secular (3740) and so on --, measured off the jss of",
     "'orbalantir de meriana-teleport a todas las peleas epicas': cell, facing, grade 1. The base's",
-    "groups on them, and on Meriana's house 122422272 where none stands, are a subarea's roster and go."
+    "groups on them, and on Meriana's house 122422272 where none stands, are a subarea's roster and go.",
+    "",
+    "THE GUIDED TUTORIAL. Its nine maps (subarea 536) hold no scattered monsters in the capture of",
+    "the whole tutorial: the 28 groups world.db puts there are removed. What stands there is one",
+    "Puch celestial (2785, grade 1) on Ganymed's platform 241438721, cell 327 facing 1, and a",
+    "Jalatín celestial (8017) leading a Jalató celestial (2781), both grade 1, on the pen 241439745,",
+    "cell 327 facing 3, as the jss of each map in that capture has them. The chafers of the last",
+    "room are NPCs there, not a group (content/npcs/spawns.json)."
   ],
   "groups": [
     {
@@ -529,6 +536,174 @@
       "members": [
         {
           "monster": 5388,
+          "grade": 0
+        }
+      ]
+    },
+    {
+      "map": 241437185,
+      "group": -1038716,
+      "remove": true
+    },
+    {
+      "map": 241437185,
+      "group": -1038717,
+      "remove": true
+    },
+    {
+      "map": 241438721,
+      "group": -1038718,
+      "remove": true
+    },
+    {
+      "map": 241438721,
+      "group": -1038719,
+      "remove": true
+    },
+    {
+      "map": 241438721,
+      "group": -1038720,
+      "remove": true
+    },
+    {
+      "map": 241438725,
+      "group": -1038721,
+      "remove": true
+    },
+    {
+      "map": 241438725,
+      "group": -1038722,
+      "remove": true
+    },
+    {
+      "map": 241438725,
+      "group": -1038723,
+      "remove": true
+    },
+    {
+      "map": 241439745,
+      "group": -1038724,
+      "remove": true
+    },
+    {
+      "map": 241439745,
+      "group": -1038725,
+      "remove": true
+    },
+    {
+      "map": 241439745,
+      "group": -1038726,
+      "remove": true
+    },
+    {
+      "map": 241439745,
+      "group": -1038727,
+      "remove": true
+    },
+    {
+      "map": 241439749,
+      "group": -1038728,
+      "remove": true
+    },
+    {
+      "map": 241439749,
+      "group": -1038729,
+      "remove": true
+    },
+    {
+      "map": 241439749,
+      "group": -1038730,
+      "remove": true
+    },
+    {
+      "map": 241440769,
+      "group": -1038731,
+      "remove": true
+    },
+    {
+      "map": 241440769,
+      "group": -1038732,
+      "remove": true
+    },
+    {
+      "map": 241440769,
+      "group": -1038733,
+      "remove": true
+    },
+    {
+      "map": 241440769,
+      "group": -1038734,
+      "remove": true
+    },
+    {
+      "map": 241440773,
+      "group": -1038735,
+      "remove": true
+    },
+    {
+      "map": 241440773,
+      "group": -1038736,
+      "remove": true
+    },
+    {
+      "map": 241440773,
+      "group": -1038737,
+      "remove": true
+    },
+    {
+      "map": 241441793,
+      "group": -1038738,
+      "remove": true
+    },
+    {
+      "map": 241441793,
+      "group": -1038739,
+      "remove": true
+    },
+    {
+      "map": 241441793,
+      "group": -1038740,
+      "remove": true
+    },
+    {
+      "map": 241441797,
+      "group": -1038741,
+      "remove": true
+    },
+    {
+      "map": 241441797,
+      "group": -1038742,
+      "remove": true
+    },
+    {
+      "map": 241441797,
+      "group": -1038743,
+      "remove": true
+    },
+    {
+      "map": 241438721,
+      "group": -2000027,
+      "cell": 327,
+      "orientation": 1,
+      "members": [
+        {
+          "monster": 2785,
+          "grade": 0
+        }
+      ]
+    },
+    {
+      "map": 241439745,
+      "group": -2000028,
+      "cell": 327,
+      "orientation": 3,
+      "members": [
+        {
+          "monster": 8017,
+          "grade": 0
+        },
+        {
+          "monster": 2781,
           "grade": 0
         }
       ]

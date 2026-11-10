@@ -263,6 +263,9 @@ namespace Jondo.Unity.Server.Handlers
 
                 await DepletedAsync(stream, resource, skillId, instance);
 
+                // A quest that asked for this gathering here (the tutorial's jobs room).
+                await Managers.Quests.OnGatheredAsync(stream, resource.ItemId, resource.MapId);
+
                 // And maybe the resource's protector, which attacks there and then (ResourceProtectors).
                 await ResourceProtectors.MayComeOutAsync(stream, resource.ItemId, nivel);
 

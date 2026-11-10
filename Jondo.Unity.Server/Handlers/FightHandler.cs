@@ -11140,9 +11140,11 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     // A dungeon room comes back as itself -- its eight, its boss -- and not as a
                     // random group of the subarea, which could have the boss in it.
-                    var repuesto = DungeonManager.IsRoom(fight.RoleplayMapId)
-                        ? MobSpawnManager.RecomposeDungeonRoom(fight.RoleplayMapId)
-                        : MobSpawnManager.RespawnOneGroup(fight.RoleplayMapId);
+                    // And one written by hand comes back as itself (the tutorial's puch).
+                    var repuesto = MobSpawnManager.RestoreWritten(fight.RoleplayMapId, muerto)
+                        ?? (DungeonManager.IsRoom(fight.RoleplayMapId)
+                            ? MobSpawnManager.RecomposeDungeonRoom(fight.RoleplayMapId)
+                            : MobSpawnManager.RespawnOneGroup(fight.RoleplayMapId));
                     if (repuesto != null)
                     {
                         Replaced(fight, repuesto);

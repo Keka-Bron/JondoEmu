@@ -1,0 +1,18 @@
+{
+  "_": [
+    "Maps the quest catalogue still names and the world no longer has, and the map that stands",
+    "for each now. 23 of the 2,923 maps the catalogue's objectives name are not in the world's",
+    "data; where a capture shows where the thing moved to, it is written here, and the catalogue",
+    "reads the new map in place of the old one when it loads.",
+    "",
+    "  { \"from\": 153093380, \"to\": 241440769, \"measured\": \"...\" }",
+    "",
+    "THE CELESTIAL TEMPLE. 3.6 rebuilt the guided tutorial on new maps (subarea 536). Quests 1629",
+    "and 1630 still name the old temple's rooms."
+  ],
+  "moved": [
+    { "from": 153093380, "to": 241440769, "measured": "1629's jobs room: in the tutorial capture Master Curro (2895) stands on 241440769 and the talk, the gathering and the ring are done there" },
+    { "from": 153092356, "to": 241441793, "measured": "1630's room of Master Darmas (2896): 241441793 in the tutorial capture" },
+    { "from": 153092354, "to": 241441793, "measured": "1630's chafers and Ganymed's appearance after the fight: the chafers are NPCs on 241441793 (2930, 2927), the fight goes to 241441797 and back, and Ganymed comes in on 241441793 (actor -20004) in the tutorial capture" }
+  ]
+}

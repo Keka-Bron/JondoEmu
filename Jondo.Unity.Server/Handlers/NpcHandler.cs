@@ -264,7 +264,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var template = Npcs.TemplateOf(npc.NpcId);
             var escrito = NpcDialogues.For(npc.NpcId, mapId);
-            var primera = escrito?.First();
+            var primera = escrito == null ? null : OpeningFor(escrito);
 
             if (primera == null && (template == null || template.DialogMessageId == 0))
             {
@@ -723,6 +723,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // The numbers some answers carry inside, if the written tree says so.
             Dictionary<long, IReadOnlyList<long>>? parametros = null;
+            Dictionary<long, IReadOnlyList<IReadOnlyList<long>>>? arguments = null;
             if (frase != null)
             {
                 foreach (var opcion in frase.Choices)
@@ -730,6 +731,9 @@ namespace Jondo.Unity.Server.Handlers
                     if (opcion.Parameters.Count == 0) continue;
                     parametros ??= new Dictionary<long, IReadOnlyList<long>>();
                     parametros[opcion.Reply] = opcion.Parameters;
+                    if (opcion.ParameterArgs.Count == 0) continue;
+                    arguments ??= new Dictionary<long, IReadOnlyList<IReadOnlyList<long>>>();
+                    arguments[opcion.Reply] = opcion.ParameterArgs;
                 }
             }
 
@@ -746,10 +750,14 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A written line that names the character carries his name (Curro's 20681).
+            if ((lineParameters == null || lineParameters.Count == 0) && frase?.NamesTheCharacter == true)
+                lineParameters = new[] { SessionContext.State.CharacterName ?? "" };
+
             // A line that names somebody -- «Haré esta ofrenda en tu nombre, #1» -- carries the name.
             byte[] ios = lineParameters is { Count: > 0 }
                 ? ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros, lineParameters)
-                : ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros);
+                : ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros, arguments);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ios, ios));
         }
 
@@ -796,6 +804,58 @@ namespace Jondo.Unity.Server.Handlers
         /// belongs to a step is not offered before being at that step. The written tree says so; here
         /// only the character's journal is asked.
         /// </remarks>
+        /// <summary>
+        /// The line a written conversation opens on for this character: by where his quests stand
+        /// and by his class (see <see cref="Jondo.Unity.World.Content.DialogueOpening"/>).
+        /// </summary>
+        private static DialogueLine? OpeningFor(Jondo.Unity.World.Content.NpcDialogue escrito)
+            => LineFor(escrito, escrito.OpeningFor);
+
+        /// <summary>The line of an opening or a push, for this character, with his journal asked.</summary>
+        private static DialogueLine? LineFor(Jondo.Unity.World.Content.NpcDialogue escrito,
+            Func<int, Func<int, bool>, Func<int, bool>, Func<int, int, bool>, Func<int, int, bool>, DialogueLine?> pick)
+        {
+            var diario = SessionContext.State.Quests;
+            if (diario == null) return pick(SessionContext.State.Breed, _ => false, _ => false, (_, _) => false, (_, _) => false);
+            return pick(SessionContext.State.Breed,
+                diario.Active,
+                diario.Finished,
+                (mision, paso) => diario.Run(mision)?.StepId == paso,
+                (mision, objetivo) => diario.ObjectiveDone(objetivo));
+        }
+
+        /// <summary>
+        /// What an NPC on the character's map says on his own once a step of a quest is done: the
+        /// guided tutorial's voice presents the class's god as soon as the first steps are walked.
+        /// The capture has idz 3226 and then, with no iov between, ioc and ios 60333.
+        /// </summary>
+        public static async Task PushAfterStepAsync(NetworkStream stream, int stepId)
+        {
+            long mapId = SessionContext.State.MapId;
+            foreach (var puesto in Npcs.Of(mapId))
+            {
+                var escrito = NpcDialogues.For(puesto.NpcId, mapId);
+                if (escrito == null || escrito.Pushes.Count == 0) continue;
+
+                foreach (var push in escrito.Pushes)
+                {
+                    if (push.AfterStep != stepId) continue;
+                    long message = push.Line.MessageFor(SessionContext.State.Breed);
+                    if (message == 0) continue;
+                    var line = escrito.Line(message) ?? new DialogueLine { Message = message };
+
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, puesto.ContextualId)));
+                    SessionContext.State.OpenDialogueNpcId = puesto.NpcId;
+                    SessionContext.State.OpenDialogueMapId = mapId;
+                    SessionContext.State.OpenDialogueMessage = message;
+                    await PreguntarAsync(stream, message, LasQueTocan(line), Npcs.TemplateOf(puesto.NpcId), line);
+                    Console.WriteLine($"[NPC] {puesto.NpcId} speaks after step {stepId}: question {message}.");
+                    return;
+                }
+            }
+        }
+
         private static long[] LasQueTocan(DialogueLine linea)
         {
             var diario = SessionContext.State.Quests;
@@ -805,7 +865,7 @@ namespace Jondo.Unity.Server.Handlers
                 diario.Active,
                 diario.Finished,
                 (mision, paso) => diario.Run(mision)?.StepId == paso,
-                (mision, objetivo) => diario.Run(mision)?.Done.Contains(objetivo) == true,
+                (mision, objetivo) => diario.ObjectiveDone(objetivo),
                 elemento => SessionContext.State.ElementsUsed.Contains(elemento));
         }
 
@@ -879,6 +939,8 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.OpenDialogueNpcId = 0;
             SessionContext.State.OpenDialogueMapId = 0;
             SessionContext.State.OpenDialogueMessage = 0;
+            SessionContext.State.LastNpcQuestion = 0;
+            SessionContext.State.LastNpcReplies = Array.Empty<long>();
         }
 
         /// <summary>
@@ -1130,9 +1192,16 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A reply that hands a quest over and ends the conversation closes it first: the
+            // tutorial capture has kld, then lqn 54 and ief (60352's «Desplazarte.», 60411's
+            // «Unirte al maestro Curro»). One that goes on starts it before the next line.
+            int startsAfterClosing = 0;
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
             {
-                await Managers.Quests.StartAsync(stream, elegidaAhora.StartsQuest);
+                bool closesHere = elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && !elegidaAhora.ReturnsHome
+                                  && elegidaAhora.TeleportPassage == 0;
+                if (closesHere) startsAfterClosing = elegidaAhora.StartsQuest;
+                else await Managers.Quests.StartAsync(stream, elegidaAhora.StartsQuest);
             }
             else if (frase == null)
             {
@@ -1209,6 +1278,12 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                     ConnectionProtocol.NpcDialogCloseReason)));
+
+            if (startsAfterClosing != 0)
+            {
+                await Managers.Quests.StartAsync(stream, startsAfterClosing);
+                return;
+            }
 
             if (reply != KamasMountainReply)
             {

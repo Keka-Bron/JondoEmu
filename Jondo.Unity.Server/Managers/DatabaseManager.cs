@@ -2913,14 +2913,15 @@ namespace Jondo.Unity.Server
         public static long CreateCharacter(long accountId, int serverId, string name, int breed,
                                            int sex, int headId, IReadOnlyList<long> colors,
                                            long mapId, int level, long kamas, int stat,
-                                           IReadOnlyList<(int Gid, int Slot)> starterSet)
+                                           IReadOnlyList<(int Gid, int Slot)> starterSet,
+                                           int cellId = -1)
         {
             lock (CharacterIdGate)
             {
                 for (int attempt = 0; attempt < 5; attempt++)
                 {
                     long id = InsertCharacter(accountId, serverId, name, breed, sex, headId, colors,
-                                              mapId, level, kamas, stat, starterSet, out bool idTaken);
+                                              mapId, level, kamas, stat, starterSet, cellId, out bool idTaken);
                     if (id != 0 || !idTaken) return id;
                 }
                 return 0;
@@ -2932,7 +2933,8 @@ namespace Jondo.Unity.Server
         private static long InsertCharacter(long accountId, int serverId, string name, int breed,
                                             int sex, int headId, IReadOnlyList<long> colors,
                                             long mapId, int level, long kamas, int stat,
-                                            IReadOnlyList<(int Gid, int Slot)> starterSet, out bool idTaken)
+                                            IReadOnlyList<(int Gid, int Slot)> starterSet, int cellId,
+                                            out bool idTaken)
         {
             idTaken = false;
             try
@@ -2944,9 +2946,10 @@ namespace Jondo.Unity.Server
                 siguiente.CommandText = "SELECT IFNULL(MAX(Id), 1000000) + 1 FROM Characters;";
                 long id = siguiente.ExecuteScalar() is long max ? max : 1000001;
 
-                // The cell: next to the zaap, not on it.
-                var zaap = Managers.Interactives.ZaapOf(mapId);
-                int cell = MapManager.GetNearestWalkableCell(mapId, zaap.Cell);
+                // The cell: the one asked for, or next to the map's zaap, not on it.
+                int cell = cellId >= 0
+                    ? cellId
+                    : MapManager.GetNearestWalkableCell(mapId, Managers.Interactives.ZaapOf(mapId).Cell);
 
                 // Resolve defaults in place, then store the indexed palette in Look. Dropping -1
                 // entries shifts every following colour into the wrong slot.

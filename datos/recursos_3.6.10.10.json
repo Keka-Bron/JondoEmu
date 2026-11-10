@@ -5,6 +5,15 @@
   "skills.json (gatheredRessourceItem). Ver tools/recursos_recoleccion.py."
  ],
  "recursos": {
+  "2204": {
+   "tipo": 17,
+   "habilidad": 24,
+   "oficio": 24,
+   "objeto": 312,
+   "nivel": 1,
+   "visto": 1,
+   "discrepa": false
+  },
   "651": {
    "tipo": 33,
    "habilidad": 39,

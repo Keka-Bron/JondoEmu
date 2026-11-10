@@ -33,6 +33,26 @@ namespace Jondo.Unity.World.Quests
 
         /// <summary>Beat the monster.</summary>
         Beat,
+
+        /// <summary>
+        /// Walk on the map: the first walk the character finishes there. The guided tutorial's
+        /// 19534 «Desplázate» is done by the server after the client's first jrw and jqi, with no
+        /// idw from the client.
+        /// </summary>
+        Walk,
+
+        /// <summary>
+        /// Every objective in <see cref="QuestBinding.AfterObjectives"/> done, of whatever quest:
+        /// the tutorial's 19253 «Recolecta los recursos necesarios» closes as 1629's fifth resource
+        /// is gathered (ieb 1629 9660, then idz 2502 3187).
+        /// </summary>
+        Objectives,
+
+        /// <summary>
+        /// Gather <see cref="QuestBinding.ItemId"/> on the map: the tutorial's «Recolecta trigo»
+        /// closes on the wheat of the jobs room (iwo 541424, iua 289, then ieb 1629 9657).
+        /// </summary>
+        Gather,
     }
 
     /// <summary>
@@ -140,6 +160,19 @@ namespace Jondo.Unity.World.Quests
         /// shown while the quest has NOT been taken, which is the opposite of all the others.
         /// </remarks>
         public int Starts { get; init; }
+
+        /// <summary>
+        /// A quest that starts once this objective is closed. The guided tutorial goes on that way:
+        /// arriving at Ganymed's map closes 2545's 19536 (idz 3228) and starts 2502 (ief), with no
+        /// NPC or element in between.
+        /// </summary>
+        public int ThenStarts { get; init; }
+
+        /// <summary>The item gathered, for <see cref="QuestBindingKind.Gather"/>.</summary>
+        public int ItemId { get; init; }
+
+        /// <summary>The objectives whose being done closes it, for <see cref="QuestBindingKind.Objectives"/>.</summary>
+        public IReadOnlyList<int> AfterObjectives { get; init; } = Array.Empty<int>();
 
         /// <summary>Why this row says what it says. Never read by the server; read by people.</summary>
         public string Why { get; init; } = "";
@@ -310,6 +343,9 @@ namespace Jondo.Unity.World.Quests
                 SpawnsMonster = spawnMonster,
                 SpawnsCount = spawnCount,
                 Starts = Int(row, "starts"),
+                ThenStarts = Int(row, "thenStarts"),
+                AfterObjectives = Ints(row, "afterObjectives"),
+                ItemId = Int(row, "item"),
                 SkillId = skill == 0 ? QuestBinding.DefaultSkill : skill,
 
                 // Not `Int(...) == 0 ? default : value`, because -1 IS the default and 0 is a
@@ -335,8 +371,22 @@ namespace Jondo.Unity.World.Quests
                 "talk" => QuestBindingKind.Talk,
                 "enter" => QuestBindingKind.Enter,
                 "beat" => QuestBindingKind.Beat,
+                "walk" => QuestBindingKind.Walk,
+                "objectives" => QuestBindingKind.Objectives,
+                "gather" => QuestBindingKind.Gather,
                 _ => QuestBindingKind.Click,
             };
+        }
+
+        private static IReadOnlyList<int> Ints(JsonElement row, string name)
+        {
+            if (!row.TryGetProperty(name, out var list) || list.ValueKind != JsonValueKind.Array) return Array.Empty<int>();
+            var found = new List<int>();
+            foreach (var item in list.EnumerateArray())
+            {
+                if (item.ValueKind == JsonValueKind.Number && item.TryGetInt32(out int number)) found.Add(number);
+            }
+            return found;
         }
 
         private static int Int(JsonElement row, string name)

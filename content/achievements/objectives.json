@@ -1,0 +1,16 @@
+{
+  "_": [
+    "What an achievement objective is judged by, where the client's own criterion cannot be.",
+    "",
+    "416 objectives carry (BI=1), which the client's criterion factory makes an Unusable: Ankama's",
+    "server decides them and nothing in the data says how. Where a capture shows when one is",
+    "earned, the criterion that says the same thing is written here, in the quests' own terms",
+    "(Qf a quest finished, Qo a quest objective validated, OA an achievement obtained), and it",
+    "replaces the client's.",
+    "",
+    "  { \"objective\": 17380, \"criterion\": \"Qo=19173\", \"measured\": \"...\" }"
+  ],
+  "objectives": [
+    { "objective": 17380, "achievement": 8518, "criterion": "Qo=19173", "measured": "«Primera parte del tutorial» of «Primer tiempo». The capture of the whole tutorial earns 8518 (mfu) right after idz 2502 3173, the reply to Ganymed by the jalatós' pen that validates objective 19173; its other two objectives, 2511 and 2545 finished, held already." }
+  ]
+}

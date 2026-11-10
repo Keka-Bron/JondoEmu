@@ -181,6 +181,8 @@ namespace Jondo.Unity.Server.Handlers
             // goes on exactly to the usual jqk.
             if (!TryTakeCompletedMovement(session.State, out long mapId, out int cellId) || stream == null)
                 return;
+            // A quest that only asked to take a few steps here (the tutorial's first objective).
+            await Managers.Quests.OnWalkedAsync(stream, mapId);
             if (await AlmanaxTempleHandler.WalkAsync(stream, mapId, cellId))
                 return;
             if (!Managers.TeleportManager.TryGetCellTrigger(mapId, cellId, out var route))
@@ -251,6 +253,12 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             int arrival = Landing(target, Jondo.Unity.Server.Network.SessionContext.State.CellId, way);
+            int measuredFacing = -1;
+            if (Managers.MeasuredArrivals.TryGet(target, out int measuredCell, out int facing))
+            {
+                arrival = measuredCell;
+                measuredFacing = facing;
+            }
             long oldMapId = SessionContext.State.MapId;
 
             // The map changes: whatever was open on the previous one stops being open.
@@ -260,7 +268,9 @@ namespace Jondo.Unity.Server.Handlers
 
             Jondo.Unity.Server.Network.SessionContext.State.MapId = target;
             Jondo.Unity.Server.Network.SessionContext.State.CellId = arrival;
-            Jondo.Unity.Server.Network.SessionContext.State.Orientation = FacingFor(way, Jondo.Unity.Server.Network.SessionContext.State.Orientation);
+            Jondo.Unity.Server.Network.SessionContext.State.Orientation = measuredFacing >= 0
+                ? measuredFacing
+                : FacingFor(way, Jondo.Unity.Server.Network.SessionContext.State.Orientation);
             DatabaseManager.SaveCurrentCharacter();
 
             // Exactly the five the capture sends, in the same order. jsd first: the character is
