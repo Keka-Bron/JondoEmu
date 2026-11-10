@@ -785,6 +785,13 @@
       "orientation": 3,
       "criterion": "Qa=1648&Qo=9859&Qo!9857",
       "why": "Percy Klópeo, who comes out of his tomb when it is searched (9859) and is there until beaten (9857). INFERRED: the walkable cell in front of the tomb (element 489506 on 343), facing the way in (396)."
+    },
+    {
+      "map": 192413698,
+      "npc": 4401,
+      "cell": 426,
+      "orientation": 1,
+      "why": "Sus Belli, «*bebe en silencio mirándote por el rabillo del ojo*», upstairs at Astrub's tavern («Montez au premier étage», Dofus pour les noobs); the objective she is for, 13852, names this map. No capture places her: INFERRED, at a table of the room."
     }
   ]
 }

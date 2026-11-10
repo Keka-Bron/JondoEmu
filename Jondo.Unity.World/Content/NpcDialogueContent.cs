@@ -226,6 +226,27 @@ namespace Jondo.Unity.World.Content
         /// <summary>How many of <see cref="Gives"/>.</summary>
         public int GivesCount { get; init; } = 1;
 
+        /// <summary>
+        /// The character's level the reply asks for, or zero: Archi's «Claro, cuenta conmigo.» from
+        /// level 10, the level «Eso va a costar un huevo» asks (PL>9).
+        /// </summary>
+        public int MinLevel { get; init; }
+
+        /// <summary>
+        /// The level under which the reply is offered, or zero: «Aún no me noto con fuerzas para una
+        /// misión así.», for whoever is not yet level 10.
+        /// </summary>
+        public int BelowLevel { get; init; }
+
+        /// <summary>
+        /// An item the reply hands to the NPC, or zero: offered only to whoever carries one, and
+        /// taken when chosen -- «Darle una cerveza a Acidrik.».
+        /// </summary>
+        public int Takes { get; init; }
+
+        /// <summary>Whether a character of that level is offered the reply.</summary>
+        public bool ForLevel(int level) => (MinLevel == 0 || level >= MinLevel) && (BelowLevel == 0 || level < BelowLevel);
+
         /// <summary>Whether any reply of this tree does that objective.</summary>
         internal bool Does(int objectiveId) => Completes != 0 && Completes == objectiveId;
 
@@ -766,6 +787,9 @@ namespace Jondo.Unity.World.Content
                             ThenNpc = (int)Number(choice, "thenNpc"),
                             Completes = (int)Number(choice, "completes"),
                             Gives = (int)Number(choice, "gives"),
+                            MinLevel = (int)Number(choice, "minLevel"),
+                            BelowLevel = (int)Number(choice, "belowLevel"),
+                            Takes = (int)Number(choice, "takes"),
                             GivesCount = Math.Max(1, (int)Number(choice, "givesCount")),
                             EndsMutation = choice.TryGetProperty("endsMutation", out var ends)
                                            && ends.ValueKind == JsonValueKind.True,
@@ -928,6 +952,9 @@ namespace Jondo.Unity.World.Content
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);
                             if (choice.Gives != 0) writer.WriteNumber("gives", choice.Gives);
+                            if (choice.MinLevel != 0) writer.WriteNumber("minLevel", choice.MinLevel);
+                            if (choice.BelowLevel != 0) writer.WriteNumber("belowLevel", choice.BelowLevel);
+                            if (choice.Takes != 0) writer.WriteNumber("takes", choice.Takes);
                             if (choice.Gives != 0 && choice.GivesCount != 1) writer.WriteNumber("givesCount", choice.GivesCount);
                             if (choice.EndsMutation) writer.WriteBoolean("endsMutation", true);
                             writer.WriteEndObject();

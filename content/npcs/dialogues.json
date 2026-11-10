@@ -164,8 +164,8 @@
         {
           "message": 30551,
           "choices": [
-            { "reply": 36853, "next": 30552 },
-            { "reply": 71415, "next": 53186 }
+            { "reply": 36853, "next": 30552, "minLevel": 10 },
+            { "reply": 71415, "next": 53186, "belowLevel": 10 }
           ]
         },
         {
@@ -202,8 +202,8 @@
         {
           "message": 30556,
           "choices": [
-            { "reply": 36864, "next": 30557 },
-            { "reply": 71417, "next": 53187 }
+            { "reply": 36864, "next": 30557, "minLevel": 10 },
+            { "reply": 71417, "next": 53187, "belowLevel": 10 }
           ]
         },
         {
@@ -663,35 +663,43 @@
         {
           "message": 30380,
           "choices": [
-            {
-              "reply": 36644,
-              "next": 30382
-            },
-            {
-              "reply": 36637,
-              "next": 30391
-            }
+            { "reply": 37062, "quest": 1959, "completes": 13855, "params": [[30, 13855]], "next": 30696, "afterObjective": 13854 },
+            { "reply": 36644, "next": 30382 },
+            { "reply": 36637, "next": 30391 }
           ]
         },
         {
           "message": 30382,
           "choices": [
-            {
-              "reply": 36627,
-              "startsQuest": 1978
-            }
+            { "reply": 36627, "startsQuest": 1978 }
           ]
         },
         {
           "message": 30391,
           "choices": [
-            {
-              "reply": 36640,
-              "startsQuest": 1979
-            }
+            { "reply": 36640, "startsQuest": 1979 }
+          ]
+        },
+        {
+          "message": 30696,
+          "choices": [
+            { "reply": 37061, "next": 30697 }
+          ]
+        },
+        {
+          "message": 30697,
+          "choices": [
+            { "reply": 37060, "next": 30698 }
+          ]
+        },
+        {
+          "message": 30698,
+          "choices": [
+            { "reply": 37059 }
           ]
         }
-      ]
+      ],
+      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698)."
     },
     {
       "npc": 4324,
@@ -6052,6 +6060,199 @@
         }
       ],
       "why": "Percy Klópeo, the one-eyed chafer of «Des chafers qui marchent», who comes out when his tomb is searched: «Defenderte.» starts the fight (npc_fights.json), and beating him drops the jewel bag (16540, 100 % in his drops)."
+    },
+    {
+      "npc": 4361,
+      "map": 0,
+      "opening": 30384,
+      "lines": [
+        {
+          "message": 30384,
+          "choices": [
+            { "reply": 36993, "next": 30645, "quest": 1959, "beforeObjective": 13852 },
+            { "reply": 36873, "next": 30385 }
+          ]
+        },
+        {
+          "message": 30645,
+          "choices": [
+            { "reply": 36992, "next": 30646 }
+          ]
+        },
+        {
+          "message": 30646,
+          "choices": [
+            { "reply": 36991 }
+          ]
+        },
+        {
+          "message": 30385,
+          "choices": [
+            { "reply": 36631, "buyItem": 6857, "buyPrice": 40 },
+            { "reply": 36632, "next": 30562 },
+            { "reply": 36633 }
+          ]
+        },
+        {
+          "message": 30562,
+          "choices": [
+            { "reply": 36633 }
+          ]
+        }
+      ],
+      "why": "Tek Abir, the tavern keeper of Astrub, from his own lines and replies. «On marche sur des œufs» per Dofus pour les noobs: «Commander une bière» for 40 kamas (30385, «Son 40 kamas y aquí no se fía.»), the Cerveza de Astrub; asked about the dofus, the rumour of pandawas (30645, 30646)."
+    },
+    {
+      "npc": 4322,
+      "map": 0,
+      "opening": 30647,
+      "lines": [
+        {
+          "message": 30647,
+          "choices": [
+            { "reply": 37025, "next": 30666, "quest": 1959, "beforeObjective": 13852 },
+            { "reply": 37024, "next": 30667, "quest": 1959, "takes": 6857 },
+            { "reply": 37009 }
+          ]
+        },
+        {
+          "message": 30666,
+          "choices": [
+            { "reply": 37020 }
+          ]
+        },
+        {
+          "message": 30667,
+          "choices": [
+            { "reply": 37023, "next": 30668 }
+          ]
+        },
+        {
+          "message": 30668,
+          "choices": [
+            { "reply": 37022, "next": 30669 }
+          ]
+        },
+        {
+          "message": 30669,
+          "choices": [
+            { "reply": 37021 }
+          ]
+        }
+      ],
+      "why": "Acidrik Rasgapanza, the haruspex of the tavern, from his own lines and replies: «Busco los dofus.» (Dofus pour les noobs: «Dire que vous êtes à la recherche des Dofus»), a beer for the stars (30666), and «Darle una cerveza a Acidrik.», which takes the Cerveza de Astrub and has him dance with the stars (30667-30669)."
+    },
+    {
+      "npc": 4401,
+      "map": 0,
+      "opening": 30681,
+      "lines": [
+        {
+          "message": 30681,
+          "choices": [
+            { "reply": 37046, "next": 30682, "quest": 1959, "beforeObjective": 13852 }
+          ]
+        },
+        {
+          "message": 30682,
+          "choices": [
+            { "reply": 37045, "next": 30683 }
+          ]
+        },
+        {
+          "message": 30683,
+          "choices": [
+            { "reply": 37044, "next": 30684 },
+            { "reply": 37048, "next": 30685 }
+          ]
+        },
+        {
+          "message": 30684,
+          "choices": [
+            { "reply": 37043, "quest": 1959, "completes": 13852, "params": [[30, 13852]] }
+          ]
+        },
+        {
+          "message": 30685,
+          "choices": [
+            { "reply": 37047, "quest": 1959, "completes": 13852, "params": [[30, 13852]] }
+          ]
+        }
+      ],
+      "why": "Sus Belli (Huze Belli), drinking upstairs at the tavern, from her own lines and replies. «On marche sur des œufs» per Dofus pour les noobs: told the character seeks the dofus and can pay («Prétendre que vous avez hérité d'un joli magot de la part de votre tatie»), she sends him to Nowa with the password (30684); that is «Habla con los ocupantes de la taberna para atraer la atención de un traficante» (13852)."
+    },
+    {
+      "npc": 4379,
+      "map": 0,
+      "opening": 30689,
+      "openings": [
+        { "quest": 1959, "objective": 13854, "message": 30687 },
+        { "quest": 1959, "objective": 13853, "message": 30688 },
+        { "after": 1959, "message": 30686 }
+      ],
+      "lines": [
+        {
+          "message": 30689,
+          "choices": [
+            { "reply": 37056, "quest": 1959, "completes": 13853, "params": [[30, 13853]], "next": 30690, "afterObjective": 13852 }
+          ]
+        },
+        {
+          "message": 30690,
+          "choices": [
+            { "reply": 37055, "next": 30691 }
+          ]
+        },
+        {
+          "message": 30691,
+          "choices": [
+            { "reply": 37054, "next": 30693 },
+            { "reply": 37053, "next": 30692 }
+          ]
+        },
+        {
+          "message": 30693,
+          "choices": [
+            { "reply": 37052, "next": 30694 },
+            { "reply": 37058, "next": 30695 }
+          ]
+        },
+        {
+          "message": 30694,
+          "choices": [
+            { "reply": 37050, "params": [905] }
+          ]
+        },
+        {
+          "message": 30695,
+          "choices": [
+            { "reply": 37057, "params": [905] }
+          ]
+        },
+        {
+          "message": 30692,
+          "choices": [
+            { "reply": 37050, "params": [905] }
+          ]
+        },
+        {
+          "message": 30688,
+          "choices": [
+            { "reply": 37051, "params": [905] }
+          ]
+        },
+        {
+          "message": 30687,
+          "choices": [
+            { "reply": 37049 }
+          ]
+        },
+        {
+          "message": 30686,
+          "choices": []
+        }
+      ],
+      "why": "Nowa, the pandawa who sells false dofus, from his own lines and replies, by «On marche sur des œufs» of Dofus pour les noobs: the password «La tortilla ya está lista para servirse.» (the visit, 13853), ten thousand kamas for a shining egg (30690, 30691), the threat with the weapon (37054), his ten-kama bribe and «Soy incorruptible.» (30693), and he runs: the fight (npc_fights.json). Beaten, he gives himself up (30687) and «Escoltar al pandawa hasta el jefe de la milicia»; still standing, «¿Otra vez tú?» (30688); afterwards, his trafficking days are over (30686)."
     }
   ]
 }

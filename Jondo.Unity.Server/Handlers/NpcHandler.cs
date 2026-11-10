@@ -902,12 +902,23 @@ namespace Jondo.Unity.Server.Handlers
             var diario = SessionContext.State.Quests;
             if (diario == null) return linea.Replies();
 
-            return linea.RepliesFor(
+            var replies = linea.RepliesFor(
                 diario.Active,
                 diario.Finished,
                 (mision, paso) => diario.Run(mision)?.StepId == paso,
                 (mision, objetivo) => diario.ObjectiveDone(objetivo),
                 elemento => SessionContext.State.ElementsUsed.Contains(elemento));
+
+            // And the character's level, where a reply asks it (DialogueChoice.MinLevel, BelowLevel).
+            int level = SessionContext.State.CharacterLevel;
+            return replies.Where(r =>
+            {
+                var choice = linea.Choice(r);
+                if (choice == null) return true;
+                if (!choice.ForLevel(level)) return false;
+                // And what it hands over, which has to be carried (DialogueChoice.Takes).
+                return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) > 0;
+            }).ToArray();
         }
 
         /// <summary>
@@ -1279,6 +1290,17 @@ namespace Jondo.Unity.Server.Handlers
             // A reply that hands a quest over and ends the conversation closes it first: the
             // tutorial capture has kld, then lqn 54 and ief (60352's «Desplazarte.», 60411's
             // «Unirte al maestro Curro»). One that goes on starts it before the next line.
+            // What the reply hands to the NPC: Acidrik's beer.
+            if (elegidaAhora != null && elegidaAhora.Takes != 0)
+            {
+                if (Managers.Equipment.HowMany(elegidaAhora.Takes) <= 0) return;
+                await Managers.Equipment.TakeAsync(stream, elegidaAhora.Takes, 1);
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        Managers.InfoMessages.ItemLost, "1",
+                        elegidaAhora.Takes.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+            }
+
             // A reply that does a conversation objective: before the next line when it goes on,
             // after the window closes when it ends it -- «He neutralizado a la rata.» is kld, then
             // lqn 56 and ied 1633 in the capture.
