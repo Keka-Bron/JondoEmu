@@ -1117,6 +1117,14 @@
       "orientation": 1,
       "criterion": "Qo=14120",
       "why": "Hipo Lítico in the left cell of Astrub's prison once handed over (14120). INFERRED."
+    },
+    {
+      "map": 189793289,
+      "npc": 4364,
+      "cell": 440,
+      "orientation": 1,
+      "criterion": "Qa=1981&Qo=13781&Qo=13782&Qo=13783&Qo=13784&Qo!13785",
+      "why": "The country doll, out of Mawy Ingals' barn once Vey Gana has her four slobbers, until beaten (13785). INFERRED: on the grass between the barn and Vey Gana."
     }
   ]
 }

@@ -343,6 +343,20 @@ namespace Jondo.Unity.Server.Managers
         /// missing three ortie" to somebody who only walked past would be chat noise on every step
         /// of every quest that ends at an NPC.
         /// </remarks>
+        /// <summary>
+        /// Whether what an objective asks to hand over is carried: true for one that asks for no
+        /// item. A reply that does a «bring» objective is offered only then -- Cindy Cato's fifteen
+        /// boxes, Kerubim's purse for Primir.
+        /// </summary>
+        public static bool CanHandOver(int objectiveId)
+        {
+            if (_book == null || objectiveId == 0) return true;
+            if (Log?.ObjectiveDone(objectiveId) == true) return true;
+            var objective = _book.Objective(objectiveId);
+            if (objective == null || objective.ItemId == 0) return true;
+            return Equipment.HowMany(objective.ItemId) >= Math.Max(1, objective.ItemCount);
+        }
+
         private static async Task<bool> HandOverAsync(NetworkStream stream, QuestObjective objective)
         {
             int wanted = Math.Max(1, objective.ItemCount);

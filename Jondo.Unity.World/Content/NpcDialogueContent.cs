@@ -225,6 +225,12 @@ namespace Jondo.Unity.World.Content
         public int ShowsNpc { get; init; }
 
         /// <summary>
+        /// More objectives of <see cref="Quest"/> this reply does, beside <see cref="Completes"/>:
+        /// Vey Gana's «Darle los ingredientes.» hands over the four slobbers, four objectives.
+        /// </summary>
+        public IReadOnlyList<int> CompletesAll { get; init; } = Array.Empty<int>();
+
+        /// <summary>
         /// An item the NPC hands over with this reply, or zero; when the reply also does an
         /// objective, only once it is done: Kotorra's jam for the five nettles.
         /// </summary>
@@ -251,11 +257,29 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public int Takes { get; init; }
 
+        /// <summary>
+        /// An item the character must carry, <see cref="HoldsCount"/> of them, for the reply to be
+        /// offered, or zero. Nothing is taken: the objective the reply does hands them over --
+        /// Cindy Cato's fifteen boxes of knick-knacks.
+        /// </summary>
+        public int Holds { get; init; }
+
+        /// <summary>How many of <see cref="Holds"/>.</summary>
+        public int HoldsCount { get; init; } = 1;
+
         /// <summary>Whether a character of that level is offered the reply.</summary>
         public bool ForLevel(int level) => (MinLevel == 0 || level >= MinLevel) && (BelowLevel == 0 || level < BelowLevel);
 
         /// <summary>Whether any reply of this tree does that objective.</summary>
-        internal bool Does(int objectiveId) => Completes != 0 && Completes == objectiveId;
+        internal bool Does(int objectiveId)
+            => objectiveId != 0 && (Completes == objectiveId || CompletesAll.Contains(objectiveId));
+
+        /// <summary>Every objective this reply does: <see cref="Completes"/> and <see cref="CompletesAll"/>.</summary>
+        public IEnumerable<int> Objectives()
+        {
+            if (Completes != 0) yield return Completes;
+            foreach (int objective in CompletesAll) yield return objective;
+        }
 
         public bool Ends => Next == 0;
 
@@ -295,6 +319,61 @@ namespace Jondo.Unity.World.Content
             return null;
         }
 
+        /// <summary>
+        /// The choice a reply stands for when the line offers it twice (DialogueChoice.Always): the
+        /// first one this character is shown, else the first one.
+        /// </summary>
+        public DialogueChoice? Choice(long reply, Func<DialogueChoice, bool> shown)
+        {
+            DialogueChoice? first = null;
+            foreach (var choice in Choices)
+            {
+                if (choice.Reply != reply) continue;
+                if (shown(choice)) return choice;
+                first ??= choice;
+            }
+
+            return first;
+        }
+
+        /// <summary>
+        /// Whether one choice is offered to a character, his quests read through the callbacks:
+        /// the filter of <see cref="RepliesFor"/>, one choice at a time.
+        /// </summary>
+        /// <remarks>
+        /// The interactive is checked before anything else, because it holds the same for a reply
+        /// that belongs to a quest and for one that starts it -- and the one that starts it is
+        /// «Always» in the filter's eyes, so if this came later it would not be checked. Without
+        /// <paramref name="objectiveDone"/>, a reply tied to an objective is not offered, which is
+        /// the prudent side: better not to see it than to see it too early.
+        /// </remarks>
+        public static bool Shows(DialogueChoice choice, Func<int, bool> active, Func<int, bool> finished,
+                                 Func<int, int, bool> onStep, Func<int, int, bool>? objectiveDone = null,
+                                 Func<int, bool>? elementUsed = null)
+        {
+            if (choice.AfterElement != 0
+                && (elementUsed == null || !elementUsed(choice.AfterElement))) return false;
+
+            if (choice.BeforeQuest != 0 && (active(choice.BeforeQuest) || finished(choice.BeforeQuest))) return false;
+
+            if (choice.Always) return true;
+
+            if (choice.AfterQuest) return finished(choice.Quest);
+
+            if (!active(choice.Quest)) return false;
+            if (choice.Step != 0 && !onStep(choice.Quest, choice.Step)) return false;
+            if (choice.BeforeObjective != 0 && objectiveDone != null && objectiveDone(choice.Quest, choice.BeforeObjective))
+                return false;
+            if (choice.AfterObjective != 0
+                && (objectiveDone == null || !objectiveDone(choice.Quest, choice.AfterObjective)))
+                return false;
+            if (choice.AfterObjectives.Count > 0
+                && (objectiveDone == null || choice.AfterObjectives.Any(o => !objectiveDone(choice.Quest, o))))
+                return false;
+
+            return true;
+        }
+
         public long[] Replies()
         {
             var replies = new long[Choices.Count];
@@ -321,38 +400,10 @@ namespace Jondo.Unity.World.Content
             var replies = new List<long>(Choices.Count);
             foreach (var choice in Choices)
             {
-                // The interactive is checked before anything else, because it holds the same for a reply that
-                // belongs to a quest and for one that starts it -- and the one that starts it is
-                // «Always» in the filter's eyes, so if this came later it would not be checked.
-                if (choice.AfterElement != 0
-                    && (elementUsed == null || !elementUsed(choice.AfterElement))) continue;
-
-                if (choice.BeforeQuest != 0 && (active(choice.BeforeQuest) || finished(choice.BeforeQuest))) continue;
-
-                if (choice.Always) { replies.Add(choice.Reply); continue; }
-
-                if (choice.AfterQuest)
-                {
-                    if (finished(choice.Quest)) replies.Add(choice.Reply);
-                    continue;
-                }
-
-                if (!active(choice.Quest)) continue;
-                if (choice.Step != 0 && !onStep(choice.Quest, choice.Step)) continue;
-                if (choice.BeforeObjective != 0 && objectiveDone != null && objectiveDone(choice.Quest, choice.BeforeObjective))
-                    continue;
-
-                // And the objective, when the row asks for it. Without the call -- which is optional so as not to
-                // force whoever does not have it -- a reply tied to an objective is not offered,
-                // which is the prudent side: better not to see it than to see it too early.
-                if (choice.AfterObjective != 0
-                    && (objectiveDone == null || !objectiveDone(choice.Quest, choice.AfterObjective)))
-                    continue;
-                if (choice.AfterObjectives.Count > 0
-                    && (objectiveDone == null || choice.AfterObjectives.Any(o => !objectiveDone(choice.Quest, o))))
-                    continue;
-
-                replies.Add(choice.Reply);
+                // A reply a quest has its own way through comes first, and the rest of the world's
+                // after it: only one of the two is offered (see Choice(reply, shown)).
+                if (replies.Contains(choice.Reply)) continue;
+                if (Shows(choice, active, finished, onStep, objectiveDone, elementUsed)) replies.Add(choice.Reply);
             }
 
             // One of each random group, the dice of the line.
@@ -794,10 +845,13 @@ namespace Jondo.Unity.World.Content
                             ThenNpc = (int)Number(choice, "thenNpc"),
                             Completes = (int)Number(choice, "completes"),
                             ShowsNpc = (int)Number(choice, "showsNpc"),
+                            CompletesAll = Numbers(choice, "completesAll").Select(o => (int)o).ToArray(),
                             Gives = (int)Number(choice, "gives"),
                             MinLevel = (int)Number(choice, "minLevel"),
                             BelowLevel = (int)Number(choice, "belowLevel"),
                             Takes = (int)Number(choice, "takes"),
+                            Holds = (int)Number(choice, "holds"),
+                            HoldsCount = Math.Max(1, (int)Number(choice, "holdsCount")),
                             GivesCount = Math.Max(1, (int)Number(choice, "givesCount")),
                             EndsMutation = choice.TryGetProperty("endsMutation", out var ends)
                                            && ends.ValueKind == JsonValueKind.True,
@@ -960,10 +1014,18 @@ namespace Jondo.Unity.World.Content
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);
                             if (choice.ShowsNpc != 0) writer.WriteNumber("showsNpc", choice.ShowsNpc);
+                            if (choice.CompletesAll.Count > 0)
+                            {
+                                writer.WriteStartArray("completesAll");
+                                foreach (int o in choice.CompletesAll) writer.WriteNumberValue(o);
+                                writer.WriteEndArray();
+                            }
                             if (choice.Gives != 0) writer.WriteNumber("gives", choice.Gives);
                             if (choice.MinLevel != 0) writer.WriteNumber("minLevel", choice.MinLevel);
                             if (choice.BelowLevel != 0) writer.WriteNumber("belowLevel", choice.BelowLevel);
                             if (choice.Takes != 0) writer.WriteNumber("takes", choice.Takes);
+                            if (choice.Holds != 0) writer.WriteNumber("holds", choice.Holds);
+                            if (choice.Holds != 0 && choice.HoldsCount != 1) writer.WriteNumber("holdsCount", choice.HoldsCount);
                             if (choice.Gives != 0 && choice.GivesCount != 1) writer.WriteNumber("givesCount", choice.GivesCount);
                             if (choice.EndsMutation) writer.WriteBoolean("endsMutation", true);
                             writer.WriteEndObject();
@@ -1023,13 +1085,18 @@ namespace Jondo.Unity.World.Content
                 // It does now, so a line with nothing to say back is a dead end the player can
                 // still walk out of.
 
-                var seen = new HashSet<long>();
+                // The same reply twice under one line is a mistake, unless the earlier one belongs to
+                // a quest: then it is that quest's way through the line, and the later one is the
+                // rest of the world's (Tek Abir's «Aquí tienes los 40 kamas.» buys the beer anybody
+                // asks for, and Bajofrente's own while «La cerveza compartida» wants it).
+                var seen = new Dictionary<long, DialogueChoice>();
                 foreach (var choice in line.Choices)
                 {
-                    if (!seen.Add(choice.Reply))
+                    if (seen.TryGetValue(choice.Reply, out var earlier) && earlier.Always)
                     {
                         wrong.Add($"message {line.Message} offers reply {choice.Reply} twice.");
                     }
+                    seen[choice.Reply] = choice;
 
                     if (!choice.Ends && !known.Contains(choice.Next))
                     {

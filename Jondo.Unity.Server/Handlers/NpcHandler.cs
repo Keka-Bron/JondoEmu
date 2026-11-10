@@ -897,6 +897,28 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[NPC] {npcId} comes in and speaks: question {line.Message}.");
         }
 
+        /// <summary>
+        /// Whether one choice is offered to the character of the session: the filter of
+        /// <see cref="LasQueTocan"/> for a single choice, so that a reply a line offers twice --
+        /// once for a quest, once for everybody -- is read as the one that was on screen.
+        /// </summary>
+        private static bool SeLeOfrece(Jondo.Unity.World.Content.DialogueChoice choice)
+        {
+            var diario = SessionContext.State.Quests;
+            if (diario == null) return choice.Always;
+            if (!Jondo.Unity.World.Content.DialogueLine.Shows(choice,
+                    diario.Active,
+                    diario.Finished,
+                    (mision, paso) => diario.Run(mision)?.StepId == paso,
+                    (mision, objetivo) => diario.ObjectiveDone(objetivo),
+                    elemento => SessionContext.State.ElementsUsed.Contains(elemento)))
+                return false;
+            if (!choice.ForLevel(SessionContext.State.CharacterLevel)) return false;
+            if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
+            if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
+            return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) > 0;
+        }
+
         private static long[] LasQueTocan(DialogueLine linea)
         {
             var diario = SessionContext.State.Quests;
@@ -917,6 +939,9 @@ namespace Jondo.Unity.Server.Handlers
                 if (choice == null) return true;
                 if (!choice.ForLevel(level)) return false;
                 // And what it hands over, which has to be carried (DialogueChoice.Takes).
+                if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
+                // A reply that hands over what an objective asks for, only to whoever carries it.
+                if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
                 return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) > 0;
             }).ToArray();
         }
@@ -952,7 +977,7 @@ namespace Jondo.Unity.Server.Handlers
         /// item as a gift; this way, the worst that can happen is that it is charged and the delivery
         /// fails, and that is said on the console instead of kept quiet.
         /// </remarks>
-        private static async Task ComprarAsync(NetworkStream stream, DialogueChoice choice)
+        private static async Task<bool> ComprarAsync(NetworkStream stream, DialogueChoice choice)
         {
             if (GameState.Kamas < choice.BuysPrice)
             {
@@ -963,7 +988,7 @@ namespace Jondo.Unity.Server.Handlers
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
                         InfoMessages.Warning, InfoMessages.MissingItem)));
-                return;
+                return false;
             }
 
             if (choice.BuysPrice > 0)
@@ -978,7 +1003,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 Console.WriteLine($"[NPC] {choice.BuysPrice} kamas charged and " +
                                   $"{choice.BuysCount}x{choice.BuysItem} could not be handed over.");
-                return;
+                return false;
             }
 
             // What the chat says, as Grobid's lemonade in «Matarratas»' capture: after the kld,
@@ -996,6 +1021,7 @@ namespace Jondo.Unity.Server.Handlers
 
             Console.WriteLine($"[NPC] Sold {choice.BuysCount}x{choice.BuysItem} for " +
                               $"{choice.BuysPrice} kamas; {GameState.Kamas} left.");
+            return true;
         }
 
         /// <summary>What a reply hands over (DialogueChoice.Gives), with the chat's line.</summary>
@@ -1204,7 +1230,7 @@ namespace Jondo.Unity.Server.Handlers
             var frase = NpcDialogues.For(SessionContext.State.OpenDialogueNpcId,
                                          SessionContext.State.OpenDialogueMapId)
                                     ?.Line(SessionContext.State.OpenDialogueMessage);
-            var elegidaAhora = frase?.Choice(reply);
+            var elegidaAhora = frase?.Choice(reply, SeLeOfrece);
 
             // Is it the answer that accepts an offer that was read? Then there is no NPC involved:
             // the question was asked by a notice, and accepting it is what records having read it. It
@@ -1224,9 +1250,10 @@ namespace Jondo.Unity.Server.Handlers
 
             // Does the answer buy something? Before the quest, because a purchase that fails must not
             // leave the conversation halfway with the quest already started.
+            bool sinPagar = false;
             if (elegidaAhora != null && elegidaAhora.BuysItem != 0)
             {
-                await ComprarAsync(stream, elegidaAhora);
+                sinPagar = !await ComprarAsync(stream, elegidaAhora);
             }
 
             // Does the answer touch the dream points? It is the fountain's shop, which has no protocol
@@ -1306,7 +1333,7 @@ namespace Jondo.Unity.Server.Handlers
             // after the window closes when it ends it -- «He neutralizado a la rata.» is kld, then
             // lqn 56 and ied 1633 in the capture.
             int completesAfterClosing = 0;
-            if (elegidaAhora != null && elegidaAhora.Completes != 0 && elegidaAhora.StartsQuest == 0)
+            if (elegidaAhora != null && elegidaAhora.Completes != 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
             {
                 if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
                     completesAfterClosing = elegidaAhora.Completes;
@@ -1321,6 +1348,18 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
             }
+
+            // The other objectives the reply does, all at once: Vey Gana's four slobbers.
+            if (elegidaAhora != null && elegidaAhora.CompletesAll.Count > 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
+            {
+                foreach (int objective in elegidaAhora.CompletesAll)
+                    await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.Quest, objective);
+            }
+
+            // Somebody who comes in on a reply that does no objective: Vey Gana's «Darle los
+            // ingredientes.» draws the country doll out of the barn.
+            if (elegidaAhora != null && elegidaAhora.Completes == 0 && elegidaAhora.ShowsNpc != 0)
+                await ComesInAsync(stream, elegidaAhora.ShowsNpc);
 
             int startsAfterClosing = 0;
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)

@@ -560,6 +560,43 @@
    "afterObjectives": [14111, 14112, 14113, 14114, 14115],
    "showsNpc": 4413,
    "why": "«Espera cerca del templo»: in front of the temple of the Twelve [6,-19], once the posters, the three rumours and the investigator are done; Hipo Lítico comes then («Allez devant le temple en [6,-19] et parlez à Hippolyte Hique qui prétend être à votre recherche»)."
+  },
+  {
+   "objective": 13771,
+   "quest": 1979,
+   "kind": "objectives",
+   "afterObjectives": [13780],
+   "why": "«Soluciona el problema de Pesk Anova»: his quest, «Como un pischis fuera del agua» (1980), done; 13780, going back to him, is its last objective. Dofus pour les noobs: «Il s'agit en fait d'effectuer quatre quêtes que ces quatre personnes vous donnent»."
+  },
+  {
+   "objective": 13772,
+   "quest": 1979,
+   "kind": "objectives",
+   "afterObjectives": [13786],
+   "why": "«Soluciona el problema de Vey Gana»: «Comer con tenedor» (1981) done, 13786 its last objective."
+  },
+  {
+   "objective": 13773,
+   "quest": 1979,
+   "kind": "objectives",
+   "afterObjectives": [13791],
+   "why": "«Soluciona el problema de Jeffry Baratón»: «La copa de vicios» (1982) done, 13791 its last objective."
+  },
+  {
+   "objective": 13774,
+   "quest": 1979,
+   "kind": "objectives",
+   "afterObjectives": [13792],
+   "why": "«Soluciona el problema de Cindy Cato»: «Los ases del hurto» (1983) done, 13792 its only objective."
+  },
+  {
+   "objective": 13785,
+   "quest": 1981,
+   "kind": "beat",
+   "monster": 5234,
+   "map": 189793289,
+   "afterObjectives": [13784],
+   "why": "«Vence a la muñeca campestre»: the country doll (5234) and the plants with her; Dofus pour les noobs: «Un combat se lance contre chaque plantes»."
   }
  ]
 }

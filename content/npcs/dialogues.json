@@ -794,20 +794,11 @@
             { "reply": 37920, "quest": 1977, "completes": 14120, "params": [[30, 14120]], "next": 31395, "afterObjective": 14119 },
             { "reply": 37503, "quest": 1962, "completes": 13949, "params": [[30, 13949]], "next": 31063, "afterObjective": 13948 },
             { "reply": 37062, "quest": 1959, "completes": 13855, "params": [[30, 13855]], "next": 30696, "afterObjective": 13854 },
-            { "reply": 36644, "next": 30382 },
-            { "reply": 36637, "next": 30391 }
-          ]
-        },
-        {
-          "message": 30382,
-          "choices": [
-            { "reply": 36627, "startsQuest": 1978 }
-          ]
-        },
-        {
-          "message": 30391,
-          "choices": [
-            { "reply": 36640, "startsQuest": 1979 }
+            { "reply": 36630, "next": 30381, "quest": 1959, "afterQuest": true, "beforeQuest": 1978 },
+            { "reply": 36639, "quest": 1978, "completes": 13770, "params": [[30, 13770]], "next": 30387, "afterObjective": 13769 },
+            { "reply": 36642, "next": 30388, "quest": 1978, "afterQuest": true, "beforeQuest": 1979 },
+            { "reply": 36645, "quest": 1979, "completes": 13775, "params": [[30, 13775]], "next": 30393, "afterObjectives": [13771, 13772, 13773, 13774] },
+            { "reply": 66930 }
           ]
         },
         {
@@ -863,9 +854,79 @@
           "choices": [
             { "reply": 36637 }
           ]
+        },
+        {
+          "message": 30381,
+          "choices": [
+            { "reply": 36629, "next": 30382 }
+          ]
+        },
+        {
+          "message": 30382,
+          "choices": [
+            { "reply": 36627, "startsQuest": 1978, "params": [[34, 1978]] },
+            { "reply": 36628, "next": 30383 }
+          ]
+        },
+        {
+          "message": 30383,
+          "choices": [
+            { "reply": 36638 }
+          ]
+        },
+        {
+          "message": 30387,
+          "choices": [
+            { "reply": 36637, "next": 30391 },
+            { "reply": 36638, "next": 30389 }
+          ]
+        },
+        {
+          "message": 30391,
+          "choices": [
+            { "reply": 36640, "startsQuest": 1979, "params": [[34, 1979]] },
+            { "reply": 36641, "next": 30392 }
+          ]
+        },
+        {
+          "message": 30388,
+          "choices": [
+            { "reply": 36635, "startsQuest": 1979, "params": [[34, 1979]] },
+            { "reply": 36636, "next": 30390 }
+          ]
+        },
+        {
+          "message": 30389,
+          "choices": [
+            { "reply": 66930 }
+          ]
+        },
+        {
+          "message": 30390,
+          "choices": [
+            { "reply": 66930 }
+          ]
+        },
+        {
+          "message": 30392,
+          "choices": [
+            { "reply": 66930 }
+          ]
+        },
+        {
+          "message": 30393,
+          "choices": [
+            { "reply": 36644, "next": 30394 }
+          ]
+        },
+        {
+          "message": 30394,
+          "choices": [
+            { "reply": 36643 }
+          ]
         }
       ],
-      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397)."
+      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394)."
     },
     {
       "npc": 4324,
@@ -1438,22 +1499,44 @@
         {
           "message": 30395,
           "choices": [
-            {
-              "reply": 36649,
-              "next": 30398
-            }
+            { "reply": 36650, "next": 30396, "quest": 1979, "beforeQuest": 1980 },
+            { "reply": 36653, "quest": 1980, "completes": 13780, "params": [[30, 13780]], "next": 30399, "afterObjectives": [13776, 13777, 13778, 13779] },
+            { "reply": 36647 }
+          ]
+        },
+        {
+          "message": 30396,
+          "choices": [
+            { "reply": 36648, "next": 30397 }
+          ]
+        },
+        {
+          "message": 30397,
+          "choices": [
+            { "reply": 36649, "next": 30398 }
           ]
         },
         {
           "message": 30398,
           "choices": [
-            {
-              "reply": 36646,
-              "startsQuest": 1980
-            }
+            { "reply": 36646, "startsQuest": 1980, "params": [[34, 1980]] },
+            { "reply": 36647 }
+          ]
+        },
+        {
+          "message": 30399,
+          "choices": [
+            { "reply": 36652, "next": 30400 }
+          ]
+        },
+        {
+          "message": 30400,
+          "choices": [
+            { "reply": 36651 }
           ]
         }
-      ]
+      ],
+      "why": "Pesk Anova (Bart Cousti), on Astrub's beach, from his own lines and replies, by «Comme un pichon hors de l'eau» of Dofus pour les noobs: sent by Bajofrente during «Combat de rue», the pischis that drove the tourists off (30396, 30397) and three of each to kill (30398, the line 1980 names); the job shown done (13780), the carcasses to keep them in the sea (30399) and the Sand Castle's key (30400)."
     },
     {
       "npc": 4363,
@@ -1463,22 +1546,39 @@
         {
           "message": 30401,
           "choices": [
-            {
-              "reply": 36656,
-              "next": 30403
-            }
+            { "reply": 36657, "next": 30402, "quest": 1979, "beforeQuest": 1981 },
+            { "reply": 36659, "next": 30404, "quest": 1981, "beforeObjective": 13785, "showsNpc": 4364, "completesAll": [13781, 13782, 13783, 13784], "params": [[30, 13781]] },
+            { "reply": 36663, "quest": 1981, "completes": 13786, "params": [[30, 13786]], "next": 30406, "afterObjective": 13785 },
+            { "reply": 36655 }
+          ]
+        },
+        {
+          "message": 30402,
+          "choices": [
+            { "reply": 36656, "next": 30403 }
           ]
         },
         {
           "message": 30403,
           "choices": [
-            {
-              "reply": 36654,
-              "startsQuest": 1981
-            }
+            { "reply": 36654, "startsQuest": 1981, "params": [[34, 1981]] },
+            { "reply": 36655 }
+          ]
+        },
+        {
+          "message": 30404,
+          "choices": [
+            { "reply": 36658, "thenNpc": 4364 }
+          ]
+        },
+        {
+          "message": 30406,
+          "choices": [
+            { "reply": 36662 }
           ]
         }
-      ]
+      ],
+      "why": "Vey Gana (Vaiguy), the cook's girl in Astrub's fields, by «Déjeuner à la fourchette» of Dofus pour les noobs: a vegetarian buffet for a sadida delegation (30402) and pieces of each plant (30403, the line 1981 names); «Darle los ingredientes.» hands the four slobbers over (13781-13784, offered once all are carried) and brings the country doll out of Mawy Ingals' barn (30404); after the fight, «Examinar su estado.» (13786) and the Hungry Sunflower Barn's key (30406)."
     },
     {
       "npc": 4365,
@@ -1488,22 +1588,39 @@
         {
           "message": 30407,
           "choices": [
-            {
-              "reply": 36667,
-              "next": 30409
-            }
+            { "reply": 36667, "next": 30408, "quest": 1979, "beforeQuest": 1982, "minLevel": 20 },
+            { "reply": 36668, "next": 30410, "quest": 1979, "beforeQuest": 1982, "belowLevel": 20 },
+            { "reply": 36670, "quest": 1982, "completes": 13791, "params": [[30, 13791]], "next": 30411, "afterObjectives": [13787, 13788, 13789, 13790] },
+            { "reply": 36665 }
+          ]
+        },
+        {
+          "message": 30408,
+          "choices": [
+            { "reply": 36666, "next": 30409 }
           ]
         },
         {
           "message": 30409,
           "choices": [
-            {
-              "reply": 36664,
-              "startsQuest": 1982
-            }
+            { "reply": 36664, "startsQuest": 1982, "params": [[34, 1982]] },
+            { "reply": 36665 }
+          ]
+        },
+        {
+          "message": 30410,
+          "choices": [
+            { "reply": 36665 }
+          ]
+        },
+        {
+          "message": 30411,
+          "choices": [
+            { "reply": 36669 }
           ]
         }
-      ]
+      ],
+      "why": "Jeffry Baratón (Jeffrey Baratourte), in Tainela, by «La coupe des vices» of Dofus pour les noobs: he cannot stand happy gobballs (30407, 30408), «Un entrenamiento no puede ser malo.» and the massacre (30409, the line 1982 names); too green under level 20 (30410, the quest asks PL>19); the massacre reported (13791) and the Royal Gobball's Court key (30411)."
     },
     {
       "npc": 4366,
@@ -1513,22 +1630,57 @@
         {
           "message": 30412,
           "choices": [
-            {
-              "reply": 36675,
-              "next": 30416
-            }
+            { "reply": 36677, "next": 30413, "quest": 1979, "beforeQuest": 1983, "minLevel": 30 },
+            { "reply": 36676, "next": 30417, "quest": 1979, "beforeQuest": 1983, "belowLevel": 30 },
+            { "reply": 36679, "quest": 1983, "completes": 13792, "params": [[30, 13792]], "next": 30418 },
+            { "reply": 36672 }
+          ]
+        },
+        {
+          "message": 30413,
+          "choices": [
+            { "reply": 36674, "next": 30414 }
+          ]
+        },
+        {
+          "message": 30414,
+          "choices": [
+            { "reply": 36673, "next": 30415 }
+          ]
+        },
+        {
+          "message": 30415,
+          "choices": [
+            { "reply": 36675, "next": 30416 }
           ]
         },
         {
           "message": 30416,
           "choices": [
-            {
-              "reply": 36671,
-              "startsQuest": 1983
-            }
+            { "reply": 36671, "startsQuest": 1983, "params": [[34, 1983]], "next": 57240 },
+            { "reply": 36672 }
+          ]
+        },
+        {
+          "message": 30417,
+          "choices": [
+            { "reply": 36672 }
+          ]
+        },
+        {
+          "message": 57240,
+          "choices": [
+            { "reply": 77898 }
+          ]
+        },
+        {
+          "message": 30418,
+          "choices": [
+            { "reply": 36678 }
           ]
         }
-      ]
+      ],
+      "why": "Cindy Cato (Cindy Cah), Astrub's housing representative, by «Les as de la cambriole» of Dofus pour les noobs: the city's houses and their vermin (30412, 30413), a network of tiny thieves (30414) and the rikiki wands to get into their hideouts (30415); the knick-knacks to bring back (30416, the line 1983 names), and one hideout pointed out (57240). Too green under level 30 (30417). The fifteen boxes handed over (13792, offered once all fifteen are carried) and the key of a hideout another mercenary found (30418)."
     },
     {
       "npc": 4372,
@@ -6450,6 +6602,7 @@
         {
           "message": 30384,
           "choices": [
+            { "reply": 36634, "next": 30385, "quest": 1978, "beforeObjective": 13769 },
             { "reply": 37324, "quest": 1975, "completes": 13958, "params": [[30, 13958]], "next": 30907, "afterObjective": 13957 },
             { "reply": 36993, "next": 30645, "quest": 1959, "beforeObjective": 13852 },
             { "reply": 36873, "next": 30385 }
@@ -6470,6 +6623,7 @@
         {
           "message": 30385,
           "choices": [
+            { "reply": 36631, "quest": 1978, "completes": 13769, "params": [[30, 13769]], "next": 30386, "beforeObjective": 13769, "buyItem": 19623, "buyPrice": 40 },
             { "reply": 36631, "buyItem": 6857, "buyPrice": 40 },
             { "reply": 36632, "next": 30562 },
             { "reply": 36633 }
@@ -6499,9 +6653,15 @@
           "choices": [
             { "reply": 37321 }
           ]
+        },
+        {
+          "message": 30386,
+          "choices": [
+            { "reply": 36991 }
+          ]
         }
       ],
-      "why": "Tek Abir, the tavern keeper of Astrub, from his own lines and replies. «On marche sur des œufs» per Dofus pour les noobs: «Commander une bière» for 40 kamas (30385, «Son 40 kamas y aquí no se fía.»), the Cerveza de Astrub; asked about the dofus, the rumour of pandawas (30645, 30646). «Ça tombe à l'eau»: the notary's description without naming him (13958): the Duke of Sidimote, gone, but his servant Camilo Demolinos is still around (30907-30909), at the markets."
+      "why": "Tek Abir, the tavern keeper of Astrub, from his own lines and replies. «On marche sur des œufs» per Dofus pour les noobs: «Commander une bière» for 40 kamas (30385, «Son 40 kamas y aquí no se fía.»), the Cerveza de Astrub; asked about the dofus, the rumour of pandawas (30645, 30646). «Ça tombe à l'eau»: the notary's description without naming him (13958): the Duke of Sidimote, gone, but his servant Camilo Demolinos is still around (30907-30909), at the markets. «Bière qui roule n'amasse pas mousse»: «Pedir una cerveza para Bajofrente», «Aquí tienes los 40 kamas.» (« Payer les 40 kamas », 13769) for the frothy Astrub beer (19623), and hurry before the froth goes (30386). The same reply buys the ordinary beer for anybody else: the quest's comes first in the line."
     },
     {
       "npc": 4322,
@@ -7661,6 +7821,21 @@
         }
       ],
       "why": "Hipo Lítico behind bars under the militia («Descendez dans le sous-sol pour parler à Hippolyte Hique qui est maintenant en prison»): how he was caught (14121), and Kerubim's miracle pills (31399)."
+    },
+    {
+      "npc": 4364,
+      "map": 0,
+      "opening": 30405,
+      "lines": [
+        {
+          "message": 30405,
+          "choices": [
+            { "reply": 36660, "params": [905] },
+            { "reply": 36661 }
+          ]
+        }
+      ],
+      "why": "The country doll out of the barn («Parlez à la Poupée Champêtre «Défendre Vaiguy contre la créature et les plantes l'accompagnant»»): the fight against her and a plant of each kind (npc_fights.json); «Pedir refuerzos.» leaves it for when the group is there."
     }
   ]
 }
