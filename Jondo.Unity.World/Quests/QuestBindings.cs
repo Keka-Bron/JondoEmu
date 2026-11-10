@@ -73,6 +73,12 @@ namespace Jondo.Unity.World.Quests
         /// gargoyle belts, which go into it.
         /// </summary>
         Use,
+
+        /// <summary>
+        /// Nothing to do: the row only says where the objective stands among its step's others
+        /// («anyOrder»), for a type the engine closes on its own (go and see, bring).
+        /// </summary>
+        Order,
     }
 
     /// <summary>
@@ -475,6 +481,7 @@ namespace Jondo.Unity.World.Quests
                 "read" => QuestBindingKind.Read,
                 "reply" => QuestBindingKind.Reply,
                 "use" => QuestBindingKind.Use,
+                "order" => QuestBindingKind.Order,
                 _ => QuestBindingKind.Click,
             };
         }
