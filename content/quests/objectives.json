@@ -80,9 +80,13 @@
     {
      "map": 153356296,
      "element": 504680
+    },
+    {
+     "map": 153357316,
+     "element": 504679
     }
    ],
-   "why": "«Examiner la stele d'un vestige sur la route des ames». Element 504680 is the only one with graphic 3518 in subarea 450, which world.db calls «Route des ames». Map [2,-3]."
+   "why": "«Examiner la stele d'un vestige sur la route des ames». Element 504680 is the only one with graphic 3518 in subarea 450, which world.db calls «Route des ames». Map [2,-3]. The tavern's, 504679 on [0,-3] (Pandawa's), counts as well: Dofus pour les noobs gives it as the one «à la taverne et donc sur la route des âmes»."
   },
   {
    "objective": 9818,
