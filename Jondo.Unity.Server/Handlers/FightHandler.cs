@@ -36,7 +36,8 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static async Task InitiateFightFromMobCollision(NetworkStream stream, MobSpawnManager.MobGroup mobGroup, long mapId,
                                                                long mobContextId = 0, FightRules rules = null,
-                                                               long arenaMapId = 0)
+                                                               long arenaMapId = 0,
+                                                               IReadOnlyList<MobSpawnManager.MobMember>? allies = null)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
@@ -122,6 +123,12 @@ namespace Jondo.Unity.Server.Handlers
             // Fighter IDs for monsters MUST be sequential negative numbers per fight (-1, -2, -3...)
             long monsterSeqId = -1;
             int redIdx = 0;
+
+            // Monsters on the player's side, played by the AI against the other side: the tutorial's
+            // Master Darmas, fighter -1 before the chafers in the capture.
+            foreach (var ally in allies ?? Array.Empty<MobSpawnManager.MobMember>())
+                fight.AddPlayer(BuildMonsterFighter(ally, monsterSeqId--, 0));
+
             // All of an ordinary group; of a dungeon room's, the first clamp(players, 4, 8).
             int players = fight.Azul.Count(f => !f.IsMonster);
             foreach (var member in MobSpawnManager.MembersFor(mobGroup, players))

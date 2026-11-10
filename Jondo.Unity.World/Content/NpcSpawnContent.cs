@@ -13,6 +13,13 @@ namespace Jondo.Unity.World.Content
         public int Cell { get; init; }
         public int Orientation { get; init; }
 
+        /// <summary>
+        /// When the NPC is there for a character, in the quests' own terms (Qa, Qf, Qo...); empty
+        /// for always. The tutorial's Ganymed comes into the combat room only once Master Darmas
+        /// has been told the fight is won: «Qa=1630&amp;Qo=10016».
+        /// </summary>
+        public string Criterion { get; init; }
+
         public override string ToString() => $"npc {NpcId} on map {MapId}, cell {Cell}";
     }
 
@@ -241,6 +248,9 @@ namespace Jondo.Unity.World.Content
                         Orientation = entry.TryGetProperty("orientation", out var o) && o.TryGetInt32(out int f)
                             ? f
                             : (below.Value.Orientation != 0 ? below.Value.Orientation : DefaultOrientation),
+                        Criterion = entry.TryGetProperty("criterion", out var shown) && shown.ValueKind == JsonValueKind.String
+                            ? shown.GetString() ?? ""
+                            : below.Value.Criterion ?? "",
                     }, from);
                 }
             }
@@ -344,6 +354,7 @@ namespace Jondo.Unity.World.Content
                     writer.WriteNumber("npc", spawn.NpcId);
                     writer.WriteNumber("cell", spawn.Cell);
                     writer.WriteNumber("orientation", spawn.Orientation);
+                    if (!string.IsNullOrEmpty(spawn.Criterion)) writer.WriteString("criterion", spawn.Criterion);
                     writer.WriteEndObject();
                 }
 

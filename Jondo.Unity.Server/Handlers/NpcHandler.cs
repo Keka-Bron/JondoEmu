@@ -856,6 +856,37 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
+        /// <summary>
+        /// An NPC of the map who walks in now (jsn) and opens his conversation (ioc, ios), as
+        /// Ganymed does in the combat room once Master Darmas has been told the fight is won.
+        /// </summary>
+        private static async Task ComesInAndSpeaksAsync(NetworkStream stream, int npcId)
+        {
+            long mapId = SessionContext.State.MapId;
+            var spawn = Npcs.OnMap(mapId).FirstOrDefault(s => s.NpcId == npcId);
+            if (spawn == null)
+            {
+                Console.WriteLine($"[NPC] {npcId} was to come in on {mapId} and is not there for this character.");
+                return;
+            }
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildNpcShown(spawn, mapId)));
+
+            var escrito = NpcDialogues.For(npcId, mapId);
+            var line = escrito == null ? null : OpeningFor(escrito);
+            if (line == null) return;
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, spawn.ContextualId)));
+            SessionContext.State.OpenDialogueNpcId = npcId;
+            SessionContext.State.OpenDialogueMapId = mapId;
+            SessionContext.State.OpenDialogueMessage = line.Message;
+            await PreguntarAsync(stream, line.Message, LasQueTocan(line), Npcs.TemplateOf(npcId), line);
+            await Managers.Quests.OnTalkingToAsync(stream, npcId);
+            Console.WriteLine($"[NPC] {npcId} comes in and speaks: question {line.Message}.");
+        }
+
         private static long[] LasQueTocan(DialogueLine linea)
         {
             var diario = SessionContext.State.Quests;
@@ -962,6 +993,21 @@ namespace Jondo.Unity.Server.Handlers
 
             // A dimension's portal: its one reply goes through it.
             if (await DimensionPortalHandler.ReplyAsync(stream, reply)) return;
+
+            // A reply that starts a fight (content/fights/npc_fights.json): the tutorial's chafers.
+            long talkedOn = SessionContext.State.OpenDialogueMapId != 0 ? SessionContext.State.OpenDialogueMapId : SessionContext.State.MapId;
+            var npcFight = NpcFights.For(SessionContext.State.OpenDialogueNpcId, talkedOn, reply);
+            if (npcFight != null)
+            {
+                CerrarConversacion();
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(ConnectionProtocol.NpcDialogCloseReason)));
+                var group = MobSpawnManager.ComposeOffMap(npcFight.Monsters);
+                if (group == null) return;
+                await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
+                    arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies));
+                return;
+            }
 
             // Did a luminomachine answer? Neither quests nor written tree: what each of its answers
             // does is said by the answer itself.
@@ -1282,6 +1328,13 @@ namespace Jondo.Unity.Server.Handlers
             if (startsAfterClosing != 0)
             {
                 await Managers.Quests.StartAsync(stream, startsAfterClosing);
+                return;
+            }
+
+            // And an NPC who comes in and speaks once this one is done (Darmas, then Ganymed).
+            if (elegidaAhora != null && elegidaAhora.ThenNpc != 0)
+            {
+                await ComesInAndSpeaksAsync(stream, elegidaAhora.ThenNpc);
                 return;
             }
 

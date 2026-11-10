@@ -1022,83 +1022,101 @@ namespace Jondo.Unity.Server.Network
 
             foreach (var npc in Managers.Npcs.Of(mapId))
             {
-                long bones = npc.Bones;
-                var skins = npc.Skins;
-                var colors = npc.Colors;
-                var scales = npc.Scales;
-
-                if (npc.Variants.Count > 1)
-                {
-                    quien ??= Managers.WorldEvents.Answering(Managers.GuildRaidManager.ResolverFor(GameState.CharacterId),
-                                                             DateTimeOffset.UtcNow);
-                    var otro = Managers.Npcs.VariantFor(npc, quien);
-                    if (otro != null)
-                    {
-                        bones = otro.Bones;
-                        skins = otro.Skins;
-                        colors = otro.Colors;
-                        scales = otro.Scales;
-                    }
-                }
-
-                var look = Pb.New();
-                if (colors.Length > 0) look.Packed(1, colors);
-                look.Var(2, LookKind);
-                look.VarIfNotZero(3, bones);
-                if (scales.Length > 0) look.Packed(5, scales);
-                if (skins.Length > 0) look.Packed(6, skins);
-
-                // The gender only travels when it is 1. Checked on the fifty-six templates
-                // of the capture: the twenty with gender 1 send it, the thirty-five with gender
-                // 0 omit it —that is proto3— and the only one with gender 2, which is the kama mountain,
-                // does not send anything either. So the field is not the template's gender as is,
-                // but is only set when it is exactly 1.
-                var template = Managers.Npcs.TemplateOf(npc.NpcId);
-                bool female = template != null && template.Gender == NpcFemale;
-
-                // THE HEAD MARK GOES IN HERE, and this is what was missing for the green
-                // exclamation mark to ever come out.
-                //
-                // The iom does not draw it. The two things were told apart by comparing byte by byte the
-                // same map and the same actor: in Ankama's jss of map 154010883, actor
-                // -20000 (NPC 2892), there are six bytes that were not in ours:
-                //
-                //   Ankama  ...1217 0a0b3a09 12041a02e00c 28cc16 1a08...
-                //   Jondo   ...1211 0a053a03            28cc16 1a08...
-                //                            ^^^^^^^^^^^^
-                //                            f2 { f3: packed[1632] }
-                //
-                // 1632 is exactly the quest that NPC hands out on that map. Outside those six
-                // bytes -and the two lengths that grow with them- the frames are identical. The
-                // same on 154010371 with NPC 2905 and quest 1639.
-                //
-                // And there is a capture, "sin apariencias equipar un escudo", that does NOT carry a single iom
-                // in the whole flow and yet its NPCs come out marked: the mark cannot come
-                // from the iom. The iom is something else -an index of the whole SUBZONE, which names maps
-                // the player is not on-, and that is why the one following accepting quest 2432
-                // names 2427: they are two different maps of the same subzone 980.
-                //
-                //   f3  the ones it OFFERS   -> the exclamation mark. 21 of 21 measured ids are quests
-                //                              whose catalogue names THAT npc on THAT map.
-                //   f1  the ones IN PROGRESS that want something from it.
-                //
-                // It goes before the gender, which is the order of all the captures: 12041a02e70c 1801
-                // 28d916. And when there is nothing to say the block is not sent: the byte pair
-                // 1200 does not appear once in the 145 real iom frames.
-                var offered = Managers.Quests.OfferedRightNowBy(npc.NpcId, mapId);
-                var doing = Managers.Quests.InProgressWith(npc.NpcId, mapId);
-
-                var identity = Pb.New();
-                AddQuestMarker(identity, offered, doing);
-                identity.VarIfNotZero(3, female ? NpcFemale : 0).Var(5, npc.NpcId);
-
-                jss.Msg(5, Pb.New()
-                    .Msg(1, Pb.New().Var(1, npc.Cell).VarIfNotZero(2, npc.Orientation))
-                    .Msg(2, Pb.New()
-                        .Msg(1, Pb.New().Msg(7, identity))
-                        .Msg(3, look))
-                    .Var(3, npc.ContextualId));
+                // An NPC a quest brings in is drawn only for whoever it is there for.
+                if (!Managers.Npcs.VisibleNow(npc)) continue;
+                jss.Msg(5, NpcActor(npc, mapId, ref quien));
             }
+        }
+
+        /// <summary>One NPC as a map actor: its cell, its look and its quest marks.</summary>
+        private static Pb NpcActor(Managers.Npcs.Spawn npc, long mapId, ref Jondo.Unity.World.Content.Criterion.Resolver quien)
+        {
+            long bones = npc.Bones;
+            var skins = npc.Skins;
+            var colors = npc.Colors;
+            var scales = npc.Scales;
+
+            if (npc.Variants.Count > 1)
+            {
+                quien ??= Managers.WorldEvents.Answering(Managers.GuildRaidManager.ResolverFor(GameState.CharacterId),
+                                                         DateTimeOffset.UtcNow);
+                var otro = Managers.Npcs.VariantFor(npc, quien);
+                if (otro != null)
+                {
+                    bones = otro.Bones;
+                    skins = otro.Skins;
+                    colors = otro.Colors;
+                    scales = otro.Scales;
+                }
+            }
+
+            var look = Pb.New();
+            if (colors.Length > 0) look.Packed(1, colors);
+            look.Var(2, LookKind);
+            look.VarIfNotZero(3, bones);
+            if (scales.Length > 0) look.Packed(5, scales);
+            if (skins.Length > 0) look.Packed(6, skins);
+
+            // The gender only travels when it is 1. Checked on the fifty-six templates
+            // of the capture: the twenty with gender 1 send it, the thirty-five with gender
+            // 0 omit it —that is proto3— and the only one with gender 2, which is the kama mountain,
+            // does not send anything either. So the field is not the template's gender as is,
+            // but is only set when it is exactly 1.
+            var template = Managers.Npcs.TemplateOf(npc.NpcId);
+            bool female = template != null && template.Gender == NpcFemale;
+
+            // THE HEAD MARK GOES IN HERE, and this is what was missing for the green
+            // exclamation mark to ever come out.
+            //
+            // The iom does not draw it. The two things were told apart by comparing byte by byte the
+            // same map and the same actor: in Ankama's jss of map 154010883, actor
+            // -20000 (NPC 2892), there are six bytes that were not in ours:
+            //
+            //   Ankama  ...1217 0a0b3a09 12041a02e00c 28cc16 1a08...
+            //   Jondo   ...1211 0a053a03            28cc16 1a08...
+            //                            ^^^^^^^^^^^^
+            //                            f2 { f3: packed[1632] }
+            //
+            // 1632 is exactly the quest that NPC hands out on that map. Outside those six
+            // bytes -and the two lengths that grow with them- the frames are identical. The
+            // same on 154010371 with NPC 2905 and quest 1639.
+            //
+            // And there is a capture, "sin apariencias equipar un escudo", that does NOT carry a single iom
+            // in the whole flow and yet its NPCs come out marked: the mark cannot come
+            // from the iom. The iom is something else -an index of the whole SUBZONE, which names maps
+            // the player is not on-, and that is why the one following accepting quest 2432
+            // names 2427: they are two different maps of the same subzone 980.
+            //
+            //   f3  the ones it OFFERS   -> the exclamation mark. 21 of 21 measured ids are quests
+            //                              whose catalogue names THAT npc on THAT map.
+            //   f1  the ones IN PROGRESS that want something from it.
+            //
+            // It goes before the gender, which is the order of all the captures: 12041a02e70c 1801
+            // 28d916. And when there is nothing to say the block is not sent: the byte pair
+            // 1200 does not appear once in the 145 real iom frames.
+            var offered = Managers.Quests.OfferedRightNowBy(npc.NpcId, mapId);
+            var doing = Managers.Quests.InProgressWith(npc.NpcId, mapId);
+
+            var identity = Pb.New();
+            AddQuestMarker(identity, offered, doing);
+            identity.VarIfNotZero(3, female ? NpcFemale : 0).Var(5, npc.NpcId);
+
+            return Pb.New()
+                .Msg(1, Pb.New().Var(1, npc.Cell).VarIfNotZero(2, npc.Orientation))
+                .Msg(2, Pb.New()
+                    .Msg(1, Pb.New().Msg(7, identity))
+                    .Msg(3, look))
+                .Var(3, npc.ContextualId);
+        }
+
+        /// <summary>
+        /// An NPC coming into the map in front of the character (jsn { f1: actor }): the tutorial's
+        /// Ganymed walking into the combat room after the chafers, cell 246 facing 3, actor -20004.
+        /// </summary>
+        public static byte[] BuildNpcShown(Managers.Npcs.Spawn npc, long mapId)
+        {
+            Jondo.Unity.World.Content.Criterion.Resolver quien = null;
+            return Pb.New().Msg(1, NpcActor(npc, mapId, ref quien)).Build();
         }
 
         /// <summary>

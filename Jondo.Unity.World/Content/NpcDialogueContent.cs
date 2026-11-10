@@ -177,6 +177,13 @@ namespace Jondo.Unity.World.Content
         public int Trades { get; init; }
         public int TradeCount { get; init; } = 1;
 
+        /// <summary>
+        /// An NPC of the map who comes in and opens his own conversation once this reply has
+        /// closed the window, or zero. Master Darmas's «Sobresaltarte al ver aparecer a Ganymed»:
+        /// kld, then jsn with Ganymed and his ioc and ios (the tutorial capture).
+        /// </summary>
+        public int ThenNpc { get; init; }
+
         public bool Ends => Next == 0;
 
         /// <summary>Whether this reply is offered to nobody in particular.</summary>
@@ -672,6 +679,7 @@ namespace Jondo.Unity.World.Content
                             Trades = (int)Number(choice, "trade"),
                             TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
                             GivesMutation = (int)Number(choice, "mutation"),
+                            ThenNpc = (int)Number(choice, "thenNpc"),
                             EndsMutation = choice.TryGetProperty("endsMutation", out var ends)
                                            && ends.ValueKind == JsonValueKind.True,
                         });
@@ -818,6 +826,7 @@ namespace Jondo.Unity.World.Content
                                 if (choice.TradeCount != 1) writer.WriteNumber("tradeCount", choice.TradeCount);
                             }
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
+                            if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.EndsMutation) writer.WriteBoolean("endsMutation", true);
                             writer.WriteEndObject();
                         }

@@ -344,6 +344,13 @@
    "kind": "enter",
    "map": 241441793,
    "why": "«Entra en la sala de combate». The tutorial capture closes it (ieb 1630 9680) on arriving at Master Darmas's room, jru 241441793."
+  },
+  {
+   "objective": 19259,
+   "quest": 2502,
+   "kind": "enter",
+   "map": 241443329,
+   "why": "«Habla con el maestro Darmas y vuelve a ver a Ganymed». The tutorial capture closes 2502 (ied) right after the jru to the Dofusarium that Ganymed's «Seguir a Ganymed» makes."
   }
  ]
 }

@@ -336,6 +336,14 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (arrival < 0) return null;
 
+            // Where a capture has measured the landing (content/maps/arrivals.json): Ganymed's
+            // «Seguir a Ganymed» puts the player on the Dofusarium's cell 127.
+            if (Managers.MeasuredArrivals.TryGet(targetMapId, out int measuredCell, out int measuredFacing))
+            {
+                arrival = measuredCell;
+                if (measuredFacing >= 0) SessionContext.State.Orientation = measuredFacing;
+            }
+
             long oldMapId = SessionContext.State.MapId;
             SessionContext.State.MapId = targetMapId;
             SessionContext.State.CellId = arrival;

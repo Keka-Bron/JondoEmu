@@ -51,6 +51,23 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>All the looks it can have, with their condition. Almost always one.</summary>
             public List<LookVariant> Variants = new();
+
+            /// <summary>When it is there for a character (quest terms); empty for always. See <see cref="VisibleNow"/>.</summary>
+            public string Criterion = "";
+        }
+
+        /// <summary>
+        /// Whether this placement is there for the character of the session: an NPC a quest brings
+        /// in (the tutorial's Ganymed after the chafers) is drawn, talked to and marked only when
+        /// its criterion holds.
+        /// </summary>
+        public static bool VisibleNow(Spawn spawn)
+        {
+            if (string.IsNullOrEmpty(spawn.Criterion)) return true;
+            var log = Managers.Quests.Log;
+            if (log == null) return false;
+            var verdict = Jondo.Unity.World.Quests.QuestCriterion.Judge(spawn.Criterion, log);
+            return !verdict.Broke && verdict.Met;
         }
 
         /// <summary>One of an NPC's looks, with what is needed to see it that way.</summary>
@@ -333,6 +350,7 @@ namespace Jondo.Unity.Server.Managers
                         Cell = entrada.Cell,
                         Orientation = entrada.Orientation,
                         ContextualId = ActorIds.NpcDelMapa(aqui.Count),
+                        Criterion = entrada.Criterion ?? "",
                     });
                     puestos++;
                 }
@@ -501,15 +519,24 @@ namespace Jondo.Unity.Server.Managers
             return _byMap.TryGetValue(mapId, out var here) ? here : (IReadOnlyList<Spawn>)Array.Empty<Spawn>();
         }
 
-        /// <summary>The NPCs on a map. Empty if there are none.</summary>
-        public static IReadOnlyList<Spawn> OnMap(long mapId) => Of(mapId);
+        /// <summary>The NPCs on a map that are there for the character of the session. Empty if there are none.</summary>
+        public static IReadOnlyList<Spawn> OnMap(long mapId)
+        {
+            var all = Of(mapId);
+            foreach (var spawn in all)
+            {
+                if (!string.IsNullOrEmpty(spawn.Criterion)) return all.Where(VisibleNow).ToList();
+            }
+            return all;
+        }
 
-        /// <summary>Who the negative the client has just clicked is.</summary>
+        /// <summary>Who the negative the client has just clicked is -- if it is there for him.</summary>
         public static Spawn? Find(long mapId, long contextualId)
         {
             AlmanaxTemple.KeepSaint(mapId);
             if (!_byMap.TryGetValue(mapId, out var here)) return null;
-            return here.Find(s => s.ContextualId == contextualId);
+            var spawn = here.Find(s => s.ContextualId == contextualId);
+            return spawn != null && VisibleNow(spawn) ? spawn : null;
         }
 
         /// <summary>

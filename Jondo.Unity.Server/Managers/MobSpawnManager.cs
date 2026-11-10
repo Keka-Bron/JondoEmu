@@ -1157,6 +1157,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>The members of a hand-composed group, up to the sixth grade.</summary>
+        /// <summary>Monsters as fight members, by monster and 0-based grade: an NPC fight's allies.</summary>
+        public static List<MobMember> ComposeMembers(IEnumerable<(int Monster, int Grade)> members) => Componer(members);
+
         private static List<MobMember> Componer(IEnumerable<(int Monstruo, int Grado)> miembros)
         {
             var quienes = new List<MobMember>();

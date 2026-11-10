@@ -1,0 +1,20 @@
+{
+  "_": [
+    "Fights a reply to an NPC starts: who is in front (monsters), who fights beside the player",
+    "(allies, monsters on his side) and on which arena. Grades are 0-based, as in groups.json.",
+    "",
+    "THE GUIDED TUTORIAL'S LAST TEST. The celestial chafers of Master Darmas's room (241441793) are",
+    "NPCs; «Empezar el combate contra los tres monstruos» (effect 911) starts the fight on",
+    "241441797 against the chafer explorer (4104) and two chafer pikemen (4111), level 2, with",
+    "Master Darmas (8018, level 10, 200 life, 12 AP, 80 % resistances) as fighter -1 on the",
+    "player's side: the jxg of the capture of the whole tutorial."
+  ],
+  "fights": [
+    { "npc": 2930, "map": 241441793, "reply": 24793, "arena": 241441797,
+      "monsters": [ { "monster": 4104, "grade": 0 }, { "monster": 4111, "grade": 0 }, { "monster": 4111, "grade": 0 } ],
+      "allies": [ { "monster": 8018, "grade": 0 } ] },
+    { "npc": 2927, "map": 241441793, "reply": 24791, "arena": 241441797,
+      "monsters": [ { "monster": 4104, "grade": 0 }, { "monster": 4111, "grade": 0 }, { "monster": 4111, "grade": 0 } ],
+      "allies": [ { "monster": 8018, "grade": 0 } ] }
+  ]
+}

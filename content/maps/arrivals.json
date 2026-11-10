@@ -13,9 +13,35 @@
     "crosses into, its jss each time."
   ],
   "arrivals": [
-    { "map": 241438721, "cell": 84, "orientation": 1, "measured": "the tutorial capture, the jss after jru 241438721" },
-    { "map": 241439745, "cell": 84, "orientation": 1, "measured": "the tutorial capture, the jss after jru 241439745" },
-    { "map": 241440769, "cell": 84, "orientation": 1, "measured": "the tutorial capture, the jss after jru 241440769" },
-    { "map": 241441793, "cell": 84, "orientation": 1, "measured": "the tutorial capture, the jss after jru 241441793" }
+    {
+      "map": 241438721,
+      "cell": 84,
+      "orientation": 1,
+      "measured": "the tutorial capture, the jss after jru 241438721"
+    },
+    {
+      "map": 241439745,
+      "cell": 84,
+      "orientation": 1,
+      "measured": "the tutorial capture, the jss after jru 241439745"
+    },
+    {
+      "map": 241440769,
+      "cell": 84,
+      "orientation": 1,
+      "measured": "the tutorial capture, the jss after jru 241440769"
+    },
+    {
+      "map": 241441793,
+      "cell": 84,
+      "orientation": 1,
+      "measured": "the tutorial capture, the jss after jru 241441793"
+    },
+    {
+      "map": 241443329,
+      "cell": 127,
+      "orientation": 1,
+      "measured": "the tutorial capture, the jss after Ganymed's «Seguir a Ganymed» (jru 241443329)"
+    }
   ]
 }

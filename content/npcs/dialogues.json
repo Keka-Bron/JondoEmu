@@ -4749,6 +4749,106 @@
         }
       ],
       "why": "Master Curro in the tutorial's jobs room, as the capture of the whole tutorial has him: 20676 «¡Saludos, joven!» with «¿Cómo va eso?», then 20677 with «¿Qué materiales me van a hacer falta?» (30 naming objective 9656 and eight 1150), then 20678 with «Explorar el lugar.» (five 1150 and 2192); once the ring is made, 20681 «¡Has trabajado muy bien, #1!», his name in it, with «Dirigirte a la salida.» showing quest 1630 and starting it. In between, the reminder of what the ring needs; afterwards, his «No hay nada como la satisfacción...»."
+    },
+    {
+      "npc": 2930,
+      "map": 241441793,
+      "opening": 20706,
+      "openings": [
+        { "after": 1630, "message": 57158 },
+        { "quest": 1630, "objective": 10121, "message": 57158 }
+      ],
+      "lines": [
+        {
+          "message": 20706,
+          "choices": [{ "reply": 24793, "quest": 1630, "afterObjective": 9685, "params": [911] }, { "reply": 24794 }]
+        },
+        {
+          "message": 57158,
+          "choices": [{ "reply": 77760 }]
+        }
+      ],
+      "why": "The celestial chafer pikemen of the combat room, as the tutorial capture has them: 20706 «llama a los chafers al rescate» with «Empezar el combate contra los tres monstruos» (911, the fight of content/fights/npc_fights.json, once Master Darmas has been heard) and «Retirarte»; once beaten, «juega con su lanza»."
+    },
+    {
+      "npc": 2927,
+      "map": 241441793,
+      "opening": 20705,
+      "openings": [
+        { "after": 1630, "message": 20704 },
+        { "quest": 1630, "objective": 10121, "message": 20704 }
+      ],
+      "lines": [
+        {
+          "message": 20705,
+          "choices": [{ "reply": 24791, "quest": 1630, "afterObjective": 9685, "params": [911] }, { "reply": 24792 }]
+        },
+        {
+          "message": 20704,
+          "choices": [{ "reply": 24788 }]
+        }
+      ],
+      "why": "The celestial chafer explorer of the combat room: the same fight from his «llama a los chafers como apoyo», and «se prepara para la revancha» once beaten."
+    },
+    {
+      "npc": 2896,
+      "map": 241441793,
+      "opening": 20700,
+      "openings": [
+        { "quest": 1630, "pending": 9685, "message": 20700 },
+        { "quest": 1630, "objective": 10121, "message": 21200 },
+        { "quest": 1630, "message": 20701 },
+        { "after": 1630, "message": 20702 }
+      ],
+      "lines": [
+        {
+          "message": 20700,
+          "names": true,
+          "choices": [{ "reply": 24786, "next": 20744 }]
+        },
+        {
+          "message": 20744,
+          "choices": [{ "reply": 24849, "next": 57155, "params": [[30, 9685]] }]
+        },
+        {
+          "message": 57155,
+          "choices": [{ "reply": 77757 }]
+        },
+        {
+          "message": 20701,
+          "choices": [{ "reply": 77757 }]
+        },
+        {
+          "message": 21200,
+          "choices": [{ "reply": 25490, "params": [350, 3007], "thenNpc": 7581 }]
+        },
+        {
+          "message": 20702,
+          "choices": [{ "reply": 24784 }]
+        }
+      ],
+      "why": "Master Darmas in the combat room, as the tutorial capture has him: 20700 «Eres #1, ¿verdad?», the name in it, with «Estoy dispuesto a demostrar lo que valgo.», then 20744 with «Seguir escuchando.» (30 naming objective 9685), then 57155 with «Dirigirte hacia una criatura para provocarla.»; after the chafers, 21200 «¡Has ganado!» with «Sobresaltarte al ver aparecer a Ganymed» (350, 3007), on which Ganymed comes in (jsn, actor -20004) and speaks."
+    },
+    {
+      "npc": 7581,
+      "map": 241441793,
+      "opening": 57149,
+      "lines": [
+        {
+          "message": 57149,
+          "names": true,
+          "choices": [{ "reply": 77750, "next": 57220 }]
+        },
+        {
+          "message": 57220,
+          "choices": [{ "reply": 77870, "next": 57221 }]
+        },
+        {
+          "message": 57221,
+          "choices": [{ "reply": 77869, "params": [[31, 2250], 777], "teleport": 241443329 }]
+        }
+      ],
+      "why": "Ganymed coming into the combat room after the chafers, as the tutorial capture has him: 57149 «¡Bravo, #1!», 57220 on changing class while a novice, 57221 «Antes de que abandones el templo...» with «Seguir a Ganymed» (31 naming step 2250, 777), which takes the player to the Dofusarium (jru 241443329)."
     }
   ]
 }
