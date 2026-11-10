@@ -6332,8 +6332,8 @@
           "message": 31507,
           "choices": [
             { "reply": 38066, "quest": 1971, "completes": 14157, "params": [[30, 14157]], "next": 31508, "beforeObjective": 14157 },
-            { "reply": 38068, "quest": 1971, "completes": 14164, "params": [[30, 14164]], "next": 31510, "afterObjective": 14163 },
-            { "reply": 38070, "quest": 1971, "completes": 14173, "params": [[30, 14173]], "next": 31511, "afterObjective": 14172 },
+            { "reply": 38068, "quest": 1971, "completes": 14164, "params": [[30, 14164]], "next": 31510, "afterObjective": 14163, "beforeObjective": 14164 },
+            { "reply": 38070, "quest": 1971, "completes": 14173, "params": [[30, 14173]], "next": 31511, "afterObjective": 14172, "beforeObjective": 14173 },
             { "reply": 38069, "quest": 1971, "afterObjective": 14173, "beforeObjective": 14174 }
           ]
         },
