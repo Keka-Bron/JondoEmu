@@ -531,7 +531,7 @@ namespace Jondo.Unity.Server.Managers
                                   $"and it is not being carried.");
                 // A hello says nothing about it: valet Doz greeted before the livery is sewn is not
                 // a tap pressed without the lemonade.
-                if (binding.Kind != QuestBindingKind.Talk)
+                if (binding.Kind != QuestBindingKind.Talk && binding.Kind != QuestBindingKind.Enter)
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
                             InfoMessages.Warning, InfoMessages.MissingItem)));

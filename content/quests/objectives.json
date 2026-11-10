@@ -1904,6 +1904,40 @@
    "requires": [{"item": 8595, "count": 1}, {"item": 8597, "count": 1}],
    "spends": true,
    "why": "«Retournez voir Vil Smisse pour lui confier l'œuf et la potion de gavage» (Dofus pour les noobs): the hello does the objective, the egg and the potion stay with him."
+  },
+  {
+   "objective": 915,
+   "quest": 225,
+   "kind": "talk",
+   "npc": 166,
+   "map": 99352584,
+   "why": "«Encuentra a alguien que te pueda transformar en wabbit»: Uba Teseo at [1,16] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 916,
+   "quest": 225,
+   "kind": "talk",
+   "npc": 169,
+   "map": 82314752,
+   "why": "«Encuentra a alguien que pueda completar la fórmula existente»: Vid Cheber at [11,16], who knows the wabbit teeth."
+  },
+  {
+   "objective": 917,
+   "quest": 225,
+   "kind": "talk",
+   "npc": 166,
+   "map": 99352584,
+   "afterObjectives": [916],
+   "why": "«Vuelve a hablar con la persona que te pidió completar su fórmula»: back to Uba Teseo."
+  },
+  {
+   "objective": 930,
+   "quest": 225,
+   "kind": "enter",
+   "map": 68552193,
+   "requires": [{"item": 8548, "count": 1}],
+   "spawns": {"monster": 1014, "count": 3, "attacks": true},
+   "why": "«Ve al castillo y hazte pasar por el príncipe»: the castle of Amakna [4,-6] reached as a wabbit; «à l'entrée du château vous êtes attaqué par 3 srams. Si vous perdez le combat, la quête se met tout de même à jour» (Dofus pour les noobs)."
   }
  ]
 }

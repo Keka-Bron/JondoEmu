@@ -2204,19 +2204,34 @@
       "why": "Valet Doz in the Bagrutte inn of Bonta [-29,-59], while «Suite Woyale» looks for the prince's retinue. INFERRED cell."
     },
     {
-      "map": 95683075,
-      "npc": 904,
-      "cell": 300,
-      "orientation": 1,
-      "criterion": "(Qa=224&Qo=911)|Qf=224",
-      "why": "The prince of Wey at the gate of Amakna castle [4,-6] once the bride's dress is brought («Allez à la rencontre du Prince d'Wa à l'entrée du Château», Dofus pour les noobs). INFERRED cell."
-    },
-    {
       "map": 88213273,
       "npc": 168,
       "cell": 300,
       "orientation": 3,
       "why": "Boff Chalon, alchemist studying the speckled rocks of [-2,-2] («allez en [-2,-2] pour récupérer un recueil de la Formule de potion de transformation auprès de Boff Chalon», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 95683075,
+      "npc": 906,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=225&Qo=930&Qo!932",
+      "why": "Bob Zollo come to kill the prince at the wedding before the castle [4,-6] («Parlez à Bob Lenald qui est venu attaquer le Prince et défendez le Prince», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 204997377,
+      "npc": 906,
+      "cell": 300,
+      "orientation": 3,
+      "why": "Bob Zollo, the zollo mercenary of Pandala [18,-24] («Direction Pandala en [18,-24] pour parler à Bob Lenald», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 95683075,
+      "npc": 904,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "(Qa=224&Qo=911)|Qf=224|(Qa=220&Qo=881)",
+      "why": "The prince of Wey at the gate of Amakna castle [4,-6] once the bride's dress is brought («Allez à la rencontre du Prince d'Wa à l'entrée du Château», Dofus pour les noobs); and for the traitors of «Trouble-fête», on the verge of marrying, once Bob Zollo is hired. INFERRED cell."
     }
   ]
 }

@@ -15228,6 +15228,13 @@
       "map": 0,
       "opening": 3880,
       "openings": [
+        { "quest": 220, "message": 3966 },
+        { "canStart": 220, "message": 3966 },
+        { "after": 220, "before": 892, "message": 10752 },
+        { "quest": 219, "step": 406, "message": 3963 },
+        { "quest": 219, "message": 3962 },
+        { "canStart": 219, "message": 3961 },
+        { "after": 219, "before": 220, "message": 3965 },
         { "quest": 218, "step": 404, "message": 3958 },
         { "quest": 218, "message": 3957 },
         { "canStart": 218, "message": 3957 },
@@ -15296,9 +15303,68 @@
         {
           "message": 3959,
           "choices": []
+        },
+        {
+          "message": 3961,
+          "choices": [
+            { "reply": 3469, "startsQuest": 219, "params": [[34, 219]] },
+            { "reply": 3468 }
+          ]
+        },
+        {
+          "message": 3962,
+          "choices": []
+        },
+        {
+          "message": 3963,
+          "choices": [
+            { "reply": 3471, "quest": 219, "completes": 880, "params": [[30, 880]], "buyPrice": 25000, "next": 3965, "refused": 3964 },
+            { "reply": 3529 }
+          ]
+        },
+        {
+          "message": 3964,
+          "choices": [
+            { "reply": 3529 }
+          ]
+        },
+        {
+          "message": 3965,
+          "choices": []
+        },
+        {
+          "message": 3966,
+          "choices": [
+            { "reply": 3471, "startsQuest": 220, "params": [[34, 220]] },
+            { "reply": 3470 }
+          ]
+        },
+        {
+          "message": 10752,
+          "choices": [
+            { "reply": 11843, "next": 10753 }
+          ]
+        },
+        {
+          "message": 10753,
+          "choices": [
+            { "reply": 11875, "next": 10787, "beforeQuest": 892 },
+            { "reply": 11874 }
+          ]
+        },
+        {
+          "message": 10787,
+          "choices": [
+            { "reply": 11876, "startsQuest": 892, "params": [[34, 892]], "next": 10788 },
+            { "reply": 11877 }
+          ]
+        },
+        {
+          "message": 10788,
+          "choices": []
         }
       ],
-      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857). «Usuwpation d'identité» (217) of Dofus pour les noobs: the plan, pass for the prince, a potion to look like a wabbit, then the castle (3941, «Bien sûr que je suis prêt»). «Tomber sur un bec» (218) of Dofus pour les noobs: another plan, a fat tofu's nest, an egg (3957, «Euh, d'accord !»); only a baby, a breeder to fatten it (3958); the egg and the potion, before the prince (3959: 878, both handed over)."
+      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857). «Usuwpation d'identité» (217) of Dofus pour les noobs: the plan, pass for the prince, a potion to look like a wabbit, then the castle (3941, «Bien sûr que je suis prêt»). «Tomber sur un bec» (218) of Dofus pour les noobs: another plan, a fat tofu's nest, an egg (3957, «Euh, d'accord !»); only a baby, a breeder to fatten it (3958); the egg and the potion, before the prince (3959: 878, both handed over). «À roublard, roublard et demi» (219) of Dofus pour les noobs: the tofu failed, poison the «quewido pwíncipe», a poisoned blopicero (3961, «Bien sûr !»), where is it, no baker? (3962), it will not do, the prince has a taster, kamas to hire assassins, 25000 (3963: 880, «Reparlez donc à Vil Smisse pour lui donner les 25 000 kamas»), «are you bringing them or not?» when short (3964), enough for now, he recruits (3965). «Trouble-fête» (220) of Dofus pour les noobs: the assassins cannot pass the prince's security, a zollo mercenary who could teleport into the throne room on the wedding day (3966, «Bien sûr !»). Afterwards: the wedding did not go as planned (10752), Bob and you made a mess of it, it is cancelled (10753), «another mission?», the wabbit family's relic (10787, «Accepter cette dernière mission»: «À la barbe du roi», 892), intercept the intendant's emissary (10788)."
     },
     {
       "npc": 1404,
@@ -15344,6 +15410,7 @@
       "map": 0,
       "opening": 3909,
       "openings": [
+        { "after": 225, "before": 891, "message": 10750 },
         { "quest": 217, "step": 402, "holds": 8548, "message": 3950 },
         { "quest": 224, "objective": 911, "pending": 5466, "message": 4040 },
         { "quest": 224, "pending": 909, "message": 4036 },
@@ -15406,9 +15473,33 @@
           "choices": [
             { "reply": 3573 }
           ]
+        },
+        {
+          "message": 10750,
+          "choices": [
+            { "reply": 11842, "next": 10751 }
+          ]
+        },
+        {
+          "message": 10751,
+          "choices": [
+            { "reply": 11863, "next": 10777, "beforeQuest": 891 },
+            { "reply": 11862 }
+          ]
+        },
+        {
+          "message": 10777,
+          "choices": [
+            { "reply": 11864, "startsQuest": 891, "params": [[34, 891]], "next": 10778 },
+            { "reply": 11865 }
+          ]
+        },
+        {
+          "message": 10778,
+          "choices": []
         }
       ],
-      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911). «Usuwpation d'identité»: «hello, master wabbit» to the transformed character (3950), «I am the prince!», not expected so soon (3951), «I had to hurry to stop this horrible wedding!», no wabbit accent, «to me, my faithful jalató!» (3953: 873, «Me han descubierto», the jalató war chief fought)."
+      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911). «Usuwpation d'identité»: «hello, master wabbit» to the transformed character (3950), «I am the prince!», not expected so soon (3951), «I had to hurry to stop this horrible wedding!», no wabbit accent, «to me, my faithful jalató!» (3953: 873, «Me han descubierto», the jalató war chief fought). After «Qui veut la peau du Wabbit ?» (5457 on a hello): here you are, the wedding did not go as planned (10750, «Preguntarle lo que ha pasado»), while you fought the assassin everyone hid, the ceremony suspended (10751); another mission? the prince's family sends a relic (10777, «À un poil près», 891), a first emissary without news, a member of the wey's family in a cawotte field, Allister's signed document (10778)."
     },
     {
       "npc": 307,
@@ -15434,6 +15525,10 @@
       "map": 0,
       "opening": 3983,
       "openings": [
+        { "quest": 220, "objective": 881, "pending": 926, "message": 10749 },
+        { "quest": 225, "step": 1508, "message": 10749 },
+        { "quest": 225, "step": 416, "message": 4024 },
+        { "quest": 225, "step": 415, "message": 10772 },
         { "after": 224, "before": 225, "message": 4019 },
         { "quest": 222, "objective": 5465, "pending": 5464, "message": 4018 },
         { "quest": 222, "step": 409, "message": 3992 },
@@ -15513,9 +15608,25 @@
             { "reply": 11858, "quest": 225, "beforeObjective": 913 },
             { "reply": 11859, "quest": 225, "beforeObjective": 913 }
           ]
+        },
+        {
+          "message": 4024,
+          "choices": [
+            { "reply": 3510, "next": 4025 }
+          ]
+        },
+        {
+          "message": 4025,
+          "choices": []
+        },
+        {
+          "message": 10749,
+          "choices": [
+            { "reply": 11841, "quest": 220, "completes": 926, "params": [[30, 926]], "afterObjective": 881 }
+          ]
         }
       ],
-      "why": "The prince of Wey, hunting south of Cania [-23,-1], by «Émissaire du roi» of Dofus pour les noobs: «what do you want? a creature worthy of my lineage» (3983), a princess to marry, «I am your prince» (3987: 860); what a lovely land (3984), where are your people? «followers then» (3988: 5463). «Le Pwince Monseigneuw» (221): «haven't you heard?», the monster coming, «you shall be my squire» (3985, «À votre service»), the fat tofu fought at his side; victorious, what brought you here? (3986), a princess to marry (3987: 884), «I am ready», the mother tofu attacks; what kind of monster was that? (3990). «Suite Woyale» (222): stronger now, recruit others, a superb trophy (3992, «Je me mets en route»), a bit stronger first (3991, under level 50); «so that is my retinue?», a walk before the castle (4018: 5465). At the castle's gate [4,-6], «Un mawiage pwincier» ends on a hello (5466): «ah, my kind squire, I wanted to ask you...» (4019), «beware the threatening sram behind you», «Qui veut la peau du Wabbit ?» (225) starts, «they are back, these srams attack me!» (10772), the two sram assassins fought."
+      "why": "The prince of Wey, hunting south of Cania [-23,-1], by «Émissaire du roi» of Dofus pour les noobs: «what do you want? a creature worthy of my lineage» (3983), a princess to marry, «I am your prince» (3987: 860); what a lovely land (3984), where are your people? «followers then» (3988: 5463). «Le Pwince Monseigneuw» (221): «haven't you heard?», the monster coming, «you shall be my squire» (3985, «À votre service»), the fat tofu fought at his side; victorious, what brought you here? (3986), a princess to marry (3987: 884), «I am ready», the mother tofu attacks; what kind of monster was that? (3990). «Suite Woyale» (222): stronger now, recruit others, a superb trophy (3992, «Je me mets en route»), a bit stronger first (3991, under level 50); «so that is my retinue?», a walk before the castle (4018: 5465). At the castle's gate [4,-6], «Un mawiage pwincier» ends on a hello (5466): «ah, my kind squire, I wanted to ask you...» (4019), «beware the threatening sram behind you», «Qui veut la peau du Wabbit ?» (225) starts, «they are back, these srams attack me!» (10772), the two sram assassins fought. «Qui veut la peau du Wabbit ?»: they dare attack him, find those ruffians, pass for him (4024, «No sé qué hacer...»), the alchemists of Amakna can disguise you (4025); during the wedding, the princess's small ears (10749). «Trouble-fête»: on the verge of marrying (10749), «Recortar las orejas del príncipe con la ayuda de Bob Zollo»: the fight, Bob Zollo beside the character (926)."
     },
     {
       "npc": 315,
@@ -15891,6 +16002,9 @@
       "map": 0,
       "opening": 620,
       "openings": [
+        { "quest": 225, "step": 1508, "message": 4093 },
+        { "quest": 225, "step": 417, "message": 4033 },
+        { "quest": 225, "objective": 915, "pending": 916, "message": 4026 },
         { "quest": 217, "step": 402, "message": 4093 },
         { "quest": 217, "step": 401, "message": 3945 },
         { "quest": 217, "objective": 861, "pending": 862, "message": 3942 },
@@ -15931,15 +16045,28 @@
         {
           "message": 10804,
           "choices": []
+        },
+        {
+          "message": 4026,
+          "choices": []
+        },
+        {
+          "message": 4033,
+          "choices": []
+        },
+        {
+          "message": 10805,
+          "choices": []
         }
       ],
-      "why": "Uba Teseo, the alchemist of the workshop [1,16]: what can the great alchemist do for you? (620). «Usuwpation d'identité» of Dofus pour les noobs: a wabbit transformation potion, too hard alone, his colleagues of Amakna (3942: 861 on a hello), the formula not complete yet (3944), the formula, now the ingredients (3945, «Buscar los ingredientes», 10768), the potion done, ready to become a wabbit? (4093), «it works» (10804: the wabbit transformation, 8548, lost in the first fight)."
+      "why": "Uba Teseo, the alchemist of the workshop [1,16]: what can the great alchemist do for you? (620). «Usuwpation d'identité» of Dofus pour les noobs: a wabbit transformation potion, too hard alone, his colleagues of Amakna (3942: 861 on a hello), the formula not complete yet (3944), the formula, now the ingredients (3945, «Buscar los ingredientes», 10768), the potion done, ready to become a wabbit? (4093), «it works» (10804: the wabbit transformation, 8548, lost in the first fight). «Qui veut la peau du Wabbit ?»: the second one today to ask for the wabbit potion, the formula did not work (4026: 915), wabbit teeth! his stock used up, the ingredients (4033), the potion, ready? (4093, the disguise)."
     },
     {
       "npc": 168,
       "map": 0,
       "opening": 624,
       "openings": [
+        { "quest": 225, "step": 416, "message": 4028 },
         { "quest": 217, "step": 400, "message": 3955 }
       ],
       "lines": [
@@ -15950,15 +16077,20 @@
         {
           "message": 3955,
           "choices": []
+        },
+        {
+          "message": 4028,
+          "choices": []
         }
       ],
-      "why": "Boff Chalon studying the speckled rocks [-2,-2] (624); «Usuwpation d'identité»: dear Uba, this book to write down what you learn (3955: the transformation potion's formula, 8692)."
+      "why": "Boff Chalon studying the speckled rocks [-2,-2] (624); «Usuwpation d'identité»: dear Uba, this book to write down what you learn (3955: the transformation potion's formula, 8692). «Qui veut la peau du Wabbit ?»: the formula not complete? he told all he knows (4028)."
     },
     {
       "npc": 167,
       "map": 0,
       "opening": 626,
       "openings": [
+        { "quest": 225, "step": 416, "message": 4027 },
         { "quest": 217, "step": 400, "message": 3954 }
       ],
       "lines": [
@@ -15969,15 +16101,20 @@
         {
           "message": 3954,
           "choices": []
+        },
+        {
+          "message": 4027,
+          "choices": []
         }
       ],
-      "why": "Kande Boffler before the little temple [4,12] (626); «Usuwpation d'identité»: sent by Uba Teseo, give him my greetings and this scroll (3954)."
+      "why": "Kande Boffler before the little temple [4,12] (626); «Usuwpation d'identité»: sent by Uba Teseo, give him my greetings and this scroll (3954). «Qui veut la peau du Wabbit ?»: the formula not complete? he told all he knows (4027)."
     },
     {
       "npc": 170,
       "map": 0,
       "opening": 628,
       "openings": [
+        { "quest": 225, "step": 416, "message": 4030 },
         { "quest": 217, "step": 400, "message": 3956 }
       ],
       "lines": [
@@ -15988,9 +16125,13 @@
         {
           "message": 3956,
           "choices": []
+        },
+        {
+          "message": 4030,
+          "choices": []
         }
       ],
-      "why": "Benn Zin listening to the water under the bridge [1,31] (628); «Usuwpation d'identité»: sent by Uba, a pleasure to give you this scroll (3956)."
+      "why": "Benn Zin listening to the water under the bridge [1,31] (628); «Usuwpation d'identité»: sent by Uba, a pleasure to give you this scroll (3956). «Qui veut la peau du Wabbit ?»: the formula not complete? he told all he knows (4030)."
     },
     {
       "npc": 54,
@@ -16030,6 +16171,76 @@
         }
       ],
       "why": "Klako, dragoturkey hunter [-16,1] (3160). «Tomber sur un bec»: a fattening potion, he just made a new one, the first to try it (3960: 877, the potion 8597)."
+    },
+    {
+      "npc": 169,
+      "map": 0,
+      "opening": 630,
+      "openings": [
+        { "quest": 225, "step": 416, "message": 4029 }
+      ],
+      "lines": [
+        {
+          "message": 630,
+          "choices": []
+        },
+        {
+          "message": 4029,
+          "choices": []
+        }
+      ],
+      "why": "Vid Cheber, alchemist among the prodigious bones [11,16] (630). «Qui veut la peau du Wabbit ?» of Dofus pour les noobs: the wabbit formula, wabbit teeth are missing, the only specialist (4029: 916)."
+    },
+    {
+      "npc": 906,
+      "map": 0,
+      "opening": 4098,
+      "openings": [
+        { "quest": 220, "pending": 881, "message": 3976 },
+        { "quest": 225, "step": 1508, "message": 10748 }
+      ],
+      "lines": [
+        {
+          "message": 4098,
+          "choices": []
+        },
+        {
+          "message": 10748,
+          "choices": [
+            { "reply": 11840, "quest": 225, "completes": 932, "params": [[30, 932]], "afterObjective": 930 }
+          ]
+        },
+        {
+          "message": 3976,
+          "choices": [
+            { "reply": 3473, "next": 3977 },
+            { "reply": 3472 }
+          ]
+        },
+        {
+          "message": 3977,
+          "choices": [
+            { "reply": 3474, "next": 3978 }
+          ]
+        },
+        {
+          "message": 3978,
+          "choices": [
+            { "reply": 3475, "next": 3980 }
+          ]
+        },
+        {
+          "message": 3980,
+          "choices": [
+            { "reply": 3477, "quest": 220, "completes": 881, "params": [[30, 881]], "next": 3979 }
+          ]
+        },
+        {
+          "message": 3979,
+          "choices": []
+        }
+      ],
+      "why": "Bob Zollo, the zollo mercenary (4098). «Qui veut la peau du Wabbit ?» of Dofus pour les noobs: at the wedding, «death to the wabbit!» (10748), «Proteger al príncipe Wey»: the fight against him (932). «Trouble-fête»: kill a wabbit prince at his wedding? dangerous (3976, «Répondre que ce maliage va souder Amakna et les Wabbits, ses ennemis julés»), his people's former glory (3977), «you will not do it all alone», how to get close? (3978, «Dire que vous allez entler dans le château poul qu'il puisse se télépolter sur vous»), possible, he will come too (3980), a deal, shake on it (3979: 881)."
     }
   ]
 }

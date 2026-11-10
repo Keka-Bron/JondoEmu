@@ -205,7 +205,12 @@ namespace Jondo.Unity.Tests.Quests
                         // An «order» row closes nothing: it only places the objective among its
                         // step's others (the visits of «Fiesta de la chocopepita» in any order).
                         bool namelessMap = objective.TypeId == QuestCatalogue.DiscoverMap && objective.DiscoverMapId == 0;
-                        if (objective.TypeId != QuestCatalogue.FreeText && !namelessMap
+                        // Nor does a «beat» row whose element only brings the monsters out: the
+                        // fight closes the objective as it would anyway (the white cart of «Tomber
+                        // sur un bec» and its fat tofu).
+                        bool bringsOut = binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0
+                                         && binding.Elements.Count > 0;
+                        if (objective.TypeId != QuestCatalogue.FreeText && !namelessMap && !bringsOut
                             && binding.Kind != QuestBindingKind.Order)
                         {
                             wrong.Add($"objective {objective.Id} is of type {objective.TypeId}, " +
