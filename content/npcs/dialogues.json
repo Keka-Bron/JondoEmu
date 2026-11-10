@@ -111,14 +111,17 @@
       "map": 0,
       "opening": 9707,
       "_byHand": true,
+      "openings": [
+        { "after": 1959, "before": 2009, "message": 30641 }
+      ],
       "lines": [
         {
           "message": 9707,
           "choices": [
+            { "reply": 36990, "quest": 1960, "completes": 13898, "params": [[30, 13898]], "next": 30644 },
             { "reply": 36861, "next": 30545, "quest": 1958, "beforeObjective": 13850 },
             { "reply": 36872, "next": 30558, "quest": 1958, "afterQuest": true, "beforeQuest": 1959 },
             { "reply": 36986, "quest": 1959, "completes": 13856, "params": [[30, 13856]], "next": 30640, "afterObjective": 13855 },
-            { "reply": 36990, "next": 30641, "quest": 1959, "afterQuest": true, "beforeQuest": 2009 },
             { "reply": 37294, "next": 30884, "quest": 1958, "afterQuest": true, "beforeQuest": 1975 },
             { "reply": 36987 }
           ]
@@ -254,6 +257,19 @@
             { "reply": 37292, "startsQuest": 1975, "params": [[34, 1975]] },
             { "reply": 37293 }
           ]
+        },
+        {
+          "message": 30644,
+          "choices": [
+            { "reply": 36989 },
+            { "reply": 36988, "next": 23537 }
+          ]
+        },
+        {
+          "message": 23537,
+          "choices": [
+            { "reply": 36989 }
+          ]
         }
       ],
       "why": "Councillor Archi, from her own lines and replies, by Dofus pour les noobs («Les principes d'Archie m'aident», «On marche sur des œufs», «Conseil de classe»): «Quiero descubrir la ciudad.» (30545), the city (30546, 30547), «Estoy totalmente de acuerdo.» with her discipline (the visit of 1958, 13850; or «soy un poco anarquista» and «Así es.», 30553), the false dofus and «Aceptar sin dudar.» (30549-30551), and «Vale, voy en dirección a la taberna.» on 30552, the line 1959 names; under level 10, «Aún no me noto con fuerzas» and her advice to go back to Incarnam (53186). Back with the trafficker behind bars (36986, 13856), she has spoken of the character to his class's representative (30641) and hands «Consejo de clase» over. «¿Dónde puede uno descansar tranquilo?» is «Esto hace aguas» (30884, the line 1975 names)."
@@ -384,52 +400,51 @@
         {
           "message": 30925,
           "choices": [
-            {
-              "reply": 37740,
-              "next": 31246
-            },
-            {
-              "reply": 37601,
-              "next": 31241
-            },
-            {
-              "reply": 37753,
-              "next": 31252
-            },
-            {
-              "reply": 37342,
-              "quest": 1975
-            }
+            { "reply": 37492, "quest": 1960, "completes": 13945, "params": [[30, 13945]], "next": 31053, "afterObjective": 13944 },
+            { "reply": 37740, "next": 31246 },
+            { "reply": 37601, "next": 31241 },
+            { "reply": 37753, "next": 31252 },
+            { "reply": 37342, "quest": 1975 }
           ]
         },
         {
           "message": 31246,
           "choices": [
-            {
-              "reply": 37743,
-              "startsQuest": 1988
-            }
+            { "reply": 37743, "startsQuest": 1988 }
           ]
         },
         {
           "message": 31241,
           "choices": [
-            {
-              "reply": 37750,
-              "startsQuest": 1989
-            }
+            { "reply": 37750, "startsQuest": 1989 }
           ]
         },
         {
           "message": 31252,
           "choices": [
-            {
-              "reply": 37756,
-              "startsQuest": 1990
-            }
+            { "reply": 37756, "startsQuest": 1990 }
+          ]
+        },
+        {
+          "message": 31053,
+          "choices": [
+            { "reply": 37493, "next": 31054 }
+          ]
+        },
+        {
+          "message": 31054,
+          "choices": [
+            { "reply": 37490, "next": 31055 }
+          ]
+        },
+        {
+          "message": 31055,
+          "choices": [
+            { "reply": 37489, "thenNpc": 4420 }
           ]
         }
-      ]
+      ],
+      "why": "«Ça sent le gaz»: «Hablarle del dragón Rathrosk.» (13945), the legend of a grey squirrel (31053), the grey dragon of the city's archives (31054), and the recruit who has just come in (31055, then the recruit speaks)."
     },
     {
       "npc": 4311,
@@ -460,6 +475,9 @@
       "npc": 4312,
       "map": 0,
       "opening": 30718,
+      "openings": [
+        { "after": 1841, "before": 1960, "message": 30728 }
+      ],
       "lines": [
         {
           "message": 30718,
@@ -479,14 +497,23 @@
           "choices": [
             { "reply": 37090, "startsQuest": 1841 }
           ]
+        },
+        {
+          "message": 30728,
+          "choices": [
+            { "reply": 37099, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37088) is this class's objective (13897, effect 30), and leads to his greeting, 30720, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37088) is this class's objective (13897, effect 30), and leads to his greeting, 30720, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1841) is done, he greets the character with Archi's summons (30728) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4313,
       "map": 0,
       "opening": 30730,
+      "openings": [
+        { "after": 1677, "before": 1960, "message": 30745 }
+      ],
       "lines": [
         {
           "message": 30730,
@@ -506,14 +533,23 @@
           "choices": [
             { "reply": 37103, "startsQuest": 1677 }
           ]
+        },
+        {
+          "message": 30745,
+          "choices": [
+            { "reply": 37121, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37102) is this class's objective (13896, effect 30), and leads to his greeting, 30732, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37102) is this class's objective (13896, effect 30), and leads to his greeting, 30732, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1677) is done, he greets the character with Archi's summons (30745) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4315,
       "map": 0,
       "opening": 30758,
+      "openings": [
+        { "after": 938, "before": 1960, "message": 30768 }
+      ],
       "lines": [
         {
           "message": 30758,
@@ -536,14 +572,23 @@
             { "reply": 37141, "startsQuest": 938 },
             { "reply": 38050 }
           ]
+        },
+        {
+          "message": 30768,
+          "choices": [
+            { "reply": 37151, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (938) is done, he greets the character with Archi's summons (30768) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4317,
       "map": 0,
       "opening": 30773,
+      "openings": [
+        { "after": 716, "before": 1960, "message": 30800 }
+      ],
       "lines": [
         {
           "message": 30773,
@@ -566,14 +611,23 @@
             { "reply": 37181, "startsQuest": 716 },
             { "reply": 37179 }
           ]
+        },
+        {
+          "message": 30800,
+          "choices": [
+            { "reply": 37195, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37160) is this class's objective (13893, effect 30), and leads to his greeting, 30775, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37160) is this class's objective (13893, effect 30), and leads to his greeting, 30775, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (716) is done, he greets the character with Archi's summons (30800) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4318,
       "map": 0,
       "opening": 30801,
+      "openings": [
+        { "after": 704, "before": 1960, "message": 30816 }
+      ],
       "lines": [
         {
           "message": 30801,
@@ -596,14 +650,23 @@
             { "reply": 37212, "startsQuest": 704 },
             { "reply": 37205 }
           ]
+        },
+        {
+          "message": 30816,
+          "choices": [
+            { "reply": 37216, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37199) is this class's objective (13892, effect 30), and leads to his greeting, 30804, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37199) is this class's objective (13892, effect 30), and leads to his greeting, 30804, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (704) is done, he greets the character with Archi's summons (30816) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4319,
       "map": 0,
       "opening": 30817,
+      "openings": [
+        { "after": 1974, "before": 1960, "message": 30820 }
+      ],
       "lines": [
         {
           "message": 30817,
@@ -626,9 +689,15 @@
             { "reply": 38202, "startsQuest": 1974 },
             { "reply": 38048 }
           ]
+        },
+        {
+          "message": 30820,
+          "choices": [
+            { "reply": 37220, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1974) is done, he greets the character with Archi's summons (30820) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4321,
@@ -705,6 +774,9 @@
       "npc": 4324,
       "map": 0,
       "opening": 30861,
+      "openings": [
+        { "after": 1965, "before": 1960, "message": 30863 }
+      ],
       "lines": [
         {
           "message": 30861,
@@ -725,14 +797,23 @@
           "choices": [
             { "reply": 37523, "next": 31076 }
           ]
+        },
+        {
+          "message": 30863,
+          "choices": [
+            { "reply": 37269, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37268) is this class's objective (13882, effect 30), and leads to his greeting, 30862, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37268) is this class's objective (13882, effect 30), and leads to his greeting, 30862, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1965) is done, he greets the character with Archi's summons (30863) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4326,
       "map": 0,
       "opening": 30864,
+      "openings": [
+        { "after": 1964, "before": 1960, "message": 30865 }
+      ],
       "lines": [
         {
           "message": 30864,
@@ -752,14 +833,23 @@
           "choices": [
             { "reply": 38245, "startsQuest": 1964 }
           ]
+        },
+        {
+          "message": 30865,
+          "choices": [
+            { "reply": 37273, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37272) is this class's objective (13881, effect 30), and leads to his greeting, 30873, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37272) is this class's objective (13881, effect 30), and leads to his greeting, 30873, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1964) is done, he greets the character with Archi's summons (30865) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4327,
       "map": 0,
       "opening": 30826,
+      "openings": [
+        { "after": 1972, "before": 1960, "message": 30829 }
+      ],
       "lines": [
         {
           "message": 30826,
@@ -780,14 +870,23 @@
           "choices": [
             { "reply": 37412, "next": 30978 }
           ]
+        },
+        {
+          "message": 30829,
+          "choices": [
+            { "reply": 37229, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37228) is this class's objective (13889, effect 30), and leads to his greeting, 30828, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37228) is this class's objective (13889, effect 30), and leads to his greeting, 30828, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1972) is done, he greets the character with Archi's summons (30829) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4328,
       "map": 0,
       "opening": 30671,
+      "openings": [
+        { "after": 1968, "before": 1960, "message": 30843 }
+      ],
       "lines": [
         {
           "message": 30671,
@@ -807,14 +906,23 @@
           "choices": [
             { "reply": 38396, "startsQuest": 1968 }
           ]
+        },
+        {
+          "message": 30843,
+          "choices": [
+            { "reply": 37249, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37248) is this class's objective (13885, effect 30), and leads to his greeting, 30845, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37248) is this class's objective (13885, effect 30), and leads to his greeting, 30845, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1968) is done, he greets the character with Archi's summons (30843) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4329,
       "map": 0,
       "opening": 30834,
+      "openings": [
+        { "after": 1970, "before": 1960, "message": 30837 }
+      ],
       "lines": [
         {
           "message": 30834,
@@ -835,14 +943,23 @@
           "choices": [
             { "reply": 37568, "next": 31114 }
           ]
+        },
+        {
+          "message": 30837,
+          "choices": [
+            { "reply": 37238, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37237) is this class's objective (13887, effect 30), and leads to his greeting, 30836, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37237) is this class's objective (13887, effect 30), and leads to his greeting, 30836, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1970) is done, he greets the character with Archi's summons (30837) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4333,
       "map": 0,
       "opening": 30830,
+      "openings": [
+        { "after": 1971, "before": 1960, "message": 30833 }
+      ],
       "lines": [
         {
           "message": 30830,
@@ -904,14 +1021,23 @@
           "choices": [
             { "reply": 38090 }
           ]
+        },
+        {
+          "message": 30833,
+          "choices": [
+            { "reply": 37234, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37233) is this class's objective (13888, effect 30), and leads to his greeting, 30832, «La consejera Archi me ha hablado de ti», then to his class quest. «C'est pour ta pomme»: how he keeps fit (38063), Ocra's blessings (31504), and the apples on the heads of people one is fond of (31506, the line the catalogue names); «El entrenamiento no ha sido nada difícil.» ends it (14175, 31526)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37233) is this class's objective (13888, effect 30), and leads to his greeting, 30832, «La consejera Archi me ha hablado de ti», then to his class quest. «C'est pour ta pomme»: how he keeps fit (38063), Ocra's blessings (31504), and the apples on the heads of people one is fond of (31506, the line the catalogue names); «El entrenamiento no ha sido nada difícil.» ends it (14175, 31526). «Aquí huele a gas» (1960): once his class quest (1971) is done, he greets the character with Archi's summons (30833) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4334,
       "map": 0,
       "opening": 30838,
+      "openings": [
+        { "after": 1969, "before": 1960, "message": 30839 }
+      ],
       "lines": [
         {
           "message": 30838,
@@ -931,14 +1057,23 @@
           "choices": [
             { "reply": 38341, "startsQuest": 1969 }
           ]
+        },
+        {
+          "message": 30839,
+          "choices": [
+            { "reply": 37242, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1969) is done, he greets the character with Archi's summons (30839) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4335,
       "map": 0,
       "opening": 30857,
+      "openings": [
+        { "after": 1966, "before": 1960, "message": 30858 }
+      ],
       "lines": [
         {
           "message": 30857,
@@ -958,14 +1093,23 @@
           "choices": [
             { "reply": 37954, "startsQuest": 1966 }
           ]
+        },
+        {
+          "message": 30858,
+          "choices": [
+            { "reply": 37265, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37264) is this class's objective (13883, effect 30), and leads to his greeting, 30859, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37264) is this class's objective (13883, effect 30), and leads to his greeting, 30859, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1966) is done, he greets the character with Archi's summons (30858) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4337,
       "map": 0,
       "opening": 30846,
+      "openings": [
+        { "after": 1967, "before": 1960, "message": 30847 }
+      ],
       "lines": [
         {
           "message": 30846,
@@ -986,14 +1130,23 @@
           "choices": [
             { "reply": 37875, "next": 31357 }
           ]
+        },
+        {
+          "message": 30847,
+          "choices": [
+            { "reply": 37253, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37252) is this class's objective (13884, effect 30), and leads to his greeting, 30856, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37252) is this class's objective (13884, effect 30), and leads to his greeting, 30856, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1967) is done, he greets the character with Archi's summons (30847) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4338,
       "map": 0,
       "opening": 30876,
+      "openings": [
+        { "after": 1963, "before": 1960, "message": 30877 }
+      ],
       "lines": [
         {
           "message": 30876,
@@ -1013,9 +1166,15 @@
           "choices": [
             { "reply": 38095, "startsQuest": 1963 }
           ]
+        },
+        {
+          "message": 30877,
+          "choices": [
+            { "reply": 37286, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37285) is this class's objective (13880, effect 30), and leads to his greeting, 30880, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37285) is this class's objective (13880, effect 30), and leads to his greeting, 30880, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1963) is done, he greets the character with Archi's summons (30877) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4339,
@@ -1077,6 +1236,9 @@
       "npc": 4347,
       "map": 0,
       "opening": 30821,
+      "openings": [
+        { "after": 1973, "before": 1960, "message": 30824 }
+      ],
       "lines": [
         {
           "message": 30821,
@@ -1097,9 +1259,15 @@
           "choices": [
             { "reply": 37626, "next": 31158 }
           ]
+        },
+        {
+          "message": 30824,
+          "choices": [
+            { "reply": 37224, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37223) is this class's objective (13890, effect 30), and leads to his greeting, 30823, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37223) is this class's objective (13890, effect 30), and leads to his greeting, 30823, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1973) is done, he greets the character with Archi's summons (30824) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4356,
@@ -1109,68 +1277,54 @@
         {
           "message": 30495,
           "choices": [
-            {
-              "reply": 36784,
-              "next": 30498
-            },
-            {
-              "reply": 36785
-            },
-            {
-              "reply": 36801,
-              "next": 30508
-            }
+            { "reply": 37394, "quest": 1960, "completes": 13932, "params": [[30, 13932]], "next": 30962, "afterObjective": 13901 },
+            { "reply": 36784, "next": 30498 },
+            { "reply": 36785 },
+            { "reply": 36801, "next": 30508 }
           ]
         },
         {
           "message": 30498,
           "choices": [
-            {
-              "reply": 36798,
-              "startsQuest": 1984
-            },
-            {
-              "reply": 36785
-            }
+            { "reply": 36798, "startsQuest": 1984 },
+            { "reply": 36785 }
           ]
         },
         {
           "message": 30508,
           "choices": [
-            {
-              "reply": 36799,
-              "startsQuest": 1985
-            },
-            {
-              "reply": 36785
-            }
+            { "reply": 36799, "startsQuest": 1985 },
+            { "reply": 36785 }
           ]
         },
         {
           "message": 30524,
           "choices": [
-            {
-              "reply": 36799,
-              "startsQuest": 1986
-            },
-            {
-              "reply": 36785
-            }
+            { "reply": 36799, "startsQuest": 1986 },
+            { "reply": 36785 }
           ]
         },
         {
           "message": 31444,
           "choices": [
-            {
-              "reply": 37979,
-              "startsQuest": 1987
-            },
-            {
-              "reply": 36785
-            }
+            { "reply": 37979, "startsQuest": 1987 },
+            { "reply": 36785 }
+          ]
+        },
+        {
+          "message": 30962,
+          "choices": [
+            { "reply": 37393, "next": 30963, "gives": 19670 }
+          ]
+        },
+        {
+          "message": 30963,
+          "choices": [
+            { "reply": 37392 }
           ]
         }
-      ]
+      ],
+      "why": "«Ça sent le gaz»: the gift for the rats' chief, a smelly crate (30962, 19670), and the sewers (30963, the line 13933 names)."
     },
     {
       "npc": 4362,
@@ -1404,6 +1558,9 @@
       "opening": 30748,
       "_byHand": true,
       "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "openings": [
+        { "after": 1615, "before": 1960, "message": 30757 }
+      ],
       "lines": [
         {
           "message": 30748,
@@ -1425,9 +1582,15 @@
           "choices": [
             { "reply": 37127, "next": 20180 }
           ]
+        },
+        {
+          "message": 30757,
+          "choices": [
+            { "reply": 37135, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37126) is this class's objective (13895, effect 30), and leads to his greeting, 30750, «La consejera Archi me ha hablado de ti», then to his class quest."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37126) is this class's objective (13895, effect 30), and leads to his greeting, 30750, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1615) is done, he greets the character with Archi's summons (30757) and «Ir a la Torre del Consejo» hands it over."
     },
     {
       "npc": 4412,
@@ -1460,28 +1623,30 @@
       "npc": 4420,
       "map": 0,
       "opening": 31058,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "openings": [
+        { "after": 1960, "before": 1962, "message": 31059 },
+        { "quest": 1962, "message": 31060 }
+      ],
       "lines": [
         {
           "message": 31058,
+          "names": true,
           "choices": [
-            {
-              "reply": 37497,
-              "next": 31059
-            }
+            { "reply": 37497, "quest": 1960, "completes": 13951, "params": [[30, 13951]], "next": 31059 }
           ]
         },
         {
           "message": 31059,
           "choices": [
-            {
-              "reply": 37496,
-              "startsQuest": 1962
-            }
+            { "reply": 37496, "startsQuest": 1962, "params": [[34, 1962]] }
           ]
+        },
+        {
+          "message": 31060,
+          "choices": []
         }
-      ]
+      ],
+      "why": "The mercenary recruit sent by Bajofrente, who comes into the library after Aisling's talk (Dofus pour les noobs: «Soudain une Recrue Mercenaire fait son apparition avec un message de Badufron»): «Seguir escuchando.» is 13951, and the news about the false dofus hands «Paseo por el bosque» over (31059, the line it names)."
     },
     {
       "npc": 1515,
@@ -6495,6 +6660,278 @@
         }
       ],
       "why": "The apple thieves loading the stolen crates near the sewer's entrance, from their own lines and replies, by Dofus pour les noobs («Flanquer une correction aux voleurs»): seen loading the crates (14170), told to go back to Astrub (31524) or mocked (31525), and the fight against three of them (npc_fights.json)."
+    },
+    {
+      "npc": 4325,
+      "map": 0,
+      "opening": 30709,
+      "openings": [
+        { "quest": 1960, "objective": 13942, "pending": 13943, "message": 30709 }
+      ],
+      "lines": [
+        {
+          "message": 30709,
+          "choices": [
+            { "reply": 37077, "next": 30710, "quest": 1960, "afterObjective": 13898, "beforeObjective": 13901 },
+            { "reply": 37391, "quest": 1960, "completes": 13943, "params": [[30, 13943]], "next": 30961, "afterObjective": 13942, "takes": 19661 },
+            { "reply": 37078 }
+          ]
+        },
+        {
+          "message": 30710,
+          "choices": [
+            { "reply": 37387, "next": 30957 }
+          ]
+        },
+        {
+          "message": 30957,
+          "choices": [
+            { "reply": 37386, "next": 30959 },
+            { "reply": 37385, "quest": 1960, "completes": 13901, "params": [[30, 13901]], "next": 30960 },
+            { "reply": 37388 }
+          ]
+        },
+        {
+          "message": 30959,
+          "choices": [
+            { "reply": 37385, "quest": 1960, "completes": 13901, "params": [[30, 13901]], "next": 30960 }
+          ]
+        },
+        {
+          "message": 30960,
+          "choices": [
+            { "reply": 37384 }
+          ]
+        },
+        {
+          "message": 30961,
+          "choices": [
+            { "reply": 37390, "quest": 1960, "completes": 13944, "params": [[30, 13944]], "next": 30953 }
+          ]
+        },
+        {
+          "message": 30953,
+          "choices": [
+            { "reply": 37380, "next": 30954 }
+          ]
+        },
+        {
+          "message": 30954,
+          "choices": [
+            { "reply": 37382, "next": 30955 }
+          ]
+        },
+        {
+          "message": 30955,
+          "choices": [
+            { "reply": 37383, "next": 30956 }
+          ]
+        },
+        {
+          "message": 30956,
+          "choices": [
+            { "reply": 37381 }
+          ]
+        }
+      ],
+      "why": "Fallanster, head of the Council of Astrub, in the council chamber upstairs (Dofus pour les noobs: «Empruntez donc les escaliers situés derrière Archie»). «Ça sent le gaz»: his welcome (30710), a neutral envoy for the Strubian rats (30957), the toxic fumes in the mines (30959), and «Estoy dispuesto a parlamentar con el jefe de las ratas.» (13901, 30960). Back with Rathrosk: «Te presento a Rathrosk.» (13943) shows him a squirrel (30961), «pedirle que se transforme» (13944) a dragon (30953); the summary (30954), the legend (30955) and Aisling at the library (30956)."
+    },
+    {
+      "npc": 4415,
+      "map": 0,
+      "opening": 30964,
+      "lines": [
+        {
+          "message": 30964,
+          "choices": [
+            { "reply": 37396, "next": 30965 },
+            { "reply": 81507 }
+          ]
+        },
+        {
+          "message": 30965,
+          "choices": [
+            { "reply": 37395, "params": [905] },
+            { "reply": 37397, "params": [905] }
+          ]
+        }
+      ],
+      "why": "The hungry rats of the sewers, after the cheese: «Este regalo es para vuestro jefe.» and they would take it anyway (30965); the fight against three of them (npc_fights.json), «Ça sent le gaz»."
+    },
+    {
+      "npc": 4414,
+      "map": 0,
+      "opening": 30966,
+      "openings": [
+        { "quest": 1960, "objective": 13934, "pending": 13935, "message": 30967 }
+      ],
+      "lines": [
+        {
+          "message": 30966,
+          "choices": [
+            { "reply": 37398 }
+          ]
+        },
+        {
+          "message": 30967,
+          "choices": [
+            { "reply": 37405, "quest": 1960, "completes": 13935, "params": [[30, 13935]], "next": 30968, "takes": 19670 }
+          ]
+        },
+        {
+          "message": 30968,
+          "choices": [
+            { "reply": 37404, "next": 30969 }
+          ]
+        },
+        {
+          "message": 30969,
+          "choices": [
+            { "reply": 37402, "next": 30970 }
+          ]
+        },
+        {
+          "message": 30970,
+          "choices": [
+            { "reply": 37403, "next": 30971 }
+          ]
+        },
+        {
+          "message": 30971,
+          "choices": [
+            { "reply": 37401, "next": 30972 }
+          ]
+        },
+        {
+          "message": 30972,
+          "choices": [
+            { "reply": 37400, "next": 30973 }
+          ]
+        },
+        {
+          "message": 30973,
+          "choices": [
+            { "reply": 37399 }
+          ]
+        }
+      ],
+      "why": "Ramán Hitu, chief of the Strubian rats, from his own lines and replies, by «Ça sent le gaz»: once his rats are beaten, his apologies (30967); the crate from Fallanster (13935, taken), the rats' innocence (30969, 30970), the grey hairs on an old grate (30971), móguiz hair (30972), and the quarry mine to explore (30973)."
+    },
+    {
+      "npc": 4416,
+      "map": 0,
+      "opening": 31033,
+      "openings": [
+        { "quest": 1960, "objective": 13940, "pending": 13941, "message": 31000 },
+        { "quest": 1960, "objective": 13995, "pending": 13937, "message": 31023 }
+      ],
+      "lines": [
+        {
+          "message": 31033,
+          "choices": [
+            { "reply": 37474, "next": 31034 },
+            { "reply": 37475 }
+          ]
+        },
+        {
+          "message": 31034,
+          "choices": [
+            { "reply": 37475 }
+          ]
+        },
+        {
+          "message": 31023,
+          "choices": [
+            { "reply": 38195, "next": 31019 }
+          ]
+        },
+        {
+          "message": 31019,
+          "choices": [
+            { "reply": 37458, "quest": 1960, "completes": 13937, "params": [[30, 13937]] }
+          ]
+        },
+        {
+          "message": 31000,
+          "choices": [
+            { "reply": 37438, "params": [905] }
+          ]
+        }
+      ],
+      "why": "A veteran móguard of the quarry's gallery, by «Ça sent le gaz»: he sends the curious away (31033, 31034); after the signalling fairy's noise (13995) he talks to the other guard (31023) and both go and see (31019, «Ver a los dos móguices alejarse.», 13937); with Rathrosk free, «¡MOGUARRRRDIAS!» and the fight."
+    },
+    {
+      "npc": 4417,
+      "map": 0,
+      "opening": 31038,
+      "openings": [
+        { "quest": 1960, "objective": 13940, "pending": 13941, "message": 31035 },
+        { "quest": 1960, "objective": 13995, "pending": 13937, "message": 31036 }
+      ],
+      "lines": [
+        {
+          "message": 31038,
+          "choices": [
+            { "reply": 37479, "next": 31039 },
+            { "reply": 37478 }
+          ]
+        },
+        {
+          "message": 31039,
+          "choices": [
+            { "reply": 37478 }
+          ]
+        },
+        {
+          "message": 31036,
+          "choices": [
+            { "reply": 38196 }
+          ]
+        },
+        {
+          "message": 31035,
+          "choices": [
+            { "reply": 37476, "params": [905] }
+          ]
+        }
+      ],
+      "why": "The other veteran móguard: sends the curious back to Astrub (31038, 31039), leaves the checking to his colleague after the noise (31036), and raises the alarm when the dragon escapes (31035) — the fight."
+    },
+    {
+      "npc": 4418,
+      "map": 0,
+      "opening": 31046,
+      "openings": [
+        { "quest": 1960, "objective": 13938, "pending": 13939, "message": 31048 },
+        { "quest": 1960, "objective": 13939, "message": 31047 }
+      ],
+      "lines": [
+        {
+          "message": 31048,
+          "choices": [
+            { "reply": 37488, "quest": 1960, "completes": 13939, "params": [[30, 13939]], "next": 31049, "takes": 19676, "gives": 19661 }
+          ]
+        },
+        {
+          "message": 31049,
+          "choices": [
+            { "reply": 37487 }
+          ]
+        },
+        {
+          "message": 31047,
+          "choices": [
+            { "reply": 37487 }
+          ]
+        },
+        {
+          "message": 31046,
+          "choices": [
+            { "reply": 37487 }
+          ]
+        }
+      ],
+      "why": "Rathrosk, the young dragon the móguices make work in the machine room. «Ça sent le gaz»: furious móguices, he does not want to go back to work (31048); the lock broken with the móguiz pickaxe, «Rathrosk, ha llegado la hora de salir de aquí.» frees him (13939, the pickaxe taken) and he follows the character (31049, the follower 19661)."
     }
   ]
 }

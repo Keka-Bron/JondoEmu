@@ -800,6 +800,53 @@
       "orientation": 3,
       "criterion": "Qa=1971&Qo!14171",
       "why": "The apple thieves, at the meadow only while «C'est pour ta pomme» has them still to beat (14171). The cell is the derived layer's."
+    },
+    {
+      "map": 192414726,
+      "npc": 4325,
+      "cell": 356,
+      "orientation": 1,
+      "why": "Fallanster in the council chamber upstairs of the Council Tower, the map his objectives name (192414726). No capture places him: INFERRED, a walkable cell by the middle of the chamber, beside the one Rathrosk takes later (370)."
+    },
+    {
+      "map": 192415748,
+      "npc": 4420,
+      "cell": 384,
+      "orientation": 3,
+      "criterion": "Qo=13945",
+      "why": "The mercenary recruit, who comes into the library once Aisling has heard of Rathrosk (13945). The cell is the derived layer's."
+    },
+    {
+      "map": 101717512,
+      "npc": 4415,
+      "cell": 288,
+      "orientation": 1,
+      "criterion": "Qa=1960&Qo!13934",
+      "why": "The hungry rats, in the sewers while «Aquí huele a gas» has them to beat (13934). INFERRED: a walkable cell of the meeting place."
+    },
+    {
+      "map": 188486154,
+      "npc": 4416,
+      "cell": 189,
+      "orientation": 1,
+      "criterion": "Qo!13937|Qo=13940",
+      "why": "A veteran móguard in front of the big chest of the quarry's gallery (element 516020 on 176), away while he and his colleague check the signalling fairy's noise (13937 done, 13940 not yet). No capture places him: INFERRED, beside the chest, facing the way in."
+    },
+    {
+      "map": 188486154,
+      "npc": 4417,
+      "cell": 203,
+      "orientation": 1,
+      "criterion": "Qo!13937|Qo=13940",
+      "why": "The other veteran móguard, on the chest's other side; away like his colleague. INFERRED."
+    },
+    {
+      "map": 188486152,
+      "npc": 4418,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=1960&Qo!13940",
+      "why": "Rathrosk at the móguices' machine, until he leaves the room with the character (13940). INFERRED: the middle of the machine room."
     }
   ]
 }

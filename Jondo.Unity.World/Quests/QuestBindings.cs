@@ -212,6 +212,12 @@ namespace Jondo.Unity.World.Quests
         /// </summary>
         public int Says { get; init; }
 
+        /// <summary>
+        /// The element only hands its items over, the objective stays: the blue pickaxe outside the
+        /// quarry is picked up while «Libera a Rathrosk» is to do, and freeing him is his reply.
+        /// </summary>
+        public bool OnlyGives { get; init; }
+
         /// <summary>Why this row says what it says. Never read by the server; read by people.</summary>
         public string Why { get; init; } = "";
 
@@ -390,6 +396,7 @@ namespace Jondo.Unity.World.Quests
                 Replies = Ints(row, "replies"),
                 ShowsNpc = Int(row, "showsNpc"),
                 Says = Int(row, "says"),
+                OnlyGives = row.TryGetProperty("onlyGives", out var only) && only.ValueKind == JsonValueKind.True,
                 OverridesMap = row.TryGetProperty("overridesMap", out var overrides)
                                && overrides.ValueKind == JsonValueKind.True,
                 ItemId = Int(row, "item"),

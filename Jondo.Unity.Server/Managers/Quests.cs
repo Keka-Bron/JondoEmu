@@ -501,6 +501,21 @@ namespace Jondo.Unity.Server.Managers
             // finished, so a hand-out that fails must not leave it marked done. Not so for a
             // conversation that hands things over: the conversation is the reason, and the
             // tutorial capture validates Ganymed's step (idz 3169) before his six items arrive.
+            // An element that only hands something over: given once, the objective left alone.
+            if (binding.OnlyGives)
+            {
+                foreach (var (item, count) in binding.Gives)
+                {
+                    if (Equipment.HowMany(item) > 0) continue;
+                    if (!await Equipment.GiveAsync(stream, item, count)) continue;
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                            InfoMessages.ItemGained, count.ToString(CultureInfo.InvariantCulture),
+                            item.ToString(CultureInfo.InvariantCulture))));
+                }
+                return false;
+            }
+
             bool talkFirst = binding.Kind == QuestBindingKind.Talk;
             if (talkFirst) await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
             foreach (var (item, count) in binding.Gives)

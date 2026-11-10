@@ -43,6 +43,16 @@
     { "npc": 4472, "map": 190580740, "reply": 38085,
       "monsters": [ { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 } ] },
     { "npc": 4472, "map": 190580740, "reply": 38089,
-      "monsters": [ { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 } ] }
+      "monsters": [ { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 }, { "monster": 5293, "grade": 0 } ] },
+    { "npc": 4415, "map": 101717512, "reply": 37395,
+      "monsters": [ { "monster": 5248, "grade": 0 }, { "monster": 5248, "grade": 0 }, { "monster": 5248, "grade": 0 } ] },
+    { "npc": 4415, "map": 101717512, "reply": 37397,
+      "monsters": [ { "monster": 5248, "grade": 0 }, { "monster": 5248, "grade": 0 }, { "monster": 5248, "grade": 0 } ] },
+    { "npc": 4416, "map": 188486154, "reply": 37438,
+      "monsters": [ { "monster": 5251, "grade": 0 }, { "monster": 5251, "grade": 0 } ],
+      "allies": [ { "monster": 5252, "grade": 0 } ] },
+    { "npc": 4417, "map": 188486154, "reply": 37476,
+      "monsters": [ { "monster": 5251, "grade": 0 }, { "monster": 5251, "grade": 0 } ],
+      "allies": [ { "monster": 5252, "grade": 0 } ] }
   ]
 }

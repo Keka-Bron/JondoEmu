@@ -482,6 +482,64 @@
    "elements": [{"map": 192415754, "element": 516184}],
    "afterObjectives": [14173],
    "why": "«Entrénate»: «cliquez sur le gros tronc en bois au centre de la pièce» (Dofus pour les noobs), element 516184 (graphic 32053) on cell 330, the middle of the instructress's room."
+  },
+  {
+   "objective": 13933,
+   "quest": 1960,
+   "kind": "enter",
+   "map": 101717512,
+   "afterObjectives": [13932],
+   "why": "«Ve a las alcantarillas al encuentro de las ratas strubienses»: the meeting place in the sewers, the map the objective carries (Dofus pour les noobs: «entrez dans les égouts par la bouche d'égouts» at [5,-17])."
+  },
+  {
+   "objective": 13936,
+   "quest": 1960,
+   "elements": [{"map": 188484104, "element": 516132}],
+   "afterObjectives": [13935],
+   "gives": [{"item": 19675, "count": 1}],
+   "why": "«Explora la mina de la cantera en busca de lo que esconden los móguices»: in the quarry mine, the bag on the gallery above the guards' (Dofus pour les noobs: «montez la map du dessus pour cliquer sur la sacoche»), element 516132 (graphic 45168, the only one of its kind there) on cell 399; it holds the signalling fairy (19675), whose use is 13995."
+  },
+  {
+   "objective": 13938,
+   "quest": 1960,
+   "kind": "enter",
+   "map": 188486152,
+   "afterObjectives": [13937],
+   "why": "«Descubre lo que hay detrás de la puerta»: the big chest of the guards' gallery (element 516020) leads to the machine room, 188486152, the map the objective carries."
+  },
+  {
+   "objective": 13939,
+   "quest": 1960,
+   "elements": [{"map": 193200131, "element": 516098}],
+   "afterObjectives": [13938],
+   "gives": [{"item": 19676, "count": 1}],
+   "onlyGives": true,
+   "why": "The blue pickaxe in front of the quarry mine (Dofus pour les noobs: «Sortez devant la mine et cliquez sur la pioche bleue pour la récupérer»), element 516098 (graphic 7400) on cell 205: it only hands the móguiz pickaxe (19676) over; «Libera a Rathrosk» is Rathrosk's reply, which takes it."
+  },
+  {
+   "objective": 13940,
+   "quest": 1960,
+   "kind": "enter",
+   "map": 188486154,
+   "afterObjectives": [13939],
+   "why": "«Sal de la sala de la máquina con Rathrosk»: back on the guards' gallery, the map the objective carries."
+  },
+  {
+   "objective": 13941,
+   "quest": 1960,
+   "kind": "beat",
+   "monster": 5251,
+   "map": 188486154,
+   "afterObjectives": [13940],
+   "why": "«Enfréntate a los moguardias veteranos»: the veteran móguards (monster 5251), with Rathrosk at the character's side (npc_fights.json)."
+  },
+  {
+   "objective": 13942,
+   "quest": 1960,
+   "kind": "enter",
+   "map": 192414726,
+   "afterObjectives": [13941],
+   "why": "«Escolta a Rathrosk hasta la sala del Consejo»: the council chamber, the map the objective carries, with Rathrosk following (19661)."
   }
  ]
 }

@@ -69,6 +69,20 @@ namespace Jondo.Unity.Server.Handlers
             // A book: its document opens, and the book stays.
             if (await ReadingItemHandler.TryReadAsync(stream, item)) return;
 
+            // A quest item whose use is an objective (effect 30): the signalling fairy of «Aquí
+            // huele a gas» makes its noise in the mine (13995) and is gone.
+            var objectiveEffects = DatabaseManager.GetItemEffectsData(
+                DatabaseManager.GetItemTemplatePossibleEffects(item.Template))
+                .Where(e => e.EffectId == ReadingItemHandler.ObjectiveEffect && e.Value != 0).ToList();
+            if (objectiveEffects.Count > 0)
+            {
+                bool any = false;
+                foreach (var effect in objectiveEffects)
+                    any |= await Quests.CompleteByReplyAsync(stream, 0, effect.Value);
+                if (any) await Equipment.TakeAsync(stream, item.Template, 1);
+                return;
+            }
+
             // A name or sex change potion: the change waits for the next connection.
             if (await RemodelHandler.TryUseAsync(stream, item)) return;
 
