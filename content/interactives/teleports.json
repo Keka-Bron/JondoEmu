@@ -117,7 +117,11 @@
     "three galleries behind it, [1,-17], [2,-18] and [3,-17], joined by the tunnel ends where their",
     "rails leave the map (graphic 44035): each gallery's lower left end goes back the way it came,",
     "its upper or right end goes on. Nothing measured them; Dofus pour les noobs sends «Cien por",
-    "cien natural» through them to the yellow puddle of [3,-17], and they are drawn as one line."
+    "cien natural» through them to the yellow puddle of [3,-17], and they are drawn as one line.",
+    "",
+    "THE HIDEOUT UNDER THE QUARRY [10,-19]. Éric's old gang keeps Hicha in a room whose entrance is hidden in",
+    "the quarry (20206): element 516145 on cell 60 of 188484104, the same graphic as the room's way out",
+    "(516147, in the graph), opens into 188483080 for «Un rayon de soleil» only."
   ],
   "passages": [
     {
@@ -355,6 +359,7 @@
     {"map": 192545798, "element": 515384, "cell": 311, "gfx": 47284, "type": 0, "skill": 114, "toMap": 147063810, "toCell": 394, "criterion": "POE15990,1"},
     {"map": 147063810, "element": 507618, "cell": 393, "gfx": 47343, "type": 0, "skill": 114, "toMap": 192545798, "toCell": 325},
     {"map": 103547392, "element": 516612, "cell": 319, "gfx": 47284, "type": 0, "skill": 114, "toMap": 195300356, "toCell": 163, "criterion": "POE15990,1"},
+    {"map": 188484104, "element": 516145, "cell": 60, "gfx": 39767, "type": 0, "skill": 114, "toMap": 188483080, "toCell": 478, "criterion": "Qa=1615"},
     {"map": 188484106, "element": 516095, "cell": 555, "gfx": 57416, "type": 0, "skill": 114, "toMap": 188483082, "toCell": 215, "criterion": "Qo=13825|Qf=1984"},
     {"map": 188743685, "element": 515978, "cell": 400, "gfx": 37257, "type": 0, "skill": 114, "toMap": 188482052, "toCell": 478},
     {"map": 188482052, "element": 515970, "cell": 532, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188743685, "toCell": 428},

@@ -1638,6 +1638,51 @@
    "elements": [{"map": 188744194, "element": 515342}],
    "spawns": {"monster": 3285, "count": 1, "attacks": true},
    "why": "«Tira una piedra donde salen las burbujas»: the ripples clicked a second time; the Gran azul comes out and attacks, alone. Its loot holds the Gran azul (13269)."
+  },
+  {
+   "objective": 9516,
+   "quest": 1615,
+   "kind": "order",
+   "why": "«Interroga a los anutrofs cerca de la entrada a los túneles»: Brookita Pyrita by the mine [1,-17], her reply does it."
+  },
+  {
+   "objective": 9526,
+   "quest": 1615,
+   "elements": [{"map": 188483080, "element": 516148}],
+   "gives": [{"item": 16138, "count": 1}],
+   "why": "«Recupera el artefacto antiguo»: the bag in the middle of the hideout (element 516148, cell 357)."
+  },
+  {
+   "objective": 10305,
+   "quest": 1677,
+   "kind": "beat",
+   "monster": 4288,
+   "map": 192413702,
+   "why": "«Impide un incidente diplomático»: the messenger tofu beaten before it insults Archi."
+  },
+  {
+   "objective": 10312,
+   "quest": 1677,
+   "kind": "enter",
+   "map": 189792769,
+   "afterObjectives": [10311],
+   "why": "«Sigue el murmullo llevado por el viento»: to [4,-30], where Sojudas hides (Dofus pour les noobs)."
+  },
+  {
+   "objective": 12183,
+   "quest": 1841,
+   "kind": "enter",
+   "map": 189794311,
+   "afterObjectives": [12182],
+   "why": "«Encuentra a la uginak en los campos de Astrub»: the fields by the peasants' workshop [7,-24] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 12191,
+   "quest": 1841,
+   "kind": "beat",
+   "monsters": [4791, 4792, 4793],
+   "map": 193332228,
+   "why": "«Dale una buena lección a los zurcaráks con la ayuda del uginak»: the three ecaflips, with the scared ouginak beside the character."
   }
  ]
 }

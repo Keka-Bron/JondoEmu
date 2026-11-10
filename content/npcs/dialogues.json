@@ -112,12 +112,14 @@
       "opening": 9707,
       "_byHand": true,
       "openings": [
+        { "quest": 1677, "objective": 10305, "pending": 10306, "message": 22278 },
         { "after": 1959, "before": 2009, "message": 30641 }
       ],
       "lines": [
         {
           "message": 9707,
           "choices": [
+            { "reply": 26826, "quest": 1677, "beforeObjective": 10305, "next": 22282, "afterObjective": 10304 },
             { "reply": 36990, "quest": 1960, "completes": 13898, "params": [[30, 13898]], "next": 30644 },
             { "reply": 36861, "next": 30545, "quest": 1958, "beforeObjective": 13850 },
             { "reply": 36872, "next": 30558, "quest": 1958, "afterQuest": true, "beforeQuest": 1959 },
@@ -283,9 +285,40 @@
           "choices": [
             { "reply": 37315 }
           ]
+        },
+        {
+          "message": 22282,
+          "choices": [
+            { "reply": 26825, "quest": 1677, "beforeObjective": 10305 }
+          ]
+        },
+        {
+          "message": 22278,
+          "choices": [
+            { "reply": 26822, "next": 22279 }
+          ]
+        },
+        {
+          "message": 22279,
+          "choices": [
+            { "reply": 26821, "next": 22280 },
+            { "reply": 26824, "next": 22281 }
+          ]
+        },
+        {
+          "message": 22280,
+          "choices": [
+            { "reply": 26820, "quest": 1677, "completes": 10306, "params": [[30, 10306]] }
+          ]
+        },
+        {
+          "message": 22281,
+          "choices": [
+            { "reply": 26823, "quest": 1677, "completes": 10306, "params": [[30, 10306]] }
+          ]
         }
       ],
-      "why": "Councillor Archi, from her own lines and replies, by Dofus pour les noobs («Les principes d'Archie m'aident», «On marche sur des œufs», «Conseil de classe»): «Quiero descubrir la ciudad.» (30545), the city (30546, 30547), «Estoy totalmente de acuerdo.» with her discipline (the visit of 1958, 13850; or «soy un poco anarquista» and «Así es.», 30553), the false dofus and «Aceptar sin dudar.» (30549-30551), and «Vale, voy en dirección a la taberna.» on 30552, the line 1959 names; under level 10, «Aún no me noto con fuerzas» and her advice to go back to Incarnam (53186). Back with the trafficker behind bars (36986, 13856), she has spoken of the character to his class's representative (30641) and hands «Consejo de clase» over. «¿Dónde puede uno descansar tranquilo?» is «Esto hace aguas» (30884, the line 1975 names). «Ça tombe à l'eau»: «Exponer el problema de la privatización del lago.» (13956); she knows no notary Fer Liz and the pond is public (30903); the squatters are to come and see her (30904)."
+      "why": "Councillor Archi, from her own lines and replies, by Dofus pour les noobs («Les principes d'Archie m'aident», «On marche sur des œufs», «Conseil de classe»): «Quiero descubrir la ciudad.» (30545), the city (30546, 30547), «Estoy totalmente de acuerdo.» with her discipline (the visit of 1958, 13850; or «soy un poco anarquista» and «Así es.», 30553), the false dofus and «Aceptar sin dudar.» (30549-30551), and «Vale, voy en dirección a la taberna.» on 30552, the line 1959 names; under level 10, «Aún no me noto con fuerzas» and her advice to go back to Incarnam (53186). Back with the trafficker behind bars (36986, 13856), she has spoken of the character to his class's representative (30641) and hands «Consejo de clase» over. «¿Dónde puede uno descansar tranquilo?» is «Esto hace aguas» (30884, the line 1975 names). «Ça tombe à l'eau»: «Exponer el problema de la privatización del lago.» (13956); she knows no notary Fer Liz and the pond is public (30903); the squatters are to come and see her (30904). «Les paroles s'envolent, les aigris restent»: Hazel's messenger tofu about to say «Archi, eres una p...» (22282), its beak shut (the fight, npc_fights.json); «are you ill?» (22278), the message the character makes up (22279-22281: 10306)."
     },
     {
       "npc": 1088,
@@ -700,20 +733,11 @@
         {
           "message": 30718,
           "choices": [
-            { "reply": 37088, "next": 30720, "completes": 13897, "params": [[30, 13897]] }
-          ]
-        },
-        {
-          "message": 26692,
-          "choices": [
-            { "reply": 37090, "startsQuest": 1841 }
-          ]
-        },
-        {
-          "message": 30720,
-          "names": true,
-          "choices": [
-            { "reply": 37090, "startsQuest": 1841 }
+            { "reply": 37088, "next": 30720, "completes": 13897, "params": [[30, 13897]] },
+            { "reply": 37088, "next": 30720, "beforeQuest": 1841 },
+            { "reply": 37098, "quest": 1841, "completes": 12193, "params": [[30, 12193]], "next": 30726 },
+            { "reply": 37087, "next": 30721 },
+            { "reply": 37086, "next": 30719 }
           ]
         },
         {
@@ -721,9 +745,62 @@
           "choices": [
             { "reply": 37099, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 30719,
+          "choices": []
+        },
+        {
+          "message": 30721,
+          "choices": []
+        },
+        {
+          "message": 30720,
+          "names": true,
+          "choices": [
+            { "reply": 37094, "next": 30722, "beforeQuest": 1841 }
+          ]
+        },
+        {
+          "message": 30722,
+          "choices": [
+            { "reply": 37093, "next": 30723 }
+          ]
+        },
+        {
+          "message": 30723,
+          "choices": [
+            { "reply": 37092, "next": 30724 }
+          ]
+        },
+        {
+          "message": 30724,
+          "choices": [
+            { "reply": 37090, "next": 30725 },
+            { "reply": 37091 }
+          ]
+        },
+        {
+          "message": 30725,
+          "choices": [
+            { "reply": 37089, "startsQuest": 1841, "params": [[34, 1841]] }
+          ]
+        },
+        {
+          "message": 30726,
+          "choices": [
+            { "reply": 37097, "next": 30727 }
+          ]
+        },
+        {
+          "message": 30727,
+          "names": true,
+          "choices": [
+            { "reply": 37096, "next": 30728 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37088) is this class's objective (13897, effect 30), and leads to his greeting, 30720, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1841) is done, he greets the character with Archi's summons (30728) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37088) is this class's objective. «Une vie de milichien» (1841) of Dofus pour les noobs: welcomed (30720), the ouginaks' temper (30722), young recruits on probation with Bajofrente (30723), watched from afar (30724), their posts on the map (30725); the recruits doing fine (30726: 12193), «it was not me being tested» (30727), Archi's summons (30728). Astrub (30719), the Picahari (30721)."
     },
     {
       "npc": 4313,
@@ -736,20 +813,13 @@
         {
           "message": 30730,
           "choices": [
-            { "reply": 37102, "next": 30732, "completes": 13896, "params": [[30, 13896]] }
-          ]
-        },
-        {
-          "message": 22251,
-          "choices": [
-            { "reply": 37103, "startsQuest": 1677 }
-          ]
-        },
-        {
-          "message": 30732,
-          "names": true,
-          "choices": [
-            { "reply": 37103, "startsQuest": 1677 }
+            { "reply": 37102, "next": 30732, "completes": 13896, "params": [[30, 13896]] },
+            { "reply": 37102, "next": 30732, "beforeQuest": 1677 },
+            { "reply": 37111, "quest": 1677, "completes": 10304, "params": [[30, 10304]], "next": 30737 },
+            { "reply": 37117, "quest": 1677, "completes": 10308, "params": [[30, 10308]], "next": 30739 },
+            { "reply": 37118, "quest": 1677, "completes": 10316, "params": [[30, 10316]], "next": 30744 },
+            { "reply": 37101, "next": 30731 },
+            { "reply": 37124, "next": 30747 }
           ]
         },
         {
@@ -757,9 +827,99 @@
           "choices": [
             { "reply": 37121, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 30731,
+          "choices": []
+        },
+        {
+          "message": 30747,
+          "choices": []
+        },
+        {
+          "message": 30732,
+          "names": true,
+          "choices": [
+            { "reply": 37108, "next": 30733, "beforeQuest": 1677 }
+          ]
+        },
+        {
+          "message": 30733,
+          "choices": [
+            { "reply": 37107, "next": 30734 }
+          ]
+        },
+        {
+          "message": 30734,
+          "names": true,
+          "choices": [
+            { "reply": 37106, "next": 30735 }
+          ]
+        },
+        {
+          "message": 30735,
+          "choices": [
+            { "reply": 37105, "next": 30736 }
+          ]
+        },
+        {
+          "message": 30736,
+          "choices": [
+            { "reply": 37103, "startsQuest": 1677, "params": [[34, 1677]] },
+            { "reply": 37104 }
+          ]
+        },
+        {
+          "message": 30737,
+          "choices": [
+            { "reply": 37110, "next": 30738 }
+          ]
+        },
+        {
+          "message": 30738,
+          "choices": [
+            { "reply": 37109 }
+          ]
+        },
+        {
+          "message": 30739,
+          "choices": [
+            { "reply": 37116, "next": 30740 }
+          ]
+        },
+        {
+          "message": 30740,
+          "choices": [
+            { "reply": 37115, "next": 30741 }
+          ]
+        },
+        {
+          "message": 30741,
+          "choices": [
+            { "reply": 37114, "next": 30742 }
+          ]
+        },
+        {
+          "message": 30742,
+          "choices": [
+            { "reply": 37113, "next": 30743 }
+          ]
+        },
+        {
+          "message": 30743,
+          "choices": [
+            { "reply": 37112, "gives": 17468 }
+          ]
+        },
+        {
+          "message": 30744,
+          "names": true,
+          "choices": [
+            { "reply": 37120, "next": 30745 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37102) is this class's objective (13896, effect 30), and leads to his greeting, 30732, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1677) is done, he greets the character with Archi's summons (30745) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37102) is this class's objective. «Les paroles s'envolent, les aigris restent» (1677) of Dofus pour les noobs: welcomed (30732), the huppermages' exile (30733), no rest since (30734), anvils instead of cauldrons (30735), the forge (30736, «Accepter et partir vers la forge»); the sleepy tofu shown, her voice saying what she never said (30737: 10304), another tofu sent to the Council Tower (30738); Sojudas, her old whisperer messenger (30739-30741: 10308), a bubble pipe to deal with him (30742, 30743, item 17468); he will behave (30744: 10316), Archi waits (30745). Astrub (30731), the Emental amulet (30747)."
     },
     {
       "npc": 4315,
@@ -1637,6 +1797,7 @@
         {
           "message": 30864,
           "choices": [
+            { "reply": 37282, "quest": 1677, "beforeObjective": 10307, "next": 30869, "afterObjective": 10306 },
             { "reply": 37272, "next": 30873, "completes": 13881, "params": [[30, 13881]] },
             { "reply": 38245, "next": 31638, "beforeQuest": 1964 },
             { "reply": 38256, "quest": 1964, "completes": 14225, "params": [[30, 14225]], "next": 31649, "takes": 19771 },
@@ -1718,9 +1879,33 @@
           "choices": [
             { "reply": 38337 }
           ]
+        },
+        {
+          "message": 30869,
+          "choices": [
+            { "reply": 37279, "next": 30870 }
+          ]
+        },
+        {
+          "message": 30870,
+          "choices": [
+            { "reply": 37280, "next": 30871 }
+          ]
+        },
+        {
+          "message": 30871,
+          "choices": [
+            { "reply": 37281, "next": 30872 }
+          ]
+        },
+        {
+          "message": 30872,
+          "choices": [
+            { "reply": 37276, "quest": 1677, "completes": 10307, "params": [[30, 10307]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37272) is this class's objective (13881, effect 30), and leads to his greeting, 30873, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1964) is done, he greets the character with Archi's summons (30865) and «Ir a la Torre del Consejo» hands it over. «Série animalière» of Dofus pour les noobs: an Osamodas wanted for the mines (31638), the Dofus (31639), the sniffing tofus and the toxic fumes (31640), an animal to stand them (31641), a digging boar and a troglodyte gobball, «Accepter» (31642, the line the step declares), the boar first (31643); the boar too aggressive (14225, 31649), the gobball a stomach on legs (14229, 31653), Lasy Lap's wauwau (31654), and the wauwau's exemplary behaviour and Timy saved (14235, 31708)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37272) is this class's objective (13881, effect 30), and leads to his greeting, 30873, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1964) is done, he greets the character with Archi's summons (30865) and «Ir a la Torre del Consejo» hands it over. «Série animalière» of Dofus pour les noobs: an Osamodas wanted for the mines (31638), the Dofus (31639), the sniffing tofus and the toxic fumes (31640), an animal to stand them (31641), a digging boar and a troglodyte gobball, «Accepter» (31642, the line the step declares), the boar first (31643); the boar too aggressive (14225, 31649), the gobball a stomach on legs (14229, 31653), Lasy Lap's wauwau (31654), and the wauwau's exemplary behaviour and Timy saved (14235, 31708). «Les paroles s'envolent, les aigris restent»: his tofus never get it wrong, the whip (30869), the battered tofu examined (30870), two conversations recorded (30871), a whisperer sowing chaos (30872: 10307)."
     },
     {
       "npc": 4327,
@@ -2282,12 +2467,15 @@
       "map": 0,
       "opening": 30857,
       "openings": [
+        { "quest": 2470, "objective": 18690, "pending": 18693, "message": 51482 },
         { "after": 1966, "before": 1960, "message": 30858 }
       ],
       "lines": [
         {
           "message": 30857,
           "choices": [
+            { "reply": 69074, "quest": 2470, "beforeObjective": 18688, "next": 51481, "afterObjective": 18687 },
+            { "reply": 69075, "quest": 2470, "completes": 18693, "params": [[30, 18693]] },
             { "reply": 37923, "next": 31400, "beforeQuest": 1966 },
             { "reply": 37954, "quest": 1966, "completes": 14109, "params": [[30, 14109]], "next": 31421, "afterObjectives": [14106, 14107, 14108] },
             { "reply": 37264, "next": 30859, "completes": 13883, "params": [[30, 13883]] }
@@ -2336,9 +2524,22 @@
           "choices": [
             { "reply": 37953 }
           ]
+        },
+        {
+          "message": 51481,
+          "choices": [
+            { "reply": 69072, "quest": 2470, "completes": 18688, "params": [[30, 18688]] },
+            { "reply": 69073 }
+          ]
+        },
+        {
+          "message": 51482,
+          "choices": [
+            { "reply": 69075, "quest": 2470, "completes": 18693, "params": [[30, 18693]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37264) is this class's objective (13883, effect 30), and leads to his greeting, 30859, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1966) is done, he greets the character with Archi's summons (30858) and «Ir a la Torre del Consejo» hands it over. «Crime et châtiment» of Dofus pour les noobs: ready to meet his master (37923), the shadow behind all the Srams (31400), three things to steal first (31401), Ramón Santo's purse, a miliwauwau's bone and a cut diamond (31402, the line the step declares; 31403, the mastiff before Peluka's salon); the loot shown (14109, 31421) and the door."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37264) is this class's objective (13883, effect 30), and leads to his greeting, 30859, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1966) is done, he greets the character with Archi's summons (30858) and «Ir a la Torre del Consejo» hands it over. «Crime et châtiment» of Dofus pour les noobs: ready to meet his master (37923), the shadow behind all the Srams (31400), three things to steal first (31401), Ramón Santo's purse, a miliwauwau's bone and a cut diamond (31402, the line the step declares; 31403, the mastiff before Peluka's salon); the loot shown (14109, 31421) and the door. «La routine anodine du chevalier citadin»: the barrels behind him, the mercenary talked, a dagger (51481: 18688, the fight with sir André); «we give up» (51482: 18693)."
     },
     {
       "npc": 4337,
@@ -2816,6 +3017,7 @@
         {
           "message": 30495,
           "choices": [
+            { "reply": 37903, "quest": 1615, "completes": 9518, "params": [[30, 9518]], "next": 31377 },
             { "reply": 37394, "quest": 1960, "completes": 13932, "params": [[30, 13932]], "next": 30962, "afterObjective": 13901 },
             { "reply": 36787, "next": 30496, "quest": 1960, "afterObjective": 13932, "beforeQuest": 1984 },
             { "reply": 36787, "next": 30496, "quest": 1960, "afterQuest": true, "beforeQuest": 1984 },
@@ -2971,9 +3173,13 @@
           "choices": [
             { "reply": 37392 }
           ]
+        },
+        {
+          "message": 31377,
+          "choices": []
         }
       ],
-      "why": "Paula Sepe, who is paid to find the jobless work, at the Council Tower, from her own lines and replies, by Dofus pour les noobs. «Ça sent le gaz»: the gift for the rats' chief, a smelly crate (30962, 19670), and the sewers (30963). «Crise sanitaire» («Proposer son aide»): looking for a job (30496), the peasants' troubles (30497) and Megustam Laspelas (30498, the line 1984 names); the summary (13829, 30507). «Livraison par intérim»: Estefi Dora's sick delivery man (30508, 1985's line, 30509) and the crates delivered (13835, 30519). «Golémancien»: Bajofrente's animated quintain (30522-30525, 30524 1986's line) and its delivery (13848, 30544). «Le rebelle de la forêt»: Vangey, Hel Munster's apprentice, missing (31439-31443) and Bajofrente first (31444, 1987's line, 31445); back with him, his troubles (14142, 31464, 31465), and the character turns to Vangey."
+      "why": "Paula Sepe, who is paid to find the jobless work, at the Council Tower, from her own lines and replies, by Dofus pour les noobs. «Ça sent le gaz»: the gift for the rats' chief, a smelly crate (30962, 19670), and the sewers (30963). «Crise sanitaire» («Proposer son aide»): looking for a job (30496), the peasants' troubles (30497) and Megustam Laspelas (30498, the line 1984 names); the summary (13829, 30507). «Livraison par intérim»: Estefi Dora's sick delivery man (30508, 1985's line, 30509) and the crates delivered (13835, 30519). «Golémancien»: Bajofrente's animated quintain (30522-30525, 30524 1986's line) and its delivery (13848, 30544). «Le rebelle de la forêt»: Vangey, Hel Munster's apprentice, missing (31439-31443) and Bajofrente first (31444, 1987's line, 31445); back with him, his troubles (14142, 31464, 31465), and the character turns to Vangey. «Un rayon de soleil»: an honest job asked for without naming Éric, Enileda the sculptor (31377: 9518)."
     },
     {
       "npc": 4362,
@@ -3503,8 +3709,6 @@
       "npc": 4314,
       "map": 0,
       "opening": 30748,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
       "openings": [
         { "after": 1615, "before": 1960, "message": 30757 }
       ],
@@ -3513,21 +3717,9 @@
           "message": 30748,
           "choices": [
             { "reply": 37126, "next": 30750, "quest": 2009, "beforeObjective": 13895, "completes": 13895, "params": [[30, 13895]] },
-            { "reply": 37127, "next": 20180 },
-            { "reply": 37134, "quest": 1615 }
-          ]
-        },
-        {
-          "message": 20180,
-          "choices": [
-            { "reply": 37128, "startsQuest": 1615 }
-          ]
-        },
-        {
-          "message": 30750,
-          "names": true,
-          "choices": [
-            { "reply": 37127, "next": 20180 }
+            { "reply": 37126, "next": 30750, "beforeQuest": 1615 },
+            { "reply": 37134, "quest": 1615, "completes": 9527, "params": [[30, 9527]], "next": 30753 },
+            { "reply": 37125, "next": 30749 }
           ]
         },
         {
@@ -3535,9 +3727,58 @@
           "choices": [
             { "reply": 37135, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 30749,
+          "choices": []
+        },
+        {
+          "message": 30750,
+          "names": true,
+          "choices": [
+            { "reply": 37127, "next": 30751, "beforeQuest": 1615 }
+          ]
+        },
+        {
+          "message": 30751,
+          "choices": [
+            { "reply": 37129, "next": 30752 }
+          ]
+        },
+        {
+          "message": 30752,
+          "choices": [
+            { "reply": 37128, "startsQuest": 1615, "params": [[34, 1615]] }
+          ]
+        },
+        {
+          "message": 30753,
+          "names": true,
+          "choices": [
+            { "reply": 37133, "next": 30754 },
+            { "reply": 37131, "next": 30756 }
+          ]
+        },
+        {
+          "message": 30754,
+          "choices": [
+            { "reply": 37132, "next": 30755 }
+          ]
+        },
+        {
+          "message": 30755,
+          "choices": [
+            { "reply": 37136, "next": 30757 }
+          ]
+        },
+        {
+          "message": 30756,
+          "choices": [
+            { "reply": 37130, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37126) is this class's objective (13895, effect 30), and leads to his greeting, 30750, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1615) is done, he greets the character with Archi's summons (30757) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37126) is this class's objective (13895). «Un rayon de soleil» (1615) of Dofus pour les noobs: welcomed (30750), help to investigate (30751), Hicha missing for four days (30752, «Ir en busca de Hicha»); Hicha freed and the ancient artefact (30753: 9527), the temple in Sufokia (30754, 30755), other favours, Archi waits (30757), «me estoy enrollando» (30756). Eliotropes in Astrub (30749)."
     },
     {
       "npc": 4412,
@@ -9727,6 +9968,8 @@
         {
           "message": 30499,
           "choices": [
+            { "reply": 37777, "quest": 1841, "beforeObjective": 12185, "next": 31272, "afterObjective": 12184 },
+            { "reply": 37780, "next": 31275, "quest": 1841, "completesAll": [12186, 12187], "params": [[30, 12187]], "gives": 18635 },
             { "reply": 37891, "quest": 1967, "completes": 14100, "params": [[30, 14100]], "next": 31369 },
             { "reply": 37893, "quest": 1967, "completes": 14102, "params": [[30, 14102]], "next": 31370 },
             { "reply": 36790, "quest": 1984, "completes": 13818, "params": [[30, 13818]], "next": 30500 },
@@ -9770,9 +10013,25 @@
           "choices": [
             { "reply": 37892 }
           ]
+        },
+        {
+          "message": 31272,
+          "choices": [
+            { "reply": 37776, "next": 31273 }
+          ]
+        },
+        {
+          "message": 31273,
+          "choices": [
+            { "reply": 37775, "quest": 1841, "completes": 12185, "params": [[30, 12185]] }
+          ]
+        },
+        {
+          "message": 31275,
+          "choices": []
         }
       ],
-      "why": "Megustam Laspelas (Emia Elliesol), at the peasants' workshop [7,-24], by «Crise sanitaire»: the bread (13818), the contaminated consumables (30500), every plant and the animals too (30501): «Ir a visitar a Unterix Unter». «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Tarot, t'es très fort»: the drought growing (37891, 31369: 14100), off to the fields; the Sun card shown (37893: 14102), Nibe Lula had a card like it, a strange wheel (31370). «Tarot, t'es très fort»: the drought growing (37891, 31369: 14100), off to the fields; the Sun card shown (37893: 14102), Nibe Lula had a card like it, a strange wheel (31370)."
+      "why": "Megustam Laspelas (Emia Elliesol), at the peasants' workshop [7,-24], by «Crise sanitaire»: the bread (13818), the contaminated consumables (30500), every plant and the animals too (30501): «Ir a visitar a Unterix Unter». «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Qui sème le vent récolte l'Artempeth»: her new seeds, pesticides and fertilisers (13862, 30585), Nibe Lula; the vermicide shown (13869): two infested granaries to try it in (30592). «Tarot, t'es très fort»: the drought growing (37891, 31369: 14100), off to the fields; the Sun card shown (37893: 14102), Nibe Lula had a card like it, a strange wheel (31370). «Tarot, t'es très fort»: the drought growing (37891, 31369: 14100), off to the fields; the Sun card shown (37893: 14102), Nibe Lula had a card like it, a strange wheel (31370). «Une vie de milichien»: a nettle infusion, «you do not look like you need it» (31272), fresh nettles and a devilish dandelion flower to bring (31273: 12185); brewed, to drink hot (31275: 12186, 12187, item 18635)."
     },
     {
       "npc": 564,
@@ -10528,6 +10787,7 @@
         {
           "message": 2411,
           "choices": [
+            { "reply": 26816, "quest": 1677, "beforeObjective": 10302, "next": 22274 },
             { "reply": 37654, "next": 31182, "quest": 1988, "afterObjective": 13997, "beforeObjective": 13998 }
           ]
         },
@@ -10536,9 +10796,21 @@
           "choices": [
             { "reply": 37653, "params": [905] }
           ]
+        },
+        {
+          "message": 22274,
+          "choices": [
+            { "reply": 26815, "next": 22275 }
+          ]
+        },
+        {
+          "message": 22275,
+          "choices": [
+            { "reply": 26814, "quest": 1677, "completes": 10302, "params": [[30, 10302]] }
+          ]
         }
       ],
-      "why": "Latem Odasep, the smiths' young apprentice [7,-16]: by «L'histoire en mouvement», the old book bought from Nacf Virgilio, just put in the fire (31182); «Abalanzarte hacia el fogón de la forja» is the fight against the forge's fire (npc_fights.json), and the burnt book comes out of it."
+      "why": "Latem Odasep, the smiths' young apprentice [7,-16]: by «L'histoire en mouvement», the old book bought from Nacf Virgilio, just put in the fire (31182); «Abalanzarte hacia el fogón de la forja» is the fight against the forge's fire (npc_fights.json), and the burnt book comes out of it. «Les paroles s'envolent, les aigris restent»: ten anvils at once, checked (22274), Hazel's messenger tofu is still here (22275: 10302)."
     },
     {
       "npc": 726,
@@ -12344,36 +12616,47 @@
     {
       "npc": 4351,
       "map": 188743686,
-      "opening": 31540,
-      "openings": [
-        { "quest": 1963, "objective": 14149, "pending": 14161, "message": 31539 },
-        { "after": 1963, "message": 31542 }
-      ],
+      "opening": 31521,
       "lines": [
         {
-          "message": 31540,
+          "message": 31521,
           "choices": [
-            { "reply": 38109, "next": 31541, "quest": 1963, "beforeObjective": 14149 }
+            { "reply": 69067, "quest": 2470, "beforeObjective": 18692, "next": 51469, "afterObjective": 18686 },
+            { "reply": 69071, "quest": 2470, "beforeObjective": 18687, "next": 51473, "afterObjective": 18692 }
           ]
         },
         {
-          "message": 31541,
+          "message": 51469,
           "choices": [
-            { "reply": 38108, "quest": 1963, "beforeObjective": 14149 }
+            { "reply": 69066, "next": 51470 }
           ]
         },
         {
-          "message": 31539,
+          "message": 51470,
           "choices": [
-            { "reply": 38107 }
+            { "reply": 69065, "quest": 2470, "completes": 18692, "params": [[30, 18692]] }
           ]
         },
         {
-          "message": 31542,
-          "choices": []
+          "message": 51473,
+          "choices": [
+            { "reply": 69070, "next": 51474 }
+          ]
+        },
+        {
+          "message": 51474,
+          "choices": [
+            { "reply": 69069, "next": 51475 }
+          ]
+        },
+        {
+          "message": 51475,
+          "choices": [
+            { "reply": 69068 }
+          ]
         }
       ],
-      "why": "The mercenary before the grocery [1,-16], by «Tournée d'inspection»: reading the Astrub gazette with a finger up his nose (31540), no orders from the character (31541), the paper snatched: the fight (npc_fights.json); back to work (31539); afterwards, a quiet city (31542)."
+      "why": "The Astrub mercenary before the grocery [1,-16]: nothing unusual (31521). «La routine anodine du chevalier citadin» of Dofus pour les noobs: a new recruit of the order (51469), «a rich and influential hero» (51470: 18692); the suspicious barrels «perfectly regulation» (51473), a Sram gang paid him (51474), the vilinsekts' share, the bulk of the cargo for a barrel (51475)."
     },
     {
       "npc": 4352,
@@ -13667,6 +13950,591 @@
         }
       ],
       "why": "Ness Ogal (Ness Lok), the steamers' diver, on the north shore of Astrub's pond [2,-21], by «L'étrange créature de l'étang bleu»: no stress (11853); the bait and the harness, the creature's lair found in the probes' echoes (11854: 5705, 5706), watch the water from the south side (11855); a huge pischis nearly drowned him (11856: 5710)."
+    },
+    {
+      "npc": 616,
+      "map": 0,
+      "opening": 2491,
+      "lines": [
+        {
+          "message": 2491,
+          "choices": [
+            { "reply": 24162, "quest": 1615, "beforeObjective": 9516, "next": 20194 }
+          ]
+        },
+        {
+          "message": 20194,
+          "choices": [
+            { "reply": 24161, "quest": 1615, "completes": 9516, "params": [[30, 9516]], "next": 20195 }
+          ]
+        },
+        {
+          "message": 20195,
+          "choices": []
+        }
+      ],
+      "why": "Brookita Pyrita by Astrub's mine [1,-17] (Dofus pour les noobs): her family of brave ones (2491). «Un rayon de soleil»: Hicha seen often, then no more (20194), the would-be underworld of Astrub, one by the fishers' workshop (20195: 9516)."
+    },
+    {
+      "npc": 2835,
+      "map": 0,
+      "opening": 20196,
+      "openings": [
+        { "quest": 1615, "objective": 9520, "message": 20207 },
+        { "after": 1615, "message": 20207 }
+      ],
+      "lines": [
+        {
+          "message": 20196,
+          "choices": [
+            { "reply": 24164, "quest": 1615, "completes": 9517, "params": [[30, 9517]], "next": 20197 },
+            { "reply": 24163, "quest": 1615, "beforeObjective": 9519, "next": 20198, "afterObjective": 9517 },
+            { "reply": 24172, "quest": 1615, "beforeObjective": 9520, "next": 20203, "afterObjective": 9519 }
+          ]
+        },
+        {
+          "message": 20197,
+          "choices": []
+        },
+        {
+          "message": 20198,
+          "choices": []
+        },
+        {
+          "message": 20203,
+          "choices": [
+            { "reply": 24171, "next": 20204 }
+          ]
+        },
+        {
+          "message": 20204,
+          "choices": [
+            { "reply": 24170, "next": 20205 }
+          ]
+        },
+        {
+          "message": 20205,
+          "choices": [
+            { "reply": 24169, "quest": 1615, "completes": 9520, "params": [[30, 9520]], "next": 20206 }
+          ]
+        },
+        {
+          "message": 20206,
+          "choices": []
+        },
+        {
+          "message": 20207,
+          "choices": []
+        }
+      ],
+      "why": "Éric by the lake [4,-20], who cannot catch a fish (20196). «Un rayon de soleil» of Dofus pour les noobs: done with the gang, an honest job wanted (20197: 9517), «I said I did not want to hear of it» (20198); the job with Enileda (20203), the artefact found underground (20204), Hicha set up (20205), shut in a hideout hidden in the quarry (20206: 9520); a quiet life now (20207)."
+    },
+    {
+      "npc": 503,
+      "map": 0,
+      "opening": 2375,
+      "lines": [
+        {
+          "message": 2375,
+          "choices": [
+            { "reply": 24168, "quest": 1615, "beforeObjective": 9519, "next": 20200, "afterObjective": 9518 },
+            { "reply": 1980, "next": 2376 }
+          ]
+        },
+        {
+          "message": 2376,
+          "choices": []
+        },
+        {
+          "message": 20200,
+          "choices": [
+            { "reply": 24167, "next": 20201 }
+          ]
+        },
+        {
+          "message": 20201,
+          "choices": [
+            { "reply": 24166, "quest": 1615, "completes": 9519, "params": [[30, 9519]], "next": 20202 }
+          ]
+        },
+        {
+          "message": 20202,
+          "choices": []
+        }
+      ],
+      "why": "Enileda, wood sculptor of Astrub [2,-16]: wands, staffs and bows (2375, 2376). «Un rayon de soleil» of Dofus pour les noobs: the woodcutter's advert (20200), Éric for the job, the sun question dodged (20201), the interview (20202: 9519)."
+    },
+    {
+      "npc": 2836,
+      "map": 0,
+      "opening": 20208,
+      "openings": [
+        { "quest": 1615, "objective": 9525, "message": 20212 }
+      ],
+      "lines": [
+        {
+          "message": 20208,
+          "choices": [
+            { "reply": 24173, "quest": 1615, "beforeObjective": 9523, "next": 20209, "afterObjective": 9522 },
+            { "reply": 24175, "quest": 1615, "completes": 9525, "params": [[30, 9525]], "next": 20212 }
+          ]
+        },
+        {
+          "message": 20209,
+          "choices": [
+            { "reply": 24174, "quest": 1615, "completes": 9523, "params": [[30, 9523]], "next": 20210 }
+          ]
+        },
+        {
+          "message": 20210,
+          "choices": []
+        },
+        {
+          "message": 20212,
+          "choices": []
+        }
+      ],
+      "why": "Hicha, the eliotrope held in the hideout under the quarry [10,-19], by «Un rayon de soleil» of Dofus pour les noobs: missing the sun (20208), a gas that inhibits his powers (20209), a portal where the bars are, the bulldog first (20210: 9523); the portal made, the artefact left behind (20212: 9525)."
+    },
+    {
+      "npc": 2837,
+      "map": 0,
+      "opening": 20211,
+      "lines": [
+        {
+          "message": 20211,
+          "choices": [
+            { "reply": 24176, "quest": 1615, "beforeObjective": 9524, "afterObjective": 9523 }
+          ]
+        }
+      ],
+      "why": "The guard bulldog of the hideout, by «Un rayon de soleil»: got rid of (the fight, npc_fights.json)."
+    },
+    {
+      "npc": 3078,
+      "map": 0,
+      "opening": 22276,
+      "lines": [
+        {
+          "message": 22276,
+          "choices": [
+            { "reply": 26819, "quest": 1677, "beforeObjective": 10303, "next": 22277, "afterObjective": 10302 }
+          ]
+        },
+        {
+          "message": 22277,
+          "choices": [
+            { "reply": 26818, "quest": 1677, "completes": 10303, "params": [[30, 10303]], "gives": 17466 },
+            { "reply": 26817, "next": 22277 }
+          ]
+        }
+      ],
+      "why": "The sleepy tofu in Astrub's forge [7,-16], by «Les paroles s'envolent, les aigris restent»: a sleepy look (22276), Hazel's voice ordering ten anvils (22277), taken back to her (10303, item 17466)."
+    },
+    {
+      "npc": 3050,
+      "map": 0,
+      "opening": 22268,
+      "openings": [
+        { "quest": 1677, "objective": 10314, "pending": 10315, "message": 22271 }
+      ],
+      "lines": [
+        {
+          "message": 22268,
+          "choices": [
+            { "reply": 26809, "quest": 1677, "beforeObjective": 10313, "next": 22269, "afterObjective": 10312 }
+          ]
+        },
+        {
+          "message": 22269,
+          "choices": [
+            { "reply": 26808, "quest": 1677, "completes": 10313, "params": [[30, 10313]] }
+          ]
+        },
+        {
+          "message": 22271,
+          "choices": [
+            { "reply": 26812, "next": 22273 }
+          ]
+        },
+        {
+          "message": 22273,
+          "choices": [
+            { "reply": 26810, "quest": 1677, "completes": 10315, "params": [[30, 10315]], "takes": 17470 }
+          ]
+        }
+      ],
+      "why": "Sojudas, Hazel's old whisperer messenger, hiding in Astrub's fields [4,-30], by «Les paroles s'envolent, les aigris restent» of Dofus pour les noobs: the bubbles, «lend me your pipe» (22268), «I do as I like», Petrita (22269: 10313, the fight); Petrita pulverised (22271), he gives in and promises (22273: 10315, the pipe handed over)."
+    },
+    {
+      "npc": 3714,
+      "map": 0,
+      "opening": 26702,
+      "lines": [
+        {
+          "message": 26702,
+          "choices": [
+            { "reply": 32085, "quest": 1841, "completes": 12173, "params": [[30, 12173]], "next": 26703 },
+            { "reply": 32084, "quest": 1841, "completes": 12173, "params": [[30, 12173]], "next": 26704 },
+            { "reply": 32098, "quest": 1841, "beforeObjective": 12181, "next": 26705, "afterObjective": 12173 }
+          ]
+        },
+        {
+          "message": 26703,
+          "choices": [
+            { "reply": 32084, "next": 26704 }
+          ]
+        },
+        {
+          "message": 26704,
+          "choices": [
+            { "reply": 32083, "next": 26705 }
+          ]
+        },
+        {
+          "message": 26705,
+          "choices": [
+            { "reply": 32082, "next": 26706 },
+            { "reply": 32081, "next": 26708 },
+            { "reply": 32080, "next": 26707 }
+          ]
+        },
+        {
+          "message": 26706,
+          "choices": [
+            { "reply": 32266, "next": 26705 }
+          ]
+        },
+        {
+          "message": 26707,
+          "choices": [
+            { "reply": 32266, "next": 26705 }
+          ]
+        },
+        {
+          "message": 26708,
+          "choices": [
+            { "reply": 32088, "next": 26709 },
+            { "reply": 32089, "next": 26710 },
+            { "reply": 32090, "next": 26711 }
+          ]
+        },
+        {
+          "message": 26709,
+          "choices": [
+            { "reply": 32266, "next": 26708 }
+          ]
+        },
+        {
+          "message": 26710,
+          "choices": [
+            { "reply": 32266, "next": 26708 }
+          ]
+        },
+        {
+          "message": 26711,
+          "choices": [
+            { "reply": 32095, "next": 26713 },
+            { "reply": 32093, "next": 26712 },
+            { "reply": 32096, "next": 26714 }
+          ]
+        },
+        {
+          "message": 26713,
+          "choices": [
+            { "reply": 32266, "next": 26711 }
+          ]
+        },
+        {
+          "message": 26714,
+          "choices": [
+            { "reply": 32266, "next": 26711 }
+          ]
+        },
+        {
+          "message": 26712,
+          "names": true,
+          "choices": [
+            { "reply": 32092, "quest": 1841, "completes": 12181, "params": [[30, 12181]] }
+          ]
+        }
+      ],
+      "why": "The disoriented ouginak, a recruit on guard by the stagecoach [0,-18], by «Une vie de milichien» of Dofus pour les noobs: «welcome to Astrub» (26702), not letting Lasy down (26703), lost giving directions (26704); the bank «à l'est» (26705), the equipment market «au sud de la taverne» (26708), Archi «dans la Tour du Conseil» (26711), a wrong answer asks «are you sure?» and the question again; thanked (26712: 12181)."
+    },
+    {
+      "npc": 3715,
+      "map": 0,
+      "opening": 26726,
+      "openings": [
+        { "quest": 1841, "objective": 12182, "pending": 12184, "message": 26727 },
+        { "quest": 1841, "objective": 12187, "pending": 12188, "message": 26727 },
+        { "after": 1841, "message": 26731 }
+      ],
+      "lines": [
+        {
+          "message": 26726,
+          "choices": [
+            { "reply": 32121, "quest": 1841, "completes": 12182, "params": [[30, 12182]] }
+          ]
+        },
+        {
+          "message": 26727,
+          "choices": [
+            { "reply": 32119, "quest": 1841, "completes": 12184, "params": [[30, 12184]], "next": 26728 },
+            { "reply": 32122, "quest": 1841, "completes": 12188, "params": [[30, 12188]], "next": 26730 }
+          ]
+        },
+        {
+          "message": 26728,
+          "choices": [
+            { "reply": 32118, "next": 26729 }
+          ]
+        },
+        {
+          "message": 26729,
+          "choices": [
+            { "reply": 32117 }
+          ]
+        },
+        {
+          "message": 26730,
+          "choices": [
+            { "reply": 32121 }
+          ]
+        },
+        {
+          "message": 26731,
+          "choices": []
+        }
+      ],
+      "why": "The allergic ouginak recruit, by «Une vie de milichien» of Dofus pour les noobs: a sneeze at her post [4,-21] (26726: 12182) before going to the fields [7,-24]; red eyes and a blocked nose (26727), allergy probably, how to cure it (26728: 12184), the workshop people (26729); the nettle infusion in one go (26730: 12188); the smell of cut cereals (26731)."
+    },
+    {
+      "npc": 3716,
+      "map": 0,
+      "opening": 26736,
+      "openings": [
+        { "quest": 1841, "objective": 12191, "pending": 12192, "message": 26737 }
+      ],
+      "lines": [
+        {
+          "message": 26736,
+          "choices": [
+            { "reply": 32129, "quest": 1841, "completes": 12189, "params": [[30, 12189]] }
+          ]
+        },
+        {
+          "message": 26737,
+          "choices": [
+            { "reply": 32131, "quest": 1841, "completes": 12192, "params": [[30, 12192]], "next": 26738 }
+          ]
+        },
+        {
+          "message": 26738,
+          "choices": [
+            { "reply": 32130 }
+          ]
+        }
+      ],
+      "why": "The scared ouginak recruit at [8,-18], by «Une vie de milichien»: chased by ecaflips, left alone by the other mercenaries (26736: 12189); «we gave them a good beating» (26737), he stood up for the character (26738: 12192)."
+    },
+    {
+      "npc": 3721,
+      "map": 0,
+      "opening": 26739,
+      "lines": [
+        {
+          "message": 26739,
+          "choices": [
+            { "reply": 32134, "quest": 1841, "beforeObjective": 12190, "next": 26740, "afterObjective": 12189 }
+          ]
+        },
+        {
+          "message": 26740,
+          "choices": [
+            { "reply": 32133, "next": 26741 }
+          ]
+        },
+        {
+          "message": 26741,
+          "choices": [
+            { "reply": 32132, "quest": 1841, "completes": 12190, "params": [[30, 12190]] }
+          ]
+        }
+      ],
+      "why": "The ecaflip rascal leading the gang at [8,-18], by «Une vie de milichien»: «another mangy cur» (26739), «go back where you came from» (26740), «we shall see» (26741: 12190), and the scared ouginak called to help (the fight)."
+    },
+    {
+      "npc": 6839,
+      "map": 0,
+      "opening": 51452,
+      "openings": [
+        { "after": 2470, "before": 1960, "message": 51794 }
+      ],
+      "lines": [
+        {
+          "message": 51452,
+          "choices": [
+            { "reply": 69040, "next": 51453, "beforeQuest": 2470 },
+            { "reply": 69080, "quest": 2470, "completes": 18691, "params": [[30, 18691]], "next": 51485 },
+            { "reply": 69514, "next": 51790 }
+          ]
+        },
+        {
+          "message": 51453,
+          "choices": [
+            { "reply": 69039, "next": 51454 }
+          ]
+        },
+        {
+          "message": 51454,
+          "choices": [
+            { "reply": 69041, "next": 51455 }
+          ]
+        },
+        {
+          "message": 51455,
+          "choices": [
+            { "reply": 69042, "startsQuest": 2470, "params": [[34, 2470]] }
+          ]
+        },
+        {
+          "message": 51485,
+          "choices": [
+            { "reply": 69079, "next": 51486 }
+          ]
+        },
+        {
+          "message": 51486,
+          "choices": [
+            { "reply": 69078, "next": 51791 }
+          ]
+        },
+        {
+          "message": 51791,
+          "choices": [
+            { "reply": 69516, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
+        },
+        {
+          "message": 51794,
+          "choices": [
+            { "reply": 69519, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
+        },
+        {
+          "message": 51790,
+          "choices": []
+        }
+      ],
+      "why": "Iván Dicta (Yvain Dykt), head of the Order of the Knights of Astrub, in the order's hall [4,-19] of the Council Tower, by «La routine anodine du chevalier citadin» (2470) of Dofus pour les noobs: the city's business going well (51452), «Demander à intégrer l'ordre», not yet (51453), a patrol with a seasoned forgelance (51454), sir André Scancio (51455); the patrol reported, counterfeit hydromel (51485: 18691), André's reward (51486), Archi first (51791, 51794). Astrub's first steps (51790)."
+    },
+    {
+      "npc": 6840,
+      "map": 0,
+      "opening": 51456,
+      "openings": [
+        { "quest": 2470, "objective": 18678, "pending": 18680, "message": 51464 },
+        { "quest": 2470, "objective": 18680, "pending": 18682, "message": 51466 },
+        { "quest": 2470, "objective": 18682, "pending": 18686, "message": 51467 },
+        { "quest": 2470, "objective": 18692, "pending": 18687, "message": 51471 },
+        { "quest": 2470, "objective": 18693, "pending": 18689, "message": 51483 }
+      ],
+      "lines": [
+        {
+          "message": 51456,
+          "choices": [
+            { "reply": 69043, "quest": 2470, "beforeObjective": 18678, "next": 51457 }
+          ]
+        },
+        {
+          "message": 51457,
+          "names": true,
+          "choices": [
+            { "reply": 69045, "next": 51460 },
+            { "reply": 69051, "next": 51597 }
+          ]
+        },
+        {
+          "message": 51597,
+          "choices": [
+            { "reply": 69247, "next": 51598 }
+          ]
+        },
+        {
+          "message": 51598,
+          "choices": [
+            { "reply": 69045, "next": 51460 }
+          ]
+        },
+        {
+          "message": 51460,
+          "choices": [
+            { "reply": 69048, "next": 51461 }
+          ]
+        },
+        {
+          "message": 51461,
+          "choices": [
+            { "reply": 69047, "quest": 2470, "completes": 18678, "params": [[30, 18678]] }
+          ]
+        },
+        {
+          "message": 51464,
+          "choices": [
+            { "reply": 69053, "next": 51465 }
+          ]
+        },
+        {
+          "message": 51465,
+          "choices": [
+            { "reply": 69052, "quest": 2470, "completes": 18680, "params": [[30, 18680]] }
+          ]
+        },
+        {
+          "message": 51466,
+          "choices": [
+            { "reply": 69054, "quest": 2470, "completes": 18682, "params": [[30, 18682]] }
+          ]
+        },
+        {
+          "message": 51467,
+          "choices": [
+            { "reply": 69052, "next": 51468 }
+          ]
+        },
+        {
+          "message": 51468,
+          "choices": [
+            { "reply": 69055, "quest": 2470, "completes": 18686, "params": [[30, 18686]] }
+          ]
+        },
+        {
+          "message": 51471,
+          "choices": [
+            { "reply": 69060, "next": 51472 }
+          ]
+        },
+        {
+          "message": 51472,
+          "choices": [
+            { "reply": 69059 }
+          ]
+        },
+        {
+          "message": 51483,
+          "choices": [
+            { "reply": 69077, "next": 51484 }
+          ]
+        },
+        {
+          "message": 51484,
+          "choices": [
+            { "reply": 69076, "quest": 2470, "completes": 18689, "params": [[30, 18689]] }
+          ]
+        }
+      ],
+      "why": "Sir André Scancio, knight of the Order of Astrub, on his routine patrol by «La routine anodine du chevalier citadin» of Dofus pour les noobs: too calm (51456), sent by Iván (51457), never left the city, useful to people (51460), south and east of the city (51461: 18678); the library and its calm (51464, 51465: 18680), the jewelers' workshop (51466: 18682), the grocery and the mercenary (51467, 51468: 18686); an orange puddle, counterfeit hydromel (51471, 51472); the Sram gang beaten (51483), Iván to be told (51484: 18689). The order (51597, 51598)."
     }
   ]
 }

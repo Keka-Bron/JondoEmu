@@ -936,8 +936,23 @@ namespace Jondo.Unity.Server.Handlers
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
             if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
             if (NotItsTurnYet(choice)) return false;
+            if (!ItsQuestIsOpenToHim(choice)) return false;
             if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
             return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) >= choice.TakesCount;
+        }
+
+        /// <summary>
+        /// Whether the quest a reply hands over, or leads into («beforeQuest»), is one this character
+        /// may take: its own start condition, the class of a class quest above all. Saketsú's «Informarte
+        /// sobre el culto de Sacrógrito.» is for sacriers; a huppermage was offered the whole talk and
+        /// refused the quest at its end.
+        /// </summary>
+        private static bool ItsQuestIsOpenToHim(Jondo.Unity.World.Content.DialogueChoice choice)
+        {
+            int quest = choice.StartsQuest != 0 ? choice.StartsQuest : choice.BeforeQuest;
+            if (quest == 0) return true;
+            var diario = SessionContext.State.Quests;
+            return diario == null || diario.CanStart(quest, out _);
         }
 
         /// <summary>
@@ -975,6 +990,7 @@ namespace Jondo.Unity.Server.Handlers
                 // A reply that hands over what an objective asks for, only to whoever carries it.
                 if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
                 if (NotItsTurnYet(choice)) return false;
+                if (!ItsQuestIsOpenToHim(choice)) return false;
                 if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
                 return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) >= choice.TakesCount;
             }).ToArray();

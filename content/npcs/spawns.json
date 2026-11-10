@@ -2000,6 +2000,132 @@
       "orientation": 5,
       "criterion": "Qa=716&Qo=4650&Qo!14079",
       "why": "The scalded tymadores out of their barrel (4650) until beaten (14079). INFERRED cell, by the barrels."
+    },
+    {
+      "map": 188743685,
+      "npc": 616,
+      "cell": 413,
+      "orientation": 1,
+      "why": "Brookita Pyrita by the mouth of Astrub's mine [1,-17] (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 188483080,
+      "npc": 2836,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1615&Qo!9526",
+      "why": "Hicha held behind the bars of the hideout until the artefact is taken back."
+    },
+    {
+      "map": 188483080,
+      "npc": 2837,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qa=1615&Qo!9524",
+      "why": "The guard bulldog, before Hicha's bars, until beaten. INFERRED cell."
+    },
+    {
+      "map": 191106052,
+      "npc": 4313,
+      "cell": 318,
+      "orientation": 3,
+      "why": "Hazel Emental, the huppermages' master, at [6,-17] (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 192939010,
+      "npc": 3078,
+      "cell": 373,
+      "orientation": 5,
+      "criterion": "Qa=1677&Qo!10303",
+      "why": "The sleepy messenger tofu in Astrub's forge, until taken back to Hazel. INFERRED cell."
+    },
+    {
+      "map": 189792769,
+      "npc": 3050,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qa=1677&Qo=10311",
+      "why": "Sojudas the whisperer, found by the bubble pipe's trail (10309-10311)."
+    },
+    {
+      "map": 188745217,
+      "npc": 3715,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1841&Qo!12182",
+      "why": "The allergic recruit at her post [4,-21], until she goes off to the fields. INFERRED cell."
+    },
+    {
+      "map": 189794311,
+      "npc": 3715,
+      "cell": 370,
+      "orientation": 1,
+      "criterion": "Qa=1841&Qo=12182|Qf=1841",
+      "why": "The allergic recruit in Astrub's fields [7,-24] (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 193332228,
+      "npc": 3719,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qa=1841&Qo!12191",
+      "why": "One of the three ecaflips harassing the scared recruit, until beaten. INFERRED cell."
+    },
+    {
+      "map": 193332228,
+      "npc": 3720,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1841&Qo!12191",
+      "why": "One of the three ecaflips harassing the scared recruit, until beaten. INFERRED cell."
+    },
+    {
+      "map": 193332228,
+      "npc": 3721,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=1841&Qo!12191",
+      "why": "The ecaflip rascal leading them, until beaten."
+    },
+    {
+      "map": 188745734,
+      "npc": 6840,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=2470&Qo!18678",
+      "why": "Sir André Scancio on the market square south of Astrub [5,-16], where Iván sends the character. INFERRED cell."
+    },
+    {
+      "map": 188746755,
+      "npc": 6840,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qa=2470&Qo=18678&Qo!18680",
+      "why": "Sir André before the library [7,-19], first stop of the patrol. INFERRED cell."
+    },
+    {
+      "map": 188746247,
+      "npc": 6840,
+      "cell": 230,
+      "orientation": 1,
+      "criterion": "Qa=2470&Qo=18680&Qo!18682",
+      "why": "Sir André before the jewelers' workshop [6,-15]. INFERRED cell."
+    },
+    {
+      "map": 188743686,
+      "npc": 6840,
+      "cell": 290,
+      "orientation": 3,
+      "criterion": "Qa=2470&Qo=18682&Qo!18687",
+      "why": "Sir André before the grocery [1,-16], with the mercenary. INFERRED cell."
+    },
+    {
+      "map": 188744710,
+      "npc": 6840,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "(Qa=2470&Qo=18692)|Qf=2470",
+      "why": "Sir André at the hydromel cargo [3,-16], from the mercenary's confession, and afterwards watching the barrels. INFERRED cell."
     }
   ]
 }

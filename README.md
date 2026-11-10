@@ -676,10 +676,10 @@ played through.
 
 | Area | Played | Quests |
 |---|:---|:---:|
-| Astrub | `███████░░░` **73%** | 37/51 |
+| Astrub | `██████████` **100%** | 51/51 |
 | Incarnam | `██████████` **100%** | 24/24 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
-| **All quests** | **3.3%** | **66/1976** |
+| **All quests** | **4.0%** | **80/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

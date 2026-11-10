@@ -169,6 +169,18 @@
     { "npc": 4474, "map": 188744706, "reply": 38226,
       "monsters": [ { "monster": 5298, "grade": 0 } ] },
     { "npc": 4445, "map": 192676866, "reply": 37808,
-      "monsters": [ { "monster": 5265, "grade": 0 }, { "monster": 5265, "grade": 0 } ] }
+      "monsters": [ { "monster": 5265, "grade": 0 }, { "monster": 5265, "grade": 0 } ] },
+    { "npc": 2837, "map": 188483080, "reply": 24176,
+      "monsters": [ { "monster": 3980, "grade": 0 } ] },
+    { "npc": 1502, "map": 192413702, "reply": 26825,
+      "monsters": [ { "monster": 4288, "grade": 0 } ] },
+    { "npc": 3050, "map": 189792769, "reply": 26808,
+      "monsters": [ { "monster": 4289, "grade": 0 } ] },
+    { "npc": 3721, "map": 193332228, "reply": 32132,
+      "monsters": [ { "monster": 4791, "grade": 0 }, { "monster": 4792, "grade": 0 }, { "monster": 4793, "grade": 0 } ],
+      "allies": [ { "monster": 4794, "grade": 0 } ] },
+    { "npc": 4335, "map": 188744710, "reply": 69072,
+      "monsters": [ { "monster": 7286, "grade": 0 }, { "monster": 7286, "grade": 0 } ],
+      "allies": [ { "monster": 7287, "grade": 0 } ] }
   ]
 }
