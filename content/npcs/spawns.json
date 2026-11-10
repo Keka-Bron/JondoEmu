@@ -835,7 +835,7 @@
     {
       "map": 188486154,
       "npc": 4417,
-      "cell": 203,
+      "cell": 217,
       "orientation": 1,
       "criterion": "Qo!13937|Qo=13940",
       "why": "The other veteran móguard, on the chest's other side; away like his colleague. INFERRED."
@@ -847,6 +847,22 @@
       "orientation": 1,
       "criterion": "Qa=1960&Qo!13940",
       "why": "Rathrosk at the móguices' machine, until he leaves the room with the character (13940). INFERRED: the middle of the machine room."
+    },
+    {
+      "map": 192414726,
+      "npc": 4443,
+      "cell": 370,
+      "orientation": 3,
+      "criterion": "Qo=13942",
+      "why": "Rathrosk as a squirrel in the council chamber, once the character has brought him there (13942, «Aquí huele a gas»). The cell is the derived layer's."
+    },
+    {
+      "map": 101717512,
+      "npc": 4414,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa!1960|Qo=13934",
+      "why": "Ramán Hitu, chief of the Strubian rats: during «Aquí huele a gas» he only arrives once his hungry rats are beaten (13934; Dofus pour les noobs: «parlez au chef Ramane Hitoo qui est enfin arrivé»). The cell is the derived layer's."
     }
   ]
 }

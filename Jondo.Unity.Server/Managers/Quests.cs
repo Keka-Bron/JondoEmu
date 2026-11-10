@@ -504,16 +504,18 @@ namespace Jondo.Unity.Server.Managers
             // An element that only hands something over: given once, the objective left alone.
             if (binding.OnlyGives)
             {
+                bool gave = false;
                 foreach (var (item, count) in binding.Gives)
                 {
                     if (Equipment.HowMany(item) > 0) continue;
                     if (!await Equipment.GiveAsync(stream, item, count)) continue;
+                    gave = true;
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
                             InfoMessages.ItemGained, count.ToString(CultureInfo.InvariantCulture),
                             item.ToString(CultureInfo.InvariantCulture))));
                 }
-                return false;
+                return gave;
             }
 
             bool talkFirst = binding.Kind == QuestBindingKind.Talk;
