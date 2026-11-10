@@ -52,6 +52,17 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A passage with a criterion opens only for whoever meets it: a vilinsekt's hideout to
+            // the rikiki wand worn. Refused, the client hears why, as for an item's criterion.
+            if (route.Criterion.Length > 0 && !Managers.ItemCriteria.Holds(route.Criterion))
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                        Managers.InfoMessages.Warning, Managers.ItemCriteria.RefusalOf(route.Criterion))));
+                Console.WriteLine($"[Teleport] Element {elementId} on {sourceMapId}: «{route.Criterion}» not met.");
+                return;
+            }
+
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
                     elementId, skillId, SessionContext.State.CharacterId)));

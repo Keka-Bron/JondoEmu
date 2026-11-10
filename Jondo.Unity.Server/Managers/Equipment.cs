@@ -756,6 +756,10 @@ namespace Jondo.Unity.Server.Managers
             return now - DateTimeOffset.FromUnixTimeSeconds(latest.Value);
         }
 
+        /// <summary>How many of a template are equipped, out of the bag.</summary>
+        public static int HowManyWorn(int template)
+            => Items.Values.Where(i => i.Template == template && IsWorn(i.Position)).Sum(i => i.Quantity);
+
         public static int HowMany(int template)
         {
             int total = 0;

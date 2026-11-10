@@ -40,6 +40,12 @@ namespace Jondo.Unity.World.Content
 
         public int DestinationCell { get; init; }
 
+        /// <summary>
+        /// What whoever takes it has to meet, in the criterion language; empty for anybody. A
+        /// vilinsekt's hideout opens only to the rikiki wand worn: «POE15990,1».
+        /// </summary>
+        public string Criterion { get; init; }
+
         public override string ToString()
             => $"{SourceMapId}/{ElementId} → {DestinationMapId}@{DestinationCell}";
     }
@@ -127,6 +133,8 @@ namespace Jondo.Unity.World.Content
                             ? id : DefaultSkill,
                         DestinationMapId = Long(entry, "toMap"),
                         DestinationCell = (int)Long(entry, "toCell"),
+                        Criterion = entry.TryGetProperty("criterion", out var criterion) &&
+                                    criterion.ValueKind == JsonValueKind.String ? criterion.GetString() ?? "" : "",
                     }, from);
                 }
             }
@@ -222,6 +230,7 @@ namespace Jondo.Unity.World.Content
                     writer.WriteNumber("skill", passage.SkillId);
                     writer.WriteNumber("toMap", passage.DestinationMapId);
                     writer.WriteNumber("toCell", passage.DestinationCell);
+                    if (!string.IsNullOrEmpty(passage.Criterion)) writer.WriteString("criterion", passage.Criterion);
                     writer.WriteEndObject();
                 }
 

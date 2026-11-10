@@ -141,6 +141,9 @@ namespace Jondo.Unity.Server.Managers
                 // A spell known: «PT!24006&PT!350» on Llamita's scroll, neither of its pair yet; and
                 // the soul stones' «PT=413», Captura de Almas.
                 "PT" => KnowsSpell((int)key) ? 1 : 0,
+
+                // An item worn: «POE15990,1», the rikiki wand in hand.
+                "POE" => Equipment.HowManyWorn((int)key),
                 _ => Character.Count(op, key, flag),
             };
         }

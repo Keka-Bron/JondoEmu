@@ -402,8 +402,12 @@ namespace Jondo.Unity.World.Quests
             /// </remarks>
             private bool? ByFacts(string op, char comparison, List<string> values)
             {
-                // POE14271: Ankama's typo for '=', see Term.
-                if (comparison == 'E') comparison = '=';
+                // «POE15990,1»: the rikiki wand worn, which is what opens a vilinsekt's hideout
+                // («Il suffit d'équiper la baguette Rikiki pour entrer»). PO with E counts what is
+                // equipped, asked of the facts as "POE"; the comparison is then '='.
+                bool worn = comparison == 'E';
+                if (worn) comparison = '=';
+                if (worn && op == "PO") op = "POE";
                 if (!long.TryParse(values[0], out long first)) return null;
 
                 // DD>7,31582: more than seven days since item 31582 was received -- the days first,

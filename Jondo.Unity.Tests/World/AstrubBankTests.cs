@@ -59,8 +59,10 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Inside, the bank's own two bankers behind their counter, facing it, and Abel Hoz in the
-        /// room; not the generic owl. The counter is the unwalkable diagonal 258-272-287-301-316.
+        /// Inside, the bank's own two bankers behind their counter, facing it; not the generic owl.
+        /// The counter is the unwalkable diagonal 258-272-287-301-316. Abel Hoz is placed in the
+        /// room, but only comes in while «Ça tombe à l'eau» has him there: he is on the map, not
+        /// shown to a character with no quest.
         /// </summary>
         [Fact]
         public void Its_own_bankers_stand_behind_the_counter()
@@ -81,7 +83,8 @@ namespace Jondo.Unity.Tests.World
                 foreach (int counter in new[] { 287, 330 }) Assert.DoesNotContain(counter, floor);
             Assert.Equal(1, MapGeometry.Distance(273, 287));
             Assert.Equal(1, MapGeometry.Distance(317, 330));
-            Assert.Contains(4410, inside);
+            Assert.DoesNotContain(4410, inside);
+            Assert.Contains(Npcs.Of(Room), s => s.NpcId == 4410 && s.Criterion.Length > 0);
             Assert.DoesNotContain(100, inside);
             Assert.NotNull(Bankers.Of(520));
             Assert.NotNull(Bankers.Of(522));

@@ -482,6 +482,7 @@ namespace Jondo.Unity.Server.Managers
                     SkillId = passage.SkillId,
                     DestinationMapId = passage.DestinationMapId,
                     DestinationCellId = passage.DestinationCell,
+                    Criterion = passage.Criterion ?? "",
                     SourceVersion = "Jondo Studio",
                     Confidence = "authored",
                 };

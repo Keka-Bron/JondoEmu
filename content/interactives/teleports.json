@@ -68,7 +68,14 @@
     "THE TEMPORAL ANOMALIES' PORTALS, measured in the two anomaly captures (content/anomalies/places.json):",
     "Noximilian's Workshop and Bonta Palace between entry and room as the iwn and the arrival cell in",
     "the jss show them -- skill 184, type -1, where the graph has 114 and an approximate cell --, and",
-    "Qilby's place and Aguabrial's Cavern, which the graph lacks."
+    "Qilby's place and Aguabrial's Cavern, which the graph lacks.",
+    "",
+    "THE VILINSEKTS' HIDEOUTS. «Los ases del hurto» (Dofus pour les noobs: «Il suffit d'équiper la",
+    "baguette Rikiki pour entrer dans leur planque») sends the character into the tiny thieves'",
+    "hideouts. The holes (gfx 47284) are in the client's maps of the houses at [6,-15], [4,-19] (the",
+    "Council Tower) and Kerubim's shop; the graph has only the shop's, with the criterion",
+    "«POE15990,1», the rikiki wand worn, which the others are given too. The hideouts' own holes",
+    "(47359, 47343) lead back."
   ],
   "passages": [
     {
@@ -297,6 +304,11 @@
     {"map": 152836096, "element": 25003, "npc": 2911, "cell": 344, "gfx": 0, "type": -1, "skill": 0, "toMap": 153881088, "toCell": 298},
     {"map": 152835072, "element": 24990, "npc": 2936, "cell": 262, "gfx": 0, "type": -1, "skill": 0, "toMap": 152836096, "toCell": 373},
     {"map": 152835072, "element": 24996, "npc": 2936, "cell": 262, "gfx": 0, "type": -1, "skill": 0, "toMap": 152836096, "toCell": 373},
-    {"map": 152835072, "element": 25015, "npc": 2936, "cell": 262, "gfx": 0, "type": -1, "skill": 0, "toMap": 152836096, "toCell": 373}
+    {"map": 152835072, "element": 25015, "npc": 2936, "cell": 262, "gfx": 0, "type": -1, "skill": 0, "toMap": 152836096, "toCell": 373},
+    {"map": 192939014, "element": 515804, "cell": 230, "gfx": 47284, "type": 0, "skill": 114, "toMap": 147062784, "toCell": 344, "criterion": "POE15990,1"},
+    {"map": 147062784, "element": 507617, "cell": 329, "gfx": 47359, "type": 0, "skill": 114, "toMap": 192939014, "toCell": 244},
+    {"map": 192545798, "element": 515384, "cell": 311, "gfx": 47284, "type": 0, "skill": 114, "toMap": 147063810, "toCell": 394, "criterion": "POE15990,1"},
+    {"map": 147063810, "element": 507618, "cell": 393, "gfx": 47343, "type": 0, "skill": 114, "toMap": 192545798, "toCell": 325},
+    {"map": 103547392, "element": 516612, "cell": 319, "gfx": 47284, "type": 0, "skill": 114, "toMap": 195300356, "toCell": 163, "criterion": "POE15990,1"}
   ]
 }
