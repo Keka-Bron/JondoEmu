@@ -773,22 +773,11 @@
           "message": 30758,
           "choices": [
             { "reply": 37138, "next": 30760, "completes": 13894, "params": [[30, 13894]] },
+            { "reply": 37138, "next": 30760, "beforeQuest": 938 },
+            { "reply": 37146, "quest": 938, "completes": 5702, "params": [[30, 5702]], "next": 30765 },
+            { "reply": 37150, "quest": 938, "completes": 5711, "params": [[30, 5711]], "next": 30766 },
+            { "reply": 37137, "next": 30759 },
             { "reply": 38051, "quest": 1977, "completes": 14113, "params": [[30, 14113]], "next": 31494 },
-            { "reply": 38050 }
-          ]
-        },
-        {
-          "message": 11844,
-          "choices": [
-            { "reply": 37141, "startsQuest": 938 },
-            { "reply": 38050 }
-          ]
-        },
-        {
-          "message": 30760,
-          "names": true,
-          "choices": [
-            { "reply": 37141, "startsQuest": 938 },
             { "reply": 38050 }
           ]
         },
@@ -803,9 +792,67 @@
           "choices": [
             { "reply": 38050 }
           ]
+        },
+        {
+          "message": 30759,
+          "choices": [
+            { "reply": 38050 }
+          ]
+        },
+        {
+          "message": 30760,
+          "names": true,
+          "choices": [
+            { "reply": 37139, "next": 30761, "beforeQuest": 938 },
+            { "reply": 38050 }
+          ]
+        },
+        {
+          "message": 30761,
+          "choices": [
+            { "reply": 37144, "next": 30762 }
+          ]
+        },
+        {
+          "message": 30762,
+          "choices": [
+            { "reply": 37143, "next": 30763 }
+          ]
+        },
+        {
+          "message": 30763,
+          "choices": [
+            { "reply": 37141, "next": 30764 },
+            { "reply": 37142 }
+          ]
+        },
+        {
+          "message": 30764,
+          "choices": [
+            { "reply": 37140, "startsQuest": 938, "params": [[34, 938]], "gives": 13266, "givesCount": 4 }
+          ]
+        },
+        {
+          "message": 30765,
+          "choices": [
+            { "reply": 37145 }
+          ]
+        },
+        {
+          "message": 30766,
+          "names": true,
+          "choices": [
+            { "reply": 37149, "next": 30767 }
+          ]
+        },
+        {
+          "message": 30767,
+          "choices": [
+            { "reply": 37148, "startsQuest": 1960, "params": [[34, 1960]] }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (938) is done, he greets the character with Archi's summons (30768) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14113), and the answer (31494)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (938) is done, he greets the character with Archi's summons (30768) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14113), and the answer (31494). «L'étrange créature de l'étang bleu» (938) of Dofus pour les noobs: welcomed to Astrub (30760), the Council of the Sea's new steamers (30761), the creature at the bottom of Astrub's pond (30762), «Répondre que vous êtes d'accord» (30763), Ness Ogal's dive and four sonoprobes to lay (30764, item 13266 x4); the probes laid, bait from Bish Fone and a harness (30765: 5702); proud of the character (30766: 5711), Sufokia later, Archi now (30767). The young steamers of Astrub (30759)."
     },
     {
       "npc": 4317,
@@ -819,21 +866,14 @@
           "message": 30773,
           "choices": [
             { "reply": 37160, "next": 30775, "completes": 13893, "params": [[30, 13893]] },
-            { "reply": 37179 }
-          ]
-        },
-        {
-          "message": 8766,
-          "choices": [
-            { "reply": 37181, "startsQuest": 716 },
-            { "reply": 37179 }
-          ]
-        },
-        {
-          "message": 30775,
-          "names": true,
-          "choices": [
-            { "reply": 37181, "startsQuest": 716 },
+            { "reply": 37160, "next": 30775, "beforeQuest": 716 },
+            { "reply": 37181, "quest": 716, "completes": 4640, "params": [[30, 4640]], "next": 30792 },
+            { "reply": 37183, "quest": 716, "completes": 4644, "params": [[30, 4644]], "next": 30793, "gives": 12279 },
+            { "reply": 37185, "quest": 716, "completes": 4646, "params": [[30, 4646]], "next": 30794 },
+            { "reply": 37188, "quest": 716, "beforeObjective": 4647, "next": 30795, "afterObjective": 4646 },
+            { "reply": 37189, "quest": 716, "completes": 4651, "params": [[30, 4651]], "next": 30797 },
+            { "reply": 37193, "quest": 716, "completes": 4652, "params": [[30, 4652]], "next": 30798 },
+            { "reply": 37159, "next": 30774 },
             { "reply": 37179 }
           ]
         },
@@ -842,9 +882,163 @@
           "choices": [
             { "reply": 37195, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 30774,
+          "choices": [
+            { "reply": 37179 }
+          ]
+        },
+        {
+          "message": 30775,
+          "names": true,
+          "choices": [
+            { "reply": 37165, "next": 30776 },
+            { "reply": 37170, "next": 30783 },
+            { "reply": 37179 }
+          ]
+        },
+        {
+          "message": 30776,
+          "choices": [
+            { "reply": 37164, "next": 30777 }
+          ]
+        },
+        {
+          "message": 30777,
+          "choices": [
+            { "reply": 37163, "next": 30778 }
+          ]
+        },
+        {
+          "message": 30778,
+          "choices": [
+            { "reply": 37162, "next": 30779 }
+          ]
+        },
+        {
+          "message": 30779,
+          "choices": [
+            { "reply": 37161, "next": 30780 }
+          ]
+        },
+        {
+          "message": 30780,
+          "choices": [
+            { "reply": 37168, "next": 30781 }
+          ]
+        },
+        {
+          "message": 30781,
+          "choices": [
+            { "reply": 37167, "next": 30782 }
+          ]
+        },
+        {
+          "message": 30782,
+          "choices": [
+            { "reply": 37166, "startsQuest": 716, "params": [[34, 716]], "gives": 12277 }
+          ]
+        },
+        {
+          "message": 30783,
+          "choices": [
+            { "reply": 37169, "next": 30784 }
+          ]
+        },
+        {
+          "message": 30784,
+          "choices": [
+            { "reply": 37171, "next": 30785 }
+          ]
+        },
+        {
+          "message": 30785,
+          "choices": [
+            { "reply": 37178, "next": 30786 },
+            { "reply": 37179 }
+          ]
+        },
+        {
+          "message": 30786,
+          "choices": [
+            { "reply": 37177, "next": 30787 }
+          ]
+        },
+        {
+          "message": 30787,
+          "choices": [
+            { "reply": 37176, "next": 30788 }
+          ]
+        },
+        {
+          "message": 30788,
+          "choices": [
+            { "reply": 37175, "next": 30789 }
+          ]
+        },
+        {
+          "message": 30789,
+          "choices": [
+            { "reply": 37174, "next": 30790 }
+          ]
+        },
+        {
+          "message": 30790,
+          "choices": [
+            { "reply": 37173, "next": 30791 }
+          ]
+        },
+        {
+          "message": 30791,
+          "choices": [
+            { "reply": 37172, "startsQuest": 716, "params": [[34, 716]], "gives": 12277 }
+          ]
+        },
+        {
+          "message": 30792,
+          "choices": [
+            { "reply": 37180 }
+          ]
+        },
+        {
+          "message": 30793,
+          "choices": [
+            { "reply": 37182 }
+          ]
+        },
+        {
+          "message": 30794,
+          "choices": [
+            { "reply": 37184 }
+          ]
+        },
+        {
+          "message": 30795,
+          "choices": [
+            { "reply": 37187, "next": 30796 }
+          ]
+        },
+        {
+          "message": 30796,
+          "choices": [
+            { "reply": 37186, "quest": 716, "completes": 4647, "params": [[30, 4647]] }
+          ]
+        },
+        {
+          "message": 30797,
+          "choices": [
+            { "reply": 37190 }
+          ]
+        },
+        {
+          "message": 30798,
+          "choices": [
+            { "reply": 37194, "next": 30800 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37160) is this class's objective (13893, effect 30), and leads to his greeting, 30775, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (716) is done, he greets the character with Archi's summons (30800) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37160) is this class's objective (13893, effect 30). «Zobal Hibaba et les 40 Roublards» (716) of Dofus pour les noobs: only a mask will do (30775), Bono's gang wants his mask and skin (30776), «Soy Zam, ábrete» and the cave (30777, 30778), the loot, his brother Qasín in skewers (30779, 30780), the bank and a power of attorney (30781, 30782; item 12277) -- or the same story from Zam Bono's name (30783-30791); keep the kamas, oil from Kompra Varatho, spark potions from the Mago de Zo (30792: 4640); the party's posters for Bajofrente (30793: 4644, item 12279); Marp's house (30794: 4646); Bono hidden in barrels, Ana Morgi in the cellar (30795, 30796: 4647); the plan worked, the tailors' workshop (30797: 4651); Bono's gang wiped out, Zam got away (30798: 4652), Archi's summons (30800). Astrub's young zobals (30774)."
     },
     {
       "npc": 4318,
@@ -858,21 +1052,10 @@
           "message": 30801,
           "choices": [
             { "reply": 37199, "next": 30804, "completes": 13892, "params": [[30, 13892]] },
-            { "reply": 37205 }
-          ]
-        },
-        {
-          "message": 8677,
-          "choices": [
-            { "reply": 37212, "startsQuest": 704 },
-            { "reply": 37205 }
-          ]
-        },
-        {
-          "message": 30804,
-          "names": true,
-          "choices": [
-            { "reply": 37212, "startsQuest": 704 },
+            { "reply": 37199, "next": 30804, "beforeQuest": 704 },
+            { "reply": 37212, "next": 30812, "quest": 704, "completesAll": [4559, 4560], "params": [[30, 4560]], "gives": 12123 },
+            { "reply": 37213, "next": 30814, "quest": 704, "completes": 4564, "params": [[30, 4564]] },
+            { "reply": 37198, "next": 30802 },
             { "reply": 37205 }
           ]
         },
@@ -881,9 +1064,65 @@
           "choices": [
             { "reply": 37216, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 30802,
+          "choices": [
+            { "reply": 37197, "next": 30803 }
+          ]
+        },
+        {
+          "message": 30803,
+          "choices": [
+            { "reply": 37196 }
+          ]
+        },
+        {
+          "message": 30804,
+          "names": true,
+          "choices": [
+            { "reply": 37200, "next": 30805, "beforeQuest": 704 },
+            { "reply": 37205 }
+          ]
+        },
+        {
+          "message": 30805,
+          "choices": [
+            { "reply": 37203, "next": 30806 }
+          ]
+        },
+        {
+          "message": 30806,
+          "choices": [
+            { "reply": 37202, "next": 30807 }
+          ]
+        },
+        {
+          "message": 30807,
+          "choices": [
+            { "reply": 37201, "startsQuest": 704, "params": [[34, 704]] }
+          ]
+        },
+        {
+          "message": 30812,
+          "choices": [
+            { "reply": 37211, "next": 30813 }
+          ]
+        },
+        {
+          "message": 30813,
+          "choices": [
+            { "reply": 37210 }
+          ]
+        },
+        {
+          "message": 30814,
+          "choices": [
+            { "reply": 37215, "next": 30816 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37199) is this class's objective (13892, effect 30), and leads to his greeting, 30804, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (704) is done, he greets the character with Archi's summons (30816) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37199) is this class's objective (13892, effect 30), and leads to his greeting, 30804, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (704) is done, he greets the character with Archi's summons (30816) and «Ir a la Torre del Consejo» hands it over. «Braquage à la Roublard» (704) of Dofus pour les noobs: who he is, Vil Smis (30804), the initiation spared, a first mission (30805), a parcel from the alchemists' workshop (30806), Clint Pot's fumarole dust (30807); both handed over, an artificial smoke fairy (30812: 4559, 4560, item 12123), the giant kama of the bank (30813); the coin handed over, sweets... weapons (30814: 4564), Archi's summons (30816). Astrub's lore: the old chapel (30801), the statues' explosion (30802), the secret passage of the old tomb (30803)."
     },
     {
       "npc": 4319,
@@ -896,15 +1135,12 @@
         {
           "message": 30817,
           "choices": [
+            { "reply": 38200, "next": 31610, "beforeQuest": 1974 },
+            { "reply": 38209, "quest": 1974, "completes": 14214, "params": [[30, 14214]], "next": 31616 },
+            { "reply": 38211, "quest": 1974, "completes": 14217, "params": [[30, 14217]], "next": 31620 },
+            { "reply": 38213, "quest": 1974, "completes": 14223, "params": [[30, 14223]], "next": 31621 },
             { "reply": 37219, "next": 30819, "completes": 13891, "params": [[30, 13891]] },
             { "reply": 38049, "quest": 1977, "completes": 14112, "params": [[30, 14112]], "next": 31493 },
-            { "reply": 38048 }
-          ]
-        },
-        {
-          "message": 31615,
-          "choices": [
-            { "reply": 38202, "startsQuest": 1974 },
             { "reply": 38048 }
           ]
         },
@@ -927,9 +1163,89 @@
           "choices": [
             { "reply": 38048 }
           ]
+        },
+        {
+          "message": 31610,
+          "choices": [
+            { "reply": 38199, "next": 31611 }
+          ]
+        },
+        {
+          "message": 31611,
+          "choices": [
+            { "reply": 38198, "next": 31612 }
+          ]
+        },
+        {
+          "message": 31612,
+          "choices": [
+            { "reply": 38197, "next": 31613 }
+          ]
+        },
+        {
+          "message": 31613,
+          "choices": [
+            { "reply": 38204, "next": 31614 }
+          ]
+        },
+        {
+          "message": 31614,
+          "choices": [
+            { "reply": 38202, "next": 31615 },
+            { "reply": 38203 }
+          ]
+        },
+        {
+          "message": 31615,
+          "choices": [
+            { "reply": 38201, "startsQuest": 1974, "params": [[34, 1974]] }
+          ]
+        },
+        {
+          "message": 31616,
+          "choices": [
+            { "reply": 38208, "next": 31617 }
+          ]
+        },
+        {
+          "message": 31617,
+          "choices": [
+            { "reply": 38207, "next": 31618 }
+          ]
+        },
+        {
+          "message": 31618,
+          "choices": [
+            { "reply": 38206, "next": 31619 }
+          ]
+        },
+        {
+          "message": 31619,
+          "choices": [
+            { "reply": 38205 }
+          ]
+        },
+        {
+          "message": 31620,
+          "choices": [
+            { "reply": 38210 }
+          ]
+        },
+        {
+          "message": 31621,
+          "names": true,
+          "choices": [
+            { "reply": 38212, "next": 31622 }
+          ]
+        },
+        {
+          "message": 31622,
+          "choices": [
+            { "reply": 38214 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1974) is done, he greets the character with Archi's summons (30820) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14112), and the answer (31493)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1974) is done, he greets the character with Archi's summons (30820) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14112), and the answer (31493). «Trempette dans un verre d'eau» of Dofus pour les noobs: he looks worried (31610), his niece «aqualic», not alcoholic (31611), she can no longer speak to the goddess (31612), Aqualics Anonymous (31613, 31614), «Proposer votre aide» (31615, the line the step declares); attacked by the well's water: an Akwadala spirit, an exorcism, a priest on the cemetery road, Tek Abir's Pandatriple first (31616-31619: 14214); the blessed beer, she ran off to the pond (31620: 14217); Reigan back, a pandawa like them, Archi wants the character (31621, 31622: 14223)."
     },
     {
       "npc": 4321,
@@ -939,6 +1255,7 @@
         {
           "message": 31261,
           "choices": [
+            { "reply": 38220, "quest": 1974, "beforeObjective": 14216, "holds": 19765, "next": 31624, "afterObjective": 14215 },
             { "reply": 37829, "quest": 1991, "completes": 14075, "params": [[30, 14075]], "next": 31315 },
             { "reply": 37962, "next": 31422, "beforeQuest": 2008 },
             { "reply": 37965, "next": 31428, "quest": 2008, "completesAll": [14177, 14176, 14146, 14147, 14148], "params": [[30, 14148]] },
@@ -1025,9 +1342,27 @@
           "choices": [
             { "reply": 37966, "quest": 2008, "completes": 14192, "params": [[30, 14192]] }
           ]
+        },
+        {
+          "message": 31624,
+          "choices": [
+            { "reply": 38219, "next": 31625 }
+          ]
+        },
+        {
+          "message": 31625,
+          "choices": [
+            { "reply": 38218, "next": 31626 }
+          ]
+        },
+        {
+          "message": 31626,
+          "choices": [
+            { "reply": 38217, "quest": 1974, "completes": 14216, "params": [[30, 14216]], "takes": 19765, "gives": 19766 }
+          ]
         }
       ],
-      "why": "«Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Le repos est dans le champ»: spirits woken by the Trépamorts (31422), the holy water to call them and appease them (31423), magic powder and water (31424, 31425), the peaceful and the others (31426), sage, clover and nettles for the incense (31427); the ingredients given all at once (14177-14148), the water blessed (31428) and the censer lent (31429, 19755, 19749); back from the exorcisms (31430, 31431, 14192)."
+      "why": "«Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Le repos est dans le champ»: spirits woken by the Trépamorts (31422), the holy water to call them and appease them (31423), magic powder and water (31424, 31425), the peaceful and the others (31426), sage, clover and nettles for the incense (31427); the ingredients given all at once (14177-14148), the water blessed (31428) and the censer lent (31429, 19755, 19749); back from the exorcisms (31430, 31431, 14192). «Trempette dans un verre d'eau»: a classic case of possession by a water spirit (31624), he spits into the Pandatriple (31625), shakes it: sprinkle the niece with it (31626: 14216, item 19766)."
     },
     {
       "npc": 4323,
@@ -1037,6 +1372,7 @@
         {
           "message": 30380,
           "choices": [
+            { "reply": 37063, "quest": 716, "completes": 4645, "params": [[30, 4645]], "next": 30699, "takes": 12279 },
             { "reply": 37920, "quest": 1977, "completes": 14120, "params": [[30, 14120]], "next": 31395, "afterObjective": 14119 },
             { "reply": 37503, "quest": 1962, "completes": 13949, "params": [[30, 13949]], "next": 31063, "afterObjective": 13948 },
             { "reply": 37062, "quest": 1959, "completes": 13855, "params": [[30, 13855]], "next": 30696, "afterObjective": 13854 },
@@ -1203,9 +1539,13 @@
           "choices": [
             { "reply": 37067, "quest": 718, "completes": 4660, "params": [[30, 4660]] }
           ]
+        },
+        {
+          "message": 30699,
+          "choices": []
         }
       ],
-      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394). «Golémancien»: the animated quintain given (13847), ugly but good for the mercenaries (30543). «Le rebelle de la forêt»: where the ruffians were seen, east of the forest's paths (14129, 31446), and Hel Munster's workshop noted. «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660)."
+      "why": "«On marche sur des œufs»: «Entregar el traficante a Bajofrente.» (13855) and his jokes about torture (30696, 30697); the false dofus is the character's to keep (30698). «Balade en forêt»: «Exijo una explicación sobre la emboscada» (13949); they were pandikazes posing as mercenaries (31063), Nowa worked for them (31064), and the council must hear of it (31065). «Tel est pris qui croyait prendre»: «Entregar a Hipo Lítico» (14120): the swindler everybody complains of (31395), Victor, former count of Lustig, who sold King Allister's castle (31396), locked up until he is sent to Amakna (31397). «Bière qui roule n'amasse pas mousse» and «Combat de rue» (Dofus pour les noobs): «Me presento voluntario a hacer misiones de mercenarios» once «Eso va a costar un huevo» is done (30381), the basics of fighting and a frothy beer from the tavern first (30382, the line 1978 names; refused, 30383); the beer handed over (13770), the requests he picked (30387, «De acuerdo.»), and the list (30391, the line 1979 names; later, «Quiero hacer misiones de mercenarios», 30388). The four problems solved, the report (13775, 30393) and other work in town (30394). «Golémancien»: the animated quintain given (13847), ugly but good for the mercenaries (30543). «Le rebelle de la forêt»: where the ruffians were seen, east of the forest's paths (14129, 31446), and Hel Munster's workshop noted. «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Attention à la Bête !»: the beast, a plague on harvests, stores and cellars (30700), seen everywhere, not enough mercenaries (30701), the offer turned down (30702: 4660). «Zobal Hibaba et les 40 Roublards»: Hibabá's posters, one of his men will put them up (30699: 4645)."
     },
     {
       "npc": 4324,
@@ -2335,21 +2675,18 @@
         {
           "message": 30821,
           "choices": [
-            { "reply": 37223, "next": 30823, "quest": 2009, "beforeObjective": 13890, "completes": 13890, "params": [[30, 13890]] },
-            { "reply": 37626, "next": 31158 }
-          ]
-        },
-        {
-          "message": 31158,
-          "choices": [
-            { "reply": 37619, "startsQuest": 1973 }
+            { "reply": 37626, "next": 31150, "beforeQuest": 1973 },
+            { "reply": 37698, "next": 31212, "quest": 1973, "beforeObjective": 14056, "afterObjective": 14055 },
+            { "reply": 37703, "next": 31218, "quest": 1973, "beforeObjective": 14058, "afterObjective": 14057 },
+            { "reply": 37724, "quest": 1973, "completes": 14067, "params": [[30, 14067]], "next": 31232 },
+            { "reply": 37223, "next": 30823, "quest": 2009, "beforeObjective": 13890, "completes": 13890, "params": [[30, 13890]] }
           ]
         },
         {
           "message": 30823,
           "names": true,
           "choices": [
-            { "reply": 37626, "next": 31158 }
+            { "reply": 37626, "next": 31150, "beforeQuest": 1973 }
           ]
         },
         {
@@ -2357,9 +2694,119 @@
           "choices": [
             { "reply": 37224, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 31150,
+          "choices": [
+            { "reply": 37625, "next": 31151 }
+          ]
+        },
+        {
+          "message": 31151,
+          "choices": [
+            { "reply": 37624, "next": 31152 }
+          ]
+        },
+        {
+          "message": 31152,
+          "choices": [
+            { "reply": 37622, "next": 31153 }
+          ]
+        },
+        {
+          "message": 31153,
+          "choices": [
+            { "reply": 37621, "next": 31154 }
+          ]
+        },
+        {
+          "message": 31154,
+          "choices": [
+            { "reply": 37618, "next": 31155 },
+            { "reply": 37620, "next": 31159 }
+          ]
+        },
+        {
+          "message": 31155,
+          "choices": [
+            { "reply": 37623, "next": 31156 }
+          ]
+        },
+        {
+          "message": 31156,
+          "choices": [
+            { "reply": 37617, "next": 31157 }
+          ]
+        },
+        {
+          "message": 31157,
+          "choices": [
+            { "reply": 37615, "next": 31158 },
+            { "reply": 37616, "next": 31160 }
+          ]
+        },
+        {
+          "message": 31158,
+          "choices": [
+            { "reply": 37619, "startsQuest": 1973, "params": [[34, 1973]] }
+          ]
+        },
+        {
+          "message": 31159,
+          "choices": []
+        },
+        {
+          "message": 31160,
+          "choices": []
+        },
+        {
+          "message": 31212,
+          "choices": [
+            { "reply": 37697, "next": 31213 }
+          ]
+        },
+        {
+          "message": 31213,
+          "choices": [
+            { "reply": 37696, "next": 31214 }
+          ]
+        },
+        {
+          "message": 31214,
+          "choices": [
+            { "reply": 37695, "next": 31215 }
+          ]
+        },
+        {
+          "message": 31215,
+          "choices": [
+            { "reply": 37694, "quest": 1973, "completes": 14056, "params": [[30, 14056]], "next": 31216, "showsNpc": 4436 }
+          ]
+        },
+        {
+          "message": 31216,
+          "choices": []
+        },
+        {
+          "message": 31218,
+          "choices": [
+            { "reply": 37702, "next": 31219 }
+          ]
+        },
+        {
+          "message": 31219,
+          "choices": [
+            { "reply": 37701, "quest": 1973, "completes": 14058, "params": [[30, 14058]] }
+          ]
+        },
+        {
+          "message": 31232,
+          "choices": [
+            { "reply": 37723 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37223) is this class's objective (13890, effect 30), and leads to his greeting, 30823, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1973) is done, he greets the character with Archi's summons (30824) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37223) is this class's objective (13890, effect 30), and leads to his greeting, 30823, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1973) is done, he greets the character with Archi's summons (30824) and «Ir a la Torre del Consejo» hands it over. «Souffre-douleur» of Dofus pour les noobs: the temple hidden from Djaul and moved (31150, 31151), the five blades of suffering stolen (31152, 31153), an honour, a ritual of suffering, a singer (31154-31157), «Confirmer» and off to Zeta Rymakón (31158, the line the step declares); a blade drawn out by a waxing (31212-31216: 14056, the flaying blade comes in); the cats of the fishers' workshop next (31218, 31219: 14058); the missing blades back (31232: 14067)."
     },
     {
       "npc": 4356,
@@ -7834,6 +8281,7 @@
         {
           "message": 30384,
           "choices": [
+            { "reply": 38216, "quest": 1974, "beforeObjective": 14215, "next": 31623, "afterObjective": 14214 },
             { "reply": 36634, "next": 30385, "quest": 1978, "beforeObjective": 13769 },
             { "reply": 37324, "quest": 1975, "completes": 13958, "params": [[30, 13958]], "next": 30907, "afterObjective": 13957 },
             { "reply": 36993, "next": 30645, "quest": 1959, "beforeObjective": 13852 },
@@ -7891,9 +8339,15 @@
           "choices": [
             { "reply": 36991 }
           ]
+        },
+        {
+          "message": 31623,
+          "choices": [
+            { "reply": 38215, "quest": 1974, "completes": 14215, "params": [[30, 14215]], "gives": 19765 }
+          ]
         }
       ],
-      "why": "Tek Abir, the tavern keeper of Astrub, from his own lines and replies. «On marche sur des œufs» per Dofus pour les noobs: «Commander une bière» for 40 kamas (30385, «Son 40 kamas y aquí no se fía.»), the Cerveza de Astrub; asked about the dofus, the rumour of pandawas (30645, 30646). «Ça tombe à l'eau»: the notary's description without naming him (13958): the Duke of Sidimote, gone, but his servant Camilo Demolinos is still around (30907-30909), at the markets. «Bière qui roule n'amasse pas mousse»: «Pedir una cerveza para Bajofrente», «Aquí tienes los 40 kamas.» (« Payer les 40 kamas », 13769) for the frothy Astrub beer (19623), and hurry before the froth goes (30386). The same reply buys the ordinary beer for anybody else: the quest's comes first in the line."
+      "why": "Tek Abir, the tavern keeper of Astrub, from his own lines and replies. «On marche sur des œufs» per Dofus pour les noobs: «Commander une bière» for 40 kamas (30385, «Son 40 kamas y aquí no se fía.»), the Cerveza de Astrub; asked about the dofus, the rumour of pandawas (30645, 30646). «Ça tombe à l'eau»: the notary's description without naming him (13958): the Duke of Sidimote, gone, but his servant Camilo Demolinos is still around (30907-30909), at the markets. «Bière qui roule n'amasse pas mousse»: «Pedir una cerveza para Bajofrente», «Aquí tienes los 40 kamas.» (« Payer les 40 kamas », 13769) for the frothy Astrub beer (19623), and hurry before the froth goes (30386). The same reply buys the ordinary beer for anybody else: the quest's comes first in the line. «Trempette dans un verre d'eau»: Essel Dawa's Pandatriple from his private stock (31623: 14215, item 19765)."
     },
     {
       "npc": 4322,
@@ -8117,6 +8571,7 @@
         {
           "message": 2168,
           "choices": [
+            { "reply": 8797, "quest": 716, "completes": 4641, "params": [[30, 4641]], "next": 8770, "takes": 12278 },
             { "reply": 38074, "quest": 1971, "completes": 14163, "params": [[30, 14163]], "next": 31512, "afterObjective": 14157 },
             { "reply": 37859, "next": 31343, "quest": 2000, "afterObjective": 14086, "beforeObjective": 14087 }
           ]
@@ -8152,9 +8607,13 @@
             { "reply": 37856, "quest": 2000, "completes": 14087, "params": [[30, 14087]], "buyItem": 19708, "buyPrice": 100 },
             { "reply": 37857 }
           ]
+        },
+        {
+          "message": 8770,
+          "choices": []
         }
       ],
-      "why": "«C'est pour ta pomme»: no fresh apples, they were stolen (31512); a crate of rotten ones instead (31513, 19750), the ones he keeps for Tek Abir (31514). «Bûcherons en détresse»: honey wanted (37859), a fresh batch from Bonta's fields with no price on it yet and a joke (31343), a forced laugh for a discount and a hundred kamas all the same (31344): paid and taken (14087), or off to beg by the zaap."
+      "why": "«C'est pour ta pomme»: no fresh apples, they were stolen (31512); a crate of rotten ones instead (31513, 19750), the ones he keeps for Tek Abir (31514). «Bûcherons en détresse»: honey wanted (37859), a fresh batch from Bonta's fields with no price on it yet and a joke (31343), a forced laugh for a discount and a hundred kamas all the same (31344): paid and taken (14087), or off to beg by the zaap. «Zobal Hibaba et les 40 Roublards»: 2000 litres of used frying oil, paid in advance with Hibabá's bag (8770: 4641)."
     },
     {
       "npc": 4378,
@@ -9386,6 +9845,9 @@
         {
           "message": 30478,
           "choices": [
+            { "reply": 37928, "quest": 716, "completes": 4643, "params": [[30, 4643]], "next": 31404 },
+            { "reply": 37831, "quest": 704, "completes": 4557, "params": [[30, 4557]], "next": 31320, "gives": 12121 },
+            { "reply": 37715, "next": 31225, "quest": 1973, "beforeObjective": 14063, "afterObjective": 14062 },
             { "reply": 36794, "next": 30502, "quest": 1984, "afterObjective": 13819, "beforeObjective": 13821, "completesAll": [13820, 13821], "params": [[30, 13821]], "takesAll": [19646, 19647, 19648, 19649, 19650], "refused": 30504 },
             { "reply": 36797, "quest": 1984, "completes": 13828, "params": [[30, 13828]], "next": 30505, "afterObjective": 13827 },
             { "reply": 36915, "quest": 1998, "completes": 13863, "params": [[30, 13863]], "next": 30586 },
@@ -9494,9 +9956,35 @@
           "choices": [
             { "reply": 37898, "quest": 1967, "completes": 14104, "params": [[30, 14104]], "gives": 19713 }
           ]
+        },
+        {
+          "message": 31225,
+          "choices": [
+            { "reply": 37714, "next": 31226 }
+          ]
+        },
+        {
+          "message": 31226,
+          "choices": [
+            { "reply": 37713, "next": 31227 }
+          ]
+        },
+        {
+          "message": 31227,
+          "choices": [
+            { "reply": 37712, "quest": 1973, "completes": 14063, "params": [[30, 14063]], "showsNpc": 4439, "alsoShows": [4440] }
+          ]
+        },
+        {
+          "message": 31320,
+          "choices": []
+        },
+        {
+          "message": 31404,
+          "choices": []
         }
       ],
-      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713)."
+      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713). «Souffre-douleur»: a flask to drink in one go and hold on (31225), a jalató war chief's diuretic (31226), holding on (31227: 14063, the flying and the swift blades come in). «Braquage à la Roublard»: Plandéh's parcel, already paid, a signature (31320: 4557, item 12121). «Zobal Hibaba et les 40 Roublards»: forty spark potions put down to the zobal Hibabá (31404: 4643)."
     },
     {
       "npc": 596,
@@ -10060,6 +10548,7 @@
         {
           "message": 2967,
           "choices": [
+            { "reply": 8798, "quest": 716, "completes": 4642, "params": [[30, 4642]], "next": 8771 },
             { "reply": 37658, "quest": 1989, "completes": 14000, "params": [[30, 14000]], "next": 31186 },
             { "reply": 37668, "next": 31190, "quest": 1989, "afterObjectives": [14001, 14002], "completesAll": [14003], "params": [[30, 14003]], "takesAll": [19684, 19685] },
             { "reply": 36848, "next": 30538, "quest": 1986, "afterObjective": 13845 },
@@ -10149,9 +10638,13 @@
           "choices": [
             { "reply": 36843, "gives": 19645 }
           ]
+        },
+        {
+          "message": 8771,
+          "choices": []
         }
       ],
-      "why": "The Mage of Zo, creator of the Almanax, in the alchemists' workshop [3,-21], from his own lines and replies, by «Restauration rapide» of Dofus pour les noobs: the burnt book shown (14000), a bibliomancy spell of three weeks (31186, 31187) or the short one with century-old bark and gobbly milk (31188), the stump south of Tainela and the gobball farm (31189); the milk and the bark handed over (14003), the disguise he took them for (31190, 31191), the book given, the spell (31192, 31193) and the enchanted bark for Primir (31194, 19686). «Golémancien»: whether the character made every part (30538), the quintain set down for its enchanting (30539, 13846), the spell (30540, 30541), animated for Badufron (30542, 19645)."
+      "why": "The Mage of Zo, creator of the Almanax, in the alchemists' workshop [3,-21], from his own lines and replies, by «Restauration rapide» of Dofus pour les noobs: the burnt book shown (14000), a bibliomancy spell of three weeks (31186, 31187) or the short one with century-old bark and gobbly milk (31188), the stump south of Tainela and the gobball farm (31189); the milk and the bark handed over (14003), the disguise he took them for (31190, 31191), the book given, the spell (31192, 31193) and the enchanted bark for Primir (31194, 19686). «Golémancien»: whether the character made every part (30538), the quintain set down for its enchanting (30539, 13846), the spell (30540, 30541), animated for Badufron (30542, 19645). «Zobal Hibaba et les 40 Roublards»: forty spark potions, too busy watching the apprentices: Nibe Lula (8771: 4642)."
     },
     {
       "npc": 4442,
@@ -12710,6 +13203,470 @@
         }
       ],
       "why": "Erty Trapchet at the Sadida grove [-2,-15], by «C'est pourtant naturel»: late? (31025), the smell at the foot of the bushes (31026), the grimace that says it (31027), his recommendations (31028: 13993, item 19669)."
+    },
+    {
+      "npc": 4433,
+      "map": 0,
+      "opening": 31199,
+      "lines": [
+        {
+          "message": 31199,
+          "choices": [
+            { "reply": 37680, "next": 31200, "quest": 1973, "beforeObjective": 14050 },
+            { "reply": 37689, "next": 31208, "quest": 1973, "beforeObjective": 14052, "afterObjective": 14051 },
+            { "reply": 37693, "next": 31211, "quest": 1973, "beforeObjective": 14055, "afterObjective": 14054 },
+            { "reply": 37711, "next": 31224, "quest": 1973, "beforeObjective": 14062, "afterObjective": 14061 },
+            { "reply": 37716, "quest": 1973, "completes": 14064, "params": [[30, 14064]], "next": 31228 },
+            { "reply": 37722, "quest": 1973, "completes": 14066, "params": [[30, 14066]], "next": 31231 }
+          ]
+        },
+        {
+          "message": 31200,
+          "names": true,
+          "choices": [
+            { "reply": 37679, "next": 31201 }
+          ]
+        },
+        {
+          "message": 31201,
+          "choices": [
+            { "reply": 37678, "quest": 1973, "completes": 14050, "params": [[30, 14050]] }
+          ]
+        },
+        {
+          "message": 31208,
+          "choices": [
+            { "reply": 37688, "next": 31209 }
+          ]
+        },
+        {
+          "message": 31209,
+          "choices": [
+            { "reply": 37687, "quest": 1973, "completes": 14052, "params": [[30, 14052]] }
+          ]
+        },
+        {
+          "message": 31211,
+          "choices": [
+            { "reply": 37692, "quest": 1973, "completes": 14055, "params": [[30, 14055]] }
+          ]
+        },
+        {
+          "message": 31224,
+          "choices": [
+            { "reply": 37710, "quest": 1973, "completes": 14062, "params": [[30, 14062]] }
+          ]
+        },
+        {
+          "message": 31228,
+          "choices": []
+        },
+        {
+          "message": 31231,
+          "choices": [
+            { "reply": 37721 }
+          ]
+        }
+      ],
+      "why": "«Souffre-douleur»: Zeta Rymakón (Brigitte Sarimavek), suffering every day (31199); the ritual, Amayan Demol brought with a promise (31200, 31201: 14050); her ears covered, «what strange sword?» twice, the dancing blade (31208, 31209: 14052); the blade for Saketsú (31211: 14055); held up by Nibe Lula, to the alchemist (31224: 14062); two blades, surprised too (31228: 14064); thanked for doing nothing (31231: 14066)."
+    },
+    {
+      "npc": 4434,
+      "map": 0,
+      "opening": 31202,
+      "lines": [
+        {
+          "message": 31202,
+          "choices": [
+            { "reply": 37686, "next": 31203, "quest": 1973, "beforeObjective": 14051, "afterObjective": 14050 }
+          ]
+        },
+        {
+          "message": 31203,
+          "choices": [
+            { "reply": 37685, "next": 31204 }
+          ]
+        },
+        {
+          "message": 31204,
+          "choices": [
+            { "reply": 37684, "next": 31205 }
+          ]
+        },
+        {
+          "message": 31205,
+          "choices": [
+            { "reply": 37683, "next": 31206 }
+          ]
+        },
+        {
+          "message": 31206,
+          "choices": [
+            { "reply": 37682, "next": 31207 }
+          ]
+        },
+        {
+          "message": 31207,
+          "choices": [
+            { "reply": 37681, "quest": 1973, "completes": 14051, "params": [[30, 14051]], "showsNpc": 4435 }
+          ]
+        }
+      ],
+      "why": "«Souffre-douleur»: the Lascar Amakdémie winner's private show (31202), her greatest hit, plagiarised (31203), the song endured (31204-31206), the effect she had (31207: 14051, the dancing blade comes in)."
+    },
+    {
+      "npc": 4435,
+      "map": 0,
+      "opening": 31210,
+      "lines": [
+        {
+          "message": 31210,
+          "choices": [
+            { "reply": 37690, "quest": 1973, "completes": 14053, "params": [[30, 14053]] },
+            { "reply": 37691 }
+          ]
+        }
+      ],
+      "why": "«Souffre-douleur»: the dancing blade of suffering, caught (the fight, npc_fights.json)."
+    },
+    {
+      "npc": 4436,
+      "map": 0,
+      "opening": 31217,
+      "lines": [
+        {
+          "message": 31217,
+          "choices": [
+            { "reply": 37699, "quest": 1973, "beforeObjective": 14057, "afterObjective": 14056 },
+            { "reply": 37700 }
+          ]
+        }
+      ],
+      "why": "«Souffre-douleur»: the flaying blade, caught (the fight)."
+    },
+    {
+      "npc": 4437,
+      "map": 0,
+      "opening": 31220,
+      "lines": [
+        {
+          "message": 31220,
+          "choices": [
+            { "reply": 37707, "next": 31221, "quest": 1973, "beforeObjective": 14060, "afterObjective": 14059 }
+          ]
+        },
+        {
+          "message": 31221,
+          "choices": [
+            { "reply": 37706, "next": 31221 },
+            { "reply": 37705, "quest": 1973, "completes": 14060, "params": [[30, 14060]], "next": 31222, "showsNpc": 4438 }
+          ]
+        },
+        {
+          "message": 31222,
+          "choices": [
+            { "reply": 37704 }
+          ]
+        }
+      ],
+      "why": "«Souffre-douleur»: the Strubian cat (31220), its backside slapped until a blade shows in the gloom (31221, 31222: 14060, the guardian blade comes in)."
+    },
+    {
+      "npc": 4438,
+      "map": 0,
+      "opening": 31223,
+      "lines": [
+        {
+          "message": 31223,
+          "choices": [
+            { "reply": 37708, "quest": 1973, "beforeObjective": 14061, "afterObjective": 14060 },
+            { "reply": 37709 }
+          ]
+        }
+      ],
+      "why": "«Souffre-douleur»: the guardian blade, caught (the fight)."
+    },
+    {
+      "npc": 4439,
+      "map": 0,
+      "opening": 31229,
+      "lines": [
+        {
+          "message": 31229,
+          "choices": [
+            { "reply": 37717, "quest": 1973, "beforeObjective": 14065, "afterObjective": 14064 },
+            { "reply": 37718 }
+          ]
+        }
+      ],
+      "why": "«Souffre-douleur»: the flying blades, caught together (the fight)."
+    },
+    {
+      "npc": 4440,
+      "map": 0,
+      "opening": 31230,
+      "lines": [
+        {
+          "message": 31230,
+          "choices": [
+            { "reply": 37719, "quest": 1973, "beforeObjective": 14065, "afterObjective": 14064 },
+            { "reply": 37720 }
+          ]
+        }
+      ],
+      "why": "«Souffre-douleur»: the swift blade, caught with the flying one (the fight)."
+    },
+    {
+      "npc": 4473,
+      "map": 0,
+      "opening": 31627,
+      "lines": [
+        {
+          "message": 31627,
+          "choices": [
+            { "reply": 38224, "quest": 1974, "beforeObjective": 14212, "next": 31628 }
+          ]
+        },
+        {
+          "message": 31628,
+          "choices": [
+            { "reply": 38221, "next": 31629 }
+          ]
+        },
+        {
+          "message": 31629,
+          "choices": [
+            { "reply": 38223, "next": 31630 },
+            { "reply": 38222, "next": 31630 }
+          ]
+        },
+        {
+          "message": 31630,
+          "choices": [
+            { "reply": 38225, "quest": 1974, "completes": 14212, "params": [[30, 14212]] }
+          ]
+        }
+      ],
+      "why": "«Trempette dans un verre d'eau»: Regane Dawa staring into the well (31627), the dancing reflections calling her (31628), the character's eyes clouded by drink (31629), «it» will not let her go (31630), the well's water rises (14212, the fight against the Raging Water, npc_fights.json)."
+    },
+    {
+      "npc": 4474,
+      "map": 0,
+      "opening": 31631,
+      "lines": [
+        {
+          "message": 31631,
+          "choices": [
+            { "reply": 38226, "quest": 1974, "completes": 14219, "params": [[30, 14219]], "takes": 19766 }
+          ]
+        }
+      ],
+      "why": "«Trempette dans un verre d'eau»: the possessed Regane by the pond (31631), sprinkled with the blessed beer (14219, the fight against the Akwadala spirit)."
+    },
+    {
+      "npc": 4475,
+      "map": 0,
+      "opening": 31632,
+      "lines": [
+        {
+          "message": 31632,
+          "choices": [
+            { "reply": 38228, "quest": 1974, "beforeObjective": 14221, "next": 31633, "afterObjective": 14220 },
+            { "reply": 38229, "quest": 1974, "afterObjective": 14221, "beforeObjective": 14222 }
+          ]
+        },
+        {
+          "message": 31633,
+          "choices": [
+            { "reply": 38227, "quest": 1974, "completes": 14221, "params": [[30, 14221]] }
+          ]
+        }
+      ],
+      "why": "«Trempette dans un verre d'eau»: Regane waking from a long nightmare (31632), saved, thankful (31633: 14221), taken back to her uncle."
+    },
+    {
+      "npc": 4332,
+      "map": 0,
+      "opening": 31321,
+      "lines": [
+        {
+          "message": 31321,
+          "choices": [
+            { "reply": 37833, "next": 31322, "quest": 704, "beforeObjective": 4558 },
+            { "reply": 37834 }
+          ]
+        },
+        {
+          "message": 31322,
+          "choices": [
+            { "reply": 37832, "quest": 704, "completes": 4558, "params": [[30, 4558]], "next": 31323, "gives": 12122 }
+          ]
+        },
+        {
+          "message": 31323,
+          "choices": []
+        }
+      ],
+      "why": "Clint Pot by Astrub's mine [1,-17]: an ore worth a small fortune (31321). «Braquage à la Roublard» of Dofus pour les noobs: the fumarole dust from Frigost (31322), «1000 kamas... only joking» (31323: 4558, item 12122)."
+    },
+    {
+      "npc": 520,
+      "map": 0,
+      "opening": 48366,
+      "lines": [
+        {
+          "message": 48366,
+          "names": true,
+          "choices": [
+            { "reply": 64359, "quest": 716, "completes": 4639, "params": [[30, 4639]], "next": 48369, "takes": 12277, "gives": 12278 },
+            { "reply": 64362, "next": 48371 }
+          ]
+        },
+        {
+          "message": 48369,
+          "choices": []
+        },
+        {
+          "message": 48371,
+          "choices": []
+        }
+      ],
+      "why": "Orroha Neuw, banker of Astrub: «we are the bankers», an account and a safe (48366; BankHandler adds «Quiero consultar mi cofre.»), how it works (48371). «Zobal Hibaba et les 40 Roublards» of Dofus pour les noobs: Hibabá's power of attorney shown, his money handed over (48369: 4639, item 12278)."
+    },
+    {
+      "npc": 1433,
+      "map": 0,
+      "opening": 8779,
+      "openings": [
+        { "quest": 716, "objective": 4648, "pending": 4649, "message": 8780 },
+        { "quest": 716, "objective": 4649, "pending": 4650, "message": 8781 },
+        { "quest": 716, "objective": 14079, "pending": 14080, "message": 31301 }
+      ],
+      "lines": [
+        {
+          "message": 8779,
+          "choices": [
+            { "reply": 8804, "quest": 716, "completes": 4648, "params": [[30, 4648]] }
+          ]
+        },
+        {
+          "message": 8780,
+          "choices": []
+        },
+        {
+          "message": 8781,
+          "choices": [
+            { "reply": 8805, "quest": 716, "completes": 4650, "params": [[30, 4650]], "showsNpc": 4445 }
+          ]
+        },
+        {
+          "message": 31301,
+          "choices": [
+            { "reply": 37810, "quest": 716, "completes": 14080, "params": [[30, 14080]] }
+          ]
+        }
+      ],
+      "why": "Ana Morgi, Hibabá's servant, in the cellar of Marp's house, by «Zobal Hibaba et les 40 Roublards» of Dofus pour les noobs: watch the oil boil and bring it (8779: 4648), the cauldron (8780), «is the oil ready?» and the tymadores out of their barrel (8781: 4650), two seconds more and they would have had her, Hibabá will be delighted (31301: 14080)."
+    },
+    {
+      "npc": 4445,
+      "map": 0,
+      "opening": 31300,
+      "lines": [
+        {
+          "message": 31300,
+          "choices": [
+            { "reply": 37808, "quest": 716, "beforeObjective": 14079, "afterObjective": 4650 },
+            { "reply": 37809 }
+          ]
+        }
+      ],
+      "why": "The scalded tymadores out of their barrel in the cellar of Marp's house, by «Zobal Hibaba et les 40 Roublards»: fought (npc_fights.json)."
+    },
+    {
+      "npc": 577,
+      "map": 0,
+      "opening": 1183,
+      "lines": [
+        {
+          "message": 1183,
+          "choices": [
+            { "reply": 13318, "quest": 938, "completes": 5703, "params": [[30, 5703]], "next": 11857, "gives": 13267 },
+            { "reply": 852, "next": 1184 }
+          ]
+        },
+        {
+          "message": 1184,
+          "choices": []
+        },
+        {
+          "message": 11857,
+          "choices": [
+            { "reply": 13317 }
+          ]
+        }
+      ],
+      "why": "Bish Fone, fishmonger of Astrub [4,-20]: «it is not my fish that smells» (1183), a fishmonger's lot (1184). «L'étrange créature de l'étang bleu»: Alberta Borida's special bait (11857: 5703, item 13267)."
+    },
+    {
+      "npc": 597,
+      "map": 0,
+      "opening": 2403,
+      "lines": [
+        {
+          "message": 2403,
+          "choices": [
+            { "reply": 13319, "quest": 938, "completes": 5704, "params": [[30, 5704]], "next": 11858, "gives": 13268 },
+            { "reply": 2043, "next": 2404 }
+          ]
+        },
+        {
+          "message": 2404,
+          "choices": []
+        },
+        {
+          "message": 11858,
+          "choices": [
+            { "reply": 13320 }
+          ]
+        }
+      ],
+      "why": "Ygat Chus, shoemaker of Astrub [4,-16]: the smell of tanned leather (2403), a shoemaker's lot (2404). «L'étrange créature de l'étang bleu»: Ness's new diving harness (11858: 5704, item 13268)."
+    },
+    {
+      "npc": 1615,
+      "map": 0,
+      "opening": 11853,
+      "lines": [
+        {
+          "message": 11853,
+          "choices": [
+            { "reply": 13311, "next": 11854, "quest": 938, "completesAll": [5705, 5706], "params": [[30, 5706]] },
+            { "reply": 13313, "quest": 938, "afterObjective": 5706, "beforeObjective": 5707 },
+            { "reply": 13315, "quest": 938, "completes": 5710, "params": [[30, 5710]], "next": 11856 }
+          ]
+        },
+        {
+          "message": 11854,
+          "names": true,
+          "choices": [
+            { "reply": 13314, "next": 11855 }
+          ]
+        },
+        {
+          "message": 11855,
+          "choices": [
+            { "reply": 13312 }
+          ]
+        },
+        {
+          "message": 11856,
+          "choices": [
+            { "reply": 13316 }
+          ]
+        }
+      ],
+      "why": "Ness Ogal (Ness Lok), the steamers' diver, on the north shore of Astrub's pond [2,-21], by «L'étrange créature de l'étang bleu»: no stress (11853); the bait and the harness, the creature's lair found in the probes' echoes (11854: 5705, 5706), watch the water from the south side (11855); a huge pischis nearly drowned him (11856: 5710)."
     }
   ]
 }

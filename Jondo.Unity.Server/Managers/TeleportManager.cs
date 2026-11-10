@@ -34,6 +34,13 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>What whoever takes it has to meet, in the quests' criterion language; empty for anybody.</summary>
         public string Criterion { get; init; } = "";
+
+        /// <summary>Where it leads instead while <see cref="InsteadWhen"/> holds; zero for nowhere else.</summary>
+        public long InsteadMapId { get; init; }
+
+        public int InsteadCellId { get; init; }
+
+        public string InsteadWhen { get; init; } = "";
     }
 
     /// <summary>
@@ -483,6 +490,9 @@ namespace Jondo.Unity.Server.Managers
                     DestinationMapId = passage.DestinationMapId,
                     DestinationCellId = passage.DestinationCell,
                     Criterion = passage.Criterion ?? "",
+                    InsteadMapId = passage.InsteadMapId,
+                    InsteadCellId = passage.InsteadCell,
+                    InsteadWhen = passage.InsteadWhen ?? "",
                     SourceVersion = "Jondo Studio",
                     Confidence = "authored",
                 };

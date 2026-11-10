@@ -67,9 +67,9 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Var(2, state).Var(4, achievementId).Build();
 
         /// <summary>
-        /// Every achievement the character has, on entering the world (mft).
+        /// Every achievement the ACCOUNT has, on entering the world (mft).
         ///
-        ///   f1 (repeated) { f2: character id, f3: achievement id }
+        ///   f1 (repeated) { f2: the character of the account that achieved it, f3: achievement id }
         /// </summary>
         /// <remarks>
         /// Measured in six captures, up to 986 entries, and no entry carries a level there: those
@@ -78,12 +78,12 @@ namespace Jondo.Unity.Server.Network
         /// thing that tells the two apart in this message, and the client uses the same inner
         /// record for both.
         /// </remarks>
-        public static byte[] BuildList(long characterId, IEnumerable<(int Achievement, int UnclaimedLevel)> achievements)
+        public static byte[] BuildList(IEnumerable<(int Achievement, long AchievedBy, int UnclaimedLevel)> achievements)
         {
             var list = Pb.New();
-            foreach (var (achievement, level) in achievements)
+            foreach (var (achievement, achievedBy, level) in achievements)
             {
-                list.Msg(1, Entry(level, characterId, achievement));
+                list.Msg(1, Entry(level, achievedBy, achievement));
             }
 
             return list.Build();

@@ -77,6 +77,7 @@ namespace Jondo.Unity.World.Achievements
 
         private readonly HashSet<int> _earned = new HashSet<int>();
         private readonly HashSet<int> _claimed = new HashSet<int>();
+        private readonly Dictionary<int, long> _achievers = new();
 
         /// <summary>
         /// How deep the cascade of achievements-needing-achievements is allowed to go.
@@ -130,6 +131,26 @@ namespace Jondo.Unity.World.Achievements
             _earned.Add(achievementId);
             if (claimed) _claimed.Add(achievementId);
         }
+
+        /// <summary>
+        /// Puts one back on that a character of the account achieved, and notes who: the client's
+        /// list is the ACCOUNT's, each entry naming the character that did it.
+        /// </summary>
+        public void Restore(int achievementId, bool claimed, long achievedBy)
+        {
+            Restore(achievementId, claimed);
+            if (achievedBy != 0) _achievers.TryAdd(achievementId, achievedBy);
+        }
+
+        /// <summary>Notes which character achieved one, when it is earned now.</summary>
+        public void Credit(int achievementId, long characterId)
+        {
+            if (characterId != 0 && _earned.Contains(achievementId)) _achievers.TryAdd(achievementId, characterId);
+        }
+
+        /// <summary>The character of the account that achieved it, or zero when nobody was noted.</summary>
+        public long AchieverOf(int achievementId)
+            => _achievers.TryGetValue(achievementId, out long who) ? who : 0;
 
         /// <summary>Marks the reward as handed over. Returns false when there was nothing to pay.</summary>
         public bool MarkClaimed(int achievementId)

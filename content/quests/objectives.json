@@ -1502,6 +1502,142 @@
    "spawns": {"monster": 5283, "count": 1, "with": [5284, 5285], "attacks": true},
    "afterObjectives": [13980],
    "why": "«Vence a los animales enfermos agresivos»: the arakmutant, araknausea and sick tofu of the puddle; the puddle brings them out again after a lost fight. The molasses sample (19665) is the arakmutant's quest loot."
+  },
+  {
+   "objective": 14059,
+   "quest": 1973,
+   "kind": "enter",
+   "map": 188744706,
+   "afterObjectives": [14058],
+   "why": "«Busca miaumiaus strubienses»: around the fishers' workshop [3,-20], where Saketsú sends the character (31219)."
+  },
+  {
+   "objective": 14065,
+   "quest": 1973,
+   "kind": "beat",
+   "monsters": [5260, 5261],
+   "map": 192937988,
+   "afterObjectives": [14064],
+   "why": "«Vence a las hojas voladoras y veloces»: the two blades of the alchemists' workshop, one fight."
+  },
+  {
+   "objective": 14156,
+   "quest": 1974,
+   "kind": "enter",
+   "map": 188746755,
+   "anyOrder": true,
+   "why": "«Busca a Reigan cerca del pozo de la biblioteca» [7,-19]: a well Regane is not at (Dofus pour les noobs: [7,-19], [4,-19] and [2,-19] before [3,-16])."
+  },
+  {
+   "objective": 14209,
+   "quest": 1974,
+   "kind": "enter",
+   "map": 191104000,
+   "anyOrder": true,
+   "why": "«Busca a Reigan cerca del pozo de la Torre del Consejo» [4,-19]: a well Regane is not at (Dofus pour les noobs: [7,-19], [4,-19] and [2,-19] before [3,-16])."
+  },
+  {
+   "objective": 14210,
+   "quest": 1974,
+   "kind": "enter",
+   "map": 188744195,
+   "anyOrder": true,
+   "why": "«Busca a Reigan cerca del pozo de la peluquería» [2,-19]: a well Regane is not at (Dofus pour les noobs: [7,-19], [4,-19] and [2,-19] before [3,-16])."
+  },
+  {
+   "objective": 14211,
+   "quest": 1974,
+   "kind": "enter",
+   "map": 188744710,
+   "afterObjectives": [14156, 14209, 14210],
+   "why": "«Busca a Reigan cerca del pozo al norte del taller de manitas» [3,-16]: where she is, once the other three wells were looked at."
+  },
+  {
+   "objective": 14218,
+   "quest": 1974,
+   "kind": "enter",
+   "map": 188744706,
+   "afterObjectives": [14217],
+   "why": "«Encuentra a Reigan cerca del estanque de Astrub»: the pond [3,-20], where she ran off to (31620)."
+  },
+  {
+   "objective": 14222,
+   "quest": 1974,
+   "kind": "enter",
+   "map": 191106050,
+   "afterObjectives": [14221],
+   "why": "«Lleva a Reigan a ver a su tío a la taberna de Astrub»: the tavern [6,-18] with her."
+  },
+  {
+   "objective": 4561,
+   "quest": 704,
+   "elements": [{"map": 191104002, "element": 514003}],
+   "requires": [{"item": 12123, "count": 1}],
+   "spends": true,
+   "why": "«Esconde el hada artificial fumígena para provocar el desconcierto»: the barrel behind the guard, by the bank's door on [4,-18] (element 514003, cell 347)."
+  },
+  {
+   "objective": 4563,
+   "quest": 704,
+   "elements": [{"map": 192677890, "element": 515679}],
+   "gives": [{"item": 12124, "count": 1}],
+   "spawns": {"monster": 3102, "count": 2, "attacks": true},
+   "why": "«Roba un kama gigante»: the big kama coin on the counter of the smoke-filled bank (element 515679, cell 374); two asphyxiated security agents attack at once (Dofus pour les noobs)."
+  },
+  {
+   "objective": 4649,
+   "quest": 716,
+   "elements": [{"map": 192676866, "element": 515836}],
+   "why": "«Vigila el caldero de aceite»: the cauldron in the middle of the cellar of Marp's house (element 515836, cell 328)."
+  },
+  {
+   "objective": 5698,
+   "quest": 938,
+   "elements": [{"map": 188743681, "element": 515345}],
+   "requires": [{"item": 13266, "count": 1}],
+   "spends": true,
+   "anyOrder": true,
+   "why": "«Coloca la primera sonosonda»: the ripples on the pond's shore of [1,-21] (element 515345, cell 138); a sonoprobe is spent."
+  },
+  {
+   "objective": 5699,
+   "quest": 938,
+   "elements": [{"map": 188744193, "element": 515344}],
+   "requires": [{"item": 13266, "count": 1}],
+   "spends": true,
+   "anyOrder": true,
+   "why": "«Coloca la segunda sonosonda»: the ripples on the pond's shore of [2,-21] (element 515344, cell 441); a sonoprobe is spent."
+  },
+  {
+   "objective": 5700,
+   "quest": 938,
+   "elements": [{"map": 188744194, "element": 515342}],
+   "requires": [{"item": 13266, "count": 1}],
+   "spends": true,
+   "anyOrder": true,
+   "why": "«Coloca la tercera sonosonda»: the ripples on the pond's shore of [2,-20] (element 515342, cell 267); a sonoprobe is spent."
+  },
+  {
+   "objective": 5701,
+   "quest": 938,
+   "elements": [{"map": 188743682, "element": 515343}],
+   "requires": [{"item": 13266, "count": 1}],
+   "spends": true,
+   "anyOrder": true,
+   "why": "«Coloca la cuarta sonosonda»: the ripples on the pond's shore of [1,-20] (element 515343, cell 21); a sonoprobe is spent."
+  },
+  {
+   "objective": 5707,
+   "quest": 938,
+   "elements": [{"map": 188744194, "element": 515342}],
+   "why": "«Escruta la superficie marina»: the ripples of [2,-20] looked at, the creature glimpsed (Dofus pour les noobs)."
+  },
+  {
+   "objective": 5708,
+   "quest": 938,
+   "elements": [{"map": 188744194, "element": 515342}],
+   "spawns": {"monster": 3285, "count": 1, "attacks": true},
+   "why": "«Tira una piedra donde salen las burbujas»: the ripples clicked a second time; the Gran azul comes out and attacks, alone. Its loot holds the Gran azul (13269)."
   }
  ]
 }

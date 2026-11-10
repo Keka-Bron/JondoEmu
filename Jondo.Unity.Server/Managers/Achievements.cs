@@ -128,10 +128,24 @@ namespace Jondo.Unity.Server.Managers
 
             var log = new AchievementLog(_book, new CharacterFacts());
 
+            // The account's, not the character's: what one character of the account achieved is
+            // achieved for all of them and paid once (the captured lists name up to four different
+            // characters). Read per character, another character of the same account earned it all
+            // again and was paid for it again. The character's own row is preferred, then a paid one.
+            long account = DatabaseManager.GetCharacterById(characterId)?.AccountId ?? 0;
+            var rowsOf = account != 0
+                ? DatabaseManager.LoadAccountAchievements(account)
+                : DatabaseManager.LoadAchievements(characterId)
+                    .Select(r => (CharacterId: characterId, r.Achievement, r.Claimed)).ToList();
+
             int rows = 0;
-            foreach (var (achievement, claimed) in DatabaseManager.LoadAchievements(characterId))
+            foreach (var group in rowsOf.GroupBy(r => r.Achievement))
             {
-                log.Restore(achievement, claimed);
+                bool claimed = group.Any(r => r.Claimed);
+                long achiever = group.Any(r => r.CharacterId == characterId) ? characterId
+                                : group.Where(r => r.Claimed).Select(r => r.CharacterId).FirstOrDefault();
+                if (achiever == 0) achiever = group.First().CharacterId;
+                log.Restore(group.Key, claimed, achiever);
                 rows++;
             }
 
@@ -156,20 +170,24 @@ namespace Jondo.Unity.Server.Managers
 
             var state = SessionContext.State;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Mft, AchievementProtocol.BuildList(state.CharacterId, ListOf(log, state.CharacterLevel))));
+                ConnectionProtocol.Push(Op.Mft, AchievementProtocol.BuildList(ListOf(log, state.CharacterId, state.CharacterLevel))));
 
             var earned = log.CheckEverything();
             state.AchievementLevelChecked = state.CharacterLevel;
             await AnnounceAsync(stream, earned);
         }
 
-        /// <summary>The list mft carries: every achievement, sorted, the unpaid ones with the level.</summary>
-        public static List<(int Achievement, int UnclaimedLevel)> ListOf(AchievementLog log, int level)
+        /// <summary>
+        /// The list mft carries: every achievement of the account, sorted, each with the character
+        /// that achieved it, the unpaid ones with the level.
+        /// </summary>
+        public static List<(int Achievement, long AchievedBy, int UnclaimedLevel)> ListOf(AchievementLog log, long characterId, int level)
         {
-            var list = new List<(int, int)>();
+            var list = new List<(int, long, int)>();
             foreach (int id in log.Earned.OrderBy(i => i))
             {
-                list.Add((id, log.WasClaimed(id) ? 0 : LevelOnTheWire(level)));
+                long by = log.AchieverOf(id);
+                list.Add((id, by != 0 ? by : characterId, log.WasClaimed(id) ? 0 : LevelOnTheWire(level)));
             }
 
             return list;
@@ -475,6 +493,7 @@ namespace Jondo.Unity.Server.Managers
             var state = SessionContext.State;
             foreach (int achievementId in earned)
             {
+                Log?.Credit(achievementId, state.CharacterId);
                 DatabaseManager.SaveAchievement(state.CharacterId, achievementId, claimed: false);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -623,7 +642,9 @@ namespace Jondo.Unity.Server.Managers
                 // Judged before it is marked paid: "Ob!<itself>" is the commonest reward condition.
                 var payout = log.Payout(id, state.CharacterLevel);
                 if (!log.MarkClaimed(id)) continue;
-                DatabaseManager.SaveAchievement(state.CharacterId, id, claimed: true);
+                // Paid on the row of whoever achieved it: the account's achievement, paid once.
+                long achiever = log.AchieverOf(id);
+                DatabaseManager.SaveAchievement(achiever != 0 ? achiever : state.CharacterId, id, claimed: true);
 
                 await CharacterRewards.GiveKamasAsync(stream, payout.Kamas);
                 levelled |= await CharacterRewards.GiveExperienceAsync(stream, payout.Experience);

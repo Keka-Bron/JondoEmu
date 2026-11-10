@@ -872,6 +872,13 @@ namespace Jondo.Unity.Server.Handlers
         /// An NPC of the map who walks in now (jsn) and opens his conversation (ioc, ios), as
         /// Ganymed does in the combat room once Master Darmas has been told the fight is won.
         /// </summary>
+        /// <summary>Whoever a reply brings in: its «showsNpc» and the «alsoShows» with it.</summary>
+        private static async Task ComeInAsync(NetworkStream stream, DialogueChoice choice)
+        {
+            await ComesInAsync(stream, choice.ShowsNpc);
+            foreach (int npc in choice.AlsoShows) await ComesInAsync(stream, npc);
+        }
+
         /// <summary>An NPC of this map comes in, for this character (jsn), without a word.</summary>
         public static async Task ComesInAsync(NetworkStream stream, int npcId)
         {
@@ -1447,7 +1454,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     await GiveFromReplyAsync(stream, elegidaAhora);
                     // And whoever comes in as it is said (Abel Hoz at the bank).
-                    if (elegidaAhora.ShowsNpc != 0) await ComesInAsync(stream, elegidaAhora.ShowsNpc);
+                    if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(stream, elegidaAhora);
                 }
             }
             else if (elegidaAhora != null && elegidaAhora.Gives != 0)
@@ -1465,7 +1472,7 @@ namespace Jondo.Unity.Server.Handlers
             // Somebody who comes in on a reply that does no objective: Vey Gana's «Darle los
             // ingredientes.» draws the country doll out of the barn.
             if (elegidaAhora != null && elegidaAhora.Completes == 0 && elegidaAhora.ShowsNpc != 0)
-                await ComesInAsync(stream, elegidaAhora.ShowsNpc);
+                await ComeInAsync(stream, elegidaAhora);
 
             int startsAfterClosing = 0;
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
@@ -1568,7 +1575,7 @@ namespace Jondo.Unity.Server.Handlers
                 await GiveFromReplyAsync(stream, elegidaAhora);
                 // Whoever comes in once it is said and the window is shut: Selim Llenneb back in
                 // the vault on «Respaldar a Becky y dirigirte hacia la puerta».
-                if (elegidaAhora.ShowsNpc != 0) await ComesInAsync(stream, elegidaAhora.ShowsNpc);
+                if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(stream, elegidaAhora);
             }
 
             if (startsAfterClosing != 0)

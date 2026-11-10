@@ -68,10 +68,19 @@ namespace Jondo.Unity.Server.Handlers
                     elementId, skillId, SessionContext.State.CharacterId)));
             await ReleaseAsync(stream, elementId, skillId, route.SourceCellId, route.InteractiveType);
 
-            int landed = await ToMapAsync(stream, route.DestinationMapId, route.DestinationCellId);
+            // The same door to somewhere else while a quest says so: the smoke-filled bank.
+            long toMap = route.DestinationMapId;
+            int toCell = route.DestinationCellId;
+            if (route.InsteadMapId != 0 && route.InsteadWhen.Length > 0 && Managers.ItemCriteria.Holds(route.InsteadWhen))
+            {
+                toMap = route.InsteadMapId;
+                toCell = route.InsteadCellId;
+            }
+
+            int landed = await ToMapAsync(stream, toMap, toCell);
             if (landed >= 0)
                 Console.WriteLine($"[Teleport] Element {elementId}: {sourceMapId} -> " +
-                                  $"{route.DestinationMapId}, cell {landed}.");
+                                  $"{toMap}, cell {landed}.");
         }
 
         /// <summary>

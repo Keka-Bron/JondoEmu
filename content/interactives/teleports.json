@@ -63,6 +63,9 @@
     "room, 192415750 at the same coordinates, landing on 410, beside the room's two exits. Those,",
     "515304 on 409 and 515305 on 424 (gfx 3518, as in the Militia Tower's training room), take",
     "skill 339, 'Indicar una salida', and lead back to 302, the square's walkable cell before the door.",
+    "While «The Tymador Job» has the smoke fairy hidden and the giant kama not yet stolen (4561..4563),",
+    "the same door leads into the smoke-filled bank, 192677890, landing on 410 as well; its two exits go",
+    "back to the square as the graph has them.",
     "No capture goes in: the door's type and skill are the pair every measured passage uses.",
     "",
     "THE TEMPORAL ANOMALIES' PORTALS, measured in the two anomaly captures (content/anomalies/places.json):",
@@ -235,7 +238,10 @@
       "type": -1,
       "skill": 184,
       "toMap": 192415750,
-      "toCell": 410
+      "toCell": 410,
+      "insteadToMap": 192677890,
+      "insteadToCell": 410,
+      "insteadWhen": "Qa=704&Qo=4561&Qo!4563"
     },
     {
       "map": 192415750,

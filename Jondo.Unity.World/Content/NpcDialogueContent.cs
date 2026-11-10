@@ -225,6 +225,12 @@ namespace Jondo.Unity.World.Content
         public int ShowsNpc { get; init; }
 
         /// <summary>
+        /// Others who come in with <see cref="ShowsNpc"/> («alsoShows»): the flying and the swift
+        /// blades of «Cabeza de turco», drawn out together by Nibe Lula's diuretic.
+        /// </summary>
+        public IReadOnlyList<int> AlsoShows { get; init; } = Array.Empty<int>();
+
+        /// <summary>
         /// More objectives of <see cref="Quest"/> this reply does, beside <see cref="Completes"/>:
         /// Vey Gana's «Darle los ingredientes.» hands over the four slobbers, four objectives.
         /// </summary>
@@ -862,6 +868,7 @@ namespace Jondo.Unity.World.Content
                             ThenNpc = (int)Number(choice, "thenNpc"),
                             Completes = (int)Number(choice, "completes"),
                             ShowsNpc = (int)Number(choice, "showsNpc"),
+                            AlsoShows = Numbers(choice, "alsoShows").Select(o => (int)o).ToArray(),
                             CompletesAll = Numbers(choice, "completesAll").Select(o => (int)o).ToArray(),
                             Gives = (int)Number(choice, "gives"),
                             MinLevel = (int)Number(choice, "minLevel"),
@@ -1035,6 +1042,12 @@ namespace Jondo.Unity.World.Content
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);
                             if (choice.ShowsNpc != 0) writer.WriteNumber("showsNpc", choice.ShowsNpc);
+                            if (choice.AlsoShows.Count > 0)
+                            {
+                                writer.WriteStartArray("alsoShows");
+                                foreach (int npc in choice.AlsoShows) writer.WriteNumberValue(npc);
+                                writer.WriteEndArray();
+                            }
                             if (choice.CompletesAll.Count > 0)
                             {
                                 writer.WriteStartArray("completesAll");

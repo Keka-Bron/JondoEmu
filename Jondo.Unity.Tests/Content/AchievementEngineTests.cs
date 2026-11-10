@@ -105,6 +105,30 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
+        public void What_another_character_of_the_account_achieved_is_not_earned_again()
+        {
+            if (!Available) return;
+
+            // The account's list: "Principiante" achieved and paid by another character of the
+            // account. A level-200 character entering must neither earn it again nor be owed it.
+            var log = new AchievementLog(Book, new Player { Level = 200 });
+            log.Restore(3, claimed: true, achievedBy: 77);
+
+            var earned = log.CheckAll(new[] { 3, 4 });
+
+            Assert.DoesNotContain(3, earned);
+            Assert.Contains(4, earned);
+            Assert.True(log.WasClaimed(3));
+            Assert.Equal(77, log.AchieverOf(3));
+            Assert.DoesNotContain(3, log.Unclaimed());
+
+            log.Credit(4, 88);
+            Assert.Equal(88, log.AchieverOf(4));
+            log.Credit(4, 99);
+            Assert.Equal(88, log.AchieverOf(4));
+        }
+
+        [Fact]
         public void The_level_achievements_want_the_level_and_nothing_more()
         {
             if (!Available) return;

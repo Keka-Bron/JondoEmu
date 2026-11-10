@@ -46,6 +46,17 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public string Criterion { get; init; }
 
+        /// <summary>
+        /// Where it leads instead while <see cref="InsteadWhen"/> holds («insteadToMap», «insteadToCell»,
+        /// «insteadWhen»): the bank's door into the smoke-filled bank of «The Tymador Job» once the
+        /// smoke fairy is hidden. Zero when the door always leads to the same place.
+        /// </summary>
+        public long InsteadMapId { get; init; }
+
+        public int InsteadCell { get; init; }
+
+        public string InsteadWhen { get; init; }
+
         public override string ToString()
             => $"{SourceMapId}/{ElementId} → {DestinationMapId}@{DestinationCell}";
     }
@@ -135,6 +146,10 @@ namespace Jondo.Unity.World.Content
                         DestinationCell = (int)Long(entry, "toCell"),
                         Criterion = entry.TryGetProperty("criterion", out var criterion) &&
                                     criterion.ValueKind == JsonValueKind.String ? criterion.GetString() ?? "" : "",
+                        InsteadMapId = Long(entry, "insteadToMap"),
+                        InsteadCell = (int)Long(entry, "insteadToCell"),
+                        InsteadWhen = entry.TryGetProperty("insteadWhen", out var instead) &&
+                                      instead.ValueKind == JsonValueKind.String ? instead.GetString() ?? "" : "",
                     }, from);
                 }
             }
@@ -231,6 +246,12 @@ namespace Jondo.Unity.World.Content
                     writer.WriteNumber("toMap", passage.DestinationMapId);
                     writer.WriteNumber("toCell", passage.DestinationCell);
                     if (!string.IsNullOrEmpty(passage.Criterion)) writer.WriteString("criterion", passage.Criterion);
+                    if (passage.InsteadMapId != 0)
+                    {
+                        writer.WriteNumber("insteadToMap", passage.InsteadMapId);
+                        writer.WriteNumber("insteadToCell", passage.InsteadCell);
+                        writer.WriteString("insteadWhen", passage.InsteadWhen ?? "");
+                    }
                     writer.WriteEndObject();
                 }
 

@@ -5115,6 +5115,36 @@ namespace Jondo.Unity.Server
             return salida;
         }
 
+        /// <summary>
+        /// The achievements of every character of an account: who did it, which, and whether it was
+        /// paid. Achievements are the account's in Dofus 3: the list the client gets on entering
+        /// names, entry by entry, the character of the account that achieved it.
+        /// </summary>
+        public static List<(long CharacterId, int Achievement, bool Claimed)> LoadAccountAchievements(long accountId)
+        {
+            EnsureProgressionTables();
+            var all = new List<(long, int, bool)>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    SELECT a.CharacterId, a.AchievementId, a.Claimed
+                    FROM CharacterAchievements a JOIN Characters c ON c.Id = a.CharacterId
+                    WHERE c.AccountId = $a
+                    ORDER BY a.rowid;";
+                command.Parameters.AddWithValue("$a", accountId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) all.Add((reader.GetInt64(0), reader.GetInt32(1), reader.GetInt32(2) != 0));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] Could not read the account's achievements: {ex.Message}");
+            }
+            return all;
+        }
+
         /// <summary>Every character's achievements at once: the character and the achievement.</summary>
         public static List<(long CharacterId, int Achievement)> LoadAllAchievements()
         {

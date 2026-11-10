@@ -1856,6 +1856,150 @@
       "orientation": 7,
       "criterion": "Qa!1972|Qo!13991",
       "why": "Erty Trapchet at [0,-19], where Dofus pour les noobs starts «Qui sème le vent récolte l'Artempeth»: by the flowering bush he studies, except while he is at the Sadida grove for «C'est pourtant naturel». INFERRED cell, the clearing south of it."
+    },
+    {
+      "map": 190578689,
+      "npc": 4433,
+      "cell": 245,
+      "orientation": 1,
+      "criterion": "Qa=1973&Qo!14055",
+      "why": "Zeta Rymakón (Brigitte Sarimavek) at [3,-13] for the ritual of suffering of «Souffre-douleur». INFERRED cell."
+    },
+    {
+      "map": 190578689,
+      "npc": 4434,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1973&Qo!14055",
+      "why": "Amayan Demol, the singer of the ritual of suffering, while it lasts."
+    },
+    {
+      "map": 190578689,
+      "npc": 4435,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1973&Qo=14051&Qo!14054",
+      "why": "The dancing blade, drawn out by the song (14051) until caught (14054)."
+    },
+    {
+      "map": 192939018,
+      "npc": 4436,
+      "cell": 317,
+      "orientation": 5,
+      "criterion": "Qa=1973&Qo=14056&Qo!14057",
+      "why": "The flaying blade, drawn out by Saketsú's waxing (14056) until caught (14057). INFERRED cell."
+    },
+    {
+      "map": 188744706,
+      "npc": 4437,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=1973&Qo=14058&Qo!14061",
+      "why": "The Strubian cat by the fishers' workshop [3,-20], for «Souffre-douleur»."
+    },
+    {
+      "map": 188744706,
+      "npc": 4438,
+      "cell": 341,
+      "orientation": 7,
+      "criterion": "Qa=1973&Qo=14060&Qo!14061",
+      "why": "The guardian blade, out of the gloom behind the cat (14060) until caught (14061). INFERRED cell."
+    },
+    {
+      "map": 188744706,
+      "npc": 4433,
+      "cell": 298,
+      "orientation": 1,
+      "criterion": "Qa=1973&Qo=14058&Qo!14062",
+      "why": "Zeta Rymakón sent by Saketsú to the fishers' workshop (31219) until she takes the character to Nibe Lula. INFERRED cell."
+    },
+    {
+      "map": 192937988,
+      "npc": 4433,
+      "cell": 384,
+      "orientation": 7,
+      "criterion": "Qa=1973&Qo=14062",
+      "why": "Zeta Rymakón in the alchemists' workshop [3,-21] with the character, to the end of «Souffre-douleur». INFERRED cell."
+    },
+    {
+      "map": 192937988,
+      "npc": 4439,
+      "cell": 399,
+      "orientation": 7,
+      "criterion": "Qa=1973&Qo=14063&Qo!14065",
+      "why": "The flying blade, drawn out by Nibe Lula's diuretic (14063) until caught (14065). INFERRED cell."
+    },
+    {
+      "map": 192937988,
+      "npc": 4440,
+      "cell": 412,
+      "orientation": 7,
+      "criterion": "Qa=1973&Qo=14063&Qo!14065",
+      "why": "The swift blade, with the flying one. INFERRED cell."
+    },
+    {
+      "map": 188744710,
+      "npc": 4473,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qa=1974&Qo=14156&Qo=14209&Qo=14210&Qo!14213",
+      "why": "Regane Dawa staring into the well north of the handymen's workshop [3,-16], once the other three wells were looked at, until the raging water is beaten."
+    },
+    {
+      "map": 188744706,
+      "npc": 4474,
+      "cell": 313,
+      "orientation": 1,
+      "criterion": "Qa=1974&Qo=14217&Qo!14220",
+      "why": "The possessed Regane by the pond [3,-20] (31620) until the Akwadala spirit is beaten."
+    },
+    {
+      "map": 188744706,
+      "npc": 4475,
+      "cell": 313,
+      "orientation": 1,
+      "criterion": "Qa=1974&Qo=14220&Qo!14222",
+      "why": "Regane freed of the spirit, by the pond until taken to her uncle."
+    },
+    {
+      "map": 191106050,
+      "npc": 4475,
+      "cell": 342,
+      "orientation": 3,
+      "criterion": "Qa=1974&Qo=14222|Qf=1974",
+      "why": "Regane back beside her uncle in the tavern, from «Lleva a Reigan a ver a su tío» on. INFERRED cell."
+    },
+    {
+      "map": 188746759,
+      "npc": 4317,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qa!716|Qo!4646|Qo=4651",
+      "why": "Hibabá, the zobals' master, by the tailors' workshop [7,-15] (Dofus pour les noobs), except while he waits in Marp's house. INFERRED cell."
+    },
+    {
+      "map": 192675842,
+      "npc": 4317,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=716&Qo=4646&Qo!4651",
+      "why": "Hibabá in Marp's house [1,-19], rented for his party, from «nos vemos allí» (4646) until the plan is reported (4651). INFERRED cell."
+    },
+    {
+      "map": 192676866,
+      "npc": 1433,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qa=716&Qo=4647",
+      "why": "Ana Morgi in the cellar of Marp's house, from Hibabá sending the character down (4647)."
+    },
+    {
+      "map": 192676866,
+      "npc": 4445,
+      "cell": 317,
+      "orientation": 5,
+      "criterion": "Qa=716&Qo=4650&Qo!14079",
+      "why": "The scalded tymadores out of their barrel (4650) until beaten (14079). INFERRED cell, by the barrels."
     }
   ]
 }
