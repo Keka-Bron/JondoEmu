@@ -681,7 +681,8 @@ played through.
 | Incarnam | `██████████` **100%** | 24/24 |
 | Wabbit Islands | `██████░░░░` **61%** | 14/23 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
-| **All quests** | **6.5%** | **128/1976** |
+| Moon Island | `████░░░░░░` **40%** | 4/10 |
+| **All quests** | **6.7%** | **132/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

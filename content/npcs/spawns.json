@@ -2400,6 +2400,61 @@
       "cell": 300,
       "orientation": 3,
       "why": "Wogew the hermit in his burrow [-1,-39], who gives «Wogew l'hewmite» (the quest's giver map). INFERRED cell."
+    },
+    {
+      "map": 156499972,
+      "npc": 3039,
+      "cell": 412,
+      "orientation": 3,
+      "criterion": "Qa=1673&Qo!10232",
+      "why": "Kanniboul Himik «qui semble cacher un colis derrière lui» (Dofus pour les noobs) at [29,10]: in front of the barrel and the box behind it (element 500581, cell 411), until beaten. No capture places him: INFERRED."
+    },
+    {
+      "map": 156499972,
+      "npc": 3036,
+      "cell": 426,
+      "orientation": 3,
+      "criterion": "Qo=10233&Qo!10234",
+      "why": "Gobagrum out of the opened parcel, beside the box (411), until he hides in it again (10234). INFERRED cell."
+    },
+    {
+      "map": 156500483,
+      "npc": 3036,
+      "cell": 345,
+      "orientation": 7,
+      "criterion": "Qo=10239|Qf=1673",
+      "why": "Gobagrum at Ñesa's pot once handed back, the kanniboulas' kitchen boy afterwards (21994). INFERRED cell."
+    },
+    {
+      "map": 158077952,
+      "npc": 3024,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qa=1669|Qf=1669",
+      "why": "Patréfin: «En remontant la caverne à partir du donjon, vous passerez devant Patréfin» (Dofus pour les noobs), on the sand of the cave below the ship. No capture places him: INFERRED cell."
+    },
+    {
+      "map": 156502273,
+      "npc": 3026,
+      "cell": 316,
+      "orientation": 1,
+      "why": "Gros Bob «En [33,5]» (Dofus pour les noobs), beside the picnic of bananaranjas and rum on the sand (302, 317). Always there: he also trades a sign of Dicardya. INFERRED cell."
+    },
+    {
+      "map": 156501761,
+      "npc": 3027,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1669|Qf=1669",
+      "why": "Pilpoil «En [32,5]» (Dofus pour les noobs), in the clearing between the totems. INFERRED cell."
+    },
+    {
+      "map": 156501250,
+      "npc": 3025,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1669|Qf=1669",
+      "why": "L'Égorgeur «En [31,4]» (Dofus pour les noobs), before his chest (271, 285). INFERRED cell."
     }
   ]
 }

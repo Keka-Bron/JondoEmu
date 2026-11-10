@@ -143,6 +143,14 @@ namespace Jondo.Unity.World.Quests
             = Array.Empty<(long, int)>();
 
         /// <summary>
+        /// With <see cref="GivesEach"/>: the item one element hands over instead of the row's
+        /// <see cref="Gives"/> -- each of the four nests of «Le combat des chefs» holds an egg of
+        /// its own.
+        /// </summary>
+        public IReadOnlyDictionary<(long MapId, int ElementId), int> ElementItems { get; init; }
+            = new Dictionary<(long, int), int>();
+
+        /// <summary>
         /// The skill the element offers. <c>Utiliser</c> unless a row says otherwise.
         /// </summary>
         /// <remarks>
@@ -269,6 +277,20 @@ namespace Jondo.Unity.World.Quests
         /// </summary>
         public bool OnlyGives { get; init; }
 
+        /// <summary>
+        /// With <see cref="OnlyGives"/>: each of the row's elements hands its item over once, up to
+        /// the count the row gives -- the four bushes of sea enchalada of «Un parfum de vacances»,
+        /// a leaf each, four in all.
+        /// </summary>
+        public bool GivesEach { get; init; }
+
+        /// <summary>
+        /// The odds, in percent, that a <see cref="GivesEach"/> element brings its monster out when
+        /// it hands its item over; zero is every time. A dodoune egg wakes a watchful dostrogo one
+        /// time in two.
+        /// </summary>
+        public int SpawnsChance { get; init; }
+
         /// <summary>Why this row says what it says. Never read by the server; read by people.</summary>
         public string Why { get; init; } = "";
 
@@ -385,13 +407,17 @@ namespace Jondo.Unity.World.Quests
             if (objective == 0) return null;
 
             var elements = new List<(long, int)>();
+            var elementItems = new Dictionary<(long, int), int>();
             if (row.TryGetProperty("elements", out var list) && list.ValueKind == JsonValueKind.Array)
             {
                 foreach (var one in list.EnumerateArray())
                 {
                     long map = Long(one, "map");
                     int element = Int(one, "element");
-                    if (map != 0 && element != 0) elements.Add((map, element));
+                    if (map == 0 || element == 0) continue;
+                    elements.Add((map, element));
+                    int own = Int(one, "item");
+                    if (own != 0) elementItems[(map, element)] = own;
                 }
             }
 
@@ -421,9 +447,11 @@ namespace Jondo.Unity.World.Quests
             int spawnMonster = 0, spawnCount = 0, spawnWith = 0;
             var spawnWithAll = new List<int>();
             bool spawnAttacks = false;
+            int spawnChance = 0;
             if (row.TryGetProperty("spawns", out var spawn) && spawn.ValueKind == JsonValueKind.Object)
             {
                 spawnMonster = Int(spawn, "monster");
+                spawnChance = Math.Clamp(Int(spawn, "chance"), 0, 100);
                 spawnCount = Math.Max(1, Int(spawn, "count"));
                 if (spawn.TryGetProperty("with", out var with) && with.ValueKind == JsonValueKind.Array)
                 {
@@ -456,6 +484,7 @@ namespace Jondo.Unity.World.Quests
                         m => m.GetInt32()))
                     : System.Array.Empty<int>(),
                 Elements = elements,
+                ElementItems = elementItems,
                 Gives = gives,
                 Requires = requires,
                 SpendsRequired = row.TryGetProperty("spends", out var spends)
@@ -465,6 +494,7 @@ namespace Jondo.Unity.World.Quests
                 SpawnsWith = spawnWith,
                 SpawnsWithAll = spawnWithAll,
                 SpawnsAttack = spawnAttacks,
+                SpawnsChance = spawnChance,
                 Times = Math.Max(1, Int(row, "times")),
                 Starts = Int(row, "starts"),
                 ThenStarts = Int(row, "thenStarts"),
@@ -474,6 +504,7 @@ namespace Jondo.Unity.World.Quests
                 ShowsNpc = Int(row, "showsNpc"),
                 Says = Int(row, "says"),
                 OnlyGives = row.TryGetProperty("onlyGives", out var only) && only.ValueKind == JsonValueKind.True,
+                GivesEach = row.TryGetProperty("givesEach", out var each) && each.ValueKind == JsonValueKind.True,
                 OverridesMap = row.TryGetProperty("overridesMap", out var overrides)
                                && overrides.ValueKind == JsonValueKind.True,
                 ItemId = Int(row, "item"),

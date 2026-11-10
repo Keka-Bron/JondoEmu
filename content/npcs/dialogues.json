@@ -18363,6 +18363,892 @@
         }
       ],
       "why": "Wogew the hermit in his burrow [-1,-39]: brave to come in, he likes solitude but does not bite (2154). «Wogew l'hewmite» (18) of Dofus pour les noobs: «congratulations on the decoration», a little job, too old for the wabbit archipelago (985, «Te ayudaré»), the syringe, the wabbit GM's blood once knocked out (986: the vet's syringe 1745, «Agarrar la jeringuilla»), the wabbit GM in a laboratory under the Cawotte island (11404); the blood, but an analysis, ask Otomai (988), «found what I asked?» (987: the analysis handed on a hello)."
+    },
+    {
+      "npc": 3015,
+      "map": 0,
+      "opening": 21814,
+      "lines": [
+        {
+          "message": 21814,
+          "choices": [
+            { "reply": 26280, "next": 21847 },
+            { "reply": 26294, "next": 21851 },
+            { "reply": 26276, "next": 21846 },
+            { "reply": 26300, "next": 21855, "beforeQuest": 1667 },
+            { "reply": 26288 }
+          ]
+        },
+        {
+          "message": 21847,
+          "choices": [
+            { "reply": 26279, "next": 21848 },
+            { "reply": 26283, "next": 21849 },
+            { "reply": 26286, "next": 21850 }
+          ]
+        },
+        {
+          "message": 21848,
+          "choices": [
+            { "reply": 26281, "next": 21847 },
+            { "reply": 26282 }
+          ]
+        },
+        {
+          "message": 21849,
+          "choices": [
+            { "reply": 26284, "next": 21847 },
+            { "reply": 26285 }
+          ]
+        },
+        {
+          "message": 21850,
+          "choices": [
+            { "reply": 26289, "next": 21847 },
+            { "reply": 26290 }
+          ]
+        },
+        {
+          "message": 21846,
+          "choices": [
+            { "reply": 26277, "next": 21814 },
+            { "reply": 26278 }
+          ]
+        },
+        {
+          "message": 21851,
+          "choices": [
+            { "reply": 26293, "next": 21852 }
+          ]
+        },
+        {
+          "message": 21852,
+          "choices": [
+            { "reply": 26292, "next": 21853 }
+          ]
+        },
+        {
+          "message": 21853,
+          "choices": [
+            { "reply": 26291, "next": 21854 }
+          ]
+        },
+        {
+          "message": 21854,
+          "choices": [
+            { "reply": 26298, "next": 21856, "beforeQuest": 1667 },
+            { "reply": 26287 }
+          ]
+        },
+        {
+          "message": 21855,
+          "choices": [
+            { "reply": 26299, "startsQuest": 1667, "params": [[34, 1667]] },
+            { "reply": 26295, "next": 21814 },
+            { "reply": 26296 }
+          ]
+        },
+        {
+          "message": 21856,
+          "choices": [
+            { "reply": 26297, "startsQuest": 1667, "params": [[34, 1667]] }
+          ]
+        }
+      ],
+      "why": "The employee of the Equipo Turist-A on the isle of Moon's beach: welcome, guest, any question (21814; «Partir un jour sans retour», 1666, done on this hello). What to know (21847): the kanniboulas, grumpy but they love tourists, their chief Daldrrak a sorcerer (21848), the pirates of the north-west (21849), Moon, the island's god in a giant tree (21850); no return trip, the zaap or a potion (21846); the activities, Tortuga beach, the forest of masks, the path of skulls, the forbidden jungle (21851-21854); «the island's oldest tourist», on the edge of the forest (21855, 21856: «Un parfum de vacances», 1667, «Me voy al bosque»)."
+    },
+    {
+      "npc": 151,
+      "map": 0,
+      "opening": 523,
+      "openings": [
+        { "quest": 1667, "objective": 10164, "pending": 10167, "message": 21868 },
+        { "quest": 1667, "objective": 10167, "pending": 10168, "message": 21868 },
+        { "quest": 1667, "objective": 10168, "message": 21871 },
+        { "after": 1667, "before": 1668, "message": 21873 }
+      ],
+      "lines": [
+        {
+          "message": 523,
+          "choices": [
+            { "reply": 26312, "next": 21859, "quest": 1667, "beforeObjective": 10164 },
+            { "reply": 478, "next": 567 },
+            { "reply": 479, "next": 568 },
+            { "reply": 480, "next": 569 },
+            { "reply": 482, "next": 571 },
+            { "reply": 510, "next": 606 },
+            { "reply": 5638, "next": 6374 }
+          ]
+        },
+        {
+          "message": 567,
+          "choices": []
+        },
+        {
+          "message": 568,
+          "choices": []
+        },
+        {
+          "message": 569,
+          "choices": []
+        },
+        {
+          "message": 606,
+          "choices": []
+        },
+        {
+          "message": 6374,
+          "choices": []
+        },
+        {
+          "message": 571,
+          "choices": [
+            { "reply": 483, "next": 572 }
+          ]
+        },
+        {
+          "message": 572,
+          "choices": [
+            { "reply": 484, "next": 573 }
+          ]
+        },
+        {
+          "message": 573,
+          "choices": []
+        },
+        {
+          "message": 21859,
+          "choices": [
+            { "reply": 26311, "next": 21860 }
+          ]
+        },
+        {
+          "message": 21860,
+          "choices": [
+            { "reply": 26310, "next": 21861 }
+          ]
+        },
+        {
+          "message": 21861,
+          "choices": [
+            { "reply": 26309, "next": 21862 }
+          ]
+        },
+        {
+          "message": 21862,
+          "choices": [
+            { "reply": 26308, "next": 21863 }
+          ]
+        },
+        {
+          "message": 21863,
+          "choices": [
+            { "reply": 26307, "next": 21864 }
+          ]
+        },
+        {
+          "message": 21864,
+          "choices": [
+            { "reply": 26306, "quest": 1667, "completes": 10164, "params": [[30, 10164]], "next": 21866 }
+          ]
+        },
+        {
+          "message": 21866,
+          "choices": [
+            { "reply": 26304, "next": 21867 },
+            { "reply": 26303 }
+          ]
+        },
+        {
+          "message": 21867,
+          "choices": [
+            { "reply": 26313 }
+          ]
+        },
+        {
+          "message": 21868,
+          "choices": [
+            { "reply": 26320, "quest": 1667, "completes": 10167, "params": [[30, 10167]], "next": 21869, "takes": 17164, "takesCount": 4 },
+            { "reply": 26313 }
+          ]
+        },
+        {
+          "message": 21869,
+          "choices": [
+            { "reply": 26319, "quest": 1667, "completes": 10168, "params": [[30, 10168]], "next": 21870 }
+          ]
+        },
+        {
+          "message": 21870,
+          "choices": [
+            { "reply": 26318 }
+          ]
+        },
+        {
+          "message": 21871,
+          "choices": [
+            { "reply": 26315, "next": 21872 }
+          ]
+        },
+        {
+          "message": 21872,
+          "choices": [
+            { "reply": 26314 }
+          ]
+        },
+        {
+          "message": 21873,
+          "choices": [
+            { "reply": 26322, "next": 21874 }
+          ]
+        },
+        {
+          "message": 21874,
+          "choices": [
+            { "reply": 26321, "next": 21875 }
+          ]
+        },
+        {
+          "message": 21875,
+          "choices": [
+            { "reply": 26324, "startsQuest": 1668, "params": [[34, 1668]] }
+          ]
+        }
+      ],
+      "why": "Propanzón Crizoe, the island of Moon's oldest tourist, on the Tortuga beach [33,12]: not alone any more (523); who he is, fifty years on holiday (567), the island (568), its attractions (569), its people, pirates, the tribe, the Turist-A guide (571-573), a roof from kokoteros (606), what turtles eat (6374). «Un parfum de vacances» (1667) of Dofus pour les noobs: «the oldest tourist?», his ship wrecked long ago (21859), not without his dokoko (21860, 21861), a secret (21862), the kanniboulas' magic eggs, chief Daldrrak (21863), «team up» (21864, «Estrechar la mano»: 10164), a repellent ointment, its ingredients (21866), the bushes that smell of rotten kelp (21867); «got it all?» (21868: the pulp, the turtle liver oil on a hello, «¡Traigo los tres tipos de ingredientes!» with the four leaves: 10167), an old gorkoko meanwhile (21869: 10168, 21871), at the jungle's end, three of his kind beaten first (21870, 21872); the ointment, spread it all over (21873, 21874); to find Daldrrak, the forest of masks and the host at the village (21875: «Un indigeste chez les indigènes», 1668)."
+    },
+    {
+      "npc": 3021,
+      "map": 0,
+      "opening": 21881,
+      "openings": [
+        { "quest": 1668, "objective": 10193, "message": 21884 }
+      ],
+      "lines": [
+        {
+          "message": 21881,
+          "choices": [
+            { "reply": 26339, "next": 21882, "quest": 1668, "afterObjective": 10192, "beforeObjective": 10193 }
+          ]
+        },
+        {
+          "message": 21882,
+          "choices": [
+            { "reply": 26338, "quest": 1668, "completes": 10193, "params": [[30, 10193]], "next": 21883, "takes": 17165, "gives": 17276 }
+          ]
+        },
+        {
+          "message": 21883,
+          "choices": [
+            { "reply": 26337, "next": 21884 }
+          ]
+        },
+        {
+          "message": 21884,
+          "choices": [
+            { "reply": 26336, "next": 21885 }
+          ]
+        },
+        {
+          "message": 21885,
+          "choices": [
+            { "reply": 26335, "next": 21886 }
+          ]
+        },
+        {
+          "message": 21886,
+          "choices": [
+            { "reply": 26334 }
+          ]
+        }
+      ],
+      "why": "Daldrrak, the kanniboulas' shaman, in the village's exit room. «Un indigeste chez les indigènes» (1668) of Dofus pour les noobs, once Kanniboul Ebil is beaten: strong but smelly (21881), the universal tongue the spirits taught him (21882), the old gorkoko's leaf as a present (21883: «Toma, la hoja del viejo gorkoko», 17165 taken, the ginsengoku seed 17276 given: 10193), only Moon gives a dokoko, the seed at his feet (21884), twelve moons of fasting (21885), or Mamie Voudou's rituals, at a cost (21886)."
+    },
+    {
+      "npc": 3022,
+      "map": 0,
+      "opening": 21887,
+      "openings": [
+        { "after": 1669, "before": 1670, "holds": 17281, "message": 21910 },
+        { "after": 1669, "before": 1670, "message": 21907 },
+        { "quest": 1670, "message": 21912 },
+        { "quest": 1669, "message": 21893 },
+        { "after": 1668, "before": 1669, "message": 21891 }
+      ],
+      "lines": [
+        {
+          "message": 21887,
+          "choices": [
+            { "reply": 26345, "next": 21888, "quest": 1668, "afterObjective": 10193, "beforeObjective": 10194 }
+          ]
+        },
+        {
+          "message": 21888,
+          "choices": [
+            { "reply": 26344, "next": 21889 }
+          ]
+        },
+        {
+          "message": 21889,
+          "choices": [
+            { "reply": 26343, "next": 21890 }
+          ]
+        },
+        {
+          "message": 21890,
+          "choices": [
+            { "reply": 26342, "quest": 1668, "completes": 10194, "params": [[30, 10194]], "next": 21891 }
+          ]
+        },
+        {
+          "message": 21891,
+          "choices": [
+            { "reply": 26341, "startsQuest": 1669, "params": [[34, 1669]], "next": 21892 }
+          ]
+        },
+        {
+          "message": 21892,
+          "choices": [
+            { "reply": 26340 }
+          ]
+        },
+        {
+          "message": 21893,
+          "choices": [
+            { "reply": 26367, "next": 21905, "quest": 1669, "afterObjective": 10203, "holds": 17280 },
+            { "reply": 26346 }
+          ]
+        },
+        {
+          "message": 21905,
+          "choices": [
+            { "reply": 26366, "next": 21906 }
+          ]
+        },
+        {
+          "message": 21906,
+          "choices": [
+            { "reply": 26365, "quest": 1669, "completes": 10204, "params": [[30, 10204]], "next": 21907, "takes": 17280 }
+          ]
+        },
+        {
+          "message": 21907,
+          "choices": [
+            { "reply": 26364, "next": 21908 }
+          ]
+        },
+        {
+          "message": 21908,
+          "choices": [
+            { "reply": 26363, "next": 21909 }
+          ]
+        },
+        {
+          "message": 21909,
+          "choices": [
+            { "reply": 26362, "next": 21910, "takes": 17276, "gives": 17281 }
+          ]
+        },
+        {
+          "message": 21910,
+          "choices": [
+            { "reply": 26361, "startsQuest": 1670, "params": [[34, 1670]], "next": 21911 }
+          ]
+        },
+        {
+          "message": 21911,
+          "choices": [
+            { "reply": 26360 }
+          ]
+        },
+        {
+          "message": 21912,
+          "choices": [
+            { "reply": 26368 }
+          ]
+        }
+      ],
+      "why": "Mamie Voudou in the forest of masks [31,9]: the soup nearly ready (21887). «Un indigeste chez les indigènes» (1668) of Dofus pour les noobs: «the favour of the spirits», you stink of rotten flesh (21888), a ginsengoku seed, a fertility dance (21889), too little meat, only moon magic (21890), «how much?» (26342: 10194, the quest ends); a pirate stole her amulet (21891: «Squelettes et amulette», 1669, «¿Quién ha robado el amuleto?»), Le Chuko's boat in the cave at the end of the path of skulls (21892, 21893). «Squelettes et amulettes» (1669): «shake Le Chuko» (21893); «look, the amulet», she snatches it (21905), «was it you who turned the pirates?», Moon did, they offended him (21906: «¡Aquí tienes, el amuleto!», 17280 given back, 10204, the quest ends), the seed in a glass jar (21907), the coloured powders and the magic words (21908), «a tiny green shoot» (21909: the seed 17276 for the young plant 17281), still frail, a moon root of ginsengoku for Moon (21910: «Rendez-vous avec la lune», 1670), the great totem, the jungle's fertilizer, Moon's servant (21911, 21912)."
+    },
+    {
+      "npc": 161,
+      "map": 0,
+      "opening": 591,
+      "openings": [
+        { "quest": 1675, "message": 22020 },
+        { "after": 1675, "message": 22016 }
+      ],
+      "lines": [
+        {
+          "message": 591,
+          "choices": [
+            { "reply": 26512, "next": 22017, "beforeQuest": 1675 }
+          ]
+        },
+        {
+          "message": 22017,
+          "choices": [
+            { "reply": 26510, "next": 22018 },
+            { "reply": 26511 }
+          ]
+        },
+        {
+          "message": 22018,
+          "choices": [
+            { "reply": 26508, "startsQuest": 1675, "params": [[34, 1675]] },
+            { "reply": 26509 }
+          ]
+        },
+        {
+          "message": 22020,
+          "choices": [
+            { "reply": 26514, "next": 22019, "quest": 1675, "completesAll": [10241, 10242, 10243, 10244], "params": [[30, 10241]] }
+          ]
+        },
+        {
+          "message": 22019,
+          "choices": [
+            { "reply": 26513 }
+          ]
+        },
+        {
+          "message": 22016,
+          "choices": []
+        }
+      ],
+      "why": "Kar Ybe in the wreck on the Tortuga beach [35,5]: one more tourist who takes the hole in his ship for a door (591). «Bas les masques» (1675) of Dofus pour les noobs: an honest trader, a little trouble with the ship, some coins to earn (22017, «¡Me interesa!»), clients on the continent for kanniboul masks (22018, «De acuerdo»); «the masks you have once a few of each kind» (22020: «Toma, las máscaras», the five masks of each colour handed over, 10241-10244), a blood stain but good work (22019); the cargo checked before he sails (22016)."
+    },
+    {
+      "npc": 3035,
+      "map": 0,
+      "opening": 21979,
+      "openings": [
+        { "quest": 1673, "message": 21982 }
+      ],
+      "lines": [
+        {
+          "message": 21979,
+          "choices": [
+            { "reply": 26462, "next": 21980, "beforeQuest": 1673 }
+          ]
+        },
+        {
+          "message": 21980,
+          "choices": [
+            { "reply": 26461, "next": 21981 }
+          ]
+        },
+        {
+          "message": 21981,
+          "choices": [
+            { "reply": 26460, "startsQuest": 1673, "params": [[34, 1673]], "next": 21982 }
+          ]
+        },
+        {
+          "message": 21982,
+          "choices": [
+            { "reply": 26459 }
+          ]
+        }
+      ],
+      "why": "Fred Hex, the deliveryman, in the forest of masks [32,12]: keep calm, they said (21979). «Le combat des chefs» (1673) of Dofus pour les noobs: a parcel for kanniboul Ñesa stolen by the natives (21980), «I can help», no hero himself (21981), «I promise», three kanniboulas, the chief in a blue mask with a spear (21982)."
+    },
+    {
+      "npc": 3039,
+      "map": 0,
+      "opening": 21983,
+      "lines": [
+        {
+          "message": 21983,
+          "choices": [
+            { "reply": 26467, "quest": 1673, "afterObjective": 10231 },
+            { "reply": 26466, "quest": 1673, "completes": 10231, "params": [[30, 10231]], "next": 21984 }
+          ]
+        },
+        {
+          "message": 21984,
+          "choices": [
+            { "reply": 26465, "next": 21985 },
+            { "reply": 26464 }
+          ]
+        },
+        {
+          "message": 21985,
+          "choices": [
+            { "reply": 26463 }
+          ]
+        }
+      ],
+      "why": "Kanniboul Himik (Petito), the thief in the blue mask at [29,10]: a nap, they will watch over you (21983). «Le combat des chefs» (1673): «a box hidden behind the barrel» (10231), curious ones with barbecue sauce (21984), «give me the parcel» and the spear (21985: «Defenderte del ataque», the fight; «Atacar al kaníbola y sus esbirros» again after a lost one)."
+    },
+    {
+      "npc": 3036,
+      "map": 156499972,
+      "opening": 21988,
+      "lines": [
+        {
+          "message": 21988,
+          "choices": [
+            { "reply": 26474, "next": 21989, "quest": 1673, "beforeObjective": 10234 }
+          ]
+        },
+        {
+          "message": 21989,
+          "choices": [
+            { "reply": 26473, "next": 21990 }
+          ]
+        },
+        {
+          "message": 21990,
+          "choices": [
+            { "reply": 26472, "next": 21991 }
+          ]
+        },
+        {
+          "message": 21991,
+          "choices": [
+            { "reply": 26471, "next": 21992 }
+          ]
+        },
+        {
+          "message": 21992,
+          "choices": [
+            { "reply": 26470, "quest": 1673, "completes": 10234, "params": [[30, 10234]], "gives": 17401 }
+          ]
+        }
+      ],
+      "why": "Gobagrum (Goblítriko), out of the parcel by the thieves' barrel: a hero (21988). «Le combat des chefs» (1673): sent by the Bwork cook, the recipe swapped with Ñesa, the goblin in the dish (21989), «I promised to deliver it» (21990), «I will talk to Ñesa for you», «swear?» (21991), back in the box, carried on the back (21992: «Tomar el paquete», the urgent parcel 17401: 10234)."
+    },
+    {
+      "npc": 3036,
+      "map": 156500483,
+      "opening": 21993,
+      "openings": [
+        { "after": 1673, "message": 21995 }
+      ],
+      "lines": [
+        {
+          "message": 21993,
+          "choices": [
+            { "reply": 26476, "quest": 1673, "completes": 10240, "params": [[30, 10240]], "next": 21994, "afterObjective": 10239 }
+          ]
+        },
+        {
+          "message": 21994,
+          "choices": [
+            { "reply": 26475 }
+          ]
+        },
+        {
+          "message": 21995,
+          "choices": [
+            { "reply": 26477 }
+          ]
+        }
+      ],
+      "why": "Gobagrum at Ñesa's pot [30,9], once Ñesa has kept his word: the soup smells good, not inside it (21993), «you are not in danger any more», a head full of recipes, the kanniboulas' new kitchen boy (21994: 10240); a taste of the soup afterwards (21995)."
+    },
+    {
+      "npc": 155,
+      "map": 0,
+      "opening": 21933,
+      "openings": [
+        { "after": 1667, "message": 21931 }
+      ],
+      "lines": [
+        {
+          "message": 21931,
+          "choices": [
+            { "reply": 26482, "next": 21996, "quest": 1673, "afterObjective": 10234, "beforeObjective": 10235, "holds": 17401 },
+            { "reply": 26491, "next": 22003, "quest": 1673, "afterObjective": 10236, "beforeObjective": 10239 },
+            { "reply": 26396, "next": 21932, "quest": 1669, "afterObjective": 10198, "beforeObjective": 10201 },
+            { "reply": 26397 }
+          ]
+        },
+        {
+          "message": 21933,
+          "choices": [
+            { "reply": 26497, "next": 22006, "quest": 1673, "afterObjective": 10234, "beforeObjective": 10235, "holds": 17401 },
+            { "reply": 26507, "next": 22013, "quest": 1673, "afterObjective": 10236, "beforeObjective": 10239 },
+            { "reply": 26396, "next": 21932, "quest": 1669, "afterObjective": 10198, "beforeObjective": 10201 },
+            { "reply": 26397 }
+          ]
+        },
+        {
+          "message": 21996,
+          "choices": [
+            { "reply": 26481, "quest": 1673, "completes": 10235, "params": [[30, 10235]], "next": 21997 }
+          ]
+        },
+        {
+          "message": 21997,
+          "choices": [
+            { "reply": 26480, "next": 21998 }
+          ]
+        },
+        {
+          "message": 21998,
+          "choices": [
+            { "reply": 26479, "next": 21999 }
+          ]
+        },
+        {
+          "message": 21999,
+          "choices": [
+            { "reply": 26478, "quest": 1673, "completes": 10236, "params": [[30, 10236]] }
+          ]
+        },
+        {
+          "message": 22003,
+          "choices": [
+            { "reply": 26487, "next": 22004, "quest": 1673, "completesAll": [10237, 10238, 10239], "params": [[30, 10239]], "holds": 10831, "holdsCount": 8, "takesAll": [17402, 17403, 17404, 17405, 17401] },
+            { "reply": 26488 }
+          ]
+        },
+        {
+          "message": 22004,
+          "choices": [
+            { "reply": 26489 }
+          ]
+        },
+        {
+          "message": 22006,
+          "choices": [
+            { "reply": 26496, "quest": 1673, "completes": 10235, "params": [[30, 10235]], "next": 22007 }
+          ]
+        },
+        {
+          "message": 22007,
+          "choices": [
+            { "reply": 26495, "next": 22008 }
+          ]
+        },
+        {
+          "message": 22008,
+          "choices": [
+            { "reply": 26494, "next": 22009 }
+          ]
+        },
+        {
+          "message": 22009,
+          "choices": [
+            { "reply": 26493, "quest": 1673, "completes": 10236, "params": [[30, 10236]] }
+          ]
+        },
+        {
+          "message": 22013,
+          "choices": [
+            { "reply": 26505, "next": 22014, "quest": 1673, "completesAll": [10237, 10238, 10239], "params": [[30, 10239]], "holds": 10831, "holdsCount": 8, "takesAll": [17402, 17403, 17404, 17405, 17401] },
+            { "reply": 26502 }
+          ]
+        },
+        {
+          "message": 22014,
+          "choices": [
+            { "reply": 26506 }
+          ]
+        },
+        {
+          "message": 21932,
+          "choices": [
+            { "reply": 26395, "quest": 1669, "completes": 10201, "params": [[30, 10201]] }
+          ]
+        }
+      ],
+      "why": "Kanniboul Gour (Ñesa) before his pot [30,9]: meat, cooked soon, after digestion (21933), or the stench of a rotten corpse on whoever has worn Propanzón's ointment (21931). «Le combat des chefs» (1673) of Dofus pour les noobs: «look, the parcel» (10235), the last ingredient, a goblin not so fresh (21996), «I need the goblin», Petito would replace him as Daldrrak's cook (21997), «Petito stole it» (21998), a quiche of sacred eggs and a bananaranja flan (21999: «Voy a buscar los ingredientes», 10236); good stuff from here, all of it? (22003: the four dodoune eggs, eight bananaranjas and the parcel handed over: 10237-10239), the promise kept, the goblin free (22004). The same lines twice in the client, one set for each greeting. «Squelettes et amulette» (1669): «have you talked to Bob Elgordo lately?», the pirate last night, patient for a recipe (21932: Bob's alibi, 10201)."
+    },
+    {
+      "npc": 3017,
+      "map": 0,
+      "opening": 21828,
+      "lines": [
+        {
+          "message": 21828,
+          "choices": [
+            { "reply": 26373, "next": 21913, "quest": 1669, "beforeObjective": 10196 },
+            { "reply": 26520, "next": 22021, "beforeQuest": 1676 },
+            { "reply": 26235 }
+          ]
+        },
+        {
+          "message": 21913,
+          "choices": [
+            { "reply": 26372, "next": 21914 }
+          ]
+        },
+        {
+          "message": 21914,
+          "choices": [
+            { "reply": 26371, "next": 21915 }
+          ]
+        },
+        {
+          "message": 21915,
+          "choices": [
+            { "reply": 26370, "quest": 1669, "completes": 10196, "params": [[30, 10196]] }
+          ]
+        },
+        {
+          "message": 22021,
+          "choices": [
+            { "reply": 26519, "next": 22022 }
+          ]
+        },
+        {
+          "message": 22022,
+          "choices": [
+            { "reply": 26518, "next": 22023 }
+          ]
+        },
+        {
+          "message": 22023,
+          "choices": [
+            { "reply": 26517, "startsQuest": 1676, "params": [[34, 1676]], "next": 22024 }
+          ]
+        },
+        {
+          "message": 22024,
+          "choices": [
+            { "reply": 26516, "next": 22025 }
+          ]
+        },
+        {
+          "message": 22025,
+          "choices": [
+            { "reply": 26515 }
+          ]
+        }
+      ],
+      "why": "Le Chuko in his cabin, the ship's exit room, beaten: a crew of good-for-nothings, Papalike laughing (21828; «Abandonar el navío de Le Chuko» leaves, dungeon_exits.json). «Squelettes et amulettes» (1669) of Dofus pour les noobs: «give Mamie Voudou's amulet back», he hates the old witch, voodoo darts made him a ghost, nothing to do with it (21913), «not so sure he is innocent», some of his crew harass the kanniboulas (21914), «where are they?», along the path of skulls (21915: 10196). «Serrons-nous la main» (1676): his right hand shakes (22021), the hook, the hand of an adventurer (22022), it plays tricks on him (22023), «I can help for a fair reward», Papalike will pay (22024: 1676), thrown from the cliff, somewhere in the jungle (22025)."
+    },
+    {
+      "npc": 3024,
+      "map": 0,
+      "opening": 21916,
+      "lines": [
+        {
+          "message": 21916,
+          "choices": [
+            { "reply": 26376, "next": 21917, "quest": 1669, "beforeObjective": 10197 }
+          ]
+        },
+        {
+          "message": 21917,
+          "choices": [
+            { "reply": 26375, "next": 21918 }
+          ]
+        },
+        {
+          "message": 21918,
+          "choices": [
+            { "reply": 26374, "quest": 1669, "completes": 10197, "params": [[30, 10197]] }
+          ]
+        }
+      ],
+      "why": "Patréfin (Lino Mufino), in the cave going back up from the ship: a new cabin boy with meat on the bones (21916). «Squelettes et amulettes» (1669): «where were you last night?», a secret (21917), «I'll be a grave», a play for the captain's birthday, rehearsed all night with Pilpoil (21918: the first crewman, 10197)."
+    },
+    {
+      "npc": 3026,
+      "map": 0,
+      "opening": 21923,
+      "lines": [
+        {
+          "message": 21923,
+          "choices": [
+            { "reply": 26390, "next": 21924, "quest": 1669, "beforeObjective": 10198 },
+            { "reply": 26391 }
+          ]
+        },
+        {
+          "message": 21924,
+          "choices": [
+            { "reply": 26389, "next": 21925 }
+          ]
+        },
+        {
+          "message": 21925,
+          "choices": [
+            { "reply": 26388, "next": 21926 }
+          ]
+        },
+        {
+          "message": 21926,
+          "choices": [
+            { "reply": 26387, "next": 21927 }
+          ]
+        },
+        {
+          "message": 21927,
+          "choices": [
+            { "reply": 26386, "next": 21928 }
+          ]
+        },
+        {
+          "message": 21928,
+          "choices": [
+            { "reply": 26385, "quest": 1669, "completes": 10198, "params": [[30, 10198]] }
+          ]
+        }
+      ],
+      "why": "Gros Bob (Bob Elgordo) at [33,5], his bananaranjas flambéed with rum (21923). «Squelettes et amulettes» (1669): «where were you last night?», none of a tourist's business (21924), «I'll report you for mutiny», adventurers worse than pirates (21925), «answer me», a pact with the enemy (21926), the ship's cook, the night with a kanniboul cook (21927), meat marinated in kokoko milk (21928: the second crewman, 10198)."
+    },
+    {
+      "npc": 3027,
+      "map": 0,
+      "opening": 21929,
+      "lines": [
+        {
+          "message": 21929,
+          "choices": [
+            { "reply": 26393, "next": 21930, "quest": 1669, "beforeObjective": 10199 },
+            { "reply": 26394 }
+          ]
+        },
+        {
+          "message": 21930,
+          "choices": [
+            { "reply": 26392, "quest": 1669, "completes": 10199, "params": [[30, 10199]] }
+          ]
+        }
+      ],
+      "why": "Pilpoil (Alpelo) at [32,5]: a free shave (21929). «Squelettes et amulettes» (1669): «where were you last night?», no sleep, Patréfin's play rehearsed all night (21930: the third crewman, 10199)."
+    },
+    {
+      "npc": 3025,
+      "map": 0,
+      "opening": 21919,
+      "lines": [
+        {
+          "message": 21919,
+          "choices": [
+            { "reply": 26380, "next": 21921, "quest": 1669, "beforeObjective": 10200 },
+            { "reply": 26383, "quest": 1669, "completes": 10202, "params": [[30, 10202]], "next": 21922 },
+            { "reply": 26384, "quest": 1669, "afterObjective": 10202, "beforeObjective": 10203 },
+            { "reply": 26378, "next": 21920 },
+            { "reply": 26377 }
+          ]
+        },
+        {
+          "message": 21920,
+          "choices": [
+            { "reply": 26381 },
+            { "reply": 26382 }
+          ]
+        },
+        {
+          "message": 21921,
+          "choices": [
+            { "reply": 26379, "quest": 1669, "completes": 10200, "params": [[30, 10200]] }
+          ]
+        },
+        {
+          "message": 21922,
+          "choices": [
+            { "reply": 26384 }
+          ]
+        }
+      ],
+      "why": "L'Égorgeur (Eldegollador) by his chest at [31,4]: keep off his treasures (21919); «your chest is rather empty», cut to pieces (21920: «Atacar» fights him). «Squelettes et amulettes» (1669): «where were you last night?», drinking rum with Patréfin (21921: the fourth crewman, 10200), who was with Pilpoil: «you lie about yesterday» once the alibis are checked (10202), the skeletons are Mamie's doing, he will take all she owns (21922: «Atacar», the fight; again from the greeting after a lost one)."
     }
   ]
 }

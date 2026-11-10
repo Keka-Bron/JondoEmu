@@ -115,6 +115,9 @@ namespace Jondo.Unity.Server
         /// </remarks>
         public HashSet<int> ElementsUsed { get; set; } = new HashSet<int>();
 
+        /// <summary>The quest elements that already gave their item in this session (objective, element).</summary>
+        public HashSet<(int Objective, int Element)> QuestElementsTaken { get; } = new HashSet<(int, int)>();
+
         /// <summary>
         /// This character's quests: which ones he carries, which step he is on and what he has met.
         /// </summary>

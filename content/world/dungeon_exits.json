@@ -15,6 +15,15 @@
   ],
   "exits": [
     {
+      "dungeon": 91,
+      "bossRoom": 157028352,
+      "room": 157029376,
+      "cell": 454,
+      "npc": 3017,
+      "replies": [26235],
+      "why": "Le Chuko's ship: after Le Chuko the winners are in his cabin, where «Squelettes et amulettes» has them order him to give the amulet back («Avant de sortir du donjon, parlez au Chouque», Dofus pour les noobs); «Abandonar el navío de Le Chuko» leaves."
+    },
+    {
       "dungeon": 90,
       "bossRoom": 152834048,
       "room": 152835072,

@@ -479,10 +479,55 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
                 if (binding.Kind != QuestBindingKind.Click) continue;
+                // One item per element, up to the row's count: a leaf from each of the four bushes.
+                if (binding.OnlyGives && binding.GivesEach)
+                {
+                    if (SessionContext.State.QuestElementsTaken.Contains((binding.ObjectiveId, elementId))) continue;
+                    if (await GiveEachAsync(stream, binding, mapId, elementId))
+                    {
+                        SessionContext.State.QuestElementsTaken.Add((binding.ObjectiveId, elementId));
+                        // What guards the element: the dostrogo a dodoune egg wakes up, now and then.
+                        if (binding.SpawnsMonster != 0
+                            && (binding.SpawnsChance == 0 || Random.Shared.Next(100) < binding.SpawnsChance))
+                            await SpawnAsync(stream, binding);
+                        moved = true;
+                        break;
+                    }
+                    continue;
+                }
                 if (await CloseAsync(stream, binding)) { moved = true; break; }
             }
 
             return moved;
+        }
+
+        /// <summary>
+        /// One of a «givesEach» row's items, when its objective is the character's to do and fewer
+        /// than the row's count are carried. Nothing is marked.
+        /// </summary>
+        private static async Task<bool> GiveEachAsync(NetworkStream stream, QuestBinding binding, long mapId, int elementId)
+        {
+            var log = Log;
+            if (log == null || _book == null) return false;
+            var run = log.Run(binding.QuestId);
+            if (run == null || run.Finished || run.Done.Contains(binding.ObjectiveId)) return false;
+            var step = _book.Step(run.StepId);
+            var objective = step?.Objectives.FirstOrDefault(o => o.Id == binding.ObjectiveId);
+            if (step == null || objective == null || !Revealed(step, objective, run)) return false;
+            bool gave = false;
+            var gives = binding.ElementItems.TryGetValue((mapId, elementId), out int own)
+                ? new[] { (own, 1) }
+                : binding.Gives.ToArray();
+            foreach (var (item, count) in gives)
+            {
+                if (Equipment.HowMany(item) >= count) continue;
+                if (!await QuestFollowers.GiveAsync(stream, item, 1)) continue;
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        InfoMessages.ItemGained, "1", item.ToString(CultureInfo.InvariantCulture))));
+                gave = true;
+            }
+            return gave;
         }
 
         /// <summary>
@@ -778,6 +823,19 @@ namespace Jondo.Unity.Server.Managers
 
                         await CloseAsync(stream, binding);
                         advanced = true;
+                    }
+
+                    // And a «beat» row with no element to press: its monsters come out when the
+                    // character arrives on its map, once it is theirs to do -- the old gorkoko of «Un
+                    // parfum de vacances», who only shows himself once three of his kind are beaten.
+                    foreach (var objective in step.Objectives)
+                    {
+                        var binding = Bindings.Of(objective.Id);
+                        if (binding == null || binding.Kind != QuestBindingKind.Beat || binding.SpawnsMonster == 0) continue;
+                        if (binding.Elements.Count > 0 || binding.MapId != mapId) continue;
+                        if (MobSpawnManager.GetMobsForMap(mapId).Any(g => g.Members.Any(m => m.Monster != null && m.Monster.Id == binding.SpawnsMonster)))
+                            continue;
+                        await BringOutAsync(stream, binding);
                     }
                 }
             }

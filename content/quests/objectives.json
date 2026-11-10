@@ -2387,6 +2387,96 @@
    "kind": "order",
    "gives": [{"item": 1747, "count": 1}],
    "why": "The assistant of Otomai analyses the blood once handed over and gives the analysis (1227)."
+  },
+  {
+   "objective": 10167,
+   "quest": 1667,
+   "kind": "click",
+   "elements": [{"map": 156893704, "element": 491712}, {"map": 156894727, "element": 491710}, {"map": 156893697, "element": 491711}, {"map": 156762625, "element": 491090}],
+   "onlyGives": true,
+   "givesEach": true,
+   "gives": [{"item": 17164, "count": 4}],
+   "anyOrder": true,
+   "why": "«Les différentes feuilles de salace marine se récupéreront aux 4 positions indiqués sur la map» (Dofus pour les noobs): [34,12], [32,11], [34,5], [36,5], a leaf from each bush (491712, 491710 graphic 7656; 491711, 491090 graphic 7399). INFERRED elements."
+  },
+  {
+   "objective": 10170,
+   "quest": 1667,
+   "kind": "beat",
+   "monsters": [4202],
+   "map": 156894723,
+   "spawns": {"monster": 4202, "count": 1},
+   "afterObjectives": [10169],
+   "why": "«Une fois les 3 Grokokos tués, rendez-vous en [32,7] ou vous pourrez trouver un vieux Grokoko» (Dofus pour les noobs): he comes out at [32,7] once three gorkokos are beaten; his leaf (17165) is his quest loot."
+  },
+  {
+   "objective": 10165,
+   "quest": 1667,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the ointment's ingredients, gathered in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10166,
+   "quest": 1667,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the ointment's ingredients, gathered in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10233,
+   "quest": 1673,
+   "elements": [{"map": 156499972, "element": 500581}],
+   "showsNpc": 3036,
+   "afterObjectives": [10232],
+   "why": "«Une fois le combat terminé cliquez sur le colis pour le récupérer... ouvrez le donc» (Dofus pour les noobs): the box behind the barrel (element 500581, graphic 49833, cell 411); Gobagrum comes out."
+  },
+  {
+   "objective": 10237,
+   "quest": 1673,
+   "kind": "click",
+   "elements": [{"map": 156500480, "element": 500585, "item": 17402}, {"map": 156500992, "element": 500584, "item": 17403}, {"map": 156499969, "element": 500583, "item": 17404}, {"map": 156500482, "element": 500582, "item": 17405}],
+   "onlyGives": true,
+   "givesEach": true,
+   "gives": [{"item": 17402, "count": 1}, {"item": 17403, "count": 1}, {"item": 17404, "count": 1}, {"item": 17405, "count": 1}],
+   "anyOrder": true,
+   "spawns": {"monster": 4244, "count": 1, "attacks": true, "chance": 50},
+   "why": "«Pour ce qui est des Œufs de Dodoune, vous les ramasserez dans la jungle interdite aux 4 positions» [30,6], [31,6], [29,7], [30,8], «1 chance sur deux de vous faire agresser par un Dostrogo Vigilant» (Dofus pour les noobs): the nests 500585, 500584, 500583, 500582, an egg each (17402-17405, which egg in which nest INFERRED). Handed to Ñesa with the bananaranjas (22003)."
+  },
+  {
+   "objective": 10197,
+   "quest": 1669,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four crewmen, or Gros Bob's alibi, asked in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10198,
+   "quest": 1669,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four crewmen, or Gros Bob's alibi, asked in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10199,
+   "quest": 1669,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four crewmen, or Gros Bob's alibi, asked in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10200,
+   "quest": 1669,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four crewmen, or Gros Bob's alibi, asked in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 10201,
+   "quest": 1669,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the four crewmen, or Gros Bob's alibi, asked in any order (Dofus pour les noobs)."
   }
  ]
 }
