@@ -1387,20 +1387,20 @@
       "map": 0,
       "opening": 30826,
       "openings": [
+        { "quest": 1972, "objective": 13977, "pending": 13978, "message": 30979 },
+        { "quest": 1972, "objective": 13987, "pending": 13988, "message": 31016 },
         { "after": 1972, "before": 1960, "message": 30829 }
       ],
       "lines": [
         {
           "message": 30826,
           "choices": [
-            { "reply": 37228, "next": 30828, "quest": 2009, "beforeObjective": 13889, "completes": 13889, "params": [[30, 13889]] },
-            { "reply": 37412, "next": 30978 }
-          ]
-        },
-        {
-          "message": 30978,
-          "choices": [
-            { "reply": 38292, "startsQuest": 1972 }
+            { "reply": 37412, "next": 30974, "beforeQuest": 1972 },
+            { "reply": 37414, "quest": 1972, "completes": 13977, "params": [[30, 13977]], "next": 30979, "holds": 19664 },
+            { "reply": 37457, "quest": 1972, "completes": 13987, "params": [[30, 13987]], "next": 31016, "holds": 311, "holdsCount": 5 },
+            { "reply": 37461, "quest": 1972, "completes": 13990, "params": [[30, 13990]], "next": 31020 },
+            { "reply": 37472, "next": 31029, "quest": 1972, "afterObjective": 13993, "beforeObjective": 13994, "holds": 19669 },
+            { "reply": 37228, "next": 30828, "quest": 2009, "beforeObjective": 13889, "completes": 13889, "params": [[30, 13889]] }
           ]
         },
         {
@@ -1415,9 +1415,101 @@
           "choices": [
             { "reply": 37229, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 30974,
+          "choices": [
+            { "reply": 37411, "next": 30975 }
+          ]
+        },
+        {
+          "message": 30975,
+          "names": true,
+          "choices": [
+            { "reply": 37410, "next": 30976 }
+          ]
+        },
+        {
+          "message": 30976,
+          "choices": [
+            { "reply": 37409, "next": 30977 }
+          ]
+        },
+        {
+          "message": 30977,
+          "choices": [
+            { "reply": 37408, "next": 30978 }
+          ]
+        },
+        {
+          "message": 30978,
+          "choices": [
+            { "reply": 37406, "startsQuest": 1972, "params": [[34, 1972]] },
+            { "reply": 37407 }
+          ]
+        },
+        {
+          "message": 30979,
+          "choices": [
+            { "reply": 37413, "quest": 1972, "completes": 13978, "params": [[30, 13978]] }
+          ]
+        },
+        {
+          "message": 31016,
+          "choices": [
+            { "reply": 37456, "next": 31017 }
+          ]
+        },
+        {
+          "message": 31017,
+          "choices": [
+            { "reply": 37455, "next": 31018 }
+          ]
+        },
+        {
+          "message": 31018,
+          "choices": [
+            { "reply": 37454, "quest": 1972, "completes": 13988, "params": [[30, 13988]], "gives": 19668 }
+          ]
+        },
+        {
+          "message": 31020,
+          "choices": [
+            { "reply": 37460, "next": 31021 }
+          ]
+        },
+        {
+          "message": 31021,
+          "choices": [
+            { "reply": 37459 }
+          ]
+        },
+        {
+          "message": 31029,
+          "choices": [
+            { "reply": 37471, "quest": 1972, "completes": 13994, "params": [[30, 13994]], "next": 31030 }
+          ]
+        },
+        {
+          "message": 31030,
+          "choices": [
+            { "reply": 37470, "next": 31031 }
+          ]
+        },
+        {
+          "message": 31031,
+          "choices": [
+            { "reply": 37469, "next": 31032 }
+          ]
+        },
+        {
+          "message": 31032,
+          "choices": [
+            { "reply": 37468 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37228) is this class's objective (13889, effect 30), and leads to his greeting, 30828, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1972) is done, he greets the character with Archi's summons (30829) and «Ir a la Torre del Consejo» hands it over."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37228) is this class's objective (13889, effect 30), and leads to his greeting, 30828, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1972) is done, he greets the character with Archi's summons (30829) and «Ir a la Torre del Consejo» hands it over. «C'est pourtant naturel» of Dofus pour les noobs: Sadida speaks in dreams (30974), the sacred grove of Astrub forest ill (30975, 30976), its roots deep in the contaminated ground (30977), «Obéir» (30978, the line the step declares); the nectar and the sap put down (30979: 13977, 13978); the potion and the five waters, the elixir brewed while the character dozes (31016-31018: 13987, 13988, item 19668); nothing changed, off to Erty Trapchet (31020, 31021: 13990); the passers-by to blame and Erty's advice (31029-31032: 13994)."
     },
     {
       "npc": 4328,
@@ -2031,7 +2123,7 @@
           "choices": [
             { "reply": 37945, "next": 31413, "beforeQuest": 1993 },
             { "reply": 37947, "next": 31416, "quest": 1993, "afterObjective": 14127, "completes": 14128, "params": [[30, 14128]], "takesAll": [6679, 6680, 6681, 6682, 6683, 6684, 6685, 6686, 6687, 6688, 6689, 19741, 19742, 19743, 19744, 19745, 19746, 19747, 27703] },
-            { "reply": 37421, "next": 30983, "quest": 1972 }
+            { "reply": 37421, "next": 30983, "quest": 1972, "afterObjective": 13982, "beforeObjective": 13983 }
           ]
         },
         {
@@ -2097,6 +2189,7 @@
         {
           "message": 30574,
           "choices": [
+            { "reply": 37463, "quest": 1972, "completes": 13991, "params": [[30, 13991]], "next": 31024 },
             { "reply": 36898, "next": 30575, "beforeQuest": 1998 },
             { "reply": 36902, "next": 30578, "quest": 1998, "beforeObjective": 13859 },
             { "reply": 36939, "quest": 1998, "completes": 13877, "params": [[30, 13877]], "next": 30603 },
@@ -2221,9 +2314,15 @@
           "choices": [
             { "reply": 36945 }
           ]
+        },
+        {
+          "message": 31024,
+          "choices": [
+            { "reply": 37462 }
+          ]
         }
       ],
-      "why": "Erty Trapchet, the botanist writer at [0,-19], by «Qui sème le vent récolte l'Artempeth» of Dofus pour les noobs: the plants he lectures on (30574, 30575), his house's plants and the beds to water with drinking water from the well or the market (30576-30578); watered (13860), the peasants' complaints about parasites, Mawy Ingals (30583); the experiment's results and the Bonta link (13874, 30595-30602), the notebook left at home; the Artempeth rose given (13877), the notebook forgotten, Ramón Santo (30603, 30604); what Ramón said (13879), a collaboration with Nibe Lula (30609, 30610)."
+      "why": "Erty Trapchet, the botanist writer at [0,-19], by «Qui sème le vent récolte l'Artempeth» of Dofus pour les noobs: the plants he lectures on (30574, 30575), his house's plants and the beds to water with drinking water from the well or the market (30576-30578); watered (13860), the peasants' complaints about parasites, Mawy Ingals (30583); the experiment's results and the Bonta link (13874, 30595-30602), the notebook left at home; the Artempeth rose given (13877), the notebook forgotten, Ramón Santo (30603, 30604); what Ramón said (13879), a collaboration with Nibe Lula (30609, 30610). «C'est pourtant naturel»: the grove's trouble explained, he will meet the character there (31024: 13991)."
     },
     {
       "npc": 4347,
@@ -9769,6 +9868,8 @@
         {
           "message": 3004,
           "choices": [
+            { "reply": 37437, "quest": 1972, "completes": 13984, "params": [[30, 13984]], "next": 30985 },
+            { "reply": 37437, "next": 30985, "quest": 1972, "afterObjective": 13984, "beforeObjective": 13985 },
             { "reply": 37652, "quest": 1988, "completes": 13997, "params": [[30, 13997]], "next": 31181, "afterObjective": 13996 },
             { "reply": 37632 }
           ]
@@ -9778,9 +9879,158 @@
           "choices": [
             { "reply": 37651 }
           ]
+        },
+        {
+          "message": 30985,
+          "choices": [
+            { "reply": 37436, "next": 30986 },
+            { "reply": 37422 }
+          ]
+        },
+        {
+          "message": 30986,
+          "choices": [
+            { "reply": 37435, "next": 30987, "buyPrice": 100 }
+          ]
+        },
+        {
+          "message": 30987,
+          "choices": [
+            { "reply": 37434, "next": 30988 },
+            { "reply": 37450, "next": 31012 }
+          ]
+        },
+        {
+          "message": 30988,
+          "choices": [
+            { "reply": 37433, "next": 30989 },
+            { "reply": 37449, "next": 31011 }
+          ]
+        },
+        {
+          "message": 30989,
+          "choices": [
+            { "reply": 37432, "next": 30990 },
+            { "reply": 37448, "next": 31010 }
+          ]
+        },
+        {
+          "message": 30990,
+          "choices": [
+            { "reply": 37431, "next": 30991 },
+            { "reply": 37447, "next": 31009 }
+          ]
+        },
+        {
+          "message": 30991,
+          "choices": [
+            { "reply": 37430, "next": 30992 },
+            { "reply": 37446, "next": 31008 }
+          ]
+        },
+        {
+          "message": 30992,
+          "choices": [
+            { "reply": 37429, "next": 30993 },
+            { "reply": 37445, "next": 31007 }
+          ]
+        },
+        {
+          "message": 30993,
+          "choices": [
+            { "reply": 37428, "next": 30994 },
+            { "reply": 37444, "next": 31006 }
+          ]
+        },
+        {
+          "message": 30994,
+          "choices": [
+            { "reply": 37427, "next": 30995 },
+            { "reply": 37443, "next": 31005 }
+          ]
+        },
+        {
+          "message": 30995,
+          "choices": [
+            { "reply": 37426, "next": 30996 },
+            { "reply": 37442, "next": 31004 }
+          ]
+        },
+        {
+          "message": 30996,
+          "choices": [
+            { "reply": 37425, "next": 30997 },
+            { "reply": 37441, "next": 31003 }
+          ]
+        },
+        {
+          "message": 30997,
+          "choices": [
+            { "reply": 37424, "next": 30998 },
+            { "reply": 37440, "next": 31002 }
+          ]
+        },
+        {
+          "message": 30998,
+          "choices": [
+            { "reply": 37423, "quest": 1972, "completes": 13985, "params": [[30, 13985]], "next": 30999, "gives": 19666 },
+            { "reply": 37439, "next": 31001 }
+          ]
+        },
+        {
+          "message": 31001,
+          "choices": []
+        },
+        {
+          "message": 31002,
+          "choices": []
+        },
+        {
+          "message": 31003,
+          "choices": []
+        },
+        {
+          "message": 31004,
+          "choices": []
+        },
+        {
+          "message": 31005,
+          "choices": []
+        },
+        {
+          "message": 31006,
+          "choices": []
+        },
+        {
+          "message": 31007,
+          "choices": []
+        },
+        {
+          "message": 31008,
+          "choices": []
+        },
+        {
+          "message": 31009,
+          "choices": []
+        },
+        {
+          "message": 31010,
+          "choices": []
+        },
+        {
+          "message": 31011,
+          "choices": []
+        },
+        {
+          "message": 31012,
+          "choices": []
+        },
+        {
+          "message": 30999,
+          "choices": []
         }
       ],
-      "why": "Nacf Virgilio, the parchment seller [3,-17]: his wares (3004); by «L'histoire en mouvement», Oz Dralett's mistake (13997): sold with a lot of damaged manuscripts to a smith's apprentice (31181)."
+      "why": "Nacf Virgilio, the parchment seller [3,-17]: his wares (3004); by «L'histoire en mouvement», Oz Dralett's mistake (13997): sold with a lot of damaged manuscripts to a smith's apprentice (31181). «C'est pourtant naturel»: the Prûût bile won fair and square, three winning rounds for a hundred kamas (30985: 13984), the rules, like «hold back the laughter» (30986), twelve rounds of holding back the sniffing (30987-30998), never «Abandonner» or it is lost (31001-31012), he gives in and the bile (30999: 13985); challenged again after giving up."
     },
     {
       "npc": 600,
@@ -12381,6 +12631,85 @@
         }
       ],
       "why": "«Piques de solution»: the Iopish Iop and his broken speech (31744, 31745), a severe case and the syringe, a duel (31746: the fight, npc_fights.json); a resounding victory (31742), revitalised, off to read (31743: 14245). «Piques de solution»: the Iopish Iop and his broken speech (31744, 31745), a severe case and the syringe, a duel (31746: the fight, npc_fights.json); a resounding victory (31742), revitalised, off to read (31743: 14245)."
+    },
+    {
+      "npc": 599,
+      "map": 0,
+      "opening": 2410,
+      "openings": [
+        { "quest": 1972, "objective": 13986, "pending": 13987, "message": 31015 }
+      ],
+      "lines": [
+        {
+          "message": 2410,
+          "choices": [
+            { "reply": 37416, "quest": 1972, "completes": 13979, "params": [[30, 13979]], "next": 30980 },
+            { "reply": 37418, "quest": 1972, "completes": 13982, "params": [[30, 13982]], "next": 30981 },
+            { "reply": 37453, "next": 31013, "quest": 1972, "afterObjective": 13985, "beforeObjective": 13986, "holds": 19666 }
+          ]
+        },
+        {
+          "message": 30980,
+          "choices": [
+            { "reply": 37415 }
+          ]
+        },
+        {
+          "message": 30981,
+          "choices": [
+            { "reply": 37417 }
+          ]
+        },
+        {
+          "message": 31013,
+          "choices": [
+            { "reply": 37452, "next": 31014 }
+          ]
+        },
+        {
+          "message": 31014,
+          "choices": [
+            { "reply": 37451, "quest": 1972, "completes": 13986, "params": [[30, 13986]], "gives": 19667 }
+          ]
+        },
+        {
+          "message": 31015,
+          "choices": []
+        }
+      ],
+      "why": "«C'est pourtant naturel»: the potion for Sadadi Sama botched, no more contaminated molasses, off to the underground (30980: 13979); the sample given, no Prûût bile for sale, Peluka uses it (30981: 13982); the bile, only joking, the potion at last (31013, 31014: 13986, item 19667); water to add once it cools (31015)."
+    },
+    {
+      "npc": 4342,
+      "map": 189530126,
+      "opening": 31025,
+      "lines": [
+        {
+          "message": 31025,
+          "choices": [
+            { "reply": 37467, "next": 31026, "quest": 1972, "beforeObjective": 13993 }
+          ]
+        },
+        {
+          "message": 31026,
+          "choices": [
+            { "reply": 37466, "next": 31027 }
+          ]
+        },
+        {
+          "message": 31027,
+          "choices": [
+            { "reply": 37465, "next": 31028 }
+          ]
+        },
+        {
+          "message": 31028,
+          "choices": [
+            { "reply": 37464, "quest": 1972, "completes": 13993, "params": [[30, 13993]], "gives": 19669 }
+          ]
+        }
+      ],
+      "why": "Erty Trapchet at the Sadida grove [-2,-15], by «C'est pourtant naturel»: late? (31025), the smell at the foot of the bushes (31026), the grimace that says it (31027), his recommendations (31028: 13993, item 19669)."
     }
   ]
 }

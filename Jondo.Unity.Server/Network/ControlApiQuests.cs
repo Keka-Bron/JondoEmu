@@ -103,7 +103,8 @@ namespace Jondo.Unity.Server.Network
             object? npcs = null, interactives = null;
             RunInSession(session, _ =>
             {
-                npcs = Npcs.Of(map).Select(n => new
+                // What the character sees: a placement whose quest terms do not hold is not there for him.
+                npcs = Npcs.OnMap(map).Select(n => new
                 {
                     npc = n.NpcId, actor = n.ContextualId, cell = n.Cell, orientation = n.Orientation,
                     offers = Quests.OfferedRightNowBy(n.NpcId, map),

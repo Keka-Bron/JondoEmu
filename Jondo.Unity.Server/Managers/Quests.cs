@@ -647,7 +647,7 @@ namespace Jondo.Unity.Server.Managers
         private static async Task SpawnAsync(NetworkStream stream, QuestBinding binding)
         {
             long mapId = SessionContext.State.MapId;
-            var grupo = MobSpawnManager.SpawnNamed(mapId, binding.SpawnsMonster, binding.SpawnsCount, binding.SpawnsWith);
+            var grupo = MobSpawnManager.SpawnNamed(mapId, binding.SpawnsMonster, binding.SpawnsCount, binding.SpawnsWithAll.ToArray());
 
             if (grupo == null)
             {
@@ -668,6 +668,11 @@ namespace Jondo.Unity.Server.Managers
 
             Console.WriteLine($"[Quests] Monster {binding.SpawnsMonster} comes out " +
                               $"(x{binding.SpawnsCount}) on cell {grupo.CellId}.");
+
+            // And, when they come out attacking, the fight starts right there: the yellow puddle
+            // of «Cien por cien natural» is a fight, not a group left standing to be clicked.
+            if (binding.SpawnsAttack)
+                await Handlers.FightHandler.InitiateFightFromMobCollision(stream, grupo, mapId);
         }
 
         /// <summary>

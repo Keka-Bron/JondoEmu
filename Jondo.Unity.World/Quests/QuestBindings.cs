@@ -193,6 +193,18 @@ namespace Jondo.Unity.World.Quests
         public int SpawnsWith { get; init; }
 
         /// <summary>
+        /// Every other kind that comes out with them: «with» written as a list, one of each, as the
+        /// three sick animals behind the yellow puddle of «Cien por cien natural».
+        /// </summary>
+        public IReadOnlyList<int> SpawnsWithAll { get; init; } = Array.Empty<int>();
+
+        /// <summary>
+        /// Whether what comes out attacks at once («spawns»'s «attacks»): pressing the element starts
+        /// the fight instead of leaving a group on the map to be clicked.
+        /// </summary>
+        public bool SpawnsAttack { get; init; }
+
+        /// <summary>
         /// How many fights against <see cref="MonsterId"/> a beat binding asks for: the three
         /// library rats of «Verdaderas ratas de biblioteca», one objective written as prose.
         /// </summary>
@@ -407,11 +419,24 @@ namespace Jondo.Unity.World.Quests
             }
 
             int spawnMonster = 0, spawnCount = 0, spawnWith = 0;
+            var spawnWithAll = new List<int>();
+            bool spawnAttacks = false;
             if (row.TryGetProperty("spawns", out var spawn) && spawn.ValueKind == JsonValueKind.Object)
             {
                 spawnMonster = Int(spawn, "monster");
                 spawnCount = Math.Max(1, Int(spawn, "count"));
-                spawnWith = Int(spawn, "with");
+                if (spawn.TryGetProperty("with", out var with) && with.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var one in with.EnumerateArray())
+                        if (one.ValueKind == JsonValueKind.Number) spawnWithAll.Add(one.GetInt32());
+                }
+                else
+                {
+                    spawnWith = Int(spawn, "with");
+                    if (spawnWith != 0) spawnWithAll.Add(spawnWith);
+                }
+                if (spawnWith == 0 && spawnWithAll.Count > 0) spawnWith = spawnWithAll[0];
+                spawnAttacks = spawn.TryGetProperty("attacks", out var attacks) && attacks.ValueKind == JsonValueKind.True;
             }
 
             int skill = Int(row, "skill");
@@ -438,6 +463,8 @@ namespace Jondo.Unity.World.Quests
                 SpawnsMonster = spawnMonster,
                 SpawnsCount = spawnCount,
                 SpawnsWith = spawnWith,
+                SpawnsWithAll = spawnWithAll,
+                SpawnsAttack = spawnAttacks,
                 Times = Math.Max(1, Int(row, "times")),
                 Starts = Int(row, "starts"),
                 ThenStarts = Int(row, "thenStarts"),

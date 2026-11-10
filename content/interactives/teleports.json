@@ -108,7 +108,13 @@
     "BECKY GORR'S CABIN [-2,-14]. Its door (514738) leads in to 193462272 by the world graph, which has no",
     "way back: the doormat inside (514746, cell 411, gfx 3507, the same as the other houses' doormats with",
     "skill 339) leads out onto 260, before the door. «L'invasion des profanateurs de sépulture» sends the",
-    "character in for Becky's lock-picking tools."
+    "character in for Becky's lock-picking tools.",
+    "",
+    "THE UNDERGROUND OF ASTRUB [1,-17]. The mine mouth of the street (element 515978) and the",
+    "three galleries behind it, [1,-17], [2,-18] and [3,-17], joined by the tunnel ends where their",
+    "rails leave the map (graphic 44035): each gallery's lower left end goes back the way it came,",
+    "its upper or right end goes on. Nothing measured them; Dofus pour les noobs sends «Cien por",
+    "cien natural» through them to the yellow puddle of [3,-17], and they are drawn as one line."
   ],
   "passages": [
     {
@@ -344,6 +350,12 @@
     {"map": 147063810, "element": 507618, "cell": 393, "gfx": 47343, "type": 0, "skill": 114, "toMap": 192545798, "toCell": 325},
     {"map": 103547392, "element": 516612, "cell": 319, "gfx": 47284, "type": 0, "skill": 114, "toMap": 195300356, "toCell": 163, "criterion": "POE15990,1"},
     {"map": 188484106, "element": 516095, "cell": 555, "gfx": 57416, "type": 0, "skill": 114, "toMap": 188483082, "toCell": 215, "criterion": "Qo=13825|Qf=1984"},
+    {"map": 188743685, "element": 515978, "cell": 400, "gfx": 37257, "type": 0, "skill": 114, "toMap": 188482052, "toCell": 478},
+    {"map": 188482052, "element": 515970, "cell": 532, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188743685, "toCell": 428},
+    {"map": 188482052, "element": 515968, "cell": 153, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188483076, "toCell": 478},
+    {"map": 188483076, "element": 515969, "cell": 476, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188482052, "toCell": 193},
+    {"map": 188483076, "element": 515967, "cell": 362, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188484100, "toCell": 170},
+    {"map": 188484100, "element": 515966, "cell": 155, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188483076, "toCell": 361},
     {"map": 192413702, "element": 515861, "cell": 272, "gfx": 63669, "type": -1, "skill": 184, "toMap": 192545798, "toCell": 386},
     {"map": 192413702, "element": 515862, "cell": 380, "gfx": 63670, "type": -1, "skill": 184, "toMap": 192545798, "toCell": 386},
     {"map": 188745735, "element": 37072, "npc": 4351, "cell": 217, "gfx": 0, "type": -1, "skill": 0, "toMap": 192414728, "toCell": 438},

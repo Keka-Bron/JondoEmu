@@ -1280,13 +1280,6 @@
       "why": "The mercenary guarding the old chapel's door [5,-15] (its wooden door on cells 204-232). INFERRED cell: the walkable one at the left of the door."
     },
     {
-      "map": 189531146,
-      "npc": 4342,
-      "cell": 273,
-      "orientation": 7,
-      "why": "Erty Trapchet at [0,-19], where Dofus pour les noobs starts «Qui sème le vent récolte l'Artempeth»: by the flowering bush he studies. INFERRED cell, the clearing south of it."
-    },
-    {
       "map": 192676868,
       "npc": 598,
       "cell": 355,
@@ -1847,6 +1840,22 @@
       "cell": 300,
       "orientation": 3,
       "why": "The Dofus-obsessed Xelor at [6,-20] (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 189530126,
+      "npc": 4342,
+      "cell": 288,
+      "orientation": 1,
+      "criterion": "Qa=1972&Qo=13991",
+      "why": "Erty Trapchet come to the Sadida grove [-2,-15] by «C'est pourtant naturel» (13991). INFERRED cell, below the tree."
+    },
+    {
+      "map": 189531146,
+      "npc": 4342,
+      "cell": 273,
+      "orientation": 7,
+      "criterion": "Qa!1972|Qo!13991",
+      "why": "Erty Trapchet at [0,-19], where Dofus pour les noobs starts «Qui sème le vent récolte l'Artempeth»: by the flowering bush he studies, except while he is at the Sadida grove for «C'est pourtant naturel». INFERRED cell, the clearing south of it."
     }
   ]
 }

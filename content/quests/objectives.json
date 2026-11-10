@@ -1468,6 +1468,40 @@
    "anyOrder": true,
    "afterObjectives": [14244],
    "why": "One of the four patients, visited in the order the player likes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 13975,
+   "quest": 1972,
+   "elements": [{"map": 189530638, "element": 515396}],
+   "gives": [{"item": 19663, "count": 1}],
+   "anyOrder": true,
+   "why": "«Consigue néctar de papadalupapadipu»: the plant left of the path across [-1,-15] (element 515396, graphic 44508, cell 187)."
+  },
+  {
+   "objective": 13976,
+   "quest": 1972,
+   "elements": [{"map": 189530116, "element": 515397}],
+   "gives": [{"item": 19664, "count": 1}],
+   "anyOrder": true,
+   "why": "«Consigue savia de arhada»: the root top right of [-2,-25] (element 515397, graphic 62864, cell 40)."
+  },
+  {
+   "objective": 13980,
+   "quest": 1972,
+   "elements": [{"map": 188484100, "element": 515998}],
+   "spawns": {"monster": 5283, "count": 1, "with": [5284, 5285], "attacks": true},
+   "why": "«Toma una muestra de melaza en los subterráneos»: the yellow puddle on the ground (element 515998, cell 274); a fight starts at once against three monsters, alone (Dofus pour les noobs)."
+  },
+  {
+   "objective": 13981,
+   "quest": 1972,
+   "kind": "beat",
+   "monsters": [5283, 5284, 5285],
+   "map": 188484100,
+   "elements": [{"map": 188484100, "element": 515998}],
+   "spawns": {"monster": 5283, "count": 1, "with": [5284, 5285], "attacks": true},
+   "afterObjectives": [13980],
+   "why": "«Vence a los animales enfermos agresivos»: the arakmutant, araknausea and sick tofu of the puddle; the puddle brings them out again after a lost fight. The molasses sample (19665) is the arakmutant's quest loot."
   }
  ]
 }

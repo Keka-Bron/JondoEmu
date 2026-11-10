@@ -995,6 +995,8 @@ namespace Jondo.Unity.World.Content
                                 if (choice.BuysCount != 1) writer.WriteNumber("buyCount", choice.BuysCount);
                                 if (choice.BuysPrice != 0) writer.WriteNumber("buyPrice", choice.BuysPrice);
                             }
+                            else if (choice.BuysPrice != 0)
+                                writer.WriteNumber("buyPrice", choice.BuysPrice);
                             if (choice.TeleportsTo != 0)
                                 writer.WriteNumber("teleport", choice.TeleportsTo);
                             if (choice.TeleportPassage != 0)

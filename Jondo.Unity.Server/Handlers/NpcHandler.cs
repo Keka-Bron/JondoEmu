@@ -1026,6 +1026,18 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
             }
 
+            // A price with nothing to hand over is a fee: Nacf Virgilio's hundred kamas to be
+            // challenged in «Cien por cien natural».
+            if (choice.BuysItem == 0)
+            {
+                if (choice.BuysPrice > 0)
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                            Managers.InfoMessages.KamasLost, choice.BuysPrice.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+                Console.WriteLine($"[NPC] Charged a fee of {choice.BuysPrice} kamas; {GameState.Kamas} left.");
+                return true;
+            }
+
             if (!await Managers.Equipment.GiveAsync(stream, choice.BuysItem, choice.BuysCount))
             {
                 Console.WriteLine($"[NPC] {choice.BuysPrice} kamas charged and " +
@@ -1334,7 +1346,7 @@ namespace Jondo.Unity.Server.Handlers
             // Does the answer buy something? Before the quest, because a purchase that fails must not
             // leave the conversation halfway with the quest already started.
             bool sinPagar = false;
-            if (elegidaAhora != null && elegidaAhora.BuysItem != 0)
+            if (elegidaAhora != null && (elegidaAhora.BuysItem != 0 || elegidaAhora.BuysPrice > 0))
             {
                 sinPagar = !await ComprarAsync(stream, elegidaAhora);
                 // Unpaid, the conversation stops here: its next line is the one that takes the money
