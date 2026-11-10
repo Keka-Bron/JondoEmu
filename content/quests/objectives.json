@@ -444,6 +444,21 @@
    "elements": [{"map": 154010113, "element": 489418}],
    "afterObjectives": [9825],
    "why": "«Utiliza el catalejo de Galilea»: her telescope over the void, element 489418 (graphic 32525) on cell 369. After talking to her."
+  },
+  {
+   "objective": 9856,
+   "quest": 1648,
+   "kind": "enter",
+   "map": 153356288,
+   "why": "«Tumba de Percy Klópeo», a «discover the map» whose map is only text: the tomb is 153356288, entered from [4,1] (Dofus pour les noobs: «Le Tombeau de Percy Klop se trouve en [4,1]. Entrez dans le tombeau»)."
+  },
+  {
+   "objective": 9859,
+   "quest": 1648,
+   "elements": [{"map": 153356288, "element": 489506}],
+   "afterObjectives": [9856],
+   "showsNpc": 2938,
+   "why": "«Registra la tumba»: the tomb in the middle of the vault, element 489506 (graphic 49357) on cell 343, the only element of the map that is not the way out. Percy Klópeo comes out of it (showsNpc)."
   }
  ]
 }

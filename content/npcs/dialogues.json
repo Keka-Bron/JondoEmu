@@ -1429,21 +1429,27 @@
       "npc": 2880,
       "map": 0,
       "opening": 20873,
-      "_byHand": true,
-      "_source": "written from the NPC's own conversation in the client; see tools/npc_conversation.py",
+      "openings": [
+        { "after": 1643, "before": 1644, "message": 20887 },
+        { "after": 1644, "before": 1645, "message": 20888 },
+        { "after": 1645, "before": 1646, "message": 20889 },
+        { "after": 1646, "before": 1647, "message": 20890 },
+        { "after": 1647, "before": 1648, "message": 20891 }
+      ],
       "lines": [
         {
           "message": 20873,
           "choices": [
-            { "reply": 25044, "next": 20874, "quest": 1632, "beforeObjective": 9765, "completes": 9765, "params": [[30, 9765]] },
+            { "reply": 25044, "quest": 1632, "completes": 9765, "params": [[30, 9765]], "next": 20874, "beforeObjective": 9765 },
             { "reply": 25048, "next": 20878, "beforeQuest": 1642 },
-            { "reply": 25054, "next": 20881, "quest": 1642, "afterQuest": true },
-            { "reply": 25061, "next": 20887, "quest": 1643, "afterQuest": true },
-            { "reply": 25063, "next": 20888, "quest": 1644, "afterQuest": true },
-            { "reply": 25065, "next": 20889, "quest": 1645, "afterQuest": true },
-            { "reply": 25067, "next": 20890, "quest": 1646, "afterQuest": true },
-            { "reply": 25071, "next": 20893, "quest": 1647, "afterQuest": true },
-            { "reply": 25073, "quest": 1648 },
+            { "reply": 25054, "quest": 1642, "completes": 9831, "params": [[30, 9831]], "next": 20880, "afterObjective": 9830 },
+            { "reply": 25055, "next": 20884, "quest": 1642, "afterQuest": true, "beforeQuest": 1643 },
+            { "reply": 25061, "quest": 1643, "completes": 9836, "params": [[30, 9836]], "next": 20887, "afterObjectives": [9832, 9833, 9834, 9835] },
+            { "reply": 25063, "quest": 1644, "completes": 9840, "params": [[30, 9840]], "next": 20888, "afterObjectives": [9837, 9838, 9839] },
+            { "reply": 25065, "quest": 1645, "completes": 9845, "params": [[30, 9845]], "next": 20889, "afterObjectives": [9841, 9842, 9843, 9844] },
+            { "reply": 25067, "quest": 1646, "completes": 9849, "params": [[30, 9849]], "next": 20890, "afterObjectives": [9846, 9847, 9848] },
+            { "reply": 25071, "quest": 1647, "completes": 9851, "params": [[30, 9851]], "next": 20891, "afterObjective": 9850 },
+            { "reply": 25073, "quest": 1648, "completes": 9858, "params": [[30, 9858]], "next": 20894, "afterObjective": 9857 },
             { "reply": 25038 }
           ]
         },
@@ -1481,42 +1487,100 @@
           ]
         },
         {
+          "message": 20880,
+          "choices": [
+            { "reply": 25053, "next": 20881 }
+          ]
+        },
+        {
           "message": 20881,
           "choices": [
-            { "reply": 25049, "startsQuest": 1643 }
+            { "reply": 25052, "startsQuest": 1643, "params": [[34, 1643]], "next": 20882 }
+          ]
+        },
+        {
+          "message": 20882,
+          "choices": [
+            { "reply": 25050, "next": 20883 },
+            { "reply": 25051 }
+          ]
+        },
+        {
+          "message": 20883,
+          "choices": [
+            { "reply": 25049 }
+          ]
+        },
+        {
+          "message": 20884,
+          "choices": [
+            { "reply": 25059, "startsQuest": 1643, "params": [[34, 1643]], "next": 20885 }
+          ]
+        },
+        {
+          "message": 20885,
+          "choices": [
+            { "reply": 25057, "next": 20886 },
+            { "reply": 25058 }
+          ]
+        },
+        {
+          "message": 20886,
+          "choices": [
+            { "reply": 25056 }
           ]
         },
         {
           "message": 20887,
           "choices": [
-            { "reply": 25060, "startsQuest": 1644 }
+            { "reply": 25060, "startsQuest": 1644, "params": [[34, 1644]] }
           ]
         },
         {
           "message": 20888,
           "choices": [
-            { "reply": 25062, "startsQuest": 1645 }
+            { "reply": 25062, "startsQuest": 1645, "params": [[34, 1645]] }
           ]
         },
         {
           "message": 20889,
           "choices": [
-            { "reply": 25064, "startsQuest": 1646 }
+            { "reply": 25064, "startsQuest": 1646, "params": [[34, 1646]] }
           ]
         },
         {
           "message": 20890,
           "choices": [
-            { "reply": 25066, "startsQuest": 1647 }
+            { "reply": 25066, "startsQuest": 1647, "params": [[34, 1647]] }
+          ]
+        },
+        {
+          "message": 20891,
+          "choices": [
+            { "reply": 25069, "next": 20892 }
+          ]
+        },
+        {
+          "message": 20892,
+          "choices": [
+            { "reply": 25070, "next": 20893 }
           ]
         },
         {
           "message": 20893,
           "choices": [
-            { "reply": 25068, "startsQuest": 1648 }
+            { "reply": 25068, "startsQuest": 1648, "params": [[34, 1648]] }
+          ]
+        },
+        {
+          "message": 20894,
+          "names": true,
+          "choices": [
+            { "reply": 25072 }
           ]
         }
-      ]
+      ],
+      "why": "The captain of the kerubims, from his own lines and replies, by Dofus pour les noobs («Le village dans les nuages», «Mise à l'épreuve» to «Des chafers qui marchent»). Each report is the reply that does the «go back and see the captain» objective (effect 30) and leads to the next mission's line, the one the catalogue names; who closed the window before taking it is greeted with that line. «Proponer tus servicios.» is the trials another day; «Estoy listo para una misión.» is 1643 another day (20884-20886)."
     },
     {
       "npc": 2886,
@@ -5595,6 +5659,101 @@
         }
       ],
       "why": "Chadalid (Kardorim), in the room past his own, from his own lines and replies. «Cryptologie» per Dofus pour les noobs: «demandez à Kardorim qui il est» -- «Háblame de ti.» (24993) is the visit, 9813 --; once captain of the celestial militia, raised by the graveyard's curse (20843), he tries to discipline the chafers (20844). Asked about the Minilubo (24991, 24999), he offers the way to its lair (24990, 24996, 25015, passages in teleports.json); his «Salir de la Cripta de Chadalid» replies leave the dungeon (dungeon_exits.json)."
+    },
+    {
+      "npc": 2894,
+      "map": 0,
+      "opening": 20905,
+      "lines": [
+        {
+          "message": 20905,
+          "choices": [
+            { "reply": 25091, "quest": 1642, "completes": 9828, "params": [[30, 9828]], "next": 20906 },
+            { "reply": 25093, "next": 20908, "quest": 1642, "afterObjective": 9828, "beforeObjective": 9829 },
+            { "reply": 25095, "next": 20909, "quest": 1642, "afterObjective": 9829, "beforeObjective": 9830 }
+          ]
+        },
+        {
+          "message": 20906,
+          "choices": [
+            { "reply": 25089, "next": 20907 },
+            { "reply": 25090 }
+          ]
+        },
+        {
+          "message": 20907,
+          "choices": [
+            { "reply": 25088, "params": [905] }
+          ]
+        },
+        {
+          "message": 20908,
+          "choices": [
+            { "reply": 25092, "params": [905] }
+          ]
+        },
+        {
+          "message": 20909,
+          "choices": [
+            { "reply": 25094, "quest": 1642, "completes": 9830, "params": [[30, 9830]] }
+          ]
+        }
+      ],
+      "why": "Corporal Mienerva, from her own lines and replies, by «Mise à l'épreuve» of Dofus pour les noobs: «Estoy listo para pasar el test de aptitud.» (the visit, 9828), her doubts (20906), «Protestar e insistir» and the fight (20907, «Empezar el combate.», npc_fights.json); beaten, «¿Ha sido concluyente el test?» (20909) and «Voy a ver al capitán» (9830). Who lost may try again (25093, 20908)."
+    },
+    {
+      "npc": 2908,
+      "map": 0,
+      "opening": 20903,
+      "openings": [
+        { "quest": 1647, "pending": 9850, "message": 20900 },
+        { "quest": 1647, "objective": 9850, "message": 20901 },
+        { "after": 1647, "message": 20901 }
+      ],
+      "lines": [
+        {
+          "message": 20900,
+          "choices": [
+            { "reply": 25082, "params": [905] },
+            { "reply": 25084 }
+          ]
+        },
+        {
+          "message": 20903,
+          "choices": [
+            { "reply": 25085, "next": 20902 },
+            { "reply": 25083 }
+          ]
+        },
+        {
+          "message": 20902,
+          "choices": [
+            { "reply": 25083 }
+          ]
+        },
+        {
+          "message": 20901,
+          "choices": [
+            { "reply": 25083 }
+          ]
+        }
+      ],
+      "why": "Kruella Troz, the vain Osamodas of «Leçon d'humilité» (Dofus pour les noobs: «Kruella vous menace de vous fouetter... Défiez alors la fougueuse Osamodas»): while the mission is on, her threat (20900) and «Desafiarla en combate uno contra uno.» (npc_fights.json); beaten, she let the character win (20901); otherwise her vanity (20903, 20902)."
+    },
+    {
+      "npc": 2938,
+      "map": 0,
+      "opening": 20904,
+      "lines": [
+        {
+          "message": 20904,
+          "choices": [
+            { "reply": 25086, "params": [905] },
+            { "reply": 25087 }
+          ]
+        }
+      ],
+      "why": "Percy Klópeo, the one-eyed chafer of «Des chafers qui marchent», who comes out when his tomb is searched: «Defenderte.» starts the fight (npc_fights.json), and beating him drops the jewel bag (16540, 100 % in his drops)."
     }
   ]
 }

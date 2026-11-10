@@ -25,6 +25,14 @@
     { "npc": 2911, "map": 152836096, "reply": 25007,
       "monsters": [ { "monster": 4102, "grade": 0 } ] },
     { "npc": 2912, "map": 153358340, "reply": 25037, "arena": 153486338,
-      "monsters": [ { "monster": 4113, "grade": 0 } ] }
+      "monsters": [ { "monster": 4113, "grade": 0 } ] },
+    { "npc": 2894, "map": 153356292, "reply": 25088,
+      "monsters": [ { "monster": 4098, "grade": 0 } ] },
+    { "npc": 2894, "map": 153356292, "reply": 25092,
+      "monsters": [ { "monster": 4098, "grade": 0 } ] },
+    { "npc": 2908, "map": 153879040, "reply": 25082,
+      "monsters": [ { "monster": 4097, "grade": 0 } ] },
+    { "npc": 2938, "map": 153356288, "reply": 25086,
+      "monsters": [ { "monster": 4053, "grade": 0 } ] }
   ]
 }

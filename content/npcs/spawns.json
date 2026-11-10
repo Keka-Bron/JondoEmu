@@ -770,6 +770,21 @@
       "cell": 262,
       "orientation": 3,
       "why": "Chadalid in the room past his own, where the winners land on 382 (dungeon_exits.json). INFERRED from the room's own floor (tools/dibujar_mapa.py): the open flagstones at the back right, clear of the tombs and of the way in, facing 3, toward the landing."
+    },
+    {
+      "map": 153879040,
+      "npc": 2908,
+      "cell": 231,
+      "orientation": 1,
+      "why": "Kruella Troz «en [1,0]» (Dofus pour les noobs, «Leçon d'humilité»). No capture places her: INFERRED, on the walkable cell nearest the middle of the map's walkable ground, every neighbour walkable."
+    },
+    {
+      "map": 153356288,
+      "npc": 2938,
+      "cell": 357,
+      "orientation": 3,
+      "criterion": "Qa=1648&Qo=9859&Qo!9857",
+      "why": "Percy Klópeo, who comes out of his tomb when it is searched (9859) and is there until beaten (9857). INFERRED: the walkable cell in front of the tomb (element 489506 on 343), facing the way in (396)."
     }
   ]
 }
