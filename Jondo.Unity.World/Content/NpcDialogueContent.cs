@@ -258,6 +258,14 @@ namespace Jondo.Unity.World.Content
         public int Takes { get; init; }
 
         /// <summary>
+        /// Items the reply hands to the NPC, one of each, all or none: Nibe Lula's five contaminated
+        /// samples. Without <see cref="RefusedNext"/> it is offered only to whoever carries them all;
+        /// with it, it is always offered and leads there when one is missing -- «Faltan una o más
+        /// muestras. Tráemelas todas a la vez.».
+        /// </summary>
+        public IReadOnlyList<int> TakesAll { get; init; } = Array.Empty<int>();
+
+        /// <summary>
         /// An item the character must carry, <see cref="HoldsCount"/> of them, for the reply to be
         /// offered, or zero. Nothing is taken: the objective the reply does hands them over --
         /// Cindy Cato's fifteen boxes of knick-knacks.
@@ -850,6 +858,7 @@ namespace Jondo.Unity.World.Content
                             MinLevel = (int)Number(choice, "minLevel"),
                             BelowLevel = (int)Number(choice, "belowLevel"),
                             Takes = (int)Number(choice, "takes"),
+                            TakesAll = Numbers(choice, "takesAll").Select(o => (int)o).ToArray(),
                             Holds = (int)Number(choice, "holds"),
                             HoldsCount = Math.Max(1, (int)Number(choice, "holdsCount")),
                             GivesCount = Math.Max(1, (int)Number(choice, "givesCount")),
@@ -1024,6 +1033,12 @@ namespace Jondo.Unity.World.Content
                             if (choice.MinLevel != 0) writer.WriteNumber("minLevel", choice.MinLevel);
                             if (choice.BelowLevel != 0) writer.WriteNumber("belowLevel", choice.BelowLevel);
                             if (choice.Takes != 0) writer.WriteNumber("takes", choice.Takes);
+                            if (choice.TakesAll.Count > 0)
+                            {
+                                writer.WriteStartArray("takesAll");
+                                foreach (int o in choice.TakesAll) writer.WriteNumberValue(o);
+                                writer.WriteEndArray();
+                            }
                             if (choice.Holds != 0) writer.WriteNumber("holds", choice.Holds);
                             if (choice.Holds != 0 && choice.HoldsCount != 1) writer.WriteNumber("holdsCount", choice.HoldsCount);
                             if (choice.Gives != 0 && choice.GivesCount != 1) writer.WriteNumber("givesCount", choice.GivesCount);

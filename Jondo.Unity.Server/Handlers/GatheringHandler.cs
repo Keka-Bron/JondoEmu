@@ -263,6 +263,10 @@ namespace Jondo.Unity.Server.Handlers
 
                 await DepletedAsync(stream, resource, skillId, instance);
 
+                // What a quest makes the gathering give besides (HarvestDrops): the contaminated
+                // samples of «Crisis sanitaria».
+                await Managers.HarvestDrops.OnGatheredAsync(stream, resource.ItemId, resource.MapId);
+
                 // A quest that asked for this gathering here (the tutorial's jobs room).
                 await Managers.Quests.OnGatheredAsync(stream, resource.ItemId, resource.MapId);
 

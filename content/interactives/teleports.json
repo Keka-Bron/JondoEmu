@@ -309,6 +309,7 @@
     {"map": 147062784, "element": 507617, "cell": 329, "gfx": 47359, "type": 0, "skill": 114, "toMap": 192939014, "toCell": 244},
     {"map": 192545798, "element": 515384, "cell": 311, "gfx": 47284, "type": 0, "skill": 114, "toMap": 147063810, "toCell": 394, "criterion": "POE15990,1"},
     {"map": 147063810, "element": 507618, "cell": 393, "gfx": 47343, "type": 0, "skill": 114, "toMap": 192545798, "toCell": 325},
-    {"map": 103547392, "element": 516612, "cell": 319, "gfx": 47284, "type": 0, "skill": 114, "toMap": 195300356, "toCell": 163, "criterion": "POE15990,1"}
+    {"map": 103547392, "element": 516612, "cell": 319, "gfx": 47284, "type": 0, "skill": 114, "toMap": 195300356, "toCell": 163, "criterion": "POE15990,1"},
+    {"map": 188484106, "element": 516095, "cell": 555, "gfx": 57416, "type": 0, "skill": 114, "toMap": 188483082, "toCell": 215, "criterion": "Qo=13825|Qf=1984"}
   ]
 }

@@ -597,6 +597,20 @@
    "map": 189793289,
    "afterObjectives": [13784],
    "why": "«Vence a la muñeca campestre»: the country doll (5234) and the plants with her; Dofus pour les noobs: «Un combat se lance contre chaque plantes»."
+  },
+  {
+   "objective": 13824,
+   "quest": 1984,
+   "elements": [{"map": 188484108, "element": 516153}],
+   "afterObjectives": [13823],
+   "why": "«Toma los explosivos»: the TNT barrel of the mine's first map (element 516153, graphic 31522, cell 233); Dofus pour les noobs: «Revenez sur la première map de la mine pour cliquer sur le tonneau de TNT et récupérer des explosifs»."
+  },
+  {
+   "objective": 13825,
+   "quest": 1984,
+   "elements": [{"map": 188484106, "element": 516095}],
+   "afterObjectives": [13824],
+   "why": "«Utiliza los explosivos»: the big rock on the right of the next map (element 516095, graphic 57416, cell 555), which blocks the abandoned gallery; once blown, its passage leads there (teleports.json)."
   }
  ]
 }

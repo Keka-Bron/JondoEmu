@@ -108,6 +108,13 @@ namespace Jondo.Unity.Server.Handlers
             var state = SessionContext.State;
 
             var options = DungeonDoor.For(state.OpenDialogueNpcId);
+
+            // Somebody else on the map keeps the door: this one only stands there. Megustam
+            // Laspelas works in the peasants' workshop, where Mawy Ingals keeps the Hungry
+            // Sunflower Barn, and asking her about the bread took the character into the barn.
+            if (!options.Asks && Npcs.Of(mapId).Any(s => s.NpcId != state.OpenDialogueNpcId && DungeonDoor.For(s.NpcId).Asks))
+                return false;
+
             bool freeEntryLeft = dungeon.OnKeyring
                                  && DungeonKeyring.FreeEntryLeft(state.CharacterId, dungeon.Id, DateTime.Now);
             if (Chosen(dungeon, options, reply, freeEntryLeft) is not EntryMethod method) return false;

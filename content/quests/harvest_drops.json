@@ -1,0 +1,38 @@
+{
+  "_comment": [
+    "What a gathering gives besides its resource, while a quest asks for it (Managers/HarvestDrops).",
+    "The monsters' quest loot is in the client's data with its criterion; what the jobs hand over for a",
+    "quest is not, and the server decides it. A row: the resource gathered, the item given (count, 1 by",
+    "default) and the criterion it is given under, read as the monsters' loot is (Qo = objective in hand,",
+    "PO! = not carried, Po = area).",
+    "",
+    "«Crisis sanitaria» (1984): the five contaminated samples of objective 13820. The meat falls off a",
+    "pío (the client's own loot row); the other four come from the jobs, one of each."
+  ],
+  "drops": [
+    {
+      "resource": 289,
+      "item": 19646,
+      "criterion": "Qo=13820&PO!19646&Po=18",
+      "why": "Muestra de cereal contaminado: wheat reaped in Astrub (area 18) while «Saca muestras contaminadas» is in hand, one only («en fauchant du Blé dans les Champs d'Astrub»)."
+    },
+    {
+      "resource": 421,
+      "item": 19647,
+      "criterion": "Qo=13820&PO!19647&Po=18",
+      "why": "Muestra de planta contaminada: a nettle picked in Astrub («en cueillant un Ortie dans la Forêt ou les Champs d'Astrub»)."
+    },
+    {
+      "resource": 303,
+      "item": 19648,
+      "criterion": "Qo=13820&PO!19648&Po=18",
+      "why": "Muestra de madera contaminada: an ash cut in Astrub («en coupant un Frêne dans la forêt d'Astrub»)."
+    },
+    {
+      "resource": 1782,
+      "item": 19650,
+      "criterion": "Qo=13820&PO!19650&Po=18",
+      "why": "Muestra de pescado contaminado: a gudgeon fished in Astrub («en pêchant du Goujon dans le Lac»)."
+    }
+  ]
+}

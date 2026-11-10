@@ -1443,37 +1443,147 @@
           "message": 30495,
           "choices": [
             { "reply": 37394, "quest": 1960, "completes": 13932, "params": [[30, 13932]], "next": 30962, "afterObjective": 13901 },
-            { "reply": 36784, "next": 30498 },
-            { "reply": 36785 },
-            { "reply": 36801, "next": 30508 }
+            { "reply": 36787, "next": 30496, "quest": 1960, "afterObjective": 13932, "beforeQuest": 1984 },
+            { "reply": 36787, "next": 30496, "quest": 1960, "afterQuest": true, "beforeQuest": 1984 },
+            { "reply": 36798, "quest": 1984, "completes": 13829, "params": [[30, 13829]], "next": 30507, "afterObjective": 13828 },
+            { "reply": 36801, "next": 30508, "quest": 1984, "afterQuest": true, "beforeQuest": 1985 },
+            { "reply": 36813, "quest": 1985, "completes": 13835, "params": [[30, 13835]], "next": 30519, "afterObjective": 13834 },
+            { "reply": 36820, "next": 30522, "quest": 1985, "afterQuest": true, "beforeQuest": 1986 },
+            { "reply": 36851, "quest": 1986, "completes": 13848, "params": [[30, 13848]], "next": 30544, "afterObjective": 13847 },
+            { "reply": 37984, "next": 31439, "quest": 1986, "afterQuest": true, "beforeQuest": 1987 },
+            { "reply": 38011, "quest": 1987, "completes": 14142, "params": [[30, 14142]], "next": 31464, "afterObjective": 14141 },
+            { "reply": 36785 }
+          ]
+        },
+        {
+          "message": 30496,
+          "choices": [
+            { "reply": 36786, "next": 30497 }
+          ]
+        },
+        {
+          "message": 30497,
+          "choices": [
+            { "reply": 36784, "next": 30498 }
           ]
         },
         {
           "message": 30498,
           "choices": [
-            { "reply": 36798, "startsQuest": 1984 },
+            { "reply": 36799, "startsQuest": 1984, "params": [[34, 1984]] },
+            { "reply": 36800 }
+          ]
+        },
+        {
+          "message": 30507,
+          "names": true,
+          "choices": [
             { "reply": 36785 }
           ]
         },
         {
           "message": 30508,
           "choices": [
-            { "reply": 36799, "startsQuest": 1985 },
+            { "reply": 36816, "startsQuest": 1985, "params": [[34, 1985]], "next": 30509 },
+            { "reply": 36817 }
+          ]
+        },
+        {
+          "message": 30509,
+          "choices": [
             { "reply": 36785 }
+          ]
+        },
+        {
+          "message": 30519,
+          "choices": [
+            { "reply": 36785 }
+          ]
+        },
+        {
+          "message": 30522,
+          "choices": [
+            { "reply": 36818, "next": 30523 }
+          ]
+        },
+        {
+          "message": 30523,
+          "choices": [
+            { "reply": 36819, "next": 30524 }
           ]
         },
         {
           "message": 30524,
           "choices": [
-            { "reply": 36799, "startsQuest": 1986 },
+            { "reply": 36799, "startsQuest": 1986, "params": [[34, 1986]], "next": 30525 },
+            { "reply": 36800 }
+          ]
+        },
+        {
+          "message": 30525,
+          "choices": [
             { "reply": 36785 }
+          ]
+        },
+        {
+          "message": 30544,
+          "choices": [
+            { "reply": 36785 }
+          ]
+        },
+        {
+          "message": 31439,
+          "choices": [
+            { "reply": 37983, "next": 31440 }
+          ]
+        },
+        {
+          "message": 31440,
+          "choices": [
+            { "reply": 37982, "next": 31441 }
+          ]
+        },
+        {
+          "message": 31441,
+          "choices": [
+            { "reply": 37981, "next": 31442 }
+          ]
+        },
+        {
+          "message": 31442,
+          "choices": [
+            { "reply": 37980, "next": 31443 }
+          ]
+        },
+        {
+          "message": 31443,
+          "choices": [
+            { "reply": 37979, "next": 31444 },
+            { "reply": 37985 }
           ]
         },
         {
           "message": 31444,
           "choices": [
-            { "reply": 37979, "startsQuest": 1987 },
+            { "reply": 37978, "startsQuest": 1987, "params": [[34, 1987]], "next": 31445 }
+          ]
+        },
+        {
+          "message": 31445,
+          "choices": [
             { "reply": 36785 }
+          ]
+        },
+        {
+          "message": 31464,
+          "choices": [
+            { "reply": 38010, "next": 31465 }
+          ]
+        },
+        {
+          "message": 31465,
+          "choices": [
+            { "reply": 38009, "thenNpc": 4455 }
           ]
         },
         {
@@ -1489,7 +1599,7 @@
           ]
         }
       ],
-      "why": "«Ça sent le gaz»: the gift for the rats' chief, a smelly crate (30962, 19670), and the sewers (30963, the line 13933 names)."
+      "why": "Paula Sepe, who is paid to find the jobless work, at the Council Tower, from her own lines and replies, by Dofus pour les noobs. «Ça sent le gaz»: the gift for the rats' chief, a smelly crate (30962, 19670), and the sewers (30963). «Crise sanitaire» («Proposer son aide»): looking for a job (30496), the peasants' troubles (30497) and Megustam Laspelas (30498, the line 1984 names); the summary (13829, 30507). «Livraison par intérim»: Estefi Dora's sick delivery man (30508, 1985's line, 30509) and the crates delivered (13835, 30519). «Golémancien»: Bajofrente's animated quintain (30522-30525, 30524 1986's line) and its delivery (13848, 30544). «Le rebelle de la forêt»: Vangey, Hel Munster's apprentice, missing (31439-31443) and Bajofrente first (31444, 1987's line, 31445); back with him, his troubles (14142, 31464, 31465), and the character turns to Vangey."
     },
     {
       "npc": 4362,
@@ -7836,6 +7946,199 @@
         }
       ],
       "why": "The country doll out of the barn («Parlez à la Poupée Champêtre «Défendre Vaiguy contre la créature et les plantes l'accompagnant»»): the fight against her and a plant of each kind (npc_fights.json); «Pedir refuerzos.» leaves it for when the group is there."
+    },
+    {
+      "npc": 4343,
+      "map": 0,
+      "opening": 30499,
+      "lines": [
+        {
+          "message": 30499,
+          "choices": [
+            { "reply": 36790, "quest": 1984, "completes": 13818, "params": [[30, 13818]], "next": 30500 },
+            { "reply": 37778 }
+          ]
+        },
+        {
+          "message": 30500,
+          "choices": [
+            { "reply": 36789, "next": 30501 }
+          ]
+        },
+        {
+          "message": 30501,
+          "choices": [
+            { "reply": 36788 }
+          ]
+        }
+      ],
+      "why": "Megustam Laspelas (Emia Elliesol), at the peasants' workshop [7,-24], by «Crise sanitaire»: the bread (13818), the contaminated consumables (30500), every plant and the animals too (30501): «Ir a visitar a Unterix Unter»."
+    },
+    {
+      "npc": 564,
+      "map": 0,
+      "opening": 2357,
+      "lines": [
+        {
+          "message": 2357,
+          "choices": [
+            { "reply": 25507, "quest": 1984, "completes": 13819, "params": [[30, 13819]], "next": 21221, "afterObjective": 13818 },
+            { "reply": 8834 }
+          ]
+        },
+        {
+          "message": 21221,
+          "choices": [
+            { "reply": 25506, "next": 21222 }
+          ]
+        },
+        {
+          "message": 21222,
+          "choices": [
+            { "reply": 8834 }
+          ]
+        }
+      ],
+      "why": "Unterix Unter, the hunter of Astrub's outskirts [1,-23], by «Crise sanitaire» («Parler des problèmes avec le bétail»): hunting banned until the game is safe (13819, 21221), and a sample of each resource for Nibe Lula -- wheat, nettle, ash, pío meat with a hunting weapon, gudgeon (21222)."
+    },
+    {
+      "npc": 4344,
+      "map": 0,
+      "opening": 30478,
+      "lines": [
+        {
+          "message": 30478,
+          "choices": [
+            { "reply": 36794, "next": 30502, "quest": 1984, "afterObjective": 13819, "beforeObjective": 13821, "completesAll": [13820, 13821], "params": [[30, 13821]], "takesAll": [19646, 19647, 19648, 19649, 19650], "refused": 30504 },
+            { "reply": 36797, "quest": 1984, "completes": 13828, "params": [[30, 13828]], "next": 30505, "afterObjective": 13827 },
+            { "reply": 54280 }
+          ]
+        },
+        {
+          "message": 30502,
+          "choices": [
+            { "reply": 36793, "next": 30503 }
+          ]
+        },
+        {
+          "message": 30503,
+          "choices": [
+            { "reply": 36792 }
+          ]
+        },
+        {
+          "message": 30504,
+          "choices": [
+            { "reply": 54280 }
+          ]
+        },
+        {
+          "message": 30505,
+          "choices": [
+            { "reply": 36796, "next": 30506 }
+          ]
+        },
+        {
+          "message": 30506,
+          "choices": [
+            { "reply": 36795 }
+          ]
+        }
+      ],
+      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506)."
+    },
+    {
+      "npc": 596,
+      "map": 0,
+      "opening": 2399,
+      "lines": [
+        {
+          "message": 2399,
+          "choices": [
+            { "reply": 25522, "quest": 1984, "completes": 13822, "params": [[30, 13822]], "next": 21251, "afterObjective": 13821 },
+            { "reply": 37541 }
+          ]
+        },
+        {
+          "message": 21251,
+          "choices": [
+            { "reply": 37541 }
+          ]
+        }
+      ],
+      "why": "Chipo Atuf, the miner of Astrub's underground, by «Crise sanitaire»: angry about the subsidy but no poisoner (13822, 21251), and somebody laying in food."
+    },
+    {
+      "npc": 830,
+      "map": 0,
+      "opening": 3454,
+      "lines": [
+        {
+          "message": 3454,
+          "choices": [
+            { "reply": 25525, "quest": 1984, "completes": 13823, "params": [[30, 13823]], "next": 21252, "afterObjective": 13822 },
+            { "reply": 3054, "next": 3455 }
+          ]
+        },
+        {
+          "message": 21252,
+          "choices": [
+            { "reply": 25524, "next": 21253 }
+          ]
+        },
+        {
+          "message": 21253,
+          "choices": [
+            { "reply": 25523, "next": 21254 }
+          ]
+        },
+        {
+          "message": 21254,
+          "choices": [
+            { "reply": 3055 }
+          ]
+        },
+        {
+          "message": 3455,
+          "choices": [
+            { "reply": 3055, "next": 3456 }
+          ]
+        },
+        {
+          "message": 3456,
+          "choices": [
+            { "reply": 3054 }
+          ]
+        }
+      ],
+      "why": "Feldz Paf, the famous miner of the mine at [10,-19], from his own lines: who he is (3455, 3456); by «Crise sanitaire» («Parler des réserves de nourriture»), his food stock (13823, 21252) against the rockslides (21253), and the blocked gallery nearby with crates of explosives to open it (21254)."
+    },
+    {
+      "npc": 2994,
+      "map": 0,
+      "opening": 21255,
+      "lines": [
+        {
+          "message": 21255,
+          "choices": [
+            { "reply": 25528, "quest": 1984, "completes": 13827, "params": [[30, 13827]], "next": 21256, "afterObjective": 13826 },
+            { "reply": 25526 }
+          ]
+        },
+        {
+          "message": 21256,
+          "choices": [
+            { "reply": 25527, "next": 21257 }
+          ]
+        },
+        {
+          "message": 21257,
+          "choices": [
+            { "reply": 25526 }
+          ]
+        }
+      ],
+      "why": "Fidel Gastro, settled in the abandoned gallery behind the rocks, by «Crise sanitaire»: who blew the rocks (21255), go away (21256), and the mouldy walls scrubbed and the rags washed in the underground river (13827, 21257)."
     }
   ]
 }

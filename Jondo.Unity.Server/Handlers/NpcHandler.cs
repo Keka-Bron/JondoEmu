@@ -916,6 +916,7 @@ namespace Jondo.Unity.Server.Handlers
             if (!choice.ForLevel(SessionContext.State.CharacterLevel)) return false;
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
             if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
+            if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
             return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) > 0;
         }
 
@@ -942,6 +943,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
                 // A reply that hands over what an objective asks for, only to whoever carries it.
                 if (choice.Objectives().Any(o => !Managers.Quests.CanHandOver(o))) return false;
+                if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
                 return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) > 0;
             }).ToArray();
         }
@@ -1248,6 +1250,36 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // What the reply hands over all at once (Nibe Lula's samples): all of them, or the line
+            // that says one is missing and nothing else -- no objective, no quest.
+            if (elegidaAhora != null && elegidaAhora.TakesAll.Count > 0)
+            {
+                if (elegidaAhora.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0))
+                {
+                    var falta = elegidaAhora.RefusedNext == 0 ? null
+                        : NpcDialogues.For(SessionContext.State.OpenDialogueNpcId, SessionContext.State.OpenDialogueMapId)
+                                      ?.Line(elegidaAhora.RefusedNext);
+                    if (falta == null)
+                    {
+                        await CloseAsync(stream);
+                        return;
+                    }
+                    SessionContext.State.OpenDialogueMessage = falta.Message;
+                    await PreguntarAsync(stream, falta.Message, LasQueTocan(falta),
+                                         Npcs.TemplateOf(SessionContext.State.OpenDialogueNpcId), falta);
+                    Console.WriteLine($"[NPC] Reply {reply}: something to hand over is missing; line {falta.Message}.");
+                    return;
+                }
+                foreach (int item in elegidaAhora.TakesAll)
+                {
+                    await Managers.Equipment.TakeAsync(stream, item, 1);
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                            Managers.InfoMessages.ItemLost, "1",
+                            item.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+                }
+            }
+
             // Does the answer buy something? Before the quest, because a purchase that fails must not
             // leave the conversation halfway with the quest already started.
             bool sinPagar = false;
@@ -1513,7 +1545,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var conversacion = NpcDialogues.For(estado.OpenDialogueNpcId, estado.OpenDialogueMapId);
             var frase = conversacion?.Line(estado.OpenDialogueMessage);
-            var elegida = frase?.Choice(reply);
+            var elegida = frase?.Choice(reply, SeLeOfrece);
             if (elegida == null || elegida.Ends) return false;
 
             // A conquest role taken (Hal Ylanza): its certificate, or the line that says not yet.
