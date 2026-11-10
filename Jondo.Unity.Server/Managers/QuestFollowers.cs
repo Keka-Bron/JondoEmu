@@ -10,7 +10,10 @@ namespace Jondo.Unity.Server.Managers
     /// A follower a quest hands over or takes back -- an item of type 32 whose «148» names the NPC --
     /// put in the follower's slot, so the map draws him walking behind the character: Manzanillo
     /// escorted to the Sadida temple («Infusión de Manzanillo», «Escolta a Manzanillo hasta el
-    /// templo de Sadida»), the way a caught criminal walks behind his captor (WantedHandler).
+    /// templo de Sadida»), the way a caught criminal walks behind his captor (WantedHandler). And
+    /// the roleplay disguises (type 31, «149» a look) the same way, in theirs: Uba Teseo's wabbit
+    /// transformation, lost in the first fight («attention de ne pas lancer de combats afin de ne
+    /// pas perdre l'apparence», Dofus pour les noobs).
     /// </summary>
     /// <remarks>
     /// Anything else goes through <see cref="Equipment"/> as it always did. A follower the player
@@ -18,15 +21,16 @@ namespace Jondo.Unity.Server.Managers
     /// </remarks>
     public static class QuestFollowers
     {
-        /// <summary>Whether the item is a follower.</summary>
-        public static bool IsFollower(int template) => Forgemagic.TemplateOf(template)?.Type == BonusSlots.FollowerType;
+        /// <summary>Whether the item is a follower or a roleplay disguise.</summary>
+        public static bool IsFollower(int template)
+            => Forgemagic.TemplateOf(template)?.Type is BonusSlots.FollowerType or BonusSlots.RoleplayBuffType;
 
         /// <summary>The item handed over: a follower to his slot when it is free, anything else to the bag.</summary>
         public static async Task<bool> GiveAsync(NetworkStream stream, int template, int count)
         {
             if (count == 1 && IsFollower(template) && Equipment.HowMany(template) == 0)
             {
-                var slots = BonusSlots.SlotsFor(BonusSlots.FollowerType);
+                var slots = BonusSlots.SlotsFor(Forgemagic.TemplateOf(template)!.Type);
                 bool free = slots.Any(s => !Equipment.All.Any(i => i.Position == s));
                 if (free && await BonusItemHandler.PlaceAsync(stream, template, slots) != null) return true;
             }

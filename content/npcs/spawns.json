@@ -2217,6 +2217,13 @@
       "orientation": 1,
       "criterion": "(Qa=224&Qo=911)|Qf=224",
       "why": "The prince of Wey at the gate of Amakna castle [4,-6] once the bride's dress is brought («Allez à la rencontre du Prince d'Wa à l'entrée du Château», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 88213273,
+      "npc": 168,
+      "cell": 300,
+      "orientation": 3,
+      "why": "Boff Chalon, alchemist studying the speckled rocks of [-2,-2] («allez en [-2,-2] pour récupérer un recueil de la Formule de potion de transformation auprès de Boff Chalon», Dofus pour les noobs). INFERRED cell."
     }
   ]
 }

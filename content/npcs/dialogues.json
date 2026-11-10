@@ -15228,6 +15228,8 @@
       "map": 0,
       "opening": 3880,
       "openings": [
+        { "quest": 217, "message": 3941 },
+        { "canStart": 217, "message": 3941 },
         { "after": 211, "before": 216, "message": 3921 },
         { "quest": 216, "step": 396, "message": 3923 },
         { "after": 216, "message": 3924 }
@@ -15269,9 +15271,15 @@
         {
           "message": 3924,
           "choices": []
+        },
+        {
+          "message": 3941,
+          "choices": [
+            { "reply": 3460, "startsQuest": 217, "params": [[34, 217]] }
+          ]
         }
       ],
-      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857)."
+      "why": "Vil Smis, chief of the rogues, in their lair. «Crypte Honnie» of Dofus pour les noobs: «hire me? my services are dear» (3880, «Mon employeur a de quoi payer»), «why me?» (3881, «Seul votre talent et votre puissance...»), he will see the employer and takes back the badge (3883: 839); not interested (3882). «Info pour un vrai traître» (216): the counsellor knows nothing to harm the king, the character will find out (3921, «Eeeh, ¡vale!»); the king marrying his niece, a suitor? (3923: 855); a wabbit prince, a plan, a broken chafer helmet (3924: 857). «Usuwpation d'identité» (217) of Dofus pour les noobs: the plan, pass for the prince, a potion to look like a wabbit, then the castle (3941, «Bien sûr que je suis prêt»)."
     },
     {
       "npc": 1404,
@@ -15317,6 +15325,7 @@
       "map": 0,
       "opening": 3909,
       "openings": [
+        { "quest": 217, "step": 402, "holds": 8548, "message": 3950 },
         { "quest": 224, "objective": 911, "pending": 5466, "message": 4040 },
         { "quest": 224, "pending": 909, "message": 4036 },
         { "after": 222, "before": 224, "canStart": 224, "message": 4035 },
@@ -15360,9 +15369,27 @@
         {
           "message": 4040,
           "choices": []
+        },
+        {
+          "message": 3950,
+          "choices": [
+            { "reply": 3464, "next": 3951, "quest": 217, "beforeObjective": 873 }
+          ]
+        },
+        {
+          "message": 3951,
+          "choices": [
+            { "reply": 3465, "quest": 217, "completes": 873, "params": [[30, 873]], "next": 3953 }
+          ]
+        },
+        {
+          "message": 3953,
+          "choices": [
+            { "reply": 3573 }
+          ]
         }
       ],
-      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911)."
+      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911). «Usuwpation d'identité»: «hello, master wabbit» to the transformed character (3950), «I am the prince!», not expected so soon (3951), «I had to hurry to stop this horrible wedding!», no wabbit accent, «to me, my faithful jalató!» (3953: 873, «Me han descubierto», the jalató war chief fought)."
     },
     {
       "npc": 307,
@@ -15558,7 +15585,7 @@
         {
           "message": 21835,
           "choices": [
-            { "reply": 26258, "buyItem": 1089, "buyPrice": 1000, "next": 21839, "refused": 21840 },
+            { "reply": 26258, "buyItem": 1089, "buyPrice": 1000, "next": 21839, "refused": 21840, "startsQuest": 1666, "params": [[34, 1666]] },
             { "reply": 26260, "next": 21836 },
             { "reply": 26270, "next": 21843 },
             { "reply": 26267, "next": 21842, "holds": 1089 },
@@ -15581,7 +15608,7 @@
         {
           "message": 21838,
           "choices": [
-            { "reply": 26271, "buyItem": 1089, "buyPrice": 1000, "next": 21839, "refused": 21840 },
+            { "reply": 26271, "buyItem": 1089, "buyPrice": 1000, "next": 21839, "refused": 21840, "startsQuest": 1666, "params": [[34, 1666]] },
             { "reply": 26262 }
           ]
         },
@@ -15628,7 +15655,7 @@
           ]
         }
       ],
-      "why": "The promoter of the Equipo Turist-A by the cannon [11,10], by «T'as les boules» of Dofus pour les noobs: tired of fighting? (21835), today's offer, the isle of Moon at half price (21836), a dream island (21837), 1000 kamas with a helmet and a pair of wings (21838); the ticket bought (21839, 21844: item 1089) or not enough kamas (21840, 21845); «what are you waiting for?» with a ticket (21842); Hannibol Smis the director (21843)."
+      "why": "The promoter of the Equipo Turist-A by the cannon [11,10], by «T'as les boules» of Dofus pour les noobs: tired of fighting? (21835), today's offer, the isle of Moon at half price (21836), a dream island (21837), 1000 kamas with a helmet and a pair of wings (21838); the ticket bought (21839, which also hands «Partir un jour sans retour» (1666) over to whoever may take it; 21844 through the offer: item 1089) or not enough kamas (21840, 21845); «what are you waiting for?» with a ticket (21842); Hannibol Smis the director (21843)."
     },
     {
       "npc": 1384,
@@ -15839,6 +15866,112 @@
         }
       ],
       "why": "Valcor of Amakna castle [5,-5], who wonders where to find fine dragoturkeys for the king (3313). «Allez hue !» (143, daily, neutral characters) of Dofus pour les noobs: the finest stud of the region, bring dragoturkeys (3308, «J'accepte cette tâche, je pars sur le champ»), a royal mission, be quicker (3312), thanks, these scrolls (3311: an almond dragoturkey, 33001)."
+    },
+    {
+      "npc": 166,
+      "map": 0,
+      "opening": 620,
+      "openings": [
+        { "quest": 217, "step": 402, "message": 4093 },
+        { "quest": 217, "step": 401, "message": 3945 },
+        { "quest": 217, "objective": 861, "pending": 862, "message": 3942 },
+        { "quest": 217, "step": 400, "message": 3944 }
+      ],
+      "lines": [
+        {
+          "message": 620,
+          "choices": []
+        },
+        {
+          "message": 3942,
+          "choices": [
+            { "reply": 3463 },
+            { "reply": 3462 }
+          ]
+        },
+        {
+          "message": 3944,
+          "choices": []
+        },
+        {
+          "message": 3945,
+          "choices": [
+            { "reply": 11856, "next": 10768 }
+          ]
+        },
+        {
+          "message": 10768,
+          "choices": []
+        },
+        {
+          "message": 4093,
+          "choices": [
+            { "reply": 11839, "next": 10804, "gives": 8548 }
+          ]
+        },
+        {
+          "message": 10804,
+          "choices": []
+        }
+      ],
+      "why": "Uba Teseo, the alchemist of the workshop [1,16]: what can the great alchemist do for you? (620). «Usuwpation d'identité» of Dofus pour les noobs: a wabbit transformation potion, too hard alone, his colleagues of Amakna (3942: 861 on a hello), the formula not complete yet (3944), the formula, now the ingredients (3945, «Buscar los ingredientes», 10768), the potion done, ready to become a wabbit? (4093), «it works» (10804: the wabbit transformation, 8548, lost in the first fight)."
+    },
+    {
+      "npc": 168,
+      "map": 0,
+      "opening": 624,
+      "openings": [
+        { "quest": 217, "step": 400, "message": 3955 }
+      ],
+      "lines": [
+        {
+          "message": 624,
+          "choices": []
+        },
+        {
+          "message": 3955,
+          "choices": []
+        }
+      ],
+      "why": "Boff Chalon studying the speckled rocks [-2,-2] (624); «Usuwpation d'identité»: dear Uba, this book to write down what you learn (3955: the transformation potion's formula, 8692)."
+    },
+    {
+      "npc": 167,
+      "map": 0,
+      "opening": 626,
+      "openings": [
+        { "quest": 217, "step": 400, "message": 3954 }
+      ],
+      "lines": [
+        {
+          "message": 626,
+          "choices": []
+        },
+        {
+          "message": 3954,
+          "choices": []
+        }
+      ],
+      "why": "Kande Boffler before the little temple [4,12] (626); «Usuwpation d'identité»: sent by Uba Teseo, give him my greetings and this scroll (3954)."
+    },
+    {
+      "npc": 170,
+      "map": 0,
+      "opening": 628,
+      "openings": [
+        { "quest": 217, "step": 400, "message": 3956 }
+      ],
+      "lines": [
+        {
+          "message": 628,
+          "choices": []
+        },
+        {
+          "message": 3956,
+          "choices": []
+        }
+      ],
+      "why": "Benn Zin listening to the water under the bridge [1,31] (628); «Usuwpation d'identité»: sent by Uba, a pleasure to give you this scroll (3956)."
     }
   ]
 }

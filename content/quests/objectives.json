@@ -1817,6 +1817,58 @@
    "kind": "order",
    "gives": [{"item": 8606, "count": 1}],
    "why": "Pako Rábano finishes the bride's dress with the four wabbit fabrics and hands it over («récupérer la robe de la mariée en échange de 4 x Étoffe du Wabbit», Dofus pour les noobs)."
+  },
+  {
+   "objective": 861,
+   "quest": 217,
+   "kind": "talk",
+   "npc": 166,
+   "map": 99352584,
+   "why": "«Encuentra a la persona que pueda transformarte en wabbit»: Uba Teseo at the alchemists' workshop [1,16]."
+  },
+  {
+   "objective": 862,
+   "quest": 217,
+   "kind": "talk",
+   "npc": 168,
+   "map": 88213273,
+   "anyOrder": true,
+   "gives": [{"item": 8692, "count": 1}],
+   "why": "One of Uba Teseo's three alchemist colleagues to visit, in any order (Dofus pour les noobs). Boff Chalon hands over the formula's book."
+  },
+  {
+   "objective": 863,
+   "quest": 217,
+   "kind": "talk",
+   "npc": 167,
+   "map": 88082187,
+   "anyOrder": true,
+   "why": "One of Uba Teseo's three alchemist colleagues to visit, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 864,
+   "quest": 217,
+   "kind": "talk",
+   "npc": 170,
+   "map": 72619521,
+   "anyOrder": true,
+   "why": "One of Uba Teseo's three alchemist colleagues to visit, in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 872,
+   "quest": 217,
+   "kind": "talk",
+   "npc": 166,
+   "map": 99352584,
+   "afterObjectives": [862, 863, 864],
+   "why": "«Vuelve a hablar con la persona que te pidió completar su fórmula»: back to Uba Teseo with the three parts."
+  },
+  {
+   "objective": 10162,
+   "quest": 1666,
+   "kind": "enter",
+   "map": 156762120,
+   "why": "«Utiliza el cañón para ir a la isla de Moon»: where the Turist-A cannon of [11,10] lands, on the isle of Moon."
   }
  ]
 }

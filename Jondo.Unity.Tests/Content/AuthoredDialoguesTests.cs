@@ -220,7 +220,8 @@ namespace Jondo.Unity.Tests.Content
                     // A line the NPC no longer says is the catalogue being older than the
                     // game: 3.6 hands 1629 over on Ganymed's 60411 (the tutorial capture),
                     // and the step still names 20673, which is none of his lines.
-                    if (declared != 0 && !lines.Contains(declared) && SaysLine(tree.NpcId, declared))
+                    if (declared != 0 && !lines.Contains(declared) && !Leads(tree, declared, lines)
+                        && SaysLine(tree.NpcId, declared))
                     {
                         wrong.Add($"npc {tree.NpcId}: quest {questId} is handed over on " +
                                   $"line {string.Join(", ", lines)}, but its first step declares {declared}");
@@ -229,6 +230,32 @@ namespace Jondo.Unity.Tests.Content
             }
 
             Assert.True(wrong.Count == 0, string.Join("\n", wrong));
+        }
+
+        /// <summary>
+        /// Whether the declared line leads, reply after reply, to one that hands the quest over:
+        /// Haraquiri's offer (3053, the line the step names) asks first about the meat's quality and
+        /// hands «De la viande pour la tablée d'Allister» over on the answer, 60431.
+        /// </summary>
+        private static bool Leads(Jondo.Unity.World.Content.NpcDialogue tree, long from, List<long> handing)
+        {
+            var seen = new HashSet<long>();
+            var queue = new Queue<long>();
+            queue.Enqueue(from);
+            while (queue.Count > 0)
+            {
+                long message = queue.Dequeue();
+                if (!seen.Add(message)) continue;
+                if (message != from && handing.Contains(message)) return true;
+                var line = tree.Line(message);
+                if (line == null) continue;
+                foreach (var choice in line.Choices)
+                {
+                    if (choice.StartsQuest != 0 && message != from && handing.Contains(message)) return true;
+                    if (choice.Next != 0) queue.Enqueue(choice.Next);
+                }
+            }
+            return false;
         }
 
         /// <summary>Whether the NPC's own template, in world.db, declares this line.</summary>
