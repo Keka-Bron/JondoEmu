@@ -678,9 +678,9 @@ played through.
 |---|:---|:---:|
 | Astrub | `██████████` **100%** | 51/51 |
 | Incarnam | `██████████` **100%** | 24/24 |
-| Kingdom of Amakna | `███░░░░░░░` **26%** | 10/38 |
+| Kingdom of Amakna | `███░░░░░░░` **29%** | 11/38 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
-| **All quests** | **4.6%** | **90/1976** |
+| **All quests** | **4.6%** | **91/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

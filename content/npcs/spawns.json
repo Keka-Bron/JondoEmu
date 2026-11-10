@@ -2163,6 +2163,21 @@
       "orientation": 3,
       "criterion": "(Qa=209&Qo=839)|Qa=211",
       "why": "Counsellor Ys Vewybad at the meeting place with Vil Smis [7,-5], his intentions plain (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 217058304,
+      "npc": 307,
+      "cell": 301,
+      "orientation": 3,
+      "why": "Tabach, a customer of Bonta's Bagrutte inn [-29,-59] (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 171706890,
+      "npc": 904,
+      "cell": 297,
+      "orientation": 1,
+      "criterion": "Qa=215|Qf=215",
+      "why": "The prince of Wey hunting south of Cania [-23,-1], from «Émissaire du roi» on (he gives «Le Pwince Monseigneuw»). INFERRED cell."
     }
   ]
 }

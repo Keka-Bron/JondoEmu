@@ -14841,7 +14841,7 @@
         {
           "message": 3084,
           "choices": [
-            { "reply": 2732, "startsQuest": 135, "params": [[34, 135]] },
+            { "reply": 2732, "startsQuest": 135, "params": [[34, 135]], "next": 3164 },
             { "reply": 2733 }
           ]
         },
@@ -15239,6 +15239,89 @@
         }
       ],
       "why": "The Kwakerback host in the Kwakwa's nest exit room: how were the kwaks? (8507), «Salir» takes the winners out (dungeon_exits.json)."
+    },
+    {
+      "npc": 897,
+      "map": 0,
+      "opening": 3909,
+      "openings": [
+        { "quest": 215, "objective": 927, "pending": 5463, "message": 4057 }
+      ],
+      "lines": [
+        {
+          "message": 3909,
+          "choices": [
+            { "reply": 3452, "next": 3910, "beforeQuest": 215 }
+          ]
+        },
+        {
+          "message": 3910,
+          "choices": [
+            { "reply": 3453, "startsQuest": 215, "params": [[34, 215]], "next": 3911 },
+            { "reply": 3454 }
+          ]
+        },
+        {
+          "message": 3911,
+          "choices": []
+        },
+        {
+          "message": 4057,
+          "choices": []
+        }
+      ],
+      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927)."
+    },
+    {
+      "npc": 307,
+      "map": 0,
+      "opening": 1206,
+      "openings": [
+        { "quest": 215, "step": 394, "message": 3918 }
+      ],
+      "lines": [
+        {
+          "message": 1206,
+          "choices": []
+        },
+        {
+          "message": 3918,
+          "choices": []
+        }
+      ],
+      "why": "«Émissaire du roi»: a prince of high standing, the prince of Wey hunting in the south of Cania (3918: 849, on a hello)."
+    },
+    {
+      "npc": 904,
+      "map": 0,
+      "opening": 3983,
+      "openings": [
+        { "quest": 215, "objective": 927, "pending": 5463, "message": 3984 }
+      ],
+      "lines": [
+        {
+          "message": 3983,
+          "choices": [
+            { "reply": 3481, "quest": 215, "completes": 860, "params": [[30, 860]], "next": 3987 },
+            { "reply": 3480 }
+          ]
+        },
+        {
+          "message": 3987,
+          "choices": []
+        },
+        {
+          "message": 3984,
+          "choices": [
+            { "reply": 3482, "quest": 215, "completes": 5463, "params": [[30, 5463]], "next": 3988 }
+          ]
+        },
+        {
+          "message": 3988,
+          "choices": []
+        }
+      ],
+      "why": "The prince of Wey, hunting south of Cania [-23,-1], by «Émissaire du roi» of Dofus pour les noobs: «what do you want? a creature worthy of my lineage» (3983), a princess to marry, «I am your prince» (3987: 860); what a lovely land (3984), where are your people? «followers then» (3988: 5463)."
     }
   ]
 }

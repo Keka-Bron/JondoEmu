@@ -1755,6 +1755,14 @@
    "kind": "enter",
    "map": 75629314,
    "why": "«Trouver la planque de Gemfé Labelle»: the Lakes Palace [-21,-5], his old hiding place by the enchanted lakes (Dofus pour les noobs)."
+  },
+  {
+   "objective": 849,
+   "quest": 215,
+   "kind": "talk",
+   "npc": 307,
+   "map": 217058304,
+   "why": "«Encuentra informaciones en el castillo o en los albergues»: Tabach in Bonta's Bagrutte inn [-29,-59], who crossed the prince of Wey (Dofus pour les noobs)."
   }
  ]
 }
