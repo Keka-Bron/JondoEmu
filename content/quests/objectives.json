@@ -2640,7 +2640,8 @@
    "quest": 2431,
    "kind": "enter",
    "map": 216402698,
-   "why": "«Pasa por el colector de basura»: it closes on landing in the sewers beside Ramy, where the kitchen's garbage chute drops (teleports.json)."
+   "overridesMap": true,
+   "why": "«Pasa por el colector de basura»: it closes on landing in the sewers beside Ramy, where the kitchen's garbage chute drops (teleports.json). The objective carries the kitchen, where the chute is; going through it is arriving below."
   },
   {
    "objective": 18363,
