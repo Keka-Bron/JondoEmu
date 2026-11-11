@@ -484,10 +484,29 @@ namespace Jondo.Unity.Server.Managers
             if (log == null || _book == null) return false;
 
             bool moved = false;
+
+            // A prop of the scene: its use is already noted down (InteractiveActionHandler), and it may
+            // be what another element of the row was waiting for, so the map's elements go out again.
+            if (Bindings.PropAt(mapId, elementId).Any(ShouldSee))
+            {
+                var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
+                if (ficha != null)
+                {
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Jss, ConnectionProtocol.BuildMapActors(
+                            mapId, ficha, SessionContext.State.CellId, SessionContext.State.Orientation,
+                            SessionContext.Current.AccountId)));
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorsComplete());
+                }
+                Console.WriteLine($"[Quests] Element {elementId} of map {mapId} used for the scene.");
+                return true;
+            }
+
             // One objective per press: the cellar's tap is looked at first and filled with lemonade
             // on a second press, two iwo in «Matarratas»' capture.
             foreach (var binding in Bindings.At(mapId, elementId))
             {
+                if (binding.AfterElement != 0 && !SessionContext.State.ElementsUsed.Contains(binding.AfterElement)) continue;
                 // A fight's element: pressing it brings the monsters out, and beating them is what
                 // does the objective (the old stump of «Restauración rápida» and its two milimulous).
                 if (binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0)

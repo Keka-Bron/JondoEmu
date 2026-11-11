@@ -272,6 +272,22 @@ namespace Jondo.Unity.World.Quests
         public int Says { get; init; }
 
         /// <summary>
+        /// Elements of the scene that are only used, closing nothing («props»): offered while the
+        /// objective is in hand, a use is noted down like any other (afterElement of the NPCs' replies
+        /// and of <see cref="AfterElement"/>). The stove of the White Rat's pantry in «Cuisine
+        /// raffinée»: «Cliquez donc sur la gazinière pour vérifier la cuisson», and Ramy then asks for
+        /// the cheese.
+        /// </summary>
+        public IReadOnlyList<(long MapId, int ElementId)> Props { get; init; } = Array.Empty<(long, int)>();
+
+        /// <summary>
+        /// An element that has to have been used before this row's own are offered, or zero: the
+        /// pantry's table, where the cheese is grated and the mice come, only once the stove is
+        /// checked.
+        /// </summary>
+        public int AfterElement { get; init; }
+
+        /// <summary>
         /// The element only hands its items over, the objective stays: the blue pickaxe outside the
         /// quarry is picked up while «Libera a Rathrosk» is to do, and freeing him is his reply.
         /// </summary>
@@ -343,7 +359,11 @@ namespace Jondo.Unity.World.Quests
             // of a «read» binding are the world's readables (the Dofusarium's statues), already there.
             // A beat binding's element brings its monsters out (the old stump of «Restauración rápida»).
             if (binding.Kind != QuestBindingKind.Click
-                && !(binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0)) return;
+                && !(binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0))
+            {
+                IndexProps(binding);
+                return;
+            }
 
             foreach (var (mapId, elementId) in binding.Elements)
             {
@@ -361,7 +381,38 @@ namespace Jondo.Unity.World.Quests
 
                 if (!onMap.Contains(binding)) onMap.Add(binding);
             }
+
+            IndexProps(binding);
         }
+
+        private void IndexProps(QuestBinding binding)
+        {
+            foreach (var (mapId, elementId) in binding.Props)
+            {
+                if (!_props.TryGetValue((mapId, elementId), out var here))
+                {
+                    _props[(mapId, elementId)] = here = new List<QuestBinding>();
+                }
+
+                here.Add(binding);
+
+                if (!_byMap.TryGetValue(mapId, out var onMap))
+                {
+                    _byMap[mapId] = onMap = new List<QuestBinding>();
+                }
+
+                if (!onMap.Contains(binding)) onMap.Add(binding);
+            }
+        }
+
+        private readonly Dictionary<(long MapId, int ElementId), List<QuestBinding>> _props
+            = new Dictionary<(long, int), List<QuestBinding>>();
+
+        /// <summary>The bindings that have that element as a prop (<see cref="QuestBinding.Props"/>).</summary>
+        public IReadOnlyList<QuestBinding> PropAt(long mapId, int elementId)
+            => _props.TryGetValue((mapId, elementId), out var rows)
+                ? rows
+                : (IReadOnlyList<QuestBinding>)Array.Empty<QuestBinding>();
     }
 
     /// <summary>Reads <c>content/quests/objectives.json</c>.</summary>
@@ -418,6 +469,17 @@ namespace Jondo.Unity.World.Quests
                     elements.Add((map, element));
                     int own = Int(one, "item");
                     if (own != 0) elementItems[(map, element)] = own;
+                }
+            }
+
+            var props = new List<(long, int)>();
+            if (row.TryGetProperty("props", out var propList) && propList.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var one in propList.EnumerateArray())
+                {
+                    long map = Long(one, "map");
+                    int element = Int(one, "element");
+                    if (map != 0 && element != 0) props.Add((map, element));
                 }
             }
 
@@ -484,6 +546,8 @@ namespace Jondo.Unity.World.Quests
                         m => m.GetInt32()))
                     : System.Array.Empty<int>(),
                 Elements = elements,
+                Props = props,
+                AfterElement = Int(row, "afterElement"),
                 ElementItems = elementItems,
                 Gives = gives,
                 Requires = requires,

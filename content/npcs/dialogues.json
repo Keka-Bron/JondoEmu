@@ -21878,6 +21878,359 @@
         }
       ],
       "why": "Oto Mustam, Brakmar's chief [-25,33]. His template's greetings: «¿Un sirviente del bien en Brakmar? ¡Guardias!» for a Bontarian, with «Huir para no sufrir la ira de Oto Mustam.», «Vaya, vaya: un alma neutra en este lugar» for a neutral and «Lo bueno de liderar una ciudad como Brakmar...» for his own. Seeing him is the neutral's last step of 2430 (18441, a hello). His militia quests are not written yet."
+    },
+    {
+      "npc": 6576,
+      "map": 0,
+      "opening": 49955,
+      "lines": [
+        {
+          "message": 49955,
+          "choices": [
+            { "reply": 66642, "next": 49956, "beforeQuest": 2431 },
+            { "reply": 66646, "next": 49961, "quest": 2431, "afterObjective": 18354 }
+          ]
+        },
+        {
+          "message": 49956,
+          "choices": [
+            { "reply": 66641, "next": 49957 }
+          ]
+        },
+        {
+          "message": 49957,
+          "choices": [
+            { "reply": 66640, "next": 49958 }
+          ]
+        },
+        {
+          "message": 49958,
+          "choices": [
+            { "reply": 66639, "next": 49959 }
+          ]
+        },
+        {
+          "message": 49959,
+          "choices": [
+            { "reply": 66638, "next": 49960 }
+          ]
+        },
+        {
+          "message": 49960,
+          "choices": [
+            { "reply": 66637, "startsQuest": 2431, "params": [[34, 2431]] }
+          ]
+        },
+        {
+          "message": 49961,
+          "choices": [
+            { "reply": 66645, "next": 49962 }
+          ]
+        },
+        {
+          "message": 49962,
+          "choices": [
+            { "reply": 66644, "next": 49963 }
+          ]
+        },
+        {
+          "message": 49963,
+          "choices": [
+            { "reply": 66643 }
+          ]
+        }
+      ],
+      "why": "The sharp-eared kitchen boy of Bonta's palace [-36,-60], who gives «Cuisine raffinée» (2431): Dofus pour les noobs, he hears noises from the garbage chute and nobody believes him; the step's own line is his «¡Ah, no sabes la alegría que me das! ... bajar por el colector de basura». Once the chef has said no (18354), «Mencionar a Ramy»: a rat is fine by him, prove to the chef the rat can cook, and ask the others what dish. Which reply leads to which line is read off their texts."
+    },
+    {
+      "npc": 6583,
+      "map": 0,
+      "opening": 49952,
+      "lines": [
+        {
+          "message": 49952,
+          "choices": [
+            { "reply": 66634, "next": 49953, "quest": 2431, "afterObjective": 18354 }
+          ]
+        },
+        {
+          "message": 49953,
+          "choices": [
+            { "reply": 66633, "quest": 2431, "completes": 18355 },
+            { "reply": 66633 }
+          ]
+        }
+      ],
+      "why": "The kitchen's cook (Commis de cuisine): the chef comes from Amakna's countryside, summer vegetables and spices, «unas cebollas y unas berenjenas con una bolsita de especias». Either helper's advice does «Pídele consejo a los ayudantes» (18355); INFERRED, the quest's own list of ingredients follows."
+    },
+    {
+      "npc": 6574,
+      "map": 0,
+      "opening": 49845,
+      "lines": [
+        {
+          "message": 49845,
+          "choices": [
+            { "reply": 66635, "next": 49954, "quest": 2431, "afterObjective": 18354 }
+          ]
+        },
+        {
+          "message": 49954,
+          "choices": [
+            { "reply": 66636, "quest": 2431, "completes": 18355 },
+            { "reply": 66636 }
+          ]
+        }
+      ],
+      "why": "The kitchen's she-cook (Commise de cuisine): sweet and salty, ripe cheese with kola sugar from Moon. Either helper's advice does 18355 (see the cook's tree)."
+    },
+    {
+      "npc": 6575,
+      "map": 0,
+      "opening": 49920,
+      "lines": [
+        {
+          "message": 49920,
+          "choices": [
+            { "reply": 66651, "next": 49964, "quest": 2431, "afterObjective": 18353, "beforeObjective": 18354 },
+            { "reply": 66764, "next": 50051, "quest": 2431, "afterObjective": 18363, "holds": 26103 }
+          ]
+        },
+        {
+          "message": 49964,
+          "choices": [
+            { "reply": 66650, "next": 49965 }
+          ]
+        },
+        {
+          "message": 49965,
+          "choices": [
+            { "reply": 66649, "next": 49966 }
+          ]
+        },
+        {
+          "message": 49966,
+          "choices": [
+            { "reply": 66648, "next": 49967 }
+          ]
+        },
+        {
+          "message": 49967,
+          "choices": [
+            { "reply": 66647, "quest": 2431, "completes": 18354 },
+            { "reply": 66647 }
+          ]
+        },
+        {
+          "message": 50051,
+          "choices": [
+            { "reply": 66766, "next": 50052 }
+          ]
+        },
+        {
+          "message": 50052,
+          "choices": [
+            { "reply": 66765, "thenNpc": 6579, "thenLine": 50053 }
+          ]
+        },
+        {
+          "message": 50058,
+          "choices": [
+            { "reply": 66773, "next": 50059, "holds": 26103 }
+          ]
+        },
+        {
+          "message": 50059,
+          "choices": [
+            { "reply": 66772, "next": 50060 }
+          ]
+        },
+        {
+          "message": 50060,
+          "choices": [
+            { "reply": 66776, "next": 50061 }
+          ]
+        },
+        {
+          "message": 50061,
+          "choices": [
+            { "reply": 66775, "next": 50062 }
+          ]
+        },
+        {
+          "message": 50062,
+          "choices": [
+            { "reply": 66774, "quest": 2431, "completes": 18364, "takes": 26103 }
+          ]
+        }
+      ],
+      "why": "Chef Tonego in the palace's kitchen. Dofus pour les noobs: short of hands because he only wants the best, and a rat, never (18354 with «Pensar si hay alguna forma de hacerle cambiar de opinión»). With the rata tuy he still refuses, «Soudain Ramy sort de sa cachette» and pleads (thenNpc, thenLine), the chef tastes, weeps, and hires him: «Reprimir una sonrisa» ends the quest (18364) and takes the dish. The order of his lines is read off their texts."
+    },
+    {
+      "npc": 6579,
+      "map": 216402698,
+      "opening": 49707,
+      "lines": [
+        {
+          "message": 49707,
+          "choices": [
+            { "reply": 66658, "next": 49968, "quest": 2431, "afterObjective": 18362, "beforeObjective": 18353 },
+            { "reply": 66659, "next": 49974, "quest": 2431, "completesAll": [18356, 18357, 18358, 18359, 18360, 18361] },
+            { "reply": 66663, "next": 49975, "quest": 2431, "afterObjective": 18361, "beforeObjective": 18363 }
+          ]
+        },
+        {
+          "message": 49968,
+          "choices": [
+            { "reply": 66657, "next": 49969 }
+          ]
+        },
+        {
+          "message": 49969,
+          "choices": [
+            { "reply": 66656, "next": 49970 }
+          ]
+        },
+        {
+          "message": 49970,
+          "choices": [
+            { "reply": 66655, "next": 49971 }
+          ]
+        },
+        {
+          "message": 49971,
+          "choices": [
+            { "reply": 66654, "next": 49972 }
+          ]
+        },
+        {
+          "message": 49972,
+          "choices": [
+            { "reply": 66653, "next": 49973 }
+          ]
+        },
+        {
+          "message": 49973,
+          "choices": [
+            { "reply": 66652, "quest": 2431, "completes": 18353, "teleport": 219284482 },
+            { "reply": 66652, "teleport": 219284482 }
+          ]
+        },
+        {
+          "message": 49974,
+          "choices": [
+            { "reply": 66663, "next": 49975 }
+          ]
+        },
+        {
+          "message": 49975,
+          "choices": [
+            { "reply": 66662, "next": 49976 }
+          ]
+        },
+        {
+          "message": 49976,
+          "choices": [
+            { "reply": 66661, "next": 49977 }
+          ]
+        },
+        {
+          "message": 49977,
+          "choices": [
+            { "reply": 66660, "teleport": 217062410 }
+          ]
+        }
+      ],
+      "why": "Ramy in Bonta's sewers [-34,-59], where the garbage chute drops you: «No sabía que los doceros estuvieran en el menú de la nobleza bontariana». Dofus pour les noobs: he is the noise, he only wants to cook with real food, you offer to talk to the chef (18353), and «Buscar una forma de subir a la superficie» takes you back up to the kitchen. Later the six ingredients (18356-18361) and «Seguirlo» to the White Rat's pantry."
+    },
+    {
+      "npc": 6579,
+      "map": 217062410,
+      "opening": 49978,
+      "openings": [
+        { "quest": 2431, "objective": 18363, "message": 49984 }
+      ],
+      "lines": [
+        {
+          "message": 49978,
+          "choices": [
+            { "reply": 66666, "next": 49982, "quest": 2431, "beforeObjective": 18363 },
+            { "reply": 66672, "next": 49983, "quest": 2431, "afterElement": 523818, "beforeObjective": 18363 },
+            { "reply": 66665, "teleport": 219284482 },
+            { "reply": 66664, "teleport": 216402698 }
+          ]
+        },
+        {
+          "message": 49982,
+          "choices": [
+            { "reply": 66670 }
+          ]
+        },
+        {
+          "message": 49983,
+          "choices": [
+            { "reply": 66671 }
+          ]
+        },
+        {
+          "message": 49984,
+          "choices": [
+            { "reply": 66674, "next": 49985 }
+          ]
+        },
+        {
+          "message": 49985,
+          "choices": [
+            { "reply": 66675, "next": 49986 }
+          ]
+        },
+        {
+          "message": 49986,
+          "choices": [
+            { "reply": 66763, "next": 50049 }
+          ]
+        },
+        {
+          "message": 50049,
+          "choices": [
+            { "reply": 66762, "next": 50050 }
+          ]
+        },
+        {
+          "message": 50050,
+          "choices": [
+            { "reply": 66761, "holds": 26103, "teleport": 219284482 },
+            { "reply": 66761, "gives": 26103, "teleport": 219284482 }
+          ]
+        }
+      ],
+      "why": "Ramy in the White Rat's pantry [-34,-59], cooking. Dofus pour les noobs: «Demander quoi faire», check the pot on the stove (element 523818), «Dire que la cuisson est parfaite», grate the cheese on the poor kitchen table (523817) and the mice come (objectives.json, 18363). After the fight he adds the cheese, you taste the rata tuy and take it to the chef (26103), Ramy hiding in the conduits."
+    },
+    {
+      "npc": 6579,
+      "map": 219284482,
+      "opening": 50063,
+      "lines": [
+        {
+          "message": 50053,
+          "choices": [
+            { "reply": 66768, "next": 50054 }
+          ]
+        },
+        {
+          "message": 50054,
+          "choices": [
+            { "reply": 66767, "thenNpc": 6575, "thenLine": 50058 }
+          ]
+        },
+        {
+          "message": 50063,
+          "choices": [
+            { "reply": 66767, "quest": 2431, "afterObjective": 18363, "holds": 26103, "thenNpc": 6575, "thenLine": 50058 }
+          ]
+        }
+      ],
+      "why": "Ramy in the palace's kitchen: out of his hiding place when the chef refuses the rata tuy («Oir a Ramy salir de su escondite»), «¡Usted era mi ídolo!», and «Girarte hacia el chef» gives the word back to Tonego, who tastes it. Hired, he stays (spawns.json)."
     }
   ]
 }

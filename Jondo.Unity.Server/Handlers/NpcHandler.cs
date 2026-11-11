@@ -909,10 +909,13 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildNpcShown(spawn, mapId)));
         }
 
-        private static async Task ComesInAndSpeaksAsync(NetworkStream stream, int npcId)
+        private static async Task ComesInAndSpeaksAsync(NetworkStream stream, int npcId, long thenLine = 0)
         {
             long mapId = SessionContext.State.MapId;
-            var spawn = Npcs.OnMap(mapId).FirstOrDefault(s => s.NpcId == npcId);
+            // Coming in is appearing: one who hides until then (Ramy in the conduits of the palace's
+            // kitchen) stands on the map for nobody before his entrance.
+            var spawn = Npcs.OnMap(mapId).FirstOrDefault(s => s.NpcId == npcId)
+                        ?? (thenLine != 0 ? Npcs.Of(mapId).FirstOrDefault(s => s.NpcId == npcId) : null);
             if (spawn == null)
             {
                 Console.WriteLine($"[NPC] {npcId} was to come in on {mapId} and is not there for this character.");
@@ -923,7 +926,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildNpcShown(spawn, mapId)));
 
             var escrito = NpcDialogues.For(npcId, mapId);
-            var line = escrito == null ? null : OpeningFor(escrito);
+            var line = escrito == null ? null : thenLine != 0 ? escrito.Line(thenLine) : OpeningFor(escrito);
             if (line == null) return;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -1681,7 +1684,7 @@ namespace Jondo.Unity.Server.Handlers
             // And an NPC who comes in and speaks once this one is done (Darmas, then Ganymed).
             if (elegidaAhora != null && elegidaAhora.ThenNpc != 0)
             {
-                await ComesInAndSpeaksAsync(stream, elegidaAhora.ThenNpc);
+                await ComesInAndSpeaksAsync(stream, elegidaAhora.ThenNpc, elegidaAhora.ThenLine);
                 return;
             }
 

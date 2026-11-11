@@ -2622,6 +2622,36 @@
       "cell": 439,
       "orientation": 1,
       "why": "Amayiro in Bonta's militia [-32,-57], where «L'appel de la cité blanche» sends a neutral (Dofus pour les noobs) and every militia quest of his starts (55 onwards, their givers' map). He stood nowhere. INFERRED cell: behind the big desk."
+    },
+    {
+      "map": 217062410,
+      "npc": 6579,
+      "cell": 274,
+      "orientation": 1,
+      "criterion": "Qa=2431",
+      "why": "Ramy cooking in the White Rat's pantry while «Cuisine raffinée» is under way (Dofus pour les noobs shows him there). INFERRED cell: by the cooking table."
+    },
+    {
+      "map": 219284482,
+      "npc": 6579,
+      "cell": 356,
+      "orientation": 3,
+      "criterion": "Qf=2431",
+      "why": "Ramy hired in the palace's kitchen once «Cuisine raffinée» is done; during its last scene he comes out of hiding here (the chef's thenNpc). INFERRED cell: beside the floor grate."
+    },
+    {
+      "map": 219284482,
+      "npc": 6583,
+      "cell": 330,
+      "orientation": 1,
+      "why": "The cook of the palace's kitchen, chopping carrots (his greeting); «Parlez aux deux autres commis» (Dofus pour les noobs). He stood nowhere. INFERRED cell: at the right-hand counter."
+    },
+    {
+      "map": 219284482,
+      "npc": 6574,
+      "cell": 424,
+      "orientation": 1,
+      "why": "The she-cook of the palace's kitchen, the other helper of «Cuisine raffinée». She stood nowhere. INFERRED cell: at the left-hand counter."
     }
   ]
 }

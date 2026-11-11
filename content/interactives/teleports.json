@@ -151,7 +151,12 @@
     "back (the sun, or the border the branch scrolls down by). The platform at the heart of the trunk",
     "(24119823) has no border at all: its one way out is 537161 on cell 174, to the branch [-52,16], as",
     "524304 was. 434028 is still there on 24118802 and leads to the branch [-55,15]. 537142, 537145 and",
-    "537147 have no counterpart in the graph and are left as scenery."
+    "537147 have no counterpart in the graph and are left as scenery.",
+    "",
+    "THE GARBAGE CHUTE of Bonta's palace kitchen (219284482, element 523345 on cell 328) drops into the sewers",
+    "beside Ramy (216402698), as the 2.73 world graph has it, with no criterion: «Cliquez sur la grille du vide",
+    "à ordure pour descendre dans les égouts de Bonta» (Dofus pour les noobs, «Cuisine raffinée»). INFERRED",
+    "arrival cell, beside him."
   ],
   "passages": [
     {
@@ -424,6 +429,7 @@
     {"map": 24118794, "element": 537156, "cell": 250, "gfx": 900417, "type": 0, "skill": 114, "toMap": 25690116, "toCell": 352},
     {"map": 24118282, "element": 537159, "cell": 150, "gfx": 900417, "type": 0, "skill": 114, "toMap": 28049920, "toCell": 520},
     {"map": 24119823, "element": 537161, "cell": 174, "gfx": 900396, "type": 0, "skill": 114, "toMap": 25690116, "toCell": 352},
-    {"map": 24118802, "element": 434028, "cell": 445, "gfx": 19228, "type": 0, "skill": 114, "toMap": 25690624, "toCell": 359}
+    {"map": 24118802, "element": 434028, "cell": 445, "gfx": 19228, "type": 0, "skill": 114, "toMap": 25690624, "toCell": 359},
+    {"map": 219284482, "element": 523345, "cell": 328, "gfx": 68651, "type": 0, "skill": 114, "toMap": 216402698, "toCell": 314}
   ]
 }

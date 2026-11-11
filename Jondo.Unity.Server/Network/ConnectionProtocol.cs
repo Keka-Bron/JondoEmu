@@ -1222,7 +1222,12 @@ namespace Jondo.Unity.Server.Network
             {
                 if (!Managers.Quests.ShouldSee(binding)) continue;
 
-                foreach (var (where, elementId) in binding.Elements)
+                // Its own elements wait for the one they come after (the pantry's table, the stove);
+                // the props are there from the start.
+                bool ready = binding.AfterElement == 0
+                             || SessionContext.State.ElementsUsed.Contains(binding.AfterElement);
+                var offered = ready ? binding.Elements.Concat(binding.Props) : binding.Props;
+                foreach (var (where, elementId) in offered)
                 {
                     if (where != mapId) continue;
 

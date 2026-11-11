@@ -243,6 +243,13 @@ namespace Jondo.Unity.World.Content
         public int ThenNpc { get; init; }
 
         /// <summary>
+        /// The line <see cref="ThenNpc"/> opens on, instead of his own opening, or zero: the scene of
+        /// «Cuisine raffinée», where Ramy comes out of hiding to plead with chef Tonego and the chef
+        /// answers him, each taking the word where the other left it.
+        /// </summary>
+        public long ThenLine { get; init; }
+
+        /// <summary>
         /// The conversation objective of <see cref="Quest"/> this reply does, or zero. «Matarratas»'
         /// capture: Grobid's «He neutralizado a la rata.» carries effect 30 with objective 9771,
         /// «go back and see Grobid», and the quest ends when it is chosen, not on hello. An
@@ -964,6 +971,7 @@ namespace Jondo.Unity.World.Content
                             TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
                             GivesMutation = (int)Number(choice, "mutation"),
                             ThenNpc = (int)Number(choice, "thenNpc"),
+                            ThenLine = Number(choice, "thenLine"),
                             Completes = (int)Number(choice, "completes"),
                             ShowsNpc = (int)Number(choice, "showsNpc"),
                             AlsoShows = Numbers(choice, "alsoShows").Select(o => (int)o).ToArray(),
@@ -1146,6 +1154,7 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
+                            if (choice.ThenLine != 0) writer.WriteNumber("thenLine", choice.ThenLine);
                             if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);
                             if (choice.ShowsNpc != 0) writer.WriteNumber("showsNpc", choice.ShowsNpc);
                             if (choice.AlsoShows.Count > 0)

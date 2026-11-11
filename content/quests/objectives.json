@@ -2634,6 +2634,25 @@
    "gives": [{"item": 26665, "count": 1}],
    "afterObjectives": [18535],
    "why": "«Toujours dans la même salle, cliquez sur l'armoire en haut à droite pour la fouiller de fond en comble et mettre la main sur un pinceau dégarni» (Dofus pour les noobs): the wardrobe of Grunob's office (element 524400, graphic 3757, cell 203) gives the bald brush 26665."
+  },
+  {
+   "objective": 18362,
+   "quest": 2431,
+   "kind": "enter",
+   "map": 216402698,
+   "why": "«Pasa por el colector de basura»: it closes on landing in the sewers beside Ramy, where the kitchen's garbage chute drops (teleports.json)."
+  },
+  {
+   "objective": 18363,
+   "quest": 2431,
+   "kind": "beat",
+   "monster": 6826,
+   "map": 217062410,
+   "elements": [{"map": 217062410, "element": 523817}],
+   "props": [{"map": 217062410, "element": 523818}],
+   "afterElement": 523818,
+   "spawns": {"monster": 6826, "count": 2, "with": [6827, 6827, 6827], "attacks": true},
+   "why": "«Ayuda a Ramy a diseñar un plato». Dofus pour les noobs: check the pot on the stove («Cliquez donc sur la gazinière», element 523818 with its pot, a prop), then «Cliquez sur la table de cuisine de mauvaise qualité pour râper le fromage, vous êtes soudain attaqué par un groupe souris» (523817, with the cheese): «Les deux Sousouris Affamée», and three Sousouris Alléchées beside them in the guide's screenshot, INFERRED. Beating them closes it; Ramy's after-fight lines follow."
   }
  ]
 }
