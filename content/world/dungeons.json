@@ -18,18 +18,18 @@
     "why": "Doctor Niet's hidden laboratory under the grassy plains [-55,4] (subarea 473): «Le fils caché» (237) of Dofus pour les noobs, «4 x combats», First to Fourth Room, then the Exit room where his son Juan hides."
   },
   "9002": {
-    "name": "Tronco del Árbol Hakam",
+    "name": "Claro floribundo",
     "minLevel": 0,
     "entrance": 25691144,
     "exit": 25691144,
     "rooms": [
-      24117761,
-      24118785,
-      24117765,
-      24118789,
-      24118793,
-      24118794
+      23068672,
+      23068675,
+      23068931,
+      23068934,
+      23070208,
+      23070211
     ],
-    "why": "The trunk of the Hakam tree (subarea 464) where Doctor Morros takes you after his wife: «La femme perdue» (238) of Dofus pour les noobs, «téléporté dans un mini-donjon infesté de mobs», «6 x combats», then «vous trouvez sa femme». The trunk is three closed 3x3 mazes no map leads into, with the passages 537142-537160 and the closed platform 24119823 (537161) at their centre. INFERRED rooms: the six maps of the passages, two per maze."
+    "why": "The Floribund Clearing (subarea 462, «Clairière de Floribonde» [-53,13]) where Doctor Morros takes you after his wife: «La femme perdue» (238) of Dofus pour les noobs, «téléporté dans un mini-donjon infesté de mobs», «6 x combats», every screenshot of them on «Île d'Otomaï (La clairière de Floribonde) -53,13», then «vous trouvez sa femme» there too; the quest's own text sends you to find her in the Dark Jungle. Its seven maps share [-53,13] and have no border, interactive or graph edge: rooms reached only by being sent. INFERRED order: the six fights by map id, Juana in the last."
   }
 }

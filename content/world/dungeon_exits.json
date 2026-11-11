@@ -115,12 +115,12 @@
     },
     {
       "dungeon": 9002,
-      "bossRoom": 24118794,
-      "room": 24119823,
-      "cell": 425,
+      "bossRoom": 23070211,
+      "room": 23070467,
+      "cell": 300,
       "npc": 934,
       "replies": [],
-      "why": "The platform in the heart of the Hakam trunk where Juana Morros hides: «Une fois tous ces monstres tués vous trouvez sa femme» (Dofus pour les noobs); her «Acepto.» leaves through her tree, once it has done 971."
+      "why": "The last map of the Floribund Clearing, where Juana Morros hides: «Une fois tous ces monstres tués vous trouvez sa femme» (Dofus pour les noobs); her «Acepto.» leaves through her tree, back to the doctor on the branches."
     }
   ]
 }

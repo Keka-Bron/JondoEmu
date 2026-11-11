@@ -21512,13 +21512,13 @@
         {
           "message": 4160,
           "choices": [
-            { "reply": 3647, "startsQuest": 238, "params": [[34, 238]], "teleport": 24117761 }
+            { "reply": 3647, "startsQuest": 238, "params": [[34, 238]], "teleport": 23068672 }
           ]
         },
         {
           "message": 4161,
           "choices": [
-            { "reply": 3647, "quest": 238, "beforeObjective": 971, "teleport": 24117761 }
+            { "reply": 3647, "quest": 238, "beforeObjective": 971, "teleport": 23068672 }
           ]
         },
         {
@@ -21540,15 +21540,15 @@
         {
           "message": 4303,
           "choices": [
-            { "reply": 3791, "takes": 8781, "teleport": 24117761 }
+            { "reply": 3791, "takes": 8781, "teleport": 63965956 }
           ]
         }
       ],
-      "why": "Doctor Morros on the branches of the Hakam tree [-52,16]: his wife is gone, he can take you where he saw her last (4160). «La femme perdue» (238) of Dofus pour les noobs: «Seguir al doctor Morros para ayudarle» into the Hakam trunk, she was fleeing that way, the creatures there first (4161: back in, while she is still to be found), did you find her? (4165: «Explicarle por qué se fugó su mujer», 972), he has to learn to win her over himself (4166); rejuvenated (4167), «Volver a la Oscura Jungla para ayudar a un amigo», sure? not without a pe-leon tooth chalice (4303: «Dar un cáliz de diente pe-león», 8781)."
+      "why": "Doctor Morros on the branches of the Hakam tree [-52,16]: his wife is gone, he can take you where he saw her last (4160). «La femme perdue» (238) of Dofus pour les noobs: «Seguir al doctor Morros para ayudarle» into the Floribund Clearing, she was fleeing that way, the creatures there first (4161: back in, while she is still to be found), did you find her? (4165: «Explicarle por qué se fugó su mujer», 972), he has to learn to win her over himself (4166); rejuvenated (4167), «Volver a la Oscura Jungla para ayudar a un amigo», sure? not without a pe-leon tooth chalice (4303: «Dar un cáliz de diente pe-león», 8781), to the Dark Jungle beside the tree [-51,16]."
     },
     {
       "npc": 934,
-      "map": 24119823,
+      "map": 23070467,
       "opening": 4162,
       "lines": [
         {
@@ -21571,7 +21571,7 @@
           ]
         }
       ],
-      "why": "Juana Morros, run away into the heart of the Hakam trunk: her husband cares more for his monsters than for her (4162), Bonta, the flame of the first days (4163), she ran so that he would react, explain it to him (4164: «Acepto.», 971, back to him on the branches)."
+      "why": "Juana Morros, run away into the Floribund Clearing: her husband cares more for his monsters than for her (4162), Bonta, the flame of the first days (4163), she ran so that he would react, explain it to him (4164: «Acepto.», 971, back to him on the branches)."
     },
     {
       "npc": 7581,

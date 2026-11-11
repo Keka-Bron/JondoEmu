@@ -141,7 +141,17 @@
     "Templo Celeste», then «Le village dans les nuages» starts with Lykhen on that Incarnam map. Out, the landing is the",
     "client's own map reference 10, cell 370, at the foot of the steps; in, the floor before the door. Whoever started",
     "before 3.6 walks back in to the Dofusarium («en allant simplement tout au fond du Temple Céleste», Dofus pour les",
-    "noobs, «Premiers pas»)."
+    "noobs, «Premiers pas»).",
+    "",
+    "THE HAKAM TREE'S TRUNK (subarea 464). Its maps are three blocks of 3x3 joined by their borders, the",
+    "branches (472) above them and the Canopy village (469) beside them. The 2.73 world graph goes from",
+    "the trunk to the branches through interactives the 3.6 client no longer has (434025-434034 and",
+    "435675); in their place it draws the passages of graphic 900417, on the same maps and a row higher",
+    "(cell - 14), or on the same cell. Each one leads where the old one did, landing beside the way",
+    "back (the sun, or the border the branch scrolls down by). The platform at the heart of the trunk",
+    "(24119823) has no border at all: its one way out is 537161 on cell 174, to the branch [-52,16], as",
+    "524304 was. 434028 is still there on 24118802 and leads to the branch [-55,15]. 537142, 537145 and",
+    "537147 have no counterpart in the graph and are left as scenery."
   ],
   "passages": [
     {
@@ -404,6 +414,16 @@
     {"map": 157812736, "element": 500683, "cell": 445, "gfx": 44035, "type": 0, "skill": 114, "toMap": 156501762, "toCell": 287},
     {"map": 158077952, "element": 490837, "cell": 95, "gfx": 0, "type": 0, "skill": 114, "toMap": 158078210, "toCell": 451, "criterion": "PO=17396"},
     {"map": 241445377, "element": 541737, "cell": 475, "gfx": 806735, "type": 475, "skill": 187, "toMap": 154010883, "toCell": 370},
-    {"map": 154010883, "element": 489503, "cell": 369, "gfx": 49576, "type": 475, "skill": 84, "toMap": 241445377, "toCell": 416}
+    {"map": 154010883, "element": 489503, "cell": 369, "gfx": 49576, "type": 475, "skill": 84, "toMap": 241445377, "toCell": 416},
+    {"map": 24117761, "element": 537143, "cell": 105, "gfx": 900417, "type": 0, "skill": 114, "toMap": 25690112, "toCell": 522},
+    {"map": 24117765, "element": 537146, "cell": 199, "gfx": 900417, "type": 0, "skill": 114, "toMap": 25691650, "toCell": 529},
+    {"map": 24117771, "element": 537160, "cell": 268, "gfx": 900417, "type": 0, "skill": 114, "toMap": 25693696, "toCell": 331},
+    {"map": 24118785, "element": 537144, "cell": 133, "gfx": 900417, "type": 0, "skill": 114, "toMap": 25692160, "toCell": 524},
+    {"map": 24118789, "element": 537148, "cell": 164, "gfx": 900417, "type": 0, "skill": 114, "toMap": 24119314, "toCell": 524},
+    {"map": 24118793, "element": 537155, "cell": 122, "gfx": 900417, "type": 0, "skill": 114, "toMap": 25690115, "toCell": 365},
+    {"map": 24118794, "element": 537156, "cell": 250, "gfx": 900417, "type": 0, "skill": 114, "toMap": 25690116, "toCell": 352},
+    {"map": 24118282, "element": 537159, "cell": 150, "gfx": 900417, "type": 0, "skill": 114, "toMap": 28049920, "toCell": 520},
+    {"map": 24119823, "element": 537161, "cell": 174, "gfx": 900396, "type": 0, "skill": 114, "toMap": 25690116, "toCell": 352},
+    {"map": 24118802, "element": 434028, "cell": 445, "gfx": 19228, "type": 0, "skill": 114, "toMap": 25690624, "toCell": 359}
   ]
 }
