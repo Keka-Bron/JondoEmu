@@ -3496,20 +3496,79 @@
       "why": "Letalina Sigisbul at the top of the tower of Gisgul [-16,17], the map every «Ve a ver a Letalina» of the quest after the militia carries (176819459). INFERRED cell: 410, on the landing in front of the altar, facing the door (element 510481, cell 532) one comes in by; she is gone once the quest is over."
     },
     {
+      "map": 217064448,
+      "npc": 6395,
+      "cell": 388,
+      "orientation": 3,
+      "criterion": "Qa=527",
+      "why": "Gracia Malsana upstairs in the library of Bonta [-35,-57], where all three of her objectives in «No dejes que tus hijos vaguen» put her (217064448; Dofus pour les noobs: «montez à l'étage sur la mezzanine puis allez dans la salle à droite»). She is there while the quest is, and goes back to the promontory of the skies once it is over (51054). INFERRED cell: 388, on the open floor of the room on the right."
+    },
+    {
+      "map": 183762954,
+      "npc": 424,
+      "cell": 373,
+      "orientation": 3,
+      "why": "Tajide Ragalde, master of the Iop temple of Amakna [1,3], in the statue room «Encuentra consejo en el templo de Yopuka» carries (183762954; Dofus pour les noobs: «traversez la première salle tout droit pour arriver devant la statue du Dieu Iop»). The temple's master is always there. INFERRED cell: 373, the open floor right in front of the statue, beside the altar."
+    },
+    {
+      "map": 88212751,
+      "npc": 1268,
+      "cell": 413,
+      "orientation": 1,
+      "criterion": "Qa=527&Qo>3624&Qo<3625",
+      "why": "Hata Mari outside the bwork village [-1,8], where «Encuéntrate con Hata fuera del pueblo bwork» (3625) carries one; she leaves to report to Bonta once she has spoken. INFERRED cell: 413, on the trodden ground in front of the village gate."
+    },
+    {
+      "map": 178522112,
+      "npc": 1269,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qa=527&Qo<3627",
+      "why": "Cabotina's corrupted spirit in the Gúltar crypt (178522112, the map of «Tranquiliza las almas de la familia de Gúltar»), until her family is calmed. Cell 384, the middle of the crypt, as the derived row for the calm crypt has it."
+    },
+    {
+      "map": 178523136,
+      "npc": 1269,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qa=527&Qo>3627&Qo<3628",
+      "why": "Cabotina's spirit at peace in the same crypt (178523136, the map «Ve a ver al Espíritu de Cabotina» carries), where the fight's win leaves the character, until she has handed over the collar. Cell 384 is the derived one, kept."
+    },
+    {
+      "map": 221249538,
+      "npc": 1266,
+      "cell": 371,
+      "orientation": 3,
+      "criterion": "Qa=527&Qo>3637&Qo>3638&Qo>3639&Qo>3640&Qo>3641&Qo<3642",
+      "why": "Letalina Sigisbul on the tumulus [-5,17], the map of «Enfréntate a Letalina antes de abandonar el Dédalo de Dark Vlad» (221249538), once the five plans are destroyed (Dofus pour les noobs: «continuez votre chemin en [-5,17] et montez sur le tumulus par les escaliers») and until her creatures are beaten. INFERRED cell: 371, on the stone path at the top of the tumulus, facing the stairs."
+    },
+    {
       "map": 104071168,
       "npc": 1267,
       "cell": 301,
-      "orientation": 1,
-      "criterion": "(Qa=526&Qo>3600&Qo<3604)|(Qa=527&Qo<3625)",
-      "why": "De Rorc at the bwork camp [-6,6], wanted by both branches of «No dejes que tus hijos vaguen»: on Brakmar's side from «Encuentra el bwork» (after 3600) until he is handed to Letalina (3604) -- beaten, he still offers the follower again to whoever lost it --, on Bonta's side while Hata Mari is held there (until «Encuéntrate con Hata fuera del pueblo bwork», 3625). Outside those he is not there. Cell 301 is the derived one, kept."
+      "remove": true
     },
     {
       "map": 104071168,
       "npc": 1268,
       "cell": 315,
-      "orientation": 1,
+      "remove": true
+    },
+    {
+      "map": 104071168,
+      "npc": 1267,
+      "cell": 399,
+      "orientation": 3,
+      "criterion": "(Qa=526&Qo>3600&Qo<3604)|(Qa=527&Qo<3625)",
+      "why": "De Rorc at the bwork camp [-6,6], wanted by both branches of «No dejes que tus hijos vaguen»: on Brakmar's side from «Encuentra el bwork» (after 3600) until he is handed to Letalina (3604) -- beaten, he still offers the follower again to whoever lost it --, on Bonta's side while Hata Mari is held there (until «Encuéntrate con Hata fuera del pueblo bwork», 3625). Outside those he is not there. INFERRED cell: 399, on the open ground below the camp's centre; the derived 301 stood among the three bwork groups (288, 303, 327) and was hard to make out or click."
+    },
+    {
+      "map": 104071168,
+      "npc": 1268,
+      "cell": 373,
+      "orientation": 3,
       "criterion": "Qa=527&Qo<3624",
-      "why": "Hata Mari, the Bontarian spy the bworks hold at their camp [-6,6]: she only belongs to Bonta's side of «No dejes que tus hijos vaguen» (527), where she is freed once De Rorc is beaten and leaves after «Nos vemos fuera del campamento» (3624). Brakmar's side (526) never meets her. Cell 315 is the derived one, kept."
+      "why": "Hata Mari, the Bontarian spy the bworks hold at their camp [-6,6]: she only belongs to Bonta's side of «No dejes que tus hijos vaguen» (527), where she is freed once De Rorc is beaten and leaves after «Nos vemos fuera del campamento» (3624). Brakmar's side (526) never meets her. INFERRED cell: 373, in front of the bworks' rack, clear of their groups (the derived 315 stood among them)."
     }
   ]
 }

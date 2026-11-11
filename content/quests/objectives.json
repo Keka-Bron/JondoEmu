@@ -3467,6 +3467,7 @@
    "objective": 3605,
    "quest": 526,
    "kind": "enter",
+   "anyOrder": true,
    "map": 220989956,
    "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
   },
@@ -3474,6 +3475,7 @@
    "objective": 3606,
    "quest": 526,
    "kind": "enter",
+   "anyOrder": true,
    "map": 220989444,
    "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
   },
@@ -3481,6 +3483,7 @@
    "objective": 3607,
    "quest": 526,
    "kind": "enter",
+   "anyOrder": true,
    "map": 220988932,
    "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
   },
@@ -3488,6 +3491,7 @@
    "objective": 3608,
    "quest": 526,
    "kind": "enter",
+   "anyOrder": true,
    "map": 220988420,
    "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
   },
@@ -3495,8 +3499,130 @@
    "objective": 3609,
    "quest": 526,
    "kind": "enter",
+   "anyOrder": true,
    "map": 220987908,
    "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
+  },
+  {
+   "objective": 3621,
+   "quest": 527,
+   "kind": "talk",
+   "npc": 1268,
+   "map": 104071168,
+   "why": "«Encuentra al espía bontariano»: Hata Mari, held at the bworks' camp [-6,6]; speaking to her finds her (De Rorc's «Liberar a la bontariana» does it too, for whoever goes to him first)."
+  },
+  {
+   "objective": 3626,
+   "quest": 527,
+   "kind": "enter",
+   "map": 178522112,
+   "why": "«Encuentra la tumba de Cabotina»: going down into the Gúltar crypt from the luminous vault of the cemetery of the Tortured [-14,36] (content/interactives/floor_passages.json)."
+  },
+  {
+   "objective": 3627,
+   "quest": 527,
+   "kind": "beat",
+   "monster": 2828,
+   "map": 178522112,
+   "why": "«Tranquiliza las almas de la familia de Gúltar»: the fight against Cabotina's spirit (2828) and the souls of Gúltar's wives and sons (2829-2834) she calls, in the crypt the objective carries."
+  },
+  {
+   "objective": 3631,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 191106050,
+   "requires": [{"item": 11090, "count": 1}],
+   "spends": true,
+   "why": "«Pega los carteles de «se busca»» in Astrub: walking onto the map the objective carries puts up one of Tajide Ragalde's posters (Dofus pour les noobs: «il vous suffit juste de passer sur les maps»)."
+  },
+  {
+   "objective": 3632,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 88080663,
+   "requires": [{"item": 11090, "count": 1}],
+   "spends": true,
+   "why": "«Pega los carteles de «se busca»» in the village of Amakna: walking onto the map the objective carries puts up one of Tajide Ragalde's posters (Dofus pour les noobs: «il vous suffit juste de passer sur les maps»)."
+  },
+  {
+   "objective": 3633,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 90703872,
+   "requires": [{"item": 11090, "count": 1}],
+   "spends": true,
+   "why": "«Pega los carteles de «se busca»» in Sufokia: walking onto the map the objective carries puts up one of Tajide Ragalde's posters (Dofus pour les noobs: «il vous suffit juste de passer sur les maps»)."
+  },
+  {
+   "objective": 3634,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 206309380,
+   "requires": [{"item": 11090, "count": 1}],
+   "spends": true,
+   "why": "«Pega los carteles de «se busca»» in the way out of the village of Pandala: walking onto the map the objective carries puts up one of Tajide Ragalde's posters (Dofus pour les noobs: «il vous suffit juste de passer sur les maps»)."
+  },
+  {
+   "objective": 3635,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 212599810,
+   "requires": [{"item": 11090, "count": 1}],
+   "spends": true,
+   "why": "«Pega los carteles de «se busca»» in Bonta: walking onto the map the objective carries puts up one of Tajide Ragalde's posters (Dofus pour les noobs: «il vous suffit juste de passer sur les maps»)."
+  },
+  {
+   "objective": 3637,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 220989956,
+   "why": "«Destruye las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] where the Brakmarians left their plans (Dofus pour les noobs, Bonta's side: «vous avez juste besoin de passer dessus»), the same five «Deja las pistas para Dark Vlad» leaves them on."
+  },
+  {
+   "objective": 3638,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 220989444,
+   "why": "«Destruye las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] where the Brakmarians left their plans (Dofus pour les noobs, Bonta's side: «vous avez juste besoin de passer dessus»), the same five «Deja las pistas para Dark Vlad» leaves them on."
+  },
+  {
+   "objective": 3639,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 220988932,
+   "why": "«Destruye las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] where the Brakmarians left their plans (Dofus pour les noobs, Bonta's side: «vous avez juste besoin de passer dessus»), the same five «Deja las pistas para Dark Vlad» leaves them on."
+  },
+  {
+   "objective": 3640,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 220988420,
+   "why": "«Destruye las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] where the Brakmarians left their plans (Dofus pour les noobs, Bonta's side: «vous avez juste besoin de passer dessus»), the same five «Deja las pistas para Dark Vlad» leaves them on."
+  },
+  {
+   "objective": 3641,
+   "quest": 527,
+   "kind": "enter",
+   "anyOrder": true,
+   "map": 220987908,
+   "why": "«Destruye las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] where the Brakmarians left their plans (Dofus pour les noobs, Bonta's side: «vous avez juste besoin de passer dessus»), the same five «Deja las pistas para Dark Vlad» leaves them on."
+  },
+  {
+   "objective": 3642,
+   "quest": 527,
+   "kind": "beat",
+   "monster": 2826,
+   "map": 221249538,
+   "why": "«Enfréntate a Letalina antes de abandonar el Dédalo de Dark Vlad»: the four gárghulas she sends on the tumulus."
   }
  ]
 }

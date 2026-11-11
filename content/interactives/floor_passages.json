@@ -8,7 +8,8 @@
     "",
     "  { \"map\", \"cell\", \"toMap\", \"toCell\" }",
     "",
-    "A cell that already has an element's passage keeps that one. This is a file of its own",
+    "A cell that already has an element's passage keeps that one. Several passages that each ask",
+    "for a «criterion» can share a cell: the first that holds leads, these before the graph's. This is a file of its own",
     "and not a list in teleports.json because Jondo Studio's passage editor rewrites that",
     "file whole, with only the passages it knows.",
     "",
@@ -74,6 +75,36 @@
       "toMap": 157812736,
       "toCell": 431,
       "why": "Isle of Moon, path of skulls [32,4]: the wreck's doorway under the hanging frame (244, 258); «Entrez dans l'épave de bateau» (Dofus pour les noobs, «Sur les traces des Moonies»). No element outside and no passage in the client's graph."
+    },
+    {
+      "map": 171443713,
+      "cell": 327,
+      "toMap": 178522112,
+      "toCell": 456,
+      "criterion": "Qa=527&Qo>3625&Qo<3627",
+      "why": "The luminous vault of the Gúltar family in the cemetery of the Tortured [-14,36] (Dofus pour les noobs: «placer sur la cellule de gauche juste devant le caveau lumineux»), on Bonta's side of «No dejes que tus hijos vaguen»: down to the crypt where Cabotina's spirit waits, from Hata's report until the family is calmed. Brakmar's side keeps the 2.73 graph's passage on the same cell, to the vault of the remains. INFERRED landing: 456, the crypt's floor by its way up."
+    },
+    {
+      "map": 171443713,
+      "cell": 327,
+      "toMap": 178523136,
+      "toCell": 456,
+      "criterion": "Qa=527&Qo>3627&Qo<3628",
+      "why": "The same vault once the family is calmed, for whoever left before Cabotina gave the collar: the crypt at peace. INFERRED landing: 456."
+    },
+    {
+      "map": 178522112,
+      "cell": 484,
+      "toMap": 171443713,
+      "toCell": 314,
+      "why": "The way up out of the Gúltar crypt: its floor opens at the bottom, between cells 469 and 484, and no element is drawn there. Lands on 314 of the cemetery, where the vault of the remains lets one out too."
+    },
+    {
+      "map": 178523136,
+      "cell": 484,
+      "toMap": 171443713,
+      "toCell": 314,
+      "why": "The way up out of the crypt at peace, the same opening as 178522112's."
     }
   ]
 }

@@ -41,6 +41,14 @@ namespace Jondo.Unity.Server.Managers
         public int InsteadCellId { get; init; }
 
         public string InsteadWhen { get; init; } = "";
+
+        /// <summary>
+        /// The next floor passage on the same cell, tried when this one's <see cref="Criterion"/>
+        /// does not hold; null for none. One cell can lead to a different map for each quest that
+        /// sends players there: the cemetery's luminous vault opens on one crypt for each branch
+        /// of «No dejes que tus hijos vaguen».
+        /// </summary>
+        public InteractiveTeleport? Otherwise { get; set; }
     }
 
     /// <summary>
@@ -640,7 +648,12 @@ namespace Jondo.Unity.Server.Managers
             int added = 0;
             foreach (var floor in passages)
             {
-                if (byCell.ContainsKey((floor.SourceMapId, floor.SourceCell)))
+                byCell.TryGetValue((floor.SourceMapId, floor.SourceCell), out var there);
+                // Floor passages that each ask for a criterion share the cell: the first one that
+                // holds leads. An element's passage, or one open to anybody, keeps the cell.
+                bool chained = there != null && there.SourceVersion == "floor" &&
+                               there.Criterion.Length > 0 && !string.IsNullOrEmpty(floor.Criterion);
+                if (there != null && !chained)
                 {
                     if (loud) Console.WriteLine($"[Teleports] Floor passage {floor}: the cell has an element's passage already; left out.");
                     continue;
@@ -651,7 +664,7 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
 
-                byCell[(floor.SourceMapId, floor.SourceCell)] = new InteractiveTeleport
+                var route = new InteractiveTeleport
                 {
                     SourceMapId = floor.SourceMapId,
                     SourceCellId = floor.SourceCell,
@@ -661,6 +674,16 @@ namespace Jondo.Unity.Server.Managers
                     Confidence = confidence,
                     Criterion = floor.Criterion ?? "",
                 };
+                if (chained)
+                {
+                    var last = there!;
+                    while (last.Otherwise != null) last = last.Otherwise;
+                    last.Otherwise = route;
+                }
+                else
+                {
+                    byCell[(floor.SourceMapId, floor.SourceCell)] = route;
+                }
                 added++;
             }
             return added;

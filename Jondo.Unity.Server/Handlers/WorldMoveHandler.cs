@@ -185,10 +185,14 @@ namespace Jondo.Unity.Server.Handlers
             await Managers.Quests.OnWalkedAsync(stream, mapId);
             if (await AlmanaxTempleHandler.WalkAsync(stream, mapId, cellId))
                 return;
-            if (!Managers.TeleportManager.TryGetCellTrigger(mapId, cellId, out var route))
+            if (!Managers.TeleportManager.TryGetCellTrigger(mapId, cellId, out var found))
                 return;
-            // A passage with a criterion -- a quest's step, an item -- opens only for whoever meets it.
-            if (route.Criterion.Length > 0 && !Managers.ItemCriteria.Holds(route.Criterion))
+            // A passage with a criterion -- a quest's step, an item -- opens only for whoever meets
+            // it. A cell can hold several, one per criterion, and the first that holds leads.
+            Managers.InteractiveTeleport? route = found;
+            while (route != null && route.Criterion.Length > 0 && !Managers.ItemCriteria.Holds(route.Criterion))
+                route = route.Otherwise;
+            if (route == null)
                 return;
 
             int landed = await TeleportHandler.ToMapAsync(

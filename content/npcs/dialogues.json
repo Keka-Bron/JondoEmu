@@ -28967,7 +28967,10 @@
       "openings": [
         { "quest": 526, "pending": 3601, "message": 7642 },
         { "quest": 526, "pending": 3602, "message": 7642 },
-        { "quest": 526, "pending": 3604, "message": 7643 }
+        { "quest": 526, "pending": 3604, "message": 7643 },
+        { "quest": 527, "pending": 3621, "message": 7653 },
+        { "quest": 527, "pending": 3622, "message": 7653 },
+        { "quest": 527, "message": 7654, "objective": 3622 }
       ],
       "lines": [
         {
@@ -28992,9 +28995,208 @@
             { "reply": 68416, "quest": 526, "criterion": "PO!11047", "gives": 11047 },
             { "reply": 7658 }
           ]
+        },
+        {
+          "message": 7653,
+          "choices": [
+            { "reply": 7657, "quest": 527, "completes": 3621, "params": [[30, 3621]] },
+            { "reply": 7657, "quest": 527, "afterObjective": 3621, "beforeObjective": 3622 },
+            { "reply": 7658 }
+          ]
+        },
+        {
+          "message": 7654,
+          "choices": []
         }
       ],
-      "why": "De Rorc at the bwork camp, the warrior Letalina's mistress Medianoche wants (Dofus pour les noobs: «Grabumpher le Bwork», and the other reply cannot avoid the fight either). «Grabumph, bwork» (7650) closes «Encuentra el bwork» (3601) and starts the fight against him (content/fights/npc_fights.json), «No grabumph» (7651) closes it too and gets his «¡Grabumph!» (7652), whose only way out is the fight. Beaten, he drops as the fight's loot the follower «De Rorc» (11047) that walks behind the character to the tower, and says «Yo vencido, yo prisionero» (7643): «Escoltar al bwork hasta Letalina» (68416) takes him along, and hands him over again to whoever has lost him. «Mantenerte al margen» (7658) leaves."
+      "why": "De Rorc at the bwork camp, the warrior Letalina's mistress Medianoche wants (Dofus pour les noobs: «Grabumpher le Bwork», and the other reply cannot avoid the fight either). «Grabumph, bwork» (7650) closes «Encuentra el bwork» (3601) and starts the fight against him (content/fights/npc_fights.json), «No grabumph» (7651) closes it too and gets his «¡Grabumph!» (7652), whose only way out is the fight. Beaten, he drops as the fight's loot the follower «De Rorc» (11047) that walks behind the character to the tower, and says «Yo vencido, yo prisionero» (7643): «Escoltar al bwork hasta Letalina» (68416) takes him along, and hands him over again to whoever has lost him. «Mantenerte al margen» (7658) leaves. On Bonta's side (527) he holds the spy: «¿Tú querer chica flaca?» (7653), «Liberar a la bontariana» (7657) closes «Encuentra al espía bontariano» (3621) if she has not been spoken to yet, and starts the fight against him (content/fights/npc_fights.json); beaten, he says «Tú fuerte, tú agarrar chica-merienda» (7654), which is «Ve a ver a De Rorc» (3623) done by the hello."
+    },
+    {
+      "npc": 6395,
+      "map": 217064448,
+      "opening": 47850,
+      "lines": [
+        {
+          "message": 47850,
+          "choices": [
+            { "reply": 63612, "quest": 527, "step": 1098, "beforeObjective": 3620, "next": 47856 },
+            { "reply": 63614, "quest": 527, "step": 1100, "beforeObjective": 3636, "next": 47857 },
+            { "reply": 63619, "quest": 527, "step": 1101, "afterObjective": 3642, "beforeObjective": 3643, "next": 51054 }
+          ]
+        },
+        {
+          "message": 47856,
+          "choices": [
+            { "reply": 63611, "quest": 527, "completes": 3620, "params": [[30, 3620]] }
+          ]
+        },
+        {
+          "message": 47857,
+          "choices": [
+            { "reply": 63613, "quest": 527, "completes": 3636, "params": [[30, 3636]] },
+            { "reply": 68378, "next": 51025 },
+            { "reply": 68380, "next": 51026 }
+          ]
+        },
+        {
+          "message": 51025,
+          "choices": [
+            { "reply": 68377, "quest": 527, "completes": 3636, "params": [[30, 3636]] }
+          ]
+        },
+        {
+          "message": 51026,
+          "choices": [
+            { "reply": 68379, "quest": 527, "completes": 3636, "params": [[30, 3636]] }
+          ]
+        },
+        {
+          "message": 51054,
+          "choices": [
+            { "reply": 68434, "quest": 527, "completes": 3643, "params": [[30, 3643]] }
+          ]
+        }
+      ],
+      "why": "Gracia Malsana, upstairs in the library of Bonta, on Bonta's side of «No dejes que tus hijos vaguen» (Dofus pour les noobs). «¿Puedo consultar el libro sobre la infancia de Gúltar?» (63612) gets 47856 (the Brakmarians are up to something in Gisgul, and a spy is held at the bworks' camp), and «Ir a Amakna» (63611) closes «Ve a ver a Gracia Malsana» (3620). Back from the posters, «Resumir los acontecimientos» (63614) gets 47857 (the cursed jewel was to lure Dark Vlad, who is Gúltar; plans were left in the Bosque Maléfico): «Ir al Bosque Maléfico» (63613) closes 3636, and so do the two doubts she answers first (68378 and 51025, 68380 and 51026). With Letalina's creatures beaten, «He desbaratado los planes de los brakmarianos» (63619) gets 51054 -- the book to keep; 47858's choice of Gúltar's gear is for those who bought the manga -- and «Darle las gracias...» (68434) closes 3643 and the quest. 47850 is her greeting."
+    },
+    {
+      "npc": 1268,
+      "map": 0,
+      "opening": 7657,
+      "openings": [
+        { "quest": 527, "pending": 3621, "message": 7651 },
+        { "quest": 527, "pending": 3622, "message": 7651 },
+        { "quest": 527, "pending": 3623, "message": 7651 },
+        { "quest": 527, "pending": 3624, "message": 7655 },
+        { "quest": 527, "pending": 3625, "message": 7656 }
+      ],
+      "lines": [
+        {
+          "message": 7651,
+          "choices": []
+        },
+        {
+          "message": 7655,
+          "choices": [
+            { "reply": 68370, "quest": 527, "completes": 3624, "params": [[30, 3624]], "afterObjective": 3623 }
+          ]
+        },
+        {
+          "message": 7656,
+          "choices": [
+            { "reply": 7719, "next": 7696 }
+          ]
+        },
+        {
+          "message": 7696,
+          "choices": [
+            { "reply": 68371, "quest": 527, "completes": 3625, "params": [[30, 3625]] }
+          ]
+        },
+        {
+          "message": 7657,
+          "choices": []
+        }
+      ],
+      "why": "Hata Mari, the Bontarian spy of «No dejes que tus hijos vaguen» (527). Held at the bworks' camp she begs for help and points at De Rorc (7651; finding her is «Encuentra al espía bontariano», 3621, content/quests/objectives.json); once he is beaten and spoken to, «¡Libre, soy libre!» (7655), and «Nos vemos fuera del campamento» (68370) closes «Ve a ver a Hata Mari» (3624). Outside the bwork village [-1,8] she tells what she found (7656), «¿Qué sugieres?» (7719) gets 7696 (look for Cabotina's tomb in the cemetery of the Tortured), and «Ir a las landas de Sidimote» (68371) closes «Encuéntrate con Hata fuera del pueblo bwork» (3625). 7657 is her sigh otherwise."
+    },
+    {
+      "npc": 1269,
+      "map": 0,
+      "opening": 7662,
+      "openings": [
+        { "quest": 527, "pending": 3627, "message": 7662 },
+        { "quest": 527, "pending": 3628, "message": 7661 }
+      ],
+      "lines": [
+        {
+          "message": 7662,
+          "choices": [
+            { "reply": 65340, "quest": 527, "beforeObjective": 3627, "next": 51048 },
+            { "reply": 68427, "teleport": 171443713 }
+          ]
+        },
+        {
+          "message": 51048,
+          "choices": [
+            { "reply": 68425, "quest": 527, "beforeObjective": 3627 },
+            { "reply": 68426, "teleport": 171443713 }
+          ]
+        },
+        {
+          "message": 7661,
+          "choices": [
+            { "reply": 7660, "quest": 527, "completes": 3628, "params": [[30, 3628]], "gives": 11046, "teleport": 171443713 },
+            { "reply": 68427, "teleport": 171443713 }
+          ]
+        }
+      ],
+      "why": "The spirit of Cabotina, Gúltar's mother, in the family crypt on Bonta's side of «No dejes que tus hijos vaguen» (Dofus pour les noobs: she is already corrupted by Brakmarian magic and calls her whole family on the character, «Se défendre contre l'attaque soudaine»). «Aquí hace tanto frío...» (7662): «Sentir un escalofrío» (65340) gets 51048, and «Defenderte del ataque repentino» (68425) starts the fight (content/fights/npc_fights.json) whose win is «Tranquiliza las almas de la familia de Gúltar» (3627); «Huir» (68426) and «Salir de la cripta» (68427) go back up to the cemetery. At peace (7661) she gives the cursed collar (11046) for Gúltar's father at the Iop temple: «Agarrar el collar y salir de la cripta» (7660) closes «Ve a ver al Espíritu de Cabotina» (3628)."
+    },
+    {
+      "npc": 424,
+      "map": 183762954,
+      "opening": 4565,
+      "openings": [
+        { "quest": 527, "pending": 3630, "message": 7665 }
+      ],
+      "lines": [
+        {
+          "message": 4565,
+          "choices": [
+            { "reply": 1375, "next": 1728 },
+            { "reply": 1386, "next": 1753 },
+            { "reply": 19421 }
+          ]
+        },
+        {
+          "message": 1728,
+          "choices": [
+            { "reply": 19421 }
+          ]
+        },
+        {
+          "message": 1753,
+          "choices": [
+            { "reply": 19421 }
+          ]
+        },
+        {
+          "message": 7665,
+          "choices": [
+            { "reply": 7659, "quest": 527, "holds": 11046, "next": 7666 },
+            { "reply": 23910 }
+          ]
+        },
+        {
+          "message": 7666,
+          "choices": [
+            { "reply": 68376, "quest": 527, "takes": 11046, "next": 51024 }
+          ]
+        },
+        {
+          "message": 51024,
+          "choices": [
+            { "reply": 68375, "quest": 527, "completes": 3630, "params": [[30, 3630]], "gives": 11090, "givesCount": 5 }
+          ]
+        }
+      ],
+      "why": "Tajide Ragalde, master of the Iop temple of Amakna [1,3], in front of Yopuka's statue. Welcome (4565) and the class master's advice on weapons (1375, 1728) and on the Iops' characteristics (1386, 1753). On Bonta's side of «No dejes que tus hijos vaguen» (Dofus pour les noobs): the evil aura she feels (7665), «Traigo un artefacto maldito que hay que destruir» (7659) with Cabotina's collar, 7666 (she will ask Yopuka how to break it) and «Incriminar a Letalina Sigisbul» (68376) leave the collar with her, and «Agarrar los carteles» (68375) closes «Encuentra consejo en el templo de Yopuka» (3630) and hands over the five «En busca y captura» posters (11090) for the five cities (51024)."
+    },
+    {
+      "npc": 1266,
+      "map": 221249538,
+      "opening": 7659,
+      "lines": [
+        {
+          "message": 7659,
+          "choices": [
+            { "reply": 7661, "quest": 527, "step": 1101, "beforeObjective": 3642 },
+            { "reply": 68407 }
+          ]
+        }
+      ],
+      "why": "Letalina Sigisbul on the tumulus of Dark Vlad's maze [-5,17], the end of Bonta's side of «No dejes que tus hijos vaguen» (Dofus pour les noobs: she sends her creatures, «Affronter les créatures de Léthaline»). «Tú eres el que se dedica a desmantelar mis planes geniales...» (7659): «Enfrentarte a las criaturas de Letalina» (7661) starts the fight against four gárghulas (content/fights/npc_fights.json), whose win is «Enfréntate a Letalina antes de abandonar el Dédalo de Dark Vlad» (3642); «Huir a toda prisa» (68407) leaves."
     }
   ]
 }
