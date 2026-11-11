@@ -3598,6 +3598,13 @@
       "cell": 397,
       "orientation": 1,
       "why": "Xiap (Patxi Fista), the pacifist wabbit of «Guewa y Paz» and «¡Cuidado con los wabbits!», at [24,-4] where both quests put him. INFERRED cell: 397, open grass below the low ruined wall, off the middle of the map where the derived cell (315) left him inside the wabbit groups."
+    },
+    {
+      "map": 132912128,
+      "npc": 2436,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Orno Tóligo in Thor Pestruz's aviary's way out, where his «Ir por la escalera y salir» (21565) and his after-the-boss line (17976) belong. INFERRED cell: 300, the open middle of the pen, in front of the caravan and clear of the fence posts."
     }
   ]
 }

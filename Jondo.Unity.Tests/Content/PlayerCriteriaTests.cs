@@ -48,6 +48,26 @@ namespace Jondo.Unity.Tests.Content
             Assert.False(Met("PJ=28", facts));
         }
 
+        /// <summary>
+        /// Mt and Ms are about the monster that drops: Thor Pestruz (a boss) gives his egg for «Un
+        /// huevo para Zurcarák», «Qa=1517&amp;PO!15317&amp;Mt=1&amp;Ms=0»; without a monster they are unknown.
+        /// </summary>
+        [Fact]
+        public void The_dropping_monster_answers_Mt_and_Ms()
+        {
+            var thor = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, MonsterId: 3618);
+            Assert.True(Met("Mt=1&Ms=0", thor));
+            Assert.False(Met("Mt=0", thor));
+            Assert.False(Met("Ms=1", thor));
+
+            var tofu = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, MonsterId: 98);
+            Assert.True(Met("Mt=0&Ms=0", tofu));
+
+            var nobody = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+            Assert.False(Met("Mt=0", nobody));
+            Assert.False(Met("Ms=0", nobody));
+        }
+
         /// <summary>The server's own letters are not known here, and an unknown row never drops.</summary>
         [Fact]
         public void What_is_not_known_does_not_drop()

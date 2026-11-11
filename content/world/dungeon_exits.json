@@ -130,6 +130,15 @@
       "npc": 1410,
       "replies": [33057],
       "why": "Brumen Tinctorias's laboratory: after Nelwynn (the fifth room) the winners are in the laboratory's own way out («LaboRATory - Exit», 176952320), where Tassa offers «Salir del laboratorio»; reaching it is «¿Dónde se ha ido la 7.ª compañía?»'s 4555. Cell 330: open floor in front of the workbench, two cells from Tassa."
+    },
+    {
+      "dungeon": 80,
+      "bossRoom": 132911104,
+      "room": 132912128,
+      "cell": 328,
+      "npc": 2436,
+      "replies": [21565],
+      "why": "Thor Pestruz's aviary: after the fifth room the winners are in the aviary's own way out («Cross Strich's Aviary - Exit», 132912128), where Orno Tóligo shows the stairs down. Cell 328: open floor of the pen, two cells from him."
     }
   ]
 }

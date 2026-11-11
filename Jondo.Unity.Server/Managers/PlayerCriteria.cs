@@ -26,7 +26,8 @@ namespace Jondo.Unity.Server.Managers
     /// In a drop, Qo asks about the objectives still to do in the quests' current steps: «Qo=14179»
     /// is «kill ten larvae» pending, and «Qo&gt;4096&amp;Qo&lt;4098» is objective 4097 among those pending
     /// -- step 1237's objectives run 4074 to 4103. INFERRED, as the order of an objective's ids.
-    /// What nobody answers here -- Ms, Mt, DD, Sc, Sv, WE… the server's own letters -- leaves the
+    /// Mt and Ms are about the monster that drops (see Resolve). What nobody answers here -- DD, Sc,
+    /// Sv, WE… the server's own letters -- leaves the
     /// row Unknown, and an Unknown row does not drop: «never dropping them is preferable to always
     /// dropping them» still holds for them.
     /// </para>
@@ -42,16 +43,17 @@ namespace Jondo.Unity.Server.Managers
         /// Whether whoever is in session meets the criterion, standing on <paramref name="mapId"/> --
         /// a fight's roleplay map, not its arena -- and holding what <paramref name="held"/> counts.
         /// </summary>
-        public static bool Met(string criterion, long mapId, Func<int, int>? held = null)
-            => Criterion.Met(criterion, ResolverFor(mapId, held));
+        public static bool Met(string criterion, long mapId, Func<int, int>? held = null, int monsterId = 0)
+            => Criterion.Met(criterion, ResolverFor(mapId, held, monsterId));
 
         /// <summary>The resolver itself, for whoever is in session.</summary>
-        public static Criterion.Resolver ResolverFor(long mapId, Func<int, int>? held = null)
+        /// <remarks><paramref name="monsterId"/>: the monster whose loot is judged, for Mt and Ms.</remarks>
+        public static Criterion.Resolver ResolverFor(long mapId, Func<int, int>? held = null, int monsterId = 0)
         {
             var state = SessionContext.State;
             held ??= Equipment.HowMany;
             var facts = new Facts(state, Quests.Log, Quests.Book, mapId, held, state.JobLevel, HuntingWeaponInHand,
-                                  Equipment.HowManyWorn);
+                                  Equipment.HowManyWorn, monsterId);
             return condition => Resolve(condition, facts);
         }
 
@@ -67,7 +69,8 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>What a condition asks of a character, as plain facts, so it can be answered without a session.</summary>
         internal readonly record struct Facts(SessionState? State, QuestLog? Log, QuestCatalogue? Book, long MapId,
                                               Func<int, int> Held, Func<int, int>? JobLevel = null,
-                                              Func<bool>? HuntingWeapon = null, Func<int, int>? Worn = null);
+                                              Func<bool>? HuntingWeapon = null, Func<int, int>? Worn = null,
+                                              int MonsterId = 0);
 
         internal static Answer Resolve(Condition condition, Facts facts)
         {
@@ -139,6 +142,16 @@ namespace Jondo.Unity.Server.Managers
 
                 case "HA":
                     return facts.State == null ? Answer.Unknown : Truth(Alterations.Has(facts.State.CharacterId, (int)value), op);
+                // The loot's own two letters, about the monster that drops it. Mt is whether he is a
+                // boss -- the value-4 bit of his m_flags (Dreams.IsBoss): of the 1,804 rows that ask
+                // it, 1,268 «Mt=1» are dungeon bosses' and 495 «Mt=0» are not (the bosses' pets, Thor
+                // Pestruz's egg for «Un huevo para Zurcarák»; the treasure maps' pieces off ordinary
+                // monsters); the 40 others are bosses outside the dungeons' list (Grozilla, Demoloch)
+                // and Kabaal. Ms is only ever asked «=0», in 1,629 rows beside Mt: whatever the
+                // server tallies there, an ordinary fight is the 0 -- INFERRED, or none of those rows
+                // would ever drop.
+                case "Mt": return facts.MonsterId == 0 ? Answer.Unknown : Compare(Dreams.IsBoss(facts.MonsterId) ? 1 : 0, op, value);
+                case "Ms": return facts.MonsterId == 0 ? Answer.Unknown : Compare(0, op, value);
                 case "OA":
                     return facts.State?.Achievements == null ? Answer.Unknown : Truth(facts.State.Achievements.Has((int)value), op);
 

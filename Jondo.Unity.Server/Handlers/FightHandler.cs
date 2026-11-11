@@ -12239,7 +12239,8 @@ namespace Jondo.Unity.Server.Handlers
                     // dropped him: «PO!11683» is one, not one a monster.
                     if (drop.ReceiverCriterion.Length > 0 && !Managers.PlayerCriteria.Met(drop.ReceiverCriterion,
                             fight.RoleplayMapId != 0 ? fight.RoleplayMapId : Network.SessionContext.State.MapId,
-                            item => Managers.Equipment.HowMany(item) + (loot.TryGetValue(item, out int rolled) ? rolled : 0)))
+                            item => Managers.Equipment.HowMany(item) + (loot.TryGetValue(item, out int rolled) ? rolled : 0),
+                            monster.MonsterId))
                         continue;
 
                     // In the loot the bonus raises the PROBABILITY of a drop, not the quantity: it is
