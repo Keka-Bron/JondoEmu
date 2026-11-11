@@ -179,12 +179,12 @@ namespace Jondo.Unity.Server.Network
                 ? DatabaseManager.CreateCharacter(account, DatabaseManager.DefaultServerId, name, breed, sex,
                                                   HeadTable.DefaultHeadId(breed, sex), new long[] { -1, -1, -1, -1, -1 },
                                                   CharacterCreationHandler.TutorialMap, CharacterCreationHandler.StartingLevel,
-                                                  CharacterCreationHandler.StartingKamas, CharacterCreationHandler.ScrolledStat,
+                                                  ServerSettings.Current.StartingKamas, ServerSettings.Current.StartingScrollStats,
                                                   CharacterCreationHandler.StarterItems, CharacterCreationHandler.TutorialCell)
                 : DatabaseManager.CreateCharacter(account, DatabaseManager.DefaultServerId, name, breed, sex,
                                                   HeadTable.DefaultHeadId(breed, sex), new long[] { -1, -1, -1, -1, -1 },
                                                   CharacterCreationHandler.StartingMap, level,
-                                                  CharacterCreationHandler.StartingKamas, CharacterCreationHandler.ScrolledStat,
+                                                  ServerSettings.Current.StartingKamas, ServerSettings.Current.StartingScrollStats,
                                                   CharacterCreationHandler.StarterItems);
             return id == 0 ? Mal(500, "create") : Bien(new { id, name, breed, level });
         }

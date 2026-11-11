@@ -2038,7 +2038,7 @@ namespace Jondo.Unity.Server
                 {
                     var add = connection.CreateCommand();
                     add.CommandText = $"ALTER TABLE Characters ADD COLUMN {column} INTEGER NOT NULL DEFAULT " +
-                                      $"{Handlers.CharacterCreationHandler.ScrolledStat};";
+                                      $"{ServerSettings.Current.StartingScrollStats};";
                     add.ExecuteNonQuery();
                     added = true;
                 }

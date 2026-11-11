@@ -43,18 +43,6 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>What he starts with: level, kamas and the scroll characteristics.</summary>
         public const int StartingLevel = 1;
-        public const long StartingKamas = 1_000_000L;
-
-        /// <summary>
-        /// What the scrolls give in each characteristic, and it goes APART from the base.
-        /// </summary>
-        /// <remarks>
-        /// A hundred and not a hundred and one: in the captures of real characters each characteristic's
-        /// f3 -- the scrolls field -- is 100 in 156 captures and 4,815 appearances, and 101 does not come
-        /// up once. And in its own column and not in the base, because the base is the points spent: put
-        /// there, a freshly made level 200 had 183 points to spend instead of 995.
-        /// </remarks>
-        public const int ScrolledStat = 100;
 
         /// <summary>
         /// The adventurer's set, which is set number 5 of the game: cape, hat, ring, boots, belt and
@@ -89,11 +77,17 @@ namespace Jondo.Unity.Server.Handlers
             (Keyring, Managers.Equipment.Bag),
         };
 
+        private static readonly (int Gid, int Slot)[] JustKeyring = {
+            (Keyring, Managers.Equipment.Bag)
+        };
+
         /// <summary>The dungeon keyring, item 10207.</summary>
         private const int Keyring = DungeonHandler.Keyring;
 
         /// <summary>What a new character comes out with. For the tests, and to be able to look at it.</summary>
-        public static IReadOnlyList<(int Gid, int Slot)> StarterItems => AdventurerSet;
+        public static IReadOnlyList<(int Gid, int Slot)> StarterItems => ServerSettings.Current.StartingAdventurerSet
+        ? AdventurerSet
+        : JustKeyring;
 
         /// <summary>
         /// The client asks for a random name (kwd) and expects a kvk with one inside.
@@ -190,7 +184,7 @@ namespace Jondo.Unity.Server.Handlers
 
             long id = DatabaseManager.CreateCharacter(accountId, serverId, name, breed, sex, head,
                                                       colors, TutorialMap, StartingLevel,
-                                                      StartingKamas, ScrolledStat, AdventurerSet,
+                                                      ServerSettings.Current.StartingKamas, ServerSettings.Current.StartingScrollStats, StarterItems,
                                                       TutorialCell);
             if (id == 0)
             {
@@ -219,7 +213,7 @@ namespace Jondo.Unity.Server.Handlers
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
 
             Console.WriteLine($"[Characters] Created {name} (id {id}), breed {breed}, before the " +
-                              $"tutorial's statue, with the adventurer's set and {StartingKamas} kamas.");
+                              $"tutorial's statue, with the adventurer's set and {ServerSettings.Current.StartingKamas} kamas.");
         }
 
         /// <summary>The reasons the kvb carries when it says no. 3 is the limit one.</summary>

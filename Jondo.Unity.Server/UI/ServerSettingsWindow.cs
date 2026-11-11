@@ -53,6 +53,10 @@ internal sealed class ServerSettingsWindow : Window
             Number("ConquestMax", "ConquestMaxHint", s.ConquestMaxMinutes, 20, 1440, 10, "min", v => s.ConquestMaxMinutes = (int)v),
             Number("Invulnerable", "InvulnerableHint", s.ConquestInvulnerabilityHours, 0, 168, 1, "h", v => s.ConquestInvulnerabilityHours = (int)v),
             Number("Protection", "ProtectionHint", s.PrismProtectionMinutes, 0, 1440, 10, "min", v => s.PrismProtectionMinutes = (int)v));
+        var startingBonuses = Card("StartingBonuses", 
+            Number("StartingKamas", "StartingKamasHint", s.StartingKamas, 0, 1_000_000_000L, 1, "", v => s.StartingKamas = (long)v),
+            Number("StartingScrollStats", "StartingScrollStatsHint", s.StartingScrollStats, 0, 10_000, 1, "", v => s.StartingScrollStats = (int)v),
+            Toggle("StartingAdventurerSet", "StartingAdventurerSetHint", s.StartingAdventurerSet, v => s.StartingAdventurerSet = v));
         var welcome = new TextBox { Name = "WelcomeMessage", Text = s.WelcomeMessage, Watermark = T("WelcomePlaceholder"), MaxLength = 300 };
         welcome.TextChanged += (_, _) => { s.WelcomeMessage = welcome.Text ?? ""; Changed(); };
         var welcomeCard = Card("Welcome", Note("WelcomeHint"), welcome);
@@ -77,7 +81,7 @@ internal sealed class ServerSettingsWindow : Window
         var raids = Card("Raids",
             Number("RaidMin", "RaidMinHint", s.RaidMinPlayers, 0, 16, 1, "", v => s.RaidMinPlayers = (int)v),
             Number("Matchmaking", "MatchmakingHint", s.MatchmakingGroupSize, 0, 4, 1, "", v => s.MatchmakingGroupSize = (int)v));
-        foreach (var card in new[] { rates, lootCard, characters, modes, conquests, raids, bots, welcomeCard })
+        foreach (var card in new[] { rates, lootCard, characters, modes, conquests, raids, bots, welcomeCard, startingBonuses })
             _cards.Children.Add(card);
         var scroll = new ScrollViewer { Name = "SettingsScroll", Content = _cards, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
         scroll.SizeChanged += (_, _) =>
