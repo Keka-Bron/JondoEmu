@@ -147,6 +147,8 @@ namespace Jondo.Unity.Server
             Managers.SkillManager.Initialize();
             Managers.RecipeManager.Initialize();
             Managers.Interactives.Initialize();
+            // The groups seeded in the scenery, back on cells one can stand on (maps and interactives read).
+            Managers.MobSpawnManager.PlaceOnWalkableCells();
             Managers.HavenBagStore.Initialize();
             Managers.StorageStacks.Initialize();
             Managers.Bank.Initialize();
