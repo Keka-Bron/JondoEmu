@@ -674,9 +674,9 @@
     {
       "map": 101713427,
       "npc": 2185,
-      "cell": 343,
+      "cell": 316,
       "orientation": 3,
-      "why": "Maeva Danselumière, in the prison under Amakna castle's militia [5,-6]: «descendez les escaliers vers le sous-sol pour entrer dans la prison» (DPLN, «On recherche Ali Grothor»); the map her thirteen criminals' delivery objectives name. INFERRED: the cell, the walkable one nearest the room's middle that no interactive or NPC takes (343), facing 3, as the bankers."
+      "why": "Maeva Danselumière, in the prison under Amakna castle's militia [5,-6]: «descendez les escaliers vers le sous-sol pour entrer dans la prison» (DPLN, «On recherche Ali Grothor»); the map her thirteen criminals' delivery objectives name. INFERRED: the cell, the walkable one nearest the room's middle that no interactive or NPC takes (343), facing 3, as the bankers. Cell 316, in sight: 343 was behind the prison fence."
     },
     {
       "map": 121900032,
@@ -1566,10 +1566,10 @@
     {
       "map": 188482056,
       "npc": 1441,
-      "cell": 299,
+      "cell": 340,
       "orientation": 3,
       "criterion": "Qa=718&Qo>4671|Qf=718",
-      "why": "The apprentice in Jykel's cave, there with his way out for whoever is in it. INFERRED cell."
+      "why": "The apprentice in Jykel's cave, there with his way out for whoever is in it. INFERRED cell. Cell 340, in sight: 299 was behind the heap of gold at the back of the cave."
     },
     {
       "map": 188482056,
@@ -1799,10 +1799,10 @@
     {
       "map": 188746756,
       "npc": 4452,
-      "cell": 330,
+      "cell": 315,
       "orientation": 3,
       "criterion": "Qa=1967&Qo>14097&Qo<14098",
-      "why": "The knave of spades on the market square once Agry Kultora has pointed at it (14097), until beaten (14098). INFERRED cell."
+      "why": "The knave of spades on the market square once Agry Kultora has pointed at it (14097), until beaten (14098). INFERRED cell. Cell 315, in sight: 330 was behind the woodpile, on a cell nobody can walk to."
     },
     {
       "map": 192413696,
@@ -1831,9 +1831,9 @@
     {
       "map": 188746242,
       "npc": 4484,
-      "cell": 300,
+      "cell": 299,
       "orientation": 3,
-      "why": "The Dofus-obsessed Xelor at [6,-20] (Dofus pour les noobs). INFERRED cell."
+      "why": "The Dofus-obsessed Xelor at [6,-20] (Dofus pour les noobs). INFERRED cell. Cell 299, in sight: 300 was behind a roof and a tree."
     },
     {
       "map": 189530126,
@@ -3342,10 +3342,10 @@
     {
       "map": 121900296,
       "npc": 2209,
-      "cell": 358,
+      "cell": 330,
       "orientation": 1,
       "criterion": "(Qa=1458&Qo=8061)|(Qa=1460&Qo=8074)",
-      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell. Cell 330, in sight: 358 was behind the training target."
     },
     {
       "map": 121900296,
