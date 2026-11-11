@@ -73,6 +73,7 @@ namespace Jondo.Unity.Server.Network
                 "session" => TestSession(),
                 "fight" => TestFight(),
                 "groups" => TestGroups(),
+                "wanted" => TestWanted(cuerpo),
                 "spells" => TestSpells(cuerpo),
                 "inject" => TestInject(cuerpo),
                 "cast" => TestCast(cuerpo),
@@ -132,6 +133,10 @@ namespace Jondo.Unity.Server.Network
             // its launch is let go, as the launcher's "fin de lanzamiento" would.
             if (ClientLaunchRegistry.TryGetByAccount(account, out var previous) && previous != null)
                 ClientLaunchRegistry.Remove(previous);
+            // And the other slots' clients the harness has closed: a launch with no session left
+            // goes after two minutes instead of the five that guard a player's slow start, or a
+            // few clients closed and opened in turn fill the eight a machine is allowed.
+            ClientLaunchRegistry.SoltarLosCaducados(TimeSpan.FromMinutes(2));
             string token = Guid.NewGuid().ToString("N");
             DatabaseManager.SetGameToken(account, token);
             DatabaseManager.SetLauncherToken(account, token);
@@ -414,6 +419,18 @@ namespace Jondo.Unity.Server.Network
                 id = g.MobId, cell = g.CellId, fighting = FightHandler.IsGroupFighting(g.MobId),
                 members = g.Members.Select(m => new { monster = m.Monster?.Id ?? 0, grade = m.GradeIndex }).ToList(),
             }).ToList());
+        }
+
+        /// <summary>Where the wanted criminals are now: each one's map and group, or none while away.</summary>
+        private static Respuesta TestWanted(string cuerpo)
+        {
+            int monster = (int)Numero(cuerpo, "monster");
+            return Bien(WantedPosters.All
+                .Where(c => monster == 0 || c.Monster == monster)
+                .Select(c => WantedPosters.WhereIs(c.Monster) is { } at
+                    ? (object)new { monster = c.Monster, quest = c.Quest, map = at.Map, group = at.Group }
+                    : new { monster = c.Monster, quest = c.Quest, map = 0L, group = 0L })
+                .ToList());
         }
 
         private static Respuesta TestFight()
