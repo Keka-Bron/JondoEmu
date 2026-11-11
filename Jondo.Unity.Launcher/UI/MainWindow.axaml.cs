@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -77,6 +78,12 @@ namespace Jondo.Unity.Launcher.UI
         private MusicPlayer? _musica;
         private string _firmaDeActivas = "";
 
+        /// <summary>One line of the game languages' dropdown. An empty code is "the launcher's".</summary>
+        private sealed record IdiomaDelJuego(string Codigo, string Bandera, string Nombre);
+
+        /// <summary>While the dropdown is being refilled, its SelectionChanged is not the player's.</summary>
+        private bool _rellenandoIdiomas;
+
         /// <summary>Whoever draws the portraits, taking them from the Dofus client's bones.</summary>
         /// <remarks>
         /// It is the same one Studio uses for the maps' NPCs. It keeps inside what it has already
@@ -99,6 +106,34 @@ namespace Jondo.Unity.Launcher.UI
             InitializeComponent();
             NativeClientSettings.IsVisible = OperatingSystem.IsLinux();
             ClientConfigPath.Text = LauncherPreferences.ClientConfigDirectory;
+
+            // The flag and the name, as in the language chips; the same template draws the closed
+            // box, so the chosen one shows with its flag too.
+            SelectorIdiomaJuego.ItemTemplate = new FuncDataTemplate<IdiomaDelJuego>((opcion, _) =>
+                new StackPanel
+                {
+                    Orientation = Avalonia.Layout.Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        new FlagIcon { Code = opcion?.Bandera ?? "", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
+                        new TextBlock { Text = opcion?.Nombre ?? "", FontSize = 12, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
+                    },
+                });
+
+            // The flag and the name, as in the language chips; the same template draws the closed
+            // box, so the chosen one shows with its flag too.
+            SelectorIdiomaJuego.ItemTemplate = new FuncDataTemplate<IdiomaDelJuego>((opcion, _) =>
+                new StackPanel
+                {
+                    Orientation = Avalonia.Layout.Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        new FlagIcon { Code = opcion?.Bandera ?? "", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
+                        new TextBlock { Text = opcion?.Nombre ?? "", FontSize = 12, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
+                    },
+                });
 
             Fondo.Source = LauncherSkin.LoadImage("bg.jpg");
             _reloj.Tick += (_, _) => MirarElEstado();
@@ -417,11 +452,13 @@ namespace Jondo.Unity.Launcher.UI
             SeccionAjustes.Content = Etiqueta(Textos.Ajustes(_idioma), 1.5, bold: true);
 
             RotuloIdioma.Text = Textos.Idioma(_idioma).ToUpperInvariant();
+            RotuloIdiomaJuego.Text = Textos.IdiomaDelJuego(_idioma).ToUpperInvariant();
             RotuloMusica.Text = Textos.Musica(_idioma).ToUpperInvariant();
             RotuloCliente.Text = Textos.Cliente(_idioma).ToUpperInvariant();
             RotuloCuentasGuardadas.Text = Textos.CuentasGuardadas(_idioma).ToUpperInvariant();
 
             PieIdioma.Text = Textos.PieIdioma(_idioma);
+            PieIdiomaJuego.Text = Textos.PieIdiomaDelJuego(_idioma);
             PieCliente.Text = Textos.PieCliente(_idioma);
             ConfigureClient.Content = Textos.ConfigurarCliente(_idioma);
             ClientConfigLabel.Text = Textos.DirectorioPreferenciasCliente(_idioma);
@@ -431,8 +468,9 @@ namespace Jondo.Unity.Launcher.UI
             TextoPrimeraCuenta.Text = _textos.AddAccountButton;
             TextoAnadirOtra.Text = _textos.AddAccountButton;
 
-            // The language also rules over the game: it is the --langCode it starts with. That is why
-            // the path row shows it, so one does not have to guess which language it will open in.
+            // The game's language is the --langCode it starts with. That is why the path row shows
+            // it, so one does not have to guess which language it will open in.
+            RefrescarIdiomasDelJuego();
             RefrescarRutaDelCliente();
             RefrescarResumen();
             RefrescarBotonDeMusica();
@@ -456,7 +494,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             string ruta = LauncherService.ResolveClient();
             string guardada = LauncherPreferences.ClientExecutableRaw;
-            string idioma = LauncherTexts.Code(_idioma).ToUpperInvariant();
+            string idioma = GameLanguages.ForLaunch(_idioma, LauncherPreferences.GameLanguage, ruta).ToUpperInvariant();
 
             if (ruta.Length == 0)
             {
@@ -763,6 +801,52 @@ namespace Jondo.Unity.Launcher.UI
             Recolocar();
         }
 
+        /// <summary>
+        /// Fills the game languages' dropdown with the packs of the client there is now.
+        /// </summary>
+        /// <remarks>
+        /// Again with every change of the launcher's language —the first line names it— and of the
+        /// client, which may bring other packs. A remembered choice the client does not have is
+        /// shown as "the launcher's", which is what it would start with, but it is not forgotten:
+        /// going back to the previous client brings it back.
+        /// </remarks>
+        private void RefrescarIdiomasDelJuego()
+        {
+            string cliente = LauncherService.ResolveClient();
+            string codigoDelLanzador = LauncherTexts.Code(_idioma);
+
+            var opciones = new List<IdiomaDelJuego>
+            {
+                new("", codigoDelLanzador, Textos.ComoElLanzador(_idioma, GameLanguages.NameOf(codigoDelLanzador))),
+            };
+            foreach (string codigo in GameLanguages.Available(cliente))
+                opciones.Add(new(codigo, codigo, GameLanguages.NameOf(codigo)));
+
+            string elegido = LauncherPreferences.GameLanguage;
+            int cual = Math.Max(0, opciones.FindIndex(o => o.Codigo == elegido));
+
+            _rellenandoIdiomas = true;
+            try
+            {
+                SelectorIdiomaJuego.ItemsSource = opciones;
+                SelectorIdiomaJuego.SelectedIndex = cual;
+            }
+            finally
+            {
+                _rellenandoIdiomas = false;
+            }
+        }
+
+        private void AlElegirIdiomaDelJuego(object? remitente, SelectionChangedEventArgs e)
+        {
+            if (_rellenandoIdiomas) return;
+            if (SelectorIdiomaJuego.SelectedItem is not IdiomaDelJuego opcion) return;
+            if (opcion.Codigo == LauncherPreferences.GameLanguage) return;
+
+            LauncherPreferences.GameLanguage = opcion.Codigo;
+            RefrescarRutaDelCliente();
+        }
+
         private void AlPulsarPestanaEntrar(object? remitente, Avalonia.Interactivity.RoutedEventArgs e)
             => CambiarDePestana(false);
 
@@ -855,6 +939,7 @@ namespace Jondo.Unity.Launcher.UI
             if (string.IsNullOrEmpty(ruta)) return;
 
             LauncherPreferences.SetClientExecutable(ruta);
+            RefrescarIdiomasDelJuego();
             RefrescarRutaDelCliente();
             RefrescarPacks();
         }

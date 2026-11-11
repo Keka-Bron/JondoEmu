@@ -395,12 +395,7 @@ namespace Jondo.Unity.Server.Network
         {
             Purge();
 
-            string normalized = (language ?? "").Trim().ToLowerInvariant() switch
-            {
-                "en" => "en",
-                "fr" => "fr",
-                _ => "es",
-            };
+            string normalized = NormalizeLanguage(language);
 
             var ticket = new Ticket
             {
@@ -425,6 +420,22 @@ namespace Jondo.Unity.Server.Network
             if (!_tickets.TryRemove(value.Trim(), out var ticket)) return null;
             if (DateTime.UtcNow - ticket.Created > Expiration) return null;
             return ticket;
+        }
+
+        /// <summary>
+        /// The language of the server's own texts, which are in three: es, en and fr.
+        /// </summary>
+        /// <remarks>
+        /// The game can be started in any language the client brings (de, pt...), and a German
+        /// player is better answered in English than in Spanish. Only a real language code goes
+        /// to English; anything else -the "0" a client sends in its authentication request, or
+        /// nothing- stays the Spanish it always was.
+        /// </remarks>
+        internal static string NormalizeLanguage(string? language)
+        {
+            string code = (language ?? "").Trim().ToLowerInvariant();
+            if (code is "es" or "en" or "fr") return code;
+            return code.Length is 2 or 3 && code.All(c => c is >= 'a' and <= 'z') ? "en" : "es";
         }
 
         /// <summary>Regression guard: the second socket keeps the language chosen on the first.</summary>

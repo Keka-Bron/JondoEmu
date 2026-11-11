@@ -12,7 +12,8 @@ namespace Jondo.Unity.Launcher.UI
     /// go to the repository. The format is <c>key=value</c>, one per line, so it can be opened and
     /// fixed by hand if something goes wrong.
     ///
-    ///   idioma=es|en|fr     the launcher's language, which is also the one the game starts with
+    ///   idioma=es|en|fr     the launcher's language, and the game's while idiomaJuego is empty
+    ///   idiomaJuego=de|...  the language the game starts in; empty means the launcher's
     ///   cliente=C:\...\Dofus.exe   where the client is, if it is not where it is supposed to be
     ///   servidor=host-or-ip  the remote server; empty means this same machine
     ///   web=https://...      the website one logs in on; empty means there is none yet
@@ -103,6 +104,25 @@ namespace Jondo.Unity.Launcher.UI
                 }
                 : UI.Language.Es;
             set => Escribir(ClaveIdioma, LauncherTexts.Code(value));
+        }
+
+        // ─── The game's language ────────────────────────────────────────────────
+        //
+        // Apart from the launcher's: the client brings more languages than the launcher has. Empty
+        // is "the same as the launcher", which is what there was before this existed, and it keeps
+        // following the launcher when that one changes. See GameLanguages.
+
+        private const string ClaveIdiomaJuego = "idiomaJuego";
+
+        /// <summary>The pack code chosen for the game, or empty to follow the launcher's language.</summary>
+        public static string GameLanguage
+        {
+            get
+            {
+                string codigo = Leer().TryGetValue(ClaveIdiomaJuego, out string? v) ? v.Trim().ToLowerInvariant() : "";
+                return GameLanguages.EsCodigo(codigo) ? codigo : "";
+            }
+            set => Escribir(ClaveIdiomaJuego, value ?? "");
         }
 
         // ─── Where the client is ────────────────────────────────────────────────

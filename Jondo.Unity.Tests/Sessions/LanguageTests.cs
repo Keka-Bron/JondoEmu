@@ -25,6 +25,21 @@ namespace Jondo.Unity.Tests.Sessions
             SessionRegistry.AssertLanguageFollowsTicket();
         }
 
+        [Theory]
+        [InlineData("es", "es")]
+        [InlineData("en", "en")]
+        [InlineData("FR", "fr")]
+        [InlineData("de", "en")]
+        [InlineData("pt", "en")]
+        [InlineData("0", "es")]
+        [InlineData("", "es")]
+        public void A_game_language_the_server_has_no_texts_for_is_answered_in_English(string launched, string answered)
+        {
+            // The launcher can start the game in any pack the client brings; the server's own
+            // texts are in three. A German player gets English, not Spanish.
+            Assert.Equal(answered, SessionRegistry.NormalizeLanguage(launched));
+        }
+
         [Fact]
         public void Every_command_text_exists_in_all_three_languages()
         {

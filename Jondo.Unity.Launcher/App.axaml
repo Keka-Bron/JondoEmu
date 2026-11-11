@@ -231,6 +231,42 @@
       <Setter Property="Foreground" Value="{DynamicResource DisabledFieldTextBrush}" />
     </Style>
 
+    <!-- The dropdowns: the game's language. Same box as the text fields, and a list in the
+         card's browns instead of Fluent's grey. -->
+    <Style Selector="ComboBox.field">
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Height" Value="36" />
+      <Setter Property="Padding" Value="10,0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource FieldBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrownBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource FieldTextBrush}" />
+    </Style>
+    <Style Selector="ComboBox.field:pointerover /template/ Border#Background">
+      <Setter Property="BorderBrush" Value="{DynamicResource GoldBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FieldBackgroundBrush}" />
+    </Style>
+    <Style Selector="ComboBox.field:dropdownopen /template/ Border#Background">
+      <Setter Property="BorderBrush" Value="{DynamicResource LightGoldBrush}" />
+    </Style>
+    <Style Selector="ComboBox.field /template/ Border#PopupBorder">
+      <Setter Property="Background" Value="#FF28180E" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrownBrush}" />
+    </Style>
+    <Style Selector="ComboBox.field ComboBoxItem">
+      <Setter Property="Foreground" Value="{DynamicResource SoftGoldBrush}" />
+    </Style>
+    <Style Selector="ComboBox.field ComboBoxItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource LightBrownBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="ComboBox.field ComboBoxItem:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="#D237250F" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
     <!-- The labels above each field. -->
     <Style Selector="TextBlock.label">
       <Setter Property="Foreground" Value="{DynamicResource SoftGoldBrush}" />

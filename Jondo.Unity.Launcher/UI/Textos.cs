@@ -78,9 +78,31 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>That the language also rules over the game, which is what one does not guess.</summary>
         public static string PieIdioma(Language i) => i switch
         {
-            Language.En => "The game starts in this language too.",
-            Language.Fr => "Le jeu démarre aussi dans cette langue.",
-            _ => "El juego arranca también en este idioma.",
+            Language.En => "The launcher's texts. The game follows it unless another language is chosen below.",
+            Language.Fr => "Les textes du lanceur. Le jeu la suit, sauf si une autre langue est choisie plus bas.",
+            _ => "Los textos del lanzador. El juego lo sigue, salvo que se elija otro idioma debajo.",
+        };
+
+        public static string IdiomaDelJuego(Language i) => i switch
+        {
+            Language.En => "Game language",
+            Language.Fr => "Langue du jeu",
+            _ => "Idioma del juego",
+        };
+
+        public static string PieIdiomaDelJuego(Language i) => i switch
+        {
+            Language.En => "Every language the client brings. The game starts in it.",
+            Language.Fr => "Toutes les langues du client. Le jeu démarre dans celle-ci.",
+            _ => "Todos los idiomas que trae el cliente. El juego arranca en él.",
+        };
+
+        /// <summary>The first option of the dropdown, with the launcher's language named after it.</summary>
+        public static string ComoElLanzador(Language i, string nombre) => i switch
+        {
+            Language.En => $"Same as the launcher ({nombre})",
+            Language.Fr => $"Comme le lanceur ({nombre})",
+            _ => $"Igual que el lanzador ({nombre})",
         };
 
         public static string PieCliente(Language i) => i switch
