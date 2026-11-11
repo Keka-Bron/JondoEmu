@@ -412,6 +412,27 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Whether a jrh or kmv asks for the fight's own map, or names none.
+        ///
+        /// Taken into a fight on another map right after a door, the client's late kmv for the room
+        /// it had just entered arrived first: answered with the placement, which the client dropped
+        /// as it loaded the arena, and its kmv for the arena found nothing left to send -- the board
+        /// stayed empty, with no foe and no ally on it.
+        /// </summary>
+        public static bool AsksForFightMap(byte[] payload, FightInstance fight)
+        {
+            var inner = ExtractMessagePayload(payload, Op.Uri(Op.Kmv))
+                        ?? ExtractMessagePayload(payload, "type.ankama.com/jrh");
+            if (inner == null) return true;
+            foreach (var field in ProtoMessage.Parse(inner).Fields)
+            {
+                if (field.FieldNumber == 1 && field.WireType == 0)
+                    return field.VarIntValue == 0 || field.VarIntValue == fight.MapId;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Sets up the fight of an accepted challenge: one player on each side.
         /// </summary>
         /// <remarks>

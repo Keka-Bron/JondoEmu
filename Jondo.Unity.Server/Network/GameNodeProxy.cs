@@ -405,6 +405,16 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if ((payloadStr.Contains("type.ankama.com/jrh")
                           || payloadStr.Contains(Op.Uri(Op.Kmv)))
+                         && FightHandler.PendingPreparation() is { } waiting
+                         && !FightHandler.AsksForFightMap(payload, waiting))
+                {
+                    // A late request for the map left behind, while the fight waits on another:
+                    // the placement is kept for the request that names the fight's map.
+                    Program.LogDebug($"[Fight] The client asks for a map other than fight #{waiting.FightId}'s; " +
+                                     "the placement waits for the fight's own.");
+                }
+                else if ((payloadStr.Contains("type.ankama.com/jrh")
+                          || payloadStr.Contains(Op.Uri(Op.Kmv)))
                          && FightHandler.PendingPreparation() != null)
                 {
                     // In a fight, who is on the map is not sent with a jss: it is the preparation's jxg,
