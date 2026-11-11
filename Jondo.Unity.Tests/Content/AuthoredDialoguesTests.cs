@@ -216,7 +216,7 @@ namespace Jondo.Unity.Tests.Content
                     var quest = book.Of(questId);
                     if (quest == null || quest.Steps.Count == 0) continue;
 
-                    long declared = quest.Steps[0].DialogId;
+                    long declared = SaidIn36.TryGetValue(questId, out long said) ? said : quest.Steps[0].DialogId;
                     // A line the NPC no longer says is the catalogue being older than the
                     // game: 3.6 hands 1629 over on Ganymed's 60411 (the tutorial capture),
                     // and the step still names 20673, which is none of his lines.
@@ -231,6 +231,13 @@ namespace Jondo.Unity.Tests.Content
 
             Assert.True(wrong.Count == 0, string.Join("\n", wrong));
         }
+
+        /// <summary>
+        /// Steps whose declared line is the one an older quest shared: the Forgelance devotion's
+        /// step names the Twelve's 30471, while 3.6 gives the class its own, 51447 «como forjalanza
+        /// no entras en esta categoría».
+        /// </summary>
+        private static readonly Dictionary<int, long> SaidIn36 = new() { [2467] = 51447 };
 
         /// <summary>
         /// Whether the declared line leads, reply after reply, to one that hands the quest over:
