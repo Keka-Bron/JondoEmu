@@ -2615,6 +2615,13 @@
       "orientation": 3,
       "criterion": "Qa=1631&Qo=9738",
       "why": "Ganymed by the temple's book [2,2] once the six statues are read: 1631's last objective (9740) is talking to him on this map, after «Ir a la próxima sala» in the Dofusarium. INFERRED cell, left of the book (287)."
+    },
+    {
+      "map": 217318404,
+      "npc": 6309,
+      "cell": 439,
+      "orientation": 1,
+      "why": "Amayiro in Bonta's militia [-32,-57], where «L'appel de la cité blanche» sends a neutral (Dofus pour les noobs) and every militia quest of his starts (55 onwards, their givers' map). He stood nowhere. INFERRED cell: behind the big desk."
     }
   ]
 }

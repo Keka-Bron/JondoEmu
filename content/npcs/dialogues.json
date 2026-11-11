@@ -26,7 +26,8 @@
     "  openings     tried in order, the first that holds wins; none, and `opening`. Each has a",
     "               `message` or a `byBreed` table (breed id to message) and any of: `before`",
     "               (quest neither started nor finished), `quest` (under way), `step` (and on that",
-    "               step), `objective` (and that objective done), `after` (quest finished).",
+    "               step), `objective` (and that objective done), `after` (quest finished),",
+    "               `criterion` (the character meets it, in the client's language: «Ps=0»).",
     "  pushes       a line the NPC opens by itself, with no click, once a step of a quest ends:",
     "               `afterStep` and a `message` or `byBreed`. The tutorial's voice does it.",
     "  params       what a reply shows beside it, as effects: a number, or an array whose first",
@@ -21674,6 +21675,209 @@
         }
       ],
       "why": "Andrée Inkarnay by the Celestial Temple's gates. «Réponses à tout» of Dofus pour les noobs: «Répondre qu'il n'est de toute façon pas possible de faire marche arrière» (52780), the gods love to watch their disciples (52781), «Dire qu'à la réflexion, votre puissance tutélaire ne vous correspond pas», take this philtre, only for novices (52782: «Prendre le philtre», 28361, «tant que vous êtes de niveau 20 ou moins»); not drunk yet? (52783); no longer a novice (52784). Once 1631 is done, 3.6's own line 60429 with «L'ignorer et sortir du Temple.», out to the foot of the steps in Incarnam, and 60430 for whoever is past level 20."
+    },
+    {
+      "npc": 6639,
+      "map": 0,
+      "opening": 50250,
+      "openings": [
+        { "quest": 2429, "objective": 18442, "pending": 18444, "criterion": "Ps=0", "message": 50257 },
+        { "quest": 2429, "objective": 18444, "pending": 18445, "criterion": "Ps=0", "message": 50258 }
+      ],
+      "lines": [
+        {
+          "message": 50250,
+          "choices": [
+            { "reply": 67043, "next": 50255, "criterion": "Ps=1", "quest": 2429, "afterObjective": 18442 },
+            { "reply": 67038, "next": 50255, "criterion": "Ps=1", "quest": 2429, "afterObjective": 18442 },
+            { "reply": 67040, "next": 50256, "criterion": "Ps=2", "quest": 2429, "afterObjective": 18442 },
+            { "reply": 67029, "next": 50251, "criterion": "Ps=1" },
+            { "reply": 67032, "next": 50252, "criterion": "Ps=2" },
+            { "reply": 67035, "next": 50253, "criterion": "Ps=0" },
+            { "reply": 67033 }
+          ]
+        },
+        {
+          "message": 50251,
+          "choices": [
+            { "reply": 67028, "startsQuest": 2429, "params": [[34, 2429]] },
+            { "reply": 67028, "quest": 2429, "beforeObjective": 18442 },
+            { "reply": 67027 }
+          ]
+        },
+        {
+          "message": 50252,
+          "choices": [
+            { "reply": 67031, "startsQuest": 2429, "params": [[34, 2429]] },
+            { "reply": 67031, "quest": 2429, "beforeObjective": 18442 },
+            { "reply": 67030 }
+          ]
+        },
+        {
+          "message": 50253,
+          "choices": [
+            { "reply": 67036, "next": 50254 }
+          ]
+        },
+        {
+          "message": 50254,
+          "choices": [
+            { "reply": 67034, "startsQuest": 2429, "params": [[34, 2429]] },
+            { "reply": 67034, "quest": 2429, "beforeObjective": 18442 }
+          ]
+        },
+        {
+          "message": 50255,
+          "choices": [
+            { "reply": 67037, "quest": 2429, "completesAll": [18444, 18445] }
+          ]
+        },
+        {
+          "message": 50256,
+          "choices": [
+            { "reply": 67039, "quest": 2429, "completesAll": [18444, 18445] }
+          ]
+        },
+        {
+          "message": 50257,
+          "choices": [
+            { "reply": 67042, "next": 50258 }
+          ]
+        },
+        {
+          "message": 50258,
+          "choices": [
+            { "reply": 67041, "quest": 2429, "completes": 18444 },
+            { "reply": 67041, "quest": 2429, "afterObjective": 18444 }
+          ]
+        }
+      ],
+      "why": "Captain Tadora, Bonta's recruiter by the zaap [-31,-56]: «L'appel de la cité blanche» (2429). Dofus pour les noobs: a Brakmarian shows his badge and she wants him out «Se tenir prêt à l'affronter», a Bontarian shows his and she wants to measure him «Accepter avec un plaisir non dissimulé», a neutral asks how to join and has to beat her first; «Dans tous les cas, le même combat se lance» (content/fights/npc_fights.json). «Une fois le combat terminé, reparlez à la Capitaine ... pour terminer la quête», except a neutral, who still has to see Amayiro [-32,-57]: the sworn's last reply does both talks (18444, 18445), the neutral's only hers. Which reply leads to which line is read off their texts; INFERRED: «Sacar pecho» beside «¿Qué te ha parecido mi actuación?» for her own side, on her greeting once the duel is won."
+    },
+    {
+      "npc": 6638,
+      "map": 0,
+      "opening": 50241,
+      "openings": [
+        { "quest": 2430, "objective": 18458, "pending": 18440, "criterion": "Ps=0", "message": 50248 },
+        { "quest": 2430, "objective": 18440, "pending": 18441, "criterion": "Ps=0", "message": 50249 }
+      ],
+      "lines": [
+        {
+          "message": 50241,
+          "choices": [
+            { "reply": 67026, "next": 50246, "criterion": "Ps=2", "quest": 2430, "afterObjective": 18458 },
+            { "reply": 67021, "next": 50246, "criterion": "Ps=2", "quest": 2430, "afterObjective": 18458 },
+            { "reply": 67023, "next": 50247, "criterion": "Ps=1", "quest": 2430, "afterObjective": 18458 },
+            { "reply": 67012, "next": 50242, "criterion": "Ps=2" },
+            { "reply": 67015, "next": 50243, "criterion": "Ps=1" },
+            { "reply": 67018, "next": 50244, "criterion": "Ps=0" },
+            { "reply": 67016 }
+          ]
+        },
+        {
+          "message": 50242,
+          "choices": [
+            { "reply": 67011, "startsQuest": 2430, "params": [[34, 2430]] },
+            { "reply": 67011, "quest": 2430, "beforeObjective": 18458 },
+            { "reply": 67010 }
+          ]
+        },
+        {
+          "message": 50243,
+          "choices": [
+            { "reply": 67014, "startsQuest": 2430, "params": [[34, 2430]] },
+            { "reply": 67014, "quest": 2430, "beforeObjective": 18458 },
+            { "reply": 67013 }
+          ]
+        },
+        {
+          "message": 50244,
+          "choices": [
+            { "reply": 67019, "next": 50245 }
+          ]
+        },
+        {
+          "message": 50245,
+          "choices": [
+            { "reply": 67017, "startsQuest": 2430, "params": [[34, 2430]] },
+            { "reply": 67017, "quest": 2430, "beforeObjective": 18458 }
+          ]
+        },
+        {
+          "message": 50246,
+          "choices": [
+            { "reply": 67020, "quest": 2430, "completesAll": [18440, 18441] }
+          ]
+        },
+        {
+          "message": 50247,
+          "choices": [
+            { "reply": 67022, "quest": 2430, "completesAll": [18440, 18441] }
+          ]
+        },
+        {
+          "message": 50248,
+          "choices": [
+            { "reply": 67025, "next": 50249 }
+          ]
+        },
+        {
+          "message": 50249,
+          "choices": [
+            { "reply": 67024, "quest": 2430, "completes": 18440 },
+            { "reply": 67024, "quest": 2430, "afterObjective": 18440 }
+          ]
+        }
+      ],
+      "why": "Captain Cryba, Brakmar's recruiter by the zaap [-26,37]: «L'appel de la cité sombre» (2430), the mirror of Tadora's. Dofus pour les noobs: the same three greetings by side, «Dans tous les cas, le même combat se lance», and the quest ends talking to her again, a neutral still having to see Oto Mustam [-25,33]. The sworn's «Dejarla trabajar e ir a saludar a Oto Mustam» and «Decidir ir a burlarte de Oto Mustam» do both talks (18440, 18441). INFERRED: «Sacar pecho» beside «¿Qué te ha parecido mi actuación?» for her own side."
+    },
+    {
+      "npc": 6309,
+      "map": 0,
+      "opening": 47058,
+      "openings": [
+        { "criterion": "Ps=2", "message": 47057 }
+      ],
+      "lines": [
+        {
+          "message": 47057,
+          "choices": [
+            { "reply": 62386 }
+          ]
+        },
+        {
+          "message": 47058,
+          "choices": []
+        }
+      ],
+      "why": "Amayiro, chief of Bonta's militia [-32,-57]. His template's greetings: «¡Dad la alerta! ¡Un demonio ha entrado en Bonta!» for a Brakmarian, with «Aprovechar el tumulto para huir.», and «Cuando se trata de defender los valores de Bonta...» for the rest. Seeing him is the neutral's last step of 2429 (18445, a hello). His militia quests (55 onwards) are not written yet."
+    },
+    {
+      "npc": 6401,
+      "map": 0,
+      "opening": 48039,
+      "openings": [
+        { "criterion": "Ps=1", "message": 48036 },
+        { "criterion": "Ps=0", "message": 48037 }
+      ],
+      "lines": [
+        {
+          "message": 48036,
+          "choices": [
+            { "reply": 64940 }
+          ]
+        },
+        {
+          "message": 48037,
+          "choices": []
+        },
+        {
+          "message": 48039,
+          "choices": []
+        }
+      ],
+      "why": "Oto Mustam, Brakmar's chief [-25,33]. His template's greetings: «¿Un sirviente del bien en Brakmar? ¡Guardias!» for a Bontarian, with «Huir para no sufrir la ira de Oto Mustam.», «Vaya, vaya: un alma neutra en este lugar» for a neutral and «Lo bueno de liderar una ciudad como Brakmar...» for his own. Seeing him is the neutral's last step of 2430 (18441, a hello). His militia quests are not written yet."
     }
   ]
 }

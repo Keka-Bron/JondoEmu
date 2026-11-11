@@ -1469,7 +1469,8 @@ namespace Jondo.Unity.Server.Managers
                 (quest, step) => log.Run(quest)?.StepId == step,
                 (quest, objective) => log.ObjectiveDone(objective),
                 quest => log.CanStart(quest, out _),
-                item => Equipment.HowMany(item) > 0);
+                item => Equipment.HowMany(item) > 0,
+                criterion => PlayerCriteria.Met(criterion, SessionContext.State.MapId));
             var found = new HashSet<int>();
             var seen = new HashSet<long>();
             var queue = new Queue<Jondo.Unity.World.Content.DialogueLine>();

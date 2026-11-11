@@ -39,6 +39,13 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>The cell of <see cref="WinMapId"/>.</summary>
             public int WinCellId { get; init; }
+
+            /// <summary>
+            /// Whether the monsters come at the grade of the character's level instead of the one written
+            /// («byLevel»): the recruiting captains of Bonta and Brakmar duel whoever comes, and their
+            /// monsters (6851, 6852) have one grade every 20 levels, from 20 to 200.
+            /// </summary>
+            public bool ByLevel { get; init; }
         }
 
         private static List<Fight>? _fights;
@@ -86,6 +93,7 @@ namespace Jondo.Unity.Server.Managers
                                 AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
                                 WinMapId = Long(row, "winMap"),
                                 WinCellId = (int)Long(row, "winCell"),
+                                ByLevel = row.TryGetProperty("byLevel", out var byLevel) && byLevel.ValueKind == JsonValueKind.True,
                             });
                         }
                     }

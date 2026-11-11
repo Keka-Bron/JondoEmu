@@ -836,7 +836,8 @@ namespace Jondo.Unity.Server.Handlers
             return LineFor(escrito, (breed, active, finished, onStep, objectiveDone) =>
                 escrito.OpeningFor(breed, active, finished, onStep, objectiveDone,
                                    quest => diario != null && diario.CanStart(quest, out _),
-                                   item => Managers.Equipment.HowMany(item) > 0));
+                                   item => Managers.Equipment.HowMany(item) > 0,
+                                   criterion => Managers.PlayerCriteria.Met(criterion, SessionContext.State.MapId)));
         }
 
         /// <summary>The line of an opening or a push, for this character, with his journal asked.</summary>
@@ -1204,7 +1205,10 @@ namespace Jondo.Unity.Server.Handlers
                 CerrarConversacion();
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(ConnectionProtocol.NpcDialogCloseReason)));
-                var group = MobSpawnManager.ComposeOffMap(npcFight.Monsters);
+                var monsters = npcFight.ByLevel
+                    ? npcFight.Monsters.Select(m => (m.Monster, MobSpawnManager.GradeForLevel(m.Monster, SessionContext.State.CharacterLevel))).ToList()
+                    : npcFight.Monsters;
+                var group = MobSpawnManager.ComposeOffMap(monsters);
                 if (group == null) return;
                 await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
                     arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),

@@ -1170,6 +1170,22 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// The 0-based grade of this monster for a character of this level: the highest one not above it,
+        /// the first if all are, and never past the sixth (<see cref="MobMember.MaxWrittenGrades"/>).
+        /// </summary>
+        public static int GradeForLevel(int monster, int level)
+        {
+            if (!_monsters.TryGetValue(monster, out var data)) return 0;
+            int best = 0;
+            int top = Math.Min(data.Grades.Count, MobMember.MaxWrittenGrades);
+            for (int i = 0; i < top; i++)
+            {
+                if (data.Grades[i].Level <= level) best = i;
+            }
+            return best;
+        }
+
         /// <summary>The members of a hand-composed group, up to the sixth grade.</summary>
         /// <summary>Monsters as fight members, by monster and 0-based grade: an NPC fight's allies.</summary>
         public static List<MobMember> ComposeMembers(IEnumerable<(int Monster, int Grade)> members) => Componer(members);
