@@ -238,11 +238,18 @@ namespace Jondo.Unity.Server.Managers
             using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
             connection.Open();
 
+            // The maps' cells BEFORE the seeding. Without them GetInnerWalkableCells answers its fallback
+            // (288, 303, 312, 327, 344, 350) for every map, and that is where the seeding put the 38,744
+            // groups of MapMobs: on those six cells, inside a wall on one map in three. Initialize only
+            // reads once; Program calls it again later.
+            MapManager.Initialize();
+
             DatabaseManager.EnsureMobsSeeded(connection);
 
             LoadMonsterData(connection);
 
             _mapMobs.Clear();
+            _fromTable.Clear();
 
             // Load MapMobs from SQLite database
             // Who is an archmonster, who is a wanted monster, and where each one belongs. It has to
@@ -337,6 +344,7 @@ namespace Jondo.Unity.Server.Managers
                     if (!_mapMobs.ContainsKey(mapId))
                         _mapMobs[mapId] = new List<MobGroup>();
                     _mapMobs[mapId].Add(group);
+                    _fromTable.Add(group.MobId);
                     count++;
                 }
             }
@@ -1235,6 +1243,57 @@ namespace Jondo.Unity.Server.Managers
                     Members = quienes,
                 };
             }
+        }
+
+        /// <summary>The groups read from MapMobs -- not placed by hand, not a dungeon room's: the ones <see cref="PlaceOnWalkableCells"/> may move.</summary>
+        private static readonly HashSet<long> _fromTable = new HashSet<long>();
+
+        /// <summary>
+        /// Puts back on a walkable cell the groups of MapMobs that stand where nobody can: in a wall, a
+        /// building, or on something clickable.
+        /// </summary>
+        /// <remarks>
+        /// A database seeded before the maps were read (see InitializeAndSpawnAll) has every group on
+        /// the six fallback cells of GetInnerWalkableCells, 12,751 of them in the scenery -- two of the
+        /// four Pious of Astrub City (4,-19) stand in its walls. Called once the maps AND the
+        /// interactives are loaded; the draw is seeded by the group, so a group lands on the same cell
+        /// at every start.
+        /// </remarks>
+        /// <returns>How many groups were moved.</returns>
+        public static int PlaceOnWalkableCells()
+        {
+            int moved = 0;
+            lock (_candado)
+            {
+                foreach (var (mapId, groups) in _mapMobs)
+                {
+                    if (!MapManager.WalkableCells.TryGetValue(mapId, out var walkable) || walkable.Count == 0) continue;
+                    var standable = new HashSet<int>(walkable);
+                    foreach (var element in Interactives.ElementsOf(mapId)) if (element.Cell != 0) standable.Remove(element.Cell);
+                    var used = new HashSet<int>(groups.Select(g => g.CellId));
+                    List<int>? inner = null;
+                    bool movedHere = false;
+                    foreach (var group in groups)
+                    {
+                        if (!_fromTable.Contains(group.MobId) || standable.Contains(group.CellId)) continue;
+                        inner ??= GetInnerWalkableCells(mapId);
+                        var choices = inner.Where(c => !used.Contains(c)).ToList();
+                        if (choices.Count == 0) continue;
+                        int cell = choices[new Random(unchecked((int)(group.MobId ^ mapId))).Next(choices.Count)];
+                        used.Remove(group.CellId);
+                        used.Add(cell);
+                        group.CellId = cell;
+                        moved++;
+                        movedHere = true;
+                    }
+                    // RestoreMap puts a map back as it was loaded: as it now stands.
+                    if (movedHere && _asLoaded.TryGetValue(mapId, out var loaded))
+                        foreach (var copy in loaded)
+                            if (groups.FirstOrDefault(g => g.MobId == copy.MobId) is { } now) copy.CellId = now.CellId;
+                }
+            }
+            Console.WriteLine($"[MobSpawnManager] {moved} group(s) of MapMobs moved off cells nobody can stand on.");
+            return moved;
         }
 
         public static List<int> GetInnerWalkableCells(long mapId)

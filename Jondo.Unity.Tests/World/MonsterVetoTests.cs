@@ -172,5 +172,23 @@ namespace Jondo.Unity.Tests.World
 
             Assert.True(checkedMaps > 0, "no map of the sample had interactives to check");
         }
+
+        [Fact]
+        public void The_seeded_groups_stand_on_walkable_cells()
+        {
+            if (!World()) return;
+            const long AstrubCity = 191104000;  // 4,-19: its Pious stood in the walls, on 312 and 350
+
+            // MapMobs was seeded before the maps were read, every group on the six fallback cells of
+            // GetInnerWalkableCells. Moved once, there is nothing left to move.
+            MobSpawnManager.PlaceOnWalkableCells();
+            Assert.Equal(0, MobSpawnManager.PlaceOnWalkableCells());
+
+            var walkable = MapManager.WalkableCells[AstrubCity];
+            var groups = MobSpawnManager.GetMobsForMap(AstrubCity);
+            Assert.NotEmpty(groups);
+            Assert.All(groups, g => Assert.Contains(g.CellId, walkable));
+            Assert.Equal(groups.Count, groups.Select(g => g.CellId).Distinct().Count());
+        }
     }
 }
