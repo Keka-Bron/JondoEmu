@@ -687,8 +687,9 @@ played through.
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
+| Class Temple | `█░░░░░░░░░` **10%** | 4/39 |
 | Wanted Notices | `░░░░░░░░░░` **1%** | 1/82 |
-| **All quests** | **9.2%** | **182/1976** |
+| **All quests** | **9.4%** | **186/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
