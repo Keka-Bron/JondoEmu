@@ -695,6 +695,19 @@ namespace Jondo.Unity.World.Content
             return false;
         }
 
+        /// <summary>Whether a line of this tree offers that reply.</summary>
+        public bool Offers(long reply)
+        {
+            foreach (var line in Lines)
+            {
+                foreach (var choice in line.Choices)
+                {
+                    if (choice.Reply == reply) return true;
+                }
+            }
+            return false;
+        }
+
         public NpcDialogueKey Key => new NpcDialogueKey(NpcId, MapId);
 
         public DialogueLine? Line(long message)

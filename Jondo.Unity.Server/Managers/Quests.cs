@@ -270,6 +270,10 @@ namespace Jondo.Unity.Server.Managers
                     if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId
                         && StandsOn(npcId, objective.MapId)) continue;
 
+                    // The key of the dungeon he keeps is given at his door, by going in.
+                    if (objective.ItemId != 0 && objective.ConsumesItems
+                        && Handlers.DungeonHandler.TakesAtTheDoor(npcId, SessionContext.State.MapId, objective.ItemId)) continue;
+
                     // "Bring me five ortie" and "show me the ring" name the same NPC as "come and
                     // see me", and turning up empty-handed must not tick them off.
                     if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) continue;
@@ -980,6 +984,32 @@ namespace Jondo.Unity.Server.Managers
                     if (binding == null || binding.Kind != QuestBindingKind.Read || binding.ItemId != itemId) continue;
                     if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
                     await CloseAsync(stream, binding);
+                }
+            }
+        }
+
+        /// <summary>
+        /// A dungeon guardian has taken the key at his door: an objective that asks for it to be
+        /// handed to him is done, with nothing more taken -- the door has spent the key already.
+        /// </summary>
+        /// <remarks>
+        /// The keyring does not count: no key changed hands. Tassa wants the laboratory's key the
+        /// first time, and the keyring does not stand in for it.
+        /// </remarks>
+        public static async Task OnKeyHandedOverAsync(NetworkStream stream, int npcId, int itemId)
+        {
+            var log = Log;
+            if (log == null || _book == null || npcId == 0 || itemId == 0) return;
+            foreach (var run in new List<QuestRun>(log.Doing()))
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    if (objective.NpcId != npcId || objective.ItemId != itemId || !objective.ConsumesItems) continue;
+                    if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
+                    await TickAsync(stream, run.QuestId, objective.Id);
+                    return;
                 }
             }
         }

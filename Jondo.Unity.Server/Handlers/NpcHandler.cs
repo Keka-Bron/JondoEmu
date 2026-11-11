@@ -300,6 +300,9 @@ namespace Jondo.Unity.Server.Handlers
             // and the only thing on screen was "No.". Offer the guardian's independent entry
             // choices; DungeonHandler checks the selected item and reports a refusal in chat.
             long[] puerta = DungeonHandler.DoorReplies(npc.NpcId, mapId);
+            // Unless his written tree leads to them in its own words: Tassa opens the inn's cellar
+            // after «¿Puedo entrar en la bodega?», not on her «No tengo nada que decirte».
+            if (escrito != null && puerta.Any(escrito.Offers)) puerta = Array.Empty<long>();
             if (puerta.Length > 0)
             {
                 var todas = new List<long>(puerta.Length + respuestas.Length);

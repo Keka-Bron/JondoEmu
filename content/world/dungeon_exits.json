@@ -121,6 +121,15 @@
       "npc": 934,
       "replies": [],
       "why": "The last map of the Floribund Clearing, where Juana Morros hides: «Une fois tous ces monstres tués vous trouvez sa femme» (Dofus pour les noobs); her «Acepto.» leaves through her tree, back to the doctor on the branches."
+    },
+    {
+      "dungeon": 35,
+      "bossRoom": 176951296,
+      "room": 176952320,
+      "cell": 330,
+      "npc": 1410,
+      "replies": [33057],
+      "why": "Brumen Tinctorias's laboratory: after Nelwynn (the fifth room) the winners are in the laboratory's own way out («LaboRATory - Exit», 176952320), where Tassa offers «Salir del laboratorio»; reaching it is «¿Dónde se ha ido la 7.ª compañía?»'s 4555. Cell 330: open floor in front of the workbench, two cells from Tassa."
     }
   ]
 }

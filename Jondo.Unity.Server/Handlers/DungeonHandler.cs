@@ -155,6 +155,10 @@ namespace Jondo.Unity.Server.Handlers
                     return false;
                 }
                 Console.WriteLine($"[Dungeon] {dungeon.Name}: one unit of item {item} is spent.");
+
+                // The key went into the guardian's hand: a quest that asks for it to be given to
+                // him has had it (TakesAtTheDoor).
+                await Managers.Quests.OnKeyHandedOverAsync(stream, state.OpenDialogueNpcId, item);
             }
 
             if (method == EntryMethod.Keyring)
@@ -176,6 +180,21 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Dungeon] Enters {dungeon.Name}, room 1 of {dungeon.Rooms.Count}.");
             await TeleportHandler.ToMapAsync(stream, dungeon.FirstRoom);
             return true;
+        }
+
+        /// <summary>
+        /// Whether this guardian takes that item at his door: the key of the dungeon he keeps.
+        /// </summary>
+        /// <remarks>
+        /// A quest that asks for the key to be given to him has it given by going in, not by a
+        /// hello: «¿Dónde se ha ido la 7.ª compañía?» wants the laboratory's key handed to Tassa,
+        /// and on a hello the key went into the quest and the door then had none to open with.
+        /// </remarks>
+        internal static bool TakesAtTheDoor(int npcId, long mapId, int itemId)
+        {
+            var dungeon = DungeonManager.AtEntrance(mapId);
+            if (dungeon == null || dungeon.FirstRoom == 0 || DungeonDoor.For(npcId).Key == 0) return false;
+            return dungeon.Required.Any(r => r.Item == itemId);
         }
 
         /// <summary>

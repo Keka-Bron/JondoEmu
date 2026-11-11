@@ -25980,15 +25980,27 @@
         {
           "message": 100,
           "choices": [
+            { "reply": 8700, "next": 8661, "beforeQuest": 703 },
+            { "reply": 8709, "quest": 703, "completes": 4556, "params": [[30, 4556]], "next": 8670, "afterObjective": 4555 },
             { "reply": 10135, "quest": 767, "afterObjective": 4864, "completes": 4865, "params": [[30, 4865]], "next": 9656 }
           ]
         },
         {
           "message": 9656,
           "choices": []
+        },
+        {
+          "message": 8661,
+          "choices": [
+            { "reply": 8701, "startsQuest": 703, "params": [[34, 703]] }
+          ]
+        },
+        {
+          "message": 8670,
+          "choices": []
         }
       ],
-      "why": "Rish Claymore, master of the class-8 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 767, objective 4865)."
+      "why": "Rish Claymore, master of the class-8 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 767, objective 4865). «¿Dónde se ha ido la 7.ª compañía?» (703, Dofus pour les noobs): «Pedir trabajo» (8700) gets the disappearance of the seventh company in the Sidimote moors (8661) and «Aceptar» (8701) starts it; once the laboratory's way out is reached, «Hacer un informe sobre el albergue Number Anticroist» (8709) closes the report (4556) and the quest (8670)."
     },
     {
       "npc": 47,
@@ -29393,6 +29405,95 @@
         }
       ],
       "why": "The spirit of Oibas (Gésa), woken by the crunchy carrot in the statue room of the great burrow of Amakna, for «Guewa y Paz» (920; speaking to him is the catalogue's 5607). From his damp grave (11602) he apologises for the hungry spirit (12922, 11603), knows the page (12929, 11604), tells the prophecy (12928, 11605), grieves for the zollos' village (12927, 11606), doubts there is another copy (12926, 11607), remembers «Pwimiw» in gold and a blue emblem on the cover (12925, 11608), and goes back to his grave when the emblem is Astrub's (12924, 11609, 12923). Dofus pour les noobs: «reparlez à l'Espwit de Gésa ... Allez voir Prim à Astrub»."
+    },
+    {
+      "npc": 1408,
+      "map": 0,
+      "opening": 8662,
+      "lines": [
+        {
+          "message": 8662,
+          "choices": [
+            { "reply": 8702, "quest": 703, "completes": 4551, "params": [[30, 4551]], "next": 8663, "afterObjective": 4550 }
+          ]
+        },
+        {
+          "message": 8663,
+          "choices": []
+        }
+      ],
+      "why": "Feruor Mitrídates, a customer of the Number Anticroist inn, for «¿Dónde se ha ido la 7.ª compañía?» (703): «Hacer preguntas sobre la séptima compañía» (8702) does «Pregunta a los clientes» (4551) once the inn is entered -- the Iops questioned the customers and went to the suspect, the big Sadida (8663; Dofus pour les noobs: «parlez à Feruor Mithridate qui vous apprendra que la 7ème compagnie a interrogé le Sadida»)."
+    },
+    {
+      "npc": 1409,
+      "map": 0,
+      "opening": 8664,
+      "lines": [
+        {
+          "message": 8664,
+          "choices": [
+            { "reply": 8703, "quest": 703, "completes": 4552, "params": [[30, 4552]], "next": 8665, "afterObjective": 4551 }
+          ]
+        },
+        {
+          "message": 8665,
+          "choices": []
+        }
+      ],
+      "why": "Yuzua the suspect, the Sadida of the Number Anticroist inn, for «¿Dónde se ha ido la 7.ª compañía?» (703): «Hacer preguntas sobre la séptima compañía» (8703) does «go and see him» (4552) after Feruor -- his two years held by Brumen Tinctorias, and the three Iops sitting down with the Sacrier woman who insulted him (8665; Dofus pour les noobs: «la 7ème compagnie c'est ensuite joint à la tablée d'une sacrieuse»)."
+    },
+    {
+      "npc": 1410,
+      "map": 177079296,
+      "opening": 8666,
+      "openings": [
+        { "quest": 703, "objective": 4554, "message": 8668 }
+      ],
+      "lines": [
+        {
+          "message": 8666,
+          "choices": [
+            { "reply": 8704, "quest": 703, "completes": 4553, "params": [[30, 4553]], "next": 8667, "afterObjective": 4552 },
+            { "reply": 8705, "next": 8669 }
+          ]
+        },
+        {
+          "message": 8667,
+          "choices": [
+            { "reply": 8705, "next": 8669 }
+          ]
+        },
+        {
+          "message": 8668,
+          "choices": [
+            { "reply": 8705, "next": 8669 }
+          ]
+        },
+        {
+          "message": 8669,
+          "choices": [
+            { "reply": 8706 },
+            { "reply": 8708, "beforeQuest": 703 },
+            { "reply": 8708, "quest": 703, "afterQuest": true },
+            { "reply": 8708, "quest": 703, "afterObjective": 4554 }
+          ]
+        }
+      ],
+      "why": "Tassa, the Sacrier woman of the Number Anticroist inn, who keeps the cellar where Brumen Tinctorias's laboratory is (the dungeon's entrance map). «No tengo nada que decirte, forastero» (8666); for «¿Dónde se ha ido la 7.ª compañía?» (703) «Hacer preguntas sobre la séptima compañía» (8704) after Yuzua does «go and see her» (4553): she told them about Brumen and sends the character to the cellar, whose key is lost (8667). «¿Puedo entrar en la bodega?» (8705) gets «La puerta está cerrada con llave, pero si me traes una podré abrirte» (8669) and the door's replies in her own words: «Toma la llave.» (8706, the lowest of the two -- DungeonDoor) spends the laboratory's key, which is the quest's «give Tassa the key» (4554, Quests.OnKeyHandedOverAsync), and «Utilizar el manojo de llaves.» (8708) is not offered until that key has been given once (Dofus pour les noobs: «le trousseau de clef ne fonctionne pas la première fois»). Back from the cellar during the quest she opens on «¿Sigues vivo, extranjero?» (8668)."
+    },
+    {
+      "npc": 1410,
+      "map": 176952320,
+      "opening": 27543,
+      "lines": [
+        {
+          "message": 27543,
+          "choices": [
+            { "reply": 33057 }
+          ]
+        }
+      ],
+      "why": "Tassa again in the laboratory's last room, after Nelwynn: «Has hecho daño a la pobre Nelwynn ... Ahora deberías irte» (27543), and «Salir del laboratorio» (33057) is the way out (content/world/dungeon_exits.json)."
     }
   ]
 }
