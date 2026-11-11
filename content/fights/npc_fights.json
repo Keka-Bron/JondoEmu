@@ -332,6 +332,16 @@
       "monsters": [ { "monster": 6844, "grade": 0 }, { "monster": 6845, "grade": 0 } ],
       "allies": [ { "monster": 6843, "grade": 0 } ] },
     { "npc": 6629, "map": 222560266, "reply": 67061, "byLevel": true,
-      "monsters": [ { "monster": 6838, "grade": 0 } ] }
+      "monsters": [ { "monster": 6838, "grade": 0 } ] },
+    { "npc": 6594, "map": 216924684, "reply": 66608, "byLevel": true,
+      "monsters": [ { "monster": 6828, "grade": 0 } ] },
+    { "npc": 6596, "map": 216926723, "reply": 66581, "byLevel": true,
+      "monsters": [ { "monster": 6830, "grade": 0 } ] },
+    { "npc": 6596, "map": 216926723, "reply": 66586, "byLevel": true,
+      "monsters": [ { "monster": 6830, "grade": 0 } ] },
+    { "npc": 6594, "map": 216924684, "reply": 66614, "byLevel": true,
+      "monsters": [ { "monster": 6829, "grade": 0 } ] },
+    { "npc": 6594, "map": 216924684, "reply": 66616, "byLevel": true,
+      "monsters": [ { "monster": 6829, "grade": 0 } ] }
   ]
 }

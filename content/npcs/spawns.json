@@ -2855,6 +2855,30 @@
       "orientation": 5,
       "criterion": "Qo>18426&Qo<18427&PO!26202",
       "why": "D'Arratagnan on the promontory after the duel he could not follow you into. INFERRED cell: by Faramis."
+    },
+    {
+      "map": 216924684,
+      "npc": 6594,
+      "cell": 174,
+      "orientation": 1,
+      "criterion": "PO!26135&(Qo<18370|Qo>18373)",
+      "why": "The lively rataplastada, Chemdilth Chab's patient, on a bed of her ward, away while it walks the streets with you. It stood nowhere. INFERRED cell: the bed beside the doctor (202)."
+    },
+    {
+      "map": 212862464,
+      "npc": 6594,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "PO!26135&Qo>18370&Qo<18372",
+      "why": "The rataplastada before the militia once you have brought it there, until it follows you again. INFERRED cell: the square before the militia."
+    },
+    {
+      "map": 214695938,
+      "npc": 6594,
+      "cell": 410,
+      "orientation": 1,
+      "criterion": "PO!26135&Qo>18372&Qo<18374",
+      "why": "The rataplastada in the Gatokemao tavern once you have brought it there, until it follows you again. INFERRED cell: among the tables."
     }
   ]
 }

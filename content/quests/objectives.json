@@ -2768,6 +2768,62 @@
    "afterObjectives": [18425],
    "why": "«Vence a Faramis en un duelo»: the duel in the training room, alone (Dofus pour les noobs, «La Geste de Ratagnan»). The catalogue names the promontory, where he is met; the duel is fought where he takes you.",
    "overridesMap": true
+  },
+  {
+   "objective": 18366,
+   "quest": 2435,
+   "kind": "beat",
+   "monsters": [6828],
+   "map": 216924684,
+   "why": "«Valora el estado de salud de la rataplastada vivaz»: its fight, alone (Dofus pour les noobs, «Déficience immunitaire»)."
+  },
+  {
+   "objective": 18369,
+   "quest": 2435,
+   "kind": "beat",
+   "monsters": [6830],
+   "map": 216926723,
+   "afterObjectives": [18368],
+   "why": "«Convence a Ratusalén»: the duel he asks for, alone (Dofus pour les noobs, «Déficience immunitaire»)."
+  },
+  {
+   "objective": 18370,
+   "quest": 2435,
+   "kind": "enter",
+   "map": 212862464,
+   "afterObjectives": [18369],
+   "requires": [{"item": 26135, "count": 1}],
+   "spends": true,
+   "why": "The rataplastada brought before the militia of Brakmar [-25,33], walking behind you (26135); it stops following and is there to talk to (Dofus pour les noobs, «Déficience immunitaire»)."
+  },
+  {
+   "objective": 18372,
+   "quest": 2435,
+   "kind": "enter",
+   "map": 214695938,
+   "afterObjectives": [18371],
+   "requires": [{"item": 26135, "count": 1}],
+   "spends": true,
+   "why": "The rataplastada brought in the Gatokemao tavern [-28,38], walking behind you (26135); it stops following and is there to talk to (Dofus pour les noobs, «Déficience immunitaire»)."
+  },
+  {
+   "objective": 18374,
+   "quest": 2435,
+   "kind": "enter",
+   "map": 216924684,
+   "afterObjectives": [18373],
+   "requires": [{"item": 26135, "count": 1}],
+   "spends": true,
+   "why": "The rataplastada brought back in the malady ward [-25,39], walking behind you (26135); it stops following and is there to talk to (Dofus pour les noobs, «Déficience immunitaire»)."
+  },
+  {
+   "objective": 18378,
+   "quest": 2435,
+   "kind": "beat",
+   "monsters": [6829],
+   "map": 216924684,
+   "afterObjectives": [18377],
+   "why": "«Vuelve a valorar el estado de la rataplastada vivaz»: the fight once it has eaten Elfi's stew, the feverish rataplastada now, alone (Dofus pour les noobs, «Déficience immunitaire»)."
   }
  ]
 }

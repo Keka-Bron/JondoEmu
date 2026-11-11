@@ -23267,6 +23267,235 @@
         }
       ],
       "why": "D'Arratagnan follows for one fight only (the follower's 811 is 1), so the duel, fought alone, leaves him behind, and so does any other fight on the way. «D'Arratagnan te había perdido de vista así que ha vuelto al último sitio donde se había cruzado contigo»: after the duel he waits on the promontory, and «Ir a buscar un noble» takes him to Hemmy Lady with you."
+    },
+    {
+      "npc": 6597,
+      "map": 216924684,
+      "opening": 49860,
+      "openings": [
+        { "after": 2435, "message": 49912 }
+      ],
+      "lines": [
+        {
+          "message": 49860,
+          "choices": [
+            { "reply": 66562, "next": 49903, "beforeQuest": 2435, "minLevel": 90 },
+            { "reply": 66565, "next": 49907, "quest": 2435, "afterObjective": 18366, "beforeObjective": 18367 },
+            { "reply": 66570, "next": 49909, "quest": 2435, "afterObjective": 18374, "beforeObjective": 18375 },
+            { "reply": 66573, "next": 49911, "quest": 2435, "afterObjective": 18378, "beforeObjective": 18379 }
+          ]
+        },
+        {
+          "message": 49903,
+          "choices": [
+            { "reply": 66561, "next": 49904 }
+          ]
+        },
+        {
+          "message": 49904,
+          "choices": [
+            { "reply": 66563, "next": 49906 },
+            { "reply": 66560, "next": 49905 }
+          ]
+        },
+        {
+          "message": 49906,
+          "choices": [
+            { "reply": 66564, "startsQuest": 2435, "params": [[34, 2435]], "beforeQuest": 2435 },
+            { "reply": 66559 }
+          ]
+        },
+        {
+          "message": 49905,
+          "choices": [
+            { "reply": 66558, "startsQuest": 2435, "params": [[34, 2435]], "beforeQuest": 2435 },
+            { "reply": 66559 }
+          ]
+        },
+        {
+          "message": 49907,
+          "choices": [
+            { "reply": 66567, "next": 49908 }
+          ]
+        },
+        {
+          "message": 49908,
+          "choices": [
+            { "reply": 66566, "quest": 2435, "completes": 18367 },
+            { "reply": 66566 }
+          ]
+        },
+        {
+          "message": 49909,
+          "choices": [
+            { "reply": 66569, "next": 49910 }
+          ]
+        },
+        {
+          "message": 49910,
+          "choices": [
+            { "reply": 66568, "quest": 2435, "completes": 18375, "takes": 26136, "gives": 26140 },
+            { "reply": 66568 }
+          ]
+        },
+        {
+          "message": 49911,
+          "choices": [
+            { "reply": 66572, "next": 49912 }
+          ]
+        },
+        {
+          "message": 49912,
+          "choices": [
+            { "reply": 66571, "quest": 2435, "afterObjective": 18378, "beforeObjective": 18379, "completes": 18379 },
+            { "reply": 66571 }
+          ]
+        }
+      ],
+      "why": "Chemdilth Chab in the malady ward of Brakmar's sewers [-25,39], sworn to keep her patients ill: Dofus pour les noobs, «Déficience immunitaire», «Faire craquer ses doigts et se mettre au travail» hires you (2435); the report on the too healthy rat sends you to Ratusalén (18367), the first symptoms earn a letter for him (18375) and the rat ill at last ends it (18379), her care free for you from then on."
+    },
+    {
+      "npc": 6596,
+      "map": 216926723,
+      "opening": 49921,
+      "lines": [
+        {
+          "message": 49921,
+          "choices": [
+            { "reply": 66585, "next": 49922, "quest": 2435, "afterObjective": 18367, "beforeObjective": 18368, "completes": 18368 },
+            { "reply": 66586, "quest": 2435, "afterObjective": 18368, "beforeObjective": 18369 },
+            { "reply": 66588, "next": 49925, "quest": 2435, "afterObjective": 18369, "beforeObjective": 18370, "criterion": "PO!26136" },
+            { "reply": 66600, "next": 49932, "quest": 2435, "afterObjective": 18375, "beforeObjective": 18376, "holds": 26140 }
+          ]
+        },
+        {
+          "message": 49922,
+          "choices": [
+            { "reply": 66584, "next": 49923 }
+          ]
+        },
+        {
+          "message": 49923,
+          "choices": [
+            { "reply": 66583, "next": 49924 }
+          ]
+        },
+        {
+          "message": 49924,
+          "choices": [
+            { "reply": 66581, "quest": 2435, "afterObjective": 18368, "beforeObjective": 18369 },
+            { "reply": 66582 }
+          ]
+        },
+        {
+          "message": 49925,
+          "choices": [
+            { "reply": 66587, "quest": 2435, "gives": 26136, "criterion": "PO!26136" },
+            { "reply": 66587 }
+          ]
+        },
+        {
+          "message": 49932,
+          "choices": [
+            { "reply": 66599, "next": 49933 }
+          ]
+        },
+        {
+          "message": 49933,
+          "choices": [
+            { "reply": 66598, "next": 49934 }
+          ]
+        },
+        {
+          "message": 49934,
+          "choices": [
+            { "reply": 66597, "next": 49935 }
+          ]
+        },
+        {
+          "message": 49935,
+          "choices": [
+            { "reply": 66596, "quest": 2435, "completes": 18376 },
+            { "reply": 66596 }
+          ]
+        }
+      ],
+      "why": "Ratusalén, the old rat by his friend the garden gnome [-27,35]: Dofus pour les noobs, «Déficience immunitaire», he sends Chemdilth's helper off until a duel, alone («Le prendre au mot et l'attaquer», 18369), then reveals Brakmar's foul air; with her letter he praises her and gives the recipe of Elfi's stew (18376). «Usar la violencia» if you walked away from the duel."
+    },
+    {
+      "npc": 6594,
+      "map": 216924684,
+      "opening": 49939,
+      "openings": [
+        { "objective": 18376, "message": 49944 }
+      ],
+      "lines": [
+        {
+          "message": 49939,
+          "choices": [
+            { "reply": 66608, "quest": 2435, "beforeObjective": 18366 },
+            { "reply": 66609, "quest": 2435, "afterObjective": 18369, "beforeObjective": 18370, "holds": 26136, "criterion": "PO!26135", "gives": 26135 }
+          ]
+        },
+        {
+          "message": 49944,
+          "choices": [
+            { "reply": 66615, "next": 49945, "quest": 2435, "afterObjective": 18376, "beforeObjective": 18377, "holds": 26133, "completes": 18377 },
+            { "reply": 66616, "quest": 2435, "afterObjective": 18377, "beforeObjective": 18378 }
+          ]
+        },
+        {
+          "message": 49945,
+          "choices": [
+            { "reply": 66614, "quest": 2435, "afterObjective": 18377, "beforeObjective": 18378 }
+          ]
+        }
+      ],
+      "why": "The lively rataplastada on its bed in the malady ward: Dofus pour les noobs, «Déficience immunitaire», its health tested in a fight, alone (18366); «Llevarla a tomar un soplo de aire fétido» once Ratusalén has spoken and it follows you (26135); Elfi's stew makes it ill and a second fight checks it (18377, 18378). It follows for one fight only: lost on the way, it is back on its bed."
+    },
+    {
+      "npc": 6594,
+      "map": 212862464,
+      "opening": 49940,
+      "lines": [
+        {
+          "message": 49940,
+          "choices": [
+            { "reply": 66611, "next": 49941, "quest": 2435, "afterObjective": 18370, "beforeObjective": 18371 },
+            { "reply": 66610, "quest": 2435, "afterObjective": 18371, "beforeObjective": 18372, "criterion": "PO!26135", "gives": 26135 }
+          ]
+        },
+        {
+          "message": 49941,
+          "choices": [
+            { "reply": 66610, "quest": 2435, "completes": 18371, "gives": 26135 },
+            { "reply": 66610 }
+          ]
+        }
+      ],
+      "why": "The rataplastada before Brakmar's militia [-25,33]: Dofus pour les noobs, «Déficience immunitaire», «un peu plus fatigué mais globalement toujours en… forme»; then on to the Gatokemao tavern with you (18371). Lost on the way there, it waits here."
+    },
+    {
+      "npc": 6594,
+      "map": 214695938,
+      "opening": 49942,
+      "lines": [
+        {
+          "message": 49942,
+          "choices": [
+            { "reply": 66613, "next": 49943, "quest": 2435, "afterObjective": 18372, "beforeObjective": 18373 },
+            { "reply": 66612, "quest": 2435, "afterObjective": 18373, "beforeObjective": 18374, "criterion": "PO!26135", "gives": 26135 }
+          ]
+        },
+        {
+          "message": 49943,
+          "choices": [
+            { "reply": 66612, "quest": 2435, "completes": 18373, "gives": 26135 },
+            { "reply": 66612 }
+          ]
+        }
+      ],
+      "why": "The rataplastada in the Gatokemao tavern [-28,38]: Dofus pour les noobs, «Déficience immunitaire», a sore throat at last, and back to the malady ward with you (18373). Lost on the way, it waits here."
     }
   ]
 }
