@@ -1,0 +1,477 @@
+{
+ "_comment": [
+  "Elements that lead to more than one place, each way under its own name and condition.",
+  "",
+  "  { map, element, cell, gfx, type, skill, ways: [ { name, toMap, toCell, criterion } ] }",
+  "",
+  "name is a row of the client's SkillNamesDataRoot: 47 «Ir a Astrub.», 48 «Hacia el territorio",
+  "de los dioses». The class temples' statues are all here: the 2.73 world graph carries their",
+  "two transitions, type 32 with skill 184, to Astrub's Temple of the Twelve once the temple's",
+  "book is read ((Qo>book&PG=class), the devotion's objective) and to the gods' territory with",
+  "quest 1938 in hand or done. Landing: Astrub on cell 483, where Incarnam's portal lands; the",
+  "territory on the walkable cell nearest the graph's 449, which is not walkable.",
+  "Type 128 is what a capture declares the steamers' statue (gfx 62135) with."
+ ],
+ "elements": [
+  {
+   "map": 17048580,
+   "element": 511714,
+   "cell": 287,
+   "gfx": 62137,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4858&PG=3"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-3 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4858&PG=3), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 67113984,
+   "element": 511872,
+   "cell": 234,
+   "gfx": 62138,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4878&PG=13"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-13 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4878&PG=13), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 69208322,
+   "element": 511874,
+   "cell": 231,
+   "gfx": 62103,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4898&PG=14"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-14 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4898&PG=14), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 96470786,
+   "element": 511873,
+   "cell": 342,
+   "gfx": 62135,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>5714&PG=15"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-15 temple; the 2.73 graph's transitions from it: to Astrub (Qo>5714&PG=15), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 148638211,
+   "element": 511869,
+   "cell": 413,
+   "gfx": 62048,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>9508&PG=16"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-16 temple; the 2.73 graph's transitions from it: to Astrub (Qo>9508&PG=16), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 163056642,
+   "element": 511870,
+   "cell": 326,
+   "gfx": 62051,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>10319&PG=17"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-17 temple; the 2.73 graph's transitions from it: to Astrub (Qo>10319&PG=17), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 177213440,
+   "element": 511871,
+   "cell": 300,
+   "gfx": 56379,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>12176&PG=18"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-18 temple; the 2.73 graph's transitions from it: to Astrub (Qo>12176&PG=18), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183762950,
+   "element": 511845,
+   "cell": 246,
+   "gfx": 62101,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4870&PG=2"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-2 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4870&PG=2), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183762954,
+   "element": 511844,
+   "cell": 302,
+   "gfx": 62100,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4866&PG=8"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-8 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4866&PG=8), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183763970,
+   "element": 511686,
+   "cell": 286,
+   "gfx": 61638,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4854&PG=7"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-7 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4854&PG=7), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183763976,
+   "element": 511867,
+   "cell": 289,
+   "gfx": 49561,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4894&PG=5"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-5 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4894&PG=5), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183764998,
+   "element": 511839,
+   "cell": 351,
+   "gfx": 61408,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4862&PG=1"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-1 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4862&PG=1), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183765000,
+   "element": 511680,
+   "cell": 275,
+   "gfx": 61788,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4846&PG=9"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-9 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4846&PG=9), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183766022,
+   "element": 511683,
+   "cell": 275,
+   "gfx": 62102,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4850&PG=6"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-6 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4850&PG=6), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183767046,
+   "element": 511855,
+   "cell": 425,
+   "gfx": 61250,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4882&PG=11"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "an older statue of the same temple; the 2.73 graph's transitions from it: to Astrub (Qo>4882&PG=11), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183767048,
+   "element": 515179,
+   "cell": 413,
+   "gfx": 63458,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4882&PG=11"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-11 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4882&PG=11), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183768070,
+   "element": 511862,
+   "cell": 329,
+   "gfx": 61791,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4890&PG=4"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-4 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4890&PG=4), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183768072,
+   "element": 511859,
+   "cell": 247,
+   "gfx": 60892,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4886&PG=10"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-10 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4886&PG=10), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 183769094,
+   "element": 528958,
+   "cell": 311,
+   "gfx": 61505,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>4874&PG=12"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-12 temple; the 2.73 graph's transitions from it: to Astrub (Qo>4874&PG=12), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 226493953,
+   "element": 529200,
+   "cell": 397,
+   "gfx": 401375,
+   "type": 128,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 47,
+     "toMap": 192416776,
+     "toCell": 483,
+     "criterion": "Qo>18616&PG=20"
+    },
+    {
+     "name": 48,
+     "toMap": 188219392,
+     "toCell": 450,
+     "criterion": "Qa=1938|Qf=1938"
+    }
+   ],
+   "why": "the statue of the class-20 temple; the 2.73 graph's transitions from it: to Astrub (Qo>18616&PG=20), to the gods' territory (Qa=1938|Qf=1938)."
+  }
+ ]
+}

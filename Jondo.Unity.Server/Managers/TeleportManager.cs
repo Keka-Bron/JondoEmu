@@ -104,6 +104,27 @@ namespace Jondo.Unity.Server.Managers
             if (taken > 0) Console.WriteLine($"[Teleport] {taken} fixed route(s) of the Almanax temple left to today's ways.");
         }
 
+        /// <summary>
+        /// The class temples' statues lead two ways, each with its own condition (InteractiveWays):
+        /// the single converted route of each -- to the gods' territory, for everybody, onto a cell
+        /// nobody can stand on -- goes, so that neither a click nor a step on its cell takes it.
+        /// </summary>
+        private static void LeaveTheStatuesToTheirWays(Dictionary<(long, int), InteractiveTeleport> byElement,
+                                                       Dictionary<long, List<InteractiveTeleport>> byMap,
+                                                       Dictionary<(long, int), InteractiveTeleport> byCell)
+        {
+            int taken = 0;
+            foreach (var ways in InteractiveWays.All)
+            {
+                if (!byElement.Remove((ways.MapId, ways.ElementId), out var route)) continue;
+                if (byMap.TryGetValue(ways.MapId, out var list)) list.Remove(route);
+                if (byCell.TryGetValue((ways.MapId, route.SourceCellId), out var onCell) && ReferenceEquals(onCell, route))
+                    byCell.Remove((ways.MapId, route.SourceCellId));
+                taken++;
+            }
+            if (taken > 0) Console.WriteLine($"[Teleport] {taken} statue route(s) left to their named ways.");
+        }
+
         public static bool TryGet(long mapId, int elementId, out InteractiveTeleport route)
             => _byElement.TryGetValue((mapId, elementId), out route!);
 
@@ -432,6 +453,7 @@ namespace Jondo.Unity.Server.Managers
             AddGuildHallDoors(byElement, byMap, byCell);
             AddFloorPassages(byCell);
             LeaveTheTempleToToday(byElement, byMap, byCell);
+            LeaveTheStatuesToTheirWays(byElement, byMap, byCell);
 
             _byElement = byElement;
             _byMap = byMap.ToDictionary(x => x.Key, x => (IReadOnlyList<InteractiveTeleport>)x.Value);

@@ -129,6 +129,9 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>A phoenix statue: «Resucitar» brings a soul back (PhantomHandler).</summary>
         Phoenix,
+
+        /// <summary>One of an element's named ways, each with its condition: the temples' statues (InteractiveWaysHandler).</summary>
+        Way,
     }
 
     /// <summary>A skill offered by an interactive element.</summary>
@@ -495,6 +498,7 @@ namespace Jondo.Unity.Server.Managers
             RegisterAnomalyPlaces();
             RegisterAlmanaxTemple();
             RegisterGargandiasTemple();
+            RegisterWays();
 
             // The passages between maps. Houses have already gone through above with their jqw protocol;
             // only the generic ones TeleportManager has validated and left active come in here.
@@ -504,6 +508,8 @@ namespace Jondo.Unity.Server.Managers
             foreach (var route in TeleportManager.All)
             {
                 if (route.NpcId != 0) continue;
+                // A statue's ways are its own (RegisterWays): the graph's one route would offer
+                // the gods' territory to everybody.
                 Declared(route.SourceMapId, new Interactives.Element(route.ElementId, route.SourceCellId, route.GfxId),
                          route.InteractiveType).AddNamed(InteractiveActionKind.Teleport, route.SkillId, route.SkillNameId);
             }
@@ -814,6 +820,21 @@ namespace Jondo.Unity.Server.Managers
                 ways++;
             }
             if (ways > 0) Console.WriteLine($"[Almanax] {ways} ways of the temple declared.");
+        }
+
+        /// <summary>The elements with several named ways (InteractiveWays): each way a named action.</summary>
+        private static void RegisterWays()
+        {
+            int count = 0;
+            foreach (var ways in InteractiveWays.All)
+            {
+                if (_byElement.ContainsKey((ways.MapId, ways.ElementId))) continue;
+                var declared = Declared(ways.MapId, new Interactives.Element(ways.ElementId, ways.Cell, ways.Gfx), ways.Type);
+                foreach (var way in ways.Ways)
+                    declared.AddNamed(InteractiveActionKind.Way, ways.Skill, way.Name);
+                count++;
+            }
+            if (count > 0) Console.WriteLine($"[Ways] {count} element(s) declared with their named ways.");
         }
 
         /// <summary>Gargandias's temple's door, grate and stairs, skill 114 (GargandiasHandler).</summary>

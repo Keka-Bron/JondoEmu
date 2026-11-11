@@ -90,7 +90,12 @@ namespace Jondo.Unity.Server.Handlers
                                   $"{elementId} is read{(lectura.Asks ? ", with a question" : "")}.");
 
                 // And a quest that asked to read it (the Dofusarium's statues, the temple's book).
-                if (!lectura.Asks) await Managers.Quests.OnReadAsync(stream, mapId);
+                if (!lectura.Asks)
+                {
+                    await Managers.Quests.OnReadAsync(stream, mapId);
+                    // The temple's statue beside the book now offers the way back to Astrub.
+                    await InteractiveWaysHandler.RefreshAsync(stream, mapId);
+                }
                 return;
             }
 
@@ -246,6 +251,9 @@ namespace Jondo.Unity.Server.Handlers
                     break;
                 case InteractiveActionKind.PlanningTable:
                     await TreasureHuntHandler.OpenPlanningTableAsync(stream, interactive, action);
+                    break;
+                case InteractiveActionKind.Way:
+                    await InteractiveWaysHandler.UseAsync(stream, interactive, action);
                     break;
                 default:
                     throw new InvalidOperationException($"Unhandled interactive action: {action.Kind}.");
