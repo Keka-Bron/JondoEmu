@@ -508,6 +508,8 @@ namespace Jondo.Unity.Server.Network
                         // map beside, from the cell it stands on. Synthetic clicks on an edge do not
                         // make the client send it.
                         else if (op == Op.Jqk) await WorldMoveHandler.ChangeMapAsync(stream, frame);
+                        // A document's «start the quest» button (a wanted poster's), with the document open.
+                        else if (op == "ido") await QuestHandler.StartFromDocumentAsync(stream, frame);
                         else throw new InvalidOperationException($"op {op} is not one the harness sends");
                     }
                     finally
