@@ -108,6 +108,15 @@ namespace Jondo.Unity.Server
         /// <summary>The prey's respite between two hunts, in minutes.</summary>
         public int HeadHuntRestMinutes { get; set; } = 30;
 
+        /// <summary>How many scrolled stats a player starts with.</summary>
+        public int StartingScrollStats { get; set; } = 100;
+
+        /// <summary>How many kamas a player starts with.</summary>
+        public long StartingKamas { get; set; } = 1_000_000L;
+
+        /// <summary>Give each new character an Adventurer's Set.</summary>
+        public bool StartingAdventurerSet { get; set; } = true;
+
         /// <summary>The server window's language: es, en or fr.</summary>
         public string WindowLanguage { get; set; } = "es";
 
