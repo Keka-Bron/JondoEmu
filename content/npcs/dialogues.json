@@ -23709,6 +23709,70 @@
         }
       ],
       "why": "The miaumiausita out of the sewers in Brakmar's streets [-21,36]: Dofus pour les noobs, «La lumière au bout des égouts», shown the shard she snatches it and runs off into the dark streets (18417)."
+    },
+    {
+      "npc": 6453,
+      "map": 217317382,
+      "opening": 49092,
+      "openings": [
+        { "canStart": 144, "message": 49097 },
+        { "quest": 144, "message": 49092 }
+      ],
+      "lines": [
+        {
+          "message": 49097,
+          "choices": [
+            { "reply": 65556, "startsQuest": 144, "params": [[34, 144]] },
+            { "reply": 65557 }
+          ]
+        },
+        {
+          "message": 49092,
+          "choices": [
+            { "reply": 65560, "next": 49098, "quest": 144, "holds": 33063, "completes": 543 },
+            { "reply": 65555, "quest": 144 }
+          ]
+        },
+        {
+          "message": 49098,
+          "choices": [
+            { "reply": 65559 }
+          ]
+        }
+      ],
+      "why": "Captain Starky at Bonta's militia [-32,-57], the Bontarians' daily dragoturkey charge (144, Dofus pour les noobs, «Chargez !»): to a Bontarian who may take it, «Para lanzarnos contra los brakmarianos con mi caballería, necesito monturas...» with «Te prometo que te traeré un animal conforme a tus necesidades» (the guide's «Promettre de lui fournir un animal correspondant à ses besoins») or the infantry; with it running, his charge line and «Te confío el dragopavo» once a red dragoturkey is carried, which he pays with breeder's scrolls (49098), or the promise to bring one. The client's texts follow one another in that order (941394-941400)."
+    },
+    {
+      "npc": 805,
+      "map": 216531202,
+      "opening": 3321,
+      "openings": [
+        { "canStart": 145, "message": 3318 },
+        { "quest": 145, "message": 3320 },
+        { "after": 145, "message": 3319 }
+      ],
+      "lines": [
+        {
+          "message": 3318,
+          "choices": [
+            { "reply": 2970, "startsQuest": 145, "params": [[34, 145]] },
+            { "reply": 2971 }
+          ]
+        },
+        {
+          "message": 3320,
+          "choices": []
+        },
+        {
+          "message": 3319,
+          "choices": []
+        },
+        {
+          "message": 3321,
+          "choices": []
+        }
+      ],
+      "why": "Aplastator el Aminal in Brakmar [-26,35], the Brakmarians' daily dragoturkey charge (145, Brakmar's twin of Dofus pour les noobs, «Chargez !»): to a Brakmarian who may take it, «Busco dragopavos masivos y violentos...» (the step's own line) with the promise or the infantry; with it running «¡¡¡QUIERO PARTICIPAR!!!», the red dragoturkey taken on a hello like the old quests' hand-overs (he has no reply to give it with), then his thanks and scrolls until the next day; else his charge line. His lines for 252 and 278 are not written: their objectives on him are done on a hello."
     }
   ]
 }
