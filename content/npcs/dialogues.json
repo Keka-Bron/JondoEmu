@@ -95,6 +95,82 @@
           "message": 30467,
           "choices": [
             { "reply": 36744, "next": 30468, "completes": 13768, "params": [[30, 13768]] },
+            { "reply": 36747, "next": 30471, "beforeQuest": 766 },
+            { "reply": 36747, "next": 30471, "quest": 766, "beforeObjective": 4860 },
+            { "reply": 36783, "next": 30520, "quest": 766, "afterObjectives": [4861, 4862] },
+            { "reply": 36748, "quest": 766, "afterQuest": true, "passage": 4355001 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 768 },
+            { "reply": 36747, "next": 30471, "quest": 768, "beforeObjective": 4868 },
+            { "reply": 36783, "next": 30520, "quest": 768, "afterObjectives": [4869, 4870] },
+            { "reply": 36748, "quest": 768, "afterQuest": true, "passage": 4355002 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 765 },
+            { "reply": 36747, "next": 30471, "quest": 765, "beforeObjective": 4856 },
+            { "reply": 36783, "next": 30520, "quest": 765, "afterObjectives": [4857, 4858] },
+            { "reply": 36748, "quest": 765, "afterQuest": true, "passage": 4355003 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 773 },
+            { "reply": 36747, "next": 30471, "quest": 773, "beforeObjective": 4888 },
+            { "reply": 36783, "next": 30520, "quest": 773, "afterObjectives": [4889, 4890] },
+            { "reply": 36748, "quest": 773, "afterQuest": true, "passage": 4355004 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 774 },
+            { "reply": 36747, "next": 30471, "quest": 774, "beforeObjective": 4892 },
+            { "reply": 36783, "next": 30520, "quest": 774, "afterObjectives": [4893, 4894] },
+            { "reply": 36748, "quest": 774, "afterQuest": true, "passage": 4355005 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 763 },
+            { "reply": 36747, "next": 30471, "quest": 763, "beforeObjective": 4848 },
+            { "reply": 36783, "next": 30520, "quest": 763, "afterObjectives": [4849, 4850] },
+            { "reply": 36748, "quest": 763, "afterQuest": true, "passage": 4355006 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 764 },
+            { "reply": 36747, "next": 30471, "quest": 764, "beforeObjective": 4852 },
+            { "reply": 36783, "next": 30520, "quest": 764, "afterObjectives": [4853, 4854] },
+            { "reply": 36748, "quest": 764, "afterQuest": true, "passage": 4355007 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 767 },
+            { "reply": 36747, "next": 30471, "quest": 767, "beforeObjective": 4864 },
+            { "reply": 36783, "next": 30520, "quest": 767, "afterObjectives": [4865, 4866] },
+            { "reply": 36748, "quest": 767, "afterQuest": true, "passage": 4355008 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 762 },
+            { "reply": 36747, "next": 30471, "quest": 762, "beforeObjective": 4844 },
+            { "reply": 36783, "next": 30520, "quest": 762, "afterObjectives": [4845, 4846] },
+            { "reply": 36748, "quest": 762, "afterQuest": true, "passage": 4355009 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 772 },
+            { "reply": 36747, "next": 30471, "quest": 772, "beforeObjective": 4884 },
+            { "reply": 36783, "next": 30520, "quest": 772, "afterObjectives": [4885, 4886] },
+            { "reply": 36748, "quest": 772, "afterQuest": true, "passage": 4355010 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 771 },
+            { "reply": 36747, "next": 30471, "quest": 771, "beforeObjective": 4880 },
+            { "reply": 36783, "next": 30520, "quest": 771, "afterObjectives": [4881, 4882] },
+            { "reply": 36748, "quest": 771, "afterQuest": true, "passage": 4355011 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 769 },
+            { "reply": 36747, "next": 30471, "quest": 769, "beforeObjective": 4872 },
+            { "reply": 36783, "next": 30520, "quest": 769, "afterObjectives": [4873, 4874] },
+            { "reply": 36748, "quest": 769, "afterQuest": true, "passage": 4355012 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 770 },
+            { "reply": 36747, "next": 30471, "quest": 770, "beforeObjective": 4876 },
+            { "reply": 36783, "next": 30520, "quest": 770, "afterObjectives": [4877, 4878] },
+            { "reply": 36748, "quest": 770, "afterQuest": true, "passage": 4355013 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 775 },
+            { "reply": 36747, "next": 30471, "quest": 775, "beforeObjective": 4896 },
+            { "reply": 36783, "next": 30520, "quest": 775, "afterObjectives": [4897, 4898] },
+            { "reply": 36748, "quest": 775, "afterQuest": true, "passage": 4355014 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 939 },
+            { "reply": 36747, "next": 30471, "quest": 939, "beforeObjective": 5712 },
+            { "reply": 36783, "next": 30520, "quest": 939, "afterObjectives": [5713, 5714] },
+            { "reply": 36748, "quest": 939, "afterQuest": true, "passage": 4355015 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 1616 },
+            { "reply": 36747, "next": 30471, "quest": 1616, "beforeObjective": 9506 },
+            { "reply": 36783, "next": 30520, "quest": 1616, "afterObjectives": [9507, 9508] },
+            { "reply": 36748, "quest": 1616, "afterQuest": true, "passage": 4355016 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 1678 },
+            { "reply": 36747, "next": 30471, "quest": 1678, "beforeObjective": 10317 },
+            { "reply": 36783, "next": 30520, "quest": 1678, "afterObjectives": [10318, 10319] },
+            { "reply": 36748, "quest": 1678, "afterQuest": true, "passage": 4355017 },
+            { "reply": 36747, "next": 30471, "beforeQuest": 1842 },
+            { "reply": 36747, "next": 30471, "quest": 1842, "beforeObjective": 12174 },
+            { "reply": 36783, "next": 30520, "quest": 1842, "afterObjectives": [12175, 12176] },
+            { "reply": 36748, "quest": 1842, "afterQuest": true, "passage": 4355018 },
+            { "reply": 69020, "next": 51447, "beforeQuest": 2467 },
+            { "reply": 69020, "next": 51447, "quest": 2467, "beforeObjective": 18614 },
+            { "reply": 69024, "next": 51449, "quest": 2467, "afterObjectives": [18615, 18616] },
+            { "reply": 69021, "quest": 2467, "afterQuest": true, "passage": 4355020 },
             { "reply": 36743, "completes": 13768, "params": [[30, 13768]] }
           ]
         },
@@ -104,8 +180,131 @@
             { "reply": 36741, "startsQuest": 1958, "completes": 14257, "params": [[34, 1958], [30, 14257]] },
             { "reply": 36743, "completes": 13768, "params": [[30, 13768]] }
           ]
+        },
+        {
+          "message": 30471,
+          "choices": [
+            { "reply": 36746, "next": 30472, "startsQuest": 766, "params": [[34, 766]] },
+            { "reply": 36746, "next": 30472, "quest": 766, "beforeObjective": 4860 },
+            { "reply": 36746, "next": 30472, "startsQuest": 768, "params": [[34, 768]] },
+            { "reply": 36746, "next": 30472, "quest": 768, "beforeObjective": 4868 },
+            { "reply": 36746, "next": 30472, "startsQuest": 765, "params": [[34, 765]] },
+            { "reply": 36746, "next": 30472, "quest": 765, "beforeObjective": 4856 },
+            { "reply": 36746, "next": 30472, "startsQuest": 773, "params": [[34, 773]] },
+            { "reply": 36746, "next": 30472, "quest": 773, "beforeObjective": 4888 },
+            { "reply": 36746, "next": 30472, "startsQuest": 774, "params": [[34, 774]] },
+            { "reply": 36746, "next": 30472, "quest": 774, "beforeObjective": 4892 },
+            { "reply": 36746, "next": 30472, "startsQuest": 763, "params": [[34, 763]] },
+            { "reply": 36746, "next": 30472, "quest": 763, "beforeObjective": 4848 },
+            { "reply": 36746, "next": 30472, "startsQuest": 764, "params": [[34, 764]] },
+            { "reply": 36746, "next": 30472, "quest": 764, "beforeObjective": 4852 },
+            { "reply": 36746, "next": 30472, "startsQuest": 767, "params": [[34, 767]] },
+            { "reply": 36746, "next": 30472, "quest": 767, "beforeObjective": 4864 },
+            { "reply": 36746, "next": 30472, "startsQuest": 762, "params": [[34, 762]] },
+            { "reply": 36746, "next": 30472, "quest": 762, "beforeObjective": 4844 },
+            { "reply": 36746, "next": 30472, "startsQuest": 772, "params": [[34, 772]] },
+            { "reply": 36746, "next": 30472, "quest": 772, "beforeObjective": 4884 },
+            { "reply": 36746, "next": 30472, "startsQuest": 771, "params": [[34, 771]] },
+            { "reply": 36746, "next": 30472, "quest": 771, "beforeObjective": 4880 },
+            { "reply": 36746, "next": 30472, "startsQuest": 769, "params": [[34, 769]] },
+            { "reply": 36746, "next": 30472, "quest": 769, "beforeObjective": 4872 },
+            { "reply": 36746, "next": 30472, "startsQuest": 770, "params": [[34, 770]] },
+            { "reply": 36746, "next": 30472, "quest": 770, "beforeObjective": 4876 },
+            { "reply": 36746, "next": 30472, "startsQuest": 775, "params": [[34, 775]] },
+            { "reply": 36746, "next": 30472, "quest": 775, "beforeObjective": 4896 },
+            { "reply": 36746, "next": 30472, "startsQuest": 939, "params": [[34, 939]] },
+            { "reply": 36746, "next": 30472, "quest": 939, "beforeObjective": 5712 },
+            { "reply": 36746, "next": 30472, "startsQuest": 1616, "params": [[34, 1616]] },
+            { "reply": 36746, "next": 30472, "quest": 1616, "beforeObjective": 9506 },
+            { "reply": 36746, "next": 30472, "startsQuest": 1678, "params": [[34, 1678]] },
+            { "reply": 36746, "next": 30472, "quest": 1678, "beforeObjective": 10317 },
+            { "reply": 36746, "next": 30472, "startsQuest": 1842, "params": [[34, 1842]] },
+            { "reply": 36746, "next": 30472, "quest": 1842, "beforeObjective": 12174 },
+            { "reply": 36742 }
+          ]
+        },
+        {
+          "message": 30472,
+          "choices": [
+            { "reply": 36745, "quest": 766, "completes": 4860, "params": [[30, 4860]], "passage": 4355001 },
+            { "reply": 36745, "quest": 768, "completes": 4868, "params": [[30, 4868]], "passage": 4355002 },
+            { "reply": 36745, "quest": 765, "completes": 4856, "params": [[30, 4856]], "passage": 4355003 },
+            { "reply": 36745, "quest": 773, "completes": 4888, "params": [[30, 4888]], "passage": 4355004 },
+            { "reply": 36745, "quest": 774, "completes": 4892, "params": [[30, 4892]], "passage": 4355005 },
+            { "reply": 36745, "quest": 763, "completes": 4848, "params": [[30, 4848]], "passage": 4355006 },
+            { "reply": 36745, "quest": 764, "completes": 4852, "params": [[30, 4852]], "passage": 4355007 },
+            { "reply": 36745, "quest": 767, "completes": 4864, "params": [[30, 4864]], "passage": 4355008 },
+            { "reply": 36745, "quest": 762, "completes": 4844, "params": [[30, 4844]], "passage": 4355009 },
+            { "reply": 36745, "quest": 772, "completes": 4884, "params": [[30, 4884]], "passage": 4355010 },
+            { "reply": 36745, "quest": 771, "completes": 4880, "params": [[30, 4880]], "passage": 4355011 },
+            { "reply": 36745, "quest": 769, "completes": 4872, "params": [[30, 4872]], "passage": 4355012 },
+            { "reply": 36745, "quest": 770, "completes": 4876, "params": [[30, 4876]], "passage": 4355013 },
+            { "reply": 36745, "quest": 775, "completes": 4896, "params": [[30, 4896]], "passage": 4355014 },
+            { "reply": 36745, "quest": 939, "completes": 5712, "params": [[30, 5712]], "passage": 4355015 },
+            { "reply": 36745, "quest": 1616, "completes": 9506, "params": [[30, 9506]], "passage": 4355016 },
+            { "reply": 36745, "quest": 1678, "completes": 10317, "params": [[30, 10317]], "passage": 4355017 },
+            { "reply": 36745, "quest": 1842, "completes": 12174, "params": [[30, 12174]], "passage": 4355018 },
+            { "reply": 36742 }
+          ]
+        },
+        {
+          "message": 30520,
+          "choices": [
+            { "reply": 36815, "next": 30521 }
+          ]
+        },
+        {
+          "message": 30521,
+          "choices": [
+            { "reply": 36814, "quest": 766, "completes": 4863, "params": [[30, 4863]] },
+            { "reply": 36814, "quest": 768, "completes": 4871, "params": [[30, 4871]] },
+            { "reply": 36814, "quest": 765, "completes": 4859, "params": [[30, 4859]] },
+            { "reply": 36814, "quest": 773, "completes": 4891, "params": [[30, 4891]] },
+            { "reply": 36814, "quest": 774, "completes": 4895, "params": [[30, 4895]] },
+            { "reply": 36814, "quest": 763, "completes": 4851, "params": [[30, 4851]] },
+            { "reply": 36814, "quest": 764, "completes": 4855, "params": [[30, 4855]] },
+            { "reply": 36814, "quest": 767, "completes": 4867, "params": [[30, 4867]] },
+            { "reply": 36814, "quest": 762, "completes": 4847, "params": [[30, 4847]] },
+            { "reply": 36814, "quest": 772, "completes": 4887, "params": [[30, 4887]] },
+            { "reply": 36814, "quest": 771, "completes": 4883, "params": [[30, 4883]] },
+            { "reply": 36814, "quest": 769, "completes": 4875, "params": [[30, 4875]] },
+            { "reply": 36814, "quest": 770, "completes": 4879, "params": [[30, 4879]] },
+            { "reply": 36814, "quest": 775, "completes": 4899, "params": [[30, 4899]] },
+            { "reply": 36814, "quest": 939, "completes": 5715, "params": [[30, 5715]] },
+            { "reply": 36814, "quest": 1616, "completes": 9509, "params": [[30, 9509]] },
+            { "reply": 36814, "quest": 1678, "completes": 10320, "params": [[30, 10320]] },
+            { "reply": 36814, "quest": 1842, "completes": 12177, "params": [[30, 12177]] }
+          ]
+        },
+        {
+          "message": 51447,
+          "choices": [
+            { "reply": 69019, "next": 51448, "startsQuest": 2467, "params": [[34, 2467]] },
+            { "reply": 69019, "next": 51448, "quest": 2467, "beforeObjective": 18614 },
+            { "reply": 69015 }
+          ]
+        },
+        {
+          "message": 51448,
+          "choices": [
+            { "reply": 69018, "quest": 2467, "completes": 18614, "params": [[30, 18614]], "passage": 4355020 },
+            { "reply": 69015 }
+          ]
+        },
+        {
+          "message": 51449,
+          "choices": [
+            { "reply": 69023, "next": 51450 }
+          ]
+        },
+        {
+          "message": 51450,
+          "choices": [
+            { "reply": 69022, "quest": 2467, "completes": 18617, "params": [[30, 18617]] }
+          ]
         }
-      ]
+      ],
+      "why": "The Envoyée of the Twelve: Astrub's welcome and «Las enseñanzas de Archie» (1958), then each class's devotion (Dofus pour les noobs, Dévotion à ...): «Interrogarle sobre el culto de tu divinidad» (the Forgelance's «Preguntarle por la Lanza Original»), «Estoy impaciente por demostrar mi devoción» starts it, «Ya estoy listo» sends the character before his temple's statue; «Ya he vuelto del templo» once the master and the book are done, «Seguir escuchando», and «Gracias. Adiós.» ends it with the class's book. After it, «Quiero teletransportarme a mi templo» whenever the character likes."
     },
     {
       "npc": 1502,
@@ -15184,7 +15383,8 @@
         {
           "message": 98,
           "choices": [
-            { "reply": 153, "next": 185, "quest": 208, "beforeObjective": 826 }
+            { "reply": 153, "next": 185, "quest": 208, "beforeObjective": 826 },
+            { "reply": 10141, "quest": 773, "afterObjective": 4888, "completes": 4889, "params": [[30, 4889]], "next": 9662 }
           ]
         },
         {
@@ -15196,9 +15396,13 @@
         {
           "message": 191,
           "choices": []
+        },
+        {
+          "message": 9662,
+          "choices": []
         }
       ],
-      "why": "Rigal Mano Ganchuda, a sram of the rogues' brotherhood in the Sram temple [-4,0]: respected by all (98). «Le Guide du Roublard»: the vilest of beings, the brotherhood (185), its lair surrounded by water in a dangerous place, only the cruellest get in (191: 826)."
+      "why": "Rigal Mano Ganchuda, a sram of the rogues' brotherhood in the Sram temple [-4,0]: respected by all (98). «Le Guide du Roublard»: the vilest of beings, the brotherhood (185), its lair surrounded by water in a dangerous place, only the cruellest get in (191: 826). And the class temple's devotion: «Faire preuve de son dévouement» (quest 773, objective 4889), then the line about the book."
     },
     {
       "npc": 894,
@@ -17122,14 +17326,20 @@
       "lines": [
         {
           "message": 20484,
-          "choices": []
+          "choices": [
+            { "reply": 24447, "quest": 772, "afterObjective": 4884, "completes": 4885, "params": [[30, 4885]], "next": 20438 }
+          ]
         },
         {
           "message": 20485,
           "choices": []
+        },
+        {
+          "message": 20438,
+          "choices": []
         }
       ],
-      "why": "Etenipse Tik of the Sadida temple [-1,9]: leather braces for his loincloth (20484). «C'est tout simple»: Manzanillo welcome to rest, the Soft Oak's magic in him (20485: 9547)."
+      "why": "Etenipse Tik of the Sadida temple [-1,9]: leather braces for his loincloth (20484). «C'est tout simple»: Manzanillo welcome to rest, the Soft Oak's magic in him (20485: 9547). And the class temple's devotion: «Faire preuve de son dévouement» (quest 772, objective 4885), then the line about the book."
     },
     {
       "npc": 2847,
@@ -23869,13 +24079,11 @@
         },
         {
           "message": 10892,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 10894,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -23935,13 +24143,11 @@
         },
         {
           "message": 11355,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11357,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24001,13 +24207,11 @@
         },
         {
           "message": 11315,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11317,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24067,13 +24271,11 @@
         },
         {
           "message": 10935,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 10937,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24133,13 +24335,11 @@
         },
         {
           "message": 11087,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11089,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24199,13 +24399,11 @@
         },
         {
           "message": 11163,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11165,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24265,13 +24463,11 @@
         },
         {
           "message": 11049,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11051,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24331,13 +24527,11 @@
         },
         {
           "message": 11239,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11241,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24397,13 +24591,11 @@
         },
         {
           "message": 10973,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 10975,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24463,13 +24655,11 @@
         },
         {
           "message": 11277,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11279,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24529,13 +24719,11 @@
         },
         {
           "message": 11201,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11203,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24595,13 +24783,11 @@
         },
         {
           "message": 11125,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11127,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24661,13 +24847,11 @@
         },
         {
           "message": 11011,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11013,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24727,13 +24911,11 @@
         },
         {
           "message": 10854,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 10856,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24793,13 +24975,11 @@
         },
         {
           "message": 11878,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 11880,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24859,13 +25039,11 @@
         },
         {
           "message": 20013,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 20015,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24925,13 +25103,11 @@
         },
         {
           "message": 22324,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 22326,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -24991,13 +25167,11 @@
         },
         {
           "message": 26769,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 26771,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -25057,13 +25231,11 @@
         },
         {
           "message": 51421,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
         {
           "message": 51423,
-          "names": true,
           "untilDaily": true,
           "choices": []
         },
@@ -25077,6 +25249,312 @@
         }
       ],
       "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (51438); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (2469) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (7226) at the character's level; done, the dopeuls are tired until 7:00 (51421, 51423)."
+    },
+    {
+      "npc": 79,
+      "map": 0,
+      "opening": 121,
+      "lines": [
+        {
+          "message": 121,
+          "choices": [
+            { "reply": 10134, "quest": 766, "afterObjective": 4860, "completes": 4861, "params": [[30, 4861]], "next": 9655 }
+          ]
+        },
+        {
+          "message": 9655,
+          "choices": []
+        }
+      ],
+      "why": "Hugo Bello, master of the class-1 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 766, objective 4861)."
+    },
+    {
+      "npc": 42,
+      "map": 0,
+      "opening": 60,
+      "lines": [
+        {
+          "message": 60,
+          "choices": [
+            { "reply": 10136, "quest": 768, "afterObjective": 4868, "completes": 4869, "params": [[30, 4869]], "next": 9657 }
+          ]
+        },
+        {
+          "message": 9657,
+          "choices": []
+        }
+      ],
+      "why": "Zeurg, master of the class-2 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 768, objective 4869)."
+    },
+    {
+      "npc": 41,
+      "map": 0,
+      "opening": 103,
+      "lines": [
+        {
+          "message": 103,
+          "choices": [
+            { "reply": 10133, "quest": 765, "afterObjective": 4856, "completes": 4857, "params": [[30, 4857]], "next": 9654 }
+          ]
+        },
+        {
+          "message": 9654,
+          "choices": []
+        }
+      ],
+      "why": "Setag, master of the class-3 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 765, objective 4857)."
+    },
+    {
+      "npc": 37,
+      "map": 0,
+      "opening": 81,
+      "lines": [
+        {
+          "message": 81,
+          "choices": [
+            { "reply": 10142, "quest": 774, "afterObjective": 4892, "completes": 4893, "params": [[30, 4893]], "next": 9663 }
+          ]
+        },
+        {
+          "message": 9663,
+          "choices": []
+        }
+      ],
+      "why": "Amino, master of the class-5 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 774, objective 4893)."
+    },
+    {
+      "npc": 40,
+      "map": 0,
+      "opening": 93,
+      "lines": [
+        {
+          "message": 93,
+          "choices": [
+            { "reply": 10131, "quest": 763, "afterObjective": 4848, "completes": 4849, "params": [[30, 4849]], "next": 9652 }
+          ]
+        },
+        {
+          "message": 9652,
+          "choices": []
+        }
+      ],
+      "why": "Filgar Feel, master of the class-6 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 763, objective 4849)."
+    },
+    {
+      "npc": 46,
+      "map": 0,
+      "opening": 91,
+      "lines": [
+        {
+          "message": 91,
+          "choices": [
+            { "reply": 10132, "quest": 764, "afterObjective": 4852, "completes": 4853, "params": [[30, 4853]], "next": 9653 }
+          ]
+        },
+        {
+          "message": 9653,
+          "choices": []
+        }
+      ],
+      "why": "Elya Wood, master of the class-7 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 764, objective 4853)."
+    },
+    {
+      "npc": 38,
+      "map": 0,
+      "opening": 100,
+      "lines": [
+        {
+          "message": 100,
+          "choices": [
+            { "reply": 10135, "quest": 767, "afterObjective": 4864, "completes": 4865, "params": [[30, 4865]], "next": 9656 }
+          ]
+        },
+        {
+          "message": 9656,
+          "choices": []
+        }
+      ],
+      "why": "Rish Claymore, master of the class-8 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 767, objective 4865)."
+    },
+    {
+      "npc": 47,
+      "map": 0,
+      "opening": 90,
+      "lines": [
+        {
+          "message": 90,
+          "choices": [
+            { "reply": 10130, "quest": 762, "afterObjective": 4844, "completes": 4845, "params": [[30, 4845]], "next": 9651 }
+          ]
+        },
+        {
+          "message": 9651,
+          "choices": []
+        }
+      ],
+      "why": "Edrige Valling, master of the class-9 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 762, objective 4845)."
+    },
+    {
+      "npc": 384,
+      "map": 0,
+      "opening": 1609,
+      "lines": [
+        {
+          "message": 1609,
+          "choices": [
+            { "reply": 10139, "quest": 771, "afterObjective": 4880, "completes": 4881, "params": [[30, 4881]], "next": 9660 }
+          ]
+        },
+        {
+          "message": 9660,
+          "choices": []
+        }
+      ],
+      "why": "Chaki Triss, master of the class-11 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 771, objective 4881)."
+    },
+    {
+      "npc": 644,
+      "map": 0,
+      "opening": 2600,
+      "lines": [
+        {
+          "message": 2600,
+          "choices": [
+            { "reply": 10137, "quest": 769, "afterObjective": 4872, "completes": 4873, "params": [[30, 4873]], "next": 9658 }
+          ]
+        },
+        {
+          "message": 9658,
+          "choices": []
+        }
+      ],
+      "why": "Pandiwan Kenobi, master of the class-12 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 769, objective 4873)."
+    },
+    {
+      "npc": 1412,
+      "map": 0,
+      "opening": 8703,
+      "lines": [
+        {
+          "message": 8703,
+          "choices": [
+            { "reply": 10138, "quest": 770, "afterObjective": 4876, "completes": 4877, "params": [[30, 4877]], "next": 9659 }
+          ]
+        },
+        {
+          "message": 9659,
+          "choices": []
+        }
+      ],
+      "why": "Agente Smis, master of the class-13 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 770, objective 4877)."
+    },
+    {
+      "npc": 1429,
+      "map": 0,
+      "opening": 8759,
+      "lines": [
+        {
+          "message": 8759,
+          "choices": [
+            { "reply": 10143, "quest": 775, "afterObjective": 4896, "completes": 4897, "params": [[30, 4897]], "next": 9664 }
+          ]
+        },
+        {
+          "message": 9664,
+          "choices": []
+        }
+      ],
+      "why": "Anzeo Declaze, master of the class-14 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 775, objective 4897)."
+    },
+    {
+      "npc": 1593,
+      "map": 0,
+      "opening": 11864,
+      "lines": [
+        {
+          "message": 11864,
+          "choices": [
+            { "reply": 13330, "quest": 939, "afterObjective": 5712, "completes": 5713, "params": [[30, 5713]], "next": 11868 }
+          ]
+        },
+        {
+          "message": 11868,
+          "choices": []
+        }
+      ],
+      "why": "Julio Never, master of the class-15 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 939, objective 5713)."
+    },
+    {
+      "npc": 2825,
+      "map": 0,
+      "opening": 20159,
+      "lines": [
+        {
+          "message": 20159,
+          "choices": [
+            { "reply": 24122, "quest": 1616, "afterObjective": 9506, "completes": 9507, "params": [[30, 9507]], "next": 20165 }
+          ]
+        },
+        {
+          "message": 20165,
+          "choices": []
+        }
+      ],
+      "why": "Aurelia, master of the class-16 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1616, objective 9507)."
+    },
+    {
+      "npc": 3052,
+      "map": 0,
+      "opening": 22302,
+      "lines": [
+        {
+          "message": 22302,
+          "choices": [
+            { "reply": 26854, "quest": 1678, "afterObjective": 10317, "completes": 10318, "params": [[30, 10318]], "next": 22306 }
+          ]
+        },
+        {
+          "message": 22306,
+          "choices": []
+        }
+      ],
+      "why": "Máiquel Koormoc, master of the class-17 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1678, objective 10318)."
+    },
+    {
+      "npc": 3712,
+      "map": 0,
+      "opening": 26744,
+      "lines": [
+        {
+          "message": 26744,
+          "choices": [
+            { "reply": 32141, "quest": 1842, "afterObjective": 12174, "completes": 12175, "params": [[30, 12175]], "next": 26748 }
+          ]
+        },
+        {
+          "message": 26748,
+          "choices": []
+        }
+      ],
+      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175)."
+    },
+    {
+      "npc": 6837,
+      "map": 0,
+      "opening": 51440,
+      "lines": [
+        {
+          "message": 51440,
+          "choices": [
+            { "reply": 69012, "quest": 2467, "afterObjective": 18614, "completes": 18615, "params": [[30, 18615]], "next": 51441 }
+          ]
+        },
+        {
+          "message": 51441,
+          "choices": []
+        }
+      ],
+      "why": "Lencaro de Albuera, master of the class-20 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 2467, objective 18615)."
     }
   ]
 }

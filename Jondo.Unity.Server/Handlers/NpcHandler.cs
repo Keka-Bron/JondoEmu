@@ -710,13 +710,14 @@ namespace Jondo.Unity.Server.Handlers
                                                  Bankers.Banker? banker = null,
                                                  IReadOnlyList<string>? lineParameters = null)
         {
+            // The hours until the daily quests come back: the tired dopeuls' «vuelve dentro de #1 hora/s».
+            // It goes first: that #1 is a number, never the character's name.
+            if ((lineParameters == null || lineParameters.Count == 0) && frase?.HoursToDailyReset == true)
+                lineParameters = new[] { HoursToDailyReset(DateTime.Now).ToString(System.Globalization.CultureInfo.InvariantCulture) };
+
             // A written line that names the character carries his name (Curro's 20681).
             if ((lineParameters == null || lineParameters.Count == 0) && frase?.NamesTheCharacter == true)
                 lineParameters = new[] { SessionContext.State.CharacterName ?? "" };
-
-            // Or the hours until the daily quests come back: the tired dopeuls' «vuelve dentro de #1 hora/s».
-            if ((lineParameters == null || lineParameters.Count == 0) && frase?.HoursToDailyReset == true)
-                lineParameters = new[] { HoursToDailyReset(DateTime.Now).ToString(System.Globalization.CultureInfo.InvariantCulture) };
 
             // A written line with nothing to offer this character -- none written, or none his -- gets
             // the client's own «Marcharte.»: his last reply would be somebody else's words, Otomai's

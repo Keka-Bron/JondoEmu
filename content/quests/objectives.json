@@ -2874,6 +2874,139 @@
    "elements": [{"map": 64489222, "element": 506007}],
    "afterObjectives": [3464],
    "why": "«Renace junto al fénix del cementerio primitivo»: its coordinates [-10,13], the phoenix statue there, element 506007 (graphic 7521), its «Resucitar» used by the soul Warko's brew made (Managers.Phantoms): «Rejoignez alors le Phénix le plus proche pour ressusciter» (Dofus pour les noobs, «Le cimetière primitif»)."
+  },
+  {
+   "objective": 4862,
+   "quest": 766,
+   "kind": "read",
+   "elements": [{"map": 183764992, "element": 511838}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511838 on 183764992."
+  },
+  {
+   "objective": 4870,
+   "quest": 768,
+   "kind": "read",
+   "elements": [{"map": 183762948, "element": 511846}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511846 on 183762948."
+  },
+  {
+   "objective": 4858,
+   "quest": 765,
+   "kind": "read",
+   "elements": [{"map": 17048576, "element": 461843}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 461843 on 17048576."
+  },
+  {
+   "objective": 4890,
+   "quest": 773,
+   "kind": "read",
+   "elements": [{"map": 183768068, "element": 511860}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511860 on 183768068."
+  },
+  {
+   "objective": 4894,
+   "quest": 774,
+   "kind": "read",
+   "elements": [{"map": 183763982, "element": 511865}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511865 on 183763982."
+  },
+  {
+   "objective": 4850,
+   "quest": 763,
+   "kind": "read",
+   "elements": [{"map": 183766018, "element": 511682}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511682 on 183766018."
+  },
+  {
+   "objective": 4854,
+   "quest": 764,
+   "kind": "read",
+   "elements": [{"map": 183763970, "element": 511685}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511685 on 183763970."
+  },
+  {
+   "objective": 4866,
+   "quest": 767,
+   "kind": "read",
+   "elements": [{"map": 183762954, "element": 511843}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511843 on 183762954."
+  },
+  {
+   "objective": 4846,
+   "quest": 762,
+   "kind": "read",
+   "elements": [{"map": 183765000, "element": 511679}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511679 on 183765000."
+  },
+  {
+   "objective": 4886,
+   "quest": 772,
+   "kind": "read",
+   "elements": [{"map": 183768074, "element": 511857}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511857 on 183768074."
+  },
+  {
+   "objective": 4882,
+   "quest": 771,
+   "kind": "read",
+   "elements": [{"map": 183767052, "element": 515156}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 515156 on 183767052."
+  },
+  {
+   "objective": 4874,
+   "quest": 769,
+   "kind": "read",
+   "elements": [{"map": 183769094, "element": 511850}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511850 on 183769094."
+  },
+  {
+   "objective": 4878,
+   "quest": 770,
+   "kind": "read",
+   "elements": [{"map": 67108864, "element": 461850}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 461850 on 67108864."
+  },
+  {
+   "objective": 4898,
+   "quest": 775,
+   "kind": "read",
+   "elements": [{"map": 69206016, "element": 461852}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 461852 on 69206016."
+  },
+  {
+   "objective": 5714,
+   "quest": 939,
+   "kind": "read",
+   "elements": [{"map": 96469506, "element": 472950}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 472950 on 96469506."
+  },
+  {
+   "objective": 9508,
+   "quest": 1616,
+   "kind": "read",
+   "elements": [{"map": 148638209, "element": 488071}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 488071 on 148638209."
+  },
+  {
+   "objective": 10319,
+   "quest": 1678,
+   "kind": "read",
+   "elements": [{"map": 163054594, "element": 502532}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 502532 on 163054594."
+  },
+  {
+   "objective": 12176,
+   "quest": 1842,
+   "kind": "read",
+   "elements": [{"map": 177211392, "element": 509749}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 509749 on 177211392."
+  },
+  {
+   "objective": 18616,
+   "quest": 2467,
+   "kind": "read",
+   "elements": [{"map": 226492929, "element": 529283}],
+   "why": "«Lee el libro del templo»: the temple book (readables.json), element 529283 on 226492929."
   }
  ]
 }

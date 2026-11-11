@@ -2932,6 +2932,13 @@
       "cell": 397,
       "orientation": 1,
       "why": "Makdo Peul, the sacriers' dopeul master: «Caza de dopeul sacrógrito» (463) is fought here; the catalogue also names him on 183767044, so no placement was derived."
+    },
+    {
+      "map": 183767052,
+      "npc": 384,
+      "cell": 427,
+      "orientation": 1,
+      "why": "Chaki Triss, the Sacrógrito temple's master, in the book's room right of the statue (Dofus pour les noobs, Dévotion à Sacrieur: «allez vers la droite... Dans la même pièce, cliquez sur le livre»); the objective names this map."
     }
   ]
 }
