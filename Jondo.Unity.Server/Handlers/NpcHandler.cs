@@ -710,15 +710,24 @@ namespace Jondo.Unity.Server.Handlers
                                                  Bankers.Banker? banker = null,
                                                  IReadOnlyList<string>? lineParameters = null)
         {
+            // A written line that names the character carries his name (Curro's 20681).
+            if ((lineParameters == null || lineParameters.Count == 0) && frase?.NamesTheCharacter == true)
+                lineParameters = new[] { SessionContext.State.CharacterName ?? "" };
+
+            // Or the hours until the daily quests come back: the tired dopeuls' «vuelve dentro de #1 hora/s».
+            if ((lineParameters == null || lineParameters.Count == 0) && frase?.HoursToDailyReset == true)
+                lineParameters = new[] { HoursToDailyReset(DateTime.Now).ToString(System.Globalization.CultureInfo.InvariantCulture) };
+
             // A written line with nothing to offer this character -- none written, or none his -- gets
             // the client's own «Marcharte.»: his last reply would be somebody else's words, Otomai's
             // apprentice saying «Ir a ver al maestro cazador» when the beast is coming, Chronokwartz
-            // «Aceptar el trato» to a Xelor with her cards still to find.
+            // «Aceptar el trato» to a Xelor with her cards still to find. Its #1 still goes with it.
             if (respuestas.Length == 0 && frase != null)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Ios, ConnectionProtocol.BuildNpcQuestion(pregunta,
-                        Array.Empty<long>())));
+                    ConnectionProtocol.Push(Op.Ios, lineParameters is { Count: > 0 }
+                        ? ConnectionProtocol.BuildNpcQuestion(pregunta, Array.Empty<long>(), null, lineParameters)
+                        : ConnectionProtocol.BuildNpcQuestion(pregunta, Array.Empty<long>())));
                 return;
             }
 
@@ -772,15 +781,18 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // A written line that names the character carries his name (Curro's 20681).
-            if ((lineParameters == null || lineParameters.Count == 0) && frase?.NamesTheCharacter == true)
-                lineParameters = new[] { SessionContext.State.CharacterName ?? "" };
-
             // A line that names somebody -- «Haré esta ofrenda en tu nombre, #1» -- carries the name.
             byte[] ios = lineParameters is { Count: > 0 }
                 ? ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros, lineParameters)
                 : ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros, arguments);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ios, ios));
+        }
+
+        /// <summary>The whole hours, rounded up, until the next daily turn (QuestResets), at least one.</summary>
+        public static int HoursToDailyReset(DateTime now)
+        {
+            var next = Jondo.Unity.World.Quests.QuestResets.Daily(now).AddDays(1);
+            return Math.Max(1, (int)Math.Ceiling((next - now).TotalHours));
         }
 
         /// <summary>

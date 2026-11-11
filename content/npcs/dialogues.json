@@ -23823,6 +23823,1260 @@
         }
       ],
       "why": "Warko Linch in the Kaliptus forest [-11,12]: Dofus pour les noobs, «Le cimetière primitif», to go into his forebears' cemetery one has to die, and he will help for five kaliptus flowers (4971, the step's line); the flowers given (3463), the brew ready and a guinea pig wanted (5442), «Aceptar» drinks it (3464): dead, a soul in the primitive cemetery [-11,16], to rise at its phoenix [-10,13] (3465). «Tu brebaje ya está listo.» brings the offer back to whoever said no, or whose soul a restart woke alive."
+    },
+    {
+      "npc": 439,
+      "map": 183765002,
+      "opening": 10889,
+      "openings": [
+        { "message": 10926, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 10889,
+          "choices": [
+            { "reply": 11997, "next": 10890, "criterion": "Qa!470&Qf!470" },
+            { "reply": 11999, "next": 10893, "criterion": "Qa=470|Qf=470", "beforeQuest": 458 },
+            { "reply": 11999, "next": 10893, "quest": 458 },
+            { "reply": 11999, "next": 10892, "quest": 470 },
+            { "reply": 11999, "next": 10894, "criterion": "Qf=470" },
+            { "reply": 12000, "next": 10895 }
+          ]
+        },
+        {
+          "message": 10890,
+          "choices": [
+            { "reply": 11996, "next": 10891, "startsQuest": 458, "params": [[34, 458]] },
+            { "reply": 11996, "next": 10891, "quest": 458 },
+            { "reply": 11994 }
+          ]
+        },
+        {
+          "message": 10891,
+          "choices": [
+            { "reply": 11995, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 11995, "quest": 458 },
+            { "reply": 11994 }
+          ]
+        },
+        {
+          "message": 10893,
+          "choices": [
+            { "reply": 11998, "startsQuest": 458, "params": [[34, 458]] },
+            { "reply": 11998, "quest": 458 },
+            { "reply": 11994 }
+          ]
+        },
+        {
+          "message": 10892,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 10894,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 10926,
+          "choices": []
+        },
+        {
+          "message": 10895,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10926); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (458) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (168) at the character's level; done, the dopeuls are tired until 7:00 (10892, 10894)."
+    },
+    {
+      "npc": 438,
+      "map": 183766020,
+      "opening": 11350,
+      "openings": [
+        { "message": 11389, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11350,
+          "choices": [
+            { "reply": 12551, "next": 11353, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12553, "next": 11356, "criterion": "Qa=470|Qf=470", "beforeQuest": 459 },
+            { "reply": 12553, "next": 11356, "quest": 459 },
+            { "reply": 12553, "next": 11355, "quest": 470 },
+            { "reply": 12553, "next": 11357, "criterion": "Qf=470" },
+            { "reply": 12554, "next": 11358 }
+          ]
+        },
+        {
+          "message": 11353,
+          "choices": [
+            { "reply": 12550, "next": 11354, "startsQuest": 459, "params": [[34, 459]] },
+            { "reply": 12550, "next": 11354, "quest": 459 },
+            { "reply": 12548 }
+          ]
+        },
+        {
+          "message": 11354,
+          "choices": [
+            { "reply": 12549, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12549, "quest": 459 },
+            { "reply": 12548 }
+          ]
+        },
+        {
+          "message": 11356,
+          "choices": [
+            { "reply": 12552, "startsQuest": 459, "params": [[34, 459]] },
+            { "reply": 12552, "quest": 459 },
+            { "reply": 12548 }
+          ]
+        },
+        {
+          "message": 11355,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11357,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11389,
+          "choices": []
+        },
+        {
+          "message": 11358,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11389); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (459) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (165) at the character's level; done, the dopeuls are tired until 7:00 (11355, 11357)."
+    },
+    {
+      "npc": 434,
+      "map": 183762956,
+      "opening": 11312,
+      "openings": [
+        { "message": 11349, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11312,
+          "choices": [
+            { "reply": 12503, "next": 11313, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12505, "next": 11316, "criterion": "Qa=470|Qf=470", "beforeQuest": 460 },
+            { "reply": 12505, "next": 11316, "quest": 460 },
+            { "reply": 12505, "next": 11315, "quest": 470 },
+            { "reply": 12505, "next": 11317, "criterion": "Qf=470" },
+            { "reply": 12506, "next": 11318 }
+          ]
+        },
+        {
+          "message": 11313,
+          "choices": [
+            { "reply": 12502, "next": 11314, "startsQuest": 460, "params": [[34, 460]] },
+            { "reply": 12502, "next": 11314, "quest": 460 },
+            { "reply": 12500 }
+          ]
+        },
+        {
+          "message": 11314,
+          "choices": [
+            { "reply": 12501, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12501, "quest": 460 },
+            { "reply": 12500 }
+          ]
+        },
+        {
+          "message": 11316,
+          "choices": [
+            { "reply": 12504, "startsQuest": 460, "params": [[34, 460]] },
+            { "reply": 12504, "quest": 460 },
+            { "reply": 12500 }
+          ]
+        },
+        {
+          "message": 11315,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11317,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11349,
+          "choices": []
+        },
+        {
+          "message": 11318,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11349); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (460) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (167) at the character's level; done, the dopeuls are tired until 7:00 (11315, 11317)."
+    },
+    {
+      "npc": 436,
+      "map": 183762944,
+      "opening": 10932,
+      "openings": [
+        { "message": 10969, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 10932,
+          "choices": [
+            { "reply": 12048, "next": 10933, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12050, "next": 10936, "criterion": "Qa=470|Qf=470", "beforeQuest": 461 },
+            { "reply": 12050, "next": 10936, "quest": 461 },
+            { "reply": 12050, "next": 10935, "quest": 470 },
+            { "reply": 12050, "next": 10937, "criterion": "Qf=470" },
+            { "reply": 12051, "next": 10938 }
+          ]
+        },
+        {
+          "message": 10933,
+          "choices": [
+            { "reply": 12047, "next": 10934, "startsQuest": 461, "params": [[34, 461]] },
+            { "reply": 12047, "next": 10934, "quest": 461 },
+            { "reply": 12045 }
+          ]
+        },
+        {
+          "message": 10934,
+          "choices": [
+            { "reply": 12046, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12046, "quest": 461 },
+            { "reply": 12045 }
+          ]
+        },
+        {
+          "message": 10936,
+          "choices": [
+            { "reply": 12049, "startsQuest": 461, "params": [[34, 461]] },
+            { "reply": 12049, "quest": 461 },
+            { "reply": 12045 }
+          ]
+        },
+        {
+          "message": 10935,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 10937,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 10969,
+          "choices": []
+        },
+        {
+          "message": 10938,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10969); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (461) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (161) at the character's level; done, the dopeuls are tired until 7:00 (10935, 10937)."
+    },
+    {
+      "npc": 435,
+      "map": 183763974,
+      "opening": 11084,
+      "openings": [
+        { "message": 11121, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11084,
+          "choices": [
+            { "reply": 12228, "next": 11085, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12230, "next": 11088, "criterion": "Qa=470|Qf=470", "beforeQuest": 462 },
+            { "reply": 12230, "next": 11088, "quest": 462 },
+            { "reply": 12230, "next": 11087, "quest": 470 },
+            { "reply": 12230, "next": 11089, "criterion": "Qf=470" },
+            { "reply": 12231, "next": 11090 }
+          ]
+        },
+        {
+          "message": 11085,
+          "choices": [
+            { "reply": 12227, "next": 11086, "startsQuest": 462, "params": [[34, 462]] },
+            { "reply": 12227, "next": 11086, "quest": 462 },
+            { "reply": 12225 }
+          ]
+        },
+        {
+          "message": 11086,
+          "choices": [
+            { "reply": 12226, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12226, "quest": 462 },
+            { "reply": 12225 }
+          ]
+        },
+        {
+          "message": 11088,
+          "choices": [
+            { "reply": 12229, "startsQuest": 462, "params": [[34, 462]] },
+            { "reply": 12229, "quest": 462 },
+            { "reply": 12225 }
+          ]
+        },
+        {
+          "message": 11087,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11089,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11121,
+          "choices": []
+        },
+        {
+          "message": 11090,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11121); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (462) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (166) at the character's level; done, the dopeuls are tired until 7:00 (11087, 11089)."
+    },
+    {
+      "npc": 443,
+      "map": 183767050,
+      "opening": 11160,
+      "openings": [
+        { "message": 11197, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11160,
+          "choices": [
+            { "reply": 12318, "next": 11161, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12320, "next": 11164, "criterion": "Qa=470|Qf=470", "beforeQuest": 463 },
+            { "reply": 12320, "next": 11164, "quest": 463 },
+            { "reply": 12320, "next": 11163, "quest": 470 },
+            { "reply": 12320, "next": 11165, "criterion": "Qf=470" },
+            { "reply": 12358, "next": 11196 }
+          ]
+        },
+        {
+          "message": 11161,
+          "choices": [
+            { "reply": 12317, "next": 11162, "startsQuest": 463, "params": [[34, 463]] },
+            { "reply": 12317, "next": 11162, "quest": 463 },
+            { "reply": 12315 }
+          ]
+        },
+        {
+          "message": 11162,
+          "choices": [
+            { "reply": 12316, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12316, "quest": 463 },
+            { "reply": 12315 }
+          ]
+        },
+        {
+          "message": 11164,
+          "choices": [
+            { "reply": 12319, "startsQuest": 463, "params": [[34, 463]] },
+            { "reply": 12319, "quest": 463 },
+            { "reply": 12315 }
+          ]
+        },
+        {
+          "message": 11163,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11165,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11197,
+          "choices": []
+        },
+        {
+          "message": 11196,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11197); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (463) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (455) at the character's level; done, the dopeuls are tired until 7:00 (11163, 11165)."
+    },
+    {
+      "npc": 440,
+      "map": 17048578,
+      "opening": 11046,
+      "openings": [
+        { "message": 11083, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11046,
+          "choices": [
+            { "reply": 12183, "next": 11047, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12185, "next": 11050, "criterion": "Qa=470|Qf=470", "beforeQuest": 464 },
+            { "reply": 12185, "next": 11050, "quest": 464 },
+            { "reply": 12185, "next": 11049, "quest": 470 },
+            { "reply": 12185, "next": 11051, "criterion": "Qf=470" },
+            { "reply": 12186, "next": 11052 }
+          ]
+        },
+        {
+          "message": 11047,
+          "choices": [
+            { "reply": 12182, "next": 11048, "startsQuest": 464, "params": [[34, 464]] },
+            { "reply": 12182, "next": 11048, "quest": 464 },
+            { "reply": 12180 }
+          ]
+        },
+        {
+          "message": 11048,
+          "choices": [
+            { "reply": 12181, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12181, "quest": 464 },
+            { "reply": 12180 }
+          ]
+        },
+        {
+          "message": 11050,
+          "choices": [
+            { "reply": 12184, "startsQuest": 464, "params": [[34, 464]] },
+            { "reply": 12184, "quest": 464 },
+            { "reply": 12180 }
+          ]
+        },
+        {
+          "message": 11049,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11051,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11083,
+          "choices": []
+        },
+        {
+          "message": 11052,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11083); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (464) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (162) at the character's level; done, the dopeuls are tired until 7:00 (11049, 11051)."
+    },
+    {
+      "npc": 442,
+      "map": 183768076,
+      "opening": 11236,
+      "openings": [
+        { "message": 11273, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11236,
+          "choices": [
+            { "reply": 12413, "next": 11237, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12415, "next": 11240, "criterion": "Qa=470|Qf=470", "beforeQuest": 465 },
+            { "reply": 12415, "next": 11240, "quest": 465 },
+            { "reply": 12415, "next": 11239, "quest": 470 },
+            { "reply": 12415, "next": 11241, "criterion": "Qf=470" },
+            { "reply": 12416, "next": 11242 }
+          ]
+        },
+        {
+          "message": 11237,
+          "choices": [
+            { "reply": 12412, "next": 11238, "startsQuest": 465, "params": [[34, 465]] },
+            { "reply": 12412, "next": 11238, "quest": 465 },
+            { "reply": 12410 }
+          ]
+        },
+        {
+          "message": 11238,
+          "choices": [
+            { "reply": 12411, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12411, "quest": 465 },
+            { "reply": 12410 }
+          ]
+        },
+        {
+          "message": 11240,
+          "choices": [
+            { "reply": 12414, "startsQuest": 465, "params": [[34, 465]] },
+            { "reply": 12414, "quest": 465 },
+            { "reply": 12410 }
+          ]
+        },
+        {
+          "message": 11239,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11241,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11273,
+          "choices": []
+        },
+        {
+          "message": 11242,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11273); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (465) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (169) at the character's level; done, the dopeuls are tired until 7:00 (11239, 11241)."
+    },
+    {
+      "npc": 672,
+      "map": 183769090,
+      "opening": 10970,
+      "openings": [
+        { "message": 11007, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 10970,
+          "choices": [
+            { "reply": 12093, "next": 10971, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12095, "next": 10974, "criterion": "Qa=470|Qf=470", "beforeQuest": 466 },
+            { "reply": 12095, "next": 10974, "quest": 466 },
+            { "reply": 12095, "next": 10973, "quest": 470 },
+            { "reply": 12095, "next": 10975, "criterion": "Qf=470" },
+            { "reply": 12096, "next": 10976 }
+          ]
+        },
+        {
+          "message": 10971,
+          "choices": [
+            { "reply": 12092, "next": 10972, "startsQuest": 466, "params": [[34, 466]] },
+            { "reply": 12092, "next": 10972, "quest": 466 },
+            { "reply": 12090 }
+          ]
+        },
+        {
+          "message": 10972,
+          "choices": [
+            { "reply": 12091, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12091, "quest": 466 },
+            { "reply": 12090 }
+          ]
+        },
+        {
+          "message": 10974,
+          "choices": [
+            { "reply": 12094, "startsQuest": 466, "params": [[34, 466]] },
+            { "reply": 12094, "quest": 466 },
+            { "reply": 12090 }
+          ]
+        },
+        {
+          "message": 10973,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 10975,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11007,
+          "choices": []
+        },
+        {
+          "message": 10976,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11007); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (466) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (2691) at the character's level; done, the dopeuls are tired until 7:00 (10973, 10975)."
+    },
+    {
+      "npc": 441,
+      "map": 183768066,
+      "opening": 11274,
+      "openings": [
+        { "message": 11311, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11274,
+          "choices": [
+            { "reply": 12458, "next": 11275, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12460, "next": 11278, "criterion": "Qa=470|Qf=470", "beforeQuest": 467 },
+            { "reply": 12460, "next": 11278, "quest": 467 },
+            { "reply": 12460, "next": 11277, "quest": 470 },
+            { "reply": 12460, "next": 11279, "criterion": "Qf=470" },
+            { "reply": 12461, "next": 11280 }
+          ]
+        },
+        {
+          "message": 11275,
+          "choices": [
+            { "reply": 12457, "next": 11276, "startsQuest": 467, "params": [[34, 467]] },
+            { "reply": 12457, "next": 11276, "quest": 467 },
+            { "reply": 12455 }
+          ]
+        },
+        {
+          "message": 11276,
+          "choices": [
+            { "reply": 12456, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12456, "quest": 467 },
+            { "reply": 12455 }
+          ]
+        },
+        {
+          "message": 11278,
+          "choices": [
+            { "reply": 12459, "startsQuest": 467, "params": [[34, 467]] },
+            { "reply": 12459, "quest": 467 },
+            { "reply": 12455 }
+          ]
+        },
+        {
+          "message": 11277,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11279,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11311,
+          "choices": []
+        },
+        {
+          "message": 11280,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11311); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (467) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (163) at the character's level; done, the dopeuls are tired until 7:00 (11277, 11279)."
+    },
+    {
+      "npc": 437,
+      "map": 183763980,
+      "opening": 11198,
+      "openings": [
+        { "message": 11235, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11198,
+          "choices": [
+            { "reply": 12368, "next": 11199, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12370, "next": 11202, "criterion": "Qa=470|Qf=470", "beforeQuest": 468 },
+            { "reply": 12370, "next": 11202, "quest": 468 },
+            { "reply": 12370, "next": 11201, "quest": 470 },
+            { "reply": 12370, "next": 11203, "criterion": "Qf=470" },
+            { "reply": 12371, "next": 11204 }
+          ]
+        },
+        {
+          "message": 11199,
+          "choices": [
+            { "reply": 12367, "next": 11200, "startsQuest": 468, "params": [[34, 468]] },
+            { "reply": 12367, "next": 11200, "quest": 468 },
+            { "reply": 12365 }
+          ]
+        },
+        {
+          "message": 11200,
+          "choices": [
+            { "reply": 12366, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12366, "quest": 468 },
+            { "reply": 12365 }
+          ]
+        },
+        {
+          "message": 11202,
+          "choices": [
+            { "reply": 12369, "startsQuest": 468, "params": [[34, 468]] },
+            { "reply": 12369, "quest": 468 },
+            { "reply": 12365 }
+          ]
+        },
+        {
+          "message": 11201,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11203,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11235,
+          "choices": []
+        },
+        {
+          "message": 11204,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11235); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (468) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (164) at the character's level; done, the dopeuls are tired until 7:00 (11201, 11203)."
+    },
+    {
+      "npc": 433,
+      "map": 183764994,
+      "opening": 11122,
+      "openings": [
+        { "message": 11159, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11122,
+          "choices": [
+            { "reply": 12273, "next": 11123, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12275, "next": 11126, "criterion": "Qa=470|Qf=470", "beforeQuest": 469 },
+            { "reply": 12275, "next": 11126, "quest": 469 },
+            { "reply": 12275, "next": 11125, "quest": 470 },
+            { "reply": 12275, "next": 11127, "criterion": "Qf=470" },
+            { "reply": 12276, "next": 11128 }
+          ]
+        },
+        {
+          "message": 11123,
+          "choices": [
+            { "reply": 12272, "next": 11124, "startsQuest": 469, "params": [[34, 469]] },
+            { "reply": 12272, "next": 11124, "quest": 469 },
+            { "reply": 12270 }
+          ]
+        },
+        {
+          "message": 11124,
+          "choices": [
+            { "reply": 12271, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12271, "quest": 469 },
+            { "reply": 12270 }
+          ]
+        },
+        {
+          "message": 11126,
+          "choices": [
+            { "reply": 12274, "startsQuest": 469, "params": [[34, 469]] },
+            { "reply": 12274, "quest": 469 },
+            { "reply": 12270 }
+          ]
+        },
+        {
+          "message": 11125,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11127,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11159,
+          "choices": []
+        },
+        {
+          "message": 11128,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11159); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (469) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (160) at the character's level; done, the dopeuls are tired until 7:00 (11125, 11127)."
+    },
+    {
+      "npc": 1414,
+      "map": 67109888,
+      "opening": 11008,
+      "openings": [
+        { "message": 11045, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11008,
+          "choices": [
+            { "reply": 12138, "next": 11009, "criterion": "Qa!470&Qf!470" },
+            { "reply": 12140, "next": 11012, "criterion": "Qa=470|Qf=470", "beforeQuest": 708 },
+            { "reply": 12140, "next": 11012, "quest": 708 },
+            { "reply": 12140, "next": 11011, "quest": 470 },
+            { "reply": 12140, "next": 11013, "criterion": "Qf=470" },
+            { "reply": 12141, "next": 11014 }
+          ]
+        },
+        {
+          "message": 11009,
+          "choices": [
+            { "reply": 12137, "next": 11010, "startsQuest": 708, "params": [[34, 708]] },
+            { "reply": 12137, "next": 11010, "quest": 708 },
+            { "reply": 12135 }
+          ]
+        },
+        {
+          "message": 11010,
+          "choices": [
+            { "reply": 12136, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 12136, "quest": 708 },
+            { "reply": 12135 }
+          ]
+        },
+        {
+          "message": 11012,
+          "choices": [
+            { "reply": 12139, "startsQuest": 708, "params": [[34, 708]] },
+            { "reply": 12139, "quest": 708 },
+            { "reply": 12135 }
+          ]
+        },
+        {
+          "message": 11011,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11013,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11045,
+          "choices": []
+        },
+        {
+          "message": 11014,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11045); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (708) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3111) at the character's level; done, the dopeuls are tired until 7:00 (11011, 11013)."
+    },
+    {
+      "npc": 1425,
+      "map": 69207040,
+      "opening": 10851,
+      "openings": [
+        { "message": 10888, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 10851,
+          "choices": [
+            { "reply": 11952, "next": 10852, "criterion": "Qa!470&Qf!470" },
+            { "reply": 11954, "next": 10855, "criterion": "Qa=470|Qf=470", "beforeQuest": 715 },
+            { "reply": 11954, "next": 10855, "quest": 715 },
+            { "reply": 11954, "next": 10854, "quest": 470 },
+            { "reply": 11954, "next": 10856, "criterion": "Qf=470" },
+            { "reply": 11955, "next": 10857 }
+          ]
+        },
+        {
+          "message": 10852,
+          "choices": [
+            { "reply": 11951, "next": 10853, "startsQuest": 715, "params": [[34, 715]] },
+            { "reply": 11951, "next": 10853, "quest": 715 },
+            { "reply": 11949 }
+          ]
+        },
+        {
+          "message": 10853,
+          "choices": [
+            { "reply": 11950, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 11950, "quest": 715 },
+            { "reply": 11949 }
+          ]
+        },
+        {
+          "message": 10855,
+          "choices": [
+            { "reply": 11953, "startsQuest": 715, "params": [[34, 715]] },
+            { "reply": 11953, "quest": 715 },
+            { "reply": 11949 }
+          ]
+        },
+        {
+          "message": 10854,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 10856,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 10888,
+          "choices": []
+        },
+        {
+          "message": 10857,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10888); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (715) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3132) at the character's level; done, the dopeuls are tired until 7:00 (10854, 10856)."
+    },
+    {
+      "npc": 1594,
+      "map": 96471552,
+      "opening": 11874,
+      "openings": [
+        { "message": 11882, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 11874,
+          "choices": [
+            { "reply": 13343, "next": 11876, "criterion": "Qa!470&Qf!470" },
+            { "reply": 13345, "next": 11879, "criterion": "Qa=470|Qf=470", "beforeQuest": 940 },
+            { "reply": 13345, "next": 11879, "quest": 940 },
+            { "reply": 13345, "next": 11878, "quest": 470 },
+            { "reply": 13345, "next": 11880, "criterion": "Qf=470" },
+            { "reply": 13347, "next": 11881 }
+          ]
+        },
+        {
+          "message": 11876,
+          "choices": [
+            { "reply": 13342, "next": 11877, "startsQuest": 940, "params": [[34, 940]] },
+            { "reply": 13342, "next": 11877, "quest": 940 },
+            { "reply": 13341 }
+          ]
+        },
+        {
+          "message": 11877,
+          "choices": [
+            { "reply": 13344, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 13344, "quest": 940 },
+            { "reply": 13341 }
+          ]
+        },
+        {
+          "message": 11879,
+          "choices": [
+            { "reply": 13346, "startsQuest": 940, "params": [[34, 940]] },
+            { "reply": 13346, "quest": 940 },
+            { "reply": 13341 }
+          ]
+        },
+        {
+          "message": 11878,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11880,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 11882,
+          "choices": []
+        },
+        {
+          "message": 11881,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11882); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (940) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3286) at the character's level; done, the dopeuls are tired until 7:00 (11878, 11880)."
+    },
+    {
+      "npc": 2834,
+      "map": 148636161,
+      "opening": 20009,
+      "openings": [
+        { "message": 20017, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 20009,
+          "choices": [
+            { "reply": 23943, "next": 20011, "criterion": "Qa!470&Qf!470" },
+            { "reply": 23945, "next": 20014, "criterion": "Qa=470|Qf=470", "beforeQuest": 1617 },
+            { "reply": 23945, "next": 20014, "quest": 1617 },
+            { "reply": 23945, "next": 20013, "quest": 470 },
+            { "reply": 23945, "next": 20015, "criterion": "Qf=470" },
+            { "reply": 23946, "next": 20016 }
+          ]
+        },
+        {
+          "message": 20011,
+          "choices": [
+            { "reply": 23942, "next": 20012, "startsQuest": 1617, "params": [[34, 1617]] },
+            { "reply": 23942, "next": 20012, "quest": 1617 },
+            { "reply": 23940 }
+          ]
+        },
+        {
+          "message": 20012,
+          "choices": [
+            { "reply": 23941, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 23941, "quest": 1617 },
+            { "reply": 23940 }
+          ]
+        },
+        {
+          "message": 20014,
+          "choices": [
+            { "reply": 23944, "startsQuest": 1617, "params": [[34, 1617]] },
+            { "reply": 23944, "quest": 1617 },
+            { "reply": 23940 }
+          ]
+        },
+        {
+          "message": 20013,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 20015,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 20017,
+          "choices": []
+        },
+        {
+          "message": 20016,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (20017); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1617) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3976) at the character's level; done, the dopeuls are tired until 7:00 (20013, 20015)."
+    },
+    {
+      "npc": 3053,
+      "map": 163053570,
+      "opening": 22320,
+      "openings": [
+        { "message": 22329, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 22320,
+          "choices": [
+            { "reply": 26877, "next": 22322, "criterion": "Qa!470&Qf!470" },
+            { "reply": 26879, "next": 22325, "criterion": "Qa=470|Qf=470", "beforeQuest": 1679 },
+            { "reply": 26879, "next": 22325, "quest": 1679 },
+            { "reply": 26879, "next": 22324, "quest": 470 },
+            { "reply": 26879, "next": 22326, "criterion": "Qf=470" },
+            { "reply": 26882, "next": 22327 }
+          ]
+        },
+        {
+          "message": 22322,
+          "choices": [
+            { "reply": 26876, "next": 22323, "startsQuest": 1679, "params": [[34, 1679]] },
+            { "reply": 26876, "next": 22323, "quest": 1679 },
+            { "reply": 26874 }
+          ]
+        },
+        {
+          "message": 22323,
+          "choices": [
+            { "reply": 26875, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 26875, "quest": 1679 },
+            { "reply": 26874 }
+          ]
+        },
+        {
+          "message": 22325,
+          "choices": [
+            { "reply": 26878, "startsQuest": 1679, "params": [[34, 1679]] },
+            { "reply": 26878, "quest": 1679 },
+            { "reply": 26874 }
+          ]
+        },
+        {
+          "message": 22324,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 22326,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 22329,
+          "choices": []
+        },
+        {
+          "message": 22327,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (22329); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1679) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (4290) at the character's level; done, the dopeuls are tired until 7:00 (22324, 22326)."
+    },
+    {
+      "npc": 3713,
+      "map": 177210626,
+      "opening": 26765,
+      "openings": [
+        { "message": 26774, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 26765,
+          "choices": [
+            { "reply": 32165, "next": 26767, "criterion": "Qa!470&Qf!470" },
+            { "reply": 32167, "next": 26770, "criterion": "Qa=470|Qf=470", "beforeQuest": 1843 },
+            { "reply": 32167, "next": 26770, "quest": 1843 },
+            { "reply": 32167, "next": 26769, "quest": 470 },
+            { "reply": 32167, "next": 26771, "criterion": "Qf=470" },
+            { "reply": 32170, "next": 26772 }
+          ]
+        },
+        {
+          "message": 26767,
+          "choices": [
+            { "reply": 32164, "next": 26768, "startsQuest": 1843, "params": [[34, 1843]] },
+            { "reply": 32164, "next": 26768, "quest": 1843 },
+            { "reply": 32162 }
+          ]
+        },
+        {
+          "message": 26768,
+          "choices": [
+            { "reply": 32163, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 32163, "quest": 1843 },
+            { "reply": 32162 }
+          ]
+        },
+        {
+          "message": 26770,
+          "choices": [
+            { "reply": 32166, "startsQuest": 1843, "params": [[34, 1843]] },
+            { "reply": 32166, "quest": 1843 },
+            { "reply": 32162 }
+          ]
+        },
+        {
+          "message": 26769,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 26771,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 26774,
+          "choices": []
+        },
+        {
+          "message": 26772,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (26774); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1843) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (4777) at the character's level; done, the dopeuls are tired until 7:00 (26769, 26771)."
+    },
+    {
+      "npc": 6836,
+      "map": 226493185,
+      "opening": 51418,
+      "openings": [
+        { "message": 51438, "criterion": "PL<9" }
+      ],
+      "lines": [
+        {
+          "message": 51418,
+          "choices": [
+            { "reply": 68984, "next": 51419, "criterion": "Qa!470&Qf!470" },
+            { "reply": 68986, "next": 51422, "criterion": "Qa=470|Qf=470", "beforeQuest": 2469 },
+            { "reply": 68986, "next": 51422, "quest": 2469 },
+            { "reply": 68986, "next": 51421, "quest": 470 },
+            { "reply": 68986, "next": 51423, "criterion": "Qf=470" },
+            { "reply": 68987, "next": 51424 }
+          ]
+        },
+        {
+          "message": 51419,
+          "choices": [
+            { "reply": 68983, "next": 51420, "startsQuest": 2469, "params": [[34, 2469]] },
+            { "reply": 68983, "next": 51420, "quest": 2469 },
+            { "reply": 68981 }
+          ]
+        },
+        {
+          "message": 51420,
+          "choices": [
+            { "reply": 68982, "startsQuest": 470, "params": [[34, 470]] },
+            { "reply": 68982, "quest": 2469 },
+            { "reply": 68981 }
+          ]
+        },
+        {
+          "message": 51422,
+          "choices": [
+            { "reply": 68985, "startsQuest": 2469, "params": [[34, 2469]] },
+            { "reply": 68985, "quest": 2469 },
+            { "reply": 68981 }
+          ]
+        },
+        {
+          "message": 51421,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 51423,
+          "names": true,
+          "untilDaily": true,
+          "choices": []
+        },
+        {
+          "message": 51438,
+          "choices": []
+        },
+        {
+          "message": 51424,
+          "choices": []
+        }
+      ],
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (51438); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (2469) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (7226) at the character's level; done, the dopeuls are tired until 7:00 (51421, 51423)."
     }
   ]
 }

@@ -379,6 +379,13 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public bool NamesTheCharacter { get; init; }
 
+        /// <summary>
+        /// True when the line's #1 is the hours left until the daily quests come back
+        /// («untilDaily»): the dopeul masters' «Todos mis dopeuls están cansados por ahora, vuelve
+        /// dentro de #1 hora/s».
+        /// </summary>
+        public bool HoursToDailyReset { get; init; }
+
         public IReadOnlyList<DialogueChoice> Choices { get; init; } = Array.Empty<DialogueChoice>();
 
         public DialogueChoice? Choice(long reply)
@@ -1012,6 +1019,7 @@ namespace Jondo.Unity.World.Content
                     Message = message,
                     Choices = choices.ToArray(),
                     NamesTheCharacter = line.TryGetProperty("names", out var names) && names.ValueKind == JsonValueKind.True,
+                    HoursToDailyReset = line.TryGetProperty("untilDaily", out var daily) && daily.ValueKind == JsonValueKind.True,
                 });
             }
 
@@ -1090,6 +1098,7 @@ namespace Jondo.Unity.World.Content
                         writer.WriteStartObject();
                         writer.WriteNumber("message", line.Message);
                         if (line.NamesTheCharacter) writer.WriteBoolean("names", true);
+                        if (line.HoursToDailyReset) writer.WriteBoolean("untilDaily", true);
 
                         writer.WritePropertyName("choices");
                         writer.WriteStartArray();

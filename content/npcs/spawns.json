@@ -2925,6 +2925,13 @@
       "cell": 248,
       "orientation": 3,
       "why": "Warko Linch, where Dofus pour les noobs, «Le cimetière primitif» starts the quest: Forêt de Kaliptus [-11,12] (its start position, map 73402891). He stood nowhere. INFERRED cell: by the red mushroom and its flasks."
+    },
+    {
+      "map": 183767050,
+      "npc": 443,
+      "cell": 397,
+      "orientation": 1,
+      "why": "Makdo Peul, the sacriers' dopeul master: «Caza de dopeul sacrógrito» (463) is fought here; the catalogue also names him on 183767044, so no placement was derived."
     }
   ]
 }
