@@ -11,6 +11,7 @@ internal static class ServerSettingsTexts
         ["Subtitle"] = ("Se guardan en config/server_settings.json y se aplican al reiniciar. Se avisa antes a los jugadores por el chat.", "Saved to config/server_settings.json and applied on restart. Players are told in the chat first.", "Enregistrés dans config/server_settings.json et appliqués au redémarrage. Les joueurs sont prévenus dans le chat."),
         ["Rates"] = ("TASAS", "RATES", "TAUX"),
         ["Xp"] = ("Bonus de experiencia", "Experience bonus", "Bonus d'expérience"),
+        ["JobXp"] = ("Bonus de experiencia de oficio", "Job experience bonus", "Bonus d'expérience de métier"),
         ["Drop"] = ("Bonus de botín", "Drop bonus", "Bonus de butin"),
         ["Kamas"] = ("Bonus de kamas", "Kamas bonus", "Bonus de kamas"),
         ["RatesHint"] = ("Un porcentaje extra para todos. 0 = sin bonus.", "An extra percent for everybody. 0 = no bonus.", "Un pourcentage en plus pour tous. 0 = sans bonus."),
