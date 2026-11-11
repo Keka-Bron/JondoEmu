@@ -22750,6 +22750,523 @@
         }
       ],
       "why": "The White Rat at the meeting point of the sewers [-33,-57]: Dofus pour les noobs, «Le pacte des profondeurs», «pénétrez dans les égouts en [-33,-57] pour rencontrer le Rat Blanc et lui remettre l'armement» (18453, the crate 26228 taken). «Après que le Rat Blanc soit partit», Tymo steps in and speaks."
+    },
+    {
+      "npc": 6628,
+      "map": 0,
+      "opening": 50162,
+      "lines": [
+        {
+          "message": 50162,
+          "choices": [
+            { "reply": 66910, "beforeQuest": 2434, "minLevel": 90, "thenNpc": 6608, "thenLine": 50173 }
+          ]
+        }
+      ],
+      "why": "The Bontarian in distress of the sewers [-32,-58], robbed by two bandits: Dofus pour les noobs, «La Geste de Ratagnan», «Sur le point de le sauver, un héros avec un heaume fait son apparition et intervient avant vous»: D'Arratagnan speaks next. Level 90, the quest's PL>89."
+    },
+    {
+      "npc": 6608,
+      "map": 216400648,
+      "opening": 50173,
+      "openings": [
+        { "quest": 2434, "pending": 18420, "message": 50175 },
+        { "quest": 2434, "objective": 18420, "message": 50225 }
+      ],
+      "lines": [
+        {
+          "message": 50173,
+          "choices": [
+            { "reply": 67087, "next": 50171, "beforeQuest": 2434, "minLevel": 90 }
+          ]
+        },
+        {
+          "message": 50171,
+          "choices": [
+            { "reply": 66912, "next": 50172 }
+          ]
+        },
+        {
+          "message": 50172,
+          "choices": [
+            { "reply": 66911, "next": 50174 }
+          ]
+        },
+        {
+          "message": 50174,
+          "choices": [
+            { "reply": 66914, "startsQuest": 2434, "params": [[34, 2434]] },
+            { "reply": 66916, "next": 50175 }
+          ]
+        },
+        {
+          "message": 50175,
+          "choices": [
+            { "reply": 66913, "startsQuest": 2434, "params": [[34, 2434]], "beforeQuest": 2434 },
+            { "reply": 66913, "quest": 2434, "beforeObjective": 18420 },
+            { "reply": 66915 }
+          ]
+        },
+        {
+          "message": 50225,
+          "choices": [
+            { "reply": 66997, "next": 50226, "quest": 2434, "afterObjective": 18420, "beforeObjective": 18421 }
+          ]
+        },
+        {
+          "message": 50226,
+          "choices": [
+            { "reply": 66996, "next": 50227 }
+          ]
+        },
+        {
+          "message": 50227,
+          "choices": [
+            { "reply": 66995, "next": 50228 }
+          ]
+        },
+        {
+          "message": 50228,
+          "choices": [
+            { "reply": 66994, "next": 50229 }
+          ]
+        },
+        {
+          "message": 50229,
+          "choices": [
+            { "reply": 66993, "quest": 2434, "completes": 18421 },
+            { "reply": 66993 }
+          ]
+        }
+      ],
+      "why": "D'Arratagnan in the sewers [-32,-58]: Dofus pour les noobs, «La Geste de Ratagnan», he sends the Bontarian away, charges the bandits and gets beaten; «Lever les yeux au ciel et se préparer à combattre» on his line 50175 (the step's own dialogue) starts the quest and the fight beside him (content/fights/npc_fights.json). Won (18420), he praises you, talks of the White Rat and runs west to her Pantry (18421)."
+    },
+    {
+      "npc": 6608,
+      "map": 216402698,
+      "opening": 50231,
+      "lines": [
+        {
+          "message": 50231,
+          "choices": []
+        }
+      ],
+      "why": "D'Arratagnan waiting at the White Rat's Pantry [-34,-59]: «D'Arratagnan te esperará en la entrada»."
+    },
+    {
+      "npc": 6612,
+      "map": 218632194,
+      "opening": 50024,
+      "lines": [
+        {
+          "message": 50024,
+          "choices": [
+            { "reply": 66998, "next": 50232, "quest": 2434, "afterObjective": 18422, "beforeObjective": 18438, "criterion": "PO!26207&PO!26208" },
+            { "reply": 67006, "next": 50238, "quest": 2434, "afterObjective": 18422, "beforeObjective": 18438, "holds": 26208 },
+            { "reply": 66726, "teleport": 216402698 }
+          ]
+        },
+        {
+          "message": 50232,
+          "choices": [
+            { "reply": 67002, "next": 50233 }
+          ]
+        },
+        {
+          "message": 50233,
+          "choices": [
+            { "reply": 67001, "next": 50234 }
+          ]
+        },
+        {
+          "message": 50234,
+          "choices": [
+            { "reply": 67000, "next": 50235 }
+          ]
+        },
+        {
+          "message": 50235,
+          "choices": [
+            { "reply": 66999, "quest": 2434, "afterObjective": 18422, "beforeObjective": 18438, "gives": 26207, "thenNpc": 6608, "thenLine": 50230 },
+            { "reply": 66999 }
+          ]
+        },
+        {
+          "message": 50238,
+          "choices": [
+            { "reply": 67009, "next": 50239 }
+          ]
+        },
+        {
+          "message": 50239,
+          "choices": [
+            { "reply": 67008, "next": 50240 }
+          ]
+        },
+        {
+          "message": 50240,
+          "choices": [
+            { "reply": 67007, "quest": 2434, "completes": 18438, "takes": 26208, "gives": 26202, "teleport": 216402698 },
+            { "reply": 67007, "teleport": 216402698 }
+          ]
+        }
+      ],
+      "why": "The White Rat in her Pantry's last room once beaten (18422): «Salir de la mazmorra» takes you back to its door [-34,-59]; Dofus pour les noobs, «La Geste de Ratagnan», «Lui demander des informations sur son art du combat», then D'Arratagnan has his say and «Écouter Ratagnan demander confirmation au Rat Blanc»: she sends him to the surface with you (18438) and he follows you from then on (the follower 26202). The two hidden items of the quest (26207, 26208) mark who has spoken."
+    },
+    {
+      "npc": 6608,
+      "map": 218632194,
+      "opening": 50230,
+      "openings": [
+        { "holds": 26208, "message": 50295 },
+        { "criterion": "Qo>18438&Qo<18423&PO!26202", "message": 50267 }
+      ],
+      "lines": [
+        {
+          "message": 50230,
+          "choices": [
+            { "reply": 67005, "next": 50236, "quest": 2434, "afterObjective": 18422, "beforeObjective": 18438, "holds": 26207 }
+          ]
+        },
+        {
+          "message": 50236,
+          "choices": [
+            { "reply": 67004, "next": 50237 }
+          ]
+        },
+        {
+          "message": 50237,
+          "choices": [
+            { "reply": 67003, "quest": 2434, "afterObjective": 18422, "beforeObjective": 18438, "takes": 26207, "gives": 26208 },
+            { "reply": 67003 }
+          ]
+        },
+        {
+          "message": 50295,
+          "choices": []
+        },
+        {
+          "message": 50267,
+          "choices": [
+            { "reply": 67064, "quest": 2434, "afterObjective": 18438, "beforeObjective": 18423, "criterion": "PO!26202", "gives": 26202 }
+          ]
+        }
+      ],
+      "why": "D'Arratagnan in the Pantry's last room, amazed the White Rat lost: Dofus pour les noobs, «La Geste de Ratagnan», «Parlez à Ratagnan étonné d'avoir assisté à la défaite du Rat Blanc», who will not hear of the surface and goes to ask her himself. Lost in a fight before the library, he comes back here («Volver a la biblioteca»)."
+    },
+    {
+      "npc": 6405,
+      "map": 217062400,
+      "opening": 48059,
+      "lines": [
+        {
+          "message": 48059,
+          "choices": [
+            { "reply": 67044, "next": 50259, "quest": 2434, "afterObjective": 18438, "beforeObjective": 18423, "holds": 26202 },
+            { "reply": 67053, "quest": 2434, "afterObjective": 18438, "beforeObjective": 18423, "criterion": "PO!26202" }
+          ]
+        },
+        {
+          "message": 50259,
+          "choices": [
+            { "reply": 67049, "next": 50260 }
+          ]
+        },
+        {
+          "message": 50260,
+          "choices": [
+            { "reply": 67048, "next": 50261 }
+          ]
+        },
+        {
+          "message": 50261,
+          "choices": [
+            { "reply": 67047, "next": 50262 }
+          ]
+        },
+        {
+          "message": 50262,
+          "choices": [
+            { "reply": 67046, "next": 50263 }
+          ]
+        },
+        {
+          "message": 50263,
+          "choices": [
+            { "reply": 67045, "next": 50264 }
+          ]
+        },
+        {
+          "message": 50264,
+          "choices": [
+            { "reply": 67052, "next": 50265 }
+          ]
+        },
+        {
+          "message": 50265,
+          "choices": [
+            { "reply": 67051, "next": 50266 }
+          ]
+        },
+        {
+          "message": 50266,
+          "choices": [
+            { "reply": 67050, "quest": 2434, "completes": 18423 },
+            { "reply": 67050 }
+          ]
+        }
+      ],
+      "why": "Vayinklán in Bonta's library [-35,-57]: Dofus pour les noobs, «La Geste de Ratagnan», «Parlez à Marcelle Rouste pour en apprendre plus sur l'art de l'escrime bontarienne», the good blades, the year 290 and the heirs on the Promontory of the Skies (18423). Without D'Arratagnan beside you, «Darte cuenta de que D'Arratagnan no está contigo»."
+    },
+    {
+      "npc": 6629,
+      "map": 212731649,
+      "opening": 50268,
+      "lines": [
+        {
+          "message": 50268,
+          "choices": [
+            { "reply": 67059, "next": 50269, "quest": 2434, "afterObjective": 18423, "beforeObjective": 18425, "holds": 26202 },
+            { "reply": 67067, "quest": 2434, "afterObjective": 18423, "beforeObjective": 18425, "criterion": "PO!26202" },
+            { "reply": 67060, "quest": 2434, "afterObjective": 18425, "beforeObjective": 18426, "teleport": 222560266 }
+          ]
+        },
+        {
+          "message": 50269,
+          "choices": [
+            { "reply": 67058, "next": 50270 }
+          ]
+        },
+        {
+          "message": 50270,
+          "choices": [
+            { "reply": 67057, "next": 50271 }
+          ]
+        },
+        {
+          "message": 50271,
+          "choices": [
+            { "reply": 67056, "next": 50272 }
+          ]
+        },
+        {
+          "message": 50272,
+          "choices": [
+            { "reply": 67055, "next": 50273 }
+          ]
+        },
+        {
+          "message": 50273,
+          "choices": [
+            { "reply": 67054, "quest": 2434, "completes": 18425, "teleport": 222560266 },
+            { "reply": 67054 }
+          ]
+        }
+      ],
+      "why": "Faramis on the Promontory of the Skies [-36,-59]: Dofus pour les noobs, «La Geste de Ratagnan», the cousin of intendant Danathor, a good blade; a rat has no noble blood, but he tells the other way only after a duel, and takes you somewhere fitter for it (18425). «Volver a la sala de duelo» if you left it first."
+    },
+    {
+      "npc": 6629,
+      "map": 222560266,
+      "opening": 50268,
+      "lines": [
+        {
+          "message": 50268,
+          "choices": [
+            { "reply": 67061, "quest": 2434, "afterObjective": 18425, "beforeObjective": 18426 },
+            { "reply": 67062, "next": 50275, "quest": 2434, "afterObjective": 18426, "beforeObjective": 18427 },
+            { "reply": 67063, "teleport": 212731649 }
+          ]
+        },
+        {
+          "message": 50275,
+          "choices": [
+            { "reply": 67071, "next": 50276 }
+          ]
+        },
+        {
+          "message": 50276,
+          "choices": [
+            { "reply": 67070, "next": 50277 }
+          ]
+        },
+        {
+          "message": 50277,
+          "choices": [
+            { "reply": 67069, "next": 50278 }
+          ]
+        },
+        {
+          "message": 50278,
+          "choices": [
+            { "reply": 67068, "teleport": 212731649 }
+          ]
+        }
+      ],
+      "why": "Faramis in the palace's training room: Dofus pour les noobs, «La Geste de Ratagnan», «Vous êtes téléporté dans un dojo, reparlez à Faramis « Affronter Faramis »», alone (content/fights/npc_fights.json, 18426); then a rat can become a good blade by serving one noble person. «Salir de la sala» and «Ir a buscar a otro noble» take you back to the promontory. INFERRED room: 222560266, the palace's one closed training hall [-36,-60] no door leads to («Ya tengo un aprendiz en el palacio»)."
+    },
+    {
+      "npc": 6627,
+      "map": 212731137,
+      "opening": 50274,
+      "openings": [
+        { "holds": 26208, "message": 50285 },
+        { "after": 2434, "message": 50288 }
+      ],
+      "lines": [
+        {
+          "message": 50274,
+          "choices": [
+            { "reply": 67072, "next": 50279, "quest": 2434, "afterObjective": 18426, "beforeObjective": 18427, "holds": 26202 },
+            { "reply": 67073 }
+          ]
+        },
+        {
+          "message": 50279,
+          "choices": [
+            { "reply": 67077, "next": 50280 }
+          ]
+        },
+        {
+          "message": 50280,
+          "choices": [
+            { "reply": 67076, "next": 50281 }
+          ]
+        },
+        {
+          "message": 50281,
+          "choices": [
+            { "reply": 67075, "quest": 2434, "completes": 18427, "takes": 26202 },
+            { "reply": 67075 }
+          ]
+        },
+        {
+          "message": 50285,
+          "choices": [
+            { "reply": 67086, "next": 50286, "quest": 2434, "afterObjective": 18427, "beforeObjective": 18428 }
+          ]
+        },
+        {
+          "message": 50286,
+          "choices": [
+            { "reply": 67085, "next": 50287 }
+          ]
+        },
+        {
+          "message": 50287,
+          "choices": [
+            { "reply": 67084, "quest": 2434, "completes": 18428, "takes": 26208 },
+            { "reply": 67084 }
+          ]
+        },
+        {
+          "message": 50288,
+          "choices": []
+        }
+      ],
+      "why": "Hemmy Lady by the fountain [-35,-59], who lost her miaumiau: Dofus pour les noobs, «La Geste de Ratagnan», D'Arratagnan promises to find Nieve, «Reparlez à Ratagnan pour qu'il vous suive» (18427); back with the cat found, she takes him as her own good blade and the quest ends (18428)."
+    },
+    {
+      "npc": 6608,
+      "map": 212731137,
+      "opening": 50296,
+      "openings": [
+        { "holds": 26208, "message": 50291 },
+        { "after": 2434, "message": 50294 }
+      ],
+      "lines": [
+        {
+          "message": 50296,
+          "choices": [
+            { "reply": 67088, "quest": 2434, "afterObjective": 18427, "beforeObjective": 18428, "gives": 26202, "criterion": "PO!26202&PO!26208" }
+          ]
+        },
+        {
+          "message": 50291,
+          "choices": []
+        },
+        {
+          "message": 50294,
+          "choices": []
+        }
+      ],
+      "why": "D'Arratagnan beside Hemmy Lady: «Vamos a ir en busca de Nieve, ¿no?» and he follows you again; out of breath once Nieve has chased him back here, and her good blade for good after the quest."
+    },
+    {
+      "npc": 210,
+      "map": 212599813,
+      "opening": 7663,
+      "openings": [
+        { "holds": 26202, "message": 50283 }
+      ],
+      "lines": [
+        {
+          "message": 7663,
+          "choices": []
+        },
+        {
+          "message": 50283,
+          "choices": [
+            { "reply": 67079, "next": 50282, "quest": 2434, "afterObjective": 18427, "beforeObjective": 18428, "holds": 26202 },
+            { "reply": 67081, "next": 50284, "quest": 2434, "afterObjective": 18427, "beforeObjective": 18428, "holds": 26202 }
+          ]
+        },
+        {
+          "message": 50282,
+          "choices": [
+            { "reply": 67078, "next": 50283 },
+            { "reply": 67080, "next": 50284 }
+          ]
+        },
+        {
+          "message": 50284,
+          "choices": [
+            { "reply": 67082, "quest": 2434, "afterObjective": 18427, "beforeObjective": 18428, "takes": 26202, "gives": 26208 },
+            { "reply": 67082 }
+          ]
+        }
+      ],
+      "why": "Nieve, Hemmy Lady's white miaumiau, among the shiny things of the slums [-33,-55]: Dofus pour les noobs, «La Geste de Ratagnan», «Laisser faire Ratagnan», the cat goes for the rat and chases him north, back to the fountain. «Buscar algo para hacer un cebo» after a scratch ends the same way."
+    },
+    {
+      "npc": 210,
+      "map": 212731137,
+      "opening": 7663,
+      "lines": [
+        {
+          "message": 7663,
+          "choices": []
+        }
+      ],
+      "why": "Nieve back with Hemmy Lady by the fountain."
+    },
+    {
+      "npc": 6608,
+      "map": 217062400,
+      "opening": 50267,
+      "lines": [
+        {
+          "message": 50267,
+          "choices": [
+            { "reply": 67065, "quest": 2434, "afterObjective": 18423, "beforeObjective": 18425, "criterion": "PO!26202", "gives": 26202 }
+          ]
+        }
+      ],
+      "why": "D'Arratagnan follows for one fight only (the follower's 811 is 1), so the duel, fought alone, leaves him behind, and so does any other fight on the way. «D'Arratagnan te había perdido de vista así que ha vuelto al último sitio donde se había cruzado contigo»: lost after the library, he waits there and «Ir a buscar un heredero de los buenos espadas» takes him along again."
+    },
+    {
+      "npc": 6608,
+      "map": 212731649,
+      "opening": 50267,
+      "lines": [
+        {
+          "message": 50267,
+          "choices": [
+            { "reply": 67066, "quest": 2434, "afterObjective": 18426, "beforeObjective": 18427, "criterion": "PO!26202", "gives": 26202 }
+          ]
+        }
+      ],
+      "why": "D'Arratagnan follows for one fight only (the follower's 811 is 1), so the duel, fought alone, leaves him behind, and so does any other fight on the way. «D'Arratagnan te había perdido de vista así que ha vuelto al último sitio donde se había cruzado contigo»: after the duel he waits on the promontory, and «Ir a buscar un noble» takes him to Hemmy Lady with you."
     }
   ]
 }

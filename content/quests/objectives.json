@@ -2750,6 +2750,24 @@
    "map": 216401670,
    "afterObjectives": [18453],
    "why": "«Sobrevive a la emboscada de Tymo»: beating Captain Tymo and his corrupt militiawoman and militiaman (Dofus pour les noobs, «Le pacte des profondeurs», «Le Capitaine Larnak a un seuil de 1350PV»)."
+  },
+  {
+   "objective": 18420,
+   "quest": 2434,
+   "kind": "beat",
+   "monsters": [6844, 6845],
+   "map": 216400648,
+   "why": "«Salva a la joven rata»: the fight beside D'Arratagnan against the suspicious smuggler and the filthy hamstringer (Dofus pour les noobs, «La Geste de Ratagnan», «Ratagnan est trop peureux pour jouer, il ne fait que fuir»)."
+  },
+  {
+   "objective": 18426,
+   "quest": 2434,
+   "kind": "beat",
+   "monsters": [6838],
+   "map": 222560266,
+   "afterObjectives": [18425],
+   "why": "«Vence a Faramis en un duelo»: the duel in the training room, alone (Dofus pour les noobs, «La Geste de Ratagnan»). The catalogue names the promontory, where he is met; the duel is fought where he takes you.",
+   "overridesMap": true
   }
  ]
 }

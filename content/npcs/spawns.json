@@ -2745,6 +2745,116 @@
       "orientation": 7,
       "criterion": "Qo>18453&Qo<18454",
       "why": "Tymo, who followed you to the meeting point, there only for his ambush. INFERRED cell: behind you, on the walkway you came by."
+    },
+    {
+      "map": 216400648,
+      "npc": 6628,
+      "cell": 258,
+      "orientation": 1,
+      "criterion": "PL>89&Qa!2434&Qf!2434",
+      "why": "The Bontarian in distress, gone once the quest is under way: he runs off as D'Arratagnan arrives."
+    },
+    {
+      "map": 216400648,
+      "npc": 6608,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "(PL>89|Qa=2434)&Qf!2434&Qo<18421",
+      "why": "D'Arratagnan in the sewers until he runs west to the Pantry (18421)."
+    },
+    {
+      "map": 216400648,
+      "npc": 6621,
+      "cell": 244,
+      "orientation": 3,
+      "criterion": "(PL>89|Qa=2434)&Qf!2434&Qo<18420",
+      "why": "The suspicious smuggler robbing the Bontarian, until the fight (18420). He stood nowhere. INFERRED cell: beside his victim."
+    },
+    {
+      "map": 216400648,
+      "npc": 6622,
+      "cell": 257,
+      "orientation": 0,
+      "criterion": "(PL>89|Qa=2434)&Qf!2434&Qo<18420",
+      "why": "The filthy hamstringer with his knives, until the fight (18420). He stood nowhere. INFERRED cell: beside his victim."
+    },
+    {
+      "map": 216402698,
+      "npc": 6608,
+      "cell": 275,
+      "orientation": 3,
+      "criterion": "Qo>18421&Qo<18422",
+      "why": "D'Arratagnan waiting at the Pantry's door while you go in. INFERRED cell: by Rata Plin."
+    },
+    {
+      "map": 218632194,
+      "npc": 6612,
+      "cell": 247,
+      "orientation": 3,
+      "why": "The White Rat in her Pantry's last room, who lets you out («Salir de la mazmorra»). She stood nowhere and the room had no way out. INFERRED cell: at the top of the steps."
+    },
+    {
+      "map": 218632194,
+      "npc": 6608,
+      "cell": 300,
+      "orientation": 7,
+      "criterion": "(Qo>18422&Qo<18438)|(Qo>18438&Qo<18423&PO!26202)",
+      "why": "D'Arratagnan, who watched the White Rat lose, until he leaves with you (18438). INFERRED cell: at the foot of the steps."
+    },
+    {
+      "map": 212731649,
+      "npc": 6629,
+      "cell": 305,
+      "orientation": 3,
+      "why": "Faramis, a good blade of Bonta, on the Promontory of the Skies [-36,-59] (Dofus pour les noobs, «La Geste de Ratagnan»). He stood nowhere. INFERRED cell: on the square."
+    },
+    {
+      "map": 222560266,
+      "npc": 6629,
+      "cell": 299,
+      "orientation": 3,
+      "criterion": "Qa=2434",
+      "why": "Faramis in the training room he takes you to for the duel."
+    },
+    {
+      "map": 212731137,
+      "npc": 6608,
+      "cell": 478,
+      "orientation": 1,
+      "criterion": "(Qo>18427&Qo<18428&PO!26202)|Qf=2434",
+      "why": "D'Arratagnan beside Hemmy Lady (479) whenever he is not following you, and for good after the quest. INFERRED cell: at her side."
+    },
+    {
+      "map": 212731137,
+      "npc": 210,
+      "cell": 464,
+      "orientation": 1,
+      "criterion": "(Qa=2434&PO=26208)|Qf=2434",
+      "why": "Nieve back by Hemmy Lady once she has chased D'Arratagnan there. INFERRED cell: at her side."
+    },
+    {
+      "map": 212599813,
+      "npc": 210,
+      "cell": 412,
+      "orientation": 1,
+      "criterion": "PO!26208&Qf!2434",
+      "why": "Nieve where a capture has her in the slums, gone once she has chased D'Arratagnan to the fountain."
+    },
+    {
+      "map": 217062400,
+      "npc": 6608,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qo>18423&Qo<18425&PO!26202",
+      "why": "D'Arratagnan back at the library when he lost sight of you on the way to Faramis. INFERRED cell: near the librarian."
+    },
+    {
+      "map": 212731649,
+      "npc": 6608,
+      "cell": 319,
+      "orientation": 5,
+      "criterion": "Qo>18426&Qo<18427&PO!26202",
+      "why": "D'Arratagnan on the promontory after the duel he could not follow you into. INFERRED cell: by Faramis."
     }
   ]
 }
