@@ -3167,6 +3167,276 @@
    "map": 192677892,
    "afterObjectives": [9532],
    "why": "«Libera a Barnabé»: the demons beaten, «vous récupérez Barnabé, le marcassin dimensionnel dans votre inventaire de quête» («Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs)). The item itself is monster 3984's drop, at 100 % in the client's table."
+  },
+  {
+   "objective": 8007,
+   "quest": 1446,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14900, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8008,
+   "quest": 1446,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8007],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8009,
+   "quest": 1446,
+   "kind": "beat",
+   "monsters": [463, 3525, 460],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8008],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8011,
+   "quest": 1447,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14901, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8012,
+   "quest": 1447,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8011],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8013,
+   "quest": 1447,
+   "kind": "beat",
+   "monsters": [462],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8012],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8015,
+   "quest": 1448,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14902, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8016,
+   "quest": 1448,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8015],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8017,
+   "quest": 1448,
+   "kind": "beat",
+   "monsters": [554, 464, 3527, 481],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8016],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8019,
+   "quest": 1449,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14903, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8020,
+   "quest": 1449,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8019],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8021,
+   "quest": 1449,
+   "kind": "beat",
+   "monsters": [446, 552, 550],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8020],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8023,
+   "quest": 1450,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14904, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8024,
+   "quest": 1450,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8023],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8025,
+   "quest": 1450,
+   "kind": "beat",
+   "monsters": [3670],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8024],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8027,
+   "quest": 1451,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14905, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8028,
+   "quest": 1451,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8027],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8029,
+   "quest": 1451,
+   "kind": "beat",
+   "monsters": [2901, 459, 3524, 2902],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8028],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8031,
+   "quest": 1452,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14906, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8032,
+   "quest": 1452,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8031],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8033,
+   "quest": 1452,
+   "kind": "beat",
+   "monsters": [3528, 2903, 555, 2904, 3669],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8032],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8035,
+   "quest": 1453,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14907, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8036,
+   "quest": 1453,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8035],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8037,
+   "quest": 1453,
+   "kind": "beat",
+   "monsters": [2905, 2906, 2970],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8036],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8039,
+   "quest": 1454,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14908, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8040,
+   "quest": 1454,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8039],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8041,
+   "quest": 1454,
+   "kind": "beat",
+   "monsters": [2908, 3400, 2909, 2910],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8040],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 8043,
+   "quest": 1455,
+   "elements": [{"map": 121897984, "element": 484172}],
+   "gives": [{"item": 14909, "count": 1}],
+   "why": "«Cliquez sur le bureau en bois afin de récupérer la feuille de formation» («L'école fantastique» and «Formation des … années» (Dofus pour les noobs)): the small desk by the blackboard, circled in the guide's screenshot. Which of the twenty identical «Ficha de formación» (14900-14919) is INFERRED: the year's."
+  },
+  {
+   "objective": 8044,
+   "quest": 1455,
+   "kind": "enter",
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8043],
+   "why": "«Se rendre dans la salle de combat»: the room the classroom's door leads to. The catalogue names the classroom itself, where the formation is given."
+  },
+  {
+   "objective": 8045,
+   "quest": 1455,
+   "kind": "beat",
+   "monsters": [3533, 3373, 3401, 3413, 3403, 3402, 3668],
+   "map": 121899268,
+   "overridesMap": true,
+   "afterObjectives": [8044],
+   "gives": [{"item": 14920, "count": 1}],
+   "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
   }
  ]
 }

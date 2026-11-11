@@ -12,6 +12,56 @@
       "quest": 1632,
       "criterion": "Qf=1631",
       "why": "«Un pueblo sobre las nubes» is handed over at the village gate, past the end of the celestial temple; the catalogue says BT=1, and Dofus pour les noobs gives «Réponses à tout» as the quest to have done first."
+    },
+    {
+      "quest": 1446,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1447&Qa!1448&Qa!1449&Qa!1450&Qa!1451&Qa!1452&Qa!1453&Qa!1454&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1447,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1448&Qa!1449&Qa!1450&Qa!1451&Qa!1452&Qa!1453&Qa!1454&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1448,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1447&Qa!1449&Qa!1450&Qa!1451&Qa!1452&Qa!1453&Qa!1454&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1449,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1450&Qa!1451&Qa!1452&Qa!1453&Qa!1454&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1450,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1449&Qa!1451&Qa!1452&Qa!1453&Qa!1454&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1451,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1449&Qa!1450&Qa!1452&Qa!1453&Qa!1454&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1452,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1449&Qa!1450&Qa!1451&Qa!1453&Qa!1454&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1453,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1449&Qa!1450&Qa!1451&Qa!1452&Qa!1454&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1454,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1449&Qa!1450&Qa!1451&Qa!1452&Qa!1453&Qa!1455",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
+    },
+    {
+      "quest": 1455,
+      "criterion": "(Qa=1445|Qc=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1449&Qa!1450&Qa!1451&Qa!1452&Qa!1453&Qa!1454",
+      "why": "The catalogue's «Qc=1445» read as «finished» would never let the first formation start: «L'école fantastique» and «Formation des … années» (Dofus pour les noobs) has it taken while «L'école fantastique» is in hand («Pour continuer cette quête, il vous faut maintenant… effectué l'un des quêtes ci-dessous»), and Skalo offers another category the same week once it is done."
     }
   ],
   "objectives": [

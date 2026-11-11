@@ -27284,6 +27284,1428 @@
         }
       ],
       "why": "the Gomberros (Petite Frappe), two of the Smis gang, at [3,3], by «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «Parlez à ... Puis combattez» (16237); the reply starts the fight against 2 x monster 3496 (content/fights/npc_fights.json), which is objective 7902."
+    },
+    {
+      "npc": 2203,
+      "map": 121897984,
+      "opening": 16558,
+      "openings": [
+        { "quest": 1456, "message": 16560 },
+        { "quest": 1457, "message": 16572 },
+        { "quest": 1458, "message": 16595 },
+        { "quest": 1459, "message": 16608 },
+        { "quest": 1460, "message": 16626 }
+      ],
+      "lines": [
+        {
+          "message": 16558,
+          "names": true,
+          "choices": [
+            { "reply": 19720, "next": 16559, "beforeQuest": 1456, "criterion": "QF>1423,0&QF>1445,0" },
+            { "reply": 19733, "startsQuest": 1457, "params": [[34, 1457]], "next": 16571, "criterion": "Qf=1456" },
+            { "reply": 19758, "startsQuest": 1458, "params": [[34, 1458]], "next": 16594, "criterion": "Qf=1457" },
+            { "reply": 19772, "startsQuest": 1459, "params": [[34, 1459]], "next": 16607, "criterion": "Qf=1458" },
+            { "reply": 19790, "startsQuest": 1460, "params": [[34, 1460]], "next": 16625, "criterion": "Qf=1459" },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16559,
+          "choices": [
+            { "reply": 19719, "startsQuest": 1456, "params": [[34, 1456]], "next": 16560 },
+            { "reply": 19822 }
+          ]
+        },
+        {
+          "message": 16560,
+          "choices": [
+            { "reply": 19723, "next": 16561, "quest": 1456 },
+            { "reply": 19823, "next": 16570, "quest": 1456, "completes": 8051, "params": [[30, 8051]], "afterObjectives": [8047, 8048, 8049, 8050] },
+            { "reply": 19823, "next": 17001, "quest": 1456, "beforeObjective": 8051 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16562,
+          "choices": [
+            { "reply": 19721, "quest": 1456, "beforeObjective": 8047, "teleport": 121900298 }
+          ]
+        },
+        {
+          "message": 16563,
+          "choices": []
+        },
+        {
+          "message": 16564,
+          "choices": [
+            { "reply": 19725, "quest": 1456, "beforeObjective": 8048, "teleport": 121900292 }
+          ]
+        },
+        {
+          "message": 16565,
+          "choices": []
+        },
+        {
+          "message": 16566,
+          "choices": [
+            { "reply": 19727, "quest": 1456, "beforeObjective": 8049, "teleport": 121900290 }
+          ]
+        },
+        {
+          "message": 16567,
+          "choices": []
+        },
+        {
+          "message": 16568,
+          "choices": [
+            { "reply": 19729, "quest": 1456, "beforeObjective": 8050, "teleport": 121900296 }
+          ]
+        },
+        {
+          "message": 16569,
+          "choices": []
+        },
+        {
+          "message": 16561,
+          "choices": [
+            { "reply": 19722, "next": 16562, "quest": 1456, "beforeObjective": 8047, "criterion": "Qf=34" },
+            { "reply": 19722, "next": 16563, "quest": 1456, "beforeObjective": 8047, "criterion": "Qf!34" },
+            { "reply": 19726, "next": 16564, "quest": 1456, "beforeObjective": 8048, "criterion": "Qf=1434" },
+            { "reply": 19726, "next": 16565, "quest": 1456, "beforeObjective": 8048, "criterion": "Qf!1434" },
+            { "reply": 19728, "next": 16566, "quest": 1456, "beforeObjective": 8049, "criterion": "Qf=30" },
+            { "reply": 19728, "next": 16567, "quest": 1456, "beforeObjective": 8049, "criterion": "Qf!30" },
+            { "reply": 19730, "next": 16568, "quest": 1456, "beforeObjective": 8050, "criterion": "Qf=35" },
+            { "reply": 19730, "next": 16569, "quest": 1456, "beforeObjective": 8050, "criterion": "Qf!35" }
+          ]
+        },
+        {
+          "message": 16570,
+          "choices": [
+            { "reply": 19731, "startsQuest": 1457, "params": [[34, 1457]], "next": 16571 }
+          ]
+        },
+        {
+          "message": 17001,
+          "choices": []
+        },
+        {
+          "message": 16571,
+          "choices": [
+            { "reply": 19737, "next": 16574, "quest": 1457 },
+            { "reply": 19732, "next": 16593, "quest": 1457, "completes": 8059, "params": [[30, 8059]], "afterObjectives": [8052, 8053, 8054, 8055, 8056, 8057, 8058] },
+            { "reply": 19732, "next": 17002, "quest": 1457, "beforeObjective": 8059 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16572,
+          "choices": [
+            { "reply": 19737, "next": 16574, "quest": 1457 },
+            { "reply": 19732, "next": 16593, "quest": 1457, "completes": 8059, "params": [[30, 8059]], "afterObjectives": [8052, 8053, 8054, 8055, 8056, 8057, 8058] },
+            { "reply": 19732, "next": 17002, "quest": 1457, "beforeObjective": 8059 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16575,
+          "choices": [
+            { "reply": 19735, "quest": 1457, "beforeObjective": 8052, "teleport": 121900298 }
+          ]
+        },
+        {
+          "message": 16576,
+          "choices": []
+        },
+        {
+          "message": 16577,
+          "choices": [
+            { "reply": 19738, "quest": 1457, "beforeObjective": 8053, "teleport": 121900290 }
+          ]
+        },
+        {
+          "message": 16578,
+          "choices": []
+        },
+        {
+          "message": 16579,
+          "choices": [
+            { "reply": 19740, "quest": 1457, "beforeObjective": 8054, "teleport": 121900292 }
+          ]
+        },
+        {
+          "message": 16580,
+          "choices": []
+        },
+        {
+          "message": 16581,
+          "choices": [
+            { "reply": 19742, "quest": 1457, "beforeObjective": 8055, "teleport": 121900294 }
+          ]
+        },
+        {
+          "message": 16582,
+          "choices": []
+        },
+        {
+          "message": 16583,
+          "choices": [
+            { "reply": 19744, "quest": 1457, "beforeObjective": 8056, "teleport": 121900290 }
+          ]
+        },
+        {
+          "message": 16584,
+          "choices": []
+        },
+        {
+          "message": 16585,
+          "choices": [
+            { "reply": 19746, "quest": 1457, "beforeObjective": 8057, "teleport": 121900296 }
+          ]
+        },
+        {
+          "message": 16586,
+          "choices": []
+        },
+        {
+          "message": 16587,
+          "choices": [
+            { "reply": 19748, "quest": 1457, "beforeObjective": 8058, "teleport": 121900294 }
+          ]
+        },
+        {
+          "message": 16588,
+          "choices": []
+        },
+        {
+          "message": 16574,
+          "choices": [
+            { "reply": 19736, "next": 16575, "quest": 1457, "beforeObjective": 8052, "criterion": "Qf=117" },
+            { "reply": 19736, "next": 16576, "quest": 1457, "beforeObjective": 8052, "criterion": "Qf!117" },
+            { "reply": 19739, "next": 16577, "quest": 1457, "beforeObjective": 8053, "criterion": "Qf=33" },
+            { "reply": 19739, "next": 16578, "quest": 1457, "beforeObjective": 8053, "criterion": "Qf!33" },
+            { "reply": 19741, "next": 16579, "quest": 1457, "beforeObjective": 8054, "criterion": "Qf=1435" },
+            { "reply": 19741, "next": 16580, "quest": 1457, "beforeObjective": 8054, "criterion": "Qf!1435" },
+            { "reply": 19743, "next": 16581, "quest": 1457, "beforeObjective": 8055, "criterion": "Qf=32" },
+            { "reply": 19743, "next": 16582, "quest": 1457, "beforeObjective": 8055, "criterion": "Qf!32" },
+            { "reply": 19745, "next": 16583, "quest": 1457, "beforeObjective": 8056, "criterion": "Qf=119" },
+            { "reply": 19745, "next": 16584, "quest": 1457, "beforeObjective": 8056, "criterion": "Qf!119" },
+            { "reply": 19747, "next": 16585, "quest": 1457, "beforeObjective": 8057, "criterion": "Qf=116" },
+            { "reply": 19747, "next": 16586, "quest": 1457, "beforeObjective": 8057, "criterion": "Qf!116" },
+            { "reply": 19749, "next": 16587, "quest": 1457, "beforeObjective": 8058, "criterion": "Qf=115" },
+            { "reply": 19749, "next": 16588, "quest": 1457, "beforeObjective": 8058, "criterion": "Qf!115" }
+          ]
+        },
+        {
+          "message": 16593,
+          "choices": [
+            { "reply": 19756, "startsQuest": 1458, "params": [[34, 1458]], "next": 16594 }
+          ]
+        },
+        {
+          "message": 17002,
+          "choices": []
+        },
+        {
+          "message": 16594,
+          "choices": [
+            { "reply": 19759, "next": 16596, "quest": 1458 },
+            { "reply": 19757, "next": 16606, "quest": 1458, "completes": 8064, "params": [[30, 8064]], "afterObjectives": [8060, 8061, 8062, 8063] },
+            { "reply": 19757, "next": 17003, "quest": 1458, "beforeObjective": 8064 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16595,
+          "choices": [
+            { "reply": 19759, "next": 16596, "quest": 1458 },
+            { "reply": 19757, "next": 16606, "quest": 1458, "completes": 8064, "params": [[30, 8064]], "afterObjectives": [8060, 8061, 8062, 8063] },
+            { "reply": 19757, "next": 17003, "quest": 1458, "beforeObjective": 8064 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16597,
+          "choices": [
+            { "reply": 19760, "quest": 1458, "beforeObjective": 8060, "teleport": 121900294 }
+          ]
+        },
+        {
+          "message": 16598,
+          "choices": []
+        },
+        {
+          "message": 16599,
+          "choices": [
+            { "reply": 19762, "quest": 1458, "beforeObjective": 8061, "teleport": 121900296 }
+          ]
+        },
+        {
+          "message": 16600,
+          "choices": []
+        },
+        {
+          "message": 16602,
+          "choices": [
+            { "reply": 19766, "quest": 1458, "beforeObjective": 8062, "teleport": 121900292 }
+          ]
+        },
+        {
+          "message": 16603,
+          "choices": []
+        },
+        {
+          "message": 16604,
+          "choices": [
+            { "reply": 19768, "quest": 1458, "beforeObjective": 8063, "teleport": 121900298 }
+          ]
+        },
+        {
+          "message": 16605,
+          "choices": []
+        },
+        {
+          "message": 16596,
+          "choices": [
+            { "reply": 19761, "next": 16597, "quest": 1458, "beforeObjective": 8060, "criterion": "Qf=544" },
+            { "reply": 19761, "next": 16598, "quest": 1458, "beforeObjective": 8060, "criterion": "Qf!544" },
+            { "reply": 19763, "next": 16599, "quest": 1458, "beforeObjective": 8061, "criterion": "Qf=29" },
+            { "reply": 19763, "next": 16600, "quest": 1458, "beforeObjective": 8061, "criterion": "Qf!29" },
+            { "reply": 19767, "next": 16602, "quest": 1458, "beforeObjective": 8062, "criterion": "Qf=1430" },
+            { "reply": 19767, "next": 16603, "quest": 1458, "beforeObjective": 8062, "criterion": "Qf!1430" },
+            { "reply": 19769, "next": 16604, "quest": 1458, "beforeObjective": 8063, "criterion": "Qf=545" },
+            { "reply": 19769, "next": 16605, "quest": 1458, "beforeObjective": 8063, "criterion": "Qf!545" }
+          ]
+        },
+        {
+          "message": 16606,
+          "choices": [
+            { "reply": 19770, "startsQuest": 1459, "params": [[34, 1459]], "next": 16607 }
+          ]
+        },
+        {
+          "message": 17003,
+          "choices": []
+        },
+        {
+          "message": 16607,
+          "choices": [
+            { "reply": 19773, "next": 16609, "quest": 1459 },
+            { "reply": 19771, "next": 16624, "quest": 1459, "completes": 8072, "params": [[30, 8072]], "afterObjectives": [8065, 8066, 8067, 8068, 8069, 8070, 8071] },
+            { "reply": 19771, "next": 17004, "quest": 1459, "beforeObjective": 8072 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16608,
+          "choices": [
+            { "reply": 19773, "next": 16609, "quest": 1459 },
+            { "reply": 19771, "next": 16624, "quest": 1459, "completes": 8072, "params": [[30, 8072]], "afterObjectives": [8065, 8066, 8067, 8068, 8069, 8070, 8071] },
+            { "reply": 19771, "next": 17004, "quest": 1459, "beforeObjective": 8072 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16610,
+          "choices": [
+            { "reply": 19774, "quest": 1459, "beforeObjective": 8065, "teleport": 121900298 }
+          ]
+        },
+        {
+          "message": 16611,
+          "choices": []
+        },
+        {
+          "message": 16612,
+          "choices": [
+            { "reply": 19776, "quest": 1459, "beforeObjective": 8066, "teleport": 121900294 }
+          ]
+        },
+        {
+          "message": 16613,
+          "choices": []
+        },
+        {
+          "message": 16614,
+          "choices": [
+            { "reply": 19778, "quest": 1459, "beforeObjective": 8067, "teleport": 121900298 }
+          ]
+        },
+        {
+          "message": 16615,
+          "choices": []
+        },
+        {
+          "message": 16616,
+          "choices": [
+            { "reply": 19780, "quest": 1459, "beforeObjective": 8068, "teleport": 121900292 }
+          ]
+        },
+        {
+          "message": 16617,
+          "choices": []
+        },
+        {
+          "message": 16618,
+          "choices": [
+            { "reply": 19782, "quest": 1459, "beforeObjective": 8069, "teleport": 121900296 }
+          ]
+        },
+        {
+          "message": 16619,
+          "choices": []
+        },
+        {
+          "message": 16620,
+          "choices": [
+            { "reply": 19784, "quest": 1459, "beforeObjective": 8070, "teleport": 121900296 }
+          ]
+        },
+        {
+          "message": 16621,
+          "choices": []
+        },
+        {
+          "message": 16622,
+          "choices": [
+            { "reply": 19786, "quest": 1459, "beforeObjective": 8071, "teleport": 121900290 }
+          ]
+        },
+        {
+          "message": 16623,
+          "choices": []
+        },
+        {
+          "message": 16609,
+          "choices": [
+            { "reply": 19775, "next": 16610, "quest": 1459, "beforeObjective": 8065, "criterion": "Qf=1436" },
+            { "reply": 19775, "next": 16611, "quest": 1459, "beforeObjective": 8065, "criterion": "Qf!1436" },
+            { "reply": 19777, "next": 16612, "quest": 1459, "beforeObjective": 8066, "criterion": "Qf=546" },
+            { "reply": 19777, "next": 16613, "quest": 1459, "beforeObjective": 8066, "criterion": "Qf!546" },
+            { "reply": 19779, "next": 16614, "quest": 1459, "beforeObjective": 8067, "criterion": "Qf=118" },
+            { "reply": 19779, "next": 16615, "quest": 1459, "beforeObjective": 8067, "criterion": "Qf!118" },
+            { "reply": 19781, "next": 16616, "quest": 1459, "beforeObjective": 8068, "criterion": "Qf=547" },
+            { "reply": 19781, "next": 16617, "quest": 1459, "beforeObjective": 8068, "criterion": "Qf!547" },
+            { "reply": 19783, "next": 16618, "quest": 1459, "beforeObjective": 8069, "criterion": "Qf=548" },
+            { "reply": 19783, "next": 16619, "quest": 1459, "beforeObjective": 8069, "criterion": "Qf!548" },
+            { "reply": 19785, "next": 16620, "quest": 1459, "beforeObjective": 8070, "criterion": "Qf=549" },
+            { "reply": 19785, "next": 16621, "quest": 1459, "beforeObjective": 8070, "criterion": "Qf!549" },
+            { "reply": 19787, "next": 16622, "quest": 1459, "beforeObjective": 8071, "criterion": "Qf=550" },
+            { "reply": 19787, "next": 16623, "quest": 1459, "beforeObjective": 8071, "criterion": "Qf!550" }
+          ]
+        },
+        {
+          "message": 16624,
+          "choices": [
+            { "reply": 19788, "startsQuest": 1460, "params": [[34, 1460]], "next": 16625 }
+          ]
+        },
+        {
+          "message": 17004,
+          "choices": []
+        },
+        {
+          "message": 16625,
+          "choices": [
+            { "reply": 19791, "next": 16627, "quest": 1460 },
+            { "reply": 19789, "next": 16654, "quest": 1460, "completes": 8083, "params": [[30, 8083]], "afterObjectives": [8073, 8074, 8075, 8076, 8077, 8078, 8079, 8080, 8081, 8082] },
+            { "reply": 19789, "next": 17005, "quest": 1460, "beforeObjective": 8083 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16626,
+          "choices": [
+            { "reply": 19791, "next": 16627, "quest": 1460 },
+            { "reply": 19789, "next": 16654, "quest": 1460, "completes": 8083, "params": [[30, 8083]], "afterObjectives": [8073, 8074, 8075, 8076, 8077, 8078, 8079, 8080, 8081, 8082] },
+            { "reply": 19789, "next": 17005, "quest": 1460, "beforeObjective": 8083 },
+            { "reply": 19824, "next": 16655 }
+          ]
+        },
+        {
+          "message": 16628,
+          "choices": [
+            { "reply": 19792, "quest": 1460, "beforeObjective": 8073, "teleport": 121900290 }
+          ]
+        },
+        {
+          "message": 16629,
+          "choices": []
+        },
+        {
+          "message": 16630,
+          "choices": [
+            { "reply": 19794, "quest": 1460, "beforeObjective": 8074, "teleport": 121900296 }
+          ]
+        },
+        {
+          "message": 16631,
+          "choices": []
+        },
+        {
+          "message": 16632,
+          "choices": [
+            { "reply": 19796, "quest": 1460, "beforeObjective": 8075, "teleport": 121900294 }
+          ]
+        },
+        {
+          "message": 16633,
+          "choices": []
+        },
+        {
+          "message": 16640,
+          "choices": [
+            { "reply": 19808, "quest": 1460, "beforeObjective": 8076, "teleport": 121900298 }
+          ]
+        },
+        {
+          "message": 16641,
+          "choices": []
+        },
+        {
+          "message": 16642,
+          "choices": [
+            { "reply": 19810, "quest": 1460, "beforeObjective": 8077, "teleport": 121900292 }
+          ]
+        },
+        {
+          "message": 16643,
+          "choices": []
+        },
+        {
+          "message": 16644,
+          "choices": [
+            { "reply": 19812, "quest": 1460, "beforeObjective": 8078, "teleport": 121900290 }
+          ]
+        },
+        {
+          "message": 16645,
+          "choices": []
+        },
+        {
+          "message": 16646,
+          "choices": [
+            { "reply": 19814, "quest": 1460, "beforeObjective": 8079, "teleport": 121900292 }
+          ]
+        },
+        {
+          "message": 16647,
+          "choices": []
+        },
+        {
+          "message": 16648,
+          "choices": [
+            { "reply": 19816, "quest": 1460, "beforeObjective": 8080, "teleport": 121900296 }
+          ]
+        },
+        {
+          "message": 16649,
+          "choices": []
+        },
+        {
+          "message": 16650,
+          "choices": [
+            { "reply": 19818, "quest": 1460, "beforeObjective": 8081, "teleport": 121900298 }
+          ]
+        },
+        {
+          "message": 16651,
+          "choices": []
+        },
+        {
+          "message": 16652,
+          "choices": [
+            { "reply": 19820, "quest": 1460, "beforeObjective": 8082, "teleport": 121900294 }
+          ]
+        },
+        {
+          "message": 16653,
+          "choices": []
+        },
+        {
+          "message": 16627,
+          "choices": [
+            { "reply": 19793, "next": 16628, "quest": 1460, "beforeObjective": 8073, "criterion": "Qf=551" },
+            { "reply": 19793, "next": 16629, "quest": 1460, "beforeObjective": 8073, "criterion": "Qf!551" },
+            { "reply": 19795, "next": 16630, "quest": 1460, "beforeObjective": 8074, "criterion": "Qf=552" },
+            { "reply": 19795, "next": 16631, "quest": 1460, "beforeObjective": 8074, "criterion": "Qf!552" },
+            { "reply": 19797, "next": 16632, "quest": 1460, "beforeObjective": 8075, "criterion": "Qf=553" },
+            { "reply": 19797, "next": 16633, "quest": 1460, "beforeObjective": 8075, "criterion": "Qf!553" },
+            { "reply": 19809, "next": 16640, "quest": 1460, "beforeObjective": 8076, "criterion": "Qf=1332" },
+            { "reply": 19809, "next": 16641, "quest": 1460, "beforeObjective": 8076, "criterion": "Qf!1332" },
+            { "reply": 19811, "next": 16642, "quest": 1460, "beforeObjective": 8077, "criterion": "Qf=1437" },
+            { "reply": 19811, "next": 16643, "quest": 1460, "beforeObjective": 8077, "criterion": "Qf!1437" },
+            { "reply": 19813, "next": 16644, "quest": 1460, "beforeObjective": 8078, "criterion": "Qf=1289" },
+            { "reply": 19813, "next": 16645, "quest": 1460, "beforeObjective": 8078, "criterion": "Qf!1289" },
+            { "reply": 19815, "next": 16646, "quest": 1460, "beforeObjective": 8079, "criterion": "Qf=1290" },
+            { "reply": 19815, "next": 16647, "quest": 1460, "beforeObjective": 8079, "criterion": "Qf!1290" },
+            { "reply": 19817, "next": 16648, "quest": 1460, "beforeObjective": 8080, "criterion": "Qf=1291" },
+            { "reply": 19817, "next": 16649, "quest": 1460, "beforeObjective": 8080, "criterion": "Qf!1291" },
+            { "reply": 19819, "next": 16650, "quest": 1460, "beforeObjective": 8081, "criterion": "Qf=1292" },
+            { "reply": 19819, "next": 16651, "quest": 1460, "beforeObjective": 8081, "criterion": "Qf!1292" },
+            { "reply": 19821, "next": 16652, "quest": 1460, "beforeObjective": 8082, "criterion": "Qf=1293" },
+            { "reply": 19821, "next": 16653, "quest": 1460, "beforeObjective": 8082, "criterion": "Qf!1293" }
+          ]
+        },
+        {
+          "message": 16654,
+          "choices": []
+        },
+        {
+          "message": 17005,
+          "choices": []
+        },
+        {
+          "message": 16655,
+          "choices": [
+            { "reply": 19825, "teleport": 121900298, "criterion": "Qf=34" },
+            { "reply": 19826, "teleport": 121900292, "criterion": "Qf=1434" },
+            { "reply": 19827, "teleport": 121900290, "criterion": "Qf=30" },
+            { "reply": 19828, "teleport": 121900296, "criterion": "Qf=35" },
+            { "reply": 19829, "teleport": 121900298, "criterion": "Qf=117" },
+            { "reply": 19830, "teleport": 121900290, "criterion": "Qf=33" },
+            { "reply": 19831, "teleport": 121900292, "criterion": "Qf=1435" },
+            { "reply": 19832, "teleport": 121900294, "criterion": "Qf=32" },
+            { "reply": 19833, "teleport": 121900290, "criterion": "Qf=119" },
+            { "reply": 19834, "teleport": 121900296, "criterion": "Qf=116" },
+            { "reply": 19835, "teleport": 121900294, "criterion": "Qf=115" },
+            { "reply": 19836, "teleport": 121900294, "criterion": "Qf=544" },
+            { "reply": 19837, "teleport": 121900296, "criterion": "Qf=29" },
+            { "reply": 19838, "teleport": 121900292, "criterion": "Qf=1430" },
+            { "reply": 19839, "teleport": 121900298, "criterion": "Qf=545" },
+            { "reply": 19840, "teleport": 121900298, "criterion": "Qf=1436" },
+            { "reply": 19841, "teleport": 121900294, "criterion": "Qf=546" },
+            { "reply": 19842, "teleport": 121900298, "criterion": "Qf=118" },
+            { "reply": 19843, "teleport": 121900292, "criterion": "Qf=547" },
+            { "reply": 19844, "teleport": 121900296, "criterion": "Qf=548" },
+            { "reply": 19845, "teleport": 121900296, "criterion": "Qf=549" },
+            { "reply": 19846, "teleport": 121900290, "criterion": "Qf=550" },
+            { "reply": 19847, "teleport": 121900290, "criterion": "Qf=551" },
+            { "reply": 19848, "teleport": 121900296, "criterion": "Qf=552" },
+            { "reply": 19849, "teleport": 121900294, "criterion": "Qf=553" },
+            { "reply": 19850, "teleport": 121900298, "criterion": "Qf=1332" },
+            { "reply": 19851, "teleport": 121900292, "criterion": "Qf=1437" },
+            { "reply": 19852, "teleport": 121900290, "criterion": "Qf=1289" },
+            { "reply": 19853, "teleport": 121900292, "criterion": "Qf=1290" },
+            { "reply": 19854, "teleport": 121900296, "criterion": "Qf=1291" },
+            { "reply": 19855, "teleport": 121900298, "criterion": "Qf=1292" },
+            { "reply": 19856, "teleport": 121900294, "criterion": "Qf=1293" }
+          ]
+        }
+      ],
+      "why": "Cuerbax in the classroom of the Justiciers' base, by «Stage de combat improvisé» (Dofus pour les noobs) and his own lines. Once «Proteger y servir» and «Escuela de superhéroes» are done (the catalogue's QF>1423,0&QF>1445,0), «Pedir más información» brings the offer (16559) and «Aceptar.» starts «Prácticas en combate improvisado» (16560: «si el recluta pierde el conocimiento durante el combate, se anulará la evaluación»). «Quiero evaluar a un recluta.» lists the pairings the quest still has to do («Al recluta explosivo contra los Gumbre»…); a prisoner already captured gives «El combate en grupo…» and «Ir a la sala de combate», the room of the quest's own objective, else «Para hacerlo, tienes que capturar primero a…». «¿Cómo han ido las evaluaciones?» is the report once every fight is won (16570, 16593, 16606, 16624, 16654) with the next quest's «Aceptar.», or «Estoy desbordado…» before. The next quest can also be taken later («Aceptar la proposición anterior»). «Quiero ayudar a un amigo…» (16655) takes the character to a captured prisoner's room. The step dialogs of the catalogue are the lines after each acceptance (16560, 16571, 16594, 16607, 16625); the second «No voy a volver a explicarte…» of each quest is its opening while in hand."
+    },
+    {
+      "npc": 2209,
+      "map": 121900290,
+      "opening": 16671,
+      "lines": [
+        {
+          "message": 16671,
+          "choices": [
+            { "reply": 19873, "next": 16674, "quest": 1457, "beforeObjective": 8056, "criterion": "Qf=119" },
+            { "reply": 19873, "next": 16675, "quest": 1457, "beforeObjective": 8056, "criterion": "Qf!119" }
+          ]
+        },
+        {
+          "message": 16674,
+          "choices": [
+            { "reply": 19872, "quest": 1457, "beforeObjective": 8056 }
+          ]
+        },
+        {
+          "message": 16675,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured. Cuerbax's reply names the thirsty recruit against Aermyn and the bandaged one against the Ice Knight, but those fights are in the sneaky and the explosive recruits' own lines, which are followed."
+    },
+    {
+      "npc": 2211,
+      "map": 121900290,
+      "opening": 16706,
+      "lines": [
+        {
+          "message": 16706,
+          "choices": [
+            { "reply": 19906, "next": 16707, "quest": 1456, "beforeObjective": 8049, "criterion": "Qf=30" },
+            { "reply": 19906, "next": 16708, "quest": 1456, "beforeObjective": 8049, "criterion": "Qf!30" },
+            { "reply": 19912, "next": 16713, "quest": 1460, "beforeObjective": 8073, "criterion": "Qf=551" },
+            { "reply": 19912, "next": 16714, "quest": 1460, "beforeObjective": 8073, "criterion": "Qf!551" }
+          ]
+        },
+        {
+          "message": 16707,
+          "choices": [
+            { "reply": 19905, "quest": 1456, "beforeObjective": 8049 }
+          ]
+        },
+        {
+          "message": 16708,
+          "choices": []
+        },
+        {
+          "message": 16713,
+          "choices": [
+            { "reply": 19911, "quest": 1460, "beforeObjective": 8073 }
+          ]
+        },
+        {
+          "message": 16714,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2212,
+      "map": 121900290,
+      "opening": 16718,
+      "lines": [
+        {
+          "message": 16718,
+          "choices": [
+            { "reply": 19917, "next": 16719, "quest": 1457, "beforeObjective": 8053, "criterion": "Qf=33" },
+            { "reply": 19917, "next": 16720, "quest": 1457, "beforeObjective": 8053, "criterion": "Qf!33" }
+          ]
+        },
+        {
+          "message": 16719,
+          "choices": [
+            { "reply": 19916, "quest": 1457, "beforeObjective": 8053 }
+          ]
+        },
+        {
+          "message": 16720,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2213,
+      "map": 121900290,
+      "opening": 16735,
+      "lines": [
+        {
+          "message": 16735,
+          "choices": [
+            { "reply": 19939, "next": 16742, "quest": 1459, "beforeObjective": 8071, "criterion": "Qf=550" },
+            { "reply": 19939, "next": 16743, "quest": 1459, "beforeObjective": 8071, "criterion": "Qf!550" },
+            { "reply": 19941, "next": 16744, "quest": 1460, "beforeObjective": 8078, "criterion": "Qf=1289" },
+            { "reply": 19941, "next": 16745, "quest": 1460, "beforeObjective": 8078, "criterion": "Qf!1289" }
+          ]
+        },
+        {
+          "message": 16742,
+          "choices": [
+            { "reply": 19938, "quest": 1459, "beforeObjective": 8071 }
+          ]
+        },
+        {
+          "message": 16743,
+          "choices": []
+        },
+        {
+          "message": 16744,
+          "choices": [
+            { "reply": 19940, "quest": 1460, "beforeObjective": 8078 }
+          ]
+        },
+        {
+          "message": 16745,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2208,
+      "map": 121900292,
+      "opening": 16659,
+      "lines": [
+        {
+          "message": 16659,
+          "choices": [
+            { "reply": 19860, "next": 16660, "quest": 1456, "beforeObjective": 8048, "criterion": "Qf=1434" },
+            { "reply": 19860, "next": 16661, "quest": 1456, "beforeObjective": 8048, "criterion": "Qf!1434" },
+            { "reply": 19868, "next": 16668, "quest": 1460, "beforeObjective": 8077, "criterion": "Qf=1437" },
+            { "reply": 19868, "next": 16669, "quest": 1460, "beforeObjective": 8077, "criterion": "Qf!1437" }
+          ]
+        },
+        {
+          "message": 16660,
+          "choices": [
+            { "reply": 19859, "quest": 1456, "beforeObjective": 8048 }
+          ]
+        },
+        {
+          "message": 16661,
+          "choices": []
+        },
+        {
+          "message": 16668,
+          "choices": [
+            { "reply": 19867, "quest": 1460, "beforeObjective": 8077 }
+          ]
+        },
+        {
+          "message": 16669,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2210,
+      "map": 121900292,
+      "opening": 16683,
+      "lines": [
+        {
+          "message": 16683,
+          "choices": [
+            { "reply": 19888, "next": 16690, "quest": 1459, "beforeObjective": 8068, "criterion": "Qf=547" },
+            { "reply": 19888, "next": 16691, "quest": 1459, "beforeObjective": 8068, "criterion": "Qf!547" },
+            { "reply": 19890, "next": 16692, "quest": 1460, "beforeObjective": 8079, "criterion": "Qf=1290" },
+            { "reply": 19890, "next": 16693, "quest": 1460, "beforeObjective": 8079, "criterion": "Qf!1290" }
+          ]
+        },
+        {
+          "message": 16690,
+          "choices": [
+            { "reply": 19887, "quest": 1459, "beforeObjective": 8068 }
+          ]
+        },
+        {
+          "message": 16691,
+          "choices": []
+        },
+        {
+          "message": 16692,
+          "choices": [
+            { "reply": 19889, "quest": 1460, "beforeObjective": 8079 }
+          ]
+        },
+        {
+          "message": 16693,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2211,
+      "map": 121900292,
+      "opening": 16706,
+      "lines": [
+        {
+          "message": 16706,
+          "choices": [
+            { "reply": 19908, "next": 16709, "quest": 1457, "beforeObjective": 8054, "criterion": "Qf=1435" },
+            { "reply": 19908, "next": 16710, "quest": 1457, "beforeObjective": 8054, "criterion": "Qf!1435" }
+          ]
+        },
+        {
+          "message": 16709,
+          "choices": [
+            { "reply": 19907, "quest": 1457, "beforeObjective": 8054 }
+          ]
+        },
+        {
+          "message": 16710,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2212,
+      "map": 121900292,
+      "opening": 16718,
+      "lines": [
+        {
+          "message": 16718,
+          "choices": [
+            { "reply": 19921, "next": 16723, "quest": 1458, "beforeObjective": 8062, "criterion": "Qf=1430" },
+            { "reply": 19921, "next": 16724, "quest": 1458, "beforeObjective": 8062, "criterion": "Qf!1430" }
+          ]
+        },
+        {
+          "message": 16723,
+          "choices": [
+            { "reply": 19920, "quest": 1458, "beforeObjective": 8062 }
+          ]
+        },
+        {
+          "message": 16724,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2208,
+      "map": 121900294,
+      "opening": 16659,
+      "lines": [
+        {
+          "message": 16659,
+          "choices": [
+            { "reply": 19862, "next": 16662, "quest": 1457, "beforeObjective": 8055, "criterion": "Qf=32" },
+            { "reply": 19862, "next": 16663, "quest": 1457, "beforeObjective": 8055, "criterion": "Qf!32" }
+          ]
+        },
+        {
+          "message": 16662,
+          "choices": [
+            { "reply": 19861, "quest": 1457, "beforeObjective": 8055 }
+          ]
+        },
+        {
+          "message": 16663,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2209,
+      "map": 121900294,
+      "opening": 16671,
+      "lines": [
+        {
+          "message": 16671,
+          "choices": [
+            { "reply": 19879, "next": 16680, "quest": 1460, "beforeObjective": 8075, "criterion": "Qf=553" },
+            { "reply": 19879, "next": 16681, "quest": 1460, "beforeObjective": 8075, "criterion": "Qf!553" }
+          ]
+        },
+        {
+          "message": 16680,
+          "choices": [
+            { "reply": 19878, "quest": 1460, "beforeObjective": 8075 }
+          ]
+        },
+        {
+          "message": 16681,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2210,
+      "map": 121900294,
+      "opening": 16683,
+      "lines": [
+        {
+          "message": 16683,
+          "choices": [
+            { "reply": 19884, "next": 16686, "quest": 1457, "beforeObjective": 8058, "criterion": "Qf=115" },
+            { "reply": 19884, "next": 16687, "quest": 1457, "beforeObjective": 8058, "criterion": "Qf!115" }
+          ]
+        },
+        {
+          "message": 16686,
+          "choices": [
+            { "reply": 19883, "quest": 1457, "beforeObjective": 8058 }
+          ]
+        },
+        {
+          "message": 16687,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2211,
+      "map": 121900294,
+      "opening": 16706,
+      "lines": [
+        {
+          "message": 16706,
+          "choices": [
+            { "reply": 19910, "next": 16711, "quest": 1459, "beforeObjective": 8066, "criterion": "Qf=546" },
+            { "reply": 19910, "next": 16712, "quest": 1459, "beforeObjective": 8066, "criterion": "Qf!546" }
+          ]
+        },
+        {
+          "message": 16711,
+          "choices": [
+            { "reply": 19909, "quest": 1459, "beforeObjective": 8066 }
+          ]
+        },
+        {
+          "message": 16712,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2213,
+      "map": 121900294,
+      "opening": 16735,
+      "lines": [
+        {
+          "message": 16735,
+          "choices": [
+            { "reply": 19935, "next": 16738, "quest": 1458, "beforeObjective": 8060, "criterion": "Qf=544" },
+            { "reply": 19935, "next": 16739, "quest": 1458, "beforeObjective": 8060, "criterion": "Qf!544" },
+            { "reply": 19943, "next": 16746, "quest": 1460, "beforeObjective": 8082, "criterion": "Qf=1293" },
+            { "reply": 19943, "next": 16747, "quest": 1460, "beforeObjective": 8082, "criterion": "Qf!1293" }
+          ]
+        },
+        {
+          "message": 16738,
+          "choices": [
+            { "reply": 19934, "quest": 1458, "beforeObjective": 8060 }
+          ]
+        },
+        {
+          "message": 16739,
+          "choices": []
+        },
+        {
+          "message": 16746,
+          "choices": [
+            { "reply": 19942, "quest": 1460, "beforeObjective": 8082 }
+          ]
+        },
+        {
+          "message": 16747,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2208,
+      "map": 121900296,
+      "opening": 16659,
+      "lines": [
+        {
+          "message": 16659,
+          "choices": [
+            { "reply": 19866, "next": 16666, "quest": 1459, "beforeObjective": 8070, "criterion": "Qf=549" },
+            { "reply": 19866, "next": 16667, "quest": 1459, "beforeObjective": 8070, "criterion": "Qf!549" }
+          ]
+        },
+        {
+          "message": 16666,
+          "choices": [
+            { "reply": 19865, "quest": 1459, "beforeObjective": 8070 }
+          ]
+        },
+        {
+          "message": 16667,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2209,
+      "map": 121900296,
+      "opening": 16671,
+      "lines": [
+        {
+          "message": 16671,
+          "choices": [
+            { "reply": 19875, "next": 16676, "quest": 1458, "beforeObjective": 8061, "criterion": "Qf=29" },
+            { "reply": 19875, "next": 16677, "quest": 1458, "beforeObjective": 8061, "criterion": "Qf!29" },
+            { "reply": 19877, "next": 16678, "quest": 1460, "beforeObjective": 8074, "criterion": "Qf=552" },
+            { "reply": 19877, "next": 16679, "quest": 1460, "beforeObjective": 8074, "criterion": "Qf!552" }
+          ]
+        },
+        {
+          "message": 16676,
+          "choices": [
+            { "reply": 19874, "quest": 1458, "beforeObjective": 8061 }
+          ]
+        },
+        {
+          "message": 16677,
+          "choices": []
+        },
+        {
+          "message": 16678,
+          "choices": [
+            { "reply": 19876, "quest": 1460, "beforeObjective": 8074 }
+          ]
+        },
+        {
+          "message": 16679,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2212,
+      "map": 121900296,
+      "opening": 16718,
+      "lines": [
+        {
+          "message": 16718,
+          "choices": [
+            { "reply": 19919, "next": 16721, "quest": 1457, "beforeObjective": 8057, "criterion": "Qf=116" },
+            { "reply": 19919, "next": 16722, "quest": 1457, "beforeObjective": 8057, "criterion": "Qf!116" },
+            { "reply": 19923, "next": 16725, "quest": 1459, "beforeObjective": 8069, "criterion": "Qf=548" },
+            { "reply": 19923, "next": 16726, "quest": 1459, "beforeObjective": 8069, "criterion": "Qf!548" },
+            { "reply": 19925, "next": 16727, "quest": 1460, "beforeObjective": 8080, "criterion": "Qf=1291" },
+            { "reply": 19925, "next": 16728, "quest": 1460, "beforeObjective": 8080, "criterion": "Qf!1291" }
+          ]
+        },
+        {
+          "message": 16721,
+          "choices": [
+            { "reply": 19918, "quest": 1457, "beforeObjective": 8057 }
+          ]
+        },
+        {
+          "message": 16722,
+          "choices": []
+        },
+        {
+          "message": 16725,
+          "choices": [
+            { "reply": 19922, "quest": 1459, "beforeObjective": 8069 }
+          ]
+        },
+        {
+          "message": 16726,
+          "choices": []
+        },
+        {
+          "message": 16727,
+          "choices": [
+            { "reply": 19924, "quest": 1460, "beforeObjective": 8080 }
+          ]
+        },
+        {
+          "message": 16728,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2213,
+      "map": 121900296,
+      "opening": 16735,
+      "lines": [
+        {
+          "message": 16735,
+          "choices": [
+            { "reply": 19933, "next": 16736, "quest": 1456, "beforeObjective": 8050, "criterion": "Qf=35" },
+            { "reply": 19933, "next": 16737, "quest": 1456, "beforeObjective": 8050, "criterion": "Qf!35" }
+          ]
+        },
+        {
+          "message": 16736,
+          "choices": [
+            { "reply": 19932, "quest": 1456, "beforeObjective": 8050 }
+          ]
+        },
+        {
+          "message": 16737,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2208,
+      "map": 121900298,
+      "opening": 16659,
+      "lines": [
+        {
+          "message": 16659,
+          "choices": [
+            { "reply": 19864, "next": 16664, "quest": 1459, "beforeObjective": 8065, "criterion": "Qf=1436" },
+            { "reply": 19864, "next": 16665, "quest": 1459, "beforeObjective": 8065, "criterion": "Qf!1436" },
+            { "reply": 20268, "next": 16990, "quest": 1460, "beforeObjective": 8081, "criterion": "Qf=1292" },
+            { "reply": 20268, "next": 16991, "quest": 1460, "beforeObjective": 8081, "criterion": "Qf!1292" }
+          ]
+        },
+        {
+          "message": 16664,
+          "choices": [
+            { "reply": 19863, "quest": 1459, "beforeObjective": 8065 }
+          ]
+        },
+        {
+          "message": 16665,
+          "choices": []
+        },
+        {
+          "message": 16990,
+          "choices": [
+            { "reply": 20267, "quest": 1460, "beforeObjective": 8081 }
+          ]
+        },
+        {
+          "message": 16991,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured. Cuerbax's reply names the thirsty recruit against Aermyn and the bandaged one against the Ice Knight, but those fights are in the sneaky and the explosive recruits' own lines, which are followed."
+    },
+    {
+      "npc": 2209,
+      "map": 121900298,
+      "opening": 16671,
+      "lines": [
+        {
+          "message": 16671,
+          "choices": [
+            { "reply": 19871, "next": 16672, "quest": 1457, "beforeObjective": 8052, "criterion": "Qf=117" },
+            { "reply": 19871, "next": 16673, "quest": 1457, "beforeObjective": 8052, "criterion": "Qf!117" }
+          ]
+        },
+        {
+          "message": 16672,
+          "choices": [
+            { "reply": 19870, "quest": 1457, "beforeObjective": 8052 }
+          ]
+        },
+        {
+          "message": 16673,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2210,
+      "map": 121900298,
+      "opening": 16683,
+      "lines": [
+        {
+          "message": 16683,
+          "choices": [
+            { "reply": 19882, "next": 16684, "quest": 1456, "beforeObjective": 8047, "criterion": "Qf=34" },
+            { "reply": 19882, "next": 16685, "quest": 1456, "beforeObjective": 8047, "criterion": "Qf!34" },
+            { "reply": 19886, "next": 16688, "quest": 1458, "beforeObjective": 8063, "criterion": "Qf=545" },
+            { "reply": 19886, "next": 16689, "quest": 1458, "beforeObjective": 8063, "criterion": "Qf!545" }
+          ]
+        },
+        {
+          "message": 16684,
+          "choices": [
+            { "reply": 19881, "quest": 1456, "beforeObjective": 8047 }
+          ]
+        },
+        {
+          "message": 16685,
+          "choices": []
+        },
+        {
+          "message": 16688,
+          "choices": [
+            { "reply": 19885, "quest": 1458, "beforeObjective": 8063 }
+          ]
+        },
+        {
+          "message": 16689,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2211,
+      "map": 121900298,
+      "opening": 16706,
+      "lines": [
+        {
+          "message": 16706,
+          "choices": [
+            { "reply": 19914, "next": 16715, "quest": 1460, "beforeObjective": 8076, "criterion": "Qf=1332" },
+            { "reply": 19914, "next": 16716, "quest": 1460, "beforeObjective": 8076, "criterion": "Qf!1332" }
+          ]
+        },
+        {
+          "message": 16715,
+          "choices": [
+            { "reply": 19913, "quest": 1460, "beforeObjective": 8076 }
+          ]
+        },
+        {
+          "message": 16716,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2213,
+      "map": 121900298,
+      "opening": 16735,
+      "lines": [
+        {
+          "message": 16735,
+          "choices": [
+            { "reply": 19937, "next": 16740, "quest": 1459, "beforeObjective": 8067, "criterion": "Qf=118" },
+            { "reply": 19937, "next": 16741, "quest": 1459, "beforeObjective": 8067, "criterion": "Qf!118" }
+          ]
+        },
+        {
+          "message": 16740,
+          "choices": [
+            { "reply": 19936, "quest": 1459, "beforeObjective": 8067 }
+          ]
+        },
+        {
+          "message": 16741,
+          "choices": []
+        }
+      ],
+      "why": "A recruit in one of Cuerbax's combat rooms, by «Stage de combat improvisé» (Dofus pour les noobs): «parlez à la Recrue assoiffée afin de lancer le combat». Its evaluation line, then «¿Listo para enfrentarte a…?» for each evaluation of the quest in hand that is fought here, its answer and «Luchar contra…»; its «no veo a nuestro adversario» when the prisoner has not been captured."
+    },
+    {
+      "npc": 2202,
+      "map": 121897984,
+      "opening": 16483,
+      "lines": [
+        {
+          "message": 16483,
+          "choices": [
+            { "reply": 19638, "next": 16484, "criterion": "(Qf=29|Qf=30|Qf=32|Qf=33|Qf=34|Qf=35|Qf=115|Qf=116|Qf=117|Qf=118|Qf=119|Qf=544|Qf=545|Qf=546|Qf=547|Qf=548|Qf=549|Qf=550|Qf=551|Qf=552|Qf=553|Qf=1289|Qf=1290|Qf=1291|Qf=1292|Qf=1293|Qf=1332|Qf=1430|Qf=1434|Qf=1435|Qf=1436|Qf=1437|Qf=1518|Qf=1519|Qf=1520)&Qa!1445" },
+            { "reply": 19650, "next": 16487, "criterion": "(Qa=1445|Qf=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1449&Qa!1450&Qa!1451&Qa!1452&Qa!1453&Qa!1454&Qa!1455" },
+            { "reply": 19639, "next": 16486, "completesAll": [8010, 8006], "params": [[30, 8010]], "criterion": "Qa=1446", "afterObjective": 8009, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8014, 8006], "params": [[30, 8014]], "criterion": "Qa=1447", "afterObjective": 8013, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8018, 8006], "params": [[30, 8018]], "criterion": "Qa=1448", "afterObjective": 8017, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8022, 8006], "params": [[30, 8022]], "criterion": "Qa=1449", "afterObjective": 8021, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8026, 8006], "params": [[30, 8026]], "criterion": "Qa=1450", "afterObjective": 8025, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8030, 8006], "params": [[30, 8030]], "criterion": "Qa=1451", "afterObjective": 8029, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8034, 8006], "params": [[30, 8034]], "criterion": "Qa=1452", "afterObjective": 8033, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8038, 8006], "params": [[30, 8038]], "criterion": "Qa=1453", "afterObjective": 8037, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8042, 8006], "params": [[30, 8042]], "criterion": "Qa=1454", "afterObjective": 8041, "holds": 14920 },
+            { "reply": 19639, "next": 16486, "completesAll": [8046, 8006], "params": [[30, 8046]], "criterion": "Qa=1455", "afterObjective": 8045, "holds": 14920 }
+          ]
+        },
+        {
+          "message": 16484,
+          "choices": [
+            { "reply": 19637, "startsQuest": 1445, "params": [[34, 1445]], "next": 16485 },
+            { "reply": 19651 }
+          ]
+        },
+        {
+          "message": 16485,
+          "choices": []
+        },
+        {
+          "message": 16486,
+          "choices": []
+        },
+        {
+          "message": 16487,
+          "choices": [
+            { "reply": 19640, "startsQuest": 1446, "params": [[34, 1446]], "next": 16485, "criterion": "Qf=34|Qf=1434|Qf=30" },
+            { "reply": 19641, "startsQuest": 1447, "params": [[34, 1447]], "next": 16485, "criterion": "Qf=35" },
+            { "reply": 19642, "startsQuest": 1448, "params": [[34, 1448]], "next": 16485, "criterion": "Qf=117|Qf=33|Qf=1435|Qf=32" },
+            { "reply": 19643, "startsQuest": 1449, "params": [[34, 1449]], "next": 16485, "criterion": "Qf=119|Qf=116|Qf=115" },
+            { "reply": 19644, "startsQuest": 1450, "params": [[34, 1450]], "next": 16485, "criterion": "Qf=1518" },
+            { "reply": 19645, "startsQuest": 1451, "params": [[34, 1451]], "next": 16485, "criterion": "Qf=544|Qf=29|Qf=1430|Qf=545" },
+            { "reply": 19646, "startsQuest": 1452, "params": [[34, 1452]], "next": 16485, "criterion": "Qf=1436|Qf=546|Qf=118|Qf=547|Qf=1519" },
+            { "reply": 19647, "startsQuest": 1453, "params": [[34, 1453]], "next": 16485, "criterion": "Qf=548|Qf=549|Qf=550" },
+            { "reply": 19648, "startsQuest": 1454, "params": [[34, 1454]], "next": 16485, "criterion": "Qf=551|Qf=1332|Qf=552|Qf=553" },
+            { "reply": 19649, "startsQuest": 1455, "params": [[34, 1455]], "next": 16485, "criterion": "Qf=1437|Qf=1289|Qf=1290|Qf=1291|Qf=1292|Qf=1293|Qf=1520" }
+          ]
+        }
+      ],
+      "why": "Skalo in the classroom, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs). «¿Necesitas ayuda?» (16484) and «Aceptar.» start «Escuela de superhéroes» for whoever has captured a wanted criminal (its catalogue criterion), 16485. «Pedirle formar a una categoría de reclutas en particular.» (16487: «esta semana puedes formar… a otra categoría») lists the ten years; each is offered once one of that year's prisoners has been captured, «Liste des ennemis par formation», and starts its «Formación de … año» on 16485, the line every formation's step declares (the client also holds ten copies of it, 16488-16497). «Darle la ficha de formación.» hands over the filled sheet (14920): it ends the formation and «Escuela de superhéroes» with it, 16486."
+    },
+    {
+      "npc": 2208,
+      "map": 121899268,
+      "opening": 16656,
+      "lines": [
+        {
+          "message": 16656,
+          "choices": [
+            { "reply": 19857, "quest": 1448, "afterObjective": 8016, "beforeObjective": 8017 },
+            { "reply": 19857, "quest": 1454, "afterObjective": 8040, "beforeObjective": 8041 }
+          ]
+        }
+      ],
+      "why": "The recruit to form, in the combat room behind the classroom's door, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs): «Parlez alors à la recrue à former qui se trouve sur la map… Puis engagez le combat contre le prisonnier à ces cotés». Its formation line and «Luchar junto al recluta…»; the guide's screenshot of the first years has the princely one say it."
+    },
+    {
+      "npc": 2209,
+      "map": 121899268,
+      "opening": 16670,
+      "lines": [
+        {
+          "message": 16670,
+          "choices": [
+            { "reply": 19869, "quest": 1450, "afterObjective": 8024, "beforeObjective": 8025 }
+          ]
+        }
+      ],
+      "why": "The recruit to form, in the combat room behind the classroom's door, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs): «Parlez alors à la recrue à former qui se trouve sur la map… Puis engagez le combat contre le prisonnier à ces cotés». Its formation line and «Luchar junto al recluta…»; the guide's screenshot of the first years has the princely one say it."
+    },
+    {
+      "npc": 2210,
+      "map": 121899268,
+      "opening": 16682,
+      "lines": [
+        {
+          "message": 16682,
+          "choices": [
+            { "reply": 19880, "quest": 1447, "afterObjective": 8012, "beforeObjective": 8013 },
+            { "reply": 19880, "quest": 1453, "afterObjective": 8036, "beforeObjective": 8037 }
+          ]
+        }
+      ],
+      "why": "The recruit to form, in the combat room behind the classroom's door, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs): «Parlez alors à la recrue à former qui se trouve sur la map… Puis engagez le combat contre le prisonnier à ces cotés». Its formation line and «Luchar junto al recluta…»; the guide's screenshot of the first years has the princely one say it."
+    },
+    {
+      "npc": 2211,
+      "map": 121899268,
+      "opening": 16701,
+      "lines": [
+        {
+          "message": 16701,
+          "choices": [
+            { "reply": 19899, "quest": 1449, "afterObjective": 8020, "beforeObjective": 8021 },
+            { "reply": 19899, "quest": 1455, "afterObjective": 8044, "beforeObjective": 8045 }
+          ]
+        }
+      ],
+      "why": "The recruit to form, in the combat room behind the classroom's door, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs): «Parlez alors à la recrue à former qui se trouve sur la map… Puis engagez le combat contre le prisonnier à ces cotés». Its formation line and «Luchar junto al recluta…»; the guide's screenshot of the first years has the princely one say it."
+    },
+    {
+      "npc": 2212,
+      "map": 121899268,
+      "opening": 16717,
+      "lines": [
+        {
+          "message": 16717,
+          "choices": [
+            { "reply": 19915, "quest": 1451, "afterObjective": 8028, "beforeObjective": 8029 }
+          ]
+        }
+      ],
+      "why": "The recruit to form, in the combat room behind the classroom's door, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs): «Parlez alors à la recrue à former qui se trouve sur la map… Puis engagez le combat contre le prisonnier à ces cotés». Its formation line and «Luchar junto al recluta…»; the guide's screenshot of the first years has the princely one say it."
+    },
+    {
+      "npc": 2213,
+      "map": 121899268,
+      "opening": 16732,
+      "lines": [
+        {
+          "message": 16732,
+          "choices": [
+            { "reply": 19929, "quest": 1446, "afterObjective": 8008, "beforeObjective": 8009 },
+            { "reply": 19929, "quest": 1452, "afterObjective": 8032, "beforeObjective": 8033 }
+          ]
+        }
+      ],
+      "why": "The recruit to form, in the combat room behind the classroom's door, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs): «Parlez alors à la recrue à former qui se trouve sur la map… Puis engagez le combat contre le prisonnier à ces cotés». Its formation line and «Luchar junto al recluta…»; the guide's screenshot of the first years has the princely one say it."
     }
   ]
 }

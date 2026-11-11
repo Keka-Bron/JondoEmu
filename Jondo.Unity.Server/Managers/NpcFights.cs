@@ -73,6 +73,15 @@ namespace Jondo.Unity.Server.Managers
             /// «contrôlable depuis la màj 2.70» (Fighter.IsPlayedAlly).
             /// </summary>
             public bool AlliesPlayed { get; init; }
+
+            /// <summary>
+            /// Whom the row is for («criterion», in the client's language), or empty for anybody.
+            /// Rows of the same reply are tried in order and the first that holds is the fight:
+            /// Skalo's recruits face the first prisoner of the formation's year the character has
+            /// captured -- «El prisionero al que hay que enfrentarse será seleccionado entre los que
+            /// ya has capturado».
+            /// </summary>
+            public string Criterion { get; init; } = "";
         }
 
         private static List<Fight>? _fights;
@@ -84,7 +93,9 @@ namespace Jondo.Unity.Server.Managers
             Load();
             foreach (var fight in _fights!)
             {
-                if (fight.NpcId == npcId && fight.Reply == reply && (fight.MapId == 0 || fight.MapId == mapId)) return fight;
+                if (fight.NpcId != npcId || fight.Reply != reply || (fight.MapId != 0 && fight.MapId != mapId)) continue;
+                if (fight.Criterion.Length > 0 && !PlayerCriteria.Met(fight.Criterion, mapId)) continue;
+                return fight;
             }
             return null;
         }
@@ -129,6 +140,8 @@ namespace Jondo.Unity.Server.Managers
                                 IncarnationInvulnerable = incarnates && incarnation.TryGetProperty("invulnerable", out var invulnerable)
                                                           && invulnerable.ValueKind == JsonValueKind.True,
                                 AlliesPlayed = row.TryGetProperty("alliesPlayed", out var played) && played.ValueKind == JsonValueKind.True,
+                                Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
+                                            ? criterion.GetString() ?? "" : "",
                             });
                         }
                     }

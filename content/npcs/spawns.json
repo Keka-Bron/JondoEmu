@@ -3226,6 +3226,230 @@
       "orientation": 1,
       "criterion": "Qa=1423&Qo=7902",
       "why": "the Gomberros (Petite Frappe), two of the Smis gang, at [3,3], while «Proteger y servir» (Protéger et sévir, Dofus pour les noobs) has them to beat (7902). INFERRED cell."
+    },
+    {
+      "map": 121900290,
+      "npc": 2209,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "(Qa=1457&Qo=8056)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900290,
+      "npc": 2211,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1456&Qo=8049)|(Qa=1460&Qo=8073)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900290,
+      "npc": 2212,
+      "cell": 373,
+      "orientation": 1,
+      "criterion": "(Qa=1457&Qo=8053)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900290,
+      "npc": 2213,
+      "cell": 401,
+      "orientation": 1,
+      "criterion": "(Qa=1459&Qo=8071)|(Qa=1460&Qo=8078)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900292,
+      "npc": 2208,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1456&Qo=8048)|(Qa=1460&Qo=8077)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900292,
+      "npc": 2210,
+      "cell": 401,
+      "orientation": 1,
+      "criterion": "(Qa=1459&Qo=8068)|(Qa=1460&Qo=8079)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900292,
+      "npc": 2211,
+      "cell": 373,
+      "orientation": 1,
+      "criterion": "(Qa=1457&Qo=8054)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900292,
+      "npc": 2212,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "(Qa=1458&Qo=8062)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900294,
+      "npc": 2208,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1457&Qo=8055)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900294,
+      "npc": 2209,
+      "cell": 388,
+      "orientation": 1,
+      "criterion": "(Qa=1460&Qo=8075)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900294,
+      "npc": 2210,
+      "cell": 373,
+      "orientation": 1,
+      "criterion": "(Qa=1457&Qo=8058)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900294,
+      "npc": 2211,
+      "cell": 401,
+      "orientation": 1,
+      "criterion": "(Qa=1459&Qo=8066)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900294,
+      "npc": 2213,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "(Qa=1458&Qo=8060)|(Qa=1460&Qo=8082)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900296,
+      "npc": 2208,
+      "cell": 401,
+      "orientation": 1,
+      "criterion": "(Qa=1459&Qo=8070)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900296,
+      "npc": 2209,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "(Qa=1458&Qo=8061)|(Qa=1460&Qo=8074)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900296,
+      "npc": 2212,
+      "cell": 373,
+      "orientation": 1,
+      "criterion": "(Qa=1457&Qo=8057)|(Qa=1459&Qo=8069)|(Qa=1460&Qo=8080)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900296,
+      "npc": 2213,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1456&Qo=8050)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900298,
+      "npc": 2208,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "(Qa=1459&Qo=8065)|(Qa=1460&Qo=8081)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900298,
+      "npc": 2209,
+      "cell": 373,
+      "orientation": 1,
+      "criterion": "(Qa=1457&Qo=8052)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900298,
+      "npc": 2210,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1456&Qo=8047)|(Qa=1458&Qo=8063)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900298,
+      "npc": 2211,
+      "cell": 371,
+      "orientation": 1,
+      "criterion": "(Qa=1460&Qo=8076)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121900298,
+      "npc": 2213,
+      "cell": 401,
+      "orientation": 1,
+      "criterion": "(Qa=1459&Qo=8067)",
+      "why": "The recruit Cuerbax sends the character to, while an evaluation of this room is pending. INFERRED cell."
+    },
+    {
+      "map": 121899268,
+      "npc": 2208,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1448&Qo=8017)|(Qa=1454&Qo=8041)",
+      "why": "The recruit of the formation in hand, until its fight is won. INFERRED cell and recruit per year."
+    },
+    {
+      "map": 121899268,
+      "npc": 2209,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1450&Qo=8025)",
+      "why": "The recruit of the formation in hand, until its fight is won. INFERRED cell and recruit per year."
+    },
+    {
+      "map": 121899268,
+      "npc": 2210,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1447&Qo=8013)|(Qa=1453&Qo=8037)",
+      "why": "The recruit of the formation in hand, until its fight is won. INFERRED cell and recruit per year."
+    },
+    {
+      "map": 121899268,
+      "npc": 2211,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1449&Qo=8021)|(Qa=1455&Qo=8045)",
+      "why": "The recruit of the formation in hand, until its fight is won. INFERRED cell and recruit per year."
+    },
+    {
+      "map": 121899268,
+      "npc": 2212,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1451&Qo=8029)",
+      "why": "The recruit of the formation in hand, until its fight is won. INFERRED cell and recruit per year."
+    },
+    {
+      "map": 121899268,
+      "npc": 2213,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1446&Qo=8009)|(Qa=1452&Qo=8033)",
+      "why": "The recruit of the formation in hand, until its fight is won. INFERRED cell and recruit per year."
     }
   ]
 }
