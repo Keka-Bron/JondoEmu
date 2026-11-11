@@ -685,10 +685,10 @@ played through.
 | Moon Island | `██████████` **100%** | 10/10 |
 | Koalak Mountain | `█████████░` **86%** | 6/7 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
-| Bonta | `████████░░` **80%** | 4/5 |
-| Brakmar | `████████░░` **80%** | 4/5 |
+| Bonta | `██████████` **100%** | 5/5 |
+| Brakmar | `██████████` **100%** | 5/5 |
 | Wanted Notices | `░░░░░░░░░░` **1%** | 1/82 |
-| **All quests** | **9.1%** | **179/1976** |
+| **All quests** | **9.2%** | **181/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
