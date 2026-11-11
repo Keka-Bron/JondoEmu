@@ -3007,6 +3007,24 @@
    "kind": "read",
    "elements": [{"map": 226492929, "element": 529283}],
    "why": "«Lee el libro del templo»: the temple book (readables.json), element 529283 on 226492929."
+  },
+  {
+   "objective": 6752,
+   "quest": 1199,
+   "kind": "beat",
+   "monster": 3361,
+   "map": 188482052,
+   "gives": [{"item": 13651, "count": 1}],
+   "why": "«Entrar en la mina y consigue una pluma de tofu husmeató»: Gaztrónomo (monster 3361, level 15) beaten in the mine [1,-17], his feather (13651) won; «Un combat se lance, il peut se faire à plusieurs»."
+  },
+  {
+   "objective": 6756,
+   "quest": 1199,
+   "kind": "click",
+   "elements": [{"map": 192413698, "element": 515284}],
+   "afterObjectives": [6755],
+   "gives": [{"item": 13653, "count": 1}],
+   "why": "«Registra la taberna en busca de una pluma blanca de búho»: «montez au premier étage et cliquez sur le balais posé contre le mur» (Dofus pour les noobs). The first floor's only element that is not a staircase: 515284 (graphic 22060) on cell 261; the other two (514144, 514145) are the 2.73 graph's passages. The banker's wife's broom holds a white owl feather (13653)."
   }
  ]
 }

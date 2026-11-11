@@ -2939,6 +2939,20 @@
       "cell": 427,
       "orientation": 1,
       "why": "Chaki Triss, the Sacrógrito temple's master, in the book's room right of the statue (Dofus pour les noobs, Dévotion à Sacrieur: «allez vers la droite... Dans la même pièce, cliquez sur le livre»); the objective names this map."
+    },
+    {
+      "map": 188482052,
+      "npc": 1917,
+      "cell": 302,
+      "orientation": 1,
+      "why": "Gaztrónomo among the sniffing tofus of Astrub's mine [1,-17] («Direction l'entrée de la mine en [1,-17] et entrez dans celle-ci. Parlez à Gaztronom», Dofus pour les noobs). INFERRED cell, between the tofus."
+    },
+    {
+      "map": 188746755,
+      "npc": 1440,
+      "cell": 316,
+      "orientation": 3,
+      "why": "Herdegriz, the Mystic, in Astrub at [7,-19] («Rendez-vous en [7,-19] et parlez à Herdegrize», Dofus pour les noobs). INFERRED cell."
     }
   ]
 }

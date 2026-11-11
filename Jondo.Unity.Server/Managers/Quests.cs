@@ -1791,9 +1791,10 @@ namespace Jondo.Unity.Server.Managers
             await AfterMoveAsync(stream, questId, move);
 
             // What an «order» row says comes of the objective once done: Escualo El Rojo's
-            // boot-licking potion, brewed from the ingredients handed over on a hello.
+            // boot-licking potion, brewed from the ingredients handed over on a hello. And what a
+            // fight wins: the burnt book saved from the forge's fire, the sniffing tofu's feather.
             var binding = Bindings.Of(objectiveId);
-            if (!move.Nothing && binding?.Kind == QuestBindingKind.Order)
+            if (!move.Nothing && binding?.Kind is QuestBindingKind.Order or QuestBindingKind.Beat)
             {
                 // What it hands over is taken, when the row says so: the fat tofu's egg and the
                 // fattening potion left with Vil Smis («Tomber sur un bec»).

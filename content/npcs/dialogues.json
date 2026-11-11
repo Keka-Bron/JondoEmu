@@ -529,6 +529,7 @@
           "message": 6169,
           "choices": [
             { "reply": 36685, "next": 30419, "beforeQuest": 1994 },
+            { "reply": 15501, "next": 13406, "quest": 1199, "afterObjective": 6754, "beforeObjective": 6755 },
             { "reply": 6025 }
           ]
         },
@@ -556,9 +557,21 @@
             { "reply": 36680, "startsQuest": 1994, "params": [[34, 1994]] },
             { "reply": 36681 }
           ]
+        },
+        {
+          "message": 13406,
+          "choices": [
+            { "reply": 15500, "next": 13407 }
+          ]
+        },
+        {
+          "message": 13407,
+          "choices": [
+            { "reply": 15499, "quest": 1199, "completes": 6755, "params": [[30, 6755]] }
+          ]
         }
       ],
-      "why": "Snori Nairb, the guard of Astrub [4,-18], by «Les deux font l'impair»: the quarrel he broke up (36685), Bontarians and Brakmarians fighting in town (30419), the two cities (30420), Astrub's neutrality and its cells (30421), the recruiting agents (30422)."
+      "why": "Snori Nairb, the guard of Astrub [4,-18], by «Les deux font l'impair»: the quarrel he broke up (36685), Bontarians and Brakmarians fighting in town (30419), the two cities (30420), Astrub's neutrality and its cells (30421), the recruiting agents (30422). «Limpieza general»: «Se renseigner à propos d'Essiac d'Engrape» (15501): one of the town's eminences in a bad mood (13406), his wife's broom at the tavern last night (13407): «¡Gracias! Voy a dar una vuelta por la taberna.» (6755)."
     },
     {
       "npc": 1441,
@@ -650,6 +663,8 @@
           "choices": [
             { "reply": 37379, "quest": 1976, "completes": 13974, "params": [[30, 13974]], "next": 30947, "afterObjective": 13973 },
             { "reply": 37908, "next": 31384, "quest": 1976, "afterQuest": true, "beforeQuest": 1977 },
+            { "reply": 15373, "next": 13383, "beforeQuest": 1199, "criterion": "PL>9" },
+            { "reply": 15374, "quest": 1199, "completes": 6757, "params": [[30, 6757]], "next": 13395, "afterObjectives": [6752, 6753, 6754, 6755, 6756], "takesAll": [13651, 13652, 13653] },
             { "reply": 26687 }
           ]
         },
@@ -689,9 +704,77 @@
             { "reply": 37906, "startsQuest": 1977, "params": [[34, 1977]], "gives": 19728 },
             { "reply": 37910 }
           ]
+        },
+        {
+          "message": 13383,
+          "choices": [
+            { "reply": 15478, "next": 13384 }
+          ]
+        },
+        {
+          "message": 13384,
+          "choices": [
+            { "reply": 15477, "next": 13385 }
+          ]
+        },
+        {
+          "message": 13385,
+          "choices": [
+            { "reply": 15476, "next": 13386 }
+          ]
+        },
+        {
+          "message": 13386,
+          "choices": [
+            { "reply": 15475, "next": 13387 }
+          ]
+        },
+        {
+          "message": 13387,
+          "choices": [
+            { "reply": 15474, "next": 13388 },
+            { "reply": 15485, "next": 13391 }
+          ]
+        },
+        {
+          "message": 13388,
+          "choices": [
+            { "reply": 15473, "next": 13391 }
+          ]
+        },
+        {
+          "message": 13391,
+          "choices": [
+            { "reply": 15484, "next": 13392 }
+          ]
+        },
+        {
+          "message": 13392,
+          "choices": [
+            { "reply": 15483, "next": 13393 }
+          ]
+        },
+        {
+          "message": 13393,
+          "choices": [
+            { "reply": 15482, "startsQuest": 1199, "params": [[34, 1199]], "next": 13394 },
+            { "reply": 15487 }
+          ]
+        },
+        {
+          "message": 13394,
+          "choices": [
+            { "reply": 15486 }
+          ]
+        },
+        {
+          "message": 13395,
+          "choices": [
+            { "reply": 15488 }
+          ]
         }
       ],
-      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again."
+      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395)."
     },
     {
       "npc": 4310,
@@ -9879,6 +9962,9 @@
       "npc": 522,
       "map": 0,
       "opening": 318,
+      "openings": [
+        { "quest": 1199, "pending": 6754, "message": 13401 }
+      ],
       "lines": [
         {
           "message": 318,
@@ -9909,9 +9995,21 @@
           "choices": [
             { "reply": 64350, "thenNpc": 4410 }
           ]
+        },
+        {
+          "message": 13401,
+          "choices": [
+            { "reply": 15495, "next": 13402 }
+          ]
+        },
+        {
+          "message": 13402,
+          "choices": [
+            { "reply": 15494 }
+          ]
         }
       ],
-      "why": "Al Etsop, banker of Astrub, from his own lines and replies: his greeting and the bank (BankHandler adds «Quiero consultar mi cofre.»), how an account works (410); and by «Ça tombe à l'eau» («Poser des questions sur le Duc de Sidimote»), a theft (30920), the Sidimote mines (30921) and the real duke long dead, when Abel comes in (30922, 13962: «showsNpc» brings him in); «Seguir escuchando.» turns to him."
+      "why": "Al Etsop, banker of Astrub, from his own lines and replies: his greeting and the bank (BankHandler adds «Quiero consultar mi cofre.»), how an account works (410); and by «Ça tombe à l'eau» («Poser des questions sur le Duc de Sidimote»), a theft (30920), the Sidimote mines (30921) and the real duke long dead, when Abel comes in (30922, 13962: «showsNpc» brings him in); «Seguir escuchando.» turns to him. «Limpieza general»: while a banker is to be seen (6754) he greets with «Hola, ¿qué puedo hacer por ti?» (13401); asked for a white feather, he is too young for those (13402)."
     },
     {
       "npc": 4410,
@@ -14143,6 +14241,9 @@
       "npc": 520,
       "map": 0,
       "opening": 48366,
+      "openings": [
+        { "quest": 1199, "pending": 6754, "message": 13403 }
+      ],
       "lines": [
         {
           "message": 48366,
@@ -14159,9 +14260,26 @@
         {
           "message": 48371,
           "choices": []
+        },
+        {
+          "message": 13403,
+          "choices": [
+            { "reply": 15498, "next": 13404 }
+          ]
+        },
+        {
+          "message": 13404,
+          "choices": [
+            { "reply": 15497, "quest": 1199, "completes": 6754, "params": [[30, 6754]] },
+            { "reply": 15496, "next": 13405 }
+          ]
+        },
+        {
+          "message": 13405,
+          "choices": []
         }
       ],
-      "why": "Orroha Neuw, banker of Astrub: «we are the bankers», an account and a safe (48366; BankHandler adds «Quiero consultar mi cofre.»), how it works (48371). «Zobal Hibaba et les 40 Roublards» of Dofus pour les noobs: Hibabá's power of attorney shown, his money handed over (48369: 4639, item 12278)."
+      "why": "Orroha Neuw, banker of Astrub: «we are the bankers», an account and a safe (48366; BankHandler adds «Quiero consultar mi cofre.»), how it works (48371). «Zobal Hibaba et les 40 Roublards» of Dofus pour les noobs: Hibabá's power of attorney shown, his money handed over (48369: 4639, item 12278). «Limpieza general»: while the banker is to be seen (6754) he opens on «¿Querías depositar o retirar dinero?» (13403); «No, si yo he venido a desplumarte.» angers him, only his wife may (13404); «Lo siento, será mejor que vaya a interrogar a Snori Nairb.» does it, «Insistir.» gets him out of the way (13405)."
     },
     {
       "npc": 1433,
@@ -25555,6 +25673,97 @@
         }
       ],
       "why": "Lencaro de Albuera, master of the class-20 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 2467, objective 18615)."
+    },
+    {
+      "npc": 1917,
+      "map": 188482052,
+      "opening": 13370,
+      "lines": [
+        {
+          "message": 13370,
+          "choices": [
+            { "reply": 15458, "quest": 1199, "beforeObjective": 6752 }
+          ]
+        }
+      ],
+      "why": "Gaztrónomo in Astrub's mine [1,-17], «¿Kui kui?» (13370). By «Limpieza general» («Parlez à Gaztronom pour tenter de lui piquer une plume. Un combat se lance, il peut se faire à plusieurs»): the reply starts the fight (content/fights/npc_fights.json); beating him is 6752 and his feather (13651)."
+    },
+    {
+      "npc": 1440,
+      "map": 0,
+      "opening": 8897,
+      "lines": [
+        {
+          "message": 8897,
+          "choices": [
+            { "reply": 9002, "next": 8898, "criterion": "PO!12376" },
+            { "reply": 15509, "next": 13408, "quest": 1199, "beforeObjective": 6753, "holds": 12376 },
+            { "reply": 9004, "next": 8903, "holds": 12376 },
+            { "reply": 9003 }
+          ]
+        },
+        {
+          "message": 8898,
+          "choices": [
+            { "reply": 9000, "next": 8899 },
+            { "reply": 9001 }
+          ]
+        },
+        {
+          "message": 8899,
+          "choices": [
+            { "reply": 8998, "next": 8900 },
+            { "reply": 8997 }
+          ]
+        },
+        {
+          "message": 8900,
+          "choices": [
+            { "reply": 8996, "next": 8901, "gives": 12376 }
+          ]
+        },
+        {
+          "message": 8901,
+          "choices": [
+            { "reply": 8999 }
+          ]
+        },
+        {
+          "message": 8903,
+          "choices": [
+            { "reply": 8999 }
+          ]
+        },
+        {
+          "message": 13408,
+          "choices": [
+            { "reply": 15504, "next": 13409 },
+            { "reply": 15506, "next": 13410 },
+            { "reply": 15508, "quest": 1199, "completes": 6753, "params": [[30, 6753]], "next": 13411, "gives": 13652 },
+            { "reply": 15503 }
+          ]
+        },
+        {
+          "message": 13409,
+          "choices": [
+            { "reply": 15502 },
+            { "reply": 15503 }
+          ]
+        },
+        {
+          "message": 13410,
+          "choices": [
+            { "reply": 15505 }
+          ]
+        },
+        {
+          "message": 13411,
+          "choices": [
+            { "reply": 15507 }
+          ]
+        }
+      ],
+      "why": "Herdegriz, the Mystic, in Astrub [7,-19], from his own lines and replies. «Limpieza general» of Dofus pour les noobs: «Engager la conversation» (9002), he thinks it is an autograph («Patienter tandis qu'Herdegrize sort une plume et un petit livre de son sac», 9000), his first work of science friction («Applaudir des deux mains», 8998), dedicated («Souffler sur la page», 8996: «La Mayor Aventura de Todos los Tiempos», 12376). Then «Lui demander une plume» (15509, 13408) and «Le flatter sans vergogne» (15508: 6753, his feather 13652); asked roughly (13409) or begged (13410), he refuses. The dedicated book offered back is refused (8903)."
     }
   ]
 }
