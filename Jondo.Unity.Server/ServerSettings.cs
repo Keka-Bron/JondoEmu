@@ -33,6 +33,9 @@ namespace Jondo.Unity.Server
 
         /// <summary>Extra experience for everybody, in percent: what fights, quests and rewards give.</summary>
         public int ExperienceBonusPercent { get; set; }
+        
+        /// <summary>Extra experience for everybody, in percent: what fights, quests and rewards give.</summary>
+        public int JobExperienceBonusPercent { get; set; }
 
         /// <summary>Extra chance of every item a monster drops, in percent.</summary>
         public int DropBonusPercent { get; set; }

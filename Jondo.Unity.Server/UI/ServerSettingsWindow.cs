@@ -41,9 +41,10 @@ internal sealed class ServerSettingsWindow : Window
         layout.Children.Add(header);
         var s = Editor.Edited;
         var rates = Card("Rates",
-            Number("Xp", null, s.ExperienceBonusPercent, 0, 1000, 10, "%", v => s.ExperienceBonusPercent = (int)v),
-            Number("Drop", null, s.DropBonusPercent, 0, 1000, 10, "%", v => s.DropBonusPercent = (int)v),
-            Number("Kamas", null, s.KamasBonusPercent, 0, 1000, 10, "%", v => s.KamasBonusPercent = (int)v), Note("RatesHint"));
+            Number("Xp", null, s.ExperienceBonusPercent, 0, 10000, 10, "%", v => s.ExperienceBonusPercent = (int)v),
+            Number("JobXp", null, s.JobExperienceBonusPercent, 0, 10000, 10, "%", v => s.JobExperienceBonusPercent = (int)v),
+            Number("Drop", null, s.DropBonusPercent, 0, 10000, 10, "%", v => s.DropBonusPercent = (int)v),
+            Number("Kamas", null, s.KamasBonusPercent, 0, 10000, 10, "%", v => s.KamasBonusPercent = (int)v), Note("RatesHint"));
         var characters = Card("Characters",
             Number("MaxAp", null, s.MaxActionPoints, 0, 30, 1, "", v => s.MaxActionPoints = (int)v),
             Number("MaxMp", "CapHint", s.MaxMovementPoints, 0, 20, 1, "", v => s.MaxMovementPoints = (int)v),
