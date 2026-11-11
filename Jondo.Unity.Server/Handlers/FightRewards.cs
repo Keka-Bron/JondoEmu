@@ -112,6 +112,11 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (!fight.Reglas.ReparteBotin) return;
 
+            // The tax collectors of the territory gather here, before anybody is shown the end, so
+            // that each end screen lists them among the winners with what they took (it was done after,
+            // in FightOverForTheWorldAsync, and they never showed).
+            if (fight.SigueVivo(FightInstance.Azules)) _collectors[fight.FightId] = TaxCollectorHandler.Gather(fight);
+
             bool won = fight.Azul.Concat(fight.Rojo).Any(f => !f.IsMonster && !f.EsInvocado && fight.HaGanado(f.Id));
             var dream = DreamHandler.PayOf(fight, won);
             // A dream started from a code pays nothing: "sans aucune récompense (que ce soit xp ou drop)".
@@ -319,6 +324,41 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The fight is over for everybody: its shares go.</summary>
-        private static void ForgetRewards(FightInstance fight) => _rewards.TryRemove(fight.FightId, out _);
+        private static void ForgetRewards(FightInstance fight)
+        {
+            _rewards.TryRemove(fight.FightId, out _);
+            _collectors.TryRemove(fight.FightId, out _);
+        }
+
+        /// <summary>What each tax collector of the territory took from this fight (PlanRewards).</summary>
+        private static readonly ConcurrentDictionary<long, List<(TaxCollectorStore.TaxCollector Collector, List<int> Items)>> _collectors = new();
+
+        /// <summary>
+        /// The tax collectors' rows of the end screen, among the winners: each with its alliance's block
+        /// and what it took, as the real game lists them.
+        /// </summary>
+        private static IEnumerable<Network.FightProtocol.FightResult> CollectorRows(FightInstance fight)
+        {
+            if (!_collectors.TryGetValue(fight.FightId, out var taken)) yield break;
+            foreach (var (tc, items) in taken)
+            {
+                var alliance = AllianceStore.ById(tc.AllianceId);
+                if (alliance == null) continue;
+                var spoils = new Network.FightProtocol.Spoils();
+                foreach (var g in items.GroupBy(i => i)) spoils.Items.Add((g.Count(), g.Key));
+                // The row's name is the len's f3 when the client does not know the collector's entity
+                // (fkv.gdl: its first and last name otherwise): the alliance's tag in brackets, «[TAG]», as
+                // the game shows a collector there -- not the alliance's whole name.
+                var block = Pb.New()
+                    .Msg(2, Network.AllianceProtocol.Emblem(alliance))
+                    .Str(3, $"[{alliance.Tag}]")
+                    .Str(4, alliance.Uuid)
+                    .Str(5, alliance.Tag);
+                yield return new Network.FightProtocol.FightResult
+                {
+                    Fighter = tc.ContextId, Winner = true, Spoils = spoils, Collector = block,
+                };
+            }
+        }
     }
 }

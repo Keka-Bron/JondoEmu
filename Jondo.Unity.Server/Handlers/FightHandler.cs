@@ -10822,11 +10822,8 @@ namespace Jondo.Unity.Server.Handlers
                 await AlignmentWar.AnnounceAsync(fight, attackersWon);
             }
             var defence = await AllianceFights.CloseAsync(fight);
-            if (defence == null)
-            {
-                if (attackersWon && fight.Reglas.ReparteBotin) TaxCollectorHandler.Gather(fight);
-                return;
-            }
+            // A won fight's tax collectors gather in PlanRewards, before the end screens that list them.
+            if (defence == null) return;
             if (defence.Kind == Network.TaxCollectorProtocol.FightOfPrism)
                 await PrismHandler.FightEndedAsync(fight, attackersWon);
             else
@@ -11037,6 +11034,8 @@ namespace Jondo.Unity.Server.Handlers
 
             // An aggression between the cities: each one's honour, in the end screen's honour column.
             foreach (var result in results) result.Pvp = AlignmentWar.ResultOf(fight, result.Fighter);
+            // And the tax collectors of the territory, among the winners, with what they took.
+            results.AddRange(CollectorRows(fight));
 
             int duration = (int)Math.Max(0, (DateTime.UtcNow - fight.StartedAt).TotalMilliseconds);
             ActivityJournal.Current.Write("fight.ended", SessionContext.Current.AccountId,
