@@ -440,6 +440,26 @@
       "monsters": [ { "monster": 5106, "grade": 0 }, { "monster": 5106, "grade": 0 }, { "monster": 5106, "grade": 0 } ] },
     { "npc": 7841, "map": 0, "reply": 81487,
       "monsters": [ { "monster": 8239, "grade": 0 }, { "monster": 8239, "grade": 0 } ],
-      "marks": -894001 }
+      "marks": -894001 },
+    { "npc": 2843, "map": 192677892, "reply": 24216,
+      "monsters": [ { "monster": 3984, "grade": 4 }, { "monster": 3983, "grade": 4 }, { "monster": 3982, "grade": 4 }, { "monster": 3981, "grade": 4 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 3986, "grade": 0 } ],
+      "alliesPlayed": true,
+      "incarnates": { "monster": 3985, "grade": 1, "invulnerable": true },
+      "why": "«Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «Accepter le marché» (obligatoire): «Vous incarnerez un épouvantail qui pourra invoquer 3 classes et vous serez accompagné de Barnabé», «1PV 0PM 3PA mais vous êtes invulnérable», Barnabé «contrôlable», «il ne doit pas mourir sinon le combat est perdu». The Entraîneur (3985) calls the gladiators Ecaflip, Crâ and Feca (3987-3989); the four hour demons at grade 5, level 170 and 4200 life as the Trantroa's sheet in its capture." },
+    { "npc": 2843, "map": 192677892, "reply": 24219,
+      "monsters": [ { "monster": 3984, "grade": 4 }, { "monster": 3983, "grade": 4 }, { "monster": 3982, "grade": 4 }, { "monster": 3981, "grade": 4 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 3986, "grade": 0 } ],
+      "alliesPlayed": true,
+      "incarnates": { "monster": 3985, "grade": 1, "invulnerable": true },
+      "why": "«Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «Accepter le marché» (obligatoire): «Vous incarnerez un épouvantail qui pourra invoquer 3 classes et vous serez accompagné de Barnabé», «1PV 0PM 3PA mais vous êtes invulnérable», Barnabé «contrôlable», «il ne doit pas mourir sinon le combat est perdu». The Entraîneur (3985) calls the gladiators Ecaflip, Crâ and Feca (3987-3989); the four hour demons at grade 5, level 170 and 4200 life as the Trantroa's sheet in its capture." },
+    { "npc": 4371, "map": 192677892, "reply": 36738,
+      "monsters": [ { "monster": 5235, "grade": 0 } ],
+      "allies": [ { "monster": 3986, "grade": 0 } ],
+      "alliesPlayed": true,
+      "incarnates": { "monster": 3985, "grade": 1, "invulnerable": true },
+      "why": "«Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «un combat d'entrainement vous permettant de comprendre les sorts que vous obtiendrez», against the training dummy (5235), on the map's own fight map, as the demons." }
   ]
 }

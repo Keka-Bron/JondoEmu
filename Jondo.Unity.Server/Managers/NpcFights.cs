@@ -53,6 +53,26 @@ namespace Jondo.Unity.Server.Managers
             /// monsters (6851, 6852) have one grade every 20 levels, from 20 to 200.
             /// </summary>
             public bool ByLevel { get; init; }
+
+            /// <summary>
+            /// The monster the character fights as, or 0 («incarnates»: { monster, grade,
+            /// invulnerable }): «Barnabé en el espacio» makes him the Entrenador (3985) -- one life
+            /// point, three AP, no MP, the gladiators' three calls, Esponja and Bronca --, «un
+            /// épouvantail qui a 1PV 0PM 3PA mais vous êtes invulnérable» (Dofus pour les noobs).
+            /// </summary>
+            public int Incarnates { get; init; }
+
+            /// <summary>The grade of <see cref="Incarnates"/>, 1-based.</summary>
+            public int IncarnationGrade { get; init; } = 1;
+
+            /// <summary>Whether the incarnation can take no blow (the client's state 269).</summary>
+            public bool IncarnationInvulnerable { get; init; }
+
+            /// <summary>
+            /// Whether the character plays the allies by hand («alliesPlayed»): Barnabé,
+            /// «contrôlable depuis la màj 2.70» (Fighter.IsPlayedAlly).
+            /// </summary>
+            public bool AlliesPlayed { get; init; }
         }
 
         private static List<Fight>? _fights;
@@ -89,6 +109,8 @@ namespace Jondo.Unity.Server.Managers
                         using var doc = JsonDocument.Parse(File.ReadAllText(path));
                         foreach (var row in doc.RootElement.GetProperty("fights").EnumerateArray())
                         {
+                            bool incarnates = row.TryGetProperty("incarnates", out var incarnation)
+                                              && incarnation.ValueKind == JsonValueKind.Object;
                             fights.Add(new Fight
                             {
                                 NpcId = (int)Long(row, "npc"),
@@ -102,6 +124,11 @@ namespace Jondo.Unity.Server.Managers
                                 WinCellId = (int)Long(row, "winCell"),
                                 Marks = (int)Long(row, "marks"),
                                 ByLevel = row.TryGetProperty("byLevel", out var byLevel) && byLevel.ValueKind == JsonValueKind.True,
+                                Incarnates = incarnates ? (int)Long(incarnation, "monster") : 0,
+                                IncarnationGrade = incarnates ? Math.Max(1, (int)Long(incarnation, "grade")) : 1,
+                                IncarnationInvulnerable = incarnates && incarnation.TryGetProperty("invulnerable", out var invulnerable)
+                                                          && invulnerable.ValueKind == JsonValueKind.True,
+                                AlliesPlayed = row.TryGetProperty("alliesPlayed", out var played) && played.ValueKind == JsonValueKind.True,
                             });
                         }
                     }

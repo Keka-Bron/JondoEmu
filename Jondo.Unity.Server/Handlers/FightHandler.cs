@@ -39,7 +39,8 @@ namespace Jondo.Unity.Server.Handlers
                                                                long arenaMapId = 0,
                                                                IReadOnlyList<MobSpawnManager.MobMember>? allies = null,
                                                                bool alliesMustLive = false,
-                                                               long winMapId = 0, int winCellId = 0, int winMarks = 0)
+                                                               long winMapId = 0, int winCellId = 0, int winMarks = 0,
+                                                               long alliesPlayedBy = 0)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
@@ -130,8 +131,20 @@ namespace Jondo.Unity.Server.Handlers
 
             // Monsters on the player's side, played by the AI against the other side: the tutorial's
             // Master Darmas, fighter -1 before the chafers in the capture.
+            // Or played by the character himself, when the fight says so: Barnabé (IsPlayedAlly).
             foreach (var ally in allies ?? Array.Empty<MobSpawnManager.MobMember>())
-                fight.AddPlayer(BuildMonsterFighter(ally, monsterSeqId--, 0));
+            {
+                var beside = BuildMonsterFighter(ally, monsterSeqId--, 0);
+                if (alliesPlayedBy != 0)
+                {
+                    beside.DrivenBy = alliesPlayedBy;
+                    beside.IsPlayedAlly = true;
+                    beside.HechizosDeInvocado = beside.SpellIds
+                        .Select(spell => (spell, Math.Max(1, beside.SpellGrades.TryGetValue(spell, out int grade) ? grade : 1)))
+                        .ToList();
+                }
+                fight.AddPlayer(beside);
+            }
             fight.AlliesMustLive = alliesMustLive && allies is { Count: > 0 };
             fight.WinMapId = winMapId;
             fight.WinCellId = winCellId;
@@ -791,6 +804,11 @@ namespace Jondo.Unity.Server.Handlers
             // A mutated character fights as his monster, at its grade (Mutations).
             if (Managers.Mutations.Current() is { } mutation)
                 Incarnate(playerFighter, mutation.Monster, 0, mutation.Grade - 1);
+            // Or the one a quest's fight makes him, at the template's own sheet: the Entrenador of
+            // «Barnabé en el espacio» (NpcFights).
+            var questIncarnation = TakeNextIncarnation(GameState.CharacterId);
+            if (questIncarnation is { } asked && !Incarnate(playerFighter, asked.Monster, 0, asked.Grade - 1))
+                questIncarnation = null;
 
             var dream = Managers.Dreams.De(GameState.CharacterId);
             if (dream?.SalaActual?.MapaDeLaSala != fight.RoleplayMapId) dream = DreamHandler.DreamOf(fight);
@@ -811,6 +829,8 @@ namespace Jondo.Unity.Server.Handlers
             // of the turn or on taking a hit. That is where, without writing anything of its own, the
             // Ochre Dofus's action point comes from.
             playerFighter.Buffs.Vaciar();
+            if (questIncarnation is { Invulnerable: true })
+                playerFighter.Buffs.PonerEstado(InvulnerableState);
 
             // And the class's own, in the order the real server casts them before the first
             // turn: the initial spells of his choices, the items' attitudes, the class passive
@@ -2290,7 +2310,10 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static GameSession? Dueno(FightInstance fight, Fighter fighter)
         {
-            if (fighter == null || !fighter.EsInvocado) return null;
+            if (fighter == null) return null;
+            // An ally the character plays, as a summon of his: Barnabé.
+            if (fighter.IsPlayedAlly && fighter.DrivenBy != 0) return SessionRegistry.FindByCharacter(fighter.DrivenBy);
+            if (!fighter.EsInvocado) return null;
             var owner = fight.Buscar(fighter.Invocador);
             if (owner == null || owner.IsMonster) return null;
             return SessionRegistry.FindByCharacter(owner.Id);
@@ -2457,7 +2480,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (suyo == spell) return LimitesDeGrado(spell, grado);
                 }
             }
-            if (caster.EsInvocado)
+            if (caster.EsInvocado || caster.IsPlayedAlly)
             {
                 foreach (var (suyo, grado) in caster.HechizosDeInvocado)
                 {
@@ -2755,7 +2778,7 @@ namespace Jondo.Unity.Server.Handlers
             // client no longer had them in hand.
             foreach (var summon in TodosLosCombatientes(fight))
             {
-                if (summon == null || !summon.IsAlive || !summon.EsInvocado || !summon.JuegaTurno
+                if (summon == null || !summon.IsAlive || !(summon.EsInvocado || summon.IsPlayedAlly) || !summon.JuegaTurno
                     || !summon.ControlledBy(me)) continue;
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                     Network.FightProtocol.BuildCooldowns(summon.Id, RecargasDe(summon))));
@@ -3118,6 +3141,15 @@ namespace Jondo.Unity.Server.Handlers
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                 Network.FightProtocol.BuildCooldowns(me, RecargasDe(yoMismo))));
+
+            // And the bar of each ally he plays, as a summon's comes when it is summoned: Barnabé's.
+            foreach (var played in fight.Azul.Where(f => f.IsPlayedAlly && f.ControlledBy(me)).ToList())
+            {
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
+                    Network.FightProtocol.BuildCooldowns(played.Id, RecargasDe(played))));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
+                    Network.FightProtocol.BuildSummonSpellBar(played.Id, me, played.HechizosDeInvocado)));
+            }
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
                 Network.FightProtocol.BuildSequenceStart(me, Network.FightProtocol.OpeningSequence)));
@@ -4759,7 +4791,8 @@ namespace Jondo.Unity.Server.Handlers
             // A summon casts its own spells, never its owner's. With the client and the fight out
             // of step -- the owner's client still on his turn, the fight on his summon's -- his
             // Invocación de Chaferloko came out of his Arakna at grade 0 and summoned for her.
-            if (caster.EsInvocado && spell != 0 && (caster.HechizosDeInvocado == null || !caster.HechizosDeInvocado.Any(h => h.Spell == spell)))
+            if ((caster.EsInvocado || caster.IsPlayedAlly) && spell != 0
+                && (caster.HechizosDeInvocado == null || !caster.HechizosDeInvocado.Any(h => h.Spell == spell)))
             {
                 Program.LogDebug($"[Fight] {caster.Id} does not have spell {spell}; it is not cast.");
                 return;

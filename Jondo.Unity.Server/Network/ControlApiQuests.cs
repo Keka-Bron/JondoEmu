@@ -191,6 +191,29 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
+        /// { item }: how many of the template the slot's character carries, whether one is worn, and
+        /// the uid of the last placed -- what a play script checks between two steps, from the
+        /// session's own inventory.
+        /// </summary>
+        private static Respuesta TestCarried(string cuerpo)
+        {
+            var session = TestSessionOnline();
+            if (session == null) return Mal(404, "offline");
+            int template = (int)Numero(cuerpo, "item");
+            int count = 0, worn = 0;
+            long uid = 0;
+            RunInSession(session, _ =>
+            {
+                var mine = Managers.Equipment.All.Where(i => i.Template == template && i.Quantity > 0).ToList();
+                count = mine.Sum(i => i.Quantity);
+                worn = Managers.Equipment.HowManyWorn(template);
+                uid = mine.OrderByDescending(i => i.Position).FirstOrDefault()?.Uid ?? 0;
+                return Task.CompletedTask;
+            });
+            return Bien(new { item = template, count, worn, uid });
+        }
+
+        /// <summary>
         /// { text }: one of the administrator's chat commands as the character typed it -- «.oficio 26
         /// 80» puts the alchemist at level 80 for a quest that asks for it (Des fleurs épineuses).
         /// </summary>

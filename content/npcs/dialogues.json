@@ -26927,6 +26927,256 @@
         }
       ],
       "why": "Nina Lichi, the tailor of Incarnam [0,-2]: the job (20993-20994). By «El fin del reinado»: «Te voy a explicar el problema de Reyes Túpido.» (20995-20996: nothing to be done for his set, but no naturist in Incarnam; a big green leaf by the last elm, a vine rope from Anta Brok) is 5245, asked again with «¿Cómo consigo los recursos para Reyes Túpido?» (20999). «Aquí tienes lo que me pediste para solucionar lo de Reyes Túpido.» hands both over (5246, 5248) and she sews the leaf pants (20997); with one only, «Con un solo recurso, no puedo hacer nada» (20998)."
+    },
+    {
+      "npc": 1367,
+      "map": 190582274,
+      "opening": 8174,
+      "openings": [
+        { "quest": 657, "objective": 9534, "message": 8178 },
+        { "quest": 657, "message": 8206 },
+        { "after": 657, "message": 8179 }
+      ],
+      "lines": [
+        {
+          "message": 8174,
+          "choices": [
+            { "reply": 8180, "next": 8175 },
+            { "reply": 8183, "startsQuest": 657, "params": [[34, 657]] },
+            { "reply": 8184 }
+          ]
+        },
+        {
+          "message": 8175,
+          "choices": [
+            { "reply": 8181, "next": 8176 }
+          ]
+        },
+        {
+          "message": 8176,
+          "choices": [
+            { "reply": 8182, "next": 8177 }
+          ]
+        },
+        {
+          "message": 8177,
+          "choices": [
+            { "reply": 8183, "startsQuest": 657, "params": [[34, 657]] },
+            { "reply": 8184 }
+          ]
+        },
+        {
+          "message": 8178,
+          "choices": [
+            { "reply": 8185, "quest": 657, "completes": 9535, "params": [[30, 9535]], "next": 8179, "holds": 11566 }
+          ]
+        },
+        {
+          "message": 8179,
+          "choices": []
+        },
+        {
+          "message": 8206,
+          "choices": []
+        }
+      ],
+      "why": "Maytesé Nyhil before his house [10,-12], by «Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «Quel malheur, par Pandawa» (8174) offers «Écouter l'histoire.», «Aider Maytésé.» and «Refuser.» (its capture); the story goes on through 8175-8177 and «Aider Maytésé» starts it. Meanwhile 8206. Once the agent has heard the report (9534), 8178: «Seguir el aprendizaje.» hands Barnabé over (9535) and the «Rire» attitude is the quest's reward; afterwards 8179."
+    },
+    {
+      "npc": 2357,
+      "map": 164496396,
+      "opening": 17562,
+      "openings": [
+        { "canStart": 1484, "message": 17563 }
+      ],
+      "lines": [
+        {
+          "message": 17562,
+          "names": true,
+          "choices": [
+            { "reply": 24208, "quest": 657, "completes": 9528, "params": [[30, 9528]], "next": 20242 },
+            { "reply": 21029 }
+          ]
+        },
+        {
+          "message": 17563,
+          "names": true,
+          "choices": [
+            { "reply": 21034, "next": 17565 },
+            { "reply": 24209, "quest": 657, "completes": 9528, "params": [[30, 9528]], "next": 20243 },
+            { "reply": 21030 }
+          ]
+        },
+        {
+          "message": 17565,
+          "choices": [
+            { "reply": 21033, "startsQuest": 1484, "params": [[34, 1484]], "next": 17566 },
+            { "reply": 21032 },
+            { "reply": 21031, "next": 17564 }
+          ]
+        },
+        {
+          "message": 17566,
+          "choices": [
+            { "reply": 21035 }
+          ]
+        },
+        {
+          "message": 17564,
+          "choices": []
+        },
+        {
+          "message": 20242,
+          "choices": []
+        },
+        {
+          "message": 20243,
+          "choices": []
+        }
+      ],
+      "why": "Sergeant Zaltzom before the Dimensional Voyagers' tower [-22,-24]. By «Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «Raconter ce qui est arrivé à Maytésé Nyhil» (9528) on either greeting -- «Tú, sí, tú» for those not yet ready (17562), his proposal for those who are (17563, «Voyage, voyage» PL>79) --, and Commander Qu is upstairs (20242/20243). His proposal: «Escuchar su propuesta.» (17565), «Sí, sí, me interesa.» starts «Voyage, voyage» (17566: go in and see Colonel Onil), «Esto... Ya conozco a los viajeros.» (17564)."
+    },
+    {
+      "npc": 2339,
+      "map": 130023939,
+      "opening": 17721,
+      "lines": [
+        {
+          "message": 17721,
+          "choices": [
+            { "reply": 24210, "quest": 657, "completes": 9529, "params": [[30, 9529]], "next": 20244 }
+          ]
+        },
+        {
+          "message": 20244,
+          "choices": []
+        }
+      ],
+      "why": "Commander Qu (Major Qiu) in the tower's generator room, «deux fois sur la droite» from the entrance, by «Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): his jammed ionised separator (17721, its capture) and «Raconter ce qui est arrivé à Maytésé Nyhil» (9529); he sends one of his men to the rift's residual marks (20244)."
+    },
+    {
+      "npc": 2838,
+      "map": 190582274,
+      "opening": 20245,
+      "openings": [
+        { "quest": 657, "objective": 9533, "message": 20248 },
+        { "quest": 657, "objective": 9531, "message": 20247 }
+      ],
+      "lines": [
+        {
+          "message": 20245,
+          "choices": [
+            { "reply": 24212, "next": 20246 }
+          ]
+        },
+        {
+          "message": 20246,
+          "choices": [
+            { "reply": 24211, "quest": 657, "completes": 9531, "params": [[30, 9531]], "teleport": 192677892 }
+          ]
+        },
+        {
+          "message": 20247,
+          "choices": [
+            { "reply": 24211, "quest": 657, "beforeObjective": 9533, "teleport": 192677892 }
+          ]
+        },
+        {
+          "message": 20248,
+          "choices": [
+            { "reply": 24214, "quest": 657, "completes": 9534, "params": [[30, 9534]], "next": 20249 }
+          ]
+        },
+        {
+          "message": 20249,
+          "choices": [
+            { "reply": 24213 }
+          ]
+        }
+      ],
+      "why": "Agent Krashtes Damy (Krashtète Deumy) before the house, by «Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): his inventions (20245, «Poser des questions sur son intervention» in its capture), Doc's prototype (20246) and «Apartarte.» (9531): «Vous êtes soudain téléporté dans une Dimension Inconnue». Back without Barnabé, the portal still open (20247), «Apartarte.» again. Back with him, «Je suis content de te voir sain et sauf !» (20248, its capture): «Raconter votre bref séjour dans une autre dimension» (9534), his report (20249)."
+    },
+    {
+      "npc": 2843,
+      "map": 192677892,
+      "opening": 20254,
+      "openings": [
+        { "quest": 657, "objective": 9533, "message": 20257 },
+        { "quest": 657, "objective": 9532, "message": 20256 }
+      ],
+      "lines": [
+        {
+          "message": 20254,
+          "choices": [
+            { "reply": 24218, "quest": 657, "completes": 9532, "params": [[30, 9532]], "next": 20255 },
+            { "reply": 60385, "teleport": 190582274 }
+          ]
+        },
+        {
+          "message": 20255,
+          "choices": [
+            { "reply": 24216, "quest": 657, "beforeObjective": 9533 },
+            { "reply": 24217 },
+            { "reply": 32774, "teleport": 190582274 },
+            { "reply": 74024, "teleport": 190582274 }
+          ]
+        },
+        {
+          "message": 20256,
+          "choices": [
+            { "reply": 24219, "quest": 657, "beforeObjective": 9533 },
+            { "reply": 24220 },
+            { "reply": 32775, "teleport": 190582274 },
+            { "reply": 74021, "teleport": 190582274 }
+          ]
+        },
+        {
+          "message": 20257,
+          "choices": [
+            { "reply": 24221, "teleport": 190582274 }
+          ]
+        }
+      ],
+      "why": "The bellicose Trantroa of the Unknown Dimension, by «Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «J'ai hâte de voir ce que ce marcassin vaut à l'entraînement» (20254) and «Exiger la libération de Barnabé» (9532, «Interroga a los nativos»), the deal (20255: «Accepter le marché.», «Prendre du temps pour réfléchir ou s'entraîner.», «Se suicider.», its capture), asked again in 20256. «Accepter le marché» (obligatoire): «Vous incarnerez un épouvantail qui pourra invoquer 3 classes et vous serez accompagné de Barnabé», «1PV 0PM 3PA mais vous êtes invulnérable», Barnabé «contrôlable», «il ne doit pas mourir sinon le combat est perdu». Beaten, the demons quarrel (20257) and «Aprovechar la discusión para marcharte.» brings him back before the house. «Huir.», «Suicidarte.» and the potion leave the dimension the same way, Barnabé left behind: what they do besides is not described anywhere."
+    },
+    {
+      "npc": 4371,
+      "map": 192677892,
+      "opening": 30466,
+      "lines": [
+        {
+          "message": 30466,
+          "choices": [
+            { "reply": 36738 },
+            { "reply": 36739 }
+          ]
+        }
+      ],
+      "why": "The training dummy of the Unknown Dimension, by «Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «S'entraîner avant le combat contre les démons» (non obligatoire) is a training fight to learn the spells; «Laisser le mannequin.» (its capture)."
+    },
+    {
+      "npc": 2840,
+      "map": 192677892,
+      "opening": 20251,
+      "lines": [
+        {
+          "message": 20251,
+          "choices": []
+        }
+      ],
+      "why": "The hungry Soissanth of the Unknown Dimension: grilled sausages in the air."
+    },
+    {
+      "npc": 2844,
+      "map": 192677892,
+      "opening": 46053,
+      "lines": [
+        {
+          "message": 46053,
+          "choices": []
+        }
+      ],
+      "why": "Barnabé, the boar kept by the demons, sniffing the character happily."
     }
   ]
 }

@@ -347,6 +347,14 @@ namespace Jondo.Unity.World.Fights
         public long DrivenBy { get; set; }
 
         /// <summary>
+        /// A monster on the players' side that one of them plays by hand (<see cref="DrivenBy"/>),
+        /// his client told so as for a summon of his -- its bar (jyy) and its turn (jyj) --, without
+        /// being one: it does not fall with him nor takes a summon's place. Barnabé in «Barnabé en
+        /// el espacio», «contrôlable depuis la màj 2.70» (Dofus pour les noobs).
+        /// </summary>
+        public bool IsPlayedAlly { get; set; }
+
+        /// <summary>
         /// A summon with NOTHING TO PLAY: no step to take and no spell of its own. Its turn is
         /// its start-of-turn triggers and then the turn handed on, and nobody gets a jyj for
         /// it. Every other summon is its owner's to play, by hand: the Tymobot (jyj on its

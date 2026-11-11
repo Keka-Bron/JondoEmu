@@ -88,6 +88,20 @@
       "cell": 370,
       "orientation": 1,
       "measured": "the client's map reference 10: the foot of the Celestial Temple's steps in Incarnam, out of the temple by its gates or by Andrée Inkarnay"
+    },
+    {
+      "map": 192677892,
+      "from": 190582274,
+      "cell": 410,
+      "orientation": 7,
+      "measured": "inferred: Krashtes' portal into the Unknown Dimension, on the island's open ground south of the tent"
+    },
+    {
+      "map": 190582274,
+      "from": 192677892,
+      "cell": 330,
+      "orientation": 7,
+      "measured": "inferred: back through the portal, before Maytesé's house beside agent Krashtes"
     }
   ]
 }

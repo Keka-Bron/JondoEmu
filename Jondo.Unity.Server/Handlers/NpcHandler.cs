@@ -1228,10 +1228,17 @@ namespace Jondo.Unity.Server.Handlers
                     : npcFight.Monsters;
                 var group = MobSpawnManager.ComposeOffMap(monsters);
                 if (group == null) return;
+                // The monster he fights as: the Entrenador of «Barnabé en el espacio».
+                if (npcFight.Incarnates != 0)
+                    FightHandler.IncarnateInNextFight(GameState.CharacterId, npcFight.Incarnates,
+                                                      npcFight.IncarnationGrade, npcFight.IncarnationInvulnerable);
                 await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
                     arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),
                     alliesMustLive: npcFight.AlliesMustLive,
-                    winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId, winMarks: npcFight.Marks);
+                    winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId, winMarks: npcFight.Marks,
+                    alliesPlayedBy: npcFight.AlliesPlayed ? GameState.CharacterId : 0);
+                // Taken by the fight when it was built; one that did not start leaves none for the next.
+                FightHandler.TakeNextIncarnation(GameState.CharacterId);
                 return;
             }
 

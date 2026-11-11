@@ -3157,6 +3157,51 @@
       "orientation": 1,
       "criterion": "Qa=894&Qo>5516&Qo<5518",
       "why": "A heap of filings at [10,-20] while the sticky filings are to be brought (5518). INFERRED cell."
+    },
+    {
+      "map": 190582274,
+      "npc": 1367,
+      "cell": 274,
+      "orientation": 3,
+      "criterion": "PL>14|Qa=657|Qf=657|Qa=2063|Qf=2063|Qa=2160|Qf=2160",
+      "why": "Maytesé Nyhil before his house, east of the dome, gives «Barnabé en el espacio» (PL>14). INFERRED cell: no capture covers the map; placed by the guide's screenshots."
+    },
+    {
+      "map": 190582274,
+      "npc": 2838,
+      "cell": 316,
+      "orientation": 3,
+      "criterion": "Qa=657&Qo>9529&Qo<9534",
+      "why": "Agent Krashtes Damy, sent by Commander Qu (9529) until he has the report (9534). INFERRED cell: no capture covers the map; placed by the guide's screenshots."
+    },
+    {
+      "map": 192677892,
+      "npc": 2843,
+      "cell": 244,
+      "orientation": 3,
+      "why": "The bellicose Trantroa beside the red tent. INFERRED cell: no capture covers the map; placed by the guide's screenshots."
+    },
+    {
+      "map": 192677892,
+      "npc": 2840,
+      "cell": 272,
+      "orientation": 3,
+      "why": "The hungry Soissanth. INFERRED cell: no capture covers the map; placed by the guide's screenshots."
+    },
+    {
+      "map": 192677892,
+      "npc": 2844,
+      "cell": 286,
+      "orientation": 3,
+      "criterion": "Qa=657&Qo<9533",
+      "why": "Barnabé, held by the demons until they are beaten (9533). INFERRED cell: no capture covers the map; placed by the guide's screenshots."
+    },
+    {
+      "map": 192677892,
+      "npc": 4371,
+      "cell": 325,
+      "orientation": 1,
+      "why": "The training dummy. INFERRED cell: no capture covers the map; placed by the guide's screenshots."
     }
   ]
 }

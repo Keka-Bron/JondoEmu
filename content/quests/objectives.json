@@ -3158,6 +3158,15 @@
    "kind": "order",
    "anyOrder": true,
    "why": "The leaf, the plume swapped for the rope and the two brought to Nina go in any order: Dofus pour les noobs fetches the plume and the rope before the leaf, Nina's own words the leaf first."
+  },
+  {
+   "objective": 9533,
+   "quest": 657,
+   "kind": "beat",
+   "monster": 3984,
+   "map": 192677892,
+   "afterObjectives": [9532],
+   "why": "«Libera a Barnabé»: the demons beaten, «vous récupérez Barnabé, le marcassin dimensionnel dans votre inventaire de quête» («Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs)). The item itself is monster 3984's drop, at 100 % in the client's table."
   }
  ]
 }
