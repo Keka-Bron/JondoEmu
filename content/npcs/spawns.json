@@ -2918,6 +2918,13 @@
       "orientation": 1,
       "criterion": "Qo>18416&Qo<18417",
       "why": "The miaumiausita lured out of the sewers by the last shard, until she runs off with it. INFERRED cell: by the sewers' way out."
+    },
+    {
+      "map": 73402891,
+      "npc": 1219,
+      "cell": 248,
+      "orientation": 3,
+      "why": "Warko Linch, where Dofus pour les noobs, «Le cimetière primitif» starts the quest: Forêt de Kaliptus [-11,12] (its start position, map 73402891). He stood nowhere. INFERRED cell: by the red mushroom and its flasks."
     }
   ]
 }

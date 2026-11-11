@@ -521,6 +521,9 @@ namespace Jondo.Unity.Server.Network
                         await ConquestHandler.OnMapEnteredAsync(stream, GameState.CharacterId,
                                                                 mapaInfo?.SubAreaId ?? 0);
 
+                        // And a soul back into the world, told he is one.
+                        await Handlers.PhantomHandler.OnMapLoadedAsync(stream);
+
                         // And the stagings the map stands with, played out: the tutorial's bridges.
                         await Managers.MapStagings.ShowAsync(stream, Managers.MapStagings.OnArrival(GameState.MapId));
 

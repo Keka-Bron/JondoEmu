@@ -99,6 +99,9 @@ namespace Jondo.Unity.Server.Handlers
             // to exist is the quest. It is what the tutorial capture does -- six clicks on elements
             // 541424-541429 and after each one the client asking «ieo {1629}» --, and what nobody did:
             // until now a click like that fell into the «unknown use» branch.
+            // A phoenix: a soul rises, and only then does the quest that asked for it hear of it.
+            if (await PhantomHandler.TryPhoenixAsync(stream, mapId, elementId)) return;
+
             if (await Managers.Quests.OnInteractiveUsedAsync(stream, mapId, elementId)) return;
 
             // The day's room's altar: the offering's prayer.

@@ -23773,6 +23773,56 @@
         }
       ],
       "why": "Aplastator el Aminal in Brakmar [-26,35], the Brakmarians' daily dragoturkey charge (145, Brakmar's twin of Dofus pour les noobs, «Chargez !»): to a Brakmarian who may take it, «Busco dragopavos masivos y violentos...» (the step's own line) with the promise or the infantry; with it running «¡¡¡QUIERO PARTICIPAR!!!», the red dragoturkey taken on a hello like the old quests' hand-overs (he has no reply to give it with), then his thanks and scrolls until the next day; else his charge line. His lines for 252 and 278 are not written: their objectives on him are done on a hello."
+    },
+    {
+      "npc": 1219,
+      "map": 73402891,
+      "opening": 5325,
+      "openings": [
+        { "canStart": 485, "message": 4971 },
+        { "quest": 485, "pending": 3463, "message": 5446 },
+        { "quest": 485, "message": 5325 }
+      ],
+      "lines": [
+        {
+          "message": 4971,
+          "choices": [
+            { "reply": 7472, "startsQuest": 485, "params": [[34, 485]], "beforeQuest": 485 },
+            { "reply": 7471 },
+            { "reply": 7469, "next": 5325 }
+          ]
+        },
+        {
+          "message": 5446,
+          "choices": [
+            { "reply": 7477, "next": 5442, "quest": 485, "beforeObjective": 3463, "holds": 7904, "holdsCount": 5, "completes": 3463 },
+            { "reply": 7469, "next": 5325 }
+          ]
+        },
+        {
+          "message": 5442,
+          "choices": [
+            { "reply": 7475, "quest": 485, "afterObjective": 3463, "beforeObjective": 3464, "completes": 3464, "teleport": 64488707, "phantom": 64489222 },
+            { "reply": 7474 }
+          ]
+        },
+        {
+          "message": 5325,
+          "choices": [
+            { "reply": 7473, "next": 5443, "quest": 485, "afterObjective": 3463, "beforeObjective": 3465 },
+            { "reply": 7476 }
+          ]
+        },
+        {
+          "message": 5443,
+          "choices": [
+            { "reply": 7475, "quest": 485, "afterObjective": 3463, "beforeObjective": 3464, "completes": 3464, "teleport": 64488707, "phantom": 64489222 },
+            { "reply": 7475, "quest": 485, "afterObjective": 3464, "beforeObjective": 3465, "teleport": 64488707, "phantom": 64489222 },
+            { "reply": 7474 }
+          ]
+        }
+      ],
+      "why": "Warko Linch in the Kaliptus forest [-11,12]: Dofus pour les noobs, «Le cimetière primitif», to go into his forebears' cemetery one has to die, and he will help for five kaliptus flowers (4971, the step's line); the flowers given (3463), the brew ready and a guinea pig wanted (5442), «Aceptar» drinks it (3464): dead, a soul in the primitive cemetery [-11,16], to rise at its phoenix [-10,13] (3465). «Tu brebaje ya está listo.» brings the offer back to whoever said no, or whose soul a restart woke alive."
     }
   ]
 }

@@ -1644,8 +1644,13 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                         ConnectionProtocol.NpcDialogCloseReason)));
 
+                // Warko's brew: a soul before the map change, so the map he lands on draws him as one.
+                if (elegidaAhora.PhantomPhoenix != 0)
+                    PhantomHandler.Become(GameState.CharacterId, elegidaAhora.PhantomPhoenix);
+
                 await WorldMoveHandler.TeleportAsync(stream, adonde);
                 Console.WriteLine($"[NPC] Reply {reply}: leads to map {adonde}.");
+                if (elegidaAhora.PhantomPhoenix != 0) await PhantomHandler.TellAsync(stream);
 
                 // The orbalantir's, after the map change: the mutation taken away or given.
                 if (elegidaAhora.EndsMutation) await MutationHandler.EndAsync(stream);

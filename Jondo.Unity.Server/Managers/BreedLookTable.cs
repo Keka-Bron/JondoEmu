@@ -204,6 +204,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static byte[] MapLook(DatabaseManager.DbCharacter character)
         {
+            if (Phantoms.Is(character.Id)) return ConnectionProtocol.MonsterLook(Phantoms.LookOf(character.Sex), false).Build();
             if (Mutations.OfCharacter(character.Id) == null)
             {
                 int bones = SlotLooks.DisguiseBones(SlotLooks.Of(character.Id));

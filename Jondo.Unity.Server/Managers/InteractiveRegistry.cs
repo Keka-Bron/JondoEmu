@@ -126,6 +126,9 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>The Malle aux trésors' planning table: the legendary hunts' window (TreasureHuntHandler).</summary>
         PlanningTable,
+
+        /// <summary>A phoenix statue: «Resucitar» brings a soul back (PhantomHandler).</summary>
+        Phoenix,
     }
 
     /// <summary>A skill offered by an interactive element.</summary>
@@ -349,6 +352,18 @@ namespace Jondo.Unity.Server.Managers
             {
                 foreach (var element in Bins.On(mapId))
                     Register(mapId, element, Bins.Type, InteractiveActionKind.Bin, Bins.UseSkill);
+            }
+
+            // The phoenix statues, graphic 7521, with their «Resucitar» (211): what brings a soul back
+            // (Managers.Phantoms, PhantomHandler), looked at before this registry is.
+            foreach (long mapId in Interactives.MapIds)
+            {
+                foreach (var element in Interactives.ElementsOf(mapId))
+                {
+                    if (element.Gfx != Phantoms.PhoenixGfx || _byElement.ContainsKey((mapId, element.Id))) continue;
+                    Register(mapId, element, Interactives.TypeOfGfx(element.Gfx), InteractiveActionKind.Phoenix,
+                             Phantoms.ResurrectSkill);
+                }
             }
 
             // Houses go in two rounds: the street doors, which are on world maps,

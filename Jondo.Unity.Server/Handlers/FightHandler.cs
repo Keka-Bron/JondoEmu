@@ -43,6 +43,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
+            // A soul fights nobody, nor is he attacked (Managers.Phantoms).
+            if (PhantomHandler.CannotFight(GameState.CharacterId)) return;
 
             // A group already being fought went off the map with a kmu: it is nobody's to attack
             // a second time. Its fight is joined by its swords (kay), not by clicking the group.
@@ -2170,6 +2172,7 @@ namespace Jondo.Unity.Server.Handlers
             if (groupId == 0) return;
             if (await DreamHandler.GuestMayNotFightAsync(stream)) return;
             if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Fight)) return;
+            if (PhantomHandler.CannotFight(GameState.CharacterId)) return;
 
             long here = GameState.MapId;
             var group = MobSpawnManager.GetMobsForMap(here).Find(g => g.MobId == groupId);

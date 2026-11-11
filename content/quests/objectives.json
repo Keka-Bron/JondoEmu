@@ -2866,6 +2866,14 @@
    "afterObjectives": [18415],
    "showsNpc": 6624,
    "why": "«Utiliza la esquirla de mineral para que la miaumiausita salga de las alcantarillas»: 26203 used up the sewers [-21,36] leaves 26204, and 26204 used outside them (its effect 30, its condition the street) brings her out (Dofus pour les noobs, «La lumière au bout des égouts»)."
+  },
+  {
+   "objective": 3465,
+   "quest": 485,
+   "kind": "click",
+   "elements": [{"map": 64489222, "element": 506007}],
+   "afterObjectives": [3464],
+   "why": "«Renace junto al fénix del cementerio primitivo»: its coordinates [-10,13], the phoenix statue there, element 506007 (graphic 7521), its «Resucitar» used by the soul Warko's brew made (Managers.Phantoms): «Rejoignez alors le Phénix le plus proche pour ressusciter» (Dofus pour les noobs, «Le cimetière primitif»)."
   }
  ]
 }

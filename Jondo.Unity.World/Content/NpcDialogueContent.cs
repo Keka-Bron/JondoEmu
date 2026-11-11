@@ -166,6 +166,13 @@ namespace Jondo.Unity.World.Content
         public bool EndsMutation { get; init; }
 
         /// <summary>
+        /// The phoenix's map when the reply kills the player into a soul, or zero: Warko Linch's brew
+        /// in «El cementerio primitivo», which leaves him in the primitive cemetery to find its phoenix
+        /// (Managers.Phantoms). Applied with the reply's map change.
+        /// </summary>
+        public long PhantomPhoenix { get; init; }
+
+        /// <summary>
         /// With <see cref="CompletesAll"/>: the reply hands over whatever of its objectives' items is
         /// carried, and is offered as soon as one of them is -- Kaponor's «Toma, esto es lo que he
         /// encontrado», the raft's materials brought one by one.
@@ -987,6 +994,7 @@ namespace Jondo.Unity.World.Content
                             GivesCount = Math.Max(1, (int)Number(choice, "givesCount")),
                             EndsMutation = choice.TryGetProperty("endsMutation", out var ends)
                                            && ends.ValueKind == JsonValueKind.True,
+                            PhantomPhoenix = Number(choice, "phantom"),
                             Partial = choice.TryGetProperty("partial", out var partial)
                                       && partial.ValueKind == JsonValueKind.True,
                             Forfeits = (int)Number(choice, "forfeits"),
@@ -1184,6 +1192,7 @@ namespace Jondo.Unity.World.Content
                             if (choice.Holds != 0 && choice.HoldsCount != 1) writer.WriteNumber("holdsCount", choice.HoldsCount);
                             if (choice.Gives != 0 && choice.GivesCount != 1) writer.WriteNumber("givesCount", choice.GivesCount);
                             if (choice.EndsMutation) writer.WriteBoolean("endsMutation", true);
+                            if (choice.PhantomPhoenix != 0) writer.WriteNumber("phantom", choice.PhantomPhoenix);
                             if (choice.Partial) writer.WriteBoolean("partial", true);
                             if (choice.Forfeits != 0) writer.WriteNumber("forfeits", choice.Forfeits);
                             if (choice.AlsoGives.Count > 0)
