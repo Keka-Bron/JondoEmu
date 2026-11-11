@@ -2953,6 +2953,30 @@
       "cell": 316,
       "orientation": 3,
       "why": "Herdegriz, the Mystic, in Astrub at [7,-19] («Rendez-vous en [7,-19] et parlez à Herdegrize», Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 188746246,
+      "npc": 1918,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=1200&Qo=6758",
+      "why": "The mad Xelor's hawker, the crook (estafadora, «Xélor Louche») at [6,-16], while «Bien velu, c'est Kerubim» has him to beat (6758). INFERRED cell."
+    },
+    {
+      "map": 88081686,
+      "npc": 1919,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1200&Qo=6759",
+      "why": "The mad Xelor's hawker, the suspect (sospechoso, «Xélor Suspect») at [3,1], while «Bien velu, c'est Kerubim» has him to beat (6759). INFERRED cell."
+    },
+    {
+      "map": 84805378,
+      "npc": 1920,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=1200&Qo=6760",
+      "why": "The mad Xelor's hawker, the fraud (fraudulento, «Xelor Interlope») at [-3,-24], while «Bien velu, c'est Kerubim» has him to beat (6760). INFERRED cell."
     }
   ]
 }
