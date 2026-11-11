@@ -230,6 +230,7 @@ namespace Jondo.Unity.Tests.Quests
                             QuestBindingKind.Walk when binding.MapId == 0 => "no map",
                             QuestBindingKind.Objectives when binding.AfterObjectives.Count == 0 => "no objectives",
                             QuestBindingKind.Gather when binding.ItemId == 0 => "no item",
+                            QuestBindingKind.Read when binding.Elements.Count == 0 && binding.ItemId == 0 => "no element nor book",
                             QuestBindingKind.Beat when binding.MonsterId == 0 && binding.AnyOfMonsters.Count == 0 => "no monster",
                             _ => "",
                         };

@@ -39,6 +39,13 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>The cell of <see cref="WinMapId"/>.</summary>
             public int WinCellId { get; init; }
+            /// <summary>
+            /// A mark the win notes among the character's used elements («marks»), which a reply's
+            /// «afterElement» asks for: the heaps of filings of «Las primeras impresiones son
+            /// engañosas» give their handful only once their moguis are beaten. Negative, so it
+            /// never meets an element of a map.
+            /// </summary>
+            public int Marks { get; init; }
 
             /// <summary>
             /// Whether the monsters come at the grade of the character's level instead of the one written
@@ -93,6 +100,7 @@ namespace Jondo.Unity.Server.Managers
                                 AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
                                 WinMapId = Long(row, "winMap"),
                                 WinCellId = (int)Long(row, "winCell"),
+                                Marks = (int)Long(row, "marks"),
                                 ByLevel = row.TryGetProperty("byLevel", out var byLevel) && byLevel.ValueKind == JsonValueKind.True,
                             });
                         }

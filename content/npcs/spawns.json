@@ -3117,6 +3117,46 @@
       "cell": 340,
       "orientation": 1,
       "why": "Vermo in the Almanax temple's hall [-4,-24], the four seasons' copies of it (only today's is reached): the quest's four starting maps. INFERRED cell, by the bookcases."
+    },
+    {
+      "map": 189530120,
+      "npc": 4377,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=894&Qo>5514&Qo<5515",
+      "why": "A Mancos bandit at [-2,-21] while the six are to be beaten (5515). INFERRED cell."
+    },
+    {
+      "map": 189530632,
+      "npc": 4441,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=894&Qo>5514&Qo<5515",
+      "why": "A Mancos bandit at [-1,-21] while the six are to be beaten (5515). INFERRED cell."
+    },
+    {
+      "map": 193331715,
+      "npc": 7841,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qa=894&Qo>5516&Qo<5518",
+      "why": "A heap of filings at [9,-19] while the sticky filings are to be brought (5518). INFERRED cell."
+    },
+    {
+      "map": 193200131,
+      "npc": 7841,
+      "cell": 302,
+      "orientation": 1,
+      "criterion": "Qa=894&Qo>5516&Qo<5518",
+      "why": "A heap of filings at [10,-19] while the sticky filings are to be brought (5518). INFERRED cell."
+    },
+    {
+      "map": 193200130,
+      "npc": 7841,
+      "cell": 305,
+      "orientation": 1,
+      "criterion": "Qa=894&Qo>5516&Qo<5518",
+      "why": "A heap of filings at [10,-20] while the sticky filings are to be brought (5518). INFERRED cell."
     }
   ]
 }

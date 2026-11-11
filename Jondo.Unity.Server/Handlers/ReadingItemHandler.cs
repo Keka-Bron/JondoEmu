@@ -55,6 +55,8 @@ namespace Jondo.Unity.Server.Handlers
             // And the objective it validates, when the quest is in hand: reading the recipe.
             foreach (var effect in effects.Where(e => e.EffectId == ObjectiveEffect && e.Value != 0))
                 await Quests.CompleteByReplyAsync(stream, 0, effect.Value);
+            // Or the one a binding ties to reading this book (content/quests/objectives.json).
+            await Quests.OnItemReadAsync(stream, item.Template);
             return true;
         }
 

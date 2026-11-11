@@ -3075,6 +3075,13 @@
    "anyOrder": true,
    "requires": [{"item": 14508, "count": 1}],
    "why": "«Utiliza la cera para lustrar ...»: the first floor's right bookcase, by its ladder (cell 347, graphic 39365), polished with the boar wax (14508) in hand. «Retournez en [3,-17] pour lustrer les meubles. Il y en a trois au rez-de-chaussée et 2 à l'étage» (Dofus pour les noobs); the five are the house's furniture elements the quest's era added (482834-482837) and the animated eye. Which chest is the small one is INFERRED from the drawing."
+  },
+  {
+   "objective": 5511,
+   "quest": 894,
+   "kind": "read",
+   "item": 13176,
+   "why": "«Hojea el libro que cuenta la leyenda de Stiff Yob»: the engravings bought from Nacf Virgilio (13176, document 308) opened from the bag («Consultez le livre La Légende de Steff Taff qui se trouve dans votre inventaire de quête et consultez-le jusque la dernière page. Le livre est vide», Dofus pour les noobs)."
   }
  ]
 }

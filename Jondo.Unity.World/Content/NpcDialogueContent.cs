@@ -94,6 +94,20 @@ namespace Jondo.Unity.World.Content
         /// </remarks>
         public int AfterElement { get; init; }
 
+        /// <summary>
+        /// A mark that must NOT be among the character's used elements yet for the reply to be
+        /// offered («beforeElement»): a heap of filings gives its handful once, the reply that takes
+        /// it leaving that very mark (<see cref="Marks"/>).
+        /// </summary>
+        public int BeforeElement { get; init; }
+
+        /// <summary>
+        /// A mark the reply notes among the character's used elements when chosen («marks»), for
+        /// another reply's <see cref="AfterElement"/> or <see cref="BeforeElement"/>. Negative, so it
+        /// never meets an element of a map.
+        /// </summary>
+        public int Marks { get; init; }
+
         /// <summary>What this reply buys, and for how much. Zero when it buys nothing.</summary>
         /// <remarks>
         /// The price goes in the reply's text --«Ponme una limonada. Toma, 1 kama.»-- and
@@ -356,7 +370,7 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public bool Gated => Criterion.Length > 0 || MinLevel != 0 || BelowLevel != 0 || Holds != 0
                              || Takes != 0 || TakesAll.Count > 0 || StartsQuest != 0 || BeforeQuest != 0
-                             || AfterElement != 0;
+                             || AfterElement != 0 || BeforeElement != 0;
 
         public override string ToString()
         {
@@ -432,6 +446,7 @@ namespace Jondo.Unity.World.Content
         {
             if (choice.AfterElement != 0
                 && (elementUsed == null || !elementUsed(choice.AfterElement))) return false;
+            if (choice.BeforeElement != 0 && elementUsed != null && elementUsed(choice.BeforeElement)) return false;
 
             if (choice.BeforeQuest != 0 && (active(choice.BeforeQuest) || finished(choice.BeforeQuest))) return false;
 
@@ -964,6 +979,8 @@ namespace Jondo.Unity.World.Content
                             BeforeQuest = (int)Number(choice, "beforeQuest"),
                             RandomGroup = (int)Number(choice, "random"),
                             AfterElement = (int)Number(choice, "afterElement"),
+                            BeforeElement = (int)Number(choice, "beforeElement"),
+                            Marks = (int)Number(choice, "marks"),
                             BuysItem = (int)Number(choice, "buyItem"),
                             BuysCount = (int)Math.Max(1, Number(choice, "buyCount")),
                             BuysPrice = Number(choice, "buyPrice"),
@@ -1127,6 +1144,10 @@ namespace Jondo.Unity.World.Content
                                 writer.WriteNumber("random", choice.RandomGroup);
                             if (choice.AfterElement != 0)
                                 writer.WriteNumber("afterElement", choice.AfterElement);
+                            if (choice.BeforeElement != 0)
+                                writer.WriteNumber("beforeElement", choice.BeforeElement);
+                            if (choice.Marks != 0)
+                                writer.WriteNumber("marks", choice.Marks);
                             if (choice.BuysItem != 0)
                             {
                                 writer.WriteNumber("buyItem", choice.BuysItem);

@@ -950,6 +950,29 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// A book of the bag has been read: an objective bound to reading it («read» with an «item»)
+        /// closes. The blank book of «Las primeras impresiones son engañosas», leafed through to its
+        /// empty last page, sends the character back to complain to Primir.
+        /// </summary>
+        public static async Task OnItemReadAsync(NetworkStream stream, int itemId)
+        {
+            var log = Log;
+            if (log == null || _book == null || itemId == 0) return;
+            foreach (var run in new List<QuestRun>(log.Doing()))
+            {
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    var binding = Bindings.Of(objective.Id);
+                    if (binding == null || binding.Kind != QuestBindingKind.Read || binding.ItemId != itemId) continue;
+                    if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
+                    await CloseAsync(stream, binding);
+                }
+            }
+        }
+
+        /// <summary>
         /// A reply that does a conversation objective (DialogueChoice.Completes) has been chosen:
         /// it is done if it is in hand and has come up, and what it asks to be handed over is.
         /// </summary>

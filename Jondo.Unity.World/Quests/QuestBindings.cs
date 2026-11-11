@@ -56,7 +56,9 @@ namespace Jondo.Unity.World.Quests
 
         /// <summary>
         /// Every element of <see cref="QuestBinding.Elements"/> read: «Averigua más información
-        /// sobre tu objetivo: los dofus», the Dofusarium's six statues, each a document.
+        /// sobre tu objetivo: los dofus», the Dofusarium's six statues, each a document. Or, with
+        /// <see cref="QuestBinding.ItemId"/>, that book of the bag opened: «Hojea el libro que
+        /// cuenta la leyenda de Stiff Yob».
         /// </summary>
         Read,
 
@@ -233,7 +235,10 @@ namespace Jondo.Unity.World.Quests
         /// </summary>
         public int ThenStarts { get; init; }
 
-        /// <summary>The item gathered, for <see cref="QuestBindingKind.Gather"/>.</summary>
+        /// <summary>
+        /// The item gathered, for <see cref="QuestBindingKind.Gather"/>; the book read, for a
+        /// <see cref="QuestBindingKind.Read"/> with no element.
+        /// </summary>
         public int ItemId { get; init; }
 
         /// <summary>

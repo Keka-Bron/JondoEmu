@@ -975,6 +975,13 @@ namespace Jondo.Unity.World.Fights
         public int WinCellId { get; set; }
 
         /// <summary>
+        /// A mark the win leaves on each winner, among the elements it has used, for a reply's
+        /// «afterElement»: the moguis guarding a heap of filings, once beaten, let it be taken
+        /// (content/fights/npc_fights.json, «marks»). Zero for every other fight.
+        /// </summary>
+        public int WinMarks { get; set; }
+
+        /// <summary>
         /// How deep the triggers set off by other triggers go right now. A hit fires "D", "D"
         /// casts a spell that hits, and that hit fires "D" again: past a few levels it is a loop
         /// in the data, not a mechanic, and it stops there.

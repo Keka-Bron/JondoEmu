@@ -1229,7 +1229,7 @@ namespace Jondo.Unity.Server.Handlers
                 await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
                     arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),
                     alliesMustLive: npcFight.AlliesMustLive,
-                    winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId);
+                    winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId, winMarks: npcFight.Marks);
                 return;
             }
 
@@ -1434,6 +1434,10 @@ namespace Jondo.Unity.Server.Handlers
                             item.ToString(System.Globalization.CultureInfo.InvariantCulture))));
                 }
             }
+
+            // The mark the reply leaves («marks»): the heap of filings that has given its handful.
+            if (elegidaAhora != null && elegidaAhora.Marks != 0 && SessionContext.State.ElementsUsed.Add(elegidaAhora.Marks))
+                DatabaseManager.RememberElement(GameState.CharacterId, elegidaAhora.Marks);
 
             // Does the answer buy something? Before the quest, because a purchase that fails must not
             // leave the conversation halfway with the quest already started.

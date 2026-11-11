@@ -39,7 +39,7 @@ namespace Jondo.Unity.Server.Handlers
                                                                long arenaMapId = 0,
                                                                IReadOnlyList<MobSpawnManager.MobMember>? allies = null,
                                                                bool alliesMustLive = false,
-                                                               long winMapId = 0, int winCellId = 0)
+                                                               long winMapId = 0, int winCellId = 0, int winMarks = 0)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
@@ -135,6 +135,7 @@ namespace Jondo.Unity.Server.Handlers
             fight.AlliesMustLive = alliesMustLive && allies is { Count: > 0 };
             fight.WinMapId = winMapId;
             fight.WinCellId = winCellId;
+            fight.WinMarks = winMarks;
 
             // All of an ordinary group; of a dungeon room's, the first clamp(players, 4, 8).
             int players = fight.Azul.Count(f => !f.IsMonster);
@@ -10912,6 +10913,11 @@ namespace Jondo.Unity.Server.Handlers
             // And the quests that asked for defeating something, for the same reason: this is where
             // it is known that it really fell, and the client is not trusted on that.
             await QuestWatcher.FightEndedAsync(stream, fight, won);
+
+            // And the mark an NPC's fight leaves on whoever wins it (npc_fights.json «marks»):
+            // the moguis of a heap of filings beaten, the heap lets its handful be taken.
+            if (won && fight.WinMarks != 0 && Network.SessionContext.State.ElementsUsed.Add(fight.WinMarks))
+                DatabaseManager.RememberElement(GameState.CharacterId, fight.WinMarks);
 
             // And what the achievements count, set aside until the character is back on the map.
             AchievementWatcher.FightEnded(fight, won);

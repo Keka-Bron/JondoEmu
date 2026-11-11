@@ -610,6 +610,9 @@
             { "reply": 37674, "quest": 1990, "completes": 14009, "params": [[30, 14009]], "next": 31196, "afterObjective": 14008 },
             { "reply": 37677, "next": 31198, "quest": 1991, "afterObjective": 14069 },
             { "reply": 37670, "quest": 1989, "completes": 14004, "params": [[30, 14004]], "next": 31195 },
+            { "reply": 12619, "next": 11409, "beforeQuest": 894 },
+            { "reply": 12628, "quest": 894, "completes": 5512, "params": [[30, 5512]], "next": 11412 },
+            { "reply": 12644, "quest": 894, "completes": 5520, "params": [[30, 5520]], "next": 11427, "holds": 13177, "takes": 13176 },
             { "reply": 12620 }
           ]
         },
@@ -649,9 +652,48 @@
           "choices": [
             { "reply": 37676 }
           ]
+        },
+        {
+          "message": 11409,
+          "choices": [
+            { "reply": 12617, "startsQuest": 894, "params": [[34, 894]], "next": 11410 },
+            { "reply": 12618 }
+          ]
+        },
+        {
+          "message": 11410,
+          "choices": [
+            { "reply": 12616 }
+          ]
+        },
+        {
+          "message": 11412,
+          "choices": [
+            { "reply": 12627, "next": 11413 }
+          ]
+        },
+        {
+          "message": 11413,
+          "choices": [
+            { "reply": 12625, "next": 11414 },
+            { "reply": 12626 }
+          ]
+        },
+        {
+          "message": 11414,
+          "choices": [
+            { "reply": 12624 }
+          ]
+        },
+        {
+          "message": 11427,
+          "names": true,
+          "choices": [
+            { "reply": 12645 }
+          ]
         }
       ],
-      "why": "«Tel est pris qui croyait prendre»: «Explicar la necesidad de carteles y folletos» (31387), and Kerubim's purse handed over (14111, 19728): he prints them at once (31388). «Restauration rapide»: the enchanted bark with the old text on it (14004), copied before the magic fades (31195), and Aisling has news of the dragon. «De vrais rats de bibliothèque»: what was engraved on the bark (14009): a first copy printed, about wars before the dofus, with a dragon (31196, the line «Légende d'automne» names); he keeps it for now and it is read there (31197, 14069; again later, 31198)."
+      "why": "«Tel est pris qui croyait prendre»: «Explicar la necesidad de carteles y folletos» (31387), and Kerubim's purse handed over (14111, 19728): he prints them at once (31388). «Restauration rapide»: the enchanted bark with the old text on it (14004), copied before the magic fades (31195), and Aisling has news of the dragon. «De vrais rats de bibliothèque»: what was engraved on the bark (14009): a first copy printed, about wars before the dofus, with a dragon (31196, the line «Légende d'automne» names); he keeps it for now and it is read there (31197, 14069; again later, 31198). «Las primeras impresiones son engañosas» (Mieux vaut ne pas se fier à la première impression, Dofus pour les noobs): «S'étonner qu'un Gobelin puisse parler de la sorte» (12619, 11409), «Répondre que vous êtes entièrement d'accord» starts it (11410: the engravings, see Nacf Virgilio). With the blank book read, «Lui montrer le livre aux pages blanches et le traiter d'escroc» (5512, 11412-11414: the apprentice's invisible ink, go and see Cirle Drawde). «Résumer la situation et donner la Poudre Révélatrice» hands the powder over and takes the blank book (5520, 11427); the reward is the real one."
     },
     {
       "npc": 1901,
@@ -11318,6 +11360,7 @@
             { "reply": 37437, "quest": 1972, "completes": 13984, "params": [[30, 13984]], "next": 30985 },
             { "reply": 37437, "next": 30985, "quest": 1972, "afterObjective": 13984, "beforeObjective": 13985 },
             { "reply": 37652, "quest": 1988, "completes": 13997, "params": [[30, 13997]], "next": 31181, "afterObjective": 13996 },
+            { "reply": 12623, "next": 11411, "quest": 894, "beforeObjective": 5510 },
             { "reply": 37632 }
           ]
         },
@@ -11475,9 +11518,16 @@
         {
           "message": 30999,
           "choices": []
+        },
+        {
+          "message": 11411,
+          "choices": [
+            { "reply": 12621, "quest": 894, "completes": 5510, "params": [[30, 5510]], "buyItem": 13176, "buyPrice": 50 },
+            { "reply": 12622 }
+          ]
         }
       ],
-      "why": "Nacf Virgilio, the parchment seller [3,-17]: his wares (3004); by «L'histoire en mouvement», Oz Dralett's mistake (13997): sold with a lot of damaged manuscripts to a smith's apprentice (31181). «C'est pourtant naturel»: the Prûût bile won fair and square, three winning rounds for a hundred kamas (30985: 13984), the rules, like «hold back the laughter» (30986), twelve rounds of holding back the sniffing (30987-30998), never «Abandonner» or it is lost (31001-31012), he gives in and the bile (30999: 13985); challenged again after giving up."
+      "why": "Nacf Virgilio, the parchment seller [3,-17]: his wares (3004); by «L'histoire en mouvement», Oz Dralett's mistake (13997): sold with a lot of damaged manuscripts to a smith's apprentice (31181). «C'est pourtant naturel»: the Prûût bile won fair and square, three winning rounds for a hundred kamas (30985: 13984), the rules, like «hold back the laughter» (30986), twelve rounds of holding back the sniffing (30987-30998), never «Abandonner» or it is lost (31001-31012), he gives in and the bile (30999: 13985); challenged again after giving up. «Las primeras impresiones son engañosas»: «Decirle que vienes de la parte de Primir» (11411), «Pagar 50 kamas.» sells the engravings («donnez-lui 50 kamas pour qu'il vous vende le recueil de gravures»: La Leyenda de Stiff Yob, 13176) and is 5510."
     },
     {
       "npc": 600,
@@ -14125,6 +14175,10 @@
           "choices": [
             { "reply": 37416, "quest": 1972, "completes": 13979, "params": [[30, 13979]], "next": 30980 },
             { "reply": 37418, "quest": 1972, "completes": 13982, "params": [[30, 13982]], "next": 30981 },
+            { "reply": 12632, "next": 11415, "quest": 894, "afterObjective": 5512, "beforeObjective": 5513 },
+            { "reply": 12637, "quest": 894, "completes": 5516, "params": [[30, 5516]], "next": 11418 },
+            { "reply": 12636, "next": 11419, "quest": 894, "afterObjective": 5516, "beforeObjective": 5517 },
+            { "reply": 12638, "quest": 894, "completes": 5517, "params": [[30, 5517]], "next": 11422, "gives": 13177, "completesAll": [5518, 5519], "criterion": "PO>384,4&PO>32098,2&PO>13174,4" },
             { "reply": 37453, "next": 31013, "quest": 1972, "afterObjective": 13985, "beforeObjective": 13986, "holds": 19666 }
           ]
         },
@@ -14155,9 +14209,50 @@
         {
           "message": 31015,
           "choices": []
+        },
+        {
+          "message": 11415,
+          "choices": [
+            { "reply": 12631, "next": 11416 }
+          ]
+        },
+        {
+          "message": 11416,
+          "choices": [
+            { "reply": 12629, "quest": 894, "completes": 5513, "params": [[30, 5513]], "next": 11417 },
+            { "reply": 12630 }
+          ]
+        },
+        {
+          "message": 11417,
+          "names": true,
+          "choices": []
+        },
+        {
+          "message": 11418,
+          "choices": [
+            { "reply": 12636, "next": 11419 }
+          ]
+        },
+        {
+          "message": 11419,
+          "choices": [
+            { "reply": 12635, "next": 11420 }
+          ]
+        },
+        {
+          "message": 11420,
+          "choices": [
+            { "reply": 12634 }
+          ]
+        },
+        {
+          "message": 11422,
+          "names": true,
+          "choices": []
         }
       ],
-      "why": "«C'est pourtant naturel»: the potion for Sadadi Sama botched, no more contaminated molasses, off to the underground (30980: 13979); the sample given, no Prûût bile for sale, Peluka uses it (30981: 13982); the bile, only joking, the potion at last (31013, 31014: 13986, item 19667); water to add once it cools (31015)."
+      "why": "«C'est pourtant naturel»: the potion for Sadadi Sama botched, no more contaminated molasses, off to the underground (30980: 13979); the sample given, no Prûût bile for sale, Peluka uses it (30981: 13982); the bile, only joking, the potion at last (31013, 31014: 13986, item 19667); water to add once it cools (31015). «Las primeras impresiones son engañosas»: «Explicarle el problema de Primir.» (11415: two orders swapped), the other client (11416), «Aceptar ayudarle.» (5513, 11417). Back with Tehenté's pardon (5516, 11418), the recipe (11419-11420: jalató wool, sticky filings by the quarry, milirat droppings in the sewers), asked again with «Preguntarle qué necesita.». «Darle los ingredientes solicitados.» hands the five wool, three filings and five droppings over (5517-5519) and he gives the revealing powder (11422)."
     },
     {
       "npc": 4342,
@@ -26454,6 +26549,136 @@
         }
       ],
       "why": "Vermo, the Almanax temple's goblin of all work, by «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «La quête se lance dans le Sanctuaire de l'Almanax en [-4,-24] en parlant à Vermô». His job (12828); the jokes of Kazuba (13272), the slap that is not a Facepalm (13273), and «Vale, te voy a traer Lotachistosos.» starts it (13274: go and see Kerubim in Astrub). «He encontrado unos Lotachistosos.» (13275) lists the flavours: each «Toma, los Lotachistosos de ...» hands over the eight different jokes of it (6745-6750) and he laughs (13276-13295, which laugh goes with which flavour is INFERRED from the ids), then «He encontrado más Lotachistosos.» while some flavour is left, or «He cumplido con mi misón.» once all six are given («vous pouvez aussi lui donner seulement une série de blagues»). Later «¿Me das mi recompensa?» does the same. The Facepalm (13312): «Aprender la actitud Facepalm.» is 6751 and the quest's reward the attitude and the Antología (13313)."
+    },
+    {
+      "npc": 1575,
+      "map": 192414728,
+      "opening": 11423,
+      "lines": [
+        {
+          "message": 11423,
+          "choices": [
+            { "reply": 12643, "next": 11424, "quest": 894, "afterObjective": 5513, "beforeObjective": 5514 },
+            { "reply": 22250 }
+          ]
+        },
+        {
+          "message": 11424,
+          "choices": [
+            { "reply": 12641, "next": 11425 },
+            { "reply": 12642 }
+          ]
+        },
+        {
+          "message": 11425,
+          "choices": [
+            { "reply": 12639, "quest": 894, "completes": 5514, "params": [[30, 5514]], "next": 11426 },
+            { "reply": 12640 }
+          ]
+        },
+        {
+          "message": 11426,
+          "choices": []
+        }
+      ],
+      "why": "Tehenté Boom inside the old chapel [5,-15] (the mercenary's 50-kamas card lets one in), by «Las primeras impresiones son engañosas»: «Thélène Teh pour lui présenter des excuses de la part de Cirle Drawde» (12643, 11424: he is on her black list), «Proposer de lui rendre un service» (11425: a word to the Mancos bandits of the forest), «Accepter le marché» is 5514 (11426)."
+    },
+    {
+      "npc": 4377,
+      "map": 189530120,
+      "opening": 31162,
+      "lines": [
+        {
+          "message": 31162,
+          "choices": [
+            { "reply": 37628, "quest": 894, "afterObjective": 5514, "beforeObjective": 5515 }
+          ]
+        }
+      ],
+      "why": "A Mancos bandit at [-2,-21], by «Las primeras impresiones son engañosas»: «vous devez vous rendre en [-2,-21] et en [-1,-21] et parler à un Bandit Manché pour les attaquer. Chaque combat lancé se fait contre 3 x Bandit Manché» (Dofus pour les noobs). «Atacar a los bandidos.» starts it (content/fights/npc_fights.json)."
+    },
+    {
+      "npc": 4441,
+      "map": 189530632,
+      "opening": 31161,
+      "lines": [
+        {
+          "message": 31161,
+          "choices": [
+            { "reply": 37627, "quest": 894, "afterObjective": 5514, "beforeObjective": 5515 }
+          ]
+        }
+      ],
+      "why": "A Mancos bandit at [-1,-21], by «Las primeras impresiones son engañosas»: «vous devez vous rendre en [-2,-21] et en [-1,-21] et parler à un Bandit Manché pour les attaquer. Chaque combat lancé se fait contre 3 x Bandit Manché» (Dofus pour les noobs). «Atacar a los bandidos.» starts it (content/fights/npc_fights.json)."
+    },
+    {
+      "npc": 7841,
+      "map": 193331715,
+      "opening": 59612,
+      "lines": [
+        {
+          "message": 59612,
+          "choices": [
+            { "reply": 81488, "next": 59613, "quest": 894, "afterObjective": 5516, "beforeElement": -894001 },
+            { "reply": 81485, "quest": 894, "afterObjective": 5516, "afterElement": -894001, "beforeElement": -894011, "marks": -894011, "gives": 32098 },
+            { "reply": 81486 }
+          ]
+        },
+        {
+          "message": 59613,
+          "choices": [
+            { "reply": 81487, "quest": 894, "afterObjective": 5516 },
+            { "reply": 81486 }
+          ]
+        }
+      ],
+      "why": "A heap of filings at [9,-19], Astrub's quarry, by «Las primeras impresiones son engañosas»: «Lors du premier dialogue avec un Tas de limaille (peu importe la position) vous ne pourrez pas éviter le combat « Ne pas tenir compte de l'avertissement ». ATTENTION : Même après avoir vaincu les monstres, il faudra reparler au même Tas de limaille pour enfin récupérer la limaille» (Dofus pour les noobs). «Intentar recoger limaduras discretamente.» meets the moguis (59613); «No hacer caso a la advertencia.» is the fight against the sticky gremoguiz, whose win leaves mark -894001. Then «Agarrar un buen puñado de limaduras ahora que los móguices se han calmado.» gives a sticky filing (32098), once per heap (mark -894011)."
+    },
+    {
+      "npc": 7841,
+      "map": 193200131,
+      "opening": 59612,
+      "lines": [
+        {
+          "message": 59612,
+          "choices": [
+            { "reply": 81488, "next": 59613, "quest": 894, "afterObjective": 5516, "beforeElement": -894001 },
+            { "reply": 81485, "quest": 894, "afterObjective": 5516, "afterElement": -894001, "beforeElement": -894012, "marks": -894012, "gives": 32098 },
+            { "reply": 81486 }
+          ]
+        },
+        {
+          "message": 59613,
+          "choices": [
+            { "reply": 81487, "quest": 894, "afterObjective": 5516 },
+            { "reply": 81486 }
+          ]
+        }
+      ],
+      "why": "A heap of filings at [10,-19], Astrub's quarry, by «Las primeras impresiones son engañosas»: «Lors du premier dialogue avec un Tas de limaille (peu importe la position) vous ne pourrez pas éviter le combat « Ne pas tenir compte de l'avertissement ». ATTENTION : Même après avoir vaincu les monstres, il faudra reparler au même Tas de limaille pour enfin récupérer la limaille» (Dofus pour les noobs). «Intentar recoger limaduras discretamente.» meets the moguis (59613); «No hacer caso a la advertencia.» is the fight against the sticky gremoguiz, whose win leaves mark -894001. Then «Agarrar un buen puñado de limaduras ahora que los móguices se han calmado.» gives a sticky filing (32098), once per heap (mark -894012)."
+    },
+    {
+      "npc": 7841,
+      "map": 193200130,
+      "opening": 59612,
+      "lines": [
+        {
+          "message": 59612,
+          "choices": [
+            { "reply": 81488, "next": 59613, "quest": 894, "afterObjective": 5516, "beforeElement": -894001 },
+            { "reply": 81485, "quest": 894, "afterObjective": 5516, "afterElement": -894001, "beforeElement": -894013, "marks": -894013, "gives": 32098 },
+            { "reply": 81486 }
+          ]
+        },
+        {
+          "message": 59613,
+          "choices": [
+            { "reply": 81487, "quest": 894, "afterObjective": 5516 },
+            { "reply": 81486 }
+          ]
+        }
+      ],
+      "why": "A heap of filings at [10,-20], Astrub's quarry, by «Las primeras impresiones son engañosas»: «Lors du premier dialogue avec un Tas de limaille (peu importe la position) vous ne pourrez pas éviter le combat « Ne pas tenir compte de l'avertissement ». ATTENTION : Même après avoir vaincu les monstres, il faudra reparler au même Tas de limaille pour enfin récupérer la limaille» (Dofus pour les noobs). «Intentar recoger limaduras discretamente.» meets the moguis (59613); «No hacer caso a la advertencia.» is the fight against the sticky gremoguiz, whose win leaves mark -894001. Then «Agarrar un buen puñado de limaduras ahora que los móguices se han calmado.» gives a sticky filing (32098), once per heap (mark -894013)."
     }
   ]
 }
