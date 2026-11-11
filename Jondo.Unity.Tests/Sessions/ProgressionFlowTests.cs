@@ -145,14 +145,14 @@ namespace Jondo.Unity.Tests.Sessions
                     at.Player.State.Achievements!.Restore(8992, claimed: false);
 
                     // Pandala route capture, frames 2643-2646: mga -1 then kub, kuf {545}, mfs.
-                    // Without that character's 5 % bonus the experience is the base, 520.
+                    // The base 520 with the character's 5 % bonus, as the capture pays it.
                     await AchievementHandler.ClaimAsync(at.ToClient,
                         ConnectionProtocol.Push(Op.Mga, Hex("08ffffffffffffffffff01")));
 
                     await at.NextAsync(Op.Kub);
-                    Assert.Equal(Hex("088804"), await at.NextAsync(Op.Kuf));
+                    Assert.Equal(Hex("08a104"), await at.NextAsync(Op.Kuf));
                     Assert.Equal(Hex("100120a046"), await at.NextAsync(Op.Mfs));
-                    Assert.Equal(ExperienceTable.LevelFloor(200) + 520, at.Player.State.Experience);
+                    Assert.Equal(ExperienceTable.LevelFloor(200) + 545, at.Player.State.Experience);
 
                     // Paid once: a second claim finds nothing owed and says nothing.
                     await AchievementHandler.ClaimAsync(at.ToClient,

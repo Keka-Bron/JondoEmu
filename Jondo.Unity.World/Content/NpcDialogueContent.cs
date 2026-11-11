@@ -336,6 +336,14 @@ namespace Jondo.Unity.World.Content
         /// <summary>Whether this reply is offered to nobody in particular.</summary>
         public bool Always => Quest == 0;
 
+        /// <summary>
+        /// Whether something besides its quest decides who is offered it: a criterion, a level, an
+        /// item to carry or hand over, a quest it starts or comes before, an interactive used.
+        /// </summary>
+        public bool Gated => Criterion.Length > 0 || MinLevel != 0 || BelowLevel != 0 || Holds != 0
+                             || Takes != 0 || TakesAll.Count > 0 || StartsQuest != 0 || BeforeQuest != 0
+                             || AfterElement != 0;
+
         public override string ToString()
         {
             string where = Ends ? "✕" : "→ " + Next;
@@ -1226,11 +1234,14 @@ namespace Jondo.Unity.World.Content
                 // The same reply twice under one line is a mistake, unless the earlier one belongs to
                 // a quest: then it is that quest's way through the line, and the later one is the
                 // rest of the world's (Tek Abir's «Aquí tienes los 40 kamas.» buys the beer anybody
-                // asks for, and Bajofrente's own while «La cerveza compartida» wants it).
+                // asks for, and Bajofrente's own while «La cerveza compartida» wants it). Or unless
+                // the earlier one is offered only to some: the guardian of the bridge of death's
+                // right answers depend on the character's sex, attitudes and pods, and the same
+                // words lead on for one and into the fight for another.
                 var seen = new Dictionary<long, DialogueChoice>();
                 foreach (var choice in line.Choices)
                 {
-                    if (seen.TryGetValue(choice.Reply, out var earlier) && earlier.Always)
+                    if (seen.TryGetValue(choice.Reply, out var earlier) && earlier.Always && !earlier.Gated)
                     {
                         wrong.Add($"message {line.Message} offers reply {choice.Reply} twice.");
                     }
