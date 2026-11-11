@@ -44,23 +44,23 @@ internal sealed class ServerSettingsWindow : Window
             Number("Xp", null, s.ExperienceBonusPercent, 0, 10000, 10, "%", v => s.ExperienceBonusPercent = (int)v),
             Number("JobXp", null, s.JobExperienceBonusPercent, 0, 10000, 10, "%", v => s.JobExperienceBonusPercent = (int)v),
             Number("Drop", null, s.DropBonusPercent, 0, 10000, 10, "%", v => s.DropBonusPercent = (int)v),
-            Number("Kamas", null, s.KamasBonusPercent, 0, 10000, 10, "%", v => s.KamasBonusPercent = (int)v), Note("RatesHint"));
+            Number("Kamas", null, s.KamasBonusPercent, 0, 10000, 10, "%", v => s.KamasBonusPercent = (int)v), CardHint("RatesHint"));
         var characters = Card("Characters",
             Number("MaxAp", null, s.MaxActionPoints, 0, 30, 1, "", v => s.MaxActionPoints = (int)v),
             Number("MaxMp", "CapHint", s.MaxMovementPoints, 0, 20, 1, "", v => s.MaxMovementPoints = (int)v),
             Toggle("NoEnergy", "NoEnergyHint", s.NoEnergyLoss, v => s.NoEnergyLoss = v));
+        var startingBonuses = Card("StartingBonuses",
+            Number("StartingKamas", "StartingKamasHint", s.StartingKamas, 0, 1_000_000_000L, 1, "", v => s.StartingKamas = (long)v),
+            Number("StartingScrollStats", "StartingScrollStatsHint", s.StartingScrollStats, 0, 10_000, 1, "", v => s.StartingScrollStats = (int)v),
+            Toggle("StartingAdventurerSet", "StartingAdventurerSetHint", s.StartingAdventurerSet, v => s.StartingAdventurerSet = v));
         var conquests = Card("Conquests",
             Number("Weakened", "WeakenedHint", s.PrismWeakenedHours, 0, 168, 1, "h", v => s.PrismWeakenedHours = (int)v),
             Number("ConquestMax", "ConquestMaxHint", s.ConquestMaxMinutes, 20, 1440, 10, "min", v => s.ConquestMaxMinutes = (int)v),
             Number("Invulnerable", "InvulnerableHint", s.ConquestInvulnerabilityHours, 0, 168, 1, "h", v => s.ConquestInvulnerabilityHours = (int)v),
             Number("Protection", "ProtectionHint", s.PrismProtectionMinutes, 0, 1440, 10, "min", v => s.PrismProtectionMinutes = (int)v));
-        var startingBonuses = Card("StartingBonuses", 
-            Number("StartingKamas", "StartingKamasHint", s.StartingKamas, 0, 1_000_000_000L, 1, "", v => s.StartingKamas = (long)v),
-            Number("StartingScrollStats", "StartingScrollStatsHint", s.StartingScrollStats, 0, 10_000, 1, "", v => s.StartingScrollStats = (int)v),
-            Toggle("StartingAdventurerSet", "StartingAdventurerSetHint", s.StartingAdventurerSet, v => s.StartingAdventurerSet = v));
         var welcome = new TextBox { Name = "WelcomeMessage", Text = s.WelcomeMessage, Watermark = T("WelcomePlaceholder"), MaxLength = 300 };
         welcome.TextChanged += (_, _) => { s.WelcomeMessage = welcome.Text ?? ""; Changed(); };
-        var welcomeCard = Card("Welcome", Note("WelcomeHint"), welcome);
+        var welcomeCard = Card("Welcome", CardHint("WelcomeHint"), welcome);
         var botsMax = Number("BotsMax", "BotsMaxHint", s.SimulatedPlayersMax, 1, Bots.SimulatedPlayers.Most, 5, "", v => s.SimulatedPlayersMax = (int)v);
         var bots = Card("Bots", Toggle("BotsOn", "BotsOnHint", s.SimulatedPlayers, v => { s.SimulatedPlayers = v; botsMax.IsEnabled = v; }), botsMax);
         botsMax.IsEnabled = s.SimulatedPlayers;
@@ -73,7 +73,7 @@ internal sealed class ServerSettingsWindow : Window
         var chance = Number("Chance", "ChanceHint", (decimal)Math.Clamp(double.IsFinite(s.RandomLootChancePercent) ? s.RandomLootChancePercent : 10, 0, 100),
             0, 100, 1, "%", v => s.RandomLootChancePercent = (double)v, 2);
         var rarities = Rarities();
-        var levels = Note("LootLevels");
+        var levels = CardHint("LootLevels");
         void LootState(bool on) { chance.IsEnabled = on; rarities.IsEnabled = on; levels.IsEnabled = on; }
         var loot = Toggle("RandomLoot", "RandomLootHint", s.RandomLoot, v => { s.RandomLoot = v; LootState(v); });
         LootState(s.RandomLoot);
@@ -132,6 +132,17 @@ internal sealed class ServerSettingsWindow : Window
         return note;
     }
 
+    /// <summary>
+    /// A card's explanation, which goes with the rows' hints: hidden when the cards are compacted to
+    /// fit the window, and then the card's tooltip.
+    /// </summary>
+    private TextBlock CardHint(string key)
+    {
+        var note = Note(key);
+        _cards.Hints.Add(note);
+        return note;
+    }
+
     private Border Card(string title, params Control[] children)
     {
         var stack = new StackPanel { Spacing = 14 };
@@ -139,7 +150,10 @@ internal sealed class ServerSettingsWindow : Window
         heading.FontWeight = FontWeight.Bold; heading.TextWrapping = TextWrapping.Wrap;
         stack.Children.Add(heading);
         foreach (var child in children) stack.Children.Add(child);
-        return ServerTheme.Card(stack);
+        var card = ServerTheme.Card(stack);
+        var tips = children.OfType<TextBlock>().Where(_cards.Hints.Contains).Select(t => t.Text).ToList();
+        if (tips.Count > 0) ToolTip.SetTip(card, string.Join(Environment.NewLine, tips));
+        return card;
     }
 
     private Control Row(string label, string hint, Control input)

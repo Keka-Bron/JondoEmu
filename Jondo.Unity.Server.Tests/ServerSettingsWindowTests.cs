@@ -18,7 +18,7 @@ public sealed class ServerSettingsWindowTests
         WithWindow(width, height, window =>
         {
             var cards = Find<SettingsCardsPanel>(window, "SettingsCards");
-            Assert.Equal(8, cards.Children.Count);
+            Assert.Equal(9, cards.Children.Count);
             Assert.All(cards.Children, card =>
             {
                 Assert.True(card.Bounds.Bottom <= cards.ViewportHeight + 1,
