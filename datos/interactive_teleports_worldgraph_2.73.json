@@ -5,11 +5,27 @@
  "graphEdges": 30742,
  "graphTransitions": 31103,
  "interactiveTransitions": 5719,
- "alreadyCoveredByGiny": 1561,
- "withoutReturnPath": 993,
- "enabledRoutes": 3745,
+ "alreadyCoveredByGiny": 1458,
+ "withoutReturnPath": 1014,
+ "enabledRoutes": 3812,
  "arrivalCellIsApproximate": true,
  "routes": [
+  {
+   "sourceMapId": 139275,
+   "elementId": 437325,
+   "sourceCellId": 374,
+   "gfxId": 20066,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 37224448,
+   "destinationCellId": 478,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
   {
    "sourceMapId": 153360,
    "elementId": 529486,
@@ -26,6 +42,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 155157,
+   "elementId": 434052,
+   "sourceCellId": 355,
+   "gfxId": 19728,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 86511105,
+   "destinationCellId": 452,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 156169,
    "elementId": 434044,
    "sourceCellId": 230,
@@ -39,6 +71,38 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 156692,
+   "elementId": 438296,
+   "sourceCellId": 359,
+   "gfxId": 701343,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 88604672,
+   "destinationCellId": 360,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 160275,
+   "elementId": 434048,
+   "sourceCellId": 270,
+   "gfxId": 17975,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 88604674,
+   "destinationCellId": 400,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 4456448,
@@ -101,6 +165,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 4459522,
+   "elementId": 504731,
+   "sourceCellId": 451,
+   "gfxId": 3507,
+   "interactiveType": -1,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 185861635,
+   "destinationCellId": 317,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "cell-transition-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 4460544,
    "elementId": 503276,
    "sourceCellId": 409,
@@ -114,6 +194,22 @@
    "confidence": "cell-transition-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 4460546,
+   "elementId": 446271,
+   "sourceCellId": 298,
+   "gfxId": 16274,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 185863169,
+   "destinationCellId": 352,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 4460546,
@@ -222,6 +318,22 @@
   },
   {
    "sourceMapId": 14551301,
+   "elementId": 873,
+   "sourceCellId": 171,
+   "gfxId": 16503,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 164364813,
+   "destinationCellId": 397,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 14551301,
    "elementId": 481491,
    "sourceCellId": 92,
    "gfxId": 701182,
@@ -249,6 +361,54 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 17048576,
+   "elementId": 460873,
+   "sourceCellId": 235,
+   "gfxId": 31535,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 185862661,
+   "destinationCellId": 401,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 17048576,
+   "elementId": 504852,
+   "sourceCellId": 456,
+   "gfxId": 3507,
+   "interactiveType": -1,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 185862661,
+   "destinationCellId": 401,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "cell-transition-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 17048576,
+   "elementId": 504853,
+   "sourceCellId": 469,
+   "gfxId": 3507,
+   "interactiveType": -1,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 185862661,
+   "destinationCellId": 401,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "cell-transition-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 17048578,
@@ -371,6 +531,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 22545408,
+   "elementId": 433982,
+   "sourceCellId": 170,
+   "gfxId": 14239,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 22675968,
+   "destinationCellId": 458,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 22546944,
    "elementId": 433981,
    "sourceCellId": 198,
@@ -461,6 +637,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 24118802,
+   "elementId": 434028,
+   "sourceCellId": 445,
+   "gfxId": 19228,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 25690624,
+   "destinationCellId": 359,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 24119314,
    "elementId": 503686,
    "sourceCellId": 539,
@@ -506,6 +698,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 25428225,
+   "elementId": 434042,
+   "sourceCellId": 159,
+   "gfxId": 19170,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 88605704,
+   "destinationCellId": 414,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 25690115,
    "elementId": 434038,
    "sourceCellId": 187,
@@ -519,6 +727,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 25690116,
+   "elementId": 434033,
+   "sourceCellId": 473,
+   "gfxId": 19228,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 20974080,
+   "destinationCellId": 310,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 25690116,
@@ -612,6 +836,22 @@
   },
   {
    "sourceMapId": 25692680,
+   "elementId": 434036,
+   "sourceCellId": 492,
+   "gfxId": 19228,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 25691146,
+   "destinationCellId": 255,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 25692680,
    "elementId": 503732,
    "sourceCellId": 146,
    "gfxId": 3507,
@@ -642,6 +882,22 @@
   },
   {
    "sourceMapId": 25694213,
+   "elementId": 434024,
+   "sourceCellId": 403,
+   "gfxId": 19228,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 63964931,
+   "destinationCellId": 469,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 25694213,
    "elementId": 511534,
    "sourceCellId": 271,
    "gfxId": 3507,
@@ -669,6 +925,22 @@
    "confidence": "cell-transition-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 28049408,
+   "elementId": 435676,
+   "sourceCellId": 371,
+   "gfxId": 19807,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 88604676,
+   "destinationCellId": 381,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 28049920,
@@ -1134,6 +1406,22 @@
    "confidence": "cell-transition-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 33827328,
+   "elementId": 447827,
+   "sourceCellId": 245,
+   "gfxId": 16274,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 220987911,
+   "destinationCellId": 482,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 34340864,
@@ -4031,6 +4319,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 54158637,
+   "elementId": 458143,
+   "sourceCellId": 376,
+   "gfxId": 403635,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 57016839,
+   "destinationCellId": 436,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 54159142,
    "elementId": 529484,
    "sourceCellId": 230,
@@ -4044,6 +4348,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 54159148,
+   "elementId": 458113,
+   "sourceCellId": 174,
+   "gfxId": 403635,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 57017863,
+   "destinationCellId": 414,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 54165827,
@@ -4181,6 +4501,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 54173005,
+   "elementId": 457171,
+   "sourceCellId": 173,
+   "gfxId": 21237,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 56886784,
+   "destinationCellId": 415,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 54173482,
    "elementId": 457185,
    "sourceCellId": 470,
@@ -4194,6 +4530,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 54173518,
+   "elementId": 457173,
+   "sourceCellId": 231,
+   "gfxId": 21237,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 56889856,
+   "destinationCellId": 244,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 54173996,
@@ -7481,6 +7833,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 59506950,
+   "elementId": 457926,
+   "sourceCellId": 302,
+   "gfxId": 27750,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 59506948,
+   "destinationCellId": 383,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 59507712,
    "elementId": 457859,
    "sourceCellId": 247,
@@ -9011,6 +9379,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 63963913,
+   "elementId": 458775,
+   "sourceCellId": 355,
+   "gfxId": 701136,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 88605706,
+   "destinationCellId": 234,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 63964422,
    "elementId": 511185,
    "sourceCellId": 415,
@@ -9024,6 +9408,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 63964931,
+   "elementId": 458463,
+   "sourceCellId": 469,
+   "gfxId": 19700,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 25694213,
+   "destinationCellId": 403,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 64225280,
@@ -9401,6 +9801,54 @@
    "criterion": "Sc=980"
   },
   {
+   "sourceMapId": 69207298,
+   "elementId": 459006,
+   "sourceCellId": 184,
+   "gfxId": 29004,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 69209346,
+   "destinationCellId": 402,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 69208064,
+   "elementId": 504949,
+   "sourceCellId": 511,
+   "gfxId": 3507,
+   "interactiveType": -1,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 69209346,
+   "destinationCellId": 287,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "cell-transition-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 69208322,
+   "elementId": 511653,
+   "sourceCellId": 395,
+   "gfxId": 29004,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 69209346,
+   "destinationCellId": 108,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 69208322,
    "elementId": 511874,
    "sourceCellId": 231,
@@ -9414,6 +9862,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": "(Qa=1938|Qf=1938)"
+  },
+  {
+   "sourceMapId": 69209346,
+   "elementId": 459008,
+   "sourceCellId": 402,
+   "gfxId": 29004,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 69207298,
+   "destinationCellId": 184,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 69209346,
@@ -9761,6 +10225,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 72618499,
+   "elementId": 460444,
+   "sourceCellId": 71,
+   "gfxId": 403848,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 30671116,
+   "destinationCellId": 439,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 73532423,
    "elementId": 461197,
    "sourceCellId": 262,
@@ -9774,6 +10254,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 74186754,
+   "elementId": 504376,
+   "sourceCellId": 402,
+   "gfxId": 3507,
+   "interactiveType": -1,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 220200961,
+   "destinationCellId": 168,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "cell-transition-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 74187778,
@@ -10916,6 +11412,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 84410881,
+   "elementId": 466173,
+   "sourceCellId": 511,
+   "gfxId": 31533,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 199229440,
+   "destinationCellId": 423,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 84410882,
    "elementId": 517299,
    "sourceCellId": 398,
@@ -10929,6 +11441,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 84411392,
+   "elementId": 466179,
+   "sourceCellId": 202,
+   "gfxId": 20363,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 199230724,
+   "destinationCellId": 430,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 84411393,
@@ -11034,6 +11562,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 84411906,
+   "elementId": 466172,
+   "sourceCellId": 411,
+   "gfxId": 31533,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 199232514,
+   "destinationCellId": 416,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 84411906,
@@ -12656,6 +13200,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 88081176,
+   "elementId": 472899,
+   "sourceCellId": 389,
+   "gfxId": 38087,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 99095049,
+   "destinationCellId": 361,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 88081681,
    "elementId": 517094,
    "sourceCellId": 219,
@@ -12669,6 +13229,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 88081686,
+   "elementId": 472905,
+   "sourceCellId": 373,
+   "gfxId": 15324,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 183763982,
+   "destinationCellId": 422,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 88084245,
@@ -12716,6 +13292,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 88212244,
+   "elementId": 472918,
+   "sourceCellId": 401,
+   "gfxId": 32290,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 183765004,
+   "destinationCellId": 478,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 88212247,
    "elementId": 472901,
    "sourceCellId": 315,
@@ -12744,6 +13336,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 88214295,
+   "elementId": 472949,
+   "sourceCellId": 317,
+   "gfxId": 18157,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 183768064,
+   "destinationCellId": 489,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 88604672,
@@ -13316,6 +13924,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 90703872,
+   "elementId": 472523,
+   "sourceCellId": 302,
+   "gfxId": 37437,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 91753985,
+   "destinationCellId": 466,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 90703875,
    "elementId": 524227,
    "sourceCellId": 167,
@@ -13404,6 +14028,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 90708481,
+   "elementId": 508199,
+   "sourceCellId": 217,
+   "gfxId": 53842,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 170133510,
+   "destinationCellId": 478,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 90964481,
@@ -14304,6 +14944,22 @@
    "confidence": "cell-transition-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 91752967,
+   "elementId": 483303,
+   "sourceCellId": 383,
+   "gfxId": 42162,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 117703169,
+   "destinationCellId": 314,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 91752967,
@@ -15401,6 +16057,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 95423492,
+   "elementId": 472866,
+   "sourceCellId": 438,
+   "gfxId": 38073,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 95422464,
+   "destinationCellId": 383,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 95683073,
    "elementId": 504458,
    "sourceCellId": 473,
@@ -16031,6 +16703,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 97256971,
+   "elementId": 505211,
+   "sourceCellId": 503,
+   "gfxId": 3507,
+   "interactiveType": -1,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 97255947,
+   "destinationCellId": 213,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "cell-transition-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 97256981,
    "elementId": 505192,
    "sourceCellId": 333,
@@ -16299,6 +16987,22 @@
    "confidence": "cell-transition-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 97259013,
+   "elementId": 505154,
+   "sourceCellId": 494,
+   "gfxId": 3507,
+   "interactiveType": -1,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 97257989,
+   "destinationCellId": 339,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "cell-transition-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 97259029,
@@ -17531,6 +18235,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 99094025,
+   "elementId": 474852,
+   "sourceCellId": 388,
+   "gfxId": 702020,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 99095049,
+   "destinationCellId": 303,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 99095047,
    "elementId": 505810,
    "sourceCellId": 414,
@@ -17559,6 +18279,38 @@
    "confidence": "cell-transition-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 99095049,
+   "elementId": 474853,
+   "sourceCellId": 303,
+   "gfxId": 38351,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 99094025,
+   "destinationCellId": 388,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 99095049,
+   "elementId": 474904,
+   "sourceCellId": 202,
+   "gfxId": 37749,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 99096073,
+   "destinationCellId": 315,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 99095049,
@@ -18099,6 +18851,22 @@
    "confidence": "cell-transition-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 99357706,
+   "elementId": 474895,
+   "sourceCellId": 275,
+   "gfxId": 702020,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 99357708,
+   "destinationCellId": 301,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 99357708,
@@ -21221,6 +21989,38 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 117703169,
+   "elementId": 483302,
+   "sourceCellId": 314,
+   "gfxId": 42043,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 91752967,
+   "destinationCellId": 383,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 117703169,
+   "elementId": 483314,
+   "sourceCellId": 426,
+   "gfxId": 41975,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 117704202,
+   "destinationCellId": 345,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 117703176,
    "elementId": 483311,
    "sourceCellId": 457,
@@ -21624,6 +22424,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 117704202,
+   "elementId": 483313,
+   "sourceCellId": 345,
+   "gfxId": 41975,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 117703169,
+   "destinationCellId": 426,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 117704202,
@@ -25526,6 +26342,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 128453121,
+   "elementId": 484929,
+   "sourceCellId": 556,
+   "gfxId": 44599,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 142089230,
+   "destinationCellId": 343,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 128974852,
    "elementId": 484975,
    "sourceCellId": 263,
@@ -25826,6 +26658,22 @@
    "criterion": "Pm=134218752"
   },
   {
+   "sourceMapId": 134219778,
+   "elementId": 485379,
+   "sourceCellId": 305,
+   "gfxId": 46637,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 134220800,
+   "destinationCellId": 338,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 134220802,
    "elementId": 485425,
    "sourceCellId": 207,
@@ -25839,6 +26687,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": "Pm=134218752"
+  },
+  {
+   "sourceMapId": 134221824,
+   "elementId": 485384,
+   "sourceCellId": 176,
+   "gfxId": 46632,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 134222082,
+   "destinationCellId": 436,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 134225922,
@@ -25884,6 +26748,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": "Pm=134225924"
+  },
+  {
+   "sourceMapId": 134350082,
+   "elementId": 485374,
+   "sourceCellId": 115,
+   "gfxId": 46631,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 134351108,
+   "destinationCellId": 430,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 134742016,
@@ -26081,6 +26961,54 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 136052736,
+   "elementId": 485397,
+   "sourceCellId": 249,
+   "gfxId": 46646,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 136054018,
+   "destinationCellId": 352,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 136052998,
+   "elementId": 485413,
+   "sourceCellId": 471,
+   "gfxId": 46640,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 137365764,
+   "destinationCellId": 311,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 136055048,
+   "elementId": 485403,
+   "sourceCellId": 381,
+   "gfxId": 46645,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 136054022,
+   "destinationCellId": 290,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 136056068,
    "elementId": 485428,
    "sourceCellId": 191,
@@ -26109,6 +27037,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": "Pm=139198464"
+  },
+  {
+   "sourceMapId": 136185090,
+   "elementId": 485426,
+   "sourceCellId": 212,
+   "gfxId": 2843,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 139202560,
+   "destinationCellId": 231,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "Pm=139198464",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 136316674,
@@ -26891,6 +27835,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 147854339,
+   "elementId": 488146,
+   "sourceCellId": 261,
+   "gfxId": 49019,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 150208514,
+   "destinationCellId": 423,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 148111873,
    "elementId": 488180,
    "sourceCellId": 233,
@@ -27132,6 +28092,22 @@
   },
   {
    "sourceMapId": 150208514,
+   "elementId": 488140,
+   "sourceCellId": 232,
+   "gfxId": 16274,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 150208516,
+   "destinationCellId": 450,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
+  },
+  {
+   "sourceMapId": 150208514,
    "elementId": 505685,
    "sourceCellId": 437,
    "gfxId": 3507,
@@ -27144,6 +28120,22 @@
    "confidence": "cell-transition-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 150208516,
+   "elementId": 488320,
+   "sourceCellId": 450,
+   "gfxId": 39770,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 150208514,
+   "destinationCellId": 232,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 150209538,
@@ -28241,6 +29233,22 @@
    "criterion": ""
   },
   {
+   "sourceMapId": 160956929,
+   "elementId": 502542,
+   "sourceCellId": 345,
+   "gfxId": 51027,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 163316738,
+   "destinationCellId": 199,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "(Qf=1699|(Qa=1699&Qo>10616))",
+   "overridesGiny": true
+  },
+  {
    "sourceMapId": 162529793,
    "elementId": 502548,
    "sourceCellId": 149,
@@ -28299,6 +29307,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 163053568,
+   "elementId": 502573,
+   "sourceCellId": 177,
+   "gfxId": 3434,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 88214297,
+   "destinationCellId": 272,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 163316738,
@@ -28554,6 +29578,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 164496396,
+   "elementId": 503186,
+   "sourceCellId": 329,
+   "gfxId": 44657,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 130024961,
+   "destinationCellId": 473,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 164758273,
@@ -29184,6 +30224,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": "PO>17966,0"
+  },
+  {
+   "sourceMapId": 169083904,
+   "elementId": 508133,
+   "sourceCellId": 185,
+   "gfxId": 53728,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 170133504,
+   "destinationCellId": 536,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 170131456,
@@ -32424,6 +33480,22 @@
    "confidence": "reverse-element-approx",
    "enabled": true,
    "criterion": ""
+  },
+  {
+   "sourceMapId": 179962371,
+   "elementId": 509923,
+   "sourceCellId": 142,
+   "gfxId": 39767,
+   "interactiveType": 0,
+   "typeSource": "WorldGraph-2.73",
+   "skillId": 114,
+   "destinationMapId": 179962370,
+   "destinationCellId": 518,
+   "sourceVersion": "WorldGraph-2.73",
+   "confidence": "reverse-element-approx",
+   "enabled": true,
+   "criterion": "",
+   "overridesGiny": true
   },
   {
    "sourceMapId": 180092928,

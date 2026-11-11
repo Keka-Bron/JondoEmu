@@ -122,6 +122,10 @@ namespace Jondo.Unity.Server.Managers
         {
             public required InteractiveTeleport Route { get; init; }
             public bool RequestedEnabled { get; init; }
+
+            /// <summary>A graph route for an element Giny sends somewhere else: it goes first, so it wins.</summary>
+            public bool OverridesGiny { get; init; }
+
             public bool Enabled { get; set; }
             public string ValidationStatus { get; set; } = "pending";
         }
@@ -132,6 +136,10 @@ namespace Jondo.Unity.Server.Managers
         /// They are TWO and the order matters: first Giny's, which brings the measured arrival cell,
         /// and then the 2.73 graph's, which can only approximate it. When both speak of the
         /// same element the first wins, and the second is left switched off with the reason written.
+        ///
+        /// Except where they disagree on the map: the graph is the client's own data, of a later
+        /// version, and Giny's map ids have moved under it -- the Hakam tree's lianas went to Amakna.
+        /// Those graph routes carry «overridesGiny» and are taken before Giny's.
         ///
         /// Everything discarded is stored all the same, with its ValidationStatus, so that a route that
         /// disappears can be looked at instead of guessing why it is not there.
@@ -176,7 +184,9 @@ namespace Jondo.Unity.Server.Managers
                         rows.Add(new ImportRow
                         {
                             Route = route,
-                            RequestedEnabled = entry.TryGetProperty("enabled", out var enabled) && enabled.GetBoolean()
+                            RequestedEnabled = entry.TryGetProperty("enabled", out var enabled) && enabled.GetBoolean(),
+                            OverridesGiny = entry.TryGetProperty("overridesGiny", out var overrides)
+                                            && overrides.ValueKind == JsonValueKind.True,
                         });
                         leidas++;
                     }
@@ -188,6 +198,9 @@ namespace Jondo.Unity.Server.Managers
                     Console.WriteLine("[Teleport] No catalogue; the one in SQLite is kept.");
                     return;
                 }
+
+                // The graph's routes against Giny first, the rest in their catalogues' order.
+                rows = rows.OrderBy(r => r.OverridesGiny ? 0 : 1).ToList();
 
                 // Two destinations for the same element within the SAME catalogue: it cannot be chosen
                 // for us, so none is activated.
