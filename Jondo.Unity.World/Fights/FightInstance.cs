@@ -700,12 +700,19 @@ namespace Jondo.Unity.World.Fights
         ///
         /// A monster presses nothing, so for counting only people count; if a
         /// side has none —the usual case against monsters— that side is ready.
+        ///
+        /// A defended fight -- a tax collector's or a prism's -- waits for its clock all the same:
+        /// its alliance is told of the attack and comes through its fights' list, and the lone
+        /// attacker pressing ready five seconds in started it before anybody could
+        /// (Idlia, fight #1005: attacked at 23:36:32, ready and started at 23:36:37). Only the
+        /// clock running out, <paramref name="clockRanOut"/>, starts it.
         /// </remarks>
-        public bool SetFighterReady(long fighterId)
+        public bool SetFighterReady(long fighterId, bool clockRanOut = false)
         {
             var f = Buscar(fighterId);
             if (f != null) f.IsReady = true;
 
+            if (DefendingAllianceId != 0 && !clockRanOut) return false;
             if (Todos.All(p => p.IsMonster || p.EsInvocado || p.IsReady))
             {
                 CancelPlacementTimer();
