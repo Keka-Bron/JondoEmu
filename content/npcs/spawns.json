@@ -3569,6 +3569,35 @@
       "orientation": 3,
       "criterion": "Qa=527&Qo<3624",
       "why": "Hata Mari, the Bontarian spy the bworks hold at their camp [-6,6]: she only belongs to Bonta's side of «No dejes que tus hijos vaguen» (527), where she is freed once De Rorc is beaten and leaves after «Nos vemos fuera del campamento» (3624). Brakmar's side (526) never meets her. INFERRED cell: 373, in front of the bworks' rack, clear of their groups (the derived 315 stood among them)."
+    },
+    {
+      "map": 99091983,
+      "npc": 1587,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa=920&Qo>5604&Qo<5606",
+      "why": "The hungry wabbit spirit of «Guewa y Paz», in the statue room of the great burrow of Amakna [7,16] (99091983, where the objective's coordinates and Dofus pour les noobs put Oibas's grave) from the crunchy carrot's use until he is beaten. INFERRED cell: 302, the open floor in front of the great wabbit statue (element 475429 on 261)."
+    },
+    {
+      "map": 99091983,
+      "npc": 1588,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa=920&Qo>5606&Qo<5608",
+      "why": "Oibas's spirit, once the hungry spirit is beaten, in front of his statue until Primir is found (he goes back to his grave, 11609). INFERRED cell: 302, where the hungry spirit stood."
+    },
+    {
+      "map": 99614726,
+      "npc": 1586,
+      "cell": 315,
+      "remove": true
+    },
+    {
+      "map": 99614726,
+      "npc": 1586,
+      "cell": 397,
+      "orientation": 1,
+      "why": "Xiap (Patxi Fista), the pacifist wabbit of «Guewa y Paz» and «¡Cuidado con los wabbits!», at [24,-4] where both quests put him. INFERRED cell: 397, open grass below the low ruined wall, off the middle of the map where the derived cell (315) left him inside the wabbit groups."
     }
   ]
 }

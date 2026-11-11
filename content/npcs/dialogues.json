@@ -606,6 +606,7 @@
         {
           "message": 11408,
           "choices": [
+            { "quest": 920, "afterObjective": 5607, "beforeObjective": 5608, "reply": 12932, "next": 11610 },
             { "reply": 37912, "next": 31387, "quest": 1977, "beforeObjective": 14111 },
             { "reply": 37674, "quest": 1990, "completes": 14009, "params": [[30, 14009]], "next": 31196, "afterObjective": 14008 },
             { "reply": 37677, "next": 31198, "quest": 1991, "afterObjective": 14069 },
@@ -691,9 +692,26 @@
           "choices": [
             { "reply": 12645 }
           ]
+        },
+        {
+          "message": 11610,
+          "choices": [
+            { "reply": 12936, "quest": 920, "completes": 5608, "params": [[30, 5608]], "gives": 13203, "next": 11612, "criterion": "Qf=894" },
+            { "reply": 12931, "quest": 920, "completes": 5608, "params": [[30, 5608]], "buyItem": 13203, "buyPrice": 1000, "next": 11611 },
+            { "reply": 12933 },
+            { "reply": 12934 }
+          ]
+        },
+        {
+          "message": 11611,
+          "choices": []
+        },
+        {
+          "message": 11612,
+          "choices": []
         }
       ],
-      "why": "«Tel est pris qui croyait prendre»: «Explicar la necesidad de carteles y folletos» (31387), and Kerubim's purse handed over (14111, 19728): he prints them at once (31388). «Restauration rapide»: the enchanted bark with the old text on it (14004), copied before the magic fades (31195), and Aisling has news of the dragon. «De vrais rats de bibliothèque»: what was engraved on the bark (14009): a first copy printed, about wars before the dofus, with a dragon (31196, the line «Légende d'automne» names); he keeps it for now and it is read there (31197, 14069; again later, 31198). «Las primeras impresiones son engañosas» (Mieux vaut ne pas se fier à la première impression, Dofus pour les noobs): «S'étonner qu'un Gobelin puisse parler de la sorte» (12619, 11409), «Répondre que vous êtes entièrement d'accord» starts it (11410: the engravings, see Nacf Virgilio). With the blank book read, «Lui montrer le livre aux pages blanches et le traiter d'escroc» (5512, 11412-11414: the apprentice's invisible ink, go and see Cirle Drawde). «Résumer la situation et donner la Poudre Révélatrice» hands the powder over and takes the blank book (5520, 11427); the reward is the real one."
+      "why": "«Tel est pris qui croyait prendre»: «Explicar la necesidad de carteles y folletos» (31387), and Kerubim's purse handed over (14111, 19728): he prints them at once (31388). «Restauration rapide»: the enchanted bark with the old text on it (14004), copied before the magic fades (31195), and Aisling has news of the dragon. «De vrais rats de bibliothèque»: what was engraved on the bark (14009): a first copy printed, about wars before the dofus, with a dragon (31196, the line «Légende d'automne» names); he keeps it for now and it is read there (31197, 14069; again later, 31198). «Las primeras impresiones son engañosas» (Mieux vaut ne pas se fier à la première impression, Dofus pour les noobs): «S'étonner qu'un Gobelin puisse parler de la sorte» (12619, 11409), «Répondre que vous êtes entièrement d'accord» starts it (11410: the engravings, see Nacf Virgilio). With the blank book read, «Lui montrer le livre aux pages blanches et le traiter d'escroc» (5512, 11412-11414: the apprentice's invisible ink, go and see Cirle Drawde). «Résumer la situation et donner la Poudre Révélatrice» hands the powder over and takes the blank book (5520, 11427); the reward is the real one. For «Guewa y Paz» (920): «Hablar de la profecía del gran wabbit» (12932) gets 11610 -- a book printed for a rich man, plenty of copies left, at a good price --; «Proponerle 1000 kamas» (12931) buys the box of books (13203, 11611), and for whoever settled his engravings in «Las primeras impresiones son engañosas» (894) «Recordarle que le ayudaste con su problema de grabados» (12936) gets it for nothing (11612); either closes «Encuentra a Primir» (5608). «Ir a mendigar a un zaap» (12933) and «Rechazar pagarle e irte» (12934) leave."
     },
     {
       "npc": 1901,
@@ -18944,19 +18962,82 @@
       "npc": 1586,
       "map": 0,
       "opening": 11561,
+      "openings": [
+        { "quest": 920, "objective": 5600, "pending": 5601, "message": 11569 }
+      ],
       "lines": [
         {
           "message": 11561,
           "choices": [
+            { "reply": 12879, "next": 11562, "beforeQuest": 920, "criterion": "PL>19" },
+            { "reply": 12884, "quest": 920, "completes": 5600, "params": [[30, 5600]], "holds": 13199, "next": 11567, "afterObjective": 5599 },
+            { "reply": 12938, "quest": 920, "completes": 5609, "params": [[30, 5609]], "holds": 13203, "next": 11613, "afterObjective": 5608 },
             { "reply": 12939, "next": 11616, "quest": 837, "completes": 5610, "params": [[30, 5610]], "gives": 13205 }
           ]
         },
         {
           "message": 11616,
           "choices": []
+        },
+        {
+          "message": 11562,
+          "choices": [
+            { "reply": 12878, "next": 11563 }
+          ]
+        },
+        {
+          "message": 11563,
+          "choices": [
+            { "reply": 12877, "next": 11564 }
+          ]
+        },
+        {
+          "message": 11564,
+          "choices": [
+            { "reply": 12876, "next": 11565 }
+          ]
+        },
+        {
+          "message": 11565,
+          "choices": [
+            { "reply": 12874, "startsQuest": 920, "params": [[34, 920]], "next": 11566 },
+            { "reply": 12875 }
+          ]
+        },
+        {
+          "message": 11566,
+          "names": true,
+          "choices": [
+            { "reply": 12880 }
+          ]
+        },
+        {
+          "message": 11567,
+          "choices": [
+            { "reply": 12883, "next": 11568 }
+          ]
+        },
+        {
+          "message": 11568,
+          "choices": [
+            { "quest": 920, "afterObjective": 5600, "beforeObjective": 5601, "reply": 12882, "next": 11569, "gives": 13201 }
+          ]
+        },
+        {
+          "message": 11569,
+          "choices": [
+            { "reply": 12881 }
+          ]
+        },
+        {
+          "message": 11613,
+          "names": true,
+          "choices": [
+            { "reply": 12937 }
+          ]
         }
       ],
-      "why": "Patxi Fista, the peaceful wabbit of the cawotte fields [24,-4]: peace and love (11561). «Faites l'amour, pas la guerre»: «prélever du sang à Xiap», thrown upon him for a blood sample, «you are completely mad!» (11616: 5610, the sample 13205)."
+      "why": "Patxi Fista, the peaceful wabbit of the cawotte fields [24,-4]: peace and love (11561). «Faites l'amour, pas la guerre»: «prélever du sang à Xiap», thrown upon him for a blood sample, «you are completely mad!» (11616: 5610, the sample 13205). «Guewa y Paz» (920, Dofus pour les noobs): «Sorprenderte de encontrar un wabbit pacifista» (12879) and three times listening (11562 to 11565) tell of the prophecy of the great wabbit and of Zoufia Barboskura, the treasure hunter who brought him a page of it; «Vale, te ayudaré» (12874) starts the quest and 11566 sends the character to the underground of the castle. With the torn page, «Mira la página que he encontrado en los subterráneos» (12884) closes «show the page» (5600): it is in mowse (11567, 11568), and «Seguir escuchando» (12882) hands over the fermented carrot juice for Wogew in Cania (11569, which he says again while it has not been given). With Primir's box, «Darle la caja de libros» (12938) closes 5609 and the quest (11613)."
     },
     {
       "npc": 1103,
@@ -19159,12 +19240,14 @@
       "openings": [
         { "quest": 18, "step": 58, "message": 987 },
         { "quest": 18, "step": 57, "message": 988 },
-        { "quest": 18, "message": 11404 }
+        { "quest": 18, "message": 11404 },
+        { "quest": 920, "objective": 5601, "pending": 5604, "message": 11570 }
       ],
       "lines": [
         {
           "message": 2154,
           "choices": [
+            { "reply": 12891, "quest": 920, "completes": 5601, "params": [[30, 5601]], "holds": 13201, "next": 11570, "afterObjective": 5600 },
             { "reply": 68350, "next": 985, "beforeQuest": 18 },
             { "reply": 68349 }
           ]
@@ -19195,9 +19278,46 @@
         {
           "message": 987,
           "choices": []
+        },
+        {
+          "message": 11570,
+          "choices": [
+            { "reply": 12890, "next": 11571 }
+          ]
+        },
+        {
+          "message": 11571,
+          "choices": [
+            { "reply": 12889, "next": 11572 }
+          ]
+        },
+        {
+          "message": 11572,
+          "choices": [
+            { "reply": 12888, "next": 11573 }
+          ]
+        },
+        {
+          "message": 11573,
+          "choices": [
+            { "reply": 12887, "next": 11574, "criterion": "PO!13202", "gives": 13202 },
+            { "reply": 12887, "next": 11574, "criterion": "PO=13202" }
+          ]
+        },
+        {
+          "message": 11574,
+          "choices": [
+            { "reply": 12886, "next": 11575 }
+          ]
+        },
+        {
+          "message": 11575,
+          "choices": [
+            { "reply": 12885 }
+          ]
         }
       ],
-      "why": "Wogew the hermit in his burrow [-1,-39]: brave to come in, he likes solitude but does not bite (2154). «Wogew l'hewmite» (18) of Dofus pour les noobs: «congratulations on the decoration», a little job, too old for the wabbit archipelago (985, «Te ayudaré»), the syringe, the wabbit GM's blood once knocked out (986: the vet's syringe 1745, «Agarrar la jeringuilla»), the wabbit GM in a laboratory under the Cawotte island (11404); the blood, but an analysis, ask Otomai (988), «found what I asked?» (987: the analysis handed on a hello)."
+      "why": "Wogew the hermit in his burrow [-1,-39]: brave to come in, he likes solitude but does not bite (2154). «Wogew l'hewmite» (18) of Dofus pour les noobs: «congratulations on the decoration», a little job, too old for the wabbit archipelago (985, «Te ayudaré»), the syringe, the wabbit GM's blood once knocked out (986: the vet's syringe 1745, «Agarrar la jeringuilla»), the wabbit GM in a laboratory under the Cawotte island (11404); the blood, but an analysis, ask Otomai (988), «found what I asked?» (987: the analysis handed on a hello). For «Guewa y Paz» (920): «Ofrecerle el zumo de zanahowia fewmentada de la parte de Patxi Fista» (12891) leaves Xiap's juice with him and closes 5601; the page shown (12890), a little patience (12889) and where the great burrow is (12888) get the translation -- the book was Oibas's, of the great burrow of Amakna, under the forest by the sawmill (11572, 11573) --, and «Me voy» (12887) gets the crunchy carrot (13202, 11574) that wakes the dead (11575). Of his five copies of these lines (11570 to 11599) the first is used. Until the carrot is used he says it all again from 11570, without a second carrot."
     },
     {
       "npc": 3015,
@@ -29197,6 +29317,82 @@
         }
       ],
       "why": "Letalina Sigisbul on the tumulus of Dark Vlad's maze [-5,17], the end of Bonta's side of «No dejes que tus hijos vaguen» (Dofus pour les noobs: she sends her creatures, «Affronter les créatures de Léthaline»). «Tú eres el que se dedica a desmantelar mis planes geniales...» (7659): «Enfrentarte a las criaturas de Letalina» (7661) starts the fight against four gárghulas (content/fights/npc_fights.json), whose win is «Enfréntate a Letalina antes de abandonar el Dédalo de Dark Vlad» (3642); «Huir a toda prisa» (68407) leaves."
+    },
+    {
+      "npc": 1587,
+      "map": 0,
+      "opening": 11600,
+      "lines": [
+        {
+          "message": 11600,
+          "choices": [
+            { "reply": 12921, "quest": 920, "completes": 5605, "params": [[30, 5605]], "next": 11601 }
+          ]
+        },
+        {
+          "message": 11601,
+          "choices": [
+            { "reply": 12920, "quest": 920, "beforeObjective": 5606 }
+          ]
+        }
+      ],
+      "why": "The hungry wabbit spirit of «Guewa y Paz» (920), out of the great statue of the burrow of Amakna as the crunchy carrot is used (Dofus pour les noobs: «L'Espwit Wabbit Affamé fait son apparition et il vous agresse pour la cawotte»). «El gwito de la zanahowia... ¡Me está llamando!» (11600): «Morder la zanahowia» (12921) closes «go and see him» (5605) and gets «¡YO QUIERO ESA ZANAHOWIA!» (11601), and «Defenderte del espíritu que te ha saltado encima» (12920) starts the fight against him (content/fights/npc_fights.json), the catalogue's 5606."
+    },
+    {
+      "npc": 1588,
+      "map": 0,
+      "opening": 11602,
+      "lines": [
+        {
+          "message": 11602,
+          "choices": [
+            { "reply": 12922, "next": 11603 }
+          ]
+        },
+        {
+          "message": 11603,
+          "choices": [
+            { "reply": 12929, "next": 11604 }
+          ]
+        },
+        {
+          "message": 11604,
+          "choices": [
+            { "reply": 12928, "next": 11605 }
+          ]
+        },
+        {
+          "message": 11605,
+          "choices": [
+            { "reply": 12927, "next": 11606 }
+          ]
+        },
+        {
+          "message": 11606,
+          "choices": [
+            { "reply": 12926, "next": 11607 }
+          ]
+        },
+        {
+          "message": 11607,
+          "choices": [
+            { "reply": 12925, "next": 11608 }
+          ]
+        },
+        {
+          "message": 11608,
+          "choices": [
+            { "reply": 12924, "next": 11609 }
+          ]
+        },
+        {
+          "message": 11609,
+          "choices": [
+            { "reply": 12923 }
+          ]
+        }
+      ],
+      "why": "The spirit of Oibas (Gésa), woken by the crunchy carrot in the statue room of the great burrow of Amakna, for «Guewa y Paz» (920; speaking to him is the catalogue's 5607). From his damp grave (11602) he apologises for the hungry spirit (12922, 11603), knows the page (12929, 11604), tells the prophecy (12928, 11605), grieves for the zollos' village (12927, 11606), doubts there is another copy (12926, 11607), remembers «Pwimiw» in gold and a blue emblem on the cover (12925, 11608), and goes back to his grave when the emblem is Astrub's (12924, 11609, 12923). Dofus pour les noobs: «reparlez à l'Espwit de Gésa ... Allez voir Prim à Astrub»."
     }
   ]
 }

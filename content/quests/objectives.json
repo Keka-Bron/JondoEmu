@@ -3623,6 +3623,35 @@
    "monster": 2826,
    "map": 221249538,
    "why": "«Enfréntate a Letalina antes de abandonar el Dédalo de Dark Vlad»: the four gárghulas she sends on the tumulus."
+  },
+  {
+   "objective": 5598,
+   "quest": 920,
+   "kind": "enter",
+   "map": 101716501,
+   "why": "«Encuentra la pista de Zoufia Barboskura»: the last map of the castle's sewers [6,-6], entered from the port of Madrestam [7,-4] where the objective carries its coordinates (Xiap: «Explowa los subtewáneos del castillo»; Dofus pour les noobs: «Entrez dans les souterrains ... afin de vous rendre en [6,-6]»). The sewer rats drop the torn page only after it (their loot row, «Qa=920&Qo>5598&PO!13199»)."
+  },
+  {
+   "objective": 5602,
+   "quest": 920,
+   "kind": "enter",
+   "map": 99090959,
+   "why": "«Descubre el mapa: Gran madriguera de Amakna», which names its map only as text: the burrow under the wabbit statue of [7,16] (Wogew: «galewías bajo el suelo del bosque de Amakna ... alwededowes del asewadewo»)."
+  },
+  {
+   "objective": 5603,
+   "quest": 920,
+   "kind": "click",
+   "elements": [{"map": 99091983, "element": 475429}],
+   "why": "«Encuentra a Oibas»: the great wabbit statue at the back of the burrow's second room, element 475429 (graphic 38555, cell 261), the room's only element that is not a way out (Dofus pour les noobs: «cliquez sur la grosse statue wabbit au fond de la salle»)."
+  },
+  {
+   "objective": 5604,
+   "quest": 920,
+   "kind": "use",
+   "afterObjectives": [5603],
+   "showsNpc": 1587,
+   "why": "«Despierta a Oibas»: the crunchy carrot used (its effect 30 is this objective; Dofus pour les noobs: «double cliquer sur la Cawotte Croquante»), which brings out the hungry wabbit spirit."
   }
  ]
 }

@@ -85,16 +85,23 @@ namespace Jondo.Unity.Server.Handlers
                     any |= await Quests.CompleteByReplyAsync(stream, 0, effect.Value);
                 if (any)
                 {
-                    await Equipment.TakeAsync(stream, item.Template, 1);
-                    // And what it turns into, «Gana x#2 #3» (209): the next spirit's holy water, the
-                    // sacred urn filled.
-                    foreach (var gain in itemEffects.Where(e => e.EffectId == BonusItemHandler.GainItems && e.Value > 0))
+                    // And what it turns into, «Gana x#2 #3»: the next spirit's holy water, the sacred
+                    // urn filled (209, the item in its third number), the sample of «Muestra de
+                    // mejunje de test» (193, in its first). One that names the item itself keeps it:
+                    // the torn page of «Guewa y Paz» is looked at (5599) and still to be shown.
+                    var gains = itemEffects
+                        .Where(e => e.EffectId is BonusItemHandler.GainItem or BonusItemHandler.GainItems)
+                        .Select(e => (Template: e.EffectId == BonusItemHandler.GainItem ? e.DiceNum : e.Value,
+                                      Count: Math.Max(1, e.DiceSide)))
+                        .Where(g => g.Template > 0).ToList();
+                    bool kept = gains.RemoveAll(g => g.Template == item.Template) > 0;
+                    if (!kept) await Equipment.TakeAsync(stream, item.Template, 1);
+                    foreach (var (template, count) in gains)
                     {
-                        int count = Math.Max(1, gain.DiceSide);
-                        if (!await WorkshopHandler.GiveAsync(stream, gain.Value, count)) continue;
+                        if (!await WorkshopHandler.GiveAsync(stream, template, count)) continue;
                         await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                             ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained,
-                                count.ToString(), gain.Value.ToString())));
+                                count.ToString(), template.ToString())));
                     }
                 }
                 return;
@@ -227,7 +234,10 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static async Task<bool> CriterionHoldsAsync(NetworkStream stream, Equipment.Item item)
         {
-            string criterion = ObjectivesAsTheClientMeansThem(DatabaseManager.GetItemTemplateCriterion(item.Template));
+            // In the client's words, which the criterion reader speaks: «Qo=X» is objective X in hand
+            // -- Nistracolamus' holy water «Qo=14181&Pm=190842368», the crunchy carrot of «Guewa y
+            // Paz» «Qa=920&Qo=5604» --, «Qo!X» not in hand.
+            string criterion = DatabaseManager.GetItemTemplateCriterion(item.Template);
             if (ItemCriteria.Holds(criterion)) return true;
 
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
@@ -235,19 +245,6 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Items] {SessionContext.State.CharacterName} cannot use item {item.Template}: «{criterion}».");
             return false;
         }
-
-        /// <summary>
-        /// An item's own criterion, from the client's data, in the reading <see cref="ItemCriteria"/>
-        /// gives the written ones: the client's «Qo=X» is objective X still to do -- Nistracolamus'
-        /// holy water «Qo=14181&amp;Pm=190842368», usable while 14181 is in hand --, where a written
-        /// «Qo=X» is X done. So the two signs swap; that the objective is the one in hand is checked
-        /// when it is marked.
-        /// </summary>
-        internal static string ObjectivesAsTheClientMeansThem(string criterion)
-            => string.IsNullOrEmpty(criterion)
-                ? criterion
-                : System.Text.RegularExpressions.Regex.Replace(criterion, @"(?<=^|[&|(])Qo([=!])(?=\d)",
-                    m => m.Groups[1].Value == "=" ? "Qo!" : "Qo=");
 
         /// <summary>
         /// The bag's weight (iun), for whoever spent with <c>weigh: false</c> to put something in

@@ -881,6 +881,9 @@
       "monsters": [ { "monster": 2828, "grade": 0 }, { "monster": 2829, "grade": 0 }, { "monster": 2830, "grade": 0 }, { "monster": 2831, "grade": 0 }, { "monster": 2832, "grade": 0 }, { "monster": 2833, "grade": 0 }, { "monster": 2834, "grade": 0 } ],
       "winMap": 178523136, "winCell": 370 },
     { "npc": 1266, "map": 221249538, "reply": 7661,
-      "monsters": [ { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 } ] }
+      "monsters": [ { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 } ] },
+    { "npc": 1587, "map": 99091983, "reply": 12920,
+      "monsters": [ { "monster": 3247, "grade": 0 } ],
+      "why": "«Guewa y Paz» (920): the hungry wabbit spirit (3247) after the crunchy carrot, «Défendez-vous contre l'esprit qui vous a sauté dessus» (Dofus pour les noobs); the catalogue's 5606." }
   ]
 }
