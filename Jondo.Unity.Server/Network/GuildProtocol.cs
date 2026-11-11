@@ -363,11 +363,19 @@ namespace Jondo.Unity.Server.Network
         /// sheet with the same shape as the jci, how many members it has (91, 339), the emblem with
         /// the jjg's four numbers, and the guild with its id, its name and its level.
         /// </remarks>
+        /// <remarks>
+        /// f3 and f6 too, or the client shows «0/0 Guildes» and «Aucune guilde ne correspond à votre
+        /// recherche» whatever the f1s hold. Read off the 3.6.10.11 client (Cpp2IL): fft.behg hands the
+        /// list, f5, f6 and f3 to btj(list, f5, f6, f3), and GuildDirectory.OnGuildList stores each guild
+        /// at f5 + i (the page's first index), writes «f3/max Guildes» with f3 the guilds found, and sizes
+        /// its list from f3 only when f6 is not zero -- left at zero, the list stays empty.
+        /// </remarks>
         public static byte[] BuildDirectory(IReadOnlyList<DirectoryEntry> entries)
         {
             var jiv = Pb.New();
             foreach (var entry in entries) jiv.Msg(1, DirectoryGuild(entry));
-            return jiv.Build();
+            // f5, the first index, stays 0: every guild is sent at once.
+            return jiv.VarIfNotZero(3, entries.Count).VarIfNotZero(6, entries.Count).Build();
         }
 
         /// <summary>A guild as the directory lists it (les): the leader, the sheet, how many they are, the emblem.</summary>
