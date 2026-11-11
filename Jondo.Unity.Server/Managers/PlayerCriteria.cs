@@ -50,7 +50,8 @@ namespace Jondo.Unity.Server.Managers
         {
             var state = SessionContext.State;
             held ??= Equipment.HowMany;
-            var facts = new Facts(state, Quests.Log, Quests.Book, mapId, held, state.JobLevel, HuntingWeaponInHand);
+            var facts = new Facts(state, Quests.Log, Quests.Book, mapId, held, state.JobLevel, HuntingWeaponInHand,
+                                  Equipment.HowManyWorn);
             return condition => Resolve(condition, facts);
         }
 
@@ -66,7 +67,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>What a condition asks of a character, as plain facts, so it can be answered without a session.</summary>
         internal readonly record struct Facts(SessionState? State, QuestLog? Log, QuestCatalogue? Book, long MapId,
                                               Func<int, int> Held, Func<int, int>? JobLevel = null,
-                                              Func<bool>? HuntingWeapon = null);
+                                              Func<bool>? HuntingWeapon = null, Func<int, int>? Worn = null);
 
         internal static Answer Resolve(Condition condition, Facts facts)
         {
@@ -103,7 +104,15 @@ namespace Jondo.Unity.Server.Managers
                                                               : Alignments.Index().Rank(side, finished), op, value);
                     }
 
-                case "PO": return Holding(condition, facts.Held);
+                case "PO":
+                    // Worn, «E», or not worn, «X»: the Kama Baraka asks for the Dados de la Suerte on.
+                    if (condition.Operator is 'E' or 'X')
+                    {
+                        if (facts.Worn == null || condition.Args.Count == 0 || !int.TryParse(condition.Args[0], out int worn))
+                            return Answer.Unknown;
+                        return Truth(facts.Worn(worn) > 0, condition.Operator == 'E' ? '=' : '!');
+                    }
+                    return Holding(condition, facts.Held);
 
                 case "Qa": return facts.Log == null ? Answer.Unknown : Truth(facts.Log.Active((int)value), op);
                 case "Qf":

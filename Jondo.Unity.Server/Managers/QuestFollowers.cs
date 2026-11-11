@@ -13,7 +13,9 @@ namespace Jondo.Unity.Server.Managers
     /// templo de Sadida»), the way a caught criminal walks behind his captor (WantedHandler). And
     /// the roleplay disguises (type 31, «149» a look) the same way, in theirs: Uba Teseo's wabbit
     /// transformation, lost in the first fight («attention de ne pas lancer de combats afin de ne
-    /// pas perdre l'apparence», Dofus pour les noobs).
+    /// pas perdre l'apparence», Dofus pour les noobs). And the curses a conversation casts (type
+    /// 30) to theirs: the Kama Baraka's «Fiebre del juego» for whoever wins («vous obtiendrez un lot
+    /// et la malédiction la Fièvre du Jeu», Dofus pour les noobs).
     /// </summary>
     /// <remarks>
     /// Anything else goes through <see cref="Equipment"/> as it always did. A follower the player
@@ -21,9 +23,10 @@ namespace Jondo.Unity.Server.Managers
     /// </remarks>
     public static class QuestFollowers
     {
-        /// <summary>Whether the item is a follower or a roleplay disguise.</summary>
+        /// <summary>Whether the item is a follower, a roleplay disguise or a curse.</summary>
         public static bool IsFollower(int template)
-            => Forgemagic.TemplateOf(template)?.Type is BonusSlots.FollowerType or BonusSlots.RoleplayBuffType;
+            => Forgemagic.TemplateOf(template)?.Type is BonusSlots.FollowerType or BonusSlots.RoleplayBuffType
+                                                      or BonusSlots.CurseType;
 
         /// <summary>The item handed over: a follower to his slot when it is free, anything else to the bag.</summary>
         public static async Task<bool> GiveAsync(NetworkStream stream, int template, int count)

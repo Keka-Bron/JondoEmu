@@ -3112,6 +3112,52 @@
    "spawns": {"monster": 3277, "count": 2, "attacks": true},
    "afterObjectives": [5612],
    "why": "«Encuentra el tercero objeto perdido» at [7,16], underground: «Cliquez sur l'entrée au pied d'une statue Wabbit (en haut à gauche de la map), puis une fois descendu, cliquez sur la petite statue wabbit à coté du gros trou. Vous obtenez alors une Pierre Spécieuse. Un autre combat se lance contre les mêmes monstres qu'auparavant, cependant cette fois-ci ils sont deux»: below [7,16] (entrance 472853), element 475028 (graphic 38059, cell 469) is the only one there that is neither the way out (475031) nor the hole (475039); «una tumba subterránea donde huele a zanahowia» (11625)."
+  },
+  {
+   "objective": -486,
+   "quest": 486,
+   "kind": "click",
+   "starts": 486,
+   "elements": [{"map": 153345, "element": 453561}],
+   "why": "«El secreto de los charcosos» (Le secret des Flaqueux, Dofus pour les noobs): «se rendre sur le lieu de lancement de la quête en [-43,-1] et cliquer sur le parasol en paille. Voilà la quête se termine aussitôt lancée». The castaways' island [-43,-1] (map 153345) has a single element, 453561 (graphic 4420, cell 331). The quest has no giver in the client. It hands the quest out."
+  },
+  {
+   "objective": 3466,
+   "quest": 486,
+   "kind": "click",
+   "elements": [{"map": 153345, "element": 453561}],
+   "why": "«Desvela el secreto de los charcosos»: the same press of the parasol. «El secreto de los charcosos» (Le secret des Flaqueux, Dofus pour les noobs): «se rendre sur le lieu de lancement de la quête en [-43,-1] et cliquer sur le parasol en paille. Voilà la quête se termine aussitôt lancée». The castaways' island [-43,-1] (map 153345) has a single element, 453561 (graphic 4420, cell 331). The quest has no giver in the client."
+  },
+  {
+   "objective": 13766,
+   "quest": 826,
+   "kind": "click",
+   "elements": [{"map": 153878529, "element": 489416}],
+   "gives": [{"item": 12793}],
+   "afterObjectives": [5245],
+   "anyOrder": true,
+   "why": "«Consigue una hojaza verde»: «Descendez maintenant en [0,1]. Puis ramassez une Grande Feuille Verte au pied du vieil Orme» (Dofus pour les noobs). Element 489416 (graphic 7399, cell 432) is the map's only one besides three of graphic 3212 on its edges."
+  },
+  {
+   "objective": 5246,
+   "quest": 826,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The leaf, the plume swapped for the rope and the two brought to Nina go in any order: Dofus pour les noobs fetches the plume and the rope before the leaf, Nina's own words the leaf first."
+  },
+  {
+   "objective": 5247,
+   "quest": 826,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The leaf, the plume swapped for the rope and the two brought to Nina go in any order: Dofus pour les noobs fetches the plume and the rope before the leaf, Nina's own words the leaf first."
+  },
+  {
+   "objective": 5248,
+   "quest": 826,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The leaf, the plume swapped for the rope and the two brought to Nina go in any order: Dofus pour les noobs fetches the plume and the rope before the leaf, Nina's own words the leaf first."
   }
  ]
 }

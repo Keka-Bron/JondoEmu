@@ -4692,6 +4692,7 @@
             { "reply": 25216, "next": 20975, "beforeQuest": 1637 },
             { "reply": 25218, "next": 20978, "quest": 1637, "completes": 9807, "params": [[30, 9807]], "afterObjective": 9806, "beforeObjective": 9807 },
             { "reply": 25224, "next": 20979, "quest": 1637, "completes": 9810, "params": [[30, 9810]], "afterObjective": 9809, "beforeObjective": 9810 },
+            { "reply": 25234, "next": 20989, "quest": 826, "afterObjective": 5245, "beforeObjective": 5247 },
             { "reply": 25222 }
           ]
         },
@@ -4744,9 +4745,16 @@
           "choices": [
             { "reply": 25222 }
           ]
+        },
+        {
+          "message": 20989,
+          "choices": [
+            { "reply": 25233, "quest": 826, "completes": 5247, "params": [[30, 5247]], "holds": 16512, "gives": 12794 },
+            { "reply": 25222 }
+          ]
         }
       ],
-      "why": "Anta Brok, from her own lines and replies, by «La galette secrète» of Dofus pour les noobs. Asked for work (25216), she asks whether the character can cook (20975) and tells of the dessert her sister dared her to make (20976, the line the catalogue names); «Yo puedo hacer la torta por ti.» hands the quest over with the secret recipe (16517), whose reading is 9805. The cake shown (25218) does 9807 and sends the character to Kotorra for jam (20978); cake and jam handed over (25224) do 9810, and Anta tastes the jam (20979): «Probar la mermelada» or not, and she keeps the cake (20981, 20982)."
+      "why": "Anta Brok, from her own lines and replies, by «La galette secrète» of Dofus pour les noobs. Asked for work (25216), she asks whether the character can cook (20975) and tells of the dessert her sister dared her to make (20976, the line the catalogue names); «Yo puedo hacer la torta por ti.» hands the quest over with the secret recipe (16517), whose reading is 9805. The cake shown (25218) does 9807 and sends the character to Kotorra for jam (20978); cake and jam handed over (25224) do 9810, and Anta tastes the jam (20979): «Probar la mermelada» or not, and she keeps the cake (20981, 20982). «El fin del reinado»: «Te cambio tu cuerda de viña por algo.» (20989: the souls newly incarnated tied it round their waist), «Hacer el intercambio.» takes the chimeric plume of a tofu (5247) and gives the vine rope («échangez votre plume contre une ficelle»). «El fin del reinado»: «Te cambio tu cuerda de viña por algo.» (20989: the souls newly incarnated tied it round their waist), «Hacer el intercambio.» takes the chimeric plume of a tofu (5247) and gives the vine rope («échangez votre plume contre une ficelle»). «El fin del reinado»: «Te cambio tu cuerda de viña por algo.» (20989: the souls newly incarnated tied it round their waist), «Hacer el intercambio.» takes the chimeric plume of a tofu (5247) and gives the vine rope («échangez votre plume contre une ficelle»)."
     },
     {
       "npc": 2888,
@@ -26768,6 +26776,157 @@
         }
       ],
       "why": "Stiff Yob in Roukerol's workshop, Sufokia [7,25], by «En busca del tiempo perdido» (À la recherche des instants perdus, Dofus pour les noobs): the lost wrench (11618); «¿Qué te ha pasado?», found wandering by Roukerol (11620), his dreams (11621), the book printed in Astrub (11622); «He leído la obra de Herdegriz, el Místico.» once «Las primeras impresiones son engañosas» is done (11623: an apple might bring it back); «Ir a conseguir una manzana.» starts it («Partir se procurer une pomme»), or the fish (11619). «Darle un manzana.» takes the apple (5612, 11624-11625: three places near Sufokia), asked again with «Pedirle más detalles sobre los objetos perdidos.» (11626). «Darle los tres objetos.» hands the iSkarab, the iZarrín and the specious stone over (5616, 11627-11628: the mask he made himself is the quest's reward). Afterwards, 11629."
+    },
+    {
+      "npc": 2140,
+      "map": 103547392,
+      "opening": 15418,
+      "openings": [
+        { "quest": 1420, "message": 15415 },
+        { "canStart": 1420, "message": 15415 },
+        { "after": 1420, "criterion": "PL>49&POE14271", "message": 15419 }
+      ],
+      "lines": [
+        {
+          "message": 15415,
+          "choices": [
+            { "reply": 18125, "quest": 1420, "next": 15416, "buyPrice": 421, "chance": 33, "otherwise": 15417 },
+            { "reply": 18125, "startsQuest": 1420, "params": [[34, 1420]], "next": 15416, "buyPrice": 421, "chance": 33, "otherwise": 15417 },
+            { "reply": 18387 },
+            { "reply": 18126 }
+          ]
+        },
+        {
+          "message": 15416,
+          "choices": [
+            { "reply": 18127, "quest": 1420, "completes": 7840, "params": [[30, 7840]], "givesOneOf": [14507, 13624, 2288], "gives": 14272 }
+          ]
+        },
+        {
+          "message": 15417,
+          "choices": [
+            { "reply": 18508, "next": 15415 },
+            { "reply": 18128 }
+          ]
+        },
+        {
+          "message": 15418,
+          "choices": []
+        },
+        {
+          "message": 15419,
+          "choices": []
+        }
+      ],
+      "why": "The Kama Baraka on the ground floor of Kerubim's house [3,-17], by «Zurcarák sonríe a los audaces» (Ecaflip sourit aux audacieux, Dofus pour les noobs): level 50 and the Dados de la Suerte worn (PL>49&POE14271) or 15418; «Payer 421 kamas et actionner le levier» starts it, and «tant que vous n'avez pas gagné il faudra rejouer»: «¡Ganaste!» (15416) or «¡Perdiste!» (15417, «Decidir volver a jugar.» pays again). The odds are not written anywhere: one in three is INFERRED. «Agarrar tus ganancias» is 7840: one of the known prizes («Pelote d'Ecaflip, Potion de Kerubim, Patte de Wabbit») and the curse «la Fièvre du Jeu (−200 Initiative, −50 sagesse pour 2 combats)». Once a day (repeatType 1): 15419 until the reset."
+    },
+    {
+      "npc": 1513,
+      "map": 153878528,
+      "opening": 10358,
+      "openings": [
+        { "quest": 826, "message": 10361 },
+        { "after": 826, "message": 10363 }
+      ],
+      "lines": [
+        {
+          "message": 10358,
+          "choices": [
+            { "reply": 11317, "next": 10359 },
+            { "reply": 11319 }
+          ]
+        },
+        {
+          "message": 10359,
+          "choices": [
+            { "reply": 11318, "next": 10360 }
+          ]
+        },
+        {
+          "message": 10360,
+          "choices": [
+            { "reply": 11320, "startsQuest": 826, "params": [[34, 826]] },
+            { "reply": 11321 }
+          ]
+        },
+        {
+          "message": 10361,
+          "choices": [
+            { "reply": 11322, "quest": 826, "completes": 5249, "params": [[30, 5249]], "next": 10362, "holds": 12795 }
+          ]
+        },
+        {
+          "message": 10362,
+          "choices": [
+            { "reply": 36881 }
+          ]
+        },
+        {
+          "message": 10363,
+          "choices": []
+        }
+      ],
+      "why": "Reyes Túpido (Regnator) camouflaged by Incarnam's pool [0,0], by «El fin del reinado» (La fin du règne, Dofus pour les noobs): «Acercarse.» (10359), «Seguir escuchando.» (10360: his Golosotrón Real set stolen while bathing), «Acepto, voy a ir a ver el taller de sastres.» starts it. Meanwhile 10361; «Toma el calzón de hoja.» hands the leaf pants over (5249, 10362). Afterwards, 10363."
+    },
+    {
+      "npc": 2917,
+      "map": 0,
+      "opening": 20992,
+      "lines": [
+        {
+          "message": 20992,
+          "choices": [
+            { "reply": 25243, "next": 20995, "quest": 826, "beforeObjective": 5245 },
+            { "reply": 25248, "next": 20999, "quest": 826, "afterObjective": 5245, "beforeObjective": 5248 },
+            { "reply": 25246, "quest": 826, "completes": 5246, "params": [[30, 5246]], "next": 20997, "gives": 12795, "completesAll": [5248], "criterion": "PO>12793,0&PO>12794,0" },
+            { "reply": 25246, "next": 20998, "quest": 826, "afterObjective": 5245, "beforeObjective": 5246, "criterion": "PO>12793,0|PO>12794,0" },
+            { "reply": 25240, "next": 20993 }
+          ]
+        },
+        {
+          "message": 20993,
+          "choices": [
+            { "reply": 25239, "next": 20994 }
+          ]
+        },
+        {
+          "message": 20994,
+          "choices": [
+            { "reply": 25238 }
+          ]
+        },
+        {
+          "message": 20995,
+          "choices": [
+            { "reply": 25242, "next": 20996 }
+          ]
+        },
+        {
+          "message": 20996,
+          "choices": [
+            { "reply": 25241, "quest": 826, "completes": 5245, "params": [[30, 5245]] }
+          ]
+        },
+        {
+          "message": 20999,
+          "choices": [
+            { "reply": 25244 }
+          ]
+        },
+        {
+          "message": 20997,
+          "choices": [
+            { "reply": 25247 }
+          ]
+        },
+        {
+          "message": 20998,
+          "choices": [
+            { "reply": 25245 }
+          ]
+        }
+      ],
+      "why": "Nina Lichi, the tailor of Incarnam [0,-2]: the job (20993-20994). By «El fin del reinado»: «Te voy a explicar el problema de Reyes Túpido.» (20995-20996: nothing to be done for his set, but no naturist in Incarnam; a big green leaf by the last elm, a vine rope from Anta Brok) is 5245, asked again with «¿Cómo consigo los recursos para Reyes Túpido?» (20999). «Aquí tienes lo que me pediste para solucionar lo de Reyes Túpido.» hands both over (5246, 5248) and she sews the leaf pants (20997); with one only, «Con un solo recurso, no puedo hacer nada» (20998)."
     }
   ]
 }

@@ -248,6 +248,22 @@ namespace Jondo.Unity.World.Content
         public long RefusedNext { get; init; }
 
         /// <summary>
+        /// The odds, in percent, that the reply goes on to its <see cref="Next"/> line, or zero for
+        /// always: the Kama Baraka's «Introducir 421 kamas y dar a la palanca.» wins now and then
+        /// and loses otherwise. Drawn once, when the next line is chosen.
+        /// </summary>
+        public int Chance { get; init; }
+
+        /// <summary>Where a <see cref="Chance"/> reply leads when the draw is lost («otherwise»).</summary>
+        public long OtherwiseNext { get; init; }
+
+        /// <summary>
+        /// Items of which the reply hands over ONE, drawn at random («givesOneOf»): the Kama Baraka's
+        /// prize, a zurcarák's ball, a Kerubim potion or a wabbit's paw.
+        /// </summary>
+        public IReadOnlyList<int> GivesOneOf { get; init; } = Array.Empty<int>();
+
+        /// <summary>
         /// The chapeuvepés this reply costs (Managers.HeadHunts), or zero: Ema and Tomás Sacre's
         /// trades, «Tomar una gema que contiene el alma del Escarajefe Dorado a cambio de 8
         /// chapeuvepés.». It hands over <see cref="Trades"/>, <see cref="TradeCount"/> of them.
@@ -997,6 +1013,9 @@ namespace Jondo.Unity.World.Content
                                          && after.ValueKind == JsonValueKind.True,
                             KothRole = (int)Number(choice, "kothRole"),
                             RefusedNext = Number(choice, "refused"),
+                            Chance = (int)Number(choice, "chance"),
+                            OtherwiseNext = Number(choice, "otherwise"),
+                            GivesOneOf = Numbers(choice, "givesOneOf").Select(o => (int)o).ToArray(),
                             Chapeuvepes = (int)Number(choice, "chapeuvepes"),
                             Trades = (int)Number(choice, "trade"),
                             TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
@@ -1184,6 +1203,14 @@ namespace Jondo.Unity.World.Content
                             if (choice.ReturnsHome) writer.WriteBoolean("teleportBack", true);
                             if (choice.KothRole != 0) writer.WriteNumber("kothRole", choice.KothRole);
                             if (choice.RefusedNext != 0) writer.WriteNumber("refused", choice.RefusedNext);
+                            if (choice.Chance != 0) writer.WriteNumber("chance", choice.Chance);
+                            if (choice.OtherwiseNext != 0) writer.WriteNumber("otherwise", choice.OtherwiseNext);
+                            if (choice.GivesOneOf.Count > 0)
+                            {
+                                writer.WriteStartArray("givesOneOf");
+                                foreach (int o in choice.GivesOneOf) writer.WriteNumberValue(o);
+                                writer.WriteEndArray();
+                            }
                             if (choice.Chapeuvepes != 0) writer.WriteNumber("chapeuvepes", choice.Chapeuvepes);
                             if (choice.Trades != 0)
                             {
@@ -1316,6 +1343,12 @@ namespace Jondo.Unity.World.Content
                     if (choice.RefusedNext != 0 && !known.Contains(choice.RefusedNext))
                     {
                         wrong.Add($"reply {choice.Reply} is refused onto message {choice.RefusedNext}, which is " +
+                                  "not one of its lines.");
+                    }
+
+                    if (choice.OtherwiseNext != 0 && !known.Contains(choice.OtherwiseNext))
+                    {
+                        wrong.Add($"reply {choice.Reply} loses its draw onto message {choice.OtherwiseNext}, which is " +
                                   "not one of its lines.");
                     }
                 }

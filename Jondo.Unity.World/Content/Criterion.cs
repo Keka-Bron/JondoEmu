@@ -141,6 +141,12 @@ namespace Jondo.Unity.World.Content
                     op = i; break;
                 }
             }
+            // An item worn or not: «POE14271», the Dados de la Suerte on for the Kama Baraka, and
+            // «POX» its opposite. The letter is the operator only right after a two-letter code
+            // with the item's number behind it, so a code with an E in it (PE) stays a code.
+            if (op < 0 && text.Length > 3 && (text[2] == 'E' || text[2] == 'X')
+                && text.Substring(3).All(c => char.IsDigit(c) || c == ','))
+                op = 2;
             if (op <= 0 || op == text.Length - 1) return Answer.Unknown;
 
             string code = text.Substring(0, op);

@@ -645,6 +645,18 @@ namespace Jondo.Unity.Server.Managers
                             InfoMessages.ItemGained, count.ToString(CultureInfo.InvariantCulture),
                             item.ToString(CultureInfo.InvariantCulture))));
                 }
+
+                // A quest that ends as it starts: the straw parasol of the castaways' island hands
+                // «El secreto de los charcosos» out and is also its only objective, so the same
+                // press does both (Dofus pour les noobs: «la quête se termine aussitôt lancée»).
+                foreach (var (where, element) in binding.Elements)
+                {
+                    foreach (var same in Bindings.At(where, element))
+                    {
+                        if (same.QuestId == binding.Starts && same.Starts == 0 && same.Kind == QuestBindingKind.Click)
+                            await CloseAsync(stream, same);
+                    }
+                }
                 return true;
             }
 

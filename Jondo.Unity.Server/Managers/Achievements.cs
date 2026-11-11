@@ -772,6 +772,8 @@ namespace Jondo.Unity.Server.Managers
             public long? Count(string op, long key, string flag) => op switch
             {
                 "PO" => Equipment.HowMany((int)key),
+                // Worn, the client's «POE»: the Kama Baraka's Dados de la Suerte, the rikiki wand.
+                "POE" => Equipment.HowManyWorn((int)key),
 
                 // A world event going on (WorldEvents): «WE=230», Osavora's Repos.
                 "WE" => WorldEvents.IsActive((int)key, DateTimeOffset.UtcNow) ? 1 : 0,

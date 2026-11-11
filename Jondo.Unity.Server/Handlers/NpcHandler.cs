@@ -1130,6 +1130,8 @@ namespace Jondo.Unity.Server.Handlers
             var items = new List<(int Item, int Count)>();
             if (choice.Gives != 0) items.Add((choice.Gives, choice.GivesCount));
             items.AddRange(choice.AlsoGives.Select(i => (i, 1)));
+            // And one of a draw: the Kama Baraka's prize.
+            if (choice.GivesOneOf.Count > 0) items.Add((choice.GivesOneOf[Random.Shared.Next(choice.GivesOneOf.Count)], 1));
             // And the kamas it pays: the mulou's 10,000 for a goblin.
             if (choice.GivesKamas > 0) await Managers.CharacterRewards.GiveKamasAsync(stream, choice.GivesKamas);
             foreach (var (item, count) in items)
@@ -1559,7 +1561,8 @@ namespace Jondo.Unity.Server.Handlers
                     if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(stream, elegidaAhora);
                 }
             }
-            else if (elegidaAhora != null && (elegidaAhora.Gives != 0 || elegidaAhora.AlsoGives.Count > 0 || elegidaAhora.GivesKamas > 0))
+            else if (elegidaAhora != null && (elegidaAhora.Gives != 0 || elegidaAhora.AlsoGives.Count > 0
+                                              || elegidaAhora.GivesOneOf.Count > 0 || elegidaAhora.GivesKamas > 0))
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
             }
@@ -1753,6 +1756,15 @@ namespace Jondo.Unity.Server.Handlers
 
             // A conquest role taken (Hal Ylanza): its certificate, or the line that says not yet.
             long next = elegida.Next;
+
+            // A reply that goes one way or the other by luck: the Kama Baraka's lever, won or lost.
+            if (elegida.Chance > 0 && Random.Shared.Next(100) >= elegida.Chance)
+            {
+                Console.WriteLine($"[NPC] Reply {reply} loses its draw ({elegida.Chance} %): line {elegida.OtherwiseNext}.");
+                next = elegida.OtherwiseNext;
+                if (next == 0) return false;
+            }
+
             if (elegida.KothRole != 0
                 && !await Managers.KothRoles.BecomeAsync(stream, elegida.KothRole, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()))
             {
