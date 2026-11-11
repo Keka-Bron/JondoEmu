@@ -44,10 +44,29 @@ namespace Jondo.Unity.Server.Managers
                 if (_groups != null) return _groups;
                 lock (_lock)
                 {
-                    _groups ??= Load(Paths.RandomDropGroupsJson);
+                    if (_groups != null) return _groups;
+                    var groups = Load(Paths.RandomDropGroupsJson);
+                    // The groups the client's file lacks, written by hand: the Lotapes open into
+                    // groups 16 to 21, which it does not carry. The client's own always win.
+                    string authored = Paths.ContentFile(AuthoredFile);
+                    if (File.Exists(authored))
+                    {
+                        foreach (var (id, group) in Load(authored))
+                            groups.TryAdd(id, group);
+                    }
+                    _groups = groups;
                     return _groups;
                 }
             }
+        }
+
+        /// <summary>The groups written by hand, relative to the content root.</summary>
+        public const string AuthoredFile = "quests/loot_groups.json";
+
+        /// <summary>For the tests and the harness's reload: read the files again.</summary>
+        internal static void Forget()
+        {
+            lock (_lock) _groups = null;
         }
 
         private static Dictionary<int, Group> Load(string path)

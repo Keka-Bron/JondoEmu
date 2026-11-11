@@ -678,6 +678,7 @@
             { "reply": 19319, "quest": 1426, "completes": 7930, "params": [[30, 7930]], "next": 16276 },
             { "reply": 36610, "next": 30370, "beforeQuest": 1696 },
             { "reply": 36611, "next": 30372, "quest": 1696 },
+            { "reply": 14832, "next": 12878, "quest": 1198 },
             { "reply": 26687 }
           ]
         },
@@ -1005,9 +1006,34 @@
             { "reply": 36607, "quest": 1696, "afterObjective": 10564, "beforeObjective": 10566, "teleport": 161224198 },
             { "reply": 36607, "quest": 1696, "afterObjective": 10566, "teleport": 161224196 }
           ]
+        },
+        {
+          "message": 12878,
+          "choices": [
+            { "reply": 14831, "next": 12879 }
+          ]
+        },
+        {
+          "message": 12879,
+          "choices": [
+            { "reply": 14830, "next": 12880 }
+          ]
+        },
+        {
+          "message": 12880,
+          "choices": [
+            { "reply": 14829, "quest": 1198, "completes": 6744, "params": [[30, 6744]], "next": 12881 },
+            { "reply": 14829, "next": 12881, "quest": 1198, "afterObjective": 6744 }
+          ]
+        },
+        {
+          "message": 12881,
+          "choices": [
+            { "reply": 14828 }
+          ]
         }
       ],
-      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566)."
+      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881)."
     },
     {
       "npc": 4310,
@@ -26312,6 +26338,122 @@
         }
       ],
       "why": "An irritating flea of Zurcalia (22466), by «Paseo por Zurcalia»: «Il faut tuer 5 Ecaflipuces, il faut parler à chacune pour les attaquer, les combats se font en solo et sont adaptés à votre niveau. Une sur la map d'arrivée, deux sur la map de gauche et deux sur la map du haut» (Dofus pour les noobs). «Atacar.» starts the fight against monster 4315 (content/fights/npc_fights.json), which counts for 10561 and drops the flea leg of its map."
+    },
+    {
+      "npc": 1627,
+      "map": 0,
+      "opening": 12827,
+      "lines": [
+        {
+          "message": 12827,
+          "choices": [
+            { "reply": 14612, "next": 12828 },
+            { "reply": 15306, "next": 13272, "beforeQuest": 1198 },
+            { "reply": 15307, "next": 13275, "quest": 1198, "afterObjective": 6744, "criterion": "Qo<6745|Qo<6746|Qo<6747|Qo<6748|Qo<6749|Qo<6750" },
+            { "reply": 15369, "next": 13312, "quest": 1198, "afterObjectives": [6745, 6746, 6747, 6748, 6749, 6750] },
+            { "reply": 14611 }
+          ]
+        },
+        {
+          "message": 12828,
+          "choices": [
+            { "reply": 14611 }
+          ]
+        },
+        {
+          "message": 13272,
+          "choices": [
+            { "reply": 15305, "next": 13273 },
+            { "reply": 15304 }
+          ]
+        },
+        {
+          "message": 13273,
+          "choices": [
+            { "reply": 15303, "startsQuest": 1198, "params": [[34, 1198]], "next": 13274 },
+            { "reply": 15304 }
+          ]
+        },
+        {
+          "message": 13274,
+          "choices": [
+            { "reply": 15302 }
+          ]
+        },
+        {
+          "message": 13275,
+          "choices": [
+            { "reply": 15309, "quest": 1198, "completes": 6745, "params": [[30, 6745]], "next": 13276, "takesAll": [13527, 13532, 13533, 13530, 13534, 13535, 13536, 13531] },
+            { "reply": 15315, "quest": 1198, "completes": 6746, "params": [[30, 6746]], "next": 13277, "takesAll": [13537, 13538, 13539, 13540, 13541, 13542, 13543, 13544] },
+            { "reply": 15322, "quest": 1198, "completes": 6747, "params": [[30, 6747]], "next": 13280, "takesAll": [13545, 13546, 13547, 13548, 13549, 13550, 13551, 13552] },
+            { "reply": 15333, "quest": 1198, "completes": 6748, "params": [[30, 6748]], "next": 13287, "takesAll": [13553, 13554, 13555, 13556, 13557, 13558, 13559, 13560] },
+            { "reply": 15337, "quest": 1198, "completes": 6749, "params": [[30, 6749]], "next": 13288, "takesAll": [13561, 13562, 13563, 13564, 13565, 13566, 13567, 13568] },
+            { "reply": 15348, "quest": 1198, "completes": 6750, "params": [[30, 6750]], "next": 13295, "takesAll": [13569, 13570, 13571, 13572, 13573, 13574, 13575, 13576] },
+            { "reply": 14611 }
+          ]
+        },
+        {
+          "message": 13312,
+          "choices": [
+            { "reply": 15368, "quest": 1198, "completes": 6751, "params": [[30, 6751]], "next": 13313 }
+          ]
+        },
+        {
+          "message": 13313,
+          "choices": [
+            { "reply": 15367 }
+          ]
+        },
+        {
+          "message": 13276,
+          "choices": [
+            { "reply": 15308, "next": 13275, "quest": 1198, "criterion": "Qo<6745|Qo<6746|Qo<6747|Qo<6748|Qo<6749|Qo<6750" },
+            { "reply": 15310, "next": 13312, "quest": 1198, "afterObjectives": [6745, 6746, 6747, 6748, 6749, 6750] },
+            { "reply": 15311 }
+          ]
+        },
+        {
+          "message": 13277,
+          "choices": [
+            { "reply": 15312, "next": 13275, "quest": 1198, "criterion": "Qo<6745|Qo<6746|Qo<6747|Qo<6748|Qo<6749|Qo<6750" },
+            { "reply": 15313, "next": 13312, "quest": 1198, "afterObjectives": [6745, 6746, 6747, 6748, 6749, 6750] },
+            { "reply": 15314 }
+          ]
+        },
+        {
+          "message": 13280,
+          "choices": [
+            { "reply": 15319, "next": 13275, "quest": 1198, "criterion": "Qo<6745|Qo<6746|Qo<6747|Qo<6748|Qo<6749|Qo<6750" },
+            { "reply": 15320, "next": 13312, "quest": 1198, "afterObjectives": [6745, 6746, 6747, 6748, 6749, 6750] },
+            { "reply": 15321 }
+          ]
+        },
+        {
+          "message": 13287,
+          "choices": [
+            { "reply": 15330, "next": 13275, "quest": 1198, "criterion": "Qo<6745|Qo<6746|Qo<6747|Qo<6748|Qo<6749|Qo<6750" },
+            { "reply": 15331, "next": 13312, "quest": 1198, "afterObjectives": [6745, 6746, 6747, 6748, 6749, 6750] },
+            { "reply": 15332 }
+          ]
+        },
+        {
+          "message": 13288,
+          "choices": [
+            { "reply": 15334, "next": 13275, "quest": 1198, "criterion": "Qo<6745|Qo<6746|Qo<6747|Qo<6748|Qo<6749|Qo<6750" },
+            { "reply": 15335, "next": 13312, "quest": 1198, "afterObjectives": [6745, 6746, 6747, 6748, 6749, 6750] },
+            { "reply": 15336 }
+          ]
+        },
+        {
+          "message": 13295,
+          "choices": [
+            { "reply": 15345, "next": 13275, "quest": 1198, "criterion": "Qo<6745|Qo<6746|Qo<6747|Qo<6748|Qo<6749|Qo<6750" },
+            { "reply": 15346, "next": 13312, "quest": 1198, "afterObjectives": [6745, 6746, 6747, 6748, 6749, 6750] },
+            { "reply": 15347 }
+          ]
+        }
+      ],
+      "why": "Vermo, the Almanax temple's goblin of all work, by «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «La quête se lance dans le Sanctuaire de l'Almanax en [-4,-24] en parlant à Vermô». His job (12828); the jokes of Kazuba (13272), the slap that is not a Facepalm (13273), and «Vale, te voy a traer Lotachistosos.» starts it (13274: go and see Kerubim in Astrub). «He encontrado unos Lotachistosos.» (13275) lists the flavours: each «Toma, los Lotachistosos de ...» hands over the eight different jokes of it (6745-6750) and he laughs (13276-13295, which laugh goes with which flavour is INFERRED from the ids), then «He encontrado más Lotachistosos.» while some flavour is left, or «He cumplido con mi misón.» once all six are given («vous pouvez aussi lui donner seulement une série de blagues»). Later «¿Me das mi recompensa?» does the same. The Facepalm (13312): «Aprender la actitud Facepalm.» is 6751 and the quest's reward the attitude and the Antología (13313)."
     }
   ]
 }

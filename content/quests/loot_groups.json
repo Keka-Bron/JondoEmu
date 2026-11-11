@@ -1,0 +1,344 @@
+{
+  "_comment": [
+    "Random drop groups the client's file (datos/random_drop_groups_*.json) lacks, which an item's",
+    "effect 222 «¿Qué hay ahí dentro?» names in its value (Managers/LootBoxes). The client's own",
+    "groups always win over these. Same shape: each item drawn by weight, or all given when every",
+    "weight is -1.",
+    "",
+    "The six Lotapes of «Reír a base de palos» (13521-13526) open into groups 16 to 21: «Chaque",
+    "Rabmarac s'ouvre en double cliquant dessus et fait apparaître une blague. Il existe 8 types de",
+    "blagues différentes pour chaque type de Rabmarac» (Dofus pour les noobs). Equal weights: INFERRED."
+  ],
+  "groups": [
+    {
+      "id": 16,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 13527,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13532,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13533,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13530,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13534,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13535,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13536,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13531,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ],
+      "why": "Lotape de caramelo (13521): one of the eight Lotachistosos de caramelo."
+    },
+    {
+      "id": 17,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 13537,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13538,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13539,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13540,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13541,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13542,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13543,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13544,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ],
+      "why": "Lotape de fresa (13522): one of the eight Lotachistosos de fresa."
+    },
+    {
+      "id": 18,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 13545,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13546,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13547,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13548,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13549,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13550,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13551,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13552,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ],
+      "why": "Lotape de limón (13523): one of the eight Lotachistosos de limón."
+    },
+    {
+      "id": 19,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 13553,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13554,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13555,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13556,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13557,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13558,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13559,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13560,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ],
+      "why": "Lotape de naranja (13524): one of the eight Lotachistosos de naranja."
+    },
+    {
+      "id": 20,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 13561,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13562,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13563,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13564,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13565,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13566,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13567,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13568,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ],
+      "why": "Lotape de cola (13525): one of the eight Lotachistosos de cola."
+    },
+    {
+      "id": 21,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 13569,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13570,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13571,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13572,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13573,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13574,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13575,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13576,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ],
+      "why": "Lotape de avellana (13526): one of the eight Lotachistosos de avellana."
+    }
+  ]
+}

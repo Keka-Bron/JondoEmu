@@ -12210,6 +12210,25 @@ namespace Jondo.Unity.Server.Handlers
                     loot[drop.ObjectId] = q + 1;
                 }
 
+                // And what any monster drops while a quest asks for it, which no table of the
+                // client's carries (content/quests/fight_drops.json): the Lotapes of «Reír a base
+                // de palos», caramel to cola, off every creature while the quest is in hand.
+                foreach (var drop in Enumerable.Repeat(Managers.QuestFightDrops.All, passes).SelectMany(t => t))
+                {
+                    if (drop.Criterion.Length > 0 && !Managers.PlayerCriteria.Met(drop.Criterion,
+                            fight.RoleplayMapId != 0 ? fight.RoleplayMapId : Network.SessionContext.State.MapId,
+                            item => Managers.Equipment.HowMany(item) + (loot.TryGetValue(item, out int rolled) ? rolled : 0)))
+                        continue;
+
+                    double probabilidad = extra > 0
+                        ? Math.Min(100.0, drop.Percent * (100.0 + extra) / 100.0)
+                        : drop.Percent;
+                    probabilidad = ServerSettings.ChanceWithBonus(WithAlmanax(probabilidad), ServerSettings.Current.DropBonusPercent);
+                    if (TirarPorcentaje() >= probabilidad) continue;
+                    loot.TryGetValue(drop.Item, out int q);
+                    loot[drop.Item] = q + 1;
+                }
+
                 // And the server's random loot (its settings), which the challenges and the drop
                 // bonus make likelier like any other drop: a handful of items around its level.
                 if (ServerSettings.Current.RandomLoot)

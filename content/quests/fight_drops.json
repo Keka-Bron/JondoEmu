@@ -1,0 +1,45 @@
+{
+  "_comment": [
+    "What any monster beaten drops while a quest asks for it (Managers/QuestFightDrops), which no",
+    "table of the client's carries. A row: the item, its chance in percent per monster beaten (raised",
+    "by challenges, the Almanax and the server's drop bonus like any other drop) and the criterion it",
+    "drops under, read as the monsters' loot is (Qa = quest in hand).",
+    "",
+    "«Reír a base de palos» (1198): the hazelnut Lotape is on 138 dungeon bosses' own tables («Qa=1198»,",
+    "about 5 %); the other five flavours «se dropent sur tous types de monstres si la quête est",
+    "activée» (Dofus pour les noobs, Du rire en barre) and are on none. Their chance is INFERRED: the",
+    "bosses' 5 %, per flavour and per monster."
+  ],
+  "drops": [
+    {
+      "item": 13521,
+      "percent": 5,
+      "criterion": "Qa=1198",
+      "why": "Lotape de caramelo: off any monster while «Reír a base de palos» is in hand («Caramel/Fraise/Citron/Orange/Kola: se dropent sur tous types de monstres si la quête est activée»); never once it is done («Une fois la quête terminée, vous ne pourrez plus drop de Rabmarac»)."
+    },
+    {
+      "item": 13522,
+      "percent": 5,
+      "criterion": "Qa=1198",
+      "why": "Lotape de fresa: off any monster while «Reír a base de palos» is in hand («Caramel/Fraise/Citron/Orange/Kola: se dropent sur tous types de monstres si la quête est activée»); never once it is done («Une fois la quête terminée, vous ne pourrez plus drop de Rabmarac»)."
+    },
+    {
+      "item": 13523,
+      "percent": 5,
+      "criterion": "Qa=1198",
+      "why": "Lotape de limón: off any monster while «Reír a base de palos» is in hand («Caramel/Fraise/Citron/Orange/Kola: se dropent sur tous types de monstres si la quête est activée»); never once it is done («Une fois la quête terminée, vous ne pourrez plus drop de Rabmarac»)."
+    },
+    {
+      "item": 13524,
+      "percent": 5,
+      "criterion": "Qa=1198",
+      "why": "Lotape de naranja: off any monster while «Reír a base de palos» is in hand («Caramel/Fraise/Citron/Orange/Kola: se dropent sur tous types de monstres si la quête est activée»); never once it is done («Une fois la quête terminée, vous ne pourrez plus drop de Rabmarac»)."
+    },
+    {
+      "item": 13525,
+      "percent": 5,
+      "criterion": "Qa=1198",
+      "why": "Lotape de cola: off any monster while «Reír a base de palos» is in hand («Caramel/Fraise/Citron/Orange/Kola: se dropent sur tous types de monstres si la quête est activée»); never once it is done («Une fois la quête terminée, vous ne pourrez plus drop de Rabmarac»)."
+    }
+  ]
+}

@@ -3089,6 +3089,34 @@
       "orientation": 1,
       "criterion": "Qa=1696&Qo>10560&Qo<10561",
       "why": "An irritating flea while the five are to be beaten (10561): one on the arrival map, two on the left one, two on the upper one (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 101450249,
+      "npc": 1627,
+      "cell": 340,
+      "orientation": 1,
+      "why": "Vermo in the Almanax temple's hall [-4,-24], the four seasons' copies of it (only today's is reached): the quest's four starting maps. INFERRED cell, by the bookcases."
+    },
+    {
+      "map": 101451273,
+      "npc": 1627,
+      "cell": 340,
+      "orientation": 1,
+      "why": "Vermo in the Almanax temple's hall [-4,-24], the four seasons' copies of it (only today's is reached): the quest's four starting maps. INFERRED cell, by the bookcases."
+    },
+    {
+      "map": 101452297,
+      "npc": 1627,
+      "cell": 340,
+      "orientation": 1,
+      "why": "Vermo in the Almanax temple's hall [-4,-24], the four seasons' copies of it (only today's is reached): the quest's four starting maps. INFERRED cell, by the bookcases."
+    },
+    {
+      "map": 101453321,
+      "npc": 1627,
+      "cell": 340,
+      "orientation": 1,
+      "why": "Vermo in the Almanax temple's hall [-4,-24], the four seasons' copies of it (only today's is reached): the quest's four starting maps. INFERRED cell, by the bookcases."
     }
   ]
 }
