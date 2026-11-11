@@ -108,7 +108,11 @@ namespace Jondo.Unity.Tests.Content
             var passages = FloorPassages.Load(Jondo.Unity.Launcher.Paths.ContentFile(FloorPassages.AuthoredFile), _ => said++);
             Assert.Equal(0, said);
             Assert.NotEmpty(passages);
-            Assert.Equal(passages.Count, passages.Select(p => (p.SourceMapId, p.SourceCell)).Distinct().Count());
+            // A cell holds one passage, or several that each ask for a criterion -- the first that
+            // holds leads: the cemetery's vault opens on one crypt for each branch of a quest.
+            foreach (var shared in passages.GroupBy(p => (p.SourceMapId, p.SourceCell)).Where(g => g.Count() > 1))
+                Assert.All(shared, p => Assert.False(string.IsNullOrEmpty(p.Criterion),
+                    $"{shared.Key} is shared by a passage open to anybody"));
         }
     }
 }
