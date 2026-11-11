@@ -454,6 +454,29 @@
     {"map": 192416776, "element": 4355004, "npc": 4355, "cell": 399, "gfx": 4355004, "type": -1, "skill": 339, "toMap": 183768070, "toCell": 316, "why": "The Envoyée of the Twelve sends class 4 to its temple «devant la statue» (Dofus pour les noobs, Dévotion): statue 511862 on 183768070, the walkable cell nearest it."},
     {"map": 192416776, "element": 4355017, "npc": 4355, "cell": 399, "gfx": 4355017, "type": -1, "skill": 339, "toMap": 163056642, "toCell": 340, "why": "The Envoyée of the Twelve sends class 17 to its temple «devant la statue» (Dofus pour les noobs, Dévotion): statue 511870 on 163056642, the walkable cell nearest it."},
     {"map": 176820229, "element": 510444, "cell": 320, "gfx": 59057, "type": 0, "skill": 114, "toMap": 176818181, "toCell": 298, "why": "The tower of Gisgul [-16,17]: the way behind the sacrificial statue of the hall the Pócima de Gisgul lands in (176820229, cell 396) up to the ritual room (176818181), «Passez derrière la statue sacrificielle» (Dofus pour les noobs, «Laisse pas trainer tes fils»). Neither end is in the 2.73 graph, which left the hall and the floors above it unconnected; its pair is 510965 (gfx 59091 of the same series of passages, cell 284). INFERRED landing: 298, the walkable cell in front of it."},
-    {"map": 176818181, "element": 510965, "cell": 284, "gfx": 59091, "type": 0, "skill": 114, "toMap": 176820229, "toCell": 333, "why": "The way back from the ritual room of the tower of Gisgul down behind the hall's sacrificial statue (element 510444, cell 320). INFERRED landing: 333, the walkable cell beside the statue."}
+    {"map": 176818181, "element": 510965, "cell": 284, "gfx": 59091, "type": 0, "skill": 114, "toMap": 176820229, "toCell": 333, "why": "The way back from the ritual room of the tower of Gisgul down behind the hall's sacrificial statue (element 510444, cell 320). INFERRED landing: 333, the walkable cell beside the statue."},
+    {
+      "map": 207624194,
+      "element": 558401,
+      "npc": 5584,
+      "cell": 396,
+      "gfx": 0,
+      "type": -1,
+      "skill": 0,
+      "toMap": 207624192,
+      "toCell": 161,
+      "why": "Samurai Hagiyo's «Saludar al samurái y entrar en la sala.»: into the Pandassembly hall on cell 161, where its own door (518658) leads back out."
+    },
+    {
+      "map": 115082755,
+      "element": 483011,
+      "cell": 446,
+      "gfx": 36109,
+      "type": -1,
+      "skill": 114,
+      "toMap": 115083777,
+      "toCell": 216,
+      "why": "The assembly hall's door (element 483011, cell 446, the hall's only prop besides the chair): Hal Ylanza lets people in with Fallanster's seal and nothing in the client's world graph leads back out. INFERRED: back to the temple, cell 216, the open floor in front of its arches."
+    }
   ]
 }

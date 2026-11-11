@@ -6075,206 +6075,85 @@
         {
           "message": 15733,
           "choices": [
-            {
-              "reply": 18584,
-              "next": 52751
-            },
-            {
-              "reply": 70774,
-              "next": 15734
-            }
+            { "reply": 18584, "next": 52751 },
+            { "reply": 70774, "next": 15734 },
+            { "reply": 19364, "quest": 1424, "completes": 7914, "params": [[30, 7914]], "holds": 14571, "afterObjective": 7913, "teleport": 115082755 },
+            { "reply": 19365, "quest": 1424, "afterObjective": 7914, "teleport": 115082755 }
           ]
         },
         {
           "message": 15734,
           "choices": [
-            {
-              "reply": 18583,
-              "next": 15735
-            },
-            {
-              "reply": 18586,
-              "next": 15738
-            },
-            {
-              "reply": 18594,
-              "next": 15747
-            },
-            {
-              "reply": 70351,
-              "next": 52521
-            },
-            {
-              "reply": 70352,
-              "next": 52522
-            },
-            {
-              "reply": 70353,
-              "next": 52523
-            },
-            {
-              "reply": 70362,
-              "next": 52530
-            },
-            {
-              "reply": 18584,
-              "next": 52751
-            }
+            { "reply": 18583, "next": 15735 },
+            { "reply": 18586, "next": 15738 },
+            { "reply": 18594, "next": 15747 },
+            { "reply": 70351, "next": 52521 },
+            { "reply": 70352, "next": 52522 },
+            { "reply": 70353, "next": 52523 },
+            { "reply": 70362, "next": 52530 },
+            { "reply": 18584, "next": 52751 }
           ]
         },
         {
           "message": 52751,
           "choices": [
-            {
-              "reply": 70775,
-              "next": 52752,
-              "kothRole": 8,
-              "refused": 52753
-            },
-            {
-              "reply": 70776,
-              "next": 52754,
-              "kothRole": 3,
-              "refused": 52755
-            },
-            {
-              "reply": 70777,
-              "next": 52756,
-              "kothRole": 4,
-              "refused": 52757
-            },
-            {
-              "reply": 70778,
-              "next": 52758,
-              "kothRole": 5,
-              "refused": 52759
-            },
-            {
-              "reply": 70779,
-              "next": 52760,
-              "kothRole": 2,
-              "refused": 52761
-            },
-            {
-              "reply": 70780,
-              "next": 52762,
-              "kothRole": 7,
-              "refused": 52763
-            },
-            {
-              "reply": 70781,
-              "next": 52764,
-              "kothRole": 6,
-              "refused": 52765
-            },
-            {
-              "reply": 70773
-            }
+            { "reply": 70775, "next": 52752, "kothRole": 8, "refused": 52753 },
+            { "reply": 70776, "next": 52754, "kothRole": 3, "refused": 52755 },
+            { "reply": 70777, "next": 52756, "kothRole": 4, "refused": 52757 },
+            { "reply": 70778, "next": 52758, "kothRole": 5, "refused": 52759 },
+            { "reply": 70779, "next": 52760, "kothRole": 2, "refused": 52761 },
+            { "reply": 70780, "next": 52762, "kothRole": 7, "refused": 52763 },
+            { "reply": 70781, "next": 52764, "kothRole": 6, "refused": 52765 },
+            { "reply": 70773 }
           ]
         },
         {
           "message": 15735,
           "choices": [
-            {
-              "reply": 18582,
-              "next": 15736,
-              "kothRole": 3,
-              "refused": 15737
-            },
-            {
-              "reply": 18595,
-              "next": 15734
-            }
+            { "reply": 18582, "next": 15736, "kothRole": 3, "refused": 15737 },
+            { "reply": 18595, "next": 15734 }
           ]
         },
         {
           "message": 15738,
           "choices": [
-            {
-              "reply": 18585,
-              "next": 15739,
-              "kothRole": 4,
-              "refused": 15740
-            },
-            {
-              "reply": 18596,
-              "next": 15734
-            }
+            { "reply": 18585, "next": 15739, "kothRole": 4, "refused": 15740 },
+            { "reply": 18596, "next": 15734 }
           ]
         },
         {
           "message": 15747,
           "choices": [
-            {
-              "reply": 18593,
-              "next": 15748,
-              "kothRole": 5,
-              "refused": 15749
-            },
-            {
-              "reply": 18597,
-              "next": 15734
-            }
+            { "reply": 18593, "next": 15748, "kothRole": 5, "refused": 15749 },
+            { "reply": 18597, "next": 15734 }
           ]
         },
         {
           "message": 52521,
           "choices": [
-            {
-              "reply": 70357,
-              "next": 52524,
-              "kothRole": 2,
-              "refused": 52525
-            },
-            {
-              "reply": 70354,
-              "next": 15734
-            }
+            { "reply": 70357, "next": 52524, "kothRole": 2, "refused": 52525 },
+            { "reply": 70354, "next": 15734 }
           ]
         },
         {
           "message": 52522,
           "choices": [
-            {
-              "reply": 70358,
-              "next": 52526,
-              "kothRole": 7,
-              "refused": 52527
-            },
-            {
-              "reply": 70355,
-              "next": 15734
-            }
+            { "reply": 70358, "next": 52526, "kothRole": 7, "refused": 52527 },
+            { "reply": 70355, "next": 15734 }
           ]
         },
         {
           "message": 52523,
           "choices": [
-            {
-              "reply": 70359,
-              "next": 52528,
-              "kothRole": 6,
-              "refused": 52529
-            },
-            {
-              "reply": 70356,
-              "next": 15734
-            }
+            { "reply": 70359, "next": 52528, "kothRole": 6, "refused": 52529 },
+            { "reply": 70356, "next": 15734 }
           ]
         },
         {
           "message": 52530,
           "choices": [
-            {
-              "reply": 70360,
-              "next": 52531,
-              "kothRole": 8,
-              "refused": 52532
-            },
-            {
-              "reply": 70361,
-              "next": 15734
-            }
+            { "reply": 70360, "next": 52531, "kothRole": 8, "refused": 52532 },
+            { "reply": 70361, "next": 15734 }
           ]
         },
         {
@@ -6389,7 +6268,8 @@
           "message": 52532,
           "choices": []
         }
-      ]
+      ],
+      "why": " «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424): «*Enseñarle el sello de Fallanster* ¿Puedo entrar en la sala de la asamblea?» (19364) with the seal is «Muestra el sello» (7914, the seal kept) and takes the character into the assembly hall (115082755); «Quiero volver a la sala de la asamblea.» (19365) takes him back while the quest lasts."
     },
     {
       "npc": 3687,
@@ -9825,6 +9705,7 @@
             { "reply": 37391, "quest": 1960, "completes": 13943, "params": [[30, 13943]], "next": 30961, "afterObjective": 13942, "takes": 19661 },
             { "reply": 37509, "quest": 1962, "completes": 13950, "params": [[30, 13950]], "next": 31066, "afterObjective": 13949 },
             { "reply": 37517, "next": 31075, "quest": 1962, "afterQuest": true, "beforeQuest": 2192 },
+            { "reply": 37082, "next": 30711, "quest": 1424, "afterObjectives": [7907, 7908, 7909, 7910, 7911, 7912], "beforeObjective": 7913, "criterion": "Qf=1962" },
             { "reply": 37078 }
           ]
         },
@@ -9915,9 +9796,33 @@
           "choices": [
             { "reply": 37518, "startsQuest": 2192, "params": [[34, 2192]] }
           ]
+        },
+        {
+          "message": 30711,
+          "choices": [
+            { "reply": 37081, "next": 30712 }
+          ]
+        },
+        {
+          "message": 30712,
+          "choices": [
+            { "reply": 37080, "next": 30713 }
+          ]
+        },
+        {
+          "message": 30713,
+          "choices": [
+            { "reply": 37079, "quest": 1424, "completes": 7913, "params": [[30, 7913]], "gives": 14571, "next": 30714 }
+          ]
+        },
+        {
+          "message": 30714,
+          "choices": [
+            { "reply": 37078 }
+          ]
         }
       ],
-      "why": "Fallanster, head of the Council of Astrub, in the council chamber upstairs (Dofus pour les noobs: «Empruntez donc les escaliers situés derrière Archie»). «Ça sent le gaz»: his welcome (30710), a neutral envoy for the Strubian rats (30957), the toxic fumes in the mines (30959), and «Estoy dispuesto a parlamentar con el jefe de las ratas.» (13901, 30960). Back with Rathrosk: «Te presento a Rathrosk.» (13943) shows him a squirrel (30961), «pedirle que se transforme» (13944) a dragon (30953); the summary (30954), the legend (30955) and Aisling at the library (30956). «Balade en forêt»: «Hablarle de la emboscada de los pandikazes» (13950); the support of the daimyo Hikomi (31066), the sacred place on Pandala (31067), the sealed message (31068, 31069, the line «Le réceptacle des Dofus» names). Put off for later, «Mencionar un viaje a la isla de Pandala» takes it up again (31075)."
+      "why": "Fallanster, head of the Council of Astrub, in the council chamber upstairs (Dofus pour les noobs: «Empruntez donc les escaliers situés derrière Archie»). «Ça sent le gaz»: his welcome (30710), a neutral envoy for the Strubian rats (30957), the toxic fumes in the mines (30959), and «Estoy dispuesto a parlamentar con el jefe de las ratas.» (13901, 30960). Back with Rathrosk: «Te presento a Rathrosk.» (13943) shows him a squirrel (30961), «pedirle que se transforme» (13944) a dragon (30953); the summary (30954), the legend (30955) and Aisling at the library (30956). «Balade en forêt»: «Hablarle de la emboscada de los pandikazes» (13950); the support of the daimyo Hikomi (31066), the sacred place on Pandala (31067), the sealed message (31068, 31069, the line «Le réceptacle des Dofus» names). Put off for later, «Mencionar un viaje a la isla de Pandala» takes it up again (31075). «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424), once the six signers are questioned and «Paseo por el bosque» (1962) is over («Pour continuer la quête, vous devez avoir terminé la quête Balade en forêt»): «¿Qué puedes contarme del edicto de Vhelika?» (37082) gets why Astrub refused (30711), «¿Qué sabes sobre el debate entre los dirigentes?» (37081) the speakers reciting like actors and the symbols (30712), «¿Puedes describir esos símbolos?» (37080) a sun or an eye (30713), «Pues podría ser el caso.» (37079) is 7913 and hands his seal (14571) for Hal Ylanza (30714), «Gracias. Hasta luego.» (37078)."
     },
     {
       "npc": 4415,
@@ -22694,15 +22599,30 @@
         {
           "message": 47057,
           "choices": [
+            { "reply": 62399, "next": 47066, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7908 },
             { "reply": 62386 }
           ]
         },
         {
           "message": 47058,
-          "choices": []
+          "choices": [
+            { "reply": 62399, "next": 47066, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7908 }
+          ]
+        },
+        {
+          "message": 47066,
+          "choices": [
+            { "reply": 62398, "next": 47067 }
+          ]
+        },
+        {
+          "message": 47067,
+          "choices": [
+            { "reply": 62397, "quest": 1424, "completes": 7908, "params": [[30, 7908]] }
+          ]
         }
       ],
-      "why": "Amayiro, chief of Bonta's militia [-32,-57]. His template's greetings: «¡Dad la alerta! ¡Un demonio ha entrado en Bonta!» for a Brakmarian, with «Aprovechar el tumulto para huir.», and «Cuando se trata de defender los valores de Bonta...» for the rest. Seeing him is the neutral's last step of 2429 (18445, a hello). His militia quests (55 onwards) are not written yet."
+      "why": "Amayiro, chief of Bonta's militia [-32,-57]. His template's greetings: «¡Dad la alerta! ¡Un demonio ha entrado en Bonta!» for a Brakmarian, with «Aprovechar el tumulto para huir.», and «Cuando se trata de defender los valores de Bonta...» for the rest. Seeing him is the neutral's last step of 2429 (18445, a hello). His militia quests (55 onwards) are not written yet. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424): «¿Qué puedes contarme del edicto de Vhelika?» (62399) gets his signature under Danathor's pressure and the headache (47066) -- also to a Brakmarian, before fleeing the alert (47057): the guide sets no alignment on it --, «Seguir escuchando.» (62398) the law for the citizens (47067) and «Hasta luego.» (62397) is 7908."
     },
     {
       "npc": 6401,
@@ -22716,19 +22636,48 @@
         {
           "message": 48036,
           "choices": [
+            { "reply": 65176, "next": 48900, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7909 },
             { "reply": 64940 }
           ]
         },
         {
           "message": 48037,
-          "choices": []
+          "choices": [
+            { "reply": 65176, "next": 48900, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7909 }
+          ]
         },
         {
           "message": 48039,
-          "choices": []
+          "choices": [
+            { "reply": 65176, "next": 48900, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7909 }
+          ]
+        },
+        {
+          "message": 48900,
+          "choices": [
+            { "reply": 65175, "next": 48901 }
+          ]
+        },
+        {
+          "message": 48901,
+          "choices": [
+            { "reply": 65174, "next": 48902 }
+          ]
+        },
+        {
+          "message": 48902,
+          "choices": [
+            { "reply": 65173, "next": 48903 }
+          ]
+        },
+        {
+          "message": 48903,
+          "choices": [
+            { "reply": 65172, "quest": 1424, "completes": 7909, "params": [[30, 7909]] }
+          ]
         }
       ],
-      "why": "Oto Mustam, Brakmar's chief [-25,33]. His template's greetings: «¿Un sirviente del bien en Brakmar? ¡Guardias!» for a Bontarian, with «Huir para no sufrir la ira de Oto Mustam.», «Vaya, vaya: un alma neutra en este lugar» for a neutral and «Lo bueno de liderar una ciudad como Brakmar...» for his own. Seeing him is the neutral's last step of 2430 (18441, a hello). His militia quests are not written yet."
+      "why": "Oto Mustam, Brakmar's chief [-25,33]. His template's greetings: «¿Un sirviente del bien en Brakmar? ¡Guardias!» for a Bontarian, with «Huir para no sufrir la ira de Oto Mustam.», «Vaya, vaya: un alma neutra en este lugar» for a neutral and «Lo bueno de liderar una ciudad como Brakmar...» for his own. Seeing him is the neutral's last step of 2430 (18441, a hello). His militia quests are not written yet. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424), to the neutral (48037), to his own (48039) and to a Bontarian before he flees (48036; the guide sets no alignment on it): «¿Qué puedes contarme del edicto de Vhelika?» (65176) gets his anger (48900), «Implorar perdón para calmar su ira.» (65175) his contempt (48901), «Adularle para conseguir información.» (65174) his feigned meekness (48902), «Seguir escuchando.» (65173) its limits (48903) and «Hasta luego.» (65172) is 7909."
     },
     {
       "npc": 6576,
@@ -23460,7 +23409,8 @@
           "message": 48041,
           "choices": [
             { "reply": 67111, "next": 50311, "quest": 2433, "afterObjective": 18449, "beforeObjective": 18450 },
-            { "reply": 67116, "next": 50316, "quest": 2433, "afterObjective": 18454, "beforeObjective": 18455 }
+            { "reply": 67116, "next": 50316, "quest": 2433, "afterObjective": 18454, "beforeObjective": 18455 },
+            { "reply": 63957, "next": 48043, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7907 }
           ]
         },
         {
@@ -23518,9 +23468,21 @@
             { "reply": 67112, "quest": 2433, "completes": 18455 },
             { "reply": 67112 }
           ]
+        },
+        {
+          "message": 48043,
+          "choices": [
+            { "reply": 63956, "next": 48044 }
+          ]
+        },
+        {
+          "message": 48044,
+          "choices": [
+            { "reply": 63955, "quest": 1424, "completes": 7907, "params": [[30, 7907]] }
+          ]
         }
       ],
-      "why": "Danathor, Bonta's intendant, in the palace room right of the throne room [-36,-60]: Dofus pour les noobs, «Le pacte des profondeurs», he signed the pact of the depths and sends you to Captain Tymo for presents (18450); after Tymo's ambush, «Mencionar la emboscada» and he blames Tymo alone (18455)."
+      "why": "Danathor, Bonta's intendant, in the palace room right of the throne room [-36,-60]: Dofus pour les noobs, «Le pacte des profondeurs», he signed the pact of the depths and sends you to Captain Tymo for presents (18450); after Tymo's ambush, «Mencionar la emboscada» and he blames Tymo alone (18455). «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424): «¿Qué puedes contarme del edicto de Vhelika?» (63957) gets why he signed, pushed by Amayiro (48043), «Seguir escuchando.» (63956) the law calling to arms against a Brakmarian invasion (48044) and «Hasta luego.» (63955) is 7907."
     },
     {
       "npc": 6640,
@@ -27378,6 +27340,9 @@
             { "reply": 19248, "startsQuest": 1423, "params": [[34, 1423]], "next": 16228, "criterion": "Qf=1423" },
             { "reply": 19246, "quest": 1423, "completes": 7904, "params": [[30, 7904]], "next": 16227, "afterObjectives": [7901, 7902, 7903], "criterion": "Qf!1423" },
             { "reply": 19250, "quest": 1423, "completes": 7904, "params": [[30, 7904]], "next": 16229, "afterObjectives": [7901, 7902, 7903], "criterion": "Qf=1423" },
+            { "reply": 19297, "next": 16261, "beforeQuest": 1424, "criterion": "PL>79&Qf=1423" },
+            { "reply": 19326, "quest": 1424, "completes": 7918, "params": [[30, 7918]], "next": 16278, "holds": 14572 },
+            { "reply": 19333, "next": 16283, "quest": 1424, "afterQuest": true, "beforeQuest": 1425 },
             { "reply": 19245 }
           ]
         },
@@ -27423,9 +27388,75 @@
           "choices": [
             { "reply": 19249 }
           ]
+        },
+        {
+          "message": 16261,
+          "choices": [
+            { "reply": 19296, "next": 16262 }
+          ]
+        },
+        {
+          "message": 16262,
+          "choices": [
+            { "reply": 19294, "next": 16263 },
+            { "reply": 19295 }
+          ]
+        },
+        {
+          "message": 16263,
+          "choices": [
+            { "reply": 19293, "startsQuest": 1424, "params": [[34, 1424]] }
+          ]
+        },
+        {
+          "message": 16278,
+          "choices": [
+            { "reply": 19325, "next": 16279 }
+          ]
+        },
+        {
+          "message": 16279,
+          "choices": [
+            { "reply": 19324, "next": 16280 }
+          ]
+        },
+        {
+          "message": 16280,
+          "names": true,
+          "choices": [
+            { "reply": 19323, "next": 16281 }
+          ]
+        },
+        {
+          "message": 16281,
+          "choices": [
+            { "reply": 19328, "startsQuest": 1425, "params": [[34, 1425]], "next": 16282 },
+            { "reply": 19329 }
+          ]
+        },
+        {
+          "message": 16282,
+          "names": true,
+          "choices": [
+            { "reply": 19327 }
+          ]
+        },
+        {
+          "message": 16283,
+          "choices": [
+            { "reply": 19331, "startsQuest": 1425, "params": [[34, 1425]], "next": 16284 },
+            { "reply": 19332 }
+          ]
+        },
+        {
+          "message": 16284,
+          "names": true,
+          "choices": [
+            { "reply": 19330 }
+          ]
         }
       ],
-      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used."
+      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424, level 80 after «Proteger y servir»): «Hablemos sobre el reino de Amakna.» (19297) gets the alliances that please him but something that does not fit (16261), «Hacerle preguntas para averiguar más cosas.» (19296) the king's councillor Makia Vhelika, who hides something (16262), «¿Quieres que haga una investigación?» (19294) his trust (16263) and «Voy a ir al castillo.» (19293) starts it; «Hasta luego.» (19295) leaves. «¡Mira! La cabeza de la marioneta.» (19326) shows the head (7918, kept) and ends it: the symbol (16278), «Informarle de tus descubrimientos.» (19325) the headache (16279), «¿De quién hablas?» (19324) Dramak the Plotter (16280), «¿Qué piensas hacer para remediar la situación?» (19323) the plan (16281), where «Acepto la misión.» (19328) starts «Como una marioneta» (1425, 16282, «Voy en busca de Dramak.» 19327) and the doctor's excuse (19329) leaves. Declined then, «¿Qué cuentas hacer a propósito de Dramak?» (19333) offers it again with the second copy of those lines (16283-16284, 19330-19332)."
     },
     {
       "npc": 2170,
@@ -29564,6 +29595,192 @@
         }
       ],
       "why": "Orno Tóligo again in the aviary's way out, after Thor Pestruz: «Seguro que Thor Pestruz no olvidará esta lección. Te mostraré la escalera para volver a bajar» (17976); «Ir por la escalera y salir de la Pajarera de Thor Pestruz» (21565) leaves (content/world/dungeon_exits.json)."
+    },
+    {
+      "npc": 2172,
+      "map": 0,
+      "opening": 16264,
+      "lines": [
+        {
+          "message": 16264,
+          "choices": [
+            { "reply": 19304, "next": 16265, "quest": 1424, "beforeObjective": 7905 },
+            { "reply": 19303 }
+          ]
+        },
+        {
+          "message": 16265,
+          "choices": [
+            { "reply": 19302, "next": 16266 }
+          ]
+        },
+        {
+          "message": 16266,
+          "choices": [
+            { "reply": 19301, "next": 16267 }
+          ]
+        },
+        {
+          "message": 16267,
+          "choices": [
+            { "reply": 19300, "next": 16268 }
+          ]
+        },
+        {
+          "message": 16268,
+          "choices": [
+            { "reply": 19299, "next": 16269 }
+          ]
+        },
+        {
+          "message": 16269,
+          "choices": [
+            { "reply": 19298, "quest": 1424, "completes": 7905, "params": [[30, 7905]] }
+          ]
+        }
+      ],
+      "why": "Makia Vhelika in Allister's castle, «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs): «Parlez donc à Makia Vhel». Her saying about the two ways of fighting (16264); «Averiguar más cosas sobre ella.» (19304) her place beside the king (16265), «¿Qué tienes que ver con la creación de las alianzas?» (19302) the edict of conquest (16266), «¿Cómo han reaccionado los dirigentes de las dos ciudades enemigas?» (19301) the Treaty of the Six and its summary in the alliances temple (16267), «Eso haré.» (19300) her advice to forget politics (16268), «Empezar a tener dolor de cabeza.» (19299) her goodbye (16269) and «Irte y darte cuenta que se te ha pasado el dolor de cabeza.» (19298) is «Habla con Makia Vhelika» (7905). Her seven replies, in the order of their ids from the highest; «Despedirte antes de irte.» (19303) leaves."
+    },
+    {
+      "npc": 5560,
+      "map": 207624192,
+      "opening": 41023,
+      "lines": [
+        {
+          "message": 41023,
+          "choices": [
+            { "reply": 53428, "next": 41022, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7910, "criterion": "Qf=2150|Qo>16380" },
+            { "reply": 53429 }
+          ]
+        },
+        {
+          "message": 41022,
+          "choices": [
+            { "reply": 53429, "quest": 1424, "completes": 7910, "params": [[30, 7910]] }
+          ]
+        }
+      ],
+      "why": "Daimia Hikomi in the Pandassembly hall [22,-29], «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs): the hall where Pandala's dignitaries meet (41023); «¿Qué puedes contarme del edicto de Vhelika?» (53428) gets Pandawelo hearing the goddess ask him to sign (41022) and «Hasta luego.» (53429) is 7910. Asked only once she has been met in «En la encrucijada de los mundos» (2150's 16380, or the quest over): «Pour continuer la quête, vous devez avoir fait la quête À la croisée des mondes jusqu'à rencontrer la Daimya»."
+    },
+    {
+      "npc": 3246,
+      "map": 90708481,
+      "opening": 24240,
+      "lines": [
+        {
+          "message": 24240,
+          "choices": [
+            { "reply": 29139, "next": 24241, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7911 },
+            { "reply": 29137 }
+          ]
+        },
+        {
+          "message": 24241,
+          "choices": [
+            { "reply": 29138, "next": 24242 }
+          ]
+        },
+        {
+          "message": 24242,
+          "choices": [
+            { "reply": 29137, "quest": 1424, "completes": 7911, "params": [[30, 7911]] }
+          ]
+        }
+      ],
+      "why": "Queen Victoria of Sufokia [23,24], «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs): «parler à la Reine Viktorie». Sufokia from fishing village to kingdom (24240); «¿Qué puedes contarme del edicto de Vhelika?» (29139) gets the long negotiations and her headache (24241), «Seguir escuchando.» (29138) the end of Bonta and Brakmar's war over the steamers (24242) and «Gracias. Hasta luego.» (29137) is 7911."
+    },
+    {
+      "npc": 1236,
+      "map": 167380484,
+      "opening": 48636,
+      "lines": [
+        {
+          "message": 48636,
+          "choices": [
+            { "reply": 64736, "next": 48629, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7912 },
+            { "reply": 64733 }
+          ]
+        },
+        {
+          "message": 48629,
+          "choices": [
+            { "reply": 64735, "next": 48630 }
+          ]
+        },
+        {
+          "message": 48630,
+          "choices": [
+            { "reply": 64734, "next": 48631 }
+          ]
+        },
+        {
+          "message": 48631,
+          "choices": [
+            { "reply": 64733, "quest": 1424, "completes": 7912, "params": [[30, 7912]] }
+          ]
+        }
+      ],
+      "why": "Captain Ardier beside the Sanguinario [-34,-16], «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs): «Capitaine Ardier qui vous attends en [-34,-16]». His welcome (48636); «¿Qué puedes contarme del edicto de Vhelika?» (64736) gets Lario sending him for the burgh (48629), «Seguir escuchando.» (64735) the headache and Astrub's refusal (48630), «¿Quién representaba a Astrub en la asamblea?» (64734) Fallanster (48631) and «Bueno, ¡hasta luego!» (64733) is 7912. The voyage to Frigost is not offered: no crossing is laid out."
+    },
+    {
+      "npc": 2173,
+      "map": 115082755,
+      "opening": 16270,
+      "openings": [
+        { "quest": 1424, "objective": 7917, "message": 16272 }
+      ],
+      "lines": [
+        {
+          "message": 16270,
+          "choices": [
+            { "reply": 19307, "quest": 1424, "completes": 7916, "params": [[30, 7916]], "next": 16272, "afterObjective": 7915 },
+            { "reply": 19306, "next": 16271 },
+            { "reply": 19305 }
+          ]
+        },
+        {
+          "message": 16271,
+          "choices": [
+            { "reply": 19308 }
+          ]
+        },
+        {
+          "message": 16272,
+          "choices": [
+            { "reply": 19310, "quest": 1424, "afterObjective": 7916, "beforeObjective": 7917 },
+            { "reply": 19311, "quest": 1424, "afterObjective": 7916, "beforeObjective": 7917 },
+            { "reply": 19309 }
+          ]
+        }
+      ],
+      "why": "The strange puppet in the assembly hall, «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs): «parlez à la Marionnette et touchez le symbole sur sa tête ... Puis attaquez la !». Hanging still (16270); «Tocar el símbolo que tiene pintado en la cabeza.» (19307) after the chair's clue is «Encuentra otra pista con un símbolo idéntico» (7916) and she comes alive (16272), where «Atacar a la marioneta.» (19310, 19311 the same) starts the fight against monster 3498 (7917, content/fights/npc_fights.json) and «Retroceder.» (19309) leaves; back before the fight she opens on 16272. «Darle una patada.» (19306) only sets her swinging (16271, «Alejarte.» 19308); «Alejarte.» (19305) leaves. Her head (14572) is the monster's own drop, «Qa=1424&Qo>7916&PO!14572»."
+    },
+    {
+      "npc": 5584,
+      "map": 207624194,
+      "opening": 40483,
+      "lines": [
+        {
+          "message": 40483,
+          "choices": [
+            { "reply": 52738, "next": 40484, "criterion": "Qf=2150|Qo>16380" },
+            { "reply": 52738, "next": 40485, "criterion": "Qf!2150&Qo<16380" }
+          ]
+        },
+        {
+          "message": 40484,
+          "choices": [
+            { "reply": 52739, "passage": 558401 }
+          ]
+        },
+        {
+          "message": 40485,
+          "choices": [
+            { "reply": 52737 }
+          ]
+        }
+      ],
+      "why": "Samurai Hagiyo (Samouraï Holi) beside the Bamboo Palace's mat into the Pandassembly hall [22,-29]: «Allez en [22,-29] et parlez à l'un des Samouraï Holi pour qu'il vous laisse entrer dans la salle» (Dofus pour les noobs, «Quelque chose de pourri au royaume d'Amakna»). His saying (40483); «Quiero ver a la daimia.» (52738) gets the Pandarin's leave (40484) once the Daimia has been met in «En la encrucijada de los mundos» (2150's 16380, or the quest over) and «Saludar al samurái y entrar en la sala.» (52739) takes him in (passage 558401, interactives/teleports.json); otherwise «No se te ha concedido tal privilegio» (40485) and «Comprender, ante su mirada inflexible, que no sirve de nada insistir.» (52737). The mat itself (cell 395) only lets through whoever wears the Pandascudo (POE23094)."
     }
   ]
 }

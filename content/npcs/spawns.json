@@ -3605,6 +3605,42 @@
       "cell": 300,
       "orientation": 1,
       "why": "Orno Tóligo in Thor Pestruz's aviary's way out, where his «Ir por la escalera y salir» (21565) and his after-the-boss line (17976) belong. INFERRED cell: 300, the open middle of the pen, in front of the caravan and clear of the fence posts."
+    },
+    {
+      "map": 115082755,
+      "npc": 2173,
+      "cell": 371,
+      "orientation": 3,
+      "criterion": "Qa=1424&Qo<7917",
+      "why": "The strange puppet in the middle of the assembly hall, on the floor's symbol, «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs), until she is beaten (7917). INFERRED cell: open floor, in sight of both tables."
+    },
+    {
+      "map": 207624192,
+      "npc": 5560,
+      "cell": 344,
+      "orientation": 3,
+      "why": "Daimia Hikomi in the Pandassembly hall [22,-29], the map «L'interroger à propos de l'édit de Vhel» names (7910 of «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs)). INFERRED cell: the mat right of the red circle, clear of the jar and the scrolls."
+    },
+    {
+      "map": 90708481,
+      "npc": 3246,
+      "cell": 372,
+      "orientation": 3,
+      "why": "Queen Victoria of Sufokia [23,24], the map 7911 of «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) names. INFERRED cell: the open flagstones in front of the machine's gantry, clear of its pipes."
+    },
+    {
+      "map": 167380484,
+      "npc": 1236,
+      "cell": 386,
+      "orientation": 3,
+      "why": "Captain Ardier beside his ship on the continent [-34,-16], the map 7912 of «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) names (Dofus pour les noobs: «en [-34,-16] ou en [-81,-37]»). INFERRED cell: the middle of the quay's walkable strip."
+    },
+    {
+      "map": 207624194,
+      "npc": 5584,
+      "cell": 396,
+      "orientation": 1,
+      "why": "Samurai Hagiyo guarding the mat into the Pandassembly hall (cells 395 and 409, the floor passage to 207624192). INFERRED cell: the open floor just right of the mat, in front of the screen."
     }
   ]
 }

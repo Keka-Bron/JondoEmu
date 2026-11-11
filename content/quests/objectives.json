@@ -3652,6 +3652,22 @@
    "afterObjectives": [5603],
    "showsNpc": 1587,
    "why": "«Despierta a Oibas»: the crunchy carrot used (its effect 30 is this objective; Dofus pour les noobs: «double cliquer sur la Cawotte Croquante»), which brings out the hungry wabbit spirit."
+  },
+  {
+   "objective": 7906,
+   "quest": 1424,
+   "kind": "read",
+   "elements": [{"map": 115082753, "element": 482832}],
+   "afterObjectives": [7905],
+   "why": "«Lee el documento oficial que está colgado delante del templo de las alianzas»: the stele in front of the temple [14,36] (element 482832, the map's only prop), which shows Makia's edict (document 364, readables.json). Dofus pour les noobs: «Direction le temple de alliances en [14,36] pour lire le document ... Cliquez sur la stèle». After Makia (7905), who sends the character there."
+  },
+  {
+   "objective": 7915,
+   "quest": 1424,
+   "kind": "click",
+   "elements": [{"map": 115082755, "element": 483012}],
+   "afterObjectives": [7914],
+   "why": "«Registra la sala de la asamblea en busca de pistas»: «le premier se trouve sur le dossier de la chaise du milieu à la table de droite» (Dofus pour les noobs) -- element 483012 on cell 331, the right table's middle chair; the hall's other element, 483011 on 446, is its way out."
   }
  ]
 }
