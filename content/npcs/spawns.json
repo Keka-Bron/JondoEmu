@@ -3202,6 +3202,30 @@
       "cell": 325,
       "orientation": 1,
       "why": "The training dummy. INFERRED cell: no capture covers the map; placed by the guide's screenshots."
+    },
+    {
+      "map": 88212759,
+      "npc": 2170,
+      "cell": 299,
+      "orientation": 3,
+      "criterion": "Qa=1423&Qo=7903",
+      "why": "Bella Kah (Vile Gredine) at [-1,0], about to snatch an old woman's bag, while «Proteger y servir» (Protéger et sévir, Dofus pour les noobs) has them to beat (7903). INFERRED cell."
+    },
+    {
+      "map": 88081686,
+      "npc": 2168,
+      "cell": 258,
+      "orientation": 1,
+      "criterion": "Qa=1423&Qo=7901",
+      "why": "Xiko Malho (Méchant Garçon) at [3,1], robbing a girl, while «Proteger y servir» (Protéger et sévir, Dofus pour les noobs) has them to beat (7901). INFERRED cell."
+    },
+    {
+      "map": 88081684,
+      "npc": 2169,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1423&Qo=7902",
+      "why": "the Gomberros (Petite Frappe), two of the Smis gang, at [3,3], while «Proteger y servir» (Protéger et sévir, Dofus pour les noobs) has them to beat (7902). INFERRED cell."
     }
   ]
 }

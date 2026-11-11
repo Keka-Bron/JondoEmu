@@ -27177,6 +27177,113 @@
         }
       ],
       "why": "Barnabé, the boar kept by the demons, sniffing the character happily."
+    },
+    {
+      "npc": 2167,
+      "map": 88212247,
+      "opening": 16221,
+      "lines": [
+        {
+          "message": 16221,
+          "choices": [
+            { "reply": 19238, "next": 16222 },
+            { "reply": 19243, "next": 16223, "beforeQuest": 1423, "criterion": "Qf!1423" },
+            { "reply": 19248, "startsQuest": 1423, "params": [[34, 1423]], "next": 16228, "criterion": "Qf=1423" },
+            { "reply": 19246, "quest": 1423, "completes": 7904, "params": [[30, 7904]], "next": 16227, "afterObjectives": [7901, 7902, 7903], "criterion": "Qf!1423" },
+            { "reply": 19250, "quest": 1423, "completes": 7904, "params": [[30, 7904]], "next": 16229, "afterObjectives": [7901, 7902, 7903], "criterion": "Qf=1423" },
+            { "reply": 19245 }
+          ]
+        },
+        {
+          "message": 16222,
+          "choices": [
+            { "reply": 19237 }
+          ]
+        },
+        {
+          "message": 16223,
+          "choices": [
+            { "reply": 19242, "next": 16224 }
+          ]
+        },
+        {
+          "message": 16224,
+          "choices": [
+            { "reply": 19240, "startsQuest": 1423, "params": [[34, 1423]], "next": 16225 },
+            { "reply": 19241 }
+          ]
+        },
+        {
+          "message": 16225,
+          "choices": [
+            { "reply": 19239 }
+          ]
+        },
+        {
+          "message": 16227,
+          "choices": [
+            { "reply": 19245 }
+          ]
+        },
+        {
+          "message": 16228,
+          "choices": [
+            { "reply": 19247 }
+          ]
+        },
+        {
+          "message": 16229,
+          "choices": [
+            { "reply": 19249 }
+          ]
+        }
+      ],
+      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used."
+    },
+    {
+      "npc": 2170,
+      "map": 88212759,
+      "opening": 16238,
+      "lines": [
+        {
+          "message": 16238,
+          "choices": [
+            { "reply": 19262, "quest": 1423, "beforeObjective": 7903 },
+            { "reply": 19263 }
+          ]
+        }
+      ],
+      "why": "Bella Kah (Vile Gredine) at [-1,0], about to snatch an old woman's bag, by «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «Parlez à ... Puis combattez» (16238); the reply starts the fight against 1 x monster 3497 (content/fights/npc_fights.json), which is objective 7903."
+    },
+    {
+      "npc": 2168,
+      "map": 88081686,
+      "opening": 16232,
+      "lines": [
+        {
+          "message": 16232,
+          "choices": [
+            { "reply": 19254, "quest": 1423, "beforeObjective": 7901 },
+            { "reply": 19255 }
+          ]
+        }
+      ],
+      "why": "Xiko Malho (Méchant Garçon) at [3,1], robbing a girl, by «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «Parlez à ... Puis combattez» (16232); the reply starts the fight against 1 x monster 3495 (content/fights/npc_fights.json), which is objective 7901."
+    },
+    {
+      "npc": 2169,
+      "map": 88081684,
+      "opening": 16237,
+      "lines": [
+        {
+          "message": 16237,
+          "choices": [
+            { "reply": 19260, "quest": 1423, "beforeObjective": 7902 },
+            { "reply": 19261 }
+          ]
+        }
+      ],
+      "why": "the Gomberros (Petite Frappe), two of the Smis gang, at [3,3], by «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «Parlez à ... Puis combattez» (16237); the reply starts the fight against 2 x monster 3496 (content/fights/npc_fights.json), which is objective 7902."
     }
   ]
 }

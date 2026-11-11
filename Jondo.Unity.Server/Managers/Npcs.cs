@@ -312,18 +312,25 @@ namespace Jondo.Unity.Server.Managers
                 return;
             }
 
-            // Maps that already carry NPCs of ours are left alone. Today that is only the Amakna
-            // zaap map, with the vendors; the captures put no NPC there, so nothing is overwritten,
-            // but the rule holds for the day one is.
+            // Maps that already carry NPCs of ours are left alone by the measured placements. Today
+            // that is only the Amakna zaap map, with the vendors; the captures put no NPC there, so
+            // nothing is overwritten, but the rule holds for the day one is. An authored placement
+            // still goes in beside the vendors: «Proteger y servir» has its thief Bella Kah on that
+            // very map, [-1,0].
             var nuestros = new HashSet<long>(_byMap.Keys);
 
             int puestos = 0, saltados = 0, absorbidos = 0;
             try
             {
-                foreach (var entrada in spawns.Values)
+                foreach (var (_, row) in spawns.Rows)
                 {
+                    var entrada = row.Value;
                     long mapId = entrada.MapId;
-                    if (nuestros.Contains(mapId)) { saltados++; continue; }
+                    if (nuestros.Contains(mapId) && row.From.Layer != Jondo.Unity.World.Content.ContentLayer.Authored)
+                    {
+                        saltados++;
+                        continue;
+                    }
 
                     // An absorbed seller is not seeded HERE either, not only in NpcSpawns.
                     //

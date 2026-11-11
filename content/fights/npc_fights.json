@@ -460,6 +460,12 @@
       "allies": [ { "monster": 3986, "grade": 0 } ],
       "alliesPlayed": true,
       "incarnates": { "monster": 3985, "grade": 1, "invulnerable": true },
-      "why": "«Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «un combat d'entrainement vous permettant de comprendre les sorts que vous obtiendrez», against the training dummy (5235), on the map's own fight map, as the demons." }
+      "why": "«Barnabé en el espacio» (Barnabé dans l'espace, Dofus pour les noobs): «un combat d'entrainement vous permettant de comprendre les sorts que vous obtiendrez», against the training dummy (5235), on the map's own fight map, as the demons." },
+    { "npc": 2170, "map": 88212759, "reply": 19262, "byLevel": true,
+      "monsters": [ { "monster": 3497, "grade": 0 } ] },
+    { "npc": 2168, "map": 88081686, "reply": 19254, "byLevel": true,
+      "monsters": [ { "monster": 3495, "grade": 0 } ] },
+    { "npc": 2169, "map": 88081684, "reply": 19260, "byLevel": true,
+      "monsters": [ { "monster": 3496, "grade": 0 }, { "monster": 3496, "grade": 0 } ] }
   ]
 }
