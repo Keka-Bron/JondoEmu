@@ -26679,6 +26679,95 @@
         }
       ],
       "why": "A heap of filings at [10,-20], Astrub's quarry, by «Las primeras impresiones son engañosas»: «Lors du premier dialogue avec un Tas de limaille (peu importe la position) vous ne pourrez pas éviter le combat « Ne pas tenir compte de l'avertissement ». ATTENTION : Même après avoir vaincu les monstres, il faudra reparler au même Tas de limaille pour enfin récupérer la limaille» (Dofus pour les noobs). «Intentar recoger limaduras discretamente.» meets the moguis (59613); «No hacer caso a la advertencia.» is the fight against the sticky gremoguiz, whose win leaves mark -894001. Then «Agarrar un buen puñado de limaduras ahora que los móguices se han calmado.» gives a sticky filing (32098), once per heap (mark -894013)."
+    },
+    {
+      "npc": 1589,
+      "map": 91750917,
+      "opening": 11618,
+      "openings": [
+        { "after": 925, "message": 11629 }
+      ],
+      "lines": [
+        {
+          "message": 11618,
+          "choices": [
+            { "reply": 12944, "next": 11620, "beforeQuest": 925 },
+            { "reply": 12950, "quest": 925, "completes": 5612, "params": [[30, 5612]], "next": 11624, "holds": 281 },
+            { "reply": 12951, "next": 11626, "quest": 925, "afterObjective": 5612, "beforeObjective": 5616 },
+            { "reply": 12955, "quest": 925, "completes": 5616, "params": [[30, 5616]], "next": 11627, "takesAll": [13208, 13206, 13207], "afterObjectives": [5613, 5614, 5615] }
+          ]
+        },
+        {
+          "message": 11620,
+          "choices": [
+            { "reply": 12942, "next": 11621 }
+          ]
+        },
+        {
+          "message": 11621,
+          "choices": [
+            { "reply": 12943, "next": 11622 }
+          ]
+        },
+        {
+          "message": 11622,
+          "choices": [
+            { "reply": 12941, "next": 11623, "criterion": "Qf=894" },
+            { "reply": 12940 }
+          ]
+        },
+        {
+          "message": 11623,
+          "choices": [
+            { "reply": 12946, "startsQuest": 925, "params": [[34, 925]] },
+            { "reply": 12945, "next": 11619 },
+            { "reply": 12947 }
+          ]
+        },
+        {
+          "message": 11619,
+          "choices": [
+            { "reply": 12946, "startsQuest": 925, "params": [[34, 925]] },
+            { "reply": 12947 }
+          ]
+        },
+        {
+          "message": 11624,
+          "choices": [
+            { "reply": 12949, "next": 11625 }
+          ]
+        },
+        {
+          "message": 11625,
+          "choices": [
+            { "reply": 12952 }
+          ]
+        },
+        {
+          "message": 11626,
+          "choices": [
+            { "reply": 12948 }
+          ]
+        },
+        {
+          "message": 11627,
+          "choices": [
+            { "reply": 12954, "next": 11628 }
+          ]
+        },
+        {
+          "message": 11628,
+          "names": true,
+          "choices": [
+            { "reply": 12953 }
+          ]
+        },
+        {
+          "message": 11629,
+          "choices": []
+        }
+      ],
+      "why": "Stiff Yob in Roukerol's workshop, Sufokia [7,25], by «En busca del tiempo perdido» (À la recherche des instants perdus, Dofus pour les noobs): the lost wrench (11618); «¿Qué te ha pasado?», found wandering by Roukerol (11620), his dreams (11621), the book printed in Astrub (11622); «He leído la obra de Herdegriz, el Místico.» once «Las primeras impresiones son engañosas» is done (11623: an apple might bring it back); «Ir a conseguir una manzana.» starts it («Partir se procurer une pomme»), or the fish (11619). «Darle un manzana.» takes the apple (5612, 11624-11625: three places near Sufokia), asked again with «Pedirle más detalles sobre los objetos perdidos.» (11626). «Darle los tres objetos.» hands the iSkarab, the iZarrín and the specious stone over (5616, 11627-11628: the mask he made himself is the quest's reward). Afterwards, 11629."
     }
   ]
 }

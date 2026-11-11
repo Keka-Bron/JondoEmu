@@ -3082,6 +3082,36 @@
    "kind": "read",
    "item": 13176,
    "why": "«Hojea el libro que cuenta la leyenda de Stiff Yob»: the engravings bought from Nacf Virgilio (13176, document 308) opened from the bag («Consultez le livre La Légende de Steff Taff qui se trouve dans votre inventaire de quête et consultez-le jusque la dernière page. Le livre est vide», Dofus pour les noobs)."
+  },
+  {
+   "objective": 5613,
+   "quest": 925,
+   "kind": "click",
+   "elements": [{"map": 88080387, "element": 473067}],
+   "gives": [{"item": 13208}],
+   "spawns": {"monster": 3277, "count": 1, "attacks": true},
+   "afterObjectives": [5612],
+   "why": "«Encuentra el primer objeto perdido» at [1,26]: «En [1,26], cliquez sur la roche en bas à gauche. Vous obtenez un Skarab. Cependant un combat se lance contre un Mal de Kwoan»: element 473067 (graphic 7401, cell 465), the map's only one besides a bush; «la entrada de un santuario que sirve de refugio a criaturas con caparazón» (11625)."
+  },
+  {
+   "objective": 5614,
+   "quest": 925,
+   "kind": "click",
+   "elements": [{"map": 88084738, "element": 473068}],
+   "gives": [{"item": 13206}],
+   "spawns": {"monster": 3277, "count": 1, "attacks": true},
+   "afterObjectives": [5612],
+   "why": "«Encuentra el segundo objeto perdido» at [9,21]: «En [9,21], cliquez sur la cage en bois en dessous du chacha rose. Vous obtenez une Ardoiz. Un autre combat se lance contre le même monstre»: element 473068 (graphic 7159, cell 273), made with the rock's 473067; «un remanso de paz donde los miaumiaus están protegidos» (11625)."
+  },
+  {
+   "objective": 5615,
+   "quest": 925,
+   "kind": "click",
+   "elements": [{"map": 99090959, "element": 475028}],
+   "gives": [{"item": 13207}],
+   "spawns": {"monster": 3277, "count": 2, "attacks": true},
+   "afterObjectives": [5612],
+   "why": "«Encuentra el tercero objeto perdido» at [7,16], underground: «Cliquez sur l'entrée au pied d'une statue Wabbit (en haut à gauche de la map), puis une fois descendu, cliquez sur la petite statue wabbit à coté du gros trou. Vous obtenez alors une Pierre Spécieuse. Un autre combat se lance contre les mêmes monstres qu'auparavant, cependant cette fois-ci ils sont deux»: below [7,16] (entrance 472853), element 475028 (graphic 38059, cell 469) is the only one there that is neither the way out (475031) nor the hole (475039); «una tumba subterránea donde huele a zanahowia» (11625)."
   }
  ]
 }
