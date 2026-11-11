@@ -454,6 +454,7 @@ namespace Jondo.Unity.World.Achievements
             public bool Finished(int questId) => _inner.Finished(questId);
             public bool Active(int questId) => _inner.Active(questId);
             public bool ObjectiveDone(int objectiveId) => _inner.ObjectiveDone(objectiveId);
+            public bool ObjectivePending(int objectiveId) => _inner.ObjectivePending(objectiveId);
             public bool AchievementDone(int achievementId) => _log.Has(achievementId);
 
             // Oa is "achievement points", and the log is the one that knows those.

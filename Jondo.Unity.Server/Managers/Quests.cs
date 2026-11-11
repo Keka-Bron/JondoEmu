@@ -182,7 +182,8 @@ namespace Jondo.Unity.Server.Managers
             int rows = 0;
             foreach (var row in DatabaseManager.LoadQuestProgress(characterId))
             {
-                log.Restore(row.QuestId, row.StepId, row.Objectives, row.Completed);
+                log.Restore(row.QuestId, row.StepId, row.Objectives, row.Completed,
+                    row.CompletedAt > 0 ? DateTimeOffset.FromUnixTimeSeconds(row.CompletedAt).LocalDateTime : default);
                 rows++;
             }
 
@@ -1991,8 +1992,11 @@ namespace Jondo.Unity.Server.Managers
             long characterId = SessionContext.State.CharacterId;
             if (characterId == 0) return;
 
+            long finishedAt = run.Finished && run.FinishedAt != default
+                ? new DateTimeOffset(run.FinishedAt).ToUnixTimeSeconds()
+                : 0;
             DatabaseManager.SaveQuestProgress(characterId, new DatabaseManager.QuestRow(
-                questId, run.StepId, QuestLog.Pack(run), run.Finished));
+                questId, run.StepId, QuestLog.Pack(run), run.Finished, finishedAt));
         }
     }
 }

@@ -22,6 +22,12 @@ namespace Jondo.Unity.World.Quests
         public bool Finished { get; internal set; }
 
         /// <summary>
+        /// When it was last done, which says when a daily or weekly quest comes back
+        /// (<see cref="Quest.OpensAgain"/>). Default when the run ended before this was kept.
+        /// </summary>
+        public DateTime FinishedAt { get; internal set; }
+
+        /// <summary>
         /// The objectives ticked off on the step in hand.
         /// </summary>
         /// <remarks>
@@ -123,6 +129,9 @@ namespace Jondo.Unity.World.Quests
             _count = count;
         }
 
+        /// <summary>The server's time, which a test can set to see a day or a week go by.</summary>
+        public static Func<DateTime> Clock { get; set; } = () => DateTime.Now;
+
         private readonly Func<int> _level;
         private readonly Func<long> _map;
         private readonly Func<string, long?>? _scalar;
@@ -156,6 +165,22 @@ namespace Jondo.Unity.World.Quests
         public bool Finished(int questId) => _runs.TryGetValue(questId, out var run) && run.Finished;
 
         public bool Active(int questId) => _runs.TryGetValue(questId, out var run) && !run.Finished;
+
+        /// <summary>Whether the objective is on the step a quest under way is on, and not ticked off.</summary>
+        public bool ObjectivePending(int objectiveId)
+        {
+            foreach (var run in _runs.Values)
+            {
+                if (run.Finished || run.Done.Contains(objectiveId)) continue;
+                var step = _book.Step(run.StepId);
+                if (step == null) continue;
+                foreach (var objective in step.Objectives)
+                {
+                    if (objective.Id == objectiveId) return true;
+                }
+            }
+            return false;
+        }
 
         public bool ObjectiveDone(int objectiveId)
         {
@@ -232,7 +257,7 @@ namespace Jondo.Unity.World.Quests
             if (_runs.TryGetValue(questId, out var run))
             {
                 if (!run.Finished) return false;
-                if (!quest.Repeatable) return false;
+                if (!quest.OpensAgain(run.FinishedAt, Clock())) return false;
             }
 
             verdict = QuestCriterion.Judge(quest.Criterion, this);
@@ -262,9 +287,9 @@ namespace Jondo.Unity.World.Quests
         /// has that quest in their log, and silently dropping it on login would lose their
         /// progress with no message anywhere.
         /// </remarks>
-        public QuestRun Restore(int questId, int stepId, string? packed, bool finished)
+        public QuestRun Restore(int questId, int stepId, string? packed, bool finished, DateTime finishedAt = default)
         {
-            var run = new QuestRun(questId, stepId) { Finished = finished };
+            var run = new QuestRun(questId, stepId) { Finished = finished, FinishedAt = finished ? finishedAt : default };
             Unpack(packed, run);
             _runs[questId] = run;
             return run;
@@ -359,6 +384,7 @@ namespace Jondo.Unity.World.Quests
             if (quest == null)
             {
                 run.Finished = true;
+                run.FinishedAt = Clock();
                 run.StepId = 0;
                 return 0;
             }
@@ -372,6 +398,7 @@ namespace Jondo.Unity.World.Quests
             if (at < 0 || at + 1 >= quest.Steps.Count)
             {
                 run.Finished = true;
+                run.FinishedAt = Clock();
                 run.StepId = 0;
                 run.Done.Clear();
                 run.Counted.Clear();

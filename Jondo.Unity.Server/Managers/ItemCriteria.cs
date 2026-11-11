@@ -110,6 +110,7 @@ namespace Jondo.Unity.Server.Managers
             public bool Finished(int questId) => Character.Finished(questId);
             public bool Active(int questId) => Character.Active(questId);
             public bool ObjectiveDone(int objectiveId) => Character.ObjectiveDone(objectiveId);
+            public bool ObjectivePending(int objectiveId) => Character.ObjectivePending(objectiveId);
 
             public bool AchievementDone(int achievementId)
                 => _lenient == Lenient.Achievements || (S.Achievements?.Has(achievementId) ?? false);

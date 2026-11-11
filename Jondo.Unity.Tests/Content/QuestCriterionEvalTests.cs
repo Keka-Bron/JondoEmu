@@ -26,7 +26,9 @@ namespace Jondo.Unity.Tests.Content
 
             public bool Finished(int questId) => Done.Contains(questId);
             public bool Active(int questId) => Doing.Contains(questId);
+            public HashSet<int> InHand { get; } = new HashSet<int>();
             public bool ObjectiveDone(int objectiveId) => Ticked.Contains(objectiveId);
+            public bool ObjectivePending(int objectiveId) => InHand.Contains(objectiveId);
         }
 
         private static CriterionVerdict Judge(string criterion, Facts facts)
@@ -108,6 +110,28 @@ namespace Jondo.Unity.Tests.Content
 
             facts.Ticked.Add(7374);
             Assert.False(Judge("Qo>7357&Qo<7374", facts).Met);
+        }
+
+        /// <summary>
+        /// '=' is the objective in hand, '!' not in hand: «(Qo=15210|(Qo>15210&amp;PO=21858))», and
+        /// the dopeul tour's «Qc=458|Qo=3147», the day's hunt done or under way.
+        /// </summary>
+        [Fact]
+        public void Qo_equal_is_an_objective_in_hand()
+        {
+            var facts = new Facts();
+            Assert.False(Judge("Qo=3147", facts).Met);
+            Assert.True(Judge("Qo!3147", facts).Met);
+
+            facts.InHand.Add(3147);
+            Assert.True(Judge("Qo=3147", facts).Met);
+            Assert.False(Judge("Qo!3147", facts).Met);
+            Assert.False(Judge("Qo>3147", facts).Met);
+
+            facts.InHand.Remove(3147);
+            facts.Ticked.Add(15210);
+            Assert.True(Judge("Qo=15210|(Qo>15210&Qf=1)", new Facts()) is { Met: false });
+            Assert.False(Judge("Qo=15210", facts).Met);
         }
 
         [Fact]

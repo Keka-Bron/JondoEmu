@@ -728,6 +728,7 @@ namespace Jondo.Unity.Server.Managers
             public bool Finished(int questId) => S.Quests?.Finished(questId) ?? false;
             public bool Active(int questId) => S.Quests?.Active(questId) ?? false;
             public bool ObjectiveDone(int objectiveId) => S.Quests?.ObjectiveDone(objectiveId) ?? false;
+            public bool ObjectivePending(int objectiveId) => S.Quests?.ObjectivePending(objectiveId) ?? false;
 
             public long? Scalar(string op) => op switch
             {

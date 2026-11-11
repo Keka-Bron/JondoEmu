@@ -623,10 +623,12 @@ namespace Jondo.Unity.Server
                         StepId INTEGER NOT NULL DEFAULT 0,
                         Objectives TEXT NOT NULL DEFAULT '',
                         Completed INTEGER NOT NULL DEFAULT 0,
+                        CompletedAt INTEGER NOT NULL DEFAULT 0,
                         PRIMARY KEY (CharacterId, QuestId)
                     );
                 ";
                 createQuests.ExecuteNonQuery();
+                EnsureQuestCompletedAtColumn();
 
                 // The achievements earned, and whether what they give has already been collected. They
                 // are two facts and not one: the client asks for the reward with a separate packet -- the
@@ -4822,12 +4824,13 @@ namespace Jondo.Unity.Server
         /// <summary>One quest's progress as the database holds it.</summary>
         public readonly struct QuestRow
         {
-            public QuestRow(int questId, int stepId, string objectives, bool completed)
+            public QuestRow(int questId, int stepId, string objectives, bool completed, long completedAt = 0)
             {
                 QuestId = questId;
                 StepId = stepId;
                 Objectives = objectives;
                 Completed = completed;
+                CompletedAt = completedAt;
             }
 
             public int QuestId { get; }
@@ -4837,6 +4840,9 @@ namespace Jondo.Unity.Server
             public string Objectives { get; }
 
             public bool Completed { get; }
+
+            /// <summary>When it was last finished, in Unix seconds; 0 when not known.</summary>
+            public long CompletedAt { get; }
         }
 
         /// <summary>
@@ -4872,24 +4878,67 @@ namespace Jondo.Unity.Server
         {
             try
             {
+                EnsureQuestCompletedAtColumn();
                 using var connection = new SqliteConnection(WorldConnectionString);
                 connection.Open();
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-                    INSERT INTO CharacterQuests (CharacterId, QuestId, StepId, Objectives, Completed)
-                    VALUES ($c, $q, $s, $o, $d)
+                    INSERT INTO CharacterQuests (CharacterId, QuestId, StepId, Objectives, Completed, CompletedAt)
+                    VALUES ($c, $q, $s, $o, $d, $t)
                     ON CONFLICT(CharacterId, QuestId) DO UPDATE
-                        SET StepId = $s, Objectives = $o, Completed = $d;";
+                        SET StepId = $s, Objectives = $o, Completed = $d, CompletedAt = $t;";
                 command.Parameters.AddWithValue("$c", characterId);
                 command.Parameters.AddWithValue("$q", quest.QuestId);
                 command.Parameters.AddWithValue("$s", quest.StepId);
                 command.Parameters.AddWithValue("$o", quest.Objectives ?? "");
                 command.Parameters.AddWithValue("$d", quest.Completed ? 1 : 0);
+                command.Parameters.AddWithValue("$t", quest.CompletedAt);
                 command.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[SQLite] Quest {quest.QuestId} could not be saved: {ex.Message}");
+            }
+        }
+
+        private static volatile bool _questCompletedAt;
+
+        /// <summary>
+        /// When each quest was last finished, which says when a daily or weekly one comes back: a
+        /// column that bases from before it lack, added once.
+        /// </summary>
+        private static void EnsureQuestCompletedAtColumn()
+        {
+            if (_questCompletedAt) return;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using (var check = connection.CreateCommand())
+                {
+                    check.CommandText = "PRAGMA table_info(CharacterQuests);";
+                    using var reader = check.ExecuteReader();
+                    bool table = false;
+                    while (reader.Read())
+                    {
+                        table = true;
+                        if (string.Equals(reader.GetString(1), "CompletedAt", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _questCompletedAt = true;
+                            return;
+                        }
+                    }
+                    if (!table) return;
+                }
+                using var add = connection.CreateCommand();
+                add.CommandText = "ALTER TABLE CharacterQuests ADD COLUMN CompletedAt INTEGER NOT NULL DEFAULT 0;";
+                add.ExecuteNonQuery();
+                _questCompletedAt = true;
+                Console.WriteLine("[SQLite] CompletedAt column added to CharacterQuests.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLite] CharacterQuests.CompletedAt could not be added: {ex.Message}");
             }
         }
 
@@ -4899,11 +4948,12 @@ namespace Jondo.Unity.Server
             var salida = new List<QuestRow>();
             try
             {
+                EnsureQuestCompletedAtColumn();
                 using var connection = new SqliteConnection(WorldConnectionString);
                 connection.Open();
                 using var command = connection.CreateCommand();
                 command.CommandText =
-                    "SELECT QuestId, StepId, Objectives, Completed FROM CharacterQuests " +
+                    "SELECT QuestId, StepId, Objectives, Completed, CompletedAt FROM CharacterQuests " +
                     "WHERE CharacterId = $c;";
                 command.Parameters.AddWithValue("$c", characterId);
                 using var reader = command.ExecuteReader();
@@ -4913,7 +4963,8 @@ namespace Jondo.Unity.Server
                         reader.GetInt32(0),
                         reader.GetInt32(1),
                         reader.IsDBNull(2) ? "" : reader.GetString(2),
-                        reader.GetInt32(3) != 0));
+                        reader.GetInt32(3) != 0,
+                        reader.IsDBNull(4) ? 0 : reader.GetInt64(4)));
                 }
             }
             catch (Exception ex)

@@ -238,6 +238,25 @@ namespace Jondo.Unity.World.Quests
         public bool Event { get; init; }
         public bool Repeatable { get; init; }
 
+        /// <summary>
+        /// When it can be done again (the client's repeatType): 0 never, 1 every day, 2 every week,
+        /// 3 every year (the Almanax's). Dofus pour les noobs says when the days and weeks turn:
+        /// «tous les jours à partir de 7h», «hebdomadaire mardi 7h».
+        /// </summary>
+        public int RepeatType { get; init; }
+
+        /// <summary>
+        /// Whether a run finished at <paramref name="finishedAt"/> lets the quest be taken again at
+        /// <paramref name="now"/>. A run whose end was not recorded (before it was) counts as old.
+        /// </summary>
+        public bool OpensAgain(DateTime finishedAt, DateTime now) => RepeatType switch
+        {
+            1 => finishedAt < QuestResets.Daily(now),
+            2 => finishedAt < QuestResets.Weekly(now),
+            3 => finishedAt < QuestResets.Yearly(now),
+            _ => Repeatable,
+        };
+
         /// <summary>What has to be true before an NPC will offer it. See <see cref="Requires"/>.</summary>
         public string Criterion { get; init; } = "";
 
@@ -672,7 +691,8 @@ namespace Jondo.Unity.World.Quests
                     Dungeon = Long(row, "dungeon") != 0,
                     Party = Long(row, "party") != 0,
                     Event = Long(row, "event") != 0,
-                    Repeatable = Long(row, "repeatLimit") > 1 || Long(row, "repeatType") > 1,
+                    Repeatable = Long(row, "repeatLimit") > 1 || Long(row, "repeatType") > 0,
+                    RepeatType = (int)Long(row, "repeatType"),
                     Criterion = criterion,
                     Givers = givers,
                     Steps = steps,

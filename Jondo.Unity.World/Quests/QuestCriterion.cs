@@ -26,8 +26,14 @@ namespace Jondo.Unity.World.Quests
         /// <summary>Whether a quest is under way right now, for <c>Qa</c>.</summary>
         bool Active(int questId);
 
-        /// <summary>Whether one objective has been ticked off, for <c>Qo</c>.</summary>
+        /// <summary>Whether one objective has been ticked off, for <c>Qo&gt;</c>.</summary>
         bool ObjectiveDone(int objectiveId);
+
+        /// <summary>
+        /// Whether one objective is in hand and not ticked off yet, for <c>Qo=</c>: on the step a
+        /// quest under way is on. False where the facts know no quests.
+        /// </summary>
+        bool ObjectivePending(int objectiveId) => false;
 
         /// <summary>
         /// Whether an achievement has been earned, for <c>OA</c>.
@@ -469,15 +475,22 @@ namespace Jondo.Unity.World.Quests
                     case "Qa":
                         return Truth(_facts.Active((int)value), comparison);
 
-                    // Qo holds objective ids — 116 of 116 — and its comparison is usually '>'
-                    // rather than '='. Both are read as "that objective is ticked off": the
-                    // conditions it appears in are of the form "(Qa=1523&Qo>8635)|Qf=1523", which
-                    // is a quest under way and past a given point, or already over. '<' is the
-                    // other way round, "not ticked off yet", as the client words them (done and
-                    // notDone) and PlayerCriteria reads them: the world graph's passages open
-                    // between two objectives, «(Qo>7357&Qo<7374)».
+                    // Qo holds objective ids — 116 of 116 — with the client's four words for them
+                    // (ui.grimoire.quest.objective pending / notPending / done / notDone), as
+                    // PlayerCriteria reads them: '>' is "ticked off" -- "(Qa=1523&Qo>8635)|Qf=1523",
+                    // a quest under way and past a given point, or over --, '<' "not ticked off
+                    // yet" -- the world graph's passages open between two objectives,
+                    // «(Qo>7357&Qo<7374)» --, '=' "in hand now" and '!' "not in hand". The 44 '='
+                    // say so themselves: «(Qo=15210|(Qo>15210&PO=21858))» is the objective in hand,
+                    // or done with its item; «Qc=458|Qo=3147», the dopeul hunt done or under way.
                     case "Qo":
-                        return Truth(_facts.ObjectiveDone((int)value), comparison == '<' ? '!' : comparison);
+                        return comparison switch
+                        {
+                            '>' => _facts.ObjectiveDone((int)value),
+                            '<' => !_facts.ObjectiveDone((int)value),
+                            '!' => !_facts.ObjectivePending((int)value),
+                            _ => _facts.ObjectivePending((int)value),
+                        };
 
                     // OA is "achievement obtained", and it is the commonest operator in the whole
                     // achievement catalogue: 2,157 objectives use it. Achievement 8520 is nothing
