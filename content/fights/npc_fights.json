@@ -426,6 +426,11 @@
     { "npc": 1919, "map": 88081686, "reply": 15555, "byLevel": true,
       "monsters": [ { "monster": 3364, "grade": 0 } ] },
     { "npc": 1920, "map": 84805378, "reply": 15556, "byLevel": true,
-      "monsters": [ { "monster": 3365, "grade": 0 } ] }
+      "monsters": [ { "monster": 3365, "grade": 0 } ] },
+    { "npc": 1905, "map": 188745223, "reply": 15581,
+      "monsters": [ { "monster": 3355, "grade": 0 } ] },
+    { "npc": 1904, "map": 192675842, "reply": 15592,
+      "monsters": [ { "monster": 3357, "grade": 0 } ],
+      "allies": [ { "monster": 3356, "grade": 0 } ] }
   ]
 }

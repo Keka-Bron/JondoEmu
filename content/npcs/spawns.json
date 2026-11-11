@@ -2977,6 +2977,30 @@
       "orientation": 1,
       "criterion": "Qa=1200&Qo=6760",
       "why": "The mad Xelor's hawker, the fraud (fraudulento, «Xelor Interlope») at [-3,-24], while «Bien velu, c'est Kerubim» has him to beat (6760). INFERRED cell."
+    },
+    {
+      "map": 192675842,
+      "npc": 1904,
+      "cell": 358,
+      "orientation": 3,
+      "criterion": "Qa=1201&Qo>6769&Qo<6772",
+      "why": "Graslahad at Marp's house [1,-19], from the alarm (6769) until he leaves with the case (6772). INFERRED cell."
+    },
+    {
+      "map": 188745223,
+      "npc": 1905,
+      "cell": 302,
+      "orientation": 1,
+      "criterion": "Qa=1201&Qo>6765&Qo<6766",
+      "why": "Piti Macholos near the old chapel [4,-15] («Búscalo cerca de la vieja capilla», 13472) while he is to be brought (6766). INFERRED cell."
+    },
+    {
+      "map": 192675842,
+      "npc": 1922,
+      "cell": 344,
+      "orientation": 1,
+      "criterion": "Qa=1201&Qo>6772&Qo<6773",
+      "why": "Kerubim in his barrel at Marp's house once Graslahad has left (6772) until the pass is given (6773); the cell is the derived one."
     }
   ]
 }
