@@ -10,7 +10,18 @@
     "THE GUIDED TUTORIAL. Its rooms are islands: walking off the right edge of one loads the next",
     "(the client asks for the id beside it, 241437697, and the real server answers 241438721), and",
     "the capture of the whole tutorial puts the character on cell 84 facing 1 in every room it",
-    "crosses into, its jss each time."
+    "crosses into, its jss each time.",
+    "",
+    "«from» names the map the character comes from, for a room entered from both sides; without",
+    "it the arrival holds for whatever arrival the others do not name, teleports included.",
+    "",
+    "THE CELESTIAL TEMPLE. Its three rooms are islands too, joined corner to corner: the",
+    "Dofusarium's right edge is its bottom-right corner (cells 419-503), the next room's left",
+    "edge its top-left corner (56-112) and its right edge its bottom-right (447-503), the exit",
+    "room's left edge its top-left (56-112) -- the mapChangeData of the client's cells. Mirrored",
+    "across, the cell left from lands in the middle of the next room or off its floor. Walking",
+    "in, the tutorial's cell 84 facing 1, the middle of the left edge; walking back, the middle",
+    "of the right edge facing 5."
   ],
   "arrivals": [
     {
@@ -42,6 +53,41 @@
       "cell": 127,
       "orientation": 1,
       "measured": "the tutorial capture, the jss after Ganymed's «Seguir a Ganymed» (jru 241443329)"
+    },
+    {
+      "map": 241444353,
+      "from": 241443329,
+      "cell": 84,
+      "orientation": 1,
+      "measured": "inferred from the client's border cells: walking in from the Dofusarium: the middle of its top-left edge (56-112), as the tutorial's rooms"
+    },
+    {
+      "map": 241445377,
+      "from": 241444353,
+      "cell": 84,
+      "orientation": 1,
+      "measured": "inferred from the client's border cells: walking in from the middle room: the middle of its top-left edge (56-112)"
+    },
+    {
+      "map": 241444353,
+      "from": 241445377,
+      "cell": 475,
+      "orientation": 5,
+      "measured": "inferred from the client's border cells: walking back from the room of the exit: the middle of its bottom-right edge (447-503)"
+    },
+    {
+      "map": 241443329,
+      "from": 241444353,
+      "cell": 461,
+      "orientation": 5,
+      "measured": "inferred from the client's border cells: walking back from the middle room: the middle of the Dofusarium's bottom-right edge (419-503)"
+    },
+    {
+      "map": 154010883,
+      "from": 241445377,
+      "cell": 370,
+      "orientation": 1,
+      "measured": "the client's map reference 10: the foot of the Celestial Temple's steps in Incarnam, out of the temple by its gates or by Andrée Inkarnay"
     }
   ]
 }

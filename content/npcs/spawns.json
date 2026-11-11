@@ -2578,6 +2578,43 @@
       "orientation": 1,
       "criterion": "Qo=18538&Qo!18539",
       "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
+    },
+    {
+      "map": 153090,
+      "npc": 925,
+      "cell": 261,
+      "orientation": 1,
+      "criterion": "Qf=231",
+      "why": "Kradoc on the beach of the castaways' island [-43,2], by his stranded ship, for whoever sailed with him (231 done). INFERRED cell."
+    },
+    {
+      "map": 90181632,
+      "npc": 932,
+      "cell": 288,
+      "orientation": 3,
+      "why": "Juan Niet in the hidden laboratory's Exit room, by its door at the back (cell 218), where the four fights leave you in front of him. INFERRED cell."
+    },
+    {
+      "map": 24119823,
+      "npc": 934,
+      "cell": 341,
+      "orientation": 1,
+      "why": "Juana Morros on the platform in the heart of the Hakam trunk, among the potions, where the six fights leave you. INFERRED cell."
+    },
+    {
+      "map": 241445377,
+      "npc": 7102,
+      "cell": 387,
+      "orientation": 5,
+      "why": "Andrée Inkarnay by the Celestial Temple's gates [3,3], facing whoever comes down the steps: «Avant de sortir du Temple Céleste un PNJ Andrée Inkarnay vous propose de vous donner une potion de changement de classe» (Dofus pour les noobs, «Réponses à tout»), «à l'entrée du temple céleste» («Sous le regard des dieux»). INFERRED cell, the floor left of the door."
+    },
+    {
+      "map": 241444353,
+      "npc": 7581,
+      "cell": 273,
+      "orientation": 3,
+      "criterion": "Qa=1631&Qo=9738",
+      "why": "Ganymed by the temple's book [2,2] once the six statues are read: 1631's last objective (9740) is talking to him on this map, after «Ir a la próxima sala» in the Dofusarium. INFERRED cell, left of the book (287)."
     }
   ]
 }

@@ -681,7 +681,11 @@ namespace Jondo.Unity.Server.Managers
                 return gave;
             }
 
-            bool talkFirst = binding.Kind == QuestBindingKind.Talk;
+            // A conversation closes its objective before handing anything over: Ganymed's «Buscar en tu
+            // bolsa los objetos y equipártelos» in the tutorial capture is idz 3169, then the six items,
+            // and the client only validates «Equipa a tu personaje» for items that arrive with that
+            // step already in hand.
+            bool talkFirst = binding.Kind == QuestBindingKind.Talk || binding.Kind == QuestBindingKind.Reply;
             if (talkFirst) await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
             foreach (var (item, count) in binding.Gives)
             {
@@ -1905,8 +1909,10 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (!reward.For(level)) continue;
 
+                // With the character's experience bonus, as the client reckons it (the capture's
+                // 141 for 1629's step 2249 at level 2, 135 without it).
                 experience += RewardFormula.Experience(level, step.OptimalLevel, reward.ExperienceRatio,
-                                                       step.Duration);
+                                                       step.Duration, CombatExperience.CharacterBonusPercent);
                 kamas += RewardFormula.Kamas(reward.KamasScale ? level : step.OptimalLevel,
                                              reward.KamasRatio, step.Duration);
                 items.AddRange(reward.Items);

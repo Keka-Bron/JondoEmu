@@ -82,6 +82,13 @@ namespace Jondo.Unity.Server.Managers
                 // Every account is subscribed here (Subscription).
                 case "PZ": return Compare(1, op, value);
 
+                // The character's sex, 0 a man and 1 a woman; an attitude he knows; the pods he has free
+                // (what he carries weighs nothing here, so his capacity): the guardian of the bridge of
+                // death's questions.
+                case "PS": return facts.State == null ? Answer.Unknown : Compare(facts.State.Sex, op, value);
+                case "PE": return facts.State == null ? Answer.Unknown : Truth(facts.State.Emotes.Contains((int)value), op);
+                case "Pw": return facts.State == null ? Answer.Unknown : Compare(1000 + 5L * facts.State.TotalStrength, op, value);
+
                 // His alignment's side: 0 neutral, 1 Bonta, 2 Brakmar (Alignments).
                 case "Ps": return facts.State == null ? Answer.Unknown : Compare(Alignments.CriterionSide(facts.State.CharacterId), op, value);
 

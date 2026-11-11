@@ -254,7 +254,7 @@ namespace Jondo.Unity.Server.Handlers
 
             int arrival = Landing(target, Jondo.Unity.Server.Network.SessionContext.State.CellId, way);
             int measuredFacing = -1;
-            if (Managers.MeasuredArrivals.TryGet(target, out int measuredCell, out int facing))
+            if (Managers.MeasuredArrivals.TryGet(target, SessionContext.State.MapId, out int measuredCell, out int facing))
             {
                 arrival = measuredCell;
                 measuredFacing = facing;
@@ -337,8 +337,9 @@ namespace Jondo.Unity.Server.Handlers
             if (arrival < 0) return null;
 
             // Where a capture has measured the landing (content/maps/arrivals.json): Ganymed's
-            // «Seguir a Ganymed» puts the player on the Dofusarium's cell 127.
-            if (Managers.MeasuredArrivals.TryGet(targetMapId, out int measuredCell, out int measuredFacing))
+            // «Seguir a Ganymed» puts the player on the Dofusarium's cell 127; leaving the Celestial
+            // Temple, the foot of its steps in Incarnam.
+            if (Managers.MeasuredArrivals.TryGet(targetMapId, SessionContext.State.MapId, out int measuredCell, out int measuredFacing))
             {
                 arrival = measuredCell;
                 if (measuredFacing >= 0) SessionContext.State.Orientation = measuredFacing;

@@ -190,6 +190,23 @@ namespace Jondo.Unity.Server.Network
             return Bien(new { item = template, uid, lines = lines.Select(l => l.Length > 220 ? l[..220] : l).ToList() });
         }
 
+        /// <summary>
+        /// { text }: one of the administrator's chat commands as the character typed it -- «.oficio 26
+        /// 80» puts the alchemist at level 80 for a quest that asks for it (Des fleurs épineuses).
+        /// </summary>
+        private static Respuesta TestCommand(string cuerpo)
+        {
+            var session = TestSessionOnline();
+            if (session == null) return Mal(404, "offline");
+            string text = Texto(cuerpo, "text");
+            bool handled = false;
+            var lines = RunInSession(session, async stream =>
+            {
+                handled = await CommandHandler.TryHandleAsync(stream, text, 0, session.AccountId);
+            });
+            return Bien(new { handled, lines = lines.Select(l => l.Length > 220 ? l[..220] : l).ToList() });
+        }
+
         /// <summary>{ element, skill }: an interactive used (iwo), with the skill instance the map gives it when none is named.</summary>
         private static Respuesta TestUse(string cuerpo)
         {
@@ -253,6 +270,8 @@ namespace Jondo.Unity.Server.Network
             Managers.Quests.ReloadContent();
             Managers.NpcFights.Forget();
             Handlers.NpcBarterHandler.Forget();
+            Managers.MapStagings.Forget();
+            Managers.MeasuredArrivals.Forget();
             Managers.HarvestDrops.Forget();
             Managers.DungeonExitRooms.Forget();
             Managers.TeleportManager.Initialize();

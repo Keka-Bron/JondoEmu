@@ -78,6 +78,7 @@ namespace Jondo.Unity.World.Achievements
         private readonly HashSet<int> _earned = new HashSet<int>();
         private readonly HashSet<int> _claimed = new HashSet<int>();
         private readonly Dictionary<int, long> _achievers = new();
+        private readonly Dictionary<int, int> _levels = new();
 
         /// <summary>
         /// How deep the cascade of achievements-needing-achievements is allowed to go.
@@ -147,6 +148,19 @@ namespace Jondo.Unity.World.Achievements
         {
             if (characterId != 0 && _earned.Contains(achievementId)) _achievers.TryAdd(achievementId, characterId);
         }
+
+        /// <summary>
+        /// Notes the level the character had when he earned one: what its reward is reckoned at,
+        /// as the client's «Recompensas» window shows it (the level of the mfu, then of the mft).
+        /// </summary>
+        public void NoteLevel(int achievementId, int level)
+        {
+            if (level > 0 && _earned.Contains(achievementId)) _levels[achievementId] = level;
+        }
+
+        /// <summary>The level it was earned at, or zero when it was not noted.</summary>
+        public int LevelOf(int achievementId)
+            => _levels.TryGetValue(achievementId, out int level) ? level : 0;
 
         /// <summary>The character of the account that achieved it, or zero when nobody was noted.</summary>
         public long AchieverOf(int achievementId)
@@ -473,9 +487,10 @@ namespace Jondo.Unity.World.Achievements
 
         /// <summary>
         /// What claiming an achievement hands over to a character of that level, conditions
-        /// judged, experience and kamas worked out with the client's formula.
+        /// judged, experience and kamas worked out with the client's formula, the experience
+        /// with the character's bonus (<paramref name="bonusPercent"/>, f1 − 100 of the hox).
         /// </summary>
-        public AchievementPayout Payout(int achievementId, int playerLevel)
+        public AchievementPayout Payout(int achievementId, int playerLevel, int bonusPercent = 0)
         {
             var payout = new AchievementPayout();
             var achievement = _book.Of(achievementId);
@@ -485,7 +500,8 @@ namespace Jondo.Unity.World.Achievements
             {
                 if (!Owed(reward)) continue;
 
-                payout.Experience += RewardFormula.Experience(playerLevel, achievement.Level, reward.ExperienceRatio);
+                payout.Experience += RewardFormula.Experience(playerLevel, achievement.Level, reward.ExperienceRatio,
+                                                              1.0, bonusPercent);
                 payout.Kamas += RewardFormula.Kamas(reward.KamasScale ? playerLevel : achievement.Level,
                                                     reward.KamasRatio);
                 payout.Items.AddRange(reward.Items);

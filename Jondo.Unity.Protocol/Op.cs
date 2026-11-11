@@ -793,6 +793,8 @@ public static class Op
     /// The state of a map element: { f1 { f2: cell, f3: element, f4: state } }.
     /// Zero full, 1 depleted, 2 in use. It is the same set of fields as the jss's f15.
     /// </summary>
+    /// <summary>A set as worn (SetUpdate): its bonus, its id and its pieces worn.</summary>
+    public const string Iwd = "iwd";
     public const string Iwf = "iwf";
 
     /// <summary>

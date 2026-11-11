@@ -184,6 +184,20 @@ namespace Jondo.Unity.World.Content
         /// <summary>Kamas the reply pays: the mulou's for the goblin of «Titi Gobelait le magobelin».</summary>
         public long GivesKamas { get; init; }
 
+        /// <summary>
+        /// A condition on the character, in the client's criterion language, for the reply to be
+        /// offered: «PS=1» a woman, «PE=14» who knows the crossed-arms attitude, «Pw>1499» with that
+        /// many pods free -- the right answers to the guardian of the bridge of death, which are not
+        /// the same for everybody. Empty for none.
+        /// </summary>
+        public string Criterion { get; init; } = "";
+
+        /// <summary>
+        /// Stagings (hpm) the reply plays: the guided tutorial's 901 and 102 on «Ver cómo se
+        /// materializa un camino», the path to the next island (Managers.MapStagings).
+        /// </summary>
+        public IReadOnlyList<int> Stagings { get; init; } = Array.Empty<int>();
+
         /// <summary>True when the reply puts the player back where they came in from.</summary>
         /// <remarks>
         /// Separate from <see cref="TeleportsTo"/> because there is no map to write down: the
@@ -552,6 +566,13 @@ namespace Jondo.Unity.World.Content
 
         /// <summary>The line it opens on, per class as an opening can be.</summary>
         public DialogueOpening Line { get; init; } = new DialogueOpening();
+
+        /// <summary>
+        /// Stagings (hpm) played before the line and after it: the tutorial's 912 and 302 around
+        /// the voice's presenting the god's statue.
+        /// </summary>
+        public IReadOnlyList<int> StagingsBefore { get; init; } = Array.Empty<int>();
+        public IReadOnlyList<int> Stagings { get; init; } = Array.Empty<int>();
     }
 
     /// <summary>A whole conversation with one NPC.</summary>
@@ -774,12 +795,19 @@ namespace Jondo.Unity.World.Content
             {
                 int step = (int)Number(item, "afterStep");
                 if (step == 0) continue;
-                read.Add(new DialoguePush { AfterStep = step, Line = ReadOpening(item) });
+                read.Add(new DialoguePush
+                {
+                    AfterStep = step,
+                    Line = ReadOpening(item),
+                    StagingsBefore = Numbers(item, "stagingsBefore").Select(o => (int)o).ToArray(),
+                    Stagings = Numbers(item, "stagings").Select(o => (int)o).ToArray(),
+                });
             }
             return read.ToArray();
         }
 
-        private static void WriteOpening(Utf8JsonWriter writer, DialogueOpening opening, int afterStep = 0)
+        private static void WriteOpening(Utf8JsonWriter writer, DialogueOpening opening, int afterStep = 0,
+                                         IReadOnlyList<int>? stagingsBefore = null, IReadOnlyList<int>? stagings = null)
         {
             writer.WriteStartObject();
             if (afterStep != 0) writer.WriteNumber("afterStep", afterStep);
@@ -800,7 +828,17 @@ namespace Jondo.Unity.World.Content
                 foreach (int breed in breeds) writer.WriteNumber(breed.ToString(), opening.ByBreed[breed]);
                 writer.WriteEndObject();
             }
+            WriteIds(writer, "stagingsBefore", stagingsBefore);
+            WriteIds(writer, "stagings", stagings);
             writer.WriteEndObject();
+        }
+
+        private static void WriteIds(Utf8JsonWriter writer, string name, IReadOnlyList<int>? ids)
+        {
+            if (ids == null || ids.Count == 0) return;
+            writer.WriteStartArray(name);
+            foreach (int id in ids) writer.WriteNumberValue(id);
+            writer.WriteEndArray();
         }
 
         public static ContentStore<NpcDialogueKey, NpcDialogue> Load(string? authoredPath,
@@ -926,6 +964,9 @@ namespace Jondo.Unity.World.Content
                             Forfeits = (int)Number(choice, "forfeits"),
                             AlsoGives = Numbers(choice, "alsoGives").Select(o => (int)o).ToArray(),
                             GivesKamas = Number(choice, "givesKamas"),
+                            Criterion = choice.TryGetProperty("criterion", out var crit) && crit.ValueKind == JsonValueKind.String
+                                        ? crit.GetString() ?? "" : "",
+                            Stagings = Numbers(choice, "stagings").Select(o => (int)o).ToArray(),
                         });
                     }
                 }
@@ -1002,7 +1043,7 @@ namespace Jondo.Unity.World.Content
                     if (dialogue.Pushes.Count > 0)
                     {
                         writer.WriteStartArray("pushes");
-                        foreach (var push in dialogue.Pushes) WriteOpening(writer, push.Line, push.AfterStep);
+                        foreach (var push in dialogue.Pushes) WriteOpening(writer, push.Line, push.AfterStep, push.StagingsBefore, push.Stagings);
                         writer.WriteEndArray();
                     }
 
@@ -1114,6 +1155,17 @@ namespace Jondo.Unity.World.Content
                             if (choice.Holds != 0 && choice.HoldsCount != 1) writer.WriteNumber("holdsCount", choice.HoldsCount);
                             if (choice.Gives != 0 && choice.GivesCount != 1) writer.WriteNumber("givesCount", choice.GivesCount);
                             if (choice.EndsMutation) writer.WriteBoolean("endsMutation", true);
+                            if (choice.Partial) writer.WriteBoolean("partial", true);
+                            if (choice.Forfeits != 0) writer.WriteNumber("forfeits", choice.Forfeits);
+                            if (choice.AlsoGives.Count > 0)
+                            {
+                                writer.WriteStartArray("alsoGives");
+                                foreach (int o in choice.AlsoGives) writer.WriteNumberValue(o);
+                                writer.WriteEndArray();
+                            }
+                            if (choice.GivesKamas != 0) writer.WriteNumber("givesKamas", choice.GivesKamas);
+                            if (choice.Criterion.Length > 0) writer.WriteString("criterion", choice.Criterion);
+                            WriteIds(writer, "stagings", choice.Stagings);
                             writer.WriteEndObject();
                         }
 

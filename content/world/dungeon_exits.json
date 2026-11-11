@@ -103,6 +103,24 @@
       "npc": 797,
       "replies": [2932, 2929],
       "why": "The Soft Oak Clearing: after the Soft Oak the winners are in the clearing's exit room [-14,-13], where «L'art de la langue de bois» questions him (9581), and Josefa Taplana takes them out; her «Salir del claro» leaves."
+    },
+    {
+      "dungeon": 9001,
+      "bossRoom": 90180608,
+      "room": 90181632,
+      "cell": 412,
+      "npc": 932,
+      "replies": [29527],
+      "why": "The hidden laboratory's Exit room: «Vous voilà maintenant devant Jean Nauh» (Dofus pour les noobs) after the four fights; «Salir.» leaves (his «Aceptar y salir del laboratorio.» leaves through his tree, once it has done 969)."
+    },
+    {
+      "dungeon": 9002,
+      "bossRoom": 24118794,
+      "room": 24119823,
+      "cell": 425,
+      "npc": 934,
+      "replies": [],
+      "why": "The platform in the heart of the Hakam trunk where Juana Morros hides: «Une fois tous ces monstres tués vous trouvez sa femme» (Dofus pour les noobs); her «Acepto.» leaves through her tree, once it has done 971."
     }
   ]
 }

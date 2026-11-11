@@ -872,12 +872,15 @@ namespace Jondo.Unity.Server.Handlers
                     if (message == 0) continue;
                     var line = escrito.Line(message) ?? new DialogueLine { Message = message };
 
+                    // The stagings around the line: the tutorial's camera on the god's statue.
+                    await Managers.MapStagings.PlayAsync(stream, push.StagingsBefore);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, puesto.ContextualId)));
                     SessionContext.State.OpenDialogueNpcId = puesto.NpcId;
                     SessionContext.State.OpenDialogueMapId = mapId;
                     SessionContext.State.OpenDialogueMessage = message;
                     await PreguntarAsync(stream, message, LasQueTocan(line), Npcs.TemplateOf(puesto.NpcId), line);
+                    await Managers.MapStagings.PlayAsync(stream, push.Stagings);
                     Console.WriteLine($"[NPC] {puesto.NpcId} speaks after step {stepId}: question {message}.");
                     return;
                 }
@@ -951,6 +954,7 @@ namespace Jondo.Unity.Server.Handlers
             if (!choice.ForLevel(SessionContext.State.CharacterLevel)) return false;
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
             if (!Managers.Quests.HandsOverEnough(choice.Objectives(), choice.Partial)) return false;
+            if (choice.Criterion.Length > 0 && !Managers.PlayerCriteria.Met(choice.Criterion, SessionContext.State.MapId)) return false;
             if (NotItsTurnYet(choice)) return false;
             if (!ItsQuestIsOpenToHim(choice)) return false;
             if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
@@ -994,21 +998,20 @@ namespace Jondo.Unity.Server.Handlers
                 (mision, objetivo) => diario.ObjectiveDone(objetivo),
                 elemento => SessionContext.State.ElementsUsed.Contains(elemento));
 
-            // And the character's level, where a reply asks it (DialogueChoice.MinLevel, BelowLevel).
-            int level = SessionContext.State.CharacterLevel;
+            // And the rest of what each choice asks (SeLeOfrece). A reply the line offers twice -- right
+            // for one character, wrong for another, as the bridge guardian's answers -- is offered when
+            // any of its choices is.
             return replies.Where(r =>
             {
-                var choice = linea.Choice(r);
-                if (choice == null) return true;
-                if (!choice.ForLevel(level)) return false;
-                // And what it hands over, which has to be carried (DialogueChoice.Takes).
-                if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
-                // A reply that hands over what an objective asks for, only to whoever carries it.
-                if (!Managers.Quests.HandsOverEnough(choice.Objectives(), choice.Partial)) return false;
-                if (NotItsTurnYet(choice)) return false;
-                if (!ItsQuestIsOpenToHim(choice)) return false;
-                if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
-                return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) >= choice.TakesCount;
+                bool written = false;
+                foreach (var choice in linea.Choices)
+                {
+                    if (choice.Reply != r) continue;
+                    written = true;
+                    if (SeLeOfrece(choice)) return true;
+                }
+
+                return !written;
             }).ToArray();
         }
 
@@ -1159,6 +1162,15 @@ namespace Jondo.Unity.Server.Handlers
             // A reply that starts a fight (content/fights/npc_fights.json): the tutorial's chafers.
             long talkedOn = SessionContext.State.OpenDialogueMapId != 0 ? SessionContext.State.OpenDialogueMapId : SessionContext.State.MapId;
             var npcFight = NpcFights.For(SessionContext.State.OpenDialogueNpcId, talkedOn, reply);
+            // The same reply offered as a step further for one character and a fight for another --
+            // the guardian of the bridge of death's right and wrong answers --: the one offered here
+            // goes on to a line, so it is the conversation and not the fight.
+            if (npcFight != null)
+            {
+                var offered = NpcDialogues.For(SessionContext.State.OpenDialogueNpcId, SessionContext.State.OpenDialogueMapId)
+                                          ?.Line(SessionContext.State.OpenDialogueMessage)?.Choice(reply, SeLeOfrece);
+                if (offered != null && offered.Next != 0 && offered.Criterion.Length > 0) npcFight = null;
+            }
             if (npcFight != null)
             {
                 // Only a reply this character is offered: Klaus Konbah's fight of «Eterno descanso»
@@ -1186,6 +1198,9 @@ namespace Jondo.Unity.Server.Handlers
                 // in for whoever sides with the bworks.
                 if (fightChoice != null && fightChoice.Forfeits != 0)
                     await Managers.Quests.ForfeitAsync(stream, fightChoice.Forfeits);
+                // And its stagings: the tutorial's camera on the Celestial Puch.
+                if (fightChoice != null && fightChoice.Stagings.Count > 0)
+                    await Managers.MapStagings.PlayAsync(stream, fightChoice.Stagings);
                 CerrarConversacion();
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(ConnectionProtocol.NpcDialogCloseReason)));
@@ -1578,6 +1593,11 @@ namespace Jondo.Unity.Server.Handlers
 
             // PortailIncarnam.pcapng: actor 4398, not Anemo, owns the crossing. Keep its destination
             // and exact landing cell in teleports.json, without declaring a fake map interactive.
+            // The stagings the reply plays (MapStagings): the tutorial's path to the next island
+            // on «Ver cómo se materializa un camino».
+            if (elegidaAhora != null && elegidaAhora.Stagings.Count > 0)
+                await Managers.MapStagings.PlayAsync(stream, elegidaAhora.Stagings);
+
             if (elegidaAhora != null && elegidaAhora.TeleportPassage != 0)
             {
                 if (SessionContext.State.IsInFight || SessionContext.State.MapId != dondeHabla ||

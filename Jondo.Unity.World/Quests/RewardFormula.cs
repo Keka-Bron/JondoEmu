@@ -39,7 +39,9 @@ namespace Jondo.Unity.World.Quests
     /// </code>
     ///
     /// with a bonus of 5 % for every character but the last, which had 110 % — the bonus comes
-    /// from the character, not from the reward, and this emulator does not model it.
+    /// from the character, not from the reward: the f1 − 100 of the hox, which every character
+    /// gets here as in every capture (CombatExperience.CharacterBonusPercent), and which
+    /// achievements and quests pay as fights do.
     ///
     /// <b>Two places where the server's rounding is not the client's.</b> The client truncates
     /// the 0.3 and the 0.7 halves separately, and multiplies by the bonus in float. With that

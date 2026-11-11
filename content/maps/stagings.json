@@ -1,0 +1,40 @@
+{
+  "_comment": [
+    "The stagings (hpm) a map shows, as the capture of the whole guided tutorial plays them",
+    "(Managers.MapStagings). The ones a reply plays are its «stagings» in content/npcs/dialogues.json,",
+    "and the ones around a line said without a click, its push's «stagingsBefore» and «stagings».",
+    "",
+    "  arrivals  { map, stagings, breed?, criterion? }  shown played out (hpm f1 100) to whoever",
+    "            enters the map, after its actors; «breed» adds the character's breed number, the",
+    "            staging of his god's statue (the capture's 11, a Sacrier's; 2 raises Osamodas' beast);",
+    "            «criterion» (Managers.PlayerCriteria: Qo> done, Qa= under way, Qf= finished) for one",
+    "            standing only once the quest has got that far",
+    "  elements  { map, element, stagings }     played from the start on using that element (iwo)",
+    "",
+    "THE GUIDED TUTORIAL. On waking, his god's statue stands raised (his breed). «Desplazarte.»",
+    "plays 902; the three steps 912, then the voice's line on the god, then 302; «Ver cómo se",
+    "materializa un camino» 901 and 102, the path off the island. Ganymed's room stands with 102 and",
+    "910 played out, the gobballs' with 104, the fight room with 108; Ganymed plays 904 on sending",
+    "the character to the Celestial Puch, 909 on handing over the gear, 106 on sending him to Master",
+    "Hoboulo; Master Hoboulo 908 on sending him to the resources and 108 on sending him on to the",
+    "fight room. The five resources of the jobs room play 9071-9075 as they are picked. A path already",
+    "built stands built when the room is entered again: the criteria below, not in the capture,",
+    "which only walks each room once."
+  ],
+  "arrivals": [
+    {"map": 241437185, "stagings": [], "breed": true},
+    {"map": 241437185, "stagings": [102], "criterion": "Qo>19534|Qf=2545"},
+    {"map": 241438721, "stagings": [102, 910]},
+    {"map": 241439745, "stagings": [104]},
+    {"map": 241439745, "stagings": [106], "criterion": "Qa=1629|Qf=1629"},
+    {"map": 241440769, "stagings": [108], "criterion": "Qa=1630|Qf=1630"},
+    {"map": 241441793, "stagings": [108]}
+  ],
+  "elements": [
+    {"map": 241440769, "element": 541428, "stagings": [9071]},
+    {"map": 241440769, "element": 541424, "stagings": [9072]},
+    {"map": 241440769, "element": 541425, "stagings": [9073]},
+    {"map": 241440769, "element": 541426, "stagings": [9074]},
+    {"map": 241440769, "element": 541427, "stagings": [9075]}
+  ]
+}

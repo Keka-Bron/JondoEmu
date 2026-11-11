@@ -15,20 +15,33 @@ namespace Jondo.Unity.Server.Managers
     /// really touch. The guided tutorial's rooms do not: each is its own island, and the capture of
     /// the whole tutorial lands the character on cell 84 facing 1 on every one of them, whatever
     /// cell of the previous room's right edge it walked off from. The rule put it on 412.
+    ///
+    /// A room crossed into from both sides lands on a different cell from each, so an arrival can
+    /// name the map it comes from («from»): the Celestial Temple's middle room is entered on cell 84
+    /// from the Dofusarium and on 475 from the room of the exit, its two borders. One without
+    /// «from» holds for any arrival the others do not name, teleports included.
     /// </remarks>
     public static class MeasuredArrivals
     {
         /// <summary>The file, relative to the content root.</summary>
         public const string AuthoredFile = "maps/arrivals.json";
 
-        private static Dictionary<long, (int Cell, int Orientation)>? _arrivals;
+        private static Dictionary<(long Map, long From), (int Cell, int Orientation)>? _arrivals;
         private static readonly object _lock = new();
 
         /// <summary>The measured landing on a map crossed into, if there is one.</summary>
         public static bool TryGet(long mapId, out int cell, out int orientation)
+            => TryGet(mapId, 0, out cell, out orientation);
+
+        /// <summary>
+        /// The measured landing on a map crossed into from another: the one written for that map
+        /// of origin, else the map's own.
+        /// </summary>
+        public static bool TryGet(long mapId, long fromMapId, out int cell, out int orientation)
         {
             Load();
-            if (_arrivals!.TryGetValue(mapId, out var arrival))
+            if ((fromMapId != 0 && _arrivals!.TryGetValue((mapId, fromMapId), out var arrival))
+                || _arrivals!.TryGetValue((mapId, 0), out arrival))
             {
                 cell = arrival.Cell;
                 orientation = arrival.Orientation;
@@ -50,7 +63,7 @@ namespace Jondo.Unity.Server.Managers
             lock (_lock)
             {
                 if (_arrivals != null) return;
-                var arrivals = new Dictionary<long, (int, int)>();
+                var arrivals = new Dictionary<(long, long), (int, int)>();
                 try
                 {
                     string path = Paths.ContentFile(AuthoredFile);
@@ -62,7 +75,8 @@ namespace Jondo.Unity.Server.Managers
                             long map = entry.GetProperty("map").GetInt64();
                             int cell = entry.GetProperty("cell").GetInt32();
                             int orientation = entry.TryGetProperty("orientation", out var facing) ? facing.GetInt32() : -1;
-                            if (map > 0 && cell >= 0 && cell < 560) arrivals[map] = (cell, orientation);
+                            long from = entry.TryGetProperty("from", out var origin) ? origin.GetInt64() : 0;
+                            if (map > 0 && cell >= 0 && cell < 560) arrivals[(map, from)] = (cell, orientation);
                         }
                     }
                 }

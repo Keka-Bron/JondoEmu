@@ -210,11 +210,10 @@
   {
    "objective": 19169,
    "quest": 2502,
-   "kind": "talk",
-   "npc": 7581,
-   "map": 241438721,
+   "kind": "reply",
+   "replies": [77737],
    "gives": [{"item": 10784}, {"item": 10785}, {"item": 10794}, {"item": 10799}, {"item": 10800}, {"item": 10801}],
-   "why": "«Habla con Ganymed para comenzar una nueva misión». In the capture talking to him after the first fight closes it (idz 3169), puts the six items of his «He metido algunos objetos en tu bolsa» in the bag (iua 10784, 10785, 10794, 10799, 10800, 10801); 2511 «Primeras armas» starts on his reply (ief 2511), see content/npcs/dialogues.json."
+   "why": "«Habla con Ganymed para comenzar una nueva misión». In the tutorial capture it is his reply «Buscar en tu bolsa los objetos y equipártelos» (77737) that closes it (idz 3169) and then puts the six items of his «He metido algunos objetos en tu bolsa» in the bag (lqn 21 for 10784, 10785, 10794, 10799, 10800, 10801), before 2511 «Primeras armas» starts (ief 2511). Not on the hello, which would pick the opening of the next step before this line is said."
   },
   {
    "objective": 19538,

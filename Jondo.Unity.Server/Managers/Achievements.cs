@@ -136,16 +136,21 @@ namespace Jondo.Unity.Server.Managers
             var rowsOf = account != 0
                 ? DatabaseManager.LoadAccountAchievements(account)
                 : DatabaseManager.LoadAchievements(characterId)
-                    .Select(r => (CharacterId: characterId, r.Achievement, r.Claimed)).ToList();
+                    .Select(r => (CharacterId: characterId, r.Achievement, r.Claimed, Level: 0)).ToList();
 
             int rows = 0;
             foreach (var group in rowsOf.GroupBy(r => r.Achievement))
             {
+                // One every character earns for himself (the guided tutorial's «Primer tiempo»):
+                // another character's leaves it to be earned and paid again.
+                if (_book.Of(group.Key)?.EachCharacter == true && group.All(r => r.CharacterId != characterId)) continue;
+
                 bool claimed = group.Any(r => r.Claimed);
                 long achiever = group.Any(r => r.CharacterId == characterId) ? characterId
                                 : group.Where(r => r.Claimed).Select(r => r.CharacterId).FirstOrDefault();
                 if (achiever == 0) achiever = group.First().CharacterId;
                 log.Restore(group.Key, claimed, achiever);
+                log.NoteLevel(group.Key, group.Where(r => r.CharacterId == achiever).Select(r => r.Level).FirstOrDefault());
                 rows++;
             }
 
@@ -187,7 +192,10 @@ namespace Jondo.Unity.Server.Managers
             foreach (int id in log.Earned.OrderBy(i => i))
             {
                 long by = log.AchieverOf(id);
-                list.Add((id, by != 0 ? by : characterId, log.WasClaimed(id) ? 0 : LevelOnTheWire(level)));
+                // The level it was earned at, which the window reckons the reward at; the
+                // character's own for one earned before that was kept.
+                int earnedAt = log.LevelOf(id);
+                list.Add((id, by != 0 ? by : characterId, log.WasClaimed(id) ? 0 : LevelOnTheWire(earnedAt > 0 ? earnedAt : level)));
             }
 
             return list;
@@ -494,7 +502,9 @@ namespace Jondo.Unity.Server.Managers
             foreach (int achievementId in earned)
             {
                 Log?.Credit(achievementId, state.CharacterId);
-                DatabaseManager.SaveAchievement(state.CharacterId, achievementId, claimed: false);
+                Log?.NoteLevel(achievementId, LevelOnTheWire(state.CharacterLevel));
+                DatabaseManager.SaveAchievement(state.CharacterId, achievementId, claimed: false,
+                                                level: LevelOnTheWire(state.CharacterLevel));
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Mfu, AchievementProtocol.BuildEarned(
@@ -625,22 +635,34 @@ namespace Jondo.Unity.Server.Managers
             var log = Log;
             if (log == null || _book == null) return;
 
+            // Only what this character achieved: the client's «Recompensas» window lists the unpaid
+            // achievements whose achiever (mft) is the character playing, and «Obtenerlo todo» (-1)
+            // means those. Paying every unpaid one of the account handed a new character of an
+            // account with others the rewards of a hundred achievements it was never shown.
+            var state = SessionContext.State;
+            bool Mine(int id) => log.AchieverOf(id) is var by && (by == 0 || by == state.CharacterId);
+
             var owed = new List<int>();
             if (achievementId > 0)
             {
-                if (log.Has(achievementId) && !log.WasClaimed(achievementId)) owed.Add(achievementId);
+                if (log.Has(achievementId) && !log.WasClaimed(achievementId) && Mine(achievementId)) owed.Add(achievementId);
             }
             else
             {
-                owed.AddRange(log.Unclaimed().OrderBy(i => i));
+                owed.AddRange(log.Unclaimed().Where(Mine).OrderBy(i => i));
             }
 
-            var state = SessionContext.State;
             bool levelled = false;
             foreach (int id in owed)
             {
                 // Judged before it is marked paid: "Ob!<itself>" is the commonest reward condition.
-                var payout = log.Payout(id, state.CharacterLevel);
+                // With the character's experience bonus, which the client adds to what its window
+                // shows: «Primer tiempo» is 115 there and in the capture, 110 without it.
+                // At the level it was earned at, as the window shows it: «Segundo tiempo», earned at
+                // level 1 by leaving the tutorial, shows 115 there and not the 241 of level 2.
+                int earnedAt = log.LevelOf(id);
+                var payout = log.Payout(id, earnedAt > 0 ? earnedAt : state.CharacterLevel,
+                                        CombatExperience.CharacterBonusPercent);
                 if (!log.MarkClaimed(id)) continue;
                 // Paid on the row of whoever achieved it: the account's achievement, paid once.
                 long achiever = log.AchieverOf(id);

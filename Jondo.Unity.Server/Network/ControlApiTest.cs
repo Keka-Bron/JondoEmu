@@ -98,6 +98,7 @@ namespace Jondo.Unity.Server.Network
                 "close" => TestCloseDialogue(),
                 "use" => TestUse(cuerpo),
                 "useitem" => TestUseItem(cuerpo),
+                "command" => TestCommand(cuerpo),
                 "goto" => TestGoto(cuerpo),
                 "give" => TestGive(cuerpo),
                 "quests" => TestQuests(),
@@ -158,7 +159,11 @@ namespace Jondo.Unity.Server.Network
                 .Select(c => new { c.Id, c.Name, c.Breed, c.Level }).ToList());
         }
 
-        /// <summary>A character of a class for the harness, at a level, made as a creation makes one.</summary>
+        /// <summary>
+        /// A character of a class for the harness, at a level. Beside the Astrub zaap, or with
+        /// { tutorial: 1 } where a real creation wakes him: before the god's statue of the guided
+        /// tutorial, at level 1.
+        /// </summary>
         private static Respuesta TestCreate(string cuerpo)
         {
             int breed = (int)Numero(cuerpo, "breed");
@@ -169,11 +174,18 @@ namespace Jondo.Unity.Server.Network
             string name = Texto(cuerpo, "name");
             if (name.Length == 0) name = $"Prueba-{breed:D2}";
             if (DatabaseManager.CharacterNameTaken(name)) return Mal(409, "name");
-            long id = DatabaseManager.CreateCharacter(account, DatabaseManager.DefaultServerId, name, breed, sex,
-                                                      HeadTable.DefaultHeadId(breed, sex), new long[] { -1, -1, -1, -1, -1 },
-                                                      CharacterCreationHandler.StartingMap, level,
-                                                      CharacterCreationHandler.StartingKamas, CharacterCreationHandler.ScrolledStat,
-                                                      CharacterCreationHandler.StarterItems);
+            bool tutorial = Numero(cuerpo, "tutorial") != 0;
+            long id = tutorial
+                ? DatabaseManager.CreateCharacter(account, DatabaseManager.DefaultServerId, name, breed, sex,
+                                                  HeadTable.DefaultHeadId(breed, sex), new long[] { -1, -1, -1, -1, -1 },
+                                                  CharacterCreationHandler.TutorialMap, CharacterCreationHandler.StartingLevel,
+                                                  CharacterCreationHandler.StartingKamas, CharacterCreationHandler.ScrolledStat,
+                                                  CharacterCreationHandler.StarterItems, CharacterCreationHandler.TutorialCell)
+                : DatabaseManager.CreateCharacter(account, DatabaseManager.DefaultServerId, name, breed, sex,
+                                                  HeadTable.DefaultHeadId(breed, sex), new long[] { -1, -1, -1, -1, -1 },
+                                                  CharacterCreationHandler.StartingMap, level,
+                                                  CharacterCreationHandler.StartingKamas, CharacterCreationHandler.ScrolledStat,
+                                                  CharacterCreationHandler.StarterItems);
             return id == 0 ? Mal(500, "create") : Bien(new { id, name, breed, level });
         }
 
@@ -475,6 +487,10 @@ namespace Jondo.Unity.Server.Network
                         // An item put on or taken off, as dragging it to its slot sends: a quest's cannon
                         // that asks for a helmet and wings worn.
                         else if (op == Op.Iuk) await EquipmentHandler.MoveAsync(stream, frame);
+                        // Off a border, as the client asks once it walks onto the edge: its guess at the
+                        // map beside, from the cell it stands on. Synthetic clicks on an edge do not
+                        // make the client send it.
+                        else if (op == Op.Jqk) await WorldMoveHandler.ChangeMapAsync(stream, frame);
                         else throw new InvalidOperationException($"op {op} is not one the harness sends");
                     }
                     finally

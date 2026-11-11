@@ -33,6 +33,12 @@
       "item": 19650,
       "criterion": "Qo=13820&PO!19650&Po=18",
       "why": "Muestra de pescado contaminado: a gudgeon fished in Astrub («en pêchant du Goujon dans le Lac»)."
+    },
+    {
+      "resource": 593,
+      "item": 13153,
+      "criterion": "Qo=551&PO<13153,20",
+      "why": "Orquídea salvaje: «Vous en obtiendrez une pour chaque Orchidée Freyesque récoltée dans la zone du Territoire des Dragodindes Sauvages. Pour récolter ces plantes il faut être alchimiste niveau 80 minimum» (Dofus pour les noobs, «Des fleurs épineuses»), while Maskara's twenty are not all carried."
     }
   ]
 }

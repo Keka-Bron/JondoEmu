@@ -54,6 +54,9 @@ namespace Jondo.Unity.Server.Handlers
                 DatabaseManager.RememberElement(GameState.CharacterId, elementId);
             }
 
+            // The staging the element plays when used (MapStagings): the tutorial's resources.
+            if (elementId != 0) await Managers.MapStagings.PlayAsync(stream, Managers.MapStagings.OfElement(mapId, elementId));
+
             // Is it something to be read? It goes before quests because a notice is not an
             // objective: the tavern's job offer does not appear in any step of the quest it opens,
             // and it still has to be shown.

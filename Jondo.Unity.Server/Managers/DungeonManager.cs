@@ -61,6 +61,12 @@ namespace Jondo.Unity.Server.Managers
             public bool AutoGroup { get; set; }
 
             /// <summary>
+            /// Written by hand in content/world/dungeons.json, its rooms in the order they are
+            /// fought: the mini-dungeons a quest NPC takes you into, which the catalogue lacks.
+            /// </summary>
+            public bool Authored { get; set; }
+
+            /// <summary>
             /// What has to be in the bag to get in: item id and how many. 126 of the 187 ask for
             /// something.
             /// </summary>
@@ -224,6 +230,13 @@ namespace Jondo.Unity.Server.Managers
                 if (dungeon.Rooms.Count == 0)
                 {
                     dungeon.LastRoom = 0;
+                    continue;
+                }
+
+                // A hand-written dungeon is already in its order; its last room is its boss room.
+                if (dungeon.Authored)
+                {
+                    dungeon.LastRoom = dungeon.Rooms[^1];
                     continue;
                 }
 
@@ -590,6 +603,13 @@ namespace Jondo.Unity.Server.Managers
             return chain.Count == rooms.Count ? chain : null;
         }
 
+        /// <summary>
+        /// The mini-dungeons a person declared, in the same form as the client's: rooms a fight
+        /// leads through with no key at their door -- Doctor Nauch's laboratory of «Le fils caché»,
+        /// whose rooms the client's dungeon list does not hold.
+        /// </summary>
+        public const string AuthoredFile = "world/dungeons.json";
+
         private static bool Read()
         {
             string path = Paths.DungeonsJson;
@@ -599,13 +619,21 @@ namespace Jondo.Unity.Server.Managers
                                   "run extract_dungeons.py.");
                 return false;
             }
+            bool read = Read(path);
+            string authored = Paths.ContentFile(AuthoredFile);
+            if (File.Exists(authored)) Read(authored, authored: true);
+            return read;
+        }
 
+        private static bool Read(string path, bool authored = false)
+        {
             try
             {
                 using var doc = JsonDocument.Parse(File.ReadAllText(path));
                 foreach (var entry in doc.RootElement.EnumerateObject())
                 {
                     if (!int.TryParse(entry.Name, out int id)) continue;
+                    if (entry.Value.ValueKind != JsonValueKind.Object) continue;
 
                     var dungeon = new Dungeon
                     {
@@ -616,6 +644,7 @@ namespace Jondo.Unity.Server.Managers
                         Difficulty = Number(entry.Value, "difficulty"),
                         EntranceMapId = Long(entry.Value, "entrance"),
                         ExitMapId = Long(entry.Value, "exit"),
+                        Authored = authored,
                     };
 
                     if (entry.Value.TryGetProperty("rooms", out var rooms))
@@ -750,6 +779,9 @@ namespace Jondo.Unity.Server.Managers
             foreach (var dungeon in _byId.Values)
             {
                 if (dungeon.EntranceMapId != mapId) continue;
+                // A hand-written one has no door: its NPC's tree takes you in (Doctor Niet's
+                // «Entrar en el laboratorio»), and his other replies are his own.
+                if (dungeon.Authored) continue;
                 if (best == null || dungeon.Id < best.Id) best = dungeon;
             }
 

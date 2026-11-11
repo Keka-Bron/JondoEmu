@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Network;
@@ -216,6 +217,28 @@ namespace Jondo.Unity.Server.Handlers
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
+            }
+
+            // And the sets the item belongs to (iwd): the pieces now worn and the bonus for that
+            // many. The real server sends it on every equip and unequip -- set 150 «Set del
+            // intrépido» growing piece by piece in the tutorial capture, its effects as {11 effect,
+            // 4 value} --, and the guided tutorial's «Equipa a tu personaje» is only validated by the
+            // client (idw) once it has seen the whole set worn.
+            var moved = Managers.Equipment.ByUid(uid);
+            if (moved != null)
+            {
+                var worn = Managers.Equipment.WornTemplates();
+                foreach (int setId in Managers.ItemSets.SetsOf(moved.Template))
+                {
+                    var (pieces, bonus) = Managers.ItemSets.Standing(setId, worn);
+                    var update = Pb.New();
+                    foreach (var (effect, value) in bonus)
+                        update.Msg(1, Pb.New().Var(11, effect).Var(4, value));
+                    update.Var(2, setId);
+                    if (pieces.Count > 0) update.Packed(3, pieces.Select(p => (long)p));
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Iwd, update.Build()));
+                }
             }
 
             // And the sheet, because what the item gives goes with it. Without this the numbers

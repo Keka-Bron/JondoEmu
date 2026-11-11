@@ -680,11 +680,13 @@ played through.
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Incarnam | `██████████` **100%** | 24/24 |
 | Wabbit Islands | `██████░░░░` **61%** | 14/23 |
-| Bwork and Goblin Camps | `█████████░` **92%** | 11/12 |
+| Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
+| Otomai Island | `█████████░` **86%** | 12/14 |
 | Moon Island | `██████████` **100%** | 10/10 |
+| Koalak Mountain | `█████████░` **86%** | 6/7 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Wanted Notices | `░░░░░░░░░░` **1%** | 1/82 |
-| **All quests** | **7.6%** | **150/1976** |
+| **All quests** | **8.6%** | **169/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

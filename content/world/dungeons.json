@@ -1,0 +1,35 @@
+{
+  "_comment": [
+    "Mini-dungeons the catalogue (datos/dungeons.json) does not have: the ones a quest NPC takes you",
+    "into. Same fields; the rooms are kept in the order written and the last one is the boss room",
+    "(DungeonManager.Dungeon.Authored). Ids above the catalogue's (it ends at 205)."
+  ],
+  "9001": {
+    "name": "Laboratorio Secreto",
+    "minLevel": 0,
+    "entrance": 159236,
+    "exit": 159236,
+    "rooms": [
+      90177536,
+      90178560,
+      90179584,
+      90180608
+    ],
+    "why": "Doctor Niet's hidden laboratory under the grassy plains [-55,4] (subarea 473): «Le fils caché» (237) of Dofus pour les noobs, «4 x combats», First to Fourth Room, then the Exit room where his son Juan hides."
+  },
+  "9002": {
+    "name": "Tronco del Árbol Hakam",
+    "minLevel": 0,
+    "entrance": 25691144,
+    "exit": 25691144,
+    "rooms": [
+      24117761,
+      24118785,
+      24117765,
+      24118789,
+      24118793,
+      24118794
+    ],
+    "why": "The trunk of the Hakam tree (subarea 464) where Doctor Morros takes you after his wife: «La femme perdue» (238) of Dofus pour les noobs, «téléporté dans un mini-donjon infesté de mobs», «6 x combats», then «vous trouvez sa femme». The trunk is three closed 3x3 mazes no map leads into, with the passages 537142-537160 and the closed platform 24119823 (537161) at their centre. INFERRED rooms: the six maps of the passages, two per maze."
+  }
+}

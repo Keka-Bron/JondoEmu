@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace Jondo.Unity.Server.Managers
@@ -20,6 +21,7 @@ namespace Jondo.Unity.Server.Managers
     {
         private sealed class Set
         {
+            public int Id;
             public readonly List<int> Items = new List<int>();
             /// <summary>how many pieces -> the effects that gives.</summary>
             public readonly Dictionary<int, List<(int Effect, long Value)>> Bonuses =
@@ -84,7 +86,7 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var entry in doc.RootElement.EnumerateObject())
                 {
                     if (!int.TryParse(entry.Name, out int setId)) continue;
-                    var set = new Set();
+                    var set = new Set { Id = setId };
 
                     if (entry.Value.TryGetProperty("items", out var items))
                     {
@@ -154,6 +156,28 @@ namespace Jondo.Unity.Server.Managers
 
             items = Array.Empty<int>();
             return false;
+        }
+
+        /// <summary>The sets an item belongs to.</summary>
+        public static IReadOnlyList<int> SetsOf(int template)
+        {
+            Ensure();
+            return _byItem.TryGetValue(template, out var sets) ? sets.Select(set => set.Id).ToList() : new List<int>();
+        }
+
+        /// <summary>
+        /// One set as it stands on a character wearing these items: its pieces worn, and the bonus
+        /// for exactly that many (none under two) -- what the set update (iwd) carries.
+        /// </summary>
+        public static (IReadOnlyList<int> Worn, IReadOnlyList<(int Effect, long Value)> Bonus) Standing(int setId, IEnumerable<int> wornTemplates)
+        {
+            Ensure();
+            if (!_byId.TryGetValue(setId, out var set))
+                return (new List<int>(), new List<(int, long)>());
+            var worn = wornTemplates.Where(set.Items.Contains).Distinct().ToList();
+            var bonus = worn.Count >= 2 && set.Bonuses.TryGetValue(worn.Count, out var effects)
+                ? effects : new List<(int, long)>();
+            return (worn, bonus);
         }
 
         /// <summary>

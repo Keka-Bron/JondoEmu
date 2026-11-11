@@ -7524,183 +7524,269 @@
         { "quest": 2545, "message": 60409 }
       ],
       "pushes": [
-        { "afterStep": 3226, "byBreed": { "1": 60313, "2": 60315, "3": 60316, "4": 60318, "5": 60321, "6": 60323, "7": 60325, "8": 60327, "9": 60329, "10": 60331, "11": 60333, "12": 60335, "13": 60337, "14": 60339, "15": 60341, "16": 60343, "17": 60345, "18": 60347, "20": 60349 } }
+        { "afterStep": 3226, "byBreed": { "1": 60313, "2": 60315, "3": 60316, "4": 60318, "5": 60321, "6": 60323, "7": 60325, "8": 60327, "9": 60329, "10": 60331, "11": 60333, "12": 60335, "13": 60337, "14": 60339, "15": 60341, "16": 60343, "17": 60345, "18": 60347, "20": 60349 }, "stagingsBefore": [912], "stagings": [302] }
       ],
       "lines": [
         {
           "message": 60352,
-          "choices": [{ "reply": 83101, "startsQuest": 2545, "params": [2192] }]
+          "choices": [
+            { "reply": 83101, "startsQuest": 2545, "params": [2192], "stagings": [902] }
+          ]
         },
         {
           "message": 60313,
-          "choices": [{ "reply": 82948, "next": 60314 }]
+          "choices": [
+            { "reply": 82948, "next": 60314 }
+          ]
         },
         {
           "message": 60314,
-          "choices": [{ "reply": 82947, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82947, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60315,
-          "choices": [{ "reply": 82954, "next": 60320 }]
+          "choices": [
+            { "reply": 82954, "next": 60320 }
+          ]
         },
         {
           "message": 60320,
-          "choices": [{ "reply": 82953, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82953, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60316,
-          "choices": [{ "reply": 82950, "next": 60317 }]
+          "choices": [
+            { "reply": 82950, "next": 60317 }
+          ]
         },
         {
           "message": 60317,
-          "choices": [{ "reply": 82949, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82949, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60318,
-          "choices": [{ "reply": 82952, "next": 60319 }]
+          "choices": [
+            { "reply": 82952, "next": 60319 }
+          ]
         },
         {
           "message": 60319,
-          "choices": [{ "reply": 82951, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82951, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60321,
-          "choices": [{ "reply": 82956, "next": 60322 }]
+          "choices": [
+            { "reply": 82956, "next": 60322 }
+          ]
         },
         {
           "message": 60322,
-          "choices": [{ "reply": 82955, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82955, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60323,
-          "choices": [{ "reply": 82958, "next": 60324 }]
+          "choices": [
+            { "reply": 82958, "next": 60324 }
+          ]
         },
         {
           "message": 60324,
-          "choices": [{ "reply": 82957, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82957, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60325,
-          "choices": [{ "reply": 82960, "next": 60326 }]
+          "choices": [
+            { "reply": 82960, "next": 60326 }
+          ]
         },
         {
           "message": 60326,
-          "choices": [{ "reply": 82959, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82959, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60327,
-          "choices": [{ "reply": 82962, "next": 60328 }]
+          "choices": [
+            { "reply": 82962, "next": 60328 }
+          ]
         },
         {
           "message": 60328,
-          "choices": [{ "reply": 82961, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82961, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60329,
-          "choices": [{ "reply": 82964, "next": 60330 }]
+          "choices": [
+            { "reply": 82964, "next": 60330 }
+          ]
         },
         {
           "message": 60330,
-          "choices": [{ "reply": 82963, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82963, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60331,
-          "choices": [{ "reply": 82966, "next": 60332 }]
+          "choices": [
+            { "reply": 82966, "next": 60332 }
+          ]
         },
         {
           "message": 60332,
-          "choices": [{ "reply": 82965, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82965, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60333,
-          "choices": [{ "reply": 82968, "next": 60334 }]
+          "choices": [
+            { "reply": 82968, "next": 60334 }
+          ]
         },
         {
           "message": 60334,
-          "choices": [{ "reply": 82967, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82967, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60335,
-          "choices": [{ "reply": 82970, "next": 60336 }]
+          "choices": [
+            { "reply": 82970, "next": 60336 }
+          ]
         },
         {
           "message": 60336,
-          "choices": [{ "reply": 82969, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82969, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60337,
-          "choices": [{ "reply": 82972, "next": 60338 }]
+          "choices": [
+            { "reply": 82972, "next": 60338 }
+          ]
         },
         {
           "message": 60338,
-          "choices": [{ "reply": 82971, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82971, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60339,
-          "choices": [{ "reply": 82974, "next": 60340 }]
+          "choices": [
+            { "reply": 82974, "next": 60340 }
+          ]
         },
         {
           "message": 60340,
-          "choices": [{ "reply": 82973, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82973, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60341,
-          "choices": [{ "reply": 82976, "next": 60342 }]
+          "choices": [
+            { "reply": 82976, "next": 60342 }
+          ]
         },
         {
           "message": 60342,
-          "choices": [{ "reply": 82975, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82975, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60343,
-          "choices": [{ "reply": 82978, "next": 60344 }]
+          "choices": [
+            { "reply": 82978, "next": 60344 }
+          ]
         },
         {
           "message": 60344,
-          "choices": [{ "reply": 82977, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82977, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60345,
-          "choices": [{ "reply": 82980, "next": 60346 }]
+          "choices": [
+            { "reply": 82980, "next": 60346 }
+          ]
         },
         {
           "message": 60346,
-          "choices": [{ "reply": 82979, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82979, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60347,
-          "choices": [{ "reply": 82982, "next": 60348 }]
+          "choices": [
+            { "reply": 82982, "next": 60348 }
+          ]
         },
         {
           "message": 60348,
-          "choices": [{ "reply": 82981, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82981, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60349,
-          "choices": [{ "reply": 82984, "next": 60350 }]
+          "choices": [
+            { "reply": 82984, "next": 60350 }
+          ]
         },
         {
           "message": 60350,
-          "choices": [{ "reply": 82983, "params": [2192, 2192] }]
+          "choices": [
+            { "reply": 82983, "params": [2192, 2192], "stagings": [901, 102] }
+          ]
         },
         {
           "message": 60409,
-          "choices": [{ "reply": 83114, "next": 60415 }]
+          "choices": [
+            { "reply": 83114, "next": 60415 }
+          ]
         },
         {
           "message": 60415,
-          "choices": [{ "reply": 83113, "next": 60416 }]
+          "choices": [
+            { "reply": 83113, "next": 60416 }
+          ]
         },
         {
           "message": 60416,
-          "choices": [{ "reply": 83115, "next": 60417 }]
+          "choices": [
+            { "reply": 83115, "next": 60417 }
+          ]
         },
         {
           "message": 60417,
-          "choices": [{ "reply": 83116 }]
+          "choices": [
+            { "reply": 83116 }
+          ]
         }
       ],
-      "why": "The guided tutorial's Mysterious Voice, as the capture of the whole tutorial has it: 60352 «¿Estás bien?» with «Desplazarte.» (effect 2192), which starts 2545; the first steps walked (idz 3226) and the voice opens by itself on the god of the character's class, then «Basta de cháchara» and «Ver cómo se materializa un camino» (2192 twice), and the window closes. The god's line, its reply and the next line are the class's own, in breed order. Whoever lingers gets the four lines that tell them to go, each answered by the next of its four replies."
+      "why": "The guided tutorial's Mysterious Voice, as the capture of the whole tutorial has it: 60352 «¿Estás bien?» with «Desplazarte.» (effect 2192), which starts 2545; the first steps walked (idz 3226) and the voice opens by itself on the god of the character's class, then «Basta de cháchara» and «Ver cómo se materializa un camino» (2192 twice), and the window closes. The god's line, its reply and the next line are the class's own, in breed order. Whoever lingers gets the four lines that tell them to go, each answered by the next of its four replies. The capture's stagings (Managers.MapStagings): 902 on «Desplazarte.», 912 and 302 around the line on the god once the steps are walked, 901 and 102 on «Ver cómo se materializa un camino», the path off the island."
     },
     {
       "npc": 7581,
@@ -7709,32 +7795,43 @@
       "openings": [
         { "quest": 2545, "message": 57134 },
         { "quest": 2502, "step": 3169, "message": 57133 },
+        { "quest": 2502, "step": 3170, "before": 2511, "message": 57133 },
         { "quest": 2511, "message": 57144 },
         { "quest": 2502, "before": 2511, "message": 57142 }
       ],
       "lines": [
         {
           "message": 57134,
-          "choices": [{ "reply": 77738, "params": [2192, 192] }]
+          "choices": [
+            { "reply": 77738, "params": [2192, 192], "stagings": [904], "quest": 2545, "completes": 19535 }
+          ]
         },
         {
           "message": 57142,
-          "choices": [{ "reply": 77738 }]
+          "choices": [
+            { "reply": 77738, "stagings": [904] }
+          ]
         },
         {
           "message": 57133,
-          "choices": [{ "reply": 77737, "startsQuest": 2511, "params": [193, 193, 193, 193, 193, 193, [34, 2511], 2192] }]
+          "choices": [
+            { "reply": 77737, "startsQuest": 2511, "params": [193, 193, 193, 193, 193, 193, [34, 2511], 2192], "stagings": [909] }
+          ]
         },
         {
           "message": 57144,
-          "choices": [{ "reply": 77739 }]
+          "choices": [
+            { "reply": 77739 }
+          ]
         },
         {
           "message": 60414,
-          "choices": [{ "reply": 77739 }]
+          "choices": [
+            { "reply": 77739 }
+          ]
         }
       ],
-      "why": "Ganymed on the celestial puch's platform, as the tutorial capture has him: 57134 «Te doy la bienvenida a Incarnam» with «Dirigirte hacia el puch celestial para atacarlo» (2192, 192) while 2545 waits on him; back from the first fight (2502 on 3169) 57133 «¡Bravo! He metido algunos objetos en tu bolsa» with «Buscar en tu bolsa los objetos y equipártelos», six 193 for the six items and 34 «Empieza una misión» naming 2511. Before that fight, his «¡Adelante, sin miedo!»; with 2511 under way, «Con tu nuevo equipo...»; afterwards, the puch is there to train on."
+      "why": "Ganymed on the celestial puch's platform, as the tutorial capture has him: 57134 «Te doy la bienvenida a Incarnam» with «Dirigirte hacia el puch celestial para atacarlo» (2192, 192) while 2545 waits on him; back from the first fight (2502 on 3169) 57133 «¡Bravo! He metido algunos objetos en tu bolsa» with «Buscar en tu bolsa los objetos y equipártelos», six 193 for the six items and 34 «Empieza una misión» naming 2511. Before that fight, his «¡Adelante, sin miedo!»; with 2511 under way, «Con tu nuevo equipo...»; afterwards, the puch is there to train on. Greeting him does 3169's objective and hands the six items over first, so 57133 is also his line on 3170 while 2511 has not started: the hello no longer skips «Primeras armas». «Dirigirte hacia el puch celestial para atacarlo» is what ends 2545 (19535), as the capture has it (lqn 56 after the reply), so the hello does not skip his welcome."
     },
     {
       "npc": 7581,
@@ -7748,15 +7845,22 @@
       "lines": [
         {
           "message": 57132,
-          "choices": [{ "reply": 77736, "params": [[30, 19173], 1142] }]
+          "choices": [
+            { "reply": 77736, "params": [[30, 19173], 1142], "completes": 19173 }
+          ]
         },
         {
           "message": 60410,
-          "choices": [{ "reply": 77739 }]
+          "choices": [
+            { "reply": 77739 }
+          ]
         },
         {
           "message": 60411,
-          "choices": [{ "reply": 83103, "params": [2192, [34, 1629]] }, { "reply": 83104, "startsQuest": 1629, "params": [2192, [34, 1629]] }]
+          "choices": [
+            { "reply": 83103, "params": [2192, [34, 1629]] },
+            { "reply": 83104, "startsQuest": 1629, "params": [2192, [34, 1629]], "stagings": [106] }
+          ]
         }
       ],
       "why": "Ganymed by the jalatós' pen, as the tutorial capture has him: after the fight (2502 on 3173) 57132 «Tus oponentes han mordido el polvo» with «Dar saltitos de impaciencia» (30 naming objective 19173, then 1142); the characteristic points still to share out (3184), the line on which element each characteristic masters; then 60411 «¿Has elegido tu vía?» with «Quedarte para entrenar» and «Unirte al maestro Curro», both showing 2192 and 34 for quest 1629, the second starting it."
@@ -7776,28 +7880,40 @@
       "lines": [
         {
           "message": 20676,
-          "choices": [{ "reply": 24751, "next": 20677 }]
+          "choices": [
+            { "reply": 24751, "next": 20677 }
+          ]
         },
         {
           "message": 20677,
-          "choices": [{ "reply": 24750, "next": 20678, "params": [[30, 9656], 1150, 1150, 1150, 1150, 1150, 1150, 1150, 1150] }]
+          "choices": [
+            { "reply": 24750, "next": 20678, "params": [[30, 9656], 1150, 1150, 1150, 1150, 1150, 1150, 1150, 1150], "completes": 19252, "completesAll": [9656] }
+          ]
         },
         {
           "message": 20678,
-          "choices": [{ "reply": 24770, "params": [1150, 1150, 1150, 1150, 1150, 2192] }]
+          "choices": [
+            { "reply": 24770, "params": [1150, 1150, 1150, 1150, 1150, 2192], "stagings": [908] }
+          ]
         },
         {
           "message": 20679,
-          "choices": [{ "reply": 24753 }]
+          "choices": [
+            { "reply": 24753 }
+          ]
         },
         {
           "message": 20681,
           "names": true,
-          "choices": [{ "reply": 24754, "startsQuest": 1630, "params": [[34, 1630], 2192] }]
+          "choices": [
+            { "reply": 24754, "startsQuest": 1630, "params": [[34, 1630], 2192], "stagings": [108] }
+          ]
         },
         {
           "message": 57157,
-          "choices": [{ "reply": 24752 }]
+          "choices": [
+            { "reply": 24752 }
+          ]
         }
       ],
       "why": "Master Curro in the tutorial's jobs room, as the capture of the whole tutorial has him: 20676 «¡Saludos, joven!» with «¿Cómo va eso?», then 20677 with «¿Qué materiales me van a hacer falta?» (30 naming objective 9656 and eight 1150), then 20678 with «Explorar el lugar.» (five 1150 and 2192); once the ring is made, 20681 «¡Has trabajado muy bien, #1!», his name in it, with «Dirigirte a la salida.» showing quest 1630 and starting it. In between, the reminder of what the ring needs; afterwards, his «No hay nada como la satisfacción...»."
@@ -7856,27 +7972,39 @@
         {
           "message": 20700,
           "names": true,
-          "choices": [{ "reply": 24786, "next": 20744 }]
+          "choices": [
+            { "reply": 24786, "next": 20744 }
+          ]
         },
         {
           "message": 20744,
-          "choices": [{ "reply": 24849, "next": 57155, "params": [[30, 9685]] }]
+          "choices": [
+            { "reply": 24849, "next": 57155, "params": [[30, 9685]], "completes": 19256, "completesAll": [9685] }
+          ]
         },
         {
           "message": 57155,
-          "choices": [{ "reply": 77757 }]
+          "choices": [
+            { "reply": 77757 }
+          ]
         },
         {
           "message": 20701,
-          "choices": [{ "reply": 77757 }]
+          "choices": [
+            { "reply": 77757 }
+          ]
         },
         {
           "message": 21200,
-          "choices": [{ "reply": 25490, "params": [350, 3007], "thenNpc": 7581 }]
+          "choices": [
+            { "reply": 25490, "params": [350, 3007], "thenNpc": 7581 }
+          ]
         },
         {
           "message": 20702,
-          "choices": [{ "reply": 24784 }]
+          "choices": [
+            { "reply": 24784 }
+          ]
         }
       ],
       "why": "Master Darmas in the combat room, as the tutorial capture has him: 20700 «Eres #1, ¿verdad?», the name in it, with «Estoy dispuesto a demostrar lo que valgo.», then 20744 with «Seguir escuchando.» (30 naming objective 9685), then 57155 with «Dirigirte hacia una criatura para provocarla.»; after the chafers, 21200 «¡Has ganado!» with «Sobresaltarte al ver aparecer a Ganymed» (350, 3007), on which Ganymed comes in (jsn, actor -20004) and speaks."
@@ -7889,15 +8017,21 @@
         {
           "message": 57149,
           "names": true,
-          "choices": [{ "reply": 77750, "next": 57220 }]
+          "choices": [
+            { "reply": 77750, "next": 57220 }
+          ]
         },
         {
           "message": 57220,
-          "choices": [{ "reply": 77870, "next": 57221 }]
+          "choices": [
+            { "reply": 77870, "next": 57221 }
+          ]
         },
         {
           "message": 57221,
-          "choices": [{ "reply": 77869, "params": [[31, 2250], 777], "teleport": 241443329 }]
+          "choices": [
+            { "reply": 77869, "params": [[31, 2250], 777], "teleport": 241443329, "completes": 9734 }
+          ]
         }
       ],
       "why": "Ganymed coming into the combat room after the chafers, as the tutorial capture has him: 57149 «¡Bravo, #1!», 57220 on changing class while a novice, 57221 «Antes de que abandones el templo...» with «Seguir a Ganymed» (31 naming step 2250, 777), which takes the player to the Dofusarium (jru 241443329)."
@@ -7916,27 +8050,37 @@
       "lines": [
         {
           "message": 57150,
-          "choices": [{ "reply": 77751, "startsQuest": 1631, "params": [[34, 1631], 3010] }]
+          "choices": [
+            { "reply": 77751, "startsQuest": 1631, "params": [[34, 1631], 3010] }
+          ]
         },
         {
           "message": 60427,
-          "choices": [{ "reply": 83200, "next": 60428 }]
+          "choices": [
+            { "reply": 83200, "next": 60428 }
+          ]
         },
         {
           "message": 60428,
-          "choices": [{ "reply": 83193 }]
+          "choices": [
+            { "reply": 83193 }
+          ]
         },
         {
           "message": 57151,
-          "choices": [{ "reply": 77755 }]
+          "choices": [
+            { "reply": 77755, "quest": 1631, "completes": 9740, "params": [[30, 9740]] }
+          ]
         },
         {
           "message": 57154,
           "names": true,
-          "choices": [{ "reply": 77754 }]
+          "choices": [
+            { "reply": 77754 }
+          ]
         }
       ],
-      "why": "Ganymed in the Dofusarium. The tutorial capture ends on his 57150 «Aquel que quiere ver cumplido su destino...» with «Inspeccionar las seis estatuas de dofus» (34 naming 1631, then 3010), the reply that starts 1631. The rest is his own lines in the order Dofus pour les noobs gives the quest: once the statues are read, 60427 on the Dofus and the hint to the book (60428, «Consultar el libro del templo», «Ir a la próxima sala»); once the book is read, 57151 «Ha llegado el momento de que comiences tu gran viaje» with «Dirigirte a la salida del Templo Celeste»; afterwards, his farewell 57154 with the name."
+      "why": "Ganymed in the Dofusarium. The tutorial capture ends on his 57150 «Aquel que quiere ver cumplido su destino...» with «Inspeccionar las seis estatuas de dofus» (34 naming 1631, then 3010), the reply that starts 1631. The rest is his own lines in the order Dofus pour les noobs gives the quest: once the statues are read, 60427 on the Dofus and the hint to the book (60428, «Consultar el libro del templo», «Ir a la próxima sala»); once the book is read, 57151 «Ha llegado el momento de que comiences tu gran viaje» with «Dirigirte a la salida del Templo Celeste»; afterwards, his farewell 57154 with the name. «Dirigirte a la salida del Templo Celeste» is what completes 9740 and ends the quest, so the hello does not skip the line."
     },
     {
       "npc": 2910,
@@ -20593,6 +20737,943 @@
         }
       ],
       "why": "Director Grunob in his office, the Akademia's last room, his poor cat Dagoberto all ruffled, go before he gets really angry (50453; «Abandonar la Akademia» leaves, dungeon_exits.json). «De joyeux petits arbres» (2455): «Gob Ross sends his regards» (18535), little Gob Ross who drew while the others fought with snot (50454), «hard to imagine goblins studying in peace», too many pupils, a teacher or two to hire (50455), «his brush», the forbidden wardrobe where he keeps what he confiscates (50456: «Ir a inspeccionar el armuario», the wardrobe 524400 gives the brush, 18541), he remembered putting it there (50457: «Gracias por el pincel», 18554, or «Meter el pincel en tu bolsa e irte de aquí»)."
+    },
+    {
+      "npc": 806,
+      "map": 0,
+      "opening": 3322,
+      "openings": [
+        { "quest": 146, "message": 3325 },
+        { "after": 146, "message": 3326 }
+      ],
+      "lines": [
+        {
+          "message": 3322,
+          "choices": [
+            { "reply": 2972, "startsQuest": 146, "params": [[34, 146]] },
+            { "reply": 2973 }
+          ]
+        },
+        {
+          "message": 3325,
+          "choices": []
+        },
+        {
+          "message": 3326,
+          "choices": []
+        }
+      ],
+      "why": "Patalenta: the koalaks' mountain was never mapped properly, a description of a few places from a curious young adventurer (3322: «Visite non guidée», 146, «Te ayudaré»); young and vigorous, it will not take long (3325, the five places discovered, 545-549, the hello ends it, 550); the new world map on the toilet wall (3326)."
+    },
+    {
+      "npc": 808,
+      "map": 0,
+      "opening": 12885,
+      "lines": [
+        {
+          "message": 12885,
+          "choices": [
+            { "reply": 14835, "startsQuest": 149, "params": [[34, 149]], "next": 12886 },
+            { "reply": 14836, "startsQuest": 148, "params": [[34, 148]], "next": 12887 },
+            { "reply": 14837, "startsQuest": 150, "params": [[34, 150]], "next": 12888 },
+            { "reply": 14839, "next": 12889, "quest": 149, "completesAll": [558, 559, 560, 3515, 3516], "params": [[30, 558]] },
+            { "reply": 14840, "next": 12890, "quest": 148, "completesAll": [553, 555], "params": [[30, 553]] },
+            { "reply": 14841, "next": 12891, "quest": 150, "completesAll": [562, 563, 564], "params": [[30, 562]] },
+            { "reply": 14838 }
+          ]
+        },
+        {
+          "message": 12886,
+          "choices": []
+        },
+        {
+          "message": 12887,
+          "choices": []
+        },
+        {
+          "message": 12888,
+          "choices": []
+        },
+        {
+          "message": 12889,
+          "choices": []
+        },
+        {
+          "message": 12890,
+          "choices": []
+        },
+        {
+          "message": 12891,
+          "choices": []
+        }
+      ],
+      "why": "Koka Dekolak, the manager of a sinking firm who wants to diversify, at the koalaks' village (12885). Three quests of a day each: «Course polaire» (149, «dragoturkey resources», the list in the journal, dragoturkeys round the village, 12886), «Épicerie fine» (148, «plants of the region», the koalaks' bags full of them, 12887), «Charger la mule» (150, «koalak resources», the kalyptus wood and the Wild Canyon, 12888); each handed over with its own «Darle...» (12889-12891: enough for now, come back tomorrow)."
+    },
+    {
+      "npc": 807,
+      "map": 0,
+      "opening": 3327,
+      "openings": [
+        { "quest": 147, "message": 3328 },
+        { "after": 147, "message": 3329 }
+      ],
+      "lines": [
+        {
+          "message": 3327,
+          "choices": [
+            { "reply": 2974, "startsQuest": 147, "params": [[34, 147]], "next": 11403 },
+            { "reply": 2975 }
+          ]
+        },
+        {
+          "message": 11403,
+          "choices": []
+        },
+        {
+          "message": 3328,
+          "choices": []
+        },
+        {
+          "message": 3329,
+          "choices": [
+            { "reply": 2974, "startsQuest": 147, "params": [[34, 147]], "next": 11403 }
+          ]
+        }
+      ],
+      "why": "Maskara the alchemist in Astrub [6,-21]: for alchemists the koalaks' mountain is a paradise, some of its flowers, but careful (3327). «Des fleurs épineuses» (147), a daily quest of Dofus pour les noobs for alchemists above level 79: «Aceptar ayudar a Maskara», the wild orchids grow in the dragoturkeys' territory, look for freyesque orchids (11403); the god Sadida keeps you from picking them, or are you dodging? (3328: the twenty wild orchids 13153 handed over on the hello, 551); thanks for the harvest, come back a little later (3329, the quest again the next day)."
+    },
+    {
+      "npc": 762,
+      "map": 0,
+      "opening": 3146,
+      "openings": [
+        { "quest": 229, "message": 4074 }
+      ],
+      "lines": [
+        {
+          "message": 3146,
+          "choices": [
+            { "reply": 3550, "next": 4073, "beforeQuest": 229 },
+            { "reply": 70347 }
+          ]
+        },
+        {
+          "message": 4073,
+          "choices": [
+            { "reply": 3551, "startsQuest": 229, "params": [[34, 229]], "next": 4074 },
+            { "reply": 70346 }
+          ]
+        },
+        {
+          "message": 4074,
+          "choices": [
+            { "reply": 3552, "quest": 229, "completesAll": [933, 934, 935, 936, 937, 938, 939], "params": [[30, 933]] }
+          ]
+        }
+      ],
+      "why": "Esmeralda at [-20,10]: may Rushu burn what is left of your conscience, you attacked her young defenceless sadidas (3146). «Le déguisement du Koalak» (229): «sorry», remorse at last, but a little favour (4073: «Escuchar lo que espera de ti», 229), a koalak disguise, a whole koalak set in good condition and she may forgive (4074: «Dar el set koalak», the seven pieces 8003-8009 handed over, 933-939)."
+    },
+    {
+      "npc": 925,
+      "map": 95420420,
+      "opening": 4123,
+      "openings": [
+        { "quest": 231, "message": 4158 },
+        { "after": 232, "message": 4159 },
+        { "after": 231, "message": 4127 }
+      ],
+      "lines": [
+        {
+          "message": 4123,
+          "choices": [
+            { "reply": 3618, "next": 4124, "beforeQuest": 231 }
+          ]
+        },
+        {
+          "message": 4124,
+          "choices": [
+            { "reply": 3624, "next": 4125 }
+          ]
+        },
+        {
+          "message": 4125,
+          "choices": [
+            { "reply": 3626, "startsQuest": 231, "params": [[34, 231]] }
+          ]
+        },
+        {
+          "message": 4158,
+          "choices": [
+            { "reply": 3627, "next": 4126, "quest": 231, "completesAll": [941, 942, 943, 944], "params": [[30, 941]] }
+          ]
+        },
+        {
+          "message": 4126,
+          "choices": []
+        },
+        {
+          "message": 4127,
+          "choices": [
+            { "reply": 3622, "next": 4128, "beforeQuest": 232 },
+            { "reply": 3784, "next": 4128 }
+          ]
+        },
+        {
+          "message": 4128,
+          "choices": [
+            { "reply": 3625 }
+          ]
+        },
+        {
+          "message": 4159,
+          "choices": [
+            { "reply": 3646, "teleport": 153621 },
+            { "reply": 3619, "teleport": 153090 }
+          ]
+        }
+      ],
+      "why": "Captain Kradoc (Guarrok) on Sufokia's quay [15,28]: to the end of the world, a desert island with no kanniboulas (4123). «Le nouveau monde» (231) of Dofus pour les noobs: «Aceptar», just accepting is not enough, a dangerous adventure (4124), stubborn, a long voyage, we shall have to protect ourselves (4125: «Aceptar la misión»), the materials? (4158: «Darle los objetos», two elite chafer misericords, a big cannonball, a foufayteur ear, sesame oil, 941-944), at last, the ammunition and his breakfast (4126). The voyage (4127: «Viajar a la isla», or «Acompañar a un amigo al que le asustan los piratas»): pirates! (4128: «Continuar con la conversación», the fight against the rachitic boomba, nakunbra and canon dorf, and the ship runs aground on the castaways' island). Once Otomai is reached, so you want to go back? (4159: to the isle of Otomai, or to the castaways' island)."
+    },
+    {
+      "npc": 925,
+      "map": 153090,
+      "opening": 4130,
+      "openings": [
+        { "quest": 232, "message": 4158 },
+        { "after": 232, "message": 4134 }
+      ],
+      "lines": [
+        {
+          "message": 4130,
+          "choices": [
+            { "reply": 3624, "next": 4131, "beforeQuest": 232 }
+          ]
+        },
+        {
+          "message": 4131,
+          "choices": [
+            { "reply": 3625, "next": 4132 }
+          ]
+        },
+        {
+          "message": 4132,
+          "choices": [
+            { "reply": 3620, "startsQuest": 232, "params": [[34, 232]] }
+          ]
+        },
+        {
+          "message": 4158,
+          "choices": [
+            { "reply": 3645, "next": 4133, "quest": 232, "completesAll": [945, 946, 947, 948], "params": [[30, 945]] }
+          ]
+        },
+        {
+          "message": 4133,
+          "choices": [
+            { "reply": 3623, "next": 4134 }
+          ]
+        },
+        {
+          "message": 4134,
+          "choices": [
+            { "reply": 3628, "teleport": 153621 }
+          ]
+        }
+      ],
+      "why": "Kradoc run aground on the castaways' island [-43,2]. «L'île des naufragés» (232): the wrong place, his digestion again (4130), pirates and kokokos, raised by a kokoko tribe (4131), thirsty and hungry, wood, tools, food (4132: «Aceptar y traerle el material»), the materials? (4158: «Darle los materiales», a kokoko trunk, the Flib's cursed casket, a kokopaille, a nodkoko slice, 945-948), unbelievable, a bit more effort (4133: «Continuar el viaje»), still damaged but sailing, or wait here a few days (4134: «Irse de Isla de los Náufragos», to Otomai)."
+    },
+    {
+      "npc": 925,
+      "map": 153621,
+      "opening": 4135,
+      "lines": [
+        {
+          "message": 4135,
+          "choices": [
+            { "reply": 3630, "teleport": 95420420 }
+          ]
+        }
+      ],
+      "why": "Kradoc on Otomai's quay [-44,21]: a short and rather quiet trip after all, his reflexes intact (4135: «Viajar a Sufokia»)."
+    },
+    {
+      "npc": 926,
+      "map": 0,
+      "opening": 4138,
+      "openings": [
+        { "quest": 234, "message": 4140 },
+        { "after": 234, "message": 4141 }
+      ],
+      "lines": [
+        {
+          "message": 4138,
+          "choices": [
+            { "reply": 3633, "next": 4139, "beforeQuest": 234 }
+          ]
+        },
+        {
+          "message": 4139,
+          "choices": [
+            { "reply": 3634, "startsQuest": 234, "params": [[34, 234]] },
+            { "reply": 81458 }
+          ]
+        },
+        {
+          "message": 4140,
+          "choices": [
+            { "reply": 3635, "next": 4142, "quest": 234, "completes": 950, "params": [[30, 950]] }
+          ]
+        },
+        {
+          "message": 4142,
+          "choices": []
+        },
+        {
+          "message": 4141,
+          "choices": []
+        }
+      ],
+      "why": "Professor Fornasol, who heals the island's wounded creatures since he lost his seven balls, and finishes them off sometimes (4138). «La Potion Bulbique» (234): «I'm free», the coralators to heal (4139: «Acepto el trabajo»), the bulbic potion? (4140: «Entregar la pócima», 8913, 950), he will try not to drink it all himself (4142); the coralators can use what is left of their brains (4141)."
+    },
+    {
+      "npc": 929,
+      "map": 0,
+      "opening": 4143,
+      "openings": [
+        { "quest": 235, "message": 4145 },
+        { "after": 235, "message": 4146 }
+      ],
+      "lines": [
+        {
+          "message": 4143,
+          "choices": [
+            { "reply": 3636, "next": 4144, "beforeQuest": 235 }
+          ]
+        },
+        {
+          "message": 4144,
+          "choices": [
+            { "reply": 3637, "startsQuest": 235, "params": [[34, 235]] }
+          ]
+        },
+        {
+          "message": 4145,
+          "choices": [
+            { "reply": 3638, "next": 4147, "quest": 235, "completesAll": [951, 952, 953, 954, 955], "params": [[30, 951]] }
+          ]
+        },
+        {
+          "message": 4147,
+          "choices": []
+        },
+        {
+          "message": 4146,
+          "choices": []
+        }
+      ],
+      "why": "Polka Merer, the assistant of Otomai in charge of the paddocks (4143). «Polka Merer a besoin de vous» (235): dragoturkey machines slightly modified (4144: «Aceptar la misión»), the breeding fuels? (4145: «Ten, los carburantes de cría», 951-955), all she needs (4147), the creatures bred for days (4146)."
+    },
+    {
+      "npc": 931,
+      "map": 0,
+      "opening": 4148,
+      "openings": [
+        { "quest": 236, "message": 4151 },
+        { "after": 236, "message": 4153 }
+      ],
+      "lines": [
+        {
+          "message": 4148,
+          "choices": [
+            { "reply": 3639, "next": 4149, "beforeQuest": 236 }
+          ]
+        },
+        {
+          "message": 4149,
+          "choices": [
+            { "reply": 3640, "next": 4150 }
+          ]
+        },
+        {
+          "message": 4150,
+          "choices": [
+            { "reply": 3641, "startsQuest": 236, "params": [[34, 236]] }
+          ]
+        },
+        {
+          "message": 4151,
+          "choices": [
+            { "reply": 3642, "next": 4152, "quest": 236, "completesAll": [956, 957, 958, 959, 960, 961, 962, 963, 964, 965], "params": [[30, 956]] }
+          ]
+        },
+        {
+          "message": 4152,
+          "choices": []
+        },
+        {
+          "message": 4153,
+          "choices": []
+        }
+      ],
+      "why": "Paulette Pain-bèche, one of the best bakers of the World of Twelve (4148). «Paulette Pain-bèche la boulangère» (236): cereal flours for the island's creatures (4149), Javier the Baker's famous flour, too long to make (4150: «Aceptar la misión»), all the cereals? (4151: «Toma los cereales», 956-965), mixed and nobody will notice (4152); her genius idea (4153)."
+    },
+    {
+      "npc": 936,
+      "map": 0,
+      "opening": 4174,
+      "openings": [
+        { "quest": 240, "message": 4176 },
+        { "after": 240, "message": 4172 }
+      ],
+      "lines": [
+        {
+          "message": 4174,
+          "choices": [
+            { "reply": 3660, "next": 4175, "beforeQuest": 240 }
+          ]
+        },
+        {
+          "message": 4175,
+          "choices": [
+            { "reply": 3661, "startsQuest": 240, "params": [[34, 240]] }
+          ]
+        },
+        {
+          "message": 4176,
+          "choices": [
+            { "reply": 3662, "next": 4177, "quest": 240, "completesAll": [975, 976], "params": [[30, 975]] }
+          ]
+        },
+        {
+          "message": 4177,
+          "choices": []
+        },
+        {
+          "message": 4172,
+          "choices": [
+            { "reply": 3659, "teleport": 20973058, "quest": 239, "afterQuest": true },
+            { "reply": 3658, "teleport": 156174, "quest": 242, "afterQuest": true },
+            { "reply": 3657, "teleport": 160260, "quest": 243, "afterQuest": true }
+          ]
+        }
+      ],
+      "why": "Flip Flap, scaeroplane pilot, named after the sound of a scarafly's wings in free fall (4174). «Un autre moyen de transport» (240): years dreaming of riding dragoturkeys (4175: «Aceptar la misión»), the two dragoturkeys? (4176: «Ten, los dos dragopavos», 975, 976), his breeding at last, the ginger on even days, the almond on odd days (4177). Once his quest is done he flies to the island's other scaeroplanes whose pilots have granted landing, their own quests done (4172: «¿Hacia qué Escareopuerto quieres que te lleve?»)."
+    },
+    {
+      "npc": 935,
+      "map": 0,
+      "opening": 4168,
+      "openings": [
+        { "quest": 239, "message": 4170 },
+        { "after": 239, "message": 4172 }
+      ],
+      "lines": [
+        {
+          "message": 4168,
+          "choices": [
+            { "reply": 3653, "next": 4169, "beforeQuest": 239 }
+          ]
+        },
+        {
+          "message": 4169,
+          "choices": [
+            { "reply": 3654, "startsQuest": 239, "params": [[34, 239]] }
+          ]
+        },
+        {
+          "message": 4170,
+          "choices": [
+            { "reply": 3655, "next": 4171, "quest": 239, "completesAll": [973, 974], "params": [[30, 973]] }
+          ]
+        },
+        {
+          "message": 4171,
+          "choices": []
+        },
+        {
+          "message": 4172,
+          "choices": [
+            { "reply": 3656, "teleport": 159766, "quest": 240, "afterQuest": true },
+            { "reply": 3658, "teleport": 156174, "quest": 242, "afterQuest": true },
+            { "reply": 3657, "teleport": 160260, "quest": 243, "afterQuest": true }
+          ]
+        }
+      ],
+      "why": "Spitte Fayeur, the scaeroplane pilot of the canopy village [-54,19]: do not laugh at her name (4168). «Scaéroplane à très grande vitesse» (239) of Dofus pour les noobs: the fastest tame scaraflies, an improved outfit (4169: «Acepto la proposición»), the items? (4170: «Dar los objetos», the improved wooden wings and helmet, 973, 974), faster flights (4171). Once his quest is done he flies to the island's other scaeroplanes whose pilots have granted landing, their own quests done (4172: «¿Hacia qué Escareopuerto quieres que te lleve?»)."
+    },
+    {
+      "npc": 939,
+      "map": 0,
+      "opening": 4183,
+      "openings": [
+        { "quest": 242, "message": 4185 },
+        { "after": 242, "message": 4172 }
+      ],
+      "lines": [
+        {
+          "message": 4183,
+          "choices": [
+            { "reply": 3665, "next": 4184, "beforeQuest": 242 }
+          ]
+        },
+        {
+          "message": 4184,
+          "choices": [
+            { "reply": 3666, "startsQuest": 242, "params": [[34, 242]] }
+          ]
+        },
+        {
+          "message": 4185,
+          "choices": []
+        },
+        {
+          "message": 4172,
+          "choices": [
+            { "reply": 3659, "teleport": 20973058, "quest": 239, "afterQuest": true },
+            { "reply": 3656, "teleport": 159766, "quest": 240, "afterQuest": true },
+            { "reply": 3657, "teleport": 160260, "quest": 243, "afterQuest": true }
+          ]
+        }
+      ],
+      "why": "Kito, the coastal village's pilot [-49,14], of twelve generations of scaeroplane pilots and a few accidents (4183). «La vengeance du Kito» (242) of Dofus pour les noobs: the pirates of Otomai's ark shoot at him (4184: «Acepto la proposición», a sparo, a barbroussa and a flib to beat, 1008-1010), well, did you smash the pirates? (4185). Once his quest is done he flies to the island's other scaeroplanes whose pilots have granted landing, their own quests done (4172: «¿Hacia qué Escareopuerto quieres que te lleve?»)."
+    },
+    {
+      "npc": 940,
+      "map": 0,
+      "opening": 4187,
+      "openings": [
+        { "quest": 243, "message": 4188 },
+        { "after": 243, "message": 4172 }
+      ],
+      "lines": [
+        {
+          "message": 4187,
+          "choices": [
+            { "reply": 3667, "startsQuest": 243, "params": [[34, 243]] },
+            { "reply": 83078 }
+          ]
+        },
+        {
+          "message": 4188,
+          "choices": [
+            { "reply": 83077 }
+          ]
+        },
+        {
+          "message": 4172,
+          "choices": [
+            { "reply": 3659, "teleport": 20973058, "quest": 239, "afterQuest": true },
+            { "reply": 3656, "teleport": 159766, "quest": 240, "afterQuest": true },
+            { "reply": 3658, "teleport": 156174, "quest": 242, "afterQuest": true }
+          ]
+        }
+      ],
+      "why": "Peggy la Porkass [-57,4]: the hateful Black and Pink Knight gave her that nickname, she wants revenge (4187: «La vengeance de Peggy la Porkass», 243, the knight beaten at [-58,-5], 1011), have you faced him? (4188: «Pronto lo haré»). Once his quest is done he flies to the island's other scaeroplanes whose pilots have granted landing, their own quests done (4172: «¿Hacia qué Escareopuerto quieres que te lleve?»)."
+    },
+    {
+      "npc": 937,
+      "map": 0,
+      "opening": 4178,
+      "openings": [
+        { "quest": 241, "message": 4180 },
+        { "after": 241, "message": 4181 }
+      ],
+      "lines": [
+        {
+          "message": 4178,
+          "choices": [
+            { "reply": 3663, "next": 4179, "beforeQuest": 241 }
+          ]
+        },
+        {
+          "message": 4179,
+          "choices": [
+            { "reply": 3664, "startsQuest": 241, "params": [[34, 241]] }
+          ]
+        },
+        {
+          "message": 4180,
+          "choices": []
+        },
+        {
+          "message": 4181,
+          "choices": []
+        }
+      ],
+      "why": "Crocodaille Dandi on Otomai's plains, who sews naughty underwear of crocodaille scales and always wanted the island to be a park (4178). «Les Chasses de Crocodaille Dandi» (241): hunts that give adventurers a purpose and thin the island's creatures (4179: «Participar a la cacería», the creatures of each step beaten anywhere), not finished yet, hurry (4180); one of the bravest adventurers he knows (4181)."
+    },
+    {
+      "npc": 927,
+      "map": 0,
+      "opening": 60402,
+      "openings": [
+        { "after": 233, "message": 4137 }
+      ],
+      "lines": [
+        {
+          "message": 60402,
+          "choices": [
+            { "reply": 83079, "startsQuest": 233, "params": [[34, 233]] },
+            { "reply": 83080, "next": 60403 },
+            { "reply": 83088, "next": 60405 },
+            { "reply": 83081 }
+          ]
+        },
+        {
+          "message": 60403,
+          "choices": [
+            { "reply": 83084, "next": 60404 }
+          ]
+        },
+        {
+          "message": 60404,
+          "choices": [
+            { "reply": 83082, "startsQuest": 233, "params": [[34, 233]] },
+            { "reply": 83083 }
+          ]
+        },
+        {
+          "message": 60405,
+          "choices": [
+            { "reply": 83089, "startsQuest": 233, "params": [[34, 233]] },
+            { "reply": 83090 }
+          ]
+        },
+        {
+          "message": 4137,
+          "choices": []
+        }
+      ],
+      "why": "The Black and Pink Knight on the bridge of the bottomless peat bog [-58,-5]: nobody crosses without a duel (60402). «Le chevalier noir et rose» (233) of Dofus pour les noobs: «accept the challenge», the fight (1093: 949, and Peggy la Porkass's revenge with it, 1011); «tell me about you», the passage the goddess entrusted to him (60403), «what is a pandawa doing here?», fight or not? (60404: a monomaniac, the fight), «I mean to cross», en garde (60405: «Desenvainar el arma»); beaten, worthy to cross (4137)."
+    },
+    {
+      "npc": 928,
+      "map": 0,
+      "opening": 4114,
+      "openings": [
+        { "after": 230, "message": 4122 }
+      ],
+      "lines": [
+        {
+          "message": 4114,
+          "choices": [
+            { "reply": 3589, "startsQuest": 230, "params": [[34, 230]], "next": 4115 },
+            { "reply": 3589, "next": 4115, "quest": 230 },
+            { "reply": 3590 }
+          ]
+        },
+        {
+          "message": 4115,
+          "choices": [
+            { "reply": 3591, "next": 4116 },
+            { "reply": 3592, "next": 4116 },
+            { "reply": 3593, "next": 4116 },
+            { "reply": 3594 }
+          ]
+        },
+        {
+          "message": 4116,
+          "choices": [
+            { "reply": 3595, "next": 4117, "criterion": "PS=1" },
+            { "reply": 3595, "criterion": "PS=0" },
+            { "reply": 3596, "next": 4117, "criterion": "PS=0" },
+            { "reply": 3596, "criterion": "PS=1" },
+            { "reply": 3597 }
+          ]
+        },
+        {
+          "message": 4117,
+          "choices": [
+            { "reply": 3598, "next": 4118, "criterion": "PE=14" },
+            { "reply": 3598, "criterion": "PE!14" },
+            { "reply": 3599, "next": 4118, "criterion": "PE!14" },
+            { "reply": 3599, "criterion": "PE=14" },
+            { "reply": 3600 }
+          ]
+        },
+        {
+          "message": 4118,
+          "choices": [
+            { "reply": 3601, "next": 4120, "criterion": "Pw<500" },
+            { "reply": 3601, "criterion": "(Pw>499&Pw<1500)|(Pw>1499&Pw<2500)|(Pw>2499)" },
+            { "reply": 3602, "next": 4120, "criterion": "Pw>499&Pw<1500" },
+            { "reply": 3602, "criterion": "(Pw<500)|(Pw>1499&Pw<2500)|(Pw>2499)" },
+            { "reply": 3603, "next": 4120, "criterion": "Pw>1499&Pw<2500" },
+            { "reply": 3603, "criterion": "(Pw<500)|(Pw>499&Pw<1500)|(Pw>2499)" },
+            { "reply": 3604, "next": 4120, "criterion": "Pw>2499" },
+            { "reply": 3604, "criterion": "(Pw<500)|(Pw>499&Pw<1500)|(Pw>1499&Pw<2500)" },
+            { "reply": 3605 }
+          ]
+        },
+        {
+          "message": 4120,
+          "choices": [
+            { "reply": 3614, "next": 4119 },
+            { "reply": 3611 },
+            { "reply": 3612 },
+            { "reply": 3613 }
+          ]
+        },
+        {
+          "message": 4119,
+          "choices": [
+            { "reply": 3610, "next": 4121 },
+            { "reply": 3606 },
+            { "reply": 3607 },
+            { "reply": 3608 },
+            { "reply": 3609 }
+          ]
+        },
+        {
+          "message": 4121,
+          "choices": [
+            { "reply": 3615, "next": 4122 }
+          ]
+        },
+        {
+          "message": 4122,
+          "choices": [
+            { "reply": 3616, "quest": 230, "completes": 940, "params": [[30, 940]], "teleport": 160002, "beforeObjective": 940 },
+            { "reply": 3617, "teleport": 160002, "afterQuest": true, "quest": 230 }
+          ]
+        }
+      ],
+      "why": "The guardian of the bridge of death at the coral beach [-56,0]: answer right or die (4114). «Le gardien du pont de la mort» (230) of Dofus pour les noobs, «Donner les bonnes réponses vous permettra de valider la quête. En donner une seule mauvaise lancera le combat contre le gardien»: the favourite colour, any but «another colour» (4115); the sex of your parents' child who is neither brother nor sister, the character's own (4116, PS); can you cross your arms, yes if the attitude is known (4117, emote 14); the morito corals a perfect boufbelt would let you carry, 100, 200, 400 or 600 by the free pods (4118, Pw); the colour of Henry Kard's white dragoturkey (4120), «a normal corbac or an ugly little one?» (4119), he does not know (4121), «wait, I call a friend», you beat him at his own game (4122: «Cruzar el puente», 940, over to the bottomless peat bog). Every wrong answer is his fight; beaten, he can be asked again."
+    },
+    {
+      "npc": 930,
+      "map": 0,
+      "opening": 4154,
+      "openings": [
+        { "quest": 237, "message": 4155 },
+        { "after": 237, "message": 4156 }
+      ],
+      "lines": [
+        {
+          "message": 4154,
+          "choices": [
+            { "reply": 3643, "startsQuest": 237, "params": [[34, 237]], "teleport": 90177536 }
+          ]
+        },
+        {
+          "message": 4155,
+          "choices": [
+            { "reply": 3697, "quest": 237, "beforeObjective": 969, "teleport": 90177536 }
+          ]
+        },
+        {
+          "message": 4156,
+          "choices": [
+            { "reply": 3788, "next": 4302 }
+          ]
+        },
+        {
+          "message": 4302,
+          "choices": [
+            { "reply": 3789, "takes": 8762, "teleport": 90177536 }
+          ]
+        }
+      ],
+      "why": "Doctor Niet on the grassy plains [-55,4]: his son Juan, his adored little wabbit, is stuck in that abandoned laboratory and the creatures there frighten him too much (4154). «Le fils caché» (237) of Dofus pour les noobs, «Parlez à Docteur Nauch qui a perdu son fils dans le laboratoire envahi de créatures»: «Entrar en el laboratorio» into its First Room, have you found my little wabbit? (4155: back in, while Juan is still to be found; once he is, the hello does 970), thanks to you he will call him «mi pequeño jalatín» from now on (4156); «vous pouvez refaire ce mini-donjon pour aider un amis ou tout seul contre un fragment de cerveau poli»: «Visitar el laboratorio», sure? not without a polished brain fragment (4302: «Darle el fragmento de cerebro pulío y entrar», 8762)."
+    },
+    {
+      "npc": 932,
+      "map": 90181632,
+      "opening": 24588,
+      "openings": [
+        { "quest": 237, "pending": 969, "message": 4157 }
+      ],
+      "lines": [
+        {
+          "message": 4157,
+          "choices": [
+            { "reply": 3644, "quest": 237, "completes": 969, "teleport": 159236 }
+          ]
+        },
+        {
+          "message": 24588,
+          "choices": [
+            { "reply": 29527 }
+          ]
+        }
+      ],
+      "why": "Juan Niet, hidden in the laboratory's Exit room: he can't stand his father calling him «Mi Wabbit», could you explain it to him? (4157: «Aceptar y salir del laboratorio», 969, out on the plains); for whoever comes back, do you want to leave? (24588: «Salir.», DungeonExitRooms)."
+    },
+    {
+      "npc": 933,
+      "map": 0,
+      "opening": 4160,
+      "openings": [
+        { "quest": 238, "pending": 971, "message": 4161 },
+        { "quest": 238, "objective": 971, "message": 4165 },
+        { "after": 238, "message": 4167 }
+      ],
+      "lines": [
+        {
+          "message": 4160,
+          "choices": [
+            { "reply": 3647, "startsQuest": 238, "params": [[34, 238]], "teleport": 24117761 }
+          ]
+        },
+        {
+          "message": 4161,
+          "choices": [
+            { "reply": 3647, "quest": 238, "beforeObjective": 971, "teleport": 24117761 }
+          ]
+        },
+        {
+          "message": 4165,
+          "choices": [
+            { "reply": 3651, "quest": 238, "completes": 972, "params": [[30, 972]], "next": 4166 }
+          ]
+        },
+        {
+          "message": 4166,
+          "choices": []
+        },
+        {
+          "message": 4167,
+          "choices": [
+            { "reply": 3790, "next": 4303 }
+          ]
+        },
+        {
+          "message": 4303,
+          "choices": [
+            { "reply": 3791, "takes": 8781, "teleport": 24117761 }
+          ]
+        }
+      ],
+      "why": "Doctor Morros on the branches of the Hakam tree [-52,16]: his wife is gone, he can take you where he saw her last (4160). «La femme perdue» (238) of Dofus pour les noobs: «Seguir al doctor Morros para ayudarle» into the Hakam trunk, she was fleeing that way, the creatures there first (4161: back in, while she is still to be found), did you find her? (4165: «Explicarle por qué se fugó su mujer», 972), he has to learn to win her over himself (4166); rejuvenated (4167), «Volver a la Oscura Jungla para ayudar a un amigo», sure? not without a pe-leon tooth chalice (4303: «Dar un cáliz de diente pe-león», 8781)."
+    },
+    {
+      "npc": 934,
+      "map": 24119823,
+      "opening": 4162,
+      "lines": [
+        {
+          "message": 4162,
+          "choices": [
+            { "reply": 3648, "next": 4163 }
+          ]
+        },
+        {
+          "message": 4163,
+          "choices": [
+            { "reply": 3649, "next": 4164 }
+          ]
+        },
+        {
+          "message": 4164,
+          "choices": [
+            { "reply": 3650, "quest": 238, "completes": 971, "teleport": 25691144 },
+            { "reply": 3650, "teleport": 25691144 }
+          ]
+        }
+      ],
+      "why": "Juana Morros, run away into the heart of the Hakam trunk: her husband cares more for his monsters than for her (4162), Bonta, the flame of the first days (4163), she ran so that he would react, explain it to him (4164: «Acepto.», 971, back to him on the branches)."
+    },
+    {
+      "npc": 7581,
+      "map": 241444353,
+      "opening": 60427,
+      "openings": [
+        { "quest": 1631, "pending": 9739, "message": 60427 },
+        { "quest": 1631, "message": 57151 },
+        { "after": 1631, "message": 57154 }
+      ],
+      "lines": [
+        {
+          "message": 60427,
+          "choices": [
+            { "reply": 83200, "next": 60428 }
+          ]
+        },
+        {
+          "message": 60428,
+          "choices": [
+            { "reply": 83193 }
+          ]
+        },
+        {
+          "message": 57151,
+          "choices": [
+            { "reply": 77755, "quest": 1631, "completes": 9740, "params": [[30, 9740]] }
+          ]
+        },
+        {
+          "message": 57154,
+          "names": true,
+          "choices": [
+            { "reply": 77754 }
+          ]
+        }
+      ],
+      "why": "Ganymed by the temple's book, where 1631's last objective (9740) has the character talk to him: before the book, his word on the Dofus and the hint to it (60427, 60428); once it is read, 57151 «Ha llegado el momento de que comiences tu gran viaje» with «Dirigirte a la salida del Templo Celeste» («reparlez à Ganymède qui vous conseille de quitter le temple direction Incarnam», Dofus pour les noobs); afterwards, his farewell 57154. «Dirigirte a la salida del Templo Celeste» is what completes 9740 and ends the quest, so the hello does not skip the line."
+    },
+    {
+      "npc": 7102,
+      "map": 241445377,
+      "opening": 52780,
+      "openings": [
+        { "holds": 28361, "message": 52783 },
+        { "after": 1631, "message": 60429 }
+      ],
+      "lines": [
+        {
+          "message": 60429,
+          "choices": [
+            { "reply": 83190, "teleport": 154010883 },
+            { "reply": 83192, "next": 52782, "belowLevel": 21 },
+            { "reply": 83192, "next": 60430, "minLevel": 21 },
+            { "reply": 83191 }
+          ]
+        },
+        {
+          "message": 60430,
+          "choices": [
+            { "reply": 83191 }
+          ]
+        },
+        {
+          "message": 52780,
+          "choices": [
+            { "reply": 83190, "teleport": 154010883 },
+            { "reply": 70793, "next": 52781 },
+            { "reply": 70800, "next": 52782, "belowLevel": 21 },
+            { "reply": 70800, "next": 52784, "minLevel": 21 },
+            { "reply": 70794 }
+          ]
+        },
+        {
+          "message": 52781,
+          "choices": [
+            { "reply": 70795, "next": 52782, "belowLevel": 21 },
+            { "reply": 70795, "next": 52784, "minLevel": 21 },
+            { "reply": 70799 }
+          ]
+        },
+        {
+          "message": 52782,
+          "choices": [
+            { "reply": 70796, "gives": 28361 }
+          ]
+        },
+        {
+          "message": 52783,
+          "choices": [
+            { "reply": 70797 },
+            { "reply": 83190, "teleport": 154010883 }
+          ]
+        },
+        {
+          "message": 52784,
+          "choices": [
+            { "reply": 70799 }
+          ]
+        }
+      ],
+      "why": "Andrée Inkarnay by the Celestial Temple's gates. «Réponses à tout» of Dofus pour les noobs: «Répondre qu'il n'est de toute façon pas possible de faire marche arrière» (52780), the gods love to watch their disciples (52781), «Dire qu'à la réflexion, votre puissance tutélaire ne vous correspond pas», take this philtre, only for novices (52782: «Prendre le philtre», 28361, «tant que vous êtes de niveau 20 ou moins»); not drunk yet? (52783); no longer a novice (52784). Once 1631 is done, 3.6's own line 60429 with «L'ignorer et sortir du Temple.», out to the foot of the steps in Incarnam, and 60430 for whoever is past level 20."
     }
   ]
 }

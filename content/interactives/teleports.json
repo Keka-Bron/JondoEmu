@@ -133,7 +133,15 @@
     "THE ISLE OF MOON'S WRECKS AND THE ONE-EYED'S CAVERN. The ways out of Kar Ybe's wreck [35,5] (500678) and of the",
     "wreck on the path of skulls [32,4] (500683) lead back to the sand before their doorways, which floor_passages.json",
     "opens; the cage door on the cave's beach [33,3] (490837, cell 95) lets whoever carries Ouily's key (17396) into his",
-    "cavern (158078210): «Entrez alors dans la Caverne du Borgne à l'aide de la clef» (Dofus pour les noobs)."
+    "cavern (158078210): «Entrez alors dans la Caverne du Borgne à l'aide de la clef» (Dofus pour les noobs).",
+    "",
+    "THE CELESTIAL TEMPLE. Its gates, type 475 «Puertas del Templo Celeste» in the client's interactives, are the golden",
+    "door at the end of the room past the temple's book [3,3] (541737) and the same door seen from Incarnam [-2,-3], up",
+    "the floating steps (489503 at their foot): Ganymed's last word in «Réponses à tout» is «Dirigirte a la salida del",
+    "Templo Celeste», then «Le village dans les nuages» starts with Lykhen on that Incarnam map. Out, the landing is the",
+    "client's own map reference 10, cell 370, at the foot of the steps; in, the floor before the door. Whoever started",
+    "before 3.6 walks back in to the Dofusarium («en allant simplement tout au fond du Temple Céleste», Dofus pour les",
+    "noobs, «Premiers pas»)."
   ],
   "passages": [
     {
@@ -394,6 +402,8 @@
     {"map": 193462272, "element": 514746, "cell": 411, "gfx": 3507, "type": -1, "skill": 339, "toMap": 190841344, "toCell": 260},
     {"map": 157811712, "element": 500678, "cell": 430, "gfx": 39767, "type": 0, "skill": 114, "toMap": 156762113, "toCell": 298},
     {"map": 157812736, "element": 500683, "cell": 445, "gfx": 44035, "type": 0, "skill": 114, "toMap": 156501762, "toCell": 287},
-    {"map": 158077952, "element": 490837, "cell": 95, "gfx": 0, "type": 0, "skill": 114, "toMap": 158078210, "toCell": 451, "criterion": "PO=17396"}
+    {"map": 158077952, "element": 490837, "cell": 95, "gfx": 0, "type": 0, "skill": 114, "toMap": 158078210, "toCell": 451, "criterion": "PO=17396"},
+    {"map": 241445377, "element": 541737, "cell": 475, "gfx": 806735, "type": 475, "skill": 187, "toMap": 154010883, "toCell": 370},
+    {"map": 154010883, "element": 489503, "cell": 369, "gfx": 49576, "type": 475, "skill": 84, "toMap": 241445377, "toCell": 416}
   ]
 }

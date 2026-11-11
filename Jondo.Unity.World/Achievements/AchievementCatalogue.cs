@@ -132,6 +132,12 @@ namespace Jondo.Unity.World.Achievements
         /// <summary>Earned once for the whole account rather than per character.</summary>
         public bool AccountWide { get; init; }
 
+        /// <summary>
+        /// Earned and paid by every character of the account that does it, where the others are
+        /// the account's, earned once (content/achievements/objectives.json, «eachCharacter»).
+        /// </summary>
+        public bool EachCharacter { get; init; }
+
         public IReadOnlyList<AchievementObjective> Objectives { get; init; }
             = Array.Empty<AchievementObjective>();
 
@@ -275,6 +281,7 @@ namespace Jondo.Unity.World.Achievements
 
                 var objectives = ReadObjectives(root, Say);
                 ApplyAuthoredCriteria(objectives, report);
+                var eachCharacter = ReadEachCharacter(report);
                 var links = ReadLinks(report);
                 var rewards = ReadRewards(root);
 
@@ -340,6 +347,7 @@ namespace Jondo.Unity.World.Achievements
                         Points = (int)Long(row, "points"),
                         Order = (int)Long(row, "order"),
                         AccountWide = Long(row, "accountWide") != 0,
+                        EachCharacter = eachCharacter.Contains(id),
                         Objectives = mine,
                         Rewards = pays,
                         FromQuests = quests,
@@ -507,6 +515,41 @@ namespace Jondo.Unity.World.Achievements
             {
                 report?.Invoke($"{Path.GetFileName(path)} is unreadable: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// The achievements every character of an account earns for himself, from the «eachCharacter»
+        /// rows of content/achievements/objectives.json.
+        /// </summary>
+        /// <remarks>
+        /// The account's achievements are earned once: the captured lists name each one once, with
+        /// the character that did it. The guided tutorial cannot be played that way: its step
+        /// «Consigue las recompensas del logro y reparte los puntos de característica» waits, in the
+        /// client, for the character to be level 2 and to spend the points, and the level comes
+        /// from «Primer tiempo»'s experience. A second character of an account that had it would
+        /// wait there for ever.
+        /// </remarks>
+        private static HashSet<int> ReadEachCharacter(Action<string>? report)
+        {
+            var ids = new HashSet<int>();
+            string path = Paths.ContentFile(AuthoredCriteriaFile);
+            if (!File.Exists(path)) return ids;
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("eachCharacter", out var rows)) return ids;
+                foreach (var row in rows.EnumerateArray())
+                {
+                    int id = (int)Long(row, "achievement");
+                    if (id > 0) ids.Add(id);
+                }
+            }
+            catch (Exception ex)
+            {
+                report?.Invoke($"{Path.GetFileName(path)} is unreadable: {ex.Message}");
+            }
+
+            return ids;
         }
 
         /// <summary>The objectives the client does not describe, from the link file. Empty when it is not there.</summary>

@@ -637,6 +637,7 @@ namespace Jondo.Unity.Server
                         CharacterId INTEGER NOT NULL,
                         AchievementId INTEGER NOT NULL,
                         Claimed INTEGER NOT NULL DEFAULT 0,
+                        Level INTEGER NOT NULL DEFAULT 0,
                         PRIMARY KEY (CharacterId, AchievementId)
                     );
                 ";
@@ -4953,6 +4954,7 @@ namespace Jondo.Unity.Server
                         CharacterId INTEGER NOT NULL,
                         AchievementId INTEGER NOT NULL,
                         Claimed INTEGER NOT NULL DEFAULT 0,
+                        Level INTEGER NOT NULL DEFAULT 0,
                         PRIMARY KEY (CharacterId, AchievementId)
                     );
                     CREATE TABLE IF NOT EXISTS CharacterAchievementCounters (
@@ -4968,6 +4970,20 @@ namespace Jondo.Unity.Server
                         PRIMARY KEY (CharacterId, EmoteId)
                     );";
                 command.ExecuteNonQuery();
+
+                // Migration: the level the character had when he earned it, which his reward is
+                // reckoned at (0 on the rows from before it was kept).
+                try
+                {
+                    using var addLevel = connection.CreateCommand();
+                    addLevel.CommandText = "ALTER TABLE CharacterAchievements ADD COLUMN Level INTEGER NOT NULL DEFAULT 0;";
+                    addLevel.ExecuteNonQuery();
+                }
+                catch (SqliteException)
+                {
+                    // Already there.
+                }
+
                 _progressionTables = true;
             }
             catch (Exception ex)
@@ -5068,8 +5084,11 @@ namespace Jondo.Unity.Server
             }
         }
 
-        /// <summary>Writes down that a character has an achievement, and whether it was paid.</summary>
-        public static void SaveAchievement(long characterId, int achievementId, bool claimed)
+        /// <summary>
+        /// Writes down that a character has an achievement, and whether it was paid; with
+        /// <paramref name="level"/>, the level he had when he earned it (kept when 0).
+        /// </summary>
+        public static void SaveAchievement(long characterId, int achievementId, bool claimed, int level = 0)
         {
             EnsureProgressionTables();
             try
@@ -5078,12 +5097,14 @@ namespace Jondo.Unity.Server
                 connection.Open();
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-                    INSERT INTO CharacterAchievements (CharacterId, AchievementId, Claimed)
-                    VALUES ($c, $a, $d)
-                    ON CONFLICT(CharacterId, AchievementId) DO UPDATE SET Claimed = $d;";
+                    INSERT INTO CharacterAchievements (CharacterId, AchievementId, Claimed, Level)
+                    VALUES ($c, $a, $d, $l)
+                    ON CONFLICT(CharacterId, AchievementId) DO UPDATE SET Claimed = $d,
+                        Level = CASE WHEN $l > 0 THEN $l ELSE Level END;";
                 command.Parameters.AddWithValue("$c", characterId);
                 command.Parameters.AddWithValue("$a", achievementId);
                 command.Parameters.AddWithValue("$d", claimed ? 1 : 0);
+                command.Parameters.AddWithValue("$l", level);
                 command.ExecuteNonQuery();
             }
             catch (Exception ex)
@@ -5120,23 +5141,23 @@ namespace Jondo.Unity.Server
         /// paid. Achievements are the account's in Dofus 3: the list the client gets on entering
         /// names, entry by entry, the character of the account that achieved it.
         /// </summary>
-        public static List<(long CharacterId, int Achievement, bool Claimed)> LoadAccountAchievements(long accountId)
+        public static List<(long CharacterId, int Achievement, bool Claimed, int Level)> LoadAccountAchievements(long accountId)
         {
             EnsureProgressionTables();
-            var all = new List<(long, int, bool)>();
+            var all = new List<(long, int, bool, int)>();
             try
             {
                 using var connection = new SqliteConnection(WorldConnectionString);
                 connection.Open();
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-                    SELECT a.CharacterId, a.AchievementId, a.Claimed
+                    SELECT a.CharacterId, a.AchievementId, a.Claimed, a.Level
                     FROM CharacterAchievements a JOIN Characters c ON c.Id = a.CharacterId
                     WHERE c.AccountId = $a
                     ORDER BY a.rowid;";
                 command.Parameters.AddWithValue("$a", accountId);
                 using var reader = command.ExecuteReader();
-                while (reader.Read()) all.Add((reader.GetInt64(0), reader.GetInt32(1), reader.GetInt32(2) != 0));
+                while (reader.Read()) all.Add((reader.GetInt64(0), reader.GetInt32(1), reader.GetInt32(2) != 0, reader.GetInt32(3)));
             }
             catch (Exception ex)
             {
