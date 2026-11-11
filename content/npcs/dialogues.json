@@ -28807,6 +28807,194 @@
         }
       ],
       "why": "Fulgencio Ramiro, the librarian of Brakmar, and the end of «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (62873) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 47369 says Letalina Sigisbul has the copy, «¿Dónde está?» (62871) gets 47370 (at the militia), and «Ir a la milicia» (67161) starts «No dejes que tus hijos vaguen» (526), whose giver he is in the catalogue."
+    },
+    {
+      "npc": 1266,
+      "map": 216530944,
+      "opening": 7632,
+      "lines": [
+        {
+          "message": 7632,
+          "choices": [
+            { "reply": 7645, "next": 7633 },
+            { "reply": 7646, "next": 7634 }
+          ]
+        },
+        {
+          "message": 7633,
+          "choices": [
+            { "reply": 62709, "quest": 526, "completes": 3595, "params": [[30, 3595]], "gives": 17766 }
+          ]
+        },
+        {
+          "message": 7634,
+          "choices": [
+            { "reply": 62708 }
+          ]
+        }
+      ],
+      "why": "Letalina Sigisbul at the militia of Brakmar, the first stop of «No dejes que tus hijos vaguen» on Brakmar's side (Dofus pour les noobs: «Accepter»): «De acuerdo» (7645) gets her plan (7633), «Agarrar la pócima antes de que Letalina desaparezca» (62709) closes «Ve a ver a Letalina» (3595) and hands over the «Pócima de Gisgul» (17766), which takes one to the tower of Gisgul. «No, gracias» (7646) gets her «¡Fuera de mi vista, cucaracha!» (7634)."
+    },
+    {
+      "npc": 1266,
+      "map": 176819459,
+      "opening": 7647,
+      "openings": [
+        { "quest": 526, "pending": 3613, "message": 7635 },
+        { "quest": 526, "pending": 3596, "message": 7636 },
+        { "quest": 526, "pending": 3597, "message": 7636 },
+        { "quest": 526, "pending": 3617, "message": 7640 },
+        { "quest": 526, "pending": 3599, "message": 7639 },
+        { "quest": 526, "pending": 3600, "message": 7641 },
+        { "quest": 526, "pending": 3601, "message": 7647 },
+        { "quest": 526, "pending": 3602, "message": 7647 },
+        { "quest": 526, "pending": 3604, "message": 7644 },
+        { "quest": 526, "pending": 3611, "message": 7646 },
+        { "quest": 526, "pending": 3612, "message": 7649 },
+        { "quest": 526, "pending": 3619, "message": 51053 }
+      ],
+      "lines": [
+        {
+          "message": 7635,
+          "choices": [
+            { "reply": 62710, "quest": 526, "completes": 3613, "params": [[30, 3613]], "gives": 17766 }
+          ]
+        },
+        {
+          "message": 7636,
+          "choices": [
+            { "reply": 7647, "quest": 526, "completes": 3596, "params": [[30, 3596]], "next": 7638, "holds": 11044 },
+            { "reply": 7649, "quest": 526, "afterObjective": 3596, "completesAll": [3597, 3614, 3615], "params": [[30, 3597]], "next": 51018 },
+            { "reply": 7648, "next": 7639 }
+          ]
+        },
+        {
+          "message": 7638,
+          "choices": [
+            { "reply": 62711, "gives": 17766 }
+          ]
+        },
+        {
+          "message": 7639,
+          "choices": [
+            { "reply": 62714 }
+          ]
+        },
+        {
+          "message": 51018,
+          "choices": [
+            { "reply": 68363, "next": 51019 }
+          ]
+        },
+        {
+          "message": 51019,
+          "choices": [
+            { "reply": 68362, "next": 7640 }
+          ]
+        },
+        {
+          "message": 7640,
+          "choices": [
+            { "reply": 62712, "quest": 526, "completes": 3617, "params": [[30, 3617]], "gives": 11046, "teleport": 178521088 },
+            { "reply": 68364, "quest": 526, "completes": 3617, "params": [[30, 3617]], "gives": 11046 }
+          ]
+        },
+        {
+          "message": 7641,
+          "choices": [
+            { "reply": 62713, "quest": 526, "completes": 3600, "params": [[30, 3600]], "gives": 17766 }
+          ]
+        },
+        {
+          "message": 7644,
+          "choices": [
+            { "reply": 7652, "quest": 526, "completes": 3604, "params": [[30, 3604]], "next": 7645, "holds": 11047, "takes": 11047 }
+          ]
+        },
+        {
+          "message": 7645,
+          "choices": [
+            { "reply": 7653, "gives": 17766 },
+            { "reply": 68366, "next": 51020 }
+          ]
+        },
+        {
+          "message": 51020,
+          "choices": [
+            { "reply": 68365, "gives": 17766 },
+            { "reply": 68367, "next": 51021 }
+          ]
+        },
+        {
+          "message": 51021,
+          "choices": [
+            { "reply": 68368, "gives": 17766 }
+          ]
+        },
+        {
+          "message": 7646,
+          "choices": [
+            { "reply": 7722, "quest": 526, "completes": 3611, "params": [[30, 3611]] },
+            { "reply": 68369 }
+          ]
+        },
+        {
+          "message": 7649,
+          "choices": [
+            { "reply": 7661, "quest": 526, "afterObjective": 3611, "beforeObjective": 3612 },
+            { "reply": 68407 }
+          ]
+        },
+        {
+          "message": 51053,
+          "choices": [
+            { "reply": 68433, "quest": 526, "completes": 3619, "params": [[30, 3619]] }
+          ]
+        },
+        {
+          "message": 7647,
+          "choices": [
+            { "reply": 62714 }
+          ]
+        }
+      ],
+      "why": "Letalina Sigisbul at the top of the tower of Gisgul, where «No dejes que tus hijos vaguen» comes back after each errand (Dofus pour les noobs, Brakmar's side). «Voy al cementerio» (62710) closes 3613 and sends one to the Gúltar family vault for the remains; with them, «Dar los restos de la familia de Gúltar» (7647) closes 3596 and she asks for the bloods (7638, «Me pongo en camino ahora mismo» with a new potion); «Dar todos los ingredientes» (7649) hands the 5 vampire, 10 jalató and 10 scorbuto bloods over (3597, 3614, 3615) and the ritual follows (51018, 51019, 7640): «Aceptar su generosa proposición y agarrar el collar» (62712) closes 3617 and takes the character straight to the vault with Cabotina's cursed collar (11046), «Decir que prefieres ir a pie» (68364) does it without the trip. Back from the tomb, «Ir en busca del bwork en cuestión» (62713) closes 3600; with De Rorc in tow, «¿Cuál es la próxima etapa de la operación?» (7652) closes 3604 and sends one to leave the plans in Dark Vlad's maze. Then «Me habría decepcionado que no me traicionaras» (7722) closes 3611 and her gárghulas attack (content/fights/npc_fights.json); «Enfrentarte a las criaturas de Letalina» (7661) is the fight again after a defeat; and once they are beaten, «Considerar que la compensación es un poco escasa...» (68433) closes 3619 and the quest, whose reward is the book. «Aún no he encontrado nada» (7648) gets «Date prisa» (7639); between errands it is «¡Largo de mi vista!» (7647)."
+    },
+    {
+      "npc": 1267,
+      "map": 0,
+      "opening": 7642,
+      "openings": [
+        { "quest": 526, "pending": 3601, "message": 7642 },
+        { "quest": 526, "pending": 3602, "message": 7642 },
+        { "quest": 526, "pending": 3604, "message": 7643 }
+      ],
+      "lines": [
+        {
+          "message": 7642,
+          "choices": [
+            { "reply": 7650, "quest": 526, "completes": 3601, "params": [[30, 3601]], "afterObjective": 3600 },
+            { "reply": 7650, "quest": 526, "afterObjective": 3601, "beforeObjective": 3602 },
+            { "reply": 7651, "quest": 526, "completes": 3601, "params": [[30, 3601]], "afterObjective": 3600, "next": 7652 },
+            { "reply": 7658 }
+          ]
+        },
+        {
+          "message": 7652,
+          "choices": [
+            { "reply": 7650, "quest": 526, "afterObjective": 3601, "beforeObjective": 3602 }
+          ]
+        },
+        {
+          "message": 7643,
+          "choices": [
+            { "reply": 68416, "quest": 526, "holds": 11047 },
+            { "reply": 68416, "quest": 526, "criterion": "PO!11047", "gives": 11047 },
+            { "reply": 7658 }
+          ]
+        }
+      ],
+      "why": "De Rorc at the bwork camp, the warrior Letalina's mistress Medianoche wants (Dofus pour les noobs: «Grabumpher le Bwork», and the other reply cannot avoid the fight either). «Grabumph, bwork» (7650) closes «Encuentra el bwork» (3601) and starts the fight against him (content/fights/npc_fights.json), «No grabumph» (7651) closes it too and gets his «¡Grabumph!» (7652), whose only way out is the fight. Beaten, he drops as the fight's loot the follower «De Rorc» (11047) that walks behind the character to the tower, and says «Yo vencido, yo prisionero» (7643): «Escoltar al bwork hasta Letalina» (68416) takes him along, and hands him over again to whoever has lost him. «Mantenerte al margen» (7658) leaves."
     }
   ]
 }

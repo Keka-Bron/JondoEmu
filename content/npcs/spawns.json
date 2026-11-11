@@ -3478,6 +3478,38 @@
       "cell": 201,
       "orientation": 1,
       "why": "Harry Stóteles, the librarian of Amakna village [4,1], who asks for silence and hands out the books: behind the reception counter, by the globe, where whoever comes in finds him. No capture places him: INFERRED (the derived cell, 356, stood among the reading tables, half behind a desk)."
+    },
+    {
+      "map": 216530944,
+      "npc": 1266,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=526&Qo<3595",
+      "why": "Letalina Sigisbul at the militia of Brakmar [-25,33], first map, where «No dejes que tus hijos vaguen» sends one (objective 3595 carries the map) and where the librarian says she is busy. She is there until she has spoken: she gives her potion «antes de que Letalina desaparezca». INFERRED cell: 316, in the middle of the hall between the desk and the braziers, clear of both NPCs of the room (6379 on 302, 6401 on 371)."
+    },
+    {
+      "map": 176819459,
+      "npc": 1266,
+      "cell": 410,
+      "orientation": 3,
+      "criterion": "Qa=526&Qo>3595",
+      "why": "Letalina Sigisbul at the top of the tower of Gisgul [-16,17], the map every «Ve a ver a Letalina» of the quest after the militia carries (176819459). INFERRED cell: 410, on the landing in front of the altar, facing the door (element 510481, cell 532) one comes in by; she is gone once the quest is over."
+    },
+    {
+      "map": 104071168,
+      "npc": 1267,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "(Qa=526&Qo>3600&Qo<3604)|(Qa=527&Qo<3625)",
+      "why": "De Rorc at the bwork camp [-6,6], wanted by both branches of «No dejes que tus hijos vaguen»: on Brakmar's side from «Encuentra el bwork» (after 3600) until he is handed to Letalina (3604) -- beaten, he still offers the follower again to whoever lost it --, on Bonta's side while Hata Mari is held there (until «Encuéntrate con Hata fuera del pueblo bwork», 3625). Outside those he is not there. Cell 301 is the derived one, kept."
+    },
+    {
+      "map": 104071168,
+      "npc": 1268,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa=527&Qo<3624",
+      "why": "Hata Mari, the Bontarian spy the bworks hold at their camp [-6,6]: she only belongs to Bonta's side of «No dejes que tus hijos vaguen» (527), where she is freed once De Rorc is beaten and leaves after «Nos vemos fuera del campamento» (3624). Brakmar's side (526) never meets her. Cell 315 is the derived one, kept."
     }
   ]
 }

@@ -3439,18 +3439,64 @@
    "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
   },
   {
-   "objective": 3591,
-   "quest": 525,
-   "kind": "enter",
-   "map": 99091969,
-   "why": "«Descubre el mapa»: the library of Amakna village, the map the objective itself carries (99091969), where Harry Stóteles keeps his silence."
-  },
-  {
    "objective": 3593,
    "quest": 525,
    "kind": "read",
    "elements": [{"map": 183762958, "element": 516215}],
    "why": "«Busca pistas en los templos de los Doce»: Harry's book went to «un gran maestro de templo», and its second extract lies on the pile of books of the Iop temple (readables.json, document 145)."
+  },
+  {
+   "objective": 3596,
+   "quest": 526,
+   "elements": [{"map": 178521088, "element": 510423}],
+   "afterObjectives": [3613],
+   "gives": [{"item": 11044, "count": 1}],
+   "onlyGives": true,
+   "why": "The remains of the Gúltar family: «farfouiller dans la seule tombe en pierre» of the vault (Dofus pour les noobs). The vault is open to this step only (the client's passage from the cemetery, cell 327 of 171443713, asks Qo>3613 and not holding 11044 yet), and the tomb hands the remains over once; Letalina takes them (3596)."
+  },
+  {
+   "objective": 3599,
+   "quest": 526,
+   "elements": [{"map": 178521088, "element": 510423}],
+   "afterObjectives": [3617],
+   "requires": [{"item": 11046, "count": 1}],
+   "spends": true,
+   "why": "«Deja el amuleto sobre la tumba de Cabotina»: Cabotina's cursed collar (11046) left on the same tomb (Dofus pour les noobs: «déposez le pendentif en cliquant sur la tombe en pierre au fond du caveau»); the passage opens again for this (Qo>3617&Qo<3600)."
+  },
+  {
+   "objective": 3605,
+   "quest": 526,
+   "kind": "enter",
+   "map": 220989956,
+   "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
+  },
+  {
+   "objective": 3606,
+   "quest": 526,
+   "kind": "enter",
+   "map": 220989444,
+   "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
+  },
+  {
+   "objective": 3607,
+   "quest": 526,
+   "kind": "enter",
+   "map": 220988932,
+   "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
+  },
+  {
+   "objective": 3608,
+   "quest": 526,
+   "kind": "enter",
+   "map": 220988420,
+   "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
+  },
+  {
+   "objective": 3609,
+   "quest": 526,
+   "kind": "enter",
+   "map": 220987908,
+   "why": "«Deja las pistas para Dark Vlad»: one of the five maps of Dark Vlad's maze [0,17] to [-4,17] the objective carries; walking onto it leaves the plans there (Dofus pour les noobs: «vous avez juste besoin de passer dessus»)."
   }
  ]
 }

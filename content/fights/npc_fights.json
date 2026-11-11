@@ -868,6 +868,12 @@
       "alliesMustLive": true,
       "allies": [ { "monster": 3596, "grade": 9 } ],
       "criterion": "Qa=1455&Qf=1520",
-      "why": "Year 10's formation: the first prisoner of «Liste des ennemis par formation» the character has captured is the one fought («El prisionero… será seleccionado entre los que ya has capturado»); the recruit at grade 10, level 200 as the formation's own level." }
+      "why": "Year 10's formation: the first prisoner of «Liste des ennemis par formation» the character has captured is the one fought («El prisionero… será seleccionado entre los que ya has capturado»); the recruit at grade 10, level 200 as the formation's own level." },
+    { "npc": 1267, "map": 104071168, "reply": 7650,
+      "monsters": [ { "monster": 2825, "grade": 0 } ] },
+    { "npc": 1266, "map": 176819459, "reply": 7722,
+      "monsters": [ { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 } ] },
+    { "npc": 1266, "map": 176819459, "reply": 7661,
+      "monsters": [ { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 }, { "monster": 2826, "grade": 0 } ] }
   ]
 }
