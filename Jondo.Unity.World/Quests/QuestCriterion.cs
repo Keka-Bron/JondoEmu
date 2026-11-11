@@ -472,9 +472,12 @@ namespace Jondo.Unity.World.Quests
                     // Qo holds objective ids — 116 of 116 — and its comparison is usually '>'
                     // rather than '='. Both are read as "that objective is ticked off": the
                     // conditions it appears in are of the form "(Qa=1523&Qo>8635)|Qf=1523", which
-                    // is a quest under way and past a given point, or already over.
+                    // is a quest under way and past a given point, or already over. '<' is the
+                    // other way round, "not ticked off yet", as the client words them (done and
+                    // notDone) and PlayerCriteria reads them: the world graph's passages open
+                    // between two objectives, «(Qo>7357&Qo<7374)».
                     case "Qo":
-                        return Truth(_facts.ObjectiveDone((int)value), comparison);
+                        return Truth(_facts.ObjectiveDone((int)value), comparison == '<' ? '!' : comparison);
 
                     // OA is "achievement obtained", and it is the commonest operator in the whole
                     // achievement catalogue: 2,157 objectives use it. Achievement 8520 is nothing

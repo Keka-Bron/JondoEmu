@@ -2654,6 +2654,67 @@
    "afterElement": 523818,
    "spawns": {"monster": 6826, "count": 2, "with": [6827, 6827, 6827], "attacks": true},
    "why": "«Ayuda a Ramy a diseñar un plato». Dofus pour les noobs: check the pot on the stove («Cliquez donc sur la gazinière», element 523818 with its pot, a prop), then «Cliquez sur la table de cuisine de mauvaise qualité pour râper le fromage, vous êtes soudain attaqué par un groupe souris» (523817, with the cheese): «Les deux Sousouris Affamée», and three Sousouris Alléchées beside them in the guide's screenshot, INFERRED. Beating them closes it; Ramy's after-fight lines follow."
+  },
+  {
+   "objective": 18390,
+   "quest": 2432,
+   "elements": [{"map": 216795141, "element": 523824}],
+   "anyOrder": true,
+   "why": "«Comprueba la trampa», [-22,36], «cliquez sur le piège dans lequel un Brâkmarien trop gourmand est tombé»: the trap with one in it (graphic 600365, cell 368); Dofus pour les noobs, «Fait comme un rat». The seven are checked in any order; the traps are scenery with no skill until this objective is in hand."
+  },
+  {
+   "objective": 18391,
+   "quest": 2432,
+   "elements": [{"map": 216795653, "element": 523825}],
+   "anyOrder": true,
+   "why": "«Comprueba la trampa», [-21,36], the lower of its two snap traps (graphic 600362, cell 526); Dofus pour les noobs, «Fait comme un rat». The seven are checked in any order; the traps are scenery with no skill until this objective is in hand."
+  },
+  {
+   "objective": 18392,
+   "quest": 2432,
+   "kind": "beat",
+   "monster": 6836,
+   "map": 216795653,
+   "elements": [{"map": 216795653, "element": 523826}],
+   "spawns": {"monster": 6836, "count": 4, "attacks": true},
+   "anyOrder": true,
+   "why": "«Comprueba la trampa», [-21,36], «celle du haut avec le squelette lance un combat réalisable en groupe contre 4 x Sousouris démineuse» (graphic 600362, cell 381); Dofus pour les noobs, «Fait comme un rat». The seven are checked in any order; the traps are scenery with no skill until this objective is in hand."
+  },
+  {
+   "objective": 18393,
+   "quest": 2432,
+   "kind": "beat",
+   "monster": 6836,
+   "map": 216795142,
+   "elements": [{"map": 216795142, "element": 523827}],
+   "spawns": {"monster": 6836, "count": 4, "attacks": true},
+   "anyOrder": true,
+   "why": "«Comprueba la trampa», [-22,37], «vérifiez le piège en haut à droite, qui semble toujours en marche avec son appât», a fight against 4 (graphic 600362, cell 122); Dofus pour les noobs, «Fait comme un rat». The seven are checked in any order; the traps are scenery with no skill until this objective is in hand."
+  },
+  {
+   "objective": 18394,
+   "quest": 2432,
+   "elements": [{"map": 216794632, "element": 523828}],
+   "anyOrder": true,
+   "why": "«Comprueba la trampa», [-23,38], «la tapette à droite dans laquelle un autre brâkmarien est tombé» (graphic 600365, cell 444); Dofus pour les noobs, «Fait comme un rat». The seven are checked in any order; the traps are scenery with no skill until this objective is in hand."
+  },
+  {
+   "objective": 18396,
+   "quest": 2432,
+   "elements": [{"map": 216927751, "element": 523839}],
+   "anyOrder": true,
+   "why": "«Comprueba la trampa», [-28,37], the trap before the Moumousetrap without its bait (graphic 600362, cell 426); Dofus pour les noobs, «Fait comme un rat». The seven are checked in any order; the traps are scenery with no skill until this objective is in hand."
+  },
+  {
+   "objective": 18397,
+   "quest": 2432,
+   "kind": "beat",
+   "monster": 6836,
+   "map": 216927751,
+   "elements": [{"map": 216927751, "element": 523840}],
+   "spawns": {"monster": 6836, "count": 4, "attacks": true},
+   "anyOrder": true,
+   "why": "«Comprueba la trampa», [-28,37], «la tapette du centre qui a encore son appât lance un combat» (graphic 600362, cell 304); Dofus pour les noobs, «Fait comme un rat». The seven are checked in any order; the traps are scenery with no skill until this objective is in hand."
   }
  ]
 }

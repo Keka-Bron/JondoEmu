@@ -2652,6 +2652,44 @@
       "cell": 424,
       "orientation": 1,
       "why": "The she-cook of the palace's kitchen, the other helper of «Cuisine raffinée». She stood nowhere. INFERRED cell: at the left-hand counter."
+    },
+    {
+      "map": 216793610,
+      "npc": 6613,
+      "cell": 288,
+      "orientation": 1,
+      "why": "Raty Opatio in Brakmar's sewers [-24,38], where Dofus pour les noobs, «Fait comme un rat» sends you to ask about the missing assistant. She stood nowhere. INFERRED cell: the middle of the grating."
+    },
+    {
+      "map": 218892288,
+      "npc": 6616,
+      "cell": 47,
+      "orientation": 1,
+      "criterion": "Qf!2432",
+      "why": "Dante Hallu caged in the Third Room of the Black Rat's Moumousetrap, «libre» once the quest is done. He stood nowhere. INFERRED cell: inside the top cage, behind its bars."
+    },
+    {
+      "map": 212860928,
+      "npc": 6615,
+      "cell": 257,
+      "orientation": 3,
+      "criterion": "PO!26166&Qo<18404&Qf!2432",
+      "why": "The bored militiawoman where Ankama has her [-28,33], gone while she follows you (26166) and once she lives with the Black Rat."
+    },
+    {
+      "map": 218894338,
+      "npc": 6615,
+      "cell": 370,
+      "orientation": 1,
+      "criterion": "Qo>18404|Qf=2432",
+      "why": "The militiawoman handed over, beside the Black Rat for good. INFERRED cell: by the Black Rat (356)."
+    },
+    {
+      "map": 216402698,
+      "npc": 799,
+      "cell": 261,
+      "orientation": 3,
+      "why": "Rata Plin, the guardian of the White Rat's Pantry («Retomar la Mazmorra de las Ratas de Bonta donde la dejaste», its old name) at its entrance in Bonta's sewers [-34,-59], the twin of Rata Plan at the Black Rat's door. He stood nowhere, so the pantry had no door-keeper and any answer of whoever else stood there (Ramy) opened it. INFERRED cell: before the barred doorway."
     }
   ]
 }

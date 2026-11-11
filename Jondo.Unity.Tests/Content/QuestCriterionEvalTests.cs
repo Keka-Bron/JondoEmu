@@ -99,6 +99,18 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
+        public void Qo_below_is_an_objective_not_ticked_off_yet()
+        {
+            // The world graph's passages: open past one objective and until another is done.
+            var facts = new Facts();
+            facts.Ticked.Add(7357);
+            Assert.True(Judge("Qo>7357&Qo<7374", facts).Met);
+
+            facts.Ticked.Add(7374);
+            Assert.False(Judge("Qo>7357&Qo<7374", facts).Met);
+        }
+
+        [Fact]
         public void Pm_is_the_map_being_stood_on()
         {
             Assert.True(Judge("Pm=69207040", new Facts { MapId = 69207040 }).Met);

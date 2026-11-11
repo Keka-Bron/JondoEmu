@@ -22231,6 +22231,235 @@
         }
       ],
       "why": "Ramy in the palace's kitchen: out of his hiding place when the chef refuses the rata tuy («Oir a Ramy salir de su escondite»), «¡Usted era mi ídolo!», and «Girarte hacia el chef» gives the word back to Tonego, who tastes it. Hired, he stays (spawns.json)."
+    },
+    {
+      "npc": 6617,
+      "map": 0,
+      "opening": 50065,
+      "lines": [
+        {
+          "message": 50065,
+          "choices": [
+            { "reply": 66792, "next": 50068, "beforeQuest": 2432 },
+            { "reply": 66796, "next": 50072, "quest": 2432, "afterObjectives": [18390, 18391, 18392, 18393, 18394, 18396, 18397], "beforeObjective": 18398 },
+            { "reply": 66815, "next": 50089, "quest": 2432, "afterObjective": 18404 }
+          ]
+        },
+        {
+          "message": 50068,
+          "choices": [
+            { "reply": 66791, "next": 50069 }
+          ]
+        },
+        {
+          "message": 50069,
+          "choices": [
+            { "reply": 66790, "next": 50070 }
+          ]
+        },
+        {
+          "message": 50070,
+          "choices": [
+            { "reply": 66789, "next": 50071 }
+          ]
+        },
+        {
+          "message": 50071,
+          "choices": [
+            { "reply": 66788, "startsQuest": 2432, "params": [[34, 2432]] },
+            { "reply": 66787 }
+          ]
+        },
+        {
+          "message": 50072,
+          "choices": [
+            { "reply": 66795, "next": 50073 }
+          ]
+        },
+        {
+          "message": 50073,
+          "choices": [
+            { "reply": 66794, "next": 50074 }
+          ]
+        },
+        {
+          "message": 50074,
+          "choices": [
+            { "reply": 66793, "quest": 2432, "completes": 18398 },
+            { "reply": 66793 }
+          ]
+        },
+        {
+          "message": 50089,
+          "choices": [
+            { "reply": 66814, "next": 50090 }
+          ]
+        },
+        {
+          "message": 50090,
+          "choices": [
+            { "reply": 66813, "quest": 2432, "completes": 18405 },
+            { "reply": 66813 }
+          ]
+        }
+      ],
+      "why": "Dexter Minador, the rat-catcher from Kuatropatas at Brakmar's Marmite [-23,37], who gives «Fait comme un rat» (2432): Dofus pour les noobs, «Fait comme un rat», «En savoir plus» and he sends you to check his traps in the sewers. Back with all seven checked (18390-18397), he suspects his assistant Dante (18398); with Dante freed, «résumez lui toute la situation» ends it (18405). Which reply leads to which line is read off their texts."
+    },
+    {
+      "npc": 6613,
+      "map": 0,
+      "opening": 50075,
+      "lines": [
+        {
+          "message": 50075,
+          "choices": [
+            { "reply": 66798, "next": 50076, "quest": 2432, "afterObjective": 18398, "beforeObjective": 18399 },
+            { "reply": 66797 }
+          ]
+        },
+        {
+          "message": 50076,
+          "choices": [
+            { "reply": 66797, "quest": 2432, "completes": 18399 },
+            { "reply": 66797 }
+          ]
+        }
+      ],
+      "why": "Raty Opatio, the gossip of Brakmar's sewers [-24,38]: Dofus pour les noobs, «Fait comme un rat», «interroger Norat Go au sujet d'un certain Stanis Ast», who saw the Black Rat drag a Brakmarian into her Moumousetrap. Asking about Dante does «Investiga la desaparición de Dante Hallu» (18399)."
+    },
+    {
+      "npc": 6616,
+      "map": 0,
+      "opening": 50077,
+      "lines": [
+        {
+          "message": 50077,
+          "choices": [
+            { "reply": 66801, "next": 50078, "quest": 2432, "afterObjective": 18399, "beforeObjective": 18400 }
+          ]
+        },
+        {
+          "message": 50078,
+          "choices": [
+            { "reply": 66800, "next": 50079 }
+          ]
+        },
+        {
+          "message": 50079,
+          "choices": [
+            { "reply": 66799, "quest": 2432, "completes": 18400 },
+            { "reply": 66799 }
+          ]
+        }
+      ],
+      "why": "Dante Hallu, Dexter's assistant, behind bars in the Third Room of the Black Rat's Moumousetrap: Dofus pour les noobs, «Fait comme un rat», «parlez à Stanis Ast enfermé derrière des barreaux qui jure être innocent»; promising to bring the Black Rat round does «Encuentra a Dante Hallu en la Raratonera» (18400)."
+    },
+    {
+      "npc": 6614,
+      "map": 0,
+      "opening": 50064,
+      "lines": [
+        {
+          "message": 50064,
+          "choices": [
+            { "reply": 66807, "next": 50080, "quest": 2432, "afterObjective": 18401, "beforeObjective": 18403 },
+            { "reply": 66812, "next": 50088, "quest": 2432, "afterObjective": 18403, "holds": 26166 },
+            { "reply": 66779, "teleport": 216927751 }
+          ]
+        },
+        {
+          "message": 50080,
+          "choices": [
+            { "reply": 66806, "next": 50081 }
+          ]
+        },
+        {
+          "message": 50081,
+          "choices": [
+            { "reply": 66805, "next": 50082 }
+          ]
+        },
+        {
+          "message": 50082,
+          "choices": [
+            { "reply": 66804, "next": 50083 }
+          ]
+        },
+        {
+          "message": 50083,
+          "choices": [
+            { "reply": 66803, "next": 50084 }
+          ]
+        },
+        {
+          "message": 50084,
+          "choices": [
+            { "reply": 66802, "quest": 2432, "completes": 18403, "teleport": 216927751 },
+            { "reply": 66802, "teleport": 216927751 }
+          ]
+        },
+        {
+          "message": 50088,
+          "choices": [
+            { "reply": 66811, "quest": 2432, "completes": 18404, "teleport": 216927751 },
+            { "reply": 66811, "teleport": 216927751 }
+          ]
+        }
+      ],
+      "why": "The Black Rat in her Moumousetrap's last room, once beaten (18401): Dofus pour les noobs, «Fait comme un rat», «Lui parler de Stanis et demander sa libération», she frees him only for a strong Brakmarian to play with (18403); «Lui présenter la brâkmarienne» hands the militiawoman over (18404, the follower item 26166) and sends you out. «Salir de la Raratonera» takes you back to her door [-28,37]."
+    },
+    {
+      "npc": 6615,
+      "map": 0,
+      "opening": 50085,
+      "lines": [
+        {
+          "message": 50085,
+          "choices": [
+            { "reply": 66810, "next": 50086, "quest": 2432, "afterObjective": 18403, "beforeObjective": 18404, "criterion": "PO!26166" }
+          ]
+        },
+        {
+          "message": 50086,
+          "choices": [
+            { "reply": 66809, "next": 50087 }
+          ]
+        },
+        {
+          "message": 50087,
+          "choices": [
+            { "reply": 66808, "quest": 2432, "afterObjective": 18403, "beforeObjective": 18404 }
+          ]
+        }
+      ],
+      "why": "The bored militiawoman of Brakmar [-28,33]: Dofus pour les noobs, «Fait comme un rat», «Proposer lui donc de consacrer son temps au divertissement du Rat Noir», and she asks for a duel to warm up (content/fights/npc_fights.json, «il s'effectue seul»). Beaten, she follows you: her own loot is the follower 26166, with the client's criterion «Qo>18403&Qo<18404&PO!26166»."
+    },
+    {
+      "npc": 6615,
+      "map": 218894338,
+      "opening": 50092,
+      "lines": [
+        {
+          "message": 50092,
+          "choices": []
+        }
+      ],
+      "why": "The militiawoman once handed over, in the Black Rat's last room: «Desde que estoy aquí, la vida es completamente diferente... la Rata Negra es bastante entrañable»."
+    },
+    {
+      "npc": 800,
+      "map": 216927751,
+      "opening": 3294,
+      "lines": [
+        {
+          "message": 3294,
+          "choices": [
+            { "reply": 66786, "quest": 2432, "afterObjective": 18403, "holds": 26166, "teleport": 218894338 },
+            { "reply": 20422 }
+          ]
+        }
+      ],
+      "why": "Rata Plan at the Moumousetrap's door [-28,37]: besides the key and the keyring (DungeonDoor), Dofus pour les noobs, «Fait comme un rat», «parlez à Rat Pido pour « Se rendre auprès du Rat Noir en compagnie de la brâkmarienne »», straight to her room. «No.» closes it."
     }
   ]
 }
