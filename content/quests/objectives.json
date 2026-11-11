@@ -3437,6 +3437,20 @@
    "afterObjectives": [8044],
    "gives": [{"item": 14920, "count": 1}],
    "why": "Beating the year's prisoner beside the recruit: «Une fois le combat terminé, vous dropez une Feuille de formation remplie»."
+  },
+  {
+   "objective": 3591,
+   "quest": 525,
+   "kind": "enter",
+   "map": 99091969,
+   "why": "«Descubre el mapa»: the library of Amakna village, the map the objective itself carries (99091969), where Harry Stóteles keeps his silence."
+  },
+  {
+   "objective": 3593,
+   "quest": 525,
+   "kind": "read",
+   "elements": [{"map": 183762958, "element": 516215}],
+   "why": "«Busca pistas en los templos de los Doce»: Harry's book went to «un gran maestro de templo», and its second extract lies on the pile of books of the Iop temple (readables.json, document 145)."
   }
  ]
 }

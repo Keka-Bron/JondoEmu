@@ -280,7 +280,7 @@ namespace Jondo.Unity.Server.Network
         /// <summary>
         /// The authored content of the quests read again with the server running: the NPCs'
         /// placements and conversations, the objectives' bindings and criteria, the fights replies
-        /// start, the gathering and fight drops, the hand-written loot groups and the passages. The
+        /// start, the gathering and fight drops, the hand-written loot groups, the readable signs and the passages. The
         /// clients stay connected; what a map
         /// shows changes on entering it again.
         /// </summary>
@@ -300,6 +300,7 @@ namespace Jondo.Unity.Server.Network
             Managers.QuestFightDrops.Forget();
             Managers.LootBoxes.Forget();
             Managers.DungeonExitRooms.Forget();
+            Managers.Readables.Forget();
             Managers.TeleportManager.Initialize();
             // The passages are declared to the client from here: a door written since the start was
             // reloaded above and still answered «Unknown use» until this was built again.

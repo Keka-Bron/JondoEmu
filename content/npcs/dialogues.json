@@ -23653,7 +23653,9 @@
           "message": 48059,
           "choices": [
             { "reply": 67044, "next": 50259, "quest": 2434, "afterObjective": 18438, "beforeObjective": 18423, "holds": 26202 },
-            { "reply": 67053, "quest": 2434, "afterObjective": 18438, "beforeObjective": 18423, "criterion": "PO!26202" }
+            { "reply": 67053, "quest": 2434, "afterObjective": 18438, "beforeObjective": 18423, "criterion": "PO!26202" },
+            { "reply": 63989, "next": 49090, "quest": 525, "afterObjective": 3593, "completesAll": [3594, 3618], "params": [[30, 3618]] },
+            { "reply": 63989, "next": 49090, "afterQuest": 525, "criterion": "Qa!526&Qf!526&Qa!527&Qf!527" }
           ]
         },
         {
@@ -23704,9 +23706,21 @@
             { "reply": 67050, "quest": 2434, "completes": 18423 },
             { "reply": 67050 }
           ]
+        },
+        {
+          "message": 49090,
+          "choices": [
+            { "reply": 65547, "next": 49091 }
+          ]
+        },
+        {
+          "message": 49091,
+          "choices": [
+            { "reply": 65546, "startsQuest": 527, "params": [[34, 527]] }
+          ]
         }
       ],
-      "why": "Vayinklán in Bonta's library [-35,-57]: Dofus pour les noobs, «La Geste de Ratagnan», «Parlez à Marcelle Rouste pour en apprendre plus sur l'art de l'escrime bontarienne», the good blades, the year 290 and the heirs on the Promontory of the Skies (18423). Without D'Arratagnan beside you, «Darte cuenta de que D'Arratagnan no está contigo»."
+      "why": "Vayinklán in Bonta's library [-35,-57]: Dofus pour les noobs, «La Geste de Ratagnan», «Parlez à Marcelle Rouste pour en apprendre plus sur l'art de l'escrime bontarienne», the good blades, the year 290 and the heirs on the Promontory of the Skies (18423). Without D'Arratagnan beside you, «Darte cuenta de que D'Arratagnan no está contigo». And «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (63989) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 49090 says Gracia Malsana borrowed it, «¿Dónde está?» (65547) gets 49091 (upstairs), and «Darle las gracias al bibliotecario» (65546) starts «No dejes que tus hijos vaguen» (527), whose giver he is in the catalogue."
     },
     {
       "npc": 6629,
@@ -28706,6 +28720,93 @@
         }
       ],
       "why": "The recruit to form, in the combat room behind the classroom's door, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs): «Parlez alors à la recrue à former qui se trouve sur la map… Puis engagez le combat contre le prisonnier à ces cotés». Its formation line and «Luchar junto al recluta…»; the guide's screenshot of the first years has the princely one say it."
+    },
+    {
+      "npc": 6778,
+      "map": 0,
+      "opening": 51047,
+      "lines": [
+        {
+          "message": 51047,
+          "choices": [
+            { "reply": 68423, "beforeQuest": 525, "criterion": "PO!11071", "gives": 11071 },
+            { "reply": 68424 }
+          ]
+        }
+      ],
+      "why": "The «Bolsa vieja mugrienta», waiting for years for its owner (51047). «Echar un vistazo dentro de la bolsa» (68423) hands over the «Extracto de la juventud de Gúltar» (11071) to whoever has neither the quest nor the extract: the extract is document 144, whose link starts «El hijo pródigo» (ido 525). «Dejar que se pudra en su rincón» (68424) leaves it."
+    },
+    {
+      "npc": 127,
+      "map": 0,
+      "opening": 402,
+      "lines": [
+        {
+          "message": 402,
+          "choices": [
+            { "reply": 319, "next": 403 },
+            { "reply": 320, "next": 678 },
+            { "reply": 68372, "next": 51022, "quest": 525, "beforeObjective": 3592 },
+            { "reply": 11038, "next": 10212 }
+          ]
+        },
+        {
+          "message": 51022,
+          "choices": [
+            { "reply": 68374, "next": 51023 }
+          ]
+        },
+        {
+          "message": 51023,
+          "choices": [
+            { "reply": 68373, "quest": 525, "completes": 3592, "params": [[30, 3592]] }
+          ]
+        },
+        {
+          "message": 403,
+          "choices": [
+            { "reply": 11275 }
+          ]
+        },
+        {
+          "message": 678,
+          "choices": [
+            { "reply": 21812 }
+          ]
+        },
+        {
+          "message": 10212,
+          "choices": []
+        }
+      ],
+      "why": "Harry Stóteles and «El hijo pródigo»: «Permanecer impasible y enseñar el documento que habla de la juventud de Gúltar» (68372) gets his 51022 (an old work by H. Manbillin, which the library no longer has), «Vaya, me habría gustado consultarlo» (68374) his 51023 (the book was lent to a great temple master long ago), and «Ir a investigar a los templos de la ciudad de Amakna» (68373) closes «Ve a ver a Harry Stóteles». His other lines belong to other quests and come with them. The four replies of his first line are the ones Dofus pour les noobs' picture of «Le divin enfant» shows: «Gritar» (319, his 403 «¡¡¡Tssssssssst!!!», and «Perdón ya me callo»), «Susurrar» (320, his 678 «*suspira* ¿Qué quieres?», and «Adiós»), the document, and «Informarte sobre la ciudad de Amakna» (11038, his 10212 on the village's temples)."
+    },
+    {
+      "npc": 6383,
+      "map": 0,
+      "opening": 47368,
+      "lines": [
+        {
+          "message": 47368,
+          "choices": [
+            { "reply": 62873, "next": 47369, "quest": 525, "afterObjective": 3593, "completesAll": [3594, 3618], "params": [[30, 3618]] },
+            { "reply": 62873, "next": 47369, "afterQuest": 525, "criterion": "Qa!526&Qf!526&Qa!527&Qf!527" }
+          ]
+        },
+        {
+          "message": 47369,
+          "choices": [
+            { "reply": 62871, "next": 47370 }
+          ]
+        },
+        {
+          "message": 47370,
+          "choices": [
+            { "reply": 67161, "startsQuest": 526, "params": [[34, 526]] }
+          ]
+        }
+      ],
+      "why": "Fulgencio Ramiro, the librarian of Brakmar, and the end of «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (62873) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 47369 says Letalina Sigisbul has the copy, «¿Dónde está?» (62871) gets 47370 (at the militia), and «Ir a la milicia» (67161) starts «No dejes que tus hijos vaguen» (526), whose giver he is in the catalogue."
     }
   ]
 }

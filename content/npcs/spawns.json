@@ -3450,6 +3450,34 @@
       "orientation": 1,
       "criterion": "(Qa=1446&Qo=8009)|(Qa=1452&Qo=8033)",
       "why": "The recruit of the formation in hand, until its fight is won. INFERRED cell and recruit per year."
+    },
+    {
+      "map": 146800640,
+      "npc": 6778,
+      "cell": 242,
+      "orientation": 1,
+      "why": "The «Bolsa vieja mugrienta» of «El hijo pródigo», lying on the ground of the Arenas de Gúltar [-13,-29], down the stairs from the Koliseo amphitheatre (Dofus pour les noobs: «descendez les escaliers. Parlez alors au Vieux sac crasseux qui traîne au sol»). No capture places it: INFERRED, on the open sand at the foot of the stairs, off the phoenix platform where the ghosts gather (the derived cell, 315, stood right before the statue)."
+    },
+    {
+      "map": 146800640,
+      "npc": 6778,
+      "cell": 315,
+      "remove": true,
+      "why": "The derived cell of the bag, before the phoenix statue: moved to 242, at the foot of the stairs."
+    },
+    {
+      "map": 99091969,
+      "npc": 127,
+      "cell": 356,
+      "remove": true,
+      "why": "The derived cell of Harry Stóteles, among the reading tables with a desk over him: moved behind the reception counter, 201."
+    },
+    {
+      "map": 99091969,
+      "npc": 127,
+      "cell": 201,
+      "orientation": 1,
+      "why": "Harry Stóteles, the librarian of Amakna village [4,1], who asks for silence and hands out the books: behind the reception counter, by the globe, where whoever comes in finds him. No capture places him: INFERRED (the derived cell, 356, stood among the reading tables, half behind a desk)."
     }
   ]
 }

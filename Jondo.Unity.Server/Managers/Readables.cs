@@ -54,7 +54,11 @@ namespace Jondo.Unity.Server.Managers
             public bool Asks => Question != 0 && Accept != 0;
         }
 
-        private static readonly Dictionary<(long Map, int Element), Readable> _porElemento
+        /// <summary>
+        /// Swapped whole on a reload, never changed in place: maps being built read it from other
+        /// threads without the lock.
+        /// </summary>
+        private static volatile Dictionary<(long Map, int Element), Readable> _porElemento
             = new Dictionary<(long, int), Readable>();
 
         /// <summary>
@@ -69,6 +73,16 @@ namespace Jondo.Unity.Server.Managers
         /// boot, with its log line, and not on the first sign somebody reads.
         /// </summary>
         public static void Load() => Ensure();
+
+        /// <summary>Reads the file again (the content reload): a sign written since the start can be read.</summary>
+        public static void Forget()
+        {
+            lock (_lock)
+            {
+                Read();
+                _loaded = true;
+            }
+        }
 
         private static void Ensure()
         {
@@ -88,6 +102,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         private static void Read()
+        {
+            var fresh = new Dictionary<(long, int), Readable>();
+            Read(fresh);
+            _porElemento = fresh;
+        }
+
+        private static void Read(Dictionary<(long, int), Readable> into)
         {
             string path = Paths.ContentFile(File);
 
@@ -113,7 +134,7 @@ namespace Jondo.Unity.Server.Managers
                     int document = (int)Number(row, "document");
 
                     if (element == 0 || document == 0) continue;
-                    _porElemento[(map, element)] = new Readable
+                    into[(map, element)] = new Readable
                     {
                         Document = document,
                         Question = (int)Number(row, "question"),
@@ -123,7 +144,7 @@ namespace Jondo.Unity.Server.Managers
                     };
                 }
 
-                Console.WriteLine($"[Readables] {_porElemento.Count} interactive(s) with a document.");
+                Console.WriteLine($"[Readables] {into.Count} interactive(s) with a document.");
             }
             catch (Exception ex)
             {
