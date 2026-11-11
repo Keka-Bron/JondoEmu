@@ -2146,6 +2146,14 @@ namespace Jondo.Unity.Server.Network
 
             /// <summary>His honour after an aggression between the cities, or null for any other fight.</summary>
             public HonourResult Pvp { get; set; }
+
+            /// <summary>
+            /// A tax collector's row, with its alliance's block (len, AllianceProtocol.Block), or null for
+            /// anybody else. Read off the 3.6.10.11 client (Cpp2IL): the row's «who» (lmk) is a oneof whose case
+            /// fkv.bgdw copies into the row's kind -- 2 a person (lmg), 4 this one (lmi { f1 len }), 5 lmh --,
+            /// and the row's name is read off the len.
+            /// </summary>
+            public Pb Collector { get; set; }
         }
 
         /// <summary>
@@ -2219,7 +2227,8 @@ namespace Jondo.Unity.Server.Network
                 entrada.Msg(2, botin);
 
                 var quien = Pb.New().Var(1, result.Fighter);
-                if (result.Level > 0)
+                if (result.Collector != null) quien.Msg(4, Pb.New().Msg(1, result.Collector));
+                else if (result.Level > 0)
                 {
                     var experiencia = Pb.New()
                         .VarIfNotZero(1, result.XpGained)

@@ -285,14 +285,17 @@ namespace Jondo.Unity.Server.Handlers
         /// after the client's guide. Only its map counted before, and a tax collector left for
         /// days on a quiet map of a busy territory came back with 0 pods.
         /// </remarks>
-        internal static void Gather(FightInstance fight)
+        /// <returns>What each tax collector took, for the end screen (FightRewards).</returns>
+        internal static List<(TaxCollectorStore.TaxCollector Collector, List<int> Items)> Gather(FightInstance fight)
         {
             int subArea = MapManager.GetMapInfo(fight.RoleplayMapId)?.SubAreaId ?? 0;
+            var taken = new List<(TaxCollectorStore.TaxCollector, List<int>)>();
             foreach (var tc in TaxCollectorStore.GatheringFor(fight.RoleplayMapId, subArea))
-                GatherFor(tc, fight);
+                taken.Add((tc, GatherFor(tc, fight)));
+            return taken;
         }
 
-        private static void GatherFor(TaxCollectorStore.TaxCollector tc, FightInstance fight)
+        private static List<int> GatherFor(TaxCollectorStore.TaxCollector tc, FightInstance fight)
         {
             int prospecting = ProspectingOf(tc);
             int maxPods = MaxPodsOf(tc);
@@ -319,6 +322,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (gathered.Count > 0)
                 Program.LogDebug($"[TaxCollector] {tc.Uuid} gathers {gathered.Count} item(s) on map {tc.MapId}: {pods} pods.");
+            return gathered;
         }
 
         // ─── Collecting ─────────────────────────────────────────────────────────
