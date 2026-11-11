@@ -8,6 +8,7 @@ namespace Jondo.Unity.Tests.World
     /// The Hakam tree's lianas: where Giny's catalogue and the 2.73 world graph send one element to
     /// different maps, the graph's wins (TeleportManager). Giny's sent two of them to Amakna.
     /// </summary>
+    [Collection("MapManager")]
     public class HakamTreePassagesTests
     {
         private static bool WorldLoaded()
