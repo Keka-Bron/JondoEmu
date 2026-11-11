@@ -678,19 +678,19 @@ played through.
 |---|:---|:---:|
 | Astrub | `██████████` **100%** | 51/51 |
 | Class Temple | `██████████` **100%** | 39/39 |
-| Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Incarnam | `██████████` **100%** | 24/24 |
+| Kingdom of Amakna | `██████░░░░` **58%** | 22/38 |
 | Wanted Notices | `███░░░░░░░` **27%** | 22/82 |
-| Wabbit Islands | `██████░░░░` **61%** | 14/23 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Moon Island | `██████████` **100%** | 10/10 |
+| Wabbit Islands | `███░░░░░░░` **30%** | 7/23 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
+| Krosmoz | `████░░░░░░` **39%** | 7/18 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| Krosmoz | `██░░░░░░░░` **22%** | 4/18 |
-| **All quests** | **12.4%** | **246/1976** |
+| **All quests** | **11.6%** | **230/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
