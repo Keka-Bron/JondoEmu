@@ -2879,6 +2879,45 @@
       "orientation": 1,
       "criterion": "PO!26135&Qo>18372&Qo<18374",
       "why": "The rataplastada in the Gatokemao tavern once you have brought it there, until it follows you again. INFERRED cell: among the tables."
+    },
+    {
+      "map": 216794632,
+      "npc": 6625,
+      "cell": 288,
+      "orientation": 1,
+      "why": "Temerius before the passage to Brakmar's mine [-23,38], where the quest starts (Dofus pour les noobs, «La lumière au bout des égouts»). He stood nowhere. INFERRED cell: before the pipe that leads to the mine."
+    },
+    {
+      "map": 216795142,
+      "npc": 6624,
+      "cell": 215,
+      "orientation": 1,
+      "criterion": "Qo>18408&Qo<18409",
+      "why": "The miaumiausita out of the crate of roguish bombs (523845) until she heads east. INFERRED cell: beside the crate."
+    },
+    {
+      "map": 216795654,
+      "npc": 6624,
+      "cell": 268,
+      "orientation": 5,
+      "criterion": "Qo>18409&Qo<18415",
+      "why": "The miaumiausita spellbound by the green ore until the shard's light leads her on. INFERRED cell: before the smallest vein (523850)."
+    },
+    {
+      "map": 216795653,
+      "npc": 6624,
+      "cell": 301,
+      "orientation": 5,
+      "criterion": "Qo>18415&PO!26200&Qo<18416",
+      "why": "The miaumiausita gone ahead after the shard's light, until it leads her out. INFERRED cell: on the way up."
+    },
+    {
+      "map": 212864515,
+      "npc": 6624,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qo>18416&Qo<18417",
+      "why": "The miaumiausita lured out of the sewers by the last shard, until she runs off with it. INFERRED cell: by the sewers' way out."
     }
   ]
 }

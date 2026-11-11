@@ -2824,6 +2824,48 @@
    "map": 216924684,
    "afterObjectives": [18377],
    "why": "«Vuelve a valorar el estado de la rataplastada vivaz»: the fight once it has eaten Elfi's stew, the feverish rataplastada now, alone (Dofus pour les noobs, «Déficience immunitaire»)."
+  },
+  {
+   "objective": 18408,
+   "quest": 2436,
+   "kind": "click",
+   "elements": [{"map": 216795142, "element": 523845}],
+   "showsNpc": 6624,
+   "why": "«Encuentra la fuente del ruido»: «cliquez sur la caisse de bombes roublardes au pied des roches en haut à gauche» (Dofus pour les noobs, «La lumière au bout des égouts»), element 523845 (graphic 42094) on cell 201; the lost miaumiausita comes out (showsNpc)."
+  },
+  {
+   "objective": 18410,
+   "quest": 2436,
+   "kind": "enter",
+   "map": 216795654,
+   "afterObjectives": [18409],
+   "why": "«Acércate a la salida de las alcantarillas con la miaumiausita»: the map to the right [-21,37], where she has stopped before the green ore (Dofus pour les noobs, «La lumière au bout des égouts»)."
+  },
+  {
+   "objective": 18414,
+   "quest": 2436,
+   "kind": "click",
+   "elements": [{"map": 216795654, "element": 523850}],
+   "afterObjectives": [18413],
+   "requires": [{"item": 26198, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 26199, "count": 1}],
+   "why": "«Extrae una esquirla de mineral precioso»: the smallest green vein, before the miaumiausita, element 523850 (graphic 45150) on cell 254, struck with the single-use pickaxe, which breaks (Dofus pour les noobs, «La lumière au bout des égouts»). The guide's odds are not kept: the shard comes out."
+  },
+  {
+   "objective": 18415,
+   "quest": 2436,
+   "kind": "use",
+   "afterObjectives": [18414],
+   "why": "«Atrae la atención de la miaumiausita con la esquirla»: the shard 26199 used before the vein (its effect 30, its own condition the map), which leaves 26203 (Dofus pour les noobs, «La lumière au bout des égouts»)."
+  },
+  {
+   "objective": 18416,
+   "quest": 2436,
+   "kind": "use",
+   "afterObjectives": [18415],
+   "showsNpc": 6624,
+   "why": "«Utiliza la esquirla de mineral para que la miaumiausita salga de las alcantarillas»: 26203 used up the sewers [-21,36] leaves 26204, and 26204 used outside them (its effect 30, its condition the street) brings her out (Dofus pour les noobs, «La lumière au bout des égouts»)."
   }
  ]
 }

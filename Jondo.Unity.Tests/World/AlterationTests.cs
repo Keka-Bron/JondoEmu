@@ -306,6 +306,17 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(new[] { (21627, 20) }, BonusItemHandler.GivenItems(new[] { Effect(209, 0, 20, 21627) }));
             Assert.Null(BonusItemHandler.GivenItems(new[] { Effect(193, 2062), Effect(949, 0, 0, 1) }));
             Assert.Null(BonusItemHandler.GivenItems(new[] { Effect(110, 30) }));
+
+            // The precious ore shard on its way out of the sewers: the next shard and the quest's
+            // marker, itself used up, and what the client shows of it.
+            var shard = new[]
+            {
+                Effect(209, 0, 1, 26200), Effect(350, 0, 0, 6625), Effect(350, 0, 0, 6626),
+                Effect(192, 26203), Effect(209, 0, 1, 26204), Effect(630, 0, 0, 1437),
+            };
+            Assert.Equal(new[] { (26200, 1), (26204, 1) }, BonusItemHandler.GivenItems(shard, 26203));
+            // Using up some other item is not something it does.
+            Assert.Null(BonusItemHandler.GivenItems(new[] { Effect(209, 0, 1, 19135), Effect(192, 19134) }, 10530));
         }
 
         // ─── Kept in the base ──────────────────────────────────────────────────────────

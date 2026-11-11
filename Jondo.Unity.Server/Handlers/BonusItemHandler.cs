@@ -50,19 +50,38 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Effects that say something of the item and do nothing on use.</summary>
         private static readonly HashSet<int> Markers = new() { 981, 983, 2818 };
 
+        /// <summary>
+        /// Effects with no text that only go with a quest item's use, beside what it gives: 350 names
+        /// NPCs (the precious ore shard of «La luz al final de las alcantarillas» names Temerius and
+        /// the «Haz de luz», 6626), 630 a number of the client's own (1437 for the shard). Nothing for
+        /// the server to keep.
+        /// </summary>
+        private static readonly HashSet<int> Shown = new() { 350, 630 };
+
+        /// <summary>
+        /// The item used up (192), with the item in its first number. Naming the item itself, it is
+        /// what spending it already does: the shard gone as the next one comes.
+        /// </summary>
+        private const int UsedUp = 192;
+
         /// <summary>Whether an item sets or takes alterations, and nothing else.</summary>
         internal static bool GivesAlterations(IReadOnlyList<DatabaseManager.ItemEffectData> effects)
             => effects.Any(e => e.EffectId is GainAlteration or LoseAlteration)
                && effects.All(e => e.EffectId is GainAlteration or LoseAlteration || Markers.Contains(e.EffectId));
 
-        /// <summary>The items an item gives and how many of each, or null when it does anything else besides.</summary>
-        internal static List<(int Template, int Quantity)>? GivenItems(IReadOnlyList<DatabaseManager.ItemEffectData> effects)
+        /// <summary>
+        /// The items an item gives and how many of each, or null when it does anything else besides.
+        /// <paramref name="own"/> is the item's own template, for a 192 that uses it up.
+        /// </summary>
+        internal static List<(int Template, int Quantity)>? GivenItems(IReadOnlyList<DatabaseManager.ItemEffectData> effects,
+                                                                     int own = 0)
         {
             if (!effects.Any(e => e.EffectId is GainItem or GainItems)) return null;
             var given = new List<(int, int)>();
             foreach (var effect in effects)
             {
-                if (Markers.Contains(effect.EffectId)) continue;
+                if (Markers.Contains(effect.EffectId) || Shown.Contains(effect.EffectId)) continue;
+                if (effect.EffectId == UsedUp && own != 0 && effect.DiceNum == own) continue;
                 if (effect.EffectId is not (GainItem or GainItems)) return null;
                 int template = effect.EffectId == GainItem ? effect.DiceNum : effect.Value;
                 if (template > 0) given.Add((template, Math.Max(1, effect.DiceSide)));
@@ -76,7 +95,7 @@ namespace Jondo.Unity.Server.Handlers
             var effects = DatabaseManager.GetItemEffectsData(DatabaseManager.GetItemTemplatePossibleEffects(item.Template));
             if (GivesAlterations(effects)) return await SetAlterationsAsync(stream, item, effects);
 
-            var given = GivenItems(effects);
+            var given = GivenItems(effects, item.Template);
             if (given == null || given.Count == 0) return false;
             foreach (var (template, _) in given)
             {

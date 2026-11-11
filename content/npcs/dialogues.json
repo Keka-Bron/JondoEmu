@@ -23496,6 +23496,219 @@
         }
       ],
       "why": "The rataplastada in the Gatokemao tavern [-28,38]: Dofus pour les noobs, «Déficience immunitaire», a sore throat at last, and back to the malady ward with you (18373). Lost on the way, it waits here."
+    },
+    {
+      "npc": 6625,
+      "map": 216794632,
+      "opening": 50108,
+      "openings": [
+        { "after": 2436, "message": 50134 }
+      ],
+      "lines": [
+        {
+          "message": 50108,
+          "choices": [
+            { "reply": 66858, "next": 50109, "beforeQuest": 2436, "minLevel": 90 },
+            { "reply": 66879, "next": 50126, "quest": 2436, "afterObjective": 18411, "beforeObjective": 18412 },
+            { "reply": 66884, "next": 50128, "quest": 2436, "afterObjective": 18412, "beforeObjective": 18413, "holds": 26198 },
+            { "reply": 66889, "next": 50133, "quest": 2436, "afterObjective": 18417, "beforeObjective": 18418 }
+          ]
+        },
+        {
+          "message": 50109,
+          "choices": [
+            { "reply": 66857, "next": 50110 }
+          ]
+        },
+        {
+          "message": 50110,
+          "choices": [
+            { "reply": 66856, "next": 50111 }
+          ]
+        },
+        {
+          "message": 50111,
+          "choices": [
+            { "reply": 66855, "next": 50112 }
+          ]
+        },
+        {
+          "message": 50112,
+          "choices": [
+            { "reply": 66854, "startsQuest": 2436, "params": [[34, 2436]], "beforeQuest": 2436 }
+          ]
+        },
+        {
+          "message": 50126,
+          "choices": [
+            { "reply": 66881, "next": 50127 }
+          ]
+        },
+        {
+          "message": 50127,
+          "choices": [
+            { "reply": 66880, "quest": 2436, "completes": 18412 },
+            { "reply": 66880 }
+          ]
+        },
+        {
+          "message": 50128,
+          "choices": [
+            { "reply": 66883, "next": 50129 }
+          ]
+        },
+        {
+          "message": 50129,
+          "choices": [
+            { "reply": 66882, "quest": 2436, "completes": 18413 },
+            { "reply": 66882 }
+          ]
+        },
+        {
+          "message": 50133,
+          "choices": [
+            { "reply": 66888, "quest": 2436, "completes": 18418 },
+            { "reply": 66888 }
+          ]
+        },
+        {
+          "message": 50134,
+          "choices": []
+        }
+      ],
+      "why": "Temerius before the passage to Brakmar's mine [-23,38]: Dofus pour les noobs, «La lumière au bout des égouts», the mine is haunted, he says, and «Aceptar el desafío» sends you to find out (2436); a lost miaumiausita, not ghosts, and he is allergic: a shard of the green ore will lure her out (18412), and the single-use pickaxe shown he tells how to use it (18413); the cat gone, he can watch the lights again (18418)."
+    },
+    {
+      "npc": 6624,
+      "map": 216795142,
+      "opening": 50113,
+      "lines": [
+        {
+          "message": 50113,
+          "choices": [
+            { "reply": 66863, "next": 50114, "quest": 2436, "afterObjective": 18408, "beforeObjective": 18419 },
+            { "reply": 66866, "next": 50118, "quest": 2436, "afterObjective": 18419, "beforeObjective": 18409, "holds": 26197, "holdsCount": 20, "completes": 18409 }
+          ]
+        },
+        {
+          "message": 50114,
+          "choices": [
+            { "reply": 66862, "next": 50115 }
+          ]
+        },
+        {
+          "message": 50115,
+          "choices": [
+            { "reply": 66861, "next": 50116 }
+          ]
+        },
+        {
+          "message": 50116,
+          "choices": [
+            { "reply": 66860, "next": 50117 }
+          ]
+        },
+        {
+          "message": 50117,
+          "choices": [
+            { "reply": 66859, "quest": 2436, "completes": 18419 },
+            { "reply": 66859 }
+          ]
+        },
+        {
+          "message": 50118,
+          "choices": [
+            { "reply": 66865, "next": 50119 }
+          ]
+        },
+        {
+          "message": 50119,
+          "choices": [
+            { "reply": 66864 }
+          ]
+        }
+      ],
+      "why": "The lost miaumiausita that comes out of the crate of roguish bombs [-22,37]: Dofus pour les noobs, «La lumière au bout des égouts», «Tenter de caresser la chachatonne», afraid of the rats around (18419); twenty tufts of Brakmar rat show her they do not scare you, and she heads east (18409)."
+    },
+    {
+      "npc": 6624,
+      "map": 216795654,
+      "opening": 50120,
+      "lines": [
+        {
+          "message": 50120,
+          "choices": [
+            { "reply": 66869, "next": 50121, "quest": 2436, "afterObjective": 18410, "beforeObjective": 18411 },
+            { "reply": 66870, "next": 50123, "quest": 2436, "afterObjective": 18410, "beforeObjective": 18411 },
+            { "reply": 66871, "next": 50124, "quest": 2436, "afterObjective": 18410, "beforeObjective": 18411 },
+            { "reply": 66872, "next": 50125, "quest": 2436, "afterObjective": 18410, "beforeObjective": 18411 }
+          ]
+        },
+        {
+          "message": 50121,
+          "choices": [
+            { "reply": 66867, "quest": 2436, "completes": 18411 },
+            { "reply": 66868, "next": 50120 }
+          ]
+        },
+        {
+          "message": 50123,
+          "choices": [
+            { "reply": 66873, "quest": 2436, "completes": 18411 },
+            { "reply": 66874, "next": 50120 }
+          ]
+        },
+        {
+          "message": 50124,
+          "choices": [
+            { "reply": 66875, "quest": 2436, "completes": 18411 },
+            { "reply": 66876, "next": 50120 }
+          ]
+        },
+        {
+          "message": 50125,
+          "choices": [
+            { "reply": 66877, "quest": 2436, "completes": 18411 },
+            { "reply": 66878, "next": 50120 }
+          ]
+        }
+      ],
+      "why": "The miaumiausita before the green ore [-21,37]: Dofus pour les noobs, «La lumière au bout des égouts», she ignores you whatever you try, «Abandonner et retourner voir Dras Fours pour parler de cet étrange minerai» (18411)."
+    },
+    {
+      "npc": 6624,
+      "map": 216795653,
+      "opening": 50130,
+      "lines": [
+        {
+          "message": 50130,
+          "choices": [
+            { "reply": 66885 }
+          ]
+        }
+      ],
+      "why": "The miaumiausita following the shard's beam of light up the sewers [-21,36]."
+    },
+    {
+      "npc": 6624,
+      "map": 212864515,
+      "opening": 50131,
+      "lines": [
+        {
+          "message": 50131,
+          "choices": [
+            { "reply": 66887, "next": 50132, "quest": 2436, "afterObjective": 18416, "beforeObjective": 18417 }
+          ]
+        },
+        {
+          "message": 50132,
+          "choices": [
+            { "reply": 66886, "quest": 2436, "completes": 18417, "takes": 26200 },
+            { "reply": 66886 }
+          ]
+        }
+      ],
+      "why": "The miaumiausita out of the sewers in Brakmar's streets [-21,36]: Dofus pour les noobs, «La lumière au bout des égouts», shown the shard she snatches it and runs off into the dark streets (18417)."
     }
   ]
 }
