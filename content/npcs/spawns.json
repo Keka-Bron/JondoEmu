@@ -3001,6 +3001,94 @@
       "orientation": 1,
       "criterion": "Qa=1201&Qo>6772&Qo<6773",
       "why": "Kerubim in his barrel at Marp's house once Graslahad has left (6772) until the pass is given (6773); the cell is the derived one."
+    },
+    {
+      "map": 161225222,
+      "npc": 3100,
+      "cell": 247,
+      "orientation": 3,
+      "criterion": "Qa=1696&Qo>10418&Qo<10564",
+      "why": "Kerubim at Zurcalia's arrival [-6,-1], from the circle of light (10418) until he takes you on (10564). INFERRED cell, by the heart."
+    },
+    {
+      "map": 161224198,
+      "npc": 3100,
+      "cell": 361,
+      "orientation": 3,
+      "criterion": "Qa=1696&Qo>10564&Qo<10566",
+      "why": "Kerubim at the statues' place [-7,-1] (10564 to 10566). INFERRED cell."
+    },
+    {
+      "map": 161224196,
+      "npc": 3100,
+      "cell": 387,
+      "orientation": 3,
+      "criterion": "Qa=1696&Qo>10566&Qo<10568",
+      "why": "Kerubim at the last place [-7,-2] (10566 to 10568). INFERRED cell."
+    },
+    {
+      "map": 161225222,
+      "npc": 3101,
+      "cell": 263,
+      "orientation": 1,
+      "criterion": "Qa=1696&Qo>10562&Qo<10564",
+      "why": "The spyglass Kerubim sets up at the arrival once the fleas are gone (10562 to 10564). INFERRED cell."
+    },
+    {
+      "map": 161224198,
+      "npc": 3101,
+      "cell": 389,
+      "orientation": 1,
+      "criterion": "Qa=1696&Qo>10564&Qo<10566",
+      "why": "The spyglass at the statues' place (10564 to 10566). INFERRED cell."
+    },
+    {
+      "map": 161224196,
+      "npc": 3101,
+      "cell": 403,
+      "orientation": 1,
+      "criterion": "Qa=1696&Qo>10566&Qo<10568",
+      "why": "The spyglass at the last place (10566 to 10568). INFERRED cell."
+    },
+    {
+      "map": 161225222,
+      "npc": 3133,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1696&Qo>10560&Qo<10561",
+      "why": "An irritating flea while the five are to be beaten (10561): one on the arrival map, two on the left one, two on the upper one (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 161224198,
+      "npc": 3133,
+      "cell": 284,
+      "orientation": 1,
+      "criterion": "Qa=1696&Qo>10560&Qo<10561",
+      "why": "An irritating flea while the five are to be beaten (10561): one on the arrival map, two on the left one, two on the upper one (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 161224198,
+      "npc": 3133,
+      "cell": 412,
+      "orientation": 1,
+      "criterion": "Qa=1696&Qo>10560&Qo<10561",
+      "why": "An irritating flea while the five are to be beaten (10561): one on the arrival map, two on the left one, two on the upper one (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 161224196,
+      "npc": 3133,
+      "cell": 231,
+      "orientation": 1,
+      "criterion": "Qa=1696&Qo>10560&Qo<10561",
+      "why": "An irritating flea while the five are to be beaten (10561): one on the arrival map, two on the left one, two on the upper one (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 161224196,
+      "npc": 3133,
+      "cell": 466,
+      "orientation": 1,
+      "criterion": "Qa=1696&Qo>10560&Qo<10561",
+      "why": "An irritating flea while the five are to be beaten (10561): one on the arrival map, two on the left one, two on the upper one (Dofus pour les noobs). INFERRED cell."
     }
   ]
 }

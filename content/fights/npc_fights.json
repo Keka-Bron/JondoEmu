@@ -431,6 +431,8 @@
       "monsters": [ { "monster": 3355, "grade": 0 } ] },
     { "npc": 1904, "map": 192675842, "reply": 15592,
       "monsters": [ { "monster": 3357, "grade": 0 } ],
-      "allies": [ { "monster": 3356, "grade": 0 } ] }
+      "allies": [ { "monster": 3356, "grade": 0 } ] },
+    { "npc": 3133, "map": 0, "reply": 27062, "byLevel": true,
+      "monsters": [ { "monster": 4315, "grade": 0 } ] }
   ]
 }
