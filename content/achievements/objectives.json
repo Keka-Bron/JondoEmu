@@ -8,7 +8,7 @@
     "(Qf a quest finished, Qo a quest objective validated, OA an achievement obtained), and it",
     "replaces the client's.",
     "",
-    "  { \"objective\": 17380, \"criterion\": \"Qo=19173\", \"measured\": \"...\" }",
+    "  { \"objective\": 17380, \"criterion\": \"Qo>19173\", \"measured\": \"...\" }",
     "",
     "«eachCharacter»: the achievements every character of an account earns and is paid for",
     "himself (Managers.Achievements), where the others are the account's and earned once.",
@@ -16,7 +16,7 @@
     "  { \"achievement\": 8518, \"measured\": \"...\" }"
   ],
   "objectives": [
-    { "objective": 17380, "achievement": 8518, "criterion": "Qo=19173", "measured": "«Primera parte del tutorial» of «Primer tiempo». The capture of the whole tutorial earns 8518 (mfu) right after idz 2502 3173, the reply to Ganymed by the jalatós' pen that validates objective 19173; its other two objectives, 2511 and 2545 finished, held already." }
+    { "objective": 17380, "achievement": 8518, "criterion": "Qo>19173", "measured": "«Primera parte del tutorial» of «Primer tiempo». The capture of the whole tutorial earns 8518 (mfu) right after idz 2502 3173, the reply to Ganymed by the jalatós' pen that validates objective 19173; its other two objectives, 2511 and 2545 finished, held already." }
   ],
   "eachCharacter": [
     { "achievement": 8518, "measured": "«Primer tiempo», whose experience makes the character level 2. The client's step of 2502 for objective 19250 («Consigue las recompensas del logro y reparte los puntos de característica», tutorial step 15) waits for level 2, the characteristics sheet opened, points spent and the sheet closed, and only then validates it (idw 19250, as the capture does after mga, mfs and kum). A second character of an account that already had it stayed at level 1 with no points, and the tutorial could not go on." }

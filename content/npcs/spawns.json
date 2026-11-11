@@ -50,7 +50,7 @@
     "lines send one to, at the right-hand corner of the room's counter. No capture shows the room."
   ],
   "spawns": [
-    { "map": 241441793, "npc": 7581, "cell": 246, "orientation": 3, "criterion": "Qa=1630&Qo=10016" },
+    { "map": 241441793, "npc": 7581, "cell": 246, "orientation": 3, "criterion": "Qa=1630&Qo>10016" },
     {
       "map": 153880835,
       "npc": 4398,
@@ -739,7 +739,7 @@
       "npc": 2911,
       "cell": 344,
       "orientation": 1,
-      "criterion": "Qa=1635&Qo!9785",
+      "criterion": "Qa=1635&Qo<9785",
       "why": "The Minilubo Albino, in his lair, «qui se tient devant vous» (Dofus pour les noobs), facing whoever comes in from the grate's landing (373); there until he is beaten, «Vence a Minilubo Albino» (9785). No capture places him: INFERRED."
     },
     {
@@ -747,7 +747,7 @@
       "npc": 2898,
       "cell": 344,
       "orientation": 1,
-      "criterion": "Qo=9785|Qf=1635",
+      "criterion": "Qo>9785|Qf=1635",
       "why": "Likantrabioso, where the Minilubo stood: «Une fois le combat terminé, Hargnok qui avait disparu apparaît. Il semblerait que le Milimilou n'était autre que lui» (Dofus pour les noobs). The derived layer had him here from the start; he is the Minilubo, so he only shows once it is beaten."
     },
     {
@@ -755,7 +755,7 @@
       "npc": 2912,
       "cell": 385,
       "orientation": 5,
-      "criterion": "Qa=1633&Qo=9769&Qo!9770",
+      "criterion": "Qa=1633&Qo>9769&Qo<9770",
       "why": "The Rata Nsiosa, out of the tap: template 2912 on cell 385 facing 5 in the jsn of «mision matarratas completa», once the lemonade is poured (9769) and until it is beaten (9770)."
     },
     {
@@ -777,7 +777,7 @@
       "npc": 2938,
       "cell": 357,
       "orientation": 3,
-      "criterion": "Qa=1648&Qo=9859&Qo!9857",
+      "criterion": "Qa=1648&Qo>9859&Qo<9857",
       "why": "Percy Klópeo, who comes out of his tomb when it is searched (9859) and is there until beaten (9857). INFERRED: the walkable cell in front of the tomb (element 489506 on 343), facing the way in (396)."
     },
     {
@@ -792,7 +792,7 @@
       "npc": 4472,
       "cell": 287,
       "orientation": 3,
-      "criterion": "Qa=1971&Qo!14171",
+      "criterion": "Qa=1971&Qo<14171",
       "why": "The apple thieves, at the meadow only while «C'est pour ta pomme» has them still to beat (14171). The cell is the derived layer's."
     },
     {
@@ -807,7 +807,7 @@
       "npc": 4415,
       "cell": 288,
       "orientation": 1,
-      "criterion": "Qa=1960&Qo!13934",
+      "criterion": "Qa=1960&Qo<13934",
       "why": "The hungry rats, in the sewers while «Aquí huele a gas» has them to beat (13934). INFERRED: a walkable cell of the meeting place."
     },
     {
@@ -815,7 +815,7 @@
       "npc": 4416,
       "cell": 189,
       "orientation": 1,
-      "criterion": "Qo!13937|Qo=13940",
+      "criterion": "Qo<13937|Qo>13940",
       "why": "A veteran móguard in front of the big chest of the quarry's gallery (element 516020 on 176), away while he and his colleague check the signalling fairy's noise (13937 done, 13940 not yet). No capture places him: INFERRED, beside the chest, facing the way in."
     },
     {
@@ -823,7 +823,7 @@
       "npc": 4417,
       "cell": 217,
       "orientation": 1,
-      "criterion": "Qo!13937|Qo=13940",
+      "criterion": "Qo<13937|Qo>13940",
       "why": "The other veteran móguard, on the chest's other side; away like his colleague. INFERRED."
     },
     {
@@ -831,7 +831,7 @@
       "npc": 4418,
       "cell": 330,
       "orientation": 1,
-      "criterion": "Qa=1960&Qo!13940",
+      "criterion": "Qa=1960&Qo<13940",
       "why": "Rathrosk at the móguices' machine, until he leaves the room with the character (13940). INFERRED: the middle of the machine room."
     },
     {
@@ -839,7 +839,7 @@
       "npc": 4414,
       "cell": 302,
       "orientation": 3,
-      "criterion": "Qa!1960|Qo=13934",
+      "criterion": "Qa!1960|Qo>13934",
       "why": "Ramán Hitu, chief of the Strubian rats: during «Aquí huele a gas» he only arrives once his hungry rats are beaten (13934; Dofus pour les noobs: «parlez au chef Ramane Hitoo qui est enfin arrivé»). The cell is the derived layer's."
     },
     {
@@ -847,7 +847,7 @@
       "npc": 4421,
       "cell": 287,
       "orientation": 1,
-      "criterion": "Qa=1962&Qo!13948",
+      "criterion": "Qa=1962&Qo<13948",
       "why": "The false recruit at the meeting point of «Balade en forêt» ([-1,-23]), there only until the ambush is beaten (13948). The cell is the derived layer's."
     },
     {
@@ -915,7 +915,7 @@
       "npc": 4408,
       "cell": 383,
       "orientation": 3,
-      "criterion": "Qa=1975&Qo!13960",
+      "criterion": "Qa=1975&Qo<13960",
       "why": "The Cra rascal pressing Camilo Demolinos, until they are beaten (13960). INFERRED."
     },
     {
@@ -923,7 +923,7 @@
       "npc": 4409,
       "cell": 411,
       "orientation": 5,
-      "criterion": "Qa=1975&Qo!13960",
+      "criterion": "Qa=1975&Qo<13960",
       "why": "The Iop rascal, on Camilo's other side, until they are beaten (13960). INFERRED."
     },
     {
@@ -937,7 +937,7 @@
       "npc": 4410,
       "cell": 344,
       "orientation": 7,
-      "criterion": "Qa=1975&Qo=13962",
+      "criterion": "Qa=1975&Qo>13962",
       "why": "Abel Hoz, who comes into the bank while Al Etsop talks of the duke (13962), in front of the counter. INFERRED."
     },
     {
@@ -951,7 +951,7 @@
       "npc": 4411,
       "cell": 402,
       "orientation": 5,
-      "criterion": "Qa=1975&Qo=13964",
+      "criterion": "Qa=1975&Qo>13964",
       "why": "Nosbro Mah, the stranger Aisling has just spoken to (13964). INFERRED, clear of the tables."
     },
     {
@@ -965,7 +965,7 @@
       "npc": 4412,
       "cell": 397,
       "orientation": 1,
-      "criterion": "Qo=13964&Qa!1976&Qf!1976",
+      "criterion": "Qo>13964&Qa!1976&Qf!1976",
       "why": "Hupe Esse, who delivered the books, from Aisling's complaint on (13964) until «Six pieds sous terre» is taken. INFERRED."
     },
     {
@@ -979,7 +979,7 @@
       "npc": 4420,
       "cell": 345,
       "orientation": 3,
-      "criterion": "Qo=13945&Qa!1962&Qf!1962",
+      "criterion": "Qo>13945&Qa!1962&Qf!1962",
       "why": "The mercenary recruit who takes the character to the meeting point of «Balade en forêt» (4420), sent by Aisling at the end of «Ça sent le gaz» (13945), until that quest is taken. The cell is clear of Aisling's (the derived 384 stood next to her). INFERRED."
     },
     {
@@ -995,7 +995,7 @@
       "npc": 4424,
       "cell": 316,
       "orientation": 1,
-      "criterion": "Qa=1976&Qo!13972",
+      "criterion": "Qa=1976&Qo<13972",
       "why": "Luci, lost with the two others in the underground until the character takes them up (13972). INFERRED, in the middle of the cave."
     },
     {
@@ -1003,7 +1003,7 @@
       "npc": 4422,
       "cell": 290,
       "orientation": 3,
-      "criterion": "Qa=1976&Qo!13972",
+      "criterion": "Qa=1976&Qo<13972",
       "why": "Bom, by Luci. INFERRED."
     },
     {
@@ -1011,7 +1011,7 @@
       "npc": 4423,
       "cell": 358,
       "orientation": 7,
-      "criterion": "Qa=1976&Qo!13972",
+      "criterion": "Qa=1976&Qo<13972",
       "why": "Pepi, by Luci. INFERRED."
     },
     {
@@ -1019,7 +1019,7 @@
       "npc": 4424,
       "cell": 397,
       "orientation": 1,
-      "criterion": "Qa=1976&Qo=13972",
+      "criterion": "Qa=1976&Qo>13972",
       "why": "Luci at the surface, once taken up (13972), until «Six pieds sous terre» is over. INFERRED, on the square below the mine."
     },
     {
@@ -1053,7 +1053,7 @@
       "npc": 4466,
       "cell": 372,
       "orientation": 3,
-      "criterion": "Qa=1977&Qo!14117",
+      "criterion": "Qa=1977&Qo<14117",
       "why": "An Amaknean investigator at [7,-19], one of the four places Dofus pour les noobs gives him ([3,-21], [1,-17], [7,-15], [7,-19]), while «Tel est pris qui croyait prendre» has him searching (until 14117). INFERRED cell."
     },
     {
@@ -1061,7 +1061,7 @@
       "npc": 4466,
       "cell": 453,
       "orientation": 1,
-      "criterion": "Qa=1977&Qo!14117",
+      "criterion": "Qa=1977&Qo<14117",
       "why": "The Amaknean investigator at [1,-17] (see [7,-19]). INFERRED cell."
     },
     {
@@ -1069,7 +1069,7 @@
       "npc": 4488,
       "cell": 338,
       "orientation": 1,
-      "criterion": "Qa=1977&Qo!14117",
+      "criterion": "Qa=1977&Qo<14117",
       "why": "The Amaknean investigator at [3,-21] (see [7,-19]). INFERRED cell."
     },
     {
@@ -1077,7 +1077,7 @@
       "npc": 4489,
       "cell": 341,
       "orientation": 1,
-      "criterion": "Qa=1977&Qo!14117",
+      "criterion": "Qa=1977&Qo<14117",
       "why": "The Amaknean investigator at [7,-15] (see [7,-19]). INFERRED cell."
     },
     {
@@ -1085,7 +1085,7 @@
       "npc": 4413,
       "cell": 411,
       "orientation": 3,
-      "criterion": "Qa=1977&Qo=14117&Qo!14120",
+      "criterion": "Qa=1977&Qo>14117&Qo<14120",
       "why": "Hipo Lítico at the foot of the temple's stairs, from the wait near the temple (14117) until he is handed to the militia (14120). INFERRED."
     },
     {
@@ -1093,7 +1093,7 @@
       "npc": 4466,
       "cell": 438,
       "orientation": 7,
-      "criterion": "Qa=1977&Qo=14118&Qo!14120",
+      "criterion": "Qa=1977&Qo>14118&Qo<14120",
       "why": "The investigator called in by the character (14118), until the swindler is handed over. INFERRED."
     },
     {
@@ -1101,7 +1101,7 @@
       "npc": 4413,
       "cell": 245,
       "orientation": 1,
-      "criterion": "Qo=14120",
+      "criterion": "Qo>14120",
       "why": "Hipo Lítico in the left cell of Astrub's prison once handed over (14120). INFERRED."
     },
     {
@@ -1109,7 +1109,7 @@
       "npc": 4364,
       "cell": 440,
       "orientation": 1,
-      "criterion": "Qa=1981&Qo=13781&Qo=13782&Qo=13783&Qo=13784&Qo!13785",
+      "criterion": "Qa=1981&Qo>13781&Qo>13782&Qo>13783&Qo>13784&Qo<13785",
       "why": "The country doll, out of Mawy Ingals' barn once Vey Gana has her four slobbers, until beaten (13785). INFERRED: on the grass between the barn and Vey Gana."
     },
     {
@@ -1130,7 +1130,7 @@
       "npc": 4375,
       "cell": 288,
       "orientation": 7,
-      "criterion": "Qa=1985&Qo!13831",
+      "criterion": "Qa=1985&Qo<13831",
       "why": "The Sram brute, threatening Estefi Dora while «Livraison par intérim» has them there, until beaten. INFERRED."
     },
     {
@@ -1138,7 +1138,7 @@
       "npc": 4376,
       "cell": 304,
       "orientation": 7,
-      "criterion": "Qa=1985&Qo!13831",
+      "criterion": "Qa=1985&Qo<13831",
       "why": "The Tymador brute, beside the Sram one. INFERRED."
     },
     {
@@ -1146,7 +1146,7 @@
       "npc": 4469,
       "cell": 345,
       "orientation": 3,
-      "criterion": "Qa!1996|Qo!14180|(Qo=14155&Qo!14196)",
+      "criterion": "Qa!1996|Qo<14180|(Qo>14155&Qo<14196)",
       "why": "The mercenary guarding the goblins at their trunk in Astrub's meadows [3,-14]; away to the workshop while the character guards them (14180 to 14155) and gone after them once they run (14196). INFERRED cell, looking over the goblins."
     },
     {
@@ -1154,7 +1154,7 @@
       "npc": 749,
       "cell": 372,
       "orientation": 1,
-      "criterion": "Qa!1996|Qo!14155",
+      "criterion": "Qa!1996|Qo<14155",
       "why": "Alka Traz at the old trunk the goblins are to cut, except while they are on the run (14155 until the quest ends). INFERRED."
     },
     {
@@ -1162,7 +1162,7 @@
       "npc": 750,
       "cell": 388,
       "orientation": 3,
-      "criterion": "Qa!1996|Qo!14155",
+      "criterion": "Qa!1996|Qo<14155",
       "why": "Luki Lushiano at the trunk (see Alka Traz). INFERRED."
     },
     {
@@ -1170,7 +1170,7 @@
       "npc": 751,
       "cell": 430,
       "orientation": 7,
-      "criterion": "Qa!1996|Qo!14155",
+      "criterion": "Qa!1996|Qo<14155",
       "why": "Guan Tánamo at the trunk (see Alka Traz). INFERRED."
     },
     {
@@ -1178,7 +1178,7 @@
       "npc": 749,
       "cell": 242,
       "orientation": 1,
-      "criterion": "Qa=1996&Qo=14155&Qo!14197",
+      "criterion": "Qa=1996&Qo>14155&Qo<14197",
       "why": "Alka Traz run away to the farm's eggs at [3,-9], until beaten (14197). INFERRED."
     },
     {
@@ -1186,7 +1186,7 @@
       "npc": 750,
       "cell": 229,
       "orientation": 1,
-      "criterion": "Qa=1996&Qo=14155&Qo!14197",
+      "criterion": "Qa=1996&Qo>14155&Qo<14197",
       "why": "Luki Lushiano at the farm (see Alka Traz). INFERRED."
     },
     {
@@ -1194,7 +1194,7 @@
       "npc": 751,
       "cell": 256,
       "orientation": 1,
-      "criterion": "Qa=1996&Qo=14155&Qo!14197",
+      "criterion": "Qa=1996&Qo>14155&Qo<14197",
       "why": "Guan Tánamo at the farm (see Alka Traz). INFERRED."
     },
     {
@@ -1202,7 +1202,7 @@
       "npc": 4469,
       "cell": 410,
       "orientation": 7,
-      "criterion": "Qa=1996&Qo=14197",
+      "criterion": "Qa=1996&Qo>14197",
       "why": "The mercenary come east after them, once they are beaten (14197). INFERRED."
     },
     {
@@ -1224,7 +1224,7 @@
       "npc": 4442,
       "cell": 284,
       "orientation": 1,
-      "criterion": "Qa=1990&Qo!14006",
+      "criterion": "Qa=1990&Qo<14006",
       "why": "A library rat in Astrub's sewers, while «De vrais rats de bibliothèque» has the three to beat. INFERRED cell, on the sewer's walkway."
     },
     {
@@ -1232,7 +1232,7 @@
       "npc": 4442,
       "cell": 372,
       "orientation": 1,
-      "criterion": "Qa=1990&Qo!14006",
+      "criterion": "Qa=1990&Qo<14006",
       "why": "A library rat in Astrub's sewers, while «De vrais rats de bibliothèque» has the three to beat. INFERRED cell, on the sewer's walkway."
     },
     {
@@ -1240,7 +1240,7 @@
       "npc": 4442,
       "cell": 412,
       "orientation": 1,
-      "criterion": "Qa=1990&Qo!14006",
+      "criterion": "Qa=1990&Qo<14006",
       "why": "A library rat in Astrub's sewers, while «De vrais rats de bibliothèque» has the three to beat. INFERRED cell, on the sewer's walkway."
     },
     {
@@ -1248,7 +1248,7 @@
       "npc": 4467,
       "cell": 300,
       "orientation": 1,
-      "criterion": "Qa!1992|Qo!14154|Qo=14205",
+      "criterion": "Qa!1992|Qo<14154|Qo>14205",
       "why": "Soki at [7,-20], except while he follows the character on his walk (fed, 14154, until back, 14205). The cell is the derived layer's."
     },
     {
@@ -1263,7 +1263,7 @@
       "npc": 4465,
       "cell": 315,
       "orientation": 1,
-      "criterion": "Qa=1992&Qo=14206&Qo!14207",
+      "criterion": "Qa=1992&Qo>14206&Qo<14207",
       "why": "The mice in the cellar, from when Soki needs one (14206) until beaten (14207). INFERRED: the middle of the cellar."
     },
     {
@@ -1278,7 +1278,7 @@
       "npc": 598,
       "cell": 355,
       "orientation": 3,
-      "criterion": "Qa=1998&Qo=13874&Qo!13876",
+      "criterion": "Qa=1998&Qo>13874&Qo<13876",
       "why": "The Artempeth rose in Erty's cellar, from when he sends the character for his notebook (13874) until beaten (13876). INFERRED cell, the middle of the cellar."
     },
     {
@@ -1293,7 +1293,7 @@
       "npc": 4455,
       "cell": 191,
       "orientation": 3,
-      "criterion": "Qa=1987&Qo=14136&Qo!14139",
+      "criterion": "Qa=1987&Qo>14136&Qo<14139",
       "why": "Vangey by the white cart [-2,-24], out of it once searched (14136) until he sets off for Astrub (14139). INFERRED cell, beside the cart."
     },
     {
@@ -1301,7 +1301,7 @@
       "npc": 4455,
       "cell": 441,
       "orientation": 7,
-      "criterion": "(Qa=1987&Qo=14140)|Qf=1987",
+      "criterion": "(Qa=1987&Qo>14140)|Qf=1987",
       "why": "Vangey at the Council Tower's ground floor once brought back (14140), and after. INFERRED cell, before Archi."
     },
     {
@@ -1309,7 +1309,7 @@
       "npc": 4458,
       "cell": 262,
       "orientation": 7,
-      "criterion": "Qa=1987&Qo=14137&Qo!14138",
+      "criterion": "Qa=1987&Qo>14137&Qo<14138",
       "why": "A ruffian of Cania at the cart, from the ambush (14137) until beaten (14138). INFERRED cell."
     },
     {
@@ -1317,7 +1317,7 @@
       "npc": 4443,
       "cell": 370,
       "orientation": 1,
-      "criterion": "Qo=13942&(Qa!1991|Qo!14068)",
+      "criterion": "Qo>13942&(Qa!1991|Qo<14068)",
       "why": "Rathrosk in the Council's room, as since «Paseo por el bosque» (13942), except while he follows the character to the cemetery in «Légende d'automne» (14068 until the quest ends)."
     },
     {
@@ -1325,7 +1325,7 @@
       "npc": 4418,
       "cell": 276,
       "orientation": 5,
-      "criterion": "Qa=1991&Qo=14071",
+      "criterion": "Qa=1991&Qo>14071",
       "why": "Rathrosk at the knight of autumn's tomb [2,-10] from when he flees there (14071) until the quest ends. INFERRED cell, beside the tomb."
     },
     {
@@ -1333,7 +1333,7 @@
       "npc": 4446,
       "cell": 328,
       "orientation": 1,
-      "criterion": "Qa=1991&Qo=14076&Qo!14077",
+      "criterion": "Qa=1991&Qo>14076&Qo<14077",
       "why": "A Purple Dawn spectre at [0,-12] while the relic is to be won. INFERRED cell."
     },
     {
@@ -1341,7 +1341,7 @@
       "npc": 4383,
       "cell": 300,
       "orientation": 1,
-      "criterion": "Qa=2008&Qo=14181&Qo!14193",
+      "criterion": "Qa=2008&Qo>14181&Qo<14193",
       "why": "Juan Arkía's spirit at [0,-14] from the holy water (14181) until incensed (14193). INFERRED cell."
     },
     {
@@ -1349,7 +1349,7 @@
       "npc": 4384,
       "cell": 300,
       "orientation": 1,
-      "criterion": "Qa=2008&Qo=14188&Qo!14187",
+      "criterion": "Qa=2008&Qo>14188&Qo<14187",
       "why": "Guy Elotro's spirit at [-1,-11] from the holy water (14188) until laid to rest (14187). INFERRED cell."
     },
     {
@@ -1357,7 +1357,7 @@
       "npc": 4386,
       "cell": 300,
       "orientation": 1,
-      "criterion": "Qa=2008&Qo=14190&Qo!14199",
+      "criterion": "Qa=2008&Qo>14190&Qo<14199",
       "why": "Klaus Konbah's spirit at [-3,-9] from the holy water (14190) until incensed (14199). INFERRED cell."
     },
     {
@@ -1372,7 +1372,7 @@
       "npc": 4372,
       "cell": 287,
       "orientation": 1,
-      "criterion": "Qa!1999|Qo!13813|Qo=13816",
+      "criterion": "Qa!1999|Qo<13813|Qo>13816",
       "why": "Leonor Mando at Tainela [1,-29], where Dofus pour les noobs starts «Le génie se meut», except while she is in the porkasses' cave with the character (13813 until 13816). INFERRED cell."
     },
     {
@@ -1380,7 +1380,7 @@
       "npc": 4373,
       "cell": 286,
       "orientation": 1,
-      "criterion": "Qa=1999&Qo=13811&Qo!13813",
+      "criterion": "Qa=1999&Qo>13811&Qo<13813",
       "why": "Khalislas Maucirio at [0,-29] with his traps once the expert is announced (13811), until the hunt sets off (13813). INFERRED cell."
     },
     {
@@ -1388,7 +1388,7 @@
       "npc": 4373,
       "cell": 345,
       "orientation": 5,
-      "criterion": "Qa=1999&Qo=13813&Qo!13815",
+      "criterion": "Qa=1999&Qo>13813&Qo<13815",
       "why": "Khalislas in the porkasses' cave until they are beaten (13815), by the junk pile and clear of the arch the character comes in by. INFERRED cell."
     },
     {
@@ -1396,7 +1396,7 @@
       "npc": 4372,
       "cell": 386,
       "orientation": 5,
-      "criterion": "Qa=1999&Qo=13813&Qo!13816",
+      "criterion": "Qa=1999&Qo>13813&Qo<13816",
       "why": "Leonor Mando in the porkasses' cave, come with the character (13813), until back at Tainela (13816), on the rug clear of the arch. INFERRED cell."
     },
     {
@@ -1404,7 +1404,7 @@
       "npc": 4450,
       "cell": 318,
       "orientation": 3,
-      "criterion": "Qa=2000&Qo=14084",
+      "criterion": "Qa=2000&Qo>14084",
       "why": "The traumatised woodcutter at the foot of a bed in the dispensary, once the Disciple has sent the character to him (14084). INFERRED cell."
     },
     {
@@ -1412,7 +1412,7 @@
       "npc": 4358,
       "cell": 402,
       "orientation": 5,
-      "criterion": "Qa=2000&Qo=14086&Qo!14088",
+      "criterion": "Qa=2000&Qo>14086&Qo<14088",
       "why": "Artand in the grocery of Astrub once Unterix has spoken of honey (14086), until he joins the character (14088). INFERRED cell."
     },
     {
@@ -1420,7 +1420,7 @@
       "npc": 4358,
       "cell": 271,
       "orientation": 3,
-      "criterion": "Qa=2000&Qo=14088&Qo!14093",
+      "criterion": "Qa=2000&Qo>14088&Qo<14093",
       "why": "Artand at the bear-man's camp from the alliance (14088) until the grimoire is his (14093)."
     },
     {
@@ -1428,7 +1428,7 @@
       "npc": 4448,
       "cell": 327,
       "orientation": 7,
-      "criterion": "Qa=2000&Qo=14090&Qo!14092",
+      "criterion": "Qa=2000&Qo>14090&Qo<14092",
       "why": "The bear-man out of the barrels (14090) until beaten (14092)."
     },
     {
@@ -1436,7 +1436,7 @@
       "npc": 4380,
       "cell": 303,
       "orientation": 3,
-      "criterion": "Qa!2007|Qo!13918",
+      "criterion": "Qa!2007|Qo<13918",
       "why": "Becky Gorr by the fountain at the cemetery's entrance [-1,-13], except while she is at the vault (13918 on). INFERRED cell."
     },
     {
@@ -1444,7 +1444,7 @@
       "npc": 4380,
       "cell": 296,
       "orientation": 5,
-      "criterion": "Qa=2007&Qo=13918&Qo!13920",
+      "criterion": "Qa=2007&Qo>13918&Qo<13920",
       "why": "Becky waiting before the vault's gate at [1,-11] until it shuts behind her (13920). INFERRED cell."
     },
     {
@@ -1452,7 +1452,7 @@
       "npc": 4380,
       "cell": 299,
       "orientation": 1,
-      "criterion": "Qa=2007&Qo=13920",
+      "criterion": "Qa=2007&Qo>13920",
       "why": "Becky inside the vault, trapped and then bound, until the quest is over. INFERRED cell."
     },
     {
@@ -1460,7 +1460,7 @@
       "npc": 4381,
       "cell": 317,
       "orientation": 3,
-      "criterion": "Qa!2007|Qo!13910|(Qo=13918&Qo!13923)",
+      "criterion": "Qa!2007|Qo<13910|(Qo>13918&Qo<13923)",
       "why": "Finney beside Becky, except while he follows the character (13910) and once he waits at the vault (13923). INFERRED cell."
     },
     {
@@ -1468,7 +1468,7 @@
       "npc": 4381,
       "cell": 311,
       "orientation": 5,
-      "criterion": "Qa=2007&Qo=13923",
+      "criterion": "Qa=2007&Qo>13923",
       "why": "Finney before the vault when the character comes back with the tools (13923). INFERRED cell."
     },
     {
@@ -1488,7 +1488,7 @@
       "npc": 4382,
       "cell": 430,
       "orientation": 5,
-      "criterion": "Qa=2007&Qo=13926&Qo!13929",
+      "criterion": "Qa=2007&Qo>13926&Qo<13929",
       "why": "Selim Llenneb back in the vault, by its way out, once Becky is untied (13926) until he flees (13929). INFERRED cell."
     },
     {
@@ -1496,7 +1496,7 @@
       "npc": 4387,
       "cell": 258,
       "orientation": 3,
-      "criterion": "Qa=2007&Qo!13900",
+      "criterion": "Qa=2007&Qo<13900",
       "why": "The angry gargrouille among the graves of [-3,-12] until calmed (13900). INFERRED cell."
     },
     {
@@ -1504,7 +1504,7 @@
       "npc": 4396,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=2007&Qo!13904",
+      "criterion": "Qa=2007&Qo<13904",
       "why": "The angry garglyph on the path of [-1,-14] until calmed (13904). INFERRED cell."
     },
     {
@@ -1512,7 +1512,7 @@
       "npc": 4397,
       "cell": 245,
       "orientation": 3,
-      "criterion": "Qa=2007&Qo!13907",
+      "criterion": "Qa=2007&Qo<13907",
       "why": "The angry stropajo among the crosses of [0,-13] until calmed (13907). INFERRED cell."
     },
     {
@@ -1520,7 +1520,7 @@
       "npc": 1441,
       "cell": 327,
       "orientation": 1,
-      "criterion": "Qa!718|Qo!4665",
+      "criterion": "Qa!718|Qo<4665",
       "why": "Otomai's apprentice at [2,-21], until he leaves for the mine (4665). INFERRED cell."
     },
     {
@@ -1528,7 +1528,7 @@
       "npc": 1441,
       "cell": 231,
       "orientation": 3,
-      "criterion": "Qa=718&Qo=4665&Qo!4680",
+      "criterion": "Qa=718&Qo>4665&Qo<4680",
       "why": "The apprentice beside the slab and the gallery of the trap, clear of it, in the mine's entrance hall, until the beast comes (4680). INFERRED cell."
     },
     {
@@ -1536,7 +1536,7 @@
       "npc": 1441,
       "cell": 243,
       "orientation": 3,
-      "criterion": "Qa=718&Qo=4680&Qo!4673",
+      "criterion": "Qa=718&Qo>4680&Qo<4673",
       "why": "The apprentice hidden in the trap room until the creature is down (4673). INFERRED cell."
     },
     {
@@ -1544,7 +1544,7 @@
       "npc": 1444,
       "cell": 314,
       "orientation": 5,
-      "criterion": "Qa=718&Qo=4681&Qo!4673",
+      "criterion": "Qa=718&Qo>4681&Qo<4673",
       "why": "Otomai's creature on the false floor, drawn in (4681) until beaten (4673)."
     },
     {
@@ -1552,7 +1552,7 @@
       "npc": 1441,
       "cell": 285,
       "orientation": 1,
-      "criterion": "Qa=718&Qo=4673&Qo!4671",
+      "criterion": "Qa=718&Qo>4673&Qo<4671",
       "why": "The apprentice by the sprung trap until Jykel leads them away (4671). INFERRED cell."
     },
     {
@@ -1560,7 +1560,7 @@
       "npc": 1442,
       "cell": 314,
       "orientation": 7,
-      "criterion": "Qa=718&Qo=4673&Qo!4671",
+      "criterion": "Qa=718&Qo>4673&Qo<4671",
       "why": "Jykel at the bottom of the pit, until pulled out (4671)."
     },
     {
@@ -1568,7 +1568,7 @@
       "npc": 1441,
       "cell": 299,
       "orientation": 3,
-      "criterion": "Qa=718&Qo=4671|Qf=718",
+      "criterion": "Qa=718&Qo>4671|Qf=718",
       "why": "The apprentice in Jykel's cave, there with his way out for whoever is in it. INFERRED cell."
     },
     {
@@ -1576,7 +1576,7 @@
       "npc": 1442,
       "cell": 330,
       "orientation": 5,
-      "criterion": "Qa=718&Qo=4671|Qf=718",
+      "criterion": "Qa=718&Qo>4671|Qf=718",
       "why": "Jykel in his robbed cave. INFERRED cell."
     },
     {
@@ -1584,7 +1584,7 @@
       "npc": 4429,
       "cell": 395,
       "orientation": 1,
-      "criterion": "Qa=1970&Qo!14030",
+      "criterion": "Qa=1970&Qo<14030",
       "why": "Brash Iops shopping at the market [6,-17] until the character has spoken to them (14030). INFERRED cells."
     },
     {
@@ -1592,7 +1592,7 @@
       "npc": 4429,
       "cell": 399,
       "orientation": 3,
-      "criterion": "Qa=1970&Qo!14030",
+      "criterion": "Qa=1970&Qo<14030",
       "why": "The same group."
     },
     {
@@ -1600,7 +1600,7 @@
       "npc": 4429,
       "cell": 427,
       "orientation": 7,
-      "criterion": "Qa=1970&Qo!14030",
+      "criterion": "Qa=1970&Qo<14030",
       "why": "The same group."
     },
     {
@@ -1608,7 +1608,7 @@
       "npc": 4429,
       "cell": 428,
       "orientation": 5,
-      "criterion": "Qa=1970&Qo=14034&Qo!14035",
+      "criterion": "Qa=1970&Qo>14034&Qo<14035",
       "why": "The brash Iop come to see the injured, once Nepra Lido has spoken (14034). INFERRED cell."
     },
     {
@@ -1616,7 +1616,7 @@
       "npc": 4430,
       "cell": 386,
       "orientation": 1,
-      "criterion": "Qa=1970&Qo=14031&Qo!14049",
+      "criterion": "Qa=1970&Qo>14031&Qo<14049",
       "why": "The moaning Iop at the dispensary while the quest has injured Iops there."
     },
     {
@@ -1624,7 +1624,7 @@
       "npc": 4429,
       "cell": 200,
       "orientation": 3,
-      "criterion": "Qa=1970&Qo=14035&Qo!14047",
+      "criterion": "Qa=1970&Qo>14035&Qo<14047",
       "why": "Brash Iops training at [11,-11] until reasoned with (14047). INFERRED cells."
     },
     {
@@ -1632,7 +1632,7 @@
       "npc": 4429,
       "cell": 203,
       "orientation": 5,
-      "criterion": "Qa=1970&Qo=14035&Qo!14047",
+      "criterion": "Qa=1970&Qo>14035&Qo<14047",
       "why": "The same group."
     },
     {
@@ -1640,7 +1640,7 @@
       "npc": 4429,
       "cell": 230,
       "orientation": 7,
-      "criterion": "Qa=1970&Qo=14035&Qo!14047",
+      "criterion": "Qa=1970&Qo>14035&Qo<14047",
       "why": "The same group."
     },
     {
@@ -1648,7 +1648,7 @@
       "npc": 4431,
       "cell": 187,
       "orientation": 3,
-      "criterion": "Qa=1970&Qo=14039&Qo!14040",
+      "criterion": "Qa=1970&Qo>14039&Qo<14040",
       "why": "Rok Elreuss's doppel, come in during the training (14039) until heard (14040)."
     },
     {
@@ -1656,7 +1656,7 @@
       "npc": 4432,
       "cell": 173,
       "orientation": 3,
-      "criterion": "Qa=1970&Qo=14042&Qo!14049",
+      "criterion": "Qa=1970&Qo>14042&Qo<14049",
       "why": "The experienced Iops Rok Elreuss sends, top left of the ground, as Dofus pour les noobs places them."
     },
     {
@@ -1664,7 +1664,7 @@
       "npc": 4476,
       "cell": 287,
       "orientation": 3,
-      "criterion": "Qf!1964&Qo!14162",
+      "criterion": "Qf!1964&Qo<14162",
       "why": "Abrazolargo's digging boar beside him at [2,-15] until taken into the mine. INFERRED cell."
     },
     {
@@ -1672,7 +1672,7 @@
       "npc": 4477,
       "cell": 243,
       "orientation": 3,
-      "criterion": "Qf!1964&Qo!14226",
+      "criterion": "Qf!1964&Qo<14226",
       "why": "The troglodyte gobball eating by Abrazolargo until it heads for the mine. INFERRED cell."
     },
     {
@@ -1680,7 +1680,7 @@
       "npc": 4478,
       "cell": 271,
       "orientation": 3,
-      "criterion": "Qa=1964&Qo=14229&Qo!14230",
+      "criterion": "Qa=1964&Qo>14229&Qo<14230",
       "why": "Lasy Lap's wauwau, lent once the gobball has failed (14229). INFERRED cell."
     },
     {
@@ -1688,7 +1688,7 @@
       "npc": 4477,
       "cell": 313,
       "orientation": 5,
-      "criterion": "Qa=1964&Qo=14226&Qo!14229",
+      "criterion": "Qa=1964&Qo>14226&Qo<14229",
       "why": "The troglodyte gobball stuffing itself in the grocery after running off (14226). INFERRED cell."
     },
     {
@@ -1710,7 +1710,7 @@
       "npc": 4479,
       "cell": 329,
       "orientation": 1,
-      "criterion": "Qa=1964&Qo=14231&Qo!14235",
+      "criterion": "Qa=1964&Qo>14231&Qo<14235",
       "why": "Timy, fallen into the sewers, while «Série animalière» has him there."
     },
     {
@@ -1718,7 +1718,7 @@
       "npc": 4480,
       "cell": 316,
       "orientation": 1,
-      "criterion": "Qa=1964&Qo=14231&Qo!14233",
+      "criterion": "Qa=1964&Qo>14231&Qo<14233",
       "why": "Young milirats around Timy until put to flight (14233). INFERRED cells."
     },
     {
@@ -1726,7 +1726,7 @@
       "npc": 4480,
       "cell": 357,
       "orientation": 7,
-      "criterion": "Qa=1964&Qo=14231&Qo!14233",
+      "criterion": "Qa=1964&Qo>14231&Qo<14233",
       "why": "The same rats."
     },
     {
@@ -1734,7 +1734,7 @@
       "npc": 4478,
       "cell": 303,
       "orientation": 3,
-      "criterion": "Qa=1964&Qo=14231&Qo!14235",
+      "criterion": "Qa=1964&Qo>14231&Qo<14235",
       "why": "The wauwau defending Timy, until led back (14235). INFERRED cell."
     },
     {
@@ -1770,7 +1770,7 @@
       "npc": 4427,
       "cell": 286,
       "orientation": 1,
-      "criterion": "Qa!1965|Qo!14022",
+      "criterion": "Qa!1965|Qo<14022",
       "why": "The guard wauwau of the market square, except while it tracks the thief (14022 on)."
     },
     {
@@ -1778,7 +1778,7 @@
       "npc": 4427,
       "cell": 381,
       "orientation": 7,
-      "criterion": "Qa=1965&Qo=14024&Qo!14028",
+      "criterion": "Qa=1965&Qo>14024&Qo<14028",
       "why": "The guard wauwau before Alba Surilla at [5,-17], once it has led the character there (14024). INFERRED cell."
     },
     {
@@ -1793,7 +1793,7 @@
       "npc": 4453,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=1966&Qo=14122&Qo!14124",
+      "criterion": "Qa=1966&Qo>14122&Qo<14124",
       "why": "Kaba as a hurried traveller waiting for the coach at [0,-18], once Shani has named him (14122). INFERRED cell."
     },
     {
@@ -1801,7 +1801,7 @@
       "npc": 4452,
       "cell": 330,
       "orientation": 3,
-      "criterion": "Qa=1967&Qo=14097&Qo!14098",
+      "criterion": "Qa=1967&Qo>14097&Qo<14098",
       "why": "The knave of spades on the market square once Agry Kultora has pointed at it (14097), until beaten (14098). INFERRED cell."
     },
     {
@@ -1809,7 +1809,7 @@
       "npc": 4490,
       "cell": 401,
       "orientation": 5,
-      "criterion": "Qa=1968&Qo=14253&Qo!14254",
+      "criterion": "Qa=1968&Qo>14253&Qo<14254",
       "why": "The petty leprechaun showing up in the tavern by Meow Moew (14253) until beaten (14254). INFERRED cell."
     },
     {
@@ -1817,7 +1817,7 @@
       "npc": 4486,
       "cell": 287,
       "orientation": 1,
-      "criterion": "Qa!1969|Qo!14238|Qo=14240",
+      "criterion": "Qa!1969|Qo<14238|Qo>14240",
       "why": "The calculating Cra at [1,-19], except while the vaccine has made him a bwork."
     },
     {
@@ -1825,7 +1825,7 @@
       "npc": 4487,
       "cell": 273,
       "orientation": 1,
-      "criterion": "Qa=1969&Qo=14238&Qo!14240",
+      "criterion": "Qa=1969&Qo>14238&Qo<14240",
       "why": "The calculating Cra as a bwork, from the injection (14238) until the verbena (14240)."
     },
     {
@@ -1840,7 +1840,7 @@
       "npc": 4342,
       "cell": 288,
       "orientation": 1,
-      "criterion": "Qa=1972&Qo=13991",
+      "criterion": "Qa=1972&Qo>13991",
       "why": "Erty Trapchet come to the Sadida grove [-2,-15] by «C'est pourtant naturel» (13991). INFERRED cell, below the tree."
     },
     {
@@ -1848,7 +1848,7 @@
       "npc": 4342,
       "cell": 273,
       "orientation": 7,
-      "criterion": "Qa!1972|Qo!13991",
+      "criterion": "Qa!1972|Qo<13991",
       "why": "Erty Trapchet at [0,-19], where Dofus pour les noobs starts «Qui sème le vent récolte l'Artempeth»: by the flowering bush he studies, except while he is at the Sadida grove for «C'est pourtant naturel». INFERRED cell, the clearing south of it."
     },
     {
@@ -1856,7 +1856,7 @@
       "npc": 4433,
       "cell": 245,
       "orientation": 1,
-      "criterion": "Qa=1973&Qo!14055",
+      "criterion": "Qa=1973&Qo<14055",
       "why": "Zeta Rymakón (Brigitte Sarimavek) at [3,-13] for the ritual of suffering of «Souffre-douleur». INFERRED cell."
     },
     {
@@ -1864,7 +1864,7 @@
       "npc": 4434,
       "cell": 287,
       "orientation": 1,
-      "criterion": "Qa=1973&Qo!14055",
+      "criterion": "Qa=1973&Qo<14055",
       "why": "Amayan Demol, the singer of the ritual of suffering, while it lasts."
     },
     {
@@ -1872,7 +1872,7 @@
       "npc": 4435,
       "cell": 300,
       "orientation": 1,
-      "criterion": "Qa=1973&Qo=14051&Qo!14054",
+      "criterion": "Qa=1973&Qo>14051&Qo<14054",
       "why": "The dancing blade, drawn out by the song (14051) until caught (14054)."
     },
     {
@@ -1880,7 +1880,7 @@
       "npc": 4436,
       "cell": 317,
       "orientation": 5,
-      "criterion": "Qa=1973&Qo=14056&Qo!14057",
+      "criterion": "Qa=1973&Qo>14056&Qo<14057",
       "why": "The flaying blade, drawn out by Saketsú's waxing (14056) until caught (14057). INFERRED cell."
     },
     {
@@ -1888,7 +1888,7 @@
       "npc": 4437,
       "cell": 327,
       "orientation": 1,
-      "criterion": "Qa=1973&Qo=14058&Qo!14061",
+      "criterion": "Qa=1973&Qo>14058&Qo<14061",
       "why": "The Strubian cat by the fishers' workshop [3,-20], for «Souffre-douleur»."
     },
     {
@@ -1896,7 +1896,7 @@
       "npc": 4438,
       "cell": 341,
       "orientation": 7,
-      "criterion": "Qa=1973&Qo=14060&Qo!14061",
+      "criterion": "Qa=1973&Qo>14060&Qo<14061",
       "why": "The guardian blade, out of the gloom behind the cat (14060) until caught (14061). INFERRED cell."
     },
     {
@@ -1904,7 +1904,7 @@
       "npc": 4433,
       "cell": 298,
       "orientation": 1,
-      "criterion": "Qa=1973&Qo=14058&Qo!14062",
+      "criterion": "Qa=1973&Qo>14058&Qo<14062",
       "why": "Zeta Rymakón sent by Saketsú to the fishers' workshop (31219) until she takes the character to Nibe Lula. INFERRED cell."
     },
     {
@@ -1912,7 +1912,7 @@
       "npc": 4433,
       "cell": 384,
       "orientation": 7,
-      "criterion": "Qa=1973&Qo=14062",
+      "criterion": "Qa=1973&Qo>14062",
       "why": "Zeta Rymakón in the alchemists' workshop [3,-21] with the character, to the end of «Souffre-douleur». INFERRED cell."
     },
     {
@@ -1920,7 +1920,7 @@
       "npc": 4439,
       "cell": 399,
       "orientation": 7,
-      "criterion": "Qa=1973&Qo=14063&Qo!14065",
+      "criterion": "Qa=1973&Qo>14063&Qo<14065",
       "why": "The flying blade, drawn out by Nibe Lula's diuretic (14063) until caught (14065). INFERRED cell."
     },
     {
@@ -1928,7 +1928,7 @@
       "npc": 4440,
       "cell": 412,
       "orientation": 7,
-      "criterion": "Qa=1973&Qo=14063&Qo!14065",
+      "criterion": "Qa=1973&Qo>14063&Qo<14065",
       "why": "The swift blade, with the flying one. INFERRED cell."
     },
     {
@@ -1936,7 +1936,7 @@
       "npc": 4473,
       "cell": 356,
       "orientation": 1,
-      "criterion": "Qa=1974&Qo=14156&Qo=14209&Qo=14210&Qo!14213",
+      "criterion": "Qa=1974&Qo>14156&Qo>14209&Qo>14210&Qo<14213",
       "why": "Regane Dawa staring into the well north of the handymen's workshop [3,-16], once the other three wells were looked at, until the raging water is beaten."
     },
     {
@@ -1944,7 +1944,7 @@
       "npc": 4474,
       "cell": 313,
       "orientation": 1,
-      "criterion": "Qa=1974&Qo=14217&Qo!14220",
+      "criterion": "Qa=1974&Qo>14217&Qo<14220",
       "why": "The possessed Regane by the pond [3,-20] (31620) until the Akwadala spirit is beaten."
     },
     {
@@ -1952,7 +1952,7 @@
       "npc": 4475,
       "cell": 313,
       "orientation": 1,
-      "criterion": "Qa=1974&Qo=14220&Qo!14222",
+      "criterion": "Qa=1974&Qo>14220&Qo<14222",
       "why": "Regane freed of the spirit, by the pond until taken to her uncle."
     },
     {
@@ -1960,7 +1960,7 @@
       "npc": 4475,
       "cell": 342,
       "orientation": 3,
-      "criterion": "Qa=1974&Qo=14222|Qf=1974",
+      "criterion": "Qa=1974&Qo>14222|Qf=1974",
       "why": "Regane back beside her uncle in the tavern, from «Lleva a Reigan a ver a su tío» on. INFERRED cell."
     },
     {
@@ -1968,7 +1968,7 @@
       "npc": 4317,
       "cell": 356,
       "orientation": 1,
-      "criterion": "Qa!716|Qo!4646|Qo=4651",
+      "criterion": "Qa!716|Qo<4646|Qo>4651",
       "why": "Hibabá, the zobals' master, by the tailors' workshop [7,-15] (Dofus pour les noobs), except while he waits in Marp's house. INFERRED cell."
     },
     {
@@ -1976,7 +1976,7 @@
       "npc": 4317,
       "cell": 330,
       "orientation": 1,
-      "criterion": "Qa=716&Qo=4646&Qo!4651",
+      "criterion": "Qa=716&Qo>4646&Qo<4651",
       "why": "Hibabá in Marp's house [1,-19], rented for his party, from «nos vemos allí» (4646) until the plan is reported (4651). INFERRED cell."
     },
     {
@@ -1984,7 +1984,7 @@
       "npc": 1433,
       "cell": 356,
       "orientation": 1,
-      "criterion": "Qa=716&Qo=4647",
+      "criterion": "Qa=716&Qo>4647",
       "why": "Ana Morgi in the cellar of Marp's house, from Hibabá sending the character down (4647)."
     },
     {
@@ -1992,7 +1992,7 @@
       "npc": 4445,
       "cell": 317,
       "orientation": 5,
-      "criterion": "Qa=716&Qo=4650&Qo!14079",
+      "criterion": "Qa=716&Qo>4650&Qo<14079",
       "why": "The scalded tymadores out of their barrel (4650) until beaten (14079). INFERRED cell, by the barrels."
     },
     {
@@ -2007,7 +2007,7 @@
       "npc": 2836,
       "cell": 343,
       "orientation": 1,
-      "criterion": "Qa=1615&Qo!9526",
+      "criterion": "Qa=1615&Qo<9526",
       "why": "Hicha held behind the bars of the hideout until the artefact is taken back."
     },
     {
@@ -2015,7 +2015,7 @@
       "npc": 2837,
       "cell": 314,
       "orientation": 1,
-      "criterion": "Qa=1615&Qo!9524",
+      "criterion": "Qa=1615&Qo<9524",
       "why": "The guard bulldog, before Hicha's bars, until beaten. INFERRED cell."
     },
     {
@@ -2023,7 +2023,7 @@
       "npc": 3078,
       "cell": 373,
       "orientation": 5,
-      "criterion": "Qa=1677&Qo!10303",
+      "criterion": "Qa=1677&Qo<10303",
       "why": "The sleepy messenger tofu in Astrub's forge, until taken back to Hazel. INFERRED cell."
     },
     {
@@ -2031,7 +2031,7 @@
       "npc": 3050,
       "cell": 314,
       "orientation": 1,
-      "criterion": "Qa=1677&Qo=10311",
+      "criterion": "Qa=1677&Qo>10311",
       "why": "Sojudas the whisperer, found by the bubble pipe's trail (10309-10311)."
     },
     {
@@ -2039,7 +2039,7 @@
       "npc": 3715,
       "cell": 300,
       "orientation": 1,
-      "criterion": "Qa=1841&Qo!12182",
+      "criterion": "Qa=1841&Qo<12182",
       "why": "The allergic recruit at her post [4,-21], until she goes off to the fields. INFERRED cell."
     },
     {
@@ -2047,7 +2047,7 @@
       "npc": 3715,
       "cell": 370,
       "orientation": 1,
-      "criterion": "Qa=1841&Qo=12182|Qf=1841",
+      "criterion": "Qa=1841&Qo>12182|Qf=1841",
       "why": "The allergic recruit in Astrub's fields [7,-24] (Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2055,7 +2055,7 @@
       "npc": 3719,
       "cell": 272,
       "orientation": 1,
-      "criterion": "Qa=1841&Qo!12191",
+      "criterion": "Qa=1841&Qo<12191",
       "why": "One of the three ecaflips harassing the scared recruit, until beaten. INFERRED cell."
     },
     {
@@ -2063,7 +2063,7 @@
       "npc": 3720,
       "cell": 287,
       "orientation": 1,
-      "criterion": "Qa=1841&Qo!12191",
+      "criterion": "Qa=1841&Qo<12191",
       "why": "One of the three ecaflips harassing the scared recruit, until beaten. INFERRED cell."
     },
     {
@@ -2071,7 +2071,7 @@
       "npc": 3721,
       "cell": 286,
       "orientation": 1,
-      "criterion": "Qa=1841&Qo!12191",
+      "criterion": "Qa=1841&Qo<12191",
       "why": "The ecaflip rascal leading them, until beaten."
     },
     {
@@ -2079,7 +2079,7 @@
       "npc": 6840,
       "cell": 300,
       "orientation": 1,
-      "criterion": "Qa=2470&Qo!18678",
+      "criterion": "Qa=2470&Qo<18678",
       "why": "Sir André Scancio on the market square south of Astrub [5,-16], where Iván sends the character. INFERRED cell."
     },
     {
@@ -2087,7 +2087,7 @@
       "npc": 6840,
       "cell": 314,
       "orientation": 1,
-      "criterion": "Qa=2470&Qo=18678&Qo!18680",
+      "criterion": "Qa=2470&Qo>18678&Qo<18680",
       "why": "Sir André before the library [7,-19], first stop of the patrol. INFERRED cell."
     },
     {
@@ -2095,7 +2095,7 @@
       "npc": 6840,
       "cell": 230,
       "orientation": 1,
-      "criterion": "Qa=2470&Qo=18680&Qo!18682",
+      "criterion": "Qa=2470&Qo>18680&Qo<18682",
       "why": "Sir André before the jewelers' workshop [6,-15]. INFERRED cell."
     },
     {
@@ -2103,7 +2103,7 @@
       "npc": 6840,
       "cell": 290,
       "orientation": 3,
-      "criterion": "Qa=2470&Qo=18682&Qo!18687",
+      "criterion": "Qa=2470&Qo>18682&Qo<18687",
       "why": "Sir André before the grocery [1,-16], with the mercenary. INFERRED cell."
     },
     {
@@ -2111,7 +2111,7 @@
       "npc": 6840,
       "cell": 343,
       "orientation": 1,
-      "criterion": "(Qa=2470&Qo=18692)|Qf=2470",
+      "criterion": "(Qa=2470&Qo>18692)|Qf=2470",
       "why": "Sir André at the hydromel cargo [3,-16], from the mercenary's confession, and afterwards watching the barrels. INFERRED cell."
     },
     {
@@ -2140,7 +2140,7 @@
       "npc": 84,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=209&Qo=838&Qo!839",
+      "criterion": "Qa=209&Qo>838&Qo<839",
       "why": "Vil Smis receiving the character in the rogues' lair, brought by Bud Spensur. INFERRED cell."
     },
     {
@@ -2148,7 +2148,7 @@
       "npc": 893,
       "cell": 299,
       "orientation": 3,
-      "criterion": "(Qa=209&Qo=839)|(Qf=209&Qf!211)",
+      "criterion": "(Qa=209&Qo>839)|(Qf=209&Qf!211)",
       "why": "Counsellor Ys Vewybad at the meeting place with Vil Smis [7,-5], his intentions plain (Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2209,7 +2209,7 @@
       "npc": 906,
       "cell": 330,
       "orientation": 1,
-      "criterion": "Qa=225&Qo=930&Qo!932",
+      "criterion": "Qa=225&Qo>930&Qo<932",
       "why": "Bob Zollo come to kill the prince at the wedding before the castle [4,-6] («Parlez à Bob Lenald qui est venu attaquer le Prince et défendez le Prince», Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2224,7 +2224,7 @@
       "npc": 904,
       "cell": 300,
       "orientation": 1,
-      "criterion": "(Qa=224&Qo=911)|Qf=224|(Qa=220&Qo=881)",
+      "criterion": "(Qa=224&Qo>911)|Qf=224|(Qa=220&Qo>881)",
       "why": "The prince of Wey at the gate of Amakna castle [4,-6] once the bride's dress is brought («Allez à la rencontre du Prince d'Wa à l'entrée du Château», Dofus pour les noobs); and for the traitors of «Trouble-fête», on the verge of marrying, once Bob Zollo is hired. INFERRED cell."
     },
     {
@@ -2253,7 +2253,7 @@
       "npc": 2851,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=1618&Qo!9541",
+      "criterion": "Qa=1618&Qo<9541",
       "why": "Arbracillo before the abandoned house [-15,-16] («parlez au petit Arbabra devant la maison abandonnée», Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2261,7 +2261,7 @@
       "npc": 2851,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=1618&Qo=9541&Qo!9542",
+      "criterion": "Qa=1618&Qo>9541&Qo<9542",
       "why": "Arbracillo waiting at [-15,-14] («En [-15,-14] reparlez à Arbabra», Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2269,7 +2269,7 @@
       "npc": 2850,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=1618&Qo=9542&Qo!9545",
+      "criterion": "Qa=1618&Qo>9542&Qo<9545",
       "why": "Manzanillo in trouble at [-16,-13] («vous trouverez Simple qui semble être en difficulté», Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2277,7 +2277,7 @@
       "npc": 2850,
       "cell": 330,
       "orientation": 1,
-      "criterion": "Qo=9546|Qf=1618",
+      "criterion": "Qo>9546|Qf=1618",
       "why": "Manzanillo resting at the Sadida temple once escorted there. INFERRED cell."
     },
     {
@@ -2306,7 +2306,7 @@
       "npc": 2854,
       "cell": 285,
       "orientation": 3,
-      "criterion": "(Qa=1620&Qo=9570)|Qf=1620",
+      "criterion": "(Qa=1620&Qo>9570)|Qf=1620",
       "why": "Silvosse in the Dark Forest's clearing [-11,-13], brought by the statue («faire apparaitre Silvosse»), and there from then on (he gives «L'art de la langue de bois»). INFERRED cell."
     },
     {
@@ -2314,7 +2314,7 @@
       "npc": 2876,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=1620&Qo=9560&Qo!9561",
+      "criterion": "Qa=1620&Qo>9560&Qo<9561",
       "why": "A lone gargantula at the forest's edge [-10,-6] («Parlez au Gargantûl Solitaire et capturez le», Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2322,7 +2322,7 @@
       "npc": 2860,
       "cell": 330,
       "orientation": 3,
-      "criterion": "Qa=1621&Qo=9584&Qo!9586",
+      "criterion": "Qa=1621&Qo>9584&Qo<9586",
       "why": "The Plotter at the Dark Forest's well, come for the stone once the character is back. INFERRED cell."
     },
     {
@@ -2344,7 +2344,7 @@
       "npc": 1470,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=891&Qo=5467&Qo!5469",
+      "criterion": "Qa=891&Qo>5467&Qo<5469",
       "why": "Captain Ligna aboard her ship at Madrestam [13,0], with the relic, once the father-in-law has spoken of her. INFERRED cell."
     },
     {
@@ -2352,7 +2352,7 @@
       "npc": 1470,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=892&Qo!5471",
+      "criterion": "Qa=892&Qo<5471",
       "why": "Captain Ligna on Madrestam's quay [13,0], waiting for Vil Smis's hire («rencontrer la Capitaine Hébreuze», Dofus pour les noobs). INFERRED cell."
     },
     {
@@ -2360,7 +2360,7 @@
       "npc": 1470,
       "cell": 272,
       "orientation": 3,
-      "criterion": "Qa=892&Qo=5471&Qo!5474",
+      "criterion": "Qa=892&Qo>5471&Qo<5474",
       "why": "Captain Ligna landed with the character on the wabbit island [25,-3]. INFERRED cell."
     },
     {
@@ -2368,7 +2368,7 @@
       "npc": 1470,
       "cell": 330,
       "orientation": 3,
-      "criterion": "Qa=892&Qo=5474&Qo!5478",
+      "criterion": "Qa=892&Qo>5474&Qo<5478",
       "why": "Captain Ligna at the cawotte fields [24,-4] beside the wey's father-in-law («Retournez en [24,-4] et parlez à Capitaine Hébreuze»). INFERRED cell."
     },
     {
@@ -2376,7 +2376,7 @@
       "npc": 1567,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=892&Qo=5472&Qo!5474",
+      "criterion": "Qa=892&Qo>5472&Qo<5474",
       "why": "King Allister's envoy lost at [25,-6] of the wabbit island. INFERRED cell."
     },
     {
@@ -2391,7 +2391,7 @@
       "npc": 2145,
       "cell": 300,
       "orientation": 3,
-      "criterion": "Qa=841&Qo=7875&Qo!7876",
+      "criterion": "Qa=841&Qo>7875&Qo<7876",
       "why": "An aggressive skeleton wabbit in the underground room of [23,-12], while «Expédition culinaire» searches it. INFERRED cell."
     },
     {
@@ -2406,7 +2406,7 @@
       "npc": 3039,
       "cell": 412,
       "orientation": 3,
-      "criterion": "Qa=1673&Qo!10232",
+      "criterion": "Qa=1673&Qo<10232",
       "why": "Kanniboul Himik «qui semble cacher un colis derrière lui» (Dofus pour les noobs) at [29,10]: in front of the barrel and the box behind it (element 500581, cell 411), until beaten. No capture places him: INFERRED."
     },
     {
@@ -2414,7 +2414,7 @@
       "npc": 3036,
       "cell": 426,
       "orientation": 3,
-      "criterion": "Qo=10233&Qo!10234",
+      "criterion": "Qo>10233&Qo<10234",
       "why": "Gobagrum out of the opened parcel, beside the box (411), until he hides in it again (10234). INFERRED cell."
     },
     {
@@ -2422,7 +2422,7 @@
       "npc": 3036,
       "cell": 345,
       "orientation": 7,
-      "criterion": "Qo=10239|Qf=1673",
+      "criterion": "Qo>10239|Qf=1673",
       "why": "Gobagrum at Ñesa's pot once handed back, the kanniboulas' kitchen boy afterwards (21994). INFERRED cell."
     },
     {
@@ -2552,7 +2552,7 @@
       "npc": 6704,
       "cell": 300,
       "orientation": 7,
-      "criterion": "Qo=18538&Qo!18539",
+      "criterion": "Qo>18538&Qo<18539",
       "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
     },
     {
@@ -2560,7 +2560,7 @@
       "npc": 6705,
       "cell": 286,
       "orientation": 7,
-      "criterion": "Qo=18538&Qo!18539",
+      "criterion": "Qo>18538&Qo<18539",
       "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
     },
     {
@@ -2568,7 +2568,7 @@
       "npc": 6706,
       "cell": 285,
       "orientation": 1,
-      "criterion": "Qo=18538&Qo!18539",
+      "criterion": "Qo>18538&Qo<18539",
       "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
     },
     {
@@ -2576,7 +2576,7 @@
       "npc": 6707,
       "cell": 299,
       "orientation": 1,
-      "criterion": "Qo=18538&Qo!18539",
+      "criterion": "Qo>18538&Qo<18539",
       "why": "«une flopée de jeunes gobelins affamés se sont agglutinés autour de sa toile» (Dofus pour les noobs), round Gob Ross's canvas once the ingredients are given and until they are beaten. INFERRED cells."
     },
     {
@@ -2613,7 +2613,7 @@
       "npc": 7581,
       "cell": 273,
       "orientation": 3,
-      "criterion": "Qa=1631&Qo=9738",
+      "criterion": "Qa=1631&Qo>9738",
       "why": "Ganymed by the temple's book [2,2] once the six statues are read: 1631's last objective (9740) is talking to him on this map, after «Ir a la próxima sala» in the Dofusarium. INFERRED cell, left of the book (287)."
     },
     {

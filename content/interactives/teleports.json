@@ -280,7 +280,7 @@
       "toCell": 410,
       "insteadToMap": 192677890,
       "insteadToCell": 410,
-      "insteadWhen": "Qa=704&Qo=4561&Qo!4563"
+      "insteadWhen": "Qa=704&Qo>4561&Qo<4563"
     },
     {
       "map": 192415750,
@@ -395,7 +395,7 @@
     {"map": 147063810, "element": 507618, "cell": 393, "gfx": 47343, "type": 0, "skill": 114, "toMap": 192545798, "toCell": 325},
     {"map": 103547392, "element": 516612, "cell": 319, "gfx": 47284, "type": 0, "skill": 114, "toMap": 195300356, "toCell": 163, "criterion": "POE15990,1"},
     {"map": 188484104, "element": 516145, "cell": 60, "gfx": 39767, "type": 0, "skill": 114, "toMap": 188483080, "toCell": 478, "criterion": "Qa=1615"},
-    {"map": 188484106, "element": 516095, "cell": 555, "gfx": 57416, "type": 0, "skill": 114, "toMap": 188483082, "toCell": 215, "criterion": "Qo=13825|Qf=1984"},
+    {"map": 188484106, "element": 516095, "cell": 555, "gfx": 57416, "type": 0, "skill": 114, "toMap": 188483082, "toCell": 215, "criterion": "Qo>13825|Qf=1984"},
     {"map": 188743685, "element": 515978, "cell": 400, "gfx": 37257, "type": 0, "skill": 114, "toMap": 188482052, "toCell": 478},
     {"map": 188482052, "element": 515970, "cell": 532, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188743685, "toCell": 428},
     {"map": 188482052, "element": 515968, "cell": 153, "gfx": 44035, "type": 0, "skill": 114, "toMap": 188483076, "toCell": 478},
