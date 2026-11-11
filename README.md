@@ -683,14 +683,14 @@ played through.
 | Wanted Notices | `███░░░░░░░` **27%** | 22/82 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
-| Krosmoz | `██████░░░░` **61%** | 11/18 |
+| Krosmoz | `███████░░░` **67%** | 12/18 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Wabbit Islands | `███░░░░░░░` **30%** | 7/23 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| **All quests** | **11.8%** | **234/1976** |
+| **All quests** | **11.9%** | **235/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
