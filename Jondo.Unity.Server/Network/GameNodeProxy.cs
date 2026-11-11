@@ -614,6 +614,8 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri("ido")) await QuestHandler.StartFromDocumentAsync(stream, payload);
                 // The item tooltips' average prices.
                 else if (payloadStr == Op.Uri("ivp")) await MarketplaceHandler.AveragePricesAsync(stream);
+                // The «Cours du marché» window, an item's price history.
+                else if (payloadStr == Op.Uri(Op.Itj)) await MarketplaceHandler.PriceHistoryAsync(stream, payload);
                 // The bank's transfer buttons: everything, what is already there, a selection.
                 else if (payloadStr == Op.Uri("kez") || payloadStr == Op.Uri("kgx") || payloadStr == Op.Uri("kcg")
                          || payloadStr == Op.Uri("kck") || payloadStr == Op.Uri("kdd"))

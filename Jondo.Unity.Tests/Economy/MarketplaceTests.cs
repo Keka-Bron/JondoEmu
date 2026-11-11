@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server;
@@ -381,6 +382,18 @@ namespace Jondo.Unity.Tests.Economy
             var rune = Assert.Single(ivi, e => e.Single(x => x.FieldNumber == 1).VarIntValue == 1523);
             Assert.Equal(MarketplaceListings.AveragePrice(1523), rune.Single(x => x.FieldNumber == 2).VarIntValue);
             Assert.True(MarketplaceListings.AveragePrice(1523) > 0);
+
+            // And the «Cours du marché» (itj -> iue): these sales by the hour over 24 hours in f1 and by the day
+            // over 30 in f3, each point f1 how many sold, f2 the price of one, f6 when, in ISO 8601.
+            var iue = ProtoMessage.Parse(MarketplaceHandler.BuildPriceHistory(1523, DateTime.UtcNow.AddMinutes(1))).Fields;
+            foreach (int list in new[] { 1, 3 })
+            {
+                var point = ProtoMessage.Parse(iue.Last(f => f.FieldNumber == list).BytesValue).Fields;
+                Assert.True(point.Single(f => f.FieldNumber == 1).VarIntValue >= 20);   // the two lots of ten, at least
+                Assert.True(point.Single(f => f.FieldNumber == 2).VarIntValue > 0);
+                Assert.True(DateTimeOffset.TryParse(Encoding.UTF8.GetString(point.Single(f => f.FieldNumber == 6).BytesValue), out _));
+            }
+            Assert.Empty(ProtoMessage.Parse(MarketplaceHandler.BuildPriceHistory(0, DateTime.UtcNow)).Fields);
         }
 
         /// <summary>Too few kamas buys nothing, and a price no longer on offer neither.</summary>

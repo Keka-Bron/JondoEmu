@@ -408,6 +408,30 @@ namespace Jondo.Unity.Server.Managers
             return prices;
         }
 
+        /// <summary>One item's sales since <paramref name="sinceUtc"/>, oldest first: when, how many, the lot's price.</summary>
+        public static List<(long At, int Quantity, long Price)> SalesOf(int gid, DateTime sinceUtc)
+        {
+            var rows = new List<(long, int, long)>();
+            try
+            {
+                lock (Gate)
+                {
+                    using var connection = Open();
+                    using var command = connection.CreateCommand();
+                    command.CommandText = "SELECT SoldAt, Quantity, Price FROM MarketplaceSales WHERE Gid = $g AND SoldAt >= $s ORDER BY SoldAt;";
+                    command.Parameters.AddWithValue("$g", gid);
+                    command.Parameters.AddWithValue("$s", new DateTimeOffset(DateTime.SpecifyKind(sinceUtc, DateTimeKind.Utc)).ToUnixTimeSeconds());
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read()) rows.Add((reader.GetInt64(0), reader.GetInt32(1), reader.GetInt64(2)));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Marketplaces] Could not read the sales of {gid}: {ex.Message}");
+            }
+            return rows;
+        }
+
         // ─── Selling ────────────────────────────────────────────────────────────────────────
 
         /// <summary>The lots an account has on sale in a marketplace, oldest first.</summary>
