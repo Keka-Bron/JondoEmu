@@ -345,6 +345,7 @@ namespace Jondo.Unity.Server.Network
                     {
                         if (!log.Active(quest) && !log.Finished(quest)) await Quests.StartAsync(stream, quest);
                         for (int guard = 0; guard < 40 && log.Active(quest); guard++) log.FinishStep(quest);
+                        Quests.SaveAsItStands(quest);
                         await Quests.SendJournalAsync(stream);
                     });
                     break;

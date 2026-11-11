@@ -2023,6 +2023,17 @@ namespace Jondo.Unity.Server.Managers
             Console.WriteLine($"[Quests] Quest {questId} is offered again.");
         }
 
+        /// <summary>
+        /// A quest's run written to the base as the log holds it now: the test routes' «finish»
+        /// closes steps on the log alone, and after a restart the character found those quests
+        /// still under way -- every quest it asked for undone again.
+        /// </summary>
+        internal static void SaveAsItStands(int questId)
+        {
+            var run = Log?.Run(questId);
+            if (run != null) Save(questId, run);
+        }
+
         private static void Save(int questId, QuestRun run)
         {
             long characterId = SessionContext.State.CharacterId;
