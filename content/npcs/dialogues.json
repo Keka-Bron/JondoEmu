@@ -28572,18 +28572,18 @@
         {
           "message": 16483,
           "choices": [
-            { "reply": 19638, "next": 16484, "criterion": "(Qf=29|Qf=30|Qf=32|Qf=33|Qf=34|Qf=35|Qf=115|Qf=116|Qf=117|Qf=118|Qf=119|Qf=544|Qf=545|Qf=546|Qf=547|Qf=548|Qf=549|Qf=550|Qf=551|Qf=552|Qf=553|Qf=1289|Qf=1290|Qf=1291|Qf=1292|Qf=1293|Qf=1332|Qf=1430|Qf=1434|Qf=1435|Qf=1436|Qf=1437|Qf=1518|Qf=1519|Qf=1520)&Qa!1445" },
+            { "reply": 19638, "next": 16484, "beforeQuest": 1445, "criterion": "(Qf=29|Qf=30|Qf=32|Qf=33|Qf=34|Qf=35|Qf=115|Qf=116|Qf=117|Qf=118|Qf=119|Qf=544|Qf=545|Qf=546|Qf=547|Qf=548|Qf=549|Qf=550|Qf=551|Qf=552|Qf=553|Qf=1289|Qf=1290|Qf=1291|Qf=1292|Qf=1293|Qf=1332|Qf=1430|Qf=1434|Qf=1435|Qf=1436|Qf=1437|Qf=1518|Qf=1519|Qf=1520)&Qa!1445" },
             { "reply": 19650, "next": 16487, "criterion": "(Qa=1445|Qf=1445)&Qa!1446&Qa!1447&Qa!1448&Qa!1449&Qa!1450&Qa!1451&Qa!1452&Qa!1453&Qa!1454&Qa!1455" },
-            { "reply": 19639, "next": 16486, "completesAll": [8010, 8006], "params": [[30, 8010]], "criterion": "Qa=1446", "afterObjective": 8009, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8014, 8006], "params": [[30, 8014]], "criterion": "Qa=1447", "afterObjective": 8013, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8018, 8006], "params": [[30, 8018]], "criterion": "Qa=1448", "afterObjective": 8017, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8022, 8006], "params": [[30, 8022]], "criterion": "Qa=1449", "afterObjective": 8021, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8026, 8006], "params": [[30, 8026]], "criterion": "Qa=1450", "afterObjective": 8025, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8030, 8006], "params": [[30, 8030]], "criterion": "Qa=1451", "afterObjective": 8029, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8034, 8006], "params": [[30, 8034]], "criterion": "Qa=1452", "afterObjective": 8033, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8038, 8006], "params": [[30, 8038]], "criterion": "Qa=1453", "afterObjective": 8037, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8042, 8006], "params": [[30, 8042]], "criterion": "Qa=1454", "afterObjective": 8041, "holds": 14920 },
-            { "reply": 19639, "next": 16486, "completesAll": [8046, 8006], "params": [[30, 8046]], "criterion": "Qa=1455", "afterObjective": 8045, "holds": 14920 }
+            { "reply": 19639, "next": 16486, "completesAll": [8010, 8006], "params": [[30, 8010]], "criterion": "Qa=1446", "afterObjective": 8009, "holds": 14920, "takes": 14900 },
+            { "reply": 19639, "next": 16486, "completesAll": [8014, 8006], "params": [[30, 8014]], "criterion": "Qa=1447", "afterObjective": 8013, "holds": 14920, "takes": 14901 },
+            { "reply": 19639, "next": 16486, "completesAll": [8018, 8006], "params": [[30, 8018]], "criterion": "Qa=1448", "afterObjective": 8017, "holds": 14920, "takes": 14902 },
+            { "reply": 19639, "next": 16486, "completesAll": [8022, 8006], "params": [[30, 8022]], "criterion": "Qa=1449", "afterObjective": 8021, "holds": 14920, "takes": 14903 },
+            { "reply": 19639, "next": 16486, "completesAll": [8026, 8006], "params": [[30, 8026]], "criterion": "Qa=1450", "afterObjective": 8025, "holds": 14920, "takes": 14904 },
+            { "reply": 19639, "next": 16486, "completesAll": [8030, 8006], "params": [[30, 8030]], "criterion": "Qa=1451", "afterObjective": 8029, "holds": 14920, "takes": 14905 },
+            { "reply": 19639, "next": 16486, "completesAll": [8034, 8006], "params": [[30, 8034]], "criterion": "Qa=1452", "afterObjective": 8033, "holds": 14920, "takes": 14906 },
+            { "reply": 19639, "next": 16486, "completesAll": [8038, 8006], "params": [[30, 8038]], "criterion": "Qa=1453", "afterObjective": 8037, "holds": 14920, "takes": 14907 },
+            { "reply": 19639, "next": 16486, "completesAll": [8042, 8006], "params": [[30, 8042]], "criterion": "Qa=1454", "afterObjective": 8041, "holds": 14920, "takes": 14908 },
+            { "reply": 19639, "next": 16486, "completesAll": [8046, 8006], "params": [[30, 8046]], "criterion": "Qa=1455", "afterObjective": 8045, "holds": 14920, "takes": 14909 }
           ]
         },
         {
@@ -28617,7 +28617,7 @@
           ]
         }
       ],
-      "why": "Skalo in the classroom, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs). «¿Necesitas ayuda?» (16484) and «Aceptar.» start «Escuela de superhéroes» for whoever has captured a wanted criminal (its catalogue criterion), 16485. «Pedirle formar a una categoría de reclutas en particular.» (16487: «esta semana puedes formar… a otra categoría») lists the ten years; each is offered once one of that year's prisoners has been captured, «Liste des ennemis par formation», and starts its «Formación de … año» on 16485, the line every formation's step declares (the client also holds ten copies of it, 16488-16497). «Darle la ficha de formación.» hands over the filled sheet (14920): it ends the formation and «Escuela de superhéroes» with it, 16486."
+      "why": "Skalo in the classroom, by «L'école fantastique» and «Formation des … années» (Dofus pour les noobs). «¿Necesitas ayuda?» (16484) and «Aceptar.» start «Escuela de superhéroes» for whoever has captured a wanted criminal (its catalogue criterion), 16485. «Pedirle formar a una categoría de reclutas en particular.» (16487: «esta semana puedes formar… a otra categoría») lists the ten years; each is offered once one of that year's prisoners has been captured, «Liste des ennemis par formation», and starts its «Formación de … año» on 16485, the line every formation's step declares (the client also holds ten copies of it, 16488-16497). «Darle la ficha de formación.» hands over the filled sheet (14920), and the year's blank one the desk gave goes with it (INFERRED): it ends the formation and «Escuela de superhéroes» with it, 16486."
     },
     {
       "npc": 2208,
