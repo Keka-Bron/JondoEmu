@@ -279,6 +279,45 @@ namespace Jondo.Unity.Server.Handlers
             return ivi.Build();
         }
 
+        /// <summary>
+        /// The «Cours du marché» window (MarketPrice) asks for an item's price history with itj
+        /// { f2 the item } and draws the iue it is answered with; nothing answered, it stayed empty.
+        /// </summary>
+        /// <remarks>
+        /// Read off the 3.6.10.11 client (Cpp2IL): emz.gxk(iue) turns each list into the window's
+        /// HistoryAveragePriceEntry -- an iuc's f1 the quantity sold, f2 the average price of one, f6 the
+        /// moment in ISO 8601 (DateTimeOffset.Parse) -- and hands MarketPrice the f3 for its 7- and 30-day
+        /// tabs (mkx, mky) and the f1 for its 24-hour tab and its «Dernier achat» (mkw, mkq). The mean and
+        /// the median are the client's own. Here the f1 goes by the hour over the last 24 hours and the f3
+        /// by the day over the last 30, from every sale recorded (MarketplaceSales).
+        /// </remarks>
+        public static Task PriceHistoryAsync(NetworkStream stream, byte[] frame)
+        {
+            byte[] itj = ConnectionProtocol.ReadPayload(frame, Op.Itj);
+            int gid = itj == null ? 0 : (int)VarOf(itj, 2);
+            return Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iue, BuildPriceHistory(gid, Clock())));
+        }
+
+        internal static byte[] BuildPriceHistory(int gid, DateTime nowUtc)
+        {
+            var iue = Pb.New();
+            if (gid <= 0) return iue.Build();
+            var sales = MarketplaceListings.SalesOf(gid, nowUtc.AddDays(-30));
+            long hourAgo = new DateTimeOffset(nowUtc.AddHours(-24)).ToUnixTimeSeconds();
+            Pb Point(long at, IEnumerable<(long At, int Quantity, long Price)> group)
+            {
+                long quantity = group.Sum(s => (long)s.Quantity), kamas = group.Sum(s => s.Price);
+                return Pb.New().Var(1, quantity).Var(2, quantity > 0 ? kamas / quantity : 0)
+                    .Str(6, DateTimeOffset.FromUnixTimeSeconds(at).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            }
+            foreach (var hour in sales.Where(s => s.At >= hourAgo).GroupBy(s => s.At - s.At % 3600))
+                iue.Msg(1, Point(hour.Key, hour));
+            foreach (var day in sales.GroupBy(s => s.At - s.At % 86400))
+                iue.Msg(3, Point(day.Key, day));
+            return iue.Build();
+        }
+
         // ─── Buying ─────────────────────────────────────────────────────────────────────────
 
         /// <summary>
