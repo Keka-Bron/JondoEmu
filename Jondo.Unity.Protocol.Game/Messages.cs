@@ -9,7 +9,7 @@ public sealed record AccountRights(bool ShowConsole, bool UnlimitedAccess, bool 
 
 public sealed record AccountRightsEvent(AccountRights Rights) : GameEvent;
 
-public sealed record AccountSubscriptionElapsedDurationUpdateEvent() : GameEvent;
+public sealed record AccountSubscriptionElapsedDurationUpdateEvent(long SubscriptionElapsedDuration) : GameEvent;
 
 public sealed record ActorInformation(EntityLook Look, ActorInformationCase ActorCase);
 
@@ -27,7 +27,7 @@ public sealed record AlignmentExtendedInformation(int Honor, AttackableStatus At
 
 public sealed record AlignmentInformation(int AlignmentQuestNumber, Alignment Alignment, AlignmentExtendedInformation? ExtendedInformation, int AlignmentGrade, int CharacterLevel);
 
-public sealed record AllianceInformation(string Name);
+public sealed record AllianceInformation(string Name, SocialEmblem? Emblem, string Uid, string Tag, AllianceCardInformation? CardInformation);
 
 public sealed record Alteration(long CreationTime, long AlterationId, IReadOnlyList<ObjectEffect> Effects, AlterationExpirationType ExpirationType, long ExpirationValue);
 
@@ -121,13 +121,17 @@ public sealed record CharacterEpicInformation(int DeathCount, EpicDeathState Dea
 
 public sealed record CharacterFirstSelectionRequest(bool DoTutorial, long CharacterId) : GameRequest;
 
+public sealed record CharacterForceSelectionEvent() : GameEvent;
+
+public sealed record CharacterForceSelectionReadyRequest() : GameRequest;
+
 public sealed record CharacterLevelUpEvent(int NewLevel) : GameEvent;
 
 public sealed record CharacterListEvent(IReadOnlyList<Character> Characters) : GameEvent;
 
 public sealed record CharacterListRequest() : GameRequest;
 
-public sealed record CharacterLook(EntityLook Look, int BreedId, CharacterLookComplementCase ComplementCase);
+public sealed record CharacterLook(EntityLook Look, int BreedId, string LastConnectionDate, string LastDisconnectionDate, CharacterLookComplementCase ComplementCase);
 
 [JsonDerivedType(typeof(CharacterLookComplementCaseBaseInformation), "BaseInformation")]
 [JsonDerivedType(typeof(CharacterLookComplementCaseGuild), "Guild")]
@@ -207,7 +211,7 @@ public sealed record EntityDisposition(int? CellId, Direction Direction, long? E
 
 public sealed record EntityFighterInformation(long MasterId, string MasterName, int EntityModelId, int Level);
 
-public sealed record EntityLook(IReadOnlyList<int> Colors, int LookType, int Bones, IReadOnlyList<int> Scales, IReadOnlyList<int> Skins);
+public sealed record EntityLook(IReadOnlyList<int> Colors, int LookType, int Bones, IReadOnlyList<int> Scales, IReadOnlyList<int> Skins, IReadOnlyList<SubEntityInformation> SubEntities);
 
 public sealed record EntitySpawnCharacter();
 
@@ -449,6 +453,8 @@ public sealed record FightCharacterResult(IReadOnlyList<FightResultAdditionalDat
 
 public sealed record FightCharacteristics(long Summoner, FightInvisibilityState InvisibilityState, bool Summoned, IReadOnlyList<CharacterCharacteristic> Characteristics);
 
+public sealed record FightCommonInformation(int FightId, FightType Type, IReadOnlyList<FightTeamInformation> TeamsInformation, IReadOnlyList<int> TeamsPosition, IReadOnlyList<FightOptionsInformation> TeamsOptions);
+
 public sealed record FightDamageDoneStatistics(int PoisonDamage, int SummonDamage, float DamagePerActionPoint, int Total, int PushDamage, float DamagePerTurn, int ObjectDamage, int ShieldDamage, int DirectDamage, int ErosionDone);
 
 public sealed record FightDamageTakenStatistics(int ObjectDamage, int ErosionTaken, float DamagePerTurn, int SummonDamage, int ShieldDamage, int PushDamage, int PoisonDamage, int Total);
@@ -530,6 +536,8 @@ public sealed record FightNewRoundEvent(int TurnOrder, int RoundNumber) : GameEv
 public enum FightOption { Unknown0, Unknown1, Unknown2, Unknown3 }
 
 public sealed record FightOptionUpdateEvent(Team Team, FightOption Option, bool State, int FightId) : GameEvent;
+
+public sealed record FightOptionsInformation(bool IsSecret, bool IsRestrictedToParty, bool IsClosed, bool IsAskingForHelp);
 
 public enum FightOutcome { ResultLost, ResultDraw, ResultVictory, ResultTax, ResultDefenderGroup }
 
@@ -707,7 +715,7 @@ public sealed record GlobalSpellModifier(int Context, SpellModifierType Modifier
 
 public sealed record GuildHallThemeInformation(int ThemeId, IReadOnlyList<int> AvailableThemeIds);
 
-public sealed record GuildInformation(int Id, string Name, int Level);
+public sealed record GuildInformation(int Id, string Name, int Level, GuildSocialInformation? SocialInformation);
 
 public sealed record GuildInformationRequest(GuildInformationType InformationType) : GameRequest;
 
@@ -719,15 +727,33 @@ public sealed record GuildMemberWarnOnConnectionStartRequest() : GameRequest;
 
 public sealed record GuildMemberWarnOnConnectionStopRequest() : GameRequest;
 
+public sealed record GuildWeeklyResetDateRequest() : GameRequest;
+
+public sealed record GuildWeeklyResetDateResponse(string ResetDate) : GameResponse;
+
 public enum Hierarchy { RoleUnavailable, RolePlayer, RoleModerator, RoleGameMasterPadawan, RoleGameMaster, RoleAdmin, RoleUnknownSpecialUser }
 
-public sealed record House(HouseInformationCase InformationCase);
+public sealed record House(int HouseId, int ModelId, HouseInformationCase InformationCase);
 
 [JsonDerivedType(typeof(HouseInformationCaseHouseInside), "HouseInside")]
+[JsonDerivedType(typeof(HouseInformationCaseHouseOnMap), "HouseOnMap")]
+[JsonDerivedType(typeof(HouseInformationCaseHouseAccount), "HouseAccount")]
+[JsonDerivedType(typeof(HouseInformationCaseHouseGuild), "HouseGuild")]
 public abstract record HouseInformationCase;
 public sealed record HouseInformationCaseHouseInside(HouseInside Value) : HouseInformationCase;
+public sealed record HouseInformationCaseHouseOnMap(HouseOnMap Value) : HouseInformationCase;
+public sealed record HouseInformationCaseHouseAccount(HouseAccount Value) : HouseInformationCase;
+public sealed record HouseInformationCaseHouseGuild(HouseGuild Value) : HouseInformationCase;
 
-public sealed record HouseInside();
+public sealed record HouseInside(MapCoordinates Coordinates, HouseInstance HouseInformation);
+
+public sealed record HouseOnMap(IReadOnlyList<int> DoorsOnMap, IReadOnlyList<HouseInstance> HousesInformation);
+
+public sealed record HouseAccount(MapExtendedCoordinates Coordinates, HouseInstance HouseInformation);
+
+public sealed record HouseGuild(MapExtendedCoordinates Coordinates, HouseInstance HouseInformation, long GuildShareParams);
+
+public sealed record HouseInstance(bool IsSaleLocked, GuildInformation? GuildInformation, bool HasOwner, bool IsAdminLocked, int RoomsCount, long? Price, AccountTag? AccountTag, bool IsLocked, int ChestsCount, IReadOnlyList<int> SkillsId, int InstanceId);
 
 public sealed record HumanAllianceOption(AttackableStatus AttackableStatus, AllianceInformation AllianceInformation);
 
@@ -771,6 +797,10 @@ public sealed record HumanoidInformation(AlignmentInformation AlignmentInformati
 
 public sealed record IdentificationRequest(string TicketKey, string LanguageCode) : GameRequest;
 
+public sealed record InteractiveElement(int ElementId, int ElementTypeId, IReadOnlyList<InteractiveElementSkill> EnabledSkills, IReadOnlyList<InteractiveElementSkill> DisabledSkills, bool OnCurrentMap, int? AgeBonus);
+
+public sealed record InteractiveElementSkill(int SkillId, int SkillInstanceUid, int? NameId);
+
 public sealed record InventoryContentEvent(long Kamas, IReadOnlyList<ObjectItemInventory> Objects) : GameEvent;
 
 public enum InventorySourceContext { Unknown0, BidHouse, Craft }
@@ -792,6 +822,10 @@ public sealed record ItemToSellInNpcShop(long Price, int Quantity, string BuyCri
 public sealed record KamasUpdateEvent(long Quantity) : GameEvent;
 
 public enum MagicPoolStatus { NoChange, Increase, Loss }
+
+public sealed record MapCellColor(uint CellId, MapCellColorValue Color);
+
+public sealed record MapCellColorValue(uint Red, uint Green, uint Blue, uint Alpha);
 
 public sealed record MapChangeOrientationEvent(long ActorId, Direction Direction) : GameEvent;
 
@@ -817,13 +851,13 @@ public sealed record MapComplementaryHavenBagInformation(int Theme, int RoomId, 
 
 public sealed record MapComplementaryInHouseInformation(House CurrentHouse);
 
-public sealed record MapComplementaryInformationEvent(long MapId, IReadOnlyList<ActorPositionInformation> Actors, int SubareaId, MapSpecificComplementaryInformationCase SpecificCase) : GameEvent;
+public sealed record MapComplementaryInformationEvent(long MapId, IReadOnlyList<ActorPositionInformation> Actors, int SubareaId, IReadOnlyList<MapObstacle> Obstacles, IReadOnlyList<House> Houses, IReadOnlyList<MapCellColor> CellColors, IReadOnlyList<InteractiveElement> InteractiveElements, IReadOnlyList<FightCommonInformation> Fights, IReadOnlyList<StatedElement> StatedElements, MapSpecificComplementaryInformationCase SpecificCase) : GameEvent;
 
 public sealed record MapCoordinates(int X, int Y);
 
 public sealed record MapCurrentEvent(long MapId) : GameEvent;
 
-public sealed record MapExtendedCoordinates();
+public sealed record MapExtendedCoordinates(long MapId, int WorldX, int SubAreaId, int WorldY);
 
 public sealed record MapInformationRequest(int MapId) : GameRequest;
 
@@ -837,12 +871,18 @@ public sealed record MapMovementRefusedEvent(int CellX, int CellY) : GameEvent;
 
 public sealed record MapMovementRequest(long MapId, IReadOnlyList<int> KeyCells, bool Cautious) : GameRequest;
 
+public sealed record MapObstacle(int CellId, MapObstacleState State);
+
+public enum MapObstacleState { ObstacleOpened, ObstacleClosed }
+
+[JsonDerivedType(typeof(MapSpecificComplementaryInformationCaseNone), "None")]
 [JsonDerivedType(typeof(MapSpecificComplementaryInformationCaseAnomaly), "Anomaly")]
 [JsonDerivedType(typeof(MapSpecificComplementaryInformationCaseGuildInformation), "GuildInformation")]
 [JsonDerivedType(typeof(MapSpecificComplementaryInformationCaseInHouseInformation), "InHouseInformation")]
 [JsonDerivedType(typeof(MapSpecificComplementaryInformationCaseHavenBagInformation), "HavenBagInformation")]
 [JsonDerivedType(typeof(MapSpecificComplementaryInformationCaseCoords), "Coords")]
 public abstract record MapSpecificComplementaryInformationCase;
+public sealed record MapSpecificComplementaryInformationCaseNone() : MapSpecificComplementaryInformationCase;
 public sealed record MapSpecificComplementaryInformationCaseAnomaly(MapComplementaryAnomalyInformation Value) : MapSpecificComplementaryInformationCase;
 public sealed record MapSpecificComplementaryInformationCaseGuildInformation(MapComplementaryGuildInformation Value) : MapSpecificComplementaryInformationCase;
 public sealed record MapSpecificComplementaryInformationCaseInHouseInformation(MapComplementaryInHouseInformation Value) : MapSpecificComplementaryInformationCase;
@@ -983,11 +1023,9 @@ public sealed record PrismInformation(int? CristalNumberLeft, long NextEvolution
 
 public enum PrismState { Normal, Weakened, Vulnerable, Protected }
 
-public sealed record ProbableGuildMissionStateRefreshRequest() : GameRequest;
-
 public sealed record QueueStatusEvent(int Position, int Total) : GameEvent;
 
-public sealed record RankInformation();
+public sealed record RankInformation(string Name, RankInformationPrivateInformation? PrivateInformation, RankInformationOrderAndGfx? OrderAndGfx, int Id);
 
 public sealed record ResetCharacterCharacteristicsRequest() : GameRequest;
 
@@ -1023,7 +1061,7 @@ public sealed record SequenceStartEvent(SequenceType SequenceType) : GameEvent;
 
 public enum SequenceType { Spell, Weapon, GlyphTrap, Triggered, Move, CharacterDeath, TurnStart, TurnEnd, FightStart, Unknown9, Unknown10 }
 
-public sealed record ServerSelectionStatusEvent() : GameEvent;
+public sealed record ServerSessionReadyEvent() : GameEvent;
 
 public sealed record ServerSettingsEvent(int ArenaLeaveBanTime, ServerType GameType, bool HasFreeAutopilot, bool IsMonoAccount, int Community, string Language) : GameEvent;
 
@@ -1071,7 +1109,7 @@ public sealed record ShortcutObjectItem(int ItemGid, int ItemUid);
 
 public sealed record ShortcutOutfit();
 
-public sealed record ShortcutPreset();
+public sealed record ShortcutPreset(string PresetUuid);
 
 public sealed record ShortcutSmiley();
 
@@ -1099,6 +1137,18 @@ public enum SpellType { Unknown0, Unknown1, Unknown2, Unknown3, Unknown4, Unknow
 
 public sealed record SpellsEvent(IReadOnlyList<SpellItem> HumanSpells, IReadOnlyList<SpellItem> MutantSpells) : GameEvent;
 
+public sealed record StatedElement(int ElementId, int CellId, int State, bool OnCurrentMap);
+
+// Stable ordinals are independent of the explicitly bound, non-contiguous wire values.
+public enum SubEntityBindingPointCategory
+{
+    HookPointCategoryUnused, HookPointCategoryPet, HookPointCategoryMountDriver,
+    HookPointCategoryLiftedEntity, HookPointCategoryBaseBackground, HookPointCategoryBaseForeground,
+    HookPointCategoryUnderwaterBubbles, Unknown9, Unknown10, Unknown11, Unknown12, Unknown13, Unknown14
+}
+
+public sealed record SubEntityInformation(EntityLook SubEntityLook, int BindingPointIndex, SubEntityBindingPointCategory BindingPointCategory);
+
 public sealed record TaxCollectorActor(TaxCollectorStaticInformation Identification, int Attack);
 
 public sealed record TaxCollectorStaticInformation(AllianceInformation? Alliance, int LastNameId, string Uid, long CallerId, int FirstNameId);
@@ -1115,10 +1165,422 @@ public sealed record TimeEvent(int TimezoneOffset, long Timestamp) : GameEvent;
 
 public sealed record TokenValidationRequest(string Token) : GameRequest;
 
-public sealed record TrustStatusEvent() : GameEvent;
+public sealed record TrustStatusEvent(bool Certified) : GameEvent;
 
 public sealed record UnknownJqj();
 
 public sealed record UnknownJrn();
+
+// Reviewed entry payloads and dependencies. Nullable messages preserve absence;
+// type-only records do not imply coverage of their populated raw fields.
+public sealed record AccountTag(string Nickname, string Tag);
+
+public sealed record AchievedAchievement(int? FinishedLevel, long AchievedBy, int AchievementId, int PioneerRank);
+
+public sealed record Achievement(int AchievementId, IReadOnlyList<AchievementObjective> AchievementObjectives);
+
+public sealed record AchievementDetailsEvent(Achievement? Achievement) : GameEvent;
+
+public sealed record AchievementDetailsRequest(int AchievementId) : GameRequest;
+
+public sealed record AchievementFinishedEvent(AchievedAchievement? Achievement) : GameEvent;
+
+public sealed record AchievementFinishedInformationEvent(long PlayerId, string PlayerName, AchievedAchievement? Achievement) : GameEvent;
+
+public sealed record AchievementObjective(int ObjectiveId, long MaxValue, long? CurrentValue);
+
+public sealed record AchievementPioneerRank(int PioneerRank, int AchievementId);
+
+public sealed record AchievementRewardRequest(int AchievementId) : GameRequest;
+
+public sealed record AchievementRewardResultEvent(bool Success, int AchievementId) : GameEvent;
+
+public sealed record AchievementsAlmostFinishedDetailedEvent(IReadOnlyList<Achievement> AlmostFinishedAchievements) : GameEvent;
+
+public sealed record AchievementsDetailedEvent(IReadOnlyList<Achievement> Achievements) : GameEvent;
+
+public sealed record AchievementsDetailedRequest(int CategoryId) : GameRequest;
+
+public sealed record AchievementsEvent(IReadOnlyList<AchievedAchievement> AchievedAchievements) : GameEvent;
+
+public sealed record AchievementsPioneerRanksResponse(IReadOnlyList<AchievementPioneerRank> AchievementsPioneerRanks) : GameResponse;
+
+public sealed record AlignmentRankUpdateEvent(int AlignmentRank) : GameEvent;
+
+public sealed record AllianceApplicationInformationEvent(SocialApplicationInformation? ApplicationInformation, AllianceInformation? Alliance) : GameEvent;
+
+public sealed record AllianceBulletinEvent(SocialNoticeInformation? BulletinInfo) : GameEvent;
+
+public sealed record AllianceCardInformation(AllianceRecruitmentInformation? Recruitment, long CreationDate, int SubareaNumber, int MembersNumber);
+
+public sealed record AllianceMemberInformation(int AvaRoleId, Character? Information);
+
+public sealed record AllianceMemberUpdateEvent(AllianceMemberInformation? Member) : GameEvent;
+
+public sealed record AllianceMembershipEvent(int RankId, AllianceInformation? AllianceInformation) : GameEvent;
+
+public sealed record AllianceMotdEvent(SocialNoticeInformation? MotdInfo) : GameEvent;
+
+public sealed record AllianceRanksEvent(IReadOnlyList<RankInformation> Ranks) : GameEvent;
+
+public sealed record AllianceRecruitmentInformation(string LastEditPlayerName, SocialRecruitmentType RecruitmentType, int MinLevel, string Text, IReadOnlyList<int> SelectedCriterion, bool MinLevelFacultative, bool TextInError, string Title, long LastEditDate, bool AutoLocked, string SocialUid, IReadOnlyList<int> SelectedLanguages);
+
+public sealed record AlmanachCalendarDateEvent(int DateId) : GameEvent;
+
+public sealed record AnomalyStateEvent(int SubAreaId, bool Active, long ClosingTimeMs) : GameEvent;
+
+public sealed record ArenaLeagueRanking(int LeagueId, int Rating, int LadderPosition);
+
+public sealed record ArenaRank(ArenaType ArenaType, int BestRating, int BestLeagueId, int FightNeededForLadder, int SeasonVictoryCount, int SeasonFightCount, int DailyVictoryCount, ArenaLeagueRanking? LeagueRanking, int DailyFightCount);
+
+public sealed record ArenaUpdatePlayerInformationEvent(string BanEndDate, IReadOnlyList<ArenaRank> ArenaRanks) : GameEvent;
+
+public sealed record Bonus(int Value, BonusType Type);
+
+public sealed record BonusesEvent(IReadOnlyList<Bonus> Bonuses) : GameEvent;
+
+public sealed record ChallengeInformation(int DropBonus, int ChallengeId, IReadOnlyList<ChallengeTarget> Targets, int ExperienceBonus, ChallengeState State);
+
+public sealed record ChallengeListEvent(IReadOnlyList<ChallengeInformation> Challenges) : GameEvent;
+
+public sealed record ChallengeModSelectedEvent(ChallengeMod ChallengeMod) : GameEvent;
+
+public sealed record ChallengeNumberEvent(int ChallengeNumber) : GameEvent;
+
+public sealed record ChallengeTarget();
+
+public sealed record CharacterAppearanceCollectionEvent(CharacterColors? CharacterColors) : GameEvent;
+
+public sealed record CharacterCapabilitiesEvent(int GuildEmblemSymbolCategory) : GameEvent;
+
+public sealed record CharacterColors(int SlotsUnlocked, IReadOnlyList<ColorPalette> ColorPalettes, int SlotsTotal);
+
+public sealed record CharacterExperienceGainEvent(long CharacterExperience) : GameEvent;
+
+public sealed record CharacterLoadingCompleteEvent() : GameEvent;
+
+public sealed record CharacterPresetInfo(PresetLook? PresetLook, int SymbolId, PresetCharacteristicsInfo? CharacteristicsInfo, string Name, IReadOnlyDictionary<int, PresetEquipment> EquipmentByPosition, string LastModificationDate, SpellPreset? SpellPreset, bool IsFavorite, string OutfitUuid, string Uuid);
+
+public sealed record ChatChannelsEnabledEvent(IReadOnlyList<ChatChannel> ActiveChannels, IReadOnlyList<ChatChannel> DisabledChannels) : GameEvent;
+
+public sealed record ColorPalette(IReadOnlyList<int> Colors);
+
+public sealed record CommunityChannelEvent() : GameEvent;
+
+public sealed record ConfigurationEvent(GuildConfiguration? GuildConfiguration) : GameEvent;
+
+public sealed record CosmeticInventoryLoadedEvent(IReadOnlyList<int> Heads, IReadOnlyList<int> Idles, IReadOnlyList<int> Bodies, IReadOnlyList<ObjectItem> Objects) : GameEvent;
+
+public sealed record EmoteAddedEvent(int EmoteId) : GameEvent;
+
+public sealed record EmotesEvent(IReadOnlyList<int> EmotesId) : GameEvent;
+
+public sealed record FightSpectatorJoinEvent(FightJoinEvent? Join) : GameEvent;
+
+public sealed record ForgettableSpellPresetInfo();
+
+public sealed record GameActionItem(GameActionItemContent? Content, IReadOnlyList<long> ItemUids);
+
+public sealed record GameActionItemContent(string Title, IReadOnlyList<GameActionItemObject> Items);
+
+public sealed record GameActionItemListEvent(IReadOnlyList<GameActionItem> Actions) : GameEvent;
+
+public sealed record GameActionItemObject(int Quantity, int ObjectGid, IReadOnlyList<ObjectEffect> Effects);
+
+public sealed record GuildActivityConfiguration(int GuildatonItemId, int MissionCapacity, int MaxExcludedRanks, int MaxExcludedCategories, int WeeklyTokenItemId, int WeeklyTokenLimit);
+
+public sealed record GuildConfiguration(GuildActivityConfiguration? Activity, long ActivityDelayMs, GuildContributionConfiguration? Contribution);
+
+public sealed record GuildContributionConfiguration(long KamasCost, int GuildatonReward, int GuildActivityReward, int GuildKamasReward);
+
+public sealed record GuildContributionLeftEvent(int ContributionLeft) : GameEvent;
+
+public sealed record GuildGeneralInformationEvent(string CreationDate, int? HallId, int Level, int Score, long ExpLevelFloor, long Experience, long GuildKamas, long ExpLevelNextFloor, int MembersCount) : GameEvent;
+
+public sealed record GuildHousesEvent(IReadOnlyList<House> Houses) : GameEvent;
+
+public sealed record GuildMemberOnlineStatusEvent(long MemberId, bool Online) : GameEvent;
+
+public sealed record GuildMemberUpdateEvent(Character? Member) : GameEvent;
+
+public sealed record GuildMembersEvent(IReadOnlyList<Character> Members) : GameEvent;
+
+// The reviewed placeholder records confirmed use without asserting gameplay meaning.
+public sealed record GuildMembershipEvent(GuildInformation? GuildInformation, int RankId, int GuildTokens, int UnknownUsedContextValue) : GameEvent;
+
+public sealed record GuildRanksEvent(IReadOnlyList<RankInformation> Ranks) : GameEvent;
+
+public sealed record GuildSocialInformation(SocialEmblem? Emblem);
+
+public sealed record HaapiSessionEvent(string SessionUid) : GameEvent;
+
+public sealed record HavenBagElement(int CellId, int ElementId, int Orientation);
+
+public sealed record HavenBagFurnitureEvent(IReadOnlyList<HavenBagElement> Furniture) : GameEvent;
+
+public sealed record HavenBagPackListEvent(IReadOnlyList<int> PacksId) : GameEvent;
+
+public sealed record HavenBagPermissionsUpdateEvent(int Permissions) : GameEvent;
+
+public sealed record HavenBagRoomPreview(int ThemeId, int RoomId);
+
+public sealed record HavenBagRoomUpdateEvent(IReadOnlyList<HavenBagRoomPreview> Preview, HavenBagRoomAction Action) : GameEvent;
+
+public sealed record HouseAccountEvent(IReadOnlyList<House> Houses) : GameEvent;
+
+public sealed record InfiniteDreamBonus(ObjectEffect? Effect, int Count);
+
+public sealed record InfiniteDreamCharacter(string Name, Gender Gender, long CharacterId, int Breed);
+
+public sealed record InfiniteDreamDoor(string RoomId, long ElementId, InfiniteDreamDoorPosition Position, InfiniteDreamPortalType PortalType);
+
+public sealed record InfiniteDreamMap(IReadOnlyDictionary<string, InfiniteDreamRoom> Rooms, InfiniteDreamStage Stage, IReadOnlyList<string> VisitedRoomIds, IReadOnlyDictionary<string, InfiniteDreamRoomLinks> RoomLinks);
+
+public sealed record InfiniteDreamMonster(int CellId, int MonsterId, InfiniteDreamMonsterKind Kind, IReadOnlyDictionary<int, int> Characteristics);
+
+public sealed record InfiniteDreamReward(int? Rerolls, int? Life, IReadOnlyList<InfiniteDreamBonus> Bonuses, int? BonusLevels, int? DreamPoints, InfiniteDreamRewardRarity Rarity, int? Price, int IconId, int RewardId, bool? Unavailable);
+
+public sealed record InfiniteDreamRoom(int Score, int DreamPoints, InfiniteDreamReward? Reward, InfiniteDreamRoomType RoomType, int Floor, InfiniteDreamRoomDifficulty? Difficulty);
+
+public sealed record InfiniteDreamRoomLinks(IReadOnlyList<string> RoomIds);
+
+public sealed record InfiniteDreamStateEvent(InfiniteDreamCharacter? Dreamer, int Intensity, IReadOnlyList<InfiniteDreamMonster> Monsters, IReadOnlyList<InfiniteDreamDoor> Doors, IReadOnlyList<InfiniteDreamCharacter> Party, IReadOnlyList<InfiniteDreamReward> Rewards, int Rerolls, int LootBonusPercent, int DreamPoints, InfiniteDreamStage Stage, string CurrentRoomId, int BonusLevels, IReadOnlyList<InfiniteDreamBonus> Bonuses, IReadOnlyList<InfiniteDreamMap> Maps, bool CanReroll, bool RoomCleared, int ScaledLevel, bool Training, int ExperienceBonusPercent) : GameEvent;
+
+public sealed record JobBookSubscription(int JobId, bool Subscribed);
+
+public sealed record JobBookSubscriptionEvent(IReadOnlyList<JobBookSubscription> Subscriptions) : GameEvent;
+
+public sealed record JobCrafterDirectorySettings(int JobId, bool Free, int MinLevel);
+
+public sealed record JobCrafterDirectorySettingsEvent(IReadOnlyList<JobCrafterDirectorySettings> Settings) : GameEvent;
+
+public sealed record JobDescription(int JobId, IReadOnlyList<JobSkillAction> Skills);
+
+public sealed record JobDescriptionEvent(IReadOnlyList<JobDescription> Jobs) : GameEvent;
+
+public sealed record JobExperience(int JobId, long JobXpNextLevelFloor, int JobLevel, long JobXpLevelFloor, long JobXp);
+
+public sealed record JobExperiencesUpdateEvent(IReadOnlyList<JobExperience> Experiences) : GameEvent;
+
+public sealed record JobSkillAction(int SkillId, JobSkillActionCase ActionCase);
+
+[JsonDerivedType(typeof(JobSkillActionCaseNone), "None")]
+[JsonDerivedType(typeof(JobSkillActionCaseTimed), "Timed")]
+[JsonDerivedType(typeof(JobSkillActionCaseCraft), "Craft")]
+public abstract record JobSkillActionCase;
+public sealed record JobSkillActionCaseNone() : JobSkillActionCase;
+public sealed record JobSkillActionCaseTimed(JobSkillActionTimed Value) : JobSkillActionCase;
+public sealed record JobSkillActionCaseCraft(JobSkillActionCraft Value) : JobSkillActionCase;
+
+public sealed record JobSkillActionCollect(int Max, int Min);
+
+public sealed record JobSkillActionCraft(int Probability);
+
+public sealed record JobSkillActionTimed(JobSkillActionCollect? Collect, int Time);
+
+// Wire units are 100 ms per HP, not HP per second.
+public sealed record LifePointsRegenBeginEvent(int RegenRate) : GameEvent;
+
+public sealed record MapFightCountEvent(int FightCount) : GameEvent;
+
+public sealed record MapNpcQuest(IReadOnlyList<NpcWithQuest> NpcsWithQuests, long MapId);
+
+public sealed record NotificationsEvent(IReadOnlyList<int> Flags) : GameEvent;
+
+public sealed record NpcWithQuest(IReadOnlyList<int> QuestsToStart, IReadOnlyList<int> QuestsToValidate, int NpcId);
+
+public sealed record NpcsMapQuestStatusUpdateEvent(IReadOnlyList<MapNpcQuest> MapInformation) : GameEvent;
+
+public sealed record OrnamentSelectedEvent() : GameEvent;
+
+public sealed record Outfit(ColorPalette? Colors, bool HarnessColorsEnabled, string LastModified, int BodyId, bool Favorite, string Uuid, int IdleId, int? AuraEmoteId, int? TitleId, int HeadId, EntityLook? EntityLook, string Name, IReadOnlyList<ObjectSlot> HiddenSlots, int PictogramId, int? OrnamentId, IReadOnlyDictionary<int, SkinOutfit> Objects);
+
+public sealed record OutfitAuraChangedEvent() : GameEvent;
+
+public sealed record OutfitLookUpdatedEvent(string OutfitId, EntityLook? Look) : GameEvent;
+
+public sealed record OutfitsLoadedEvent(IReadOnlyList<Outfit> Outfits, Outfit? Current) : GameEvent;
+
+public sealed record PresetCharacteristicsDetails(int FromInitialBonus, int FromAllocated, int FromBonus, int FromBase, int? Limit, int FromEquipment);
+
+public sealed record PresetCharacteristicsInfo(IReadOnlyDictionary<int, PresetCharacteristicsDetails> CharacteristicDetailsById);
+
+public sealed record PresetEquipment(int Gid, int? Uid, IReadOnlyList<ObjectEffect> Effects);
+
+public sealed record PresetListEvent(IReadOnlyDictionary<string, CharacterPresetInfo> CharacterPresetInfoById, IReadOnlyDictionary<string, ForgettableSpellPresetInfo> ForgettableSpellPresetInfoById) : GameEvent;
+
+public sealed record PresetLook(EntityLook? LookWithoutOutfit, EntityLook? LookWithOutfit);
+
+public sealed record PrismListEvent(IReadOnlyList<PrismLocalizedInformation> Prisms) : GameEvent;
+
+public sealed record PrismLocalizedInformation(long MapId, MapCoordinates? MapCoordinates, int SubAreaId, PrismInformation? Prism);
+
+public sealed record QuestActive(QuestActiveDetails? Details, int QuestId);
+
+public sealed record QuestActiveDetails(IReadOnlyList<QuestObjective> Objectives, int StepId);
+
+public sealed record QuestFinished(int QuestId);
+
+public sealed record QuestObjective(IReadOnlyList<string> DialogParams, int ObjectiveId, QuestObjectiveCompletion? Completion, bool ObjectivePending);
+
+public sealed record QuestObjectiveCompletion(long MaxCompletion, long CurrentCompletion);
+
+public sealed record QuestObjectiveUpdatedEvent(int ObjectiveId, QuestObjectiveCompletion? Completion, int QuestId) : GameEvent;
+
+public sealed record QuestsEvent(IReadOnlyList<QuestActive> ActiveQuests, IReadOnlyList<QuestFinished> FinishedQuests, IReadOnlyList<int> ReinitializedDoneQuestsId) : GameEvent;
+
+public sealed record QuestsFollowedEvent(IReadOnlyList<QuestActive> Quests) : GameEvent;
+
+public sealed record RaidGoalCompleted();
+
+public sealed record RaidGoalProgress(int Value);
+
+public sealed record RaidGoalState(RaidGoalStateCase State);
+
+[JsonDerivedType(typeof(RaidGoalStateCaseNone), "None")]
+[JsonDerivedType(typeof(RaidGoalStateCaseCompleted), "Completed")]
+[JsonDerivedType(typeof(RaidGoalStateCaseInProgress), "InProgress")]
+public abstract record RaidGoalStateCase;
+public sealed record RaidGoalStateCaseNone() : RaidGoalStateCase;
+public sealed record RaidGoalStateCaseCompleted(RaidGoalCompleted Value) : RaidGoalStateCase;
+public sealed record RaidGoalStateCaseInProgress(RaidGoalProgress Value) : RaidGoalStateCase;
+
+public sealed record RaidLadderReward(int RaidId);
+
+public sealed record RaidLadderRewardsObtainedEvent(IReadOnlyList<RaidLadderReward> Rewards) : GameEvent;
+
+public sealed record RaidParticipantStatusUpdatedEvent(string RaidUuid, string ParticipantKey, CharacterStatus? Status) : GameEvent;
+
+public sealed record RaidPendingRewardEvent(IReadOnlyList<int> RewardStepIds) : GameEvent;
+
+public sealed record RaidPlayerInformation(int Level, Gender Gender, long CharacterId, int Breed, string ParticipantKey, CharacterStatus? Status, string Name);
+
+public sealed record RankInformationOrderAndGfx(int GfxId, int Order);
+
+public sealed record RankInformationPrivateInformation(bool Modifiable, IReadOnlyList<int> Rights);
+
+public sealed record RunningRaid(IReadOnlyDictionary<string, RunningRaidParticipant> Participants, int RaidId, string EndDate, string CaptainKey, RunningRaidState? State);
+
+public sealed record RunningRaidJoinedEvent(RunningRaid? Raid, string RaidUuid) : GameEvent;
+
+public sealed record RunningRaidParticipant(int? Group, int? Health, RaidPlayerInformation? Player, RunningRaidParticipantState State);
+
+public sealed record RunningRaidParticipantStateUpdatedEvent(string ParticipantKey, string RaidUuid, RunningRaidParticipantState State) : GameEvent;
+
+public sealed record RunningRaidState(int Score, IReadOnlyDictionary<int, RaidGoalState> Goals, int? Health, IReadOnlyDictionary<int, int> Variables);
+
+public sealed record SalesHistoryEntry(long Kamas, string Date, SalesHistoryStatus Status, ItemMinimalInformation? Item, int AuctionHouseId);
+
+public sealed record SalesHistoryEvent(IReadOnlyList<SalesHistoryEntry> Entries) : GameEvent;
+
+public sealed record ServerExperienceModifierEvent(int ExperiencePercentage, int SecondaryPercentage, int ExperienceLimitPercentage) : GameEvent;
+
+public sealed record SetUpdateEvent(IReadOnlyList<ObjectEffect> Effects, int SetId, IReadOnlyList<int> ObjectsUid) : GameEvent;
+
+public sealed record SkinOutfit(int? Skin, int Gid);
+
+public sealed record SocialApplicationInformation(long CreationDate, string Content, SocialApplicationPlayerInformation? PlayerInformation);
+
+public sealed record SocialApplicationPlayerInformation();
+
+public sealed record SocialEmblem(int SymbolShapeId, int BackgroundShapeId, int BackgroundColor, int SymbolColor);
+
+public sealed record SocialNoticeInformation(string Content, long LastModifiedTimestampSeconds, string AuthorName, long MemberId);
+
+public sealed record SpellPositions(IReadOnlyList<int> Positions);
+
+public sealed record SpellPreset(IReadOnlyDictionary<int, SpellPositions> SpellPositionsById);
+
+public sealed record SpouseStatusEvent(bool HasSpouse) : GameEvent;
+
+public sealed record StagingEvent(int Progression, int Intensity, int StagingId) : GameEvent;
+
+public sealed record StorageKamasUpdateEvent(long Kamas) : GameEvent;
+
+public sealed record SurrenderStateEvent(bool HasSurrenderPopup, bool CanLeave) : GameEvent;
+
+public sealed record TagInformation(TagObjectData? TagObjectData, TagStorageData? TagStorageData);
+
+public sealed record TagObjectData(IReadOnlyList<int> TagObjectUuids);
+
+public sealed record TagStorageData(string TagStorageUuid, string Name, int Picto);
+
+public sealed record TagStoragesRefreshEvent(IReadOnlyList<TagInformation> TagInformation) : GameEvent;
+
+public sealed record TaxCollectorMovement(long PlayerId, int LastNameId, MapExtendedCoordinates? MapCoordinates, int FirstNameId, string PlayerName, TaxCollectorMovementType MovementType);
+
+public sealed record TaxCollectorMovementsOfflineEvent(IReadOnlyList<TaxCollectorMovement> Movements) : GameEvent;
+
+public sealed record TitleSelectedEvent() : GameEvent;
+
+public sealed record TitleSelectionErrorEvent() : GameEvent;
+
+public sealed record TitlesAndOrnamentsEvent(IReadOnlyList<int> Titles, IReadOnlyList<int> Ornaments) : GameEvent;
+
+public sealed record TreasureHuntEvent(int CurrentCheckPoint, TreasureHuntPortalInformation? PortalInformation, int TotalCheckPoint, IReadOnlyList<TreasureHuntFlag> Flags, int AvailableRetryCount, long StartMapId, int TotalStepCount, TreasureHuntType QuestType, IReadOnlyList<TreasureHuntStep> KnownSteps) : GameEvent;
+
+public sealed record TreasureHuntFlag(TreasureHuntFlagState State, long MapId);
+
+public sealed record TreasureHuntPortalInformation(TreasureHuntPortalType PortalType);
+
+public sealed record TreasureHuntStep(TreasureHuntStepCase Step);
+
+[JsonDerivedType(typeof(TreasureHuntStepCaseNone), "None")]
+[JsonDerivedType(typeof(TreasureHuntStepCaseFollowDirectionToPoi), "FollowDirectionToPoi")]
+[JsonDerivedType(typeof(TreasureHuntStepCaseFollowDirectionToHint), "FollowDirectionToHint")]
+[JsonDerivedType(typeof(TreasureHuntStepCaseFollowDirection), "FollowDirection")]
+public abstract record TreasureHuntStepCase;
+public sealed record TreasureHuntStepCaseNone() : TreasureHuntStepCase;
+public sealed record TreasureHuntStepCaseFollowDirectionToPoi(TreasureHuntStepFollowDirectionToPoi Value) : TreasureHuntStepCase;
+public sealed record TreasureHuntStepCaseFollowDirectionToHint(TreasureHuntStepFollowDirectionToHint Value) : TreasureHuntStepCase;
+public sealed record TreasureHuntStepCaseFollowDirection(TreasureHuntStepFollowDirection Value) : TreasureHuntStepCase;
+
+public sealed record TreasureHuntStepFollowDirection(int MapCount, Direction Direction);
+
+public sealed record TreasureHuntStepFollowDirectionToHint(int HintId, Direction Direction);
+
+public sealed record TreasureHuntStepFollowDirectionToPoi(int PoiLabelId, Direction Direction);
+
+public sealed record ZaapKnownListEvent(IReadOnlyList<long> Destinations) : GameEvent;
+
+public enum ArenaType { OneVsOne, TwoVsTwo, ThreeVsThree, Event }
+
+public enum BonusType { Unknown0, Unknown1, Unknown2, Unknown3, Unknown4, Unknown5, Unknown6, Unknown7, Unknown8, Unknown9, Unknown10, Unknown11, Unknown12, Unknown13, Unknown14, Unknown15, Unknown16, Unknown17, Unknown18, Unknown19, Unknown20, Unknown21, Unknown22, Unknown23, Unknown24, Unknown25, Unknown26, Unknown27, Unknown28, Unknown29, Unknown30, Unknown31, Unknown32, Unknown33, Unknown34, Unknown35, Unknown36 }
+
+public enum ChallengeMod { Choice, Random }
+
+public enum ChallengeState { Completed, Failed, InProgress }
+
+public enum HavenBagRoomAction { HavenBagRoomDispatch, HavenBagRoomUpdate }
+
+public enum InfiniteDreamDoorPosition { First, Second, Third }
+
+public enum InfiniteDreamMonsterKind { Normal, Boss, MiniBoss }
+
+public enum InfiniteDreamPortalType { None, Fountain, Favor, Fight, HardFight, Boss, Exit }
+
+public enum InfiniteDreamRewardRarity { Common, Rare, Epic, Legendary }
+
+public enum InfiniteDreamRoomDifficulty { Normal, Hard }
+
+public enum InfiniteDreamRoomType { Start, Fight, Favor, Fountain, Boss }
+
+public enum InfiniteDreamStage { Stage1, Stage2, Stage3, Stage4, Stage5 }
+
+public enum ObjectSlot { Amulet, RingLeft, RingRight, Belt, Boots, Petmount, Dragoturkey, Rhineetle, Seemyool, Cape, Hat, Pet, Shield, Bow, Wand, Staff, Dagger, Scythe, Axe, Lance, Hammer, Shovel, Sword, Disguise, Wings, Shoulders }
+
+public enum RunningRaidParticipantState { Left, Offline, Fighting, Present }
+
+public enum SalesHistoryStatus { Sold, Unsold }
+
+public enum SocialRecruitmentType { Blocked, Automatic, Manual }
+
+public enum TaxCollectorMovementType { TaxCollectorUnknownAction, TaxCollectorHired, TaxCollectorHarvested, TaxCollectorDefeated, TaxCollectorDestroyed }
+
+public enum TreasureHuntFlagState { Unknown, Ok, Wrong }
+
+public enum TreasureHuntPortalType { Unknown, Enutrosor, Srambad, Xelorium, Ecaflipus }
+
+public enum TreasureHuntType { Classic, Portal, Legendary }
 
 public sealed record UpdateLifePointsEvent() : GameEvent;

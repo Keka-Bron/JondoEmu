@@ -21,8 +21,9 @@ the precise client patch installed.
 | `Jondo.Unity.Server/Network/WorldMovementDispatch.cs` | Narrow typed world-movement request dispatch |
 | `Jondo.Unity.Server/Diagnostics/GameTrafficFormatter.cs` | Best-effort typed live-log presentation |
 
-The imported schema contains 2,169 messages. The semantic mapping covers 346
-payload/common message types plus the four Game envelope roles. JondoEmu's stable
+The imported schema contains 2,169 messages. The semantic mapping covers 533
+payload/common message types, 65 enums and 1,374 payload/common fields, plus the
+four Game envelope roles. JondoEmu's stable
 C# API defines semantic names, required/nullable members and explicit oneof case
 records. Nullable message members and explicit `None` cases preserve absence
 where the semantic contract permits it. These models are maintained as source,
