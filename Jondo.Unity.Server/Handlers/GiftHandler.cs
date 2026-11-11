@@ -29,23 +29,6 @@ namespace Jondo.Unity.Server.Handlers
     /// </remarks>
     public static class GiftHandler
     {
-        /// <summary>jtg: the account's gifts, in the shape of the captures'.</summary>
-        public static byte[] BuildList(long accountId)
-        {
-            // The veteran rewards its days have earned come in as gifts first (VeteranRewards).
-            VeteranRewards.GrantDue(accountId);
-            var jtg = Pb.New();
-            foreach (var gift in Gifts.Of(accountId))
-            {
-                var description = Pb.New()
-                    .Str(2, gift.Title)
-                    .Msg(3, Pb.New().Var(2, gift.Quantity).Var(3, gift.Gid))
-                    .StrIfNotEmpty(6, gift.Description);
-                jtg.Msg(3, Pb.New().Msg(1, description).Packed(2, new long[] { gift.Id }));
-            }
-            return jtg.Build();
-        }
-
         /// <summary>jwm: one gift to one of the account's characters.</summary>
         public static async Task ClaimAsync(NetworkStream stream, byte[] payload)
         {
@@ -72,15 +55,7 @@ namespace Jondo.Unity.Server.Handlers
         /// The account's characters that are playing get the list again: a gift just granted shows
         /// in the window without logging out.
         /// </summary>
-        public static async Task TellAsync(long accountId)
-        {
-            byte[] frame = ConnectionProtocol.Push(Op.Jtg, BuildList(accountId));
-            foreach (var session in SessionRegistry.InWorld().Where(s => s.AccountId == accountId))
-            {
-                try { await session.SendAsync(frame); }
-                catch (Exception ex) { Console.WriteLine($"[Gifts] Could not tell account {accountId}: {ex.Message}"); }
-            }
-        }
+        public static Task TellAsync(long accountId) => GiftService.Live.BroadcastAsync(accountId);
 
         private static async Task HandOutAsync(NetworkStream stream, int giftId, long character)
         {

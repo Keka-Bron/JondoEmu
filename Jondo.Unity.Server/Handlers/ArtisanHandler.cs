@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 
@@ -47,9 +48,8 @@ namespace Jondo.Unity.Server.Handlers
         /// skills have no recipe but are smithmagic.
         /// </summary>
         public static IReadOnlyList<int> Jobs()
-            => JobManager.All
-                .Where(j => IsPractised(j.Id, SkillManager.ForJob(j.Id), skill => RecipeManager.ForSkill(skill).Count))
-                .Select(j => j.Id).OrderBy(id => id).ToList();
+            => ProfessionMessages.SupportedDirectoryJobs(JobManager.All, SkillManager.ForJob,
+                skill => RecipeManager.ForSkill(skill).Count);
 
         /// <summary>Whether a job is one that can be practised: base, or a skill that gathers, crafts or mages.</summary>
         internal static bool IsPractised(int jobId, IEnumerable<SkillDefinition> skills, Func<int, int> recipesOf)
@@ -62,14 +62,22 @@ namespace Jondo.Unity.Server.Handlers
         // ─── Settings ───────────────────────────────────────────────────────────────────────
 
         /// <summary>isd: every job's settings.</summary>
+        internal static JobCrafterDirectorySettingsEvent Settings(SessionState state, IEnumerable<int> jobs)
+            => new(jobs.Select(job =>
+            {
+                var setting = SettingOf(state, job);
+                return new JobCrafterDirectorySettings(job, setting.Free,
+                    job == WorkshopHandler.BaseJob ? 0 : setting.MinLevel);
+            }).ToArray());
+
+        /// <summary>Legacy settings payload for the directory's existing request handler.</summary>
         public static byte[] BuildSettings(SessionState state, IEnumerable<int>? jobs = null)
         {
             var isd = Pb.New();
-            foreach (int job in jobs ?? Jobs())
+            foreach (var setting in Settings(state, jobs ?? Jobs()).Settings)
             {
-                var s = SettingOf(state, job);
-                int minLevel = job == WorkshopHandler.BaseJob ? 0 : s.MinLevel;
-                isd.Msg(1, Pb.New().Var(3, job).VarIfNotZero(4, s.Free ? 1 : 0).VarIfNotZero(5, minLevel));
+                isd.Msg(1, Pb.New().Var(3, setting.JobId).VarIfNotZero(4, setting.Free ? 1 : 0)
+                    .VarIfNotZero(5, setting.MinLevel));
             }
             return isd.Build();
         }

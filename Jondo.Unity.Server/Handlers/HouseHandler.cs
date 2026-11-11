@@ -369,7 +369,7 @@ namespace Jondo.Unity.Server.Handlers
             await WriteAsync(stream, ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId));
             await WriteAsync(stream, ConnectionProtocol.BuildLoadMap(salidaMapa));
             await WriteAsync(stream, ConnectionProtocol.BuildMapClock());
-            await WriteAsync(stream, ConnectionProtocol.BuildMapDiscovered(salidaMapa));
+            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, salidaMapa);
 
             Console.WriteLine($"[Houses] Out of the interior {here} to map {salidaMapa}, " +
                               $"cell {SessionContext.State.CellId}.");

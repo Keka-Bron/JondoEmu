@@ -264,7 +264,7 @@ namespace Jondo.Unity.Tests.Economy
                     Assert.Equal(toPot, pot);
 
                     // Closing: nothing left in the window, nothing more given.
-                    await WorkshopHandler.CloseAsync(a.ToClient);
+                    await WorkshopHandler.CloseAsync(a.Session);
                     await a.Next(Op.Khd);
                     Assert.Equal(2, Equipment.All.Where(i => i.Template == BossDrop).Sum(i => i.Quantity));
 

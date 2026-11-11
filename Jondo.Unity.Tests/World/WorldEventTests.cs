@@ -92,8 +92,12 @@ namespace Jondo.Unity.Tests.World
         public void A_received_date_travels_as_the_capture_has_it()
         {
             long seconds = new DateTimeOffset(2026, 8, 12, 22, 15, 10, TimeSpan.Zero).ToUnixTimeSeconds();
-            var date = ProtoMessage.Parse(ConnectionProtocol.EffectDate(seconds).Build());
-            Assert.Equal(new[] { (1, 13L), (2, 656L), (3, 8L), (4, 15L) }, date.Fields.Select(f => (f.FieldNumber, f.VarIntValue)));
+            var date = ItemEffectMessages.Date(seconds);
+            Assert.Equal(13, date.Day);
+            Assert.Equal(656, date.Year);
+            Assert.Equal(8, date.Month);
+            Assert.Equal(15, date.Minute);
+            Assert.Equal(0, date.Hour);
         }
 
         [Fact]

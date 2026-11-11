@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 
@@ -45,11 +46,19 @@ namespace Jondo.Unity.Server.Handlers
         /// <see cref="CombatExperience.CharacterBonusPercent"/>, which the fights pay), 100 + the
         /// other bonus in f2, and his limit in f4.
         /// </summary>
+        internal static ServerExperienceModifierEvent Settings(int limit)
+            => new(ExperienceLimit.Full + CombatExperience.CharacterBonusPercent,
+                ExperienceLimit.Full + SecondBonusPercent, limit);
+
+        /// <summary>Legacy settings payload for the limit-change request handler.</summary>
         public static byte[] BuildSettings(int limit)
-            => Pb.New()
-                .Var(1, ExperienceLimit.Full + CombatExperience.CharacterBonusPercent)
-                .Var(2, ExperienceLimit.Full + SecondBonusPercent)
-                .VarIfNotZero(4, limit)
+        {
+            var settings = Settings(limit);
+            return Pb.New()
+                .Var(1, settings.ExperiencePercentage)
+                .Var(2, settings.SecondaryPercentage)
+                .VarIfNotZero(4, settings.ExperienceLimitPercentage)
                 .Build();
+        }
     }
 }

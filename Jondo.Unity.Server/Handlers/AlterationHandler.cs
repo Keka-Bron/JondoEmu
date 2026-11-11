@@ -27,10 +27,10 @@ namespace Jondo.Unity.Server.Handlers
     /// </remarks>
     public static class AlterationHandler
     {
+        private static readonly AlterationSnapshotService Snapshots = new(AlterationMessages.FromCatalogue, new SnapshotBackend());
+
         /// <summary>The list asked for on entering the world (lzh): every alteration (lzp).</summary>
-        public static Task ListAsync(NetworkStream stream)
-            => WriteAsync(stream, ConnectionProtocol.Push(Op.Lzp,
-                AlterationProtocol.BuildList(Alterations.Of(SessionContext.State.CharacterId), DateTime.UtcNow)));
+        public static Task ListAsync(GameSession session) => Snapshots.ListAsync(session);
 
         /// <summary>An alteration set on whoever is in session: lzs. Null when the client does not know it.</summary>
         public static async Task<Alterations.Active?> GainAsync(NetworkStream stream, int alteration, long untilMs = 0)
@@ -87,19 +87,7 @@ namespace Jondo.Unity.Server.Handlers
         /// One fight over for whoever is in session, before his kub: the list with the counts brought
         /// down, the bonus slots' items, and what was spent.
         /// </summary>
-        public static async Task AfterFightAsync(NetworkStream stream, bool won)
-        {
-            long character = SessionContext.State.CharacterId;
-            var now = DateTime.UtcNow;
-            var expired = Alterations.Expire(character, now);
-            var (listed, spent) = Alterations.CountFight(character, won);
-
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Lzp, AlterationProtocol.BuildList(listed, now)));
-            await SlotLookHandler.TellTakenOffAsync(stream);
-            await CountSlotsDownAsync(stream, character, won);
-
-            foreach (var gone in expired.Concat(spent)) await TellLostAsync(stream, gone, now);
-        }
+        public static Task AfterFightAsync(GameSession session, bool won) => Snapshots.AfterFightAsync(session, won);
 
         /// <summary>
         /// The heartbeat's look at the clock: the timed alterations whose date has come, lost, and the
@@ -210,5 +198,27 @@ namespace Jondo.Unity.Server.Handlers
 
         private static Task WriteAsync(NetworkStream stream, byte[] frame)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
+
+        private sealed class SnapshotBackend : IAlterationSnapshotBackend
+        {
+            public DateTime UtcNow => DateTime.UtcNow;
+            public IReadOnlyList<Alterations.Active> Of(long characterId) => Alterations.Of(characterId);
+            public IReadOnlyList<Alterations.Active> Expire(long characterId, DateTime nowUtc) => Alterations.Expire(characterId, nowUtc);
+            public (IReadOnlyList<Alterations.Active> Listed, IReadOnlyList<Alterations.Active> Spent) CountFight(long characterId, bool won)
+                => Alterations.CountFight(characterId, won);
+
+            public async Task RefreshSlotsAsync(GameSession session, bool won)
+            {
+                var stream = StreamOf(session);
+                await SlotLookHandler.TellTakenOffAsync(stream);
+                await CountSlotsDownAsync(stream, session.CharacterId, won);
+            }
+
+            public Task TellLostAsync(GameSession session, Alterations.Active active, DateTime nowUtc)
+                => AlterationHandler.TellLostAsync(StreamOf(session), active, nowUtc);
+
+            private static NetworkStream StreamOf(GameSession session)
+                => session.Stream ?? throw new InvalidOperationException("Alteration feature hooks require a connected game session.");
+        }
     }
 }

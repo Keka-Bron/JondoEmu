@@ -26,6 +26,29 @@ namespace Jondo.Unity.Tests.Quests
         private static bool Available => File.Exists(Paths.AlmanaxJson) && File.Exists(Paths.QuestsJson);
 
         [Fact]
+        public void Entry_calendar_uses_the_live_server_day_across_midnight_and_omits_an_unloaded_calendar()
+        {
+            if (!Available) return;
+            var previousClock = AlmanaxManager.Clock;
+            try
+            {
+                AlmanaxManager.Reset();
+                Assert.Null(Jondo.Unity.Server.Network.EntryEnvironmentMessages.Live.Calendar());
+                AlmanaxManager.Clock = () => new DateTime(2026, 9, 18, 12, 0, 0);
+                AlmanaxManager.Load();
+                Assert.Equal(new Jondo.Unity.Protocol.Game.AlmanachCalendarDateEvent(3),
+                    Jondo.Unity.Server.Network.EntryEnvironmentMessages.Live.Calendar());
+                AlmanaxManager.Clock = () => new DateTime(2026, 9, 25, 23, 59, 59);
+                Assert.NotEqual(new Jondo.Unity.Protocol.Game.AlmanachCalendarDateEvent(11),
+                    Jondo.Unity.Server.Network.EntryEnvironmentMessages.Live.Calendar());
+                AlmanaxManager.Clock = () => new DateTime(2026, 9, 26, 0, 0, 0);
+                Assert.Equal(new Jondo.Unity.Protocol.Game.AlmanachCalendarDateEvent(11),
+                    Jondo.Unity.Server.Network.EntryEnvironmentMessages.Live.Calendar());
+            }
+            finally { AlmanaxManager.Clock = previousClock; AlmanaxManager.Reset(); }
+        }
+
+        [Fact]
         public void The_calendar_holds_every_day_with_its_quest()
         {
             if (!Available) return;

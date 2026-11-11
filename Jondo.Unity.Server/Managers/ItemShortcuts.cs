@@ -36,31 +36,30 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The bar's slots: slot -> the shortcut as the client sent it.</summary>
         public static SortedDictionary<int, byte[]> Of(long characterId)
         {
-            var slots = new SortedDictionary<int, byte[]>();
-            if (characterId <= 0) return slots;
             try
             {
-                EnsureTable();
-                using var connection = Open();
-                using var command = connection.CreateCommand();
-                command.CommandText = "SELECT Slot, Shortcut FROM CharacterItemShortcuts WHERE CharacterId = $c;";
-                command.Parameters.AddWithValue("$c", characterId);
-                using var reader = command.ExecuteReader();
-                while (reader.Read()) slots[reader.GetInt32(0)] = (byte[])reader.GetValue(1);
+                return ReadForSnapshot(characterId);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Item bar] Could not read {characterId}'s bar: {ex.Message}");
             }
-            return slots;
+            return new();
         }
 
-        /// <summary>The bar as the entry's itg carries it: { repeated 1 shortcut }, no bar number.</summary>
-        public static byte[] BuildBar(long characterId)
+        /// <summary>Strict ordered read: a failed query must not advertise an empty or partial bar.</summary>
+        internal static SortedDictionary<int, byte[]> ReadForSnapshot(long characterId)
         {
-            var itg = Pb.New();
-            foreach (var shortcut in Of(characterId).Values) itg.Bytes(1, shortcut);
-            return itg.Build();
+            var slots = new SortedDictionary<int, byte[]>();
+            if (characterId <= 0) return slots;
+            EnsureTable();
+            using var connection = Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT Slot, Shortcut FROM CharacterItemShortcuts WHERE CharacterId = $c;";
+            command.Parameters.AddWithValue("$c", characterId);
+            using var reader = command.ExecuteReader();
+            while (reader.Read()) slots.Add(reader.GetInt32(0), (byte[])reader.GetValue(1));
+            return slots;
         }
 
         /// <summary>Keeps a shortcut in its slot, the one it says.</summary>

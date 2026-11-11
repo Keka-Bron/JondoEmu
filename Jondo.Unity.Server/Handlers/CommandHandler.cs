@@ -561,7 +561,7 @@ namespace Jondo.Unity.Server.Handlers
                 return T("spells.breed_missing", GameState.Breed);
             }
 
-            await SpellHandler.SendSpellsAndBarAsync(stream);
+            await SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
 
             int opened = 0, closed = 0, moved = 0;
             foreach (var spell in after)

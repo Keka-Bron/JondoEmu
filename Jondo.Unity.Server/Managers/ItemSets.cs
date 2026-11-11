@@ -180,6 +180,33 @@ namespace Jondo.Unity.Server.Managers
             return (worn, bonus);
         }
 
+        public sealed record EquippedSet(int Id, IReadOnlyList<int> Templates,
+            IReadOnlyList<(int Effect, long Value)> Effects);
+
+        /// <summary>
+        /// Detached, per-set equipment snapshots. One piece still identifies a set, with no
+        /// bonus; two or more use the exact piece-count tier, never cumulative tiers.
+        /// </summary>
+        public static IReadOnlyList<EquippedSet> Equipped(IEnumerable<int> wornTemplates)
+        {
+            Ensure();
+            var pieces = new Dictionary<Set, List<int>>();
+            foreach (int template in wornTemplates)
+            {
+                if (!_byItem.TryGetValue(template, out var sets)) continue;
+                foreach (var set in sets)
+                {
+                    if (!pieces.TryGetValue(set, out var templates)) pieces[set] = templates = new();
+                    templates.Add(template);
+                }
+            }
+
+            return pieces.OrderBy(pair => pair.Key.Id).Select(pair => new EquippedSet(pair.Key.Id,
+                pair.Value.ToArray(), pair.Value.Count >= 2 &&
+                    pair.Key.Bonuses.TryGetValue(pair.Value.Count, out var effects)
+                        ? effects.ToArray() : Array.Empty<(int, long)>())).ToArray();
+        }
+
         /// <summary>
         /// Everything the sets give for this lot of worn items. A set only counts once however
         /// many of its pieces are on, and the bonus is the one for exactly that many — not the sum

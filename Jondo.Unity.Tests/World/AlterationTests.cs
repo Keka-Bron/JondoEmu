@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -173,24 +176,46 @@ namespace Jondo.Unity.Tests.World
         /// enters with an empty list.
         /// </summary>
         [Fact]
-        public void The_world_entry_lists_the_characters_own()
+        public async Task The_world_entry_lists_the_characters_own()
         {
             ForgetAlterations();
             try
             {
-                // The recorded lzp: 764 and 763, lasting, as the manifest has them.
-                byte[] recorded = ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Lzp,
-                    Convert.FromHexString("0a0c08e4d395aff53310fc0520010a0c08e4d395aff53310fb052001"));
-                var character = new DatabaseManager.DbCharacter { Id = Eater };
-
-                Assert.Equal(Hex(ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Lzp, Array.Empty<byte>())),
-                             Hex(WorldEntry.Rebuilt(recorded, "", character)!));
+                var codec = new GameCodec();
+                var messages = new List<GamePayload>();
+                var session = new GameSession(codec, packet =>
+                {
+                    messages.Add(codec.Decode(packet).Content);
+                    return Task.CompletedTask;
+                });
+                session.State.CharacterId = Eater;
+                var now = DateTime.UtcNow;
+                async Task<AlterationsEvent> SendAsync()
+                {
+                    messages.Clear();
+                    var initial = new GameEntryInitialMessages([], [], session.State, new([], _ => []), 0, 0,
+                        () => AlterationMessages.FromCatalogue.Snapshot(Alterations.Of(session.CharacterId), now),
+                        () => new("1970-01-01T00:00:00.000Z", []), () => new([]),
+                        () => CharacterSelectionMessages.Success(new() { Id = session.CharacterId, Name = "Selected", Level = 1 }, new([], 3, 1, [], [], [])),
+                        () => InventoryMessages.FromCatalogue.Snapshot(session.State), () => new([]), () => new(81_001),
+                        () => EntryInformationMessages.PreviousConnection(session.State.PreviousVisit),
+                        new(_ => 0, _ => [], _ => 0, ItemEffectMessages.FromCatalogue),
+                        new(() => new(0), () => new(null), () => new(null), () => new("", null)));
+                    await initial.SendAsync(session);
+                    return Assert.Single(messages.OfType<AlterationsEvent>());
+                }
+                Assert.Empty((await SendAsync()).Alterations);
 
                 if (Of(625) == null) return;
-                var now = DateTime.UtcNow;
                 var jibejan = Alterations.Gain(Eater, 625, now)!;
-                Assert.Equal(Hex(ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Lzp, AlterationProtocol.BuildList(new[] { jibejan }, now))),
-                             Hex(WorldEntry.Rebuilt(recorded, "", character)!));
+                var actual = Assert.Single((await SendAsync()).Alterations);
+                Assert.Equal(jibejan.FromMs, actual.CreationTime);
+                Assert.Equal(625, actual.AlterationId);
+                Assert.Equal(AlterationExpirationType.FightCount, actual.ExpirationType);
+                Assert.Equal(1, actual.ExpirationValue);
+                Assert.Equal(new[] {
+                    new ObjectEffect(811, new ObjectEffectCaseValueDice(new(1, 1, 1))),
+                    new ObjectEffect(174, new ObjectEffectCaseValueInt(50)) }, actual.Effects);
             }
             finally
             {

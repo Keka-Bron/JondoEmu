@@ -90,15 +90,16 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>
         /// The ranks after renaming 1, touching 2's permissions and creating a fifth in the
-        /// third position: the capture's 192-byte jco, with 4 shifted to the fourth.
+        /// third position: the captured policy, with 4 shifted to the fourth. The independent
+        /// 192-byte compatibility fixture lives in the protocol suite.
         /// </summary>
         [Fact]
-        public void The_edited_ranks_are_the_capture()
+        public void The_edited_ranks_use_persisted_names_rights_and_display_order()
         {
             var guild = GuildStore.Create(7001, "Jondo", 165, 8, 16744448, 9476018);
             var ranks = GuildStore.Ranks(guild.Id);
             Assert.Equal(4, ranks.Count);
-            Assert.Equal(Hex(GuildProtocol.BuildDefaultRanks()), Hex(GuildProtocol.BuildRanks(ranks)));
+            Assert.Equal(new[] { 1, 2, 3, 4 }, GuildRankMessages.Snapshot(ranks).Ranks.Select(rank => rank.Id));
 
             // jct: «Tesorero», with f4 empty, which leaves the icon as it was.
             var first = ranks.Single(r => r.Id == 1);
@@ -115,8 +116,15 @@ namespace Jondo.Unity.Tests.World
             var created = GuildStore.CreateRank(guild.Id, "Rango personalizado", 102, 3);
             Assert.Equal(5, created.Id);
 
-            Assert.Equal("123012085465736f7265726f1a1e1a1c0102050607080d0e0f1718191a1d1e1f202122232425262728292a2b2202107428011229120a546573742072616e676f1a1308011a0f0105062607270828290d0e0f1718192204107318012802121f12116775696c642e72616e6b2e332e6e616d651a02080122041072180228031221121352616e676f20706572736f6e616c697a61646f1a0208012204106618032805121d12116775696c642e72616e6b2e342e6e616d651a002204107518042804",
-                         Hex(GuildProtocol.BuildRanks(GuildStore.Ranks(guild.Id))));
+            var snapshot = GuildRankService.Live.Snapshot(guild.Id).Ranks;
+            Assert.Equal(new[] { 1, 2, 3, 5, 4 }, snapshot.Select(rank => rank.Id));
+            Assert.Equal(new[] { "Tesorero", "Test rango", "guild.rank.3.name", "Rango personalizado", "guild.rank.4.name" },
+                snapshot.Select(rank => rank.Name));
+            Assert.Equal(new[] { 116, 115, 114, 102, 117 }, snapshot.Select(rank => rank.OrderAndGfx!.GfxId));
+            Assert.Equal(new[] { 0, 1, 2, 3, 4 }, snapshot.Select(rank => rank.OrderAndGfx!.Order));
+            Assert.Equal(new[] { 1, 5, 6, 38, 7, 39, 8, 40, 41, 13, 14, 15, 23, 24, 25 }, snapshot[1].PrivateInformation!.Rights);
+            Assert.True(snapshot[3].PrivateInformation!.Modifiable);
+            Assert.Empty(snapshot[3].PrivateInformation!.Rights);
         }
 
         /// <summary>The «Jondo» journal: the founding and Player-Alpha's two lines.</summary>
@@ -303,8 +311,12 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void Belonging_is_the_world_entrys_jhe_and_not_the_jgw_of_joining()
         {
-            const string captured = "0a200a111a0f08a5011008188080fe0728b2afc20410bbc8021a054a6f6e646f200110011814" + "20ff0d";
-            Assert.Equal(captured[..^6], Hex(GuildProtocol.BuildMembership(Jondo, rank: 1, contribution: 20)));
+            var membership = GuildStateMessages.Membership(Jondo, rankId: 1, contributed: 20);
+            Assert.Equal(42043, membership.GuildInformation!.Id);
+            Assert.Equal("Jondo", membership.GuildInformation.Name);
+            Assert.Equal(1, membership.RankId);
+            Assert.Equal(20, membership.GuildTokens);
+            Assert.Equal(0, membership.UnknownUsedContextValue);
         }
 
         /// <summary>The next weekly reset (jez), against the five captures that ask for it.</summary>
@@ -317,7 +329,7 @@ namespace Jondo.Unity.Tests.World
         public void The_week_starts_again_on_tuesday_at_five(string asked, string reset)
         {
             var now = DateTime.Parse(asked, null, System.Globalization.DateTimeStyles.AdjustToUniversal);
-            Assert.Equal("0a14" + Hex(System.Text.Encoding.ASCII.GetBytes(reset)), Hex(GuildProtocol.BuildWeeklyReset(now)));
+            Assert.Equal(reset, GuildProtocol.BuildWeeklyReset(now).ResetDate);
         }
 
         /// <summary>The tabs of a guild with nothing in them, as the captures answer them.</summary>

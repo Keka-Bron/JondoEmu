@@ -150,8 +150,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.BuildLoadMap(mapId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(mapId));
+            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, mapId);
 
             Console.WriteLine($"[Teleport] To map {mapId}, cell {SessionContext.State.CellId}. " +
                               "Waiting for the jrh.");

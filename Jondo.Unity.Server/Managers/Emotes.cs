@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
@@ -25,6 +24,7 @@ namespace Jondo.Unity.Server.Managers
     {
         private static volatile EmoteCatalogue? _book;
         private static readonly object _loadLock = new object();
+        private static readonly EmoteOwnershipService Ownership = new(new OwnershipBackend());
 
         /// <summary>Reads the emote table. Once, at startup.</summary>
         public static void Load()
@@ -47,9 +47,8 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static void LoadFrom(long characterId)
         {
-            var owned = new HashSet<int>(EmoteRules.Starting);
-            owned.UnionWith(DatabaseManager.LoadEmotes(characterId));
-            if (_book != null && AdminSpells.Para(SessionContext.Current.AccountId)) owned.UnionWith(_book.Ids);
+            var owned = EmoteOwnershipService.Owned(DatabaseManager.LoadEmotes(characterId),
+                _book != null && AdminSpells.Para(SessionContext.Current.AccountId) ? _book.Ids : Array.Empty<int>());
 
             var state = SessionContext.State;
             state.Emotes = owned;
@@ -61,13 +60,7 @@ namespace Jondo.Unity.Server.Managers
         /// The character's emotes (khn), in place of the list the replayed block used to carry —
         /// the recorded account's 47.
         /// </summary>
-        public static Task SendListAsync(NetworkStream stream)
-        {
-            var list = new List<int>(SessionContext.State.Emotes);
-            list.Sort();
-            return Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Khn, EmoteProtocol.BuildList(list)));
-        }
+        public static Task SendListAsync(GameSession session) => EmoteOwnershipService.SendSnapshotAsync(session);
 
         /// <summary>Whether that emote is an aura, worn rather than played.</summary>
         public static bool IsAura(int emoteId) => _book?.Of(emoteId)?.Aura == true;
@@ -146,18 +139,12 @@ namespace Jondo.Unity.Server.Managers
         /// A new emote for this character: kept, and announced with khi. Returns false when it was
         /// already known or does not exist.
         /// </summary>
-        public static async Task<bool> LearnAsync(NetworkStream stream, int emoteId)
+        public static Task<bool> LearnAsync(GameSession session, int emoteId) => Ownership.LearnAsync(session, emoteId);
+
+        private sealed class OwnershipBackend : IEmoteOwnershipBackend
         {
-            var state = SessionContext.State;
-            if (_book?.Of(emoteId) == null) return false;
-            if (!state.Emotes.Add(emoteId)) return false;
-
-            DatabaseManager.SaveEmote(state.CharacterId, emoteId);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Khi, EmoteProtocol.BuildLearned(emoteId)));
-
-            Console.WriteLine($"[Attitudes] {state.CharacterName} learns attitude {emoteId}.");
-            return true;
+            public bool Exists(int emoteId) => _book?.Of(emoteId) != null;
+            public void Save(long characterId, int emoteId) => DatabaseManager.SaveEmote(characterId, emoteId);
         }
     }
 }

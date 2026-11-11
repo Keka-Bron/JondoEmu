@@ -6,6 +6,8 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -96,17 +98,28 @@ namespace Jondo.Unity.Tests.Sessions
 
             private Task<byte[]> Read() => _pending ??= Jondo.Protocol.NetworkMessage.ReadFrameAsync(FromServer);
 
-            public async Task<byte[]> NextAsync(string opcode)
+            private async Task<byte[]> NextFrameAsync()
             {
                 var read = Read();
                 var first = await Task.WhenAny(read, Task.Delay(TimeSpan.FromSeconds(10)));
-                Assert.True(first == read, $"nothing arrived where {opcode} was expected");
+                Assert.True(first == read, "nothing arrived");
                 _pending = null;
+                return await read;
+            }
 
-                byte[] frame = await read;
+            public async Task<byte[]> NextAsync(string opcode)
+            {
+                byte[] frame = await NextFrameAsync();
                 byte[]? payload = ConnectionProtocol.ReadPayload(frame, opcode);
                 Assert.True(payload != null, $"{opcode} was expected and {NetworkEnvelope.GetMessageTypeUrl(frame)} came");
                 return payload!;
+            }
+
+            public async Task<GameEvent> NextEventAsync()
+            {
+                var frame = new GameCodec().Decode(await NextFrameAsync());
+                Assert.Null(frame.Uid);
+                return Assert.IsAssignableFrom<GameEvent>(frame.Content);
             }
 
             /// <summary>Nothing more arrives for a moment: a refusal is silence.</summary>
@@ -349,8 +362,8 @@ namespace Jondo.Unity.Tests.Sessions
                     await at.NothingAsync();
 
                     // Learned — as an achievement reward would teach it — and announced with khi.
-                    Assert.True(await Emotes.LearnAsync(at.ToClient, 29));
-                    Assert.Equal(Hex("081d"), await at.NextAsync(Op.Khi));
+                    Assert.True(await Emotes.LearnAsync(at.Player, 29));
+                    Assert.Equal(new EmoteAddedEvent(29), await at.NextEventAsync());
 
                     // Emotes\usar emote malabares, frames 4-5, byte for byte.
                     await EmoteHandler.PlayAsync(at.ToClient, ConnectionProtocol.Push(Op.Khl, Hex("081d")));
@@ -396,7 +409,7 @@ namespace Jondo.Unity.Tests.Sessions
                 {
                     Emotes.LoadFrom(character);
                     // Owned already when the account is the server's administrator, who has them all.
-                    if (await Emotes.LearnAsync(pipe.ToClient, Septango)) await pipe.Next(Op.Khi);
+                    if (await Emotes.LearnAsync(pipe.Session, Septango)) await pipe.Next(Op.Khi);
                     Assert.Contains(Septango, pipe.Session.State.Emotes);
 
                     // The client's own, f2 set: it draws that one itself, and nothing is shown for it.

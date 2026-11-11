@@ -267,14 +267,13 @@ namespace Jondo.Unity.Server.Handlers
             if (emblem != null) guild = GuildStore.SetEmblem(guild.Id, emblem[0], emblem[1], emblem[2], emblem[3]);
 
             var members = GuildStore.Members(guild.Id);
-            byte[] header = ConnectionProtocol.Push(Op.Jhh, GuildProtocol.BuildGuildInfo(guild, members.Count));
+            var header = GuildStateService.Live.Header(guild, members.Count);
             byte[] said = ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(name != null ? NameChanged : EmblemChanged));
             foreach (var member in members)
             {
                 var session = SessionRegistry.FindByCharacter(member.CharacterId);
                 if (session?.Stream == null) continue;
-                await session.SendAsync(ConnectionProtocol.Push(Op.Jhe,
-                    GuildProtocol.BuildMembership(guild, member.Rank, GuildStore.ContributedBy(member.CharacterId))));
+                await session.SendAsync(GuildStateService.Live.Membership(guild, member.Rank, member.CharacterId));
                 await session.SendAsync(header);
                 await session.SendAsync(said);
                 await RedrawAsync(member.CharacterId == who ? stream : null, member.CharacterId);
@@ -321,13 +320,13 @@ namespace Jondo.Unity.Server.Handlers
             // jjs, jhq, jco, jgw, khi, jgu, jhh: the capture's order.
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jjs, System.Array.Empty<byte>()));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhq, System.Array.Empty<byte>()));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
+            await GuildRankService.Live.SendAsync(SessionContext.Current, guild.Id);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jgw,
                 GuildProtocol.BuildGuildJoined(guild, GuildStore.RankOf(founderCharacterId))));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Khi, GuildProtocol.BuildGoneNotice()));
             var members = GuildStore.Members(guild.Id);
             await WriteAsync(stream, MembersFrame(members));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhh, GuildProtocol.BuildGuildInfo(guild, members.Count)));
+            await SessionContext.Current.SendAsync(GuildStateService.Live.Header(guild, members.Count));
             await RedrawAsync(stream, founderCharacterId);
 
             Console.WriteLine($"[Guild] {SessionContext.State.CharacterName} founds «{name}» " +
@@ -366,24 +365,38 @@ namespace Jondo.Unity.Server.Handlers
         /// ("jco jgw"): the client's jgw handler looks the rank up among them and does not ask
         /// whether it is there.
         /// </remarks>
-        public static async Task SendGuildToOwnerAsync(NetworkStream stream, GuildStore.Guild guild, long characterId)
+        public static async Task SendGuildToOwnerAsync(GameSession session, GuildStore.Guild guild)
         {
-            int rank = GuildStore.RankOf(characterId);
+            int rank = GuildStore.RankOf(session.CharacterId);
             var members = GuildStore.Members(guild.Id);
 
             // The guild's own ranks: a member of a rank of its own is looked up among them.
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildRanks(GuildStore.Ranks(guild.Id))));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jgw,
+            await GuildRankService.Live.SendAsync(session, guild.Id);
+            await session.SendAsync(ConnectionProtocol.Push(Op.Jgw,
                 GuildProtocol.BuildGuildJoined(guild, rank)));
-            await WriteAsync(stream, MembersFrame(members));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhh,
-                GuildProtocol.BuildGuildInfo(guild, members.Count)));
+            await session.SendAsync(MembersFrame(members));
+            await session.SendAsync(GuildStateService.Live.Header(guild, members.Count));
 
             // And its notices, written or not written.
             if (GuildStore.NoticeOf(guild.Id, GuildStore.NoticeKind.MessageOfTheDay) is { } motd)
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhk, GuildProtocol.BuildMessageOfTheDay(motd)));
+                await session.SendAsync(ConnectionProtocol.Push(Op.Jhk, GuildProtocol.BuildMessageOfTheDay(motd)));
             if (GuildStore.NoticeOf(guild.Id, GuildStore.NoticeKind.Bulletin) is { } bulletin)
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Jjf, GuildProtocol.BuildBulletin(bulletin)));
+                await session.SendAsync(ConnectionProtocol.Push(Op.Jjf, GuildProtocol.BuildBulletin(bulletin)));
+        }
+
+        /// <summary>Entry repeats ranks before silent membership, never the joined popup.</summary>
+        internal static async Task SendMembershipAtEntryAsync(GameSession session)
+        {
+            long characterId = session.CharacterId;
+            var guild = GuildStore.GuildOf(characterId);
+            if (guild == null) return;
+            int rank = GuildStore.RankOf(characterId);
+            var members = GuildStore.Members(guild.Id);
+            await GuildRankService.Live.SendAsync(session, guild.Id);
+            await session.SendAsync(GuildStateService.Live.Membership(guild, rank, characterId));
+            await session.SendAsync(GuildStateService.Live.Header(guild, members.Count));
+            await session.SendAsync(MembersFrame(members));
+            Console.WriteLine($"[World] Guild sent for {session.State.CharacterName}: {guild.Name} ({members.Count} members).");
         }
 
         /// <summary>The right to write the message of the day: the guild window binds its edit to right 7 (GuildUI.InitUiBindings). Inferred.</summary>
@@ -504,10 +517,6 @@ namespace Jondo.Unity.Server.Handlers
                 StorageProtocol.BuildGuildChestTabs(GuildChests.TabsOfGuild(guild.Id))));
         }
 
-        /// <summary>The window's header (jhh), with the guild as it stands.</summary>
-        public static byte[] HeaderFrame(GuildStore.Guild guild)
-            => ConnectionProtocol.Push(Op.Jhh, GuildProtocol.BuildGuildInfo(guild, GuildStore.Members(guild.Id).Count));
-
         /// <summary>
         /// The members (jml {f1: true}): one jgu per member. The jml of the perks tab and of
         /// closing the window come empty, and the capture answers them nothing.
@@ -585,9 +594,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>When the week starts again (jew → jez), on root 3 with the request's id.</summary>
-        public static async Task WeeklyResetAsync(NetworkStream stream, byte[] frame)
-            => await WriteAsync(stream, ConnectionProtocol.Answer(Op.Jez, GuildProtocol.BuildWeeklyReset(DateTime.UtcNow),
-                                                                  ConnectionProtocol.RequestId(frame)));
+        public static Task WeeklyResetAsync(GameSession session, int uid)
+            => session.SendAsync(GuildProtocol.BuildWeeklyReset(DateTime.UtcNow), uid);
 
         /// <summary>The f2 of the jiy that asks for the directory sheet.</summary>
         public const int ProfileTab = 4;
@@ -619,7 +627,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             else if (tab == 0)
             {
-                await WriteAsync(stream, HeaderFrame(guild));
+                await GuildStateService.Live.SendHeaderAsync(SessionContext.Current, guild);
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Jla,
                     GuildProtocol.BuildContributionsLeft(GuildStore.ContributionsLeft(who))));
             }
@@ -890,7 +898,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         private static async Task SendRanksAsync(NetworkStream stream, GuildStore.Guild guild)
-            => await WriteAsync(stream, ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildRanks(GuildStore.Ranks(guild.Id))));
+            => await GuildRankService.Live.SendAsync(SessionContext.Current, guild.Id);
 
         /// <summary>Only the leader touches the ranks. Returns his guild, or null if he may not.</summary>
         private static GuildStore.Guild GuildIfLeader(long who)
@@ -1230,15 +1238,7 @@ namespace Jondo.Unity.Server.Handlers
             if (character == null) return;
 
             byte[] updated = ConnectionProtocol.Push(Op.Jgz, MemberUpdated(member, character));
-            byte[] warning = ConnectionProtocol.Push(Op.Jhd, GuildProtocol.BuildMemberConnection(characterId, true));
-            foreach (var other in GuildStore.Members(guild.Id))
-            {
-                if (other.CharacterId == characterId) continue;
-                var session = SessionRegistry.FindByCharacter(other.CharacterId);
-                if (session == null) continue;
-                await session.SendAsync(updated);
-                if (online && session.State.WarnGuildConnections) await session.SendAsync(warning);
-            }
+            await GuildPresenceService.Live.BroadcastAsync(guild.Id, characterId, online, updated);
         }
 
         internal static async Task TellEveryoneAsync(GuildStore.Guild guild, byte[] frame)
@@ -1469,7 +1469,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var members = GuildStore.Members(guild.Id);
             byte[] list = MembersFrame(members);
-            byte[] header = ConnectionProtocol.Push(Op.Jhh, GuildProtocol.BuildGuildInfo(guild, members.Count));
+            var header = GuildStateService.Live.Header(guild, members.Count);
 
             foreach (var member in members)
             {
@@ -1624,7 +1624,7 @@ namespace Jondo.Unity.Server.Handlers
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jla, GuildProtocol.BuildContributionsLeft(left)));
 
             // A milestone reached moves the guild's experience, and maybe its level: everybody's header.
-            if (credited.Experience > 0) await TellEveryoneAsync(guild, HeaderFrame(GuildStore.GuildOf(who)));
+            if (credited.Experience > 0) await GuildStateService.Live.TellHeaderAsync(GuildStore.GuildOf(who));
         }
 
         // ─── Applications ───────────────────────────────────────────────────────
@@ -1868,7 +1868,7 @@ namespace Jondo.Unity.Server.Handlers
             if (guild == null) return;
 
             // The capture's order: the guild, the jsn that draws him with it, then the jij.
-            await SendGuildToOwnerAsync(stream, guild, who);
+            await SendGuildToOwnerAsync(SessionContext.Current, guild);
             await RedrawAsync(stream, who);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jij, GuildProtocol.BuildJoinDone()));
             await RefreshEveryoneAsync(guild, who);
@@ -1915,7 +1915,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             GuildStore.Join(who, guild.Id);
-            await SendGuildToOwnerAsync(stream, guild, who);
+            await SendGuildToOwnerAsync(SessionContext.Current, guild);
             await RedrawAsync(stream, who);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jij, GuildProtocol.BuildJoinDone()));
             await RefreshEveryoneAsync(guild, who);
@@ -1930,11 +1930,10 @@ namespace Jondo.Unity.Server.Handlers
             int rank = GuildStore.RankOf(characterId);
             var members = GuildStore.Members(guild.Id);
 
-            await session.SendAsync(ConnectionProtocol.Push(Op.Jco, GuildProtocol.BuildDefaultRanks()));
+            await GuildRankService.Live.SendAsync(session, guild.Id);
             await session.SendAsync(ConnectionProtocol.Push(Op.Jgw, GuildProtocol.BuildGuildJoined(guild, rank)));
             await session.SendAsync(MembersFrame(members));
-            await session.SendAsync(ConnectionProtocol.Push(Op.Jhh,
-                GuildProtocol.BuildGuildInfo(guild, members.Count)));
+            await session.SendAsync(GuildStateService.Live.Header(guild, members.Count));
             await RedrawAsync(null, characterId);
             await session.SendAsync(ConnectionProtocol.Push(Op.Jij, GuildProtocol.BuildJoinDone()));
         }

@@ -3,6 +3,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -76,16 +78,19 @@ namespace Jondo.Unity.Tests.Economy
                 // A bonus may also produce a job level-up before the final resource state.
                 while ((await pipe.NextAny()).Opcode != Op.Iwm) { }
 
-                await WorkshopHandler.InventoryAsync(pipe.ToClient);
-                var inventory = ProtoMessage.Parse(await pipe.Next(Op.Ivx)).Fields
-                    .Where(f => f.FieldNumber == 3)
-                    .Select(f => ProtoMessage.Parse(f.BytesValue!)).ToList();
-                var body = Assert.Single(inventory.Select(entry => ProtoMessage.Parse(
-                    entry.Fields.Single(f => f.FieldNumber == 5).BytesValue!)),
-                    item => item.Fields.Single(f => f.FieldNumber == 1).VarIntValue == ResourceItem);
-                Assert.Equal(saved.Quantity, body.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
-                Assert.Equal(saved.Uid, body.Fields.Single(f => f.FieldNumber == 4).VarIntValue);
-                Assert.Equal(2, inventory.Count);
+                await WorkshopHandler.InventoryAsync(pipe.Session);
+                var frame = new GameCodec().Decode(await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer)
+                    .WaitAsync(TimeSpan.FromSeconds(10)));
+                var inventory = Assert.IsType<InventoryContentEvent>(frame.Content);
+                var resourceItem = Assert.Single(inventory.Objects, item => item.Item.Gid == ResourceItem);
+                Assert.Equal(saved.Quantity, resourceItem.Item.Quantity);
+                Assert.Equal(saved.Uid, resourceItem.Item.Uid);
+                Assert.Equal(Equipment.Bag, resourceItem.Position);
+                Assert.Equal(2, inventory.Objects.Count);
+                var equipped = Assert.Single(inventory.Objects, item => item.Position == 0);
+                Assert.Equal(worn.Uid, equipped.Item.Uid);
+                Assert.Equal(new ObjectEffect(118, new ObjectEffectCaseValueInt(5)), Assert.Single(equipped.Item.Effects));
+                Assert.Null(frame.Uid);
                 Assert.Equal(0, Equipment.ByUid(worn.Uid)!.Position);
                 Assert.Equal(5, Assert.Single(Equipment.ByUid(worn.Uid)!.Effects).Value);
                 await pipe.Next(Op.Hlm);

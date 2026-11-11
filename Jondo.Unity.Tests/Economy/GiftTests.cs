@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -47,20 +49,30 @@ namespace Jondo.Unity.Tests.Economy
                 int first = Gifts.Grant(Account, Rune, 3, "Un regalo", "Para probar");
                 int second = Gifts.Grant(Account, Rune, 2, "Otro regalo", "");
 
-                var list = ProtoMessage.Parse(GiftHandler.BuildList(Account)).Fields.Where(f => f.FieldNumber == 3).ToList();
-                Assert.Equal(2, list.Count);
-                var entry = ProtoMessage.Parse(list[0].BytesValue);
-                var item = ProtoMessage.Parse(ProtoMessage.Parse(entry.Fields.Single(f => f.FieldNumber == 1).BytesValue)
-                    .Fields.Single(f => f.FieldNumber == 3).BytesValue);
-                Assert.Equal(Rune, item.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
-                Assert.Equal(3, item.Fields.Single(f => f.FieldNumber == 2).VarIntValue);
+                var list = GiftService.Live.Snapshot(Account);
+                Assert.Equal(new long[] { first, second }, list.Actions.Select(action => Assert.Single(action.ItemUids)));
+                var item = Assert.Single(list.Actions[0].Content!.Items);
+                Assert.Equal(Rune, item.ObjectGid);
+                Assert.Equal(3, item.Quantity);
+                Assert.Equal("Para probar", Gifts.Of(Account)[0].Description);
 
                 await using var pipe = await ClientPipe.OpenAsync(Account, playing, 191105026, "Regalado-Uno");
                 using (SessionContext.Push(pipe.Session))
                 {
+                    // Entry now uses this account's live list after its numeric HAAPI identity.
+                    await GameEntryContinuationMessages.Live.SendAsync(pipe.Session);
+                    var codec = new GameCodec();
+                    var identity = Assert.IsType<HaapiSessionEvent>(codec.Decode(ConnectionProtocol.Push("jby", await pipe.Next("jby"))).Content);
+                    Assert.Equal(pipe.Session.HaapiSessionUid.ToString(System.Globalization.CultureInfo.InvariantCulture), identity.SessionUid);
+                    var atEntry = Assert.IsType<GameActionItemListEvent>(codec.Decode(ConnectionProtocol.Push(Op.Jtg, await pipe.Next(Op.Jtg))).Content);
+                    Assert.Equal(new long[] { first, second }, atEntry.Actions.Select(action => Assert.Single(action.ItemUids)));
+
                     // A gift granted while playing shows at once: the list again.
                     await GiftHandler.TellAsync(Account);
-                    Assert.Equal(GiftHandler.BuildList(Account), await pipe.Next(Op.Jtg));
+                    var refreshed = Assert.IsType<GameActionItemListEvent>(new GameCodec().Decode(
+                        ConnectionProtocol.Push(Op.Jtg, await pipe.Next(Op.Jtg))).Content);
+                    Assert.Equal(new long[] { first, second }, refreshed.Actions.Select(action => Assert.Single(action.ItemUids)));
+                    Assert.Equal(new[] { "Un regalo", "Otro regalo" }, refreshed.Actions.Select(action => action.Content!.Title));
 
                     // To the one playing: jwj, the item and the weight, as the shop capture has it.
                     await GiftHandler.ClaimAsync(pipe.ToClient, ConnectionProtocol.Push("jwm",
@@ -82,6 +94,9 @@ namespace Jondo.Unity.Tests.Economy
                     Assert.Equal(second, ProtoMessage.Parse(await pipe.Next("jwj")).Fields.Single(f => f.FieldNumber == 2).VarIntValue);
                     Assert.Equal(2, ItemsOf(resting));
                     Assert.Empty(Gifts.Of(Account));
+                    await GiftHandler.TellAsync(Account);
+                    Assert.Empty(Assert.IsType<GameActionItemListEvent>(codec.Decode(
+                        ConnectionProtocol.Push(Op.Jtg, await pipe.Next(Op.Jtg))).Content).Actions);
                 }
             }
             finally

@@ -68,9 +68,11 @@ namespace Jondo.Unity.Tests.Social
                     pipe.Session.State.Emotes = new HashSet<int> { Sit, Power };
                     byte[] Lxw(int aura) => ConnectionProtocol.Push(Op.Lxw, Pb.New().VarIfNotZero(2, aura).Build());
 
-                    // Taken: told with lym, answered lwx f1, and on the look the others see.
+                    // Taken: empty lym notification, answered lwx f1, and on the look others see.
+                    // The unused lym scalar is omitted under
+                    // docs/populated-unmapped-fields.md#after-selection-omission-policy.
                     await AppearanceHandler.AuraAsync(pipe.ToClient, Lxw(Power));
-                    Assert.Equal(Power, (int)Field(await pipe.Next(Op.Lym), 1)!.VarIntValue);
+                    Assert.Empty(await pipe.Next(Op.Lym));
                     Assert.Equal(1, (int)Field(await pipe.Next(Op.Lwx), 1)!.VarIntValue);
                     await Until(pipe, Op.Jsn);
                     Assert.Equal(Power, Wardrobe.AuraOf(character));

@@ -44,6 +44,11 @@ the pinned 3.6.10.11 schema, generated wire types and mapping-driven conversions
 Includes worked mappings, standalone regeneration commands, semantic validation
 policies and TCP handshake tests.
 
+**[`populated-unmapped-fields.md`](populated-unmapped-fields.md)** — Non-default wire data outside semantic mappings.
+Cases backed by captures, documented measurements or explicit JondoEmu construction
+paths, with the client-use finding and handling implications for each. Read alongside
+[`game-protocol.md`](game-protocol.md) when a stable projection would omit populated data.
+
 **`appearances.md`** — What the character looks like.
 Dofus does not ship the item-to-look table in its client data: the server sends it. So the looks
 were measured one garment at a time in the appearance window — **2,371** of the **2,420** in the

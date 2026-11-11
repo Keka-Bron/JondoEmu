@@ -240,9 +240,12 @@ namespace Jondo.Unity.Tests.World
                     Assert.Equal(new[] { 3 }, ItemShortcuts.Of(character).Keys);
 
                     // On entering the world: the bar, with the build in it.
-                    var bar = Fields(ItemShortcuts.BuildBar(character));
-                    Assert.Single(bar);
-                    Assert.Equal("00000000-0000-4000-8000-000000000009", Text(Sub(bar[0].BytesValue, 4), 2));
+                    var bar = ShortcutBarMessages.Live.GeneralBar(pipe.Session);
+                    var saved = Assert.Single(bar.Shortcuts);
+                    Assert.Equal(Jondo.Unity.Protocol.Game.ShortcutBar.General, bar.BarType);
+                    Assert.Equal(3, saved.SlotId);
+                    Assert.Equal("00000000-0000-4000-8000-000000000009",
+                        Assert.IsType<Jondo.Unity.Protocol.Game.ShortcutCaseShortcutPreset>(saved.ShortcutCase).Value.PresetUuid);
 
                     // iul { 2 3 }: ivr { 2 3 }, the bar's 0 left out.
                     await ItemBarHandler.RemoveAsync(pipe.ToClient, 3);

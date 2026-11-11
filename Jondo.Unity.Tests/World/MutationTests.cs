@@ -2,9 +2,11 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Jondo.Unity.Launcher;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Content;
 using Jondo.Unity.World.Fights;
 using Xunit;
@@ -60,6 +62,29 @@ namespace Jondo.Unity.Tests.World
             if (!File.Exists(Paths.EffectFieldsJson)) return;
             using var fields = JsonDocument.Parse(File.ReadAllText(Paths.EffectFieldsJson));
             Assert.Equal(EffectFields.AsDice, fields.RootElement.GetProperty("197").GetInt32());
+        }
+
+        [Fact]
+        public void Semantic_spell_book_reads_mutation_equipment_from_its_explicit_owner()
+        {
+            var item = new Equipment.Item { Position = Mutations.Slot };
+            item.Effects.Add(new Equipment.ItemEffect(Mutations.TransformsInto, 0, 3577, 1));
+            if (Mutations.Of(item.Effects) == null) return;
+            var own = GameSession.SinSocket();
+            own.State.Breed = 8;
+            own.State.CharacterLevel = 200;
+            own.State.EquipmentItems[71_001] = item;
+            var wrong = GameSession.SinSocket();
+            using var context = SessionContext.Push(wrong);
+
+            var snapshot = SpellMessages.Live.Snapshot(own);
+
+            Assert.Equal(new[] { 4312, 4313, 4314, 4315, 4316 }, snapshot.MutantSpells.Select(spell => spell.SpellId).OrderBy(id => id));
+            Assert.All(snapshot.MutantSpells, spell => Assert.Equal(SpellType.Unknown6, spell.SpellType));
+            Assert.Equal(new SpellItem(1, 0, SpellType.Unknown2), snapshot.HumanSpells[0]);
+            Assert.Same(wrong, SessionContext.Actual);
+            own.State.EquipmentItems.Clear();
+            Assert.Empty(SpellMessages.Live.Snapshot(own).MutantSpells);
         }
 
         [Fact]

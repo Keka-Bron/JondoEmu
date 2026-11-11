@@ -33,18 +33,8 @@ namespace Jondo.Unity.Server.Handlers
         /// the next login. With no spell table loaded nothing is sent: an empty hms does not say
         /// "nothing changed", it says "you have no spells".
         /// </remarks>
-        internal static async Task SendSpellsAndBarAsync(NetworkStream stream)
-        {
-            if (!SpellTable.IsLoaded) return;
-
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Hms,
-                    ConnectionProtocol.BuildSpellList(GameState.Breed, GameState.CharacterLevel,
-                        SessionContext.Current.AccountId)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Itg,
-                    ConnectionProtocol.BuildSpellBar(GameState.Breed, GameState.CharacterLevel)));
-        }
+        internal static Task SendSpellsAndBarAsync(GameSession session)
+            => SpellMessages.Live.RefreshAsync(session, () => ShortcutBarMessages.Live.SendSpellAsync(session));
 
         public static async Task HandleVariantAsync(NetworkStream stream, byte[] payload)
         {

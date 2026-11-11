@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -16,8 +17,6 @@ namespace Jondo.Unity.Tests.World
     /// </summary>
     public class SpellScrollTests
     {
-        private static string Hex(byte[] bytes) => string.Concat(bytes.Select(b => b.ToString("x2")));
-
         private const int Llamita = 24006;
         private const int Llamilla = 350;
         private const int CapturaDeAlmas = 413;
@@ -118,7 +117,7 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>
         /// Learnt and kept: read again from the base it is still there, the spell list carries it with
-        /// the origin 2 of the captured hms -- «08 03 18 f0 02 20 02», Liberación at its third grade --,
+        /// the special-spell type, Liberación at its third grade,
         /// and Llamita's scroll is refused by its criterion once its pair is known.
         /// </summary>
         [Fact]
@@ -145,9 +144,10 @@ namespace Jondo.Unity.Tests.World
                     LearnedSpells.Forget(Reader);
                     Assert.Equal(new[] { 368, Llamita }, LearnedSpells.Of(Reader).OrderBy(s => s));
 
-                    string hms = Hex(ConnectionProtocol.BuildSpellList(8, 200));
-                    Assert.Contains("0a07080318f0022002", hms);
-                    Assert.DoesNotContain("0a07080318f0022001", hms);
+                    var spells = SpellMessages.Live.Snapshot(session);
+                    Assert.Equal(new SpellItem(3, 368, SpellType.Unknown2),
+                        Assert.Single(spells.HumanSpells, spell => spell.SpellId == 368));
+                    Assert.Contains(spells.HumanSpells, spell => spell.SpellId == Llamita && spell.SpellType == SpellType.Unknown2);
                 }
             }
             finally

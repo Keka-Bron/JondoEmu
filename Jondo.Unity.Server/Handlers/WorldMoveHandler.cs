@@ -296,8 +296,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(target));
+            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, target);
 
             Console.WriteLine($"[Move] Map change {way}: {target}, arriving on cell {arrival} " +
                               $"facing {Jondo.Unity.Server.Network.SessionContext.State.Orientation}. Waiting for jrh.");
@@ -368,8 +367,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.BuildLoadMap(targetMapId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(targetMapId));
+            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, targetMapId);
 
             Console.WriteLine($"[Move] Teleport: map {oldMapId} -> {targetMapId}, " +
                               $"arrival cell {arrival}. Waiting for jrh.");

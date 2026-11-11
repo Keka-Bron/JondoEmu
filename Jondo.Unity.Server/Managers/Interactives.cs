@@ -524,7 +524,7 @@ namespace Jondo.Unity.Server.Managers
         ///
         /// Here the character has them all, so they are all the activated ones for which it is also
         /// known where their element is. Without this list the travel window comes out empty however
-        /// many destinations the hjj brings; see ConnectionProtocol.BuildDiscoveredZaaps.
+        /// many destinations the travel window brings; see EntryEnvironmentMessages.
         /// </summary>
         public static IEnumerable<long> DiscoveredZaapMaps()
         {

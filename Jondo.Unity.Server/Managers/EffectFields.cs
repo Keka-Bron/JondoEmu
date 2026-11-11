@@ -135,7 +135,7 @@ namespace Jondo.Unity.Server.Managers
                     case AsDice: return (AsDice, value, diceNum, diceSide);
                     case AsNumber: return (AsNumber, OnlyNonZero(value, diceNum, diceSide), 0, 0);
                     // A date the item carries in seconds -- «Recibido el» (805), stamped when it is
-                    // received -- travels as one (EffectDate). A string, or a date the item has no
+                    // received -- travels as one (ItemEffectMessages.Date). A string, or a date the item has no
                     // moment for, does not: the client would draw the label with nothing behind.
                     case AsDate when value >= DatedSince: return (AsDate, value, 0, 0);
                     case AsString:

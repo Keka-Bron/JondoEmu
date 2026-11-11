@@ -237,10 +237,12 @@ Not implemented yet.
 
 ### How
 
-The real messages from the capture are replayed, extracted with `extraer_world.py` into three
-files (`world_etapa*.bin`, since replaced by `content/world/entry.json` and no longer in the
-repository). They do not go back to back: the real server sends a block, waits for
-the client's confirmation and carries on.
+Historically, messages extracted with `extraer_world.py` were replayed from three
+`world_etapa*.bin` files, later replaced by a JSON reconstruction. Both formats and
+the reference loader have since been deleted. The sequence below describes that
+historical implementation; current entry constructs messages directly from live
+state (see [the Game protocol](game-protocol.md#initial-character-state)). The real
+server sends a block, waits for the client's confirmation and carries on.
 
 ```
 client kvw  ->   block 1: character, characteristics, quests...  (330 messages)
@@ -952,7 +954,7 @@ Empty `logs/` before packaging anything.
 
 **Pending**, in order:
 
-1. Remove the replay (done: the files are gone and the manifest is read instead). Everything that came out of them was another account's data:
+1. Remove the replay (done: the binary blocks, later JSON reconstruction and loader are gone; entry is constructed directly). Everything that came out of them was another account's data:
    it serves as a reference for what the client expects, not as an answer. What is already built
    from the database is `kva`, `kub`, `jru`, `jss`, `irq`, `hms` and `itg`.
 2. **Inventory from the database**, and with it **everything the equipment adds to the sheet**: the

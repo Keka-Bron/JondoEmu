@@ -101,23 +101,22 @@ namespace Jondo.Unity.Tests.World
             Assert.False(AllianceHandler.MayManageRank(9303, ranks.Single(r => r.Id == 4)));
         }
 
-        /// <summary>A rank written with BuildRanks reads back the same: what the window sends has that shape.</summary>
+        /// <summary>A stored rank supplies the semantic management snapshot.</summary>
         [Fact]
-        public void A_rank_reads_back_as_written()
+        public void A_rank_snapshot_uses_the_stored_management_values()
         {
             var rank = new AllianceStore.Rank
             {
                 Id = 6, Name = "Tesorero", Flag = true, Icon = 118, Order = 2, Rights = new() { 3, 18, 9 },
             };
-            var mbm = ProtoMessage.Parse(AllianceProtocol.BuildRanks(new[] { rank }));
-            var sent = AllianceProtocol.ReadRank(mbm.Fields.Single(f => f.FieldNumber == 1).BytesValue);
+            var sent = Assert.Single(AllianceRankMessages.Snapshot(new[] { rank }).Ranks);
 
             Assert.Equal(6, sent.Id);
             Assert.Equal("Tesorero", sent.Name);
-            Assert.True(sent.Modifiable);
-            Assert.Equal(118, sent.Icon);
-            Assert.Equal(2, sent.Order);
-            Assert.Equal(new[] { 3, 18, 9 }, sent.Rights);
+            Assert.True(sent.PrivateInformation!.Modifiable);
+            Assert.Equal(118, sent.OrderAndGfx!.GfxId);
+            Assert.Equal(2, sent.OrderAndGfx.Order);
+            Assert.Equal(new[] { 3, 18, 9 }, sent.PrivateInformation.Rights);
         }
 
         /// <summary>A rank's name cannot be empty, too long or a translation key in disguise.</summary>
@@ -148,8 +147,9 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(new AllianceStore.Notice("Hola", 1800000000, "Member-Three", 9401), bulletin);
             Assert.Equal(alliance.CreatedUtcS, AllianceStore.NoticeOf(alliance, AllianceStore.NoticeMessage).WhenS);
 
-            var leg = ProtoMessage.Parse(ProtoMessage.Parse(AllianceProtocol.BuildNotice(bulletin)).Fields.Single().BytesValue);
-            Assert.Equal(new[] { 1, 2, 3, 4 }, leg.Fields.Select(f => f.FieldNumber));
+            var snapshot = Assert.IsType<Jondo.Unity.Protocol.Game.AllianceBulletinEvent>(
+                AllianceNoticeMessages.Snapshot(AllianceStore.NoticeBulletin, bulletin));
+            Assert.Equal(new Jondo.Unity.Protocol.Game.SocialNoticeInformation("Hola", 1800000000, "Member-Three", 9401), snapshot.BulletinInfo);
         }
 
         // ─── Applications ────────────────────────────────────────────────────────

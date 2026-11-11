@@ -271,9 +271,9 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         /// <remarks>
         /// Measured when the deadline runs out: lqn with the notice and the timestamp, an empty ltk, and
-        /// the lsx saying the search is over. The rating's lty also travels there and is NOT sent: it is
-        /// 144 bytes with a floating-point block inside that has not been deciphered, and sending made-up
-        /// bytes is worse than not sending them.
+        /// the lsx saying the search is over. The capture's lty also travels there; originally omitted
+        /// because its 144 bytes include an undeciphered floating-point block. This cancellation path
+        /// still omits that update; the typed player-information migration covers entry and return.
         /// </remarks>
         private static async Task DeshacerAsync(KoliseoOffers.Offer oferta, List<long> culpables,
                                                 bool yaCerrada = false)
@@ -376,29 +376,20 @@ namespace Jondo.Unity.Server.Handlers
         /// <remarks>
         /// It is not leaving the queue, although it might look like it: in the capture the luy and the
         /// lte are five and a half minutes apart, with the whole fight in between. What is answered is
-        /// three frames within 80 ms -- lty, lsr and lsx --; only the last goes here, which is the only one
-        /// of the three whose four bytes can be repeated without pretending to understand them. The lty is
-        /// 151 undeciphered bytes and sending 151 made-up bytes is worse than not sending them.
+        /// three frames within 80 ms -- lty, lsr and lsx. Earlier only the last was sent because the
+        /// 151-byte lty was undeciphered. The reviewed player-information mapping now lets entry and
+        /// return share direct construction from this character's standings and penalty.
         ///
         /// Just in case, his place in the queue is taken away too: coming back from the koliseo and still
         /// being enrolled would make no sense, and if he was not, it costs nothing.
         /// </remarks>
-        public static async Task ReturnAsync(NetworkStream stream, byte[]? payload = null)
+        public static async Task ReturnAsync(GameSession session, byte[]? payload = null)
         {
-            KoliseoQueue.Leave(GameState.CharacterId);
-
             // The league as the fight left it (lty, pushed), then the empty lsr that answers the
             // lte (root 3, with its request id), as the capture has them.
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lty, BuildRanks(GameState.CharacterId, GameState.CharacterLevel)));
-            if (payload != null)
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Answer(Op.Lsr, null, ConnectionProtocol.RequestId(payload)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lsx,
-                    BuildLeftQueue(KoliseoOffers.LastMode(GameState.CharacterId))));
-
-            Console.WriteLine($"[Koliseo] {GameState.CharacterId} comes back from the koliseo.");
+            await ArenaPlayerInformationService.Live.ReturnAsync(session,
+                payload == null ? null : unchecked((int)ConnectionProtocol.RequestId(payload)));
+            Console.WriteLine($"[Koliseo] {session.CharacterId} comes back from the koliseo.");
         }
 
         /// <summary>
@@ -539,50 +530,6 @@ namespace Jondo.Unity.Server.Handlers
                     await TryMatchAsync(modo.Index, modo.TeamSize);
                 } while (KoliseoQueue.CountIn(modo.Index) < before && KoliseoQueue.CountIn(modo.Index) >= modo.TeamSize * 2);
             }
-        }
-
-        // ─── The ladder ─────────────────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// The lty: the season's start and a character's standing in every mode, what the Koliseo
-        /// window draws its leagues and victories from.
-        /// </summary>
-        /// <remarks>
-        /// Measured in the world entry of every capture and after the 2v2 of "koliseo completo";
-        /// the field meanings read off the client (its frame fff builds one oa per ltw, which the
-        /// window's UpdateUILeague and UpdateUIVictories draw):
-        ///
-        /// <code>
-        ///   lty { f2: season start, "2025-03-14T20:46:31.598Z"
-        ///         f3 (repeated) ltw { f1: mode, f3: league (-1 none), f4: placement fights left,
-        ///                             f5: season wins, f6: season fights, f7: day wins,
-        ///                             f8 { f1: best league of the season (-1 none) },
-        ///                             f10: day fights } }
-        /// </code>
-        ///
-        /// The recorder of "koliseo completo" LOST the 2v2 (the kolichas of its jyg went to the
-        /// other side), and the lty that follows says f6 = 1, f10 = 1 and no f5 or f7: so f6 and
-        /// f10 are fights and f5 and f7 wins. The f4 of that capture's f8, 6691, is not read by
-        /// any of the window's code seen, and is not sent.
-        /// </remarks>
-        public static byte[] BuildRanks(long characterId, int level)
-        {
-            var season = KoliseoLadder.Current();
-            var lty = Pb.New().Str(2, season.StartUtc.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'",
-                                                               System.Globalization.CultureInfo.InvariantCulture));
-            foreach (var s in KoliseoLadder.AllOf(characterId, level))
-            {
-                lty.Msg(3, Pb.New()
-                    .VarIfNotZero(1, s.Mode)
-                    .Var(3, s.League)
-                    .VarIfNotZero(4, s.PlacementLeft)
-                    .VarIfNotZero(5, s.SeasonWins)
-                    .VarIfNotZero(6, s.SeasonFights)
-                    .VarIfNotZero(7, s.DayWins)
-                    .Msg(8, Pb.New().Var(1, s.BestLeague))
-                    .VarIfNotZero(10, s.DayFights));
-            }
-            return lty.Build();
         }
 
         private static string IsoDate(DateTime utc)

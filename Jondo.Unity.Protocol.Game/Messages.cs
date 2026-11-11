@@ -935,6 +935,7 @@ public sealed record ObjectDeletedEvent(int ObjectUid) : GameEvent;
 
 public sealed record ObjectEffect(int Action, ObjectEffectCase EffectCase);
 
+[JsonDerivedType(typeof(ObjectEffectCaseNone), "None")]
 [JsonDerivedType(typeof(ObjectEffectCaseValueString), "ValueString")]
 [JsonDerivedType(typeof(ObjectEffectCaseValueDate), "ValueDate")]
 [JsonDerivedType(typeof(ObjectEffectCaseValueDurationMinutes), "ValueDurationMinutes")]
@@ -946,6 +947,7 @@ public sealed record ObjectEffect(int Action, ObjectEffectCase EffectCase);
 [JsonDerivedType(typeof(ObjectEffectCaseValueCreatureFamily), "ValueCreatureFamily")]
 [JsonDerivedType(typeof(ObjectEffectCaseValueMonsterCount), "ValueMonsterCount")]
 public abstract record ObjectEffectCase;
+public sealed record ObjectEffectCaseNone() : ObjectEffectCase;
 public sealed record ObjectEffectCaseValueString(string Value) : ObjectEffectCase;
 public sealed record ObjectEffectCaseValueDate(ObjectEffectDateValue Value) : ObjectEffectCase;
 public sealed record ObjectEffectCaseValueDurationMinutes(long Value) : ObjectEffectCase;
@@ -1101,17 +1103,17 @@ public sealed record ShortcutCaseShortcutEmote(ShortcutEmote Value) : ShortcutCa
 public sealed record ShortcutCaseShortcutCosmeticObject(ShortcutCosmeticObject Value) : ShortcutCase;
 public sealed record ShortcutCaseShortcutOutfit(ShortcutOutfit Value) : ShortcutCase;
 
-public sealed record ShortcutCosmeticObject();
+public sealed record ShortcutCosmeticObject(bool Enable, int ObjectGid);
 
-public sealed record ShortcutEmote();
+public sealed record ShortcutEmote(int EmoteId);
 
 public sealed record ShortcutObjectItem(int ItemGid, int ItemUid);
 
-public sealed record ShortcutOutfit();
+public sealed record ShortcutOutfit(string OutfitUuid);
 
 public sealed record ShortcutPreset(string PresetUuid);
 
-public sealed record ShortcutSmiley();
+public sealed record ShortcutSmiley(int SmileyId);
 
 public sealed record ShortcutSpell(int SpellId);
 

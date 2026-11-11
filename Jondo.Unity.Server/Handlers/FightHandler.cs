@@ -960,7 +960,7 @@ namespace Jondo.Unity.Server.Handlers
                                                           DateTime.UtcNow),
                 MaxLifeAtFightEntry(fight)));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildMapDiscovered(fight.MapId));
+            await Network.EntryEnvironmentMessages.SendDiscoveredAsync(Network.SessionContext.Current, fight.MapId);
 
             Program.LogDebug($"[Fight] Fight #{fight.FightId} on map {fight.MapId}. " +
                              "Waiting for the client to ask for the actors.");
@@ -11140,7 +11140,7 @@ namespace Jondo.Unity.Server.Handlers
                         ConnectionProtocol.Push(Op.Kua, ConnectionProtocol.BuildLevelUp(newLevel)));
 
                     // And what the new level opens, in the book and on the bar.
-                    await SpellHandler.SendSpellsAndBarAsync(stream);
+                    await SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
                 }
             }
             if (kamas > 0) GameState.Kamas += kamas;
@@ -11245,7 +11245,7 @@ namespace Jondo.Unity.Server.Handlers
             // The alterations and the bonus slots, one fight on: the whole list with the counts
             // brought down (lzp), the slots' items (iuj, or ium when spent), and the lzo with its
             // «Has perdido la alteración» for each spent -- the larva race's order, before the kub.
-            await AlterationHandler.AfterFightAsync(stream, gane);
+            await AlterationHandler.AfterFightAsync(SessionContext.Current, gane);
 
             Program.LogDebug($"[Fight] Share: {xpGained} experience (total {GameState.Experience}, " +
                              $"level {GameState.CharacterLevel}), {kamas} kamas and {loot.Count} kind(s) of item.");
@@ -12455,7 +12455,7 @@ namespace Jondo.Unity.Server.Handlers
         /// fine in the database and the player not to see it.
         ///
         /// There are two views of the inventory: <c>GameState</c> is the session state's, and the one
-        /// BuildInventory reads to build the ivx is <c>Managers.Equipment</c>. Refreshing only the first
+        /// InventoryMessages reads to build the ivx is the session's equipment cache. Refreshing only the first
         /// left the second with the old one until the next login -- 73 Jondo Coin in CharacterItems and
         /// not one on screen.
         ///

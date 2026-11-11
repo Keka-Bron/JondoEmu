@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Network;
 using Xunit;
 
@@ -22,17 +23,17 @@ namespace Jondo.Unity.Tests.Economy
         public NetworkStream ToClient { get; }
         public NetworkStream FromServer { get; }
 
-        private ClientPipe(TcpListener listener, TcpClient client, TcpClient server)
+        private ClientPipe(TcpListener listener, TcpClient client, TcpClient server, IGameCodec? codec)
         {
             _listener = listener;
             _client = client;
             _server = server;
             ToClient = server.GetStream();
             FromServer = client.GetStream();
-            Session = new GameSession(ToClient);
+            Session = codec == null ? new GameSession(ToClient) : new GameSession(ToClient, codec);
         }
 
-        public static async Task<ClientPipe> OpenAsync(long accountId, long characterId, long mapId, string name = "")
+        public static async Task<ClientPipe> OpenAsync(long accountId, long characterId, long mapId, string name = "", IGameCodec? codec = null)
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
             listener.Start();
@@ -40,7 +41,7 @@ namespace Jondo.Unity.Tests.Economy
             await client.ConnectAsync(IPAddress.Loopback, ((IPEndPoint)listener.LocalEndpoint).Port);
             var server = await listener.AcceptTcpClientAsync();
 
-            var pipe = new ClientPipe(listener, client, server);
+            var pipe = new ClientPipe(listener, client, server, codec);
             pipe.Session.BindAccount(accountId, 1);
             pipe.Session.State.CharacterId = characterId;
             pipe.Session.State.CharacterName = name;

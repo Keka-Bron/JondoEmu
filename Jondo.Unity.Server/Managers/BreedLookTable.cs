@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Managers
 {
@@ -215,10 +216,15 @@ namespace Jondo.Unity.Server.Managers
 
         public static byte[] BuildLook(DatabaseManager.DbCharacter character,
                                        bool paraLaVentana = false, bool onFoot = false)
+            => WriteLook(SemanticLook(character, paraLaVentana, onFoot)).Build();
+
+        /// <summary>The resolved appearance, before any wire serialization.</summary>
+        public static EntityLook SemanticLook(DatabaseManager.DbCharacter character,
+                                              bool paraLaVentana = false, bool onFoot = false)
             => Mutations.OfCharacter(character.Id) is { } mutation && !paraLaVentana
-                ? ConnectionProtocol.MonsterLook(mutation.Look, false).Build()   // mutated: the monster's (Mutations)
-                : BuildLook(character.Breed, character.Sex, character.HeadId, SavedColors(character),
-                            character.Id, paraLaVentana, onFoot);
+                ? ConnectionProtocol.SemanticMonsterLook(mutation.Look, false)
+                : SemanticLook(character.Breed, character.Sex, character.HeadId, SavedColors(character),
+                               character.Id, paraLaVentana, onFoot);
 
         /// <summary>
         /// Assembles a character's look block. If custom colors are passed those are used;
@@ -241,6 +247,11 @@ namespace Jondo.Unity.Server.Managers
                                        long characterId = 0,
                                        bool paraLaVentana = false,
                                        bool onFoot = false)
+            => WriteLook(SemanticLook(breedId, sex, headId, customColors, characterId, paraLaVentana, onFoot)).Build();
+
+        private static EntityLook SemanticLook(int breedId, int sex, int headId,
+                                              IReadOnlyList<long>? customColors, long characterId,
+                                              bool paraLaVentana, bool onFoot)
         {
             // With an id that character is asked about, which is what is needed on the selection
             // screen; without it, the one playing.
@@ -278,12 +289,10 @@ namespace Jondo.Unity.Server.Managers
             // On foot the root is the character himself, so the pet hangs off him, and the aura after it.
             if (!montado)
             {
-                AddPets(cuerpo, prendas, colores);
-                AddAura(cuerpo, auraBones);
-                return cuerpo.Build();
+                return AddAura(AddPets(cuerpo, prendas, colores), auraBones);
             }
 
-            return Mounted(cuerpo.Build(), mount!, impuesto,
+            return Mounted(cuerpo, mount!, impuesto,
                            paraLaVentana ? prendas : null, colores, auraBones);
         }
 
@@ -296,18 +305,19 @@ namespace Jondo.Unity.Server.Managers
         public static byte[] Composed(long bones, IReadOnlyList<long> skins, IReadOnlyList<long> colors,
                                       IReadOnlyList<long> scales, Mounts.Look? mount = null,
                                       Cosmetics.PieceLook? appearanceMount = null)
+            => WriteLook(Compose(bones, skins, colors, scales, mount, appearanceMount)).Build();
+
+        internal static EntityLook Compose(long bones, IReadOnlyList<long> skins, IReadOnlyList<long> colors,
+                                           IReadOnlyList<long> scales, Mounts.Look? mount = null,
+                                           Cosmetics.PieceLook? appearanceMount = null)
         {
             bool riding = mount != null || (appearanceMount != null && appearanceMount.Bones != 0);
-            var body = Pb.New();
-            if (colors.Count > 0) body.Packed(1, colors);
-            body.Var(2, LookType);
-            body.Var(3, riding ? Mounts.RiderBones : bones);
-            if (scales.Count > 0) body.Packed(5, scales);
-            if (skins.Count > 0) body.Packed(6, skins);
-            if (!riding) return body.Build();
+            var body = new EntityLook(Ints(colors), LookType, checked((int)(riding ? Mounts.RiderBones : bones)),
+                Ints(scales), Ints(skins), []);
+            if (!riding) return body;
 
             var root = mount ?? new Mounts.Look { Bones = appearanceMount!.Bones, Scale = appearanceMount.Scale };
-            return Mounted(body.Build(), root, appearanceMount, null, colors);
+            return Mounted(body, root, appearanceMount, null, colors);
         }
 
         /// <summary>A breed's colours as they travel, each with its index in the high byte.</summary>
@@ -321,41 +331,29 @@ namespace Jondo.Unity.Server.Managers
         ///
         /// It comes as is from a capture of equipping a dragoturkey with no cosmetic on.
         /// </summary>
-        private static byte[] Mounted(byte[] rider, Mounts.Look mount,
-                                      Cosmetics.PieceLook? cosmetico = null,
-                                      IReadOnlyList<Wardrobe.Worn>? prendas = null,
-                                      IReadOnlyList<long>? coloresDelPortador = null,
-                                      int auraBones = 0)
+        private static EntityLook Mounted(EntityLook rider, Mounts.Look mount,
+                                          Cosmetics.PieceLook? cosmetico = null,
+                                          IReadOnlyList<Wardrobe.Worn>? prendas = null,
+                                          IReadOnlyList<long>? coloresDelPortador = null,
+                                          int auraBones = 0)
         {
-            var pb = Pb.New();
-
-            if (cosmetico?.Colors != null) pb.Bytes(1, cosmetico.Colors);
-            else if (mount.Colors.Count > 0) pb.Packed(1, mount.Colors);
-
-            pb.Var(2, LookType);
-            pb.Var(3, (cosmetico != null && cosmetico.Bones != 0) ? cosmetico.Bones : mount.Bones);
-
             long escala = (cosmetico != null && cosmetico.Scale > 0) ? cosmetico.Scale : mount.Scale;
-            if (escala > 0) pb.Packed(5, new long[] { escala });
-
-            // Only appearance mounts carry a skin of their own; petsmounts do not touch f6.
-            if (cosmetico != null && cosmetico.Skin > 0) pb.Packed(6, new long[] { cosmetico.Skin });
+            var root = new EntityLook(
+                cosmetico?.Colors != null ? PackedColors(cosmetico.Colors) : Ints(mount.Colors),
+                LookType, (cosmetico != null && cosmetico.Bones != 0) ? cosmetico.Bones : mount.Bones,
+                escala > 0 ? [checked((int)escala)] : [],
+                cosmetico != null && cosmetico.Skin > 0 ? [cosmetico.Skin] : [], []);
 
             // The pet goes before the rider, as in the capture, and so does the aura: it hangs off
             // the root, the mount, in all 73 mounted looks that carry one.
-            if (prendas != null) AddPets(pb, prendas, coloresDelPortador ?? new List<long>());
-            AddAura(pb, auraBones);
-
-            pb.Msg(7, Pb.New()
-                .Bytes(1, rider)
-                .Var(4, Mounts.RiderBindingPoint));
-
-            return pb.Build();
+            if (prendas != null) root = AddPets(root, prendas, coloresDelPortador ?? new List<long>());
+            root = AddAura(root, auraBones);
+            return root with { SubEntities = [.. root.SubEntities,
+                new SubEntityInformation(rider, 0, SubEntityBindingPointCategory.HookPointCategoryMountDriver)] };
         }
 
         /// <summary>
-        /// The character's own look, without mount or pet. It returns the half-built builder and not the
-        /// bytes, because on foot the pet still has to be hung on it.
+        /// The character's own look, without mount, pet or aura.
         /// </summary>
         /// <param name="quien">
         /// Whose body it is. It is needed for the SIZE: f5 is a multiplier and what the breed declares --
@@ -363,33 +361,21 @@ namespace Jondo.Unity.Server.Managers
         /// <see cref="CharacterSize"/> stores is applied on top of that and does not replace the number.
         /// Zero means "nobody in particular" and then it is drawn at the breed's size.
         /// </param>
-        private static Pb BuildBodyLook(int breedId, int sex, int headId,
-                                        IReadOnlyList<long>? customColors, bool riding,
-                                        IReadOnlyList<Wardrobe.Worn>? appearance = null,
-                                        long quien = 0,
-                                        IReadOnlyList<(int Slot, int Template)>? worn = null,
-                                        int? bodyId = null)
+        private static EntityLook BuildBodyLook(int breedId, int sex, int headId,
+                                               IReadOnlyList<long>? customColors, bool riding,
+                                               IReadOnlyList<Wardrobe.Worn>? appearance = null,
+                                               long quien = 0,
+                                               IReadOnlyList<(int Slot, int Template)>? worn = null,
+                                               int? bodyId = null)
         {
             var baseLook = Get(breedId, sex);
-            var pb = Pb.New();
-
             var colors = ColorsFor(breedId, sex, customColors);
-
-            if (colors.Count > 0) pb.Packed(1, colors);
-            pb.Var(2, LookType);
             // Mounted, the rider changes bones: the client has a RiderBones table and 2 is the normal
             // one. In the capture the same character is seen with bones 1 on foot and 2 on top of the
             // dragoturkey.
-            pb.Var(3, riding ? Mounts.RiderBones : (baseLook?.Bones ?? 1));
-            if (baseLook != null && baseLook.Scales.Count > 0)
-            {
-                pb.Packed(5, CharacterSize.Applied(baseLook.Scales, quien));
-            }
-
             var skins = SkinsWornBy(breedId, sex, headId, quien, appearance, worn, bodyId);
-            if (skins.Count > 0) pb.Packed(6, skins);
-
-            return pb;
+            return new EntityLook(Ints(colors), LookType, riding ? Mounts.RiderBones : (baseLook?.Bones ?? 1),
+                baseLook != null ? Ints(CharacterSize.Applied(baseLook.Scales, quien)) : [], Ints(skins), []);
         }
 
         /// <summary>
@@ -401,8 +387,7 @@ namespace Jondo.Unity.Server.Managers
         {
             var body = BuildBodyLook(character.Breed, character.Sex, headId, colors, riding: false,
                                      garments, character.Id, bodyId: bodyId);
-            AddPets(body, garments, ColorsFor(character.Breed, character.Sex, colors));
-            return body.Build();
+            return WriteLook(AddPets(body, garments, ColorsFor(character.Breed, character.Sex, colors))).Build();
         }
 
         /// <summary>
@@ -420,9 +405,9 @@ namespace Jondo.Unity.Server.Managers
         /// capture carries only skins [110, 5312] beside the full look of its f14.
         /// </summary>
         public static byte[] BareLook(DatabaseManager.DbCharacter character)
-            => BuildBodyLook(character.Breed, character.Sex, character.HeadId, SavedColors(character),
-                             riding: false, appearance: null, character.Id,
-                             worn: Array.Empty<(int Slot, int Template)>()).Build();
+            => WriteLook(BuildBodyLook(character.Breed, character.Sex, character.HeadId, SavedColors(character),
+                              riding: false, appearance: null, character.Id,
+                              worn: Array.Empty<(int Slot, int Template)>())).Build();
 
         public static (byte[] Equipment, byte[] Appearance) PresetLooks(DatabaseManager.DbCharacter character,
                                                                         IReadOnlyList<(int Slot, int Template)> worn)
@@ -440,7 +425,7 @@ namespace Jondo.Unity.Server.Managers
 
             var appearance = BuildBodyLook(character.Breed, character.Sex, character.HeadId, SavedColors(character),
                                            riding: false, Wardrobe.AppearanceOf(character.Id), character.Id, worn);
-            return (equipment.Build(), appearance.Build());
+            return (equipment.Build(), WriteLook(appearance).Build());
         }
 
         /// <summary>
@@ -591,9 +576,10 @@ namespace Jondo.Unity.Server.Managers
         /// it is not a palette of their own, it is the tint of whoever carries them, so it is copied. And
         /// a missing scale is the default one, not zero.
         /// </summary>
-        private static void AddPets(Pb raiz, IReadOnlyList<Wardrobe.Worn> prendas,
-                                    IReadOnlyList<long> coloresDelPortador)
+        private static EntityLook AddPets(EntityLook raiz, IReadOnlyList<Wardrobe.Worn> prendas,
+                                          IReadOnlyList<long> coloresDelPortador)
         {
+            var children = new List<SubEntityInformation>(raiz.SubEntities);
             foreach (var prenda in prendas)
             {
                 if (prenda.Slot != Cosmetics.SlotPet || prenda.Hidden) continue;
@@ -601,33 +587,59 @@ namespace Jondo.Unity.Server.Managers
                 var mascota = Cosmetics.PetOf(prenda.Gid);
                 if (mascota == null) continue;
 
-                var cuerpo = Pb.New();
-                if (mascota.ColorsFromWearer)
-                {
-                    if (coloresDelPortador.Count > 0) cuerpo.Packed(1, coloresDelPortador);
-                }
-                else if (mascota.Colors != null) cuerpo.Bytes(1, mascota.Colors);
-
-                cuerpo.Var(2, LookType).Var(3, mascota.Bones);
-                if (mascota.Scale > 0) cuerpo.Packed(5, new long[] { mascota.Scale });
-
-                raiz.Msg(7, Pb.New().Bytes(1, cuerpo.Build()).Var(4, PetBindingPoint));
+                var cuerpo = new EntityLook(mascota.ColorsFromWearer ? Ints(coloresDelPortador)
+                    : mascota.Colors != null ? PackedColors(mascota.Colors) : [],
+                    LookType, mascota.Bones, mascota.Scale > 0 ? [mascota.Scale] : [], [], []);
+                children.Add(new SubEntityInformation(cuerpo, 0, SubEntityBindingPointCategory.HookPointCategoryPet));
             }
+            return raiz with { SubEntities = children };
         }
-
-        /// <summary>Where an aura attaches.</summary>
-        private const int AuraBindingPoint = 6;
 
         /// <summary>
         /// Hangs an aura from binding point 6 of the root: { f1 { f2: 3, f3: bones }, f4: 6 }, the
         /// shape of all 129 looks of the captures that carry one.
         /// </summary>
-        private static void AddAura(Pb root, int bones)
+        private static EntityLook AddAura(EntityLook root, int bones)
         {
-            if (bones <= 0) return;
-            root.Msg(7, Pb.New()
-                .Bytes(1, Pb.New().Var(2, LookType).Var(3, bones).Build())
-                .Var(4, AuraBindingPoint));
+            if (bones <= 0) return root;
+            return root with { SubEntities = [.. root.SubEntities,
+                new SubEntityInformation(new EntityLook([], LookType, bones, [], [], []), 0,
+                    SubEntityBindingPointCategory.HookPointCategoryBaseForeground)] };
+        }
+
+        private static int[] Ints(IReadOnlyList<long> values)
+            => values.Select(value => checked((int)value)).ToArray();
+
+        // Persisted/catalogue palettes are packed varints; this reads stored data, not a built packet.
+        private static int[] PackedColors(byte[] bytes)
+        {
+            var colors = new List<int>();
+            using var input = new Google.Protobuf.CodedInputStream(bytes);
+            while (!input.IsAtEnd) colors.Add(input.ReadInt32());
+            return colors.ToArray();
+        }
+
+        /// <summary>Compatibility serializer for gameplay paths still consuming look bytes.</summary>
+        internal static Pb WriteLook(EntityLook look)
+        {
+            var pb = Pb.New();
+            if (look.Colors.Count > 0) pb.Packed(1, look.Colors.Select(value => (long)value).ToArray());
+            pb.Var(2, look.LookType).VarIfNotZero(3, look.Bones);
+            if (look.Scales.Count > 0) pb.Packed(5, look.Scales.Select(value => (long)value).ToArray());
+            if (look.Skins.Count > 0) pb.Packed(6, look.Skins.Select(value => (long)value).ToArray());
+            foreach (var child in look.SubEntities)
+            {
+                int category = child.BindingPointCategory switch
+                {
+                    SubEntityBindingPointCategory.HookPointCategoryPet => 1,
+                    SubEntityBindingPointCategory.HookPointCategoryMountDriver => 2,
+                    SubEntityBindingPointCategory.HookPointCategoryBaseForeground => 6,
+                    _ => throw new InvalidOperationException("Unsupported composed appearance attachment."),
+                };
+                pb.Msg(7, Pb.New().Msg(1, WriteLook(child.SubEntityLook))
+                    .VarIfNotZero(3, child.BindingPointIndex).Var(4, category));
+            }
+            return pb;
         }
 
         /// <summary>The colours the character wears, already indexed as they go on the wire.</summary>
@@ -655,9 +667,6 @@ namespace Jondo.Unity.Server.Managers
             foreach (long color in fuente) salida.Add(color & 0xFFFFFF);
             return salida;
         }
-
-        /// <summary>Where pets attach. 2 is the rider and 6 the aura.</summary>
-        private const int PetBindingPoint = 1;
 
         /// <summary>
         /// The variant chosen for a garment. The appearance window does not send an inventory uid but the

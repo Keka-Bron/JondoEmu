@@ -3030,7 +3030,9 @@
     },
     "lfh": {
       "name": "ShortcutSmiley",
-      "fields": {},
+      "fields": {
+        "gaqm": "SmileyId"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -3038,7 +3040,9 @@
     },
     "lfj": {
       "name": "ShortcutOutfit",
-      "fields": {},
+      "fields": {
+        "gaqv": "OutfitUuid"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -3191,7 +3195,9 @@
     },
     "lhh": {
       "name": "ShortcutEmote",
-      "fields": {},
+      "fields": {
+        "gbaq": "EmoteId"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -4011,6 +4017,7 @@
       "oneofs": {
         "gcco": {
           "member": "EffectCase",
+          "noneType": "ObjectEffectCaseNone",
           "cases": {
             "gcca": {
               "type": "ObjectEffectCaseValueString",
@@ -4269,7 +4276,10 @@
     },
     "lob": {
       "name": "ShortcutCosmeticObject",
-      "fields": {},
+      "fields": {
+        "gcgv": "Enable",
+        "gcgw": "ObjectGid"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],

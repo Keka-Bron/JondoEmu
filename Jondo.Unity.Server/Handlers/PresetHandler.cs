@@ -412,7 +412,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (spell == Network.FightProtocol.HechizoCuerpoACuerpo) continue;
                 foreach (int slot in slots) SpellChoices.PutInBar(slot, spell);
             }
-            await SendAsync(stream, Op.Itg, ConnectionProtocol.BuildSpellBar(state.Breed, state.CharacterLevel, accountId));
+            await ShortcutBarMessages.Live.SendSpellAsync(SessionContext.Current);
 
             // The items: off what the build does not wear, on what it does.
             var wanted = preset.Items.Where(p => Equipment.ByUid(p.Value) != null)

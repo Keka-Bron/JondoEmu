@@ -90,22 +90,22 @@ items out of a real inventory message, so it lives as data and is stated as meas
 
 ---
 
-## The three world-entry blocks
+## World-entry stages
 
-Entering the world is not one burst. The real server sends a block, waits for the client, and only
-then continues:
+Entry retains three timing stages, all constructed from live server/account/character state:
 
-| Cue | Server sends | Block in `content/world/entry.json` | Frames |
+| Cue | Server sends | Runtime source | Frames |
 |---|---|---|---:|
-| `kvw`, the client picks a character | character, stats, quests, almanax… | `afterCharacter` | 322 |
-| nothing — it follows block 1 | `jby`, then the gift-item catalogue `jtg` | `afterConfirm` | 2 |
-| `lqc`, "block 1 digested" | the map | `map` | 31 |
+| Character selection | initial character state | `GameEntryInitialMessages` | 32 + equipped-set snapshots + optional calendar/previous visit |
+| Immediately after the existing live hooks and characteristics | HAAPI identity `jby`, then current account gifts `jtg` | `GameEntryContinuationMessages` | 2 |
+| `lqc`, "block 1 digested" | the map | `GameEntryMapMessages` plus live hooks | variable |
 
-Two of those differ from the recorded session, and both differences are deliberate.
+The historical world-entry manifest and its loader have been deleted. The
+continuation supplies a connection-owned numeric HAAPI ID and current account gifts,
+including due veteran rewards, rather than the capture's identity and gift IDs.
 
-**Block 2 does not wait.** In the capture the client asks for it with `lqc`. It sends that `lqc`
-here too, but only after digesting block 1, by which time the catalogues have been sitting unused.
-So block 2 goes out on the heels of block 1.
+**The continuation does not wait.** The client sends `lqc` after digesting initial
+state; the two direct continuation events retain their existing earlier timing.
 
 **Block 3 goes out on `lqc`, not on `kqo`.** `kqo` is the heartbeat — the client sends it every five
 seconds for as long as it is in the world, 2,821 times across the captures, and the server answers
@@ -114,15 +114,10 @@ standing in a world it did not know the map of, and sending the block twice made
 loop, because the block carries `jru` and `jru` means "load this map". The `kqo` path survives only
 as a fallback for clients that never send `lqc`; `tools/cliente_falso.py` is one.
 
-That is why block 3 is its own block: it has to go out exactly once, on its own cue. Blocks 1 and 2
-are two because that is how the capture was cut.
-
-The bytes are the real ones. Without a schema for every message that is the only way to get this
-far. `WorldEntry.Rebuilt` is the list of frames the emulator builds from the database instead of
-replaying, and it is meant to grow: `kva` (which character you are), `irq` (the jobs, which arrived
-maxed out), `hms` (the spells), `ivx` (the inventory) and `itg` (both shortcut bars — the spell one
-rebuilt, the item one sent empty). `jru` is rewritten too, to carry the map you are standing on.
-Everything else still describes the captured account.
+That is why the map remains its own block: it goes out once, on its own cue.
+Initial state and the continuation come directly from server/session/account state.
+Map entry constructs spells (`hms`), both shortcut bars (`itg`) and the current map
+(`jru`) directly. See [the Game protocol](game-protocol.md) for the current entry sequence.
 
 ### What was taken out, and why
 
@@ -131,21 +126,18 @@ list, twenty Ankama accounts with nickname and tag, alliances by name, the guild
 saved outfits, a player's stall with the account behind it. Shipping the file as recorded ships all
 of that.
 
-`WorldEntry.NotReplayed` already refused to forward those 14 message families, so the emulator's
-output was already clean. But the data was still *inside the file*, and the file is what gets
-published. `tools/sanear_world.py` drops those frames and leaves every other byte untouched. Same
-list as `NotReplayed`, deliberately — if one is added there it goes here too. The traffic on the
-wire is identical before and after; what changed is that the data no longer travels in the
-repository.
+Historically, a runtime skip list and `tools/sanear_world.py` removed recorded-account
+messages from replay and from the published files. Direct construction has replaced
+the replay path, and the obsolete skip list and reference loader have been removed.
 
-Measured on the files as they stand:
+Historical capture measurement:
 
 | File | Frames with a sensitive opcode |
 |---|---|
 | `world_entering_3_6_10_10.bin` (raw, not published) | 13, across 11 families: `kub`×2, `jhh`×2, `jhe`, `jhk`, `ife`, `jgu`, `jaa`, `lyt`, `hhy`, `ihb`, `jjs` |
 
-The carved blocks are gone from the repository as well: nothing read them once the world entry
-moved to `content/world/entry.json`, and `.gitignore` keeps every `*.bin` out.
+The carved binary blocks and their later JSON reconstruction have both been removed
+from the repository. `.gitignore` keeps every `*.bin` out.
 
 `kub` is the one exception in that list: it is not dropped, it is replaced. The captured `kub` is a
 level-154 character sheet, and the emulator builds its own from the database.
@@ -254,13 +246,10 @@ text}}`, and 4 multilingual `MAPPED_*.json` exports.
 Some `tools/` scripts read `dofus3_data/`; the rest open the `.bundle` files directly with
 **UnityPy** (`UnityPy.config.FALLBACK_UNITY_VERSION = '2022.3.20f1'`).
 
-**The captures.** 242 `.pcapng` files. Only three things in `datos/` come from them, because they
-are the three things the client does not know: the item-to-look table (`cosmetic_skins.json`), the
-effect field map (`item_effect_fields.json`) and the world entry manifest
-(`content/world/entry.json`).
-
-The manifest was decoded from three blocks carved out of a capture by `extraer_world.py` and
-cleaned by `sanear_world.py`. Those blocks are not in the repository.
+**The captures.** 242 `.pcapng` files supplied the item-to-look table
+(`cosmetic_skins.json`) and effect field map (`item_effect_fields.json`). The former
+world-entry reconstruction was also capture-derived, but has been retired: neither
+runtime initialization nor tests load that recording any more.
 
 ### The order
 

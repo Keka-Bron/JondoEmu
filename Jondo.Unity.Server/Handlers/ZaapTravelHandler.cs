@@ -245,8 +245,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(target));
+            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, target);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(Jondo.Unity.Server.Network.SessionContext.State.Kamas)));
 

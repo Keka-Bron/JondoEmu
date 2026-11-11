@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 
 namespace Jondo.Unity.Server.Network
@@ -108,14 +110,32 @@ namespace Jondo.Unity.Server.Network
         /// f3: least }, f2: 30 }, f4: skill }, the 30 being the tenths the gesture lasts.
         /// </summary>
         public static byte[] BuildJobLevelUp(int jobId, int level, IEnumerable<(int Skill, bool Gathers, int Least, int Most)> skills)
+            => BuildJobLevelUp(level, new JobDescription(jobId,
+                skills.Select(skill => ProfessionMessages.Action(skill.Skill, skill.Gathers, skill.Least, skill.Most)).ToArray()));
+
+        internal static byte[] BuildJobLevelUp(int level, JobDescription description)
         {
-            var job = Pb.New().Var(2, jobId);
-            foreach (var (skill, gathers, least, most) in skills)
+            var job = Pb.New().Var(2, description.JobId);
+            foreach (var skill in description.Skills)
             {
-                var entry = gathers
-                    ? Pb.New().Msg(1, Pb.New().Msg(1, Pb.New().Var(2, most).Var(3, least)).Var(2, Resources.GatherTenths))
-                    : Pb.New().Msg(2, Pb.New().Var(1, CraftProbability));
-                job.Msg(4, entry.Var(4, skill));
+                var entry = Pb.New();
+                switch (skill.ActionCase)
+                {
+                    case JobSkillActionCaseTimed timed:
+                        var action = Pb.New();
+                        if (timed.Value.Collect is { } collect)
+                            action.Msg(1, Pb.New().Var(2, collect.Max).Var(3, collect.Min));
+                        entry.Msg(1, action.Var(2, timed.Value.Time));
+                        break;
+                    case JobSkillActionCaseCraft craft:
+                        entry.Msg(2, Pb.New().Var(1, craft.Value.Probability));
+                        break;
+                    case JobSkillActionCaseNone:
+                        break;
+                    default:
+                        throw new ArgumentException("Unsupported profession skill action.", nameof(description));
+                }
+                job.Msg(4, entry.Var(4, skill.SkillId));
             }
             return Pb.New().Msg(1, job).Var(3, level).Build();
         }
@@ -205,8 +225,5 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The f3 of kdr.</summary>
         public const int Failure = 1;
         public const int Success = 2;
-
-        /// <summary>The f1 of a craft skill's entry in isz: 100 on all four of the captures'.</summary>
-        private const int CraftProbability = 100;
     }
 }

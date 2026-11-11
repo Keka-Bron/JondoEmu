@@ -185,9 +185,12 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>When the penalty is lifted, or null if there is none.</summary>
         public static DateTime? BannedUntil(long characterId)
+            => BannedUntil(characterId, DateTime.UtcNow);
+
+        internal static DateTime? BannedUntil(long characterId, DateTime nowUtc)
         {
             if (!_banned.TryGetValue(characterId, out var hasta)) return null;
-            if (hasta <= DateTime.UtcNow)
+            if (hasta <= nowUtc)
             {
                 _banned.TryRemove(characterId, out _);
                 return null;

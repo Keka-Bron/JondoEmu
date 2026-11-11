@@ -50,7 +50,7 @@ namespace Jondo.Unity.Server.Handlers
             if (attitude == 0) return false;
             if (!await ItemUseHandler.CriterionHoldsAsync(stream, item)) return true;
 
-            if (!await Emotes.LearnAsync(stream, attitude))
+            if (!await Emotes.LearnAsync(SessionContext.Current, attitude))
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.AttitudeAlreadyKnown)));

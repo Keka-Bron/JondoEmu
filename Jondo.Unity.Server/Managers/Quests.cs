@@ -2070,7 +2070,7 @@ namespace Jondo.Unity.Server.Managers
                 kamas += RewardFormula.Kamas(reward.KamasScale ? level : step.OptimalLevel,
                                              reward.KamasRatio, step.Duration);
                 items.AddRange(reward.Items);
-                foreach (int emote in reward.Emotes) await Emotes.LearnAsync(stream, emote);
+                foreach (int emote in reward.Emotes) await Emotes.LearnAsync(SessionContext.Current, emote);
             }
 
             // The Almanax days that raise what quests pay, when they do so unconditionally.

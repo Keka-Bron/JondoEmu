@@ -20,6 +20,9 @@ namespace Jondo.Unity.Server
 
         /// <summary>The message that goes with «away», empty otherwise.</summary>
         public string ChatStatusMessage { get; set; } = "";
+
+        /// <summary>Null until the client supplies channel preferences; empty means all channels off.</summary>
+        internal IReadOnlyList<Jondo.Unity.Protocol.Game.ChatChannel>? ActiveChatChannels { get; set; }
         public byte[]? PlayerActorDetails { get; set; }
         public byte[]? LookBytes { get; set; }
 

@@ -414,12 +414,12 @@ namespace Jondo.Unity.Server.Handlers
             finally { commission.Gate.Release(); }
         }
 
-        private static async Task CloseWindowAsync(GameSession session, Commission commission)
+        internal static async Task CloseWindowAsync(GameSession session, Commission commission)
         {
             if (commission.Accepted) await SendAsync(session, Op.Kcl, WorkshopProtocol.BuildPayment(0));
             await SendAsync(session, Op.Khd, ConnectionProtocol.BuildShopClosed());
             if (commission.Accepted)
-                await SendAsync(session, Op.Ivx, As(session, ConnectionProtocol.BuildInventory));
+                await InventoryMessages.FromCatalogue.SendAsync(session);
             await SendAsync(session, Op.Hlm, Array.Empty<byte>());
         }
 

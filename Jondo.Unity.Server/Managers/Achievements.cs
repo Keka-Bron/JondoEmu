@@ -685,7 +685,7 @@ namespace Jondo.Unity.Server.Managers
                     }
                 }
 
-                foreach (int emote in payout.Emotes) await Emotes.LearnAsync(stream, emote);
+                foreach (int emote in payout.Emotes) await Emotes.LearnAsync(SessionContext.Current, emote);
 
                 if (payout.Experience > 0 || payout.Kamas > 0) CharacterRewards.Save();
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Network
 {
@@ -26,6 +27,9 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     public static class ConnectionProtocol
     {
+        // Compatibility framing for the older synchronous welcome/list callers.
+        // Gift construction is shared with direct session sends, never decoded from legacy bytes.
+        private static readonly Game.Wire.GameCodec LegacyCodec = new();
         public const string UriPrefix = "type.ankama.com/";
 
         // ─── Envelope ───────────────────────────────────────────────────────────
@@ -75,7 +79,8 @@ namespace Jondo.Unity.Server.Network
                 Push(Op.Kqp, Pb.New().Var(1, 1).Build()),
                 Push(Op.Kqp),
                 Push(Op.Kvi, BuildCharactersList(characters)),
-                Push(Op.Jtg, Handlers.GiftHandler.BuildList(characters.Count > 0 ? characters[0].AccountId : SessionContext.Current.AccountId)),
+                LegacyCodec.Encode(new Game.GameFrame(GiftService.Live.Snapshot(
+                    characters.Count > 0 ? characters[0].AccountId : SessionContext.Current.AccountId))),
             };
 
         /// <summary>
@@ -100,7 +105,7 @@ namespace Jondo.Unity.Server.Network
             {
                 Push(Op.Kra),
                 Push(Op.Lqu, Pb.New()
-                    .Var(1, SyncRate)
+                    .Var(1, ServerTimeMessages.TimezoneOffsetMinutes)
                     .Var(2, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
                     .Build()),
                 Push(Op.Hoy, BuildHoy()),
@@ -128,7 +133,7 @@ namespace Jondo.Unity.Server.Network
                 Push(Op.Mgt, Pb.New().EmptyMsg(2).Build()),
                 Push(Op.Hpd, Pb.New().Var(1, 1).Build()),
                 Push(Op.Krs),
-                Push(Op.Mgz, Pb.New().Var(1, CatalogMark).Build()),
+                Push(Op.Mgz, Pb.New().VarIfNotZero(1, SubscriptionElapsedSeconds).Build()),
 
                 // A kvd DOES NOT GO HERE, and sending it was what had half the screen dead.
                 //
@@ -155,14 +160,39 @@ namespace Jondo.Unity.Server.Network
             return burst;
         }
 
-        /// <summary>How often the server synchronizes the clock with the client.</summary>
-        private const int SyncRate = 120;
+        internal static async System.Threading.Tasks.Task SendWelcomeAsync(GameSession session,
+            IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withList)
+        {
+            await session.SendAsync(new Game.AuthenticationTicketAcceptedEvent());
+            await session.SendAsync(ServerTimeMessages.Snapshot());
+            // Settings still carry unmapped f7; retain that payload losslessly.
+            await GameEntryMessages.SendAsync(session, Push(Op.Hoy, BuildHoy(session.State.Language)));
+            await session.SendAsync(new Game.OptionalFeaturesEvent(ActiveFeatures.Select(x => (int)x).ToArray()));
+            await session.SendAsync(new Game.AccountCapabilitiesEvent(Game.CharacterCreationRights.Allowed,
+                true, Game.Hierarchy.RolePlayer));
+            await session.SendAsync(new Game.AccountRightsEvent(new Game.AccountRights(false, false, false, false)));
+            await session.SendAsync(new Game.TrustStatusEvent(Certified: true));
+            await session.SendAsync(new Game.ServerSessionReadyEvent());
+            await session.SendAsync(new Game.AccountSubscriptionElapsedDurationUpdateEvent(SubscriptionElapsedSeconds));
+            if (withList) await SendCharacterListAsync(session, characters);
+        }
+
+        internal static async System.Threading.Tasks.Task SendCharacterListAsync(GameSession session,
+            IReadOnlyList<DatabaseManager.DbCharacter> characters)
+        {
+            await session.SendAsync(new Game.QueueStatusEvent(1, 1));
+            await session.SendAsync(new Game.QueueStatusEvent(1, 0));
+            await session.SendAsync(new Game.QueueStatusEvent(0, 0));
+            // Project only when the complete nested character/look data survives.
+            await GameEntryMessages.SendAsync(session, Push(Op.Kvi, BuildCharactersList(characters)));
+            await GiftService.Live.SendAsync(session);
+        }
 
         /// <summary>
-        /// Identifier of the content catalogue the client asks for afterwards. It is an opaque
-        /// value copied from the capture: the client only compares it against itself.
+        /// Elapsed subscribed seconds are not stored by the account backend.
+        /// Zero is the explicit default, not a calculation from subscription expiry.
         /// </summary>
-        private const int CatalogMark = 304672615;
+        private const long SubscriptionElapsedSeconds = 0;
 
         /// <summary>
         /// List of features enabled on the server. Copied verbatim from the capture, with no
@@ -194,13 +224,13 @@ namespace Jondo.Unity.Server.Network
         /// So f5 comes and goes for one account between sessions and says nothing about what the
         /// account may do. Sending it was copying a value nobody had decoded.
         /// </remarks>
-        private static byte[] BuildHoy()
+        private static byte[] BuildHoy(string? language = null)
         {
             return Pb.New()
                 .Var(1, 30)
                 .Var(2, 1)
                 .Var(3, 1)
-                .Str(6, ClientLanguage)
+                .Str(6, language ?? SessionContext.Actual?.State.Language ?? ClientLanguage)
                 .Var(7, 200)
                 .Build();
         }
@@ -253,32 +283,18 @@ namespace Jondo.Unity.Server.Network
                    .ToList();
 
         /// <summary>
-        /// The character block shared by the character list and the selection reply.
+        /// The character-list details block. Selection constructs semantic records directly.
         ///
         ///   f2: name, f3: level, f4 { f2: sex, f6: look, f7: breed }
         ///
-        /// When <paramref name="withDates"/> is set the two dates the selection reply carries are
-        /// added: f4.f1 is when the character was created and f4.f4 is the server's timestamp.
         /// </summary>
-        private static Pb BuildCharacterDetails(DatabaseManager.DbCharacter character, bool withDates = false)
+        private static Pb BuildCharacterDetails(DatabaseManager.DbCharacter character)
         {
             var traits = Pb.New();
-
-            if (withDates)
-            {
-                traits.Str(1, string.IsNullOrEmpty(character.LastConnection)
-                    ? DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-                    : character.LastConnection);
-            }
 
             // The sex block is always there: empty for sex 0, carrying f3 for sex 1.
             if (character.Sex != 0) traits.Msg(2, Pb.New().Var(3, character.Sex));
             else traits.EmptyMsg(2);
-
-            if (withDates)
-            {
-                traits.Str(4, DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ"));
-            }
 
             // With the id, so that on the selection screen he comes out mounted if he is. Without it the
             // mount was only known for the character already playing.
@@ -289,26 +305,6 @@ namespace Jondo.Unity.Server.Network
                 .Str(2, character.Name)
                 .VarIfNotZero(3, character.Level)
                 .Msg(4, traits);
-        }
-
-        /// <summary>
-        /// Reply to the character selection (kva). Without it the client stays on the character
-        /// screen with the hourglass up: it is the message that tells it which character it is
-        /// now playing.
-        ///
-        ///   f1 { f1 { f1: details, f2: characterId } }
-        ///
-        /// Two wrappers deeper than the character list, and the details carry the two dates.
-        /// Taken from the world-entry capture.
-        /// </summary>
-        public static byte[] BuildCharacterSelectedSuccess(DatabaseManager.DbCharacter character)
-        {
-            return Pb.New()
-                .Msg(1, Pb.New()
-                    .Msg(1, Pb.New()
-                        .Msg(1, BuildCharacterDetails(character, withDates: true))
-                        .Var(2, character.Id)))
-                .Build();
         }
 
         // ─── World: characteristics ─────────────────────────────────────────────
@@ -948,24 +944,20 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>The same, with Hardcore (the server's settings) putting every monster at twice its size.</summary>
         internal static Pb MonsterLook(string look, bool hardcore)
+            => BreedLookTable.WriteLook(SemanticMonsterLook(look, hardcore));
+
+        internal static Jondo.Unity.Protocol.Game.EntityLook SemanticMonsterLook(string look, bool hardcore)
         {
             var variants = string.IsNullOrEmpty(look) ? null : Managers.Npcs.Variantes(look);
             if (variants == null || variants.Count == 0)
             {
-                var bare = Pb.New().Var(2, LookKind).VarIfNotZero(3, BonesOf(look));
-                if (hardcore) bare.Packed(5, new long[] { ServerSettings.HardcoreScale });
-                return bare;
+                return new([], LookKind, checked((int)BonesOf(look)), hardcore ? [ServerSettings.HardcoreScale] : [], [], []);
             }
 
             var first = variants[0];
-            var pb = Pb.New();
-            if (first.Colors.Length > 0) pb.Packed(1, first.Colors);
-            pb.Var(2, LookKind);
-            pb.VarIfNotZero(3, first.Bones);
-            if (hardcore) pb.Packed(5, new long[] { ServerSettings.HardcoreScale });
-            else if (first.Scales.Length > 0) pb.Packed(5, first.Scales);
-            if (first.Skins.Length > 0) pb.Packed(6, first.Skins);
-            return pb;
+            return new(first.Colors.Select(value => checked((int)value)).ToArray(), LookKind, checked((int)first.Bones),
+                hardcore ? [ServerSettings.HardcoreScale] : first.Scales.Select(value => checked((int)value)).ToArray(),
+                first.Skins.Select(value => checked((int)value)).ToArray(), []);
         }
 
         /// <summary>
@@ -1546,130 +1538,6 @@ namespace Jondo.Unity.Server.Network
 
         // ─── World: spells ──────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Where the spell comes from: 1 the class ones, 2 the ones that are not —melee,
-        /// item ones, mount ones, the special ones a scroll teaches—.
-        /// </summary>
-        private const int OrigenQueNoEsDeClase = 2;
-
-        /// <summary>
-        /// Melee is SPELL ZERO, and it does not have to be invented: it is in the base as
-        /// <c>SpellTemplates.Id 0</c>, with name 64658 —"Puñetazo"— and a single grade,
-        /// <c>SpellLevels.Id 10461</c>, of 3 AP and range 1.
-        ///
-        /// The real server sends it as one more entry of the spell list, with the number
-        /// omitted —proto3 does not write zeros— and the origin at 2: the bytes are <c>08 01 20 02</c>.
-        /// It is in the nine captures that bring an hms, from the tutorial's level 1 character
-        /// to the level 200 one. Without it the client has no token to put in the weapon
-        /// slot: out of combat it does not draw it, and in combat it draws it but with nothing to cast
-        /// —hence it came out greyed and with the item text unresolved, with the rows
-        /// "[QUANTITÉ EN INVENTAIRE]" and "[Valeurs théoriques]"—.
-        /// </summary>
-        private const int GradoDelCuerpoACuerpo = 1;
-
-        /// <summary>
-        /// The spells the character has (hms), each at the grade its level has opened.
-        ///
-        ///   f1 (repeated) { f1: grade, f3: spell id, f4: 1 }
-        ///
-        /// The captured one belongs to a level 154 Sacrieur, which is why a level 50 Cra was
-        /// holding somebody else's spells. Both the list and the grades come from the client's own
-        /// data through <see cref="SpellTable"/>; only the breed and the level are ours.
-        /// </summary>
-        public static byte[] BuildSpellList(int breed, int level, long accountId = 0)
-        {
-            var hms = Pb.New();
-
-            hms.Msg(1, Pb.New().Var(1, GradoDelCuerpoACuerpo).Var(4, OrigenQueNoEsDeClase));
-
-            // The class's with origin 1, and the special ones learnt from scrolls with the 2 of the
-            // melee: the level 200 of the captures carries his ten that way, after his 22.
-            var learned = Managers.LearnedSpells.For(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, accountId);
-            foreach (var spell in SpellTable.KnownFor(breed, level, Managers.SpellChoices.Chosen, learned))
-            {
-                hms.Msg(1, Pb.New().Var(1, spell.Grade).Var(3, spell.SpellId)
-                                   .Var(4, spell.Special ? OrigenQueNoEsDeClase : 1));
-            }
-
-            // And the administration ones, which go after and only for whoever is one. The role is checked
-            // against the base each time: taking it away from someone takes effect as soon as he comes back
-            // in, with nothing stored in the session going stale.
-            if (Managers.AdminSpells.Para(accountId))
-            {
-                foreach (var (spell, grade) in Managers.AdminSpells.Granted)
-                    hms.Msg(1, Pb.New().Var(1, grade).Var(3, spell).Var(4, 1));
-            }
-
-            // And a mutation's, after his own: f3 { f1 grade, f3 spell, f4 6 } (Mutations).
-            if (Managers.Mutations.Current() is { } mutation)
-            {
-                foreach (var (spell, grade) in Managers.Mutations.SpellsOf(mutation))
-                    hms.Msg(3, Pb.New().Var(1, grade).Var(3, spell).Var(4, Managers.Mutations.SpellOrigin));
-            }
-
-            // The loose f2 at the end, which is the same kind of oversight the spell bar
-            // had with its itg: it goes after the list, looks like one more slot and without it is zero.
-            //
-            // It is in the NINE captures that bring an hms, from the tutorial's level 1
-            // character to the level 200 one, and it did not come out in any of the 138 this
-            // emulator has sent. What it is suspected to switch off is the damage preview: the client
-            // carries inside a switch called isDamagePreviewEnabled, and the game's own help
-            // text describes in a single sentence the two halves that were missing —the estimated
-            // damage and the displacement—. It is not proven that this is the switch; what
-            // is measured is that the real server always sends it and we never did.
-            return hms.Var(2, 1).Build();
-        }
-
-        /// <summary>
-        /// The shortcut bar (itg). The real server sends two of them, one for the spells and one
-        /// for the items; this is the spell one.
-        ///
-        ///   f1 (repeated) { f2: slot, f6 { f2: spell id } }
-        ///   f2: 1        ← WHICH BAR IT IS
-        ///
-        /// That f2 at the end is what had the bar empty. It goes loose at the end of the list and is not
-        /// seen reading the tree at a glance, because it looks like one more slot; it is the bar type, and without
-        /// it it is zero, which is the item one. The client received thirty-four spells
-        /// declared as shortcuts of the item bar and drew them in neither of the two.
-        /// The item one, which really is type zero, does not carry it.
-        ///
-        /// The slot is left out when it is zero, as proto3 does everywhere else. The client edits
-        /// a slot with itz —f2 the shortcut, f3 the bar— and the server echoes it in ivk.
-        /// </summary>
-        public static byte[] BuildSpellBar(int breed, int level, long accountId = 0)
-        {
-            // A mutated character's bar is the monster's spells alone, slot by slot from 0 (Mutations).
-            if (Managers.Mutations.Current() is { } mutation)
-            {
-                var bar = Pb.New();
-                int slot = 0;
-                foreach (var (spell, _) in Managers.Mutations.SpellsOf(mutation))
-                    bar.Msg(1, Pb.New().VarIfNotZero(2, slot++).Msg(6, Pb.New().Var(2, spell)));
-                return bar.Var(2, SpellBar).Build();
-            }
-
-            var layout = Managers.FightSpellLayout.Current(breed, level, accountId);
-
-            var remembered = new List<(int Slot, int SpellId)>();
-            foreach (var (slot, spell) in layout.Bar)
-            {
-                if (spell != Network.FightProtocol.HechizoCuerpoACuerpo)
-                    remembered.Add((slot, spell));
-            }
-            Managers.SpellChoices.RememberBar(remembered);
-
-            var itg = Pb.New();
-            foreach (var (slot, spell) in layout.Bar)
-            {
-                var shortcut = Pb.New().VarIfNotZero(2, slot);
-                if (spell == Network.FightProtocol.HechizoCuerpoACuerpo) shortcut.EmptyMsg(6);
-                else shortcut.Msg(6, Pb.New().Var(2, spell));
-                itg.Msg(1, shortcut);
-            }
-
-            return itg.Var(2, SpellBar).Build();
-        }
-
         /// <summary>Which bar it is: 0 the item one, 1 the spell one.</summary>
         public const int SpellBar = 1;
 
@@ -1941,9 +1809,10 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildDraftOutfit(DatabaseManager.DbCharacter character, string draftId)
             => Pb.New().Bytes(1, AppearanceBody(character, draftId)).Build();
 
-        /// <summary>The aura worn (lym { f1: aura }); empty for none.</summary>
+        /// <summary>Type-only aura notification; its former tag-1 value is no longer emitted.</summary>
         public static byte[] BuildAura(int aura)
-            => aura == 0 ? Array.Empty<byte>() : Pb.New().Var(1, aura).Build();
+            // Unused by project policy; see docs/populated-unmapped-fields.md#after-selection-omission-policy.
+            => Array.Empty<byte>();
 
         /// <summary>The worn outfit as the window drafts it, under the draft's own uuid.</summary>
         private static byte[] AppearanceBody(DatabaseManager.DbCharacter character, string draftId)
@@ -2417,50 +2286,6 @@ namespace Jondo.Unity.Server.Network
             return lqn.Build();
         }
 
-        /// <summary>
-        /// The last connection notice, with its date and the address it was made from.
-        ///
-        /// The client has two templates and the difference is the IP:
-        ///
-        ///   193  «Última conexión a esta cuenta realizada el {2}/{1}/{0} a las {3}:{4}»
-        ///   152  the same «… mediante la dirección IP {5}»
-        ///
-        /// The parameters go in the order year, month, day, hour, minute and address — the template's
-        /// order is not the reading order, and the recorded block confirms it: it sends 193 with
-        /// ["2026","08","09","18","53"] and the client draws «09/08/2026 a las 18:53».
-        ///
-        /// Without an IP 193 is sent, which is exactly what the real server does when it does not
-        /// have it: showing an empty address looks worse than not showing it.
-        /// </summary>
-        public static byte[] BuildLastConnection(DateTimeOffset when, string ip)
-        {
-            string[] cuando =
-            {
-                when.Year.ToString("D4"),
-                when.Month.ToString("D2"),
-                when.Day.ToString("D2"),
-                when.Hour.ToString("D2"),
-                when.Minute.ToString("D2"),
-            };
-
-            if (string.IsNullOrWhiteSpace(ip))
-                return BuildSystemMessage(LastConnectionMessage, cuando);
-
-            var conIp = new string[6];
-            Array.Copy(cuando, conIp, 5);
-            conIp[5] = ip;
-            return BuildSystemMessage(LastConnectionWithIpMessage, conIp);
-        }
-
-        /// <summary>«Última conexión… a las {3}:{4}», without an address.</summary>
-        public const int LastConnectionMessage = 193;
-
-        /// <summary>The same, «… mediante la dirección IP {5}».</summary>
-        public const int LastConnectionWithIpMessage = 152;
-
-        /// <summary>«Tienes {0} contacto(s) recíproco(s) conectado(s)», on entering the world.</summary>
-        public const int MutualFriendsPlayingMessage = 197;
-
         /// <summary>The "you have received kamas" message, with the figure as a parameter.</summary>
         public const int KamasReceivedMessage = 45;
 
@@ -2538,25 +2363,6 @@ namespace Jondo.Unity.Server.Network
                 .Build());
 
         /// <summary>
-        /// The zaaps the character has DISCOVERED (hjk), in a packed list.
-        ///
-        /// This is not «which maps you have seen»: it is the only reason the client shows anything
-        /// in the travel window. The real server sends this whole list on entering the world
-        /// —182 bytes with 45 maps, and all 45 are activated zaaps— and then a single one each time
-        /// a new zaap is stepped on. Without it the client considers none discovered and the window
-        /// comes out with «Ningún destino» however many destinations the hjj brings.
-        ///
-        /// The emulator does not store discoveries per character —here one has them all— so the
-        /// list is always the same: all the activated zaaps for which it is also known where
-        /// their element is, which are the ones that can be left from.
-        /// </summary>
-        public static byte[] BuildDiscoveredZaaps(IEnumerable<long> mapIds)
-            => Pb.New().Packed(1, mapIds).Build();
-
-        public static byte[] BuildMapDiscovered(long mapId)
-            => Push(Op.Hjk, BuildDiscoveredZaaps(new long[] { mapId }));
-
-        /// <summary>
         /// Movement along a map (jsj), which is what the server sends back to a jrw.
         ///
         ///   f1: the cells walked, packed
@@ -2573,36 +2379,6 @@ namespace Jondo.Unity.Server.Network
         // ─── World: inventory ───────────────────────────────────────────────────
 
         /// <summary>
-        /// The inventory (ivx), built from the database instead of replayed from the capture.
-        ///
-        ///   f3 (repeated) { f1: slot,
-        ///                   f5 { f1: template, f2 (repeated) { &lt;valor&gt;, f11: effect },
-        ///                        f3: how many, f4: uid } }
-        ///
-        /// The slot is left out when it is zero, as proto3 does everywhere: zero is the amulet.
-        /// </summary>
-        public static byte[] BuildInventory()
-        {
-            // f1 is the kamas: every ivx of every capture carries them there, 66,381,547 on the way
-            // into the world, 61,898,327 when the oven opens. Without them a refresh of the bag
-            // reads as a character with none.
-            var ivx = Pb.New().VarIfNotZero(1, SessionContext.State.Kamas);
-            foreach (var item in Managers.Equipment.All)
-            {
-                var body = Pb.New().Var(1, item.Template);
-                foreach (var effect in item.Effects)
-                {
-                    var entry = EffectEntry(effect);
-                    if (entry != null) body.Msg(2, entry);
-                }
-                body.Var(3, Math.Max(1, item.Quantity)).Var(4, item.Uid);
-
-                ivx.Msg(3, Pb.New().VarIfNotZero(1, item.Position).Msg(5, body));
-            }
-            return ivx.Build();
-        }
-
-        /// <summary>
         /// An effect entry: the id in f11 and the value in whichever field it belongs.
         ///
         /// The field is not just any slot, it is the one saying what type the effect is. f4 carries a
@@ -2612,57 +2388,7 @@ namespace Jondo.Unity.Server.Network
         /// and the dofus with "{spellNoLvl,,}" instead of the spell's name.
         /// </summary>
         internal static Pb? EffectEntry(Managers.Equipment.ItemEffect effect)
-        {
-            // The smithmagic pool and any other line of ours that is no effect of the client's:
-            // it lives with the item and never goes on the wire.
-            if (effect.Effect <= 0) return null;
-
-            // The ones that are not a number go with their text in f1: 988 is "Fabricado por: #4" and the
-            // #4 is this string. Without text they do not go, because the label would come out empty.
-            if (!string.IsNullOrEmpty(effect.Text))
-            {
-                return Pb.New().Str(1, effect.Text).Var(11, effect.Effect);
-            }
-
-            var (field, v1, v2, v3) = Managers.EffectFields.Shape(
-                effect.Effect, effect.Value, effect.DiceNum, effect.DiceSide);
-            if (field == Managers.EffectFields.Skip) return null;
-
-            var entry = Pb.New();
-            switch (field)
-            {
-                case Managers.EffectFields.AsNumber:
-                    // Written even at zero: "Ninguna forjamagia futura" (2825) travels as
-                    // 20 00 58 89 16 on the captured shield, its f4 there and empty.
-                    entry.Var(4, v1);
-                    break;
-                case Managers.EffectFields.AsRange:
-                    entry.Msg(5, Pb.New().VarIfNotZero(1, v1).VarIfNotZero(2, v2));
-                    break;
-                case Managers.EffectFields.AsDice:
-                    entry.Msg(6, Pb.New().VarIfNotZero(1, v1).VarIfNotZero(2, v2).VarIfNotZero(3, v3));
-                    break;
-                case Managers.EffectFields.AsDate:
-                    entry.Msg(2, EffectDate(v1));
-                    break;
-            }
-            return entry.Var(11, effect.Effect);
-        }
-
-        /// <summary>
-        /// A date as an item's effect carries it, on Paris's clock and the Twelve's calendar:
-        /// f1 the day, f2 the year less 1370, f3 the month, f4 the minute, f5 the hour. Measured on
-        /// an item received at 00:15 on 13 August 2026 in Paris: { f1: 13, f2: 656, f3: 8, f4: 15 }.
-        /// </summary>
-        internal static Pb EffectDate(long seconds)
-        {
-            var paris = Managers.OsavoraSeasons.InParis(DateTimeOffset.FromUnixTimeSeconds(seconds));
-            return Pb.New().VarIfNotZero(1, paris.Day).VarIfNotZero(2, paris.Year - TwelveYearOffset)
-                     .VarIfNotZero(3, paris.Month).VarIfNotZero(4, paris.Minute).VarIfNotZero(5, paris.Hour);
-        }
-
-        /// <summary>The Twelve's calendar runs 1370 years behind ours: 2026 is its 656.</summary>
-        private const int TwelveYearOffset = 1370;
+            => ItemEffectMessages.FromCatalogue.Effect(effect) is { } entry ? ItemEffectMessages.Write(entry) : null;
 
         // ─── World: titles and ornaments ────────────────────────────────────────
 
@@ -2679,16 +2405,17 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Packed(1, titles).Packed(2, ornaments).Build();
 
         /// <summary>
-        /// The title worn (hid) and the ornament worn (hif). With nothing equipped the message goes
-        /// EMPTY —not with a zero inside—, which is how the real server says "none".
+        /// The title worn (hid). With nothing equipped the message goes EMPTY —not with a zero
+        /// inside—, which is how the real server says "none". The separate ornament notification
+        /// omits its unused scalar under the policy linked below.
         /// </summary>
         public static byte[] BuildTitleUpdated(int titleId)
             => titleId == Managers.Wardrobe.None ? Array.Empty<byte>()
                                                  : Pb.New().Var(1, titleId).Build();
 
         public static byte[] BuildOrnamentUpdated(int ornamentId)
-            => ornamentId == Managers.Wardrobe.None ? Array.Empty<byte>()
-                                                    : Pb.New().Var(1, ornamentId).Build();
+            // Unused by project policy; see docs/populated-unmapped-fields.md#after-selection-omission-policy.
+            => Array.Empty<byte>();
 
         /// <summary>
         /// The character's "options" within the actor block: the title and the ornament.

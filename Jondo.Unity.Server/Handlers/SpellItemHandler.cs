@@ -61,7 +61,7 @@ namespace Jondo.Unity.Server.Handlers
             LearnedSpells.Learn(me.CharacterId, spell);
             SpellChoices.PlaceLearned(me.Breed, me.CharacterLevel, spell);
 
-            await SpellHandler.SendSpellsAndBarAsync(stream);
+            await SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                 ConnectionProtocol.BuildSystemMessage(InfoMessages.SpellLearned, spell.ToString())));
             await ItemUseHandler.WeighAsync(stream);

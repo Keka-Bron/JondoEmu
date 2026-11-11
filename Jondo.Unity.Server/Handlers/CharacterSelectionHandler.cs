@@ -268,6 +268,15 @@ namespace Jondo.Unity.Server.Handlers
             return true;
         }
 
+        internal static bool SelectCharacterOnServer(long characterId, GameSession session)
+        {
+            if (!session.IsAuthenticated) return false;
+            var character = DatabaseManager.GetCharacterById(characterId);
+            return character != null && character.AccountId == session.AccountId
+                && character.ServerId == session.ServerId
+                && SelectCharacter(characterId, session.AccountId);
+        }
+
         /// <summary>Reads the two selection layouts without mistaking kvl's success flag for id 1.</summary>
         internal static long ReadSelectedCharacterId(byte[] framePayload)
         {

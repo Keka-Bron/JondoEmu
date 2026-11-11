@@ -165,7 +165,7 @@ namespace Jondo.Unity.Server.Network
             // The X closes whatever is open, as the client's kla does (GameNodeProxy): a workshop too,
             // whose closing is what marks a quest's «Fabricar … y cerrar la interfaz».
             var lines = RunInSession(session, stream => WorkshopHandler.IsOpen
-                ? WorkshopHandler.CloseAsync(stream)
+                ? WorkshopHandler.CloseAsync(session)
                 : NpcHandler.CloseAsync(stream));
             return Bien(DialogueNow(session, lines));
         }

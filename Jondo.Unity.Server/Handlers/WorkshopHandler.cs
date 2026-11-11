@@ -126,8 +126,9 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── Open and close ─────────────────────────────────────────────────────────────────
 
-        public static async Task OpenAsync(NetworkStream stream, int elementId, int skillId)
+        public static async Task OpenAsync(GameSession session, int elementId, int skillId)
         {
+            using var context = SessionContext.Push(session);
             if (SessionContext.State.Commission != null)
             {
                 Console.WriteLine($"[Workshop] {SessionContext.State.CharacterId} is in a commission; element {elementId} not opened.");
@@ -136,16 +137,17 @@ namespace Jondo.Unity.Server.Handlers
 
             if (skillId == Workshops.BookSkill)
             {
-                await ArtisanHandler.OpenBookAsync(stream, elementId, skillId);
+                await ArtisanHandler.OpenBookAsync(
+                    session.Stream ?? throw new InvalidOperationException("The artisan book requires a connected session."), elementId, skillId);
                 return;
             }
 
             if (skillId == Breaking.Skill)
             {
                 SessionContext.State.Workshop = new Bench { ElementId = elementId, SkillId = skillId, Breaker = true };
-                await SendAsync(stream, Op.Iwn, ConnectionProtocol.BuildElementInUse(
+                await SendAsync(session, Op.Iwn, ConnectionProtocol.BuildElementInUse(
                     elementId, skillId, SessionContext.State.CharacterId));
-                await SendAsync(stream, Op.Kbv, Array.Empty<byte>());
+                await SendAsync(session, Op.Kbv, Array.Empty<byte>());
                 Console.WriteLine($"[Workshop] Element {elementId} opened to break items.");
                 return;
             }
@@ -166,35 +168,38 @@ namespace Jondo.Unity.Server.Handlers
             // A conversation still up is over first. Natacha Manka's «Ahora, utiliza mi material» has
             // no reply, and her workshop is clicked with the bubble still open: the client then shut
             // the bubble for the bench with a kla, and the kla shut the bench it was not meant for.
-            if (NpcHandler.IsDialogueOpen) await NpcHandler.CloseAsync(stream);
+            if (NpcHandler.IsDialogueOpen && session.Stream is { } open) await NpcHandler.CloseAsync(open);
 
             SessionContext.State.Workshop = new Bench { ElementId = elementId, SkillId = skillId, Magus = skill.IsForgemagus, Wraps = wraps };
 
-            await SendAsync(stream, Op.Iwn, ConnectionProtocol.BuildElementInUse(
+            await SendAsync(session, Op.Iwn, ConnectionProtocol.BuildElementInUse(
                 elementId, skillId, SessionContext.State.CharacterId));
-            await SendAsync(stream, Op.Ivx, ConnectionProtocol.BuildInventory());
-            await SendAsync(stream, Op.Hlm, Array.Empty<byte>());
-            await SendAsync(stream, Op.Kgq, WorkshopProtocol.BuildOpened(skillId));
+            await InventoryMessages.FromCatalogue.SendAsync(session);
+            await SendAsync(session, Op.Hlm, Array.Empty<byte>());
+            await SendAsync(session, Op.Kgq, WorkshopProtocol.BuildOpened(skillId));
 
             Console.WriteLine($"[Workshop] Element {elementId} opened with skill {skillId} " +
                               (skill.IsForgemagus ? "(magus table)." : wraps ? "(gift wrapping)." : $"({RecipeManager.ForSkill(skillId).Count} recipes)."));
         }
 
-        public static async Task CloseAsync(NetworkStream stream)
+        public static async Task CloseAsync(GameSession session)
         {
+            using var context = SessionContext.Push(session);
             var bench = SessionContext.State.Workshop;
             SessionContext.State.Workshop = null;
             SessionContext.State.DirectoryJob = 0;
-            await SendAsync(stream, Op.Khd, ConnectionProtocol.BuildShopClosed());
-            if (bench?.Recycle != null) await RecycleHandler.ClosingAsync(stream, bench);
+            await SendAsync(session, Op.Khd, ConnectionProtocol.BuildShopClosed());
+            if (bench?.Recycle != null) await RecycleHandler.ClosingAsync(
+                session.Stream ?? throw new InvalidOperationException("Recycling requires a connected session."), bench);
             if (bench?.Breaker == true || bench?.Book == true || bench?.Recycle != null) return;   // the grinder's close, the book's and the recycling's is the khd alone
-            await SendAsync(stream, Op.Ivx, ConnectionProtocol.BuildInventory());
-            await SendAsync(stream, Op.Hlm, Array.Empty<byte>());
+            await InventoryMessages.FromCatalogue.SendAsync(session);
+            await SendAsync(session, Op.Hlm, Array.Empty<byte>());
 
             // «Fabricar #2 #1 y cerrar la interfaz»: the tutorial's ring (9662, 19254), validated
             // in the capture once the bench is closed.
             if (bench != null && bench.Made.Count > 0)
-                await Managers.Quests.OnCraftedAsync(stream, bench.Made);
+                await Managers.Quests.OnCraftedAsync(
+                    session.Stream ?? throw new InvalidOperationException("Craft quest updates require a connected session."), bench.Made);
         }
 
         /// <summary>Nothing open survives a map change; a commission or a trade ends for both.</summary>
@@ -208,10 +213,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>itr: the client wants its inventory again. ivx and an empty hlm, twelve of twelve.</summary>
-        public static async Task InventoryAsync(NetworkStream stream)
+        public static async Task InventoryAsync(GameSession session)
         {
-            await SendAsync(stream, Op.Ivx, ConnectionProtocol.BuildInventory());
-            await SendAsync(stream, Op.Hlm, Array.Empty<byte>());
+            await InventoryMessages.FromCatalogue.SendAsync(session);
+            await SendAsync(session, Op.Hlm, Array.Empty<byte>());
         }
 
         // ─── The craft bench ────────────────────────────────────────────────────────────────
@@ -945,10 +950,8 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>isz: the job's new level and all of its skills, the way the tutorial's ring sends it.</summary>
         public static Task SendLevelUpAsync(NetworkStream stream, int jobId, int level)
         {
-            var skills = SkillManager.ForJob(jobId).Select(s => s.IsGathering
-                ? (s.Id, true, 1, level >= s.LevelMin ? GatheringHandler.Ceiling(level, s.LevelMin) : 1)
-                : (s.Id, false, 0, 0));
-            return SendAsync(stream, Op.Isz, WorkshopProtocol.BuildJobLevelUp(jobId, level, skills));
+            var description = ProfessionMessages.Description(jobId, level, SkillManager.ForJob(jobId));
+            return SendAsync(stream, Op.Isz, WorkshopProtocol.BuildJobLevelUp(level, description));
         }
 
         /// <summary>

@@ -107,5 +107,34 @@ namespace Jondo.Unity.Tests.Sessions
                 Forget();
             }
         }
+
+        [Fact]
+        public void Failed_emote_writes_propagate_instead_of_reporting_success()
+        {
+            if (!Available) return;
+            DatabaseManager.EnsureProgressionTables();
+            using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+            connection.Open();
+            try
+            {
+                using (var create = connection.CreateCommand())
+                {
+                    // Only this invented character is affected; unrelated progression can run normally.
+                    create.CommandText = @"
+                        CREATE TRIGGER JondoTestEmoteWriteFailure BEFORE INSERT ON CharacterEmotes
+                        WHEN NEW.CharacterId = -910003
+                        BEGIN SELECT RAISE(ABORT, 'test emote persistence failure'); END;";
+                    create.ExecuteNonQuery();
+                }
+                Assert.Throws<SqliteException>(() => DatabaseManager.SaveEmote(-910_003, 81_001));
+                Assert.Empty(DatabaseManager.LoadEmotes(-910_003));
+            }
+            finally
+            {
+                using var drop = connection.CreateCommand();
+                drop.CommandText = "DROP TRIGGER IF EXISTS JondoTestEmoteWriteFailure;";
+                drop.ExecuteNonQuery();
+            }
+        }
     }
 }

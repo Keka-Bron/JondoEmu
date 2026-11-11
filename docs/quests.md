@@ -229,11 +229,12 @@ lost in an ugly shutdown — and losing an afternoon's quest is worse than losin
 
 ## 6. Someone else's journal
 
-The block the server replays on entering the world carried **261 `idu` frames**: the whole quest
+The block the server formerly replayed on entering the world carried **261 `idu` frames**: the whole quest
 journal of the captured account. Everyone who entered saw a stranger's
 quests, and since there has been an engine they also contradicted what the server believes.
 
-`idu` is now in `WorldEntry.NotReplayed`, and in its place goes the journal of the character connecting.
+The replay and its skip list are gone. `Quests.SendJournalAsync` sends the journal
+of the character connecting from that character's own stored state.
 
 ---
 

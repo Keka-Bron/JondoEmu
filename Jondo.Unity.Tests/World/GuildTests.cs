@@ -73,10 +73,14 @@ namespace Jondo.Unity.Tests.World
         /// 50 experience level 2 starts at and the only member there is.
         /// </summary>
         [Fact]
-        public void The_guild_header_is_the_capture()
+        public void The_guild_header_uses_the_founding_date_level_and_member_count()
         {
-            Assert.Equal("0a1e323032362d30382d31325432303a35333a30322e3138373531353334325a180148325001",
-                         Hex(GuildProtocol.BuildGuildInfo(Jondo(), memberCount: 1)));
+            var header = GuildStateMessages.Header(Jondo(), memberCount: 1, hallId: null);
+            Assert.Equal("2026-08-12T20:53:02.187515342Z", header.CreationDate);
+            Assert.Equal(1, header.Level);
+            Assert.Equal(1, header.MembersCount);
+            Assert.Equal(50, header.ExpLevelNextFloor);
+            Assert.Null(header.HallId);
         }
 
         /// <summary>
@@ -87,8 +91,9 @@ namespace Jondo.Unity.Tests.World
         {
             var guild = Jondo();
             guild.GuildKamas = 10;
-            Assert.Equal("0a1e323032362d30382d31325432303a35333a30322e3138373531353334325a1801380a48325002",
-                         Hex(GuildProtocol.BuildGuildInfo(guild, memberCount: 2)));
+            var header = GuildStateMessages.Header(guild, memberCount: 2, hallId: null);
+            Assert.Equal(10, header.GuildKamas);
+            Assert.Equal(2, header.MembersCount);
         }
 
         /// <summary>
@@ -101,12 +106,11 @@ namespace Jondo.Unity.Tests.World
             var guild = Jondo();
             guild.Level = 4;
             guild.Experience = 181;
-            var fields = ProtoMessage.Parse(GuildProtocol.BuildGuildInfo(guild, memberCount: 16)).Fields
-                                     .ToDictionary(f => f.FieldNumber, f => f.VarIntValue);
-            Assert.Equal(150, fields[5]);
-            Assert.Equal(181, fields[6]);
-            Assert.Equal(210, fields[9]);
-            Assert.False(fields.ContainsKey(7));
+            var header = GuildStateMessages.Header(guild, memberCount: 16, hallId: null);
+            Assert.Equal(150, header.ExpLevelFloor);
+            Assert.Equal(181, header.Experience);
+            Assert.Equal(210, header.ExpLevelNextFloor);
+            Assert.Equal(0, header.GuildKamas);
         }
 
         /// <summary>The guild levels' curve, where the captures meet it and at its ends.</summary>
@@ -124,16 +128,19 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(1890, GuildLevels.NextFloorOf(20));
         }
 
-        /// <summary>The four default ranks (jco), the whole mould of a new guild.</summary>
+        /// <summary>The four default ranks, the server's founding policy.</summary>
         [Fact]
-        public void The_default_ranks_are_the_capture()
+        public void The_default_ranks_keep_the_founding_policy()
         {
-            Assert.Equal("123912116775696c642e72616e6b2e312e6e616d651a1e1a1c0102050607080d0e0f1718191a1d1e1f" +
-                         "202122232425262728292a2b220210742801123212116775696c642e72616e6b2e322e6e616d65" +
-                         "1a1508011a11010205062607270828290d0e0f1718191a2204107318012802121f12116775696c" +
-                         "642e72616e6b2e332e6e616d651a0208012204107218022803121d12116775696c642e72616e6b" +
-                         "2e342e6e616d651a002204107518032804",
-                         Hex(GuildProtocol.BuildDefaultRanks()));
+            var ranks = GuildRankMessages.Snapshot(GuildStore.DefaultRanks(0)).Ranks;
+            Assert.Equal(new[] { 1, 2, 3, 4 }, ranks.Select(rank => rank.Id));
+            Assert.Equal(new[] { 116, 115, 114, 117 }, ranks.Select(rank => rank.OrderAndGfx!.GfxId));
+            Assert.Equal(new[] { 0, 1, 2, 3 }, ranks.Select(rank => rank.OrderAndGfx!.Order));
+            Assert.Equal(new[] { false, true, true, false }, ranks.Select(rank => rank.PrivateInformation!.Modifiable));
+            Assert.Equal(new[] { "guild.rank.1.name", "guild.rank.2.name", "guild.rank.3.name", "guild.rank.4.name" },
+                ranks.Select(rank => rank.Name));
+            Assert.Empty(ranks[2].PrivateInformation!.Rights);
+            Assert.Empty(ranks[3].PrivateInformation!.Rights);
         }
 
         /// <summary>

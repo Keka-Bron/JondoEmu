@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
@@ -41,19 +39,6 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(5, accountId)
                 .StrIfNotEmpty(6, animation)
                 .Build();
-
-        /// <summary>The character's emotes (khn): f1, packed.</summary>
-        public static byte[] BuildList(IEnumerable<int> emotes)
-        {
-            var ids = new List<long>();
-            foreach (int id in emotes) ids.Add(id);
-            return Pb.New().Packed(1, ids).Build();
-        }
-
-        /// <summary>
-        /// One emote learned (khi): f1 the emote, as the guild founding capture sends it for 97.
-        /// </summary>
-        public static byte[] BuildLearned(int emoteId) => Pb.New().Var(1, emoteId).Build();
 
         /// <summary>A smiley over somebody's head (hoc), to everybody on the map.</summary>
         public static byte[] BuildSmiley(long characterId, long accountId, int smileyId)

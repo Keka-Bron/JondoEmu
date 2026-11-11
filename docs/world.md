@@ -724,7 +724,9 @@ two of them.
 
 ### 4.4 Inventory and equipment
 
-The inventory travels as `ivx`, built from `CharacterItems` (`ConnectionProtocol.BuildInventory`):
+The inventory travels as `InventoryContentEvent` (`ivx`), constructed by
+`InventoryMessages.Snapshot` from the owning session's kamas and equipment cache loaded
+from `CharacterItems`:
 
 ```
 ivx: f3 (repeated) { f1: slot,
@@ -773,12 +775,13 @@ limit is not applied.
 
 ### 4.6 What entering the world actually does
 
-Worth knowing before reading anything above too literally: the world entry is **replayed from a real
-capture** (`Network/WorldEntry.cs`, `content/world/entry.json`), in three blocks the client
-acknowledges one at a time. What is rebuilt from the database is the identity — `kva`, `kub`
-(the sheet), `hms` (the spells), `ivx` (the inventory), `jru` (the map). Everything else still
-describes the recorded account. Messages that would leak real names are dropped outright, and
-`tools/leak.py` checks that none reach the wire.
+World entry is constructed from **server, account and character state** by
+`Network/WorldEntry.cs` and the `GameEntry*Messages` services. Initial state and
+its HAAPI/gift continuation precede map initialization, which follows sequence
+confirmation with a first-ping fallback. Spells, inventory, both shortcut bars and
+map state come from the selected character and live catalogues. The historical
+capture reconstruction and its loader have been deleted; entry no longer replays
+recorded-account rows. See [the Game protocol](game-protocol.md#initial-character-state).
 
 ---
 

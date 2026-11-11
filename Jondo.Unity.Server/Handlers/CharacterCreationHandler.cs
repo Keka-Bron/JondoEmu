@@ -223,7 +223,7 @@ namespace Jondo.Unity.Server.Handlers
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
 
             foreach (byte[] frame in ConnectionProtocol.CharacterListFrames(characters))
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
+                await GameEntryMessages.SendAsync(stream, frame);
 
             Console.WriteLine($"[Characters] Created {name} (id {id}), breed {breed}, before the " +
                               $"tutorial's statue, {(ServerSettings.Current.StartingAdventurerSet ? "with" : "without")} the " +

@@ -243,7 +243,7 @@ namespace Jondo.Unity.Server.Handlers
             if (credited.Experience > 0)
             {
                 var fresh = GuildStore.ById(guild.Id) ?? guild;
-                await GuildHandler.TellEveryoneAsync(fresh, GuildHandler.HeaderFrame(fresh));
+                await GuildStateService.Live.TellHeaderAsync(fresh);
             }
         }
 

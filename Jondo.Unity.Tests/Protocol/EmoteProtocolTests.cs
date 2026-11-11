@@ -1,6 +1,5 @@
 using System;
 using Jondo.Unity.Server.Network;
-using Jondo.Unity.World.Emotes;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Protocol
@@ -30,20 +29,6 @@ namespace Jondo.Unity.Tests.Protocol
             Assert.Equal(1, EmoteProtocol.ReadPlay(Bytes("0801")));
             Assert.Equal("0881f092cbdd081801" + "28818ece1c" + "320c" + "416e696d456d6f7465536974",
                 Hex(EmoteProtocol.BuildPlayed(300000000001, 1, 60000001, "AnimEmoteSit")));
-        }
-
-        [Fact]
-        public void A_new_character_s_list_is_the_captured_khn()
-        {
-            // Autenticacion-Servidor-Personaje\crear personaje - borrar personaje, frame 57.
-            Assert.Equal("0a040161627f", Hex(EmoteProtocol.BuildList(EmoteRules.Starting)));
-        }
-
-        [Fact]
-        public void An_emote_learned_is_the_captured_khi()
-        {
-            // Gremio\comprar gremialogema-crear gremio: khi {97}, the guild banner, on founding.
-            Assert.Equal("0861", Hex(EmoteProtocol.BuildLearned(97)));
         }
 
         [Fact]

@@ -6,6 +6,7 @@ using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Tests.Economy;
 using Microsoft.Data.Sqlite;
 using Xunit;
@@ -57,7 +58,18 @@ namespace Jondo.Unity.Tests.Sessions
                 CheckLook(At(list, 1, 1, 4, 6));
                 var sexFields = ProtoMessage.Parse(At(list, 1, 1, 4, 2)).Fields;
                 Assert.Equal(sex, sexFields.SingleOrDefault(f => f.FieldNumber == 3)?.VarIntValue ?? 0);
-                CheckLook(At(ConnectionProtocol.BuildCharacterSelectedSuccess(character), 1, 1, 1, 4, 6));
+                var selection = CharacterSelectionMessages.Success(character);
+                var selectedBasic = Assert.IsType<CharacterComplementCaseCharacterBasicInformation>(selection.Value.Character.ComplementCase).Value;
+                var selectedLook = Assert.IsType<CharacterBasicInformationComplementCaseCharacterLook>(selectedBasic.ComplementCase).Value;
+                Assert.Equal(Indexed.Select(value => (int)value), selectedLook.Look.Colors);
+                Assert.Equal(new[] { (int)body, (int)headSkin }, selectedLook.Look.Skins);
+                Assert.Equal(new[] { (int)scale }, selectedLook.Look.Scales);
+                Assert.Equal(sex == 1 ? Gender.Female : Gender.Male,
+                    Assert.IsType<CharacterLookComplementCaseBaseInformation>(selectedLook.ComplementCase).Value.Gender);
+                // Creation/login is not a disconnection boundary. Only the known
+                // current connection date is sent; no fresh timestamp is invented.
+                Assert.Empty(selectedLook.LastDisconnectionDate);
+                Assert.Equal(character.LastConnection, selectedLook.LastConnectionDate);
                 CheckLook(At(ConnectionProtocol.BuildPlayerActorBlock(character, 245, 1, account), 2, 3));
                 CheckLook(At(ConnectionProtocol.BuildLookChanged(character), 2));
 

@@ -68,9 +68,9 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(Hex("10041a4b" + block), AllianceProtocol.BuildMembership(SampleAlliance, 4));
         }
 
-        /// <summary>The four ranks of «E X A M P L E» (mbm), with their own names, rights and icons.</summary>
+        /// <summary>The four ranks of «E X A M P L E»; the byte fixture lives in the protocol suite.</summary>
         [Fact]
-        public void The_ranks_match_the_capture()
+        public void Rank_snapshots_keep_custom_names_rights_icons_and_order()
         {
             var ranks = new List<AllianceStore.Rank>
             {
@@ -83,16 +83,23 @@ namespace Jondo.Unity.Tests.World
                 new() { Id = 4, Name = "Rank No 4", Icon = 117, Order = 3 },
             };
 
-            Assert.Equal(Hex(
-                "0a2c120e52616e6b204e756d6265722030311a141a1201020304060708090a0b0c0d0f10111213152202107428010a2e120e52616e6b204e756d6265722030321a1408011a1001020304060708090a0c0d0f1011121522041017180128020a23120f52616e6b204e756d626572203030331a0808011a0412090a0c2204102d180228030a15120952616e6b204e6f20341a002204107518032804"),
-                AllianceProtocol.BuildRanks(ranks));
+            var snapshot = AllianceRankMessages.Snapshot(ranks).Ranks;
+            Assert.Equal(new[] { 1, 2, 3, 4 }, snapshot.Select(rank => rank.Id));
+            Assert.Equal(new[] { "Rank Number 01", "Rank Number 02", "Rank Number 003", "Rank No 4" }, snapshot.Select(rank => rank.Name));
+            Assert.Equal(new[] { 116, 23, 45, 117 }, snapshot.Select(rank => rank.OrderAndGfx!.GfxId));
+            Assert.Equal(new[] { 0, 1, 2, 3 }, snapshot.Select(rank => rank.OrderAndGfx!.Order));
+            Assert.Equal(new[] { false, true, true, false }, snapshot.Select(rank => rank.PrivateInformation!.Modifiable));
+            Assert.Equal(new[] { 18, 9, 10, 12 }, snapshot[2].PrivateInformation!.Rights);
+            Assert.Empty(snapshot[3].PrivateInformation!.Rights);
         }
 
         /// <summary>The alliance message and the bulletin on joining: only the alliance's founding date.</summary>
         [Fact]
-        public void The_notices_match_the_capture()
+        public void Joining_notices_keep_the_founding_date_without_an_author()
         {
-            Assert.Equal(Hex("0a0610b5c1a6ce06"), AllianceProtocol.BuildNotice(new AllianceStore.Notice("", 1774821557, "", 0)));
+            var snapshot = Assert.IsType<Jondo.Unity.Protocol.Game.AllianceMotdEvent>(
+                AllianceNoticeMessages.Snapshot(AllianceStore.NoticeMessage, new("", 1774821557, "", 0)));
+            Assert.Equal(new Jondo.Unity.Protocol.Game.SocialNoticeInformation("", 1774821557, "", 0), snapshot.MotdInfo);
             Assert.Equal(Hex("0862"), AllianceProtocol.BuildEmote());
         }
 

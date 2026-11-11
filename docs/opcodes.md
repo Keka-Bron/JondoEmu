@@ -103,7 +103,8 @@ the order of the capture.
 | `kqp` | S→C | 24 / 6 files | Sent three times in a row, with three different payloads. Meaning *not established*. | `BuildWelcomeBurst` | `f1:1, f2:1` then `f1:1` then empty |
 | `kvi` | S→C | 10 / 8 files | The account's characters on the chosen server. | `BuildCharactersList` | `f1 (rep) { f1 { f2: name, f3: level, f4 { f2 { f3: sex } }, f6: look, f7: breed }, f2: characterId }` |
 | `kvd` | S→C | 4 / 3 files | Closes the character list. Empty, immediately behind `kvi` in the real burst. It was not being sent, and it is the leading candidate for the dead create-character button: the client received the list and nothing saying the list was complete. | `BuildWelcomeBurst` | empty |
-| `jtg` | S→C | 11 / 7 files | Catalogue of gift items on the account. Sent empty — our accounts own none. | `BuildGiftCatalogue` | `f3 (rep) { f1 { f2: name, f3 {…item…}, f6 {…description…} }, f2: id }` |
+| `jtg` | S→C | 11 / 7 files | Current account's unclaimed gifts, including due veteran rewards; empty list clears prior state. | `GiftMessages`, `GiftService` | `f3 (rep) { f1 { f2: title, f3 { f2: quantity, f3: template } }, f2: packed redemption IDs }`; unused description tag 6 omitted |
+| `jby` | S→C | — | HAAPI session identity, allocated once per game connection. | `GameEntryContinuationMessages` | `f1: invariant decimal Int64 string` |
 | `kqq` | C→S | 3 / 3 files | The client is going back to the character or server screen. | `GameNodeProxy` | — |
 | `kqr` | S→C | 3 / 3 files | Answer to `kqq`. The client then closes the connection itself and redoes the handshake. | `GameNodeProxy.BuildKqrPayload` | `f1: session guid, f4: 1` |
 
@@ -120,7 +121,7 @@ client; they are deliberately not in the burst.
 | `kvk` | S→C | 8 / 2 files | A suggested character name (the dice button). | `CharacterCreationHandler.SuggestNameAsync` | `f1: name` |
 | `kvw` | C→S | 2 / 2 files | Select a character. The id is checked against the session's account: the client picks it, so it cannot be trusted. | `CharacterSelectionHandler` | read for character id |
 | `kvl` | C→S | 1 / 1 file | Same step straight after a successful creation — the client sends `kvl` behind `kvi` and enters the world without passing through the list. | `CharacterSelectionHandler` | read for character id |
-| `kva` | S→C | 7 / 6 files | "You are now playing this character." Without it the client sits on the character screen with the hourglass up. Rebuilt from the database, never replayed. | `BuildCharacterSelectedSuccess` | `f1 { f1 { f1: details, f2: characterId } }` |
+| `kva` | S→C | 7 / 6 files | "You are now playing this character." Without it the client sits on the character screen with the hourglass up. Constructed directly as semantic selection success from server state. | `CharacterSelectionMessages.Success` | `f1 { f1 { f1: details, f2: characterId } }` |
 | `kpa` | C→S | 1 / 1 file | Character-list request. Dispatched, but seen once in 242 captures. | `CharacterSelectionHandler.HandleCharacterListRequest` | — |
 
 `kqu` is **not** a character-list request in 3.6.10.10, whatever older tables say: the server
@@ -154,8 +155,8 @@ its own stored capture to decide what to substitute, not reading the client.
 | `lva` | S→C | 1071 / 88 files | "That is every actor." Empty, immediately behind `jss`. Without it the client never counts the map as loaded: it waits about two seconds, asks again with `knm`, `kno`, `kny`, and starts over. | `BuildActorsComplete` | empty |
 | `kub` | S→C | 188 / 54 files | The character sheet. The container field is **not** the same for every characteristic and getting it wrong kills the whole sheet with a `NullReferenceException` in the client's own log. Which id uses which container is read off the captured `kub`, not written down. Sent twice — once with the character, once with the map; the client keeps the second. | `BuildCharacteristics`, `WorldEntry.ContainerOf` | `f2 { f1: where the next level starts, f7: where this one started, f8: experience held, f10: kamas, f11 (rep) { f1: id, <container> {…} } }` — containers: `f4 {f2: base, f3: parchments, f7: equipment}` for most, `f5 {f1: base, f5: bonus}` for 1 and 23, `f2 {f2: value}` for 29, 47 and 96 |
 | `irq` | S→C | 93 / 11 files | Jobs. The id list is kept (it is game data); the captured progress is thrown away and every job goes out at level 1. | `WorldEntry.ResetJobs` | `f1 (rep) { f1: job id, f3: level, f4/f5: experience }` |
-| `hms` | S→C | 8 / 6 files | The spells the character has, each at the grade its level opens. | `BuildSpellList` | `f1 (rep) { f1: grade, f3: spell id, f4: 1 }` |
-| `ivx` | S→C | 68 / 27 files | The inventory, built from the database. Slot omitted when zero, because zero is the amulet. | `BuildInventory` | `f3 (rep) { f1: slot, f5 { f1: template, f2 (rep) {…value…, f11: effect}, f3: quantity, f4: uid } }` |
+| `hms` | S→C | 8 / 6 files | The spells the character has, each at the grade its level opens. | `SpellMessages` → `SpellsEvent` | Human/mutant `SpellItem` lists; explicit grade, spell ID and type |
+| `ivx` | S→C | 68 / 27 files | Semantic inventory snapshot from the owning session's loaded items and kamas. Slot zero is the amulet. | `InventoryMessages.Snapshot` | `f3 (rep) { f1: slot, f5 { f1: template, f2 (rep) {…value…, f11: effect}, f3: quantity, f4: uid } }` |
 | `itg` | S→C | 19 / 7 files | The shortcut bars. The server sends **two**, and nothing inside the message says which is which: a slot holding a spell carries `f6`, one holding an item carries `f9`. The trailing bare `f2` is the bar type — the spell bar carries `f2: 1`, the item bar omits it (type zero). | `BuildSpellBar`, `WorldEntry.Rebuilt` | `f1 (rep) { f2: slot, f6 { f2: spell id } }, f2: 1` |
 
 The three experience fields of `kub` are not in the order they look. `f1` is the threshold of the

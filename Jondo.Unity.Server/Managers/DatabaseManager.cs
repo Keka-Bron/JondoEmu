@@ -5213,7 +5213,7 @@ namespace Jondo.Unity.Server
             return emotes;
         }
 
-        /// <summary>Writes down that a character has learned an emote.</summary>
+        /// <summary>Writes down that a character has learned an emote; failure propagates before ownership is granted.</summary>
         public static void SaveEmote(long characterId, int emoteId)
         {
             EnsureProgressionTables();
@@ -5232,6 +5232,7 @@ namespace Jondo.Unity.Server
             catch (Exception ex)
             {
                 Console.WriteLine($"[SQLite] Attitude {emoteId} could not be saved: {ex.Message}");
+                throw;
             }
         }
 

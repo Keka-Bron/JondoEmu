@@ -7,8 +7,8 @@ namespace Jondo.Unity.Server.Network
     /// <summary>
     /// The guild frames, each measured on the 12 captures of Gremio/.
     ///
-    /// What goes byte by byte against the capture -the guild one belongs to (jgw), the header
-    /// of its window (jhh) and the four default ranks (jco)- has its test. The member
+    /// What goes byte by byte against the capture -the guild one belongs to (jgw)- has its test.
+    /// Guild ranks use GuildRankMessages; membership/headers use GuildStateMessages. The member
     /// list (jgu) is built with the fields that are understood and a few constants that are
     /// copied from the founder's capture without knowing what they mean; they are marked where appropriate.
     /// </summary>
@@ -46,32 +46,14 @@ namespace Jondo.Unity.Server.Network
                 .Build();
 
         /// <summary>
-        /// Belonging to a guild, said silently (jhe): f1 the guild's block, f2 the rank, f3 the
-        /// member's contribution. What world entry sends; the jgw is joining, and its handler
-        /// prints "you have just joined" and opens a popup every time it comes.
-        /// </summary>
-        /// <remarks>
-        /// Against the captures of «Jondo»: f3 is 10 and then 20 around "contribuir en el gremio
-        /// 10 puntos", the {20, 20} of the member's own jgu row. The f4 (1791 for that member,
-        /// 4568 for another) is not known and does not go; a member who has just joined has it at
-        /// zero, since the jgw does not carry it.
-        /// </remarks>
-        public static byte[] BuildMembership(GuildStore.Guild guild, int rank, long contribution)
-            => Pb.New()
-                .Msg(1, GuildBlock(guild))
-                .Var(2, rank)
-                .VarIfNotZero(3, contribution)
-                .Build();
-
-        /// <summary>
         /// The next weekly reset (jez), as an ISO string: Tuesday at 05:00 UTC. The five captures
         /// that ask for it agree -- asked on Sunday the 9th it is the 11th, on Wednesday the 12th
         /// and Saturday the 15th the 18th, on Saturday the 29th 1 September, and on Tuesday the
         /// 1st at 23:12, the reset of that morning already past, the 8th.
         /// </summary>
-        public static byte[] BuildWeeklyReset(DateTime utcNow)
-            => Pb.New().Str(1, NextWeeklyReset(utcNow).ToString("yyyy-MM-dd'T'HH:mm:ss'Z'",
-                                                                  System.Globalization.CultureInfo.InvariantCulture)).Build();
+        public static Jondo.Unity.Protocol.Game.GuildWeeklyResetDateResponse BuildWeeklyReset(DateTime utcNow)
+            => new(NextWeeklyReset(utcNow).ToString("yyyy-MM-dd'T'HH:mm:ss'Z'",
+                                                  System.Globalization.CultureInfo.InvariantCulture));
 
         internal static DateTime NextWeeklyReset(DateTime utcNow)
         {
@@ -118,39 +100,6 @@ namespace Jondo.Unity.Server.Network
             return Pb.New().Msg(1, jgb).Build();
         }
 
-        /// <summary>
-        /// The guild window's header (jhh): f1 the founding date, f3 the level, f5 the experience
-        /// the level starts at, f6 the guild's experience, f7 its guild kamas, f9 the experience
-        /// the next level starts at and f10 how many members it has.
-        /// </summary>
-        /// <remarks>
-        /// Read off the client (fft::wm builds the header's hook btm from f5, f6, f9 and f3, which
-        /// GuildUI.OnGuildInformationGeneral puts in m_expLevelFloor, m_experience,
-        /// m_expNextLevelFloor and m_level; f7 goes to the guild service's kamas). f9 was taken
-        /// for the member maximum: a level 1 guild's 50 is level 2's floor. The captures: a level 1
-        /// guild "f3 1, f7 10, f9 50, f10 2", 20 kamas after a contribution; a level 4 one "f5 150,
-        /// f6 181, f9 210". Its f2 (7, then 6) is not read by that handler and does not go.
-        /// </remarks>
-        public static byte[] BuildGuildInfo(GuildStore.Guild guild, int memberCount)
-            => Pb.New()
-                .Str(1, guild.FoundedUtc)
-                .Var(3, guild.Level)
-                .VarIfNotZero(5, GuildLevels.FloorOf(guild.Level))
-                .VarIfNotZero(6, guild.Experience)
-                .VarIfNotZero(7, guild.GuildKamas)
-                .Var(9, GuildLevels.NextFloorOf(guild.Level))
-                .Var(10, memberCount)
-                .Build();
-
-        /// <summary>
-        /// The four default ranks of a freshly created guild (jco). They are a fixed mould,
-        /// measured once in the creation of «Jondo»: the names are translation keys
-        /// (guild.rank.N.name), and each rank's permissions go as a string of bytes that
-        /// this emulator does not yet interpret -they are copied as is, which is what a new
-        /// guild does-. The f4{f2} is the rank's icon and f5 its number.
-        /// </summary>
-        public static byte[] BuildDefaultRanks() => BuildRanks(GuildStore.DefaultRanks(0));
-
         /// <summary>A notice as the client reads it (leg): { f1 the text, f2 when, f3 the author's name, f4 the author }.</summary>
         private static Pb Notice(GuildStore.Notice notice)
             => Pb.New().Str(1, notice.Text).Var(2, notice.WhenMs).Str(3, notice.AuthorName).Var(4, notice.AuthorId);
@@ -180,28 +129,8 @@ namespace Jondo.Unity.Server.Network
             return Pb.New().Msg(3, Pb.New().VarIfNotZero(1, mayChoose ? 1 : 0)).Build();
         }
 
-        /// <summary>A member's connection (jhd): { f1 the character, f2 on line }.</summary>
-        public static byte[] BuildMemberConnection(long characterId, bool online)
-            => Pb.New().Var(1, characterId).VarIfNotZero(2, online ? 1 : 0).Build();
-
         /// <summary>The logbook's bulletin (jjf): { f1 the notice } -- fft.behl, shown by GuildLogBook.</summary>
         public static byte[] BuildBulletin(GuildStore.Notice notice) => Pb.New().Msg(1, Notice(notice)).Build();
-
-        /// <summary>
-        /// A guild's ranks (jco), one per f2 { f2 name, f3 permissions, f4 { f2 icon,
-        /// f3 order }, f5 id }. The permissions are { f1 flag, f3 list } just as they arrived.
-        /// </summary>
-        /// <remarks>
-        /// Measured twice: the mould of a new guild, and the same guild after renaming
-        /// rank 1, touching rank 2's permissions and creating a fifth -jct, jck and jcv-, which the server
-        /// answers with this same whole jco, with the new one in its place and 4 shifted one position.
-        /// </remarks>
-        public static byte[] BuildRanks(IReadOnlyList<GuildStore.Rank> ranks)
-        {
-            var jco = Pb.New();
-            foreach (var rank in ranks) jco.Msg(2, Rank(rank));
-            return jco.Build();
-        }
 
         /// <summary>
         /// A rank (ldt): f2 name, f3 permissions, f4 { f2 icon, f3 order }, f5 id. The f4 always

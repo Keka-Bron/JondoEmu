@@ -170,26 +170,7 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>The rights a rank's list holds, read as the packed numbers it is.</summary>
         public static HashSet<int> RightsOf(byte[]? packed)
-        {
-            var rights = new HashSet<int>();
-            if (packed == null) return rights;
-            int i = 0;
-            while (i < packed.Length)
-            {
-                ulong value = 0;
-                int shift = 0;
-                while (i < packed.Length)
-                {
-                    byte b = packed[i++];
-                    value |= (ulong)(b & 0x7f) << shift;
-                    if ((b & 0x80) == 0) break;
-                    shift += 7;
-                    if (shift > 63) return rights;
-                }
-                if (value <= int.MaxValue) rights.Add((int)value);
-            }
-            return rights;
-        }
+            => GuildRankRights.Decode(packed).ToHashSet();
 
         /// <summary>The rights this character has in his guild, by his rank; empty outside a guild.</summary>
         public static HashSet<int> RightsOf(long characterId)

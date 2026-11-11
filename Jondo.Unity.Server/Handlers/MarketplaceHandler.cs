@@ -202,7 +202,7 @@ namespace Jondo.Unity.Server.Handlers
 
         private static async Task InventoryAsync(GameSession me)
         {
-            await SendAsync(me, Op.Ivx, CommissionHandler.As(me, ConnectionProtocol.BuildInventory));
+            await InventoryMessages.FromCatalogue.SendAsync(me);
             await SendAsync(me, Op.Hlm, Array.Empty<byte>());
         }
 

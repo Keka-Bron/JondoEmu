@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Protocol;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -101,26 +104,38 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
-        public void World_entry_carries_the_character_s_rank_not_the_capturer_s()
+        public async Task World_entry_carries_the_character_s_rank_not_the_capturer_s()
         {
             if (!Available) return;
             Index();
-            WorldEntryContent.Load(Paths.ContentFile(WorldEntryContent.AuthoredFile));
-            var row = WorldEntryContent.Rows(WorldEntry.BlockAfterCharacter).Single(r => r.Opcode == Op.Hod);
-            var session = GameSession.SinSocket();
+            var codec = new GameCodec();
+            var packets = new List<byte[]>();
+            var session = new GameSession(codec, packet => { packets.Add(packet); return Task.CompletedTask; });
             using (SessionContext.Push(session))
             {
                 const long me = 9_400_300_011;
                 session.State.CharacterId = me;
                 Alignments.Set(me, Alignments.Neutral, 0);
-                var character = new DatabaseManager.DbCharacter { Id = me, Name = "Neutro", Level = 30, Breed = 1 };
-
-                // A neutral one is nothing, as a new character's hod.
-                Assert.Empty(ConnectionProtocol.ReadPayload(WorldEntry.Rebuilt(row.Frame, row.Built, character)!, Op.Hod)!);
+                // Neutral characters start at rank zero.
+                Assert.Equal(new AlignmentRankUpdateEvent(0), await SendRankAsync());
 
                 Alignments.Set(me, Alignments.Brakmar, 0);
-                Assert.Equal(Convert.FromHexString("0812"), ConnectionProtocol.ReadPayload(
-                    WorldEntry.Rebuilt(row.Frame, row.Built, character)!, Op.Hod));
+                Assert.Equal(new AlignmentRankUpdateEvent(18), await SendRankAsync());
+            }
+
+            async Task<AlignmentRankUpdateEvent> SendRankAsync()
+            {
+                packets.Clear();
+                var initial = new GameEntryInitialMessages([], [], session.State, new([], _ => []), Alignments.Rank(), 0,
+                    () => new([]), () => new("1970-01-01T00:00:00.000Z", []), () => new([]),
+                    () => CharacterSelectionMessages.Success(new() { Id = session.CharacterId, Name = "Selected", Level = 1 }, new([], 3, 1, [], [], [])),
+                    () => InventoryMessages.FromCatalogue.Snapshot(session.State), () => new([]), () => new(81_001),
+                    () => EntryInformationMessages.PreviousConnection(session.State.PreviousVisit),
+                    new(_ => 0, _ => [], _ => 0, ItemEffectMessages.FromCatalogue),
+                    new(() => new(0), () => new(null), () => new(null), () => new("", null)));
+                await initial.SendAsync(session);
+                return Assert.Single(packets.Select(packet => codec.Decode(packet).Content)
+                    .OfType<AlignmentRankUpdateEvent>());
             }
         }
 

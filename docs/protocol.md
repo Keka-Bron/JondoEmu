@@ -233,7 +233,7 @@ The two `ivx` figures give the per-item cost, and they differ:
 - Real server, 616 items in 20,691 bytes → **34 bytes per item**.
 - This emulator, 1,722 items in 96,713 bytes → **56 bytes per item**.
 
-Ours are heavier because `ConnectionProtocol.BuildInventory` writes out every effect of every item
+Ours are heavier because inventory serialization writes out every effect of every item
 as its own submessage. The correlation is exact: the console log records
 `[Equipment] 1722 items from the database` at 19:15:25.087 and the traffic log records a 96,713-byte
 `ivx` eleven milliseconds later.
@@ -480,16 +480,18 @@ else.
 
 ---
 
-## 9. The three world blocks
+## 9. The three world blocks (historical)
 
-The burst the official server sends on entering the world, recorded from a real session. It used
-to ship as three `datos/world_etapa*.bin` files replayed by `Network/WorldEntry.cs`; today it is
-`content/world/entry.json`, one row per frame, and the .bin files are no longer in the repository.
+The burst the official server sends on entering the world was recorded from a real
+session. It shipped first as three `datos/world_etapa*.bin` files, then as a JSON
+reconstruction. Both formats and the reference loader have been deleted. Current
+entry constructs initial state, continuation and map messages from live state; see
+[the Game protocol](game-protocol.md#initial-character-state). The counts and
+sanitisation notes below describe the retired replay implementation.
 
-**Why they exist.** Entering the world is 368 messages of which we have a schema for a handful. The
-blocks are the only way to get a client fully into the world today. They are the recording that the
-emulator is gradually replacing: every message rebuilt from the database is one frame that no longer
-has to be replayed.
+**Why they existed.** The 368-message recording initially allowed world entry before
+the emulator had builders for the full sequence. Direct construction has now
+replaced those recorded rows.
 
 **Why three and not one.** The real server sends a block, waits for the client, and carries on. Send
 it all at once and the client discards the tail: it has not asked for the map yet.
@@ -508,13 +510,11 @@ The recording is somebody's real session. It carries their contacts, their guild
 their spouse, their saved outfits, twenty Ankama accounts with nickname and tag, and player stalls
 with the account behind them. Publishing the file as recorded publishes all of that.
 
-Two mechanisms, deliberately kept in step:
+Two historical mechanisms were deliberately kept in step:
 
-- `WorldEntry.NotReplayed` is the runtime filter. The emulator refuses to forward those messages
-  even if they are in the file.
-- `tools/sanear_world.py` physically deletes the same frames from the file, so the data does not
-  travel inside the repository either. The list is duplicated in both places on purpose; if one
-  grows, the other has to.
+- A runtime skip list refused to forward recorded-account messages, even if present
+  in the file. That obsolete list has been removed with the replay path.
+- `tools/sanear_world.py` deleted the same frames from the published recording.
 
 Measured frame by frame against the capture the blocks came from, **13 of the 368 frames were
 removed**:
@@ -525,46 +525,24 @@ removed**:
 | 2 | 4 | 2 | `hhy` that account's titles and ornaments, `ihb` its fourteen saved builds, each carrying a full look (replaced by the character's own) |
 | 3 | 34 | 31 | `kub` again, `jhh` the guild again, `jjs` a stall |
 
-`WorldEntry.NotReplayed` holds a longer list than that — `kqg` the contact list, `koj` twenty Ankama
-accounts with nickname and tag, `hol` the spouse — because those messages arrive just after the map
-block in the capture and were never part of the three files to begin with. The filter still names
-them, so they cannot come back in by accident if the blocks are ever regenerated.
-
-Running `py tools/sanear_world.py --ver` today reports **322 → 322, 2 → 2, 31 → 31**. That is the
-check working: the shipped files are already clean.
+The former skip list also covered `kqg` (contacts), `koj` (twenty Ankama accounts)
+and `hol` (spouse), which arrived just after the map block in the capture.
 
 Two of those removals also fixed a crash. `jhh` and `jhk` describe a guild whose own message (`jhe`)
 was already being dropped, so the client had nothing to attach them to and threw a
 `NullReferenceException` on each — visible in its own `Player.log`. Taking them out removed two of
 the client's six crashes and one more real name off the wire at the same time.
 
-### What is rebuilt instead of replayed
+### Current construction and characteristics
 
-`WorldEntry.Rebuilt` swaps five messages for ones built from the database, because each of them was
-showing the player somebody else's character: `kva` (name, level, breed, look), `irq` (the jobs,
-which arrived maxed out), `hms` (the spell list), `ivx` (the inventory) and `itg` (the shortcut
-bars). Everything else is rewritten rather than rebuilt: `CaptureRewriter` swaps the captured
-character id and name — plus the names signing forgemaged items, which are read out of the block
-rather than written into the source — for the ones playing.
+Selection, inventory, professions, spells, shortcut bars and map state are now
+constructed directly. Entry no longer learns a captured identity, item signatures
+or characteristic structure from recorded packets.
 
-### What the sanitisation costs
-
-`kub` is the character sheet, and it is gone from the shipped blocks. That has a measurable effect,
-because `WorldEntry.LearnCharacteristicIds` learns two things from the captured `kub`:
-
-- **Which characteristics to declare.** The real `kub` declares **120**, each with its id. With no
-  `kub` to read, `ConnectionProtocol.BuildCharacteristics` falls back to a hardcoded list of **25**.
-  That matters more than it sounds: the client fills in whatever the server leaves undeclared, and
-  that is where the -100 % damage and the blanket 50 % resistances came from.
-- **Which container each one travels in.** The real `kub` puts 115 of the 120 in `f4`, ids 1 and 23
-  in `f5`, and ids 29, 47 and 96 in `f2`. There is no rule to it that we can see. With no `kub` to
-  read, `WorldEntry.ContainerOf` returns 4 for everything — and putting a characteristic in the
-  wrong container makes the client throw a `NullReferenceException` and lose the whole sheet.
-  `ConnectionProtocolSelfTest` checks those five ids, but skips the check when the list is empty,
-  which is exactly the shipped configuration.
-
-This is the honest state of it: the blocks were sanitised because publishing real accounts' data is
-not acceptable, and the sheet is the piece that has not been rebuilt from our own data yet.
+`WorldEntry.Initialize` loads `datos/caracteristicas_kub.json` independently. This
+measured catalogue supplies the characteristic ids and their value containers to
+`ConnectionProtocol.BuildCharacteristics`; character values come from live state.
+Deleting the entry reconstruction does not remove that catalogue.
 
 ---
 
@@ -575,7 +553,6 @@ Python is `py`, never `python`.
 ```
 py tools/pcap.py <capture.pcapng>                 timeline: root field, opcode, payload size
 py tools/pcap.py <capture.pcapng> --raw jru       hex dump of just those messages
-py tools/sanear_world.py --ver                    what would be stripped from the world blocks
 py tools/cliente_falso.py                         drive the emulator without opening the game
 ```
 

@@ -198,17 +198,6 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Var(1, rank).Msg(2, Block(alliance)).Build();
 
         /// <summary>
-        /// The alliance's ranks (mbm): one f1 each, { f2 name, f3 { f1 modifiable, f3 rights },
-        /// f4 { f2 icon, f3 order }, f5 id }. The four of «E X A M P L E» have that shape.
-        /// </summary>
-        public static byte[] BuildRanks(IReadOnlyList<AllianceStore.Rank> ranks)
-        {
-            var mbm = Pb.New();
-            foreach (var rank in ranks) mbm.Msg(1, Rank(rank));
-            return mbm.Build();
-        }
-
-        /// <summary>
         /// A rank (ldt): f2 name, f3 { f1 modifiable, f3 rights }, f4 { f2 icon, f3 order }, f5 id.
         /// The f4 always goes, even empty: the card reads it without looking (gl.mwk).
         /// </summary>
@@ -315,20 +304,6 @@ namespace Jondo.Unity.Server.Network
             foreach (var entry in page) mcv.Msg(2, Block(entry.Alliance, entry.Card));
             return mcv.VarIfNotZero(4, total).VarIfNotZero(5, pageSize).Build();
         }
-
-        /// <summary>
-        /// The alliance message (mcm) and the bulletin (mcr), each a leg { f1 text, f2 when in
-        /// seconds, f3 author, f4 author's id } -- the four fields fgv copies into the alliance
-        /// service. On joining «E X A M P L E» both came with only the date, which was the
-        /// alliance's founding.
-        /// </summary>
-        public static byte[] BuildNotice(AllianceStore.Notice notice)
-            => Pb.New().Msg(1, Pb.New()
-                    .StrIfNotEmpty(1, notice.Text)
-                    .VarIfNotZero(2, notice.WhenS)
-                    .StrIfNotEmpty(3, notice.AuthorName)
-                    .VarIfNotZero(4, notice.AuthorId))
-                .Build();
 
         /// <summary>Why a notice was not set (mdf, mco): f1 the reason.</summary>
         public static byte[] BuildNoticeRefused(int reason) => Pb.New().Var(1, reason).Build();

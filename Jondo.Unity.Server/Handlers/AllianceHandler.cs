@@ -175,7 +175,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var alliance = AllianceStore.Create(founder, name, tag, symbol, symbolColor, background, shape, symbolRgb);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Mch, AllianceProtocol.BuildCreationResult(AllianceProtocol.CreationOk)));
-            await SendJoinedAsync(stream, alliance, founder);
+            await SendJoinedAsync(SessionContext.Current, alliance);
 
             Console.WriteLine($"[Alliance] {SessionContext.State.CharacterName} founds «{name}» [{tag}] " +
                               "and spends their alliance gem.");
@@ -357,35 +357,34 @@ namespace Jondo.Unity.Server.Handlers
         /// the sheet, joining (with its chat line), the banner emote, the redrawn character, and the
         /// message and the bulletin.
         /// </summary>
-        public static async Task SendJoinedAsync(NetworkStream stream, AllianceStore.Alliance alliance, long characterId)
+        public static async Task SendJoinedAsync(GameSession session, AllianceStore.Alliance alliance)
         {
+            using var context = SessionContext.Push(session);
+            long characterId = session.CharacterId;
             int rank = AllianceStore.RankOf(characterId);
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Mbm, AllianceProtocol.BuildRanks(AllianceStore.Ranks(alliance.Id))));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Mbz, AllianceProtocol.BuildMembership(alliance, rank)));
-            await WriteAsync(stream, InformationFrame(alliance));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Mca, AllianceProtocol.BuildJoined(alliance, rank)));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Khi, AllianceProtocol.BuildEmote()));
-            await RedrawAsync(stream, characterId);
-            await SendNoticesAsync(stream, alliance);
+            await AllianceRankService.Live.SendAsync(session, alliance.Id);
+            await session.SendAsync(ConnectionProtocol.Push(Op.Mbz, AllianceProtocol.BuildMembership(alliance, rank)));
+            await session.SendAsync(InformationFrame(alliance));
+            await session.SendAsync(ConnectionProtocol.Push(Op.Mca, AllianceProtocol.BuildJoined(alliance, rank)));
+            await session.SendAsync(ConnectionProtocol.Push(Op.Khi, AllianceProtocol.BuildEmote()));
+            await RedrawAsync(session.Stream, characterId);
+            await SendNoticesAsync(session, alliance);
         }
 
         /// <summary>The alliance message and the bulletin, as they stand.</summary>
-        private static async Task SendNoticesAsync(NetworkStream stream, AllianceStore.Alliance alliance)
-        {
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Mcm,
-                AllianceProtocol.BuildNotice(AllianceStore.NoticeOf(alliance, AllianceStore.NoticeMessage))));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Mcr,
-                AllianceProtocol.BuildNotice(AllianceStore.NoticeOf(alliance, AllianceStore.NoticeBulletin))));
-        }
+        private static Task SendNoticesAsync(GameSession session, AllianceStore.Alliance alliance)
+            => AllianceNoticeService.Live.SendAsync(session, alliance);
 
         /// <summary>
         /// Somebody has joined: he gets his part, whoever was there his line (mbv), and a pending
         /// application of his is done with.
         /// </summary>
-        private static async Task WelcomeAsync(NetworkStream stream, AllianceStore.Alliance alliance, long characterId)
+        private static async Task WelcomeAsync(GameSession session, AllianceStore.Alliance alliance)
         {
+            using var context = SessionContext.Push(session);
+            long characterId = session.CharacterId;
             AllianceStore.DropApplication(characterId);
-            await SendJoinedAsync(stream, alliance, characterId);
+            await SendJoinedAsync(session, alliance);
             var row = RowOf(AllianceStore.MemberOf(characterId));
             if (row != null)
                 await TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Mbv, AllianceProtocol.BuildMemberUpdate(row.Value)), characterId);
@@ -418,7 +417,7 @@ namespace Jondo.Unity.Server.Handlers
             if (profile.Recruitment != AllianceStore.RecruitmentOpen) return;
 
             AllianceStore.Join(who, alliance.Id);
-            await WelcomeAsync(stream, alliance, who);
+            await WelcomeAsync(SessionContext.Current, alliance);
             Console.WriteLine($"[Alliance] {SessionContext.State.CharacterName} joins «{alliance.Name}».");
         }
 
@@ -532,7 +531,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var alliance = MyAlliance();
             if (alliance == null) return;
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Mbm, AllianceProtocol.BuildRanks(AllianceStore.Ranks(alliance.Id))));
+            await AllianceRankService.Live.SendAsync(SessionContext.Current, alliance.Id);
         }
 
         /// <summary>
@@ -806,7 +805,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>The ranks have changed: the mbm, to everybody connected.</summary>
         private static Task RanksChangedAsync(AllianceStore.Alliance alliance)
-            => TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Mbm, AllianceProtocol.BuildRanks(AllianceStore.Ranks(alliance.Id))));
+            => AllianceRankService.Live.BroadcastAsync(alliance.Id);
 
         /// <summary>
         /// A member's rank has changed: his line to everybody (mbv), and to him his belonging again
@@ -831,18 +830,18 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>The alliance message (mcs): f1 the text. Everybody connected gets the mcm.</summary>
         public static Task SetMessageAsync(NetworkStream stream, byte[] frame)
-            => SetNoticeAsync(stream, frame, Op.Mcs, AllianceStore.NoticeMessage, Op.Mcm, Op.Mdf);
+            => SetNoticeAsync(stream, frame, Op.Mcs, AllianceStore.NoticeMessage, Op.Mdf);
 
         /// <summary>The bulletin (mdg): f1 the text. Everybody connected gets the mcr.</summary>
         public static Task SetBulletinAsync(NetworkStream stream, byte[] frame)
-            => SetNoticeAsync(stream, frame, Op.Mdg, AllianceStore.NoticeBulletin, Op.Mcr, Op.Mco);
+            => SetNoticeAsync(stream, frame, Op.Mdg, AllianceStore.NoticeBulletin, Op.Mco);
 
         /// <summary>
         /// A notice written: it takes «Modificar el mensaje de alianza», and without it the window is
         /// told why (mdf / mco, «no rights»).
         /// </summary>
         private static async Task SetNoticeAsync(NetworkStream stream, byte[] frame, string request, int kind,
-                                                 string answer, string refusal)
+                                                 string refusal)
         {
             byte[] payload = ConnectionProtocol.ReadPayload(frame, request);
             var alliance = MyAlliance();
@@ -862,7 +861,7 @@ namespace Jondo.Unity.Server.Handlers
             var notice = new AllianceStore.Notice(text, DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                                                   SessionContext.State.CharacterName ?? "", who);
             AllianceStore.SetNotice(alliance.Id, kind, notice);
-            await TellMembersAsync(alliance, ConnectionProtocol.Push(answer, AllianceProtocol.BuildNotice(notice)));
+            await AllianceNoticeService.Live.BroadcastAsync(alliance.Id, kind, notice);
         }
 
         // ─── Applications ───────────────────────────────────────────────────────
@@ -1045,7 +1044,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     await WriteAsync(session.Stream, ConnectionProtocol.Push(Op.Maq,
                         AllianceProtocol.BuildApplicationAnswered(alliance, accepted)));
-                    if (joins) await WelcomeAsync(session.Stream, alliance, applicant);
+                    if (joins) await WelcomeAsync(session, alliance);
                 }
             }
             else if (joins)
@@ -1170,7 +1169,7 @@ namespace Jondo.Unity.Server.Handlers
                     AllianceStore.Join(invitedId, alliance.Id);
                     using (SessionContext.Push(invitedSession))
                     {
-                        await WelcomeAsync(invitedSession.Stream, alliance, invitedId);
+                        await WelcomeAsync(invitedSession, alliance);
                     }
                 }
             }
@@ -1326,8 +1325,10 @@ namespace Jondo.Unity.Server.Handlers
         /// bulletin. The others see him connected (mbv), and whoever asked to be warned is. One
         /// without an alliance but with an application gets it back, for the directory.
         /// </summary>
-        public static async Task OnWorldEntryAsync(NetworkStream stream, long characterId)
+        public static async Task OnWorldEntryAsync(GameSession session)
         {
+            using var context = SessionContext.Push(session);
+            long characterId = session.CharacterId;
             var alliance = AllianceStore.AllianceOf(characterId);
             if (alliance == null)
             {
@@ -1335,14 +1336,14 @@ namespace Jondo.Unity.Server.Handlers
                 var applied = application == null ? null : AllianceStore.ById(application.AllianceId);
                 var row = application == null ? null : RowOf(application);
                 if (applied != null && row != null)
-                    await WriteAsync(stream, ConnectionProtocol.Push(Op.Lzx, AllianceProtocol.BuildOwnApplication(row.Value, applied)));
+                    await session.SendAsync(ConnectionProtocol.Push(Op.Lzx, AllianceProtocol.BuildOwnApplication(row.Value, applied)));
                 return;
             }
 
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Mbm, AllianceProtocol.BuildRanks(AllianceStore.Ranks(alliance.Id))));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Mbz,
+            await AllianceRankService.Live.SendAsync(session, alliance.Id);
+            await session.SendAsync(ConnectionProtocol.Push(Op.Mbz,
                 AllianceProtocol.BuildMembership(alliance, AllianceStore.RankOf(characterId))));
-            await SendNoticesAsync(stream, alliance);
+            await SendNoticesAsync(session, alliance);
             await ConnectionChangedAsync(alliance, characterId, online: true);
         }
 

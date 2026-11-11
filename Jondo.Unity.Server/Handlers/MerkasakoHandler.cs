@@ -344,8 +344,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.BuildLoadMap(salidaMapa));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(salidaMapa));
+            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, salidaMapa);
 
             Console.WriteLine($"[Merkasako] Out of {dentro} to map {salidaMapa}, " +
                               $"cell {state.CellId}.");
@@ -439,8 +438,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.BuildLoadMap(target));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildMapClock());
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapDiscovered(target));
+            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, target);
             if (entering)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

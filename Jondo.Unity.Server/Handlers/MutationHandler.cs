@@ -45,7 +45,7 @@ namespace Jondo.Unity.Server.Handlers
             if (placed == null) return false;
             var mutation = Mutations.Current();
 
-            await SpellHandler.SendSpellsAndBarAsync(stream);
+            await SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                 ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained, "1", template.ToString())));
             await ItemUseHandler.WeighAsync(stream);
@@ -67,7 +67,7 @@ namespace Jondo.Unity.Server.Handlers
             Mutations.Current();
 
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hod, Pb.New().Var(1, Mutations.EndedMark).Build()));
-            await SpellHandler.SendSpellsAndBarAsync(stream);
+            await SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Ium, ConnectionProtocol.BuildItemGone(item.Uid)));
             await LookChangedAsync(stream);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));

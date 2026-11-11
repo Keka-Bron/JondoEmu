@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -145,22 +146,23 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal((750, KoliseoLadder.PlacementFights, 0), (fresh.Rating, fresh.PlacementLeft, fresh.SeasonFights));
         }
 
-        // ─── The lty ────────────────────────────────────────────────────────────────────────
+        // ─── Arena player information ───────────────────────────────────────────────────────
 
-        /// <summary>Unplaced everywhere, in the captured season: the world entry's lty, byte for byte.</summary>
+        /// <summary>Unplaced everywhere: actual initial ratings and five placement fights per mode.</summary>
         [Fact]
-        public void An_unplaced_character_gets_the_world_entrys_lty()
+        public void An_unplaced_character_gets_its_own_initial_arena_standings()
         {
             KoliseoLadder.StartSeason(CapturedSeason);
             KoliseoLadder.Clock = () => CapturedSeason.AddDays(10);
             long a = Character(9_100_000_021);
-            Assert.Equal(Hex(
-                "1218323032352d30332d31345432303a34363a33312e3539385a" +
-                "1a1a18ffffffffffffffffff012005420b08ffffffffffffffffff01" +
-                "1a1c080118ffffffffffffffffff012005420b08ffffffffffffffffff01" +
-                "1a1c080218ffffffffffffffffff012005420b08ffffffffffffffffff01" +
-                "1a1c080318ffffffffffffffffff012005420b08ffffffffffffffffff01"),
-                KoliseoHandler.BuildRanks(a, 200));
+            var actual = ArenaPlayerInformationService.Live.Snapshot(a, 200);
+            Assert.Equal("1970-01-01T00:00:00.000Z", actual.BanEndDate);
+            ArenaRank[] expected = [
+                new(ArenaType.OneVsOne, 0, -1, 5, 0, 0, 0, new(-1, 1000, 0), 0),
+                new(ArenaType.TwoVsTwo, 0, -1, 5, 0, 0, 0, new(-1, 1000, 0), 0),
+                new(ArenaType.ThreeVsThree, 0, -1, 5, 0, 0, 0, new(-1, 1000, 0), 0),
+                new(ArenaType.Event, 0, -1, 5, 0, 0, 0, new(-1, 1000, 0), 0)];
+            Assert.Equal(expected, actual.ArenaRanks);
         }
 
         /// <summary>
@@ -168,7 +170,7 @@ namespace Jondo.Unity.Tests.Combat
         /// fight in the season and in the day, no win.
         /// </summary>
         [Fact]
-        public void A_lost_fight_shows_as_the_captures_does()
+        public void A_lost_fight_updates_only_its_modes_placement_rating_and_counters()
         {
             KoliseoLadder.StartSeason(CapturedSeason);
             KoliseoLadder.Clock = () => CapturedSeason.AddDays(10);
@@ -176,12 +178,15 @@ namespace Jondo.Unity.Tests.Combat
             long them1 = Character(9_100_000_033), them2 = Character(9_100_000_034);
             KoliseoLadder.Record(1, new[] { (them1, 200), (them2, 200) }, new[] { (me, 200), (mate, 200) });
 
-            var lty = ProtoMessage.Parse(KoliseoHandler.BuildRanks(me, 200));
-            var twoVersusTwo = lty.Fields.Where(f => f.FieldNumber == 3).Select(f => ProtoMessage.Parse(f.BytesValue))
-                                  .Single(m => m.Fields.Any(f => f.FieldNumber == 1 && f.VarIntValue == 1));
-            long Field(int n) => twoVersusTwo.Fields.FirstOrDefault(f => f.FieldNumber == n)?.VarIntValue ?? 0;
-            Assert.Equal((4L, 0L, 1L, 0L, 1L), (Field(4), Field(5), Field(6), Field(7), Field(10)));
-            Assert.Equal(-1L, Field(3));
+            var actual = ArenaPlayerInformationService.Live.Snapshot(me, 200);
+            Assert.Equal(new ArenaRank(ArenaType.TwoVsTwo, 0, -1, 4, 0, 1, 0, new(-1, 910, 0), 1),
+                Assert.Single(actual.ArenaRanks, rank => rank.ArenaType == ArenaType.TwoVsTwo));
+            Assert.All(actual.ArenaRanks.Where(rank => rank.ArenaType != ArenaType.TwoVsTwo), rank =>
+            {
+                Assert.Equal(5, rank.FightNeededForLadder);
+                Assert.Equal(0, rank.SeasonFightCount);
+                Assert.Equal(new ArenaLeagueRanking(-1, 1000, 0), rank.LeagueRanking);
+            });
         }
 
         // ─── The matchmaking ────────────────────────────────────────────────────────────────

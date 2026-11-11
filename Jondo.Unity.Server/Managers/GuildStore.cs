@@ -61,10 +61,9 @@ namespace Jondo.Unity.Server.Managers
         /// A guild rank, just as it travels in the jco: name, permissions, icon and order.
         /// </summary>
         /// <remarks>
-        /// The permissions are two things the client sends and the server returns unchanged:
-        /// a packed list of numbers (the f3.f3) and a flag (the f3.f1, 1 in every rank except
-        /// the leader's and the newcomers'). Which permission each number is has not been
-        /// reconstructed, and it is not needed to store them: they are returned as they came.
+        /// Rights retain their historical packed-int32 storage representation (f3.f3).
+        /// GuildRankRights decodes them for delivery and permission checks. Flag is the
+        /// client's Modifiable value (f3.f1), true by default except for leader/newcomer.
         /// </remarks>
         public sealed class Rank
         {
@@ -514,7 +513,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// Whether a member's rank carries a right of the client's guild rights table. Rank 1, the
         /// guild master, has them all; the rest have what their rank's list says, which is the list
-        /// of right ids as the client sends it (one byte each: none passes 127).
+        /// of right ids as the client sends it, decoded as packed int32s rather than bytes.
         /// </summary>
         public static bool HasRight(long characterId, int right)
         {
@@ -523,7 +522,7 @@ namespace Jondo.Unity.Server.Managers
             int rank = RankOf(characterId);
             if (rank == 1) return true;
             var rights = Ranks(guild.Id).Find(r => r.Id == rank)?.Rights;
-            return rights != null && Array.IndexOf(rights, (byte)right) >= 0;
+            return GuildRankRights.Decode(rights).Contains(right);
         }
 
         /// <summary>A guild's members, by their character and their rank.</summary>
@@ -639,7 +638,7 @@ namespace Jondo.Unity.Server.Managers
             var query = conexion.CreateCommand();
             query.CommandText = "SELECT COALESCE(SUM(Done), 0) FROM GuildContributions WHERE CharacterId = $c;";
             query.Parameters.AddWithValue("$c", characterId);
-            return Convert.ToInt32(query.ExecuteScalar()) * ContributionGuildKamas;
+            return checked(Convert.ToInt32(query.ExecuteScalar()) * ContributionGuildKamas);
         }
 
         // ─── Ranks ──────────────────────────────────────────────────────────────
@@ -700,6 +699,9 @@ namespace Jondo.Unity.Server.Managers
 
         private static void SaveRank(SqliteConnection conexion, Rank rank)
         {
+            // Validate the whole list before persisting it; a malformed suffix must
+            // never turn into a partial permission set on a later read.
+            GuildRankRights.Decode(rank.Rights);
             var upsert = conexion.CreateCommand();
             upsert.CommandText = @"
                 INSERT INTO GuildRanks (GuildId, RankId, Name, Rights, Flag, Icon, Ord)

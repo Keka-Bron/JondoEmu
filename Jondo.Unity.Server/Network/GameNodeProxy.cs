@@ -9,6 +9,7 @@ using System.Linq;
 using Google.Protobuf;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Network
 {
@@ -125,17 +126,8 @@ namespace Jondo.Unity.Server.Network
 
             byte[] payload = firstPayload;
             string payloadStr = RoutingTextOf(payload, firstPayloadStr);
-            bool isAuthenticated = false;
+            var entryService = new GameEntryService(session, new GameEntryBackend());
             bool hasSentIthBurst = false;
-
-            // The map block goes out once per entry into the world. kqo, which used to trigger it,
-            // turns out to be a heartbeat that repeats every five seconds.
-            bool hasSentMapBlock = false;
-
-            // Account and server for this session, resolved when redeeming the ticket the client
-            // presents in kqz. Without this the character list would be the same for everyone.
-            long sessionAccountId = 0;
-            int sessionServerId = 0;
 
             if (payloadStr.Contains(Op.Uri(Op.Lqu)) || payloadStr.Contains(Op.Uri(Op.Hoy)) || payloadStr.Contains(Op.Uri(Op.Hmt)) || payloadStr.Contains("type.ankama.com/knx"))
             {
@@ -162,43 +154,32 @@ namespace Jondo.Unity.Server.Network
 
                 GameServerProxy.LogTraffic("GAME_C->S", payload, payload.Length);
 
-                if (payloadStr.Contains(Op.Uri(Op.Kqz)))
+                Game.GameFrame? entryFrame;
+                try
                 {
-                    // The client presents the ticket handed to it by the connection server. From
-                    // here on the session knows which account it serves, and answers it with the
-                    // burst that ends in the character list. A valid ticket is the only way in.
-                    if (HandleTicketPresentation(payload, ref sessionAccountId, ref sessionServerId))
-                    {
-                        isAuthenticated = true;
-                        // The same account in another connection goes, and its character is saved,
-                        // before this one reads its characters.
-                        int replaced = await SessionRegistry.CloseOthersOfAsync(session, TimeSpan.FromSeconds(10));
-                        if (replaced > 0)
-                            Console.WriteLine($"[Game Node] Account {sessionAccountId} came in again: " +
-                                              $"{replaced} older connection(s) closed.");
+                    entryFrame = GameEntryDispatch.Decode(session, payload, payloadStr);
+                }
+                catch (Exception ex) when (ex is InvalidProtocolBufferException or Game.GameConversionException)
+                {
+                    Program.LogDebug($"[Entry] Invalid request: {ex.Message}");
+                    return;
+                }
+                var entryRequest = entryFrame?.Content as Game.GameRequest;
 
-                        var characters = DatabaseManager.GetCharactersByAccountId(sessionAccountId, sessionServerId);
+                // Legacy feature handlers use these per-packet views; the owning session is
+                // the only source of account/authentication state.
+                bool isAuthenticated = session.IsAuthenticated;
+                long sessionAccountId = session.AccountId;
+                int sessionServerId = session.ServerId;
+                var entryResult = entryFrame == null
+                    ? GameEntryResult.Unhandled : await entryService.HandleAsync(entryFrame);
+                if (entryResult == GameEntryResult.Close) return;
+                if (entryResult == GameEntryResult.Unhandled && entryRequest != null
+                    && !GameEntryDispatch.IsAllowed(session, entryRequest)) return;
 
-                        // One of them still in a fight: the burst stops short of the list, and
-                        // the list goes out with the kvd behind it when the client asks (kvc).
-                        // Sending the list inside the burst and the kvd after it -- behind the
-                        // jtg -- put the client on the character screen anyway.
-                        bool backIntoAFight = characters.Any(c => FightHandler.FightToRejoin(c.Id) != null);
-                        foreach (byte[] frame in ConnectionProtocol.BuildWelcomeBurst(characters, withList: !backIntoAFight))
-                        {
-                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
-                        }
-                        Console.WriteLine($"[Game Node] Burst sent to account {sessionAccountId}: " +
-                                          $"{characters.Count} character(s) on server {sessionServerId}" +
-                                          (backIntoAFight ? ", one of them still in a fight." : "."));
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("[Game Node] Invalid or expired ticket. Closing the session.");
-                        Console.ResetColor();
-                        return;
-                    }
+                if (entryResult == GameEntryResult.Handled)
+                {
+                    // Read the next frame at the end of the loop, after releasing the session turn.
                 }
                 else if (payloadStr.Contains("type.ankama.com/krt"))
                 {
@@ -210,34 +191,7 @@ namespace Jondo.Unity.Server.Network
                     // the server only answers kqr and it is the client that closes the connection
                     // and redoes the handshake with the connection server. Both ways back are
                     // handled the same: the client decides which of the two screens it lands on.
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Kqr, BuildKqrPayload(sessionAccountId)));
-                    // If he leaves while in a fight, he has to be returned to the surface map:
-                    // the arena one is an instance and staying there is staying locked in.
-                    //
-                    // But the fight itself stays, the same as when the socket simply dies: the
-                    // character is still in it, the next character list carries the kvd, and he
-                    // can come back. LeaveFight -- which throws the whole fight away -- is only
-                    // for a fight he could not go back to anyway.
-                    if (FightHandler.FightToRejoin(SessionContext.State.CharacterId) != null)
-                    {
-                        FightHandler.BackToRoleplayMap();
-                        SessionContext.State.IsInFight = false;
-                        SessionContext.State.FightId = 0;
-                    }
-                    else
-                    {
-                        FightHandler.LeaveFight();
-                    }
-                    if (SessionContext.Current.IsInWorld)
-                    {
-                        await SessionRegistry.RemoveFromMapAsync(
-                            SessionContext.State.MapId, SessionContext.State.CharacterId,
-                            SessionContext.Current.Id);
-                        SessionContext.Current.LeaveWorld();
-                    }
-                    hasSentMapBlock = false;
-                    Console.WriteLine("[Game Node] Client is going back: sent kqr and released the session.");
+                    await entryService.ReturnToSelectionAsync();
                 }
                 // Careful: kqu no longer belongs here. In 3.6.10.10 it is a message pushed by the
                 // server inside the welcome burst, not a client request.
@@ -266,7 +220,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lte)))
                 {
-                    await KoliseoHandler.ReturnAsync(stream, payload);
+                    await KoliseoHandler.ReturnAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Lsi)))
                 {
@@ -312,248 +266,10 @@ namespace Jondo.Unity.Server.Network
                     // used to wait for the kvk itself, which the client never sends.
                     await CharacterCreationHandler.SuggestNameAsync(stream);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Kvw)) || payloadStr.Contains(Op.Uri(Op.Ksl))
-                         || payloadStr.Contains(Op.Uri(Op.Kvl)))
-                {
-                    // Character selection. We check that it belongs to this session's account:
-                    // the client picks the id, so it cannot be trusted.
-                    //
-                    // The kvl is the same step but right after the character was created: in the capture of a
-                    // creation that goes well, the client sends kvl right after the kvi and enters the
-                    // world without going through the list.
-                    if (!CharacterSelectionHandler.HandleCharacterSelectionRequest(payload, sessionAccountId))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("[Game Node] Character selection rejected. Closing the session.");
-                        Console.ResetColor();
-                        return;
-                    }
-
-                    // Picking a character that is still in a fight the ordinary way -- not the
-                    // kwb of "go on then" -- is turning the fight down: he gives it up, the
-                    // others get his surrender, and he enters the world where he left it.
-                    var turnedDown = FightHandler.FightToRejoin(GameState.CharacterId);
-                    if (turnedDown != null)
-                    {
-                        await FightHandler.AbandonFromOutsideAsync(turnedDown, GameState.CharacterId);
-                    }
-
-                    // A fresh entry into the world: the map block is owed again.
-                    hasSentMapBlock = false;
-                    if (!await EnterWorldAsync(stream)) return;
-                }
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvc)))
-                {
-                    // The client asks for the list. On an ordinary login it already has it; when
-                    // a character is still in a fight this is where it goes, with the empty kvd
-                    // behind it: "do not stop here". The client answers kwb, handled below.
-                    var characters = DatabaseManager.GetCharactersByAccountId(sessionAccountId, sessionServerId);
-                    var stillFighting = characters.FirstOrDefault(c => FightHandler.FightToRejoin(c.Id) != null);
-                    if (stillFighting != null)
-                    {
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                            ConnectionProtocol.Push(Op.Kvi, ConnectionProtocol.BuildCharactersList(characters)));
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                            ConnectionProtocol.Push(Op.Kvd));
-                        Console.WriteLine($"[Game Node] {stillFighting.Name} is still in a fight: kvi and kvd sent.");
-                    }
-                }
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kwb)))
-                {
-                    // "Go on then": the answer to the kvd. The character is the one of this
-                    // account still in a fight; the message itself names nobody.
-                    long back = 0;
-                    Jondo.Unity.World.Fights.FightInstance? fightToRejoin = null;
-                    foreach (var candidate in DatabaseManager.GetCharactersByAccountId(sessionAccountId, sessionServerId))
-                    {
-                        fightToRejoin = FightHandler.FightToRejoin(candidate.Id);
-                        if (fightToRejoin != null) { back = candidate.Id; break; }
-                    }
-                    if (fightToRejoin == null
-                        || !CharacterSelectionHandler.SelectCharacter(back, sessionAccountId))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("[Game Node] kwb without a fight to go back to. Closing the session.");
-                        Console.ResetColor();
-                        return;
-                    }
-
-                    hasSentMapBlock = false;
-                    FightHandler.RejoinState(fightToRejoin);
-                    if (!await EnterWorldAsync(stream)) return;
-                }
-                else if ((payloadStr.Contains(Op.Uri(Op.Ijm)) || payloadStr.Contains(Op.Uri(Op.Kmv)))
-                         && FightHandler.PendingSpectatorBoard() != null)
-                {
-                    // A spectator's client has the arena: the fight as it stands, once.
-                    var watched = FightHandler.PendingSpectatorBoard()!;
-                    await FightHandler.InTurnAsync(watched, () => FightHandler.SendSpectatorBoardAsync(stream, watched));
-                }
                 else if (payloadStr.Contains(Op.Uri(Op.Kme)) && SessionContext.State.SpectatingFightId != 0)
                 {
                     // «Abandonar el modo espectador»: home, as at the fight's end.
                     await FightHandler.StopWatchingAsync(SessionContext.Current);
-                }
-                else if ((payloadStr.Contains(Op.Uri(Op.Ijm)) || payloadStr.Contains(Op.Uri(Op.Kmv)))
-                         && FightHandler.PendingResume() != null)
-                {
-                    // Back into a fight already running: the board as it is now, once, and the
-                    // client picks the fight up from there. The placement case is not this: it
-                    // goes through the preparation below, from scratch, as the capture does.
-                    var resumed = FightHandler.PendingResume()!;
-                    await FightHandler.InTurnAsync(resumed, () => FightHandler.ResumeForOneAsync(stream, resumed));
-                }
-                else if ((payloadStr.Contains("type.ankama.com/jrh")
-                          || payloadStr.Contains(Op.Uri(Op.Kmv)))
-                         && FightHandler.PendingPreparation() is { } waiting
-                         && !FightHandler.AsksForFightMap(payload, waiting))
-                {
-                    // A late request for the map left behind, while the fight waits on another:
-                    // the placement is kept for the request that names the fight's map.
-                    Program.LogDebug($"[Fight] The client asks for a map other than fight #{waiting.FightId}'s; " +
-                                     "the placement waits for the fight's own.");
-                }
-                else if ((payloadStr.Contains("type.ankama.com/jrh")
-                          || payloadStr.Contains(Op.Uri(Op.Kmv)))
-                         && FightHandler.PendingPreparation() != null)
-                {
-                    // In a fight, who is on the map is not sent with a jss: it is the preparation's jxg,
-                    // and only when the client asks for them. That is the capture's
-                    // order, and sending them before the map change makes it discard them.
-                    //
-                    // And it asks for them with kmv, not with jrh. On loading a normal map the client sends
-                    // both, so hooking the jrh was enough there; but on entering a fight it sends
-                    // ijm and kmv and nothing else, and kmv was on the list of messages ignored without
-                    // a word. That is why the fight appeared in the server log and on screen
-                    // nothing happened.
-                    var prepared = FightHandler.PendingPreparation()!;
-                    await FightHandler.InTurnAsync(prepared, async () =>
-                    {
-                        await FightHandler.SendPreparationAsync(stream, prepared);
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                            ConnectionProtocol.BuildActorsComplete());
-                    });
-                }
-                else if (payloadStr.Contains("type.ankama.com/jrh"))
-                {
-                    // While fighting, the map is already set: sending it the surface map's jss would
-                    // take it out of the fight.
-                    //
-                    // And this CANNOT be a continue. Reading the next frame is at the
-                    // END of this while's body, so jumping to the condition skips it:
-                    // the payload is still the same, this same branch is entered again, and
-                    // it jumps again. Forever, without a single await in between, that is spinning
-                    // at full speed and never reading another byte from that client again.
-                    var here = GameState.IsInFight
-                        ? null
-                        : DatabaseManager.GetCharacterById(GameState.CharacterId);
-
-                    // The client asks who is on the map. Without an answer it draws an empty map:
-                    // no avatar, no NPCs, no monsters.
-                    if (here != null)
-                    {
-                        // The green marks go out FIRST, before the actor list. That is not a style
-                        // choice: in all 20 captures that load a map, iom comes before jss and
-                        // never after -- empty ones and full ones alike, "iom (0)" then "jss
-                        // (3589)", "iom (96)" then "jss (3895)". This server sent it after the
-                        // actors were complete, and the client drew nothing, which is exactly what
-                        // it looks like when the marks arrive for a map the client considers
-                        // finished. Same frames, same contents, wrong side of the actor list.
-                        //
-                        // Nothing open survives a map change either: otherwise the X of the new
-                        // map's zaap is taken by a conversation the player left behind.
-                        NpcHandler.Forget();
-                        WorkshopHandler.Forget();
-                        MarketplaceHandler.Forget();
-                        await Handlers.DreamHandler.OnMapLoadedAsync(stream);
-                        Handlers.AnomalyHandler.BeforeMapLoaded(GameState.MapId);
-                        await Managers.Quests.SendMarksAsync(stream, GameState.MapId);
-
-                        byte[] actors = ConnectionProtocol.Push(Op.Jss,
-                            ConnectionProtocol.BuildMapActors(GameState.MapId, here,
-                                                              GameState.CellId, GameState.Orientation,
-                                                              sessionAccountId));
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, actors);
-
-                        // How many fights the map has, right behind its actors when it has any.
-                        await FightHandler.SendFightCountAsync(stream, GameState.MapId);
-
-                        // And straight behind it, the mark that says there are no more actors. In
-                        // every capture that loads a map lva comes immediately after jss, and
-                        // without it the client never counts the map as loaded: two seconds later
-                        // it asks again with knm, kno and kny and goes round once more.
-                        // Inside the haven bag the furniture and the permissions also go, which in the
-                        // capture come out between the jss and the lva.
-                        if (Managers.Merkasako.IsHavenBag(GameState.MapId))
-                        {
-                            await MerkasakoHandler.SendFurnitureAsync(stream);
-                        }
-
-
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                            ConnectionProtocol.BuildActorsComplete());
-
-                        // And on a guild raid's map, what the raid has shown there: its stagings,
-                        // which a map load resets in the client.
-                        await Managers.GuildRaidStagings.OnMapLoadedAsync(stream, GameState.CharacterId, GameState.MapId);
-                        // And in the Travelers' Tower's portal room, the portal as it stands.
-                        await Handlers.TravelersTowerHandler.OnMapLoadedAsync(stream, GameState.MapId);
-                        // And on Osavora's maps, the look of the season.
-                        await Handlers.OsavoraSeasonHandler.OnMapLoadedAsync(stream, GameState.MapId);
-                        // And in a temporal anomaly's zone, the anomaly; on its zaap, the vestige.
-                        await Handlers.AnomalyHandler.OnMapLoadedAsync(stream, GameState.MapId);
-                        // And in Gargandias's room, the fight of whoever the grate let through.
-                        await Handlers.GargandiasHandler.OnMapLoadedAsync(stream, GameState.MapId);
-                        // And in a guild hall, its banners: the guild's own, or the neutral ones.
-                        await Handlers.GuildHallHandler.OnMapLoadedAsync(stream, GameState.CharacterId, GameState.MapId);
-
-                        // And what depends on having arrived here: the objectives met
-                        // by stepping on a map or a zone.
-                        //
-                        // HERE and not in MapLoadHandler, which is where it was and it did not work. The kkr
-                        // that one handles only arrives on the world's initial load; walking from one map
-                        // to another does not send it, and it is seen in the log: four map changes
-                        // in a row —154011397, 154010885, 154010884, 154010883— and not one call to
-                        // the marks, so the NPC that did have a quest to give came out without the
-                        // exclamation mark above it. This block, on the other hand, is where the five
-                        // ways of reaching a map go through, because the client always asks for the actors.
-                        var mapaInfo = MapManager.GetMapInfo(GameState.MapId);
-                        await Managers.Quests.OnMapEnteredAsync(stream, GameState.MapId,
-                                                                mapaInfo?.SubAreaId ?? 0);
-
-                        // And the achievements that walking here earns: the zone explored, and
-                        // the level and the bag looked at again. Same place, same reason.
-                        await Managers.Achievements.OnMapEnteredAsync(stream, GameState.MapId,
-                                                                      mapaInfo?.SubAreaId ?? 0);
-
-                        // And the conquests: walking into a vulnerable prism's zone, or out of it,
-                        // changes an AvA fighter's status.
-                        await ConquestHandler.OnMapEnteredAsync(stream, GameState.CharacterId,
-                                                                mapaInfo?.SubAreaId ?? 0);
-
-                        // And a soul back into the world, told he is one.
-                        await Handlers.PhantomHandler.OnMapLoadedAsync(stream);
-
-                        // And the stagings the map stands with, played out: the tutorial's bridges.
-                        await Managers.MapStagings.ShowAsync(stream, Managers.MapStagings.OnArrival(GameState.MapId));
-
-                        Console.WriteLine($"[Game Node] Actors of map {GameState.MapId} sent: " +
-                                          $"{here.Name} on cell {GameState.CellId}.");
-                    }
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Lqc)))
-                {
-                    // lqc is the client saying it has already digested the first block. This is where
-                    // it is time to give it the map.
-                    //
-                    // Before, we waited for the first kqo, which is the heartbeat and arrives every five seconds:
-                    // in the real client's log 4.8 s passed between choosing a character and receiving
-                    // the map. That gap is the flash of empty Incarnam before the fade to black:
-                    // the client is already in the world, does not yet know on which map, and meanwhile
-                    // shows its default scene, which is Incarnam's. That is why its
-                    // music also played on the character screen.
-                    Console.WriteLine("[Game Node] Client confirmed with lqc.");
-                    if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, Op.Lqc)) hasSentMapBlock = true;
                 }
                 else if (await WorldMovementDispatch.TryHandleAsync(session, payload, payloadStr))
                 {
@@ -695,7 +411,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jqk)))
                 {
-                    hasSentMapBlock = true;   // the map block belongs to entering the world, not to this
+                    entryService.OnMapChange();
                     await WorldMoveHandler.ChangeMapAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kum)))
@@ -1178,10 +894,10 @@ namespace Jondo.Unity.Server.Network
                     await Handlers.GuildRaidHandler.InviteAsync(stream, payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iag)))
                     await Handlers.GuildRaidHandler.InvitationAnswerAsync(stream, payload);
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jew)))
+                else if (entryRequest is Game.GuildWeeklyResetDateRequest)
                 {
                     // When the week starts again: asked at world entry too.
-                    await Handlers.GuildHandler.WeeklyResetAsync(stream, payload);
+                    await Handlers.GuildHandler.WeeklyResetAsync(session, entryFrame!.Uid!.Value);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jiy)))
                 {
@@ -1424,19 +1140,19 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Jbn)))
                 {
                     // The haven bag button, and the H key.
-                    hasSentMapBlock = true;
+                    entryService.OnMapChange();
                     await MerkasakoHandler.EnterFromOutsideAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jbl)))
                 {
                     // Going to another room of the haven bag.
-                    hasSentMapBlock = true;
+                    entryService.OnMapChange();
                     await MerkasakoHandler.ChangeRoomAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Jbt)))
                 {
                     // The room's theme changed.
-                    hasSentMapBlock = true;
+                    entryService.OnMapChange();
                     await MerkasakoHandler.ChangeThemeAsync(stream, payload);
                 }
                 else if (payloadStr.Contains("type.ankama.com/jbv"))
@@ -1593,7 +1309,7 @@ namespace Jondo.Unity.Server.Network
                 {
                     // The client asks for its inventory again. Silenced until now; the real
                     // server answers ivx and hlm the twelve times it is captured.
-                    await WorkshopHandler.InventoryAsync(stream);
+                    await WorkshopHandler.InventoryAsync(SessionContext.Current);
                 }
                 else if (payloadStr.Contains("type.ankama.com/lyk"))
                 {
@@ -1715,7 +1431,7 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Lzh)))
                 {
                     // The alterations, asked for on entering the world: this character's, from the base.
-                    await AlterationHandler.ListAsync(stream);
+                    await AlterationHandler.ListAsync(session);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
@@ -1742,7 +1458,7 @@ namespace Jondo.Unity.Server.Network
                     else if (await TradeHandler.CloseAsync()) { }
                     else if (await NpcBarterHandler.CloseAsync(stream)) { }
                     else if (MarketplaceHandler.IsOpen) await MarketplaceHandler.CloseAsync();
-                    else if (WorkshopHandler.IsOpen) await WorkshopHandler.CloseAsync(stream);
+                    else if (WorkshopHandler.IsOpen) await WorkshopHandler.CloseAsync(SessionContext.Current);
                     else if (BankHandler.IsOpen) await BankHandler.CloseAsync(stream);
                     else if (await HouseHandler.CloseDialogAsync(stream)) { }
                     else if (await EstateAgencyHandler.CloseAsync(stream)) { }
@@ -1759,7 +1475,7 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Hjc)))
                 {
                     // He has chosen a destination in the zaap list.
-                    hasSentMapBlock = true;   // the map block belongs to entering the world, not to this
+                    entryService.OnMapChange();
                     await ZaapTravelHandler.TravelAsync(stream, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hmt)))
@@ -1808,33 +1524,6 @@ namespace Jondo.Unity.Server.Network
                     //   iuv: f1: first slot, f2: second slot, f3: which bar
                     //   answer: ivk per filled slot, ivr per emptied one (ghost icon otherwise)
                     await SwapShortcutsAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Kqo)))
-                {
-                    // kqo is a heartbeat, not a request for the map. The client sends it every five
-                    // seconds for as long as it is in the world and the real server answers it with
-                    // kqy alone: twenty-four in a row, 5.000 ms apart, in the tutorial capture.
-                    //
-                    // Answering it with the map block is what made the client reload the world over
-                    // and over: the block carries jru, and jru means "load this map". So the block
-                    // goes out on the first kqo of the entry and the heartbeat gets its own answer
-                    // from then on. The block already opens with a kqy of its own, which is why the
-                    // first one is not answered twice.
-                    // The lqc has usually sent it already, so this does nothing; it stays here because
-                    // not everything that connects sends lqc —the test client, for one—
-                    // and without a map there is no world.
-                    if (await SendMapBlockOnceAsync(stream, hasSentMapBlock, "first kqo"))
-                    {
-                        hasSentMapBlock = true;
-                    }
-                    else
-                    {
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                            ConnectionProtocol.BuildHeartbeatAnswer());
-
-                        // And the clock of the timed alterations: the ones whose date has come are lost.
-                        await AlterationHandler.TickAsync(stream);
-                    }
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Loy)))
                 {
@@ -2220,116 +1909,6 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// What follows a selection, whoever made it: the character's things are read from the
-        /// database, the session enters the world, and blocks 1 and 2 go out. False when the
-        /// character is not in the database, which closes the session.
-        /// </summary>
-        private static async Task<bool> EnterWorldAsync(NetworkStream stream)
-        {
-            // Block 1 of the world entry, replayed from the 3.6.10.10 capture with the identity
-            // rebuilt from the database. The real server stops here and waits for the client to
-            // confirm with lqc before sending anything else.
-            var chosen = DatabaseManager.GetCharacterById(GameState.CharacterId);
-            if (chosen == null)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[Game Node] Character {GameState.CharacterId} is not in the database.");
-                Console.ResetColor();
-                return false;
-            }
-
-            Managers.Equipment.LoadFrom(chosen.Id);
-            Managers.SpellChoices.LoadFrom(chosen.Id);
-            Managers.Quests.LoadFrom(chosen.Id);
-            Managers.Achievements.LoadFrom(chosen.Id);
-            Managers.Emotes.LoadFrom(chosen.Id);
-            SessionContext.State.ElementsUsed = DatabaseManager.LoadElementsUsed(chosen.Id);
-
-            SessionContext.Current.EnterWorld();
-
-            // Somebody going back into a fight is not on a roleplay map for anybody to see.
-            if (!GameState.IsInFight)
-            {
-                await SessionRegistry.BroadcastToMapAsync(
-                    SessionContext.State.MapId,
-                    ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                        chosen, SessionContext.State.CellId, SessionContext.State.Orientation,
-                        SessionContext.Current.AccountId)),
-                    SessionContext.Current.Id);
-            }
-
-            await WorldEntry.SendAfterCharacterAsync(stream, chosen);
-
-            // Block 2 goes out straight after. In the capture the client asks for it with lqc,
-            // and it does send that lqc here too, only later: it comes once the client has
-            // digested block 1, by which time ours has already sent block 2. Waiting for it
-            // would leave the client without the catalogues for no reason.
-            await WorldEntry.SendAfterConfirmAsync(stream, chosen);
-
-            // His guild raid sees him connected, and a running one comes back with its panel.
-            await Handlers.GuildRaidHandler.OnEnterWorldAsync(chosen.Id);
-
-            // His guild sees him on line, and whoever asked is warned.
-            await Handlers.GuildHandler.TellConnectionAsync(chosen.Id, online: true);
-
-            // His mutual friends see him playing.
-            await Handlers.FriendsHandler.AnnouncePresenceAsync(SessionContext.Current.AccountId);
-
-            // A name change potion used last time: the Rename window.
-            await Handlers.RemodelHandler.OnEnterWorldAsync(stream, chosen);
-
-            // And the server's welcome line, if its settings have one.
-            if (!string.IsNullOrWhiteSpace(ServerSettings.Current.WelcomeMessage))
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
-                    ConnectionProtocol.BuildNotice(ServerSettings.Current.WelcomeMessage.Trim())));
-            return true;
-        }
-
-        /// <summary>
-        /// Sends the map block, only once per entry into the world.
-        ///
-        /// The block carries a jru, and jru means "load this map": sending it twice makes
-        /// the client reload the world again and again. Returns whether it sent it.
-        /// </summary>
-        private static async Task<bool> SendMapBlockOnceAsync(NetworkStream stream, bool alreadySent,
-                                                              string reason)
-        {
-            if (alreadySent) return false;
-
-            var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
-            if (character == null) return false;
-
-            // The character and the map go in the trace on purpose: when two clients enter at
-            // once, it is the first thing to look at to know whether they have crossed.
-            Console.WriteLine($"[Game Node] Sending the map block ({reason}): " +
-                              $"{GameState.CharacterName} on map {GameState.MapId}.");
-            await WorldEntry.SendMapAsync(stream, character, GameState.MapId,
-                                          GameState.IsInFight ? FightHandler.FightOf(GameState.CharacterId) : null);
-
-            // And what one has as adornment, which the real server sends only once, here: the
-            // available titles and ornaments, and which one is worn.
-            await WardrobeHandler.SendOwnedAsync(stream, SessionContext.Current.AccountId);
-
-            // The account's houses (jaa): the capture's no longer travels, this one is ours.
-            await HouseHandler.SendAccountHousesAsync(stream);
-
-            // And his quest journal, for the same reason: the capture's no longer travels.
-            await Managers.Quests.SendJournalAsync(stream, box: true);
-
-            // And their emotes and achievements, for the same reason: the replayed block carried
-            // the recorded account's 47 emotes and 954 achievements.
-            await Managers.Emotes.SendListAsync(stream);
-            await Managers.Achievements.SendListAsync(stream);
-
-            // And his builds, for the same reason: the replayed block carried that account's fourteen.
-            await PresetHandler.SendListAsync(stream);
-
-            // And the green mark over whoever has something to offer on this map.
-            await Managers.Quests.SendMarksAsync(stream, GameState.MapId);
-            return true;
-        }
-
-        /// <summary>
         /// Says whether a message we do not know how to handle carries inside the id of a spell that is
         /// paired with another. The variant swap has to be one of these, and that way the
         /// message is identified the first time someone swaps a variant instead of guessing it.
@@ -2513,81 +2092,6 @@ namespace Jondo.Unity.Server.Network
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ivr, ConnectionProtocol.BuildShortcutRemoved(slot)));
-        }
-
-        /// <summary>
-        /// Redeems the ticket the client presents in kqz and binds the session to an account,
-        /// server and language. The ticket travels in field 2 of the message.
-        /// </summary>
-        private static bool HandleTicketPresentation(byte[] payload, ref long accountId, ref int serverId)
-        {
-            try
-            {
-                byte[]? kqz = ConnectionProtocol.ReadPayload(payload, Op.Kqz);
-                if (kqz == null || kqz.Length == 0) return false;
-
-                var msg = ProtoMessage.Parse(kqz);
-                var ticketField = msg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                if (ticketField == null) return false;
-
-                string ticket = Encoding.UTF8.GetString(ticketField.BytesValue);
-                var session = SessionRegistry.Redeem(ticket);
-                if (session == null) return false;
-
-                accountId = session.AccountId;
-                serverId = session.ServerId;
-                SessionContext.Current.BindAccount(accountId, serverId, session.Language);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Program.LogDebug($"[Game Node] Error redeeming the ticket: {ex.Message}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Reply to the "go back" request: a session id and a one.
-        /// </summary>
-        /// <remarks>
-        /// THE ID IS REGISTERED BEFORE SENDING IT, and this was what left «Cambiar de
-        /// servidor» hanging.
-        ///
-        /// The shape was right: the real server sends here a GUID WITH HYPHENS, 36 characters
-        /// —«desde world a eleccion servidor.pcapng» opens with
-        /// <c>kqr (40) 0a24 00000000-0000-4000-8000-00000000000a 2001</c>— and we sent
-        /// one just like it. What was missing is that nobody knew ours afterwards.
-        ///
-        /// What the client does with it is measured in the player's log: it closes the
-        /// connection, opens another, and presents THAT SAME id as its identity. The last one we sent
-        /// was b52b…16eb and it is exactly the one that came back and we rejected, with
-        /// «The presented token does not match any account». All the tokens this server
-        /// minted were 32 characters —Guid "N" or sixteen bytes in hexadecimal— so an
-        /// id of 36 could not match any of them by definition.
-        ///
-        /// Registering it opens nothing: the server mints it, it goes through that account's
-        /// already authenticated socket, and it is good for the same as the game token already handed out.
-        /// </remarks>
-        private static byte[] BuildKqrPayload(long accountId)
-        {
-            string sessionId = Guid.NewGuid().ToString();
-
-            if (accountId > 0)
-            {
-                ClientLaunchRegistry.RegisterToken(accountId, sessionId);
-                Console.WriteLine($"[Game Node] Going back for account {accountId}: it is given the " +
-                                  "session id and stays recognised for when it connects again.");
-            }
-            else
-            {
-                Console.WriteLine("[Game Node] Going back without an identified account: the session id " +
-                                  "is not registered and the reconnection will be rejected.");
-            }
-
-            return Pb.New()
-                .Str(1, sessionId)
-                .Var(4, 1)
-                .Build();
         }
 
         // Here lived PatchJpvEnteringPacket, which opened the jpv going out to the client, looked

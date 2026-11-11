@@ -11,6 +11,7 @@ namespace Jondo.Unity.Server.Network
     public sealed class GameSession
     {
         private static readonly IGameCodec DefaultCodec = new GameCodec();
+        private static long _nextHaapiSessionUid;
         private readonly IGameCodec _codec = DefaultCodec;
         private readonly Func<byte[], Task>? _sendPacket;
 
@@ -75,6 +76,9 @@ namespace Jondo.Unity.Server.Network
         }
 
         public Guid Id { get; } = Guid.NewGuid();
+        // The client parses the HAAPI identity as Int64. Keep this process-local
+        // connection identity across character changes, independently of the registry GUID.
+        internal long HaapiSessionUid { get; } = Interlocked.Increment(ref _nextHaapiSessionUid);
         public NetworkStream? Stream { get; }
 
         public SessionState State { get; } = new SessionState();

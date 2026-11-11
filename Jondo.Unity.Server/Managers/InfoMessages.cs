@@ -46,6 +46,18 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Warning or error: the client draws it differently.</summary>
         public const int Warning = 1;
 
+        /// <summary>The parameterless warning sent during initial world entry.</summary>
+        public const int InitialEntryWarning = 89;
+
+        /// <summary>Previous connection: year, month, day, hour and minute.</summary>
+        public const int LastConnection = 193;
+
+        /// <summary>Previous connection with its IP as a sixth parameter.</summary>
+        public const int LastConnectionWithIp = 152;
+
+        /// <summary>Online mutual contacts: the current account's count as one parameter.</summary>
+        public const int OnlineMutualFriends = 197;
+
         /// <summary>«{0} acaba de volver a conectarse al combate.» Goes with <see cref="Warning"/>.</summary>
         public const int BackInTheFight = 184;
 

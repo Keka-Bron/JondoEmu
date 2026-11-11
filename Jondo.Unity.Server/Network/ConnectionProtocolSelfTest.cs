@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Network
 {
@@ -324,19 +325,19 @@ namespace Jondo.Unity.Server.Network
             Same(failures, "ilx (new leader)", "088ad0b8e1981a10a69c04",
                  ConnectionProtocol.BuildPartyLeader(900000000010, 69158));
 
-            // The last connection notice. Without an IP it has to come out byte for byte the same as the one
-            // the recorded block brings: 9 August 2026 at 18:53. It is what pins the order of
-            // the parameters, which is not the reading order.
-            Same(failures, "lqn (last connection, no IP)",
-                 "10c101220432303236220230382202303922023138220235 33".Replace(" ", ""),
-                 ConnectionProtocol.BuildLastConnection(
-                     new DateTimeOffset(2026, 8, 9, 18, 53, 0, TimeSpan.Zero), ""));
-
-            // And with an IP, which adds the sixth parameter and changes template.
-            Same(failures, "lqn (last connection, with IP)",
-                 "1098012204323032362202303822023039220231382202353322093132372e302e302e31",
-                 ConnectionProtocol.BuildLastConnection(
-                     new DateTimeOffset(2026, 8, 9, 18, 53, 0, TimeSpan.Zero), "127.0.0.1"));
+            // Semantic notice policies: parameter order is year/month/day/hour/minute,
+            // with an optional sixth IP parameter selecting the other template.
+            var previousWhen = new DateTimeOffset(2026, 8, 9, 18, 53, 0, TimeSpan.Zero);
+            var previousWithoutIp = EntryInformationMessages.PreviousConnection(new() { When = previousWhen });
+            if (previousWithoutIp == null || previousWithoutIp.MessageType != TextInformationType.TextInformationMessage
+                || previousWithoutIp.MessageId != 193
+                || !previousWithoutIp.Parameters.SequenceEqual(new[] { "2026", "08", "09", "18", "53" }))
+                failures.Add("last connection without IP: semantic values differ");
+            var previousWithIp = EntryInformationMessages.PreviousConnection(new() { When = previousWhen, Ip = "127.0.0.1" });
+            if (previousWithIp == null || previousWithIp.MessageType != TextInformationType.TextInformationMessage
+                || previousWithIp.MessageId != 152
+                || !previousWithIp.Parameters.SequenceEqual(new[] { "2026", "08", "09", "18", "53", "127.0.0.1" }))
+                failures.Add("last connection with IP: semantic values differ");
 
             // The private message, just as the real server sent it on whispering to Player-Alpha.
             Same(failures, "kth (private message)",
@@ -365,24 +366,8 @@ namespace Jondo.Unity.Server.Network
             Same(failures, "lqn (item obtained, type 0)", "101522013122053130373834",
                  ConnectionProtocol.BuildSystemMessage(Managers.InfoMessages.ItemGained, "1", "10784"));
 
-            // And the list of discovered zaaps, which is what keeps the window from coming out empty.
-            // They are the 45 of the capture's character, in their order, and they have to give their 182 bytes.
-            Same(failures, "hjk (zaaps descubiertos)",
-                 "0ab3018196b82892b8098880e060a9baea198290d8208184d0588380d0209b96903c8488b00d858a"
-                 + "b0498388a039808cb0498386b849838cb0658180c0558388c0658490c02d8084e05581a6802a81"
-                 + "8e800a8188882a8998b0468a8a882a8490b05e8880e04a9092802a928880528294c04a978e882a"
-                 + "8288d0528992c06a8196e04e878af0069080b04e8194f036878ce04e8080802387849837848880"
-                 + "638290905bc9b6ea198684c02f8eace0438184e82f8080f033",
-                 ConnectionProtocol.BuildDiscoveredZaaps(new long[]
-                 {
-                     84806401, 154642, 202899464, 54172969, 68552706, 185860609, 68419587,
-                     126094107, 28050436, 153879813, 120062979, 153880064, 154010371, 212600323,
-                     179306497, 212861955, 95422468, 179831296, 88085249, 20973313, 88212481,
-                     147590153, 88212746, 197920772, 156762120, 88082704, 171967506, 156240386,
-                     88213271, 173278210, 223349001, 165153537, 14419207, 164364304, 115083777,
-                     165152263, 73400320, 115737095, 207619076, 191105026, 54172489, 99615238,
-                     142087694, 100270593, 108789760,
-                 }));
+            // The historical discovered-zaap list now has an independent stable-codec
+            // fixture in the Game protocol suite; production builds it semantically.
 
             Same(failures, "hjj (anomaly)",
                  "1a13088c0118042204102b187828c9e6e91930e104",
