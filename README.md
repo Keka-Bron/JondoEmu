@@ -690,7 +690,8 @@ played through.
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| **All quests** | **11.9%** | **235/1976** |
+| Vigilantes | `░░░░░░░░░░` **5%** | 1/21 |
+| **All quests** | **11.9%** | **236/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
