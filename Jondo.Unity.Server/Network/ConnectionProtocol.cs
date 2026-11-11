@@ -2268,15 +2268,16 @@ namespace Jondo.Unity.Server.Network
         /// The same question, with the texts its own line fills in: f3, one string per «#n». The
         /// banker's greeting is the measured one -- «te costará #1 kamas» goes with f3 "1397",
         /// frame 74 of the bank capture --, and Ontoral's «Haré esta ofrenda en tu nombre, #1»
-        /// goes the same way with the character's name.
+        /// goes the same way with the character's name. The replies keep their effects' arguments.
         /// </summary>
         public static byte[] BuildNpcQuestion(long messageId, IEnumerable<long> replies,
                                               IReadOnlyDictionary<long, IReadOnlyList<long>>? parametros,
-                                              IEnumerable<string> lineParameters)
+                                              IEnumerable<string> lineParameters,
+                                              IReadOnlyDictionary<long, IReadOnlyList<IReadOnlyList<long>>>? arguments = null)
         {
             var ios = Pb.New();
             foreach (string parameter in lineParameters) ios.Str(3, parameter ?? "");
-            byte[] question = BuildNpcQuestion(messageId, replies, parametros!);
+            byte[] question = BuildNpcQuestion(messageId, replies, parametros, arguments);
             byte[] tail = ios.Build();
             var both = new byte[question.Length + tail.Length];
             Buffer.BlockCopy(question, 0, both, 0, question.Length);

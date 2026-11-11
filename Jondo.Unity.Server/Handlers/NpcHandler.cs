@@ -722,6 +722,13 @@ namespace Jondo.Unity.Server.Handlers
             if ((lineParameters == null || lineParameters.Count == 0) && frase?.NamesTheCharacter == true)
                 lineParameters = new[] { SessionContext.State.CharacterName ?? "" };
 
+            // Any other line's «#1», read off its own text: the character's name, breed or level
+            // (Hal Ylanza's «¡Te doy la bienvenida, #1!» went out with an empty gap). A banker's
+            // greeting is his fee and goes its own way below.
+            if ((lineParameters == null || lineParameters.Count == 0) && banker == null)
+                lineParameters = Managers.LinePlaceholders.For(pregunta,
+                    plantilla?.Id ?? SessionContext.State.OpenDialogueNpcId);
+
             // A written line with nothing to offer this character -- none written, or none his -- gets
             // the client's own «Marcharte.»: his last reply would be somebody else's words, Otomai's
             // apprentice saying «Ir a ver al maestro cazador» when the beast is coming, Chronokwartz
@@ -785,9 +792,10 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // A line that names somebody -- «Haré esta ofrenda en tu nombre, #1» -- carries the name.
+            // A line that names somebody -- «Haré esta ofrenda en tu nombre, #1» -- carries the name,
+            // and its replies keep what their effects act on (the quest a «?» reply starts).
             byte[] ios = lineParameters is { Count: > 0 }
-                ? ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros, lineParameters)
+                ? ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros, lineParameters, arguments)
                 : ConnectionProtocol.BuildNpcQuestion(pregunta, respuestas, parametros, arguments);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ios, ios));
         }
