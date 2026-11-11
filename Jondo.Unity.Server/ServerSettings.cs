@@ -34,7 +34,7 @@ namespace Jondo.Unity.Server
         /// <summary>Extra experience for everybody, in percent: what fights, quests and rewards give.</summary>
         public int ExperienceBonusPercent { get; set; }
         
-        /// <summary>Extra experience for everybody, in percent: what fights, quests and rewards give.</summary>
+        /// <summary>Extra job experience for everybody, in percent: what gathering, crafting and breeding give.</summary>
         public int JobExperienceBonusPercent { get; set; }
 
         /// <summary>Extra chance of every item a monster drops, in percent.</summary>
@@ -112,7 +112,7 @@ namespace Jondo.Unity.Server
         public int HeadHuntRestMinutes { get; set; } = 30;
 
         /// <summary>How many scrolled stats a player starts with.</summary>
-        public int StartingScrollStats { get; set; } = 100;
+        public int StartingScrollStats { get; set; } = Handlers.CharacterCreationHandler.ScrolledStat;
 
         /// <summary>How many kamas a player starts with.</summary>
         public long StartingKamas { get; set; } = 1_000_000L;

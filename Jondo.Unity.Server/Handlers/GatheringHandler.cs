@@ -244,8 +244,10 @@ namespace Jondo.Unity.Server.Handlers
 
                 bool subeNivel = SessionContext.State.AddJobExperience(
                     resource.JobId,
-                    Managers.Almanax.WithBonus(Managers.Almanax.BonusType.JobExperience, JobExperience.PerGather,
-                        Managers.Almanax.Where.AtWork(resource.JobId, skillId)),
+                    ServerSettings.WithBonus(
+                        Managers.Almanax.WithBonus(Managers.Almanax.BonusType.JobExperience, JobExperience.PerGather,
+                            Managers.Almanax.Where.AtWork(resource.JobId, skillId)),
+                        ServerSettings.Current.JobExperienceBonusPercent),
                     out long total, out int nivel);
                 DatabaseManager.SaveJobExperience(characterId, resource.JobId, total);
 
