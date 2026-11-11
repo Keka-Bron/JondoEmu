@@ -92,6 +92,22 @@ namespace Jondo.Unity.Tests.Content
             Assert.False(Met(item, facts));
         }
 
+        /// <summary>«QF&gt;q,0»: the quest finished at least once, as Cuerbax asks of «Proteger y servir».</summary>
+        [Fact]
+        public void A_quest_finished_once_is_counted()
+        {
+            if (!File.Exists(Paths.QuestsJson)) return;
+            var book = new QuestCatalogue();
+            if (book.Step(1237) == null) return;
+            var log = new QuestLog(book, () => 200, () => 0);
+            var facts = new PlayerCriteria.Facts(null, log, book, 0, _ => 0);
+            Assert.False(Met("QF>632,0", facts));
+            log.Restore(632, 1237, null, true);
+            Assert.True(Met("QF>632,0", facts));
+            Assert.True(Met("QF=632", facts));
+            Assert.False(Met("QF>632,0&QF>633,0", facts));
+        }
+
         /// <summary>Gein's own table: his follower, to whoever is on his quest's step.</summary>
         [Fact]
         public void A_monsters_quest_drop_keeps_its_criterion()

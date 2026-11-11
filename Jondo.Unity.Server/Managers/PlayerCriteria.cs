@@ -117,6 +117,15 @@ namespace Jondo.Unity.Server.Managers
                 case "Qa": return facts.Log == null ? Answer.Unknown : Truth(facts.Log.Active((int)value), op);
                 case "Qf":
                 case "Qc": return facts.Log == null ? Answer.Unknown : Truth(facts.Log.Finished((int)value), op);
+
+                // How many times a quest was finished: «QF>1423,0» at least once, which Cuerbax asks
+                // before his evaluations. One run is kept per quest, so it counts as once.
+                case "QF":
+                    if (facts.Log == null || condition.Args.Count == 0 || !int.TryParse(condition.Args[0], out int quest))
+                        return Answer.Unknown;
+                    return condition.Args.Count == 1
+                        ? Truth(facts.Log.Finished(quest), op)
+                        : Compare(facts.Log.Finished(quest) ? 1 : 0, op, value);
                 case "Qs":
                     return facts.Log == null ? Answer.Unknown : Truth(facts.Log.Doing().Any(r => r.StepId == value), op);
                 case "Qo": return Pending(facts, op, value);
