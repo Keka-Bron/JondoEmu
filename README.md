@@ -677,8 +677,10 @@ played through.
 | Area | Played | Quests |
 |---|:---|:---:|
 | Astrub | `██████████` **100%** | 51/51 |
+| Class Temple | `██████████` **100%** | 39/39 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Incarnam | `██████████` **100%** | 24/24 |
+| Wanted Notices | `██░░░░░░░░` **24%** | 20/82 |
 | Wabbit Islands | `██████░░░░` **61%** | 14/23 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
@@ -687,9 +689,7 @@ played through.
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| Class Temple | `█░░░░░░░░░` **10%** | 4/39 |
-| Wanted Notices | `░░░░░░░░░░` **1%** | 1/82 |
-| **All quests** | **9.4%** | **186/1976** |
+| **All quests** | **12.1%** | **240/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
