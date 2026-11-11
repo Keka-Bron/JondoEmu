@@ -2715,6 +2715,41 @@
    "spawns": {"monster": 6836, "count": 4, "attacks": true},
    "anyOrder": true,
    "why": "«Comprueba la trampa», [-28,37], «la tapette du centre qui a encore son appât lance un combat» (graphic 600362, cell 304); Dofus pour les noobs, «Fait comme un rat». The seven are checked in any order; the traps are scenery with no skill until this objective is in hand."
+  },
+  {
+   "objective": 18447,
+   "quest": 2433,
+   "kind": "beat",
+   "monsters": [6857, 6858, 6859],
+   "map": 216269570,
+   "afterObjectives": [18446],
+   "why": "«Inspecciona la segunda zona de búsqueda»: the garriglifo's reply starts the fight against the ambushing Aloeverrata, Perverrata and Chikarrata (Dofus pour les noobs, «Le pacte des profondeurs»: Soignerat, Collapserat, Embrocherat), and winning it closes the zone."
+  },
+  {
+   "objective": 18448,
+   "quest": 2433,
+   "kind": "beat",
+   "monsters": [6856, 6858, 6859],
+   "map": 216401408,
+   "afterObjectives": [18447],
+   "why": "«Inspecciona la tercera zona de búsqueda»: the fight against the ambushing Chikarrata, Perverrata and Chacrata (Dofus pour les noobs, «Le pacte des profondeurs»: Embrocherat, Collapserat, Préciserat)."
+  },
+  {
+   "objective": 18452,
+   "quest": 2433,
+   "elements": [{"map": 217319430, "element": 523867}],
+   "afterObjectives": [18451],
+   "gives": [{"item": 26228, "count": 1}],
+   "why": "«Consigue el equipamiento en el almacén»: Dofus pour les noobs, «Le pacte des profondeurs», «cliquez sur la grosse caisse à côté des grilles au sol afin de récupérer 1 x Caisse d'armes bontariennes» (graphic 52365, cell 442 of the store)."
+  },
+  {
+   "objective": 18454,
+   "quest": 2433,
+   "kind": "beat",
+   "monsters": [6853, 6854, 6855],
+   "map": 216401670,
+   "afterObjectives": [18453],
+   "why": "«Sobrevive a la emboscada de Tymo»: beating Captain Tymo and his corrupt militiawoman and militiaman (Dofus pour les noobs, «Le pacte des profondeurs», «Le Capitaine Larnak a un seuil de 1350PV»)."
   }
  ]
 }

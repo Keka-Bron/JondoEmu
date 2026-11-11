@@ -318,6 +318,12 @@
     { "npc": 6638, "map": 212861955, "reply": 67017, "byLevel": true,
       "monsters": [ { "monster": 6852, "grade": 0 } ] },
     { "npc": 6615, "map": 212860928, "reply": 66808, "byLevel": true,
-      "monsters": [ { "monster": 6837, "grade": 0 } ] }
+      "monsters": [ { "monster": 6837, "grade": 0 } ] },
+    { "npc": 6647, "map": 216269570, "reply": 67090, "byLevel": true,
+      "monsters": [ { "monster": 6857, "grade": 0 }, { "monster": 6858, "grade": 0 }, { "monster": 6859, "grade": 0 } ] },
+    { "npc": 6647, "map": 216401408, "reply": 67091, "byLevel": true,
+      "monsters": [ { "monster": 6859, "grade": 0 }, { "monster": 6858, "grade": 0 }, { "monster": 6856, "grade": 0 } ] },
+    { "npc": 6640, "map": 216401670, "reply": 67120, "byLevel": true,
+      "monsters": [ { "monster": 6853, "grade": 0 }, { "monster": 6854, "grade": 0 }, { "monster": 6855, "grade": 0 } ] }
   ]
 }

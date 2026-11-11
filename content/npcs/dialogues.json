@@ -22460,6 +22460,296 @@
         }
       ],
       "why": "Rata Plan at the Moumousetrap's door [-28,37]: besides the key and the keyring (DungeonDoor), Dofus pour les noobs, «Fait comme un rat», «parlez à Rat Pido pour « Se rendre auprès du Rat Noir en compagnie de la brâkmarienne »», straight to her room. «No.» closes it."
+    },
+    {
+      "npc": 6633,
+      "map": 0,
+      "opening": 50298,
+      "lines": [
+        {
+          "message": 50298,
+          "choices": [
+            { "reply": 67096, "next": 50299, "beforeQuest": 2433 },
+            { "reply": 67099, "next": 50303, "quest": 2433, "afterObjective": 18455, "beforeObjective": 18456 }
+          ]
+        },
+        {
+          "message": 50299,
+          "choices": [
+            { "reply": 67095, "next": 50300 }
+          ]
+        },
+        {
+          "message": 50300,
+          "choices": [
+            { "reply": 67094, "next": 50301 }
+          ]
+        },
+        {
+          "message": 50301,
+          "choices": [
+            { "reply": 67093, "next": 50302 }
+          ]
+        },
+        {
+          "message": 50302,
+          "choices": [
+            { "reply": 67092, "startsQuest": 2433, "params": [[34, 2433]] }
+          ]
+        },
+        {
+          "message": 50303,
+          "choices": [
+            { "reply": 67098, "next": 50304 }
+          ]
+        },
+        {
+          "message": 50304,
+          "choices": [
+            { "reply": 67097, "quest": 2433, "completes": 18456 },
+            { "reply": 67097 }
+          ]
+        }
+      ],
+      "why": "Pyer Matiz, the collector of the cosmetics market of Bonta [-35,-60], who gives «Le pacte des profondeurs» (2433): Dofus pour les noobs, «Le pacte des profondeurs», his men sent into the sewers for garriglifos are not coming back. «Resumirle los hechos» ends it (18456). Which reply leads to which line is read off their texts."
+    },
+    {
+      "npc": 6647,
+      "map": 216269574,
+      "opening": 50297,
+      "lines": [
+        {
+          "message": 50297,
+          "choices": [
+            { "reply": 67089, "quest": 2433, "beforeObjective": 18446, "completes": 18446 }
+          ]
+        }
+      ],
+      "why": "A garriglifo, the rock carving Pyer is after: Dofus pour les noobs, «Le pacte des profondeurs», «dès l'entrée sur la map [-31,-57] des égouts parlez à la Calligriffes sur le mur», with signs of a struggle and no fight. Its three «Inspeccionar los alrededores» are one per search zone, in the objectives' order."
+    },
+    {
+      "npc": 6647,
+      "map": 216269570,
+      "opening": 50297,
+      "lines": [
+        {
+          "message": 50297,
+          "choices": [
+            { "reply": 67090, "quest": 2433, "afterObjective": 18446, "beforeObjective": 18447 }
+          ]
+        }
+      ],
+      "why": "A garriglifo, the rock carving Pyer is after: Dofus pour les noobs, «Le pacte des profondeurs», «descendez les égouts jusqu'en [-31,-55] et parlez à la Calligriffes sur le pilier»: rats attack (content/fights/npc_fights.json). Its three «Inspeccionar los alrededores» are one per search zone, in the objectives' order."
+    },
+    {
+      "npc": 6647,
+      "map": 216401408,
+      "opening": 50297,
+      "lines": [
+        {
+          "message": 50297,
+          "choices": [
+            { "reply": 67091, "quest": 2433, "afterObjective": 18447, "beforeObjective": 18448 }
+          ]
+        }
+      ],
+      "why": "A garriglifo, the rock carving Pyer is after: Dofus pour les noobs, «Le pacte des profondeurs», «allez sur la gauche jusqu'en [-33,-54] pour inspecter une troisième Calligriphes sur le pilier à droite de la pièce», and the rats attack again. Its three «Inspeccionar los alrededores» are one per search zone, in the objectives' order."
+    },
+    {
+      "npc": 6645,
+      "map": 0,
+      "opening": 50305,
+      "lines": [
+        {
+          "message": 50305,
+          "choices": [
+            { "reply": 67105, "next": 50306, "quest": 2433, "afterObjective": 18448, "beforeObjective": 18449 }
+          ]
+        },
+        {
+          "message": 50306,
+          "choices": [
+            { "reply": 67104, "next": 50307 }
+          ]
+        },
+        {
+          "message": 50307,
+          "choices": [
+            { "reply": 67103, "next": 50308 }
+          ]
+        },
+        {
+          "message": 50308,
+          "choices": [
+            { "reply": 67102, "next": 50309 }
+          ]
+        },
+        {
+          "message": 50309,
+          "choices": [
+            { "reply": 67101, "next": 50310 }
+          ]
+        },
+        {
+          "message": 50310,
+          "choices": [
+            { "reply": 67100, "quest": 2433, "completes": 18449 },
+            { "reply": 67100 }
+          ]
+        }
+      ],
+      "why": "The White Rat's envoy at the third search zone [-33,-54]: Dofus pour les noobs, «Le pacte des profondeurs», «Une fois le combat terminé, parlez à l'Envoyée du Rat Blanc», who blames the surface for breaking the pact of the depths signed with the intendant (18449)."
+    },
+    {
+      "npc": 6364,
+      "map": 0,
+      "opening": 48041,
+      "lines": [
+        {
+          "message": 48041,
+          "choices": [
+            { "reply": 67111, "next": 50311, "quest": 2433, "afterObjective": 18449, "beforeObjective": 18450 },
+            { "reply": 67116, "next": 50316, "quest": 2433, "afterObjective": 18454, "beforeObjective": 18455 }
+          ]
+        },
+        {
+          "message": 50311,
+          "choices": [
+            { "reply": 67110, "next": 50312 }
+          ]
+        },
+        {
+          "message": 50312,
+          "choices": [
+            { "reply": 67109, "next": 50313 }
+          ]
+        },
+        {
+          "message": 50313,
+          "choices": [
+            { "reply": 67108, "next": 50314 }
+          ]
+        },
+        {
+          "message": 50314,
+          "choices": [
+            { "reply": 67107, "next": 50315 }
+          ]
+        },
+        {
+          "message": 50315,
+          "choices": [
+            { "reply": 67106, "quest": 2433, "completes": 18450 },
+            { "reply": 67106 }
+          ]
+        },
+        {
+          "message": 50316,
+          "choices": [
+            { "reply": 67115, "next": 50317 }
+          ]
+        },
+        {
+          "message": 50317,
+          "choices": [
+            { "reply": 67114, "next": 50318 }
+          ]
+        },
+        {
+          "message": 50318,
+          "choices": [
+            { "reply": 67113, "next": 50319 }
+          ]
+        },
+        {
+          "message": 50319,
+          "choices": [
+            { "reply": 67112, "quest": 2433, "completes": 18455 },
+            { "reply": 67112 }
+          ]
+        }
+      ],
+      "why": "Danathor, Bonta's intendant, in the palace room right of the throne room [-36,-60]: Dofus pour les noobs, «Le pacte des profondeurs», he signed the pact of the depths and sends you to Captain Tymo for presents (18450); after Tymo's ambush, «Mencionar la emboscada» and he blames Tymo alone (18455)."
+    },
+    {
+      "npc": 6640,
+      "map": 217320452,
+      "opening": 50320,
+      "lines": [
+        {
+          "message": 50320,
+          "choices": [
+            { "reply": 67119, "next": 50321, "quest": 2433, "afterObjective": 18450, "beforeObjective": 18451 }
+          ]
+        },
+        {
+          "message": 50321,
+          "choices": [
+            { "reply": 67118, "next": 50322 }
+          ]
+        },
+        {
+          "message": 50322,
+          "choices": [
+            { "reply": 67117, "quest": 2433, "completes": 18451 },
+            { "reply": 67117 }
+          ]
+        }
+      ],
+      "why": "Captain Tymo napping in the militia's dormitories [-32,-57]: Dofus pour les noobs, «Le pacte des profondeurs», «Parlez alors au Capitaine», who lets you take a crate of weapons from the store across the corridor (18451)."
+    },
+    {
+      "npc": 6640,
+      "map": 216401670,
+      "opening": 50323,
+      "lines": [
+        {
+          "message": 50323,
+          "choices": [
+            { "reply": 67121, "next": 50324, "quest": 2433, "afterObjective": 18453, "beforeObjective": 18454 }
+          ]
+        },
+        {
+          "message": 50324,
+          "choices": [
+            { "reply": 67120, "quest": 2433, "afterObjective": 18453, "beforeObjective": 18454 }
+          ]
+        }
+      ],
+      "why": "Tymo at the meeting point once the White Rat has gone: Dofus pour les noobs, «Le pacte des profondeurs», «parlez au Capitaine qui vous a suivi jusqu'ici car il a été chargé de vous éliminer»; «Prepararte para el combate» is the fight against him and two corrupt militia (content/fights/npc_fights.json)."
+    },
+    {
+      "npc": 6612,
+      "map": 216401670,
+      "opening": 50326,
+      "lines": [
+        {
+          "message": 50326,
+          "choices": [
+            { "reply": 67125, "next": 50327, "quest": 2433, "afterObjective": 18452, "beforeObjective": 18453, "holds": 26228 }
+          ]
+        },
+        {
+          "message": 50327,
+          "choices": [
+            { "reply": 67124, "next": 50328 }
+          ]
+        },
+        {
+          "message": 50328,
+          "choices": [
+            { "reply": 67123, "next": 50329 }
+          ]
+        },
+        {
+          "message": 50329,
+          "choices": [
+            { "reply": 67122, "quest": 2433, "completes": 18453, "takes": 26228, "thenNpc": 6640, "thenLine": 50323 },
+            { "reply": 67122 }
+          ]
+        }
+      ],
+      "why": "The White Rat at the meeting point of the sewers [-33,-57]: Dofus pour les noobs, «Le pacte des profondeurs», «pénétrez dans les égouts en [-33,-57] pour rencontrer le Rat Blanc et lui remettre l'armement» (18453, the crate 26228 taken). «Après que le Rat Blanc soit partit», Tymo steps in and speaks."
     }
   ]
 }

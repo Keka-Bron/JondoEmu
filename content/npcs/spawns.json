@@ -2690,6 +2690,61 @@
       "cell": 261,
       "orientation": 3,
       "why": "Rata Plin, the guardian of the White Rat's Pantry («Retomar la Mazmorra de las Ratas de Bonta donde la dejaste», its old name) at its entrance in Bonta's sewers [-34,-59], the twin of Rata Plan at the Black Rat's door. He stood nowhere, so the pantry had no door-keeper and any answer of whoever else stood there (Ramy) opened it. INFERRED cell: before the barred doorway."
+    },
+    {
+      "map": 216269574,
+      "npc": 6647,
+      "cell": 157,
+      "orientation": 1,
+      "criterion": "Qa=2433|Qf=2433",
+      "why": "The first garriglifo, «le premier est juste à côté de l'échelle» (Dofus pour les noobs, «Le pacte des profondeurs»). It stood nowhere. INFERRED cell: on the wall beside the ladder (element 523671, cell 170)."
+    },
+    {
+      "map": 216269570,
+      "npc": 6647,
+      "cell": 374,
+      "orientation": 3,
+      "criterion": "Qa=2433|Qf=2433",
+      "why": "The second garriglifo, on the pillar of [-31,-55]. INFERRED cell: at the foot of the right-hand pillar, the one standing in the walkway."
+    },
+    {
+      "map": 216401408,
+      "npc": 6647,
+      "cell": 485,
+      "orientation": 3,
+      "criterion": "Qa=2433|Qf=2433",
+      "why": "The third garriglifo, «sur le pilier à droite de la pièce» of [-33,-54]. INFERRED cell: at the foot of that pillar."
+    },
+    {
+      "map": 216401408,
+      "npc": 6645,
+      "cell": 442,
+      "orientation": 1,
+      "criterion": "Qo>18448&Qo<18449",
+      "why": "The White Rat's envoy, who turns up once the third zone's rats are beaten and is gone once heard. She stood nowhere. INFERRED cell: the middle of the room."
+    },
+    {
+      "map": 219153408,
+      "npc": 6364,
+      "cell": 290,
+      "orientation": 3,
+      "why": "Danathor in his office right of the throne room [-36,-60] (Dofus pour les noobs, «Le pacte des profondeurs», «depuis la salle du trône allez à droite»). He stood nowhere. INFERRED cell: at the end of his desk, facing the door."
+    },
+    {
+      "map": 216401670,
+      "npc": 6612,
+      "cell": 230,
+      "orientation": 3,
+      "criterion": "Qo>18452&Qo<18453",
+      "why": "The White Rat waiting for the crate at the meeting point [-33,-57], only while it is owed. INFERRED cell: in front of the large pipe."
+    },
+    {
+      "map": 216401670,
+      "npc": 6640,
+      "cell": 340,
+      "orientation": 7,
+      "criterion": "Qo>18453&Qo<18454",
+      "why": "Tymo, who followed you to the meeting point, there only for his ambush. INFERRED cell: behind you, on the walkway you came by."
     }
   ]
 }
