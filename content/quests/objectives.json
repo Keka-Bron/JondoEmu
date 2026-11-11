@@ -3025,6 +3025,56 @@
    "afterObjectives": [6755],
    "gives": [{"item": 13653, "count": 1}],
    "why": "«Registra la taberna en busca de una pluma blanca de búho»: «montez au premier étage et cliquez sur le balais posé contre le mur» (Dofus pour les noobs). The first floor's only element that is not a staircase: 515284 (graphic 22060) on cell 261; the other two (514144, 514145) are the 2.73 graph's passages. The banker's wife's broom holds a white owl feather (13653)."
+  },
+  {
+   "objective": 7925,
+   "quest": 1426,
+   "kind": "click",
+   "elements": [{"map": 103547392, "element": 482837}],
+   "afterObjectives": [7924],
+   "anyOrder": true,
+   "requires": [{"item": 14508, "count": 1}],
+   "why": "«Utiliza la cera para lustrar ...»: the small chest of drawers, on the ground floor (cell 304, graphic 39429), polished with the boar wax (14508) in hand. «Retournez en [3,-17] pour lustrer les meubles. Il y en a trois au rez-de-chaussée et 2 à l'étage» (Dofus pour les noobs); the five are the house's furniture elements the quest's era added (482834-482837) and the animated eye. Which chest is the small one is INFERRED from the drawing."
+  },
+  {
+   "objective": 7926,
+   "quest": 1426,
+   "kind": "click",
+   "elements": [{"map": 103547392, "element": 482836}],
+   "afterObjectives": [7924],
+   "anyOrder": true,
+   "requires": [{"item": 14508, "count": 1}],
+   "why": "«Utiliza la cera para lustrar ...»: the big chest of drawers, on the ground floor (cell 327, graphic 39388), polished with the boar wax (14508) in hand. «Retournez en [3,-17] pour lustrer les meubles. Il y en a trois au rez-de-chaussée et 2 à l'étage» (Dofus pour les noobs); the five are the house's furniture elements the quest's era added (482834-482837) and the animated eye. Which chest is the small one is INFERRED from the drawing."
+  },
+  {
+   "objective": 7928,
+   "quest": 1426,
+   "kind": "click",
+   "elements": [{"map": 103547392, "element": 476493}, {"map": 103547392, "element": 476494}],
+   "afterObjectives": [7924],
+   "anyOrder": true,
+   "requires": [{"item": 14508, "count": 1}],
+   "why": "«Utiliza la cera para lustrar ...»: Luisito's eye, the house's animated eye on the ground floor (cells 298 and 284, graphic 700742), polished with the boar wax (14508) in hand. «Retournez en [3,-17] pour lustrer les meubles. Il y en a trois au rez-de-chaussée et 2 à l'étage» (Dofus pour les noobs); the five are the house's furniture elements the quest's era added (482834-482837) and the animated eye. Which chest is the small one is INFERRED from the drawing."
+  },
+  {
+   "objective": 7927,
+   "quest": 1426,
+   "kind": "click",
+   "elements": [{"map": 103548416, "element": 482834}],
+   "afterObjectives": [7924],
+   "anyOrder": true,
+   "requires": [{"item": 14508, "count": 1}],
+   "why": "«Utiliza la cera para lustrar ...»: the first floor's left bookcase, by its ladder (cell 314, graphic 39363), polished with the boar wax (14508) in hand. «Retournez en [3,-17] pour lustrer les meubles. Il y en a trois au rez-de-chaussée et 2 à l'étage» (Dofus pour les noobs); the five are the house's furniture elements the quest's era added (482834-482837) and the animated eye. Which chest is the small one is INFERRED from the drawing."
+  },
+  {
+   "objective": 7929,
+   "quest": 1426,
+   "kind": "click",
+   "elements": [{"map": 103548416, "element": 482835}],
+   "afterObjectives": [7924],
+   "anyOrder": true,
+   "requires": [{"item": 14508, "count": 1}],
+   "why": "«Utiliza la cera para lustrar ...»: the first floor's right bookcase, by its ladder (cell 347, graphic 39365), polished with the boar wax (14508) in hand. «Retournez en [3,-17] pour lustrer les meubles. Il y en a trois au rez-de-chaussée et 2 à l'étage» (Dofus pour les noobs); the five are the house's furniture elements the quest's era added (482834-482837) and the animated eye. Which chest is the small one is INFERRED from the drawing."
   }
  ]
 }
