@@ -1,0 +1,22 @@
+{
+  "_comment": [
+    "Gates that open while characters stand on every one of their plates (Managers.PlateGates).",
+    "obstacles: the cells the gate stands on, unwalkable in the client's map data while it is shut.",
+    "inside: the cells behind it; whoever is still there when it shuts is put back on «outside»,",
+    "unless he meets «stays». Each character on a plate counts only if he meets «criterion»."
+  ],
+  "gates": [
+    {
+      "map": 106694162,
+      "elements": [482595, 482596],
+      "obstacles": [269, 284],
+      "plates": [368, 440, 464],
+      "criterion": "Qo>7881|Qf=842",
+      "inside": [185, 199, 212, 213, 227, 240, 241, 255, 269, 284],
+      "outside": 298,
+      "stays": "Qf=842",
+      "openSeconds": 30,
+      "why": "The wabbits' tic-tac-toe room under the Cawotte island [22,-10], «Voyage au centre du Wabbit» (842) of Dofus pour les noobs: «il vous faut être 3 minimum pour ouvrir la grille et ces 3 personnes doivent en être au même point ou plus loin que vous dans ces quêtes. Placez les personnages sur les dalles marquées d'un point violet» -- the guide's three plates, one on each of the three boards; its guardian's riddle says the same, one on each board that has a trick. The gate is the two graphic-854 elements on 269 and 284, the only way onto the ledge (the client's linked zone 32) where the guardian and the door to «Des pwinces pas très charmants» stand. «Si vous ne lui parlez pas avant que la grille se referme, lorsque la grille se refermera votre personnage sera remis à l'extérieur de la grille»: put back on 298, the first cell in front of it. INFERRED: thirty seconds open."
+    }
+  ]
+}

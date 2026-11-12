@@ -30526,6 +30526,79 @@
         }
       ],
       "why": "Omoca Dicaz south of Madrestam [13,1]. «Pollution, je dis non» (Dofus pour les noobs): «Parlez à Omoca Dicaz et faites lui comprendre que vous voulez de l'huile lourde... Annoncez lui être fervent admirateur de son dieu Retazoum... Agenouillez vous alors devant elle... félicitez la pour la pollution de la Kawaii... Attaquez la alors». «Me gustaría conseguir algo de aceite pesado.» (19612), «Guiñarle y decirle que eres adepto a su dios.» (19618), her god is Lefúleo (19616; Osamodas, Aceitator and Merkator bring Tofuel instead, npc_fights.json), «Seguirle el juego y arrodillarte.» (19625), «Felicidades por la contaminación del Kawaii.» (19624), «Reír con ella y preguntar...» (19623), «¿Qué es el Súper Limpiador?» (19622); then «Mostrar una gran sonrisa y atacar» (19620) or «Dejar el enfrentamiento para más tarde.» (19621) are 8002 — «la quête se mettra à jour sur tous les personnages ayant répondus \"Remettre l'affrontement à plus tard\"» — and «Atacar a Omoca Dicaz para arrebatarle su frasco de Súper Limpiador.» (19613) takes the fight up later."
+    },
+    {
+      "npc": 2146,
+      "map": 0,
+      "opening": 15986,
+      "lines": [
+        {
+          "message": 15986,
+          "choices": [
+            { "reply": 18899, "next": 15987 }
+          ]
+        },
+        {
+          "message": 15987,
+          "choices": [
+            { "reply": 18898, "next": 15988 }
+          ]
+        },
+        {
+          "message": 15988,
+          "choices": [
+            { "reply": 18897, "next": 15989 }
+          ]
+        },
+        {
+          "message": 15989,
+          "choices": [
+            { "reply": 18896, "next": 15990 }
+          ]
+        },
+        {
+          "message": 15990,
+          "choices": [
+            { "reply": 18895, "quest": 842, "completes": 7880, "params": [[30, 7880]] }
+          ]
+        }
+      ],
+      "why": "Betamacho in the expedition's camp under the Cawotte island, «Voyage au centre du Wabbit» (842) of Dofus pour les noobs: «Parlez au pnj Betamoche qui apparait». Who you are (15986, «Contarle brevemente tu investigación sin entrar en detalles»), Fwancisco Combawas' expedition (15987, «¿Por qué no hay ni rastro del campamento?»), the skeleton wabbits and the spectres that wiped the camp out (15988, «Cuéntame más cosas sobre el pasaje secreto»), «No vayas, es una locura» (15989, «Sí, por favor. Cuéntame lo que sabes»), and the porous cawotte, with his balaclava to go down (15990): «Ponerte un pasamontañas» is the talk done (7880), and the cawotte lets through whoever has done it."
+    },
+    {
+      "npc": 2147,
+      "map": 0,
+      "opening": 16005,
+      "openings": [
+        { "after": 842, "message": 16029 },
+        { "quest": 842, "objective": 7881, "cells": [185, 199, 212, 213, 227, 240, 241, 255, 269, 284], "message": 16003 }
+      ],
+      "lines": [
+        {
+          "message": 16005,
+          "choices": []
+        },
+        {
+          "message": 16003,
+          "choices": [
+            { "reply": 18916, "next": 16004 }
+          ]
+        },
+        {
+          "message": 16004,
+          "choices": [
+            { "reply": 78584, "quest": 842, "completes": 7882, "params": [[30, 7882]], "passage": 2147001, "cells": [185, 199, 212, 213, 227, 240, 241, 255, 269, 284] }
+          ]
+        },
+        {
+          "message": 16029,
+          "choices": [
+            { "reply": 78583, "passage": 2147001 },
+            { "reply": 18917, "passage": 2147002, "cells": [185, 199, 212, 213, 227, 240, 241, 255, 269, 284] }
+          ]
+        }
+      ],
+      "why": "The wabbit guardian on the ledge behind the tic-tac-toe room's grille, «Voyage au centre du Wabbit» (842) of Dofus pour les noobs. From the other side of the grille it is forbidden to pass, and his riddle (16005) tells the trick: three people, one on each of the boards that have one -- «il vous faut être 3 minimum pour ouvrir la grille». Whoever has come past it (the ledge's cells, the client's linked zone 32, and the grille's own two) is asked what he did to get through (16003); «Quiero ver a los pwíncipes decaídos» and he would rather open the door than be hit (16004): «Franquear la puerta» is the guardian threatened (7882) and the way through the ledge's door into the princes' den -- «placez vous devant le Gawdien Wabbit pour lui parler et finir la quête. La prochaine quête continue en franchissant la porte». Whoever has finished it is let in from anywhere (16029, «si no te habwía abiewto»), and let out past the grille from the ledge."
     }
   ]
 }

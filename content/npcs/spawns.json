@@ -3656,6 +3656,33 @@
       "cell": 356,
       "orientation": 1,
       "why": "Merkator in the Aquadome's Exit room, where the winners find him beaten («Pollution, je dis non» (Dofus pour les noobs): «Une fois le Merkator vaincu, reparlez lui»). The cell is the one the client's own quest data places him on."
+    },
+    {
+      "map": 106698248,
+      "npc": 2146,
+      "cell": 328,
+      "remove": true
+    },
+    {
+      "map": 106698248,
+      "npc": 2146,
+      "cell": 191,
+      "orientation": 3,
+      "criterion": "(Qa=842&Qo>7879)|Qf=842",
+      "why": "Betamacho, the expedition's survivor, in its camp under the Cawotte island [22,-10]: «Cliquez sur la tombe wabbit», «Parlez au pnj Betamoche qui apparait» (Dofus pour les noobs, «Voyage au centre du Wabbit»), from the tomb searched (7879) on -- not before, as the derived row on 328 had him. INFERRED cell: in front of the tombstone (482578 on 177), beside the porous cawotte (178), facing the camp; 190, the other cell in front of it, is behind the cave's pillar."
+    },
+    {
+      "map": 106694162,
+      "npc": 2147,
+      "cell": 356,
+      "remove": true
+    },
+    {
+      "map": 106694162,
+      "npc": 2147,
+      "cell": 213,
+      "orientation": 1,
+      "why": "The wabbit guardian on the ledge behind the tic-tac-toe room's grille, before the door to the fallen princes: «Une fois la grille ouverte, franchissez-la et placez vous devant le Gawdien Wabbit pour lui parler» (Dofus pour les noobs, «Voyage au centre du Wabbit»). INFERRED cell: the ledge's middle (the client's linked zone 32), between the grille and the door (482597 on 184), facing the room."
     }
   ]
 }

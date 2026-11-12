@@ -798,6 +798,12 @@ public static class Op
     public const string Iwf = "iwf";
 
     /// <summary>
+    /// Map obstacles changed (client's enq): f1 repeated jrg { f1: state, f2: cell }, state 0 the
+    /// cell walkable and 1 not. The jss's f3 carries the same list on arrival.
+    /// </summary>
+    public const string Jqx = "jqx";
+
+    /// <summary>
     /// Declares an element again: { f3 { the same shape as the jss's f11 } }. It is sent
     /// when its skill can no longer be used or can again, because it changes field.
     /// </summary>

@@ -863,7 +863,8 @@ namespace Jondo.Unity.Server.Handlers
                 escrito.OpeningFor(breed, active, finished, onStep, objectiveDone,
                                    quest => diario != null && diario.CanStart(quest, out _),
                                    item => Managers.Equipment.HowMany(item) > 0,
-                                   criterion => Managers.PlayerCriteria.Met(criterion, SessionContext.State.MapId)));
+                                   criterion => Managers.PlayerCriteria.Met(criterion, SessionContext.State.MapId),
+                                   SessionContext.State.CellId));
         }
 
         /// <summary>The line of an opening or a push, for this character, with his journal asked.</summary>
@@ -985,6 +986,7 @@ namespace Jondo.Unity.Server.Handlers
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
             if (!Managers.Quests.HandsOverEnough(choice.Objectives(), choice.Partial)) return false;
             if (choice.Criterion.Length > 0 && !Managers.PlayerCriteria.Met(choice.Criterion, SessionContext.State.MapId)) return false;
+            if (choice.Cells.Count > 0 && !choice.Cells.Contains(SessionContext.State.CellId)) return false;
             if (NotItsTurnYet(choice)) return false;
             if (!ItsQuestIsOpenToHim(choice)) return false;
             if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;

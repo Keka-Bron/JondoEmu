@@ -219,6 +219,12 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public IReadOnlyList<int> Stagings { get; init; } = Array.Empty<int>();
 
+        /// <summary>
+        /// Only offered to a character standing on one of these cells; empty for anywhere: the
+        /// wabbit guardian lets through only whoever has come past his gate.
+        /// </summary>
+        public IReadOnlyList<int> Cells { get; init; } = Array.Empty<int>();
+
         /// <summary>True when the reply puts the player back where they came in from.</summary>
         /// <remarks>
         /// Separate from <see cref="TeleportsTo"/> because there is no map to write down: the
@@ -601,14 +607,22 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public string Criterion { get; init; } = "";
 
+        /// <summary>
+        /// Only to a character standing on one of these cells, or anywhere when empty: the wabbit
+        /// guardian greets whoever has come past his gate, and turns away whoever talks to him
+        /// from the other side.
+        /// </summary>
+        public IReadOnlyList<int> Cells { get; init; } = Array.Empty<int>();
+
         /// <summary>The line for a character of this class.</summary>
         public long MessageFor(int breed) => ByBreed.TryGetValue(breed, out long line) ? line : Message;
 
         /// <summary>Whether it holds for a character, his quests read through the callbacks.</summary>
         public bool Holds(Func<int, bool> active, Func<int, bool> finished, Func<int, int, bool> onStep,
                           Func<int, int, bool> objectiveDone, Func<int, bool>? canStart = null,
-                          Func<int, bool>? carries = null, Func<string, bool>? meets = null)
+                          Func<int, bool>? carries = null, Func<string, bool>? meets = null, int cell = -1)
         {
+            if (Cells.Count > 0 && !Cells.Contains(cell)) return false;
             if (Criterion.Length > 0 && (meets == null || !meets(Criterion))) return false;
             if (CanStart != 0 && (canStart == null || !canStart(CanStart))) return false;
             if (HoldsItem != 0 && (carries == null || !carries(HoldsItem))) return false;
@@ -660,11 +674,11 @@ namespace Jondo.Unity.World.Content
         public DialogueLine? OpeningFor(int breed, Func<int, bool> active, Func<int, bool> finished,
                                         Func<int, int, bool> onStep, Func<int, int, bool> objectiveDone,
                                         Func<int, bool>? canStart = null, Func<int, bool>? carries = null,
-                                        Func<string, bool>? meets = null)
+                                        Func<string, bool>? meets = null, int cell = -1)
         {
             foreach (var opening in Openings)
             {
-                if (!opening.Holds(active, finished, onStep, objectiveDone, canStart, carries, meets)) continue;
+                if (!opening.Holds(active, finished, onStep, objectiveDone, canStart, carries, meets, cell)) continue;
                 long message = opening.MessageFor(breed);
                 if (message == 0) continue;
                 return Line(message) ?? new DialogueLine { Message = message };
@@ -858,6 +872,7 @@ namespace Jondo.Unity.World.Content
                 HoldsItem = (int)Number(entry, "holds"),
                 Criterion = entry.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
                             ? criterion.GetString() ?? "" : "",
+                Cells = Numbers(entry, "cells").Select(o => (int)o).ToArray(),
             };
         }
 
@@ -905,6 +920,7 @@ namespace Jondo.Unity.World.Content
             if (opening.CanStart != 0) writer.WriteNumber("canStart", opening.CanStart);
             if (opening.HoldsItem != 0) writer.WriteNumber("holds", opening.HoldsItem);
             if (opening.Criterion.Length > 0) writer.WriteString("criterion", opening.Criterion);
+            WriteIds(writer, "cells", opening.Cells);
             if (opening.ByBreed.Count > 0)
             {
                 writer.WriteStartObject("byBreed");
@@ -1059,6 +1075,7 @@ namespace Jondo.Unity.World.Content
                             Criterion = choice.TryGetProperty("criterion", out var crit) && crit.ValueKind == JsonValueKind.String
                                         ? crit.GetString() ?? "" : "",
                             Stagings = Numbers(choice, "stagings").Select(o => (int)o).ToArray(),
+                            Cells = Numbers(choice, "cells").Select(o => (int)o).ToArray(),
                         });
                     }
                 }
@@ -1274,6 +1291,7 @@ namespace Jondo.Unity.World.Content
                             if (choice.GivesKamas != 0) writer.WriteNumber("givesKamas", choice.GivesKamas);
                             if (choice.Criterion.Length > 0) writer.WriteString("criterion", choice.Criterion);
                             WriteIds(writer, "stagings", choice.Stagings);
+                            WriteIds(writer, "cells", choice.Cells);
                             writer.WriteEndObject();
                         }
 

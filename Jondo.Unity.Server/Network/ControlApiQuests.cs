@@ -308,6 +308,7 @@ namespace Jondo.Unity.Server.Network
             Managers.NpcFights.Forget();
             Handlers.NpcBarterHandler.Forget();
             Managers.MapStagings.Forget();
+            Managers.PlateGates.Forget();
             Managers.MeasuredArrivals.Forget();
             Managers.HarvestDrops.Forget();
             Managers.QuestFightDrops.Forget();

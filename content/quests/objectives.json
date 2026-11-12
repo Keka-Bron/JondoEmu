@@ -2374,6 +2374,30 @@
    "why": "«Poursuivez votre chemin à la recherche d'autres indices»: the room of the aggressive skeleton wabbits [23,-12]."
   },
   {
+   "objective": 7878,
+   "quest": 842,
+   "kind": "enter",
+   "map": 106698248,
+   "why": "«Découvrez la campement en faisant demi-tour et allant en [22,-10]» (Dofus pour les noobs, «Voyage au centre du Wabbit»): the expedition's camp under the Cawotte island, between the galleries 106697224 and 106693130."
+  },
+  {
+   "objective": 7879,
+   "quest": 842,
+   "kind": "click",
+   "elements": [{"map": 106698248, "element": 482578}],
+   "afterObjectives": [7878],
+   "showsNpc": 2146,
+   "why": "«Registra el subterráneo en busca de una pista»: «Cliquez sur la tombe wabbit» and «Parlez au pnj Betamoche qui apparait» (Dofus pour les noobs). The wabbit tombstone of graphic 38971 on 177, beside the porous cawotte (482594, graphic 38970) the 2.73 world graph leads down through."
+  },
+  {
+   "objective": 7881,
+   "quest": 842,
+   "kind": "enter",
+   "map": 106694162,
+   "afterObjectives": [7880],
+   "why": "«Le passage secret en question est sur la même map, il vous suffit de cliquer sur la cawotte»: the tic-tac-toe room below, where the grille is."
+  },
+  {
    "objective": 102,
    "quest": 18,
    "kind": "enter",

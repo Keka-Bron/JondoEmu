@@ -882,6 +882,9 @@ namespace Jondo.Unity.Server.Network
 
             AddInteractiveElements(jss, mapId, accountId);
 
+            // A gate held open by characters on its plates: its cells walkable (Managers.PlateGates).
+            Managers.PlateGates.AddToMap(jss, mapId);
+
             // And last, the fights in their placement: the swords. Each f12 is what an hpy carries
             // (the sword capture's jss at frame 53, the jalatós one at 840); a fight past its
             // placement has none -- it is only counted, by the jqz that follows the jss.
@@ -1374,6 +1377,13 @@ namespace Jondo.Unity.Server.Network
             }
             // The abyssal base's lights and doors: lit or open as they stand on the map.
             // Without its placement the client does not draw them at all.
+            // A plate gate's own elements, open or shut (Managers.PlateGates): not drawn without it either.
+            if (interactive.Actions.Count == 0 && Managers.PlateGates.IsGateElement(interactive.MapId, interactive.Element.Id))
+            {
+                DeclarePlacement(jss, interactive.Element,
+                    (Managers.ResourceState)Managers.PlateGates.StateOf(interactive.MapId));
+                return;
+            }
             if (interactive.Actions.Count == 0 && Managers.AbyssalBase.IsDoorOrLight(interactive.MapId, interactive.Element.Id))
             {
                 DeclarePlacement(jss, interactive.Element,

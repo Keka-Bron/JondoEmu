@@ -183,6 +183,8 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             // A quest that only asked to take a few steps here (the tutorial's first objective).
             await Managers.Quests.OnWalkedAsync(stream, mapId);
+            // A plate of a gate that wants characters on all its plates at once.
+            await Managers.PlateGates.SteppedAsync(mapId, cellId);
             if (await AlmanaxTempleHandler.WalkAsync(stream, mapId, cellId))
                 return;
             if (!Managers.TeleportManager.TryGetCellTrigger(mapId, cellId, out var found))
