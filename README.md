@@ -688,10 +688,11 @@ played through.
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
+| Cania | `███░░░░░░░` **27%** | 7/26 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| **All quests** | **14.9%** | **294/1976** |
+| **All quests** | **15.2%** | **301/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
