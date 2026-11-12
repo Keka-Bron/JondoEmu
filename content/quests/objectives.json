@@ -2429,6 +2429,18 @@
    "why": "«Les pwinces déchus», the daily rerun: «Parlez à l'un des pwinces pour les attaquer : … vous pouvez rentrez tous vos personnages dans le combat et ils droperont tous le livre» (Dofus pour les noobs). The same fight and the same Necronobacon (14489, Dowo's own loot) as «Des pwinces pas très charmants»."
   },
   {
+   "objective": 7890,
+   "quest": 844,
+   "kind": "click",
+   "skill": 237,
+   "elements": [{"map": 99615234, "element": 482761}, {"map": 99615746, "element": 482761}, {"map": 99746304, "element": 482762}, {"map": 99614720, "element": 482762}, {"map": 99746305, "element": 482763}, {"map": 99614721, "element": 482763}, {"map": 99615492, "element": 482764}, {"map": 99614980, "element": 482764}, {"map": 99746564, "element": 482765}, {"map": 99614980, "element": 482765}, {"map": 99615747, "element": 482766}, {"map": 99746305, "element": 482767}, {"map": 99746817, "element": 482768}, {"map": 99746305, "element": 482768}, {"map": 99615237, "element": 482769}, {"map": 99614725, "element": 482769}, {"map": 99615232, "element": 482770}, {"map": 99614980, "element": 482771}, {"map": 99615490, "element": 482772}, {"map": 99614978, "element": 482772}, {"map": 99615748, "element": 482773}, {"map": 99615236, "element": 482773}, {"map": 99615234, "element": 482774}, {"map": 99614722, "element": 482774}, {"map": 99746562, "element": 482775}, {"map": 99616514, "element": 482776}, {"map": 99616002, "element": 482776}, {"map": 99746563, "element": 482777}, {"map": 99746563, "element": 482778}, {"map": 99614979, "element": 482778}, {"map": 99746820, "element": 482779}, {"map": 99746309, "element": 482780}, {"map": 99615490, "element": 482781}, {"map": 99614978, "element": 482781}, {"map": 99746308, "element": 482782}, {"map": 99614724, "element": 482782}, {"map": 99616001, "element": 482783}, {"map": 99616513, "element": 482783}, {"map": 99615236, "element": 482784}, {"map": 99614724, "element": 482784}, {"map": 99614725, "element": 482785}, {"map": 99614722, "element": 482786}, {"map": 99746306, "element": 482786}, {"map": 116919296, "element": 482787}, {"map": 116917252, "element": 482788}, {"map": 116919304, "element": 482789}, {"map": 116916232, "element": 482790}],
+   "onlyGives": true,
+   "givesEach": true,
+   "gives": [{"item": 14503, "count": 10}],
+   "anyOrder": true,
+   "why": "«Te volverá amable» (Ça rend aimable, Dofus pour les noobs): «Lilou vous demande de lui ramener 10 cawottes fraîches réparties un peu partout sur l'île : Les Cawottes fraîches se récoltent un peu partout sur l'île (pensez à appuyer sur \"y\" pour afficher les objets en surbrillance)». The client's skill 237, «Recolectar una zanahowia», gathers the Zanahowia fresca (14503); its elements are the graphic 2345, found only on the wabbit islands (subareas 161, 162 and 164): 30 of them, the ones on a map's edge in both maps that draw them. One fresh carrot from each while the quest is in hand, up to the ten Emilia asks for; the objective is done handing them to her."
+  },
+  {
    "objective": 102,
    "quest": 18,
    "kind": "enter",

@@ -18762,7 +18762,9 @@
           "message": 465,
           "choices": [
             { "reply": 11426, "next": 10429, "beforeQuest": 836 },
-            { "reply": 18943, "next": 16023, "quest": 843, "afterObjective": 7888 }
+            { "reply": 18943, "next": 16023, "quest": 843, "afterObjective": 7888 },
+            { "reply": 18945, "next": 16026, "beforeQuest": 844 },
+            { "reply": 18946, "next": 16028, "quest": 844, "completes": 7890, "params": [[30, 7890]] }
           ]
         },
         {
@@ -18861,9 +18863,23 @@
         {
           "message": 16025,
           "choices": []
+        },
+        {
+          "message": 16026,
+          "choices": [
+            { "reply": 18944, "next": 16027, "startsQuest": 844, "params": [[34, 844]] }
+          ]
+        },
+        {
+          "message": 16027,
+          "choices": []
+        },
+        {
+          "message": 16028,
+          "choices": []
         }
       ],
-      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello). «Faites l'amour, pas la guerre» (837) of Dofus pour les noobs: part of her plan, a brew to calm the wabbits' warlike ardour (10432, «Vale, te ayudo»), bring everything at once (10433: the egg, a ripe cawotte, the grated cawotte juice, a squashed black wabbit and Patxi Fista's blood, on a hello). «Ça sent la cawotte» (838): the potion done, a few drops in growing cawottes with a syringe (10437, «¡Sí, señor!»: the syringe 12880), the island's cawottes (10438). «Il y a un os, de Wabbit» (839) of Dofus pour les noobs: skeleton wabbits eat no cawottes, the tombs' islet (10439, «Vale, te ayudaré»); Eliebwe Palp Atynte's information, ask the zollo of the ancient times (15962: 5311); Wob's words, the wabbits themselves must be asked (15963: 5315). «Art gastronomique» (840): «what if we caught some wabbits?», sailors came by with live wabbits for a barbecue (15965, 15964; «Vale, voy a capturar algunos wabbits»). «Haz el amor y no la guerra» (837): «Tráeme todos los ingredientes al mismo tiempo» (10433), so «Toma los ingredientes.» hands the five over together — the egg, the ripe carrot, the juice, the crushed black wabbit and Patxi Fista's blood — and the potion she brews (10435) leads to the next task (10437, «Ça sent la cawotte» in Dofus pour les noobs). Accepting it, she remembers Patxi Fista's blood (11614), the one ingredient her list leaves out. «Des pwinces pas très charmants» ends with her: «allez voir Lilou pour finir la quête» (Dofus pour les noobs): «Llevarle el fruto de tu investigación», then her law and her king."
+      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello). «Faites l'amour, pas la guerre» (837) of Dofus pour les noobs: part of her plan, a brew to calm the wabbits' warlike ardour (10432, «Vale, te ayudo»), bring everything at once (10433: the egg, a ripe cawotte, the grated cawotte juice, a squashed black wabbit and Patxi Fista's blood, on a hello). «Ça sent la cawotte» (838): the potion done, a few drops in growing cawottes with a syringe (10437, «¡Sí, señor!»: the syringe 12880), the island's cawottes (10438). «Il y a un os, de Wabbit» (839) of Dofus pour les noobs: skeleton wabbits eat no cawottes, the tombs' islet (10439, «Vale, te ayudaré»); Eliebwe Palp Atynte's information, ask the zollo of the ancient times (15962: 5311); Wob's words, the wabbits themselves must be asked (15963: 5315). «Art gastronomique» (840): «what if we caught some wabbits?», sailors came by with live wabbits for a barbecue (15965, 15964; «Vale, voy a capturar algunos wabbits»). «Haz el amor y no la guerra» (837): «Tráeme todos los ingredientes al mismo tiempo» (10433), so «Toma los ingredientes.» hands the five over together — the egg, the ripe carrot, the juice, the crushed black wabbit and Patxi Fista's blood — and the potion she brews (10435) leads to the next task (10437, «Ça sent la cawotte» in Dofus pour les noobs). Accepting it, she remembers Patxi Fista's blood (11614), the one ingredient her list leaves out. «Des pwinces pas très charmants» ends with her: «allez voir Lilou pour finir la quête» (Dofus pour les noobs): «Llevarle el fruto de tu investigación», then her law and her king. Her daily «Te volverá amable» (Ça rend aimable): «¿Te las apañas bien?», «Prestarse voluntario» for ten fresh carrots, «Toma las zanahowias frescas» to hand them over («Donnez les cawottes à Lilou en [24,-3] pour achever la quête»)."
     },
     {
       "npc": 1470,
@@ -30610,12 +30626,13 @@
         {
           "message": 16029,
           "choices": [
+            { "reply": 18947, "startsQuest": 845, "params": [[34, 845]], "passage": 2147001 },
             { "reply": 78583, "passage": 2147001 },
             { "reply": 18917, "passage": 2147002, "cells": [185, 199, 212, 213, 227, 240, 241, 255, 269, 284] }
           ]
         }
       ],
-      "why": "The wabbit guardian on the ledge behind the tic-tac-toe room's grille, «Voyage au centre du Wabbit» (842) of Dofus pour les noobs. From the other side of the grille it is forbidden to pass, and his riddle (16005) tells the trick: three people, one on each of the boards that have one -- «il vous faut être 3 minimum pour ouvrir la grille». Whoever has come past it (the ledge's cells, the client's linked zone 32, and the grille's own two) is asked what he did to get through (16003); «Quiero ver a los pwíncipes decaídos» and he would rather open the door than be hit (16004): «Franquear la puerta» is the guardian threatened (7882) and the way through the ledge's door into the princes' den -- «placez vous devant le Gawdien Wabbit pour lui parler et finir la quête. La prochaine quête continue en franchissant la porte». Whoever has finished it is let in from anywhere (16029, «si no te habwía abiewto»), and let out past the grille from the ledge."
+      "why": "The wabbit guardian on the ledge behind the tic-tac-toe room's grille, «Voyage au centre du Wabbit» (842) of Dofus pour les noobs. From the other side of the grille it is forbidden to pass, and his riddle (16005) tells the trick: three people, one on each of the boards that have one -- «il vous faut être 3 minimum pour ouvrir la grille». Whoever has come past it (the ledge's cells, the client's linked zone 32, and the grille's own two) is asked what he did to get through (16003); «Quiero ver a los pwíncipes decaídos» and he would rather open the door than be hit (16004): «Franquear la puerta» is the guardian threatened (7882) and the way through the ledge's door into the princes' den -- «placez vous devant le Gawdien Wabbit pour lui parler et finir la quête. La prochaine quête continue en franchissant la porte». Whoever has finished it is let in from anywhere (16029, «si no te habwía abiewto»), and let out past the grille from the ledge. «Les pwinces déchus», the daily rerun, is his: «Une fois la grille ouverte, passez et parlez au Gawdien Wabbit pour lancer la quête : Franchissez la porte pour tuer les pwinces déchus» (Dofus pour les noobs): «¿Puedo ver a los pwíncipes decaídos?» hands it out and lets one through."
     },
     {
       "npc": 2151,
