@@ -668,7 +668,7 @@ namespace Jondo.Unity.Server.Handlers
             byte[] look = !string.IsNullOrEmpty(fighter.IncarnationLook)
                 ? ConnectionProtocol.MonsterLook(fighter.IncarnationLook, false).Build()
                 : ficha != null
-                    ? Managers.BreedLookTable.BuildLook(ficha)
+                    ? Managers.CharacterLookBuilder.BuildLook(ficha)
                     : Array.Empty<byte>();
             return (look, ficha?.Breed ?? 0, ficha?.Sex ?? 0);
         }
@@ -1931,7 +1931,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var character = DatabaseManager.GetCharacterById(fighter.DoubleOf != 0 ? fighter.DoubleOf : fighter.Id);
             return character != null
-                ? Managers.BreedLookTable.BuildLook(character, onFoot: onFoot)
+                ? Managers.CharacterLookBuilder.BuildLook(character, onFoot: onFoot)
                 : Array.Empty<byte>();
         }
 
@@ -12398,9 +12398,8 @@ namespace Jondo.Unity.Server.Handlers
 
             if (!fighter.IsMonster)
             {
-                byte[] playerLookBytes = (GameState.LookBytes != null && GameState.LookBytes.Length > 0)
-                    ? GameState.LookBytes
-                    : NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
+                var fight = GetCurrentFight();
+                byte[] playerLookBytes = fight != null ? CurrentFightLook(fight, fighter) : NormalFightLook(fighter);
                 entityDetails.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = playerLookBytes });
             }
             else

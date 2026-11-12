@@ -216,7 +216,7 @@ Not implemented yet.
   of the capture.
 - `Network/SessionRegistry.cs` — single-use tickets that tie the second connection to an
   account and a server.
-- `Managers/BreedLookTable.cs` — base look per breed and sex.
+- `Managers/BreedLookCatalog.cs` — base look per breed and sex; `CharacterLookBuilder.cs` composes appearances.
 - `Servers` table and `ServerId` and `LastConnection` columns in `Characters`.
 
 ## What is left

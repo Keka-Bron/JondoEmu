@@ -112,7 +112,7 @@ public sealed class GameEntryLifecycleTests
     public async Task Force_selection_only_resumes_a_character_from_the_owning_account_and_server(bool ownFight)
     {
         var h = new Harness();
-        var foreign = new DatabaseManager.DbCharacter
+        var foreign = new DbCharacter
         {
             Id = h.Character.Id + 1, AccountId = h.Session.AccountId + 1, ServerId = h.Session.ServerId, Name = "Other",
         };
@@ -280,7 +280,7 @@ public sealed class GameEntryLifecycleTests
         public GameSession Session { get; }
         public Backend Backend { get; }
         public GameEntryService Service { get; }
-        public DatabaseManager.DbCharacter Character { get; }
+        public DbCharacter Character { get; }
         public List<byte[]> Packets { get; } = [];
 
         public Harness(bool authenticated = true, long accountId = 90_000_200)
@@ -302,10 +302,10 @@ public sealed class GameEntryLifecycleTests
         }
     }
 
-    private sealed class Backend(GameSession owner, DatabaseManager.DbCharacter character) : IGameEntryBackend
+    private sealed class Backend(GameSession owner, DbCharacter character) : IGameEntryBackend
     {
         public List<string> Calls { get; } = [];
-        public List<DatabaseManager.DbCharacter> Characters { get; } = [character];
+        public List<DbCharacter> Characters { get; } = [character];
         public HashSet<long> Resumable { get; } = [];
         public Task CloseOthers { get; set; } = Task.CompletedTask;
         public Task BeforeMap { get; set; } = Task.CompletedTask;
@@ -333,7 +333,7 @@ public sealed class GameEntryLifecycleTests
             await CloseOthers;
         }
 
-        public IReadOnlyList<DatabaseManager.DbCharacter> GetCharacters(GameSession session)
+        public IReadOnlyList<DbCharacter> GetCharacters(GameSession session)
         {
             Record("characters", session);
             return Characters.Where(c => c.AccountId == session.AccountId && c.ServerId == session.ServerId).ToArray();
@@ -368,35 +368,35 @@ public sealed class GameEntryLifecycleTests
             return Task.CompletedTask;
         }
 
-        public Task SendWelcomeAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withList)
+        public Task SendWelcomeAsync(GameSession session, IReadOnlyList<DbCharacter> characters, bool withList)
         {
             Record("welcome", session);
             WelcomeWithList = withList;
             return Task.CompletedTask;
         }
 
-        public Task SendCharacterListAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withInitialization)
+        public Task SendCharacterListAsync(GameSession session, IReadOnlyList<DbCharacter> characters, bool withInitialization)
         {
             Record("list", session);
             ListWithInitialization = withInitialization;
             return session.SendAsync(new CharacterListEvent([]));
         }
 
-        public DatabaseManager.DbCharacter? FindCharacter(long characterId)
+        public DbCharacter? FindCharacter(long characterId)
         {
             Record("find");
             return Characters.FirstOrDefault(c => c.Id == characterId);
         }
 
-        public void LoadCharacterState(GameSession session, DatabaseManager.DbCharacter selected) => Record("load", session);
-        public Task AnnounceMapPresenceAsync(GameSession session, DatabaseManager.DbCharacter selected) { Record("presence", session); return Task.CompletedTask; }
-        public Task SendInitialStateAsync(GameSession session, DatabaseManager.DbCharacter selected) { Record("initial", session); return Task.CompletedTask; }
+        public void LoadCharacterState(GameSession session, DbCharacter selected) => Record("load", session);
+        public Task AnnounceMapPresenceAsync(GameSession session, DbCharacter selected) { Record("presence", session); return Task.CompletedTask; }
+        public Task SendInitialStateAsync(GameSession session, DbCharacter selected) { Record("initial", session); return Task.CompletedTask; }
         public Task RestoreGuildRaidAsync(long characterId) { Record("raid"); return Task.CompletedTask; }
         public Task NotifyGuildConnectionAsync(long characterId) { Record("guild"); return Task.CompletedTask; }
         public Task NotifyFriendsAsync(long accountId) { Record("friends"); return Task.CompletedTask; }
-        public Task RestoreRemodelAsync(GameSession session, DatabaseManager.DbCharacter selected) { Record("remodel", session); return Task.CompletedTask; }
+        public Task RestoreRemodelAsync(GameSession session, DbCharacter selected) { Record("remodel", session); return Task.CompletedTask; }
 
-        public async Task SendMapInitializationAsync(GameSession session, DatabaseManager.DbCharacter selected)
+        public async Task SendMapInitializationAsync(GameSession session, DbCharacter selected)
         {
             Record("map-initialization", session);
             await BeforeMap;
@@ -412,7 +412,7 @@ public sealed class GameEntryLifecycleTests
             return Task.FromResult(FightMapPending);
         }
 
-        public Task SendMapInformationAsync(GameSession session, DatabaseManager.DbCharacter selected) { Record("actors", session); return Task.CompletedTask; }
+        public Task SendMapInformationAsync(GameSession session, DbCharacter selected) { Record("actors", session); return Task.CompletedTask; }
         public Task TickAlterationsAsync(GameSession session) { Record("tick", session); return Task.CompletedTask; }
         public Task SendReturnToSelectionAsync(GameSession session) { Record("return-token", session); return Task.CompletedTask; }
         public void PrepareReturnToSelection(GameSession session) => Record("prepare-return", session);

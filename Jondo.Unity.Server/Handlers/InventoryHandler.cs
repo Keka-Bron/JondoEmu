@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Server.Managers;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -19,30 +21,6 @@ namespace Jondo.Unity.Server.Handlers
     /// </summary>
     public static class InventoryHandler
     {
-        /// <summary>
-        /// A SECOND EQUIPMENT-LOOK PATH, AND IT CONTRADICTS THE FIRST. Left alone on purpose.
-        /// </summary>
-        /// <remarks>
-        /// Managers.EquipmentSkins now carries 741 real items and BuildBodyLook puts their skin in
-        /// the look's f6. This table carries four and puts them in f2, and the two disagree about
-        /// what the value even is: for the Paper Hat, Cape and Shield the new table says 460, 461
-        /// and 462 while this one says 53375140, 68293394 and 84411912. Different field, different
-        /// encoding, same three objects. The Paper Sword (10797) is only here.
-        ///
-        /// Neither has been measured against the other, so this stays until somebody does: these
-        /// four work today, and removing a path that works on the strength of a guess is how a
-        /// character ends up wearing nothing. What has to be measured is which field the real
-        /// server uses for a worn item's skin, and whether those large numbers are a packed form
-        /// of the small ones.
-        /// </remarks>
-        private static readonly Dictionary<int, int> ItemGidToSkinId = new Dictionary<int, int>
-        {
-            { 10801, 53375140 },  // Paper Hat
-            { 10800, 68293394 },  // Paper Cape
-            { 10798, 84411912 },  // Paper Shield
-            { 10797, 110287861 }  // Paper Sword
-        };
-
         public static async Task HandleItemMovementRequest(NetworkStream stream, byte[] payload)
         {
             LogDebug("[Inventory] Received Item Movement Request (isi) [3.6]");
@@ -88,12 +66,12 @@ namespace Jondo.Unity.Server.Handlers
                 LogDebug("[Inventory] Sent luy (InventoryTransactionFinished)");
 
                 // 5. Update character appearance
-                byte[]? lookBytes = UpdateCharacterLook();
+                var looks = UpdateCharacterLook();
 
-                if (lookBytes != null)
+                if (looks.HasValue)
                 {
                     // 6. luq (UpdateSelfLookMessage) — updates local avatar in inventory panel
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildLuqPacket(lookBytes));
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildLuqPacket(looks.Value.Preview));
                     LogDebug("[Inventory] Sent luq (UpdateSelfLookMessage)");
                 }
 
@@ -101,10 +79,10 @@ namespace Jondo.Unity.Server.Handlers
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, StatsHandler.BuildIsfPacket());
                 LogDebug("[Inventory] Sent isf (InventoryWeightMessage)");
 
-                if (lookBytes != null)
+                if (looks.HasValue)
                 {
                     // 8. kku (ActorLookMessage) — updates character look in the world
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildKkuPacket(lookBytes, Jondo.Unity.Server.Network.SessionContext.State.CharacterId));
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildKkuPacket(looks.Value.Map, Jondo.Unity.Server.Network.SessionContext.State.CharacterId));
                     LogDebug("[Inventory] Sent kku (ActorLookMessage)");
                 }
 
@@ -146,75 +124,28 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── Appearance ─────────────────────────────────────────────────────────────
 
-        private static byte[]? UpdateCharacterLook()
+        private static (EntityLook Preview, EntityLook Map)? UpdateCharacterLook()
         {
-            if (Jondo.Unity.Server.Network.SessionContext.State.LookBytes == null || Jondo.Unity.Server.Network.SessionContext.State.LookBytes.Length == 0)
-                Jondo.Unity.Server.Network.SessionContext.State.LookBytes = NetworkEnvelope.ConvertHexStringToByteArray("08-01-18-03-22-18-A2-8B-9B-0F-CB-E5-F6-15-A4-E1-B9-19-92-A6-C8-20-88-8C-A0-28-F5-B7-CB-34-2A-03-5B-E4-10-42-01-34-32-02-20-01-38-09");
-
             try
             {
-                var lookMsg = ProtoMessage.Parse(Jondo.Unity.Server.Network.SessionContext.State.LookBytes);
-
-                // 1. Extract current skins (Field 2 of EntityLook)
-                var allSkins = new List<int>();
-                foreach (var field in lookMsg.Fields)
-                {
-                    if (field.FieldNumber == 2)
-                    {
-                        if (field.WireType == 2) // packed
-                        {
-                            int subPos = 0;
-                            while (subPos < field.BytesValue.Length)
-                                allSkins.Add((int)ReadVarIntFromBytes(field.BytesValue, ref subPos));
-                        }
-                        else if (field.WireType == 0) // unpacked
-                        {
-                            allSkins.Add((int)field.VarIntValue);
-                        }
-                    }
-                }
-
-                // 2. Remove old equipment skins
-                var equipmentSkins = new HashSet<int>(ItemGidToSkinId.Values);
-                var updatedSkins   = allSkins.Where(s => !equipmentSkins.Contains(s)).ToList();
-
-                // 3. Add skins of currently equipped items
-                foreach (var equippedItem in Jondo.Unity.Server.Network.SessionContext.State.GetEquippedItemsCopy())
-                {
-                    var playerItem = Jondo.Unity.Server.Network.SessionContext.State.GetInventoryItem(equippedItem.Key);
-                    if (playerItem != null && ItemGidToSkinId.TryGetValue(playerItem.ItemId, out int skinId))
-                    {
-                        if (!updatedSkins.Contains(skinId))
-                            updatedSkins.Add(skinId);
-                    }
-                }
-
-                // 4. Rebuild skins field in EntityLook
-                lookMsg.Fields.RemoveAll(f => f.FieldNumber == 2);
-                using (var msSkins = new MemoryStream())
-                {
-                    foreach (int skin in updatedSkins)
-                        ProtoMessage.WriteVarInt(msSkins, (ulong)skin);
-                    lookMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = msSkins.ToArray() });
-                }
-
-                byte[] entityLookBytes = lookMsg.ToByteArray();
-                Jondo.Unity.Server.Network.SessionContext.State.LookBytes = entityLookBytes;
-
-                // 5. Reconstruct actor details cleanly
-                Jondo.Unity.Server.Network.SessionContext.State.PlayerActorDetails = DatabaseManager.ReconstructActorDetails(Jondo.Unity.Server.Network.SessionContext.State.LookBytes, Jondo.Unity.Server.Network.SessionContext.State.CharacterName);
-
-                LogDebug($"[Appearance] Updated character look. Total skins: {updatedSkins.Count}");
-                DatabaseManager.SaveCharacterLook(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, entityLookBytes);
-                LogDebug("[Appearance] Saved updated look to database.");
-
-                return entityLookBytes;
+                return BuildLooks(SessionContext.Current, DatabaseManager.GetCharacterById,
+                    (character, preview) => preview ? CharacterLookBuilder.SemanticLook(character, paraLaVentana: true)
+                        : CharacterLookBuilder.SemanticMapLook(character));
             }
             catch (Exception ex)
             {
                 LogDebug($"[-] Error in UpdateCharacterLook: {ex.Message}");
                 return null;
             }
+        }
+
+        internal static (EntityLook Preview, EntityLook Map) BuildLooks(GameSession session,
+            Func<long, DbCharacter?> find, Func<DbCharacter, bool, EntityLook> build)
+        {
+            using var context = SessionContext.Push(session);
+            var character = find(session.CharacterId)
+                ?? throw new InvalidOperationException($"Character {session.CharacterId} no longer exists.");
+            return (build(character, true), build(character, false));
         }
 
         // ─── Packet builders ────────────────────────────────────────────────────────
@@ -229,21 +160,21 @@ namespace Jondo.Unity.Server.Handlers
             return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Iry), ms.ToArray());
         }
 
-        private static byte[] BuildLuqPacket(byte[] lookBytes)
+        internal static byte[] BuildLuqPacket(EntityLook look)
         {
             using var ms = new MemoryStream();
             var output = new CodedOutputStream(ms);
-            output.WriteTag((uint)((2 << 3) | 2)); output.WriteBytes(ByteString.CopyFrom(lookBytes));     // Field 2: EntityLook
+            output.WriteTag((uint)((2 << 3) | 2)); output.WriteBytes(ByteString.CopyFrom(CharacterLookBuilder.WriteLook(look).Build()));
             output.WriteTag((uint)((3 << 3) | 2)); output.WriteString(Guid.NewGuid().ToString());          // Field 3: session UUID
             output.Flush();
             return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Luq), ms.ToArray());
         }
 
-        private static byte[] BuildKkuPacket(byte[] lookBytes, long characterId)
+        internal static byte[] BuildKkuPacket(EntityLook look, long characterId)
         {
             using var ms = new MemoryStream();
             var output = new CodedOutputStream(ms);
-            output.WriteTag((uint)((1 << 3) | 2)); output.WriteBytes(ByteString.CopyFrom(lookBytes)); // Field 1: EntityLook
+            output.WriteTag((uint)((1 << 3) | 2)); output.WriteBytes(ByteString.CopyFrom(CharacterLookBuilder.WriteLook(look).Build()));
             output.WriteTag((uint)((2 << 3) | 0)); output.WriteInt64(characterId);                    // Field 2: Character ID
             output.Flush();
             return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Kku), ms.ToArray());
@@ -259,20 +190,6 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         // ─── Utilities ──────────────────────────────────────────────────────────────
-
-        private static ulong ReadVarIntFromBytes(byte[] data, ref int pos)
-        {
-            ulong value = 0;
-            int shift = 0;
-            while (pos < data.Length)
-            {
-                byte b = data[pos++];
-                value |= (ulong)(b & 0x7F) << shift;
-                if ((b & 0x80) == 0) break;
-                shift += 7;
-            }
-            return value;
-        }
 
         private static void LogDebug(string msg) => Program.LogDebug(msg);
     }

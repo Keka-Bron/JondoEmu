@@ -7,8 +7,8 @@ namespace Jondo.Unity.Tests.Protocol;
 /// <summary>Live welcome ordering and the ordinary character-selection screen.</summary>
 public sealed class WelcomeBurstTests
 {
-    private static DatabaseManager.DbCharacter[] Characters(int count)
-        => Enumerable.Range(0, count).Select(index => new DatabaseManager.DbCharacter
+    private static DbCharacter[] Characters(int count)
+        => Enumerable.Range(0, count).Select(index => new DbCharacter
         { Id = 1000 + index, Name = "Prueba" + index, Level = 1, Breed = 1 }).ToArray();
 
     [Theory]

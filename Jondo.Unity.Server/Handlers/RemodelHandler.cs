@@ -61,7 +61,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>Entering the world with a name change waiting: the Rename window, with the name as it is.</summary>
-        public static async Task OnEnterWorldAsync(NetworkStream stream, DatabaseManager.DbCharacter character)
+        public static async Task OnEnterWorldAsync(NetworkStream stream, DbCharacter character)
         {
             if (CharacterRemodel.PendingOf(character.Id) != CharacterRemodel.Change.Name) return;
             await SendAsync(stream, Op.Kvk, Pb.New().Str(1, character.Name).Build());

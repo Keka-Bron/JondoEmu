@@ -222,7 +222,7 @@ public sealed class EmoteOwnershipTests
             calls.Add(call);
             return Task.CompletedTask;
         }
-        public Task SendMapAsync(GameSession session, DatabaseManager.DbCharacter character)
+        public Task SendMapAsync(GameSession session, DbCharacter character)
         {
             Assert.Equal(owner.CharacterId, character.Id);
             return Record("map", session);

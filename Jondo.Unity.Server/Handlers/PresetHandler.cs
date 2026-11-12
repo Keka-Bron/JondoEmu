@@ -72,7 +72,7 @@ namespace Jondo.Unity.Server.Handlers
         private static long Number(List<ProtoField> fields, int number)
             => fields.FirstOrDefault(f => f.FieldNumber == number && f.WireType == 0)?.VarIntValue ?? 0;
 
-        private static DatabaseManager.DbCharacter? Character() => DatabaseManager.GetCharacterById(Me);
+        private static DbCharacter? Character() => DatabaseManager.GetCharacterById(Me);
 
         // ─── The character's state ──────────────────────────────────────────────
 

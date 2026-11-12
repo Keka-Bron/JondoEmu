@@ -51,7 +51,7 @@ namespace Jondo.Unity.Server.Network
         /// the character-list refresh; a resumable fight waits for the list request.
         /// </summary>
         internal static async System.Threading.Tasks.Task SendWelcomeAsync(GameSession session,
-            IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withList)
+            IReadOnlyList<DbCharacter> characters, bool withList)
         {
             await session.SendAsync(new Game.AuthenticationTicketAcceptedEvent());
             await session.SendAsync(ServerTimeMessages.Snapshot());
@@ -76,7 +76,7 @@ namespace Jondo.Unity.Server.Network
         /// after creation once left the client selecting its previously cached character.
         /// </summary>
         internal static System.Threading.Tasks.Task SendCharacterListAsync(GameSession session,
-            IReadOnlyList<DatabaseManager.DbCharacter> characters)
+            IReadOnlyList<DbCharacter> characters)
             => CharacterListService.Live.SendAsync(session, characters);
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Jondo.Unity.Server.Network
         /// just created, already dated, heads the list. A character with no date goes last; equal
         /// dates keep the order they came in.
         /// </remarks>
-        internal static List<DatabaseManager.DbCharacter> MostRecentFirst(IEnumerable<DatabaseManager.DbCharacter> characters)
+        internal static List<DbCharacter> MostRecentFirst(IEnumerable<DbCharacter> characters)
             => characters.OrderByDescending(c => System.DateTimeOffset.TryParse(c.LastConnection,
                        System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None,
                        out var at) ? at : System.DateTimeOffset.MinValue)
@@ -612,7 +612,7 @@ namespace Jondo.Unity.Server.Network
         /// NPCs and monster groups use negative contextual ids, which is how the client tells
         /// them from players.
         /// </summary>
-        public static byte[] BuildMapActors(long mapId, DatabaseManager.DbCharacter character,
+        public static byte[] BuildMapActors(long mapId, DbCharacter character,
                                             int cell, int facing, long accountId)
         {
             var jss = Pb.New().Var(2, mapId);
@@ -759,7 +759,7 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>The same, with Hardcore (the server's settings) putting every monster at twice its size.</summary>
         internal static Pb MonsterLook(string look, bool hardcore)
-            => BreedLookTable.WriteLook(SemanticMonsterLook(look, hardcore));
+            => CharacterLookBuilder.WriteLook(SemanticMonsterLook(look, hardcore));
 
         internal static Jondo.Unity.Protocol.Game.EntityLook SemanticMonsterLook(string look, bool hardcore)
         {
@@ -1513,7 +1513,7 @@ namespace Jondo.Unity.Server.Network
         /// loose inside the jsn, which is a single actor. That is why it is here and not inside either of
         /// the two.
         /// </summary>
-        private static Pb PlayerActor(DatabaseManager.DbCharacter character, int cell, int facing,
+        private static Pb PlayerActor(DbCharacter character, int cell, int facing,
                                      long accountId)
         {
             // The order and the fields are those of a real jsn with a title on:
@@ -1556,12 +1556,12 @@ namespace Jondo.Unity.Server.Network
                 .Msg(1, Pb.New().Var(1, cell).Var(2, facing))
                 .Msg(2, Pb.New()
                     .Msg(1, Pb.New().Msg(5, humanoid))
-                    .Bytes(3, BreedLookTable.MapLook(character)))
+                    .Bytes(3, CharacterLookBuilder.MapLook(character)))
                 .Var(3, character.Id);
         }
 
         /// <summary>Serialized actor block used by map snapshots outside this protocol builder.</summary>
-        public static byte[] BuildPlayerActorBlock(DatabaseManager.DbCharacter character, int cell,
+        public static byte[] BuildPlayerActorBlock(DbCharacter character, int cell,
                                                    int facing, long accountId)
             => PlayerActor(character, cell, facing, accountId).Build();
 
@@ -1582,7 +1582,7 @@ namespace Jondo.Unity.Server.Network
         ///
         /// The real server sends three in a row; one is enough.
         /// </summary>
-        public static byte[] BuildActorRefreshed(DatabaseManager.DbCharacter character, int cell,
+        public static byte[] BuildActorRefreshed(DbCharacter character, int cell,
                                                  int facing, long accountId)
             => Pb.New()
                 .Msg(1, PlayerActor(character, cell, facing, accountId))
@@ -1600,10 +1600,10 @@ namespace Jondo.Unity.Server.Network
         /// derived from the character's id: constant for him and different from anyone else's. If the
         /// client does not check it, it does not matter; if it checks it, at least it is consistent.
         /// </summary>
-        public static byte[] BuildLookChanged(DatabaseManager.DbCharacter character)
+        public static byte[] BuildLookChanged(DbCharacter character)
             => Pb.New()
                 .Str(1, LookIdOf(character.Id))
-                .Bytes(2, BreedLookTable.BuildLook(character, paraLaVentana: true))
+                .Bytes(2, CharacterLookBuilder.BuildLook(character, paraLaVentana: true))
                 .Build();
 
         /// <summary>
@@ -1617,11 +1617,11 @@ namespace Jondo.Unity.Server.Network
         /// f7 is the same uuid the preview's lxc carries, and f12 its same look:
         /// that is how the panel knows that what reaches it is its own.
         /// </summary>
-        public static byte[] BuildAppearanceState(DatabaseManager.DbCharacter character, string draftId)
+        public static byte[] BuildAppearanceState(DbCharacter character, string draftId)
             => Pb.New().Var(1, 1).Bytes(3, AppearanceBody(character, draftId)).Build();
 
         /// <summary>lwq { f1: the outfit being drafted }, the same block the lxo carries in its f3.</summary>
-        public static byte[] BuildDraftOutfit(DatabaseManager.DbCharacter character, string draftId)
+        public static byte[] BuildDraftOutfit(DbCharacter character, string draftId)
             => Pb.New().Bytes(1, AppearanceBody(character, draftId)).Build();
 
         /// <summary>Type-only aura notification; its former tag-1 value is no longer emitted.</summary>
@@ -1630,20 +1630,20 @@ namespace Jondo.Unity.Server.Network
             => Array.Empty<byte>();
 
         /// <summary>The worn outfit as the window drafts it, under the draft's own uuid.</summary>
-        private static byte[] AppearanceBody(DatabaseManager.DbCharacter character, string draftId)
+        private static byte[] AppearanceBody(DbCharacter character, string draftId)
             => OutfitBody(character, draftId, Managers.Outfits.Of(character.Id)[0], Managers.Outfits.Worn(character),
-                          BreedLookTable.BuildLook(character, paraLaVentana: true));
+                          CharacterLookBuilder.BuildLook(character, paraLaVentana: true));
 
         /// <summary>One of the character's outfits: the worn one from the live tables, the others as kept.</summary>
-        public static byte[] BuildOutfit(DatabaseManager.DbCharacter character, Managers.Outfits.Outfit outfit)
+        public static byte[] BuildOutfit(DbCharacter character, Managers.Outfits.Outfit outfit)
         {
             if (outfit.Kept is not { } kept)
                 return OutfitBody(character, outfit.Uuid, outfit, Managers.Outfits.Worn(character),
-                                  BreedLookTable.BuildLook(character, paraLaVentana: true));
+                                  CharacterLookBuilder.BuildLook(character, paraLaVentana: true));
 
             int head = kept.Head > 0 ? kept.Head : character.HeadId;
             return OutfitBody(character, outfit.Uuid, outfit, kept,
-                              BreedLookTable.OutfitLook(character, head, kept.Body, kept.Colors, kept.Garments));
+                              CharacterLookBuilder.OutfitLook(character, head, kept.Body, kept.Colors, kept.Garments));
         }
 
         /// <summary>
@@ -1661,7 +1661,7 @@ namespace Jondo.Unity.Server.Network
         /// An empty name is drawn as the window's own default. f9 is the aura, an emote id
         /// (lk::bno looks it up as one).
         /// </summary>
-        private static byte[] OutfitBody(DatabaseManager.DbCharacter character, string uuid,
+        private static byte[] OutfitBody(DbCharacter character, string uuid,
                                          Managers.Outfits.Outfit outfit, Managers.Outfits.Look look, byte[] drawn)
         {
             var body = Pb.New();
@@ -1669,7 +1669,7 @@ namespace Jondo.Unity.Server.Network
             // The outfit's colours, bare and without an index. Without this the client blows up on opening
             // the cosmetics window: its own log says so, ColorSet..ctor with the null
             // list, inside the lyt handler.
-            var colores = BreedLookTable.PlainColors(character.Breed, character.Sex, look.Colors);
+            var colores = CharacterLookBuilder.PlainColors(character.Breed, character.Sex, look.Colors);
             if (colores.Count > 0) body.Msg(1, Pb.New().Packed(2, colores));
 
             body
@@ -1710,7 +1710,7 @@ namespace Jondo.Unity.Server.Network
         /// left undrawn: it blows up in CosmeticUi.DisplayOutfit with a null reference because it does not
         /// have any outfit to show. It was seen in its own Player.log.
         /// </summary>
-        public static byte[] BuildOutfits(DatabaseManager.DbCharacter character)
+        public static byte[] BuildOutfits(DbCharacter character)
         {
             var outfits = Managers.Outfits.Of(character.Id);
             var pb = Pb.New();

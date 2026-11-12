@@ -454,7 +454,7 @@ namespace Jondo.Unity.Server.Handlers
         /// own, since nobody visits another's. The HavenbagManagerUI shows its menu -- rooms,
         /// themes, furniture -- only in one's own bag (m_inMyOwnHavenbag), which it learns here.
         /// </summary>
-        public static void AddToMap(Pb jss, long mapId, DatabaseManager.DbCharacter owner)
+        public static void AddToMap(Pb jss, long mapId, DbCharacter owner)
         {
             if (owner == null || !Merkasako.IsHavenBag(mapId)) return;
             long visited = SessionContext.Actual?.State.HavenBagOwnerId ?? 0;

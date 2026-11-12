@@ -478,7 +478,7 @@ namespace Jondo.Unity.Server.Network
                     nivel = personaje.Level,
                     raza = personaje.Breed,
                     sexo = personaje.Sex,
-                    aspecto = Managers.BreedLookTable.Drawable(personaje),
+                    aspecto = Managers.CharacterLookBuilder.Drawable(personaje),
                 });
             }
 

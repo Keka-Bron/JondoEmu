@@ -122,10 +122,11 @@ client; they are deliberately not in the burst.
 | `kvz` | C→S | 2 / 2 files | Create a character. | `CharacterCreationHandler.CreateAsync` | read for name, breed, sex, look |
 | `kvb` | S→C | 2 / 2 files | Result of the creation. Empty on success; `f2` carries the refusal reason. | `CharacterCreationHandler` | empty, or `f2: reason` |
 | `kvk` | S→C | 8 / 2 files | A suggested character name (the dice button). | `CharacterCreationHandler.SuggestNameAsync` | `f1: name` |
-| `kvw` | C→S | 2 / 2 files | Select a character. The id is checked against the session's account: the client picks it, so it cannot be trusted. | `CharacterSelectionHandler` | read for character id |
-| `kvl` | C→S | 1 / 1 file | Same step straight after a successful creation — the client sends `kvl` behind `kvi` and enters the world without passing through the list. | `CharacterSelectionHandler` | read for character id |
+| `kvw` | C→S | 2 / 2 files | Select a character. The id is checked against the session's account and server. | `GameEntryDispatch`, `GameEntryService` | `CharacterSelectionRequest.CharacterId` |
+| `kvl` | C→S | 1 / 1 file | Same step straight after a successful creation — the client sends `kvl` behind `kvi` and enters the world without passing through the list. | `GameEntryDispatch`, `GameEntryService` | `CharacterFirstSelectionRequest(DoTutorial, CharacterId)` |
 | `kva` | S→C | 7 / 6 files | "You are now playing this character." Without it the client sits on the character screen with the hourglass up. Constructed directly as semantic selection success from server state. | `CharacterSelectionMessages.Success` | `f1 { f1 { f1: details, f2: characterId } }` |
-| `kpa` | C→S | 1 / 1 file | Character-list request. Dispatched, but seen once in 242 captures. | `CharacterSelectionHandler.HandleCharacterListRequest` | — |
+
+`CharacterListRequest` uses `kvc`.
 
 `kqu` is **not** a character-list request in 3.6.10.10, whatever older tables say: the server
 pushes it inside the welcome burst and the client never sends it.
@@ -399,6 +400,34 @@ not a zero inside.
 
 A private message is a different message, `ktb`, and it carries its recipient. Not implemented.
 
+### 2.13.1 Ignore player (`kpa`)
+
+| Opcode | Dir | Wire | What it does | Native client handler | Payload |
+|---|---|---|---|---|---|
+| `kpa` | C→S | 1 / 1 file | Add a player to the ignored-player list. | `fhf.bezh` | `f1: lgf player target`; `f2: enum, meaning unresolved` |
+
+Evidence is scoped to analysis build **`jondo-11-08-2026`**, version **`11-08-2026`**.
+All addresses below are hexadecimal module-relative RVAs:
+
+- `PlayerMenuMaker.OnIgnorePlayer` (`0x49f1060`) publishes internal action `djv`
+  with `m_playerName` and an empty second string.
+- `fhf.Enable` (`0x5289180`) registers `djv` with `fhf.bezh` (`0x528db50`). That
+  handler validates the target, rejects self-targeting, checks an existing social
+  collection, then constructs `kpa`, fills its tag-1 target and submits it through
+  the network interface.
+- `JoinPartyUi.<InitUI>b__14_0` (`0x6150e40`) independently publishes the same
+  action for `m_fromName` when `m_ignoringNext` is enabled, before declining the
+  party invitation. This confirms the ignore-player meaning.
+- Target helper `gji.bklc` (`0x5660600`) builds `lgf` with either a single-name
+  branch or a two-part name/tag branch. `AddFriendUi.SendInvite` (`0x5fcb970`)
+  splits input on `#`, validates a four-digit tag and can publish the same action.
+
+`IgnoredAddRequest` is an inferred semantic name without a reviewed binding.
+Tag 1 (`kpa.fymh`, backing field `evnf`) is client-used. Tag 2
+(`kpa.fymi`, enum `kpa.koz.koy`) remains at its default in the inspected sends;
+field-use analysis classifies it as **indeterminate**, so its purpose and enum
+values remain unresolved.
+
 ### 2.14 Heartbeat
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
@@ -424,8 +453,8 @@ entry (or on `lqc`, whichever comes first) and the heartbeat gets its own answer
 
 ## 3. Implemented, but on a dead code path
 
-These 22 are inside the 128, yet the branch that emits or consumes them is keyed on a message the
-3.6.10.10 client never sends. Most belong to the 3.6.4.3 world-loading handshake (`kkn`, `lpj`,
+The branches below are keyed on messages the 3.6.10.10 client never sends.
+Most belong to the 3.6.4.3 world-loading handshake (`kkn`, `lpj`,
 `hmv`, `ibt`, `loy`) or to the old combat dispatch. Several are builders in
 `TransitionPacketsBuilder` that nothing calls at all — of its 48 public builders, **34 are never
 invoked** from anywhere in the solution. The fourteen that are called are all reached from
@@ -433,7 +462,6 @@ invoked** from anywhere in the solution. The fourteen that are called are all re
 
 | Opcode | Wire | Where it is in the code | Why it is dead |
 |---|---|---|---|
-| `jto` | S→C 7324 / 23 files | `GameNodeProxy` character-list branch | The **server** sends `jto`; the client never does. Only `kpa` reaches that branch. |
 | `jwe` | S→C 9463 / 23 files | `FightHandler` dispatch | Server-sent. Used as a client trigger. |
 | `jxw` | S→C 4933 / 23 files | `FightHandler` dispatch | Same. |
 | `jya` | S→C 3962 / 20 files | `FightHandler` emits it | Only reachable from the fight dispatch above. |
@@ -585,11 +613,9 @@ on every packet. Fifteen of them key a branch of their own, and those are the on
 | `jxx` | `FightHandler` | Old fight dispatch. |
 | `iuw` | `DestroyItemHandler` | **Not a leftover.** Observed against the real client in the emulator's own traffic log, just not in the pcapng set. Genuinely implemented. |
 
-The other fourteen — `igx`, `ise`, `joi`, `jqf`, `jrb`, `jtk`, `jub`, `jyk`, `jyz`, `jza`, `knx`,
-`kpc`, `ksl`, `ksx` — carry no branch of their own. They ride along inside the `||` chains of the
-branches above: `ise`, `jtk` and `knx` share the authentication branch, `kpc` and `ksx` the
-character-list branch with `jto` and `kpa`, `ksl` the selection branch with `kvw`, `jqf` and `igx`
-the `kkr` branch, and `joi`, `jrb`, `jub`, `jyk`, `jyz` and `jza` the fight branch with `jxx`.
+Additional aliases share the `||` chains of the branches above: `ise`, `jtk` and `knx`
+share the authentication branch, `jqf` and `igx` the `kkr` branch, and `joi`, `jrb`,
+`jub`, `jyk`, `jyz` and `jza` the fight branch with `jxx`.
 Removing a whole branch therefore retires more than the one opcode that names it.
 
 **Seventy-seven are never dispatched.** They are constants, builders nothing calls, protobuf

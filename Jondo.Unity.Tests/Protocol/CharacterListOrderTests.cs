@@ -15,10 +15,10 @@ namespace Jondo.Unity.Tests.Protocol
     {
         private const long Account = 8_970_000_001;
 
-        private static DatabaseManager.DbCharacter Character(long id, string lastConnection)
+        private static DbCharacter Character(long id, string lastConnection)
             => new() { Id = id, AccountId = Account, Name = "Orden" + id, Level = 1, Breed = 1, LastConnection = lastConnection };
 
-        private static long[] IdsOf(System.Collections.Generic.IReadOnlyList<DatabaseManager.DbCharacter> characters)
+        private static long[] IdsOf(System.Collections.Generic.IReadOnlyList<DbCharacter> characters)
             => CharacterListMessages.Live.Snapshot(characters).Characters.Select(character => character.Id).ToArray();
 
         [Fact]

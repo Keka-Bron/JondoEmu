@@ -620,7 +620,7 @@ namespace Jondo.Unity.Tests.World
             Houses.Initialize();
             InteractiveRegistry.Initialize();
 
-            var me = new DatabaseManager.DbCharacter { Id = 990_000_801, Name = "Visita", Level = 200, Breed = 1 };
+            var me = new DbCharacter { Id = 990_000_801, Name = "Visita", Level = 200, Breed = 1 };
             var jss = ProtoMessage.Parse(ConnectionProtocol.BuildMapActors(interior, me, 429, 1, 990_000_801));
             long ElementOf(ProtoMessage m, int field)
                 => m.Fields.FirstOrDefault(f => f.FieldNumber == field)?.VarIntValue ?? 0;

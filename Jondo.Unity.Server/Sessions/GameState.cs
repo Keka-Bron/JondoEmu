@@ -30,8 +30,6 @@ namespace Jondo.Unity.Server
         public static string CharacterName { get => S.CharacterName; set => S.CharacterName = value; }
         public static int CharacterLevel { get => S.CharacterLevel; set => S.CharacterLevel = value; }
         public static int Breed { get => S.Breed; set => S.Breed = value; }
-        public static byte[]? PlayerActorDetails { get => S.PlayerActorDetails; set => S.PlayerActorDetails = value; }
-        public static byte[]? LookBytes { get => S.LookBytes; set => S.LookBytes = value; }
 
         // Where he is
         public static long MapId { get => S.MapId; set => S.MapId = value; }

@@ -5,10 +5,10 @@ namespace Jondo.Unity.Server.Network;
 
 internal static class CharacterSelectionMessages
 {
-    internal static CharacterSelectionEventCaseSuccess Success(DatabaseManager.DbCharacter character)
-        => Success(character, BreedLookTable.SemanticLook(character));
+    internal static CharacterSelectionEventCaseSuccess Success(DbCharacter character)
+        => Success(character, CharacterLookBuilder.SemanticLook(character));
 
-    internal static CharacterSelectionEventCaseSuccess Success(DatabaseManager.DbCharacter character, EntityLook look)
+    internal static CharacterSelectionEventCaseSuccess Success(DbCharacter character, EntityLook look)
     {
         var identity = new CharacterBaseInformation(character.Sex == 1 ? Gender.Female : Gender.Male,
             new CharacterBaseInformationComplementCaseNone());

@@ -16,7 +16,7 @@ namespace Jondo.Unity.Tests.Network
         private const long Who = 8_999_201;
         private static readonly GameCodec Wire = new();
 
-        private static DatabaseManager.DbCharacter Character()
+        private static DbCharacter Character()
             => new() { Id = Who, AccountId = Who, Name = "Propio", Level = 200, Breed = 8 };
 
         [Fact]

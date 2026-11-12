@@ -73,7 +73,7 @@ namespace Jondo.Unity.Server.Managers
                     foreach (int b in SpellTable.ClassBreeds)
                         for (int sex = 0; sex < 2; sex++)
                         {
-                            var look = BreedLookTable.Get(b, sex);
+                            var look = BreedLookCatalog.Get(b, sex);
                             if (look != null && look.Skins.Count > 0) bodies[look.Skins[0]] = b;
                         }
                     _npcLooks = new Dictionary<int, List<Npcs.Spawn>>();
@@ -198,12 +198,12 @@ namespace Jondo.Unity.Server.Managers
             }
             else
             {
-                var breed = BreedLookTable.Get(spec.Breed, spec.Sex);
+                var breed = BreedLookCatalog.Get(spec.Breed, spec.Sex);
                 bones = breed?.Bones ?? 1;
                 skins = breed?.Skins.ToList() ?? new List<long>();
                 int head = HeadTable.SkinFor(HeadTable.DefaultHeadId(spec.Breed, spec.Sex), spec.Breed, spec.Sex);
                 if (head > 0) skins.Add(head);
-                colors = BreedLookTable.IndexedColors(spec.Breed, spec.Sex);
+                colors = CharacterLookBuilder.IndexedColors(spec.Breed, spec.Sex);
                 scales = breed?.Scales.ToList() ?? new List<long>();
             }
 
@@ -238,7 +238,7 @@ namespace Jondo.Unity.Server.Managers
                 Skin = spec.RidesAppearance.Skin,
                 Colors = spec.RidesAppearance.Colors,
             };
-            return BreedLookTable.Composed(bones, skins, colors, scales, rides, appearance);
+            return CharacterLookBuilder.Composed(bones, skins, colors, scales, rides, appearance);
         }
 
         private static readonly ConcurrentDictionary<long, Spec> _alive = new();
@@ -301,7 +301,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 Id = System.Threading.Interlocked.Increment(ref _lastId),
                 Breed = breed,
-                Sex = npc != null ? (BreedLookTable.Get(breed, 1)?.Skins.FirstOrDefault() == npc.Skins[0] ? 1 : 0) : sex,
+                Sex = npc != null ? (BreedLookCatalog.Get(breed, 1)?.Skins.FirstOrDefault() == npc.Skins[0] ? 1 : 0) : sex,
                 Name = "JondoBot " + (ClassNames.TryGetValue(breed, out var name) ? name : breed.ToString()),
                 Choices = choices,
                 LooksLike = npc,

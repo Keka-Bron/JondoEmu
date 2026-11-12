@@ -77,8 +77,8 @@ namespace Jondo.Unity.Tests.Social
                     await Until(pipe, Op.Jsn);
                     Assert.Equal(Power, Wardrobe.AuraOf(character));
                     var me = DatabaseManager.GetCharacterById(character)!;
-                    Assert.Equal(PowerBones, AuraBonesOf(BreedLookTable.MapLook(me)));
-                    Assert.Equal(0, AuraBonesOf(BreedLookTable.BuildLook(me, paraLaVentana: true)));
+                    Assert.Equal(PowerBones, AuraBonesOf(CharacterLookBuilder.MapLook(me)));
+                    Assert.Equal(0, AuraBonesOf(CharacterLookBuilder.BuildLook(me, paraLaVentana: true)));
                     Assert.Equal(Power, AuraOptionOf(ConnectionProtocol.BuildPlayerActorBlock(me, 300, 1, Account)));
 
                     // An aura not known, and an emote that is no aura: refused, the aura as it was.
@@ -98,7 +98,7 @@ namespace Jondo.Unity.Tests.Social
                     Assert.Empty(await pipe.Next(Op.Lym));
                     Assert.Equal(1, (int)Field(await pipe.Next(Op.Lwx), 1)!.VarIntValue);
                     Assert.Equal(0, Wardrobe.AuraOf(character));
-                    Assert.Equal(0, AuraBonesOf(BreedLookTable.MapLook(DatabaseManager.GetCharacterById(character)!)));
+                    Assert.Equal(0, AuraBonesOf(CharacterLookBuilder.MapLook(DatabaseManager.GetCharacterById(character)!)));
                 }
             }
             finally

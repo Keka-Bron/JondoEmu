@@ -9,6 +9,8 @@ using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Tests.Economy;
 using Microsoft.Data.Sqlite;
+using Jondo.Unity.Server.Database.Migrations;
+using CharacterColors = Jondo.Unity.Server.CharacterColors;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Sessions
@@ -59,7 +61,8 @@ namespace Jondo.Unity.Tests.Sessions
                 Assert.Equal(breed, character.Breed);
                 Assert.Equal(sex, character.Sex);
                 Assert.Equal(head, character.HeadId);
-                CheckLook(Convert.FromHexString(character.LookHex));
+                Assert.Equal(CharacterColors.FromRgb(Rgb), character.Colors);
+                CheckLook(CharacterLookBuilder.BuildLook(character));
                 CheckLook(At(list, 1, 1, 4, 6));
                 var sexFields = ProtoMessage.Parse(At(list, 1, 1, 4, 2)).Fields;
                 Assert.Equal(sex, sexFields.SingleOrDefault(f => f.FieldNumber == 3)?.VarIntValue ?? 0);
@@ -86,7 +89,7 @@ namespace Jondo.Unity.Tests.Sessions
                     Assert.Equal(Rgb, Packed(At(outfit.BytesValue, 1, 2)));
                     CheckLook(At(outfit.BytesValue, 12));
                 }
-                Assert.Contains("2=#E80006", BreedLookTable.Drawable(character));
+                Assert.Contains("2=#E80006", CharacterLookBuilder.Drawable(character));
             }
             finally
             {
@@ -117,17 +120,17 @@ namespace Jondo.Unity.Tests.Sessions
         [MemberData(nameof(BreedSexIds))]
         public void Default_slots_and_black_do_not_shift_a_later_custom_colour(int breed, int sex)
         {
-            var defaults = BreedLookTable.Get(breed, sex).Colors;
+            var defaults = BreedLookCatalog.Get(breed, sex).Colors;
             long[] colors = { -1, 0, -1, 0xD30006, -1, -1 };
             Assert.Equal(new long[]
             {
                 0x01000000 | defaults[0], 0x02000000, 0x03000000 | defaults[2],
                 0x04D30006, 0x05000000 | defaults[4], 0x06000000 | defaults[5]
-            }, BreedLookTable.CreationColors(breed, sex, colors));
-            Assert.Equal(BreedLookTable.IndexedColors(breed, sex),
-                BreedLookTable.CreationColors(breed, sex, new long[] { -1, -1, -1, -1, -1, -1 }));
-            Assert.Equal(BreedLookTable.IndexedColors(breed, sex),
-                BreedLookTable.CreationColors(breed, sex, Array.Empty<long>()));
+            }, CharacterLookBuilder.CreationColors(breed, sex, colors));
+            Assert.Equal(CharacterLookBuilder.IndexedColors(breed, sex),
+                CharacterLookBuilder.CreationColors(breed, sex, new long[] { -1, -1, -1, -1, -1, -1 }));
+            Assert.Equal(CharacterLookBuilder.IndexedColors(breed, sex),
+                CharacterLookBuilder.CreationColors(breed, sex, Array.Empty<long>()));
         }
 
         // Read the expectations independently from the client-derived catalogues, not from the
@@ -174,12 +177,12 @@ namespace Jondo.Unity.Tests.Sessions
         public void Every_catalogue_head_keeps_its_skin_body_and_palette(
             int breed, int sex, int head, long headSkin, long body, long scale)
         {
-            var character = new DatabaseManager.DbCharacter
+            var character = new DbCharacter
             {
                 Breed = breed, Sex = sex, HeadId = head,
-                LookHex = Convert.ToHexString(Pb.New().Packed(1, Indexed).Var(2, 3).Var(3, 1).Build())
+                Colors = CharacterColors.FromRgb(Rgb)
             };
-            AssertLook(BreedLookTable.BuildLook(character), body, scale, headSkin);
+            AssertLook(CharacterLookBuilder.BuildLook(character), body, scale, headSkin);
             var listed = Assert.Single(CharacterListMessages.Live.Snapshot(new[] { character }).Characters);
             var basic = Assert.IsType<CharacterComplementCaseCharacterBasicInformation>(listed.ComplementCase).Value;
             var look = Assert.IsType<CharacterBasicInformationComplementCaseCharacterLook>(basic.ComplementCase).Value.Look;
@@ -201,12 +204,9 @@ namespace Jondo.Unity.Tests.Sessions
         [Fact]
         public void Existing_creations_with_bare_RGB_are_read_with_their_slot_indices()
         {
-            var character = new DatabaseManager.DbCharacter
-            {
-                Breed = 18, Sex = 1,
-                LookHex = Convert.ToHexString(Pb.New().Packed(1, Rgb).Var(2, 3).Var(3, 1).Build())
-            };
-            Assert.Equal(Indexed, BreedLookTable.SavedColors(character));
+            string lookHex = Convert.ToHexString(Pb.New().Packed(1, Rgb).Var(2, 3).Var(3, 1).Build());
+            Assert.Equal(Rgb.Select(value => (int?)value),
+                Rgb.Select((_, index) => CharacterColorsMigration.DecodeColor(lookHex, index + 1)));
         }
 
         [Theory]
@@ -214,23 +214,27 @@ namespace Jondo.Unity.Tests.Sessions
         [InlineData("")]
         [InlineData("not hex")]
         [InlineData("0A0180")]
-        [InlineData("080118032218A28B9B0FCBE5F615A4E1B91992A6C820888CA028F5B7CB34")]
-        public void Missing_or_legacy_look_uses_the_breed_palette(string? look)
+        [InlineData("2218A28B9B0FCBE5F615A4E1B91992A6C820888CA028F5B7CB34")]
+        public void Missing_or_unrecognized_look_uses_the_breed_palette(string? look)
         {
-            var character = new DatabaseManager.DbCharacter { Breed = 18, Sex = 1, LookHex = look };
-            Assert.Equal(BreedLookTable.IndexedColors(18, 1), BreedLookTable.SavedColors(character));
+            var character = new DbCharacter { Breed = 18, Sex = 1 };
+            Assert.All(Enumerable.Range(1, 6), slot => Assert.Null(CharacterColorsMigration.DecodeColor(look, slot)));
+            Assert.Equal(CharacterLookBuilder.IndexedColors(18, 1), CharacterLookBuilder.SavedColors(character));
         }
 
         [Fact]
         public void Saved_indexed_colours_keep_their_explicit_slots()
         {
             long[] colors = { 0x02000000, 0x04D30006 };
-            var character = new DatabaseManager.DbCharacter
+            var character = new DbCharacter
             {
                 Breed = 18, Sex = 1,
-                LookHex = Convert.ToHexString(Pb.New().Packed(1, colors).Var(2, 3).Var(3, 1).Build())
+                Colors = CharacterColors.FromIndexed(colors)
             };
-            Assert.Equal(colors, BreedLookTable.SavedColors(character));
+            var saved = CharacterLookBuilder.SavedColors(character);
+            Assert.Equal(6, saved.Count);
+            Assert.Equal(colors[0], saved[1]);
+            Assert.Equal(colors[1], saved[3]);
         }
 
         private static void AssertLook(byte[] look, long body, long scale, long headSkin)

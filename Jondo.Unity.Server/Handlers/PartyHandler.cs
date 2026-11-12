@@ -645,7 +645,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var traits = Pb.New()
                 .Msg(2, enElGrupo)
-                .Bytes(6, BreedLookTable.BuildLook(character))
+                .Bytes(6, CharacterLookBuilder.BuildLook(character))
                 .VarIfNotZero(7, character.Breed);
 
             return Pb.New()
@@ -676,7 +676,7 @@ namespace Jondo.Unity.Server.Handlers
             var character = DatabaseManager.GetCharacterById(guestId);
             if (character == null) return null;
             return Pb.New()
-                .Bytes(1, BreedLookTable.BuildLook(character))
+                .Bytes(1, CharacterLookBuilder.BuildLook(character))
                 .Str(2, character.Name)
                 .Var(3, guestId)
                 .Var(5, hostId)

@@ -39,10 +39,10 @@ namespace Jondo.Unity.Tests.Sessions
     /// </remarks>
     public class CharacterDeletionTests
     {
-        private static readonly List<DatabaseManager.DbCharacter> Two = new()
+        private static readonly List<DbCharacter> Two = new()
         {
-            new DatabaseManager.DbCharacter { Id = 100_001, Name = "Primero", Level = 1, Breed = 13 },
-            new DatabaseManager.DbCharacter { Id = 100_002, Name = "Segundo", Level = 1, Breed = 4 },
+            new DbCharacter { Id = 100_001, Name = "Primero", Level = 1, Breed = 13 },
+            new DbCharacter { Id = 100_002, Name = "Segundo", Level = 1, Breed = 4 },
         };
 
         private static async Task<IReadOnlyList<GameFrame>> CaptureAsync(Func<GameSession, Task> send)
@@ -54,7 +54,7 @@ namespace Jondo.Unity.Tests.Sessions
             return codec.Frames;
         }
 
-        private static Task<IReadOnlyList<GameFrame>> RefreshAsync(IReadOnlyList<DatabaseManager.DbCharacter> characters)
+        private static Task<IReadOnlyList<GameFrame>> RefreshAsync(IReadOnlyList<DbCharacter> characters)
             => CaptureAsync(session => new CharacterListService(
                 new(_ => new([], 3, 1, [], [], [])), new(_ => { }, _ => [], () => [], _ => { }))
                 .SendAsync(session, characters));

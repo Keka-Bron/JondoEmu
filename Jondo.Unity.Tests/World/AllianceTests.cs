@@ -269,8 +269,8 @@ namespace Jondo.Unity.Tests.World
         public void An_allied_actor_carries_its_alliance()
         {
             var alliance = AllianceStore.Create(8401, "Jondo Unidos", "JON", 408, 27, 3116544, 0, 15859463);
-            var member = new DatabaseManager.DbCharacter { Id = 8401, Name = "Member-Three", Level = 200, Breed = 2 };
-            var loner = new DatabaseManager.DbCharacter { Id = 8402, Name = "Solo", Level = 200, Breed = 2 };
+            var member = new DbCharacter { Id = 8401, Name = "Member-Three", Level = 200, Breed = 2 };
+            var loner = new DbCharacter { Id = 8402, Name = "Solo", Level = 200, Breed = 2 };
 
             var option = AllianceOption(ConnectionProtocol.BuildPlayerActorBlock(member, 341, 5, 60000001));
             Assert.NotNull(option);
@@ -354,7 +354,7 @@ namespace Jondo.Unity.Tests.World
         public void The_alliance_fight_switch_is_kept_and_answered()
         {
             AllianceStore.Create(8413, "Jondo Guerreros", "JGU", 408, 27, 3116544, 0, 15859463);
-            var member = new DatabaseManager.DbCharacter { Id = 8413, Name = "Guerrero", Level = 200, Breed = 2 };
+            var member = new DbCharacter { Id = 8413, Name = "Guerrero", Level = 200, Breed = 2 };
 
             AllianceStore.SetTakesPartInAva(8413, true);
             Assert.Equal(AllianceProtocol.AvaNotAggressable, AllianceProtocol.AggressableStatus(8413));

@@ -38,18 +38,22 @@ public sealed class InitialPresentationMessagesTests
     [Fact]
     public void Live_palette_reads_the_selected_characters_persisted_colors_and_refreshes_without_capture_data()
     {
-        var character = new Jondo.Unity.Server.DatabaseManager.DbCharacter { Id = 71_001,
-            LookHex = Convert.ToHexString(Pb.New().Packed(1, [0x01112233, -1, 0x03abcdef]).Build()) };
+        var character = new Jondo.Unity.Server.DbCharacter { Id = 71_001,
+            Breed = 18, Sex = 1, Colors = new(0x112233, null, 0xABCDEF, null, 0, 0xFFFFFF) };
         var messages = InitialPresentationMessages.Live(character);
         using var context = SessionContext.Push(GameSession.SinSocket());
         Assert.Equal(-1, messages.Capabilities().GuildEmblemSymbolCategory);
         var colors = messages.Colors().CharacterColors!;
         Assert.Equal(1, colors.SlotsUnlocked);
         Assert.Equal(1, colors.SlotsTotal);
-        Assert.Equal(new[] { 0x112233, -1, 0xabcdef }, Assert.Single(colors.ColorPalettes).Colors);
-        character.LookHex = Convert.ToHexString(Pb.New().Packed(1, [0x01556677]).Build());
-        Assert.Equal(new[] { 0x556677 }, Assert.Single(messages.Colors().CharacterColors!.ColorPalettes).Colors);
-        Assert.Equal(new[] { 0x112233, -1, 0xabcdef }, colors.ColorPalettes[0].Colors);
+        var defaults = Jondo.Unity.Server.Managers.BreedLookCatalog.Get(character.Breed, character.Sex)!.Colors;
+        Assert.Equal(new[] { 0x112233, (int)defaults[1], 0xABCDEF, (int)defaults[3], 0, 0xFFFFFF },
+            Assert.Single(colors.ColorPalettes).Colors);
+        character.Colors = new(0x556677, null, null, null, null, null);
+        Assert.Equal(new[] { 0x556677, (int)defaults[1], (int)defaults[2], (int)defaults[3],
+            (int)defaults[4], (int)defaults[5] }, Assert.Single(messages.Colors().CharacterColors!.ColorPalettes).Colors);
+        Assert.Equal(0x112233, colors.ColorPalettes[0].Colors[0]);
+        Assert.Equal(0xABCDEF, colors.ColorPalettes[0].Colors[2]);
     }
 
     [Theory]

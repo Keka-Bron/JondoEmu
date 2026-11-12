@@ -38,7 +38,7 @@ namespace Jondo.Unity.Server.Network
         };
 
         /// <summary>A build as the window draws it.</summary>
-        public static byte[] BuildPreset(DatabaseManager.DbCharacter character, CharacterPresets.Preset preset,
+        public static byte[] BuildPreset(DbCharacter character, CharacterPresets.Preset preset,
                                          bool playerState = false)
         {
             var placed = Placed(preset);
@@ -74,9 +74,9 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>igs { 1 the equipment look, 3 the appearance look }.</summary>
-        internal static byte[] Looks(DatabaseManager.DbCharacter character, IEnumerable<(int Position, Equipment.Item Item)> placed)
+        internal static byte[] Looks(DbCharacter character, IEnumerable<(int Position, Equipment.Item Item)> placed)
         {
-            var (equipment, appearance) = BreedLookTable.PresetLooks(character,
+            var (equipment, appearance) = CharacterLookBuilder.PresetLooks(character,
                 placed.Select(p => (p.Position, p.Item.Template)).ToList());
             return Pb.New().Bytes(1, equipment).Bytes(3, appearance).Build();
         }
@@ -166,7 +166,7 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>ihb { repeated 1 { 1 uuid, 2 build } }: the character's builds, on entering the world.</summary>
-        public static byte[] BuildList(DatabaseManager.DbCharacter character, IEnumerable<CharacterPresets.Preset> presets)
+        public static byte[] BuildList(DbCharacter character, IEnumerable<CharacterPresets.Preset> presets)
         {
             var ihb = Pb.New();
             foreach (var preset in presets)

@@ -39,7 +39,7 @@ internal static class ConnectionAccountProjection
     internal const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fffzzz";
 
     internal static ServerList ServerList(IReadOnlyList<DatabaseManager.DbServer> servers,
-        IReadOnlyList<DatabaseManager.DbCharacter> characters, DateTimeOffset now)
+        IReadOnlyList<DbCharacter> characters, DateTimeOffset now)
         => new(servers.Select(server => new ServerInformation(
             // Preserve the existing connection reply's default Online/Accessible values.
             // DB Status is an HTTP enum (3=online), not the connection enum. HTTP owns

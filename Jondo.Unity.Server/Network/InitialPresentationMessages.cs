@@ -21,11 +21,11 @@ internal sealed class InitialPresentationMessages(
     internal const int MaxExcludedCategories = 2;
     internal const long ActivityDelayMs = 24L * 60 * 60 * 1000;
 
-    internal static InitialPresentationMessages Live(DatabaseManager.DbCharacter character) => new(
+    internal static InitialPresentationMessages Live(DbCharacter character) => new(
         () => new(AllowedEmblemCategories),
-        () => new(new(PaletteSlots, [new(Palette(BreedLookTable.SavedColors(character)))], PaletteSlots)),
+        () => new(new(PaletteSlots, [new(Palette(CharacterLookBuilder.SavedColors(character)))], PaletteSlots)),
         () => new(GuildPolicy()),
-        () => new(ConnectionProtocol.LookIdOf(character.Id), BreedLookTable.SemanticLook(character, paraLaVentana: true)));
+        () => new(ConnectionProtocol.LookIdOf(character.Id), CharacterLookBuilder.SemanticLook(character, paraLaVentana: true)));
 
     internal CharacterCapabilitiesEvent Capabilities() => capabilities();
     internal CharacterAppearanceCollectionEvent Colors()

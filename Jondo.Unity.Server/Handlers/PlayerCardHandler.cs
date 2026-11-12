@@ -63,7 +63,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>lad { 2 { 3 when, 4 the character } }.</summary>
-        internal static byte[] Build(DatabaseManager.DbCharacter character)
+        internal static byte[] Build(DbCharacter character)
         {
             var (_, ornament) = Wardrobe.Of(character.Id);
             var card = Pb.New()
@@ -73,11 +73,11 @@ namespace Jondo.Unity.Server.Handlers
                 .Var(4, character.Id)
                 .VarIfNotZero(6, SessionRegistry.FindByCharacter(character.Id) != null ? 1 : 0)
                 .Var(7, character.Level)
-                .Bytes(8, BreedLookTable.BareLook(character))
+                .Bytes(8, CharacterLookBuilder.BareLook(character))
                 .VarIfNotZero(9, Wardrobe.CardBackgroundOf(character.Id))
                 .VarIfNotZero(10, character.Sex)
                 .Str(11, character.Name)
-                .Bytes(14, BreedLookTable.BuildLook(character, paraLaVentana: true));
+                .Bytes(14, CharacterLookBuilder.BuildLook(character, paraLaVentana: true));
             return Pb.New().Msg(2, Pb.New().Str(3, CharacterPresets.Now()).Msg(4, card)).Build();
         }
     }

@@ -187,18 +187,18 @@ public sealed class GameEntryServiceTests
     {
         public bool BindTicket(GameSession session, IdentificationRequest request) => throw new NotSupportedException();
         public Task CloseOtherSessionsAsync(GameSession session) => throw new NotSupportedException();
-        public IReadOnlyList<DatabaseManager.DbCharacter> GetCharacters(GameSession session) => throw new NotSupportedException();
+        public IReadOnlyList<DbCharacter> GetCharacters(GameSession session) => throw new NotSupportedException();
         public bool CanResumeFight(long characterId) => throw new NotSupportedException();
         public bool SelectCharacter(GameSession session, long characterId) => throw new NotSupportedException();
         public bool ResumeFight(GameSession session, long characterId) => throw new NotSupportedException();
         public Task AbandonFightAsync(long characterId) => throw new NotSupportedException();
-        public Task SendWelcomeAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withList)
+        public Task SendWelcomeAsync(GameSession session, IReadOnlyList<DbCharacter> characters, bool withList)
             => throw new NotSupportedException();
-        public Task SendCharacterListAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withInitialization)
+        public Task SendCharacterListAsync(GameSession session, IReadOnlyList<DbCharacter> characters, bool withInitialization)
             => throw new NotSupportedException();
-        public Task SendMapInitializationAsync(GameSession session, DatabaseManager.DbCharacter character) => throw new NotSupportedException();
+        public Task SendMapInitializationAsync(GameSession session, DbCharacter character) => throw new NotSupportedException();
         public Task<bool> TrySendFightMapAsync(GameSession session, GameRequest request) => throw new NotSupportedException();
-        public Task SendMapInformationAsync(GameSession session, DatabaseManager.DbCharacter character) => throw new NotSupportedException();
+        public Task SendMapInformationAsync(GameSession session, DbCharacter character) => throw new NotSupportedException();
         public Task TickAlterationsAsync(GameSession session) => throw new NotSupportedException();
         public Task SendReturnToSelectionAsync(GameSession session) => throw new NotSupportedException();
         public void PrepareReturnToSelection(GameSession session) => throw new NotSupportedException();
@@ -215,31 +215,31 @@ public sealed class GameEntryServiceTests
             init => _welcomeMessage = value;
         }
 
-        public DatabaseManager.DbCharacter? FindCharacter(long characterId)
+        public DbCharacter? FindCharacter(long characterId)
         {
             Record("find");
             Assert.Equal(owner.CharacterId, characterId);
-            return MissingCharacter ? null : new DatabaseManager.DbCharacter
+            return MissingCharacter ? null : new DbCharacter
             {
                 Id = characterId, AccountId = owner.AccountId, ServerId = owner.ServerId, Name = "Adventurer",
             };
         }
 
-        public void LoadCharacterState(GameSession session, DatabaseManager.DbCharacter character)
+        public void LoadCharacterState(GameSession session, DbCharacter character)
         {
             Record("load", session, character);
             Assert.False(session.IsInWorld);
             session.State.ElementsUsed = [123, 456];
         }
 
-        public Task AnnounceMapPresenceAsync(GameSession session, DatabaseManager.DbCharacter character)
+        public Task AnnounceMapPresenceAsync(GameSession session, DbCharacter character)
         {
             Record("presence", session, character);
             Assert.True(session.IsInWorld);
             return Task.CompletedTask;
         }
 
-        public async Task SendInitialStateAsync(GameSession session, DatabaseManager.DbCharacter character)
+        public async Task SendInitialStateAsync(GameSession session, DbCharacter character)
         {
             Record("initial", session, character);
             Assert.True(session.IsInWorld);
@@ -269,13 +269,13 @@ public sealed class GameEntryServiceTests
             return Task.CompletedTask;
         }
 
-        public Task RestoreRemodelAsync(GameSession session, DatabaseManager.DbCharacter character)
+        public Task RestoreRemodelAsync(GameSession session, DbCharacter character)
         {
             Record("remodel", session, character);
             return Task.CompletedTask;
         }
 
-        private void Record(string operation, GameSession? session = null, DatabaseManager.DbCharacter? character = null)
+        private void Record(string operation, GameSession? session = null, DbCharacter? character = null)
         {
             Assert.Same(owner, SessionContext.Actual);
             if (session != null) Assert.Same(owner, session);

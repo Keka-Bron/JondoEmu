@@ -58,7 +58,7 @@ namespace Jondo.Unity.Tests.Sessions
         [InlineData(1000, 200)]
         public void The_map_actor_shows_the_level_up_to_200(int level, int shown)
         {
-            var character = new Jondo.Unity.Server.DatabaseManager.DbCharacter
+            var character = new Jondo.Unity.Server.DbCharacter
             {
                 Id = 7101, Name = "Omega", Level = level, Breed = 7,
             };

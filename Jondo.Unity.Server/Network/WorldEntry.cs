@@ -64,7 +64,7 @@ namespace Jondo.Unity.Server.Network
         /// Initial state after selection: semantic sends, live feature hooks, then
         /// session-owned HAAPI identity and account gifts, without a client wait.
         /// </summary>
-        public static async Task<int> SendInitialStateAsync(GameSession session, DatabaseManager.DbCharacter character)
+        public static async Task<int> SendInitialStateAsync(GameSession session, DbCharacter character)
         {
             var stream = session.Stream ?? throw new InvalidOperationException("World entry requires a connected game session.");
             var initial = new GameEntryInitialMessages(
@@ -134,7 +134,7 @@ namespace Jondo.Unity.Server.Network
         /// Set when the character is going straight back into a fight. The opening uses
         /// the fight context and arena, followed by the reconnection notice and actors.
         /// </param>
-        public static async Task<int> SendMapAsync(GameSession session, DatabaseManager.DbCharacter character, long mapId,
+        public static async Task<int> SendMapAsync(GameSession session, DbCharacter character, long mapId,
                                                     Jondo.Unity.World.Fights.FightInstance? fightToRejoin = null)
         {
             using var context = SessionContext.Push(session);

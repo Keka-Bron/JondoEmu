@@ -13,7 +13,7 @@ internal sealed class WelcomeCapture
     internal IEnumerable<GamePayload> Messages => Frames.Select(frame => frame.Content);
     internal Type[] DeliveryTypes => Deliveries.Select(frame => frame.Content.GetType()).ToArray();
 
-    internal static async Task<WelcomeCapture> SendAsync(IReadOnlyList<DatabaseManager.DbCharacter> characters,
+    internal static async Task<WelcomeCapture> SendAsync(IReadOnlyList<DbCharacter> characters,
         bool withList = true, string language = "es")
     {
         var capture = new WelcomeCapture();

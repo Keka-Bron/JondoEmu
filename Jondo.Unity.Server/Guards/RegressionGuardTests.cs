@@ -136,9 +136,8 @@ namespace Jondo.Unity.Server
         /// <summary>
         /// Without a resolved account no character is selected.
         ///
-        /// This is checked by RUNNING it, not by reading the code: a real kvw is sent to it with
-        /// account zero, which is what arrives if somebody opens a socket and sends the selection
-        /// without first presenting the kqz ticket. It has to say no.
+        /// This exercises the state-loading method directly with unresolved account ids.
+        /// Typed request decoding and selection-before-identification checks live in the entry tests.
         ///
         /// The check was written as «accountId > 0 && !EsSuyo(...)», so with account zero it was
         /// skipped entirely and loaded whoever's sheet it was -- and then wrote over it on saving, so
@@ -147,20 +146,15 @@ namespace Jondo.Unity.Server
         /// </summary>
         private static void AssertCharacterSelectionNeedsAnAccount()
         {
-            // A kvw like the one the client sends: the character's id in f1.
-            byte[] kvw = Network.ConnectionProtocol.Push(
-                Protocol.Op.Kvw, Network.Pb.New().Var(1, 300000000001L).Build());
-
-            if (Handlers.CharacterSelectionHandler.HandleCharacterSelectionRequest(kvw, 0))
+            const long characterId = 300000000001L;
+            if (Handlers.CharacterSelectionHandler.SelectCharacter(characterId, 0))
                 throw new InvalidOperationException(
                     "[RegressionGuard FAILED] Character selection succeeds with account zero. " +
                     "A socket that has not presented the ticket can load anybody's sheet.");
 
-            // Nor with an account that exists but is not the owner.
-            if (Handlers.CharacterSelectionHandler.HandleCharacterSelectionRequest(kvw, -1))
+            if (Handlers.CharacterSelectionHandler.SelectCharacter(characterId, -1))
                 throw new InvalidOperationException(
-                    "[RegressionGuard FAILED] Character selection succeeds with an account " +
-                    "that does not own the character.");
+                    "[RegressionGuard FAILED] Character selection succeeds with a negative account id.");
         }
 
         /// <summary>

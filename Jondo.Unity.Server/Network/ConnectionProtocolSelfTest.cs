@@ -379,7 +379,7 @@ namespace Jondo.Unity.Server.Network
                  }));
         }
 
-        private static readonly DatabaseManager.DbCharacter TestCharacter = new DatabaseManager.DbCharacter
+        private static readonly DbCharacter TestCharacter = new DbCharacter
         {
             Id = 4242424242L,
             Name = "Test",

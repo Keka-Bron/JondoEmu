@@ -56,7 +56,7 @@ namespace Jondo.Unity.Server.Handlers
             => Pb.New().Var(2, when.Year - YearOffset).Var(3, when.Month - 1).Var(4, when.Day).Build();
 
         /// <summary>lqe: who the character is, where he plays, and his guild and alliance.</summary>
-        public static byte[] Build(DatabaseManager.DbCharacter character)
+        public static byte[] Build(DbCharacter character)
         {
             var session = SessionRegistry.FindByCharacter(character.Id);
             bool online = session != null && session.IsInWorld;
@@ -90,7 +90,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The character an lqw's f2 names: by his name, or the one an account has playing.</summary>
-        private static DatabaseManager.DbCharacter? CharacterOf(byte[] lqw)
+        private static DbCharacter? CharacterOf(byte[] lqw)
         {
             var lgf = ProtoMessage.Parse(lqw).Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
             if (lgf == null) return null;

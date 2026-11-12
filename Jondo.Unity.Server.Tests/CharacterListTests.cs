@@ -18,7 +18,7 @@ public sealed class CharacterListTests
                 2, SubEntityBindingPointCategory.HookPointCategoryMountDriver),
         };
         var resolved = new EntityLook([0x01445566], 3, 200, [120], [800], children);
-        var source = new List<DatabaseManager.DbCharacter>
+        var source = new List<DbCharacter>
         {
             new() { Id = 9_000_000_001, Name = "Sélection ☀", Breed = 18, Sex = 1, Level = 57,
                 LastConnection = "2026-11-12T09:00:00Z" },
@@ -66,7 +66,7 @@ public sealed class CharacterListTests
     [Fact]
     public void Sorting_compares_instants_and_keeps_ties_invalid_and_missing_dates_stable()
     {
-        DatabaseManager.DbCharacter Character(long id, string date) => new()
+        DbCharacter Character(long id, string date) => new()
         { Id = id, Name = $"Character {id}", LastConnection = date };
         var source = new[]
         {
@@ -177,8 +177,8 @@ public sealed class CharacterListTests
             new(_ => throw new Exception("No gifts after source failure"), _ => [], () => [], _ => { }));
         var characters = new[]
         {
-            new DatabaseManager.DbCharacter { Name = "Valid", Sex = 0 },
-            new DatabaseManager.DbCharacter { Name = "Invalid", Sex = invalidGender ? 2 : 0 },
+            new DbCharacter { Name = "Valid", Sex = 0 },
+            new DbCharacter { Name = "Invalid", Sex = invalidGender ? 2 : 0 },
         };
         if (invalidGender)
             await Assert.ThrowsAsync<GameConversionException>(() => service.SendAsync(own.Session, characters));

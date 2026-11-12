@@ -155,7 +155,7 @@ echo. See `docs/protocol.md` for the framing.
 
 One nested protobuf message, used for the character, for the mount and for every sub-entity.
 Layout confirmed against the character-selection and appearance captures
-(`Jondo.Unity.Launcher/Managers/BreedLookTable.cs`):
+(`Jondo.Unity.Server/Managers/CharacterLookBuilder.cs`, defaults in `BreedLookCatalog.cs`):
 
 | field | contents |
 |---|---|
@@ -180,6 +180,39 @@ binding points ever appear, and all three hang directly off the root:
 Binding point 2 is the one that flips the whole structure. **On foot the root is the character. On a
 mount the root is the mount, and the character becomes the sub-entity at binding point 2.** Every
 tool that reads a character's skins has to check for that first, otherwise it reads the mount's.
+
+### Server composition pipeline
+
+`CharacterLookBuilder.Build(character, purpose, overrides)` returns an `EntityLook` before any
+serialization. `CharacterLookPurpose` and `CharacterLookOverrides` live in
+`Jondo.Unity.Server/Characters/CharacterLookOptions.cs`.
+
+| purpose | body inputs | attachments and replacements |
+|---|---|---|
+| `Normal` | current character | mount, pet on foot, aura; mutation replaces the whole look |
+| `Map` | current character | normal attachments; replacement priority is phantom, mutation, disguise |
+| `AppearancePreview` | current character | mount and pet together; no aura or replacement look |
+| `Bare` | selected body, head, colors and size; no equipment or garments | none |
+| `SavedOutfit` | supplied body/head/colors/garments over current equipment | pet; always on foot |
+| `PresetEquipment` | supplied equipment; no garments | none |
+| `PresetAppearance` | supplied equipment and current garments | none |
+| `Portrait` | current character | none; always on foot, ignoring replacement looks |
+
+Overrides inherit current state when null. Empty equipment, garment or color collections explicitly
+supply none; body id zero explicitly chooses the breed's body. Purpose still determines which
+equipment, garments and attachments may be included. `OnFoot` suppresses riding without changing
+the purpose's other rules. The legacy `OutfitLook` byte adapter retains its empty-color convention:
+an empty palette there uses breed defaults.
+
+The resolver reads owner state and resolves colors and size, then `BuildBodyLook` builds the body
+with explicit inputs. `Compose` handles root selection, rider bones and attachment order without
+querying character state. Bots supply already-resolved body parts to the same composer; unlike a
+player, a bot may supply an appearance mount without a real ridden mount.
+
+`MapLook`, `BuildLook`, `BareLook`, `OutfitLook` and `PresetLooks` are byte adapters around this
+pipeline. `WriteLook` serializes all of them, using a distinct format to omit the look-type field
+from preset equipment looks. `Drawable` formats the shared portrait body as
+`{bones|skins|colors|scale}`, retaining the empty-string result for unknown breeds.
 
 ---
 
@@ -465,7 +498,7 @@ Two traps encoded in that table:
   real zero would be written out explicitly. Absent means "leave it alone".
 - **`c: "portador"`** (Spanish for *wearer*) means the sub-entity repeats the **character's own**
   colours byte for byte. It is not a palette belonging to the pet. 44 of the 242 measured pets do
-  this, and `BreedLookTable.AddPets` copies the wearer's colours for them.
+  this, and `CharacterLookBuilder.AttachmentsFor` copies the wearer's colours for them.
 
 The mount colours are stored exactly as measured. Part of those bytes are the capture character's
 own colours, so on a different character they may not be faithful. That caveat is in the file's own
@@ -476,7 +509,7 @@ difference is exactly 120 — the six never-drawn living objects at 20 variants 
 
 The variant is not carried in a uid field, because the window never sends an inventory uid — it
 sends the template id. `AppearanceHandler` therefore composes one: `uid = item * 1000 + variant`,
-and `BreedLookTable.VarianteDe` takes it apart again. Ugly, but it keeps the variant alive through
+and `CharacterLookBuilder.GarmentVariant` takes it apart again. Ugly, but it keeps the variant alive through
 the database round trip without a schema change.
 
 ---
@@ -539,7 +572,7 @@ the 48 have a look whose first six values equal the outfit's six. Whatever the s
 the encoding rule holds in every sample: outfit bare, look indexed.
 
 Send indexed colours in the outfit block and the client cannot build its `ColorSet`. That is what
-`BreedLookTable.PlainColors` exists for. It takes the six colours the emulator would put in the
+`CharacterLookBuilder.PlainColors` exists for. It takes the six colours the emulator would put in the
 look and masks the index off — enough for the client, and the only part of this that is settled.
 
 The outfit body is the same block that goes inside `lxo` (`ConnectionProtocol.AppearanceBody`), which
@@ -592,8 +625,9 @@ So: **mounted, the appearance pet shows in the panel preview but never goes out 
 mount and a real pet share equipment slot 8, so the two cannot coexist in the world — but the panel
 still draws the pet, so you can see what you picked. On foot both appear in both.
 
-`BreedLookTable.BuildLook` takes a `paraLaVentana` flag ("for the window") for exactly this, and it
-is the only thing that flag changes.
+`CharacterLookPurpose.AppearancePreview` enables pets while mounted. The legacy
+`CharacterLookBuilder.BuildLook` adapter selects that purpose with its `paraLaVentana` flag
+("for the window"). That purpose also suppresses aura attachments and replacement looks.
 
 ---
 

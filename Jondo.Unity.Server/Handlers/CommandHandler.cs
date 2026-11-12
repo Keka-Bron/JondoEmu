@@ -742,7 +742,7 @@ namespace Jondo.Unity.Server.Handlers
         // ─── .size ──────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// The size of the figure. It is stored on the character and BreedLookTable applies it when
+        /// The size of the figure. It is stored on the character and CharacterLookBuilder applies it when
         /// building the look; here it only has to be rebuilt, which is the two messages
         /// EquipmentHandler already sends when changing clothes: the jsn redraws the one on the map
         /// and the lxc the one on the sheet.

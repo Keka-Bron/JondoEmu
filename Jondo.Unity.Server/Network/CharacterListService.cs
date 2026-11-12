@@ -7,7 +7,7 @@ internal sealed class CharacterListService(CharacterListMessages messages, GiftS
 {
     internal static CharacterListService Live { get; } = new(CharacterListMessages.Live, GiftService.Live);
 
-    internal async Task SendAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters,
+    internal async Task SendAsync(GameSession session, IReadOnlyList<DbCharacter> characters,
         bool withInitialization = true)
     {
         using var context = SessionContext.Push(session);

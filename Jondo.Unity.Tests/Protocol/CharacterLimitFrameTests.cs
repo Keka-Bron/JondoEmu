@@ -16,7 +16,7 @@ public sealed class CharacterLimitFrameTests
     [InlineData(4)]
     public async Task Creation_is_allowed_without_claiming_the_account_has_reached_its_limit(int count)
     {
-        var characters = Enumerable.Range(0, count).Select(index => new DatabaseManager.DbCharacter
+        var characters = Enumerable.Range(0, count).Select(index => new DbCharacter
         { Id = 2000 + index, Name = "Capability" + index, Level = 1, Breed = 1 }).ToArray();
         var welcome = await WelcomeCapture.SendAsync(characters);
         Assert.Equal(new AccountCapabilitiesEvent(CharacterCreationRights.Allowed, true, Hierarchy.RolePlayer),

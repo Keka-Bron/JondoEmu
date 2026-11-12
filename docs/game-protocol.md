@@ -251,7 +251,7 @@ failures, grant/claim behavior and the continuation's identity-before-gifts orde
 ### Character-list snapshots and refreshes
 
 `CharacterListMessages` constructs `CharacterListEvent` directly from the queried
-account/server characters and `BreedLookTable.SemanticLook`, including recursive
+account/server characters and `CharacterLookBuilder.SemanticLook`, including recursive
 mount, rider, pet, aura and mutation appearance. It snapshots nested collections
 before delivery. Last-connection instants determine most-recent-first order;
 equal, invalid or missing dates retain source order. Both date strings remain empty
@@ -272,6 +272,8 @@ server and refresh codec; their request parsing and acknowledgments remain legac
 `BuildCharactersList` and `BuildCharacterDetails` are removed. Welcome and list
 orchestration no longer expose byte-returning frame-list helpers or select a private
 codec; encoding and delivery belong to the owning session.
+Selection input is decoded by the typed entry boundary; `CharacterSelectionHandler`
+owns character ownership checks and state loading.
 Semantic tests use an opaque recording codec, and framed database tests match unique
 codec tokens to length-framed socket payloads while asserting queue/list/gift objects,
 newly-created-first and deletion-to-empty refreshes with an unrelated ambient session.
@@ -284,6 +286,30 @@ recording codec and inspect delivered semantic messages, including ordinary-logi
 versus deferred-list order, creation rights and queue/list/gift adjacency. Only the
 remaining raw settings packet has byte-level assertions, captured from that same
 live sender rather than a second welcome builder.
+
+### Fixed character-colour storage
+
+`CharacterColors` represents exactly six nullable plain-RGB choices. Character
+queries read `Color1` through `Color6`; `CharacterLookBuilder.SavedColors` resolves each
+NULL against that breed/sex's corresponding default, then adds indices for the
+outgoing look. Black remains an explicit zero, and an
+inherited slot never shifts a later custom colour.
+
+Creation, recolouring and outfit application write only these choices. The shared
+`CharacterLookBuilder` composes appearances from current owner state; immutable
+breed/sex defaults live in `BreedLookCatalog`. Inventory builds distinct preview
+and map looks, legacy map loading reuses the shared actor builder, and fighter-show
+uses the fighter's normal/current appearance. Byte serialization occurs at packet
+boundaries. `LookHex`, `LookBytes`, `PlayerActorDetails` and actor-detail reconstruction
+are removed, so storage and selection no longer construct look blobs.
+
+One migration adds the six columns, backfills them from `Characters.Look`, drops
+the blob column and records completion in a single transaction, after verified backup
+and base schema setup, before character seeding. Later starts skip that one marker,
+preserving new choices. Fresh databases already have the six columns and no blob;
+the helper validates the columns and records the same marker without changing data.
+There is one SQL file. SQL and outstanding verification are in
+[`Database/Migrations`](../Jondo.Unity.Server/Database/Migrations/README.md).
 
 ### Initial character state
 
@@ -332,16 +358,15 @@ comes from `Quests.SendJournalAsync`.
   acknowledgment cap and contribution cost/rewards. Exclusion limits (three ranks,
   two categories) and the 86,400,000 ms activity delay are explicit client-facing
   server policy. The unused outer block and activity tag 7 are omitted.
-- `CharacterAppearanceCollectionEvent` supplies the selected character's persisted
-  palette. Indexed entity-look colours become RGB slots; missing slots retain `-1`,
-  and repeated indices use the last assignment. There is one unlocked/total palette
+- `CharacterAppearanceCollectionEvent` supplies the selected character's six-slot
+  palette, with inherited slots resolved from breed/sex defaults. There is one unlocked/total palette
   slot because Jondo stores the current palette, without a saved-palette shop/store.
   Palette tag 1 and character-colours tag 2 are unused and omitted.
 - `OutfitAuraChangedEvent` and `OrnamentSelectedEvent` are empty typed notifications.
   Their former 206/135 values are unused and omitted; the shared legacy writers also
   stop emitting those scalars.
 - `OutfitLookUpdatedEvent` supplies the character-derived `LookIdOf` identifier and
-  a detached recursive `BreedLookTable.SemanticLook(..., paraLaVentana: true)` snapshot.
+  a detached recursive `CharacterLookBuilder.SemanticLook(..., paraLaVentana: true)` snapshot.
   It retains the existing preview policy, including mounted pet appearance, rather
   than confusing this notification with map actor updates. Its unused tag 3 is omitted.
 
@@ -359,7 +384,7 @@ Notifications carry an empty flag collection as Jondo's initial policy; no recor
 acknowledgement bitsets are reused. `CharacterSelectionMessages` builds the success
 case from the selected character's identity, gender, current connection date and
 resolved `EntityLook`. The unrecorded disconnection date stays empty and a zero level
-retains its optional absence. `BreedLookTable` composes that typed appearance using
+retains its optional absence. `CharacterLookBuilder` composes that typed appearance using
 the same equipment, cosmetics, mount, pet, aura and mutation rules as legacy gameplay
 consumers, which serialize the resolved model through a compatibility writer.
 Selection never builds or decodes an intermediate legacy packet. Its `Rebuilt`

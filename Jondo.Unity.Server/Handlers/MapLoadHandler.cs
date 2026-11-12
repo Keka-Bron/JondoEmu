@@ -135,40 +135,11 @@ namespace Jondo.Unity.Server.Handlers
 
             // Field 15: All Map Actors (Polymorphic: Player, NPCs, Monster Groups)
             // A. Add Player Character Actor
-            var playerActor = new ProtoMessage();
-
-            // Disposition (Field 1)
-            var playerDisp = new ProtoMessage();
-            playerDisp.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = spawnCell });
-            playerDisp.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = GameState.Orientation });
-            playerActor.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = playerDisp.ToByteArray() });
-
-            // Details (Field 2)
-            //
-            // The look is REBUILT here, the one stored on entering is not taken. The one in
-            // GameState.PlayerActorDetails comes from the Characters.Look column, which is a look of
-            // the OLD protocol and is also frozen since the login: it carries neither the mount nor
-            // the clothes one has put on since. That is why on equipping a Mulagua he was seen
-            // mounted -- the equip jsn sends that -- and on changing map he appeared on foot again.
-            //
-            // BuildLook is the same one the jss uses, which does know about mounts and appearances.
-            var quien = DatabaseManager.GetCharacterById(GameState.CharacterId);
-            byte[] aspecto = quien != null
-                ? Managers.BreedLookTable.MapLook(quien)
-                : GameState.LookBytes;
-            byte[] detalles = aspecto != null && aspecto.Length > 0
-                ? DatabaseManager.ReconstructActorDetails(aspecto, GameState.CharacterName)
-                : GameState.PlayerActorDetails;
-
-            if (detalles != null)
-            {
-                playerActor.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = detalles });
-            }
-
-            // Contextual ID (Field 3)
-            playerActor.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = GameState.CharacterId });
-
-            jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = playerActor.ToByteArray() });
+            var character = DatabaseManager.GetCharacterById(GameState.CharacterId)
+                ?? throw new InvalidOperationException($"Character {GameState.CharacterId} no longer exists.");
+            byte[] playerActor = ConnectionProtocol.BuildPlayerActorBlock(character, spawnCell,
+                GameState.Orientation, character.AccountId);
+            jpvMsg.Fields.Add(new ProtoField { FieldNumber = 15, WireType = 2, BytesValue = playerActor });
             int totalActors = 1;
 
             foreach (var other in SessionRegistry.OnMap(mapId))

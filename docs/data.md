@@ -55,7 +55,7 @@ nothing — they are working references, and `.gitignore` keeps them local.
 | `suenos_3.6.10.10.json` | 20,445 | The Infinite Dreams: the client's ten intensities (loot and xp bonus, starting dream points and sand, legends allowed, dream fragments a wave), its 111 rewards and their actions, and the dream's loot table, the 61 lines of the captures' `izo` taken back to a loot bonus of 100 | `DreamData` via `Paths.Resolve` | `extraer_suenos.py` (client DataRoots + captures) |
 | `breed_stats.json` | 12,781 | 19 breeds × 6 characteristics → what a point costs in each band | `BreedStatCost` via `Paths.BreedStatsJson` | `extract_breed_stats.py` |
 | `dofus3_mappings.json` | 9,524 | 93 `type.ankama.com/<opcode>` → a name someone assigned while reversing; 3 also carry field renames | nothing | no script |
-| `breed_looks.json` | 4,314 | 19 breeds × male/female → bones, skins, scales, six default colors | `BreedLookTable` via `Paths.BreedLooksJson` | `extract_breed_looks.py` |
+| `breed_looks.json` | 4,314 | 19 breeds × male/female → bones, skins, scales, six default colors | `BreedLookCatalog` via `Paths.BreedLooksJson` | `extract_breed_looks.py` |
 | `waypoints.json` | 3,553 | The 62 zaaps with their map and sub-area | `Interactives` via `Paths.WaypointsJson` | `extract_interactivos.py` |
 | `titles_ornaments.json` | 2,660 | 539 title ids and 167 ornament ids | `Titles` via `Paths.TitlesOrnamentsJson` | `extract_titulos.py` |
 | `item_effect_fields.json` | 1,226 | 121 effect ids → which protobuf field of the `ivx` entry carries the value | `EffectFields` via `Paths.EffectFieldsJson` | measured from a capture; no script |

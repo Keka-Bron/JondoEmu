@@ -4,14 +4,14 @@ using Jondo.Unity.Server.Managers;
 namespace Jondo.Unity.Server.Network;
 
 /// <summary>The account's selection-screen characters, resolved before serialization.</summary>
-internal sealed class CharacterListMessages(Func<DatabaseManager.DbCharacter, EntityLook> look)
+internal sealed class CharacterListMessages(Func<DbCharacter, EntityLook> look)
 {
-    internal static CharacterListMessages Live { get; } = new(character => BreedLookTable.SemanticLook(character));
+    internal static CharacterListMessages Live { get; } = new(character => CharacterLookBuilder.SemanticLook(character));
 
-    internal CharacterListEvent Snapshot(IReadOnlyList<DatabaseManager.DbCharacter> characters)
+    internal CharacterListEvent Snapshot(IReadOnlyList<DbCharacter> characters)
         => new(ConnectionProtocol.MostRecentFirst(characters).Select(Character).ToArray());
 
-    private Character Character(DatabaseManager.DbCharacter character)
+    private Character Character(DbCharacter character)
     {
         var gender = character.Sex switch
         {

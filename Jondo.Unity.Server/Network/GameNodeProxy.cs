@@ -193,12 +193,6 @@ namespace Jondo.Unity.Server.Network
                     // handled the same: the client decides which of the two screens it lands on.
                     await entryService.ReturnToSelectionAsync();
                 }
-                // Careful: kqu no longer belongs here. In 3.6.10.10 it is a message pushed by the
-                // server inside the welcome burst, not a client request.
-                else if (payloadStr.Contains(Op.Uri(Op.Jto)) || payloadStr.Contains("type.ankama.com/kpc") || payloadStr.Contains(Op.Uri(Op.Ksx)))
-                {
-                    await CharacterSelectionHandler.HandleCharacterListRequest(stream, payload, payloadStr, sessionAccountId, sessionServerId);
-                }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvz)))
                 {
                     // Creating a character. isAuthenticated is the first of the two guards: the

@@ -72,7 +72,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static int BaseOf(int breedId, int sex)
         {
-            var skins = BreedLookTable.Get(breedId, sex)?.Skins;
+            var skins = BreedLookCatalog.Get(breedId, sex)?.Skins;
             if (skins == null || skins.Count == 0) return 0;
             foreach (var (id, body) in _bodies.Value)
                 if (body.Creation && body.Skin == skins[0] && body.Breed == breedId && body.Gender == (sex == 1 ? 1 : 0))
