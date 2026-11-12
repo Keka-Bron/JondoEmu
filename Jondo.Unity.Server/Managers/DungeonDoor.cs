@@ -51,6 +51,19 @@ namespace Jondo.Unity.Server.Managers
         public const string TakeKeyWording = "Toma la llave";
 
         /// <summary>
+        /// And as three guardians who also take the keyring word it: Hywan Kenoby at the Sakaï mine
+        /// («Darle la llave para entrar.»), Teo Dolito («Darle la llave y atravesar las puertas.») and
+        /// Matilde Ualtzin («Darle la llave y escuchar el canto de Kidibom.»). Without them their
+        /// key reply led nowhere and only the keyring opened the door.
+        /// </summary>
+        public static readonly string[] OtherKeyWordings =
+        {
+            "Darle la llave para entrar",
+            "Darle la llave y atravesar las puertas",
+            "Darle la llave y escuchar el canto de Kidibom",
+        };
+
+        /// <summary>
         /// Reply ids at or above this belong to the Expedición generation, not the base dungeon.
         /// </summary>
         /// <remarks>
@@ -117,6 +130,7 @@ namespace Jondo.Unity.Server.Managers
             var key = TextKeysSaying(KeyWording);
             key.UnionWith(TextKeysSaying(UseKeyWording));
             key.UnionWith(TextKeysSaying(TakeKeyWording));
+            foreach (string wording in OtherKeyWordings) key.UnionWith(TextKeysSaying(wording));
             // «Sí.» and «Sí, ...», not every sentence that opens with those letters («Sígueme»).
             var yes = TextKeysSaying(YesWording + ".");
             yes.UnionWith(TextKeysSaying(YesWording + ","));

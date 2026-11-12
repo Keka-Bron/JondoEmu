@@ -3641,6 +3641,14 @@
       "cell": 396,
       "orientation": 1,
       "why": "Samurai Hagiyo guarding the mat into the Pandassembly hall (cells 395 and 409, the floor passage to 207624192). INFERRED cell: the open floor just right of the mat, in front of the screen."
+    },
+    {
+      "map": 54790159,
+      "npc": 1293,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qf=590",
+      "why": "Reltux Richards at the Frigostian Paradise Tavern [-77,-38], after «Paseemos por el bosque» (590) has taken him out of the Lost Pines forest («Sin tu ayuda, aún estaría atrapado en el Bosque de los Pinos Perdidos», 16538). «Rendez-vous à la Taverne située en [-77,-38] pour y trouver Richard Rouge», «il faut avoir terminé la quête Promenons-nous dans les bois» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). INFERRED cell: open floor between the tables, in sight."
     }
   ]
 }

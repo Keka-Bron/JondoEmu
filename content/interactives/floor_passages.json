@@ -105,6 +105,34 @@
       "toMap": 171443713,
       "toCell": 314,
       "why": "The way up out of the crypt at peace, the same opening as 178522112's."
+    },
+    {
+      "map": 54165815,
+      "cell": 184,
+      "toMap": 55836672,
+      "toCell": 478,
+      "why": "Down the frozen lake's crane [-64,-55]: «Dans les profondeurs du lac gelé, parlez à Waldos» (Dofus pour les noobs, «Les joyeux de la couronne»), «Descendez comme pour aller dans le donjon» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The planks' end under the crane, the only way the surface's drawing gives down; no element is drawn on it and the 2.73 graph has no transition into the depths (55836672, 55837184 and 55837696 only lead to one another). Lands at the foot of the depths' winch. INFERRED cells."
+    },
+    {
+      "map": 55836672,
+      "cell": 450,
+      "toMap": 54165815,
+      "toCell": 212,
+      "why": "Back up the crane from the depths, by the winch on their left edge (the 2.73 graph brings the mine under the same crane up from its cell 448). Lands on the planks next to the way down. INFERRED cells."
+    },
+    {
+      "map": 55836672,
+      "cell": 503,
+      "toMap": 55837184,
+      "toCell": 464,
+      "why": "The depths' right edge into the cave where Reltux's bag lies: the 2.73 graph's walk from 55836672 to 55837184 leaves on cell 503, and the client's own map data draws no arrow there. Lands by the cave's left wall. INFERRED landing."
+    },
+    {
+      "map": 55837184,
+      "cell": 490,
+      "toMap": 55836672,
+      "toCell": 487,
+      "why": "And back: the graph's walk from 55837184 to 55836672 leaves on cell 490, the cave's left edge. Lands by the depths' right edge. INFERRED landing."
     }
   ]
 }

@@ -27344,6 +27344,7 @@
             { "reply": 19326, "quest": 1424, "completes": 7918, "params": [[30, 7918]], "next": 16278, "holds": 14572 },
             { "reply": 19333, "next": 16283, "quest": 1424, "afterQuest": true, "beforeQuest": 1425 },
             { "reply": 19336, "next": 16285, "quest": 1425, "afterObjective": 7922, "beforeObjective": 7923 },
+            { "reply": 19671, "next": 16516, "quest": 1461, "beforeObjective": 8084 },
             { "reply": 19245 }
           ]
         },
@@ -27467,9 +27468,33 @@
           "message": 16286,
           "names": true,
           "choices": []
+        },
+        {
+          "message": 16516,
+          "choices": [
+            { "reply": 19670, "next": 16517 }
+          ]
+        },
+        {
+          "message": 16517,
+          "choices": [
+            { "reply": 19669, "next": 16518 }
+          ]
+        },
+        {
+          "message": 16518,
+          "choices": [
+            { "reply": 19668, "next": 16519 }
+          ]
+        },
+        {
+          "message": 16519,
+          "choices": [
+            { "reply": 19667, "quest": 1461, "completes": 8084, "params": [[30, 8084]] }
+          ]
         }
       ],
-      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424, level 80 after «Proteger y servir»): «Hablemos sobre el reino de Amakna.» (19297) gets the alliances that please him but something that does not fit (16261), «Hacerle preguntas para averiguar más cosas.» (19296) the king's councillor Makia Vhelika, who hides something (16262), «¿Quieres que haga una investigación?» (19294) his trust (16263) and «Voy a ir al castillo.» (19293) starts it; «Hasta luego.» (19295) leaves. «¡Mira! La cabeza de la marioneta.» (19326) shows the head (7918, kept) and ends it: the symbol (16278), «Informarle de tus descubrimientos.» (19325) the headache (16279), «¿De quién hablas?» (19324) Dramak the Plotter (16280), «¿Qué piensas hacer para remediar la situación?» (19323) the plan (16281), where «Acepto la misión.» (19328) starts «Como una marioneta» (1425, 16282, «Voy en busca de Dramak.» 19327) and the doctor's excuse (19329) leaves. Declined then, «¿Qué cuentas hacer a propósito de Dramak?» (19333) offers it again with the second copy of those lines (16283-16284, 19330-19332). «Como una marioneta» (Ainsi font les petites marionnettes, Dofus pour les noobs): «Annoncez lui alors votre victoire contre Dramak». «He vencido a Dramak.» (19336), once Dramak has been talked to (7922), gets his congratulations and the promise of his shield (16285), «Aprender el arte de blandir el escudo.» (19335) is 7923 and ends the quest with the attitude, and he congratulates again (16286)."
+      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424, level 80 after «Proteger y servir»): «Hablemos sobre el reino de Amakna.» (19297) gets the alliances that please him but something that does not fit (16261), «Hacerle preguntas para averiguar más cosas.» (19296) the king's councillor Makia Vhelika, who hides something (16262), «¿Quieres que haga una investigación?» (19294) his trust (16263) and «Voy a ir al castillo.» (19293) starts it; «Hasta luego.» (19295) leaves. «¡Mira! La cabeza de la marioneta.» (19326) shows the head (7918, kept) and ends it: the symbol (16278), «Informarle de tus descubrimientos.» (19325) the headache (16279), «¿De quién hablas?» (19324) Dramak the Plotter (16280), «¿Qué piensas hacer para remediar la situación?» (19323) the plan (16281), where «Acepto la misión.» (19328) starts «Como una marioneta» (1425, 16282, «Voy en busca de Dramak.» 19327) and the doctor's excuse (19329) leaves. Declined then, «¿Qué cuentas hacer a propósito de Dramak?» (19333) offers it again with the second copy of those lines (16283-16284, 19330-19332). «Como una marioneta» (Ainsi font les petites marionnettes, Dofus pour les noobs): «Annoncez lui alors votre victoire contre Dramak». «He vencido a Dramak.» (19336), once Dramak has been talked to (7922), gets his congratulations and the promise of his shield (16285), «Aprender el arte de blandir el escudo.» (19335) is 7923 and ends the quest with the attitude, and he congratulates again (16286). «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Dîtes alors à celui-ci que vous êtes envoyé par Lumino afin de pénétrer la Dimension Obscure». «Lúmino me ha pedido que entre en la dimensión obscura.» (19671) gets his laugh and Sombra freed by Sylargh (16516), «Seguir escuchando.» (19670) the ice gallery and the five multimen (16517), «Seguir escuchando.» (19669) Bowis and the freed brothers (16518), «¿Qué puedes contarme sobre la leyenda?» (19668) the cobbler who knows it better (16519), and «Tranquilo, tendré mucho cuidado. Ahora voy a ver a Bowis.» (19667) is 8084."
     },
     {
       "npc": 2170,
@@ -29839,6 +29864,297 @@
         }
       ],
       "why": "Dramak in his theatre's Exit room, once the Puppet Master is beaten: «¡Has saboteado mi representación!» (16311). «Como una marioneta» (Ainsi font les petites marionnettes, Dofus pour les noobs): «Une fois le donjon terminé, parlez à Dramak mais ne sortez pas tout de suite, demandez lui des informations à propos du traité des Six et Makia Vhel». «Exijo explicaciones sobre Makia Vhelika y el Tratado de los Seis.» (19372) gets who the character is, one of Captain Amakna's assistants (16312), «Más vale que te expliques si no quieres que te dé una buena.» (19371) his plan to rule the world (16313), «Pues no veo la relación con las alianzas.» (19370) the political map he changed (16314), «¿Qué me puedes contar de los símbolos?» (19369) his symbols and Fallanster's staff (16315), «No habrá una próxima vez. Te ordeno que no vuelvas a maquinar nada.» (19368) his crossed fingers and Makia freed (16316), and «Abandonar el teatro con la sensación de haber cumplido con tu deber.» (19367) is 7922 and leaves the theatre (dungeon_exits.json), like «Abandonar el Teatro de Dramak.» (19366). The template's replies, each to the message of its rank."
+    },
+    {
+      "npc": 2200,
+      "map": 0,
+      "opening": 16509,
+      "lines": [
+        {
+          "message": 16509,
+          "choices": [
+            { "reply": 19755, "next": 16592, "quest": 1461, "afterObjective": 8104, "beforeObjective": 8105 },
+            { "reply": 19709, "next": 16550, "quest": 1461, "afterObjective": 8092, "beforeObjective": 8093, "holds": 14955 },
+            { "reply": 19663, "next": 16511, "beforeQuest": 1461 },
+            { "reply": 19664, "next": 16510 },
+            { "reply": 19754 }
+          ]
+        },
+        {
+          "message": 16510,
+          "choices": [
+            { "reply": 19663, "next": 16511, "beforeQuest": 1461 },
+            { "reply": 19754 }
+          ]
+        },
+        {
+          "message": 16511,
+          "choices": [
+            { "reply": 19662, "next": 16512 },
+            { "reply": 19661 }
+          ]
+        },
+        {
+          "message": 16512,
+          "choices": [
+            { "reply": 19660, "startsQuest": 1461, "params": [[34, 1461]], "next": 16513 },
+            { "reply": 19661 }
+          ]
+        },
+        {
+          "message": 16513,
+          "names": true,
+          "choices": [
+            { "reply": 19659 }
+          ]
+        },
+        {
+          "message": 16550,
+          "choices": [
+            { "reply": 19708, "next": 16551 }
+          ]
+        },
+        {
+          "message": 16551,
+          "choices": [
+            { "reply": 19707, "next": 16552 }
+          ]
+        },
+        {
+          "message": 16552,
+          "choices": [
+            { "reply": 19706, "quest": 1461, "completes": 8093, "params": [[30, 8093]], "holds": 14955 }
+          ]
+        },
+        {
+          "message": 16592,
+          "names": true,
+          "choices": [
+            { "reply": 19754, "quest": 1461, "completes": 8105, "params": [[30, 8105]] }
+          ]
+        }
+      ],
+      "why": "Lumino in the Justiciers' base [4,4]. «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Parlez à Lumino afin d'en apprendre un peu plus à son sujet» — «¿Quién eres?» (19664) gets the leader of the multimen (16510), «¿No necesitas ayuda?» (19663) the delicate task (16511), «¿Quién es Sombra?» (19662) the lord of the dark dimension and the question (16512), «Aceptar.» (19660) starts the quest and sends the hero to Captain Amakna first (16513, «Vale, voy a ver a Capitán Amakna.» 19659); «No, gracias. Adiós.» (19661) declines. «Tendez le journal d'Ereziah à Lumino»: «Enseñar el diario de Ereziah a Lúmino.» (19709), with the first notebook, gets the handwriting (16550), «Seguir escuchando.» (19708) the rift (16551), «No lo sé, ¡pero pienso averiguarlo!» (19707) the advice to search the dark dimension (16552), and «Voy al dominio de Sombra.» (19706) is 8093. «Annoncez alors à Lumino que Ombre est de nouveau prisonnier»: «Sombra vuelve a estar prisionero en la dimensión obscura.» (19755) gets his thanks (16592), and «Gracias, hasta luego.» (19754) is 8105, also the greeting's farewell."
+    },
+    {
+      "npc": 57,
+      "map": 0,
+      "opening": 29,
+      "lines": [
+        {
+          "message": 29,
+          "choices": [
+            { "reply": 19686, "next": 16527, "quest": 1461, "afterObjective": 8084, "beforeObjective": 8085 },
+            { "reply": 81, "next": 85 },
+            { "reply": 326, "next": 408 },
+            { "reply": 82, "next": 86 }
+          ]
+        },
+        {
+          "message": 85,
+          "choices": []
+        },
+        {
+          "message": 408,
+          "choices": []
+        },
+        {
+          "message": 86,
+          "choices": []
+        },
+        {
+          "message": 16527,
+          "choices": [
+            { "reply": 19685, "next": 16528 }
+          ]
+        },
+        {
+          "message": 16528,
+          "choices": [
+            { "reply": 19684, "next": 16529 }
+          ]
+        },
+        {
+          "message": 16529,
+          "choices": [
+            { "reply": 19683, "next": 16530 }
+          ]
+        },
+        {
+          "message": 16530,
+          "choices": [
+            { "reply": 19682, "quest": 1461, "completes": 8085, "params": [[30, 8085]] }
+          ]
+        }
+      ],
+      "why": "Bowis, the cobbler of Amakna village. «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Annoncez alors à Bowisse avec son super chapeau venir de la part du Captain Amakna». «Vengo de parte de Capitán Amakna.» (19686), once the Captain has sent the hero (8084), gets «eres uno de sus asistentes» (16527), «¿Qué puedes contarme sobre la leyenda de los multimen?» (19685) the old book in the castle (16528), «Seguir escuchando.» (19684) the six multimen, the dofus and Kontatrás' ice gallery (16529), «¿Quién es el sexto hermano?» (19683) Sombra and Reltux Richards' search in the Justiciers' base (16530), and «Voy a la base para hablar con Reltux Richards.» (19682) is 8085. His greeting (29) also tells of his order («Informarte sobre la Orden del Culo Pateado.» 81, 85), his craft («Informarte sobre el oficio de zapatero.» 326, 408) and that his workshop is no shop («Comprar unas botas.» 82, 86)."
+    },
+    {
+      "npc": 2214,
+      "map": 0,
+      "opening": 16531,
+      "lines": [
+        {
+          "message": 16531,
+          "choices": [
+            { "reply": 19690, "next": 16532 },
+            { "reply": 19689 }
+          ]
+        },
+        {
+          "message": 16532,
+          "choices": [
+            { "reply": 19688, "next": 16533, "quest": 1461, "afterObjective": 8085, "beforeObjective": 8086 },
+            { "reply": 19689 }
+          ]
+        },
+        {
+          "message": 16533,
+          "choices": [
+            { "reply": 19687, "quest": 1461, "completes": 8086, "params": [[30, 8086]] }
+          ]
+        }
+      ],
+      "why": "Reltux Richards' klon in the Justiciers' base. «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Richard Rouge vous apprend plaindre le pauvre Richard Rouge qui est toujours sur Frigost. Interrogez-le alors sur cette affirmation». «No lo entiendo, pero si estás aquí, en la base de los justicieros.» (19690) gets the klon's confession (16532); with Bowis heard (8085), «¿Cómo va tu investigación sobre los multimen?» (19688) gets the discovery on Frigost and the frost port (16533), and «Resignarse e ir a Frigost.» (19687) is 8086. «Hasta luego.» (19689) leaves."
+    },
+    {
+      "npc": 1293,
+      "map": 54790159,
+      "opening": 16538,
+      "lines": [
+        {
+          "message": 16538,
+          "choices": [
+            { "reply": 19703, "next": 16539, "quest": 1461, "afterObjective": 8087, "beforeObjective": 8088 }
+          ]
+        },
+        {
+          "message": 16539,
+          "choices": [
+            { "reply": 19702, "next": 16540 }
+          ]
+        },
+        {
+          "message": 16540,
+          "choices": [
+            { "reply": 19701, "next": 16541 }
+          ]
+        },
+        {
+          "message": 16541,
+          "choices": [
+            { "reply": 19700, "next": 16542 }
+          ]
+        },
+        {
+          "message": 16542,
+          "choices": [
+            { "reply": 19699, "quest": 1461, "completes": 8088, "params": [[30, 8088]] }
+          ]
+        }
+      ],
+      "why": "Reltux Richards in the tavern, thankful for the forest walk (16538). «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Parlez alors à Richard Rouge et dîtes lui avoir rencontré son klône». «He conocido a tu klon en Amakna.» (19703) gets the klon's luck (16539), «Mi misión es descubrir el secreto de Sombra.» (19702) the alchemist's diary he lost (16540), «Levantar las cejas con incredulidad.» (19701) the bag fallen into the frozen lake's excavation (16541), «Yo puedo ir a recuperar el diario.» (19700) the way there and Lumino (16542), and «Voy al lago helado.» (19699) is 8088."
+    },
+    {
+      "npc": 2215,
+      "map": 0,
+      "opening": 16553,
+      "lines": [
+        {
+          "message": 16553,
+          "choices": [
+            { "reply": 19714, "next": 16556, "quest": 1461, "afterObjective": 8095, "completesAll": [8096, 8097, 8098, 8099], "params": [[30, 8099]], "gives": 14957 },
+            { "reply": 19711, "quest": 1461, "completes": 8095, "params": [[30, 8095]], "next": 16555, "afterObjective": 8094, "beforeObjective": 8095 },
+            { "reply": 19712, "next": 16554 },
+            { "reply": 19713 }
+          ]
+        },
+        {
+          "message": 16554,
+          "choices": [
+            { "reply": 19711, "quest": 1461, "completes": 8095, "params": [[30, 8095]], "next": 16555, "afterObjective": 8094, "beforeObjective": 8095 },
+            { "reply": 19713 }
+          ]
+        },
+        {
+          "message": 16555,
+          "choices": [
+            { "reply": 19710 }
+          ]
+        },
+        {
+          "message": 16556,
+          "choices": [
+            { "reply": 19713 }
+          ]
+        }
+      ],
+      "why": "Vhé, the keeper of Sombra's pyramid in the dark dimension (his keys and the room he remembers are the door's own replies). «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Rendez vous au fin fond de la Dimension obscure en suivant le chemin vers la Pyramide d'Ombre afin de parler à Vhé qui souhaite exercer une vendetta». «¿Por qué buscas venganza?» (19712) gets the life thief who beat his master (16554); «Voy tras las huellas de Ereziah, el alquimista.» (19711), once in the dimension (8094), is 8095 and gets the second notebook he found and the masks he wants for it (16555, «Ir a luchar contra los obscuranti.» 19710). «Donnez vos objets de quête à Vhé qui vous donnera le Journal»: «Aquí tienes las máscaras que me pediste.» (19714) hands over the eight masks (8096-8099, two of each) and gives the second notebook (14957), with his thanks (16556). «Gracias. Hasta luego.» (19713) leaves."
+    },
+    {
+      "npc": 1363,
+      "map": 0,
+      "opening": 8153,
+      "lines": [
+        {
+          "message": 8153,
+          "choices": [
+            { "reply": 19734, "quest": 1461, "completes": 8101, "params": [[30, 8101]], "next": 16573, "afterObjective": 8100 },
+            { "reply": 8146 },
+            { "reply": 8145 }
+          ]
+        },
+        {
+          "message": 16573,
+          "choices": [
+            { "reply": 8146 },
+            { "reply": 8145 }
+          ]
+        }
+      ],
+      "why": "Hywan Kenoby, the goblin who keeps the Sakaï mine's door, speaking goblin. «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Parlez à Hywan Kenoby pour savoir s'il a vu un alchimiste passer» — «¿Has visto pasar a un alquimista?» (19734), once the second notebook is read (8100), is 8101 and gets the man with the shining eyes who forged something in the mines, and the key he wants (16573). His door's own replies stay on both lines: «Utilizar el manojo de llaves.» (8146) and «Darle la llave para entrar.» (8145)."
+    },
+    {
+      "npc": 2216,
+      "map": 0,
+      "opening": 16589,
+      "lines": [
+        {
+          "message": 16589,
+          "choices": [
+            { "reply": 19752, "next": 16590, "quest": 1461, "afterObjective": 8103, "beforeObjective": 8104, "holds": 14956 },
+            { "reply": 19995, "next": 16782 },
+            { "reply": 19753 }
+          ]
+        },
+        {
+          "message": 16590,
+          "choices": [
+            { "reply": 19751, "next": 16591 }
+          ]
+        },
+        {
+          "message": 16591,
+          "choices": [
+            { "reply": 19750, "quest": 1461, "completes": 8104, "params": [[30, 8104]] }
+          ]
+        },
+        {
+          "message": 16782,
+          "choices": [
+            { "reply": 19994, "next": 16783 },
+            { "reply": 19992 }
+          ]
+        },
+        {
+          "message": 16783,
+          "choices": [
+            { "reply": 19993, "next": 16589 },
+            { "reply": 19992 }
+          ]
+        }
+      ],
+      "why": "Sombra in his pyramid's Exit room once beaten, still boasting (16589). «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Une fois que vous avez vaincu Ombre parlez lui et attachez le avec les chaînes au sol de la Pyramide. Apprenez lui alors qu'il est de nouveau prisonnier et qu'il n'est pas prêt de se libérer. Il vous menace alors avant que vous ne partiez». With the chains of life (14956), «Mira estas cadenas que te retienen ahora al suelo de la pirámide.» (19752) gets his rage at Ereziah's light (16590), «Vuelves a ser prisionero de esta dimensión.» (19751) his threat (16591), and «Salir de la Pirámide de Sombra.» (19750) is 8104 and leaves (dungeon_exits.json). «Háblame sobre ti.» (19995) gets his creed (16782), «¿Qué puedes contarme sobre los multimen?» (19994) his solitude (16783) and «Quedarte un rato más.» (19993) his first words again; «Salir de la Pirámide de Sombra.» (19753, 19992) leaves."
     }
   ]
 }

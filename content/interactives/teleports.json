@@ -477,6 +477,17 @@
       "toMap": 115083777,
       "toCell": 216,
       "why": "The assembly hall's door (element 483011, cell 446, the hall's only prop besides the chair): Hal Ylanza lets people in with Fallanster's seal and nothing in the client's world graph leads back out. INFERRED: back to the temple, cell 216, the open floor in front of its arches."
+    },
+    {
+      "map": 88083210,
+      "element": 484182,
+      "cell": 350,
+      "gfx": 16231,
+      "type": -1,
+      "skill": 184,
+      "toMap": 121766912,
+      "toCell": 284,
+      "why": "The rim of Amakna's rift [6,13]: «Cliquez sur le rebord de la crevasse pour descendre puis empruntez le portail» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The client lets the rim (element 484182) be used and the server had nowhere for it; the 2.73 graph takes the same way down from cell 261, which is the hole and cannot be walked to, and lands on 280 of the gallery (121766912). INFERRED landing: 284, the first walkable cell of that row."
     }
   ]
 }

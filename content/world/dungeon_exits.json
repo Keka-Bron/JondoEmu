@@ -148,6 +148,15 @@
       "npc": 2174,
       "replies": [19366, 19367],
       "why": "Dramak's Theatre: after the Puppet Master (Auditorium 5) the winners are in the theatre's Exit room where Dramak stands, and «Ainsi font les petites marionnettes» has them talk to him before leaving («Une fois le donjon terminé, parlez à Dramak mais ne sortez pas tout de suite», Dofus pour les noobs); «Abandonar el Teatro de Dramak.» and «Abandonar el teatro con la sensación de haber cumplido con tu deber.» leave. INFERRED cell: two rows above Dramak's (399), on the stage's floor."
+    },
+    {
+      "dungeon": 74,
+      "bossRoom": 123212800,
+      "room": 123213824,
+      "cell": 342,
+      "npc": 2216,
+      "replies": [19750, 19753, 19992],
+      "why": "Sombra's Pyramid: after Sombra (Fifth Room) the winners are in the pyramid's Exit room where he stands beaten, and «L'armée des ombres» has them chain him there before leaving («Une fois que vous avez vaincu Ombre parlez lui et attachez le avec les chaînes au sol de la Pyramide», Dofus pour les noobs); his three «Salir de la Pirámide de Sombra.» leave. INFERRED cell: two rows below his (314)."
     }
   ]
 }

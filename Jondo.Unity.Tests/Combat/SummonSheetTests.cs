@@ -49,6 +49,34 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(50, Summons.CaracteristicaDelInvocado(tofu!.Agilidad, tofu.BonusAgilidad, 200));
             Assert.Equal(30, Summons.PotenciaDelInvocado(tofu.BonusDeDanos));
             Assert.Equal(525, Summons.VidaDelInvocado(tofu.Vida, 200, tofu.VidaFija));
+            Assert.False(Summons.GradeIsAtItsLevel(tofu));
+        }
+
+        /// <summary>
+        /// The shade Sombra raises (3563, level 190, 5,000 life): a monster's own grade, which no
+        /// summoner grows -- its 600 stay 600, not the 1,740 that made each light hit for 920.
+        /// </summary>
+        [Fact]
+        public void A_monsters_own_grade_is_not_grown_by_its_summoner()
+        {
+            var shade = Summons.De(3563, 1);
+            if (shade == null) return;   // no world base to read
+            Assert.True(Summons.GradeIsAtItsLevel(shade));
+
+            var sombra = new Fighter { Id = -1, Level = 190, IsMonster = true, MonsterId = 3564 };
+            var raised = new Fighter { Id = -5, IsMonster = true, MonsterId = 3563 };
+            Summons.Characteristics(raised, shade, sombra);
+
+            Assert.Equal(600, raised.Strength);
+            Assert.Equal(600, raised.Intelligence);
+            Assert.Equal(5000, raised.MaxHP);
+        }
+
+        [Fact]
+        public void Without_a_level_the_characteristic_is_the_grades_own()
+        {
+            Assert.Equal(650, Summons.CaracteristicaDelInvocado(600, 50, 0));
+            Assert.Equal(1790, Summons.CaracteristicaDelInvocado(600, 50, 190));
         }
 
         /// <summary>

@@ -147,4 +147,28 @@ namespace Jondo.Unity.Tests.World
             Assert.Null(DungeonDoor.Pick(null!, null!, KeyringTexts, KeyTexts));
         }
     }
+
+    /// <summary>
+    /// The guardians who word the hand-over of their key their own way, read from the game's text table.
+    /// </summary>
+    /// <remarks>
+    /// In the MapManager collection because it loads the world's NPCs, which other tests of that
+    /// collection load too.
+    /// </remarks>
+    [Collection("MapManager")]
+    public class DungeonDoorWordingTests
+    {
+        [Fact]
+        public void Hywan_Kenoby_takes_the_key_in_his_own_words()
+        {
+            Npcs.Initialize();
+            DungeonDoor.Initialize();
+            var hywan = DungeonDoor.For(1363);
+            if (!hywan.Asks) return;   // no world base to read
+
+            // «Darle la llave para entrar.», beside «Utilizar el manojo de llaves.»: the Sakaï mine.
+            Assert.Equal(8146, hywan.Keyring);
+            Assert.Equal(8145, hywan.Key);
+        }
+    }
 }

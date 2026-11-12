@@ -3675,6 +3675,47 @@
    "kind": "enter",
    "map": 117965057,
    "why": "«Descubre dónde se esconde Dramak»: «Il vous faut découvrir Dramak, qui se trouve dans son donjon en [21,7]» (Dofus pour les noobs, «Ainsi font les petites marionnettes»). It closes on reaching the map at [21,7] where Otto Rino keeps the theatre's door (117965057, the dungeon's entrance)."
+  },
+  {
+   "objective": 8087,
+   "quest": 1461,
+   "kind": "enter",
+   "map": 54790159,
+   "why": "«Encuentra a Reltux Richards en la isla de Frigost»: «Rendez-vous à la Taverne située en [-77,-38] pour y trouver Richard Rouge» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). It closes on entering the tavern where he stands."
+  },
+  {
+   "objective": 8089,
+   "quest": 1461,
+   "kind": "click",
+   "elements": [{"map": 55837184, "element": 483926}],
+   "afterObjectives": [8088],
+   "spawns": {"monster": 3581, "count": 1, "attacks": true},
+   "why": "«Encuentra la bolsa en las profundidades del lago helado»: «Descendez comme pour aller dans le donjon puis cliquez sur le sac abandonné. Vous serez alors agressé. Il vous faut donc combattre un Mansot Hargneux» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The bag is the excavation's element 483926 (gfx 21522, cell 486), and the click brings out the Mansot Hargneux (3581) attacking, whose defeat is 8090."
+  },
+  {
+   "objective": 8091,
+   "quest": 1461,
+   "kind": "click",
+   "elements": [{"map": 55837184, "element": 483926}],
+   "afterObjectives": [8090],
+   "gives": [{"item": 14955, "count": 1}],
+   "why": "«Registra la bolsa perdida de Reltux Richards»: «Une fois le Mansot Hargneux vaincu, cliquez une nouvelle fois sur le sac afin de le ramasser. Vous obtenez alors le Journal d'un alchimiste - Premier cahier» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)), item 14955, whose own effects are document 377 and objective 8092 (read it)."
+  },
+  {
+   "objective": 8094,
+   "quest": 1461,
+   "kind": "enter",
+   "map": 121634816,
+   "why": "«Entra en la dimensión obscura»: «Rendez-vous donc en [6,13] pour passer au travers de la faille dans le sol d'Amakna. Cliquez sur le rebord de la crevasse pour descendre puis empruntez le portail» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The portal (element 521357 of 121766912) lands on 121634816, the dimension's first map."
+  },
+  {
+   "objective": 8102,
+   "quest": 1461,
+   "kind": "click",
+   "elements": [{"map": 57935617, "element": 484127}],
+   "afterObjectives": [8101],
+   "gives": [{"item": 14956, "count": 1}],
+   "why": "«Encuentra las cadenas alquímicas forjadas por Ereziah»: «Rendez-vous dans la deuxième salle afin de cliquer sur la caisse. Vous obtenez alors dans votre inventaire de quêtes des Chaînes de Vie» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The second room's only element, the crate 484127 (cell 300), gives 14956."
   }
  ]
 }

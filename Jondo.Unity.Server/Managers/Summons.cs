@@ -145,7 +145,26 @@ namespace Jondo.Unity.Server.Managers
         /// others 75 and 100. They were all zero here, and a JondoBot Osamodas' Tofu pecked for ten.
         /// </remarks>
         public static int CaracteristicaDelInvocado(int propia, int bonus, int nivelDelInvocador)
-            => propia * (100 + Math.Max(1, nivelDelInvocador)) / 100 + bonus;
+            => nivelDelInvocador <= 0
+                ? propia + bonus
+                : propia * (100 + nivelDelInvocador) / 100 + bonus;
+
+        /// <summary>
+        /// Whether this grade is a monster's, written at its own level, rather than a summon's to
+        /// be grown by whoever calls it.
+        /// </summary>
+        /// <remarks>
+        /// The two shapes do not mix in world.db. Every summon measured above (and the other 415
+        /// grades shaped like them) has no life of its own, only a <c>bonusCharacteristics.lifePoints</c>
+        /// the summoner's level grows, and level 1. The 26,452 grades with a <c>lifePoints</c> of
+        /// their own and no such bonus are monsters' -- 3563, the shade Sombra raises in his
+        /// pyramid, is level 190 with 5,000 life and 600 in each characteristic, next to the 710
+        /// of Sombra himself. Its life was already read plain (VidaFija); its characteristics were
+        /// still grown by Sombra's 190, to 1,740, and each of its «Alumbrado» lights hit the
+        /// players out of reach for 920 instead of 350 before anybody had played. INFERRED that
+        /// the characteristics go with the life: no capture holds a monster's summon.
+        /// </remarks>
+        public static bool GradeIsAtItsLevel(Summon receta) => receta.VidaFija > 0 && receta.Vida == 0;
 
         /// <summary>
         /// A summon's power: three fifths of the grade's bonus damage.
@@ -176,10 +195,13 @@ namespace Jondo.Unity.Server.Managers
             invocado.WaterResPct = receta.ResistenciaAgua;
             invocado.AirResPct = receta.ResistenciaAire;
             invocado.MaxHP = VidaDelInvocado(receta.Vida, quienInvoca.StatLevel, receta.VidaFija);
-            invocado.Strength = CaracteristicaDelInvocado(receta.Fuerza, receta.BonusFuerza, quienInvoca.StatLevel);
-            invocado.Intelligence = CaracteristicaDelInvocado(receta.Inteligencia, receta.BonusInteligencia, quienInvoca.StatLevel);
-            invocado.Chance = CaracteristicaDelInvocado(receta.Suerte, receta.BonusSuerte, quienInvoca.StatLevel);
-            invocado.Agility = CaracteristicaDelInvocado(receta.Agilidad, receta.BonusAgilidad, quienInvoca.StatLevel);
+            // A monster's own grade is already at its level: no summoner scales it (see
+            // GradeIsAtItsLevel).
+            int nivelQueEscala = GradeIsAtItsLevel(receta) ? 0 : quienInvoca.StatLevel;
+            invocado.Strength = CaracteristicaDelInvocado(receta.Fuerza, receta.BonusFuerza, nivelQueEscala);
+            invocado.Intelligence = CaracteristicaDelInvocado(receta.Inteligencia, receta.BonusInteligencia, nivelQueEscala);
+            invocado.Chance = CaracteristicaDelInvocado(receta.Suerte, receta.BonusSuerte, nivelQueEscala);
+            invocado.Agility = CaracteristicaDelInvocado(receta.Agilidad, receta.BonusAgilidad, nivelQueEscala);
             invocado.Power = PotenciaDelInvocado(receta.BonusDeDanos);
             invocado.CurrentHP = invocado.MaxHP;
 
