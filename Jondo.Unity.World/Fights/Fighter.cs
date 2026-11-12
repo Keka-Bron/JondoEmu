@@ -370,7 +370,20 @@ namespace Jondo.Unity.World.Fights
         /// hand of its own for them -- so the row only matters to one that has neither. On
         /// somebody else's fighter it is not honoured: no class spell lays it there.
         /// </remarks>
-        public bool PlaysOnItsOwn => EsInvocado && MaxMP <= 0 && HechizosDeInvocado.Count == 0 && !ControlTaken;
+        public bool PlaysOnItsOwn => EsInvocado && !ControlTaken
+                                     && (MaxMP <= 0 && HechizosDeInvocado.Count == 0
+                                         || ControlledFromState != 0 && !Buffs.TieneEstado(ControlledFromState));
+
+        /// <summary>
+        /// The state from which its owner plays this summon, zero for one that is his from the
+        /// start: the Steamer's turrets play on their own, spells and all, until Evolución III
+        /// (state 135) hands them to him. Played by hand from their first turn, the arponera
+        /// was the Steamer's to aim at Evolución I.
+        /// </summary>
+        public int ControlledFromState { get; set; }
+
+        /// <summary>Whether such a summon's bar has gone to its owner since it became his.</summary>
+        public bool HandedToOwner { get; set; }
 
         /// <summary>
         /// The character this fighter is the double of (effect 180), or zero: his look and his

@@ -212,7 +212,34 @@ namespace Jondo.Unity.Server.Managers
             invocado.JuegaTurno = receta.Juega;
             invocado.HechizosDeInvocado = receta.Hechizos;
             invocado.TemplateAllowsTackle = receta.AllowsTackle;
+            invocado.ControlledFromState = SteamerTurrets.Contains(receta.Plantilla) ? EvolutionIII : 0;
+
+            // A Steamer's turret fights with his characteristics on top of its own: its blows grow
+            // with his build and its «best element» is his (the arponera's Espadon). Measured by the
+            // player against the real game: the arponera's damage follows the Steamer's stats. With
+            // its grade's even 100 alone, the client previewed and the server struck in earth, first
+            // of a tie, for a water Steamer. INFERRED: all four added whole, as they stand when it
+            // comes out; the real game's share is not measured.
+            if (SteamerTurrets.Contains(receta.Plantilla))
+            {
+                invocado.Strength += quienInvoca.Strength;
+                invocado.Intelligence += quienInvoca.Intelligence;
+                invocado.Chance += quienInvoca.Chance;
+                invocado.Agility += quienInvoca.Agility;
+            }
         }
+
+        /// <summary>
+        /// The Steamer's six turrets -- the guardiana, the arponera and the táctica, and the
+        /// batiscafo, the arrastrero and the perforadora --, the ones Evolución evolves.
+        /// </summary>
+        public static readonly int[] SteamerTurrets = { 5831, 5832, 5833, 5835, 5836, 5837 };
+
+        /// <summary>
+        /// «Evolución III», the state from which a turret is its Steamer's to play: up to it the
+        /// turret plays on its own (Fighter.ControlledFromState).
+        /// </summary>
+        public const int EvolutionIII = 135;
 
         // ─── How long it lives ──────────────────────────────────────────────────
         //

@@ -3521,6 +3521,9 @@ namespace Jondo.Unity.Server.Handlers
             // first, so the turn below finds its entry.
             if (fight.TakeTimelineChange()) await ReenviarLaListaAsync(stream, fight);
 
+            // A turret that has become its Steamer's since: its bar, before any turn starts.
+            await HandOverWhatBecameHisAsync(fight);
+
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jzc,
                 Network.FightProtocol.BuildTurnStart(fighter.Id, duration,
                                                      fight.CurrentTurnIndex, fight.RoundNumber, carried,
@@ -3888,6 +3891,34 @@ namespace Jondo.Unity.Server.Handlers
                 // left but to abandon the fight. The right turn pass is PassTurnAsync, the same one the
                 // monsters use.
                 await PassTurnAsync(stream);
+            }
+        }
+
+        /// <summary>
+        /// Hands a summon that has become its owner's in the fight -- a turret reaching Evolución
+        /// III (Fighter.ControlledFromState) -- to his client, once: its cooldowns and its bar
+        /// (jxc, jyy), as a summon of his is handed over when it comes out. Before a turn starts
+        /// and not with its jyj: sent between its jzc and its jyj, the client cast with it but
+        /// never let its turn be passed, and the clock ran out. One that goes back to its own
+        /// (back to Evolución II) is handed over again when it next becomes his.
+        /// </summary>
+        private static async Task HandOverWhatBecameHisAsync(FightInstance fight)
+        {
+            foreach (var summon in TodosLosCombatientes(fight))
+            {
+                if (summon == null || summon.ControlledFromState == 0) continue;
+                bool his = summon.IsAlive && !summon.PlaysOnItsOwn;
+                if (!his) { summon.HandedToOwner = false; continue; }
+                if (summon.HandedToOwner) continue;
+                summon.HandedToOwner = true;
+
+                var owner = SessionRegistry.FindByCharacter(summon.Invocador);
+                if (owner == null) continue;
+                await owner.SendAsync(ConnectionProtocol.Push(Op.Jxc,
+                    Network.FightProtocol.BuildCooldowns(summon.Id, RecargasDe(summon))));
+                await owner.SendAsync(ConnectionProtocol.Push(Op.Jyy,
+                    Network.FightProtocol.BuildSummonSpellBar(summon.Id, summon.Invocador, summon.HechizosDeInvocado)));
+                Program.LogDebug($"[Fight] {summon.Id} is {summon.Invocador}'s to play now: its bar goes to him.");
             }
         }
 
