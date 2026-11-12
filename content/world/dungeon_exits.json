@@ -139,6 +139,15 @@
       "npc": 2436,
       "replies": [21565],
       "why": "Thor Pestruz's aviary: after the fifth room the winners are in the aviary's own way out («Cross Strich's Aviary - Exit», 132912128), where Orno Tóligo shows the stairs down. Cell 328: open floor of the pen, two cells from him."
+    },
+    {
+      "dungeon": 72,
+      "bossRoom": 118231040,
+      "room": 118232064,
+      "cell": 371,
+      "npc": 2174,
+      "replies": [19366, 19367],
+      "why": "Dramak's Theatre: after the Puppet Master (Auditorium 5) the winners are in the theatre's Exit room where Dramak stands, and «Ainsi font les petites marionnettes» has them talk to him before leaving («Une fois le donjon terminé, parlez à Dramak mais ne sortez pas tout de suite», Dofus pour les noobs); «Abandonar el Teatro de Dramak.» and «Abandonar el teatro con la sensación de haber cumplido con tu deber.» leave. INFERRED cell: two rows above Dramak's (399), on the stage's floor."
     }
   ]
 }

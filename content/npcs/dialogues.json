@@ -27343,6 +27343,7 @@
             { "reply": 19297, "next": 16261, "beforeQuest": 1424, "criterion": "PL>79&Qf=1423" },
             { "reply": 19326, "quest": 1424, "completes": 7918, "params": [[30, 7918]], "next": 16278, "holds": 14572 },
             { "reply": 19333, "next": 16283, "quest": 1424, "afterQuest": true, "beforeQuest": 1425 },
+            { "reply": 19336, "next": 16285, "quest": 1425, "afterObjective": 7922, "beforeObjective": 7923 },
             { "reply": 19245 }
           ]
         },
@@ -27454,9 +27455,21 @@
           "choices": [
             { "reply": 19330 }
           ]
+        },
+        {
+          "message": 16285,
+          "names": true,
+          "choices": [
+            { "reply": 19335, "quest": 1425, "completes": 7923, "params": [[30, 7923]], "next": 16286 }
+          ]
+        },
+        {
+          "message": 16286,
+          "names": true,
+          "choices": []
         }
       ],
-      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424, level 80 after «Proteger y servir»): «Hablemos sobre el reino de Amakna.» (19297) gets the alliances that please him but something that does not fit (16261), «Hacerle preguntas para averiguar más cosas.» (19296) the king's councillor Makia Vhelika, who hides something (16262), «¿Quieres que haga una investigación?» (19294) his trust (16263) and «Voy a ir al castillo.» (19293) starts it; «Hasta luego.» (19295) leaves. «¡Mira! La cabeza de la marioneta.» (19326) shows the head (7918, kept) and ends it: the symbol (16278), «Informarle de tus descubrimientos.» (19325) the headache (16279), «¿De quién hablas?» (19324) Dramak the Plotter (16280), «¿Qué piensas hacer para remediar la situación?» (19323) the plan (16281), where «Acepto la misión.» (19328) starts «Como una marioneta» (1425, 16282, «Voy en busca de Dramak.» 19327) and the doctor's excuse (19329) leaves. Declined then, «¿Qué cuentas hacer a propósito de Dramak?» (19333) offers it again with the second copy of those lines (16283-16284, 19330-19332)."
+      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424, level 80 after «Proteger y servir»): «Hablemos sobre el reino de Amakna.» (19297) gets the alliances that please him but something that does not fit (16261), «Hacerle preguntas para averiguar más cosas.» (19296) the king's councillor Makia Vhelika, who hides something (16262), «¿Quieres que haga una investigación?» (19294) his trust (16263) and «Voy a ir al castillo.» (19293) starts it; «Hasta luego.» (19295) leaves. «¡Mira! La cabeza de la marioneta.» (19326) shows the head (7918, kept) and ends it: the symbol (16278), «Informarle de tus descubrimientos.» (19325) the headache (16279), «¿De quién hablas?» (19324) Dramak the Plotter (16280), «¿Qué piensas hacer para remediar la situación?» (19323) the plan (16281), where «Acepto la misión.» (19328) starts «Como una marioneta» (1425, 16282, «Voy en busca de Dramak.» 19327) and the doctor's excuse (19329) leaves. Declined then, «¿Qué cuentas hacer a propósito de Dramak?» (19333) offers it again with the second copy of those lines (16283-16284, 19330-19332). «Como una marioneta» (Ainsi font les petites marionnettes, Dofus pour les noobs): «Annoncez lui alors votre victoire contre Dramak». «He vencido a Dramak.» (19336), once Dramak has been talked to (7922), gets his congratulations and the promise of his shield (16285), «Aprender el arte de blandir el escudo.» (19335) is 7923 and ends the quest with the attitude, and he congratulates again (16286)."
     },
     {
       "npc": 2170,
@@ -29781,6 +29794,51 @@
         }
       ],
       "why": "Samurai Hagiyo (Samouraï Holi) beside the Bamboo Palace's mat into the Pandassembly hall [22,-29]: «Allez en [22,-29] et parlez à l'un des Samouraï Holi pour qu'il vous laisse entrer dans la salle» (Dofus pour les noobs, «Quelque chose de pourri au royaume d'Amakna»). His saying (40483); «Quiero ver a la daimia.» (52738) gets the Pandarin's leave (40484) once the Daimia has been met in «En la encrucijada de los mundos» (2150's 16380, or the quest over) and «Saludar al samurái y entrar en la sala.» (52739) takes him in (passage 558401, interactives/teleports.json); otherwise «No se te ha concedido tal privilegio» (40485) and «Comprender, ante su mirada inflexible, que no sirve de nada insistir.» (52737). The mat itself (cell 395) only lets through whoever wears the Pandascudo (POE23094)."
+    },
+    {
+      "npc": 2174,
+      "map": 0,
+      "opening": 16311,
+      "lines": [
+        {
+          "message": 16311,
+          "choices": [
+            { "reply": 19372, "next": 16312, "quest": 1425, "afterObjective": 7921, "beforeObjective": 7922 },
+            { "reply": 19366 }
+          ]
+        },
+        {
+          "message": 16312,
+          "choices": [
+            { "reply": 19371, "next": 16313 }
+          ]
+        },
+        {
+          "message": 16313,
+          "choices": [
+            { "reply": 19370, "next": 16314 }
+          ]
+        },
+        {
+          "message": 16314,
+          "choices": [
+            { "reply": 19369, "next": 16315 }
+          ]
+        },
+        {
+          "message": 16315,
+          "choices": [
+            { "reply": 19368, "next": 16316 }
+          ]
+        },
+        {
+          "message": 16316,
+          "choices": [
+            { "reply": 19367, "quest": 1425, "completes": 7922, "params": [[30, 7922]] }
+          ]
+        }
+      ],
+      "why": "Dramak in his theatre's Exit room, once the Puppet Master is beaten: «¡Has saboteado mi representación!» (16311). «Como una marioneta» (Ainsi font les petites marionnettes, Dofus pour les noobs): «Une fois le donjon terminé, parlez à Dramak mais ne sortez pas tout de suite, demandez lui des informations à propos du traité des Six et Makia Vhel». «Exijo explicaciones sobre Makia Vhelika y el Tratado de los Seis.» (19372) gets who the character is, one of Captain Amakna's assistants (16312), «Más vale que te expliques si no quieres que te dé una buena.» (19371) his plan to rule the world (16313), «Pues no veo la relación con las alianzas.» (19370) the political map he changed (16314), «¿Qué me puedes contar de los símbolos?» (19369) his symbols and Fallanster's staff (16315), «No habrá una próxima vez. Te ordeno que no vuelvas a maquinar nada.» (19368) his crossed fingers and Makia freed (16316), and «Abandonar el teatro con la sensación de haber cumplido con tu deber.» (19367) is 7922 and leaves the theatre (dungeon_exits.json), like «Abandonar el Teatro de Dramak.» (19366). The template's replies, each to the message of its rank."
     }
   ]
 }

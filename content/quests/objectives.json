@@ -3668,6 +3668,13 @@
    "elements": [{"map": 115082755, "element": 483012}],
    "afterObjectives": [7914],
    "why": "«Registra la sala de la asamblea en busca de pistas»: «le premier se trouve sur le dossier de la chaise du milieu à la table de droite» (Dofus pour les noobs) -- element 483012 on cell 331, the right table's middle chair; the hall's other element, 483011 on 446, is its way out."
+  },
+  {
+   "objective": 7919,
+   "quest": 1425,
+   "kind": "enter",
+   "map": 117965057,
+   "why": "«Descubre dónde se esconde Dramak»: «Il vous faut découvrir Dramak, qui se trouve dans son donjon en [21,7]» (Dofus pour les noobs, «Ainsi font les petites marionnettes»). It closes on reaching the map at [21,7] where Otto Rino keeps the theatre's door (117965057, the dungeon's entrance)."
   }
  ]
 }
