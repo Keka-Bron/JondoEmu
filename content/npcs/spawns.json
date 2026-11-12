@@ -3649,6 +3649,13 @@
       "orientation": 1,
       "criterion": "Qf=590",
       "why": "Reltux Richards at the Frigostian Paradise Tavern [-77,-38], after «Paseemos por el bosque» (590) has taken him out of the Lost Pines forest («Sin tu ayuda, aún estaría atrapado en el Bosque de los Pinos Perdidos», 16538). «Rendez-vous à la Taverne située en [-77,-38] pour y trouver Richard Rouge», «il faut avoir terminé la quête Promenons-nous dans les bois» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). INFERRED cell: open floor between the tables, in sight."
+    },
+    {
+      "map": 119278083,
+      "npc": 2197,
+      "cell": 356,
+      "orientation": 1,
+      "why": "Merkator in the Aquadome's Exit room, where the winners find him beaten («Pollution, je dis non» (Dofus pour les noobs): «Une fois le Merkator vaincu, reparlez lui»). The cell is the one the client's own quest data places him on."
     }
   ]
 }

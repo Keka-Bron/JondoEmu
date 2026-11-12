@@ -1067,6 +1067,17 @@ namespace Jondo.Unity.Server.Managers
         {
             var binding = Bindings.Of(objectiveId);
             if (binding == null || binding.Kind != QuestBindingKind.Use) return true;
+            // Where the objective says, when it names a place the item carries no condition for:
+            // «Activa la pikosonda cerca del templo de Pandawa» (7979) at [4,-2], not anywhere.
+            if (binding.MapId != 0 && SessionContext.State.MapId != binding.MapId)
+            {
+                Console.WriteLine($"[Quests] Objective {objectiveId} is done on map {binding.MapId}, " +
+                                  $"not on {SessionContext.State.MapId}.");
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                        InfoMessages.Warning, InfoMessages.RequirementsNotMet)));
+                return false;
+            }
             foreach (var (item, count) in binding.Requires)
             {
                 if (Equipment.HowMany(item) >= count) continue;

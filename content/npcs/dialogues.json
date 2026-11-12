@@ -1576,6 +1576,8 @@
         {
           "message": 30758,
           "choices": [
+            { "reply": 37156, "next": 30769, "quest": 1444, "beforeObjective": 7978 },
+            { "reply": 37158, "next": 30772, "quest": 1444, "afterObjective": 7978, "beforeObjective": 7983, "criterion": "PO!14813&PO!14869" },
             { "reply": 37138, "next": 30760, "completes": 13894, "params": [[30, 13894]] },
             { "reply": 37146, "quest": 938, "completes": 5702, "params": [[30, 5702]], "next": 30765 },
             { "reply": 37150, "quest": 938, "completes": 5711, "params": [[30, 5711]], "next": 30766 },
@@ -1587,6 +1589,8 @@
         {
           "message": 30768,
           "choices": [
+            { "reply": 37156, "next": 30769, "quest": 1444, "beforeObjective": 7978 },
+            { "reply": 37158, "next": 30772, "quest": 1444, "afterObjective": 7978, "beforeObjective": 7983, "criterion": "PO!14813&PO!14869" },
             { "reply": 37151, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
         },
@@ -1606,6 +1610,8 @@
           "message": 30760,
           "names": true,
           "choices": [
+            { "reply": 37156, "next": 30769, "quest": 1444, "beforeObjective": 7978 },
+            { "reply": 37158, "next": 30772, "quest": 1444, "afterObjective": 7978, "beforeObjective": 7983, "criterion": "PO!14813&PO!14869" },
             { "reply": 37139, "next": 30761, "beforeQuest": 938 },
             { "reply": 38050 }
           ]
@@ -1653,9 +1659,33 @@
           "choices": [
             { "reply": 37148, "startsQuest": 1960, "params": [[34, 1960]] }
           ]
+        },
+        {
+          "message": 30769,
+          "choices": [
+            { "reply": 37155, "next": 30770 }
+          ]
+        },
+        {
+          "message": 30770,
+          "choices": [
+            { "reply": 37154, "quest": 1444, "completes": 7978, "params": [[30, 7978]], "next": 30771, "gives": 14813 }
+          ]
+        },
+        {
+          "message": 30771,
+          "choices": [
+            { "reply": 37153 }
+          ]
+        },
+        {
+          "message": 30772,
+          "choices": [
+            { "reply": 37157, "quest": 1444, "gives": 14813 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (938) is done, he greets the character with Archi's summons (30768) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14113), and the answer (31494). «L'étrange créature de l'étang bleu» (938) of Dofus pour les noobs: welcomed to Astrub (30760), the Council of the Sea's new steamers (30761), the creature at the bottom of Astrub's pond (30762), «Répondre que vous êtes d'accord» (30763), Ness Ogal's dive and four sonoprobes to lay (30764, item 13266 x4); the probes laid, bait from Bish Fone and a harness (30765: 5702); proud of the character (30766: 5711), Sufokia later, Archi now (30767). The young steamers of Astrub (30759)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37138) is this class's objective (13894, effect 30), and leads to his greeting, 30760, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (938) is done, he greets the character with Archi's summons (30768) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14113), and the answer (31494). «L'étrange créature de l'étang bleu» (938) of Dofus pour les noobs: welcomed to Astrub (30760), the Council of the Sea's new steamers (30761), the creature at the bottom of Astrub's pond (30762), «Répondre que vous êtes d'accord» (30763), Ness Ogal's dive and four sonoprobes to lay (30764, item 13266 x4); the probes laid, bait from Bish Fone and a harness (30765: 5702); proud of the character (30766: 5711), Sufokia later, Archi now (30767). The young steamers of Astrub (30759). «Pollution, je dis non» (Dofus pour les noobs): «Commencez par aller à la rencontre de Alberta Borida en Astrub en [1,-21]... Elle vous confie alors une Pikosonde». «Hablarle del problema de contaminación del río Kawaii.» (37156) gets her word that the steamers respect the sea (30769), «Seguir escuchando.» (37155) the pikosondas (30770), «Tomar la pikosonda.» (37154) is 7978 and hands the Pikosonda (14813), with her advice to start by the Pandawa temple (30771). One lost before the water sample is taken: «Necesito otra pikosonda, por favor.» (37158) gets «Ten cuidado, este aparato de alta precisión es muy caro» (30772) and another."
     },
     {
       "npc": 4317,
@@ -18552,6 +18582,7 @@
           "message": 386,
           "names": true,
           "choices": [
+            { "reply": 19608, "quest": 1444, "completes": 8004, "params": [[30, 8004]], "next": 16464, "holds": 14814, "afterObjective": 8003 },
             { "reply": 18890, "startsQuest": 827, "params": [[34, 827]], "next": 15981 },
             { "reply": 18889, "next": 15982, "quest": 827, "afterQuest": true }
           ]
@@ -18567,9 +18598,15 @@
         {
           "message": 1227,
           "choices": []
+        },
+        {
+          "message": 16464,
+          "choices": [
+            { "reply": 19607 }
+          ]
         }
       ],
-      "why": "An assistant of Otomai in the Amakna village [-2,-4], studying the local artisans' preparations (386). «Intrusion chez les wabbits» (827) of Dofus pour les noobs: a remedy for the myxomawosis, a pair of wings of each colour of leafbeetle (15981, the four wings on a hello); asked again, its effects are permanent, go to the wabbit archipelago (15982). «Wogew l'hewmite»: blood so genetically modified, here is the analysis (1227: the GM's blood handed on a hello, the analysis 1747 given)."
+      "why": "An assistant of Otomai in the Amakna village [-2,-4], studying the local artisans' preparations (386). «Intrusion chez les wabbits» (827) of Dofus pour les noobs: a remedy for the myxomawosis, a pair of wings of each colour of leafbeetle (15981, the four wings on a hello); asked again, its effects are permanent, go to the wabbit archipelago (15982). «Wogew l'hewmite»: blood so genetically modified, here is the analysis (1227: the GM's blood handed on a hello, the analysis 1747 given). «Pollution, je dis non» (Dofus pour les noobs): «Ramenez alors ce produit à l'Assistant d'Otomaï en [-2,-4]». «Evocar la contaminación del Kawaii y darle el frasco de Súper Limpiador.» (19608) hands the cleaner over (8004) and gets his thanks (16464); «Despedirte y volver a ver a Capitán Amakna.» (19607) leaves."
     },
     {
       "npc": 1568,
@@ -27345,6 +27382,8 @@
             { "reply": 19333, "next": 16283, "quest": 1424, "afterQuest": true, "beforeQuest": 1425 },
             { "reply": 19336, "next": 16285, "quest": 1425, "afterObjective": 7922, "beforeObjective": 7923 },
             { "reply": 19671, "next": 16516, "quest": 1461, "beforeObjective": 8084 },
+            { "reply": 19549, "next": 16412, "quest": 1425, "afterQuest": true, "beforeQuest": 1444, "criterion": "PL>179" },
+            { "reply": 19611, "next": 16465, "quest": 1444, "afterObjective": 8004, "beforeObjective": 8005 },
             { "reply": 19245 }
           ]
         },
@@ -27492,9 +27531,65 @@
           "choices": [
             { "reply": 19667, "quest": 1461, "completes": 8084, "params": [[30, 8084]] }
           ]
+        },
+        {
+          "message": 16412,
+          "choices": [
+            { "reply": 19548, "next": 16413 }
+          ]
+        },
+        {
+          "message": 16413,
+          "choices": [
+            { "reply": 19547, "next": 16414 }
+          ]
+        },
+        {
+          "message": 16414,
+          "choices": [
+            { "reply": 19546, "next": 16415 }
+          ]
+        },
+        {
+          "message": 16415,
+          "choices": [
+            { "reply": 19545, "next": 16416 }
+          ]
+        },
+        {
+          "message": 16416,
+          "choices": [
+            { "reply": 19543, "next": 16417 },
+            { "reply": 19544 }
+          ]
+        },
+        {
+          "message": 16417,
+          "choices": [
+            { "reply": 19542, "next": 16418 }
+          ]
+        },
+        {
+          "message": 16418,
+          "choices": [
+            { "reply": 19541, "startsQuest": 1444, "params": [[34, 1444]] }
+          ]
+        },
+        {
+          "message": 16465,
+          "names": true,
+          "choices": [
+            { "reply": 19610, "next": 16466 }
+          ]
+        },
+        {
+          "message": 16466,
+          "choices": [
+            { "reply": 19609, "quest": 1444, "completes": 8005, "params": [[30, 8005]] }
+          ]
         }
       ],
-      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424, level 80 after «Proteger y servir»): «Hablemos sobre el reino de Amakna.» (19297) gets the alliances that please him but something that does not fit (16261), «Hacerle preguntas para averiguar más cosas.» (19296) the king's councillor Makia Vhelika, who hides something (16262), «¿Quieres que haga una investigación?» (19294) his trust (16263) and «Voy a ir al castillo.» (19293) starts it; «Hasta luego.» (19295) leaves. «¡Mira! La cabeza de la marioneta.» (19326) shows the head (7918, kept) and ends it: the symbol (16278), «Informarle de tus descubrimientos.» (19325) the headache (16279), «¿De quién hablas?» (19324) Dramak the Plotter (16280), «¿Qué piensas hacer para remediar la situación?» (19323) the plan (16281), where «Acepto la misión.» (19328) starts «Como una marioneta» (1425, 16282, «Voy en busca de Dramak.» 19327) and the doctor's excuse (19329) leaves. Declined then, «¿Qué cuentas hacer a propósito de Dramak?» (19333) offers it again with the second copy of those lines (16283-16284, 19330-19332). «Como una marioneta» (Ainsi font les petites marionnettes, Dofus pour les noobs): «Annoncez lui alors votre victoire contre Dramak». «He vencido a Dramak.» (19336), once Dramak has been talked to (7922), gets his congratulations and the promise of his shield (16285), «Aprender el arte de blandir el escudo.» (19335) is 7923 and ends the quest with the attitude, and he congratulates again (16286). «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Dîtes alors à celui-ci que vous êtes envoyé par Lumino afin de pénétrer la Dimension Obscure». «Lúmino me ha pedido que entre en la dimensión obscura.» (19671) gets his laugh and Sombra freed by Sylargh (16516), «Seguir escuchando.» (19670) the ice gallery and the five multimen (16517), «Seguir escuchando.» (19669) Bowis and the freed brothers (16518), «¿Qué puedes contarme sobre la leyenda?» (19668) the cobbler who knows it better (16519), and «Tranquilo, tendré mucho cuidado. Ahora voy a ver a Bowis.» (19667) is 8084."
+      "why": "Captain Amakna on the village square, «Proteger y servir» (Protéger et sévir, Dofus pour les noobs): «La quête se lance en [0,0] auprès du Captain Amakna», daily (repeatType 1), from level 10 (PL>9). «¿Quién eres tú?» (16222). The first time «¿No necesitas ayuda?» (16223) tells of the criminals grown in number while he chased Sylargh, the recruiting of super-assistants (16224), and «Acepto.» starts it (16225). «Los bandidos han salido corriendo.» once the three are beaten ends it (7904, 16227: «¡Has aprobado el examen!»). On later days «Estoy dispuesto a devolver el orden al pueblo de Amakna.» starts it again (16228) and the same report ends it (16229). The client also holds a second copy of the recruiting lines (16524-16526, replies 19677-19681) with the same words; the first is used. «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424, level 80 after «Proteger y servir»): «Hablemos sobre el reino de Amakna.» (19297) gets the alliances that please him but something that does not fit (16261), «Hacerle preguntas para averiguar más cosas.» (19296) the king's councillor Makia Vhelika, who hides something (16262), «¿Quieres que haga una investigación?» (19294) his trust (16263) and «Voy a ir al castillo.» (19293) starts it; «Hasta luego.» (19295) leaves. «¡Mira! La cabeza de la marioneta.» (19326) shows the head (7918, kept) and ends it: the symbol (16278), «Informarle de tus descubrimientos.» (19325) the headache (16279), «¿De quién hablas?» (19324) Dramak the Plotter (16280), «¿Qué piensas hacer para remediar la situación?» (19323) the plan (16281), where «Acepto la misión.» (19328) starts «Como una marioneta» (1425, 16282, «Voy en busca de Dramak.» 19327) and the doctor's excuse (19329) leaves. Declined then, «¿Qué cuentas hacer a propósito de Dramak?» (19333) offers it again with the second copy of those lines (16283-16284, 19330-19332). «Como una marioneta» (Ainsi font les petites marionnettes, Dofus pour les noobs): «Annoncez lui alors votre victoire contre Dramak». «He vencido a Dramak.» (19336), once Dramak has been talked to (7922), gets his congratulations and the promise of his shield (16285), «Aprender el arte de blandir el escudo.» (19335) is 7923 and ends the quest with the attitude, and he congratulates again (16286). «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Dîtes alors à celui-ci que vous êtes envoyé par Lumino afin de pénétrer la Dimension Obscure». «Lúmino me ha pedido que entre en la dimensión obscura.» (19671) gets his laugh and Sombra freed by Sylargh (16516), «Seguir escuchando.» (19670) the ice gallery and the five multimen (16517), «Seguir escuchando.» (19669) Bowis and the freed brothers (16518), «¿Qué puedes contarme sobre la leyenda?» (19668) the cobbler who knows it better (16519), and «Tranquilo, tendré mucho cuidado. Ahora voy a ver a Bowis.» (19667) is 8084. «Pollution, je dis non» (Dofus pour les noobs): «Parlez au Captain Amakna et demandez lui ce qui le préoccupe». «Capitán, pareces preocupado.» (19549, level 180 and «Como una marioneta» done) gets the sick fishers (16412), «Seguir escuchando.» (19548) the heavy technomagic oil (16413), «Probablemente se trata de una contaminación accidental.» (19547) Buuky's word on Merkator (16414), «¿Quién es Merkator?» (19546) the mad cartographer (16415), «También puedes contar conmigo.» (19545) his request (16416), «Dime lo que necesitas.» (19543) the source to find (16417), «Hmm... Quizás los steamers puedan localizar el lugar exacto.» (19542) the steamer diver of Astrub (16418), and «Voy a Astrub.» (19541) starts the quest. Back with the cleaner handed over (8004), «He arreglado el problema de contaminación del río.» (19611) gets 16465, «Solo he hecho lo que tenía que hacer.» (19610) the hammer head (16466) and «Gracias. Hasta luego.» (19609) ends it (8005). The template's replies, each to the message of its rank."
     },
     {
       "npc": 2170,
@@ -30155,6 +30250,270 @@
         }
       ],
       "why": "Sombra in his pyramid's Exit room once beaten, still boasting (16589). «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Une fois que vous avez vaincu Ombre parlez lui et attachez le avec les chaînes au sol de la Pyramide. Apprenez lui alors qu'il est de nouveau prisonnier et qu'il n'est pas prêt de se libérer. Il vous menace alors avant que vous ne partiez». With the chains of life (14956), «Mira estas cadenas que te retienen ahora al suelo de la pirámide.» (19752) gets his rage at Ereziah's light (16590), «Vuelves a ser prisionero de esta dimensión.» (19751) his threat (16591), and «Salir de la Pirámide de Sombra.» (19750) is 8104 and leaves (dungeon_exits.json). «Háblame sobre ti.» (19995) gets his creed (16782), «¿Qué puedes contarme sobre los multimen?» (19994) his solitude (16783) and «Quedarte un rato más.» (19993) his first words again; «Salir de la Pirámide de Sombra.» (19753, 19992) leaves."
+    },
+    {
+      "npc": 2171,
+      "map": 88085268,
+      "opening": 16226,
+      "openings": [
+        { "quest": 1444, "objective": 7985, "pending": 7993, "message": 16438 },
+        { "quest": 1444, "objective": 7993, "pending": 7994, "message": 16440 }
+      ],
+      "lines": [
+        {
+          "message": 16226,
+          "choices": [
+            { "reply": 19244 }
+          ]
+        },
+        {
+          "message": 16438,
+          "choices": [
+            { "reply": 19575, "next": 16439 }
+          ]
+        },
+        {
+          "message": 16439,
+          "choices": [
+            { "reply": 19574, "quest": 1444, "completes": 7992, "params": [[30, 7992]] }
+          ]
+        },
+        {
+          "message": 16440,
+          "choices": [
+            { "reply": 19579, "next": 16441 }
+          ]
+        },
+        {
+          "message": 16441,
+          "choices": [
+            { "reply": 19578, "next": 16442 }
+          ]
+        },
+        {
+          "message": 16442,
+          "choices": [
+            { "reply": 19577, "next": 16443, "quest": 1444, "holds": 14874 }
+          ]
+        },
+        {
+          "message": 16443,
+          "choices": [
+            { "reply": 19576, "quest": 1444, "completes": 7994, "params": [[30, 7994]], "takes": 14874 }
+          ]
+        }
+      ],
+      "why": "Buuky at the river mouth [10,3], once the scout machangrejo is beaten. «Pollution, je dis non» (Dofus pour les noobs): «Une fois le combat terminé, parlez à Beurky... Il vous annonce que d'autre méchants arrivent et il va vous aider à les vaincre». «He vencido a los adversarios más tenaces.» (19575) gets the mercenarinos coming (16439) and «Prepararte para el combate.» (19574) is 7992 and the fight beside him (npc_fights.json). Once they are beaten (7993): «Gracias por tu ayuda. ¿Qué haces aquí?» (19579) gets the Captain's errand (16440-16441), «Acepto esta peligrosa misión.» (19578) Tekar Howar in Sufokia (16442), «Comprobar que la pikosonda ha conseguido tomar las muestras y, luego, darle el objeto a Buuky.» (19577) with the dented pikosonda (16443), and «Despedirte e ir a Sufokia.» (19576) hands it over and is 7994."
+    },
+    {
+      "npc": 1597,
+      "map": 0,
+      "opening": 11916,
+      "lines": [
+        {
+          "message": 11916,
+          "choices": [
+            { "reply": 19587, "next": 16445, "quest": 1444, "afterObjective": 7994, "beforeObjective": 7995 },
+            { "reply": 19539 }
+          ]
+        },
+        {
+          "message": 16445,
+          "choices": [
+            { "reply": 19586, "next": 16446 }
+          ]
+        },
+        {
+          "message": 16446,
+          "choices": [
+            { "reply": 19585, "quest": 1444, "completes": 7995, "params": [[30, 7995]], "next": 16447 }
+          ]
+        },
+        {
+          "message": 16447,
+          "choices": [
+            { "reply": 19584, "next": 16448, "beforeQuest": 1442 },
+            { "reply": 19581 }
+          ]
+        },
+        {
+          "message": 16448,
+          "choices": [
+            { "reply": 19582, "next": 16449 },
+            { "reply": 19583 }
+          ]
+        },
+        {
+          "message": 16449,
+          "names": true,
+          "choices": [
+            { "reply": 19588, "startsQuest": 1442, "params": [[34, 1442]] }
+          ]
+        }
+      ],
+      "why": "Tekar Howar at the dig site of Sufokia. «Pollution, je dis non» (Dofus pour les noobs): «Commencez par vous rendre en Sufokia... Apprenez alors à Pam que vous êtes envoyé par le Captain pour rencontrer le Merkator. Demandez à Pam comment vous rendre auprès du Merkator». «Capitán Amakna me envía para decirle un par de palabras a Merkator.» (19587) gets 16445, «¿Cómo puedo ir a ver a Merkator?» (19586) the lift to the abyssal base and Gustavo Hifel (16446), and «Gracias por la información.» (19585) is 7995 — and her «Antes de que te vayas...» (16447), whose «Pedir más información.» (19584) leads to her own quest, «Profundímetro» (1442, 16448-16449). The template's replies, each to the message of its rank."
+    },
+    {
+      "npc": 1596,
+      "map": 0,
+      "opening": 11915,
+      "lines": [
+        {
+          "message": 11915,
+          "choices": [
+            { "reply": 19592, "next": 16450, "quest": 1444, "afterObjective": 7995, "beforeObjective": 7996 },
+            { "reply": 19503 }
+          ]
+        },
+        {
+          "message": 16450,
+          "choices": [
+            { "reply": 19591, "next": 16451 }
+          ]
+        },
+        {
+          "message": 16451,
+          "choices": [
+            { "reply": 19590, "next": 16452 }
+          ]
+        },
+        {
+          "message": 16452,
+          "choices": [
+            { "reply": 19589, "quest": 1444, "completes": 7996, "params": [[30, 7996]], "gives": 14795, "givesCount": 12 }
+          ]
+        }
+      ],
+      "why": "Gustavo Hifel on the way down to the abyssal base. «Pollution, je dis non» (Dofus pour les noobs): «Allez voir Estave Guiffel... parlez à Estave afin de l'interroger sur l'accès à l'Aquadôme de Merkator... il faut actionner des leviers qui ouvriront des portes. Cependant pour faire fonctionner ces leviers il faut des piles Steamers... Estave vous donne quelques piles». «Interrogarle acerca del acceso al Acuadomo de Merkator.» (19592) gets the key he made (16450), «¿Qué me puedes contar sobre el acceso a los diferentes niveles de la base?» (19591) the lifts and the levers (16451), «¿No tienes algunas pilas guardadas, por casualidad?» (19590) «puedo darte algunas» (16452), and «Gracias. Hasta luego.» (19589) is 7996 with the batteries. INFERRED count: twelve, what «Chemin vers le donjon Aquadôme de Merkator» (Dofus pour les noobs) says the long way spends."
+    },
+    {
+      "npc": 2196,
+      "map": 0,
+      "opening": 16404,
+      "lines": [
+        {
+          "message": 16404,
+          "choices": [
+            { "reply": 19532, "quest": 1444, "completes": 7998, "params": [[30, 7998]], "next": 16404, "afterObjective": 7997, "beforeObjective": 7998 }
+          ]
+        }
+      ],
+      "why": "Teo Dolito, the Sea Council's agent at the Aquadome's door. «Pollution, je dis non» (Dofus pour les noobs): «Maintenant il vous suffit de suivre le chemin pour accéder au Merkator puis parlez à Théo Dolith». «Tengo previsto ir a ver a Merkator.» (19532) is 7998 and brings his line back, with the key and the keyring the door offers by itself (DungeonDoor)."
+    },
+    {
+      "npc": 2197,
+      "map": 119278083,
+      "opening": 16455,
+      "lines": [
+        {
+          "message": 16455,
+          "choices": [
+            { "reply": 19600, "next": 16456, "quest": 1444, "afterObjective": 7999, "beforeObjective": 8000 },
+            { "reply": 19604, "next": 16460 },
+            { "reply": 19605 }
+          ]
+        },
+        {
+          "message": 16456,
+          "choices": [
+            { "reply": 19599, "next": 16457 }
+          ]
+        },
+        {
+          "message": 16457,
+          "choices": [
+            { "reply": 19598, "next": 16458 }
+          ]
+        },
+        {
+          "message": 16458,
+          "choices": [
+            { "reply": 19597, "next": 16459 }
+          ]
+        },
+        {
+          "message": 16459,
+          "choices": [
+            { "reply": 19596, "quest": 1444, "completes": 8000, "params": [[30, 8000]] }
+          ]
+        },
+        {
+          "message": 16460,
+          "choices": [
+            { "reply": 19603, "next": 16461 }
+          ]
+        },
+        {
+          "message": 16461,
+          "choices": [
+            { "reply": 19601 },
+            { "reply": 19602 }
+          ]
+        }
+      ],
+      "why": "Merkator in the Aquadome's Exit room, beaten. «Pollution, je dis non» (Dofus pour les noobs): «Une fois le Merkator vaincu, reparlez lui afin de lui ordonner d'arrêter la pollution de la rivière». «Merkator, ¡deja de contaminar el río Kawaii ahora mismo!» (19600) gets his denial (16456), «Pues tus esbirros me han atacado en la desembocadura del río.» (19599) 16457, «La sustancia incriminada es un aceite pesado tecnomágico.» (19598) the barrels sold to an illuminated one (16458), «Exijo que me cuentes más sobre la iluminada.» (19597) the osamodas of Lefúleo (16459), and «Darle algunas réplicas sinceras e irte.» (19596) is 8000 and leaves the Aquadome (dungeon_exits.json), like «Salir del Acuadomo de Merkator.» (19605) and «Encogerte de hombros y salir del Acuadomo.» (19601); «Háblame más de ti.» (19604) gets his work (16460-16461)."
+    },
+    {
+      "npc": 2198,
+      "map": 68422664,
+      "opening": 16463,
+      "lines": [
+        {
+          "message": 16463,
+          "choices": [
+            { "reply": 19612, "next": 16467, "quest": 1444, "afterObjective": 8001, "beforeObjective": 8002 },
+            { "reply": 19613, "quest": 1444, "afterObjective": 8002, "beforeObjective": 8003 },
+            { "reply": 19619 }
+          ]
+        },
+        {
+          "message": 16467,
+          "choices": [
+            { "reply": 19618, "next": 16468 }
+          ]
+        },
+        {
+          "message": 16468,
+          "choices": [
+            { "reply": 19614 },
+            { "reply": 19615 },
+            { "reply": 19617 },
+            { "reply": 19616, "next": 16469 }
+          ]
+        },
+        {
+          "message": 16469,
+          "choices": [
+            { "reply": 19625, "next": 16470 }
+          ]
+        },
+        {
+          "message": 16470,
+          "choices": [
+            { "reply": 19624, "next": 16471 }
+          ]
+        },
+        {
+          "message": 16471,
+          "choices": [
+            { "reply": 19623, "next": 16472 }
+          ]
+        },
+        {
+          "message": 16472,
+          "choices": [
+            { "reply": 19622, "next": 16473 }
+          ]
+        },
+        {
+          "message": 16473,
+          "choices": [
+            { "reply": 19620, "quest": 1444, "completes": 8002, "params": [[30, 8002]] },
+            { "reply": 19621, "quest": 1444, "completes": 8002, "params": [[30, 8002]] }
+          ]
+        }
+      ],
+      "why": "Omoca Dicaz south of Madrestam [13,1]. «Pollution, je dis non» (Dofus pour les noobs): «Parlez à Omoca Dicaz et faites lui comprendre que vous voulez de l'huile lourde... Annoncez lui être fervent admirateur de son dieu Retazoum... Agenouillez vous alors devant elle... félicitez la pour la pollution de la Kawaii... Attaquez la alors». «Me gustaría conseguir algo de aceite pesado.» (19612), «Guiñarle y decirle que eres adepto a su dios.» (19618), her god is Lefúleo (19616; Osamodas, Aceitator and Merkator bring Tofuel instead, npc_fights.json), «Seguirle el juego y arrodillarte.» (19625), «Felicidades por la contaminación del Kawaii.» (19624), «Reír con ella y preguntar...» (19623), «¿Qué es el Súper Limpiador?» (19622); then «Mostrar una gran sonrisa y atacar» (19620) or «Dejar el enfrentamiento para más tarde.» (19621) are 8002 — «la quête se mettra à jour sur tous les personnages ayant répondus \"Remettre l'affrontement à plus tard\"» — and «Atacar a Omoca Dicaz para arrebatarle su frasco de Súper Limpiador.» (19613) takes the fight up later."
     }
   ]
 }

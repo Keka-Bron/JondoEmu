@@ -1,3 +1,4 @@
+﻿using System;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace Jondo.Unity.Server.Managers
                 var slots = BonusSlots.SlotsFor(Forgemagic.TemplateOf(template)!.Type);
                 bool free = slots.Any(s => !Equipment.All.Any(i => i.Position == s));
                 if (free && await BonusItemHandler.PlaceAsync(stream, template, slots) != null) return true;
+                Console.WriteLine($"[QuestFollowers] Item {template}: its slot is {(free ? "refused" : "taken")}, to the bag.");
             }
             return await Equipment.GiveAsync(stream, template, count);
         }

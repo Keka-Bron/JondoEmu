@@ -888,6 +888,25 @@
     { "npc": 2173, "map": 115082755, "reply": 19310, "byLevel": true,
       "monsters": [ { "monster": 3498, "grade": 0 } ] },
     { "npc": 2173, "map": 115082755, "reply": 19311, "byLevel": true,
-      "monsters": [ { "monster": 3498, "grade": 0 } ] }
+      "monsters": [ { "monster": 3498, "grade": 0 } ] },
+    { "npc": 2171, "map": 88085268, "reply": 19574,
+      "monsters": [ { "monster": 3546, "grade": 0 }, { "monster": 3547, "grade": 0 }, { "monster": 3545, "grade": 0 } ],
+      "allies": [ { "monster": 3548, "grade": 0 } ],
+      "why": "«Vence a los mercenarinos con la ayuda de Buuky»: an imposing and a cruel mercenarino and a scout machangrejo, the three whose spells «Pollution, je dis non» (Dofus pour les noobs) lists, with Buuky (3548) on the character's side — «Le combat s'effectue encore une fois seul mais accompagné de Beurky. Beurky peut mourir le combat continuera». The imposing one drops the dented pikosonda (his own table, 100 %)." },
+    { "npc": 2198, "map": 68422664, "reply": 19620,
+      "monsters": [ { "monster": 3549, "grade": 0 } ],
+      "why": "«Mostrar una gran sonrisa y atacar a Omoca Dicaz para hacer triunfar la justicia.»: the fight for the Súper Limpiador (8003)." },
+    { "npc": 2198, "map": 68422664, "reply": 19613,
+      "monsters": [ { "monster": 3549, "grade": 0 } ],
+      "why": "«Atacar a Omoca Dicaz para arrebatarle su frasco de Súper Limpiador.»: the same fight, put off and taken up again." },
+    { "npc": 2198, "map": 68422664, "reply": 19614,
+      "monsters": [ { "monster": 3550, "grade": 0 } ],
+      "why": "A wrong name for her god: «si te equivocas Tofuel te mostrará el poder de mi verdadero maestro» (16468); «Pollution, je dis non» (Dofus pour les noobs): «Si vous vous trompez de réponses vous devrez combattre la bête ci-dessous et obtiendrez la malédiction». Tofuel drops the Maldición de Lefúleo (14887) under his own row «Qa=1444&Qo<8002&PO!14887»." },
+    { "npc": 2198, "map": 68422664, "reply": 19615,
+      "monsters": [ { "monster": 3550, "grade": 0 } ],
+      "why": "A wrong name for her god: «si te equivocas Tofuel te mostrará el poder de mi verdadero maestro» (16468); «Pollution, je dis non» (Dofus pour les noobs): «Si vous vous trompez de réponses vous devrez combattre la bête ci-dessous et obtiendrez la malédiction». Tofuel drops the Maldición de Lefúleo (14887) under his own row «Qa=1444&Qo<8002&PO!14887»." },
+    { "npc": 2198, "map": 68422664, "reply": 19617,
+      "monsters": [ { "monster": 3550, "grade": 0 } ],
+      "why": "A wrong name for her god: «si te equivocas Tofuel te mostrará el poder de mi verdadero maestro» (16468); «Pollution, je dis non» (Dofus pour les noobs): «Si vous vous trompez de réponses vous devrez combattre la bête ci-dessous et obtiendrez la malédiction». Tofuel drops the Maldición de Lefúleo (14887) under his own row «Qa=1444&Qo<8002&PO!14887»." }
   ]
 }

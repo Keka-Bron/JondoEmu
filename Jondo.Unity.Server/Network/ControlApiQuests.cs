@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -202,15 +202,17 @@ namespace Jondo.Unity.Server.Network
             int template = (int)Numero(cuerpo, "item");
             int count = 0, worn = 0;
             long uid = 0;
+            int[] positions = Array.Empty<int>();
             RunInSession(session, _ =>
             {
                 var mine = Managers.Equipment.All.Where(i => i.Template == template && i.Quantity > 0).ToList();
                 count = mine.Sum(i => i.Quantity);
                 worn = Managers.Equipment.HowManyWorn(template);
                 uid = mine.OrderByDescending(i => i.Position).FirstOrDefault()?.Uid ?? 0;
+                positions = mine.Select(i => i.Position).ToArray();
                 return Task.CompletedTask;
             });
-            return Bien(new { item = template, count, worn, uid });
+            return Bien(new { item = template, count, worn, uid, positions });
         }
 
         /// <summary>
@@ -264,13 +266,24 @@ namespace Jondo.Unity.Server.Network
             return Bien(new { map = session.State.MapId, cell = session.State.CellId, landed, lines = lines.Where(l => l.Contains("[Quest")).ToList() });
         }
 
-        /// <summary>{ item, quantity }: an item handed to the character as the administrator hands one.</summary>
+        /// <summary>
+        /// { item, quantity }: an item handed to the character as the administrator hands one; a
+        /// negative quantity takes it back instead, a follower out of his slot too -- what a quest
+        /// closed by hand leaves behind.
+        /// </summary>
         private static Respuesta TestGive(string cuerpo)
         {
             var session = TestSessionOnline();
             if (session == null) return Mal(404, "offline");
             int item = (int)Numero(cuerpo, "item");
-            int quantity = Math.Max(1, (int)Numero(cuerpo, "quantity"));
+            int asked = (int)Numero(cuerpo, "quantity");
+            if (asked < 0)
+            {
+                bool taken = false;
+                RunInSession(session, async stream => taken = await Managers.QuestFollowers.TakeAsync(stream, item, -asked));
+                return taken ? Bien(new { item, quantity = asked }) : Mal(422, "not carried");
+            }
+            int quantity = Math.Max(1, asked);
             if (!DatabaseManager.TryGetItemTemplateEffects(item, out _)) return Mal(404, $"item {item}");
             bool given = false;
             RunInSession(session, async stream => given = await CommandHandler.GrantItemAsync(stream, item, quantity) != null);

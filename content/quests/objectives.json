@@ -3716,6 +3716,72 @@
    "afterObjectives": [8101],
    "gives": [{"item": 14956, "count": 1}],
    "why": "«Encuentra las cadenas alquímicas forjadas por Ereziah»: «Rendez-vous dans la deuxième salle afin de cliquer sur la caisse. Vous obtenez alors dans votre inventaire de quêtes des Chaînes de Vie» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The second room's only element, the crate 484127 (cell 300), gives 14956."
+  },
+  {
+   "objective": 7979,
+   "quest": 1444,
+   "kind": "use",
+   "map": 88082201,
+   "afterObjectives": [7978],
+   "why": "«Activa la pikosonda cerca del templo de Pandawa»: the Pikosonda used (its effect 30 is this objective, its 193 makes it the Pikosonda activada, a follower) at [4,-2]; «Rendez-vous maintenant devant le temple Pandawa en [4,-2] puis cliquez sur la pikosonde afin de l'activer» («Pollution, je dis non» (Dofus pour les noobs))."
+  },
+  {
+   "objective": 7980,
+   "quest": 1444,
+   "kind": "enter",
+   "map": 68420616,
+   "afterObjectives": [7979],
+   "why": "«Ve a la posición indicada por la pikosonda»: [9,1], «Celle-ci vous indique alors une nouvelle position. Rendez-vous donc en [9,1]»."
+  },
+  {
+   "objective": 7981,
+   "quest": 1444,
+   "kind": "enter",
+   "map": 68421128,
+   "afterObjectives": [7980],
+   "why": "«Ve a la posición indicada por la pikosonda»: [10,1], «allez en [10,1] sur la map de droite»."
+  },
+  {
+   "objective": 7982,
+   "quest": 1444,
+   "kind": "enter",
+   "map": 88085268,
+   "afterObjectives": [7981],
+   "why": "«Ve a la posición indicada por la pikosonda»: the river mouth [10,3], «Et enfin descendez encore une fois pour arriver en [10,3]»."
+  },
+  {
+   "objective": 7983,
+   "quest": 1444,
+   "elements": [{"map": 88085268, "element": 483322}],
+   "afterObjectives": [7982],
+   "requires": [{"item": 14869, "count": 1}],
+   "spends": true,
+   "why": "«Utiliza la pikosonda para tomar una muestra de agua»: the strange shape in the water at [10,3] (element 483322, graphic 37507, cell 149), where the activated pikosonda dives and does not come back: «Cliquez alors sur la forme étrange dans l'eau. La pikosonda a alors plongé dans l'eau»."
+  },
+  {
+   "objective": 7984,
+   "quest": 1444,
+   "elements": [{"map": 88085268, "element": 483322}],
+   "afterObjectives": [7983],
+   "spawns": {"monster": 3545, "count": 1, "attacks": true},
+   "why": "«Examina el borde para ver si puedes recuperar la pikosonda»: the same shape clicked again — «Tentez de la récupérer en re-cliquant sur la forme étrange dans l'eau. Vous vous faites alors agresser par un Krabouilleur Éclaireur. Le combat va s'effectuer seul» (the scout machangrejo, 3545, objective 7985)."
+  },
+  {
+   "objective": 7993,
+   "quest": 1444,
+   "kind": "beat",
+   "monster": 3546,
+   "map": 88085268,
+   "afterObjectives": [7992],
+   "why": "«Vence a los mercenarinos con la ayuda de Buuky»: the fight Buuky's «Prepararte para el combate.» starts (npc_fights.json), led by the imposing mercenarino."
+  },
+  {
+   "objective": 8001,
+   "quest": 1444,
+   "kind": "enter",
+   "map": 68422664,
+   "afterObjectives": [8000],
+   "why": "«Encuentra a la osamodas al sur de Madrestam»: «Rendez-vous en [13,1] pour rencontrer l'Osamodas pollueuse» («Pollution, je dis non» (Dofus pour les noobs))."
   }
  ]
 }

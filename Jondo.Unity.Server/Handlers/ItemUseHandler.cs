@@ -98,7 +98,13 @@ namespace Jondo.Unity.Server.Handlers
                     if (!kept) await Equipment.TakeAsync(stream, item.Template, 1);
                     foreach (var (template, count) in gains)
                     {
-                        if (!await WorkshopHandler.GiveAsync(stream, template, count)) continue;
+                        // A follower walks behind the character instead of going to the bag: the
+                        // Pikosonda of «Prestigio y contaminación» turns into the Pikosonda activada
+                        // (type 32), «Vous obtenez alors la Pikosonde en personnage suiveur».
+                        bool handed = Managers.QuestFollowers.IsFollower(template)
+                            ? await Managers.QuestFollowers.GiveAsync(stream, template, count)
+                            : await WorkshopHandler.GiveAsync(stream, template, count);
+                        if (!handed) continue;
                         await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                             ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained,
                                 count.ToString(), template.ToString())));
