@@ -1,6 +1,19 @@
 {
   "source": "Sadida 3.6.10.10: Arbre.pcapng packets 57-58, LarmeDeSadida.pcapng packet 57, ArbreFeuillu.pcapng packet 25. Appearance 1177 changes to bones 3164 at scale 70.",
+  "steamerTurrets": "The Steamer's turrets at Evolución II and III: 13851 and 13852 change each turret's look (149) to an appearance the client's AppearanceData (182 entries) does not carry, so the server sends the look. INFERRED from the bones: each turret's template look is the first of three consecutive bones the client ships (bones_assets_bone_N.bundle), the next one for II and the one after for III -- the arponera 5836 is {7754}, 2545 at II, 2546 at III; the guardiana 5835 {7757}, 2541/2542; the tactiquilla 5837 {7725}, 2539/2540; the arrastrero 5832 {7722}, 2537/2538; the batiscafo 5831 {7763}, 2543/2544; the perforadora 5833 {7760}, 2547/2548.",
   "looks": {
-    "1177": "{3164|||70}"
+    "1177": "{3164|||70}",
+    "2537": "{7723}",
+    "2538": "{7724}",
+    "2539": "{7726}",
+    "2540": "{7727}",
+    "2541": "{7758}",
+    "2542": "{7759}",
+    "2543": "{7764}",
+    "2544": "{7765}",
+    "2545": "{7755}",
+    "2546": "{7756}",
+    "2547": "{7761}",
+    "2548": "{7762}"
   }
 }
