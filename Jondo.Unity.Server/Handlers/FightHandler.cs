@@ -107,7 +107,11 @@ namespace Jondo.Unity.Server.Handlers
             //
             // The ToList copy is not cosmetic: GetFightWalkable returns MapManager's live HashSet,
             // and GeneratePlacementCells would get the map's data for good.
-            fight.GeneratePlacementCells(PlacementGround(arenaMapId));
+            //
+            // Drawn anew for each fight, as the real game's change from one to the next on a map
+            // (PlacementLayout), and ahead of it: the one its preview has shown (TakePlacement).
+            var (attackers, defenders) = TakePlacement(mapId, arenaMapId);
+            fight.SetPlacementCells(attackers, defenders);
 
             // A raid arena that flags its own placement is placed as its map says when the group
             // fits its side: the Reina's two cells in each of her jails, the chess's four, the
@@ -508,12 +512,10 @@ namespace Jondo.Unity.Server.Handlers
             }
             else
             {
-                // The same cells as an ordinary fight, and for the same reason: the seeding filter
-                // leaves two of an arena's seventy-seven and both would end up on top of each other.
-                var enCombate = MapManager.GetFightWalkable(arenaMapId);
-                fight.GeneratePlacementCells(enCombate != null && enCombate.Count > 0
-                    ? new List<int>(enCombate)
-                    : MobSpawnManager.GetInnerWalkableCells(arenaMapId));
+                // The same cells as an ordinary fight -- the fight-walkable ones, not the seeding
+                // filter's two of seventy-seven -- and the same next placement, the one shown.
+                var (attackers, defenders) = TakePlacement(mapId, arenaMapId);
+                fight.SetPlacementCells(attackers, defenders);
             }
 
             // Who the fight is against, which is what the entry's kmu names. In a challenge it is
@@ -1476,12 +1478,44 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static IReadOnlyList<int> DefenderPlacement(long mapId) => Placement(mapId).Defenders;
 
-        /// <summary>Both teams' placement cells for a fight on this map, the way a fight computes them.</summary>
+        /// <summary>
+        /// Both teams' placement cells for the next fight on this map: what its preview (L, the kaz)
+        /// shows and what that fight will have.
+        /// </summary>
         public static (List<int> Attackers, List<int> Defenders) Placement(long mapId)
         {
-            long arenaMapId = MapManager.ResolveArenaMapId(mapId);
+            var (attackers, defenders) = NextPlacement(mapId, MapManager.ResolveArenaMapId(mapId));
+            return (attackers.ToList(), defenders.ToList());
+        }
+
+        /// <summary>The next fight's placement on each arena, drawn ahead and kept until a fight takes it.</summary>
+        private static readonly ConcurrentDictionary<long, (List<int> Attackers, List<int> Defenders)> _nextPlacement = new();
+
+        /// <summary>
+        /// The placement the next fight on this arena will have. It is drawn anew for every fight
+        /// (PlacementLayout), but ahead of it: the preview shows the cells the fight will really
+        /// use, and a new draw only after a fight has taken them. Drawn at the start of the fight,
+        /// the preview showed one placement -- the fixed one -- and the fight had another. A dream's
+        /// room keeps its fixed one, which its bestiary tells beforehand.
+        /// </summary>
+        internal static (List<int> Attackers, List<int> Defenders) NextPlacement(long mapId, long arenaMapId)
+        {
+            if (Managers.Dreams.IsDreamMap(mapId)) return Drawn(mapId, arenaMapId, null);
+            return _nextPlacement.GetOrAdd(arenaMapId, arena => Drawn(mapId, arena, Random.Shared));
+        }
+
+        /// <summary>A fight takes its arena's next placement; the one after is drawn when next asked for.</summary>
+        internal static (List<int> Attackers, List<int> Defenders) TakePlacement(long mapId, long arenaMapId)
+        {
+            var placement = NextPlacement(mapId, arenaMapId);
+            _nextPlacement.TryRemove(arenaMapId, out _);
+            return placement;
+        }
+
+        private static (List<int> Attackers, List<int> Defenders) Drawn(long mapId, long arenaMapId, Random? dice)
+        {
             var fight = new FightInstance(0, mapId, arenaMapId);
-            fight.GeneratePlacementCells(PlacementGround(arenaMapId));
+            fight.GeneratePlacementCells(PlacementGround(arenaMapId), dice!);
             return (fight.BluePlacementCells.ToList(), fight.RedPlacementCells.ToList());
         }
 
