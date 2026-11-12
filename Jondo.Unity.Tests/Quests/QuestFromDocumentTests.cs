@@ -78,7 +78,7 @@ namespace Jondo.Unity.Tests.Quests
                     await QuestHandler.DetailAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Iec,
                         Pb.New().Var(1, Poster).Var(2, -1).Build()));
                     await pipe.Next(Op.Idu);
-                    await QuestEngine.SendJournalAsync(pipe.ToClient);
+                    await QuestEngine.SendJournalAsync(pipe.ToClient, box: true);
                     await pipe.Next(Op.Idr);
                     var iel = ProtoMessage.Parse(await pipe.Next(Op.Iel)).Fields;
                     var entry = ProtoMessage.Parse(Assert.Single(iel).BytesValue);
