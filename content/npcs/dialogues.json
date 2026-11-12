@@ -18777,13 +18777,25 @@
         {
           "message": 10432,
           "choices": [
-            { "reply": 11430, "startsQuest": 837, "params": [[34, 837]] },
+            { "reply": 11430, "startsQuest": 837, "params": [[34, 837]], "next": 11614 },
             { "reply": 11434 }
           ]
         },
         {
-          "message": 10433,
+          "message": 11614,
           "choices": []
+        },
+        {
+          "message": 10433,
+          "choices": [
+            { "reply": 11433, "next": 10435, "quest": 837, "completesAll": [5296, 5298, 5300, 5301, 5611], "params": [[30, 5296]] }
+          ]
+        },
+        {
+          "message": 10435,
+          "choices": [
+            { "reply": 11437, "next": 10437 }
+          ]
         },
         {
           "message": 10437,
@@ -18834,7 +18846,7 @@
           ]
         }
       ],
-      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello). «Faites l'amour, pas la guerre» (837) of Dofus pour les noobs: part of her plan, a brew to calm the wabbits' warlike ardour (10432, «Vale, te ayudo»), bring everything at once (10433: the egg, a ripe cawotte, the grated cawotte juice, a squashed black wabbit and Patxi Fista's blood, on a hello). «Ça sent la cawotte» (838): the potion done, a few drops in growing cawottes with a syringe (10437, «¡Sí, señor!»: the syringe 12880), the island's cawottes (10438). «Il y a un os, de Wabbit» (839) of Dofus pour les noobs: skeleton wabbits eat no cawottes, the tombs' islet (10439, «Vale, te ayudaré»); Eliebwe Palp Atynte's information, ask the zollo of the ancient times (15962: 5311); Wob's words, the wabbits themselves must be asked (15963: 5315). «Art gastronomique» (840): «what if we caught some wabbits?», sailors came by with live wabbits for a barbecue (15965, 15964; «Vale, voy a capturar algunos wabbits»)."
+      "why": "Emilia the zolla on the Cawotte island [24,-3]: without a remedy for the myxomawosis you go blind (465). «Sauvegarder l'espèce» (836) of Dofus pour les noobs: since that terrible night her people go from bad to worse, four things hidden on the island (10429, «Aceptar»; 10430 while they are looked for, each handed on a hello). «Faites l'amour, pas la guerre» (837) of Dofus pour les noobs: part of her plan, a brew to calm the wabbits' warlike ardour (10432, «Vale, te ayudo»), bring everything at once (10433: the egg, a ripe cawotte, the grated cawotte juice, a squashed black wabbit and Patxi Fista's blood, on a hello). «Ça sent la cawotte» (838): the potion done, a few drops in growing cawottes with a syringe (10437, «¡Sí, señor!»: the syringe 12880), the island's cawottes (10438). «Il y a un os, de Wabbit» (839) of Dofus pour les noobs: skeleton wabbits eat no cawottes, the tombs' islet (10439, «Vale, te ayudaré»); Eliebwe Palp Atynte's information, ask the zollo of the ancient times (15962: 5311); Wob's words, the wabbits themselves must be asked (15963: 5315). «Art gastronomique» (840): «what if we caught some wabbits?», sailors came by with live wabbits for a barbecue (15965, 15964; «Vale, voy a capturar algunos wabbits»). «Haz el amor y no la guerra» (837): «Tráeme todos los ingredientes al mismo tiempo» (10433), so «Toma los ingredientes.» hands the five over together — the egg, the ripe carrot, the juice, the crushed black wabbit and Patxi Fista's blood — and the potion she brews (10435) leads to the next task (10437, «Ça sent la cawotte» in Dofus pour les noobs). Accepting it, she remembers Patxi Fista's blood (11614), the one ingredient her list leaves out."
     },
     {
       "npc": 1470,
