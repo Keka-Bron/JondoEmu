@@ -192,5 +192,32 @@ namespace Jondo.Unity.Tests.Combat
             stand = MonsterTactics.Reposition(Board(dying, player), dying, new[] { fist });
             Assert.True(MapGeometry.Distance(stand[^1], player.CellId) > 3);
         }
+
+        /// <summary>
+        /// A melee one that cannot reach its enemy this turn walks toward it the way it can go, not
+        /// as the crow flies: the cell nearest as the crow flies is against a wall, a dead end it
+        /// would never leave. Feu Follets stood there turn after turn until the player came to them.
+        /// </summary>
+        [Fact]
+        public void A_melee_one_walks_around_a_wall_rather_than_into_it()
+        {
+            var (x0, y0) = MapGeometry.CellToPoint(Centre);
+            var brute = Monster(mp: 3);
+            var player = Player(1, MapGeometry.PointToCell(x0 + 6, y0));
+            // A wall two columns ahead, open below it.
+            bool Wall(int cell)
+            {
+                var (x, y) = MapGeometry.CellToPoint(cell);
+                return x == x0 + 2 && y <= y0 + 1 && y >= y0 - 12;
+            }
+            var board = new MonsterTactics.Board { Fighters = new[] { brute, player }, Walkable = cell => MapGeometry.IsValid(cell) && !Wall(cell) };
+
+            var stand = MonsterTactics.Reposition(board, brute, new[] { Hit(max: 1) })[^1];
+
+            var deadEnd = MapGeometry.PointToCell(x0 + 1, y0);
+            Assert.NotEqual(deadEnd, stand);
+            var walk = MonsterTactics.WalkingDistances(board, player.CellId);
+            Assert.True(walk[stand] < walk[deadEnd]);
+        }
     }
 }

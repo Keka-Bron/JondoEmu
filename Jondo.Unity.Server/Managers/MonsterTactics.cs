@@ -574,14 +574,54 @@ namespace Jondo.Unity.Server.Managers
                                     .OrderBy(kv => kv.Value.Count).FirstOrDefault();
                     if (next.Value != null) { chosen = next; break; }
                 }
+                // Toward the nearest by the steps it would take to get there, not as the crow flies:
+                // the cell nearest as the crow flies is often across a hole or behind crates, a dead
+                // end it never leaves -- Feu Follets stood there turn after turn, their turns passed
+                // at once, until the player came to them.
                 if (chosen.Value == null)
-                    chosen = cells.OrderBy(kv => Nearest(kv.Key)).ThenBy(kv => kv.Value.Count).First();
+                {
+                    var walks = enemies.Select(e => WalkingDistances(board, e.CellId)).ToList();
+                    int Steps(int cell)
+                    {
+                        int best = int.MaxValue;
+                        foreach (var walk in walks)
+                            if (walk.TryGetValue(cell, out int steps) && steps < best) best = steps;
+                        return best == int.MaxValue ? UnreachableSteps + Nearest(cell) : best;
+                    }
+                    chosen = cells.OrderBy(kv => Steps(kv.Key)).ThenBy(kv => Nearest(kv.Key)).ThenBy(kv => kv.Value.Count).First();
+                }
             }
             return chosen.Value;
         }
 
         /// <summary>What ending the turn out of every enemy's sight is worth, in cells of distance.</summary>
         private const int HiddenWorth = 2;
+
+        /// <summary>Steps counted for a cell no walk leads to from any enemy: behind every reachable one.</summary>
+        private const int UnreachableSteps = 1000;
+
+        /// <summary>
+        /// How many steps each walkable cell is from <paramref name="from"/>, walking on the board's
+        /// floor around holes and obstacles. The fighters are walked through: they move, and a
+        /// cell behind one is still the way.
+        /// </summary>
+        internal static Dictionary<int, int> WalkingDistances(Board board, int from)
+        {
+            var steps = new Dictionary<int, int> { [from] = 0 };
+            var queue = new Queue<int>();
+            queue.Enqueue(from);
+            while (queue.Count > 0)
+            {
+                int here = queue.Dequeue();
+                foreach (int next in MapGeometry.GetNeighbors(here))
+                {
+                    if (steps.ContainsKey(next) || !board.Walkable(next)) continue;
+                    steps[next] = steps[here] + 1;
+                    queue.Enqueue(next);
+                }
+            }
+            return steps;
+        }
 
         /// <summary>What ending it next to an enemy costs a ranged fighter, in cells of distance.</summary>
         private const int StuckCost = 5;
