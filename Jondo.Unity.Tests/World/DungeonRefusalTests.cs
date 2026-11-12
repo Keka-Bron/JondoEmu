@@ -109,6 +109,47 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// The keyring reply is only offered while the keyring can open the door: not without one in
+        /// the bag, nor at a dungeon it does not take. The key's reply is never held back.
+        /// </summary>
+        [Fact]
+        public async Task The_keyring_is_not_offered_when_it_cannot_open()
+        {
+            const int dungeonId = int.MaxValue - 1, npcId = int.MaxValue - 1;
+            const long entrance = -990000011, keyReply = 24970, keyringReply = 24973;
+            var dungeons = (Dictionary<int, DungeonManager.Dungeon>)DungeonManager.All;
+            var guardians = (Dictionary<int, DungeonDoor.Options>)typeof(DungeonDoor)
+                .GetField("_byNpc", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
+            // Dungeon 0: its free entry is always left, with no database to ask.
+            var dungeon = new DungeonManager.Dungeon { Id = 0, Name = "Cripta de Chadalid", EntranceMapId = entrance, OnKeyring = true };
+            dungeon.Rooms.Add(entrance - 1);
+            dungeons.Add(dungeonId, dungeon);
+            guardians.Add(npcId, new DungeonDoor.Options { Key = keyReply, Keyring = keyringReply });
+
+            try
+            {
+                await using var pipe = await ClientPipe.OpenAsync(990000021, 990000022, entrance);
+                using (SessionContext.Push(pipe.Session))
+                {
+                    Assert.True(DungeonHandler.KeyringOfferedForNothing(npcId, entrance, keyringReply));
+                    Assert.False(DungeonHandler.KeyringOfferedForNothing(npcId, entrance, keyReply));
+
+                    Equipment.Add(1, DungeonHandler.Keyring, 1, Equipment.Bag, null);
+                    Assert.False(DungeonHandler.KeyringOfferedForNothing(npcId, entrance, keyringReply));
+
+                    dungeon.OnKeyring = false;
+                    Assert.True(DungeonHandler.KeyringOfferedForNothing(npcId, entrance, keyringReply));
+                    Assert.False(DungeonHandler.KeyringOfferedForNothing(npcId, entrance, keyReply));
+                }
+            }
+            finally
+            {
+                guardians.Remove(npcId);
+                dungeons.Remove(dungeonId);
+            }
+        }
+
+        /// <summary>
         /// A guardian that declares neither reply lets the player in on any answer: with the keyring
         /// while this week's entry is left, else with the key. One that asks opens only on its own.
         /// </summary>

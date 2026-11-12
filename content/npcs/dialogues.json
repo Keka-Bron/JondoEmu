@@ -5479,6 +5479,10 @@
           "choices": [
             { "reply": 24973, "startsQuest": 1638, "params": [[34, 1638]] },
             { "reply": 24970, "startsQuest": 1638, "params": [[34, 1638]] },
+            { "reply": 24973, "quest": 1638 },
+            { "reply": 24970, "quest": 1638 },
+            { "reply": 24973, "quest": 1638, "afterQuest": true },
+            { "reply": 24970, "quest": 1638, "afterQuest": true },
             { "reply": 24989, "next": 20839, "quest": 1635, "beforeObjective": 9784, "completes": 9783, "params": [[30, 9783]] },
             { "reply": 24986 }
           ]
@@ -5502,7 +5506,7 @@
           ]
         }
       ],
-      "why": "Klasmor the gravedigger, keeper of Chadalid's crypt. «Dans la gueule du Milimilou»: asked about the Minilubo (24989), he would rather the character faced flesh than the walking dead (20839), tells where the beast lives (20840) and the two ways in, past Chadalid or by the rusty grate to the west (20841, the line 9784 names). «Cryptologie» is handed over on his opening (20830, the line the catalogue names) by going into the crypt, with the bunch of keys (24973) or a key (24970); the door itself is DungeonHandler's."
+      "why": "Klasmor the gravedigger, keeper of Chadalid's crypt. «Dans la gueule du Milimilou»: asked about the Minilubo (24989), he would rather the character faced flesh than the walking dead (20839), tells where the beast lives (20840) and the two ways in, past Chadalid or by the rusty grate to the west (20841, the line 9784 names). «Cryptologie» is handed over on his opening (20830, the line the catalogue names) by going into the crypt, with the bunch of keys (24973) or a key (24970); the door itself is DungeonHandler's. The same two go in again without the quest while it is under way and once it is done: a reply that starts a quest is only offered while it can be started, and Klasmor offered nothing but «S'en aller» to whoever had been in once."
     },
     {
       "npc": 7581,
