@@ -32478,7 +32478,8 @@
           "names": true,
           "choices": [
             { "reply": 29582, "next": 24627, "quest": 1770, "holds": 18168, "criterion": "PO=30328" },
-            { "reply": 29591, "next": 24629, "quest": 1770, "holds": 18170, "criterion": "PO=30328" }
+            { "reply": 29591, "next": 24629, "quest": 1770, "holds": 18170, "criterion": "PO=30328" },
+            { "reply": 29810, "quest": 1774, "completes": 11385, "params": [[30, 11385]], "next": 24849, "gives": 18205 }
           ]
         },
         {
@@ -32538,9 +32539,22 @@
           "choices": [
             { "reply": 29587, "takes": 18170, "gives": 18171 }
           ]
+        },
+        {
+          "message": 24849,
+          "choices": [
+            { "reply": 29809, "next": 24850 }
+          ]
+        },
+        {
+          "message": 24850,
+          "choices": [
+            { "reply": 29807, "teleport": 158336001 },
+            { "reply": 29808 }
+          ]
         }
       ],
-      "why": "Yova Etna, the fair's seer, who wants a fair ticket before any question (1640). «La foire aux gobs» (1770) of Dofus pour les noobs: the goblin's scroll is nonsense (24627), no horoscope without his birth data (24628: the questionnaire); his answers (24629), born on Todobai, so Pischis (24632: «Horóscopo certificado por Yova Etna»); any other sign disappoints her (24631, 24633-24635)."
+      "why": "Yova Etna, the fair's seer, who wants a fair ticket before any question (1640). «La foire aux gobs» (1770) of Dofus pour les noobs: the goblin's scroll is nonsense (24627), no horoscope without his birth data (24628: the questionnaire); his answers (24629), born on Todobai, so Pischis (24632: «Horóscopo certificado por Yova Etna»); any other sign disappoints her (24631, 24633-24635). «Oiseau de mauvais augure» (1774): «Ten: la carta de Natacha Manka» (11385), her explanations written while the character dawdled (24849: «Tomar la carta», the letter for Natacha), and a way there without a zaap (24850: «Acepto» takes the character to Natacha's camp [-13,-61])."
     },
     {
       "npc": 3377,
@@ -32776,6 +32790,150 @@
         }
       ],
       "why": "Xanamla at the Almanax temple [-4,-24] (12043). «La foire aux gobs» (1770) of Dofus pour les noobs: the «Potion Astromagique du Bworky» (13351) for the restless goblin, 2000 kamas (15809)."
+    },
+    {
+      "npc": 3405,
+      "map": 0,
+      "opening": 24827,
+      "openings": [
+        { "after": 1774, "message": 24846 },
+        { "quest": 1774, "objective": 11386, "message": 24846 },
+        { "quest": 1774, "objective": 11384, "message": 24843 },
+        { "quest": 1774, "objective": 11383, "message": 24838 },
+        { "quest": 1774, "objective": 11376, "message": 24835 },
+        { "quest": 1774, "message": 24830 }
+      ],
+      "lines": [
+        {
+          "message": 24827,
+          "choices": [
+            { "reply": 29787, "next": 24828, "beforeQuest": 1774 }
+          ]
+        },
+        {
+          "message": 24828,
+          "choices": [
+            { "reply": 29786, "startsQuest": 1774, "params": [[34, 1774]], "next": 24829 }
+          ]
+        },
+        {
+          "message": 24829,
+          "choices": []
+        },
+        {
+          "message": 24830,
+          "choices": [
+            { "reply": 29791, "quest": 1774, "completes": 11375, "params": [[30, 11375]], "next": 24831, "completesAll": [11376] }
+          ]
+        },
+        {
+          "message": 24831,
+          "choices": [
+            { "reply": 29790, "next": 24832 }
+          ]
+        },
+        {
+          "message": 24832,
+          "choices": [
+            { "reply": 29789, "next": 24833 }
+          ]
+        },
+        {
+          "message": 24833,
+          "choices": [
+            { "reply": 29788, "next": 24834 }
+          ]
+        },
+        {
+          "message": 24834,
+          "choices": []
+        },
+        {
+          "message": 24835,
+          "choices": [
+            { "reply": 29792, "quest": 1774, "completes": 11378, "params": [[30, 11378]], "next": 24836, "takesAll": [18200, 18201, 18202], "afterObjective": 11377 },
+            { "reply": 29794, "quest": 1774, "completes": 11380, "params": [[30, 11380]], "next": 24837, "afterObjective": 11379, "completesAll": [11381, 11382, 11383] }
+          ]
+        },
+        {
+          "message": 24836,
+          "choices": []
+        },
+        {
+          "message": 24837,
+          "choices": [
+            { "reply": 29793 }
+          ]
+        },
+        {
+          "message": 24838,
+          "choices": [
+            { "reply": 29798, "next": 24839 }
+          ]
+        },
+        {
+          "message": 24839,
+          "choices": [
+            { "reply": 29797, "next": 24840 }
+          ]
+        },
+        {
+          "message": 24840,
+          "choices": [
+            { "reply": 29796, "next": 24841 }
+          ]
+        },
+        {
+          "message": 24841,
+          "choices": [
+            { "reply": 29795, "quest": 1774, "completes": 11384, "params": [[30, 11384]], "gives": 18204 }
+          ]
+        },
+        {
+          "message": 24843,
+          "choices": [
+            { "reply": 29803, "quest": 1774, "completes": 11386, "params": [[30, 11386]], "next": 24844 }
+          ]
+        },
+        {
+          "message": 24844,
+          "choices": [
+            { "reply": 29802, "next": 24845 }
+          ]
+        },
+        {
+          "message": 24845,
+          "choices": [
+            { "reply": 29801 }
+          ]
+        },
+        {
+          "message": 24846,
+          "choices": [
+            { "reply": 29806, "quest": 1774, "completes": 11387, "params": [[30, 11387]], "next": 24847 },
+            { "reply": 29812, "startsQuest": 1775, "params": [[34, 1775]], "next": 24851, "beforeQuest": 1775 }
+          ]
+        },
+        {
+          "message": 24847,
+          "choices": [
+            { "reply": 29805, "startsQuest": 1775, "params": [[34, 1775]], "next": 24848, "beforeQuest": 1775 }
+          ]
+        },
+        {
+          "message": 24848,
+          "choices": [
+            { "reply": 29804 }
+          ]
+        },
+        {
+          "message": 24851,
+          "choices": [
+            { "reply": 29811 }
+          ]
+        }
+      ],
+      "why": "Natacha Manka, the sadida hurt in the Penates of the Corbac (24827). «Oiseau de mauvais augure» (1774) of Dofus pour les noobs, in its order: «Preguntarle por sus necesidades» (24828: her herbs and first-aid kit forgotten in her bag by her camp), «Acepto» starts it, and sage too (24829). Back with the bag and forty sage, «Darle el material y preguntarle por su presencia en el lugar» (11375, 11376): the forest spirits led her here for a divination ritual (24831), the adventurer she hired vanished with her things (24832), will you help (24833), corbac wood first (24834). «Toma, la madera de cuerbok» (11378, the three woods taken): her workshop to carve the enchanted logs (24836); «Darle todo lo que necesita» (11380-11383): meet her far from here for the ritual (24837). There she sleeps (24838-24840) and wakes with a letter for Yova Etna, the fair's seer (24841, 11384). Back at her camp, «Darle la carta de Yova Etna» (24843, 11386): meet her before Master Corbac's library (24845). At the library (24846), «Informarte sobre el desarrollo de los acontecimientos» ends it (11387, 24847: the augury bodes ill); «¿Necesitas un escolta?» starts «Voler dans les plumes» (1775) then or on coming back (24848/24851), whose step text is 24851."
     }
   ]
 }

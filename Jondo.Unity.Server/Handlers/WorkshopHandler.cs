@@ -163,6 +163,11 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A conversation still up is over first. Natacha Manka's «Ahora, utiliza mi material» has
+            // no reply, and her workshop is clicked with the bubble still open: the client then shut
+            // the bubble for the bench with a kla, and the kla shut the bench it was not meant for.
+            if (NpcHandler.IsDialogueOpen) await NpcHandler.CloseAsync(stream);
+
             SessionContext.State.Workshop = new Bench { ElementId = elementId, SkillId = skillId, Magus = skill.IsForgemagus, Wraps = wraps };
 
             await SendAsync(stream, Op.Iwn, ConnectionProtocol.BuildElementInUse(

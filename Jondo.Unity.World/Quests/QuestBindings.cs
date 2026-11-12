@@ -310,9 +310,10 @@ namespace Jondo.Unity.World.Quests
         public bool OnlyGives { get; init; }
 
         /// <summary>
-        /// With <see cref="OnlyGives"/>: each of the row's elements hands its item over once, up to
-        /// the count the row gives -- the four bushes of sea enchalada of «Un parfum de vacances»,
-        /// a leaf each, four in all.
+        /// Each of the row's elements hands its item over once, up to the count the row gives -- the
+        /// four bushes of sea enchalada of «Un parfum de vacances», a leaf each, four in all. With
+        /// <see cref="OnlyGives"/> the objective stays; without it, it is done once every element's
+        /// item is carried: the three trunks of «Pájaro de mal agüero», a corbac wood each.
         /// </summary>
         public bool GivesEach { get; init; }
 

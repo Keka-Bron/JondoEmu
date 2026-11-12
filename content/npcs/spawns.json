@@ -3911,6 +3911,38 @@
       "cell": 313,
       "orientation": 1,
       "why": "Xanamla in the Almanax temple [-4,-24], beside Ontoral Zo (Dofus pour les noobs, «La foire aux gobs»: the Potion Astromagique du Bworky)."
+    },
+    {
+      "map": 158336514,
+      "npc": 3405,
+      "cell": 274,
+      "orientation": 1,
+      "criterion": "Qo<11383",
+      "why": "Natacha Manka hurt at [-12,-60], where «Oiseau de mauvais augure» starts (the quest's giver), until all she needs is handed over; beside her workshop. INFERRED cell, checked in the client: she stands in the open, by the monsters' path."
+    },
+    {
+      "map": 158337024,
+      "npc": 3405,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qo>11383&Qo<11384",
+      "why": "Natacha at [-11,-62] for the ritual, «Reúnete conmigo lejos de aquí» (24837) until she hands the letter over (11384's map). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 158336001,
+      "npc": 3405,
+      "cell": 275,
+      "orientation": 1,
+      "criterion": "Qo>11384&Qo<11386",
+      "why": "Back at her camp [-13,-61] once the letter is given, «Yo me vuelvo al campamento» (24841), until Yova Etna's letter comes (11386's map). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 158334976,
+      "npc": 3405,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qo>11386&Qf!1775",
+      "why": "Before Master Corbac's library [-15,-62] (24845, 11387's map), where «Voler dans les plumes» is given (its giver). INFERRED cell, an open walkable one."
     }
   ]
 }

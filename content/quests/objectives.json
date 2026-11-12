@@ -4112,6 +4112,23 @@
    "anyOrder": true,
    "gives": [{"item": 18174, "count": 1}, {"item": 18175, "count": 1}, {"item": 18176, "count": 1}, {"item": 18177, "count": 1}],
    "why": "«Vieux chouine-gomme», four of them in the fair's tents (Dofus pour les noobs): the jar on a stool, the wicker basket, under the stool, the round cage, each its own old chillicle (18174-18177) and its own line (info messages 684-687)."
+  },
+  {
+   "objective": 11374,
+   "quest": 1774,
+   "kind": "click",
+   "elements": [{"map": 158336001, "element": 509203}],
+   "gives": [{"item": 18199, "count": 1}],
+   "why": "«Busca el bolso de Natacha Manka»: the bag by her camp at [-13,-61] (the objective's map), element 509203 of the client's map, the only quest element there; it gives «Bolso de Natacha Manka» (18199)."
+  },
+  {
+   "objective": 11377,
+   "quest": 1774,
+   "kind": "click",
+   "givesEach": true,
+   "elements": [{"map": 158334978, "element": 509204, "item": 18200}, {"map": 158336512, "element": 509206, "item": 18201}, {"map": 158335488, "element": 509205, "item": 18202}],
+   "gives": [{"item": 18200, "count": 1}, {"item": 18201, "count": 1}, {"item": 18202, "count": 1}],
+   "why": "«Recoge tres maderas de cuerbok»: the three trunks where the corbacs perch, at [-15,-60], [-12,-62] and [-14,-62] (Dofus pour les noobs), the client's elements 509204, 509206 and 509205 (graphic 47541, the same on the three maps). Each gives one «Madera de cuerbok», three items of that name (18200-18202); which trunk gives which is INFERRED. Done once the three are carried."
   }
  ]
 }

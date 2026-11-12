@@ -530,7 +530,7 @@ namespace Jondo.Unity.Server.Managers
                 }
                 if (binding.Kind != QuestBindingKind.Click) continue;
                 // One item per element, up to the row's count: a leaf from each of the four bushes.
-                if (binding.OnlyGives && binding.GivesEach)
+                if (binding.GivesEach)
                 {
                     if (SessionContext.State.QuestElementsTaken.Contains((binding.ObjectiveId, elementId))) continue;
                     if (await GiveEachAsync(stream, binding, mapId, elementId))
@@ -540,6 +540,10 @@ namespace Jondo.Unity.Server.Managers
                         if (binding.SpawnsMonster != 0
                             && (binding.SpawnsChance == 0 || Random.Shared.Next(100) < binding.SpawnsChance))
                             await SpawnAsync(stream, binding);
+                        // Without «onlyGives» the gathering IS the objective: «Recoge tres maderas de
+                        // cuerbok» is done once each of the three trunks' wood is in the bag.
+                        if (!binding.OnlyGives && CarriesEveryOne(binding))
+                            await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
                         moved = true;
                         break;
                     }
@@ -550,6 +554,15 @@ namespace Jondo.Unity.Server.Managers
 
             return moved;
         }
+
+        /// <summary>
+        /// Whether every item a «givesEach» row hands over is in the bag: one of each element's own,
+        /// or the row's count of what it gives.
+        /// </summary>
+        private static bool CarriesEveryOne(QuestBinding binding)
+            => binding.ElementItems.Count > 0
+                ? binding.ElementItems.Values.Distinct().All(item => Equipment.HowMany(item) >= 1)
+                : binding.Gives.All(g => Equipment.HowMany(g.Item) >= g.Count);
 
         /// <summary>
         /// One of a «givesEach» row's items, when its objective is the character's to do and fewer

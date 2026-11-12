@@ -29,6 +29,14 @@
       "type": 145,
       "skills": [209],
       "why": "The tent's second packing table (cell 359), the same as the first."
+    },
+    {
+      "map": 158336514,
+      "element": 509207,
+      "gfx": 3910,
+      "type": 298,
+      "skills": [349],
+      "why": "Natacha Manka's workshop at [-12,-60], the only quest element of her map (cell 246): «Ahora, utiliza mi material, vamos a tallar los troncos encantados juntos» (24836). The client's interactive type 298 and skill 349 are both «Taller de Natacha Manka», and 349 makes only the «Tronco encantado» (18203): ten bombu wood and a tamed corbac feather, five of them for «Pájaro de mal agüero»."
     }
   ]
 }
