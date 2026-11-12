@@ -128,6 +128,34 @@ namespace Jondo.Unity.World.Fights
             get { lock (_candadoDelTurno) return _turnoAtendido != (RoundNumber, TurnSlot, CurrentFighter?.Id ?? 0); }
         }
 
+        private (int Round, int Slot, long Fighter) _turnoConfirmandose;
+        private readonly HashSet<long> _quienesConfirmaron = new();
+
+        /// <summary>
+        /// Someone's client confirmed this turn (jwz): whether, with him, everyone of
+        /// <paramref name="awaited"/> has. A turn opens only once every client has shown what came
+        /// before it.
+        /// </summary>
+        /// <remarks>
+        /// The first jwz used to open it. With two clients, one in the background answered at once
+        /// while the other was still drawing the tax collector's spells: the next player's clock
+        /// started under his animations, his actions were blocked and his turn ran short (fight
+        /// #1001, the tax collector's turn handed on 185 ms after it began).
+        /// </remarks>
+        public bool ConfirmTurn(int round, int turnSlot, long fighterId, long who, IEnumerable<long> awaited)
+        {
+            lock (_candadoDelTurno)
+            {
+                if (_turnoConfirmandose != (round, turnSlot, fighterId))
+                {
+                    _turnoConfirmandose = (round, turnSlot, fighterId);
+                    _quienesConfirmaron.Clear();
+                }
+                _quienesConfirmaron.Add(who);
+                return awaited.All(_quienesConfirmaron.Contains);
+            }
+        }
+
         /// <summary>
         /// The last turn that went out as a jzc: who, at what index and round, for how long, and
         /// when. It is what a reconnecting client is told first, so that his carousel and his

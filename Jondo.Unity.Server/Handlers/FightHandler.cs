@@ -3426,13 +3426,82 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// The client has confirmed (jwz). Now the turn is given to whoever is next.
         /// </summary>
-        public static async Task ConfirmAsync(NetworkStream stream)
+        public static Task ConfirmAsync(NetworkStream stream) => ConfirmAsync(stream, everyoneAnswered: false);
+
+        /// <summary>
+        /// How long a turn waits for the clients that have not confirmed it once one has: one whose
+        /// window froze or that is gone must not hold the fight up for good.
+        /// </summary>
+        private const int ConfirmationWaitMs = 10_000;
+
+        /// <summary>
+        /// The people whose clients confirm the turns: those of the fight connected to it.
+        /// </summary>
+        private static IEnumerable<long> AwaitedConfirmations(FightInstance fight)
+            => TodosLosCombatientes(fight)
+                .Where(f => !f.IsMonster && !f.EsInvocado && !f.IsPlayedAlly)
+                .Select(f => f.Id)
+                .Where(id => SessionRegistry.FindByCharacter(id)?.State.FightId == fight.FightId)
+                .ToList();
+
+        /// <summary>
+        /// The turn waits for the clients still drawing; if they have not answered in
+        /// <see cref="ConfirmationWaitMs"/>, it opens all the same, under the same locks as a jwz.
+        /// </summary>
+        private static void AwaitTheOthers(NetworkStream stream, FightInstance fight, long fighterId)
+        {
+            long deQueCombate = fight.FightId;
+            int ronda = fight.RoundNumber;
+            int hueco = fight.TurnSlot;
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(ConfirmationWaitMs);
+
+                var turno = MiTurno();
+                await turno.WaitAsync();
+                try
+                {
+                    await InTurnAsync(fight, async () =>
+                    {
+                        var ahora = GetCurrentFight();
+                        if (ahora == null || ahora.FightId != deQueCombate) return;
+                        if (ahora.State != Jondo.Unity.World.Fights.FightState.Ongoing) return;
+                        if (ahora.CurrentFighter?.Id != fighterId || ahora.RoundNumber != ronda || ahora.TurnSlot != hueco) return;
+                        if (!ahora.TurnAwaitingConfirmation) return;
+
+                        Program.LogDebug($"[Fight] Not every client confirmed the turn of {fighterId} in " +
+                                         $"{ConfirmationWaitMs / 1000} s; it opens without them.");
+                        await ConfirmAsync(stream, everyoneAnswered: true);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Program.LogDebug($"[Fight] The confirmation wait choked: {ex.Message}");
+                }
+                finally
+                {
+                    turno.Release();
+                }
+            });
+        }
+
+        private static async Task ConfirmAsync(NetworkStream stream, bool everyoneAnswered)
         {
             var fight = GetCurrentFight();
             if (fight == null || fight.State != Jondo.Unity.World.Fights.FightState.Ongoing) return;
 
             var fighter = fight.CurrentFighter;
             if (fighter == null) return;
+
+            // Every client has to have shown what came before: the first to answer waits for the
+            // others, and only if they never do does the turn open without them.
+            if (!everyoneAnswered && !fight.ConfirmTurn(fight.RoundNumber, fight.TurnSlot, fighter.Id,
+                                                        GameState.CharacterId, AwaitedConfirmations(fight)))
+            {
+                AwaitTheOthers(stream, fight, fighter.Id);
+                return;
+            }
 
             // In a challenge both clients answer and the work of opening the turn is a single one.
             // The second jwz is let go without doing anything: otherwise expired summons are undone
