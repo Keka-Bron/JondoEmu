@@ -166,6 +166,24 @@
       "npc": 2197,
       "replies": [19605, 19601, 19596],
       "why": "Merkator's Aquadome: after the Treasure Room the winners are in the Aquadome's Exit room where Merkator stands, and «Pollution, je dis non» (Dofus pour les noobs) has them talk to him there; «Salir del Acuadomo de Merkator.», «Encogerte de hombros y salir del Acuadomo.» and «Darle algunas réplicas sinceras e irte.» leave. INFERRED cell: open floor a row below Merkator's."
+    },
+    {
+      "dungeon": 52,
+      "bossRoom": 116392450,
+      "room": 116393474,
+      "cell": 326,
+      "npc": 137,
+      "replies": [18856, 18858],
+      "why": "The Wa Wabbit's castle: after the Wa Wabbit the winners are in the castle's Exit room («Castillo del Wey Wabbit - Salida»), where he sits beaten by his throne, and «Le château du Wa» has them talk to him there («Une fois le Wa Wabbit vaincu, parlez lui», Dofus pour les noobs); his two «Salir.» leave. Cell 326: the room's way in, across the carpet from him."
+    },
+    {
+      "dungeon": 17,
+      "bossRoom": 116657665,
+      "room": 116655619,
+      "cell": 282,
+      "npc": 148,
+      "replies": [18850, 18851],
+      "why": "The Wa Wabbit's burrow: after the Wa Wobot the winners are in the burrow's Exit room («Madriguera del Wey Wabbit - Salida»), where the guardian of the carrot dofus stands by its pedestal, and «L'œuf ou la cawotte ?» has them talk to him there («Il vous faut finir le Terrier du Wa Wabbit pour parler au Gawdien du Dofus», Dofus pour les noobs). «Apoderarte del dofus zanahowia y escaparte.» and «Irte sin buscar problemas.» leave by the dungeon's own exit. Cell 282: the room's way in."
     }
   ]
 }

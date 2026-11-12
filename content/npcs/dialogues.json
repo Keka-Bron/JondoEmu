@@ -19111,14 +19111,321 @@
       "lines": [
         {
           "message": 471,
-          "choices": []
+          "choices": [
+            { "reply": 18780, "next": 15907, "beforeQuest": 846 },
+            { "reply": 18782, "next": 15908, "quest": 846, "completesAll": [7848, 7849, 7850], "params": [[30, 7850]] },
+            { "reply": 18781, "next": 15909, "startsQuest": 847, "params": [[34, 847]] },
+            { "reply": 18784, "next": 15911, "quest": 847, "criterion": "Qo<7856" },
+            { "reply": 18837, "next": 15941, "otherwise": 15942, "verdict": true, "quest": 847, "afterObjective": 7856 }
+          ]
         },
         {
           "message": 15968,
           "choices": []
+        },
+        {
+          "message": 15907,
+          "choices": [
+            { "reply": 18778, "startsQuest": 846, "params": [[34, 846]] },
+            { "reply": 18779 }
+          ]
+        },
+        {
+          "message": 15908,
+          "choices": [
+            { "reply": 18783, "next": 15910, "startsQuest": 847, "params": [[34, 847]] }
+          ]
+        },
+        {
+          "message": 15909,
+          "choices": []
+        },
+        {
+          "message": 15910,
+          "choices": []
+        },
+        {
+          "message": 15911,
+          "choices": [
+            { "reply": 18786, "next": 15912, "hand": [5, 0, 0], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18786, "next": 15912, "hand": [5, 0, 0], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18786, "next": 15912, "hand": [5, 0, 0], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18786, "next": 15912, "hand": [5, 0, 0] },
+            { "reply": 18789, "next": 15913 },
+            { "reply": 18794, "next": 15916 },
+            { "reply": 18801, "next": 15920 },
+            { "reply": 18810, "next": 15925 },
+            { "reply": 18821, "next": 15931 }
+          ]
+        },
+        {
+          "message": 15913,
+          "choices": [
+            { "reply": 18788, "next": 15914, "hand": [4, 1, 0], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18788, "next": 15914, "hand": [4, 1, 0], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18788, "next": 15914, "hand": [4, 1, 0], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18788, "next": 15914, "hand": [4, 1, 0] },
+            { "reply": 18791, "next": 15915, "hand": [4, 0, 1], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18791, "next": 15915, "hand": [4, 0, 1], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18791, "next": 15915, "hand": [4, 0, 1], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18791, "next": 15915, "hand": [4, 0, 1] }
+          ]
+        },
+        {
+          "message": 15916,
+          "choices": [
+            { "reply": 18793, "next": 15917, "hand": [3, 2, 0], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18793, "next": 15917, "hand": [3, 2, 0], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18793, "next": 15917, "hand": [3, 2, 0], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18793, "next": 15917, "hand": [3, 2, 0] },
+            { "reply": 18796, "next": 15918, "hand": [3, 1, 1], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18796, "next": 15918, "hand": [3, 1, 1], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18796, "next": 15918, "hand": [3, 1, 1], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18796, "next": 15918, "hand": [3, 1, 1] },
+            { "reply": 18798, "next": 15919, "hand": [3, 0, 2], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18798, "next": 15919, "hand": [3, 0, 2], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18798, "next": 15919, "hand": [3, 0, 2], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18798, "next": 15919, "hand": [3, 0, 2] }
+          ]
+        },
+        {
+          "message": 15920,
+          "choices": [
+            { "reply": 18800, "next": 15921, "hand": [2, 3, 0], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18800, "next": 15921, "hand": [2, 3, 0], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18800, "next": 15921, "hand": [2, 3, 0], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18800, "next": 15921, "hand": [2, 3, 0] },
+            { "reply": 18803, "next": 15922, "hand": [2, 2, 1], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18803, "next": 15922, "hand": [2, 2, 1], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18803, "next": 15922, "hand": [2, 2, 1], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18803, "next": 15922, "hand": [2, 2, 1] },
+            { "reply": 18805, "next": 15923, "hand": [2, 1, 2], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18805, "next": 15923, "hand": [2, 1, 2], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18805, "next": 15923, "hand": [2, 1, 2], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18805, "next": 15923, "hand": [2, 1, 2] },
+            { "reply": 18807, "next": 15924, "hand": [2, 0, 3], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18807, "next": 15924, "hand": [2, 0, 3], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18807, "next": 15924, "hand": [2, 0, 3], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18807, "next": 15924, "hand": [2, 0, 3] }
+          ]
+        },
+        {
+          "message": 15925,
+          "choices": [
+            { "reply": 18809, "next": 15926, "hand": [1, 4, 0], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18809, "next": 15926, "hand": [1, 4, 0], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18809, "next": 15926, "hand": [1, 4, 0], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18809, "next": 15926, "hand": [1, 4, 0] },
+            { "reply": 18812, "next": 15927, "hand": [1, 3, 1], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18812, "next": 15927, "hand": [1, 3, 1], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18812, "next": 15927, "hand": [1, 3, 1], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18812, "next": 15927, "hand": [1, 3, 1] },
+            { "reply": 18814, "next": 15928, "hand": [1, 2, 2], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18814, "next": 15928, "hand": [1, 2, 2], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18814, "next": 15928, "hand": [1, 2, 2], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18814, "next": 15928, "hand": [1, 2, 2] },
+            { "reply": 18816, "next": 15929, "hand": [1, 1, 3], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18816, "next": 15929, "hand": [1, 1, 3], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18816, "next": 15929, "hand": [1, 1, 3], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18816, "next": 15929, "hand": [1, 1, 3] },
+            { "reply": 18818, "next": 15930, "hand": [1, 0, 4], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18818, "next": 15930, "hand": [1, 0, 4], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18818, "next": 15930, "hand": [1, 0, 4], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18818, "next": 15930, "hand": [1, 0, 4] }
+          ]
+        },
+        {
+          "message": 15931,
+          "choices": [
+            { "reply": 18820, "next": 15932, "hand": [0, 5, 0], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18820, "next": 15932, "hand": [0, 5, 0], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18820, "next": 15932, "hand": [0, 5, 0], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18820, "next": 15932, "hand": [0, 5, 0] },
+            { "reply": 18823, "next": 15933, "hand": [0, 4, 1], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18823, "next": 15933, "hand": [0, 4, 1], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18823, "next": 15933, "hand": [0, 4, 1], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18823, "next": 15933, "hand": [0, 4, 1] },
+            { "reply": 18825, "next": 15934, "hand": [0, 3, 2], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18825, "next": 15934, "hand": [0, 3, 2], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18825, "next": 15934, "hand": [0, 3, 2], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18825, "next": 15934, "hand": [0, 3, 2] },
+            { "reply": 18827, "next": 15935, "hand": [0, 2, 3], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18827, "next": 15935, "hand": [0, 2, 3], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18827, "next": 15935, "hand": [0, 2, 3], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18827, "next": 15935, "hand": [0, 2, 3] },
+            { "reply": 18829, "next": 15936, "hand": [0, 1, 4], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18829, "next": 15936, "hand": [0, 1, 4], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18829, "next": 15936, "hand": [0, 1, 4], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18829, "next": 15936, "hand": [0, 1, 4] },
+            { "reply": 18831, "next": 15937, "hand": [0, 0, 5], "quest": 847, "completes": 7851, "params": [[30, 7851]], "criterion": "Qo<7851" },
+            { "reply": 18831, "next": 15937, "hand": [0, 0, 5], "quest": 847, "completes": 7853, "params": [[30, 7853]], "criterion": "Qo<7853" },
+            { "reply": 18831, "next": 15937, "hand": [0, 0, 5], "quest": 847, "completes": 7855, "params": [[30, 7855]], "criterion": "Qo<7855" },
+            { "reply": 18831, "next": 15937, "hand": [0, 0, 5] }
+          ]
+        },
+        {
+          "message": 15912,
+          "choices": [
+            { "reply": 18785, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15914,
+          "choices": [
+            { "reply": 18787, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15915,
+          "choices": [
+            { "reply": 18790, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15917,
+          "choices": [
+            { "reply": 18792, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15918,
+          "choices": [
+            { "reply": 18795, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15919,
+          "choices": [
+            { "reply": 18797, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15921,
+          "choices": [
+            { "reply": 18799, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15922,
+          "choices": [
+            { "reply": 18802, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15923,
+          "choices": [
+            { "reply": 18804, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15924,
+          "choices": [
+            { "reply": 18806, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15926,
+          "choices": [
+            { "reply": 18808, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15927,
+          "choices": [
+            { "reply": 18811, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15928,
+          "choices": [
+            { "reply": 18813, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15929,
+          "choices": [
+            { "reply": 18815, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15930,
+          "choices": [
+            { "reply": 18817, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15932,
+          "choices": [
+            { "reply": 18819, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15933,
+          "choices": [
+            { "reply": 18822, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15934,
+          "choices": [
+            { "reply": 18824, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15935,
+          "choices": [
+            { "reply": 18826, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15936,
+          "choices": [
+            { "reply": 18828, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15937,
+          "choices": [
+            { "reply": 18830, "next": 15938 }
+          ]
+        },
+        {
+          "message": 15938,
+          "choices": [
+            { "reply": 18832, "next": 15939, "otherwise": 15940, "duel": true, "quest": 847, "completes": 7852, "params": [[30, 7852]], "criterion": "Qo<7852" },
+            { "reply": 18832, "next": 15939, "otherwise": 15940, "duel": true, "quest": 847, "completes": 7854, "params": [[30, 7854]], "criterion": "Qo<7854" },
+            { "reply": 18832, "next": 15939, "otherwise": 15940, "duel": true, "quest": 847, "completes": 7856, "params": [[30, 7856]], "criterion": "Qo<7856" },
+            { "reply": 18832, "next": 15939, "otherwise": 15940, "duel": true }
+          ]
+        },
+        {
+          "message": 15939,
+          "choices": [
+            { "reply": 18784, "next": 15911, "quest": 847, "criterion": "Qo<7856" },
+            { "reply": 18833, "next": 15941, "otherwise": 15942, "verdict": true, "quest": 847, "afterObjective": 7856 }
+          ]
+        },
+        {
+          "message": 15940,
+          "choices": [
+            { "reply": 18784, "next": 15911, "quest": 847, "criterion": "Qo<7856" },
+            { "reply": 18835, "next": 15941, "otherwise": 15942, "verdict": true, "quest": 847, "afterObjective": 7856 }
+          ]
+        },
+        {
+          "message": 15941,
+          "choices": [
+            { "reply": 18834, "quest": 847, "completes": 7857, "params": [[30, 7857]], "takesAll": [14453, 14454, 14455], "takesCount": 10 }
+          ]
+        },
+        {
+          "message": 15942,
+          "choices": [
+            { "reply": 18836, "quest": 847, "completes": 7857, "params": [[30, 7857]], "takesAll": [14453, 14454, 14455], "takesCount": 10 }
+          ]
         }
       ],
-      "why": "The zollo of the ancient times by the zaap [25,-4]: welcome, stranger (471). «Il y a un os, de Wabbit»: not much known, Lily's crew spoke of a wabbit feared by its kind, shut in an underground cave (15968: 5312, on a hello)."
+      "why": "The zollo of the ancient times by the zaap [25,-4]: welcome, stranger (471). «Il y a un os, de Wabbit»: not much known, Lily's crew spoke of a wabbit feared by its kind, shut in an underground cave (15968: 5312, on a hello). «Caltes stlatégiques» (Dofus pour les noobs): «¿Sabes para qué sirven las cartas de madera de los wabbits?», his people's cards the wabbits stole; «Aceptar.» to bring them, ten of each kind, then «Enseñarle las cartas.» (shown, not taken) and «¿Cómo se juega?» starts «Le jeu de Lenald» (15910; 15909 for whoever comes back for it). The game, all in replies: «Comenzar la manga.», five cards chosen by how many stones and then how many of the rest -- each hand has its own «Ahora que has elegido tus caltas» line and «Colocar las cartas boca abajo.», in the client's own order --, «Volver las cartas.» against his hand (CardDuels), three rounds, then «¿Quién ha ganado?», won or lost («même si vous perdez la quête se termine»), and he keeps the wooden cards «ahola que ya sabes jugal»: «Toma las cartas de madera.»."
     },
     {
       "npc": 136,
@@ -30793,6 +31100,267 @@
         }
       ],
       "why": "The wabbit assistant: «Parlez à l'assistant pour sortir» (Dofus pour les noobs, «Des pwinces pas très charmants»), «Puis parlez à Assistant Wabbit pour sortir» («Les pwinces déchus»). The way out is offered once Tim Bawton has been heard out in either quest: Tim's room has no other way back in."
+    },
+    {
+      "npc": 141,
+      "map": 0,
+      "opening": 467,
+      "lines": [
+        {
+          "message": 467,
+          "choices": [
+            { "reply": 391, "next": 15952 }
+          ]
+        },
+        {
+          "message": 15952,
+          "choices": [
+            { "reply": 81611, "next": 59672, "quest": 833, "beforeObjective": 5274 }
+          ]
+        },
+        {
+          "message": 59672,
+          "choices": [
+            { "reply": 81610, "quest": 833, "completes": 5274, "params": [[30, 5274]], "criterion": "Qo<5275|Qo<5276" },
+            { "reply": 81617, "quest": 833, "completes": 5274, "params": [[30, 5274]], "criterion": "Qo>5275&Qo>5276" }
+          ]
+        }
+      ],
+      "why": "«Jamais deux sans trois» (Dofus pour les noobs): the three keys of the Wa Wabbit's castle. In the client's own words the guards have lost them since: «Entrégame la llave del Castillo del Wey» is answered by the lost key, and the last of the three to be heard out ends with «Decidir ir a la entrada del castillo para ver si es posible prescindir de las tres llaves»; the others with «Tomo nota de la información»."
+    },
+    {
+      "npc": 143,
+      "map": 0,
+      "opening": 468,
+      "lines": [
+        {
+          "message": 468,
+          "choices": [
+            { "reply": 392, "next": 15953 }
+          ]
+        },
+        {
+          "message": 15953,
+          "choices": [
+            { "reply": 81614, "next": 59673, "quest": 833, "beforeObjective": 5275 }
+          ]
+        },
+        {
+          "message": 59673,
+          "choices": [
+            { "reply": 81613, "quest": 833, "completes": 5275, "params": [[30, 5275]], "criterion": "Qo<5274|Qo<5276" },
+            { "reply": 81619, "quest": 833, "completes": 5275, "params": [[30, 5275]], "criterion": "Qo>5274&Qo>5276" }
+          ]
+        }
+      ],
+      "why": "«Jamais deux sans trois» (Dofus pour les noobs): the three keys of the Wa Wabbit's castle. In the client's own words the guards have lost them since: «Entrégame la llave del Castillo del Wey» is answered by the lost key, and the last of the three to be heard out ends with «Decidir ir a la entrada del castillo para ver si es posible prescindir de las tres llaves»; the others with «Tomo nota de la información»."
+    },
+    {
+      "npc": 144,
+      "map": 0,
+      "opening": 469,
+      "lines": [
+        {
+          "message": 469,
+          "choices": [
+            { "reply": 393, "next": 15954 }
+          ]
+        },
+        {
+          "message": 15954,
+          "choices": [
+            { "reply": 81616, "next": 59674, "quest": 833, "beforeObjective": 5276 }
+          ]
+        },
+        {
+          "message": 59674,
+          "choices": [
+            { "reply": 81615, "quest": 833, "completes": 5276, "params": [[30, 5276]], "criterion": "Qo<5274|Qo<5275" },
+            { "reply": 81620, "quest": 833, "completes": 5276, "params": [[30, 5276]], "criterion": "Qo>5274&Qo>5275" }
+          ]
+        }
+      ],
+      "why": "«Jamais deux sans trois» (Dofus pour les noobs): the three keys of the Wa Wabbit's castle. In the client's own words the guards have lost them since: «Entrégame la llave del Castillo del Wey» is answered by the lost key, and the last of the three to be heard out ends with «Decidir ir a la entrada del castillo para ver si es posible prescindir de las tres llaves»; the others with «Tomo nota de la información»."
+    },
+    {
+      "npc": 640,
+      "map": 0,
+      "opening": 2744,
+      "lines": [
+        {
+          "message": 2744,
+          "choices": [
+            { "reply": 11389, "next": 10411, "startsQuest": 833, "params": [[34, 833]] },
+            { "reply": 19266, "next": 15959, "criterion": "Qf!1962&Qa!833&Qf!833" },
+            { "reply": 19266, "next": 15960, "criterion": "Qf=1962&Qf!2193&Qa!833&Qf!833" },
+            { "reply": 11392, "next": 10413, "quest": 834, "completes": 5281, "params": [[30, 5281]], "afterObjective": 5280 },
+            { "reply": 11396, "next": 10415, "beforeQuest": 835 },
+            { "reply": 11397, "next": 10416, "quest": 835, "completes": 5286, "params": [[30, 5286]] }
+          ]
+        },
+        {
+          "message": 10411,
+          "choices": []
+        },
+        {
+          "message": 15959,
+          "choices": []
+        },
+        {
+          "message": 15960,
+          "choices": []
+        },
+        {
+          "message": 10413,
+          "choices": [
+            { "reply": 11394, "next": 10414, "beforeQuest": 835 }
+          ]
+        },
+        {
+          "message": 10414,
+          "choices": [
+            { "reply": 11393, "next": 15950, "beforeQuest": 835 }
+          ]
+        },
+        {
+          "message": 15950,
+          "choices": [
+            { "reply": 18848, "startsQuest": 835, "params": [[34, 835]] }
+          ]
+        },
+        {
+          "message": 10415,
+          "choices": [
+            { "reply": 11395, "next": 15951, "beforeQuest": 835 }
+          ]
+        },
+        {
+          "message": 15951,
+          "choices": [
+            { "reply": 18849, "startsQuest": 835, "params": [[34, 835]] }
+          ]
+        },
+        {
+          "message": 10416,
+          "choices": []
+        }
+      ],
+      "why": "Zanal, the zolla sage [23,-4], who sends the character after the Wa Wabbit and his carrot dofus. «Jamais deux sans trois» starts with «¿Qué puedes contarme del Castillo del Wey Wabbit?» (10411, its step's line); to whoever cannot take it yet, «Informarte sobre el Castillo del Wey Wabbit» says what is missing: the class master's teachings (15959) or Nowa's dragon egg (15960). «Le château du Wa» ends on «¡He vencido al Wey Wabbit!» (10413), and «Si vous décidez de poursuivre la conversation avec celui-ci, il vous donnera la prochaine quête : L'œuf ou la cawotte ?» (Dofus pour les noobs): his power, «Seguir escuchando», the disguise (15950; 15951 is the quest's own line, for whoever comes back for it later), «Vale». «Enseñar el dofus zanahowia» ends that one (10416)."
+    },
+    {
+      "npc": 1439,
+      "map": 0,
+      "opening": 8886,
+      "lines": [
+        {
+          "message": 8886,
+          "choices": [
+            { "reply": 81622, "next": 59675, "quest": 833, "afterObjective": 5277 }
+          ]
+        },
+        {
+          "message": 59675,
+          "choices": [
+            { "reply": 81621, "quest": 833, "completes": 5278, "params": [[30, 5278]] }
+          ]
+        }
+      ],
+      "why": "Llavero, the keeper of the Wa Wabbit's castle [24,-13]: «Parlez à Powte-clef pour finir la quête» («Jamais deux sans trois», Dofus pour les noobs): «¿Es indispensable disponer de las llaves...?», the king has done away with them, «Darte por satisfecho con esta decisión». His dungeon door's replies come with it (DungeonHandler)."
+    },
+    {
+      "npc": 137,
+      "map": 0,
+      "opening": 15957,
+      "lines": [
+        {
+          "message": 15957,
+          "choices": [
+            { "reply": 18857, "next": 15958 },
+            { "reply": 18856 }
+          ]
+        },
+        {
+          "message": 15958,
+          "choices": [
+            { "reply": 18858 }
+          ]
+        }
+      ],
+      "why": "The Wa Wabbit beaten in his castle's Exit room: «Une fois le Wa Wabbit vaincu, parlez lui» («Le château du Wa», Dofus pour les noobs). The client gives him two greetings; 15957 is the later one, with its own replies (18856-18858): sore and vowing revenge, he dares the character to face him in his burrow. «¿Qué puedes contarme del dofus?» gets him to say no more of it; «Salir.» leaves the dungeon (content/world/dungeon_exits.json)."
+    },
+    {
+      "npc": 147,
+      "map": 0,
+      "opening": 477,
+      "lines": [
+        {
+          "message": 477,
+          "choices": [
+            { "reply": 11688, "next": 478, "criterion": "POE969,1&POE970,1&POE971,1" },
+            { "reply": 11688, "next": 10602 }
+          ]
+        },
+        {
+          "message": 478,
+          "choices": [
+            { "reply": 403, "next": 333, "quest": 835, "completesAll": [5282, 5283, 5284], "params": [[30, 5284]] },
+            { "reply": 403, "next": 333 },
+            { "reply": 404 }
+          ]
+        },
+        {
+          "message": 333,
+          "choices": [
+            { "reply": 438 },
+            { "reply": 18909 }
+          ]
+        },
+        {
+          "message": 10602,
+          "choices": [
+            { "reply": 18915, "next": 16001 }
+          ]
+        },
+        {
+          "message": 16001,
+          "choices": [
+            { "reply": 438 },
+            { "reply": 18909 }
+          ]
+        }
+      ],
+      "why": "The wabbit robot guarding the Wa Wabbit's burrow [28,-12]. «Équipez la panoplie du Wa Wabbit et parlez au Gawde Wabbit pour mettre à jour la quête» («L'œuf ou la cawotte ?», Dofus pour les noobs): to whoever wears the Wa's crown, staff and cape he bows, «Pewdóneme mi wey, no le había weconocido», and «Sí.» is the three objectives of the step (shown, not taken). Anybody else is an impostor «que no huele a zanahowia» until he makes up an excuse. Either way the corridor has caved in and the robots clearing it will attack: the burrow's key or keyring (its door, DungeonHandler)."
+    },
+    {
+      "npc": 148,
+      "map": 0,
+      "opening": 15956,
+      "openings": [
+        { "quest": 835, "pending": 5285, "criterion": "POE969,1&POE970,1&POE971,1", "message": 497 },
+        { "quest": 835, "pending": 5285, "message": 15955 }
+      ],
+      "lines": [
+        {
+          "message": 15956,
+          "choices": [
+            { "reply": 18852 },
+            { "reply": 18851 }
+          ]
+        },
+        {
+          "message": 497,
+          "choices": [
+            { "reply": 18850, "quest": 835, "completes": 5285, "params": [[30, 5285]] }
+          ]
+        },
+        {
+          "message": 15955,
+          "choices": [
+            { "reply": 18851 }
+          ]
+        }
+      ],
+      "why": "The guardian of the carrot dofus, in the burrow's last room: «Parlez au Gawdien vêtu de la panoplie du Wa Wabbit pour qu'il vous délivre le Dofus Cawotte» («L'œuf ou la cawotte ?», Dofus pour les noobs). To the false king, on the quest, «podéis llevawos el dofus zanahowia», and «Apoderarte del dofus zanahowia y escaparte.»; to someone on it without the disguise, the alarm; to everybody else, a polite invitation to leave. «Irte sin buscar problemas.» and the escape leave the burrow (content/world/dungeon_exits.json); the dofus is the objective's (content/quests/objectives.json)."
     }
   ]
 }

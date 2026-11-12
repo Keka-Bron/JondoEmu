@@ -2392,10 +2392,31 @@
   {
    "objective": 7881,
    "quest": 842,
-   "kind": "enter",
-   "map": 106694162,
+   "kind": "order",
    "afterObjectives": [7880],
-   "why": "«Le passage secret en question est sur la même map, il vous suffit de cliquer sur la cawotte»: the tic-tac-toe room below, where the grille is."
+   "why": "«Le passage secret en question est sur la même map, il vous suffit de cliquer sur la cawotte»: the tic-tac-toe room below, where the grille is. The map is the objective's own and discovered as any other; the row only holds it back until the cawotte has been found."
+  },
+  {
+   "objective": 5277,
+   "quest": 833,
+   "kind": "order",
+   "afterObjectives": [5274, 5275, 5276],
+   "why": "«Jamais deux sans trois» (Dofus pour les noobs): «Il vous faut maintenant trouver l'entrée du Château du Wa Wabbit», [24,-13], the map the objective carries and discovered as any other; the row only holds it back until the three wabbits have been heard out. Each has lost his key, and the last conversation ends «Decidir ir a la entrada del castillo para ver si es posible prescindir de las tres llaves»."
+  },
+  {
+   "objective": -834,
+   "quest": 834,
+   "kind": "enter",
+   "starts": 834,
+   "map": 116392448,
+   "why": "«Le château du Wa» has no giver to talk to: «La quête se lance automatiquement une fois entré dans le donjon» (Dofus pour les noobs), after Llavero has let the character in. 116392448 is the room his door loads; the quest's own condition (Qf=833) says who."
+  },
+  {
+   "objective": 5285,
+   "quest": 835,
+   "kind": "order",
+   "gives": [{"item": 972, "count": 1}],
+   "why": "«Parlez au Gawdien vêtu de la panoplie du Wa Wabbit pour qu'il vous délivre le Dofus Cawotte» («L'œuf ou la cawotte ?», Dofus pour les noobs): the carrot dofus (972) comes with the conversation, «Apoderarte del dofus zanahowia y escaparte.», which also leaves the burrow; Zanal is shown it in the next objective."
   },
   {
    "objective": -843,
@@ -2404,13 +2425,6 @@
    "starts": 843,
    "map": 106695186,
    "why": "«Des pwinces pas très charmants» has no giver: «Position de lancement : Aucune - Il suffit de franchir la porte après avoir ouvert la grille dans la quête précédente» (Dofus pour les noobs). The fallen princes' den (106695186), behind the door of the wabbit guardian's ledge; the quest's own condition (Qf=842) says who."
-  },
-  {
-   "objective": 7883,
-   "quest": 843,
-   "kind": "enter",
-   "map": 106695186,
-   "why": "Its first objective, a map to discover whose map the client does not carry: the den itself, ticked as the quest starts there."
   },
   {
    "objective": 7887,

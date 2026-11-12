@@ -3711,6 +3711,14 @@
       "cell": 402,
       "orientation": 5,
       "why": "The wabbit assistant in Tim Bawton's room, the way out: «Parlez à l'assistant pour sortir» (Dofus pour les noobs, «Des pwinces pas très charmants»); «Mi ayudante te llevawá», says Tim. INFERRED cell: by the room's tunnel (482593 on 444), facing it."
+    },
+    {
+      "map": 99614979,
+      "npc": 1439,
+      "cell": 371,
+      "orientation": 3,
+      "criterion": "Qa=833|Qf=833|Qa=834|Qf=834",
+      "why": "Llavero, the keeper of the Wa Wabbit's castle [24,-13]: «Parlez à Powte-clef pour finir la quête» («Jamais deux sans trois», Dofus pour les noobs). In front of the castle's door, clear of the banners and carrots in the client; there from the quest that sends the character to him."
     }
   ]
 }
