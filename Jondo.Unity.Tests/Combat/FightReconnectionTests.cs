@@ -99,6 +99,28 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(fight.TurnAwaitingConfirmation);
         }
 
+        /// <summary>
+        /// A turn opens once every client has confirmed it, not at the first jwz: the second client
+        /// was still drawing the tax collector's spells when the first, in the background, answered.
+        /// A new turn starts the count again.
+        /// </summary>
+        [Fact]
+        public void A_turn_waits_for_every_client_s_confirmation()
+        {
+            var fight = new FightInstance(1, 100, 100);
+            long[] awaited = { 10, 20 };
+
+            Assert.False(fight.ConfirmTurn(1, 0, -1, 10, awaited));
+            Assert.False(fight.ConfirmTurn(1, 0, -1, 10, awaited));
+            Assert.True(fight.ConfirmTurn(1, 0, -1, 20, awaited));
+
+            Assert.False(fight.ConfirmTurn(1, 1, 10, 20, awaited));
+            Assert.True(fight.ConfirmTurn(1, 1, 10, 10, awaited));
+
+            // Alone in the fight, his own answer is enough.
+            Assert.True(fight.ConfirmTurn(1, 2, 20, 20, new long[] { 20 }));
+        }
+
         private static string Hex(byte[]? bytes)
             => bytes == null ? "<null>" : string.Concat(bytes.Select(b => b.ToString("x2")));
     }
