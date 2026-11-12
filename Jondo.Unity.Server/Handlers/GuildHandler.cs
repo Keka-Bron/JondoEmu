@@ -465,8 +465,10 @@ namespace Jondo.Unity.Server.Handlers
             long founded = DateTimeOffset.TryParse(guild.FoundedUtc, System.Globalization.CultureInfo.InvariantCulture,
                                                    System.Globalization.DateTimeStyles.AssumeUniversal, out var when)
                 ? when.ToUnixTimeSeconds() : 0;
+            var ranks = GuildStore.Ranks(guild.Id);
+            var shown = MemberRows(members).Select(row => (row, ranks.FirstOrDefault(r => r.Id == row.Member.Rank)));
             await WriteAsync(stream, ConnectionProtocol.Answer(Op.Jie,
-                GuildProtocol.BuildGuildCard(DirectoryEntryOf(guild, members.Count), MemberRows(members), founded),
+                GuildProtocol.BuildGuildCard(DirectoryEntryOf(guild, members.Count), shown, founded),
                 ConnectionProtocol.RequestId(frame)));
         }
 
