@@ -264,6 +264,27 @@ namespace Jondo.Unity.World.Content
         public long OtherwiseNext { get; init; }
 
         /// <summary>
+        /// The hand of the zolla's card game this reply plays, as stone, paper and scissors cards --
+        /// five in all -- or empty: «Jugar con 2 cartas piedra.» then «Jugar con 2 cartas hoja y 1
+        /// carta tijeras.». Kept for the next <see cref="Duel"/>.
+        /// </summary>
+        public IReadOnlyList<int> Hand { get; init; } = Array.Empty<int>();
+
+        /// <summary>
+        /// The reply turns the cards over («Volver las cartas.»): the NPC lays a hand of his own and
+        /// the round is the character's, on to <see cref="Next"/>, or his, on to
+        /// <see cref="OtherwiseNext"/>.
+        /// </summary>
+        public bool Duel { get; init; }
+
+        /// <summary>
+        /// The reply asks who has won the game («¿Quién ha ganado?»): with more rounds won than
+        /// lost, on to <see cref="Next"/>; otherwise on to <see cref="OtherwiseNext"/>. The game is
+        /// over then.
+        /// </summary>
+        public bool Verdict { get; init; }
+
+        /// <summary>
         /// Items of which the reply hands over ONE, drawn at random («givesOneOf»): the Kama Baraka's
         /// prize, a zurcarák's ball, a Kerubim potion or a wabbit's paw.
         /// </summary>
@@ -346,11 +367,15 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public int Takes { get; init; }
 
-        /// <summary>How many of <see cref="Takes"/>: the meadow's mercenary asks for ten pieces of larva.</summary>
+        /// <summary>
+        /// How many of <see cref="Takes"/>, or of each of <see cref="TakesAll"/>: the meadow's
+        /// mercenary asks for ten pieces of larva, the zolla of the old times keeps ten wooden cards
+        /// of each kind.
+        /// </summary>
         public int TakesCount { get; init; } = 1;
 
         /// <summary>
-        /// Items the reply hands to the NPC, one of each, all or none: Nibe Lula's five contaminated
+        /// Items the reply hands to the NPC, one of each (or «takesCount»), all or none: Nibe Lula's five contaminated
         /// samples. Without <see cref="RefusedNext"/> it is offered only to whoever carries them all;
         /// with it, it is always offered and leads there when one is missing -- «Faltan una o más
         /// muestras. Tráemelas todas a la vez.».
@@ -1044,6 +1069,9 @@ namespace Jondo.Unity.World.Content
                             RefusedNext = Number(choice, "refused"),
                             Chance = (int)Number(choice, "chance"),
                             OtherwiseNext = Number(choice, "otherwise"),
+                            Hand = Numbers(choice, "hand").Select(o => (int)o).ToArray(),
+                            Duel = choice.TryGetProperty("duel", out var duel) && duel.ValueKind == JsonValueKind.True,
+                            Verdict = choice.TryGetProperty("verdict", out var verdict) && verdict.ValueKind == JsonValueKind.True,
                             GivesOneOf = Numbers(choice, "givesOneOf").Select(o => (int)o).ToArray(),
                             Chapeuvepes = (int)Number(choice, "chapeuvepes"),
                             Trades = (int)Number(choice, "trade"),
@@ -1235,6 +1263,14 @@ namespace Jondo.Unity.World.Content
                             if (choice.RefusedNext != 0) writer.WriteNumber("refused", choice.RefusedNext);
                             if (choice.Chance != 0) writer.WriteNumber("chance", choice.Chance);
                             if (choice.OtherwiseNext != 0) writer.WriteNumber("otherwise", choice.OtherwiseNext);
+                            if (choice.Hand.Count > 0)
+                            {
+                                writer.WriteStartArray("hand");
+                                foreach (int o in choice.Hand) writer.WriteNumberValue(o);
+                                writer.WriteEndArray();
+                            }
+                            if (choice.Duel) writer.WriteBoolean("duel", true);
+                            if (choice.Verdict) writer.WriteBoolean("verdict", true);
                             if (choice.GivesOneOf.Count > 0)
                             {
                                 writer.WriteStartArray("givesOneOf");
@@ -1268,7 +1304,7 @@ namespace Jondo.Unity.World.Content
                             if (choice.MinLevel != 0) writer.WriteNumber("minLevel", choice.MinLevel);
                             if (choice.BelowLevel != 0) writer.WriteNumber("belowLevel", choice.BelowLevel);
                             if (choice.Takes != 0) writer.WriteNumber("takes", choice.Takes);
-                            if (choice.Takes != 0 && choice.TakesCount != 1) writer.WriteNumber("takesCount", choice.TakesCount);
+                            if ((choice.Takes != 0 || choice.TakesAll.Count > 0) && choice.TakesCount != 1) writer.WriteNumber("takesCount", choice.TakesCount);
                             if (choice.TakesAll.Count > 0)
                             {
                                 writer.WriteStartArray("takesAll");

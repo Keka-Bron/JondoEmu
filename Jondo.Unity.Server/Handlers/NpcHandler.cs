@@ -989,7 +989,7 @@ namespace Jondo.Unity.Server.Handlers
             if (choice.Cells.Count > 0 && !choice.Cells.Contains(SessionContext.State.CellId)) return false;
             if (NotItsTurnYet(choice)) return false;
             if (!ItsQuestIsOpenToHim(choice)) return false;
-            if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0)) return false;
+            if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) < choice.TakesCount)) return false;
             return choice.Takes == 0 || Managers.Equipment.HowMany(choice.Takes) >= choice.TakesCount;
         }
 
@@ -1441,7 +1441,7 @@ namespace Jondo.Unity.Server.Handlers
             // that says one is missing and nothing else -- no objective, no quest.
             if (elegidaAhora != null && elegidaAhora.TakesAll.Count > 0)
             {
-                if (elegidaAhora.TakesAll.Any(i => Managers.Equipment.HowMany(i) <= 0))
+                if (elegidaAhora.TakesAll.Any(i => Managers.Equipment.HowMany(i) < elegidaAhora.TakesCount))
                 {
                     var falta = elegidaAhora.RefusedNext == 0 ? null
                         : NpcDialogues.For(SessionContext.State.OpenDialogueNpcId, SessionContext.State.OpenDialogueMapId)
@@ -1459,10 +1459,11 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 foreach (int item in elegidaAhora.TakesAll)
                 {
-                    await Managers.Equipment.TakeAsync(stream, item, 1);
+                    await Managers.Equipment.TakeAsync(stream, item, elegidaAhora.TakesCount);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
-                            Managers.InfoMessages.ItemLost, "1",
+                            Managers.InfoMessages.ItemLost,
+                            elegidaAhora.TakesCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             item.ToString(System.Globalization.CultureInfo.InvariantCulture))));
                 }
             }
@@ -1791,6 +1792,17 @@ namespace Jondo.Unity.Server.Handlers
             if (elegida.Chance > 0 && Random.Shared.Next(100) >= elegida.Chance)
             {
                 Console.WriteLine($"[NPC] Reply {reply} loses its draw ({elegida.Chance} %): line {elegida.OtherwiseNext}.");
+                next = elegida.OtherwiseNext;
+                if (next == 0) return false;
+            }
+
+            // The zolla's card game (CardDuels): the hand chosen is kept, the cards turned over
+            // decide the round, and asking who has won ends the game.
+            long character = estado.CharacterId;
+            if (elegida.Hand.Count > 0) Managers.CardDuels.Choose(character, elegida.Hand);
+            if ((elegida.Duel && !Managers.CardDuels.Round(character))
+                || (elegida.Verdict && !Managers.CardDuels.Won(character)))
+            {
                 next = elegida.OtherwiseNext;
                 if (next == 0) return false;
             }
