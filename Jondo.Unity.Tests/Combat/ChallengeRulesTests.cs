@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Server.Handlers;
@@ -12,9 +12,9 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Four of the generic challenges, by their descriptions: «Manos limpias» (no direct damage),
-    /// «Cada uno con su monstruo» (nobody else's enemy), «Espejo» (an ally behind the one who falls)
-    /// and how «El dos por uno» and the others are offered at all.
+    /// Four of the generic challenges, by their descriptions: �Manos limpias� (no direct damage),
+    /// �Cada uno con su monstruo� (nobody else's enemy), �Espejo� (an ally behind the one who falls)
+    /// and how �El dos por uno� and the others are offered at all.
     /// </summary>
     [Collection("Challenges table")]   // Challenges.Initialize reloads a static table
     public class ChallengeRulesTests
@@ -30,7 +30,8 @@ namespace Jondo.Unity.Tests.Combat
             {
                 if (_loaded) return;
                 // Loaded once for the whole run: reloading it under another class's feet empties it.
-                if (Challenges.KindOf(ChallengeWatcher.Zombi) != ChallengeWatcher.Zombi)
+                // Not KindOf: with the table empty it answers the id itself, and nothing got loaded.
+                if (Challenges.Get(ChallengeWatcher.Zombi)?.Kind != ChallengeWatcher.Zombi)
                 {
                     Challenges.Initialize();
                     Challenges.OnlyOffer(ChallengeWatcher.Watched);
@@ -110,6 +111,73 @@ namespace Jondo.Unity.Tests.Combat
             enemy2.CurrentHP = 0;
             await ChallengeWatcher.DiedAsync(pipe.ToClient, lonely, enemy2, false, a2);
             Assert.Contains(ChallengeWatcher.Espejo, lonely.ChallengesBroken);
+        }
+
+        /// <summary>
+        /// �First� is met the moment its target falls first, as the real game draws it green then,
+        /// and the end still pays it.
+        /// </summary>
+        [Fact]
+        public async Task First_is_met_when_its_target_falls_first()
+        {
+            if (!Available) return;
+            Load();
+            await using var pipe = await ClientPipe.OpenAsync(8_960_100_041, 8_960_100_041, 191105026, "Uno");
+            var (fight, a, _, enemy) = Fight(ChallengeWatcher.Primero, 8_960_100_040);
+            fight.ChallengeTargets[ChallengeWatcher.Primero] = enemy.Id;
+
+            enemy.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, enemy, false, a);
+            Assert.Contains(ChallengeWatcher.Primero, fight.ChallengesMet);
+            Assert.Contains(ChallengeWatcher.Primero, fight.ChallengesBroken);
+
+            try
+            {
+                Assert.Equal(50, ChallengeWatcher.EndBonus(fight, won: true));
+                Assert.Equal(50, await ChallengeWatcher.FightEndedAsync(pipe.ToClient, fight, won: true));
+                Assert.Contains(ChallengeWatcher.Primero, ChallengeWatcher.WonIn(fight));
+            }
+            finally { ChallengeWatcher.Forget(fight); }
+        }
+
+        [Fact]
+        public async Task First_is_broken_when_another_falls_first()
+        {
+            if (!Available) return;
+            Load();
+            await using var pipe = await ClientPipe.OpenAsync(8_960_100_051, 8_960_100_051, 191105026, "Uno");
+            var (fight, a, _, enemy) = Fight(ChallengeWatcher.Primero, 8_960_100_050);
+            fight.ChallengeTargets[ChallengeWatcher.Primero] = -2;
+
+            enemy.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, enemy, false, a);
+            Assert.Contains(ChallengeWatcher.Primero, fight.ChallengesBroken);
+            Assert.DoesNotContain(ChallengeWatcher.Primero, fight.ChallengesMet);
+            Assert.Equal(0, ChallengeWatcher.EndBonus(fight, won: true));
+        }
+
+        /// <summary>A boss's �CK#4051,1� (117, the Chadalid falls first): met when the Chadalid falls first.</summary>
+        [Fact]
+        public async Task A_boss_s_first_is_met_when_the_boss_falls_first()
+        {
+            if (!Available) return;
+            Load();
+            const int chadalidFirst = 117;
+            Assert.Equal(new[] { 4051 }, Challenges.Get(chadalidFirst)!.KillFirst);
+            await using var pipe = await ClientPipe.OpenAsync(8_960_100_061, 8_960_100_061, 191105026, "Uno");
+
+            var (fight, a, _, enemy) = Fight(chadalidFirst, 8_960_100_060);
+            enemy.MonsterId = 4051;
+            enemy.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, enemy, false, a);
+            Assert.Contains(chadalidFirst, fight.ChallengesMet);
+
+            var (other, a2, _, enemy2) = Fight(chadalidFirst, 8_960_100_070);
+            enemy2.MonsterId = 31;
+            enemy2.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, other, enemy2, false, a2);
+            Assert.Contains(chadalidFirst, other.ChallengesBroken);
+            Assert.DoesNotContain(chadalidFirst, other.ChallengesMet);
         }
     }
 }

@@ -1340,8 +1340,18 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public const int WaitsForTheJwz = int.MaxValue;
 
-        /// <summary>The ones already broken. It is reported once and not looked at again.</summary>
+        /// <summary>
+        /// The ones already settled: broken, or met before the end (<see cref="ChallengesMet"/>).
+        /// It is reported once and not looked at again.
+        /// </summary>
         public HashSet<int> ChallengesBroken { get; } = new HashSet<int>();
+
+        /// <summary>
+        /// The ones met before the end, because nothing left could break them: «First» once its
+        /// target has fallen first. They are in <see cref="ChallengesBroken"/> too, so nobody
+        /// watches them any more, and the end counts them as met.
+        /// </summary>
+        public HashSet<int> ChallengesMet { get; } = new HashSet<int>();
 
         /// <summary>Where and with how many MP whoever has the turn now started it.</summary>
         public int TurnStartCell { get; set; }

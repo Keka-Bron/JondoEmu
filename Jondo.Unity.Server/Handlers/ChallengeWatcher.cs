@@ -660,11 +660,15 @@ namespace Jondo.Unity.Server.Handlers
                                      $"{quienRemata.Name} finishes off the summon {victima.Name}");
             }
 
-            // First: the one pointed out has to be the very first to fall.
-            if (Vivo(fight, Primero) && !EsElSenalado(fight, Primero, victima.Id))
+            // First: the one pointed out has to be the very first to fall. Once he has, nothing can
+            // break it any more, and it is met then.
+            if (Vivo(fight, Primero))
             {
-                await BreakAsync(stream, fight, Primero,
-                                 $"{victima.Name} has fallen before the marked one");
+                if (!EsElSenalado(fight, Primero, victima.Id))
+                    await BreakAsync(stream, fight, Primero,
+                                     $"{victima.Name} has fallen before the marked one");
+                else
+                    await MeetAsync(stream, fight, Primero, $"the marked one {victima.Name} falls first");
             }
 
             // Last: the one pointed out has to fall last, that is with nobody else standing.
@@ -750,6 +754,11 @@ namespace Jondo.Unity.Server.Handlers
                         await BreakOneAsync(stream, fight, id,
                                             $"{victima.Name} has fallen before the one that had to fall first");
                     }
+                }
+                else if (reto.KillFirst.Count > 0 && AsksOnlyToKillFirst(reto))
+                {
+                    // The one that had to fall first has: nothing else it asks can go wrong now.
+                    await MeetOneAsync(stream, fight, id, $"{victima.Name} falls first");
                 }
 
                 if (reto.KillLast.Count > 0 && reto.KillLast.Contains(victima.MonsterId))
@@ -842,12 +851,18 @@ namespace Jondo.Unity.Server.Handlers
             int extra = 0;
             foreach (var (id, percent) in fight.ChallengesFixed)
             {
-                if (fight.ChallengesBroken.Contains(id)) continue;
+                // One met before the end counts as met when the fight is won. Lost, it is left as
+                // it was shown: no failure comes after its success.
+                bool metEarly = fight.ChallengesMet.Contains(id);
+                if (fight.ChallengesBroken.Contains(id) && !metEarly) continue;
+                if (metEarly && !won) continue;
 
                 bool cumplido = won;
                 fight.ChallengesBroken.Add(id);
                 byte[] verdict = ConnectionProtocol.Push(Op.Kwl, Network.FightProtocol.BuildChallengeResult(id, cumplido));
                 end.Frames.Add(verdict);
+                // Sent again for one met before: only the player whose blow met it was told then,
+                // and the client takes the same verdict twice as once (flr.bdql sets the state).
                 await WriteFrameAsync(stream, verdict);
 
                 var reto = Challenges.Get(id);
@@ -999,7 +1014,7 @@ namespace Jondo.Unity.Server.Handlers
             int extra = 0;
             foreach (var (id, percent) in fight.ChallengesFixed)
             {
-                if (fight.ChallengesBroken.Contains(id)) continue;
+                if (fight.ChallengesBroken.Contains(id) && !fight.ChallengesMet.Contains(id)) continue;
                 if (id == Reparto && fight.Azul.Any(a => !fight.Killers.Contains(a.Id))) continue;
                 if (id == CadaUnoConSuMonstruo && fight.Azul.Any(a => !a.EsInvocado && !Notes(fight).KillOwners.Contains(a.Id))) continue;
                 if (id == DosPorUno && Notes(fight).TurnKills == 1) continue;
@@ -1136,6 +1151,40 @@ namespace Jondo.Unity.Server.Handlers
 
             Console.WriteLine($"[Challenges] «{Challenges.Get(id)?.Name ?? id.ToString()}» BROKEN: {porque}.");
         }
+
+        /// <summary>
+        /// Meeting a challenge before the end, the moment nothing left can break it: the client
+        /// draws it green then, as the real game does when the one that had to fall first falls.
+        /// Until then it shows «in progress», since a success otherwise only goes at the end.
+        /// </summary>
+        private static async Task MeetAsync(NetworkStream stream, FightInstance fight, int id, string porque)
+        {
+            var sameKind = new List<int>();
+            foreach (var (suyo, _) in fight.ChallengesFixed)
+            {
+                if (Challenges.KindOf(suyo) == id) sameKind.Add(suyo);
+            }
+
+            foreach (int uno in sameKind) await MeetOneAsync(stream, fight, uno, porque);
+        }
+
+        /// <summary>Meets ONE challenge, by its number: what <see cref="MeetAsync"/> does to each.</summary>
+        private static async Task MeetOneAsync(NetworkStream stream, FightInstance fight, int id, string porque)
+        {
+            if (!fight.ChallengesBroken.Add(id)) return;
+            fight.ChallengesMet.Add(id);
+
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwl, Network.FightProtocol.BuildChallengeResult(id, true)));
+            Console.WriteLine($"[Challenges] «{Challenges.Get(id)?.Name ?? id.ToString()}» met already: {porque}.");
+        }
+
+        /// <summary>
+        /// Whether a boss's «CK#» asks for nothing but its monster falling first, and so is met
+        /// when it does: not when it also wants one last, a turn limit or a rule of its own.
+        /// </summary>
+        private static bool AsksOnlyToKillFirst(Challenges.Challenge reto)
+            => reto.KillLast.Count == 0 && reto.TurnLimit == 0 && reto.Rule == Challenges.BossRule.None
+               && !reto.PartySizeOnly && Challenges.KindOf(reto.Id) == 0;
 
         /// <summary>Does he have somebody of that side next to him? Next to is one cell, no diagonals.</summary>
         private static bool Adyacente(FightInstance fight, Fighter quien, int bando)
