@@ -2314,7 +2314,7 @@ namespace Jondo.Unity.Server.Network
             await HouseHandler.SendAccountHousesAsync(stream);
 
             // And his quest journal, for the same reason: the capture's no longer travels.
-            await Managers.Quests.SendJournalAsync(stream);
+            await Managers.Quests.SendJournalAsync(stream, box: true);
 
             // And their emotes and achievements, for the same reason: the replayed block carried
             // the recorded account's 47 emotes and 954 achievements.

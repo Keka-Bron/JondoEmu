@@ -359,14 +359,17 @@ namespace Jondo.Unity.Server.Network
                     lines = RunInSession(session, async stream =>
                     {
                         if (!log.Active(quest) && !log.Finished(quest)) await Quests.StartAsync(stream, quest);
+                        bool wasActive = log.Active(quest);
                         for (int guard = 0; guard < 40 && log.Active(quest); guard++) log.FinishStep(quest);
                         Quests.SaveAsItStands(quest);
+                        if (wasActive) await DropFromTheBoxAsync(stream, quest);
                         await Quests.SendJournalAsync(stream);
                     });
                     break;
                 case "forget":
                     lines = RunInSession(session, async stream =>
                     {
+                        if (log.Active(quest)) await DropFromTheBoxAsync(stream, quest);
                         Quests.Forget(quest);
                         await Quests.SendJournalAsync(stream);
                     });
@@ -376,6 +379,19 @@ namespace Jondo.Unity.Server.Network
             }
             var run = log.Run(quest);
             return Bien(new { quest, op, run = run == null ? null : RunOf(log, run), lines = lines.Where(l => l.Contains("[Quest")).ToList() });
+        }
+
+        /// <summary>
+        /// A quest under way that the scene set closes or wipes out of turn leaves the client's
+        /// followed box as a quest ends: the client follows every quest it starts, and only the
+        /// ied of a quest done takes it out again. Without it a quest wiped out while under way
+        /// stayed in the box, asking for objectives the server no longer had.
+        /// </summary>
+        private static async System.Threading.Tasks.Task DropFromTheBoxAsync(System.Net.Sockets.NetworkStream stream, int quest)
+        {
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(quest)));
+            FollowedQuests.Unfollow(SessionContext.State.CharacterId, quest);
         }
     }
 }

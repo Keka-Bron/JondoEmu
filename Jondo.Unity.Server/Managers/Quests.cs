@@ -326,7 +326,16 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         private static bool Revealed(QuestStep step, QuestObjective objective, QuestRun run)
         {
-            bool anyOrder = Bindings.Of(objective.Id)?.AnyOrder == true;
+            // What its binding asks to come first: the castle's gate of «Jamais deux sans trois» is
+            // gone to once the three wabbits have been heard out, though the catalogue lists it
+            // after three conversations, which never hold anything back -- a walk past the castle
+            // ticked it before the first wabbit.
+            var own = Bindings.Of(objective.Id);
+            if (own != null && own.Kind != QuestBindingKind.Objectives
+                && own.AfterObjectives.Any(before => !run.Done.Contains(before) && Log?.ObjectiveDone(before) != true))
+                return false;
+
+            bool anyOrder = own?.AnyOrder == true;
             foreach (var before in step.Objectives)
             {
                 if (before.Id == objective.Id) return true;
@@ -1800,8 +1809,14 @@ namespace Jondo.Unity.Server.Managers
         /// quests would also have been ones the server did not think they had.
         ///
         /// Nothing is sent for a character with no quests, which is what a new one looks like.
+        ///
+        /// The followed quests' box (iel) goes with it only on entering the world («box»): later
+        /// in the session the client adds what an iel brings to what its box already shows, and
+        /// each journal sent again -- a quest forfeited, the tutorial left -- showed the followed
+        /// quests once more. Once in the world the client keeps the box itself: it follows a quest
+        /// as it starts, and the ied of a finished one takes it out.
         /// </remarks>
-        public static async Task SendJournalAsync(NetworkStream stream)
+        public static async Task SendJournalAsync(NetworkStream stream, bool box = false)
         {
             var log = Log;
             if (log == null) return;
@@ -1833,6 +1848,7 @@ namespace Jondo.Unity.Server.Managers
                 ConnectionProtocol.Push(Op.Idr, QuestProtocol.BuildJournal(doing, finished)));
 
             Console.WriteLine($"[Quests] Journal sent: {doing.Count} in progress, {finished.Count} done.");
+            if (!box) return;
 
             // And the followed quests' box, which the client fills from its own message (iel), in
             // the order they were taken up. Only those still in progress: a finished one leaves it.
