@@ -496,6 +496,22 @@ namespace Jondo.Unity.World.Fights
             RedPlacementCells.AddRange(red);
         }
 
+        /// <summary>
+        /// Both teams' placement cells on these walkable cells: drawn anew with <paramref name="dice"/>,
+        /// as every fight is (see <see cref="Maps.PlacementLayout"/>), or the same every time without
+        /// it, for whoever has to tell beforehand where a fight will stand (a dream's room).
+        /// </summary>
+        public void GeneratePlacementCells(List<int> walkableCells, Random dice)
+        {
+            if (dice != null && walkableCells != null && walkableCells.Count >= PlacesForBothTeams
+                && Maps.PlacementLayout.Draw(walkableCells, dice) is { } drawn)
+            {
+                SetPlacementCells(drawn.Blue, drawn.Red);
+                return;
+            }
+            GeneratePlacementCells(walkableCells);
+        }
+
         public void GeneratePlacementCells(List<int> walkableCells)
         {
             BluePlacementCells.Clear();
