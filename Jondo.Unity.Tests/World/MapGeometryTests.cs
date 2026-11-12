@@ -82,5 +82,25 @@ namespace Jondo.Unity.Tests.World
             // Cell zero is a corner. Everything that walks has to cope with the short list.
             Assert.True(MapGeometry.GetNeighbors(0).Count() < 4);
         }
+
+        /// <summary>
+        /// A perfect diagonal passes between the cells at its corners, and they never close it,
+        /// even with an obstacle on both sides: a Steamer at 275 was refused 303 between a crate
+        /// (289) and a Feu Follet (290), which the client offered. A cell ON the diagonal still does.
+        /// </summary>
+        [Fact]
+        public void A_diagonal_passes_between_two_obstacles_at_its_corner()
+        {
+            Assert.Equal((1, -1), (MapGeometry.CellToPoint(303).X - MapGeometry.CellToPoint(275).X,
+                                   MapGeometry.CellToPoint(303).Y - MapGeometry.CellToPoint(275).Y));
+            Assert.True(MapGeometry.HasLineOfSight(275, 303, cell => cell == 289 || cell == 290));
+
+            // Two diagonal steps: the cell in the middle of the diagonal blocks it.
+            var (x, y) = MapGeometry.CellToPoint(275);
+            int middle = MapGeometry.PointToCell(x + 1, y - 1);
+            int far = MapGeometry.PointToCell(x + 2, y - 2);
+            Assert.False(MapGeometry.HasLineOfSight(275, far, cell => cell == middle));
+            Assert.True(MapGeometry.HasLineOfSight(275, far, cell => cell != middle && cell != 275 && cell != far));
+        }
     }
 }

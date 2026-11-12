@@ -162,6 +162,13 @@ namespace Jondo.Unity.World.Maps
             int steps = Math.Abs(dx) + Math.Abs(dy);
             if (steps <= 1) return true;
 
+            // A perfect diagonal goes from corner to corner: the points between the cells on it
+            // are corners, and a corner never closes it, even with an obstacle on both sides. The
+            // client offers such a cell and the cast went out, but it was refused here: a Steamer
+            // at 275 could not reach 303, two cells away diagonally, between a crate (289) and a
+            // Feu Follet (290).
+            bool diagonal = Math.Abs(dx) == Math.Abs(dy);
+
             // The segment is walked in `steps` sections and at every intermediate point we look
             // at which cells touch it. When the point lands exactly on an edge or a corner there
             // is more than one candidate, and it is enough for ONE of them to be clear: that way
@@ -174,6 +181,7 @@ namespace Jondo.Unity.World.Maps
 
                 int fx = (int)Math.Floor(px), cx = (int)Math.Ceiling(px);
                 int fy = (int)Math.Floor(py), cy = (int)Math.Ceiling(py);
+                if (diagonal && fx != cx && fy != cy) continue;
 
                 bool anyOpen = false;
                 bool anyCell = false;
