@@ -681,8 +681,8 @@ played through.
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
 | Incarnam | `██████████` **100%** | 24/24 |
+| Wabbit Islands | `██████████` **100%** | 23/23 |
 | Vigilantes | `██████████` **100%** | 21/21 |
-| Wabbit Islands | `████████░░` **83%** | 19/23 |
 | Krosmoz | `██████████` **100%** | 18/18 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
@@ -691,7 +691,7 @@ played through.
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| **All quests** | **14.7%** | **290/1976** |
+| **All quests** | **14.9%** | **294/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
