@@ -42,7 +42,7 @@ namespace Jondo.Unity.Studio.Pages
         private readonly WorldData _world;
         private NpcCatalogue? _catalogue;
 
-        private readonly Dictionary<NpcDialogueKey, Draft> _drafts = new Dictionary<NpcDialogueKey, Draft>();
+        private readonly Dictionary<NpcDialogueKey, DialogueDraft> _drafts = new Dictionary<NpcDialogueKey, DialogueDraft>();
 
         private bool _loaded;
         private bool _dirty;
@@ -54,85 +54,6 @@ namespace Jondo.Unity.Studio.Pages
         public override string ToString() => Words.T(TitleKey);
 
         // ─── What is being edited ─────────────────────────────────────────────────
-
-        private sealed class Draft
-        {
-            public int NpcId;
-            public long Opening;
-
-            /// <summary>message → the replies hanging under it, and where each leads.</summary>
-            public readonly Dictionary<long, List<DraftChoice>> Lines = new Dictionary<long, List<DraftChoice>>();
-
-            public bool Has(long message) => Lines.ContainsKey(message);
-
-            public List<DraftChoice> Under(long message)
-                => Lines.TryGetValue(message, out var choices) ? choices : new List<DraftChoice>();
-
-            public bool Empty => Lines.Count == 0;
-
-            public NpcDialogue Freeze()
-            {
-                var lines = new List<DialogueLine>();
-                foreach (var pair in Lines)
-                {
-                    lines.Add(new DialogueLine
-                    {
-                        Message = pair.Key,
-                        Choices = pair.Value.ConvertAll(c => new DialogueChoice
-                        {
-                            Reply = c.Reply,
-                            Next = c.Next,
-                            Quest = c.Quest,
-                            Step = c.Step,
-                            StartsQuest = c.StartsQuest,
-                            AfterQuest = c.AfterQuest,
-                            KothRole = c.KothRole,
-                            RefusedNext = c.RefusedNext,
-                        }).ToArray(),
-                    });
-                }
-
-                // The opening line first, so the file reads in the order the conversation happens.
-                lines.Sort((a, b) =>
-                {
-                    if (a.Message == Opening) return -1;
-                    if (b.Message == Opening) return 1;
-                    return a.Message.CompareTo(b.Message);
-                });
-
-                return new NpcDialogue
-                {
-                    NpcId = NpcId,
-                    MapId = NpcDialogueKey.AnyMap,
-                    Opening = Opening != 0 ? Opening : (lines.Count > 0 ? lines[0].Message : 0),
-                    Lines = lines,
-                };
-            }
-        }
-
-        private sealed class DraftChoice
-        {
-            public long Reply;
-            public long Next;
-
-            /// <summary>
-            /// What the reply is for, carried through untouched.
-            /// </summary>
-            /// <remarks>
-            /// The editor cannot set these yet — a reply's quest and step are written by hand or by
-            /// tools/build_dialogue_trees.py — and that is exactly why they are here. Without them
-            /// the draft would rebuild every choice from just the reply and the line it leads to,
-            /// so opening a conversation in the editor and saving it would quietly erase the quest
-            /// markings on every reply of that NPC. Nothing would look wrong until a quest stopped
-            /// being handed out.
-            /// </remarks>
-            public int Quest;
-            public int Step;
-            public int StartsQuest;
-            public bool AfterQuest;
-            public int KothRole;
-            public long RefusedNext;
-        }
 
         /// <summary>One line of the NPC, as the list shows it.</summary>
         private sealed record LineRow(long Message, string Text, bool InTree, bool Opens);
@@ -207,7 +128,7 @@ namespace Jondo.Unity.Studio.Pages
             };
 
             NpcDialogueSource? source = null;
-            Draft? draft = null;
+            DialogueDraft? draft = null;
             bool filling = false;
             long chosenLine = 0;
 
@@ -632,7 +553,7 @@ namespace Jondo.Unity.Studio.Pages
         /// and looked like it did not do chaining at all. Now picking a line that is not in the
         /// tree yet puts it in, which is what somebody choosing "and then he says this" means.
         /// </remarks>
-        private static List<Destination> Destinations(Draft draft, NpcDialogueSource? source, long from)
+        private static List<Destination> Destinations(DialogueDraft draft, NpcDialogueSource? source, long from)
         {
             var options = new List<Destination> { new Destination(0, Words.T("dlg.ends")) };
             var seen = new HashSet<long>();
@@ -656,7 +577,7 @@ namespace Jondo.Unity.Studio.Pages
         }
 
         /// <summary>The tree as text, so its shape can be seen without clicking through it.</summary>
-        private static string Sketch(Draft draft, NpcDialogueSource? source)
+        private static string Sketch(DialogueDraft draft, NpcDialogueSource? source)
         {
             var text = new StringBuilder();
             var order = new List<long>(draft.Lines.Keys);
@@ -733,34 +654,9 @@ namespace Jondo.Unity.Studio.Pages
             _loaded = true;
         }
 
-        private void Adopt(NpcDialogue dialogue)
-        {
-            var draft = new Draft { NpcId = dialogue.NpcId, Opening = dialogue.Opening };
-            foreach (var line in dialogue.Lines)
-            {
-                var choices = new List<DraftChoice>();
-                foreach (var choice in line.Choices)
-                {
-                    choices.Add(new DraftChoice
-                    {
-                        Reply = choice.Reply,
-                        Next = choice.Next,
-                        Quest = choice.Quest,
-                        Step = choice.Step,
-                        StartsQuest = choice.StartsQuest,
-                        AfterQuest = choice.AfterQuest,
-                        KothRole = choice.KothRole,
-                        RefusedNext = choice.RefusedNext,
-                    });
-                }
+        private void Adopt(NpcDialogue dialogue) => _drafts[dialogue.Key] = DialogueDraft.From(dialogue);
 
-                draft.Lines[line.Message] = choices;
-            }
-
-            _drafts[dialogue.Key] = draft;
-        }
-
-        private Draft DraftFor(int npcId)
+        private DialogueDraft DraftFor(int npcId)
         {
             // Every tree written here is for every map the NPC stands on. Per-map openings are in
             // the file format and in the server, because the real game does make that distinction,
@@ -769,7 +665,7 @@ namespace Jondo.Unity.Studio.Pages
             var key = new NpcDialogueKey(npcId, NpcDialogueKey.AnyMap);
             if (_drafts.TryGetValue(key, out var draft)) return draft;
 
-            draft = new Draft { NpcId = npcId };
+            draft = new DialogueDraft { NpcId = npcId };
             _drafts[key] = draft;
             return draft;
         }

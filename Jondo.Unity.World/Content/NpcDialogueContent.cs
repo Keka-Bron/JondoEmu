@@ -11,10 +11,28 @@ namespace Jondo.Unity.World.Content
     public sealed class DialogueChoice
     {
         /// <summary>The reply's id, out of the ones the NPC's template declares.</summary>
-        public long Reply { get; init; }
+        public long Reply { get => _reply; init => _reply = value; }
+        private long _reply;
 
         /// <summary>The line it leads to. Zero ends the conversation, which is most of them.</summary>
-        public long Next { get; init; }
+        public long Next { get => _next; init => _next = value; }
+        private long _next;
+
+        /// <summary>
+        /// This same choice as <paramref name="reply"/> leading to <paramref name="next"/>, with
+        /// everything else it says -- quest, conditions, gifts, teleports... -- carried over.
+        /// </summary>
+        /// <remarks>
+        /// For an editor that only moves replies around (the Studio's): building a new choice from
+        /// the two fields it edits dropped every other one when the tree was saved.
+        /// </remarks>
+        public DialogueChoice Leading(long reply, long next)
+        {
+            var copy = (DialogueChoice)MemberwiseClone();
+            copy._reply = reply;
+            copy._next = next;
+            return copy;
+        }
 
         /// <summary>
         /// The quest this reply belongs to, or zero when it belongs to no quest.
@@ -447,7 +465,16 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public bool HoursToDailyReset { get; init; }
 
-        public IReadOnlyList<DialogueChoice> Choices { get; init; } = Array.Empty<DialogueChoice>();
+        public IReadOnlyList<DialogueChoice> Choices { get => _choices; init => _choices = value; }
+        private IReadOnlyList<DialogueChoice> _choices = Array.Empty<DialogueChoice>();
+
+        /// <summary>This same line with <paramref name="choices"/>, its own flags carried over.</summary>
+        public DialogueLine WithChoices(IReadOnlyList<DialogueChoice> choices)
+        {
+            var copy = (DialogueLine)MemberwiseClone();
+            copy._choices = choices;
+            return copy;
+        }
 
         public DialogueChoice? Choice(long reply)
         {
@@ -717,9 +744,32 @@ namespace Jondo.Unity.World.Content
         public long MapId { get; init; }
 
         /// <summary>The line it opens with. Zero falls back to the template's.</summary>
-        public long Opening { get; init; }
+        public long Opening { get => _opening; init => _opening = value; }
+        private long _opening;
 
-        public IReadOnlyList<DialogueLine> Lines { get; init; } = Array.Empty<DialogueLine>();
+        public IReadOnlyList<DialogueLine> Lines { get => _lines; init => _lines = value; }
+        private IReadOnlyList<DialogueLine> _lines = Array.Empty<DialogueLine>();
+
+        /// <summary>Why the tree is as it is («why»): the guide, capture or text it follows. Read by people only.</summary>
+        public string Why { get; init; } = "";
+
+        /// <summary>Written by hand («_byHand»), for the tools that write trees to leave alone. Read by people and tools only.</summary>
+        public bool ByHand { get; init; }
+
+        /// <summary>Where the tree was taken from («_source»). Read by people only.</summary>
+        public string SourceNote { get; init; } = "";
+
+        /// <summary>
+        /// This same tree opening on <paramref name="opening"/> with <paramref name="lines"/>: its
+        /// map, quest openings, pushes and notes carried over.
+        /// </summary>
+        public NpcDialogue WithLines(long opening, IReadOnlyList<DialogueLine> lines)
+        {
+            var copy = (NpcDialogue)MemberwiseClone();
+            copy._opening = opening;
+            copy._lines = lines;
+            return copy;
+        }
 
         /// <summary>Whether a reply of this tree does that objective (<see cref="DialogueChoice.Completes"/>).</summary>
         public bool HasReplyFor(int objectiveId)
@@ -1001,6 +1051,9 @@ namespace Jondo.Unity.World.Content
                         Openings = ReadOpenings(entry),
                         Pushes = ReadPushes(entry),
                         Lines = ReadLines(entry, report, npcId),
+                        Why = Text(entry, "why"),
+                        ByHand = entry.TryGetProperty("_byHand", out var byHand) && byHand.ValueKind == JsonValueKind.True,
+                        SourceNote = Text(entry, "_source"),
                     }, from);
                 }
             }
@@ -1161,7 +1214,7 @@ namespace Jondo.Unity.World.Content
 
                 writer.WritePropertyName("_comment");
                 writer.WriteStartArray();
-                foreach (string line in comment ?? DefaultComment) writer.WriteStringValue(line);
+                foreach (string line in comment ?? CommentOf(path) ?? DefaultComment) writer.WriteStringValue(line);
                 writer.WriteEndArray();
 
                 writer.WritePropertyName("dialogues");
@@ -1172,6 +1225,8 @@ namespace Jondo.Unity.World.Content
                     writer.WriteNumber("npc", dialogue.NpcId);
                     writer.WriteNumber("map", dialogue.MapId);
                     if (dialogue.Opening != 0) writer.WriteNumber("opening", dialogue.Opening);
+                    if (dialogue.ByHand) writer.WriteBoolean("_byHand", true);
+                    if (dialogue.SourceNote.Length > 0) writer.WriteString("_source", dialogue.SourceNote);
                     if (dialogue.Openings.Count > 0)
                     {
                         writer.WriteStartArray("openings");
@@ -1336,6 +1391,7 @@ namespace Jondo.Unity.World.Content
                     }
 
                     writer.WriteEndArray();
+                    if (dialogue.Why.Length > 0) writer.WriteString("why", dialogue.Why);
                     writer.WriteEndObject();
                 }
 
@@ -1427,6 +1483,33 @@ namespace Jondo.Unity.World.Content
         private static long Number(JsonElement element, string name)
             => element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number
                && value.TryGetInt64(out long number) ? number : 0;
+
+        /// <summary>
+        /// The «_comment» the file at <paramref name="path"/> already has, or null. A save without
+        /// a comment of its own keeps it: the Studio's put the short default over the long one.
+        /// </summary>
+        private static IReadOnlyList<string>? CommentOf(string path)
+        {
+            try
+            {
+                if (!File.Exists(path)) return null;
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("_comment", out var lines) || lines.ValueKind != JsonValueKind.Array)
+                    return null;
+                var read = new List<string>();
+                foreach (var line in lines.EnumerateArray())
+                    if (line.ValueKind == JsonValueKind.String) read.Add(line.GetString() ?? "");
+                return read.Count > 0 ? read : null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static string Text(JsonElement element, string name)
+            => element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
+               ? value.GetString() ?? "" : "";
 
         private static readonly string[] DefaultComment =
         {
