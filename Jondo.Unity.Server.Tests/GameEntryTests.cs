@@ -110,27 +110,108 @@ public sealed class GameEntryTests
     }
 
     [Fact]
-    public async Task Welcome_uses_typed_sends_in_existing_order_and_preserves_partial_packets()
+    public async Task Welcome_constructs_semantic_events_in_existing_order()
     {
-        var packets = new List<byte[]>();
-        var codec = new GameMessagingTests.CountingCodec();
-        var session = new GameSession(codec, bytes => { packets.Add(bytes); return Task.CompletedTask; });
+        var codec = new WelcomeCodec();
+        var frames = new List<GameFrame>();
+        var session = new GameSession(codec, token =>
+        {
+            frames.Add(codec.Pending[token]);
+            codec.Pending.Remove(token);
+            return Task.CompletedTask;
+        });
         session.BindAccount(90_000_002, 290, "fr");
         await ConnectionProtocol.SendWelcomeAsync(session, [], withList: false);
-        Assert.Equal(new[] { "kra", "lqu", "hoy", "kqu", "mgq", "mgt", "hpd", "krs", "mgz" },
-            packets.Select(p => Codec.ReadEnvelope(p).Alias));
-        Assert.Equal(8, codec.Encodes);
-        Assert.All(packets, p => Assert.Equal(GameMessageKind.Event, Codec.ReadEnvelope(p).Kind));
-        Assert.Equal("fr", Assert.IsType<ServerSettingsEvent>(Codec.Decode(packets[2]).Content).Language);
+        Assert.Equal(new[] { typeof(AuthenticationTicketAcceptedEvent), typeof(TimeEvent), typeof(ServerSettingsEvent),
+            typeof(OptionalFeaturesEvent), typeof(AccountCapabilitiesEvent), typeof(AccountRightsEvent),
+            typeof(TrustStatusEvent), typeof(ServerSessionReadyEvent), typeof(AccountSubscriptionElapsedDurationUpdateEvent) },
+            frames.Select(frame => frame.Content.GetType()));
+        Assert.Equal(9, codec.Frames.Count);
+        Assert.Empty(codec.Pending);
+        Assert.All(frames, frame => Assert.Null(frame.Uid));
+        Assert.Equal(new ServerSettingsEvent(30, ServerType.Classical, true, false, 0, "fr"), frames[2].Content);
         Assert.Equal(new AccountCapabilitiesEvent(CharacterCreationRights.Allowed, true, Hierarchy.RolePlayer),
-            Codec.Decode(packets[4]).Content);
-        Assert.Equal(new AccountRightsEvent(new(false, false, false, false)), Codec.Decode(packets[5]).Content);
-        Assert.Equal(new TrustStatusEvent(true), Codec.Decode(packets[6]).Content);
-        Assert.Equal(new ServerSessionReadyEvent(), Codec.Decode(packets[7]).Content);
-        Assert.Equal(new AccountSubscriptionElapsedDurationUpdateEvent(0), Codec.Decode(packets[8]).Content);
-        Assert.Empty(Codec.ReadEnvelope(packets[8]).Content.Value);
-        Assert.Contains(ProtoMessage.Parse(Codec.ReadEnvelope(packets[2]).Content.Value.ToByteArray()).Fields,
-            f => f.FieldNumber == 7 && f.VarIntValue == 200);
+            frames[4].Content);
+        Assert.Equal(new AccountRightsEvent(new(false, false, false, false)), frames[5].Content);
+        Assert.Equal(new TrustStatusEvent(true), frames[6].Content);
+        Assert.Equal(new ServerSessionReadyEvent(), frames[7].Content);
+        Assert.Equal(new AccountSubscriptionElapsedDurationUpdateEvent(0), frames[8].Content);
+    }
+
+    [Fact]
+    public async Task Welcome_settings_use_each_owning_session_despite_a_conflicting_ambient_session()
+    {
+        var ambientCodec = new WelcomeCodec();
+        var ambient = new GameSession(ambientCodec, _ => throw new Exception("Unexpected ambient delivery"));
+        ambient.BindAccount(90_000_003, 290, "fr");
+        using var scope = SessionContext.Push(ambient);
+
+        foreach (var language in new[] { "es", "en" })
+        {
+            var codec = new WelcomeCodec();
+            var own = new GameSession(codec, token =>
+            {
+                Assert.True(codec.Pending.Remove(token));
+                return Task.CompletedTask;
+            });
+            own.BindAccount(language == "es" ? 90_000_004 : 90_000_005, 290, language);
+            await ConnectionProtocol.SendWelcomeAsync(own, [], withList: false);
+
+            Assert.Equal(new ServerSettingsEvent(30, ServerType.Classical, true, false, 0, language),
+                Assert.Single(codec.Frames.Select(frame => frame.Content).OfType<ServerSettingsEvent>()));
+            Assert.Empty(codec.Pending);
+            Assert.Same(ambient, SessionContext.Actual);
+        }
+
+        Assert.Empty(ambientCodec.Frames);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Settings_delivery_failure_propagates_and_stops_the_welcome(bool codecFailure)
+    {
+        var failure = new IOException("settings delivery failed");
+        var codec = new WelcomeCodec(codecFailure ? failure : null);
+        var delivered = new List<GameFrame>();
+        int transports = 0;
+        var session = new GameSession(codec, token =>
+        {
+            transports++;
+            var frame = codec.Pending[token];
+            codec.Pending.Remove(token);
+            if (!codecFailure && frame.Content is ServerSettingsEvent) return Task.FromException(failure);
+            delivered.Add(frame);
+            return Task.CompletedTask;
+        });
+        session.BindAccount(90_000_006, 290, "fr");
+
+        Assert.Same(failure, await Assert.ThrowsAsync<IOException>(() =>
+            ConnectionProtocol.SendWelcomeAsync(session, [], withList: true)));
+
+        Assert.Equal(new[] { typeof(AuthenticationTicketAcceptedEvent), typeof(TimeEvent), typeof(ServerSettingsEvent) },
+            codec.Frames.Select(frame => frame.Content.GetType()));
+        Assert.Equal(2, delivered.Count);
+        Assert.Equal(codecFailure ? 2 : 3, transports);
+        Assert.Empty(codec.Pending);
+    }
+
+    private sealed class WelcomeCodec(Exception? settingsFailure = null) : IGameCodec
+    {
+        internal List<GameFrame> Frames { get; } = [];
+        internal Dictionary<byte[], GameFrame> Pending { get; } = [];
+
+        public byte[] Encode(GameFrame frame)
+        {
+            Frames.Add(frame);
+            if (frame.Content is ServerSettingsEvent && settingsFailure != null) throw settingsFailure;
+            byte[] token = [0xfe, 0xff];
+            Pending.Add(token, frame);
+            return token;
+        }
+
+        public GameFrame Decode(ReadOnlySpan<byte> payload)
+            => throw new InvalidOperationException("Unexpected decode during semantic welcome construction");
     }
 
     [Theory]

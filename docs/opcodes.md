@@ -96,7 +96,7 @@ the current implementation. See [the typed protocol documentation](game-protocol
 | `krt` | C→S | 7 / 6 files | Arrives together with `kqz`. Expects nothing back. | `GameNodeProxy` (empty branch) | — |
 | `kra` | S→C | 10 / 9 files | Opens the burst. | `ConnectionProtocol.SendWelcomeAsync` | `AuthenticationTicketAcceptedEvent` |
 | `lqu` | S→C | 735 / 91 files | Clock sync. Also sent on every map change. | `ConnectionProtocol.SendWelcomeAsync`, `ServerTimeMessages` | `TimeEvent`: timezone offset minutes and current Unix milliseconds |
-| `hoy` | S→C | 9 / 8 files | Game-server hello. `f5` is deliberately absent: it appears in none of the three startup captures. | `ConnectionProtocol.BuildHoy` | `f1: 30, f2: 1, f3: 1, f6: language, f7: 200` |
+| `hoy` | S→C | 9 / 8 files | `ServerSettingsEvent`. Community defaults to 0; the unnamed tag-7 extra is omitted by the [welcome-settings policy](populated-unmapped-fields.md#welcome-settings-omission-policy). | `ConnectionProtocol.SendWelcomeAsync` (direct semantic send) | Arena leave-ban time 30, Classical, free autopilot, not mono-account, community 0, owning-session language. |
 | `kqu` | S→C | 11 / 9 files | Features enabled on the server, as opaque ids copied from the capture. | `ConnectionProtocol.SendWelcomeAsync` | `OptionalFeaturesEvent`: [3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150] |
 | `mgq` | S→C | 9 / 8 files | Current welcome policy allows character creation and advertises subscription/player hierarchy. | `ConnectionProtocol.SendWelcomeAsync` | `AccountCapabilitiesEvent(Allowed, true, RolePlayer)` |
 | `mgt` | S→C | 9 / 8 files | Account access flags. | `ConnectionProtocol.SendWelcomeAsync` | `AccountRightsEvent`: present rights block, all four flags false |

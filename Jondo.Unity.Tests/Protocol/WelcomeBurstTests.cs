@@ -28,7 +28,7 @@ public sealed class WelcomeBurstTests
         var welcome = await WelcomeCapture.SendAsync(Characters(2));
         int list = Array.IndexOf(welcome.DeliveryTypes, typeof(CharacterListEvent));
         Assert.True(list >= 0, "The welcome must include the character list.");
-        Assert.IsType<GameActionItemListEvent>(Assert.IsType<GameFrame>(welcome.Deliveries[list + 1]).Content);
+        Assert.IsType<GameActionItemListEvent>(welcome.Deliveries[list + 1].Content);
     }
 
     [Theory]
@@ -39,7 +39,7 @@ public sealed class WelcomeBurstTests
         var welcome = await WelcomeCapture.SendAsync(Characters(1), withList);
         var expected = new List<Type>
         {
-            typeof(AuthenticationTicketAcceptedEvent), typeof(TimeEvent), typeof(WelcomeCapture.RawPacket),
+            typeof(AuthenticationTicketAcceptedEvent), typeof(TimeEvent), typeof(ServerSettingsEvent),
             typeof(OptionalFeaturesEvent), typeof(AccountCapabilitiesEvent), typeof(AccountRightsEvent),
             typeof(TrustStatusEvent), typeof(ServerSessionReadyEvent), typeof(AccountSubscriptionElapsedDurationUpdateEvent),
         };
@@ -48,7 +48,6 @@ public sealed class WelcomeBurstTests
                 typeof(CharacterListEvent), typeof(GameActionItemListEvent)]);
         Assert.Equal(expected, welcome.DeliveryTypes);
         Assert.All(welcome.Frames, frame => Assert.Null(frame.Uid));
-        Assert.Single(welcome.Deliveries.OfType<WelcomeCapture.RawPacket>());
         Assert.Equal(new QueueStatusEvent[] { new(1, 1), new(1, 0), new(0, 0) }.Take(withList ? 3 : 0),
             welcome.Messages.OfType<QueueStatusEvent>());
     }

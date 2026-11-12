@@ -8,13 +8,10 @@ namespace Jondo.Unity.Tests.Protocol;
 /// <summary>Records actual welcome delivery through an opaque, session-owned codec.</summary>
 internal sealed class WelcomeCapture
 {
-    internal sealed record RawPacket(byte[] Bytes);
-
-    internal List<object> Deliveries { get; } = [];
-    internal IEnumerable<GameFrame> Frames => Deliveries.OfType<GameFrame>();
+    internal List<GameFrame> Deliveries { get; } = [];
+    internal IEnumerable<GameFrame> Frames => Deliveries;
     internal IEnumerable<GamePayload> Messages => Frames.Select(frame => frame.Content);
-    internal Type[] DeliveryTypes => Deliveries.Select(delivery => delivery is GameFrame frame
-        ? frame.Content.GetType() : typeof(RawPacket)).ToArray();
+    internal Type[] DeliveryTypes => Deliveries.Select(frame => frame.Content.GetType()).ToArray();
 
     internal static async Task<WelcomeCapture> SendAsync(IReadOnlyList<DatabaseManager.DbCharacter> characters,
         bool withList = true, string language = "es")
@@ -23,7 +20,8 @@ internal sealed class WelcomeCapture
         var codec = new RecordingCodec();
         var session = new GameSession(codec, packet =>
         {
-            capture.Deliveries.Add(codec.Pending.Remove(packet, out var frame) ? frame : new RawPacket(packet));
+            Assert.True(codec.Pending.Remove(packet, out var frame), "Welcome delivery bypassed the owning codec.");
+            capture.Deliveries.Add(frame!);
             return Task.CompletedTask;
         });
         session.BindAccount(8_919_099_003, 290, language);

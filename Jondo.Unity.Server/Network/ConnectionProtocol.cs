@@ -55,8 +55,12 @@ namespace Jondo.Unity.Server.Network
         {
             await session.SendAsync(new Game.AuthenticationTicketAcceptedEvent());
             await session.SendAsync(ServerTimeMessages.Snapshot());
-            // Settings still carry unmapped f7; retain that payload losslessly.
-            await GameEntryMessages.SendAsync(session, Push(Op.Hoy, BuildHoy(session.State.Language)));
+            // Community is not a subscription marker. The unnamed settings extra is
+            // omitted by policy; see docs/populated-unmapped-fields.md#welcome-settings-omission-policy.
+            await session.SendAsync(new Game.ServerSettingsEvent(
+                ArenaLeaveBanTime: 30, GameType: Game.ServerType.Classical,
+                HasFreeAutopilot: true, IsMonoAccount: false, Community: 0,
+                Language: session.State.Language));
             await session.SendAsync(new Game.OptionalFeaturesEvent(ActiveFeatures.Select(x => (int)x).ToArray()));
             await session.SendAsync(new Game.AccountCapabilitiesEvent(Game.CharacterCreationRights.Allowed,
                 true, Game.Hierarchy.RolePlayer));
@@ -87,42 +91,6 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static readonly long[] ActiveFeatures =
             { 3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150 };
-
-        /// <summary>
-        /// The game server's greeting, the frame that carries, among other things, what the account
-        /// is entitled to. The same values as the capture:
-        ///
-        ///   f1: 30   f2: 1   f3: 1   f6: language   f7: 200
-        /// </summary>
-        /// <remarks>
-        /// Field 5 is deliberately NOT written, and the reason is worth keeping because it was
-        /// added here once on a correlation and taken straight back out.
-        ///
-        /// Across the first six captures f5 appeared in exactly one of the two accounts recorded,
-        /// and that was the account holding four characters on a single server -- which reads like
-        /// a subscription marker and is not one. The capture "crear personaje - borrar personaje"
-        /// settles it: the SAME account, in three consecutive logins, creating an eleventh
-        /// character and deleting it again, sends
-        ///
-        /// <code>
-        ///   081e100118013202667238c801      no f5, and the create button is working
-        /// </code>
-        ///
-        /// So f5 comes and goes for one account between sessions and says nothing about what the
-        /// account may do. Sending it was copying a value nobody had decoded.
-        /// </remarks>
-        private static byte[] BuildHoy(string? language = null)
-        {
-            return Pb.New()
-                .Var(1, 30)
-                .Var(2, 1)
-                .Var(3, 1)
-                .Str(6, language ?? SessionContext.Actual?.State.Language ?? ClientLanguage)
-                .Var(7, 200)
-                .Build();
-        }
-
-
 
         /// <summary>The language the client is launched with.</summary>
         public const string ClientLanguage = "es";

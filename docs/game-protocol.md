@@ -824,10 +824,17 @@ still follows successful notification; achievement result messages follow their 
 notifications. `EmoteProtocol.BuildList` and `BuildLearned` are removed, with historical
 compatibility fixtures moved to the protocol suite.
 
-The welcome sequence constructs stable acceptance, time, optional-feature,
+The welcome sequence constructs stable acceptance, time, settings, optional-feature,
 capability, rights, trust, session-ready, subscription-duration and queue events
-directly. Server settings use the session's launch language and retain their
-original payload because field 7 remains unmapped.
+directly. `ServerSettingsEvent` uses the owning session's launch language, arena
+leave-ban time 30, `Classical` server type, free autopilot enabled, mono-account
+disabled and community 0. Community is not a subscription or character-limit marker.
+The unnamed tag-7 value formerly sent as 200 is deliberately omitted under the
+[welcome-settings policy](populated-unmapped-fields.md#welcome-settings-omission-policy).
+Its native-use finding remains indeterminate. `BuildHoy` is removed; settings no
+longer use byte construction, reparsing or projection. Opaque-codec semantic tests
+cover ordering, owning-session language isolation, and codec/transport failures
+stopping the welcome before later sends. Real-client acceptance remains unverified.
 
 The corrected August identities are `krs` = `ServerSessionReadyEvent` (the empty
 DH-handshake trigger) and `mgz` = `AccountSubscriptionElapsedDurationUpdateEvent`.
@@ -860,8 +867,8 @@ map-specific oneof; it differs from present-empty coordinates. No coordinates
 or special-map payload are invented for an ordinary map.
 
 `GameEntryMessages` is a transitional **lossless projection boundary**, not a
-replacement for the remaining builders. It handles welcome settings, remaining
-feature-hook payloads and the initial actor list; character lists and initial/map
+replacement for the remaining builders. It handles remaining feature-hook payloads
+and the initial actor list; welcome settings, character lists and initial/map
 sequencers send semantic events directly.
 For each mapped event it decodes the stable object, re-encodes it and compares the
 complete raw protobuf payload and envelope. Parsed-value comparison tolerates
