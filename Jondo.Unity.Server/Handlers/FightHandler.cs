@@ -10265,7 +10265,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 bool damages = false, hurtsAllies = false, summons = false, mechanics = false, mechanicsOnEnemies = false;
                 int zone = 0, removal = 0, buff = 0;
-                double heal = 0;
+                double heal = 0, pickedDamage = 0;
                 var masks = new Dictionary<int, string>();
                 foreach (var effect in Managers.SpellEffects.De(spell, grade))
                 {
@@ -10280,6 +10280,16 @@ namespace Jondo.Unity.Server.Handlers
                         if (enemies || (!own && !HasMask(mask, "C"))) damages = true;
                         if (own) hurtsAllies = true;
                         if (effect.Forma != 'P') zone = Math.Max(zone, effect.Tamano);
+                    }
+                    else if (BlowsInAPickedElement.Contains(effect.EffectId))
+                    {
+                        // A blow or a steal whose element is picked at the blow -- the best, the
+                        // worst --: a blow all the same. Weighed as nothing, the arponera's Espadon
+                        // (2828 only) was a utility spell, cast once a turn on one enemy of three.
+                        if (enemies || (!own && !HasMask(mask, "C"))) damages = true;
+                        if (own) hurtsAllies = true;
+                        if (effect.Forma != 'P') zone = Math.Max(zone, effect.Tamano);
+                        pickedDamage = Math.Max(pickedDamage, average);
                     }
                     else if (effect.EffectId == Jondo.Unity.World.Combat.EffectSupport.FireHeal)
                         heal = Math.Max(heal, average);
@@ -10318,7 +10328,9 @@ namespace Jondo.Unity.Server.Handlers
                     InLine = data.CastInLine,
                     PerTurn = limits.PorTurno > 0 ? limits.PorTurno : data.MaxCastPerTurn,
                     PerTarget = limits.PorObjetivo > 0 ? limits.PorObjetivo : data.MaxCastPerTarget,
-                    Damage = damages ? (data.BaseDamageMin + data.BaseDamageMax) / 2.0 : 0,
+                    Damage = !damages ? 0
+                             : data.BaseDamageMin + data.BaseDamageMax > 0 ? (data.BaseDamageMin + data.BaseDamageMax) / 2.0
+                             : pickedDamage,
                     Element = (Jondo.Unity.World.Fights.ElementType)Math.Clamp(data.Element, 0, 4),
                     Zone = zone,
                     HurtsAllies = hurtsAllies,
@@ -10342,6 +10354,13 @@ namespace Jondo.Unity.Server.Handlers
             }
             return spells;
         }
+
+        /// <summary>
+        /// The blows and steals whose element is picked at the blow: 2822 and 2832, the best and
+        /// worst element's damage; 2828 and 2890, their steals. Outside 91-100, where the tactics
+        /// looked for a blow.
+        /// </summary>
+        private static readonly HashSet<int> BlowsInAPickedElement = new() { 2822, 2828, 2832, 2890 };
 
         private static bool HasMask(string mask, string who)
         {
