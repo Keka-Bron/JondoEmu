@@ -3827,6 +3827,90 @@
       "orientation": 1,
       "criterion": "Qa=1771",
       "why": "Gengis Khani at his little camp [-18,-29] while «Le quiproquo» is under way; the derived cell."
+    },
+    {
+      "map": 139723780,
+      "npc": 3375,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qa=1770&Qo<11322",
+      "why": "The restless goblin at [-12,-38] while «La foire aux gobs» is under way and until he flees (Dofus pour les noobs); an open cell of the fair's lane."
+    },
+    {
+      "map": 139724289,
+      "npc": 3376,
+      "cell": 428,
+      "orientation": 1,
+      "criterion": "Qa=1770&Qo<11323",
+      "why": "The superstitious goblin at [-11,-41] while «La foire aux gobs» is under way and until he goes home (Dofus pour les noobs); in front of the little train."
+    },
+    {
+      "map": 139723265,
+      "npc": 3377,
+      "cell": 429,
+      "orientation": 1,
+      "criterion": "Qa=1770&Qo<11324",
+      "why": "The hungry goblin at [-13,-41] while «La foire aux gobs» is under way and until he walks off to digest (Dofus pour les noobs); in front of the ghost train."
+    },
+    {
+      "map": 139725315,
+      "npc": 3378,
+      "cell": 341,
+      "orientation": 1,
+      "criterion": "Qa=1770&Qo<11325",
+      "why": "The quarrelsome goblin at [-9,-39] while «La foire aux gobs» is under way and until he is beaten (Dofus pour les noobs); among the spring rides."
+    },
+    {
+      "map": 139724291,
+      "npc": 3379,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=1770&Qo<11326",
+      "why": "The gambler goblin at [-11,-39] while «La foire aux gobs» is under way and until he loses (Dofus pour les noobs); on the gambling deck, between the dice tables."
+    },
+    {
+      "map": 139724292,
+      "npc": 3380,
+      "cell": 397,
+      "orientation": 1,
+      "criterion": "Qa=1770&Qo<11327",
+      "why": "The collector goblin at [-11,-38] while «La foire aux gobs» is under way and until he leaves for Sufokia (Dofus pour les noobs); below the merry-go-round."
+    },
+    {
+      "map": 139724805,
+      "npc": 3393,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1770&Qo<11350",
+      "why": "The depressed goblin at [-10,-37] while «La foire aux gobs» is under way and until he leaves to party (Dofus pour les noobs); in the middle of the cages' square."
+    },
+    {
+      "map": 139724804,
+      "npc": 397,
+      "cell": 247,
+      "orientation": 1,
+      "why": "Maxims, the fair's restaurant at [-10,-38] (Dofus pour les noobs, «La foire aux gobs»: the hungry goblin's burger and fries); on the deck before the burger stall."
+    },
+    {
+      "map": 165153537,
+      "npc": 7519,
+      "cell": 229,
+      "orientation": 1,
+      "why": "The ticket seller at [-11,-36] (Dofus pour les noobs, «La foire aux gobs»: the ticket Yova Etna asks for, 500 kamas); before the ticket booth."
+    },
+    {
+      "map": 165153026,
+      "npc": 3391,
+      "cell": 285,
+      "orientation": 1,
+      "why": "The nostalgic cheat at [-12,-37], outside the fair (Dofus pour les noobs, «La foire aux gobs»: the loaded dice «contre 500k»)."
+    },
+    {
+      "map": 101450251,
+      "npc": 1628,
+      "cell": 313,
+      "orientation": 1,
+      "why": "Xanamla in the Almanax temple [-4,-24], beside Ontoral Zo (Dofus pour les noobs, «La foire aux gobs»: the Potion Astromagique du Bworky)."
     }
   ]
 }

@@ -43,7 +43,12 @@
     "",
     "PEPITO (NPC 7030), at the Temple of Alliances: the pacifying crystal (27632), which the client's",
     "help says is traded for nuggets with him (Translations 1149314). He charges in nuggets (14635),",
-    "datos/tiendas_en_fichas.json."
+    "datos/tiendas_en_fichas.json.",
+    "",
+    "THE TROOL FAIR, for «La foire aux gobs» (1770, Dofus pour les noobs): Maxims (397) and his tofu hot dog",
+    "(6668), trool burger (6669) and wild sunflower fries (6670), what the hungry goblin eats; the ticket",
+    "seller (7519), the fair ticket (30328) Yova Etna asks for and the Gladiatrool one (30449); Rubén Paket",
+    "Hado (1573), the wrapping papers his workshop makes presents of (GiftWrapping)."
   ],
   "shops": [
     {
@@ -261,6 +266,89 @@
         },
         {
           "gid": 32091
+        }
+      ]
+    },
+    {
+      "npc": 397,
+      "items": [
+        {
+          "gid": 6668,
+          "price": 300
+        },
+        {
+          "gid": 6669,
+          "price": 600
+        },
+        {
+          "gid": 6670,
+          "price": 300
+        }
+      ]
+    },
+    {
+      "npc": 7519,
+      "items": [
+        {
+          "gid": 30328,
+          "price": 500
+        },
+        {
+          "gid": 30449,
+          "price": 5000
+        }
+      ]
+    },
+    {
+      "npc": 1573,
+      "items": [
+        {
+          "gid": 12899,
+          "price": 1000
+        },
+        {
+          "gid": 12900,
+          "price": 500
+        },
+        {
+          "gid": 12902,
+          "price": 100
+        },
+        {
+          "gid": 12904,
+          "price": 1000
+        },
+        {
+          "gid": 12907,
+          "price": 1000
+        },
+        {
+          "gid": 12908,
+          "price": 500
+        },
+        {
+          "gid": 12909,
+          "price": 500
+        },
+        {
+          "gid": 12910,
+          "price": 1000
+        },
+        {
+          "gid": 12911,
+          "price": 500
+        },
+        {
+          "gid": 12912,
+          "price": 1000
+        },
+        {
+          "gid": 12913,
+          "price": 100
+        },
+        {
+          "gid": 12914,
+          "price": 1000
         }
       ]
     }

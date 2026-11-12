@@ -756,9 +756,13 @@ namespace Jondo.Unity.Server.Managers
             return now - DateTimeOffset.FromUnixTimeSeconds(latest.Value);
         }
 
-        /// <summary>How many of a template are equipped, out of the bag.</summary>
+        /// <summary>
+        /// How many of a template are equipped, out of the bag: the bonus slots too, where a potion's
+        /// look stays -- «Nativo del signo Bworka» (13347) is what the Trool fair's restless goblin
+        /// asks to see on («POE13347»).
+        /// </summary>
         public static int HowManyWorn(int template)
-            => Items.Values.Where(i => i.Template == template && IsWorn(i.Position)).Sum(i => i.Quantity);
+            => Items.Values.Where(i => i.Template == template && CountsOnSheet(i.Position)).Sum(i => i.Quantity);
 
         public static int HowMany(int template)
         {

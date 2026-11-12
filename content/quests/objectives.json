@@ -4057,6 +4057,61 @@
    "kind": "enter",
    "map": 164104209,
    "why": "«Escondite de Megan Fux», [-25,-17], where the merchant says she hides (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11322,
+   "quest": 1770,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the seven goblins; none waits on the others (Dofus pour les noobs takes them in its own order, the step lists another)."
+  },
+  {
+   "objective": 11323,
+   "quest": 1770,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the seven goblins; none waits on the others (Dofus pour les noobs takes them in its own order, the step lists another)."
+  },
+  {
+   "objective": 11324,
+   "quest": 1770,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the seven goblins; none waits on the others (Dofus pour les noobs takes them in its own order, the step lists another)."
+  },
+  {
+   "objective": 11326,
+   "quest": 1770,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the seven goblins; none waits on the others (Dofus pour les noobs takes them in its own order, the step lists another)."
+  },
+  {
+   "objective": 11350,
+   "quest": 1770,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "One of the seven goblins; none waits on the others (Dofus pour les noobs takes them in its own order, the step lists another)."
+  },
+  {
+   "objective": 11325,
+   "quest": 1770,
+   "kind": "beat",
+   "monster": 4586,
+   "map": 139725315,
+   "anyOrder": true,
+   "why": "«Deshazte de un goblin pendenciero»: beating him (4586) on his map [-9,-39] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11327,
+   "quest": 1770,
+   "kind": "click",
+   "elements": [{"map": 139993611, "element": 509172, "item": 18174, "says": 684}, {"map": 139993607, "element": 537083, "item": 18175, "says": 685}, {"map": 139993609, "element": 509171, "item": 18176, "says": 686}, {"map": 139992585, "element": 509174, "item": 18177, "says": 687}],
+   "onlyGives": true,
+   "givesEach": true,
+   "anyOrder": true,
+   "gives": [{"item": 18174, "count": 1}, {"item": 18175, "count": 1}, {"item": 18176, "count": 1}, {"item": 18177, "count": 1}],
+   "why": "«Vieux chouine-gomme», four of them in the fair's tents (Dofus pour les noobs): the jar on a stool, the wicker basket, under the stool, the round cage, each its own old chillicle (18174-18177) and its own line (info messages 684-687)."
   }
  ]
 }

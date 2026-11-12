@@ -13,6 +13,22 @@
       "type": 13,
       "skills": [110],
       "why": "The workbench by Kaponor's raft on the Tortuga beach [36,11] of the isle of Moon: «allez crafter en [36,11] à l'aide de l'établi : 6 x Planche en bois de kokoko, 2 x Poutre en bois de kokoko» (Dofus pour les noobs, «Le radeau ivre»). Skill 110, «Utilizar banco de trabajo», has those two recipes and no other; the captures saw the graphic (49504) as a handyman's workbench elsewhere (171)."
+    },
+    {
+      "map": 139993605,
+      "element": 508889,
+      "gfx": 34674,
+      "type": 145,
+      "skills": [209],
+      "why": "Rubén Paket Hado's packing table in his tent at the Trool fair: «Primero, uno de los numerosos papeles de regalo que hay en mi tienda. Cuando lo tengas, usa uno de los talleres de empaquetado para envolver el objeto» (11401). The client's interactive type 145 is «Taller de empaquetado» and skill 209 «Envolver un regalo»; a paper and any one thing make the present the paper names (GiftWrapping)."
+    },
+    {
+      "map": 139993605,
+      "element": 508890,
+      "gfx": 34674,
+      "type": 145,
+      "skills": [209],
+      "why": "The tent's second packing table (cell 359), the same as the first."
     }
   ]
 }

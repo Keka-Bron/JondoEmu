@@ -64,6 +64,12 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private const int UsedUp = 192;
 
+        /// <summary>
+        /// «Subir/Bajar de una montura»: the potions that change the look, the Trool fair's «Pócima
+        /// astromágica de bworky» (13351) among them, carry it beside what they give. A rider gets off first.
+        /// </summary>
+        private const int Dismounts = 949;
+
         /// <summary>Whether an item sets or takes alterations, and nothing else.</summary>
         internal static bool GivesAlterations(IReadOnlyList<DatabaseManager.ItemEffectData> effects)
             => effects.Any(e => e.EffectId is GainAlteration or LoseAlteration)
@@ -82,6 +88,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (Markers.Contains(effect.EffectId) || Shown.Contains(effect.EffectId)) continue;
                 if (effect.EffectId == UsedUp && own != 0 && effect.DiceNum == own) continue;
+                if (effect.EffectId == Dismounts) continue;
                 if (effect.EffectId is not (GainItem or GainItems)) return null;
                 int template = effect.EffectId == GainItem ? effect.DiceNum : effect.Value;
                 if (template > 0) given.Add((template, Math.Max(1, effect.DiceSide)));
@@ -160,6 +167,9 @@ namespace Jondo.Unity.Server.Handlers
                              .ToList();
             if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
             if (typed.Any(g => g.Type == BonusSlots.BoostFoodType)) await AlterationHandler.DropCandyEffectsAsync(stream);
+            if (DatabaseManager.GetItemEffectsData(DatabaseManager.GetItemTemplatePossibleEffects(item.Template))
+                               .Any(e => e.EffectId == Dismounts))
+                await GetOffAsync(stream);
 
             bool placed = false, redraw = false;
             foreach (var (template, quantity, type) in typed)
@@ -228,5 +238,13 @@ namespace Jondo.Unity.Server.Handlers
 
         private static Task WriteAsync(NetworkStream stream, byte[] frame)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
+
+        /// <summary>The mount ridden, back to the bag: what «Subir/Bajar de una montura» asks of a rider.</summary>
+        private static async Task GetOffAsync(NetworkStream stream)
+        {
+            var ridden = Equipment.All.FirstOrDefault(i => i.Position == Mounts.Slot && Mounts.Of(i.Template) != null);
+            if (ridden == null) return;
+            await EquipmentHandler.MoveItemAsync(stream, ridden.Uid, Equipment.Bag);
+        }
     }
 }

@@ -965,6 +965,12 @@
       "why": "Izak Azimof's automatons against Mecatron (4598) at your side: «vous allez devoir en sa compagnie affronter les automates qu'il possède» (Dofus pour les noobs). The four automatons of the Massif de Cania (pusher, flail, equipped chest, Robionicle)." },
     { "npc": 3410, "map": 164104209, "reply": 29785,
       "monsters": [ { "monster": 4599, "grade": 0 } ],
-      "why": "Megan Fux (4599) when asked for the documents (Dofus pour les noobs: one fight, in group)." }
+      "why": "Megan Fux (4599) when asked for the documents (Dofus pour les noobs: one fight, in group)." },
+    { "npc": 3378, "map": 139725315, "reply": 29659, "byLevel": true,
+      "monsters": [ { "monster": 4586, "grade": 0 } ],
+      "why": "«Atacar al goblin.»: the quarrelsome goblin (4586), «Pour lui vous n'aurez pas d'autre choix que de l'attaquer. Le combat se fait seul.» (Dofus pour les noobs); a grade for the player's level, as the quest is from level 20 to 200." },
+    { "npc": 3378, "map": 139725315, "reply": 29660, "byLevel": true,
+      "monsters": [ { "monster": 4586, "grade": 0 } ],
+      "why": "«Atacar al goblin.» after his insults: the same quarrelsome goblin (4586)." }
   ]
 }

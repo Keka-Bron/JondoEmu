@@ -577,6 +577,13 @@ namespace Jondo.Unity.Server.Managers
                         InfoMessages.ItemGained, "1", item.ToString(CultureInfo.InvariantCulture))));
                 gave = true;
             }
+            // What the place says when it gives: each of the goblin's four hiding places has its own line.
+            int says = binding.ElementSays.TryGetValue((mapId, elementId), out int line) ? line : binding.Says;
+            if (gave && says != 0)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(0, says)));
+            }
             return gave;
         }
 

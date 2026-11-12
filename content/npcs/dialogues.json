@@ -32352,6 +32352,430 @@
         }
       ],
       "why": "Gengis Khani, the kanugro thief at [-18,-29] (24820). «Le quiproquo» (1771) of Dofus pour les noobs: the documents behind him (24821: what documents?), pointing at them (24822: they go to my clients), threatening to burn them (24823: he read them already) hands them over (11421)."
+    },
+    {
+      "npc": 7428,
+      "map": 0,
+      "opening": 55306,
+      "lines": [
+        {
+          "message": 55306,
+          "choices": [
+            { "reply": 74508, "next": 55318, "beforeQuest": 1770 },
+            { "reply": 74513, "quest": 1770, "completes": 11328, "params": [[30, 11328]], "next": 55320, "afterObjectives": [11322, 11323, 11324, 11325, 11326, 11327, 11350] },
+            { "reply": 74485, "next": 55307 }
+          ]
+        },
+        {
+          "message": 55318,
+          "choices": [
+            { "reply": 74506, "next": 55319 },
+            { "reply": 74507 }
+          ]
+        },
+        {
+          "message": 55319,
+          "choices": [
+            { "reply": 74505, "startsQuest": 1770, "params": [[34, 1770]] }
+          ]
+        },
+        {
+          "message": 55307,
+          "choices": [
+            { "reply": 74484 }
+          ]
+        },
+        {
+          "message": 55320,
+          "choices": []
+        }
+      ],
+      "why": "The fair's employee at [-11,-37], his boss gone (55306). «La foire aux gobs» (1770) of Dofus pour les noobs: the goblins (55318: they appeared years ago and drove the visitors off), «Yo podría ayudarte» (55319: careful not to use force every time) and «Ir a cantarles las cuarenta a los goblins» starts it. «He conseguido que haya menos goblins» once the seven are gone (55320) ends it. Where Parissil is (55307: asleep in his tent)."
+    },
+    {
+      "npc": 3376,
+      "map": 0,
+      "opening": 24693,
+      "lines": [
+        {
+          "message": 24693,
+          "choices": [
+            { "reply": 29640, "next": 24694, "quest": 1770, "criterion": "PO!18168&PO!18169&PO!18170&PO!18171" },
+            { "reply": 29646, "next": 24697, "quest": 1770, "holds": 18169 },
+            { "reply": 29649, "next": 24702, "quest": 1770, "holds": 18171 },
+            { "reply": 29636 }
+          ]
+        },
+        {
+          "message": 24694,
+          "choices": [
+            { "reply": 29638, "next": 24696 },
+            { "reply": 29639, "next": 24695 }
+          ]
+        },
+        {
+          "message": 24695,
+          "choices": []
+        },
+        {
+          "message": 24696,
+          "choices": [
+            { "reply": 29637, "gives": 18168 }
+          ]
+        },
+        {
+          "message": 24697,
+          "choices": [
+            { "reply": 29645, "next": 24698 }
+          ]
+        },
+        {
+          "message": 24698,
+          "choices": [
+            { "reply": 29644, "next": 24699 }
+          ]
+        },
+        {
+          "message": 24699,
+          "choices": [
+            { "reply": 29643, "next": 24700 }
+          ]
+        },
+        {
+          "message": 24700,
+          "choices": [
+            { "reply": 29642, "next": 24701 }
+          ]
+        },
+        {
+          "message": 24701,
+          "choices": [
+            { "reply": 29641, "takes": 18169, "gives": 18170 }
+          ]
+        },
+        {
+          "message": 24702,
+          "choices": [
+            { "reply": 29648, "next": 24703 }
+          ]
+        },
+        {
+          "message": 24703,
+          "choices": [
+            { "reply": 29647, "quest": 1770, "completes": 11323, "params": [[30, 11323]], "takes": 18171 }
+          ]
+        }
+      ],
+      "why": "The superstitious goblin at [-11,-41] (24693). «La foire aux gobs» (1770) of Dofus pour les noobs: his horoscope, a dirty scroll (24694, 24696: «Pergamino mugriento»); Yova Etna's questionnaire filled in his words (24697-24701: the sign of the «Goblinón Glotón», born on Todobai, in Amakna's goblin camp); the horoscope she certifies sends him home (24703)."
+    },
+    {
+      "npc": 393,
+      "map": 0,
+      "opening": 1640,
+      "lines": [
+        {
+          "message": 1640,
+          "names": true,
+          "choices": [
+            { "reply": 29582, "next": 24627, "quest": 1770, "holds": 18168, "criterion": "PO=30328" },
+            { "reply": 29591, "next": 24629, "quest": 1770, "holds": 18170, "criterion": "PO=30328" }
+          ]
+        },
+        {
+          "message": 24627,
+          "choices": [
+            { "reply": 29581, "next": 24628 }
+          ]
+        },
+        {
+          "message": 24628,
+          "choices": [
+            { "reply": 29580, "takes": 18168, "gives": 18169 }
+          ]
+        },
+        {
+          "message": 24629,
+          "choices": [
+            { "reply": 29590, "next": 24630 }
+          ]
+        },
+        {
+          "message": 24630,
+          "choices": [
+            { "reply": 29584, "next": 24631 },
+            { "reply": 29585, "next": 24633 },
+            { "reply": 29586, "next": 24634 },
+            { "reply": 29588, "next": 24632 },
+            { "reply": 29589, "next": 24635 }
+          ]
+        },
+        {
+          "message": 24631,
+          "choices": [
+            { "reply": 29583 }
+          ]
+        },
+        {
+          "message": 24633,
+          "choices": [
+            { "reply": 29593 }
+          ]
+        },
+        {
+          "message": 24634,
+          "choices": [
+            { "reply": 29594 }
+          ]
+        },
+        {
+          "message": 24635,
+          "choices": [
+            { "reply": 29595 }
+          ]
+        },
+        {
+          "message": 24632,
+          "choices": [
+            { "reply": 29587, "takes": 18170, "gives": 18171 }
+          ]
+        }
+      ],
+      "why": "Yova Etna, the fair's seer, who wants a fair ticket before any question (1640). «La foire aux gobs» (1770) of Dofus pour les noobs: the goblin's scroll is nonsense (24627), no horoscope without his birth data (24628: the questionnaire); his answers (24629), born on Todobai, so Pischis (24632: «Horóscopo certificado por Yova Etna»); any other sign disappoints her (24631, 24633-24635)."
+    },
+    {
+      "npc": 3377,
+      "map": 0,
+      "opening": 24705,
+      "lines": [
+        {
+          "message": 24705,
+          "choices": [
+            { "reply": 29654, "quest": 1770, "completes": 11324, "params": [[30, 11324]], "next": 24706, "takesAll": [6669, 6670] },
+            { "reply": 29655, "next": 24708, "quest": 1770, "holds": 6668 },
+            { "reply": 29656, "next": 24709, "quest": 1770, "holds": 6668 }
+          ]
+        },
+        {
+          "message": 24706,
+          "choices": [
+            { "reply": 29653, "next": 24707 }
+          ]
+        },
+        {
+          "message": 24707,
+          "choices": [
+            { "reply": 29652 }
+          ]
+        },
+        {
+          "message": 24708,
+          "choices": []
+        },
+        {
+          "message": 24709,
+          "choices": []
+        }
+      ],
+      "why": "The hungry goblin at [-13,-41], sweets and ice cream not enough (24705). «La foire aux gobs» (1770) of Dofus pour les noobs: Maxims' «Burguer de trool» and «Patatas fritas de girasol salvaje» (24706: his belly hurts), a walk out of the fair to digest (24707). The tofu hot dog tastes of birdseed (24708, 24709)."
+    },
+    {
+      "npc": 3378,
+      "map": 0,
+      "opening": 24710,
+      "lines": [
+        {
+          "message": 24710,
+          "choices": [
+            { "reply": 29659, "quest": 1770 },
+            { "reply": 29662, "next": 24711 }
+          ]
+        },
+        {
+          "message": 24711,
+          "choices": [
+            { "reply": 29660, "quest": 1770 },
+            { "reply": 29661 }
+          ]
+        }
+      ],
+      "why": "The quarrelsome goblin at [-9,-39], looking for a fight (24710). «La foire aux gobs» (1770) of Dofus pour les noobs: «Atacar al goblin», alone; non-violence earns insults (24711)."
+    },
+    {
+      "npc": 3379,
+      "map": 0,
+      "opening": 24712,
+      "lines": [
+        {
+          "message": 24712,
+          "choices": [
+            { "reply": 29669, "next": 24713, "quest": 1770 }
+          ]
+        },
+        {
+          "message": 24713,
+          "choices": [
+            { "reply": 29666, "next": 24714, "chance": 25, "otherwise": 24715 },
+            { "reply": 29668, "next": 24716, "holds": 18173, "takes": 18173 },
+            { "reply": 29697 }
+          ]
+        },
+        {
+          "message": 24714,
+          "choices": [
+            { "reply": 29663, "quest": 1770, "completes": 11326, "params": [[30, 11326]] }
+          ]
+        },
+        {
+          "message": 24715,
+          "choices": [
+            { "reply": 29665, "next": 24713 },
+            { "reply": 29664 }
+          ]
+        },
+        {
+          "message": 24716,
+          "choices": [
+            { "reply": 29667, "quest": 1770, "completes": 11326, "params": [[30, 11326]] }
+          ]
+        }
+      ],
+      "why": "The gambler goblin at [-11,-39], king of the 421 (24712). «La foire aux gobs» (1770) of Dofus pour les noobs: «La probabilité de gagner est assez faible, si vous perdez il faudra tenter de nouveau votre chance jusqu'à gagner» -- an honest throw now and then rolls the 421 (24714), most often he shows how (24715); the nostalgic cheat's loaded dice always do (24716)."
+    },
+    {
+      "npc": 3380,
+      "map": 0,
+      "opening": 24719,
+      "lines": [
+        {
+          "message": 24719,
+          "choices": [
+            { "reply": 29678, "quest": 1770, "completes": 11327, "params": [[30, 11327]], "next": 24720, "takesAll": [18174, 18175, 18176, 18177] },
+            { "reply": 29675 }
+          ]
+        },
+        {
+          "message": 24720,
+          "choices": [
+            { "reply": 29677, "next": 24721 }
+          ]
+        },
+        {
+          "message": 24721,
+          "choices": [
+            { "reply": 29676 }
+          ]
+        }
+      ],
+      "why": "The collector goblin at [-11,-38], after old chewed chillicles (24719). «La foire aux gobs» (1770) of Dofus pour les noobs: the four found in the fair's tents (24720), Sufokia's shells to collect next (24721)."
+    },
+    {
+      "npc": 3393,
+      "map": 0,
+      "opening": 24722,
+      "lines": [
+        {
+          "message": 24722,
+          "choices": [
+            { "reply": 29680, "next": 24723, "quest": 1770 },
+            { "reply": 29683, "quest": 1770, "completes": 11350, "params": [[30, 11350]], "next": 24724, "holds": 13142, "takes": 13142 }
+          ]
+        },
+        {
+          "message": 24723,
+          "choices": []
+        },
+        {
+          "message": 24724,
+          "choices": [
+            { "reply": 29682, "next": 24725 }
+          ]
+        },
+        {
+          "message": 24725,
+          "choices": [
+            { "reply": 29681 }
+          ]
+        }
+      ],
+      "why": "The depressed goblin at [-10,-37]: older, and nobody wished him a happy birthday (24722). «La foire aux gobs» (1770) of Dofus pour les noobs: wishes are not enough (24723); a birthday present wrapped at Rubén Paket Hado's tent (24724), a party at Amakna's goblin camp (24725)."
+    },
+    {
+      "npc": 3375,
+      "map": 0,
+      "opening": 24690,
+      "lines": [
+        {
+          "message": 24690,
+          "choices": [
+            { "reply": 29630, "quest": 1770, "completes": 11322, "params": [[30, 11322]], "next": 24689, "criterion": "POE13347" },
+            { "reply": 29630, "next": 24691, "quest": 1770, "criterion": "POX13347" },
+            { "reply": 29634, "next": 24691 },
+            { "reply": 29632 }
+          ]
+        },
+        {
+          "message": 24689,
+          "choices": []
+        },
+        {
+          "message": 24691,
+          "choices": [
+            { "reply": 29633, "next": 24692 },
+            { "reply": 29632 }
+          ]
+        },
+        {
+          "message": 24692,
+          "choices": [
+            { "reply": 29632 }
+          ]
+        }
+      ],
+      "why": "The restless goblin at [-12,-38], watching around and trembling (24690). «La foire aux gobs» (1770) of Dofus pour les noobs: «pensez à utiliser la potion afin de vous transformer en Bworky. Puis parlez au Gobelin Inquiet pour lui faire peur»: under «Nativo del signo Bworka» (13347, what the potion leaves) he screams and runs (24689); a plain visitor, no green skin and no smell, only relieves him (24691)."
+    },
+    {
+      "npc": 3391,
+      "map": 0,
+      "opening": 24717,
+      "lines": [
+        {
+          "message": 24717,
+          "choices": [
+            { "reply": 29674, "next": 24718, "quest": 1770 }
+          ]
+        },
+        {
+          "message": 24718,
+          "choices": [
+            { "reply": 29671, "buyItem": 18173, "buyPrice": 500 },
+            { "reply": 29672 },
+            { "reply": 29673 }
+          ]
+        }
+      ],
+      "why": "The nostalgic cheat at [-12,-37], gobophobe since (24717). «La foire aux gobs» (1770) of Dofus pour les noobs: loaded dice for the goblin's 421, 500 kamas (24718)."
+    },
+    {
+      "npc": 1628,
+      "map": 0,
+      "opening": 12043,
+      "lines": [
+        {
+          "message": 12043,
+          "choices": [
+            { "reply": 18668, "next": 15809, "quest": 1770 }
+          ]
+        },
+        {
+          "message": 15809,
+          "choices": [
+            { "reply": 18665, "buyItem": 13351, "buyPrice": 2000 },
+            { "reply": 18666 },
+            { "reply": 18667 }
+          ]
+        }
+      ],
+      "why": "Xanamla at the Almanax temple [-4,-24] (12043). «La foire aux gobs» (1770) of Dofus pour les noobs: the «Potion Astromagique du Bworky» (13351) for the restless goblin, 2000 kamas (15809)."
     }
   ]
 }

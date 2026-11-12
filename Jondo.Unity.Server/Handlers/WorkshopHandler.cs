@@ -76,6 +76,9 @@ namespace Jondo.Unity.Server.Handlers
             /// <summary>The grinder breaking items.</summary>
             public bool Breaker { get; init; }
 
+            /// <summary>A gift-wrapping table: a paper and one thing instead of a recipe (GiftWrapping).</summary>
+            public bool Wraps { get; init; }
+
             /// <summary>An artisans' book: the directory is open.</summary>
             public bool Book { get; init; }
 
@@ -152,13 +155,15 @@ namespace Jondo.Unity.Server.Handlers
                 Console.WriteLine($"[Workshop] Unknown skill {skillId} on element {elementId}.");
                 return;
             }
-            if (!skill.IsForgemagus && RecipeManager.ForSkill(skillId).Count == 0)
+            // Wrapping a present has no recipe: what it makes is the paper's to say.
+            bool wraps = skillId == GiftWrapping.Skill;
+            if (!skill.IsForgemagus && !wraps && RecipeManager.ForSkill(skillId).Count == 0)
             {
                 Console.WriteLine($"[Workshop] Skill {skillId} has no recipe; element {elementId} not opened.");
                 return;
             }
 
-            SessionContext.State.Workshop = new Bench { ElementId = elementId, SkillId = skillId, Magus = skill.IsForgemagus };
+            SessionContext.State.Workshop = new Bench { ElementId = elementId, SkillId = skillId, Magus = skill.IsForgemagus, Wraps = wraps };
 
             await SendAsync(stream, Op.Iwn, ConnectionProtocol.BuildElementInUse(
                 elementId, skillId, SessionContext.State.CharacterId));
@@ -167,7 +172,7 @@ namespace Jondo.Unity.Server.Handlers
             await SendAsync(stream, Op.Kgq, WorkshopProtocol.BuildOpened(skillId));
 
             Console.WriteLine($"[Workshop] Element {elementId} opened with skill {skillId} " +
-                              (skill.IsForgemagus ? "(magus table)." : $"({RecipeManager.ForSkill(skillId).Count} recipes)."));
+                              (skill.IsForgemagus ? "(magus table)." : wraps ? "(gift wrapping)." : $"({RecipeManager.ForSkill(skillId).Count} recipes)."));
         }
 
         public static async Task CloseAsync(NetworkStream stream)
@@ -325,6 +330,12 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
 
+            if (bench.Wraps)
+            {
+                await WrapAsync(stream, bench);
+                return true;
+            }
+
             // What is on the bench, by template, the signature rune apart: it signs, it is no ingredient.
             var ingredients = new Dictionary<int, int>();
             bool signs = false;
@@ -425,6 +436,52 @@ namespace Jondo.Unity.Server.Handlers
                               $"job {recipe.JobId} level {jobLevel}), +{experience} xp" +
                               (signatures > 0 ? $", {signatures} signed." : "."));
             return true;
+        }
+
+        /// <summary>
+        /// kep on a gift-wrapping table: one wrapping paper and one other thing, one of each, make
+        /// the present the paper names (GiftWrapping), «Envuelto por» its wrapper. Both are spent:
+        /// the thing is inside now.
+        /// </summary>
+        private static async Task WrapAsync(NetworkStream stream, Bench bench)
+        {
+            var laid = bench.Slots
+                .Select(s => (Item: Equipment.ByUid(s.Uid), s.Quantity))
+                .Where(s => s.Item != null && s.Item.Position == Equipment.Bag)
+                .ToList();
+            var paper = laid.Select(s => s.Item).FirstOrDefault(i => GiftWrapping.PresentOf(i!.Template) != 0);
+            var content = laid.Select(s => s.Item).FirstOrDefault(i => i != paper);
+            int present = paper == null ? 0 : GiftWrapping.PresentOf(paper.Template);
+            var template = present == 0 ? null : Forgemagic.TemplateOf(present);
+
+            string? refusal = laid.Count != 2 || laid.Any(s => s.Quantity != 1) ? "a present is one paper and one thing, one of each"
+                            : paper == null ? "there is no wrapping paper on the table"
+                            : content == null || GiftWrapping.PresentOf(content.Template) != 0 ? "there is nothing to wrap"
+                            : template == null ? $"no template for {present}"
+                            : null;
+            if (refusal != null)
+            {
+                await SendAsync(stream, Op.Kdr, WorkshopProtocol.BuildImpossible());
+                Console.WriteLine($"[Workshop] Wrapping refused: {refusal}.");
+                return;
+            }
+
+            await ConsumeAsync(SessionContext.Current, paper!, 1);
+            await ConsumeAsync(SessionContext.Current, content!, 1);
+            foreach (var (uid, _) in bench.Slots.ToList())
+                await SendAsync(stream, Op.Kfs, WorkshopProtocol.BuildRemoved(uid));
+            bench.Slots.Clear();
+
+            var effects = Forgemagic.Signed(Forgemagic.Roll(template!, Dice), GiftWrapping.WrappedBy, SessionContext.State.CharacterName);
+            var created = Equipment.Create(present, 1, effects);
+            if (created != null)
+                await SendAsync(stream, Op.Itf, WorkshopProtocol.BuildItemsArrived(new[] { Arrival(created) }));
+            await SendAsync(stream, Op.Kdr, WorkshopProtocol.BuildCrafted(present, effects, 1, created?.Uid ?? 0));
+            await SendPodsAsync(SessionContext.Current);
+
+            bench.Made.TryGetValue(present, out int madeHere);
+            bench.Made[present] = madeHere + 1;
+            Console.WriteLine($"[Workshop] Wrapped {content!.Template} in paper {paper!.Template}: present {present}.");
         }
 
         /// <summary>

@@ -153,6 +153,15 @@ namespace Jondo.Unity.World.Quests
             = new Dictionary<(long, int), int>();
 
         /// <summary>
+        /// With <see cref="GivesEach"/>: the info line one element prints when it hands its item
+        /// over, instead of the row's <see cref="Says"/> -- each old chillicle of «La foire aux gobs»
+        /// is found somewhere of its own: in the jar (684), the wicker basket (685), under the stool
+        /// (686), on the cage (687).
+        /// </summary>
+        public IReadOnlyDictionary<(long MapId, int ElementId), int> ElementSays { get; init; }
+            = new Dictionary<(long, int), int>();
+
+        /// <summary>
         /// The skill the element offers. <c>Utiliser</c> unless a row says otherwise.
         /// </summary>
         /// <remarks>
@@ -481,6 +490,7 @@ namespace Jondo.Unity.World.Quests
 
             var elements = new List<(long, int)>();
             var elementItems = new Dictionary<(long, int), int>();
+            var elementSays = new Dictionary<(long, int), int>();
             if (row.TryGetProperty("elements", out var list) && list.ValueKind == JsonValueKind.Array)
             {
                 foreach (var one in list.EnumerateArray())
@@ -491,6 +501,8 @@ namespace Jondo.Unity.World.Quests
                     elements.Add((map, element));
                     int own = Int(one, "item");
                     if (own != 0) elementItems[(map, element)] = own;
+                    int says = Int(one, "says");
+                    if (says != 0) elementSays[(map, element)] = says;
                 }
             }
 
@@ -571,6 +583,7 @@ namespace Jondo.Unity.World.Quests
                 Props = props,
                 AfterElement = Int(row, "afterElement"),
                 ElementItems = elementItems,
+                ElementSays = elementSays,
                 Gives = gives,
                 Requires = requires,
                 SpendsRequired = row.TryGetProperty("spends", out var spends)
