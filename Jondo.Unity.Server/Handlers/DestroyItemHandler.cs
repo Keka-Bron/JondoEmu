@@ -18,7 +18,7 @@ namespace Jondo.Unity.Server.Handlers
     ///
     /// The answer is the same as when an item leaves the bag for any other reason:
     ///
-    ///   ium { f1: uid }   it goes          or   iua, if only the quantity drops
+    ///   ium { f1: uid }   it goes          or   ivj, the new total, if only the quantity drops
     ///   iun               the weight, which is now lower
     /// </summary>
     public static class DestroyItemHandler
@@ -64,14 +64,13 @@ namespace Jondo.Unity.Server.Handlers
             }
             else
             {
-                // There is still some: it is sent again with the new quantity.
+                // There is still some: the stack's new total, the ivj. An iua would be ADDED by the
+                // client to the stack it shows, ten destroyed down to seven showing seventeen.
                 var queda = HavenBagStore.FromInventory(Jondo.Unity.Server.Network.SessionContext.State.CharacterId, uid);
                 if (queda != null)
                 {
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(ChestHandler.ArrivesInBag,
-                            ConnectionProtocol.BuildItemArrived(
-                                ChestHandler.FieldOf(ChestHandler.ArrivesInBag), queda)));
+                        ConnectionProtocol.Push(Op.Ivj, ConnectionProtocol.BuildItemQuantity(uid, queda.Quantity)));
                 }
             }
 

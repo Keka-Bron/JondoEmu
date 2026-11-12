@@ -11011,6 +11011,10 @@ namespace Jondo.Unity.Server.Handlers
             var caidos = new List<PlayerItem>();
             Dictionary<int, int> loot;
 
+            // The stacks he already had, before the loot lands: a drop onto one of them is told to
+            // the client as the stack's new total (ivj), not as an item arrived (iua).
+            var yaLasTenia = DatabaseManager.LoadInventory(GameState.CharacterId).Select(i => i.Uid).ToHashSet();
+
             // His share, when the fight was planned for all its winners (FightRewards): the same
             // numbers his partners see in their end screen. Only winners are planned, and the one
             // loser who is: the dreamer who falls at the Fin du rêve after its minimum of waves.
@@ -11145,8 +11149,20 @@ namespace Jondo.Unity.Server.Handlers
             //
             // The real server sends one iua per item. Measured in the jalató dungeon: four 17-byte
             // iua with f3{f1:63, f5{gid, quantity, uid}}. 63 is the bag.
+            //
+            // But only for a stack that is new. The client ADDS an iua's quantity to a stack of the
+            // same uid it already shows, so an iua carrying the total made the bag grow by its
+            // whole size on every fight: six jalamut blood samples in the database showed as nine
+            // (1, then +2, then +6), 464 Jondo Coin as 4,241, until the next login read them again.
+            // A stack that was already there gets its new total, the ivj, as gathering sends it.
             foreach (var pieza in caidos)
             {
+                if (yaLasTenia.Contains(pieza.Uid))
+                {
+                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ivj,
+                        ConnectionProtocol.BuildItemQuantity(pieza.Uid, pieza.Quantity)));
+                    continue;
+                }
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Iua,
                     ConnectionProtocol.BuildItemArrived(3, new Managers.HavenBagStore.StoredItem
                     {

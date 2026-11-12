@@ -99,8 +99,8 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 else if (HavenBagStore.FromInventory(character, uid) is { } rest)
                 {
-                    await WriteAsync(stream, ChestHandler.ArrivesInBag,
-                        ConnectionProtocol.BuildItemArrived(ChestHandler.FieldOf(ChestHandler.ArrivesInBag), rest));
+                    // The stack's new total: an iua's quantity is added to the stack the client shows.
+                    await WriteAsync(stream, Op.Ivj, ConnectionProtocol.BuildItemQuantity(uid, rest.Quantity));
                 }
                 await WriteAsync(stream, "lyb", Pb.New().Packed(1, new long[] { entry.Gid }).Msg(3, Body(entry)).Build());
                 await WriteAsync(stream, Op.Iun, Pods());
