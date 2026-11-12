@@ -225,6 +225,8 @@ namespace Jondo.Unity.World.Quests
         /// There are quests that start by pressing something, not by talking: «Mort au rat» starts at the
         /// notice on the tavern's front. It also changes when the element is seen -- it is
         /// shown while the quest has NOT been taken, which is the opposite of all the others.
+        /// On an «enter» row it is the map that hands it out, on arriving: «Des pwinces pas très
+        /// charmants» has no giver, «il suffit de franchir la porte» (Dofus pour les noobs).
         /// </remarks>
         public int Starts { get; init; }
 
@@ -356,9 +358,24 @@ namespace Jondo.Unity.World.Quests
                 ? rows
                 : (IReadOnlyList<QuestBinding>)Array.Empty<QuestBinding>();
 
+        /// <summary>The «enter» rows that hand their quest out on arriving on that map.</summary>
+        public IReadOnlyList<QuestBinding> StartedOn(long mapId)
+            => _startedOn.TryGetValue(mapId, out var rows)
+                ? rows
+                : (IReadOnlyList<QuestBinding>)Array.Empty<QuestBinding>();
+
+        private readonly Dictionary<long, List<QuestBinding>> _startedOn = new Dictionary<long, List<QuestBinding>>();
+
         public void Add(QuestBinding binding)
         {
             _byObjective[binding.ObjectiveId] = binding;
+
+            if (binding.Kind == QuestBindingKind.Enter && binding.Starts != 0 && binding.MapId != 0)
+            {
+                if (!_startedOn.TryGetValue(binding.MapId, out var starting))
+                    _startedOn[binding.MapId] = starting = new List<QuestBinding>();
+                starting.Add(binding);
+            }
 
             // Only an element to click is the quest's own, drawn and pressed as such; the elements
             // of a «read» binding are the world's readables (the Dofusarium's statues), already there.

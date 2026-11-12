@@ -3683,6 +3683,34 @@
       "cell": 213,
       "orientation": 1,
       "why": "The wabbit guardian on the ledge behind the tic-tac-toe room's grille, before the door to the fallen princes: «Une fois la grille ouverte, franchissez-la et placez vous devant le Gawdien Wabbit pour lui parler» (Dofus pour les noobs, «Voyage au centre du Wabbit»). INFERRED cell: the ledge's middle (the client's linked zone 32), between the grille and the door (482597 on 184), facing the room."
+    },
+    {
+      "map": 106695186,
+      "npc": 2151,
+      "cell": 399,
+      "criterion": "(Qa=843&Qo<7887)|(Qa=845&Qo<7891)|(Qa!843&Qf!843)",
+      "why": "The fallen princes in their den, around the sacrifice: «Parlez aux trois Pwinces», «Un combat se lance alors» (Dofus pour les noobs, «Des pwinces pas très charmants»). Seen until they are beaten, in that quest or in its daily rerun «Les pwinces déchus»; and by whoever comes through the door before the first, which the den itself starts."
+    },
+    {
+      "map": 106695186,
+      "npc": 2152,
+      "cell": 385,
+      "criterion": "(Qa=843&Qo<7887)|(Qa=845&Qo<7891)|(Qa!843&Qf!843)",
+      "why": "The fallen princes in their den, around the sacrifice: «Parlez aux trois Pwinces», «Un combat se lance alors» (Dofus pour les noobs, «Des pwinces pas très charmants»). Seen until they are beaten, in that quest or in its daily rerun «Les pwinces déchus»; and by whoever comes through the door before the first, which the den itself starts."
+    },
+    {
+      "map": 106695186,
+      "npc": 2153,
+      "cell": 384,
+      "criterion": "(Qa=843&Qo<7887)|(Qa=845&Qo<7891)|(Qa!843&Qf!843)",
+      "why": "The fallen princes in their den, around the sacrifice: «Parlez aux trois Pwinces», «Un combat se lance alors» (Dofus pour les noobs, «Des pwinces pas très charmants»). Seen until they are beaten, in that quest or in its daily rerun «Les pwinces déchus»; and by whoever comes through the door before the first, which the den itself starts."
+    },
+    {
+      "map": 106696210,
+      "npc": 2155,
+      "cell": 402,
+      "orientation": 5,
+      "why": "The wabbit assistant in Tim Bawton's room, the way out: «Parlez à l'assistant pour sortir» (Dofus pour les noobs, «Des pwinces pas très charmants»); «Mi ayudante te llevawá», says Tim. INFERRED cell: by the room's tunnel (482593 on 444), facing it."
     }
   ]
 }

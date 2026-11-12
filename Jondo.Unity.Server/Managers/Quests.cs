@@ -858,6 +858,21 @@ namespace Jondo.Unity.Server.Managers
             await OldCharacterReachesTheDofusariumAsync(stream, mapId);
             bool advanced = false;
             var log = Log;
+
+            // A quest the map itself hands out: «Des pwinces pas très charmants» starts on going
+            // through the door of the wabbit guardian's ledge, with no giver («Position de lancement :
+            // Aucune - Il suffit de franchir la porte», Dofus pour les noobs). Its own condition says
+            // who: whoever has finished the quest before.
+            if (log != null && mapId != 0)
+            {
+                foreach (var starter in Bindings.StartedOn(mapId))
+                {
+                    if (log.Run(starter.Starts) != null) continue;
+                    if (!await StartAsync(stream, starter.Starts)) continue;
+                    Console.WriteLine($"[Quests] Quest {starter.Starts} starts on arriving on {mapId}.");
+                    advanced = true;
+                }
+            }
             if (log != null && _book != null && mapId != 0)
             {
                 foreach (var run in new List<QuestRun>(log.Doing()))

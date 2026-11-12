@@ -2398,6 +2398,37 @@
    "why": "«Le passage secret en question est sur la même map, il vous suffit de cliquer sur la cawotte»: the tic-tac-toe room below, where the grille is."
   },
   {
+   "objective": -843,
+   "quest": 843,
+   "kind": "enter",
+   "starts": 843,
+   "map": 106695186,
+   "why": "«Des pwinces pas très charmants» has no giver: «Position de lancement : Aucune - Il suffit de franchir la porte après avoir ouvert la grille dans la quête précédente» (Dofus pour les noobs). The fallen princes' den (106695186), behind the door of the wabbit guardian's ledge; the quest's own condition (Qf=842) says who."
+  },
+  {
+   "objective": 7883,
+   "quest": 843,
+   "kind": "enter",
+   "map": 106695186,
+   "why": "Its first objective, a map to discover whose map the client does not carry: the den itself, ticked as the quest starts there."
+  },
+  {
+   "objective": 7887,
+   "quest": 843,
+   "kind": "beat",
+   "monster": 3472,
+   "map": 106695186,
+   "why": "«Vence a los pwíncipes decaídos y róbales el Necronobacon»: «Un combat se lance alors. Attention au renvoi de sort de certains monstres. Vous dropez un livre» (Dofus pour les noobs): Dowo (3472), Dowewo (3471) and Do (3470), the reply «Atacar a los pwíncipes decaídos» of any of them (content/fights/npc_fights.json). The book is the Necronobacon (14489), on Dowo's own loot table in the client, at 100 %."
+  },
+  {
+   "objective": 7891,
+   "quest": 845,
+   "kind": "beat",
+   "monster": 3472,
+   "map": 106695186,
+   "why": "«Les pwinces déchus», the daily rerun: «Parlez à l'un des pwinces pour les attaquer : … vous pouvez rentrez tous vos personnages dans le combat et ils droperont tous le livre» (Dofus pour les noobs). The same fight and the same Necronobacon (14489, Dowo's own loot) as «Des pwinces pas très charmants»."
+  },
+  {
    "objective": 102,
    "quest": 18,
    "kind": "enter",
