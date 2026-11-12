@@ -134,6 +134,19 @@ namespace Jondo.Unity.Server.Handlers
                     return false;
                 }
 
+                // A set's piece is worn once: a second Gelano does not go on the other finger while
+                // the first is on one. A ring of no set can be worn twice (732). The slot it goes to
+                // does not count -- what is there comes off --, nor the item itself, moved between rings.
+                if (loSuyo != null && Managers.ItemSets.SetsOf(loSuyo.Template).Count > 0
+                    && Managers.Equipment.All.Any(i => i.Uid != uid && i.Template == loSuyo.Template
+                                                       && i.Position != position && Managers.Equipment.IsWorn(i.Position)))
+                {
+                    Console.WriteLine($"[Equipment] Item {uid} is a set's piece already worn. It is not put on twice.");
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, loSuyo.Position).Build()));
+                    return false;
+                }
+
                 int pide = loSuyo != null ? DatabaseManager.ItemLevelRequirement(loSuyo.Template) : 0;
 
                 if (pide > SessionContext.State.CharacterLevel)
@@ -152,6 +165,27 @@ namespace Jondo.Unity.Server.Handlers
                             Pb.New().Var(1, uid).Var(2, loSuyo!.Position).Build()));
                     return false;
                 }
+            }
+
+            // One of a stack: a slot holds one, and the iuk asks for one (its f1). Moving the stack
+            // put both rings of a pair of Gelano on the same finger. One is taken off the stack as an
+            // item of its own -- the stack's new count, the new item in the bag -- and that one goes on.
+            if (position != Bag && Managers.Equipment.ByUid(uid) is { Quantity: > 1 } stack)
+            {
+                var one = Managers.Equipment.SplitOne(stack);
+                if (one == null) return false;
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ivj, ConnectionProtocol.BuildItemQuantity(stack.Uid, stack.Quantity)));
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3, new Managers.HavenBagStore.StoredItem
+                    {
+                        Uid = one.Uid,
+                        Gid = one.Template,
+                        Quantity = 1,
+                        Effects = Managers.Forgemagic.Serialize(one.Effects),
+                    })));
+                Console.WriteLine($"[Equipment] One of stack {stack.Uid} ({stack.Quantity} left) becomes {one.Uid}.");
+                uid = one.Uid;
             }
 
             // A slot holds one. Whatever was worn goes to the bag before the new one goes in, and its

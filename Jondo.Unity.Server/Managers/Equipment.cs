@@ -658,6 +658,21 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// One taken off a stack as an item of its own, in the bag; the stack keeps the rest. A slot
+        /// holds one: equipping a ring from a stack of two put both on the finger.
+        /// </summary>
+        public static Item? SplitOne(Item stack)
+        {
+            if (stack.Quantity <= 1) return stack;
+            var effects = new List<ItemEffect>(stack.Effects);
+            var one = Create(stack.Template, 1, effects);
+            if (one == null) return null;
+            Rewrite(stack, stack.Quantity - 1, effects);
+            return one;
+        }
+
+
+        /// <summary>
         /// The one place the worn-item cache is written.
         /// </summary>
         /// <remarks>
