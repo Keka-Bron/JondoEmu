@@ -513,12 +513,35 @@ namespace Jondo.Unity.Server.Network
                 .Var(2, id);
 
         /// <summary>
-        /// The tax collector in the list: its two name ids as its name, "35 109", its fight's level
-        /// and the breed -5, which is how the client tells it from a person.
+        /// The tax collector in the list: its two name ids as its name, "z,31" for 35 and 109, its
+        /// fight's level and the breed -5, which is how the client tells it from a person.
         /// </summary>
+        /// <remarks>
+        /// The client reads that name as two ids in base 36 split by a comma: ffc.bdjh is
+        /// pu.pgp(name.Split(a.bb())[i]), with a.bb() "," and pu.pgp a base-36 reader, both seen in
+        /// the running client («35,220» gave 113 and 2664). It went as "35 109", then "35,220": the
+        /// first split gave one piece and threw IndexOutOfRangeException, the second looked up
+        /// names 113 and 2664 that do not exist and threw NullReferenceException. Either way ffc
+        /// dropped every mdx and mdu, and the attacks tab counted the fight but drew no line, so
+        /// no defender could join.
+        /// </remarks>
         public static Pb TaxCollectorFighter(TaxCollectorStore.TaxCollector tc, AllianceStore.Alliance alliance)
-            => Fighter(tc.ContextId, $"{tc.FirstNameId} {tc.LastNameId}", LevelOf(Monster),
+            => Fighter(tc.ContextId, NameIds(tc.FirstNameId, tc.LastNameId), LevelOf(Monster),
                        Look(alliance, MapBones).Build(), FighterListMarker);
+
+        /// <summary>A tax collector's two name ids as the alliance fights' list names it: "z,31" for 35 and 109.</summary>
+        public static string NameIds(int firstNameId, int lastNameId) => Base36(firstNameId) + "," + Base36(lastNameId);
+
+        private static string Base36(long value)
+        {
+            if (value == 0) return "0";
+            const string digits = "0123456789abcdefghijklmnopqrstuvwxyz";
+            bool negative = value < 0;
+            ulong rest = negative ? (ulong)(-value) : (ulong)value;
+            var text = new System.Text.StringBuilder();
+            while (rest > 0) { text.Insert(0, digits[(int)(rest % 36)]); rest /= 36; }
+            return negative ? "-" + text : text.ToString();
+        }
 
         /// <summary>A monster's first grade's level, as its fight has it; 1 when it is not loaded.</summary>
         internal static int LevelOf(int monster)
