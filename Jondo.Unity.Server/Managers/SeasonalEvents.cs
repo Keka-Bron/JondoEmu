@@ -52,5 +52,27 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>Whether that value is one of the yearly events.</summary>
         public static bool IsEvent(int criterion) => Windows.ContainsKey(criterion);
+
+        /// <summary>
+        /// Whether that value's meaning is known: a yearly event, or a switch some quest's criterion
+        /// carries -- what the «on» above was read off. The monsters' loot asks only these; the
+        /// values only it carries (the bosses' shields' 3000 to 3069, the kings' cake's 947, 629)
+        /// are nobody's to guess.
+        /// </summary>
+        public static bool IsKnown(int criterion) => IsEvent(criterion) || QuestSwitches().Contains(criterion);
+
+        private static HashSet<int>? _questSwitches;
+
+        private static HashSet<int> QuestSwitches()
+        {
+            if (_questSwitches != null) return _questSwitches;
+            var book = Quests.Book;
+            if (book == null) return new HashSet<int>();   // not read yet: none known, and asked again
+            var switches = new HashSet<int>();
+            foreach (var quest in book.All())
+                foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(quest.Criterion, @"Sc[=!](\d+)"))
+                    switches.Add(int.Parse(m.Groups[1].Value));
+            return _questSwitches = switches;
+        }
     }
 }

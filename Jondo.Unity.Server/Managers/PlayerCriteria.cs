@@ -26,9 +26,11 @@ namespace Jondo.Unity.Server.Managers
     /// In a drop, Qo asks about the objectives still to do in the quests' current steps: «Qo=14179»
     /// is «kill ten larvae» pending, and «Qo&gt;4096&amp;Qo&lt;4098» is objective 4097 among those pending
     /// -- step 1237's objectives run 4074 to 4103. INFERRED, as the order of an objective's ids.
-    /// Mt and Ms are about the monster that drops (see Resolve). The character's other letters --
-    /// the server's type and season, the yearly events, the date -- are asked of the achievement
-    /// engine (ByCharacter). What nobody answers -- Sv, OO, Ot… the server's own letters -- leaves
+    /// Mt and Ms are about the monster that drops (see Resolve); Sc, the yearly events and content
+    /// switches, only where its meaning is known (SeasonalEvents.IsKnown). The character's other
+    /// letters -- the server's type and season, the date, the days an item has been held -- are
+    /// asked of the achievement engine (ByCharacter). What nobody answers -- Sv, OO, Ot… the
+    /// server's own letters, and the Sc only the loot carries -- leaves
     /// the row Unknown, and an Unknown row does not drop: «never dropping them is preferable to
     /// always dropping them» still holds for them.
     /// </para>
@@ -156,6 +158,16 @@ namespace Jondo.Unity.Server.Managers
                 case "OA":
                     return facts.State?.Achievements == null ? Answer.Unknown : Truth(facts.State.Achievements.Has((int)value), op);
 
+                // A yearly event or a content switch, the client's StaticCriterion, which only the
+                // real server judges: answered only where its meaning is known (SeasonalEvents.IsKnown),
+                // the events by their dates and the switches the quests carry as on. The loot's own
+                // stay unknown: the bosses' shields' «Sc=3049&Mt=1&PO!30414», each watched by an
+                // invisible «[!] DR» marker the real server hands out with it, would otherwise drop
+                // at 100 % on every win; «Sc=947» is the kings' cake, a January event; «Sc!629»
+                // guards the 3,848 global rows of equipment off every monster.
+                case "Sc":
+                    return SeasonalEvents.IsKnown((int)value) ? Truth(SeasonalEvents.IsOn((int)value, Almanax.Clock()), op) : Answer.Unknown;
+
                 default: return ByCharacter(condition, facts);
             }
         }
@@ -170,8 +182,8 @@ namespace Jondo.Unity.Server.Managers
         /// on the piwis and the like, never fell: SC and ST were nobody's here, and an unknown row
         /// does not drop. SC is the server's game type, ST its season (the client's
         /// ServerTypeCriterion and SeasonCriterion): not the fifth Temporis on this classic server.
-        /// The same reader answers the yearly events' «Sc=944», the days an item has been held
-        /// («DD&lt;30,21172»), the world events' «WE» and the date's «SG»/«Sd», with the shapes
+        /// The same reader answers the days an item has been held («DD&lt;91,30071», false without
+        /// the item), the world events' «WE» and the date's «SG»/«Sd», with the shapes
         /// <see cref="Jondo.Unity.World.Quests.QuestCriterion"/> gives them: «DD&lt;days,item»,
         /// «OP&gt;key,n» a tally compared with n, «OP=n» a number, or «OP=key» at least one held.
         /// Only for the character in session: the reader asks the session, not these facts.
@@ -185,9 +197,13 @@ namespace Jondo.Unity.Server.Managers
             string code = condition.Code;
             char op = condition.Operator;
 
+            // Without the item there is no date to count from: «PL<21&DD<30,21172&Sc=944», the
+            // piwis' pollen, falls only to whoever holds a pollen net received less than thirty days
+            // ago -- counting the days of a net he does not have as none gave it to every newcomer.
             if (code is "DD" or "DH" or "DM" && condition.Args.Count >= 2)
             {
-                if (!long.TryParse(condition.Args[1], out long item)) return Answer.Unknown;
+                if (!int.TryParse(condition.Args[1], out int item)) return Answer.Unknown;
+                if (facts.Held(item) == 0) return Answer.False;
                 long? since = character.Count(code, item, "");
                 return since.HasValue ? Compare(since.Value, op, first) : Answer.Unknown;
             }

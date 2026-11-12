@@ -12231,16 +12231,15 @@ namespace Jondo.Unity.Server.Handlers
                 int passes = 1 + Managers.Almanax.ChancesMet(1, Managers.Almanax.BonusPercent(Managers.Almanax.BonusType.SecondLoot,
                     Managers.Almanax.ForFight(fight.RoleplayMapId, new[] { monster.MonsterId }, worn, inDungeon)), Random.Shared);
 
+                // What he holds counts what this fight has already dropped him: «PO!11683» is one,
+                // not one a monster.
+                int Held(int item) => Managers.Equipment.HowMany(item) + (loot.TryGetValue(item, out int rolled) ? rolled : 0);
+
                 var table = DatabaseManager.GetMonsterDrops(monster.MonsterId, monster.GradeIndex);
                 foreach (var drop in Enumerable.Repeat(table, passes).SelectMany(t => t))
                 {
-                    // A quest's item to whoever is on it, counting what this fight has already
-                    // dropped him: «PO!11683» is one, not one a monster.
-                    if (drop.ReceiverCriterion.Length > 0 && !Managers.PlayerCriteria.Met(drop.ReceiverCriterion,
-                            fight.RoleplayMapId != 0 ? fight.RoleplayMapId : Network.SessionContext.State.MapId,
-                            item => Managers.Equipment.HowMany(item) + (loot.TryGetValue(item, out int rolled) ? rolled : 0),
-                            monster.MonsterId))
-                        continue;
+                    // A quest's item to whoever is on it.
+                    if (!SeLoLleva(fight, drop.ReceiverCriterion, Held, monster.MonsterId)) continue;
 
                     // In the loot the bonus raises the PROBABILITY of a drop, not the quantity: it is
                     // one roll per item and per monster, and what the challenge improves is the luck.
@@ -12259,7 +12258,7 @@ namespace Jondo.Unity.Server.Handlers
                 // seven gems --, so without this a raid is a place where nothing drops.
                 foreach (var drop in Enumerable.Repeat(DatabaseManager.GetMonsterGlobalDrops(monster.MonsterId), passes).SelectMany(t => t))
                 {
-                    if (!SeLoLleva(fight, drop.ReceiverCriterion)) continue;
+                    if (!SeLoLleva(fight, drop.ReceiverCriterion, Held, monster.MonsterId)) continue;
 
                     double probabilidad = extra > 0
                         ? Math.Min(100.0, drop.PercentDrop * (100.0 + extra) / 100.0)
@@ -12275,10 +12274,7 @@ namespace Jondo.Unity.Server.Handlers
                 // de palos», caramel to cola, off every creature while the quest is in hand.
                 foreach (var drop in Enumerable.Repeat(Managers.QuestFightDrops.All, passes).SelectMany(t => t))
                 {
-                    if (drop.Criterion.Length > 0 && !Managers.PlayerCriteria.Met(drop.Criterion,
-                            fight.RoleplayMapId != 0 ? fight.RoleplayMapId : Network.SessionContext.State.MapId,
-                            item => Managers.Equipment.HowMany(item) + (loot.TryGetValue(item, out int rolled) ? rolled : 0)))
-                        continue;
+                    if (!SeLoLleva(fight, drop.Criterion, Held, monster.MonsterId)) continue;
 
                     double probabilidad = extra > 0
                         ? Math.Min(100.0, drop.Percent * (100.0 + extra) / 100.0)
@@ -12333,12 +12329,19 @@ namespace Jondo.Unity.Server.Handlers
         /// are «(HA=50|HS=3383)&amp;Az=1&amp;Pm!28049666»: none fell outside a raid, where every
         /// letter was unknown.
         /// </remarks>
-        internal static bool SeLoLleva(FightInstance fight, string criterion)
+        /// <remarks>
+        /// One judge for every table a monster drops from -- its own, the global one and the
+        /// quests' -- given what he holds (<paramref name="held"/>, with what this fight has already
+        /// dropped him) and the monster that drops (<paramref name="monsterId"/>, for Mt and Ms).
+        /// The own table asks the fight's letters too: the Purple Dawn champion's temporal loops
+        /// drop on «HA=51|HS=3384|HA=52|HS=3385», an elixir's state, which only the fight knows.
+        /// </remarks>
+        internal static bool SeLoLleva(FightInstance fight, string criterion, Func<int, int> held = null, int monsterId = 0)
         {
             if (string.IsNullOrWhiteSpace(criterion)) return true;
             var raid = Managers.GuildRaidManager.ResolverFor(GameState.CharacterId);
             long mapId = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : GameState.MapId;
-            var player = Managers.PlayerCriteria.ResolverFor(mapId);
+            var player = Managers.PlayerCriteria.ResolverFor(mapId, held, monsterId);
             var me = fight.Buscar(GameState.CharacterId);
             return Jondo.Unity.World.Content.Criterion.Met(criterion, condition =>
             {
