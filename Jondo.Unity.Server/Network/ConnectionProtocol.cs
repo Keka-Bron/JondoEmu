@@ -1465,7 +1465,7 @@ namespace Jondo.Unity.Server.Network
         /// Level of a spawned monster: the one the spawner rolled, or failing that the one its
         /// grade declares.
         /// </summary>
-        private static long LevelOf(Managers.MobSpawnManager.MobMember member)
+        internal static long LevelOf(Managers.MobSpawnManager.MobMember member)
         {
             if (member.Level > 0) return member.Level;
 
@@ -1512,7 +1512,7 @@ namespace Jondo.Unity.Server.Network
         private const int MaxGrade = 5;
         private const int MaxDeclaredGrade = 6;
 
-        private static long GradeOf(Managers.MobSpawnManager.MobMember member)
+        internal static long GradeOf(Managers.MobSpawnManager.MobMember member)
         {
             int declared = member.Monster?.Grades?.Count ?? 0;
             int top = declared >= MaxDeclaredGrade ? MaxDeclaredGrade : MaxGrade;
@@ -2648,7 +2648,8 @@ namespace Jondo.Unity.Server.Network
         ///   f5: their character
         ///   f6: their account
         ///   f7: what they said
-        ///   f8: {} , empty in every line of every capture
+        ///   f8: what the line's links stand for (ktp) -- empty in every line of every capture,
+        ///       which has none; see <see cref="ChatLinks"/>
         ///   f9: the channel
         ///
         /// Channels, from the capture that goes through all of them in one sitting: 0 general
@@ -2657,14 +2658,14 @@ namespace Jondo.Unity.Server.Network
         /// and it carries who it is for.
         /// </summary>
         public static byte[] BuildChatLine(string who, long characterId, long accountId,
-                                           string text, int channel)
+                                           string text, int channel, Pb? links = null)
             => Pb.New()
                 .Str(3, DateTimeOffset.Now.ToString("yyyy-MM-ddTHH:mm:sszzz"))
                 .Str(4, who ?? "")
                 .Var(5, characterId)
                 .VarIfNotZero(6, accountId)
                 .Str(7, text ?? "")
-                .EmptyMsg(8)
+                .Msg(8, links ?? Pb.New())
                 .VarIfNotZero(9, channel)
                 .Build();
 

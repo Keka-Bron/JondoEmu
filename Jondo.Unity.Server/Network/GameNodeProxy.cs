@@ -466,9 +466,12 @@ namespace Jondo.Unity.Server.Network
 
                         if (text.Length > 0 && !consumed && !muted)
                         {
+                            // A monster group shared goes as its id alone: what it is goes with the
+                            // line, for the clients that draw the link (ChatLinks).
                             byte[] linea = ConnectionProtocol.Push(Op.Kti,
                                 ConnectionProtocol.BuildChatLine(GameState.CharacterName,
-                                    GameState.CharacterId, sessionAccountId, text, channel));
+                                    GameState.CharacterId, sessionAccountId, text, channel,
+                                    ChatLinks.Of(text, GameState.MapId)));
                             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, linea);
 
                             // And to the others. It ended here: the line went back to whoever wrote it and
