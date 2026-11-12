@@ -367,5 +367,25 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(beacon.PlaysOnItsOwn);
             Assert.False(me.ControlledBy(11));
         }
+
+        /// <summary>
+        /// The Steamer's turrets play on their own, spells and all, until Evolución III hands them
+        /// to him: the arponera was his to aim from its first turn.
+        /// </summary>
+        [Fact]
+        public void A_steamer_turret_is_its_owner_s_only_at_Evolucion_III()
+        {
+            var me = Rogue(10, 0, 300);
+            var arponera = Bomb(-1, me, 301);
+            arponera.HechizosDeInvocado = new[] { (29112, 1), (29122, 1) };
+            arponera.ControlledFromState = Summons.EvolutionIII;
+
+            Assert.True(arponera.PlaysOnItsOwn);
+            Assert.False(arponera.ControlledBy(10));
+
+            arponera.Buffs.PonerEstado(Summons.EvolutionIII);
+            Assert.False(arponera.PlaysOnItsOwn);
+            Assert.True(arponera.ControlledBy(10));
+        }
     }
 }
