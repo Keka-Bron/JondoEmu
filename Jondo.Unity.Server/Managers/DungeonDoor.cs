@@ -51,16 +51,33 @@ namespace Jondo.Unity.Server.Managers
         public const string TakeKeyWording = "Toma la llave";
 
         /// <summary>
-        /// And as three guardians who also take the keyring word it: Hywan Kenoby at the Sakaï mine
-        /// («Darle la llave para entrar.»), Teo Dolito («Darle la llave y atravesar las puertas.») and
-        /// Matilde Ualtzin («Darle la llave y escuchar el canto de Kidibom.»). Without them their
-        /// key reply led nowhere and only the keyring opened the door.
+        /// And as the guardians who also take the keyring word it their own way. Without these their
+        /// key reply led nowhere and only the keyring opened the door, so once the week's free entry
+        /// was spent there was no way in at all, key in hand.
         /// </summary>
+        /// <remarks>
+        /// Read off the game's text table: of the 97 guardians that offer the keyring, 30 offered no
+        /// key reply the server knew. Twenty-four of them simply say «Darle la llave.» -- director
+        /// Grunob's doorman at the goblins' Akademia among them --, five name the key («Darle la llave
+        /// del tofullinero.», «... de la Mazmorra de los Bworks.»), and the guardians of the
+        /// Dragocerdo's den, Sfinter Cell's lair and the Morsagüino Real's dig have a sentence of
+        /// their own.
+        ///
+        /// Whole sentences rather than «Darle la llave» alone: that prefix also opens «Darle la llave
+        /// al capitán.» and «Darle la llave de Brakmar.», quest replies of two NPCs who keep no door.
+        /// </remarks>
         public static readonly string[] OtherKeyWordings =
         {
+            "Darle la llave.",
+            "Darle la llave del ",
+            "Darle la llave de la Mazmorra",
             "Darle la llave para entrar",
             "Darle la llave y atravesar las puertas",
             "Darle la llave y escuchar el canto de Kidibom",
+            "Darle las dos llaves y entrar",
+            "Presentar la llave y entrar",
+            "Entregar las llaves y entrar",
+            "Aceptar y entrar con la llave",
         };
 
         /// <summary>

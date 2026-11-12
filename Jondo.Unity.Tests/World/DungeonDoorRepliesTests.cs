@@ -170,5 +170,47 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(8146, hywan.Keyring);
             Assert.Equal(8145, hywan.Key);
         }
+
+        /// <summary>
+        /// The doorman of the goblins' Akademia only says «Darle la llave.». Without it he offered
+        /// the keyring alone, and with this week's free entry spent nobody got in, key or no key.
+        /// </summary>
+        [Fact]
+        public void The_Akademia_doorman_takes_the_key_on_a_plain_give_him_the_key()
+        {
+            Npcs.Initialize();
+            DungeonDoor.Initialize();
+            var doorman = DungeonDoor.For(6674);
+            if (!doorman.Asks) return;   // no world base to read
+
+            Assert.Equal(67777, doorman.Keyring);
+            Assert.Equal(67773, doorman.Key);
+        }
+
+        [Fact]
+        public void The_guardians_with_a_sentence_of_their_own_take_the_key_too()
+        {
+            Npcs.Initialize();
+            DungeonDoor.Initialize();
+            if (!DungeonDoor.For(6674).Asks) return;   // no world base to read
+
+            Assert.Equal(3032, DungeonDoor.For(818).Key);    // «Entregar las llaves y entrar en la mazmorra.»
+            Assert.Equal(8211, DungeonDoor.For(1300).Key);   // «Aceptar y entrar con la llave.»
+            Assert.Equal(2847, DungeonDoor.For(784).Key);    // «Presentar la llave y entrar.», the lower of two
+        }
+
+        /// <summary>
+        /// A quest reply that opens with the same words does not make a door of its NPC.
+        /// </summary>
+        [Fact]
+        public void Give_the_key_to_the_captain_is_not_a_door()
+        {
+            Npcs.Initialize();
+            DungeonDoor.Initialize();
+            if (!DungeonDoor.For(6674).Asks) return;   // no world base to read
+
+            Assert.False(DungeonDoor.For(2880).Asks);   // «Darle la llave al capitán.»
+            Assert.False(DungeonDoor.For(6401).Asks);   // «Darle la llave de Brakmar.»
+        }
     }
 }
