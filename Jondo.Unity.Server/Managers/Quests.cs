@@ -1395,6 +1395,10 @@ namespace Jondo.Unity.Server.Managers
             var run = log.Start(questId);
             if (run == null) return false;
 
+            // A quest taken again gathers afresh: the fresh carrots of a daily are there for the
+            // picking the next day too, and were remembered as taken for the whole session.
+            SessionContext.State.QuestElementsTaken.RemoveWhere(taken => Bindings.Of(taken.Objective)?.QuestId == questId);
+
             // Said once per start rather than swallowed: a quest handed out on a condition that was
             // only half read is a different thing from one whose condition passed, and the person
             // running the server is the only one who can judge whether it matters.
