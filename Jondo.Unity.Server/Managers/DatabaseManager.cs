@@ -2297,6 +2297,77 @@ namespace Jondo.Unity.Server
             "CharacterSavedPositions", "CharacterPresets", "CharacterItemShortcuts", "CharacterPendingChanges",
         };
 
+        /// <summary>The ids of deleted characters, so that none is ever handed out again.</summary>
+        private const string RetiredIdsTable = "RetiredCharacterIds";
+
+        /// <summary>The tables of the schema with a CharacterId column, whoever they belong to.</summary>
+        private static List<string> TablesKeyedByCharacter(SqliteConnection connection, SqliteTransaction? transaction = null)
+        {
+            var tables = new List<string>();
+            var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = "SELECT m.name FROM sqlite_master m JOIN pragma_table_info(m.name) p " +
+                                  "WHERE m.type = 'table' AND p.name = 'CharacterId' ORDER BY m.name;";
+            using var reader = command.ExecuteReader();
+            while (reader.Read()) tables.Add(reader.GetString(0));
+            return tables;
+        }
+
+        /// <summary>
+        /// What a deletion empties: the list above, and every table the schema has now that is the
+        /// character's own -- named after characters or the haven bag, and the jail. The list
+        /// alone had fallen behind: the alignment, the emotes, the alterations, the mounts, the
+        /// learned spells and a dozen more stayed behind. Guilds, alliances and ladders are shared
+        /// with others and keep their rows.
+        /// </summary>
+        private static List<string> OwnedTables(SqliteConnection connection, SqliteTransaction transaction)
+        {
+            var owned = new List<string>(CharacterOwnedTables);
+            foreach (string table in TablesKeyedByCharacter(connection, transaction))
+            {
+                bool his = table.StartsWith("Character", StringComparison.Ordinal)
+                           || table.StartsWith("HavenBag", StringComparison.Ordinal) || table == "Jail";
+                if (his && !owned.Contains(table)) owned.Add(table);
+            }
+            return owned;
+        }
+
+        /// <summary>
+        /// The id for a new character: past every id ever handed out, not only past those still
+        /// in Characters.
+        /// </summary>
+        /// <remarks>
+        /// It used to be the largest in Characters plus one: deleting the newest character and
+        /// making another gave the newcomer the same id, and with it whatever the deletion left
+        /// -- his predecessor's alignment above all, so he came out of the creation sworn to Bonta
+        /// with his wings out, and the wings took the ornament's place. Deleted ids are kept now
+        /// (<see cref="RetiredIdsTable"/>), and the rows an older deletion left in any table keep
+        /// theirs taken too.
+        /// </remarks>
+        private static long NextCharacterId(SqliteConnection connection)
+        {
+            var queries = new List<string> { "SELECT MAX(Id) FROM Characters" };
+            foreach (string table in TablesKeyedByCharacter(connection))
+                queries.Add($"SELECT MAX(CharacterId) FROM \"{table}\"");
+            queries.Add($"SELECT MAX(Id) FROM {RetiredIdsTable}");
+
+            long highest = 1000000;
+            foreach (string query in queries)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = query;
+                try
+                {
+                    if (command.ExecuteScalar() is long value && value > highest) highest = value;
+                }
+                catch (SqliteException)
+                {
+                    // The retired ids' table before the first deletion: nothing retired yet.
+                }
+            }
+            return highest + 1;
+        }
+
         /// <summary>
         /// Deletes a character and everything hanging off it. Returns its name, or "" if nothing
         /// was deleted.
@@ -2335,12 +2406,13 @@ namespace Jondo.Unity.Server
                     return "";
                 }
 
-                foreach (string table in CharacterOwnedTables)
+                var owned = OwnedTables(connection, transaction);
+                foreach (string table in owned)
                 {
                     var cleanup = connection.CreateCommand();
                     cleanup.Transaction = transaction;
-                    // The table names come from the constant list above, never from the wire.
-                    cleanup.CommandText = $"DELETE FROM {table} WHERE CharacterId = $id;";
+                    // The table names come from the list above and the schema, never from the wire.
+                    cleanup.CommandText = $"DELETE FROM \"{table}\" WHERE CharacterId = $id;";
                     cleanup.Parameters.AddWithValue("$id", characterId);
                     try
                     {
@@ -2367,9 +2439,17 @@ namespace Jondo.Unity.Server
                     return "";
                 }
 
+                // His id is retired: no character made later gets it (NextCharacterId).
+                var retire = connection.CreateCommand();
+                retire.Transaction = transaction;
+                retire.CommandText = $"CREATE TABLE IF NOT EXISTS {RetiredIdsTable} (Id INTEGER PRIMARY KEY); " +
+                                     $"INSERT OR IGNORE INTO {RetiredIdsTable} (Id) VALUES ($id);";
+                retire.Parameters.AddWithValue("$id", characterId);
+                retire.ExecuteNonQuery();
+
                 transaction.Commit();
                 Console.WriteLine($"[DatabaseManager] Deleted character {name} ({characterId}) " +
-                                  $"and its rows in {CharacterOwnedTables.Length} tables.");
+                                  $"and its rows in {owned.Count} tables.");
                 return name;
             }
             catch (Exception ex)
@@ -2967,9 +3047,7 @@ namespace Jondo.Unity.Server
                 using var connection = new SqliteConnection(WorldConnectionString);
                 connection.Open();
 
-                var siguiente = connection.CreateCommand();
-                siguiente.CommandText = "SELECT IFNULL(MAX(Id), 1000000) + 1 FROM Characters;";
-                long id = siguiente.ExecuteScalar() is long max ? max : 1000001;
+                long id = NextCharacterId(connection);
 
                 // The cell: the one asked for, or next to the map's zaap, not on it.
                 int cell = cellId >= 0
