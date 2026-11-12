@@ -731,8 +731,7 @@ namespace Jondo.Unity.World.Fights
         ///
         /// A defended fight -- a tax collector's or a prism's -- waits for its clock all the same:
         /// its alliance is told of the attack and comes through its fights' list, and the lone
-        /// attacker pressing ready five seconds in started it before anybody could
-        /// (Idlia, fight #1005: attacked at 23:36:32, ready and started at 23:36:37). Only the
+        /// attacker pressing ready five seconds in started it before anybody could. Only the
         /// clock running out, <paramref name="clockRanOut"/>, starts it.
         /// </remarks>
         public bool SetFighterReady(long fighterId, bool clockRanOut = false)
