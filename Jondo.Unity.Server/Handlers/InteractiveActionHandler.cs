@@ -206,6 +206,9 @@ namespace Jondo.Unity.Server.Handlers
                 case InteractiveActionKind.TopTaxCollectors:
                     await TaxCollectorHandler.ShowTopsAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
+                case InteractiveActionKind.AbyssLever:
+                    await AbyssalBase.PullAsync(stream, mapId, interactive.Element.Id, action.SkillId);
+                    break;
                 case InteractiveActionKind.RaidStatue:
                     await GuildRaidExecrabe.PressAsync(stream, GameState.CharacterId, mapId,
                                                        interactive.Element.Id, action.SkillId);

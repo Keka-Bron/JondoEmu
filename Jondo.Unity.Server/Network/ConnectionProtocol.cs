@@ -1372,6 +1372,15 @@ namespace Jondo.Unity.Server.Network
                         or Managers.InteractiveActionKind.Way)
                     sinColocacion = true;
             }
+            // The abyssal base's lights and doors: lit or open as they stand on the map.
+            // Without its placement the client does not draw them at all.
+            if (interactive.Actions.Count == 0 && Managers.AbyssalBase.IsDoorOrLight(interactive.MapId, interactive.Element.Id))
+            {
+                DeclarePlacement(jss, interactive.Element,
+                    (Managers.ResourceState)Managers.AbyssalBase.StateOf(interactive.MapId, interactive.Element.Id));
+                return;
+            }
+
             if (interactive.Actions.Count == 0 || sinColocacion) return;
 
             // The Cangrancio's statues: lit once the viewer's raid has seen their form.

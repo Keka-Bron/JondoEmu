@@ -52,6 +52,14 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A door of the abyssal base lets through only while its lights are lit.
+            if (!Managers.AbyssalBase.MayPass(sourceMapId, elementId))
+            {
+                await Managers.AbyssalBase.TellShutAsync(stream);
+                Console.WriteLine($"[Teleport] Element {elementId} on {sourceMapId}: its door is shut.");
+                return;
+            }
+
             // A passage with a criterion opens only for whoever meets it: a vilinsekt's hideout to
             // the rikiki wand worn. Refused, the client hears why, as for an item's criterion.
             if (route.Criterion.Length > 0 && !Managers.ItemCriteria.Holds(route.Criterion))

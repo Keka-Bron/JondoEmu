@@ -132,6 +132,9 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>One of an element's named ways, each with its condition: the temples' statues (InteractiveWaysHandler).</summary>
         Way,
+
+        /// <summary>A lever of the abyssal base: a battery for its door's light (AbyssalBase).</summary>
+        AbyssLever,
     }
 
     /// <summary>A skill offered by an interactive element.</summary>
@@ -252,6 +255,7 @@ namespace Jondo.Unity.Server.Managers
         public static void Initialize()
         {
             var fresh = new Tables();
+            AbyssalBase.Reset();
             _building = fresh;
             try
             {
@@ -608,6 +612,14 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
+            // The abyssal base's levers, each lighting its door's light for a battery.
+            foreach (var lever in AbyssalBase.Levers)
+            {
+                if (_byElement.ContainsKey((lever.MapId, lever.Element.Id))) continue;
+                Register(lever.MapId, lever.Element, AbyssalBase.LeverType, InteractiveActionKind.AbyssLever,
+                         AbyssalBase.LeverSkill);
+            }
+
             // And the Santuario's manuscript, a page on each of its zones: "Arrancar una página".
             foreach (var (manuscriptMap, manuscript, _) in GuildRaidSanctuary.Manuscripts(
                          Jondo.Unity.World.Content.Raids.Of(Jondo.Unity.World.Content.Raids.EternalGardens)))
@@ -831,7 +843,7 @@ namespace Jondo.Unity.Server.Managers
                 if (_byElement.ContainsKey((ways.MapId, ways.ElementId))) continue;
                 var declared = Declared(ways.MapId, new Interactives.Element(ways.ElementId, ways.Cell, ways.Gfx), ways.Type);
                 foreach (var way in ways.Ways)
-                    declared.AddNamed(InteractiveActionKind.Way, ways.Skill, way.Name);
+                    declared.AddNamed(InteractiveActionKind.Way, InteractiveWays.SkillOf(ways, way), way.Name);
                 count++;
             }
             if (count > 0) Console.WriteLine($"[Ways] {count} element(s) declared with their named ways.");

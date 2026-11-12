@@ -194,6 +194,9 @@ namespace Jondo.Unity.Server.Handlers
                 route = route.Otherwise;
             if (route == null)
                 return;
+            // Nor through an abyssal base door that is shut.
+            if (!Managers.AbyssalBase.MayPass(mapId, route.ElementId))
+                return;
 
             int landed = await TeleportHandler.ToMapAsync(
                 stream, route.DestinationMapId, route.DestinationCellId);

@@ -25,7 +25,7 @@ namespace Jondo.Unity.Server.Handlers
             if (ways == null) return null;
             return interactive.Actions
                 .Where(a => a.Kind == InteractiveActionKind.Way
-                            && InteractiveWays.WayOf(ways, a.SkillNameId) is { } way
+                            && InteractiveWays.WayOf(ways, a.SkillId, a.SkillNameId) is { } way
                             && ItemCriteria.Holds(way.Criterion))
                 .ToList();
         }
@@ -58,7 +58,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var state = SessionContext.State;
             var ways = InteractiveWays.Of(interactive.MapId, interactive.Element.Id);
-            var way = ways == null ? null : InteractiveWays.WayOf(ways, action.SkillNameId);
+            var way = ways == null ? null : InteractiveWays.WayOf(ways, action.SkillId, action.SkillNameId);
             if (way == null || way.ToMap == 0) return;
             if (!ItemCriteria.Holds(way.Criterion))
             {
@@ -67,7 +67,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             await SessionRegistry.BroadcastToMapAsync(state.MapId, ConnectionProtocol.Push(Op.Iwn,
                 ConnectionProtocol.BuildElementInUse(interactive.Element.Id, action.SkillId, state.CharacterId)));
-            Console.WriteLine($"[Ways] {state.CharacterName} takes way {way.Name} of element {interactive.Element.Id} to {way.ToMap}.");
+            Console.WriteLine($"[Ways] {state.CharacterName} takes way {(way.Skill != 0 ? way.Skill : way.Name)} of element {interactive.Element.Id} to {way.ToMap}.");
             await TeleportHandler.ToMapAsync(stream, way.ToMap, way.ToCell);
         }
     }

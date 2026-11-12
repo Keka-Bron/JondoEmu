@@ -26,6 +26,13 @@ namespace Jondo.Unity.Server.Managers
         {
             /// <summary>The skill's name, a row of the client's SkillNamesDataRoot.</summary>
             public int Name { get; init; }
+
+            /// <summary>
+            /// The way's own skill, when it has one: a lift offers each floor as a skill of its
+            /// own, 240 «Hacia las salas de las salpicaduras» to 243 «Hacia el Acuadomo de
+            /// Merkator» in the abyssal base. 0 for the element's skill under the way's name.
+            /// </summary>
+            public int Skill { get; init; }
             public long ToMap { get; init; }
             public int ToCell { get; init; }
 
@@ -65,9 +72,22 @@ namespace Jondo.Unity.Server.Managers
         public static Way? WayOf(WayElement element, int name)
         {
             foreach (var way in element.Ways)
-                if (way.Name == name) return way;
+                if (way.Skill == 0 && way.Name == name) return way;
             return null;
         }
+
+        /// <summary>The way behind one of the element's actions: by its own skill, or by its name.</summary>
+        public static Way? WayOf(WayElement element, int skill, int name)
+        {
+            foreach (var way in element.Ways)
+            {
+                if (way.Skill != 0 ? way.Skill == skill && way.Name == name : way.Name == name) return way;
+            }
+            return null;
+        }
+
+        /// <summary>The skill an action of this way is declared with.</summary>
+        public static int SkillOf(WayElement element, Way way) => way.Skill != 0 ? way.Skill : element.Skill;
 
         public static void Load() => Ensure();
 
@@ -100,6 +120,7 @@ namespace Jondo.Unity.Server.Managers
                             ways.Add(new Way
                             {
                                 Name = (int)Number(way, "name"),
+                                Skill = (int)Number(way, "skill"),
                                 ToMap = Number(way, "toMap"),
                                 ToCell = (int)Number(way, "toCell"),
                                 Criterion = way.TryGetProperty("criterion", out var c) && c.ValueKind == JsonValueKind.String

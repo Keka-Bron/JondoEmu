@@ -488,6 +488,14 @@
       "toMap": 121766912,
       "toCell": 284,
       "why": "The rim of Amakna's rift [6,13]: «Cliquez sur le rebord de la crevasse pour descendre puis empruntez le portail» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The client lets the rim (element 484182) be used and the server had nowhere for it; the 2.73 graph takes the same way down from cell 261, which is the hole and cannot be walked to, and lands on 280 of the gallery (121766912). INFERRED landing: 284, the first walkable cell of that row."
-    }
+    },
+    {"map": 117703169, "element": 483314, "remove": true, "why": "An abyssal base lift: one skill per floor, each with its condition, in ways.json."},
+    {"map": 117704202, "element": 483313, "remove": true, "why": "An abyssal base lift: one skill per floor, each with its condition, in ways.json."},
+    {"map": 117704209, "element": 483310, "remove": true, "why": "An abyssal base lift: one skill per floor, each with its condition, in ways.json."},
+    {"map": 117707786, "element": 483309, "remove": true, "why": "An abyssal base lift: one skill per floor, each with its condition, in ways.json."},
+    {"map": 117703176, "element": 483311, "remove": true, "why": "An abyssal base lift: one skill per floor, each with its condition, in ways.json."},
+    {"map": 117706767, "element": 483312, "remove": true, "why": "An abyssal base lift: one skill per floor, each with its condition, in ways.json."},
+    {"map": 117703178, "element": 483194, "cell": 176, "gfx": 42154, "type": 0, "skill": 184, "toMap": 117703176, "toCell": 310, "why": "The abyssal base's door on 117703178 [21,18], into the Cartographer's lift room: the 2.73 graph's transition (type 32, skill 184, cell 176) that the routes left out. It opens with its lever (AbyssalBase). INFERRED landing: 310, the left end of the room's floor."},
+    {"map": 117708815, "element": 483243, "cell": 186, "gfx": 42154, "type": 0, "skill": 184, "toMap": 117707791, "toCell": 445, "why": "The abyssal base's door on 117708815 [24,32], into the half-sunk submarine's room: the 2.73 graph's transition (type 32, skill 184, cell 186) that the routes left out. It opens with its lever (AbyssalBase). INFERRED landing: 445, the right side of the room, toward [24,32]."}
   ]
 }

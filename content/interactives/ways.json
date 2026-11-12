@@ -10,7 +10,16 @@
   "book is read ((Qo>book&PG=class), the devotion's objective) and to the gods' territory with",
   "quest 1938 in hand or done. Landing: Astrub on cell 483, where Incarnam's portal lands; the",
   "territory on the walkable cell nearest the graph's 449, which is not walkable.",
-  "Type 128 is what a capture declares the steamers' statue (gfx 62135) with."
+  "Type 128 is what a capture declares the steamers' statue (gfx 62135) with.",
+  "",
+  "A way may carry a skill of its own instead of a name: the abyssal base's lifts offer each floor",
+  "as a skill the client names, 212 «Ir a Sufokia», 240 «Hacia las salas de las salpicaduras», 241",
+  "«Hacia las salas de las corrientes», 242 «Hacia las salas de los abismos», 243 «Hacia el Acuadomo",
+  "de Merkator» -- the 2.73 graph's type-32 transitions from each lift, with those skills. The",
+  "Undertow Rooms open with «Torcer el brazo» (1441) done and the Abyss Rooms with «Basta de Bazano»",
+  "(1440), the Aquadome's lift with «Profundímetro» (1442) (Dofus pour les noobs, «Chemin vers le",
+  "donjon Aquadôme de Merkator»: «À bas Kralab Rah», «KO pour Bosko Tho», «Relevez les niveaux»).",
+  "Type 226 is the client's «Ascensor», the name the guide's capture shows over the Aquadome's lift."
  ],
  "elements": [
   {
@@ -472,6 +481,163 @@
     }
    ],
    "why": "the statue of the class-20 temple; the 2.73 graph's transitions from it: to Astrub (Qo>18616&PG=20), to the gods' territory (Qa=1938|Qf=1938)."
+  },
+  {
+   "map": 117703169,
+   "element": 483314,
+   "cell": 426,
+   "gfx": 41975,
+   "type": 226,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 0,
+     "skill": 240,
+     "toMap": 117704202,
+     "toCell": 345
+    },
+    {
+     "name": 0,
+     "skill": 241,
+     "toMap": 117704209,
+     "toCell": 332,
+     "criterion": "Qf=1441"
+    },
+    {
+     "name": 0,
+     "skill": 242,
+     "toMap": 117707786,
+     "toCell": 415,
+     "criterion": "Qf=1440"
+    }
+   ],
+   "why": "the abyssal base's lift on 117703169; the 2.73 graph's transitions from it go to the Splash Zone (240), the Undertow Rooms (241), the Abyss Rooms (242)."
+  },
+  {
+   "map": 117704202,
+   "element": 483313,
+   "cell": 345,
+   "gfx": 41975,
+   "type": 226,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 0,
+     "skill": 212,
+     "toMap": 117703169,
+     "toCell": 426
+    },
+    {
+     "name": 0,
+     "skill": 241,
+     "toMap": 117704209,
+     "toCell": 332,
+     "criterion": "Qf=1441"
+    },
+    {
+     "name": 0,
+     "skill": 242,
+     "toMap": 117707786,
+     "toCell": 415,
+     "criterion": "Qf=1440"
+    }
+   ],
+   "why": "the abyssal base's lift on 117704202; the 2.73 graph's transitions from it go to Sufokia (212), the Undertow Rooms (241), the Abyss Rooms (242)."
+  },
+  {
+   "map": 117704209,
+   "element": 483310,
+   "cell": 332,
+   "gfx": 41975,
+   "type": 226,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 0,
+     "skill": 212,
+     "toMap": 117703169,
+     "toCell": 426
+    },
+    {
+     "name": 0,
+     "skill": 240,
+     "toMap": 117704202,
+     "toCell": 345
+    },
+    {
+     "name": 0,
+     "skill": 242,
+     "toMap": 117707786,
+     "toCell": 415,
+     "criterion": "Qf=1440"
+    }
+   ],
+   "why": "the abyssal base's lift on 117704209; the 2.73 graph's transitions from it go to Sufokia (212), the Splash Zone (240), the Abyss Rooms (242)."
+  },
+  {
+   "map": 117707786,
+   "element": 483309,
+   "cell": 415,
+   "gfx": 41975,
+   "type": 226,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 0,
+     "skill": 212,
+     "toMap": 117703169,
+     "toCell": 426
+    },
+    {
+     "name": 0,
+     "skill": 240,
+     "toMap": 117704202,
+     "toCell": 345
+    },
+    {
+     "name": 0,
+     "skill": 241,
+     "toMap": 117704209,
+     "toCell": 332,
+     "criterion": "Qf=1441"
+    }
+   ],
+   "why": "the abyssal base's lift on 117707786; the 2.73 graph's transitions from it go to Sufokia (212), the Splash Zone (240), the Undertow Rooms (241)."
+  },
+  {
+   "map": 117703176,
+   "element": 483311,
+   "cell": 457,
+   "gfx": 41975,
+   "type": 226,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 0,
+     "skill": 243,
+     "toMap": 117706767,
+     "toCell": 405,
+     "criterion": "Qf=1442"
+    }
+   ],
+   "why": "the Cartographer's lift, Splash Zone to the Aquadome's entrance (graph skill 243); «pour pouvoir utiliser cet ascenseur vers le donjon Merkator il faut avoir terminé la quête Relevez les niveaux»."
+  },
+  {
+   "map": 117706767,
+   "element": 483312,
+   "cell": 405,
+   "gfx": 41975,
+   "type": 226,
+   "skill": 184,
+   "ways": [
+    {
+     "name": 0,
+     "skill": 240,
+     "toMap": 117703176,
+     "toCell": 457
+    }
+   ],
+   "why": "the same lift back up to the Splash Zone (graph skill 240). INFERRED: open to anybody, as the guide names a condition only on the way down."
   }
  ]
 }
