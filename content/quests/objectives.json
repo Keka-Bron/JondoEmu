@@ -3863,6 +3863,200 @@
    "map": 68422664,
    "afterObjectives": [8000],
    "why": "«Encuentra a la osamodas al sur de Madrestam»: «Rendez-vous en [13,1] pour rencontrer l'Osamodas pollueuse» («Pollution, je dis non» (Dofus pour les noobs))."
+  },
+  {
+   "objective": 11450,
+   "quest": 1779,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The three adventurers are injected in any order (Dofus pour les noobs lists them one way, the step another)."
+  },
+  {
+   "objective": 11451,
+   "quest": 1779,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The three adventurers are injected in any order (Dofus pour les noobs lists them one way, the step another)."
+  },
+  {
+   "objective": 11452,
+   "quest": 1779,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The three adventurers are injected in any order (Dofus pour les noobs lists them one way, the step another)."
+  },
+  {
+   "objective": 11453,
+   "quest": 1779,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The three adventurers are injected in any order (Dofus pour les noobs lists them one way, the step another)."
+  },
+  {
+   "objective": 11454,
+   "quest": 1779,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The three adventurers are injected in any order (Dofus pour les noobs lists them one way, the step another)."
+  },
+  {
+   "objective": 11455,
+   "quest": 1779,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The three adventurers are injected in any order (Dofus pour les noobs lists them one way, the step another)."
+  },
+  {
+   "objective": 11413,
+   "quest": 1772,
+   "kind": "click",
+   "elements": [{"map": 142213633, "element": 509200}],
+   "says": 690,
+   "anyOrder": true,
+   "why": "«Inspecciona el castillo del norte»: the sand castle 509200 on cell 382 of [-39,-49], the map's only prop besides four flowers. Its pebble starts the sentence (info message 690: «Entre ... rebasa ... mordida ... hasta verte rodeado ...»); the south one finishes it. INFERRED which pebble each castle holds."
+  },
+  {
+   "objective": 11352,
+   "quest": 1772,
+   "kind": "click",
+   "elements": [{"map": 142085644, "element": 509201}],
+   "says": 691,
+   "anyOrder": true,
+   "why": "«Inspecciona el castillo del sur»: the sand castle 509201 on cell 453 of [-31,-38] (info message 691: «... los castillos ... la tabla ... y ve ... por el oleaje»). Both castles in any order (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11414,
+   "quest": 1772,
+   "kind": "click",
+   "elements": [{"map": 142083079, "element": 509199}],
+   "gives": [{"item": 18188, "count": 1}],
+   "says": 693,
+   "afterObjectives": [11413, 11352],
+   "why": "«Encuentra la valva de los murmullos»: the pointed rock 509199 on cell 443 of [-36,-43], between the castles past the bitten plank (Dofus pour les noobs); info message 693 «¡encuentras una valva escondida bajo una roca!», and the shell (18188) Manala asks for."
+  },
+  {
+   "objective": 11372,
+   "quest": 1772,
+   "kind": "click",
+   "elements": [{"map": 142085128, "element": 509202}],
+   "says": 692,
+   "why": "«Inspecciona el escondrijo secreto»: the things under the arbours on the right of [-32,-42], element 509202 on cell 278 (Dofus pour les noobs); info message 692: a private place of Bonta, ask captain Malfe Eikles."
+  },
+  {
+   "objective": 11365,
+   "quest": 1772,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [11364],
+   "why": "Guerl's four beasts of the fields count together, five of each (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11366,
+   "quest": 1772,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [11364],
+   "why": "Guerl's four beasts of the fields count together, five of each (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11367,
+   "quest": 1772,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [11364],
+   "why": "Guerl's four beasts of the fields count together, five of each (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11368,
+   "quest": 1772,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [11364],
+   "why": "Guerl's four beasts of the fields count together, five of each (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11458,
+   "quest": 1780,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Grouiiik !»: the four porkass monsters count together, five of each (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11459,
+   "quest": 1780,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Grouiiik !»: the four porkass monsters count together, five of each (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11460,
+   "quest": 1780,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Grouiiik !»: the four porkass monsters count together, five of each (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11461,
+   "quest": 1780,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Grouiiik !»: the four porkass monsters count together, five of each (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11429,
+   "quest": 1777,
+   "kind": "click",
+   "elements": [{"map": 14551301, "element": 509212}],
+   "gives": [{"item": 18214, "count": 1}],
+   "why": "«Encuentra un módulo de comunicación sintética»: on the brigandins' platform, the module on the left by the three barrels and the crates (Dofus pour les noobs), element 509212 on cell 367, graphic 15722."
+  },
+  {
+   "objective": 11433,
+   "quest": 1777,
+   "kind": "beat",
+   "monster": 4560,
+   "map": 14551301,
+   "why": "«Ayuda a Mecatrón a pasar el control técnico de Izak Azimof»: the fight against Izak's automatons, of which the Robionicle (4560) is the one always there."
+  },
+  {
+   "objective": 11425,
+   "quest": 1777,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [11423],
+   "why": "The three experimental automatons are beaten in any order (Dofus pour les noobs lists another than the step)."
+  },
+  {
+   "objective": 11426,
+   "quest": 1777,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [11423],
+   "why": "The three experimental automatons are beaten in any order (Dofus pour les noobs lists another than the step)."
+  },
+  {
+   "objective": 11427,
+   "quest": 1777,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [11423],
+   "why": "The three experimental automatons are beaten in any order (Dofus pour les noobs lists another than the step)."
+  },
+  {
+   "objective": 11360,
+   "quest": 1771,
+   "kind": "click",
+   "elements": [{"map": 164365331, "element": 509222}],
+   "gives": [{"item": 18226, "count": 1}],
+   "says": 694,
+   "why": "«Inspecciona el lugar del incidente»: the white wagon (element 509222, cell 134, graphic 13112) gives the Brakmarian scroll (Dofus pour les noobs); info message 694: an almost empty crate, a torn scroll with Brakmar's seal."
+  },
+  {
+   "objective": 11445,
+   "quest": 1771,
+   "kind": "enter",
+   "map": 164104209,
+   "why": "«Escondite de Megan Fux», [-25,-17], where the merchant says she hides (Dofus pour les noobs)."
   }
  ]
 }

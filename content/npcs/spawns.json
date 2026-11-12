@@ -3719,6 +3719,114 @@
       "orientation": 3,
       "criterion": "Qa=833|Qf=833|Qa=834|Qf=834",
       "why": "Llavero, the keeper of the Wa Wabbit's castle [24,-13]: «Parlez à Powte-clef pour finir la quête» («Jamais deux sans trois», Dofus pour les noobs). In front of the castle's door, clear of the banners and carrots in the client; there from the quest that sends the character to him."
+    },
+    {
+      "map": 189530112,
+      "npc": 3426,
+      "cell": 315,
+      "orientation": 1,
+      "why": "The wool keeper at the gate of Tainela's farm [-2,-29], for everyone: he lets visitors in and points to the lailait (Dofus pour les noobs). INFERRED cell, the one already guessed."
+    },
+    {
+      "map": 147590667,
+      "npc": 3398,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qf!1773",
+      "why": "The young medibwork at [-16,-45], where «Les cailloux de Cania» starts (the quest's giver), until it is done. He had no placement at all: the quest could not be started. INFERRED cell."
+    },
+    {
+      "map": 139463682,
+      "npc": 3398,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qf=1773",
+      "why": "With doctor Knok at [-15,-43] once «Les cailloux de Cania» is done: he gives «Le triomphe de la médecine» there (the quest's giver, Dofus pour les noobs). INFERRED cell, next to Knok."
+    },
+    {
+      "map": 217055242,
+      "npc": 236,
+      "cell": 243,
+      "orientation": 1,
+      "why": "Behind the counter of Bonta's grocery [-33,-57], where «Le champ de la mer» sends you for the cord (Dofus pour les noobs). INFERRED cell, behind the counter."
+    },
+    {
+      "map": 142086660,
+      "npc": 1113,
+      "cell": 301,
+      "orientation": 1,
+      "why": "By the convoy wagon at Bonta's exit [-29,-46] (Dofus pour les noobs), where objective 11364 sends you; she had no placement. INFERRED cell, in front of the wagon."
+    },
+    {
+      "map": 224920584,
+      "npc": 236,
+      "cell": 311,
+      "remove": true,
+      "why": "The grocer of Bonta stood in the Imaginarium [0,0], a guess carried over from another emulator; she keeps her shop in Bonta [-33,-57] (Dofus pour les noobs)."
+    },
+    {
+      "map": 165152778,
+      "npc": 3412,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qo<11436",
+      "why": "Basuratron at [-12,-25] (the quest's giver) until it turns into Mecatron (Dofus pour les noobs: «Mechatron vient d'apparaître sur la map à la place de la poubelle»). The cell is the derived one."
+    },
+    {
+      "map": 165152778,
+      "npc": 3416,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qo>11436&Qo<11431",
+      "why": "Mecatron where the bin stood, from the transformation until it sends you to the brigandins' village."
+    },
+    {
+      "map": 164364813,
+      "npc": 3416,
+      "cell": 425,
+      "orientation": 1,
+      "criterion": "Qo>11431&Qo<11430",
+      "why": "Mecatron waiting at the foot of the brigandins' ladder [-19,-23] for the module (Dofus pour les noobs: «Mechatron qui vous attendait en bas»). INFERRED cell, by the ladder."
+    },
+    {
+      "map": 14551301,
+      "npc": 3416,
+      "cell": 287,
+      "orientation": 5,
+      "criterion": "Qo>11430",
+      "why": "Mecatron on the platform beside its maker Izak Azimof once the module is in (Dofus pour les noobs: present it to Mazimof, then talk to it after the control). INFERRED cell, next to Izak (273)."
+    },
+    {
+      "map": 189531147,
+      "npc": 3404,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1771",
+      "why": "Manu Scrito at [0,-18] while «Le quiproquo» is under way (Dofus pour les noobs); the derived cell."
+    },
+    {
+      "map": 189531147,
+      "npc": 3424,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa=1771",
+      "why": "The suspicious merchant on Manu Scrito's map while «Le quiproquo» is under way; the derived cell."
+    },
+    {
+      "map": 164104209,
+      "npc": 3410,
+      "cell": 426,
+      "orientation": 1,
+      "criterion": "Qa=1771",
+      "why": "Megan Fux hiding at [-25,-17] while «Le quiproquo» is under way; the derived cell."
+    },
+    {
+      "map": 164365319,
+      "npc": 3411,
+      "cell": 340,
+      "orientation": 1,
+      "criterion": "Qa=1771",
+      "why": "Gengis Khani at his little camp [-18,-29] while «Le quiproquo» is under way; the derived cell."
     }
   ]
 }

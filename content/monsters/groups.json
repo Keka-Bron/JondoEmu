@@ -707,6 +707,42 @@
           "grade": 0
         }
       ]
+    },
+    {
+      "map": 165154827,
+      "group": -2000029,
+      "cell": 300,
+      "orientation": 1,
+      "members": [
+        {
+          "monster": 4595,
+          "grade": 0
+        }
+      ]
+    },
+    {
+      "map": 165152782,
+      "group": -2000030,
+      "cell": 300,
+      "orientation": 1,
+      "members": [
+        {
+          "monster": 4596,
+          "grade": 0
+        }
+      ]
+    },
+    {
+      "map": 165153280,
+      "group": -2000031,
+      "cell": 300,
+      "orientation": 1,
+      "members": [
+        {
+          "monster": 4597,
+          "grade": 0
+        }
+      ]
     }
   ]
 }

@@ -16476,7 +16476,10 @@
       "lines": [
         {
           "message": 1245,
-          "choices": []
+          "choices": [
+            { "reply": 29742, "quest": 1772, "completes": 11361, "params": [[30, 11361]], "next": 24788, "takes": 18187 },
+            { "reply": 29750, "quest": 1772, "completes": 11370, "params": [[30, 11370]], "next": 24790, "holds": 18197 }
+          ]
         },
         {
           "message": 3931,
@@ -16521,9 +16524,71 @@
         {
           "message": 4039,
           "choices": []
+        },
+        {
+          "message": 24788,
+          "choices": [
+            { "reply": 29741, "next": 24789 }
+          ]
+        },
+        {
+          "message": 24789,
+          "choices": [
+            { "reply": 29740 }
+          ]
+        },
+        {
+          "message": 24790,
+          "choices": [
+            { "reply": 29747, "next": 24792 },
+            { "reply": 29748, "next": 24796 },
+            { "reply": 29749, "next": 24791 }
+          ]
+        },
+        {
+          "message": 24791,
+          "choices": [
+            { "reply": 29746, "next": 24796 }
+          ]
+        },
+        {
+          "message": 24792,
+          "choices": [
+            { "reply": 29745, "next": 24793 }
+          ]
+        },
+        {
+          "message": 24793,
+          "choices": [
+            { "reply": 29744, "next": 24794, "gives": 18186 }
+          ]
+        },
+        {
+          "message": 24794,
+          "choices": [
+            { "reply": 29743 }
+          ]
+        },
+        {
+          "message": 24796,
+          "choices": [
+            { "reply": 29753, "next": 24797 }
+          ]
+        },
+        {
+          "message": 24797,
+          "choices": [
+            { "reply": 29752, "next": 24798, "gives": 18186 }
+          ]
+        },
+        {
+          "message": 24798,
+          "choices": [
+            { "reply": 29751 }
+          ]
         }
       ],
-      "why": "Pako Rábano, Bonta's tailor [-33,-54]. «Info pour un vrai traître» of Dofus pour les noobs: even the king orders from her (3931, «Dire qu'elle est aussi fameuse pour ses prédictions...»), what she was asked, for three silk threads (3932: 853), the threads (3933), Allisteria's wedding dress (3934: 854); an affront (4054). «Suite Woyale»: a valet's livery for a wabbit prince, a purple fabric like the eztrambworks' and three silk threads (4016), «here they are», the livery (4017: item 8603). «Un mawiage pwincier»: the bride's dress is ready but not the opaque veil the intendant asked for, four wabbit fabrics (4038); a moment, her masterpiece done (4039: 910 on a hello, the dress 8606 handed over)."
+      "why": "Pako Rábano, Bonta's tailor [-33,-54]. «Info pour un vrai traître» of Dofus pour les noobs: even the king orders from her (3931, «Dire qu'elle est aussi fameuse pour ses prédictions...»), what she was asked, for three silk threads (3932: 853), the threads (3933), Allisteria's wedding dress (3934: 854); an affront (4054). «Suite Woyale»: a valet's livery for a wabbit prince, a purple fabric like the eztrambworks' and three silk threads (4016), «here they are», the livery (4017: item 8603). «Un mawiage pwincier»: the bride's dress is ready but not the opaque veil the intendant asked for, four wabbit fabrics (4038); a moment, her masterpiece done (4039: 910 on a hello, the dress 8606 handed over). «Le champ de la mer» (1772) of Dofus pour les noobs: the big larva pelt shown and left (11361, 24788: a cord made for it is needed, 24789: the grocery has them); the Bill & Kall cord handed over (11370, 24790: 10 000 kamas), and as soon as Manala comes up (24792/24796) the girl's story (24793/24797) and the cape for nothing (24794/24798)."
     },
     {
       "npc": 134,
@@ -31361,6 +31426,932 @@
         }
       ],
       "why": "The guardian of the carrot dofus, in the burrow's last room: «Parlez au Gawdien vêtu de la panoplie du Wa Wabbit pour qu'il vous délivre le Dofus Cawotte» («L'œuf ou la cawotte ?», Dofus pour les noobs). To the false king, on the quest, «podéis llevawos el dofus zanahowia», and «Apoderarte del dofus zanahowia y escaparte.»; to someone on it without the disguise, the alarm; to everybody else, a polite invitation to leave. «Irte sin buscar problemas.» and the escape leave the burrow (content/world/dungeon_exits.json); the dofus is the objective's (content/quests/objectives.json)."
+    },
+    {
+      "npc": 3426,
+      "map": 0,
+      "opening": 24969,
+      "lines": [
+        {
+          "message": 24969,
+          "choices": [
+            { "reply": 29953, "next": 24970, "beforeQuest": 1780 },
+            { "reply": 29957, "next": 24973, "quest": 1780, "completes": 11462, "params": [[30, 11462]], "afterObjectives": [11458, 11459, 11460, 11461] },
+            { "reply": 37801, "next": 31292 },
+            { "reply": 29956 }
+          ]
+        },
+        {
+          "message": 24970,
+          "choices": [
+            { "reply": 29952, "next": 24971 },
+            { "reply": 29955, "startsQuest": 1780, "params": [[34, 1780]], "next": 24972 }
+          ]
+        },
+        {
+          "message": 24971,
+          "choices": [
+            { "reply": 29955, "startsQuest": 1780, "params": [[34, 1780]], "next": 24972 }
+          ]
+        },
+        {
+          "message": 24972,
+          "choices": [
+            { "reply": 29954 }
+          ]
+        },
+        {
+          "message": 24973,
+          "choices": [
+            { "reply": 29956 }
+          ]
+        },
+        {
+          "message": 31292,
+          "choices": [
+            { "reply": 37800 }
+          ]
+        }
+      ],
+      "why": "The wool keeper of Tainela's farm [-2,-29] looks the visitor over: not a porkass, come in (24969). «Grouiiik !» (1780) of Dofus pour les noobs: «what is your problem with the porkass?» (24970: they steal the wool), «yet I saw shepherds among them» (24971: shepherds without a flock, named for their stink), «Proposer de punir les Porkass en leur rentrant dans le lard» starts it (24972, «go show your butcher's talents»). Five each of the four porkass monsters beaten, «I spread panic among the porkass» ends it (24973, 11462). Where to find bouftou lailait: the farm's refectory (31292), for anyone."
+    },
+    {
+      "npc": 3398,
+      "map": 0,
+      "opening": 24757,
+      "openings": [
+        { "quest": 1773, "objective": 11354, "message": 24765 },
+        { "quest": 1773, "objective": 11353, "message": 24767 },
+        { "quest": 1773, "message": 24759 },
+        { "after": 1773, "message": 24948 }
+      ],
+      "lines": [
+        {
+          "message": 24757,
+          "choices": [
+            { "reply": 29702, "next": 24758, "beforeQuest": 1773 }
+          ]
+        },
+        {
+          "message": 24758,
+          "choices": [
+            { "reply": 29701, "startsQuest": 1773, "params": [[34, 1773]] }
+          ]
+        },
+        {
+          "message": 24759,
+          "choices": [
+            { "reply": 29708, "quest": 1773, "completes": 11353, "params": [[30, 11353]], "next": 24760 },
+            { "reply": 29703 }
+          ]
+        },
+        {
+          "message": 24760,
+          "choices": [
+            { "reply": 29707, "next": 24761 }
+          ]
+        },
+        {
+          "message": 24761,
+          "choices": [
+            { "reply": 29706, "next": 24762 }
+          ]
+        },
+        {
+          "message": 24762,
+          "choices": [
+            { "reply": 29705, "next": 24763 }
+          ]
+        },
+        {
+          "message": 24763,
+          "choices": [
+            { "reply": 29704, "next": 24764 }
+          ]
+        },
+        {
+          "message": 24764,
+          "choices": [
+            { "reply": 29709 },
+            { "reply": 81517 }
+          ]
+        },
+        {
+          "message": 24767,
+          "choices": [
+            { "reply": 29711 },
+            { "reply": 81517 }
+          ]
+        },
+        {
+          "message": 24765,
+          "choices": [
+            { "reply": 29710, "quest": 1773, "completes": 11355, "params": [[30, 11355]] }
+          ]
+        },
+        {
+          "message": 24948,
+          "choices": [
+            { "reply": 29935, "next": 24949, "beforeQuest": 1779 },
+            { "reply": 29934 }
+          ]
+        },
+        {
+          "message": 24949,
+          "choices": [
+            { "reply": 29933, "startsQuest": 1779, "params": [[34, 1779]], "next": 24950 },
+            { "reply": 29934 }
+          ]
+        },
+        {
+          "message": 24950,
+          "choices": [
+            { "reply": 29932 }
+          ]
+        }
+      ],
+      "why": "The young medibwork who must bring crackler pebbles to the old medibworks (24757). «Les cailloux de Cania» (1773) of Dofus pour les noobs: «proposer d'aider le Jeune Médibwork» (24758: ten cracked pebbles, «No creo que tenga problema» takes it on); «have you found them?» (24759), «Darle los diez pedruscos» (11353, 24760), what they are for (24761: anaesthesia), a noise (24762), the ground shakes (24763: no talisman, the Great Canialla woke up), «Enfrentarte al Canialla» (24764; the fight 11354) or run, and he waits for it until it is beaten (24767). «Canialla roto! Tú muy fuerte» (24765, 11355) ends it. After it he cures small and big hurts by doctor Knok [-15,-43] (24948): «¿Los pedruscos son eficaces?», the clan attacked (24949), «Répondre que vous êtes disponibles» starts «Le triomphe de la médecine» (1779, 24950: go and see Knok)."
+    },
+    {
+      "npc": 3419,
+      "map": 0,
+      "opening": 24951,
+      "lines": [
+        {
+          "message": 24951,
+          "choices": [
+            { "reply": 29940, "next": 24952, "quest": 1779, "beforeObjective": 11449 },
+            { "reply": 29942, "quest": 1779, "completes": 11456, "params": [[30, 11456]], "next": 24956, "afterObjectives": [11451, 11453, 11455] },
+            { "reply": 29941 }
+          ]
+        },
+        {
+          "message": 24952,
+          "choices": [
+            { "reply": 29939, "next": 24953 }
+          ]
+        },
+        {
+          "message": 24953,
+          "choices": [
+            { "reply": 29938, "next": 24954 }
+          ]
+        },
+        {
+          "message": 24954,
+          "choices": [
+            { "reply": 29937, "next": 24955 }
+          ]
+        },
+        {
+          "message": 24955,
+          "choices": [
+            { "reply": 29936, "quest": 1779, "completes": 11449, "params": [[30, 11449]] }
+          ]
+        },
+        {
+          "message": 24956,
+          "choices": [
+            { "reply": 29941 }
+          ]
+        }
+      ],
+      "why": "Doctor Knok, the medibworks' healer at [-15,-43]: «does it sting or tickle?» (24951). «Le triomphe de la médecine» (1779) of Dofus pour les noobs: «talk of the young medibwork's problem» (24952: adventurers attack the clan), what drives them (24953: a rabid trool, or psychopaths), how to fix it (24954: the pacifist serum, will you inject it?), «what you ask seems reasonable» (24955: a rudimentary syringe), «Apuntar las posiciones en tu mapa» (11449). The three injected, «Ya se ha administrado el tratamiento» ends it (24956, 11456)."
+    },
+    {
+      "npc": 3421,
+      "map": 0,
+      "opening": 24960,
+      "openings": [
+        { "quest": 1779, "objective": 11451, "message": 24961 },
+        { "after": 1779, "message": 24961 }
+      ],
+      "lines": [
+        {
+          "message": 24960,
+          "choices": [
+            { "reply": 29943, "quest": 1779, "completes": 11450, "params": [[30, 11450]], "afterObjectives": [11449] },
+            { "reply": 29944 }
+          ]
+        },
+        {
+          "message": 24961,
+          "choices": [
+            { "reply": 29944 }
+          ]
+        }
+      ],
+      "why": "The bloodthirsty adventurer [-20,-40], out to hurt bworks (Dofus pour les noobs). «Le triomphe de la médecine» (1779): «Brandir la seringue et faire une petite injection» starts the fight, alone (11450, 11451); pacified afterwards (24961)."
+    },
+    {
+      "npc": 3422,
+      "map": 0,
+      "opening": 24962,
+      "openings": [
+        { "quest": 1779, "objective": 11453, "message": 24963 },
+        { "after": 1779, "message": 24963 }
+      ],
+      "lines": [
+        {
+          "message": 24962,
+          "choices": [
+            { "reply": 29945, "quest": 1779, "completes": 11452, "params": [[30, 11452]], "afterObjectives": [11449] },
+            { "reply": 29946 }
+          ]
+        },
+        {
+          "message": 24963,
+          "choices": [
+            { "reply": 29946 }
+          ]
+        }
+      ],
+      "why": "The cruel adventuress [-18,-37], out to hurt bworks (Dofus pour les noobs). «Le triomphe de la médecine» (1779): «Brandir la seringue et faire une petite injection» starts the fight, alone (11452, 11453); pacified afterwards (24963)."
+    },
+    {
+      "npc": 3423,
+      "map": 0,
+      "opening": 24964,
+      "openings": [
+        { "quest": 1779, "objective": 11455, "message": 24965 },
+        { "after": 1779, "message": 24965 }
+      ],
+      "lines": [
+        {
+          "message": 24964,
+          "choices": [
+            { "reply": 29947, "quest": 1779, "completes": 11454, "params": [[30, 11454]], "afterObjectives": [11449] },
+            { "reply": 29948 }
+          ]
+        },
+        {
+          "message": 24965,
+          "choices": [
+            { "reply": 29948 }
+          ]
+        }
+      ],
+      "why": "The battling adventurer [-15,-40], out to hurt bworks (Dofus pour les noobs). «Le triomphe de la médecine» (1779): «Brandir la seringue et faire une petite injection» starts the fight, alone (11454, 11455); pacified afterwards (24965)."
+    },
+    {
+      "npc": 3369,
+      "map": 0,
+      "opening": 24600,
+      "openings": [
+        { "quest": 1768, "objective": 11331, "message": 24600 },
+        { "quest": 1768, "objective": 11315, "message": 24605 }
+      ],
+      "lines": [
+        {
+          "message": 24600,
+          "choices": [
+            { "reply": 29557, "next": 24619 },
+            { "reply": 29541, "quest": 1768, "completes": 11315, "params": [[30, 11315]], "next": 24605, "afterObjectives": [11309, 11312, 11314] },
+            { "reply": 29555, "quest": 1768, "completes": 11332, "params": [[30, 11332]], "next": 24617, "afterObjectives": [11329, 11330, 11331] }
+          ]
+        },
+        {
+          "message": 24619,
+          "choices": [
+            { "reply": 29691, "next": 24730, "beforeQuest": 1768 },
+            { "reply": 29558 }
+          ]
+        },
+        {
+          "message": 24730,
+          "choices": [
+            { "reply": 29690, "startsQuest": 1768, "params": [[34, 1768]] },
+            { "reply": 29558 }
+          ]
+        },
+        {
+          "message": 24605,
+          "choices": [
+            { "reply": 29542 },
+            { "reply": 81518 }
+          ]
+        },
+        {
+          "message": 24617,
+          "choices": []
+        }
+      ],
+      "why": "The old bwork chief of the camp at [-11,-19] (24600). «La tribu pas si fixe» (1768) of Dofus pour les noobs: compliment him on his speech (24619: a peaceful philosophy), how the bworks live it (24730: some turned violent and his own may not use «arguments»), volunteering starts it (29690: first the mystic bwork). The three beaten, «Los bworks disidentes han sido derrotados» (11315, 24605: they gathered), the fight against the three together (29542, 11329-11331), and reassuring him ends it (11332, 24617)."
+    },
+    {
+      "npc": 3368,
+      "map": 0,
+      "opening": 24591,
+      "lines": [
+        {
+          "message": 24591,
+          "choices": [
+            { "reply": 29528, "quest": 1768, "completes": 11310, "params": [[30, 11310]] },
+            { "reply": 81519 },
+            { "reply": 29529 }
+          ]
+        }
+      ],
+      "why": "The mystic bwork [-9,-19], a dissident of the chief's camp. «La tribu pas si fixe» (1768) of Dofus pour les noobs: challenging him starts the fight (11310, 11309), one after the other: mystic, instinctive, valiant."
+    },
+    {
+      "npc": 3370,
+      "map": 0,
+      "opening": 24594,
+      "lines": [
+        {
+          "message": 24594,
+          "choices": [
+            { "reply": 29532, "quest": 1768, "completes": 11311, "params": [[30, 11311]], "afterObjectives": [11309] },
+            { "reply": 81520 },
+            { "reply": 29533 }
+          ]
+        }
+      ],
+      "why": "The instinctive bwork [-9,-20], a dissident of the chief's camp. «La tribu pas si fixe» (1768) of Dofus pour les noobs: challenging him starts the fight (11311, 11312), one after the other: mystic, instinctive, valiant."
+    },
+    {
+      "npc": 3371,
+      "map": 0,
+      "opening": 24603,
+      "lines": [
+        {
+          "message": 24603,
+          "choices": [
+            { "reply": 29539, "quest": 1768, "completes": 11313, "params": [[30, 11313]], "afterObjectives": [11312] },
+            { "reply": 81521 },
+            { "reply": 29540 }
+          ]
+        }
+      ],
+      "why": "The valiant bwork [-9,-22], a dissident of the chief's camp. «La tribu pas si fixe» (1768) of Dofus pour les noobs: challenging him starts the fight (11313, 11314), one after the other: mystic, instinctive, valiant."
+    },
+    {
+      "npc": 3402,
+      "map": 0,
+      "opening": 24768,
+      "lines": [
+        {
+          "message": 24768,
+          "choices": [
+            { "reply": 29712, "startsQuest": 1772, "params": [[34, 1772]], "next": 24769 },
+            { "reply": 29717, "next": 24771, "quest": 1772, "beforeObjective": 11359 },
+            { "reply": 29718, "quest": 1772, "completes": 11359, "params": [[30, 11359]], "next": 24772, "holds": 18188 },
+            { "reply": 29725, "next": 24778, "quest": 1772, "afterObjectives": [11359], "beforeObjective": 11371 },
+            { "reply": 29727, "quest": 1772, "completes": 11371, "params": [[30, 11371]], "next": 24779, "holds": 18186 },
+            { "reply": 29728, "next": 24780, "quest": 1772, "afterObjectives": [11371] },
+            { "reply": 29902 }
+          ]
+        },
+        {
+          "message": 24769,
+          "choices": [
+            { "reply": 29713, "next": 24770 },
+            { "reply": 29715 }
+          ]
+        },
+        {
+          "message": 24770,
+          "choices": [
+            { "reply": 29714 }
+          ]
+        },
+        {
+          "message": 24771,
+          "choices": [
+            { "reply": 29716 }
+          ]
+        },
+        {
+          "message": 24772,
+          "choices": [
+            { "reply": 29719, "next": 24773 }
+          ]
+        },
+        {
+          "message": 24773,
+          "choices": [
+            { "reply": 29720, "next": 24774 }
+          ]
+        },
+        {
+          "message": 24774,
+          "choices": [
+            { "reply": 29721, "next": 24775 }
+          ]
+        },
+        {
+          "message": 24775,
+          "choices": [
+            { "reply": 29722, "next": 24776 }
+          ]
+        },
+        {
+          "message": 24776,
+          "choices": [
+            { "reply": 29723, "next": 24777 }
+          ]
+        },
+        {
+          "message": 24777,
+          "choices": [
+            { "reply": 29724 }
+          ]
+        },
+        {
+          "message": 24778,
+          "choices": [
+            { "reply": 29726 }
+          ]
+        },
+        {
+          "message": 24779,
+          "choices": [
+            { "reply": 29728, "next": 24780 }
+          ]
+        },
+        {
+          "message": 24780,
+          "choices": [
+            { "reply": 29729, "next": 24781 }
+          ]
+        },
+        {
+          "message": 24781,
+          "choices": [
+            { "reply": 29730 }
+          ]
+        }
+      ],
+      "why": "Manala, alone at home while her parents' boat trip lasts too long (24768). «Le champ de la mer» (1772) of Dofus pour les noobs: «let's play» starts it (24769: the whispering shell, the clues in the north and south castles; 24770 more about them before, 24771 while searching). The shell handed over (11359, 24772), why not any shell (24773), what to play now (24774: a cape that turns into an animal), which animal (24775), a larva (24776), giving in (24777: big larvae, then the tailors of Bonta; 24778 while it is made). The cape handed over (11371, 24779), what now (24780: her sister's secret hideout), where (24781: right of the house)."
+    },
+    {
+      "npc": 236,
+      "map": 0,
+      "opening": 1032,
+      "lines": [
+        {
+          "message": 1032,
+          "choices": [
+            { "reply": 29755, "quest": 1772, "completes": 11363, "params": [[30, 11363]], "next": 24799 },
+            { "reply": 32438, "next": 27006 },
+            { "reply": 29754 }
+          ]
+        },
+        {
+          "message": 24799,
+          "choices": [
+            { "reply": 29754 }
+          ]
+        },
+        {
+          "message": 27006,
+          "choices": [
+            { "reply": 32437, "next": 27007 }
+          ]
+        },
+        {
+          "message": 27007,
+          "choices": [
+            { "reply": 32436 }
+          ]
+        }
+      ],
+      "why": "The grocer of Bonta, open day and night (1032). «Le champ de la mer» (1772) of Dofus pour les noobs: asking for a Bill & Kall cord (11363): the last ones went to a merchant bound for Astrub, see Guerl at Bonta's exit (24799). For anyone, a taste of the bali meat Ala Reyna brings (27006, 27007)."
+    },
+    {
+      "npc": 1113,
+      "map": 0,
+      "opening": 6492,
+      "lines": [
+        {
+          "message": 6492,
+          "choices": [
+            { "reply": 29759, "next": 24800, "quest": 1772, "afterObjectives": [11363], "beforeObjective": 11364 },
+            { "reply": 29761, "quest": 1772, "completes": 11369, "params": [[30, 11369]], "next": 24804, "gives": 18197, "afterObjectives": [11365, 11366, 11367, 11368] },
+            { "reply": 29760 }
+          ]
+        },
+        {
+          "message": 24800,
+          "choices": [
+            { "reply": 29758, "next": 24801 }
+          ]
+        },
+        {
+          "message": 24801,
+          "choices": [
+            { "reply": 29757, "next": 24802 }
+          ]
+        },
+        {
+          "message": 24802,
+          "choices": [
+            { "reply": 29756, "quest": 1772, "completes": 11364, "params": [[30, 11364]] }
+          ]
+        },
+        {
+          "message": 24804,
+          "choices": [
+            { "reply": 29760 }
+          ]
+        }
+      ],
+      "why": "Guerl, who supervises the convoys between Bonta and Astrub (6492). «Le champ de la mer» (1772) of Dofus pour les noobs: «stop the convoy that just left» (24800: no, you are a bandit), what the cord is for (24801: she bought one to resell), «I can help» (24802: thin out the fields' fauna), going (11364). Five each of the four beasts beaten, «the field animals will not bother for a while» hands the cord over (11369, 24804)."
+    },
+    {
+      "npc": 257,
+      "map": 0,
+      "opening": 991,
+      "lines": [
+        {
+          "message": 991,
+          "choices": [
+            { "reply": 29733, "next": 24782, "quest": 1772, "afterObjectives": [11372] }
+          ]
+        },
+        {
+          "message": 24782,
+          "choices": [
+            { "reply": 29732, "next": 24783 }
+          ]
+        },
+        {
+          "message": 24783,
+          "choices": [
+            { "reply": 29731, "next": 24784 }
+          ]
+        },
+        {
+          "message": 24784,
+          "names": true,
+          "choices": [
+            { "reply": 29734, "quest": 1772, "completes": 11373, "params": [[30, 11373]] }
+          ]
+        }
+      ],
+      "why": "Captain Malfe at Bonta's southern outpost (991). «Le champ de la mer» (1772) of Dofus pour les noobs: the paper with his name by the «secret hideout» (24782: it is his), Manala sent you (24783: is she well?), what you did and that you know about their parents (24784: thanks for the time with his sister) ends it (11373)."
+    },
+    {
+      "npc": 3412,
+      "map": 0,
+      "opening": 24863,
+      "lines": [
+        {
+          "message": 24863,
+          "choices": [
+            { "reply": 29822, "next": 24864, "beforeQuest": 1777 },
+            { "reply": 29827, "quest": 1777, "completes": 11423, "params": [[30, 11423]], "next": 24866, "holds": 18213, "holdsCount": 10 },
+            { "reply": 29829, "quest": 1777, "completes": 11428, "params": [[30, 11428]], "next": 24867, "holds": 18212, "holdsCount": 3 },
+            { "reply": 29823 }
+          ]
+        },
+        {
+          "message": 24864,
+          "choices": [
+            { "reply": 29825, "next": 24865 },
+            { "reply": 29826 }
+          ]
+        },
+        {
+          "message": 24865,
+          "choices": [
+            { "reply": 29824, "startsQuest": 1777, "params": [[34, 1777]] }
+          ]
+        },
+        {
+          "message": 24866,
+          "choices": [
+            { "reply": 29828 }
+          ]
+        },
+        {
+          "message": 24867,
+          "choices": [
+            { "reply": 29830, "quest": 1777, "completes": 11436, "params": [[30, 11436]] }
+          ]
+        }
+      ],
+      "why": "Basuratron, the automaton that looks like a bin at [-12,-25] (24863). «La mécanique du corps» (1777) of Dofus pour les noobs: searching it (24864: a sheet, abandoned for poor performance), accepting its request (24865: bolts in good state) starts it. The ten bolts thrown in (11423, 24866: three experimental automaton pieces next), the pieces put in (11428, 24867: little arms assemble them) and stepping back to watch (11436): Mecatron stands in its place."
+    },
+    {
+      "npc": 3416,
+      "map": 0,
+      "opening": 24868,
+      "lines": [
+        {
+          "message": 24868,
+          "choices": [
+            { "reply": 29832, "next": 24869, "quest": 1777, "afterObjectives": [11436], "beforeObjective": 11431 },
+            { "reply": 29835, "quest": 1777, "completes": 11430, "params": [[30, 11430]], "next": 24871, "holds": 18214 },
+            { "reply": 29846, "next": 24879, "quest": 1777, "afterObjectives": [11433], "beforeObjective": 11434 }
+          ]
+        },
+        {
+          "message": 24869,
+          "choices": [
+            { "reply": 29831, "next": 24870 }
+          ]
+        },
+        {
+          "message": 24870,
+          "choices": [
+            { "reply": 29833, "quest": 1777, "completes": 11431, "params": [[30, 11431]] }
+          ]
+        },
+        {
+          "message": 24871,
+          "choices": [
+            { "reply": 29834, "next": 24872 }
+          ]
+        },
+        {
+          "message": 24872,
+          "choices": [
+            { "reply": 29836 }
+          ]
+        },
+        {
+          "message": 24879,
+          "choices": [
+            { "reply": 29847 }
+          ]
+        }
+      ],
+      "why": "Mecatron, Basuratron updated (24868). «La mécanique du corps» (1777) of Dofus pour les noobs: its new sheet (24869: version 1.29, renamed), accepting (24870: synthetic communication modules, used by the brigandin makers) and going to their village (11431). Below their platform it takes the module (11430, 24871), version 2.0 (24872: find my maker, Izak Azimof). Once his automatons are beaten it thanks you (24879)."
+    },
+    {
+      "npc": 3417,
+      "map": 0,
+      "opening": 24873,
+      "lines": [
+        {
+          "message": 24873,
+          "choices": [
+            { "reply": 29839, "next": 24874, "quest": 1777, "afterObjectives": [11430], "beforeObjective": 11432 },
+            { "reply": 29900, "next": 24876, "quest": 1777, "afterObjectives": [11432], "beforeObjective": 11433 },
+            { "reply": 29844, "quest": 1777, "completes": 11434, "params": [[30, 11434]], "next": 24878, "afterObjectives": [11433] },
+            { "reply": 29840 }
+          ]
+        },
+        {
+          "message": 24874,
+          "choices": [
+            { "reply": 29838, "quest": 1777, "completes": 11432, "params": [[30, 11432]], "next": 24875 }
+          ]
+        },
+        {
+          "message": 24875,
+          "choices": [
+            { "reply": 29837, "next": 24876 }
+          ]
+        },
+        {
+          "message": 24876,
+          "choices": [
+            { "reply": 29841 },
+            { "reply": 29842 }
+          ]
+        },
+        {
+          "message": 24878,
+          "choices": [
+            { "reply": 29845 }
+          ]
+        }
+      ],
+      "why": "Izak Azimof, the brigandins' automaton maker on their platform [-19,-23] (24873). «La mécanique du corps» (1777) of Dofus pour les noobs: «I come about Basuratron» (24874: that junk was unusable), presenting Mecatron (11432, 24875: just another automaton), it only wants to prove itself (24876: let us see against my automatons; later, 29900, if put off). The technical control passed (11433), «I passed it with Mecatron» ends it (11434, 24878)."
+    },
+    {
+      "npc": 3403,
+      "map": 0,
+      "opening": 24803,
+      "lines": [
+        {
+          "message": 24803,
+          "choices": [
+            { "reply": 29762, "next": 24805, "beforeQuest": 1771 },
+            { "reply": 29766, "quest": 1771, "completes": 11362, "params": [[30, 11362]], "next": 24808, "afterObjectives": [11360] },
+            { "reply": 29784, "next": 24826, "quest": 1771, "afterObjectives": [11422], "beforeObjective": 11424 }
+          ]
+        },
+        {
+          "message": 24805,
+          "choices": [
+            { "reply": 29763, "next": 24806 }
+          ]
+        },
+        {
+          "message": 24806,
+          "choices": [
+            { "reply": 29764, "startsQuest": 1771, "params": [[34, 1771]], "next": 24996 }
+          ]
+        },
+        {
+          "message": 24996,
+          "choices": [
+            { "reply": 29982 }
+          ]
+        },
+        {
+          "message": 24808,
+          "choices": [
+            { "reply": 29767, "next": 24809 }
+          ]
+        },
+        {
+          "message": 24809,
+          "choices": []
+        },
+        {
+          "message": 24826,
+          "choices": [
+            { "reply": 29898, "next": 24925 }
+          ]
+        },
+        {
+          "message": 24925,
+          "choices": [
+            { "reply": 29899, "quest": 1771, "completes": 11424, "params": [[30, 11424]], "takes": 18220 }
+          ]
+        }
+      ],
+      "why": "Emci Tupack, who coordinates the ruffians' attacks on the rocky roads [-19,-22] (24803). «Le quiproquo» (1771) of Dofus pour les noobs: tell me about you (24805: a failed raid, its leader missing), the convoy carried books, not ore (24806), offering to find her starts it (24996: inspect the place of the attack, south). The empty crate and the scroll (11362, 24808), Brakmar's seal (24809: the librarian Fulgencio Ramiro must know). Megan Fux a double agent (24826), the smuggling documents for the books (24925) closes the deal (11424)."
+    },
+    {
+      "npc": 3404,
+      "map": 0,
+      "opening": 24813,
+      "lines": [
+        {
+          "message": 24813,
+          "choices": [
+            { "reply": 29773, "quest": 1771, "completes": 11416, "params": [[30, 11416]], "next": 24814, "afterObjectives": [11415] },
+            { "reply": 29783, "quest": 1771, "completes": 11422, "params": [[30, 11422]], "next": 24825, "afterObjectives": [11421] },
+            { "reply": 29971, "next": 24988, "quest": 1771, "afterObjectives": [11424], "beforeObjective": 11463 },
+            { "reply": 29776 }
+          ]
+        },
+        {
+          "message": 24814,
+          "choices": [
+            { "reply": 29774, "next": 24815 }
+          ]
+        },
+        {
+          "message": 24815,
+          "choices": [
+            { "reply": 29775, "next": 24816 }
+          ]
+        },
+        {
+          "message": 24816,
+          "choices": [
+            { "reply": 29776 }
+          ]
+        },
+        {
+          "message": 24825,
+          "choices": [
+            { "reply": 29895, "next": 24924 },
+            { "reply": 29897 }
+          ]
+        },
+        {
+          "message": 24924,
+          "choices": []
+        },
+        {
+          "message": 24988,
+          "choices": [
+            { "reply": 29972, "quest": 1771, "completes": 11463, "params": [[30, 11463]], "next": 24989 }
+          ]
+        },
+        {
+          "message": 24989,
+          "choices": [
+            { "reply": 29973 }
+          ]
+        }
+      ],
+      "why": "Manu Scrito, passing through [0,-18] and waiting for someone (24813). «Le quiproquo» (1771) of Dofus pour les noobs: the intercepted convoy (11416, 24814: valuable works), the secret annex of Astrub's library (24815), the scroll (24816: he chose every book, no scroll among them). The whole story told (11422, 24825), «you will get your books back» (24924). The good news (24988) and where the cargo is (11463, 24989) ends it."
+    },
+    {
+      "npc": 3424,
+      "map": 0,
+      "opening": 24976,
+      "lines": [
+        {
+          "message": 24976,
+          "choices": [
+            { "reply": 29964, "quest": 1771, "completes": 11464, "params": [[30, 11464]], "next": 24981, "afterObjectives": [11416], "takes": 18226 }
+          ]
+        },
+        {
+          "message": 24981,
+          "choices": [
+            { "reply": 29965, "next": 24982 }
+          ]
+        },
+        {
+          "message": 24982,
+          "choices": [
+            { "reply": 29966, "next": 24983 }
+          ]
+        },
+        {
+          "message": 24983,
+          "choices": [
+            { "reply": 29967, "next": 24984 }
+          ]
+        },
+        {
+          "message": 24984,
+          "choices": [
+            { "reply": 29968, "next": 24985 }
+          ]
+        },
+        {
+          "message": 24985,
+          "choices": []
+        }
+      ],
+      "why": "The suspicious merchant beside Manu Scrito [0,-18], who saw you talk to the librarian (24976). «Le quiproquo» (1771) of Dofus pour les noobs: showing the scroll, he snatches it (11464, 24981), the convoy smuggled Brakmar's documents (24982), the routes and timetables (24983), the infiltrated leader betrayed them (24984), hiding by the old blop enclave, south of the rocky roads' mountain (24985)."
+    },
+    {
+      "npc": 3410,
+      "map": 0,
+      "opening": 24817,
+      "openings": [
+        { "quest": 1771, "objective": 11419, "message": 24817 },
+        { "quest": 1771, "objective": 11418, "message": 24818 }
+      ],
+      "lines": [
+        {
+          "message": 24817,
+          "choices": [
+            { "reply": 29777, "quest": 1771, "completes": 11418, "params": [[30, 11418]], "next": 24818, "afterObjectives": [11445] },
+            { "reply": 29799, "quest": 1771, "completes": 11420, "params": [[30, 11420]], "next": 24842, "afterObjectives": [11419] }
+          ]
+        },
+        {
+          "message": 24818,
+          "choices": [
+            { "reply": 29785 }
+          ]
+        },
+        {
+          "message": 24842,
+          "choices": [
+            { "reply": 29800, "next": 24986 }
+          ]
+        },
+        {
+          "message": 24986,
+          "choices": [
+            { "reply": 29969, "next": 24987 }
+          ]
+        },
+        {
+          "message": 24987,
+          "choices": [
+            { "reply": 29970 }
+          ]
+        }
+      ],
+      "why": "Megan Fux, napping by the road at [-25,-17] (24817). «Le quiproquo» (1771) of Dofus pour les noobs: «give me the stolen documents» (11418, 24818: you will regret it) and the fight (29785, 11419). Asked again (11420, 24842: she has not got them), a ruffian raider took them (24986), the thief is Gengis, a kanugro by a small camp at the foot of the hill (24987)."
+    },
+    {
+      "npc": 3411,
+      "map": 0,
+      "opening": 24820,
+      "lines": [
+        {
+          "message": 24820,
+          "choices": [
+            { "reply": 29779, "next": 24821, "quest": 1771, "afterObjectives": [11420], "beforeObjective": 11421 }
+          ]
+        },
+        {
+          "message": 24821,
+          "choices": [
+            { "reply": 29780, "next": 24822 }
+          ]
+        },
+        {
+          "message": 24822,
+          "choices": [
+            { "reply": 29781, "next": 24823 }
+          ]
+        },
+        {
+          "message": 24823,
+          "choices": [
+            { "reply": 29782, "quest": 1771, "completes": 11421, "params": [[30, 11421]], "gives": 18220 }
+          ]
+        }
+      ],
+      "why": "Gengis Khani, the kanugro thief at [-18,-29] (24820). «Le quiproquo» (1771) of Dofus pour les noobs: the documents behind him (24821: what documents?), pointing at them (24822: they go to my clients), threatening to burn them (24823: he read them already) hands them over (11421)."
     }
   ]
 }
