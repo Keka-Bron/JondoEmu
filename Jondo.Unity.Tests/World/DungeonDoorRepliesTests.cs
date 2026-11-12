@@ -119,6 +119,22 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(0, options.Key);
         }
 
+        [Fact]
+        public void Her_yeses_are_known_so_her_first_line_does_not_offer_them()
+        {
+            // «Sí.» answers her «¿Seguro que quieres utilizar una llave para entrar?», «Sí, quiero volver
+            // a esta sala.» her «¿Quieres volver a $map#1?». A guardian whose last reply is one of them
+            // offered it beside the key, as his farewell, agreeing to nothing.
+            var yesTexts = new HashSet<long> { 425815, 425811, 24319, 1070579, 1070582 };
+            var options = DungeonDoor.Pick(Mawy.Select(r => r.Reply).ToArray(),
+                                           Mawy.Select(r => r.Text).ToArray(),
+                                           KeyringTexts, KeyTexts, yesTexts);
+
+            Assert.Equal(new long[] { 8869, 20904, 20906, 74096, 74098 }, options!.Yes.OrderBy(r => r));
+            Assert.DoesNotContain(20907L, options.Yes);   // «No.» still leaves
+            Assert.Empty(PickFrom(Mawy)!.Yes);            // nothing known, nothing dropped
+        }
+
         [Theory]
         [InlineData(0)]
         [InlineData(1)]

@@ -492,11 +492,15 @@ namespace Jondo.Unity.Server.Managers
             var bosses = new HashSet<int>(dungeon.Bosses);
             bool bossRoom = room == dungeon.LastRoom && dungeon.Bosses.Count > 0;
 
-            var roster = RosterOf(room).Where(m => !bosses.Contains(m)).ToList();
-            if (roster.Count == 0) roster = fallback.Where(m => !bosses.Contains(m)).ToList();
+            // Nor the monster a quest wants beaten in ANOTHER of its rooms: that room's own, like a
+            // boss -- Dramak is the fourth auditorium's mini-boss and was leading the first's group.
+            var elsewhere = dungeon.Quarry.Where(pair => pair.Key != room).SelectMany(pair => pair.Value).ToHashSet();
+            var roster = RosterOf(room).Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
+            if (roster.Count == 0) roster = fallback.Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
 
             var members = ComposeRoom(roster, bossRoom ? dungeon.Bosses : Array.Empty<int>(),
-                                      index, dungeon.Rooms.Count, room);
+                                      index, dungeon.Rooms.Count, room,
+                                      dungeon.Quarry.TryGetValue(room, out var quarry) ? quarry : null);
             if (members.Count == 0) return null;
 
             return new MobGroup
@@ -513,9 +517,13 @@ namespace Jondo.Unity.Server.Managers
         /// never twice; then every monster of the roster once, so the four a solo player fights are
         /// four different ones; then the roster again, drawn, up to eight. All but the bosses at
         /// the room's grade. Seeded by the map, so a room is the same each time it is composed.
+        /// After the bosses and before the roster, once and at the room's grade, the monsters a
+        /// quest asks to beat in this room (<see cref="DungeonManager.Dungeon.Quarry"/>): Dramak in
+        /// his fourth auditorium.
         /// </summary>
         internal static List<MobMember> ComposeRoom(IReadOnlyList<int> roster, IReadOnlyList<int> bosses,
-                                                    int room, int rooms, long seed)
+                                                    int room, int rooms, long seed,
+                                                    IReadOnlyList<int>? quarry = null)
         {
             var dice = new Random(unchecked((int)(seed ^ (seed >> 32))));
             var members = new List<MobMember>();
@@ -531,7 +539,17 @@ namespace Jondo.Unity.Server.Managers
                 members.Add(MemberAt(data, int.MaxValue));
             }
 
-            var species = roster.Distinct().Where(m => _monsters.TryGetValue(m, out var d) && d.Grades.Count > 0)
+            var wanted = new HashSet<int>();
+            foreach (int monster in (quarry ?? Array.Empty<int>()).Distinct())
+            {
+                if (members.Count >= DungeonGroupSize || bosses.Contains(monster)) continue;
+                if (!_monsters.TryGetValue(monster, out var data) || data.Grades.Count == 0) continue;
+                members.Add(MemberAt(data, RoomGrade(room, rooms)));
+                wanted.Add(monster);
+            }
+
+            var species = roster.Distinct().Where(m => !wanted.Contains(m))
+                                .Where(m => _monsters.TryGetValue(m, out var d) && d.Grades.Count > 0)
                                 .OrderBy(m => m).ToList();
             var order = species.OrderBy(_ => dice.Next()).ToList();
             foreach (int monster in order)

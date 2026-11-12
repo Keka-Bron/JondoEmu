@@ -59,6 +59,18 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public const long Expedition = 74000;
 
+        /// <summary>
+        /// What the guardian's own follow-up questions are answered with: «Sí.» to «¿Seguro que quieres
+        /// utilizar una llave para entrar?», «Sí, quiero volver a esta sala.» to «¿Quieres volver a
+        /// $map#1?».
+        /// </summary>
+        /// <remarks>
+        /// One of them is often the template's LAST reply, the one a guardian with no written tree
+        /// falls back on as his farewell: Otto Rino, at the door of Dramak's theatre, said «El teatro
+        /// está cerrado al público» and offered the keyring, the key and a «Sí.» that agreed to nothing.
+        /// </remarks>
+        public const string YesWording = "Sí";
+
         public sealed class Options
         {
             /// <summary>"Utilizar el manojo de llaves.", or zero if this guardian has no such reply.</summary>
@@ -72,6 +84,12 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>Whether the guardian asks the player to pick, with either reply.</summary>
             public bool Asks => Keyring != 0 || Key != 0;
+
+            /// <summary>
+            /// His answers to his own follow-up questions (<see cref="YesWording"/>), which the first
+            /// line does not offer.
+            /// </summary>
+            public IReadOnlySet<long> Yes { get; init; } = new HashSet<long>();
         }
 
         private static readonly Dictionary<int, Options> _byNpc = new Dictionary<int, Options>();
@@ -99,6 +117,9 @@ namespace Jondo.Unity.Server.Managers
             var key = TextKeysSaying(KeyWording);
             key.UnionWith(TextKeysSaying(UseKeyWording));
             key.UnionWith(TextKeysSaying(TakeKeyWording));
+            // «Sí.» and «Sí, ...», not every sentence that opens with those letters («Sígueme»).
+            var yes = TextKeysSaying(YesWording + ".");
+            yes.UnionWith(TextKeysSaying(YesWording + ","));
 
             if (keyring.Count == 0 && key.Count == 0)
             {
@@ -110,7 +131,7 @@ namespace Jondo.Unity.Server.Managers
             int ambiguos = 0;
             foreach (var template in Npcs.Templates)
             {
-                var options = Pick(template.Replies, template.ReplyTexts, keyring, key);
+                var options = Pick(template.Replies, template.ReplyTexts, keyring, key, yes);
                 if (options == null) continue;
 
                 if (options.Ambiguous) ambiguos++;
@@ -133,18 +154,21 @@ namespace Jondo.Unity.Server.Managers
         /// several base dungeons -- take the lowest and say the pick was a guess.
         /// </remarks>
         public static Options? Pick(long[] replies, long[] texts,
-                                    ISet<long> keyringTexts, ISet<long> keyTexts)
+                                    ISet<long> keyringTexts, ISet<long> keyTexts,
+                                    ISet<long>? yesTexts = null)
         {
             long conManojo = 0, conLlave = 0;
             int cuantosManojo = 0, cuantasLlaves = 0;
+            var yes = new HashSet<long>();
 
             int upto = Math.Min(replies?.Length ?? 0, texts?.Length ?? 0);
             for (int i = 0; i < upto; i++)
             {
                 long reply = replies![i];
+                long text = texts![i];
+                if (yesTexts != null && yesTexts.Contains(text)) yes.Add(reply);
                 if (reply >= Expedition) continue;
 
-                long text = texts![i];
                 if (keyringTexts.Contains(text))
                 {
                     cuantosManojo++;
@@ -164,6 +188,7 @@ namespace Jondo.Unity.Server.Managers
                 Keyring = conManojo,
                 Key = conLlave,
                 Ambiguous = cuantosManojo > 1 || cuantasLlaves > 1,
+                Yes = yes,
             };
         }
 

@@ -65,6 +65,41 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
+        public void ByName_reads_rooms_numbered_with_figures_and_keeps_the_backstage_apart()
+        {
+            // Dramak's Theatre, in the catalogue's order: the Puppet Master's auditorium first, and
+            // two runs numbered from 1. Walked: auditoriums 1 to 5, Dramak in the fourth and the
+            // Puppet Master in the fifth; the backstage is the secret passage off the third.
+            var names = new Dictionary<long, string>
+            {
+                [118231040] = "Dramak's Theatre - Auditorium 5",
+                [118229250] = "Dramak's Theatre - Backstage 1",
+                [118229252] = "Dramak's Theatre - Backstage 2",
+                [118226944] = "Dramak's Theatre - Auditorium 1",
+                [118227968] = "Dramak's Theatre - Auditorium 2",
+                [118228992] = "Dramak's Theatre - Auditorium 3",
+                [118230016] = "Dramak's Theatre - Auditorium 4",
+            };
+            var rooms = names.Keys.ToList();
+
+            Assert.Null(DungeonManager.ByEveryName(rooms, names));   // two rooms 1, two rooms 2
+            var ordered = DungeonManager.ByName(rooms, names);
+
+            Assert.Equal(new long[] { 118226944, 118227968, 118228992, 118230016, 118231040, 118229250, 118229252 },
+                         ordered.Rooms);
+            Assert.Equal(118231040, DungeonManager.PickBossRoom(ordered.Rooms!, names, ordered.NumberedLast));
+        }
+
+        [Theory]
+        [InlineData("Dramak's Theatre - Auditorium 5", 5)]
+        [InlineData("Sandy Castle - Fifth Room", 5)]
+        [InlineData("Dramak's Theatre - Exit", 0)]
+        [InlineData("Sandy Castle", 0)]
+        [InlineData("Brakmar 2", 0)]
+        public void OrdinalOf_reads_words_and_figures(string name, int expected)
+            => Assert.Equal(expected, DungeonManager.OrdinalOf(name));
+
+        [Fact]
         public void PickBossRoom_skips_Exit_and_picks_the_throne()
         {
             var names = new Dictionary<long, string>

@@ -90,6 +90,13 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>The room you start in.</summary>
             public long FirstRoom => Rooms.Count == 0 ? 0 : Rooms[0];
+
+            /// <summary>
+            /// The monsters, not bosses, that a quest asks to beat in one of its rooms: room → them.
+            /// Dramak, the mini-boss of his theatre's fourth auditorium, whom «Ainsi font les petites
+            /// marionnettes» (1425's 7920) wants beaten there.
+            /// </summary>
+            public Dictionary<long, List<int>> Quarry { get; } = new();
         }
 
         /// <summary>
@@ -223,6 +230,7 @@ namespace Jondo.Unity.Server.Managers
             }
 
             var questBossRooms = BossRoomsTheQuestsName();
+            QuarryTheQuestsName();
 
             int changed = 0;
             foreach (var dungeon in _byId.Values)
@@ -330,6 +338,54 @@ namespace Jondo.Unity.Server.Managers
                 Console.WriteLine($"[DungeonManager] Could not read the quests' boss maps: {ex.Message}");
             }
             return byDungeon;
+        }
+
+        /// <summary>
+        /// Fills each dungeon's <see cref="Dungeon.Quarry"/>: the objectives that ask to beat a
+        /// monster that is not one of its bosses in one of its rooms -- «in one fight» (6) or «on
+        /// this map» (16), the monster their first parameter.
+        /// </summary>
+        /// <remarks>
+        /// Five in the whole catalogue, and each a monster the room's group has to bring: a room is
+        /// composed from its subarea's monsters in a drawn order and a player alone fights the first
+        /// four, so Dramak, one of five there, stood in the fourth auditorium's fight or did not.
+        /// </remarks>
+        private static void QuarryTheQuestsName()
+        {
+            const int InOneFight = 6, OnThisMap = 16;
+            try
+            {
+                string path = Paths.QuestsJson;
+                if (!File.Exists(path)) return;
+
+                var dungeonOfRoom = new Dictionary<long, Dungeon>();
+                foreach (var dungeon in _byId.Values)
+                {
+                    dungeon.Quarry.Clear();
+                    foreach (long room in dungeon.Rooms) dungeonOfRoom.TryAdd(room, dungeon);
+                }
+
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("objectives", out var objectives)) return;
+                foreach (var objective in objectives.EnumerateObject())
+                {
+                    var o = objective.Value;
+                    if (!o.TryGetProperty("type", out var type) || type.ValueKind != JsonValueKind.Number) continue;
+                    if (type.GetInt32() is not (InOneFight or OnThisMap)) continue;
+                    if (!o.TryGetProperty("map", out var map) || map.ValueKind != JsonValueKind.Number) continue;
+                    if (!o.TryGetProperty("params", out var parameters) || parameters.GetArrayLength() == 0) continue;
+                    if (!dungeonOfRoom.TryGetValue(map.GetInt64(), out var where)) continue;
+
+                    int monster = parameters[0].GetInt32();
+                    if (where.Bosses.Contains(monster)) continue;
+                    if (!where.Quarry.TryGetValue(map.GetInt64(), out var list)) where.Quarry[map.GetInt64()] = list = new List<int>();
+                    if (!list.Contains(monster)) list.Add(monster);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DungeonManager] Could not read the quests' monsters in dungeon rooms: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -526,11 +582,41 @@ namespace Jondo.Unity.Server.Managers
                 // while a name like "Thirsty Room" must not be read as one.
                 if (lower.Contains(Ordinals[i] + " room")) return i + 1;
             }
-            return 0;
+            return FigureOf(name);
         }
 
+        /// <summary>
+        /// A room numbered with a figure, «Dramak's Theatre - Auditorium 5»: its number, or 0.
+        /// </summary>
+        /// <remarks>
+        /// Dramak's Theatre is the one dungeon that numbers its rooms this way, and it has two runs
+        /// of them: the five auditoriums it is fought through -- Dramak in the fourth, the Puppet
+        /// Master in the fifth (Dofus pour les noobs, «Théâtre de Dramak») -- and the two backstage
+        /// rooms of its secret passage. Unread, the catalogue's list stood, which starts in the
+        /// Puppet Master's auditorium and left the fourth as the boss room.
+        /// </remarks>
+        private static int FigureOf(string name)
+        {
+            var figure = NumberedRoom.Match(name);
+            return figure.Success && int.TryParse(figure.Groups[1].Value, out int number)
+                                  && number >= 1 && number <= Ordinals.Length
+                ? number
+                : 0;
+        }
+
+        /// <summary>The room part of a name ending in a figure: « - Auditorium 5».</summary>
+        private static readonly System.Text.RegularExpressions.Regex NumberedRoom =
+            new(@" - [^-]*\D (\d{1,2})$", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        /// <summary>
+        /// The run a numbered room belongs to: the dungeon's name, and for a room numbered with a
+        /// figure its kind too («Dramak's Theatre - Auditorium»), so the backstage rooms are a run
+        /// of their own and not a second room 1 and 2 of the auditoriums.
+        /// </summary>
         private static string PrefixOf(string name)
         {
+            if (FigureOf(name) != 0)
+                return name.Substring(0, name.LastIndexOf(' '));
             int dash = name.LastIndexOf(" - ", StringComparison.Ordinal);
             return dash > 0 ? name.Substring(0, dash) : name;
         }

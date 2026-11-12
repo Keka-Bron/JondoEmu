@@ -310,9 +310,11 @@ namespace Jondo.Unity.Server.Handlers
 
                 // After them, whatever was going to be said, without repeating any. The farewell matters:
                 // without a way out the player is left with a window that does not close.
+                // But not the «Sí.» to his own «¿Seguro...?»: on the first line it agrees to nothing.
+                var yes = DungeonDoor.For(npc.NpcId).Yes;
                 foreach (long r in respuestas)
                 {
-                    if (!todas.Contains(r)) todas.Add(r);
+                    if (!todas.Contains(r) && (escrito != null || !yes.Contains(r))) todas.Add(r);
                 }
 
                 respuestas = todas.ToArray();
@@ -1379,6 +1381,14 @@ namespace Jondo.Unity.Server.Handlers
                 : 0;
             if (dungeonExit != 0)
             {
+                // And what the reply does besides, before the door takes the character away: Dramak's
+                // «Abandonar el teatro con la sensación de haber cumplido con tu deber.» is «Ve a ver a
+                // Dramak» (1425's 7922) as well as the way out, and past the door there is no line left
+                // to read it from.
+                var exitChoice = NpcDialogues.For(dialogueState.OpenDialogueNpcId, dialogueState.OpenDialogueMapId)
+                                             ?.Line(dialogueState.OpenDialogueMessage)?.Choice(reply, SeLeOfrece);
+                if (exitChoice != null && exitChoice.Completes != 0 && SeLeOfrece(exitChoice))
+                    await Managers.Quests.CompleteByReplyAsync(stream, exitChoice.Quest, exitChoice.Completes);
                 CerrarConversacion();
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
