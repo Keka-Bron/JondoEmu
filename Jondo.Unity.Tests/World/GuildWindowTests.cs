@@ -380,6 +380,42 @@ namespace Jondo.Unity.Tests.World
                                              .Fields.Single(f => f.FieldNumber == 1).BytesValue);
             Assert.Equal(7003, leo.Fields.Single(f => f.FieldNumber == 1).VarIntValue);   // the leader
             Assert.Equal(1, leo.Fields.Single(f => f.FieldNumber == 7).VarIntValue);      // one member
+
+            // Each member carries his rank (f6) with its f4, never the details (f5): gl.mwk reads
+            // the rank without a null check, and the details made the client throw.
+            foreach (var member in jie.Fields.Where(f => f.FieldNumber == 1))
+            {
+                var lpe = ProtoMessage.Parse(ProtoMessage.Parse(member.BytesValue).Fields.Single(f => f.FieldNumber == 1).BytesValue);
+                Assert.DoesNotContain(lpe.Fields, f => f.FieldNumber == 5);
+                var ldt = ProtoMessage.Parse(lpe.Fields.Single(f => f.FieldNumber == 6).BytesValue);
+                Assert.Contains(ldt.Fields, f => f.FieldNumber == 4);
+            }
+        }
+
+        /// <summary>
+        /// The card's members carry their rank, the f4 included even for a rank the guild does not
+        /// have: the client reads both without looking.
+        /// </summary>
+        [Fact]
+        public void A_guild_card_member_carries_his_rank()
+        {
+            var guild = new GuildStore.Guild { Id = 1, Name = "Jondo", Level = 1 };
+            var member = new GuildStore.Member { CharacterId = 42, GuildId = 1, Rank = 1 };
+            var row = new GuildProtocol.MemberRow(member, "Sley", 200, 1, 8, 0, 0, true);
+            var rank = GuildStore.DefaultRanks(1).First();
+            var entry = new GuildProtocol.DirectoryEntry { Guild = guild, LeaderId = 42, LeaderName = "Sley", Members = 1 };
+
+            foreach (var given in new[] { rank, null })
+            {
+                var jie = ProtoMessage.Parse(GuildProtocol.BuildGuildCard(entry, new[] { (row, given) }, 0));
+                var lpg = ProtoMessage.Parse(jie.Fields.Single(f => f.FieldNumber == 1).BytesValue);
+                Assert.Equal(42, lpg.Fields.Single(f => f.FieldNumber == 2).VarIntValue);
+                var lpe = ProtoMessage.Parse(lpg.Fields.Single(f => f.FieldNumber == 1).BytesValue);
+                Assert.Equal("Sley", System.Text.Encoding.UTF8.GetString(lpe.Fields.Single(f => f.FieldNumber == 2).BytesValue));
+                Assert.Equal(200, lpe.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
+                var ldt = ProtoMessage.Parse(lpe.Fields.Single(f => f.FieldNumber == 6).BytesValue);
+                Assert.Contains(ldt.Fields, f => f.FieldNumber == 4);
+            }
         }
 
         /// <summary>

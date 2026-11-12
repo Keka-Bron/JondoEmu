@@ -199,16 +199,22 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildRanks(IReadOnlyList<GuildStore.Rank> ranks)
         {
             var jco = Pb.New();
-            foreach (var rank in ranks)
-            {
-                jco.Msg(2, Pb.New()
+            foreach (var rank in ranks) jco.Msg(2, Rank(rank));
+            return jco.Build();
+        }
+
+        /// <summary>
+        /// A rank (ldt): f2 name, f3 permissions, f4 { f2 icon, f3 order }, f5 id. The f4 always
+        /// goes, even for an unknown rank: the guild card reads it without looking (gl.mwk).
+        /// </summary>
+        private static Pb Rank(GuildStore.Rank rank)
+            => rank == null
+                ? Pb.New().Msg(4, Pb.New())
+                : Pb.New()
                     .Str(2, rank.Name)
                     .Msg(3, Pb.New().VarIfNotZero(1, rank.Flag ? 1 : 0).BytesIfNotEmpty(3, rank.Rights))
                     .Msg(4, Pb.New().Var(2, rank.Icon).VarIfNotZero(3, rank.Order))
-                    .Var(5, rank.Id));
-            }
-            return jco.Build();
-        }
+                    .Var(5, rank.Id);
 
         /// <summary>
         /// The guild as seen from a map actor (jhe): the guild block, the position, the
@@ -392,17 +398,26 @@ namespace Jondo.Unity.Server.Network
                 .Var(4, entry.Guild.Level);
 
         /// <summary>
-        /// A guild's card (jie): f1 its members, each as the jgu lists them, f2 its founding in
-        /// seconds, f3 the guild as the directory lists it. Read off fft.behh: the card's leader is
-        /// the directory's f1 looked up among the members, its member count the directory's f7, and
-        /// its creation date the f2.
+        /// A guild's card (jie): f1 its members, f2 its founding in seconds, f3 the guild as the
+        /// directory lists it. Read off fft.behh: the card's leader is the directory's f1 looked up
+        /// among the members, its member count the directory's f7, and its creation date the f2.
         /// </summary>
-        public static byte[] BuildGuildCard(DirectoryEntry entry, IEnumerable<MemberRow> members, long foundedSeconds)
+        /// <remarks>
+        /// Each member is { f1 { f2 name, f3 level, f6 his rank }, f2 the character }, as on the
+        /// alliance card. They went as the jgu lists them, with the details (f5): fft.behh converts
+        /// them with gl.mwk, which reads the rank (f6) and its f4 without a null check, so the client
+        /// threw (Player.log: NullReferenceException at gl.mwk) and «Voir détail» never opened.
+        /// </remarks>
+        public static byte[] BuildGuildCard(DirectoryEntry entry, IEnumerable<(MemberRow Row, GuildStore.Rank Rank)> members,
+                                            long foundedSeconds)
         {
             var jie = Pb.New();
-            foreach (var r in members)
-                jie.Msg(1, MemberEntry(r.Member, r.Name, r.Level, r.AccountId, r.Breed, r.AchievementPoints,
-                                       r.Contributed, r.Online));
+            foreach (var (row, rank) in members)
+            {
+                jie.Msg(1, Pb.New()
+                    .Msg(1, Pb.New().Str(2, row.Name).Var(3, row.Level).Msg(6, Rank(rank)))
+                    .Var(2, row.Member.CharacterId));
+            }
             return jie.VarIfNotZero(2, foundedSeconds).Msg(3, DirectoryGuild(entry)).Build();
         }
 
