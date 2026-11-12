@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Server.Handlers;
@@ -12,9 +12,9 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Four of the generic challenges, by their descriptions: �Manos limpias� (no direct damage),
-    /// �Cada uno con su monstruo� (nobody else's enemy), �Espejo� (an ally behind the one who falls)
-    /// and how �El dos por uno� and the others are offered at all.
+    /// Four of the generic challenges, by their descriptions: «Manos limpias» (no direct damage),
+    /// «Cada uno con su monstruo» (nobody else's enemy), «Espejo» (an ally behind the one who falls)
+    /// and how «El dos por uno» and the others are offered at all.
     /// </summary>
     [Collection("Challenges table")]   // Challenges.Initialize reloads a static table
     public class ChallengeRulesTests
@@ -114,7 +114,7 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
-        /// �First� is met the moment its target falls first, as the real game draws it green then,
+        /// «First» is met the moment its target falls first, as the real game draws it green then,
         /// and the end still pays it.
         /// </summary>
         [Fact]
@@ -156,7 +156,7 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(0, ChallengeWatcher.EndBonus(fight, won: true));
         }
 
-        /// <summary>A boss's �CK#4051,1� (117, the Chadalid falls first): met when the Chadalid falls first.</summary>
+        /// <summary>A boss's «CK#4051,1» (117, the Chadalid falls first): met when the Chadalid falls first.</summary>
         [Fact]
         public async Task A_boss_s_first_is_met_when_the_boss_falls_first()
         {
