@@ -8867,7 +8867,8 @@
         {
           "message": 20853,
           "choices": [
-            { "reply": 25013, "next": 20854, "completes": 9786, "params": [[30, 9786]] },
+            { "reply": 25013, "next": 20854, "quest": 1635, "completes": 9786, "params": [[30, 9786]] },
+            { "reply": 25013, "next": 20854 },
             { "reply": 25014, "passage": 25014 }
           ]
         },
@@ -8885,7 +8886,7 @@
           ]
         }
       ],
-      "why": "Likantrabioso (Hargnok), once the Minilubo is beaten: he was the beast, bitten by it before he killed it, and his dofus are long gone (Dofus pour les noobs, «Dans la gueule du Milimilou»). «Salir de la Cripta del Minilubo Albino» leads back out through the grate."
+      "why": "Likantrabioso (Hargnok), once the Minilubo is beaten: he was the beast, bitten by it before he killed it, and his dofus are long gone (Dofus pour les noobs, «Dans la gueule du Milimilou»). «Salir de la Cripta del Minilubo Albino» leads back out through the grate. He stands there for whoever has not the quest too (spawns.json), and to him «¿Dónde está el Minilubo?» is only a question: its objective (9786) and its «?» go with the quest under way."
     },
     {
       "npc": 4360,

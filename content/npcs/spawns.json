@@ -747,8 +747,8 @@
       "npc": 2898,
       "cell": 344,
       "orientation": 1,
-      "criterion": "Qo>9785|Qf=1635",
-      "why": "Likantrabioso, where the Minilubo stood: «Une fois le combat terminé, Hargnok qui avait disparu apparaît. Il semblerait que le Milimilou n'était autre que lui» (Dofus pour les noobs). The derived layer had him here from the start; he is the Minilubo, so he only shows once it is beaten."
+      "criterion": "Qa!1635|Qo>9785",
+      "why": "Likantrabioso, where the Minilubo stood, whenever the Minilubo is not: the lair's only way out is his reply 25014, and Kardorim (24990, 24996, 25015) and the grate let anybody in, quest or not -- with «Qo>9785|Qf=1635» whoever came without «Dans la gueule du Milimilou» found nobody and could not leave. «Une fois le combat terminé, Hargnok qui avait disparu apparaît. Il semblerait que le Milimilou n'était autre que lui» (Dofus pour les noobs). The derived layer had him here from the start; he is the Minilubo, so while the quest has it to beat he is not there."
     },
     {
       "map": 153358340,
