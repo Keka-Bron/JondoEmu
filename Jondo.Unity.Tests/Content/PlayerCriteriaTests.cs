@@ -3,6 +3,7 @@ using System.Linq;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Content;
 using Jondo.Unity.World.Quests;
 using Xunit;
@@ -66,6 +67,39 @@ namespace Jondo.Unity.Tests.Content
             var nobody = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
             Assert.False(Met("Mt=0", nobody));
             Assert.False(Met("Ms=0", nobody));
+        }
+
+        /// <summary>
+        /// The young's equipment off the piwis and the like, «(SC!5|ST!5)&amp;PL&gt;0&amp;PL&lt;59»: on a classic
+        /// server, not the fifth Temporis, for whoever is below level 59. The server's letters are the
+        /// character's in session; without one they stay unknown.
+        /// </summary>
+        [Fact]
+        public void The_youngs_equipment_drops_on_a_classic_server()
+        {
+            var session = GameSession.SinSocket();
+            using (SessionContext.Push(session))
+            {
+                session.State.CharacterLevel = 20;
+                var facts = new PlayerCriteria.Facts(session.State, null, null, 0, _ => 0);
+                Assert.True(Met("(SC!5|ST!5)&PL>0&PL<59", facts));
+                Assert.False(Met("SC=5", facts));
+                Assert.False(Met("ST=5", facts));
+
+                // The date, Paris's: «SG=08&Sd>18&Sd<27» is the end of August.
+                var today = OsavoraSeasons.InParis(System.DateTimeOffset.UtcNow);
+                Assert.True(Met($"SG={today.Month:00}&Sd={today.Day}", facts));
+                Assert.False(Met($"SG!{today.Month}", facts));
+
+                // Still strict: a letter nobody answers keeps the row from dropping.
+                Assert.False(Met("SC!5&Sv!946,0", facts));
+
+                session.State.CharacterLevel = 60;
+                Assert.False(Met("(SC!5|ST!5)&PL>0&PL<59", facts));
+            }
+
+            var nobody = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+            Assert.False(Met("SC!5", nobody));
         }
 
         /// <summary>The server's own letters are not known here, and an unknown row never drops.</summary>

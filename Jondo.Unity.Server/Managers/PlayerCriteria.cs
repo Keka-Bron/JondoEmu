@@ -26,10 +26,11 @@ namespace Jondo.Unity.Server.Managers
     /// In a drop, Qo asks about the objectives still to do in the quests' current steps: «Qo=14179»
     /// is «kill ten larvae» pending, and «Qo&gt;4096&amp;Qo&lt;4098» is objective 4097 among those pending
     /// -- step 1237's objectives run 4074 to 4103. INFERRED, as the order of an objective's ids.
-    /// Mt and Ms are about the monster that drops (see Resolve). What nobody answers here -- DD, Sc,
-    /// Sv, WE… the server's own letters -- leaves the
-    /// row Unknown, and an Unknown row does not drop: «never dropping them is preferable to always
-    /// dropping them» still holds for them.
+    /// Mt and Ms are about the monster that drops (see Resolve). The character's other letters --
+    /// the server's type and season, the yearly events, the date -- are asked of the achievement
+    /// engine (ByCharacter). What nobody answers -- Sv, OO, Ot… the server's own letters -- leaves
+    /// the row Unknown, and an Unknown row does not drop: «never dropping them is preferable to
+    /// always dropping them» still holds for them.
     /// </para>
     /// <para>
     /// The meats: «Pj&gt;41,9&amp;CU&gt;0» on «Carne picada», «Pj&gt;41,19» on «Carne manida» -- job 41 is
@@ -155,8 +156,60 @@ namespace Jondo.Unity.Server.Managers
                 case "OA":
                     return facts.State?.Achievements == null ? Answer.Unknown : Truth(facts.State.Achievements.Has((int)value), op);
 
-                default: return Answer.Unknown;
+                default: return ByCharacter(condition, facts);
             }
+        }
+
+        /// <summary>
+        /// A letter the loot does not judge itself, as the achievement engine answers it for the
+        /// character in session (<see cref="Achievements.CharacterFacts"/>, which the quests and the
+        /// items' criteria read too); Unknown when it does not know it either.
+        /// </summary>
+        /// <remarks>
+        /// The 117 pieces of equipment the monsters drop to the young, «(SC!5|ST!5)&amp;PL&gt;0&amp;PL&lt;59»
+        /// on the piwis and the like, never fell: SC and ST were nobody's here, and an unknown row
+        /// does not drop. SC is the server's game type, ST its season (the client's
+        /// ServerTypeCriterion and SeasonCriterion): not the fifth Temporis on this classic server.
+        /// The same reader answers the yearly events' «Sc=944», the days an item has been held
+        /// («DD&lt;30,21172»), the world events' «WE» and the date's «SG»/«Sd», with the shapes
+        /// <see cref="Jondo.Unity.World.Quests.QuestCriterion"/> gives them: «DD&lt;days,item»,
+        /// «OP&gt;key,n» a tally compared with n, «OP=n» a number, or «OP=key» at least one held.
+        /// Only for the character in session: the reader asks the session, not these facts.
+        /// </remarks>
+        private static Answer ByCharacter(Condition condition, Facts facts)
+        {
+            if (facts.State == null || !ReferenceEquals(facts.State, SessionContext.State) || condition.Args.Count == 0)
+                return Answer.Unknown;
+            if (!long.TryParse(condition.Args[0], out long first)) return Answer.Unknown;
+            var character = new Achievements.CharacterFacts();
+            string code = condition.Code;
+            char op = condition.Operator;
+
+            if (code is "DD" or "DH" or "DM" && condition.Args.Count >= 2)
+            {
+                if (!long.TryParse(condition.Args[1], out long item)) return Answer.Unknown;
+                long? since = character.Count(code, item, "");
+                return since.HasValue ? Compare(since.Value, op, first) : Answer.Unknown;
+            }
+
+            if (condition.Args.Count >= 2)
+            {
+                if (!long.TryParse(condition.Args[1], out long threshold)) return Answer.Unknown;
+                long? tally = character.Count(code, first, condition.Args.Count >= 3 ? condition.Args[2] : "");
+                return tally.HasValue ? Compare(tally.Value, op, threshold) : Answer.Unknown;
+            }
+
+            long? scalar = character.Scalar(code);
+            if (scalar.HasValue) return Compare(scalar.Value, op, first);
+
+            long? held = character.Count(code, first, "");
+            if (!held.HasValue) return Answer.Unknown;
+            return op switch
+            {
+                '=' => Bool(held.Value > 0),
+                '!' => Bool(held.Value == 0),
+                _ => Answer.Unknown,
+            };
         }
 
         /// <summary>

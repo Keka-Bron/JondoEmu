@@ -40,6 +40,12 @@ namespace Jondo.Unity.Server.Managers
         public const int ServerGameType = 0;
 
         /// <summary>
+        /// The server's season, for <c>ST</c>: none, 0. Seasons belong to the Temporis servers
+        /// (the client's ServerSeasons), and this one is classic.
+        /// </summary>
+        public const int ServerSeason = 0;
+
+        /// <summary>
         /// Volatile, and assigned only once the catalogue is fully built: readers take no lock,
         /// so this assignment is what publishes it to them.
         /// </summary>
@@ -733,6 +739,16 @@ namespace Jondo.Unity.Server.Managers
             public long? Scalar(string op) => op switch
             {
                 "SC" => ServerGameType,
+
+                // The server's season, the client's SeasonCriterion: the current one of the server's
+                // own seasons (Temporis), which a classic server has none of. «(SC!5|ST!5)» on the
+                // young's equipment the monsters drop keeps it from the fifth Temporis only.
+                "ST" => ServerSeason,
+
+                // The date on the server's clock, Paris's, the client's DayCriterion and
+                // MonthCriterion: «SG=08&Sd>18&Sd<27», the end of August.
+                "Sd" => OsavoraSeasons.InParis(DateTimeOffset.UtcNow).Day,
+                "SG" => OsavoraSeasons.InParis(DateTimeOffset.UtcNow).Month,
 
                 // His class: «The Tymador Job» asks PG=13, the class quests and items theirs.
                 "PG" => S.Breed,
