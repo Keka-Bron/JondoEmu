@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Sockets;
@@ -2061,8 +2061,18 @@ namespace Jondo.Unity.Server.Managers
             long characterId = SessionContext.State.CharacterId;
             if (log == null || characterId == 0 || !log.Forget(questId)) return;
             DatabaseManager.DeleteQuestProgress(characterId, questId);
-            Console.WriteLine($"[Quests] Quest {questId} is offered again.");
+            // And the marks its conversations and fights left, numbered after it (-894001 is the
+            // first of «Las primeras impresiones son engañosas»): the heaps of filings would never
+            // fight again on the quest played anew.
+            int first = -(questId * QuestMarkSpan + QuestMarkSpan - 1), last = -(questId * QuestMarkSpan);
+            int cleared = SessionContext.State.ElementsUsed.RemoveWhere(e => e >= first && e <= last);
+            if (cleared > 0) DatabaseManager.ForgetElements(characterId, first, last);
+            Console.WriteLine($"[Quests] Quest {questId} is offered again" +
+                              (cleared > 0 ? $", its {cleared} mark(s) wiped." : "."));
         }
+
+        /// <summary>How many marks a quest numbers after itself: -894001 to -894999 are 894's.</summary>
+        private const int QuestMarkSpan = 1000;
 
         /// <summary>
         /// A quest's run written to the base as the log holds it now: the test routes' «finish»

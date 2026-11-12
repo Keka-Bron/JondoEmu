@@ -2233,6 +2233,28 @@ namespace Jondo.Unity.Server
             }
         }
 
+        /// <summary>The marks between two ids this character had, wiped: a quest's, when it is forgotten.</summary>
+        public static void ForgetElements(long characterId, int from, int to)
+        {
+            if (characterId <= 0) return;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText =
+                    "DELETE FROM CharacterElements WHERE CharacterId = $c AND ElementId BETWEEN $from AND $to;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$from", from);
+                command.Parameters.AddWithValue("$to", to);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DatabaseManager] Could not wipe elements {from} to {to}: {ex.Message}");
+            }
+        }
+
         /// <summary>The interactives this character has already used.</summary>
         public static HashSet<int> LoadElementsUsed(long characterId)
         {
