@@ -320,6 +320,10 @@ namespace Jondo.Unity.Server.Handlers
                 respuestas = todas.ToArray();
             }
 
+            // The keyring only while it can open the door: none in the bag, or this week's entry spent,
+            // and the real game does not offer it -- written in the tree or added above.
+            respuestas = respuestas.Where(r => !DungeonHandler.KeyringOfferedForNothing(npc.NpcId, mapId, r)).ToArray();
+
             // And a jailer takes the criminals carried and sells the news of those still out.
             long[] wanted = WantedHandler.OpeningReplies(npc.NpcId, mapId);
             if (wanted.Length > 0) respuestas = wanted.Concat(respuestas.Where(r => !wanted.Contains(r))).ToArray();
@@ -765,14 +769,18 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // The numbers some answers carry inside, if the written tree says so.
+            // The numbers some answers carry inside, if the written tree says so: those of the choice
+            // this character is shown, for a reply the line writes twice. Klasmor's door replies hand
+            // «Criptología» over (34, its «!») and go again without it once it is done; the first
+            // one's numbers drew the «!» for a quest that could not be taken.
             Dictionary<long, IReadOnlyList<long>>? parametros = null;
             Dictionary<long, IReadOnlyList<IReadOnlyList<long>>>? arguments = null;
             if (frase != null)
             {
-                foreach (var opcion in frase.Choices)
+                foreach (long respuesta in respuestas)
                 {
-                    if (opcion.Parameters.Count == 0) continue;
+                    var opcion = frase.Choice(respuesta, SeLeOfrece);
+                    if (opcion == null || opcion.Parameters.Count == 0) continue;
                     parametros ??= new Dictionary<long, IReadOnlyList<long>>();
                     parametros[opcion.Reply] = opcion.Parameters;
                     if (opcion.ParameterArgs.Count == 0) continue;

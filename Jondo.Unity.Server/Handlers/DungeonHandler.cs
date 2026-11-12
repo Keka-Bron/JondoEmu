@@ -87,6 +87,24 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Whether <paramref name="reply"/> is this guardian's keyring reply and the keyring cannot
+        /// open his door for the character of the session: the dungeon is not on it, there is no
+        /// keyring in the bag, or this week's free entry is spent. The real game does not offer it
+        /// then; offered, it only led to the refusal in the chat.
+        /// </summary>
+        public static bool KeyringOfferedForNothing(int npcId, long mapId, long reply)
+        {
+            var options = DungeonDoor.For(npcId);
+            if (reply == 0 || options.Keyring != reply) return false;
+            var dungeon = DungeonManager.AtEntrance(mapId);
+            if (dungeon == null || dungeon.FirstRoom == 0) return false;
+
+            return !dungeon.OnKeyring
+                   || FindInBag(Keyring, 1) == 0
+                   || !DungeonKeyring.FreeEntryLeft(SessionContext.State.CharacterId, dungeon.Id, DateTime.Now);
+        }
+
+        /// <summary>
         /// The player has answered the guardian of a dungeon. Try to let them in.
         /// </summary>
         /// <remarks>
