@@ -4449,6 +4449,18 @@ namespace Jondo.Unity.Server.Handlers
             return cells;
         }
 
+        /// <summary>
+        /// Spells the client casts on an empty cell though their level wants it occupied
+        /// (needTakenCell), and the effects they leave out there. The Turbine (13874): aimed at an
+        /// empty cell it pulls toward it and evolves the turrets around, without the cross of fire
+        /// it deals around a target (99). Its level wants an occupied cell, the client offers the
+        /// empty ones, and the server refused them: the spell did nothing.
+        /// </summary>
+        internal static readonly IReadOnlyDictionary<int, int[]> EmptyCellCasts = new Dictionary<int, int[]>
+        {
+            [13874] = new[] { 99 },
+        };
+
         /// <summary>Whether a spell's rows at this grade lay a trap (effect 400).</summary>
         internal static bool LaysATrap(int spell, int grade)
             => Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.ColocaUnaTrampa);
@@ -5042,7 +5054,7 @@ namespace Jondo.Unity.Server.Handlers
             // switches either (314/297 occupied, 299 free).
             var (needFree, needTaken) = Managers.SpellModifiers.Cells(caster, spell, limites.NeedFreeCell,
                                                                       limites.NeedTakenCell, fight.RoundNumber);
-            if (needTaken && victim == null)
+            if (needTaken && victim == null && !EmptyCellCasts.ContainsKey(spell))
             {
                 Program.LogDebug($"[Fight] Spell {spell} wants an occupied cell and cell {cell} is empty.");
                 return;
@@ -5196,6 +5208,10 @@ namespace Jondo.Unity.Server.Handlers
             // ONE DRAW FOR THE WHOLE CAST: Bumerán Pérfido steals in one element and boosts
             // that element's characteristic, out of the same throw of the dice.
             var tirada = spell != 0 ? Managers.EffectEngine.EfectosSorteados(spell, grade, critico) : null;
+            // Cast on an empty cell, what it does there and no more: the Turbine pulls and evolves
+            // without its cross of fire (EmptyCellCasts).
+            if (victim == null && tirada != null && EmptyCellCasts.TryGetValue(spell, out var notOnEmpty))
+                tirada = tirada.Where(row => !notOnEmpty.Contains(row.EffectId)).ToList();
 
             // Through a portal the cast says so to its masks' R and r, and its damage and healing
             // grow with the network it crossed.
