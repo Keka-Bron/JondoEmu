@@ -204,8 +204,7 @@ namespace Jondo.Unity.Server.Network
                     // Creating a character. isAuthenticated is the first of the two guards: the
                     // second is inside CreateAsync, which rejects an unresolved account. Both
                     // go because this same branch is also reached from GameServerProxy.
-                    await CharacterCreationHandler.CreateAsync(stream, payload, sessionAccountId,
-                                                               sessionServerId);
+                    await CharacterCreationHandler.CreateAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Luy)))
                 {
@@ -252,8 +251,7 @@ namespace Jondo.Unity.Server.Network
                 {
                     // Deleting a character. The usual two guards: isAuthenticated here and the
                     // resolved account inside, because the client picks the id.
-                    await CharacterDeletionHandler.DeleteAsync(stream, payload, sessionAccountId,
-                                                               sessionServerId);
+                    await CharacterDeletionHandler.DeleteAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kvh)))
                 {

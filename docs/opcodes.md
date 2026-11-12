@@ -84,25 +84,28 @@ there, with the values the capture carries. Nothing has been invented to fill th
 ### 2.1 Authentication and the welcome burst
 
 The client reconnects to port 5555 with the ticket it was handed after picking a server. The
-server answers with a fixed burst that ends in the character list. Order matters: it is replayed in
-the order of the capture.
+server answers through `ConnectionProtocol.SendWelcomeAsync`, ending ordinary login
+with the session-owned character-list refresh. Order follows the measured sequence;
+messages are constructed from current policy/state rather than replayed. The Wire
+counts below remain the historical capture inventory; send-site references describe
+the current implementation. See [the typed protocol documentation](game-protocol.md).
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
 | `kqz` | C→S | 10 / 9 files | Presents the single-use ticket. Binds the session to an account and a server; an unknown ticket closes the connection. | `GameNodeProxy.HandleTicketPresentation` | `f2: ticket` |
 | `krt` | C→S | 7 / 6 files | Arrives together with `kqz`. Expects nothing back. | `GameNodeProxy` (empty branch) | — |
-| `kra` | S→C | 10 / 9 files | Opens the burst. | `ConnectionProtocol.BuildWelcomeBurst` | empty |
-| `lqu` | S→C | 735 / 91 files | Clock sync. Also sent on every map change. | `BuildWelcomeBurst`, `BuildMapClock` | `f1: 120` (sync rate), `f2: server clock, unix ms` |
+| `kra` | S→C | 10 / 9 files | Opens the burst. | `ConnectionProtocol.SendWelcomeAsync` | `AuthenticationTicketAcceptedEvent` |
+| `lqu` | S→C | 735 / 91 files | Clock sync. Also sent on every map change. | `ConnectionProtocol.SendWelcomeAsync`, `ServerTimeMessages` | `TimeEvent`: timezone offset minutes and current Unix milliseconds |
 | `hoy` | S→C | 9 / 8 files | Game-server hello. `f5` is deliberately absent: it appears in none of the three startup captures. | `ConnectionProtocol.BuildHoy` | `f1: 30, f2: 1, f3: 1, f6: language, f7: 200` |
-| `kqu` | S→C | 11 / 9 files | Features enabled on the server, as opaque ids copied from the capture. | `BuildWelcomeBurst` | `f1: packed [3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150]` |
-| `mgq` | S→C | 9 / 8 files | *Not established.* | `BuildWelcomeBurst` | `f1: 1, f2: 1, f3: 1` |
-| `mgt` | S→C | 9 / 8 files | *Not established.* | `BuildWelcomeBurst` | `f2: {}` (empty submessage) |
-| `hpd` | S→C | 9 / 8 files | *Not established.* | `BuildWelcomeBurst` | `f1: 1` |
-| `krs` | S→C | 9 / 8 files | *Not established.* | `BuildWelcomeBurst` | empty |
-| `mgz` | S→C | 6 / 6 files | Identifier of the content catalogue. Opaque: the client only compares it against itself. | `BuildWelcomeBurst` | `f1: 304672615` |
-| `kqp` | S→C | 24 / 6 files | Sent three times in a row, with three different payloads. Meaning *not established*. | `BuildWelcomeBurst` | `f1:1, f2:1` then `f1:1` then empty |
-| `kvi` | S→C | 10 / 8 files | The account's characters on the chosen server. | `BuildCharactersList` | `f1 (rep) { f1 { f2: name, f3: level, f4 { f2 { f3: sex } }, f6: look, f7: breed }, f2: characterId }` |
-| `kvd` | S→C | 4 / 3 files | Closes the character list. Empty, immediately behind `kvi` in the real burst. It was not being sent, and it is the leading candidate for the dead create-character button: the client received the list and nothing saying the list was complete. | `BuildWelcomeBurst` | empty |
+| `kqu` | S→C | 11 / 9 files | Features enabled on the server, as opaque ids copied from the capture. | `ConnectionProtocol.SendWelcomeAsync` | `OptionalFeaturesEvent`: [3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150] |
+| `mgq` | S→C | 9 / 8 files | Current welcome policy allows character creation and advertises subscription/player hierarchy. | `ConnectionProtocol.SendWelcomeAsync` | `AccountCapabilitiesEvent(Allowed, true, RolePlayer)` |
+| `mgt` | S→C | 9 / 8 files | Account access flags. | `ConnectionProtocol.SendWelcomeAsync` | `AccountRightsEvent`: present rights block, all four flags false |
+| `hpd` | S→C | 9 / 8 files | Certified trust status. | `ConnectionProtocol.SendWelcomeAsync` | `TrustStatusEvent(true)` |
+| `krs` | S→C | 9 / 8 files | Game session ready. | `ConnectionProtocol.SendWelcomeAsync` | `ServerSessionReadyEvent` |
+| `mgz` | S→C | 6 / 6 files | Elapsed subscribed duration in seconds; current policy is zero while history is not stored. | `ConnectionProtocol.SendWelcomeAsync` | `AccountSubscriptionElapsedDurationUpdateEvent(0)` |
+| `kqp` | S→C | 24 / 6 files | Queue status, three updates before an ordinary list refresh. | `CharacterListService` | `QueueStatusEvent(1, 1)`, `(1, 0)`, `(0, 0)` |
+| `kvi` | S→C | 10 / 8 files | The account's characters on the chosen server, most recently played first. | `CharacterListMessages`, `CharacterListService` | `CharacterListEvent` with semantic identities and recursive looks |
+| `kvd` | S→C | 4 / 3 files | Force-selection continuation for an account-owned resumable fight; omitted on ordinary login. | `GameEntryService` | `CharacterForceSelectionEvent` |
 | `jtg` | S→C | 11 / 7 files | Current account's unclaimed gifts, including due veteran rewards; empty list clears prior state. | `GiftMessages`, `GiftService` | `f3 (rep) { f1 { f2: title, f3 { f2: quantity, f3: template } }, f2: packed redemption IDs }`; unused description tag 6 omitted |
 | `jby` | S→C | — | HAAPI session identity, allocated once per game connection. | `GameEntryContinuationMessages` | `f1: invariant decimal Int64 string` |
 | `kqq` | C→S | 3 / 3 files | The client is going back to the character or server screen. | `GameNodeProxy` | — |

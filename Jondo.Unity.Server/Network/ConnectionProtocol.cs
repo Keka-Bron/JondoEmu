@@ -27,9 +27,6 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     public static class ConnectionProtocol
     {
-        // Compatibility framing for the older synchronous welcome/list callers.
-        // Gift construction is shared with direct session sends, never decoded from legacy bytes.
-        private static readonly Game.Wire.GameCodec LegacyCodec = new();
         public const string UriPrefix = "type.ankama.com/";
 
         // ─── Envelope ───────────────────────────────────────────────────────────
@@ -50,116 +47,9 @@ namespace Jondo.Unity.Server.Network
         // ─── Game server: welcome burst ─────────────────────────────────────────
 
         /// <summary>
-        /// The character list as it actually travels: three kqp, the list, and the gift catalogue.
+        /// Sends welcome messages through the owning session. Ordinary login includes
+        /// the character-list refresh; a resumable fight waits for the list request.
         /// </summary>
-        /// <remarks>
-        /// Five frames, never the kvi on its own. That is how every capture sends it -- in the
-        /// welcome burst, after a creation, and after a deletion -- and sending only the kvi is
-        /// what made a freshly created character invisible to the client.
-        ///
-        /// The symptom was ugly and easy to blame on the wrong thing: create a character, press
-        /// play, and the PREVIOUS character walked into the world. Nothing was mixed up
-        /// server-side; the selection arrived naming the old character and was honoured correctly,
-        /// because the client still held the list it had before the creation and sent the only
-        /// entry it knew. Going back to the selection screen refreshed it and everything worked,
-        /// which is exactly the shape of a stale list rather than a wrong lookup.
-        ///
-        /// Measured in "crear personaje - borrar personaje", where the real server answers a
-        /// successful kvb with the whole set again:
-        ///
-        /// <code>
-        ///   kvb (empty, success)  ->  kqp kqp kqp  kvi  jtg
-        ///   kvn (deleted)         ->  kqp kqp kqp  kvi  jtg
-        /// </code>
-        /// </remarks>
-        public static List<byte[]> CharacterListFrames(IReadOnlyList<DatabaseManager.DbCharacter> characters)
-            => new()
-            {
-                Push(Op.Kqp, Pb.New().Var(1, 1).Var(2, 1).Build()),
-                Push(Op.Kqp, Pb.New().Var(1, 1).Build()),
-                Push(Op.Kqp),
-                Push(Op.Kvi, BuildCharactersList(characters)),
-                LegacyCodec.Encode(new Game.GameFrame(GiftService.Live.Snapshot(
-                    characters.Count > 0 ? characters[0].AccountId : SessionContext.Current.AccountId))),
-            };
-
-        /// <summary>
-        /// The burst the real server sends as soon as the client presents the ticket, in the
-        /// same order as the capture. It ends with the character list.
-        ///
-        /// kvc and krv were deliberately not copied from the capture: there they are client
-        /// messages, and the previous version of this emulator sent them back to the client
-        /// by mistake.
-        /// </summary>
-        /// <param name="withList">
-        /// Whether the character list closes the burst. It does on an ordinary login; when a
-        /// character of the account is still in a fight the real burst stops at the krs, the
-        /// client asks with kvc, and the answer is the list followed by the kvd. Measured in the
-        /// two reconnection captures: "kra lqu hoy kqu mgq mgt hpd krs", then "kvc krv" from the
-        /// client, then "kvi kvd".
-        /// </param>
-        public static List<byte[]> BuildWelcomeBurst(IReadOnlyList<DatabaseManager.DbCharacter> characters,
-                                                     bool withList = true)
-        {
-            var burst = new List<byte[]>
-            {
-                Push(Op.Kra),
-                Push(Op.Lqu, Pb.New()
-                    .Var(1, ServerTimeMessages.TimezoneOffsetMinutes)
-                    .Var(2, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
-                    .Build()),
-                Push(Op.Hoy, BuildHoy()),
-                Push(Op.Kqu, Pb.New().Packed(1, ActiveFeatures).Build()),
-                // mgq without field 1. That field is the whole reason "create a character" was
-                // dark, and it is the one frame in the burst where this server said something the
-                // captures never say on an account that can create. Sorted by whether creation
-                // worked, every capture in "Autenticacion-Servidor-Personaje" falls on the right
-                // side of it:
-                //
-                //   10011801         creation succeeds        "creacion personaje-exito"
-                //   10011801         creation succeeds        "crear personaje - borrar personaje"
-                //   10011801         already in the world     "tutorial completo"
-                //   080110011801     refused, maximum reached "fallo por limite maximo"
-                //   080110011801     account sitting at 4/5   "eleccion servidor a eleccion personaje"
-                //
-                // The same account sends it in one session and not in another, so it is a state and
-                // not a property of the account. Ours sent it always, on every login, which is why
-                // an account with a single character was told it had reached its maximum -- and why
-                // an empty one could still make its first: one is a limit you have not hit yet.
-                //
-                // What field 1 means exactly is not decoded here, and the comment says so. What is
-                // measured is that no capture where creation works carries it.
-                Push(Op.Mgq, Pb.New().Var(2, 1).Var(3, 1).Build()),
-                Push(Op.Mgt, Pb.New().EmptyMsg(2).Build()),
-                Push(Op.Hpd, Pb.New().Var(1, 1).Build()),
-                Push(Op.Krs),
-                Push(Op.Mgz, Pb.New().VarIfNotZero(1, SubscriptionElapsedSeconds).Build()),
-
-                // A kvd DOES NOT GO HERE, and sending it was what had half the screen dead.
-                //
-                // It was put in by eye, with the reasoning that «it closes the character list» and
-                // that the create button was greyed out because the screen was missing its ending.
-                // It sounds right and it is the other way round. Measured on the captures: the kvd appears in THREE, and the
-                // three are of entering the world directly without going through the screen —reconnection to a
-                // fight and koliseo—, looking like this:
-                //
-                //   kvi(381)  kvd(0)  ipc  kva  mft        back to a fight
-                //   kra  kqu  kvd(0)  kva  ivx  hlm        koliseo, and there is not even a kvi
-                //
-                // And in the burst of the real character screen it IS NOT THERE: neither in the one of the
-                // account with four characters and the button active, nor in the one of the empty account that
-                // creates one, nor in the one that fails on the maximum limit. All three go kvi and then jtg.
-                //
-                // That is, the kvd means «do not stop here». Sending it always, the client
-                // built the screen as if it were passing through: the create character button lifeless
-                // and the change server one leading nowhere.
-            };
-
-            // The list closes the burst, framed the way it always travels.
-            if (withList) burst.AddRange(CharacterListFrames(characters));
-            return burst;
-        }
-
         internal static async System.Threading.Tasks.Task SendWelcomeAsync(GameSession session,
             IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withList)
         {
@@ -177,16 +67,13 @@ namespace Jondo.Unity.Server.Network
             if (withList) await SendCharacterListAsync(session, characters);
         }
 
-        internal static async System.Threading.Tasks.Task SendCharacterListAsync(GameSession session,
+        /// <summary>
+        /// Queue updates, the semantic list, then current gifts. Sending only the list
+        /// after creation once left the client selecting its previously cached character.
+        /// </summary>
+        internal static System.Threading.Tasks.Task SendCharacterListAsync(GameSession session,
             IReadOnlyList<DatabaseManager.DbCharacter> characters)
-        {
-            await session.SendAsync(new Game.QueueStatusEvent(1, 1));
-            await session.SendAsync(new Game.QueueStatusEvent(1, 0));
-            await session.SendAsync(new Game.QueueStatusEvent(0, 0));
-            // Project only when the complete nested character/look data survives.
-            await GameEntryMessages.SendAsync(session, Push(Op.Kvi, BuildCharactersList(characters)));
-            await GiftService.Live.SendAsync(session);
-        }
+            => CharacterListService.Live.SendAsync(session, characters);
 
         /// <summary>
         /// Elapsed subscribed seconds are not stored by the account backend.
@@ -243,30 +130,6 @@ namespace Jondo.Unity.Server.Network
         // ─── Character list (kvi) ───────────────────────────────────────────────
 
         /// <summary>
-        /// List of the account's characters on the chosen server, the one played last first.
-        ///
-        ///   f1 (repeated) { f1 { f2: name
-        ///                        f3: level
-        ///                        f4 { f2: { f3: sex }   (present but empty when the sex is 0)
-        ///                             f6: look
-        ///                             f7: breed } }
-        ///                   f2: characterId }
-        /// </summary>
-        public static byte[] BuildCharactersList(IReadOnlyList<DatabaseManager.DbCharacter> characters)
-        {
-            var kvi = Pb.New();
-
-            foreach (var character in MostRecentFirst(characters))
-            {
-                kvi.Msg(1, Pb.New()
-                    .Msg(1, BuildCharacterDetails(character))
-                    .Var(2, character.Id));
-            }
-
-            return kvi.Build();
-        }
-
-        /// <summary>
         /// The order the real server sends the list in, which the client shows as it comes.
         /// </summary>
         /// <remarks>
@@ -281,31 +144,6 @@ namespace Jondo.Unity.Server.Network
                        System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None,
                        out var at) ? at : System.DateTimeOffset.MinValue)
                    .ToList();
-
-        /// <summary>
-        /// The character-list details block. Selection constructs semantic records directly.
-        ///
-        ///   f2: name, f3: level, f4 { f2: sex, f6: look, f7: breed }
-        ///
-        /// </summary>
-        private static Pb BuildCharacterDetails(DatabaseManager.DbCharacter character)
-        {
-            var traits = Pb.New();
-
-            // The sex block is always there: empty for sex 0, carrying f3 for sex 1.
-            if (character.Sex != 0) traits.Msg(2, Pb.New().Var(3, character.Sex));
-            else traits.EmptyMsg(2);
-
-            // With the id, so that on the selection screen he comes out mounted if he is. Without it the
-            // mount was only known for the character already playing.
-            traits.Bytes(6, BreedLookTable.BuildLook(character));
-            traits.VarIfNotZero(7, character.Breed);
-
-            return Pb.New()
-                .Str(2, character.Name)
-                .VarIfNotZero(3, character.Level)
-                .Msg(4, traits);
-        }
 
         // ─── World: characteristics ─────────────────────────────────────────────
 

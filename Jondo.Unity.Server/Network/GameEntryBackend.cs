@@ -46,10 +46,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         => ConnectionProtocol.SendWelcomeAsync(session, characters, withList);
 
     public Task SendCharacterListAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withInitialization)
-        => withInitialization
-            ? ConnectionProtocol.SendCharacterListAsync(session, characters)
-            : GameEntryMessages.SendAsync(session,
-                ConnectionProtocol.Push(Op.Kvi, ConnectionProtocol.BuildCharactersList(characters)));
+        => CharacterListService.Live.SendAsync(session, characters, withInitialization);
 
     public DatabaseManager.DbCharacter? FindCharacter(long characterId)
         => DatabaseManager.GetCharacterById(characterId);

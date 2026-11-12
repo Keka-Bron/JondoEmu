@@ -44,8 +44,9 @@ namespace Jondo.Unity.Tests.Sessions
                 .Var(5, 42).VarIfNotZero(6, sex).Var(7, breed);
             try
             {
-                await CharacterCreationHandler.CreateAsync(pipe.ToClient,
-                    ConnectionProtocol.Push(Op.Kvz, Pb.New().Msg(1, creation).Build()), account, 290);
+                pipe.Session.BindAccount(account, 290);
+                await CharacterCreationHandler.CreateAsync(pipe.Session,
+                    ConnectionProtocol.Push(Op.Kvz, Pb.New().Msg(1, creation).Build()));
                 Assert.Empty(await pipe.Next(Op.Kvb));
                 for (int i = 0; i < 3; i++) await pipe.Next(Op.Kqp);
                 byte[] list = await pipe.Next(Op.Kvi);
@@ -179,7 +180,12 @@ namespace Jondo.Unity.Tests.Sessions
                 LookHex = Convert.ToHexString(Pb.New().Packed(1, Indexed).Var(2, 3).Var(3, 1).Build())
             };
             AssertLook(BreedLookTable.BuildLook(character), body, scale, headSkin);
-            AssertLook(At(ConnectionProtocol.BuildCharactersList(new[] { character }), 1, 1, 4, 6), body, scale, headSkin);
+            var listed = Assert.Single(CharacterListMessages.Live.Snapshot(new[] { character }).Characters);
+            var basic = Assert.IsType<CharacterComplementCaseCharacterBasicInformation>(listed.ComplementCase).Value;
+            var look = Assert.IsType<CharacterBasicInformationComplementCaseCharacterLook>(basic.ComplementCase).Value.Look;
+            Assert.Equal(Indexed.Select(value => (int)value), look.Colors);
+            Assert.Equal(new[] { (int)body, (int)headSkin }, look.Skins);
+            Assert.Equal(new[] { (int)scale }, look.Scales);
         }
 
         [Theory]

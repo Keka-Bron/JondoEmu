@@ -208,8 +208,8 @@ first-ping fallback. Subsequent pings only receive their pong and alteration tic
 Fight-map handling retains spectator, resume and preparation precedence and fight
 locks; roleplay map actors are never sent into an active fight. Map-information
 updates remain repeatable on travel. Initial and map sequences now construct their
-messages directly; remaining feature hooks and welcome/character packet builders
-still use compatibility paths.
+messages directly; remaining feature hooks, welcome settings and character-management
+requests/acknowledgments still use compatibility paths.
 
 ### HAAPI identity and gift continuation
 
@@ -237,9 +237,9 @@ not that text. See [the gift-field finding](populated-unmapped-fields.md#gift-de
 The character-list send and live gift refresh share this factory/source policy.
 Live refresh captures one account snapshot, encodes through each matching online
 recipient's codec, and preserves the existing log-and-continue behavior after a
-recipient delivery failure. Older synchronous welcome/character-list helpers encode
-the same semantic snapshot into their compatibility frame lists. `GiftHandler.BuildList`
-and its raw protobuf construction are removed.
+recipient delivery failure. Welcome and character-list delivery use the same live
+session-owned send path. `GiftHandler.BuildList` and its raw protobuf construction
+are removed.
 
 The historical entry JSON reconstruction, all three reference blocks and the
 `WorldEntryContent` loader have been deleted. Entry no longer loads a recording,
@@ -247,6 +247,43 @@ filters reference rows or learns metadata from captured entry packets.
 Focused semantic, independent protocol and framed storage tests cover identity
 lifetime/format, gift IDs/order/account isolation, empty refreshes, source and delivery
 failures, grant/claim behavior and the continuation's identity-before-gifts ordering.
+
+### Character-list snapshots and refreshes
+
+`CharacterListMessages` constructs `CharacterListEvent` directly from the queried
+account/server characters and `BreedLookTable.SemanticLook`, including recursive
+mount, rider, pet, aura and mutation appearance. It snapshots nested collections
+before delivery. Last-connection instants determine most-recent-first order;
+equal, invalid or missing dates retain source order. Both date strings remain empty
+in the list payload, matching the former list policy rather than selection success.
+Zero level remains absent, and the base-information block is present even for male
+gender's zero value. Unsupported stored genders fail instead of falling back to raw bytes.
+
+`CharacterListService` shares delivery across welcome, explicit list requests and
+creation/deletion refreshes. Ordinary delivery is three `QueueStatusEvent`s, then
+the list, then current gifts from the owning account. A resumable fight gets only
+the list here; `GameEntryService` sends `CharacterForceSelectionEvent` next.
+The caller's turn is reused, legacy appearance sources run under the explicit owner's
+context, and source/codec/transport failures stop the sequence without retries.
+List-source failure retains the already-sent queue prefix but never sends a partial list.
+
+Creation and deletion handlers now accept their owning session, which supplies account,
+server and refresh codec; their request parsing and acknowledgments remain legacy.
+`BuildCharactersList` and `BuildCharacterDetails` are removed. Welcome and list
+orchestration no longer expose byte-returning frame-list helpers or select a private
+codec; encoding and delivery belong to the owning session.
+Semantic tests use an opaque recording codec, and framed database tests match unique
+codec tokens to length-framed socket payloads while asserting queue/list/gift objects,
+newly-created-first and deletion-to-empty refreshes with an unrelated ambient session.
+Those refresh checks do not encode or decode protobuf. Independent legacy request/
+acknowledgment fixtures isolate the still-raw character-management boundary; populated
+encoding/presence checks belong in the Game protocol tests.
+
+Welcome regressions invoke `ConnectionProtocol.SendWelcomeAsync` with an opaque
+recording codec and inspect delivered semantic messages, including ordinary-login
+versus deferred-list order, creation rights and queue/list/gift adjacency. Only the
+remaining raw settings packet has byte-level assertions, captured from that same
+live sender rather than a second welcome builder.
 
 ### Initial character state
 
@@ -823,9 +860,9 @@ map-specific oneof; it differs from present-empty coordinates. No coordinates
 or special-map payload are invented for an ordinary map.
 
 `GameEntryMessages` is a transitional **lossless projection boundary**, not a
-replacement for the remaining builders. It handles remaining feature-hook payloads,
-character lists and the initial actor list; initial/map sequencers send semantic
-events directly.
+replacement for the remaining builders. It handles welcome settings, remaining
+feature-hook payloads and the initial actor list; character lists and initial/map
+sequencers send semantic events directly.
 For each mapped event it decodes the stable object, re-encodes it and compares the
 complete raw protobuf payload and envelope. Parsed-value comparison tolerates
 field order, packed lists and omitted scalar defaults, but preserves nested

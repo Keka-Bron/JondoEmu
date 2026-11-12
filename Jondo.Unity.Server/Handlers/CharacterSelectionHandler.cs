@@ -377,7 +377,7 @@ namespace Jondo.Unity.Server.Handlers
             return NetworkEnvelope.BuildGameNodePacket("type.ankama.com/ksq", ksqBytes);
         }
 
-        // The character list (kvi) is now built by ConnectionProtocol.BuildCharactersList.
+        // The character list (kvi) is now constructed by CharacterListMessages.
         // The version that used to live here could not work: it put the character id where the
         // level goes, the level inside the look block and the account id where the character id
         // goes, on top of wrapping the message in the wrong root field.

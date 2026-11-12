@@ -94,9 +94,11 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// The kvu: confirmed. Deletes, then sends the list as it now stands.
         /// </summary>
-        public static async Task<bool> DeleteAsync(NetworkStream stream, byte[] framePayload,
-                                                   long accountId, int serverId)
+        public static async Task<bool> DeleteAsync(GameSession session, byte[] framePayload)
         {
+            using var context = SessionContext.Push(session);
+            long accountId = session.AccountId;
+            int serverId = session.ServerId;
             long characterId = ReadCharacterId(framePayload);
 
             if (characterId <= 0)
@@ -124,8 +126,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
-            foreach (byte[] frame in ConnectionProtocol.CharacterListFrames(characters))
-                await GameEntryMessages.SendAsync(stream, frame);
+            await ConnectionProtocol.SendCharacterListAsync(session, characters);
 
             Console.WriteLine($"[Characters] Deleted {name} ({characterId}). " +
                               $"{characters.Count} left on server {serverId}.");
