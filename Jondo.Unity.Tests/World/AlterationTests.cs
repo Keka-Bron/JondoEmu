@@ -304,7 +304,8 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(new[] { (1723, 1) }, BonusItemHandler.GivenItems(new[] { Effect(193, 1723) }));
             Assert.Equal(new[] { (11693, 1) }, BonusItemHandler.GivenItems(new[] { Effect(209, 0, 1, 11693), Effect(981) }));
             Assert.Equal(new[] { (21627, 20) }, BonusItemHandler.GivenItems(new[] { Effect(209, 0, 20, 21627) }));
-            Assert.Null(BonusItemHandler.GivenItems(new[] { Effect(193, 2062), Effect(949, 0, 0, 1) }));
+            // A look potion's «Subir/Bajar de una montura» (949) only gets the rider off first.
+            Assert.Equal(new[] { (2062, 1) }, BonusItemHandler.GivenItems(new[] { Effect(193, 2062), Effect(949, 0, 0, 1) }));
             Assert.Null(BonusItemHandler.GivenItems(new[] { Effect(110, 30) }));
 
             // The precious ore shard on its way out of the sewers: the next shard and the quest's
