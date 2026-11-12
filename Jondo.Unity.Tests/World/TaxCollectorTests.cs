@@ -469,7 +469,7 @@ namespace Jondo.Unity.Tests.World
         public void A_fighter_of_the_list_is_the_fighter_variant()
         {
             byte[] look = { 0x0a, 0x01, 0x02 };
-            var (numbers, blocks) = Fields(TaxCollectorProtocol.Fighter(-40001, "78 241", 200, look, TaxCollectorProtocol.FighterListMarker).Build());
+            var (numbers, blocks) = Fields(TaxCollectorProtocol.Fighter(-40001, "78,241", 200, look, TaxCollectorProtocol.FighterListMarker).Build());
             Assert.Equal(-40001, numbers[2]);
             var (_, entry) = Fields(Assert.Single(blocks[1]));
             Assert.False(entry.ContainsKey(6));
@@ -477,6 +477,22 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(look, Assert.Single(fighter[6]));
             Assert.Equal(TaxCollectorProtocol.FighterListMarker, breed[7]);
         }
+
+        /// <summary>
+        /// A tax collector's name in the list is its two name ids in base 36 joined by a comma: the
+        /// client (ffc.bdjh) read «35,220» as 113 and 2664, names that do not exist, and drew no line.
+        /// </summary>
+        [Fact]
+        public void A_tax_collector_s_list_name_is_its_two_ids_in_base_36()
+        {
+            Assert.Equal("z,64", TaxCollectorProtocol.NameIds(35, 220));
+            Assert.Equal("10,0", TaxCollectorProtocol.NameIds(36, 0));
+            string name = TaxCollectorProtocol.NameIds(78, 241);
+            Assert.Equal(new long[] { 78, 241 }, name.Split(",").Select(p => Convert.ToInt64(FromBase36(p))));
+        }
+
+        private static long FromBase36(string text)
+            => text.Aggregate(0L, (n, c) => n * 36 + (char.IsDigit(c) ? c - '0' : c - 'a' + 10));
 
         /// <summary>
         /// A tax collector's end-of-fight entry is a monster's: no alliance in the f4 of the
