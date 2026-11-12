@@ -200,6 +200,26 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(FightInstance.JoinRefusal.None, fight.CanJoin(FightInstance.Rojos, 8));
         }
 
+        /// <summary>
+        /// The attacker's ready does not start it: the defenders have the whole placement to come.
+        /// Only the clock running out does.
+        /// </summary>
+        [Fact]
+        public void The_attackers_ready_waits_for_the_clock()
+        {
+            var fight = new FightInstance(1, 1, 1);
+            fight.GeneratePlacementCells(Enumerable.Range(200, 40).ToList());
+            fight.AddPlayer(new Fighter { Id = 10, MaxHP = 500, CurrentHP = 500 });
+            fight.AddMonster(new Fighter { Id = -1, IsMonster = true, MonsterId = TaxCollectorProtocol.Monster, MaxHP = 100, CurrentHP = 100 });
+            fight.DefendingAllianceId = 7;
+
+            Assert.False(fight.SetFighterReady(10));
+            Assert.Equal(FightState.Placement, fight.State);
+
+            Assert.True(fight.SetFighterReady(10, clockRanOut: true));
+            Assert.Equal(FightState.Ongoing, fight.State);
+        }
+
         // ─── The store ───────────────────────────────────────────────────────────
 
         /// <summary>One per map, found by its map, its uuid and its actor; gone with what it carried.</summary>
@@ -523,6 +543,41 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(entrance.SubAreaId, TaxCollectorHandler.GroupOf(room.MapId, room.SubAreaId));
             Assert.Equal(entrance.SubAreaId, TaxCollectorHandler.GroupOf(entrance.MapId, entrance.SubAreaId));
             Assert.Equal(5, TaxCollectorHandler.FightPeopleCap);
+        }
+
+        /// <summary>
+        /// Incarnam takes none: its subareas, levels 1 to 10, are inside the 20 potion's band
+        /// («Ox=10&amp;SL&lt;21»), so the potion's criterion alone let one stand there.
+        /// </summary>
+        [Fact]
+        public void Incarnam_takes_none()
+        {
+            const long IncarnamMap = 81527303, BontaSquare = 217318404;
+            int incarnam = DatabaseManager.SubAreaOfMap(IncarnamMap), bonta = DatabaseManager.SubAreaOfMap(BontaSquare);
+            if (incarnam == 0 || bonta == 0) return;   // no map subareas in the base
+            if (Interactives.AreaOfSubArea(incarnam) < 0) Interactives.Initialize();
+            Assert.Equal(45, Interactives.AreaOfSubArea(incarnam));
+
+            var alliance = AllianceStore.Create(990000052, "Incarnam", "INC", 1, 1, 1, 1, 1);
+            var there = new MapInfo { MapId = IncarnamMap, SubAreaId = incarnam, Outdoor = true };
+            Assert.Equal(TaxCollectorProtocol.ErrorCantHireHere, TaxCollectorHandler.WhyNotHere(alliance, 990000052, there, 0));
+            var elsewhere = new MapInfo { MapId = BontaSquare, SubAreaId = bonta, Outdoor = true };
+            Assert.Equal(-1, TaxCollectorHandler.WhyNotHere(alliance, 990000052, elsewhere, 0));
+        }
+
+        /// <summary>A zaap's map takes none: Astrub's, though it is outdoors.</summary>
+        [Fact]
+        public void A_zaap_map_takes_none()
+        {
+            const long AstrubZaap = 191105026;
+            int astrub = DatabaseManager.SubAreaOfMap(AstrubZaap);
+            if (astrub == 0) return;   // no map subareas in the base
+            if (Interactives.WaypointOf(AstrubZaap) == null) Interactives.Initialize();
+            if (Interactives.WaypointOf(AstrubZaap) == null) return;   // no waypoints.json
+
+            var alliance = AllianceStore.Create(990000053, "Zaaps", "ZAP", 1, 1, 1, 1, 1);
+            var zaap = new MapInfo { MapId = AstrubZaap, SubAreaId = astrub, Outdoor = true };
+            Assert.Equal(TaxCollectorProtocol.ErrorCantHireHere, TaxCollectorHandler.WhyNotHere(alliance, 990000053, zaap, 0));
         }
 
         /// <summary>

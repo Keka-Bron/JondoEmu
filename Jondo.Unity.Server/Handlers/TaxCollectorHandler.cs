@@ -49,6 +49,9 @@ namespace Jondo.Unity.Server.Handlers
         public const int FightPeopleCap = 5;
         private const int TooManyInZone = 168;
 
+        /// <summary>The area no tax collector stands in: Incarnam.</summary>
+        private const int IncarnamArea = 45;
+
         /// <summary>«Uno de tus recaudadores ha sido destruido.», info 0/1579, to whoever placed it.</summary>
         private const int OneOfYoursDestroyed = 1579;
 
@@ -117,13 +120,18 @@ namespace Jondo.Unity.Server.Handlers
         /// Dungeons take them: «Si se coloca a un recaudador en una mazmorra, solo se contarán los
         /// combates dentro de esa mazmorra» (1149321), and the hks of the temple's board carries ten
         /// in dungeons. Their rooms are almost all indoors (753 of 763), so they pass on their own.
+        /// Incarnam (area 45) takes none, though its subareas, levels 1 to 10, fall inside the
+        /// band of the 20 potion («Ox=10&amp;SL&lt;21»): nothing in the data keeps it out. Nor does
+        /// a zaap's map take one.
         /// </remarks>
         internal static int WhyNotHere(AllianceStore.Alliance alliance, long characterId, MapInfo map, int potion)
         {
             if (alliance == null || !AllianceStore.HasRight(characterId, AllianceData.PlaceTaxCollector))
                 return TaxCollectorProtocol.ErrorNoRights;
             if (map == null || map.SubAreaId <= 0 || (!map.Outdoor && !DungeonManager.IsRoom(map.MapId))
-                || Dreams.IsDreamMap(map.MapId) || GuildRaidManager.IsRaidMap(map.MapId))
+                || Dreams.IsDreamMap(map.MapId) || GuildRaidManager.IsRaidMap(map.MapId)
+                || Interactives.AreaOfSubArea(map.SubAreaId) == IncarnamArea
+                || Interactives.WaypointOf(map.MapId) != null)
                 return TaxCollectorProtocol.ErrorCantHireHere;
             if (!CriterionHolds(DatabaseManager.GetItemTemplateCriterion(potion), characterId,
                                 Interactives.LevelOfSubArea(map.SubAreaId)))

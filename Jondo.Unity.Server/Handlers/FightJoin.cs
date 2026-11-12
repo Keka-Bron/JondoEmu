@@ -1005,7 +1005,7 @@ namespace Jondo.Unity.Server.Handlers
             bool allReady = people.Count == 0 && fight.Todos.All(f => f.IsMonster || f.EsInvocado || f.IsReady);
             foreach (var person in people)
             {
-                allReady = fight.SetFighterReady(person.Id);
+                allReady = fight.SetFighterReady(person.Id, clockRanOut: true);
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kah,
                     Network.FightProtocol.BuildReadyAck(person.Id)));
             }
