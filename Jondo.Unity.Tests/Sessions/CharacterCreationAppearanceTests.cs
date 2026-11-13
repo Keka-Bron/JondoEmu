@@ -32,7 +32,8 @@ namespace Jondo.Unity.Tests.Sessions
             using var heads = JsonDocument.Parse(File.ReadAllText(Paths.HeadsJson));
             long headSkin = heads.RootElement.GetProperty("heads").GetProperty(head.ToString()).GetProperty("skin").GetInt64();
             void CheckLook(byte[] look) => AssertLook(look, body, scale, headSkin);
-            string name = "Palette-" + Guid.NewGuid().ToString("N");
+            // Unique, and within the client's naming rule (CharacterNames), which the server checks.
+            string name = "Palette-" + string.Concat(Guid.NewGuid().ToString("N")[..11].Select(c => (char)('a' + Convert.ToInt32(c.ToString(), 16))));
             var creation = Pb.New().Str(1, name).Var(2, head)
                 // The bytes are from the capture, independent of the server's colour writer.
                 .Bytes(3, Convert.FromHexString("EF969E068680A0078780E0078680CC06C7ACE5038680B406"))
