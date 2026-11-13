@@ -102,5 +102,25 @@ namespace Jondo.Unity.Tests.World
             Assert.False(MapGeometry.HasLineOfSight(275, far, cell => cell == middle));
             Assert.True(MapGeometry.HasLineOfSight(275, far, cell => cell != middle && cell != 275 && cell != far));
         }
+
+        /// <summary>
+        /// The sight line is the client's, cell for cell. From 235 to 246 it crosses 248, 234,
+        /// 247 and 233, so a fighter on any of them hides 246, as the client shows it; the old
+        /// walk kept sight whenever one cell beside the line was open, and a monster struck
+        /// through the fighter in front of its target.
+        /// </summary>
+        [Fact]
+        public void The_sight_line_is_the_clients()
+        {
+            Assert.Equal(new[] { 248, 234, 247, 233, 246 }, MapGeometry.SightLine(235, 246));
+            Assert.False(MapGeometry.HasLineOfSight(235, 246, cell => cell == 233));
+            Assert.False(MapGeometry.HasLineOfSight(235, 246, cell => cell == 248));
+            Assert.True(MapGeometry.HasLineOfSight(235, 246, cell => cell == 235 || cell == 246));
+
+            // Three across and one down: both axes are due at once halfway, and the line steps
+            // diagonally there instead of brushing a corner cell.
+            Assert.Equal(new[] { 249, 250, 265 }, MapGeometry.SightLine(235, 265));
+            Assert.Equal(new[] { 249, 263, 277, 292, 305, 320 }, MapGeometry.SightLine(235, 320));
+        }
     }
 }

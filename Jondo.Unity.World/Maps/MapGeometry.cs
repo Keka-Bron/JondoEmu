@@ -155,51 +155,75 @@ namespace Jondo.Unity.World.Maps
         {
             if (!IsValid(fromCell) || !IsValid(toCell) || fromCell == toCell) return true;
 
-            int x0 = PointX[fromCell], y0 = PointY[fromCell];
-            int x1 = PointX[toCell], y1 = PointY[toCell];
-
-            int dx = x1 - x0, dy = y1 - y0;
-            int steps = Math.Abs(dx) + Math.Abs(dy);
-            if (steps <= 1) return true;
-
-            // A perfect diagonal goes from corner to corner: the points between the cells on it
-            // are corners, and a corner never closes it, even with an obstacle on both sides. The
-            // client offers such a cell and the cast went out, but it was refused here: a Steamer
-            // at 275 could not reach 303, two cells away diagonally, between a crate (289) and a
-            // Feu Follet (290).
-            bool diagonal = Math.Abs(dx) == Math.Abs(dy);
-
-            // The segment is walked in `steps` sections and at every intermediate point we look
-            // at which cells touch it. When the point lands exactly on an edge or a corner there
-            // is more than one candidate, and it is enough for ONE of them to be clear: that way
-            // a row of obstacles blocks sight, but a lone obstacle does not close the gap beside
-            // it.
-            for (int i = 1; i < steps; i++)
+            // Every cell the line crosses before the target must be clear; the target itself
+            // never blocks (a fighter standing on it is what is being aimed at). A point of the
+            // line that falls outside the map has no cell and blocks nothing.
+            bool clear = true;
+            WalkSightLine(fromCell, toCell, cell =>
             {
-                double px = x0 + (double)dx * i / steps;
-                double py = y0 + (double)dy * i / steps;
+                if (cell == toCell) return false;
+                if (cell >= 0 && opaque(cell)) { clear = false; return false; }
+                return true;
+            });
+            return clear;
+        }
 
-                int fx = (int)Math.Floor(px), cx = (int)Math.Ceiling(px);
-                int fy = (int)Math.Floor(py), cy = (int)Math.Ceiling(py);
-                if (diagonal && fx != cx && fy != cy) continue;
+        /// <summary>
+        /// The cells the client's sight line crosses from one cell to another, in order and with
+        /// the target last; -1 for a point outside the map. See <see cref="WalkSightLine"/>.
+        /// </summary>
+        public static List<int> SightLine(int fromCell, int toCell)
+        {
+            var line = new List<int>();
+            if (!IsValid(fromCell) || !IsValid(toCell) || fromCell == toCell) return line;
+            WalkSightLine(fromCell, toCell, cell => { line.Add(cell); return true; });
+            return line;
+        }
 
-                bool anyOpen = false;
-                bool anyCell = false;
-                foreach (int gx in (fx == cx) ? new[] { fx } : new[] { fx, cx })
+        /// <summary>
+        /// The client's own sight line, step for step (oh.owy in the 3.6 client; the fight's
+        /// sight test, enq.babb, then asks every cell of it but the last whether something stands
+        /// on it or the map closes it). It is a grid traversal in single precision over the
+        /// cells' (x, y) points: each axis is due again every |1 / direction| along the line,
+        /// starting half a step in; the axis due first moves, and when both are due at once
+        /// (within 0.0001) the line steps diagonally, so it never squeezes between two cells
+        /// that only touch at a corner -- an exact diagonal crosses only the cells on it.
+        ///
+        /// It has to be this walk and no other: a laxer one let the server cast at cells the
+        /// client shows as out of sight (a monster's blow through a wall, or through the fighter
+        /// standing in front of its target), and a stricter one would refuse casts the client
+        /// offers.
+        /// </summary>
+        private static void WalkSightLine(int fromCell, int toCell, Func<int, bool> visit)
+        {
+            int x = PointX[fromCell], y = PointY[fromCell];
+            int x1 = PointX[toCell], y1 = PointY[toCell];
+            int dx = x1 - x, dy = y1 - y;
+
+            float length = MathF.Sqrt(dx * dx + dy * dy);
+            float ux = dx / length, uy = dy / length;
+            float deltaX = Math.Abs(1f / ux), deltaY = Math.Abs(1f / uy);
+            int stepX = ux < 0 ? -1 : 1, stepY = uy < 0 ? -1 : 1;
+            float dueX = deltaX * 0.5f, dueY = deltaY * 0.5f;
+
+            for (int guard = 0; guard < 4 * MaxCells && (x != x1 || y != y1); guard++)
+            {
+                if (Math.Abs(dueX - dueY) < 0.0001)
                 {
-                    foreach (int gy in (fy == cy) ? new[] { fy } : new[] { fy, cy })
-                    {
-                        int cell = PointToCell(gx, gy);
-                        if (cell < 0 || cell == fromCell || cell == toCell) continue;
-                        anyCell = true;
-                        if (!opaque(cell)) anyOpen = true;
-                    }
+                    dueX += deltaX; x += stepX;
+                    dueY += deltaY; y += stepY;
+                }
+                else if (dueY <= dueX)
+                {
+                    dueY += deltaY; y += stepY;
+                }
+                else
+                {
+                    dueX += deltaX; x += stepX;
                 }
 
-                if (anyCell && !anyOpen) return false;
+                if (!visit(PointToCell(x, y))) return;
             }
-
-            return true;
         }
 
         public static List<int> FindShortestPath(int startCell, int targetCell, HashSet<int> walkableCells = null, HashSet<int> occupiedCells = null)
