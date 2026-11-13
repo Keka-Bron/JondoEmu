@@ -3327,7 +3327,12 @@ namespace Jondo.Unity.Server
         /// </summary>
         public static bool InsertCharacterItem(long uid, long characterId, int gid, int quantity,
                                                int position, string? effects)
+            => TryInsertCharacterItem(uid, characterId, gid, quantity, position, effects, out _);
+
+        private static bool TryInsertCharacterItem(long uid, long characterId, int gid, int quantity,
+                                                   int position, string? effects, out bool uidTaken)
         {
+            uidTaken = false;
             try
             {
                 using var connection = new SqliteConnection(WorldConnectionString);
@@ -3346,11 +3351,45 @@ namespace Jondo.Unity.Server
                 command.ExecuteNonQuery();
                 return true;
             }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == UniqueConstraint && ex.Message.Contains("CharacterItems.Uid"))
+            {
+                uidTaken = true;
+                Console.WriteLine($"[SQLite] Could not create item {uid}: the uid is already taken.");
+                return false;
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"[SQLite] Could not create item {uid}: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>SQLite's error 19, a constraint: here, a uid already in CharacterItems.</summary>
+        private const int UniqueConstraint = 19;
+
+        /// <summary>
+        /// A new item into somebody's inventory, with a uid of its own: the uid it got, or zero
+        /// when it could not be written.
+        /// </summary>
+        /// <remarks>
+        /// The uids come from a counter read once, at the first one, from the highest uid in
+        /// CharacterItems (<see cref="NextItemUid"/>): it holds while this server is the only one
+        /// writing there. When another writes too -- a second process on the same base, a test run
+        /// pointed at it, a base restored under the server's feet -- the counter hands out a uid
+        /// already taken. The insert was refused and the item lost without a word: a dropped hat
+        /// never reached the bag, and the loot's log still said «added to the inventory». The
+        /// counter is now set above the highest uid in the base again, and the insert tried once more.
+        /// </remarks>
+        public static long InsertNewCharacterItem(long characterId, int gid, int quantity, int position, string? effects)
+        {
+            long uid = NextItemUid();
+            if (TryInsertCharacterItem(uid, characterId, gid, quantity, position, effects, out bool uidTaken)) return uid;
+            if (!uidTaken) return 0;
+
+            KeepUidsAbove(MayorUidEnUso());
+            uid = NextItemUid();
+            Console.WriteLine($"[SQLite] Item uids set above the base's highest again; item {gid} tried as {uid}.");
+            return TryInsertCharacterItem(uid, characterId, gid, quantity, position, effects, out _) ? uid : 0;
         }
 
         /// <summary>
@@ -5837,14 +5876,22 @@ namespace Jondo.Unity.Server
                     continue;
                 }
 
+                // A new stack is INSERTED, not saved: SaveInventoryItem's ON CONFLICT on a uid that
+                // is another character's writes nothing and says nothing, and the client was then
+                // told about an item that was not there (InsertNewCharacterItem).
+                long uid = InsertNewCharacterItem(characterId, kv.Key, kv.Value, 63, "[]");
+                if (uid == 0)
+                {
+                    Console.WriteLine($"[SQLite] Item {kv.Key} x{kv.Value} could not be put in the inventory of {characterId}.");
+                    continue;
+                }
                 var nuevo = new PlayerItem
                 {
-                    Uid = NextItemUid(),
+                    Uid = uid,
                     ItemId = kv.Key,
                     Quantity = kv.Value,
                     Position = 63
                 };
-                SaveInventoryItem(characterId, nuevo);
 
                 // To the list in memory as well: if the same loot brings the same item twice -- it does
                 // not happen today, but the dictionary does not prevent it -- the second has to stack on
@@ -5865,8 +5912,8 @@ namespace Jondo.Unity.Server
         /// </summary>
         public static PlayerItem AddPieceToInventory(long characterId, int gid, string effects)
         {
-            long uid = NextItemUid();
-            if (!InsertCharacterItem(uid, characterId, gid, 1, 63, effects)) return null;
+            long uid = InsertNewCharacterItem(characterId, gid, 1, 63, effects);
+            if (uid == 0) return null;
             return new PlayerItem { Uid = uid, ItemId = gid, Quantity = 1, Position = 63, RawEffects = effects };
         }
 

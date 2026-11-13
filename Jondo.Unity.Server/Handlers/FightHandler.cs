@@ -12768,8 +12768,19 @@ namespace Jondo.Unity.Server.Handlers
             }
             caidos = DatabaseManager.AddItemsToInventory(GameState.CharacterId, stacked);
             caidos.AddRange(pieces);
+            // Only what reached the bag: an item the base refused is not «added», and said so.
+            var llegaron = caidos.GroupBy(p => p.ItemId).ToDictionary(g => g.Key, g => g.Count());
             foreach (var kv in loot)
-                Program.LogDebug($"[FightHandler] Loot: item {kv.Key} x{kv.Value} added to the inventory.");
+            {
+                bool llego = stacked.ContainsKey(kv.Key)
+                    ? llegaron.ContainsKey(kv.Key)
+                    : llegaron.TryGetValue(kv.Key, out int piezas) && piezas >= kv.Value;
+                if (llego)
+                    Program.LogDebug($"[FightHandler] Loot: item {kv.Key} x{kv.Value} added to the inventory.");
+                else
+                    Console.WriteLine($"[FightHandler] Loot: item {kv.Key} x{kv.Value} could NOT be put in the inventory " +
+                                      $"of {GameState.CharacterId}.");
+            }
 
             if (loot.Count == 0) return;
 
