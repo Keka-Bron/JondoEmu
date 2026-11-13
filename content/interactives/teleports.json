@@ -167,9 +167,24 @@
     "upper right to the room on the right, lower right to the one below, lower left to the left, upper",
     "left to the one above --, round the other side at the grid's edge, as the old library's rooms",
     "led on. That way 46 of the 55 arches have the arch back in the room they lead to, and the player",
-    "lands by it; the other nine land inside that side of the room."
+    "lands by it; the other nine land inside that side of the room.",
+    "",
+    "THE GIANT KRALAMOURE'S LAIR. Its gate on [-60,-8] (162056, element 453562 on cell 317) is the way into",
+    "the first room, 26738688, and lets through only while its plate has opened it (content/maps/gates.json,",
+    "PlateGates.MayPass). The landing cell 478 is INFERRED: the walkable cell nearest to the 518 the Stasis",
+    "client's dungeon data gives as the lair's entrance cell, which this client's map does not walk."
   ],
   "passages": [
+    {
+      "map": 162056,
+      "element": 453562,
+      "cell": 317,
+      "gfx": 849,
+      "type": -1,
+      "skill": 184,
+      "toMap": 26738688,
+      "toCell": 478
+    },
     {
       "map": 238551040,
       "element": 539699,

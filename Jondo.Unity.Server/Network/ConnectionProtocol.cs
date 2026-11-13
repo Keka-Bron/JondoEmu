@@ -1378,8 +1378,9 @@ namespace Jondo.Unity.Server.Network
             }
             // The abyssal base's lights and doors: lit or open as they stand on the map.
             // Without its placement the client does not draw them at all.
-            // A plate gate's own elements, open or shut (Managers.PlateGates): not drawn without it either.
-            if (interactive.Actions.Count == 0 && Managers.PlateGates.IsGateElement(interactive.MapId, interactive.Element.Id))
+            // A plate gate's own elements, open or shut (Managers.PlateGates): not drawn without it either,
+            // also when the gate is itself a passage (the Kralamoure's lair).
+            if (Managers.PlateGates.IsGateElement(interactive.MapId, interactive.Element.Id))
             {
                 DeclarePlacement(jss, interactive.Element,
                     (Managers.ResourceState)Managers.PlateGates.StateOf(interactive.MapId));
