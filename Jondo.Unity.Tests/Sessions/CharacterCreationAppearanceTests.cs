@@ -27,7 +27,10 @@ namespace Jondo.Unity.Tests.Sessions
         {
             if (!File.Exists(Paths.WorldDb)) return;
             long account = 8_919_000_001 + breed * 2 + sex;
-            await using var pipe = await ClientPipe.OpenAsync(account, account + 100_000, CharacterCreationHandler.StartingMap);
+            // Creation does not look at the session's map, and the starting map is where other tests
+            // run fights whose kmu goes to everyone on it: one landing between kvb and kqp failed this.
+            long quietMap = 990_000_000 + breed * 2 + sex;
+            await using var pipe = await ClientPipe.OpenAsync(account, account + 100_000, quietMap);
             using var scope = SessionContext.Push(pipe.Session);
             using var heads = JsonDocument.Parse(File.ReadAllText(Paths.HeadsJson));
             long headSkin = heads.RootElement.GetProperty("heads").GetProperty(head.ToString()).GetProperty("skin").GetInt64();
