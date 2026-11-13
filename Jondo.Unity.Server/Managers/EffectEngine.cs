@@ -3046,8 +3046,15 @@ namespace Jondo.Unity.Server.Managers
 
                     // Effondrement's point sub-cast is still announced on an empty aimed cell
                     // (packet 64). Do not turn a target/template requirement into an empty-cell cast.
+                    // Nor is a cell emptied by this very cast left without its sub-cast: the
+                    // Sadida's Ronce kills the infected enemy it is aimed at with its blow, and its
+                    // 2960 that hits «every infected enemy as well» found nobody alive on the cell
+                    // and hit none of them.
+                    bool emptiedByTheCast = aimedCell >= 0
+                        && Todos(combat).Any(f => f != null && !f.IsAlive && f.CellId == aimedCell)
+                        && !Todos(combat).Any(f => f != null && f.IsAlive && f.CellId == aimedCell);
                     if (candidatos.Count == 0 && efecto.EffectId == 2960 && aimedCell >= 0
-                        && ForgelanceCombat.IsActor(combat, caster)
+                        && (ForgelanceCombat.IsActor(combat, caster) || emptiedByTheCast)
                         && CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar)
                         && efecto.TargetMask.Split(',').All(t => t is "a" or "A" || t.StartsWith("*")))
                         candidatos.Add(caster);
@@ -5794,9 +5801,21 @@ namespace Jondo.Unity.Server.Managers
             for (int i = 0; i < rows.Count && firstBlow < 0; i++)
                 if (EsDeDano(rows[i].EffectId) && IsImmediate(rows[i])) firstBlow = i;
             for (int i = 0; i < firstBlow; i++)
-                if (RaisesTheSpell(spell, rows[i], 0)) ahead.Add(rows[i]);
+                if (RaisesTheSpell(spell, rows[i], 0) || SetsUpWithoutMoving(rows[i])) ahead.Add(rows[i]);
             return ahead;
         }
+
+        /// <summary>
+        /// An immediate row written ahead of the blows that moves nobody, by itself or by what it
+        /// casts: a state, a mark, a sub-cast. Resolved after the blows it was lost whenever they
+        /// killed the target. The Sadida's Ronce infects its target and marks it and its caster
+        /// (29615, states 263, 5409, 6244) before it hits, and its last row hits «every infected
+        /// enemy as well» only for a caster so marked: on a kill, the marks never came and no other
+        /// infected enemy was hit. Moving nobody, going first changes nothing of who the blows land on.
+        /// </summary>
+        private static bool SetsUpWithoutMoving(SpellEffect row)
+            => IsImmediate(row) && !EsDeDano(row.EffectId)
+               && !MonsterTactics.Spell.MovesByRows(new[] { row }, 0);
 
         private static bool IsImmediate(SpellEffect row)
             => row.Delay <= 0

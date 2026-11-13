@@ -113,7 +113,7 @@ namespace Jondo.Unity.Server.Managers
 
             private bool? _moves;
 
-            private static bool MovesByRows(IEnumerable<SpellEffect> rows, int depth)
+            internal static bool MovesByRows(IEnumerable<SpellEffect> rows, int depth)
                 => rows.Any(r => !r.ForClientOnly
                                  && (Moving.Contains(r.EffectId) || Returning.Contains(r.EffectId)
                                      || (depth < SubCastDepth && EffectEngine.EsDeLaFamiliaDeSublanzar(r.EffectId) && r.DiceNum > 0
