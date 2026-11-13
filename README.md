@@ -7,13 +7,22 @@ High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** writte
 
 ## 🧙 Class spells: debug status
 
-Every class spell is tried in real fights with the game client: alone against Puchs, in 2v2 and 3v3
-team fights against bots of every class, and in scenarios that replay each class mechanic from its
-in-game sheet. A spell passes when every effect it declares shows on the board. Each summon is
-brought out too: it must take its own turn (or none, if it is static) and its spells must pass.
+Every class spell is tried by an automated harness in real fights with the game client: alone
+against Puchs, in 2v2 and 3v3 team fights against bots of every class, and in scenarios that replay
+each class mechanic from its in-game sheet. A spell passes when every effect it declares shows on
+the board. Each summon is brought out too: it must take its own turn (or none, if it is static) and
+its spells must pass.
+
+> ⚠️ **These are automated checks, not finished classes.** They do not see which element a spell
+> picks, how many times a turn it is cast, who controls a summon and from when, a turn that cannot
+> be passed, what the client previews or draws, or a cast refused on a cell the client offers.
+> Playing the Foggernaut by hand turned up several such bugs
+> ([#100](https://github.com/Keka-Bron/JondoEmu/issues/100)). Every class is now being played by
+> hand in the client, its summons and signature mechanics first; until a class has been, its 100%
+> only means its automated checks pass.
 
 <!-- class-status:start -->
-| Class | Debug level | Spells passing | Mechanic checks | Summons: own turn | Summons' spells |
+| Class | Automated checks | Spells passing | Mechanic checks | Summons: own turn | Summons' spells |
 |---|:---|:---:|:---:|:---:|:---:|
 | Feca | `██████████` **100%** | 44/44 | 23/23 | 4/4 | — |
 | Osamodas | `██████████` **100%** | 44/44 | 8/8 | 14/14 | 34/34 |
