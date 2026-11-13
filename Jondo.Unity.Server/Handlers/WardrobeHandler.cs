@@ -50,10 +50,9 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            long characterId = SessionContext.State.CharacterId;
-            if (!Titles.HasTitle(title) || (title != Wardrobe.None && Titles.Knows(characterId, title) != true))
+            if (!Titles.HasTitle(title))
             {
-                Console.WriteLine($"[Appearances] Title {title} is not known by character {characterId}.");
+                Console.WriteLine($"[Appearances] Title {title} is not in the catalogue.");
                 return;
             }
 
@@ -140,7 +139,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Hhy, ConnectionProtocol.BuildTitlesOwned(
-                    Titles.OwnedBy(SessionContext.State.CharacterId), Titles.AllOrnaments)));
+                    Titles.All, Titles.AllOrnaments)));
 
             // The account's cosmetics collection, which the capture sends right before the sets.
             await CosmeticCollectionHandler.SendAsync(stream, accountId);
@@ -160,7 +159,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await AnnounceAsync(stream, accountId);
 
-            Console.WriteLine($"[Appearances] {Titles.OwnedBy(SessionContext.State.CharacterId).Count} titles and " +
+            Console.WriteLine($"[Appearances] {Titles.All.Count} titles and " +
                               $"{Titles.AllOrnaments.Count} ornaments offered.");
         }
     }

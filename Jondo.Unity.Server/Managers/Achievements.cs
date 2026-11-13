@@ -282,6 +282,15 @@ namespace Jondo.Unity.Server.Managers
             candidates.AddRange(book.WaitingOn("Pm", mapId));
             candidates.AddRange(book.WaitingOn("PO"));
 
+            // A map some achievement asks to have been on (BI): Incarnam's «A lo largo y a lo
+            // ancho», 421 objectives. Only those maps are written down, once.
+            var onTheMap = book.WaitingOn(VisitedKind, mapId);
+            if (onTheMap.Count > 0 && Tally(VisitedKind, mapId) == 0)
+            {
+                SetTally(VisitedKind, mapId, 1);
+                candidates.AddRange(onTheMap);
+            }
+
             // And whatever the last fight set aside.
             candidates.AddRange(state.AchievementsPending);
             state.AchievementsPending.Clear();
@@ -466,6 +475,9 @@ namespace Jondo.Unity.Server.Managers
             return guild != null && hall != null && GuildHalls.ChoiceOf(guild.Id)?.HallId == hall.Id;
         }
 
+        /// <summary>A map been on, by its id: <c>BI=85983744</c>.</summary>
+        private const string VisitedKind = "BI";
+
         /// <summary>A year in minutes: how long every account has been subscribed, for OV.</summary>
         private const long SubscribedMinutes = 365L * 24 * 60;
 
@@ -620,7 +632,8 @@ namespace Jondo.Unity.Server.Managers
         /// gained (kuf), the items, the emotes (khi), and last the mfs that says it is paid. The
         /// numbers come from <see cref="AchievementLog.Payout"/>, which is the client's own formula.
         ///
-        /// Title rewards become known to the character when claimed.
+        /// Every character is offered all 539 titles and 167 ornaments already (see Titles); the
+        /// titles a claim pays are written down for the character as well.
         /// </remarks>
         public static async Task ClaimAsync(NetworkStream stream, int achievementId)
         {
@@ -804,7 +817,7 @@ namespace Jondo.Unity.Server.Managers
                 "EM" => Tally(flag == "d" ? DungeonKind : "EM", key),
                 "Ef" => Tally("Ef", key),
                 "EH" => S.ChallengesDone.Contains((int)key) ? 1 : 0,
-                "EB" or "HD" or "NC" or "EI" or "Eu" or "EJ" => Tally(op, key),
+                "EB" or "HD" or "NC" or "EI" or "Eu" or "EJ" or VisitedKind => Tally(op, key),
                 _ when FromIntensity.Contains(op) => AtIntensityOrHarder(op, key),
                 "EC" => Tally(AchievementCatalogue.CraftKey, 0),
                 "ES" => Tally(AchievementCatalogue.ExploreKey, key),

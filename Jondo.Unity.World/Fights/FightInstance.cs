@@ -25,8 +25,12 @@ namespace Jondo.Unity.World.Fights
         /// </remarks>
         public FightRules Reglas { get; set; } = FightRules.ContraMonstruos;
 
-        /// <summary>Whether this monster fight began from a soul stone, or null when its origin is unknown.</summary>
-        public bool? SoulStoneFight { get; set; }
+        /// <summary>
+        /// Whether this monster fight began from a soul stone, or null when its origin is unknown.
+        /// No fight here starts from a soul stone yet, so every fight is a plain one unless told
+        /// otherwise: left null, the 1,629 loot rows that ask «Ms=0» would never drop.
+        /// </summary>
+        public bool? SoulStoneFight { get; set; } = false;
 
         /// <summary>Whether there are people opposite and not monsters. The same IsDuel said.</summary>
         public bool EsPvp => !Reglas.EnfrenteHayMonstruos;

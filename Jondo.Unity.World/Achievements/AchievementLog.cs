@@ -114,10 +114,7 @@ namespace Jondo.Unity.World.Achievements
             if (Has(objective.AchievementId)) return Answer.True;
 
             var facts = Facts();
-            // Use the full expression whenever it contains BI, so normal operators and OR
-            // branches retain their meaning. A linked progress shortcut must not replace it.
-            bool hasBi = HasBi(objective.Criterion);
-            if (objective.Link != null && !hasBi) return StateOf(objective.Link, facts);
+            if (objective.Link != null) return StateOf(objective.Link, facts);
             if (objective.Criterion.Length == 0) return Answer.Unknown;
 
             return Criterion.Evaluate(objective.Criterion, condition => JudgeOne(condition, facts));
@@ -273,15 +270,12 @@ namespace Jondo.Unity.World.Achievements
         /// </remarks>
         private bool Holds(AchievementObjective objective, IQuestFacts facts)
         {
-            if (objective.Link != null && !HasBi(objective.Criterion)) return Holds(objective.Link, facts);
+            if (objective.Link != null) return Holds(objective.Link, facts);
             if (objective.Criterion.Length == 0) return false;
 
             return Criterion.Evaluate(objective.Criterion, condition => JudgeOne(condition, facts))
                    == Content.Answer.True;
         }
-
-        private static bool HasBi(string criterion)
-            => QuestCriterion.Terms(criterion).Any(term => term.Op == "BI");
 
         /// <summary>One term, judged by the same reader the quests use, with a third answer for "cannot say".</summary>
         private static Answer JudgeOne(Condition condition, IQuestFacts facts)

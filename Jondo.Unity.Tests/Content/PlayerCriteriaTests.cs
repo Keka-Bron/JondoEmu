@@ -179,7 +179,7 @@ namespace Jondo.Unity.Tests.Content
         }
 
         /// <summary>
-        /// Mt is about the originating dungeon room; Ms is about a soul-stone fight in a city arena.
+        /// Mt is about the monster that drops; Ms is about a soul-stone fight in a city arena.
         /// </summary>
         [Fact]
         public void Ms_requires_fight_source_and_checks_the_Bonta_or_Brakmar_arena()
@@ -227,22 +227,21 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
-        public void Mt_uses_dungeon_membership_of_the_origin_map_not_the_monster_boss_flag()
+        public void Mt_is_whether_the_monster_that_drops_is_a_boss()
         {
-            if (!File.Exists(Paths.DungeonsJson)) return;
+            // The boss flag of the monster's template: the Lord Crow (289) has it, a tofu (98) not.
+            if (!Jondo.Unity.Server.Managers.Dreams.IsBoss(289)) return;   // no monster data here
 
-            DungeonManager.Initialize();
-            var dungeon = DungeonManager.All.Values.FirstOrDefault(d => d.Rooms.Count > 0
-                && d.EntranceMapId != 0 && DungeonManager.OfRoom(d.EntranceMapId) == null);
-            if (dungeon == null || !DungeonManager.IsLoaded) return;
+            var boss = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, MonsterId: 289);
+            Assert.True(Met("Mt=1", boss));
+            Assert.False(Met("Mt=0", boss));
 
-            var room = new PlayerCriteria.Facts(null, null, null, dungeon.Rooms[0], _ => 0, MonsterId: 98);
-            Assert.True(Met("Mt=1", room));
-            Assert.False(Met("Mt=0", room));
+            var tofu = boss with { MonsterId = 98 };
+            Assert.True(Met("Mt=0", tofu));
+            Assert.False(Met("Mt=1", tofu));
 
-            var entrance = room with { MapId = dungeon.EntranceMapId };
-            Assert.True(Met("Mt=0", entrance));
-            Assert.False(Met("Mt=1", entrance));
+            // Without a monster there is nothing to say.
+            Assert.Equal(Answer.Unknown, PlayerCriteria.Resolve(new Condition("Mt", '=', ["1"]), boss with { MonsterId = 0 }));
         }
 
         /// <summary>
@@ -277,10 +276,11 @@ namespace Jondo.Unity.Tests.Content
                 var netHolder = facts with { Held = item => item == 21172 ? 1 : 0 };
                 Assert.True(Met(pollen, netHolder));
 
-                // Sc is intentionally ignored for player drops, including known seasonal IDs.
-                Assert.False(Met("Sc=3049&Mt=1&PO!30414", facts with { MonsterId = 3618 }));
-                Assert.True(Met("Sc!629&PL>0&PL<91", facts));
-                Assert.True(Met("Sc=967", facts));
+                // Sc only where its meaning is known: Halouine (967) is a yearly event, judged by the
+                // calendar; an id nobody knows keeps its rows from dropping.
+                bool halouine = SeasonalEvents.IsOn(967, Almanax.Clock());
+                Assert.Equal(halouine, Met("Sc=967", facts));
+                Assert.Equal(!halouine, Met("Sc!967", facts));
 
                 session.State.CharacterLevel = 60;
                 Assert.False(Met("(SC!5|ST!5)&PL>0&PL<59", facts));
@@ -291,14 +291,12 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
-        public void Sc_is_unconditionally_met_for_player_drops_even_for_unknown_ids()
+        public void Sc_with_an_unknown_id_is_unknown_either_way()
         {
             var noCharacter = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
 
-            Assert.Equal(Answer.True, Criterion.Evaluate("Sc=18", condition => PlayerCriteria.Resolve(condition, noCharacter)));
-            Assert.Equal(Answer.True, Criterion.Evaluate("Sc!18", condition => PlayerCriteria.Resolve(condition, noCharacter)));
-            Assert.Equal(Answer.True, Criterion.Evaluate("Sc=987654321", condition => PlayerCriteria.Resolve(condition, noCharacter)));
-            Assert.Equal(Answer.True, Criterion.Evaluate("Sc!987654321", condition => PlayerCriteria.Resolve(condition, noCharacter)));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Sc=987654321", condition => PlayerCriteria.Resolve(condition, noCharacter)));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Sc!987654321", condition => PlayerCriteria.Resolve(condition, noCharacter)));
         }
 
         [Fact]

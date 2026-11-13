@@ -28,13 +28,11 @@ namespace Jondo.Unity.Server.Managers
     /// In a drop, Qo asks about the objectives still to do in the quests' current steps: «Qo=14179»
     /// is «kill ten larvae» pending, and «Qo&gt;4096&amp;Qo&lt;4098» is objective 4097 among those pending
     /// -- step 1237's objectives run 4074 to 4103. INFERRED, as the order of an objective's ids.
-    /// Mt is about the fight's originating map and Ms about fight context (see Resolve); Sc is
-    /// intentionally treated as met in player drops while its odd, currently unexplained disabled
-    /// behavior is unresolved. The character's other
-    /// letters -- the server's type and season, the date, the days an item has been held -- are
-    /// asked of the achievement engine (ByCharacter). What nobody answers -- Sv, OO, Ot… the
-    /// server's own letters -- leaves
-    /// the row Unknown, and an Unknown row does not drop: «never dropping them is preferable to
+    /// Mt is about the monster that drops and Ms about the fight's source (see Resolve); Sc, the
+    /// yearly events and content switches, only where its meaning is known (SeasonalEvents.IsKnown).
+    /// The character's other letters -- the server's type and season, the date, the days an item
+    /// has been held -- are asked of the achievement engine (ByCharacter). What nobody answers --
+    /// Sv, the server's own letters, and the Sc only the loot carries -- leaves the row Unknown, and an Unknown row does not drop: «never dropping them is preferable to
     /// always dropping them» still holds for them.
     /// </para>
     /// <para>
@@ -226,13 +224,14 @@ namespace Jondo.Unity.Server.Managers
 
                 case "HA":
                     return facts.State == null ? Answer.Unknown : Truth(Alterations.Has(facts.State.CharacterId, (int)value), op);
-                // Mt asks whether this fight began on a dungeon room map; the monster's boss flag
-                // does not determine it. A missing origin map or unloaded dungeon catalogue leaves
-                // it unknown. Ms is resolved from fight type separately.
+                // Ga: whether the player is alive at the end of the fight.
                 case "Ga": return facts.PlayerAlive.HasValue ? Compare(facts.PlayerAlive.Value ? 1 : 0, op, value) : Answer.Unknown;
-                case "Mt": return facts.MapId == 0 || !DungeonManager.IsLoaded
-                    ? Answer.Unknown
-                    : Compare(DungeonManager.OfRoom(facts.MapId) != null ? 1 : 0, op, value);
+                // Mt is whether the monster that drops is a boss -- the value-4 bit of his m_flags
+                // (Dreams.IsBoss). Of the 1,308 rows that ask «Mt=1», 1,268 are dungeon bosses' and
+                // 33 more are bosses fought outside any dungeon (Grozilla, Demoloch...); of the 496
+                // «Mt=0», 495 are monsters that are not bosses (the treasure maps' pieces). Read as
+                // "the fight began in a dungeon room", those 33 bosses' loot would never drop.
+                case "Mt": return facts.MonsterId == 0 ? Answer.Unknown : Compare(Dreams.IsBoss(facts.MonsterId) ? 1 : 0, op, value);
                 // Ss asks whether this monster is currently alive in the specified subarea.
                 // Its two arguments identify the monster and subarea; the operator negates or
                 // asserts live presence. Spawn catalog possibilities are not live presence.
@@ -270,9 +269,16 @@ namespace Jondo.Unity.Server.Managers
                 // it Unknown until both are authoritative.
                 case "Sv": return Answer.Unknown;
 
-                // TODO: Sc appears disabled and is still unexplained; this odd unconditional pass is
-                // intentional in player drop criteria for now so Sc never blocks an affected drop.
-                case "Sc": return Answer.True;
+                // A yearly event or a content switch, the client's StaticCriterion, which only the
+                // real server judges: answered only where its meaning is known (SeasonalEvents.IsKnown),
+                // the events by their dates and the switches the quests carry as on. The loot's own
+                // stay unknown, and a met answer must still respect the operator: the bosses' shields'
+                // «Sc=3049&Mt=1&PO!30414», each watched by an invisible «[!] DR» marker the real
+                // server hands out with it, would otherwise drop at 100 % on every win; «Sc=947» is
+                // the kings' cake, a January event; «Sc!629» guards the 3,854 global rows of
+                // equipment (976 items) off every monster.
+                case "Sc":
+                    return SeasonalEvents.IsKnown((int)value) ? Truth(SeasonalEvents.IsOn((int)value, Almanax.Clock()), op) : Answer.Unknown;
 
                 default: return ByCharacter(condition, facts);
             }

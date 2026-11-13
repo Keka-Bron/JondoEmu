@@ -32,7 +32,7 @@ namespace Jondo.Unity.Tests.Content
             => Criterion.Met(criterion, condition => PlayerCriteria.Resolve(condition, facts));
 
         [Fact]
-        public void The_achievement_cannot_be_held_when_its_BI_objective_is_unmet()
+        public void A_BI_objective_with_an_authored_criterion_is_judged_by_it()
         {
             if (!File.Exists(Paths.AchievementsJson) || !File.Exists(Paths.QuestsJson)
                 || !File.Exists(Paths.AchievementLinksJson)) return;
@@ -40,10 +40,10 @@ namespace Jondo.Unity.Tests.Content
             var facts = new PlayerFacts { AssumeEverythingElse = true };
             var book = new AchievementCatalogue();
             var log = new AchievementLog(book, facts);
-            Assert.Equal(Answer.False, log.ObjectiveState(17380));
-            // The other tutorial objectives' quest facts and tallies all read as satisfied.
-            // BI=1 remains the blocker for the achievement as a whole.
-            Assert.False(log.Holds(8518));
+            // 17380 is «BI=1» in the client; content/achievements/objectives.json judges it by the
+            // tutorial step the capture earns it after, so «Primer tiempo» (8518) can be held.
+            Assert.Equal(Answer.True, log.ObjectiveState(17380));
+            Assert.True(log.Holds(8518));
         }
 
         [Fact]

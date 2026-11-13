@@ -53,30 +53,26 @@ namespace Jondo.Unity.Tests.Content
         }
 
         /// <summary>
-        /// The dream trials won (EJ) and the Infinite Dreams' tallies «en
+        /// Maps been on (BI), the dream trials won (EJ) and the Infinite Dreams' tallies «en
         /// intensidad X o superior», kept per difficulty: 600 fragments in a Paradoja II are 600
         /// «Paradoja I o superior» and none «Pesadilla I o superior».
         /// </summary>
         [Fact]
-        public void BI_compares_the_zero_accessible_state_and_trials_and_dreams_are_counted()
+        public void Maps_trials_and_dreams_answer_their_criteria()
         {
             var session = GameSession.SinSocket();
             using (SessionContext.Push(session))
             {
                 var tallies = session.State.AchievementTallies;
+                tallies[("BI", 85983744)] = 1;
                 tallies[("EJ", 9016)] = 1;
                 tallies[("ET", 5)] = 600;
                 tallies[("ET", 2)] = 500;
                 tallies[("Et", 9)] = 1000;
 
-                Assert.False(Judge("BI=1").Met);
-                Assert.True(Judge("BI!1").Met);
-                Assert.True(Judge("BI=0").Met);
-                Assert.False(Judge("BI!0").Met);
-                Assert.True(Judge("BI!1").FullyJudged);
-                Assert.False(Judge("BI=1,2").FullyJudged);
-                Assert.True(Judge("(BI=1)|EJ>9016,0").Met);     // OR can still pass through another condition
-                Assert.False(Judge("(BI=1)&EJ>9016,0").Met);
+                Assert.True(Judge("(BI=85983744)").Met);           // «A lo largo y a lo ancho»
+                Assert.False(Judge("(BI=85985792)").Met);
+                Assert.True(Judge("(BI=85985792)").FullyJudged);
                 Assert.True(Judge("EJ>9016,0").Met);               // «Prueba FONSOCAC»
                 Assert.False(Judge("EJ>9017,0").Met);
                 Assert.True(Judge("ET>1,999").Met);                // 1100 at Sueño I or harder
