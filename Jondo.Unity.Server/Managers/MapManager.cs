@@ -333,6 +333,12 @@ namespace Jondo.Unity.Server
             long medida = Managers.MeasuredArenas.Of(roleplayMapId);
             if (medida != 0 && maps.ContainsKey(medida)) return medida;
 
+            // A dungeon room fights on its own twin arena, the one whose placement is the room's
+            // (DungeonPlacements). The subarea's rule below took another room's twin for four of
+            // the Royal Gobball's five: another room's scenery and placement.
+            long board = Managers.DungeonPlacements.BoardOf(roleplayMapId);
+            if (board != 0 && maps.ContainsKey(board)) return board;
+
             // A temporal anomaly's room fights on its place's arena (AnomalyPlaces).
             long anomaly = Managers.AnomalyPlaces.ArenaOf(roleplayMapId);
             if (anomaly != 0 && maps.ContainsKey(anomaly)) return anomaly;
