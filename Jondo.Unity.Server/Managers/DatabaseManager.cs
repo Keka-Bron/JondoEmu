@@ -5995,11 +5995,16 @@ namespace Jondo.Unity.Server
                     foreach (var e in doc.RootElement.EnumerateArray())
                     {
                         int effectId = e.TryGetProperty("effectId", out var eid) ? eid.GetInt32() : 0;
-                        // effectIds 96-100 are damage effects (96=Water, 97=Earth, 98=Air, 99=Fire, 100=Neutral)
-                        if (effectId >= 96 && effectId <= 100)
+                        // effectIds 96-100 are damage effects (96=Water, 97=Earth, 98=Air, 99=Fire, 100=Neutral),
+                        // and 91-95 the same as life steals (91=Water ... 95=Neutral). Left out, a steal
+                        // was weighed at the class's default 5 to 10: the Kralamoure's Primary Tentacle
+                        // never cast its 900 of air steal on the summon in its reach. A die with no
+                        // side is its number: 900, not an average of 900 and nothing.
+                        if (effectId >= 91 && effectId <= 100)
                         {
                             data.BaseDamageMin = e.TryGetProperty("diceNum", out var dn) ? dn.GetInt32() : 5;
-                            data.BaseDamageMax = e.TryGetProperty("diceSide", out var ds) ? ds.GetInt32() : 10;
+                            data.BaseDamageMax = e.TryGetProperty("diceSide", out var ds) && ds.GetInt32() != 0
+                                ? ds.GetInt32() : data.BaseDamageMin;
 
                             // The element is given by the effect itself (effectElement). It is the
                             // same number the client expects in the damage packet: spell 13425
@@ -6009,12 +6014,11 @@ namespace Jondo.Unity.Server
                                 ? ee.GetInt32()
                                 : effectId switch
                                 {
-                                    96 => 3,  // Water
-                                    97 => 1,  // Earth
-                                    98 => 4,  // Air
-                                    99 => 2,  // Fire
-                                    100 => 0, // Neutral
-                                    _ => 0
+                                    91 or 96 => 3,  // Water
+                                    92 or 97 => 1,  // Earth
+                                    93 or 98 => 4,  // Air
+                                    94 or 99 => 2,  // Fire
+                                    _ => 0,         // Neutral
                                 };
                             continue; // keep going: a spell can deal damage and push as well
                         }
