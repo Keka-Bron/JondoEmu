@@ -528,9 +528,12 @@ namespace Jondo.Unity.Server.Managers
             var roster = RosterOf(room).Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
             if (roster.Count == 0) roster = fallback.Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
 
-            var members = ComposeRoom(roster, bossRoom ? dungeon.Bosses : Array.Empty<int>(),
-                                      index, dungeon.Rooms.Count, room,
-                                      dungeon.Quarry.TryGetValue(room, out var quarry) ? quarry : null);
+            // A boss fought alone (DungeonManager.BossFightsAlone): his room is him and nobody else.
+            var members = bossRoom && dungeon.BossAlone
+                ? ComposeRoom(Array.Empty<int>(), dungeon.Bosses, index, dungeon.Rooms.Count, room)
+                : ComposeRoom(roster, bossRoom ? dungeon.Bosses : Array.Empty<int>(),
+                              index, dungeon.Rooms.Count, room,
+                              dungeon.Quarry.TryGetValue(room, out var quarry) ? quarry : null);
             if (members.Count == 0) return null;
 
             return new MobGroup
