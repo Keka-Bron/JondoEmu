@@ -28,7 +28,7 @@ namespace Jondo.Unity.Server.Managers
     /// </remarks>
     public static class CharacterRewards
     {
-        private const int MaxLevelWithPoints = Handlers.StatsHandler.MaxLevelWithStats;
+        private const int MaxLevelWithPoints = CharacteristicRules.MaxLevelWithStats;
 
         /// <summary>Hands over kamas and says so. Returns false when there was nothing to give.</summary>
         public static async Task<bool> GiveKamasAsync(NetworkStream stream, long kamas)
@@ -59,7 +59,8 @@ namespace Jondo.Unity.Server.Managers
             if (experience <= 0) return false;
             if (serverBonus) experience = ServerSettings.WithBonus(experience, ServerSettings.Current.ExperienceBonusPercent);
 
-            var state = SessionContext.State;
+            var session = SessionContext.Current;
+            var state = session.State;
             if (limited) experience = ExperienceLimit.ApplyFor(state.CharacterId, experience);
             if (experience <= 0) return false;
             state.Experience += experience;
@@ -78,11 +79,10 @@ namespace Jondo.Unity.Server.Managers
                     ConnectionProtocol.Push(Op.Kua, ConnectionProtocol.BuildLevelUp(newLevel)));
 
                 // And what the new level opens, in the book and on the bar.
-                await Handlers.SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
+                await Handlers.SpellHandler.SendSpellsAndBarAsync(session);
             }
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(session);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kuf, BuildExperienceGained(experience)));
             return up;

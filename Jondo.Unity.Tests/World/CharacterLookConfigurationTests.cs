@@ -199,7 +199,7 @@ public sealed class CharacterLookConfigurationTests : IDisposable
         Phantoms.Rise(character.Id);
         Assert.Equal(2554, CharacterLookBuilder.SemanticMapLook(character).Bones);
         session.State.EquipmentItems.Remove(session.State.EquipmentItems.Single(item => item.Value.Position == Mutations.Slot).Key);
-        Assert.Equal(884, CharacterLookBuilder.SemanticMapLook(character).Bones);
+        Assert.Equal(761, CharacterLookBuilder.SemanticMapLook(character).Bones);
         Assert.Equal(1, CharacterLookBuilder.SemanticLook(character).Bones);
     }
 

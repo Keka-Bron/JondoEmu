@@ -152,12 +152,12 @@ its own stored capture to decide what to substitute, not reading the client.
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
 | `lqc` | C→S | 77 / 56 files | "Block 1 digested." The real server waits for this before sending block 2. | `GameNodeProxy` | — |
-| `jru` | S→C | 719 / 86 files | "Load this map." Sending it twice makes the client reload the world in a loop. | `BuildLoadMap`, `WorldEntry.SendMapAsync` | `f2: map id` |
+| `jru` | S→C | 719 / 86 files | "Load this map." Sending it twice makes the client reload the world in a loop. | `BuildLoadMap`, `WorldEntry.SendMapEntryStateAsync` | `f2: map id` |
 | `hjk` | S→C | 7 / 6 files | Travels with `jru` on every map change. | `BuildMapDiscovered` | `f1: packed [map id]` |
 | `jrh` | C→S | 690 / 86 files | "Who is on this map?" Unanswered, the map draws empty: no avatar, no NPCs, no monsters. | `GameNodeProxy` | — |
 | `jss` | S→C | 692 / 87 files | The actors. `f6` is not decoration: with a zero subarea the client throws inside `MapInfoUI.SetInfoFromSubarea` and loses the map name, the coordinates and the minimap marker. Actor type comes from which field appears inside `f2.f1` — `f5` player, `f7` NPC, `f4` monster group; NPCs and groups use negative contextual ids. | `BuildMapActors` | `f2: map id, f6: subarea id, f5 (rep) { f1 { f1: cell, f2: facing }, f2 {…what it is…}, f3: contextual id }` |
 | `lva` | S→C | 1071 / 88 files | "That is every actor." Empty, immediately behind `jss`. Without it the client never counts the map as loaded: it waits about two seconds, asks again with `knm`, `kno`, `kny`, and starts over. | `BuildActorsComplete` | empty |
-| `kub` | S→C | 188 / 54 files | The character sheet. The container field is **not** the same for every characteristic and getting it wrong kills the whole sheet with a `NullReferenceException` in the client's own log. Which id uses which container is read off the captured `kub`, not written down. Sent twice — once with the character, once with the map; the client keeps the second. | `BuildCharacteristics`, `WorldEntry.ContainerOf` | `f2 { f1: where the next level starts, f7: where this one started, f8: experience held, f10: kamas, f11 (rep) { f1: id, <container> {…} } }` — containers: `f4 {f2: base, f3: parchments, f7: equipment}` for most, `f5 {f1: base, f5: bonus}` for 1 and 23, `f2 {f2: value}` for 29, 47 and 96 |
+| `kub` | S→C | 188 / 54 files | The character sheet. The container field is **not** the same for every characteristic and getting it wrong kills the whole sheet with a `NullReferenceException` in the client's own log. `CharacteristicCatalogue.Default` defines the IDs, semantic kinds and fixed bases in code. Sent twice — once with the character, once with the map; the client keeps the second. | `CharacteristicsMessages.Snapshot`, `CharacteristicsMessages.SendAsync` | `f2 { f1: where the next level starts, f7: where this one started, f8: experience held, f10: kamas, f11 (rep) { f1: id, <container> {…} } }` — containers: `f4 {f2: base, f3: parchments, f7: equipment}` for most, `f5 {f1: base, f5: bonus}` for 1 and 23, `f2 {f2: value}` for 29, 47 and 96 |
 | `irq` | S→C | 93 / 11 files | Jobs. The id list is kept (it is game data); the captured progress is thrown away and every job goes out at level 1. | `WorldEntry.ResetJobs` | `f1 (rep) { f1: job id, f3: level, f4/f5: experience }` |
 | `hms` | S→C | 8 / 6 files | The spells the character has, each at the grade its level opens. | `SpellMessages` → `SpellsEvent` | Human/mutant `SpellItem` lists; explicit grade, spell ID and type |
 | `ivx` | S→C | 68 / 27 files | Semantic inventory snapshot from the owning session's loaded items and kamas. Slot zero is the amulet. | `InventoryMessages.Snapshot` | `f3 (rep) { f1: slot, f5 { f1: template, f2 (rep) {…value…, f11: effect}, f3: quantity, f4: uid } }` |
@@ -472,7 +472,6 @@ invoked** from anywhere in the solution. The fourteen that are called are all re
 | `jwm` | C→S 7 / 1 file | `FightHandler` builds it as a server message | Direction inverted: the client sends it. |
 | `hnk` | S→C 243 / 9 files | `TransitionPacketsBuilder.BuildHnkMessage` | Never called; the `hmv` branch uses a raw payload and `hmv` never arrives. |
 | `ilc` | S→C 5 / 3 files | `BuildIlcMessage` | Only called from the `kkn` branch. |
-| `isf` | S→C 7 / 2 files | `StatsHandler.BuildIsfPacket` | Reachable only from `krc` and from `isi`, neither of which arrives. |
 | `hhf` | S→C 1 / 1 file | `InventoryHandler` | Only reachable from `isi`, which never arrives. |
 | `kku` | S→C 2 / 2 files | `InventoryHandler` | Same. |
 | `luy` | C→S 1 / 1 file | `InventoryHandler`, `BuildLuyMessage` | Built as a server message; the client sends it. Builder never called. |
@@ -598,7 +597,6 @@ on every packet. Fifteen of them key a branch of their own, and those are the on
 
 | Opcode | Handler | Note |
 |---|---|---|
-| `kkn` | `GameNodeProxy` → 3.6.4.3 initialisation burst | Sends `kkp`, `kkm`, `krb`, `ilc`, `joh`, `lor`, `kri`, `hmd`, `itp`. |
 | `ibt` | `GameNodeProxy` → final burst | Sends `icg` ×3, `ith`, `klt`, `klp`. |
 | `hmv` | `GameNodeProxy` | Sends `hnk` and the `kqm` list. |
 | `lpj` | `GameNodeProxy` | Sends `lpe`. |
@@ -607,8 +605,6 @@ on every packet. Fifteen of them key a branch of their own, and those are the on
 | `jte` | `GameNodeProxy` | Answers with a hardcoded `jto` frame. |
 | `kkr` | `MapLoadHandler` | Old map-load request. |
 | `jos` `jpp` | `MapChangeHandler` | Old map change and movement confirm. Replaced by `jqk` and `jrw`. |
-| `isi` | `InventoryHandler` | Old item move. Replaced by `iuk`. |
-| `krc` | `StatsHandler` | Old stats upgrade. Replaced by `kum`. |
 | `kqn` | `ChatHandler` | Old chat. Replaced by `ktm`. |
 | `jxx` | `FightHandler` | Old fight dispatch. |
 | `iuw` | `DestroyItemHandler` | **Not a leftover.** Observed against the real client in the emulator's own traffic log, just not in the pcapng set. Genuinely implemented. |

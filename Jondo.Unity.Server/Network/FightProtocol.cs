@@ -685,62 +685,6 @@ namespace Jondo.Unity.Server.Network
         // ─── Moving and casting ─────────────────────────────────────────────────
 
         /// <summary>
-        /// Where the player wants to walk (jrw).
-        ///
-        ///   f1: the map
-        ///   f2: packed varints, each one <c>(direction &lt;&lt; 12) | cell</c>
-        ///
-        /// And careful, it is not the whole path: only the POINTS WHERE IT TURNS go. The first is
-        /// where it starts from and the last is where it goes, and that last one's direction is which way it
-        /// wants to end up facing. A straight path is two numbers.
-        ///
-        /// It is the same message used to walk around the map outside a fight.
-        /// </summary>
-        public static (long MapId, List<int> Corners, int Facing) ReadMove(byte[] payload)
-        {
-            var corners = new List<int>();
-            long mapId = 0;
-            int facing = 0;
-
-            byte[]? jrw = ConnectionProtocol.ReadPayload(payload, Op.Jrw);
-            if (jrw == null) return (0, corners, 0);
-
-            foreach (var field in ProtoMessage.Parse(jrw).Fields)
-            {
-                if (field.FieldNumber == 1 && field.WireType == 0) mapId = field.VarIntValue;
-                else if (field.FieldNumber == 2 && field.WireType == 2)
-                {
-                    foreach (long key in Unpack(field.BytesValue))
-                    {
-                        corners.Add((int)(key & 0xFFF));
-                        facing = (int)(key >> 12);
-                    }
-                }
-            }
-            return (mapId, corners, facing);
-        }
-
-        private static List<long> Unpack(byte[] bytes)
-        {
-            var fuera = new List<long>();
-            int i = 0;
-            while (i < bytes.Length)
-            {
-                long value = 0;
-                int shift = 0;
-                while (i < bytes.Length)
-                {
-                    byte b = bytes[i++];
-                    value |= (long)(b & 0x7F) << shift;
-                    if ((b & 0x80) == 0) break;
-                    shift += 7;
-                }
-                fuera.Add(value);
-            }
-            return fuera;
-        }
-
-        /// <summary>
         /// Which cell is cast at and with what (jwh).
         ///
         ///   f1: the target cell          f4: the spell, and if it does not come it is a weapon hit
@@ -2057,7 +2001,7 @@ namespace Jondo.Unity.Server.Network
                 {
                     1 => 5,
                     23 => 4,
-                    0 => Handlers.StatsHandler.BaseLifeForLevel(level),
+                    0 => CharacteristicRules.BaseLifeForLevel(level),
                     10 or 11 or 13 or 14 or 15 => 100,
                     19 or 26 => 1,
                     107 or 150 or 120 or 121 or 122 or 123 or 124 or 125 or 141 or 142 or 143 => 100,

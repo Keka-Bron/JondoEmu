@@ -4465,7 +4465,7 @@ namespace Jondo.Unity.Server.Managers
                         Name = "ilusión",
                         CellId = celda,
                         Level = quienLanza.Level,
-                        MaxHP = Handlers.StatsHandler.BaseLifeForLevel(quienLanza.Level),
+                        MaxHP = CharacteristicRules.BaseLifeForLevel(quienLanza.Level),
                         SummonCost = 0,
                         JuegaTurno = false,
                         EsIlusion = true,

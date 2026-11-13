@@ -144,7 +144,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (int alteration in gains) await AlterationHandler.GainAsync(stream, alteration);
 
             if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await ItemUseHandler.WeighAsync(stream);
 
             Console.WriteLine($"[Items] {me.CharacterName} uses {item.Template}: alteration(s) " +
@@ -192,7 +192,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained, quantity.ToString(), template.ToString())));
             }
 
-            if (placed) await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            if (placed) await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await ItemUseHandler.WeighAsync(stream);
             if (redraw) await SlotLookHandler.RedrawAsync(stream);
 

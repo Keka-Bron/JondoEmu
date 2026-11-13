@@ -9,6 +9,7 @@ using System.Linq;
 using Google.Protobuf;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game.Wire;
 using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Network
@@ -154,34 +155,34 @@ namespace Jondo.Unity.Server.Network
 
                 GameServerProxy.LogTraffic("GAME_C->S", payload, payload.Length);
 
-                Game.GameFrame? entryFrame;
-                try
+                var requestFrame = DecodeRequest(session, payload);
+                switch (await DispatchTypedAsync(session, requestFrame, entryService))
                 {
-                    entryFrame = GameEntryDispatch.Decode(session, payload, payloadStr);
+                    case GameEntryResult.Close:
+                        return;
+                    case GameEntryResult.Handled:
+                        break;
+                    default:
+                        await DispatchLegacyAsync();
+                        break;
                 }
-                catch (Exception ex) when (ex is InvalidProtocolBufferException or Game.GameConversionException)
-                {
-                    Program.LogDebug($"[Entry] Invalid request: {ex.Message}");
-                    return;
-                }
-                var entryRequest = entryFrame?.Content as Game.GameRequest;
 
+                packetTurn.Dispose();
+                payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stream);
+                if (payload == null) break;
+                payloadStr = RoutingTextOf(payload, Encoding.UTF8.GetString(payload));
+            }
+
+            // Only requests without a typed handler (or without a decodable request frame)
+            // reach compatibility routing. Called under the owning session's packet turn.
+            async Task DispatchLegacyAsync()
+            {
                 // Legacy feature handlers use these per-packet views; the owning session is
                 // the only source of account/authentication state.
                 bool isAuthenticated = session.IsAuthenticated;
                 long sessionAccountId = session.AccountId;
                 int sessionServerId = session.ServerId;
-                var entryResult = entryFrame == null
-                    ? GameEntryResult.Unhandled : await entryService.HandleAsync(entryFrame);
-                if (entryResult == GameEntryResult.Close) return;
-                if (entryResult == GameEntryResult.Unhandled && entryRequest != null
-                    && !GameEntryDispatch.IsAllowed(session, entryRequest)) return;
-
-                if (entryResult == GameEntryResult.Handled)
-                {
-                    // Read the next frame at the end of the loop, after releasing the session turn.
-                }
-                else if (payloadStr.Contains("type.ankama.com/krt"))
+                if (payloadStr.Contains("type.ankama.com/krt"))
                 {
                     // Comes along with kqz and expects no response of its own.
                 }
@@ -263,26 +264,8 @@ namespace Jondo.Unity.Server.Network
                     // «Abandonar el modo espectador»: home, as at the fight's end.
                     await FightHandler.StopWatchingAsync(SessionContext.Current);
                 }
-                else if (await WorldMovementDispatch.TryHandleAsync(session, payload, payloadStr))
-                {
-                    // Typed world movement has been handled (or rejected). Combat falls through.
-                }
                 // ─── 3.6.10.10 world messages. The joi/jos/jpp branches further down belong to
                 // an earlier version of the protocol and this client never sends them.
-                else if (GameState.IsInFight && payloadStr.Contains(Op.Uri(Op.Jrw)))
-                {
-                    // Walking is the same message inside and outside a fight. While fighting the
-                    // fight handler resolves it, which also spends movement points; if it fell here,
-                    // the character would move around the board for free and without telling anyone.
-                    //
-                    // It goes through HandleFightMessageAsync and not straight to WalkAsync: that is the one that takes
-                    // the session's lock. Calling WalkAsync bare, walking was the ONLY thing in the
-                    // fight that skipped the lock, so it could cross with the turn
-                    // clock —which also touches the fight and writes to the socket— and leave the state
-                    // half done. And on top of that it made unreachable the jrw branch that already existed inside
-                    // the fight handler.
-                    await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
-                }
                 else if (payloadStr.Contains("type.ankama.com/hir"))
                 {
                     await ZaapTravelHandler.TellCostAsync(stream, payload);
@@ -388,31 +371,6 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri("kon"))
                 {
                     // The window's own setting, sent as it opens. The real server answers nothing.
-                }
-                else if (payloadStr.Contains("type.ankama.com/jqe"))
-                {
-                    // Combat ignores cancellation; world cancellation uses the typed dispatch above.
-                }
-                else if (GameState.IsInFight && payloadStr.Contains("type.ankama.com/jqi"))
-                {
-                    await WorldMoveHandler.AllowLegacyMapExitAsync(stream, payload);
-
-                    // A party member whose leader opened a fight while he was walking goes in
-                    // when his walk ends, as the follow capture does.
-                    await FightHandler.AfterWalkAsync(stream);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Jqk)))
-                {
-                    entryService.OnMapChange();
-                    await WorldMoveHandler.ChangeMapAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Kum)))
-                {
-                    await CharacteristicsHandler.SpendAsync(stream, payload);
-                }
-                else if (payloadStr.Contains("type.ankama.com/kuh"))
-                {
-                    await CharacteristicsHandler.ResetAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kts)))
                 {
@@ -889,11 +847,6 @@ namespace Jondo.Unity.Server.Network
                     await Handlers.GuildRaidHandler.InviteAsync(stream, payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iag)))
                     await Handlers.GuildRaidHandler.InvitationAnswerAsync(stream, payload);
-                else if (entryRequest is Game.GuildWeeklyResetDateRequest)
-                {
-                    // When the week starts again: asked at world entry too.
-                    await Handlers.GuildHandler.WeeklyResetAsync(session, entryFrame!.Uid!.Value);
-                }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jiy)))
                 {
                     // The directory sheet or the contributions left, depending on the tab.
@@ -1534,50 +1487,6 @@ namespace Jondo.Unity.Server.Network
                     
                     Console.WriteLine("[Game Node] Sent lok and jdj status packets successfully.");
                 }
-                else if (payloadStr.Contains("type.ankama.com/kkn"))
-                {
-                    Console.WriteLine("[Game Node] Received kkn from client. Sending initialization burst...");
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildKkpMessage());
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildKkmMessage());
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildKrbMessage());
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIlcMessage());
-                    
-                    // Patch joh dynamically with character's map ID
-                    byte[] patchedJoh = PatchJohPacket(TransitionPacketsBuilder.BuildJohMessage(), GameState.MapId);
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, patchedJoh);
-                    
-                    int subAreaId = 1;
-                    try
-                    {
-                        var mapInfo = MapManager.GetMapInfo(GameState.MapId);
-                        if (mapInfo != null)
-                        {
-                            subAreaId = mapInfo.SubAreaId;
-                        }
-                    }
-                    catch { }
-                    if (subAreaId == 444) subAreaId = 20663;
-
-                    foreach (var lor in TransitionPacketsBuilder.BuildLorList())
-                    {
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, lor);
-                    }
-                    
-                    // Dynamically send character's real stats (kri)
-                    byte[]? updatedKri = StatsHandler.BuildUpdatedKriPacket();
-                    if (updatedKri != null)
-                    {
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, updatedKri);
-                    }
-                    
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildHmdMessage());
-                    
-                    foreach (var itp in TransitionPacketsBuilder.BuildItpList())
-                    {
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, itp);
-                    }
-                    Console.WriteLine("[Game Node] Initialization burst sent successfully.");
-                }
                 else if (payloadStr.Contains(Op.Uri(Op.Lpj)))
                 {
                     Console.WriteLine("[Game Node] Received lpj from client. Sending lpe response...");
@@ -1669,10 +1578,6 @@ namespace Jondo.Unity.Server.Network
                 {
                     await MapChangeHandler.HandleMovementConfirm(stream);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Isi)))
-                {
-                    await InventoryHandler.HandleItemMovementRequest(stream, payload);
-                }
                 else if (payloadStr.Contains(Op.Uri(Op.Iov)))
                 {
                     // He has clicked an NPC: depending on the action, the shop or the dialogue opens for him. With
@@ -1746,10 +1651,6 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Hor)))
                 {
                     await EmoteHandler.MoodAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Krc)))
-                {
-                    await StatsHandler.HandleStatsUpgradeRequest(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Hqa)))
                 {
@@ -1866,12 +1767,64 @@ namespace Jondo.Unity.Server.Network
                         Console.ResetColor();
                     }
                 }
-
-                packetTurn.Dispose();
-                payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stream);
-                if (payload == null) break;
-                payloadStr = RoutingTextOf(payload, Encoding.UTF8.GetString(payload));
             }
+        }
+
+        /// <summary>Best-effort semantic decoding. Failures leave original bytes available to raw routing.</summary>
+        internal static Game.GameFrame? DecodeRequest(GameSession session, byte[] payload)
+        {
+            try
+            {
+                var frame = session.Decode(payload);
+                if (frame.Content is not Game.GameRequest || frame.Uid is null) return null;
+                return frame;
+            }
+            catch (Game.GameConversionException) when (
+                NetworkEnvelope.GetMessageTypeUrl(payload) is { } typeUrl
+                && typeUrl.StartsWith(ConnectionProtocol.UriPrefix, StringComparison.Ordinal)
+                && GameBindings.StableName(typeUrl[ConnectionProtocol.UriPrefix.Length..]) is null)
+            {
+                // Missing semantic mappings are expected during migration; raw routing owns diagnostics.
+                return null;
+            }
+            catch (Exception ex) when (ex is InvalidProtocolBufferException or Game.GameConversionException)
+            {
+                Program.LogDebug($"[Game Node] Typed request decode unavailable: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>Routes already-decoded requests. Recognized handlers own refusals and no-ops too.</summary>
+        internal static async Task<GameEntryResult> DispatchTypedAsync(GameSession session, Game.GameFrame? frame,
+            GameEntryService entryService, CharacteristicsHandler? characteristics = null)
+        {
+            if (frame?.Content is not Game.GameRequest || frame.Uid is null) return GameEntryResult.Unhandled;
+            switch (frame.Content)
+            {
+                case Game.IdentificationRequest or Game.CharacterListRequest or Game.CharacterSelectionRequest
+                    or Game.CharacterFirstSelectionRequest or Game.CharacterForceSelectionReadyRequest
+                    or Game.SequenceNumberRequest or Game.ContextCreationRequest or Game.ContextReadyRequest
+                    or Game.MapInformationRequest or Game.FightMapRequest or Game.PingRequest
+                    or Game.ChatChannelSubscriptionRequest:
+                    return await entryService.HandleAsync(frame);
+                case Game.CharacterCharacteristicUpgradeRequest request:
+                    await (characteristics ?? CharacteristicsHandler.Live).SpendAsync(session, request);
+                    break;
+                case Game.ResetCharacterCharacteristicsRequest:
+                    await (characteristics ?? CharacteristicsHandler.Live).ResetAsync(session);
+                    break;
+                case Game.GuildWeeklyResetDateRequest request:
+                    if (GameEntryDispatch.IsAllowed(session, request))
+                        await GuildHandler.WeeklyResetAsync(session, frame.Uid.Value);
+                    break;
+                case Game.MapMovementRequest or Game.MapMovementCancelRequest
+                    or Game.MapMovementConfirmRequest or Game.MapChangeRequest:
+                    await MovementDispatch.TryHandleAsync(session, frame, entryService.OnMapChange);
+                    break;
+                default:
+                    return GameEntryResult.Unhandled;
+            }
+            return GameEntryResult.Handled;
         }
 
         /// <summary>
@@ -2099,46 +2052,6 @@ namespace Jondo.Unity.Server.Network
         // Nobody called it: the jpv has long been built in MapLoadHandler with the right id
         // from the start, so there was nothing to patch. Out, together with the three
         // numbers.
-
-        private static byte[] PatchJohPacket(byte[] packetPayload, long mapId)
-        {
-            try
-            {
-                var rootMsg = ProtoMessage.Parse(packetPayload);
-                var rootField = rootMsg.Fields.FirstOrDefault(f => f.FieldNumber == 3 && f.WireType == 2);
-                if (rootField == null) return packetPayload;
-
-                var wrapperMsg = ProtoMessage.Parse(rootField.BytesValue);
-                var wrapperField = wrapperMsg.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 2);
-                if (wrapperField == null) return packetPayload;
-
-                var anyMsg = ProtoMessage.Parse(wrapperField.BytesValue);
-                var anyValueField = anyMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 2);
-                if (anyValueField == null) return packetPayload;
-
-                var johMsg = ProtoMessage.Parse(anyValueField.BytesValue);
-                var mapIdField = johMsg.Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 0);
-                if (mapIdField != null)
-                {
-                    mapIdField.VarIntValue = mapId;
-                }
-                else
-                {
-                    johMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = mapId });
-                }
-
-                anyValueField.BytesValue = johMsg.ToByteArray();
-                wrapperField.BytesValue = anyMsg.ToByteArray();
-                rootField.BytesValue = wrapperMsg.ToByteArray();
-
-                return rootMsg.ToByteArray();
-            }
-            catch (Exception ex)
-            {
-                Program.LogDebug($"[-] Error patching joh packet: {ex.Message}");
-                return packetPayload;
-            }
-        }
 
     }
 }

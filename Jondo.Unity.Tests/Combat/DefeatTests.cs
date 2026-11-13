@@ -113,7 +113,7 @@ namespace Jondo.Unity.Tests.Combat
                     session.State.CharacterLevel = 200;
                     session.State.StatVitality = 3;
                     session.State.ScrolledVitality = 100;
-                    Assert.Equal(1153, StatsHandler.GetPlayerMaxHp());
+                    Assert.Equal(1153, SessionContext.Current.Combat.GetPlayerMaxHp());
                     Assert.Equal(DefeatPenalty.MaxEnergy, Energy.Of(Loser));
 
                     var defeat = FightHandler.ApplyDefeat();
@@ -129,9 +129,9 @@ namespace Jondo.Unity.Tests.Combat
 
                     // And the sheet says so: 29 the energy, 47 the gauge, 97 the life missing.
                     session.State.RegenerationStartedUtc = DateTime.UtcNow;
-                    Assert.Equal(8000, ConnectionProtocol.ValueOf(ConnectionProtocol.Stat.EnergyPoints, 200));
-                    Assert.Equal(10000, ConnectionProtocol.ValueOf(ConnectionProtocol.Stat.MaxEnergyPoints, 200));
-                    Assert.Equal(-576, ConnectionProtocol.ValueOf(ConnectionProtocol.Stat.HitPointLoss, 200));
+                    Assert.Equal(8000, CharacteristicsMessages.Live.ValueOf(Stat.EnergyPoints, 200, session));
+                    Assert.Equal(10000, CharacteristicsMessages.Live.ValueOf(Stat.MaxEnergyPoints, 200, session));
+                    Assert.Equal(-576, CharacteristicsMessages.Live.ValueOf(Stat.HitPointLoss, 200, session));
 
                     // The next fight takes the life he has.
                     Assert.Equal(577, FightHandler.BuildPlayerFighter(new FightInstance(9, 120195585)).CurrentHP);

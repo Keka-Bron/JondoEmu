@@ -381,8 +381,9 @@ in `giq.bkjt (llp a)` inside `ees.wuc (kub a)` and **is left without the whole c
 is what had the characteristics button greyed out while the C key did open the panel: the
 client builds the panel with its data, the button is enabled by the handler that never finished.
 
-Which id goes in which container **is read from the captured `kub`**, it is not written in the code:
-`WorldEntry.ContainerOf`. At startup it says so on the console.
+The ID/container table was originally extracted from captured `kub` messages. It is now
+declared in code by `CharacteristicCatalogue.Default`, using semantic kinds and fixed base
+values; there is no characteristic file to load at startup.
 
 The `f3` was not the constant 100 it seemed either. The captured character had exactly 100 in
 the six primaries because it had drunk **all the scrolls** in the game, which is the cap.

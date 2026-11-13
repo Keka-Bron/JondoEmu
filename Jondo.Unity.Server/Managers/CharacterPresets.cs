@@ -43,7 +43,7 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>Equipment slot -> item uid.</summary>
             public SortedDictionary<int, long> Items { get; set; } = new();
 
-            /// <summary>Characteristic -> the points spent in it (the same numbers the krc carries).</summary>
+            /// <summary>Characteristic -> allocated stat value, before scrolls and equipment; cost is calculated separately.</summary>
             public SortedDictionary<int, int> Points { get; set; } = new();
 
             /// <summary>Spell -> the bar slots it sits in; 0 is the weapon.</summary>

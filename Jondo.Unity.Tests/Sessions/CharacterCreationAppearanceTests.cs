@@ -33,6 +33,8 @@ namespace Jondo.Unity.Tests.Sessions
             // run fights whose kmu goes to everyone on it: one landing between kvb and kqp failed this.
             long quietMap = 990_000_000 + breed * 2 + sex;
             await using var pipe = await ClientPipe.OpenAsync(account, account + 100_000, quietMap);
+            // Creation is a selection-screen operation, not a recipient of other tests' map broadcasts.
+            pipe.Session.LeaveWorld();
             using var scope = SessionContext.Push(pipe.Session);
             using var heads = JsonDocument.Parse(File.ReadAllText(Paths.HeadsJson));
             long headSkin = heads.RootElement.GetProperty("heads").GetProperty(head.ToString()).GetProperty("skin").GetInt64();

@@ -1,4 +1,4 @@
-using Jondo.Unity.Server.Handlers;
+using Jondo.Unity.Server;
 using Jondo.Unity.Server.Network;
 using System.Linq;
 using Xunit;
@@ -25,9 +25,9 @@ namespace Jondo.Unity.Tests.Sessions
         [InlineData(1000, 1050, 995)]
         public void Life_and_points_stop_at_level_200(int level, int life, int capital)
         {
-            Assert.Equal(life, StatsHandler.BaseLifeForLevel(level));
-            Assert.Equal(capital, StatsHandler.TotalCapitalForLevel(level));
-            Assert.Equal(life, ConnectionProtocol.ValueOf(ConnectionProtocol.Stat.LifePoints, level));
+            Assert.Equal(life, CharacteristicRules.BaseLifeForLevel(level));
+            Assert.Equal(capital, CharacteristicRules.TotalCapitalForLevel(level));
+            Assert.Equal(life, CharacteristicsMessages.Live.ValueOf(Stat.LifePoints, level, SessionContext.Current));
         }
 
         /// <summary>

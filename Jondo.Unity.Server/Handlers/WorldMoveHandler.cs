@@ -165,15 +165,6 @@ namespace Jondo.Unity.Server.Handlers
             await CompleteMovementAsync(session, session.Stream);
         }
 
-        // Combat retains its current byte-based confirmation entry point until its migration.
-        internal static async Task AllowLegacyMapExitAsync(NetworkStream stream, byte[] payload)
-        {
-            long request = ConnectionProtocol.RequestId(payload);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Answer(Op.Jsq, null, request));
-            await CompleteMovementAsync(SessionContext.Current, stream);
-        }
-
         private static async Task CompleteMovementAsync(GameSession session, NetworkStream? stream)
         {
             // Always answer before changing map. The old branch returned as soon as it found a route
@@ -227,18 +218,14 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── jqk: take me to this map ───────────────────────────────────────────
 
-        public static async Task ChangeMapAsync(NetworkStream stream, byte[] payload)
+        public static async Task ChangeMapAsync(GameSession session, MapChangeRequest request)
         {
-            byte[]? jqk = ConnectionProtocol.ReadPayload(payload, Op.Jqk);
-            if (jqk == null || jqk.Length == 0) return;
-            if (await Managers.Jail.KeepsInAsync(stream)) return;
-
-            long asked = 0;
-            foreach (var f in ProtoMessage.Parse(jqk).Fields)
-            {
-                if (f.FieldNumber == 2 && f.WireType == 0) asked = f.VarIntValue;
-            }
+            if (session.State.IsInFight) return;
+            using var context = SessionContext.Push(session);
+            long asked = request.MapId;
             if (asked <= 0) return;
+            var stream = session.Stream ?? throw new InvalidOperationException("Map travel requires a connected game session.");
+            if (await Managers.Jail.KeepsInAsync(stream)) return;
 
             Way way = WayOut(Jondo.Unity.Server.Network.SessionContext.State.MapId, Jondo.Unity.Server.Network.SessionContext.State.CellId, asked);
             long target = Neighbour(Jondo.Unity.Server.Network.SessionContext.State.MapId, way, asked);

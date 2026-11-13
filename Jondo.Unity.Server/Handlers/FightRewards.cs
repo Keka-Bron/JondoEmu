@@ -74,7 +74,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             using (SessionContext.Push(session))
             {
-                Equipment.Bonuses().TryGetValue(ConnectionProtocol.Stat.Prospecting, out long fromGear);
+                Equipment.Bonuses().TryGetValue(Stat.Prospecting, out long fromGear);
                 return 100 + session.State.TotalChance / 10 + (int)fromGear;
             }
         }
@@ -170,7 +170,7 @@ namespace Jondo.Unity.Server.Handlers
                         .Select(f => f.Level).ToList();
                     using (SessionContext.Push(session))
                     {
-                        int wisdom = session.State.TotalWisdom + StatsHandler.GetEquipBonus(ConnectionProtocol.Stat.Wisdom);
+                        int wisdom = session.State.TotalWisdom + session.Combat.GetEquipBonus(Stat.Wisdom);
                         xp = XpShare(xpBase, session.State.CharacterLevel, levels, strongest, monsterLevels, wisdom);
                     }
                     xp = CombatExperience.WithCharacterBonus(xp, CombatExperience.CharacterBonusPercent);

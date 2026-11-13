@@ -240,7 +240,7 @@ public sealed class GameEntryLifecycleTests
         h.Session.State.IsInFight = true;
         Assert.Equal(GameEntryResult.Handled, await h.Send(new MapInformationRequest(checked((int)h.Session.MapId))));
         Assert.Equal(2, h.Backend.Calls.Count(c => c == "actors"));
-        Assert.Equal(GameEntryResult.Unhandled, await h.Send(new FightMapRequest()));
+        Assert.Equal(GameEntryResult.Handled, await h.Send(new FightMapRequest()));
         Assert.Equal(GameEntryResult.Close, await h.Send(new MapInformationRequest(checked((int)h.Session.MapId + 1))));
         Assert.Equal(GameEntryResult.Close, await h.Send(new ContextReadyRequest(h.Session.MapId + 1)));
     }

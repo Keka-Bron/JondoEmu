@@ -143,7 +143,7 @@ namespace Jondo.Unity.Server.Handlers
             Alignments.Set(Me, side, Now);
             HeadHunts.Forget(Me);
             await SlotLookHandler.RedrawAsync(stream);
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hod, BuildRank(Alignments.Rank())));
             Console.WriteLine($"[Alignment] {SessionContext.State.CharacterName} is now " +
                               (side == Alignments.Bonta ? "Bontarian" : side == Alignments.Brakmar ? "Brakmarian" : "neutral") + ".");
@@ -171,12 +171,12 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, HeadHunts.CannotHide)));
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
                 return;
             }
 
             Alignments.SetPvp(Me, on);
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await SlotLookHandler.RedrawAsync(stream);
             Console.WriteLine($"[Alignment] {SessionContext.State.CharacterName} switches PvP {(on ? "on" : "off")}.");
         }
@@ -190,7 +190,7 @@ namespace Jondo.Unity.Server.Handlers
             var (level, rank) = Alignments.Moves(questId);
             if (level)
             {
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
                 Console.WriteLine($"[Alignment] {SessionContext.State.CharacterName}'s alignment level is {Alignments.Level()}.");
             }
             if (rank)

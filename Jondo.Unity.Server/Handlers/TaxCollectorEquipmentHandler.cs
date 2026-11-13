@@ -82,12 +82,12 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Its prospecting: the 200 every tax collector has and what its chests add.</summary>
         internal static int ProspectingOf(TaxCollectorStore.TaxCollector tc)
             => TaxCollectorProtocol.Prospecting
-               + (int)BonusesOf(TaxCollectorStore.EquipmentOf(tc)).GetValueOrDefault(ConnectionProtocol.Stat.Prospecting);
+               + (int)BonusesOf(TaxCollectorStore.EquipmentOf(tc)).GetValueOrDefault(Stat.Prospecting);
 
         /// <summary>What it can carry: the 1000 every tax collector has and what its saddlebags add.</summary>
         internal static int MaxPodsOf(TaxCollectorStore.TaxCollector tc)
             => TaxCollectorProtocol.MaxPods
-               + (int)BonusesOf(TaxCollectorStore.EquipmentOf(tc)).GetValueOrDefault(ConnectionProtocol.Stat.Pods);
+               + (int)BonusesOf(TaxCollectorStore.EquipmentOf(tc)).GetValueOrDefault(Stat.Pods);
 
         /// <summary>
         /// Its characteristics (lns), as the kub carries the player's: what the monster
@@ -104,17 +104,16 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (!seen.Add(characteristic)) continue;
                 long bonus = gear + bonuses.GetValueOrDefault(characteristic);
-                sheet.Add(TaxCollectorProtocol.Characteristic(characteristic, baseValue, bonus,
-                                                             WorldEntry.ContainerOf(characteristic)));
+                sheet.Add(TaxCollectorProtocol.Characteristic(characteristic, baseValue, bonus));
             }
-            foreach (int characteristic in new[] { ConnectionProtocol.Stat.Prospecting, ConnectionProtocol.Stat.Pods })
+            foreach (int characteristic in new[] { Stat.Prospecting, Stat.Pods })
             {
                 if (!seen.Add(characteristic)) continue;
-                long baseValue = characteristic == ConnectionProtocol.Stat.Pods
+                long baseValue = characteristic == Stat.Pods
                     ? TaxCollectorProtocol.MaxPods
                     : TaxCollectorProtocol.Prospecting;
                 sheet.Add(TaxCollectorProtocol.Characteristic(characteristic, baseValue,
-                    bonuses.GetValueOrDefault(characteristic), WorldEntry.ContainerOf(characteristic)));
+                    bonuses.GetValueOrDefault(characteristic)));
             }
             return sheet;
         }
@@ -158,18 +157,18 @@ namespace Jondo.Unity.Server.Handlers
         {
             switch (characteristic)
             {
-                case ConnectionProtocol.Stat.ActionPoints: fighter.MaxAP += value; fighter.CurrentAP += value; break;
-                case ConnectionProtocol.Stat.MovementPoints: fighter.MaxMP += value; fighter.CurrentMP += value; break;
-                case ConnectionProtocol.Stat.Vitality:
+                case Stat.ActionPoints: fighter.MaxAP += value; fighter.CurrentAP += value; break;
+                case Stat.MovementPoints: fighter.MaxMP += value; fighter.CurrentMP += value; break;
+                case Stat.Vitality:
                     fighter.Vitality += value; fighter.MaxHP += value; fighter.CurrentHP += value; break;
-                case ConnectionProtocol.Stat.Strength: fighter.Strength += value; break;
-                case ConnectionProtocol.Stat.Intelligence: fighter.Intelligence += value; break;
-                case ConnectionProtocol.Stat.Chance: fighter.Chance += value; break;
-                case ConnectionProtocol.Stat.Agility: fighter.Agility += value; break;
-                case ConnectionProtocol.Stat.Critical: fighter.CriticalBonus += value; break;
-                case ConnectionProtocol.Stat.Range: fighter.Range += value; break;
-                case ConnectionProtocol.Stat.Power: fighter.Power += value; break;
-                case ConnectionProtocol.Stat.Initiative: fighter.Initiative += value; break;
+                case Stat.Strength: fighter.Strength += value; break;
+                case Stat.Intelligence: fighter.Intelligence += value; break;
+                case Stat.Chance: fighter.Chance += value; break;
+                case Stat.Agility: fighter.Agility += value; break;
+                case Stat.Critical: fighter.CriticalBonus += value; break;
+                case Stat.Range: fighter.Range += value; break;
+                case Stat.Power: fighter.Power += value; break;
+                case Stat.Initiative: fighter.Initiative += value; break;
                 case 16: fighter.FlatDamage += value; break;
                 case 86: fighter.CriticalDamage += value; break;
                 case 84: fighter.PushDamage += value; break;
@@ -183,8 +182,8 @@ namespace Jondo.Unity.Server.Handlers
                 case 35: fighter.WaterResPct += value; break;
                 case 36: fighter.AirResPct += value; break;
                 case 37: fighter.NeutralResPct += value; break;
-                case ConnectionProtocol.Stat.Prospecting:
-                case ConnectionProtocol.Stat.Pods:
+                case Stat.Prospecting:
+                case Stat.Pods:
                     break;
                 default:
                     fighter.Otras.TryGetValue(characteristic, out int had);

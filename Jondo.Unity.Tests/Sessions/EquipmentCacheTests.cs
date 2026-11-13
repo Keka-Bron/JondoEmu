@@ -5,12 +5,11 @@ using Xunit;
 namespace Jondo.Unity.Tests.Sessions
 {
     /// <summary>
-    /// The cache of what a character is wearing, which is what the COMBAT sheet is built from.
+    /// The older worn-item cache and the shared equipment contribution rules.
     /// </summary>
     /// <remarks>
-    /// Not the characteristic sheet — that one is <c>Equipment.Bonuses()</c> over the real
-    /// inventory and was never stale. This dictionary feeds <c>StatsHandler.GetEquipBonus</c>, so
-    /// what it says is the player's maximum health and initiative in a fight.
+    /// Both combat and owner sheets now use EquipmentItems through Equipment.BonusesOf. The
+    /// older cache is still maintained for legacy consumers, independently of that calculation.
     /// </remarks>
     public class EquipmentCacheTests
     {
@@ -51,8 +50,8 @@ namespace Jondo.Unity.Tests.Sessions
                 Equipment.Add(uid, template: 14289, quantity: 1, 1, "[[96,0,46,60],[125,350,0,0]]");
                 Equipment.RememberWorn(uid, 1, Equipment.ByUid(uid)!.Effects);
 
-                Assert.Equal(0, Jondo.Unity.Server.Handlers.StatsHandler.GetEquipBonus(EffectEngine.ShieldCharacteristic));
-                Assert.Equal(350, Jondo.Unity.Server.Handlers.StatsHandler.GetEquipBonus(11));
+                Assert.Equal(0, session.Combat.GetEquipBonus(EffectEngine.ShieldCharacteristic));
+                Assert.Equal(350, session.Combat.GetEquipBonus(11));
             }
         }
 

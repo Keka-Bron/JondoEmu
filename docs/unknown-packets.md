@@ -12,6 +12,13 @@ log. The silenced ones are worse than the noisy ones, because they stop existing
 Both are now recorded, with the difference noted. "There is something I don't know about" becomes a
 list you can work from: what is missing, how often it happens, and from where.
 
+`GameNodeProxy` runs typed dispatch first and enters its raw compatibility chain only
+from the default result. Recognized typed handlers own refused actions and intentional
+no-ops too, so these requests produce neither an unhandled warning nor an unknown-packet
+row. Decoding or finding a mapping alone does not claim a request: typed requests with no
+handler retain the warning/recording if raw dispatch also leaves them unhandled. Decoding
+failures still reach raw routing. Typed connection-close results take effect immediately.
+
 ## The idea worth having: group by shape, not by opcode
 
 One opcode can carry completely different payloads depending on what the player is doing. Counting

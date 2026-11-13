@@ -269,7 +269,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <paramref name="serverId"/>: the slots are counted per category, not per server.
         /// </summary>
         public static int SlotsTaken(IEnumerable<DatabaseManager.DbServer> servers,
-                                     IEnumerable<DatabaseManager.DbCharacter> characters, int serverId)
+                                     IEnumerable<DbCharacter> characters, int serverId)
         {
             var known = servers.ToList();
             int category = known.FirstOrDefault(s => s.Id == serverId)?.Type ?? 1;

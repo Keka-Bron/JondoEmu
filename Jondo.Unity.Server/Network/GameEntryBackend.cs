@@ -92,7 +92,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
     private sealed class MapBackend : IGameEntryMapBackend
     {
         public Task SendMapAsync(GameSession session, DbCharacter character)
-            => WorldEntry.SendMapAsync(session, character, session.MapId,
+            => WorldEntry.SendMapEntryStateAsync(session, character, session.MapId,
                 session.State.IsInFight ? FightHandler.FightOf(session.CharacterId) : null);
         // Available titles and ornaments, and which one is worn.
         public Task SendWardrobeAsync(GameSession session) => WardrobeHandler.SendOwnedAsync(StreamOf(session), session.AccountId);
@@ -220,7 +220,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         Console.WriteLine($"[Entry] Actors of map {session.MapId} sent: {character.Name} on cell {state.CellId}.");
     }
 
-    public Task TickAlterationsAsync(GameSession session) => AlterationHandler.TickAsync(StreamOf(session));
+    public Task TickAlterationsAsync(GameSession session) => AlterationHandler.TickAsync(session);
 
     public Task SendReturnToSelectionAsync(GameSession session)
         => session.SendAsync(ConnectionProtocol.Push(Op.Kqr, BuildReturnToken(session.AccountId)));

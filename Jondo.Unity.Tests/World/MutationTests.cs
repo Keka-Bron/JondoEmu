@@ -88,6 +88,33 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
+        public void Semantic_characteristics_use_the_owners_mutation_grade_and_restore_after_removal()
+        {
+            var item = new Equipment.Item { Position = Mutations.Slot };
+            item.Effects.Add(new Equipment.ItemEffect(Mutations.TransformsInto, 0, 3577, 1));
+            if (Mutations.Of(item.Effects) == null) return;
+            var own = GameSession.SinSocket();
+            own.State.CharacterLevel = 200;
+            own.State.StatStrength = 41;
+            own.State.ScrolledStrength = 17;
+            own.State.EquipmentItems[71_002] = item;
+            var wrong = GameSession.SinSocket();
+            using var context = SessionContext.Push(wrong);
+
+            var mutated = CharacteristicsMessages.Live.Snapshot(own).Stats;
+            own.State.EquipmentItems.Clear();
+            var restored = CharacteristicsMessages.Live.Snapshot(own).Stats;
+            CharacterCharacteristicDetailed Detail(CharacterCharacteristics stats, int id)
+                => Assert.IsType<CharacterCharacteristicCaseDetailed>(stats.Characteristics.Single(entry => entry.CharacteristicId == id).CharacteristicCase).Value;
+            Assert.Equal(10000, Detail(mutated, 0).Base);
+            Assert.Equal(0, Detail(mutated, 10).Additional);
+            Assert.Equal(0, Detail(mutated, 10).Equipment);
+            Assert.Equal(1050, Detail(restored, 0).Base);
+            Assert.Equal(new CharacterCharacteristicDetailed(41, 17, 0, 0, 0, 0), Detail(restored, 10));
+            Assert.Same(wrong, SessionContext.Actual);
+        }
+
+        [Fact]
         public void A_mutation_goes_to_its_slot()
         {
             Assert.Equal(new[] { Mutations.Slot }, BonusSlots.SlotsFor(BonusSlots.MutationType));

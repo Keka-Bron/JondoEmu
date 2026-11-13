@@ -247,8 +247,7 @@ namespace Jondo.Unity.Server.Network
                     if (sheetChanged || kamasChanged)
                     {
                         DatabaseManager.SaveCurrentCharacter();
-                        sesion.SendAsync(ConnectionProtocol.Push(Op.Kub,
-                            ConnectionProtocol.BuildCharacteristics())).GetAwaiter().GetResult();
+                        CharacteristicsMessages.Live.SendAsync(sesion).GetAwaiter().GetResult();
                         sesion.SendAsync(ConnectionProtocol.Push(Op.Ivf,
                             ConnectionProtocol.BuildKamas(estado.Kamas))).GetAwaiter().GetResult();
                         sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
@@ -369,14 +368,14 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         /// <remarks>
         /// It used to be int.MaxValue, which is the one value guaranteed to break: max HP is
-        /// computed as <c>50 + level * 5 + vitality</c> in StatsHandler, in int arithmetic and
-        /// with no check, so a vitality of int.MaxValue overflows to a NEGATIVE maximum. The
+        /// formerly computed as <c>50 + level * 5 + vitality</c> in unchecked int arithmetic,
+        /// so a vitality of int.MaxValue overflowed to a NEGATIVE maximum. The
         /// character then has a life bar the client cannot draw and the fight engine treats as
         /// already dead.
         ///
         /// Ten million is far above anything the game reaches — the highest vitality a level 200
         /// character can hold is in the low thousands — and leaves the sum three orders of
-        /// magnitude short of overflowing.
+        /// magnitude short of overflowing. CombatCharacteristics now also checks its arithmetic.
         /// </remarks>
         private const int TopeDeCaracteristica = 10_000_000;
 

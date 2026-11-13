@@ -42,7 +42,7 @@ internal sealed class AfterSelectionMessages(
         // Keep the existing pods capacity policy (allocated + scrolled strength).
         // Arithmetic is widened before multiplication and checked at the int32 wire boundary.
         long strength = (long)state.StatStrength + state.ScrolledStrength;
-        return new(checked((int)carried), checked((int)(ConnectionProtocol.BasePods + 5L * strength)));
+        return new(checked((int)carried), checked((int)(CharacteristicRules.BasePods + 5L * strength)));
     }
 
     internal StorageKamasUpdateEvent Storage(long accountId) => new(storageKamas(accountId));

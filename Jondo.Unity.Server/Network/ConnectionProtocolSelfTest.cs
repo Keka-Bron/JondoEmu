@@ -499,13 +499,13 @@ namespace Jondo.Unity.Server.Network
             // wrong field, which is what left the characteristics button greyed out.
             foreach (int id in new[] { 1, 23 })
             {
-                if (WorldEntry.CharacteristicIds.Count > 0 && WorldEntry.ContainerOf(id) != 5)
-                    failures.Add($"kub: characteristic {id} should travel in f5, not f{WorldEntry.ContainerOf(id)}");
+                if (CharacteristicCatalogue.Default.KindOf(id) != CharacteristicKind.Usable)
+                    failures.Add($"kub: characteristic {id} should be Usable");
             }
             foreach (int id in new[] { 29, 47, 96 })
             {
-                if (WorldEntry.CharacteristicIds.Count > 0 && WorldEntry.ContainerOf(id) != 2)
-                    failures.Add($"kub: characteristic {id} should travel in f2, not f{WorldEntry.ContainerOf(id)}");
+                if (CharacteristicCatalogue.Default.KindOf(id) != CharacteristicKind.Value)
+                    failures.Add($"kub: characteristic {id} should be Value");
             }
         }
 

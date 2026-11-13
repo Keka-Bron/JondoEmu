@@ -23,7 +23,7 @@ public sealed class GameEntryTests
         byte[] request = Pb.New().Msg(2, Pb.New()
             .Msg(1, Pb.New().Str(1, ConnectionProtocol.UriPrefix + "jew").Bytes(2, []))
             .Var(2, uid)).Build();
-        var decoded = GameEntryDispatch.Decode(session, request, ConnectionProtocol.UriPrefix + "jew");
+        var decoded = GameNodeProxy.DecodeRequest(session, request);
         Assert.IsType<GuildWeeklyResetDateRequest>(decoded!.Content);
         var before = GuildProtocol.BuildWeeklyReset(DateTime.UtcNow);
         await Jondo.Unity.Server.Handlers.GuildHandler.WeeklyResetAsync(session, decoded.Uid!.Value);
@@ -55,26 +55,25 @@ public sealed class GameEntryTests
         foreach (var request in requests)
         {
             byte[] bytes = Codec.Encode(new(request, uid));
-            var decoded = GameEntryDispatch.Decode(session, bytes, Codec.ReadEnvelope(bytes).Content.TypeUrl);
+            var decoded = GameNodeProxy.DecodeRequest(session, bytes);
             Assert.NotNull(decoded);
             Assert.Equal(request, decoded.Content);
             Assert.Equal(uid, decoded.Uid);
         }
         Assert.Equal(requests.Length, codec.Decodes);
-        Assert.Null(GameEntryDispatch.Decode(session, Codec.Encode(new(new MapMovementConfirmRequest(), uid)),
-            ConnectionProtocol.UriPrefix + "jqi"));
+        Assert.IsType<MapMovementConfirmRequest>(GameNodeProxy.DecodeRequest(session,
+            Codec.Encode(new(new MapMovementConfirmRequest(), uid)))!.Content);
+        Assert.Equal(requests.Length + 1, codec.Decodes);
     }
 
     [Fact]
-    public void Wrong_envelopes_and_malformed_owned_requests_do_not_fall_back_to_legacy_parsing()
+    public void Wrong_envelopes_and_malformed_requests_leave_typed_decoding_unavailable_for_raw_fallthrough()
     {
         var session = new GameSession(Codec, _ => Task.CompletedTask);
         // Old selection tests used event envelopes for requests; the typed boundary rejects them.
         byte[] eventEnvelope = ConnectionProtocol.Push("kvw", Pb.New().Var(1, 42).Build());
-        Assert.Throws<GameConversionException>(() => GameEntryDispatch.Decode(session, eventEnvelope,
-            ConnectionProtocol.UriPrefix + "kvw"));
-        Assert.Throws<InvalidProtocolBufferException>(() => GameEntryDispatch.Decode(session, [0xff],
-            ConnectionProtocol.UriPrefix + "kqz"));
+        Assert.Null(GameNodeProxy.DecodeRequest(session, eventEnvelope));
+        Assert.Null(GameNodeProxy.DecodeRequest(session, [0xff]));
     }
 
     [Fact]

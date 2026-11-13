@@ -713,10 +713,11 @@ namespace Jondo.Unity.Server.Handlers
             int life, initiative, prospecting;
             using (SessionContext.Push(session))
             {
-                life = StatsHandler.GetPlayerMaxHp();
-                initiative = StatsHandler.GetPlayerInitiative();
+                var stats = SessionContext.Current.Combat;
+                life = stats.GetPlayerMaxHp();
+                initiative = stats.GetPlayerInitiative();
                 Managers.Equipment.Bonuses().TryGetValue(
-                    ConnectionProtocol.Stat.Prospecting, out long delEquipo);
+                    Stat.Prospecting, out long delEquipo);
                 prospecting = BaseProspecting + state.TotalChance / 10 + (int)delEquipo;
             }
 

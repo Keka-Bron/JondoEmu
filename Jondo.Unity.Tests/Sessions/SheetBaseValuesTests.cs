@@ -1,3 +1,4 @@
+using Jondo.Unity.Server;
 using Jondo.Unity.Server.Network;
 using Xunit;
 
@@ -17,7 +18,8 @@ namespace Jondo.Unity.Tests.Sessions
         [InlineData(200, 7)]
         public void The_seventh_action_point_comes_at_level_100(int level, int actionPoints)
         {
-            Assert.Equal(actionPoints, ConnectionProtocol.ValueOf(ConnectionProtocol.Stat.ActionPoints, level));
+            var session = GameSession.SinSocket();
+            Assert.Equal(actionPoints, CharacteristicsMessages.Live.ValueOf(Stat.ActionPoints, level, session));
         }
 
         [Theory]
@@ -25,7 +27,8 @@ namespace Jondo.Unity.Tests.Sessions
         [InlineData(200)]
         public void Every_character_has_one_summon(int level)
         {
-            Assert.Equal(1, ConnectionProtocol.ValueOf(ConnectionProtocol.Stat.Summons, level));
+            var session = GameSession.SinSocket();
+            Assert.Equal(1, CharacteristicsMessages.Live.ValueOf(Stat.Summons, level, session));
         }
     }
 }

@@ -18,7 +18,7 @@ the precise client patch installed.
 | `Jondo.Unity.ProtocolGenerator` | Descriptor/Roslyn validation and direct conversion/dispatch generation |
 | `Jondo.Unity.Server/Network/GameSession.cs` | Typed single-client sends through an injected Game codec |
 | `Jondo.Unity.Server/Network/GameMapAudience.cs` | Explicit map-instance event audiences and shared encoded broadcast |
-| `Jondo.Unity.Server/Network/WorldMovementDispatch.cs` | Narrow typed world-movement request dispatch |
+| `Jondo.Unity.Server/Network/MovementDispatch.cs` | Typed roleplay and combat movement request dispatch |
 | `Jondo.Unity.Server/Diagnostics/GameTrafficFormatter.cs` | Best-effort typed live-log presentation |
 
 The imported schema contains 2,169 messages. The semantic mapping covers 533
@@ -128,14 +128,38 @@ does not unregister it. The returned count is the number of nonthrowing send
 calls, not client acknowledgements. Awaiting the broadcast waits for all target
 sends, including any write timeout.
 
-## First handler migration: world movement
+## Incoming request boundary and compatibility routing
 
-`WorldMovementDispatch` recognizes only `MapMovementRequest`,
-`MapMovementCancelRequest`, and `MapMovementConfirmRequest` using generated alias
-metadata. Under the existing packet/session turn, it verifies world entry and
-decodes through the owning session's codec. Recognized malformed/wrong-envelope
-requests are consumed without falling back to the legacy parser. Backend or
-handler failures are not reclassified as decode failures.
+`GameNodeProxy` attempts semantic request decoding once per packet through the owning
+session's codec, under its existing session turn. This is generic decoding, without
+feature-specific alias allowlists. It dispatches the decoded request to typed entry,
+characteristic, weekly-reset or movement handlers first.
+
+Typed dispatch explicitly owns its implemented request types, including refused actions
+and intentional no-ops. A handled request skips the entire raw chain and its diagnostics;
+an explicit entry-service close result ends the session immediately. Only the default
+dispatch result enters legacy routing, using the original bytes and routing text. This
+retains unmigrated requests and special cases during migration without running a second
+handler after typed handling.
+
+Successful decoding alone does not claim a request: decoded requests without a typed
+handler still reach legacy routing and, if unhandled there too, warning/unknown-packet
+recording. Codec conversion/protobuf errors also select this fallback. Missing mappings
+fall back without a separate decode diagnostic; malformed mapped payloads retain that
+diagnostic. Handler, persistence and transport failures propagate. There is no per-packet handled flag.
+`GameNodeDispatchTests` pins this behavior through the production socket loop, including
+exclusive typed/raw replies, raw fallback after decode failure or an unsupported typed
+request, refused actions, immediate closure, diagnostics and next-packet processing.
+
+## Typed movement requests
+
+`MovementDispatch` accepts an already-decoded frame and recognizes
+`MapMovementRequest`, `MapMovementCancelRequest`, `MapMovementConfirmRequest` and
+`MapChangeRequest`. It requires authentication, a selected character and world entry.
+It has no wire parsing or codec dependency; its action-level result is false for
+disallowed or unrelated requests. The outer typed dispatcher still consumes recognized
+movement types when their actions are refused. Combat confirmation, cancellation and border-change requests are
+intentional handled no-ops: they send nothing and run no arrival or pending-end hooks.
 
 World handlers accept the session and stable values. They retain map-ID checking,
 key-cell decoding, orientation/pending-arrival state, cancellation walkability
@@ -148,11 +172,29 @@ and unpacked key cells.
 Arrival is acknowledged with `MapMovementConfirmedResponse` on the response
 envelope using the original UID, before a pending movement is consumed and any
 floor passage runs. Deferred party/fight joining remains after arrival handling.
-Combat bypasses this adapter and retains its lock-owning dispatcher, raw movement
-builder and legacy confirmation entry point; map-change packets are also still
-handled by their existing code.
+The context is selected once for each request. Arrival may auto-join a fight, but
+the same roleplay confirmation cannot then run as a combat packet. Raw `jrw`, `jqe`,
+`jqi` and `jqk` routes and the legacy confirmation entry point are removed.
 
-The mapped movement event intentionally omits the old builder's wire-only field
+Combat walking accepts the same typed `MapMovementRequest`. Its explicit-session
+entry acquires the fight turn under the caller's session turn, flushes an already
+pending fight end, and otherwise retains turn/controller ownership, placement and MP
+checks, expanded paths, tackle, portals, traps and fight-ending reactions. Key cells
+come directly from the codec; the manual combat movement parser is removed. Combat
+action-sequence output and `jti` acknowledgments retain their existing serializers.
+
+Border crossing accepts a typed `MapChangeRequest`, retaining neighbour resolution,
+jail/raid restrictions, measured arrivals, persistence and departure/load/time/zaap
+ordering. The proxy supplies its entry-lifecycle map-change hook. The control harness
+uses the same typed movement dispatch as incoming client frames.
+
+`MovementDispatchTests` and `TypedCombatMovementTests` cover lifecycle guards, silent
+combat no-ops, packed/unpacked key cells, single MP charging, placement/turn/MP
+refusals, malformed/wrong-envelope rejection, and a roleplay confirmation auto-joining
+a fight with exactly one response before entry. Trap and fight-ending regressions
+also call the typed entry point.
+
+The mapped roleplay movement event intentionally omits the old builder's wire-only field
 2, formerly described as facing. The reviewed `3.6.10.10` mapping binds cells,
 character ID and cautious movement; it does not bind this field. Native inspection
 found path-derived directions (`eoo.bakd`, RVA `0x4ea76f0`), but field 2's usage
@@ -163,12 +205,12 @@ wire/state checks.
 
 ## Game identification, selection and entry migration
 
-`GameEntryDispatch` decodes identification, character-list/selection (including
+`GameNodeProxy` decodes identification, character-list/selection (including
 first selection), sequence-number, context creation/readiness, map-information,
 fight-map, force-selection continuation, weekly-reset and ping requests through
 the owning session's codec. It retains the decoded frame and signed request UID.
-Recognized invalid envelopes
-close the connection rather than falling through to legacy parsers. Entry guards
+`GameEntryDispatch` now contains only lifecycle eligibility and ticket binding.
+Invalid envelopes use the generic compatibility fallthrough described above. Entry guards
 require identification before selection and a selected, in-world character before
 map/context initialization. Selection also checks the ticket's server. Tutorial
 preference is decoded; the existing saved-map spawn policy is retained.
@@ -378,6 +420,94 @@ The owner is scoped for all initial sources, each event uses its codec, and the 
 turn is reused. Tests cover distinct settings/slot counts, recursive detachment, saved
 palette refresh, signed masks, absence/empty presence, unknown-field omission, every
 source/codec/transport failure boundary and real framed account isolation.
+
+The characteristics contract now includes `AlignmentExtendedInformation.HonorNextGradeFloor`
+and `HonorGradeFloor`, imported from the reviewed August mapping on 13 November 2026.
+They bind the extended alignment block's int32 tags 3 and 4 respectively.
+
+#### Characteristics snapshots
+
+`CharacteristicsMessages` constructs `CharacterCharacteristicsEvent` directly from the
+owning session, with an immutable catalogue, injectable state sources and clock. `WorldEntry` owns
+sequencing and explicitly calls `session.SendAsync(CharacteristicsMessages.Live.Snapshot(session))`
+at both entry positions. Initial entry sends the sheet after live feature hooks and
+optional sales history, before the separate HAAPI/gift continuation.
+`WorldEntry.SendMapEntryStateAsync` sends a fresh sheet after the map/spell/channel
+sequence and before the known-zaap snapshot. Roleplay map initialization commits `RegenerationStartedUtc` before
+this second sheet; fight entry retains its existing timestamp. Neither send builds,
+decodes or projects an intermediate payload, and both reuse the caller's session turn.
+
+`CharacteristicCatalogue.Default` is an immutable code-defined registry of the complete
+120-entry sheet, preserving ID order and declaring semantic Value/Detailed/Usable cases
+alongside fixed base values. AP/MP are Usable, energy/max-energy/shield are Value and
+the other 115 IDs are Detailed. IDs with established names use the shared
+`Jondo.Unity.Server.Stat` constants in `Characters/Stat.cs`; unidentified IDs remain numeric.
+The former capture-derived JSON and its startup loader
+are removed, along with the truncated, all-Detailed missing-file fallback. Duplicate
+definitions are rejected and the ID sequence is read-only. `TaxCollectorProtocol` uses
+the same registry, translating kinds to legacy fields only when serializing collector
+entries. Undeclared fighter-sheet IDs retain their Detailed representation.
+
+Calculation keeps allocated points, scrolls, equipment/set/bonus-slot effects and
+alterations separate before semantic case construction. Detailed entries use `Base`,
+`Additional`, `Equipment` and `Temporary`; AP/MP preserve the historical policy of adding
+equipment and alteration contributions together in `Equipment`, leaving the other usable
+columns zero. Value cases retain the base total. Derived stats include all primary
+contributions, while mutations override the established monster-grade values and suppress
+scroll/equipment/alteration and derived contributions. Missing grades use the human sheet.
+Life, percentage defaults, int64 XP floors/experience/kamas and the fixed weapon-critical
+policy value 5 retain their existing behavior. Spell modifier lists remain empty and the
+sheet's experience-bonus limit stays zero. Int32 contributions use checked conversion.
+
+Alignment uses the owner's quest progression, side, PvP state and displayed grade, with
+`Honour.CeilingOf`/`FloorOf` supplying the reviewed threshold members. Missing life is
+negative at the saved regeneration start, falling back to the injected clock only when
+that timestamp is unset. Snapshots detach collections before delivery. Source, codec and
+transport failures propagate without retry or sending the later continuation/zaap event.
+
+Gameplay refreshes use `CharacteristicsMessages.SendAsync(session)`, which constructs the
+same snapshot and sends it once through the owning session's codec. This includes rewards
+from map-arrival quests, heartbeat alteration/bonus-slot expiration, equipment, item use,
+alignment/honour, presets, mutations, fight return, commands and control-API changes.
+Their existing position among surrounding messages and failure propagation are retained.
+Heartbeat expiration takes an explicit session and scopes its legacy feature hooks to that
+owner. `Characters/CharacteristicRules.cs` owns the fixed pods base and derived contribution
+formulas, shared by snapshots, preset columns and entry weight. Characteristic construction
+no longer depends on `ConnectionProtocol`; its payload/value adapters are removed.
+
+`CharacteristicRules` also owns capped base life and level-derived capital. Preset/fallback
+allocation costs are calculated in checked int64 arithmetic; negative and out-of-int32
+preset request values are rejected before narrowing, without replacing the existing draft.
+Preset equip revalidates saved allocations and sends remaining capital in the typed sheets,
+without the obsolete `krb` notification. The legacy `StatsHandler` packet builders and
+`GameNodeProxy`'s `krc`, old `isi` movement and `kkn` initialization routes are retired.
+`StatsHandler` is removed: `GameSession.Combat` captures detached human combat calculations
+from the explicit owner, using the same general equipment/set catalogue as the owner sheet.
+Both use 6 innate AP below level 100 and 7 from level 100 onward. Owner AP/MP retain raw
+equipment bonuses, with configured cap reductions in `Context`; mutations retain their own
+grade totals. Fight-only incarnations and modifiers remain in the fight pipeline.
+
+`GameNodeProxy` routes decoded upgrade/reset requests (`kum`/`kuh`) directly to
+`CharacteristicsHandler`; the feature-specific `CharacteristicsDispatch` is removed.
+The handler requires authentication, a selected character and world entry. Changes during
+fight placement refresh the owner's fighter; requests during active combat are refused. It
+reports whether it handled the request and validates target total capital as one distribution, preserving
+scrolls and leaving rejected distributions untouched. Repeated targets are idempotent.
+Spending, presets and commands share `BreedStatCost` bands, int64 costs and missing-data
+fallback; the duplicate preset-only fifth tier is removed. Successful changes persist
+before sending typed weight then characteristic events through the owner codec. See
+[the audit](stats-handler-audit.md) for implementation and regression details.
+
+`CharacteristicsMessagesTests` uses opaque recording codecs for owner isolation, distinct
+contributions, mutation/restoration, the full registry order/cases/defaults, numeric boundaries,
+regeneration timing and source/codec/transport failures. Semantic assertions
+exercise all three stat cases, selected-zero totals and int64 XP/currency. Collector
+entries are pinned against legacy bytes, including selected-zero and unknown-ID cases. General
+scroll/mutation regressions cover live source adapters. `CharacteristicRefreshTests` drives
+actual reward and heartbeat-expiration callers through opaque recording codecs, checking
+loss/sheet/gain ordering, explicit-owner isolation, no intermediate decode and encoding
+failure without retry or a later gain event. Real-client characteristics-panel
+and alignment acceptance remains unverified.
 
 Entry experience gain is explicitly zero, not the character's accumulated experience.
 Notifications carry an empty flag collection as Jondo's initial policy; no recorded
@@ -1029,5 +1159,6 @@ and aliases, signed UIDs, raw unknown-field retention, maps/bytes/presence,
 explicit defaults, nested-case formatting, redaction, and raw fallback without
 changing bytes delivered to legacy handlers. Session/movement tests cover signed
 response IDs, recipient inclusion/exclusion, nonlocal delivery and ordering,
-explicit house/haven-bag instance isolation, malformed request rejection,
-world/combat routing separation, pending-arrival consumption and cancellation.
+explicit house/haven-bag instance isolation, best-effort request decoding and raw
+default-only legacy fallthrough, typed ownership of refused actions, world/combat routing separation,
+pending-arrival consumption and cancellation.

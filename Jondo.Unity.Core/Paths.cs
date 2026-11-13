@@ -436,11 +436,6 @@ namespace Jondo.Unity.Launcher
             }
         }
 
-        // The 120 characteristics with the slot each one gets inside the kub, taken
-        // from the 672 real kub of the captures by tools/extraer_caracteristicas_kub.py. It
-        // was opened by relative path, and without it the sheet drops from 120 entries to 25 without a word.
-        public static string CharacteristicFieldsJson => Resolve("caracteristicas_kub.json");
-
         /// <summary>
         /// What each bomb does: its explosion, what it casts at the target and its chain. It comes from the
         /// client with tools/extract_bomb_spells.py, from the SpellBombData class.

@@ -120,7 +120,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Iuj, AlterationProtocol.BuildSlotItemChanged(pet)));
             if (worn && after != before)
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await ItemUseHandler.WeighAsync(stream);
 
             Console.WriteLine($"[Pets] {who}'s pet {pet.Template} eats {foods.Sum(f => f.Quantity)} food(s): " +

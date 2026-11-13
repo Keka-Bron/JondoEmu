@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Bots;
 using Jondo.Unity.Server.Handlers;
@@ -77,9 +77,12 @@ namespace Jondo.Unity.Tests.Combat
             await using var pipe = await ClientPipe.OpenAsync(8_900_000_081, Me, map, "Pisador");
             try
             {
-                var walk = ConnectionProtocol.Push(Op.Jrw, Pb.New().Var(1, map)
-                    .Packed(2, SimulatedPlayer.Corners(new[] { from, middle, end })).Build());
-                using (SessionContext.Push(pipe.Session)) await FightHandler.WalkAsync(pipe.ToClient, walk);
+                pipe.Session.State.IsInFight = true;
+                pipe.Session.State.FightId = fight.FightId;
+                var walk = new MapMovementRequest(map,
+                    SimulatedPlayer.Corners(new[] { from, middle, end }).Select(key => (int)key).ToArray(), false);
+                using var turn = await pipe.Session.EnterTurnAsync();
+                Assert.True(await MovementDispatch.TryHandleAsync(pipe.Session, new(walk, 1)));
 
                 Assert.Equal(middle, me.CellId);
                 Assert.True(trap.Gastado);

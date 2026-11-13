@@ -462,7 +462,7 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The ops a harness may send in the character's name, and the handler each goes to.</summary>
         private static readonly HashSet<string> FightOps = new()
         {
-            Op.Jwh, Op.Jwn, "jxy", "jwz", Op.Jrw, Op.Kaq, Op.Jzy,
+            Op.Jwh, Op.Jwn, "jxy", "jwz", Op.Kaq, Op.Jzy,
         };
 
         /// <summary>A client frame as the client wraps it: { f2 { f1 Any { f1 uri, f2 body }, f2 -1 } }.</summary>
@@ -492,8 +492,11 @@ namespace Jondo.Unity.Server.Network
                     try
                     {
                         var stream = session.Stream!;
+                        // Movement uses the same typed boundary as the socket loop.
+                        if (op == Op.Jrw || op == Op.Jqk)
+                            await MovementDispatch.TryHandleAsync(session, GameNodeProxy.DecodeRequest(session, frame));
                         // kme: giving the fight up, so that a harness closing its client leaves no fight behind.
-                        if (FightOps.Contains(op) || op == Op.Kme) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
+                        else if (FightOps.Contains(op) || op == Op.Kme) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
                         else if (op == Op.Hqa) await FightHandler.AttackAsync(stream, frame);
                         else if (op == Op.Hmt) await SpellHandler.HandleVariantAsync(stream, frame);
                         // A workshop's recipe chosen and crafted, as the craft window sends them: a
@@ -520,16 +523,13 @@ namespace Jondo.Unity.Server.Network
                         else if (op == Op.Iuk) await EquipmentHandler.MoveAsync(stream, frame);
                         // The characteristics window's confirm, its paid totals per characteristic:
                         // points spent while placing for a fight, which the fight has to start with.
-                        else if (op == Op.Kum) await CharacteristicsHandler.SpendAsync(stream, frame);
+                        else if (op == Op.Kum && GameNodeProxy.DecodeRequest(session, frame)?.Content is Jondo.Unity.Protocol.Game.CharacterCharacteristicUpgradeRequest upgrade)
+                            await CharacteristicsHandler.Live.SpendAsync(session, upgrade);
                         // And its reset, which gives them all back.
-                        else if (op == "kuh") await CharacteristicsHandler.ResetAsync(stream);
+                        else if (op == "kuh") await CharacteristicsHandler.Live.ResetAsync(session);
                         // Kamas laid in a trade, as typing them in the exchange window sends: the
                         // keyboard does not reach a harness client in the background.
                         else if (op == Op.Kee) await TradeHandler.KamasAsync(stream, frame);
-                        // Off a border, as the client asks once it walks onto the edge: its guess at the
-                        // map beside, from the cell it stands on. Synthetic clicks on an edge do not
-                        // make the client send it.
-                        else if (op == Op.Jqk) await WorldMoveHandler.ChangeMapAsync(stream, frame);
                         // A document's «start the quest» button (a wanted poster's), with the document open.
                         else if (op == "ido") await QuestHandler.StartFromDocumentAsync(stream, frame);
                         else throw new InvalidOperationException($"op {op} is not one the harness sends");

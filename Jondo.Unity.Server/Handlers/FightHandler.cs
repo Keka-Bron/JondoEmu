@@ -724,10 +724,11 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static Fighter SheetFromState()
         {
-            int fuerza = GameState.TotalStrength + StatsHandler.GetEquipBonus(10);
-            int inteligencia = GameState.TotalIntelligence + StatsHandler.GetEquipBonus(15);
-            int suerte = GameState.TotalChance + StatsHandler.GetEquipBonus(13);
-            int agilidad = GameState.TotalAgility + StatsHandler.GetEquipBonus(14);
+            var stats = SessionContext.Current.Combat;
+            int fuerza = GameState.TotalStrength + stats.GetEquipBonus(10);
+            int inteligencia = GameState.TotalIntelligence + stats.GetEquipBonus(15);
+            int suerte = GameState.TotalChance + stats.GetEquipBonus(13);
+            int agilidad = GameState.TotalAgility + stats.GetEquipBonus(14);
 
             // Build Player Fighter from GameState (Fighter ID = player CharacterId)
             var playerFighter = new Fighter
@@ -743,12 +744,12 @@ namespace Jondo.Unity.Server.Handlers
                 // 305 HP while the client displayed 514, because equipped items (the Emerald
                 // Dofus gives +200) were only added on one side. The result: the character died
                 // "in the background" after 8 turns with a full health bar on screen.
-                MaxHP = StatsHandler.GetPlayerMaxHp(),
+                MaxHP = stats.GetPlayerMaxHp(),
                 // And for the same reason, the points: base plus equipment, from the same place the
                 // sheet the player sees comes from. They were written here as 6 and 3, so a character
                 // with +4 AP and +2 MP from equipment saw 10 and 5 on screen and then fought with 6 and 3.
-                MaxAP = StatsHandler.GetPlayerMaxAp(),
-                MaxMP = StatsHandler.GetPlayerMaxMp(),
+                MaxAP = stats.GetPlayerMaxAp(),
+                MaxMP = stats.GetPlayerMaxMp(),
                 // The same initiative the sheet shows, and from the same place.
                 //
                 // It added only the INVESTED points and characteristic 44's bonus, so the elementals
@@ -761,38 +762,38 @@ namespace Jondo.Unity.Server.Handlers
                 // The comment that was here said exactly this -- that ignoring the items made the piwi
                 // play first -- and fixed only half: it put in the initiative bonus and left out the
                 // four elementals.
-                Initiative = StatsHandler.GetPlayerInitiative(),
+                Initiative = stats.GetPlayerInitiative(),
                 Strength = fuerza,
                 Intelligence = inteligencia,
                 Chance = suerte,
                 Agility = agilidad,
                 // Power from the gear (characteristic 25). It feeds straight into damage.
-                Power = StatsHandler.GetEquipBonus(25),
+                Power = stats.GetEquipBonus(25),
                 // Critical hit from the gear (characteristic 18): the Turquoise Dofus gives +10.
-                CriticalBonus = StatsHandler.GetEquipBonus(18),
+                CriticalBonus = stats.GetEquipBonus(18),
                 // The damage added at the end, without multiplying: general, critical and each
                 // element's.
-                FlatDamage = StatsHandler.GetEquipBonus(16),
-                CriticalDamage = StatsHandler.GetEquipBonus(86),
-                EarthDamage = StatsHandler.GetEquipBonus(88),
-                FireDamage = StatsHandler.GetEquipBonus(89),
-                WaterDamage = StatsHandler.GetEquipBonus(90),
-                AirDamage = StatsHandler.GetEquipBonus(91),
-                NeutralDamage = StatsHandler.GetEquipBonus(92),
+                FlatDamage = stats.GetEquipBonus(16),
+                CriticalDamage = stats.GetEquipBonus(86),
+                EarthDamage = stats.GetEquipBonus(88),
+                FireDamage = stats.GetEquipBonus(89),
+                WaterDamage = stats.GetEquipBonus(90),
+                AirDamage = stats.GetEquipBonus(91),
+                NeutralDamage = stats.GetEquipBonus(92),
                 // The percentage resistances per element (characteristics 33 to 37). They were missing:
                 // these five Fighter fields were only touched by the monster code and the summon code, so
                 // for the player they stayed at zero and the fight panel showed 0% everywhere. And it was
                 // not only cosmetic: the same zero reached the damage calculation, so the character took
                 // the hits with no resistance at all.
-                EarthResPct = StatsHandler.GetEquipBonus(33),
-                FireResPct = StatsHandler.GetEquipBonus(34),
-                WaterResPct = StatsHandler.GetEquipBonus(35),
-                AirResPct = StatsHandler.GetEquipBonus(36),
-                NeutralResPct = StatsHandler.GetEquipBonus(37),
+                EarthResPct = stats.GetEquipBonus(33),
+                FireResPct = stats.GetEquipBonus(34),
+                WaterResPct = stats.GetEquipBonus(35),
+                AirResPct = stats.GetEquipBonus(36),
+                NeutralResPct = stats.GetEquipBonus(37),
                 // Push (84 on equipment, which the client draws as 85) and range (19).
-                PushDamage = StatsHandler.GetEquipBonus(84),
-                Vitality = GameState.TotalVitality + StatsHandler.GetEquipBonus(11),
-                Range = StatsHandler.GetEquipBonus(19),
+                PushDamage = stats.GetEquipBonus(84),
+                Vitality = GameState.TotalVitality + stats.GetEquipBonus(11),
+                Range = stats.GetEquipBonus(19),
                 LookBoneId = 744,
                 IsMonster = false
             };
@@ -1059,10 +1060,10 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>The life the kuq reports for whoever is entering: his fighter's, else full.</summary>
         private static int LifeAtFightEntry(FightInstance fight)
-            => fight.Buscar(GameState.CharacterId)?.CurrentHP ?? StatsHandler.GetPlayerMaxHp();
+            => fight.Buscar(GameState.CharacterId)?.CurrentHP ?? SessionContext.Current.Combat.GetPlayerMaxHp();
 
         private static int MaxLifeAtFightEntry(FightInstance fight)
-            => fight.Buscar(GameState.CharacterId)?.MaxHP ?? StatsHandler.GetPlayerMaxHp();
+            => fight.Buscar(GameState.CharacterId)?.MaxHP ?? SessionContext.Current.Combat.GetPlayerMaxHp();
 
         /// <summary>
         /// The fight's placement, as the real server sends it.
@@ -1648,12 +1649,13 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static void RellenarLaFicha(Fighter quien)
         {
+            var stats = SessionContext.Current.Combat;
             void Poner(int caracteristica, int baseDelPersonaje)
-                => quien.Otras[caracteristica] = baseDelPersonaje + StatsHandler.GetEquipBonus(caracteristica);
+                => quien.Otras[caracteristica] = baseDelPersonaje + stats.GetEquipBonus(caracteristica);
 
             const int PorCadaDiez = 10;
             int agilidad = quien.Agility;
-            int sabiduria = GameState.TotalWisdom + StatsHandler.GetEquipBonus(12);
+            int sabiduria = GameState.TotalWisdom + stats.GetEquipBonus(12);
 
             Poner(78, agilidad / PorCadaDiez);    // huida
             Poner(79, agilidad / PorCadaDiez);    // placaje
@@ -2188,6 +2190,32 @@ namespace Jondo.Unity.Server.Handlers
             finally { fight.Turno.Release(); }
         }
 
+        /// <summary>Typed combat movement. The caller owns the session turn; this entry owns the fight turn.</summary>
+        internal static async Task HandleMovementAsync(GameSession session, Jondo.Unity.Protocol.Game.MapMovementRequest request)
+        {
+            using var context = SessionContext.Push(session);
+            if (!session.State.IsInFight) return;
+            var fight = GetCurrentFight();
+            if (fight == null) return;
+            await InTurnAsync(fight, async () =>
+            {
+                // A fight clock may finish it while this request waits for the fight turn.
+                if (!session.State.IsInFight || !ReferenceEquals(GetCurrentFight(), fight)) return;
+                if (await FinishPendingFightAsync(fight)) return;
+                var stream = session.Stream ?? throw new InvalidOperationException("Combat movement requires a connected game session.");
+                await WalkAsync(stream, fight, request);
+            });
+        }
+
+        private static async Task<bool> FinishPendingFightAsync(FightInstance fight)
+        {
+            if (fight.FinPendiente == 0) return false;
+            fight.FinPendiente = 0;
+            Program.LogDebug("[Fight] The ending was waiting for the acknowledgement and something else arrived; it is shown.");
+            await EndFightAsync(fight);
+            return true;
+        }
+
         private static async Task AtenderAlClienteAsync(NetworkStream stream, byte[] payload, string payloadStr)
         {
             Program.LogDebug($"\n[FIGHT PACKET RECEIVED] Length: {payload.Length} bytes");
@@ -2214,12 +2242,8 @@ namespace Jondo.Unity.Server.Handlers
             // the client has played the blows that ended the fight (see CheckFightOverAsync).
             var fight = GetCurrentFight();
 
-            if (fight != null && fight.FinPendiente != 0 && !payloadStr.Contains(Op.Uri(Op.Jti)))
-            {
-                fight.FinPendiente = 0;
-                Program.LogDebug("[Fight] The ending was waiting for the acknowledgement and something else arrived; it is shown.");
-                await EndFightAsync(fight);
-            }
+            if (fight != null && !payloadStr.Contains(Op.Uri(Op.Jti)))
+                await FinishPendingFightAsync(fight);
 
             if (payloadStr.Contains(Op.Uri(Op.Jzy)))
             {
@@ -2252,11 +2276,6 @@ namespace Jondo.Unity.Server.Handlers
                     return;
                 }
                 await PassTurnAsync(stream);
-            }
-            else if (payloadStr.Contains(Op.Uri(Op.Jrw)))
-            {
-                // Walking. It is the same message as outside a fight; here it spends MP.
-                await WalkAsync(stream, payload);
             }
             else if (payloadStr.Contains(Op.Uri(Op.Jwh)) || payloadStr.Contains(Op.Uri(Op.Jwn)))
             {
@@ -4351,10 +4370,10 @@ namespace Jondo.Unity.Server.Handlers
         /// see <see cref="WalkPathAsync"/>. The client sends only the corners of the path; the
         /// jsj gives back every cell, which is what the client animates.
         /// </summary>
-        public static async Task WalkAsync(NetworkStream stream, byte[] payload)
+        private static async Task WalkAsync(NetworkStream stream, FightInstance fight,
+            Jondo.Unity.Protocol.Game.MapMovementRequest request)
         {
-            var fight = GetCurrentFight();
-            if (fight == null || fight.State != Jondo.Unity.World.Fights.FightState.Ongoing) return;
+            if (fight.State != Jondo.Unity.World.Fights.FightState.Ongoing) return;
 
             var walker = fight.CurrentFighter;
             if (walker == null || !walker.ControlledBy(GameState.CharacterId)) return;
@@ -4362,10 +4381,11 @@ namespace Jondo.Unity.Server.Handlers
             // A chess piece does not walk: it moves by its spell (GuildRaidEfedra).
             if (!Managers.GuildRaidEfedra.MayWalk(fight, walker)) return;
 
-            var (_, corners, facing) = Network.FightProtocol.ReadMove(payload);
+            var corners = request.KeyCells.Select(key => key & 0xFFF).ToList();
             if (corners.Count < 2) return;
+            int facing = request.KeyCells[^1] >> 12;
 
-            int destination = corners[corners.Count - 1];
+            int destination = corners[^1];
 
             // In a fight it sends the ARENA's list of cells, not the walking one: the outer ring of
             // a fight map is not walkable even if it is on the normal map.
@@ -4385,9 +4405,7 @@ namespace Jondo.Unity.Server.Handlers
             // it sends only the VERTICES, one for each change of direction. Walking ten cells in a
             // straight line is two vertices, and here «vertices minus one» was charged, that is ONE
             // point for ten cells. Crossing the map cost whatever turning cost.
-            var enteras = new List<int>();
-            for (int i = 0; i < corners.Count; i++) enteras.Add((int)corners[i]);
-            var camino = Jondo.Unity.World.Maps.MapGeometry.ExpandPath(enteras, pisables, ocupadas);
+            var camino = Jondo.Unity.World.Maps.MapGeometry.ExpandPath(corners, pisables, ocupadas);
             if (camino.Count < 2) return;
 
             int steps = camino.Count - 1;
@@ -7002,7 +7020,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// Returns the simultaneous summon capacity. Player equipment is already stored in
-        /// Otras[26] by RellenarLaFicha, so reading StatsHandler again would count it twice.
+        /// Otras[26] by RellenarLaFicha, so reading equipment contributions again would count it twice.
         /// </summary>
         internal static int SummonLimitFor(Fighter fighter, int round)
         {
@@ -11461,8 +11479,7 @@ namespace Jondo.Unity.Server.Handlers
             // through "kri", and that does not exist: zero appearances in the 295 captures of all
             // the folders, against 672 of kub. So the packet went out from here and the client
             // never picked it up, and that is why the previous fix changed nothing.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kub,
-                ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
 
             // "Has perdido 2000 puntos de energía.", right behind that kub in the Pandala and
             // Dopeul defeats. With nothing lost -- the gauge already at its last point -- there is
@@ -11632,9 +11649,9 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// The life points the level gives, without vitality: fifty to start with and five per level.
-        /// It is the same calculation StatsHandler.GetPlayerMaxHp does before adding anything.
+        /// It is the same base-life rule the session's combat calculator uses before contributions.
         /// </summary>
-        private static int LifeFromLevel(int level) => StatsHandler.BaseLifeForLevel(level);
+        private static int LifeFromLevel(int level) => CharacteristicRules.BaseLifeForLevel(level);
 
         /// <summary>What casting something costs when it is not known: a spell's ordinary cost.</summary>
         private const int DefaultCastCost = 3;
@@ -11643,7 +11660,7 @@ namespace Jondo.Unity.Server.Handlers
         /// The last level that hands out characteristic points. The client's table goes up to 1889,
         /// but from 201 on that is Omega: the capture's 354 is a level 200 with Omega 154.
         /// </summary>
-        private const int MaxLevelWithPoints = StatsHandler.MaxLevelWithStats;
+        private const int MaxLevelWithPoints = CharacteristicRules.MaxLevelWithStats;
 
         /// <summary>What a spell costs and what limits it, all from the same row.</summary>
         public readonly record struct LimitesDelHechizo(
@@ -12302,8 +12319,8 @@ namespace Jondo.Unity.Server.Handlers
             //
             // It comes from THIS session's GameState, like everything else in this method: with several
             // players in a fight it will have to come from the fighter himself.
-            if (!fighter.IsMonster) AddBaseBonusVal(44, StatsHandler.IniciativaInvertida(),
-                                                        StatsHandler.IniciativaDelEquipo());
+            if (!fighter.IsMonster) AddBaseBonusVal(44, SessionContext.Current.Combat.IniciativaInvertida(),
+                                                        SessionContext.Current.Combat.IniciativaDelEquipo());
             else AddStatEntry(44, new ProtoMessage());
 
             // 22. STATID 0 = LIFE POINTS / MAX HP! (statId = null -> omitted f5)
@@ -12326,7 +12343,7 @@ namespace Jondo.Unity.Server.Handlers
             else AddSimpleVal(null, fighter.MaxHP);
 
             // 23. 11 (Vitality: player bonus; monster empty)
-            if (!fighter.IsMonster) AddBaseBonusVal(11, 0, GameState.TotalVitality + StatsHandler.GetEquipBonus(11));
+            if (!fighter.IsMonster) AddBaseBonusVal(11, 0, GameState.TotalVitality + SessionContext.Current.Combat.GetEquipBonus(11));
             else AddStatEntry(11, new ProtoMessage());
 
             // 25. 97 (empty)

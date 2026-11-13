@@ -2793,7 +2793,7 @@ namespace Jondo.Unity.Server
                                   "WHERE Id = $id;";
             command.Parameters.AddWithValue("$level", level);
             command.Parameters.AddWithValue("$xp", ExperienceTable.IsLoaded ? ExperienceTable.LevelFloor(level) : 0L);
-            command.Parameters.AddWithValue("$points", Handlers.StatsHandler.TotalCapitalForLevel(level));
+            command.Parameters.AddWithValue("$points", CharacteristicRules.TotalCapitalForLevel(level));
             command.Parameters.AddWithValue("$id", characterId);
             command.ExecuteNonQuery();
         }
@@ -3082,7 +3082,7 @@ namespace Jondo.Unity.Server
                             1, $kamas, $now, $color1, $color2, $color3, $color4, $color5, $color6);";
                 CharacterColorStorage.Bind(insertar, palette);
                 insertar.Parameters.AddWithValue("$xp", ExperienceTable.IsLoaded ? ExperienceTable.LevelFloor(level) : 0L);
-                insertar.Parameters.AddWithValue("$points", Handlers.StatsHandler.TotalCapitalForLevel(level));
+                insertar.Parameters.AddWithValue("$points", CharacteristicRules.TotalCapitalForLevel(level));
                 insertar.Parameters.AddWithValue("$id", id);
                 insertar.Parameters.AddWithValue("$acc", accountId);
                 insertar.Parameters.AddWithValue("$name", name);

@@ -92,7 +92,7 @@ namespace Jondo.Unity.Server.Handlers
                         if (s.Change.Message != 0)
                             await session.SendAsync(ConnectionProtocol.Push(Op.Lqn,
                                 ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, s.Change.Message, s.Change.Amount.ToString())));
-                        await session.SendAsync(ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                        await CharacteristicsMessages.Live.SendAsync(session);
                         if (Alignments.Of(id).HonourGrade != s.GradeBefore && session.IsInWorld)
                             await SlotLookHandler.RedrawAsync(session.Stream);
                     }

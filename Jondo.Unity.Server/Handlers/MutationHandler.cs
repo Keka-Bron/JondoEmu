@@ -50,7 +50,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained, "1", template.ToString())));
             await ItemUseHandler.WeighAsync(stream);
             await LookChangedAsync(stream);
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
 
             Console.WriteLine($"[Mutations] {me.CharacterName} mutates into monster {mutation?.Monster} " +
                               $"(grade {mutation?.Grade}) with item {template}.");
@@ -70,7 +70,7 @@ namespace Jondo.Unity.Server.Handlers
             await SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Ium, ConnectionProtocol.BuildItemGone(item.Uid)));
             await LookChangedAsync(stream);
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await ItemUseHandler.WeighAsync(stream);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                 ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemLost, "1", item.Template.ToString())));

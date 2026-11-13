@@ -32,6 +32,7 @@ internal interface IGameEntryBackend
     string WelcomeMessage { get; }
 }
 
+// Handled means the typed handler owns the request, including refusals and intentional no-ops.
 internal enum GameEntryResult { Unhandled, Handled, Close }
 
 /// <summary>One entry lifecycle per session: identification, selection and map readiness.</summary>
@@ -107,8 +108,9 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
                 if (await backend.TrySendFightMapAsync(session, request)) return GameEntryResult.Handled;
                 return ready.MapId == session.MapId ? GameEntryResult.Handled : GameEntryResult.Close;
             case FightMapRequest:
-                return await backend.TrySendFightMapAsync(session, request)
-                    ? GameEntryResult.Handled : GameEntryResult.Unhandled;
+                // A stale readiness notification has no response, but still belongs to this handler.
+                await backend.TrySendFightMapAsync(session, request);
+                return GameEntryResult.Handled;
             case MapInformationRequest map:
                 if (await backend.TrySendFightMapAsync(session, request)) return GameEntryResult.Handled;
                 if (map.MapId != session.MapId) return GameEntryResult.Close;

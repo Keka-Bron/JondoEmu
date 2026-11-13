@@ -152,7 +152,7 @@ public sealed class GameEntryServiceTests
         using var turn = await session.EnterTurnAsync();
         var request = new ChatChannelSubscriptionRequest([ChatChannel.Private], [ChatChannel.Fight]);
         var payload = Codec.Encode(new(request, uid));
-        var frame = GameEntryDispatch.Decode(session, payload, ConnectionProtocol.UriPrefix + "ktn");
+        var frame = GameNodeProxy.DecodeRequest(session, payload);
         Assert.NotNull(frame);
         Assert.Equal(uid, frame.Uid);
         var backend = new Backend(session);

@@ -949,6 +949,10 @@ transition path (`Handlers/MapChangeHandler.cs`, `Handlers/MapLoadHandler.cs`,
 `Handlers/StatsHandler.cs`, `Network/GameNodeProxy.cs`, `Network/TransitionPacketsBuilder.cs`). They
 are all the previous version of the protocol.
 
+**13 November 2026 update:** this is the historical scan. The obsolete stat/weight/capital
+builders and `krc`/old `isi`/`kkn` routes have since been removed, and `StatsHandler`
+was replaced by the session-owned `CombatCharacteristics`. See [the audit](stats-handler-audit.md).
+
 And the two the fight code reads as client requests travel the other way in reality. Measured on
 `Combate/combate contra poutch nivel 50…pcapng`:
 

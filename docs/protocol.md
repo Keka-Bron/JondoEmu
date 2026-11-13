@@ -539,10 +539,14 @@ Selection, inventory, professions, spells, shortcut bars and map state are now
 constructed directly. Entry no longer learns a captured identity, item signatures
 or characteristic structure from recorded packets.
 
-`WorldEntry.Initialize` loads `datos/caracteristicas_kub.json` independently. This
-measured catalogue supplies the characteristic ids and their value containers to
-`ConnectionProtocol.BuildCharacteristics`; character values come from live state.
-Deleting the entry reconstruction does not remove that catalogue.
+`CharacteristicCatalogue.Default` defines all 120 characteristic IDs, their semantic
+Value/Detailed/Usable cases and fixed base values in code. No external characteristic
+file or startup loading is needed. `CharacteristicsMessages` constructs owner-state
+snapshots directly at initial and map entry; the second snapshot observes the map
+sequence's regeneration timestamp. Gameplay refreshes send the same snapshot through
+`CharacteristicsMessages.SendAsync(session)` and the owning session's codec. Shared
+characteristic arithmetic lives in `CharacteristicRules`, outside the packet builders. See
+[characteristics snapshots](game-protocol.md#characteristics-snapshots) for policy and coverage.
 
 ---
 

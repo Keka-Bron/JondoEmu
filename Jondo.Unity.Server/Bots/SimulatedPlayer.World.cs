@@ -349,7 +349,7 @@ namespace Jondo.Unity.Server.Bots
         {
             var session = Session;
             if (session == null || session.State.CharacterRemainingPoints <= 0) return;
-            int capital = StatsHandler.TotalCapitalForLevel(session.State.CharacterLevel);
+            int capital = CharacteristicRules.TotalCapitalForLevel(session.State.CharacterLevel);
             // Once per total: the server takes a moment to put the points down.
             if (capital <= _capitalSent) return;
             _capitalSent = capital;

@@ -23,7 +23,7 @@ public sealed record ActorPositionInformation(EntityDisposition Disposition, Act
 
 public enum Alignment { Unknown, Without, Neutral, Angel, Evil }
 
-public sealed record AlignmentExtendedInformation(int Honor, AttackableStatus Attackable);
+public sealed record AlignmentExtendedInformation(int Honor, AttackableStatus Attackable, int HonorNextGradeFloor, int HonorGradeFloor);
 
 public sealed record AlignmentInformation(int AlignmentQuestNumber, Alignment Alignment, AlignmentExtendedInformation? ExtendedInformation, int AlignmentGrade, int CharacterLevel);
 
