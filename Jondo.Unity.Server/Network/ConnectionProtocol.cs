@@ -630,7 +630,7 @@ namespace Jondo.Unity.Server.Network
             }
             // The base; strength's five pods a point go on top (GivenByCharacteristics), which is
             // what the capture shows: five points of strength moved this characteristic by twenty-five.
-            if (id == Stat.Pods) return BasePods;
+            if (id == Stat.Pods) return PodsBeforeStrength(Jondo.Unity.Server.Network.SessionContext.Current?.State);
             if (id == Stat.RemainingPoints) return Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints;
             return FreshCharacter.TryGetValue(id, out long value) ? value : 0;
         }
@@ -1604,6 +1604,43 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildPods(long carried, long capacity)
             => Pb.New().VarIfNotZero(1, carried).VarIfNotZero(3, capacity).Build();
 
+        /// <summary>Pods a level brings: the character's, Omega ones too, and each job's.</summary>
+        public const int PodsPerLevel = 5;
+
+        /// <summary>
+        /// What a character can carry: the thousand of a new character, five a level since the
+        /// first -- the client's own level-up window shows «Pods +5» on every level --, five a
+        /// level of each job since its first («Obtienes {2} pods adicionales», text 1120328), and
+        /// five a point of strength. It was the thousand and the strength alone, in a dozen copies.
+        /// </summary>
+        public static long Capacity(SessionState state)
+            => state == null ? BasePods
+               // Widened before the sum: points and scrolls near int.MaxValue add up past it.
+               : PodsBeforeStrength(state) + PodsPerLevel * ((long)state.StatStrength + state.ScrolledStrength);
+
+        /// <summary>The same without the strength: the sheet's pods characteristic, which adds strength's on its own.</summary>
+        public static long PodsBeforeStrength(SessionState state)
+        {
+            if (state == null) return BasePods;
+            long jobs = 0;
+            foreach (var job in state.Jobs.Values.ToArray()) jobs += Math.Max(0, job.Level - 1);
+            return BasePods + PodsPerLevel * (Math.Max(1L, state.CharacterLevel) - 1) + PodsPerLevel * jobs;
+        }
+
+        /// <summary>
+        /// What a character carries: every item's real weight by its quantity, worn ones too, as
+        /// the world entry counts it (AfterSelectionMessages.Weight). Every refresh but that one
+        /// sent zero, and the bag read «0 pods» from the first item moved.
+        /// </summary>
+        public static long Carried(SessionState state)
+        {
+            if (state == null) return 0;
+            long carried = 0;
+            foreach (var item in state.EquipmentItems.Values.ToArray())
+                carried += (long)DatabaseManager.GetItemRealWeight(item.Template) * Math.Max(1, item.Quantity);
+            return carried;
+        }
+
         // ─── Gathering ──────────────────────────────────────────────────────────
 
         /// <summary>
@@ -1741,7 +1778,9 @@ namespace Jondo.Unity.Server.Network
 
             cuerpo.Msg(5, Pb.New().Var(7, 1));
             cuerpo.Var(6, 1);
-            cuerpo.Bytes(7, HumanTrailer);
+            // His restrictions: the 0x0b of every capture, and CannotRun when he is overloaded --
+            // sent with only the 0x0b on every map, it let an overloaded character run again.
+            cuerpo.Bytes(7, Handlers.OverloadRestriction.PackedOf(character.Id));
 
             var humanoid = Pb.New()
                 .Str(1, character.Name)
@@ -2495,9 +2534,6 @@ namespace Jondo.Unity.Server.Network
                     .Var(4, ornament)));
             }
         }
-
-        /// <summary>The f7 that closes the block, a single byte with the same value in every capture.</summary>
-        private static readonly byte[] HumanTrailer = { 0x0b };
 
         // ─── World: merkasako ───────────────────────────────────────────────────
 

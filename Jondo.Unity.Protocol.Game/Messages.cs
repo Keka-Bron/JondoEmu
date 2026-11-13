@@ -705,7 +705,13 @@ public sealed record GameActionFightEvent(long SourceId, int ActionType, FightAc
 
 public enum GameContext { RolePlay, Fight }
 
-public sealed record GameMapMovementEvent(IReadOnlyList<int> Cells, long CharacterId, bool Cautious) : GameEvent;
+/// <summary>
+/// An actor's walk on the map. <see cref="Pace"/> is how it walks: 1 for an overloaded character,
+/// who walks instead of running -- an official capture sends its third field at 1 on every move
+/// of an overloaded character and leaves it out once he is back under; INFERRED that the value is
+/// a pace and that 0 is running.
+/// </summary>
+public sealed record GameMapMovementEvent(IReadOnlyList<int> Cells, long CharacterId, bool Cautious, int Pace = 0) : GameEvent;
 
 public sealed record GameRolePlayShowActorsEvent(IReadOnlyList<ActorPositionInformation> Actors) : GameEvent;
 

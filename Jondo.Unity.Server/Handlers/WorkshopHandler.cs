@@ -984,7 +984,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         private static Task SendPodsAsync(GameSession session)
-            => SendAsync(session, Op.Iun, ConnectionProtocol.BuildPods(0, 1000 + 5L * session.State.TotalStrength));
+            => SendAsync(session, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(session.State), ConnectionProtocol.Capacity(session.State)));
 
         /// <summary>The bag's stacks of a template, oldest first. Worn items never go into a workshop.</summary>
         private static IEnumerable<Equipment.Item> BagStacksOf(int gid)

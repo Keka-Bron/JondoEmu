@@ -97,9 +97,8 @@ namespace Jondo.Unity.Server.Handlers
                     LogDebug("[Inventory] Sent luq (UpdateSelfLookMessage)");
                 }
 
-                // 7. isf (InventoryWeightMessage)
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, StatsHandler.BuildIsfPacket());
-                LogDebug("[Inventory] Sent isf (InventoryWeightMessage)");
+                // 7. The pods (iun).
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, StatsHandler.BuildPodsPacket());
 
                 if (lookBytes != null)
                 {

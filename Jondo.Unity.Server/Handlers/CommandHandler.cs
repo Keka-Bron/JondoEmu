@@ -459,7 +459,7 @@ namespace Jondo.Unity.Server.Handlers
             // CharacteristicsHandler sends when spending points.
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
-                    ConnectionProtocol.BuildPods(0, 1000 + 5L * GameState.TotalStrength)));
+                    ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State))));
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
 
@@ -1109,7 +1109,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(
-                    0, 1000 + 5L * GameState.TotalStrength)));
+                    ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State))));
         }
 
         // ─── Loose pieces ───────────────────────────────────────────────────────

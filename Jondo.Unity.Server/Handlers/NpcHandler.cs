@@ -2031,7 +2031,7 @@ namespace Jondo.Unity.Server.Handlers
             // The order is the measured one, and the two rounds of ivf/iun too: the real server sends
             // them identical before and after the kdg. Since both carry the total and not an increment,
             // repeating them throws nothing off.
-            long capacity = 1000 + 5L * GameState.TotalStrength;
+            long capacity = ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State);
 
             if (tokenShop == null)
             {
@@ -2063,7 +2063,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3, bought)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), capacity)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kdg));
 
@@ -2071,7 +2071,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), capacity)));
 
             Console.WriteLine(tokenShop == null
                 ? $"[NPC] Bought item {gid} x{quantity} (uid {uid}) for {price}; " +

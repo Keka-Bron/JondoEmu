@@ -252,7 +252,7 @@ namespace Jondo.Unity.Server.Network
                         sesion.SendAsync(ConnectionProtocol.Push(Op.Ivf,
                             ConnectionProtocol.BuildKamas(estado.Kamas))).GetAwaiter().GetResult();
                         sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
-                            ConnectionProtocol.BuildPods(0, 1000 + 5L * estado.StatStrength)))
+                            ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(estado), ConnectionProtocol.Capacity(estado))))
                             .GetAwaiter().GetResult();
                     }
 
@@ -285,7 +285,7 @@ namespace Jondo.Unity.Server.Network
                         // And the weight, as the .item command does: without this the pods bar
                         // stays stale until the next inventory movement.
                         sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
-                            ConnectionProtocol.BuildPods(0, 1000 + 5L * estado.StatStrength)))
+                            ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(estado), ConnectionProtocol.Capacity(estado))))
                             .GetAwaiter().GetResult();
                     }
 

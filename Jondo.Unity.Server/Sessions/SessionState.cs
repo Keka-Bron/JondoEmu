@@ -58,6 +58,9 @@ namespace Jondo.Unity.Server
         // Combat State
         public bool IsInFight { get; set; }
 
+        /// <summary>Whether the client was last told he cannot run for his weight (the kur's CannotRun).</summary>
+        public bool ToldOverloaded { get; set; }
+
         /// <summary>
         /// This session came back into a fight that was already running, and the client has
         /// not asked for the board yet. Cleared by the burst that answers that request.

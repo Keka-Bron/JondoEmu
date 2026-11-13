@@ -163,10 +163,8 @@ namespace Jondo.Unity.Server.Handlers
             DatabaseManager.SaveCurrentCharacter();
             Console.WriteLine("[Stats] Saved updated stats to database.");
 
-            // 1. Send updated pods weight (isf) — max pods depend on strength
-            byte[] isfPacket = BuildIsfPacket();
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, isfPacket);
-            Console.WriteLine("[Stats] Sent isf (pods weight).");
+            // 1. The pods (iun): what he can carry depends on strength.
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, BuildPodsPacket());
 
             // 2. Send the available-capital notification (krb). The official server sends this
             // whenever the stats-points pool changes; the client's characteristics panel binds
@@ -205,43 +203,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Builds the isf (InventoryWeightMessage) packet from the database: current weight
-        /// is the sum of each item's realWeight (ItemTemplates) times its quantity, and max
-        /// pods follow the Dofus rule of 1000 base + 5 per strength point.
-        /// Also used by InventoryHandler after equipment changes.
+        /// The pods (iun): what he carries and what he can carry, after his characteristics or
+        /// his equipment change. It went out as an «isf» -- the quest list's opcode -- carrying
+        /// the two numbers, which the client read as no weight at all.
         /// </summary>
-        public static byte[] BuildIsfPacket()
+        public static byte[] BuildPodsPacket()
         {
-            // Out of the live inventory, which every item that comes, goes or is spent goes
-            // through; the login's list only when that one is empty.
-            int currentWeight = 0;
-            var live = Managers.Equipment.All.ToList();
-            if (live.Count > 0)
-            {
-                foreach (var item in live)
-                    currentWeight += DatabaseManager.GetItemRealWeight(item.Template) * item.Quantity;
-            }
-            else
-            {
-                foreach (var item in GameState.GetInventoryCopy())
-                    currentWeight += DatabaseManager.GetItemRealWeight(item.ItemId) * item.Quantity;
-            }
-
-            int maxWeight = 1000 + GameState.TotalStrength * 5;
-
-            using var ms = new MemoryStream();
-            var output = new CodedOutputStream(ms);
-
-            // Field 1: Current weight
-            output.WriteTag((uint)((1 << 3) | 0));
-            output.WriteInt32(currentWeight);
-
-            // Field 2: Max weight
-            output.WriteTag((uint)((2 << 3) | 0));
-            output.WriteInt32(maxWeight);
-
-            output.Flush();
-            return NetworkEnvelope.BuildGameNodePacket(Op.Uri(Op.Isf), ms.ToArray());
+            var state = Jondo.Unity.Server.Network.SessionContext.State;
+            return ConnectionProtocol.Push(Op.Iun,
+                ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(state), ConnectionProtocol.Capacity(state)));
         }
 
         /// <summary>Stats whose values are computed from the database/GameState;

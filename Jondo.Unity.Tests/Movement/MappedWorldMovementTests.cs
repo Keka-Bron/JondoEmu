@@ -114,6 +114,73 @@ public sealed class MappedWorldMovementTests
         Assert.Empty(other.Packets);
     }
 
+    /// <summary>
+    /// An overloaded character walks: the real server sends the move's third field at 1 on each of
+    /// his moves, and leaves it out once he is back under his capacity (an official capture). The
+    /// client ran with any weight in its bag, Cautious at 1 or not.
+    /// </summary>
+    [Fact]
+    public async Task An_overloaded_character_walks()
+    {
+        LoadWorld();
+        using var mover = new Peer(MapId);
+        mover.Session.State.CellId = 100;
+        int purse = 8815;
+        long heavy = ConnectionProtocol.Capacity(mover.Session.State) / Math.Max(1, DatabaseManager.GetItemRealWeight(purse)) + 1;
+        if (DatabaseManager.GetItemRealWeight(purse) == 0) return;   // no item data
+        mover.Session.State.EquipmentItems[1] = new Equipment.Item { Uid = 1, Template = purse, Quantity = (int)heavy };
+
+        await WorldMoveHandler.ConfirmMovementAsync(mover.Session, new(MapId, [(3 << 12) | 100, (5 << 12) | 114], false));
+        byte[] walking = mover.Packets.First(p => Codec.ReadEnvelope(p).Alias == "jsj");
+        Assert.Equal(1, Assert.IsType<GameMapMovementEvent>(Codec.Decode(walking).Content).Pace);
+        Assert.Contains(ProtoMessage.Parse(Codec.ReadEnvelope(walking).Content.Value.ToByteArray()).Fields,
+            f => f.FieldNumber == 3 && f.VarIntValue == 1);
+        // And his own client, which walks or runs on its own, is told it cannot run.
+        var told = ProtoMessage.Parse(Codec.ReadEnvelope(mover.Packets.Single(p => Codec.ReadEnvelope(p).Alias == "kur")).Content.Value.ToByteArray());
+        Assert.Equal(mover.Session.CharacterId, (long)told.Fields.Single(f => f.FieldNumber == 1).VarIntValue);
+        Assert.Equal(new byte[] { OverloadRestriction.CannotRun, OverloadRestriction.CannotAttackAsMutant },
+                     told.Fields.Single(f => f.FieldNumber == 2).BytesValue);
+
+        // Once told, not again for the next step.
+        mover.Packets.Clear();
+        await WorldMoveHandler.ConfirmMovementAsync(mover.Session, new(MapId, [(5 << 12) | 114, (3 << 12) | 100], false));
+        Assert.DoesNotContain(mover.Packets, p => Codec.ReadEnvelope(p).Alias == "kur");
+
+        mover.Session.State.EquipmentItems.Clear();
+        mover.Packets.Clear();
+        await WorldMoveHandler.ConfirmMovementAsync(mover.Session, new(MapId, [(3 << 12) | 100, (5 << 12) | 114], false));
+        byte[] running = mover.Packets.First(p => Codec.ReadEnvelope(p).Alias == "jsj");
+        Assert.Equal(0, Assert.IsType<GameMapMovementEvent>(Codec.Decode(running).Content).Pace);
+        Assert.DoesNotContain(ProtoMessage.Parse(Codec.ReadEnvelope(running).Content.Value.ToByteArray()).Fields,
+            f => f.FieldNumber == 3);
+        // Under again: told he can run, with every player's restriction left -- the whole list.
+        var free = ProtoMessage.Parse(Codec.ReadEnvelope(mover.Packets.Single(p => Codec.ReadEnvelope(p).Alias == "kur")).Content.Value.ToByteArray());
+        Assert.Equal(new byte[] { OverloadRestriction.CannotAttackAsMutant }, free.Fields.Single(f => f.FieldNumber == 2).BytesValue);
+    }
+
+    /// <summary>
+    /// The actor block's restrictions (its f7) say the same: sent on every map, the plain 0x0b
+    /// put an overloaded character back to running.
+    /// </summary>
+    [Fact]
+    public void The_actor_block_carries_cannot_run_while_overloaded()
+    {
+        Assert.Equal(new long[] { OverloadRestriction.CannotAttackAsMutant }, OverloadRestriction.RestrictionsOf(false));
+        Assert.Equal(new long[] { OverloadRestriction.CannotRun, OverloadRestriction.CannotAttackAsMutant }, OverloadRestriction.RestrictionsOf(true));
+        Assert.Equal(new byte[] { 0x0b }, OverloadRestriction.PackedOf(-424242));   // nobody's session: the plain list
+    }
+
+    /// <summary>
+    /// A pods refresh pushed by the server is seen as one, whatever writes it: the type url read
+    /// for the log missed the pushes, and a haven bag chest's deposit never let him run again.
+    /// </summary>
+    [Fact]
+    public void A_pushed_pods_refresh_is_recognised()
+    {
+        Assert.True(Jondo.Protocol.NetworkMessage.IsPods(ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Iun, Pb.New().Var(1, 1769).Var(3, 1765).Build())));
+        Assert.False(Jondo.Protocol.NetworkMessage.IsPods(ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Jsn, Pb.New().Var(1, 1).Build())));
+    }
+
     [Fact]
     public async Task Cell_zero_and_invalid_facing_preserve_proto3_and_existing_orientation_semantics()
     {

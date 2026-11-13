@@ -67,7 +67,7 @@ namespace Jondo.Unity.Server.Handlers
             => WriteAsync(stream, "lwt", BuildCollection(accountId));
 
         private static byte[] Pods()
-            => ConnectionProtocol.BuildPods(0, 1000 + 5L * SessionContext.State.TotalStrength);
+            => ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State));
 
         /// <summary>lyn: the bag's appearance items into the collection, one of each template.</summary>
         public static async Task AddAsync(NetworkStream stream, byte[] payload)

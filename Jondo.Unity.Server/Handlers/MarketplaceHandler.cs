@@ -110,7 +110,7 @@ namespace Jondo.Unity.Server.Handlers
             return session.SendAsync(ConnectionProtocol.Push(opcode, body));
         }
 
-        private static long Capacity(GameSession session) => 1000 + 5L * session.State.TotalStrength;
+        private static long Capacity(GameSession session) => ConnectionProtocol.Capacity(session.State);
 
         private static MarketplaceWindow? WindowOf(GameSession session, out Marketplaces.House house)
         {
@@ -369,7 +369,7 @@ namespace Jondo.Unity.Server.Handlers
             await OfferChangedAsync(house, offer, added: false);
             await SendAsync(me, Op.Ivf, ConnectionProtocol.BuildKamas(me.State.Kamas));
             await SendAsync(me, received.Value.Opcode, received.Value.Body);
-            await SendAsync(me, Op.Iun, ConnectionProtocol.BuildPods(0, Capacity(me)));
+            await SendAsync(me, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(me.State), Capacity(me)));
             await SendAsync(me, Op.Lqn, MarketplaceProtocol.BuildPurchaseNotice(
                 listing.Gid, received.Value.Uid, listing.Quantity, listing.Price));
             await SendAsync(me, Op.Kcx, MarketplaceProtocol.BuildBought(offer.Id));
@@ -470,7 +470,7 @@ namespace Jondo.Unity.Server.Handlers
             await SendAsync(me, Op.Kes, MarketplaceProtocol.BuildListed(listing, listing.SecondsLeft(Clock())));
             await OfferChangedAsync(house, offer, added: isNew);
             await SendAsync(me, given.Value.Opcode, given.Value.Body);
-            await SendAsync(me, Op.Iun, ConnectionProtocol.BuildPods(0, Capacity(me)));
+            await SendAsync(me, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(me.State), Capacity(me)));
             Console.WriteLine($"[Marketplaces] {me.CharacterId} puts {listing.Gid} x{lot} on sale in {house.Name} " +
                               $"for {price} (tax {tax}), listing {listing.Id}.");
         }
@@ -507,7 +507,7 @@ namespace Jondo.Unity.Server.Handlers
             else
             {
                 await SendAsync(me, received.Value.Opcode, received.Value.Body);
-                await SendAsync(me, Op.Iun, ConnectionProtocol.BuildPods(0, Capacity(me)));
+                await SendAsync(me, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(me.State), Capacity(me)));
             }
             await OfferChangedAsync(house, offer, added: false);
             await SendAsync(me, Op.Ken, MarketplaceProtocol.BuildSellerRemoved(listing.Id));
@@ -650,7 +650,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (received != null)
                 {
                     await SendAsync(seller, received.Value.Opcode, received.Value.Body);
-                    await SendAsync(seller, Op.Iun, ConnectionProtocol.BuildPods(0, Capacity(seller)));
+                    await SendAsync(seller, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(seller.State), Capacity(seller)));
                     return;
                 }
             }

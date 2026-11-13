@@ -366,7 +366,7 @@ namespace Jondo.Unity.Server.Handlers
 
             if (quantity > 0) await PutOnAsync(stream, tc, uid);
             else await TakeOffAsync(stream, tc, uid);
-            await SendAsync(stream, Op.Iun, ConnectionProtocol.BuildPods(0, 1000 + 5L * SessionContext.State.TotalStrength));
+            await SendAsync(stream, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State)));
             return true;
         }
 

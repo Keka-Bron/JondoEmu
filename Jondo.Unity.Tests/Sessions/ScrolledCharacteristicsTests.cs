@@ -56,9 +56,11 @@ namespace Jondo.Unity.Tests.Sessions
                 Assert.Equal(0, Value(wisdom, 2));
                 Assert.Equal(0, Value(wisdom, 3));
 
-                // What the game uses is the sum: 498 strength is 3,490 pods.
+                // What the game uses is the sum: 498 strength is 2,490 pods, on top of the
+                // thousand and the five a level (ConnectionProtocol.Capacity).
                 Assert.Equal(498, session.State.TotalStrength);
-                Assert.Equal(1000 + 5 * 498, Value(Detail(body, ConnectionProtocol.Stat.Pods), 2));
+                Assert.Equal(1000 + 5 * (session.State.CharacterLevel - 1) + 5 * 498,
+                             Value(Detail(body, ConnectionProtocol.Stat.Pods), 2));
             }
         }
 
@@ -85,7 +87,7 @@ namespace Jondo.Unity.Tests.Sessions
                 Assert.Equal(35, Value(Detail(body, ConnectionProtocol.Stat.WithdrawMovementPoints), 2));
                 Assert.Equal(50 + 100, Value(Detail(body, ConnectionProtocol.Stat.Initiative), 2));
                 Assert.Equal(100 + 10, Value(Detail(body, ConnectionProtocol.Stat.Prospecting), 2));
-                Assert.Equal(1000 + 5 * 50, Value(Detail(body, ConnectionProtocol.Stat.Pods), 2));
+                Assert.Equal(1000 + 5 * 199 + 5 * 50, Value(Detail(body, ConnectionProtocol.Stat.Pods), 2));
             }
         }
 
