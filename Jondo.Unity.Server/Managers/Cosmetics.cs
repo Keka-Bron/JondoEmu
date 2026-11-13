@@ -528,6 +528,54 @@ namespace Jondo.Unity.Server.Managers
             {
                 Console.WriteLine($"[Appearances] Could not read fight transformations: {ex.Message}");
             }
+
+            LoadLostAppearances();
+        }
+
+        /// <summary>The appearance ids the client no longer carries, read after the measured ones.</summary>
+        public const string LostAppearancesFile = "world/appearance_looks.json";
+
+        /// <summary>
+        /// The looks of the appearances only the server resolves: the roleplay buffs' and curses' 149
+        /// and the followers' 148 of kind 4. The client's AppearancesDataRoot kept 182 ids, those its
+        /// own fights need; the items' ids sit among them without ever colliding, and drawn as bones
+        /// they are other creatures -- «Nativo del signo Bworka» (1039) came out a ghost dragoturkey.
+        /// The file gives each the look the client itself gives the creature the item names
+        /// (content/world/appearance_looks.json, «source»). A measured look keeps precedence.
+        /// </summary>
+        private static void LoadLostAppearances()
+        {
+            string path = Paths.ContentFile(LostAppearancesFile);
+            if (!File.Exists(path)) return;
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                foreach (var entry in doc.RootElement.GetProperty("looks").EnumerateObject())
+                {
+                    if (!int.TryParse(entry.Name, out int id)) continue;
+                    if (!entry.Value.TryGetProperty("look", out var look) || look.ValueKind != JsonValueKind.String) continue;
+                    string text = look.GetString() ?? "";
+                    if (text.Length > 0) _appearanceLooks.TryAdd(id, text);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Appearances] Could not read {LostAppearancesFile}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// What an appearance id draws as a whole look: the measured or recovered one, else a type 5
+        /// appearance's bones bare; null when it is not known, which is drawn as nothing rather than
+        /// as whatever creature its number happens to be among the bones.
+        /// </summary>
+        public static string? LookOfAppearance(int appearanceId)
+        {
+            if (appearanceId <= 0) return null;
+            string full = AppearanceLook(appearanceId);
+            if (!string.IsNullOrEmpty(full)) return full;
+            int bones = AppearanceBones(appearanceId);
+            return bones > 0 ? "{" + bones + "}" : null;
         }
 
         /// <summary>A measured full transformation, including its scale; empty for bone-only appearances.</summary>

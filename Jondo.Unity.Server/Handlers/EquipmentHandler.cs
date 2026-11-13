@@ -245,9 +245,13 @@ namespace Jondo.Unity.Server.Handlers
             var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             if (character != null)
             {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                        character, Jondo.Unity.Server.Network.SessionContext.State.CellId, Jondo.Unity.Server.Network.SessionContext.State.Orientation, accountId)));
+                byte[] jsn = ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
+                    character, Jondo.Unity.Server.Network.SessionContext.State.CellId, Jondo.Unity.Server.Network.SessionContext.State.Orientation, accountId));
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, jsn);
+                // And whoever shares his map sees it too: they went on seeing him with the hat he
+                // had just taken off until they changed map themselves.
+                if (!SessionContext.State.IsInFight)
+                    await SessionRegistry.BroadcastToMapAsync(SessionContext.State.MapId, jsn, SessionContext.Current.Id);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
@@ -281,6 +285,8 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                // Put on or taken off while placing for a fight, the fight starts with it.
+                await FightHandler.RefreshPlacementSheetAsync(stream);
             }
 
             Console.WriteLine($"[Equipment] Item {uid} -> position {position}"

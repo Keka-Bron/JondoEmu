@@ -14,15 +14,18 @@ namespace Jondo.Unity.Server.Managers
     /// <remarks>
     /// <para>
     /// A disguise is 149 «Cambia la apariencia» on an item of the curses' slots or the roleplay
-    /// buffer (24 to 26), its value the bones the character takes: the «Camuflaje» (2062) is 884,
-    /// the bwak's transformation 1632 -- bones the client carries, bones_assets_bone_884 and the
-    /// rest --. He is drawn as those bones alone. INFERRED: no capture shows one worn; the class
-    /// attitudes carry a 1 in their first number (the Feca's «1, 888»), which is not read.
+    /// buffer (24 to 26), its value an APPEARANCE, not bones: «Nativo del signo Bworka» (13347)
+    /// is 1039, the same as Bworknroll's «Ritual de la cerveza», and bones 1039 are a ghost
+    /// dragoturkey. The client no longer carries those appearances; their looks are recovered in
+    /// content/world/appearance_looks.json (<see cref="Cosmetics.LookOfAppearance"/>), and one
+    /// still unknown is not drawn. INFERRED: no capture shows one worn; the class attitudes carry
+    /// a 1 in their first number (the Feca's «1, 888»), which is not read.
     /// </para>
     /// <para>
     /// A follower is 148 «¡Alguien te sigue!»: in its first number what it is -- 1 an NPC, 2 a
-    /// monster, 4 bare bones, the balloons' --, in its value which. It travels in the humanoid's
-    /// option f6 { f1 { f1 look, f2 index } }, the two fields the client reads of it (giv.bkix).
+    /// monster, 4 an appearance, the balloons' and the pets' --, in its value which. It travels in
+    /// the humanoid's option f6 { f1 { f1 look, f2 index } }, the two fields the client reads of it
+    /// (giv.bkix).
     /// </para>
     /// </remarks>
     public static class SlotLooks
@@ -38,7 +41,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>A follower's first number: what its value names.</summary>
         public const int FollowerNpc = 1;
         public const int FollowerMonster = 2;
-        public const int FollowerBones = 4;
+        public const int FollowerAppearance = 4;
 
         /// <summary>An item in a bonus slot, as far as the map cares.</summary>
         public sealed record Worn(long Uid, int Position, IReadOnlyList<Equipment.ItemEffect> Effects);
@@ -72,14 +75,29 @@ namespace Jondo.Unity.Server.Managers
         public static bool ChangesTheLook(IEnumerable<Equipment.ItemEffect> effects)
             => effects.Any(e => e.Effect is ChangesAppearance or Follows);
 
-        /// <summary>The bones a disguise gives, or zero: the roleplay buffer's before a curse's.</summary>
-        public static int DisguiseBones(IReadOnlyList<Worn> worn)
+        /// <summary>
+        /// The look a disguise gives, or null: the roleplay buffer's before a curse's, the first whose
+        /// appearance is known.
+        /// </summary>
+        public static string? DisguiseLook(IReadOnlyList<Worn> worn)
             => worn.Where(w => w.Position >= FirstCurse && w.Position <= RoleplayBuffer)
                    .OrderByDescending(w => w.Position)
                    .SelectMany(w => w.Effects)
                    .Where(e => e.Effect == ChangesAppearance)
-                   .Select(e => (int)(e.Value != 0 ? e.Value : e.DiceSide))
-                   .FirstOrDefault(bones => bones > 0);
+                   .Select(e => LookOfAppearance((int)(e.Value != 0 ? e.Value : e.DiceSide)))
+                   .FirstOrDefault(look => look != null);
+
+        private static readonly ConcurrentDictionary<int, bool> _unknownTold = new();
+
+        /// <summary>An appearance's look, saying once in the log when it is one still unknown.</summary>
+        private static string? LookOfAppearance(int appearance)
+        {
+            if (appearance <= 0) return null;
+            string? look = Cosmetics.LookOfAppearance(appearance);
+            if (look == null && _unknownTold.TryAdd(appearance, true))
+                Console.WriteLine($"[SlotLooks] Appearance {appearance} has no known look; it is not drawn.");
+            return look;
+        }
 
         /// <summary>The looks of the followers walking behind, in their slots' order.</summary>
         public static List<string> FollowerLooks(IReadOnlyList<Worn> worn)
@@ -92,7 +110,7 @@ namespace Jondo.Unity.Server.Managers
                    .Select(look => look!)
                    .ToList();
 
-        /// <summary>A follower's look: the NPC's or the monster's template, or the bones bare.</summary>
+        /// <summary>A follower's look: the NPC's or the monster's template, or the appearance's.</summary>
         public static string? LookOfFollower(int kind, int id)
         {
             if (id <= 0) return null;
@@ -103,8 +121,8 @@ namespace Jondo.Unity.Server.Managers
                 case FollowerMonster:
                     MobSpawnManager.EnsureMonsterData();
                     return MobSpawnManager.GetMonsterData(id)?.Look;
-                case FollowerBones:
-                    return "{" + id + "}";
+                case FollowerAppearance:
+                    return LookOfAppearance(id);
                 default:
                     return null;
             }

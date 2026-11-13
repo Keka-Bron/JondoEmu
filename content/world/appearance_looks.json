@@ -1,0 +1,1702 @@
+{
+ "source": "Looks for the appearance ids the 3.6 client no longer carries. Effect 149 (Changes appearance) on the roleplay buffs and curses, and kind 4 of effect 148 (Someone follows you), name an appearance, not bones: their ids (394 on the disguises, those of 87 followers) sit in the same range as the client's AppearancesDataRoot (182 ids kept) without ever colliding with it. Drawn as bones they give other creatures (1039, a bworky, is a ghost dragoturkey in the client's bones). Each look here is the one the client itself gives the creature the item names: a monster, an NPC or a pet of the same name, or, for the stealth disguises, the client's stealth bones in the same order. The unresolved ids have no creature to match (faces, hoods, class attitudes, coloured balloons) and are not drawn.",
+ "looks": {
+  "877": {
+   "look": "{895}",
+   "from": "stealth bones: the bin"
+  },
+  "878": {
+   "look": "{896}",
+   "from": "stealth bones: the barrel"
+  },
+  "879": {
+   "look": "{897}",
+   "from": "stealth bones: the grave cross"
+  },
+  "880": {
+   "look": "{898}",
+   "from": "stealth bones: the rocks"
+  },
+  "881": {
+   "look": "{899}",
+   "from": "stealth bones: the stool"
+  },
+  "882": {
+   "look": "{900}",
+   "from": "the stumps after the stealth bones"
+  },
+  "883": {
+   "look": "{901}",
+   "from": "the grass after the stealth bones"
+  },
+  "884": {
+   "look": "{761}",
+   "from": "stealth bones without graphics: invisible"
+  },
+  "914": {
+   "look": "{4826}",
+   "from": "monster sapomorros albino"
+  },
+  "921": {
+   "look": "{556|||110}",
+   "from": "monster 98 tofu"
+  },
+  "1009": {
+   "look": "{1502|||120}",
+   "from": "monster kepika"
+  },
+  "1011": {
+   "look": "{1529}",
+   "from": "monster kanugro invernal"
+  },
+  "1012": {
+   "look": "{1496|||100}",
+   "from": "monster muñeco de nieve"
+  },
+  "1013": {
+   "look": "{1503|||100}",
+   "from": "monster abominable yiti de las nieves"
+  },
+  "1031": {
+   "look": "{196|||75}",
+   "from": "npc 4577 dragún rosa"
+  },
+  "1037": {
+   "look": "{267|||90}",
+   "from": "npc 5040 boluto"
+  },
+  "1038": {
+   "look": "{255|||80}",
+   "from": "npc 5053 minimino"
+  },
+  "1039": {
+   "look": "{264|||80}",
+   "from": "npc 4590 Bworky (the pet; 712 is the mechanic)"
+  },
+  "1040": {
+   "look": "{225}",
+   "from": "pet 7524 Miaumiau atigrado: appearance 689, between 688 (223) and 690 (226); bones 225 is the striped cat"
+  },
+  "1041": {
+   "look": "{1815|||70}",
+   "from": "npc 5051 kejicón"
+  },
+  "1055": {
+   "look": "{1504|||100}",
+   "from": "monster 867 Bobola de nieve"
+  },
+  "1056": {
+   "look": "{1506|||100}",
+   "from": "monster crujidor de hielo"
+  },
+  "1067": {
+   "look": "{279}",
+   "from": "monster abráknido"
+  },
+  "1080": {
+   "look": "{288|||120}",
+   "from": "monster 54 Chafer"
+  },
+  "1106": {
+   "look": "{318|||100}",
+   "from": "monster pekewabbit"
+  },
+  "1118": {
+   "look": "{2554|||100}",
+   "from": "monster 3577 Reflejo de Prismaradona"
+  },
+  "1122": {
+   "look": "{2667}",
+   "from": "monster 3665 antesoro"
+  },
+  "1123": {
+   "look": "{2701}",
+   "from": "monster 3660 papatroz"
+  },
+  "1124": {
+   "look": "{2718|||90}",
+   "from": "monster 3655 levitrof"
+  },
+  "1125": {
+   "look": "{2717}",
+   "from": "monster 3653 kamasterix"
+  },
+  "1131": {
+   "look": "{2801|||90}",
+   "from": "monster 3733 trabucador"
+  },
+  "1132": {
+   "look": "{2757}",
+   "from": "monster 3738 perfácnida"
+  },
+  "1133": {
+   "look": "{2763}",
+   "from": "monster 3747 terroristócrata"
+  },
+  "1134": {
+   "look": "{2804}",
+   "from": "monster 3749 verdugolista"
+  },
+  "1137": {
+   "look": "{2761|||90}",
+   "from": "monster 3730 milimaestro"
+  },
+  "1138": {
+   "look": "{2803}",
+   "from": "monster 3734 elsumo"
+  },
+  "1139": {
+   "look": "{2765}",
+   "from": "monster escaliopendra debilitado"
+  },
+  "1140": {
+   "look": "{2800|||88}",
+   "from": "monster 3746 machasesino"
+  },
+  "1141": {
+   "look": "{2753}",
+   "from": "monster 3761 Lonyon Plata"
+  },
+  "1143": {
+   "look": "{2488}",
+   "from": "monster 3570 sombrejón"
+  },
+  "1145": {
+   "look": "{2912}",
+   "from": "monster 3826 virusca"
+  },
+  "1146": {
+   "look": "{2906}",
+   "from": "monster 3825 bacterrible"
+  },
+  "1147": {
+   "look": "{2907}",
+   "from": "monster 3823 baciloloco"
+  },
+  "1149": {
+   "look": "{2982}",
+   "from": "monster 3855 trasgolog"
+  },
+  "1150": {
+   "look": "{2975}",
+   "from": "monster 3841 vintydós"
+  },
+  "1151": {
+   "look": "{2968}",
+   "from": "monster 3836 arraca"
+  },
+  "1152": {
+   "look": "{2967}",
+   "from": "monster 3834 ikarisko"
+  },
+  "1167": {
+   "look": "{3104|||125}",
+   "from": "npc 2804 Khelebragón"
+  },
+  "1186": {
+   "look": "{279}",
+   "from": "monster 47 abráknido"
+  },
+  "1200": {
+   "look": "{3443}",
+   "from": "monster 4293 pícbul"
+  },
+  "1201": {
+   "look": "{3450}",
+   "from": "monster 4300 miauzúcar"
+  },
+  "1202": {
+   "look": "{3454}",
+   "from": "monster 4285 sota afortunada"
+  },
+  "1203": {
+   "look": "{3475}",
+   "from": "npc michakichán"
+  },
+  "1239": {
+   "look": "{413|||120}",
+   "from": "monster 281 cuerbok"
+  },
+  "1240": {
+   "look": "{397|||125}",
+   "from": "monster 261 cocodrail"
+  },
+  "1243": {
+   "look": "{3722|||125}",
+   "from": "monster 4606 cactoblongo"
+  },
+  "1262": {
+   "look": "{1291}",
+   "from": "monster gaviota sagrada"
+  },
+  "1269": {
+   "look": "{3979|||18}",
+   "from": "monster 4826 Gerard Carnaza"
+  },
+  "1271": {
+   "look": "{556|||110}",
+   "from": "monster 98 tofu"
+  },
+  "1272": {
+   "look": "{3960|||70}",
+   "from": "monster 4808 Ocrambo"
+  },
+  "1314": {
+   "look": "{3378}",
+   "from": "monster minikornio"
+  },
+  "1365": {
+   "look": "{4903|||110}",
+   "from": "monster 5228 Martóguiz"
+  },
+  "1366": {
+   "look": "{4904}",
+   "from": "monster 5229 Sherpóguiz"
+  },
+  "1367": {
+   "look": "{4905|||120}",
+   "from": "monster 5230 Gremóguiz"
+  },
+  "1368": {
+   "look": "{4906}",
+   "from": "monster 5231 Pinchóguiz"
+  },
+  "1372": {
+   "look": "{1975}",
+   "from": "monster 3307 devorror"
+  },
+  "1373": {
+   "look": "{1973}",
+   "from": "monster 3308 pesadillakna"
+  },
+  "1374": {
+   "look": "{1974}",
+   "from": "monster 3309 calachampastoso"
+  },
+  "1375": {
+   "look": "{1976}",
+   "from": "monster 3310 calarva"
+  },
+  "1376": {
+   "look": "{1968}",
+   "from": "monster 3311 murciego terrorífico"
+  },
+  "1377": {
+   "look": "{647|||100}",
+   "from": "monster 793 jalató de Haluín"
+  },
+  "1378": {
+   "look": "{358|||110}",
+   "from": "monster 794 tofu de Haluín"
+  },
+  "1380": {
+   "look": "{600|||100}",
+   "from": "monster 1049 barbrusa"
+  },
+  "1381": {
+   "look": "{601|||100}",
+   "from": "monster 1048 sparo"
+  },
+  "1382": {
+   "look": "{3337|||100}",
+   "from": "monster 4160 chafuñal"
+  },
+  "1383": {
+   "look": "{370|||100}",
+   "from": "monster 230 Le Chuko"
+  },
+  "1384": {
+   "look": "{379|||100}",
+   "from": "monster 228 boomba"
+  },
+  "1385": {
+   "look": "{369|||100}",
+   "from": "monster 231 cañón dorf"
+  },
+  "1386": {
+   "look": "{3334|||100}",
+   "from": "monster 4161 toebrio"
+  },
+  "1387": {
+   "look": "{378|||100}",
+   "from": "monster 229 notyebra"
+  },
+  "1388": {
+   "look": "{708|||120}",
+   "from": "monster Gurlo el terrible"
+  },
+  "1403": {
+   "look": "{1|3252,3284||40}",
+   "from": "monster 4044 Sombra astral"
+  },
+  "1405": {
+   "look": "{1511|||120}",
+   "from": "monster 899 black pekewabbitus"
+  },
+  "1406": {
+   "look": "{1820|||100}",
+   "from": "monster 851 duende rabioso"
+  },
+  "1407": {
+   "look": "{1822|||115}",
+   "from": "monster 843 duende perverso"
+  },
+  "1408": {
+   "look": "{1819|||100}",
+   "from": "monster 842 duende alborotador"
+  },
+  "1409": {
+   "look": "{1529}",
+   "from": "monster 840 kanugro invernal"
+  },
+  "1410": {
+   "look": "{1505|||100}",
+   "from": "monster 896 kitsu nakwatus"
+  },
+  "1411": {
+   "look": "{1521}",
+   "from": "monster 3107 tofu de peluche"
+  },
+  "1412": {
+   "look": "{1523}",
+   "from": "monster 3109 wabbit de peluche"
+  },
+  "1413": {
+   "look": "{1522}",
+   "from": "monster 3108 jalató de peluche"
+  },
+  "1414": {
+   "look": "{1536|||100}",
+   "from": "monster 868 tofu nevado"
+  },
+  "1427": {
+   "look": "{5053|||120}",
+   "from": "monster 5394 Cocoburio"
+  },
+  "1459": {
+   "look": "{5196}",
+   "from": "monster 5689 nauseawab"
+  },
+  "1460": {
+   "look": "{5194}",
+   "from": "monster 5691 warkaiko"
+  },
+  "1461": {
+   "look": "{5202}",
+   "from": "monster 5680 chocorakol"
+  },
+  "1462": {
+   "look": "{5204}",
+   "from": "monster 5681 kwakao"
+  },
+  "1463": {
+   "look": "{5225|||150}",
+   "from": "monster 5669 mocasesino"
+  },
+  "1464": {
+   "look": "{5221|||150}",
+   "from": "monster 5670 praliciana"
+  },
+  "1467": {
+   "look": "{5195}",
+   "from": "monster 5690 wabbinómano"
+  },
+  "1468": {
+   "look": "{5197}",
+   "from": "monster 5652 pewsiwevo"
+  },
+  "1469": {
+   "look": "{5203}",
+   "from": "monster 5679 golosote choconuboso"
+  },
+  "1470": {
+   "look": "{5201}",
+   "from": "monster 5677 koalakao"
+  },
+  "1471": {
+   "look": "{5205}",
+   "from": "monster 5678 chocogüino"
+  },
+  "1472": {
+   "look": "{5217|||140}",
+   "from": "monster 5668 chocoligarca"
+  },
+  "1473": {
+   "look": "{5224|||120}",
+   "from": "monster 5671 temperaturgo"
+  },
+  "1484": {
+   "look": "{281|||115}",
+   "from": "monster bwork"
+  },
+  "1532": {
+   "look": "{563|||105}",
+   "from": "monster 36 jalató"
+  },
+  "1563": {
+   "look": "{5575|||135}",
+   "from": "monster 6031 gangrecán"
+  },
+  "1602": {
+   "look": "{9108}",
+   "from": "monster puch simple"
+  },
+  "1626": {
+   "look": "{4825|||250}",
+   "from": "npc 5689 Protector de las ranadinas"
+  },
+  "1627": {
+   "look": "{68|||90}",
+   "from": "monster pandikaze alerta"
+  },
+  "1631": {
+   "look": "{201|||85}",
+   "from": "npc pequeño miaumiau blanco"
+  },
+  "1632": {
+   "look": "{241|||60}",
+   "from": "npc mascota bwak"
+  },
+  "1644": {
+   "look": "{226|||60}",
+   "from": "npc 5034 leopardo"
+  },
+  "1652": {
+   "look": "{4044|||120}",
+   "from": "npc 5856 miaumiau pelirrojo"
+  },
+  "1653": {
+   "look": "{223|||120}",
+   "from": "npc 5857 miaumiau pelirroja"
+  },
+  "1675": {
+   "look": "{6001}",
+   "from": "monster 6620 porco pandaleño"
+  },
+  "1691": {
+   "look": "{374}",
+   "from": "monster tortuga ninjawa"
+  },
+  "1692": {
+   "look": "{374}",
+   "from": "monster tortuga ninjawa"
+  },
+  "1693": {
+   "look": "{374}",
+   "from": "monster tortuga ninjawa"
+  },
+  "1694": {
+   "look": "{374}",
+   "from": "monster tortuga ninjawa"
+  },
+  "1699": {
+   "look": "{5962}",
+   "from": "pet 23719 autonel"
+  },
+  "1700": {
+   "look": "{5751}",
+   "from": "monster 6318 bambuto"
+  },
+  "1701": {
+   "look": "{44|120,2188|5=#3d472b,2=#4f4d34,4=#ebdec0,1=#ebdec0,3=#751516|53}",
+   "from": "monster 2783 pancuba"
+  },
+  "1745": {
+   "look": "{6310}",
+   "from": "monster 6653 puerkcebú"
+  },
+  "1787": {
+   "look": "{6490}",
+   "from": "monster 6802 jalabola"
+  },
+  "1797": {
+   "look": "{6392}",
+   "from": "monster 1244 guerrero de Brakmar"
+  },
+  "1811": {
+   "look": "{225}",
+   "from": "pet 7524 Miaumiau atigrado, as 1040"
+  },
+  "1820": {
+   "look": "{6049}",
+   "from": "npc chtigre domesticado"
+  },
+  "2028": {
+   "look": "{537|||100}",
+   "from": "monster 927 estrella del mar Rano"
+  },
+  "2029": {
+   "look": "{285|||145}",
+   "from": "monster 63 cangrejo"
+  },
+  "2030": {
+   "look": "{345|||150}",
+   "from": "monster cascasaurio joven crudo"
+  },
+  "2039": {
+   "look": "{4894|||80}",
+   "from": "monster 924 pischis payaso"
+  },
+  "2040": {
+   "look": "{4894|||80}",
+   "from": "monster 924 pischis payaso"
+  },
+  "2067": {
+   "look": "{6191}",
+   "from": "Agrid Shakuro"
+  },
+  "2068": {
+   "look": "{3105}",
+   "from": "monster 6008 Pandora"
+  },
+  "2069": {
+   "look": "{3483|||130}",
+   "from": "Ush Galesh"
+  },
+  "2070": {
+   "look": "{2723}",
+   "from": "rey Nidas"
+  },
+  "2071": {
+   "look": "{3216}",
+   "from": "monster 4074 Furyha"
+  },
+  "2072": {
+   "look": "{2604|||125}",
+   "from": "Brumen Tinctorias"
+  },
+  "2075": {
+   "look": "{4139}",
+   "from": "monster 4967 Ilyzaelle"
+  },
+  "2076": {
+   "look": "{3102}",
+   "from": "monster 3978 Eco"
+  },
+  "2077": {
+   "look": "{2432}",
+   "from": "monster 3534 Merkator"
+  },
+  "2078": {
+   "look": "{5137}",
+   "from": "monster 5393 Meriana"
+  },
+  "2080": {
+   "look": "{174}",
+   "from": "monster 854 Cocabulia"
+  },
+  "2082": {
+   "look": "{6950}",
+   "from": "monster 7217 jalahondero"
+  },
+  "2083": {
+   "look": "{6949|||90}",
+   "from": "monster 7216 hachicera"
+  },
+  "2084": {
+   "look": "{6948}",
+   "from": "monster 7215 martinete"
+  },
+  "2085": {
+   "look": "{6947}",
+   "from": "monster 7214 blinduro"
+  },
+  "2109": {
+   "look": "{318|||100}",
+   "from": "monster 96 pekewabbit"
+  },
+  "2117": {
+   "look": "{7493|||90}",
+   "from": "npc 7052 Tinieblas"
+  },
+  "2118": {
+   "look": "{7478|||90}",
+   "from": "npc 7055 Hoja"
+  },
+  "2119": {
+   "look": "{7505|||90}",
+   "from": "npc 7053 Nube"
+  },
+  "2120": {
+   "look": "{7498|||90}",
+   "from": "npc 7054 Gota"
+  },
+  "2121": {
+   "look": "{7485|||90}",
+   "from": "npc 7056 Llama"
+  },
+  "2123": {
+   "look": "{7293}",
+   "from": "Gruut"
+  },
+  "2124": {
+   "look": "{7300}",
+   "from": "npc 7071 Infernus"
+  },
+  "2125": {
+   "look": "{7298}",
+   "from": "npc 7072 Styx"
+  },
+  "2126": {
+   "look": "{7296}",
+   "from": "npc 7073 Mandrín"
+  },
+  "2127": {
+   "look": "{7302}",
+   "from": "npc 2609 Will Killson"
+  },
+  "2128": {
+   "look": "{7307}",
+   "from": "npc 7068 Panpun Pon"
+  },
+  "2129": {
+   "look": "{7345}",
+   "from": "npc 7069 Gramm"
+  },
+  "2130": {
+   "look": "{7511}",
+   "from": "npc 7070 Mirh"
+  },
+  "2131": {
+   "look": "{7347}",
+   "from": "npc 7058 Napazam"
+  },
+  "2132": {
+   "look": "{7474}",
+   "from": "npc 7059 Kunye"
+  },
+  "2133": {
+   "look": "{7318}",
+   "from": "npc 7057 Grizú"
+  },
+  "2134": {
+   "look": "{7356}",
+   "from": "npc 7064 Koxys"
+  },
+  "2135": {
+   "look": "{7329}",
+   "from": "npc 7065 Cúbitus"
+  },
+  "2136": {
+   "look": "{7291}",
+   "from": "npc 7066 Dicardya"
+  },
+  "2137": {
+   "look": "{7348}",
+   "from": "npc 7067 Nillo"
+  },
+  "2138": {
+   "look": "{7327}",
+   "from": "npc 7084 Ugicle"
+  },
+  "2139": {
+   "look": "{7463}",
+   "from": "Haku"
+  },
+  "2140": {
+   "look": "{7491}",
+   "from": "Zoth Manitú"
+  },
+  "2141": {
+   "look": "{7342}",
+   "from": "Gobuevo"
+  },
+  "2144": {
+   "look": "{7335}",
+   "from": "Logram"
+  },
+  "2152": {
+   "look": "{6112|||140}",
+   "from": "monster 6558 Chtigre de papel"
+  },
+  "2155": {
+   "look": "{7370}",
+   "from": "riktus arquero"
+  },
+  "2156": {
+   "look": "{2736}",
+   "from": "grullestruz"
+  },
+  "2167": {
+   "look": "{7337}",
+   "from": "Grolot"
+  },
+  "2168": {
+   "look": "{7359}",
+   "from": "Hectopp"
+  },
+  "2169": {
+   "look": "{7451}",
+   "from": "Ravelaca"
+  },
+  "2170": {
+   "look": "{7305}",
+   "from": "Retkel"
+  },
+  "2171": {
+   "look": "{7334}",
+   "from": "Phong Huss"
+  },
+  "2172": {
+   "look": "{7349}",
+   "from": "npc 7062 Rapiat"
+  },
+  "2173": {
+   "look": "{7328}",
+   "from": "npc 7063 Rapiña"
+  },
+  "2174": {
+   "look": "{7306}",
+   "from": "Piggy Pope"
+  },
+  "2175": {
+   "look": "{7363}",
+   "from": "riktus pendenciero"
+  },
+  "2176": {
+   "look": "{7352}",
+   "from": "Blackarotz"
+  },
+  "2179": {
+   "look": "{7365}",
+   "from": "riktus hechicera"
+  },
+  "2180": {
+   "look": "{7520}",
+   "from": "riktus espadachín"
+  },
+  "2182": {
+   "look": "{1264}",
+   "from": "monster 2898 korrosif"
+  },
+  "2183": {
+   "look": "{1260}",
+   "from": "monster 2895 dramanita"
+  },
+  "2184": {
+   "look": "{1259}",
+   "from": "monster 2896 galerina"
+  },
+  "2185": {
+   "look": "{1261}",
+   "from": "monster 2897 hongador"
+  },
+  "2186": {
+   "look": "{1263}",
+   "from": "monster 2900 cortinaria"
+  },
+  "2199": {
+   "look": "{3467}",
+   "from": "npc 3106 Nyan"
+  },
+  "2200": {
+   "look": "{449|||110}",
+   "from": "monster 1159 Ugah"
+  },
+  "2560": {
+   "look": "{1819|||100}",
+   "from": "monster 842 duende alborotador"
+  },
+  "2561": {
+   "look": "{1820|||100}",
+   "from": "monster 851 duende rabioso"
+  },
+  "2562": {
+   "look": "{1822|||115}",
+   "from": "monster 843 duende perverso"
+  },
+  "2592": {
+   "look": "{9682}",
+   "from": "monster 8076 dragún"
+  },
+  "2601": {
+   "look": "{285|||145}",
+   "from": "monster 63 Cangrejo"
+  },
+  "2602": {
+   "look": "{3591|||80}",
+   "from": "monster 4456 Cangrejo yolonista"
+  },
+  "2603": {
+   "look": "{1239|||115}",
+   "from": "monster 2893 Cangrabino"
+  },
+  "2604": {
+   "look": "{2436}",
+   "from": "monster 3542 Machangrejo"
+  },
+  "2605": {
+   "look": "{2712|||90}",
+   "from": "monster 3654 barbestrella"
+  },
+  "2606": {
+   "look": "{2717}",
+   "from": "monster 3653 kamasterix"
+  },
+  "2607": {
+   "look": "{2718|||90}",
+   "from": "monster 3655 levitrof"
+  },
+  "2608": {
+   "look": "{2719}",
+   "from": "monster 3656 llavoro"
+  },
+  "2609": {
+   "look": "{2713}",
+   "from": "monster 3657 melenutrof"
+  },
+  "2611": {
+   "look": "{6775|||80}",
+   "from": "pet 26286 espíritu de javián"
+  },
+  "2612": {
+   "look": "{6783|||80}",
+   "from": "pet 26696 espíritu de martalo"
+  },
+  "2613": {
+   "look": "{6890|||80}",
+   "from": "pet 27047 espíritu de maisial"
+  },
+  "2614": {
+   "look": "{6907|||120}",
+   "from": "pet 27069 espíritu de juninsidor"
+  },
+  "2615": {
+   "look": "{7004|||85}",
+   "from": "pet 27389 espíritu de agusto"
+  },
+  "2635": {
+   "look": "{4827|||140}",
+   "from": "monster 6183 sapodagua"
+  },
+  "2639": {
+   "look": "{4038|||110}",
+   "from": "bun encantador"
+  },
+  "2672": {
+   "look": "{5551|||135}",
+   "from": "monster 5994 kentus"
+  },
+  "2673": {
+   "look": "{5549|||135}",
+   "from": "monster 5995 yawa"
+  },
+  "2674": {
+   "look": "{5597|||135}",
+   "from": "monster 5992 hambrón"
+  },
+  "2691": {
+   "look": "{555|||140}",
+   "from": "cunejo"
+  },
+  "2692": {
+   "look": "{555|||140}",
+   "from": "cunejo"
+  },
+  "2693": {
+   "look": "{555|||140}",
+   "from": "cunejo"
+  },
+  "2694": {
+   "look": "{377}",
+   "from": "npc 2750 trool"
+  },
+  "2726": {
+   "look": "{446|||120}",
+   "from": "monster regalo animado"
+  },
+  "2824": {
+   "look": "{5768|||100}",
+   "from": "monster 6550 tsukumogami"
+  },
+  "2826": {
+   "look": "{3346|||110}",
+   "from": "monster 4152 gorkoko"
+  },
+  "2827": {
+   "look": "{3218}",
+   "from": "monster 4065 fucus"
+  },
+  "2830": {
+   "look": "{7288}",
+   "from": "pet 28427 origamiaumiau"
+  },
+  "2833": {
+   "look": "{524|||80}",
+   "from": "monster 828 gelatinodado"
+  },
+  "2836": {
+   "look": "{1177|||100}",
+   "from": "monster 2859 ardilla de las nieves"
+  },
+  "2837": {
+   "look": "{5980|||80}",
+   "from": "monster 6447 hahakigami"
+  },
+  "2838": {
+   "look": "{566}",
+   "from": "monster girasol"
+  },
+  "2841": {
+   "look": "{5750}",
+   "from": "monster 6321 bulbomatorral"
+  },
+  "2844": {
+   "look": "{9088}",
+   "from": "monster 7981 troolibre"
+  },
+  "2845": {
+   "look": "{9069}",
+   "from": "monster 7982 artroolero"
+  },
+  "2846": {
+   "look": "{9091}",
+   "from": "monster 7983 nitrool"
+  },
+  "2868": {
+   "look": "{287|||110}",
+   "from": "monster coolebra"
+  },
+  "2896": {
+   "look": "{3052|||80}",
+   "from": "monster 3942 grilladiador"
+  },
+  "2913": {
+   "look": "{357}",
+   "from": "monster 1039 príncipe Wey"
+  },
+  "2914": {
+   "look": "{9269$1;0;0;},{9269$2;0;0;(WE=228|WE=252)&(PB=1044|PB=1041)},{9268$3;0;0;(WE=229|WE=254)&(PB=1044|PB=1041)},{9267$4;0;0;(WE=230|WE=255)&(PB=1044|PB=1041)},{9269|||50$5;0;0;(WE=228|WE=252)&(PB!1044|PB!1041)},{9268|||50$6;0;0;(WE=229|WE=254)&(PB!1044|PB!1041)},{9267|||50$7;0;0;(WE=230|WE=255)&(PB!1044|PB!1041)}",
+   "from": "monster 8048 fortachobz"
+  },
+  "2917": {
+   "look": "{9542||1=#E37B31,2=#B52C22,3=#2E70A2,4=#7F7F7F,5=#7F7F7F,6=#7F7F7F|100}",
+   "from": "npc 7705 Joven leosa"
+  },
+  "2919": {
+   "look": "{9313$1;0;0;WE=228|WE=252},{9359$2;0;0;WE=229|WE=254},{9358$3;0;0;WE=230|WE=255},{9313$4;0;0;}",
+   "from": "monster 8043 antilonejo"
+  },
+  "2920": {
+   "look": "{9335$1;0;0;},{9335$2;0;0;WE=228|WE=252},{9336$3;0;0;WE=229|WE=254},{9337$4;0;0;WE=230|WE=255}",
+   "from": "monster 8040 leonisa"
+  },
+  "2921": {
+   "look": "{9447|||95}",
+   "from": "monster 8101 domatadora perturbada"
+  },
+  "2954": {
+   "look": "{9269$1;0;0;},{9269$2;0;0;(WE=228|WE=252)&(PB=1044|PB=1041)},{9268$3;0;0;(WE=229|WE=254)&(PB=1044|PB=1041)},{9267$4;0;0;(WE=230|WE=255)&(PB=1044|PB=1041)},{9269|||50$5;0;0;(WE=228|WE=252)&(PB!1044|PB!1041)},{9268|||50$6;0;0;(WE=229|WE=254)&(PB!1044|PB!1041)},{9267|||50$7;0;0;(WE=230|WE=255)&(PB!1044|PB!1041)}",
+   "from": "monster 8048 fortachobz"
+  },
+  "2955": {
+   "look": "{9269$1;0;0;},{9269$2;0;0;(WE=228|WE=252)&(PB=1044|PB=1041)},{9268$3;0;0;(WE=229|WE=254)&(PB=1044|PB=1041)},{9267$4;0;0;(WE=230|WE=255)&(PB=1044|PB=1041)},{9269|||50$5;0;0;(WE=228|WE=252)&(PB!1044|PB!1041)},{9268|||50$6;0;0;(WE=229|WE=254)&(PB!1044|PB!1041)},{9267|||50$7;0;0;(WE=230|WE=255)&(PB!1044|PB!1041)}",
+   "from": "monster 8048 fortachobz"
+  },
+  "2956": {
+   "look": "{9313$1;0;0;WE=228|WE=252},{9359$2;0;0;WE=229|WE=254},{9358$3;0;0;WE=230|WE=255},{9313$4;0;0;}",
+   "from": "monster 8043 antilonejo"
+  },
+  "2957": {
+   "look": "{9313$1;0;0;WE=228|WE=252},{9359$2;0;0;WE=229|WE=254},{9358$3;0;0;WE=230|WE=255},{9313$4;0;0;}",
+   "from": "monster 8043 antilonejo"
+  },
+  "2958": {
+   "look": "{9335$1;0;0;},{9335$2;0;0;WE=228|WE=252},{9336$3;0;0;WE=229|WE=254},{9337$4;0;0;WE=230|WE=255}",
+   "from": "monster 8040 leonisa"
+  },
+  "2959": {
+   "look": "{9335$1;0;0;},{9335$2;0;0;WE=228|WE=252},{9336$3;0;0;WE=229|WE=254},{9337$4;0;0;WE=230|WE=255}",
+   "from": "monster 8040 leonisa"
+  },
+  "3002": {
+   "look": "{2673}",
+   "from": "monster 3666 berserkofre"
+  },
+  "3003": {
+   "look": "{2672}",
+   "from": "monster 3664 mimicofre"
+  },
+  "3004": {
+   "look": "{2674}",
+   "from": "monster 3667 tesorero"
+  },
+  "3005": {
+   "look": "{2671}",
+   "from": "monster 3663 sacurador"
+  },
+  "3006": {
+   "look": "{2724}",
+   "from": "monster 3649 bobolsa"
+  },
+  "3007": {
+   "look": "{4166}",
+   "from": "monster 5840 cofre animado"
+  },
+  "3009": {
+   "look": "{4543}",
+   "from": "monster 5839 arcón animado"
+  },
+  "3376": {
+   "look": "{714|||110}",
+   "from": "monster 3859 recaudador"
+  },
+  "3379": {
+   "look": "{2733}",
+   "from": "monster 3620 Pestruzkito"
+  },
+  "3380": {
+   "look": "{2490}",
+   "from": "monster 3567 Panterror"
+  },
+  "3413": {
+   "look": "{1328|||100}",
+   "from": "monster 2936 Perkutador"
+  },
+  "3428": {
+   "look": "{315}",
+   "from": "monster wabbit"
+  },
+  "3429": {
+   "look": "{315}",
+   "from": "monster 64 wabbit"
+  },
+  "3430": {
+   "look": "{4943|||110}",
+   "from": "ardilla («irdillik»)"
+  },
+  "3431": {
+   "look": "{4907|||130}",
+   "from": "monster larva azul"
+  },
+  "3432": {
+   "look": "{305|||100}",
+   "from": "monster dragocerdo"
+  },
+  "3433": {
+   "look": "{195}",
+   "from": "miaumiau (npc mascota miaumiau)"
+  },
+  "3451": {
+   "look": "{10124}",
+   "from": "monster minilodón"
+  },
+  "3462": {
+   "look": "{6891|||75}",
+   "from": "pet 26749 Terrak"
+  }
+ },
+ "unresolved": {
+  "612": [
+   "Enterrado vivo"
+  ],
+  "614": [
+   "Alma rota"
+  ],
+  "659": [
+   "Cochino jabato huérfano"
+  ],
+  "872": [
+   "Transformación en cochino jabato"
+  ],
+  "875": [
+   "Más Bonita que Ninguna",
+   "Más Bonita que Ninguna"
+  ],
+  "886": [
+   "Bastón del aprendiz peregrino",
+   "Anillo de búho"
+  ],
+  "887": [
+   "Ghulificado",
+   "Ghulificado"
+  ],
+  "888": [
+   "Feca Attitude"
+  ],
+  "890": [
+   "Osamodas Attitude"
+  ],
+  "892": [
+   "Anutrof Attitude"
+  ],
+  "894": [
+   "Sram Attitude"
+  ],
+  "896": [
+   "Xelor Attitude"
+  ],
+  "898": [
+   "Zurcarák Attitude"
+  ],
+  "900": [
+   "Aniripsa Attitude"
+  ],
+  "904": [
+   "Ocra Attitude"
+  ],
+  "906": [
+   "Sadida Attitude"
+  ],
+  "908": [
+   "Sacrógrito Attitude"
+  ],
+  "910": [
+   "Pandawa attitude"
+  ],
+  "972": [
+   "La colmena"
+  ],
+  "1008": [
+   "Peluche de Nawidad"
+  ],
+  "1010": [
+   "Caja de regalo de Nawidad"
+  ],
+  "1014": [
+   "Mini nuit de Nawidad"
+  ],
+  "1032": [
+   "Transformación en dragún dorado"
+  ],
+  "1036": [
+   "Globo acompañante",
+   "Globo paseante rojo"
+  ],
+  "1043": [
+   "Murcieguito terrorífico"
+  ],
+  "1044": [
+   "Belléza pútrida"
+  ],
+  "1045": [
+   "Carpe escamoso"
+  ],
+  "1050": [
+   "Lokitofu"
+  ],
+  "1051": [
+   "Alkolipoke"
+  ],
+  "1052": [
+   "Chocobwak de pistacho"
+  ],
+  "1053": [
+   "Aire marino"
+  ],
+  "1054": [
+   "Varita glucídica"
+  ],
+  "1057": [
+   "Sakai de Nawidad"
+  ],
+  "1062": [
+   "Canto de sirena"
+  ],
+  "1068": [
+   "Podredumbre de Dremoan",
+   "Podredumbre de Dremoan",
+   "Podredumbre de Dremoan"
+  ],
+  "1069": [
+   "Podredumbre de Dremoan",
+   "Podredumbre de Dremoan"
+  ],
+  "1072": [
+   "Jalató veterano"
+  ],
+  "1078": [
+   "Marca de Makss"
+  ],
+  "1079": [
+   "Marca de Makss"
+  ],
+  "1081": [
+   "Marca de Makss"
+  ],
+  "1082": [
+   "Marca de Makss"
+  ],
+  "1083": [
+   "Marca de Makss"
+  ],
+  "1084": [
+   "Cara de puerkazo",
+   "Caratocino"
+  ],
+  "1086": [
+   "Yopuka Attitude"
+  ],
+  "1105": [
+   "Kuakuafia rosa"
+  ],
+  "1144": [
+   "Disfraz"
+  ],
+  "1175": [
+   "Transformación en arak-hai"
+  ],
+  "1185": [
+   "Larvorma"
+  ],
+  "1192": [
+   "Transformación en bandido"
+  ],
+  "1275": [
+   "Bendición de Galaethiel"
+  ],
+  "1276": [
+   "Docilidad encarnada"
+  ],
+  "1277": [
+   "Maldición de Uginak"
+  ],
+  "1278": [
+   "Maldición de Uginak"
+  ],
+  "1357": [
+   "Morros de Martillelo"
+  ],
+  "1398": [
+   "Muerte aparente"
+  ],
+  "1428": [
+   "Morros de dragón"
+  ],
+  "1450": [
+   "Anillo de chocomorfosis"
+  ],
+  "1475": [
+   "Transformación en cublanoforme estimulante"
+  ],
+  "1476": [
+   "Transformación en cublanoforme galvanizante"
+  ],
+  "1477": [
+   "Transformación en cronoblok acérrimo"
+  ],
+  "1478": [
+   "Transformación en cronoblok pernicioso"
+  ],
+  "1479": [
+   "Transformación en kaxanoforme aplastante"
+  ],
+  "1480": [
+   "Transformación en kaxanoforme protector"
+  ],
+  "1524": [
+   "Espada inflable"
+  ],
+  "1525": [
+   "Escobilla de baño"
+  ],
+  "1526": [
+   "Sillón de cuero"
+  ],
+  "1527": [
+   "Máquina de escribir"
+  ],
+  "1528": [
+   "Caja de mudanza"
+  ],
+  "1529": [
+   "Ladrillos norteños"
+  ],
+  "1530": [
+   "Pizarra de conferencia"
+  ],
+  "1576": [
+   "Globo paseante azul"
+  ],
+  "1577": [
+   "Globo paseante amarillo"
+  ],
+  "1578": [
+   "Globo paseante verde"
+  ],
+  "1600": [
+   "Transformación en antagonista"
+  ],
+  "1601": [
+   "Transformación en hombre milubo"
+  ],
+  "1633": [
+   "Transformación en cerdo pandaleño"
+  ],
+  "1634": [
+   "Aspecto inteligente"
+  ],
+  "1674": [
+   "Estatua de Puda"
+  ],
+  "1688": [
+   "Efecto de la salsa nuoc ñam"
+  ],
+  "1695": [
+   "Transformación en novillo"
+  ],
+  "1702": [
+   "Ilusión evanescente"
+  ],
+  "1703": [
+   "Ilusión efímera"
+  ],
+  "1742": [
+   "Anillo sacaram"
+  ],
+  "1743": [
+   "Sortija utotune"
+  ],
+  "1761": [
+   "¿Pero vos te ves cuando bebés?"
+  ],
+  "1777": [
+   "Anomanillo"
+  ],
+  "1778": [
+   "Resaca de hierro"
+  ],
+  "1790": [
+   "Transformación en jalabolista bontariano"
+  ],
+  "1791": [
+   "Transformación en jalabolista brakmariano"
+  ],
+  "1794": [
+   "Transformación en soldado de Bonta"
+  ],
+  "1795": [
+   "Transformación en soldado de Brakmar"
+  ],
+  "1796": [
+   "Transformación en guerrero de Bonta",
+   "En recuerdo de Jahash"
+  ],
+  "1805": [
+   "Anillo invernal"
+  ],
+  "1806": [
+   "Transformación en jalabolista bontariano"
+  ],
+  "1807": [
+   "Transformación en jalabolista bontariano"
+  ],
+  "1808": [
+   "Transformación en jalabolista brakmariano"
+  ],
+  "1809": [
+   "Transformación en jalabolista brakmariano"
+  ],
+  "1829": [
+   "Luz y ámbar"
+  ],
+  "1832": [
+   "Disfrazado de sectario de Jalépona"
+  ],
+  "2021": [
+   "Castigo de amarrador"
+  ],
+  "2023": [
+   "Cara de gob"
+  ],
+  "2024": [
+   "Anillo de pinglamur"
+  ],
+  "2025": [
+   "Anillo de batortuga"
+  ],
+  "2026": [
+   "Anillo de cicalofrío"
+  ],
+  "2027": [
+   "Anillo de buitreracán"
+  ],
+  "2031": [
+   "Casktel eventa"
+  ],
+  "2032": [
+   "Casktel eventa"
+  ],
+  "2033": [
+   "Casktel eventa"
+  ],
+  "2034": [
+   "Casktel etubiz"
+  ],
+  "2035": [
+   "Casktel etubiz"
+  ],
+  "2036": [
+   "Casktel etubiz"
+  ],
+  "2037": [
+   "Casktel ekinesia"
+  ],
+  "2038": [
+   "Casktel ekinesia"
+  ],
+  "2056": [
+   "Anillo de tokageko"
+  ],
+  "2057": [
+   "Anillo de peletero"
+  ],
+  "2073": [
+   "En recuerdo de Rubilax"
+  ],
+  "2079": [
+   "En recuerdo de Atcham"
+  ],
+  "2087": [
+   "Guardias de Albuera"
+  ],
+  "2088": [
+   "Guardias de Albuera"
+  ],
+  "2092": [
+   "Bentlechuga y conspiradores POMS"
+  ],
+  "2093": [
+   "Bentlechuga y conspiradores POMS"
+  ],
+  "2094": [
+   "Bentlechuga y conspiradores POMS"
+  ],
+  "2095": [
+   "Bentlechuga y conspiradores POMS"
+  ],
+  "2122": [
+   "Maskarada de los Riktus"
+  ],
+  "2142": [
+   "Vewduwa gowda"
+  ],
+  "2147": [
+   "Cieno considerable"
+  ],
+  "2148": [
+   "Bobolsa de dados"
+  ],
+  "2149": [
+   "Hecho polvo... de chocolate"
+  ],
+  "2153": [
+   "Roedores de corteza vieja",
+   "Roedores de corteza vieja",
+   "Roedores de corteza vieja",
+   "Roedores de corteza vieja"
+  ],
+  "2154": [
+   "Regalo de alcantarilla"
+  ],
+  "2157": [
+   "Pekebulglup de Styx"
+  ],
+  "2197": [
+   "Idolatría de Hulhu"
+  ],
+  "2198": [
+   "Idolatría de Genkyatto"
+  ],
+  "2522": [
+   "Anillo de anfiburbuja"
+  ],
+  "2523": [
+   "Anillo de cangruido"
+  ],
+  "2524": [
+   "Anillo de mimistral"
+  ],
+  "2525": [
+   "Anillo de tapricioso"
+  ],
+  "2534": [
+   "Tez duendelística"
+  ],
+  "2557": [
+   "Muerto y enterrado"
+  ],
+  "2574": [
+   "Malforma devastadora"
+  ],
+  "2575": [
+   "Malforma devastadora"
+  ],
+  "2576": [
+   "Banda de larvas",
+   "Banda de larvas",
+   "Banda de larvas"
+  ],
+  "2595": [
+   "Notas musicales",
+   "Anillo musical"
+  ],
+  "2596": [
+   "Pazcuanillo de chocolate"
+  ],
+  "2597": [
+   "Wonejanillo de chocolate"
+  ],
+  "2598": [
+   "Huevanillo de chocolate"
+  ],
+  "2599": [
+   "Dofanillo de chocolate"
+  ],
+  "2600": [
+   "Máscara de lokitofu"
+  ],
+  "2610": [
+   "Castigo sulfuroso"
+  ],
+  "2636": [
+   "Metamorfosis de Nikodeus"
+  ],
+  "2659": [
+   "Usbñtgpsnbdjpñ fñ hptcvtufbeps"
+  ],
+  "2677": [
+   "Favorito de los fab'huritus"
+  ],
+  "2678": [
+   "Favorito de los fab'huritus"
+  ],
+  "2679": [
+   "Carne para salchicha"
+  ],
+  "2706": [
+   "Araknas de Kia",
+   "Araknas de Kia",
+   "Araknas de Kia"
+  ],
+  "2725": [
+   "Transformación en vela"
+  ],
+  "2727": [
+   "Transformación en globo"
+  ],
+  "2747": [
+   "Globo paseante de trool amarillo"
+  ],
+  "2748": [
+   "Globo paseante de trool rojo"
+  ],
+  "2749": [
+   "Globo paseante de trool verde"
+  ],
+  "2750": [
+   "Globo paseante de trool azul"
+  ],
+  "2751": [
+   "Globo paseante de tofu amarillo"
+  ],
+  "2752": [
+   "Globo paseante de tofu rojo"
+  ],
+  "2753": [
+   "Globo paseante de tofu verde"
+  ],
+  "2754": [
+   "Globo paseante de tofu azul"
+  ],
+  "2755": [
+   "Globo paseante de jalató amarillo"
+  ],
+  "2756": [
+   "Globo paseante de jalató rojo"
+  ],
+  "2757": [
+   "Globo paseante de jalató verde"
+  ],
+  "2758": [
+   "Globo paseante de jalató azul"
+  ],
+  "2815": [
+   "El rey soy yo"
+  ],
+  "2816": [
+   "Gue está bien empleado"
+  ],
+  "2823": [
+   "Mimagen de mascotiscafo"
+  ],
+  "2825": [
+   "Mimagen de zumbimoto"
+  ],
+  "2828": [
+   "Mimagen de minidragón"
+  ],
+  "2829": [
+   "Mimagen de koalak"
+  ],
+  "2831": [
+   "Mimagen de chimi nuki"
+  ],
+  "2832": [
+   "Mimagen de bamgambón"
+  ],
+  "2834": [
+   "Mimagen de bobina"
+  ],
+  "2835": [
+   "Mimagen de jalafrasco"
+  ],
+  "2839": [
+   "Mimagen de kami oscuro"
+  ],
+  "2840": [
+   "Mimagen de anfibella"
+  ],
+  "2842": [
+   "Mimagen de ualaflama"
+  ],
+  "2847": [
+   "Paso de kuakuá"
+  ],
+  "3015": [
+   "Soplo de snoofle"
+  ],
+  "3042": [
+   "Anillo de lana"
+  ],
+  "3043": [
+   "Anillo de plumas"
+  ],
+  "3044": [
+   "Anillo de espinas"
+  ],
+  "3045": [
+   "Anillo de seda"
+  ],
+  "3046": [
+   "Anillo de roca"
+  ],
+  "3422": [
+   "Kaniglú domesticado"
+  ],
+  "3452": [
+   "Legado jardinero"
+  ],
+  "3455": [
+   "Legado de Vulkania"
+  ],
+  "3456": [
+   "Legado de Vulkania"
+  ],
+  "3457": [
+   "Legado de Vulkania"
+  ],
+  "3458": [
+   "Legado de Vulkania"
+  ],
+  "3459": [
+   "Legado de Vulkania"
+  ],
+  "3460": [
+   "Legado de dragún ocre"
+  ],
+  "3461": [
+   "Legado de gongón ocre"
+  ]
+ }
+}
