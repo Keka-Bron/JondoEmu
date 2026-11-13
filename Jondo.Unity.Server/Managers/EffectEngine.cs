@@ -5936,12 +5936,20 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// The dice behind AP and MP removal, one draw in [0, 1) per point. Tests set it to
-        /// decide the outcome; the fight uses the engine's own random source.
+        /// decide the outcome; the fight uses the engine's own random source. The borrowed dice
+        /// belong to the test's own flow only: shared, a removal resolved by another test running
+        /// alongside drew the queued numbers first and the first test found its points dodged.
         /// </summary>
-        internal static Func<double> DadoDeRetirada { get; set; } = SiguienteAzar;
+        internal static Func<double> DadoDeRetirada
+        {
+            get => dadoPrestado.Value ?? SiguienteAzar;
+            set => dadoPrestado.Value = value;
+        }
+
+        private static readonly System.Threading.AsyncLocal<Func<double>?> dadoPrestado = new();
 
         /// <summary>The fight's own dice again, for a test that borrowed them.</summary>
-        internal static void DadoDeRetiradaPorDefecto() => DadoDeRetirada = SiguienteAzar;
+        internal static void DadoDeRetiradaPorDefecto() => dadoPrestado.Value = null;
 
         /// <summary>
         /// The removal effects that a target can DODGE: "retira PA/PM" (1079, 1080, 101, 127)
