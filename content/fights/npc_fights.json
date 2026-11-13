@@ -977,6 +977,9 @@
       "why": "«Vaincre Maelstrooll et ses adeptes» (11411): Dofus pour les noobs gives the fight's four kinds, Maelstrooll, Troollseum, Troollogram and Troolléolé, level 112 to 120; INFERRED: two Troollseums («Hey, les Troollseums !»), one of each other, at the character's level." },
     { "npc": 3408, "map": 155977219, "reply": 29891, "byLevel": true,
       "monsters": [ { "monster": 4592, "grade": 0 }, { "monster": 4593, "grade": 0 }, { "monster": 4593, "grade": 0 }, { "monster": 4540, "grade": 0 }, { "monster": 4539, "grade": 0 } ],
-      "why": "«Vaincre Maelstrooll et ses adeptes» (11411): Dofus pour les noobs gives the fight's four kinds, Maelstrooll, Troollseum, Troollogram and Troolléolé, level 112 to 120; INFERRED: two Troollseums («Hey, les Troollseums !»), one of each other, at the character's level." }
+      "why": "«Vaincre Maelstrooll et ses adeptes» (11411): Dofus pour les noobs gives the fight's four kinds, Maelstrooll, Troollseum, Troollogram and Troolléolé, level 112 to 120; INFERRED: two Troollseums («Hey, les Troollseums !»), one of each other, at the character's level." },
+    { "npc": 2802, "map": 126615554, "reply": 29650, "byLevel": true,
+      "monsters": [ { "monster": 4588, "grade": 0 }, { "monster": 4588, "grade": 0 }, { "monster": 4588, "grade": 0 }, { "monster": 4588, "grade": 0 } ],
+      "why": "«Vence a 2 balíes» (11346): «un groupe de monstres vous charge, attiré par l'amulette assemblée par Marty» (Dofus pour les noobs, «Au temps l'emportent les landes»); its screenshots show four Gligli (4588, level 142-150) on the beach with the character. Two of them are the objective; the four are the group they come in." }
   ]
 }

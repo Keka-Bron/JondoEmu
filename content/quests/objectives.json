@@ -4137,6 +4137,72 @@
    "monster": 4592,
    "map": 155977219,
    "why": "«Vence a Maelstrool y a sus adeptos»: the fight his «Prepararte para combatir» starts in his camp (content/fights/npc_fights.json); Maelstrooll (4592) leads it and drops his pauldron (18210) while it is under way."
+  },
+  {
+   "objective": 11318,
+   "quest": 1769,
+   "kind": "click",
+   "elements": [{"map": 127927310, "element": 509184}],
+   "afterObjectives": [11317],
+   "anyOrder": true,
+   "gives": [{"item": 18162, "count": 1}],
+   "why": "«En [-4,-46], récupérez une Boule en métal déformée dans la carcasse en haut à gauche de la map» (Dofus pour les noobs, «Au temps l'emportent les landes»): the skeleton 509184 (graphic 15854), cell 99, the map's top left. Each of the four «Examina un … esqueleto» is one of the four skeletons, in the guide's order, any of them first."
+  },
+  {
+   "objective": 11319,
+   "quest": 1769,
+   "kind": "click",
+   "elements": [{"map": 127928845, "element": 509182}],
+   "afterObjectives": [11317],
+   "anyOrder": true,
+   "gives": [{"item": 18160, "count": 1}],
+   "why": "«En [-1,-47], récupérez un Boulier rouillé en cliquant sur la carcasse en haut en centre» (Dofus pour les noobs, «Au temps l'emportent les landes»): the skeleton 509182 (graphic 15835), cell 64."
+  },
+  {
+   "objective": 11320,
+   "quest": 1769,
+   "kind": "click",
+   "elements": [{"map": 128059404, "element": 509181}],
+   "afterObjectives": [11317],
+   "anyOrder": true,
+   "gives": [{"item": 18159, "count": 1}],
+   "why": "«En [-10,-48], cliquez sur la carcasse en haut à gauche afin de récupérer une Partition inconnue» (Dofus pour les noobs, «Au temps l'emportent les landes»): the skeleton 509181 (graphic 15853), cell 142, the map's only element."
+  },
+  {
+   "objective": 11321,
+   "quest": 1769,
+   "kind": "click",
+   "elements": [{"map": 127926796, "element": 509183}],
+   "afterObjectives": [11317],
+   "anyOrder": true,
+   "gives": [{"item": 18161, "count": 1}],
+   "why": "«en [-5,-48], cliquez sur la carcasse en bas de la map afin de récupérer une Chaine de mauvais goût» (Dofus pour les noobs, «Au temps l'emportent les landes»): the skeleton 509183 (graphic 15854), cell 480, the bottom of the map."
+  },
+  {
+   "objective": 11335,
+   "quest": 1769,
+   "kind": "click",
+   "elements": [{"map": 139723266, "element": 509156}],
+   "afterObjectives": [11334],
+   "why": "«Inspecciona la tienda de la Feria del Trool»: «Cliquez sur l'entrée de la tente. Vous ne pourrez pas y entrer» (Dofus pour les noobs, «Au temps l'emportent les landes»). The entrance is 509156 (graphic 47087) on cell 400, at the front left of the striped tent where the guide rings it; 485621, the same graphic on cell 363, is the blue tent's."
+  },
+  {
+   "objective": 11340,
+   "quest": 1769,
+   "kind": "click",
+   "elements": [{"map": 127927311, "element": 509191}],
+   "afterObjectives": [11336],
+   "onlyGives": true,
+   "gives": [{"item": 18164, "count": 1}],
+   "why": "«Pour le Graine de Cania intemporelle, rendez-vous en [-4,-45]. Cliquez alors sur la plante au pied des gros rochers situés vers le centre de la map» (Dofus pour les noobs, «Au temps l'emportent les landes»): 509191 (graphic 17712), cell 232, the map's quest element. It only hands the seed over; Marty's «Aquí tienes los ingredientes» takes it."
+  },
+  {
+   "objective": 11344,
+   "quest": 1769,
+   "kind": "enter",
+   "map": 126615554,
+   "afterObjectives": [11343],
+   "why": "«Entra en la tienda»: the tent's entrance, with the passenger amulet, leads to the other time (126615554, an indoor map at [1,-48] of the Cania plains, the beach of the guide's screenshots with Septango); stepping onto it is entering."
   }
  ]
 }

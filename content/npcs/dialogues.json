@@ -26442,15 +26442,35 @@
         {
           "message": 81,
           "choices": [
-            { "reply": 10142, "quest": 774, "afterObjective": 4892, "completes": 4893, "params": [[30, 4893]], "next": 9663 }
+            { "reply": 10142, "quest": 774, "afterObjective": 4892, "completes": 4893, "params": [[30, 4893]], "next": 9663 },
+            { "reply": 29551, "next": 24613, "quest": 1769, "beforeObjective": 11316 }
           ]
         },
         {
           "message": 9663,
           "choices": []
+        },
+        {
+          "message": 24613,
+          "choices": [
+            { "reply": 29553, "next": 24614, "holds": 18158 },
+            { "reply": 29552 }
+          ]
+        },
+        {
+          "message": 24614,
+          "choices": [
+            { "reply": 29699, "next": 24978 }
+          ]
+        },
+        {
+          "message": 24978,
+          "choices": [
+            { "reply": 29961, "quest": 1769, "completes": 11316, "params": [[30, 11316]] }
+          ]
         }
       ],
-      "why": "Amino, master of the class-5 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 774, objective 4893)."
+      "why": "Amino, master of the class-5 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 774, objective 4893). «Lo que el tiempo se llevó» (1769): «Eludir la cuestión y hablarle del problema de Juan Luis Erra», not enough to go on (24613); «Presentarle el esqueleto de baglitch…», offered with the intact skeleton in the bag (18158, the baglitchs' drop while 11316 is pending), a remote time manipulation (24614); «¿Conoces a alguien que sepa más?», Marty Makzap at the Cania lakes zaap (24978); «Gracias, ¡hasta luego!» (11316). He only looks: the skeleton is for Marty."
     },
     {
       "npc": 40,
@@ -33514,6 +33534,285 @@
         }
       ],
       "why": "Professor Plumón (Professeur Duvet) by his caravan in the Cania circus [-9,-46], «Frankenstruche» (1778) as the screenshots of Dofus pour les noobs show it. He studies the pestruces (24929): «¿Qué tal va la investigación?» (24930), «Te ofrezco mi ayuda» (24931), «¿Qué alma de pestruz sería ideal?» (24932), «Acepto» starts the quest. «Toma: el alma de Thor Pestruz» hands over the soul (11443) -- offered only with it in a full stone --, «¿Qué recursos hacen falta?» (24933), he writes them down (24934). «Darle los recursos de pestruz» hands over the five tongues, ten feathers and ten thighs at once (11438, 11447, 11448): the body does not wake (24935), «Encogerte de hombros», Vid Cheber's resurrection potion (24936), «Ahora mismo voy». «Entregar la pócima de resurrección» (11446): nothing at all (24944), «Dar un paso atrás». Talked to again, «Impresionarte por el resultado obtenido»: a tiny Thor Pestruz (24967), «Levantar la vista y marcharte» (11457)."
+    },
+    {
+      "npc": 3374,
+      "map": 0,
+      "opening": 24606,
+      "lines": [
+        {
+          "message": 24606,
+          "choices": [
+            { "reply": 29544, "next": 24607, "beforeQuest": 1769 },
+            { "reply": 29596, "next": 24639, "quest": 1769, "afterObjective": 11351, "beforeObjective": 11333 },
+            { "reply": 29651, "gives": 18165, "quest": 1769, "afterObjective": 11336, "beforeObjective": 11343, "criterion": "PO!18165" },
+            { "reply": 29543 }
+          ]
+        },
+        {
+          "message": 24607,
+          "choices": [
+            { "reply": 29545, "next": 24608 }
+          ]
+        },
+        {
+          "message": 24608,
+          "choices": [
+            { "reply": 29546, "next": 24609 }
+          ]
+        },
+        {
+          "message": 24609,
+          "choices": [
+            { "reply": 29547, "next": 24610 }
+          ]
+        },
+        {
+          "message": 24610,
+          "choices": [
+            { "reply": 29548, "next": 24611 }
+          ]
+        },
+        {
+          "message": 24611,
+          "choices": [
+            { "reply": 29549, "next": 24612, "startsQuest": 1769, "params": [[34, 1769]] },
+            { "reply": 29698 }
+          ]
+        },
+        {
+          "message": 24612,
+          "choices": [
+            { "reply": 29550 }
+          ]
+        },
+        {
+          "message": 24639,
+          "choices": [
+            { "reply": 29597, "next": 24640 }
+          ]
+        },
+        {
+          "message": 24640,
+          "choices": [
+            { "reply": 29598, "next": 24641 }
+          ]
+        },
+        {
+          "message": 24641,
+          "choices": [
+            { "reply": 29599, "next": 24642 }
+          ]
+        },
+        {
+          "message": 24642,
+          "choices": [
+            { "reply": 29600, "quest": 1769, "completes": 11333, "params": [[30, 11333]], "showsNpc": 3373 }
+          ]
+        }
+      ],
+      "why": "Juan Luis Erra (Francis Lalande) on the Cania beach [2,-47], «Lo que el tiempo se llevó» (1769) as the screenshots of Dofus pour les noobs, «Au temps l'emportent les landes» show it. Humming (24606): «La coronación del rey Allister fue hace un montón de años» (24607), «Indicarle qué fecha es…» (24608, he walks off and reappears), «¿No habrás visto cosas a las que les suceda la misma anomalía?» (24609), «Recordarle la fecha otra vez» (24610), «Sacar tu arma…» (24611): «Eh, para el carro: te ayudo…» starts the quest and he asks for a baglitch's intact body for a xelor master (24612). Back from Doctor Bu, «¿Notaste o viste algo raro…?» (24639), «Hablarle de los objetos» (24640), «Describirle la bola» -- the fair! (24641), «No sé si entiendo» -- the tent of talismans (24642), «Dejarlo descansar e ir a consultar a Marty» (11333), and Marty «vient de faire son apparition». Once Marty wants his hair, «Arrancarle un pelo sin advertirlo y salir corriendo» hands it over (18165). «Dejarlo seguir con sus paranoias» always."
+    },
+    {
+      "npc": 3373,
+      "map": 0,
+      "opening": 24615,
+      "openings": [
+        { "quest": 1769, "objective": 11343, "pending": 11344, "criterion": "PO!18166", "message": 24686 }
+      ],
+      "lines": [
+        {
+          "message": 24615,
+          "choices": [
+            { "reply": 29554, "quest": 1769, "completes": 11317, "params": [[30, 11317]], "next": 24616, "afterObjective": 11316 },
+            { "reply": 29601, "next": 24647, "quest": 1769, "afterObjective": 11333, "beforeObjective": 11334 },
+            { "reply": 29605, "next": 24655, "quest": 1769, "afterObjective": 11335, "beforeObjective": 11336 },
+            { "reply": 29608, "quest": 1769, "completes": 11337, "params": [[30, 11337]], "next": 24685, "completesAll": [11338, 11339, 11340, 11343], "afterObjective": 11336 },
+            { "reply": 29626, "next": 24684, "quest": 1769, "afterObjective": 11347, "beforeObjective": 11348 },
+            { "reply": 29700 }
+          ]
+        },
+        {
+          "message": 24616,
+          "choices": [
+            { "reply": 29686, "next": 24728 }
+          ]
+        },
+        {
+          "message": 24728,
+          "choices": [
+            { "reply": 29687, "next": 24974 }
+          ]
+        },
+        {
+          "message": 24974,
+          "choices": [
+            { "reply": 29958 }
+          ]
+        },
+        {
+          "message": 24647,
+          "choices": [
+            { "reply": 29602, "next": 24991 }
+          ]
+        },
+        {
+          "message": 24991,
+          "choices": [
+            { "reply": 29975, "quest": 1769, "completes": 11334, "params": [[30, 11334]] }
+          ]
+        },
+        {
+          "message": 24655,
+          "choices": [
+            { "reply": 29606, "next": 24656 }
+          ]
+        },
+        {
+          "message": 24656,
+          "choices": [
+            { "reply": 29607, "next": 24975 }
+          ]
+        },
+        {
+          "message": 24975,
+          "choices": [
+            { "reply": 29959, "next": 24992 }
+          ]
+        },
+        {
+          "message": 24992,
+          "choices": [
+            { "reply": 29976, "quest": 1769, "completes": 11336, "params": [[30, 11336]] }
+          ]
+        },
+        {
+          "message": 24685,
+          "choices": [
+            { "reply": 29627, "next": 24686 }
+          ]
+        },
+        {
+          "message": 24686,
+          "choices": [
+            { "reply": 29628, "next": 24687 }
+          ]
+        },
+        {
+          "message": 24687,
+          "choices": [
+            { "reply": 29629, "next": 24688 }
+          ]
+        },
+        {
+          "message": 24688,
+          "choices": [
+            { "reply": 29688, "gives": 18166, "quest": 1769, "afterObjective": 11343, "beforeObjective": 11344, "criterion": "PO!18166" }
+          ]
+        },
+        {
+          "message": 24684,
+          "choices": [
+            { "reply": 29689, "next": 24729 }
+          ]
+        },
+        {
+          "message": 24729,
+          "choices": [
+            { "reply": 29901, "quest": 1769, "completes": 11348, "params": [[30, 11348]] }
+          ]
+        }
+      ],
+      "why": "Marty Makzap, «Lo que el tiempo se llevó» (1769), as the screenshots of Dofus pour les noobs, «Au temps l'emportent les landes» show it; the spatio-temporal fluctuations (24615) and «Dejarlo cavilando sobre sus cuestiones temporales» always. At the Cania lakes zaap [-3,-42]: «Hablarle del problema de Juan Luis…» hands the intact skeleton over (11317), a collateral victim (24616), «Anunciarle con orgullo de qué época procede Juan Luis», not the skeleton's (24728), «¿Cómo puedo conseguir esa información?», vestiges in the skeletons' remains, for Doctor Bu (24974), «Ir en busca de los objetos vetustos». By Juan Luis [2,-47]: «Contar lo que dijo Juan Luis» (24647), «Seguir escuchando», the attraction east of the Trool fair (24991), «Aceptar e irte sin más tardar» (11334). In front of the fair's tent [-13,-40]: «Explicarle lo sucedido intentando entrar en la tienda», a portal (24655), «Esperar» (24656), «Seguir escuchando» (24975), «¿Qué necesitas?» (24992), «Voy a buscar los ingredientes» (11336). «Aquí tienes los ingredientes que necesitas» hands the ten hairs, the strap, the musk, the seed and Juan Luis' hair over at once (11337-11343): «Perfecto» (24685), «Esperar», the amulet and the potion (24686), «¿La pócima esta lleva almizcle?», «Sí.» (24687), «Suspirar y beberte la pócima…» (24688), «Irte a la tienda» gives the passenger amulet (18166); whoever left before taking it finds him at 24686 again. Back from the other time by Juan Luis' place: «Contarle lo que has visto», Septango (24684), «¿Dónde se ha metido Juan Luis?», gone (24729), «Gracias por tu ayuda» (11348)."
+    },
+    {
+      "npc": 1590,
+      "map": 0,
+      "opening": 11932,
+      "lines": [
+        {
+          "message": 11932,
+          "choices": [
+            { "reply": 13517, "next": 12023 },
+            { "reply": 29571, "next": 24620, "quest": 1769, "beforeObjective": 11351, "criterion": "Qo>11318&Qo>11319&Qo>11320&Qo>11321" },
+            { "reply": 13518 }
+          ]
+        },
+        {
+          "message": 12023,
+          "choices": [
+            { "reply": 13518 }
+          ]
+        },
+        {
+          "message": 24620,
+          "choices": [
+            { "reply": 29572, "next": 24621 }
+          ]
+        },
+        {
+          "message": 24621,
+          "choices": [
+            { "reply": 29573, "next": 24622 }
+          ]
+        },
+        {
+          "message": 24622,
+          "choices": [
+            { "reply": 29592, "next": 24977 }
+          ]
+        },
+        {
+          "message": 24977,
+          "choices": [
+            { "reply": 29960, "quest": 1769, "completes": 11351, "params": [[30, 11351]] }
+          ]
+        }
+      ],
+      "why": "Doctor Bu, archivist of Sufokia [20,25]: doctor in literature and more (11932), «Seguir escuchando», time fascinates him (12023), «Hasta luego». «Lo que el tiempo se llevó» (1769) as the screenshots of Dofus pour les noobs, «Au temps l'emportent les landes» show it, once the four skeletons are searched: «¿Puedes fechar los objetos…?» (24620), «Impacientarte» (24621), «¿Puedes describir los objetos?», the chain of 636, the ball of 436, the abacus of 536, the score nobody can date (24622), «Explicarle el problema de Juan Luis Erra y de los baglitchs», several epochs a hundred years apart (24977), «Gracias por la información. Voy a ir a ver a Juan Luis.» (11351)."
+    },
+    {
+      "npc": 2802,
+      "map": 126615554,
+      "opening": 24679,
+      "openings": [
+        { "quest": 1769, "objective": 11345, "pending": 11346, "message": 24682 },
+        { "quest": 1769, "objective": 11346, "pending": 11347, "message": 24683 }
+      ],
+      "lines": [
+        {
+          "message": 24679,
+          "choices": [
+            { "reply": 29622, "next": 24680, "quest": 1769, "beforeObjective": 11345 }
+          ]
+        },
+        {
+          "message": 24680,
+          "choices": [
+            { "reply": 29623, "next": 24681 }
+          ]
+        },
+        {
+          "message": 24681,
+          "choices": [
+            { "reply": 29624, "quest": 1769, "completes": 11345, "params": [[30, 11345]], "next": 24682 }
+          ]
+        },
+        {
+          "message": 24682,
+          "choices": [
+            { "reply": 29650, "quest": 1769, "afterObjective": 11345, "beforeObjective": 11346 }
+          ]
+        },
+        {
+          "message": 24683,
+          "names": true,
+          "choices": [
+            { "reply": 29625, "quest": 1769, "completes": 11347, "params": [[30, 11347]], "takes": 18166, "passage": 2802001, "afterObjective": 11346 }
+          ]
+        }
+      ],
+      "why": "Septango on the beach of the other time behind the fair's tent (126615554, [1,-48] of the Cania plains), «Lo que el tiempo se llevó» (1769) as the screenshots of Dofus pour les noobs, «Au temps l'emportent les landes» show it. The calm before the manipulation (24679), «¿Quién eres?», a delicate experiment (24680), «Hablarle de Juan Luis…» (24681), «¿Puedes darme detalles de la época actual?…» (11345), we will be yesterday (24682): monsters drawn by the amulet charge, «Sacar tu arma» starts the fight; who lost finds her there again. Beaten them, the manipulation failed by your fault (24683), «Cerrar los ojos» (11347): the amulet is gone and the character is outside, in front of Marty Makzap («Vous êtes téléporté à l'extérieur devant Marty Makzap»)."
     }
   ]
 }

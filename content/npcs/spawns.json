@@ -4065,6 +4065,46 @@
       "cell": 381,
       "orientation": 1,
       "why": "Kande Boffler before the little temple of the Amakna forest [4,12]: «Este pequeño templo es verdaderamente magnífico» (626). The screenshots of Dofus pour les noobs («Frankenstruche») show him on the grass at the front of the temple, on its orange-bannered side; the guessed cell 246 put him inside the building."
+    },
+    {
+      "map": 127930381,
+      "npc": 3374,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "PL>129&Qo<11347&Qf!1769",
+      "why": "Juan Luis Erra on the Cania beach [2,-47], where 1769 is given, until Septango sends him back to his time: «Francis s'est volatilisé au moment où vous êtes apparu» (Dofus pour les noobs, «Au temps l'emportent les landes»). The cell is the one the deduced placement had."
+    },
+    {
+      "map": 156240386,
+      "npc": 3373,
+      "cell": 232,
+      "orientation": 1,
+      "criterion": "Qa=1769&Qo<11333",
+      "why": "Marty Makzap by the Cania lakes zaap [-3,-42] (11317's map), sent there for the fluctuations (24978), until he joins Juan Luis. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 127930381,
+      "npc": 3373,
+      "cell": 273,
+      "orientation": 3,
+      "criterion": "(Qa=1769&Qo>11333&Qo<11334)|(Qa=1769&Qo>11347)",
+      "why": "Marty Makzap by Juan Luis [2,-47] «qui vient de faire son apparition» (11334's map), and there again when Septango sends the character back (Dofus pour les noobs, «Au temps l'emportent les landes»). INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 139723266,
+      "npc": 3373,
+      "cell": 383,
+      "orientation": 0,
+      "criterion": "Qa=1769&Qo>11334&Qo<11344",
+      "why": "Marty Makzap «qui se trouve devant la tente» of the Trool fair [-13,-40] (Dofus pour les noobs, «Au temps l'emportent les landes»; 11336's map), left of its entrance as in the guide's screenshots. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 126615554,
+      "npc": 2802,
+      "cell": 274,
+      "orientation": 1,
+      "criterion": "Qa=1769&Qo>11343&Qo<11348",
+      "why": "Septango on the beach of the other time (126615554), in the middle of it right of the palms, as the guide's screenshots show her. INFERRED cell, an open walkable one in view."
     }
   ]
 }
