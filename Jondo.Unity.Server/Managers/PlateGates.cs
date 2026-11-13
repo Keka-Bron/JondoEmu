@@ -70,6 +70,20 @@ namespace Jondo.Unity.Server.Managers
             public string Stays { get; init; } = "";
 
             public TimeSpan OpenFor { get; init; } = TimeSpan.FromSeconds(30);
+
+            /// <summary>
+            /// The information message (type, id) the whole server reads when it opens, or null:
+            /// the Kralamoure's «Les portes de l'Antre du Kralamoure Géant se sont ouvertes».
+            /// </summary>
+            public (int Type, int Id)? Announce { get; init; }
+
+            /// <summary>
+            /// Whether its elements are drawn open or shut. Not the Kralamoure's: drawn with a
+            /// state its element stopped being clickable in the client -- the gate opened and no
+            /// click came any more --, so it keeps its map drawing and the passage itself refuses
+            /// while it is shut (<see cref="MayPass"/>).
+            /// </summary>
+            public bool DrawsState { get; init; } = true;
         }
 
         private static Dictionary<long, Gate>? _gates;
@@ -93,7 +107,18 @@ namespace Jondo.Unity.Server.Managers
         public static bool IsGateElement(long mapId, int elementId)
             => On(mapId) is { } gate && gate.Elements.Contains(elementId);
 
-        public static int StateOf(long mapId) => IsOpen(mapId) ? Open : 0;
+        public static int StateOf(long mapId) => IsOpen(mapId) && On(mapId) is { DrawsState: true } ? Open : 0;
+
+        /// <summary>
+        /// Whether a passage lets through: anything but a shut gate's own element. The
+        /// Kralamoure's gate is itself the way into its lair, and only while it stands open.
+        /// </summary>
+        public static bool MayPass(long mapId, int elementId) => !IsGateElement(mapId, elementId) || IsOpen(mapId);
+
+        public static Task TellShutAsync(NetworkStream stream)
+            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(
+                    Handlers.CommandTexts.Get(SessionContext.State.Language, "gate.shut"))));
 
         /// <summary>
         /// The gate as it stands, for whoever comes onto its map: its cells walkable in the jss's
@@ -134,6 +159,12 @@ namespace Jondo.Unity.Server.Managers
             }
             Console.WriteLine($"[PlateGates] The gate of {mapId} opens: {string.Join(", ", standing.Values)} on its plates.");
             await ShowAsync(gate, open: true);
+            if (gate.Announce is { } announce)
+            {
+                byte[] said = ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(announce.Type, announce.Id));
+                foreach (var session in SessionRegistry.All())
+                    if (session.Stream != null) await session.SendAsync(said);
+            }
             _ = ShutLaterAsync(gate);
         }
 
@@ -168,11 +199,14 @@ namespace Jondo.Unity.Server.Managers
 
         private static async Task ShowAsync(Gate gate, bool open)
         {
-            var list = Pb.New();
-            foreach (int cell in gate.Obstacles) list.Msg(1, Obstacle(cell, open ? Walkable : Blocked));
-            await SessionRegistry.BroadcastToMapAsync(gate.MapId, ConnectionProtocol.Push(Op.Jqx, list.Build()));
+            if (gate.Obstacles.Length > 0)
+            {
+                var list = Pb.New();
+                foreach (int cell in gate.Obstacles) list.Msg(1, Obstacle(cell, open ? Walkable : Blocked));
+                await SessionRegistry.BroadcastToMapAsync(gate.MapId, ConnectionProtocol.Push(Op.Jqx, list.Build()));
+            }
 
-            foreach (int elementId in gate.Elements)
+            foreach (int elementId in gate.DrawsState ? gate.Elements : Array.Empty<int>())
             {
                 var element = Interactives.ByElementId(gate.MapId, elementId);
                 if (element.Id == 0) continue;
@@ -209,8 +243,13 @@ namespace Jondo.Unity.Server.Managers
                                 Outside = entry.TryGetProperty("outside", out var o) ? o.GetInt32() : 0,
                                 Stays = Text(entry, "stays"),
                                 OpenFor = TimeSpan.FromSeconds(entry.TryGetProperty("openSeconds", out var s) ? s.GetInt32() : 30),
+                                Announce = Ints(entry, "announce") is { Length: 2 } said ? (said[0], said[1]) : null,
+                                DrawsState = !entry.TryGetProperty("drawsState", out var ds) || ds.ValueKind != JsonValueKind.False,
                             };
-                            if (gate.MapId > 0 && gate.Plates.Length > 0 && gate.Obstacles.Length > 0) gates[gate.MapId] = gate;
+                            // A gate shuts cells, or is itself the passage (its elements): the
+                            // Kralamoure's has no cell behind it to walk.
+                            if (gate.MapId > 0 && gate.Plates.Length > 0 && (gate.Obstacles.Length > 0 || gate.Elements.Length > 0))
+                                gates[gate.MapId] = gate;
                         }
                     }
                 }

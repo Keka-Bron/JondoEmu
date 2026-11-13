@@ -60,6 +60,14 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // Nor a plate gate that is itself the passage, while it stands shut: the Kralamoure's.
+            if (!Managers.PlateGates.MayPass(sourceMapId, elementId))
+            {
+                await Managers.PlateGates.TellShutAsync(stream);
+                Console.WriteLine($"[Teleport] Element {elementId} on {sourceMapId}: its gate is shut.");
+                return;
+            }
+
             // A passage with a criterion opens only for whoever meets it: a vilinsekt's hideout to
             // the rikiki wand worn. Refused, the client hears why, as for an item's criterion.
             if (route.Criterion.Length > 0 && !Managers.ItemCriteria.Holds(route.Criterion))
@@ -74,7 +82,10 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
                     elementId, skillId, SessionContext.State.CharacterId)));
-            await ReleaseAsync(stream, elementId, skillId, route.SourceCellId, route.InteractiveType);
+            // A gate's element is put back as it stands -- open --, not as an element at rest.
+            await ReleaseAsync(stream, elementId, skillId, route.SourceCellId, route.InteractiveType,
+                               Managers.PlateGates.IsGateElement(sourceMapId, elementId)
+                                   ? Managers.PlateGates.StateOf(sourceMapId) : 0);
 
             // The same door to somewhere else while a quest says so: the smoke-filled bank.
             long toMap = route.DestinationMapId;
@@ -95,14 +106,15 @@ namespace Jondo.Unity.Server.Handlers
         /// A passage's use closed before the map changes: the use ended (iwi), the element available
         /// again (iwf) and declared anew (iwm), so its graphic is still there on coming back.
         /// </summary>
-        internal static async Task ReleaseAsync(NetworkStream stream, int elementId, int skillId, int cellId, int type)
+        internal static async Task ReleaseAsync(NetworkStream stream, int elementId, int skillId, int cellId, int type,
+                                                int state = 0)
         {
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwi,
                     ConnectionProtocol.BuildInteractiveUseEnded(elementId, skillId)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwf,
-                    ConnectionProtocol.BuildElementState(cellId, elementId, state: 0)));
+                    ConnectionProtocol.BuildElementState(cellId, elementId, state: state)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iwm,
                     ConnectionProtocol.BuildElementRedeclared(

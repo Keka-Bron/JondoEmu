@@ -156,9 +156,24 @@
     "THE GARBAGE CHUTE of Bonta's palace kitchen (219284482, element 523345 on cell 328) drops into the sewers",
     "beside Ramy (216402698), as the 2.73 world graph has it, with no criterion: «Cliquez sur la grille du vide",
     "à ordure pour descendre dans les égouts de Bonta» (Dofus pour les noobs, «Cuisine raffinée»). INFERRED",
-    "arrival cell, beside him."
+    "arrival cell, beside him.",
+    "",
+    "THE GIANT KRALAMOURE'S LAIR. Its gate on [-60,-8] (162056, element 453562 on cell 317) is the way into",
+    "the first room, 26738688, and lets through only while its plate has opened it (content/maps/gates.json,",
+    "PlateGates.MayPass). The landing cell 478 is INFERRED: the walkable cell nearest to the 518 the Stasis",
+    "client's dungeon data gives as the lair's entrance cell, which this client's map does not walk."
   ],
   "passages": [
+    {
+      "map": 162056,
+      "element": 453562,
+      "cell": 317,
+      "gfx": 849,
+      "type": -1,
+      "skill": 184,
+      "toMap": 26738688,
+      "toCell": 478
+    },
     {
       "map": 238551040,
       "element": 539699,
