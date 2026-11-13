@@ -665,6 +665,7 @@
       "name": "GameMapMovementEvent",
       "fields": {
         "fuwy": "Cells",
+        "fuxb": "Pace",
         "fuxd": "CharacterId",
         "fuxe": "Cautious"
       },

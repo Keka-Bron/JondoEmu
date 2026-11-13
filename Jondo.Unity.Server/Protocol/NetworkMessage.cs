@@ -109,6 +109,23 @@ namespace Jondo.Protocol
             Buffer.BlockCopy(lenBytes, 0, frame, 0, lenBytes.Length);
             Buffer.BlockCopy(payload, 0, frame, lenBytes.Length, payload.Length);
             await WriteSerializedAsync(stream, frame);
+
+            // The pods told: whether he can still run goes with them, when it changed
+            // (OverloadRestriction). Every pods refresh comes through here. Found by its url in
+            // the bytes: GetMessageTypeUrl reads a request's envelope and missed the pushes.
+            if (IsPods(payload))
+                await Jondo.Unity.Server.Handlers.OverloadRestriction.AfterPodsAsync(stream);
+        }
+
+        private static readonly byte[] PodsTypeUrl = System.Text.Encoding.ASCII.GetBytes(Op.Uri(Op.Iun));
+
+        /// <summary>Whether a frame is the pods (iun): its url, and no letter after it -- not «iuna».</summary>
+        internal static bool IsPods(byte[] payload)
+        {
+            int at = payload.AsSpan().IndexOf(PodsTypeUrl);
+            if (at < 0) return false;
+            int after = at + PodsTypeUrl.Length;
+            return after >= payload.Length || payload[after] < (byte)'a' || payload[after] > (byte)'z';
         }
 
         // Use this for packets that already include their VarInt length prefix.

@@ -1778,7 +1778,9 @@ namespace Jondo.Unity.Server.Network
 
             cuerpo.Msg(5, Pb.New().Var(7, 1));
             cuerpo.Var(6, 1);
-            cuerpo.Bytes(7, HumanTrailer);
+            // His restrictions: the 0x0b of every capture, and CannotRun when he is overloaded --
+            // sent with only the 0x0b on every map, it let an overloaded character run again.
+            cuerpo.Bytes(7, Handlers.OverloadRestriction.PackedOf(character.Id));
 
             var humanoid = Pb.New()
                 .Str(1, character.Name)
@@ -2532,9 +2534,6 @@ namespace Jondo.Unity.Server.Network
                     .Var(4, ornament)));
             }
         }
-
-        /// <summary>The f7 that closes the block, a single byte with the same value in every capture.</summary>
-        private static readonly byte[] HumanTrailer = { 0x0b };
 
         // ─── World: merkasako ───────────────────────────────────────────────────
 
