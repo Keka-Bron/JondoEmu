@@ -4203,6 +4203,89 @@
    "map": 126615554,
    "afterObjectives": [11343],
    "why": "«Entra en la tienda»: the tent's entrance, with the passenger amulet, leads to the other time (126615554, an indoor map at [1,-48] of the Cania plains, the beach of the guide's screenshots with Septango); stepping onto it is entering."
+  },
+  {
+   "objective": 8220,
+   "quest": 1474,
+   "kind": "enter",
+   "map": 158859268,
+   "afterObjectives": [8219],
+   "why": "«Ve a la posta de diligencias junto al cementerio de Bonta»: the gates of the cemetery [-21,-58]."
+  },
+  {
+   "objective": 8222,
+   "quest": 1474,
+   "kind": "enter",
+   "map": 189531147,
+   "afterObjectives": [8221],
+   "why": "«Ve a la posta de diligencias junto a Astrub»: the station [0,-18]."
+  },
+  {
+   "objective": 8224,
+   "quest": 1474,
+   "kind": "enter",
+   "map": 139463681,
+   "afterObjectives": [8223],
+   "overridesMap": true,
+   "why": "«Encuentra la diligencia en los picos de Cania»: the wreck at [-15,-44] (Dofus pour les noobs, «Les monstres aboient, la diligence casse»)."
+  },
+  {
+   "objective": 8225,
+   "quest": 1474,
+   "kind": "reply",
+   "replies": [52072],
+   "afterObjectives": [8224],
+   "says": 439,
+   "why": "«Examina los restos de la diligencia»: the wreck's «Examinar los restos.», and the howls the wind brings from the south (info 439)."
+  },
+  {
+   "objective": 8226,
+   "quest": 1474,
+   "kind": "enter",
+   "map": 139463683,
+   "afterObjectives": [8225],
+   "overridesMap": true,
+   "why": "«Encuentra el origen de los alaridos»: south, at [-15,-42] (Dofus pour les noobs, «Les monstres aboient, la diligence casse»)."
+  },
+  {
+   "objective": 8227,
+   "quest": 1474,
+   "kind": "beat",
+   "monsters": [3629, 3630],
+   "map": 139463683,
+   "why": "«Ayuda a la bontariana en peligro»: the fight against her two blops."
+  },
+  {
+   "objective": 8229,
+   "quest": 1474,
+   "kind": "enter",
+   "map": 212602376,
+   "afterObjectives": [8228],
+   "requires": [{"item": 15105, "count": 1}],
+   "spends": true,
+   "says": 440,
+   "saysCarrying": {"item": 15121, "says": 441},
+   "why": "«Escolta a la bontariana… hasta Bonta»: Bonta's gates [-29,-53] reached with her walking behind; she thanks the character and goes in (440), or runs off without paying whoever holds her debt acknowledgement (441)."
+  },
+  {
+   "objective": 8230,
+   "quest": 1474,
+   "kind": "enter",
+   "map": 128058891,
+   "afterObjectives": [8250],
+   "requires": [{"item": 15115, "count": 1}],
+   "overridesMap": true,
+   "why": "«Pídele violentamente a un kanugro que te lleve frente a su jefe»: a kanugro of the rocky roads beaten (8250) drops the scared one (15115, «Ce Kanigrou a accepté de vous conduire jusqu'à son chef»), and this is done when he has brought the character to the chief [-9,-49]; the guide's quest log still has it open while «Trouver le chef» is the next goal, and its drop asks for it open."
+  },
+  {
+   "objective": 8231,
+   "quest": 1474,
+   "kind": "enter",
+   "map": 128058891,
+   "afterObjectives": [8230],
+   "requires": [{"item": 15115, "count": 1}],
+   "spends": true,
+   "why": "«Encuentra al jefe de los kanugros»: [-9,-49], where the scared kanugro stops following."
   }
  ]
 }

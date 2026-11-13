@@ -726,10 +726,11 @@ namespace Jondo.Unity.Server.Managers
 
             if (!await CarriesWhatItAsksAsync()) return false;
 
-            if (binding.Says != 0)
+            int says = binding.SaysFor(Equipment.HowMany);
+            if (says != 0)
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(0, binding.Says)));
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(0, says)));
             }
 
             // What it puts in the bag, before the tick: the item is the reason the objective is

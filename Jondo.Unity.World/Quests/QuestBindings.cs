@@ -288,6 +288,18 @@ namespace Jondo.Unity.World.Quests
         public int Says { get; init; }
 
         /// <summary>
+        /// The info line said instead of <see cref="Says"/> while an item is carried
+        /// («saysCarrying»), or zeroes: the Bontarian of «A monstruos necios, golpes sordos» thanks
+        /// whoever brought her to Bonta's gates for nothing (440), and runs off without paying the
+        /// one she signed a debt acknowledgement for (15121, 441).
+        /// </summary>
+        public (int Item, int Says) SaysCarrying { get; init; }
+
+        /// <summary>The line this binding prints, given what is carried.</summary>
+        public int SaysFor(Func<int, int> howMany)
+            => SaysCarrying.Says != 0 && howMany(SaysCarrying.Item) > 0 ? SaysCarrying.Says : Says;
+
+        /// <summary>
         /// Elements of the scene that are only used, closing nothing («props»): offered while the
         /// objective is in hand, a use is noted down like any other (afterElement of the NPCs' replies
         /// and of <see cref="AfterElement"/>). The stove of the White Rat's pantry in «Cuisine
@@ -603,6 +615,9 @@ namespace Jondo.Unity.World.Quests
                 AnyOrder = row.TryGetProperty("anyOrder", out var anyOrder) && anyOrder.ValueKind == JsonValueKind.True,
                 ShowsNpc = Int(row, "showsNpc"),
                 Says = Int(row, "says"),
+                SaysCarrying = row.TryGetProperty("saysCarrying", out var carrying) && carrying.ValueKind == JsonValueKind.Object
+                    ? (Int(carrying, "item"), Int(carrying, "says"))
+                    : (0, 0),
                 OnlyGives = row.TryGetProperty("onlyGives", out var only) && only.ValueKind == JsonValueKind.True,
                 GivesEach = row.TryGetProperty("givesEach", out var each) && each.ValueKind == JsonValueKind.True,
                 OverridesMap = row.TryGetProperty("overridesMap", out var overrides)

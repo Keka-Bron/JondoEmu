@@ -4176,6 +4176,76 @@
       "orientation": 1,
       "criterion": "Qa=1473&Qo<8206&PO!15102",
       "why": "The scared gorkoko on the Moon beach [32,9], while 1473 wants his nut. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 217061382,
+      "npc": 316,
+      "cell": 368,
+      "orientation": 1,
+      "why": "Angelo Bolle, master of Bonta's bakers' workshop [-31,-52] (8219's map), in front of the work benches. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 158859268,
+      "npc": 2220,
+      "cell": 358,
+      "orientation": 1,
+      "why": "Ro Entier, keeper of Bonta's cemetery, at its gates [-21,-58] (8221's map), on the stone path below the arch. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 139463681,
+      "npc": 5472,
+      "cell": 161,
+      "orientation": 1,
+      "criterion": "Qa=1474&Qo<8225",
+      "why": "The wrecked stagecoach at [-15,-44] (8225's map), by the wreck the map draws, until examined. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 139463683,
+      "npc": 2286,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1474&Qo>8225&Qo<8229&PO!15105",
+      "why": "The Bontarian in distress at [-15,-42] (8228's map), from the wreck examined to her escort, unless she is already following. The cell is the one the deduced placement had."
+    },
+    {
+      "map": 139463683,
+      "npc": 2301,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=1474&Qo>8225&Qo<8227",
+      "why": "The sticky blop, blue, below and right of the Bontarian as the guide's screenshot has it, until beaten. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 128058891,
+      "npc": 2287,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "(Qa=1474&Qo>8229)|(Qf=1474&Qa!1475&Qf!1475)",
+      "why": "Chief Ray Ahieno in the Cania moors [-9,-49] (8231's map), from the Bontarian's escort until he has handed out «La risueña miaumiena». INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 139463683,
+      "npc": 2302,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa=1474&Qo>8225&Qo<8227",
+      "why": "The lonely blop, red, right of the Bontarian, until beaten. The guide's screenshot has it above her, but there (273) the tree's leaves hide it. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 128058891,
+      "npc": 2312,
+      "cell": 284,
+      "orientation": 1,
+      "criterion": "Qa=1474&Qo>8229&Qo<8233",
+      "why": "A kanugro veteran by his chief, a cell apart so that neither hides the other. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 128058891,
+      "npc": 2312,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=1474&Qo>8229&Qo<8233",
+      "why": "The other kanugro veteran by his chief. INFERRED cell, an open walkable one in view."
     }
   ]
 }

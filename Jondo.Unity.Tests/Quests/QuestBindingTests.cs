@@ -169,6 +169,34 @@ namespace Jondo.Unity.Tests.Quests
         }
 
         [Fact]
+        public void The_line_said_changes_while_its_item_is_carried()
+        {
+            // The Bontarian at Bonta's gates: thanks for the escort (440), or running off without
+            // paying whoever holds the debt acknowledgement she signed (15121, 441).
+            string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".json");
+            File.WriteAllText(path, """
+            { "bindings": [
+              { "objective": 8229, "quest": 1474, "kind": "enter", "map": 212602376, "says": 440,
+                "saysCarrying": { "item": 15121, "says": 441 } },
+              { "objective": 8225, "quest": 1474, "kind": "reply", "replies": [52072], "says": 439 }
+            ] }
+            """);
+
+            try
+            {
+                var book = QuestBindingContent.Load(path);
+                var escort = book.Of(8229)!;
+                Assert.Equal(440, escort.SaysFor(_ => 0));
+                Assert.Equal(441, escort.SaysFor(item => item == 15121 ? 1 : 0));
+                Assert.Equal(439, book.Of(8225)!.SaysFor(_ => 1));
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [Fact]
         public void Every_binding_written_closes_a_real_objective_of_the_quest_it_names()
         {
             // The content, not the loader. A binding naming an objective that does not exist does

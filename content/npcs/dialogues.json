@@ -26965,6 +26965,7 @@
             { "reply": 15601, "quest": 1201, "completes": 6774, "params": [[30, 6774]], "next": 13498, "afterObjective": 6773 },
             { "reply": 15603, "next": 13500, "quest": 1201, "afterQuest": true },
             { "reply": 15602, "next": 13497, "criterion": "Qf!1201" },
+            { "reply": 20572, "next": 17184, "quest": 1474, "afterObjective": 8222, "beforeObjective": 8223 },
             { "reply": 82521 }
           ]
         },
@@ -26999,9 +27000,21 @@
             { "reply": 15605, "teleport": 158859268 },
             { "reply": 15606, "teleport": 180355584 }
           ]
+        },
+        {
+          "message": 17184,
+          "choices": [
+            { "reply": 20571, "next": 17185 }
+          ]
+        },
+        {
+          "message": 17185,
+          "choices": [
+            { "reply": 20570, "quest": 1474, "completes": 8223, "params": [[30, 8223]] }
+          ]
         }
       ],
-      "why": "Lauren Fertrén, Astrub's stagecoach station [0,-18] (13496). By «Luisito, fab'huritu, eres muy malito»: «Allez en [0,-18] et parlez à Hassen Cehef « Montrer le ticket de Kerubim Crépin »» (Dofus pour les noobs): «Mira, tengo un pase.» hands Kerubim's pass over (6774, 13498), the network reopened (13499) and its warning (60129). Without it the office is on strike (13497). Afterwards «Elegir destino.» (13500): «Elegir los caminos rocosos.» to Cania's bay [-29,-12], «Me voy al Cementerio de los Héroes.» to [-21,-58], «Elegir el Cementerio de los Torturados.» to the fungus territory [-12,29], the three one-way destinations of the guide; the reply names the subarea around each."
+      "why": "Lauren Fertrén, Astrub's stagecoach station [0,-18] (13496). By «Luisito, fab'huritu, eres muy malito»: «Allez en [0,-18] et parlez à Hassen Cehef « Montrer le ticket de Kerubim Crépin »» (Dofus pour les noobs): «Mira, tengo un pase.» hands Kerubim's pass over (6774, 13498), the network reopened (13499) and its warning (60129). Without it the office is on strike (13497). Afterwards «Elegir destino.» (13500): «Elegir los caminos rocosos.» to Cania's bay [-29,-12], «Me voy al Cementerio de los Héroes.» to [-21,-58], «Elegir el Cementerio de los Torturados.» to the fungus territory [-12,29], the three one-way destinations of the guide; the reply names the subarea around each. For 1474 (Dofus pour les noobs, «Les monstres aboient, la diligence casse», «Parlez alors à Hassen Cehef»): «Estoy buscando a un pasajero procedente de Bonta», the Bonta-Astrub stagecoach lost passengers (17184), «¿Qué más sabes…?», an accident on the north border of the Cania peaks, the investigator never came back (17185), «Encogerte de hombros e ir a los picos de Cania» (8223)."
     },
     {
       "npc": 3100,
@@ -33819,7 +33832,9 @@
       "map": 0,
       "opening": 10808,
       "openings": [
-        { "quest": 1473, "objective": 8212, "pending": 8213, "message": 17147 }
+        { "quest": 1473, "objective": 8212, "pending": 8213, "message": 17147 },
+        { "canStart": 1474, "message": 17165 },
+        { "quest": 1474, "pending": 8218, "message": 17166 }
       ],
       "lines": [
         {
@@ -33892,9 +33907,22 @@
           "choices": [
             { "reply": 20547, "quest": 1473, "completes": 8217, "params": [[30, 8217]] }
           ]
+        },
+        {
+          "message": 17165,
+          "choices": [
+            { "reply": 20545 },
+            { "reply": 20549, "startsQuest": 1474, "params": [[34, 1474]], "next": 17166 }
+          ]
+        },
+        {
+          "message": 17166,
+          "choices": [
+            { "reply": 20546 }
+          ]
         }
       ],
-      "why": "Jacoba Lucinati Scalati, seneschal of Amakna castle [4,-6]: the king is busy, the castle open to visit (10808), the prince of Wey's relic (10809). «El acusado de la recepción» (1473) as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show it: «Pareces preocupada», the cook Simona Burla and her exotic ingredients (17123), «¿Quién es ese embajador?», Berami of the kanigs and the banquet (17124), «Yo puedo ayudar», paid and invited (17125), «¿Puedes darme la lista…?», slime, leaves, ears and gorkoko nuts (17126), «Voy a buscar los ingredientes» starts it. Ingredients handed over, «Ya le he llevado los ingredientes…», the reception has begun (17134), «Vale, voy a la sala de espectáculos» (8207). Out of the cells: escaped? (17147), «Lokusta me ha atacado», maybe a misjudgement (17156), «Mira el mensaje…» (8213, the tablet is only shown), somebody paid the poisoner, to Madrestam (17157). The author named, «El responsable… es Tibiore» (20548), a matter between kanigs, a reward earned (17164), «Me voy, adiós» (8217)."
+      "why": "Jacoba Lucinati Scalati, seneschal of Amakna castle [4,-6]: the king is busy, the castle open to visit (10808), the prince of Wey's relic (10809). «El acusado de la recepción» (1473) as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show it: «Pareces preocupada», the cook Simona Burla and her exotic ingredients (17123), «¿Quién es ese embajador?», Berami of the kanigs and the banquet (17124), «Yo puedo ayudar», paid and invited (17125), «¿Puedes darme la lista…?», slime, leaves, ears and gorkoko nuts (17126), «Voy a buscar los ingredientes» starts it. Ingredients handed over, «Ya le he llevado los ingredientes…», the reception has begun (17134), «Vale, voy a la sala de espectáculos» (8207). Out of the cells: escaped? (17147), «Lokusta me ha atacado», maybe a misjudgement (17156), «Mira el mensaje…» (8213, the tablet is only shown), somebody paid the poisoner, to Madrestam (17157). The author named, «El responsable… es Tibiore» (20548), a matter between kanigs, a reward earned (17164), «Me voy, adiós» (8217). «A monstruos necios, golpes sordos» (1474) as Dofus pour les noobs, «Les monstres aboient, la diligence casse» starts it: once 1473 is done, one last thing, Simona is worried since her cousin vanished, go and see her in the kitchen (17165), «Creo que ya he hecho bastante…» or «Vale, voy a ver a Simona», which starts it; until she is seen, the same (17166)."
     },
     {
       "npc": 1570,
@@ -34001,13 +34029,19 @@
       "map": 0,
       "opening": 17130,
       "openings": [
-        { "quest": 1473, "pending": 8206, "message": 17131 }
+        { "quest": 1473, "pending": 8206, "message": 17131 },
+        { "quest": 1474, "pending": 8218, "message": 17131 }
       ],
       "lines": [
+        {
+          "message": 17130,
+          "choices": []
+        },
         {
           "message": 17131,
           "choices": [
             { "reply": 20509, "next": 17132 },
+            { "reply": 20556, "next": 17173, "quest": 1474, "beforeObjective": 8218 },
             { "reply": 20511, "quest": 1473, "completes": 8203, "params": [[30, 8203]], "completesAll": [8204, 8205, 8206], "takesAll": [15101, 15102, 15103], "next": 17133 },
             { "reply": 20512 }
           ]
@@ -34023,9 +34057,21 @@
           "choices": [
             { "reply": 20510 }
           ]
+        },
+        {
+          "message": 17173,
+          "choices": [
+            { "reply": 20555, "next": 17174 }
+          ]
+        },
+        {
+          "message": 17174,
+          "choices": [
+            { "reply": 20554, "quest": 1474, "completes": 8218, "params": [[30, 8218]] }
+          ]
         }
       ],
-      "why": "Simona Burla, the castle cook: a banquet to make (17130). While «El acusado de la recepción» (1473) wants her ingredients: an oyster with hot chocolate and tripe jam (17131), «Aceptar y probar», delicious and matching your green face (17132), «Pedir disculpas…» leaves the Nausea curse (15119), «vous pouvez aller la voir quand vous voulez et obtenir ce malus» (Dofus pour les noobs, «L'accusé de la réception»); «No, gracias. Aquí tienes los ingredientes» hands over the slime, leaves, ears (8203-8205) and the three gorkoko nuts (8206), ears with nuts for the ambassador (17133), «Yo me voy a ver a Jacoba…»."
+      "why": "Simona Burla, the castle cook: a banquet to make (17130). While «El acusado de la recepción» (1473) wants her ingredients: an oyster with hot chocolate and tripe jam (17131), «Aceptar y probar», delicious and matching your green face (17132), «Pedir disculpas…» leaves the Nausea curse (15119), «vous pouvez aller la voir quand vous voulez et obtenir ce malus» (Dofus pour les noobs, «L'accusé de la réception»); «No, gracias. Aquí tienes los ingredientes» hands over the slime, leaves, ears (8203-8205) and the three gorkoko nuts (8206), ears with nuts for the ambassador (17133), «Yo me voy a ver a Jacoba…». For «A monstruos necios, golpes sordos» (1474): the same oyster first (17131), then «¿Qué sabes de tu primo?» -- «Demander des nouvelles de son cousin» in the guide's screenshot --, poor Pol, asked to make his pepper blopicero for the ambassador and never seen since (17173), «Está decidido: ¡voy a ir a buscarlo!», he works in Bonta's bakers' workshop (17174), «¡Pues a Bonta me voy!» (8218)."
     },
     {
       "npc": 2284,
@@ -34036,6 +34082,10 @@
         { "quest": 1473, "objective": 8211, "pending": 8212, "message": 17155 }
       ],
       "lines": [
+        {
+          "message": 17150,
+          "choices": []
+        },
         {
           "message": 17151,
           "choices": [
@@ -34163,6 +34213,211 @@
         }
       ],
       "why": "A gorkoko of the Moon beach, a palm that stares (17129): «Darle una buena patada en el tronco» starts the fight whose gorkoko drops its nut for «El acusado de la recepción» (1473), «Parlez à Grokoko … afin de l'affronter» (Dofus pour les noobs, «L'accusé de la réception»); «Irse»."
+    },
+    {
+      "npc": 316,
+      "map": 0,
+      "opening": 1247,
+      "lines": [
+        {
+          "message": 1247,
+          "choices": [
+            { "reply": 20566, "next": 17179, "quest": 1474, "afterObjective": 8218, "beforeObjective": 8219 }
+          ]
+        },
+        {
+          "message": 17179,
+          "choices": [
+            { "reply": 20565, "next": 17180 }
+          ]
+        },
+        {
+          "message": 17180,
+          "choices": [
+            { "reply": 20564, "next": 17181 }
+          ]
+        },
+        {
+          "message": 17181,
+          "choices": [
+            { "reply": 20563, "quest": 1474, "completes": 8219, "params": [[30, 8219]] }
+          ]
+        }
+      ],
+      "why": "Angelo Bolle in Bonta's bakers' workshop [-31,-52]: bread or brioche? (1247). For «A monstruos necios, golpes sordos» (1474), as Dofus pour les noobs, «Les monstres aboient, la diligence casse» has it: «Estoy buscando a Pol», gone to his cousin's at the castle (17179), «Lo cierto es que Pol nunca llegó…», he took the stagecoach south, zaaps make him sick (17180), «¿Dónde está la posta de diligencias más cercana?», at the gates of Bonta's cemetery (17181), «Gracias. Voy al cementerio.» (8219)."
+    },
+    {
+      "npc": 2220,
+      "map": 0,
+      "opening": 16805,
+      "lines": [
+        {
+          "message": 16805,
+          "choices": [
+            { "reply": 20569, "next": 17182, "quest": 1474, "afterObjective": 8220, "beforeObjective": 8221 }
+          ]
+        },
+        {
+          "message": 17182,
+          "choices": [
+            { "reply": 20568, "next": 17183 }
+          ]
+        },
+        {
+          "message": 17183,
+          "choices": [
+            { "reply": 20567, "quest": 1474, "completes": 8221, "params": [[30, 8221]] }
+          ]
+        }
+      ],
+      "why": "Ro Entier at the gates of Bonta's cemetery [-21,-58] -- Sellia Renuf in the French guide --: the dead sleep lightly here (16805). For 1474, as Dofus pour les noobs, «Les monstres aboient, la diligence casse» has it: «¿Has visto una diligencia pasar recientemente?», it crosses Cania once a week (17182), «Estoy buscando a un panadero…», the pepper blopicero, he boarded the one to Astrub (17183), «Gracias. Hasta luego.» (8221)."
+    },
+    {
+      "npc": 5472,
+      "map": 139463681,
+      "opening": 40003,
+      "lines": [
+        {
+          "message": 40003,
+          "choices": [
+            { "reply": 52072, "quest": 1474, "afterObjective": 8224, "beforeObjective": 8225 }
+          ]
+        }
+      ],
+      "why": "The wrecked stagecoach in the Cania peaks [-15,-44]: a sorry state, fang marks of kanugros (40003), «Examinar los restos.» -- «Cliquez sur la calèche accidentée» (Dofus pour les noobs, «Les monstres aboient, la diligence casse»); the map's own wreck is scenery with no element to click, and this is the client's NPC for it."
+    },
+    {
+      "npc": 2286,
+      "map": 0,
+      "opening": 17198,
+      "openings": [
+        { "quest": 1474, "objective": 8227, "pending": 8228, "message": 17199 },
+        { "quest": 1474, "objective": 8228, "pending": 8229, "message": 17199 }
+      ],
+      "lines": [
+        {
+          "message": 17198,
+          "choices": []
+        },
+        {
+          "message": 17199,
+          "choices": [
+            { "reply": 20609, "next": 17204, "quest": 1474, "afterObjective": 8227, "beforeObjective": 8228 },
+            { "reply": 20610, "gives": 15105, "quest": 1474, "afterObjective": 8228, "beforeObjective": 8229 }
+          ]
+        },
+        {
+          "message": 17204,
+          "choices": [
+            { "reply": 20608, "next": 17205 }
+          ]
+        },
+        {
+          "message": 17205,
+          "choices": [
+            { "reply": 20607, "next": 17206 }
+          ]
+        },
+        {
+          "message": 17206,
+          "choices": [
+            { "reply": 20606, "next": 17207 }
+          ]
+        },
+        {
+          "message": 17207,
+          "choices": [
+            { "reply": 20603, "quest": 1474, "completes": 8228, "params": [[30, 8228]], "gives": 15105 },
+            { "reply": 20605, "next": 17208 }
+          ]
+        },
+        {
+          "message": 17208,
+          "choices": [
+            { "reply": 20604, "quest": 1474, "completes": 8228, "params": [[30, 8228]], "gives": 15105, "alsoGives": [15121] }
+          ]
+        }
+      ],
+      "why": "The Bontarian in distress at [-15,-42], as the screenshots of Dofus pour les noobs, «Les monstres aboient, la diligence casse» show it: help, these blops will not let go (17198, no reply). Saved: thanks, lost on the Cania plain since the stagecoach (17199), «¿Puedes contarme qué le pasó…?», furry creatures cut the road (17204), «¿Sabes qué monstruos eran?», kanugros and a chief who laughed all the time (17205), «¿Había un panadero…?», a blopicero pastry chef taken by force (17206), «Gracias por la información», don't leave me here (17207): «Claro que no: te llevaré hasta Bonta» (8228, she follows, 15105), or «Lo siento…», I am very rich, a debt acknowledgement (17208), «Bueno, vale…» (8228, she follows, and the acknowledgement 15121). Whoever lost her on the way finds her here again: «Ven, te acompañaré hasta la ciudad de la luz»."
+    },
+    {
+      "npc": 2301,
+      "map": 0,
+      "opening": 17194,
+      "lines": [
+        {
+          "message": 17194,
+          "choices": [
+            { "reply": 20589, "quest": 1474, "afterObjective": 8226, "beforeObjective": 8227 }
+          ]
+        }
+      ],
+      "why": "A blop threatening the Bontarian at [-15,-42] (17194): «Parlez à l'un des blops afin de défendre celle-ci» (Dofus pour les noobs, «Les monstres aboient, la diligence casse»); the reply is the fight against both."
+    },
+    {
+      "npc": 2302,
+      "map": 0,
+      "opening": 17195,
+      "lines": [
+        {
+          "message": 17195,
+          "choices": [
+            { "reply": 20590, "quest": 1474, "afterObjective": 8226, "beforeObjective": 8227 }
+          ]
+        }
+      ],
+      "why": "A blop threatening the Bontarian at [-15,-42] (17195): «Parlez à l'un des blops afin de défendre celle-ci» (Dofus pour les noobs, «Les monstres aboient, la diligence casse»); the reply is the fight against both."
+    },
+    {
+      "npc": 2287,
+      "map": 0,
+      "opening": 17212,
+      "openings": [
+        { "quest": 1474, "objective": 8231, "pending": 8232, "message": 17212 },
+        { "quest": 1474, "objective": 8232, "pending": 8233, "message": 17213 },
+        { "canStart": 1475, "message": 17214 }
+      ],
+      "lines": [
+        {
+          "message": 17212,
+          "choices": [
+            { "reply": 20611, "quest": 1474, "afterObjective": 8231, "beforeObjective": 8232 }
+          ]
+        },
+        {
+          "message": 17213,
+          "choices": [
+            { "reply": 20614, "quest": 1474, "completes": 8233, "params": [[30, 8233]], "next": 17214 }
+          ]
+        },
+        {
+          "message": 17214,
+          "choices": [
+            { "reply": 20613, "next": 17215 }
+          ]
+        },
+        {
+          "message": 17215,
+          "choices": [
+            { "reply": 20612, "startsQuest": 1475, "params": [[34, 1475]] }
+          ]
+        }
+      ],
+      "why": "Chief Ray Ahieno of the kanugros in the Cania moors [-9,-49] -- Chef Krokouto in the French guide --, as the screenshots of Dofus pour les noobs, «Les monstres aboient, la diligence casse» show him: alone? you, slave! (17212), «Defender tu vida y tu libertad» is the fight against him and two veterans (8232). Beaten: understood, stop hitting (17213), «Te exijo que me digas…» (8233, the quest's end), he pretends not to understand (17214), «*Te arremangas de forma amenazadora*», the slaves are at the kanig camp in the Stone Teeth quarry (17215), «Anotar la localización… e irte» starts «La risueña miaumiena» (1475), «si vous continuez la conversation avec le Chef Kanigrou, vous obtiendrez la prochaine quête»."
+    },
+    {
+      "npc": 2312,
+      "map": 128058891,
+      "opening": 17216,
+      "lines": [
+        {
+          "message": 17216,
+          "choices": [
+            { "reply": 20615 }
+          ]
+        }
+      ],
+      "why": "A kanugro veteran of the chief's band at [-9,-49] (17216), «Encogerte de hombros e irte»; two stand by him and fight with him (Dofus pour les noobs, «Les monstres aboient, la diligence casse»: «accompagné de deux Kanigrous Vétéran»)."
     }
   ]
 }

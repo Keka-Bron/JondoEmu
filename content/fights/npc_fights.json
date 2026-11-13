@@ -998,6 +998,15 @@
       "why": "«Defenderte de Tibiore»: Tibiore (3628, level 150, 6,900 life in the guide's screenshot) by the Madrestam fountain, alone." },
     { "npc": 2285, "map": 68420101, "reply": 20540,
       "monsters": [ { "monster": 3628, "grade": 0 } ],
-      "why": "«Atacar a Tibiore»: the same fight, again, for whoever lost it." }
+      "why": "«Atacar a Tibiore»: the same fight, again, for whoever lost it." },
+    { "npc": 2301, "map": 139463683, "reply": 20589,
+      "monsters": [ { "monster": 3629, "grade": 0 }, { "monster": 3630, "grade": 0 } ],
+      "why": "«Darle una paliza al blop pegajoso»: the sticky blop (3629) and the lonely one (3630), both level 155 with 5,400 life as the guide's screenshots show them; the sticky one drops the bit of sticky blop (15120)." },
+    { "npc": 2302, "map": 139463683, "reply": 20590,
+      "monsters": [ { "monster": 3630, "grade": 0 }, { "monster": 3629, "grade": 0 } ],
+      "why": "«Darle una tunda al blop abandonado»: the same two blops." },
+    { "npc": 2287, "map": 128058891, "reply": 20611,
+      "monsters": [ { "monster": 3631, "grade": 0 }, { "monster": 3633, "grade": 0 }, { "monster": 3633, "grade": 0 } ],
+      "why": "«Le Chef Krokouto vous attaque alors accompagné de deux Kanigrous Vétéran» (Dofus pour les noobs, «Les monstres aboient, la diligence casse»): Chief Ray Ahieno (3631, 5,400 life) and two kanugro veterans (3633, 2,900 life), level 155." }
   ]
 }
