@@ -837,7 +837,11 @@ namespace Jondo.Unity.Server.Managers
                 value += 40 + monster.Level / 2.0 + 15 * (Nearest(from) - Nearest(aim));
             }
 
-            if (spell.Utility > 0 && (spell.UtilityOnEnemies ? onEnemy : target == monster))
+            // Cast on itself, a spell for enemies is never aimed at one, and weighed as one it was
+            // worth nothing.
+            if (spell.Utility > 0 && spell.OnSelf && spell.UtilityOnEnemies)
+                value += OwnZoneUtility(spell);
+            else if (spell.Utility > 0 && (spell.UtilityOnEnemies ? onEnemy : target == monster))
                 value += spell.Utility;
 
             return value;
@@ -1852,8 +1856,18 @@ namespace Jondo.Unity.Server.Managers
                     board.ThroughPortal?.Invoke(false);
                 }
             }
-            return ValueOfRows(board, spell, monster, from, aim, enemies);
+            double byRows = ValueOfRows(board, spell, monster, from, aim, enemies);
+            return byRows > 0 ? byRows : OwnZoneUtility(spell);
         }
+
+        /// <summary>
+        /// A spell cast on itself for the enemies round it, worth its utility every turn. The
+        /// tactirelle's and the chalutier's put a state round them and push or pull: row by row
+        /// that is worth nothing, and they passed every turn. In the game they cast it every turn,
+        /// whoever stands round them.
+        /// </summary>
+        private static double OwnZoneUtility(Spell spell)
+            => spell.Utility > 0 && spell.OnSelf && spell.UtilityOnEnemies ? spell.Utility : 0;
 
         /// <summary>«Mata al objetivo y lo sustituye por la invocación» (405), and its twin (2796).</summary>
         internal const int KillsAndReplaces = 405;
