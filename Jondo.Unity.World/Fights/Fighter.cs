@@ -548,6 +548,15 @@ namespace Jondo.Unity.World.Fights
             AccumulatedApLoss = 0;
         }
 
+        /// <summary>
+        /// The fight's last buff number when this fighter's last turn ended, or minus one before
+        /// its first. A row it put after that -- in somebody else's turn, a reaction to a blow --
+        /// has not lived one of its turns yet, and does not fall at the start of the next one
+        /// (FightHandler, the sweep): the Kralamoure's Kraken gives him the state of the element
+        /// he was hit with, for one turn, and «au prochain tour il invoquera un tentacule».
+        /// </summary>
+        public int UltimoEmbrujoDeSuTurno { get; set; } = -1;
+
         /// <summary>The catalogue's numbers for the two kinds of points.</summary>
         public const int CaracteristicaDePuntosDeAccion = 1;
         public const int CaracteristicaDePuntosDeMovimiento = 23;
