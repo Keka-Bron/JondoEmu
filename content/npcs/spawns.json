@@ -4105,6 +4105,77 @@
       "orientation": 1,
       "criterion": "Qa=1769&Qo>11343&Qo<11348",
       "why": "Septango on the beach of the other time (126615554), in the middle of it right of the palms, as the guide's screenshots show her. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 95686145,
+      "npc": 1570,
+      "cell": 325,
+      "orientation": 1,
+      "why": "Jacoba Lucinati Scalati, seneschal of Amakna castle, in the great hall [4,-6] where 1473 is given, left of the long table on the red carpet as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show her."
+    },
+    {
+      "map": 95685123,
+      "npc": 1570,
+      "cell": 357,
+      "orientation": 1,
+      "criterion": "Qa=1473&Qo>8209&Qo<8210",
+      "why": "Jacoba come into the show room once the ambassador collapses, next to the king. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 95685123,
+      "npc": 1523,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qa=1473&Qo>8207&Qo<8210",
+      "why": "King Allister at the reception in the show room (8208's map), from the reception's start to the character's arrest. The cell is the one the deduced placement had."
+    },
+    {
+      "map": 95685123,
+      "npc": 2283,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1473&Qo>8207&Qo<8210",
+      "why": "Ambassador Berami at the reception (8209's map), among the benches as in the guide's screenshot, until the character is arrested. The cell is the one the deduced placement had."
+    },
+    {
+      "map": 101713429,
+      "npc": 2284,
+      "cell": 454,
+      "orientation": 1,
+      "criterion": "Qa=1473&Qo>8210&Qo<8212",
+      "why": "Lokusta outside the cell the character is locked in, in the castle prison [6,-5] (8211's map), as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show her, until she is beaten. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 68420101,
+      "npc": 2285,
+      "cell": 355,
+      "orientation": 1,
+      "criterion": "Qa=1473&Qo>8213&Qo<8216",
+      "why": "Tibiore left of the Madrestam fountain [8,-2] (8215's map), as the guide's screenshots show him, from the tablet shown to his escape. The cell is the one the deduced placement had."
+    },
+    {
+      "map": 156894216,
+      "npc": 2297,
+      "cell": 229,
+      "orientation": 1,
+      "criterion": "Qa=1473&Qo<8206&PO!15103",
+      "why": "The angry gorkoko on the Moon beach [33,12], while 1473 wants his nut. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 156894727,
+      "npc": 2298,
+      "cell": 229,
+      "orientation": 1,
+      "criterion": "Qa=1473&Qo<8206&PO!15101",
+      "why": "The shy gorkoko on the Moon beach [32,11], while 1473 wants his nut. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 156894725,
+      "npc": 2299,
+      "cell": 259,
+      "orientation": 1,
+      "criterion": "Qa=1473&Qo<8206&PO!15102",
+      "why": "The scared gorkoko on the Moon beach [32,9], while 1473 wants his nut. INFERRED cell, an open walkable one in view."
     }
   ]
 }

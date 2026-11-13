@@ -33813,6 +33813,356 @@
         }
       ],
       "why": "Septango on the beach of the other time behind the fair's tent (126615554, [1,-48] of the Cania plains), «Lo que el tiempo se llevó» (1769) as the screenshots of Dofus pour les noobs, «Au temps l'emportent les landes» show it. The calm before the manipulation (24679), «¿Quién eres?», a delicate experiment (24680), «Hablarle de Juan Luis…» (24681), «¿Puedes darme detalles de la época actual?…» (11345), we will be yesterday (24682): monsters drawn by the amulet charge, «Sacar tu arma» starts the fight; who lost finds her there again. Beaten them, the manipulation failed by your fault (24683), «Cerrar los ojos» (11347): the amulet is gone and the character is outside, in front of Marty Makzap («Vous êtes téléporté à l'extérieur devant Marty Makzap»)."
+    },
+    {
+      "npc": 1570,
+      "map": 0,
+      "opening": 10808,
+      "openings": [
+        { "quest": 1473, "objective": 8212, "pending": 8213, "message": 17147 }
+      ],
+      "lines": [
+        {
+          "message": 10808,
+          "choices": [
+            { "reply": 11903, "next": 10809 },
+            { "reply": 20501, "next": 17123, "beforeQuest": 1473 },
+            { "reply": 20514, "next": 17134, "quest": 1473, "afterObjective": 8206, "beforeObjective": 8207 },
+            { "reply": 20548, "next": 17164, "quest": 1473, "afterObjective": 8216, "beforeObjective": 8217 }
+          ]
+        },
+        {
+          "message": 10809,
+          "choices": [
+            { "reply": 11901 },
+            { "reply": 11902 }
+          ]
+        },
+        {
+          "message": 17123,
+          "choices": [
+            { "reply": 20500, "next": 17124 }
+          ]
+        },
+        {
+          "message": 17124,
+          "choices": [
+            { "reply": 20499, "next": 17125 }
+          ]
+        },
+        {
+          "message": 17125,
+          "choices": [
+            { "reply": 20498, "next": 17126 }
+          ]
+        },
+        {
+          "message": 17126,
+          "choices": [
+            { "reply": 20497, "startsQuest": 1473, "params": [[34, 1473]] }
+          ]
+        },
+        {
+          "message": 17134,
+          "choices": [
+            { "reply": 20513, "quest": 1473, "completes": 8207, "params": [[30, 8207]] }
+          ]
+        },
+        {
+          "message": 17147,
+          "choices": [
+            { "reply": 20533 },
+            { "reply": 20536, "next": 17156, "quest": 1473, "afterObjective": 8212, "beforeObjective": 8213 }
+          ]
+        },
+        {
+          "message": 17156,
+          "choices": [
+            { "reply": 20535, "quest": 1473, "completes": 8213, "params": [[30, 8213]], "next": 17157 }
+          ]
+        },
+        {
+          "message": 17157,
+          "choices": [
+            { "reply": 20534 }
+          ]
+        },
+        {
+          "message": 17164,
+          "choices": [
+            { "reply": 20547, "quest": 1473, "completes": 8217, "params": [[30, 8217]] }
+          ]
+        }
+      ],
+      "why": "Jacoba Lucinati Scalati, seneschal of Amakna castle [4,-6]: the king is busy, the castle open to visit (10808), the prince of Wey's relic (10809). «El acusado de la recepción» (1473) as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show it: «Pareces preocupada», the cook Simona Burla and her exotic ingredients (17123), «¿Quién es ese embajador?», Berami of the kanigs and the banquet (17124), «Yo puedo ayudar», paid and invited (17125), «¿Puedes darme la lista…?», slime, leaves, ears and gorkoko nuts (17126), «Voy a buscar los ingredientes» starts it. Ingredients handed over, «Ya le he llevado los ingredientes…», the reception has begun (17134), «Vale, voy a la sala de espectáculos» (8207). Out of the cells: escaped? (17147), «Lokusta me ha atacado», maybe a misjudgement (17156), «Mira el mensaje…» (8213, the tablet is only shown), somebody paid the poisoner, to Madrestam (17157). The author named, «El responsable… es Tibiore» (20548), a matter between kanigs, a reward earned (17164), «Me voy, adiós» (8217)."
+    },
+    {
+      "npc": 1570,
+      "map": 95685123,
+      "opening": 17149,
+      "lines": [
+        {
+          "message": 17149,
+          "names": true,
+          "choices": [
+            { "reply": 20526, "quest": 1473, "completes": 8210, "params": [[30, 8210]], "passage": 1570001, "afterObjective": 8209 }
+          ]
+        }
+      ],
+      "why": "Jacoba in the show room once the ambassador collapses: poisoned, the starter you helped make? Guards, to the prison with #1 (17149); «Protestar con ímpetu» (8210) and the guards take the character to the castle's cells, where the guide's next screenshots are."
+    },
+    {
+      "npc": 1523,
+      "map": 95685123,
+      "opening": 10747,
+      "openings": [
+        { "quest": 1473, "objective": 8209, "pending": 8210, "message": 17135 }
+      ],
+      "lines": [
+        {
+          "message": 10747,
+          "choices": [
+            { "reply": 20515, "next": 17137, "quest": 1473, "afterObjective": 8207, "beforeObjective": 8208 },
+            { "reply": 20520, "next": 17139, "quest": 1473, "afterObjective": 8207, "beforeObjective": 8208 }
+          ]
+        },
+        {
+          "message": 17137,
+          "names": true,
+          "choices": [
+            { "reply": 20517, "next": 17138 }
+          ]
+        },
+        {
+          "message": 17138,
+          "choices": [
+            { "reply": 20516, "quest": 1473, "completes": 8208, "params": [[30, 8208]] }
+          ]
+        },
+        {
+          "message": 17139,
+          "names": true,
+          "choices": [
+            { "reply": 20519, "next": 17140 }
+          ]
+        },
+        {
+          "message": 17140,
+          "choices": [
+            { "reply": 20518, "quest": 1473, "completes": 8208, "params": [[30, 8208]] }
+          ]
+        }
+      ],
+      "why": "King Allister at the reception in the castle's show room (95685123): «Saludar respetuosamente al rey», he has heard well of you (17137), «Saludar al embajador», Berami speaks for the great matriarch (17138), «Inclinarte siguiendo el protocolo» (8208), as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show it; greeted gruffly he remembers the throne room instead (17139, 17140). Once the ambassador falls, «¿Qué le pasa al embajador?» (17135)."
+    },
+    {
+      "npc": 2283,
+      "map": 95685123,
+      "opening": 17142,
+      "openings": [
+        { "quest": 1473, "objective": 8209, "message": 17141 }
+      ],
+      "lines": [
+        {
+          "message": 17142,
+          "choices": [
+            { "reply": 20525, "next": 17143, "quest": 1473, "afterObjective": 8208, "beforeObjective": 8209 }
+          ]
+        },
+        {
+          "message": 17143,
+          "choices": [
+            { "reply": 20524, "next": 17144 }
+          ]
+        },
+        {
+          "message": 17144,
+          "choices": [
+            { "reply": 20523, "next": 17145 }
+          ]
+        },
+        {
+          "message": 17145,
+          "choices": [
+            { "reply": 20522, "next": 17146 }
+          ]
+        },
+        {
+          "message": 17146,
+          "choices": [
+            { "reply": 20521, "quest": 1473, "completes": 8209, "params": [[30, 8209]], "showsNpc": 1570 }
+          ]
+        }
+      ],
+      "why": "Ambassador Berami at the reception, as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show it: a strange place, no theatre in the Stone Teeth village (17142), «¿Quién es la matriarca?», Kanígrula wants the amakneans close (17143), «¿Por qué te ríes?», laughter is punctuation, and these ears look delicious (17144), «No, muchas gracias…», he chews (17145), «¿¡Va todo bien!?», he drools (17146), «Darle golpes en la espalda y pedir ayuda» (8209): the seneschal comes in. Fallen, «Garrglglglagl… Erk.» (17141)."
+    },
+    {
+      "npc": 2282,
+      "map": 0,
+      "opening": 17130,
+      "openings": [
+        { "quest": 1473, "pending": 8206, "message": 17131 }
+      ],
+      "lines": [
+        {
+          "message": 17131,
+          "choices": [
+            { "reply": 20509, "next": 17132 },
+            { "reply": 20511, "quest": 1473, "completes": 8203, "params": [[30, 8203]], "completesAll": [8204, 8205, 8206], "takesAll": [15101, 15102, 15103], "next": 17133 },
+            { "reply": 20512 }
+          ]
+        },
+        {
+          "message": 17132,
+          "choices": [
+            { "reply": 20508, "gives": 15119 }
+          ]
+        },
+        {
+          "message": 17133,
+          "choices": [
+            { "reply": 20510 }
+          ]
+        }
+      ],
+      "why": "Simona Burla, the castle cook: a banquet to make (17130). While «El acusado de la recepción» (1473) wants her ingredients: an oyster with hot chocolate and tripe jam (17131), «Aceptar y probar», delicious and matching your green face (17132), «Pedir disculpas…» leaves the Nausea curse (15119), «vous pouvez aller la voir quand vous voulez et obtenir ce malus» (Dofus pour les noobs, «L'accusé de la réception»); «No, gracias. Aquí tienes los ingredientes» hands over the slime, leaves, ears (8203-8205) and the three gorkoko nuts (8206), ears with nuts for the ambassador (17133), «Yo me voy a ver a Jacoba…»."
+    },
+    {
+      "npc": 2284,
+      "map": 0,
+      "opening": 17150,
+      "openings": [
+        { "quest": 1473, "objective": 8210, "pending": 8211, "message": 17151 },
+        { "quest": 1473, "objective": 8211, "pending": 8212, "message": 17155 }
+      ],
+      "lines": [
+        {
+          "message": 17151,
+          "choices": [
+            { "reply": 20530, "next": 17152, "quest": 1473, "beforeObjective": 8211 }
+          ]
+        },
+        {
+          "message": 17152,
+          "choices": [
+            { "reply": 20529, "next": 17153 },
+            { "reply": 20531, "next": 17153 }
+          ]
+        },
+        {
+          "message": 17153,
+          "choices": [
+            { "reply": 20528, "next": 17154 }
+          ]
+        },
+        {
+          "message": 17154,
+          "choices": [
+            { "reply": 20527, "quest": 1473, "completes": 8211, "params": [[30, 8211]] }
+          ]
+        },
+        {
+          "message": 17155,
+          "choices": [
+            { "reply": 20527, "quest": 1473, "afterObjective": 8211, "beforeObjective": 8212 }
+          ]
+        }
+      ],
+      "why": "Lokusta, Simona's kitchen help (17150), outside the character's cell in the castle prison [6,-5], as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show it: no need to die of thirst, some water? (17151), «Me suena tu cara…», she works at the castle (17152), «Mostrarte desconfiado y rechazar el agua» (the water changes nothing), you do not make it easy (17153), «¿Por qué quieres ponerle fin a mis días?», the letter on your body, *opens the cell* (17154), «Defender tu vida con todas tus fuerzas» (8211) is the fight. Lost it, resigned to die? (17155)."
+    },
+    {
+      "npc": 2285,
+      "map": 0,
+      "opening": 17158,
+      "openings": [
+        { "quest": 1473, "objective": 8215, "pending": 8216, "message": 17161 }
+      ],
+      "lines": [
+        {
+          "message": 17158,
+          "choices": [
+            { "reply": 20539, "next": 17159, "quest": 1473, "afterObjective": 8213, "beforeObjective": 8214 },
+            { "reply": 20540, "quest": 1473, "afterObjective": 8214, "beforeObjective": 8215 }
+          ]
+        },
+        {
+          "message": 17159,
+          "choices": [
+            { "reply": 20538, "next": 17160 }
+          ]
+        },
+        {
+          "message": 17160,
+          "choices": [
+            { "reply": 20537, "quest": 1473, "completes": 8214, "params": [[30, 8214]] }
+          ]
+        },
+        {
+          "message": 17161,
+          "choices": [
+            { "reply": 20543, "next": 17162 }
+          ]
+        },
+        {
+          "message": 17162,
+          "choices": [
+            { "reply": 20542, "next": 17163 },
+            { "reply": 20544, "quest": 1473, "completes": 8216, "params": [[30, 8216]] }
+          ]
+        },
+        {
+          "message": 17163,
+          "choices": [
+            { "reply": 20541, "quest": 1473, "completes": 8216, "params": [[30, 8216]] }
+          ]
+        }
+      ],
+      "why": "Tibiore by the Madrestam fountain [8,-2], where the tablet sends the character, as the screenshots of Dofus pour les noobs, «L'accusé de la réception» show it: not from here, waiting for somebody (17158), «Vengo de parte de Lokusta», he smells poison (17159), «Sí, Berami ha muerto», then treason (17160), «Defenderte de Tibiore» (8214) is the fight; who lost it attacks him again (20540). Beaten, don't hit me (17161), «Exigo que me expliques…», the shaman's revenge on Kanígrula (17162), «Acompáñame al castillo…», a glass ball on the ground (17163), «Intentar atraparlo» (8216); letting him go does it too."
+    },
+    {
+      "npc": 2297,
+      "map": 0,
+      "opening": 17127,
+      "lines": [
+        {
+          "message": 17127,
+          "choices": [
+            { "reply": 20502, "quest": 1473, "beforeObjective": 8206 },
+            { "reply": 20503 }
+          ]
+        }
+      ],
+      "why": "A gorkoko of the Moon beach, a palm that stares (17127): «Darle una buena patada en el tronco» starts the fight whose gorkoko drops its nut for «El acusado de la recepción» (1473), «Parlez à Grokoko … afin de l'affronter» (Dofus pour les noobs, «L'accusé de la réception»); «Irse»."
+    },
+    {
+      "npc": 2298,
+      "map": 0,
+      "opening": 17128,
+      "lines": [
+        {
+          "message": 17128,
+          "choices": [
+            { "reply": 20504, "quest": 1473, "beforeObjective": 8206 },
+            { "reply": 20505 }
+          ]
+        }
+      ],
+      "why": "A gorkoko of the Moon beach, a palm that stares (17128): «Darle una buena patada en el tronco» starts the fight whose gorkoko drops its nut for «El acusado de la recepción» (1473), «Parlez à Grokoko … afin de l'affronter» (Dofus pour les noobs, «L'accusé de la réception»); «Irse»."
+    },
+    {
+      "npc": 2299,
+      "map": 0,
+      "opening": 17129,
+      "lines": [
+        {
+          "message": 17129,
+          "choices": [
+            { "reply": 20506, "quest": 1473, "beforeObjective": 8206 },
+            { "reply": 20507 }
+          ]
+        }
+      ],
+      "why": "A gorkoko of the Moon beach, a palm that stares (17129): «Darle una buena patada en el tronco» starts the fight whose gorkoko drops its nut for «El acusado de la recepción» (1473), «Parlez à Grokoko … afin de l'affronter» (Dofus pour les noobs, «L'accusé de la réception»); «Irse»."
     }
   ]
 }

@@ -980,6 +980,24 @@
       "why": "«Vaincre Maelstrooll et ses adeptes» (11411): Dofus pour les noobs gives the fight's four kinds, Maelstrooll, Troollseum, Troollogram and Troolléolé, level 112 to 120; INFERRED: two Troollseums («Hey, les Troollseums !»), one of each other, at the character's level." },
     { "npc": 2802, "map": 126615554, "reply": 29650, "byLevel": true,
       "monsters": [ { "monster": 4588, "grade": 0 }, { "monster": 4588, "grade": 0 }, { "monster": 4588, "grade": 0 }, { "monster": 4588, "grade": 0 } ],
-      "why": "«Vence a 2 balíes» (11346): «un groupe de monstres vous charge, attiré par l'amulette assemblée par Marty» (Dofus pour les noobs, «Au temps l'emportent les landes»); its screenshots show four Gligli (4588, level 142-150) on the beach with the character. Two of them are the objective; the four are the group they come in." }
+      "why": "«Vence a 2 balíes» (11346): «un groupe de monstres vous charge, attiré par l'amulette assemblée par Marty» (Dofus pour les noobs, «Au temps l'emportent les landes»); its screenshots show four Gligli (4588, level 142-150) on the beach with the character. Two of them are the objective; the four are the group they come in." },
+    { "npc": 2297, "map": 156894216, "reply": 20502,
+      "monsters": [ { "monster": 3626, "grade": 0 } ],
+      "why": "«Le premier monstre à affronter se situe en [33,12]» (Dofus pour les noobs, «L'accusé de la réception»): the angry gorkoko (3626), alone, who drops one gorkoko nut (15103) to whoever is on 1473 without it." },
+    { "npc": 2298, "map": 156894727, "reply": 20504,
+      "monsters": [ { "monster": 3624, "grade": 0 } ],
+      "why": "«Le second monstre à affronter se situe en [32,11]. Parlez à Grokoko Fuyard afin de l'affronter» (Dofus pour les noobs, «L'accusé de la réception»): the shy gorkoko (3624), alone, nut 15101." },
+    { "npc": 2299, "map": 156894725, "reply": 20506,
+      "monsters": [ { "monster": 3625, "grade": 0 } ],
+      "why": "«Le troisième monstre à affronter se situe en [32,9]. Parlez à Grokoko Peureux afin de l'affronter» (Dofus pour les noobs, «L'accusé de la réception»): the scared gorkoko (3625), alone, nut 15102." },
+    { "npc": 2284, "map": 101713429, "reply": 20527,
+      "monsters": [ { "monster": 3627, "grade": 0 } ],
+      "why": "«Defender tu vida con todas tus fuerzas»: Lokusta (3627, level 150, 5,200 life in the guide's screenshot) in the castle cells, alone; she drops the engraved tablet (15104)." },
+    { "npc": 2285, "map": 68420101, "reply": 20537,
+      "monsters": [ { "monster": 3628, "grade": 0 } ],
+      "why": "«Defenderte de Tibiore»: Tibiore (3628, level 150, 6,900 life in the guide's screenshot) by the Madrestam fountain, alone." },
+    { "npc": 2285, "map": 68420101, "reply": 20540,
+      "monsters": [ { "monster": 3628, "grade": 0 } ],
+      "why": "«Atacar a Tibiore»: the same fight, again, for whoever lost it." }
   ]
 }
