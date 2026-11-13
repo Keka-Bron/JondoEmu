@@ -4309,6 +4309,86 @@
       "orientation": 1,
       "criterion": "Qa=1475&Qo>8239&Qo<8280&Ue!-1475006",
       "why": "A Tamiter larva at [0,-50], «Sixième larve» in Dofus pour les noobs, «Chachyène de vie», from Protélez's request until the larvae are handed over, and until this one is caught (mark -1475006). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 126223128,
+      "npc": 2304,
+      "cell": 300,
+      "orientation": 7,
+      "criterion": "((PL>134)|Qa=1476|Qf=1476|Qa=1477|Qf=1477)&(Qa!1477|Qo<8262|Qo>8270)",
+      "why": "Elin Térprete beside Lalat at the Stone Teeth [-6,-53] (Dofus pour les noobs, «Niera bien qui niera le dernier»: «une interprète tout simplement nommée Linter Prette en [-6,-53]»), wherever Lalat is, except while she goes with the character to the tied kanigs (8262 to 8270). INFERRED cell: next to Lalat, facing her."
+    },
+    {
+      "map": 126223135,
+      "npc": 2304,
+      "cell": 315,
+      "orientation": 7,
+      "criterion": "Qa=1477&Qo>8262&Qo<8270",
+      "why": "Elin Térprete with the tied kanigs [-6,-60] from leaving Lalat with the character (8262) until the kanigs are freed (8270). INFERRED cell: beside Chitarapar."
+    },
+    {
+      "map": 126223128,
+      "npc": 2305,
+      "cell": 301,
+      "orientation": 5,
+      "criterion": "(PL>134)|Qa=1476|Qf=1476|Qa=1477|Qf=1477",
+      "why": "The kanig merchant haggling with Lalat at the Stone Teeth (her «barrigudo este», 17233), wherever she is. INFERRED cell: facing her."
+    },
+    {
+      "map": 126223135,
+      "npc": 2307,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1476|(Qf=1476&Qf!1477&Qo<8270)",
+      "why": "Chitarapar at [-6,-60] (the derived placement's cell): through «Allá donde van las bestias» and tied up after it until «Liberar a los kanigs» (8270 of 1477) sets her free."
+    },
+    {
+      "map": 126223135,
+      "npc": 2308,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=1476|(Qf=1476&Qf!1477&Qo<8270)",
+      "why": "Chitarapar's pack beside her, eating and then tied up, as long as she is there. INFERRED cell."
+    },
+    {
+      "map": 126223135,
+      "npc": 2309,
+      "cell": 288,
+      "orientation": 3,
+      "criterion": "Qa=1476|(Qf=1476&Qf!1477&Qo<8270)",
+      "why": "Chitarapar's pack beside her, eating and then tied up, as long as she is there. INFERRED cell."
+    },
+    {
+      "map": 126223135,
+      "npc": 2312,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=1476|(Qf=1476&Qf!1477&Qo<8270)",
+      "why": "Chitarapar's pack beside her, eating and then tied up, as long as she is there. INFERRED cell."
+    },
+    {
+      "map": 126618624,
+      "npc": 2310,
+      "cell": 299,
+      "orientation": 1,
+      "criterion": "Qa=1477&Qo<8273",
+      "why": "The first of the two huerfelino guards before the cages of the hideout [-5,-58], until dealt with (8273). INFERRED cell."
+    },
+    {
+      "map": 126618624,
+      "npc": 2310,
+      "cell": 313,
+      "orientation": 1,
+      "criterion": "Qa=1477&Qo<8273",
+      "why": "The second huerfelino guard, beside the first. INFERRED cell."
+    },
+    {
+      "map": 126091549,
+      "npc": 2311,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1477&Qo>8273",
+      "why": "Oopay Tevin outside the hideout [-5,-58] once the guards are dealt with, until the quest ends. The derived placement's cell."
     }
   ]
 }

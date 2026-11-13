@@ -23923,7 +23923,8 @@
           "choices": [
             { "reply": 67111, "next": 50311, "quest": 2433, "afterObjective": 18449, "beforeObjective": 18450 },
             { "reply": 67116, "next": 50316, "quest": 2433, "afterObjective": 18454, "beforeObjective": 18455 },
-            { "reply": 63957, "next": 48043, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7907 }
+            { "reply": 63957, "next": 48043, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7907 },
+            { "reply": 63959, "next": 48045, "quest": 1477, "afterObjective": 8278 }
           ]
         },
         {
@@ -23993,9 +23994,15 @@
           "choices": [
             { "reply": 63955, "quest": 1424, "completes": 7907, "params": [[30, 7907]] }
           ]
+        },
+        {
+          "message": 48045,
+          "choices": [
+            { "reply": 63958, "quest": 1477, "completes": 8279, "params": [[30, 8279]] }
+          ]
         }
       ],
-      "why": "Danathor, Bonta's intendant, in the palace room right of the throne room [-36,-60]: Dofus pour les noobs, «Le pacte des profondeurs», he signed the pact of the depths and sends you to Captain Tymo for presents (18450); after Tymo's ambush, «Mencionar la emboscada» and he blames Tymo alone (18455). «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424): «¿Qué puedes contarme del edicto de Vhelika?» (63957) gets why he signed, pushed by Amayiro (48043), «Seguir escuchando.» (63956) the law calling to arms against a Brakmarian invasion (48044) and «Hasta luego.» (63955) is 7907."
+      "why": "Danathor, Bonta's intendant, in the palace room right of the throne room [-36,-60]: Dofus pour les noobs, «Le pacte des profondeurs», he signed the pact of the depths and sends you to Captain Tymo for presents (18450); after Tymo's ambush, «Mencionar la emboscada» and he blames Tymo alone (18455). «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs) (1424): «¿Qué puedes contarme del edicto de Vhelika?» (63957) gets why he signed, pushed by Amayiro (48043), «Seguir escuchando.» (63956) the law calling to arms against a Brakmarian invasion (48044) and «Hasta luego.» (63955) is 7907. «Quien niega el último, niega mejor» (1477), for whoever refused Lalat's kamas: «Explicarle que ciertos habitantes de Bonta son víctimas del tráfico de esclavos.» -- he will have judge Satirev Novini look into it, and a reward for the trouble (48045) --, «Embolsarte la recompensa.» does 8279 (Dofus pour les noobs, «Niera bien qui niera le dernier»)."
     },
     {
       "npc": 6640,
@@ -34782,11 +34789,16 @@
       "npc": 2303,
       "map": 0,
       "opening": 17233,
+      "openings": [
+        { "quest": 1477, "objective": 8276, "pending": 8278, "message": 17273 }
+      ],
       "lines": [
         {
           "message": 17233,
           "choices": [
             { "reply": 20635, "next": 17234, "criterion": "Qa!1476&Qf!1476&PL>134" },
+            { "reply": 20661, "quest": 1477, "completes": 8261, "params": [[30, 8261]], "next": 17266, "afterObjective": 8260 },
+            { "reply": 20672, "quest": 1477, "completes": 8276, "params": [[30, 8276]], "next": 17272, "afterObjective": 8275 },
             { "reply": 20670 }
           ]
         },
@@ -34822,9 +34834,27 @@
           "choices": [
             { "reply": 20668, "startsQuest": 1476, "params": [[34, 1476]] }
           ]
+        },
+        {
+          "message": 17266,
+          "choices": []
+        },
+        {
+          "message": 17272,
+          "choices": [
+            { "reply": 20671, "next": 17273, "quest": 1477 }
+          ]
+        },
+        {
+          "message": 17273,
+          "choices": [
+            { "reply": 20673, "quest": 1477, "completesAll": [8277, 8278, 8279], "params": [[30, 8277], [30, 8278], [30, 8279]] },
+            { "reply": 20674, "quest": 1477, "completesAll": [8277, 8278], "params": [[30, 8277], [30, 8278]] },
+            { "reply": 20670 }
+          ]
         }
       ],
-      "why": "Lalat haggles with a kanig over the price of cattle (17233). For «Allá donde van las bestias» (1476), as Dofus pour les noobs, «Où que les bêtes aillent» has it: her convoy vanished and the kanig will not pay for the missing cattle; offering to look into it («Si quieres, puedo investigar la desaparición») she explains (17234-17236), a bigger share asked (20634) makes her give in (17237), and accepting (20633) brings the step's own line (17238), where «Acepto.» starts the quest. The offer only to whoever can take it (level over 134, the quest's criterion, neither under way nor done); everyone else only hears the haggling."
+      "why": "Lalat haggles with a kanig over the price of cattle (17233). For «Allá donde van las bestias» (1476), as Dofus pour les noobs, «Où que les bêtes aillent» has it: her convoy vanished and the kanig will not pay for the missing cattle; offering to look into it («Si quieres, puedo investigar la desaparición») she explains (17234-17236), a bigger share asked (20634) makes her give in (17237), and accepting (20633) brings the step's own line (17238), where «Acepto.» starts the quest. The offer only to whoever can take it (level over 134, the quest's criterion, neither under way nor done); everyone else only hears the haggling. For «Quien niega el último, niega mejor» (1477, Dofus pour les noobs, «Niera bien qui niera le dernier»): «Necesito la ayuda de tu intérprete.» (20661, once Elin has sent you to her boss) lends her, to be brought back safe and sound (17266, 8261). With the cattle found, «Anunciar el descubrimiento del ganado y la implicación de los kanigs» (8276): the kanigs staged the theft to bargain the price down (17272); «Exijo explicaciones: tu ganado es humano.» -- talk to the merchandise? take a share and forget it all (17273). The two endings of Dofus pour les noobs, «Niera bien qui niera le dernier»: «Acepto parte de los beneficios de la venta.» ends the quest there (8277, 8278 and Danathor's 8279), «No acepto kamas de esta venta. ¡Y voy a denunciarte a Danathor por tráfico!» (8277, 8278) sends you to Bonta's intendant."
     },
     {
       "npc": 2307,
@@ -34832,7 +34862,12 @@
       "opening": 17244,
       "openings": [
         { "quest": 1476, "objective": 8256, "pending": 8258, "message": 17258 },
-        { "quest": 1476, "objective": 8258, "message": 17259 }
+        { "quest": 1476, "objective": 8258, "message": 17259 },
+        { "quest": 1477, "objective": 8268, "pending": 8269, "message": 17407 },
+        { "quest": 1477, "objective": 8267, "pending": 8268, "message": 17406 },
+        { "quest": 1477, "objective": 8264, "pending": 8265, "message": 17403 },
+        { "quest": 1477, "message": 17260 },
+        { "canStart": 1477, "message": 17260 }
       ],
       "lines": [
         {
@@ -34849,18 +34884,252 @@
         {
           "message": 17259,
           "choices": [
-            { "reply": 20655, "next": 17260 }
+            { "reply": 20655, "next": 17260, "quest": 1476, "completes": 8259, "params": [[30, 8259]], "afterObjective": 8258 }
           ]
         },
         {
           "message": 17260,
           "choices": [
-            { "reply": 20653, "quest": 1476, "completes": 8259, "params": [[30, 8259]], "afterObjective": 8258 },
-            { "reply": 20654, "next": 17260 }
+            { "reply": 20654, "next": 17260 },
+            { "reply": 20653, "startsQuest": 1477, "params": [[34, 1477]] },
+            { "reply": 20841, "quest": 1477, "completes": 8268, "params": [[30, 8268]], "afterObjective": 8267 }
+          ]
+        },
+        {
+          "message": 17403,
+          "choices": [
+            { "reply": 20836, "quest": 1477, "completes": 8265, "params": [[30, 8265]], "next": 17407 }
+          ]
+        },
+        {
+          "message": 17406,
+          "choices": [
+            { "reply": 20842, "next": 17260, "quest": 1477, "afterObjective": 8267, "beforeObjective": 8268 }
+          ]
+        },
+        {
+          "message": 17407,
+          "choices": [
+            { "reply": 20844, "next": 17408, "quest": 1477, "afterObjective": 8268, "beforeObjective": 8269 }
+          ]
+        },
+        {
+          "message": 17408,
+          "choices": [
+            { "reply": 20843, "quest": 1477, "completes": 8269, "params": [[30, 8269]], "next": 17409 },
+            { "reply": 20845, "next": 17407, "quest": 1477, "afterObjective": 8268, "beforeObjective": 8269 }
+          ]
+        },
+        {
+          "message": 17409,
+          "choices": []
+        }
+      ],
+      "why": "Chitarapar, the highiena eating a scrawny jalató war chief (17244). For 1476 (Dofus pour les noobs, «Où que les bêtes aillent»): followed to [-6,-60], she and three of hers attack: «Grrrr...» (17258), «Defenderse» or «Pedir refuerzos», the same fight (npc_fights). Beaten, she answers «¡Rrrr wuf!» (17259); «Hacer preguntas sobre el convoy» ends 1476 (8259) and gets only grunts (17260) however they are put («Formular las preguntas de otro modo»): she does not speak the player's language, and «Atar a los kanigs antes de ir a buscar un intérprete» starts «Quien niega el último, niega mejor» (1477: «Parlez à Félybrêle après l'avoir vaincue dans la quête précédente, puis ligotez-la afin de trouver un interprète», Dofus pour les noobs, «Niera bien qui niera le dernier»). Tied up she grumbles (17260). With Elin there and the questions mocked, «Muijiji. Ñyark, ñyark.» (17403): «Amenazar a la kanig con tu arma.» does 8265, a glare and a stamp of feet (17407). With the culebrón's box (8267 beaten): «Muijiji...» (17406), «Explicar tus intenciones a la kanig.», a grumble (17260), «Pasar al acto y esperar.» hands the box over (8268). Then threatened -- «¡Quieta, o te parto la rodilla!»: she thinks you bluff (17408) --, «Amenazarla con contar hasta cero y ¡PAF! ¡Chúpate esa!» -- baffled by the nonsense and a culebrón in her underwear, she sings: the cattle were penned in and she only followed orders (17409, 8269). «Hoy no es tu día.» only gets the glare again."
+    },
+    {
+      "npc": 2304,
+      "map": 0,
+      "opening": 17239,
+      "openings": [
+        { "quest": 1477, "objective": 8269, "pending": 8270, "message": 17410 },
+        { "quest": 1477, "objective": 8263, "pending": 8264, "message": 17398 }
+      ],
+      "lines": [
+        {
+          "message": 17239,
+          "choices": [
+            { "reply": 20663, "quest": 1477, "completes": 8260, "params": [[30, 8260]], "next": 17265, "beforeObjective": 8261 },
+            { "reply": 20660, "next": 17425, "quest": 1477, "afterObjective": 8261, "beforeObjective": 8262 },
+            { "reply": 20838, "next": 17404, "quest": 1477, "afterObjective": 8265, "beforeObjective": 8266 }
+          ]
+        },
+        {
+          "message": 17265,
+          "choices": []
+        },
+        {
+          "message": 17425,
+          "choices": [
+            { "reply": 20662, "quest": 1477, "completes": 8262, "params": [[30, 8262]], "next": 17267 }
+          ]
+        },
+        {
+          "message": 17267,
+          "choices": []
+        },
+        {
+          "message": 17398,
+          "choices": [
+            { "reply": 20835, "next": 17399, "quest": 1477 }
+          ]
+        },
+        {
+          "message": 17399,
+          "choices": [
+            { "reply": 20834, "next": 17400, "quest": 1477 }
+          ]
+        },
+        {
+          "message": 17400,
+          "choices": [
+            { "reply": 20833, "next": 17401, "quest": 1477 }
+          ]
+        },
+        {
+          "message": 17401,
+          "choices": [
+            { "reply": 20832, "quest": 1477, "completes": 8264, "params": [[30, 8264]], "next": 17402 }
+          ]
+        },
+        {
+          "message": 17402,
+          "choices": []
+        },
+        {
+          "message": 17404,
+          "choices": [
+            { "reply": 20837, "quest": 1477, "completes": 8266, "params": [[30, 8266]] }
+          ]
+        },
+        {
+          "message": 17410,
+          "choices": [
+            { "reply": 20848, "next": 17411, "quest": 1477 }
+          ]
+        },
+        {
+          "message": 17411,
+          "choices": [
+            { "reply": 20847, "next": 17412, "quest": 1477 }
+          ]
+        },
+        {
+          "message": 17412,
+          "choices": [
+            { "reply": 20846, "quest": 1477, "completes": 8270, "params": [[30, 8270]] }
           ]
         }
       ],
-      "why": "Chitarapar, the highiena eating a scrawny jalató war chief (17244). For 1476 (Dofus pour les noobs, «Où que les bêtes aillent»): followed to [-6,-60], she and three of hers attack: «Grrrr...» (17258), «Defenderse» or «Pedir refuerzos», the same fight (npc_fights). Beaten, she answers «¡Rrrr wuf!» (17259) to questions about the convoy and only grunts (17260) however they are put («Formular las preguntas de otro modo»): she does not speak the player's language, and «Atar a los kanigs antes de ir a buscar un intérprete» ends the quest (8259)."
+      "why": "Elin Térprete, the kanig interpreter (17239: the job wants cold blood and a strong body). For «Quien niega el último, niega mejor» (1477), as Dofus pour les noobs, «Niera bien qui niera le dernier» has it: asked for help (20663) she has been hired by Lalat and nobody else (17265, 8260); once Lalat lends her, «Necesito tu ayuda.» (20660) has her come along gladly (17425) and «Guiar a Elin Térprete.» does 8262 (17267, «Ve tú delante, te sigo.»). At the tied kanigs [-6,-60] (17398, «Habla con Chitarapar como si yo no estuviera») she translates the questions: why the convoy was attacked -- «¡Porque sí!» (17399) --, «Eso no es una respuesta» -- «¡Sí!» (17400) --, «¡Que no!» -- «¿De verdad quieres saberlo?» (17401) --, «Sí.» does 8264: she is mocking you (17402). After the threat, «¿Qué opinas de la situación actual?» (20838): Chitarapar fears talking more than you, a culebrón in her underwear might help (17404); «Tomarla en serio.» does 8266. Once she has talked, «¿Qué piensas hacer ahora?» (17410): «Explicarle el plan.» -- follow her once freed, but how unseen? (17411) --, «Señalar el promontorio rocoso, al Oeste.» -- clever, and she goes back to her own boss (17412) --, «Liberar a los kanigs.» does 8270."
+    },
+    {
+      "npc": 2308,
+      "map": 126223135,
+      "opening": 17242,
+      "openings": [
+        { "after": 1476, "message": 17256 },
+        { "quest": 1476, "objective": 8258, "message": 17256 }
+      ],
+      "lines": [
+        {
+          "message": 17242,
+          "choices": []
+        },
+        {
+          "message": 17256,
+          "choices": []
+        }
+      ],
+      "why": "The Kanublú of Chitarapar's pack at [-6,-60]: eating (17242) until beaten in «Allá donde van las bestias», then tied up and only growling (17256)."
+    },
+    {
+      "npc": 2309,
+      "map": 126223135,
+      "opening": 17243,
+      "openings": [
+        { "after": 1476, "message": 17257 },
+        { "quest": 1476, "objective": 8258, "message": 17257 }
+      ],
+      "lines": [
+        {
+          "message": 17243,
+          "choices": []
+        },
+        {
+          "message": 17257,
+          "choices": []
+        }
+      ],
+      "why": "The Huerfelino of Chitarapar's pack at [-6,-60]: eating (17243) until beaten in «Allá donde van las bestias», then tied up and only growling (17257)."
+    },
+    {
+      "npc": 2312,
+      "map": 126223135,
+      "opening": 17217,
+      "openings": [
+        { "after": 1476, "message": 17218 },
+        { "quest": 1476, "objective": 8258, "message": 17218 }
+      ],
+      "lines": [
+        {
+          "message": 17217,
+          "choices": []
+        },
+        {
+          "message": 17218,
+          "choices": []
+        }
+      ],
+      "why": "The veteran Kanugro of Chitarapar's pack at [-6,-60]: «Grrr, grmbl wuf. Grrrr.» (17217) until beaten in «Allá donde van las bestias», then tied up, «Rgrrrniark. Arf, arf.» (17218)."
+    },
+    {
+      "npc": 2310,
+      "map": 126618624,
+      "opening": 17371,
+      "lines": [
+        {
+          "message": 17371,
+          "choices": [
+            { "reply": 20800, "quest": 1477, "afterObjective": 8272, "cells": [285, 286, 298, 314, 326, 327], "completesAll": [8273, 8274], "params": [[30, 8273], [30, 8274]] },
+            { "reply": 20802, "quest": 1477, "afterObjective": 8272 },
+            { "reply": 20803, "next": 17372 },
+            { "reply": 20801, "next": 17372 },
+            { "reply": 20806 }
+          ]
+        },
+        {
+          "message": 17372,
+          "choices": [
+            { "reply": 20805, "quest": 1477, "afterObjective": 8272 },
+            { "reply": 20807, "quest": 1477, "afterObjective": 8272 },
+            { "reply": 20806 }
+          ]
+        }
+      ],
+      "why": "The two huerfelino guards of the cattle's hideout [-5,-58], talking among themselves (17371). Dofus pour les noobs, «Niera bien qui niera le dernier»: «parlez à l'un des deux Gardes Orfélin et foncez dans le tas» -- «Lanzarte al ataque.» --, and «le combat peut être évité : il faut se placer sur une cellule à côté du Garde Orfélin et lui parler. Un autre dialogue « Assommer les gardes par derrière » est alors proposé»: «Pasar discretamente por detrás de los guardias para atacarles.» (20800), offered only on a cell beside one of them, does 8273 and 8274 without a fight. Distracting them or praying gets you noticed (17372), where charging like a iop or waiting for a miracle is the same fight and «Poner pies en polvorosa» leaves."
+    },
+    {
+      "npc": 2311,
+      "map": 0,
+      "opening": 17268,
+      "lines": [
+        {
+          "message": 17268,
+          "choices": [
+            { "reply": 20667, "next": 17269, "quest": 1477, "afterObjective": 8274 }
+          ]
+        },
+        {
+          "message": 17269,
+          "choices": [
+            { "reply": 20666, "next": 17270, "quest": 1477 }
+          ]
+        },
+        {
+          "message": 17270,
+          "choices": [
+            { "reply": 20665, "next": 17271, "quest": 1477 }
+          ]
+        },
+        {
+          "message": 17271,
+          "choices": [
+            { "reply": 20664, "quest": 1477, "completes": 8275, "params": [[30, 8275]] }
+          ]
+        }
+      ],
+      "why": "Oopay Tevin outside the hideout [-5,-58], begging for help (17268). Dofus pour les noobs, «Niera bien qui niera le dernier»: the «cattle» are poor Bontarians: «¿Alguien ha visto ganado por aquí?» -- «¡Nosotros somos el ganado!» (17269) --, put to sleep at the soup kitchen and carted off (17270), the convoy ambushed by the kanigs beyond the Cania moors (17271); «Te prometo que voy a tener dos palabritas con el que ha organizado todo esto.» does 8275."
     }
   ]
 }

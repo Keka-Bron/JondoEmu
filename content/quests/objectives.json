@@ -4317,6 +4317,36 @@
    "elements": [{"map": 126619648, "element": 484865}, {"map": 126619648, "element": 484866}],
    "spawns": {"monster": 3632, "count": 1, "attacks": true},
    "why": "«Vence a Tigredón sorprendido», for whoever lost the first fight: once the wagon has been inspected (8253), pressing one again brings the Tigredón out again, attacking."
+  },
+  {
+   "objective": 8263,
+   "quest": 1477,
+   "kind": "order",
+   "afterObjectives": [8262],
+   "why": "«Descubre el mapa: Kanigs maniatados»: back at [-6,-60] with Elin (8262), not on taking the quest there."
+  },
+  {
+   "objective": 8271,
+   "quest": 1477,
+   "kind": "order",
+   "afterObjectives": [8270],
+   "why": "«Descubre el mapa: Promontorio rocoso»: up the ladder of [-6,-60] once Chitarapar is freed (8270), to watch where she goes (Dofus pour les noobs, «Niera bien qui niera le dernier»)."
+  },
+  {
+   "objective": 8273,
+   "quest": 1477,
+   "kind": "beat",
+   "monster": 3634,
+   "map": 126618624,
+   "anyOrder": true,
+   "why": "«Deshazte de los guardias»: beating the two huerfelino guards (3634) does it as well as knocking them out from behind (Dofus pour les noobs, «Niera bien qui niera le dernier»)."
+  },
+  {
+   "objective": 8274,
+   "quest": 1477,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Vence a 2 Guardia huerfelino»: the same fight as 8273, which it does not wait for."
   }
  ]
 }
