@@ -5292,11 +5292,15 @@ namespace Jondo.Unity.Server.Handlers
                                  $"{ConBonos(caster, CriticoCaracteristica, 0, fight.RoundNumber)} from the character).");
             }
 
+            // ONE DRAW FOR THE WHOLE CAST: Bumerán Pérfido steals in one element and boosts
+            // that element's characteristic, out of the same throw of the dice. Drawn before the
+            // capacity is weighed: Invocación de Arakne summons the Arakne (80%) OR the Arakne
+            // Mayor (20%), and counted both, one summon of capacity 1 was refused with none out.
+            var tirada = spell != 0 ? Managers.EffectEngine.EfectosSorteados(spell, grade, critico) : null;
+
             // The capacity refusal and AP mutation stay in one tested operation. Previously the
             // capacity guard ran much later, when the effect was applied and AP was already gone.
-            IEnumerable<SpellEffect> castEffects = spell == 0
-                ? Array.Empty<SpellEffect>()
-                : Managers.EffectEngine.EfectosDeLaTirada(spell, grade, critico);
+            IEnumerable<SpellEffect> castEffects = tirada ?? (IEnumerable<SpellEffect>)Array.Empty<SpellEffect>();
             if (!await TryPayCastCostAsync(
                     fight, caster, castEffects, cost,
                     packet => WriteFrameAsync(stream, packet)))
@@ -5380,9 +5384,6 @@ namespace Jondo.Unity.Server.Handlers
             int daboAntes = cuenta?.OwnDamage ?? 0;
             if (cuenta != null) cuenta.ActionPointsSpent += cost;
 
-            // ONE DRAW FOR THE WHOLE CAST: Bumerán Pérfido steals in one element and boosts
-            // that element's characteristic, out of the same throw of the dice.
-            var tirada = spell != 0 ? Managers.EffectEngine.EfectosSorteados(spell, grade, critico) : null;
             // Cast on an empty cell, what it does there and no more: the Turbine pulls and evolves
             // without its cross of fire (EmptyCellCasts).
             if (victim == null && tirada != null && EmptyCellCasts.TryGetValue(spell, out var notOnEmpty))

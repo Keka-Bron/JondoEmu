@@ -107,6 +107,30 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(1, FightHandler.SummonLimitFor(plain, round: 0));
         }
 
+        /// <summary>
+        /// Invocación de Arakne summons the Arakne (80%) or the Arakne Mayor (20%): its draw puts out
+        /// one, and one summon fits a capacity of 1. Counted on both rows, it was refused with none out.
+        /// </summary>
+        [Fact]
+        public async Task A_summon_drawn_between_two_fits_a_capacity_of_one()
+        {
+            const int InvocacionDeArakne = 370;
+            if (SpellEffects.De(InvocacionDeArakne, 1).Count(e => e.EffectId == EffectSupport.Summon) != 2) return;   // no spell data
+
+            for (int i = 0; i < 20; i++)
+            {
+                var drawn = EffectEngine.EfectosSorteados(InvocacionDeArakne, 1, critico: false);
+                Assert.Single(drawn, e => e.EffectId == EffectSupport.Summon);
+
+                var fight = new FightInstance(1, 1);
+                var caster = new Fighter { Id = 10, CurrentHP = 100, CurrentAP = 6 };
+                fight.AddPlayer(caster);
+                bool paid = await FightHandler.TryPayCastCostAsync(fight, caster, drawn, cost: 3, _ => Task.CompletedTask);
+
+                Assert.True(paid);
+            }
+        }
+
         [Fact]
         public async Task A_summon_below_capacity_pays_its_AP_normally()
         {
