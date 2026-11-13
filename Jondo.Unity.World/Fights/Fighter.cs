@@ -371,9 +371,22 @@ namespace Jondo.Unity.World.Fights
         /// somebody else's fighter it is not honoured: no class spell lays it there.
         /// </remarks>
         public bool PlaysOnItsOwn => EsInvocado && !ControlTaken
-                                     && (Autonomous
+                                     && (Autonomous || Dominable
                                          || MaxMP <= 0 && HechizosDeInvocado.Count == 0
                                          || ControlledFromState != 0 && !Buffs.TieneEstado(ControlledFromState));
+
+        /// <summary>
+        /// A «maîtrisable» summon of an owner who knows Dominio de Invocaciones: his to play only
+        /// while the spell's 2027 row is on it, and on its own when he has switched the spell off.
+        /// Without this every summon was his whatever the spell said, and casting it changed nothing.
+        /// </summary>
+        public bool Dominable { get; set; }
+
+        /// <summary>
+        /// Whether this character knows Dominio de Invocaciones, which decides who plays his
+        /// «maîtrisable» summons (<see cref="Dominable"/>). Who does not know it plays them as before.
+        /// </summary>
+        public bool MastersSummons { get; set; }
 
         /// <summary>
         /// A summon that is never its owner's to play, whatever it has to play: the Chaferfu and

@@ -1,7 +1,9 @@
 ﻿using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
+using Jondo.Unity.World.Combat;
 using Microsoft.Data.Sqlite;
 using Jondo.Unity.World.Fights;
 
@@ -214,6 +216,7 @@ namespace Jondo.Unity.Server.Managers
             invocado.TemplateAllowsTackle = receta.AllowsTackle;
             invocado.ControlledFromState = SteamerTurrets.Contains(receta.Plantilla) ? EvolutionIII : 0;
             invocado.Autonomous = AutonomousSummons.Contains(receta.Plantilla);
+            invocado.Dominable = quienInvoca.MastersSummons && IsDominable(receta.Plantilla);
 
             // A Steamer's turret fights with his characteristics on top of its own: its blows grow
             // with his build and its «best element» is his (the arponera's Espadon). Measured by the
@@ -246,6 +249,31 @@ namespace Jondo.Unity.Server.Managers
         /// Measured by the player against the real game: the Arakne is his to play, the Chaferfu not.
         /// </summary>
         public static readonly int[] AutonomousSummons = { 262, 1108 };
+
+        /// <summary>Dominio de Invocaciones (18646) and the sub-cast that marks its summons (18648).</summary>
+        public const int SummonMastery = 18646, SummonMasteryMark = 18648;
+
+        /// <summary>«Invocación dominable», the state 18648 puts on the summons the spell can hand over.</summary>
+        public const int DominableState = 2132;
+
+        private static HashSet<int> _dominable;
+
+        /// <summary>
+        /// Whether Dominio de Invocaciones hands this template to its owner: the templates its
+        /// 18648 marks «dominable» (state 2132), read off that row's mask -- the Osamodas'
+        /// animals 8070 to 8081, the Sadida's dolls 5895 to 5899, the Arakne… thirty-six of them.
+        /// </summary>
+        public static bool IsDominable(int template)
+        {
+            _dominable ??= SpellEffects.De(SummonMasteryMark, 1)
+                .Where(e => e.EffectId == EffectSupport.AddState && e.Value == DominableState)
+                .SelectMany(e => (e.TargetMask ?? "").Split(','))
+                .Select(part => part.Trim())
+                .Where(part => part.Length > 1 && part[0] == 'F' && int.TryParse(part.Substring(1), out _))
+                .Select(part => int.Parse(part.Substring(1)))
+                .ToHashSet();
+            return _dominable.Contains(template);
+        }
 
         /// <summary>
         /// «Evolución III», the state from which a turret is its Steamer's to play: up to it the
