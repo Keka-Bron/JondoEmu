@@ -1436,6 +1436,9 @@ namespace Jondo.Unity.World.Fights
             CancelTurnTimer();
             StartsNewRound = false;
 
+            // Whoever was playing ends his turn: the rows he puts from now on are put outside it.
+            if (CurrentFighter != null) CurrentFighter.UltimoEmbrujoDeSuTurno = _ultimoEmbrujo;
+
             // This is where the turn really changes, so this is where the counters are emptied. Before,
             // they were emptied in ResetTurnCastCounters, which only HandleTurnReadyAck calls, which nobody
             // calls: they were the only written proof of an intention that was not fulfilled.

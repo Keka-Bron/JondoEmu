@@ -3723,6 +3723,7 @@ namespace Jondo.Unity.Server.Handlers
             var caducados = new List<(Fighter Quien, Jondo.Unity.World.Fights.Buff Caido)>();
             foreach (var quien in TodosLosCombatientes(fight))
             {
+                AguantaSuTurno(fight, fighter, quien);
                 foreach (var caido in quien.Buffs.Barrer(fight.RoundNumber, embrujo => LeTocaCaer(fight, fighter, embrujo)))
                 {
                     caducados.Add((quien, caido));
@@ -4283,6 +4284,26 @@ namespace Jondo.Unity.Server.Handlers
             await UnGolpeAsync(stream, fight, caster, waiting.HechizoOrigen, row, element, result.Target,
                                rolled, 0, waiting.Critico, fromTurnTrigger: true);
             await RefrescarLaVidaAsync(stream, fight, result.Target, caster);
+        }
+
+        /// <summary>
+        /// A row its caster put after his last turn ended -- a reaction to a blow in somebody
+        /// else's turn -- lives through his next one and falls at the start of the one after.
+        /// Falling at the next, it never lived one of his turns: the Kralamoure's Kraken gave him
+        /// the state of the element he was hit with «for one turn», and it was swept at his turn
+        /// start, before he could summon the tentacle it allows (Dofus pour les noobs: «au
+        /// prochain tour il invoquera un tentacule de l'élément dans lequel vous l'avez tapé»).
+        /// </summary>
+        internal static void AguantaSuTurno(FightInstance fight, Fighter quienEmpieza, Fighter portador)
+        {
+            if (quienEmpieza.UltimoEmbrujoDeSuTurno < 0) return;
+            foreach (var embrujo in portador.Buffs.Puestos)
+            {
+                if (embrujo.Quien == quienEmpieza.Id && !embrujo.Pendiente
+                    && embrujo.CaducaEnRonda == fight.RoundNumber
+                    && embrujo.Numero > quienEmpieza.UltimoEmbrujoDeSuTurno)
+                    embrujo.CaducaEnRonda++;
+            }
         }
 
         /// <summary>
