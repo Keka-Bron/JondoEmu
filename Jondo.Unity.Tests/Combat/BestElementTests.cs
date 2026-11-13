@@ -36,13 +36,44 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void El_empate_se_rompe_siempre_igual()
         {
-            // Which one the real game picks with two equal characteristics is not measured, but ONE
-            // stable criterion is needed: two identical casts have to give the same.
+            // Equal characteristics and equal damages: the first of earth, fire, water, air, as the
+            // 3.6 client walks them (gvq.bmcb).
             var quien = Con(300, 300, 300, 300);
 
             int primero = EffectEngine.MejorElementoDe(quien, ronda: 1);
             Assert.Equal(primero, EffectEngine.MejorElementoDe(quien, ronda: 1));
             Assert.Equal(1, primero);
+        }
+
+        [Theory]
+        [InlineData(0, 0, 50, 0, 3)]    // agua: sus daños rompen el empate
+        [InlineData(0, 20, 0, 20, 2)]   // fuego y aire empatan también en daños: el primero
+        public void El_empate_va_a_los_danos_del_elemento(int tierra, int fuego, int agua, int aire, int esperado)
+        {
+            // The client breaks a tie on the characteristic by the element's damage (88 to 91).
+            var quien = Con(300, 300, 300, 300);
+            quien.EarthDamage = tierra; quien.FireDamage = fuego;
+            quien.WaterDamage = agua; quien.AirDamage = aire;
+
+            Assert.Equal(esperado, EffectEngine.MejorElementoDe(quien, ronda: 1));
+        }
+
+        [Fact]
+        public void La_caracteristica_pesa_mas_que_los_danos()
+        {
+            var quien = Con(301, 300, 300, 300);
+            quien.WaterDamage = 500;
+
+            Assert.Equal(1, EffectEngine.MejorElementoDe(quien, ronda: 1));
+        }
+
+        [Fact]
+        public void El_peor_desempata_por_los_danos_mas_bajos()
+        {
+            var quien = Con(300, 300, 300, 300);
+            quien.EarthDamage = 30; quien.FireDamage = 30; quien.WaterDamage = 30; quien.AirDamage = 0;
+
+            Assert.Equal(4, EffectEngine.PeorElementoDe(quien, ronda: 1));
         }
 
         [Fact]

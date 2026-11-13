@@ -1956,18 +1956,22 @@ namespace Jondo.Unity.Server.Managers
         /// can change which is your best element halfway through a fight, and that is exactly what it is cast
         /// for.
         ///
-        /// A tie is broken by the order earth, fire, water, air. Which one the real game uses is not measured;
-        /// ONE stable criterion is needed so that two identical casts give the same, and this is the order the
-        /// catalogue itself numbers the elements in.
+        /// A tie is broken as the 3.6 client breaks it (gvq.bmcb): the elements are walked in the order
+        /// earth, fire, water, air; a tie on the characteristic goes to the highest damage of that element
+        /// (88 to 91), buffs on as well, and a tie on both to the first of the order.
         /// </remarks>
         internal static int MejorElementoDe(Fighter quien, int ronda)
         {
-            int mejor = 1, cuanto = int.MinValue;
+            int mejor = 1, cuanto = int.MinValue, suDano = int.MinValue;
 
             foreach (int elemento in new[] { 1, 2, 3, 4 })
             {
                 int tiene = PointsOfElement(quien, elemento, ronda);
-                if (tiene > cuanto) { cuanto = tiene; mejor = elemento; }
+                int dano = DamageOfElement(quien, elemento, ronda);
+                if (tiene > cuanto || (tiene == cuanto && dano > suDano))
+                {
+                    cuanto = tiene; suDano = dano; mejor = elemento;
+                }
             }
 
             return mejor;
@@ -1983,16 +1987,39 @@ namespace Jondo.Unity.Server.Managers
             return StatOf(quien, car) + quien.Buffs.De(car, ronda);
         }
 
-        /// <summary>The element of the caster's lowest characteristic; the first of a tie.</summary>
+        /// <summary>
+        /// A fighter's fixed damage of an element (88 earth, 89 fire, 90 water, 91 air, 92 neutral),
+        /// buffs included.
+        /// </summary>
+        internal static int DamageOfElement(Fighter quien, int element, int ronda)
+        {
+            var (car, sheet) = element switch
+            {
+                1 => (88, quien.EarthDamage),
+                2 => (89, quien.FireDamage),
+                3 => (90, quien.WaterDamage),
+                4 => (91, quien.AirDamage),
+                _ => (92, quien.NeutralDamage),
+            };
+            return sheet + quien.Buffs.De(car, ronda);
+        }
+
+        /// <summary>
+        /// The element of the caster's lowest characteristic; a tie goes to the lowest damage of that
+        /// element, then to the first of earth, fire, water, air (the 3.6 client's gvq.bmcc).
+        /// </summary>
         internal static int PeorElementoDe(Fighter quien, int ronda)
         {
-            int peor = 1, cuanto = int.MaxValue;
+            int peor = 1, cuanto = int.MaxValue, suDano = int.MaxValue;
 
             foreach (int elemento in new[] { 1, 2, 3, 4 })
             {
-                int car = CharacteristicOfElement(elemento);
-                int tiene = StatOf(quien, car) + quien.Buffs.De(car, ronda);
-                if (tiene < cuanto) { cuanto = tiene; peor = elemento; }
+                int tiene = PointsOfElement(quien, elemento, ronda);
+                int dano = DamageOfElement(quien, elemento, ronda);
+                if (tiene < cuanto || (tiene == cuanto && dano < suDano))
+                {
+                    cuanto = tiene; suDano = dano; peor = elemento;
+                }
             }
 
             return peor;
