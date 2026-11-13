@@ -131,6 +131,19 @@ namespace Jondo.Unity.Server.Handlers
             // A spell scroll: a special spell learnt.
             if (await SpellItemHandler.TryUseAsync(stream, item)) return;
 
+            // A purse of kamas (effect 194, ┬½+#1 kamas┬╗): the Bourses de 1000, 5000 and 10000 Kamas.
+            // Nothing handled it, and using one did nothing at all.
+            if (itemEffects.FirstOrDefault(e => e.EffectId == KamasEffect) is { } purse)
+            {
+                long kamas = purse.DiceSide > purse.DiceNum ? Random.Shared.Next(purse.DiceNum, purse.DiceSide + 1)
+                           : purse.DiceNum > 0 ? purse.DiceNum : purse.Value;
+                if (kamas <= 0 || !await CriterionHoldsAsync(stream, item)) return;
+                if (!await SpendOneAsync(stream, uid)) return;
+                await Managers.CharacterRewards.GiveKamasAsync(stream, kamas);
+                Console.WriteLine($"[Items] Purse {item.Template} (uid {uid}) opened: {kamas} kamas.");
+                return;
+            }
+
             // Effect 30 validates a quest's objective: the treasure chests' «Encuentra y abre el
             // cofre del día» and 315 other items. A box does it on being opened; an item that only
             // does that does it and stays.
@@ -176,6 +189,9 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>«Valida el objetivo de misión»: the effect an item validates an objective with, the objective its value.</summary>
         public const int QuestObjectiveEffect = 30;
+
+        /// <summary>Effect 194, ┬½+#1{{~1~2 a }}#2 kamas┬╗: a purse's kamas.</summary>
+        public const int KamasEffect = 194;
 
         /// <summary>The objectives an item's effect 30 validates.</summary>
         internal static List<int> QuestObjectivesOf(int template)
