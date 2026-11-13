@@ -32801,6 +32801,12 @@
       "map": 0,
       "opening": 24827,
       "openings": [
+        { "quest": 1776, "objective": 11409, "message": 24918 },
+        { "quest": 1776, "objective": 11408, "message": 24911 },
+        { "quest": 1776, "objective": 11407, "message": 24912 },
+        { "quest": 1776, "objective": 11404, "message": 24911 },
+        { "quest": 1776, "objective": 11403, "message": 24908 },
+        { "quest": 1776, "message": 24897 },
         { "after": 1775, "message": 24861 },
         { "quest": 1775, "objective": 11395, "message": 24859 },
         { "quest": 1775, "objective": 11394, "message": 24857 },
@@ -33026,9 +33032,92 @@
           "choices": [
             { "reply": 29852, "startsQuest": 1776, "params": [[34, 1776]] }
           ]
+        },
+        {
+          "message": 24897,
+          "choices": [
+            { "reply": 29866, "quest": 1776, "completes": 11398, "params": [[30, 11398]], "next": 24898, "afterObjective": 11397 },
+            { "reply": 29877, "quest": 1776, "completes": 11403, "params": [[30, 11403]], "next": 24905, "afterObjective": 11402 }
+          ]
+        },
+        {
+          "message": 24898,
+          "choices": [
+            { "reply": 29865, "next": 24899 }
+          ]
+        },
+        {
+          "message": 24899,
+          "choices": []
+        },
+        {
+          "message": 24905,
+          "choices": [
+            { "reply": 29876, "next": 24906 }
+          ]
+        },
+        {
+          "message": 24906,
+          "choices": [
+            { "reply": 29875, "next": 24907 }
+          ]
+        },
+        {
+          "message": 24907,
+          "choices": [
+            { "reply": 29874 }
+          ]
+        },
+        {
+          "message": 24908,
+          "choices": [
+            { "reply": 29880, "next": 24909 }
+          ]
+        },
+        {
+          "message": 24909,
+          "choices": [
+            { "reply": 29879, "next": 24910 }
+          ]
+        },
+        {
+          "message": 24910,
+          "choices": [
+            { "reply": 29878, "quest": 1776, "completes": 11404, "params": [[30, 11404]] }
+          ]
+        },
+        {
+          "message": 24911,
+          "choices": [
+            { "reply": 29881, "quest": 1776, "completes": 11407, "params": [[30, 11407]], "next": 24912, "showsNpc": 3407, "afterObjective": 11406 },
+            { "reply": 29886, "next": 24917, "quest": 1776, "afterObjective": 11408, "beforeObjective": 11409 }
+          ]
+        },
+        {
+          "message": 24912,
+          "choices": []
+        },
+        {
+          "message": 24917,
+          "choices": [
+            { "reply": 29885, "quest": 1776, "completes": 11409, "params": [[30, 11409]] }
+          ]
+        },
+        {
+          "message": 24918,
+          "choices": [
+            { "reply": 29894, "next": 24923, "quest": 1776, "afterObjective": 11411 }
+          ]
+        },
+        {
+          "message": 24923,
+          "names": true,
+          "choices": [
+            { "reply": 29893, "quest": 1776, "completes": 11412, "params": [[30, 11412]] }
+          ]
         }
       ],
-      "why": "Natacha Manka, the sadida hurt in the Penates of the Corbac (24827). «Oiseau de mauvais augure» (1774) of Dofus pour les noobs, in its order: «Preguntarle por sus necesidades» (24828: her herbs and first-aid kit forgotten in her bag by her camp), «Acepto» starts it, and sage too (24829). Back with the bag and forty sage, «Darle el material y preguntarle por su presencia en el lugar» (11375, 11376): the forest spirits led her here for a divination ritual (24831), the adventurer she hired vanished with her things (24832), will you help (24833), corbac wood first (24834). «Toma, la madera de cuerbok» (11378, the three woods taken): her workshop to carve the enchanted logs (24836); «Darle todo lo que necesita» (11380-11383): meet her far from here for the ritual (24837). There she sleeps (24838-24840) and wakes with a letter for Yova Etna, the fair's seer (24841, 11384). Back at her camp, «Darle la carta de Yova Etna» (24843, 11386): meet her before Master Corbac's library (24845). At the library (24846), «Informarte sobre el desarrollo de los acontecimientos» ends it (11387, 24847: the augury bodes ill); «¿Necesitas un escolta?» starts «Voler dans les plumes» (1775) then or on coming back (24848/24851), whose step text is 24851. «Voler dans les plumes» (1775): at the Pénates she sends the character to Virgil (24851, «Dirigirte a Virgilio para entrar en la biblioteca»). In the Second Room she misses the old library (24852), «¿Cómo van tus investigaciones?», Virgil suggested books further in (24853), «Introducirte en la biblioteca» (11389). In the Seventh, Capsálocke keeps her from working (24854), «Darle azotes a los adultos es para mí una costumbre» (11391). In the throne room, after Capsálocke, the master will give her his guide if somebody entertains him (24855); «Bueno, yo os dejo a solas…» gets her «¡Qué horror! Tienes la mente sucia»: he wants a worthy opponent (24856), «Bruñir tus armas» (11393). In the antechamber after the master, «¿Sigues entero?» (24857): «Tenderle la guía», her first edition (24858), «Soltar la guía» hands it over (11395). At the edge of the Litneg wood the trools frighten her (24859, 24860), «Venga, tranquila» ends it (11396) and she will not give up (24861). From there, «S'informer des raisons de venir dans le bois de Litneg» (29855) leads into «Jeu de Trooll» (1776, PL>99): Astroollog (24884), «Se mettre en route» and «Où vas-tu ?» (24885), «Attendre les indications» and its step text (24886), «Aceptar» starts it; below level 100 she does not want the character risking their life (24862)."
+      "why": "Natacha Manka, the sadida hurt in the Penates of the Corbac (24827). «Oiseau de mauvais augure» (1774) of Dofus pour les noobs, in its order: «Preguntarle por sus necesidades» (24828: her herbs and first-aid kit forgotten in her bag by her camp), «Acepto» starts it, and sage too (24829). Back with the bag and forty sage, «Darle el material y preguntarle por su presencia en el lugar» (11375, 11376): the forest spirits led her here for a divination ritual (24831), the adventurer she hired vanished with her things (24832), will you help (24833), corbac wood first (24834). «Toma, la madera de cuerbok» (11378, the three woods taken): her workshop to carve the enchanted logs (24836); «Darle todo lo que necesita» (11380-11383): meet her far from here for the ritual (24837). There she sleeps (24838-24840) and wakes with a letter for Yova Etna, the fair's seer (24841, 11384). Back at her camp, «Darle la carta de Yova Etna» (24843, 11386): meet her before Master Corbac's library (24845). At the library (24846), «Informarte sobre el desarrollo de los acontecimientos» ends it (11387, 24847: the augury bodes ill); «¿Necesitas un escolta?» starts «Voler dans les plumes» (1775) then or on coming back (24848/24851), whose step text is 24851. «Voler dans les plumes» (1775): at the Pénates she sends the character to Virgil (24851, «Dirigirte a Virgilio para entrar en la biblioteca»). In the Second Room she misses the old library (24852), «¿Cómo van tus investigaciones?», Virgil suggested books further in (24853), «Introducirte en la biblioteca» (11389). In the Seventh, Capsálocke keeps her from working (24854), «Darle azotes a los adultos es para mí una costumbre» (11391). In the throne room, after Capsálocke, the master will give her his guide if somebody entertains him (24855); «Bueno, yo os dejo a solas…» gets her «¡Qué horror! Tienes la mente sucia»: he wants a worthy opponent (24856), «Bruñir tus armas» (11393). In the antechamber after the master, «¿Sigues entero?» (24857): «Tenderle la guía», her first edition (24858), «Soltar la guía» hands it over (11395). At the edge of the Litneg wood the trools frighten her (24859, 24860), «Venga, tranquila» ends it (11396) and she will not give up (24861). From there, «S'informer des raisons de venir dans le bois de Litneg» (29855) leads into «Jeu de Trooll» (1776, PL>99): Astroollog (24884), «Se mettre en route» and «Où vas-tu ?» (24885), «Attendre les indications» and its step text (24886), «Aceptar» starts it; below level 100 she does not want the character risking their life (24862). «Jeu de Trooll» (1776): in the sawmill [-13,-51] she feels safer indoors (24897); after Larvenia, «Háblame de la continuación de los acontecimientos» (11398): a suspicious bag from a dark miner, copied by the sculptor Abel Bobel (24898), «Y ¿qué vas a hacer mientras tanto?», she keeps at Larvenia (24899). Back with the giant bag, «Darle la bolsa gigante…» (11403): the troollists meet at the bistrooll (24905), «Seguir escuchando» (24906), «Tu proyecto es una locura», she goes alone and will meet the character at the zaap (24907), «Buena suerte». By the zaap [-14,-47] the troollists were friendly (24908), «¿Has conseguido concertar un encuentro con Astréologo?» (24909), «Al grano», the krosmic gatrool's recipe (24910), «Ir a buscar los huevos» (11404). At the meeting place [-14,-58], «El lugar no tiene buen aspecto» (24911), «Toma: el gatrool krósmico» (11407): they share it and Astroollog shows (24912); after him, «¿Qué opinas sobre el augurio?» (24917), «Vamos a ver a Maelstrool» (11409). By Maelstrooll's camp [-12,-56] she dislikes the woods (24918); after the fight «Hablarle del augurio» (24923) and «Igualmente. ¡Hasta luego!» hands over Maelstrooll's pauldron (11412). Lines and replies as the screenshots of Dofus pour les noobs show them."
     },
     {
       "npc": 774,
@@ -33099,6 +33188,207 @@
         }
       ],
       "why": "Virgil in the antechamber, where the master's winners are left (content/world/dungeon_exits.json): «Bueno, pues parece que al amo le gustó tu visita» (3181), and «Salir de la biblioteca» out to the Pénates."
+    },
+    {
+      "npc": 3406,
+      "map": 0,
+      "opening": 24887,
+      "lines": [
+        {
+          "message": 24887,
+          "choices": [
+            { "reply": 29864, "next": 24893, "quest": 1776, "beforeObjective": 11397 },
+            { "reply": 29857, "next": 24888 },
+            { "reply": 29860, "next": 24890 }
+          ]
+        },
+        {
+          "message": 24893,
+          "choices": [
+            { "reply": 29863, "next": 24894 }
+          ]
+        },
+        {
+          "message": 24894,
+          "choices": [
+            { "reply": 29862, "next": 24895 }
+          ]
+        },
+        {
+          "message": 24895,
+          "choices": [
+            { "reply": 29861, "quest": 1776, "completes": 11397, "params": [[30, 11397]], "next": 24896 }
+          ]
+        },
+        {
+          "message": 24896,
+          "choices": []
+        },
+        {
+          "message": 24888,
+          "choices": [
+            { "reply": 29856, "next": 24889 }
+          ]
+        },
+        {
+          "message": 24889,
+          "choices": []
+        },
+        {
+          "message": 24890,
+          "choices": [
+            { "reply": 29859, "next": 24891 }
+          ]
+        },
+        {
+          "message": 24891,
+          "choices": [
+            { "reply": 29858, "next": 24892 }
+          ]
+        },
+        {
+          "message": 24892,
+          "choices": []
+        }
+      ],
+      "why": "Larvenia, the lumberjack of the Litneg sawmill. «Jeu de Trooll» (Dofus pour les noobs, with screenshots): her greeting (24887) offers «Discuter des bûcherons», «Discuter des Chafers» and, during the quest, «Poser des questions sur les Troollistes»: the most dangerous trools, very talkative (24893), «En savoir plus sur ces histoires» (24894), «Écouter la suite» (24895), «Demander comment entrer en contact avec des Troollistes»: strange rites at night (24896), which closes «Interroga a los leñadores del aserradero» (11397). The lumberjacks (24888, 24889) and the chafers (24890-24892) are her other two talks. Her «¿Conoces a alguna familia bontariana…?» (39670, 32665) belongs to another story and is left out."
+    },
+    {
+      "npc": 63,
+      "map": 0,
+      "opening": 37,
+      "openings": [
+        { "quest": 1776, "objective": 11402, "holds": 18207, "message": 37 },
+        { "quest": 1776, "objective": 11402, "pending": 11403, "message": 24902 }
+      ],
+      "lines": [
+        {
+          "message": 37,
+          "choices": [
+            { "reply": 29873, "quest": 1776, "completes": 11399, "params": [[30, 11399]], "next": 24900 },
+            { "reply": 275, "next": 341 }
+          ]
+        },
+        {
+          "message": 341,
+          "choices": [
+            { "reply": 350, "next": 426 },
+            { "reply": 351, "next": 427 },
+            { "reply": 352, "next": 428 }
+          ]
+        },
+        {
+          "message": 426,
+          "choices": []
+        },
+        {
+          "message": 427,
+          "choices": []
+        },
+        {
+          "message": 428,
+          "choices": []
+        },
+        {
+          "message": 24900,
+          "choices": [
+            { "reply": 29872, "next": 24901 }
+          ]
+        },
+        {
+          "message": 24901,
+          "choices": [
+            { "reply": 29871, "quest": 1776, "completes": 11400, "params": [[30, 11400]], "next": 24902, "completesAll": [11401, 11402], "buyPrice": 3000, "criterion": "PK>2999" },
+            { "reply": 29867, "criterion": "PK<3000" }
+          ]
+        },
+        {
+          "message": 24902,
+          "choices": [
+            { "reply": 29870, "next": 24903 }
+          ]
+        },
+        {
+          "message": 24903,
+          "choices": [
+            { "reply": 29869, "next": 24904 }
+          ]
+        },
+        {
+          "message": 24904,
+          "choices": [
+            { "reply": 29868, "gives": 18207, "quest": 1776, "afterObjective": 11402, "beforeObjective": 11403 }
+          ]
+        }
+      ],
+      "why": "Abel Bobel in the sculptors' workshop [3,12]. «Jeu de Trooll» (Dofus pour les noobs, with screenshots): «Demander une reproduction de la bourse suspecte et de son contenu» shows him the suspicious bag (11399); «Vous avez amené toutes les ressources ?» (24900), «Se renseigner sur le prix», 3000 kamas of labour (24901): «Donner les Kamas» pays them and hands over the cherry wood, silver and trooléolé hairs (11400-11402); with less than 3000 kamas only «Llorar.». Then «Patienter» (24902), «Patienter encore» (24903) and «Agarrar la bolsa gigante» (24904) gives the giant bag (18207). Whoever leaves while he works finds him still at it (24902). His trade talk (341, 426-428) is kept; teaching the trades and carving barks are left out."
+    },
+    {
+      "npc": 3407,
+      "map": 0,
+      "opening": 24913,
+      "lines": [
+        {
+          "message": 24913,
+          "choices": [
+            { "reply": 29884, "next": 24914 }
+          ]
+        },
+        {
+          "message": 24914,
+          "choices": [
+            { "reply": 29883, "next": 24915 }
+          ]
+        },
+        {
+          "message": 24915,
+          "choices": [
+            { "reply": 29882, "quest": 1776, "completes": 11408, "params": [[30, 11408]], "next": 24916 }
+          ]
+        },
+        {
+          "message": 24916,
+          "choices": []
+        }
+      ],
+      "why": "Astroollog at the meeting place [-14,-58], once the krosmic gatrool is shared (Dofus pour les noobs, with screenshots): chaos approaches (24913), «Se mettre les mains devant la bouche pour se retenir de vomir le gâtrool», the Troollback (24914), «Se renseigner sur le Troollback» (24915), «Se renseigner sur Maelstrooll» (24916), which closes 11408."
+    },
+    {
+      "npc": 3408,
+      "map": 0,
+      "opening": 24919,
+      "openings": [
+        { "quest": 1776, "objective": 11411, "message": 24946 },
+        { "after": 1776, "message": 24946 }
+      ],
+      "lines": [
+        {
+          "message": 24919,
+          "choices": [
+            { "reply": 29890, "next": 24920, "quest": 1776, "beforeObjective": 11410 },
+            { "reply": 29891, "quest": 1776, "afterObjective": 11410, "beforeObjective": 11411 },
+            { "reply": 29892, "quest": 1776, "afterObjective": 11410, "beforeObjective": 11411 }
+          ]
+        },
+        {
+          "message": 24920,
+          "choices": [
+            { "reply": 29889, "quest": 1776, "completes": 11410, "params": [[30, 11410]], "next": 24921 }
+          ]
+        },
+        {
+          "message": 24921,
+          "choices": [
+            { "reply": 29887 },
+            { "reply": 29888 }
+          ]
+        },
+        {
+          "message": 24946,
+          "choices": []
+        }
+      ],
+      "why": "Maelstrooll in his camp [-12,-56] (Dofus pour les noobs, with screenshots): «Bouaaaark !» (24919), «Tenter de le convaincre de sa méprise», the predators of the World of Twelve (24920), «Expliquer qu'en laissant la rage les dominer…» (11410), «Euh… tu as tort !» (24921): «Se préparer à combattre» starts the fight, «Appeler des renforts» leaves it for later; back with the reinforcements, «Dejar que hablen los puños y los hechizos» starts it (29891) and «Pedir refuerzos» waits again. Beaten, the Twelvers are worse than them (24946)."
     }
   ]
 }

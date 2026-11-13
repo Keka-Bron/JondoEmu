@@ -971,6 +971,12 @@
       "why": "«Atacar al goblin.»: the quarrelsome goblin (4586), «Pour lui vous n'aurez pas d'autre choix que de l'attaquer. Le combat se fait seul.» (Dofus pour les noobs); a grade for the player's level, as the quest is from level 20 to 200." },
     { "npc": 3378, "map": 139725315, "reply": 29660, "byLevel": true,
       "monsters": [ { "monster": 4586, "grade": 0 } ],
-      "why": "«Atacar al goblin.» after his insults: the same quarrelsome goblin (4586)." }
+      "why": "«Atacar al goblin.» after his insults: the same quarrelsome goblin (4586)." },
+    { "npc": 3408, "map": 155977219, "reply": 29887, "byLevel": true,
+      "monsters": [ { "monster": 4592, "grade": 0 }, { "monster": 4593, "grade": 0 }, { "monster": 4593, "grade": 0 }, { "monster": 4540, "grade": 0 }, { "monster": 4539, "grade": 0 } ],
+      "why": "«Vaincre Maelstrooll et ses adeptes» (11411): Dofus pour les noobs gives the fight's four kinds, Maelstrooll, Troollseum, Troollogram and Troolléolé, level 112 to 120; INFERRED: two Troollseums («Hey, les Troollseums !»), one of each other, at the character's level." },
+    { "npc": 3408, "map": 155977219, "reply": 29891, "byLevel": true,
+      "monsters": [ { "monster": 4592, "grade": 0 }, { "monster": 4593, "grade": 0 }, { "monster": 4593, "grade": 0 }, { "monster": 4540, "grade": 0 }, { "monster": 4539, "grade": 0 } ],
+      "why": "«Vaincre Maelstrooll et ses adeptes» (11411): Dofus pour les noobs gives the fight's four kinds, Maelstrooll, Troollseum, Troollogram and Troolléolé, level 112 to 120; INFERRED: two Troollseums («Hey, les Troollseums !»), one of each other, at the character's level." }
   ]
 }

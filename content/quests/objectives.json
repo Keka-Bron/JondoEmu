@@ -4129,6 +4129,14 @@
    "elements": [{"map": 158334978, "element": 509204, "item": 18200}, {"map": 158336512, "element": 509206, "item": 18201}, {"map": 158335488, "element": 509205, "item": 18202}],
    "gives": [{"item": 18200, "count": 1}, {"item": 18201, "count": 1}, {"item": 18202, "count": 1}],
    "why": "«Recoge tres maderas de cuerbok»: the three trunks where the corbacs perch, at [-15,-60], [-12,-62] and [-14,-62] (Dofus pour les noobs), the client's elements 509204, 509206 and 509205 (graphic 47541, the same on the three maps). Each gives one «Madera de cuerbok», three items of that name (18200-18202); which trunk gives which is INFERRED. Done once the three are carried."
+  },
+  {
+   "objective": 11411,
+   "quest": 1776,
+   "kind": "beat",
+   "monster": 4592,
+   "map": 155977219,
+   "why": "«Vence a Maelstrool y a sus adeptos»: the fight his «Prepararte para combatir» starts in his camp (content/fights/npc_fights.json); Maelstrooll (4592) leads it and drops his pauldron (18210) while it is under way."
   }
  ]
 }

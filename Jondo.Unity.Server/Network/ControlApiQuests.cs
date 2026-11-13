@@ -317,6 +317,9 @@ namespace Jondo.Unity.Server.Network
             Managers.FightWinAlterations.Forget();
             Managers.Readables.Forget();
             Managers.TeleportManager.Initialize();
+            // The stations written by hand in content/interactives/workshops.json, before the registry
+            // that declares them is built again.
+            Managers.Workshops.Initialize();
             // The passages are declared to the client from here: a door written since the start was
             // reloaded above and still answered «Unknown use» until this was built again.
             Managers.InteractiveRegistry.Initialize();

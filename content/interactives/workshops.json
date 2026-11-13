@@ -37,6 +37,14 @@
       "type": 298,
       "skills": [349],
       "why": "Natacha Manka's workshop at [-12,-60], the only quest element of her map (cell 246): «Ahora, utiliza mi material, vamos a tallar los troncos encantados juntos» (24836). The client's interactive type 298 and skill 349 are both «Taller de Natacha Manka», and 349 makes only the «Tronco encantado» (18203): ten bombu wood and a tamed corbac feather, five of them for «Pájaro de mal agüero»."
+    },
+    {
+      "map": 155975694,
+      "element": 509216,
+      "gfx": 3157,
+      "type": 299,
+      "skills": [350],
+      "why": "The fresh eggs at [-15,-45] of the Litneg wood, the only quest element of the map (cell 183): «Cliquez sur les Oeufs frais (qui est en fait un atelier) pour fabriquer le Gâtrool Krosmique» (Dofus pour les noobs, «Jeu de Trooll»). The client's interactive type 299 and skill 350 are both «Huevos frescos», and 350 makes only the «Gatrool krósmico» (18208): a gatrool, twenty wild mint and ten cherries."
     }
   ]
 }

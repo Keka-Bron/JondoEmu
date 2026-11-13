@@ -147,6 +147,9 @@ namespace Jondo.Unity.Server.Managers
                 case "PE": return facts.State == null ? Answer.Unknown : Truth(facts.State.Emotes.Contains((int)value), op);
                 case "Pw": return facts.State == null ? Answer.Unknown : Compare(1000 + 5L * facts.State.TotalStrength, op, value);
 
+                // The kamas he carries: Abel Bobel's «Llorar.» is for whoever cannot pay his 3000.
+                case "PK": return facts.State == null ? Answer.Unknown : Compare(facts.State.Kamas, op, value);
+
                 // His alignment's side: 0 neutral, 1 Bonta, 2 Brakmar (Alignments).
                 case "Ps": return facts.State == null ? Answer.Unknown : Compare(Alignments.CriterionSide(facts.State.CharacterId), op, value);
 

@@ -3997,6 +3997,61 @@
       "cell": 257,
       "orientation": 1,
       "why": "Virgil in the antechamber after the master, to see the winners out (3181). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 158597120,
+      "npc": 3406,
+      "cell": 272,
+      "orientation": 1,
+      "why": "Larvenia in the Litneg sawmill [-13,-51]: «Entrez dans le bâtiment. Puis parlez à Larvenia» (Dofus pour les noobs). A lumberjack of the place, always there. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 158597120,
+      "npc": 3405,
+      "cell": 284,
+      "orientation": 1,
+      "criterion": "Qa=1776&Qo<11403",
+      "why": "Natacha in the sawmill, «Sur la même map, parlez à Natacha» (Dofus pour les noobs), until she has the giant bag (11403's map). INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 155976204,
+      "npc": 3405,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=1776&Qo>11403&Qo<11404",
+      "why": "Natacha by the zaap [-14,-47], «nous nous retrouverons au zaap» (24907, 11404's map). INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 155976193,
+      "npc": 3405,
+      "cell": 340,
+      "orientation": 1,
+      "criterion": "Qa=1776&Qo>11404&Qo<11409",
+      "why": "Natacha at the meeting place [-14,-58] (11407 and 11409's map), until she leaves for Maelstrooll. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 155976193,
+      "npc": 3407,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1776&Qo>11407",
+      "why": "Astroollog «qui vient d'apparaître» once the krosmic gatrool is shared (Dofus pour les noobs; 11408's map). The cell is the one the deduced placement had."
+    },
+    {
+      "map": 155977219,
+      "npc": 3405,
+      "cell": 382,
+      "orientation": 1,
+      "criterion": "Qa=1776&Qo>11409",
+      "why": "Natacha by Maelstrooll's camp [-12,-56], «Je vais t'accompagner jusqu'à lui» (24917, 11412's map). INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 155977219,
+      "npc": 3408,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa=1776|Qf=1776",
+      "why": "Maelstrooll by his camp fire [-12,-56] (11410's map), during «Jeu de Trooll» and after it. The cell is the one the deduced placement had."
     }
   ]
 }

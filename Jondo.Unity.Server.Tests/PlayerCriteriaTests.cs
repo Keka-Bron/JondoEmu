@@ -35,6 +35,18 @@ public sealed class PlayerCriteriaTests
         Assert.Equal(Answer.Unknown, PlayerCriteria.Resolve(new Condition("Ga", op, [value]), facts));
     }
 
+    [Theory]
+    [InlineData(2999, '<', "3000", Answer.True)]
+    [InlineData(3000, '<', "3000", Answer.False)]
+    [InlineData(3000, '>', "2999", Answer.True)]
+    [InlineData(0, '>', "2999", Answer.False)]
+    public void PK_compares_the_kamas_the_character_carries(long kamas, char op, string value, Answer expected)
+    {
+        var facts = Facts(null, new SessionState { Kamas = kamas });
+
+        Assert.Equal(expected, PlayerCriteria.Resolve(new Condition("PK", op, [value]), facts));
+    }
+
     private static PlayerCriteria.Facts Facts(bool? playerAlive, SessionState? state = null)
         => new(state ?? new SessionState(), null, null, 0, _ => 0, PlayerAlive: playerAlive);
 }
