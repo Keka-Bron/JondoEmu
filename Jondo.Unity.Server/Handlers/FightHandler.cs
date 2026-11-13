@@ -3641,6 +3641,11 @@ namespace Jondo.Unity.Server.Handlers
             // one turn (ControlApiTest.cs). Ten minutes ran out on the slower classes, and the
             // client put up its «Inactividad» notice.
             if (Network.ControlApi.TestKey.Length > 0 && !fighter.IsMonster && !fighter.EsInvocado) duration = 36000;
+            // And a summon its owner plays -- a turret from Evolution III, an Osamodas's animal --
+            // for the same reason: its 15 seconds (the real game's, measured) ran out before the
+            // harness had cast once with it from the client.
+            if (Network.ControlApi.TestKey.Length > 0 && fighter.EsInvocado && !fighter.PlaysOnItsOwn
+                && Dueno(fight, fighter) != null) duration = 36000;
 
             // A turn of his, or of a summon he drives, for the per-turn averages of the end.
             if (!fighter.IsMonster || Dueno(fight, fighter) != null)
