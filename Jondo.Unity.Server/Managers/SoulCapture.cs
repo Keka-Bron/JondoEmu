@@ -24,8 +24,10 @@ namespace Jondo.Unity.Server.Managers
     /// capturer un groupe que si son niveau dépasse celui du monstre le plus fort du groupe», and a
     /// capture that cannot be fails. INFERRED: the 705's first number is the chance, in percent; the
     /// stone is spent; the group's archmonsters each go in a «Piedra de alma de archimonstruo» (10418)
-    /// and a dungeon's guardian in a «Piedra de alma de guardián de mazmorra» (10417) -- the Ochre
-    /// quest asks for each archmonster --, the rest together in a «Piedra de alma llena» (7010).
+    /// -- the Ochre quest asks for each archmonster --, the rest together in a «Piedra de alma llena»
+    /// (7010). A dungeon's guardian takes its group along in a «Piedra de alma de guardián de
+    /// mazmorra» (10417): Dofus pour les noobs' «Frankenstruche» shows «Gardien de donjon : Haute
+    /// Truche» holding five souls, the Haute Truche, a Gruche, two Truchmuches and a Truchtine.
     /// </para>
     /// </remarks>
     public static class SoulCapture
@@ -76,12 +78,9 @@ namespace Jondo.Unity.Server.Managers
 
             var stones = new List<Stone>();
             foreach (var soul in souls)
-            {
                 if (soul.Archmonster) stones.Add(new Stone(ArchmonsterStone, new[] { soul }));
-                else if (soul.Guardian) stones.Add(new Stone(GuardianStone, new[] { soul }));
-            }
-            var rest = souls.Where(s => !s.Archmonster && !s.Guardian).ToList();
-            if (rest.Count > 0) stones.Add(new Stone(FullStone, rest));
+            var rest = souls.Where(s => !s.Archmonster).OrderByDescending(s => s.Guardian).ToList();
+            if (rest.Count > 0) stones.Add(new Stone(rest[0].Guardian ? GuardianStone : FullStone, rest));
             return stones;
         }
     }

@@ -40,9 +40,9 @@ namespace Jondo.Unity.Tests.World
             Assert.Empty(SoulCapture.Capture(Array.Empty<SoulCapture.Soul>(), 50, 100, new Random(1)));
         }
 
-        /// <summary>Each archmonster and guardian in a stone of its own, the rest together.</summary>
+        /// <summary>Each archmonster in a stone of its own; the guardian's stone holds the rest of its group.</summary>
         [Fact]
-        public void Archmonsters_and_guardians_go_apart()
+        public void Archmonsters_go_apart_and_the_guardian_takes_its_group()
         {
             var group = new[]
             {
@@ -52,10 +52,9 @@ namespace Jondo.Unity.Tests.World
                 new SoulCapture.Soul(204, 4, 95, false, false),
             };
             var stones = SoulCapture.Capture(group, 150, 100, new Random(2));
-            Assert.Equal(new[] { SoulCapture.ArchmonsterStone, SoulCapture.GuardianStone, SoulCapture.FullStone },
-                         stones.Select(s => s.Item));
+            Assert.Equal(new[] { SoulCapture.ArchmonsterStone, SoulCapture.GuardianStone }, stones.Select(s => s.Item));
             Assert.Equal(new[] { 201 }, stones[0].Souls.Select(s => s.Monster));
-            Assert.Equal(new[] { 203, 204 }, stones[2].Souls.Select(s => s.Monster));
+            Assert.Equal(new[] { 202, 203, 204 }, stones[1].Souls.Select(s => s.Monster));
         }
     }
 }

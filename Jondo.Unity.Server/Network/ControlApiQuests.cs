@@ -269,7 +269,8 @@ namespace Jondo.Unity.Server.Network
         /// <summary>
         /// { item, quantity }: an item handed to the character as the administrator hands one; a
         /// negative quantity takes it back instead, a follower out of his slot too -- what a quest
-        /// closed by hand leaves behind.
+        /// closed by hand leaves behind. { item, souls: [monster, ...] }: a full soul stone holding
+        /// those souls, as a capture leaves it -- the Professor's soul of Thor Pestruz.
         /// </summary>
         private static Respuesta TestGive(string cuerpo)
         {
@@ -285,6 +286,16 @@ namespace Jondo.Unity.Server.Network
             }
             int quantity = Math.Max(1, asked);
             if (!DatabaseManager.TryGetItemTemplateEffects(item, out _)) return Mal(404, $"item {item}");
+            var souls = System.Text.RegularExpressions.Regex.Match(cuerpo, @"""souls""\s*:\s*\[([^\]]*)\]");
+            if (souls.Success)
+            {
+                var stone = new Managers.SoulCapture.Stone(item, souls.Groups[1].Value
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Select(m => new Managers.SoulCapture.Soul(int.Parse(m), 1, 0, false, false)).ToList());
+                bool filled = false;
+                RunInSession(session, async stream => filled = await Handlers.SoulCaptureHandler.GrantAsync(stream, stone));
+                return filled ? Bien(new { item, souls = stone.Souls.Count }) : Mal(422, "not given");
+            }
             bool given = false;
             RunInSession(session, async stream => given = await CommandHandler.GrantItemAsync(stream, item, quantity) != null);
             return given ? Bien(new { item, quantity }) : Mal(422, "not given");

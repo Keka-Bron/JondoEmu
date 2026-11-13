@@ -51,22 +51,26 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             if (!await ItemUseHandler.SpendOneAsync(stream, stone.Uid)) return;
-            foreach (var full in stones)
-            {
-                var item = Equipment.Create(full.Item, 1, full.Effects);
-                if (item == null) continue;
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3,
-                    new HavenBagStore.StoredItem
-                    {
-                        Uid = item.Uid,
-                        Gid = full.Item,
-                        Quantity = 1,
-                        Effects = Forgemagic.Serialize(full.Effects),
-                    })));
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
-                    ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained, "1", full.Item.ToString())));
-            }
+            foreach (var full in stones) await GrantAsync(stream, full);
             Console.WriteLine($"[Souls] {SessionContext.State.CharacterName} captures {souls.Count} soul(s) in {stones.Count} stone(s).");
+        }
+
+        /// <summary>A full stone into the bag, with its souls, and the «you have gained» line.</summary>
+        public static async Task<bool> GrantAsync(NetworkStream stream, SoulCapture.Stone full)
+        {
+            var item = Equipment.Create(full.Item, 1, full.Effects);
+            if (item == null) return false;
+            await WriteAsync(stream, ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3,
+                new HavenBagStore.StoredItem
+                {
+                    Uid = item.Uid,
+                    Gid = full.Item,
+                    Quantity = 1,
+                    Effects = Forgemagic.Serialize(full.Effects),
+                })));
+            await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained, "1", full.Item.ToString())));
+            return true;
         }
     }
 }

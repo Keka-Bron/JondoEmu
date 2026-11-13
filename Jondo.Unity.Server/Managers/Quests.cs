@@ -382,17 +382,24 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// Whether what an objective asks to hand over is carried: true for one that asks for no
-        /// item. A reply that does a «bring» objective is offered only then -- Cindy Cato's fifteen
-        /// boxes, Kerubim's purse for Primir.
+        /// item nor soul. A reply that does a «bring» objective is offered only then -- Cindy Cato's
+        /// fifteen boxes, Kerubim's purse for Primir, the Professor's soul of Thor Pestruz.
         /// </summary>
         public static bool CanHandOver(int objectiveId)
         {
             if (_book == null || objectiveId == 0) return true;
             if (Log?.ObjectiveDone(objectiveId) == true) return true;
             var objective = _book.Objective(objectiveId);
-            if (objective == null || objective.ItemId == 0) return true;
+            if (objective == null) return true;
+            if (objective.SoulMonster != 0) return SoulsCarried(objective.SoulMonster) >= objective.SoulCount;
+            if (objective.ItemId == 0) return true;
             return Equipment.HowMany(objective.ItemId) >= Math.Max(1, objective.ItemCount);
         }
+
+        /// <summary>How many souls of a monster the full soul stones carried hold.</summary>
+        private static int SoulsCarried(int monster)
+            => Equipment.All.Sum(stone => stone.Effects.Count(e => e.Effect == SoulCapture.SoulEffect && e.Value == monster)
+                                          * Math.Max(1, stone.Quantity));
 
         /// <summary>
         /// Whether a reply that does these objectives can be offered for what is carried: all their
@@ -445,7 +452,7 @@ namespace Jondo.Unity.Server.Managers
             var stones = Equipment.All.Where(i => SoulsIn(i) > 0)
                                       .OrderBy(i => i.Effects.Count(e => e.Effect == SoulCapture.SoulEffect))
                                       .ToList();
-            if (stones.Sum(s => SoulsIn(s) * Math.Max(1, s.Quantity)) < wanted) return false;
+            if (SoulsCarried(monster) < wanted) return false;
 
             int still = wanted;
             foreach (var stone in stones)
