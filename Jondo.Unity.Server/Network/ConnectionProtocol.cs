@@ -607,8 +607,16 @@ namespace Jondo.Unity.Server.Network
         internal static long ValueOf(int id, int level)
         {
             if (id == Stat.LifePoints) return BaseLife(level);
-            if (id == Stat.ActionPoints) return BaseActionPoints;
+            // The seventh action point comes at level 100: the real sheet of a level 200 has a
+            // base of 7 where a new character's has 6. It was always 6 here, so out of a fight a
+            // level 100 showed one point less than the fight then gave him.
+            if (id == Stat.ActionPoints)
+                return BaseActionPoints + (level >= Handlers.StatsHandler.LevelForSeventhAp ? 1 : 0);
             if (id == Stat.MovementPoints) return BaseMovementPoints;
+            // Every character has one summon of his own: the real sheet's base is 1, with what
+            // the equipment adds beside it, and a fight counts the same one. Sent at zero, the
+            // sheet showed one summon less than the fight.
+            if (id == Stat.Summons) return Handlers.FightHandler.BasePlayerSummonLimit;
             if (id == Stat.MaxEnergyPoints) return Jondo.Unity.World.Fights.DefeatPenalty.MaxEnergy;
             if (id == Stat.EnergyPoints)
                 return Managers.Energy.Of(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
