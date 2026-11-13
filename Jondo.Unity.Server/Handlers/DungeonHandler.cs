@@ -105,6 +105,22 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Whether <paramref name="reply"/> is this guardian's key reply and the key his dungeon asks
+        /// for is not in the bag. The real game does not offer it then: Rotabla the shepherd offers
+        /// «Donner la clef des bouftous» only to whoever carries one. Offered, it only led to
+        /// «Vous ne possédez pas l'objet nécessaire» in the chat.
+        /// </summary>
+        public static bool KeyOfferedForNothing(int npcId, long mapId, long reply)
+        {
+            var options = DungeonDoor.For(npcId);
+            if (reply == 0 || options.Key != reply) return false;
+            var dungeon = DungeonManager.AtEntrance(mapId);
+            if (dungeon == null || dungeon.FirstRoom == 0 || dungeon.Required.Count == 0) return false;
+
+            return dungeon.Required.All(r => FindInBag(r.Item, r.Count) == 0);
+        }
+
+        /// <summary>
         /// The player has answered the guardian of a dungeon. Try to let them in.
         /// </summary>
         /// <remarks>

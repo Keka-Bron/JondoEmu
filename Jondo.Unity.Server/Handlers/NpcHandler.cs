@@ -303,26 +303,33 @@ namespace Jondo.Unity.Server.Handlers
             // Unless his written tree leads to them in its own words: Tassa opens the inn's cellar
             // after «¿Puedo entrar en la bodega?», not on her «No tengo nada que decirte».
             if (escrito != null && puerta.Any(escrito.Offers)) puerta = Array.Empty<long>();
+            bool doorOnly = puerta.Length > 0 && escrito == null;
             if (puerta.Length > 0)
             {
                 var todas = new List<long>(puerta.Length + respuestas.Length);
                 todas.AddRange(puerta);
 
-                // After them, whatever was going to be said, without repeating any. The farewell matters:
-                // without a way out the player is left with a window that does not close.
-                // But not the «Sí.» to his own «¿Seguro...?»: on the first line it agrees to nothing.
-                var yes = DungeonDoor.For(npc.NpcId).Yes;
-                foreach (long r in respuestas)
+                // After them, what his written tree says, without repeating any. Without a tree, nothing:
+                // the template's last reply SinArbolEscrito falls back on is, at a door, one of the
+                // guardian's own follow-ups -- the «Sí.» to his «¿Seguro...?», which agrees to nothing,
+                // or Rotabla's «Retourner dans cette salle.», offered to a character who never died
+                // in his dungeon. The client's cross closes the window.
+                if (escrito != null)
                 {
-                    if (!todas.Contains(r) && (escrito != null || !yes.Contains(r))) todas.Add(r);
+                    foreach (long r in respuestas)
+                    {
+                        if (!todas.Contains(r)) todas.Add(r);
+                    }
                 }
 
                 respuestas = todas.ToArray();
             }
 
             // The keyring only while it can open the door: none in the bag, or this week's entry spent,
-            // and the real game does not offer it -- written in the tree or added above.
-            respuestas = respuestas.Where(r => !DungeonHandler.KeyringOfferedForNothing(npc.NpcId, mapId, r)).ToArray();
+            // and the real game does not offer it -- written in the tree or added above. Nor the
+            // key without the key.
+            respuestas = respuestas.Where(r => !DungeonHandler.KeyringOfferedForNothing(npc.NpcId, mapId, r)
+                                               && !DungeonHandler.KeyOfferedForNothing(npc.NpcId, mapId, r)).ToArray();
 
             // And a jailer takes the criminals carried and sells the news of those still out.
             long[] wanted = WantedHandler.OpeningReplies(npc.NpcId, mapId);
@@ -347,7 +354,10 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.OpenDialogueMapId = mapId;
             SessionContext.State.OpenDialogueMessage = pregunta;
 
-            await PreguntarAsync(stream, pregunta, respuestas, template,
+            // A guardian with no written tree and no door reply left -- no key, no keyring -- says his
+            // line with nothing to answer, and the client's cross closes it: PreguntarAsync's fallback,
+            // his template's last reply, is Rotabla's «Retourner dans cette salle.» again.
+            await PreguntarAsync(stream, pregunta, respuestas, doorOnly && respuestas.Length == 0 ? null : template,
                                  escrito?.Line(pregunta), banker);
 
             Console.WriteLine($"[NPC] Dialog of {npc.NpcId}: question {pregunta}, " +
