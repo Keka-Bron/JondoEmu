@@ -139,7 +139,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             long capacity = Pods();
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(0, capacity)));
+                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), capacity)));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
         }
@@ -151,7 +151,7 @@ namespace Jondo.Unity.Server.Handlers
         ///
         /// What it is CARRYING goes out as zero, because nothing here weighs the inventory yet.
         /// </summary>
-        private static long Pods() => 1000 + 5L * Jondo.Unity.Server.Network.SessionContext.State.TotalStrength;
+        private static long Pods() => ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State);
 
         /// <summary>
         /// Sets a characteristic to whatever <paramref name="points"/> buys, counting from zero.

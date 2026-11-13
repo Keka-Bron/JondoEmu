@@ -99,7 +99,7 @@ namespace Jondo.Unity.Tests.World
                     var sheet = Sub(Sub(iic, 2), 2);
                     Assert.Equal(30, Column(sheet, ConnectionProtocol.Stat.Strength)[6]);
                     Assert.Equal(5 * 130, Column(sheet, ConnectionProtocol.Stat.Pods)[3]);
-                    Assert.Equal(ConnectionProtocol.BasePods, Column(sheet, ConnectionProtocol.Stat.Pods)[4]);
+                    Assert.Equal(ConnectionProtocol.PodsBeforeStrength(state), Column(sheet, ConnectionProtocol.Stat.Pods)[4]);
 
                     // Points: fifty in strength fit a level 200; five thousand do not.
                     await PresetHandler.PointsAsync(pipe.ToClient, ConnectionProtocol.Push("iha",

@@ -83,7 +83,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>What a character can carry: a thousand, and five a point of strength.</summary>
         private static long Capacity(GameSession session)
-            => CommissionHandler.As(session, () => 1000 + 5L * session.State.TotalStrength);
+            => CommissionHandler.As(session, () => ConnectionProtocol.Capacity(session.State));
 
         // ─── Asking ─────────────────────────────────────────────────────────────────────────
 
@@ -302,7 +302,7 @@ namespace Jondo.Unity.Server.Handlers
                         long capacity = Capacity(side);
                         bool mine = side == viewer;
                         await SendAsync(viewer, Op.Keq, TradeProtocol.BuildWeight(capacity, 0, remote: !mine));
-                        if (mine) await SendAsync(viewer, Op.Iun, ConnectionProtocol.BuildPods(0, capacity));
+                        if (mine) await SendAsync(viewer, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(viewer.State), capacity));
                     }
                 }
 

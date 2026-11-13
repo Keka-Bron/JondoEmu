@@ -39,10 +39,9 @@ internal sealed class AfterSelectionMessages(
         foreach (var item in state.EquipmentItems.Values)
             carried = checked(carried + (long)itemWeight(item.Template) * Math.Max(1, item.Quantity));
 
-        // Keep the existing pods capacity policy (allocated + scrolled strength).
+        // The capacity every refresh sends (ConnectionProtocol.Capacity): levels, jobs, strength.
         // Arithmetic is widened before multiplication and checked at the int32 wire boundary.
-        long strength = (long)state.StatStrength + state.ScrolledStrength;
-        return new(checked((int)carried), checked((int)(ConnectionProtocol.BasePods + 5L * strength)));
+        return new(checked((int)carried), checked((int)ConnectionProtocol.Capacity(state)));
     }
 
     internal StorageKamasUpdateEvent Storage(long accountId) => new(storageKamas(accountId));

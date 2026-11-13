@@ -237,7 +237,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The bag's weight, and the same bank for another character of the account at a counter.</summary>
         private static async Task AfterMovingAsync(NetworkStream stream)
         {
-            await SendAsync(stream, Op.Iun, ConnectionProtocol.BuildPods(0, 1000 + 5L * SessionContext.State.TotalStrength));
+            await SendAsync(stream, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State)));
             await RefreshWindowsAsync(SessionContext.Current.AccountId, SessionContext.Current.Id);
         }
 

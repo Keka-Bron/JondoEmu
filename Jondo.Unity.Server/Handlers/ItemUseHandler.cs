@@ -166,7 +166,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Iun,
-                ConnectionProtocol.BuildPods(0, 1000 + 5L * SessionContext.State.TotalStrength)));
+                ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State))));
 
             await TickQuestObjectivesAsync(stream, objectives);
 
@@ -258,7 +258,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static Task WeighAsync(NetworkStream stream)
             => WriteAsync(stream, ConnectionProtocol.Push(Op.Iun,
-                ConnectionProtocol.BuildPods(0, 1000 + 5L * SessionContext.State.TotalStrength)));
+                ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State))));
 
         private static Task WriteAsync(NetworkStream stream, byte[] frame)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);

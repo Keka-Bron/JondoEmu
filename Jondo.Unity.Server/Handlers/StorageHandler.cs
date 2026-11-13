@@ -189,7 +189,7 @@ namespace Jondo.Unity.Server.Handlers
                 await TellOthersAsync(place, left.opcode, left.body);
             }
 
-            await SendAsync(stream, Op.Iun, ConnectionProtocol.BuildPods(0, 1000 + 5L * SessionContext.State.TotalStrength));
+            await SendAsync(stream, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State)));
             return true;
         }
 

@@ -145,7 +145,7 @@ namespace Jondo.Unity.Server.Managers
                 // death's questions.
                 case "PS": return facts.State == null ? Answer.Unknown : Compare(facts.State.Sex, op, value);
                 case "PE": return facts.State == null ? Answer.Unknown : Truth(facts.State.Emotes.Contains((int)value), op);
-                case "Pw": return facts.State == null ? Answer.Unknown : Compare(1000 + 5L * facts.State.TotalStrength, op, value);
+                case "Pw": return facts.State == null ? Answer.Unknown : Compare(Jondo.Unity.Server.Network.ConnectionProtocol.Capacity(facts.State), op, value);
 
                 // The kamas he carries: Abel Bobel's «Llorar.» is for whoever cannot pay his 3000.
                 case "PK": return facts.State == null ? Answer.Unknown : Compare(facts.State.Kamas, op, value);
