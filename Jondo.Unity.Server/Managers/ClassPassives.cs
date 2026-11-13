@@ -42,6 +42,9 @@ namespace Jondo.Unity.Server.Managers
 
         private static readonly object _lock = new();
         private static Dictionary<int, ClassEntry> _classes;
+
+        /// <summary>The common spells' initial spells, by known spell: Dominio de Invocaciones' 21976.</summary>
+        private static Dictionary<int, int> _commonInitials;
         private static Dictionary<int, List<(int Spell, int Icon)>> _initialSpellsByType;
         private static Dictionary<int, int> _icons;
 
@@ -61,6 +64,15 @@ namespace Jondo.Unity.Server.Managers
         {
             Load();
             var fuera = new List<(int, int)>();
+            known = known.ToList();
+
+            // The common spells' first, any class (content/fights/class_passives.json, "commonInitials").
+            foreach (var (spell, _) in known)
+            {
+                if (_commonInitials.TryGetValue(spell, out int initial) && fuera.All(f => f.Item1 != initial))
+                    fuera.Add((initial, 1));
+            }
+
             if (!_classes.TryGetValue(breed, out var entry)) return fuera;
 
             if (entry.InitialSpellType != 0 && _initialSpellsByType.TryGetValue(entry.InitialSpellType, out var initials))
@@ -91,6 +103,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (_classes != null) return;
                 var classes = new Dictionary<int, ClassEntry>();
+                var commonInitials = new Dictionary<int, int>();
                 try
                 {
                     using var doc = JsonDocument.Parse(File.ReadAllText(Paths.ContentFile(AuthoredFile)));
@@ -102,12 +115,17 @@ namespace Jondo.Unity.Server.Managers
                             InitialSpellType = property.Value.TryGetProperty("initialSpellType", out var t) ? t.GetInt32() : 0,
                         };
                     }
+                    if (doc.RootElement.TryGetProperty("commonInitials", out var common))
+                        foreach (var property in common.EnumerateObject())
+                            if (int.TryParse(property.Name, out int spell) && property.Value.TryGetProperty("initial", out var i))
+                                commonInitials[spell] = i.GetInt32();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"[ClassPassives] Could not read {AuthoredFile}: {ex.Message}");
                 }
                 _classes = classes;
+                _commonInitials = commonInitials;
                 var types = classes.Values.Select(c => c.InitialSpellType).Where(t => t != 0).ToHashSet();
                 _icons = new Dictionary<int, int>();
                 _initialSpellsByType = new Dictionary<int, List<(int, int)>>();

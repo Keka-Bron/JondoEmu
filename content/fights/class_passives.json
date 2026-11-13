@@ -30,5 +30,9 @@
     "17": { "name": "Hipermago",  "passive": 23959, "initialSpellType": 2000, "measured": "3 of 3 fights (Última Runa); Torrente Arcano in 2 of 3, by name" },
     "18": { "name": "Uginak",     "passive": 21986, "initialSpellType": 2001, "measured": "no fight captured; the spell of the type named after the class" },
     "20": { "name": "Forjalanza", "passive": 24387, "initialSpellType": 2377, "measured": "no fight captured; the spell of the type named after the class" }
+  },
+  "commonInitials": {
+    "_": "Common spells, any class, whose initial spell is cast at fight start like the classes' own: the known spell, then its initial. By hand, not by icon: the initial's type (1335) holds the spell's sub-casts too, with the same icon.",
+    "18646": { "initial": 21976, "name": "Dominio de Invocaciones", "measured": "the level 50 poutch capture casts 21976 (level 57060) before the first turn, then its 18647 (51206); 21976 puts state 2131 and hands the summons to their owner, and casting 18646 then takes it all off (its 406 on 21976, 18646 and 18649) and back on" }
   }
 }

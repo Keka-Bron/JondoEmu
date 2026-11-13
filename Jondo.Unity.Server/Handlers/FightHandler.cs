@@ -870,10 +870,10 @@ namespace Jondo.Unity.Server.Handlers
             // None of them for a monster he fights as: it brings its own start (Incarnate).
             if (playerFighter.IncarnatedMonster == 0)
             {
-                var propios = Managers.ClassPassives.ForFight(
-                    GameState.Breed,
-                    Managers.FightSpellLayout.ForFight(GameState.Breed, GameState.CharacterLevel,
-                                                      SessionContext.Current.AccountId).Spells);
+                var suyos = Managers.FightSpellLayout.ForFight(GameState.Breed, GameState.CharacterLevel,
+                                                              SessionContext.Current.AccountId).Spells;
+                var propios = Managers.ClassPassives.ForFight(GameState.Breed, suyos);
+                playerFighter.MastersSummons = suyos.Any(s => s.Spell == Managers.Summons.SummonMastery);
                 int pasivo = Managers.ClassPassives.PassiveOf(GameState.Breed);
                 foreach (var (hechizo, grado) in propios)
                 {
@@ -4070,17 +4070,21 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// Hands a summon that has become its owner's in the fight -- a turret reaching Evolución
-        /// III (Fighter.ControlledFromState) -- to his client, once: its cooldowns and its bar
+        /// III (Fighter.ControlledFromState), a «maîtrisable» one Dominio de Invocaciones hands
+        /// over -- to his client, once: its cooldowns and its bar
         /// (jxc, jyy), as a summon of his is handed over when it comes out. Before a turn starts
         /// and not with its jyj: sent between its jzc and its jyj, the client cast with it but
         /// never let its turn be passed, and the clock ran out. One that goes back to its own
         /// (back to Evolución II) is handed over again when it next becomes his.
         /// </summary>
-        private static async Task HandOverWhatBecameHisAsync(FightInstance fight)
+        internal static async Task HandOverWhatBecameHisAsync(FightInstance fight)
         {
             foreach (var summon in TodosLosCombatientes(fight))
             {
-                if (summon == null || summon.ControlledFromState == 0) continue;
+                // And a «maîtrisable» summon, which Dominio de Invocaciones hands over after it is
+                // born, and back again each time it is switched on (Fighter.Dominable): handed
+                // nothing at birth, its owner could not play its turn.
+                if (summon == null || summon.ControlledFromState == 0 && !summon.Dominable) continue;
                 bool his = summon.IsAlive && !summon.PlaysOnItsOwn;
                 if (!his) { summon.HandedToOwner = false; continue; }
                 if (summon.HandedToOwner) continue;
@@ -4278,6 +4282,27 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), sequenceOwner,
                                                        Network.FightProtocol.TurnStartSequence)));
         }
+
+        /// <summary>
+        /// Dominio de Invocaciones switched on (state 2131) hands every «maîtrisable» summon its owner
+        /// brings out to him: its 18647 marks it (2132) and gives it the control row (2027, 2130).
+        /// </summary>
+        /// <remarks>
+        /// The spell's own row does it «under CI», when he summons, but with «*e2131» on it, his
+        /// state the spell itself puts: read when he summons, with the spell on, it never held,
+        /// and every summon after the first cast played on its own. In the game «afecta también a
+        /// las siguientes invocaciones». The rows' own guards (e2132, e2130) keep it from doing
+        /// anything twice.
+        /// </remarks>
+        private static async Task DominioAlInvocarAsync(NetworkStream stream, FightInstance fight, Fighter dueno, Fighter nuevo)
+        {
+            if (!nuevo.Dominable || !dueno.Buffs.TieneEstado(DominioActivo)) return;
+            await AplicarEfectosAsync(stream, fight, dueno, DominioEnLasInvocaciones, 1, dueno,
+                                      Managers.EffectEngine.AlLanzar, dueno.CellId, armar: false);
+        }
+
+        /// <summary>Dominio de Invocaciones switched on, and the sub-cast that hands the summons over.</summary>
+        private const int DominioActivo = 2131, DominioEnLasInvocaciones = 18647;
 
         /// <summary>
         /// A blow its delay held back, dealt when its round comes: the row it was cast with,
@@ -8264,6 +8289,7 @@ namespace Jondo.Unity.Server.Handlers
                     // The summoner has summoned (CI), with the new one as what set it off -- the "u"
                     // of the rows it fires: Pacto Bestial sacrifices "sus invocaciones ... futuras".
                     if (nuevo != null) Disparo(invoca, Managers.EffectEngine.AlInvocar, nuevo);
+                    if (nuevo != null) await DominioAlInvocarAsync(stream, fight, invoca, nuevo);
                     continue;
                 }
 
