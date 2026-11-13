@@ -371,8 +371,16 @@ namespace Jondo.Unity.World.Fights
         /// somebody else's fighter it is not honoured: no class spell lays it there.
         /// </remarks>
         public bool PlaysOnItsOwn => EsInvocado && !ControlTaken
-                                     && (MaxMP <= 0 && HechizosDeInvocado.Count == 0
+                                     && (Autonomous
+                                         || MaxMP <= 0 && HechizosDeInvocado.Count == 0
                                          || ControlledFromState != 0 && !Buffs.TieneEstado(ControlledFromState));
+
+        /// <summary>
+        /// A summon that is never its owner's to play, whatever it has to play: the Chaferfu and
+        /// the Chaferfu Lancier, whose sheets do not say «maîtrisable» as the Arakne's do
+        /// (Summons.AutonomousSummons).
+        /// </summary>
+        public bool Autonomous { get; set; }
 
         /// <summary>
         /// The state from which its owner plays this summon, zero for one that is his from the

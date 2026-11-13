@@ -213,6 +213,7 @@ namespace Jondo.Unity.Server.Managers
             invocado.HechizosDeInvocado = receta.Hechizos;
             invocado.TemplateAllowsTackle = receta.AllowsTackle;
             invocado.ControlledFromState = SteamerTurrets.Contains(receta.Plantilla) ? EvolutionIII : 0;
+            invocado.Autonomous = AutonomousSummons.Contains(receta.Plantilla);
 
             // A Steamer's turret fights with his characteristics on top of its own: its blows grow
             // with his build and its «best element» is his (the arponera's Espadon). Measured by the
@@ -234,6 +235,17 @@ namespace Jondo.Unity.Server.Managers
         /// batiscafo, the arrastrero and the perforadora --, the ones Evolución evolves.
         /// </summary>
         public static readonly int[] SteamerTurrets = { 5831, 5832, 5833, 5835, 5836, 5837 };
+
+        /// <summary>
+        /// The summons that play on their own, never their owner's: the Chaferfu (262) and the
+        /// Chaferfu Lancier (1108) of Invocación de Chaferfu. Nothing in the data tells them from
+        /// the Arakne and the Arakne Mayor of Invocación de Arakne -- the same summon rows, the same
+        /// template flags --, only the spells' sheets: «Invoque une Arakne maîtrisable», and «Invoque
+        /// un Chaferfu qui peut occasionner des dommages Terre aléatoirement aux alliés ou aux
+        /// ennemis».
+        /// Measured by the player against the real game: the Arakne is his to play, the Chaferfu not.
+        /// </summary>
+        public static readonly int[] AutonomousSummons = { 262, 1108 };
 
         /// <summary>
         /// «Evolución III», the state from which a turret is its Steamer's to play: up to it the
