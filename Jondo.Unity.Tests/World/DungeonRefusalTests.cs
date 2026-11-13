@@ -110,7 +110,7 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>
         /// The keyring reply is only offered while the keyring can open the door: not without one in
-        /// the bag, nor at a dungeon it does not take. The key's reply is never held back.
+        /// the bag, nor at a dungeon it does not take. The key's reply has its own test below.
         /// </summary>
         [Fact]
         public async Task The_keyring_is_not_offered_when_it_cannot_open()
@@ -140,6 +140,43 @@ namespace Jondo.Unity.Tests.World
                     dungeon.OnKeyring = false;
                     Assert.True(DungeonHandler.KeyringOfferedForNothing(npcId, entrance, keyringReply));
                     Assert.False(DungeonHandler.KeyringOfferedForNothing(npcId, entrance, keyReply));
+                }
+            }
+            finally
+            {
+                guardians.Remove(npcId);
+                dungeons.Remove(dungeonId);
+            }
+        }
+
+        /// <summary>
+        /// The key reply is only offered to whoever carries the key: Rotabla the shepherd offered
+        /// «Donner la clef des bouftous» to anybody and then refused it in the chat.
+        /// </summary>
+        [Fact]
+        public async Task The_key_is_not_offered_without_the_key()
+        {
+            const int dungeonId = int.MaxValue - 2, npcId = int.MaxValue - 2, key = 999998;
+            const long entrance = -990000031, keyReply = 24970, keyringReply = 24973;
+            var dungeons = (Dictionary<int, DungeonManager.Dungeon>)DungeonManager.All;
+            var guardians = (Dictionary<int, DungeonDoor.Options>)typeof(DungeonDoor)
+                .GetField("_byNpc", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
+            var dungeon = new DungeonManager.Dungeon { Id = 0, Name = "Corte del Jalató Real", EntranceMapId = entrance };
+            dungeon.Rooms.Add(entrance - 1);
+            dungeon.Required.Add((key, 1));
+            dungeons.Add(dungeonId, dungeon);
+            guardians.Add(npcId, new DungeonDoor.Options { Key = keyReply, Keyring = keyringReply });
+
+            try
+            {
+                await using var pipe = await ClientPipe.OpenAsync(990000031, 990000032, entrance);
+                using (SessionContext.Push(pipe.Session))
+                {
+                    Assert.True(DungeonHandler.KeyOfferedForNothing(npcId, entrance, keyReply));
+                    Assert.False(DungeonHandler.KeyOfferedForNothing(npcId, entrance, keyringReply));
+
+                    Equipment.Add(1, key, 1, Equipment.Bag, null);
+                    Assert.False(DungeonHandler.KeyOfferedForNothing(npcId, entrance, keyReply));
                 }
             }
             finally
