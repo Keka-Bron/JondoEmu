@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.Server.Network.Connection;
 using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Server.Handlers
@@ -188,6 +190,26 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // The slots the server list announces: so many per category of server, the client's
+            // «Clásico (5/5)». The client opens the creation screen all the same, so the count
+            // is kept here.
+            int held = SlotsTaken(DatabaseManager.GetServers(),
+                                  DatabaseManager.GetCharactersByAccountId(accountId), serverId);
+            if (held >= ConnectionService.MaxCharactersPerServer)
+            {
+                Console.WriteLine($"[Characters] Account {accountId} already has {held} characters in that " +
+                                  "category of server; no more are made.");
+                await RefuseAsync(stream, TooManyCharacters);
+                return;
+            }
+
+            if (!CharacterNames.IsValid(name))
+            {
+                Console.WriteLine($"[Characters] \"{name}\" breaks the naming rule.");
+                await RefuseAsync(stream, InvalidName);
+                return;
+            }
+
             if (DatabaseManager.CharacterNameTaken(name))
             {
                 Console.WriteLine($"[Characters] The name \"{name}\" is already taken.");
@@ -230,9 +252,29 @@ namespace Jondo.Unity.Server.Handlers
                               $"adventurer's set and with {ServerSettings.Current.StartingKamas} kamas.");
         }
 
-        /// <summary>The reasons the kvb carries when it says no. 3 is the limit one.</summary>
+        /// <summary>
+        /// The reasons the kvb carries in f2 when it says no, as the client reads them (edr.wqk):
+        /// 1 «noReason», 2 «invalidName», 3 «tooManyCharacters», 4 «notSubscriber». A name taken
+        /// has no text of its own and goes as an invalid one.
+        /// </summary>
         private const int CreationRefused = 1;
-        private const int NameAlreadyTaken = 2;
+        private const int InvalidName = 2;
+        private const int NameAlreadyTaken = InvalidName;
+        private const int TooManyCharacters = 3;
+
+        /// <summary>
+        /// How many of the account's characters live on servers of the same category as
+        /// <paramref name="serverId"/>: the slots are counted per category, not per server.
+        /// </summary>
+        public static int SlotsTaken(IEnumerable<DatabaseManager.DbServer> servers,
+                                     IEnumerable<DatabaseManager.DbCharacter> characters, int serverId)
+        {
+            var known = servers.ToList();
+            int category = known.FirstOrDefault(s => s.Id == serverId)?.Type ?? 1;
+            var sameCategory = known.Where(s => s.Type == category).Select(s => s.Id).ToHashSet();
+            sameCategory.Add(serverId);
+            return characters.Count(c => sameCategory.Contains(c.ServerId));
+        }
 
         private static async Task RefuseAsync(NetworkStream stream, int reason)
         {

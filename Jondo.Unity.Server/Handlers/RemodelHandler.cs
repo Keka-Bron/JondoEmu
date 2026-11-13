@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
@@ -34,8 +33,6 @@ namespace Jondo.Unity.Server.Handlers
         private const int Popup = 4;
         private const int NameNextTime = 41, SexNextTime = 44, ChangeAlreadyWaiting = 43, NameNotAvailable = 40;
 
-        /// <summary>Rule 1 of the client's NamingRules, the one CharacterCreationHandler suggests names by.</summary>
-        private static readonly Regex NameRule = new(@"^[A-Z][a-z]+(\-[a-zA-Z][a-z]*){0,2}$");
 
         private static Task SendAsync(NetworkStream stream, string op, byte[] body)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(op, body));
@@ -80,7 +77,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var state = SessionContext.State;
             if (CharacterRemodel.PendingOf(state.CharacterId) != CharacterRemodel.Change.Name) return;
-            if (!NameRule.IsMatch(name) || !DatabaseManager.RenameCharacter(state.CharacterId, name))
+            if (!CharacterNames.IsValid(name) || !DatabaseManager.RenameCharacter(state.CharacterId, name))
             {
                 await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(Popup, NameNotAvailable));
                 Console.WriteLine($"[Remodel] {state.CharacterName} cannot be called «{name}».");

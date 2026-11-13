@@ -3068,19 +3068,24 @@ namespace Jondo.Unity.Server
                 using var transaction = connection.BeginTransaction();
 
                 // The scrolls go in THEIR columns and the base starts at zero: the base is the points
-                // the player spends, and a freshly made character has spent none.
+                // the player spends, and a freshly made character has spent none. What it has to
+                // spend is the capital of its level, and its experience the level's floor: nothing
+                // at level 1, and for one made at a higher level (the test harness's) what reaching
+                // it would have given, so its characteristics window is not left with no points.
                 var insertar = connection.CreateCommand();
                 insertar.CommandText = @"
                     INSERT INTO Characters
-                        (Id, AccountId, Name, Breed, Sex, Level, MapId, CellId, RemainingPoints,
+                        (Id, AccountId, Name, Breed, Sex, Level, Experience, MapId, CellId, RemainingPoints,
                          Vitality, Wisdom, Strength, Intelligence, Chance, Agility,
                          ScrolledVitality, ScrolledWisdom, ScrolledStrength,
                          ScrolledIntelligence, ScrolledChance, ScrolledAgility,
                          Look, Orientation, Kamas, LastConnection)
-                    VALUES ($id, $acc, $name, $breed, $sex, $level, $map, $cell, 0,
+                    VALUES ($id, $acc, $name, $breed, $sex, $level, $xp, $map, $cell, $points,
                             0, 0, 0, 0, 0, 0,
                             $stat, $stat, $stat, $stat, $stat, $stat,
                             $look, 1, $kamas, $now);";
+                insertar.Parameters.AddWithValue("$xp", ExperienceTable.IsLoaded ? ExperienceTable.LevelFloor(level) : 0L);
+                insertar.Parameters.AddWithValue("$points", Handlers.StatsHandler.TotalCapitalForLevel(level));
                 insertar.Parameters.AddWithValue("$id", id);
                 insertar.Parameters.AddWithValue("$acc", accountId);
                 insertar.Parameters.AddWithValue("$name", name);
