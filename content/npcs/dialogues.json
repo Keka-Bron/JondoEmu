@@ -17024,7 +17024,9 @@
       "lines": [
         {
           "message": 626,
-          "choices": []
+          "choices": [
+            { "reply": 29921, "next": 24939, "quest": 1778, "afterObjective": 11439, "beforeObjective": 11440 }
+          ]
         },
         {
           "message": 3954,
@@ -17033,9 +17035,33 @@
         {
           "message": 4027,
           "choices": []
+        },
+        {
+          "message": 24939,
+          "choices": [
+            { "reply": 29922, "next": 24940 }
+          ]
+        },
+        {
+          "message": 24940,
+          "choices": [
+            { "reply": 29923, "next": 24941 }
+          ]
+        },
+        {
+          "message": 24941,
+          "choices": [
+            { "reply": 29924, "next": 24966 }
+          ]
+        },
+        {
+          "message": 24966,
+          "choices": [
+            { "reply": 29949, "quest": 1778, "completes": 11440, "params": [[30, 11440]], "gives": 18216 }
+          ]
         }
       ],
-      "why": "Kande Boffler before the little temple [4,12] (626); «Usuwpation d'identité»: sent by Uba Teseo, give him my greetings and this scroll (3954). «Qui veut la peau du Wabbit ?»: the formula not complete? he told all he knows (4027)."
+      "why": "Kande Boffler before the little temple [4,12] (626); «Usuwpation d'identité»: sent by Uba Teseo, give him my greetings and this scroll (3954). «Qui veut la peau du Wabbit ?»: the formula not complete? he told all he knows (4027). «Frankenstruche» (1778): «Preguntar por la pócima de resurrección», Vid's failing memory (24939), «¿Hay alguna otra forma de encontrar la receta?», a memory potion (24940), «¿Cómo puedo conseguir esa pócima?», he gives it (24941), «Gracias», no taking liberties (24966), «Asentir con la cabeza e irte» closes 11440 and hands over the potion (18216)."
     },
     {
       "npc": 170,
@@ -17105,19 +17131,47 @@
       "map": 0,
       "opening": 630,
       "openings": [
+        { "quest": 1778, "objective": 11441, "pending": 11446, "criterion": "PO!18215", "message": 24943 },
         { "quest": 225, "step": 416, "message": 4029 }
       ],
       "lines": [
         {
           "message": 630,
-          "choices": []
+          "choices": [
+            { "reply": 29920, "next": 24937, "quest": 1778, "afterObjective": 11448, "beforeObjective": 11439 },
+            { "reply": 29926, "quest": 1778, "completes": 11441, "params": [[30, 11441]], "next": 24942, "afterObjective": 11440 }
+          ]
         },
         {
           "message": 4029,
           "choices": []
+        },
+        {
+          "message": 24937,
+          "choices": [
+            { "reply": 29919, "next": 24938 }
+          ]
+        },
+        {
+          "message": 24938,
+          "choices": [
+            { "reply": 29918, "quest": 1778, "completes": 11439, "params": [[30, 11439]] }
+          ]
+        },
+        {
+          "message": 24942,
+          "choices": [
+            { "reply": 29927, "next": 24943 }
+          ]
+        },
+        {
+          "message": 24943,
+          "choices": [
+            { "reply": 29928, "gives": 18215, "quest": 1778, "afterObjective": 11441, "beforeObjective": 11446, "criterion": "PO!18215" }
+          ]
         }
       ],
-      "why": "Vid Cheber, alchemist among the prodigious bones [11,16] (630). «Qui veut la peau du Wabbit ?» of Dofus pour les noobs: the wabbit formula, wabbit teeth are missing, the only specialist (4029: 916)."
+      "why": "Vid Cheber, alchemist among the prodigious bones [11,16] (630). «Qui veut la peau du Wabbit ?» of Dofus pour les noobs: the wabbit formula, wabbit teeth are missing, the only specialist (4029: 916). «Frankenstruche» (1778): «Reclamar una pócima de resurrección» (24937), «Impacientarse», he cannot remember the formula and sends to his colleague of Amakna (24938), «Gracias. Hasta luego.» (11439). With Kande's potion, «Aquí tienes la pócima recordatoria» (11441): he remembers everything (24942), «No atreverte a pedirle que te dé más detalles», the resurrection potion (24943), «Agarrar la pócima y marcharte» gives it (18215). Whoever left before taking it finds him at 24943 again."
     },
     {
       "npc": 906,
@@ -33389,6 +33443,77 @@
         }
       ],
       "why": "Maelstrooll in his camp [-12,-56] (Dofus pour les noobs, with screenshots): «Bouaaaark !» (24919), «Tenter de le convaincre de sa méprise», the predators of the World of Twelve (24920), «Expliquer qu'en laissant la rage les dominer…» (11410), «Euh… tu as tort !» (24921): «Se préparer à combattre» starts the fight, «Appeler des renforts» leaves it for later; back with the reinforcements, «Dejar que hablen los puños y los hechizos» starts it (29891) and «Pedir refuerzos» waits again. Beaten, the Twelvers are worse than them (24946)."
+    },
+    {
+      "npc": 3418,
+      "map": 0,
+      "opening": 24929,
+      "lines": [
+        {
+          "message": 24929,
+          "choices": [
+            { "reply": 29909, "next": 24930, "beforeQuest": 1778 },
+            { "reply": 29914, "quest": 1778, "completes": 11443, "params": [[30, 11443]], "next": 24933 },
+            { "reply": 29917, "quest": 1778, "completes": 11438, "params": [[30, 11438]], "next": 24935, "completesAll": [11447, 11448], "afterObjective": 11443 },
+            { "reply": 29929, "quest": 1778, "completes": 11446, "params": [[30, 11446]], "next": 24944, "afterObjective": 11441 },
+            { "reply": 29951, "next": 24967, "quest": 1778, "afterObjective": 11446, "beforeObjective": 11457 }
+          ]
+        },
+        {
+          "message": 24930,
+          "choices": [
+            { "reply": 29910, "next": 24931 }
+          ]
+        },
+        {
+          "message": 24931,
+          "choices": [
+            { "reply": 29913, "next": 24932 }
+          ]
+        },
+        {
+          "message": 24932,
+          "choices": [
+            { "reply": 29911, "startsQuest": 1778, "params": [[34, 1778]] },
+            { "reply": 29912 }
+          ]
+        },
+        {
+          "message": 24933,
+          "choices": [
+            { "reply": 29915, "next": 24934 }
+          ]
+        },
+        {
+          "message": 24934,
+          "choices": []
+        },
+        {
+          "message": 24935,
+          "choices": [
+            { "reply": 29916, "next": 24936 }
+          ]
+        },
+        {
+          "message": 24936,
+          "choices": [
+            { "reply": 29925 }
+          ]
+        },
+        {
+          "message": 24944,
+          "choices": [
+            { "reply": 29930 }
+          ]
+        },
+        {
+          "message": 24967,
+          "choices": [
+            { "reply": 29950, "quest": 1778, "completes": 11457, "params": [[30, 11457]] }
+          ]
+        }
+      ],
+      "why": "Professor Plumón (Professeur Duvet) by his caravan in the Cania circus [-9,-46], «Frankenstruche» (1778) as the screenshots of Dofus pour les noobs show it. He studies the pestruces (24929): «¿Qué tal va la investigación?» (24930), «Te ofrezco mi ayuda» (24931), «¿Qué alma de pestruz sería ideal?» (24932), «Acepto» starts the quest. «Toma: el alma de Thor Pestruz» hands over the soul (11443) -- offered only with it in a full stone --, «¿Qué recursos hacen falta?» (24933), he writes them down (24934). «Darle los recursos de pestruz» hands over the five tongues, ten feathers and ten thighs at once (11438, 11447, 11448): the body does not wake (24935), «Encogerte de hombros», Vid Cheber's resurrection potion (24936), «Ahora mismo voy». «Entregar la pócima de resurrección» (11446): nothing at all (24944), «Dar un paso atrás». Talked to again, «Impresionarte por el resultado obtenido»: a tiny Thor Pestruz (24967), «Levantar la vista y marcharte» (11457)."
     }
   ]
 }

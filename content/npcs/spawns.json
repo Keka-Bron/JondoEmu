@@ -4052,6 +4052,19 @@
       "orientation": 1,
       "criterion": "Qa=1776|Qf=1776",
       "why": "Maelstrooll by his camp fire [-12,-56] (11410's map), during «Jeu de Trooll» and after it. The cell is the one the deduced placement had."
+    },
+    {
+      "map": 88082187,
+      "npc": 167,
+      "cell": 246,
+      "remove": true
+    },
+    {
+      "map": 88082187,
+      "npc": 167,
+      "cell": 381,
+      "orientation": 1,
+      "why": "Kande Boffler before the little temple of the Amakna forest [4,12]: «Este pequeño templo es verdaderamente magnífico» (626). The screenshots of Dofus pour les noobs («Frankenstruche») show him on the grass at the front of the temple, on its orange-bannered side; the guessed cell 246 put him inside the building."
     }
   ]
 }
