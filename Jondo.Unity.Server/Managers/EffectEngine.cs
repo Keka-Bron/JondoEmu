@@ -2095,7 +2095,13 @@ namespace Jondo.Unity.Server.Managers
         private const int PuntosDeMovimiento = 23;
 
         /// <summary>How many chained spells are allowed before suspecting a loop.</summary>
-        private const int HondoMaximo = 6;
+        /// <remarks>
+        /// Eight: the Turbine's evolution to III is the sixth link (13874, 30136-1, 30136-3,
+        /// 13852-3, 13852-4, 13852-1), and its sending the other turret at III back to II
+        /// (13851-4, 13851-1, and its 792 13852-2) the next three. Cut at six, two turrets stood at
+        /// Evolución III, which the game never allows.
+        /// </remarks>
+        private const int HondoMaximo = 8;
 
         /// <summary>The "right now" trigger.</summary>
         public const string AlLanzar = "I";
