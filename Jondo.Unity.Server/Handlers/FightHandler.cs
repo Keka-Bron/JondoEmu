@@ -1606,6 +1606,10 @@ namespace Jondo.Unity.Server.Handlers
         internal static (List<int> Attackers, List<int> Defenders) NextPlacement(long mapId, long arenaMapId)
         {
             if (Managers.Dreams.IsDreamMap(mapId)) return Drawn(mapId, arenaMapId, null);
+            // A dungeon room's fight is placed on its board's own cells, the same every time, as
+            // the game does: the ones the client marks in the board's cellsData[] (DungeonPlacements).
+            if (Managers.DungeonManager.IsRoom(mapId) && Managers.DungeonPlacements.Of(mapId, arenaMapId) is { } official)
+                return (official.Blue, official.Red);
             return _nextPlacement.GetOrAdd(arenaMapId, arena => Drawn(mapId, arena, Random.Shared));
         }
 
