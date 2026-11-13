@@ -1007,6 +1007,10 @@
       "why": "«Darle una tunda al blop abandonado»: the same two blops." },
     { "npc": 2287, "map": 128058891, "reply": 20611,
       "monsters": [ { "monster": 3631, "grade": 0 }, { "monster": 3633, "grade": 0 }, { "monster": 3633, "grade": 0 } ],
-      "why": "«Le Chef Krokouto vous attaque alors accompagné de deux Kanigrous Vétéran» (Dofus pour les noobs, «Les monstres aboient, la diligence casse»): Chief Ray Ahieno (3631, 5,400 life) and two kanugro veterans (3633, 2,900 life), level 155." }
+      "why": "«Le Chef Krokouto vous attaque alors accompagné de deux Kanigrous Vétéran» (Dofus pour les noobs, «Les monstres aboient, la diligence casse»): Chief Ray Ahieno (3631, 5,400 life) and two kanugro veterans (3633, 2,900 life), level 155." },
+    { "npc": 2307, "map": 126223135, "reply": 20642, "byLevel": true,
+      "monsters": [ { "monster": 3638, "grade": 2 }, { "monster": 3633, "grade": 2 }, { "monster": 3636, "grade": 2 }, { "monster": 3637, "grade": 2 } ] },
+    { "npc": 2307, "map": 126223135, "reply": 20643, "byLevel": true,
+      "monsters": [ { "monster": 3638, "grade": 2 }, { "monster": 3633, "grade": 2 }, { "monster": 3636, "grade": 2 }, { "monster": 3637, "grade": 2 } ] }
   ]
 }

@@ -34777,6 +34777,90 @@
         }
       ],
       "why": "Pol Borón, Simona's cousin -- Hulos the baker in the French guide --, at the gate of Kanígrula's palace [-5,-54]: punished for refusing to fry boar tripe, a baker and no butcher (17250), «Tu prima me ha enviado para liberarte», convince Kanígrula (17251). Freed (Dofus pour les noobs, «Chachyène de vie»: «Hulos vous attend à la sortie du donjon et vous remercie»): free at last (17252), «Solo cumplía con mi deber de héroe», the other slaves (17253), «Pues lo cierto es que no me asusta la idea», back to Bonta, and a young miaumiena of Croqueta's (17254), «Gracias por el regalo. Buena suerte.» (8243, the Chachyène 15110). Then goodbye, may the Twelve protect you (17255), «Hasta luego», and he goes, back to Bonta."
+    },
+    {
+      "npc": 2303,
+      "map": 0,
+      "opening": 17233,
+      "lines": [
+        {
+          "message": 17233,
+          "choices": [
+            { "reply": 20635, "next": 17234, "criterion": "Qa!1476&Qf!1476&PL>134" },
+            { "reply": 20670 }
+          ]
+        },
+        {
+          "message": 17234,
+          "choices": [
+            { "reply": 20636, "next": 17235 }
+          ]
+        },
+        {
+          "message": 17235,
+          "choices": [
+            { "reply": 20636, "next": 17236 }
+          ]
+        },
+        {
+          "message": 17236,
+          "choices": [
+            { "reply": 20634, "next": 17237 },
+            { "reply": 20633, "next": 17238 },
+            { "reply": 20675 }
+          ]
+        },
+        {
+          "message": 17237,
+          "choices": [
+            { "reply": 20633, "next": 17238 },
+            { "reply": 20675 }
+          ]
+        },
+        {
+          "message": 17238,
+          "choices": [
+            { "reply": 20668, "startsQuest": 1476, "params": [[34, 1476]] }
+          ]
+        }
+      ],
+      "why": "Lalat haggles with a kanig over the price of cattle (17233). For «Allá donde van las bestias» (1476), as Dofus pour les noobs, «Où que les bêtes aillent» has it: her convoy vanished and the kanig will not pay for the missing cattle; offering to look into it («Si quieres, puedo investigar la desaparición») she explains (17234-17236), a bigger share asked (20634) makes her give in (17237), and accepting (20633) brings the step's own line (17238), where «Acepto.» starts the quest. The offer only to whoever can take it (level over 134, the quest's criterion, neither under way nor done); everyone else only hears the haggling."
+    },
+    {
+      "npc": 2307,
+      "map": 0,
+      "opening": 17244,
+      "openings": [
+        { "quest": 1476, "objective": 8256, "pending": 8258, "message": 17258 },
+        { "quest": 1476, "objective": 8258, "message": 17259 }
+      ],
+      "lines": [
+        {
+          "message": 17244,
+          "choices": []
+        },
+        {
+          "message": 17258,
+          "choices": [
+            { "reply": 20642, "quest": 1476, "afterObjective": 8256, "beforeObjective": 8258 },
+            { "reply": 20643, "quest": 1476, "afterObjective": 8256, "beforeObjective": 8258 }
+          ]
+        },
+        {
+          "message": 17259,
+          "choices": [
+            { "reply": 20655, "next": 17260 }
+          ]
+        },
+        {
+          "message": 17260,
+          "choices": [
+            { "reply": 20653, "quest": 1476, "completes": 8259, "params": [[30, 8259]], "afterObjective": 8258 },
+            { "reply": 20654, "next": 17260 }
+          ]
+        }
+      ],
+      "why": "Chitarapar, the highiena eating a scrawny jalató war chief (17244). For 1476 (Dofus pour les noobs, «Où que les bêtes aillent»): followed to [-6,-60], she and three of hers attack: «Grrrr...» (17258), «Defenderse» or «Pedir refuerzos», the same fight (npc_fights). Beaten, she answers «¡Rrrr wuf!» (17259) to questions about the convoy and only grunts (17260) however they are put («Formular las preguntas de otro modo»): she does not speak the player's language, and «Atar a los kanigs antes de ir a buscar un intérprete» ends the quest (8259)."
     }
   ]
 }

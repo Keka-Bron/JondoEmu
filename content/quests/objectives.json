@@ -4286,6 +4286,37 @@
    "requires": [{"item": 15115, "count": 1}],
    "spends": true,
    "why": "«Encuentra al jefe de los kanugros»: [-9,-49], where the scared kanugro stops following."
+  },
+  {
+   "objective": 8252,
+   "quest": 1476,
+   "elements": [{"map": 128057857, "element": 509027}],
+   "why": "«Inspecciona el lugar» at the end of the convoy's trail [-7,-59]: the hidden cave at the top of the map (element 509027, cell 151), which Dofus pour les noobs, «Où que les bêtes aillent» says to go into. Its first press inspects it, the next one goes in (the passage to 126619648)."
+  },
+  {
+   "objective": 8253,
+   "quest": 1476,
+   "elements": [{"map": 126619648, "element": 484865}, {"map": 126619648, "element": 484866}],
+   "spawns": {"monster": 3632, "count": 1, "attacks": true},
+   "why": "«Inspecciona el lugar» in the hidden cave: one of the convoy's wagons (elements 484865 and 484866, cells 370 and 496), «Trouvez des indices en cliquant sur l'une des charrettes» (Dofus pour les noobs, «Où que les bêtes aillent»); a surprised Tigredón (3632) attacks at once, the fight of 8254."
+  },
+  {
+   "objective": 8258,
+   "quest": 1476,
+   "kind": "beat",
+   "monster": 3638,
+   "map": 126223135,
+   "why": "«Vence a los kanigs»: Chitarapar (3638) and her three -- the veteran Kanugro (3633), the sated Kanublé (3636) and the sated Huerfelino (3637), the chain's only quest kanigs no other quest uses, «accompagnée de 3 acolytes» (Dofus pour les noobs, «Où que les bêtes aillent»)."
+  },
+  {
+   "objective": 8254,
+   "quest": 1476,
+   "kind": "beat",
+   "monster": 3632,
+   "map": 126619648,
+   "elements": [{"map": 126619648, "element": 484865}, {"map": 126619648, "element": 484866}],
+   "spawns": {"monster": 3632, "count": 1, "attacks": true},
+   "why": "«Vence a Tigredón sorprendido», for whoever lost the first fight: once the wagon has been inspected (8253), pressing one again brings the Tigredón out again, attacking."
   }
  ]
 }
