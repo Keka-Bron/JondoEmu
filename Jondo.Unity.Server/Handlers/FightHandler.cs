@@ -1423,6 +1423,31 @@ namespace Jondo.Unity.Server.Handlers
             return loQueYaTiene + quien.Buffs.De(caracteristica, ronda);
         }
 
+        /// <summary>
+        /// The target's percentage resistance to an element as the blow reads it: what he carries,
+        /// plus the rows on him of that element's resistance (33 to 37) and of every element's (101).
+        /// The blow read only what he carries: the Giant Kralamoure's Vulnérabilité de la Tourbière,
+        /// «-900 % resistencia» on 101, was put on him and changed nothing, and he took one point a
+        /// blow at 900 % for the whole fight.
+        /// </summary>
+        internal static int ResistenciaDeLaVictima(Fighter target, Jondo.Unity.World.Fights.ElementType element, int round)
+        {
+            int ofTheElement = element switch
+            {
+                Jondo.Unity.World.Fights.ElementType.Earth => 33,
+                Jondo.Unity.World.Fights.ElementType.Fire => 34,
+                Jondo.Unity.World.Fights.ElementType.Water => 35,
+                Jondo.Unity.World.Fights.ElementType.Air => 36,
+                _ => 37,
+            };
+            return target.GetResPctForElement(element)
+                   + target.Buffs.De(ofTheElement, round)
+                   + target.Buffs.De(EveryElementResistance, round);
+        }
+
+        /// <summary>Characteristic 101, «% resistencia» on every element (effects 1076 and 1077).</summary>
+        private const int EveryElementResistance = 101;
+
         /// <summary>The characteristic that feeds each element in the damage formula.</summary>
         private static int CaracteristicaDelElemento(Jondo.Unity.World.Fights.ElementType elemento)
             => elemento switch
@@ -9564,7 +9589,7 @@ namespace Jondo.Unity.Server.Handlers
                 power: deSuVida ? 0 : potencia,
                 flatElementDamage: deSuVida ? 0 : fuente.GetFlatDamageForElement(element),
                 flatDamage: deSuVida ? 0 : flat,
-                targetResPct: target.GetResPctForElement(element),
+                targetResPct: ResistenciaDeLaVictima(target, element, fight.RoundNumber),
                 targetFlatRes: 0);
 
             // The bestial form puts +20 on characteristic 107, whose base is 100.
