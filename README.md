@@ -693,15 +693,15 @@ played through.
 | Wabbit Islands | `██████████` **100%** | 23/23 |
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Krosmoz | `██████████` **100%** | 18/18 |
+| Cania | `███████░░░` **65%** | 17/26 |
 | Otomai Island | `██████████` **100%** | 14/14 |
-| Cania | `█████░░░░░` **50%** | 13/26 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| **All quests** | **15.5%** | **307/1976** |
+| **All quests** | **15.7%** | **311/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
