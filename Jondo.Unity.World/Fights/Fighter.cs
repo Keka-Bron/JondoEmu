@@ -764,6 +764,11 @@ namespace Jondo.Unity.World.Fights
             return pierde;
         }
 
+        /// <summary>
+        /// The characteristic an element's damage grows with. Neutral goes with strength, as earth
+        /// does: the 3.6 client reads characteristic 10 for both (gvq.bmcb). It took the highest of
+        /// the four, and a punch with 1,283 chance and 105 strength hit 80 to 94 for its 6-7.
+        /// </summary>
         public int GetStatForElement(ElementType element)
         {
             return element switch
@@ -772,7 +777,7 @@ namespace Jondo.Unity.World.Fights
                 ElementType.Fire => Intelligence,
                 ElementType.Water => Chance,
                 ElementType.Air => Agility,
-                ElementType.Neutral => Math.Max(Strength, Math.Max(Intelligence, Math.Max(Chance, Agility))),
+                ElementType.Neutral => Strength,
                 _ => 0
             };
         }

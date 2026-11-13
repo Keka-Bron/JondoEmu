@@ -9151,10 +9151,15 @@ namespace Jondo.Unity.Server.Handlers
             //
             // Now the engine is asked which blows this spell deals on this target. If it deals
             // none, nobody is touched here.
+            // Bare-handed, the hit is the punch's own level (spell 0, 6-7 neutral), the one the
+            // client previews: with no weapon to read, the punch dealt nothing.
             var golpes = spell != 0
                 ? Managers.EffectEngine.Golpes(fight, caster, spell, grade, target, celdaApuntada, critico, tirada,
                                                disparador, soloAlObjetivo)
-                : GolpeDelArma(fight, caster, target, celdaApuntada, critico);
+                : ArmaDe(caster) != null
+                    ? GolpeDelArma(fight, caster, target, celdaApuntada, critico)
+                    : Managers.EffectEngine.Golpes(fight, caster, 0, PunchGrade, target, celdaApuntada, critico,
+                                                   null, disparador, soloAlObjetivo);
             if (golpes.Count == 0) return;
 
             // The die is rolled ONCE per effect, not once per target: if a "25 to 30" spell rolls a
@@ -9212,6 +9217,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         private static readonly Random _dado = new Random();
+
+        /// <summary>The punch's one grade in SpellLevels (spell 0, level 10461).</summary>
+        private const int PunchGrade = 1;
 
         /// <summary>
         /// The template of the weapon worn, or zero if bare-handed.

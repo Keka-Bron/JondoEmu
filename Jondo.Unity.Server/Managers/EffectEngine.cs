@@ -410,7 +410,11 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public enum ModoDeDano { Normal, VidaDelLanzador, Fijo, VidaDelObjetivo, DanoSufrido, PorPuntos }
 
-        private static readonly HashSet<int> Fijos = new HashSet<int> { 1063, 1064, 1065, 1066 };
+        /// <summary>
+        /// "#1 a #2 daños Tierra/Aire/Agua/Fuego (fijo)", 1063 to 1066, and the neutral one, 144: the
+        /// admins' Pichenette (30092) hits with it, 1 a time, and did nothing without it.
+        /// </summary>
+        private static readonly HashSet<int> Fijos = new HashSet<int> { 144, 1063, 1064, 1065, 1066 };
         private static readonly HashSet<int> PorLaVidaDelObjetivo = new HashSet<int> { 1067, 1068, 1069, 1070, 1071 };
         private static readonly HashSet<int> PorElDanoSufrido = new HashSet<int> { 1123, 1124, 1125, 1126, 1127, 1128 };
 
