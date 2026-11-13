@@ -33,7 +33,8 @@ namespace Jondo.Unity.Tests.Economy
             Session = codec == null ? new GameSession(ToClient) : new GameSession(ToClient, codec);
         }
 
-        public static async Task<ClientPipe> OpenAsync(long accountId, long characterId, long mapId, string name = "", IGameCodec? codec = null)
+        public static async Task<ClientPipe> OpenAsync(long accountId, long characterId, long mapId, string name = "", IGameCodec? codec = null,
+                                                       bool enterWorld = true)
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
             listener.Start();
@@ -46,7 +47,7 @@ namespace Jondo.Unity.Tests.Economy
             pipe.Session.State.CharacterId = characterId;
             pipe.Session.State.CharacterName = name;
             pipe.Session.State.MapId = mapId;
-            pipe.Session.EnterWorld();
+            if (enterWorld) pipe.Session.EnterWorld();
             Assert.True(SessionRegistry.Register(pipe.Session));
             return pipe;
         }

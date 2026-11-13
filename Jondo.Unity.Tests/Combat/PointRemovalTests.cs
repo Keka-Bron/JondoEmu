@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
@@ -32,6 +33,36 @@ namespace Jondo.Unity.Tests.Combat
         {
             var queue = new Queue<double>(draws);
             EffectEngine.DadoDeRetirada = () => queue.Count > 0 ? queue.Dequeue() : 0.999;
+        }
+
+        [Fact]
+        public async Task Removal_dice_overrides_are_isolated_between_parallel_fights()
+        {
+            var caster = Person(10, 0, 300, wisdom: 100);
+            var target = Person(20, 1, 400, wisdom: 100);
+            var firstReady = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var secondReady = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            Dice(0.49, 0.51);
+
+            var landed = Task.Run(async () =>
+            {
+                EffectEngine.DadoDeRetirada = () => 0;
+                firstReady.SetResult();
+                await secondReady.Task;
+                return Roll();
+            });
+            var dodged = Task.Run(async () =>
+            {
+                await firstReady.Task;
+                EffectEngine.DadoDeRetirada = () => 0.999;
+                secondReady.SetResult();
+                return Roll();
+            });
+
+            Assert.Equal(new[] { 2, 0 }, await Task.WhenAll(landed, dodged).WaitAsync(System.TimeSpan.FromSeconds(5)));
+            Assert.Equal(1, Roll()); // Neither child may replace or consume the parent's sequence.
+
+            int Roll() => EffectEngine.PuntosQuePierde(caster, target, 1, pedidos: 2, cuentan: 7, maximo: 7, ronda: 1);
         }
 
         /// <summary>

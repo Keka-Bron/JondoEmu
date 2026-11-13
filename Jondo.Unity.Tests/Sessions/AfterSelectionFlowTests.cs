@@ -74,8 +74,9 @@ public sealed class AfterSelectionFlowTests
                 Assert.True(DatabaseManager.InsertCharacterItem(DatabaseManager.NextItemUid(), character, template, quantity, position, null));
             var ownCodec = new CountingCodec();
             var otherCodec = new CountingCodec();
-            await using var own = await ClientPipe.OpenAsync(account, character, 191105026, codec: ownCodec);
-            await using var other = await ClientPipe.OpenAsync(otherAccount, otherCharacter, 191105026, codec: otherCodec);
+            // Initial selection precedes world entry, so neither socket receives world broadcasts.
+            await using var own = await ClientPipe.OpenAsync(account, character, 191105026, codec: ownCodec, enterWorld: false);
+            await using var other = await ClientPipe.OpenAsync(otherAccount, otherCharacter, 191105026, codec: otherCodec, enterWorld: false);
             using (SessionContext.Push(own.Session)) Equipment.LoadFrom(character);
             own.Session.State.Kamas = 123;
             own.Session.State.StatStrength = 17;

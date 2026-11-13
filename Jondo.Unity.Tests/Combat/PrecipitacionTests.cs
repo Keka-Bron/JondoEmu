@@ -17,7 +17,8 @@ namespace Jondo.Unity.Tests.Combat
     /// </summary>
     public class PrecipitacionTests
     {
-        private const long Iop = 54000000121, Ally = 54000000122, Foe = 54000000123;
+        // These characters and their fight must not share LineOfSightCastTests' registry keys.
+        private const long Iop = 54_000_009_121, Ally = 54_000_009_122, Foe = 54_000_009_123;
         private const int Precipitacion = 13114, Debilitado = 42;
         private readonly ITestOutputHelper _out;
         public PrecipitacionTests(ITestOutputHelper output) => _out = output;
@@ -26,7 +27,7 @@ namespace Jondo.Unity.Tests.Combat
         {
             var active = (System.Collections.Concurrent.ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
                 .GetField("_activeFights", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!.GetValue(null)!;
-            active[fight.FightId] = fight;
+            Assert.True(active.TryAdd(fight.FightId, fight));
             try
             {
                 using (SessionContext.Push(mine.Session))
@@ -75,7 +76,7 @@ namespace Jondo.Unity.Tests.Combat
             // The turns pass as the server passes them, with what each start fires.
             var active = (System.Collections.Concurrent.ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
                 .GetField("_activeFights", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!.GetValue(null)!;
-            active[fight.FightId] = fight;
+            Assert.True(active.TryAdd(fight.FightId, fight));
             try
             {
                 async Task ToHisTurn()
@@ -98,7 +99,11 @@ namespace Jondo.Unity.Tests.Combat
                 _out.WriteLine($"his next turn in round {fight.RoundNumber}: AP {ally.CurrentAP}, state 42 {ally.Buffs.TieneEstado(Debilitado)}");
                 Assert.Equal(7 - 3, ally.CurrentAP);
             }
-            finally { active.TryRemove(fight.FightId, out _); }
+            finally
+            {
+                active.TryRemove(fight.FightId, out _);
+                fight.CancelTurnTimer();
+            }
         }
     }
 }

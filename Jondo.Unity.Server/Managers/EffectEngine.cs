@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Jondo.Unity.World.Fights;
 
 namespace Jondo.Unity.Server.Managers
@@ -5907,12 +5908,19 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// The dice behind AP and MP removal, one draw in [0, 1) per point. Tests set it to
-        /// decide the outcome; the fight uses the engine's own random source.
+        /// decide the outcome within their execution flow; concurrent fights must not consume
+        /// that sequence. Without an override the fight uses the engine's own random source.
         /// </summary>
-        internal static Func<double> DadoDeRetirada { get; set; } = SiguienteAzar;
+        private static readonly AsyncLocal<Func<double>?> _removalDie = new();
+
+        internal static Func<double> DadoDeRetirada
+        {
+            get => _removalDie.Value ?? SiguienteAzar;
+            set => _removalDie.Value = value;
+        }
 
         /// <summary>The fight's own dice again, for a test that borrowed them.</summary>
-        internal static void DadoDeRetiradaPorDefecto() => DadoDeRetirada = SiguienteAzar;
+        internal static void DadoDeRetiradaPorDefecto() => _removalDie.Value = null;
 
         /// <summary>
         /// The removal effects that a target can DODGE: "retira PA/PM" (1079, 1080, 101, 127)

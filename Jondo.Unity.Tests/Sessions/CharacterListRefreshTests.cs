@@ -16,7 +16,7 @@ public sealed class CharacterListRefreshTests
         const long account = 8_919_099_001;
         var codec = new RecordingCodec();
         await using var pipe = await ClientPipe.OpenAsync(account, account + 100_000,
-            CharacterCreationHandler.StartingMap, codec: codec);
+            CharacterCreationHandler.StartingMap, codec: codec, enterWorld: false);
         pipe.Session.BindAccount(account, 290);
         var unrelated = GameSession.SinSocket();
         unrelated.BindAccount(account + 1, 291);
@@ -25,7 +25,7 @@ public sealed class CharacterListRefreshTests
         int delivered = 0;
         try
         {
-            old = DatabaseManager.CreateCharacter(account, 290, "Old-" + Guid.NewGuid().ToString("N"),
+            old = DatabaseManager.CreateCharacter(account, 290, Name("Old"),
                 1, 0, 0, [], CharacterCreationHandler.StartingMap, 1, 0, 0, []);
             Assert.True(old > 0);
             using (var connection = new SqliteConnection(DatabaseManager.WorldConnectionString))
@@ -37,10 +37,10 @@ public sealed class CharacterListRefreshTests
                 played.ExecuteNonQuery();
             }
 
-            string name = "New-" + Guid.NewGuid().ToString("N");
+            string name = Name("New");
             await CharacterCreationHandler.CreateAsync(pipe.Session, CharacterManagementRequestFixtures.Create(name));
-            fresh = DatabaseManager.GetCharactersByAccountId(account, 290).Single(character => character.Name == name).Id;
             Assert.Equal(CharacterManagementRequestFixtures.CreationAccepted, await ReadPacket());
+            fresh = DatabaseManager.GetCharactersByAccountId(account, 290).Single(character => character.Name == name).Id;
             await ReadRefresh(fresh, old);
             Assert.Same(unrelated, SessionContext.Actual);
 
@@ -86,6 +86,11 @@ public sealed class CharacterListRefreshTests
             return packet;
         }
     }
+
+    // Keep unique fixture names within the client's letter-only, 20-character rule.
+    private static string Name(string prefix)
+        => prefix + "-" + string.Concat(Guid.NewGuid().ToString("N")[..11]
+            .Select(digit => (char)('a' + Convert.ToInt32(digit.ToString(), 16))));
 
     private sealed class RecordingCodec : IGameCodec
     {
