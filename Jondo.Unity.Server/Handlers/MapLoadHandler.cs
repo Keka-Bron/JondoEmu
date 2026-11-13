@@ -174,6 +174,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var other in SessionRegistry.OnMap(mapId))
             {
                 if (other.CharacterId <= 0 || other.CharacterId == GameState.CharacterId) continue;
+                if (!SessionRegistry.StandsOnTheMap(other)) continue;
                 var otherCharacter = DatabaseManager.GetCharacterById(other.CharacterId);
                 if (otherCharacter == null) continue;
                 jpvMsg.Fields.Add(new ProtoField

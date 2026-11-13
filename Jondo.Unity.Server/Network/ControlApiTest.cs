@@ -220,6 +220,10 @@ namespace Jondo.Unity.Server.Network
             {
                 character = s.CharacterId, name = s.CharacterName, breed = s.Breed, level = s.CharacterLevel,
                 map = s.MapId, cell = s.CellId, inFight = s.IsInFight, fightId = s.FightId, kamas = s.Kamas,
+                spectating = s.SpectatingFightId, standsOnTheMap = SessionRegistry.StandsOnTheMap(session),
+                sessions = SessionRegistry.All().Count(x => x.CharacterId == s.CharacterId),
+                othersOnTheMap = SessionRegistry.OnMap(s.MapId).Where(x => x.CharacterId != s.CharacterId)
+                    .Select(x => new { x.CharacterId, stands = SessionRegistry.StandsOnTheMap(x) }).ToArray(),
             });
         }
 
@@ -514,6 +518,14 @@ namespace Jondo.Unity.Server.Network
                         // An item put on or taken off, as dragging it to its slot sends: a quest's cannon
                         // that asks for a helmet and wings worn.
                         else if (op == Op.Iuk) await EquipmentHandler.MoveAsync(stream, frame);
+                        // The characteristics window's confirm, its paid totals per characteristic:
+                        // points spent while placing for a fight, which the fight has to start with.
+                        else if (op == Op.Kum) await CharacteristicsHandler.SpendAsync(stream, frame);
+                        // And its reset, which gives them all back.
+                        else if (op == "kuh") await CharacteristicsHandler.ResetAsync(stream);
+                        // Kamas laid in a trade, as typing them in the exchange window sends: the
+                        // keyboard does not reach a harness client in the background.
+                        else if (op == Op.Kee) await TradeHandler.KamasAsync(stream, frame);
                         // Off a border, as the client asks once it walks onto the edge: its guess at the
                         // map beside, from the cell it stands on. Synthetic clicks on an edge do not
                         // make the client send it.

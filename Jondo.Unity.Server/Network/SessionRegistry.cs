@@ -208,6 +208,15 @@ namespace Jondo.Unity.Server.Network
         /// bag, himself. Nobody visits another's here. Without it two players in two bags of one
         /// theme saw each other, the second to come in seeing the first.
         /// </remarks>
+        /// <summary>
+        /// Whether a session on the map is drawn on it: not when it is fighting or watching a
+        /// fight. Who was there when the fight opened saw him go with a kmu and sees him come back
+        /// with the jsn of FightHandler.BackOnTheMapAsync; who arrives in between must not find
+        /// him standing on his fight cell.
+        /// </summary>
+        public static bool StandsOnTheMap(GameSession session)
+            => session.State.FightId == 0 && !session.State.IsInFight && session.State.SpectatingFightId == 0;
+
         public static IReadOnlyList<GameSession> OnMap(long mapId)
         {
             var here = _sessions.Values.Where(s => s.IsInWorld && s.MapId == mapId);
