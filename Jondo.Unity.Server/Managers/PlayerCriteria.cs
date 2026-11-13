@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Content;
 using Jondo.Unity.World.Quests;
@@ -26,11 +28,12 @@ namespace Jondo.Unity.Server.Managers
     /// In a drop, Qo asks about the objectives still to do in the quests' current steps: «Qo=14179»
     /// is «kill ten larvae» pending, and «Qo&gt;4096&amp;Qo&lt;4098» is objective 4097 among those pending
     /// -- step 1237's objectives run 4074 to 4103. INFERRED, as the order of an objective's ids.
-    /// Mt and Ms are about the monster that drops (see Resolve); Sc, the yearly events and content
-    /// switches, only where its meaning is known (SeasonalEvents.IsKnown). The character's other
+    /// Mt is about the fight's originating map and Ms about fight context (see Resolve); Sc is
+    /// intentionally treated as met in player drops while its odd, currently unexplained disabled
+    /// behavior is unresolved. The character's other
     /// letters -- the server's type and season, the date, the days an item has been held -- are
     /// asked of the achievement engine (ByCharacter). What nobody answers -- Sv, OO, Ot… the
-    /// server's own letters, and the Sc only the loot carries -- leaves
+    /// server's own letters -- leaves
     /// the row Unknown, and an Unknown row does not drop: «never dropping them is preferable to
     /// always dropping them» still holds for them.
     /// </para>
@@ -50,13 +53,26 @@ namespace Jondo.Unity.Server.Managers
             => Criterion.Met(criterion, ResolverFor(mapId, held, monsterId));
 
         /// <summary>The resolver itself, for whoever is in session.</summary>
-        /// <remarks><paramref name="monsterId"/>: the monster whose loot is judged, for Mt and Ms.</remarks>
-        public static Criterion.Resolver ResolverFor(long mapId, Func<int, int>? held = null, int monsterId = 0)
+        /// <remarks>
+        /// <paramref name="monsterId"/>: the monster whose loot is judged, for monster-specific criteria.
+        /// <paramref name="playerAlive"/>: the player's actual post-fight outcome, for Ga.
+        /// <paramref name="soulStoneFight"/>: whether the fight came from a soul stone, for Ms.
+        /// </remarks>
+        public static Criterion.Resolver ResolverFor(long mapId, Func<int, int>? held = null, int monsterId = 0,
+                                                     bool? playerAlive = null, bool? soulStoneFight = null)
         {
             var state = SessionContext.State;
             held ??= Equipment.HowMany;
             var facts = new Facts(state, Quests.Log, Quests.Book, mapId, held, state.JobLevel, HuntingWeaponInHand,
-                                  Equipment.HowManyWorn, monsterId);
+                                  Equipment.HowManyWorn, monsterId, playerAlive, soulStoneFight,
+                                  titleId => Titles.Knows(state.CharacterId, titleId),
+                                  slot => Equipment.InSlot(slot) is { Quantity: > 0 },
+                                  () => Equipment.Worn == 0,
+                                  MobSpawnManager.IsMonsterAliveInSubarea,
+                                  () => SessionContext.Actual is { IsAuthenticated: true } session
+                                      && DatabaseManager.TryGetAccountRole(session.AccountId, out int role)
+                                          ? role >= Jondo.Unity.Launcher.Roles.Administrador
+                                          : null);
             return condition => Resolve(condition, facts);
         }
 
@@ -69,11 +85,48 @@ namespace Jondo.Unity.Server.Managers
         private static bool HuntingWeaponInHand()
             => Equipment.InSlot(WeaponSlot)?.Effects.Any(e => e.Effect == HuntingWeaponEffect) ?? false;
 
+        /// <summary>Whether the roleplay map is one of the Bonta or Brakmar arenas.</summary>
+        private static bool? IsBontaOrBrakmarArena(long mapId)
+        {
+            var map = MapManager.GetMapInfo(mapId);
+            if (map == null) return null;
+
+            string mapName = NormalizeMapName(map.Name ?? "");
+            if (IsNamedCityArena(mapName)) return true;
+            string subArea = NormalizeMapName(DatabaseManager.GetSubAreaName(map.SubAreaId));
+            if (string.IsNullOrWhiteSpace(mapName) && string.IsNullOrWhiteSpace(subArea)) return null;
+            return IsNamedCityArena(mapName + " " + subArea);
+        }
+
+        private static bool IsNamedCityArena(string identity)
+        {
+            bool city = identity.Contains("bonta", StringComparison.Ordinal)
+                || identity.Contains("brakmar", StringComparison.Ordinal);
+            bool arena = identity.Contains("arena", StringComparison.Ordinal)
+                || identity.Contains("arene", StringComparison.Ordinal);
+            return city && arena;
+        }
+
+        private static string NormalizeMapName(string name)
+        {
+            string decomposed = name.Normalize(NormalizationForm.FormD);
+            var normalized = new StringBuilder(decomposed.Length);
+            foreach (char character in decomposed)
+                if (CharUnicodeInfo.GetUnicodeCategory(character) != UnicodeCategory.NonSpacingMark)
+                    normalized.Append(char.ToLowerInvariant(character));
+            return normalized.ToString();
+        }
+
         /// <summary>What a condition asks of a character, as plain facts, so it can be answered without a session.</summary>
         internal readonly record struct Facts(SessionState? State, QuestLog? Log, QuestCatalogue? Book, long MapId,
                                               Func<int, int> Held, Func<int, int>? JobLevel = null,
                                               Func<bool>? HuntingWeapon = null, Func<int, int>? Worn = null,
-                                              int MonsterId = 0);
+                                              int MonsterId = 0, bool? PlayerAlive = null, bool? SoulStoneFight = null,
+                                              Func<int, bool?>? KnownTitle = null,
+                                              Func<int, bool?>? OccupiedEquipmentSlot = null,
+                                              Func<bool?>? EmptyEquipment = null,
+                                              Func<int, int, bool?>? LiveMonsterInSubarea = null,
+                                              Func<bool?>? IsAdministrator = null);
 
         internal static Answer Resolve(Condition condition, Facts facts)
         {
@@ -99,6 +152,14 @@ namespace Jondo.Unity.Server.Managers
                 // His alignment's side: 0 neutral, 1 Bonta, 2 Brakmar (Alignments).
                 case "Ps": return facts.State == null ? Answer.Unknown : Compare(Alignments.CriterionSide(facts.State.CharacterId), op, value);
 
+                // PX is categorical: A selects the administrator role. Read the account's
+                // current auth-database role; neither the selector nor character data grants it.
+                case "PX":
+                    if (condition.Args.Count != 1 || condition.Args[0] != "A" || facts.IsAdministrator == null)
+                        return Answer.Unknown;
+                    bool? isAdministrator = facts.IsAdministrator();
+                    return isAdministrator.HasValue ? Truth(isAdministrator.Value, op) : Answer.Unknown;
+
                 // Its level and rank, from the quests he finished (Alignments.Progression).
                 case "Pa":
                 case "Pr":
@@ -120,9 +181,29 @@ namespace Jondo.Unity.Server.Managers
                     }
                     return Holding(condition, facts.Held);
 
+                // Pn carries an equipment slot: «Pn!1» means the weapon slot is empty. The
+                // observed «Pn!-1» form is the whole-equipment-empty sentinel, not item template
+                // -1. Equipment occupancy comes from the session's worn positions.
+                case "Pn": return EquipmentState(condition, facts);
+
+                // BI marks unobtainable content; compare its value against zero.
+                case "BI":
+                    if (condition.Args.Count != 1 || !long.TryParse(condition.Args[0], out long biValue))
+                        return Answer.Unknown;
+                    return Compare(0, op, biValue);
+
                 case "Qa": return facts.Log == null ? Answer.Unknown : Truth(facts.Log.Active((int)value), op);
-                case "Qf":
-                case "Qc": return facts.Log == null ? Answer.Unknown : Truth(facts.Log.Finished((int)value), op);
+                case "Qf": return facts.Log == null ? Answer.Unknown : Truth(facts.Log.Finished((int)value), op);
+                // Qc asks whether the quest can be taken now, which depends on its catalogue
+                // prerequisites and this character's run/repeat state; completion is Qf.
+                case "Qc":
+                    if (facts.Log == null || facts.Book == null || !facts.Book.Ready
+                        || value < int.MinValue || value > int.MaxValue) return Answer.Unknown;
+                    int questId = (int)value;
+                    var catalogueQuest = facts.Book.Of(questId);
+                    if (catalogueQuest == null || catalogueQuest.Steps.Count == 0) return Truth(false, op);
+                    bool available = facts.Log.CanStart(questId, out var availability);
+                    return availability.FullyJudged ? Truth(available, op) : Answer.Unknown;
 
                 // How many times a quest was finished: «QF>1423,0» at least once, which Cuerbax asks
                 // before his evaluations. One run is kept per quest, so it counts as once.
@@ -145,28 +226,53 @@ namespace Jondo.Unity.Server.Managers
 
                 case "HA":
                     return facts.State == null ? Answer.Unknown : Truth(Alterations.Has(facts.State.CharacterId, (int)value), op);
-                // The loot's own two letters, about the monster that drops it. Mt is whether he is a
-                // boss -- the value-4 bit of his m_flags (Dreams.IsBoss): of the 1,804 rows that ask
-                // it, 1,268 «Mt=1» are dungeon bosses' and 495 «Mt=0» are not (the bosses' pets, Thor
-                // Pestruz's egg for «Un huevo para Zurcarák»; the treasure maps' pieces off ordinary
-                // monsters); the 40 others are bosses outside the dungeons' list (Grozilla, Demoloch)
-                // and Kabaal. Ms is only ever asked «=0», in 1,629 rows beside Mt: whatever the
-                // server tallies there, an ordinary fight is the 0 -- INFERRED, or none of those rows
-                // would ever drop.
-                case "Mt": return facts.MonsterId == 0 ? Answer.Unknown : Compare(Dreams.IsBoss(facts.MonsterId) ? 1 : 0, op, value);
-                case "Ms": return facts.MonsterId == 0 ? Answer.Unknown : Compare(0, op, value);
+                // Mt asks whether this fight began on a dungeon room map; the monster's boss flag
+                // does not determine it. A missing origin map or unloaded dungeon catalogue leaves
+                // it unknown. Ms is resolved from fight type separately.
+                case "Ga": return facts.PlayerAlive.HasValue ? Compare(facts.PlayerAlive.Value ? 1 : 0, op, value) : Answer.Unknown;
+                case "Mt": return facts.MapId == 0 || !DungeonManager.IsLoaded
+                    ? Answer.Unknown
+                    : Compare(DungeonManager.OfRoom(facts.MapId) != null ? 1 : 0, op, value);
+                // Ss asks whether this monster is currently alive in the specified subarea.
+                // Its two arguments identify the monster and subarea; the operator negates or
+                // asserts live presence. Spawn catalog possibilities are not live presence.
+                case "Ss":
+                    if (condition.Args.Count != 2
+                        || !int.TryParse(condition.Args[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int ssMonster)
+                        || !int.TryParse(condition.Args[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int subAreaId)
+                        || ssMonster <= 0 || subAreaId <= 0 || facts.LiveMonsterInSubarea == null)
+                        return Answer.Unknown;
+                    bool? live = facts.LiveMonsterInSubarea(ssMonster, subAreaId);
+                    return live.HasValue ? Truth(live.Value, op) : Answer.Unknown;
+                case "Ms":
+                    if (!facts.SoulStoneFight.HasValue) return Answer.Unknown;
+                    if (!facts.SoulStoneFight.Value) return Compare(0, op, value);
+                    bool? arenaFight = IsBontaOrBrakmarArena(facts.MapId);
+                    return arenaFight.HasValue ? Compare(arenaFight.Value ? 1 : 0, op, value) : Answer.Unknown;
                 case "OA":
                     return facts.State?.Achievements == null ? Answer.Unknown : Truth(facts.State.Achievements.Has((int)value), op);
+                // Ot asks whether the character owns this title, not whether it exists in the catalog.
+                case "Ot":
+                    if (condition.Args.Count == 0 || !int.TryParse(condition.Args[0], out int titleId)
+                        || facts.KnownTitle == null) return Answer.Unknown;
+                    bool? knowsTitle = facts.KnownTitle(titleId);
+                    return knowsTitle.HasValue ? Truth(knowsTitle.Value, op) : Answer.Unknown;
+                // OO names an achievement objective, not a quest objective. The achievement log
+                // judges its catalogued criterion against this character's facts.
+                case "OO":
+                    if (facts.State?.Achievements == null || value < int.MinValue || value > int.MaxValue)
+                        return Answer.Unknown;
+                    Answer objectiveState = facts.State.Achievements.ObjectiveState((int)value);
+                    return objectiveState == Answer.Unknown ? Answer.Unknown : Truth(objectiveState == Answer.True, op);
 
-                // A yearly event or a content switch, the client's StaticCriterion, which only the
-                // real server judges: answered only where its meaning is known (SeasonalEvents.IsKnown),
-                // the events by their dates and the switches the quests carry as on. The loot's own
-                // stay unknown: the bosses' shields' «Sc=3049&Mt=1&PO!30414», each watched by an
-                // invisible «[!] DR» marker the real server hands out with it, would otherwise drop
-                // at 100 % on every win; «Sc=947» is the kings' cake, a January event; «Sc!629»
-                // guards the 3,848 global rows of equipment off every monster.
-                case "Sc":
-                    return SeasonalEvents.IsKnown((int)value) ? Truth(SeasonalEvents.IsOn((int)value, Almanax.Clock()), op) : Answer.Unknown;
+                // Sv is the server-wide, week-long world quest where players gather items to open
+                // the Grozilla and Grasmera door. Its event ID and state are not mapped yet, so keep
+                // it Unknown until both are authoritative.
+                case "Sv": return Answer.Unknown;
+
+                // TODO: Sc appears disabled and is still unexplained; this odd unconditional pass is
+                // intentional in player drop criteria for now so Sc never blocks an affected drop.
+                case "Sc": return Answer.True;
 
                 default: return ByCharacter(condition, facts);
             }
@@ -190,6 +296,17 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         private static Answer ByCharacter(Condition condition, Facts facts)
         {
+            // Uppercase SD is a day-of-week number (Sunday=1 through Saturday=7). Keep it
+            // separate from lowercase Sd, which the achievement facts use for day-of-month.
+            if (condition.Code == "SD")
+            {
+                if (condition.Args.Count == 0 || !long.TryParse(condition.Args[0], out long day))
+                    return Answer.Unknown;
+                var parisDay = OsavoraSeasons.InParis(new DateTimeOffset(Almanax.Clock())).DayOfWeek;
+                long today = (int)parisDay + 1;
+                return Compare(today, condition.Operator, day);
+            }
+
             if (facts.State == null || !ReferenceEquals(facts.State, SessionContext.State) || condition.Args.Count == 0)
                 return Answer.Unknown;
             if (!long.TryParse(condition.Args[0], out long first)) return Answer.Unknown;
@@ -285,6 +402,37 @@ namespace Jondo.Unity.Server.Managers
                 // objective, which no other reading lets through.
                 '>' => Bool(facts.Log.ObjectiveDone((int)value)),
                 '<' => Bool(!facts.Log.ObjectiveDone((int)value)),
+                _ => Answer.Unknown,
+            };
+        }
+
+        private static Answer EquipmentState(Condition condition, Facts facts)
+        {
+            if (condition.Args.Count != 1 || !int.TryParse(condition.Args[0], out int slot))
+                return Answer.Unknown;
+
+            if (slot == -1)
+            {
+                if (facts.EmptyEquipment == null) return Answer.Unknown;
+                bool? empty = facts.EmptyEquipment();
+                if (!empty.HasValue) return Answer.Unknown;
+                return condition.Operator switch
+                {
+                    '!' => Bool(empty.Value),
+                    '=' => Bool(!empty.Value),
+                    _ => Answer.Unknown,
+                };
+            }
+
+            if (slot < 0 || slot > Equipment.LastWornSlot || facts.OccupiedEquipmentSlot == null)
+                return Answer.Unknown;
+
+            bool? occupied = facts.OccupiedEquipmentSlot(slot);
+            if (!occupied.HasValue) return Answer.Unknown;
+            return condition.Operator switch
+            {
+                '=' => Bool(occupied.Value),
+                '!' => Bool(!occupied.Value),
                 _ => Answer.Unknown,
             };
         }

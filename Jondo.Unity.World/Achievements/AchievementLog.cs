@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Jondo.Unity.World.Content;
 using Jondo.Unity.World.Quests;
 
@@ -103,6 +104,24 @@ namespace Jondo.Unity.World.Achievements
         public IReadOnlyCollection<int> Claimed => _claimed;
 
         public bool Has(int achievementId) => _earned.Contains(achievementId);
+
+        /// <summary>Whether an achievement objective is currently complete, or cannot be judged.</summary>
+        /// <remarks>An already earned achievement keeps its objectives complete even if their facts later change.</remarks>
+        public Answer ObjectiveState(int objectiveId)
+        {
+            var objective = _book.ObjectiveOf(objectiveId);
+            if (objective == null) return Answer.Unknown;
+            if (Has(objective.AchievementId)) return Answer.True;
+
+            var facts = Facts();
+            // Use the full expression whenever it contains BI, so normal operators and OR
+            // branches retain their meaning. A linked progress shortcut must not replace it.
+            bool hasBi = HasBi(objective.Criterion);
+            if (objective.Link != null && !hasBi) return StateOf(objective.Link, facts);
+            if (objective.Criterion.Length == 0) return Answer.Unknown;
+
+            return Criterion.Evaluate(objective.Criterion, condition => JudgeOne(condition, facts));
+        }
 
         public bool WasClaimed(int achievementId) => _claimed.Contains(achievementId);
 
@@ -254,12 +273,15 @@ namespace Jondo.Unity.World.Achievements
         /// </remarks>
         private bool Holds(AchievementObjective objective, IQuestFacts facts)
         {
-            if (objective.Link != null) return Holds(objective.Link, facts);
+            if (objective.Link != null && !HasBi(objective.Criterion)) return Holds(objective.Link, facts);
             if (objective.Criterion.Length == 0) return false;
 
             return Criterion.Evaluate(objective.Criterion, condition => JudgeOne(condition, facts))
                    == Content.Answer.True;
         }
+
+        private static bool HasBi(string criterion)
+            => QuestCriterion.Terms(criterion).Any(term => term.Op == "BI");
 
         /// <summary>One term, judged by the same reader the quests use, with a third answer for "cannot say".</summary>
         private static Answer JudgeOne(Condition condition, IQuestFacts facts)
@@ -279,6 +301,38 @@ namespace Jondo.Unity.World.Achievements
             AchievementLink.Monster => (facts.Count("EM", link.MonsterId, "") ?? 0) > 0,
             _ => false,
         };
+
+        private static Answer StateOf(AchievementLink link, IQuestFacts facts)
+        {
+            long? count = link.Kind switch
+            {
+                AchievementLink.Explore => facts.Count(AchievementCatalogue.ExploreKey, link.Subarea, ""),
+                AchievementLink.JobLevel => facts.Count(AchievementCatalogue.JobKey, link.LevelNeeded, ""),
+                AchievementLink.Craft => facts.Scalar(AchievementCatalogue.CraftKey),
+                AchievementLink.Monster => facts.Count("EM", link.MonsterId, ""),
+                _ => null,
+            };
+
+            if (link.Kind is AchievementLink.Explore or AchievementLink.JobLevel or AchievementLink.Craft
+                or AchievementLink.Monster)
+            {
+                if (!count.HasValue) return Answer.Unknown;
+                long needed = link.Kind switch
+                {
+                    AchievementLink.JobLevel => link.Jobs,
+                    AchievementLink.Craft => link.Count,
+                    _ => 1,
+                };
+                return count.Value >= needed ? Answer.True : Answer.False;
+            }
+
+            return link.Kind switch
+            {
+                AchievementLink.Level => facts.Level >= link.LevelNeeded ? Answer.True : Answer.False,
+                AchievementLink.Quest => facts.Finished(link.QuestId) ? Answer.True : Answer.False,
+                _ => Answer.Unknown,
+            };
+        }
 
         // ─── Progress, for the window ─────────────────────────────────────────────
 

@@ -1426,7 +1426,14 @@ namespace Jondo.Unity.Server
         /// </summary>
         public static int GetAccountRole(long accountId)
         {
-            if (accountId <= 0) return Roles.PorDefecto;
+            return TryGetAccountRole(accountId, out int role) ? role : Roles.PorDefecto;
+        }
+
+        /// <summary>Reads an account's role, distinguishing unavailable data from the default player role.</summary>
+        public static bool TryGetAccountRole(long accountId, out int role)
+        {
+            role = Roles.PorDefecto;
+            if (accountId <= 0) return false;
             try
             {
                 using var connection = new SqliteConnection(AuthConnectionString);
@@ -1435,15 +1442,14 @@ namespace Jondo.Unity.Server
                 command.CommandText = "SELECT Role FROM Accounts WHERE Id = $id;";
                 command.Parameters.AddWithValue("$id", accountId);
                 object? valor = command.ExecuteScalar();
-                return valor == null || valor == DBNull.Value
-                    ? Roles.PorDefecto
-                    : Convert.ToInt32(valor);
+                if (valor == null || valor == DBNull.Value) return false;
+                role = Convert.ToInt32(valor);
+                return true;
             }
             catch (Exception ex)
             {
-                // If the database does not answer, the one who can do least. Never the other way round.
                 Console.WriteLine($"[DatabaseManager] Could not read the role of {accountId}: {ex.Message}");
-                return Roles.PorDefecto;
+                return false;
             }
         }
 

@@ -151,6 +151,12 @@ namespace Jondo.Unity.World.Content
 
             string code = text.Substring(0, op);
             string[] args = text.Substring(op + 1).Split(',');
+            // BI marks unobtainable content. Compare its single numeric value against zero,
+            // so BI=1 is unmet while BI=0 and BI!1 pass consistently across callers.
+            if (code == "BI")
+                return args.Length == 1 && long.TryParse(args[0], out long expected)
+                    ? Compare(text[op], 0, expected)
+                    : Answer.Unknown;
             return resolver(new Condition(code, text[op], args));
         }
 

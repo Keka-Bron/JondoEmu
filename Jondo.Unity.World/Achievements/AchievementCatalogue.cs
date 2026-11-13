@@ -186,6 +186,7 @@ namespace Jondo.Unity.World.Achievements
         public const string CraftKey = "Xc";
 
         private readonly Dictionary<int, Achievement> _byId = new Dictionary<int, Achievement>();
+        private readonly Dictionary<int, AchievementObjective> _objectiveById = new Dictionary<int, AchievementObjective>();
         private readonly Dictionary<int, AchievementCategory> _categories = new Dictionary<int, AchievementCategory>();
         private readonly Dictionary<int, List<Achievement>> _byCategory = new Dictionary<int, List<Achievement>>();
 
@@ -216,6 +217,10 @@ namespace Jondo.Unity.World.Achievements
         public int FromQuestsCount { get; private set; }
 
         public Achievement? Of(int id) => _byId.TryGetValue(id, out var a) ? a : null;
+
+        /// <summary>Finds one achievement objective by its own id.</summary>
+        public AchievementObjective? ObjectiveOf(int id)
+            => _objectiveById.TryGetValue(id, out var objective) ? objective : null;
 
         public IReadOnlyCollection<AchievementCategory> Categories => _categories.Values;
 
@@ -385,6 +390,7 @@ namespace Jondo.Unity.World.Achievements
         {
             foreach (var objective in achievement.Objectives)
             {
+                _objectiveById.TryAdd(objective.Id, objective);
                 foreach (var term in objective.Terms)
                 {
                     // "Not having it" is not waiting on it: OA!8518 must not make an achievement
@@ -482,11 +488,9 @@ namespace Jondo.Unity.World.Achievements
         /// client's, for objectives whose own the server alone can judge.
         /// </summary>
         /// <remarks>
-        /// 416 objectives carry «BI=1», which the client's criterion factory makes an Unusable:
-        /// Ankama's server decides them. The tutorial's «Primera parte del tutorial» (17380) is one,
-        /// and «Primer tiempo» (8518), which hands over the experience of level 2, could never be
-        /// earned. The capture says when it is: right after 2502's step 3173 is validated (idz 3173,
-        /// then mfu 8518). What it is judged by is written here, with the measurement beside it.
+        /// Some objectives carry «BI=1», which is unmet when compared against zero.
+        /// Authored criteria cannot replace BI expressions; other authored criteria remain
+        /// available where the actual condition is known from captures.
         /// </remarks>
         private static void ApplyAuthoredCriteria(Dictionary<int, AchievementObjective> objectives, Action<string>? report)
         {
@@ -501,6 +505,8 @@ namespace Jondo.Unity.World.Achievements
                     int id = (int)Long(row, "objective");
                     string criterion = Text(row, "criterion");
                     if (id == 0 || criterion.Length == 0 || !objectives.TryGetValue(id, out var old)) continue;
+                    // Do not let an authored reconstruction bypass an original BI expression.
+                    if (QuestCriterion.Terms(old.Criterion).Any(term => term.Op == "BI")) continue;
                     objectives[id] = new AchievementObjective
                     {
                         Id = old.Id,

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Jondo.Unity.Launcher;
@@ -18,6 +19,56 @@ namespace Jondo.Unity.Tests.Content
         private static bool Met(string criterion, PlayerCriteria.Facts facts)
             => Criterion.Met(criterion, condition => PlayerCriteria.Resolve(condition, facts));
 
+        [Fact]
+        public void BI_compares_the_zero_accessible_state_for_player_drop_criteria()
+        {
+            var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 1);
+            Assert.False(Met("BI=1", facts));
+            Assert.True(Met("BI!1", facts));
+            Assert.True(Met("BI=0", facts));
+            Assert.False(Met("BI!0", facts));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("BI=1,2", condition => PlayerCriteria.Resolve(condition, facts)));
+        }
+
+        [Fact]
+        public void PX_checks_authoritative_administrator_role_for_selector_A()
+        {
+            var administrator = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, IsAdministrator: () => true);
+            Assert.True(Met("PX=A", administrator));
+            Assert.False(Met("PX!A", administrator));
+
+            var player = administrator with { IsAdministrator = () => false };
+            Assert.False(Met("PX=A", player));
+            Assert.True(Met("PX!A", player));
+        }
+
+        [Fact]
+        public void PX_keeps_unavailable_or_unsupported_role_checks_unknown()
+        {
+            var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, IsAdministrator: () => null);
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("PX=A", condition => PlayerCriteria.Resolve(condition, facts)));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("PX!A", condition => PlayerCriteria.Resolve(condition, facts)));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("PX=B", condition => PlayerCriteria.Resolve(condition, facts with { IsAdministrator = () => true })));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("PX>A", condition => PlayerCriteria.Resolve(condition, facts with { IsAdministrator = () => true })));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("PX=A,extra", condition => PlayerCriteria.Resolve(condition, facts with { IsAdministrator = () => true })));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("PX=A", condition => PlayerCriteria.Resolve(condition, facts with { IsAdministrator = null })));
+        }
+
+        [Fact]
+        public void Ot_checks_character_title_ownership_and_keeps_unavailable_state_unknown()
+        {
+            var owner = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, KnownTitle: id => id == 560);
+            Assert.True(Met("Ot=560", owner));
+            Assert.False(Met("Ot!560", owner));
+            Assert.False(Met("Ot=560", owner with { KnownTitle = _ => false }));
+            Assert.True(Met("Ot!560", owner with { KnownTitle = _ => false }));
+
+            var unavailable = owner with { KnownTitle = _ => null };
+            Assert.False(Met("Ot=560", unavailable));
+            Assert.False(Met("Ot!560", unavailable));
+            Assert.False(Met("Ot", owner));
+        }
+
         /// <summary>«PO!x» none, «PO=x» one at least, «PO&lt;x,n» fewer than n.</summary>
         [Fact]
         public void What_is_held_is_counted()
@@ -32,6 +83,84 @@ namespace Jondo.Unity.Tests.Content
             Assert.True(Met("PO=11683", facts));
             Assert.False(Met("PO<2269,10", facts));
             Assert.True(Met("PO>2269,9", facts));
+        }
+
+        [Fact]
+        public void Pn_checks_equipment_slots_and_the_whole_equipment_empty_sentinel()
+        {
+            bool empty = true;
+            int slotCalls = 0;
+            var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0,
+                OccupiedEquipmentSlot: slot =>
+                {
+                    Assert.InRange(slot, 0, Equipment.LastWornSlot);
+                    slotCalls++;
+                    return slot == 0;
+                },
+                EmptyEquipment: () => empty);
+
+            // The corpus uses Pn!slot for an empty slot and -1 for empty equipment as a whole.
+            Assert.True(Met("Pn!1", facts));
+            Assert.False(Met("Pn=1", facts));
+            Assert.False(Met("Pn!0", facts));
+            Assert.True(Met("Pn=0", facts));
+            Assert.True(Met("Pn!-1", facts));
+            Assert.False(Met("Pn=-1", facts));
+            Assert.Equal(4, slotCalls); // -1 was never passed to the slot lookup.
+
+            empty = false;
+            Assert.False(Met("Pn!-1", facts));
+            Assert.True(Met("Pn=-1", facts));
+            Assert.True(Met("Pn!1", facts));
+        }
+
+        [Fact]
+        public void Pn_keeps_malformed_unsupported_and_unavailable_equipment_unknown()
+        {
+            var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0,
+                OccupiedEquipmentSlot: _ => false,
+                EmptyEquipment: () => null);
+
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Pn!1,2", condition => PlayerCriteria.Resolve(condition, facts)));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Pn!-2", condition => PlayerCriteria.Resolve(condition, facts)));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Pn>1", condition => PlayerCriteria.Resolve(condition, facts)));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Pn!-1", condition => PlayerCriteria.Resolve(condition, facts)));
+
+            var noSlotLookup = facts with { OccupiedEquipmentSlot = null };
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Pn!1", condition => PlayerCriteria.Resolve(condition, noSlotLookup)));
+        }
+
+        [Fact]
+        public void Ss_checks_live_monster_presence_in_the_requested_subarea()
+        {
+            var calls = new List<(int Monster, int Subarea)>();
+            var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0,
+                LiveMonsterInSubarea: (monster, subarea) =>
+                {
+                    calls.Add((monster, subarea));
+                    return monster == 622 && subarea == 2970;
+                });
+
+            Assert.True(Met("Ss=622,2970", facts));
+            Assert.False(Met("Ss!622,2970", facts));
+            Assert.Equal(new[] { (622, 2970), (622, 2970) }, calls);
+
+            var absent = facts with { LiveMonsterInSubarea = (_, _) => false };
+            Assert.True(Met("Ss!622,2970", absent));
+            Assert.False(Met("Ss=622,2970", absent));
+        }
+
+        [Fact]
+        public void Ss_keeps_unavailable_or_malformed_live_presence_unknown()
+        {
+            var unavailable = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Ss!622,2970", c => PlayerCriteria.Resolve(c, unavailable)));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Ss!622,2970", c => PlayerCriteria.Resolve(c,
+                unavailable with { LiveMonsterInSubarea = (_, _) => null })));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Ss!622", c => PlayerCriteria.Resolve(c,
+                unavailable with { LiveMonsterInSubarea = (_, _) => true })));
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Ss!0,2970", c => PlayerCriteria.Resolve(c,
+                unavailable with { LiveMonsterInSubarea = (_, _) => true })));
         }
 
         /// <summary>The hunter's meat: job 41 above 9, a hunting weapon in hand.</summary>
@@ -50,23 +179,70 @@ namespace Jondo.Unity.Tests.Content
         }
 
         /// <summary>
-        /// Mt and Ms are about the monster that drops: Thor Pestruz (a boss) gives his egg for «Un
-        /// huevo para Zurcarák», «Qa=1517&amp;PO!15317&amp;Mt=1&amp;Ms=0»; without a monster they are unknown.
+        /// Mt is about the originating dungeon room; Ms is about a soul-stone fight in a city arena.
         /// </summary>
         [Fact]
-        public void The_dropping_monster_answers_Mt_and_Ms()
+        public void Ms_requires_fight_source_and_checks_the_Bonta_or_Brakmar_arena()
         {
-            var thor = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, MonsterId: 3618);
-            Assert.True(Met("Mt=1&Ms=0", thor));
-            Assert.False(Met("Mt=0", thor));
-            Assert.False(Met("Ms=1", thor));
-
-            var tofu = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, MonsterId: 98);
-            Assert.True(Met("Mt=0&Ms=0", tofu));
-
             var nobody = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
-            Assert.False(Met("Mt=0", nobody));
-            Assert.False(Met("Ms=0", nobody));
+            Assert.False(Met("Ms=0", nobody)); // the fight type is not known
+
+            var regularFight = nobody with { SoulStoneFight = false };
+            Assert.True(Met("Ms=0", regularFight));
+            Assert.False(Met("Ms=1", regularFight));
+
+            const long bontaArena = 987654321, brakmarArena = 987654322, otherMap = 987654323;
+            var previousMaps = new Dictionary<long, MapInfo?>();
+            foreach (long mapId in new[] { bontaArena, brakmarArena, otherMap })
+                previousMaps[mapId] = MapManager.Maps.TryGetValue(mapId, out var previous) ? previous : null;
+            try
+            {
+                MapManager.Maps[bontaArena] = new MapInfo { MapId = bontaArena, Name = "Arena de Bonta" };
+                MapManager.Maps[brakmarArena] = new MapInfo { MapId = brakmarArena, Name = "Arène de Brâkmar" };
+                MapManager.Maps[otherMap] = new MapInfo { MapId = otherMap, Name = "Amakna" };
+                var soulStoneFight = regularFight with { MapId = bontaArena, SoulStoneFight = true };
+                Assert.True(Met("Ms=1", soulStoneFight));
+                Assert.True(Met("Ms>0", soulStoneFight));
+                Assert.False(Met("Ms=0", soulStoneFight));
+
+                var brakmarSoulStoneFight = soulStoneFight with { MapId = brakmarArena };
+                Assert.True(Met("Ms=1", brakmarSoulStoneFight));
+                Assert.False(Met("Ms=0", brakmarSoulStoneFight));
+
+                var outsideArena = soulStoneFight with { MapId = otherMap };
+                Assert.True(Met("Ms=0", outsideArena));
+                Assert.False(Met("Ms=1", outsideArena));
+            }
+            finally
+            {
+                foreach (var (mapId, previous) in previousMaps)
+                {
+                    if (previous != null) MapManager.Maps[mapId] = previous;
+                    else MapManager.Maps.Remove(mapId);
+                }
+            }
+
+            var unknownArena = regularFight with { SoulStoneFight = true };
+            Assert.False(Met("Ms=0", unknownArena)); // no map metadata, so arena state is unknown
+        }
+
+        [Fact]
+        public void Mt_uses_dungeon_membership_of_the_origin_map_not_the_monster_boss_flag()
+        {
+            if (!File.Exists(Paths.DungeonsJson)) return;
+
+            DungeonManager.Initialize();
+            var dungeon = DungeonManager.All.Values.FirstOrDefault(d => d.Rooms.Count > 0
+                && d.EntranceMapId != 0 && DungeonManager.OfRoom(d.EntranceMapId) == null);
+            if (dungeon == null || !DungeonManager.IsLoaded) return;
+
+            var room = new PlayerCriteria.Facts(null, null, null, dungeon.Rooms[0], _ => 0, MonsterId: 98);
+            Assert.True(Met("Mt=1", room));
+            Assert.False(Met("Mt=0", room));
+
+            var entrance = room with { MapId = dungeon.EntranceMapId };
+            Assert.True(Met("Mt=0", entrance));
+            Assert.False(Met("Mt=1", entrance));
         }
 
         /// <summary>
@@ -101,12 +277,10 @@ namespace Jondo.Unity.Tests.Content
                 var netHolder = facts with { Held = item => item == 21172 ? 1 : 0 };
                 Assert.True(Met(pollen, netHolder));
 
-                // A switch only the loot carries is nobody's to guess: the bosses' shields, each
-                // watched by an invisible marker the real server gives with it, would drop on every
-                // win. Halouine's (967) is known: met while its two weeks of October last.
+                // Sc is intentionally ignored for player drops, including known seasonal IDs.
                 Assert.False(Met("Sc=3049&Mt=1&PO!30414", facts with { MonsterId = 3618 }));
-                Assert.False(Met("Sc!629&PL>0&PL<91", facts));
-                Assert.Equal(SeasonalEvents.IsOn(967, Almanax.Clock()), Met("Sc=967", facts));
+                Assert.True(Met("Sc!629&PL>0&PL<91", facts));
+                Assert.True(Met("Sc=967", facts));
 
                 session.State.CharacterLevel = 60;
                 Assert.False(Met("(SC!5|ST!5)&PL>0&PL<59", facts));
@@ -116,15 +290,91 @@ namespace Jondo.Unity.Tests.Content
             Assert.False(Met("SC!5", nobody));
         }
 
+        [Fact]
+        public void Sc_is_unconditionally_met_for_player_drops_even_for_unknown_ids()
+        {
+            var noCharacter = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+
+            Assert.Equal(Answer.True, Criterion.Evaluate("Sc=18", condition => PlayerCriteria.Resolve(condition, noCharacter)));
+            Assert.Equal(Answer.True, Criterion.Evaluate("Sc!18", condition => PlayerCriteria.Resolve(condition, noCharacter)));
+            Assert.Equal(Answer.True, Criterion.Evaluate("Sc=987654321", condition => PlayerCriteria.Resolve(condition, noCharacter)));
+            Assert.Equal(Answer.True, Criterion.Evaluate("Sc!987654321", condition => PlayerCriteria.Resolve(condition, noCharacter)));
+        }
+
+        [Fact]
+        public void Uppercase_SD_uses_the_Paris_weekday_number_in_both_criterion_readers()
+        {
+            var clock = Almanax.Clock;
+            try
+            {
+                // 12 November 2026 at noon UTC is Thursday afternoon in Paris.
+                Almanax.Clock = () => new System.DateTime(2026, 11, 12, 12, 0, 0, System.DateTimeKind.Utc);
+
+                var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+                Assert.True(Met("SD=5", facts));
+                Assert.False(Met("SD=4", facts));
+                Assert.True(Met("SD>4", facts));
+                Assert.Equal(5L, new Achievements.CharacterFacts().Scalar("SD"));
+            }
+            finally
+            {
+                Almanax.Clock = clock;
+            }
+        }
+
         /// <summary>The server's own letters are not known here, and an unknown row never drops.</summary>
         [Fact]
         public void What_is_not_known_does_not_drop()
         {
             var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+            Assert.Equal(Answer.Unknown, Criterion.Evaluate("Sv!946,0", condition => PlayerCriteria.Resolve(condition, facts)));
+            var achievementFacts = new Achievements.CharacterFacts();
+            Assert.Null(achievementFacts.Scalar("Sv"));
+            Assert.Null(achievementFacts.Count("Sv", 946, "0"));
             Assert.False(Met("Ms=0&Mt=1&Sc=947", facts));
             Assert.False(Met("Pj>41,9&CU>0", facts));   // nobody's jobs to ask
             Assert.False(Met("PL>9", facts));   // no character to ask
             Assert.True(Met("Pm=98567687|PO!1", facts));
+        }
+
+        [Fact]
+        public void Qc_checks_quest_availability_separately_from_completion()
+        {
+            if (!File.Exists(Paths.QuestsJson)) return;
+
+            var book = new QuestCatalogue();
+            if (!book.Ready || book.Of(2432) == null || book.Of(56) == null) return;
+
+            int level = 50;
+            var log = new QuestLog(book, () => level, () => 0);
+            var facts = new PlayerCriteria.Facts(null, log, book, 0, _ => 0);
+
+            // 2432 has the fully known prerequisite PL>89: too low means unavailable.
+            Assert.False(Met("Qc=2432", facts));
+            Assert.True(Met("Qc!2432", facts));
+            Assert.False(Met("Qf=2432", facts)); // availability is not completion.
+
+            level = 90;
+            Assert.True(Met("Qc=2432", facts));
+            Assert.False(Met("Qc!2432", facts));
+            Assert.False(Met("Qf=2432", facts));
+
+            // An active quest cannot be taken again, although it is not complete.
+            log.Restore(2432, book.Of(2432)!.Steps[0].Id, null, finished: false);
+            Assert.False(Met("Qc=2432", facts));
+            Assert.True(Met("Qc!2432", facts));
+            Assert.False(Met("Qf=2432", facts));
+
+            // Quest 56 also depends on alignment facts this engine does not have. Do not guess
+            // availability from CanStart's fail-open handling of those skipped prerequisites.
+            var uncertain = new QuestLog(book, () => 90, () => 0);
+            var uncertainFacts = facts with { Log = uncertain };
+            Assert.False(Met("Qc=56", uncertainFacts));
+            Assert.False(Met("Qc!56", uncertainFacts));
+
+            var missingCatalogue = facts with { Book = null };
+            Assert.False(Met("Qc=2432", missingCatalogue));
+            Assert.False(Met("Qc!2432", missingCatalogue));
         }
 
         /// <summary>
@@ -189,8 +439,7 @@ namespace Jondo.Unity.Tests.Content
         /// <summary>
         /// One judge for all of a monster's tables: the own table asks the fight's letters too (the
         /// Purple Dawn champion's temporal loop, «HA=51|HS=3384|HA=52|HS=3385», an elixir's state the
-        /// winner carries), and the global one knows the monster that drops («PZ=1&amp;Ms=0», the
-        /// riktus' seal holders).
+        /// winner carries), and the global one asks whether this is a soul-stone city-arena fight.
         /// </summary>
         [Fact]
         public void A_monster_s_tables_ask_the_fight_and_the_monster()
@@ -200,7 +449,10 @@ namespace Jondo.Unity.Tests.Content
             session.State.MapId = 191105026;
             using (SessionContext.Push(session))
             {
-                var fight = new Jondo.Unity.World.Fights.FightInstance(9_400_011, 191105026);
+                var fight = new Jondo.Unity.World.Fights.FightInstance(9_400_011, 191105026)
+                {
+                    SoulStoneFight = false,
+                };
                 var me = new Jondo.Unity.World.Fights.Fighter { Id = session.State.CharacterId, MaxHP = 100, CurrentHP = 100 };
                 fight.AddPlayer(me);
 
@@ -210,7 +462,7 @@ namespace Jondo.Unity.Tests.Content
                 Assert.True(Jondo.Unity.Server.Handlers.FightHandler.SeLoLleva(fight, loop, _ => 0, 5662));
 
                 Assert.True(Jondo.Unity.Server.Handlers.FightHandler.SeLoLleva(fight, "PZ=1&Ms=0", _ => 0, 98));
-                Assert.False(Jondo.Unity.Server.Handlers.FightHandler.SeLoLleva(fight, "PZ=1&Ms=0"));   // which monster?
+                Assert.True(Jondo.Unity.Server.Handlers.FightHandler.SeLoLleva(fight, "PZ=1&Ms=0")); // Ms is fight-wide.
                 Assert.True(Jondo.Unity.Server.Handlers.FightHandler.SeLoLleva(fight, "PO<2269,10", item => item == 2269 ? 9 : 0));
                 Assert.False(Jondo.Unity.Server.Handlers.FightHandler.SeLoLleva(fight, "PO<2269,10", item => item == 2269 ? 10 : 0));
             }

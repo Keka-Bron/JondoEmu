@@ -25,6 +25,9 @@ namespace Jondo.Unity.World.Fights
         /// </remarks>
         public FightRules Reglas { get; set; } = FightRules.ContraMonstruos;
 
+        /// <summary>Whether this monster fight began from a soul stone, or null when its origin is unknown.</summary>
+        public bool? SoulStoneFight { get; set; }
+
         /// <summary>Whether there are people opposite and not monsters. The same IsDuel said.</summary>
         public bool EsPvp => !Reglas.EnfrenteHayMonstruos;
 
