@@ -1026,7 +1026,7 @@ namespace Jondo.Unity.Server.Managers
                 var spell = step.Spell;
                 if (spell.Damage > 0)
                 {
-                    foreach (var enemy in Foes(Board, _monster).Where(e => Hit(spell, step.TargetCell, e)))
+                    foreach (var enemy in Foes(Board, _monster).Where(e => Hit(spell, _monster.CellId, step.TargetCell, e)))
                         Hurt(enemy, Blow(spell, _monster, enemy));
                 }
             }

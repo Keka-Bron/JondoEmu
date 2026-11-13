@@ -60,6 +60,13 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>The cells around the aimed one the blow also reaches: 0 for one cell.</summary>
             public int Zone { get; init; }
 
+            /// <summary>
+            /// The blow's row whose zone that is, for its shape: a ring (Salto del Grillete, O2) does
+            /// not reach the cell beside the caster, and weighed as a disc of radius 2 the surprised
+            /// Tigredón leapt with its only foe in the hole and hit nobody. Null for one cell.
+            /// </summary>
+            public SpellEffect? ZoneRow { get; init; }
+
             /// <summary>Whether its blow also hurts the caster's side inside the zone.</summary>
             public bool HurtsAllies { get; init; }
 
@@ -818,14 +825,14 @@ namespace Jondo.Unity.Server.Managers
             // A spell that hurts whoever stands on the aimed cell is never aimed at one of its
             // own, whatever else it gives: the JondoBot's Bumerán Pérfido "buffed" its own summon
             // to death.
-            if (!onEnemy && target != monster && spell.Damage > 0 && Hit(spell, aim, target)) return 0;
+            if (!onEnemy && target != monster && spell.Damage > 0 && Hit(spell, from, aim, target)) return 0;
 
             if (spell.Damage > 0 && (onEnemy || spell.OnSelf))
             {
-                foreach (var hit in enemies.Where(e => Hit(spell, aim, e)))
+                foreach (var hit in enemies.Where(e => Hit(spell, from, aim, e)))
                     value += Worth(spell, monster, hit);
                 if (spell.HurtsAllies)
-                    foreach (var own in allies.Where(a => Hit(spell, aim, a)))
+                    foreach (var own in allies.Where(a => Hit(spell, from, aim, a)))
                         value -= Blow(spell, monster, own);
             }
 
@@ -2072,8 +2079,15 @@ namespace Jondo.Unity.Server.Managers
             return reached;
         }
 
-        private static bool Hit(Spell spell, int aim, Fighter who)
-            => MapGeometry.Distance(aim, who.CellId) <= spell.Zone;
+        /// <summary>
+        /// Whether a blow aimed there from there reaches that fighter: the cells of its zone as the
+        /// engine draws them (<see cref="EffectEngine.CasillasDelEfecto"/>), rings and lines with
+        /// their own shape; a spell with no zone row, a disc of its radius.
+        /// </summary>
+        private static bool Hit(Spell spell, int from, int aim, Fighter who)
+            => spell.ZoneRow != null
+                ? EffectEngine.CasillasDelEfecto(spell.ZoneRow, from, aim).Contains(who.CellId)
+                : MapGeometry.Distance(aim, who.CellId) <= spell.Zone;
 
         /// <summary>Same row or same column of the diamond grid: a straight line.</summary>
         private static bool InLine(int a, int b)

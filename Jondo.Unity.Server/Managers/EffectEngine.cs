@@ -585,11 +585,10 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (sobre == null || !sobre.IsAlive) continue;
 
-                    // How many cells from the centre of the area he is. Damage drops as he gets further
-                    // away, and the spell itself says by how much.
-                    int lejos = celdaApuntada >= 0
-                        ? Jondo.Unity.World.Maps.MapGeometry.Distance(celdaApuntada, sobre.CellId)
-                        : 0;
+                    // How many cells of falloff he is from the centre of the area, measured the
+                    // way the zone's shape measures them. Damage drops with each, and the spell
+                    // itself says by how much.
+                    int lejos = FalloffCells(efecto, quienLanza.CellId, celdaApuntada, sobre.CellId);
                     fuera.Add((fila, elemento, sobre, lejos));
                 }
             }
@@ -647,10 +646,22 @@ namespace Jondo.Unity.Server.Managers
         {
             if (dano <= 0 || lejos <= 0 || efecto.PasoDeCaida <= 0) return dano;
 
-            int pasos = efecto.TopeDeCaida > 0 ? Math.Min(lejos, efecto.TopeDeCaida) : lejos;
-            double queda = Math.Pow(1.0 - efecto.PasoDeCaida / 100.0, pasos);
-            return Math.Max(0, (int)Math.Round(dano * queda));
+            // The client's grz::blil: the steps capped at the zone's count (a count of zero caps
+            // them at zero), times the percentage, never past all of it. It is one subtraction,
+            // not a percentage of a percentage: four steps of 10% leave 60%, not 66%.
+            int lost = Math.Min(Math.Min(lejos, Math.Max(0, efecto.TopeDeCaida)) * efecto.PasoDeCaida, 100);
+            return Math.Max(0, (int)Math.Round(dano * (100 - lost) / 100.0));
         }
+
+        /// <summary>
+        /// The cells of falloff a row counts against somebody on <paramref name="cell"/>, by its
+        /// zone's shape (<see cref="Jondo.Unity.World.Maps.Zone.FalloffCells"/>). Zero with no
+        /// aimed cell.
+        /// </summary>
+        internal static int FalloffCells(SpellEffect efecto, int casterCell, int aimedCell, int cell)
+            => aimedCell < 0 ? 0
+             : Jondo.Unity.World.Maps.Zone.FalloffCells(efecto.Forma, efecto.Tamano, efecto.TamanoMinimo,
+                                                         casterCell, aimedCell, cell);
         private const int Empujar = EffectSupport.Push;
 
         /// <summary>84, «Empuje» (push): the pusher's FLAT addition. The percentage is 158.</summary>
@@ -5308,10 +5319,8 @@ namespace Jondo.Unity.Server.Managers
                 // 12858.
                 baseHeal += SpellModifiers.BaseHeal(quienLanza, hechizo, ronda);
 
-                int distance = celdaApuntada >= 0
-                    ? Jondo.Unity.World.Maps.MapGeometry.Distance(celdaApuntada, sobre.CellId)
-                    : 0;
-                baseHeal = ConLaCaidaDeLaZona(baseHeal, efecto, distance);
+                baseHeal = ConLaCaidaDeLaZona(baseHeal, efecto,
+                    FalloffCells(efecto, quienLanza.CellId, celdaApuntada, sobre.CellId));
 
                 // The characteristic of the effect's ELEMENT. It is no longer always intelligence: with
                 // the five heals active, water scales with chance, air with agility and earth with

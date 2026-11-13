@@ -219,5 +219,27 @@ namespace Jondo.Unity.Tests.Combat
             var walk = MonsterTactics.WalkingDistances(board, player.CellId);
             Assert.True(walk[stand] < walk[deadEnd]);
         }
+
+        /// <summary>
+        /// A ring round the caster (the surprised Tigredón's Salto del Grillete, O2) does not reach
+        /// the cell beside it: with its only foe there, it is not worth casting; two cells off, it is.
+        /// </summary>
+        [Fact]
+        public void A_ring_round_itself_misses_the_foe_beside_it()
+        {
+            var ring = new MonsterTactics.Spell
+            {
+                Id = 4082, Grade = 1, Cost = 2, MinRange = 0, MaxRange = 0, Damage = 65, Zone = 2,
+                ZoneRow = new SpellEffect { EffectId = 96, Forma = 'O', Tamano = 2 },
+            };
+
+            var beside = Monster(mp: 0);
+            var next = MonsterTactics.Next(Board(beside, Player(1, CellAt(Centre, 1))), beside, new[] { ring });
+            Assert.True(next == null || next.Spell == null || next.Spell.Id != ring.Id);
+
+            var twoOff = Monster(mp: 0);
+            var hit = MonsterTactics.Next(Board(twoOff, Player(2, CellAt(Centre, 2))), twoOff, new[] { ring });
+            Assert.Equal(ring.Id, hit?.Spell?.Id);
+        }
     }
 }

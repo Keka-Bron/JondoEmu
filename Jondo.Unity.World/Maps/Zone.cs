@@ -156,6 +156,79 @@ namespace Jondo.Unity.World.Maps
         /// <summary>The zone whose cells the effect names outright (<c>cellIds</c>).</summary>
         public const int FormaDeCeldasFijas = ';';
 
+        /// <summary>
+        /// How many cells of falloff a zone's blow counts against whoever stands on
+        /// <paramref name="target"/>: the steps its <c>damageDecreaseStepPercent</c> is taken
+        /// off for, before the cap. Zero when the shape does not fall off at all.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The client's rule, 3.6.10.11: <c>gru::blgz</c> picks the measure by shape and
+        /// <c>grz::blil</c> applies it. The measure starts from the aimed cell, never from the
+        /// caster, and an offset is taken off it before it counts:
+        /// </para>
+        /// <list type="bullet">
+        /// <item>The whole map ('A', 'a') and the empty zone lose nothing, and neither does any
+        /// zone bigger than 50 (a C63 is the whole map too).</item>
+        /// <item>The ring ('O') counts from its own radius. All of its cells are that far, so
+        /// it hits them in full. The Tigredón's Salto del Grillete (O2) was losing 20% on the
+        /// only cells it has.</item>
+        /// <item>The shapes with a minimum size ('C', 'Q', 'X', '+') and the line from the caster
+        /// ('l') count from that minimum: a C3 with a hole of 1 hits its inner edge in full.</item>
+        /// <item>The squares ('G', 'R', 'W') measure the larger of the two coordinate gaps.</item>
+        /// <item>The half circle and the diagonal shapes ('U', '-', '/', '+', '#') take half the
+        /// distance.</item>
+        /// <item>The cone and the fork ('V', 'F') measure along the way they were cast
+        /// (<see cref="Heading"/>, the client's og::ovk). On the two walked axes, it is the gap on
+        /// that axis. Straight down or up, it is the gap between rows. Straight across, the
+        /// client adds the two rows instead of taking one from the other. That looks like a slip,
+        /// and it is kept as it is: the client shows its preview with it.</item>
+        /// <item>Every other shape measures the plain distance.</item>
+        /// </list>
+        /// </remarks>
+        public static int FalloffCells(int shape, int size, int minSize, int caster, int centre, int target)
+        {
+            if (!MapGeometry.IsValid(centre) || !MapGeometry.IsValid(target)) return 0;
+            if (shape is 0 or ' ' or TodoElMapa or WholeMap || size > 50) return 0;
+
+            int measure;
+            switch (shape)
+            {
+                case Square: case Rectangle: case SquareWithoutDiagonals:
+                {
+                    var (cx, cy) = MapGeometry.CellToPoint(centre);
+                    var (tx, ty) = MapGeometry.CellToPoint(target);
+                    measure = Math.Max(Math.Abs(cx - tx), Math.Abs(cy - ty));
+                    break;
+                }
+                case MedioCirculo: case DiagonalLine: case LineaPerpendicular:
+                case DiagonalCross: case DiagonalCrossWithoutCentre:
+                    measure = MapGeometry.Distance(centre, target) >> 1;
+                    break;
+                case Cone: case Fork:
+                {
+                    var (cx, cy) = MapGeometry.CellToPoint(centre);
+                    var (tx, ty) = MapGeometry.CellToPoint(target);
+                    measure = (Heading(caster, centre) % 4) switch
+                    {
+                        0 => Math.Abs(Math.Abs(cx - cy) + Math.Abs(tx - ty)),
+                        1 => Math.Abs(cx - tx),
+                        2 => Math.Abs(Math.Abs(cx - cy) - Math.Abs(tx - ty)),
+                        _ => Math.Abs(cy - ty),
+                    };
+                    break;
+                }
+                default:
+                    measure = MapGeometry.Distance(centre, target);
+                    break;
+            }
+
+            int offset = shape == Anillo ? size
+                       : shape is Circulo or CruzRecta or Aspa or DiagonalCross or Segmento ? minSize
+                       : 0;
+            return Math.Max(0, measure - offset);
+        }
+
         private static readonly (int Dx, int Dy)[] Walking = { (1, 0), (-1, 0), (0, 1), (0, -1) };
         private static readonly (int Dx, int Dy)[] Diagonals = { (1, 1), (-1, -1), (1, -1), (-1, 1) };
         private static readonly (int Dx, int Dy)[] EightWays =

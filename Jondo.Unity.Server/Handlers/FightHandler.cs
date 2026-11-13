@@ -9414,6 +9414,9 @@ namespace Jondo.Unity.Server.Handlers
                     EffectUid = -(++cual),
                     DiceNum = linea.Min + bonus,
                     DiceSide = linea.Max + bonus,
+                    Forma = zona.Shape,
+                    Tamano = zona.Size,
+                    TamanoMinimo = zona.MinSize,
                     PasoDeCaida = zona.DecreaseStep,
                     TopeDeCaida = zona.MaxSteps,
                 };
@@ -9422,7 +9425,7 @@ namespace Jondo.Unity.Server.Handlers
                 foreach (var quien in alcanzados)
                 {
                     fuera.Add((fila, elemento, quien,
-                               Jondo.Unity.World.Maps.MapGeometry.Distance(centro, quien.CellId)));
+                               Managers.EffectEngine.FalloffCells(fila, caster.CellId, centro, quien.CellId)));
                 }
             }
 
@@ -10533,6 +10536,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 bool damages = false, hurtsAllies = false, summons = false, mechanics = false, mechanicsOnEnemies = false;
                 int zone = 0, removal = 0, buff = 0;
+                Managers.SpellEffect? zoneRow = null;
                 double heal = 0, pickedDamage = 0;
                 var masks = new Dictionary<int, string>();
                 foreach (var effect in Managers.SpellEffects.De(spell, grade))
@@ -10547,6 +10551,7 @@ namespace Jondo.Unity.Server.Handlers
                     {
                         if (enemies || (!own && !HasMask(mask, "C"))) damages = true;
                         if (own) hurtsAllies = true;
+                        if (effect.Forma != 'P' && (zoneRow == null || effect.Tamano > zone)) zoneRow = effect;
                         if (effect.Forma != 'P') zone = Math.Max(zone, effect.Tamano);
                     }
                     else if (BlowsInAPickedElement.Contains(effect.EffectId))
@@ -10556,6 +10561,7 @@ namespace Jondo.Unity.Server.Handlers
                         // (2828 only) was a utility spell, cast once a turn on one enemy of three.
                         if (enemies || (!own && !HasMask(mask, "C"))) damages = true;
                         if (own) hurtsAllies = true;
+                        if (effect.Forma != 'P' && (zoneRow == null || effect.Tamano > zone)) zoneRow = effect;
                         if (effect.Forma != 'P') zone = Math.Max(zone, effect.Tamano);
                         pickedDamage = Math.Max(pickedDamage, average);
                     }
@@ -10601,6 +10607,7 @@ namespace Jondo.Unity.Server.Handlers
                              : pickedDamage,
                     Element = (Jondo.Unity.World.Fights.ElementType)Math.Clamp(data.Element, 0, 4),
                     Zone = zone,
+                    ZoneRow = zoneRow,
                     HurtsAllies = hurtsAllies,
                     Heal = heal,
                     Removal = removal,
