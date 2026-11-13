@@ -1169,8 +1169,16 @@ namespace Jondo.Unity.Server.Handlers
             var items = new List<(int Item, int Count)>();
             if (choice.Gives != 0) items.Add((choice.Gives, choice.GivesCount));
             items.AddRange(choice.AlsoGives.Select(i => (i, 1)));
-            // And one of a draw: the Kama Baraka's prize.
-            if (choice.GivesOneOf.Count > 0) items.Add((choice.GivesOneOf[Random.Shared.Next(choice.GivesOneOf.Count)], 1));
+            // And one of a draw: the Kama Baraka's prize. A zero in it is nothing this time: a Tamiter
+            // larva leaves its slime or its jaundice on the hands only now and then, and a curse
+            // already carried is not caught twice.
+            if (choice.GivesOneOf.Count > 0)
+            {
+                int drawn = choice.GivesOneOf[Random.Shared.Next(choice.GivesOneOf.Count)];
+                bool cursedAlready = Managers.Forgemagic.TemplateOf(drawn)?.Type == Managers.BonusSlots.CurseType
+                                     && Managers.Equipment.HowMany(drawn) > 0;
+                if (drawn != 0 && !cursedAlready) items.Add((drawn, 1));
+            }
             // And the kamas it pays: the mulou's 10,000 for a goblin.
             if (choice.GivesKamas > 0) await Managers.CharacterRewards.GiveKamasAsync(stream, choice.GivesKamas);
             foreach (var (item, count) in items)
@@ -1738,11 +1746,22 @@ namespace Jondo.Unity.Server.Handlers
             // client carries the sentences and the answers but never which goes with which.
             if (await SeguirLaConversacionAsync(stream, reply)) return;
 
+            int spokenTo = SessionContext.State.OpenDialogueNpcId;
+            long spokenOn = SessionContext.State.OpenDialogueMapId != 0 ? SessionContext.State.OpenDialogueMapId : SessionContext.State.MapId;
             CerrarConversacion();
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                     ConnectionProtocol.NpcDialogCloseReason)));
+
+            // The NPC goes from the map as the window shuts («leaves»): the larva caught. Only for
+            // this character, as the mark the reply left only hides it from him.
+            if (elegidaAhora is { Leaves: true } && spokenOn == SessionContext.State.MapId)
+            {
+                var gone = Npcs.Of(spokenOn).FirstOrDefault(s => s.NpcId == spokenTo);
+                if (gone != null)
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorRemoved(gone.ContextualId));
+            }
 
             if (completesAfterClosing != 0
                 && await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora!.Quest, completesAfterClosing))

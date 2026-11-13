@@ -34418,6 +34418,365 @@
         }
       ],
       "why": "A kanugro veteran of the chief's band at [-9,-49] (17216), «Encogerte de hombros e irte»; two stand by him and fight with him (Dofus pour les noobs, «Les monstres aboient, la diligence casse»: «accompagné de deux Kanigrous Vétéran»)."
+    },
+    {
+      "npc": 2288,
+      "map": 0,
+      "opening": 17219,
+      "openings": [
+        { "quest": 1475, "objective": 8235, "message": 17229 }
+      ],
+      "lines": [
+        {
+          "message": 17219,
+          "choices": [
+            { "reply": 20619, "next": 17220, "quest": 1475, "afterObjective": 8234, "beforeObjective": 8235 },
+            { "reply": 20618 }
+          ]
+        },
+        {
+          "message": 17220,
+          "choices": [
+            { "reply": 20618, "quest": 1475, "completes": 8235, "params": [[30, 8235]], "beforeObjective": 8235 },
+            { "reply": 20618 }
+          ]
+        },
+        {
+          "message": 17229,
+          "choices": [
+            { "reply": 20629, "next": 17220 },
+            { "reply": 20618 }
+          ]
+        }
+      ],
+      "why": "The grumpy slave of the Stone Teeth quarry [-4,-52] -- l'esclave Grincheux --: leave me alone, I spend the day breaking stones (17219). For «La risueña miaumiena» (1475), as Dofus pour les noobs, «Chachyène de vie» has it: «¿Sabes dónde está Pol, el panadero?», never heard of him (17220), «Encogerte de hombros e irte» (8235). Once seen, the client's second opening with the same words (17229) asks the same question again (20629) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive."
+    },
+    {
+      "npc": 2289,
+      "map": 0,
+      "opening": 17221,
+      "openings": [
+        { "quest": 1475, "objective": 8236, "message": 17230 }
+      ],
+      "lines": [
+        {
+          "message": 17221,
+          "choices": [
+            { "reply": 20621, "next": 17222, "quest": 1475, "afterObjective": 8234, "beforeObjective": 8236 },
+            { "reply": 20620 }
+          ]
+        },
+        {
+          "message": 17222,
+          "choices": [
+            { "reply": 20620, "quest": 1475, "completes": 8236, "params": [[30, 8236]], "beforeObjective": 8236 },
+            { "reply": 20620 }
+          ]
+        },
+        {
+          "message": 17230,
+          "choices": [
+            { "reply": 20630, "next": 17222 },
+            { "reply": 20620 }
+          ]
+        }
+      ],
+      "why": "The weary slave [-3,-52] -- l'esclave épuisé --: no whip, only a little break (17221). For 1475 (Dofus pour les noobs, «Chachyène de vie»): «¿Sabes dónde está Pol, el panadero?», he dug beside him but not any more (17222), «Continúa con tu pausa, yo me voy ya» (8236). Once seen, the client's second opening with the same words (17230) asks the same question again (20630) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive."
+    },
+    {
+      "npc": 2290,
+      "map": 0,
+      "opening": 17223,
+      "openings": [
+        { "quest": 1475, "objective": 8237, "message": 17231 }
+      ],
+      "lines": [
+        {
+          "message": 17223,
+          "choices": [
+            { "reply": 20623, "next": 17224, "quest": 1475, "afterObjective": 8234, "beforeObjective": 8237 },
+            { "reply": 20622 }
+          ]
+        },
+        {
+          "message": 17224,
+          "choices": [
+            { "reply": 20622, "quest": 1475, "completes": 8237, "params": [[30, 8237]], "beforeObjective": 8237 },
+            { "reply": 20622 }
+          ]
+        },
+        {
+          "message": 17231,
+          "choices": [
+            { "reply": 20631, "next": 17224 },
+            { "reply": 20622 }
+          ]
+        }
+      ],
+      "why": "The vengeful slave [-4,-53] -- l'esclave Revancharde --: one day she will settle Lalat's account (17223). For 1475 (Dofus pour les noobs, «Chachyène de vie»): «¿Sabes dónde está Pol, el panadero?», no, and the kanigs will not make freeing him easy (17224), «Decir que no te dan miedo e irte» (8237). Once seen, the client's second opening with the same words (17231) asks the same question again (20631) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive."
+    },
+    {
+      "npc": 2291,
+      "map": 0,
+      "opening": 17225,
+      "openings": [
+        { "quest": 1475, "objective": 8238, "message": 17228 },
+        { "after": 1475, "message": 17228 }
+      ],
+      "lines": [
+        {
+          "message": 17225,
+          "choices": [
+            { "reply": 20626, "quest": 1475, "completes": 8238, "params": [[30, 8238]], "next": 17226, "afterObjective": 8234, "holds": 468, "takes": 468 },
+            { "reply": 20627 }
+          ]
+        },
+        {
+          "message": 17226,
+          "choices": [
+            { "reply": 20625, "next": 17227 }
+          ]
+        },
+        {
+          "message": 17227,
+          "choices": [
+            { "reply": 20624 }
+          ]
+        },
+        {
+          "message": 17228,
+          "choices": [
+            { "reply": 20628 }
+          ]
+        }
+      ],
+      "why": "The hungry slave [-5,-53] -- l'esclave Affamée --: nothing to eat since a thin slice of bacon, would you have a bit of bread of Incarnam? (17225). For 1475, as Dofus pour les noobs, «Chachyène de vie» has it («munissez vous d'un Pain d'Incarnam… Donnez le pain à la jeune esclave»): «Darle pan de Incarnam» takes the bread (468) and is 8238, crunch (17226), «¿Sabes dónde está Pol, el panadero?», orphelins took him, ask Protélez, the kanig who looks after the slaves (17227), «Gracias, voy a hablar con Protélez». «No, pero ahora mismo voy a buscarlo» for whoever has none. Fed, she loves Amakna's bread, the crust above all (17228)."
+    },
+    {
+      "npc": 2292,
+      "map": 0,
+      "opening": 17245,
+      "lines": [
+        {
+          "message": 17245,
+          "choices": [
+            { "reply": 20641, "next": 17246, "criterion": "Qo>8235&Qo>8236&Qo>8237", "quest": 1475, "afterObjective": 8238, "beforeObjective": 8239 },
+            { "reply": 20646, "quest": 1475, "completes": 8280, "params": [[30, 8280]], "next": 17248, "afterObjective": 8239, "holds": 15128, "holdsCount": 6 },
+            { "reply": 20641, "next": 17246, "quest": 1475, "afterObjective": 8239, "beforeObjective": 8280 }
+          ]
+        },
+        {
+          "message": 17246,
+          "choices": [
+            { "reply": 20640, "next": 17247 }
+          ]
+        },
+        {
+          "message": 17247,
+          "choices": [
+            { "reply": 20639, "quest": 1475, "completes": 8239, "params": [[30, 8239]], "beforeObjective": 8239 },
+            { "reply": 20639 }
+          ]
+        },
+        {
+          "message": 17248,
+          "choices": [
+            { "reply": 20645, "next": 17249 }
+          ]
+        },
+        {
+          "message": 17249,
+          "choices": [
+            { "reply": 20644 }
+          ]
+        }
+      ],
+      "why": "Protélez at the quarry's entrance [-3,-53] -- Protel in the French guide --: slaves want clean mats and meat once a week now, what decadence (17245). For 1475, as Dofus pour les noobs, «Chachyène de vie» has it, once the four slaves have been asked: «¿Dónde está Pol, el panadero?», you are no slave, an adventurer (17246), «He dicho que dónde está Pol…», a good handful of Tamiter larvae first, by the old enclosures, west then south of the village (17247, the line 8280 names), «Gruñir e ir a por las larvas» (8239); asked again until they are brought. With six: «Darle las larvas de Tamiter» (8280), delicious, Pol refused to cook for the great matriarch and washes dishes in the palace (17248), «¿Podría liberarlo de algún modo?», Kanígrula makes the law, her palace is at the end of the quarry (17249), «Me voy a la Gruta de Kanígrula»."
+    },
+    {
+      "npc": 2313,
+      "map": 126092059,
+      "opening": 17232,
+      "lines": [
+        {
+          "message": 17232,
+          "choices": [
+            { "reply": 20632, "beforeElement": -1475001, "marks": -1475001, "gives": 15128, "givesOneOf": [15129, 15130, 0, 0], "leaves": true, "quest": 1475, "afterObjective": 8239, "beforeObjective": 8280 }
+          ]
+        }
+      ],
+      "why": "A Tamiter larva at [-4,-56] (Première larve, Dofus pour les noobs, «Chachyène de vie»): it squirms, watching with its bulging eyes (17232), «Atraparla.» gives the larva (15128) once, leaves its mark (-1475001) and the larva goes. «En collectant ces larves, vous pourrez obtenir deux malédictions»: its slime on the hands (15129, -20 critical hits and -500 initiative) or the jaundice (15130, yellow), one in four each -- the odds are INFERRED."
+    },
+    {
+      "npc": 2313,
+      "map": 126092571,
+      "opening": 17232,
+      "lines": [
+        {
+          "message": 17232,
+          "choices": [
+            { "reply": 20632, "beforeElement": -1475002, "marks": -1475002, "gives": 15128, "givesOneOf": [15129, 15130, 0, 0], "leaves": true, "quest": 1475, "afterObjective": 8239, "beforeObjective": 8280 }
+          ]
+        }
+      ],
+      "why": "A Tamiter larva at [-3,-56] (Seconde larve, Dofus pour les noobs, «Chachyène de vie»): it squirms, watching with its bulging eyes (17232), «Atraparla.» gives the larva (15128) once, leaves its mark (-1475002) and the larva goes. «En collectant ces larves, vous pourrez obtenir deux malédictions»: its slime on the hands (15129, -20 critical hits and -500 initiative) or the jaundice (15130, yellow), one in four each -- the odds are INFERRED."
+    },
+    {
+      "npc": 2313,
+      "map": 126092570,
+      "opening": 17232,
+      "lines": [
+        {
+          "message": 17232,
+          "choices": [
+            { "reply": 20632, "beforeElement": -1475003, "marks": -1475003, "gives": 15128, "givesOneOf": [15129, 15130, 0, 0], "leaves": true, "quest": 1475, "afterObjective": 8239, "beforeObjective": 8280 }
+          ]
+        }
+      ],
+      "why": "A Tamiter larva at [-3,-55] (Troisième larve, Dofus pour les noobs, «Chachyène de vie»): it squirms, watching with its bulging eyes (17232), «Atraparla.» gives the larva (15128) once, leaves its mark (-1475003) and the larva goes. «En collectant ces larves, vous pourrez obtenir deux malédictions»: its slime on the hands (15129, -20 critical hits and -500 initiative) or the jaundice (15130, yellow), one in four each -- the odds are INFERRED."
+    },
+    {
+      "npc": 2313,
+      "map": 126093590,
+      "opening": 17232,
+      "lines": [
+        {
+          "message": 17232,
+          "choices": [
+            { "reply": 20632, "beforeElement": -1475004, "marks": -1475004, "gives": 15128, "givesOneOf": [15129, 15130, 0, 0], "leaves": true, "quest": 1475, "afterObjective": 8239, "beforeObjective": 8280 }
+          ]
+        }
+      ],
+      "why": "A Tamiter larva at [-1,-51] (Quatrième larve, Dofus pour les noobs, «Chachyène de vie»): it squirms, watching with its bulging eyes (17232), «Atraparla.» gives the larva (15128) once, leaves its mark (-1475004) and the larva goes. «En collectant ces larves, vous pourrez obtenir deux malédictions»: its slime on the hands (15129, -20 critical hits and -500 initiative) or the jaundice (15130, yellow), one in four each -- the odds are INFERRED."
+    },
+    {
+      "npc": 2313,
+      "map": 126094102,
+      "opening": 17232,
+      "lines": [
+        {
+          "message": 17232,
+          "choices": [
+            { "reply": 20632, "beforeElement": -1475005, "marks": -1475005, "gives": 15128, "givesOneOf": [15129, 15130, 0, 0], "leaves": true, "quest": 1475, "afterObjective": 8239, "beforeObjective": 8280 }
+          ]
+        }
+      ],
+      "why": "A Tamiter larva at [0,-51] (Cinquième larve, Dofus pour les noobs, «Chachyène de vie»): it squirms, watching with its bulging eyes (17232), «Atraparla.» gives the larva (15128) once, leaves its mark (-1475005) and the larva goes. «En collectant ces larves, vous pourrez obtenir deux malédictions»: its slime on the hands (15129, -20 critical hits and -500 initiative) or the jaundice (15130, yellow), one in four each -- the odds are INFERRED."
+    },
+    {
+      "npc": 2313,
+      "map": 126094101,
+      "opening": 17232,
+      "lines": [
+        {
+          "message": 17232,
+          "choices": [
+            { "reply": 20632, "beforeElement": -1475006, "marks": -1475006, "gives": 15128, "givesOneOf": [15129, 15130, 0, 0], "leaves": true, "quest": 1475, "afterObjective": 8239, "beforeObjective": 8280 }
+          ]
+        }
+      ],
+      "why": "A Tamiter larva at [0,-50] (Sixième larve, Dofus pour les noobs, «Chachyène de vie»): it squirms, watching with its bulging eyes (17232), «Atraparla.» gives the larva (15128) once, leaves its mark (-1475006) and the larva goes. «En collectant ces larves, vous pourrez obtenir deux malédictions»: its slime on the hands (15129, -20 critical hits and -500 initiative) or the jaundice (15130, yellow), one in four each -- the odds are INFERRED."
+    },
+    {
+      "npc": 2294,
+      "map": 0,
+      "opening": 17261,
+      "lines": [
+        {
+          "message": 17261,
+          "choices": [
+            { "reply": 20659, "next": 17262 },
+            { "reply": 20681, "next": 17274 },
+            { "reply": 20676 }
+          ]
+        },
+        {
+          "message": 17262,
+          "choices": [
+            { "reply": 20658, "next": 17263 }
+          ]
+        },
+        {
+          "message": 17263,
+          "choices": [
+            { "reply": 20657, "quest": 1475, "completes": 8242, "params": [[30, 8242]], "next": 17264, "afterObjective": 8241 },
+            { "reply": 20656 }
+          ]
+        },
+        {
+          "message": 17264,
+          "choices": [
+            { "reply": 20676 }
+          ]
+        },
+        {
+          "message": 17274,
+          "choices": [
+            { "reply": 20680, "next": 17275 }
+          ]
+        },
+        {
+          "message": 17275,
+          "choices": [
+            { "reply": 20679, "next": 17276 }
+          ]
+        },
+        {
+          "message": 17276,
+          "choices": [
+            { "reply": 20677 },
+            { "reply": 20678 }
+          ]
+        }
+      ],
+      "why": "Kanígrula, great matriarch of the kanigs, in the room after her own (the cave's exit room): you dared raise a hand against me (17261), as Dofus pour les noobs, «Chachyène de vie» has it -- «Répondez lui alors que ces paroles ne changeront rien à votre victoire» --: «Tus insultos no borrarán tu derrota», one favour, only one (17262), «Exijo la liberación de todos los esclavos», one, I said (17263); for 1475 «Entonces, libera a Pol, el panadero» (8242), the cook who would not bend, he will wait at the palace's way out (17264). «¿Puedes hablarme de ti?»: the matriarch who crossed the seas (17274), «Hmm... Pero tú no eres una kanig» (17275), «¿Quién es entonces?», too curious (17276). Her three «Salir de la Gruta de Kanígrula» leave by the dungeon's way out."
+    },
+    {
+      "npc": 2293,
+      "map": 0,
+      "opening": 17250,
+      "openings": [
+        { "quest": 1475, "objective": 8242, "message": 17252 }
+      ],
+      "lines": [
+        {
+          "message": 17250,
+          "choices": [
+            { "reply": 20648, "next": 17251 }
+          ]
+        },
+        {
+          "message": 17251,
+          "choices": [
+            { "reply": 20647 }
+          ]
+        },
+        {
+          "message": 17252,
+          "choices": [
+            { "reply": 20651, "next": 17253 }
+          ]
+        },
+        {
+          "message": 17253,
+          "choices": [
+            { "reply": 20650, "next": 17254 }
+          ]
+        },
+        {
+          "message": 17254,
+          "choices": [
+            { "reply": 20649, "quest": 1475, "completes": 8243, "params": [[30, 8243]], "next": 17255 }
+          ]
+        },
+        {
+          "message": 17255,
+          "choices": [
+            { "reply": 20652, "leaves": true }
+          ]
+        }
+      ],
+      "why": "Pol Borón, Simona's cousin -- Hulos the baker in the French guide --, at the gate of Kanígrula's palace [-5,-54]: punished for refusing to fry boar tripe, a baker and no butcher (17250), «Tu prima me ha enviado para liberarte», convince Kanígrula (17251). Freed (Dofus pour les noobs, «Chachyène de vie»: «Hulos vous attend à la sortie du donjon et vous remercie»): free at last (17252), «Solo cumplía con mi deber de héroe», the other slaves (17253), «Pues lo cierto es que no me asusta la idea», back to Bonta, and a young miaumiena of Croqueta's (17254), «Gracias por el regalo. Buena suerte.» (8243, the Chachyène 15110). Then goodbye, may the Twelve protect you (17255), «Hasta luego», and he goes, back to Bonta."
     }
   ]
 }

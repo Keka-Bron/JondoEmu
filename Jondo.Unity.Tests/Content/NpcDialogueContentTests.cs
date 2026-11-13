@@ -49,6 +49,18 @@ namespace Jondo.Unity.Tests.Content
             Assert.Equal(806080, tree!.Line(30638)!.Choice(36977)!.TeleportPassage);
         }
 
+        [Fact]
+        public void A_reply_that_sends_the_npc_away_survives_saving()
+        {
+            NpcDialogueContent.Save(_path, new[]
+            {
+                Tree(2293, 17255, Line(17255, new DialogueChoice { Reply = 20652, Leaves = true }, Choice(20653))),
+            });
+            var line = NpcDialogueContent.For(NpcDialogueContent.Load(_path), 2293, 0)!.Line(17255)!;
+            Assert.True(line.Choice(20652)!.Leaves);
+            Assert.False(line.Choice(20653)!.Leaves);
+        }
+
         // ─── Round trip ───────────────────────────────────────────────────────────
 
         [Fact]

@@ -4246,6 +4246,69 @@
       "orientation": 3,
       "criterion": "Qa=1474&Qo>8229&Qo<8233",
       "why": "The other kanugro veteran by his chief. INFERRED cell, an open walkable one in view."
+    },
+    {
+      "map": 126091544,
+      "npc": 2291,
+      "cell": 356,
+      "orientation": 1,
+      "why": "The hungry slave at [-5,-53], where Dofus pour les noobs, «Chachyène de vie» has her («l'esclave Affamée que vous trouverez en [-5,-53]»); a slave of the quarry like the others, there for everybody. INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 126091545,
+      "npc": 2293,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=1475&Qo>8239",
+      "why": "Pol Borón at the gate of Kanígrula's palace [-5,-54] (8243's map), from Protélez telling where he is until he has given his miaumiena. The derived placement's cell."
+    },
+    {
+      "map": 126092059,
+      "npc": 2313,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1475&Qo>8239&Qo<8280&Ue!-1475001",
+      "why": "A Tamiter larva at [-4,-56], «Première larve» in Dofus pour les noobs, «Chachyène de vie», from Protélez's request until the larvae are handed over, and until this one is caught (mark -1475001). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 126092571,
+      "npc": 2313,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qa=1475&Qo>8239&Qo<8280&Ue!-1475002",
+      "why": "A Tamiter larva at [-3,-56], «Seconde larve» in Dofus pour les noobs, «Chachyène de vie», from Protélez's request until the larvae are handed over, and until this one is caught (mark -1475002). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 126092570,
+      "npc": 2313,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1475&Qo>8239&Qo<8280&Ue!-1475003",
+      "why": "A Tamiter larva at [-3,-55], «Troisième larve» in Dofus pour les noobs, «Chachyène de vie», from Protélez's request until the larvae are handed over, and until this one is caught (mark -1475003). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 126093590,
+      "npc": 2313,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qa=1475&Qo>8239&Qo<8280&Ue!-1475004",
+      "why": "A Tamiter larva at [-1,-51], «Quatrième larve» in Dofus pour les noobs, «Chachyène de vie», from Protélez's request until the larvae are handed over, and until this one is caught (mark -1475004). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 126094102,
+      "npc": 2313,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1475&Qo>8239&Qo<8280&Ue!-1475005",
+      "why": "A Tamiter larva at [0,-51], «Cinquième larve» in Dofus pour les noobs, «Chachyène de vie», from Protélez's request until the larvae are handed over, and until this one is caught (mark -1475005). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 126094101,
+      "npc": 2313,
+      "cell": 371,
+      "orientation": 1,
+      "criterion": "Qa=1475&Qo>8239&Qo<8280&Ue!-1475006",
+      "why": "A Tamiter larva at [0,-50], «Sixième larve» in Dofus pour les noobs, «Chachyène de vie», from Protélez's request until the larvae are handed over, and until this one is caught (mark -1475006). INFERRED cell, an open walkable one."
     }
   ]
 }

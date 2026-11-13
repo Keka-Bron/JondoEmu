@@ -835,6 +835,11 @@ namespace Jondo.Unity.Server.Managers
                 // learnt yet.
                 "PE" => S.Emotes.Contains((int)key) ? 1 : 0,
 
+                // A mark among the character's used elements, the server's own («Ue!-1475001»): a
+                // Tamiter larva of «La risueña miaumiena» caught stays gone from its map, the
+                // reply that caught it having left the mark (DialogueChoice.Marks).
+                "Ue" => S.ElementsUsed.Contains((int)key) ? 1 : 0,
+
                 AchievementCatalogue.ExploreKey => Tally(AchievementCatalogue.ExploreKey, key),
                 AchievementCatalogue.JobKey => S.Jobs.Values.Count(j => j.Level >= key),
                 _ => null,

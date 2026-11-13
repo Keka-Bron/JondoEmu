@@ -203,6 +203,13 @@ namespace Jondo.Unity.World.Content
         public bool DreamFavor { get; init; }
 
         /// <summary>
+        /// True when the NPC spoken to goes from the map, for this character, as the conversation
+        /// closes («leaves»): a Tamiter larva of «La risueña miaumiena» caught. Its placement's
+        /// criterion is what keeps it gone afterwards -- the mark the reply leaves, «Ue!mark».
+        /// </summary>
+        public bool Leaves { get; init; }
+
+        /// <summary>
         /// The mutation item this reply gives, or zero: the Orbalantir de Meriana's «Pensar en Dark
         /// Vlad y tocar las escamas.» takes the player to the epic fight and mutates him (15019).
         /// </summary>
@@ -1133,6 +1140,8 @@ namespace Jondo.Unity.World.Content
                             DreamPointsPercent = (int)Number(choice, "dreamPointsPercent"),
                             DreamFavor = choice.TryGetProperty("dreamFavor", out var favor)
                                          && favor.ValueKind == JsonValueKind.True,
+                            Leaves = choice.TryGetProperty("leaves", out var leaves)
+                                     && leaves.ValueKind == JsonValueKind.True,
                             ReturnsHome = choice.TryGetProperty("teleportBack", out var back)
                                           && back.ValueKind == JsonValueKind.True,
                             AfterQuest = choice.TryGetProperty("afterQuest", out var after)
@@ -1314,6 +1323,7 @@ namespace Jondo.Unity.World.Content
                             if (choice.DreamPointsPercent != 0)
                                 writer.WriteNumber("dreamPointsPercent", choice.DreamPointsPercent);
                             if (choice.DreamFavor) writer.WriteBoolean("dreamFavor", true);
+                            if (choice.Leaves) writer.WriteBoolean("leaves", true);
                             if (choice.Parameters.Count > 0)
                             {
                                 writer.WriteStartArray("params");

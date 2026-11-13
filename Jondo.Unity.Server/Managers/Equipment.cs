@@ -544,6 +544,21 @@ namespace Jondo.Unity.Server.Managers
             => await GrantAsync(stream, gid, quantity) != null;
 
         /// <summary>
+        /// The bag's stack an item handed over joins, or null for a new one: the same template with
+        /// the same effects, unless it is a pet or a piece worn, each of which is its own.
+        /// </summary>
+        internal static Item? StackFor(int gid, string effects)
+        {
+            if (Pets.IsPet(gid)) return null;
+            var template = Forgemagic.TemplateOf(gid);
+            if (template != null && RandomLoot.IsWorn(template.Type)) return null;
+
+            string same = Forgemagic.Serialize(ParseEffects(effects));
+            return Items.Values.FirstOrDefault(i => i.Position == Bag && i.Template == gid
+                                                    && Forgemagic.Serialize(i.Effects) == same);
+        }
+
+        /// <summary>
         /// The same, giving back what was created instead of only whether it worked.
         /// </summary>
         /// <remarks>
@@ -558,6 +573,18 @@ namespace Jondo.Unity.Server.Managers
 
             // A pet comes into the world at level 0, and grows (Pets).
             if (Pets.IsPet(gid)) effects = Forgemagic.Serialize(Pets.Fresh(gid));
+
+            // Onto the bag's stack of the same thing, as the loot goes (DatabaseManager.AddItemsToInventory):
+            // six Tamiter larvae caught one by one are one stack of six, told to the client as its
+            // new total (ivj, the client adds an iua's quantity to a stack it already shows). Not a
+            // pet nor a piece worn, which are each their own.
+            var onto = StackFor(gid, effects);
+            if (onto != null && Rewrite(onto, onto.Quantity + quantity, onto.Effects))
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Ivj, ConnectionProtocol.BuildItemQuantity(onto.Uid, onto.Quantity)));
+                return new HavenBagStore.StoredItem { Uid = onto.Uid, Gid = gid, Quantity = quantity, Effects = effects };
+            }
 
             long uid = DatabaseManager.NextItemUid();
             if (!DatabaseManager.InsertCharacterItem(uid, SessionContext.State.CharacterId, gid, quantity,
