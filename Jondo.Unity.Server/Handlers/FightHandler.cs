@@ -4313,11 +4313,15 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// A row its caster put after his last turn ended -- a reaction to a blow in somebody
-        /// else's turn -- lives through his next one and falls at the start of the one after.
-        /// Falling at the next, it never lived one of his turns: the Kralamoure's Kraken gave him
-        /// the state of the element he was hit with «for one turn», and it was swept at his turn
-        /// start, before he could summon the tentacle it allows (Dofus pour les noobs: «au
-        /// prochain tour il invoquera un tentacule de l'élément dans lequel vous l'avez tapé»).
+        /// else's turn -- lives through his next one and falls once it is over, at the next turn
+        /// start of anybody else (<see cref="LeTocaCaer"/>). Falling at the next, it never lived one
+        /// of his turns: the Kralamoure's Kraken gave him the state of the element he was hit with
+        /// «for one turn», and it was swept at his turn start, before he could summon the tentacle
+        /// it allows (Dofus pour les noobs: «au prochain tour il invoquera un tentacule de
+        /// l'élément dans lequel vous l'avez tapé»). Nor does it wait for his turn after: in the
+        /// Troll fair's knife throwing, the rows the player puts on the targets in another's turn
+        /// fall at the turn start that follows his own, all nine of them, and kept a round more a
+        /// trap's lost movement points would have followed its victim into his next turn.
         /// </summary>
         internal static void AguantaSuTurno(FightInstance fight, Fighter quienEmpieza, Fighter portador)
         {
@@ -4327,7 +4331,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (embrujo.Quien == quienEmpieza.Id && !embrujo.Pendiente
                     && embrujo.CaducaEnRonda == fight.RoundNumber
                     && embrujo.Numero > quienEmpieza.UltimoEmbrujoDeSuTurno)
-                    embrujo.CaducaEnRonda++;
+                    embrujo.CaeAlAcabarSuTurno = true;
             }
         }
 
@@ -4336,8 +4340,10 @@ namespace Jondo.Unity.Server.Handlers
         /// the caster is a summon that never plays, and at anybody's when the caster is gone
         /// or nobody in particular. See the sweep in ConfirmAsync for the measurement.
         /// </summary>
-        private static bool LeTocaCaer(FightInstance fight, Fighter quienEmpieza, Jondo.Unity.World.Fights.Buff embrujo)
+        internal static bool LeTocaCaer(FightInstance fight, Fighter quienEmpieza, Jondo.Unity.World.Fights.Buff embrujo)
         {
+            // Kept through its caster's turn (AguantaSuTurno): it falls at whoever's start comes next.
+            if (embrujo.CaeAlAcabarSuTurno) return embrujo.Quien != quienEmpieza.Id;
             if (embrujo.Quien == 0 || embrujo.Quien == quienEmpieza.Id) return true;
             var quienLoPuso = fight.Buscar(embrujo.Quien);
             if (quienLoPuso == null || !quienLoPuso.IsAlive) return true;

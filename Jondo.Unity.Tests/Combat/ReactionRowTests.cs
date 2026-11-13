@@ -6,9 +6,10 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// A row its caster puts outside his own turn lives through his next one. The Kralamoure's
-    /// Kraken gives him the state of the element he is hit with, for one turn, and on his next
-    /// turn that state lets him summon the matching tentacle; it was swept at that turn's start.
+    /// A row its caster puts outside his own turn lives through his next one, and falls once it is
+    /// over. The Kralamoure's Kraken gives him the state of the element he is hit with, for one
+    /// turn, and on his next turn that state lets him summon the matching tentacle; it was swept
+    /// at that turn's start.
     /// </summary>
     public class ReactionRowTests
     {
@@ -39,11 +40,15 @@ namespace Jondo.Unity.Tests.Combat
             kralamoure.Buffs.PonerEstado(WaterState);
             kralamoure.Buffs.Poner(State(kralamoure, fight.RoundNumber), fight.SiguienteEmbrujo);
 
-            // His next turn starts: the state is still his, and falls at the one after.
+            // His next turn starts: the state is still his...
             FightHandler.AguantaSuTurno(fight, kralamoure, kralamoure);
-            Assert.Empty(kralamoure.Buffs.Barrer(fight.RoundNumber));
+            Assert.Empty(kralamoure.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, kralamoure, row)));
             Assert.True(kralamoure.Buffs.TieneEstado(WaterState));
-            Assert.Equal(fight.RoundNumber + 1, kralamoure.Buffs.Puestos.Single().CaducaEnRonda);
+
+            // ...and falls once it is over, at the next turn start, not at his turn after.
+            FightHandler.AguantaSuTurno(fight, player, kralamoure);
+            Assert.Single(kralamoure.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, player, row)));
+            Assert.False(kralamoure.Buffs.TieneEstado(WaterState));
         }
 
         [Fact]
@@ -58,7 +63,7 @@ namespace Jondo.Unity.Tests.Combat
             kralamoure.UltimoEmbrujoDeSuTurno = fight.UltimoEmbrujo;   // put, then his turn ended
 
             FightHandler.AguantaSuTurno(fight, kralamoure, kralamoure);
-            Assert.Single(kralamoure.Buffs.Barrer(fight.RoundNumber));
+            Assert.Single(kralamoure.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, kralamoure, row)));
         }
     }
 }

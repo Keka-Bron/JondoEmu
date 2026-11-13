@@ -117,6 +117,7 @@ namespace Jondo.Unity.Server.Managers
             /// lists Capsálocke's companions and the Master's together, and each room has its own.
             /// </summary>
             public Dictionary<long, List<int>> WrittenRoster { get; } = new();
+
             /// <summary>Whether its boss is fought alone in his room (<see cref="BossFightsAlone"/>).</summary>
             public bool BossAlone { get; set; }
         }

@@ -115,6 +115,12 @@ namespace Jondo.Unity.World.Fights
         public int CaducaEnRonda { get; set; }
 
         /// <summary>
+        /// A row its caster put outside his own turn, kept through his next one: it falls once that
+        /// turn is over, at the next turn start of anybody else (FightHandler.AguantaSuTurno).
+        /// </summary>
+        public bool CaeAlAcabarSuTurno { get; set; }
+
+        /// <summary>
         /// The round in which it STARTS to count. For almost all it is the cast's; for the
         /// delayed ones, that many rounds later as the effect's delay says.
         ///
