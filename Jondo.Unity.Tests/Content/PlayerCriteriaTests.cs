@@ -178,54 +178,6 @@ namespace Jondo.Unity.Tests.Content
             Assert.False(Met("PJ=28", facts));
         }
 
-        /// <summary>
-        /// Mt is about the monster that drops; Ms is about a soul-stone fight in a city arena.
-        /// </summary>
-        [Fact]
-        public void Ms_requires_fight_source_and_checks_the_Bonta_or_Brakmar_arena()
-        {
-            var nobody = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
-            Assert.False(Met("Ms=0", nobody)); // the fight type is not known
-
-            var regularFight = nobody with { SoulStoneFight = false };
-            Assert.True(Met("Ms=0", regularFight));
-            Assert.False(Met("Ms=1", regularFight));
-
-            const long bontaArena = 987654321, brakmarArena = 987654322, otherMap = 987654323;
-            var previousMaps = new Dictionary<long, MapInfo?>();
-            foreach (long mapId in new[] { bontaArena, brakmarArena, otherMap })
-                previousMaps[mapId] = MapManager.Maps.TryGetValue(mapId, out var previous) ? previous : null;
-            try
-            {
-                MapManager.Maps[bontaArena] = new MapInfo { MapId = bontaArena, Name = "Arena de Bonta" };
-                MapManager.Maps[brakmarArena] = new MapInfo { MapId = brakmarArena, Name = "Arène de Brâkmar" };
-                MapManager.Maps[otherMap] = new MapInfo { MapId = otherMap, Name = "Amakna" };
-                var soulStoneFight = regularFight with { MapId = bontaArena, SoulStoneFight = true };
-                Assert.True(Met("Ms=1", soulStoneFight));
-                Assert.True(Met("Ms>0", soulStoneFight));
-                Assert.False(Met("Ms=0", soulStoneFight));
-
-                var brakmarSoulStoneFight = soulStoneFight with { MapId = brakmarArena };
-                Assert.True(Met("Ms=1", brakmarSoulStoneFight));
-                Assert.False(Met("Ms=0", brakmarSoulStoneFight));
-
-                var outsideArena = soulStoneFight with { MapId = otherMap };
-                Assert.True(Met("Ms=0", outsideArena));
-                Assert.False(Met("Ms=1", outsideArena));
-            }
-            finally
-            {
-                foreach (var (mapId, previous) in previousMaps)
-                {
-                    if (previous != null) MapManager.Maps[mapId] = previous;
-                    else MapManager.Maps.Remove(mapId);
-                }
-            }
-
-            var unknownArena = regularFight with { SoulStoneFight = true };
-            Assert.False(Met("Ms=0", unknownArena)); // no map metadata, so arena state is unknown
-        }
-
         [Fact]
         public void Mt_is_whether_the_monster_that_drops_is_a_boss()
         {
@@ -276,11 +228,6 @@ namespace Jondo.Unity.Tests.Content
                 var netHolder = facts with { Held = item => item == 21172 ? 1 : 0 };
                 Assert.True(Met(pollen, netHolder));
 
-                // Sc only where its meaning is known: Halouine (967) is a yearly event, judged by the
-                // calendar; an id nobody knows keeps its rows from dropping.
-                bool halouine = SeasonalEvents.IsOn(967, Almanax.Clock());
-                Assert.Equal(halouine, Met("Sc=967", facts));
-                Assert.Equal(!halouine, Met("Sc!967", facts));
 
                 session.State.CharacterLevel = 60;
                 Assert.False(Met("(SC!5|ST!5)&PL>0&PL<59", facts));
@@ -297,27 +244,6 @@ namespace Jondo.Unity.Tests.Content
 
             Assert.Equal(Answer.Unknown, Criterion.Evaluate("Sc=987654321", condition => PlayerCriteria.Resolve(condition, noCharacter)));
             Assert.Equal(Answer.Unknown, Criterion.Evaluate("Sc!987654321", condition => PlayerCriteria.Resolve(condition, noCharacter)));
-        }
-
-        [Fact]
-        public void Uppercase_SD_uses_the_Paris_weekday_number_in_both_criterion_readers()
-        {
-            var clock = Almanax.Clock;
-            try
-            {
-                // 12 November 2026 at noon UTC is Thursday afternoon in Paris.
-                Almanax.Clock = () => new System.DateTime(2026, 11, 12, 12, 0, 0, System.DateTimeKind.Utc);
-
-                var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
-                Assert.True(Met("SD=5", facts));
-                Assert.False(Met("SD=4", facts));
-                Assert.True(Met("SD>4", facts));
-                Assert.Equal(5L, new Achievements.CharacterFacts().Scalar("SD"));
-            }
-            finally
-            {
-                Almanax.Clock = clock;
-            }
         }
 
         /// <summary>The server's own letters are not known here, and an unknown row never drops.</summary>
@@ -490,6 +416,116 @@ namespace Jondo.Unity.Tests.Content
             var drop = DatabaseManager.GetMonsterDrops(3761, 0).SingleOrDefault(d => d.ObjectId == 15585);
             if (drop == null) return;
             Assert.StartsWith("Qs=2174", drop.ReceiverCriterion);
+        }
+    }
+
+    /// <summary>
+    /// Ms writes maps into <see cref="MapManager.Maps"/>, so it runs with the other tests that do.
+    /// </summary>
+    [Collection("MapManager")]
+    public class PlayerCriteriaArenaTests
+    {
+        private static bool Met(string criterion, PlayerCriteria.Facts facts)
+            => Criterion.Met(criterion, condition => PlayerCriteria.Resolve(condition, facts));
+
+        /// <summary>
+        /// Mt is about the monster that drops; Ms is about a soul-stone fight in a city arena.
+        /// </summary>
+        [Fact]
+        public void Ms_requires_fight_source_and_checks_the_Bonta_or_Brakmar_arena()
+        {
+            var nobody = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+            Assert.False(Met("Ms=0", nobody)); // the fight type is not known
+
+            var regularFight = nobody with { SoulStoneFight = false };
+            Assert.True(Met("Ms=0", regularFight));
+            Assert.False(Met("Ms=1", regularFight));
+
+            const long bontaArena = 987654321, brakmarArena = 987654322, otherMap = 987654323;
+            var previousMaps = new Dictionary<long, MapInfo?>();
+            foreach (long mapId in new[] { bontaArena, brakmarArena, otherMap })
+                previousMaps[mapId] = MapManager.Maps.TryGetValue(mapId, out var previous) ? previous : null;
+            try
+            {
+                MapManager.Maps[bontaArena] = new MapInfo { MapId = bontaArena, Name = "Arena de Bonta" };
+                MapManager.Maps[brakmarArena] = new MapInfo { MapId = brakmarArena, Name = "Arène de Brâkmar" };
+                MapManager.Maps[otherMap] = new MapInfo { MapId = otherMap, Name = "Amakna" };
+                var soulStoneFight = regularFight with { MapId = bontaArena, SoulStoneFight = true };
+                Assert.True(Met("Ms=1", soulStoneFight));
+                Assert.True(Met("Ms>0", soulStoneFight));
+                Assert.False(Met("Ms=0", soulStoneFight));
+
+                var brakmarSoulStoneFight = soulStoneFight with { MapId = brakmarArena };
+                Assert.True(Met("Ms=1", brakmarSoulStoneFight));
+                Assert.False(Met("Ms=0", brakmarSoulStoneFight));
+
+                var outsideArena = soulStoneFight with { MapId = otherMap };
+                Assert.True(Met("Ms=0", outsideArena));
+                Assert.False(Met("Ms=1", outsideArena));
+            }
+            finally
+            {
+                foreach (var (mapId, previous) in previousMaps)
+                {
+                    if (previous != null) MapManager.Maps[mapId] = previous;
+                    else MapManager.Maps.Remove(mapId);
+                }
+            }
+
+            // A map nobody registered: no metadata, so whether it is an arena is unknown.
+            var unknownArena = regularFight with { MapId = 987654329, SoulStoneFight = true };
+            Assert.False(Met("Ms=0", unknownArena)); // no map metadata, so arena state is unknown
+        }
+    }
+
+    /// <summary>The criteria read off the calendar, run with the other tests that move its clock.</summary>
+    [Collection(Jondo.Unity.Tests.Quests.AlmanaxTests.AlmanaxClock)]
+    public class PlayerCriteriaCalendarTests
+    {
+        private static bool Met(string criterion, PlayerCriteria.Facts facts)
+            => Criterion.Met(criterion, condition => PlayerCriteria.Resolve(condition, facts));
+
+        [Fact]
+        public void Uppercase_SD_uses_the_Paris_weekday_number_in_both_criterion_readers()
+        {
+            var clock = Almanax.Clock;
+            try
+            {
+                // 12 November 2026 at noon UTC is Thursday afternoon in Paris.
+                Almanax.Clock = () => new System.DateTime(2026, 11, 12, 12, 0, 0, System.DateTimeKind.Utc);
+
+                var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+                Assert.True(Met("SD=5", facts));
+                Assert.False(Met("SD=4", facts));
+                Assert.True(Met("SD>4", facts));
+                Assert.Equal(5L, new Achievements.CharacterFacts().Scalar("SD"));
+            }
+            finally
+            {
+                Almanax.Clock = clock;
+            }
+        }
+
+        /// <summary>
+        /// Sc only where its meaning is known: Halouine (967) is a yearly event, judged by the
+        /// calendar.
+        /// </summary>
+        [Fact]
+        public void A_known_Sc_is_judged_by_the_calendar()
+        {
+            var clock = Almanax.Clock;
+            try
+            {
+                var facts = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+                Almanax.Clock = () => new System.DateTime(2026, 10, 31, 12, 0, 0, System.DateTimeKind.Utc);
+                bool halouine = SeasonalEvents.IsOn(967, Almanax.Clock());
+                Assert.Equal(halouine, Met("Sc=967", facts));
+                Assert.Equal(!halouine, Met("Sc!967", facts));
+            }
+            finally
+            {
+                Almanax.Clock = clock;
+            }
         }
     }
 }
