@@ -1285,6 +1285,12 @@ namespace Jondo.Unity.Server.Managers
             var tutorial = TutorialContent.Load();
             if (log == null || tutorial == null) return;
             if (tutorial.Quests.TrueForAll(log.Finished)) return;
+            if (!InTheTutorial(log, tutorial))
+            {
+                Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} is not in the tutorial: " +
+                                  "its «Abandonar el tutorial» is ignored.");
+                return;
+            }
 
             foreach (int questId in tutorial.Quests)
             {
@@ -1315,6 +1321,27 @@ namespace Jondo.Unity.Server.Managers
             if (tutorial.MapId != 0)
                 await Handlers.TeleportHandler.ToMapAsync(stream, tutorial.MapId, tutorial.Cell);
             Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} leaves the tutorial.");
+        }
+
+        /// <summary>
+        /// Whether the character playing is in the middle of the tutorial: one of its quests in hand,
+        /// or none started yet and the character on the maps where a new one wakes up.
+        /// </summary>
+        /// <remarks>
+        /// The client sends its idt again on the next character's entry when the one before was
+        /// switched out mid-tutorial (main menu, «Cambiar de personaje»). Honoured as it came, a
+        /// level-200 character in Cania had the tutorial validated, the set given and was put in
+        /// the Dofusarium while its client confirmed the map it stood on, which closed the
+        /// connection.
+        /// </remarks>
+        private static bool InTheTutorial(QuestLog log, TutorialContent tutorial)
+        {
+            if (tutorial.Quests.Exists(log.Active)) return true;
+            if (tutorial.Quests.Exists(log.Finished)) return false;
+            long mapId = SessionContext.State.MapId;
+            return mapId == Handlers.CharacterCreationHandler.TutorialMap
+                   || (mapId != 0 && DatabaseManager.SubAreaOfMap(mapId)
+                       == DatabaseManager.SubAreaOfMap(Handlers.CharacterCreationHandler.TutorialMap));
         }
 
         /// <summary>
