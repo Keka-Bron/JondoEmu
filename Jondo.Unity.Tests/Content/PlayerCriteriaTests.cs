@@ -179,21 +179,27 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
-        public void Mt_is_whether_the_monster_that_drops_is_a_boss()
+        public void Mt_is_whether_the_fight_began_in_a_dungeon_room_not_the_boss_flag()
         {
-            // The boss flag of the monster's template: the Lord Crow (289) has it, a tofu (98) not.
-            if (!Jondo.Unity.Server.Managers.Dreams.IsBoss(289)) return;   // no monster data here
+            if (!File.Exists(Paths.DungeonsJson)) return;
 
-            var boss = new PlayerCriteria.Facts(null, null, null, 0, _ => 0, MonsterId: 289);
-            Assert.True(Met("Mt=1", boss));
-            Assert.False(Met("Mt=0", boss));
+            DungeonManager.Initialize();
+            var dungeon = DungeonManager.All.Values.FirstOrDefault(d => d.Rooms.Count > 0
+                && d.EntranceMapId != 0 && DungeonManager.OfRoom(d.EntranceMapId) == null);
+            if (dungeon == null || !DungeonManager.IsLoaded) return;
 
-            var tofu = boss with { MonsterId = 98 };
-            Assert.True(Met("Mt=0", tofu));
-            Assert.False(Met("Mt=1", tofu));
+            // A tofu (98) in a dungeon room is in a dungeon; the monster does not matter.
+            var room = new PlayerCriteria.Facts(null, null, null, dungeon.Rooms[0], _ => 0, MonsterId: 98);
+            Assert.True(Met("Mt=1", room));
+            Assert.False(Met("Mt=0", room));
 
-            // Without a monster there is nothing to say.
-            Assert.Equal(Answer.Unknown, PlayerCriteria.Resolve(new Condition("Mt", '=', ["1"]), boss with { MonsterId = 0 }));
+            // And a boss fought at the door, off a soul stone, is not.
+            var entrance = room with { MapId = dungeon.EntranceMapId, MonsterId = 289 };
+            Assert.True(Met("Mt=0", entrance));
+            Assert.False(Met("Mt=1", entrance));
+
+            // Without the fight's map there is nothing to say.
+            Assert.Equal(Answer.Unknown, PlayerCriteria.Resolve(new Condition("Mt", '=', ["1"]), room with { MapId = 0 }));
         }
 
         /// <summary>
@@ -429,7 +435,7 @@ namespace Jondo.Unity.Tests.Content
             => Criterion.Met(criterion, condition => PlayerCriteria.Resolve(condition, facts));
 
         /// <summary>
-        /// Mt is about the monster that drops; Ms is about a soul-stone fight in a city arena.
+        /// Mt is about the dungeon room the fight began in; Ms is about a soul-stone fight in a city arena.
         /// </summary>
         [Fact]
         public void Ms_requires_fight_source_and_checks_the_Bonta_or_Brakmar_arena()

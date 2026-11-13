@@ -28,7 +28,7 @@ namespace Jondo.Unity.Server.Managers
     /// In a drop, Qo asks about the objectives still to do in the quests' current steps: «Qo=14179»
     /// is «kill ten larvae» pending, and «Qo&gt;4096&amp;Qo&lt;4098» is objective 4097 among those pending
     /// -- step 1237's objectives run 4074 to 4103. INFERRED, as the order of an objective's ids.
-    /// Mt is about the monster that drops and Ms about the fight's source (see Resolve); Sc, the
+    /// Mt is about where the fight began (a dungeon room or not) and Ms about the fight's source (see Resolve); Sc, the
     /// yearly events and content switches, only where its meaning is known (SeasonalEvents.IsKnown).
     /// The character's other letters -- the server's type and season, the date, the days an item
     /// has been held -- are asked of the achievement engine (ByCharacter). What nobody answers --
@@ -229,12 +229,16 @@ namespace Jondo.Unity.Server.Managers
                     return facts.State == null ? Answer.Unknown : Truth(Alterations.Has(facts.State.CharacterId, (int)value), op);
                 // Ga: whether the player is alive at the end of the fight.
                 case "Ga": return facts.PlayerAlive.HasValue ? Compare(facts.PlayerAlive.Value ? 1 : 0, op, value) : Answer.Unknown;
-                // Mt is whether the monster that drops is a boss -- the value-4 bit of his m_flags
-                // (Dreams.IsBoss). Of the 1,308 rows that ask «Mt=1», 1,268 are dungeon bosses' and
-                // 33 more are bosses fought outside any dungeon (Grozilla, Demoloch...); of the 496
-                // «Mt=0», 495 are monsters that are not bosses (the treasure maps' pieces). Read as
-                // "the fight began in a dungeon room", those 33 bosses' loot would never drop.
-                case "Mt": return facts.MonsterId == 0 ? Answer.Unknown : Compare(Dreams.IsBoss(facts.MonsterId) ? 1 : 0, op, value);
+                // Mt is whether the fight began on a dungeon room map, not whether the monster is a
+                // boss. Read as the boss flag, nearly every row that asks it would say nothing: of
+                // the 1,308 «Mt=1» rows, 1,262 sit on bosses' own drops, and of the 496 «Mt=0»,
+                // 495 on monsters that are not bosses. Read as the dungeon, each one is a rule: a
+                // boss's resources only in his dungeon, not off a soul stone fought elsewhere, and
+                // 410 rows of monsters that also live in dungeons only outside them. A missing
+                // origin map or an unloaded dungeon catalogue leaves it unknown.
+                case "Mt": return facts.MapId == 0 || !DungeonManager.IsLoaded
+                    ? Answer.Unknown
+                    : Compare(DungeonManager.OfRoom(facts.MapId) != null ? 1 : 0, op, value);
                 // Ss asks whether this monster is currently alive in the specified subarea.
                 // Its two arguments identify the monster and subarea; the operator negates or
                 // asserts live presence. Spawn catalog possibilities are not live presence.
