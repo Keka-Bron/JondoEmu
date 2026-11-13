@@ -117,7 +117,17 @@ namespace Jondo.Unity.Server.Managers
             /// lists Capsálocke's companions and the Master's together, and each room has its own.
             /// </summary>
             public Dictionary<long, List<int>> WrittenRoster { get; } = new();
+            /// <summary>Whether its boss is fought alone in his room (<see cref="BossFightsAlone"/>).</summary>
+            public bool BossAlone { get; set; }
         }
+
+        /// <summary>
+        /// The dungeons whose boss stands alone in his room, not leading a group the room fills up to
+        /// eight. The Giant Kralamoure (31): «Troisième et dernier combat : le Kralamoure Géant»,
+        /// nobody else (wiki-dofus, Dofus pour les noobs); composed like the others, he came with
+        /// seven of his lair's monsters. Nothing in the client's data says it.
+        /// </summary>
+        public static readonly int[] BossFightsAlone = { 31 };
 
         /// <summary>
         /// The dungeons as one set: <see cref="Initialize"/> fills a new one on its own thread and
@@ -754,6 +764,7 @@ namespace Jondo.Unity.Server.Managers
                         ExitMapId = Long(entry.Value, "exit"),
                         Authored = authored,
                         KeepsADoor = authored && Number(entry.Value, "door") != 0,
+                        BossAlone = BossFightsAlone.Contains(id),
                     };
 
                     if (entry.Value.TryGetProperty("rooms", out var rooms))
