@@ -510,6 +510,15 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// The cells the NPCs placed on a map stand on, whatever their criterion: the ones a monster
+        /// group has to leave clear. No temple saint is placed for it, unlike <see cref="Of"/>.
+        /// </summary>
+        public static int[] CellsOn(long mapId)
+        {
+            lock (_byMap) return _byMap.TryGetValue(mapId, out var here) ? here.Select(s => s.Cell).ToArray() : Array.Empty<int>();
+        }
+
         /// <summary>Every NPC placed in the world, map by map.</summary>
         public static IEnumerable<Spawn> AllSpawns
         {

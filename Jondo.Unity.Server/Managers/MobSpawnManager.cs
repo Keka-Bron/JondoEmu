@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using System.Linq;
+using Jondo.Unity.World.Maps;
 
 namespace Jondo.Unity.Server.Managers
 {
@@ -989,7 +990,7 @@ namespace Jondo.Unity.Server.Managers
             }
 
             var availableMonsters = GetSpawnableMonsterIds(mapId);
-            var validCells = GetInnerWalkableCells(mapId);
+            var validCells = GetGroupCells(mapId);
             var usedCells = new HashSet<int>();
 
             int numMobs = _rand.Next(2, 5); // 2 to 4 groups per map
@@ -1026,7 +1027,7 @@ namespace Jondo.Unity.Server.Managers
                 }
 
                 var usedCells = new HashSet<int>(mobs.Select(m => m.CellId));
-                var group = BuildRandomGroup(mapId, GetSpawnableMonsterIds(mapId), GetInnerWalkableCells(mapId), usedCells);
+                var group = BuildRandomGroup(mapId, GetSpawnableMonsterIds(mapId), GetGroupCells(mapId), usedCells);
                 if (group == null) return null;
 
                 mobs.Add(group);
@@ -1147,7 +1148,7 @@ namespace Jondo.Unity.Server.Managers
 
                 var ocupadas = new HashSet<int>(mobs.Select(m => m.CellId));
                 int celda = 0;
-                foreach (int libre in GetInnerWalkableCells(mapId))
+                foreach (int libre in GetGroupCells(mapId))
                 {
                     if (ocupadas.Contains(libre)) continue;
                     celda = libre;
@@ -1227,7 +1228,7 @@ namespace Jondo.Unity.Server.Managers
 
                 var ocupadas = new HashSet<int>(mobs.Select(m => m.CellId));
                 int celda = cell >= 0 ? cell : 0;
-                foreach (int libre in cell >= 0 ? (IEnumerable<int>)Array.Empty<int>() : GetInnerWalkableCells(mapId))
+                foreach (int libre in cell >= 0 ? (IEnumerable<int>)Array.Empty<int>() : GetGroupCells(mapId))
                 {
                     if (ocupadas.Contains(libre)) continue;
                     celda = libre;
@@ -1320,16 +1321,46 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The groups read from MapMobs -- not placed by hand, not a dungeon room's: the ones <see cref="PlaceOnWalkableCells"/> may move.</summary>
         private static readonly HashSet<long> _fromTable = new HashSet<long>();
 
+        /// <summary>The six cells <see cref="GetInnerWalkableCells"/> answers for a map whose cells it does not know.</summary>
+        private static readonly HashSet<int> FallbackCells = new() { 288, 303, 312, 327, 344, 350 };
+
+        /// <summary>The groups <see cref="PlaceOnWalkableCells"/> has placed: where it put them is where they stay.</summary>
+        private static readonly HashSet<long> _spread = new();
+
+        /// <summary>How many steps around an NPC no monster group stands on.</summary>
+        private const int NpcClearance = 3;
+
+        /// <summary>How many steps apart <see cref="PlaceOnWalkableCells"/> tries to keep the groups of a map.</summary>
+        private const int GroupSpacing = 3;
+
         /// <summary>
-        /// Puts back on a walkable cell the groups of MapMobs that stand where nobody can: in a wall, a
-        /// building, or on something clickable.
+        /// The inner cells a monster group may stand on: <see cref="GetInnerWalkableCells"/> without the
+        /// NPCs and the cells around them. A group beside an NPC hides it and takes the clicks meant for
+        /// it. When that leaves nothing, the NPCs' own cells are still kept clear.
+        /// </summary>
+        public static List<int> GetGroupCells(long mapId)
+        {
+            var inner = GetInnerWalkableCells(mapId);
+            var npcs = Npcs.CellsOn(mapId);
+            if (npcs.Length == 0) return inner;
+            var clear = inner.Where(c => npcs.All(n => MapGeometry.Distance(c, n) > NpcClearance)).ToList();
+            if (clear.Count > 0) return clear;
+            var notOnThem = inner.Where(c => !npcs.Contains(c)).ToList();
+            return notOnThem.Count > 0 ? notOnThem : inner;
+        }
+
+        /// <summary>
+        /// Spreads over the map the groups of MapMobs that stand where they should not: in a wall, a
+        /// building, on something clickable, beside an NPC, or on the six fallback cells of
+        /// <see cref="GetInnerWalkableCells"/>.
         /// </summary>
         /// <remarks>
         /// A database seeded before the maps were read (see InitializeAndSpawnAll) has every group on
-        /// the six fallback cells of GetInnerWalkableCells, 12,751 of them in the scenery -- two of the
-        /// four Pious of Astrub City (4,-19) stand in its walls. Called once the maps AND the
-        /// interactives are loaded; the draw is seeded by the group, so a group lands on the same cell
-        /// at every start.
+        /// those six fallback cells: 12,751 of them in the scenery -- two of the four Pious of Astrub
+        /// City (4,-19) stand in its walls -- and on the other maps all the groups huddled in the
+        /// middle, around whoever stands there. Called once the maps, the interactives AND the NPCs
+        /// are loaded; the draw is seeded by the group, so a group lands on the same cell at every
+        /// start, at least <see cref="GroupSpacing"/> steps from the others when the map has room.
         /// </remarks>
         /// <returns>How many groups were moved.</returns>
         public static int PlaceOnWalkableCells()
@@ -1342,18 +1373,30 @@ namespace Jondo.Unity.Server.Managers
                     if (!MapManager.WalkableCells.TryGetValue(mapId, out var walkable) || walkable.Count == 0) continue;
                     var standable = new HashSet<int>(walkable);
                     foreach (var element in Interactives.ElementsOf(mapId)) if (element.Cell != 0) standable.Remove(element.Cell);
-                    var used = new HashSet<int>(groups.Select(g => g.CellId));
-                    List<int>? inner = null;
+                    var npcs = Npcs.CellsOn(mapId);
+                    bool Misplaced(MobGroup g) => _fromTable.Contains(g.MobId) && !_spread.Contains(g.MobId)
+                        && (!standable.Contains(g.CellId) || FallbackCells.Contains(g.CellId)
+                            || npcs.Any(n => MapGeometry.Distance(g.CellId, n) <= NpcClearance));
+                    var used = new HashSet<int>(groups.Where(g => !Misplaced(g)).Select(g => g.CellId));
+                    List<int>? cells = null;
                     bool movedHere = false;
                     foreach (var group in groups)
                     {
-                        if (!_fromTable.Contains(group.MobId) || standable.Contains(group.CellId)) continue;
-                        inner ??= GetInnerWalkableCells(mapId);
-                        var choices = inner.Where(c => !used.Contains(c)).ToList();
-                        if (choices.Count == 0) continue;
-                        int cell = choices[new Random(unchecked((int)(group.MobId ^ mapId))).Next(choices.Count)];
-                        used.Remove(group.CellId);
+                        if (!Misplaced(group)) continue;
+                        cells ??= GetGroupCells(mapId);
+                        var choices = cells.Where(c => !used.Contains(c) && !FallbackCells.Contains(c)).ToList();
+                        if (choices.Count == 0) choices = cells.Where(c => !used.Contains(c)).ToList();
+                        if (choices.Count == 0) { used.Add(group.CellId); continue; }
+                        var draw = new Random(unchecked((int)(group.MobId ^ mapId)));
+                        for (int i = choices.Count - 1; i > 0; i--)
+                        {
+                            int j = draw.Next(i + 1);
+                            (choices[i], choices[j]) = (choices[j], choices[i]);
+                        }
+                        int cell = choices.FirstOrDefault(c => used.All(u => MapGeometry.Distance(c, u) >= GroupSpacing), choices[0]);
                         used.Add(cell);
+                        _spread.Add(group.MobId);
+                        if (cell == group.CellId) continue;
                         group.CellId = cell;
                         moved++;
                         movedHere = true;

@@ -147,8 +147,6 @@ namespace Jondo.Unity.Server
             Managers.SkillManager.Initialize();
             Managers.RecipeManager.Initialize();
             Managers.Interactives.Initialize();
-            // The groups seeded in the scenery, back on cells one can stand on (maps and interactives read).
-            Managers.MobSpawnManager.PlaceOnWalkableCells();
             Managers.HavenBagStore.Initialize();
             Managers.StorageStacks.Initialize();
             Managers.Bank.Initialize();
@@ -191,6 +189,9 @@ namespace Jondo.Unity.Server
             Network.UnknownPackets.Initialize();
             Managers.Vendors.Initialize();
             Managers.Npcs.Initialize();
+            // The groups seeded in the scenery or in the middle of the map, spread over cells one can stand
+            // on, away from the NPCs (maps, interactives and NPCs read).
+            Managers.MobSpawnManager.PlaceOnWalkableCells();
 
             // After the NPCs on purpose: it reads their templates to know with which reply
             // each guardian offers the bundle and with which the key.
