@@ -10,7 +10,7 @@ namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
     /// The Giant Kralamoure hit in water summons the Quaternary Tentacle on his next turn
-    /// (spell 1110, Â«HS=36Â», four to twelve cells away). The cells around him are not walkable,
+    /// (spell 1110, «HS=36», four to twelve cells away). The cells around him are not walkable,
     /// and a summon with no rows was only ever aimed at its caster's neighbours: he never summoned.
     /// </summary>
     [Collection("MapManager")]
@@ -54,5 +54,43 @@ namespace Jondo.Unity.Tests.Combat
             // And before his Kracheau: the tentacle is the point of the turn.
             Assert.True(summons.Max(o => o.Score) > options.Where(o => o.Spell.Id == Kracheau).Max(o => o.Score));
         }
+
+        /// <summary>
+        /// The Primary Tentacle with its five AP eats the summon at its contact: Kraken Primario,
+        /// 900 of air steal and a kill, which passes the relay on to the Secondary. Its damage is a
+        /// steal (93), which the spell data left at the default 5 to 10: it preferred its own
+        /// +1 AP every turn and never struck.
+        /// </summary>
+        [Fact]
+        public void The_primary_tentacle_eats_the_summon_at_its_contact()
+        {
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            if (!MapManager.WalkableCells.ContainsKey(BossRoom)) return;   // no world data
+
+            var fight = new FightInstance(9_999_778, BossRoom, BossRoom);
+            var player = new Fighter { Id = 10, TeamId = 0, CellId = 460, MaxHP = 5000, CurrentHP = 5000, Level = 200, MaxAP = 12, CurrentAP = 12, MaxMP = 6, CurrentMP = 6 };
+            var turret = new Fighter { Id = -6, TeamId = 0, CellId = 486, MaxHP = 1890, CurrentHP = 1890, Level = 200, IsMonster = true, MonsterId = 5833, Invocador = 10 };
+            var primary = new Fighter
+            {
+                Id = -5, TeamId = 1, CellId = 499, MaxHP = 230, CurrentHP = 230, Level = 100, IsMonster = true,
+                MonsterId = 424, MaxAP = 4, CurrentAP = 5, MaxMP = 2, CurrentMP = 2, Invocador = -1,
+            };
+            foreach (int spell in new[] { MotivacionNatural, KrakenPrimario })
+            {
+                primary.SpellIds.Add(spell);
+                primary.SpellGrades[spell] = 5;
+            }
+            fight.AddPlayer(player); fight.AddPlayer(turret); fight.AddOpponent(primary);
+
+            var spells = FightHandler.TacticsOf(primary);
+            if (spells.All(s => s.Id != KrakenPrimario)) return;   // no spell data
+            var next = MonsterTactics.Next(FightHandler.BoardOf(fight), primary, spells);
+
+            Assert.NotNull(next);
+            Assert.Equal(KrakenPrimario, next!.Spell.Id);
+            Assert.Equal(turret.Id, next.Target.Id);
+        }
+
+        private const int MotivacionNatural = 261, KrakenPrimario = 1096;
     }
 }
