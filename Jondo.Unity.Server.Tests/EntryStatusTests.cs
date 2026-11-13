@@ -45,13 +45,31 @@ public sealed class EntryStatusTests
     {
         var own = new StatusRecipient();
         var other = new StatusRecipient();
+        var service = new EntryEnvironmentMessages(() => new long[] { 71_001 }, () => null, _ => { },
+                                                   map => map == 9_000_000_001);
         using var context = SessionContext.Push(other.Session);
         using var turn = await own.Session.EnterTurnAsync();
-        await EntryEnvironmentMessages.SendDiscoveredAsync(own.Session, 9_000_000_001).WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.Equal(new long[] { 9_000_000_001 }, Assert.IsType<ZaapKnownListEvent>(Assert.Single(own.Codec.Frames).Content).Destinations);
+        await service.SendKnownAsync(own.Session, 9_000_000_001).WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal(new long[] { 71_001, 9_000_000_001 }, Assert.IsType<ZaapKnownListEvent>(Assert.Single(own.Codec.Frames).Content).Destinations);
         Assert.Empty(other.Packets);
         Assert.Equal(0, own.Codec.Decodes);
         Assert.Same(other.Session, SessionContext.Actual);
+    }
+
+    /// <summary>
+    /// The client replaces its known zaaps with each hjk: arriving anywhere sends them all, and the
+    /// arrival map only when it is a zaap. A list of the arrival map alone turned every zaap of the
+    /// world map into a «?».
+    /// </summary>
+    [Fact]
+    public void Arriving_on_a_map_sends_every_known_zaap_and_the_map_only_when_it_is_one()
+    {
+        var service = new EntryEnvironmentMessages(() => new long[] { 71_001, 72_002 }, () => null, _ => { },
+                                                   map => map is 71_001 or 73_003);
+
+        Assert.Equal(new long[] { 71_001, 72_002 }, service.Zaaps(99_999).Destinations);   // not a zaap
+        Assert.Equal(new long[] { 71_001, 72_002 }, service.Zaaps(71_001).Destinations);   // known already
+        Assert.Equal(new long[] { 71_001, 72_002, 73_003 }, service.Zaaps(73_003).Destinations);
     }
 
     [Fact]
