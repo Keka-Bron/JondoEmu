@@ -4504,7 +4504,12 @@ namespace Jondo.Unity.Server.Handlers
         /// plays -- and those of a caster who is gone. Not the bomb walls, which are the bombs'
         /// business (ReconciliarLosMurosAsync).
         /// </summary>
-        private static async Task QuitarLosGlifosCaducadosAsync(FightInstance fight, Fighter quienEmpieza)
+        /// <remarks>
+        /// In their own action sequence, as the expired buffs above them. Sent loose -- after the
+        /// buffs' jwi, before the next jto --, the 3.6 client swallowed them: a Feca's glyphs
+        /// dropped on the server and stayed painted on the board for the rest of the fight.
+        /// </remarks>
+        internal static async Task QuitarLosGlifosCaducadosAsync(FightInstance fight, Fighter quienEmpieza)
         {
             bool EsSuTiempo(Jondo.Unity.World.Fights.Glifo g)
             {
@@ -4516,11 +4521,18 @@ namespace Jondo.Unity.Server.Handlers
                 => !Managers.BombWalls.IsWall(g) && fight.Buscar(g.Dueno) is not { IsAlive: true };
 
             var caidos = fight.QuitarLosGlifosCaducados(g => !Managers.BombWalls.IsWall(g) && EsSuTiempo(g), SinDueno);
+            if (caidos.Count == 0) return;
+
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
+                Network.FightProtocol.BuildSequenceStart(quienEmpieza.Id, Network.FightProtocol.ActionSequence)));
             foreach (var caido in caidos)
             {
                 await MarcaQuitadaAsync(fight, caido);
                 Program.LogDebug($"[Fight] Glyph {caido.Id} of {caido.Dueno} drops at the start of {quienEmpieza.Id}'s turn.");
             }
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
+                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quienEmpieza.Id,
+                                                       Network.FightProtocol.ActionSequence)));
         }
 
         /// <summary>The aura glyph effect: given while one stands in it.</summary>
