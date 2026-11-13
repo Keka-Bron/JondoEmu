@@ -314,6 +314,7 @@ namespace Jondo.Unity.Server.Network
             Managers.QuestFightDrops.Forget();
             Managers.LootBoxes.Forget();
             Managers.DungeonExitRooms.Forget();
+            Managers.FightWinAlterations.Forget();
             Managers.Readables.Forget();
             Managers.TeleportManager.Initialize();
             // The passages are declared to the client from here: a door written since the start was

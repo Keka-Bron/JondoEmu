@@ -1,0 +1,38 @@
+{
+  "_comment": [
+    "Monsters of which their maps hold a single one at a time (Managers.UniqueMonsters).",
+    "",
+    "  monster          the unique monster",
+    "  ordinary         who it is swapped for wherever the groups have it: the background groups of the",
+    "                   base and those drawn on the fly bring it two and three times over",
+    "  maps             the maps where it stands, in one of their groups chosen at random",
+    "  respawnMinutes   how long it stays away once beaten (0: it is back with the next map loaded)",
+    "",
+    "LORD CROW'S LIBRARY, as Ankama remade it on 21 January 2025: «le but est de trouver 3 monstres",
+    "uniques qui se cachent parmi les 16 salles du donjon [...] Chaque monstre n'est présent qu'en un",
+    "seul exemplaire dans le donjon. S'il est en combat, il faut donc attendre qu'il repop. Si vous avez",
+    "de la chance, les 3 monstres uniques seront dans le même groupe» (Dofus pour les noobs). The",
+    "sixteen rooms are the client's subarea 1038, whose monsters are the three and the ordinary ones",
+    "they are a named version of. The guide gives no respawn time: INFERRED, back at once, so that",
+    "«attendre qu'il repop» is only the wait for the fight that holds it. The Master's companions in",
+    "his throne room are the same three (the guide again); a dungeon room's composed group is not",
+    "touched."
+  ],
+  "uniques": [
+    {
+      "monster": 823, "ordinary": 820, "respawnMinutes": 0,
+      "maps": [159121408, 159122432, 159123456, 159124480, 159121410, 159122434, 159123458, 159124482, 159121412, 159122436, 159123460, 159124484, 159121414, 159122438, 159123462, 159124486],
+      "why": "Zorio, el Zorrowapo (Rono le Renarbo), a Zorrowapo's (Renarbo's) named version; the library's sixteen rooms."
+    },
+    {
+      "monster": 824, "ordinary": 818, "respawnMinutes": 0,
+      "maps": [159121408, 159122432, 159123456, 159124480, 159121410, 159122434, 159123458, 159124482, 159121412, 159122436, 159123460, 159124484, 159121414, 159122438, 159123462, 159124486],
+      "why": "Horacio, el Cuerbok Domesticado (Horace le Corbac Apprivoisé), a Cuerbok domesticado's named version; the library's sixteen rooms."
+    },
+    {
+      "monster": 825, "ordinary": 819, "respawnMinutes": 0,
+      "maps": [159121408, 159122432, 159123456, 159124480, 159121410, 159122434, 159123458, 159124482, 159121412, 159122436, 159123460, 159124484, 159121414, 159122438, 159123462, 159124486],
+      "why": "Kondonio, el Bebedor (Kapotie le Buveur), a Bebedor's (Buveur's) named version; the library's sixteen rooms."
+    }
+  ]
+}

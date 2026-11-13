@@ -149,6 +149,20 @@ namespace Jondo.Unity.World.Content
         public int TeleportPassage { get; init; }
 
         /// <summary>
+        /// The dungeon door this reply opens, «key» or «keyring», or empty: the reply goes in by
+        /// the dungeon's key or by the keyring, spent and checked as at any guardian's door
+        /// (DungeonHandler). For the replies the door cannot find by their wording -- Virgil's
+        /// «Enseñar las plumas, darle la llave y entrar.» in the first room of Lord Crow's library.
+        /// </summary>
+        public string Door { get; init; } = "";
+
+        /// <summary>The key door, <see cref="Door"/>.</summary>
+        public const string KeyDoor = "key";
+
+        /// <summary>The keyring door, <see cref="Door"/>.</summary>
+        public const string KeyringDoor = "keyring";
+
+        /// <summary>
         /// The numbers this reply carries inside its own message, for the client to read into
         /// its text. Empty for almost every reply.
         /// </summary>
@@ -797,6 +811,9 @@ namespace Jondo.Unity.World.Content
             return false;
         }
 
+        /// <summary>Whether a reply of this tree opens a dungeon door in its own words (<see cref="DialogueChoice.Door"/>).</summary>
+        public bool OpensADoor => Lines.Any(line => line.Choices.Any(choice => choice.Door.Length > 0));
+
         public NpcDialogueKey Key => new NpcDialogueKey(NpcId, MapId);
 
         public DialogueLine? Line(long message)
@@ -1109,6 +1126,8 @@ namespace Jondo.Unity.World.Content
                             BuysPrice = Number(choice, "buyPrice"),
                             TeleportsTo = Number(choice, "teleport"),
                             TeleportPassage = (int)Number(choice, "passage"),
+                            Door = choice.TryGetProperty("door", out var door) && door.ValueKind == JsonValueKind.String
+                                   ? door.GetString() ?? "" : "",
                             Parameters = Numbers(choice, "params"),
                             ParameterArgs = ParameterArguments(choice),
                             DreamPointsPercent = (int)Number(choice, "dreamPointsPercent"),
@@ -1381,6 +1400,7 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.GivesKamas != 0) writer.WriteNumber("givesKamas", choice.GivesKamas);
                             if (choice.Criterion.Length > 0) writer.WriteString("criterion", choice.Criterion);
+                            if (choice.Door.Length > 0) writer.WriteString("door", choice.Door);
                             WriteIds(writer, "stagings", choice.Stagings);
                             WriteIds(writer, "cells", choice.Cells);
                             writer.WriteEndObject();
@@ -1473,6 +1493,12 @@ namespace Jondo.Unity.World.Content
                     {
                         wrong.Add($"reply {choice.Reply} loses its draw onto message {choice.OtherwiseNext}, which is " +
                                   "not one of its lines.");
+                    }
+
+                    if (choice.Door.Length > 0 && choice.Door != DialogueChoice.KeyDoor && choice.Door != DialogueChoice.KeyringDoor)
+                    {
+                        wrong.Add($"reply {choice.Reply} opens door «{choice.Door}», which is neither " +
+                                  $"«{DialogueChoice.KeyDoor}» nor «{DialogueChoice.KeyringDoor}».");
                     }
                 }
             }

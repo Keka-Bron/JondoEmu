@@ -1,0 +1,23 @@
+{
+  "_comment": [
+    "Alterations a won fight hands over for a monster beaten in it, and takes back on a map",
+    "(Managers.FightWinAlterations).",
+    "",
+    "  monster     the monster whose defeat hands it over",
+    "  subarea     only when beaten there (0: anywhere)",
+    "  alteration  the client's alteration (datos/alterations_3.6.10.11.json)",
+    "  lostAt      a map where a won fight takes it back (0: never)",
+    "",
+    "LORD CROW'S LIBRARY, as Ankama remade it on 21 January 2025: «Pour chaque monstre unique que",
+    "vous affrontez, vous obtenez une altération correspondant à ce dernier. Il faut donc obtenir",
+    "les 3 altérations pour continuer le donjon» (Dofus pour les noobs). The three are the client's",
+    "632-634 (category 20), «Esta pluma se consiguió después de haber arremetido contra las de…»",
+    "each, and Virgil asks for them in the First Room. INFERRED: they go once the master is beaten",
+    "in his throne room, so that the next run asks for them again; the guide does not say."
+  ],
+  "wins": [
+    { "monster": 823, "subarea": 1038, "alteration": 634, "lostAt": 159125512, "why": "Zorio, el Zorrowapo (Rono le Renarbo) leaves the «Pluma de Zorio»." },
+    { "monster": 824, "subarea": 1038, "alteration": 632, "lostAt": 159125512, "why": "Horacio, el Cuerbok Domesticado (Horace le Corbac Apprivoisé) leaves the «Pluma de Horacio»." },
+    { "monster": 825, "subarea": 1038, "alteration": 633, "lostAt": 159125512, "why": "Kondonio, el Bebedor (Kapotie le Buveur) leaves the «Pluma de Kondonio»." }
+  ]
+}

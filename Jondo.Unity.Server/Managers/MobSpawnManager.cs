@@ -263,6 +263,10 @@ namespace Jondo.Unity.Server.Managers
             WantedPosters.Load();
             WantedMonsters.Initialize(connection);
 
+            // And the monsters their maps hold one of: swapped out of the groups as they are read,
+            // and placed in one of their maps' groups when the first map is loaded (PlaceUniques).
+            UniqueMonsters.Load();
+
             // Who lives in each subarea, which is who a dungeon room is made of.
             _subareaRosters = LoadSubareaRosters(connection);
 
@@ -276,6 +280,7 @@ namespace Jondo.Unity.Server.Managers
             int archmonsters = 0;
             int criminals = 0;
             int wanted = 0;
+            int uniques = 0;
             int bajoTecho = 0;
             using (var reader = cmdMapMobs.ExecuteReader())
             {
@@ -318,6 +323,11 @@ namespace Jondo.Unity.Server.Managers
                             // The wanted monsters come in 6.352 groups. Same rules; the ones that
                             // do not stay have no ordinary version and are taken out (id 0).
                             if (WantedMonsters.Thin(mapId, mobId, ids) != 0) wanted++;
+
+                            // The library's three unique monsters are in almost every group of
+                            // its rooms, up to four times in one: each stands in a single group,
+                            // which PlaceUniques chooses.
+                            uniques += UniqueMonsters.Strip(ids);
 
                             for (int i = 0; i < ids.Count; i++) {
                                 // A wanted criminal stands in one group of his zone, not in the
@@ -390,6 +400,11 @@ namespace Jondo.Unity.Server.Managers
                               "each comes back in one group of its zone when the first map is loaded.");
             Console.WriteLine($"[MobSpawnManager] {wanted} groups keep a wanted monster " +
                               $"({100.0 * wanted / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
+            if (uniques > 0)
+            {
+                Console.WriteLine($"[MobSpawnManager] {uniques} unique monster(s) swapped for their ordinary version; " +
+                                  "each stands in one group of its maps once the first map is loaded.");
+            }
             // The two numbers separately, not the subtraction. With one group placed and another removed the
             // subtraction gives zero and the line does not come out, which is exactly the start where it is most needed
             // to see that content/ has touched something.
@@ -525,7 +540,10 @@ namespace Jondo.Unity.Server.Managers
             // Nor the monster a quest wants beaten in ANOTHER of its rooms: that room's own, like a
             // boss -- Dramak is the fourth auditorium's mini-boss and was leading the first's group.
             var elsewhere = dungeon.Quarry.Where(pair => pair.Key != room).SelectMany(pair => pair.Value).ToHashSet();
-            var roster = RosterOf(room).Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
+            // A hand-written dungeon may say who a room is made of: the subarea of Lord Crow's
+            // throne lists Capsálocke's companions and the Master's together.
+            var roster = (dungeon.WrittenRoster.TryGetValue(room, out var written) ? written : RosterOf(room))
+                .Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
             if (roster.Count == 0) roster = fallback.Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
 
             var members = ComposeRoom(roster, bossRoom ? dungeon.Bosses : Array.Empty<int>(),
@@ -798,6 +816,9 @@ namespace Jondo.Unity.Server.Managers
                 // The wanted criminals that may come back, back in a group of their zone.
                 PlaceCriminals(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
 
+                // And the unique monsters that are standing nowhere, each in a group of its maps.
+                PlaceUniques();
+
                 // A map with written groups that has been emptied stays empty: what fills a map on
                 // the fly is for maps that have none written (GetSpawnableMonsterIds). Where a beaten
                 // group is replaced, its fight already put one back; where it is not -- a dream room,
@@ -895,6 +916,9 @@ namespace Jondo.Unity.Server.Managers
             }
             Archimonsters.Thin(mapId, group.MobId, ids, draw: false);
             WantedMonsters.Thin(mapId, group.MobId, ids, draw: false);
+
+            // Nor a unique monster: it stands in the one group PlaceUniques gives it.
+            UniqueMonsters.Strip(ids);
 
             // And no criminal: each stands in one group of his zone, and that one is chosen by
             // PlaceCriminals, not drawn from the roster.
@@ -1481,6 +1505,7 @@ namespace Jondo.Unity.Server.Managers
             var members = group.Members.Where(m => m.Monster != null).Select(m => m.Monster.Id).ToList();
             Archimonsters.Release(mapId, members);
             WantedMonsters.Release(mapId, members);
+            UniqueMonsters.Released(mapId, mobId);
             WantedPosters.Released(mapId, mobId, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
         }
 
@@ -1555,6 +1580,57 @@ namespace Jondo.Unity.Server.Managers
             }
 
             if (placed > 0) Console.WriteLine($"[Wanted] {placed} criminal(s) back in their zones.");
+            return placed;
+        }
+
+        /// <summary>
+        /// Puts every unique monster that is standing nowhere into a group of its maps chosen at
+        /// random, in the place of its ordinary version if the group has one, of any member
+        /// otherwise. Groups in a fight are left alone. Under the lock.
+        /// </summary>
+        /// <remarks>
+        /// Lazily, on a map load, like the criminals: the groups are read before anything else and
+        /// a map's are only final once loaded. A unique whose group went away without its fight --
+        /// emptied by hand, put back as it was loaded -- stands nowhere and is placed again.
+        /// </remarks>
+        private static int PlaceUniques()
+        {
+            var due = UniqueMonsters.Due((monster, map, group) =>
+                _mapMobs.TryGetValue(map, out var groups)
+                && groups.Any(g => g.MobId == group && g.Members.Any(m => m.Monster?.Id == monster)));
+            if (due.Count == 0) return 0;
+
+            int placed = 0;
+            foreach (var unique in due)
+            {
+                if (!_monsters.TryGetValue(unique.Monster, out var data) || data.Grades.Count == 0) continue;
+                var candidates = new List<(long Map, MobGroup Group)>();
+                foreach (long mapId in unique.Maps)
+                {
+                    if (!_mapMobs.TryGetValue(mapId, out var groups)) continue;
+                    foreach (var group in groups)
+                        if (group.Members.Count > 0 && !group.Modular && !Handlers.FightHandler.IsGroupFighting(group.MobId))
+                            candidates.Add((mapId, group));
+                }
+                if (candidates.Count == 0) continue;
+
+                var (where, chosen) = candidates[_rand.Next(candidates.Count)];
+                int grade = _rand.Next(Math.Min(data.Grades.Count, MobMember.MaxGradesPerMonster));
+                // A new list, as for the criminals: the groups are read outside the lock.
+                var members = new List<MobMember>(chosen.Members);
+                int slot = members.FindIndex(m => m.Monster?.Id == unique.Ordinary);
+                if (slot < 0) slot = _rand.Next(members.Count);
+                members[slot] = new MobMember
+                {
+                    Monster = data,
+                    GradeIndex = grade,
+                    Level = data.Grades[grade].Level,
+                };
+                chosen.Members = members;
+                UniqueMonsters.Placed(unique.Monster, where, chosen.MobId);
+                Console.WriteLine($"[Uniques] {unique.Monster} stands in group {chosen.MobId} of map {where}.");
+                placed++;
+            }
             return placed;
         }
 

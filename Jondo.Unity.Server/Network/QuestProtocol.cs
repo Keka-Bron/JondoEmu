@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Jondo.Unity.Server.Network
 {
@@ -161,14 +162,28 @@ namespace Jondo.Unity.Server.Network
         /// </remarks>
         public static byte[] BuildQuestMarks(long mapId,
                                              IEnumerable<(long Actor, IReadOnlyList<int> Quests)> actors)
+            => BuildQuestMarks(mapId, actors.Select(a => (a.Actor, a.Quests, (IReadOnlyList<int>)Array.Empty<int>())));
+
+        /// <summary>
+        /// The same with the quests under way that want something from each actor, in f3. 89 of
+        /// the 472 captured iom carry it -- the tutorial's 2502 on its NPC, then 2502 and 1629
+        /// together --, and they go out after every ieb, idz, ief and ied. It is not what draws
+        /// the question mark over the NPC's head: that rides in the actor list, and a talk
+        /// objective revealed on arriving at the map (Lord Crow's library) got no mark from it.
+        ///
+        ///   f1 { f2 (repeated) { f2: packed quests offered, f3: packed quests under way, f4: actor id }
+        ///        f3: map id }
+        /// </summary>
+        public static byte[] BuildQuestMarks(long mapId,
+                                             IEnumerable<(long Actor, IReadOnlyList<int> Offers, IReadOnlyList<int> InProgress)> actors)
         {
             var inner = Pb.New();
-            foreach (var (actor, quests) in actors)
+            foreach (var (actor, quests, inProgress) in actors)
             {
                 // Named only if it has something. Pb.Packed with an empty list writes 1200 -f2 with
                 // zero length- and that byte pair does not appear once in the 145 real iom
                 // frames. A mark is removed by disappearing from the index, not by figuring in it with zero.
-                if (quests.Count == 0) continue;
+                if (quests.Count == 0 && inProgress.Count == 0) continue;
 
                 var block = Pb.New();
 
@@ -178,9 +193,8 @@ namespace Jondo.Unity.Server.Network
                 // 1200 -f2 with zero length- does not appear once in the 145 real iom frames
                 // measured, and removing a mark is done by sending the whole iom empty, not by naming
                 // the actor with a list of zero.
-                var packed = new List<long>(quests.Count);
-                foreach (int quest in quests) packed.Add(quest);
-                block.Packed(2, packed);
+                if (quests.Count > 0) block.Packed(2, quests.Select(q => (long)q).ToList());
+                if (inProgress.Count > 0) block.Packed(3, inProgress.Select(q => (long)q).ToList());
 
                 block.Var(4, actor);
                 inner.Msg(2, block);

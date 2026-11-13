@@ -96,6 +96,16 @@ namespace Jondo.Unity.Server.Handlers
         {
             var options = DungeonDoor.For(npcId);
             if (reply == 0 || options.Keyring != reply) return false;
+            return KeyringCannotOpen(mapId);
+        }
+
+        /// <summary>
+        /// Whether the keyring cannot open the door of the dungeon whose entrance this map is, for the
+        /// character of the session: the dungeon is not on it, there is no keyring in the bag, or this
+        /// week's free entry is spent. False on a map that is no dungeon's entrance.
+        /// </summary>
+        public static bool KeyringCannotOpen(long mapId)
+        {
             var dungeon = DungeonManager.AtEntrance(mapId);
             if (dungeon == null || dungeon.FirstRoom == 0) return false;
 
@@ -115,7 +125,7 @@ namespace Jondo.Unity.Server.Handlers
         /// method and other dialogue answers do not open the dungeon. When it offers neither, any
         /// answer opens, as it always did; see <see cref="Chosen"/>.
         /// </remarks>
-        public static async Task<bool> AtTheDoorAsync(NetworkStream stream, long mapId, long reply = 0)
+        public static async Task<bool> AtTheDoorAsync(NetworkStream stream, long mapId, long reply = 0, string door = "")
         {
             var dungeon = DungeonManager.AtEntrance(mapId);
             if (dungeon == null || dungeon.FirstRoom == 0) return false;
@@ -135,7 +145,10 @@ namespace Jondo.Unity.Server.Handlers
 
             bool freeEntryLeft = dungeon.OnKeyring
                                  && DungeonKeyring.FreeEntryLeft(state.CharacterId, dungeon.Id, DateTime.Now);
-            if (Chosen(dungeon, options, reply, freeEntryLeft) is not EntryMethod method) return false;
+            // A written reply that names its door goes in by it (DialogueChoice.Door); any other
+            // reply is one of the door's own or none.
+            var written = WrittenDoor(door);
+            if ((written ?? Chosen(dungeon, options, reply, freeEntryLeft)) is not EntryMethod method) return false;
 
             if (dungeon.MinLevel > 0 && state.CharacterLevel < dungeon.MinLevel)
             {
@@ -327,6 +340,14 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         internal enum EntryMethod { Key, Keyring }
+
+        /// <summary>The entry method a written reply's door names, or null when it names none.</summary>
+        internal static EntryMethod? WrittenDoor(string door) => door switch
+        {
+            Jondo.Unity.World.Content.DialogueChoice.KeyDoor => EntryMethod.Key,
+            Jondo.Unity.World.Content.DialogueChoice.KeyringDoor => EntryMethod.Keyring,
+            _ => null,
+        };
 
         /// <summary>
         /// The entry method this reply picks, or null when it is not one of the door's replies.

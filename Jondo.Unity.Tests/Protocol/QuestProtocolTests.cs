@@ -183,6 +183,35 @@ namespace Jondo.Unity.Tests.Protocol
         }
 
         [Fact]
+        public void The_captured_mark_of_a_quest_under_way_is_rebuilt_byte_for_byte()
+        {
+            // The tutorial capture, map 241440769, actor -20000: 2502 under way with it (f3), and
+            // later 2502 and 1629 together, each iom right after an ieb.
+            //
+            //   0a16                          f1, 22 bytes
+            //     120f                          f2, 15 bytes: one actor
+            //       1a02 c613                     f3, packed: varint 2502
+            //       20 e0e3feffffffffffff01       f4: -20000
+            //     18 81b09073                   f3: map 241440769
+            IReadOnlyList<int> none = Array.Empty<int>();
+            Assert.Equal("0a16120f1a02c61320e0e3feffffffffffff011881b09073",
+                         Hex(QuestProtocol.BuildQuestMarks(
+                             241440769, new[] { (-20000L, none, (IReadOnlyList<int>)new[] { 2502 }) })));
+            Assert.Equal("0a1812111a04c613dd0c20e0e3feffffffffffff011881b09073",
+                         Hex(QuestProtocol.BuildQuestMarks(
+                             241440769, new[] { (-20000L, none, (IReadOnlyList<int>)new[] { 2502, 1629 }) })));
+        }
+
+        [Fact]
+        public void An_actor_with_a_quest_to_offer_and_one_under_way_carries_both_in_order()
+        {
+            IReadOnlyList<int> offered = new[] { 2511 }, underWay = new[] { 2502 };
+            string built = Hex(QuestProtocol.BuildQuestMarks(1, new[] { (-20001L, offered, underWay) }));
+
+            Assert.Contains("1202cf131a02c613", built);   // f2 [2511], then f3 [2502]
+        }
+
+        [Fact]
         public void A_step_with_no_objectives_still_names_the_step_and_the_quest()
         {
             // 9 of the 457 captured frames carry no objective list. Building one must not produce

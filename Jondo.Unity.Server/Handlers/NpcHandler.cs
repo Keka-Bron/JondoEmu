@@ -302,7 +302,10 @@ namespace Jondo.Unity.Server.Handlers
             long[] puerta = DungeonHandler.DoorReplies(npc.NpcId, mapId);
             // Unless his written tree leads to them in its own words: Tassa opens the inn's cellar
             // after «¿Puedo entrar en la bodega?», not on her «No tengo nada que decirte».
-            if (escrito != null && puerta.Any(escrito.Offers)) puerta = Array.Empty<long>();
+            // Nor when it opens the door with replies of its own (DialogueChoice.Door): Virgil shows the
+            // three feathers before he takes the key, and the plain «Darle la llave y entrar.» would
+            // let anybody past him.
+            if (escrito != null && (puerta.Any(escrito.Offers) || escrito.OpensADoor)) puerta = Array.Empty<long>();
             if (puerta.Length > 0)
             {
                 var todas = new List<long>(puerta.Length + respuestas.Length);
@@ -994,6 +997,9 @@ namespace Jondo.Unity.Server.Handlers
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
             if (!Managers.Quests.HandsOverEnough(choice.Objectives(), choice.Partial)) return false;
             if (choice.Criterion.Length > 0 && !Managers.PlayerCriteria.Met(choice.Criterion, SessionContext.State.MapId)) return false;
+            // The keyring's door only while the keyring can open it, as the guardians' own reply.
+            if (choice.Door == Jondo.Unity.World.Content.DialogueChoice.KeyringDoor
+                && DungeonHandler.KeyringCannotOpen(SessionContext.State.MapId)) return false;
             if (choice.Cells.Count > 0 && !choice.Cells.Contains(SessionContext.State.CellId)) return false;
             if (NotItsTurnYet(choice)) return false;
             if (!ItsQuestIsOpenToHim(choice)) return false;
@@ -1649,7 +1655,7 @@ namespace Jondo.Unity.Server.Handlers
             // map change and there is nothing more to tell him.
             long dondeHabla = SessionContext.State.OpenDialogueMapId;
             if (dondeHabla == 0) dondeHabla = SessionContext.State.MapId;
-            if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla, reply))
+            if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla, reply, elegidaAhora?.Door ?? ""))
             {
                 CerrarConversacion();
                 // Going in can be what hands a quest over: Klasmor's «Criptología».

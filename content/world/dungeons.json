@@ -2,8 +2,57 @@
   "_comment": [
     "Mini-dungeons the catalogue (datos/dungeons.json) does not have: the ones a quest NPC takes you",
     "into. Same fields; the rooms are kept in the order written and the last one is the boss room",
-    "(DungeonManager.Dungeon.Authored). Ids above the catalogue's (it ends at 205)."
+    "(DungeonManager.Dungeon.Authored). Ids above the catalogue's (it ends at 205).",
+    "",
+    "Or a catalogue dungeon Ankama remade after the catalogue's rooms were written, under the",
+    "catalogue's own id, which this entry replaces whole. «door»: 1 keeps a guardian at the entrance",
+    "who takes the key or the keyring (DungeonHandler), where a mini-dungeon's NPC lets you in by his",
+    "own tree. «quarry»: room -> the monsters its fight brings besides the boss, as the quests'",
+    "objectives put theirs (DungeonManager.Dungeon.WrittenQuarry). «roster»: room -> who its group is",
+    "made of, in the place of its subarea's monsters (DungeonManager.Dungeon.WrittenRoster)."
   ],
+  "3": {
+    "name": "Biblioteca del Maestro Cuerbok",
+    "minLevel": 100,
+    "optimalLevel": 110,
+    "difficulty": 3,
+    "entrance": 159121408,
+    "exit": 158334976,
+    "rooms": [
+      159121666,
+      159125512
+    ],
+    "bosses": [
+      289
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        7926,
+        1
+      ]
+    ],
+    "autoGroup": 1,
+    "door": 1,
+    "quarry": {
+      "159121666": [
+        4572
+      ]
+    },
+    "roster": {
+      "159121666": [
+        4578,
+        4579,
+        4580
+      ],
+      "159125512": [
+        823,
+        824,
+        825
+      ]
+    },
+    "why": "Lord Crow's library as Ankama remade it on 21 January 2025 (Dofus pour les noobs, «Bibliothèque du Maître Corbac»): one walks its sixteen rooms freely (content/interactives/teleports.json), beats its three unique monsters for their feathers (content/fights/win_alterations.json), and Virgil, in the First Room [-15,-61], «Montrer les plumes, et utiliser le trousseau de clefs», lets the holder of the three in with the key or the keyring: «une salle avec le Capsaalocke et la salle du Maître Corbac». The catalogue's three rooms are kept: the throne room (159125512) is the boss's, where «Voler dans les plumes» (1775) has him beaten (11394), and its antechamber (159124488) is where Natacha waits after it (11395), the room after the boss (content/world/dungeon_exits.json). INFERRED: Capsálocke's room is the remaining one, the Library Annexe (159121666), since no objective names his map (11392). Who each of the two rooms is made of: «chaque monstre a un nom différent s'il accompagne le Capsaloocke ou le Maître Corbac [...] Les monstres qui accompagnent le Maître Corbac sont les mêmes que ceux que vous devez trouver dans la Bibliothèque»; the client's subarea 211 lists both sets together, Capsálocke's being the Bebesangres, the Jefe cuerbok and the Cuerbok adiestrado (4578-4580, of subarea 211 alone) and the Master's the library's three unique monsters (823-825)."
+  },
   "9001": {
     "name": "Laboratorio Secreto",
     "minLevel": 0,

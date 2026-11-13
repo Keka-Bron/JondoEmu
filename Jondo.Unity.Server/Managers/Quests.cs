@@ -885,7 +885,6 @@ namespace Jondo.Unity.Server.Managers
         public static async Task OnMapEnteredAsync(NetworkStream stream, long mapId, int subAreaId)
         {
             await OldCharacterReachesTheDofusariumAsync(stream, mapId);
-            bool advanced = false;
             var log = Log;
 
             // A quest the map itself hands out: «Des pwinces pas très charmants» starts on going
@@ -899,7 +898,6 @@ namespace Jondo.Unity.Server.Managers
                     if (log.Run(starter.Starts) != null) continue;
                     if (!await StartAsync(stream, starter.Starts)) continue;
                     Console.WriteLine($"[Quests] Quest {starter.Starts} starts on arriving on {mapId}.");
-                    advanced = true;
                 }
             }
             if (log != null && _book != null && mapId != 0)
@@ -920,8 +918,7 @@ namespace Jondo.Unity.Server.Managers
                         if (here && !run.Done.Contains(objective.Id) && Revealed(step, objective, run))
                         {
                             await TickAsync(stream, run.QuestId, objective.Id);
-                            advanced = true;
-                        }
+                                }
                     }
 
                     // And the free-text ones that are an arrival: "Pénétrer dans l'antre du
@@ -934,8 +931,7 @@ namespace Jondo.Unity.Server.Managers
                         if (binding.MapId != mapId) continue;
 
                         await CloseAsync(stream, binding);
-                        advanced = true;
-                    }
+                        }
 
                     // And a «beat» row with no element to press: its monsters come out when the
                     // character arrives on its map, once it is theirs to do -- the old gorkoko of «Un
@@ -952,11 +948,9 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
-            // Only when arriving actually finished something. The marks for this map went out
-            // BEFORE the actor list, which is where the captures put them -- see the caller in
-            // GameNodeProxy. Sending them again here every time would be a second frame per step
-            // saying exactly what the first one said.
-            if (advanced) await SendMarksAsync(stream, mapId);
+            // The marks for this map went out BEFORE the actor list, which is where the captures
+            // put them -- see the caller in GameNodeProxy. What arriving finishes or starts sends
+            // them again itself (TickAsync, StartAsync), as the captures do after every ieb.
         }
 
         /// <summary>
@@ -1565,11 +1559,14 @@ namespace Jondo.Unity.Server.Managers
             // Only the ones that have something. The iom is an index, not a census: in the 145 real
             // frames there is not one named actor with an empty list. Whoever stops having anything
             // disappears from the index, and that is what removes his mark.
-            var marks = new List<(long Actor, IReadOnlyList<int> Quests)>(here.Count);
+            // With the quests under way that want something from each, as the captures carry them
+            // (f3). The question mark over the head is the actor list's, drawn as the map loads.
+            var marks = new List<(long Actor, IReadOnlyList<int> Offers, IReadOnlyList<int> InProgress)>(here.Count);
             foreach (var npc in here)
             {
                 var offers = OfferedRightNowBy(npc.NpcId, mapId);
-                if (offers.Count > 0) marks.Add((npc.ContextualId, offers));
+                var waiting = InProgressWith(npc.NpcId, mapId);
+                if (offers.Count > 0 || waiting.Count > 0) marks.Add((npc.ContextualId, offers, waiting));
             }
 
             // And if on this map nobody is left with anything, the empty frame, which is how
@@ -1585,16 +1582,17 @@ namespace Jondo.Unity.Server.Managers
             // has been sent, or the empty list has been sent— and telling them apart meant opening the
             // traffic log and decoding the iom by hand. With this line one sees at a glance whether
             // the NPC has nothing to offer or whether it is the sending that does not arrive.
-            int conMarca = 0, ofrecidas = 0;
-            foreach (var (_, quests) in marks)
+            int conMarca = 0, ofrecidas = 0, enCurso = 0;
+            foreach (var (_, quests, waiting) in marks)
             {
+                enCurso += waiting.Count;
                 if (quests.Count == 0) continue;
                 conMarca++;
                 ofrecidas += quests.Count;
             }
 
             Console.WriteLine($"[Quests] Marks of map {mapId}: {conMarca} of {marks.Count} NPCs " +
-                              $"with something to offer, {ofrecidas} quest(s).");
+                              $"with something to offer, {ofrecidas} quest(s); {enCurso} under way waiting on them.");
         }
 
         /// <summary>
@@ -2004,6 +2002,9 @@ namespace Jondo.Unity.Server.Managers
             if (!move.QuestFinished)
             {
                 await SendStepAsync(stream, questId);
+
+                // And the marks again, as after every ieb and idz of the captures.
+                if (move.ObjectiveTicked || move.StepFinished) await SendMarksAsync(stream, SessionContext.State.MapId);
             }
             else
             {

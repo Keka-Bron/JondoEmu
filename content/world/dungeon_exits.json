@@ -184,6 +184,17 @@
       "npc": 148,
       "replies": [18850, 18851],
       "why": "The Wa Wabbit's burrow: after the Wa Wobot the winners are in the burrow's Exit room («Madriguera del Wey Wabbit - Salida»), where the guardian of the carrot dofus stands by its pedestal, and «L'œuf ou la cawotte ?» has them talk to him there («Il vous faut finir le Terrier du Wa Wabbit pour parler au Gawdien du Dofus», Dofus pour les noobs). «Apoderarte del dofus zanahowia y escaparte.» and «Irte sin buscar problemas.» leave by the dungeon's own exit. Cell 282: the room's way in."
+    },
+    {
+      "dungeon": 3,
+      "bossRoom": 159125512,
+      "room": 159124488,
+      "cell": 315,
+      "npc": 774,
+      "replies": [
+        78019
+      ],
+      "why": "Lord Crow's library: after the master the winners are in the antechamber next to his throne room, where Natacha waits for his guide in «Voler dans les plumes» («Avant de sortir, parlez à Natacha Manka qui vous demandera le guide», Dofus pour les noobs; 11395's map) and Virgil's «Salir de la biblioteca» leaves. INFERRED cell, an open walkable one."
     }
   ]
 }

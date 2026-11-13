@@ -32801,6 +32801,13 @@
       "map": 0,
       "opening": 24827,
       "openings": [
+        { "after": 1775, "message": 24861 },
+        { "quest": 1775, "objective": 11395, "message": 24859 },
+        { "quest": 1775, "objective": 11394, "message": 24857 },
+        { "quest": 1775, "objective": 11392, "message": 24855 },
+        { "quest": 1775, "objective": 11389, "message": 24854 },
+        { "quest": 1775, "objective": 11388, "message": 24852 },
+        { "quest": 1775, "message": 24851 },
         { "after": 1774, "message": 24846 },
         { "quest": 1774, "objective": 11386, "message": 24846 },
         { "quest": 1774, "objective": 11384, "message": 24843 },
@@ -32936,9 +32943,162 @@
           "choices": [
             { "reply": 29811 }
           ]
+        },
+        {
+          "message": 24852,
+          "choices": [
+            { "reply": 29814, "next": 24853 }
+          ]
+        },
+        {
+          "message": 24853,
+          "choices": [
+            { "reply": 29813, "quest": 1775, "completes": 11389, "params": [[30, 11389]] }
+          ]
+        },
+        {
+          "message": 24854,
+          "choices": [
+            { "reply": 29815, "quest": 1775, "completes": 11391, "params": [[30, 11391]] }
+          ]
+        },
+        {
+          "message": 24855,
+          "choices": [
+            { "reply": 29817, "next": 24856 }
+          ]
+        },
+        {
+          "message": 24856,
+          "choices": [
+            { "reply": 29816, "quest": 1775, "completes": 11393, "params": [[30, 11393]] }
+          ]
+        },
+        {
+          "message": 24857,
+          "choices": [
+            { "reply": 29819, "next": 24858 }
+          ]
+        },
+        {
+          "message": 24858,
+          "choices": [
+            { "reply": 29818, "quest": 1775, "completes": 11395, "params": [[30, 11395]] }
+          ]
+        },
+        {
+          "message": 24859,
+          "choices": [
+            { "reply": 29820, "next": 24860 }
+          ]
+        },
+        {
+          "message": 24860,
+          "choices": [
+            { "reply": 29821, "quest": 1775, "completes": 11396, "params": [[30, 11396]], "next": 24861 }
+          ]
+        },
+        {
+          "message": 24861,
+          "choices": [
+            { "reply": 29855, "next": 24884, "minLevel": 100, "beforeQuest": 1776 },
+            { "reply": 29855, "next": 24862, "belowLevel": 100 }
+          ]
+        },
+        {
+          "message": 24862,
+          "choices": []
+        },
+        {
+          "message": 24884,
+          "choices": [
+            { "reply": 29854, "next": 24885 }
+          ]
+        },
+        {
+          "message": 24885,
+          "choices": [
+            { "reply": 29853, "next": 24886 }
+          ]
+        },
+        {
+          "message": 24886,
+          "choices": [
+            { "reply": 29852, "startsQuest": 1776, "params": [[34, 1776]] }
+          ]
         }
       ],
-      "why": "Natacha Manka, the sadida hurt in the Penates of the Corbac (24827). «Oiseau de mauvais augure» (1774) of Dofus pour les noobs, in its order: «Preguntarle por sus necesidades» (24828: her herbs and first-aid kit forgotten in her bag by her camp), «Acepto» starts it, and sage too (24829). Back with the bag and forty sage, «Darle el material y preguntarle por su presencia en el lugar» (11375, 11376): the forest spirits led her here for a divination ritual (24831), the adventurer she hired vanished with her things (24832), will you help (24833), corbac wood first (24834). «Toma, la madera de cuerbok» (11378, the three woods taken): her workshop to carve the enchanted logs (24836); «Darle todo lo que necesita» (11380-11383): meet her far from here for the ritual (24837). There she sleeps (24838-24840) and wakes with a letter for Yova Etna, the fair's seer (24841, 11384). Back at her camp, «Darle la carta de Yova Etna» (24843, 11386): meet her before Master Corbac's library (24845). At the library (24846), «Informarte sobre el desarrollo de los acontecimientos» ends it (11387, 24847: the augury bodes ill); «¿Necesitas un escolta?» starts «Voler dans les plumes» (1775) then or on coming back (24848/24851), whose step text is 24851."
+      "why": "Natacha Manka, the sadida hurt in the Penates of the Corbac (24827). «Oiseau de mauvais augure» (1774) of Dofus pour les noobs, in its order: «Preguntarle por sus necesidades» (24828: her herbs and first-aid kit forgotten in her bag by her camp), «Acepto» starts it, and sage too (24829). Back with the bag and forty sage, «Darle el material y preguntarle por su presencia en el lugar» (11375, 11376): the forest spirits led her here for a divination ritual (24831), the adventurer she hired vanished with her things (24832), will you help (24833), corbac wood first (24834). «Toma, la madera de cuerbok» (11378, the three woods taken): her workshop to carve the enchanted logs (24836); «Darle todo lo que necesita» (11380-11383): meet her far from here for the ritual (24837). There she sleeps (24838-24840) and wakes with a letter for Yova Etna, the fair's seer (24841, 11384). Back at her camp, «Darle la carta de Yova Etna» (24843, 11386): meet her before Master Corbac's library (24845). At the library (24846), «Informarte sobre el desarrollo de los acontecimientos» ends it (11387, 24847: the augury bodes ill); «¿Necesitas un escolta?» starts «Voler dans les plumes» (1775) then or on coming back (24848/24851), whose step text is 24851. «Voler dans les plumes» (1775): at the Pénates she sends the character to Virgil (24851, «Dirigirte a Virgilio para entrar en la biblioteca»). In the Second Room she misses the old library (24852), «¿Cómo van tus investigaciones?», Virgil suggested books further in (24853), «Introducirte en la biblioteca» (11389). In the Seventh, Capsálocke keeps her from working (24854), «Darle azotes a los adultos es para mí una costumbre» (11391). In the throne room, after Capsálocke, the master will give her his guide if somebody entertains him (24855); «Bueno, yo os dejo a solas…» gets her «¡Qué horror! Tienes la mente sucia»: he wants a worthy opponent (24856), «Bruñir tus armas» (11393). In the antechamber after the master, «¿Sigues entero?» (24857): «Tenderle la guía», her first edition (24858), «Soltar la guía» hands it over (11395). At the edge of the Litneg wood the trools frighten her (24859, 24860), «Venga, tranquila» ends it (11396) and she will not give up (24861). From there, «S'informer des raisons de venir dans le bois de Litneg» (29855) leads into «Jeu de Trooll» (1776, PL>99): Astroollog (24884), «Se mettre en route» and «Où vas-tu ?» (24885), «Attendre les indications» and its step text (24886), «Aceptar» starts it; below level 100 she does not want the character risking their life (24862)."
+    },
+    {
+      "npc": 774,
+      "map": 158334976,
+      "opening": 57296,
+      "lines": [
+        {
+          "message": 57296,
+          "choices": [
+            { "reply": 78006, "passage": 774001 },
+            { "reply": 77997, "next": 57297 }
+          ]
+        },
+        {
+          "message": 57297,
+          "choices": [
+            { "reply": 77996, "next": 57298 }
+          ]
+        },
+        {
+          "message": 57298,
+          "choices": [
+            { "reply": 77995, "passage": 774001 }
+          ]
+        }
+      ],
+      "why": "Virgil at the door of Lord Crow's library, the Pénates [-15,-62], since Ankama remade it on 21 January 2025: «Vous pouvez également entrer et sortir du donjon comme bon vous semble et sans avoir besoin de clef en parlant à Virgil» (Dofus pour les noobs). His welcome (57296), «Entrar en la biblioteca» into the First Room; «¿Puedes hablarme de este lugar?»: sixteen rooms and three guardians (57297), a feather from each and the key (57298), «Ir en busca de las tres criaturas» goes in too."
+    },
+    {
+      "npc": 774,
+      "map": 159121408,
+      "opening": 3166,
+      "lines": [
+        {
+          "message": 3166,
+          "choices": [
+            { "reply": 78002, "criterion": "HA=632&HA=633&HA=634", "door": "key" },
+            { "reply": 78005, "criterion": "HA=632&HA=633&HA=634", "door": "keyring" },
+            { "reply": 77997, "next": 57297 },
+            { "reply": 78019, "passage": 774002 }
+          ]
+        },
+        {
+          "message": 57297,
+          "choices": [
+            { "reply": 77996, "next": 57298 }
+          ]
+        },
+        {
+          "message": 57298,
+          "choices": [
+            { "reply": 77995 }
+          ]
+        }
+      ],
+      "why": "Virgil in the First Room of Lord Crow's library [-15,-61], the only room he keeps since the remake: «Une fois que vous avez trouvé et vaincu les 3 monstres uniques, il faut retourner à la Première salle du donjon pour reparler à Virgil « Montrer les plumes, et utiliser le trousseau de clefs. »» (Dofus pour les noobs). With the three feathers (alterations 632-634, content/fights/win_alterations.json), «Enseñar las plumas, darle la llave y entrar» or «Mostrarle las plumas y utilizar el manojo de llaves» takes the key or the keyring to Capsálocke's room (the dungeon's door, content/world/dungeons.json). «Salir de la biblioteca» back to the Pénates. The confirmations 57301/57302 are left out, as at every guardian's door here."
+    },
+    {
+      "npc": 774,
+      "map": 159124488,
+      "opening": 3181,
+      "lines": [
+        {
+          "message": 3181,
+          "choices": [
+            { "reply": 78019 }
+          ]
+        }
+      ],
+      "why": "Virgil in the antechamber, where the master's winners are left (content/world/dungeon_exits.json): «Bueno, pues parece que al amo le gustó tu visita» (3181), and «Salir de la biblioteca» out to the Pénates."
     }
   ]
 }

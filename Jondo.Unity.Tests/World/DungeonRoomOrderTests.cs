@@ -180,6 +180,33 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// Lord Crow's library as Ankama remade it: written over the catalogue's dungeon 3, its
+        /// sixteen rooms walked freely, Virgil at the First Room's door, Capsálocke in the annexe
+        /// with his own companions and the Master in his throne room with the library's three.
+        /// </summary>
+        [Fact]
+        public void Live_catalogue_has_the_remade_library()
+        {
+            if (!File.Exists(Paths.DungeonsJson)) return;
+
+            DungeonManager.Initialize();
+            if (!DungeonManager.IsLoaded) return;
+
+            var library = DungeonManager.Get(3);
+            Assert.NotNull(library);
+            Assert.True(library!.Authored);
+            Assert.True(library.KeepsADoor);
+            Assert.Equal(new[] { 159121666L, 159125512L }, library.Rooms);
+            Assert.Equal(new[] { 4572 }, library.WrittenQuarry[159121666]);
+            Assert.Equal(new[] { 4578, 4579, 4580 }, library.WrittenRoster[159121666]);
+            Assert.Equal(new[] { 823, 824, 825 }, library.WrittenRoster[159125512]);
+
+            Assert.Same(library, DungeonManager.AtEntrance(159121408));
+            Assert.False(DungeonManager.IsRoom(159122432));   // the Second Room is no longer a room of it
+            Assert.True(DungeonManager.IsRoom(159121666));
+        }
+
+        /// <summary>
         /// The dungeons whose corridors already gave their order keep the last room of it: the
         /// partial names put these bosses in a Fourth or Third Room, and a win there left the
         /// dungeon before its real last room.

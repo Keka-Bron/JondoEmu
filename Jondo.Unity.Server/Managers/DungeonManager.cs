@@ -67,6 +67,12 @@ namespace Jondo.Unity.Server.Managers
             public bool Authored { get; set; }
 
             /// <summary>
+            /// Whether a hand-written dungeon still has a guardian who takes its key or the keyring at its
+            /// entrance («door» in content/world/dungeons.json), as the catalogue's do.
+            /// </summary>
+            public bool KeepsADoor { get; set; }
+
+            /// <summary>
             /// What has to be in the bag to get in: item id and how many. 126 of the 187 ask for
             /// something.
             /// </summary>
@@ -97,6 +103,20 @@ namespace Jondo.Unity.Server.Managers
             /// marionnettes» (1425's 7920) wants beaten there.
             /// </summary>
             public Dictionary<long, List<int>> Quarry { get; } = new();
+
+            /// <summary>
+            /// The monsters a person wrote for a room of a hand-written dungeon (content/world/dungeons.json
+            /// «quarry»), put into <see cref="Quarry"/> with the quests' own: Capsálocke in the room of
+            /// Lord Crow's library that leads to the throne, which no objective names a map for.
+            /// </summary>
+            public Dictionary<long, List<int>> WrittenQuarry { get; } = new();
+
+            /// <summary>
+            /// Who a room of a hand-written dungeon is made of (content/world/dungeons.json
+            /// «roster»), in the place of its subarea's monsters: Lord Crow's library's subarea 211
+            /// lists Capsálocke's companions and the Master's together, and each room has its own.
+            /// </summary>
+            public Dictionary<long, List<int>> WrittenRoster { get; } = new();
         }
 
         /// <summary>
@@ -362,6 +382,8 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var dungeon in _byId.Values)
                 {
                     dungeon.Quarry.Clear();
+                    foreach (var (room, monsters) in dungeon.WrittenQuarry)
+                        dungeon.Quarry[room] = monsters.Where(m => !dungeon.Bosses.Contains(m)).Distinct().ToList();
                     foreach (long room in dungeon.Rooms) dungeonOfRoom.TryAdd(room, dungeon);
                 }
 
@@ -731,6 +753,7 @@ namespace Jondo.Unity.Server.Managers
                         EntranceMapId = Long(entry.Value, "entrance"),
                         ExitMapId = Long(entry.Value, "exit"),
                         Authored = authored,
+                        KeepsADoor = authored && Number(entry.Value, "door") != 0,
                     };
 
                     if (entry.Value.TryGetProperty("rooms", out var rooms))
@@ -753,6 +776,39 @@ namespace Jondo.Unity.Server.Managers
                             int item = numbers.Current.GetInt32();
                             int count = numbers.MoveNext() ? numbers.Current.GetInt32() : 1;
                             if (item != 0) dungeon.Required.Add((item, Math.Max(1, count)));
+                        }
+                    }
+
+                    if (entry.Value.TryGetProperty("quarry", out var quarry) && quarry.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var room in quarry.EnumerateObject())
+                        {
+                            if (!long.TryParse(room.Name, out long map) || room.Value.ValueKind != JsonValueKind.Array) continue;
+                            dungeon.WrittenQuarry[map] = room.Value.EnumerateArray()
+                                .Where(m => m.TryGetInt32(out _)).Select(m => m.GetInt32()).ToList();
+                        }
+                    }
+
+                    if (entry.Value.TryGetProperty("roster", out var roster) && roster.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var room in roster.EnumerateObject())
+                        {
+                            if (!long.TryParse(room.Name, out long map) || room.Value.ValueKind != JsonValueKind.Array) continue;
+                            var monsters = room.Value.EnumerateArray()
+                                .Where(m => m.TryGetInt32(out _)).Select(m => m.GetInt32()).Where(m => m > 0).ToList();
+                            if (monsters.Count > 0) dungeon.WrittenRoster[map] = monsters;
+                        }
+                    }
+
+                    // A hand-written dungeon with a catalogue id takes that dungeon's place: Ankama
+                    // remade Lord Crow's library after the catalogue's rooms were written. Its old
+                    // rooms are no longer its rooms.
+                    if (_byId.TryGetValue(id, out var replaced))
+                    {
+                        foreach (long room in replaced.Rooms)
+                        {
+                            if (_byRoom.TryGetValue(room, out var holders) && holders.Remove(replaced) && holders.Count == 0)
+                                _byRoom.Remove(room);
                         }
                     }
 
@@ -866,8 +922,9 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (dungeon.EntranceMapId != mapId) continue;
                 // A hand-written one has no door: its NPC's tree takes you in (Doctor Niet's
-                // «Entrar en el laboratorio»), and his other replies are his own.
-                if (dungeon.Authored) continue;
+                // «Entrar en el laboratorio»), and his other replies are his own. Unless it says
+                // it keeps one: Lord Crow's library takes its key from Virgil in its first room.
+                if (dungeon.Authored && !dungeon.KeepsADoor) continue;
                 if (best == null || dungeon.Id < best.Id) best = dungeon;
             }
 

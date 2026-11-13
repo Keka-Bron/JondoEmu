@@ -3941,8 +3941,62 @@
       "npc": 3405,
       "cell": 314,
       "orientation": 1,
-      "criterion": "Qo>11386&Qf!1775",
-      "why": "Before Master Corbac's library [-15,-62] (24845, 11387's map), where «Voler dans les plumes» is given (its giver). INFERRED cell, an open walkable one."
+      "criterion": "Qo>11386&Qf!1775&Qo<11389",
+      "why": "Before Master Corbac's library [-15,-62] (24845, 11387's map), where «Voler dans les plumes» is given (its giver), until she has gone in with the character: in the Second Room after that. INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 159122432,
+      "npc": 3405,
+      "cell": 258,
+      "orientation": 1,
+      "criterion": "Qa=1775&Qo<11389",
+      "why": "Natacha in the Second Room of the library (11389's map) until she has been talked to there. INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 159123458,
+      "npc": 3405,
+      "cell": 258,
+      "orientation": 1,
+      "criterion": "Qa=1775&Qo>11389&Qo<11391",
+      "why": "Natacha in the Seventh Room (11391's map), further in as Virgil suggested (24853). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 159125512,
+      "npc": 3405,
+      "cell": 298,
+      "orientation": 1,
+      "criterion": "Qa=1775&Qo>11392&Qo<11393",
+      "why": "Natacha in the throne room once Capsálocke is beaten (11393's map), until she leaves the character alone with the master. INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 159124488,
+      "npc": 3405,
+      "cell": 246,
+      "orientation": 1,
+      "criterion": "Qa=1775&Qo>11393&Qo<11395",
+      "why": "Natacha waiting in the room next to the throne, «me espero en la habitación de al lado» (29817), for the master's guide (11395's map). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 155976704,
+      "npc": 3405,
+      "cell": 160,
+      "orientation": 1,
+      "criterion": "Qo>11395&Qa!1776&Qf!1776",
+      "why": "Natacha at the edge of the Litneg wood [-13,-59], «je t'attendrai à la lisière» (24858, 11396's map), where «Jeu de Trooll» is given (its giver), until it starts. INFERRED cell: on the sand path in front of the stone arch at the wood's northern edge, the side of the library, in full view (behind the arch she could not be seen)."
+    },
+    {
+      "map": 159121408,
+      "npc": 774,
+      "cell": 230,
+      "orientation": 1,
+      "why": "Virgil in the First Room of the library, «Virgil se trouve uniquement dans la première salle du donjon» (Dofus pour les noobs). INFERRED cell, an open walkable one."
+    },
+    {
+      "map": 159124488,
+      "npc": 774,
+      "cell": 257,
+      "orientation": 1,
+      "why": "Virgil in the antechamber after the master, to see the winners out (3181). INFERRED cell, an open walkable one."
     }
   ]
 }
