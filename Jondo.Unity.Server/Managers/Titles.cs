@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Microsoft.Data.Sqlite;
 
 namespace Jondo.Unity.Server.Managers
 {
@@ -31,6 +32,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static volatile bool _loaded;
         private static readonly object _lock = new object();
+        private static volatile bool _ownershipReady;
 
         public static IReadOnlyList<long> All { get { Ensure(); return _titles; } }
         public static IReadOnlyList<long> AllOrnaments { get { Ensure(); return _ornaments; } }
@@ -43,7 +45,106 @@ namespace Jondo.Unity.Server.Managers
         /// Calling it again does nothing, on purpose: titles_ornaments.json comes out of the
         /// client and does not change while the server is up.
         /// </remarks>
-        public static void Initialize() => Ensure();
+        public static void Initialize()
+        {
+            Ensure();
+            InitializeOwnership();
+        }
+
+        private static void InitializeOwnership()
+        {
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CharacterTitles (
+                        CharacterId INTEGER NOT NULL,
+                        TitleId INTEGER NOT NULL,
+                        PRIMARY KEY (CharacterId, TitleId));
+
+                    INSERT OR IGNORE INTO CharacterTitles (CharacterId, TitleId)
+                    SELECT CharacterId, TitleId FROM CharacterWardrobe
+                    WHERE TitleId != 0;";
+                command.ExecuteNonQuery();
+                _ownershipReady = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Titles] Could not initialize title ownership: {ex.Message}");
+            }
+        }
+
+        /// <summary>Whether this character knows a title; null means ownership data is unavailable.</summary>
+        public static bool? Knows(long characterId, int titleId)
+        {
+            if (!_ownershipReady || characterId == 0 || titleId <= 0) return null;
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT 1 FROM CharacterTitles WHERE CharacterId = $c AND TitleId = $t;";
+                command.Parameters.AddWithValue("$c", characterId);
+                command.Parameters.AddWithValue("$t", titleId);
+                return command.ExecuteScalar() != null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Titles] Could not read title ownership: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>Records titles granted by an authoritative character reward.</summary>
+        public static void Grant(long characterId, IEnumerable<int> titleIds)
+        {
+            if (!_ownershipReady || characterId == 0) return;
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                using var transaction = connection.BeginTransaction();
+                foreach (int titleId in titleIds)
+                {
+                    if (titleId <= 0) continue;
+                    using var command = connection.CreateCommand();
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR IGNORE INTO CharacterTitles (CharacterId, TitleId) VALUES ($c, $t);";
+                    command.Parameters.AddWithValue("$c", characterId);
+                    command.Parameters.AddWithValue("$t", titleId);
+                    command.ExecuteNonQuery();
+                }
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Titles] Could not grant title ownership: {ex.Message}");
+            }
+        }
+
+        /// <summary>The owned title ids, for the character's wardrobe response.</summary>
+        public static IReadOnlyList<long> OwnedBy(long characterId)
+        {
+            var owned = new List<long>();
+            if (!_ownershipReady || characterId == 0) return owned;
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT TitleId FROM CharacterTitles WHERE CharacterId = $c ORDER BY TitleId;";
+                command.Parameters.AddWithValue("$c", characterId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) owned.Add(reader.GetInt64(0));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Titles] Could not list owned titles: {ex.Message}");
+            }
+            return owned;
+        }
 
         private static void Ensure()
         {

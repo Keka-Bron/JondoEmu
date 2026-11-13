@@ -155,6 +155,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Every monster the server knows, with its grades: what the admin window lists levels from.</summary>
         public static IReadOnlyCollection<MonsterData> AllMonsters => _monsters.Values;
         private static Dictionary<long, List<MobGroup>> _mapMobs = new Dictionary<long, List<MobGroup>>();
+        private static volatile bool _initialized;
 
         /// <summary>
         /// The lock on the groups per map.
@@ -233,6 +234,7 @@ namespace Jondo.Unity.Server.Managers
 
         public static void InitializeAndSpawnAll()
         {
+            _initialized = false;
             Console.WriteLine("[MobSpawnManager] Loading data from SQLite...");
             
             using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
@@ -395,6 +397,34 @@ namespace Jondo.Unity.Server.Managers
             {
                 Console.WriteLine($"[MobSpawnManager] From content/: {deLaMano.Puestos} group(s) " +
                                   $"placed by hand and {deLaMano.Quitados} removed.");
+            }
+            _initialized = true;
+        }
+
+        /// <summary>
+        /// Whether a monster currently exists in a live group on any map in a subarea.
+        /// This deliberately reads the placed groups without asking GetMobsForMap, which may
+        /// generate possible groups for an unvisited map and would turn a spawn possibility
+        /// into a false live-presence claim.
+        /// </summary>
+        public static bool? IsMonsterAliveInSubarea(int monsterId, int subAreaId)
+        {
+            if (!_initialized || monsterId <= 0 || subAreaId <= 0) return null;
+            var maps = DatabaseManager.MapsOfSubArea(subAreaId);
+            if (maps.Count == 0) return null;
+
+            lock (_candado)
+            {
+                foreach (long mapId in maps)
+                {
+                    if (!_mapMobs.TryGetValue(mapId, out var groups)) continue;
+                    if (groups.Any(group => group.Members.Any(member => member.Monster?.Id == monsterId)))
+                        return true;
+                }
+
+                // We can conclude absence only after the spawner has loaded and the subarea
+                // mapping was available. Empty/unmaterialized dynamic maps do not imply presence.
+                return false;
             }
         }
 

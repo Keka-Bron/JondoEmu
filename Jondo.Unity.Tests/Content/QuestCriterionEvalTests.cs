@@ -45,6 +45,20 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
+        public void BI_compares_the_zero_accessible_state_with_normal_negation()
+        {
+            var plain = Judge("BI=1", new Facts());
+            var negated = Judge("BI!1", new Facts());
+            Assert.False(plain.Met);
+            Assert.True(negated.Met);
+            Assert.True(Judge("BI=0", new Facts()).Met);
+            Assert.False(Judge("BI!0", new Facts()).Met);
+            Assert.False(Judge("BI=1,2", new Facts()).FullyJudged);
+            Assert.True(plain.FullyJudged);
+            Assert.True(negated.FullyJudged);
+        }
+
+        [Fact]
         public void Level_is_strictly_greater()
         {
             // PL>29 is level 30 and up. Reading it as "at least 29" would let a level 29 character

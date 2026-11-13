@@ -40,7 +40,7 @@ namespace Jondo.Unity.Server.Handlers
                                                                IReadOnlyList<MobSpawnManager.MobMember>? allies = null,
                                                                bool alliesMustLive = false,
                                                                long winMapId = 0, int winCellId = 0, int winMarks = 0,
-                                                               long alliesPlayedBy = 0)
+                                                               long alliesPlayedBy = 0, bool? soulStoneFight = false)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
@@ -74,6 +74,7 @@ namespace Jondo.Unity.Server.Handlers
             if (arenaMapId <= 0) arenaMapId = Managers.GuildRaidGuardians.ArenaOf(mobGroup, mapId);
             if (arenaMapId <= 0) arenaMapId = MapManager.ResolveArenaMapId(mapId);
             var fight = new FightInstance(fightId, mapId, arenaMapId);
+            fight.SoulStoneFight = soulStoneFight;
 
             // In a kanojedo the fight follows the training rulebook: no challenges, no loot and
             // the puch does not disappear on winning. The map decides -- where the master puch is --
@@ -12613,7 +12614,8 @@ namespace Jondo.Unity.Server.Handlers
         /// <remarks>
         /// One judge for every table a monster drops from -- its own, the global one and the
         /// quests' -- given what he holds (<paramref name="held"/>, with what this fight has already
-        /// dropped him) and the monster that drops (<paramref name="monsterId"/>, for Mt and Ms).
+        /// dropped him), the monster whose table is being judged (<paramref name="monsterId"/>), and the
+        /// fight's source (<see cref="FightInstance.SoulStoneFight"/>, for Ms).
         /// The own table asks the fight's letters too: the Purple Dawn champion's temporal loops
         /// drop on «HA=51|HS=3384|HA=52|HS=3385», an elixir's state, which only the fight knows.
         /// </remarks>
@@ -12622,8 +12624,9 @@ namespace Jondo.Unity.Server.Handlers
             if (string.IsNullOrWhiteSpace(criterion)) return true;
             var raid = Managers.GuildRaidManager.ResolverFor(GameState.CharacterId);
             long mapId = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : GameState.MapId;
-            var player = Managers.PlayerCriteria.ResolverFor(mapId, held, monsterId);
             var me = fight.Buscar(GameState.CharacterId);
+            var player = Managers.PlayerCriteria.ResolverFor(mapId, held, monsterId,
+                playerAlive: me?.IsAlive, soulStoneFight: fight.SoulStoneFight);
             return Jondo.Unity.World.Content.Criterion.Met(criterion, condition =>
             {
                 var answer = raid(condition);

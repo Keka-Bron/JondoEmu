@@ -259,7 +259,7 @@ namespace Jondo.Unity.World.Quests
         /// <summary>Whether this engine knows what an operator means.</summary>
         public static bool Understands(string op) => op switch
         {
-            "PL" or "Qf" or "Qa" or "Qc" or "Qo" or "Pm" or "OA" => true,
+            "PL" or "Qf" or "Qa" or "Qc" or "Qo" or "Pm" or "OA" or "BI" => true,
             _ => false,
         };
 
@@ -373,6 +373,13 @@ namespace Jondo.Unity.World.Quests
                     At++;
                 }
 
+                if (op == "BI" && values.Count != 1)
+                {
+                    string term = _text.Substring(start, At - start);
+                    if (!_skipped.Contains(term)) _skipped.Add(term);
+                    return true;
+                }
+
                 if (!Understands(op))
                 {
                     // Not one of the reader's own, but the facts may know it: the achievement
@@ -459,6 +466,11 @@ namespace Jondo.Unity.World.Quests
             {
                 switch (op)
                 {
+                    // BI marks unobtainable content. Compare its numeric value against zero:
+                    // BI=1 fails while BI=0 and BI!1 pass under the normal operators.
+                    case "BI":
+                        return Compare(0, comparison, value);
+
                     case "PL":
                         // Strictly greater and strictly less. PL>29 is level 30 and up: the level
                         // the client shows on the quest card is one more than the number here.

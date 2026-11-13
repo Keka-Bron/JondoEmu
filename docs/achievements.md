@@ -108,8 +108,8 @@ defeated with a challenge, areas visited, items crafted, the day of the last Alm
 challenges won, mounts born, rides caught, guild missions and tokens, items used and broken,
 maps been on, dream trials won and the dreams' tallies per difficulty).
 
-`BI=map` is «has been on that map»: the 421 objectives of Incarnam's «A lo largo y a lo ancho» and its
-kind. Only the maps some objective names are written down, once each, on arriving.
+`BI` marks unobtainable content: `BI=1` is unmet. Compare against zero, so `BI=0` and `BI!1` pass
+under the normal operators. BI is not a follower-item or visited-map count.
 
 `EJ>achievement,0` is a dream trial won, «Vencer en el combate final de la prueba FONSOCAC»: counted
 for whoever fought the trial's Fin du rêve.
