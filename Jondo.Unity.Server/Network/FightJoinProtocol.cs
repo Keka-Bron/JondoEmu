@@ -173,16 +173,20 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>
         /// A team as the spectator window lists it (lgw with its f1 case, lcu): the map's team -- f2
-        /// the kind of side, f3 its leader, f4 1, f5 no members, f6 which team -- and f1 { f3 how
-        /// many it is, f8 their mean level }. gop.blaf reads the case and nothing without it.
+        /// the kind of side, f3 its leader, f4 1, f6 which team -- and f1 { f3 how many it is, f8
+        /// their mean level }. gop.blaf reads the case and nothing without it.
         /// </summary>
+        /// <remarks>
+        /// No f5: the member list of the map's team is the other case of the same oneof, and an
+        /// empty one after f1 left the case at 5. blaf then gave the window a null team and
+        /// SpectatorUi.UpdateFightListUI threw, so the list never opened.
+        /// </remarks>
         public static Pb LightTeam(int team, long leader, int sideKind, int members, int meanLevel)
             => Pb.New()
                 .Msg(1, Pb.New().VarIfNotZero(3, members).VarIfNotZero(8, meanLevel))
                 .VarIfNotZero(2, sideKind)
                 .Var(3, leader)
                 .Var(4, 1)
-                .Msg(5, Pb.New())
                 .VarIfNotZero(6, team);
 
         /// <summary>
@@ -214,23 +218,50 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>
         /// One fighter of a fight's details (lgr), as ff.mus reads it: f9 the level, f10 the fighter,
-        /// and in its oneof a monster's f2 { f1 the monster, f2 its grade } or a person's f6 { f1
-        /// the name }.
+        /// and its oneof says what it is -- f6 { f1 the name } a person, f7 { f1 the monster } a
+        /// monster, f2 { f1 first name, f2 last name } a tax collector (f11 is a companion).
         /// </summary>
-        public static Pb FighterInDetails(long id, int level, int monster, int grade, string name)
+        /// <remarks>
+        /// f2 is not a monster with its grade: ff.mus makes it a tax collector and
+        /// SpectatorUi.GetEntityName looks its two ids up among the tax collectors' names, so the
+        /// monsters of the window's detail came out nameless.
+        /// </remarks>
+        /// <remarks>
+        /// The row's head comes from f5 and f3 (SpectatorUi.BindingListView): f5 above zero is a
+        /// class, drawn with f3's sex (1 female); f5 = -2 with a monster in f7 is that monster's
+        /// head; any other f5 is read as a companion and looked up by the f11 id, which throws
+        /// when there is none. Without f5 every row of the window threw there and the detail
+        /// came out empty. What a tax collector's row carries in f5 is not known.
+        /// </remarks>
+        public static Pb FighterInDetails(long id, int level, int monster, string name,
+                                          int taxCollectorFirstName = 0, int taxCollectorLastName = 0,
+                                          int breed = 0, bool female = false)
         {
             var lgr = Pb.New().VarIfNotZero(9, level).Var(10, id);
-            return monster != 0
-                ? lgr.Msg(2, Pb.New().Var(1, monster).VarIfNotZero(2, grade))
-                : lgr.Msg(6, Pb.New().Str(1, name ?? ""));
+            if (taxCollectorFirstName != 0 || taxCollectorLastName != 0)
+                return lgr.Msg(2, Pb.New().VarIfNotZero(1, taxCollectorFirstName).VarIfNotZero(2, taxCollectorLastName));
+            if (monster != 0)
+                return lgr.Var(5, MonsterHead).Msg(7, Pb.New().Var(1, monster));
+            if (female) lgr.Var(3, 1);
+            return lgr.VarIfNotZero(5, breed).Msg(6, Pb.New().Str(1, name ?? ""));
         }
 
-        /// <summary>One fight's people (jqy): { f1 the fight, f2 each attacker, f3 each defender }.</summary>
+        /// <summary>The f5 of a monster's row in a fight's details: draw its head from f7.</summary>
+        public const int MonsterHead = -2;
+
+        /// <summary>
+        /// One fight's people (jqy): { f1 the fight, f2 each defender, f3 each attacker }.
+        /// </summary>
+        /// <remarks>
+        /// fhs.bffv builds the window's bpa from f3 first, and SpectatorUi.FillFighterDetails takes
+        /// that first list as the attackers: with the attackers in f2 the window put each side
+        /// under the other's name and average level.
+        /// </remarks>
         public static byte[] BuildFightDetails(long fightId, IEnumerable<Pb> attackers, IEnumerable<Pb> defenders)
         {
             var jqy = Pb.New().Var(1, fightId);
-            foreach (var a in attackers) jqy.Msg(2, a);
-            foreach (var d in defenders) jqy.Msg(3, d);
+            foreach (var d in defenders) jqy.Msg(2, d);
+            foreach (var a in attackers) jqy.Msg(3, a);
             return jqy.Build();
         }
 

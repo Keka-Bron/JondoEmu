@@ -243,6 +243,14 @@ namespace Jondo.Unity.World.Fights
             if (givenInRound >= 0) _attitudeRounds[hechizo] = givenInRound;
         }
 
+        /// <summary>An attitude taken away: the item that gave it is no longer worn.</summary>
+        public void QuitarActitud(int hechizo)
+        {
+            Actitudes.Remove(hechizo);
+            _gradosDeActitud.Remove(hechizo);
+            _attitudeRounds.Remove(hechizo);
+        }
+
         /// <summary>
         /// The round the attitude was given in, or -1 when it was there from the start. A row of
         /// it that waits on a trigger with a delay does not go off before that round plus its

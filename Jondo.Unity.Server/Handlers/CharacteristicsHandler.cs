@@ -99,6 +99,8 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Stats] {asked} of {capital} points spent; " +
                               $"{Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints} left.");
             await AnswerAsync(stream);
+            // Spent while placing for a fight, the fight starts with them (FightHandler).
+            await FightHandler.RefreshPlacementSheetAsync(stream);
         }
 
         /// <summary>
@@ -130,6 +132,7 @@ namespace Jondo.Unity.Server.Handlers
 
             Console.WriteLine($"[Stats] Characteristics reset: {Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints} points to spend.");
             await AnswerAsync(stream);
+            await FightHandler.RefreshPlacementSheetAsync(stream);
         }
 
         private static async Task AnswerAsync(NetworkStream stream)

@@ -429,6 +429,8 @@ namespace Jondo.Unity.Server.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, StatsHandler.BuildKrbPacket(state.CharacterRemainingPoints));
             await SendAsync(stream, Op.Kub, ConnectionProtocol.BuildCharacteristics());
+            // A build put on while placing for a fight: the fight starts with its points and items.
+            await FightHandler.RefreshPlacementSheetAsync(stream);
 
             // The outfit the build puts on, if it has one and it is not the one worn.
             var character = Character();

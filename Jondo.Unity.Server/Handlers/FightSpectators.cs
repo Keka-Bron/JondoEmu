@@ -172,7 +172,7 @@ namespace Jondo.Unity.Server.Handlers
                     fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret), fight.FightId)));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu, TeamsOf(fight)));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwq, FightProtocol.BuildBuffSync(LiveBuffFrames(fight))));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk, FightProtocol.BuildFightMap(fight.MapId)));
+            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk, FightHandler.FightMapOf(fight)));
             await WriteFrameAsync(stream, ConnectionProtocol.BuildActorsComplete());
         }
 
@@ -266,9 +266,12 @@ namespace Jondo.Unity.Server.Handlers
             var fight = FightById(fightId);
             if (fight == null) return;
 
+            // A character's sex is his row's; a bot carries its own.
+            int SexOf(Fighter f) => f.IsMonster ? 0 : f.IsBot ? f.Sex : DatabaseManager.GetCharacterById(f.Id)?.Sex ?? 0;
             IEnumerable<Pb> PeopleOf(int team) => fight.Bando(team).Where(f => !f.EsInvocado && f.IsAlive)
-                .Select(f => FightJoinProtocol.FighterInDetails(f.Id, f.Level, f.IsMonster ? f.MonsterId : 0,
-                                                                f.GradeIndex + 1, f.Name));
+                .Select(f => FightJoinProtocol.FighterInDetails(f.Id, f.Level, f.IsMonster ? f.MonsterId : 0, f.Name,
+                                                                f.TaxCollectorFirstName, f.TaxCollectorLastName,
+                                                                f.Breed, SexOf(f) == 1));
             await WriteFrameAsync(stream, ConnectionProtocol.Answer(Op.Jqy,
                 FightJoinProtocol.BuildFightDetails(fight.FightId, PeopleOf(FightInstance.Azules), PeopleOf(FightInstance.Rojos)),
                 ConnectionProtocol.RequestId(payload)));

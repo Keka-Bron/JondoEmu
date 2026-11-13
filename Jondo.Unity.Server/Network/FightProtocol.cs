@@ -50,9 +50,6 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public const long Nobody = -1;
 
-        /// <summary>What the jrk carries in its f2 in the fifteen captures.</summary>
-        private const int FightMapKind = 10;
-
         // ─── Starting ───────────────────────────────────────────────────────────
 
         /// <summary>
@@ -124,13 +121,17 @@ namespace Jondo.Unity.Server.Network
         /// <summary>
         /// Which map the fight is on (jrk).
         ///
-        ///   f2: 10      f3: empty      f4: the map
+        ///   f2: the subarea      f3: its coordinates {1 x, 2 y}      f4: the map
         ///
-        /// f3 goes present and empty in the captures, so it is sent the same: it is a submessage with no
-        /// fields, which is not the same as not sending it.
+        /// The client names the place from f2 and f3: it looks f2 up with GetSubAreaById and
+        /// writes the coordinates of f3 beside it, which is the label of the fight's map. Every
+        /// fight said "Amakna (Amakna village) 0,0 - level 10" while f2 went as a constant 10 and
+        /// f3 empty. They are those of the map where the fight was started, so an arena, which
+        /// has no place of its own, is shown where it is fought from; f4 stays the map the fight
+        /// is drawn on. f3 goes present even at 0,0, as the captures send it.
         /// </summary>
-        public static byte[] BuildFightMap(long mapId)
-            => Pb.New().Var(2, FightMapKind).EmptyMsg(3).Var(4, mapId).Build();
+        public static byte[] BuildFightMap(long mapId, int subAreaId, int x, int y)
+            => Pb.New().Var(2, subAreaId).Msg(3, Pb.New().VarIfNotZero(1, x).VarIfNotZero(2, y)).Var(4, mapId).Build();
 
         // ─── The fight exists ───────────────────────────────────────────────────
 

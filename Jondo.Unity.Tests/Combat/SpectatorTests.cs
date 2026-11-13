@@ -82,23 +82,39 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(2, lcu.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
             Assert.Equal(75, lcu.Fields.Single(f => f.FieldNumber == 8).VarIntValue);
             Assert.Equal(9_100_001, lgw.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
+            Assert.DoesNotContain(lgw.Fields, f => f.FieldNumber == 5);   // the other case of the oneof
             Assert.Equal("2001", Hex(jwt.Fields.Single(f => f.FieldNumber == 2).BytesValue));   // party only: f4
         }
 
-        /// <summary>A fight's people (jqy): a person by his name (f6), a monster by itself and its grade (f2).</summary>
+        /// <summary>
+        /// A fight's people (jqy): the defenders in f2 and the attackers in f3; a person by his
+        /// name (f6), a monster by itself (f7), a tax collector by his two names (f2).
+        /// </summary>
         [Fact]
-        public void A_fight_s_details_name_people_and_monsters()
+        public void A_fight_s_details_name_people_monsters_and_tax_collectors()
         {
             var jqy = ProtoMessage.Parse(FightJoinProtocol.BuildFightDetails(77,
-                new[] { FightJoinProtocol.FighterInDetails(9_100_001, 50, 0, 0, "Uno") },
-                new[] { FightJoinProtocol.FighterInDetails(-1, 10, 494, 1, "") }));
+                new[] { FightJoinProtocol.FighterInDetails(9_100_001, 50, 0, "Uno", breed: 8, female: true) },
+                new[] { FightJoinProtocol.FighterInDetails(-1, 10, 494, ""),
+                        FightJoinProtocol.FighterInDetails(-2, 60, 0, "", 12, 34) }));
             Assert.Equal(77, jqy.Fields.Single(f => f.FieldNumber == 1).VarIntValue);
-            var person = ProtoMessage.Parse(jqy.Fields.Single(f => f.FieldNumber == 2).BytesValue);
+
+            var person = ProtoMessage.Parse(jqy.Fields.Single(f => f.FieldNumber == 3).BytesValue);
             Assert.Equal("Uno", System.Text.Encoding.UTF8.GetString(
                 ProtoMessage.Parse(person.Fields.Single(f => f.FieldNumber == 6).BytesValue).Fields.Single().BytesValue));
-            var monster = ProtoMessage.Parse(jqy.Fields.Single(f => f.FieldNumber == 3).BytesValue);
-            Assert.Equal(494, ProtoMessage.Parse(monster.Fields.Single(f => f.FieldNumber == 2).BytesValue)
+            // Its head: the class in f5, the sex in f3.
+            Assert.Equal(8, person.Fields.Single(f => f.FieldNumber == 5).VarIntValue);
+            Assert.Equal(1, person.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
+
+            var defenders = jqy.Fields.Where(f => f.FieldNumber == 2).Select(f => ProtoMessage.Parse(f.BytesValue)).ToList();
+            Assert.Equal(494, ProtoMessage.Parse(defenders[0].Fields.Single(f => f.FieldNumber == 7).BytesValue)
                                   .Fields.Single(f => f.FieldNumber == 1).VarIntValue);
+            Assert.DoesNotContain(defenders[0].Fields, f => f.FieldNumber == 2);
+            // A monster's head is drawn from f7 only when f5 says -2.
+            Assert.Equal(FightJoinProtocol.MonsterHead, (int)defenders[0].Fields.Single(f => f.FieldNumber == 5).VarIntValue);
+            var names = ProtoMessage.Parse(defenders[1].Fields.Single(f => f.FieldNumber == 2).BytesValue).Fields;
+            Assert.Equal(12, names.Single(f => f.FieldNumber == 1).VarIntValue);
+            Assert.Equal(34, names.Single(f => f.FieldNumber == 2).VarIntValue);
         }
     }
 }

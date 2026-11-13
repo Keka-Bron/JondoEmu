@@ -180,22 +180,22 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The panel setting (kwo): it is sent back as it came in a kwn, and the list goes AFTER it.
+        /// The panel setting (kwo): it is sent back as it came in a kwn, and nothing else.
         ///
-        /// The order matters and is measured: in the twelve times the real server sends the list of
-        /// candidates, all twelve go AFTER the client's kwo -- including the two that arrive without
-        /// anybody asking, in the automatic entry capture. The emulator sent it at the end of
-        /// placement, before the client had said anything about its panel.
+        /// The list of candidates does NOT follow it. The client asks for the list itself (kwr) when
+        /// the player presses READY in placement with challenges still to choose
+        /// (EndTurnWidgetUI.OnReadyOrSkipClicked), and the real server answers that kwr within
+        /// milliseconds. Sending the list right after the kwo opened the selector on arrival, and while
+        /// a proposal is open the client greys out the lock, the spectator eye and the party lock: the
+        /// leader could never close the fight in placement.
         /// </summary>
-        public static async Task SettingsAsync(NetworkStream stream, FightInstance? fight, byte[] payload)
+        public static async Task SettingsAsync(NetworkStream stream, byte[] payload)
         {
             byte[]? kwo = ConnectionProtocol.ReadPayload(payload, Op.Kwo);
             if (kwo == null) return;
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwn,
                 Network.FightProtocol.BuildChallengeSettings(VarField(kwo, 1))));
-
-            if (fight != null) await OpenAsync(stream, fight);
         }
 
         /// <summary>

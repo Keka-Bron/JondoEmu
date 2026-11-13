@@ -416,6 +416,16 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// The jrk of a fight: the map it is drawn on, named after the map it was started from (an
+        /// arena has no subarea or coordinates of its own), or after itself when that one is unknown.
+        /// </summary>
+        internal static byte[] FightMapOf(FightInstance fight)
+        {
+            var place = MapManager.GetMapInfo(fight.RoleplayMapId) ?? MapManager.GetMapInfo(fight.MapId);
+            return Network.FightProtocol.BuildFightMap(fight.MapId, place?.SubAreaId ?? 0, place?.PosX ?? 0, place?.PosY ?? 0);
+        }
+
+        /// <summary>
         /// Whether a jrh or kmv asks for the fight's own map, or names none.
         ///
         /// Taken into a fight on another map right after a door, the client's late kmv for the room
@@ -706,18 +716,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The fighter of WHOEVER is talking right now, read from his own session.
+        /// The sheet the character's state gives a fighter: life, points, initiative, the
+        /// characteristics, what the gear adds, and what follows from them (RellenarLaFicha).
+        /// Nothing else is touched -- no camouflage taken off, no quest incarnation used up --,
+        /// so it can be worked out again during the placement (RefreshPlacementSheetAsync).
         /// </summary>
-        /// <remarks>
-        /// It was inside InitiateFightFromMobCollision because there was only one player per fight. In
-        /// a challenge there are two, each with his characteristics and his equipment, and the only way
-        /// to read the other's is to build his INSIDE his session context: all this comes from
-        /// GameState, which belongs to the connection being served.
-        ///
-        /// The cell is not set here. Whoever puts him in a team decides it, since that is what knows
-        /// whether he goes to the blue side or the red.
-        /// </remarks>
-        public static Fighter BuildPlayerFighter(FightInstance fight)
+        private static Fighter SheetFromState()
         {
             int fuerza = GameState.TotalStrength + StatsHandler.GetEquipBonus(10);
             int inteligencia = GameState.TotalIntelligence + StatsHandler.GetEquipBonus(15);
@@ -791,13 +795,35 @@ namespace Jondo.Unity.Server.Handlers
                 LookBoneId = 744,
                 IsMonster = false
             };
+            playerFighter.CurrentHP = playerFighter.MaxHP;
+            playerFighter.CurrentAP = playerFighter.MaxAP;
+            playerFighter.CurrentMP = playerFighter.MaxMP;
+            RellenarLaFicha(playerFighter);
+            return playerFighter;
+        }
+
+        /// <summary>
+        /// The fighter of WHOEVER is talking right now, read from his own session.
+        /// </summary>
+        /// <remarks>
+        /// It was inside InitiateFightFromMobCollision because there was only one player per fight. In
+        /// a challenge there are two, each with his characteristics and his equipment, and the only way
+        /// to read the other's is to build his INSIDE his session context: all this comes from
+        /// GameState, which belongs to the connection being served.
+        ///
+        /// The cell is not set here. Whoever puts him in a team decides it, since that is what knows
+        /// whether he goes to the blue side or the red.
+        /// </remarks>
+        public static Fighter BuildPlayerFighter(FightInstance fight)
+        {
+            var playerFighter = SheetFromState();
             // The life he has, not the whole of it: what a defeat left missing comes back with
             // the regeneration, and the fight takes what is there (FightDefeat.cs).
             playerFighter.CurrentHP = Managers.RestingLife.LifeAt(GameState.CharacterId, playerFighter.MaxHP,
                                                                    DateTime.UtcNow);
-            playerFighter.CurrentAP = playerFighter.MaxAP;
-            playerFighter.CurrentMP = playerFighter.MaxMP;
-            RellenarLaFicha(playerFighter);
+            // What his sheet was built from, to carry over a change made while placing
+            // (RefreshPlacementSheetAsync); the item attitudes are added to it further down.
+            BuiltFrom.AddOrUpdate(playerFighter, new PlacementSheet(SheetFromState(), new List<int>()));
 
             // In a dream's room, the dream's bonuses: they are the dream's and they apply to its
             // fights, not to the character outside them -- to every one of its people, the owner
@@ -861,6 +887,7 @@ namespace Jondo.Unity.Server.Handlers
                 foreach (int hechizo in Managers.SpellEffects.ActitudesDelEquipo(GameState.CharacterId))
                 {
                     playerFighter.Buffs.PonerActitud(hechizo, givenInRound: 1);
+                    if (BuiltFrom.TryGetValue(playerFighter, out var builtFrom)) builtFrom.ItemAttitudes.Add(hechizo);
                 }
                 // And his alterations' (an uchronic elixir's state for the anomalies).
                 foreach (int hechizo in Managers.Alterations.FightAttitudes(GameState.CharacterId))
@@ -895,6 +922,85 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             return playerFighter;
+        }
+
+        /// <summary>The sheet a fighter was built from, and the item attitudes it gave him.</summary>
+        private sealed record PlacementSheet(Fighter Sheet, List<int> ItemAttitudes);
+
+        /// <summary>Each character fighter's <see cref="PlacementSheet"/>, gone with the fighter.</summary>
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Fighter, PlacementSheet> BuiltFrom = new();
+
+        /// <summary>
+        /// A change to the character's sheet while the fight is still being placed -- points spent
+        /// or given back, an item put on or taken off -- carried over to his fighter, which was
+        /// built when he came in. Without it the fight started with the sheet he came in with: all
+        /// the capital put in intelligence during the placement was back at 100 once it began.
+        /// </summary>
+        /// <remarks>
+        /// Only the difference between the sheet he was built from and the one he has now is
+        /// added, field by field. What the fight itself put on top -- a dream's bonuses, a trial's
+        /// -- stays where it is. A character who fights as a monster (a mutation, a quest's or a
+        /// trial's incarnation) fights with the monster's sheet, so nothing of his own is carried.
+        /// Once the fight has begun, nothing is carried either.
+        /// </remarks>
+        public static async Task RefreshPlacementSheetAsync(NetworkStream stream)
+        {
+            if (!GameState.IsInFight) return;
+            var fight = FightOf(GameState.CharacterId);
+            if (fight == null || fight.State != FightState.Placement) return;
+            var fighter = fight.Buscar(GameState.CharacterId);
+            if (fighter == null || fighter.IsMonster || fighter.IncarnatedMonster != 0) return;
+            if (!BuiltFrom.TryGetValue(fighter, out var before)) return;
+
+            var now = SheetFromState();
+            int lifeGained = now.MaxHP - before.Sheet.MaxHP;
+            fighter.MaxHP += lifeGained;
+            fighter.CurrentHP = Math.Clamp(fighter.CurrentHP + lifeGained, 1, Math.Max(1, fighter.MaxHP));
+            fighter.MaxAP += now.MaxAP - before.Sheet.MaxAP;
+            fighter.MaxMP += now.MaxMP - before.Sheet.MaxMP;
+            fighter.CurrentAP = fighter.MaxAP;
+            fighter.CurrentMP = fighter.MaxMP;
+            fighter.Initiative += now.Initiative - before.Sheet.Initiative;
+            fighter.Strength += now.Strength - before.Sheet.Strength;
+            fighter.Intelligence += now.Intelligence - before.Sheet.Intelligence;
+            fighter.Chance += now.Chance - before.Sheet.Chance;
+            fighter.Agility += now.Agility - before.Sheet.Agility;
+            fighter.Vitality += now.Vitality - before.Sheet.Vitality;
+            fighter.Power += now.Power - before.Sheet.Power;
+            fighter.CriticalBonus += now.CriticalBonus - before.Sheet.CriticalBonus;
+            fighter.FlatDamage += now.FlatDamage - before.Sheet.FlatDamage;
+            fighter.CriticalDamage += now.CriticalDamage - before.Sheet.CriticalDamage;
+            fighter.EarthDamage += now.EarthDamage - before.Sheet.EarthDamage;
+            fighter.FireDamage += now.FireDamage - before.Sheet.FireDamage;
+            fighter.WaterDamage += now.WaterDamage - before.Sheet.WaterDamage;
+            fighter.AirDamage += now.AirDamage - before.Sheet.AirDamage;
+            fighter.NeutralDamage += now.NeutralDamage - before.Sheet.NeutralDamage;
+            fighter.EarthResPct += now.EarthResPct - before.Sheet.EarthResPct;
+            fighter.FireResPct += now.FireResPct - before.Sheet.FireResPct;
+            fighter.WaterResPct += now.WaterResPct - before.Sheet.WaterResPct;
+            fighter.AirResPct += now.AirResPct - before.Sheet.AirResPct;
+            fighter.NeutralResPct += now.NeutralResPct - before.Sheet.NeutralResPct;
+            fighter.PushDamage += now.PushDamage - before.Sheet.PushDamage;
+            fighter.Range += now.Range - before.Sheet.Range;
+            foreach (int characteristic in now.Otras.Keys.Union(before.Sheet.Otras.Keys).ToList())
+            {
+                int change = now.Otras.GetValueOrDefault(characteristic) - before.Sheet.Otras.GetValueOrDefault(characteristic);
+                if (change != 0) fighter.Otras[characteristic] = fighter.Otras.GetValueOrDefault(characteristic) + change;
+            }
+
+            // The items' attitudes (the dofus and the trophies): the ones of an item taken off
+            // go, the ones of an item put on come.
+            var attitudes = Managers.SpellEffects.ActitudesDelEquipo(GameState.CharacterId).ToList();
+            foreach (int gone in before.ItemAttitudes.Except(attitudes)) fighter.Buffs.QuitarActitud(gone);
+            foreach (int come in attitudes.Except(before.ItemAttitudes)) fighter.Buffs.PonerActitud(come, givenInRound: 1);
+
+            BuiltFrom.AddOrUpdate(fighter, new PlacementSheet(now, attitudes));
+
+            // And everybody in the fight sees him again with it, as when he came in.
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxg, BuildPlayerAppearance(fight, fighter)));
+            Program.LogDebug($"[Fight] {fighter.Name}'s sheet changed while placing: {fighter.MaxHP} life, " +
+                             $"{fighter.MaxAP} AP, {fighter.MaxMP} MP, strength {fighter.Strength}, " +
+                             $"intelligence {fighter.Intelligence}, chance {fighter.Chance}, agility {fighter.Agility}.");
         }
 
         /// <summary>
@@ -1127,12 +1233,10 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildPlacementDone()));
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk,
-                Network.FightProtocol.BuildFightMap(fight.MapId)));
+                FightMapOf(fight)));
 
-            // The list of challenges does NOT go here. The client sends its panel settings (kwo) right
-            // after receiving the jrk, and in the twelve real appearances the list ALWAYS arrives after
-            // that kwo -- including the two the server sends without anybody asking --. It is fired from
-            // ChallengeHandler.SettingsAsync.
+            // The list of challenges does NOT go here: the client asks for it (kwr) when the player
+            // presses READY with challenges still to choose. See ChallengeHandler.SettingsAsync.
 
             Program.LogDebug($"[Fight] Preparation of fight #{fight.FightId}: " +
                              $"{fight.Azul.Count} against {fight.Rojo.Count}, " +
@@ -2207,7 +2311,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             else if (payloadStr.Contains(Op.Uri(Op.Kwo)))
             {
-                await ChallengeHandler.SettingsAsync(stream, fight, payload);
+                await ChallengeHandler.SettingsAsync(stream, payload);
             }
             else if (payloadStr.Contains(Op.Uri(Op.Kwi)) || payloadStr.Contains(Op.Uri(Op.Kxb)))
             {
@@ -2858,7 +2962,7 @@ namespace Jondo.Unity.Server.Handlers
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwq,
                 Network.FightProtocol.BuildBuffSync(LiveBuffFrames(fight))));
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk,
-                Network.FightProtocol.BuildFightMap(fight.MapId)));
+                FightMapOf(fight)));
 
             // His own cooldowns, which the fight-start burst would have given him.
             var yoMismo = fight.Buscar(me);

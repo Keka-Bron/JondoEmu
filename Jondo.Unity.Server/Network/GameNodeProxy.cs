@@ -1897,12 +1897,14 @@ namespace Jondo.Unity.Server.Network
         /// with jrh on every map load and expects nothing back; hnn is the client saying which spell
         /// the pointer is on. The list was searched for as three-letter pieces anywhere in the frame,
         /// and three of its entries -- itr, hmt, jqf -- had a branch of their own above it, so they
-        /// never reached it.
+        /// never reached it. ijm goes with the kmv that follows a kmp, the client loading a fight's
+        /// map: its jrk comes in the burst that kmv is answered with.
         /// </summary>
         private static readonly System.Collections.Generic.HashSet<string> Silenced = new()
         {
             Op.Uri(Op.Kmw), Op.Uri("klw"), Op.Uri("knb"), Op.Uri("klo"), Op.Uri("kmt"), Op.Uri(Op.Jfc),
             Op.Uri(Op.Kqk), Op.Uri(Op.Knc), Op.Uri("kna"), Op.Uri("lxi"), Op.Uri(Op.Kmv), Op.Uri(Op.Hnn),
+            Op.Uri(Op.Ijm),
         };
 
         internal static string RoutingTextOf(byte[] payload, string wholeText)

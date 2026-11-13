@@ -48,7 +48,8 @@ namespace Jondo.Unity.Server.Network
                  + "120d1a0b10fdffffffffffffffff01120d1a0b10fcffffffffffffffff01",
                  FightProtocol.BuildTeams(new[] { fighter, -1L, -2L, -3L, -4L }));
 
-            Same(failures, Op.Jrk, "100a1a00208d84a82f", FightProtocol.BuildFightMap(mapId));
+            // An arena: subarea 10 at 0,0 is the place of the map that fight was started from.
+            Same(failures, Op.Jrk, "100a1a00208d84a82f", FightProtocol.BuildFightMap(mapId, 10, 0, 0));
 
             Same(failures, Op.Kmp, "0801", FightProtocol.BuildFightMapComing());
 
