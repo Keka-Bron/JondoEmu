@@ -429,7 +429,7 @@ namespace Jondo.Unity.Server.Managers
                     if (spell.Cost > route.ActionPoints) continue;
                     var path = route.Path;
                     double walk = 1.0 - WalkPenalty * (route.Steps + route.LostToTackles(monster));
-                    var aims = spell.HasRows ? AimsByRows(board, spell, monster, cell, enemies, cache) : Targets(spell, monster, cell, enemies, allies);
+                    var aims = spell.HasRows ? AimsByRows(board, spell, monster, cell, enemies, cache) : Targets(spell, monster, cell, enemies, allies, cache);
                     // And the portals that are on: aimed at one, the spell goes through the network.
                     if (portalCells.Count > 0 && spell.HasRows && spell.ThroughPortals)
                         aims = aims.Concat(portalCells.Where(c => c != cell).Select(c => (monster, c))).ToList();
@@ -746,7 +746,8 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>Whom a spell can be aimed at, and at which cell.</summary>
         private static IEnumerable<(Fighter Target, int Aim)> Targets(Spell spell, Fighter monster, int from,
-                                                                     List<Fighter> enemies, List<Fighter> allies)
+                                                                     List<Fighter> enemies, List<Fighter> allies,
+                                                                     AimCache cache)
         {
             if (spell.OnSelf)
             {
@@ -764,7 +765,19 @@ namespace Jondo.Unity.Server.Managers
             if (spell.Heal > 0 || spell.Buff > 0)
                 foreach (var ally in allies) yield return (ally, ally == monster ? from : ally.CellId);
             if (spell.Summons)
+            {
                 foreach (int cell in MapGeometry.GetNeighbors(from)) yield return (monster, cell);
+                // A summon that cannot be put next to its caster: the free cells nearest the
+                // enemy, in its reach. The Kralamoure's tentacles come out four to twelve cells
+                // away, and the cells around him are not walkable: aimed at its neighbours only,
+                // he never summoned one.
+                if (spell.MinRange > 1)
+                    foreach (int cell in cache.Toward)
+                    {
+                        int distance = MapGeometry.Distance(from, cell);
+                        if (distance >= spell.MinRange && distance <= spell.ReachFor(monster)) yield return (monster, cell);
+                    }
+            }
             if (spell.Utility > 0)
             {
                 if (spell.UtilityOnEnemies)
@@ -779,7 +792,9 @@ namespace Jondo.Unity.Server.Managers
         {
             if (spell.OnSelf) return aim == from;
             if (!spell.HasRows && spell.Summons && target == monster && aim != from)
-                return board.Walkable(aim) && !board.Occupied(aim) && MapGeometry.Distance(from, aim) <= Math.Max(1, spell.MaxRange);
+                return board.Walkable(aim) && !board.Occupied(aim)
+                       && MapGeometry.Distance(from, aim) >= spell.MinRange
+                       && MapGeometry.Distance(from, aim) <= Math.Max(1, spell.MaxRange);
 
             if (spell.NeedsFreeCell && (board.Occupied(aim) || aim == from || !board.Walkable(aim))) return false;
 
