@@ -81,9 +81,15 @@ namespace Jondo.Unity.Server.Handlers
         private static Task SendBothAsync(GameSession? a, GameSession? b, string opcode, byte[] body)
             => Task.WhenAll(SendAsync(a, opcode, body), SendAsync(b, opcode, body));
 
-        /// <summary>What a character can carry: a thousand, and five a point of strength.</summary>
+        /// <summary>What a character can carry (ConnectionProtocol.Capacity).</summary>
         private static long Capacity(GameSession session)
             => CommissionHandler.As(session, () => ConnectionProtocol.Capacity(session.State));
+
+        /// <summary>
+        /// What a character carries, for the window's pods bars: the kbg and the keq sent zero, and
+        /// the bars stayed empty -- the client draws them from these and adds what is on the table.
+        /// </summary>
+        private static long Carried(GameSession session) => ConnectionProtocol.Carried(session.State);
 
         // ─── Asking ─────────────────────────────────────────────────────────────────────────
 
@@ -136,8 +142,8 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             trade.Accepted = true;
-            byte[] kbg = TradeProtocol.BuildStarted(source.CharacterId, Capacity(source), 0,
-                                                    me.CharacterId, Capacity(me), 0);
+            byte[] kbg = TradeProtocol.BuildStarted(source.CharacterId, Capacity(source), Carried(source),
+                                                    me.CharacterId, Capacity(me), Carried(me));
             await SendBothAsync(source, me, Op.Kbg, kbg);
             Console.WriteLine($"[Trade] {me.CharacterId} accepts the trade with {source.CharacterId}.");
             return true;
@@ -301,8 +307,9 @@ namespace Jondo.Unity.Server.Handlers
                     {
                         long capacity = Capacity(side);
                         bool mine = side == viewer;
-                        await SendAsync(viewer, Op.Keq, TradeProtocol.BuildWeight(capacity, 0, remote: !mine));
-                        if (mine) await SendAsync(viewer, Op.Iun, ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(viewer.State), capacity));
+                        long carried = Carried(side);
+                        await SendAsync(viewer, Op.Keq, TradeProtocol.BuildWeight(capacity, carried, remote: !mine));
+                        if (mine) await SendAsync(viewer, Op.Iun, ConnectionProtocol.BuildPods(carried, capacity));
                     }
                 }
 
