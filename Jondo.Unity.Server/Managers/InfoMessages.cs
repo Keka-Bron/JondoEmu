@@ -62,6 +62,12 @@ namespace Jondo.Unity.Server.Managers
         public const int BackInTheFight = 184;
 
         /// <summary>
+        /// «Este canal está restringido para mejorar su visibilidad. Podrás enviar un nuevo mensaje
+        /// dentro de {0} segundos.» Goes with <see cref="Info"/>, the only type that has it.
+        /// </summary>
+        public const int ChannelRestricted = 115;
+
+        /// <summary>
         /// «Acción imposible: para poder cambiar de rango, un miembro debe llevar en tu gremio al menos
         /// {0} horas.» Goes with <see cref="Warning"/>: "080110e40522023234", the hours as "24".
         /// </summary>

@@ -71,6 +71,34 @@ namespace Jondo.Unity.Tests.Social
             Assert.DoesNotContain(Line, elsewhere.Packets);
         }
 
+        /// <summary>Trade and recruitment take a line every two minutes, each its own; the others none.</summary>
+        [Fact]
+        public void Trade_and_recruitment_wait_two_minutes_between_lines()
+        {
+            long who = Interlocked.Increment(ref _nextId);
+            var t0 = new System.DateTime(2026, 11, 14, 2, 0, 0, System.DateTimeKind.Utc);
+            const int player = Jondo.Unity.Launcher.Roles.Jugador;
+
+            Assert.Equal(0, ChatChannels.WaitLeft(who, ChatChannels.Trade, player, t0));
+            Assert.Equal(120, ChatChannels.WaitLeft(who, ChatChannels.Trade, player, t0));
+            Assert.Equal(90, ChatChannels.WaitLeft(who, ChatChannels.Trade, player, t0.AddSeconds(30)));
+            Assert.Equal(1, ChatChannels.WaitLeft(who, ChatChannels.Trade, player, t0.AddSeconds(119.5)));
+            // A refused line does not start the wait again.
+            Assert.Equal(0, ChatChannels.WaitLeft(who, ChatChannels.Trade, player, t0.AddMinutes(2)));
+
+            // Recruitment counts on its own; the general channel and the community wait for nothing.
+            Assert.Equal(0, ChatChannels.WaitLeft(who, ChatChannels.Recruitment, player, t0.AddMinutes(2)));
+            Assert.Equal(0, ChatChannels.WaitLeft(who, ChatChannels.General, player, t0));
+            Assert.Equal(0, ChatChannels.WaitLeft(who, ChatChannels.General, player, t0));
+            Assert.Equal(0, ChatChannels.WaitLeft(who, ChatChannels.Community, player, t0));
+            Assert.Equal(0, ChatChannels.WaitLeft(who, ChatChannels.Community, player, t0));
+
+            // A moderator, not at all.
+            long staff = Interlocked.Increment(ref _nextId);
+            Assert.Equal(0, ChatChannels.WaitLeft(staff, ChatChannels.Trade, Jondo.Unity.Launcher.Roles.Moderador, t0));
+            Assert.Equal(0, ChatChannels.WaitLeft(staff, ChatChannels.Trade, Jondo.Unity.Launcher.Roles.Moderador, t0));
+        }
+
         [Fact]
         public async Task The_party_channel_reaches_the_members_alone()
         {
