@@ -85,6 +85,9 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private const long KamasMountainReply = 70285;
 
+        /// <summary>The most of one item a single purchase takes. A bound of ours: no capture buys near it.</summary>
+        internal const long MaxPurchase = 1_000_000;
+
         /// <summary>
         /// The client has clicked an NPC (iov). Depending on the action, the shop or the dialogue opens.
         /// </summary>
@@ -1931,7 +1934,14 @@ namespace Jondo.Unity.Server.Handlers
                 else if (field.FieldNumber == 2) quantity = field.VarIntValue;
             }
 
-            if (gid == 0 || quantity <= 0) return;
+            // The quantity is the client's, a varint as large as it likes: unbounded, price times
+            // quantity wrapped round -- a price below zero passes «has enough» and pays the buyer --
+            // and the (int) below made of it another number of items than the one charged for.
+            if (gid == 0 || quantity <= 0 || quantity > MaxPurchase)
+            {
+                if (quantity > MaxPurchase) Console.WriteLine($"[NPC] Purchase of {quantity} x {gid} refused: over {MaxPurchase}.");
+                return;
+            }
 
             if (OpenShop == 0)
             {
@@ -1973,9 +1983,21 @@ namespace Jondo.Unity.Server.Handlers
 
             // What is paid with here. Without a token shop it is the usual: kamas.
             var tokenShop = TokenShops.Of(OpenShopNpc);
-            long price = tokenShop == null
-                ? NpcShops.PriceOf(gid) * quantity
-                : TokenShops.PriceOf(tokenShop, gid) * quantity;
+            long unit = tokenShop == null ? NpcShops.PriceOf(gid) : TokenShops.PriceOf(tokenShop, gid);
+            long price;
+            try
+            {
+                price = checked(unit * quantity);
+            }
+            catch (OverflowException)
+            {
+                price = -1;
+            }
+            if (unit < 0 || price < 0 || (tokenShop != null && price > int.MaxValue))
+            {
+                Console.WriteLine($"[NPC] Purchase of {quantity} x {gid} at {unit} refused: the price does not hold.");
+                return;
+            }
 
             // The player's stack of tokens, if he has one. It is looked up by template in the
             // inventory: a token is a resource and stacks, so there is only one.

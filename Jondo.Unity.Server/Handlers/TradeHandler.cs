@@ -123,7 +123,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         private static bool Busy(GameSession session)
-            => session.State.Trade != null || session.State.Commission != null || session.State.IsInFight;
+            => session.State.Trade != null || session.State.Commission != null || session.State.Barter != null
+               || session.State.IsInFight;
 
         /// <summary>kgi: the one asked accepts.</summary>
         /// <returns>False when no trade waits for this character.</returns>
@@ -349,10 +350,41 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task ExecuteAsync(Trade trade)
         {
+            // The other one's turn as well as this one's, which the packet loop holds already: the
+            // goods and the kamas of both change here, from one connection, and the other's own
+            // packet -- the bank's fee, a sale -- could be halfway through the same purse or the
+            // same stack. Asked for before the gate and with a deadline: two «ready» crossing would
+            // each wait for the other's turn for ever, and then the trade is called off instead.
+            var me = SessionContext.Actual;
+            var partner = me == null ? null : SessionRegistry.FindByCharacter(trade.Other(me.CharacterId));
+            bool held = partner != null && !ReferenceEquals(partner, me) && await partner.UnoCadaVez.WaitAsync(PartnerTurnWait);
+            try
+            {
+                await ExecuteHeldAsync(trade, partnerMissed: partner != null && !ReferenceEquals(partner, me) && !held);
+            }
+            finally
+            {
+                if (held) partner!.UnoCadaVez.Release();
+            }
+        }
+
+        /// <summary>How long the other one's turn is waited for before the trade is called off.</summary>
+        private static readonly TimeSpan PartnerTurnWait = TimeSpan.FromSeconds(5);
+
+        private static async Task ExecuteHeldAsync(Trade trade, bool partnerMissed)
+        {
             await trade.Gate.WaitAsync();
             try
             {
                 if (trade.Ended) return;
+                if (partnerMissed)
+                {
+                    Console.WriteLine($"[Trade] {trade.SourceId} and {trade.TargetId}: the other side's turn did not come; called off.");
+                    await EndHeldAsync(trade, done: false);
+                    return;
+                }
+                // The table may have changed between the second «ready» and here, and took both back.
+                if (!trade.Ready.Contains(trade.SourceId) || !trade.Ready.Contains(trade.TargetId)) return;
                 var source = SessionRegistry.FindByCharacter(trade.SourceId);
                 var target = SessionRegistry.FindByCharacter(trade.TargetId);
                 if (source == null || target == null || !StillThere(trade, source) || !StillThere(trade, target))

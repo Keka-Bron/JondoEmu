@@ -366,9 +366,13 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (FightHandler.IsGroupFighting(tc.ContextId)) return;
 
-            var items = TaxCollectorStore.Items(tc);
+            // Its bag and its leaving in one go: whoever comes second finds it gone, and gets nothing.
+            if (!TaxCollectorStore.TryTake(tc, out var items))
+            {
+                await SendAsync(stream, Op.Hla, TaxCollectorProtocol.BuildError(TaxCollectorProtocol.ErrorUnknown));
+                return;
+            }
             await ReturnEquipmentAsync(tc);
-            TaxCollectorStore.Remove(tc);
             if (tc.OwnerId != me.CharacterId)
                 await TellOwnerAsync(tc, TaxCollectorStore.AbsenceCollected, me.CharacterId, me.CharacterName);
             bool recycling = SessionContext.State.Workshop == null

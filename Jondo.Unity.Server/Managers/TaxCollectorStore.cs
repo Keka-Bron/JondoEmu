@@ -257,6 +257,31 @@ namespace Jondo.Unity.Server.Managers
         public static void Remove(TaxCollector tc)
         {
             if (tc == null) return;
+            lock (_takeLock) Delete(tc);
+        }
+
+        private static readonly object _takeLock = new object();
+
+        /// <summary>
+        /// Takes a tax collector off its map and hands over what it carried, once: false, and
+        /// nothing, when somebody else took it first. Two members collecting the same one at the
+        /// same moment both read its bag before either removed it, and both were given all of it.
+        /// </summary>
+        public static bool TryTake(TaxCollector tc, out List<(int ItemId, int Quantity)> items)
+        {
+            items = new List<(int, int)>();
+            if (tc == null) return false;
+            lock (_takeLock)
+            {
+                if (!ByMap.TryGetValue(tc.MapId, out var standing) || standing.Id != tc.Id) return false;
+                items = Items(tc);
+                Delete(tc);
+                return true;
+            }
+        }
+
+        private static void Delete(TaxCollector tc)
+        {
             using var conexion = Open();
             var delete = conexion.CreateCommand();
             delete.CommandText = @"DELETE FROM TaxCollectors WHERE Id = $id;

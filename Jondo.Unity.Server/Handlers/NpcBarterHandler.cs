@@ -191,9 +191,30 @@ namespace Jondo.Unity.Server.Handlers
             if (barter == null) return false;
             if (barter.Offer.Count == 0) return true;
 
-            var laid = barter.Laid.Select(l => (Equipment.ByUid(l.Uid), l.Quantity)).Where(l => l.Item1 != null).ToList();
+            // What lies on the table is looked at again, now: the offer was reckoned when the last
+            // stack was laid, and a stack can leave the bag since without a kcr -- traded away,
+            // sold, used, banked -- or the character walk off. The NPC then gave for nothing.
+            var laid = barter.Laid.Select(l => (Equipment.ByUid(l.Uid), l.Quantity)).ToList();
+            bool here = Npcs.Find(SessionContext.State.MapId, barter.ActorId) != null;
+            bool whole = laid.All(l => l.Item1 != null && l.Item1.Position == Equipment.Bag && l.Item1.Quantity >= l.Quantity);
+            var offer = here && whole ? Answer(barter) : new List<(int Item, int Count)>();
+            if (offer.Count == 0)
+            {
+                Console.WriteLine($"[Barter] {barter.NpcId}: what was laid is no longer there; nothing swapped.");
+                SessionContext.State.Barter = null;
+                await WriteAsync(stream, Op.Khd, TradeProtocol.BuildClosed(done: false));
+                return true;
+            }
+            barter.Offer = offer;
+
             foreach (var (item, quantity) in laid)
-                await Equipment.TakeAsync(stream, item!.Template, quantity);
+            {
+                if (await Equipment.TakeAsync(stream, item!.Template, quantity)) continue;
+                Console.WriteLine($"[Barter] {barter.NpcId}: {quantity}x{item.Template} could not be taken; nothing given.");
+                SessionContext.State.Barter = null;
+                await WriteAsync(stream, Op.Khd, TradeProtocol.BuildClosed(done: false));
+                return true;
+            }
             foreach (var (gid, count) in barter.Offer)
             {
                 if (!await Equipment.GiveAsync(stream, gid, count)) continue;

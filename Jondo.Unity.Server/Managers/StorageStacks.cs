@@ -303,11 +303,13 @@ namespace Jondo.Unity.Server.Managers
                     using (var take = connection.CreateCommand())
                     {
                         take.Transaction = transaction;
+                        // Only if the stack is still as it was read: the bag is not under this lock.
                         take.CommandText = moving >= have
-                            ? "DELETE FROM CharacterItems WHERE Uid = $uid AND CharacterId = $c;"
-                            : "UPDATE CharacterItems SET Quantity = Quantity - $n WHERE Uid = $uid AND CharacterId = $c;";
+                            ? "DELETE FROM CharacterItems WHERE Uid = $uid AND CharacterId = $c AND IFNULL(Quantity, 1) = $have;"
+                            : "UPDATE CharacterItems SET Quantity = Quantity - $n WHERE Uid = $uid AND CharacterId = $c AND Quantity = $have;";
                         take.Parameters.AddWithValue("$uid", uid);
                         take.Parameters.AddWithValue("$c", characterId);
+                        take.Parameters.AddWithValue("$have", have);
                         if (moving < have) take.Parameters.AddWithValue("$n", moving);
                         if (take.ExecuteNonQuery() != 1) return null;
                     }
