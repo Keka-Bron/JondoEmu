@@ -31481,7 +31481,8 @@
             { "reply": 19266, "next": 15960, "criterion": "Qf=1962&Qf!2193&Qa!833&Qf!833" },
             { "reply": 11392, "next": 10413, "quest": 834, "completes": 5281, "params": [[30, 5281]], "afterObjective": 5280 },
             { "reply": 11396, "next": 10415, "beforeQuest": 835 },
-            { "reply": 11397, "next": 10416, "quest": 835, "completes": 5286, "params": [[30, 5286]] }
+            { "reply": 11397, "next": 10416, "quest": 835, "completes": 5286, "params": [[30, 5286]] },
+            { "reply": 52841, "quest": 2193, "afterObjective": 16286, "beforeObjective": 16290, "next": 40564 }
           ]
         },
         {
@@ -31529,9 +31530,39 @@
         {
           "message": 10416,
           "choices": []
+        },
+        {
+          "message": 40564,
+          "choices": [
+            { "reply": 52846, "quest": 2193, "next": 40565 }
+          ]
+        },
+        {
+          "message": 40565,
+          "choices": [
+            { "reply": 52845, "quest": 2193, "next": 40566 }
+          ]
+        },
+        {
+          "message": 40566,
+          "choices": [
+            { "reply": 52844, "quest": 2193, "next": 40567 }
+          ]
+        },
+        {
+          "message": 40567,
+          "choices": [
+            { "reply": 52843, "quest": 2193, "next": 40568 }
+          ]
+        },
+        {
+          "message": 40568,
+          "choices": [
+            { "reply": 52842, "quest": 2193 }
+          ]
         }
       ],
-      "why": "Zanal, the zolla sage [23,-4], who sends the character after the Wa Wabbit and his carrot dofus. «Jamais deux sans trois» starts with «¿Qué puedes contarme del Castillo del Wey Wabbit?» (10411, its step's line); to whoever cannot take it yet, «Informarte sobre el Castillo del Wey Wabbit» says what is missing: the class master's teachings (15959) or Nowa's dragon egg (15960). «Le château du Wa» ends on «¡He vencido al Wey Wabbit!» (10413), and «Si vous décidez de poursuivre la conversation avec celui-ci, il vous donnera la prochaine quête : L'œuf ou la cawotte ?» (Dofus pour les noobs): his power, «Seguir escuchando», the disguise (15950; 15951 is the quest's own line, for whoever comes back for it later), «Vale». «Enseñar el dofus zanahowia» ends that one (10416)."
+      "why": "Zanal, the zolla sage [23,-4], who sends the character after the Wa Wabbit and his carrot dofus. «Jamais deux sans trois» starts with «¿Qué puedes contarme del Castillo del Wey Wabbit?» (10411, its step's line); to whoever cannot take it yet, «Informarte sobre el Castillo del Wey Wabbit» says what is missing: the class master's teachings (15959) or Nowa's dragon egg (15960). «Le château du Wa» ends on «¡He vencido al Wey Wabbit!» (10413), and «Si vous décidez de poursuivre la conversation avec celui-ci, il vous donnera la prochaine quête : L'œuf ou la cawotte ?» (Dofus pour les noobs): his power, «Seguir escuchando», the disguise (15950; 15951 is the quest's own line, for whoever comes back for it later), «Vale». «Enseñar el dofus zanahowia» ends that one (10416). «Un sabio entre los sabios» (2193): «Hablarle de Zoyo, el Sabio Zollo» (52841): Zoyo came back to the zollos' land (40564) and went to explore the wabbits' burrows for news of the carrot dofus, alone (40565); the story of that fake dofus, a vegetable the Wa bewitched to lure adventurers (40566-40568), until «Gracias por esa historia tan edificante: me voy en busca de Zoyo» (52842)."
     },
     {
       "npc": 1439,
@@ -35289,6 +35320,9 @@
       "npc": 5561,
       "map": 0,
       "opening": 40499,
+      "openings": [
+        { "canStart": 2193, "message": 40532 }
+      ],
       "lines": [
         {
           "message": 40499,
@@ -35352,7 +35386,7 @@
           ]
         }
       ],
-      "why": "Surivitna, the shaman of the Pandala village [20,-27]. «El receptáculo de los dofus» (2192), as Dofus pour les noobs, «Le réceptacle des Dofus» has it: «Hola, estoy buscando los seis dofus.» (52761) does 16270; one more would-be hero (40500), but with a brighter aura (40501): the receptacle, a dragon idol waiting for the six dofus (40502); to glimpse what awaits, the eyes must open (40503): a visionary's pint from the Fermenté tavern, drunk before the stone dragon, and his assistant waiting by the Airedala stairs (40504). Back with «Precisamente he sido testigo de una llama crepitante.» (52803, 16279): rare revelations (40532); the path is unclear (52802, 40533); could he guide? (52801) not his role, but a sage whose fate is tied to a dofus (40534); «Háblame más de ese personaje.» (52800): Zoyo, in the zollos' great house (40535), and «Gracias por la información. Adiós.» (52799) hands over «Un sabio entre los sabios» (2193), «en continuant votre conversation avec Surivitna»."
+      "why": "Surivitna, the shaman of the Pandala village [20,-27]. «El receptáculo de los dofus» (2192), as Dofus pour les noobs, «Le réceptacle des Dofus» has it: «Hola, estoy buscando los seis dofus.» (52761) does 16270; one more would-be hero (40500), but with a brighter aura (40501): the receptacle, a dragon idol waiting for the six dofus (40502); to glimpse what awaits, the eyes must open (40503): a visionary's pint from the Fermenté tavern, drunk before the stone dragon, and his assistant waiting by the Airedala stairs (40504). Back with «Precisamente he sido testigo de una llama crepitante.» (52803, 16279): rare revelations (40532); the path is unclear (52802, 40533); could he guide? (52801) not his role, but a sage whose fate is tied to a dofus (40534); «Háblame más de ese personaje.» (52800): Zoyo, in the zollos' great house (40535), and «Gracias por la información. Adiós.» (52799) hands over «Un sabio entre los sabios» (2193), «en continuant votre conversation avec Surivitna». Whoever finished «El receptáculo de los dofus» and closed the window before taking «Un sabio entre los sabios» is met again with 40532, the revelation's line, and its replies to 52799."
     },
     {
       "npc": 5562,
@@ -35635,6 +35669,174 @@
         }
       ],
       "why": "Deporakí, the spirit in the room the fermented bamboo milk wakes one up in (207620100, «vous vous réveillez dans une pièce où vous pouvez voir un esprit», Dofus pour les noobs, «Le réveil de Pandala»). He laughs at the hangover (41727-41729), is a spirit and not a god (41730-41732), tells why the spirits came back to Pandala (41733, 41734) and leaves: «Ver cómo el espíritu desaparece en medio de una nube de humo rosa.» (54299) is 16325, and the door is the way out (16326)."
+    },
+    {
+      "npc": 5566,
+      "map": 0,
+      "opening": 40556,
+      "lines": [
+        {
+          "message": 40556,
+          "choices": [
+            { "reply": 52833, "quest": 2193, "afterObjective": 16280, "beforeObjective": 16281, "next": 40557 },
+            { "reply": 52835, "quest": 2193, "afterObjective": 16280, "beforeObjective": 16281, "next": 40559 }
+          ]
+        },
+        {
+          "message": 40557,
+          "choices": [
+            { "reply": 52832, "quest": 2193, "next": 40558 }
+          ]
+        },
+        {
+          "message": 40558,
+          "choices": [
+            { "reply": 52831, "quest": 2193, "next": 40559 }
+          ]
+        },
+        {
+          "message": 40559,
+          "choices": [
+            { "reply": 52830, "quest": 2193 },
+            { "reply": 52834, "quest": 2193 }
+          ]
+        }
+      ],
+      "why": "Rapusu, the zollo who keeps the house of his people in Pandala [22,-28] («Guipol», Dofus pour les noobs, «Un sage parmi les sages»): to «Me gustaría hablar con Zoyo.» (52833) the sage is away and only the dean Helmelina knows where (40557); she is not to be bothered by a nobody (40558), so «Estoy destinado a hacer grandes cosas…» (52831) earns his challenge (40559), and «Aceptar el desafío de Rapusu» (52830) the fight, alone (content/fights/npc_fights.json), that is «Demuestra que eres fuelte y astuto como un zollo» (16281). Whoever lost or thought it over is challenged again at once with «Demostrar a Rapusu que eres digno de hablar con la decana» (52835)."
+    },
+    {
+      "npc": 5565,
+      "map": 0,
+      "opening": 40560,
+      "lines": [
+        {
+          "message": 40560,
+          "choices": [
+            { "reply": 52836, "quest": 2193, "afterObjective": 16280, "beforeObjective": 16281 },
+            { "reply": 52840, "quest": 2193, "afterObjective": 16281, "beforeObjective": 16282, "next": 40561 }
+          ]
+        },
+        {
+          "message": 40561,
+          "choices": [
+            { "reply": 52839, "quest": 2193, "next": 40562 }
+          ]
+        },
+        {
+          "message": 40562,
+          "choices": [
+            { "reply": 52838, "quest": 2193, "next": 40563 }
+          ]
+        },
+        {
+          "message": 40563,
+          "choices": [
+            { "reply": 52837, "quest": 2193, "completes": 16282, "params": [[30, 16282]] }
+          ]
+        }
+      ],
+      "why": "Helmelina, the dean meditating in the zollos' house (Dofus pour les noobs, «Un sage parmi les sages»: «parlez à Helmeline»). Before Rapusu's challenge is won, «Oír a Rapusu ordenarte que no molestes a la decana» (52836) is all one gets. After it, «Inclinarte ante la decana y decirle que buscas a Zoyo» (52840): the sage left on a long quest that is not the dofus' (40561), he was the guardian of one and knows the six dragon eggs (40562), and he went back to the zollos' native island, overrun by wabbits: Captain Lily takes one there (40563). «Darle las gracias y seguir su consejo» (52837) is 16282."
+    },
+    {
+      "npc": 5569,
+      "map": 106695168,
+      "opening": 40579,
+      "openings": [
+        { "quest": 2193, "objective": 16288, "message": 40575 }
+      ],
+      "lines": [
+        {
+          "message": 40579,
+          "choices": [
+            { "reply": 52859, "quest": 2193, "beforeObjective": 16288 },
+            { "reply": 52860, "quest": 2193, "beforeObjective": 16288 }
+          ]
+        },
+        {
+          "message": 40575,
+          "choices": [
+            { "reply": 52858, "quest": 2193, "completes": 16289, "params": [[30, 16289]], "gives": 23117, "beforeObjective": 16289 },
+            { "reply": 52857, "quest": 2193, "beforeObjective": 16289, "next": 40576 }
+          ]
+        },
+        {
+          "message": 40576,
+          "choices": [
+            { "reply": 52856, "quest": 2193, "next": 40577 }
+          ]
+        },
+        {
+          "message": 40577,
+          "choices": [
+            { "reply": 52855, "quest": 2193, "next": 40578 }
+          ]
+        },
+        {
+          "message": 40578,
+          "choices": [
+            { "reply": 52854, "quest": 2193, "completes": 16289, "params": [[30, 16289]], "gives": 23117 }
+          ]
+        }
+      ],
+      "why": "Zoyo, the zollo sage, in the wabbits' mine under [24,-7], reached through the hole of a house of the burrows' maze (Dofus pour les noobs, «Un sage parmi les sages»). Set upon by wabbits though he came in peace (40579): «Sugerir otra forma de negociación y defender al sabio zollo» (52859) is the fight beside him, «Vence a los comezanahowias» (16288). Then he thanks the character (40575), has a few scratches (40576), will talk of the lost dofus somewhere less dangerous (40577) and asks to be taken to Zanal (40578): «Yo te acompaño fuera» (52854), or at once «Acompañar a Zoyo a la superficie» (52858), is 16289 and he follows the character (23117, «Zoyo, el Sabio Zollo»)."
+    },
+    {
+      "npc": 5569,
+      "map": 99746310,
+      "opening": 40580,
+      "openings": [
+        { "canStart": 2194, "message": 40597 }
+      ],
+      "lines": [
+        {
+          "message": 40580,
+          "choices": [
+            { "reply": 52878, "quest": 2193, "afterObjective": 16290, "beforeObjective": 16291, "next": 40592 }
+          ]
+        },
+        {
+          "message": 40592,
+          "choices": [
+            { "reply": 52877, "quest": 2193, "next": 40593 }
+          ]
+        },
+        {
+          "message": 40593,
+          "choices": [
+            { "reply": 52876, "quest": 2193, "next": 40594 }
+          ]
+        },
+        {
+          "message": 40594,
+          "choices": [
+            { "reply": 52875, "quest": 2193, "next": 40595 }
+          ]
+        },
+        {
+          "message": 40595,
+          "choices": [
+            { "reply": 52874, "quest": 2193, "next": 40596 }
+          ]
+        },
+        {
+          "message": 40596,
+          "choices": [
+            { "reply": 52883, "quest": 2193, "completes": 16291, "params": [[30, 16291]], "next": 40597 }
+          ]
+        },
+        {
+          "message": 40597,
+          "choices": [
+            { "reply": 52882, "startsQuest": 2194, "params": [[34, 2194]], "next": 40598 }
+          ]
+        },
+        {
+          "message": 40598,
+          "names": true,
+          "choices": []
+        }
+      ],
+      "why": "Zoyo back with Zanal [23,-4], escorted out of the burrows (16290). The dragons' eggs are the World of Twelve's most precious treasures (40580); «Hablar de los dofus primordiales» (52878): the guardians' guild, Bolgrot (40592), the eggs hidden again and stolen again until the Cursed Day (40593, 40594), and the lord of the Evil Forest who might hold one, where Zoyo cannot go (40595). «Hacer acopio de valor…» (52874): «Tu temelidad podlía costalte la vida» (40596), and «Jamás he estado más preparado en mi vida» (52883) is 16291, the quest's end. He sends the character to meditate in its class temple first (40597, the step line of «Protección divina»): «Bueno, ¡hasta luego!» (52882) hands that quest out (Dofus pour les noobs, «Un sage parmi les sages»: «en continuant votre conversation avec Ronald le sage, vous débloquez la prochaine quête Protection divine»)."
     }
   ]
 }

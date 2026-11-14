@@ -4407,6 +4407,70 @@
    "kind": "enter",
    "map": 207619076,
    "why": "«Sal de la habitación»: through the door of the spirit's room, out by the Pandazaap [20,-29] (Dofus pour les noobs, «Le réveil de Pandala»: «Sortez de la pièce pour vous retrouver devant le Pandazaap. La quête se termine alors»)."
+  },
+  {
+   "objective": 16280,
+   "quest": 2193,
+   "kind": "enter",
+   "map": 207621122,
+   "overridesMap": true,
+   "why": "«Entra en la casa de los zollos para ver a Zoyo»: inside the house at [22,-28] (the objective names the street, 206308867)."
+  },
+  {
+   "objective": 16281,
+   "quest": 2193,
+   "kind": "beat",
+   "monster": 6197,
+   "map": 207621122,
+   "why": "«Demuestra que eres fuelte y astuto como un zollo»: Rapusu beaten."
+  },
+  {
+   "objective": 16283,
+   "quest": 2193,
+   "kind": "talk",
+   "npc": 134,
+   "map": 68420613,
+   "why": "«Ve a ver a la capitana Lily al puerto de Madrestam» (Dofus pour les noobs, «Un sage parmi les sages»: «Allez donc en [9,-2] et parlez à la Capitaine Lily»)."
+  },
+  {
+   "objective": 16284,
+   "quest": 2193,
+   "kind": "enter",
+   "map": 99614726,
+   "overridesMap": true,
+   "why": "«Protégete contra la mixomawosis y toma el barco hacia la isla»: landed on the island; Lily takes nobody without the remedy of «Intrusión en casa de los wabbits» (827), for 500 kamas."
+  },
+  {
+   "objective": 16285,
+   "quest": 2193,
+   "kind": "enter",
+   "map": 99746310,
+   "why": "«Encuentra a un sabio zollo en la isla Zanahowia»: Zanal's place at [23,-4] (Dofus pour les noobs, «Un sage parmi les sages»)."
+  },
+  {
+   "objective": 16287,
+   "quest": 2193,
+   "kind": "enter",
+   "map": 106695168,
+   "why": "«Encuentra al sabio desaparecido en los subterráneos de los wabbits»: the mine under [24,-7], down the hole of a house of the burrows' maze."
+  },
+  {
+   "objective": 16288,
+   "quest": 2193,
+   "kind": "beat",
+   "monster": 6199,
+   "map": 106695168,
+   "why": "«Vence a los comezanahowias»: the fight beside Zoyo won."
+  },
+  {
+   "objective": 16290,
+   "quest": 2193,
+   "kind": "enter",
+   "map": 99746310,
+   "requires": [{"item": 23117, "count": 1}],
+   "spends": true,
+   "showsNpc": 5569,
+   "why": "«Escolta a Zoyo hasta un lugar seguro»: back at Zanal's [23,-4] with Zoyo following; he leaves the character's side and stands there (Dofus pour les noobs, «Un sage parmi les sages»: «Il faudra donc le reconduire là où se trouve Wanald»)."
   }
  ]
 }

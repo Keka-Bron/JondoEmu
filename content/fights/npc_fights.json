@@ -1022,6 +1022,13 @@
       "monsters": [ { "monster": 6162, "grade": 1 }, { "monster": 6162, "grade": 1 } ] },
     { "npc": 5770, "map": 207619080, "reply": 54525, "byLevel": true, "defeatFree": true,
       "monsters": [ { "monster": 6196, "grade": 1 } ],
-      "why": "The prophetic fire before the receptacle, fought alone: «Si vous perdez le combat, vous ne perdez pas d'énergie et vous restez sur la map» (Dofus pour les noobs, «Le réceptacle des Dofus»)." }
+      "why": "The prophetic fire before the receptacle, fought alone: «Si vous perdez le combat, vous ne perdez pas d'énergie et vous restez sur la map» (Dofus pour les noobs, «Le réceptacle des Dofus»)." },
+    { "npc": 5566, "map": 207621122, "reply": 52830, "byLevel": true,
+      "monsters": [ { "monster": 6197, "grade": 1 } ],
+      "why": "«Accepter le défi de Guipol»: a fight alone against Rapusu (Dofus pour les noobs, «Un sage parmi les sages»: «Un combat se lance, il s'effectue seul»)." },
+    { "npc": 5569, "map": 106695168, "reply": 52859, "byLevel": true,
+      "monsters": [ { "monster": 6199, "grade": 1 }, { "monster": 6199, "grade": 1 }, { "monster": 6200, "grade": 1 }, { "monster": 6200, "grade": 1 } ],
+      "allies": [ { "monster": 6198, "grade": 1 } ],
+      "why": "«Suggérer une autre forme de négociation et défendre le sage lenald»: beside Zoyo (6198) against two aggressive wabbits and two biting pekewabbits, the guide's timeline (Dofus pour les noobs, «Un sage parmi les sages»)." }
   ]
 }

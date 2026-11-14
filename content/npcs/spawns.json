@@ -4428,6 +4428,36 @@
       "orientation": 3,
       "criterion": "Qa=2149&Qo>16324",
       "why": "Deporakí in the room the pint wakes one up in, while «Habla con el espíritu que hay en la sala» (16325) and «Sal de la habitación» (16326) are to do (Dofus pour les noobs, «Le réveil de Pandala»)."
+    },
+    {
+      "map": 207621122,
+      "npc": 5566,
+      "cell": 357,
+      "orientation": 1,
+      "why": "Rapusu by the card table of the zollos' house in Pandala [22,-28], facing its door (Dofus pour les noobs, «Un sage parmi les sages»)."
+    },
+    {
+      "map": 207621122,
+      "npc": 5565,
+      "cell": 288,
+      "orientation": 1,
+      "why": "Helmelina, the dean, meditating at the back of the zollos' house (Dofus pour les noobs, «Un sage parmi les sages»)."
+    },
+    {
+      "map": 106695168,
+      "npc": 5569,
+      "cell": 330,
+      "orientation": 3,
+      "criterion": "Qa=2193&Qo<16289",
+      "why": "Zoyo set upon by wabbits in the mine under [24,-7], until he follows the character out (16289)."
+    },
+    {
+      "map": 99746310,
+      "npc": 5569,
+      "cell": 290,
+      "orientation": 3,
+      "criterion": "(Qa=2193&Qo>16290)|(Qf=2193&Qa!2194&Qf!2194)",
+      "why": "Zoyo beside Zanal [23,-4] once escorted there (16290), until he has handed out «Protección divina»."
     }
   ]
 }

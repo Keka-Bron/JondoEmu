@@ -701,9 +701,9 @@ played through.
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| World Quests | `░░░░░░░░░░` **1%** | 1/145 |
+| World Quests | `░░░░░░░░░░` **1%** | 2/145 |
 | Pandala Island | `░░░░░░░░░░` **2%** | 1/55 |
-| **All quests** | **15.9%** | **314/1976** |
+| **All quests** | **15.9%** | **315/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
