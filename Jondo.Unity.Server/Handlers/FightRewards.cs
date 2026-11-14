@@ -294,15 +294,15 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
+        /// <summary>A dream fight's experience at its intensity's percentage (<see cref="Dreams.BonusOf"/>).</summary>
+        internal static long DreamExperience(long xp, int difficulty)
+            => xp * Dreams.BonusOf(difficulty) / 100;
+
         /// <summary>
         /// What a dream's fight drops for one of its winners: the dream's loot at the room's loot
         /// bonus (<see cref="Dreams.LootOf"/>), the Jondo coin every monster pays on this server,
         /// and, when the fight finished the dream, the dream fragments of its waves.
         /// </summary>
-        /// <summary>A dream fight's experience at its intensity's percentage (<see cref="Dreams.BonusOf"/>).</summary>
-        internal static long DreamExperience(long xp, int difficulty)
-            => xp * Dreams.BonusOf(difficulty) / 100;
-
         private static Dictionary<int, int> DreamLootOf(FightInstance fight, DreamHandler.DreamPay dream)
         {
             var loot = Dreams.LootOf(dream.Difficulty, dream.Row, dream.LootBonus, TirarPorcentaje);

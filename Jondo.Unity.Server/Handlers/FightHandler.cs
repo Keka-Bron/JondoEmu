@@ -10910,6 +10910,16 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Whether a monster is one of a fight's earlier waves, fallen -- a Fin du rêve's, or one
+        /// that came by the clock (<see cref="NextTimedWaveAsync"/>), told to the client the same
+        /// way: the end screen leaves it out. The client keeps none of them once the next wave
+        /// comes, and every one went on the screen all the same, a «???» at level 0 -- a hundred
+        /// and thirty rows after eighteen waves. INFERRED: no capture shows the end of a Fin du rêve.
+        /// </summary>
+        internal static bool FellInAnEarlierWave(Fighter monster, int lastWave)
+            => lastWave > 0 && monster.Wave < lastWave && !monster.IsAlive;
+
+        /// <summary>
         /// The next wave of a Fin du rêve, on the board: each of its monsters built as any fight
         /// builds them, brought to the wave's level, placed on a free defender cell and marked with
         /// the wave's number. Then what the client expects of a wave: the jyb that makes it the
@@ -10919,15 +10929,6 @@ namespace Jondo.Unity.Server.Handlers
         /// (see <see cref="Network.FightProtocol.BuildNewWave"/>).
         /// False when there is no next wave, and the fight is over.
         /// </summary>
-        /// <summary>
-        /// Whether a monster is one of a Fin du rêve's earlier waves, fallen: the end screen leaves
-        /// it out. The client keeps none of them once the next wave comes, and every one went on
-        /// the screen all the same, a «???» at level 0 -- a hundred and thirty rows after eighteen
-        /// waves. INFERRED: no capture shows the end of a Fin du rêve.
-        /// </summary>
-        internal static bool FellInAnEarlierWave(Fighter monster, int lastWave)
-            => lastWave > 0 && monster.Wave < lastWave && !monster.IsAlive;
-
         internal static async Task<bool> NextDreamWaveAsync(NetworkStream stream, FightInstance fight)
         {
             var next = DreamHandler.NextWave(fight);
