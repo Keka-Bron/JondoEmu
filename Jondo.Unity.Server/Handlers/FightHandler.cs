@@ -10919,6 +10919,15 @@ namespace Jondo.Unity.Server.Handlers
         /// (see <see cref="Network.FightProtocol.BuildNewWave"/>).
         /// False when there is no next wave, and the fight is over.
         /// </summary>
+        /// <summary>
+        /// Whether a monster is one of a Fin du rêve's earlier waves, fallen: the end screen leaves
+        /// it out. The client keeps none of them once the next wave comes, and every one went on
+        /// the screen all the same, a «???» at level 0 -- a hundred and thirty rows after eighteen
+        /// waves. INFERRED: no capture shows the end of a Fin du rêve.
+        /// </summary>
+        internal static bool FellInAnEarlierWave(Fighter monster, int lastWave)
+            => lastWave > 0 && monster.Wave < lastWave && !monster.IsAlive;
+
         internal static async Task<bool> NextDreamWaveAsync(NetworkStream stream, FightInstance fight)
         {
             var next = DreamHandler.NextWave(fight);
@@ -11526,9 +11535,11 @@ namespace Jondo.Unity.Server.Handlers
                 if (f.EsInvocado || f.EsIlusion) continue;
                 results.Add(FinDe(f, azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }
+            int lastWave = fight.Rojo.Count == 0 ? 0 : fight.Rojo.Max(f => f.Wave);
             foreach (var f in fight.Rojo)
             {
                 if (f.EsInvocado || f.EsIlusion) continue;
+                if (FellInAnEarlierWave(f, lastWave)) continue;
                 results.Add(FinDe(f, !azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }
 
