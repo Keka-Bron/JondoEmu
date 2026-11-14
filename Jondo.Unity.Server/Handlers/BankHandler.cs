@@ -134,9 +134,13 @@ namespace Jondo.Unity.Server.Handlers
 
             if (opening.Fee > 0)
             {
-                SessionContext.State.Kamas = opening.CharacterKamas;
+                // Taken off the purse as it stands now, not written over it: the figure handed to
+                // the bank was read before the wait, and whatever left the purse meanwhile from
+                // another connection -- a commission's payment -- came back with it.
+                SessionContext.State.Kamas -= opening.Fee;
+                CharacterRewards.Save();
                 await SendAsync(stream, Op.Lqn, BankProtocol.BuildFeePaid(opening.Fee));
-                await SendAsync(stream, Op.Ivf, ConnectionProtocol.BuildKamas(opening.CharacterKamas));
+                await SendAsync(stream, Op.Ivf, ConnectionProtocol.BuildKamas(SessionContext.State.Kamas));
             }
 
             SessionContext.State.BankMapId = SessionContext.State.MapId;
@@ -391,8 +395,10 @@ namespace Jondo.Unity.Server.Handlers
                                                   SessionContext.State.Kamas, amount);
             if (moved == null) return true;
 
-            SessionContext.State.Kamas = moved.Value.Character;
-            await SendAsync(stream, Op.Ivf, ConnectionProtocol.BuildKamas(moved.Value.Character));
+            // What moved, off the purse as it stands now: see OpenAsync.
+            SessionContext.State.Kamas -= moved.Value.Moved;
+            CharacterRewards.Save();
+            await SendAsync(stream, Op.Ivf, ConnectionProtocol.BuildKamas(SessionContext.State.Kamas));
 
             // The bank's new total goes to every open window of the account, this one included,
             // in the same turn as a credit from outside would: see RefreshWindowsAsync.

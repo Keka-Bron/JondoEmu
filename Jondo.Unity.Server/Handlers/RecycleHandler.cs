@@ -233,8 +233,8 @@ namespace Jondo.Unity.Server.Handlers
                 var item = Equipment.ByUid(uid);
                 if (item == null || item.Position != Equipment.Bag) continue;
                 int units = Math.Min(quantity, item.Quantity);
+                if (!await WorkshopHandler.ConsumeAsync(me, item, units, inWorkshop: false)) continue;
                 nuggets += Recycling.NuggetsOf(item.Template, units, session.SubAreaId);
-                await WorkshopHandler.ConsumeAsync(me, item, units, inWorkshop: false);
                 stacks++;
             }
             bench.Slots.Clear();

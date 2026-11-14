@@ -3429,26 +3429,32 @@ namespace Jondo.Unity.Server
                 using var connection = new SqliteConnection(WorldConnectionString);
                 connection.Open();
 
-                var leer = connection.CreateCommand();
-                leer.CommandText = "SELECT Quantity FROM CharacterItems WHERE Uid = $uid AND CharacterId = $id;";
-                leer.Parameters.AddWithValue("$uid", uid);
-                leer.Parameters.AddWithValue("$id", characterId);
-                if (leer.ExecuteScalar() is not long tiene) return false;
-
+                // The count is judged by the statement that takes it, not read first: a stack read
+                // at ten and halved by somebody else's trade before the write was deleted whole
+                // and answered «done» to a caller that then paid for ten. Asked for more than there
+                // is, nothing is taken and it says so.
                 var command = connection.CreateCommand();
-                if (quantity <= 0 || quantity >= tiene)
+                if (quantity <= 0)
                 {
                     command.CommandText = "DELETE FROM CharacterItems WHERE Uid = $uid AND CharacterId = $id;";
                 }
                 else
                 {
                     command.CommandText = "UPDATE CharacterItems SET Quantity = Quantity - $n " +
-                                          "WHERE Uid = $uid AND CharacterId = $id;";
+                                          "WHERE Uid = $uid AND CharacterId = $id AND Quantity > $n;";
                     command.Parameters.AddWithValue("$n", quantity);
                 }
                 command.Parameters.AddWithValue("$uid", uid);
                 command.Parameters.AddWithValue("$id", characterId);
-                return command.ExecuteNonQuery() > 0;
+                if (command.ExecuteNonQuery() > 0) return true;
+                if (quantity <= 0) return false;
+
+                var last = connection.CreateCommand();
+                last.CommandText = "DELETE FROM CharacterItems WHERE Uid = $uid AND CharacterId = $id AND IFNULL(Quantity, 1) = $n;";
+                last.Parameters.AddWithValue("$uid", uid);
+                last.Parameters.AddWithValue("$id", characterId);
+                last.Parameters.AddWithValue("$n", quantity);
+                return last.ExecuteNonQuery() > 0;
             }
             catch (Exception ex)
             {

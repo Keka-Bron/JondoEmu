@@ -208,6 +208,7 @@ namespace Jondo.Unity.Server.Handlers
             var session = SessionContext.Current;
             RecycleHandler.Abandon(session);
             session.State.Workshop = null;
+            session.State.Barter = null;
             if (session.State.Commission != null) _ = CommissionHandler.AbandonAsync(session);
             if (session.State.Trade != null) _ = TradeHandler.AbandonAsync(session);
         }
@@ -396,8 +397,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (item != null && owed.TryGetValue(item.Template, out int left) && left > 0)
                 {
                     int take = Math.Min(left, item.Quantity);
-                    await ConsumeAsync(SessionContext.Current, item, take);
-                    owed[item.Template] = left - take;
+                    if (await ConsumeAsync(SessionContext.Current, item, take)) owed[item.Template] = left - take;
                 }
                 await SendAsync(stream, Op.Kfs, WorkshopProtocol.BuildRemoved(uid));
             }
@@ -408,9 +408,18 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     if (owed[gid] <= 0) break;
                     int take = Math.Min(owed[gid], stack.Quantity);
-                    await ConsumeAsync(SessionContext.Current, stack, take);
-                    owed[gid] -= take;
+                    if (await ConsumeAsync(SessionContext.Current, stack, take)) owed[gid] -= take;
                 }
+            }
+
+            // Nothing is made of what was not spent: a stack the bag shows and the base no longer
+            // has was «consumed» in silence, and the craft came out of it all the same.
+            if (owed.Values.Any(unspent => unspent > 0))
+            {
+                await SendAsync(stream, Op.Kdr, WorkshopProtocol.BuildImpossible());
+                await SendPodsAsync(SessionContext.Current);
+                Console.WriteLine($"[Workshop] Craft of {recipe.ResultId} stopped: some ingredients could not be spent.");
+                return true;
             }
 
             // Into the bag, with the second ones today's Almanax may give: «un 25% de posibilidades de
@@ -476,8 +485,12 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            await ConsumeAsync(SessionContext.Current, paper!, 1);
-            await ConsumeAsync(SessionContext.Current, content!, 1);
+            if (!await ConsumeAsync(SessionContext.Current, paper!, 1) || !await ConsumeAsync(SessionContext.Current, content!, 1))
+            {
+                await SendAsync(stream, Op.Kdr, WorkshopProtocol.BuildImpossible());
+                Console.WriteLine("[Workshop] Wrapping stopped: the paper or the thing could not be spent.");
+                return;
+            }
             foreach (var (uid, _) in bench.Slots.ToList())
                 await SendAsync(stream, Op.Kfs, WorkshopProtocol.BuildRemoved(uid));
             bench.Slots.Clear();
@@ -748,7 +761,14 @@ namespace Jondo.Unity.Server.Handlers
                     ? Managers.Almanax.BonusPercent(Managers.Almanax.BonusType.RuneKept,
                                                     Managers.Almanax.Where.AtWork(magus.ParentJobId, bench.SkillId))
                     : 0;
-                if (kept <= 0 || Dice.Next(100) >= kept) await ConsumeAsync(runeOwner, rune, 1);
+                bool runeSpent = (kept > 0 && Dice.Next(100) < kept) || await ConsumeAsync(runeOwner, rune, 1);
+                if (!runeSpent)
+                {
+                    // A rune that could not be spent does nothing to the item.
+                    if (!typed) bench.RuneSlot = null;
+                    Console.WriteLine($"[Workshop] Rune {rune.Template} could not be spent; the item is left as it was.");
+                    return;
+                }
                 await SendAsync(stream, Op.Kfs, WorkshopProtocol.BuildRemoved(runeUid));
                 await SendAsync(customer, Op.Kfs, WorkshopProtocol.BuildRemoved(runeUid, remote: true));
                 if (!typed) bench.RuneSlot = null;
@@ -837,6 +857,8 @@ namespace Jondo.Unity.Server.Handlers
                 var template = Forgemagic.TemplateOf(item.Template);
                 if (template == null) continue;
                 int units = Math.Min(quantity, item.Quantity);
+                // Spent first: what could not be taken out of the bag gives no runes.
+                if (!await ConsumeAsync(me, item, units, inWorkshop: false)) continue;
                 brokenUnits += units;
                 double coefficient = Breaking.CoefficientOf(item.Template);
 
@@ -846,7 +868,6 @@ namespace Jondo.Unity.Server.Handlers
                         runes[rune] = (runes.TryGetValue(rune, out int had) ? had : 0) + n;
                 Breaking.Broke(item.Template, units);
 
-                await ConsumeAsync(me, item, units, inWorkshop: false);
                 foreach (var (rune, n) in runes) gained[rune] = (gained.TryGetValue(rune, out int had) ? had : 0) + n;
                 report.Add((uid, runes.Select(r => (r.Key, r.Value)).ToList(), (float)coefficient));
             }
@@ -958,7 +979,8 @@ namespace Jondo.Unity.Server.Handlers
         /// Takes units off a stack in someone's bag and tells them: ium when it goes, ivj when
         /// some are left -- the workshop's ivj, or the plain one the grinder sends.
         /// </summary>
-        internal static async Task ConsumeAsync(GameSession owner, Equipment.Item item, int quantity, bool inWorkshop = true)
+        /// <returns>False when nothing was taken: the base no longer has that many.</returns>
+        internal static async Task<bool> ConsumeAsync(GameSession owner, Equipment.Item item, int quantity, bool inWorkshop = true)
         {
             long uid = item.Uid;
             int left = item.Quantity - quantity;
@@ -968,12 +990,13 @@ namespace Jondo.Unity.Server.Handlers
                 Equipment.Remove(uid, quantity);
                 return true;
             });
-            if (!done) return;
+            if (!done) return false;
             if (left <= 0)
                 await SendAsync(owner, Op.Ium, ConnectionProtocol.BuildItemGone(uid));
             else
                 await SendAsync(owner, Op.Ivj, inWorkshop ? WorkshopProtocol.BuildStackUsed(uid, left)
                                                           : ConnectionProtocol.BuildItemQuantity(uid, left));
+            return true;
         }
 
         private static async Task EmptyBenchAsync(NetworkStream stream, Bench bench)
