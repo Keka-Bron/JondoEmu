@@ -252,7 +252,21 @@ namespace Jondo.Unity.Server.Handlers
             if (asked <= 0) return;
 
             Way way = WayOut(Jondo.Unity.Server.Network.SessionContext.State.MapId, Jondo.Unity.Server.Network.SessionContext.State.CellId, asked);
-            long target = Neighbour(Jondo.Unity.Server.Network.SessionContext.State.MapId, way, asked);
+            long here = SessionContext.State.MapId;
+            // A border a quest keeps shut (ClosedBorders: the Pandala bridge before the serum).
+            if (Managers.ClosedBorders.Shut(here, WayName(way), criterion => Managers.PlayerCriteria.Met(criterion, here)))
+            {
+                Console.WriteLine($"[Move] The {WayName(way)} border of {here} is shut for this character; it stays.");
+                return;
+            }
+            int graphLanding = -1;
+            // A border the world graph sends elsewhere (BorderPassages: the Pandala bridge) goes
+            // first; it is only written down where MapScrolls names a map that does not exist.
+            long target = Managers.BorderPassages.TryFind(here, WayName(way), SessionContext.State.CellId,
+                                                          criterion => Managers.PlayerCriteria.Met(criterion, here),
+                                                          out long passage, out graphLanding)
+                ? passage
+                : Neighbour(here, way, asked);
             if (target > 0 && await Managers.GuildRaidManager.KeepsOutAsync(stream,
                     Jondo.Unity.Server.Network.SessionContext.State.CharacterId, target)) return;
 
@@ -272,7 +286,9 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            int arrival = Landing(target, Jondo.Unity.Server.Network.SessionContext.State.CellId, way);
+            int arrival = graphLanding >= 0
+                ? graphLanding
+                : Landing(target, Jondo.Unity.Server.Network.SessionContext.State.CellId, way);
             int measuredFacing = -1;
             if (Managers.MeasuredArrivals.TryGet(target, SessionContext.State.MapId, out int measuredCell, out int facing))
             {
@@ -410,7 +426,9 @@ namespace Jondo.Unity.Server.Handlers
         {
             int row = cell / 14, column = cell % 14;
             if (column != 0 && column != 13 && row > 1 && row < 38) return 0;
-            long target = Neighbour(from, FromEdge(cell), 0, quiet: true);
+            Way way = FromEdge(cell);
+            long past = Managers.BorderPassages.AnyPast(from, WayName(way), cell);
+            long target = past > 0 ? past : Neighbour(from, way, 0, quiet: true);
             return target > 0 && target != from && MapManager.GetMapInfo(target) != null ? target : 0;
         }
 
@@ -576,6 +594,16 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Move] Cell {arrival} of map {map} cannot be stood on; {nearest} instead.");
             return nearest;
         }
+
+        /// <summary>The way as BorderPassages writes it.</summary>
+        private static string WayName(Way way) => way switch
+        {
+            Way.Right => "right",
+            Way.Left => "left",
+            Way.Up => "up",
+            Way.Down => "down",
+            _ => "",
+        };
 
         private static int FacingFor(Way way, int current) => way switch
         {

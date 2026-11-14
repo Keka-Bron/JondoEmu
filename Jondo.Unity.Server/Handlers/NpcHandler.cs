@@ -1283,7 +1283,8 @@ namespace Jondo.Unity.Server.Handlers
                     arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),
                     alliesMustLive: npcFight.AlliesMustLive,
                     winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId, winMarks: npcFight.Marks,
-                    alliesPlayedBy: npcFight.AlliesPlayed ? GameState.CharacterId : 0);
+                    alliesPlayedBy: npcFight.AlliesPlayed ? GameState.CharacterId : 0,
+                    defeatFree: npcFight.DefeatFree);
                 // Taken by the fight when it was built; one that did not start leaves none for the next.
                 FightHandler.TakeNextIncarnation(GameState.CharacterId);
                 return;

@@ -1017,6 +1017,11 @@
     { "npc": 2310, "map": 126618624, "reply": 20805, "byLevel": true,
       "monsters": [ { "monster": 3634, "grade": 2 }, { "monster": 3634, "grade": 2 } ] },
     { "npc": 2310, "map": 126618624, "reply": 20807, "byLevel": true,
-      "monsters": [ { "monster": 3634, "grade": 2 }, { "monster": 3634, "grade": 2 } ] }
+      "monsters": [ { "monster": 3634, "grade": 2 }, { "monster": 3634, "grade": 2 } ] },
+    { "npc": 5564, "map": 207623170, "reply": 52810, "byLevel": true,
+      "monsters": [ { "monster": 6162, "grade": 1 }, { "monster": 6162, "grade": 1 } ] },
+    { "npc": 5770, "map": 207619080, "reply": 54525, "byLevel": true, "defeatFree": true,
+      "monsters": [ { "monster": 6196, "grade": 1 } ],
+      "why": "The prophetic fire before the receptacle, fought alone: «Si vous perdez le combat, vous ne perdez pas d'énergie et vous restez sur la map» (Dofus pour les noobs, «Le réceptacle des Dofus»)." }
   ]
 }

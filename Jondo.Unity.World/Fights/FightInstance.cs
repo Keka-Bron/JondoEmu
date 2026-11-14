@@ -1022,6 +1022,12 @@ namespace Jondo.Unity.World.Fights
         public bool AlliesMustLive { get; set; }
 
         /// <summary>
+        /// Losing costs nothing -- no energy, no life missing, no way back to the save point -- and
+        /// leaves the players on the map they fought from: an NPC fight's «defeatFree».
+        /// </summary>
+        public bool DefeatFree { get; set; }
+
+        /// <summary>
         /// Where winning leaves the players, when not the map they fought from: the trap room of
         /// «¡Cuidado con la bestia!», whose false floor has given way once the creature is down
         /// (content/fights/npc_fights.json, «winMap»). Zero for every other fight.

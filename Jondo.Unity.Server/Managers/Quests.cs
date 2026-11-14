@@ -937,6 +937,10 @@ namespace Jondo.Unity.Server.Managers
                         var binding = Bindings.Of(objective.Id);
                         if (binding == null || binding.Kind != QuestBindingKind.Enter) continue;
                         if (binding.MapId != mapId) continue;
+                        // Once it is the character's to do, as a map to discover: the tavern of «El
+                        // receptáculo de los dofus» (16271), reached by the Pandala zaap before the
+                        // bridge is crossed and the palace seen, ticked ahead of both.
+                        if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
 
                         await CloseAsync(stream, binding);
                         }

@@ -4347,6 +4347,66 @@
    "kind": "order",
    "anyOrder": true,
    "why": "«Vence a 2 Guardia huerfelino»: the same fight as 8273, which it does not wait for."
+  },
+  {
+   "objective": 16267,
+   "quest": 2192,
+   "kind": "enter",
+   "map": 206307331,
+   "overridesMap": true,
+   "why": "«Atraviesa el puente de Pandala»: «La quête se met à jour dès que vous arrivez sur la map [19,-28]» (Dofus pour les noobs, «Le réceptacle des Dofus»), the bridge's far end. The objective carries the bridge's first half, 189399809 [16,-24], which is only on the way."
+  },
+  {
+   "objective": 16271,
+   "quest": 2192,
+   "kind": "enter",
+   "map": 207623170,
+   "why": "«Ve a la Taberna del Fermenté»: inside the tavern [22,-27]."
+  },
+  {
+   "objective": 16273,
+   "quest": 2192,
+   "kind": "beat",
+   "monster": 6162,
+   "map": 207623170,
+   "why": "«Apacigua a los borrachos»: the fight against the two drunk pandawas (6162) the singer's 52810 starts."
+  },
+  {
+   "objective": 16276,
+   "quest": 2192,
+   "kind": "enter",
+   "map": 207618056,
+   "overridesMap": true,
+   "why": "«Entra en la cueva oculta»: through the waterfall of [21,-33] into the cave's first hall («cliquez derrière la cascade pour y entrer», Dofus pour les noobs, «Le réceptacle des Dofus»). The objective carries the outside of the cave, 209192193, where the shaman's assistant drops the character before the waterfall is clicked."
+  },
+  {
+   "objective": 16277,
+   "quest": 2192,
+   "kind": "use",
+   "showsNpc": 5770,
+   "why": "«Bebe de la pinta de visionario delante del receptáculo»: the vision's pint (23021, its effect 30 is this objective) drunk before the dragon idol calls up the prophetic fire («utilisez la Pinte du visionnaire … Parlez au Feu prophétique», Dofus pour les noobs)."
+  },
+  {
+   "objective": 16278,
+   "quest": 2192,
+   "kind": "beat",
+   "monster": 6196,
+   "map": 207619080,
+   "why": "«Enfréntate a la visión»: beating the prophetic fire (6196) before the receptacle («Il suffit de tuer le Feu prophétique pour gagner le combat»)."
+  },
+  {
+   "objective": 16322,
+   "quest": 2149,
+   "kind": "enter",
+   "map": 206307331,
+   "why": "«Atraviesa el puente de Pandala»: arriving at its Pandala end [19,-28], where the guard Chopynju stands (Dofus pour les noobs, «Le réveil de Pandala»: «vous pouvez traverser le pont de Pandala … et vous rendre en Pandala en allant en [19,-28]»). The bridge itself stays shut until 16321 (content/maps/closed_borders.json)."
+  },
+  {
+   "objective": 16326,
+   "quest": 2149,
+   "kind": "enter",
+   "map": 207619076,
+   "why": "«Sal de la habitación»: through the door of the spirit's room, out by the Pandazaap [20,-29] (Dofus pour les noobs, «Le réveil de Pandala»: «Sortez de la pièce pour vous retrouver devant le Pandazaap. La quête se termine alors»)."
   }
  ]
 }

@@ -75,6 +75,14 @@ namespace Jondo.Unity.Server.Managers
             public bool AlliesPlayed { get; init; }
 
             /// <summary>
+            /// Whether losing costs nothing and leaves the character where it fought («defeatFree»):
+            /// the prophetic fire of «El receptáculo de los dofus», «Si vous perdez le combat, vous ne
+            /// perdez pas d'énergie et vous restez sur la map vous permettant de relancer le combat
+            /// instantanément» (Dofus pour les noobs).
+            /// </summary>
+            public bool DefeatFree { get; init; }
+
+            /// <summary>
             /// Whom the row is for («criterion», in the client's language), or empty for anybody.
             /// Rows of the same reply are tried in order and the first that holds is the fight:
             /// Skalo's recruits face the first prisoner of the formation's year the character has
@@ -140,6 +148,7 @@ namespace Jondo.Unity.Server.Managers
                                 IncarnationInvulnerable = incarnates && incarnation.TryGetProperty("invulnerable", out var invulnerable)
                                                           && invulnerable.ValueKind == JsonValueKind.True,
                                 AlliesPlayed = row.TryGetProperty("alliesPlayed", out var played) && played.ValueKind == JsonValueKind.True,
+                                DefeatFree = row.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
                                 Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
                                             ? criterion.GetString() ?? "" : "",
                             });

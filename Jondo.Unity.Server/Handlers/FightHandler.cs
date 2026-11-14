@@ -40,7 +40,8 @@ namespace Jondo.Unity.Server.Handlers
                                                                IReadOnlyList<MobSpawnManager.MobMember>? allies = null,
                                                                bool alliesMustLive = false,
                                                                long winMapId = 0, int winCellId = 0, int winMarks = 0,
-                                                               long alliesPlayedBy = 0, bool? soulStoneFight = false)
+                                                               long alliesPlayedBy = 0, bool? soulStoneFight = false,
+                                                               bool defeatFree = false)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
@@ -151,6 +152,7 @@ namespace Jondo.Unity.Server.Handlers
                 fight.AddPlayer(beside);
             }
             fight.AlliesMustLive = alliesMustLive && allies is { Count: > 0 };
+            fight.DefeatFree = defeatFree;
             fight.WinMapId = winMapId;
             fight.WinCellId = winCellId;
             fight.WinMarks = winMarks;

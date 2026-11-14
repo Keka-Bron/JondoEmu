@@ -1,0 +1,14 @@
+{
+  "_comment": [
+    "Map borders a quest keeps shut (Managers.ClosedBorders): crossing «way» of «map» needs «open»,",
+    "a criterion in the client's syntax. Whoever does not meet it stays on the map."
+  ],
+  "borders": [
+    {
+      "map": 193201153,
+      "way": "right",
+      "open": "Qf=2149|Qo>16321",
+      "why": "The Pandala bridge off the Astrub quarry [12,-21]. Moktwa keeps it shut until the serum against the pandrista is in: «il ne peut pas vous laisser traverser le pont car celui-ci est en trop mauvais état», then «Maintenant que vous êtes vacciné, vous pouvez traverser le pont de Pandala» (Dofus pour les noobs, «Le réveil de Pandala»). 16321 is Nepra Lido's injection; 16322, the next objective, is crossing it."
+    }
+  ]
+}

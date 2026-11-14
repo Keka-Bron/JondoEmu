@@ -1974,7 +1974,8 @@
             { "reply": 38213, "quest": 1974, "completes": 14223, "params": [[30, 14223]], "next": 31621 },
             { "reply": 37219, "next": 30819, "completes": 13891, "params": [[30, 13891]] },
             { "reply": 38049, "quest": 1977, "completes": 14112, "params": [[30, 14112]], "next": 31493 },
-            { "reply": 38048 }
+            { "reply": 38048 },
+            { "reply": 54288, "quest": 2149, "afterObjective": 16316, "beforeObjective": 16318, "criterion": "PO<23038,1", "next": 41713 }
           ]
         },
         {
@@ -1988,7 +1989,8 @@
         {
           "message": 30820,
           "choices": [
-            { "reply": 37220, "startsQuest": 1960, "params": [[34, 1960]] }
+            { "reply": 37220, "startsQuest": 1960, "params": [[34, 1960]] },
+            { "reply": 54288, "quest": 2149, "afterObjective": 16316, "beforeObjective": 16318, "criterion": "PO<23038,1", "next": 41713 }
           ]
         },
         {
@@ -2076,9 +2078,33 @@
           "choices": [
             { "reply": 38214 }
           ]
+        },
+        {
+          "message": 41713,
+          "choices": [
+            { "reply": 54287, "quest": 2149, "next": 41714 }
+          ]
+        },
+        {
+          "message": 41714,
+          "choices": [
+            { "reply": 54286, "quest": 2149, "next": 41715 }
+          ]
+        },
+        {
+          "message": 41715,
+          "choices": [
+            { "reply": 54285, "quest": 2149, "takes": 23204, "gives": 23038, "next": 41716 }
+          ]
+        },
+        {
+          "message": 41716,
+          "choices": [
+            { "reply": 54284, "quest": 2149 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1974) is done, he greets the character with Archi's summons (30820) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14112), and the answer (31493). «Trempette dans un verre d'eau» of Dofus pour les noobs: he looks worried (31610), his niece «aqualic», not alcoholic (31611), she can no longer speak to the goddess (31612), Aqualics Anonymous (31613, 31614), «Proposer votre aide» (31615, the line the step declares); attacked by the well's water: an Akwadala spirit, an exorcism, a priest on the cemetery road, Tek Abir's Pandatriple first (31616-31619: 14214); the blessed beer, she ran off to the pond (31620: 14217); Reigan back, a pandawa like them, Archi wants the character (31621, 31622: 14223)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37219) is this class's objective (13891, effect 30), and leads to his greeting, 30819, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1974) is done, he greets the character with Archi's summons (30820) and «Ir a la Torre del Consejo» hands it over. «Tel est pris qui croyait prendre»: «Lanzar el rumor sobre la compra de una estatua» (14112), and the answer (31493). «Trempette dans un verre d'eau» of Dofus pour les noobs: he looks worried (31610), his niece «aqualic», not alcoholic (31611), she can no longer speak to the goddess (31612), Aqualics Anonymous (31613, 31614), «Proposer votre aide» (31615, the line the step declares); attacked by the well's water: an Akwadala spirit, an exorcism, a priest on the cemetery road, Tek Abir's Pandatriple first (31616-31619: 14214); the blessed beer, she ran off to the pond (31620: 14217); Reigan back, a pandawa like them, Archi wants the character (31621, 31622: 14223). «Le réveil de Pandala» (2149): «¿Puedo sacarte una gotita de sangre?» (54288), Dofus pour les noobs, «Le réveil de Pandala»: «parlez à Sel Dawa … il acceptera de vous aider et de vous donner un peu de son sang»; «Acercar la jeringuilla» (54285) turns the empty syringe (23204) into his blood sample (23038), the serum's third ingredient."
     },
     {
       "npc": 4321,
@@ -3043,7 +3069,9 @@
             { "reply": 38360, "quest": 1969, "completes": 14239, "params": [[30, 14239]], "next": 31726, "afterObjective": 14238 },
             { "reply": 38361, "quest": 1969, "completes": 14246, "params": [[30, 14246]], "next": 31728 },
             { "reply": 37241, "next": 30841, "completes": 13886, "params": [[30, 13886]] },
-            { "reply": 37580, "next": 31123, "quest": 1970, "afterObjective": 14033, "beforeObjective": 14034 }
+            { "reply": 37580, "next": 31123, "quest": 1970, "afterObjective": 14033, "beforeObjective": 14034 },
+            { "reply": 54278, "quest": 2149, "completes": 16315, "params": [[30, 16315]], "next": 41702, "afterObjective": 16314, "beforeObjective": 16315 },
+            { "reply": 54293, "quest": 2149, "afterObjective": 16318, "beforeObjective": 16321, "next": 41717 }
           ]
         },
         {
@@ -3056,7 +3084,9 @@
         {
           "message": 30839,
           "choices": [
-            { "reply": 37242, "startsQuest": 1960, "params": [[34, 1960]] }
+            { "reply": 37242, "startsQuest": 1960, "params": [[34, 1960]] },
+            { "reply": 54278, "quest": 2149, "completes": 16315, "params": [[30, 16315]], "next": 41702, "afterObjective": 16314, "beforeObjective": 16315 },
+            { "reply": 54293, "quest": 2149, "afterObjective": 16318, "beforeObjective": 16321, "next": 41717 }
           ]
         },
         {
@@ -3130,9 +3160,75 @@
           "choices": [
             { "reply": 38363 }
           ]
+        },
+        {
+          "message": 41702,
+          "choices": [
+            { "reply": 54277, "quest": 2149, "next": 41703 }
+          ]
+        },
+        {
+          "message": 41703,
+          "choices": [
+            { "reply": 54276, "quest": 2149, "next": 41704 }
+          ]
+        },
+        {
+          "message": 41704,
+          "choices": [
+            { "reply": 54275, "quest": 2149, "next": 41705 }
+          ]
+        },
+        {
+          "message": 41705,
+          "choices": [
+            { "reply": 54274, "quest": 2149, "next": 41706 }
+          ]
+        },
+        {
+          "message": 41706,
+          "choices": [
+            { "reply": 54273, "quest": 2149, "next": 41707 }
+          ]
+        },
+        {
+          "message": 41707,
+          "choices": [
+            { "reply": 54272, "quest": 2149, "next": 41708 }
+          ]
+        },
+        {
+          "message": 41708,
+          "choices": [
+            { "reply": 54271, "quest": 2149 }
+          ]
+        },
+        {
+          "message": 41717,
+          "choices": [
+            { "reply": 54292, "quest": 2149, "completes": 16321, "params": [[30, 16321]], "next": 41718, "takes": 23039 }
+          ]
+        },
+        {
+          "message": 41718,
+          "choices": [
+            { "reply": 54291, "quest": 2149, "next": 41719 }
+          ]
+        },
+        {
+          "message": 41719,
+          "choices": [
+            { "reply": 54290, "quest": 2149, "next": 41720 }
+          ]
+        },
+        {
+          "message": 41720,
+          "choices": [
+            { "reply": 54289, "quest": 2149 }
+          ]
         }
       ],
-      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1969) is done, he greets the character with Archi's summons (30839) and «Ir a la Torre del Consejo» hands it over. «Iop et hop»: the Iops' injuries, nobody says how (31123), rest is the cure (31124: 14034, the brash Iop comes in), an Eniripsa's calling (31125). «Piques de solution» of Dofus pour les noobs: examined, «saperlipopette» said right (31710, 31711), acute adventuritis (31712), a fascination for the Dofus is normal (31713), the syringe and four injections (31714, 31715, the line the step declares); the Cra turned bwork, enchanted verbena (31726, 31727: item 19776, then 14239 by the leaves taken); all cured (14246, 31728). «Piques de solution» of Dofus pour les noobs: examined, «saperlipopette» said right (31710, 31711), acute adventuritis (31712), a fascination for the Dofus is normal (31713), the syringe and four injections (31714, 31715, the line the step declares); the Cra turned bwork, enchanted verbena (31726, 31727: 14239, item 19776); all cured (14246, 31728)."
+      "why": "«Consejo de clase» (2009): «Presentarte.» (37241) is this class's objective (13886, effect 30), and leads to his greeting, 30841, «La consejera Archi me ha hablado de ti», then to his class quest. «Aquí huele a gas» (1960): once his class quest (1969) is done, he greets the character with Archi's summons (30839) and «Ir a la Torre del Consejo» hands it over. «Iop et hop»: the Iops' injuries, nobody says how (31123), rest is the cure (31124: 14034, the brash Iop comes in), an Eniripsa's calling (31125). «Piques de solution» of Dofus pour les noobs: examined, «saperlipopette» said right (31710, 31711), acute adventuritis (31712), a fascination for the Dofus is normal (31713), the syringe and four injections (31714, 31715, the line the step declares); the Cra turned bwork, enchanted verbena (31726, 31727: item 19776, then 14239 by the leaves taken); all cured (14246, 31728). «Piques de solution» of Dofus pour les noobs: examined, «saperlipopette» said right (31710, 31711), acute adventuritis (31712), a fascination for the Dofus is normal (31713), the syringe and four injections (31714, 31715, the line the step declares); the Cra turned bwork, enchanted verbena (31726, 31727: 14239, item 19776); all cured (14246, 31728). «Le réveil de Pandala» (2149): «He venido a por un suero contra la pandrista.» (54278) is 16315; she is out of serum (41705, 41706) and sends the character to Nibe Lula (41707). «He hablado con Nibe Lula.» (54293), once the serum is made (16318), leads to the injection: «Tenderle la jeringuilla.» (54292) hands the serum over and is 16321 (Dofus pour les noobs, «Le réveil de Pandala»: «retournez auprès de Nepra Lido … afin qu'elle vous vaccine»)."
     },
     {
       "npc": 4335,
@@ -10865,7 +10961,8 @@
             { "reply": 36755, "quest": 1999, "completes": 13805, "params": [[30, 13805]], "next": 30479 },
             { "reply": 54280 },
             { "reply": 37899, "next": 31374, "quest": 1967, "afterObjective": 14103, "beforeObjective": 14104 },
-            { "reply": 37897, "next": 31371, "quest": 1967, "afterObjective": 14102, "beforeObjective": 14103 }
+            { "reply": 37897, "next": 31371, "quest": 1967, "afterObjective": 14102, "beforeObjective": 14103 },
+            { "reply": 54279, "quest": 2149, "afterObjective": 16315, "beforeObjective": 16316, "next": 41709 }
           ]
         },
         {
@@ -10956,7 +11053,8 @@
         {
           "message": 31374,
           "choices": [
-            { "reply": 37899, "next": 31375 }
+            { "reply": 37899, "next": 31375 },
+            { "reply": 54279, "quest": 2149, "afterObjective": 16315, "beforeObjective": 16316, "next": 41709 }
           ]
         },
         {
@@ -10990,9 +11088,33 @@
         {
           "message": 31404,
           "choices": []
+        },
+        {
+          "message": 41709,
+          "choices": [
+            { "reply": 54283, "quest": 2149, "next": 41710 }
+          ]
+        },
+        {
+          "message": 41710,
+          "choices": [
+            { "reply": 54282, "quest": 2149, "completes": 16316, "params": [[30, 16316]], "next": 41711, "gives": 23205, "alsoGives": [23204] }
+          ]
+        },
+        {
+          "message": 41711,
+          "choices": [
+            { "reply": 54281, "quest": 2149, "next": 41712 }
+          ]
+        },
+        {
+          "message": 41712,
+          "choices": [
+            { "reply": 54280, "quest": 2149 }
+          ]
         }
       ],
-      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713). «Souffre-douleur»: a flask to drink in one go and hold on (31225), a jalató war chief's diuretic (31226), holding on (31227: 14063, the flying and the swift blades come in). «Braquage à la Roublard»: Plandéh's parcel, already paid, a signature (31320: 4557, item 12121). «Zobal Hibaba et les 40 Roublards»: forty spark potions put down to the zobal Hibabá (31404: 4643)."
+      "why": "Nibe Lula, the alchemist [3,-21], by «Crise sanitaire»: the five samples handed over all at once (13820, 13821; one missing, 30504): a mould of mineral origin, just after the council refused Chipo Atuf's quarry (30502, 30503); Fidel Gastro's cleaning (13828): the wells, the cereals, the animals (30505), and Paula Sepe is to hear of it (30506). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Qui sème le vent récolte l'Artempeth»: a vermicide short of ingredients (13863, 30586, 30587); the four shown, not taken -- the alembic's recipe takes them (13864-13867), the mix given (30590, 19656), another for 500 kamas (30591); the vermicide back after the tests (13873, 30593). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Le génie se meut»: Leonor Mando's five samples handed over (13805), for her animals and not for her (30479). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713). «Tarot, t'es très fort»: the card Megustam described (37897), his experiment first (31371), a plasmogrine teleport potion (31372, 31373), doing nothing and the explosion throwing the character to the other end of Astrub (14103); a failure, his fault (31374), the card found by the pond if the character clears off (31375: 14104, the Wheel of Fortune 19713). «Souffre-douleur»: a flask to drink in one go and hold on (31225), a jalató war chief's diuretic (31226), holding on (31227: 14063, the flying and the swift blades come in). «Braquage à la Roublard»: Plandéh's parcel, already paid, a signature (31320: 4557, item 12121). «Zobal Hibaba et les 40 Roublards»: forty spark potions put down to the zobal Hibabá (31404: 4643). «Le réveil de Pandala» (2149): «¿Te queda alguna dosis de suero contra la pandrista?» (54279); none left, but «¿Qué necesitas?» (54282) is 16316 and hands over the serum's recipe (23205, «Aquí tienes una lista», 41711) and the empty syringe (23204) he gives in 41712 for the blood sample, both at once so that a window closed between the two lines leaves nothing behind."
     },
     {
       "npc": 596,
@@ -35130,6 +35252,389 @@
         }
       ],
       "why": "Oopay Tevin outside the hideout [-5,-58], begging for help (17268). Dofus pour les noobs, «Niera bien qui niera le dernier»: the «cattle» are poor Bontarians: «¿Alguien ha visto ganado por aquí?» -- «¡Nosotros somos el ganado!» (17269) --, put to sleep at the soup kitchen and carted off (17270), the convoy ambushed by the kanigs beyond the Cania moors (17271); «Te prometo que voy a tener dos palabritas con el que ha organizado todo esto.» does 8275."
+    },
+    {
+      "npc": 5596,
+      "map": 0,
+      "opening": 40495,
+      "lines": [
+        {
+          "message": 40495,
+          "choices": [
+            { "reply": 52755, "quest": 2192, "completes": 16268, "params": [[30, 16268]], "next": 40496, "afterObjective": 16267 }
+          ]
+        },
+        {
+          "message": 40496,
+          "choices": [
+            { "reply": 52754, "quest": 2192, "next": 40497 }
+          ]
+        },
+        {
+          "message": 40497,
+          "choices": [
+            { "reply": 52753, "quest": 2192, "next": 40498 }
+          ]
+        },
+        {
+          "message": 40498,
+          "choices": [
+            { "reply": 52752, "quest": 2192 }
+          ]
+        }
+      ],
+      "why": "Pandarín Sudopong in the bamboo palace [22,-29] (Dofus pour les noobs, «Le réceptacle des Dofus»: «parler au Pandarin Sudopong et lui remettre la lettre de Fallanster»). «Tengo una carta para la daimia de parte de Fallanster.» (52755) does 16268: he will hand it to the daimyo (40496); asked about the sacred place (52754) he takes the character for one more seeker of the six dragon eggs (40497), and «Responder con aplomo» (52753) sends him to the shaman Surivitna, marked on the map (40498)."
+    },
+    {
+      "npc": 5561,
+      "map": 0,
+      "opening": 40499,
+      "lines": [
+        {
+          "message": 40499,
+          "choices": [
+            { "reply": 52761, "quest": 2192, "completes": 16270, "params": [[30, 16270]], "next": 40500, "afterObjective": 16268 },
+            { "reply": 52803, "quest": 2192, "completes": 16279, "params": [[30, 16279]], "next": 40532, "afterObjective": 16278 }
+          ]
+        },
+        {
+          "message": 40500,
+          "choices": [
+            { "reply": 52760, "quest": 2192, "next": 40501 }
+          ]
+        },
+        {
+          "message": 40501,
+          "choices": [
+            { "reply": 52759, "quest": 2192, "next": 40502 }
+          ]
+        },
+        {
+          "message": 40502,
+          "choices": [
+            { "reply": 52758, "quest": 2192, "next": 40503 }
+          ]
+        },
+        {
+          "message": 40503,
+          "choices": [
+            { "reply": 52757, "quest": 2192, "next": 40504 }
+          ]
+        },
+        {
+          "message": 40504,
+          "choices": [
+            { "reply": 52756, "quest": 2192 }
+          ]
+        },
+        {
+          "message": 40532,
+          "choices": [
+            { "reply": 52802, "next": 40533, "canStart": 2193 }
+          ]
+        },
+        {
+          "message": 40533,
+          "choices": [
+            { "reply": 52801, "next": 40534, "canStart": 2193 }
+          ]
+        },
+        {
+          "message": 40534,
+          "choices": [
+            { "reply": 52800, "next": 40535, "canStart": 2193 }
+          ]
+        },
+        {
+          "message": 40535,
+          "choices": [
+            { "reply": 52799, "startsQuest": 2193, "params": [[34, 2193]] }
+          ]
+        }
+      ],
+      "why": "Surivitna, the shaman of the Pandala village [20,-27]. «El receptáculo de los dofus» (2192), as Dofus pour les noobs, «Le réceptacle des Dofus» has it: «Hola, estoy buscando los seis dofus.» (52761) does 16270; one more would-be hero (40500), but with a brighter aura (40501): the receptacle, a dragon idol waiting for the six dofus (40502); to glimpse what awaits, the eyes must open (40503): a visionary's pint from the Fermenté tavern, drunk before the stone dragon, and his assistant waiting by the Airedala stairs (40504). Back with «Precisamente he sido testigo de una llama crepitante.» (52803, 16279): rare revelations (40532); the path is unclear (52802, 40533); could he guide? (52801) not his role, but a sage whose fate is tied to a dofus (40534); «Háblame más de ese personaje.» (52800): Zoyo, in the zollos' great house (40535), and «Gracias por la información. Adiós.» (52799) hands over «Un sabio entre los sabios» (2193), «en continuant votre conversation avec Surivitna»."
+    },
+    {
+      "npc": 5562,
+      "map": 0,
+      "opening": 40540,
+      "openings": [
+        { "quest": 2192, "objective": 16273, "pending": 16274, "message": 40540 },
+        { "quest": 2192, "objective": 16272, "pending": 16273, "message": 40539 },
+        { "quest": 2192, "objective": 16271, "pending": 16272, "message": 40536 }
+      ],
+      "lines": [
+        {
+          "message": 40540,
+          "choices": [
+            { "reply": 52809, "quest": 2192, "completes": 16274, "params": [[30, 16274]], "next": 40541, "afterObjective": 16273, "gives": 23021 }
+          ]
+        },
+        {
+          "message": 40541,
+          "choices": [
+            { "reply": 52808, "quest": 2192 }
+          ]
+        },
+        {
+          "message": 40536,
+          "choices": [
+            { "reply": 52807, "quest": 2192, "completes": 16272, "params": [[30, 16272]], "next": 40537 }
+          ]
+        },
+        {
+          "message": 40537,
+          "choices": [
+            { "reply": 52806, "quest": 2192, "next": 40538 }
+          ]
+        },
+        {
+          "message": 40538,
+          "choices": [
+            { "reply": 52805, "quest": 2192, "next": 40539 }
+          ]
+        },
+        {
+          "message": 40539,
+          "choices": [
+            { "reply": 52804, "quest": 2192 }
+          ]
+        }
+      ],
+      "why": "Chonayu, the Fermenté tavern's keeper [22,-27] (40540, «Aquí encontrarás la serenidad»). For «El receptáculo de los dofus» (2192), as Dofus pour les noobs, «Le réceptacle des Dofus» has it: in the tavern she complains of customers who drink without manners (40536); «Pedir una pinta de visionario.» (52807) does 16272: sent by Surivitna? (40537); «Yo también soy capaz de reflexión» (52806): she cannot raise a hand to her customers (40538), but a passing visitor teaching them manners would earn a brew of his choice (40539), «Captar el mensaje» (52804). Until the drunks are dealt with she repeats the hint (40539). After the fight «Mencionar de nuevo la pinta de visionario.» (52809) does 16274 and hands the Pinta de visionario (23021) with her thanks (40541)."
+    },
+    {
+      "npc": 5564,
+      "map": 0,
+      "opening": 40542,
+      "lines": [
+        {
+          "message": 40542,
+          "choices": [
+            { "reply": 52811, "quest": 2192, "afterObjective": 16272, "beforeObjective": 16273, "next": 40543 }
+          ]
+        },
+        {
+          "message": 40543,
+          "choices": [
+            { "reply": 52812, "quest": 2192, "next": 40544 }
+          ]
+        },
+        {
+          "message": 40544,
+          "choices": [
+            { "reply": 52810, "quest": 2192 }
+          ]
+        }
+      ],
+      "why": "The drunk pandawa singing his heart out in the Fermenté tavern (40542). Once Chonayu has asked (16272), «Intentar razonar con él.» (52811): he goes where he likes (40543); «Vamos fuera a hacer vocalizaciones.» (52812): he burps and calls his crony (40544); «Defenderte del ataque de los dos borrachos.» (52810) is the fight against the two of them (Dofus pour les noobs, «Le réceptacle des Dofus»: «Un combat se lance, il peut se faire à plusieurs»)."
+    },
+    {
+      "npc": 5563,
+      "map": 209190912,
+      "opening": 40548,
+      "lines": [
+        {
+          "message": 40548,
+          "choices": [
+            { "reply": 52818, "quest": 2192, "afterObjective": 16274, "beforeObjective": 16275, "next": 40549 },
+            { "reply": 52820, "quest": 2192, "afterQuest": true, "passage": 5563001 }
+          ]
+        },
+        {
+          "message": 40549,
+          "choices": [
+            { "reply": 52817, "quest": 2192, "completes": 16275, "params": [[30, 16275]], "next": 40550, "holds": 23021 },
+            { "reply": 52822, "quest": 2192, "next": 40551 },
+            { "reply": 52819, "quest": 2192 }
+          ]
+        },
+        {
+          "message": 40550,
+          "choices": [
+            { "reply": 52816, "passage": 5563001 }
+          ]
+        },
+        {
+          "message": 40551,
+          "choices": [
+            { "reply": 52821, "quest": 2192 }
+          ]
+        }
+      ],
+      "why": "The shaman's assistant by the Airedala stairs [19,-32] (Dofus pour les noobs, «Le réceptacle des Dofus»: «demander de vous conduire à l'entrée de la caverne du réceptacle»). With the pint (16274): «Hola, me envía el chamán Surivitna.» (52818) -- the receptacle is in a cave with a secret entrance, does he have the sacred drink? (40549); «Enseñar la pinta de visionario.» (52817, holding 23021) does 16275 and he knows a shortcut (40550); «Seguir al ayudante del chamán.» (52816) takes the character before the cave [21,-33]. «¿Dónde está la cueva?» (52822): very near, open your mind (40551). After the quest «Seguir al ayudante del chamán a la cueva del receptáculo.» (52820) still leads there."
+    },
+    {
+      "npc": 5770,
+      "map": 0,
+      "opening": 41906,
+      "lines": [
+        {
+          "message": 41906,
+          "choices": [
+            { "reply": 54525, "quest": 2192, "afterObjective": 16277, "beforeObjective": 16278 }
+          ]
+        }
+      ],
+      "why": "The prophetic fire that comes out of the visionary's pint before the receptacle (41906, «arde con una energía que reduciría un dios a cenizas»): «Esperar que no se trate de una visión y clavar tu mirada en las llamas.» (54525) is the fight against it, alone (Dofus pour les noobs, «Le réceptacle des Dofus»)."
+    },
+    {
+      "npc": 5604,
+      "map": 0,
+      "opening": 41233,
+      "lines": [
+        {
+          "message": 41233,
+          "choices": [
+            { "reply": 53698, "next": 41696, "canStart": 2149 },
+            { "reply": 54270, "quest": 2149, "completes": 16314, "params": [[30, 16314]], "next": 41699, "afterObjectives": [16310, 16311, 16312, 16313], "beforeObjective": 16314 }
+          ]
+        },
+        {
+          "message": 41696,
+          "choices": [
+            { "reply": 54266, "next": 41697, "canStart": 2149 }
+          ]
+        },
+        {
+          "message": 41697,
+          "choices": [
+            { "reply": 54265, "next": 41698, "canStart": 2149 }
+          ]
+        },
+        {
+          "message": 41698,
+          "choices": [
+            { "reply": 54264, "startsQuest": 2149, "params": [[34, 2149]] }
+          ]
+        },
+        {
+          "message": 41699,
+          "choices": [
+            { "reply": 54269, "quest": 2149, "next": 41700 }
+          ]
+        },
+        {
+          "message": 41700,
+          "choices": [
+            { "reply": 54268, "quest": 2149, "next": 41701 }
+          ]
+        },
+        {
+          "message": 41701,
+          "choices": [
+            { "reply": 54267, "quest": 2149 }
+          ]
+        }
+      ],
+      "why": "Moktwa before the Pandala bridge [12,-21], «Le réveil de Pandala» (2149) as Dofus pour les noobs, «Le réveil de Pandala» tells it: «Quisiera cruzar el puente.» (53698) is refused, the bridge being in too bad a state (41696); the workers repairing it are troubled by the móguices (41697, 41698) and «Aceptar ayudar a Móphatte» (54264) hands the quest out. Back with the five of each beaten, «Ya me he encargado de los móguices.» (54270) is 16314; he asks about the serum against the pandrista (41699) and sends the character to Astrub for it (41700, 41701)."
+    },
+    {
+      "npc": 5605,
+      "map": 0,
+      "opening": 41722,
+      "lines": [
+        {
+          "message": 41722,
+          "choices": [
+            { "reply": 54298, "quest": 2149, "completes": 16323, "params": [[30, 16323]], "next": 41723, "afterObjective": 16322, "beforeObjective": 16323 },
+            { "reply": 55372, "quest": 2149, "afterObjective": 16323, "beforeObjective": 16324, "criterion": "PO<23043,1", "next": 41726 }
+          ]
+        },
+        {
+          "message": 41723,
+          "choices": [
+            { "reply": 54297, "quest": 2149, "next": 41724 }
+          ]
+        },
+        {
+          "message": 41724,
+          "choices": [
+            { "reply": 54296, "quest": 2149, "next": 41725 }
+          ]
+        },
+        {
+          "message": 41725,
+          "choices": [
+            { "reply": 54295, "quest": 2149, "criterion": "PO<23043,1", "gives": 23043, "next": 41726 }
+          ]
+        },
+        {
+          "message": 41726,
+          "choices": [
+            { "reply": 54294, "quest": 2149 }
+          ]
+        }
+      ],
+      "why": "The guard Chopynju at the bridge's end [19,-28], «Le réveil de Pandala» (2149): «Parlez alors au Garde Chopynju qui vous annonce que vous êtes le bienvenu sur l'île» (Dofus pour les noobs, «Le réveil de Pandala»); «¡Qué ganas de descubrir la isla de Pandala!» (54298) is 16323. To see the spirits he shares a pint of fermented bamboo milk: «Sentarte con él» (54295) hands it over (23043, 41726: «te la da»), and «Necesito una nueva pinta…» (55372) another one to whoever no longer has it before drinking it."
+    },
+    {
+      "npc": 5677,
+      "map": 207620100,
+      "opening": 41727,
+      "lines": [
+        {
+          "message": 41727,
+          "choices": [
+            { "reply": 54308, "quest": 2149, "next": 41728 }
+          ]
+        },
+        {
+          "message": 41728,
+          "choices": [
+            { "reply": 54307, "quest": 2149, "next": 41729 }
+          ]
+        },
+        {
+          "message": 41729,
+          "choices": [
+            { "reply": 54306, "quest": 2149, "next": 41730 }
+          ]
+        },
+        {
+          "message": 41730,
+          "choices": [
+            { "reply": 54305, "quest": 2149, "next": 41731 }
+          ]
+        },
+        {
+          "message": 41731,
+          "choices": [
+            { "reply": 54304, "quest": 2149, "next": 41732 }
+          ]
+        },
+        {
+          "message": 41732,
+          "choices": [
+            { "reply": 54303, "quest": 2149, "next": 41733 }
+          ]
+        },
+        {
+          "message": 41733,
+          "choices": [
+            { "reply": 54302, "quest": 2149, "next": 41734 }
+          ]
+        },
+        {
+          "message": 41734,
+          "choices": [
+            { "reply": 54301, "quest": 2149, "next": 41735 }
+          ]
+        },
+        {
+          "message": 41735,
+          "choices": [
+            { "reply": 54300, "quest": 2149, "next": 41736 }
+          ]
+        },
+        {
+          "message": 41736,
+          "choices": [
+            { "reply": 54299, "quest": 2149, "completes": 16325, "params": [[30, 16325]] }
+          ]
+        }
+      ],
+      "why": "Deporakí, the spirit in the room the fermented bamboo milk wakes one up in (207620100, «vous vous réveillez dans une pièce où vous pouvez voir un esprit», Dofus pour les noobs, «Le réveil de Pandala»). He laughs at the hangover (41727-41729), is a spirit and not a god (41730-41732), tells why the spirits came back to Pandala (41733, 41734) and leaves: «Ver cómo el espíritu desaparece en medio de una nube de humo rosa.» (54299) is 16325, and the door is the way out (16326)."
     }
   ]
 }

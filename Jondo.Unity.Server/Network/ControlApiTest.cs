@@ -79,6 +79,7 @@ namespace Jondo.Unity.Server.Network
                 "cast" => TestCast(cuerpo),
                 "place" => TestPlace(cuerpo),
                 "walk" => TestWalk(cuerpo),
+                "sight" => TestSight(cuerpo),
                 "stage" => TestStage(cuerpo),
                 "spell" => TestSpell(cuerpo),
                 "refresh" => TestRefresh(cuerpo),
@@ -783,6 +784,29 @@ namespace Jondo.Unity.Server.Network
         /// A fighter walked to a cell as the fight walks it: { fighter, cell }. What it set off on
         /// the way comes back -- life, points, effects, marks spent -- with the lines logged.
         /// </summary>
+        /// <summary>
+        /// Which of these cells see the target cell on the fight's board, as a cast tests it
+        /// (walls and the fighters standing in the way): where to walk before casting.
+        /// </summary>
+        private static Respuesta TestSight(string cuerpo)
+        {
+            var session = TestSessionOnline();
+            var fight = session == null ? null : FightHandler.FightOf(session.State.CharacterId);
+            if (session == null || fight == null) return Mal(409, "no-fight");
+            int target = (int)Numero(cuerpo, "target");
+            List<int> cells;
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(string.IsNullOrEmpty(cuerpo) ? "{}" : cuerpo);
+                cells = doc.RootElement.TryGetProperty("cells", out var a) && a.ValueKind == System.Text.Json.JsonValueKind.Array
+                    ? a.EnumerateArray().Where(x => x.ValueKind == System.Text.Json.JsonValueKind.Number).Select(x => x.GetInt32()).ToList()
+                    : new List<int>();
+            }
+            catch (System.Text.Json.JsonException) { return Mal(400, "json"); }
+            var board = FightHandler.BoardOf(fight);
+            return Bien(new { target, sees = cells.Where(c => c == target || board.Sees(c, target)).ToList() });
+        }
+
         private static Respuesta TestWalk(string cuerpo)
         {
             var session = TestSessionOnline();

@@ -80,6 +80,24 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(FightHandler.DefeatCostsIn(new FightInstance(3, Dreams.MapaDeEntrada)));
         }
 
+        /// <summary>
+        /// A quest fight the guide says is free to lose: the prophetic fire before the receptacle
+        /// («vous ne perdez pas d'énergie et vous restez sur la map»).
+        /// </summary>
+        [Fact]
+        public void A_fight_marked_free_to_lose_costs_nothing()
+        {
+            Assert.False(FightHandler.DefeatCostsIn(new FightInstance(4, 120195585) { DefeatFree = true }));
+
+            var fire = NpcFights.For(5770, 207619080, 54525);
+            Assert.NotNull(fire);
+            Assert.True(fire!.DefeatFree);
+            // The tavern's drunks, the same quest's other fight, cost as usual.
+            var drunks = NpcFights.For(5564, 207623170, 52810);
+            Assert.NotNull(drunks);
+            Assert.False(drunks!.DefeatFree);
+        }
+
         // ─── What it does to the character ───────────────────────────────────────────────────
 
         private const long Loser = 8_950_000_001;

@@ -57,7 +57,7 @@ namespace Jondo.Unity.Server.Handlers
         /// energy at 10000 and the life full, back in the dream (DreamHandler decides where).
         /// </summary>
         internal static bool DefeatCostsIn(FightInstance fight)
-            => fight != null && fight.Reglas.DefeatCosts && !Dreams.IsDreamMap(fight.RoleplayMapId);
+            => fight != null && fight.Reglas.DefeatCosts && !fight.DefeatFree && !Dreams.IsDreamMap(fight.RoleplayMapId);
 
         /// <summary>
         /// The defeat, applied to the character of the session being served: the energy spent

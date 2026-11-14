@@ -109,6 +109,15 @@ namespace Jondo.Unity.Server.Handlers
                             ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained,
                                 count.ToString(), template.ToString())));
                     }
+
+                    // And where it takes the character (826 or 1155, a map reference of the client's
+                    // data): the fermented bamboo milk of «El despertar de Pandala» (23043, reference
+                    // 379) knocks one out into the spirit's room, «vous vous réveillez dans une pièce
+                    // où vous pouvez voir un esprit».
+                    var journey = itemEffects.FirstOrDefault(e => e.EffectId is TravelItemHandler.MapReferenceEffect
+                                                                      or TravelItemHandler.OtherMapReferenceEffect);
+                    if (journey != null && Managers.TravelData.TryMapReference(journey.Value, out long toMap, out int toCell))
+                        await TeleportHandler.ToMapAsync(stream, toMap, toCell);
                 }
                 return;
             }

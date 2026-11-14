@@ -4389,6 +4389,45 @@
       "orientation": 1,
       "criterion": "Qa=1477&Qo>8273",
       "why": "Oopay Tevin outside the hideout [-5,-58] once the guards are dealt with, until the quest ends. The derived placement's cell."
+    },
+    {
+      "map": 207619072,
+      "npc": 5561,
+      "cell": 344,
+      "orientation": 3,
+      "why": "Surivitna at home [20,-27], the house «El receptáculo de los dofus» sends the character to (16270, «Allez donc en [20,-27] et parlez à Surivitna», Dofus pour les noobs, «Le réceptacle des Dofus»). INFERRED cell: on the rug before the low table, facing the door."
+    },
+    {
+      "map": 207623170,
+      "npc": 5564,
+      "cell": 288,
+      "orientation": 3,
+      "criterion": "Qf!2192&(Qa!2192|Qo<16273)",
+      "why": "The drunk pandawa singing in the Fermenté tavern [22,-27] until the character throws him out (16273). INFERRED cell: at the low table, beside Chonayu."
+    },
+    {
+      "map": 209190912,
+      "npc": 5563,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=2192|Qf=2192",
+      "why": "The shaman's assistant waiting by the Airedala stairs [19,-32] («Mi asistente te esperará al lado de las escaleras de Airedala», 40504), during «El receptáculo de los dofus» and after it, to lead back to the cave. INFERRED cell."
+    },
+    {
+      "map": 207619080,
+      "npc": 5770,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=2192&Qo>16277&Qo<16278",
+      "why": "The prophetic fire before the receptacle's stone dragon, from drinking the visionary's pint (16277) until it is beaten (16278): «une flamme multicolore fait son apparition» (Dofus pour les noobs, «Le réceptacle des Dofus»). INFERRED cell: before the statue."
+    },
+    {
+      "map": 207620100,
+      "npc": 5677,
+      "cell": 370,
+      "orientation": 3,
+      "criterion": "Qa=2149&Qo>16324",
+      "why": "Deporakí in the room the pint wakes one up in, while «Habla con el espíritu que hay en la sala» (16325) and «Sal de la habitación» (16326) are to do (Dofus pour les noobs, «Le réveil de Pandala»)."
     }
   ]
 }
