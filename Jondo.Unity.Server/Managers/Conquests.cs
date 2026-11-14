@@ -21,10 +21,10 @@ namespace Jondo.Unity.Server.Managers
     /// <item>the winner then has thirty minutes alone to place a prism there.</item>
     /// </list>
     /// How many points a map or a fight is worth the help does not say: those are inferred
-    /// (<see cref="PointsPerMap"/>, <see cref="PointsPerFighter"/>), and so are the roles' own:
-    /// the champion's fights count double, and the scout's minutes in the zone, carried until he
-    /// drinks his potion on the prism's map, are the prism's column of the window
-    /// (<see cref="ScoutPointsPerMinute"/>, <see cref="ScoutCap"/>). Each alliance brings at most
+    /// (<see cref="PointsPerMap"/>, <see cref="PointsPerFighter"/>), and so is the champion's
+    /// weight -- his fights count double. The scout's minutes in the zone, carried until he drinks
+    /// his potion on the prism's map, are the prism's column of the window, at Ankama's own
+    /// figures (<see cref="ScoutPointsPerMinute"/>, <see cref="ScoutCap"/>). Each alliance brings at most
     /// <see cref="KothRoles.Limits"/> of a role into one conquest.
     /// The wars live in memory; a restart in the middle of one starts it again from its prism,
     /// which stays vulnerable in world.db.
@@ -62,11 +62,14 @@ namespace Jondo.Unity.Server.Managers
         public const int ChampionFactor = 2;
 
         /// <summary>
-        /// INFERRED: what a scout gathers each minute in the zone off the prism's map, and the most he
-        /// carries -- «acumula puntos mientras permanezca con vida hasta un límite».
+        /// What a scout gathers each minute in the zone off the prism's map, and the most he carries
+        /// -- «acumula puntos mientras permanezca con vida hasta un límite». Ankama's devblog
+        /// «Refonte des alliances» (7/11/2022) and the update's details say it: «5 points par minute»,
+        /// «son stock temporaire ne peut pas dépasser 50 points, au-delà, son compteur est bloqué».
+        /// It was 1 and 10, inferred.
         /// </summary>
-        public const int ScoutPointsPerMinute = 1;
-        public const int ScoutCap = 10;
+        public const int ScoutPointsPerMinute = 5;
+        public const int ScoutCap = 50;
 
         /// <summary>An alliance taking part.</summary>
         public sealed class Side

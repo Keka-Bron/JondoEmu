@@ -199,21 +199,29 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// A scout gathers a point a minute off the prism's map, up to his cap, none on it, and his
-        /// potion hands them in as his alliance's prism points.
+        /// A scout gathers five points a minute off the prism's map, fifty at most, none on it --
+        /// Ankama's «5 points par minute», «ne peut pas dépasser 50 points» -- and his potion hands
+        /// them in as his alliance's prism points.
         /// </summary>
         [Fact]
         public void A_scout_gathers_and_hands_in()
         {
+            Assert.Equal(5, Conquests.ScoutPointsPerMinute);
+            Assert.Equal(50, Conquests.ScoutCap);
+
             var war = Conquests.Start(9009, 1, 0, 7_200_000, prismMapId: PrismMap);
-            for (int minute = 1; minute <= Conquests.ScoutCap + 3; minute++)
-                Conquests.Tick(war, new[] { At(2, OtherMap, 30, KothRoles.Scout), At(2, PrismMap, 31, KothRoles.Scout) },
-                               minute * Conquests.TickMs);
-            Assert.Equal(Conquests.ScoutCap, war.ScoutCarried[30]);
+            var scouts = new[] { At(2, OtherMap, 30, KothRoles.Scout), At(2, PrismMap, 31, KothRoles.Scout) };
+            Conquests.Tick(war, scouts, Conquests.TickMs);
+            Assert.Equal(5, war.ScoutCarried[30]);
+
+            // Ten minutes fill the stock; two more add nothing.
+            for (int minute = 2; minute <= 12; minute++)
+                Conquests.Tick(war, scouts, minute * Conquests.TickMs);
+            Assert.Equal(50, war.ScoutCarried[30]);
             Assert.False(war.ScoutCarried.ContainsKey(31));
 
-            Assert.Equal(Conquests.ScoutCap, Conquests.HandIn(war, 30, 2));
-            Assert.Equal(Conquests.ScoutCap, war.SideOf(2).Scores[Conquests.ScoreOfPrism]);
+            Assert.Equal(50, Conquests.HandIn(war, 30, 2));
+            Assert.Equal(50, war.SideOf(2).Scores[Conquests.ScoreOfPrism]);
             Assert.Equal(0, Conquests.HandIn(war, 30, 2));
         }
 
