@@ -693,7 +693,7 @@ played through.
 | Wabbit Islands | `██████████` **100%** | 23/23 |
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Krosmoz | `██████████` **100%** | 18/18 |
-| Cania | `███████░░░` **65%** | 17/26 |
+| Cania | `███████░░░` **69%** | 18/26 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Moon Island | `██████████` **100%** | 10/10 |
@@ -701,7 +701,9 @@ played through.
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| **All quests** | **15.7%** | **311/1976** |
+| World Quests | `░░░░░░░░░░` **1%** | 1/145 |
+| Pandala Island | `░░░░░░░░░░` **2%** | 1/55 |
+| **All quests** | **15.9%** | **314/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
