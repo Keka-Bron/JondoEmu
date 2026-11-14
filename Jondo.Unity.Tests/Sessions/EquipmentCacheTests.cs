@@ -57,6 +57,35 @@ namespace Jondo.Unity.Tests.Sessions
         }
 
         [Fact]
+        public void The_fight_counts_the_sets_worn_as_the_sheet_does()
+        {
+            // Flidever's three sets, worn without their pieces' own effects: what is left is the sets'.
+            // The fight knew only one set, written by hand, and fought with 8 AP and 4,400 life where
+            // the sheet said 10 and 4,550.
+            if (!ItemSets.TryGetItems(957, out _)) return;   // no set data
+            var worn = new (long Uid, int Template, int Slot)[]
+            {
+                (957_000, 17997, 0), (957_001, 18018, 1), (957_004, 17998, 4),
+                (458_002, 19977, 2), (458_003, 19976, 3), (458_006, 19978, 6),
+            };
+            var session = GameSession.SinSocket();
+            using (SessionContext.Push(session))
+            {
+                foreach (var (uid, template, slot) in worn)
+                {
+                    Equipment.Add(uid, template, quantity: 1, slot, "[]");
+                    session.State.AddInventoryItem(new Jondo.Unity.Server.PlayerItem { Uid = uid, ItemId = template, Quantity = 1, Position = slot });
+                    Equipment.RememberWorn(uid, slot, Equipment.ByUid(uid)!.Effects);
+                }
+
+                var sheet = Equipment.Bonuses();
+                Assert.NotEmpty(sheet);
+                foreach (var (characteristic, value) in sheet)
+                    Assert.Equal(value, Jondo.Unity.Server.Handlers.StatsHandler.GetEquipBonus(characteristic));
+            }
+        }
+
+        [Fact]
         public void Moving_an_item_moves_it_in_the_session_s_older_list_too()
         {
             // An equip from the client went through Equipment and the base only, and the login's
