@@ -171,13 +171,28 @@ docker compose build --build-arg SKIP_TESTS=false      # the test gate of a norm
 The build uses the .NET 10 SDK image and the runtime uses `mcr.microsoft.com/dotnet/aspnet:10.0`,
 which carries the ASP.NET Core shared framework the server needs.
 
-## High availability
+## Towards high availability and a full ops deployment
 
-Running the server in Docker is the first step towards high availability. It packages the server as
-one replaceable image, keeps every file it writes in volumes apart from the image, restarts it on
-its own when it fails (healthcheck and `restart: unless-stopped`) and shuts it down cleanly on
-SIGTERM. Those are what an orchestrator or a failover setup builds on: a standby node only has to
-run the same image on the same data.
+Running the server in Docker is the first step towards high availability and a complete operations
+setup. It gives the server what those are built on:
+
+- **One reproducible artifact.** The image is built from the repository and holds the server and
+  its game data. The same image runs on a laptop, a VPS or a cluster, and a release can be pushed
+  to a registry by CI and pulled by any host.
+- **State apart from code.** Everything the server writes is in three volumes, so upgrading or
+  rolling back is replacing the image while the data stays. Backing up is copying the volumes.
+- **Self-healing.** The healthcheck and `restart: unless-stopped` bring a failed server back on
+  their own. Orchestrators (Docker Swarm, Kubernetes, Nomad) read the same signals.
+- **Clean lifecycle.** SIGTERM ends it gracefully with players told and the world saved, which is
+  what a rolling update or a failover sends.
+- **Configuration from the environment.** Bind address, restart mode and the server's switches
+  come from variables, which deployment tools set per environment.
+- **Observable.** Logs go to stdout for `docker logs` and any log collector, and to the `logs`
+  volume.
+
+The next steps are publishing the image from CI, deploying it to a host (compose or an
+orchestrator), automated volume backups, monitoring and alerting on the healthcheck, and the
+failover described below. A standby node only has to run the same image on the same data.
 
 The world lives in memory and in SQLite files, so **two instances can never share one database**:
 SQLite over shared storage with two writers corrupts it. What works today is a single instance
