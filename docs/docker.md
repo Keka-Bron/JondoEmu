@@ -173,6 +173,12 @@ which carries the ASP.NET Core shared framework the server needs.
 
 ## High availability
 
+Running the server in Docker is the first step towards high availability. It packages the server as
+one replaceable image, keeps every file it writes in volumes apart from the image, restarts it on
+its own when it fails (healthcheck and `restart: unless-stopped`) and shuts it down cleanly on
+SIGTERM. Those are what an orchestrator or a failover setup builds on: a standby node only has to
+run the same image on the same data.
+
 The world lives in memory and in SQLite files, so **two instances can never share one database**:
 SQLite over shared storage with two writers corrupts it. What works today is a single instance
 restarted quickly (the healthcheck and restart policy above). Active/passive failover (a standby
