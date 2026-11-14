@@ -4525,6 +4525,53 @@
       "orientation": 1,
       "criterion": "Qa=1465&Qo!8133&Qo=8135",
       "why": "Talma Esmya's spirit in Tierradala [27,-28], only once Tungusa's ritual has called him up and until he is asked about Dark Vlad (Dofus pour les noobs, «Le voleur d'âmes»: «Grâce au rituel l'esprit de Tonam Etamwa apparait sur la map»); nobody sees him otherwise. Cell 286 stood him behind the tall standing stone; INFERRED cell, open floor in front of the low rock, near Tungusa."
+    },
+    {
+      "map": 199232770,
+      "npc": 2224,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "(Qa=1466&Qo<8145)|(Qa=1466&Qo<8151&PO!14968)",
+      "why": "Master Nabur's restless bones in his ruined room of the dragoeufs' village [-4,25] (Dofus pour les noobs, «L'amour perdu de Nabur»: «Entrez dans la seconde maison en partant de la droite et montez à l'étage»), until he follows the character, and again if he has stopped following before reaching his family's vault. INFERRED cell."
+    },
+    {
+      "map": 199232770,
+      "npc": 2253,
+      "cell": 316,
+      "orientation": 5,
+      "criterion": "Qa=1466&Qo>8141&Qo>8142&Qo<8144",
+      "why": "The pillagers' chief, at Nabur in his room once both answers are in hand and until they are beaten (Dofus pour les noobs, «L'amour perdu de Nabur»: «Nabur se fait attaquer par des pillards»). INFERRED cell."
+    },
+    {
+      "map": 199232770,
+      "npc": 2254,
+      "cell": 344,
+      "orientation": 5,
+      "criterion": "Qa=1466&Qo>8141&Qo>8142&Qo<8144",
+      "why": "The irritable pillager, at Nabur in his room once both answers are in hand and until they are beaten (Dofus pour les noobs, «L'amour perdu de Nabur»: «Nabur se fait attaquer par des pillards»). INFERRED cell."
+    },
+    {
+      "map": 199232770,
+      "npc": 2255,
+      "cell": 302,
+      "orientation": 5,
+      "criterion": "Qa=1466&Qo>8141&Qo>8142&Qo<8144",
+      "why": "The cruel pillager, at Nabur in his room once both answers are in hand and until they are beaten (Dofus pour les noobs, «L'amour perdu de Nabur»: «Nabur se fait attaquer par des pillards»). INFERRED cell."
+    },
+    {
+      "map": 199230724,
+      "npc": 789,
+      "cell": 303,
+      "orientation": 1,
+      "why": "Ziho, guardian of the ruined temple, the Kanojedo [-4,24] (Dofus pour les noobs, «L'amour perdu de Nabur»: «rendez vous dans le Kanojedo en [-4,24]. Parlez alors à Ziho le gardien du temple en ruines»), by its hole down to the sanctuary; he also keeps Crocabulia's lair. INFERRED cell."
+    },
+    {
+      "map": 83102208,
+      "npc": 2224,
+      "cell": 357,
+      "orientation": 5,
+      "criterion": "(Qa=1466&Qo>8150)|Qf=1466",
+      "why": "Master Nabur at rest in his family's vault: there once Una has turned to him, and for good after (Dofus pour les noobs, «L'amour perdu de Nabur»: «Nabur peut maintenant se reposer tranquillement auprès des siens»). INFERRED cell."
     }
   ]
 }

@@ -1113,6 +1113,10 @@
       "why": "«Atacar al zapatero.»: the Zapatero oscuro (3582) with the reinforcements he threatens with, a Panadero oscuro (153) and a Minero oscuro (118) (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Il est accompagné du boulanger sombre et du mineur sombre»). He drops the Secretos de fabricación de las suelas de viento (14979, his own loot at 100 %)." },
     { "npc": 2219, "map": 205261570, "reply": 20005,
       "monsters": [ { "monster": 3583, "grade": 0 } ],
-      "why": "«Defender con recelo tu alma.»: the Espíritu de Talma Esmya (3583, level 80), alone (Dofus pour les noobs, «Le voleur d'âmes»: «Un combat se lance, il peut se faire à plusieurs»)." }
+      "why": "«Defender con recelo tu alma.»: the Espíritu de Talma Esmya (3583, level 80), alone (Dofus pour les noobs, «Le voleur d'âmes»: «Un combat se lance, il peut se faire à plusieurs»)." },
+    { "npc": 2253, "map": 199232770, "reply": 20030,
+      "monsters": [ { "monster": 3584, "grade": 0 }, { "monster": 3603, "grade": 0 }, { "monster": 3602, "grade": 0 } ],
+      "allies": [ { "monster": 3585, "grade": 0 } ],
+      "why": "«Atacar a los saqueadores.»: the Jefe de los saqueadores (3584, level 90) with a Saqueadora cruel (3603) and a Saqueador irritable (3602) (Dofus pour les noobs, «L'amour perdu de Nabur»: «Le Chef des Pillards est accompagné d'une Pillarde Cruelle et d'un Pillard Irascible»), Master Nabur (3585) fighting beside the character, five in its turn line (his «Eres muy valiente por haber combatido junto a mí»)." }
   ]
 }

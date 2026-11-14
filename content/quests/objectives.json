@@ -4892,7 +4892,86 @@
     }
    ],
    "afterObjectives": [8136],
-   "why": "«Examina las tumbas»: Nabur's is the open, empty one by the statue under the arch (Dofus pour les noobs, «Le voleur d'âmes»: «cliquer sur la tombe de Nabur comme indiqué ci-dessous [...] la tombe de Nabur est vide»), the map's element 509143 (graphic 51637, an open stone tomb; 509144 is a closed one with a cross and 509145 a wooden stake)."
+   "says": 424,
+   "why": "«Examina las tumbas»: Nabur's is the open, empty one by the statue under the arch (Dofus pour les noobs, «Le voleur d'âmes»: «cliquer sur la tombe de Nabur comme indiqué ci-dessous [...] la tombe de Nabur est vide»), the map's element 509143 (graphic 51637, an open stone tomb; 509144 is a closed one with a cross and 509145 a wooden stake). The client says so with its info 424: «Esta tumba está a nombre de Nabur, pero parece que su ocupante ya no está en ella»."
+  },
+  {
+   "objective": 8141,
+   "quest": 1466,
+   "kind": "reply",
+   "replies": [
+    2878
+   ],
+   "afterObjectives": [
+    8140
+   ],
+   "anyOrder": true,
+   "why": "«Averigua más cosas del pueblo devastado»: Ziho, guardian of the Kanojedo [-4,24], asked «Cuéntame más cosas sobre el pueblo devastado» (2878): the old village of Amakna, burnt by the dragoeufs Osamodas set free (Dofus pour les noobs, «L'amour perdu de Nabur»: «Ziho vous apprend alors que le village dévasté n'est autre que l'ancien village d'Amakna»). In either order with the breeder's: the guide asks the breeder first."
+  },
+  {
+   "objective": 8142,
+   "quest": 1466,
+   "kind": "reply",
+   "replies": [
+    20029
+   ],
+   "afterObjectives": [
+    8140
+   ],
+   "anyOrder": true,
+   "why": "«Averigua lo que le ocurrió a Nabura»: the dragoeuf breeder [-3,24], asked whether his grandfather spoke of Dulcenia and Nabura (20029): Nabura's granddaughter Unaberia took refuge in the castle of Amakna (Dofus pour les noobs, «L'amour perdu de Nabur»: «Parlez alors à l'éleveur de Dragœuf qui vous apprend que des descendants de Nabur sont partis se réfugier au Château d'Amakna»)."
+  },
+  {
+   "objective": 8146,
+   "quest": 1466,
+   "kind": "enter",
+   "map": 68552193,
+   "afterObjectives": [
+    8145
+   ],
+   "requires": [
+    {
+     "item": 14968,
+     "count": 1
+    }
+   ],
+   "why": "«Lleva a Nabur al castillo de Amakna»: the castle [4,-6] reached with him walking behind (Dofus pour les noobs, «L'amour perdu de Nabur»: «Il vous faut maintenant amener Nabur au Château d'Amakna en [4,-6]»); he keeps following."
+  },
+  {
+   "objective": 8148,
+   "quest": 1466,
+   "kind": "click",
+   "elements": [
+    {
+     "map": 95685121,
+     "element": 484147
+    }
+   ],
+   "afterObjectives": [
+    8147
+   ],
+   "says": 426,
+   "why": "«Consulta los archivos del castillo»: the heap of books by the royal library's left wall, element 484147 on cell 351 (Dofus pour les noobs, «L'amour perdu de Nabur»: «Cliquez sur les bouquins en bazar en bas à gauche», circled in its picture); the client's info 426, «Encuentras un viejo registro que indica que existe un panteón de la familia Nabur en el cementerio de Amakna»."
+  },
+  {
+   "objective": 8149,
+   "quest": 1466,
+   "kind": "enter",
+   "map": 83102208,
+   "afterObjectives": [
+    8148
+   ],
+   "why": "«Panteón de los Nabur», a discovery the catalogue gives no map: the Nabur vault in Amakna's cemetery [11,16], map 83102208, where Una and Nabur's objectives stand (Dofus pour les noobs, «L'amour perdu de Nabur»: «un caveau de la famille Nabur dans le cimetière d'Amakna en [11,16]»)."
+  },
+  {
+   "objective": 8152,
+   "quest": 1466,
+   "kind": "enter",
+   "map": 217317382,
+   "afterObjectives": [
+    8151
+   ],
+   "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: the compass now points at Bonta's militia [-32,-57] (14983, map reference 189: the hall 217318404) (Dofus pour les noobs, «L'amour perdu de Nabur»: «Double cliquez sur la boussole de Mériana afin d'obtenir la position de la milice de Bonta en [-32,-57]»); done in Captain Starky's room 217317382, which both ways into the militia lead to."
   }
  ]
 }

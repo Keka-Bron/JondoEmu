@@ -721,6 +721,7 @@
         {
           "message": 12877,
           "choices": [
+            { "reply": 20018, "next": 16808, "quest": 1466, "beforeObjective": 8139 },
             { "reply": 37379, "quest": 1976, "completes": 13974, "params": [[30, 13974]], "next": 30947, "afterObjective": 13973 },
             { "reply": 37908, "next": 31384, "quest": 1976, "afterQuest": true, "beforeQuest": 1977 },
             { "reply": 15373, "next": 13383, "beforeQuest": 1199, "criterion": "PL>9" },
@@ -1132,9 +1133,27 @@
           "choices": [
             { "reply": 21559 }
           ]
+        },
+        {
+          "message": 16808,
+          "choices": [
+            { "reply": 20017, "next": 16809 }
+          ]
+        },
+        {
+          "message": 16809,
+          "choices": [
+            { "reply": 20016, "next": 16810, "quest": 1466, "beforeObjective": 8139, "completes": 8139 }
+          ]
+        },
+        {
+          "message": 16810,
+          "choices": [
+            { "reply": 20015 }
+          ]
         }
       ],
-      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881). «Un huevo para Zurcarák» (1517, Dofus pour les noobs «Un œuf pour Ecaflip»: level 130, after the achievement «Ángeles y demonios» -- «Faire le keke», 586 --, at his home in Astrub [3,-17]): «¿Cómo estás?» (21556) gets «¡Te has convertido en todo un Keké!» (17965); taken as a compliment (21554) he asks a favour (17966), «¿Qué favor?» (21553) is a fertilised egg of Thor Pestruz from the nest in Cania's natural park, against the dotruz (17967), «¿Y qué vas a hacer con el huevo?» (21551) is a present for his father Zurcarák (17968), hiding the surprise (21557) he asks again (17969), and «Me voy a Cania» (21558) starts the quest; «Tomártelo como un insulto e irte» (21555) and «No, gracias. Adiós» (21552) leave. With the egg, «Aquí tienes el huevo fecundado de Thor Pestruz» (21560) hands it over (8537) and gets the dotruz (17970, the step's reward), «Despedirte e irte con tu dotruz» (21559)."
+      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881). «Un huevo para Zurcarák» (1517, Dofus pour les noobs «Un œuf pour Ecaflip»: level 130, after the achievement «Ángeles y demonios» -- «Faire le keke», 586 --, at his home in Astrub [3,-17]): «¿Cómo estás?» (21556) gets «¡Te has convertido en todo un Keké!» (17965); taken as a compliment (21554) he asks a favour (17966), «¿Qué favor?» (21553) is a fertilised egg of Thor Pestruz from the nest in Cania's natural park, against the dotruz (17967), «¿Y qué vas a hacer con el huevo?» (21551) is a present for his father Zurcarák (17968), hiding the surprise (21557) he asks again (17969), and «Me voy a Cania» (21558) starts the quest; «Tomártelo como un insulto e irte» (21555) and «No, gracias. Adiós» (21552) leave. With the egg, «Aquí tienes el huevo fecundado de Thor Pestruz» (21560) hands it over (8537) and gets the dotruz (17970, the step's reward), «Despedirte e irte con tu dotruz» (21559). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «posez lui des questions au sujet de Nabur»): the master of arms (16808), killed by Dark Vlad though he took a dofus from him (16809), and his youth's love in the first village of Amakna, on the dragoeufs' peninsula (16810)."
     },
     {
       "npc": 4310,
@@ -25224,6 +25243,7 @@
       "map": 217317382,
       "opening": 49092,
       "openings": [
+        { "quest": 1466, "objective": 8152, "pending": 8153, "message": 49092 },
         { "canStart": 144, "message": 49097 },
         { "quest": 144, "message": 49092 }
       ],
@@ -25238,6 +25258,7 @@
         {
           "message": 49092,
           "choices": [
+            { "reply": 65551, "next": 49093, "quest": 1466, "afterObjective": 8152, "beforeObjective": 8153, "completes": 8153 },
             { "reply": 65560, "next": 49098, "quest": 144, "holds": 33063, "completes": 543 },
             { "reply": 65555, "quest": 144 }
           ]
@@ -25247,9 +25268,15 @@
           "choices": [
             { "reply": 65559 }
           ]
+        },
+        {
+          "message": 49093,
+          "choices": [
+            { "reply": 65559 }
+          ]
         }
       ],
-      "why": "Captain Starky at Bonta's militia [-32,-57], the Bontarians' daily dragoturkey charge (144, Dofus pour les noobs, «Chargez !»): to a Bontarian who may take it, «Para lanzarnos contra los brakmarianos con mi caballería, necesito monturas...» with «Te prometo que te traeré un animal conforme a tus necesidades» (the guide's «Promettre de lui fournir un animal correspondant à ses besoins») or the infantry; with it running, his charge line and «Te confío el dragopavo» once a red dragoturkey is carried, which he pays with breeder's scrolls (49098), or the promise to bring one. The client's texts follow one another in that order (941394-941400)."
+      "why": "Captain Starky at Bonta's militia [-32,-57], the Bontarians' daily dragoturkey charge (144, Dofus pour les noobs, «Chargez !»): to a Bontarian who may take it, «Para lanzarnos contra los brakmarianos con mi caballería, necesito monturas...» with «Te prometo que te traeré un animal conforme a tus necesidades» (the guide's «Promettre de lui fournir un animal correspondant à ses besoins») or the infantry; with it running, his charge line and «Te confío el dragopavo» once a red dragoturkey is carried, which he pays with breeder's scrolls (49098), or the promise to bring one. The client's texts follow one another in that order (941394-941400). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «parlez au Captain Starky et demandez lui si il a lui vu le Dark Vlad afin de finir la quête»): Dark Vlad came by a few days ago and left the militia with disorder and desecrations (49093)."
     },
     {
       "npc": 805,
@@ -37106,6 +37133,236 @@
         }
       ],
       "why": "Talma Esmya's spirit, called up by Tungusa's ritual (Dofus pour les noobs, «Le voleur d'âmes»): «Defender con recelo tu alma.» starts the fight; beaten, he tells of Dark Vlad, who tricked him («Une fois vaincu, reparlez à l'esprit pour l'interroger au sujet du Dark Vlad»), and Meriana's compass, brought near him, spins and points elsewhere (14981 becomes 14982, «En approchant la boussole de celui-ci, elle se met à bouger»)."
+    },
+    {
+      "npc": 2224,
+      "map": 199232770,
+      "opening": 16815,
+      "openings": [
+        { "quest": 1466, "objective": 8142, "pending": 8144, "criterion": "Qo>8141", "message": 16814 }
+      ],
+      "lines": [
+        {
+          "message": 16815,
+          "choices": [
+            { "reply": 20026, "next": 16816, "quest": 1466, "afterObjective": 8139, "beforeObjective": 8140, "completes": 8140 },
+            { "reply": 20034, "next": 16821, "quest": 1466, "afterObjective": 8144, "beforeObjective": 8145 },
+            { "reply": 20035, "quest": 1466, "afterObjective": 8145, "beforeObjective": 8151, "criterion": "PO!14968", "gives": 14968 }
+          ]
+        },
+        {
+          "message": 16816,
+          "choices": [
+            { "reply": 20027 }
+          ]
+        },
+        {
+          "message": 16814,
+          "choices": []
+        },
+        {
+          "message": 16821,
+          "choices": [
+            { "reply": 20033, "next": 16822, "quest": 1466, "afterObjective": 8144, "beforeObjective": 8145 }
+          ]
+        },
+        {
+          "message": 16822,
+          "choices": [
+            { "reply": 20032, "quest": 1466, "afterObjective": 8144, "beforeObjective": 8145, "completes": 8145, "gives": 14968 }
+          ]
+        }
+      ],
+      "why": "Master Nabur, a chafer in his ruined room of the dragoeufs' village (Dofus pour les noobs, «L'amour perdu de Nabur»): Meriana's compass does not stir by him (20026) and he asks for help: what happened here, where Dulcenia rests, what became of Nabura (16816); with the pillagers at him, «¡Atrás, ladrones!» (16814); saved, he asks for news (16821, «tu bisnieta sobrevivió [...] y vivió en Amakna») and to be taken to the castle (16822), and follows («Il vous faut maintenant amener Nabur au Château d'Amakna»: the follower 14968). Lost on the way, «Nabur, ¿puedes seguirme?» takes him again."
+    },
+    {
+      "npc": 2253,
+      "map": 199232770,
+      "opening": 16818,
+      "lines": [
+        {
+          "message": 16818,
+          "choices": [
+            { "reply": 20030, "quest": 1466, "afterObjectives": [8141, 8142], "beforeObjective": 8144, "completes": 8143 },
+            { "reply": 20031 }
+          ]
+        }
+      ],
+      "why": "The pillagers' chief at Nabur's bones: «Atacar a los saqueadores» is the fight and the coming back to Nabur, if he has not been talked to first (Dofus pour les noobs, «L'amour perdu de Nabur»: «Parlez au Chef des Pillards pour les attaquer et défendre ainsi le pauvre Nabur»), «Retroceder» walks away."
+    },
+    {
+      "npc": 2254,
+      "map": 199232770,
+      "opening": 16819,
+      "lines": [
+        {
+          "message": 16819,
+          "choices": []
+        }
+      ],
+      "why": "A pillager at Nabur in his room (Dofus pour les noobs, «L'amour perdu de Nabur»), with nothing but a threat to say; the chief is the one to talk to."
+    },
+    {
+      "npc": 2255,
+      "map": 199232770,
+      "opening": 16820,
+      "lines": [
+        {
+          "message": 16820,
+          "choices": []
+        }
+      ],
+      "why": "A pillager at Nabur in his room (Dofus pour les noobs, «L'amour perdu de Nabur»), with nothing but a threat to say; the chief is the one to talk to."
+    },
+    {
+      "npc": 789,
+      "map": 199230724,
+      "opening": 3236,
+      "lines": [
+        {
+          "message": 3236,
+          "choices": [
+            { "reply": 2878, "next": 3238 },
+            { "reply": 2877, "next": 3237 }
+          ]
+        },
+        {
+          "message": 3238,
+          "choices": [
+            { "reply": 2879, "next": 3239 }
+          ]
+        },
+        {
+          "message": 3239,
+          "choices": [
+            { "reply": 2880, "next": 3240 }
+          ]
+        },
+        {
+          "message": 3240,
+          "choices": [
+            { "reply": 2881, "next": 3241 }
+          ]
+        },
+        {
+          "message": 3241,
+          "choices": []
+        },
+        {
+          "message": 3237,
+          "choices": []
+        }
+      ],
+      "why": "Ziho, guardian of the ruined Kanojedo (Dofus pour les noobs, «L'amour perdu de Nabur», its pictures: «Se renseigner à propos du village dévasté», then «Continuer la discussion» twice): the village is the old Amakna, its survivors fled to the castle (3238) and rebuilt by it (3239); the dragoeufs were Osamodas' punishment (3240, 3241). And the big hole, the way down to the sanctuary (3237)."
+    },
+    {
+      "npc": 129,
+      "map": 84411904,
+      "opening": 433,
+      "lines": [
+        {
+          "message": 433,
+          "choices": [
+            { "reply": 20029, "next": 16817, "quest": 1466, "afterObjective": 8140, "beforeObjective": 8142 },
+            { "reply": 359, "next": 434 }
+          ]
+        },
+        {
+          "message": 16817,
+          "choices": [
+            { "reply": 20028 }
+          ]
+        },
+        {
+          "message": 434,
+          "choices": [
+            { "reply": 360, "next": 435 }
+          ]
+        },
+        {
+          "message": 435,
+          "choices": []
+        }
+      ],
+      "why": "The dragoeuf breeder north of the ruined village [-3,24]. For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»): his grandfather knew Nabura's granddaughter Unaberia, a healer who fled to the castle of Amakna (16817). And his trouble: the dragoeufs grown too wild to rob of their eggs (434), and what he would give for ten (435)."
+    },
+    {
+      "npc": 1512,
+      "map": 95685121,
+      "opening": 10347,
+      "lines": [
+        {
+          "message": 10347,
+          "choices": [
+            { "reply": 20038, "next": 16823, "quest": 1466, "afterObjective": 8146, "beforeObjective": 8147, "criterion": "PO=14968" }
+          ]
+        },
+        {
+          "message": 16823,
+          "choices": [
+            { "reply": 20037, "next": 16824 }
+          ]
+        },
+        {
+          "message": 16824,
+          "choices": [
+            { "reply": 20036, "quest": 1466, "afterObjective": 8146, "beforeObjective": 8147, "completes": 8147 }
+          ]
+        }
+      ],
+      "why": "Jorge de Segrob, the owl of the castle's royal library (Dofus pour les noobs, «L'amour perdu de Nabur», its pictures): the library is not open to the public (10347); asked where the survivors of the ancestral village rest, he notices the chafer following (16823); told it is the famous Nabur, he lets the character into the funeral registers (16824, «Le remercier et fouiller dans les archives»)."
+    },
+    {
+      "npc": 2225,
+      "map": 83102208,
+      "opening": 16825,
+      "lines": [
+        {
+          "message": 16825,
+          "choices": [
+            { "reply": 20040, "next": 16826, "quest": 1466, "afterObjective": 8149, "beforeObjective": 8150, "criterion": "PO=14968" },
+            { "reply": 20041 }
+          ]
+        },
+        {
+          "message": 16826,
+          "choices": [
+            { "reply": 20039, "quest": 1466, "afterObjective": 8149, "beforeObjective": 8150, "completes": 8150, "showsNpc": 2224 }
+          ]
+        }
+      ],
+      "why": "Una, who brings flowers to her family's tombs (Dofus pour les noobs, «L'amour perdu de Nabur»: «Présentez lui alors son ancêtre Nabur et celle-ci vous apprend que Dulcinea est bien enterrée ici»): introduced to her ancestor (20040), she is glad he can find Dulcenia again (16826), and the character turns to Nabur (20039), who stands there from then on."
+    },
+    {
+      "npc": 2224,
+      "map": 83102208,
+      "opening": 16815,
+      "openings": [
+        { "after": 1466, "message": 16828 }
+      ],
+      "lines": [
+        {
+          "message": 16815,
+          "choices": [
+            { "reply": 20043, "next": 16827, "quest": 1466, "afterObjective": 8150, "beforeObjective": 8151 }
+          ]
+        },
+        {
+          "message": 16827,
+          "choices": [
+            { "reply": 20042, "quest": 1466, "afterObjective": 8150, "beforeObjective": 8151, "takes": 14968, "completes": 8151, "takesAll": [14982], "gives": 14983 },
+            { "reply": 20042, "quest": 1466, "afterObjective": 8150, "beforeObjective": 8151, "takes": 14968, "completes": 8151, "criterion": "PO!14982&PO!14983", "gives": 14983 },
+            { "reply": 20042, "quest": 1466, "afterObjective": 8150, "beforeObjective": 8151, "takes": 14968, "completes": 8151, "criterion": "PO!14982&PO=14983" }
+          ]
+        },
+        {
+          "message": 16828,
+          "choices": [
+            { "reply": 20044 }
+          ]
+        }
+      ],
+      "why": "Master Nabur in his family's vault (Dofus pour les noobs, «L'amour perdu de Nabur», its pictures): told he may rest here (20043), he thanks the character (16827), stops following, and Meriana's compass spins again («la boussole se remet à fonctionner»: 14982 becomes 14983, pointing at Bonta's militia). At peace for good after (16828)."
     }
   ]
 }
