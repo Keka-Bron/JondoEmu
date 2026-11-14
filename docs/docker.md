@@ -200,3 +200,32 @@ restarted quickly (the healthcheck and restart policy above). Active/passive fai
 started on replicated storage, or the database files replicated with a tool such as Litestream) is
 the next step. Every file the server writes is already in the three volumes, which is what such a
 setup needs.
+
+### The end goal: one image per service
+
+Today one process, and so one image, plays every role: HAAPI (8888), Zaap (15881), the connection
+and game server (5555), the game node (5556) and chat (6337). They share one memory (the session
+registry and the live world) and the same two SQLite databases. The goal is to **split the server
+into services, each with its own image**, which can be deployed, scaled and restarted on its own:
+
+| Service | Today | As its own image |
+|---|---|---|
+| Auth and HAAPI | port 8888, `auth.db` | stateless web API, several replicas behind a load balancer |
+| Zaap | port 15881 | stateless, scaled freely |
+| Connection | port 5555, shared with the game | logs in and hands the player to a world node |
+| World / game | port 5555, the in-memory world, `world.db` | one or more world nodes, each owning a part of the world |
+| Chat | port 6337 | its own service, scaled apart from the world |
+
+That is a refactor of the server, not a Docker change. It needs:
+
+- **A database server** (PostgreSQL, for instance) instead of SQLite files, so several processes can
+  write at once.
+- **Services that talk over the network** (a message bus or RPC) instead of sharing memory, for
+  sessions, the hand-off from connection to world, and chat.
+- **Configurable ports and addresses**, since today they are fixed and the client is always sent
+  to `127.0.0.1:5555`.
+- **A world split into nodes** (by map area, or one node per instance of a dungeon or fight), with
+  a player's state moved between them.
+
+The single image here is the step before that split. Its volumes, healthcheck, environment
+configuration and SIGTERM handling are what each future service image will need too.
