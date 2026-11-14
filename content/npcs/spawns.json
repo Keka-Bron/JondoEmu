@@ -4497,6 +4497,34 @@
       "orientation": 3,
       "criterion": "Qa=1464",
       "why": "The Zapatero oscuro of «¿Quién patea el culo de los Culo Pateado?» in the bandits' territory at [14,17] (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Le cordonnier sombre se trouve en [14,17]»). INFERRED cell: on the path, off the map's monster groups."
+    },
+    {
+      "map": 205261570,
+      "npc": 2218,
+      "cell": 272,
+      "remove": true
+    },
+    {
+      "map": 205261570,
+      "npc": 2218,
+      "cell": 400,
+      "orientation": 1,
+      "criterion": "(Qf=1464)|Qa=1465|Qf=1465|Qa=1464|Qf=1464|Qa=1791|Qf=1791",
+      "why": "Tungusa in Tierradala [27,-28], by the low rock she hid behind («Me escondí detrás de una roca», 16775), under the same condition as before. Cell 272 stood her behind the tall standing stone, where the client drew nothing of her. INFERRED cell, open floor in view."
+    },
+    {
+      "map": 205261570,
+      "npc": 2219,
+      "cell": 286,
+      "remove": true
+    },
+    {
+      "map": 205261570,
+      "npc": 2219,
+      "cell": 441,
+      "orientation": 1,
+      "criterion": "Qa=1465&Qo!8133&Qo=8135",
+      "why": "Talma Esmya's spirit in Tierradala [27,-28], only once Tungusa's ritual has called him up and until he is asked about Dark Vlad (Dofus pour les noobs, «Le voleur d'âmes»: «Grâce au rituel l'esprit de Tonam Etamwa apparait sur la map»); nobody sees him otherwise. Cell 286 stood him behind the tall standing stone; INFERRED cell, open floor in front of the low rock, near Tungusa."
     }
   ]
 }

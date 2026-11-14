@@ -4872,6 +4872,27 @@
    "kind": "enter",
    "map": 205261570,
    "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: near Dark Vlad's boots the compass turns to another trace (14981, map reference 187), Tierradala in Pandala [27,-28], map 205261570 (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Utilisez de nouveau la boussole, elle vous indique [27,-28]»); the objective is done on getting there. The catalogue gives it no map."
+  },
+  {
+   "objective": 8136,
+   "quest": 1465,
+   "kind": "enter",
+   "map": 158859780,
+   "afterObjectives": [8135],
+   "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: brought near Talma Esmya, the compass picks up Dark Vlad's trace again (14982, map reference 188), Bonta's cemetery [-20,-58], map 158859780 (Dofus pour les noobs, «Le voleur d'âmes»: «Double cliquez sur la boussole de Mériana [...] afin d'obtenir une position menant au cimetière de Bonta en [-20,-58]»); the objective is done on getting there, once the spirit has been asked about Dark Vlad. The catalogue gives it no map."
+  },
+  {
+   "objective": 8137,
+   "quest": 1465,
+   "kind": "click",
+   "elements": [
+    {
+     "map": 158859780,
+     "element": 509143
+    }
+   ],
+   "afterObjectives": [8136],
+   "why": "«Examina las tumbas»: Nabur's is the open, empty one by the statue under the arch (Dofus pour les noobs, «Le voleur d'âmes»: «cliquer sur la tombe de Nabur comme indiqué ci-dessous [...] la tombe de Nabur est vide»), the map's element 509143 (graphic 51637, an open stone tomb; 509144 is a closed one with a cross and 509145 a wooden stake)."
   }
  ]
 }

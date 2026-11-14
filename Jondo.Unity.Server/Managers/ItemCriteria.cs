@@ -80,7 +80,7 @@ namespace Jondo.Unity.Server.Managers
         /// Whether whoever is in session has a spell: a special one learnt, itself or its pair, or one
         /// of his class's at his level, either half of its pair.
         /// </summary>
-        private static bool KnowsSpell(int spell)
+        internal static bool KnowsSpell(int spell)
         {
             var learned = LearnedSpells.OfSession();
             if (LearnedSpells.Holds(learned, spell)) return true;

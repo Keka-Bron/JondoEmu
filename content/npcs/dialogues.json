@@ -35107,6 +35107,8 @@
         {
           "message": 16805,
           "choices": [
+            { "reply": 20014, "next": 16806, "quest": 1465, "afterObjective": 8137, "beforeObjective": 8138, "completes": 8138 },
+            { "reply": 20013, "next": 16807, "criterion": "Qf=1465", "beforeQuest": 1466 },
             { "reply": 20569, "next": 17182, "quest": 1474, "afterObjective": 8220, "beforeObjective": 8221 }
           ]
         },
@@ -35121,9 +35123,21 @@
           "choices": [
             { "reply": 20567, "quest": 1474, "completes": 8221, "params": [[30, 8221]] }
           ]
+        },
+        {
+          "message": 16806,
+          "choices": [
+            { "reply": 20013, "next": 16807 }
+          ]
+        },
+        {
+          "message": 16807,
+          "choices": [
+            { "reply": 20012, "startsQuest": 1466, "params": [[34, 1466]], "beforeQuest": 1466 }
+          ]
         }
       ],
-      "why": "Ro Entier at the gates of Bonta's cemetery [-21,-58] -- Sellia Renuf in the French guide --: the dead sleep lightly here (16805). For 1474, as Dofus pour les noobs, «Les monstres aboient, la diligence casse» has it: «¿Has visto una diligencia pasar recientemente?», it crosses Cania once a week (17182), «Estoy buscando a un panadero…», the pepper blopicero, he boarded the one to Astrub (17183), «Gracias. Hasta luego.» (8221)."
+      "why": "Ro Entier at the gates of Bonta's cemetery [-21,-58] -- Sellia Renuf in the French guide --: the dead sleep lightly here (16805). For 1474, as Dofus pour les noobs, «Les monstres aboient, la diligence casse» has it: «¿Has visto una diligencia pasar recientemente?», it crosses Cania once a week (17182), «Estoy buscando a un panadero…», the pepper blopicero, he boarded the one to Astrub (17183), «Gracias. Hasta luego.» (8221). For «Le voleur d'âmes» (Dofus pour les noobs, «Le voleur d'âmes»: «Demandez à Sellia si elle a aperçu le Dark Vlad afin de finir la quête»): «¿Has visto a Dark Vlad?» ends it (16806), and «¿Quién es Nabur?» tells of the master of arms Dark Vlad killed long ago and of Kerubim, now in Astrub (16807), the way into «El amor perdido de Nabur»: «Gracias, me voy a Astrub» takes it, and whoever left him without asking can come back and ask."
     },
     {
       "npc": 5472,
@@ -36953,11 +36967,20 @@
       "npc": 2218,
       "map": 205261570,
       "opening": 16774,
+      "openings": [
+        { "quest": 1465, "objective": 8134, "message": 16803 },
+        { "quest": 1465, "objective": 8133, "message": 16773 },
+        { "after": 1465, "message": 16804 }
+      ],
       "lines": [
         {
           "message": 16774,
           "choices": [
-            { "reply": 19987, "next": 16775, "quest": 1464, "afterObjective": 8126, "beforeObjective": 8127, "completes": 8127 }
+            { "reply": 19987, "next": 16775, "quest": 1464, "afterObjective": 8126, "beforeObjective": 8127, "completes": 8127 },
+            { "reply": 19989, "next": 16781, "criterion": "Qf=1464&PT=413", "beforeQuest": 1465 },
+            { "reply": 19983, "next": 16779, "criterion": "Qf=1464&PT!413", "beforeQuest": 1465 },
+            { "reply": 19999, "next": 16784, "quest": 1465, "criterion": "(Qo=8128|Qo=8129|Qo=8130|Qo=8131|Qo=8132)", "completesAll": [8128, 8129, 8130, 8131, 8132], "partial": true },
+            { "reply": 20004, "next": 16785, "quest": 1465, "afterObjectives": [8128, 8129, 8130, 8131, 8132], "beforeObjective": 8133 }
           ]
         },
         {
@@ -36981,11 +37004,108 @@
         {
           "message": 16778,
           "choices": [
-            { "reply": 19988, "startsQuest": 1465, "params": [[34, 1465]] }
+            { "reply": 19988, "next": 16780, "criterion": "PT=413", "beforeQuest": 1465 },
+            { "reply": 19983, "next": 16779, "criterion": "PT!413", "beforeQuest": 1465 }
+          ]
+        },
+        {
+          "message": 16779,
+          "choices": [
+            { "reply": 19982 }
+          ]
+        },
+        {
+          "message": 16780,
+          "choices": [
+            { "reply": 19990, "startsQuest": 1465, "params": [[34, 1465]] }
+          ]
+        },
+        {
+          "message": 16781,
+          "choices": [
+            { "reply": 19991, "startsQuest": 1465, "params": [[34, 1465]] }
+          ]
+        },
+        {
+          "message": 16784,
+          "choices": [
+            { "reply": 19998, "next": 16785 },
+            { "reply": 19997 }
+          ]
+        },
+        {
+          "message": 16785,
+          "choices": [
+            { "reply": 20003, "next": 16786 }
+          ]
+        },
+        {
+          "message": 16786,
+          "choices": [
+            { "reply": 20002, "next": 16787 }
+          ]
+        },
+        {
+          "message": 16787,
+          "choices": [
+            { "reply": 20001, "next": 16788 }
+          ]
+        },
+        {
+          "message": 16788,
+          "choices": [
+            { "reply": 20000, "quest": 1465, "afterObjectives": [8128, 8129, 8130, 8131, 8132], "beforeObjective": 8133, "completes": 8133, "showsNpc": 2219 }
+          ]
+        },
+        {
+          "message": 16773,
+          "choices": [
+            { "reply": 20009 }
+          ]
+        },
+        {
+          "message": 16803,
+          "choices": [
+            { "reply": 20010 }
+          ]
+        },
+        {
+          "message": 16804,
+          "choices": [
+            { "reply": 20009 }
           ]
         }
       ],
-      "why": "Tungusa in Tierradala (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»): asked whether she saw Dark Vlad («¿Has visto a Dark Vlad por aquí?»), she tells of the fire-haired iop who spoke with a spirit by the sea, and the quest ends there («La quête se termine en apprenant que Tungusa a vu le Dark Vlad parler avec l'esprit Talma Esmya»); what she says next, of Talma Esmya and the offerings, leads to «Le voleur d'âmes»."
+      "why": "Tungusa in Tierradala (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»): asked whether she saw Dark Vlad («¿Has visto a Dark Vlad por aquí?»), she tells of the fire-haired iop who spoke with a spirit by the sea, and the quest ends there («La quête se termine en apprenant que Tungusa a vu le Dark Vlad parler avec l'esprit Talma Esmya»); what she says next, of Talma Esmya and the offerings, leads to «Le voleur d'âmes». For «Le voleur d'âmes» (Dofus pour les noobs, «Le voleur d'âmes»): only to whoever has Captura de Almas («Il vous faut posséder le sort \"Capture d'âmes\" pour lancer cette quête»; otherwise she sends him to the Kwoknan nest, 16779), the five souls handed over («donnez lui les pierres d'âmes afin qu'elle puisse accomplir le rituel»), then the ritual, at whose end the spirit is there (16788) and she can neither move nor speak (16773); after the fight she is sorry she was not ready (16803)."
+    },
+    {
+      "npc": 2219,
+      "map": 205261570,
+      "opening": 16800,
+      "lines": [
+        {
+          "message": 16800,
+          "choices": [
+            { "reply": 20005, "quest": 1465, "criterion": "Qo=8134" },
+            { "reply": 20006, "next": 16801, "quest": 1465, "afterObjective": 8134, "beforeObjective": 8135 }
+          ]
+        },
+        {
+          "message": 16801,
+          "choices": [
+            { "reply": 20008, "next": 16802 }
+          ]
+        },
+        {
+          "message": 16802,
+          "choices": [
+            { "reply": 20007, "quest": 1465, "afterObjective": 8134, "beforeObjective": 8135, "takesAll": [14981], "gives": 14982, "completes": 8135 },
+            { "reply": 20007, "quest": 1465, "afterObjective": 8134, "beforeObjective": 8135, "criterion": "PO!14981&PO!14982", "gives": 14982, "completes": 8135 },
+            { "reply": 20007, "quest": 1465, "afterObjective": 8134, "beforeObjective": 8135, "criterion": "PO!14981&PO=14982", "completes": 8135 }
+          ]
+        }
+      ],
+      "why": "Talma Esmya's spirit, called up by Tungusa's ritual (Dofus pour les noobs, «Le voleur d'âmes»): «Defender con recelo tu alma.» starts the fight; beaten, he tells of Dark Vlad, who tricked him («Une fois vaincu, reparlez à l'esprit pour l'interroger au sujet du Dark Vlad»), and Meriana's compass, brought near him, spins and points elsewhere (14981 becomes 14982, «En approchant la boussole de celui-ci, elle se met à bouger»)."
     }
   ]
 }

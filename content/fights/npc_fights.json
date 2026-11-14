@@ -1110,6 +1110,9 @@
       "why": "«Prepararte para el combate»: Hell Mina Ensorcelée, alone (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Un combat se lance, il s'effectue seul»). She drops Dark Vlad's letter (14959, her drop at 100 %)." },
     { "npc": 2241, "map": 88087302, "reply": 19980,
       "monsters": [ { "monster": 3582, "grade": 0 }, { "monster": 153, "grade": 0 }, { "monster": 118, "grade": 0 } ],
-      "why": "«Atacar al zapatero.»: the Zapatero oscuro (3582) with the reinforcements he threatens with, a Panadero oscuro (153) and a Minero oscuro (118) (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Il est accompagné du boulanger sombre et du mineur sombre»). He drops the Secretos de fabricación de las suelas de viento (14979, his own loot at 100 %)." }
+      "why": "«Atacar al zapatero.»: the Zapatero oscuro (3582) with the reinforcements he threatens with, a Panadero oscuro (153) and a Minero oscuro (118) (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Il est accompagné du boulanger sombre et du mineur sombre»). He drops the Secretos de fabricación de las suelas de viento (14979, his own loot at 100 %)." },
+    { "npc": 2219, "map": 205261570, "reply": 20005,
+      "monsters": [ { "monster": 3583, "grade": 0 } ],
+      "why": "«Defender con recelo tu alma.»: the Espíritu de Talma Esmya (3583, level 80), alone (Dofus pour les noobs, «Le voleur d'âmes»: «Un combat se lance, il peut se faire à plusieurs»)." }
   ]
 }

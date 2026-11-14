@@ -147,6 +147,12 @@ namespace Jondo.Unity.Server.Managers
                 case "PE": return facts.State == null ? Answer.Unknown : Truth(facts.State.Emotes.Contains((int)value), op);
                 case "Pw": return facts.State == null ? Answer.Unknown : Compare(Jondo.Unity.Server.Network.ConnectionProtocol.Capacity(facts.State), op, value);
 
+                // A spell known, the way an item's criterion reads it: Tungusa hands «Le voleur d'âmes»
+                // only to whoever has Captura de Almas («PT=413»). Answered for whoever is in session.
+                case "PT": return facts.State == null || !ReferenceEquals(facts.State, SessionContext.State)
+                    ? Answer.Unknown
+                    : Truth(ItemCriteria.KnowsSpell((int)value), op);
+
                 // The kamas he carries: Abel Bobel's «Llorar.» is for whoever cannot pay his 3000.
                 case "PK": return facts.State == null ? Answer.Unknown : Compare(facts.State.Kamas, op, value);
 

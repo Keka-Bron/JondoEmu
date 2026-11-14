@@ -403,7 +403,8 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// Whether a reply that does these objectives can be offered for what is carried: all their
-        /// items, or -- a partial hand-over -- the items of one still to do.
+        /// items, or -- a partial hand-over -- the items or souls of one still to do: Tungusa takes
+        /// whichever of the five souls for Talma Esmya are brought, the rest another time.
         /// </summary>
         public static bool HandsOverEnough(IEnumerable<int> objectiveIds, bool partial)
         {
@@ -413,7 +414,9 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (log?.ObjectiveDone(id) == true) return false;
                 var objective = _book?.Objective(id);
-                return objective != null && objective.ItemId != 0
+                if (objective == null) return false;
+                if (objective.SoulMonster != 0) return SoulsCarried(objective.SoulMonster) >= objective.SoulCount;
+                return objective.ItemId != 0
                        && Equipment.HowMany(objective.ItemId) >= Math.Max(1, objective.ItemCount);
             });
         }
