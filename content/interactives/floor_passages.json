@@ -133,6 +133,20 @@
       "toMap": 55836672,
       "toCell": 487,
       "why": "And back: the graph's walk from 55837184 to 55836672 leaves on cell 490, the cave's left edge. Lands by the depths' right edge. INFERRED landing."
+    },
+    {
+      "map": 220987396,
+      "cell": 204,
+      "toMap": 221249538,
+      "toCell": 535,
+      "why": "Dark Vlad's maze [-5,17]: the stone stairs up the tumulus to the Elm Clearing (221249538), the clearing of «Ver a Dark Vlad y morir... o no» and «Letalina». Dofus pour les noobs: «vous rendre au centre de celui-ci dans la clairière du Dark Vlad en [-5,17] en montant les escaliers vers la clairière». The client's map gives the stairs no border; INFERRED cells: 204, the walkable foot of the stairs, and 535, the top of the clearing's own stairs down (536, 549 and 550 are its bottom border back to [-5,17])."
+    },
+    {
+      "map": 220987396,
+      "cell": 218,
+      "toMap": 221249538,
+      "toCell": 535,
+      "why": "Dark Vlad's maze [-5,17]: the stone stairs up the tumulus to the Elm Clearing (221249538), the clearing of «Ver a Dark Vlad y morir... o no» and «Letalina». Dofus pour les noobs: «vous rendre au centre de celui-ci dans la clairière du Dark Vlad en [-5,17] en montant les escaliers vers la clairière». The client's map gives the stairs no border; INFERRED cells: 218, the walkable foot of the stairs, and 535, the top of the clearing's own stairs down (536, 549 and 550 are its bottom border back to [-5,17])."
     }
   ]
 }

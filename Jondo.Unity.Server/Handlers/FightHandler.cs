@@ -76,6 +76,12 @@ namespace Jondo.Unity.Server.Handlers
             if (arenaMapId <= 0) arenaMapId = MapManager.ResolveArenaMapId(mapId);
             var fight = new FightInstance(fightId, mapId, arenaMapId);
             fight.SoulStoneFight = soulStoneFight;
+            // The waves a quest's fight brings in by the clock (NpcFights «waves»).
+            if (TakeNextWaves(GameState.CharacterId) is { Count: > 0 } waves)
+            {
+                fight.TimedWaves.AddRange(waves);
+                fight.NextWaveRound = FirstRound + waves[0].Turns;
+            }
 
             // In a kanojedo the fight follows the training rulebook: no challenges, no loot and
             // the puch does not disappear on winning. The map decides -- where the master puch is --
@@ -10922,6 +10928,58 @@ namespace Jondo.Unity.Server.Handlers
             var group = MobSpawnManager.ComposeOffMap(members);
             if (group == null || group.Members.Count == 0) return false;
 
+            var dream = DreamHandler.DreamOf(fight);
+            int arrivals = await BringWaveAsync(stream, fight, group, wave, turnsBeforeNext: 0, monster =>
+            {
+                Managers.Dreams.ScaleTo(monster, level);
+                Managers.Dreams.AsTrialWants(monster, dream);
+            });
+            if (arrivals == 0) return false;
+
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Lqn,
+                ConnectionProtocol.BuildNotice(CommandTexts.Get("dream.wave", wave, level))));
+            Program.LogDebug($"[Dreams] Wave {wave}: {arrivals} monster(s) at level {level}.");
+            return true;
+        }
+
+        /// <summary>
+        /// The next of a fight's waves that come by the clock (<see cref="FightInstance.TimedWaves"/>),
+        /// on the board: when its round has come, or at once when nobody is left in front. Its turns
+        /// are counted again from here for the one after it. False when there is none.
+        /// </summary>
+        internal static async Task<bool> NextTimedWaveAsync(NetworkStream stream, FightInstance fight)
+        {
+            if (fight.TimedWaves.Count == 0) return false;
+            var next = fight.TimedWaves[0];
+            fight.TimedWaves.RemoveAt(0);
+
+            var group = MobSpawnManager.ComposeOffMap(next.Monsters);
+            if (group == null || group.Members.Count == 0) return false;
+
+            int wave = fight.WaveNumber + 1;
+            int turnsBeforeNext = fight.TimedWaves.Count > 0 ? fight.TimedWaves[0].Turns : 0;
+            int arrivals = await BringWaveAsync(stream, fight, group, wave, turnsBeforeNext, _ => { });
+            if (arrivals == 0) return false;
+
+            fight.WaveNumber = wave;
+            fight.NextWaveRound = fight.RoundNumber + turnsBeforeNext;
+            Program.LogDebug($"[Fight] Wave {wave}: {arrivals} monster(s); {fight.TimedWaves.Count} still to come.");
+            return true;
+        }
+
+        /// <summary>
+        /// Brings a wave onto the board: each of its monsters built as any fight builds them,
+        /// shaped by <paramref name="shape"/>, placed on a free defender cell and marked with the
+        /// wave's number. Then what the client expects of a wave: the jyb that makes it the current
+        /// wave, and the fighters list (jxb) inside a sequence of its own, as at the fight's start.
+        /// The client takes the newcomers' sheets without drawing them, and when that sequence ends
+        /// draws them one by one, each with the light falling on its cell
+        /// (see <see cref="Network.FightProtocol.BuildNewWave"/>). How many came in.
+        /// </summary>
+        private static async Task<int> BringWaveAsync(NetworkStream stream, FightInstance fight,
+                                                      MobSpawnManager.MobGroup group, int wave,
+                                                      int turnsBeforeNext, Action<Fighter> shape)
+        {
             var fallen = fight.Rojo.LastOrDefault();
             var arrivals = new List<Fighter>();
             foreach (var member in group.Members)
@@ -10931,18 +10989,17 @@ namespace Jondo.Unity.Server.Handlers
                 if (cell < 0) break;
 
                 var monster = BuildMonsterFighter(member, fight.SiguienteIdDeInvocado(), cell);
-                Managers.Dreams.ScaleTo(monster, level);
-                Managers.Dreams.AsTrialWants(monster, DreamHandler.DreamOf(fight));
+                shape(monster);
                 monster.Wave = wave;
                 fight.Join(monster);
                 arrivals.Add(monster);
             }
-            if (arrivals.Count == 0) return false;
+            if (arrivals.Count == 0) return 0;
 
             // The wave first: the client compares each newcomer's wave with the current one when
             // the sequence below ends, so it must already hold this one by then.
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jyb,
-                Network.FightProtocol.BuildNewWave(arrivals[0].TeamId, wave, turnsBeforeNext: 0)));
+                Network.FightProtocol.BuildNewWave(arrivals[0].TeamId, wave, turnsBeforeNext)));
 
             // The list inside a sequence of its own. Not as summons: the client draws a summon at
             // once, and the wave came on with no arrival. And not bare: behind the closed sequence
@@ -10965,10 +11022,7 @@ namespace Jondo.Unity.Server.Handlers
                 arrival.CasillaAlEmpezarCombate = arrival.CellId;
                 await LanzarLaConductaAsync(stream, fight, arrival);
             }
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Lqn,
-                ConnectionProtocol.BuildNotice(CommandTexts.Get("dream.wave", wave, level))));
-            Program.LogDebug($"[Dreams] Wave {wave}: {arrivals.Count} monster(s) at level {level}.");
-            return true;
+            return arrivals.Count;
         }
 
         /// <summary>
@@ -11188,6 +11242,8 @@ namespace Jondo.Unity.Server.Handlers
 
             // The Fin du rêve does not end with a wave: the next one comes in.
             if (alliesAlive && !enemiesAlive && await NextDreamWaveAsync(stream, fight)) return false;
+            // Nor a fight whose waves come by the clock: the next one does not wait for its round.
+            if (alliesAlive && !enemiesAlive && await NextTimedWaveAsync(stream, fight)) return false;
 
             if (alliesAlive && enemiesAlive) return false;
 
@@ -12007,6 +12063,10 @@ namespace Jondo.Unity.Server.Handlers
 
                 // Unpredictable points out another enemy on every global turn.
                 await ChallengeWatcher.RoundStartedAsync(stream, fight);
+
+                // A wave whose round has come: Dark Vlad's chafers, three rounds after the first.
+                if (fight.TimedWaves.Count > 0 && fight.RoundNumber >= fight.NextWaveRound)
+                    await NextTimedWaveAsync(stream, fight);
             }
 
             await AskToConfirmAsync(stream, fight, deQuien: ending.Id);

@@ -51,7 +51,7 @@ namespace Jondo.Unity.Server.Managers
             public IReadOnlyList<Way> Ways { get; init; } = Array.Empty<Way>();
         }
 
-        private static readonly Dictionary<(long Map, int Element), WayElement> _byElement = new();
+        private static Dictionary<(long Map, int Element), WayElement> _byElement = new();
         private static readonly object _lock = new();
         private static volatile bool _loaded;
 
@@ -91,6 +91,19 @@ namespace Jondo.Unity.Server.Managers
 
         public static void Load() => Ensure();
 
+        /// <summary>
+        /// The file read again, for the content reload: a statue's new way (the «Rezar» of «Protección
+        /// divina») is offered without restarting the server.
+        /// </summary>
+        public static void Forget()
+        {
+            lock (_lock)
+            {
+                Read();
+                _loaded = true;
+            }
+        }
+
         private static void Ensure()
         {
             if (_loaded) return;
@@ -103,6 +116,13 @@ namespace Jondo.Unity.Server.Managers
         }
 
         private static void Read()
+        {
+            var fresh = new Dictionary<(long Map, int Element), WayElement>();
+            Read(fresh);
+            _byElement = fresh;
+        }
+
+        private static void Read(Dictionary<(long Map, int Element), WayElement> into)
         {
             string path = Paths.ContentFile(File);
             if (!System.IO.File.Exists(path)) return;
@@ -139,9 +159,9 @@ namespace Jondo.Unity.Server.Managers
                         Ways = ways,
                     };
                     if (element.MapId == 0 || element.ElementId == 0 || ways.Count == 0) continue;
-                    _byElement[(element.MapId, element.ElementId)] = element;
+                    into[(element.MapId, element.ElementId)] = element;
                 }
-                Console.WriteLine($"[Ways] {_byElement.Count} element(s) with named ways.");
+                Console.WriteLine($"[Ways] {into.Count} element(s) with named ways.");
             }
             catch (Exception ex)
             {

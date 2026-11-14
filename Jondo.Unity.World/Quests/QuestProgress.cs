@@ -49,6 +49,18 @@ namespace Jondo.Unity.World.Quests
         /// </remarks>
         public Dictionary<int, int> Counted { get; } = new Dictionary<int, int>();
 
+        /// <summary>
+        /// When each objective of the step in hand was ticked off, for the replies that have to
+        /// wait a while after one: Trimpize needs some minutes to forge the pendulum once he has
+        /// the chain, the ebony and the scalp.
+        /// </summary>
+        /// <remarks>
+        /// Kept in memory only. A character who logs out in between comes back to an objective
+        /// with no time against it, and that counts as time enough: the wait is a pause in a
+        /// conversation, not something worth a column.
+        /// </remarks>
+        public Dictionary<int, DateTime> DoneAt { get; } = new Dictionary<int, DateTime>();
+
         public override string ToString()
             => Finished ? $"quest {QuestId} finished" : $"quest {QuestId} on step {StepId}";
     }
@@ -180,6 +192,22 @@ namespace Jondo.Unity.World.Quests
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Whether the objective is done and at least that many minutes have gone by since. An
+        /// objective done with no time against it -- before a logout, or on a step already left --
+        /// has waited long enough.
+        /// </summary>
+        public bool WaitedSince(int objectiveId, int minutes)
+        {
+            if (!ObjectiveDone(objectiveId)) return false;
+            foreach (var run in _runs.Values)
+            {
+                if (run.DoneAt.TryGetValue(objectiveId, out var at))
+                    return Clock() - at >= TimeSpan.FromMinutes(minutes);
+            }
+            return true;
         }
 
         public bool ObjectiveDone(int objectiveId)
@@ -341,6 +369,7 @@ namespace Jondo.Unity.World.Quests
             }
 
             if (!run.Done.Add(objectiveId)) return QuestMove.None;
+            run.DoneAt[objectiveId] = Clock();
 
             foreach (var objective in step.Objectives)
             {
@@ -402,12 +431,14 @@ namespace Jondo.Unity.World.Quests
                 run.StepId = 0;
                 run.Done.Clear();
                 run.Counted.Clear();
+                run.DoneAt.Clear();
                 return 0;
             }
 
             run.StepId = quest.Steps[at + 1].Id;
             run.Done.Clear();
             run.Counted.Clear();
+            run.DoneAt.Clear();
             return run.StepId;
         }
 

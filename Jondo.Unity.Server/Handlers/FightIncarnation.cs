@@ -84,6 +84,20 @@ namespace Jondo.Unity.Server.Handlers
         internal static NextIncarnation? TakeNextIncarnation(long characterId)
             => _nextIncarnations.TryRemove(characterId, out var next) ? next : null;
 
+        /// <summary>The timed waves waiting for their fight, by character.</summary>
+        private static readonly ConcurrentDictionary<long, IReadOnlyList<FightInstance.TimedWave>> _nextWaves = new();
+
+        /// <summary>
+        /// Gives <paramref name="characterId"/>'s next fight waves that come by the clock: the
+        /// reply that starts a quest's fight says so just before starting it (NpcFights «waves»).
+        /// </summary>
+        internal static void WavesInNextFight(long characterId, IReadOnlyList<FightInstance.TimedWave> waves)
+            => _nextWaves[characterId] = waves;
+
+        /// <summary>The waves waiting for this character's fight, taken so that they go to one fight only.</summary>
+        internal static IReadOnlyList<FightInstance.TimedWave>? TakeNextWaves(long characterId)
+            => _nextWaves.TryRemove(characterId, out var waves) ? waves : null;
+
         /// <summary>
         /// Makes <paramref name="player"/> fight as <paramref name="monsterId"/> at the grade
         /// <paramref name="gradeIndex"/>, its sheet brought to <paramref name="level"/> when it is

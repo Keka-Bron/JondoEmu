@@ -69,6 +69,9 @@ namespace Jondo.Unity.Server.Handlers
             // A book: its document opens, and the book stays.
             if (await ReadingItemHandler.TryReadAsync(stream, item)) return;
 
+            // A compass: a flag on the world map where its map reference is, and the compass stays.
+            if (await CompassItemHandler.TryUseAsync(stream, item)) return;
+
             // A quest item whose use is an objective (effect 30): the signalling fairy of «Aquí
             // huele a gas» makes its noise in the mine (13995) and is gone.
             var itemEffects = DatabaseManager.GetItemEffectsData(

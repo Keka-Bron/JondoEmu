@@ -328,6 +328,7 @@ namespace Jondo.Unity.Server.Network
             Managers.DungeonExitRooms.Forget();
             Managers.FightWinAlterations.Forget();
             Managers.Readables.Forget();
+            Managers.InteractiveWays.Forget();
             Managers.TeleportManager.Initialize();
             // The stations written by hand in content/interactives/workshops.json, before the registry
             // that declares them is built again.
@@ -390,8 +391,14 @@ namespace Jondo.Unity.Server.Network
                         await Quests.SendJournalAsync(stream);
                     });
                     break;
+                case "tick":
+                    // One objective of the step in hand marked done, to try a later one again
+                    // without replaying what comes before it.
+                    int objective = (int)Numero(cuerpo, "objective");
+                    lines = RunInSession(session, stream => Quests.TickAsync(stream, quest, objective));
+                    break;
                 default:
-                    return Mal(400, "op: start, finish or forget");
+                    return Mal(400, "op: start, finish, forget or tick");
             }
             var run = log.Run(quest);
             return Bien(new { quest, op, run = run == null ? null : RunOf(log, run), lines = lines.Where(l => l.Contains("[Quest")).ToList() });

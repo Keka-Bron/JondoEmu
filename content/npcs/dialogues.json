@@ -15985,7 +15985,8 @@
           "message": 98,
           "choices": [
             { "reply": 153, "next": 185, "quest": 208, "beforeObjective": 826 },
-            { "reply": 10141, "quest": 773, "afterObjective": 4888, "completes": 4889, "params": [[30, 4889]], "next": 9662 }
+            { "reply": 10141, "quest": 773, "afterObjective": 4888, "completes": 4889, "params": [[30, 4889]], "next": 9662 },
+            { "reply": 52956, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=4", "next": 40655 }
           ]
         },
         {
@@ -16001,9 +16002,27 @@
         {
           "message": 9662,
           "choices": []
+        },
+        {
+          "message": 40655,
+          "choices": [
+            { "reply": 52955, "quest": 2194, "next": 40656 }
+          ]
+        },
+        {
+          "message": 40656,
+          "choices": [
+            { "reply": 52954, "quest": 2194, "next": 40657 }
+          ]
+        },
+        {
+          "message": 40657,
+          "choices": [
+            { "reply": 52953, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Rigal Mano Ganchuda, a sram of the rogues' brotherhood in the Sram temple [-4,0]: respected by all (98). «Le Guide du Roublard»: the vilest of beings, the brotherhood (185), its lair surrounded by water in a dangerous place, only the cruellest get in (191: 826). And the class temple's devotion: «Faire preuve de son dévouement» (quest 773, objective 4889), then the line about the book."
+      "why": "Rigal Mano Ganchuda, a sram of the rogues' brotherhood in the Sram temple [-4,0]: respected by all (98). «Le Guide du Roublard»: the vilest of beings, the brotherhood (185), its lair surrounded by water in a dangerous place, only the cruellest get in (191: 826). And the class temple's devotion: «Faire preuve de son dévouement» (quest 773, objective 4889), then the line about the book. «Protección divina» (2194), for the class-4 temple's own: «Estoy de camino al Bosque Maléfico» (52956), madness to go without protection, train against a dopeul and pray to the statue (40655); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40656); then Trimpize at the forest's edge (40657), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52953) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 894,
@@ -18047,19 +18066,40 @@
         {
           "message": 20484,
           "choices": [
-            { "reply": 24447, "quest": 772, "afterObjective": 4884, "completes": 4885, "params": [[30, 4885]], "next": 20438 }
+            { "reply": 24447, "quest": 772, "afterObjective": 4884, "completes": 4885, "params": [[30, 4885]], "next": 20438 },
+            { "reply": 52928, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=10", "next": 40631 }
           ]
         },
         {
           "message": 20485,
-          "choices": []
+          "choices": [
+            { "reply": 52928, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=10", "next": 40631 }
+          ]
         },
         {
           "message": 20438,
           "choices": []
+        },
+        {
+          "message": 40631,
+          "choices": [
+            { "reply": 52927, "quest": 2194, "next": 40634 }
+          ]
+        },
+        {
+          "message": 40634,
+          "choices": [
+            { "reply": 52926, "quest": 2194, "next": 40635 }
+          ]
+        },
+        {
+          "message": 40635,
+          "choices": [
+            { "reply": 52925, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Etenipse Tik of the Sadida temple [-1,9]: leather braces for his loincloth (20484). «C'est tout simple»: Manzanillo welcome to rest, the Soft Oak's magic in him (20485: 9547). And the class temple's devotion: «Faire preuve de son dévouement» (quest 772, objective 4885), then the line about the book."
+      "why": "Etenipse Tik of the Sadida temple [-1,9]: leather braces for his loincloth (20484). «C'est tout simple»: Manzanillo welcome to rest, the Soft Oak's magic in him (20485: 9547). And the class temple's devotion: «Faire preuve de son dévouement» (quest 772, objective 4885), then the line about the book. «Protección divina» (2194), for the class-10 temple's own: «Estoy de camino al Bosque Maléfico» (52928), madness to go without protection, train against a dopeul and pray to the statue (40631); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40634); then Trimpize at the forest's edge (40635), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52925) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 2847,
@@ -25309,7 +25349,8 @@
             { "reply": 11999, "next": 10893, "quest": 458 },
             { "reply": 11999, "next": 10892, "quest": 470 },
             { "reply": 11999, "next": 10894, "criterion": "Qf=470" },
-            { "reply": 12000, "next": 10895 }
+            { "reply": 12000, "next": 10895 },
+            { "reply": 53021, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=9", "next": 40705 }
           ]
         },
         {
@@ -25348,14 +25389,23 @@
         },
         {
           "message": 10926,
-          "choices": []
+          "choices": [
+            { "reply": 53021, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=9", "next": 40705 }
+          ]
         },
         {
           "message": 10895,
           "choices": []
+        },
+        {
+          "message": 40705,
+          "choices": [
+            { "reply": 53020, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53020, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10926); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (458) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (168) at the character's level; done, the dopeuls are tired until 7:00 (10892, 10894)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10926); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (458) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (168) at the character's level; done, the dopeuls are tired until 7:00 (10892, 10894). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53021), not without proving one can defend oneself against the evil dopeul (40705), and «Pasar la prueba» (53020) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 438,
@@ -25373,7 +25423,8 @@
             { "reply": 12553, "next": 11356, "quest": 459 },
             { "reply": 12553, "next": 11355, "quest": 470 },
             { "reply": 12553, "next": 11357, "criterion": "Qf=470" },
-            { "reply": 12554, "next": 11358 }
+            { "reply": 12554, "next": 11358 },
+            { "reply": 53017, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=6", "next": 40703 }
           ]
         },
         {
@@ -25412,14 +25463,23 @@
         },
         {
           "message": 11389,
-          "choices": []
+          "choices": [
+            { "reply": 53017, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=6", "next": 40703 }
+          ]
         },
         {
           "message": 11358,
           "choices": []
+        },
+        {
+          "message": 40703,
+          "choices": [
+            { "reply": 53016, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53016, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11389); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (459) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (165) at the character's level; done, the dopeuls are tired until 7:00 (11355, 11357)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11389); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (459) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (165) at the character's level; done, the dopeuls are tired until 7:00 (11355, 11357). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53017), not without proving one can defend oneself against the evil dopeul (40703), and «Pasar la prueba» (53016) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 434,
@@ -25437,7 +25497,8 @@
             { "reply": 12505, "next": 11316, "quest": 460 },
             { "reply": 12505, "next": 11315, "quest": 470 },
             { "reply": 12505, "next": 11317, "criterion": "Qf=470" },
-            { "reply": 12506, "next": 11318 }
+            { "reply": 12506, "next": 11318 },
+            { "reply": 53009, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=8", "next": 40699 }
           ]
         },
         {
@@ -25476,14 +25537,23 @@
         },
         {
           "message": 11349,
-          "choices": []
+          "choices": [
+            { "reply": 53009, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=8", "next": 40699 }
+          ]
         },
         {
           "message": 11318,
           "choices": []
+        },
+        {
+          "message": 40699,
+          "choices": [
+            { "reply": 53008, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53008, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11349); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (460) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (167) at the character's level; done, the dopeuls are tired until 7:00 (11315, 11317)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11349); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (460) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (167) at the character's level; done, the dopeuls are tired until 7:00 (11315, 11317). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53009), not without proving one can defend oneself against the evil dopeul (40699), and «Pasar la prueba» (53008) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 436,
@@ -25501,7 +25571,8 @@
             { "reply": 12050, "next": 10936, "quest": 461 },
             { "reply": 12050, "next": 10935, "quest": 470 },
             { "reply": 12050, "next": 10937, "criterion": "Qf=470" },
-            { "reply": 12051, "next": 10938 }
+            { "reply": 12051, "next": 10938 },
+            { "reply": 53013, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=2", "next": 40701 }
           ]
         },
         {
@@ -25540,14 +25611,23 @@
         },
         {
           "message": 10969,
-          "choices": []
+          "choices": [
+            { "reply": 53013, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=2", "next": 40701 }
+          ]
         },
         {
           "message": 10938,
           "choices": []
+        },
+        {
+          "message": 40701,
+          "choices": [
+            { "reply": 53012, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53012, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10969); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (461) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (161) at the character's level; done, the dopeuls are tired until 7:00 (10935, 10937)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10969); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (461) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (161) at the character's level; done, the dopeuls are tired until 7:00 (10935, 10937). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53013), not without proving one can defend oneself against the evil dopeul (40701), and «Pasar la prueba» (53012) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 435,
@@ -25565,7 +25645,8 @@
             { "reply": 12230, "next": 11088, "quest": 462 },
             { "reply": 12230, "next": 11087, "quest": 470 },
             { "reply": 12230, "next": 11089, "criterion": "Qf=470" },
-            { "reply": 12231, "next": 11090 }
+            { "reply": 12231, "next": 11090 },
+            { "reply": 53011, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=7", "next": 40700 }
           ]
         },
         {
@@ -25604,14 +25685,23 @@
         },
         {
           "message": 11121,
-          "choices": []
+          "choices": [
+            { "reply": 53011, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=7", "next": 40700 }
+          ]
         },
         {
           "message": 11090,
           "choices": []
+        },
+        {
+          "message": 40700,
+          "choices": [
+            { "reply": 53010, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53010, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11121); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (462) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (166) at the character's level; done, the dopeuls are tired until 7:00 (11087, 11089)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11121); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (462) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (166) at the character's level; done, the dopeuls are tired until 7:00 (11087, 11089). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53011), not without proving one can defend oneself against the evil dopeul (40700), and «Pasar la prueba» (53010) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 443,
@@ -25629,7 +25719,8 @@
             { "reply": 12320, "next": 11164, "quest": 463 },
             { "reply": 12320, "next": 11163, "quest": 470 },
             { "reply": 12320, "next": 11165, "criterion": "Qf=470" },
-            { "reply": 12358, "next": 11196 }
+            { "reply": 12358, "next": 11196 },
+            { "reply": 53029, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=11", "next": 40709 }
           ]
         },
         {
@@ -25668,14 +25759,23 @@
         },
         {
           "message": 11197,
-          "choices": []
+          "choices": [
+            { "reply": 53029, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=11", "next": 40709 }
+          ]
         },
         {
           "message": 11196,
           "choices": []
+        },
+        {
+          "message": 40709,
+          "choices": [
+            { "reply": 53028, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53028, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11197); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (463) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (455) at the character's level; done, the dopeuls are tired until 7:00 (11163, 11165)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11197); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (463) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (455) at the character's level; done, the dopeuls are tired until 7:00 (11163, 11165). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53029), not without proving one can defend oneself against the evil dopeul (40709), and «Pasar la prueba» (53028) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 440,
@@ -25693,7 +25793,8 @@
             { "reply": 12185, "next": 11050, "quest": 464 },
             { "reply": 12185, "next": 11049, "quest": 470 },
             { "reply": 12185, "next": 11051, "criterion": "Qf=470" },
-            { "reply": 12186, "next": 11052 }
+            { "reply": 12186, "next": 11052 },
+            { "reply": 53023, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=3", "next": 40706 }
           ]
         },
         {
@@ -25732,14 +25833,23 @@
         },
         {
           "message": 11083,
-          "choices": []
+          "choices": [
+            { "reply": 53023, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=3", "next": 40706 }
+          ]
         },
         {
           "message": 11052,
           "choices": []
+        },
+        {
+          "message": 40706,
+          "choices": [
+            { "reply": 53022, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53022, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11083); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (464) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (162) at the character's level; done, the dopeuls are tired until 7:00 (11049, 11051)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11083); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (464) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (162) at the character's level; done, the dopeuls are tired until 7:00 (11049, 11051). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53023), not without proving one can defend oneself against the evil dopeul (40706), and «Pasar la prueba» (53022) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 442,
@@ -25757,7 +25867,8 @@
             { "reply": 12415, "next": 11240, "quest": 465 },
             { "reply": 12415, "next": 11239, "quest": 470 },
             { "reply": 12415, "next": 11241, "criterion": "Qf=470" },
-            { "reply": 12416, "next": 11242 }
+            { "reply": 12416, "next": 11242 },
+            { "reply": 53027, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=10", "next": 40708 }
           ]
         },
         {
@@ -25796,14 +25907,23 @@
         },
         {
           "message": 11273,
-          "choices": []
+          "choices": [
+            { "reply": 53027, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=10", "next": 40708 }
+          ]
         },
         {
           "message": 11242,
           "choices": []
+        },
+        {
+          "message": 40708,
+          "choices": [
+            { "reply": 53026, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53026, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11273); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (465) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (169) at the character's level; done, the dopeuls are tired until 7:00 (11239, 11241)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11273); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (465) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (169) at the character's level; done, the dopeuls are tired until 7:00 (11239, 11241). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53027), not without proving one can defend oneself against the evil dopeul (40708), and «Pasar la prueba» (53026) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 672,
@@ -25821,7 +25941,8 @@
             { "reply": 12095, "next": 10974, "quest": 466 },
             { "reply": 12095, "next": 10973, "quest": 470 },
             { "reply": 12095, "next": 10975, "criterion": "Qf=470" },
-            { "reply": 12096, "next": 10976 }
+            { "reply": 12096, "next": 10976 },
+            { "reply": 53031, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=12", "next": 40710 }
           ]
         },
         {
@@ -25860,14 +25981,23 @@
         },
         {
           "message": 11007,
-          "choices": []
+          "choices": [
+            { "reply": 53031, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=12", "next": 40710 }
+          ]
         },
         {
           "message": 10976,
           "choices": []
+        },
+        {
+          "message": 40710,
+          "choices": [
+            { "reply": 53030, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53030, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11007); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (466) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (2691) at the character's level; done, the dopeuls are tired until 7:00 (10973, 10975)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11007); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (466) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (2691) at the character's level; done, the dopeuls are tired until 7:00 (10973, 10975). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53031), not without proving one can defend oneself against the evil dopeul (40710), and «Pasar la prueba» (53030) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 441,
@@ -25885,7 +26015,8 @@
             { "reply": 12460, "next": 11278, "quest": 467 },
             { "reply": 12460, "next": 11277, "quest": 470 },
             { "reply": 12460, "next": 11279, "criterion": "Qf=470" },
-            { "reply": 12461, "next": 11280 }
+            { "reply": 12461, "next": 11280 },
+            { "reply": 53025, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=4", "next": 40707 }
           ]
         },
         {
@@ -25924,14 +26055,23 @@
         },
         {
           "message": 11311,
-          "choices": []
+          "choices": [
+            { "reply": 53025, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=4", "next": 40707 }
+          ]
         },
         {
           "message": 11280,
           "choices": []
+        },
+        {
+          "message": 40707,
+          "choices": [
+            { "reply": 53024, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53024, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11311); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (467) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (163) at the character's level; done, the dopeuls are tired until 7:00 (11277, 11279)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11311); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (467) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (163) at the character's level; done, the dopeuls are tired until 7:00 (11277, 11279). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53025), not without proving one can defend oneself against the evil dopeul (40707), and «Pasar la prueba» (53024) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 437,
@@ -25949,7 +26089,8 @@
             { "reply": 12370, "next": 11202, "quest": 468 },
             { "reply": 12370, "next": 11201, "quest": 470 },
             { "reply": 12370, "next": 11203, "criterion": "Qf=470" },
-            { "reply": 12371, "next": 11204 }
+            { "reply": 12371, "next": 11204 },
+            { "reply": 53015, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=5", "next": 40702 }
           ]
         },
         {
@@ -25988,14 +26129,23 @@
         },
         {
           "message": 11235,
-          "choices": []
+          "choices": [
+            { "reply": 53015, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=5", "next": 40702 }
+          ]
         },
         {
           "message": 11204,
           "choices": []
+        },
+        {
+          "message": 40702,
+          "choices": [
+            { "reply": 53014, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53014, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11235); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (468) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (164) at the character's level; done, the dopeuls are tired until 7:00 (11201, 11203)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11235); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (468) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (164) at the character's level; done, the dopeuls are tired until 7:00 (11201, 11203). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53015), not without proving one can defend oneself against the evil dopeul (40702), and «Pasar la prueba» (53014) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 433,
@@ -26013,7 +26163,8 @@
             { "reply": 12275, "next": 11126, "quest": 469 },
             { "reply": 12275, "next": 11125, "quest": 470 },
             { "reply": 12275, "next": 11127, "criterion": "Qf=470" },
-            { "reply": 12276, "next": 11128 }
+            { "reply": 12276, "next": 11128 },
+            { "reply": 53007, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=1", "next": 40698 }
           ]
         },
         {
@@ -26052,14 +26203,23 @@
         },
         {
           "message": 11159,
-          "choices": []
+          "choices": [
+            { "reply": 53007, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=1", "next": 40698 }
+          ]
         },
         {
           "message": 11128,
           "choices": []
+        },
+        {
+          "message": 40698,
+          "choices": [
+            { "reply": 53006, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53006, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11159); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (469) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (160) at the character's level; done, the dopeuls are tired until 7:00 (11125, 11127)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11159); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (469) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (160) at the character's level; done, the dopeuls are tired until 7:00 (11125, 11127). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53007), not without proving one can defend oneself against the evil dopeul (40698), and «Pasar la prueba» (53006) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 1414,
@@ -26077,7 +26237,8 @@
             { "reply": 12140, "next": 11012, "quest": 708 },
             { "reply": 12140, "next": 11011, "quest": 470 },
             { "reply": 12140, "next": 11013, "criterion": "Qf=470" },
-            { "reply": 12141, "next": 11014 }
+            { "reply": 12141, "next": 11014 },
+            { "reply": 53033, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=13", "next": 40711 }
           ]
         },
         {
@@ -26116,14 +26277,23 @@
         },
         {
           "message": 11045,
-          "choices": []
+          "choices": [
+            { "reply": 53033, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=13", "next": 40711 }
+          ]
         },
         {
           "message": 11014,
           "choices": []
+        },
+        {
+          "message": 40711,
+          "choices": [
+            { "reply": 53032, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53032, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11045); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (708) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3111) at the character's level; done, the dopeuls are tired until 7:00 (11011, 11013)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11045); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (708) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3111) at the character's level; done, the dopeuls are tired until 7:00 (11011, 11013). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53033), not without proving one can defend oneself against the evil dopeul (40711), and «Pasar la prueba» (53032) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 1425,
@@ -26141,7 +26311,8 @@
             { "reply": 11954, "next": 10855, "quest": 715 },
             { "reply": 11954, "next": 10854, "quest": 470 },
             { "reply": 11954, "next": 10856, "criterion": "Qf=470" },
-            { "reply": 11955, "next": 10857 }
+            { "reply": 11955, "next": 10857 },
+            { "reply": 53035, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=14", "next": 40712 }
           ]
         },
         {
@@ -26180,14 +26351,23 @@
         },
         {
           "message": 10888,
-          "choices": []
+          "choices": [
+            { "reply": 53035, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=14", "next": 40712 }
+          ]
         },
         {
           "message": 10857,
           "choices": []
+        },
+        {
+          "message": 40712,
+          "choices": [
+            { "reply": 53034, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 53034, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10888); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (715) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3132) at the character's level; done, the dopeuls are tired until 7:00 (10854, 10856)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (10888); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (715) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3132) at the character's level; done, the dopeuls are tired until 7:00 (10854, 10856). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (53035), not without proving one can defend oneself against the evil dopeul (40712), and «Pasar la prueba» (53034) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 1594,
@@ -26205,7 +26385,8 @@
             { "reply": 13345, "next": 11879, "quest": 940 },
             { "reply": 13345, "next": 11878, "quest": 470 },
             { "reply": 13345, "next": 11880, "criterion": "Qf=470" },
-            { "reply": 13347, "next": 11881 }
+            { "reply": 13347, "next": 11881 },
+            { "reply": 13339, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=15", "next": 11875 }
           ]
         },
         {
@@ -26244,14 +26425,23 @@
         },
         {
           "message": 11882,
-          "choices": []
+          "choices": [
+            { "reply": 13339, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=15", "next": 11875 }
+          ]
         },
         {
           "message": 11881,
           "choices": []
+        },
+        {
+          "message": 11875,
+          "choices": [
+            { "reply": 13340, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 13340, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11882); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (940) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3286) at the character's level; done, the dopeuls are tired until 7:00 (11878, 11880)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (11882); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (940) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3286) at the character's level; done, the dopeuls are tired until 7:00 (11878, 11880). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (13339), not without proving one can defend oneself against the evil dopeul (11875), and «Pasar la prueba» (13340) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 2834,
@@ -26269,7 +26459,8 @@
             { "reply": 23945, "next": 20014, "quest": 1617 },
             { "reply": 23945, "next": 20013, "quest": 470 },
             { "reply": 23945, "next": 20015, "criterion": "Qf=470" },
-            { "reply": 23946, "next": 20016 }
+            { "reply": 23946, "next": 20016 },
+            { "reply": 23939, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=16", "next": 20010 }
           ]
         },
         {
@@ -26308,14 +26499,23 @@
         },
         {
           "message": 20017,
-          "choices": []
+          "choices": [
+            { "reply": 23939, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=16", "next": 20010 }
+          ]
         },
         {
           "message": 20016,
           "choices": []
+        },
+        {
+          "message": 20010,
+          "choices": [
+            { "reply": 23938, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 23938, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (20017); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1617) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3976) at the character's level; done, the dopeuls are tired until 7:00 (20013, 20015)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (20017); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1617) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (3976) at the character's level; done, the dopeuls are tired until 7:00 (20013, 20015). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (23939), not without proving one can defend oneself against the evil dopeul (20010), and «Pasar la prueba» (23938) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 3053,
@@ -26333,7 +26533,8 @@
             { "reply": 26879, "next": 22325, "quest": 1679 },
             { "reply": 26879, "next": 22324, "quest": 470 },
             { "reply": 26879, "next": 22326, "criterion": "Qf=470" },
-            { "reply": 26882, "next": 22327 }
+            { "reply": 26882, "next": 22327 },
+            { "reply": 26873, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=17", "next": 22321 }
           ]
         },
         {
@@ -26372,14 +26573,23 @@
         },
         {
           "message": 22329,
-          "choices": []
+          "choices": [
+            { "reply": 26873, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=17", "next": 22321 }
+          ]
         },
         {
           "message": 22327,
           "choices": []
+        },
+        {
+          "message": 22321,
+          "choices": [
+            { "reply": 26872, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 26872, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (22329); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1679) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (4290) at the character's level; done, the dopeuls are tired until 7:00 (22324, 22326)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (22329); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1679) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (4290) at the character's level; done, the dopeuls are tired until 7:00 (22324, 22326). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (26873), not without proving one can defend oneself against the evil dopeul (22321), and «Pasar la prueba» (26872) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 3713,
@@ -26397,7 +26607,8 @@
             { "reply": 32167, "next": 26770, "quest": 1843 },
             { "reply": 32167, "next": 26769, "quest": 470 },
             { "reply": 32167, "next": 26771, "criterion": "Qf=470" },
-            { "reply": 32170, "next": 26772 }
+            { "reply": 32170, "next": 26772 },
+            { "reply": 32161, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=18", "next": 26766 }
           ]
         },
         {
@@ -26436,14 +26647,23 @@
         },
         {
           "message": 26774,
-          "choices": []
+          "choices": [
+            { "reply": 32161, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=18", "next": 26766 }
+          ]
         },
         {
           "message": 26772,
           "choices": []
+        },
+        {
+          "message": 26766,
+          "choices": [
+            { "reply": 32160, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 32160, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (26774); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1843) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (4777) at the character's level; done, the dopeuls are tired until 7:00 (26769, 26771)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (26774); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (1843) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (4777) at the character's level; done, the dopeuls are tired until 7:00 (26769, 26771). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (32161), not without proving one can defend oneself against the evil dopeul (26766), and «Pasar la prueba» (32160) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 6836,
@@ -26461,7 +26681,8 @@
             { "reply": 68986, "next": 51422, "quest": 2469 },
             { "reply": 68986, "next": 51421, "quest": 470 },
             { "reply": 68986, "next": 51423, "criterion": "Qf=470" },
-            { "reply": 68987, "next": 51424 }
+            { "reply": 68987, "next": 51424 },
+            { "reply": 69523, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=20", "next": 51795 }
           ]
         },
         {
@@ -26500,14 +26721,23 @@
         },
         {
           "message": 51438,
-          "choices": []
+          "choices": [
+            { "reply": 69523, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=20", "next": 51795 }
+          ]
         },
         {
           "message": 51424,
           "choices": []
+        },
+        {
+          "message": 51795,
+          "choices": [
+            { "reply": 69522, "quest": 2194, "completes": 16293, "params": [[30, 16293]], "beforeObjective": 16293 },
+            { "reply": 69522, "quest": 2194, "afterObjective": 16293 }
+          ]
         }
       ],
-      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (51438); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (2469) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (7226) at the character's level; done, the dopeuls are tired until 7:00 (51421, 51423)."
+      "why": "The dopeul master of a temple, by «Chasse au Dopeul» of Dofus pour les noobs: below level 9, six class spells first (51438); «Luchar contra todos los dopeuls» and «De acuerdo» start the day's hunt (2469) and, on «Empezar el entrenamiento», the tour of the nineteen (470) with the fight; once the tour is under way or done, «Entrenarte con un dopeul» is the day's hunt, its dopeul (7226) at the character's level; done, the dopeuls are tired until 7:00 (51421, 51423). «Protección divina» (2194), once the temple's master has sent the character: «Aludir a tu viaje al Bosque Maléfico» (69523), not without proving one can defend oneself against the evil dopeul (51795), and «Pasar la prueba» (69522) is 16293 and the fight, alone (content/fights/npc_fights.json); whoever lost it is offered it again (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 79,
@@ -26517,15 +26747,34 @@
         {
           "message": 121,
           "choices": [
-            { "reply": 10134, "quest": 766, "afterObjective": 4860, "completes": 4861, "params": [[30, 4861]], "next": 9655 }
+            { "reply": 10134, "quest": 766, "afterObjective": 4860, "completes": 4861, "params": [[30, 4861]], "next": 9655 },
+            { "reply": 52936, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=1", "next": 40639 }
           ]
         },
         {
           "message": 9655,
           "choices": []
+        },
+        {
+          "message": 40639,
+          "choices": [
+            { "reply": 52935, "quest": 2194, "next": 40640 }
+          ]
+        },
+        {
+          "message": 40640,
+          "choices": [
+            { "reply": 52934, "quest": 2194, "next": 40641 }
+          ]
+        },
+        {
+          "message": 40641,
+          "choices": [
+            { "reply": 52933, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Hugo Bello, master of the class-1 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 766, objective 4861)."
+      "why": "Hugo Bello, master of the class-1 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 766, objective 4861). «Protección divina» (2194), for the class-1 temple's own: «Estoy de camino al Bosque Maléfico» (52936), madness to go without protection, train against a dopeul and pray to the statue (40639); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40640); then Trimpize at the forest's edge (40641), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52933) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 42,
@@ -26535,15 +26784,34 @@
         {
           "message": 60,
           "choices": [
-            { "reply": 10136, "quest": 768, "afterObjective": 4868, "completes": 4869, "params": [[30, 4869]], "next": 9657 }
+            { "reply": 10136, "quest": 768, "afterObjective": 4868, "completes": 4869, "params": [[30, 4869]], "next": 9657 },
+            { "reply": 52977, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=2", "next": 40673 }
           ]
         },
         {
           "message": 9657,
           "choices": []
+        },
+        {
+          "message": 40673,
+          "choices": [
+            { "reply": 52976, "quest": 2194, "next": 40674 }
+          ]
+        },
+        {
+          "message": 40674,
+          "choices": [
+            { "reply": 52975, "quest": 2194, "next": 40675 }
+          ]
+        },
+        {
+          "message": 40675,
+          "choices": [
+            { "reply": 52974, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Zeurg, master of the class-2 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 768, objective 4869)."
+      "why": "Zeurg, master of the class-2 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 768, objective 4869). «Protección divina» (2194), for the class-2 temple's own: «Estoy de camino al Bosque Maléfico» (52977), madness to go without protection, train against a dopeul and pray to the statue (40673); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40674); then Trimpize at the forest's edge (40675), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52974) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 41,
@@ -26553,15 +26821,34 @@
         {
           "message": 103,
           "choices": [
-            { "reply": 10133, "quest": 765, "afterObjective": 4856, "completes": 4857, "params": [[30, 4857]], "next": 9654 }
+            { "reply": 10133, "quest": 765, "afterObjective": 4856, "completes": 4857, "params": [[30, 4857]], "next": 9654 },
+            { "reply": 52973, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=3", "next": 40670 }
           ]
         },
         {
           "message": 9654,
           "choices": []
+        },
+        {
+          "message": 40670,
+          "choices": [
+            { "reply": 52972, "quest": 2194, "next": 40671 }
+          ]
+        },
+        {
+          "message": 40671,
+          "choices": [
+            { "reply": 52971, "quest": 2194, "next": 40672 }
+          ]
+        },
+        {
+          "message": 40672,
+          "choices": [
+            { "reply": 52970, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Setag, master of the class-3 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 765, objective 4857)."
+      "why": "Setag, master of the class-3 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 765, objective 4857). «Protección divina» (2194), for the class-3 temple's own: «Estoy de camino al Bosque Maléfico» (52973), madness to go without protection, train against a dopeul and pray to the statue (40670); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40671); then Trimpize at the forest's edge (40672), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52970) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 37,
@@ -26572,7 +26859,8 @@
           "message": 81,
           "choices": [
             { "reply": 10142, "quest": 774, "afterObjective": 4892, "completes": 4893, "params": [[30, 4893]], "next": 9663 },
-            { "reply": 29551, "next": 24613, "quest": 1769, "beforeObjective": 11316 }
+            { "reply": 29551, "next": 24613, "quest": 1769, "beforeObjective": 11316 },
+            { "reply": 52901, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=5", "next": 40614 }
           ]
         },
         {
@@ -26597,9 +26885,27 @@
           "choices": [
             { "reply": 29961, "quest": 1769, "completes": 11316, "params": [[30, 11316]] }
           ]
+        },
+        {
+          "message": 40614,
+          "choices": [
+            { "reply": 52904, "quest": 2194, "next": 40615 }
+          ]
+        },
+        {
+          "message": 40615,
+          "choices": [
+            { "reply": 52903, "quest": 2194, "next": 40616 }
+          ]
+        },
+        {
+          "message": 40616,
+          "choices": [
+            { "reply": 52902, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Amino, master of the class-5 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 774, objective 4893). «Lo que el tiempo se llevó» (1769): «Eludir la cuestión y hablarle del problema de Juan Luis Erra», not enough to go on (24613); «Presentarle el esqueleto de baglitch…», offered with the intact skeleton in the bag (18158, the baglitchs' drop while 11316 is pending), a remote time manipulation (24614); «¿Conoces a alguien que sepa más?», Marty Makzap at the Cania lakes zaap (24978); «Gracias, ¡hasta luego!» (11316). He only looks: the skeleton is for Marty."
+      "why": "Amino, master of the class-5 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 774, objective 4893). «Lo que el tiempo se llevó» (1769): «Eludir la cuestión y hablarle del problema de Juan Luis Erra», not enough to go on (24613); «Presentarle el esqueleto de baglitch…», offered with the intact skeleton in the bag (18158, the baglitchs' drop while 11316 is pending), a remote time manipulation (24614); «¿Conoces a alguien que sepa más?», Marty Makzap at the Cania lakes zaap (24978); «Gracias, ¡hasta luego!» (11316). He only looks: the skeleton is for Marty. «Protección divina» (2194), for the class-5 temple's own: «Estoy de camino al Bosque Maléfico» (52901), madness to go without protection, train against a dopeul and pray to the statue (40614); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40615); then Trimpize at the forest's edge (40616), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52902) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 40,
@@ -26609,15 +26915,34 @@
         {
           "message": 93,
           "choices": [
-            { "reply": 10131, "quest": 763, "afterObjective": 4848, "completes": 4849, "params": [[30, 4849]], "next": 9652 }
+            { "reply": 10131, "quest": 763, "afterObjective": 4848, "completes": 4849, "params": [[30, 4849]], "next": 9652 },
+            { "reply": 52932, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=6", "next": 40636 }
           ]
         },
         {
           "message": 9652,
           "choices": []
+        },
+        {
+          "message": 40636,
+          "choices": [
+            { "reply": 52931, "quest": 2194, "next": 40637 }
+          ]
+        },
+        {
+          "message": 40637,
+          "choices": [
+            { "reply": 52930, "quest": 2194, "next": 40638 }
+          ]
+        },
+        {
+          "message": 40638,
+          "choices": [
+            { "reply": 52929, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Filgar Feel, master of the class-6 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 763, objective 4849)."
+      "why": "Filgar Feel, master of the class-6 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 763, objective 4849). «Protección divina» (2194), for the class-6 temple's own: «Estoy de camino al Bosque Maléfico» (52932), madness to go without protection, train against a dopeul and pray to the statue (40636); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40637); then Trimpize at the forest's edge (40638), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52929) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 46,
@@ -26627,15 +26952,34 @@
         {
           "message": 91,
           "choices": [
-            { "reply": 10132, "quest": 764, "afterObjective": 4852, "completes": 4853, "params": [[30, 4853]], "next": 9653 }
+            { "reply": 10132, "quest": 764, "afterObjective": 4852, "completes": 4853, "params": [[30, 4853]], "next": 9653 },
+            { "reply": 52916, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=7", "next": 40623 }
           ]
         },
         {
           "message": 9653,
           "choices": []
+        },
+        {
+          "message": 40623,
+          "choices": [
+            { "reply": 52915, "quest": 2194, "next": 40624 }
+          ]
+        },
+        {
+          "message": 40624,
+          "choices": [
+            { "reply": 52914, "quest": 2194, "next": 40625 }
+          ]
+        },
+        {
+          "message": 40625,
+          "choices": [
+            { "reply": 52913, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Elya Wood, master of the class-7 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 764, objective 4853)."
+      "why": "Elya Wood, master of the class-7 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 764, objective 4853). «Protección divina» (2194), for the class-7 temple's own: «Estoy de camino al Bosque Maléfico» (52916), madness to go without protection, train against a dopeul and pray to the statue (40623); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40624); then Trimpize at the forest's edge (40625), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52913) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 38,
@@ -26647,7 +26991,8 @@
           "choices": [
             { "reply": 8700, "next": 8661, "beforeQuest": 703 },
             { "reply": 8709, "quest": 703, "completes": 4556, "params": [[30, 4556]], "next": 8670, "afterObjective": 4555 },
-            { "reply": 10135, "quest": 767, "afterObjective": 4864, "completes": 4865, "params": [[30, 4865]], "next": 9656 }
+            { "reply": 10135, "quest": 767, "afterObjective": 4864, "completes": 4865, "params": [[30, 4865]], "next": 9656 },
+            { "reply": 52963, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=8", "next": 40661 }
           ]
         },
         {
@@ -26663,9 +27008,27 @@
         {
           "message": 8670,
           "choices": []
+        },
+        {
+          "message": 40661,
+          "choices": [
+            { "reply": 52962, "quest": 2194, "next": 40662 }
+          ]
+        },
+        {
+          "message": 40662,
+          "choices": [
+            { "reply": 52961, "quest": 2194, "next": 40663 }
+          ]
+        },
+        {
+          "message": 40663,
+          "choices": [
+            { "reply": 52960, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Rish Claymore, master of the class-8 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 767, objective 4865). «¿Dónde se ha ido la 7.ª compañía?» (703, Dofus pour les noobs): «Pedir trabajo» (8700) gets the disappearance of the seventh company in the Sidimote moors (8661) and «Aceptar» (8701) starts it; once the laboratory's way out is reached, «Hacer un informe sobre el albergue Number Anticroist» (8709) closes the report (4556) and the quest (8670)."
+      "why": "Rish Claymore, master of the class-8 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 767, objective 4865). «¿Dónde se ha ido la 7.ª compañía?» (703, Dofus pour les noobs): «Pedir trabajo» (8700) gets the disappearance of the seventh company in the Sidimote moors (8661) and «Aceptar» (8701) starts it; once the laboratory's way out is reached, «Hacer un informe sobre el albergue Number Anticroist» (8709) closes the report (4556) and the quest (8670). «Protección divina» (2194), for the class-8 temple's own: «Estoy de camino al Bosque Maléfico» (52963), madness to go without protection, train against a dopeul and pray to the statue (40661); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40662); then Trimpize at the forest's edge (40663), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52960) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 47,
@@ -26675,15 +27038,34 @@
         {
           "message": 90,
           "choices": [
-            { "reply": 10130, "quest": 762, "afterObjective": 4844, "completes": 4845, "params": [[30, 4845]], "next": 9651 }
+            { "reply": 10130, "quest": 762, "afterObjective": 4844, "completes": 4845, "params": [[30, 4845]], "next": 9651 },
+            { "reply": 52912, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=9", "next": 40620 }
           ]
         },
         {
           "message": 9651,
           "choices": []
+        },
+        {
+          "message": 40620,
+          "choices": [
+            { "reply": 52911, "quest": 2194, "next": 40621 }
+          ]
+        },
+        {
+          "message": 40621,
+          "choices": [
+            { "reply": 52910, "quest": 2194, "next": 40622 }
+          ]
+        },
+        {
+          "message": 40622,
+          "choices": [
+            { "reply": 52909, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Edrige Valling, master of the class-9 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 762, objective 4845)."
+      "why": "Edrige Valling, master of the class-9 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 762, objective 4845). «Protección divina» (2194), for the class-9 temple's own: «Estoy de camino al Bosque Maléfico» (52912), madness to go without protection, train against a dopeul and pray to the statue (40620); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40621); then Trimpize at the forest's edge (40622), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52909) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 384,
@@ -26693,15 +27075,34 @@
         {
           "message": 1609,
           "choices": [
-            { "reply": 10139, "quest": 771, "afterObjective": 4880, "completes": 4881, "params": [[30, 4881]], "next": 9660 }
+            { "reply": 10139, "quest": 771, "afterObjective": 4880, "completes": 4881, "params": [[30, 4881]], "next": 9660 },
+            { "reply": 52908, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=11", "next": 40617 }
           ]
         },
         {
           "message": 9660,
           "choices": []
+        },
+        {
+          "message": 40617,
+          "choices": [
+            { "reply": 52907, "quest": 2194, "next": 40618 }
+          ]
+        },
+        {
+          "message": 40618,
+          "choices": [
+            { "reply": 52906, "quest": 2194, "next": 40619 }
+          ]
+        },
+        {
+          "message": 40619,
+          "choices": [
+            { "reply": 52905, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Chaki Triss, master of the class-11 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 771, objective 4881)."
+      "why": "Chaki Triss, master of the class-11 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 771, objective 4881). «Protección divina» (2194), for the class-11 temple's own: «Estoy de camino al Bosque Maléfico» (52908), madness to go without protection, train against a dopeul and pray to the statue (40617); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40618); then Trimpize at the forest's edge (40619), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52905) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 644,
@@ -26711,15 +27112,34 @@
         {
           "message": 2600,
           "choices": [
-            { "reply": 10137, "quest": 769, "afterObjective": 4872, "completes": 4873, "params": [[30, 4873]], "next": 9658 }
+            { "reply": 10137, "quest": 769, "afterObjective": 4872, "completes": 4873, "params": [[30, 4873]], "next": 9658 },
+            { "reply": 52948, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=12", "next": 40649 }
           ]
         },
         {
           "message": 9658,
           "choices": []
+        },
+        {
+          "message": 40649,
+          "choices": [
+            { "reply": 52947, "quest": 2194, "next": 40650 }
+          ]
+        },
+        {
+          "message": 40650,
+          "choices": [
+            { "reply": 52946, "quest": 2194, "next": 40651 }
+          ]
+        },
+        {
+          "message": 40651,
+          "choices": [
+            { "reply": 52945, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Pandiwan Kenobi, master of the class-12 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 769, objective 4873)."
+      "why": "Pandiwan Kenobi, master of the class-12 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 769, objective 4873). «Protección divina» (2194), for the class-12 temple's own: «Estoy de camino al Bosque Maléfico» (52948), madness to go without protection, train against a dopeul and pray to the statue (40649); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40650); then Trimpize at the forest's edge (40651), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52945) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 1412,
@@ -26729,15 +27149,34 @@
         {
           "message": 8703,
           "choices": [
-            { "reply": 10138, "quest": 770, "afterObjective": 4876, "completes": 4877, "params": [[30, 4877]], "next": 9659 }
+            { "reply": 10138, "quest": 770, "afterObjective": 4876, "completes": 4877, "params": [[30, 4877]], "next": 9659 },
+            { "reply": 52897, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=13", "next": 40611 }
           ]
         },
         {
           "message": 9659,
           "choices": []
+        },
+        {
+          "message": 40611,
+          "choices": [
+            { "reply": 52900, "quest": 2194, "next": 40612 }
+          ]
+        },
+        {
+          "message": 40612,
+          "choices": [
+            { "reply": 52899, "quest": 2194, "next": 40613 }
+          ]
+        },
+        {
+          "message": 40613,
+          "choices": [
+            { "reply": 52898, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Agente Smis, master of the class-13 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 770, objective 4877)."
+      "why": "Agente Smis, master of the class-13 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 770, objective 4877). «Protección divina» (2194), for the class-13 temple's own: «Estoy de camino al Bosque Maléfico» (52897), madness to go without protection, train against a dopeul and pray to the statue (40611); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40612); then Trimpize at the forest's edge (40613), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52898) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 1429,
@@ -26747,15 +27186,34 @@
         {
           "message": 8759,
           "choices": [
-            { "reply": 10143, "quest": 775, "afterObjective": 4896, "completes": 4897, "params": [[30, 4897]], "next": 9664 }
+            { "reply": 10143, "quest": 775, "afterObjective": 4896, "completes": 4897, "params": [[30, 4897]], "next": 9664 },
+            { "reply": 52940, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=14", "next": 40642 }
           ]
         },
         {
           "message": 9664,
           "choices": []
+        },
+        {
+          "message": 40642,
+          "choices": [
+            { "reply": 52939, "quest": 2194, "next": 40643 }
+          ]
+        },
+        {
+          "message": 40643,
+          "choices": [
+            { "reply": 52938, "quest": 2194, "next": 40644 }
+          ]
+        },
+        {
+          "message": 40644,
+          "choices": [
+            { "reply": 52937, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Anzeo Declaze, master of the class-14 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 775, objective 4897)."
+      "why": "Anzeo Declaze, master of the class-14 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 775, objective 4897). «Protección divina» (2194), for the class-14 temple's own: «Estoy de camino al Bosque Maléfico» (52940), madness to go without protection, train against a dopeul and pray to the statue (40642); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40643); then Trimpize at the forest's edge (40644), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52937) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 1593,
@@ -26765,15 +27223,34 @@
         {
           "message": 11864,
           "choices": [
-            { "reply": 13330, "quest": 939, "afterObjective": 5712, "completes": 5713, "params": [[30, 5713]], "next": 11868 }
+            { "reply": 13330, "quest": 939, "afterObjective": 5712, "completes": 5713, "params": [[30, 5713]], "next": 11868 },
+            { "reply": 52981, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=15", "next": 40676 }
           ]
         },
         {
           "message": 11868,
           "choices": []
+        },
+        {
+          "message": 40676,
+          "choices": [
+            { "reply": 52980, "quest": 2194, "next": 40677 }
+          ]
+        },
+        {
+          "message": 40677,
+          "choices": [
+            { "reply": 52979, "quest": 2194, "next": 40678 }
+          ]
+        },
+        {
+          "message": 40678,
+          "choices": [
+            { "reply": 52978, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Julio Never, master of the class-15 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 939, objective 5713)."
+      "why": "Julio Never, master of the class-15 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 939, objective 5713). «Protección divina» (2194), for the class-15 temple's own: «Estoy de camino al Bosque Maléfico» (52981), madness to go without protection, train against a dopeul and pray to the statue (40676); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40677); then Trimpize at the forest's edge (40678), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52978) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 2825,
@@ -26783,15 +27260,34 @@
         {
           "message": 20159,
           "choices": [
-            { "reply": 24122, "quest": 1616, "afterObjective": 9506, "completes": 9507, "params": [[30, 9507]], "next": 20165 }
+            { "reply": 24122, "quest": 1616, "afterObjective": 9506, "completes": 9507, "params": [[30, 9507]], "next": 20165 },
+            { "reply": 52990, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=16", "next": 40683 }
           ]
         },
         {
           "message": 20165,
           "choices": []
+        },
+        {
+          "message": 40683,
+          "choices": [
+            { "reply": 52989, "quest": 2194, "next": 40684 }
+          ]
+        },
+        {
+          "message": 40684,
+          "choices": [
+            { "reply": 52988, "quest": 2194, "next": 40685 }
+          ]
+        },
+        {
+          "message": 40685,
+          "choices": [
+            { "reply": 52987, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Aurelia, master of the class-16 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1616, objective 9507)."
+      "why": "Aurelia, master of the class-16 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1616, objective 9507). «Protección divina» (2194), for the class-16 temple's own: «Estoy de camino al Bosque Maléfico» (52990), madness to go without protection, train against a dopeul and pray to the statue (40683); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40684); then Trimpize at the forest's edge (40685), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52987) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 3052,
@@ -26801,15 +27297,34 @@
         {
           "message": 22302,
           "choices": [
-            { "reply": 26854, "quest": 1678, "afterObjective": 10317, "completes": 10318, "params": [[30, 10318]], "next": 22306 }
+            { "reply": 26854, "quest": 1678, "afterObjective": 10317, "completes": 10318, "params": [[30, 10318]], "next": 22306 },
+            { "reply": 52994, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=17", "next": 40686 }
           ]
         },
         {
           "message": 22306,
           "choices": []
+        },
+        {
+          "message": 40686,
+          "choices": [
+            { "reply": 52993, "quest": 2194, "next": 40687 }
+          ]
+        },
+        {
+          "message": 40687,
+          "choices": [
+            { "reply": 52992, "quest": 2194, "next": 40688 }
+          ]
+        },
+        {
+          "message": 40688,
+          "choices": [
+            { "reply": 52991, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Máiquel Koormoc, master of the class-17 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1678, objective 10318)."
+      "why": "Máiquel Koormoc, master of the class-17 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1678, objective 10318). «Protección divina» (2194), for the class-17 temple's own: «Estoy de camino al Bosque Maléfico» (52994), madness to go without protection, train against a dopeul and pray to the statue (40686); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40687); then Trimpize at the forest's edge (40688), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52991) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 3712,
@@ -26819,15 +27334,34 @@
         {
           "message": 26744,
           "choices": [
-            { "reply": 32141, "quest": 1842, "afterObjective": 12174, "completes": 12175, "params": [[30, 12175]], "next": 26748 }
+            { "reply": 32141, "quest": 1842, "afterObjective": 12174, "completes": 12175, "params": [[30, 12175]], "next": 26748 },
+            { "reply": 53001, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=18", "next": 40692 }
           ]
         },
         {
           "message": 26748,
           "choices": []
+        },
+        {
+          "message": 40692,
+          "choices": [
+            { "reply": 53000, "quest": 2194, "next": 40693 }
+          ]
+        },
+        {
+          "message": 40693,
+          "choices": [
+            { "reply": 52999, "quest": 2194, "next": 40694 }
+          ]
+        },
+        {
+          "message": 40694,
+          "choices": [
+            { "reply": 52998, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175)."
+      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175). «Protección divina» (2194), for the class-18 temple's own: «Estoy de camino al Bosque Maléfico» (53001), madness to go without protection, train against a dopeul and pray to the statue (40692); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40693); then Trimpize at the forest's edge (40694), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52998) is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 6837,
@@ -26837,15 +27371,72 @@
         {
           "message": 51440,
           "choices": [
-            { "reply": 69012, "quest": 2467, "afterObjective": 18614, "completes": 18615, "params": [[30, 18615]], "next": 51441 }
+            { "reply": 69012, "quest": 2467, "afterObjective": 18614, "completes": 18615, "params": [[30, 18615]], "next": 51441 },
+            { "reply": 69155, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=20", "next": 51537 }
           ]
         },
         {
           "message": 51441,
           "choices": []
+        },
+        {
+          "message": 51537,
+          "choices": [
+            { "reply": 69154, "quest": 2194, "next": 51538 }
+          ]
+        },
+        {
+          "message": 51538,
+          "choices": [
+            { "reply": 77791, "quest": 2194, "next": 57173 },
+            { "reply": 69153, "quest": 2194, "next": 51539 },
+            { "reply": 69152, "quest": 2194 }
+          ]
+        },
+        {
+          "message": 51539,
+          "choices": [
+            { "reply": 77795, "quest": 2194, "next": 57176 }
+          ]
+        },
+        {
+          "message": 57173,
+          "choices": [
+            { "reply": 77790, "quest": 2194, "next": 57174 }
+          ]
+        },
+        {
+          "message": 57174,
+          "choices": [
+            { "reply": 77789, "quest": 2194, "next": 57175 }
+          ]
+        },
+        {
+          "message": 57175,
+          "choices": [
+            { "reply": 77788, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
+        },
+        {
+          "message": 57176,
+          "choices": [
+            { "reply": 77794, "quest": 2194, "next": 57177 }
+          ]
+        },
+        {
+          "message": 57177,
+          "choices": [
+            { "reply": 77793, "quest": 2194, "next": 57178 }
+          ]
+        },
+        {
+          "message": 57178,
+          "choices": [
+            { "reply": 77792, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
+          ]
         }
       ],
-      "why": "Lencaro de Albuera, master of the class-20 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 2467, objective 18615)."
+      "why": "Lencaro de Albuera, master of the class-20 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 2467, objective 18615). «Protección divina» (2194): «Estoy de camino al Bosque Maléfico» (69155), for a forgelance only: speak to the dopeul trainer and pray to the temple's statue for the Twelve's blessing (51537, 51538), which a forgelance takes with a shrug (77791) or after «No me arrodillaré ante los dioses» (69153, 51539, 77795); the forest's dangers and Wally's notes (57173-57178), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» is 16292 (Dofus pour les noobs, «Protection divine»)."
     },
     {
       "npc": 1917,
@@ -30677,6 +31268,7 @@
         {
           "message": 29,
           "choices": [
+            { "reply": 19964, "next": 16757, "quest": 1463, "afterObjective": 8121, "beforeObjective": 8122 },
             { "reply": 19686, "next": 16527, "quest": 1461, "afterObjective": 8084, "beforeObjective": 8085 },
             { "reply": 81, "next": 85 },
             { "reply": 326, "next": 408 },
@@ -30718,9 +31310,45 @@
           "choices": [
             { "reply": 19682, "quest": 1461, "completes": 8085, "params": [[30, 8085]] }
           ]
+        },
+        {
+          "message": 16757,
+          "choices": [
+            { "reply": 19963, "next": 16758 }
+          ]
+        },
+        {
+          "message": 16758,
+          "choices": [
+            { "reply": 19962, "next": 16759, "quest": 1463, "completes": 8122 }
+          ]
+        },
+        {
+          "message": 16759,
+          "choices": [
+            { "reply": 19961, "next": 16760 }
+          ]
+        },
+        {
+          "message": 16760,
+          "choices": [
+            { "reply": 19960, "next": 16761 }
+          ]
+        },
+        {
+          "message": 16761,
+          "choices": [
+            { "reply": 19959, "next": 16762 }
+          ]
+        },
+        {
+          "message": 16762,
+          "choices": [
+            { "reply": 19958 }
+          ]
         }
       ],
-      "why": "Bowis, the cobbler of Amakna village. «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Annoncez alors à Bowisse avec son super chapeau venir de la part du Captain Amakna». «Vengo de parte de Capitán Amakna.» (19686), once the Captain has sent the hero (8084), gets «eres uno de sus asistentes» (16527), «¿Qué puedes contarme sobre la leyenda de los multimen?» (19685) the old book in the castle (16528), «Seguir escuchando.» (19684) the six multimen, the dofus and Kontatrás' ice gallery (16529), «¿Quién es el sexto hermano?» (19683) Sombra and Reltux Richards' search in the Justiciers' base (16530), and «Voy a la base para hablar con Reltux Richards.» (19682) is 8085. His greeting (29) also tells of his order («Informarte sobre la Orden del Culo Pateado.» 81, 85), his craft («Informarte sobre el oficio de zapatero.» 326, 408) and that his workshop is no shop («Comprar unas botas.» 82, 86)."
+      "why": "Bowis, the cobbler of Amakna village. «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Annoncez alors à Bowisse avec son super chapeau venir de la part du Captain Amakna». «Vengo de parte de Capitán Amakna.» (19686), once the Captain has sent the hero (8084), gets «eres uno de sus asistentes» (16527), «¿Qué puedes contarme sobre la leyenda de los multimen?» (19685) the old book in the castle (16528), «Seguir escuchando.» (19684) the six multimen, the dofus and Kontatrás' ice gallery (16529), «¿Quién es el sexto hermano?» (19683) Sombra and Reltux Richards' search in the Justiciers' base (16530), and «Voy a la base para hablar con Reltux Richards.» (19682) is 8085. His greeting (29) also tells of his order («Informarte sobre la Orden del Culo Pateado.» 81, 85), his craft («Informarte sobre el oficio de zapatero.» 326, 408) and that his workshop is no shop («Comprar unas botas.» 82, 86). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): asked whether he saw Dark Vlad, then told about Meriana's compass, he owns up to the visit, and the quest ends on its reason, the dragon-leather boots the Order of the Kicked Butt once stole from him («La quête se termine en apprenant que le Dark Vlad est passé voir Bowisse dans l'intention de récupérer une paire de bottes»)."
     },
     {
       "npc": 2214,
@@ -35837,6 +36465,409 @@
         }
       ],
       "why": "Zoyo back with Zanal [23,-4], escorted out of the burrows (16290). The dragons' eggs are the World of Twelve's most precious treasures (40580); «Hablar de los dofus primordiales» (52878): the guardians' guild, Bolgrot (40592), the eggs hidden again and stolen again until the Cursed Day (40593, 40594), and the lord of the Evil Forest who might hold one, where Zoyo cannot go (40595). «Hacer acopio de valor…» (52874): «Tu temelidad podlía costalte la vida» (40596), and «Jamás he estado más preparado en mi vida» (52883) is 16291, the quest's end. He sends the character to meditate in its class temple first (40597, the step line of «Protección divina»): «Bueno, ¡hasta luego!» (52882) hands that quest out (Dofus pour les noobs, «Un sage parmi les sages»: «en continuant votre conversation avec Ronald le sage, vous débloquez la prochaine quête Protection divine»)."
+    },
+    {
+      "npc": 447,
+      "map": 99092993,
+      "opening": 40715,
+      "lines": [
+        {
+          "message": 40715,
+          "choices": [
+            { "reply": 53043, "quest": 2194, "afterObjective": 16296, "beforeObjective": 16298, "criterion": "PO!23121", "next": 40716 },
+            { "reply": 68129, "next": 40719, "criterion": "(Qf=2194|Qo>16298)&PO!23121" }
+          ]
+        },
+        {
+          "message": 40716,
+          "choices": [
+            { "reply": 53042, "quest": 2194, "next": 40717 }
+          ]
+        },
+        {
+          "message": 40717,
+          "choices": [
+            { "reply": 53041, "quest": 2194, "next": 40718 }
+          ]
+        },
+        {
+          "message": 40718,
+          "choices": [
+            { "reply": 53040, "quest": 2194, "next": 40719 }
+          ]
+        },
+        {
+          "message": 40719,
+          "choices": [
+            { "reply": 53039, "gives": 23121 }
+          ]
+        }
+      ],
+      "why": "Wally Oluconom deciphering an old manuscript upstairs in Amakna's library (40715). «Protección divina» (2194): «Carraspear para llamarle la atención» (53043), «Mencionar un mapa del Bosque Maléfico» (53042): not a map but notes (40717), gathered from those who came back from the forest without setting foot there himself (40718); «Enhorabuena por tu rigor» (53040), he leaves them (40719) and «Agarrar el libro» (53039) is «Rutas y caminos de campo: el Bosque Maléfico» (23121), to be read (16298). Whoever lost them asks again with «He perdido tus notas sobre el Bosque Maléfico» (68129) (Dofus pour les noobs, «Protection divine»: «Se racler la gorge pour attirer son attention»)."
+    },
+    {
+      "npc": 6709,
+      "map": 0,
+      "opening": 50473,
+      "lines": [
+        {
+          "message": 50473,
+          "choices": [
+            { "reply": 67661, "next": 50474 },
+            { "reply": 67665, "next": 50476, "startsQuest": 2195, "params": [[34, 2195]], "beforeQuest": 2450, "criterion": "PL>19" },
+            { "reply": 67665, "next": 50487, "startsQuest": 2195, "params": [[34, 2195]], "criterion": "Qf=2450" },
+            { "reply": 67665, "next": 50476, "beforeQuest": 2450, "criterion": "PL>19" },
+            { "reply": 67667, "next": 50480, "belowLevel": 20, "beforeQuest": 2450 },
+            { "reply": 67669, "next": 50481, "quest": 2450, "completesAll": [18543, 18544, 18545] },
+            { "reply": 67671, "next": 50483, "quest": 2450, "waited": [18545, 3], "completesAll": [18546, 18547], "gives": 26670 },
+            { "reply": 67671, "next": 50486, "quest": 2450, "stillWaiting": [18545, 3], "beforeObjective": 18546 },
+            { "reply": 67676, "next": 50487, "quest": 2195, "beforeObjective": 16301 }
+          ]
+        },
+        {
+          "message": 50474,
+          "choices": [
+            { "reply": 67660, "next": 50475 }
+          ]
+        },
+        {
+          "message": 50475,
+          "choices": [
+            { "reply": 67659 }
+          ]
+        },
+        {
+          "message": 50476,
+          "choices": [
+            { "reply": 67664, "next": 50477 }
+          ]
+        },
+        {
+          "message": 50477,
+          "choices": [
+            { "reply": 67663, "next": 50478 }
+          ]
+        },
+        {
+          "message": 50478,
+          "choices": [
+            { "reply": 67662, "startsQuest": 2450, "params": [[34, 2450]] }
+          ]
+        },
+        {
+          "message": 50480,
+          "choices": [
+            { "reply": 67666 }
+          ]
+        },
+        {
+          "message": 50481,
+          "choices": [
+            { "reply": 67675 }
+          ]
+        },
+        {
+          "message": 50486,
+          "choices": [
+            { "reply": 67668 }
+          ]
+        },
+        {
+          "message": 50483,
+          "choices": [
+            { "reply": 67674, "next": 50484 }
+          ]
+        },
+        {
+          "message": 50484,
+          "choices": [
+            { "reply": 67673, "next": 50485 }
+          ]
+        },
+        {
+          "message": 50485,
+          "choices": [
+            { "reply": 67672 }
+          ]
+        },
+        {
+          "message": 50487,
+          "choices": [
+            { "reply": 67677, "quest": 2195, "criterion": "Qf=2450", "completes": 16301 },
+            { "reply": 67677 }
+          ]
+        }
+      ],
+      "why": "Trimpize De Askurias at the enchanted edge [-5,13], keeper of the Dark Vlad maze. Dofus pour les noobs, «Un pendule pour guider ses pas»: «Demande à entrer dans la forêt», he warns, then asks for the chain, the ebony and the bwork archer's scalp to forge a pendulum; «Vous devez donc attendre au minimum 3 minutes avant de pouvoir reparler», too early he asks for more time; then «Demander si le pendule est prêt» hands it over and he explains how it is held. «Voir le Dark Vlad et mourir... ou pas» starts on the same «Demander à entrer dans la forêt» once «Protection divine» is done, and its first objective waits for the pendulum («Un pendule pour guider ses pas (bloque une étape)»)."
+    },
+    {
+      "npc": 673,
+      "map": 221249538,
+      "opening": 16869,
+      "openings": [
+        { "quest": 2195, "message": 2778 }
+      ],
+      "lines": [
+        {
+          "message": 16869,
+          "choices": []
+        },
+        {
+          "message": 2778,
+          "choices": [
+            { "reply": 53094, "next": 40760, "quest": 2195, "completes": 16303 },
+            { "reply": 53096, "quest": 2195, "afterObjective": 16303, "beforeObjective": 16304 },
+            { "reply": 53098, "next": 40761, "quest": 2195, "completes": 16305 },
+            { "reply": 53100, "quest": 2195, "afterObjective": 16305, "beforeObjective": 16306 },
+            { "reply": 53107, "next": 40762, "quest": 2195, "afterObjective": 16306, "beforeObjective": 16307 }
+          ]
+        },
+        {
+          "message": 40760,
+          "choices": [
+            { "reply": 53093, "quest": 2195, "beforeObjective": 16304 },
+            { "reply": 53095 }
+          ]
+        },
+        {
+          "message": 40761,
+          "choices": [
+            { "reply": 53097, "quest": 2195, "beforeObjective": 16306 },
+            { "reply": 53099 }
+          ]
+        },
+        {
+          "message": 40762,
+          "choices": [
+            { "reply": 53105, "next": 40763 }
+          ]
+        },
+        {
+          "message": 40763,
+          "choices": [
+            { "reply": 53104, "next": 40764 }
+          ]
+        },
+        {
+          "message": 40764,
+          "choices": [
+            { "reply": 53103, "next": 40765 }
+          ]
+        },
+        {
+          "message": 40765,
+          "choices": [
+            { "reply": 53101, "quest": 2195, "completes": 16307, "teleport": 221511680 },
+            { "reply": 53102, "quest": 2195, "completes": 16307 }
+          ]
+        }
+      ],
+      "why": "Dark Vlad in the Elm Clearing, «Ver a Dark Vlad y morir... o no» (Dofus pour les noobs, «Voir le Dark Vlad et mourir... ou pas»): asked which Dofus he took he sends his evil servants («Se défendre vaillamment»), asked again his chafers in waves («Tenter de survivre»), and the third time, the Twelve's blessing saving the character, he names the Dofus of Razeriane and sends him away: «Insister» takes him out of the maze to its entrance, «S'en aller» leaves him in the clearing. The guide's own pictures show the opening (HA HA HA !) with «Ne pas se laisser intimider...» and «Jeter un tas d'os aux pieds de la karne...», and «Je t'ai dit de déguerpir...» with «Insister» and «S'en aller». Anybody else gets his «Qui ose me déranger ?»."
+    },
+    {
+      "npc": 5569,
+      "map": 68421122,
+      "opening": 40580,
+      "openings": [
+        { "canStart": 1462, "message": 40604 }
+      ],
+      "lines": [
+        {
+          "message": 40580,
+          "choices": [
+            { "reply": 52887, "next": 40599, "quest": 2195, "afterObjective": 16307, "beforeObjective": 16308 }
+          ]
+        },
+        {
+          "message": 40599,
+          "choices": [
+            { "reply": 52886, "next": 40600 }
+          ]
+        },
+        {
+          "message": 40600,
+          "choices": [
+            { "reply": 52885, "next": 40601 }
+          ]
+        },
+        {
+          "message": 40601,
+          "choices": [
+            { "reply": 52888, "next": 40602, "quest": 2195, "completes": 16308 }
+          ]
+        },
+        {
+          "message": 40602,
+          "choices": [
+            { "reply": 52884, "next": 40603, "startsQuest": 1462, "params": [[34, 1462]] }
+          ]
+        },
+        {
+          "message": 40603,
+          "choices": [
+            { "reply": 52889 }
+          ]
+        },
+        {
+          "message": 40604,
+          "choices": [
+            { "reply": 52890, "next": 40605, "startsQuest": 1462, "params": [[34, 1462]] }
+          ]
+        },
+        {
+          "message": 40605,
+          "choices": [
+            { "reply": 52889 }
+          ]
+        }
+      ],
+      "why": "Zoyo on Madrestam's harbour (Dofus pour les noobs, «Voir le Dark Vlad et mourir... ou pas»): «Lui révéler que le Dark Vlad est en possession du Dofus de Razeriane» -- the guide's picture of his window, on «Los huevos de los dragones...» --, he explains it is Aerafal's emerald egg and that the zollos once guarded an immaculate Dofus he hid in Pandala; the quest ends there and «en continuant votre conversation avec Ronald le sage lenald, vous débloquez la prochaine quête La magicienne des marécages». Whoever left before that is offered it on coming back (40604, the same words)."
+    },
+    {
+      "npc": 2205,
+      "map": 122421248,
+      "opening": 16694,
+      "lines": [
+        {
+          "message": 16694,
+          "choices": [
+            { "reply": 19898, "next": 16695, "quest": 1462, "completes": 8106 },
+            { "reply": 19904, "next": 16702, "criterion": "Qf=1462&PL>39", "beforeQuest": 1463 },
+            { "reply": 19945, "next": 16748, "quest": 1463, "beforeObjective": 8113, "takesAll": [14969, 14970, 14971, 14972, 14973, 14974], "completes": 8113 },
+            { "reply": 19948, "next": 16749, "quest": 1463, "afterObjective": 8114, "beforeObjective": 8115, "completes": 8115 },
+            { "reply": 19949, "quest": 1463, "afterObjective": 8115, "beforeObjective": 8116, "teleport": 221249538 },
+            { "reply": 19957, "next": 16753, "quest": 1463, "afterObjective": 8119, "beforeObjective": 8120, "holds": 14959, "completes": 8120 }
+          ]
+        },
+        {
+          "message": 16695,
+          "choices": [
+            { "reply": 19897, "next": 16697, "criterion": "PL>39", "beforeQuest": 1463 },
+            { "reply": 19892, "next": 16696, "belowLevel": 40 }
+          ]
+        },
+        {
+          "message": 16696,
+          "choices": [
+            { "reply": 19891 }
+          ]
+        },
+        {
+          "message": 16697,
+          "choices": [
+            { "reply": 19896, "next": 16698 }
+          ]
+        },
+        {
+          "message": 16698,
+          "choices": [
+            { "reply": 19895, "next": 16699 }
+          ]
+        },
+        {
+          "message": 16699,
+          "choices": [
+            { "reply": 19894, "next": 16700 }
+          ]
+        },
+        {
+          "message": 16700,
+          "choices": [
+            { "reply": 19893, "startsQuest": 1463, "params": [[34, 1463]] }
+          ]
+        },
+        {
+          "message": 16702,
+          "choices": [
+            { "reply": 19903, "next": 16703 }
+          ]
+        },
+        {
+          "message": 16703,
+          "choices": [
+            { "reply": 19902, "next": 16704 }
+          ]
+        },
+        {
+          "message": 16704,
+          "choices": [
+            { "reply": 19901, "next": 16705 }
+          ]
+        },
+        {
+          "message": 16705,
+          "choices": [
+            { "reply": 19900, "startsQuest": 1463, "params": [[34, 1463]] }
+          ]
+        },
+        {
+          "message": 16748,
+          "choices": [
+            { "reply": 19944 }
+          ]
+        },
+        {
+          "message": 16749,
+          "choices": [
+            { "reply": 19946, "teleport": 221249538 },
+            { "reply": 19947 }
+          ]
+        },
+        {
+          "message": 16753,
+          "choices": [
+            { "reply": 19956, "next": 16754 }
+          ]
+        },
+        {
+          "message": 16754,
+          "choices": [
+            { "reply": 19955, "next": 16755 }
+          ]
+        },
+        {
+          "message": 16755,
+          "choices": [
+            { "reply": 19954, "next": 16756, "gives": 14978 }
+          ]
+        },
+        {
+          "message": 16756,
+          "choices": [
+            { "reply": 19953 }
+          ]
+        }
+      ],
+      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978)."
+    },
+    {
+      "npc": 2217,
+      "map": 221249538,
+      "opening": 16750,
+      "openings": [
+        { "quest": 1463, "objective": 8118, "message": 16751 }
+      ],
+      "lines": [
+        {
+          "message": 16750,
+          "choices": [
+            { "reply": 19952, "next": 16752, "quest": 1463, "beforeObjective": 8118, "completes": 8117 }
+          ]
+        },
+        {
+          "message": 16752,
+          "choices": [
+            { "reply": 19951, "quest": 1463, "beforeObjective": 8118 }
+          ]
+        },
+        {
+          "message": 16751,
+          "choices": [
+            { "reply": 19950, "teleport": 221511680 }
+          ]
+        }
+      ],
+      "why": "Hell Mina in the Elm Clearing (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): asked where the master of the place is («Exijo saber dónde se encuentra el señor de este lugar») she flies into a rage and attacks; beaten, she sends whoever talks to her out of the maze to its entrance («Pour sortir du dédale sans avoir à vous faire mourir... parlez tout simplement à Hell Mina qui vous expulsera à l'entrée»)."
     }
   ]
 }

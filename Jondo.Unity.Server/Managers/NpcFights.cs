@@ -90,6 +90,13 @@ namespace Jondo.Unity.Server.Managers
             /// ya has capturado».
             /// </summary>
             public string Criterion { get; init; } = "";
+
+            /// <summary>
+            /// Monsters that come in later, each wave so many rounds after the one before
+            /// («waves»: [{ "turns", "monsters" }]): Dark Vlad's chafers.
+            /// </summary>
+            public IReadOnlyList<Jondo.Unity.World.Fights.FightInstance.TimedWave> Waves { get; init; }
+                = Array.Empty<Jondo.Unity.World.Fights.FightInstance.TimedWave>();
         }
 
         private static List<Fight>? _fights;
@@ -151,6 +158,7 @@ namespace Jondo.Unity.Server.Managers
                                 DefeatFree = row.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
                                 Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
                                             ? criterion.GetString() ?? "" : "",
+                                Waves = Waves(row),
                             });
                         }
                     }
@@ -161,6 +169,19 @@ namespace Jondo.Unity.Server.Managers
                 }
                 _fights = fights;
             }
+        }
+
+        private static List<Jondo.Unity.World.Fights.FightInstance.TimedWave> Waves(JsonElement row)
+        {
+            var waves = new List<Jondo.Unity.World.Fights.FightInstance.TimedWave>();
+            if (!row.TryGetProperty("waves", out var list) || list.ValueKind != JsonValueKind.Array) return waves;
+            foreach (var wave in list.EnumerateArray())
+            {
+                var members = Members(wave, "monsters");
+                if (members.Count > 0)
+                    waves.Add(new Jondo.Unity.World.Fights.FightInstance.TimedWave(Math.Max(1, (int)Long(wave, "turns")), members));
+            }
+            return waves;
         }
 
         private static List<(int, int)> Members(JsonElement row, string name)

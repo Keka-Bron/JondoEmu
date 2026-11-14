@@ -316,6 +316,13 @@ namespace Jondo.Unity.World.Quests
         public int AfterElement { get; init; }
 
         /// <summary>
+        /// The one action of the element that counts, by its name in SkillNamesDataRoot, or zero
+        /// for any: the class temples' statues are a way to Astrub and to the gods' territory too,
+        /// and only «Rezar» (104) is the prayer of «Protección divina».
+        /// </summary>
+        public int SkillName { get; init; }
+
+        /// <summary>
         /// The element only hands its items over, the objective stays: the blue pickaxe outside the
         /// quarry is picked up while «Libera a Rathrosk» is to do, and freeing him is his reply.
         /// </summary>
@@ -595,6 +602,7 @@ namespace Jondo.Unity.World.Quests
                 Elements = elements,
                 Props = props,
                 AfterElement = Int(row, "afterElement"),
+                SkillName = Int(row, "skillName"),
                 ElementItems = elementItems,
                 ElementSays = elementSays,
                 Gives = gives,

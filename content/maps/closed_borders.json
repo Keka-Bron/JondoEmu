@@ -9,6 +9,36 @@
       "way": "right",
       "open": "Qf=2149|Qo>16321",
       "why": "The Pandala bridge off the Astrub quarry [12,-21]. Moktwa keeps it shut until the serum against the pandrista is in: «il ne peut pas vous laisser traverser le pont car celui-ci est en trop mauvais état», then «Maintenant que vous êtes vacciné, vous pouvez traverser le pont de Pandala» (Dofus pour les noobs, «Le réveil de Pandala»). 16321 is Nepra Lido's injection; 16322, the next objective, is crossing it."
+    },
+    {
+      "map": 221511680,
+      "way": "down",
+      "open": "Qf=2450",
+      "why": "The Dark Vlad maze (subarea 9), [-5,13] down to [-5,14]: one of its five ways in, open once «Un pendule pour guider ses pas» is done. Dofus pour les noobs: «Pour entrer dans le Dédale du Dark Vlad il existe 5 accès», and «il faut avoir terminé la quête Un pendule pour guider ses pas»."
+    },
+    {
+      "map": 221643779,
+      "way": "right",
+      "open": "Qf=2450",
+      "why": "The Dark Vlad maze (subarea 9), [-7,16] right to [-6,16]: one of its five ways in, open once «Un pendule pour guider ses pas» is done. Dofus pour les noobs: «Pour entrer dans le Dédale du Dark Vlad il existe 5 accès», and «il faut avoir terminé la quête Un pendule pour guider ses pas»."
+    },
+    {
+      "map": 221511685,
+      "way": "right",
+      "open": "Qf=2450",
+      "why": "The Dark Vlad maze (subarea 9), [-6,20] right to [-5,20]: one of its five ways in, open once «Un pendule pour guider ses pas» is done. Dofus pour les noobs: «Pour entrer dans le Dédale du Dark Vlad il existe 5 accès», and «il faut avoir terminé la quête Un pendule pour guider ses pas»."
+    },
+    {
+      "map": 221511688,
+      "way": "up",
+      "open": "Qf=2450",
+      "why": "The Dark Vlad maze (subarea 9), [-5,23] up to [-5,22]: one of its five ways in, open once «Un pendule pour guider ses pas» is done. Dofus pour les noobs: «Pour entrer dans le Dédale du Dark Vlad il existe 5 accès», and «il faut avoir terminé la quête Un pendule pour guider ses pas»."
+    },
+    {
+      "map": 221512707,
+      "way": "down",
+      "open": "Qf=2450",
+      "why": "The Dark Vlad maze (subarea 9), [0,16] down to [0,17]: one of its five ways in, open once «Un pendule pour guider ses pas» is done. Dofus pour les noobs: «Pour entrer dans le Dédale du Dark Vlad il existe 5 accès», and «il faut avoir terminé la quête Un pendule pour guider ses pas»."
     }
   ]
 }

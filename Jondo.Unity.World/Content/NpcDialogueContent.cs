@@ -93,6 +93,19 @@ namespace Jondo.Unity.World.Content
         public int BeforeObjective { get; init; }
 
         /// <summary>
+        /// An objective and a number of minutes: the reply is offered once the objective is done
+        /// and that long has gone by. Trimpize's «¿Está listo el péndulo?» hands the pendulum over
+        /// three minutes after the materials.
+        /// </summary>
+        public IReadOnlyList<int> Waited { get; init; } = Array.Empty<int>();
+
+        /// <summary>
+        /// The other side of <see cref="Waited"/>: offered while the objective is done but the
+        /// minutes have not gone by yet («Bromeas, ¿no?... Dame unos minutos»).
+        /// </summary>
+        public IReadOnlyList<int> StillWaiting { get; init; } = Array.Empty<int>();
+
+        /// <summary>
         /// A quest neither started nor finished for the reply to be offered: Ternette's «Estoy
         /// impaciente por explorar la isla celeste» leads to 1639 only for whoever has not had it.
         /// </summary>
@@ -1123,6 +1136,8 @@ namespace Jondo.Unity.World.Content
                             AfterObjective = (int)Number(choice, "afterObjective"),
                             AfterObjectives = Numbers(choice, "afterObjectives").Select(o => (int)o).ToArray(),
                             BeforeObjective = (int)Number(choice, "beforeObjective"),
+                            Waited = Numbers(choice, "waited").Select(o => (int)o).ToArray(),
+                            StillWaiting = Numbers(choice, "stillWaiting").Select(o => (int)o).ToArray(),
                             BeforeQuest = (int)Number(choice, "beforeQuest"),
                             RandomGroup = (int)Number(choice, "random"),
                             AfterElement = (int)Number(choice, "afterElement"),
@@ -1298,6 +1313,18 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.BeforeObjective != 0)
                                 writer.WriteNumber("beforeObjective", choice.BeforeObjective);
+                            if (choice.Waited.Count > 0)
+                            {
+                                writer.WriteStartArray("waited");
+                                foreach (int o in choice.Waited) writer.WriteNumberValue(o);
+                                writer.WriteEndArray();
+                            }
+                            if (choice.StillWaiting.Count > 0)
+                            {
+                                writer.WriteStartArray("stillWaiting");
+                                foreach (int o in choice.StillWaiting) writer.WriteNumberValue(o);
+                                writer.WriteEndArray();
+                            }
                             if (choice.BeforeQuest != 0)
                                 writer.WriteNumber("beforeQuest", choice.BeforeQuest);
                             if (choice.RandomGroup != 0)

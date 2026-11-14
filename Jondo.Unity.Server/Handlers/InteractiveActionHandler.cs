@@ -107,7 +107,12 @@ namespace Jondo.Unity.Server.Handlers
             // A phoenix: a soul rises, and only then does the quest that asked for it hear of it.
             if (await PhantomHandler.TryPhoenixAsync(stream, mapId, elementId)) return;
 
-            if (await Managers.Quests.OnInteractiveUsedAsync(stream, mapId, elementId)) return;
+            if (await Managers.Quests.OnInteractiveUsedAsync(stream, mapId, elementId, skillInstanceId))
+            {
+                // A statue prayed at no longer offers «Rezar».
+                if (InteractiveWays.Has(mapId, elementId)) await InteractiveWaysHandler.RefreshAsync(stream, mapId);
+                return;
+            }
 
             // The day's room's altar: the offering's prayer.
             if (await AlmanaxOfferingHandler.OnAltarUsedAsync(stream, mapId, elementId)) return;

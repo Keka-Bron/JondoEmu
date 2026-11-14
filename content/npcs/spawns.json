@@ -4458,6 +4458,37 @@
       "orientation": 3,
       "criterion": "(Qa=2193&Qo>16290)|(Qf=2193&Qa!2194&Qf!2194)",
       "why": "Zoyo beside Zanal [23,-4] once escorted there (16290), until he has handed out «Protección divina»."
+    },
+    {
+      "map": 221249538,
+      "npc": 673,
+      "cell": 384,
+      "orientation": 3,
+      "criterion": "Qf!2195",
+      "why": "Dark Vlad in the Elm Clearing [-5,17], at the heart of his maze (Dofus pour les noobs, «Voir le Dark Vlad et mourir... ou pas»: «Une fois arrivé dans la clairière du Dark Vlad, parlez au Dark Vlad»). INFERRED cell: 384, on the stone path below the mushrooms his dialogue window shows behind him, facing the stairs. Gone once «Ver a Dark Vlad y morir... o no» is done: he has left the forest and Hell Mina keeps it («La lettre vous apprend que Dark Vlad a quitté son repaire et confié la garde de celui-ci à Hell Mina»)."
+    },
+    {
+      "map": 68421122,
+      "npc": 5569,
+      "cell": 315,
+      "orientation": 3,
+      "criterion": "(Qa=2195&Qo>16307)|Qf=2195",
+      "why": "Zoyo on Madrestam's harbour [10,-5] for the end of «Ver a Dark Vlad y morir... o no» and the start of «La hechicera de los pantanos» (Dofus pour les noobs: «Retournez maintenant auprès de Ronald le sage lenald au port de Madrestam en [10,-5]»; the quest's own objective names map 68421122). INFERRED cell: 315, on the quay's edge by the moored rowboat his dialogue window shows."
+    },
+    {
+      "map": 122421248,
+      "npc": 2205,
+      "cell": 441,
+      "orientation": 3,
+      "why": "Meriana in her cabin in the Smelly Swamps [-6,-3], by her cauldron: «La hechicera de los pantanos» ends there and the first quests of the six primordial Dofus start there (Dofus pour les noobs, «La magicienne des marécages»: «Allez donc en [-6,-3] pour rencontrer Mériana»; the quest's objective names map 122421248). INFERRED cell: 441, the open floor in front of the cauldron, facing the door (506)."
+    },
+    {
+      "map": 221249538,
+      "npc": 2217,
+      "cell": 384,
+      "orientation": 3,
+      "criterion": "Qa=1463",
+      "why": "Hell Mina in the Elm Clearing for «Volver a ver a Dark Vlad, y seguir sin morirse», where Dark Vlad stood (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Une fois dans la clairière du Dark Vlad, parlez à la iop présente sur la map, Hell Mina»). INFERRED cell: his."
     }
   ]
 }

@@ -23,10 +23,15 @@ namespace Jondo.Unity.Server.Handlers
         {
             var ways = InteractiveWays.Of(interactive.MapId, interactive.Element.Id);
             if (ways == null) return null;
+            // A click on the element takes its first action, so one that goes nowhere comes first:
+            // «Rezar» is only offered while «Protección divina» asks for it, and it is what the
+            // click is then for; once prayed, the statue is a way to Astrub again.
             return interactive.Actions
-                .Where(a => a.Kind == InteractiveActionKind.Way
-                            && InteractiveWays.WayOf(ways, a.SkillId, a.SkillNameId) is { } way
-                            && ItemCriteria.Holds(way.Criterion))
+                .Select(a => (Action: a, Way: a.Kind == InteractiveActionKind.Way
+                    ? InteractiveWays.WayOf(ways, a.SkillId, a.SkillNameId) : null))
+                .Where(p => p.Way != null && ItemCriteria.Holds(p.Way.Criterion))
+                .OrderBy(p => p.Way!.ToMap != 0)
+                .Select(p => p.Action)
                 .ToList();
         }
 

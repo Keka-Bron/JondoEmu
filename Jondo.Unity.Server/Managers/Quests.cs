@@ -499,7 +499,7 @@ namespace Jondo.Unity.Server.Managers
         ///
         /// Returns whether anything happened, so the caller knows whether the click was answered.
         /// </remarks>
-        public static async Task<bool> OnInteractiveUsedAsync(NetworkStream stream, long mapId, int elementId)
+        public static async Task<bool> OnInteractiveUsedAsync(NetworkStream stream, long mapId, int elementId, int skillInstanceId = 0)
         {
             var log = Log;
             if (log == null || _book == null) return false;
@@ -536,6 +536,10 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
                 if (binding.Kind != QuestBindingKind.Click) continue;
+                // Only the named action counts: «Ir a Astrub.» of a temple's statue is a way, not a prayer.
+                if (binding.SkillName != 0
+                    && (!InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId, out _, out var picked)
+                        || picked.SkillNameId != binding.SkillName)) continue;
                 // One item per element, up to the row's count: a leaf from each of the four bushes.
                 if (binding.GivesEach)
                 {

@@ -140,5 +140,56 @@ namespace Jondo.Unity.Tests.Combat
                 Dreams.OlvidarTodo();
             }
         }
+
+        /// <summary>
+        /// Dark Vlad's chafers come by the clock: the fight's waves are read from its NPC fight, and
+        /// the next one comes on with its number and the turns before the one after it, the round
+        /// for that one counted from here.
+        /// </summary>
+        [Fact]
+        public async Task A_timed_wave_comes_on_with_the_turns_before_the_next()
+        {
+            var vlad = NpcFights.For(673, 221249538, 53097);
+            Assert.NotNull(vlad);
+            Assert.Equal(new[] { 3, 5, 5 }, vlad!.Waves.Select(w => w.Turns).ToArray());
+            Assert.Equal(new[] { 6210, 6209 }, vlad.Waves[0].Monsters.Select(m => m.Monster).ToArray());
+
+            const long player = 900_000_000_003;
+            MobSpawnManager.EnsureMonsterData();
+            if (MobSpawnManager.GetMonsterData(6210) == null) return;   // no world base to read
+
+            await using var pipe = await ClientPipe.OpenAsync(990_000_202, player, 221249538, "Retador");
+            var fight = new FightInstance(7_000_011, 221249538);
+            fight.SetPlacementCells(new[] { 286, 298, 326 }, new[] { 411, 424, 439, 397, 410, 426, 438, 453 });
+            fight.AddPlayer(new Fighter
+            {
+                Id = player, Name = "Retador", Level = 150, MaxHP = 3000, CurrentHP = 3000,
+                MaxAP = 12, CurrentAP = 12, MaxMP = 6, CurrentMP = 6,
+            });
+            var first = new Fighter { Id = -1, Level = 40, MaxHP = 300, CurrentHP = 300, IsMonster = true, MonsterId = 6209 };
+            fight.AddMonster(first);
+            fight.TimedWaves.AddRange(vlad.Waves);
+            fight.NextWaveRound = 1 + vlad.Waves[0].Turns;
+
+            bool cameOn;
+            using (SessionContext.Push(pipe.Session))
+            {
+                cameOn = await FightHandler.NextTimedWaveAsync(pipe.ToClient, fight);
+            }
+            Assert.True(cameOn);
+            Assert.Equal(1, fight.WaveNumber);
+            Assert.Equal(2, fight.TimedWaves.Count);
+            Assert.Equal(fight.RoundNumber + 5, fight.NextWaveRound);
+
+            var arrivals = fight.Rojo.Where(f => f.Id != first.Id && !f.EsInvocado).ToList();
+            Assert.Equal(new[] { 6209, 6210 }, arrivals.Select(a => a.MonsterId).OrderBy(m => m).ToArray());
+            Assert.All(arrivals, a => Assert.Equal(1, a.Wave));
+
+            var frames = await pipe.Take(4);
+            Assert.Equal(new[] { Op.Jyb, Op.Jto, Op.Jxb, Op.Jwi }, frames.Select(f => f.Opcode).ToArray());
+            var wave = Fields(frames[0].Payload);
+            Assert.Equal(1, Var(wave, 2));
+            Assert.Equal(5, Var(wave, 3));
+        }
     }
 }

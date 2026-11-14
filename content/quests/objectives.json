@@ -4471,6 +4471,195 @@
    "spends": true,
    "showsNpc": 5569,
    "why": "«Escolta a Zoyo hasta un lugar seguro»: back at Zanal's [23,-4] with Zoyo following; he leaves the character's side and stands there (Dofus pour les noobs, «Un sage parmi les sages»: «Il faudra donc le reconduire là où se trouve Wanald»)."
+  },
+  {
+   "objective": 16295,
+   "quest": 2194,
+   "kind": "click",
+   "skillName": 104,
+   "elements": [{"map": 17048580, "element": 511714}, {"map": 67113984, "element": 511872}, {"map": 69208322, "element": 511874}, {"map": 96470786, "element": 511873}, {"map": 148638211, "element": 511869}, {"map": 163056642, "element": 511870}, {"map": 177213440, "element": 511871}, {"map": 183762950, "element": 511845}, {"map": 183762954, "element": 511844}, {"map": 183763970, "element": 511686}, {"map": 183763976, "element": 511867}, {"map": 183764998, "element": 511839}, {"map": 183765000, "element": 511680}, {"map": 183766022, "element": 511683}, {"map": 183767046, "element": 511855}, {"map": 183767048, "element": 515179}, {"map": 183768070, "element": 511862}, {"map": 183768072, "element": 511859}, {"map": 183769094, "element": 528958}, {"map": 226493953, "element": 529200}],
+   "afterObjectives": [16294],
+   "why": "«Reza delante de la estatua del templo para recibir la bendición de los Doce»: «Rezar» on the statue of a class temple, offered by content/interactives/ways.json once the evil dopeul is beaten (Dofus pour les noobs, «Protection divine»)."
+  },
+  {
+   "objective": 16296,
+   "quest": 2194,
+   "kind": "enter",
+   "map": 99092993,
+   "afterObjectives": [16295],
+   "why": "«Ve a la biblioteca de Amakna»: its upper floor at [4,1], where Wally works (Dofus pour les noobs, «Protection divine»: «monter à l'étage»)."
+  },
+  {
+   "objective": 16298,
+   "quest": 2194,
+   "kind": "read",
+   "item": 23121,
+   "afterObjectives": [16297],
+   "why": "«Lee la obra de Wally Oluconom»: his notes on the Evil Forest (23121, document 627) opened from the bag (Dofus pour les noobs, «Protection divine»: «qu'il vous faudra consulter en double cliquant dessus»)."
+  },
+  {
+   "objective": 16299,
+   "quest": 2194,
+   "kind": "enter",
+   "map": 221511680,
+   "afterObjectives": [16298],
+   "why": "«Ve a la linde encantada del Bosque Maléfico»: [-5,13], where Trimpize keeps the way in."
+  },
+  {
+   "objective": 16301,
+   "quest": 2195,
+   "kind": "objectives",
+   "afterObjectives": [18548],
+   "why": "«Habla con Trimpize para obtener el derecho de entrar en el Bosque Maléfico»: the pendulum of «Un pendule pour guider ses pas» is that right (Dofus pour les noobs: «Un pendule pour guider ses pas (bloque une étape)»), so testing it closes this too. Whoever had it before this quest gets the step from Trimpize's «¿Me dejas entrar en el laberinto?»."
+  },
+  {
+   "objective": 16302,
+   "quest": 2195,
+   "kind": "enter",
+   "map": 221249538,
+   "why": "«Descubre el mapa: Claro de Dark Vlad»: the Elm Clearing, up the tumulus stairs of [-5,17]. The catalogue's objective names the place, not the map."
+  },
+  {
+   "objective": 16304,
+   "quest": 2195,
+   "kind": "beat",
+   "monster": 6208,
+   "map": 221249538,
+   "why": "«Enfréntate a los monstruos maléficos»: Dark Vlad's evil oni, calabash and nujo (6208, 6207, 6206), alone (Dofus pour les noobs: «Un combat se lance, il s'effectue seul», their spells Oniside, Vol de Pièces, Hypnose)."
+  },
+  {
+   "objective": 16306,
+   "quest": 2195,
+   "kind": "beat",
+   "monster": 6209,
+   "map": 221249538,
+   "why": "«Enfréntate a los chafers invocados por el yopuka oscuro»: the four waves of withered chafers (6209, 6210, 6211), alone."
+  },
+  {
+   "objective": 8107,
+   "quest": 1463,
+   "elements": [
+    {
+     "map": 133890,
+     "element": 484116
+    }
+   ],
+   "anyOrder": true,
+   "gives": [
+    {
+     "item": 14969,
+     "count": 1
+    }
+   ],
+   "why": "«Recoge una flor de pantano»: the swamp flower of Meriana's potion in the Smelly Swamps, the quest's own plant on map 133890 (element 484116, cell 410), which hands its ingredient (14969) over. In any order (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Afin de rentabiliser votre parcours, suivez les positions indiquées dans l'ordre croissant»)."
+  },
+  {
+   "objective": 8108,
+   "quest": 1463,
+   "elements": [
+    {
+     "map": 134915,
+     "element": 484117
+    }
+   ],
+   "anyOrder": true,
+   "gives": [
+    {
+     "item": 14970,
+     "count": 1
+    }
+   ],
+   "why": "«Corta trébol pútrido»: the putrid clover of Meriana's potion in the Smelly Swamps, the quest's own plant on map 134915 (element 484117, cell 430), which hands its ingredient (14970) over. In any order (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Afin de rentabiliser votre parcours, suivez les positions indiquées dans l'ordre croissant»)."
+  },
+  {
+   "objective": 8109,
+   "quest": 1463,
+   "elements": [
+    {
+     "map": 135939,
+     "element": 484118
+    }
+   ],
+   "anyOrder": true,
+   "gives": [
+    {
+     "item": 14971,
+     "count": 1
+    }
+   ],
+   "why": "«Arranca raíces sanguinas»: the blood roots of Meriana's potion in the Smelly Swamps, the quest's own plant on map 135939 (element 484118, cell 375), which hands its ingredient (14971) over. In any order (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Afin de rentabiliser votre parcours, suivez les positions indiquées dans l'ordre croissant»)."
+  },
+  {
+   "objective": 8110,
+   "quest": 1463,
+   "elements": [
+    {
+     "map": 133632,
+     "element": 484119
+    }
+   ],
+   "anyOrder": true,
+   "gives": [
+    {
+     "item": 14972,
+     "count": 1
+    }
+   ],
+   "why": "«Toma una piedra viscosa»: the slimy stone of Meriana's potion in the Smelly Swamps, the quest's own plant on map 133632 (element 484119, cell 219), which hands its ingredient (14972) over. In any order (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Afin de rentabiliser votre parcours, suivez les positions indiquées dans l'ordre croissant»)."
+  },
+  {
+   "objective": 8111,
+   "quest": 1463,
+   "elements": [
+    {
+     "map": 135428,
+     "element": 484120
+    }
+   ],
+   "anyOrder": true,
+   "gives": [
+    {
+     "item": 14973,
+     "count": 1
+    }
+   ],
+   "why": "«Corta una planta palustre»: the marsh plant of Meriana's potion in the Smelly Swamps, the quest's own plant on map 135428 (element 484120, cell 242), which hands its ingredient (14973) over. In any order (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Afin de rentabiliser votre parcours, suivez les positions indiquées dans l'ordre croissant»)."
+  },
+  {
+   "objective": 8112,
+   "quest": 1463,
+   "elements": [
+    {
+     "map": 135680,
+     "element": 484121
+    }
+   ],
+   "anyOrder": true,
+   "gives": [
+    {
+     "item": 14974,
+     "count": 1
+    }
+   ],
+   "why": "«Recoge campanillas olorosas»: the smelly bells of Meriana's potion in the Smelly Swamps, the quest's own plant on map 135680 (element 484121, cell 375), which hands its ingredient (14974) over. In any order (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Afin de rentabiliser votre parcours, suivez les positions indiquées dans l'ordre croissant»)."
+  },
+  {
+   "objective": 8114,
+   "quest": 1463,
+   "elements": [
+    {
+     "map": 122421248,
+     "element": 484122
+    }
+   ],
+   "why": "«Prueba el brebaje del caldero»: Meriana's cauldron in her cabin (element 484122, cell 370), once she has put the ingredients in (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Cliquez alors sur le chaudron pour boire cette potion»)."
+  },
+  {
+   "objective": 8121,
+   "quest": 1463,
+   "kind": "enter",
+   "map": 99356682,
+   "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: her compass (14978, map reference 186) points at Bowis' workshop in [5,1], map 99356682 (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «La boussole vous indique alors de vous rendre en [5,1]»); the objective is done on getting there. The catalogue gives it no map."
   }
  ]
 }

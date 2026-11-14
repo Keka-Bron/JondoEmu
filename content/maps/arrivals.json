@@ -102,6 +102,13 @@
       "cell": 330,
       "orientation": 7,
       "measured": "inferred: back through the portal, before Maytesé's house beside agent Krashtes"
+    },
+    {
+      "map": 220987396,
+      "from": 221249538,
+      "cell": 231,
+      "orientation": 3,
+      "measured": "inferred: walking down the Elm Clearing's stairs (its bottom border, cells 536-550) lands at the foot of the tumulus stairs, not mirrored onto the top edge of [-5,17]"
     }
   ]
 }

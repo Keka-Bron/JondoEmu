@@ -76,6 +76,25 @@ namespace Jondo.Unity.Tests.World
             Assert.False(ClosedBorders.Shut(BridgeStart, "left", _ => false));
         }
 
+        /// <summary>
+        /// The Dark Vlad maze has five ways in, and each waits for Trimpize's pendulum («Un
+        /// péndulo para guiar sus pasos»); the way back out of it is open to everybody.
+        /// </summary>
+        [Theory]
+        [InlineData(221511680, "down")]
+        [InlineData(221643779, "right")]
+        [InlineData(221511685, "right")]
+        [InlineData(221511688, "up")]
+        [InlineData(221512707, "down")]
+        public void The_maze_stays_shut_until_the_pendulum(long map, string way)
+        {
+            string asked = "";
+            Assert.True(ClosedBorders.Shut(map, way, c => { asked = c; return false; }));
+            Assert.Equal("Qf=2450", asked);
+            Assert.False(ClosedBorders.Shut(map, way, _ => true));
+            Assert.False(ClosedBorders.Shut(220987393, "up", _ => false));   // [-5,14], inside
+        }
+
         [Fact]
         public void A_map_with_no_such_border_has_none()
         {

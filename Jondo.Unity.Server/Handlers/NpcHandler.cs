@@ -1004,6 +1004,10 @@ namespace Jondo.Unity.Server.Handlers
                     elemento => SessionContext.State.ElementsUsed.Contains(elemento)))
                 return false;
             if (!choice.ForLevel(SessionContext.State.CharacterLevel)) return false;
+            if (choice.Waited.Count == 2 && !diario.WaitedSince(choice.Waited[0], choice.Waited[1])) return false;
+            if (choice.StillWaiting.Count == 2
+                && (!diario.ObjectiveDone(choice.StillWaiting[0])
+                    || diario.WaitedSince(choice.StillWaiting[0], choice.StillWaiting[1]))) return false;
             if (choice.Holds != 0 && Managers.Equipment.HowMany(choice.Holds) < choice.HoldsCount) return false;
             if (!Managers.Quests.HandsOverEnough(choice.Objectives(), choice.Partial)) return false;
             if (choice.Criterion.Length > 0 && !Managers.PlayerCriteria.Met(choice.Criterion, SessionContext.State.MapId)) return false;
@@ -1279,6 +1283,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (npcFight.Incarnates != 0)
                     FightHandler.IncarnateInNextFight(GameState.CharacterId, npcFight.Incarnates,
                                                       npcFight.IncarnationGrade, npcFight.IncarnationInvulnerable);
+                // And the waves that come in later: Dark Vlad's chafers.
+                if (npcFight.Waves.Count > 0) FightHandler.WavesInNextFight(GameState.CharacterId, npcFight.Waves);
                 await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
                     arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),
                     alliesMustLive: npcFight.AlliesMustLive,
@@ -1287,6 +1293,7 @@ namespace Jondo.Unity.Server.Handlers
                     defeatFree: npcFight.DefeatFree);
                 // Taken by the fight when it was built; one that did not start leaves none for the next.
                 FightHandler.TakeNextIncarnation(GameState.CharacterId);
+                FightHandler.TakeNextWaves(GameState.CharacterId);
                 return;
             }
 

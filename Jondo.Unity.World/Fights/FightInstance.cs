@@ -1028,6 +1028,25 @@ namespace Jondo.Unity.World.Fights
         public bool DefeatFree { get; set; }
 
         /// <summary>
+        /// A wave of monsters still to come in a fight whose waves come by the clock: it arrives
+        /// <see cref="Turns"/> rounds after the one before it, or at once when the board is cleared.
+        /// </summary>
+        public sealed record TimedWave(int Turns, IReadOnlyList<(int Monster, int Grade)> Monsters);
+
+        /// <summary>
+        /// The waves still to come, in order: Dark Vlad's chafers in «Ver a Dark Vlad y morir... o
+        /// no» (Dofus pour les noobs: «Vague 2 : 1 x Archer décati + 1 x Chafer décati (dans 3
+        /// tours)»). Empty for every other fight.
+        /// </summary>
+        public List<TimedWave> TimedWaves { get; } = new List<TimedWave>();
+
+        /// <summary>The wave last brought in: zero for the monsters the fight started with.</summary>
+        public int WaveNumber { get; set; }
+
+        /// <summary>The round at whose start the next of <see cref="TimedWaves"/> comes in.</summary>
+        public int NextWaveRound { get; set; }
+
+        /// <summary>
         /// Where winning leaves the players, when not the map they fought from: the trap room of
         /// «¡Cuidado con la bestia!», whose false floor has given way once the creature is down
         /// (content/fights/npc_fights.json, «winMap»). Zero for every other fight.
