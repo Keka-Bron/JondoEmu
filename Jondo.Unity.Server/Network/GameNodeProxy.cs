@@ -469,7 +469,20 @@ namespace Jondo.Unity.Server.Network
                                     Handlers.CommandTexts.Get("jail.channel"))));
                         }
 
-                        if (text.Length > 0 && !consumed && !muted)
+                        // Trade and recruitment take a line every two minutes (ChatChannels): one
+                        // written sooner stays with whoever wrote it, told how long is left.
+                        int wait = text.Length > 0 && !consumed && !muted
+                            ? Handlers.ChatChannels.WaitLeft(GameState.CharacterId, channel,
+                                  DatabaseManager.GetAccountRole(sessionAccountId), DateTime.UtcNow)
+                            : 0;
+                        if (wait > 0)
+                        {
+                            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                                    Managers.InfoMessages.Info, Managers.InfoMessages.ChannelRestricted, wait.ToString())));
+                        }
+
+                        if (text.Length > 0 && !consumed && !muted && wait == 0)
                         {
                             // A monster group shared goes as its id alone: what it is goes with the
                             // line, for the clients that draw the link (ChatLinks).

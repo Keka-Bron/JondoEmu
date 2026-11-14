@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Jondo.Unity.Launcher;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 
@@ -20,6 +23,33 @@ namespace Jondo.Unity.Server.Handlers
     {
         public const int General = 0, Team = 1, Guild = 2, Alliance = 3, Party = 4,
                          Trade = 5, Recruitment = 6, Community = 14;
+
+        /// <summary>
+        /// One line on trade or recruitment every two minutes, as on Dofus Retro's: the official
+        /// one varies -- players quote «Podrás enviar un nuevo mensaje dentro de 334 segundos» --
+        /// and is the client's information 115 when one writes too soon.
+        /// </summary>
+        public static readonly TimeSpan RestrictedDelay = TimeSpan.FromMinutes(2);
+
+        /// <summary>The channels held to <see cref="RestrictedDelay"/>.</summary>
+        public static bool IsRestricted(int channel) => channel is Trade or Recruitment;
+
+        private static readonly ConcurrentDictionary<(long Character, int Channel), DateTime> _lastSaid = new();
+
+        /// <summary>
+        /// The seconds he has still to wait before saying something on this channel, rounded up; zero
+        /// when he may, and then the line counts from <paramref name="now"/>. The staff, from
+        /// moderator up, are not held.
+        /// </summary>
+        public static int WaitLeft(long characterId, int channel, int role, DateTime now)
+        {
+            if (!IsRestricted(channel) || Roles.AlMenos(role, Roles.Moderador)) return 0;
+            var key = (characterId, channel);
+            if (_lastSaid.TryGetValue(key, out var last) && now - last < RestrictedDelay)
+                return (int)Math.Ceiling((RestrictedDelay - (now - last)).TotalSeconds);
+            _lastSaid[key] = now;
+            return 0;
+        }
 
         /// <summary>Hands a line out to whoever hears its channel, the speaker aside. Returns how many heard it.</summary>
         public static async Task<int> SayAsync(GameSession speaker, int channel, byte[] line)
