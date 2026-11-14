@@ -842,6 +842,9 @@ public static class Op
     /// <summary>Using an item from the bag, a double click: { f3: uid }. ItemUseHandler.</summary>
     public const string Iuu = "iuu";
 
+    /// <summary>«Utiliser plusieurs», an item used several times: { f1: uid, f2: how many }. ItemUseHandler.</summary>
+    public const string Ivs = "ivs";
+
     /// <summary>
     /// Using an item of the shortcut bar on another character: { f1: the target's character id,
     /// f2: the item's uid }. Read from the real client with the iron scissors. ItemOnCharacterHandler.

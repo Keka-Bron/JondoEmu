@@ -40,6 +40,42 @@ namespace Jondo.Unity.Server.Handlers
                 if (field.FieldNumber == 3 && field.WireType == 0) uid = field.VarIntValue;
             if (uid == 0) return;
 
+            await UseOneAsync(stream, uid);
+        }
+
+        /// <summary>
+        /// «Utiliser plusieurs», the item's menu: ivs { f1 uid, f2 how many }, measured on the 44
+        /// purses of 10000 kamas opened at once, which nothing answered. Each one is used as a
+        /// double click uses it, until the count is reached or the stack is gone; one use that
+        /// spends nothing -- a book read, an item refused -- stops it, so it is not done again.
+        /// </summary>
+        public static async Task UseSeveralAsync(NetworkStream stream, byte[] payload)
+        {
+            byte[]? ivs = ConnectionProtocol.ReadPayload(payload, Op.Ivs);
+            if (ivs == null) return;
+
+            long uid = 0, count = 0;
+            foreach (var field in ProtoMessage.Parse(ivs).Fields)
+            {
+                if (field.WireType != 0) continue;
+                if (field.FieldNumber == 1) uid = field.VarIntValue;
+                else if (field.FieldNumber == 2) count = field.VarIntValue;
+            }
+            if (uid == 0 || count <= 0) return;
+
+            int used = 0;
+            for (; used < count; used++)
+            {
+                int before = Equipment.ByUid(uid)?.Quantity ?? 0;
+                if (before <= 0) break;
+                await UseOneAsync(stream, uid);
+                if ((Equipment.ByUid(uid)?.Quantity ?? 0) >= before) break;
+            }
+            Console.WriteLine($"[Items] {SessionContext.State.CharacterName} uses {used} of {count} asked of uid {uid}.");
+        }
+
+        private static async Task UseOneAsync(NetworkStream stream, long uid)
+        {
             var item = Equipment.ByUid(uid);
             if (item == null || item.Quantity <= 0) return;
 
