@@ -75,6 +75,39 @@ namespace Jondo.Unity.Server.Managers
             using (SessionContext.Push(session)) return RoleOfCurrent();
         }
 
+        /// <summary>No role, as the alliance's members tab shows it: «---».</summary>
+        public const int None = -1;
+
+        /// <summary>
+        /// The role whose certificate a character carries, online or not -- the default role's too,
+        /// which Hal Ylanza hands over like the others --, or <see cref="None"/>: the alliance's
+        /// members tab shows it in «Rôle AvA».
+        /// </summary>
+        public static int HeldRoleOf(long characterId)
+        {
+            var certificates = AllianceData.KothRoles.Where(r => r.Certificate != 0).ToList();
+            if (characterId == 0 || certificates.Count == 0) return None;
+            try
+            {
+                using var connection = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT Gid FROM CharacterItems WHERE CharacterId = $id AND Quantity > 0 AND Gid IN (" +
+                                      string.Join(",", certificates.Select(r => r.Certificate)) + ");";
+                command.Parameters.AddWithValue("$id", characterId);
+                using var reader = command.ExecuteReader();
+                var held = new HashSet<int>();
+                while (reader.Read()) held.Add(reader.GetInt32(0));
+                // A role's certificate before the default's, as RoleOfCurrent reads them.
+                return certificates.OrderBy(r => r.Default).FirstOrDefault(r => held.Contains(r.Certificate))?.Id ?? None;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Conquest] The role of {characterId} could not be read: {ex.Message}");
+                return None;
+            }
+        }
+
         /// <summary>Whether the character may change role now.</summary>
         public static bool MayChange(long characterId, long nowMs)
             => !_changedAt.TryGetValue(characterId, out long at) || nowMs - at >= ChangeCooldownMs;

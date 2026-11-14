@@ -273,14 +273,21 @@ namespace Jondo.Unity.Tests.World
             using (SessionContext.Push(a.Session))
             {
                 Assert.Equal(AllianceData.DefaultKothRole, KothRoles.RoleOfCurrent());
+                Assert.Equal(KothRoles.None, KothRoles.HeldRoleOf(CharacterA));
                 Assert.True(await KothRoles.BecomeAsync(a.ToClient, KothRoles.Scout, 1_000_000));
                 Assert.Equal(KothRoles.Scout, KothRoles.RoleOfCurrent());
+                Assert.Equal(KothRoles.Scout, KothRoles.HeldRoleOf(CharacterA));
                 Assert.Equal(1, Equipment.HowMany(27659));
                 Assert.False(await KothRoles.BecomeAsync(a.ToClient, KothRoles.Seer, 1_000_000 + 60_000));
                 Assert.Equal(KothRoles.Scout, KothRoles.RoleOfCurrent());
                 Assert.True(await KothRoles.BecomeAsync(a.ToClient, KothRoles.Seer, 1_000_000 + KothRoles.ChangeCooldownMs));
                 Assert.Equal(KothRoles.Seer, KothRoles.RoleOfCurrent());
+                Assert.Equal(KothRoles.Seer, KothRoles.HeldRoleOf(CharacterA));
                 Assert.Equal(0, Equipment.HowMany(27659));
+
+                // Cannon fodder's certificate is a role the members tab shows too, not «---».
+                Assert.True(await KothRoles.BecomeAsync(a.ToClient, AllianceData.DefaultKothRole, 1_000_000 + 2 * KothRoles.ChangeCooldownMs));
+                Assert.Equal(AllianceData.DefaultKothRole, KothRoles.HeldRoleOf(CharacterA));
             }
         }
 

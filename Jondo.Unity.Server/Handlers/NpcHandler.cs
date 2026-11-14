@@ -1858,11 +1858,15 @@ namespace Jondo.Unity.Server.Handlers
                 if (next == 0) return false;
             }
 
-            if (elegida.KothRole != 0
-                && !await Managers.KothRoles.BecomeAsync(stream, elegida.KothRole, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()))
+            if (elegida.KothRole != 0)
             {
-                next = elegida.RefusedNext;
-                if (next == 0) return false;
+                if (await Managers.KothRoles.BecomeAsync(stream, elegida.KothRole, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()))
+                    await AllianceHandler.RoleChangedAsync(character);
+                else
+                {
+                    next = elegida.RefusedNext;
+                    if (next == 0) return false;
+                }
             }
 
             // A trade of chapeuvepés (the Sacres): paid, then handed over; without enough, the line

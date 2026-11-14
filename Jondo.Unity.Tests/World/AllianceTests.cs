@@ -290,14 +290,35 @@ namespace Jondo.Unity.Tests.World
             Assert.Null(Whereabouts(new AllianceProtocol.MemberRow(member, "Offline", 200, 1, 9, 1, 17, false)));
         }
 
+        /// <summary>
+        /// The line's f2 (AvaRoleId) is the member's conquests' role, the column «Rôle AvA»: -1,
+        /// «---», for one who holds none, as all the capture's; it was -1 for everybody, a role
+        /// taken or not.
+        /// </summary>
+        [Fact]
+        public void A_member_s_line_carries_his_role()
+        {
+            var member = new AllianceStore.Member { CharacterId = 8412, Rank = 1, JoinedUtcMs = 1791760506416 };
+            Assert.Equal(-1, RoleOf(new AllianceProtocol.MemberRow(member, "None", 200, 1, 9, 1, 17, true)));
+            Assert.Equal(KothRoles.Gravedigger,
+                         RoleOf(new AllianceProtocol.MemberRow(member, "Gravedigger", 200, 1, 9, 1, 17, true, KothRoles.Gravedigger)));
+        }
+
+        /// <summary>A member's line's f2, the role.</summary>
+        private static int RoleOf(AllianceProtocol.MemberRow row)
+            => (int)ProtoMessage.Parse(AllianceProtocol.MemberLine(row).Build()).Fields.Single(f => f.FieldNumber == 2).VarIntValue;
+
         /// <summary>The details' f3 of a member's line, or null.</summary>
-        private static long? Whereabouts(AllianceProtocol.MemberRow row)
+        private static long? Whereabouts(AllianceProtocol.MemberRow row) => Detail(row, 3);
+
+        /// <summary>One field of the details of a member's line, or null.</summary>
+        private static long? Detail(AllianceProtocol.MemberRow row, int field)
         {
             var line = ProtoMessage.Parse(AllianceProtocol.MemberLine(row).Build());
             var person = ProtoMessage.Parse(line.Fields.Single(f => f.FieldNumber == 3).BytesValue);
             var entry = ProtoMessage.Parse(person.Fields.Single(f => f.FieldNumber == 1).BytesValue);
             var details = ProtoMessage.Parse(entry.Fields.Single(f => f.FieldNumber == 5).BytesValue);
-            return details.Fields.FirstOrDefault(f => f.FieldNumber == 3)?.VarIntValue;
+            return details.Fields.FirstOrDefault(f => f.FieldNumber == field)?.VarIntValue;
         }
 
         /// <summary>

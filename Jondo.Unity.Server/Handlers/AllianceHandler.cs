@@ -1356,6 +1356,18 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// A member who took a role at Hal Ylanza: his line again (mbv) to every member, himself
+        /// included, so «Rôle AvA» shows it without the window being opened anew.
+        /// </summary>
+        public static async Task RoleChangedAsync(long characterId)
+        {
+            var alliance = AllianceStore.AllianceOf(characterId);
+            var row = alliance == null ? null : RowOf(AllianceStore.MemberOf(characterId));
+            if (row == null) return;
+            await TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Mbv, AllianceProtocol.BuildMemberUpdate(row.Value)));
+        }
+
+        /// <summary>
         /// A member's connection seen by the others: his line with his state (mbv), and on
         /// connecting, «Un miembro de tu alianza, X, está en línea» to whoever wants it.
         /// </summary>
@@ -1404,7 +1416,8 @@ namespace Jondo.Unity.Server.Handlers
             return new AllianceProtocol.MemberRow(member, character.Name, character.Level, character.AccountId,
                                                   character.Breed, character.Sex,
                                                   Achievements.PointsOf(member.CharacterId),
-                                                  online ?? SessionRegistry.FindByCharacter(member.CharacterId) != null);
+                                                  online ?? SessionRegistry.FindByCharacter(member.CharacterId) != null,
+                                                  KothRoles.HeldRoleOf(member.CharacterId));
         }
 
         /// <summary>An application with the applicant's sheet.</summary>

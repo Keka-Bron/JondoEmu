@@ -212,7 +212,8 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>A member's line, with what the entry needs besides the membership.</summary>
         public readonly record struct MemberRow(AllianceStore.Member Member, string Name, int Level, long AccountId,
-                                                int Breed, int Sex, int AchievementPoints, bool Online);
+                                                int Breed, int Sex, int AchievementPoints, bool Online,
+                                                int Role = KothRoles.None);
 
         /// <summary>
         /// The alliance's sheet (mcx): f1 its tax collectors, f2 its prisms, f3 the alliance with its
@@ -230,10 +231,15 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// A member's line (lmr): f2 -1 and f3 the member { f1 { f2 name, f3 level, f5 details },
-        /// f2 the character }.
+        /// A member's line (lmr, AllianceMemberInformation): f2 his conquests' role and f3 the member
+        /// { f1 { f2 name, f3 level, f5 details }, f2 the character }.
         /// </summary>
         /// <remarks>
+        /// The f2 is AvaRoleId: gw.bnp hands it to gw.mxj, which keeps it in gw's dbok (+0x60), and
+        /// AllianceMembersUi.BindMembersItem looks it up among the roles for the column «Rôle AvA»,
+        /// «---» when it is none -- the capture's -1 for all 46, who held none. It went as -1 for
+        /// everybody, and a role taken at Hal Ylanza never showed.
+        ///
         /// The details (lon) as the client reads them: f1 the achievement points (1893, 759, 116...),
         /// f2 the rank, f3 where he is (lay: 0 offline, 1 in the world), f4 when he joined in
         /// milliseconds, f5 -1, f6 the class, f8 the availability ({f1 1} available), f9 the sex
@@ -257,7 +263,7 @@ namespace Jondo.Unity.Server.Network
                 .Var(10, row.AccountId);
 
             return Pb.New()
-                .Var(2, MeasuredMinusOne)
+                .Var(2, row.Role)
                 .Msg(3, Pb.New()
                     .Msg(1, Pb.New().Str(2, row.Name).Var(3, row.Level).Msg(5, details))
                     .Var(2, row.Member.CharacterId));
