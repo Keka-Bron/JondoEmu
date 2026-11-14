@@ -698,12 +698,13 @@ played through.
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
+| World Quests | `░░░░░░░░░░` **5%** | 7/145 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| World Quests | `░░░░░░░░░░` **1%** | 2/145 |
 | Pandala Island | `░░░░░░░░░░` **2%** | 1/55 |
-| **All quests** | **15.9%** | **315/1976** |
+| Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
+| **All quests** | **16.2%** | **321/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
