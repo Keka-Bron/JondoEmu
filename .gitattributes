@@ -5,3 +5,9 @@
 /Jondo.Unity.Protocol.Game.Wire/Schemas/*.proto text eol=lf
 /Jondo.Unity.Protocol.Game.Wire/Mappings/*.json text eol=lf
 /Jondo.Unity.Protocol.Game.Wire/Import/*.provenance.json text eol=lf
+
+# The Docker files are read inside Linux; keep them LF on every checkout.
+/Dockerfile text eol=lf
+/.dockerignore text eol=lf
+/docker-compose.yml text eol=lf
+/.env.example text eol=lf
