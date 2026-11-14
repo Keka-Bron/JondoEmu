@@ -897,7 +897,7 @@ namespace Jondo.Unity.Server.Managers
         {
             int characteristic = Math.Max(0, caster.GetStatForElement(element));
             double raw = baseDamage * (100 + characteristic + Math.Max(0, caster.Power)) / 100.0 + caster.FlatDamage;
-            int resistance = Math.Clamp(target.GetResPctForElement(element), -100, 100);
+            int resistance = Math.Clamp(target.CappedResistance(target.GetResPctForElement(element)), -100, 100);
             // And a bomb's combo, as the fight deals it (FightHandler, THE COMBO): from nothing at
             // Combo I to +360% at XV -- the Tymador's Detonador is worth what the bomb has grown.
             int combo = Combo.PercentOf(caster);
