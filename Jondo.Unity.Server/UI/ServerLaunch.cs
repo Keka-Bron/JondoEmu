@@ -13,6 +13,21 @@ internal static class ServerLaunch
            // Avalonia 11's Linux desktop uses X11, including XWayland in Wayland sessions.
            (linux && string.IsNullOrWhiteSpace(display));
 
+    /// <summary>
+    /// The exit code of a run that ends to be restarted by its supervisor (EX_TEMPFAIL).
+    /// </summary>
+    internal const int RestartExitCode = 75;
+
+    /// <summary>
+    /// Whether a restart ends this process and leaves starting the next run to its supervisor
+    /// (<c>JONDO_RESTART_MODE=exit</c>). In a container the server is PID 1: a child it spawned
+    /// would die with it, so Docker's restart policy has to start the next run instead.
+    /// </summary>
+    internal static bool RestartByExit() => RestartByExit(Environment.GetEnvironmentVariable("JONDO_RESTART_MODE"));
+
+    internal static bool RestartByExit(string mode)
+        => string.Equals((mode ?? "").Trim(), "exit", StringComparison.OrdinalIgnoreCase);
+
     internal static ProcessStartInfo Restart(string executable, string assembly, int previous, bool headless)
     {
         var start = new ProcessStartInfo(executable)

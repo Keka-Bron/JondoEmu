@@ -81,6 +81,9 @@ its spells must pass.
 
 ## 🚀 Quick Start
 
+**Docker:** the server also runs as a headless container: `docker compose up -d --build`. See
+[Jondo Server in Docker](docs/docker.md). Running it natively is unchanged.
+
 **Linux source users:** all four desktop tools have a native Linux workflow. See
 [Linux desktop setup](docs/linux-desktop.md) for building, configuring `Dofus.x64`
 without a mod loader, and desktop verification. Linux players can also take the Linux zip below.

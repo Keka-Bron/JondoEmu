@@ -132,3 +132,15 @@ jobs:
           name: linux-test-results
           path: TestResults/*.trx
           if-no-files-found: ignore
+
+  # The server image (Dockerfile, docs/docker.md): built, not pushed, so it cannot rot unnoticed.
+  docker-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Build the server image
+        run: docker build --tag jondo-server:ci .

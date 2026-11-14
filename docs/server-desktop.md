@@ -45,6 +45,8 @@ not initialize Avalonia or require a display. For sandboxed/service installation
 ensure .NET's native-library extraction directory is writable (or set
 `DOTNET_BUNDLE_EXTRACT_BASE_DIR` to a writable directory).
 
+To run the server headless in a container instead, see [Jondo Server in Docker](docker.md).
+
 ## Data and publishing
 
 The server still uses the emulator's `.jondo-root`, `datos/` and `content/` directories.
