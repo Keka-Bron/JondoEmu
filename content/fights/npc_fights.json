@@ -1107,6 +1107,9 @@
       "why": "«Luchar contra las oleadas de chafers invocados por Dark Vlad», to try again: the withered chafers in four waves, alone. Dofus pour les noobs: «Vague 1 : 2 x Chafer décati. Vague 2 : 1 x Archer décati + 1 x Chafer décati (dans 3 tours). Vague 3 : 1 x Assassin décati + 1 Chafer décati (dans 5 tours). Vague 4 : 1 x Assassin décati + 1 x Archer décati (dans 5 tours)»." },
     { "npc": 2217, "map": 221249538, "reply": 19951,
       "monsters": [ { "monster": 3599, "grade": 0 } ],
-      "why": "«Prepararte para el combate»: Hell Mina Ensorcelée, alone (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Un combat se lance, il s'effectue seul»). She drops Dark Vlad's letter (14959, her drop at 100 %)." }
+      "why": "«Prepararte para el combate»: Hell Mina Ensorcelée, alone (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Un combat se lance, il s'effectue seul»). She drops Dark Vlad's letter (14959, her drop at 100 %)." },
+    { "npc": 2241, "map": 88087302, "reply": 19980,
+      "monsters": [ { "monster": 3582, "grade": 0 }, { "monster": 153, "grade": 0 }, { "monster": 118, "grade": 0 } ],
+      "why": "«Atacar al zapatero.»: the Zapatero oscuro (3582) with the reinforcements he threatens with, a Panadero oscuro (153) and a Minero oscuro (118) (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Il est accompagné du boulanger sombre et du mineur sombre»). He drops the Secretos de fabricación de las suelas de viento (14979, his own loot at 100 %)." }
   ]
 }

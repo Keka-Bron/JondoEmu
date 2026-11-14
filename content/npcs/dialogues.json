@@ -31268,6 +31268,13 @@
         {
           "message": 29,
           "choices": [
+            { "reply": 19969, "next": 16764, "criterion": "Qf=1463&(Pj>2,49|Pj>11,49|Pj>13,49|Pj>15,49|Pj>16,49|Pj>24,49|Pj>26,49|Pj>27,49|Pj>28,49|Pj>36,49|Pj>41,49|Pj>44,49|Pj>48,49|Pj>60,49|Pj>62,49|Pj>63,49|Pj>64,49|Pj>65,49|Pj>74,49|Pj>75,49|Pj>78,49|Pj>79,49)", "beforeQuest": 1464 },
+            { "reply": 19969, "next": 16765, "criterion": "Qf=1463&Pj<2,50&Pj<11,50&Pj<13,50&Pj<15,50&Pj<16,50&Pj<24,50&Pj<26,50&Pj<27,50&Pj<28,50&Pj<36,50&Pj<41,50&Pj<44,50&Pj<48,50&Pj<60,50&Pj<62,50&Pj<63,50&Pj<64,50&Pj<65,50&Pj<74,50&Pj<75,50&Pj<78,50&Pj<79,50", "beforeQuest": 1464 },
+            { "reply": 19971, "next": 16766, "quest": 1464, "beforeObjective": 8123, "criterion": "Qo=8124", "holds": 14960, "holdsCount": 10, "completes": 8123 },
+            { "reply": 19974, "next": 16768, "quest": 1464, "afterObjective": 8124, "beforeObjective": 8123, "holds": 14960, "holdsCount": 10, "completes": 8123 },
+            { "reply": 19973, "next": 16767, "quest": 1464, "afterObjective": 8124, "beforeObjective": 8123, "criterion": "PO<14960,10" },
+            { "reply": 19973, "next": 16768, "quest": 1464, "afterObjectives": [8123, 8124], "beforeObjective": 8125, "criterion": "PO!14980" },
+            { "reply": 19979, "next": 16769, "quest": 1464, "afterObjectives": [8123, 8124], "beforeObjective": 8125, "takes": 14980, "completes": 8125 },
             { "reply": 19964, "next": 16757, "quest": 1463, "afterObjective": 8121, "beforeObjective": 8122 },
             { "reply": 19686, "next": 16527, "quest": 1461, "afterObjective": 8084, "beforeObjective": 8085 },
             { "reply": 81, "next": 85 },
@@ -31344,11 +31351,69 @@
         {
           "message": 16762,
           "choices": [
+            { "reply": 19966, "next": 16763, "criterion": "(Pj>2,49|Pj>11,49|Pj>13,49|Pj>15,49|Pj>16,49|Pj>24,49|Pj>26,49|Pj>27,49|Pj>28,49|Pj>36,49|Pj>41,49|Pj>44,49|Pj>48,49|Pj>60,49|Pj>62,49|Pj>63,49|Pj>64,49|Pj>65,49|Pj>74,49|Pj>75,49|Pj>78,49|Pj>79,49)", "beforeQuest": 1464 },
+            { "reply": 19966, "next": 16765, "criterion": "Pj<2,50&Pj<11,50&Pj<13,50&Pj<15,50&Pj<16,50&Pj<24,50&Pj<26,50&Pj<27,50&Pj<28,50&Pj<36,50&Pj<41,50&Pj<44,50&Pj<48,50&Pj<60,50&Pj<62,50&Pj<63,50&Pj<64,50&Pj<65,50&Pj<74,50&Pj<75,50&Pj<78,50&Pj<79,50", "beforeQuest": 1464 },
             { "reply": 19958 }
+          ]
+        },
+        {
+          "message": 16763,
+          "choices": [
+            { "reply": 19965, "startsQuest": 1464, "params": [[34, 1464]] }
+          ]
+        },
+        {
+          "message": 16764,
+          "choices": [
+            { "reply": 19967, "startsQuest": 1464, "params": [[34, 1464]] }
+          ]
+        },
+        {
+          "message": 16765,
+          "choices": [
+            { "reply": 19968 }
+          ]
+        },
+        {
+          "message": 16766,
+          "choices": [
+            { "reply": 19970 }
+          ]
+        },
+        {
+          "message": 16767,
+          "choices": [
+            { "reply": 19972 }
+          ]
+        },
+        {
+          "message": 16768,
+          "choices": [
+            { "reply": 19975 }
+          ]
+        },
+        {
+          "message": 16769,
+          "choices": [
+            { "reply": 19978, "next": 16770 }
+          ]
+        },
+        {
+          "message": 16770,
+          "choices": [
+            { "reply": 19977, "next": 16771 }
+          ]
+        },
+        {
+          "message": 16771,
+          "choices": [
+            { "reply": 19976, "quest": 1464, "afterObjective": 8125, "beforeObjective": 8126, "takesAll": [14978], "gives": 14981 },
+            { "reply": 19976, "quest": 1464, "afterObjective": 8125, "beforeObjective": 8126, "criterion": "PO!14978&PO!14981", "gives": 14981 },
+            { "reply": 19976, "criterion": "PO!14978&PO=14981" }
           ]
         }
       ],
-      "why": "Bowis, the cobbler of Amakna village. «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Annoncez alors à Bowisse avec son super chapeau venir de la part du Captain Amakna». «Vengo de parte de Capitán Amakna.» (19686), once the Captain has sent the hero (8084), gets «eres uno de sus asistentes» (16527), «¿Qué puedes contarme sobre la leyenda de los multimen?» (19685) the old book in the castle (16528), «Seguir escuchando.» (19684) the six multimen, the dofus and Kontatrás' ice gallery (16529), «¿Quién es el sexto hermano?» (19683) Sombra and Reltux Richards' search in the Justiciers' base (16530), and «Voy a la base para hablar con Reltux Richards.» (19682) is 8085. His greeting (29) also tells of his order («Informarte sobre la Orden del Culo Pateado.» 81, 85), his craft («Informarte sobre el oficio de zapatero.» 326, 408) and that his workshop is no shop («Comprar unas botas.» 82, 86). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): asked whether he saw Dark Vlad, then told about Meriana's compass, he owns up to the visit, and the quest ends on its reason, the dragon-leather boots the Order of the Kicked Butt once stole from him («La quête se termine en apprenant que le Dark Vlad est passé voir Bowisse dans l'intention de récupérer une paire de bottes»)."
+      "why": "Bowis, the cobbler of Amakna village. «Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs): «Annoncez alors à Bowisse avec son super chapeau venir de la part du Captain Amakna». «Vengo de parte de Capitán Amakna.» (19686), once the Captain has sent the hero (8084), gets «eres uno de sus asistentes» (16527), «¿Qué puedes contarme sobre la leyenda de los multimen?» (19685) the old book in the castle (16528), «Seguir escuchando.» (19684) the six multimen, the dofus and Kontatrás' ice gallery (16529), «¿Quién es el sexto hermano?» (19683) Sombra and Reltux Richards' search in the Justiciers' base (16530), and «Voy a la base para hablar con Reltux Richards.» (19682) is 8085. His greeting (29) also tells of his order («Informarte sobre la Orden del Culo Pateado.» 81, 85), his craft («Informarte sobre el oficio de zapatero.» 326, 408) and that his workshop is no shop («Comprar unas botas.» 82, 86). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): asked whether he saw Dark Vlad, then told about Meriana's compass, he owns up to the visit, and the quest ends on its reason, the dragon-leather boots the Order of the Kicked Butt once stole from him («La quête se termine en apprenant que le Dark Vlad est passé voir Bowisse dans l'intention de récupérer une paire de bottes»). For «¿Quién patea el culo de los Culo Pateado?» (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»): he makes an honorary member of the Order only of a competent craftsman, a job at level 50 («Debes tener un mínimo de competencia. Progresa en el arte de un oficio»; «il faut avoir un métier niveau 50 pour accéder à la quête»), the mushrooms and the dark shoemaker's secret in either order (16766, 16767), then the soles made at his workshop; shown Dark Vlad's boots, Meriana's compass picks up their trace and points elsewhere (14978 becomes 14981)."
     },
     {
       "npc": 2214,
@@ -36868,6 +36933,59 @@
         }
       ],
       "why": "Hell Mina in the Elm Clearing (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): asked where the master of the place is («Exijo saber dónde se encuentra el señor de este lugar») she flies into a rage and attacks; beaten, she sends whoever talks to her out of the maze to its entrance («Pour sortir du dédale sans avoir à vous faire mourir... parlez tout simplement à Hell Mina qui vous expulsera à l'entrée»)."
+    },
+    {
+      "npc": 2241,
+      "map": 88087302,
+      "opening": 16772,
+      "lines": [
+        {
+          "message": 16772,
+          "choices": [
+            { "reply": 19980, "quest": 1464, "criterion": "Qo=8124" },
+            { "reply": 19981 }
+          ]
+        }
+      ],
+      "why": "The Zapatero oscuro in the bandits' territory: he wants the purse and the boots, and threatens with reinforcements; «Atacar al zapatero.» starts the fight while it is to do (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Parlez lui afin de pouvoir l'attaquer»)."
+    },
+    {
+      "npc": 2218,
+      "map": 205261570,
+      "opening": 16774,
+      "lines": [
+        {
+          "message": 16774,
+          "choices": [
+            { "reply": 19987, "next": 16775, "quest": 1464, "afterObjective": 8126, "beforeObjective": 8127, "completes": 8127 }
+          ]
+        },
+        {
+          "message": 16775,
+          "choices": [
+            { "reply": 19986, "next": 16776 }
+          ]
+        },
+        {
+          "message": 16776,
+          "choices": [
+            { "reply": 19985, "next": 16777 }
+          ]
+        },
+        {
+          "message": 16777,
+          "choices": [
+            { "reply": 19984, "next": 16778 }
+          ]
+        },
+        {
+          "message": 16778,
+          "choices": [
+            { "reply": 19988 }
+          ]
+        }
+      ],
+      "why": "Tungusa in Tierradala (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»): asked whether she saw Dark Vlad («¿Has visto a Dark Vlad por aquí?»), she tells of the fire-haired iop who spoke with a spirit by the sea, and the quest ends there («La quête se termine en apprenant que Tungusa a vu le Dark Vlad parler avec l'esprit Talma Esmya»); what she says next, of Talma Esmya and the offerings, leads to «Le voleur d'âmes»."
     }
   ]
 }

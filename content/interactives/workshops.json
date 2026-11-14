@@ -45,6 +45,16 @@
       "type": 299,
       "skills": [350],
       "why": "The fresh eggs at [-15,-45] of the Litneg wood, the only quest element of the map (cell 183): «Cliquez sur les Oeufs frais (qui est en fait un atelier) pour fabriquer le Gâtrool Krosmique» (Dofus pour les noobs, «Jeu de Trooll»). The client's interactive type 299 and skill 350 are both «Huevos frescos», and 350 makes only the «Gatrool krósmico» (18208): a gatrool, twenty wild mint and ten cherries."
+    },
+    {
+      "map": 99356682,
+      "element": 484125,
+      "gfx": 16545,
+      "type": -1,
+      "skills": [
+        246
+      ],
+      "why": "Bowis' workshop in [5,1]: «Examina el taller para descubrir las cantidades exactas» (Bowis, 16768; Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Allez ensuite fabriquer les semelles de vent dans l'atelier spécial de Bowisse»). The client's skill 246, «Fabricar suelas», crafts the Suelas de viento (14980) and nothing else: 6 alas de escarahoja blanco, 8 semillas de la discordia, 10 plumas de kwak de viento, 2 piedras de esmeralda and 4 resinas. The element is the quest's own (484125, cell 315); the client names no interactive for the skill, so the type is the quest elements' -1."
     }
   ]
 }

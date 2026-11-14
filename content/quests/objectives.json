@@ -4660,6 +4660,218 @@
    "kind": "enter",
    "map": 99356682,
    "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: her compass (14978, map reference 186) points at Bowis' workshop in [5,1], map 99356682 (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «La boussole vous indique alors de vous rendre en [5,1]»); the objective is done on getting there. The catalogue gives it no map."
+  },
+  {
+   "objective": 8123,
+   "quest": 1464,
+   "kind": "click",
+   "skill": 247,
+   "elements": [
+    {
+     "map": 88085260,
+     "element": 483996
+    },
+    {
+     "map": 88085260,
+     "element": 484008
+    },
+    {
+     "map": 88085260,
+     "element": 483997
+    },
+    {
+     "map": 88085260,
+     "element": 483998
+    },
+    {
+     "map": 88085260,
+     "element": 484006
+    },
+    {
+     "map": 88084237,
+     "element": 484019
+    },
+    {
+     "map": 88084237,
+     "element": 484020
+    },
+    {
+     "map": 88084237,
+     "element": 483992
+    },
+    {
+     "map": 88085774,
+     "element": 484002
+    },
+    {
+     "map": 88085774,
+     "element": 484010
+    },
+    {
+     "map": 88085774,
+     "element": 484011
+    },
+    {
+     "map": 88085774,
+     "element": 484012
+    },
+    {
+     "map": 88085261,
+     "element": 484015
+    },
+    {
+     "map": 88085261,
+     "element": 484017
+    },
+    {
+     "map": 88085261,
+     "element": 484016
+    },
+    {
+     "map": 88085261,
+     "element": 484018
+    },
+    {
+     "map": 88084749,
+     "element": 484019
+    },
+    {
+     "map": 88084749,
+     "element": 484016
+    },
+    {
+     "map": 88084749,
+     "element": 483991
+    },
+    {
+     "map": 88084749,
+     "element": 483992
+    },
+    {
+     "map": 88084748,
+     "element": 484008
+    },
+    {
+     "map": 88084748,
+     "element": 484009
+    },
+    {
+     "map": 88084748,
+     "element": 483997
+    },
+    {
+     "map": 88084748,
+     "element": 483994
+    },
+    {
+     "map": 88085772,
+     "element": 483996
+    },
+    {
+     "map": 88085772,
+     "element": 484005
+    },
+    {
+     "map": 88085772,
+     "element": 484014
+    },
+    {
+     "map": 88085772,
+     "element": 483998
+    },
+    {
+     "map": 88085772,
+     "element": 484006
+    },
+    {
+     "map": 88085772,
+     "element": 484007
+    },
+    {
+     "map": 88086285,
+     "element": 484000
+    },
+    {
+     "map": 88086285,
+     "element": 483999
+    },
+    {
+     "map": 88085773,
+     "element": 484015
+    },
+    {
+     "map": 88085773,
+     "element": 484017
+    },
+    {
+     "map": 88085773,
+     "element": 484000
+    },
+    {
+     "map": 88085773,
+     "element": 484018
+    },
+    {
+     "map": 88085262,
+     "element": 484001
+    },
+    {
+     "map": 88085262,
+     "element": 484002
+    },
+    {
+     "map": 88085262,
+     "element": 484011
+    },
+    {
+     "map": 88085262,
+     "element": 484004
+    },
+    {
+     "map": 88084236,
+     "element": 483993
+    },
+    {
+     "map": 88084236,
+     "element": 483994
+    },
+    {
+     "map": 88086284,
+     "element": 484013
+    },
+    {
+     "map": 88086284,
+     "element": 484014
+    },
+    {
+     "map": 88086284,
+     "element": 484007
+    }
+   ],
+   "onlyGives": true,
+   "givesEach": true,
+   "gives": [
+    {
+     "item": 14960,
+     "count": 10
+    }
+   ],
+   "anyOrder": true,
+   "why": "«Tráeme champiñones leñosos que crecen en el claro de Brus Bulguro» (Bowis, 16763; Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Récoltez 10 champignons ligneux dans la clairière de Brouce Boulgoure»). The client's skill 247, «Recoger un champiñón», gathers the Champiñón leñoso (14960); its elements are the graphics 2550 and 2551 of the clearing's subarea (481), 28 of them, the ones on a map's edge in both maps that draw them. One mushroom from each while the quest is in hand, up to the ten Bowis asks for; the objective is done handing them to him. In any order with the dark shoemaker's fight: Bowis has a line for either coming first (16766, 16767)."
+  },
+  {
+   "objective": 8124,
+   "quest": 1464,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Vence a Zapatero oscuro»: he waits in the bandits' territory at [14,17] (map 88087302; Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Le cordonnier sombre se trouve en [14,17]. Parlez lui afin de pouvoir l'attaquer»), his reply «Atacar al zapatero.» (content/fights/npc_fights.json). He drops the Secretos de fabricación de las suelas de viento (14979, his own loot at 100 %). In any order with the mushrooms."
+  },
+  {
+   "objective": 8126,
+   "quest": 1464,
+   "kind": "enter",
+   "map": 205261570,
+   "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: near Dark Vlad's boots the compass turns to another trace (14981, map reference 187), Tierradala in Pandala [27,-28], map 205261570 (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Utilisez de nouveau la boussole, elle vous indique [27,-28]»); the objective is done on getting there. The catalogue gives it no map."
   }
  ]
 }

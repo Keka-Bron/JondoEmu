@@ -4489,6 +4489,14 @@
       "orientation": 3,
       "criterion": "Qa=1463",
       "why": "Hell Mina in the Elm Clearing for «Volver a ver a Dark Vlad, y seguir sin morirse», where Dark Vlad stood (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»: «Une fois dans la clairière du Dark Vlad, parlez à la iop présente sur la map, Hell Mina»). INFERRED cell: his."
+    },
+    {
+      "map": 88087302,
+      "npc": 2241,
+      "cell": 344,
+      "orientation": 3,
+      "criterion": "Qa=1464",
+      "why": "The Zapatero oscuro of «¿Quién patea el culo de los Culo Pateado?» in the bandits' territory at [14,17] (Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Le cordonnier sombre se trouve en [14,17]»). INFERRED cell: on the path, off the map's monster groups."
     }
   ]
 }
