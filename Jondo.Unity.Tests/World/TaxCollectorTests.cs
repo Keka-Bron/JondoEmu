@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -71,7 +72,7 @@ namespace Jondo.Unity.Tests.World
         /// name and its 154 its first: the client reads f2 as the last name and f5 as the first.
         /// </summary>
         [Fact]
-        public void The_map_actor_matches_the_capture()
+        public void The_map_actor_uses_its_captured_identity_position_and_alliance_look()
         {
             var tc = new TaxCollectorStore.TaxCollector
             {
@@ -84,11 +85,20 @@ namespace Jondo.Unity.Tests.World
                 LastNameId = 74,
             };
             Assert.Equal(-20006, tc.ContextId);
-            Assert.Equal(Hex("0a0508e00210011295010a7b32790a770a43120908681008288482d4051a09416c6c69616e636532222430303030" +
-                             "303030302d303030302d343030302d383030302d3030303030303030303030352a05424c4f4f44104a1a24303030" +
-                             "30303030302d303030302d343030302d383030302d303030303030303030303037208ec0f588fe06289a011a160a" +
-                             "088482d4458080803810031890392a01733202ef0c18dae3feffffffffffff01"),
-                         TaxCollectorProtocol.Actor(tc, Alliance2).Build());
+            var actor = Assert.Single(MapActorMessages.TaxCollectorShown(tc, Alliance2).Actors);
+            Assert.Equal(-20006, actor.ActorId);
+            Assert.Equal(new EntityDisposition(352, Direction.SouthEast, null, null), actor.Disposition);
+            var identity = Identity(actor);
+            Assert.Equal(74, identity.LastNameId);
+            Assert.Equal(154, identity.FirstNameId);
+            Assert.Equal(tc.Uuid, identity.Uid);
+            Assert.Equal(240000000014, identity.CallerId);
+            Assert.Equal("Alliance2", identity.Alliance!.Name);
+            Assert.Equal("BLOOD", identity.Alliance.Tag);
+            Assert.Equal(new SocialEmblem(104, 8, 0, 11862276), identity.Alliance.Emblem);
+            Assert.Equal(7312, actor.ActorInformation!.Look.Bones);
+            Assert.Equal(new[] { 115 }, actor.ActorInformation.Look.Scales);
+            Assert.Equal(new[] { 0x08b50104, 0x07000000 }, actor.ActorInformation.Look.Colors);
         }
 
         /// <summary>
@@ -101,18 +111,22 @@ namespace Jondo.Unity.Tests.World
         {
             var tc = new TaxCollectorStore.TaxCollector { Id = 1, Uuid = "u", FirstNameId = 78, LastNameId = 241 };
 
-            var block = Field(Field(Field(Field(TaxCollectorProtocol.Actor(tc, Alliance2).Build(), 2), 1), 6), 1);
-            Assert.Equal(241, Number(block, 2));
-            Assert.Equal(78, Number(block, 5));
+            var identity = Identity(MapActorMessages.TaxCollector(tc, Alliance2));
+            Assert.Equal(241, identity.LastNameId);
+            Assert.Equal(78, identity.FirstNameId);
 
             if (AllianceData.TaxCollectorFirstNames.Count == 0) return;   // no client data
-            Assert.Contains(AllianceData.TaxCollectorFirstNames, n => n.Id == Number(block, 5));
-            Assert.Contains(AllianceData.TaxCollectorNames, n => n.Id == Number(block, 2));
+            Assert.Contains(AllianceData.TaxCollectorFirstNames, n => n.Id == identity.FirstNameId);
+            Assert.Contains(AllianceData.TaxCollectorNames, n => n.Id == identity.LastNameId);
             Assert.DoesNotContain(AllianceData.TaxCollectorFirstNames, n => n.Id == 241);
         }
 
         private static byte[] Field(byte[] message, int number)
             => ProtoMessage.Parse(message).Fields.First(f => f.FieldNumber == number && f.WireType == 2).BytesValue;
+
+        private static TaxCollectorStaticInformation Identity(ActorPositionInformation actor)
+            => Assert.IsType<RolePlayActorCaseTaxCollectorActor>(Assert.IsType<ActorInformationCaseRolePlayActor>(
+                actor.ActorInformation!.ActorCase).Value.ActorCase).Value.Identification;
 
         private static long Number(byte[] message, int number)
             => ProtoMessage.Parse(message).Fields.First(f => f.FieldNumber == number && f.WireType == 0).VarIntValue;

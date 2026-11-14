@@ -121,16 +121,6 @@ namespace Jondo.Unity.Server.Managers
                     Handlers.CommandTexts.Get(SessionContext.State.Language, "gate.shut"))));
 
         /// <summary>
-        /// The gate as it stands, for whoever comes onto its map: its cells walkable in the jss's
-        /// f3 while it is open, and its elements' placements -- without them they are not drawn.
-        /// </summary>
-        public static void AddToMap(Pb jss, long mapId)
-        {
-            if (On(mapId) is not { } gate || !IsOpen(mapId)) return;
-            foreach (int cell in gate.Obstacles) jss.Msg(3, Obstacle(cell, Walkable));
-        }
-
-        /// <summary>
         /// A character has stopped on a cell: on the last free plate, with everybody on the plates
         /// meeting the gate's criterion, the gate opens.
         /// </summary>

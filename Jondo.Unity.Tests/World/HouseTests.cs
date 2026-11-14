@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -153,20 +154,6 @@ namespace Jondo.Unity.Tests.World
                          HouseProtocol.BuildChanged(House, new long[] { Door }, plaque));
         }
 
-        [Fact]
-        public void A_house_on_its_street_is_the_jss_f9()
-        {
-            // Pandala, frame 3867: house 519513, model 407, door 520644, HouseOwner's instance 4,
-            // shared with the guild "Guild-Sample" -- a block Jondo does not send, given here as captured.
-            byte[] guild = Hex("0a0c1a0a08e7011020288fd2bf0710982c1a0c4775696c642d53616d706c65200f");
-            var plaque = new HouseProtocol.Plaque
-            {
-                Instance = 4, OwnerName = "HouseOwner", OwnerTag = "0004", Locked = true, GuildBlock = guild,
-            };
-            Assert.Equal(Hex("10d9da1f2097033a460a03c4e31f123f1a210a0c1a0a08e7011020288fd2bf0710982c1a0c4775696c642d53616d706c65200f2001280142120a0a486f7573654f776e657212043030303448016004"),
-                         HouseProtocol.BuildOnMap(519513, 407, new long[] { 520644 }, new[] { plaque }).Build());
-        }
-
         /// <summary>
         /// A house nobody owns is declared on its street too, on sale at its model's price, with an
         /// empty owner block (f8) and neither f4 nor f9: a house its map never declared, the client
@@ -187,15 +174,6 @@ namespace Jondo.Unity.Tests.World
 
             // One that has an owner and is not on sale asks nothing.
             Assert.Equal(0, HouseHandler.PlaqueOf(new HouseStore.House { AccountId = 7 }, door).Price);
-        }
-
-        [Fact]
-        public void The_house_one_is_inside_is_the_jss_f7()
-        {
-            // "entrar en mi casa", frame 16: the street's -30,-53, the plaque, the house and its model.
-            byte[] guild = Hex("0a111a0f08ce0210221885e2ef072896d2820110be351a074775696c642d412004");
-            Assert.Equal(Hex("0a640a5b0a1608e2ffffffffffffffff0110cbffffffffffffffff0112411a210a111a0f08ce0210221885e2ef072896d2820110be351a074775696c642d4120042001280142140a0c4f776e65724163636f756e7412043030303148016016109cf31f20ba03"),
-                         HouseProtocol.BuildInterior(House, 442, -30, -53, CapturedPlaque(locked: true, guild: guild)).Build());
         }
 
         // ─── Codes ──────────────────────────────────────────────────────────────
@@ -621,14 +599,15 @@ namespace Jondo.Unity.Tests.World
             InteractiveRegistry.Initialize();
 
             var me = new DbCharacter { Id = 990_000_801, Name = "Visita", Level = 200, Breed = 1 };
-            var jss = ProtoMessage.Parse(ConnectionProtocol.BuildMapActors(interior, me, 429, 1, 990_000_801));
-            long ElementOf(ProtoMessage m, int field)
-                => m.Fields.FirstOrDefault(f => f.FieldNumber == field)?.VarIntValue ?? 0;
-
-            Assert.Contains(jss.Fields.Where(f => f.FieldNumber == 11),
-                            f => ElementOf(ProtoMessage.Parse(f.BytesValue), 5) == sun);
-            Assert.DoesNotContain(jss.Fields.Where(f => f.FieldNumber == 15),
-                                  f => ElementOf(ProtoMessage.Parse(f.BytesValue), 3) == sun);
+            var session = GameSession.SinSocket();
+            session.BindAccount(990_000_801, 1);
+            session.State.CharacterId = me.Id;
+            session.State.MapId = interior;
+            session.State.CellId = 429;
+            session.State.Orientation = 1;
+            var snapshot = MapInformationMessages.Live.Snapshot(session, me);
+            Assert.Contains(snapshot.InteractiveElements, element => element.ElementId == sun);
+            Assert.DoesNotContain(snapshot.StatedElements, element => element.ElementId == sun);
         }
 
         /// <summary>The small house of Sufokia, 17,29, has two suns: both lead out.</summary>
@@ -874,14 +853,15 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(accountB, HouseStore.Of(Street, DoorElement, 2).AccountId);
                 Assert.Equal(new[] { 1, 2, 3 }, HouseStore.CopiesOf(Street, DoorElement, door.Copies).Select(h => h.Instance));
 
-                // The street's jss carries one plaque per copy shown, each with its instance (f12).
-                var jss = Pb.New();
-                HouseHandler.AddToMap(jss, Street);
-                var house = ProtoMessage.Parse(jss.Build()).Fields.Single(f => f.FieldNumber == 9
-                    && ProtoMessage.Parse(f.BytesValue).Fields.Any(g => g.FieldNumber == 2 && g.VarIntValue == houseId));
-                var list = ProtoMessage.Parse(house.BytesValue).Fields.Single(f => f.FieldNumber == 7);
-                var plaques = ProtoMessage.Parse(list.BytesValue).Fields.Where(f => f.FieldNumber == 2).ToList();
-                Assert.Equal(new long[] { 1, 2, 3 }, plaques.Select(p => ProtoMessage.Parse(p.BytesValue).Fields.Single(f => f.FieldNumber == 12).VarIntValue));
+                // The typed street snapshot keeps independently owned copies and the next free one.
+                var house = Assert.Single(MapHouseMessages.OnMap(Street), h => h.HouseId == houseId);
+                var plaques = Assert.IsType<HouseInformationCaseHouseOnMap>(house.InformationCase).Value;
+                Assert.Equal(new[] { DoorElement }, plaques.DoorsOnMap);
+                Assert.Equal(new[] { 1, 2, 3 }, plaques.HousesInformation.Select(p => p.InstanceId));
+                Assert.Equal(new[] { true, true, false }, plaques.HousesInformation.Select(p => p.HasOwner));
+                Assert.Null(plaques.HousesInformation[0].Price);
+                Assert.Null(plaques.HousesInformation[1].Price);
+                Assert.Equal(2_500_000, plaques.HousesInformation[2].Price);
 
                 // Each goes into his own copy: same interior map, different houses.
                 using (SessionContext.Push(a.Session))

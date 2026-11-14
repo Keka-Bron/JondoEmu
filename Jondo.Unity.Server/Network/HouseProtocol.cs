@@ -100,30 +100,6 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// A house on its street (jss f9): { f2: house, f4: model, f7 { f1: packed doors, f2 (per
-        /// instance): plaque } }. Frame 13 of "desde dentro de casa salir a fuera" carries two.
-        /// </summary>
-        public static Pb BuildOnMap(int houseId, int model, IEnumerable<long> doors, IEnumerable<Plaque> instances)
-        {
-            var list = Pb.New().Packed(1, doors);
-            foreach (var plaque in instances) list.Msg(2, Build(plaque, false));
-            return Pb.New().Var(2, houseId).Var(4, model).Msg(7, list);
-        }
-
-        /// <summary>
-        /// The house one is inside (jss f7): { f1 { f1 { f1 { f1: x, f2: y }, f2: plaque }, f2:
-        /// house, f4: model } }. The coordinates are the street's: -30,-53 for Bonta's, "entrar en
-        /// mi casa" frame 16; -25,34 for a Brakmarian one, "Gremio/pocima hogar a gremio", frame 14.
-        /// </summary>
-        public static Pb BuildInterior(int houseId, int model, int worldX, int worldY, Plaque plaque)
-            => Pb.New().Msg(1, Pb.New()
-                .Msg(1, Pb.New()
-                    .Msg(1, Pb.New().VarIfNotZero(1, worldX).VarIfNotZero(2, worldY))
-                    .Msg(2, Build(plaque, false)))
-                .Var(2, houseId)
-                .Var(4, model));
-
-        /// <summary>
         /// A house changed (izz): { f1: plaque, f2: house, f3: packed doors }. Frames 14, 17 and 20
         /// of the sale, 21 and 24 of the withdrawal, 16 and 14 of the two code changes.
         /// </summary>

@@ -241,6 +241,7 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task GoInsideAsync(NetworkStream? stream, Houses.Door door, int instance, long wayBackMap, int wayBackCell)
         {
             long mapaQueDeja = SessionContext.State.MapId;
+            var previousMap = SessionContext.Current.Map;
             SessionContext.State.HouseEntryMapId = wayBackMap;
             SessionContext.State.HouseEntryCell = wayBackCell;
             SessionContext.State.HouseEntryElementId = door.ElementId;
@@ -252,7 +253,7 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.CellId = MapManager.GetNearestWalkableCell(door.InteriorMapId, destino);
             DatabaseManager.SaveCurrentCharacter();
 
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, mapaQueDeja);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap);
 
             await WriteAsync(stream, ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jqw, Pb.New().Var(1, door.InteriorMapId).Build()));
@@ -341,6 +342,7 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task GoOutAsync(NetworkStream? stream)
         {
             long here = SessionContext.State.MapId;
+            var previousMap = SessionContext.Current.Map;
 
             // First the way he came in; if it is not known, the way the data says.
             long salidaMapa = SessionContext.State.HouseEntryMapId;
@@ -364,7 +366,7 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.HouseEntryInstance = 0;
             DatabaseManager.SaveCurrentCharacter();
 
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, here);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap);
 
             await WriteAsync(stream, ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId));
             await WriteAsync(stream, ConnectionProtocol.BuildLoadMap(salidaMapa));
@@ -568,40 +570,6 @@ namespace Jondo.Unity.Server.Handlers
         public static (string Name, string Tag) AccountTagOf(long accountId)
             => (DatabaseManager.GetAccountById(accountId)?.Nickname ?? "Jondo",
                 GameServerProxy.BuildAccountTag(accountId));
-
-        /// <summary>
-        /// The houses of a map's jss: f7, the one the viewer is inside, and f9, those on this
-        /// street that can be owned. A house nobody owns is declared too, on sale at its model's
-        /// price: without it the client knows no house behind the door and drops the buyer's khr.
-        /// No plaque of a free house was ever captured, but the client takes this one: it shows the
-        /// house as abandoned and on sale at that price, and opens the buyer's window. A building of
-        /// many copies sends one plaque per copy the street is shown, as the capture's eleven.
-        /// </summary>
-        public static void AddToMap(Pb jss, long mapId)
-        {
-            if (Houses.IsInterior(mapId))
-            {
-                var (doorMap, doorElement, instance) = CurrentHouse();
-                if (doorMap != 0 && Houses.TryGetDoor(doorMap, doorElement, out var door) && door.IsOwnable)
-                {
-                    var house = HouseStore.Of(doorMap, doorElement, instance);
-                    var street = MapManager.GetMapInfo(doorMap);
-                    if (house.Owned)
-                    {
-                        jss.Msg(7, HouseProtocol.BuildInterior(Houses.HouseIdOf(doorMap, doorElement), door.Model,
-                            street?.PosX ?? 0, street?.PosY ?? 0, PlaqueOf(house, door)));
-                    }
-                }
-            }
-
-            foreach (var door in Houses.On(mapId))
-            {
-                if (!door.IsOwnable) continue;
-                var copies = HouseStore.CopiesOf(mapId, door.ElementId, door.Copies);
-                jss.Msg(9, HouseProtocol.BuildOnMap(Houses.HouseIdOf(mapId, door.ElementId), door.Model,
-                    new long[] { door.ElementId }, copies.Select(h => PlaqueOf(h, door))));
-            }
-        }
 
         /// <summary>
         /// izv { f1: instance, f2: house }: the plaque, answered with izr { f1: full plaque } on

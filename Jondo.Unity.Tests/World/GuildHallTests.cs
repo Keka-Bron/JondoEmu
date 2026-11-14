@@ -69,16 +69,13 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// The frames: jjv { f2 8 } once Amakna's was chosen; the room's f4 for the guild's own hall at
-        /// level 1, and for the leader of a guild without one.
+        /// The standalone hall-change and staging frames. Typed map hall branches
+        /// have independent fixtures in the Game protocol suite's GuildHallMappingTests.
         /// </summary>
         [Fact]
         public void The_hall_frames_are_the_captures()
         {
             Assert.Equal("1008", Hex(GuildProtocol.BuildHallChanged(8)));
-            Assert.Equal("0a070a050801120101", Hex(GuildProtocol.BuildHallVisit(true, 1, new[] { 1 }, false)));
-            Assert.Equal("1a020801", Hex(GuildProtocol.BuildHallVisit(false, 0, Array.Empty<int>(), true)));
-            Assert.Equal("1a00", Hex(GuildProtocol.BuildHallVisit(false, 0, Array.Empty<int>(), false)));
             Assert.Equal("08641064180a", Hex(GuildRaidStagings.BuildPlay(GuildHalls.NeutralStaging, GuildRaidStagings.AtEnd)));
         }
 

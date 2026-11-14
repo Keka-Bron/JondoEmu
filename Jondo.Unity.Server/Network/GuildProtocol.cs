@@ -116,19 +116,6 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The guild hall's look (jqf): { f1 the theme }.</summary>
         public static byte[] BuildHallTheme(int theme) => Pb.New().Var(1, theme).Build();
 
-        /// <summary>
-        /// A hall room's jss f4 (jry): the guild's own hall, f1 { f1 { f1 its look, f2 the looks it may
-        /// take } }, which fft's map frame raises as PlayerGuildHallEntered; or anybody else's, f3 { f1
-        /// whether he may choose it }. Measured: "0a070a050801120101" once Amakna's was chosen at
-        /// level 1, "1a020801" before, by the leader.
-        /// </summary>
-        public static byte[] BuildHallVisit(bool own, int theme, IEnumerable<int> themes, bool mayChoose)
-        {
-            if (own)
-                return Pb.New().Msg(1, Pb.New().Msg(1, Pb.New().Var(1, theme).Packed(2, themes.Select(t => (long)t)))).Build();
-            return Pb.New().Msg(3, Pb.New().VarIfNotZero(1, mayChoose ? 1 : 0)).Build();
-        }
-
         /// <summary>The logbook's bulletin (jjf): { f1 the notice } -- fft.behl, shown by GuildLogBook.</summary>
         public static byte[] BuildBulletin(GuildStore.Notice notice) => Pb.New().Msg(1, Notice(notice)).Build();
 
@@ -147,17 +134,17 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>
         /// The guild as seen from a map actor (jhe): the guild block, the position, the
-        /// member's experience and a constant f4 (1791 in all the «Jondo» captures, with no
-        /// reconstructed meaning). It is what the client draws on hovering over.
+        /// member's experience and guild skin id in f4. The historical map-actor policy
+        /// supplies skin 1791; silent membership sends retain their separate zero policy.
         /// </summary>
-        public const int ActorGuildTrailer = 1791;
+        public const int ActorGuildSkinId = 1791;
 
         public static byte[] BuildActorGuild(GuildStore.Guild guild, int rank, long memberExperience)
             => Pb.New()
                 .Msg(1, GuildBlock(guild))
                 .Var(2, rank)
                 .VarIfNotZero(3, memberExperience)
-                .Var(4, ActorGuildTrailer)
+                .Var(4, ActorGuildSkinId)
                 .Build();
 
         /// <summary>

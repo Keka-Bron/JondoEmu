@@ -8,6 +8,7 @@ using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Tests.Economy;
 using Xunit;
+using Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Tests.World
 {
@@ -39,12 +40,26 @@ namespace Jondo.Unity.Tests.World
                          ConnectionProtocol.BuildHavenBagThemes(new[] { 34, 51, 2, 4, 1, 21, 32, 3 }));
         }
 
-        /// <summary>Whose bag the map is (jss f8): room, theme, rooms and owner, as «Hero-Example»'s.</summary>
+        /// <summary>The live typed snapshot keeps the owner's identity and selected room zero.</summary>
         [Fact]
-        public void Whose_bag_has_the_capture_s_shape()
+        public void Whose_bag_uses_the_current_owner_theme_and_room()
         {
-            Assert.Equal(Hex("10201804" + "2a1a0a11120c4865726f2d4578616d706c6518e202" + "1081f092cbdd08"),
-                         ConnectionProtocol.HavenBagInfo(0, 32, 4, 300000000001, "Hero-Example", 354).Build());
+            if (!WorldLoaded()) return;
+            const long who = 9_963_000_711;
+            var session = GameSession.SinSocket();
+            session.BindAccount(who, 1);
+            session.State.CharacterId = who;
+            session.State.MapId = Merkasako.MapOfTheme(Merkasako.DefaultTheme);
+            HavenBagStore.SetCurrentRoom(who, 0);
+            var snapshot = MapInformationMessages.Live.Snapshot(session, new() { Id = who, Name = "Bag-Owner", Level = 354, Breed = 1 });
+            var bag = Assert.IsType<MapSpecificComplementaryInformationCaseHavenBagInformation>(snapshot.SpecificCase).Value;
+            Assert.Equal(Merkasako.DefaultTheme, bag.Theme);
+            Assert.Equal(0, bag.RoomId);
+            Assert.Equal(who, bag.OwnerInformation.Id);
+            var owner = Assert.IsType<CharacterComplementCaseCharacterBasicInformation>(bag.OwnerInformation.ComplementCase).Value;
+            Assert.Equal("Bag-Owner", owner.Name);
+            Assert.Equal(354, owner.Level);
+            Assert.IsType<CharacterBasicInformationComplementCaseNone>(owner.ComplementCase);
         }
 
         /// <summary>Every character has every theme and the four rooms; a room keeps the theme it is given.</summary>
@@ -100,11 +115,11 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(Merkasako.DefaultTheme, HavenBagStore.ThemeOfRoom(who, 1));
 
                 var me = new DbCharacter { Id = who, Name = "Dueno", Level = 200, Breed = 1 };
-                var jss = ProtoMessage.Parse(ConnectionProtocol.BuildMapActors(pipe.Session.State.MapId, me, 300, 1, who));
-                var bag = ProtoMessage.Parse(jss.Fields.Single(f => f.FieldNumber == 8).BytesValue);
-                var owner = ProtoMessage.Parse(bag.Fields.Single(f => f.FieldNumber == 5).BytesValue);
-                Assert.Equal(who, owner.Fields.Single(f => f.FieldNumber == 2).VarIntValue);
-                Assert.Equal(1, bag.Fields.Single(f => f.FieldNumber == 1).VarIntValue);
+                var snapshot = MapInformationMessages.Live.Snapshot(pipe.Session, me);
+                var bag = Assert.IsType<MapSpecificComplementaryInformationCaseHavenBagInformation>(snapshot.SpecificCase).Value;
+                Assert.Equal(who, bag.OwnerInformation.Id);
+                Assert.Equal(1, bag.RoomId);
+                Assert.Equal(Merkasako.DefaultTheme, bag.Theme);
             }
             HavenBagStore.SetCurrentRoom(who, 0);
         }

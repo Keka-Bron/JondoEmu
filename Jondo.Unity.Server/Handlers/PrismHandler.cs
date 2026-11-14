@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Content;
@@ -59,7 +60,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!IsPrism(item.Template)) return false;
 
-            var me = SessionContext.State;
+            var session = SessionContext.Current;
+            var me = session.State;
             var alliance = AllianceStore.AllianceOf(me.CharacterId);
             var map = MapManager.GetMapInfo(me.MapId);
             int refusal = WhyNotHere(alliance, me.CharacterId, map, item.Template, out bool rights);
@@ -97,9 +99,9 @@ namespace Jondo.Unity.Server.Handlers
             }
             await ItemUseHandler.SpendOneAsync(stream, item.Uid);
 
-            byte[] shown = ConnectionProtocol.Push(Op.Jsn, PrismProtocol.BuildShown(prism, alliance));
-            await SendAsync(stream, shown);
-            await SessionRegistry.BroadcastToMapAsync(prism.MapId, shown, SessionContext.Current.Id, fightId: 0);
+            var shown = MapActorMessages.PrismShown(prism, alliance);
+            await session.SendAsync(shown);
+            await SessionRegistry.BroadcastToMapAsync(prism.MapId, shown, session.Id, fightId: 0);
             await BroadcastChangedAsync(prism);
 
             Program.LogDebug($"[Prism] {me.CharacterName} places a prism of «{alliance.Name}» in subarea " +
@@ -166,16 +168,6 @@ namespace Jondo.Unity.Server.Handlers
                 if (alliance != null) prisms.Add(PrismProtocol.Information(prism, alliance, own: alliance.Id == mine));
             }
             await SendAsync(stream, ConnectionProtocol.Push(Op.Ife, PrismProtocol.BuildAll(prisms)));
-        }
-
-        /// <summary>The map's prism among its actors, unless it is being fought.</summary>
-        public static void AddToMap(Pb jss, long mapId)
-        {
-            var prism = PrismStore.OnMap(mapId);
-            if (prism == null || FightHandler.IsGroupFighting(prism.ContextId)) return;
-            var alliance = AllianceStore.ById(prism.AllianceId);
-            if (alliance == null) return;
-            jss.Msg(5, PrismProtocol.Actor(prism, alliance));
         }
 
         /// <summary>
@@ -465,15 +457,13 @@ namespace Jondo.Unity.Server.Handlers
                 PrismProtocol.BuildFightResult(attackersWon ? PrismProtocol.Weakened : PrismProtocol.NotDefeated,
                                                PrismProtocol.Information(prism, alliance, own: true))));
             if (!attackersWon)
-                await SessionRegistry.BroadcastToMapAsync(prism.MapId, ConnectionProtocol.Push(Op.Jsn,
-                    PrismProtocol.BuildShown(prism, alliance)), fightId: 0);
+                await SessionRegistry.BroadcastToMapAsync(prism.MapId, MapActorMessages.PrismShown(prism, alliance), fightId: 0);
         }
 
         /// <summary>A prism gone: off its map (kmu) and off the world's list (iew).</summary>
         internal static async Task GoneAsync(PrismStore.Prism prism)
         {
-            await SessionRegistry.BroadcastToMapAsync(prism.MapId, ConnectionProtocol.Push(Op.Kmu,
-                FightJoinProtocol.BuildActorHidden(prism.ContextId)), fightId: 0);
+            await SessionRegistry.BroadcastToMapAsync(prism.MapId, new ContextRemoveElementEvent(prism.ContextId), fightId: 0);
             await SessionRegistry.BroadcastAsync(ConnectionProtocol.Push(Op.Iew, PrismProtocol.BuildGone(prism.SubAreaId)));
         }
 

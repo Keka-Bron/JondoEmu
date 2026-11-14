@@ -313,7 +313,9 @@ other way round, and the group closes with `f5 = -1`.
 
 The player also carries, in the captures, `f3.f1 {…}`, `f3.f5 {f7:1}` (repeated, options) and
 `f3.f7`, which we do not send. They do not seem to prevent drawing, but they are unidentified.
-**NPCs are not sent yet**: `BuildMapActors` does not build them.
+**Historical state at this stage:** the original actor builder did not yet send NPCs.
+Current map snapshots construct NPCs and their quest markers through `MapActorMessages`;
+see [the current map-information service](game-protocol.md#map-information-service).
 
 #### `f6` is the subarea, and it is not decoration
 
@@ -723,8 +725,11 @@ it connected.
 `lqn` is not sent: its only field is a number we cannot explain (197 on entering the world, 24
 on changing map, 470 after resetting characteristics) and making it up is worse than not sending it.
 
-`MapChangeHandler` is still there with the previous version's opcodes (`jos`, `joh`, `joi`, `joo`),
-unused: this client never sends them. The new code is in `Handlers/WorldMoveHandler.cs`.
+The previous-version map/movement routes (`kkr`, `joi`, `jos`, `jpp`) and loading
+handshake (`loy`, `lpj`, `hmv`, `ibt`) have been retired, together with their handlers
+and transition payloads. Current routing is in `GameEntryService`, `MovementDispatch`
+and `Handlers/WorldMoveHandler.cs`; see
+[the retirement notes](game-protocol.md#retired-maptransition-routes).
 
 ### Dungeons
 

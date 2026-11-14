@@ -45,12 +45,18 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static byte[] PackedOf(long characterId)
         {
-            var session = SessionRegistry.FindByCharacter(characterId);
-            bool overloaded = session?.State != null && IsOverloaded(session.State);
-            if (session?.State != null) session.State.ToldOverloaded = overloaded;
+            bool overloaded = RememberActorOverload(characterId);
             var packed = new System.Collections.Generic.List<byte>();
             foreach (long value in RestrictionsOf(overloaded)) packed.Add((byte)value);   // each under 128
             return packed.ToArray();
+        }
+
+        internal static bool RememberActorOverload(long characterId)
+        {
+            var session = SessionRegistry.FindByCharacter(characterId);
+            bool overloaded = session?.State != null && IsOverloaded(session.State);
+            if (session?.State != null) session.State.ToldOverloaded = overloaded;
+            return overloaded;
         }
 
         /// <summary>After a pods refresh written on a stream: its session's restriction, if it changed.</summary>
@@ -76,8 +82,7 @@ namespace Jondo.Unity.Server.Handlers
             // And his actor block, with the same list: the kur alone set CannotRun but never took it
             // away, and he walked once lighter until the next map's block said otherwise.
             if (!walking && !session.State.IsInFight && DatabaseManager.GetCharacterById(session.CharacterId) is { } character)
-                await session.SendAsync(ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                    character, session.State.CellId, session.State.Orientation, session.AccountId)));
+                await MapPresenceService.Live.RefreshAsync(session, character, includeMap: false);
             Console.WriteLine($"[Pods] {session.CharacterId} {(overloaded ? "carries too much: cannot run" : "can run again")}.");
         }
 

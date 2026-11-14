@@ -481,7 +481,7 @@
       "kind": "request"
     },
     "jqj": {
-      "name": "UnknownJqj",
+      "name": "MapComplementaryGuildHallSelectionInformation",
       "fields": {},
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -592,8 +592,12 @@
       "kind": "event"
     },
     "jrn": {
-      "name": "UnknownJrn",
-      "fields": {},
+      "name": "MapComplementaryGuildHallCustomizationInformation",
+      "fields": {
+        "futh": "SkinId",
+        "futi": "Color7",
+        "futk": "Color8"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -635,11 +639,11 @@
               "member": "Value"
             },
             "fuur": {
-              "type": "MapComplementaryGuildInformationCaseUnknownFuur",
+              "type": "MapComplementaryGuildInformationCaseGuildHallCustomizationInformation",
               "member": "Value"
             },
             "fuus": {
-              "type": "MapComplementaryGuildInformationCaseUnknownFuus",
+              "type": "MapComplementaryGuildInformationCaseGuildHallSelectionInformation",
               "member": "Value"
             }
           }
@@ -4345,7 +4349,8 @@
               "type": "CharacterBasicInformationComplementCaseRank",
               "member": "Value"
             }
-          }
+          },
+          "noneType": "CharacterBasicInformationComplementCaseNone"
         }
       },
       "ignoredStableMembers": [],
@@ -6054,7 +6059,7 @@
         "ftik": "GuildInformation",
         "ftil": "RankId",
         "ftim": "GuildTokens",
-        "ftin": "UnknownUsedContextValue"
+        "ftin": "SkinId"
       },
       "oneofs": {},
       "ignoredStableMembers": [],

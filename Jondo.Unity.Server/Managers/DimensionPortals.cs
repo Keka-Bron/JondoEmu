@@ -42,9 +42,6 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The way they face, as the vendors near them do.</summary>
         public const int Facing = 1;
 
-        /// <summary>The map actor kind (lja) of a portal.</summary>
-        public const int ActorKind = 3;
-
         /// <summary>The portals' actor ids, one each, below everything else's.</summary>
         public const long ContextBase = -980000;
 

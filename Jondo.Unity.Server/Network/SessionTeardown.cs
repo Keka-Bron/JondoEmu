@@ -25,7 +25,7 @@ namespace Jondo.Unity.Server.Network
             {
                 try
                 {
-                    await SessionRegistry.RemoveFromMapAsync(session.MapId, session.CharacterId, session.Id);
+                    await MapPresenceService.Live.RemoveAsync(session.Map, session.CharacterId, session.Id);
                 }
                 catch { }
 

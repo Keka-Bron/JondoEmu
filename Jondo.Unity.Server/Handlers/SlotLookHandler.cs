@@ -32,10 +32,7 @@ namespace Jondo.Unity.Server.Handlers
             var character = DatabaseManager.GetCharacterById(me.CharacterId);
             if (character == null) return;
 
-            byte[] jsn = ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                character, me.CellId, me.Orientation, SessionContext.Current.AccountId));
-            await WriteAsync(stream, jsn);
-            await SessionRegistry.BroadcastToMapAsync(me.MapId, jsn, SessionContext.Current.Id);
+            await MapPresenceService.Live.RefreshAsync(SessionContext.Current, character);
         }
 
         /// <summary>A step about to be taken: what disappears on moving goes first.</summary>

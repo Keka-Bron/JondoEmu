@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Xunit;
@@ -106,7 +107,7 @@ namespace Jondo.Unity.Tests.World
             => Assert.Equal(grade, MobSpawnManager.RoomGrade(room, rooms));
 
         /// <summary>
-        /// The alternatives of the first room of the capture, byte for byte: the first four for
+        /// The alternatives of the first room of the capture: the first four for
         /// one player, then five to eight, each member with its id, level and grade and no look.
         /// </summary>
         [Fact]
@@ -115,18 +116,21 @@ namespace Jondo.Unity.Tests.World
             MobSpawnManager.EnsureMonsterData();
             var group = MobSpawnManager.ComposeOffMap(new[] { 149, 134, 101, 148, 148, 101, 134, 149 }.Select(m => (m, 0)))!;
 
-            var creatures = Pb.New();
-            ConnectionProtocol.AddAlternatives(creatures, group.Members);
-
-            Assert.Equal(
-                "1a250a07089501101620010a07088601101620010a060865101620010a070894011016200110011a2e0a0708950110" +
-                "1620010a07088601101620010a060865101620010a07089401101620010a070894011016200110051a360a070895" +
-                "01101620010a07088601101620010a060865101620010a07089401101620010a07089401101620010a0608651016" +
-                "200110061a3f0a07089501101620010a07088601101620010a060865101620010a07089401101620010a07089401" +
-                "101620010a060865101620010a070886011016200110071a480a07089501101620010a07088601101620010a0608" +
-                "65101620010a07089401101620010a07089401101620010a060865101620010a07088601101620010a0708950110" +
-                "1620011008",
-                Convert.ToHexString(creatures.Build()).ToLowerInvariant());
+            group.Modular = true;
+            var actor = MapActorMessages.MonsterGroup(group, false);
+            var roleplay = Assert.IsType<ActorInformationCaseRolePlayActor>(actor.ActorInformation!.ActorCase).Value;
+            var alternatives = Assert.IsType<RolePlayActorCaseMonsterGroupActor>(roleplay.ActorCase).Value.Identification.Alternatives;
+            Assert.Equal(new[] { 1, 5, 6, 7, 8 }, alternatives.Select(a => a.PlayerCount));
+            for (int i = 0; i < alternatives.Count; i++)
+            {
+                Assert.Equal(group.Members.Take(i + 4).Select(m => m.Monster.Id), alternatives[i].Monsters.Select(m => m.Gid));
+                Assert.All(alternatives[i].Monsters, member =>
+                {
+                    Assert.Equal(22, member.Level);
+                    Assert.Equal(1, member.Grade);
+                    Assert.Null(member.Look);
+                });
+            }
         }
     }
 }

@@ -133,8 +133,7 @@ namespace Jondo.Unity.Server.Handlers
             if (alliance == null) return;
             await PrismHandler.BroadcastChangedAsync(prism);
             if (!FightHandler.IsGroupFighting(prism.ContextId))
-                await SessionRegistry.BroadcastToMapAsync(prism.MapId, ConnectionProtocol.Push(Op.Jsn,
-                    PrismProtocol.BuildShown(prism, alliance)), fightId: 0);
+                await SessionRegistry.BroadcastToMapAsync(prism.MapId, MapActorMessages.PrismShown(prism, alliance), fightId: 0);
         }
 
         // ─── Weakened ───────────────────────────────────────────────────────────
@@ -430,10 +429,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 var character = DatabaseManager.GetCharacterById(id);
                 if (character == null) continue;
-                byte[] jsn = ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                    character, session.State.CellId, session.State.Orientation, session.AccountId));
-                await session.SendAsync(jsn);
-                await SessionRegistry.BroadcastToMapAsync(session.MapId, jsn, session.Id);
+                await MapPresenceService.Live.RefreshAsync(session, character);
             }
             if (war != null) await SendRolesAsync(war);
         }

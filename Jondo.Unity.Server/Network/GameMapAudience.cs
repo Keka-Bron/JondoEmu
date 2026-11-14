@@ -20,18 +20,22 @@ public sealed class GameMapAudience
     }
 
     public long MapId => _scope.MapId;
+    internal bool SameInstance(GameMapAudience other) => _scope == other._scope;
 
     public Task<int> SendAsync(GameEvent message, Guid? exceptSessionId = null, long? fightId = null)
     {
         ArgumentNullException.ThrowIfNull(message);
-        var targets = SessionRegistry.All()
-            .Where(s => _scope.Contains(s) && s.Id != exceptSessionId && SessionRegistry.Hears(s.State.FightId, fightId))
-            .ToArray();
+        var targets = Recipients(exceptSessionId, fightId);
         // All current sessions use the pinned Game profile. Encode once, then use
         // each recipient's existing transport; never acquire their gameplay locks.
         byte[] packet = _codec.Encode(new GameFrame(message));
         return SessionRegistry.SendToAsync(targets, packet);
     }
+
+    internal GameSession[] Recipients(Guid? exceptSessionId = null, long? fightId = null)
+        => SessionRegistry.All()
+            .Where(s => _scope.Contains(s) && s.Id != exceptSessionId && SessionRegistry.Hears(s.State.FightId, fightId))
+            .ToArray();
 }
 
 internal readonly record struct MapAudienceScope(

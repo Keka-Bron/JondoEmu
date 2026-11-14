@@ -1,6 +1,6 @@
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Network;
-using System.Linq;
+using Jondo.Unity.Tests.World;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Sessions
@@ -63,14 +63,8 @@ namespace Jondo.Unity.Tests.Sessions
                 Id = 7101, Name = "Omega", Level = level, Breed = 7,
             };
 
-            var root = ProtoMessage.Parse(ConnectionProtocol.BuildPlayerActorBlock(character, 341, 5, 60000001));
-            var details = ProtoMessage.Parse(root.Fields.Single(f => f.FieldNumber == 2).BytesValue);
-            var kind = ProtoMessage.Parse(details.Fields.Single(f => f.FieldNumber == 1).BytesValue);
-            var humanoid = ProtoMessage.Parse(kind.Fields.Single(f => f.FieldNumber == 5).BytesValue);
-            var body = ProtoMessage.Parse(humanoid.Fields.Single(f => f.FieldNumber == 3).BytesValue);
-            var identity = ProtoMessage.Parse(body.Fields.First(f => f.FieldNumber == 1).BytesValue);
-
-            Assert.Equal(shown, identity.Fields.Single(f => f.FieldNumber == 5).VarIntValue);
+            var actor = MapActorMessages.Player(character, 341, 5, 60000001);
+            Assert.Equal(shown, MapActorAssertions.Human(actor).AlignmentInformation!.CharacterLevel);
         }
     }
 }

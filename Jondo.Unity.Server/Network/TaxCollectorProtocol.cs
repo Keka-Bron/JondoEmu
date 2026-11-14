@@ -120,40 +120,7 @@ namespace Jondo.Unity.Server.Network
 
         // ─── On the map ─────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// The tax collector as an actor of its map (ljx): the kind 6 of the actor's f2.f1.
-        ///
-        ///   f1 { f1 cell, f2 direction }
-        ///   f2 { f1 { f6 { f1 { f1 the alliance, f2 last name, f3 uuid, f4 who placed it, f5 first name } } }
-        ///        f3 the look }
-        ///   f3 its actor id
-        ///
-        /// Byte for byte «Alliance2»'s tax collector of the party search capture.
-        /// </summary>
-        /// <remarks>
-        /// The last name goes first. gjc.bkiy, which writes this block back from the client's
-        /// entity, puts entity info 10 in f2 and 9 in f5, and the tooltip (fnl.bhcj) looks 10 up
-        /// among the TaxCollectorNames and 9 among the TaxCollectorFirstNames; the capture's
-        /// f5 is 154, the last first name there is. With the two the other way round the first
-        /// name was looked for among the 154 first names by a last name's id -- 241 of 253 --,
-        /// found nothing, and the tax collector had no tooltip and no menu.
-        /// </remarks>
-        public static Pb Actor(TaxCollectorStore.TaxCollector tc, AllianceStore.Alliance alliance)
-            => Pb.New()
-                .Msg(1, Pb.New().Var(1, tc.CellId).Var(2, tc.Direction))
-                .Msg(2, Pb.New()
-                    .Msg(1, Pb.New().Msg(6, Pb.New().Msg(1, Pb.New()
-                        .Msg(1, AllianceProtocol.Block(alliance))
-                        .Var(2, tc.LastNameId)
-                        .Str(3, tc.Uuid)
-                        .Var(4, tc.OwnerId)
-                        .Var(5, tc.FirstNameId))))
-                    .Msg(3, Look(alliance, MapBones)))
-                .Var(3, tc.ContextId);
-
-        /// <summary>The actor drawn again or for the first time (jsn): { f1 the actor }.</summary>
-        public static byte[] BuildShown(TaxCollectorStore.TaxCollector tc, AllianceStore.Alliance alliance)
-            => Pb.New().Msg(1, Actor(tc, alliance)).Build();
+        // Actor snapshots and standalone appearances use MapActorMessages.TaxCollector.
 
         /// <summary>
         /// Where something stands (lgl): f1 the map, f2 and f5 its world coordinates, f4 its subarea.

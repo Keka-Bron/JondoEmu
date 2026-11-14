@@ -121,14 +121,14 @@ public static class CharacterLookBuilder
     private static EntityLook? ReplacementFor(DbCharacter character, CharacterLookPurpose purpose)
     {
         if (purpose == CharacterLookPurpose.Map && Phantoms.Is(character.Id))
-            return ConnectionProtocol.SemanticMonsterLook(Phantoms.LookOf(character.Sex), false);
+            return MonsterMessages.Look(Phantoms.LookOf(character.Sex), false);
         if (purpose is not (CharacterLookPurpose.Normal or CharacterLookPurpose.Map)) return null;
         if (Mutations.OfCharacter(character.Id) is { } mutation)
-            return ConnectionProtocol.SemanticMonsterLook(mutation.Look, false);
+            return MonsterMessages.Look(mutation.Look, false);
         if (purpose == CharacterLookPurpose.Map)
         {
             string? disguise = SlotLooks.DisguiseLook(SlotLooks.Of(character.Id));
-            if (disguise != null) return ConnectionProtocol.SemanticMonsterLook(disguise, false);
+            if (disguise != null) return MonsterMessages.Look(disguise, false);
         }
         return null;
     }

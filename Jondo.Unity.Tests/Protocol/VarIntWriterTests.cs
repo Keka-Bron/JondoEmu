@@ -11,7 +11,7 @@ namespace Jondo.Unity.Tests.Protocol
     /// </summary>
     /// <remarks>
     /// There were five hand-written copies of this in the server project -- in NetworkEnvelope, Pb,
-    /// ProtoMessage, CaptureRewriter and MapLoadHandler -- in three spellings: a
+    /// ProtoMessage, CaptureRewriter and the retired map loader -- in three spellings: a
     /// <c>while (true)</c> with the break at the bottom, a <c>while (value >= 0x80)</c> with the
     /// last byte after the loop, and one that masked the final byte with 0x7F for no reason (a
     /// no-op there, since the loop only exits below 0x80). All five agreed. That is the point: five

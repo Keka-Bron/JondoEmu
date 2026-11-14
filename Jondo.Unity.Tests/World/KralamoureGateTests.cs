@@ -1,5 +1,6 @@
 using System.Linq;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Xunit;
 
 namespace Jondo.Unity.Tests.World
@@ -51,6 +52,18 @@ namespace Jondo.Unity.Tests.World
             if (!TeleportManager.TryGet(Lair, Gate, out var route)) return;   // no content
 
             Assert.Equal(FirstRoom, route.DestinationMapId);
+        }
+
+        [Fact]
+        public void The_typed_map_keeps_the_gate_placement_even_when_it_also_offers_a_passage()
+        {
+            Interactives.Initialize();
+            InteractiveRegistry.Initialize();
+            var gate = InteractiveRegistry.OnMap(Lair).Single(element => element.Element.Id == Gate);
+            Assert.Contains(gate.Actions, action => action.Kind == InteractiveActionKind.Teleport);
+            var snapshot = MapInteractiveMessages.Snapshot(Lair, 0);
+            Assert.Contains(snapshot.Elements, element => element.ElementId == Gate);
+            Assert.Equal(PlateGates.StateOf(Lair), Assert.Single(snapshot.States, state => state.ElementId == Gate).State);
         }
     }
 }

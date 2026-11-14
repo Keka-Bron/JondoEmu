@@ -16,11 +16,11 @@ internal static class GuildStateMessages
     /// <summary>
     /// Entry/identity updates use silent membership, not the joined popup. The old
     /// contribution captures carried 10 then 20 here; retain that persisted total.
-    /// The separately reviewed context value stays zero in these sends (the old
+    /// The guild skin id stays zero in these sends (the old
     /// builder omitted it); map-actor membership has its own construction policy.
     /// </summary>
     internal static GuildMembershipEvent Membership(GuildStore.Guild guild, int rankId, long contributed)
-        => new(Information(guild), rankId, checked((int)contributed), UnknownUsedContextValue: 0);
+        => new(Information(guild), rankId, checked((int)contributed), SkinId: 0);
 
     /// <summary>
     /// Captured level 1 headers used next floor 50; level 4 used 150/181/210.

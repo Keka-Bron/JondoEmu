@@ -189,10 +189,10 @@ same maps, since every hop goes through the resolution in 1.4.
   walk through walls.
 * The nearest-walkable-cell search measures distance as `(row, column)` Euclidean, not isometric.
   It is good enough to unstick an arrival, not to be exact.
-* `MapChangeHandler.cs` still holds a full map-change and movement path on `jos` / `joi` / `jpp`.
-  Those three opcodes appear **0 times** in the 250 captures: they belong to 3.6.4.3 and this client
-  never sends them. That file is dead weight — except that it is also the only place that starts a
-  fight (see 6).
+* The old `jos` / `joi` / `jpp` movement and `kkr` map-load routes have been retired,
+  together with their handlers and transition payloads. Current movement/map requests
+  use `MovementDispatch`, `WorldMoveHandler` and `GameEntryService`; see
+  [the current protocol architecture](game-protocol.md#retired-maptransition-routes).
 
 ---
 
@@ -683,9 +683,11 @@ capital is refused whole, not partially: the client works the cost out itself fi
 does not fit means the two sides disagree about the sheet, and taking half the points would make
 that worse.
 
-Carrying capacity is `1000 + 5 × strength`, confirmed by a capture where five points of strength
-moved both the pods characteristic and the `iun` capacity by exactly twenty-five. What is being
-carried always goes out as zero: nothing here weighs the inventory.
+Carrying capacity starts at 1000, plus five per character/job level after the first and five
+per strength point, including Omega levels and scrolled strength. A capture confirms that five
+points of strength move both the pods characteristic and the `iun` capacity by twenty-five.
+Typed allocation replies also include worn strength/pods bonuses. Carried weight is the sum
+of each live inventory item's real weight times its quantity, including worn items.
 
 Reset is free. The capture shows the same kamas before and after.
 
@@ -952,6 +954,11 @@ are all the previous version of the protocol.
 **13 November 2026 update:** this is the historical scan. The obsolete stat/weight/capital
 builders and `krc`/old `isi`/`kkn` routes have since been removed, and `StatsHandler`
 was replaced by the session-owned `CombatCharacteristics`. See [the audit](stats-handler-audit.md).
+
+**14 November 2026 update:** the map/transition handlers and builders named above
+are now deleted too. The remaining fight discussion below is historical, not a claim
+about current fight availability: current attack, aggression and scripted-encounter
+callers still use the shared fight-start implementation.
 
 And the two the fight code reads as client requests travel the other way in reality. Measured on
 `Combate/combate contra poutch nivel 50…pcapng`:

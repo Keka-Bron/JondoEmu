@@ -83,6 +83,47 @@ public sealed class GameMessagingTests
     }
 
     [Fact]
+    public async Task Typed_world_broadcast_uses_each_recipient_codec_and_preserves_map_fight_exclusion_and_failure_isolation()
+    {
+        const long map = 12_000_006;
+        var firstCodec = new RecordingCodec();
+        var secondCodec = new RecordingCodec();
+        using var first = new Recipient(map, firstCodec);
+        using var second = new Recipient(map, secondCodec);
+        using var excluded = new Recipient(map);
+        using var fighter = new Recipient(map);
+        using var inactive = new Recipient(map, enterWorld: false);
+        using var elsewhere = new Recipient(map + 1);
+        using var broken = new Recipient(map, send: _ => throw new IOException("broadcast failed"));
+        fighter.Session.State.FightId = 99;
+        var message = new GameRolePlayShowActorsEvent([]);
+        using (SessionContext.Push(elsewhere.Session))
+        using (await second.Session.EnterTurnAsync())
+        {
+            Assert.Equal(2, await SessionRegistry.BroadcastToMapAsync(map, message, excluded.Session.Id, fightId: 0)
+                .WaitAsync(TimeSpan.FromSeconds(5)));
+            Assert.Same(elsewhere.Session, SessionContext.Actual);
+        }
+        Assert.Same(message, Assert.Single(firstCodec.Frames).Content);
+        Assert.Same(message, Assert.Single(secondCodec.Frames).Content);
+        Assert.Null(firstCodec.Frames[0].Uid);
+        Assert.Single(first.Packets);
+        Assert.Single(second.Packets);
+        Assert.Empty(excluded.Packets);
+        Assert.Empty(fighter.Packets);
+        Assert.Empty(inactive.Packets);
+        Assert.Empty(elsewhere.Packets);
+        Assert.True(SessionRegistry.TryGet(broken.Session.Id, out _));
+    }
+
+    private sealed class RecordingCodec : IGameCodec
+    {
+        internal List<GameFrame> Frames = [];
+        public byte[] Encode(GameFrame frame) { Frames.Add(frame); return [0x71]; }
+        public GameFrame Decode(ReadOnlySpan<byte> payload) => throw new InvalidOperationException("Unexpected broadcast decode");
+    }
+
+    [Fact]
     public async Task Fanout_runs_concurrently_and_one_failure_does_not_remove_or_block_other_recipients()
     {
         const long map = 12_000_005;

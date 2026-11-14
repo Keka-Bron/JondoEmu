@@ -1,8 +1,10 @@
 using System;
-using Jondo.Unity.Server.Network;
+using System.Collections;
+using Google.Protobuf;
+using Jondo.Unity.Protocol.Game.Wire;
 using Xunit;
 
-namespace Jondo.Unity.Tests.Protocol
+namespace Jondo.Unity.Protocol.Game.Tests
 {
     /// <summary>
     /// The green exclamation over an NPC, against the bytes Ankama's server actually sent.
@@ -32,10 +34,20 @@ namespace Jondo.Unity.Tests.Protocol
     {
         private static string Marker(int[] offered, int[] doing)
         {
-            var identity = Pb.New();
-            ConnectionProtocol.AddQuestMarker(identity, offered, doing);
-            return Convert.ToHexString(identity.Build()).ToLowerInvariant();
+            var npc = new NpcStaticInformation("", offered.Length == 0 && doing.Length == 0 ? null : new(doing, offered),
+                Gender.Male, 0, 0, []);
+            var actor = new ActorPositionInformation(new(0, Direction.East, null, null),
+                new(new([], 0, 0, [], [], []), new ActorInformationCaseRolePlayActor(new(new RolePlayActorCaseNpcStaticInformation(npc)))), 0);
+            var codec = new GameCodec();
+            var envelope = codec.ReadEnvelope(codec.Encode(new(new GameRolePlayShowActorsEvent([actor]))));
+            var payload = codec.DecodeRawPayload("jsn", envelope.Content.Value.Span);
+            var actors = (IList)payload.Descriptor.FindFieldByNumber(1).Accessor.GetValue(payload);
+            var identity = Child(Child(Child((IMessage)actors[0]!, 2), 1), 7);
+            return Convert.ToHexString(identity.ToByteArray()).ToLowerInvariant();
         }
+
+        private static IMessage Child(IMessage message, int tag)
+            => (IMessage)message.Descriptor.FindFieldByNumber(tag).Accessor.GetValue(message);
 
         [Fact]
         public void One_quest_on_offer_is_the_six_bytes_that_were_missing()

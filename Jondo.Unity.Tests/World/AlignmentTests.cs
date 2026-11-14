@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Protocol;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -124,10 +125,10 @@ namespace Jondo.Unity.Tests.World
 
                 // And the others see it: the actor's block carries the status and the grade.
                 var character = new DbCharacter { Id = me, Name = "Alado", Level = 120, Breed = 1 };
-                var actor = ProtoMessage.Parse(ConnectionProtocol.BuildPlayerActorBlock(character, 300, 1, 1));
-                var block = Sub(Sub(Sub(Sub(Sub(actor, 2), 1), 5), 3), 1);
-                Assert.Equal(1, Sub(block, 3).Fields.First(f => f.FieldNumber == 2).VarIntValue);
-                Assert.Equal(1, block.Fields.First(f => f.FieldNumber == 4).VarIntValue);
+                var actor = MapActorMessages.Player(character, 300, 1, 1);
+                var block = MapActorAssertions.Human(actor).AlignmentInformation!;
+                Assert.Equal(AttackableStatus.PvpEnabledAttackable, block.ExtendedInformation!.Attackable);
+                Assert.Equal(1, block.AlignmentGrade);
 
                 // hnu {}: off again, the block as every player of the captures has it.
                 await AlignmentHandler.PvpAsync(pipe.ToClient, ConnectionProtocol.Push("hnu", Array.Empty<byte>()));
@@ -172,11 +173,9 @@ namespace Jondo.Unity.Tests.World
         {
             const long me = 9_400_300_003;
             Alignments.Set(me, Alignments.Brakmar, Now);
-                var character = new DbCharacter { Id = me, Name = "Negro", Level = 120, Breed = 1 };
-            var actor = ProtoMessage.Parse(ConnectionProtocol.BuildPlayerActorBlock(character, 300, 1, 1));
-            var body = Sub(Sub(Sub(Sub(actor, 2), 1), 5), 3);
-            var identity = Sub(body, 1);
-            Assert.Equal(Alignments.Brakmar, identity.Fields.First(f => f.FieldNumber == 2).VarIntValue);
+            var character = new DbCharacter { Id = me, Name = "Negro", Level = 120, Breed = 1 };
+            var actor = MapActorMessages.Player(character, 300, 1, 1);
+            Assert.Equal(Alignment.Evil, MapActorAssertions.Human(actor).AlignmentInformation!.Alignment);
         }
 
         private static ProtoMessage Sub(ProtoMessage message, int field)

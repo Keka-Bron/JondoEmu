@@ -6,7 +6,8 @@ using Jondo.Unity.Server.Managers;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// The alliance prisms' frames.
+    /// The alliance prisms' world-list, crystal and alliance-fight frames.
+    /// Map appearances use <see cref="MapActorMessages.Prism"/>.
     /// </summary>
     /// <remarks>
     /// Measured: the map actor of two prisms (a jss of «Chats/hablar por canal Comunidad», of
@@ -128,26 +129,6 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>The crystal's uid in its slot: none of the bag's, so it is the prism's own id from far below.</summary>
         public static long CrystalUid(PrismStore.Prism prism) => 2_000_000_000L + prism.Id;
-
-        /// <summary>
-        /// The prism as an actor of its map (ljx): the kind 2 of the actor's f2.f1.
-        ///
-        ///   f1 { f1 cell, f2 direction }    f2 { f1 { f2 its state }, f3 its look }    f3 its actor id
-        /// </summary>
-        public static Pb Actor(PrismStore.Prism prism, AllianceStore.Alliance alliance)
-            => Actor(prism, alliance, Look(alliance).Build());
-
-        /// <summary>The same with the look already made.</summary>
-        public static Pb Actor(PrismStore.Prism prism, AllianceStore.Alliance alliance, byte[] look)
-            => Pb.New()
-                .Msg(1, Pb.New().Var(1, prism.CellId).Var(2, prism.Direction))
-                .Msg(2, Pb.New()
-                    .Msg(1, Pb.New().Msg(2, State(prism, alliance)))
-                    .Bytes(3, look))
-                .Var(3, prism.ContextId);
-
-        public static byte[] BuildShown(PrismStore.Prism prism, AllianceStore.Alliance alliance)
-            => Pb.New().Msg(1, Actor(prism, alliance)).Build();
 
         /// <summary>
         /// A prism in the world's lists (lhm): f1 its map, f2 { f1 x, f2 y }, f3 its subarea, f4 its

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Network;
 
 namespace Jondo.Unity.Server.Managers
@@ -84,9 +83,7 @@ namespace Jondo.Unity.Server.Managers
                     {
                         var character = DatabaseManager.GetCharacterById(viewer.CharacterId);
                         if (character == null) continue;
-                        await viewer.SendAsync(ConnectionProtocol.Push(Op.Jss, ConnectionProtocol.BuildMapActors(
-                            mapId, character, viewer.State.CellId, viewer.State.Orientation, viewer.AccountId)));
-                        await viewer.SendAsync(ConnectionProtocol.BuildActorsComplete());
+                        await MapInformationService.Live.RefreshActorsAsync(viewer, character);
                         told++;
                     }
                 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -53,17 +54,14 @@ namespace Jondo.Unity.Tests.World
         public void The_messages_go_as_the_client_reads_them()
         {
             var portal = DimensionPortals.OfType(1)!;
-            byte[] look = ConnectionProtocol.BuildNpcLook(2720, Array.Empty<long>(), Array.Empty<long>(), Array.Empty<long>());
-            var actor = ProtoMessage.Parse(DimensionPortalProtocol.Actor(portal, 53, look).Build());
-            Assert.Equal(new[] { 1, 2, 3 }, actor.Fields.Select(f => f.FieldNumber));
-            Assert.Equal(DimensionPortals.ContextBase - 1, actor.Fields[2].VarIntValue);
-            Assert.Equal(new[] { (1, 297L), (2, (long)DimensionPortals.Facing) },
-                ProtoMessage.Parse(actor.Fields[0].BytesValue).Fields.Select(f => (f.FieldNumber, f.VarIntValue)));
-            var shape = ProtoMessage.Parse(actor.Fields[1].BytesValue);
-            Assert.Equal(look, shape.Fields.Single(f => f.FieldNumber == 3).BytesValue);
-            var kind = ProtoMessage.Parse(shape.Fields.Single(f => f.FieldNumber == 1).BytesValue).Fields.Single();
-            Assert.Equal(DimensionPortals.ActorKind, kind.FieldNumber);
-            Assert.Equal(new[] { (2, 1L), (3, 53L) }, ProtoMessage.Parse(kind.BytesValue).Fields.Select(f => (f.FieldNumber, f.VarIntValue)));
+            var actor = MapActorMessages.Portal(portal);
+            Assert.NotNull(actor);
+            Assert.Equal(DimensionPortals.ContextBase - 1, actor.ActorId);
+            Assert.Equal(297, actor.Disposition.CellId);
+            Assert.Equal(MapActorMessages.Facing(DimensionPortals.Facing), actor.Disposition.Direction);
+            Assert.Equal(2720, actor.ActorInformation!.Look.Bones);
+            var kind = Assert.IsType<ActorInformationCaseRolePlayActor>(actor.ActorInformation.ActorCase).Value;
+            Assert.Equal(1, Assert.IsType<RolePlayActorCasePortalActor>(kind.ActorCase).Value.PortalId);
 
             var ioc = ProtoMessage.Parse(DimensionPortalProtocol.BuildDialog(portal));
             Assert.Equal(new[] { (2, 1L), (4, DimensionPortals.VillageMap), (5, DimensionPortals.ContextBase - 1) },

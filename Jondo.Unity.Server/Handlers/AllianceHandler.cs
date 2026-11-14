@@ -1588,10 +1588,7 @@ namespace Jondo.Unity.Server.Handlers
             var character = DatabaseManager.GetCharacterById(characterId);
             if (session == null || character == null) return;
 
-            byte[] jsn = ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                character, session.State.CellId, session.State.Orientation, session.AccountId));
-            await WriteAsync(stream, jsn);
-            await SessionRegistry.BroadcastToMapAsync(session.MapId, jsn, session.Id);
+            await MapPresenceService.Live.RefreshAsync(session, character);
         }
     }
 }

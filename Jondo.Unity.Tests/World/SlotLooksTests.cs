@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Jondo.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -100,20 +101,15 @@ namespace Jondo.Unity.Tests.World
                 // The look: the camouflage's invisible bones (its f3).
                 Assert.Equal(761L, Varint(ProtoMessage.Parse(CharacterLookBuilder.MapLook(character)), 3));
 
-                // The actor: f2 { f1 { f5 humanoid { f3 body { f5 options } } } } with f6 the followers.
-                var actor = ProtoMessage.Parse(ConnectionProtocol.BuildPlayerActorBlock(character, 300, 1, 1));
-                var body = Sub(Sub(Sub(Sub(actor, 2), 1), 5), 3);
-                var followers = body.Fields.Where(f => f.FieldNumber == 5 && f.WireType == 2)
-                                           .Select(f => ProtoMessage.Parse(f.BytesValue))
-                                           .Select(option => option.Fields.FirstOrDefault(f => f.FieldNumber == 6))
-                                           .Single(f => f != null)!;
-                var walking = Sub(ProtoMessage.Parse(followers.BytesValue), 1);
-                Assert.Equal(1328L, Varint(Sub(walking, 1), 3));
+                var actor = MapActorMessages.Player(character, 300, 1, 1);
+                Assert.Equal(761, actor.ActorInformation!.Look.Bones);
+                var followers = Assert.Single(MapActorAssertions.Human(actor).Options
+                    .Select(option => option.OptionCase).OfType<HumanOptionCaseFollowers>()).Value;
+                var walking = Assert.Single(followers.FollowingCharactersLooks);
+                Assert.Equal(1328, walking.Look.Bones);
+                Assert.Equal(0, walking.Index);
             }
         }
-
-        private static ProtoMessage Sub(ProtoMessage message, int field)
-            => ProtoMessage.Parse(message.Fields.First(f => f.FieldNumber == field && f.WireType == 2).BytesValue);
 
         private static long Varint(ProtoMessage message, int field)
             => message.Fields.First(f => f.FieldNumber == field && f.WireType == 0).VarIntValue;

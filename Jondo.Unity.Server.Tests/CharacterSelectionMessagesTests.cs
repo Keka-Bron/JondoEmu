@@ -98,7 +98,7 @@ public sealed class CharacterSelectionMessagesTests
     [Fact]
     public void Mutation_look_keeps_monster_bones_skins_colors_and_scale()
     {
-        var look = ConnectionProtocol.SemanticMonsterLook("{2554|110|1=#112233|100}", false);
+        var look = MonsterMessages.Look("{2554|110|1=#112233|100}", false);
         Assert.Equal(2554, look.Bones);
         Assert.Equal(3, look.LookType);
         Assert.Equal(new[] { 110 }, look.Skins);

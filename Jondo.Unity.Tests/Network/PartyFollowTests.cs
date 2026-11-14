@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -126,9 +128,9 @@ namespace Jondo.Unity.Tests.Network
         // ─── Who hears what when somebody leaves a map ──────────────────────────
 
         [Fact]
-        public void A_party_mate_on_the_old_map_gets_the_way_out_and_then_the_kmu()
+        public async Task A_party_mate_on_the_old_map_gets_the_way_out_and_then_the_kmu()
         {
-            var notices = SessionRegistry.LeaveNotices(Leader, partyMate: true, porDonde: 6);
+            var notices = await DeparturePackets(partyMate: true, direction: 6);
             Assert.Equal(new[]
             {
                 "0a220a200a13747970652e616e6b616d612e636f6d2f6a736412091083a8e3aab8081806",
@@ -137,21 +139,33 @@ namespace Jondo.Unity.Tests.Network
         }
 
         [Fact]
-        public void A_jump_sends_no_way_out_even_to_the_party()
+        public async Task A_jump_sends_no_way_out_even_to_the_party()
         {
             // frames 245-246: the leader takes the zaap and the member gets the empty imk and the
             // kmu; the imk is the follow handler's, and from the map there is only the kmu.
-            var notices = SessionRegistry.LeaveNotices(Leader, partyMate: true, porDonde: null);
+            var notices = await DeparturePackets(partyMate: true, direction: null);
             Assert.Equal(new[] { "0a200a1e0a13747970652e616e6b616d612e636f6d2f6b6d7512071083a8e3aab808" },
                          notices.Select(Hex).ToArray());
         }
 
         [Fact]
-        public void Somebody_outside_the_party_only_sees_him_go()
+        public async Task Somebody_outside_the_party_only_sees_him_go()
         {
-            var notices = SessionRegistry.LeaveNotices(Leader, partyMate: false, porDonde: 4);
+            var notices = await DeparturePackets(partyMate: false, direction: 4);
             Assert.Single(notices);
-            Assert.Equal(Hex(ConnectionProtocol.BuildActorRemoved(Leader)), Hex(notices[0]));
+            Assert.Equal("0a200a1e0a13747970652e616e6b616d612e636f6d2f6b6d7512071083a8e3aab808", Hex(notices[0]));
+        }
+
+        private static async Task<IReadOnlyList<byte[]>> DeparturePackets(bool partyMate, int? direction)
+        {
+            // Give the real presence service a real party and the production codec;
+            // expected captured frames above stay independent of the implementation.
+            using var party = new Party(Leader, Member);
+            var packets = new List<byte[]>();
+            var target = new GameSession(new GameCodec(), packet => { packets.Add(packet); return Task.CompletedTask; });
+            target.State.CharacterId = partyMate ? Member : Member + 1;
+            Assert.Equal(1, await MapPresenceService.Live.RemoveAsync(new[] { target }, Leader, direction));
+            return packets;
         }
 
         // ─── Who follows whom ───────────────────────────────────────────────────

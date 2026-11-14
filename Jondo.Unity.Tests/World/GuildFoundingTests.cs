@@ -8,6 +8,7 @@ using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Microsoft.Data.Sqlite;
 using Xunit;
 
@@ -75,36 +76,17 @@ namespace Jondo.Unity.Tests.World
             var founder = new DbCharacter { Id = 7001, Name = "Hero-Example", Level = 200, Breed = 11 };
             var loner = new DbCharacter { Id = 7002, Name = "Solo", Level = 200, Breed = 11 };
 
-            var withGuild = GuildOption(ConnectionProtocol.BuildPlayerActorBlock(founder, 341, 5, 60000001));
+            var withGuild = GuildOption(MapActorMessages.Player(founder, 341, 5, 60000001));
             Assert.NotNull(withGuild);
-            Assert.Equal(guild.Id, Field(withGuild!, 2));
-            Assert.Equal("Jondo", System.Text.Encoding.UTF8.GetString(
-                withGuild!.Fields.Single(f => f.FieldNumber == 3 && f.WireType == 2).BytesValue));
-            Assert.Equal(1, Field(withGuild!, 4));
+            Assert.Equal(guild.Id, withGuild!.Id);
+            Assert.Equal("Jondo", withGuild.Name);
+            Assert.Equal(1, withGuild.Level);
 
-            Assert.Null(GuildOption(ConnectionProtocol.BuildPlayerActorBlock(loner, 341, 5, 60000001)));
+            Assert.Null(GuildOption(MapActorMessages.Player(loner, 341, 5, 60000001)));
         }
 
-        /// <summary>The f5 { f4 { ... } } of the actor's humanoid body, or null if it does not carry it.</summary>
-        private static ProtoMessage? GuildOption(byte[] actor)
-        {
-            var root = ProtoMessage.Parse(actor);
-            var details = ProtoMessage.Parse(root.Fields.Single(f => f.FieldNumber == 2).BytesValue);
-            var kind = ProtoMessage.Parse(details.Fields.Single(f => f.FieldNumber == 1).BytesValue);
-            var humanoid = ProtoMessage.Parse(kind.Fields.Single(f => f.FieldNumber == 5).BytesValue);
-            var body = ProtoMessage.Parse(humanoid.Fields.Single(f => f.FieldNumber == 3).BytesValue);
-
-            foreach (var option in body.Fields.Where(f => f.FieldNumber == 5 && f.WireType == 2))
-            {
-                var inner = ProtoMessage.Parse(option.BytesValue);
-                var guild = inner.Fields.FirstOrDefault(f => f.FieldNumber == 4 && f.WireType == 2);
-                if (guild != null) return ProtoMessage.Parse(guild.BytesValue);
-            }
-
-            return null;
-        }
-
-        private static long Field(ProtoMessage message, int number)
-            => message.Fields.Single(f => f.FieldNumber == number && f.WireType == 0).VarIntValue;
+        private static GuildInformation? GuildOption(ActorPositionInformation actor)
+            => MapActorAssertions.Human(actor).Options.Select(option => option.OptionCase)
+                .OfType<HumanOptionCaseGuildInformation>().SingleOrDefault()?.Value;
     }
 }

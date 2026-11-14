@@ -27,6 +27,11 @@ finished.
 
 ## 1. What prevented it when the plan was written, in dependency order
 
+**14 November 2026:** references below to `MapLoadHandler` and its `jpv` describe
+the historical implementation. The old map/transition routes and writers are now
+retired; current map contents and presence use typed snapshots and audiences. See
+[the current architecture](game-protocol.md#retired-maptransition-routes).
+
 The order mattered: each blocker hid the next one. Several entries of this list are already
 solved; see `sessions.md` for the current state.
 
@@ -152,9 +157,10 @@ This has to be fixed before touching the monsters or nothing will match between 
   another, summons in another.
 * The mobs keep their id in the `MobGroup`, they do not compute it in `MapLoadHandler`.
 
-What there was, and what turned out to be broken **already with one player**: the client asks for both
-actor messages when loading a map —the `jss` with the `jrh` and the `jpv` with the `kkr`— and both handed out
-different numbers for the same creature. On the Amakna NPCs map, measured: the `jss` gave
+What there was, and what turned out to be inconsistent **already with one player**:
+the server maintained two actor writers, `jss` and the now-retired `jpv`, and they
+handed out different numbers for the same creature. This was not evidence that the
+supported client needed both protocols. On the Amakna NPCs map, measured: the `jss` gave
 the two monster groups −1011567 and −1011566, which are their `MobId`, and the `jpv` gave them
 −20052 and −20053, because it numbered them by their position behind the 52 NPCs. The client sends back
 the last one it got, so attacking fell into a `mobs.FirstOrDefault()` in

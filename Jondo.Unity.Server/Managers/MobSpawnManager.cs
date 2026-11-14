@@ -917,7 +917,7 @@ namespace Jondo.Unity.Server.Managers
         /// lock: the jpv of a map load, the jss of an entry, the group lookup on
         /// attacking. Meanwhile, another player winning his fight on that same map did a
         /// RemoveAll and an Add on that same list, and the first one's foreach died with a
-        /// «Collection was modified» that MapLoadHandler's try/catch swallows without a word:
+        /// «Collection was modified» that the retired map loader's try/catch swallowed without a word:
         /// the jpv did not go out, and the player entered an empty map —without his character, without NPCs and without
         /// monsters— with no error anywhere.
         ///
@@ -2042,4 +2042,3 @@ namespace Jondo.Unity.Server.Managers
         }
     }
 }
-

@@ -1,4 +1,5 @@
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
@@ -84,14 +85,12 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(group.Members, MobSpawnManager.MembersFor(group, players));
 
             // One alternative, the five, from one player on.
-            var shown = Pb.New();
-            ConnectionProtocol.AddAlternatives(shown, group.Members, group.Leaders);
-            var five = Pb.New();
-            foreach (var member in group.Members)
-                five.Msg(1, Pb.New().Var(1, member.Monster.Id)
-                    .VarIfNotZero(2, ConnectionProtocol.LevelOf(member)).VarIfNotZero(4, ConnectionProtocol.GradeOf(member)));
-            five.Var(2, 1);
-            Assert.Equal(Pb.New().Msg(3, five).Build(), shown.Build());
+            var actor = MapActorMessages.MonsterGroup(group, false);
+            var roleplay = Assert.IsType<ActorInformationCaseRolePlayActor>(actor.ActorInformation!.ActorCase).Value;
+            var monsters = Assert.IsType<RolePlayActorCaseMonsterGroupActor>(roleplay.ActorCase).Value;
+            var alternative = Assert.Single(monsters.Identification.Alternatives);
+            Assert.Equal(1, alternative.PlayerCount);
+            Assert.Equal(group.Members.Select(member => member.Monster.Id), alternative.Monsters.Select(member => member.Gid));
         }
 
         [Fact]

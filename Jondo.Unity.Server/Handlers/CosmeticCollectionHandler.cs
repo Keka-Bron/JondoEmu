@@ -175,7 +175,7 @@ namespace Jondo.Unity.Server.Handlers
             await WriteAsync(stream, Op.Lym, ConnectionProtocol.BuildAura(Wardrobe.AuraOf(state.CharacterId)));
             await WriteAsync(stream, Op.Hie, Pb.New().Var(1, 2).Build());
             await WriteAsync(stream, Op.Hii, Pb.New().Var(1, 2).Build());
-            await WriteAsync(stream, Op.Jsn, ConnectionProtocol.BuildActorRefreshed(character, state.CellId, state.Orientation, accountId));
+            await MapPresenceService.Live.RefreshAsync(SessionContext.Current, character, includeMap: false);
             await WriteAsync(stream, Op.Lxc, ConnectionProtocol.BuildLookChanged(character));
         }
 

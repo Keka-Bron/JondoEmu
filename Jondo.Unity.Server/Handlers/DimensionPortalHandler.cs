@@ -18,29 +18,6 @@ namespace Jondo.Unity.Server.Handlers
     /// </remarks>
     public static class DimensionPortalHandler
     {
-        /// <summary>The portal's NPC look and the dimension's area, as the actor carries them.</summary>
-        private static (int Area, byte[] Look)? Drawing(DimensionPortals.Portal portal)
-        {
-            var template = Npcs.EnsureTemplate(portal.Dimension.PortalNpc);
-            if (template == null) return null;
-            var variant = Npcs.Variantes(template.Look).FirstOrDefault();
-            byte[] look = variant == null
-                ? ConnectionProtocol.BuildNpcLook(0, Array.Empty<long>(), Array.Empty<long>(), Array.Empty<long>())
-                : ConnectionProtocol.BuildNpcLook(variant.Bones, variant.Skins, variant.Colors, variant.Scales);
-            int area = Interactives.AreaOfSubArea(MapManager.GetMapInfo(portal.Dimension.EntryMap)?.SubAreaId ?? 0);
-            return (Math.Max(0, area), look);
-        }
-
-        /// <summary>The map's portals among its actors.</summary>
-        public static void AddToMap(Pb jss, long mapId)
-        {
-            foreach (var portal in DimensionPortals.OnMap(mapId))
-            {
-                if (Drawing(portal) is not { } drawing) continue;
-                jss.Msg(5, DimensionPortalProtocol.Actor(portal, drawing.Area, drawing.Look));
-            }
-        }
-
         /// <summary>
         /// Talking to a portal (iov 3 on its actor): the dialogue as its NPC (ioc with the portal's
         /// type) and its sentence (ios). False when the actor is no portal.

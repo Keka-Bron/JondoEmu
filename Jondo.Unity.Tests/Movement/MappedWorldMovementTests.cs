@@ -168,6 +168,26 @@ public sealed class MappedWorldMovementTests
         Assert.Equal(new long[] { OverloadRestriction.CannotAttackAsMutant }, OverloadRestriction.RestrictionsOf(false));
         Assert.Equal(new long[] { OverloadRestriction.CannotRun, OverloadRestriction.CannotAttackAsMutant }, OverloadRestriction.RestrictionsOf(true));
         Assert.Equal(new byte[] { 0x0b }, OverloadRestriction.PackedOf(-424242));   // nobody's session: the plain list
+
+        LoadWorld();
+        using var mover = new Peer(MapId);
+        int weight = DatabaseManager.GetItemRealWeight(8815);
+        Assert.True(weight > 0);
+        mover.Session.State.EquipmentItems[1] = new Equipment.Item
+        {
+            Uid = 1, Template = 8815,
+            Quantity = checked((int)(ConnectionProtocol.Capacity(mover.Session.State) / weight + 1)),
+        };
+        HumanoidInformation Human() => Assert.IsType<NamedActorCaseHumanoidInformation>(
+            Assert.IsType<RolePlayActorCaseNamedActor>(Assert.IsType<ActorInformationCaseRolePlayActor>(
+                MapActorMessages.Player(new() { Id = mover.Session.CharacterId, Name = "Walker" }, 100, 0, 1,
+                    new([], 3, 1, [], [], []), null, null, []).ActorInformation!.ActorCase).Value.ActorCase).Value.ActorCase).Value;
+
+        Assert.Equal(new[] { Restriction.CannotRun, Restriction.CannotAttackAsMutant }, Human().Restrictions);
+        Assert.True(mover.Session.State.ToldOverloaded);
+        mover.Session.State.EquipmentItems.Clear();
+        Assert.Equal(new[] { Restriction.CannotAttackAsMutant }, Human().Restrictions);
+        Assert.False(mover.Session.State.ToldOverloaded);
     }
 
     /// <summary>

@@ -105,7 +105,7 @@ namespace Jondo.Unity.Server
                     if (fichero.Contains(sep + "obj" + sep) || fichero.Contains(sep + "bin" + sep)) continue;
 
                     string nombre = Path.GetFileName(fichero);
-                    if (nombre == "BasePayloads.cs" || nombre == "TransitionPayloads.cs" ||
+                    if (nombre == "BasePayloads.cs" ||
                         nombre == "RegressionGuardTests.cs" || nombre == "SecurityGuardTests.cs")
                         continue;
 

@@ -10,6 +10,7 @@ using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Microsoft.Data.Sqlite;
 using Xunit;
 
@@ -272,10 +273,17 @@ namespace Jondo.Unity.Tests.World
             var member = new DbCharacter { Id = 8401, Name = "Member-Three", Level = 200, Breed = 2 };
             var loner = new DbCharacter { Id = 8402, Name = "Solo", Level = 200, Breed = 2 };
 
-            var option = AllianceOption(ConnectionProtocol.BuildPlayerActorBlock(member, 341, 5, 60000001));
+            var option = AllianceOption(MapActorMessages.Player(member, 341, 5, 60000001));
             Assert.NotNull(option);
-            Assert.Equal(AllianceProtocol.Block(alliance).Build(), option);
-            Assert.Null(AllianceOption(ConnectionProtocol.BuildPlayerActorBlock(loner, 341, 5, 60000001)));
+            var identity = option!.AllianceInformation;
+            Assert.Equal("Jondo Unidos", identity.Name);
+            Assert.Equal("JON", identity.Tag);
+            Assert.Equal(alliance.Uuid, identity.Uid);
+            // The typed map policy uses reviewed emblem meanings and omits the
+            // indeterminate legacy tag 4, rather than reproducing that raw block.
+            Assert.Equal(new SocialEmblem(408, 27, 3116544, 15859463), identity.Emblem);
+            Assert.Null(identity.CardInformation);
+            Assert.Null(AllianceOption(MapActorMessages.Player(loner, 341, 5, 60000001)));
         }
 
         /// <summary>
@@ -477,51 +485,18 @@ namespace Jondo.Unity.Tests.World
             AllianceStore.SetTakesPartInAva(8413, true);
             Assert.Equal(AllianceProtocol.AvaNotAggressable, AllianceProtocol.AggressableStatus(8413));
             Assert.Equal(Hex("2804"), AllianceProtocol.BuildAggressableStatus(AllianceProtocol.AggressableStatus(8413)));
-            Assert.Equal(AllianceProtocol.AvaNotAggressable, AllianceStatusOption(ConnectionProtocol.BuildPlayerActorBlock(member, 341, 5, 60000001)));
+            Assert.Equal(AttackableStatus.AvaEnabledNonAttackable,
+                AllianceOption(MapActorMessages.Player(member, 341, 5, 60000001))!.AttackableStatus);
 
             AllianceStore.SetTakesPartInAva(8413, false);
             Assert.Equal(AllianceProtocol.NotAggressable, AllianceProtocol.AggressableStatus(8413));
             Assert.Empty(AllianceProtocol.BuildAggressableStatus(AllianceProtocol.AggressableStatus(8413)));
-            Assert.Equal(0, AllianceStatusOption(ConnectionProtocol.BuildPlayerActorBlock(member, 341, 5, 60000001)));
+            Assert.Equal(AttackableStatus.NonAttackable,
+                AllianceOption(MapActorMessages.Player(member, 341, 5, 60000001))!.AttackableStatus);
         }
 
-        /// <summary>The f1 of the actor's alliance option, f5 { f5 { f1 ... } }, or 0.</summary>
-        private static long AllianceStatusOption(byte[] actor)
-        {
-            var root = ProtoMessage.Parse(actor);
-            var details = ProtoMessage.Parse(root.Fields.Single(f => f.FieldNumber == 2).BytesValue);
-            var kind = ProtoMessage.Parse(details.Fields.Single(f => f.FieldNumber == 1).BytesValue);
-            var humanoid = ProtoMessage.Parse(kind.Fields.Single(f => f.FieldNumber == 5).BytesValue);
-            var body = ProtoMessage.Parse(humanoid.Fields.Single(f => f.FieldNumber == 3).BytesValue);
-
-            foreach (var option in body.Fields.Where(f => f.FieldNumber == 5 && f.WireType == 2))
-            {
-                var alliance = ProtoMessage.Parse(option.BytesValue).Fields.FirstOrDefault(f => f.FieldNumber == 5 && f.WireType == 2);
-                if (alliance == null) continue;
-                var status = ProtoMessage.Parse(alliance.BytesValue).Fields.FirstOrDefault(f => f.FieldNumber == 1);
-                return status == null ? 0 : status.VarIntValue;
-            }
-            return -1;
-        }
-
-        /// <summary>The f5 { f5 { f2 ... } } of the actor's humanoid body, or null.</summary>
-        private static byte[]? AllianceOption(byte[] actor)
-        {
-            var root = ProtoMessage.Parse(actor);
-            var details = ProtoMessage.Parse(root.Fields.Single(f => f.FieldNumber == 2).BytesValue);
-            var kind = ProtoMessage.Parse(details.Fields.Single(f => f.FieldNumber == 1).BytesValue);
-            var humanoid = ProtoMessage.Parse(kind.Fields.Single(f => f.FieldNumber == 5).BytesValue);
-            var body = ProtoMessage.Parse(humanoid.Fields.Single(f => f.FieldNumber == 3).BytesValue);
-
-            foreach (var option in body.Fields.Where(f => f.FieldNumber == 5 && f.WireType == 2))
-            {
-                var inner = ProtoMessage.Parse(option.BytesValue);
-                var alliance = inner.Fields.FirstOrDefault(f => f.FieldNumber == 5 && f.WireType == 2);
-                if (alliance == null) continue;
-                var block = ProtoMessage.Parse(alliance.BytesValue).Fields.FirstOrDefault(f => f.FieldNumber == 2);
-                if (block != null) return block.BytesValue;
-            }
-            return null;
-        }
+        private static HumanAllianceOption? AllianceOption(ActorPositionInformation actor)
+            => MapActorAssertions.Human(actor).Options.Select(option => option.OptionCase)
+                .OfType<HumanOptionCaseAllianceInformation>().SingleOrDefault()?.Value;
     }
 }

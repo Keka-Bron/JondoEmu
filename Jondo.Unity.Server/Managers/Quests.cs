@@ -523,11 +523,7 @@ namespace Jondo.Unity.Server.Managers
                 var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
                 if (ficha != null)
                 {
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Jss, ConnectionProtocol.BuildMapActors(
-                            mapId, ficha, SessionContext.State.CellId, SessionContext.State.Orientation,
-                            SessionContext.Current.AccountId)));
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorsComplete());
+                    await MapInformationService.Live.RefreshActorsAsync(SessionContext.Current, ficha);
                 }
                 Console.WriteLine($"[Quests] Element {elementId} of map {mapId} used for the scene.");
                 return true;
@@ -961,7 +957,7 @@ namespace Jondo.Unity.Server.Managers
                 await SpawnAsync(stream, binding);
 
             if (binding.ShowsNpc != 0)
-                await Handlers.NpcHandler.ComesInAsync(stream, binding.ShowsNpc);
+                await Handlers.NpcHandler.ComesInAsync(SessionContext.Current, binding.ShowsNpc);
 
             if (binding.ThenStarts != 0 && log.Run(binding.ThenStarts) == null)
                 await StartAsync(stream, binding.ThenStarts);
@@ -995,12 +991,7 @@ namespace Jondo.Unity.Server.Managers
             var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
             if (ficha == null) return;
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Jss, ConnectionProtocol.BuildMapActors(
-                    mapId, ficha, SessionContext.State.CellId, SessionContext.State.Orientation,
-                    SessionContext.Current.AccountId)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildActorsComplete());
+            await MapInformationService.Live.RefreshActorsAsync(SessionContext.Current, ficha);
 
             Console.WriteLine($"[Quests] Monster {binding.SpawnsMonster} comes out " +
                               $"(x{binding.SpawnsCount}) on cell {grupo.CellId}.");
@@ -1286,7 +1277,7 @@ namespace Jondo.Unity.Server.Managers
                 // Whoever the use brings out: the spirit the holy water calls up.
                 var used = Bindings.Of(objectiveId);
                 if (used != null && used.Kind == QuestBindingKind.Use && used.ShowsNpc != 0)
-                    await Handlers.NpcHandler.ComesInAsync(stream, used.ShowsNpc);
+                    await Handlers.NpcHandler.ComesInAsync(SessionContext.Current, used.ShowsNpc);
                 return true;
             }
             return false;
@@ -1771,7 +1762,7 @@ namespace Jondo.Unity.Server.Managers
         /// the character stands on.
         /// </summary>
         /// <remarks>
-        /// A quest's elements go out with the map, on arrival (ConnectionProtocol.AddQuestElements),
+        /// A quest's elements go out with the map, on arrival (MapInteractiveMessages),
         /// and only to whoever should see them then. Taking «A la leche caliente, batir de repente»
         /// from Apísafe is done beside the golden milk bucket it asks for, and the bucket stayed
         /// unclickable until the character left the refuge and came back. The same for an element
@@ -1792,11 +1783,7 @@ namespace Jondo.Unity.Server.Managers
 
             var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
             if (ficha == null) return;
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Jss, ConnectionProtocol.BuildMapActors(
-                    mapId, ficha, SessionContext.State.CellId, SessionContext.State.Orientation,
-                    SessionContext.Current.AccountId)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorsComplete());
+            await MapInformationService.Live.RefreshActorsAsync(SessionContext.Current, ficha);
             Console.WriteLine($"[Quests] Elements of map {mapId} sent again for quest {questId}.");
         }
 
@@ -1885,7 +1872,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         /// <remarks>
         /// Two callers and they must never disagree: the green mark travels in the NPC's own actor
-        /// record inside the jss -- see <c>ConnectionProtocol.AddNpcs</c>, which is what actually
+        /// record inside the jss -- see <c>MapActorMessages.Npc</c>, which is what actually
         /// draws it -- and the iom carries the same list again as a sub-area index. Two copies of
         /// this filter would be two chances to drift.
         /// </remarks>

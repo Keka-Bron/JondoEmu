@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Network
 {
@@ -259,29 +260,39 @@ namespace Jondo.Unity.Server.Network
         /// said in. Left out, nothing is filtered, which is right for anything the whole map should
         /// hear and wrong for anything said by a person.
         /// </remarks>
-        public static async Task<int> BroadcastToMapAsync(long mapId, byte[] packet,
+        public static Task<int> BroadcastToMapAsync(long mapId, byte[] packet,
                                                            Guid? exceptSessionId = null,
                                                            long? fightId = null,
                                                            long speakerAccountId = 0)
-        {
+            => SendToAsync(MapRecipients(mapId, exceptSessionId, fightId, speakerAccountId), packet);
+
+        /// <summary>Delivers a semantic event through each map recipient's own codec.</summary>
+        public static Task<int> BroadcastToMapAsync(long mapId, GameEvent message,
+                                                     Guid? exceptSessionId = null,
+                                                     long? fightId = null,
+                                                     long speakerAccountId = 0)
+            => SendToAsync(MapRecipients(mapId, exceptSessionId, fightId, speakerAccountId),
+                target => target.SendAsync(message));
+
+        private static GameSession[] MapRecipients(long mapId, Guid? exceptSessionId, long? fightId, long speakerAccountId)
             // Whoever blocked or ignores the speaker does not hear him.
-            var targets = OnMap(mapId)
+            => OnMap(mapId)
                 .Where(s => !exceptSessionId.HasValue || s.Id != exceptSessionId.Value)
                 .Where(s => Hears(s.State.FightId, fightId))
                 .Where(s => speakerAccountId == 0 || !Managers.Contacts.Shuts(s.AccountId, speakerAccountId))
                 .ToArray();
 
-            return await SendToAsync(targets, packet);
-        }
-
         /// <summary>Fans out already encoded bytes without acquiring recipients' gameplay locks.</summary>
-        internal static async Task<int> SendToAsync(IReadOnlyList<GameSession> targets, byte[] packet)
+        internal static Task<int> SendToAsync(IReadOnlyList<GameSession> targets, byte[] packet)
+            => SendToAsync(targets, target => target.SendAsync(packet));
+
+        private static async Task<int> SendToAsync(IReadOnlyList<GameSession> targets, Func<GameSession, Task> send)
         {
             var results = await Task.WhenAll(targets.Select(async target =>
             {
                 try
                 {
-                    await target.SendAsync(packet);
+                    await send(target);
                     return true;
                 }
                 catch (Exception ex)
@@ -316,98 +327,18 @@ namespace Jondo.Unity.Server.Network
         /// and in both cases he himself is excluded, since he already learns about his own movements
         /// another way.
         /// </summary>
-        public static async Task<(int seVa, int llega)> AnunciarMudanzaAsync(GameSession quien,
-                                                                            long mapaQueDeja,
-                                                                            int? porDonde = null)
+        // Capture the old instance before mutating map/house/bag state.
+        public static async Task<(int seVa, int llega)> AnunciarMudanzaAsync(GameSession quien, GameMapAudience previousMap, int? porDonde = null)
         {
-            if (quien == null || !quien.IsInWorld || quien.CharacterId <= 0) return (0, 0);
-
-            int seVa = 0;
-            if (mapaQueDeja > 0 && mapaQueDeja != quien.MapId)
-            {
-                seVa = await RemoveFromMapAsync(mapaQueDeja, quien.CharacterId, quien.Id, porDonde);
-
-                // And whoever follows him, if he leads a party, learns where he landed, right
-                // behind the jsd and kmu of the old map: frames 101-103 of "Grupos/con grupo
-                // seguir desplazamiento del lider...". See PartyFollowHandler.
-                await Handlers.PartyFollowHandler.LeaderMovedAsync(quien);
-            }
-
-            var ficha = DatabaseManager.GetCharacterById(quien.CharacterId);
-            if (ficha == null) return (seVa, 0);
-
-            int llega = await BroadcastToMapAsync(quien.MapId,
-                ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                    ficha, quien.State.CellId, quien.State.Orientation, quien.AccountId)),
-                quien.Id);
-
-            if (seVa > 0 || llega > 0)
-            {
-                Program.LogDebug($"[Move] {ficha.Name}: {mapaQueDeja} -> {quien.MapId}. " +
-                                 $"Told {seVa} on the map left and {llega} on the one found.");
-            }
-
-            // His heroes go with him: off the map he left, at his side on this one.
-            await HeroPresence.MasterMovedAsync(quien, mapaQueDeja);
-            return (seVa, llega);
+            var result = await MapPresenceService.Live.TravelAsync(quien, previousMap, porDonde);
+            if (quien.IsInWorld && quien.CharacterId > 0)
+                await HeroPresence.MasterMovedAsync(quien, previousMap.MapId);
+            return result;
         }
 
-        /// <summary>
-        /// Whether a character is in the world for the others -- his guild, his alliance --: played
-        /// from a client, or somebody's hero (Managers.Heroes).
-        /// </summary>
+        /// <summary>Whether a character is played by a client or present as somebody's hero.</summary>
         public static bool IsOnline(long characterId)
             => FindByCharacter(characterId) != null || Managers.Heroes.AsHero(characterId) != null;
-
-        /// <summary>
-        /// A character gone from a map, told to everyone still on it: the kmu that takes him off
-        /// their screens, with the jsd before it for the ones in his party, as the captures have
-        /// it (see <see cref="ConnectionProtocol.BuildActorRemoved"/>).
-        /// </summary>
-        public static async Task<int> RemoveFromMapAsync(long mapId, long characterId, Guid exceptSessionId,
-                                                         int? porDonde = null)
-        {
-            var party = Managers.Parties.Of(characterId);
-
-            var targets = OnMap(mapId).Where(s => s.Id != exceptSessionId).ToArray();
-            var results = await Task.WhenAll(targets.Select(async target =>
-            {
-                try
-                {
-                    bool mate = party != null && Managers.Parties.Of(target.CharacterId) == party;
-                    foreach (byte[] notice in LeaveNotices(characterId, mate, porDonde))
-                        await target.SendAsync(notice);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // Not taken out of the registry: a failed send is not a closed connection, and
-                    // taking it out left a player still playing unreachable -- no whispers, no guild
-                    // notices -- until he reconnected. His connection's own way out unregisters him.
-                    Program.LogDebug($"[Sessions] Send to {target.Id} failed: {ex.Message}");
-                    return false;
-                }
-            }));
-            return results.Count(delivered => delivered);
-        }
-
-        /// <summary>
-        /// What one person still on the map gets when a character leaves it, in order.
-        /// </summary>
-        /// <remarks>
-        /// The jsd only goes when the character walked out, because only then is there a way out
-        /// to tell. When the leader takes the zaap in "Grupos/con grupo seguir desplazamiento del
-        /// lider...", the member standing next to him gets an empty imk and the kmu, and no jsd
-        /// (frames 245-246). A jsd without its f3 is not "no direction" either: it is direction 0,
-        /// east, which proto3 leaves off the wire -- frame 5 is the leader walking right from
-        /// [1,-32] to [2,-32] -- so sending one for a jump told the party he had walked off east.
-        /// </remarks>
-        internal static IReadOnlyList<byte[]> LeaveNotices(long characterId, bool partyMate, int? porDonde)
-        {
-            byte[] removed = ConnectionProtocol.BuildActorRemoved(characterId);
-            if (!partyMate || !porDonde.HasValue) return new[] { removed };
-            return new[] { ConnectionProtocol.BuildActorLeft(characterId, porDonde), removed };
-        }
 
         /// <summary>Creates a new ticket for a specific account, server and client language.</summary>
         public static Ticket Issue(long accountId, int serverId, string language = "es")

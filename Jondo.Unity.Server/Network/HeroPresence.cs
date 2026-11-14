@@ -16,7 +16,7 @@ namespace Jondo.Unity.Server.Network
     /// The heroes stand beside their master and follow him. A
     /// hero has no client: his actor is the server's to put on the map (jsn), to walk (jsj, the
     /// master's own walk, ending a few steps behind him) and to take off (kmu), and every map's
-    /// actor list carries the heroes of the people on it (ConnectionProtocol.BuildMapActors).
+    /// actor list carries the heroes of the people on it (MapInformationMessages).
     /// </remarks>
     internal static class HeroPresence
     {
@@ -56,7 +56,7 @@ namespace Jondo.Unity.Server.Network
         private static async Task LeaveAsync(long mapId, long heroId)
         {
             if (mapId <= 0) return;
-            try { await SessionRegistry.RemoveFromMapAsync(mapId, heroId, Guid.Empty); }
+            try { await MapPresenceService.Live.RemoveAsync(SessionRegistry.OnMap(mapId), heroId); }
             catch (Exception ex) { Program.LogDebug($"[Heroes] {heroId} could not be taken off map {mapId}: {ex.Message}"); }
         }
 
@@ -126,8 +126,8 @@ namespace Jondo.Unity.Server.Network
             if (character == null || state.IsInFight || master.State.IsInFight) return;
             try
             {
-                await SessionRegistry.BroadcastToMapAsync(state.MapId, ConnectionProtocol.Push(Op.Jsn,
-                    ConnectionProtocol.BuildActorRefreshed(character, state.CellId, state.Orientation, master.AccountId)), Guid.Empty);
+                await SessionRegistry.BroadcastToMapAsync(state.MapId,
+                    MapActorMessages.Refreshed(character, state.CellId, state.Orientation, master.AccountId), Guid.Empty);
             }
             catch (Exception ex) { Program.LogDebug($"[Heroes] {hero.CharacterId} could not be drawn: {ex.Message}"); }
         }

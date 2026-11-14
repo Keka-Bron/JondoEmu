@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -49,11 +50,11 @@ namespace Jondo.Unity.Tests.World
         private const string PrismMonsterLook = "{2211||1=12772846,2=16752644,3=14301485,4=12148110,5=3994880}";
 
         /// <summary>
-        /// The map actor: kind 2 with when it was placed and its alliance, at its cell. Byte for
-        /// byte with the capture's look, skin included.
+        /// The map actor: when it was placed and its alliance, at its cell. The
+        /// independent captured wire fixture lives in MapActorContractTests.
         /// </summary>
         [Fact]
-        public void The_map_actor_matches_the_capture()
+        public void The_map_actor_uses_its_captured_position_state_and_alliance()
         {
             var prism = new PrismStore.Prism
             {
@@ -63,10 +64,18 @@ namespace Jondo.Unity.Tests.World
                 PlacedUtcMs = 1784886505835,
             };
             Assert.Equal(-20000, prism.ContextId);
-            Assert.Equal(Hex("0a05088c041001126f0a54125210ebe29a9cf93320e9e98cd3062a43120908681008288482d4051a09416c6c69" +
-                             "616e636532222430303030303030302d303030302d343030302d383030302d3030303030303030303030352a05" +
-                             "414c4c59321a170a0ceecb8b0e808080488482d455100318a3113202f11418e0e3feffffffffffff01"),
-                         PrismProtocol.Actor(prism, Alliance2, Hex("0a0ceecb8b0e808080488482d455100318a3113202f114")).Build());
+            var actor = Assert.Single(MapActorMessages.PrismShown(prism, Alliance2).Actors);
+            Assert.Equal(-20000, actor.ActorId);
+            Assert.Equal(new EntityDisposition(524, Direction.SouthEast, null, null), actor.Disposition);
+            var state = Assert.IsType<RolePlayActorCasePrismActor>(Assert.IsType<ActorInformationCaseRolePlayActor>(
+                actor.ActorInformation!.ActorCase).Value.ActorCase).Value;
+            Assert.Equal(PrismState.Normal, state.State);
+            Assert.Equal(1784886505835, state.NextEvolutionDate);
+            Assert.Equal(1784886505, state.PlacementDate);
+            Assert.Equal("Alliance2", state.AllianceInformation!.Name);
+            Assert.Equal("ALLY2", state.AllianceInformation.Tag);
+            Assert.Null(state.CristalNumberLeft);
+            Assert.Null(state.Cristal);
         }
 
         /// <summary>

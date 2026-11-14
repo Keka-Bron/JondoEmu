@@ -848,9 +848,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                    character, GameState.CellId, GameState.Orientation, accountId)));
+            await MapPresenceService.Live.RefreshAsync(SessionContext.Current, character, includeMap: false);
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
 

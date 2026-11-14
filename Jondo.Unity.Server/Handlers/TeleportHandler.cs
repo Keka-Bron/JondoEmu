@@ -148,13 +148,14 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             long mapaQueDeja = SessionContext.State.MapId;
+            var previousMap = SessionContext.Current.Map;
             SessionContext.State.MapId = mapId;
             SessionContext.State.CellId = MapManager.GetNearestWalkableCell(mapId, targetCell);
             DatabaseManager.SaveCurrentCharacter();
 
             // The other two maps involved: the one he leaves and the one he enters. Without this,
             // teleporting left a ghost where he was and he arrived invisible where he went.
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, mapaQueDeja);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId));

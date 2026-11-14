@@ -316,7 +316,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal("Jondo", membership.GuildInformation.Name);
             Assert.Equal(1, membership.RankId);
             Assert.Equal(20, membership.GuildTokens);
-            Assert.Equal(0, membership.UnknownUsedContextValue);
+            Assert.Equal(0, membership.SkinId);
         }
 
         /// <summary>The next weekly reset (jez), against the five captures that ask for it.</summary>

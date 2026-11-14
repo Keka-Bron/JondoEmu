@@ -70,6 +70,6 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The group as its tooltip reads it: «grade x monster x level» for each, joined by «|».</summary>
         internal static string GroupInfos(MobSpawnManager.MobGroup group)
             => string.Join("|", group.Members.Select(m =>
-                $"{ConnectionProtocol.GradeOf(m)}x{m.Monster.Id}x{ConnectionProtocol.LevelOf(m)}"));
+                $"{MonsterMessages.GradeOf(m)}x{m.Monster.Id}x{MonsterMessages.LevelOf(m)}"));
     }
 }

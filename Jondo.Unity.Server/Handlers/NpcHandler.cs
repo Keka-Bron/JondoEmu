@@ -955,25 +955,27 @@ namespace Jondo.Unity.Server.Handlers
         /// Ganymed does in the combat room once Master Darmas has been told the fight is won.
         /// </summary>
         /// <summary>Whoever a reply brings in: its «showsNpc» and the «alsoShows» with it.</summary>
-        private static async Task ComeInAsync(NetworkStream stream, DialogueChoice choice)
+        private static async Task ComeInAsync(DialogueChoice choice)
         {
-            await ComesInAsync(stream, choice.ShowsNpc);
-            foreach (int npc in choice.AlsoShows) await ComesInAsync(stream, npc);
+            var session = SessionContext.Current;
+            await ComesInAsync(session, choice.ShowsNpc);
+            foreach (int npc in choice.AlsoShows) await ComesInAsync(session, npc);
         }
 
         /// <summary>An NPC of this map comes in, for this character (jsn), without a word.</summary>
-        public static async Task ComesInAsync(NetworkStream stream, int npcId)
+        public static async Task ComesInAsync(GameSession session, int npcId)
         {
-            long mapId = SessionContext.State.MapId;
+            using var context = SessionContext.Push(session);
+            long mapId = session.MapId;
             var spawn = Npcs.OnMap(mapId).FirstOrDefault(s => s.NpcId == npcId);
             if (spawn == null) return;
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildNpcShown(spawn, mapId)));
+            await session.SendAsync(MapActorMessages.NpcShown(spawn, mapId));
         }
 
         private static async Task ComesInAndSpeaksAsync(NetworkStream stream, int npcId, long thenLine = 0)
         {
-            long mapId = SessionContext.State.MapId;
+            var session = SessionContext.Current;
+            long mapId = session.MapId;
             // Coming in is appearing: one who hides until then (Ramy in the conduits of the palace's
             // kitchen) stands on the map for nobody before his entrance.
             var spawn = Npcs.OnMap(mapId).FirstOrDefault(s => s.NpcId == npcId)
@@ -984,8 +986,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildNpcShown(spawn, mapId)));
+            await session.SendAsync(MapActorMessages.NpcShown(spawn, mapId));
 
             var escrito = NpcDialogues.For(npcId, mapId);
             var line = escrito == null ? null : thenLine != 0 ? escrito.Line(thenLine) : OpeningFor(escrito);
@@ -1705,7 +1706,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     await GiveFromReplyAsync(stream, elegidaAhora);
                     // And whoever comes in as it is said (Abel Hoz at the bank).
-                    if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(stream, elegidaAhora);
+                    if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(elegidaAhora);
                 }
             }
             else if (elegidaAhora != null && (elegidaAhora.Gives != 0 || elegidaAhora.AlsoGives.Count > 0
@@ -1733,7 +1734,7 @@ namespace Jondo.Unity.Server.Handlers
             // Somebody who comes in on a reply that does no objective: Vey Gana's «Darle los
             // ingredientes.» draws the country doll out of the barn.
             if (elegidaAhora != null && elegidaAhora.Completes == 0 && elegidaAhora.ShowsNpc != 0)
-                await ComeInAsync(stream, elegidaAhora);
+                await ComeInAsync(elegidaAhora);
 
             int startsAfterClosing = 0;
             // A quest the reply ends there and then, with nothing paid: the goblin sold to the mulou of
@@ -1865,7 +1866,7 @@ namespace Jondo.Unity.Server.Handlers
                 await GiveFromReplyAsync(stream, elegidaAhora);
                 // Whoever comes in once it is said and the window is shut: Selim Llenneb back in
                 // the vault on «Respaldar a Becky y dirigirte hacia la puerta».
-                if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(stream, elegidaAhora);
+                if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(elegidaAhora);
             }
 
             if (startsAfterClosing != 0)

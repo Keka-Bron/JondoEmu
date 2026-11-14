@@ -9,6 +9,7 @@ using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using static Jondo.Protocol.NetworkMessage;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -235,6 +236,43 @@ namespace Jondo.Unity.Server.Handlers
                 TeamOnMap(fight, FightInstance.Rojos, withMembers: true),
                 fight.OptionOn(FightInstance.Azules, FightInstance.OptionPartyOnly),
                 fight.OptionOn(FightInstance.Rojos, FightInstance.OptionPartyOnly));
+        }
+
+        /// <summary>The same placement state, constructed directly for typed map snapshots.</summary>
+        internal static Game.FightCommonInformation MapSnapshotOf(FightInstance fight)
+        {
+            _onTheMap.TryGetValue(fight.FightId, out var where);
+            Game.FightTeamInformation Team(int team)
+            {
+                var side = fight.Bando(team).ToArray();
+                bool collector = team == FightInstance.Rojos && fight.TaxCollectorUuid != null;
+                bool monsters = side.Any(f => f.IsMonster && !f.EsInvocado)
+                    || team == FightInstance.Rojos && fight.Reglas.EnfrenteHayMonstruos;
+                long leader = collector || monsters ? fight.DefenderLeaderId
+                    : side.FirstOrDefault(f => !f.IsMonster && !f.EsInvocado)?.Id
+                        ?? (team == FightInstance.Rojos ? fight.DefenderLeaderId : 0);
+                var members = side.Where(f => !f.EsInvocado && f.IsAlive).Select(f => new Game.FightTeamMemberInformation(f.Id,
+                    collector && f.TaxCollectorFirstName > 0
+                        ? new Game.FightTeamMemberInformationCaseTaxCollectorMember(new(f.TaxCollectorFirstName, f.TaxCollectorLastName))
+                        : !collector && f.IsMonster
+                            ? new Game.FightTeamMemberInformationCaseMonsterMember(new(f.MonsterId, f.GradeIndex + 1))
+                            : new Game.FightTeamMemberInformationCaseCharacter(new(f.Level, f.Name ?? "")))).ToArray();
+                return new(collector ? Game.TeamType.TaxCollector : monsters ? Game.TeamType.Monster : Game.TeamType.Player,
+                    leader, Game.Alignment.Without, team == FightInstance.Azules ? Game.Team.Challenger : Game.Team.Defender,
+                    0, new Game.FightTeamInformationCaseMembers(new(members)));
+            }
+            var type = fight.Reglas.TipoDelKam switch
+            {
+                0 => Game.FightType.Challenge, 1 => Game.FightType.Aggression, 2 => Game.FightType.PvMa,
+                3 => Game.FightType.MxvM, 4 => Game.FightType.PvM, 5 => Game.FightType.PvT,
+                6 => Game.FightType.PvMu, 7 => Game.FightType.PvpArena, 8 => Game.FightType.Koh,
+                9 => Game.FightType.PvPr, 10 => Game.FightType.Breach,
+                _ => throw new InvalidOperationException($"Unsupported map fight type {fight.Reglas.TipoDelKam}."),
+            };
+            return new(checked((int)fight.FightId), type, [Team(FightInstance.Azules), Team(FightInstance.Rojos)],
+                [where?.AttackersFlag ?? 0, where?.DefendersFlag ?? 0],
+                [new(false, fight.OptionOn(FightInstance.Azules, FightInstance.OptionPartyOnly), false, false),
+                 new(false, fight.OptionOn(FightInstance.Rojos, FightInstance.OptionPartyOnly), false, false)]);
         }
 
         /// <summary>
@@ -1054,8 +1092,7 @@ namespace Jondo.Unity.Server.Handlers
             if (groupNow != null && groupNow.Members.Count > 0)
             {
                 await SessionRegistry.BroadcastToMapAsync(fight.RoleplayMapId,
-                    ConnectionProtocol.Push(Op.Jsn, Pb.New()
-                        .Msg(1, ConnectionProtocol.MonsterGroupActor(groupNow)).Build()),
+                    new Game.GameRolePlayShowActorsEvent([MapActorMessages.MonsterGroup(groupNow)]),
                     fightId: 0);
             }
         }
@@ -1070,10 +1107,8 @@ namespace Jondo.Unity.Server.Handlers
             var ficha = DatabaseManager.GetCharacterById(who.CharacterId);
             if (ficha == null) return;
 
-            await SessionRegistry.BroadcastToMapAsync(who.MapId,
-                ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(
-                    ficha, who.State.CellId, who.State.Orientation, who.AccountId)),
-                who.Id, fightId: 0);
+            await who.Map.SendAsync(MapActorMessages.Refreshed(ficha, who.State.CellId, who.State.Orientation, who.AccountId),
+                exceptSessionId: who.Id, fightId: 0);
         }
     }
 }

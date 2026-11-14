@@ -73,10 +73,12 @@ public sealed record CharacterBaseInformationComplementCasePartyInvitationMember
 
 public sealed record CharacterBasicInformation(string Name, int? Level, CharacterBasicInformationComplementCase ComplementCase);
 
+[JsonDerivedType(typeof(CharacterBasicInformationComplementCaseNone), "None")]
 [JsonDerivedType(typeof(CharacterBasicInformationComplementCaseCharacterLook), "CharacterLook")]
 [JsonDerivedType(typeof(CharacterBasicInformationComplementCaseRank), "Rank")]
 [JsonDerivedType(typeof(CharacterBasicInformationComplementCaseSocialMember), "SocialMember")]
 public abstract record CharacterBasicInformationComplementCase;
+public sealed record CharacterBasicInformationComplementCaseNone() : CharacterBasicInformationComplementCase;
 public sealed record CharacterBasicInformationComplementCaseCharacterLook(CharacterLook Value) : CharacterBasicInformationComplementCase;
 public sealed record CharacterBasicInformationComplementCaseRank(RankInformation Value) : CharacterBasicInformationComplementCase;
 public sealed record CharacterBasicInformationComplementCaseSocialMember(SocialMember Value) : CharacterBasicInformationComplementCase;
@@ -799,7 +801,7 @@ public sealed record HumanSkillUseOption(string SkillEndTime, int SkillId, int E
 
 public sealed record HumanTitleOption(string TitleParameter, int? TitleId);
 
-public sealed record HumanoidInformation(AlignmentInformation AlignmentInformation, MutantInformation? MutantInformation, long AccountId, IReadOnlyList<HumanOption> Options, Hierarchy Role, IReadOnlyList<Restriction> Restrictions, Gender Gender);
+public sealed record HumanoidInformation(AlignmentInformation? AlignmentInformation, MutantInformation? MutantInformation, long AccountId, IReadOnlyList<HumanOption> Options, Hierarchy Role, IReadOnlyList<Restriction> Restrictions, Gender Gender);
 
 public sealed record IdentificationRequest(string TicketKey, string LanguageCode) : GameRequest;
 
@@ -843,15 +845,19 @@ public sealed record MapComplementaryAnomalyInformation();
 
 public sealed record MapComplementaryGuildHallInformation(GuildHallThemeInformation? ThemeInformation);
 
+public sealed record MapComplementaryGuildHallCustomizationInformation(int SkinId, int Color7, int Color8);
+
+public sealed record MapComplementaryGuildHallSelectionInformation();
+
 public sealed record MapComplementaryGuildInformation(MapComplementaryGuildInformationCase ComplementaryInformationCase);
 
 [JsonDerivedType(typeof(MapComplementaryGuildInformationCaseGuildHallInformation), "GuildHallInformation")]
-[JsonDerivedType(typeof(MapComplementaryGuildInformationCaseUnknownFuur), "UnknownFuur")]
-[JsonDerivedType(typeof(MapComplementaryGuildInformationCaseUnknownFuus), "UnknownFuus")]
+[JsonDerivedType(typeof(MapComplementaryGuildInformationCaseGuildHallCustomizationInformation), "GuildHallCustomizationInformation")]
+[JsonDerivedType(typeof(MapComplementaryGuildInformationCaseGuildHallSelectionInformation), "GuildHallSelectionInformation")]
 public abstract record MapComplementaryGuildInformationCase;
 public sealed record MapComplementaryGuildInformationCaseGuildHallInformation(MapComplementaryGuildHallInformation Value) : MapComplementaryGuildInformationCase;
-public sealed record MapComplementaryGuildInformationCaseUnknownFuur(UnknownJrn Value) : MapComplementaryGuildInformationCase;
-public sealed record MapComplementaryGuildInformationCaseUnknownFuus(UnknownJqj Value) : MapComplementaryGuildInformationCase;
+public sealed record MapComplementaryGuildInformationCaseGuildHallCustomizationInformation(MapComplementaryGuildHallCustomizationInformation Value) : MapComplementaryGuildInformationCase;
+public sealed record MapComplementaryGuildInformationCaseGuildHallSelectionInformation(MapComplementaryGuildHallSelectionInformation Value) : MapComplementaryGuildInformationCase;
 
 public sealed record MapComplementaryHavenBagInformation(int Theme, int RoomId, Character OwnerInformation);
 
@@ -901,7 +907,7 @@ public sealed record MonsterGroupStaticInformation(IReadOnlyList<MonsterInGroupI
 
 public sealed record MonsterGroupWaveInformation(IReadOnlyList<MonsterGroupStaticInformation> Alternatives, int? WaveCount);
 
-public sealed record MonsterInGroupInformation(int Gid, int Level, EntityLook Look, int Grade);
+public sealed record MonsterInGroupInformation(int Gid, int Level, EntityLook? Look, int Grade);
 
 public sealed record MonstersInGroupAlternativeInformation(IReadOnlyList<MonsterInGroupInformation> Monsters, int PlayerCount);
 
@@ -1175,10 +1181,6 @@ public sealed record TokenValidationRequest(string Token) : GameRequest;
 
 public sealed record TrustStatusEvent(bool Certified) : GameEvent;
 
-public sealed record UnknownJqj();
-
-public sealed record UnknownJrn();
-
 // Reviewed entry payloads and dependencies. Nullable messages preserve absence;
 // type-only records do not imply coverage of their populated raw fields.
 public sealed record AccountTag(string Nickname, string Tag);
@@ -1313,8 +1315,7 @@ public sealed record GuildMemberUpdateEvent(Character? Member) : GameEvent;
 
 public sealed record GuildMembersEvent(IReadOnlyList<Character> Members) : GameEvent;
 
-// The reviewed placeholder records confirmed use without asserting gameplay meaning.
-public sealed record GuildMembershipEvent(GuildInformation? GuildInformation, int RankId, int GuildTokens, int UnknownUsedContextValue) : GameEvent;
+public sealed record GuildMembershipEvent(GuildInformation? GuildInformation, int RankId, int GuildTokens, int SkinId) : GameEvent;
 
 public sealed record GuildRanksEvent(IReadOnlyList<RankInformation> Ranks) : GameEvent;
 

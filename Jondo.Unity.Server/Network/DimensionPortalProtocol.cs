@@ -21,15 +21,6 @@ namespace Jondo.Unity.Server.Network
     /// </remarks>
     public static class DimensionPortalProtocol
     {
-        /// <summary>The portal among its map's actors, with its NPC's look.</summary>
-        public static Pb Actor(DimensionPortals.Portal portal, int area, byte[] look)
-            => Pb.New()
-                .Msg(1, Pb.New().Var(1, portal.Cell).VarIfNotZero(2, DimensionPortals.Facing))
-                .Msg(2, Pb.New()
-                    .Msg(1, Pb.New().Msg(DimensionPortals.ActorKind, Pb.New().Var(2, portal.Type).VarIfNotZero(3, area)))
-                    .Bytes(3, look))
-                .Var(3, portal.ContextId);
-
         /// <summary>The dialogue with the portal opened (ioc): its type makes the client show its NPC.</summary>
         public static byte[] BuildDialog(DimensionPortals.Portal portal)
             => Pb.New().Var(2, portal.Type).Var(4, portal.MapId).Var(5, portal.ContextId).Build();

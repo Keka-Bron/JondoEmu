@@ -76,7 +76,7 @@ namespace Jondo.Unity.Server.Network
             DatabaseManager.SaveCurrentCharacter();
             // With no map loaded again his own client is told too: the actor it played goes.
             bool reload = ServerSettings.Current.HeroSwitchReloadsMap;
-            await SessionRegistry.RemoveFromMapAsync(map, masterId, reload ? session.Id : Guid.Empty);
+            await MapPresenceService.Live.RemoveAsync(session.Map, masterId, reload ? session.Id : Guid.Empty);
             int place = Heroes.HandOver(masterId, heroId);
             if (place < 0) return false;
 
@@ -102,8 +102,7 @@ namespace Jondo.Unity.Server.Network
             // which is what makes a switch quick. The whole map again when the setting asks for it.
             if (reload) await backend.SendMapInitializationAsync(session, character);
             else
-                await session.SendAsync(ConnectionProtocol.Push(Op.Jsn,
-                    ConnectionProtocol.BuildActorRefreshed(character, cell, facing, session.AccountId)));
+                await session.SendAsync(MapActorMessages.Refreshed(character, cell, facing, session.AccountId));
             // His look told as a change of gear tells it: an inventory left open kept drawing the
             // one played before over the new one's bag.
             await session.SendAsync(ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));

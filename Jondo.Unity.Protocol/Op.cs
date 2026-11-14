@@ -3348,8 +3348,7 @@ public static class Op
 
     /// <summary>
     /// S→C: the answer to the colours picked in the appearance window { f1: taken }; eqq::bbga
-    /// copies them into the drafted outfit. The old map-load path (MapLoadHandler, on kkr, jqf or
-    /// igx, which no 3.6 client sends) still names it as an empty wrapper.
+    /// copies them into the drafted outfit.
     /// </summary>
     public const string Lxd = "lxd";
 

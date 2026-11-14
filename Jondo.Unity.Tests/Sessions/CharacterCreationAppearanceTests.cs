@@ -80,7 +80,10 @@ namespace Jondo.Unity.Tests.Sessions
                 // current connection date is sent; no fresh timestamp is invented.
                 Assert.Empty(selectedLook.LastDisconnectionDate);
                 Assert.Equal(character.LastConnection, selectedLook.LastConnectionDate);
-                CheckLook(At(ConnectionProtocol.BuildPlayerActorBlock(character, 245, 1, account), 2, 3));
+                var mapLook = MapActorMessages.Player(character, 245, 1, account).ActorInformation!.Look;
+                Assert.Equal(Indexed.Select(value => (int)value), mapLook.Colors);
+                Assert.Equal(new[] { (int)body, (int)headSkin }, mapLook.Skins);
+                Assert.Equal(new[] { (int)scale }, mapLook.Scales);
                 CheckLook(At(ConnectionProtocol.BuildLookChanged(character), 2));
 
                 byte[] appearance = At(ConnectionProtocol.BuildAppearanceState(character, "draft"), 3);

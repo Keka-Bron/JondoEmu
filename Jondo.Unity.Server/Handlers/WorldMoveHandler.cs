@@ -286,6 +286,7 @@ namespace Jondo.Unity.Server.Handlers
                 measuredFacing = facing;
             }
             long oldMapId = SessionContext.State.MapId;
+            var previousMap = session.Map;
 
             // The map changes: whatever was open on the previous one stops being open.
             NpcHandler.Forget();
@@ -307,7 +308,7 @@ namespace Jondo.Unity.Server.Handlers
                 Jondo.Unity.Server.Network.SessionContext.State.CharacterId,
                 Jondo.Unity.Server.Network.SessionContext.State.Orientation);
             await SessionContext.Current.SendAsync(actorLeft);
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId,
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap,
                 Jondo.Unity.Server.Network.SessionContext.State.Orientation);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(target));
@@ -371,6 +372,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             long oldMapId = SessionContext.State.MapId;
+            var previousMap = SessionContext.Current.Map;
             SessionContext.State.MapId = targetMapId;
             SessionContext.State.CellId = arrival;
             DatabaseManager.SaveCurrentCharacter();
@@ -379,7 +381,7 @@ namespace Jondo.Unity.Server.Handlers
             // with jrh, and GameNodeProxy sends the actors and interactive elements of the map.
             byte[] actorLeft = ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId);
             await SessionContext.Current.SendAsync(actorLeft);
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, oldMapId);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildLoadMap(targetMapId));
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

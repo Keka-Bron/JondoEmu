@@ -18,11 +18,16 @@ the precise client patch installed.
 | `Jondo.Unity.ProtocolGenerator` | Descriptor/Roslyn validation and direct conversion/dispatch generation |
 | `Jondo.Unity.Server/Network/GameSession.cs` | Typed single-client sends through an injected Game codec |
 | `Jondo.Unity.Server/Network/GameMapAudience.cs` | Explicit map-instance event audiences and shared encoded broadcast |
+| `Jondo.Unity.Server/Network/MapInformationService.cs` | Repeatable roleplay-map replies, ordered feature hooks and actor-only refresh delivery |
+| `Jondo.Unity.Server/Network/MapInformationMessages.cs` | Direct viewer-owned complementary map snapshots |
+| `Jondo.Unity.Server/Network/MapActorMessages.cs` | Shared semantic player, monster, NPC, collector, prism and portal actors |
+| `Jondo.Unity.Server/Network/MonsterMessages.cs` | Shared semantic monster looks, rolled levels and grade policy for typed and legacy consumers |
+| `Jondo.Unity.Server/Network/MapPresenceService.cs` | Typed player arrival, departure and presentation refreshes |
 | `Jondo.Unity.Server/Network/MovementDispatch.cs` | Typed roleplay and combat movement request dispatch |
 | `Jondo.Unity.Server/Diagnostics/GameTrafficFormatter.cs` | Best-effort typed live-log presentation |
 
 The imported schema contains 2,169 messages. The semantic mapping covers 533
-payload/common message types, 65 enums and 1,374 payload/common fields, plus the
+payload/common message types, 65 enums and 1,377 payload/common fields, plus the
 four Game envelope roles. JondoEmu's stable
 C# API defines semantic names, required/nullable members and explicit oneof case
 records. Nullable message members and explicit `None` cases preserve absence
@@ -249,9 +254,147 @@ Map initialization is separately triggered by sequence confirmation, with a
 first-ping fallback. Subsequent pings only receive their pong and alteration tick.
 Fight-map handling retains spectator, resume and preparation precedence and fight
 locks; roleplay map actors are never sent into an active fight. Map-information
-updates remain repeatable on travel. Initial and map sequences now construct their
-messages directly; remaining feature hooks, welcome settings and character-management
-requests/acknowledgments still use compatibility paths.
+updates remain repeatable on travel. Initial state, map-opening sequences and roleplay
+map snapshots now construct their messages directly; remaining feature hooks, welcome
+settings and character-management requests/acknowledgments still use compatibility paths.
+
+### Map-information service
+
+`GameEntryBackend.SendMapInformationAsync` delegates to `MapInformationService`.
+The service owns the repeatable roleplay reply: clear old interactions, restore dream
+state, prepare anomalies, send marks before actors, send the conditional fight count,
+then haven-bag furniture/permissions before `AreaFightModifierUpdateEvent`. Raid and
+special-map displays follow, then quest/achievement/conquest arrival processing,
+phantom state and map staging. The arrival hooks share one resolved subarea value.
+
+The service takes an explicit owning session, scopes legacy sources to that owner and
+reuses the caller's session turn. It has no once-per-entry flag; `GameEntryService`
+retains that flag, request/map validation and fight readiness routing. Hook, codec and
+transport failures propagate immediately, without replaying or sending the remaining
+steps. `IMapInformationBackend` makes the hook order and snapshot delivery independently
+testable without a world database.
+
+`RefreshActorsAsync` sends only the current actor snapshot and the modifier event;
+admin and quest redraws use it without replaying map-arrival hooks. The live backend
+calls `MapInformationMessages.SendAsync`, which constructs
+`MapComplementaryInformationEvent` directly and sends through the owner's codec. There
+is no intermediate protobuf serialization, reparsing, projection or raw fallback.
+
+`MapActorMessages` supplies players, monster groups, NPCs with conditional looks/quest
+markers, collectors, prisms and portals. It reuses semantic character looks, retains
+alignment/mutation precedence, account identities and presentation-option order, and
+snapshots nested member/alternative lists. Leaders and modular alternatives have absent
+looks, independently of an explicit empty look. Other players are selected from the
+captured house/bag instance and exclude active fighters and spectators.
+
+`MapInteractiveMessages` retains viewer-specific skill visibility, resource availability
+and raid states, plus quest/readable/altar elements. Placements remain a subset of
+declarations: passages, dream doors and counters do not receive invented states. Usable
+resources retain a present zero age bonus. `MapHouseMessages` retains short plaques,
+instance identity, account/guild presence, optional int64 prices and the separate tag-5
+admin/tag-9 door-lock construction policies. Placement fights construct full typed teams,
+members, flag cells and party options from the fight owner.
+
+Haven-bag information uses the reviewed meanings **theme at tag 1, room ID at tag 2**,
+correcting their reversed legacy arguments. Owners use the explicit absent
+`CharacterBasicInformation` complement. The maintained contracts now also permit absent
+`MonsterInGroupInformation.Look`; these are structural presence corrections to existing
+bindings, not new field-name research. The installed reviewed August schema/binding pair
+was explicitly reimported after adding the absent-complement policy, so provenance
+records the actual maintained inputs used for that import.
+
+`MapPresenceService` sends typed player arrivals and presentation refreshes and typed
+directional departures/removals. Border travel, teleports, zaaps, houses and bags capture
+the source `GameMapAudience` before changing map/instance state. Even a same-map bag-owner
+change removes the player from the old instance; party-follow map updates retain their
+different-map condition. Arrivals exclude the mover. A walking direction goes only to
+party mates, before removal; jumps send removal alone. Departure sends use each target's
+codec, isolate failures and retain registration. Guild/alliance, equipment, wardrobe,
+slot-look, cosmetic, size-command and fight-return player refreshes share typed actors.
+Standalone NPC appearances reuse `MapActorMessages.NpcShown`: the explicit owner
+controls conditional visibility, looks and quest marks. Scripted hidden-NPC entrances
+still appear before opening their dialogue, and an appearance failure stops that
+sequence. Fight-end monster reappearance uses `MapActorMessages.MonsterGroup` after
+the fight count, with the existing roleplay-map `fightId: 0` audience. The typed
+`SessionRegistry.BroadcastToMapAsync` overload uses each recipient's codec and shares
+the byte overload's recipient filters and isolated fanout.
+
+Collector/prism map presence reuses `MapActorMessages.TaxCollectorShown` and
+`PrismShown`. Placement spends the item, sends the owner's actor, then the other
+roleplay-map recipients, then the existing alliance/world-list notice. Fight
+restoration keeps its result/state notices before the actor; conquest updates keep
+world-list information before the map redraw and suppress redraws while the prism
+is fighting. Removal uses `ContextRemoveElementEvent` before the relevant list/owner
+notices. Map broadcasts retain `fightId: 0`, sender exclusion on placement,
+per-recipient codecs and failure isolation; own-send failures propagate before fanout.
+These actors use the same emblem omission policy as full map snapshots. World-list,
+equipment, crystal and alliance-fight feature packets retain their separate serializers.
+
+The direct map path applies the documented omission policy to indeterminate
+alliance-emblem tag 4 and haven-bag tag 3; it does not claim lossless reproduction of
+those former raw values. See [the map construction policy](populated-unmapped-fields.md#map-snapshot-construction-policy).
+
+`MapInformationServiceTests`, `MapInformationMessagesTests` and `MapPresenceServiceTests`
+cover ordering, owner/context isolation, detached populated snapshots, repeatable replies,
+audiences, and source/codec/transport failure boundaries with opaque recording codecs.
+`MapActorContractTests` supplies independent populated protocol fixtures for all actor
+identity branches and absence versus present-empty looks/owner complements. The database
+and framed `TypedMapSnapshotTests` check live owner codecs, repeated bag snapshots,
+instance isolation and fighting-player exclusion. Automated coverage does not replace
+targeted real-client map/presence checks.
+
+The retired map-construction tree has been removed: `BuildMapActors`, its private
+NPC/interactive declaration helpers, `BuildActorRefreshed`, the map-only feature
+`AddToMap` adapters, and the old hall/house/bag/portal snapshot serializers. There
+is no test-only `SessionRegistry.LeaveNotices` alternate; its captured departure
+expectations now run against `MapPresenceService` and the production codec. The
+house street/interior byte fixtures moved to `MapHouseContractTests`, and world
+tests assert typed house copies, bag ownership and portal actors. The raw
+`MonsterGroupActor`, `NpcActor`, `BuildNpcShown`, `AddAlternatives` and `AddQuestMarker`
+tree is also removed. Captured dungeon-alternative and NPC quest-marker fixtures now
+exercise the Game codec in `MapActorContractTests` and `NpcQuestMarkerTests`.
+`TypedActorNotificationTests` checks the actual standalone NPC and fight-end sends
+with opaque codecs and framed transports, including hidden entrances, ordering,
+empty monster groups and appearance failures.
+
+`TaxCollectorProtocol.Actor`/`BuildShown` and `PrismProtocol.Actor`/`BuildShown`
+are removed. Their independent captured actor fixtures now run in
+`MapActorContractTests`; world tests use typed factories for catalogue name IDs,
+placement/evolution dates and alliance looks. `CollectorPrismPresenceTests` exercises
+actual placement, fight restoration, collection/defeat, dissolution and conquest
+send paths with opaque recording codecs, including owner failure, failed-recipient
+isolation, roleplay filtering, notification order and detached state snapshots.
+
+`MonsterMessages` owns the shared semantic look, level and grade rules. Typed actor
+snapshots, character replacement looks and chat links use it directly; surviving
+legacy look writers delegate to the same rules. The two-argument
+`MonsterLook` adapter serves combat, prism and collector packets;
+its unused one-argument overload is removed. Those live
+consumers are tracked migration work in the handoff, rather than unused alternate
+map builders retained for tests.
+
+### Retired map/transition routes
+
+The previous-protocol `kkr`/`jqf`/`igx`, `joi`/`jos`/`jpp` and
+`loy`/`lpj`/`hmv`/`ibt` branches have been removed from `GameNodeProxy`.
+`MapLoadHandler`, `MapChangeHandler`, `TransitionPacketsBuilder` and
+`TransitionPayloads` are deleted, along with the branch-only burst flag and
+`ConnectionProtocol.BuildPlayerActorBlock`/private player-option assembly tree.
+
+Supported clients use `jrh` for map information and `jrw`/`jqi`/`jqk` for
+walking, confirmation and map changes, through `GameEntryService`,
+`MovementDispatch` and `WorldMoveHandler`. Existing authentication, selection,
+fight-readiness and UID rules continue to belong to those handlers. Retired aliases
+fall through to the existing unhandled-packet diagnostics; no compatibility response
+or state mutation is attached to them.
+
+Creation palettes, capped/Omega levels, PvP alignment, guild/alliance identity,
+auras and followers now exercise `MapActorMessages.Player` in their world tests.
+Independent player wire fixtures remain in `MapActorContractTests`. Shared fight
+startup remains available to live monster attacks, aggression and scripted encounters.
+`GameNodeDispatchTests` sends all ten retired aliases through the real packet loop,
+checks unhandled diagnostics and unchanged map state with no compatibility replies,
+then verifies a current typed ping on the same connection.
 
 ### HAAPI identity and gift continuation
 
@@ -340,7 +483,7 @@ inherited slot never shifts a later custom colour.
 Creation, recolouring and outfit application write only these choices. The shared
 `CharacterLookBuilder` composes appearances from current owner state; immutable
 breed/sex defaults live in `BreedLookCatalog`. Inventory builds distinct preview
-and map looks, legacy map loading reuses the shared actor builder, and fighter-show
+and map looks, typed map actors reuse the shared semantic look, and fighter-show
 uses the fighter's normal/current appearance. Byte serialization occurs at packet
 boundaries. `LookHex`, `LookBytes`, `PlayerActorDetails` and actor-detail reconstruction
 are removed, so storage and selection no longer construct look blobs.
@@ -472,8 +615,9 @@ alignment/honour, presets, mutations, fight return, commands and control-API cha
 Their existing position among surrounding messages and failure propagation are retained.
 Heartbeat expiration takes an explicit session and scopes its legacy feature hooks to that
 owner. `Characters/CharacteristicRules.cs` owns the fixed pods base and derived contribution
-formulas, shared by snapshots, preset columns and entry weight. Characteristic construction
-no longer depends on `ConnectionProtocol`; its payload/value adapters are removed.
+formulas. `ConnectionProtocol.PodsBeforeStrength` retains character/job level gains, including
+Omega levels, for snapshots, preset columns and entry weight. Typed allocation replies also
+retain actual carried item weight. The legacy characteristic payload/value adapters are removed.
 
 `CharacteristicRules` also owns capped base life and level-derived capital. Preset/fallback
 allocation costs are calculated in checked int64 arithmetic; negative and out-of-int32
@@ -822,10 +966,10 @@ overflow before a wrapped value can reach membership or the member list.
 
 Membership keeps the existing `GuildStore.ContributedBy(characterId)` policy: the
 persisted total of contributed guild kamas across stored contribution rows. It is
-not replaced with weekly activity tokens or the inventory token stack. The reviewed
-context placeholder is explicitly zero in silent entry/identity updates, matching
-the former builder's omission. The protocol still represents nonzero historical
-placeholder values without assigning them new gameplay meaning.
+not replaced with weekly activity tokens or the inventory token stack. `SkinId`
+is explicitly zero in silent entry/identity updates, matching the former builder's
+omission. The legacy map-actor membership builder retains its separate skin-1791
+policy; see [the reviewed mapping](#upstream-guild-hall-customization-mapping).
 
 Headers now include `GuildHalls.ChoiceOf(guild.Id)?.HallId`, which the former builder
 omitted: no choice is absent, and the hall ID is distinct from its theme. Founding
@@ -849,10 +993,51 @@ boundaries, presence, snapshots, recipient isolation and failures. Socket/storag
 regressions cover conditional entry, hall reloads, expulsion, member-specific rename/
 emblem notifications and real contribution/mission milestone ordering. Historical
 wire fixtures moved to the protocol suite, alongside optional hall zero/absence,
-nested guild/social/emblem presence, int64 totals, nonzero score and context values.
+nested guild/social/emblem presence, int64 totals, nonzero score and skin IDs.
 These are conditional-hook migrations; the current initial sequence comprises
 **32 unconditional direct sends + equipped-set snapshots + two optional sends**,
 with no reference loader or recorded entry rows.
+
+#### Upstream guild-hall customization mapping
+
+The **13 November 2026** native investigation names the August `jry` tag-2 branch
+**guild_hall_customization_information** and its `jrn` payload
+**MapComplementaryGuildHallCustomizationInformation** (formerly `unknown_fuur` /
+`UnknownJrn`). The installed bindings now cover all three reviewed int32 fields:
+
+| August field | Semantic field | Confirmed client use |
+|---|---|---|
+| `futh`, tag **2** | `skin_id` | Supplies EntityLook's short skin list through the guild-service map override. |
+| `futi`, tag **3** | `color_7` | Supplies zero-based native EntityLook color-list slot **7**. |
+| `futk`, tag **5** | `color_8` | Supplies zero-based native EntityLook color-list slot **8**. |
+
+`color_7` and `color_8` name native rendering slots, not protobuf field numbers or
+guessed visual parts. The August map handler **`0x4cfbb70`** forwards the values
+through notification `cug`; callback **`0x51ff140`** stores them in the guild service.
+`ApplyGuildCustomisation.MoveNext` **`0x5446090`** reads checked interface getters
+and supplies the skin list and colors to EntityLook. The same path is established
+on the September and October builds despite shuffled fields.
+
+The renderer's skin getter also proves that `GuildMembershipEvent.ftin`, tag **4**,
+is **skin_id**: membership supplies the fallback, and map customization supplies
+the override. The former captured **1791** is a skin ID, not a guild identifier,
+score or required constant. Wire values remain int32; native short narrowing and
+the override's **-1** fallback sentinel are rendering behavior.
+
+The nested `jrn.futg` message and `futj` integer remain unmapped, with no positive
+native-use witness and incomplete caller coverage. The separate `jqj` selection
+boolean retains its [client-unused/omit decision](populated-unmapped-fields.md#guild-hall-selection-boolean-jqj-tag-1).
+
+Jondo imports these bindings from the reviewed August schema/mapping pair through
+`Import/import-remap.py`. The stable model and JSON case names distinguish
+`GuildHallInformation`, `GuildHallCustomizationInformation` and
+`GuildHallSelectionInformation`. `GuildMembershipEvent.SkinId` replaces the former
+context placeholder without changing its wire tag or existing send values.
+
+`GuildHallMappingTests` independently exercises populated and default customization,
+signed int32 boundaries and the -1 sentinel, selected-empty selection, the separate
+own-hall theme branch, semantic JSON naming and raw retention of unmapped fields.
+Direct map construction remains in the entry migration backlog.
 
 ### Entry status, preferences and social notifications
 
@@ -1125,6 +1310,23 @@ exception, `messages`, `enums`, the four `gameEnvelope` roles, and optional
 `wireAliases`. Fields/cases name existing C# constructor members and record types.
 See the [shared mapping contract](connection-protocol.md#mapping-contract) for
 field, case and enum bindings. Stable-model edits are a separate source change.
+
+For a reviewed remap-format mapping/schema pair, use the adapter:
+
+```sh
+python3 Jondo.Unity.Protocol.Game.Wire/Import/import-remap.py \
+  --schema /path/to/game.proto \
+  --mapping /path/to/reviewed-game.json \
+  --bindings Jondo.Unity.Protocol.Game.Wire/Mappings/game-3.6.10.10.json \
+  --version 3.6.10.10
+```
+
+The adapter preserves existing C# member names and construction policies and adds
+new reviewed bindings. Migrate changed type identities, maintained oneof case names
+and intentional member renames explicitly in the models/bindings before importing.
+The normal importer publishes the adapted C# mapping and records its provenance;
+the source mapping checksum describes that adapted input. Generated conversions
+are validated by the subsequent build.
 
 The importer accepts Game's proto3 schema subset (messages, enums, maps, oneofs,
 optional/repeated fields and field attributes). It checks wire references and

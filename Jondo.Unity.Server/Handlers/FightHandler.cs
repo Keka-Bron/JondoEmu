@@ -31,7 +31,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Called by MapChangeHandler when the player's movement path terminates on a mob's cell.
+        /// Used by monster attacks, aggression and scripted encounters to open their fight.
         /// Builds the FightInstance from real mob data and sends placement bursts 1 and 2.
         /// </summary>
         public static async Task InitiateFightFromMobCollision(NetworkStream stream, MobSpawnManager.MobGroup mobGroup, long mapId,

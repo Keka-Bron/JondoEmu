@@ -11,10 +11,9 @@ public sealed class GuildStateTests
         new GuildSocialInformation(new SocialEmblem(165, 8, 16744448, 9476018)));
 
     [Fact]
-    public void Historical_membership_preserves_both_omitted_and_populated_context_values()
+    public void Historical_membership_preserves_both_omitted_and_populated_skin_ids()
     {
-        // World-entry capture after two contributions. The reviewed placeholder
-        // retains the historical 1791 without assigning it a gameplay meaning.
+        // World-entry capture after two contributions, including guild skin 1791.
         byte[] original = Convert.FromHexString("0a200a111a0f08a5011008188080fe0728b2afc20410bbc8021a054a6f6e646f20011001181420ff0d");
         AssertFixture("jhe", original, new GuildMembershipEvent(HistoricalGuild, 1, 20, 1791));
         AssertFixture("jhe", original[..^3], new GuildMembershipEvent(HistoricalGuild, 1, 20, 0));

@@ -126,20 +126,16 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
+            var previousMap = SessionContext.Current.Map;
             if (!Merkasako.IsHavenBag(state.MapId))
             {
                 state.HavenBagEntryMapId = state.MapId;
                 state.HavenBagEntryCell = state.CellId;
                 HavenBagStore.SetEntry(state.CharacterId, state.MapId, state.CellId);
             }
-            else
-            {
-                // From one bag to another: the first one's people see him go before he changes bag.
-                await SessionRegistry.RemoveFromMapAsync(state.MapId, state.CharacterId, SessionContext.Current.Id);
-            }
 
             state.HavenBagOwnerId = visiting ? owner : 0;
-            await GoToRoomAsync(stream, HavenBagStore.CurrentRoom(BagOwnerOf(state)), entering: true);
+            await GoToRoomAsync(stream, HavenBagStore.CurrentRoom(BagOwnerOf(state)), entering: true, previousMap);
         }
 
         // ─── Invitations and kicks ───────────────────────────────────────────────
@@ -314,6 +310,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var state = Jondo.Unity.Server.Network.SessionContext.State;
             long dentro = state.MapId;
+            var previousMap = SessionContext.Current.Map;
 
             long salidaMapa = state.HavenBagEntryMapId;
             int salidaCasilla = state.HavenBagEntryCell;
@@ -333,7 +330,7 @@ namespace Jondo.Unity.Server.Handlers
             DatabaseManager.SaveCurrentCharacter();
 
             // Told while he still belongs to the bag he leaves: its people see him go.
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, dentro);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap);
             state.HavenBagOwnerId = 0;
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -398,8 +395,9 @@ namespace Jondo.Unity.Server.Handlers
         /// Into a room of one's bag: its theme's map, by the zaap. Entering, the rooms' list (jbf)
         /// goes behind the map's own frames, as in «ir al merkasako y volver» (frame 11).
         /// </summary>
-        private static async Task GoToRoomAsync(NetworkStream stream, int room, bool entering)
+        private static async Task GoToRoomAsync(NetworkStream stream, int room, bool entering, GameMapAudience? previousMap = null)
         {
+            previousMap ??= SessionContext.Current.Map;
             long who = BagOwnerOf(SessionContext.State);
             bool own = who == SessionContext.State.CharacterId;
             int theme = HavenBagStore.ThemeOfRoom(who, room);
@@ -430,7 +428,7 @@ namespace Jondo.Unity.Server.Handlers
             // into the haven bag left him standing on the street, drawn, for everybody on it.
             // And whoever is in this bag -- its owner and his visitors, nobody else's -- sees him
             // come (SessionRegistry.OnMap keeps each bag apart).
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, left);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId));
@@ -447,20 +445,6 @@ namespace Jondo.Unity.Server.Handlers
 
             Console.WriteLine($"[Merkasako] Room {room}, theme {Merkasako.ThemeOfMap(target)} -> map {target}, " +
                               $"cell {SessionContext.State.CellId} (zaap on {zaap.Cell}).");
-        }
-
-        /// <summary>
-        /// Whose bag the map is, the jss's f8 (jqd), for the one standing in it: here always his
-        /// own, since nobody visits another's. The HavenbagManagerUI shows its menu -- rooms,
-        /// themes, furniture -- only in one's own bag (m_inMyOwnHavenbag), which it learns here.
-        /// </summary>
-        public static void AddToMap(Pb jss, long mapId, DbCharacter owner)
-        {
-            if (owner == null || !Merkasako.IsHavenBag(mapId)) return;
-            long visited = SessionContext.Actual?.State.HavenBagOwnerId ?? 0;
-            if (visited != 0 && visited != owner.Id) owner = DatabaseManager.GetCharacterById(visited) ?? owner;
-            jss.Msg(8, ConnectionProtocol.HavenBagInfo(HavenBagStore.CurrentRoom(owner.Id), Merkasako.ThemeOfMap(mapId),
-                                                       Merkasako.Rooms, owner.Id, owner.Name, owner.Level));
         }
 
         // ─── Furniture placement mode ───────────────────────────────────────────

@@ -138,7 +138,6 @@ namespace Jondo.Unity.Server.Network
             byte[] payload = firstPayload;
             string payloadStr = RoutingTextOf(payload, firstPayloadStr);
             var entryService = new GameEntryService(session, new GameEntryBackend());
-            bool hasSentIthBurst = false;
 
             if (payloadStr.Contains(Op.Uri(Op.Lqu)) || payloadStr.Contains(Op.Uri(Op.Hoy)) || payloadStr.Contains(Op.Uri(Op.Hmt)) || payloadStr.Contains("type.ankama.com/knx"))
             {
@@ -1508,111 +1507,6 @@ namespace Jondo.Unity.Server.Network
                     //   answer: ivk per filled slot, ivr per emptied one (ghost icon otherwise)
                     await SwapShortcutsAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Loy)))
-                {
-                    Console.WriteLine("[Game Node] Received loy (World Load Ack) from client. Map loaded successfully. Sending lok and jdj...");
-                    
-                    // Send lok (SelectedServerData / Game State configuration)
-                    byte[] lokBytes = NetworkEnvelope.ConvertHexStringToByteArray("1A-1E-0A-1C-0A-13-74-79-70-65-2E-61-6E-6B-61-6D-61-2E-63-6F-6D-2F-6C-6F-6B-12-05-10-01-18-CD-01");
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, lokBytes);
-                    
-                    // Send jdj (Server date / Maintenance synchronization)
-                    byte[] jdjBytes = NetworkEnvelope.ConvertHexStringToByteArray("12-3A-12-2D-0A-13-74-79-70-65-2E-61-6E-6B-61-6D-61-2E-63-6F-6D-2F-6A-64-6A-12-16-12-14-32-30-32-36-2D-30-36-2D-33-30-54-30-35-3A-30-30-3A-30-30-5A-18-FF-FF-FF-FF-FF-FF-FF-FF-FF-01");
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, jdjBytes);
-                    
-                    Console.WriteLine("[Game Node] Sent lok and jdj status packets successfully.");
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Lpj)))
-                {
-                    Console.WriteLine("[Game Node] Received lpj from client. Sending lpe response...");
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildLpeMessage());
-                }
-                else if (payloadStr.Contains("type.ankama.com/hmv"))
-                {
-                    Console.WriteLine("[Game Node] Received hmv from client. Sending official hnk and kqm chat channel lists...");
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPayloads.hnk);
-                    
-                    int subAreaId = 1;
-                    try
-                    {
-                        var mapInfo = MapManager.GetMapInfo(GameState.MapId);
-                        if (mapInfo != null)
-                        {
-                            subAreaId = mapInfo.SubAreaId;
-                        }
-                    }
-                    catch { }
-
-                    if (subAreaId == 444)
-                    {
-                        subAreaId = 20663;
-                    }
-
-                    foreach (var kqm in TransitionPayloads.kqmList)
-                    {
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, kqm);
-                    }
-                }
-                else if (payloadStr.Contains("type.ankama.com/ibt"))
-                {
-                    if (!hasSentIthBurst)
-                    {
-                        hasSentIthBurst = true;
-                        Console.WriteLine("[Game Node] Received ibt from client. Sending final initialization burst (ith, icg, klt, klp)...");
-                        
-                        int subAreaId = 1;
-                        try
-                        {
-                            var mapInfo = MapManager.GetMapInfo(GameState.MapId);
-                            if (mapInfo != null)
-                            {
-                                subAreaId = mapInfo.SubAreaId;
-                            }
-                        }
-                        catch { }
-                        if (subAreaId == 444) subAreaId = 20663;
-
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIcgMessage());
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIcgMessage());
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIcgMessage());
-                        
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildIthMessage());
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildKltMessage());
-                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, TransitionPacketsBuilder.BuildKlpMessage());
-                        Console.WriteLine("[Game Node] Final initialization burst sent successfully.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("[Game Node] Received duplicate ibt from client. Ignored.");
-                    }
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Kkr)) || payloadStr.Contains(Op.Uri(Op.Jqf)) || payloadStr.Contains("type.ankama.com/igx"))
-                {
-                    await MapLoadHandler.HandleMapLoadRequest(stream, payload);
-                }
-                else if (payloadStr.Contains("type.ankama.com/joi"))
-                {
-                    // CAREFUL: this branch and the fight-message one (further down) both match 'joi'.
-                    // Since this is an if/else-if chain, the first match wins. During a fight the
-                    // movement must be resolved by FightHandler (it expands the path, spends MP and
-                    // emits jud/joo/jvm/juc); if it fell through to here, the player teleported.
-                    if (GameState.IsInFight)
-                    {
-                        await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
-                    }
-                    else
-                    {
-                        await MapChangeHandler.HandleMovementRequest(stream, payload);
-                    }
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Jos)))
-                {
-                    await MapChangeHandler.HandleMapChangeRequest(stream, payload);
-                }
-                else if (payloadStr.Contains("type.ankama.com/jpp"))
-                {
-                    await MapChangeHandler.HandleMovementConfirm(stream);
-                }
                 else if (payloadStr.Contains(Op.Uri(Op.Iov)))
                 {
                     // He has clicked an NPC: depending on the action, the shop or the dialogue opens for him. With
@@ -1886,8 +1780,8 @@ namespace Jondo.Unity.Server.Network
         /// The client's messages that are let go without an answer, by their exact type. kmv comes
         /// with jrh on every map load and expects nothing back; hnn is the client saying which spell
         /// the pointer is on. The list was searched for as three-letter pieces anywhere in the frame,
-        /// and three of its entries -- itr, hmt, jqf -- had a branch of their own above it, so they
-        /// never reached it. ijm goes with the kmv that follows a kmp, the client loading a fight's
+        /// and some entries had a branch of their own above it, so they never reached it.
+        /// ijm goes with the kmv that follows a kmp, the client loading a fight's
         /// map: its jrk comes in the burst that kmv is answered with.
         /// </summary>
         private static readonly System.Collections.Generic.HashSet<string> Silenced = new()
@@ -2088,15 +1982,6 @@ namespace Jondo.Unity.Server.Network
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ivr, ConnectionProtocol.BuildShortcutRemoved(slot)));
         }
-
-        // Here lived PatchJpvEnteringPacket, which opened the jpv going out to the client, looked
-        // in it for three character ids from the captures the emulator was started with, written
-        // by hand, and swapped them for the player's. One of the three is among those the
-        // RegressionGuardTests guard forbids, so they are not even repeated here.
-        //
-        // Nobody called it: the jpv has long been built in MapLoadHandler with the right id
-        // from the start, so there was nothing to patch. Out, together with the three
-        // numbers.
 
     }
 }

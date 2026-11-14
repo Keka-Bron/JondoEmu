@@ -164,9 +164,10 @@ longer repeated inside the network dispatcher.
 
 ## 4. Declaring interactives in `jss`
 
-When the client requests a map, `ConnectionProtocol.AddInteractiveElements` asks
-`InteractiveRegistry.OnMap(mapId)` for the registered elements. Each one produces an `f11`;
-stateful elements additionally produce an `f15`:
+When the client requests a map, `MapInteractiveMessages.Snapshot` asks
+`InteractiveRegistry.OnMap(mapId)` for the registered elements and constructs typed
+`InteractiveElement` declarations and their `StatedElement` subset. The codec writes
+each declaration as `f11`; stateful elements additionally produce an `f15`:
 
 ```text
 jss.f11 {

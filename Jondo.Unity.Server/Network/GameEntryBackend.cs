@@ -69,9 +69,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
     }
 
     public Task AnnounceMapPresenceAsync(GameSession session, DbCharacter character)
-        => SessionRegistry.BroadcastToMapAsync(session.MapId,
-            ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(character,
-                session.State.CellId, session.State.Orientation, session.AccountId)), session.Id);
+        => MapPresenceService.Live.AnnounceAsync(session, character);
 
     public Task SendInitialStateAsync(GameSession session, DbCharacter character)
         => WorldEntry.SendInitialStateAsync(session, character);
@@ -167,68 +165,8 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         return false;
     }
 
-    public async Task SendMapInformationAsync(GameSession session, DbCharacter character)
-    {
-        var stream = StreamOf(session);
-        var state = session.State;
-        // The client asks who is on the map. Without an answer it draws an empty map:
-        // no avatar, no NPCs, no monsters.
-        //
-        // The green marks go out FIRST, before the actor list. That is not a style
-        // choice: in all 20 captures that load a map, iom comes before jss and
-        // never after -- empty ones and full ones alike, "iom (0)" then "jss
-        // (3589)", "iom (96)" then "jss (3895)". This server sent it after the
-        // actors were complete, and the client drew nothing, which is exactly what
-        // it looks like when the marks arrive for a map the client considers
-        // finished. Same frames, same contents, wrong side of the actor list.
-        //
-        // Nothing open survives a map change either: otherwise the X of the new
-        // map's zaap is taken by a conversation the player left behind.
-        NpcHandler.Forget();
-        WorkshopHandler.Forget();
-        MarketplaceHandler.Forget();
-        await DreamHandler.OnMapLoadedAsync(stream);
-        AnomalyHandler.BeforeMapLoaded(session.MapId);
-        await Managers.Quests.SendMarksAsync(stream, session.MapId);
-
-        byte[] actors = ConnectionProtocol.Push(Op.Jss,
-            ConnectionProtocol.BuildMapActors(session.MapId, character, state.CellId, state.Orientation, session.AccountId));
-        await GameEntryMessages.SendAsync(session, actors);
-        await FightHandler.SendFightCountAsync(stream, session.MapId);
-
-        // In every capture that loads a map lva comes immediately after jss, and
-        // without it the client never counts the map as loaded: two seconds later
-        // it asks again with knm, kno and kny and goes round once more.
-        // Inside the haven bag the furniture and permissions come between jss and lva.
-        if (Managers.Merkasako.IsHavenBag(session.MapId))
-            await MerkasakoHandler.SendFurnitureAsync(stream);
-        await session.SendAsync(new AreaFightModifierUpdateEvent([]));
-
-        // Map loads reset raid stagings and the feature-specific displays in the client.
-        await Managers.GuildRaidStagings.OnMapLoadedAsync(stream, session.CharacterId, session.MapId);
-        await TravelersTowerHandler.OnMapLoadedAsync(stream, session.MapId);
-        await OsavoraSeasonHandler.OnMapLoadedAsync(stream, session.MapId);
-        await AnomalyHandler.OnMapLoadedAsync(stream, session.MapId);
-        await GargandiasHandler.OnMapLoadedAsync(stream, session.MapId);
-        await GuildHallHandler.OnMapLoadedAsync(stream, session.CharacterId, session.MapId);
-
-        // Objectives met by stepping on a map or a zone belong here, not in MapLoadHandler.
-        // The kkr that handler receives only arrives on the world's initial load; walking
-        // from one map to another does not send it. Four map changes in the log —154011397,
-        // 154010885, 154010884, 154010883— never called the marks, leaving quest givers
-        // without their exclamation marks. All five ways of reaching a map pass here,
-        // because the client always asks for the actors.
-        var map = MapManager.GetMapInfo(session.MapId);
-        await Managers.Quests.OnMapEnteredAsync(stream, session.MapId, map?.SubAreaId ?? 0);
-        await Managers.Achievements.OnMapEnteredAsync(stream, session.MapId, map?.SubAreaId ?? 0);
-        await ConquestHandler.OnMapEnteredAsync(stream, session.CharacterId, map?.SubAreaId ?? 0);
-        await Managers.LingeringRooms.OnMapEnteredAsync(stream, session.CharacterId, session.MapId);
-        await PhantomHandler.OnMapLoadedAsync(stream);
-        await Managers.MapStagings.ShowAsync(stream, Managers.MapStagings.OnArrival(session.MapId));
-        // What a fight dropped for the bonus slots -- a mutation, a curse --, now that he is back.
-        await BonusItemHandler.PlacePendingAsync(stream);
-        Console.WriteLine($"[Entry] Actors of map {session.MapId} sent: {character.Name} on cell {state.CellId}.");
-    }
+    public Task SendMapInformationAsync(GameSession session, DbCharacter character)
+        => MapInformationService.Live.SendAsync(session, character);
 
     public Task TickAlterationsAsync(GameSession session) => AlterationHandler.TickAsync(session);
 
@@ -250,7 +188,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
     }
 
     public Task RemoveFromMapAsync(GameSession session)
-        => SessionRegistry.RemoveFromMapAsync(session.MapId, session.CharacterId, session.Id);
+        => MapPresenceService.Live.RemoveAsync(session.Map, session.CharacterId, session.Id);
 
     /// <summary>Reply to the "go back" request: a session id and a one.</summary>
     /// <remarks>

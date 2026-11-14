@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Content;
@@ -71,7 +72,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!IsPotion(item.Template)) return false;
 
-            var me = SessionContext.State;
+            var session = SessionContext.Current;
+            var me = session.State;
             var alliance = AllianceStore.AllianceOf(me.CharacterId);
             var map = MapManager.GetMapInfo(me.MapId);
             int reason = WhyNotHere(alliance, me.CharacterId, map, item.Template);
@@ -101,9 +103,9 @@ namespace Jondo.Unity.Server.Handlers
             // It starts with the alliance's default spells, the personalization tab's preset.
             TaxCollectorStore.SetSpells(tc, TaxCollectorStore.PresetOf(alliance.Id));
 
-            byte[] shown = ConnectionProtocol.Push(Op.Jsn, TaxCollectorProtocol.BuildShown(tc, alliance));
-            await SendAsync(stream, shown);
-            await SessionRegistry.BroadcastToMapAsync(tc.MapId, shown, SessionContext.Current.Id, fightId: 0);
+            var shown = MapActorMessages.TaxCollectorShown(tc, alliance);
+            await session.SendAsync(shown);
+            await SessionRegistry.BroadcastToMapAsync(tc.MapId, shown, session.Id, fightId: 0);
             await AllianceHandler.TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Hjq,
                 TaxCollectorProtocol.BuildAdded(LeaOf(tc, alliance))));
 
@@ -180,16 +182,6 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         // ─── On the map ─────────────────────────────────────────────────────────
-
-        /// <summary>The map's tax collector among its actors, unless it is being fought.</summary>
-        public static void AddToMap(Pb jss, long mapId)
-        {
-            var tc = TaxCollectorStore.OnMap(mapId);
-            if (tc == null || FightHandler.IsGroupFighting(tc.ContextId)) return;
-            var alliance = AllianceStore.ById(tc.AllianceId);
-            if (alliance == null) return;
-            jss.Msg(5, TaxCollectorProtocol.Actor(tc, alliance));
-        }
 
         /// <summary>
         /// Talking to it (iov 3 on its actor): the dialogue opens (ioc) and it says what it carries
@@ -404,8 +396,7 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task GoneAsync(TaxCollectorStore.TaxCollector tc, AllianceStore.Alliance alliance,
                                             long whoId, string whoName)
         {
-            await SessionRegistry.BroadcastToMapAsync(tc.MapId, ConnectionProtocol.Push(Op.Kmu,
-                FightJoinProtocol.BuildActorHidden(tc.ContextId)), fightId: 0);
+            await SessionRegistry.BroadcastToMapAsync(tc.MapId, new ContextRemoveElementEvent(tc.ContextId), fightId: 0);
             if (alliance == null) return;
             if (whoId != 0)
             {
@@ -546,8 +537,7 @@ namespace Jondo.Unity.Server.Handlers
             if (alliance == null) return;
             await AllianceHandler.TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Hkd,
                 TaxCollectorProtocol.BuildState(tc.Uuid, TaxCollectorProtocol.StateCollecting)));
-            await SessionRegistry.BroadcastToMapAsync(tc.MapId, ConnectionProtocol.Push(Op.Jsn,
-                TaxCollectorProtocol.BuildShown(tc, alliance)), fightId: 0);
+            await SessionRegistry.BroadcastToMapAsync(tc.MapId, MapActorMessages.TaxCollectorShown(tc, alliance), fightId: 0);
             Program.LogDebug($"[TaxCollector] {tc.Uuid} survives fight #{fight.FightId}.");
         }
 

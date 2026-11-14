@@ -212,6 +212,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             long mapaQueDeja = Jondo.Unity.Server.Network.SessionContext.State.MapId;
+            var previousMap = SessionContext.Current.Map;
             Jondo.Unity.Server.Network.SessionContext.State.Kamas -= cost;
             Jondo.Unity.Server.Network.SessionContext.State.MapId = target;
 
@@ -235,7 +236,7 @@ namespace Jondo.Unity.Server.Handlers
             await PartyFollowHandler.LeaderTravelledAsync(SessionContext.Current);
 
             // And let both maps find out: the zaap told neither.
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, mapaQueDeja);
+            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap);
 
             // The same order as the capture: first the character is taken off the map he leaves,
             // then he is told to load the new one, and the kamas at the end.

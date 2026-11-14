@@ -107,7 +107,7 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         /// <remarks>
         /// This was the fourth of five hand-written copies -- Pb, NetworkEnvelope, ProtoMessage,
-        /// CaptureRewriter and MapLoadHandler -- in three spellings that all happened to agree.
+        /// CaptureRewriter and the retired map loader -- in three spellings that all happened to agree.
         /// Five correct copies is four chances for the next edit to land on the wrong one, and a
         /// protocol writer that is subtly wrong produces frames the client drops without a word.
         /// The survivor is pinned against Google's own encoder in VarIntWriterTests.

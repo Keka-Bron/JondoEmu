@@ -5,7 +5,8 @@ Evidence snapshot: **10 November 2026**. Game profile **3.6.10.10**, using the
 Game profile. Tags, aliases and native evidence below belong to that build.
 Mapping status updated **11 November 2026**; capture/population evidence retains
 its original snapshot date. Welcome-settings omission policy and native-use finding
-updated **12 November 2026**.
+updated **12 November 2026**. Guild-hall selection boolean classification and
+installed customization-field coverage updated **13 November 2026**.
 
 This inventory records fields with **proven non-default population** and an
 unused, unresolved or incomplete semantic-mapping status. Each entry has a
@@ -98,6 +99,31 @@ Stable owner: **GameActionItemContent**. Wire type: `string`. From
 The non-empty historical text does not reopen this field as a semantic-remap gap
 or require a compatibility member in newly constructed messages.
 
+### Guild-hall selection boolean: `jqj`, tag 1
+
+**Unused by client for Jondo's outbound construction**, by the **13 November 2026**
+decision. Omit this boolean from new semantic sends; it is not an outstanding
+field-remapping task. Preserve the selected-empty guild-hall selection branch.
+
+- **Wire path:** `MapComplementaryInformationEvent` / `jss`, tag **4** →
+  `MapComplementaryGuildInformation` / `jry`, branch **3** → `jqj.fupf`, boolean
+  tag **1**, property **198365** in the August build.
+- **Historical code population:** the removed `GuildProtocol.BuildHallVisit` wrote tag 1 as **true** when
+  `own == false && mayChoose == true`; false is omitted. `mayChoose` is the local
+  builder's label, not an established semantic field name.
+- **Client finding:** the inspected map handler **158876 / `0x4cfbb70`** sets
+  guild-hall state **3** from the selected branch without reading the boolean.
+  `MapInfoUI.OnClickBtnGuildHall` **139141 / `0x6366640`** enables "Choose guild hall"
+  from that state, independently of the boolean. No gameplay/UI use was found;
+  the references found are generated protobuf operations and accessors.
+- **Evidence boundary:** native classification remains **indeterminate**, with
+  incomplete native-call coverage. "Unused" is Jondo's explicit handling decision
+  based on the inspected client flow, not proof of global non-use. No boolean
+  meaning, polarity or cross-version field correspondence is inferred.
+
+The sibling `jrn` payload's three rendering fields are now mapped in Jondo; see
+[guild-hall customization correspondence](game-protocol.md#upstream-guild-hall-customization-mapping).
+
 ## 2. Populated scalar payloads with type-only recognition
 
 These message identities are named, but the listed payload fields are not
@@ -131,7 +157,7 @@ scalar names solely from the surrounding message name or builder parameter.
 | Owner / field | Non-default population evidence | Current finding |
 |---|---|---|
 | ServerSettingsEvent / `hoy`, tag **7**, int32 | **Historical code:** the removed `BuildHoy` wrote **200** unconditionally. | **Omitted** under the [welcome-settings policy](#welcome-settings-omission-policy). Native finding remains indeterminate; this is not an active remap task or a client-unused classification. |
-| SocialEmblem / `lld`, tag **4**, int32, in alliance identity | **Code:** `AllianceProtocol.Emblem` writes stored `AllianceStore.Alliance.EmblemBackgroundShape` when nonzero. Creation/modification readers can persist that slot. This is conditional code evidence, not an official-capture population claim. | The August `SocialEmblem` contract represents tags 1/2/3/5; tag 4 remains unmapped. Historical storage labels do not establish its meaning. A typed alliance identity conversion would need to retain this populated slot before replacing that construction path. |
+| SocialEmblem / `lld`, tag **4**, int32, in alliance identity | **Code:** `AllianceProtocol.Emblem` writes stored `AllianceStore.Alliance.EmblemBackgroundShape` when nonzero. Creation/modification readers can persist that slot. This is conditional code evidence, not an official-capture population claim. | The August contract represents tags 1/2/3/5; tag 4 remains unmapped. Renewed MCP classification is indeterminate with incomplete native caller coverage. Direct map actor construction omits it under the map construction policy below; standalone alliance serializers retain their own construction paths. |
 | QuestFinished / `idr.idq.idp`, tag **1**, int32; root path `3[*] → 1` | **Code:** [`QuestProtocol.BuildJournal`](../Jondo.Unity.Server/Network/QuestProtocol.cs#L86-L89) writes **1** for each finished quest. The [same file's capture description](../Jondo.Unity.Server/Network/QuestProtocol.cs#L36-L64) records that finished-entry shape. | Indeterminate. A count-like interpretation is a historical lead, not a reviewed binding. ID-only conversion does not retain this value. |
 | ConfigurationEvent / `krj`, tag **1**, message | **Documented capture measurement:** the retired entry reconstruction contained the non-empty message `{1: 30, 2: 5, 3: 300}`. | **Unused/omit** under the [after-selection policy](#after-selection-omission-policy). Native finding remains indeterminate. The sibling guild configuration at tag 2 is constructed from server policy. |
 | InfiniteDreamStateEvent / `izg`, tag **17**, int32 | **Code:** [`BuildDreamState`](../Jondo.Unity.Server/Network/DreamProtocol.cs#L429-L433) uses `VarIfNotZero(17, sueno.Arena)`. [`Dreams.StartingArenas`](../Jondo.Unity.Server/Managers/Dreams.cs#L251) returns **1** for the supported starting-arena branch, and [new-dream initialization](../Jondo.Unity.Server/Managers/Dreams.cs#L1078-L1096) stores that result in `Arena`. | Populated raw-only. The builder's life/arena interpretation has not completed the semantic evidence gate. |
@@ -178,6 +204,34 @@ construction retains its default **false**; no true-valued capability is claimed
 Both findings are build-local to **jondo-11-08-2026**, verified through MCP bootstrap,
 field references and decoy classification. `SpellMessages` constructs only the
 reviewed human/mutant lists, IDs, grades and opaque `SpellType` variants.
+
+## Map snapshot construction policy
+
+Direct roleplay map snapshots and typed actor appearances/refreshes—including
+standalone collector/prism placement, restoration and conquest redraws—construct
+only the reviewed semantic fields. In particular:
+
+- `SocialEmblem` / `lld` tag **4**, property **203185**, remains indeterminate:
+  renewed `jondo-11-08-2026` MCP classification found no positive business-use witness
+  and reported incomplete native caller coverage. The source column's historical
+  `EmblemBackgroundShape` label is not a new semantic name. Direct map actors omit
+  this field; tag **2** remains the reviewed background shape supplied by the existing
+  `EmblemSymbolColor` column, independently of that omitted slot.
+- `MapComplementaryHavenBagInformation` / `jqd` tag **3**, property **198342**, also
+  remains indeterminate under the same MCP check. The legacy `HavenBagInfo` writer
+  populated it from `Merkasako.Rooms`. Direct map snapshots omit it. Tag **4**,
+  property **198343**, has the same indeterminate classification and was not populated
+  by that writer; no type-only child or gameplay value is invented for it.
+- The reviewed haven-bag values are **theme at tag 1** and **room ID at tag 2**.
+  Direct snapshots supply the actual theme and current owner's room, correcting the
+  legacy writer's reversed arguments. Owner ID/name/level retain their own presence,
+  including an absent character-basic complement.
+
+These are explicit outbound omission/construction decisions for the migrated map
+path, not proven-unused native classifications or claims of lossless legacy-byte
+reproduction. They follow the handoff's omission rule for indeterminate values;
+population alone does not reopen a field-remapping task. Other alliance, world-list,
+equipment/crystal and haven-bag feature serializers remain separate migration work.
 
 ## Keeping the inventory reproducible
 
