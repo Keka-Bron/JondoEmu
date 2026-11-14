@@ -608,6 +608,9 @@ namespace Jondo.Unity.Tests.World
             long room = DungeonManager.All.Values.Select(d => d.FirstRoom).FirstOrDefault(r => r != 0);
             var alliance = AllianceStore.Create(990000031, "Tops", "TOP", 1, 1, 1, 1, 1);
             var placed = new List<TaxCollectorStore.TaxCollector>();
+            // The worth is by the marketplace's averages: a sale of 287 for it to have one.
+            MarketplaceListings.AveragePrice(287);
+            SaleOf287(insert: true);
             try
             {
                 for (int i = 1; i <= 12; i++)
@@ -647,7 +650,20 @@ namespace Jondo.Unity.Tests.World
             finally
             {
                 foreach (var tc in placed) TaxCollectorStore.Remove(tc);
+                SaleOf287(insert: false);
             }
+        }
+
+        /// <summary>The board test's sale of 287, ten kamas the unit, marked by its seller.</summary>
+        private static void SaleOf287(bool insert)
+        {
+            using var connection = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseManager.WorldConnectionString);
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = insert
+                ? "INSERT INTO MarketplaceSales (House, Gid, Quantity, Price, SellerAccountId, BuyerCharacterId, SoldAt) VALUES (0, 287, 1, 10, 990000031, 0, 0);"
+                : "DELETE FROM MarketplaceSales WHERE Gid = 287 AND SellerAccountId = 990000031;";
+            command.ExecuteNonQuery();
         }
 
         /// <summary>«Leave» on a tax collector's dialogue closes it with the conversation's kld (reason 1).</summary>

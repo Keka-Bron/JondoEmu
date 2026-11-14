@@ -230,8 +230,15 @@ namespace Jondo.Unity.Server.Handlers
         private static int PodsOf(IEnumerable<(int ItemId, int Quantity)> items)
             => items.Sum(i => DatabaseManager.GetItemRealWeight(i.ItemId) * i.Quantity);
 
-        private static long WorthOf(IEnumerable<(int ItemId, int Quantity)> items)
-            => items.Sum(i => NpcShops.PriceOf(i.ItemId) * i.Quantity);
+        /// <summary>
+        /// What a tax collector carries is worth, by the marketplace's average prices: «L'estimation
+        /// de la valeur des objets est calculée à partir des prix de vente moyens en hôtel de vente
+        /// et dans les modes marchands» (the official forum's «Le Percepteur»). An item never sold
+        /// here has no average and counts for nothing, as the server owner chose. It was the NPC
+        /// shops' price, one kama for nearly everything: the worth was the count of items.
+        /// </summary>
+        internal static long WorthOf(IEnumerable<(int ItemId, int Quantity)> items)
+            => items.Sum(i => MarketplaceListings.AveragePrice(i.ItemId) * i.Quantity);
 
         // ─── The tops ───────────────────────────────────────────────────────────
 

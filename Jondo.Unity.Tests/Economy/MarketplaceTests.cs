@@ -383,6 +383,12 @@ namespace Jondo.Unity.Tests.Economy
             Assert.Equal(MarketplaceListings.AveragePrice(1523), rune.Single(x => x.FieldNumber == 2).VarIntValue);
             Assert.True(MarketplaceListings.AveragePrice(1523) > 0);
 
+            // A tax collector's worth is by these averages: three runes are worth three of their
+            // average, an item never sold here nothing -- not the NPC shops' one kama.
+            Assert.Equal(3 * MarketplaceListings.AveragePrice(1523), TaxCollectorHandler.WorthOf(new[] { (1523, 3) }));
+            Assert.Equal(0, MarketplaceListings.AveragePrice(-7));
+            Assert.Equal(3 * MarketplaceListings.AveragePrice(1523), TaxCollectorHandler.WorthOf(new[] { (1523, 3), (-7, 50) }));
+
             // And the «Cours du marché» (itj -> iue): these sales by the hour over 24 hours in f1 and by the day
             // over 30 in f3, each point f1 how many sold, f2 the price of one, f6 when, in ISO 8601.
             var iue = ProtoMessage.Parse(MarketplaceHandler.BuildPriceHistory(1523, DateTime.UtcNow.AddMinutes(1))).Fields;
