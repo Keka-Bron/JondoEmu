@@ -50,6 +50,8 @@ public sealed class AllianceRankFlowTests : IDisposable
         Assert.Equal("Gardien", Rank(await NextRanks(pipe), custom.Id).Name);
         // Membership precedes the typed notices; rank expectations remain semantic.
         Assert.Equal(ConnectionProtocol.Push(Op.Mbz, AllianceProtocol.BuildMembership(alliance, custom.Id)), await Packet(pipe));
+        // The sheet, with the tax collectors the minimap draws.
+        Assert.Equal(AllianceHandler.InformationFrame(alliance), await Packet(pipe));
         await Packet(pipe);
         await Packet(pipe);
         Assert.Collection(spy.Encoded,

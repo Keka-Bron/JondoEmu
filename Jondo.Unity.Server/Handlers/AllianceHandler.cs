@@ -1321,8 +1321,8 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// A member entering the world: the ranks and belonging (mbz), silently -- the mca is
-        /// joining, and would print "you have joined" at every login --, the message and the
-        /// bulletin. The others see him connected (mbv), and whoever asked to be warned is. One
+        /// joining, and would print "you have joined" at every login --, the sheet (mcx), the
+        /// message and the bulletin. The others see him connected (mbv), and whoever asked to be warned is. One
         /// without an alliance but with an application gets it back, for the directory.
         /// </summary>
         public static async Task OnWorldEntryAsync(GameSession session)
@@ -1343,6 +1343,10 @@ namespace Jondo.Unity.Server.Handlers
             await AllianceRankService.Live.SendAsync(session, alliance.Id);
             await session.SendAsync(ConnectionProtocol.Push(Op.Mbz,
                 AllianceProtocol.BuildMembership(alliance, AllianceStore.RankOf(characterId))));
+            // The sheet, as joining sends it after the mbz: its f1 is the alliance's tax collectors,
+            // which the minimap draws. Without it they were drawn only once the alliance window
+            // had asked for it (mcf). INFERRED: no capture enters the world in an alliance.
+            await session.SendAsync(InformationFrame(alliance));
             await SendNoticesAsync(session, alliance);
             await ConnectionChangedAsync(alliance, characterId, online: true);
         }
