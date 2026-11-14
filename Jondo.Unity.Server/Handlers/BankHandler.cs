@@ -295,6 +295,15 @@ namespace Jondo.Unity.Server.Handlers
                     }
                     break;
                 }
+                case "kcz":
+                {
+                    // «Transférer les objets visibles» from the bank's side: kcz { 2 the stacks }.
+                    byte[]? kcz = ConnectionProtocol.ReadPayload(payload, "kcz");
+                    if (kcz == null) return true;
+                    var uids = PackedOrSingle(ProtoMessage.Parse(kcz).Fields, 2).ToHashSet();
+                    moves = Bank.ItemsOf(account).Where(i => uids.Contains(i.Uid)).Select(i => (i.Uid, -(long)i.Quantity)).ToList();
+                    break;
+                }
                 default:
                     return false;
             }

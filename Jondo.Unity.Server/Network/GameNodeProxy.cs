@@ -333,12 +333,14 @@ namespace Jondo.Unity.Server.Network
                 // The «Cours du marché» window, an item's price history.
                 else if (payloadStr == Op.Uri(Op.Itj)) await MarketplaceHandler.PriceHistoryAsync(stream, payload);
                 // The transfer buttons: everything, what is already there, a selection -- onto a
-                // trade's table when one is open, into the bank otherwise.
+                // trade's table when one is open, a chest, a bin or the haven bag chest when one is,
+                // into the bank otherwise.
                 else if (payloadStr == Op.Uri("kez") || payloadStr == Op.Uri("kgx") || payloadStr == Op.Uri("kcg")
-                         || payloadStr == Op.Uri("kck") || payloadStr == Op.Uri("kdd"))
+                         || payloadStr == Op.Uri("kck") || payloadStr == Op.Uri("kdd") || payloadStr == Op.Uri("kcz"))
                 {
                     string transfer = payloadStr.Substring(payloadStr.LastIndexOf('/') + 1);
-                    if (!await TradeHandler.TransferAsync(stream, payload, transfer))
+                    if (!await TradeHandler.TransferAsync(stream, payload, transfer)
+                        && !await StorageHandler.TransferAsync(stream, payload, transfer))
                         await BankHandler.TransferAsync(stream, payload, transfer);
                 }
                 // The zaap window's «Guardar»: the position saved at that zaap.
