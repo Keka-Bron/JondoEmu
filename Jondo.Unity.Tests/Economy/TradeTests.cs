@@ -228,6 +228,61 @@ namespace Jondo.Unity.Tests.Economy
             }
         }
 
+        /// <summary>
+        /// The inventory's transfer buttons lay on the table too: a selection (kdd), the stacks of a
+        /// kind already laid (kgx), everything (kez), and everything back (kcg). They went to the
+        /// bank alone, which was not open, and nothing moved.
+        /// </summary>
+        [Fact]
+        public async Task The_transfer_buttons_lay_on_the_table()
+        {
+            var asker = Player(9_000_000_020, 0);
+            var asked = Player(9_000_000_021, 0);
+            var bag = Jondo.Unity.Server.Managers.Equipment.Bag;
+            asker.State.EquipmentItems[11] = new Jondo.Unity.Server.Managers.Equipment.Item { Uid = 11, Template = 6902, Quantity = 4, Position = bag };
+            asker.State.EquipmentItems[12] = new Jondo.Unity.Server.Managers.Equipment.Item { Uid = 12, Template = 6902, Quantity = 2, Position = bag };
+            asker.State.EquipmentItems[13] = new Jondo.Unity.Server.Managers.Equipment.Item { Uid = 13, Template = 6903, Quantity = 7, Position = bag };
+            try
+            {
+                // No trade open: not the trade's.
+                Assert.False(await TransferAs(asker, "kez", Pb.New().Build()));
+
+                await As(asker, () => TradeHandler.RequestAsync(null!, ConnectionProtocol.Push(Op.Keu,
+                    Pb.New().Var(2, asked.CharacterId).Build())));
+                await As(asked, TradeHandler.AcceptAsync);
+                var trade = asker.State.Trade!;
+                var table = trade.OfferOf(asker.CharacterId);
+
+                // A selection: the whole stack, or how many is asked.
+                Assert.True(await TransferAs(asker, "kdd", Pb.New().Packed(1, new List<long> { 11, 13 }).Packed(2, new List<long> { 0, 3 }).Build()));
+                Assert.Equal(new[] { (11L, 4), (13L, 3) }, table);
+
+                // Those of a kind already laid: the other 6902 joins, whole.
+                Assert.True(await TransferAs(asker, "kgx", Pb.New().Build()));
+                Assert.Contains((12L, 2), table);
+                Assert.Equal(3, table.Count);
+
+                // Everything: the 6903 goes whole.
+                Assert.True(await TransferAs(asker, "kez", Pb.New().Build()));
+                Assert.Contains((13L, 7), table);
+
+                // Everything back.
+                Assert.True(await TransferAs(asker, "kcg", Pb.New().Build()));
+                Assert.Empty(table);
+            }
+            finally
+            {
+                SessionRegistry.Unregister(asker);
+                SessionRegistry.Unregister(asked);
+            }
+        }
+
+        private static async Task<bool> TransferAs(GameSession session, string op, byte[] body)
+        {
+            using (SessionContext.Push(session))
+                return await TradeHandler.TransferAsync(null!, ConnectionProtocol.Push(op, body), op);
+        }
+
         private static async Task<bool> CloseAs(GameSession session)
         {
             using (SessionContext.Push(session)) return await TradeHandler.CloseAsync();

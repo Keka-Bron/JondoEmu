@@ -162,27 +162,106 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (trade.Ended) return true;
                 var other = SessionRegistry.FindByCharacter(trade.Other(me.CharacterId));
-                var item = Equipment.ByUid(uid);
-                var offer = trade.OfferOf(me.CharacterId);
-                int index = offer.FindIndex(o => o.Uid == uid);
-                int had = index >= 0 ? offer[index].Quantity : 0;
-                int now = item == null || item.Position != Equipment.Bag ? 0 : Math.Clamp(had + delta, 0, item.Quantity);
-                if (now == had) return true;
+                int had = trade.OfferOf(me.CharacterId).Find(o => o.Uid == uid).Quantity;
+                if (await LayAsync(trade, me, other, uid, had + delta))
+                    await NobodyReadyAsync(trade, me, other);
+            }
+            finally { trade.Gate.Release(); }
+            return true;
+        }
 
-                if (now == 0)
+        /// <summary>
+        /// One stack on this side of the table at <paramref name="wanted"/>, within what the bag
+        /// holds: laid, changed, or taken back at zero. Under the trade's gate.
+        /// </summary>
+        /// <returns>Whether the table changed.</returns>
+        private static async Task<bool> LayAsync(Trade trade, GameSession me, GameSession? other, long uid, long wanted)
+        {
+            var item = Equipment.ByUid(uid);
+            var offer = trade.OfferOf(me.CharacterId);
+            int index = offer.FindIndex(o => o.Uid == uid);
+            int had = index >= 0 ? offer[index].Quantity : 0;
+            int now = item == null || item.Position != Equipment.Bag ? 0 : (int)Math.Clamp(wanted, 0, item.Quantity);
+            if (now == had) return false;
+
+            if (now == 0)
+            {
+                offer.RemoveAt(index);
+                await SendAsync(me, Op.Kfs, WorkshopProtocol.BuildRemoved(uid));
+                await SendAsync(other, Op.Kfs, WorkshopProtocol.BuildRemoved(uid, remote: true));
+            }
+            else
+            {
+                if (index >= 0) offer[index] = (uid, now);
+                else offer.Add((uid, now));
+                await SendAsync(me, Op.Kfb, TradeProtocol.BuildLaid(item!.Template, item.Effects, now, uid, remote: false));
+                await SendAsync(other, Op.Kfb, TradeProtocol.BuildLaid(item.Template, item.Effects, now, uid, remote: true));
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// The inventory's transfer buttons in a trade, the same messages as at the bank
+        /// (BankHandler.TransferAsync): kez «every item» and kgx «the items already there» -- those
+        /// of a kind already on this side of the table --, kdd { 1 the stacks, 2 how many } «the
+        /// visible ones» or a selection, and kcg every stack taken back off the table. Each stack
+        /// goes on whole, as a kcr would lay it. They reached the bank alone, which was not open,
+        /// and nothing moved.
+        /// </summary>
+        /// <returns>False when this character is in no open trade.</returns>
+        public static async Task<bool> TransferAsync(NetworkStream stream, byte[] payload, string op)
+        {
+            var me = SessionContext.Current;
+            var trade = me?.State.Trade;
+            if (trade == null || !trade.Accepted) return false;
+
+            await trade.Gate.WaitAsync();
+            try
+            {
+                if (trade.Ended) return true;
+                var offer = trade.OfferOf(me!.CharacterId);
+                var bag = Equipment.All.Where(i => i.Position == Equipment.Bag).ToList();
+                List<(long Uid, long Quantity)> moves;
+                switch (op)
                 {
-                    offer.RemoveAt(index);
-                    await SendAsync(me, Op.Kfs, WorkshopProtocol.BuildRemoved(uid));
-                    await SendAsync(other, Op.Kfs, WorkshopProtocol.BuildRemoved(uid, remote: true));
+                    case "kez":
+                        moves = bag.Select(i => (i.Uid, (long)i.Quantity)).ToList();
+                        break;
+                    case "kgx":
+                    {
+                        var laid = offer.Select(o => Equipment.ByUid(o.Uid)?.Template ?? 0).ToHashSet();
+                        moves = bag.Where(i => laid.Contains(i.Template)).Select(i => (i.Uid, (long)i.Quantity)).ToList();
+                        break;
+                    }
+                    case "kdd":
+                    {
+                        byte[]? kdd = ConnectionProtocol.ReadPayload(payload, "kdd");
+                        if (kdd == null) return true;
+                        var fields = ProtoMessage.Parse(kdd).Fields;
+                        var uids = BankHandler.PackedOrSingle(fields, 1);
+                        var quantities = BankHandler.PackedOrSingle(fields, 2);
+                        var byUid = bag.ToDictionary(i => i.Uid);
+                        moves = new List<(long, long)>();
+                        for (int k = 0; k < uids.Count; k++)
+                        {
+                            if (!byUid.TryGetValue(uids[k], out var item)) continue;
+                            moves.Add((item.Uid, k < quantities.Count && quantities[k] > 0 ? quantities[k] : item.Quantity));
+                        }
+                        break;
+                    }
+                    case "kcg":
+                        moves = offer.Select(o => (o.Uid, 0L)).ToList();
+                        break;
+                    default:
+                        return false;
                 }
-                else
-                {
-                    if (index >= 0) offer[index] = (uid, now);
-                    else offer.Add((uid, now));
-                    await SendAsync(me, Op.Kfb, TradeProtocol.BuildLaid(item!.Template, item.Effects, now, uid, remote: false));
-                    await SendAsync(other, Op.Kfb, TradeProtocol.BuildLaid(item.Template, item.Effects, now, uid, remote: true));
-                }
-                await NobodyReadyAsync(trade, me, other);
+
+                var other = SessionRegistry.FindByCharacter(trade.Other(me.CharacterId));
+                int changed = 0;
+                foreach (var (uid, quantity) in moves)
+                    if (await LayAsync(trade, me, other, uid, quantity)) changed++;
+                if (changed > 0) await NobodyReadyAsync(trade, me, other);
+                Console.WriteLine($"[Trade] {me.CharacterId}: {op}, {changed} of {moves.Count} stack(s) on the table.");
             }
             finally { trade.Gate.Release(); }
             return true;

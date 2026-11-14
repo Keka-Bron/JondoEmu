@@ -332,10 +332,15 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri("ivp")) await MarketplaceHandler.AveragePricesAsync(stream);
                 // The «Cours du marché» window, an item's price history.
                 else if (payloadStr == Op.Uri(Op.Itj)) await MarketplaceHandler.PriceHistoryAsync(stream, payload);
-                // The bank's transfer buttons: everything, what is already there, a selection.
+                // The transfer buttons: everything, what is already there, a selection -- onto a
+                // trade's table when one is open, into the bank otherwise.
                 else if (payloadStr == Op.Uri("kez") || payloadStr == Op.Uri("kgx") || payloadStr == Op.Uri("kcg")
                          || payloadStr == Op.Uri("kck") || payloadStr == Op.Uri("kdd"))
-                    await BankHandler.TransferAsync(stream, payload, payloadStr.Substring(payloadStr.LastIndexOf('/') + 1));
+                {
+                    string transfer = payloadStr.Substring(payloadStr.LastIndexOf('/') + 1);
+                    if (!await TradeHandler.TransferAsync(stream, payload, transfer))
+                        await BankHandler.TransferAsync(stream, payload, transfer);
+                }
                 // The zaap window's «Guardar»: the position saved at that zaap.
                 else if (payloadStr == Op.Uri("hip")) await ZaapTravelHandler.SaveAsync(stream);
                 // The guidebook's suggestions: the cards asked for, and a card locked.
