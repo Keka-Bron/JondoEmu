@@ -1423,6 +1423,11 @@ namespace Jondo.Unity.Server.Network
                     // Using an item: a box, an alliance's potion or prism, a travel item.
                     await ItemUseHandler.UseAsync(stream, payload);
                 }
+                else if (payloadStr.Contains(Op.Uri(Op.Ivs)))
+                {
+                    // «Utiliser plusieurs»: the same item used several times.
+                    await ItemUseHandler.UseSeveralAsync(stream, payload);
+                }
                 else if (payloadStr.Contains(Op.Uri(Op.Itw)))
                 {
                     // A pet fed from the «Alimentar» window.
