@@ -4572,6 +4572,30 @@
       "orientation": 5,
       "criterion": "(Qa=1466&Qo>8150)|Qf=1466",
       "why": "Master Nabur at rest in his family's vault: there once Una has turned to him, and for good after (Dofus pour les noobs, «L'amour perdu de Nabur»: «Nabur peut maintenant se reposer tranquillement auprès des siens»). INFERRED cell."
+    },
+    {
+      "map": 212599811,
+      "npc": 2226,
+      "cell": 343,
+      "orientation": 3,
+      "criterion": "Qa=1467&Qo<8155",
+      "why": "Nikono Klasta, one of the two srams who defaced the Iop statue of the militia, on the square [-32,-56] (Dofus pour les noobs, «Naissance d'une vocation»: «Les responsables de la profanation sont deux srams en [-32,-56]»), until they are beaten. INFERRED cell."
+    },
+    {
+      "map": 212599811,
+      "npc": 2227,
+      "cell": 355,
+      "orientation": 3,
+      "criterion": "Qa=1467&Qo<8155",
+      "why": "Dora Profana, one of the two srams who defaced the Iop statue of the militia, on the square [-32,-56] (Dofus pour les noobs, «Naissance d'une vocation»: «Les responsables de la profanation sont deux srams en [-32,-56]»), until they are beaten. INFERRED cell."
+    },
+    {
+      "map": 190972421,
+      "npc": 673,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1467&Qo>8168&Qo<8169",
+      "why": "Dark Vlad among the tombs of Astrub's cemetery [-4,-9] once Nistracolamus has sent the character to the fields of rest (Dofus pour les noobs, «Naissance d'une vocation»: «En effet le Dark Vlad se trouve en [-4,-9]»), until he has struck. INFERRED cell."
     }
   ]
 }

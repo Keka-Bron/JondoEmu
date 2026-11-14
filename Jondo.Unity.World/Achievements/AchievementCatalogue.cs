@@ -493,6 +493,12 @@ namespace Jondo.Unity.World.Achievements
         /// and «Primer tiempo» (8518), which hands over the experience of level 2, could never be
         /// earned. The capture says when it is: right after 2502's step 3173 is validated (idz 3173,
         /// then mfu 8518). What it is judged by is written here, with the measurement beside it.
+        /// <para>
+        /// A row that names its «achievement» may also judge an objective the client lists under
+        /// that achievement without a criterion of its own, which the catalogue does not carry
+        /// otherwise: «Primeriza» (107) is the only objective of «Hacer que nazca 1 montura» and
+        /// could never be earned.
+        /// </para>
         /// </remarks>
         private static void ApplyAuthoredCriteria(Dictionary<int, AchievementObjective> objectives, Action<string>? report)
         {
@@ -506,7 +512,13 @@ namespace Jondo.Unity.World.Achievements
                 {
                     int id = (int)Long(row, "objective");
                     string criterion = Text(row, "criterion");
-                    if (id == 0 || criterion.Length == 0 || !objectives.TryGetValue(id, out var old)) continue;
+                    if (id == 0 || criterion.Length == 0) continue;
+                    if (!objectives.TryGetValue(id, out var old))
+                    {
+                        int achievement = (int)Long(row, "achievement");
+                        if (achievement == 0) continue;
+                        old = new AchievementObjective { Id = id, AchievementId = achievement };
+                    }
                     objectives[id] = new AchievementObjective
                     {
                         Id = old.Id,

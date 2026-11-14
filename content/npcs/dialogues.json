@@ -2133,6 +2133,7 @@
         {
           "message": 31261,
           "choices": [
+            { "reply": 40033, "next": 31265, "quest": 1467, "afterObjective": 8167, "beforeObjective": 8168 },
             { "reply": 38220, "quest": 1974, "beforeObjective": 14216, "holds": 19765, "next": 31624, "afterObjective": 14215 },
             { "reply": 37829, "quest": 1991, "completes": 14075, "params": [[30, 14075]], "next": 31315 },
             { "reply": 37962, "next": 31422, "beforeQuest": 2008 },
@@ -2238,9 +2239,15 @@
           "choices": [
             { "reply": 38217, "quest": 1974, "completes": 14216, "params": [[30, 14216]], "takes": 19765, "gives": 19766 }
           ]
+        },
+        {
+          "message": 31265,
+          "choices": [
+            { "reply": 40032, "quest": 1467, "afterObjective": 8167, "beforeObjective": 8168, "completes": 8168 }
+          ]
         }
       ],
-      "why": "«Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Le repos est dans le champ»: spirits woken by the Trépamorts (31422), the holy water to call them and appease them (31423), magic powder and water (31424, 31425), the peaceful and the others (31426), sage, clover and nettles for the incense (31427); the ingredients given all at once (14177-14148), the water blessed (31428) and the censer lent (31429, 19755, 19749); back from the exorcisms (31430, 31431, 14192). «Trempette dans un verre d'eau»: a classic case of possession by a water spirit (31624), he spits into the Pandatriple (31625), shakes it: sprinkle the niece with it (31626: 14216, item 19766)."
+      "why": "«Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Légende d'automne»: the knight of autumn's eternal sleep (14075), his tomb's spells (31315); earth before Brutas' crypt, gargoyle belts and a Purple Dawn spectre's relic in the sacred urn, buried at the tomb (31316); the Brakmarian spirits where the fallen Strubians lie (31317); the urn handed over (19705). «Le repos est dans le champ»: spirits woken by the Trépamorts (31422), the holy water to call them and appease them (31423), magic powder and water (31424, 31425), the peaceful and the others (31426), sage, clover and nettles for the incense (31427); the ingredients given all at once (14177-14148), the water blessed (31428) and the censer lent (31429, 19755, 19749); back from the exorcisms (31430, 31431, 14192). «Trempette dans un verre d'eau»: a classic case of possession by a water spirit (31624), he spits into the Pandatriple (31625), shakes it: sprinkle the niece with it (31626: 14216, item 19766). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Parlez à Nistracolamus qui se trouve là et qui vous apprend qu'il se pourrai que le Dark Vlad soit dans les champs du repos»): asked whether he has seen Dark Vlad, he blames the restless spirits on him (31265), and the character goes looking around."
     },
     {
       "npc": 4323,
@@ -25243,6 +25250,8 @@
       "map": 217317382,
       "opening": 49092,
       "openings": [
+        { "after": 1466, "before": 1467, "message": 49092 },
+        { "quest": 1467, "message": 49092 },
         { "quest": 1466, "objective": 8152, "pending": 8153, "message": 49092 },
         { "canStart": 144, "message": 49097 },
         { "quest": 144, "message": 49092 }
@@ -25258,7 +25267,9 @@
         {
           "message": 49092,
           "choices": [
+            { "reply": 65554, "next": 49095, "quest": 1467, "afterObjective": 8155, "beforeObjective": 8156, "holds": 14990, "completes": 8156 },
             { "reply": 65551, "next": 49093, "quest": 1466, "afterObjective": 8152, "beforeObjective": 8153, "completes": 8153 },
+            { "reply": 65551, "next": 49093, "criterion": "Qf=1466", "beforeQuest": 1467 },
             { "reply": 65560, "next": 49098, "quest": 144, "holds": 33063, "completes": 543 },
             { "reply": 65555, "quest": 144 }
           ]
@@ -25272,11 +25283,30 @@
         {
           "message": 49093,
           "choices": [
+            { "reply": 65550, "next": 49094, "criterion": "Qf=1466", "beforeQuest": 1467 },
             { "reply": 65559 }
+          ]
+        },
+        {
+          "message": 49094,
+          "choices": [
+            { "reply": 65549, "startsQuest": 1467, "params": [[34, 1467]], "beforeQuest": 1467 }
+          ]
+        },
+        {
+          "message": 49095,
+          "choices": [
+            { "reply": 65553, "next": 49096 }
+          ]
+        },
+        {
+          "message": 49096,
+          "choices": [
+            { "reply": 65552 }
           ]
         }
       ],
-      "why": "Captain Starky at Bonta's militia [-32,-57], the Bontarians' daily dragoturkey charge (144, Dofus pour les noobs, «Chargez !»): to a Bontarian who may take it, «Para lanzarnos contra los brakmarianos con mi caballería, necesito monturas...» with «Te prometo que te traeré un animal conforme a tus necesidades» (the guide's «Promettre de lui fournir un animal correspondant à ses besoins») or the infantry; with it running, his charge line and «Te confío el dragopavo» once a red dragoturkey is carried, which he pays with breeder's scrolls (49098), or the promise to bring one. The client's texts follow one another in that order (941394-941400). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «parlez au Captain Starky et demandez lui si il a lui vu le Dark Vlad afin de finir la quête»): Dark Vlad came by a few days ago and left the militia with disorder and desecrations (49093)."
+      "why": "Captain Starky at Bonta's militia [-32,-57], the Bontarians' daily dragoturkey charge (144, Dofus pour les noobs, «Chargez !»): to a Bontarian who may take it, «Para lanzarnos contra los brakmarianos con mi caballería, necesito monturas...» with «Te prometo que te traeré un animal conforme a tus necesidades» (the guide's «Promettre de lui fournir un animal correspondant à ses besoins») or the infantry; with it running, his charge line and «Te confío el dragopavo» once a red dragoturkey is carried, which he pays with breeder's scrolls (49098), or the promise to bring one. The client's texts follow one another in that order (941394-941400). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «parlez au Captain Starky et demandez lui si il a lui vu le Dark Vlad afin de finir la quête»): Dark Vlad came by a few days ago and left the militia with disorder and desecrations (49093). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»): the desecrations (49093, «¿Las profanaciones?»), insults painted on the militia's Iop statue by someone who hates Dark Vlad (49094, «Voy a investigar el asunto.» starts it); shown the compromising document, he knows the Giasau seal, breeders for generations (49095), and sends the character to Giasau (49096)."
     },
     {
       "npc": 805,
@@ -36837,6 +36867,7 @@
         {
           "message": 16694,
           "choices": [
+            { "reply": 20121, "next": 16873, "quest": 1467, "afterObjective": 8170, "beforeObjective": 8171 },
             { "reply": 19898, "next": 16695, "quest": 1462, "completes": 8106 },
             { "reply": 19904, "next": 16702, "criterion": "Qf=1462&PL>39", "beforeQuest": 1463 },
             { "reply": 19945, "next": 16748, "quest": 1463, "beforeObjective": 8113, "takesAll": [14969, 14970, 14971, 14972, 14973, 14974], "completes": 8113 },
@@ -36942,9 +36973,27 @@
           "choices": [
             { "reply": 19953 }
           ]
+        },
+        {
+          "message": 16873,
+          "choices": [
+            { "reply": 20120, "next": 16874, "quest": 1467, "afterObjective": 8170, "beforeObjective": 8171, "completes": 8171 }
+          ]
+        },
+        {
+          "message": 16874,
+          "choices": [
+            { "reply": 20119, "next": 16875 }
+          ]
+        },
+        {
+          "message": 16875,
+          "choices": [
+            { "reply": 20118 }
+          ]
         }
       ],
-      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978)."
+      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875)."
     },
     {
       "npc": 2217,
@@ -37363,6 +37412,269 @@
         }
       ],
       "why": "Master Nabur in his family's vault (Dofus pour les noobs, «L'amour perdu de Nabur», its pictures): told he may rest here (20043), he thanks the character (16827), stops following, and Meriana's compass spins again («la boussole se remet à fonctionner»: 14982 becomes 14983, pointing at Bonta's militia). At peace for good after (16828)."
+    },
+    {
+      "npc": 2226,
+      "map": 212599811,
+      "opening": 16834,
+      "lines": [
+        {
+          "message": 16834,
+          "choices": [
+            { "reply": 20053, "quest": 1467, "beforeObjective": 8154, "completes": 8154 },
+            { "reply": 20053, "quest": 1467, "afterObjective": 8154, "beforeObjective": 8155 },
+            { "reply": 20054, "quest": 1467, "beforeObjective": 8154, "completes": 8154 },
+            { "reply": 20054, "quest": 1467, "afterObjective": 8154 }
+          ]
+        }
+      ],
+      "why": "Nikono Klasta, a sram of the square (Dofus pour les noobs, «Naissance d'une vocation», its picture: «Attaquer ce désagréable personnage», «S'éloigner»): either answer finds the culprits, so a group's other members, who only walk away, have the fight count for them too («à condition que ceux qui ne lancent pas le combat aient tout de même parlé à Nikono en lui répondant « S'éloigner »»). Once found, the fight can be asked for again by whoever lost it."
+    },
+    {
+      "npc": 2227,
+      "map": 212599811,
+      "opening": 16833,
+      "lines": [
+        {
+          "message": 16833,
+          "choices": [
+            { "reply": 20051, "quest": 1467, "beforeObjective": 8154, "completes": 8154 },
+            { "reply": 20051, "quest": 1467, "afterObjective": 8154, "beforeObjective": 8155 },
+            { "reply": 20052, "quest": 1467, "beforeObjective": 8154, "completes": 8154 },
+            { "reply": 20052, "quest": 1467, "afterObjective": 8154 }
+          ]
+        }
+      ],
+      "why": "Dora Profana, Nikono's accomplice (Dofus pour les noobs, «Naissance d'une vocation»: «Parlez à l'un des deux srams présents sur la maps, Nikono ou Profana pour les attaquer»): «No moverte ni un ápice» is the fight, «Alejarte» walks away; either finds the culprits. Once found, the fight can be asked for again by whoever lost it."
+    },
+    {
+      "npc": 2228,
+      "map": 212601346,
+      "opening": 16839,
+      "lines": [
+        {
+          "message": 16839,
+          "choices": [
+            { "reply": 20066, "next": 16841, "quest": 1467, "afterObjective": 8156, "beforeObjective": 8157 },
+            { "reply": 20103, "next": 16861, "quest": 1467, "afterObjectives": [8159, 8160, 8161, 8162, 8163, 8164], "beforeObjective": 8165 },
+            { "reply": 20067, "next": 16840 }
+          ]
+        },
+        {
+          "message": 16840,
+          "choices": []
+        },
+        {
+          "message": 16841,
+          "choices": [
+            { "reply": 20065, "next": 16842 }
+          ]
+        },
+        {
+          "message": 16842,
+          "choices": [
+            { "reply": 20064, "next": 16843 }
+          ]
+        },
+        {
+          "message": 16843,
+          "choices": [
+            { "reply": 20063, "next": 16844 }
+          ]
+        },
+        {
+          "message": 16844,
+          "choices": [
+            { "reply": 20062, "next": 16845 }
+          ]
+        },
+        {
+          "message": 16845,
+          "choices": [
+            { "reply": 20061, "quest": 1467, "afterObjective": 8156, "beforeObjective": 8157, "completes": 8157 }
+          ]
+        },
+        {
+          "message": 16861,
+          "choices": [
+            { "reply": 20102, "next": 16862 }
+          ]
+        },
+        {
+          "message": 16862,
+          "choices": [
+            { "reply": 20101, "next": 16863 }
+          ]
+        },
+        {
+          "message": 16863,
+          "choices": [
+            { "reply": 20100, "next": 16864 }
+          ]
+        },
+        {
+          "message": 16864,
+          "choices": [
+            { "reply": 20104, "quest": 1467, "afterObjective": 8164, "beforeObjective": 8165, "completes": 8165 }
+          ]
+        }
+      ],
+      "why": "Giasau in his paddock of the breeders' quarter [-30,-58] (Dofus pour les noobs, «Naissance d'une vocation»): he denies, then owns to paying the srams (16842), because Dark Vlad killed the king and ruined the family that kept the royal stables (16843); his only heir wants nothing of dragoturkeys (16844), and he will try to forget if she is won over (16845). Told she is, he thanks the character (16861); the compass's needle stays still (16862), and the only relic left is the stone of the royal stables, in the arch at the quarter's old entrance (16863, 16864: «il reste un vestige des anciens enclos que le Dark Vlad à détruits»)."
+    },
+    {
+      "npc": 2229,
+      "map": 212601346,
+      "opening": 16847,
+      "openings": [
+        { "quest": 1467, "objective": 8158, "pending": 8165, "message": 16851 },
+        { "after": 1467, "message": 16846 }
+      ],
+      "lines": [
+        {
+          "message": 16847,
+          "choices": [
+            { "reply": 20069, "next": 16848, "quest": 1467, "afterObjective": 8157, "beforeObjective": 8158 },
+            { "reply": 20068 }
+          ]
+        },
+        {
+          "message": 16848,
+          "choices": [
+            { "reply": 20072, "next": 16849 }
+          ]
+        },
+        {
+          "message": 16849,
+          "choices": [
+            { "reply": 20071, "next": 16850, "quest": 1467, "afterObjective": 8157, "beforeObjective": 8158, "completes": 8158 }
+          ]
+        },
+        {
+          "message": 16850,
+          "choices": [
+            { "reply": 82511, "next": 60125, "beforeObjective": 8159, "criterion": "OA=95", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 82514, "next": 60126, "beforeObjective": 8159, "criterion": "OA!95", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 82520, "next": 60128, "beforeObjective": 8160, "criterion": "Pj>79,19", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 82517, "next": 60127, "beforeObjective": 8160, "criterion": "Pj<79,20", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20091, "next": 16857, "beforeObjective": 8161, "criterion": "OA=107", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20088, "next": 16856, "beforeObjective": 8161, "criterion": "OA!107", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20095, "next": 16859, "beforeObjective": 8162, "completesAll": [8162, 8163, 8164], "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20094, "next": 16858, "beforeObjective": 8162, "criterion": "PO!33063|PO!33001|PO!33011", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20099, "next": 16860, "quest": 1467, "afterObjectives": [8159, 8160, 8161, 8162, 8163, 8164], "beforeObjective": 8165 },
+            { "reply": 20070 }
+          ]
+        },
+        {
+          "message": 16851,
+          "choices": [
+            { "reply": 82511, "next": 60125, "beforeObjective": 8159, "criterion": "OA=95", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 82514, "next": 60126, "beforeObjective": 8159, "criterion": "OA!95", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 82520, "next": 60128, "beforeObjective": 8160, "criterion": "Pj>79,19", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 82517, "next": 60127, "beforeObjective": 8160, "criterion": "Pj<79,20", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20091, "next": 16857, "beforeObjective": 8161, "criterion": "OA=107", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20088, "next": 16856, "beforeObjective": 8161, "criterion": "OA!107", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20095, "next": 16859, "beforeObjective": 8162, "completesAll": [8162, 8163, 8164], "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20094, "next": 16858, "beforeObjective": 8162, "criterion": "PO!33063|PO!33001|PO!33011", "quest": 1467, "afterObjective": 8158 },
+            { "reply": 20099, "next": 16860, "quest": 1467, "afterObjectives": [8159, 8160, 8161, 8162, 8163, 8164], "beforeObjective": 8165 },
+            { "reply": 20068 }
+          ]
+        },
+        {
+          "message": 60125,
+          "choices": [
+            { "reply": 82509, "next": 16851 },
+            { "reply": 82510 }
+          ]
+        },
+        {
+          "message": 60126,
+          "choices": [
+            { "reply": 82512, "next": 16851 },
+            { "reply": 82513 }
+          ]
+        },
+        {
+          "message": 60128,
+          "choices": [
+            { "reply": 82518, "next": 16851 },
+            { "reply": 82519 }
+          ]
+        },
+        {
+          "message": 60127,
+          "choices": [
+            { "reply": 82515, "next": 16851 },
+            { "reply": 82516 }
+          ]
+        },
+        {
+          "message": 16857,
+          "choices": [
+            { "reply": 20089, "next": 16851 },
+            { "reply": 20090 }
+          ]
+        },
+        {
+          "message": 16856,
+          "choices": [
+            { "reply": 20086, "next": 16851 },
+            { "reply": 20087 }
+          ]
+        },
+        {
+          "message": 16859,
+          "choices": [
+            { "reply": 20096, "next": 16851 },
+            { "reply": 20097 }
+          ]
+        },
+        {
+          "message": 16858,
+          "choices": [
+            { "reply": 20092, "next": 16851 },
+            { "reply": 20093 }
+          ]
+        },
+        {
+          "message": 16860,
+          "choices": [
+            { "reply": 20098 }
+          ]
+        },
+        {
+          "message": 16846,
+          "choices": []
+        }
+      ],
+      "why": "Ademaga, Giasau's daughter (Dofus pour les noobs, «Naissance d'une vocation»): she finds dragoturkeys ugly and her father a dull teacher (16848, 16849), and dares the character to surprise her (16850). The lessons, each a success line and a line that sends the character back: domesticating a mount with «Cazamonturas» (95) earned («Vous devez avoir terminé le succès \"Ce n'est qu'un prélèvement\"»: 60125, else 60126), a breeder's tools at breeder level 20 («Avoir son métier d'Éleveur niveau 20 ou plus»: 60128, else 60127), a birth with «Primeriza» (107) («Vous devrez avoir validé le succès \"Elle a peut-être trop mangé ?\"»: 16857, else 16856), and the three generation-one dragoturkeys, red, almond and golden, given to her (16859; 16858 «¿sueñas despierto?» without them). Then «Felicidades, Ademaga» (16860): she will follow her father. Waiting for her lessons (16851), and a breeder for good after (16846)."
+    },
+    {
+      "npc": 673,
+      "map": 190972421,
+      "opening": 16869,
+      "lines": [
+        {
+          "message": 16869,
+          "choices": [
+            { "reply": 20115, "next": 16870, "quest": 1467, "afterObjective": 8168, "beforeObjective": 8169 }
+          ]
+        },
+        {
+          "message": 16870,
+          "choices": [
+            { "reply": 20114, "next": 16871, "quest": 1467, "afterObjective": 8168, "beforeObjective": 8169 }
+          ]
+        },
+        {
+          "message": 16871,
+          "choices": [
+            { "reply": 20113, "quest": 1467, "afterObjective": 8168, "beforeObjective": 8169, "completes": 8169, "teleport": 190841860, "phantom": 190843392, "takes": 14991, "gives": 14992 },
+            { "reply": 20113, "quest": 1467, "afterObjective": 8168, "beforeObjective": 8169, "completes": 8169, "teleport": 190841860, "phantom": 190843392, "criterion": "PO!14991&PO!14992", "gives": 14992 },
+            { "reply": 20113, "quest": 1467, "afterObjective": 8168, "beforeObjective": 8169, "completes": 8169, "teleport": 190841860, "phantom": 190843392, "criterion": "PO!14991&PO=14992" }
+          ]
+        }
+      ],
+      "why": "Dark Vlad among the tombs of Astrub's cemetery (Dofus pour les noobs, «Naissance d'une vocation», its pictures: «Répondre que vous le cherchez depuis un bon moment», «Dégainer votre arme», «MEURS !», «Tenter de résister à l'attaque du Dark Vlad»): he strikes, and the character comes to in the fields of rest [-1,-10] as a soul («vous vous retrouvez au cimetière en tant que fantôme»), with Astrub's phoenix to rise at («Allez ressusciter votre âme au phénix»). The 3.6 kills no one any more, so the soul is the one its client still draws, as Warko Linch's brew leaves it. Meriana's compass melts on him (14991 becomes 14992, whose use is the next objective)."
     }
   ]
 }

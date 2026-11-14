@@ -1117,6 +1117,12 @@
     { "npc": 2253, "map": 199232770, "reply": 20030,
       "monsters": [ { "monster": 3584, "grade": 0 }, { "monster": 3603, "grade": 0 }, { "monster": 3602, "grade": 0 } ],
       "allies": [ { "monster": 3585, "grade": 0 } ],
-      "why": "«Atacar a los saqueadores.»: the Jefe de los saqueadores (3584, level 90) with a Saqueadora cruel (3603) and a Saqueador irritable (3602) (Dofus pour les noobs, «L'amour perdu de Nabur»: «Le Chef des Pillards est accompagné d'une Pillarde Cruelle et d'un Pillard Irascible»), Master Nabur (3585) fighting beside the character, five in its turn line (his «Eres muy valiente por haber combatido junto a mí»)." }
+      "why": "«Atacar a los saqueadores.»: the Jefe de los saqueadores (3584, level 90) with a Saqueadora cruel (3603) and a Saqueador irritable (3602) (Dofus pour les noobs, «L'amour perdu de Nabur»: «Le Chef des Pillards est accompagné d'une Pillarde Cruelle et d'un Pillard Irascible»), Master Nabur (3585) fighting beside the character, five in its turn line (his «Eres muy valiente por haber combatido junto a mí»)." },
+    { "npc": 2226, "map": 212599811, "reply": 20053,
+      "monsters": [ { "monster": 3586, "grade": 0 }, { "monster": 3587, "grade": 0 } ],
+      "why": "Nikono Klasta (3586) and Dora Profana (3587), level 90, together whichever of them is answered (Dofus pour les noobs, «Naissance d'une vocation»: «Parlez à l'un des deux srams présents sur la maps, Nikono ou Profana pour les attaquer»; «Les deux srams frappent avec attaque mortelle et peuvent se rendre invisibles»)." },
+    { "npc": 2227, "map": 212599811, "reply": 20051,
+      "monsters": [ { "monster": 3586, "grade": 0 }, { "monster": 3587, "grade": 0 } ],
+      "why": "Nikono Klasta (3586) and Dora Profana (3587), level 90, together whichever of them is answered (Dofus pour les noobs, «Naissance d'une vocation»: «Parlez à l'un des deux srams présents sur la maps, Nikono ou Profana pour les attaquer»; «Les deux srams frappent avec attaque mortelle et peuvent se rendre invisibles»)." }
   ]
 }

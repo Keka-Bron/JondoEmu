@@ -4935,6 +4935,7 @@
      "count": 1
     }
    ],
+   "says": 425,
    "why": "«Lleva a Nabur al castillo de Amakna»: the castle [4,-6] reached with him walking behind (Dofus pour les noobs, «L'amour perdu de Nabur»: «Il vous faut maintenant amener Nabur au Château d'Amakna en [4,-6]»); he keeps following."
   },
   {
@@ -4972,6 +4973,125 @@
     8151
    ],
    "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: the compass now points at Bonta's militia [-32,-57] (14983, map reference 189: the hall 217318404) (Dofus pour les noobs, «L'amour perdu de Nabur»: «Double cliquez sur la boussole de Mériana afin d'obtenir la position de la milice de Bonta en [-32,-57]»); done in Captain Starky's room 217317382, which both ways into the militia lead to."
+  },
+  {
+   "objective": 8155,
+   "quest": 1467,
+   "kind": "beat",
+   "monster": 3587,
+   "map": 212599811,
+   "afterObjectives": [
+    8154
+   ],
+   "why": "«Vence a Dora Profana y a Nikono Klasta»: the two srams of the square [-32,-56] fight together (3587 and 3586, level 90; Dofus pour les noobs, «Naissance d'une vocation»: «Un combat se lance, il peut se faire à plusieurs»). Done on beating them; Dora's «Documento comprometedor» (14990) is her drop at 100 % («A la fin du combat vous droperez un Document Compromettant»)."
+  },
+  {
+   "objective": 8159,
+   "quest": 1467,
+   "kind": "reply",
+   "replies": [
+    82511
+   ],
+   "afterObjectives": [
+    8158
+   ],
+   "anyOrder": true,
+   "why": "Ademaga's lesson: how to domesticate a mount, once «Cazamonturas» (95) is earned (Dofus pour les noobs, «Naissance d'une vocation»: «Tout d'abord pour les trois premières étapes il faut simplement avoir validé une condition»). Her success line only; the other one sends the character back to learn. In any order with the other lessons."
+  },
+  {
+   "objective": 8160,
+   "quest": 1467,
+   "kind": "reply",
+   "replies": [
+    82520
+   ],
+   "afterObjectives": [
+    8158
+   ],
+   "anyOrder": true,
+   "why": "Ademaga's lesson: how to make a breeder's tools, as a breeder of level 20 or more (Dofus pour les noobs, «Naissance d'une vocation»: «Tout d'abord pour les trois premières étapes il faut simplement avoir validé une condition»). Her success line only; the other one sends the character back to learn. In any order with the other lessons."
+  },
+  {
+   "objective": 8161,
+   "quest": 1467,
+   "kind": "reply",
+   "replies": [
+    20091
+   ],
+   "afterObjectives": [
+    8158
+   ],
+   "anyOrder": true,
+   "why": "Ademaga's lesson: how to help a mount give birth, once «Primeriza» (107) is earned (Dofus pour les noobs, «Naissance d'une vocation»: «Tout d'abord pour les trois premières étapes il faut simplement avoir validé une condition»). Her success line only; the other one sends the character back to learn. In any order with the other lessons."
+  },
+  {
+   "objective": 8162,
+   "quest": 1467,
+   "kind": "order",
+   "afterObjectives": [
+    8158
+   ],
+   "anyOrder": true,
+   "why": "The red dragoturkey handed to Ademaga, all three at once on «Regalarle tus dragopavos.»; in any order with her other lessons (Dofus pour les noobs gives them as one more lesson)."
+  },
+  {
+   "objective": 8163,
+   "quest": 1467,
+   "kind": "order",
+   "afterObjectives": [
+    8158
+   ],
+   "anyOrder": true,
+   "why": "The almond dragoturkey handed to Ademaga, all three at once on «Regalarle tus dragopavos.»; in any order with her other lessons (Dofus pour les noobs gives them as one more lesson)."
+  },
+  {
+   "objective": 8164,
+   "quest": 1467,
+   "kind": "order",
+   "afterObjectives": [
+    8158
+   ],
+   "anyOrder": true,
+   "why": "The golden dragoturkey handed to Ademaga, all three at once on «Regalarle tus dragopavos.»; in any order with her other lessons (Dofus pour les noobs gives them as one more lesson)."
+  },
+  {
+   "objective": 8166,
+   "quest": 1467,
+   "kind": "click",
+   "elements": [
+    {
+     "map": 212601344,
+     "element": 522711
+    }
+   ],
+   "afterObjectives": [
+    8165
+   ],
+   "requires": [
+    {
+     "item": 14983,
+     "count": 1
+    }
+   ],
+   "spends": true,
+   "gives": [
+    {
+     "item": 14991,
+     "count": 1
+    }
+   ],
+   "says": 427,
+   "why": "«Examina el arco del antiguo barrio de los ganaderos»: the keystone of the broken stone arch [-30,-60], element 522711 on cell 558, with no skill of its own (Dofus pour les noobs, «Naissance d'une vocation»: «Cliquez sur la clé de voûte de l'arche afin de faire réagir la boussole»). The client's info 427, «Tomas la brújula en tu mano [...] la aguja comienza a girar»; Meriana's compass now points at Astrub's phoenix (14983 becomes 14991, map reference 190)."
+  },
+  {
+   "objective": 8167,
+   "quest": 1467,
+   "kind": "enter",
+   "map": 190843392,
+   "afterObjectives": [
+    8166
+   ],
+   "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: the compass's reference 190, Astrub's phoenix [2,-14] (Dofus pour les noobs, «Naissance d'une vocation»: «La boussole se met à vous indiquer une position au Sud d'Astrub, plus précisément en [2,-14]»), where Nistracolamus stands."
   }
  ]
 }

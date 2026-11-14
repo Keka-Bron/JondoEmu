@@ -46,6 +46,35 @@ namespace Jondo.Unity.Tests.Content
             Assert.True(log.Holds(8518));
         }
 
+        private sealed class Births : IQuestFacts
+        {
+            public long Born { get; set; }
+
+            public int Level => 200;
+            public long MapId => 0;
+            public bool Finished(int questId) => false;
+            public bool Active(int questId) => false;
+            public bool ObjectiveDone(int objectiveId) => false;
+            public long? Count(string op, long key, string flag) => op == "EB" && key == 0 ? Born : 0;
+        }
+
+        [Fact]
+        public void An_objective_the_client_lists_without_a_criterion_takes_the_authored_one()
+        {
+            if (!File.Exists(Paths.AchievementsJson) || !File.Exists(Paths.QuestsJson)
+                || !File.Exists(Paths.AchievementLinksJson)) return;
+
+            // «Primeriza» (107): its only objective, 79, has no criterion in the client and was left
+            // out, so the achievement could not be earned. Authored, it is the first mount born.
+            var births = new Births();
+            var book = new AchievementCatalogue();
+            Assert.Contains(book.Of(107)!.Objectives, objective => objective.Id == 79);
+            var log = new AchievementLog(book, births);
+            Assert.False(log.Holds(107));
+            births.Born = 1;
+            Assert.True(log.Holds(107));
+        }
+
         [Fact]
         public void OO_uses_the_character_s_achievement_objective_state_with_negation()
         {

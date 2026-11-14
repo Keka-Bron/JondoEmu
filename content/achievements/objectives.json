@@ -13,10 +13,14 @@
     "«eachCharacter»: the achievements every character of an account earns and is paid for",
     "himself (Managers.Achievements), where the others are the account's and earned once.",
     "",
-    "  { \"achievement\": 8518, \"measured\": \"...\" }"
+    "  { \"achievement\": 8518, \"measured\": \"...\" }",
+    "",
+    "A row naming its achievement may also judge an objective the client lists under it without",
+    "any criterion, which the catalogue would otherwise leave out (79 of «Primeriza»)."
   ],
   "objectives": [
-    { "objective": 17380, "achievement": 8518, "criterion": "Qo>19173", "measured": "«Primera parte del tutorial» of «Primer tiempo». The capture of the whole tutorial earns 8518 (mfu) right after idz 2502 3173, the reply to Ganymed by the jalatós' pen that validates objective 19173; its other two objectives, 2511 and 2545 finished, held already." }
+    { "objective": 17380, "achievement": 8518, "criterion": "Qo>19173", "measured": "«Primera parte del tutorial» of «Primer tiempo». The capture of the whole tutorial earns 8518 (mfu) right after idz 2502 3173, the reply to Ganymed by the jalatós' pen that validates objective 19173; its other two objectives, 2511 and 2545 finished, held already." },
+    { "objective": 79, "achievement": 107, "criterion": "(EB>0,0)", "measured": "INFERRED. The only objective of «Primeriza» (107), «Hacer que nazca 1 montura»: the client lists it without a criterion, so the achievement could never be earned. Its siblings say how births are counted: «Hacer que nazcan 10 monturas» (106) is (EB>0,9), 100 (108) is (EB>0,99) and 1000 (109) is (EB>0,999), each key 0 any colour, which the breeding counts as each litter is born (BreedingHandler, EB 0 with the children). «Naissance d'une vocation» (1467) asks for it before Ademaga will hear how a mount gives birth." }
   ],
   "eachCharacter": [
     { "achievement": 8518, "measured": "«Primer tiempo», whose experience makes the character level 2. The client's step of 2502 for objective 19250 («Consigue las recompensas del logro y reparte los puntos de característica», tutorial step 15) waits for level 2, the characteristics sheet opened, points spent and the sheet closed, and only then validates it (idw 19250, as the capture does after mga, mfs and kum). A second character of an account that already had it stayed at level 1 with no points, and the tutorial could not go on." }
