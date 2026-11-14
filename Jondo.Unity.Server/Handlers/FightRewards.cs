@@ -179,6 +179,12 @@ namespace Jondo.Unity.Server.Handlers
                     xp = ServerSettings.WithBonus(ConElExtra(xp, extra), ServerSettings.Current.ExperienceBonusPercent);
                     using (SessionContext.Push(session)) xp = WithAlmanaxExperience(xp, paying, fight.RoleplayMapId, inDungeon);
                 }
+                // A dream's fight pays its intensity's experience: the XP percentage the panel shows
+                // under the dream's name (the izg's f22, the client's xpBonus), 50 % in a Rêve I and
+                // 300 % in a Cauchemar III. Its loot already went by the room's bonus; the experience
+                // went as it was, the same in every intensity.
+                else if (dream != null)
+                    xp = DreamExperience(xp, dream.Difficulty);
                 // And last, as the client cuts its tooltip: the limit he set on what he earns.
                 xp = ExperienceLimit.ApplyFor(fighter.Id, xp);
                 plan[fighter.Id] = new Reward
@@ -293,6 +299,10 @@ namespace Jondo.Unity.Server.Handlers
         /// bonus (<see cref="Dreams.LootOf"/>), the Jondo coin every monster pays on this server,
         /// and, when the fight finished the dream, the dream fragments of its waves.
         /// </summary>
+        /// <summary>A dream fight's experience at its intensity's percentage (<see cref="Dreams.BonusOf"/>).</summary>
+        internal static long DreamExperience(long xp, int difficulty)
+            => xp * Dreams.BonusOf(difficulty) / 100;
+
         private static Dictionary<int, int> DreamLootOf(FightInstance fight, DreamHandler.DreamPay dream)
         {
             var loot = Dreams.LootOf(dream.Difficulty, dream.Row, dream.LootBonus, TirarPorcentaje);
