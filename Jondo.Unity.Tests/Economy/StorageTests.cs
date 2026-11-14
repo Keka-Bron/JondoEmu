@@ -400,6 +400,73 @@ namespace Jondo.Unity.Tests.Economy
             }
         }
 
+        /// <summary>
+        /// The inventory's transfer buttons at the haven bag chest: a selection (kdd), what the
+        /// chest has already (kgx), everything (kez), a selection out (kcz) and everything back (kcg). They went to the bank alone, which was not open, and nothing moved.
+        /// </summary>
+        [Fact]
+        public async Task The_transfer_buttons_fill_and_empty_the_haven_bag_chest()
+        {
+            const long account = 8_810_000_021, character = 8_810_100_021;
+            var chest = StorageStacks.HavenBag(character);
+            Forget(chest, character);
+
+            await using var pipe = await ClientPipe.OpenAsync(account, character, 162795538);
+            try
+            {
+                using (SessionContext.Push(pipe.Session))
+                {
+                    long four = Give(character, 17626, 4);
+                    Equipment.Add(four, 17626, 4, Equipment.Bag, null);
+                    long two = Give(character, 17627, 2);
+                    Equipment.Add(two, 17627, 2, Equipment.Bag, null);
+                    long seven = Give(character, 17628, 7);
+                    Equipment.Add(seven, 17628, 7, Equipment.Bag, null);
+
+                    // No chest open: not the storage's.
+                    Assert.False(await StorageHandler.TransferAsync(pipe.ToClient, ConnectionProtocol.Push("kez"), "kez"));
+
+                    await ChestHandler.OpenAsync(pipe.ToClient, 516924, Merkasako.ChestSkill);
+                    await pipe.Take(3);
+
+                    // A selection: one of the four, all of the seven.
+                    Assert.True(await StorageHandler.TransferAsync(pipe.ToClient,
+                        ConnectionProtocol.Push("kdd", Pb.New().Packed(1, new System.Collections.Generic.List<long> { four, seven })
+                                                              .Packed(2, new System.Collections.Generic.List<long> { 1, 0 }).Build()), "kdd"));
+                    Assert.Equal(new[] { (17626, 1), (17628, 7) }, Contents());
+
+                    // What the chest has already: the three other 17626, not the 17627.
+                    Assert.True(await StorageHandler.TransferAsync(pipe.ToClient, ConnectionProtocol.Push("kgx"), "kgx"));
+                    Assert.Equal(new[] { (17626, 4), (17628, 7) }, Contents());
+
+                    // Everything.
+                    Assert.True(await StorageHandler.TransferAsync(pipe.ToClient, ConnectionProtocol.Push("kez"), "kez"));
+                    Assert.Equal(new[] { (17626, 4), (17627, 2), (17628, 7) }, Contents());
+                    Assert.DoesNotContain(Equipment.All, i => i.Position == Equipment.Bag && i.Template is 17626 or 17627 or 17628);
+
+                    // A selection out, from the chest's side: the 17627.
+                    long twoInChest = StorageStacks.ItemsOf(chest).Single(i => i.Gid == 17627).Uid;
+                    Assert.True(await StorageHandler.TransferAsync(pipe.ToClient,
+                        ConnectionProtocol.Push("kcz", Pb.New().Packed(2, new System.Collections.Generic.List<long> { twoInChest }).Build()), "kcz"));
+                    Assert.Equal(new[] { (17626, 4), (17628, 7) }, Contents());
+
+                    // Everything back.
+                    Assert.True(await StorageHandler.TransferAsync(pipe.ToClient, ConnectionProtocol.Push("kcg"), "kcg"));
+                    Assert.Empty(StorageStacks.ItemsOf(chest));
+                    Assert.Equal(13, Equipment.All.Where(i => i.Position == Equipment.Bag && i.Template is 17626 or 17627 or 17628).Sum(i => i.Quantity));
+
+                    await ChestHandler.CloseAsync(pipe.ToClient);
+                }
+            }
+            finally
+            {
+                Forget(chest, character);
+            }
+
+            (int, int)[] Contents()
+                => StorageStacks.ItemsOf(chest).GroupBy(i => i.Gid).OrderBy(g => g.Key).Select(g => (g.Key, g.Sum(i => i.Quantity))).ToArray();
+        }
+
         private static byte[] Kcr(long quantity, long uid)
             => ConnectionProtocol.Push(Op.Kcr, Pb.New().Var(1, quantity).Var(2, uid).Build());
     }
