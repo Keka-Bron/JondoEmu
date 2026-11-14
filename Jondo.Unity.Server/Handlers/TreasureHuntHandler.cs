@@ -342,7 +342,8 @@ namespace Jondo.Unity.Server.Handlers
             if (legendary == null) return;
 
             var roster = dimension == null ? Array.Empty<int>() : MobSpawnManager.RosterOfMap(dimension.EntryMap);
-            var members = FissureFight(legendary, roster, MobSpawnManager.GetMonsterData, _dice);
+            var members = FissureFight(legendary, roster, MobSpawnManager.GetMonsterData, _dice,
+                                       LegendaryHunts.CompanyOf(legendary.Id));
             var group = MobSpawnManager.ComposeOffMap(members);
             if (group == null)
             {
@@ -360,7 +361,8 @@ namespace Jondo.Unity.Server.Handlers
         /// its dimension's monsters, each at the grade nearest the hunt's level.
         /// </summary>
         public static List<(int Monster, int Grade)> FissureFight(LegendaryHunts.Definition legendary, IReadOnlyList<int> roster,
-                                                                  Func<int, MobSpawnManager.MonsterData?> data, Random dice)
+                                                                  Func<int, MobSpawnManager.MonsterData?> data, Random dice,
+                                                                  IReadOnlyList<int>? partners = null)
         {
             int GradeNear(MobSpawnManager.MonsterData monster)
             {
@@ -375,6 +377,9 @@ namespace Jondo.Unity.Server.Handlers
             var members = new List<(int Monster, int Grade)>();
             if (data(legendary.Monster) is { Grades.Count: > 0 } fissure)
                 members.Add((legendary.Monster, GradeNear(fissure)));
+            // Whoever always stands with it: the two other bandits of Cania (LegendaryHunts.CompanyOf).
+            foreach (int partner in partners ?? Array.Empty<int>())
+                if (data(partner) is { Grades.Count: > 0 } beside) members.Add((partner, GradeNear(beside)));
 
             var company = roster.Distinct().Select(id => data(id)).Where(m => m is { Grades.Count: > 0 }).ToList();
             for (int i = 0; i < FissureCompany && company.Count > 0; i++)

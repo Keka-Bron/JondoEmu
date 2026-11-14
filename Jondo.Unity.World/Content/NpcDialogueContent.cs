@@ -139,6 +139,34 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public int Marks { get; init; }
 
+        /// <summary>
+        /// A range of marks and a count («marksBelow»: lowest, highest, count): the reply is offered
+        /// while fewer than that many of the character's marks fall in the range. The bounty hunter
+        /// of Amakna's militia hands over a primaton for each criminal brought to justice, nine at
+        /// most: «Cuando hayas realizado bastantes arrestos, digamos nueve, me habrás convencido».
+        /// </summary>
+        public IReadOnlyList<int> MarksBelow { get; init; } = Array.Empty<int>();
+
+        /// <summary>
+        /// The other side of <see cref="MarksBelow"/> («marksReached»): offered once at least that
+        /// many of the character's marks fall in the range -- the hunter's «¡Estoy impresionado!».
+        /// </summary>
+        public IReadOnlyList<int> MarksReached { get; init; } = Array.Empty<int>();
+
+        /// <summary>Whether the character's marks let the reply through <see cref="MarksBelow"/> and <see cref="MarksReached"/>.</summary>
+        public bool MarksAllow(IReadOnlyCollection<int> used)
+        {
+            if (MarksBelow.Count == 3 && MarksIn(used, MarksBelow) >= MarksBelow[2]) return false;
+            if (MarksReached.Count == 3 && MarksIn(used, MarksReached) < MarksReached[2]) return false;
+            return true;
+        }
+
+        private static int MarksIn(IReadOnlyCollection<int> used, IReadOnlyList<int> range)
+        {
+            int low = Math.Min(range[0], range[1]), high = Math.Max(range[0], range[1]);
+            return used.Count(mark => mark >= low && mark <= high);
+        }
+
         /// <summary>What this reply buys, and for how much. Zero when it buys nothing.</summary>
         /// <remarks>
         /// The price goes in the reply's text --«Ponme una limonada. Toma, 1 kama.»-- and
@@ -469,7 +497,7 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public bool Gated => Criterion.Length > 0 || MinLevel != 0 || BelowLevel != 0 || Holds != 0
                              || Takes != 0 || TakesAll.Count > 0 || StartsQuest != 0 || BeforeQuest != 0
-                             || AfterElement != 0 || BeforeElement != 0;
+                             || AfterElement != 0 || BeforeElement != 0 || MarksBelow.Count > 0 || MarksReached.Count > 0;
 
         public override string ToString()
         {
@@ -1143,6 +1171,8 @@ namespace Jondo.Unity.World.Content
                             AfterElement = (int)Number(choice, "afterElement"),
                             BeforeElement = (int)Number(choice, "beforeElement"),
                             Marks = (int)Number(choice, "marks"),
+                            MarksBelow = Numbers(choice, "marksBelow").Select(o => (int)o).ToArray(),
+                            MarksReached = Numbers(choice, "marksReached").Select(o => (int)o).ToArray(),
                             BuysItem = (int)Number(choice, "buyItem"),
                             BuysCount = (int)Math.Max(1, Number(choice, "buyCount")),
                             BuysPrice = Number(choice, "buyPrice"),
@@ -1335,6 +1365,13 @@ namespace Jondo.Unity.World.Content
                                 writer.WriteNumber("beforeElement", choice.BeforeElement);
                             if (choice.Marks != 0)
                                 writer.WriteNumber("marks", choice.Marks);
+                            foreach (var (key, range) in new[] { ("marksBelow", choice.MarksBelow), ("marksReached", choice.MarksReached) })
+                            {
+                                if (range.Count == 0) continue;
+                                writer.WriteStartArray(key);
+                                foreach (int value in range) writer.WriteNumberValue(value);
+                                writer.WriteEndArray();
+                            }
                             if (choice.BuysItem != 0)
                             {
                                 writer.WriteNumber("buyItem", choice.BuysItem);

@@ -325,6 +325,8 @@ namespace Jondo.Unity.Server.Network
             Managers.HarvestDrops.Forget();
             Managers.QuestFightDrops.Forget();
             Managers.LootBoxes.Forget();
+            Managers.LegendaryHunts.ForgetCompany();
+            Managers.TokenShops.Initialize();
             Managers.DungeonExitRooms.Forget();
             Managers.FightWinAlterations.Forget();
             Managers.Readables.Forget();

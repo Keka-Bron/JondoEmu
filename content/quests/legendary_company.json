@@ -1,0 +1,18 @@
+{
+  "_comment": [
+    "Monsters that wait at a criminal legendary hunt's end beside the one the client's row names",
+    "(datos/legendary_hunts_*.json), read by Managers/LegendaryHunts.CompanyOf.",
+    "",
+    "  { \"hunt\": 57, \"company\": [ 6543, 6544 ], \"why\": \"...\" }"
+  ],
+  "hunts": [
+    {
+      "hunt": 57,
+      "company": [
+        6543,
+        6544
+      ],
+      "why": "«Trésor des bandits de Cania»: the row names Nomekop el Crío (6542) alone, and «Un combat se lance contre les trois bandits de Cania, il peut se faire à plusieurs» (Dofus pour les noobs) -- Eratz el Reivindicador and Edass el Aguafiestas with him."
+    }
+  ]
+}

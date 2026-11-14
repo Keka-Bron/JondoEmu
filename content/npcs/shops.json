@@ -351,6 +351,21 @@
           "price": 1000
         }
       ]
+    },
+    {
+      "npc": 5963,
+      "items": [
+        {
+          "gid": 23740
+        },
+        {
+          "gid": 23741
+        },
+        {
+          "gid": 23742
+        }
+      ],
+      "why": "The bounty hunter's three copies of the map of Cania, paid in primatons (datos/tiendas_en_fichas.json): «vous pourrez alors acheter chaque fragment au Chasseur de primes en [5,-6] pour 3 x Primaton unité» (Dofus pour les noobs)."
     }
   ]
 }

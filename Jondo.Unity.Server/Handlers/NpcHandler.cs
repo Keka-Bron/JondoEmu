@@ -1015,6 +1015,7 @@ namespace Jondo.Unity.Server.Handlers
             if (choice.Door == Jondo.Unity.World.Content.DialogueChoice.KeyringDoor
                 && DungeonHandler.KeyringCannotOpen(SessionContext.State.MapId)) return false;
             if (choice.Cells.Count > 0 && !choice.Cells.Contains(SessionContext.State.CellId)) return false;
+            if (!choice.MarksAllow(SessionContext.State.ElementsUsed)) return false;
             if (NotItsTurnYet(choice)) return false;
             if (!ItsQuestIsOpenToHim(choice)) return false;
             if (choice.RefusedNext == 0 && choice.TakesAll.Any(i => Managers.Equipment.HowMany(i) < choice.TakesCount)) return false;
@@ -1752,7 +1753,10 @@ namespace Jondo.Unity.Server.Handlers
             // Does this answer lead to another sentence? It is the only thing that makes this a
             // conversation instead of a loose question, and only the hand-written tree can say so: the
             // client carries the sentences and the answers but never which goes with which.
-            if (await SeguirLaConversacionAsync(stream, reply)) return;
+            // The choice taken above, not one looked up again: the mark it has just left hides it and
+            // its twins alike, and the first of them would be taken -- the bounty hunter's tenth criminal
+            // got the line of a paid one with no primaton.
+            if (await SeguirLaConversacionAsync(stream, reply, elegidaAhora)) return;
 
             int spokenTo = SessionContext.State.OpenDialogueNpcId;
             long spokenOn = SessionContext.State.OpenDialogueMapId != 0 ? SessionContext.State.OpenDialogueMapId : SessionContext.State.MapId;
@@ -1826,14 +1830,15 @@ namespace Jondo.Unity.Server.Handlers
         /// state. If it does not fit -- the player has another window open, or none -- it is closed, which is
         /// the safe thing: leaving the window up is leaving it with no way out.
         /// </remarks>
-        private static async Task<bool> SeguirLaConversacionAsync(NetworkStream stream, long reply)
+        private static async Task<bool> SeguirLaConversacionAsync(NetworkStream stream, long reply,
+                                                                  Jondo.Unity.World.Content.DialogueChoice? chosen = null)
         {
             var estado = SessionContext.State;
             if (estado.OpenDialogueNpcId == 0 || reply == 0) return false;
 
             var conversacion = NpcDialogues.For(estado.OpenDialogueNpcId, estado.OpenDialogueMapId);
             var frase = conversacion?.Line(estado.OpenDialogueMessage);
-            var elegida = frase?.Choice(reply, SeLeOfrece);
+            var elegida = chosen != null && frase != null && frase.Choices.Contains(chosen) ? chosen : frase?.Choice(reply, SeLeOfrece);
             if (elegida == null || elegida.Ends) return false;
 
             // A conquest role taken (Hal Ylanza): its certificate, or the line that says not yet.

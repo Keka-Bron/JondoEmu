@@ -46,6 +46,53 @@ namespace Jondo.Unity.Server.Managers
             return null;
         }
 
+        /// <summary>The company written by hand, relative to the content root.</summary>
+        public const string CompanyFile = "quests/legendary_company.json";
+
+        private static Dictionary<int, int[]>? _company;
+
+        /// <summary>
+        /// The monsters that wait with a criminal hunt's own at its end, beyond the one the client's
+        /// row names: «Trésor des bandits de Cania» (57) names Nomekop alone, and «Un combat se lance
+        /// contre les trois bandits de Cania» (Dofus pour les noobs) -- Eratz and Edass with him.
+        /// </summary>
+        public static IReadOnlyList<int> CompanyOf(int hunt)
+        {
+            var company = _company;
+            if (company == null)
+            {
+                lock (_lock) company = _company ??= LoadCompany(Paths.ContentFile(CompanyFile));
+            }
+            return company.TryGetValue(hunt, out var monsters) ? monsters : Array.Empty<int>();
+        }
+
+        /// <summary>For the harness's reload: read the company again.</summary>
+        internal static void ForgetCompany()
+        {
+            lock (_lock) _company = null;
+        }
+
+        private static Dictionary<int, int[]> LoadCompany(string path)
+        {
+            var company = new Dictionary<int, int[]>();
+            if (!File.Exists(path)) return company;
+            try
+            {
+                using var json = JsonDocument.Parse(File.ReadAllText(path));
+                foreach (var row in json.RootElement.GetProperty("hunts").EnumerateArray())
+                {
+                    var monsters = new List<int>();
+                    foreach (var monster in row.GetProperty("company").EnumerateArray()) monsters.Add(monster.GetInt32());
+                    company[row.GetProperty("hunt").GetInt32()] = monsters.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Hunts] Could not read {Path.GetFileName(path)}: {ex.Message}");
+            }
+            return company;
+        }
+
         private static Dictionary<int, Definition> Load(string path)
         {
             var hunts = new Dictionary<int, Definition>();

@@ -3527,6 +3527,14 @@
    "why": "«Busca pistas en los templos de los Doce»: Harry's book went to «un gran maestro de templo», and its second extract lies on the pile of books of the Iop temple (readables.json, document 145)."
   },
   {
+   "objective": 8178,
+   "quest": 1470,
+   "elements": [{"map": 171443713, "element": 510212}],
+   "gives": [{"item": 15002, "count": 1}],
+   "onlyGives": true,
+   "why": "The flower of the tormented (15002): «Vous pourrez récolter la Fleur des Tourmentés dans le Cimetière des Torturés en [-14,36]» (Dofus pour les noobs, «Draconanthropie»), «deberás recolectarla cerca de un panteón del Cementerio de los Torturados» (Meriana, 16886). No job's skill gives it: the flower beside the pantheon on 171443713 (element 510212, cell 300) hands one over while the quest wants it; Meriana takes it (8178)."
+  },
+  {
    "objective": 3596,
    "quest": 526,
    "elements": [{"map": 178521088, "element": 510423}],

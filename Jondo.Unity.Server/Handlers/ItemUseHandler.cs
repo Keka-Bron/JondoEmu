@@ -180,11 +180,15 @@ namespace Jondo.Unity.Server.Handlers
             if (await SpellItemHandler.TryUseAsync(stream, item)) return;
 
             // A purse of kamas (effect 194, ┬½+#1 kamas┬╗): the Bourses de 1000, 5000 and 10000 Kamas.
-            // Nothing handled it, and using one did nothing at all.
-            if (itemEffects.FirstOrDefault(e => e.EffectId == KamasEffect) is { } purse)
+            // Nothing handled it, and using one did nothing at all. A box with kamas besides (the
+            // chest of the bandits of Cania: their three scales and 1510 kamas) opens as a box below.
+            var box = LootBoxes.BoxOf(item.Template);
+            var purse = itemEffects.FirstOrDefault(e => e.EffectId == KamasEffect);
+            long KamasOf(DatabaseManager.ItemEffectData p) => p.DiceSide > p.DiceNum ? Random.Shared.Next(p.DiceNum, p.DiceSide + 1)
+                                              : p.DiceNum > 0 ? p.DiceNum : p.Value;
+            if (purse != null && box == null)
             {
-                long kamas = purse.DiceSide > purse.DiceNum ? Random.Shared.Next(purse.DiceNum, purse.DiceSide + 1)
-                           : purse.DiceNum > 0 ? purse.DiceNum : purse.Value;
+                long kamas = KamasOf(purse);
                 if (kamas <= 0 || !await CriterionHoldsAsync(stream, item)) return;
                 if (!await SpendOneAsync(stream, uid)) return;
                 await Managers.CharacterRewards.GiveKamasAsync(stream, kamas);
@@ -196,7 +200,7 @@ namespace Jondo.Unity.Server.Handlers
             // cofre del día» and 315 other items. A box does it on being opened; an item that only
             // does that does it and stays.
             var objectives = QuestObjectivesOf(item.Template);
-            if (LootBoxes.BoxOf(item.Template) is not { } box)
+            if (box is not { } opened)
             {
                 if (objectives.Count > 0 && await TickQuestObjectivesAsync(stream, objectives)) return;
                 Console.WriteLine($"[Items] Using item {item.Template} (uid {uid}) is not handled yet.");
@@ -206,13 +210,17 @@ namespace Jondo.Unity.Server.Handlers
             long character = SessionContext.State.CharacterId;
             if (!await SpendOneAsync(stream, uid)) return;
 
-            var given = LootBoxes.Open(box.Group, box.Draws, Random.Shared);
+            var given = LootBoxes.Open(opened.Group, opened.Draws, Random.Shared);
             foreach (var (gid, quantity) in given)
             {
                 if (!await WorkshopHandler.GiveAsync(stream, gid, quantity)) continue;
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained, quantity.ToString(), gid.ToString())));
             }
+
+            // And its kamas, when it has some.
+            if (purse != null && KamasOf(purse) is > 0 and var boxKamas)
+                await Managers.CharacterRewards.GiveKamasAsync(stream, boxKamas);
 
             // The recobotín boxes give a job's experience besides: 614 beside their 222, the farmer's
             // or the alchemist's, 190 to 500 points.
@@ -231,7 +239,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await TickQuestObjectivesAsync(stream, objectives);
 
-            Console.WriteLine($"[Items] {character} opens a {item.Template} (group {box.Group.Id}): " +
+            Console.WriteLine($"[Items] {character} opens a {item.Template} (group {opened.Group.Id}): " +
                               string.Join(", ", given.ConvertAll(g => $"{g.Quantity} x {g.ItemId}")) + ".");
         }
 

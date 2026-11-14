@@ -3496,6 +3496,13 @@
       "why": "Letalina Sigisbul at the top of the tower of Gisgul [-16,17], the map every «Ve a ver a Letalina» of the quest after the militia carries (176819459). INFERRED cell: 410, on the landing in front of the altar, facing the door (element 510481, cell 532) one comes in by; she is gone once the quest is over."
     },
     {
+      "map": 176820483,
+      "npc": 2256,
+      "cell": 359,
+      "orientation": 1,
+      "why": "Rasamun the Green on the roof of the tower of Gisgul [-16,17], under its pentagram window: the room the last stairs of «Draconanthropie»'s path lead to (Dofus pour les noobs: the hall's sacrificial statue, the room of the two arches, the room of the red doors, then the stairs on the left of 176819457), «...un círculo mágico para gobernarlos a todos...» among the candles of its pictures. INFERRED cell: 359, in the window's light, facing the stairs one comes up by."
+    },
+    {
       "map": 217064448,
       "npc": 6395,
       "cell": 388,
@@ -4596,6 +4603,20 @@
       "orientation": 1,
       "criterion": "Qa=1467&Qo>8168&Qo<8169",
       "why": "Dark Vlad among the tombs of Astrub's cemetery [-4,-9] once Nistracolamus has sent the character to the fields of rest (Dofus pour les noobs, «Naissance d'une vocation»: «En effet le Dark Vlad se trouve en [-4,-9]»), until he has struck. INFERRED cell."
+    },
+    {
+      "map": 95685125,
+      "npc": 5963,
+      "cell": 300,
+      "orientation": 1,
+      "why": "The bounty hunter («Chasseur de primes»), «dans la milice du château d'Amakna en [5,-6]» (Dofus pour les noobs, «Les bandits de Cania»). INFERRED: the hall the castle's door leads into, on a stool by the long table -- «Me estoy tomando un respiro»."
+    },
+    {
+      "map": 122421248,
+      "npc": 2240,
+      "cell": 325,
+      "orientation": 1,
+      "why": "Flado, Meriana's goblin, who blames Gorco for the treacle («¡Gorco haber robado melaza!»). INFERRED: in her cabin beside the cauldron, where Gorco stands too."
     }
   ]
 }

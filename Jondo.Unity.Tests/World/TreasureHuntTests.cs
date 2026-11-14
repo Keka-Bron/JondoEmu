@@ -254,6 +254,28 @@ namespace Jondo.Unity.Tests.World
             Assert.All(fight.Skip(1), m => Assert.Equal((1, 2), m));
         }
 
+        /// <summary>
+        /// A criminal hunt has no dimension to draw company from, but «Trésor des bandits de Cania»
+        /// ends against the three bandits: the two its row leaves out come from the authored company.
+        /// </summary>
+        [Fact]
+        public void The_bandits_of_cania_wait_together()
+        {
+            Assert.Equal(new[] { 6543, 6544 }, LegendaryHunts.CompanyOf(57));
+            Assert.Empty(LegendaryHunts.CompanyOf(8));
+
+            var legendary = new LegendaryHunts.Definition(57, 0, 100, 6542, 23744, 23743, 10);
+            MobSpawnManager.MonsterData Monster(int id) => new()
+            {
+                Id = id,
+                Grades = new[] { 100, 100, 100, 100, 100 }.Select(l => new MobSpawnManager.MonsterGrade { Level = l }).ToList(),
+            };
+            var data = new[] { 6542, 6543, 6544 }.ToDictionary(id => id, Monster);
+            var fight = TreasureHuntHandler.FissureFight(legendary, Array.Empty<int>(), id => data.GetValueOrDefault(id),
+                                                         new Random(1), LegendaryHunts.CompanyOf(57));
+            Assert.Equal(new[] { 6542, 6543, 6544 }, fight.Select(m => m.Monster));
+        }
+
         [Fact]
         public void The_steps_and_flags_are_kept_as_written()
         {

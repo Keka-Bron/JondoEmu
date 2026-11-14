@@ -339,6 +339,962 @@
         }
       ],
       "why": "Lotape de avellana (13526): one of the eight Lotachistosos de avellana."
+    },
+    {
+      "id": 100,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 14993,
+          "weight": -1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 14994,
+          "weight": -1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 14995,
+          "weight": -1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ],
+      "why": "Cofre de los bandidos de Cania (23744): «Ouvrez le coffre des bandits de Cania pour obtenir automatiquement une écaille de Courage, une écaille d'Endurance et une écaille de Férocité» (Dofus pour les noobs). All three."
+    },
+    {
+      "id": 462,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 32295,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32296,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32297,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32298,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32299,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32300,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32301,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32302,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32303,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32304,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32305,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32306,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32307,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32308,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32309,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32310,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32311,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32312,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32313,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32314,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32315,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32316,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32317,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32318,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32319,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32320,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32321,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32322,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32323,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32324,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32325,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32326,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32327,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32328,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32329,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32330,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32331,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32332,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32333,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32334,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32335,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32336,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32337,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32338,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32339,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32340,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32341,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32342,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32343,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32344,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32345,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32346,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32347,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32348,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32349,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32350,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32351,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32352,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32353,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32354,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32355,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32356,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32357,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32358,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32359,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32360,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32361,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32362,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32363,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32364,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32365,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32366,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32367,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32368,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32369,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32370,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32371,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32372,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32373,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32374,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32375,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32376,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32671,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32672,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32673,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32674,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32675,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32676,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32677,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32678,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32679,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32680,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32681,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32682,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32683,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32684,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32685,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32686,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32687,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32688,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32689,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32690,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32691,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32692,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32693,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32694,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32695,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32696,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32697,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32698,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32699,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32700,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32701,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32702,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32703,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32704,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32705,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32706,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32707,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32708,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32709,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32710,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32711,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32712,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32713,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32714,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32715,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32716,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32717,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32718,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32719,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32720,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32721,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32722,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32723,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32724,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32725,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32726,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32727,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32728,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32729,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32730,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32731,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32732,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32733,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32734,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32735,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32736,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32737,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32738,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32739,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32740,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32741,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 32742,
+          "weight": 1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ],
+      "why": "Caja de fragmentos de cazador (32381), the bounty hunter's box for a spare primaton: «Cette boîte vous donnera comme son nom l'indique des fragments de cartes de chasse aux trésors» (Dofus pour les noobs). INFERRED: one fragment, equally likely, of the legendary hunts that came with it (65 to 94, whose maps sit by the box's id)."
     }
   ]
 }

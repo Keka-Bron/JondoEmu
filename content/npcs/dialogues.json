@@ -36867,6 +36867,12 @@
         {
           "message": 16694,
           "choices": [
+            { "reply": 20131, "next": 16880, "criterion": "Qf=1467&PL>79", "beforeQuest": 1469 },
+            { "reply": 20136, "next": 16884, "quest": 1469 },
+            { "reply": 20137, "next": 16885, "criterion": "Qf=1469&PL>79", "beforeQuest": 1470 },
+            { "reply": 20146, "next": 16887, "quest": 1470, "beforeObjective": 8177, "criterion": "PO=15000&PO=15001&PO=15002" },
+            { "reply": 20146, "next": 16888, "quest": 1470, "afterObjectives": [8177, 8178, 8179], "beforeObjective": 8180 },
+            { "reply": 20147, "next": 16895, "criterion": "Qf=1470&PL>79", "beforeQuest": 1471 },
             { "reply": 20121, "next": 16873, "quest": 1467, "afterObjective": 8170, "beforeObjective": 8171 },
             { "reply": 19898, "next": 16695, "quest": 1462, "completes": 8106 },
             { "reply": 19904, "next": 16702, "criterion": "Qf=1462&PL>39", "beforeQuest": 1463 },
@@ -36983,7 +36989,8 @@
         {
           "message": 16874,
           "choices": [
-            { "reply": 20119, "next": 16875 }
+            { "reply": 20119, "next": 16876, "criterion": "PL>79", "beforeQuest": 1469 },
+            { "reply": 20119, "next": 16875, "criterion": "PL<80" }
           ]
         },
         {
@@ -36991,9 +36998,146 @@
           "choices": [
             { "reply": 20118 }
           ]
+        },
+        {
+          "message": 16876,
+          "choices": [
+            { "reply": 20125, "next": 16877 }
+          ]
+        },
+        {
+          "message": 16880,
+          "choices": [
+            { "reply": 20130, "next": 16877 }
+          ]
+        },
+        {
+          "message": 16877,
+          "choices": [
+            { "reply": 20124, "next": 16878 }
+          ]
+        },
+        {
+          "message": 16878,
+          "choices": [
+            { "reply": 20123, "next": 16879 }
+          ]
+        },
+        {
+          "message": 16879,
+          "choices": [
+            { "reply": 20122, "startsQuest": 1469, "params": [[34, 1469]], "beforeQuest": 1469 }
+          ]
+        },
+        {
+          "message": 16884,
+          "choices": [
+            { "reply": 20135, "next": 16885, "quest": 1469, "completesAll": [8173, 8174, 8175, 8176] },
+            { "reply": 20132 }
+          ]
+        },
+        {
+          "message": 16885,
+          "choices": [
+            { "reply": 20134, "next": 16886 }
+          ]
+        },
+        {
+          "message": 16886,
+          "choices": [
+            { "reply": 20133, "startsQuest": 1470, "params": [[34, 1470]], "beforeQuest": 1470, "gives": 17766 }
+          ]
+        },
+        {
+          "message": 16887,
+          "choices": [
+            { "reply": 20145, "next": 16888, "quest": 1470, "beforeObjective": 8177, "criterion": "PO=15000&PO=15001&PO=15002", "completesAll": [8177, 8178, 8179] },
+            { "reply": 20133 }
+          ]
+        },
+        {
+          "message": 16888,
+          "choices": [
+            { "reply": 20144, "next": 16889 }
+          ]
+        },
+        {
+          "message": 16889,
+          "choices": [
+            { "reply": 20143, "next": 16890, "quest": 1470, "afterObjectives": [8177, 8178, 8179], "completes": 8180 }
+          ]
+        },
+        {
+          "message": 16890,
+          "choices": [
+            { "reply": 20142, "next": 16891 }
+          ]
+        },
+        {
+          "message": 16891,
+          "choices": [
+            { "reply": 20141, "next": 16892 }
+          ]
+        },
+        {
+          "message": 16892,
+          "choices": [
+            { "reply": 20140, "next": 16893 }
+          ]
+        },
+        {
+          "message": 16893,
+          "choices": [
+            { "reply": 20139, "next": 16894, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471 }
+          ]
+        },
+        {
+          "message": 16894,
+          "choices": [
+            { "reply": 20138 }
+          ]
+        },
+        {
+          "message": 16895,
+          "choices": [
+            { "reply": 20141, "next": 16896 }
+          ]
+        },
+        {
+          "message": 16896,
+          "choices": [
+            { "reply": 20149, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471 },
+            { "reply": 20148 }
+          ]
         }
       ],
-      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875)."
+      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896)."
+    },
+    {
+      "npc": 2256,
+      "map": 176820483,
+      "opening": 16899,
+      "lines": [
+        {
+          "message": 16899,
+          "choices": [
+            { "reply": 20154, "next": 16900 }
+          ]
+        },
+        {
+          "message": 16900,
+          "choices": [
+            { "reply": 20153, "next": 16901 }
+          ]
+        },
+        {
+          "message": 16901,
+          "choices": [
+            { "reply": 20152 }
+          ]
+        }
+      ],
+      "why": "Rasamun the Green on the roof of the tower of Gisgul, «Draconanthropie» (Dofus pour les noobs): «Parlez à Rasamoune le Vert. Demandez lui le pendentif en obsidienne, seulement celui-ci ne veux pas vous le donner, il vous faudra donc l'attaquer». His three lines in the client's order: the monologue interrupted, the pendant demanded, Fladnag's envoy refused; «Atacarle» (20152) starts the fight of npc_fights.json, and the pendant (15000) is his drop while the quest wants it."
     },
     {
       "npc": 2217,
@@ -37675,6 +37819,741 @@
         }
       ],
       "why": "Dark Vlad among the tombs of Astrub's cemetery (Dofus pour les noobs, «Naissance d'une vocation», its pictures: «Répondre que vous le cherchez depuis un bon moment», «Dégainer votre arme», «MEURS !», «Tenter de résister à l'attaque du Dark Vlad»): he strikes, and the character comes to in the fields of rest [-1,-10] as a soul («vous vous retrouvez au cimetière en tant que fantôme»), with Astrub's phoenix to rise at («Allez ressusciter votre âme au phénix»). The 3.6 kills no one any more, so the soul is the one its client still draws, as Warko Linch's brew leaves it. Meriana's compass melts on him (14991 becomes 14992, whose use is the next objective)."
+    },
+    {
+      "npc": 5963,
+      "map": 95685125,
+      "opening": 43189,
+      "lines": [
+        {
+          "message": 43189,
+          "choices": [
+            { "reply": 56279, "next": 43191, "beforeElement": -1469000 },
+            { "reply": 56276, "next": 43190, "criterion": "Qa=1469" },
+            { "reply": 56277, "next": 43400, "afterElement": -1469000, "criterion": "Qf!1469" },
+            { "reply": 81689, "next": 59704, "afterElement": -1469000, "criterion": "Qf!1469" },
+            { "reply": 81599, "next": 59664, "afterElement": -1469000, "criterion": "Qf=1470" },
+            { "reply": 81599, "next": 59665, "afterElement": -1469000, "criterion": "Qf=1469&Qf!1470" },
+            { "reply": 56278, "next": 43268, "criterion": "PO=14993|PO=14994|PO=14995|PO=14996|PO=14997|PO=14998" },
+            { "reply": 82402, "next": 60060, "holds": 23740 },
+            { "reply": 82403, "next": 60061, "holds": 23741 },
+            { "reply": 82404, "next": 60062, "holds": 23742 }
+          ]
+        },
+        {
+          "message": 43191,
+          "choices": [
+            { "reply": 56275, "next": 59704, "marks": -1469000 },
+            { "reply": 56425 }
+          ]
+        },
+        {
+          "message": 59704,
+          "choices": [
+            { "reply": 81688 }
+          ]
+        },
+        {
+          "message": 43190,
+          "choices": []
+        },
+        {
+          "message": 59665,
+          "choices": [
+            { "reply": 81598 }
+          ]
+        },
+        {
+          "message": 59664,
+          "choices": [
+            { "reply": 81597, "next": 59664, "takes": 23746, "gives": 32381 },
+            { "reply": 81596 }
+          ]
+        },
+        {
+          "message": 43446,
+          "choices": [
+            { "reply": 56779, "next": 43400 },
+            { "reply": 56781 },
+            { "reply": 56780 }
+          ]
+        },
+        {
+          "message": 43448,
+          "choices": [
+            { "reply": 56779, "next": 43400 },
+            { "reply": 56780 }
+          ]
+        },
+        {
+          "message": 43449,
+          "choices": [
+            { "reply": 56783, "next": 43400 },
+            { "reply": 56785 },
+            { "reply": 56784 }
+          ]
+        },
+        {
+          "message": 43451,
+          "choices": [
+            { "reply": 56783, "next": 43400 },
+            { "reply": 56784 }
+          ]
+        },
+        {
+          "message": 43452,
+          "choices": [
+            { "reply": 56787, "next": 43400 },
+            { "reply": 56789 },
+            { "reply": 56788 }
+          ]
+        },
+        {
+          "message": 43454,
+          "choices": [
+            { "reply": 56787, "next": 43400 },
+            { "reply": 56788 }
+          ]
+        },
+        {
+          "message": 43455,
+          "choices": [
+            { "reply": 56791, "next": 43400 },
+            { "reply": 56793 },
+            { "reply": 56792 }
+          ]
+        },
+        {
+          "message": 43457,
+          "choices": [
+            { "reply": 56791, "next": 43400 },
+            { "reply": 56792 }
+          ]
+        },
+        {
+          "message": 43458,
+          "choices": [
+            { "reply": 56795, "next": 43400 },
+            { "reply": 56797 },
+            { "reply": 56796 }
+          ]
+        },
+        {
+          "message": 43460,
+          "choices": [
+            { "reply": 56795, "next": 43400 },
+            { "reply": 56796 }
+          ]
+        },
+        {
+          "message": 43461,
+          "choices": [
+            { "reply": 56799, "next": 43400 },
+            { "reply": 56801 },
+            { "reply": 56800 }
+          ]
+        },
+        {
+          "message": 43463,
+          "choices": [
+            { "reply": 56799, "next": 43400 },
+            { "reply": 56800 }
+          ]
+        },
+        {
+          "message": 43464,
+          "choices": [
+            { "reply": 56803, "next": 43400 },
+            { "reply": 56805 },
+            { "reply": 56804 }
+          ]
+        },
+        {
+          "message": 43466,
+          "choices": [
+            { "reply": 56803, "next": 43400 },
+            { "reply": 56804 }
+          ]
+        },
+        {
+          "message": 43467,
+          "choices": [
+            { "reply": 56807, "next": 43400 },
+            { "reply": 56809 },
+            { "reply": 56808 }
+          ]
+        },
+        {
+          "message": 43469,
+          "choices": [
+            { "reply": 56807, "next": 43400 },
+            { "reply": 56808 }
+          ]
+        },
+        {
+          "message": 43470,
+          "choices": [
+            { "reply": 56811, "next": 43400 },
+            { "reply": 56813 },
+            { "reply": 56812 }
+          ]
+        },
+        {
+          "message": 43472,
+          "choices": [
+            { "reply": 56811, "next": 43400 },
+            { "reply": 56812 }
+          ]
+        },
+        {
+          "message": 43473,
+          "choices": [
+            { "reply": 56815, "next": 43400 },
+            { "reply": 56817 },
+            { "reply": 56816 }
+          ]
+        },
+        {
+          "message": 43475,
+          "choices": [
+            { "reply": 56815, "next": 43400 },
+            { "reply": 56816 }
+          ]
+        },
+        {
+          "message": 43476,
+          "choices": [
+            { "reply": 56819, "next": 43400 },
+            { "reply": 56821 },
+            { "reply": 56820 }
+          ]
+        },
+        {
+          "message": 43478,
+          "choices": [
+            { "reply": 56819, "next": 43400 },
+            { "reply": 56820 }
+          ]
+        },
+        {
+          "message": 43479,
+          "choices": [
+            { "reply": 56823, "next": 43400 },
+            { "reply": 56825 },
+            { "reply": 56824 }
+          ]
+        },
+        {
+          "message": 43481,
+          "choices": [
+            { "reply": 56823, "next": 43400 },
+            { "reply": 56824 }
+          ]
+        },
+        {
+          "message": 43482,
+          "choices": [
+            { "reply": 56827, "next": 43400 },
+            { "reply": 56829 },
+            { "reply": 56828 }
+          ]
+        },
+        {
+          "message": 43484,
+          "choices": [
+            { "reply": 56827, "next": 43400 },
+            { "reply": 56828 }
+          ]
+        },
+        {
+          "message": 43485,
+          "choices": [
+            { "reply": 56831, "next": 43400 },
+            { "reply": 56833 },
+            { "reply": 56832 }
+          ]
+        },
+        {
+          "message": 43487,
+          "choices": [
+            { "reply": 56831, "next": 43400 },
+            { "reply": 56832 }
+          ]
+        },
+        {
+          "message": 43488,
+          "choices": [
+            { "reply": 56835, "next": 43400 },
+            { "reply": 56837 },
+            { "reply": 56836 }
+          ]
+        },
+        {
+          "message": 43490,
+          "choices": [
+            { "reply": 56835, "next": 43400 },
+            { "reply": 56836 }
+          ]
+        },
+        {
+          "message": 43491,
+          "choices": [
+            { "reply": 56839, "next": 43400 },
+            { "reply": 56841 },
+            { "reply": 56840 }
+          ]
+        },
+        {
+          "message": 43493,
+          "choices": [
+            { "reply": 56839, "next": 43400 },
+            { "reply": 56840 }
+          ]
+        },
+        {
+          "message": 43503,
+          "choices": [
+            { "reply": 56855, "next": 43400 },
+            { "reply": 56857 },
+            { "reply": 56856 }
+          ]
+        },
+        {
+          "message": 43505,
+          "choices": [
+            { "reply": 56855, "next": 43400 },
+            { "reply": 56856 }
+          ]
+        },
+        {
+          "message": 43506,
+          "choices": [
+            { "reply": 56859, "next": 43400 },
+            { "reply": 56861 },
+            { "reply": 56860 }
+          ]
+        },
+        {
+          "message": 43508,
+          "choices": [
+            { "reply": 56859, "next": 43400 },
+            { "reply": 56860 }
+          ]
+        },
+        {
+          "message": 43509,
+          "choices": [
+            { "reply": 56863, "next": 43400 },
+            { "reply": 56865 },
+            { "reply": 56864 }
+          ]
+        },
+        {
+          "message": 43511,
+          "choices": [
+            { "reply": 56863, "next": 43400 },
+            { "reply": 56864 }
+          ]
+        },
+        {
+          "message": 43512,
+          "choices": [
+            { "reply": 56867, "next": 43400 },
+            { "reply": 56869 },
+            { "reply": 56868 }
+          ]
+        },
+        {
+          "message": 43514,
+          "choices": [
+            { "reply": 56867, "next": 43400 },
+            { "reply": 56868 }
+          ]
+        },
+        {
+          "message": 43515,
+          "choices": [
+            { "reply": 56871, "next": 43400 },
+            { "reply": 56873 },
+            { "reply": 56872 }
+          ]
+        },
+        {
+          "message": 43517,
+          "choices": [
+            { "reply": 56871, "next": 43400 },
+            { "reply": 56872 }
+          ]
+        },
+        {
+          "message": 43518,
+          "choices": [
+            { "reply": 56875, "next": 43400 },
+            { "reply": 56877 },
+            { "reply": 56876 }
+          ]
+        },
+        {
+          "message": 43520,
+          "choices": [
+            { "reply": 56875, "next": 43400 },
+            { "reply": 56876 }
+          ]
+        },
+        {
+          "message": 43521,
+          "choices": [
+            { "reply": 56879, "next": 43400 },
+            { "reply": 56881 },
+            { "reply": 56880 }
+          ]
+        },
+        {
+          "message": 43523,
+          "choices": [
+            { "reply": 56879, "next": 43400 },
+            { "reply": 56880 }
+          ]
+        },
+        {
+          "message": 43524,
+          "choices": [
+            { "reply": 56883, "next": 43400 },
+            { "reply": 56885 },
+            { "reply": 56884 }
+          ]
+        },
+        {
+          "message": 43526,
+          "choices": [
+            { "reply": 56883, "next": 43400 },
+            { "reply": 56884 }
+          ]
+        },
+        {
+          "message": 43527,
+          "choices": [
+            { "reply": 56887, "next": 43400 },
+            { "reply": 56889 },
+            { "reply": 56888 }
+          ]
+        },
+        {
+          "message": 43529,
+          "choices": [
+            { "reply": 56887, "next": 43400 },
+            { "reply": 56888 }
+          ]
+        },
+        {
+          "message": 43530,
+          "choices": [
+            { "reply": 56891, "next": 43400 },
+            { "reply": 56893 },
+            { "reply": 56892 }
+          ]
+        },
+        {
+          "message": 43532,
+          "choices": [
+            { "reply": 56891, "next": 43400 },
+            { "reply": 56892 }
+          ]
+        },
+        {
+          "message": 43533,
+          "choices": [
+            { "reply": 56895, "next": 43400 },
+            { "reply": 56897 },
+            { "reply": 56896 }
+          ]
+        },
+        {
+          "message": 43535,
+          "choices": [
+            { "reply": 56895, "next": 43400 },
+            { "reply": 56896 }
+          ]
+        },
+        {
+          "message": 43536,
+          "choices": [
+            { "reply": 56899, "next": 43400 },
+            { "reply": 56901 },
+            { "reply": 56900 }
+          ]
+        },
+        {
+          "message": 43538,
+          "choices": [
+            { "reply": 56899, "next": 43400 },
+            { "reply": 56900 }
+          ]
+        },
+        {
+          "message": 43539,
+          "choices": [
+            { "reply": 56903, "next": 43400 },
+            { "reply": 56905 },
+            { "reply": 56904 }
+          ]
+        },
+        {
+          "message": 43541,
+          "choices": [
+            { "reply": 56903, "next": 43400 },
+            { "reply": 56904 }
+          ]
+        },
+        {
+          "message": 43542,
+          "choices": [
+            { "reply": 56907, "next": 43400 },
+            { "reply": 56909 },
+            { "reply": 56908 }
+          ]
+        },
+        {
+          "message": 43544,
+          "choices": [
+            { "reply": 56907, "next": 43400 },
+            { "reply": 56908 }
+          ]
+        },
+        {
+          "message": 43545,
+          "choices": [
+            { "reply": 56911, "next": 43400 },
+            { "reply": 56913 },
+            { "reply": 56912 }
+          ]
+        },
+        {
+          "message": 43547,
+          "choices": [
+            { "reply": 56911, "next": 43400 },
+            { "reply": 56912 }
+          ]
+        },
+        {
+          "message": 43548,
+          "choices": [
+            { "reply": 56915, "next": 43400 },
+            { "reply": 56917 },
+            { "reply": 56916 }
+          ]
+        },
+        {
+          "message": 43550,
+          "choices": [
+            { "reply": 56915, "next": 43400 },
+            { "reply": 56916 }
+          ]
+        },
+        {
+          "message": 43400,
+          "choices": [
+            { "reply": 56782, "next": 43446, "criterion": "Qf=34", "beforeElement": -1469001, "marks": -1469001, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56782, "next": 43448, "criterion": "Qf=34", "beforeElement": -1469001, "marks": -1469001, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56786, "next": 43449, "criterion": "Qf=1680", "beforeElement": -1469002, "marks": -1469002, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56786, "next": 43451, "criterion": "Qf=1680", "beforeElement": -1469002, "marks": -1469002, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56790, "next": 43452, "criterion": "Qf=30", "beforeElement": -1469003, "marks": -1469003, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56790, "next": 43454, "criterion": "Qf=30", "beforeElement": -1469003, "marks": -1469003, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56794, "next": 43455, "criterion": "Qf=1434", "beforeElement": -1469004, "marks": -1469004, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56794, "next": 43457, "criterion": "Qf=1434", "beforeElement": -1469004, "marks": -1469004, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56798, "next": 43458, "criterion": "Qf=1681", "beforeElement": -1469005, "marks": -1469005, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56798, "next": 43460, "criterion": "Qf=1681", "beforeElement": -1469005, "marks": -1469005, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56802, "next": 43461, "criterion": "Qf=1682", "beforeElement": -1469006, "marks": -1469006, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56802, "next": 43463, "criterion": "Qf=1682", "beforeElement": -1469006, "marks": -1469006, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56806, "next": 43464, "criterion": "Qf=35", "beforeElement": -1469007, "marks": -1469007, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56806, "next": 43466, "criterion": "Qf=35", "beforeElement": -1469007, "marks": -1469007, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56810, "next": 43467, "criterion": "Qf=1683", "beforeElement": -1469008, "marks": -1469008, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56810, "next": 43469, "criterion": "Qf=1683", "beforeElement": -1469008, "marks": -1469008, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56814, "next": 43470, "criterion": "Qf=33", "beforeElement": -1469009, "marks": -1469009, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56814, "next": 43472, "criterion": "Qf=33", "beforeElement": -1469009, "marks": -1469009, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56818, "next": 43473, "criterion": "Qf=117", "beforeElement": -1469010, "marks": -1469010, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56818, "next": 43475, "criterion": "Qf=117", "beforeElement": -1469010, "marks": -1469010, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56822, "next": 43476, "criterion": "Qf=1435", "beforeElement": -1469011, "marks": -1469011, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56822, "next": 43478, "criterion": "Qf=1435", "beforeElement": -1469011, "marks": -1469011, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56826, "next": 43479, "criterion": "Qf=1684", "beforeElement": -1469012, "marks": -1469012, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56826, "next": 43481, "criterion": "Qf=1684", "beforeElement": -1469012, "marks": -1469012, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56830, "next": 43482, "criterion": "Qf=32", "beforeElement": -1469013, "marks": -1469013, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56830, "next": 43484, "criterion": "Qf=32", "beforeElement": -1469013, "marks": -1469013, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56834, "next": 43485, "criterion": "Qf=1685", "beforeElement": -1469014, "marks": -1469014, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56834, "next": 43487, "criterion": "Qf=1685", "beforeElement": -1469014, "marks": -1469014, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56838, "next": 43488, "criterion": "Qf=119", "beforeElement": -1469015, "marks": -1469015, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56838, "next": 43490, "criterion": "Qf=119", "beforeElement": -1469015, "marks": -1469015, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56842, "next": 43491, "criterion": "Qf=116", "beforeElement": -1469016, "marks": -1469016, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56842, "next": 43493, "criterion": "Qf=116", "beforeElement": -1469016, "marks": -1469016, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56858, "next": 43503, "criterion": "Qf=1622", "beforeElement": -1469017, "marks": -1469017, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56858, "next": 43505, "criterion": "Qf=1622", "beforeElement": -1469017, "marks": -1469017, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56862, "next": 43506, "criterion": "Qf=1686", "beforeElement": -1469018, "marks": -1469018, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56862, "next": 43508, "criterion": "Qf=1686", "beforeElement": -1469018, "marks": -1469018, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56866, "next": 43509, "criterion": "Qf=1783", "beforeElement": -1469019, "marks": -1469019, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56866, "next": 43511, "criterion": "Qf=1783", "beforeElement": -1469019, "marks": -1469019, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56870, "next": 43512, "criterion": "Qf=115", "beforeElement": -1469020, "marks": -1469020, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56870, "next": 43514, "criterion": "Qf=115", "beforeElement": -1469020, "marks": -1469020, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56874, "next": 43515, "criterion": "Qf=1687", "beforeElement": -1469021, "marks": -1469021, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56874, "next": 43517, "criterion": "Qf=1687", "beforeElement": -1469021, "marks": -1469021, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56878, "next": 43518, "criterion": "Qf=1852", "beforeElement": -1469022, "marks": -1469022, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56878, "next": 43520, "criterion": "Qf=1852", "beforeElement": -1469022, "marks": -1469022, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56882, "next": 43521, "criterion": "Qf=1518", "beforeElement": -1469023, "marks": -1469023, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56882, "next": 43523, "criterion": "Qf=1518", "beforeElement": -1469023, "marks": -1469023, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56886, "next": 43524, "criterion": "Qf=1623", "beforeElement": -1469024, "marks": -1469024, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56886, "next": 43526, "criterion": "Qf=1623", "beforeElement": -1469024, "marks": -1469024, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56890, "next": 43527, "criterion": "Qf=1674", "beforeElement": -1469025, "marks": -1469025, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56890, "next": 43529, "criterion": "Qf=1674", "beforeElement": -1469025, "marks": -1469025, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56894, "next": 43530, "criterion": "Qf=1688", "beforeElement": -1469026, "marks": -1469026, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56894, "next": 43532, "criterion": "Qf=1688", "beforeElement": -1469026, "marks": -1469026, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56898, "next": 43533, "criterion": "Qf=1855", "beforeElement": -1469027, "marks": -1469027, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56898, "next": 43535, "criterion": "Qf=1855", "beforeElement": -1469027, "marks": -1469027, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56902, "next": 43536, "criterion": "Qf=1922", "beforeElement": -1469028, "marks": -1469028, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56902, "next": 43538, "criterion": "Qf=1922", "beforeElement": -1469028, "marks": -1469028, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56906, "next": 43539, "criterion": "Qf=544", "beforeElement": -1469029, "marks": -1469029, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56906, "next": 43541, "criterion": "Qf=544", "beforeElement": -1469029, "marks": -1469029, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56910, "next": 43542, "criterion": "Qf=1604", "beforeElement": -1469030, "marks": -1469030, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56910, "next": 43544, "criterion": "Qf=1604", "beforeElement": -1469030, "marks": -1469030, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56914, "next": 43545, "criterion": "Qf=1624", "beforeElement": -1469031, "marks": -1469031, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56914, "next": 43547, "criterion": "Qf=1624", "beforeElement": -1469031, "marks": -1469031, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56918, "next": 43548, "criterion": "Qf=1923", "beforeElement": -1469032, "marks": -1469032, "marksBelow": [-1469032, -1469001, 9], "gives": 23746 },
+            { "reply": 56918, "next": 43550, "criterion": "Qf=1923", "beforeElement": -1469032, "marks": -1469032, "marksReached": [-1469032, -1469001, 9] },
+            { "reply": 56919 }
+          ]
+        },
+        {
+          "message": 43268,
+          "choices": [
+            { "reply": 56431, "next": 43269, "criterion": "Qf=1469&(PO=14993|PO=14994|PO=14995)" },
+            { "reply": 56432, "next": 43273, "criterion": "PO=14996|PO=14997|PO=14998" },
+            { "reply": 56433 }
+          ]
+        },
+        {
+          "message": 43269,
+          "choices": [
+            { "reply": 56427, "next": 43270, "holds": 14993 },
+            { "reply": 56428, "next": 43271, "holds": 14994 },
+            { "reply": 56429, "next": 43272, "holds": 14995 },
+            { "reply": 56430 }
+          ]
+        },
+        {
+          "message": 43270,
+          "choices": [
+            { "reply": 56426, "takes": 14993, "gives": 23740 },
+            { "reply": 56434, "takes": 14993, "gives": 23741 },
+            { "reply": 56435, "takes": 14993, "gives": 23742 },
+            { "reply": 56436 }
+          ]
+        },
+        {
+          "message": 43271,
+          "choices": [
+            { "reply": 56437, "takes": 14994, "gives": 23740 },
+            { "reply": 56438, "takes": 14994, "gives": 23741 },
+            { "reply": 56439, "takes": 14994, "gives": 23742 },
+            { "reply": 56440 }
+          ]
+        },
+        {
+          "message": 43272,
+          "choices": [
+            { "reply": 56441, "takes": 14995, "gives": 23740 },
+            { "reply": 56442, "takes": 14995, "gives": 23741 },
+            { "reply": 56443, "takes": 14995, "gives": 23742 },
+            { "reply": 56444 }
+          ]
+        },
+        {
+          "message": 43273,
+          "choices": [
+            { "reply": 56445, "next": 43274, "takes": 14996, "gives": 23746 },
+            { "reply": 56446, "next": 43275, "takes": 14997, "gives": 23746 },
+            { "reply": 56447, "next": 43276, "takes": 14998, "gives": 23746 }
+          ]
+        },
+        {
+          "message": 43274,
+          "choices": [
+            { "reply": 56448, "next": 43273 },
+            { "reply": 56449 }
+          ]
+        },
+        {
+          "message": 43275,
+          "choices": [
+            { "reply": 56450, "next": 43273 },
+            { "reply": 56451 }
+          ]
+        },
+        {
+          "message": 43276,
+          "choices": [
+            { "reply": 56452, "next": 43273 },
+            { "reply": 56453 }
+          ]
+        },
+        {
+          "message": 60060,
+          "choices": [
+            { "reply": 82417, "takes": 23740, "gives": 23741 },
+            { "reply": 82418, "takes": 23740, "gives": 23742 },
+            { "reply": 82419 }
+          ]
+        },
+        {
+          "message": 60061,
+          "choices": [
+            { "reply": 82420, "takes": 23741, "gives": 23740 },
+            { "reply": 82421, "takes": 23741, "gives": 23742 },
+            { "reply": 82422 }
+          ]
+        },
+        {
+          "message": 60062,
+          "choices": [
+            { "reply": 82423, "takes": 23742, "gives": 23740 },
+            { "reply": 82424, "takes": 23742, "gives": 23741 },
+            { "reply": 82425 }
+          ]
+        }
+      ],
+      "why": "The bounty hunter of Amakna's militia (Dofus pour les noobs, «Les bandits de Cania»): «Rendez-vous dans la milice du château d'Amakna en [5,-6] où vous rencontrerez un Chasseur de primes qui vous proposera de vous donner 1 x Primaton, pour chaque recherchés de niveau inférieur ou égal à 120 que vous aurez capturé « Se déclarer intéressé »» -- «Vous ne pouvez obtenir que 9 primatons maximum»; past nine he is only impressed (the second line of each criminal). One primaton per criminal (a mark each), until the bandits are found (1469 over). His 32 criminals are the 32 of the guide's list, matched to their wanted quests by name; each reply's line is the one of the same rank among his messages (Sam Sagaz's gardener and ring, Ogivol, Brumen and so on name themselves). The copies of the map of Cania are bought from him for three primatons («Chaque fragment de la carte coûte 3 x Primaton», content/npcs/shops.json); a scale shown is traded for a copy and a scale fragment for a primaton, the copies for one another, and after «Draconanthropie» each spare primaton for a box of fragments. INFERRED: which line answers which reply where the texts leave it open, and where he stands."
+    },
+    {
+      "npc": 2240,
+      "map": 122421248,
+      "opening": 16734,
+      "lines": [
+        {
+          "message": 16734,
+          "choices": [
+            { "reply": 20272, "next": 16992, "criterion": "PO=14993|PO=14994|PO=14995" },
+            { "reply": 19931 }
+          ]
+        },
+        {
+          "message": 16992,
+          "choices": [
+            { "reply": 20269, "next": 16993, "takes": 14993, "gives": 14996, "givesCount": 3 },
+            { "reply": 20270, "next": 16994, "takes": 14994, "gives": 14997, "givesCount": 3 },
+            { "reply": 20271, "next": 16995, "takes": 14995, "gives": 14998, "givesCount": 3 }
+          ]
+        },
+        {
+          "message": 16993,
+          "choices": []
+        },
+        {
+          "message": 16994,
+          "choices": []
+        },
+        {
+          "message": 16995,
+          "choices": []
+        }
+      ],
+      "why": "Flado, the goblin of Meriana's cabin: «Tú tener demasiadas escamas inútiles. Yo conocer la forma de romperlas» -- a scale of Prysmaradoth broken into fragments (bitten, stamped on, squeezed), which the bounty hunter takes for a primaton each, so that one who has finished the quest can help another without the fight («il est possible d'éviter l'affrontement en récupérant des fragments d'écailles», Dofus pour les noobs). INFERRED: three fragments a scale, the hunter giving a copy for a scale and a copy costing three primatons; where he stands."
     }
   ]
 }
