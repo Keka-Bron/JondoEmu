@@ -220,6 +220,8 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         await ConquestHandler.OnMapEnteredAsync(stream, session.CharacterId, map?.SubAreaId ?? 0);
         await PhantomHandler.OnMapLoadedAsync(stream);
         await Managers.MapStagings.ShowAsync(stream, Managers.MapStagings.OnArrival(session.MapId));
+        // What a fight dropped for the bonus slots -- a mutation, a curse --, now that he is back.
+        await BonusItemHandler.PlacePendingAsync(stream);
         Console.WriteLine($"[Entry] Actors of map {session.MapId} sent: {character.Name} on cell {state.CellId}.");
     }
 

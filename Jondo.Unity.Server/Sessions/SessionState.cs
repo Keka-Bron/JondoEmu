@@ -300,6 +300,12 @@ namespace Jondo.Unity.Server
         public bool IsChestOpen { get; set; }
 
         /// <summary>
+        /// The mutations, curses and other bonus slots' items a fight dropped, waiting for the
+        /// character to be back on a map to be put in their slots (BonusItemHandler.PlacePendingAsync).
+        /// </summary>
+        public List<int> PendingSlotItems { get; } = new();
+
+        /// <summary>
         /// The map where this character opened the bank, or zero when the bank is not open.
         /// A map rather than a flag: see <see cref="Handlers.BankHandler.IsOpen"/>.
         /// </summary>

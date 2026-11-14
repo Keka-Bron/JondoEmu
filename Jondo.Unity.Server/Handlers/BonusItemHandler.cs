@@ -202,6 +202,49 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// The bonus slots' items a fight dropped, once the character is back on a map: a mutation
+        /// through <see cref="MutationHandler"/> -- "right after the map change", as the orbalantir's
+        /// arrives --, a curse or a blessing to its slot with its «Has conseguido» line, and one of a
+        /// type this server does not place to the bag. Nothing while he is still fighting.
+        /// </summary>
+        public static async Task PlacePendingAsync(NetworkStream stream)
+        {
+            var me = SessionContext.State;
+            if (me.PendingSlotItems.Count == 0 || me.IsInFight || me.FightId != 0) return;
+            var pending = me.PendingSlotItems.ToList();
+            me.PendingSlotItems.Clear();
+
+            bool placed = false, redraw = false;
+            foreach (int template in pending)
+            {
+                int type = DatabaseManager.GetItemTemplateType(template);
+                if (type == BonusSlots.MutationType)
+                {
+                    await MutationHandler.GiveAsync(stream, template);
+                    continue;
+                }
+                var slots = BonusSlots.SlotsFor(type);
+                var put = slots.Count > 0 ? await PlaceAsync(stream, template, slots) : null;
+                if (put == null)
+                {
+                    if (!await WorkshopHandler.GiveAsync(stream, template, 1)) continue;
+                }
+                else
+                {
+                    placed = true;
+                    if (SlotLooks.ChangesTheLook(put.Effects)) redraw = true;
+                }
+                await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained, "1", template.ToString())));
+            }
+
+            if (placed) await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await ItemUseHandler.WeighAsync(stream);
+            if (redraw) await SlotLookHandler.RedrawAsync(stream);
+            Console.WriteLine($"[Items] {me.CharacterName}: the fight's {string.Join(", ", pending)} to their slots.");
+        }
+
+        /// <summary>
         /// An item put in its bonus slot, with its fights as left, total, total: the first free one of
         /// its slots, or the one whose item has the fewest fights left. Told with an iua into the slot,
         /// as the orbalantir's mutation arrives.

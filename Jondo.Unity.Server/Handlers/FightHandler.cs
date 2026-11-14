@@ -12858,6 +12858,19 @@ namespace Jondo.Unity.Server.Handlers
             var stacked = new Dictionary<int, int>();
             var pieces = new List<PlayerItem>();
             var exos = perfect?.ToList() ?? new List<Managers.RandomLoot.Drop>();
+
+            // A mutation, a curse, a blessing...: not the bag but its slot, once the character is
+            // back on a map (BonusItemHandler.PlacePendingAsync). Put in the bag, Halouine's Zombie,
+            // the Malédiction du Ballotin and the Transformation Bouftou d'Halouine stayed there as
+            // items, and none of them did anything.
+            var toSlots = loot.Keys.Where(gid => Managers.BonusSlots.IsSlotType(DatabaseManager.GetItemTemplateType(gid))).ToList();
+            foreach (int gid in toSlots)
+            {
+                Network.SessionContext.State.PendingSlotItems.Add(gid);
+                Program.LogDebug($"[FightHandler] Loot: item {gid} goes to its slot once back on the map.");
+            }
+            if (toSlots.Count > 0) loot = loot.Where(kv => !toSlots.Contains(kv.Key)).ToDictionary(kv => kv.Key, kv => kv.Value);
+
             foreach (var kv in loot)
             {
                 var template = Managers.Forgemagic.TemplateOf(kv.Key);
