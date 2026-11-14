@@ -689,11 +689,11 @@ namespace Jondo.Unity.World.Fights
         /// The summons that play no turn are left out of the list, but they are still in
         /// the fight: they can be hit and they count for the board.
         /// </summary>
-        private static List<List<Fighter>> Agrupar(List<Fighter> bando)
+        private static List<List<Fighter>> Agrupar(List<Fighter> bando, Func<Fighter, (int Place, int Initiative)> orderKey)
         {
             var salida = new List<List<Fighter>>();
             foreach (var quien in bando.Where(f => f.IsAlive && !f.EsInvocado)
-                                       .OrderByDescending(f => f.Initiative))
+                                       .OrderBy(orderKey))
             {
                 var grupo = new List<Fighter> { quien };
                 foreach (var suyo in bando)
@@ -1281,6 +1281,7 @@ namespace Jondo.Unity.World.Fights
             {
                 TurnOrder = BuildAlternatingTurnOrder();
             }
+            FreezeTurnOrder();
             CurrentTurnIndex = 0;
 
             if (CurrentFighter != null)
@@ -1295,6 +1296,42 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public bool BlueTakesInitiative { get; set; }
 
+        /// <summary>
+        /// Each fighter's place in the order the fight started with, and which side opened it:
+        /// set once, at the start, and kept. Null before.
+        /// </summary>
+        private Dictionary<long, int>? _startingPlaces;
+        private bool _blueOpened;
+
+        /// <summary>
+        /// The order is the one the fight starts with, whatever the initiatives do after.
+        /// </summary>
+        /// <remarks>
+        /// It was rebuilt by the initiatives of the moment every time someone came in or went:
+        /// a summon, a death, an illusion gone. In a dream, where the dreamer's sheet is brought
+        /// to his dreamer level, an attitude's summon before the first turn rebuilt it with the
+        /// new initiatives, the first monster -1 slid from place 0 to 3 keeping its turn, and the
+        /// three who came before it -- the Osamodas among them -- lost theirs in the first round
+        /// (fight #1031: «first -1», then «Turn of -1, position 3»). The order the client is told
+        /// at the start (the jxb, in play order) is the one played.
+        /// </remarks>
+        private void FreezeTurnOrder()
+        {
+            if (_startingPlaces != null) return;
+            _startingPlaces = new Dictionary<long, int>();
+            for (int i = 0; i < TurnOrder.Count; i++) _startingPlaces[TurnOrder[i].Id] = i;
+            _blueOpened = TurnOrder.Count > 0 && TurnOrder[0].TeamId == Azules;
+        }
+
+        /// <summary>
+        /// A fighter's key in his side's order: his starting place once the fight has started, and
+        /// behind every one of those whoever came in later, by initiative.
+        /// </summary>
+        private (int Place, int Initiative) OrderKey(Fighter fighter)
+            => _startingPlaces != null && _startingPlaces.TryGetValue(fighter.Id, out int place)
+                ? (place, 0)
+                : (int.MaxValue, -fighter.Initiative);
+
         public List<Fighter> BuildAlternatingTurnOrder()
         {
             // Summons are NOT ordered by initiative: they go stuck to whoever placed them, and only those
@@ -1303,15 +1340,17 @@ namespace Jondo.Unity.World.Fights
             // GROUPS are interleaved, not loose fighters: each group is one of the usual ones
             // with their summons behind. Interleaving one by one, the beacon got separated from its
             // Cra and played after the monster, when in the capture it goes immediately behind.
-            var team0Sorted = Agrupar(Azul);
-            var team1Sorted = Agrupar(Rojo);
+            var team0Sorted = Agrupar(Azul, OrderKey);
+            var team1Sorted = Agrupar(Rojo, OrderKey);
 
             var result = new List<Fighter>();
             int maxCount = Math.Max(team0Sorted.Count, team1Sorted.Count);
 
             int team0BestInit = team0Sorted.FirstOrDefault()?[0].Initiative ?? 0;
             int team1BestInit = team1Sorted.FirstOrDefault()?[0].Initiative ?? 0;
-            bool team0First = BlueTakesInitiative || team0BestInit >= team1BestInit;
+            bool team0First = _startingPlaces != null
+                ? _blueOpened
+                : BlueTakesInitiative || team0BestInit >= team1BestInit;
 
             for (int i = 0; i < maxCount; i++)
             {
