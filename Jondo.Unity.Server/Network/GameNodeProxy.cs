@@ -479,24 +479,10 @@ namespace Jondo.Unity.Server.Network
                                     ChatLinks.Of(text, GameState.MapId)));
                             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, linea);
 
-                            // And to the others. It ended here: the line went back to whoever wrote it and
-                            // nobody else ever saw it, which with a single player was not noticed.
-                            //
-                            // The general channel is the MAP's, not the server's: whoever is
-                            // present hears it. The line is the same for everyone —it carries inside the
-                            // name and id of whoever speaks—, so it is handed out as is. The
-                            // other channels (trade, recruitment) are server-wide and
-                            // are not handed out yet.
-                            //
-                            // The guild's (2) and the alliance's (3) go to their members connected.
-                            int oidos = channel switch
-                            {
-                                0 => await SessionRegistry.BroadcastToMapAsync(
-                                         SessionContext.State.MapId, linea, SessionContext.Current.Id),
-                                2 => await Handlers.GuildHandler.SayAsync(GameState.CharacterId, linea),
-                                3 => await Handlers.AllianceHandler.SayAsync(GameState.CharacterId, linea),
-                                _ => 0,
-                            };
+                            // And to the others, by the channel (ChatChannels). The line is the same
+                            // for everyone --it carries inside the name and id of whoever speaks--,
+                            // so it is handed out as is.
+                            int oidos = await Handlers.ChatChannels.SayAsync(SessionContext.Current, channel, linea);
                             Console.WriteLine($"[Chat] channel {channel}: {text}" +
                                               (oidos > 0 ? $"   (heard by {oidos} more)" : ""));
                         }
