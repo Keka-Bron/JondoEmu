@@ -1,0 +1,67 @@
+# Jondo Server in Docker. See docs/docker.md.
+#
+#   cp .env.example .env      # optional
+#   docker compose up -d --build
+#   docker compose logs -f
+#
+# The ports are fixed in the server and the client is sent to 127.0.0.1:5555 (the launcher relays
+# it), so each running instance needs a host IP of its own: JONDO_BIND_IP.
+
+x-jondo-server: &jondo-server
+  build:
+    context: .
+    args:
+      SKIP_TESTS: ${JONDO_SKIP_TESTS:-true}
+  image: jondo-server:${JONDO_TAG:-local}
+  init: true
+  restart: unless-stopped
+  # A shutdown tells the players and saves the world; give it time before Docker kills it.
+  stop_grace_period: 90s
+  environment:
+    TZ: ${TZ:-UTC}
+    JONDO_SIN_REGISTRO_DE_TRAFICO: ${JONDO_SIN_REGISTRO_DE_TRAFICO:-}
+    JONDO_RAID_MIN_PLAYERS: ${JONDO_RAID_MIN_PLAYERS:-}
+  logging:
+    driver: json-file
+    options:
+      max-size: 20m
+      max-file: "5"
+
+services:
+  jondo-server:
+    <<: *jondo-server
+    container_name: jondo-server
+    ports:
+      - "${JONDO_BIND_IP:-0.0.0.0}:5555:5555"     # game and connection
+      - "${JONDO_BIND_IP:-0.0.0.0}:6337:6337"     # chat
+      - "${JONDO_BIND_IP:-0.0.0.0}:8888:8888"     # HAAPI and launcher control API
+      - "${JONDO_BIND_IP:-0.0.0.0}:15881:15881"   # Zaap
+      # - "${JONDO_BIND_IP:-0.0.0.0}:5556:5556"   # game node compatibility, not used by the client
+    volumes:
+      - jondo-bases:/app/bases
+      - jondo-config:/app/config
+      - jondo-logs:/app/logs
+
+  # A second, independent server (its own world, accounts and settings) on another host IP.
+  #   docker compose --profile second up -d
+  jondo-server-2:
+    <<: *jondo-server
+    container_name: jondo-server-2
+    profiles: [second]
+    ports:
+      - "${JONDO_BIND_IP_2:-127.0.0.2}:5555:5555"
+      - "${JONDO_BIND_IP_2:-127.0.0.2}:6337:6337"
+      - "${JONDO_BIND_IP_2:-127.0.0.2}:8888:8888"
+      - "${JONDO_BIND_IP_2:-127.0.0.2}:15881:15881"
+    volumes:
+      - jondo-2-bases:/app/bases
+      - jondo-2-config:/app/config
+      - jondo-2-logs:/app/logs
+
+volumes:
+  jondo-bases:
+  jondo-config:
+  jondo-logs:
+  jondo-2-bases:
+  jondo-2-config:
+  jondo-2-logs:

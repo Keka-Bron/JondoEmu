@@ -119,3 +119,6 @@ Jondo.Unity.Studio/obj/
 # The photos of the launcher window: they are working files, not part of the project.
 capturas-lanzador/
 README.bbcode.txt
+
+# Docker compose local settings (docker-compose.yml, .env.example)
+.env

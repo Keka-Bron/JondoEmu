@@ -90,7 +90,16 @@ namespace Jondo.Unity.Server
                 _ready = false;
                 StopServices();
             }
-            if (_restartRequested != 0 && Failure == null) StartTheNextRun();
+            if (_restartRequested != 0 && Failure == null)
+            {
+                if (UI.ServerLaunch.RestartByExit())
+                {
+                    // The supervisor (Docker's restart policy) starts the next run.
+                    Environment.ExitCode = UI.ServerLaunch.RestartExitCode;
+                    Console.WriteLine("[+] The server exits so that its supervisor starts it again with its new settings.");
+                }
+                else StartTheNextRun();
+            }
         }
 
         /// <summary>The complete failure written before a WinExe exits during startup.</summary>

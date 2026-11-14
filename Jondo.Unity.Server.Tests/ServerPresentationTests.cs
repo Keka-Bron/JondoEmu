@@ -93,4 +93,15 @@ public sealed class ServerPresentationTests
         Assert.Equal(new[] { "--restart-after", "456" }, apphost.ArgumentList);
         Assert.False(apphost.UseShellExecute);
     }
+
+    [Fact]
+    public void Restart_by_exit_only_when_the_supervisor_is_asked_to_restart()
+    {
+        Assert.True(ServerLaunch.RestartByExit("exit"));
+        Assert.True(ServerLaunch.RestartByExit(" EXIT "));
+        Assert.False(ServerLaunch.RestartByExit(null!));
+        Assert.False(ServerLaunch.RestartByExit(""));
+        Assert.False(ServerLaunch.RestartByExit("spawn"));
+        Assert.Equal(75, ServerLaunch.RestartExitCode);
+    }
 }
