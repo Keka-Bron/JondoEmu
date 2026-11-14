@@ -456,7 +456,7 @@ namespace Jondo.Unity.Server.Handlers
                         bonus += value;
                 }
             }
-            bonus += GetSetBonus(statId);
+            bonus += GetSetBonus(statId, legacyEffect);
 
             // And what the alterations add -- a candy's wisdom, the Trool potion's initiative --,
             // which the bonus slots' items already brought in through the cache above.
@@ -535,31 +535,29 @@ namespace Jondo.Unity.Server.Handlers
         public static int GetPlayerInitiative() => IniciativaInvertida() + IniciativaDelEquipo();
 
         /// <summary>
-        /// Returns the set bonus for a given stat ID based on how many Intrepid set pieces are equipped.
-        /// Set GIDs: 10801, 10800, 10798, 10797, 10784, 10785, 10799, 10794
-        /// Bonuses:
-        ///   Vitality (11): +1 per piece equipped (starting from 2 pieces)
-        ///   Initiative (44): +2 with full set (8 pieces)
+        /// What the sets worn add to a characteristic, counted like the pieces' own effects above.
         /// </summary>
-        private static int GetSetBonus(int statId)
+        /// <remarks>
+        /// The sheet counts every set (<see cref="Managers.Equipment.Bonuses"/>, through
+        /// <see cref="Managers.ItemSets"/>); this only knew one, «Intrepid», written by hand -- and
+        /// one of its eight pieces, 10801, is the Paper Hat. So a character wearing three sets saw
+        /// 10 AP and 4,550 life on his sheet and fought with 8 and 4,400.
+        /// </remarks>
+        private static int GetSetBonus(int statId, int legacyEffect)
         {
-            var equippedItems  = GameState.GetEquippedItemsCopy();
-            var intrepidGids  = new HashSet<int> { 10801, 10800, 10798, 10797, 10784, 10785, 10799, 10794 };
-            int count = 0;
+            var worn = GameState.GetEquippedItemsCopy().Keys
+                .Select(uid => GameState.GetInventoryItem(uid))
+                .Where(item => item != null)
+                .Select(item => item!.ItemId);
 
-            foreach (var uid in equippedItems.Keys)
+            int bonus = 0;
+            foreach (var (effectId, value) in Managers.ItemSets.BonusesFor(worn))
             {
-                var item = GameState.GetInventoryItem(uid);
-                if (item != null && intrepidGids.Contains(item.ItemId))
-                    count++;
+                var (characteristic, sign) = DatabaseManager.EffectMeta(effectId);
+                if (characteristic == statId && sign != 0) bonus += (int)value * sign;
+                else if (characteristic == 0 && effectId == legacyEffect) bonus += (int)value;
             }
-
-            if (count >= 2)
-            {
-                if (statId == 11) return count;           // +1 Vitality per equipped piece
-                if (statId == 44) return count == 8 ? 2 : 0; // +2 Initiative only with the full set
-            }
-            return 0;
+            return bonus;
         }
     }
 }
