@@ -1440,9 +1440,10 @@ namespace Jondo.Unity.Server.Handlers
                 Jondo.Unity.World.Fights.ElementType.Air => 36,
                 _ => 37,
             };
-            return target.GetResPctForElement(element)
-                   + target.Buffs.De(ofTheElement, round)
-                   + target.Buffs.De(EveryElementResistance, round);
+            // A character's total stops at 50 % (Fighter.MaxResistCharacter): gear and spells together.
+            return target.CappedResistance(target.GetResPctForElement(element)
+                                           + target.Buffs.De(ofTheElement, round)
+                                           + target.Buffs.De(EveryElementResistance, round));
         }
 
         /// <summary>Characteristic 101, «% resistencia» on every element (effects 1076 and 1077).</summary>

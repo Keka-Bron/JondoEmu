@@ -812,6 +812,24 @@ namespace Jondo.Unity.World.Fights
             };
         }
 
+        /// <summary>
+        /// The highest percentage resistance a character takes blows with: the client's own
+        /// DofusConstants.MaxResistCharacter, 50. A player with 60 % from his gear took a tenth
+        /// less than he should have.
+        /// </summary>
+        public const int MaxResistCharacter = 50;
+
+        /// <summary>
+        /// Whether the 50 % applies: a player's character, or a bot playing one. Not a monster, a
+        /// summon or a double (no class), nor a character fighting as a monster, whose sheet is
+        /// the monster's.
+        /// </summary>
+        public bool IsCharacter => !IsMonster && Breed > 0 && IncarnatedMonster == 0;
+
+        /// <summary>A percentage resistance as a blow reads it: a character's stops at 50, below has no floor.</summary>
+        public int CappedResistance(int percent)
+            => IsCharacter ? Math.Min(percent, MaxResistCharacter) : percent;
+
         public int GetResPctForElement(ElementType element)
         {
             return element switch
