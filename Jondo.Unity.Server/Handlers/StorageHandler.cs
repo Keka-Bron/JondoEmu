@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
@@ -107,6 +108,87 @@ namespace Jondo.Unity.Server.Handlers
             var logged = window.Kind == Kind.GuildChest ? GuildChestHandler.ItemOfMove(window, quantity, uid) : null;
             if (await MoveAsync(stream, window.Place, quantity, uid, goneFirst: false) && logged != null)
                 GuildChestHandler.LogMove(window, quantity, uid, logged.Value);
+            return true;
+        }
+
+        /// <summary>
+        /// The windows' transfer buttons at the haven bag chest, a house chest, a bin or the guild
+        /// chest, the same messages as at the bank (BankHandler.TransferAsync): kez everything into
+        /// the storage, kgx what it has already, kdd { 1 the stacks, 2 how many } a selection, kcg
+        /// everything out, kck out what the bag has already and kcz { 2 the stacks } a selection
+        /// out -- «Transférer les objets visibles» from the storage's side. They reached the bank alone, which
+        /// was not open, and nothing moved. Each stack moves as a kcr would move it, the guild
+        /// chest's rights asked for each. False when no storage is open.
+        /// </summary>
+        public static async Task<bool> TransferAsync(NetworkStream? stream, byte[] payload, string op)
+        {
+            var window = Current;
+            bool havenBag = window == null && ChestHandler.IsOpen;
+            if (window == null && !havenBag) return false;
+            var place = window?.Place ?? StorageStacks.HavenBag(SessionContext.State.CharacterId);
+
+            var bag = Equipment.All.Where(i => i.Position == Equipment.Bag).ToList();
+            var stored = StorageStacks.ItemsOf(place);
+            List<(long Uid, int Quantity)> moves;
+            switch (op)
+            {
+                case "kez":
+                    moves = bag.Select(i => (i.Uid, i.Quantity)).ToList();
+                    break;
+                case "kgx":
+                {
+                    var there = stored.Select(i => i.Gid).ToHashSet();
+                    moves = bag.Where(i => there.Contains(i.Template)).Select(i => (i.Uid, i.Quantity)).ToList();
+                    break;
+                }
+                case "kcg":
+                    moves = stored.Select(i => (i.Uid, -i.Quantity)).ToList();
+                    break;
+                case "kck":
+                {
+                    var inBag = bag.Select(i => i.Template).ToHashSet();
+                    moves = stored.Where(i => inBag.Contains(i.Gid)).Select(i => (i.Uid, -i.Quantity)).ToList();
+                    break;
+                }
+                case "kdd":
+                {
+                    byte[]? kdd = ConnectionProtocol.ReadPayload(payload, "kdd");
+                    if (kdd == null) return true;
+                    var fields = ProtoMessage.Parse(kdd).Fields;
+                    var uids = BankHandler.PackedOrSingle(fields, 1);
+                    var quantities = BankHandler.PackedOrSingle(fields, 2);
+                    var byUid = bag.ToDictionary(i => i.Uid);
+                    moves = new List<(long, int)>();
+                    for (int k = 0; k < uids.Count; k++)
+                    {
+                        if (!byUid.TryGetValue(uids[k], out var item)) continue;
+                        moves.Add((item.Uid, k < quantities.Count && quantities[k] > 0 ? (int)Math.Min(quantities[k], item.Quantity) : item.Quantity));
+                    }
+                    break;
+                }
+                case "kcz":
+                {
+                    byte[]? kcz = ConnectionProtocol.ReadPayload(payload, "kcz");
+                    if (kcz == null) return true;
+                    var uids = BankHandler.PackedOrSingle(ProtoMessage.Parse(kcz).Fields, 2).ToHashSet();
+                    moves = stored.Where(i => uids.Contains(i.Uid)).Select(i => (i.Uid, -i.Quantity)).ToList();
+                    break;
+                }
+                default:
+                    return false;
+            }
+
+            int moved = 0;
+            foreach (var (uid, quantity) in moves)
+            {
+                if (window?.Kind == Kind.GuildChest && !await GuildChestHandler.MayMoveAsync(stream, window, quantity > 0, uid))
+                    continue;
+                var logged = window?.Kind == Kind.GuildChest ? GuildChestHandler.ItemOfMove(window, quantity, uid) : null;
+                if (!await MoveAsync(stream, place, quantity, uid, goneFirst: havenBag)) continue;
+                moved++;
+                if (logged != null) GuildChestHandler.LogMove(window!, quantity, uid, logged.Value);
+            }
+            Console.WriteLine($"[Storage] {SessionContext.State.CharacterName}: {op}, {moved} of {moves.Count} stack(s) moved in {place}.");
             return true;
         }
 
