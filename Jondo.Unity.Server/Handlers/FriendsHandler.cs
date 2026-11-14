@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 
@@ -331,6 +332,45 @@ namespace Jondo.Unity.Server.Handlers
         public static int MutualPlaying(long accountId)
             => accountId <= 0 ? 0
                : Contacts.ContactsOf(accountId).Count(other => Contacts.IsContact(other, accountId) && Playing(other) != null);
+
+        // ─── warning when a friend connects ──────────────────────────────────────────────────
+
+        /// <summary>«{0}({{player,{1},{2}}}) est en ligne.»: the account's nickname, then the character.</summary>
+        public const int FriendOnline = 143;
+
+        /// <summary>
+        /// The friends window's «Avertir quand mes amis se connectent» (koe, FriendSetWarnOnConnection-
+        /// Request { f1 enable }). The client sends it on every login, as the alliance's mdj/mda; it
+        /// went unanswered, «UNHANDLED CLIENT PACKET», and nobody was ever told a friend came in.
+        /// </summary>
+        public static void SetConnectionWarnings(byte[] payload)
+        {
+            byte[]? koe = ConnectionProtocol.ReadPayload(payload, "koe");
+            long account = SessionContext.Current.AccountId;
+            if (koe == null || account <= 0) return;
+            bool on = ProtoMessage.Parse(koe).Fields.Any(f => f.FieldNumber == 1 && f.WireType == 0 && f.VarIntValue != 0);
+            Contacts.SetWarnsOnConnection(account, on);
+        }
+
+        /// <summary>
+        /// A character entering the world: each mutual friend playing who asked to be warned hears
+        /// «Pseudo (Personnage) est en ligne» -- only mutual friends see each other playing.
+        /// </summary>
+        public static async Task OnWorldEntryAsync(GameSession session)
+        {
+            long account = session.AccountId;
+            if (account <= 0) return;
+            byte[]? warning = null;
+            foreach (long other in Contacts.ContactsOf(account))
+            {
+                if (other == account || !Contacts.IsContact(other, account) || !Contacts.WarnsOnConnection(other)) continue;
+                var friend = Playing(other);
+                if (friend == null) continue;
+                warning ??= ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(FriendOnline,
+                    HouseHandler.AccountTagOf(account).Name, session.State.CharacterName ?? "", session.CharacterId.ToString()));
+                await friend.SendAsync(warning);
+            }
+        }
 
         // ─── reading the requests ────────────────────────────────────────────────────────────
 

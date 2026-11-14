@@ -659,6 +659,9 @@ namespace Jondo.Unity.Server.Network
                     Handlers.AllianceHandler.SetConnectionWarnings(true);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Mda)))
                     Handlers.AllianceHandler.SetConnectionWarnings(false);
+                // The friends window's «Avertir quand mes amis se connectent».
+                else if (isAuthenticated && payloadStr == Op.Uri("koe"))
+                    Handlers.FriendsHandler.SetConnectionWarnings(payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Mes)))
                     await Handlers.AllianceHandler.AvaSwitchAsync(stream, payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Mba)))

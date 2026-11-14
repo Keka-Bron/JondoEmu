@@ -22,6 +22,7 @@ namespace Jondo.Unity.Server.Managers
     /// </para>
     /// <code>
     ///   AccountContacts (AccountId, OtherId, Kind)   Kind 0 contact, 1 blocked
+    ///   AccountConnectionWarnings (AccountId)        warned when a mutual friend connects
     /// </code>
     /// <para>
     /// Ignoring lasts the session: it is kept in memory and forgotten when the account leaves.
@@ -151,6 +152,49 @@ namespace Jondo.Unity.Server.Managers
                 return _ignored.TryGetValue(accountId, out var set) && set.Remove(otherId);
         }
 
+        /// <summary>
+        /// Whether the account wants to hear when a mutual friend connects: the friends window's
+        /// «Avertir quand mes amis se connectent», kept in world.db as AccountConnectionWarnings.
+        /// </summary>
+        public static bool WarnsOnConnection(long accountId)
+        {
+            if (accountId <= 0) return false;
+            try
+            {
+                EnsureTable();
+                using var connection = Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT 1 FROM AccountConnectionWarnings WHERE AccountId = $a;";
+                command.Parameters.AddWithValue("$a", accountId);
+                return command.ExecuteScalar() != null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Contacts] Could not read the connection warning of {accountId}: {ex.Message}");
+                return false;
+            }
+        }
+
+        public static void SetWarnsOnConnection(long accountId, bool warns)
+        {
+            if (accountId <= 0) return;
+            try
+            {
+                EnsureTable();
+                using var connection = Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = warns
+                    ? "INSERT OR IGNORE INTO AccountConnectionWarnings (AccountId) VALUES ($a);"
+                    : "DELETE FROM AccountConnectionWarnings WHERE AccountId = $a;";
+                command.Parameters.AddWithValue("$a", accountId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Contacts] Could not save the connection warning of {accountId}: {ex.Message}");
+            }
+        }
+
         /// <summary>The account left: the session's ignored list goes with it.</summary>
         public static void ForgetSession(long accountId)
         {
@@ -192,7 +236,9 @@ namespace Jondo.Unity.Server.Managers
                         AccountId INTEGER NOT NULL,
                         OtherId   INTEGER NOT NULL,
                         Kind      INTEGER NOT NULL,
-                        PRIMARY KEY (AccountId, OtherId, Kind));";
+                        PRIMARY KEY (AccountId, OtherId, Kind));
+                    CREATE TABLE IF NOT EXISTS AccountConnectionWarnings (
+                        AccountId INTEGER NOT NULL PRIMARY KEY);";
                 create.ExecuteNonQuery();
                 _tableReady = true;
             }

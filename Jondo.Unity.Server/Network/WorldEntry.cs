@@ -92,6 +92,9 @@ namespace Jondo.Unity.Server.Network
             // The alliance, if he has one: its ranks and belonging (mbz).
             await Handlers.AllianceHandler.OnWorldEntryAsync(session);
 
+            // His mutual friends who asked to be warned hear he is in.
+            await Handlers.FriendsHandler.OnWorldEntryAsync(session);
+
             // The world's prisms, for the world map (ife): everybody gets them, alliance or not.
             await Handlers.PrismHandler.OnWorldEntryAsync(stream);
 

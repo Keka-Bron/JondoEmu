@@ -40,6 +40,52 @@ namespace Jondo.Unity.Tests.Social
         private static byte[] ById(string op, int field, long account)
             => ConnectionProtocol.Push(op, Pb.New().Var(field, account).Build());
 
+        /// <summary>
+        /// «Avertir quand mes amis se connectent» (koe { f1 enable }): kept per account, and a
+        /// character entering the world is announced -- info 143, «Pseudo (Personnage) est en
+        /// ligne» -- to his mutual friends playing who asked for it; not to one who did not, nor to
+        /// one who listed him without being listed back. koe went unanswered, and nobody heard.
+        /// </summary>
+        [Fact]
+        public async Task A_friend_coming_in_is_announced_to_who_asked()
+        {
+            Forget();
+            try
+            {
+                await using var b = await ClientPipe.OpenAsync(AccountB, 8_870_100_002, Map, "Amigo-Dos");
+                await using var c = await ClientPipe.OpenAsync(AccountC, 8_870_100_003, Map, "Amigo-Tres");
+                Contacts.Add(AccountA, AccountB, Contacts.Contact);
+                Contacts.Add(AccountB, AccountA, Contacts.Contact);
+                Contacts.Add(AccountC, AccountA, Contacts.Contact);   // A never listed C: one-way
+
+                using (SessionContext.Push(b.Session))
+                    FriendsHandler.SetConnectionWarnings(ConnectionProtocol.Push("koe", Pb.New().Var(1, 1).Build()));
+                using (SessionContext.Push(c.Session))
+                    FriendsHandler.SetConnectionWarnings(ConnectionProtocol.Push("koe", Pb.New().Var(1, 1).Build()));
+                Assert.True(Contacts.WarnsOnConnection(AccountB));
+
+                await using var a = await ClientPipe.OpenAsync(AccountA, 8_870_100_001, Map, "Amigo-Uno");
+                await FriendsHandler.OnWorldEntryAsync(a.Session);
+                Assert.Equal(ConnectionProtocol.BuildSystemMessage(FriendsHandler.FriendOnline,
+                                 HouseHandler.AccountTagOf(AccountA).Name, "Amigo-Uno", "8870100001"),
+                             await b.Next(Jondo.Unity.Protocol.Op.Lqn));
+                await c.Quiet();
+
+                // Switched off, B hears nothing the next time.
+                using (SessionContext.Push(b.Session))
+                    FriendsHandler.SetConnectionWarnings(ConnectionProtocol.Push("koe", Pb.New().Build()));
+                Assert.False(Contacts.WarnsOnConnection(AccountB));
+                await FriendsHandler.OnWorldEntryAsync(a.Session);
+                await b.Quiet();
+            }
+            finally
+            {
+                Forget();
+                Contacts.SetWarnsOnConnection(AccountB, false);
+                Contacts.SetWarnsOnConnection(AccountC, false);
+            }
+        }
+
         private static ProtoMessage Parse(byte[] payload) => ProtoMessage.Parse(payload);
 
         private static ProtoMessage Sub(ProtoMessage message, int field)
