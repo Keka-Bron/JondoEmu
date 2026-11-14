@@ -70,6 +70,15 @@ namespace Jondo.Unity.Server.Managers
         public int BonusAgilidad { get; init; }
         public int BonusDeDanos { get; init; }
 
+        /// <summary>The grade's four elemental bonus damages, each on its own (<c>bonusEarthDamage</c>…).</summary>
+        public int BonusDanosTierra { get; init; }
+        public int BonusDanosFuego { get; init; }
+        public int BonusDanosAgua { get; init; }
+        public int BonusDanosAire { get; init; }
+
+        /// <summary>The template's <c>race</c>: 199 is the Osamodas' creatures (<see cref="Summons.OsamodasRace"/>).</summary>
+        public int Raza { get; init; }
+
         /// <summary>The spell that governs the creature, and at which grade.</summary>
         public int HechizoPropio { get; init; }
         public int GradoDelHechizoPropio { get; init; }
@@ -231,7 +240,78 @@ namespace Jondo.Unity.Server.Managers
                 invocado.Chance += quienInvoca.Chance;
                 invocado.Agility += quienInvoca.Agility;
             }
+
+            if (receta.Raza == OsamodasRace) InheritFromOsamodas(invocado, receta, quienInvoca);
         }
+
+        /// <summary>The race of the Osamodas' creatures, 8070 to 8083: Tofus, Bouftous, Crapauds, Dragons and the rest.</summary>
+        public const int OsamodasRace = 199;
+
+        /// <summary>
+        /// What an Osamodas' creature takes of its Osamodas, by what it costs: «L'héritage des
+        /// caractéristiques est lui aussi corrélé au coût en PI : 1 PI = 50% ; 2 PI = 75% ; 3 PI =
+        /// 100% des caractéristiques» (devblog «MàJ 3.2 : Refonte Osamodas»).
+        /// </summary>
+        public static int OsamodasShare(int summonCost) => summonCost switch
+        {
+            <= 0 => 0,
+            1 => 50,
+            2 => 75,
+            _ => 100,
+        };
+
+        /// <summary>
+        /// An Osamodas' creature inherits from its summoner, on top of its own grade.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Its grade's bonusCharacteristics read as those shares, and only those: 50 at 1 PI, 75 at
+        /// 2, 100 at 3, in the characteristic and the elemental damage of its family -- the Bouftou
+        /// 8072 «strength 50, bonusEarthDamage 50» at 1 PI, the Bouftou 8078 100 and 100 at 3. The
+        /// family is Ankama's own: «Bouftous : 100% de la Force et des dommages Terre», «Dragonnets :
+        /// 100% de l'Intelligence, des Dommages Feu et des Soins», «Crapauds : 100% de la Chance et
+        /// des Dommages Eau», «Tofus : 100% de l'Agilité et des Dommages Air» (update 2.66).
+        /// </para>
+        /// <para>
+        /// And every one of them «l'héritage complet de la Puissance, des Dommages "classiques" et des
+        /// Dommages de Poussée» (devblog «Modifications des classes et des équipements», DOFUS 3.0),
+        /// at its share; the Bouftou «hérite également du Soin de son invocateur» (update 3.4).
+        /// </para>
+        /// <para>
+        /// The summoner's sheet, not what spells in the fight add: those live in his Buffs, and «
+        /// l'héritage des caractéristiques obtenues via les sorts lancés en combat sera désactivé»
+        /// (3.2). It was nothing: a level 200 Osamodas' Bouftou struck with its own 50 strength.
+        /// INFERRED: the grade's own bonus stays as it was, the inheritance on top.
+        /// </para>
+        /// </remarks>
+        internal static void InheritFromOsamodas(Fighter invocado, Summon receta, Fighter quienInvoca)
+        {
+            int share = OsamodasShare(receta.SummonCost);
+            if (share == 0 || quienInvoca == null) return;
+
+            invocado.Strength += quienInvoca.Strength * receta.BonusFuerza / 100;
+            invocado.Intelligence += quienInvoca.Intelligence * receta.BonusInteligencia / 100;
+            invocado.Chance += quienInvoca.Chance * receta.BonusSuerte / 100;
+            invocado.Agility += quienInvoca.Agility * receta.BonusAgilidad / 100;
+            invocado.EarthDamage += quienInvoca.EarthDamage * receta.BonusDanosTierra / 100;
+            invocado.FireDamage += quienInvoca.FireDamage * receta.BonusDanosFuego / 100;
+            invocado.WaterDamage += quienInvoca.WaterDamage * receta.BonusDanosAgua / 100;
+            invocado.AirDamage += quienInvoca.AirDamage * receta.BonusDanosAire / 100;
+
+            invocado.Power += quienInvoca.Power * share / 100;
+            invocado.FlatDamage += quienInvoca.FlatDamage * share / 100;
+            invocado.PushDamage += quienInvoca.PushDamage * share / 100;
+
+            // The heals, the Bouftous' and the Dragons': the families of strength and intelligence.
+            if (receta.BonusFuerza > 0 || receta.BonusInteligencia > 0)
+            {
+                int heals = quienInvoca.Otra(HealsCharacteristic) * share / 100;
+                if (heals != 0) invocado.Otras[HealsCharacteristic] = invocado.Otra(HealsCharacteristic) + heals;
+            }
+        }
+
+        /// <summary>The heals characteristic (49), kept in a fighter's Otras.</summary>
+        private const int HealsCharacteristic = 49;
 
         /// <summary>
         /// The Steamer's six turrets -- the guardiana, the arponera and the táctica, and the
@@ -339,6 +419,7 @@ namespace Jondo.Unity.Server.Managers
                 // take up a cell —one could walk through it— and did nothing.
                 int vidaFija = Math.Max(0, Entero(gr, "lifePoints"));
                 int bonusVida = 0, bonusFuerza = 0, bonusInteligencia = 0, bonusSuerte = 0, bonusAgilidad = 0, bonusDanos = 0;
+                int bonusTierra = 0, bonusFuego = 0, bonusAgua = 0, bonusAire = 0;
                 if (gr.TryGetProperty("bonusCharacteristics", out var bonus))
                 {
                     bonusVida = Entero(bonus, "lifePoints");
@@ -346,8 +427,11 @@ namespace Jondo.Unity.Server.Managers
                     bonusInteligencia = Entero(bonus, "intelligence");
                     bonusSuerte = Entero(bonus, "chance");
                     bonusAgilidad = Entero(bonus, "agility");
-                    bonusDanos = Math.Max(Math.Max(Entero(bonus, "bonusEarthDamage"), Entero(bonus, "bonusFireDamage")),
-                                          Math.Max(Entero(bonus, "bonusWaterDamage"), Entero(bonus, "bonusAirDamage")));
+                    bonusTierra = Entero(bonus, "bonusEarthDamage");
+                    bonusFuego = Entero(bonus, "bonusFireDamage");
+                    bonusAgua = Entero(bonus, "bonusWaterDamage");
+                    bonusAire = Entero(bonus, "bonusAirDamage");
+                    bonusDanos = Math.Max(Math.Max(bonusTierra, bonusFuego), Math.Max(bonusAgua, bonusAire));
                 }
 
                 // The spell it behaves with: the startingSpellId is a SpellLevels.Id.
@@ -388,6 +472,11 @@ namespace Jondo.Unity.Server.Managers
                     BonusSuerte = Math.Max(0, bonusSuerte),
                     BonusAgilidad = Math.Max(0, bonusAgilidad),
                     BonusDeDanos = Math.Max(0, bonusDanos),
+                    BonusDanosTierra = Math.Max(0, bonusTierra),
+                    BonusDanosFuego = Math.Max(0, bonusFuego),
+                    BonusDanosAgua = Math.Max(0, bonusAgua),
+                    BonusDanosAire = Math.Max(0, bonusAire),
+                    Raza = Entero(doc.RootElement, "race"),
                     HechizoPropio = hechizo,
                     GradoDelHechizoPropio = gradoDelHechizo,
                     Juega = juega,
