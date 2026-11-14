@@ -2410,6 +2410,9 @@ public static class Op
     /// <summary>Unidentified. 2 uses in the emulator.</summary>
     public const string Kea = "kea";
 
+    /// <summary>Selling to a vendor: { f2 (repeated): { f1: how many, f2: uid } }. NpcHandler.SellAsync.</summary>
+    public const string Kem = "kem";
+
     /// <summary>
     /// Client to server, a marketplace: follow an item, { f1: item, f2: true }, answered by kbt;
     /// stop following it, f1 alone. The client sends that one twice in a row.

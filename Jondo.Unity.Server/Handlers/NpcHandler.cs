@@ -2089,6 +2089,85 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Selling to the vendor open (kem): the shop's «Vendre» and «Tout vendre»
+        /// (NpcStoreUi::OnSellItem, OnSellAllItem), { f2 (repeated): { f1 how many, f2 the uid } },
+        /// measured on one sold item, which nothing answered: «UNHANDLED CLIENT PACKET». Each stack
+        /// leaves the bag (ivj, or ium for the last), and the vendor pays a tenth of the item's own
+        /// price a unit, rounded up (<see cref="NpcShops.BuyBackOf"/>), with the purchase's
+        /// lqn 252 and the purse (ivf).
+        /// INFERRED: no capture sells, so the frames are the purchase's and the bag's.
+        /// A token shop buys nothing back: what it would pay in is not known.
+        /// </summary>
+        public static async Task SellAsync(NetworkStream stream, byte[] payload)
+        {
+            byte[]? kem = ConnectionProtocol.ReadPayload(payload, Op.Kem);
+            if (kem == null) return;
+
+            if (OpenShop == 0 || Managers.Npcs.Find(SessionContext.State.MapId, OpenShop) == null)
+            {
+                Console.WriteLine($"[NPC] A sale with no vendor open on map {SessionContext.State.MapId}.");
+                Forget();
+                return;
+            }
+            if (TokenShops.Of(OpenShopNpc) != null)
+            {
+                Console.WriteLine($"[NPC] Vendor {OpenShopNpc} takes tokens and buys nothing back.");
+                return;
+            }
+
+            var sales = new List<(long Uid, int Quantity)>();
+            foreach (var field in ProtoMessage.Parse(kem).Fields)
+            {
+                if (field.FieldNumber != 2 || field.WireType != 2) continue;
+                long uid = 0, quantity = 0;
+                foreach (var inner in ProtoMessage.Parse(field.BytesValue).Fields)
+                {
+                    if (inner.WireType != 0) continue;
+                    if (inner.FieldNumber == 1) quantity = inner.VarIntValue;
+                    else if (inner.FieldNumber == 2) uid = inner.VarIntValue;
+                }
+                if (uid != 0 && quantity > 0) sales.Add((uid, (int)Math.Min(quantity, int.MaxValue)));
+            }
+
+            long earned = 0;
+            int sold = 0;
+            foreach (var (uid, wanted) in sales)
+            {
+                var item = Equipment.ByUid(uid);
+                if (item == null || item.Position != Equipment.Bag) continue;
+                int quantity = Math.Min(wanted, item.Quantity);
+                int left = item.Quantity - quantity;
+                if (!DatabaseManager.DestroyCharacterItem(GameState.CharacterId, uid, quantity)) continue;
+                Equipment.Remove(uid, quantity);
+
+                long price = NpcShops.BuyBackOf(item.Template, quantity);
+                GameState.Kamas += price;
+                earned += price;
+                sold++;
+
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, left > 0
+                    ? ConnectionProtocol.Push(Op.Ivj, ConnectionProtocol.BuildItemQuantity(uid, left))
+                    : ConnectionProtocol.Push(Op.Ium, ConnectionProtocol.BuildItemGone(uid)));
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        ConnectionProtocol.PurchaseMessage,
+                        item.Template.ToString(), uid.ToString(), quantity.ToString(), price.ToString())));
+            }
+            if (sold == 0) return;
+
+            DatabaseManager.SaveCurrentCharacter();
+            GameState.SetInventory(DatabaseManager.LoadInventory(GameState.CharacterId));
+
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Ivf, ConnectionProtocol.BuildKamas(GameState.Kamas)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iun, ConnectionProtocol.BuildPods(
+                    ConnectionProtocol.Carried(SessionContext.State), ConnectionProtocol.Capacity(SessionContext.State))));
+
+            Console.WriteLine($"[NPC] Sold {sold} stack(s) to vendor {OpenShopNpc} for {earned}; {GameState.Kamas} kamas.");
+        }
+
+        /// <summary>
         /// The shop's close button (empty kla).
         ///
         /// The client sends it TWICE in a row, less than a millisecond apart, and the real server answers a

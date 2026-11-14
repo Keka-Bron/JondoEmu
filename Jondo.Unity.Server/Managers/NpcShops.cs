@@ -297,5 +297,40 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static long PriceOf(int gid)
             => _prices.TryGetValue(gid, out long price) ? price : DefaultPrice;
+
+        /// <summary>A vendor buys back at a tenth of the item's own price: «se vend à 30 000k à un PNJ […] 1/10 du prix».</summary>
+        public const int BuyBackDivisor = 10;
+
+        /// <summary>
+        /// What a vendor pays for <paramref name="quantity"/> of an item: a tenth of the template's
+        /// price a unit, rounded up, not of the catalogue's -- the tournament server's one kama
+        /// would make it nothing. The client's shop shows the same: the Casque Dragoeuf (12900) at
+        /// 1290 a unit, the Fée d'artifice (1) at 1 and the Blé (0) at 0.
+        /// </summary>
+        public static long BuyBackOf(int gid, int quantity)
+            => (TemplatePriceOf(gid) + BuyBackDivisor - 1) / BuyBackDivisor * quantity;
+
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, long> _templatePrices = new();
+
+        /// <summary>The item template's price (ItemTemplates' «price»), zero when it has none.</summary>
+        internal static long TemplatePriceOf(int gid) => _templatePrices.GetOrAdd(gid, static gid =>
+        {
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT Data FROM ItemTemplates WHERE Id = $gid;";
+                command.Parameters.AddWithValue("$gid", gid);
+                if (command.ExecuteScalar() is not string data) return 0;
+                using var doc = JsonDocument.Parse(data);
+                return doc.RootElement.TryGetProperty("price", out var price) && price.ValueKind == JsonValueKind.Number
+                    ? Math.Max(0, (long)price.GetDouble()) : 0;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        });
     }
 }

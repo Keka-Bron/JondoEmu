@@ -1709,6 +1709,11 @@ namespace Jondo.Unity.Server.Network
                     // Buying something from the NPC with the shop open.
                     await NpcHandler.BuyAsync(stream, payload);
                 }
+                else if (payloadStr.Contains(Op.Uri(Op.Kem)))
+                {
+                    // Selling to the NPC with the shop open: «Vendre» and «Tout vendre».
+                    await NpcHandler.SellAsync(stream, payload);
+                }
                 else if (payloadStr == Op.Uri(Op.Idt) || payloadStr.Contains(Op.Uri(Op.Idt)))
                 {
                     // «Abandonar el tutorial» confirmed: its quests validated, the set given.
