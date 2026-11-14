@@ -228,6 +228,61 @@ namespace Jondo.Unity.Tests.Economy
             }
         }
 
+        /// <summary>
+        /// The window's pods bars: the kbg carries what each side carries, as the captures' 16,677
+        /// and 12,117 did, and so does the keq at the end. Both sent zero, and the bars stayed empty.
+        /// </summary>
+        [Fact]
+        public async Task The_window_opens_and_closes_with_what_each_carries()
+        {
+            const int Purse = 8815;
+            long weight = Jondo.Unity.Server.DatabaseManager.GetItemRealWeight(Purse);
+            if (weight == 0) return;   // no item data
+
+            var codec = new Jondo.Unity.Protocol.Game.Wire.GameCodec();
+            var seen = new List<byte[]>();
+            GameSession Watched(long id)
+            {
+                var session = new GameSession(codec, bytes => { lock (seen) seen.Add(bytes); return Task.CompletedTask; });
+                session.BindAccount(id, 1);
+                session.State.CharacterId = id;
+                session.State.MapId = 191105026;
+                session.EnterWorld();
+                Assert.True(SessionRegistry.Register(session));
+                return session;
+            }
+            var asker = Watched(9_000_000_018);
+            var asked = Watched(9_000_000_019);
+            asker.State.EquipmentItems[1] = new Jondo.Unity.Server.Managers.Equipment.Item { Uid = 1, Template = Purse, Quantity = 3 };
+            try
+            {
+                await As(asker, () => TradeHandler.RequestAsync(null!, ConnectionProtocol.Push(Op.Keu,
+                    Pb.New().Var(2, asked.CharacterId).Build())));
+                await As(asked, TradeHandler.AcceptAsync);
+
+                var opened = ProtoMessage.Parse(codec.ReadEnvelope(
+                    seen.Find(p => codec.ReadEnvelope(p).Alias == Op.Kbg)!).Content.Value.ToByteArray());
+                Assert.Equal(3 * weight, (long)opened.Fields.Find(f => f.FieldNumber == 5)!.VarIntValue);
+                Assert.DoesNotContain(opened.Fields, f => f.FieldNumber == 8);   // the asked carries nothing
+
+                byte[] ready = ConnectionProtocol.Push(Op.Kep, Pb.New().Var(1, 1).Var(2, 3).Build());
+                await As(asker, () => TradeHandler.ReadyAsync(null!, ready));
+                await As(asked, () => TradeHandler.ReadyAsync(null!, ready));
+
+                var mine = seen.ConvertAll(p => codec.ReadEnvelope(p))
+                               .FindAll(e => e.Alias == Op.Keq)
+                               .ConvertAll(e => ProtoMessage.Parse(e.Content.Value.ToByteArray()))
+                               .Find(m => !m.Fields.Exists(f => f.FieldNumber == 2) && m.Fields.Exists(f => f.FieldNumber == 3));
+                Assert.NotNull(mine);
+                Assert.Equal(3 * weight, (long)mine!.Fields.Find(f => f.FieldNumber == 3)!.VarIntValue);
+            }
+            finally
+            {
+                SessionRegistry.Unregister(asker);
+                SessionRegistry.Unregister(asked);
+            }
+        }
+
         private static async Task<bool> CloseAs(GameSession session)
         {
             using (SessionContext.Push(session)) return await TradeHandler.CloseAsync();
