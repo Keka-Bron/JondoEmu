@@ -566,7 +566,10 @@ namespace Heroes
                 Named(grid, "JondoHeroesMenuButton", mine);
                 var button = mine.Count > 0 ? mine[0] : null;
 
-                var place = FreePlace(grid);
+                var place = FreePlace(grid, out var model, out var other);
+                // No place free in the grid -- the window made narrow, its last row full --: the
+                // button goes into the title bar, beside its «⋮», rather than out of sight.
+                Spare(grid, place == null);
                 if (place == null)
                 {
                     if (button != null) button.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
@@ -579,17 +582,162 @@ namespace Heroes
                 button.style.top = new StyleLength(top);
                 button.style.width = new StyleLength(size.x);
                 button.style.height = new StyleLength(size.y);
+                if (_dressedFor != size)
+                {
+                    _dressedFor = size;
+                    Dress(button, model, other, size);
+                }
                 return;
             }
         }
+
+        /// <summary>The slot size the grid's button was last dressed for.</summary>
+        private static UnityEngine.Vector2 _dressedFor;
+
+        /// <summary>
+        /// The game's own look laid into the button, layer by layer off one of its slots: what two
+        /// slots both show -- the frame, its border, its back -- is copied, and the picture they
+        /// differ in, which is each one's icon, is ours (<see cref="Figure"/>).
+        /// </summary>
+        private static void Dress(VisualElement button, VisualElement model, VisualElement other, UnityEngine.Vector2 size)
+        {
+            button.Clear();
+            bool icon = false;
+            if (model != null) Layers(model, other, model.worldBound, button, ref icon);
+            if (icon) return;
+            var picture = Layer(size.x * 0.14f, size.y * 0.14f, size.x * 0.72f, size.y * 0.72f);
+            picture.style.backgroundImage = new StyleBackground(Figure());
+            picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+            button.Add(picture);
+        }
+
+        private static void Layers(VisualElement a, VisualElement b, UnityEngine.Rect origin, VisualElement into, ref bool icon)
+        {
+            var s = a.resolvedStyle;
+            if (s.display == DisplayStyle.None || s.visibility != Visibility.Visible || s.opacity < 0.02f) return;
+            // Its words -- a shortcut's letter, a count -- are its own, not the frame's.
+            if (a.TryCast<TextElement>() != null) return;
+            var r = a.worldBound;
+            if (r.width >= 1f && r.height >= 1f)
+            {
+                var layer = Layer(r.x - origin.x, r.y - origin.y, r.width, r.height);
+                layer.style.backgroundColor = new StyleColor(s.backgroundColor);
+                layer.style.borderTopWidth = new StyleFloat(s.borderTopWidth);
+                layer.style.borderBottomWidth = new StyleFloat(s.borderBottomWidth);
+                layer.style.borderLeftWidth = new StyleFloat(s.borderLeftWidth);
+                layer.style.borderRightWidth = new StyleFloat(s.borderRightWidth);
+                layer.style.borderTopColor = new StyleColor(s.borderTopColor);
+                layer.style.borderBottomColor = new StyleColor(s.borderBottomColor);
+                layer.style.borderLeftColor = new StyleColor(s.borderLeftColor);
+                layer.style.borderRightColor = new StyleColor(s.borderRightColor);
+                layer.style.borderTopLeftRadius = new StyleLength(s.borderTopLeftRadius);
+                layer.style.borderTopRightRadius = new StyleLength(s.borderTopRightRadius);
+                layer.style.borderBottomLeftRadius = new StyleLength(s.borderBottomLeftRadius);
+                layer.style.borderBottomRightRadius = new StyleLength(s.borderBottomRightRadius);
+                layer.style.opacity = new StyleFloat(s.opacity);
+                var picture = s.backgroundImage;
+                if (HasPicture(picture))
+                {
+                    if (b != null && SamePicture(picture, b.resolvedStyle.backgroundImage))
+                    {
+                        layer.style.backgroundImage = new StyleBackground(picture);
+                        layer.style.unityBackgroundImageTintColor = new StyleColor(s.unityBackgroundImageTintColor);
+                        try { layer.style.backgroundSize = new StyleBackgroundSize(s.backgroundSize); } catch { }
+                        try { layer.style.unitySliceLeft = new StyleInt(s.unitySliceLeft); layer.style.unitySliceRight = new StyleInt(s.unitySliceRight);
+                              layer.style.unitySliceTop = new StyleInt(s.unitySliceTop); layer.style.unitySliceBottom = new StyleInt(s.unitySliceBottom); } catch { }
+                    }
+                    else if (!icon)
+                    {
+                        icon = true;
+                        layer.style.backgroundImage = new StyleBackground(Figure());
+                        layer.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+                    }
+                }
+                into.Add(layer);
+            }
+            for (int i = 0; i < Kids(a); i++)
+                Layers(Kid(a, i), b != null && i < Kids(b) ? Kid(b, i) : null, origin, into, ref icon);
+        }
+
+        private static VisualElement Layer(float left, float top, float width, float height)
+        {
+            var layer = new VisualElement();
+            layer.pickingMode = PickingMode.Ignore;
+            layer.style.position = new StyleEnum<Position>(Position.Absolute);
+            layer.style.left = new StyleLength(left);
+            layer.style.top = new StyleLength(top);
+            layer.style.width = new StyleLength(width);
+            layer.style.height = new StyleLength(height);
+            return layer;
+        }
+
+        private static bool HasPicture(Background picture)
+            => picture.texture != null || picture.sprite != null || picture.vectorImage != null || picture.renderTexture != null;
+
+        private static bool SamePicture(Background a, Background b)
+        {
+            static IntPtr At(UnityEngine.Object o) => o == null ? IntPtr.Zero : o.Pointer;
+            return At(a.texture) == At(b.texture) && At(a.sprite) == At(b.sprite)
+                   && At(a.vectorImage) == At(b.vectorImage) && At(a.renderTexture) == At(b.renderTexture);
+        }
+
+        /// <summary>
+        /// The button kept in the MENUS title bar, before its «⋮», for when the grid has no place:
+        /// shown or hidden as <paramref name="shown"/> says.
+        /// </summary>
+        private static void Spare(VisualElement grid, bool shown)
+        {
+            VisualElement banner = grid;
+            while (banner != null && banner.name != "BannerMenu") banner = banner.hierarchy.parent;
+            if (banner == null) return;
+            var mine = new List<VisualElement>();
+            Named(banner, "JondoHeroesMenuSpare", mine);
+            var spare = mine.Count > 0 ? mine[0] : null;
+            if (spare == null)
+            {
+                if (!shown) return;
+                var places = new List<VisualElement>();
+                Named(banner, "header_right", places);
+                if (places.Count == 0) return;
+                var dots = new List<VisualElement>();
+                Named(places[0], "header_buttonRight", dots);
+                float h = dots.Count > 0 ? dots[0].worldBound.height : float.NaN;
+                float size = float.IsNaN(h) || h < 16f ? 22f : Math.Min(h + 2f, 28f);
+                spare = new VisualElement();
+                spare.name = "JondoHeroesMenuSpare";
+                spare.style.width = new StyleLength(size);
+                spare.style.height = new StyleLength(size);
+                spare.style.alignSelf = new StyleEnum<Align>(Align.Center);
+                spare.style.marginRight = new StyleLength(2f);
+                spare.style.backgroundImage = new StyleBackground(Figure());
+                spare.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+                Pressed(spare);
+                Hint(spare, "hint.window");
+                places[0].hierarchy.Insert(0, spare);
+            }
+            spare.style.display = new StyleEnum<DisplayStyle>(shown ? DisplayStyle.Flex : DisplayStyle.None);
+        }
+
+        /// <summary>
+        /// Opens or closes the window at the press, before the grid's or the title bar's own
+        /// handling -- a slot's drag, the window's -- swallows the click a Clickable waits for.
+        /// </summary>
+        private static void Pressed(VisualElement button)
+            => button.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
+                new Action<PointerDownEvent>(e =>
+                {
+                    try { e.StopImmediatePropagation(); } catch { }
+                    if (_window != null) Close(); else Open();
+                })), TrickleDown.TrickleDown);
 
         /// <summary>
         /// Where in the grid the place after its last button is -- left, top and size, the grid's
         /// own --, or null when its last row is full. Its buttons are its slots that show
         /// something: an empty slot shows less than most of them do.
         /// </summary>
-        private static (float, float, UnityEngine.Vector2)? FreePlace(VisualElement grid)
+        private static (float, float, UnityEngine.Vector2)? FreePlace(VisualElement grid, out VisualElement model, out VisualElement other)
         {
+            model = other = null;
             var slots = new List<VisualElement>();
             SlotsUnder(grid, slots);
             slots = slots.Where(s => s.resolvedStyle.display != DisplayStyle.None && s.resolvedStyle.visibility == Visibility.Visible
@@ -613,6 +761,11 @@ namespace Heroes
                                 $"{perRow} a row, {inLast} on the last; weights {string.Join(",", sorted)}.");
             }
             if (perRow < 2 || inLast >= perRow || step <= 0) return null;
+
+            // The look is copied off two plain slots -- no warning dot on them, which shows more.
+            var plain = full.Where(s => weight[s] == usual).Take(2).ToList();
+            model = plain.Count > 0 ? plain[0] : full[0];
+            other = plain.Count > 1 ? plain[1] : full[1];
 
             var last = full[^1].worldBound;
             var origin = grid.worldBound;
@@ -652,21 +805,9 @@ namespace Heroes
             var button = new VisualElement();
             button.name = "JondoHeroesMenuButton";
             button.style.position = new StyleEnum<Position>(Position.Absolute);
-            var picture = new VisualElement();
-            picture.pickingMode = PickingMode.Ignore;
-            picture.style.flexGrow = new StyleFloat(1f);
-            picture.style.marginLeft = picture.style.marginRight = picture.style.marginTop = picture.style.marginBottom = new StyleLength(2f);
-            picture.style.backgroundImage = new StyleBackground(Icon());
-            picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
-            button.Add(picture);
-            // Taken at the press, before the slot grid's own handling -- its drag and its
-            // selection -- swallows the click a Clickable waits for.
-            button.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
-                new Action<PointerDownEvent>(e =>
-                {
-                    try { e.StopImmediatePropagation(); } catch { }
-                    if (_window != null) Close(); else Open();
-                })), TrickleDown.TrickleDown);
+            // Dressed once placed, at the size it takes (Dress).
+            _dressedFor = default;
+            Pressed(button);
             Hint(button, "hint.window");
             grid.hierarchy.Add(button);
             return button;
@@ -693,13 +834,22 @@ namespace Heroes
             for (int i = 0; i < Kids(element) && i < 4; i++) Describe(Kid(element, i), depth + 1, into);
         }
 
+        private static UnityEngine.Texture2D _figure;
+
+        /// <summary>
+        /// The MENUS button's picture: the two heroes and the crown alone, coloured as the game's
+        /// own pictures are, for the frame copied off its slots (<see cref="Dress"/>).
+        /// </summary>
+        private static UnityEngine.Texture2D Figure() => _figure ??= Draw(framed: false);
+
         /// <summary>
         /// The button's icon, drawn here: a gold square like the bar's others, two heroes' busts
         /// side by side and a crown on the one in front. Three by three samples a pixel.
         /// </summary>
-        private static UnityEngine.Texture2D Icon()
+        private static UnityEngine.Texture2D Icon() => _icon ??= Draw(framed: true);
+
+        private static UnityEngine.Texture2D Draw(bool framed)
         {
-            if (_icon != null) return _icon;
             const int size = 64;
             var outline = new UnityEngine.Color(0.36f, 0.17f, 0.04f, 1f);
             var texture = new UnityEngine.Texture2D(size, size, UnityEngine.TextureFormat.RGBA32, false);
@@ -711,7 +861,7 @@ namespace Heroes
                         for (int sx = 0; sx < 3; sx++)
                         {
                             float x = px + (sx + 0.5f) / 3f, y = py + (sy + 0.5f) / 3f;
-                            var c = IconAt(x, y, outline);
+                            var c = framed ? IconAt(x, y, outline) : FigureAt(x, y);
                             r += c.r * c.a; g += c.g * c.a; b += c.b * c.a; a += c.a;
                         }
                     var color = a > 0 ? new UnityEngine.Color(r / a, g / a, b / a, a / 9f) : new UnityEngine.Color(0, 0, 0, 0);
@@ -720,7 +870,25 @@ namespace Heroes
             texture.Apply();
             texture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
             texture.hideFlags = UnityEngine.HideFlags.DontUnloadUnusedAsset;
-            return _icon = texture;
+            return texture;
+        }
+
+        /// <summary>
+        /// The two heroes with no square round them, y going down: the one behind blue, the one in
+        /// front warm, the crown gold, all edged dark as the game's pictures are.
+        /// </summary>
+        private static UnityEngine.Color FigureAt(float x, float y)
+        {
+            var outline = new UnityEngine.Color(0.17f, 0.10f, 0.06f, 1f);
+            var color = new UnityEngine.Color(0, 0, 0, 0);
+            if (y > 58f) return color;
+            color = Bust(x, y, 22f, 24f, 8f, color, new UnityEngine.Color(0.55f, 0.78f, 0.98f, 1f), outline);
+            color = Bust(x, y, 39f, 29f, 9f, color, new UnityEngine.Color(1f, 0.74f, 0.40f, 1f), outline);
+            if (InCrown(x, y, 39f, 14f)) color = new UnityEngine.Color(1f, 0.86f, 0.20f, 1f);
+            else if (InCrown(x, y, 39f, 14f, 1.6f)) color = outline;
+            // The bottom cut straight and edged, as the shoulders end.
+            if (color.a > 0f && y > 55.6f) color = outline;
+            return color;
         }
 
         /// <summary>The icon at a point, y going down: the last shape that holds it wins.</summary>
