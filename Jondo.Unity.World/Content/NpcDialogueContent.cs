@@ -286,6 +286,14 @@ namespace Jondo.Unity.World.Content
         public long GivesKamas { get; init; }
 
         /// <summary>
+        /// An information message the reply prints in the chat as it is chosen («says»): the id of a
+        /// type-0 row of the client's InfoMessagesDataRoot. The orbalantir of Incarnam's militia shows
+        /// a vision when its three figures are turned in the wrong order (429-433, «Ultime
+        /// réminiscence»), and nothing in a conversation said anything in the chat before.
+        /// </summary>
+        public int Says { get; init; }
+
+        /// <summary>
         /// A condition on the character, in the client's criterion language, for the reply to be
         /// offered: «PS=1» a woman, «PE=14» who knows the crossed-arms attitude, «Pw>1499» with that
         /// many pods free -- the right answers to the guardian of the bridge of death, which are not
@@ -1226,6 +1234,7 @@ namespace Jondo.Unity.World.Content
                             Forfeits = (int)Number(choice, "forfeits"),
                             AlsoGives = Numbers(choice, "alsoGives").Select(o => (int)o).ToArray(),
                             GivesKamas = Number(choice, "givesKamas"),
+                            Says = (int)Number(choice, "says"),
                             Criterion = choice.TryGetProperty("criterion", out var crit) && crit.ValueKind == JsonValueKind.String
                                         ? crit.GetString() ?? "" : "",
                             Stagings = Numbers(choice, "stagings").Select(o => (int)o).ToArray(),
@@ -1473,6 +1482,7 @@ namespace Jondo.Unity.World.Content
                                 writer.WriteEndArray();
                             }
                             if (choice.GivesKamas != 0) writer.WriteNumber("givesKamas", choice.GivesKamas);
+                            if (choice.Says != 0) writer.WriteNumber("says", choice.Says);
                             if (choice.Criterion.Length > 0) writer.WriteString("criterion", choice.Criterion);
                             if (choice.Door.Length > 0) writer.WriteString("door", choice.Door);
                             WriteIds(writer, "stagings", choice.Stagings);

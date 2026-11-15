@@ -1649,6 +1649,11 @@ namespace Jondo.Unity.Server.Handlers
                     await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.Quest, objective);
             }
 
+            // What the reply prints in the chat: the orbalantir's visions, its figures turned wrong.
+            if (elegidaAhora != null && elegidaAhora.Says != 0 && !sinPagar)
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(Managers.InfoMessages.Info, elegidaAhora.Says)));
+
             // Somebody who comes in on a reply that does no objective: Vey Gana's «Darle los
             // ingredientes.» draws the country doll out of the barn.
             if (elegidaAhora != null && elegidaAhora.Completes == 0 && elegidaAhora.ShowsNpc != 0)
