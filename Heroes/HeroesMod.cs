@@ -494,6 +494,8 @@ namespace Heroes
         private static void BorrowServices()
         {
             if ((_displayers != null && _entities != null) || _liveBroken) return;
+            if (_displayers != null) EntitiesOffDisplayers();
+            if (_entities != null) return;
             // The displaying service had, the entities' one is looked for a while longer only.
             if (_displayers != null && ++_borrowScans > 60) return;
             var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
@@ -527,6 +529,66 @@ namespace Heroes
             }
         }
 
+        private static bool _toldDisplayers;
+
+        /// <summary>
+        /// The entities' service, which makes the character a portrait shows, out of the displaying
+        /// one: off a portrait of the client's among the displayers it keeps (fep.bdvz), or off
+        /// the service's own object, whose fields may hold it.
+        /// </summary>
+        private static void EntitiesOffDisplayers()
+        {
+            try
+            {
+                var kept = _displayers.bdvz();
+                if (kept != null)
+                {
+                    foreach (var one in kept)
+                    {
+                        var portrait = one?.TryCast<Il2CppCore.UILogic.Components.Figma.EntityPortrait>();
+                        if (portrait?.m_entityService == null) continue;
+                        Borrowed(portrait.m_entityService, portrait.m_entityDisplayerService, portrait.m_entityInfoService,
+                                 portrait.m_playerContextMenuDependenciesService, portrait.m_contextMenuService, "a kept portrait");
+                        return;
+                    }
+                }
+
+                var native = new Il2CppSystem.Object(_displayers.Pointer).GetIl2CppType();
+                Type managed = null;
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    managed = assembly.GetType("Il2Cpp." + native.Name) ?? assembly.GetType(native.FullName);
+                    if (managed != null) break;
+                }
+                var found = new List<string>();
+                if (managed != null)
+                {
+                    object real = Activator.CreateInstance(managed, _displayers.Pointer);
+                    foreach (var property in managed.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
+                    {
+                        found.Add(property.PropertyType.Name);
+                        if (property.PropertyType != typeof(Il2Cpp.feu)) continue;
+                        if (property.GetValue(real) is Il2Cpp.feu entities)
+                        {
+                            Borrowed(entities, null, null, null, null, $"the displaying service's {managed.Name}.{property.Name}");
+                            return;
+                        }
+                    }
+                }
+                if (!_toldDisplayers)
+                {
+                    _toldDisplayers = true;
+                    MelonLogger.Msg($"[Heroes] No entities' service yet: the displaying service is {native.FullName}" +
+                                    $"{(managed == null ? " (no managed type)" : "")}, holding {string.Join(",", found)}; " +
+                                    $"{kept?.Count ?? 0} displayer(s) kept.");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!_toldDisplayers) { _toldDisplayers = true; MelonLogger.Warning($"[Heroes] The displayers looked into in vain: {ex.Message}"); }
+            }
+        }
+
         /// <summary>Harmony's postfix on EntityPortrait.InitEntityPortrait: the services as the client hands them.</summary>
         public static void OnInitEntityPortrait(Il2Cpp.feu __0, Il2Cpp.fep __1, Il2Cpp.fer __2, Il2Cpp.fdf __3, Il2Cpp.fcg __4)
         {
@@ -538,8 +600,17 @@ namespace Heroes
                                      Il2Cpp.fcg menus, string from)
         {
             bool first = _displayers == null;
-            if (_entities == null && entities != null && !first)
-                MelonLogger.Msg($"[Heroes] The entities' service had too (off {from}).");
+            if (_entities == null && entities != null)
+            {
+                MelonLogger.Msg($"[Heroes] The entities' service had (off {from}): the portraits come alive.");
+                // Whatever was made without it, made again with it.
+                foreach (var made in _live.Values) Release(made.View);
+                _live.Clear();
+                _portraitFailed = false;
+                _toldLive = false;
+                _panelKey = null;
+                _nextPoll = 0f;
+            }
             _entities ??= entities;
             _displayers ??= displayers;
             _entityInfos ??= infos;
@@ -644,7 +715,8 @@ namespace Heroes
         /// </summary>
         private static VisualElement LivePortrait(string place, long id, string look, bool seated)
         {
-            if (_liveBroken || _displayers == null || string.IsNullOrEmpty(look)) return null;
+            // Without the entities' service the portrait stays an empty frame: the drawn one until it is had.
+            if (_liveBroken || _displayers == null || _entities == null || string.IsNullOrEmpty(look)) return null;
             string where = place + ":" + id, key = look + (seated ? "|seated" : "|standing");
             if (_live.TryGetValue(where, out var known))
             {
