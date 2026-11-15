@@ -43,7 +43,7 @@ namespace Jondo.Unity.Server.Handlers
     /// server supplies, exactly like the quest ones; writing it into the tree is a job for the
     /// editor, not for this class.
     /// </remarks>
-    public static class DungeonHandler
+    public static partial class DungeonHandler
     {
         /// <summary>The keyring. Opens 107 of the 187 dungeons without their own key.</summary>
         /// <remarks>
@@ -198,6 +198,9 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             }
 
+            // His heroes follow him in: a way in for each of them, or nobody goes (DungeonHeroes.cs).
+            if (await WaysForHeroesAsync(stream, dungeon, uid != 0, DateTime.Now) is not { } heroWays) return false;
+
             if (uid != 0)
             {
                 // Spend one key and announce the remaining stack, or the removal of its last unit.
@@ -220,6 +223,12 @@ namespace Jondo.Unity.Server.Handlers
                 DungeonKeyring.SpendFreeEntry(state.CharacterId, dungeon.Id, DateTime.Now);
                 Console.WriteLine($"[Dungeon] {dungeon.Name}: goes in with the keyring. The free entry " +
                                   $"comes back on {DungeonKeyring.NextReset(DateTime.Now):dd/MM}.");
+            }
+
+            if (!await SpendForHeroesAsync(stream, dungeon, heroWays, DateTime.Now))
+            {
+                await TellAsync(stream, CommandTexts.Get("dungeon.missing_item"));
+                return false;
             }
 
             // The guardian's window is closed before anybody is moved. The client does not close it
@@ -280,12 +289,14 @@ namespace Jondo.Unity.Server.Handlers
                 await TellAsync(stream, Refusal(dungeon, method, false, freeEntryLeft, DateTime.Now));
                 return false;
             }
+            if (await WaysForHeroesAsync(stream, dungeon, uid != 0, DateTime.Now) is not { } heroWays) return false;
             if (uid != 0)
             {
                 if (!await ItemUseHandler.SpendOneAsync(stream, uid)) return false;
                 Console.WriteLine($"[Dungeon] {dungeon.Name}: one unit of item {item} is spent by the search.");
             }
             if (method == EntryMethod.Keyring) DungeonKeyring.SpendFreeEntry(state.CharacterId, dungeon.Id, DateTime.Now);
+            if (!await SpendForHeroesAsync(stream, dungeon, heroWays, DateTime.Now)) return false;
 
             long to = room != 0 && dungeon.Rooms.Contains(room) ? room : dungeon.FirstRoom;
             Console.WriteLine($"[Dungeon] {state.CharacterName} enters {dungeon.Name} by the search, " +
