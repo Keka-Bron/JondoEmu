@@ -1750,6 +1750,8 @@ namespace Heroes
                     // The game's hints: a dark slate box, rounded, with no edge drawn.
                     _hint.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.12f, 0.12f, 0.17f, 0.96f));
                     Round(_hint, 5f);
+                    _hint.RegisterCallback<GeometryChangedEvent>(DelegateSupport.ConvertDelegate<EventCallback<GeometryChangedEvent>>(
+                        new Action<GeometryChangedEvent>(_ => { try { PlaceAbove(); } catch { } })), TrickleDown.NoTrickleDown);
                     layer.Add(_hint);
                 }
                 // A label a line: one label with line breaks in it is measured one line high, and
@@ -1768,6 +1770,7 @@ namespace Heroes
                 // buttons' hints set (ShowButtonHint) undone.
                 var at = target.worldBound;
                 float width = layer.resolvedStyle.width;
+                _hintAbove = null;
                 _hint.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
                 _hint.style.alignItems = new StyleEnum<Align>(Align.FlexStart);
                 _hint.style.left = new StyleLength(StyleKeyword.Auto);
@@ -1888,17 +1891,40 @@ namespace Heroes
                     _hint.Add(key);
                 }
 
-                // Above the button, its middle on the button's.
-                var layer = _hint.hierarchy.parent;
-                var at = target.worldBound;
-                float height = layer?.resolvedStyle.height ?? float.NaN;
-                _hint.style.right = new StyleLength(StyleKeyword.Auto);
-                _hint.style.top = new StyleLength(StyleKeyword.Auto);
-                _hint.style.left = new StyleLength(at.center.x);
-                _hint.style.bottom = new StyleLength(float.IsNaN(height) ? 0f : height - at.yMin + 4f);
-                _hint.style.translate = new StyleTranslate(new Translate(new Length(-50f, LengthUnit.Percent), new Length(0f), 0f));
+                // Above the button, its middle on the button's -- placed once its size is known.
+                _hintAbove = target.worldBound;
+                PlaceAbove();
             }
             catch { }
+        }
+
+        /// <summary>The button a button's hint stands above, until another hint is shown.</summary>
+        private static UnityEngine.Rect? _hintAbove;
+
+        /// <summary>
+        /// A button's hint above it and centred on it, kept inside the screen: pushed left off the
+        /// right edge -- the group panel stands against it --, below the button when there is no
+        /// room above. Done again as the hint's size comes (its GeometryChangedEvent).
+        /// </summary>
+        private static void PlaceAbove()
+        {
+            if (_hintAbove is not UnityEngine.Rect at || _hint == null) return;
+            var layer = _hint.hierarchy.parent;
+            if (layer == null) return;
+            float w = _hint.resolvedStyle.width, h = _hint.resolvedStyle.height;
+            if (float.IsNaN(w) || float.IsNaN(h)) { w = 0f; h = 0f; }
+            var origin = layer.worldBound;
+            float lw = layer.resolvedStyle.width;
+            float x = at.center.x - origin.x - w / 2f;
+            if (!float.IsNaN(lw)) x = Math.Min(x, lw - w - 4f);
+            x = Math.Max(4f, x);
+            float y = at.yMin - origin.y - h - 4f;
+            if (y < 4f) y = at.yMax - origin.y + 4f;
+            _hint.style.translate = new StyleTranslate(StyleKeyword.Null);
+            _hint.style.right = new StyleLength(StyleKeyword.Auto);
+            _hint.style.bottom = new StyleLength(StyleKeyword.Auto);
+            _hint.style.left = new StyleLength(x);
+            _hint.style.top = new StyleLength(y);
         }
 
         private static void HideHint()
