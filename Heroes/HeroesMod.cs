@@ -585,10 +585,7 @@ namespace Heroes
                 break;
             }
 
-            // Nowhere in the menu's grids, and no «+» to hold it as the game's own are held: the
-            // title bar, beside its «⋮», rather than out of sight.
-            bool more = grids.Any(g => g.name == "gd_additionalBtns" && Kids(g) > 0);
-            Spare(main, host == null && !more);
+            // No free slot in sight: hidden, as the game's own buttons folded behind its «+» are.
             if (host == null)
             {
                 if (_menuButton != null) _menuButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
@@ -761,45 +758,8 @@ namespace Heroes
         }
 
         /// <summary>
-        /// The button kept in the MENUS title bar, before its «⋮», for when the grid has no place:
-        /// shown or hidden as <paramref name="shown"/> says.
-        /// </summary>
-        private static void Spare(VisualElement grid, bool shown)
-        {
-            VisualElement banner = grid;
-            while (banner != null && banner.name != "BannerMenu") banner = banner.hierarchy.parent;
-            if (banner == null) return;
-            var mine = new List<VisualElement>();
-            Named(banner, "JondoHeroesMenuSpare", mine);
-            var spare = mine.Count > 0 ? mine[0] : null;
-            if (spare == null)
-            {
-                if (!shown) return;
-                var places = new List<VisualElement>();
-                Named(banner, "header_right", places);
-                if (places.Count == 0) return;
-                var dots = new List<VisualElement>();
-                Named(places[0], "header_buttonRight", dots);
-                float h = dots.Count > 0 ? dots[0].worldBound.height : float.NaN;
-                float size = float.IsNaN(h) || h < 16f ? 22f : Math.Min(h + 2f, 28f);
-                spare = new VisualElement();
-                spare.name = "JondoHeroesMenuSpare";
-                spare.style.width = new StyleLength(size);
-                spare.style.height = new StyleLength(size);
-                spare.style.alignSelf = new StyleEnum<Align>(Align.Center);
-                spare.style.marginRight = new StyleLength(2f);
-                spare.style.backgroundImage = new StyleBackground(Figure());
-                spare.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
-                Pressed(spare);
-                MenuHint(spare);
-                places[0].hierarchy.Insert(0, spare);
-            }
-            spare.style.display = new StyleEnum<DisplayStyle>(shown ? DisplayStyle.Flex : DisplayStyle.None);
-        }
-
-        /// <summary>
-        /// Opens or closes the window at the press, before the grid's or the title bar's own
-        /// handling -- a slot's drag, the window's -- swallows the click a Clickable waits for.
+        /// Opens or closes the window at the press, before the grid's own handling -- a slot's
+        /// drag -- swallows the click a Clickable waits for.
         /// </summary>
         private static void Pressed(VisualElement button)
             => button.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
