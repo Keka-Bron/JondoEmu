@@ -87,6 +87,7 @@ namespace Heroes
                 try { PutMenuButton(); } catch { }
                 try { KeepPanelInSight(); } catch { }
                 try { BorrowServices(); } catch { }
+                try { WatchLive(); } catch { }
             }
             if (now >= _nextPoll && !_polling)
             {
@@ -715,8 +716,7 @@ namespace Heroes
         /// </summary>
         private static VisualElement LivePortrait(string place, long id, string look, bool seated)
         {
-            // Without the entities' service the portrait stays an empty frame: the drawn one until it is had.
-            if (_liveBroken || _displayers == null || _entities == null || string.IsNullOrEmpty(look)) return null;
+            if (_liveBroken || _displayers == null || string.IsNullOrEmpty(look)) return null;
             string where = place + ":" + id, key = look + (seated ? "|seated" : "|standing");
             if (_live.TryGetValue(where, out var known))
             {
@@ -742,8 +742,9 @@ namespace Heroes
                 return null;
             }
 
-            // The client's portrait first, as its party window draws its members.
-            if (!_portraitFailed)
+            // The client's portrait first, as its party window draws its members -- with the
+            // entities' service only: without it, it stays an empty frame.
+            if (!_portraitFailed && _entities != null)
             {
                 try
                 {
@@ -773,7 +774,10 @@ namespace Heroes
                 displayer.name = "JondoHeroesLivePortrait";
                 displayer.pickingMode = PickingMode.Ignore;
                 displayer.style.flexGrow = new StyleFloat(1f);
-                displayer.Init(_displayers, _entities);
+                // As the character selection draws its characters, which works with no more than
+                // the displaying service the mod has.
+                try { displayer.Init(_displayers, _entities); }
+                catch (Exception ex) { MelonLogger.Warning($"[Heroes] EntityDisplayer.Init refused, its look given all the same: {ex.Message}"); }
                 displayer.autosize = true;
                 Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
                 _live[where] = (key, displayer);
@@ -785,6 +789,51 @@ namespace Heroes
                 _liveBroken = true;
                 MelonLogger.Warning($"[Heroes] The client's displayer refused too, the drawn portraits stay: {ex}");
                 return null;
+            }
+        }
+
+        /// <summary>Whether a live portrait has its character made, and draws him.</summary>
+        private static bool HasCharacter(VisualElement view)
+        {
+            try
+            {
+                var displayer = view.TryCast<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer>();
+                if (displayer != null) return displayer.character != null;
+                var portrait = view.TryCast<Il2CppCore.UILogic.Components.Figma.EntityPortrait>();
+                return portrait != null && portrait.hasCharacter;
+            }
+            catch { return false; }
+        }
+
+        private static bool _toldAlive;
+        private static int _liveWaits;
+
+        /// <summary>
+        /// Every scan: a live portrait whose character has come takes the drawn one's place --
+        /// the drawn one off the element under it --, logged the first time.
+        /// </summary>
+        private static void WatchLive()
+        {
+            if (_live.Count > 0 && !_toldAlive && ++_liveWaits == 10)
+            {
+                var first = _live.Values.First().View;
+                var displayer = first?.TryCast<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer>();
+                MelonLogger.Msg($"[Heroes] {_live.Count} live portrait(s), none with a character after 10 s: " +
+                                $"{first?.GetIl2CppType().Name}, attached {(first?.panel != null ? "yes" : "no")}, " +
+                                $"size {first?.resolvedStyle.width}x{first?.resolvedStyle.height}" +
+                                (displayer != null ? $", look {(displayer.displayerLook != null ? "yes" : "no")}, texture {(displayer.m_renderTexture != null ? "yes" : "no")}" : ""));
+            }
+            foreach (var made in _live.Values)
+            {
+                var view = made.View;
+                var under = view?.hierarchy.parent;
+                if (under == null || !HasCharacter(view)) continue;
+                under.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                var frame = under.hierarchy.parent;
+                if (frame != null) frame.style.opacity = new StyleFloat(1f);
+                if (_toldAlive) continue;
+                _toldAlive = true;
+                MelonLogger.Msg($"[Heroes] A live portrait has its character: {view.GetIl2CppType().Name}.");
             }
         }
 
@@ -1042,16 +1091,18 @@ namespace Heroes
             picture.style.marginTop = picture.style.marginBottom = new StyleLength(10f);
             // The client's own portrait, alive: seated when he is not in the world, standing when
             // he is. The server's still drawing when the client's cannot be had.
+            // The drawn portrait under it until the live one has its character (WatchLive).
             var live = LivePortrait("card", id, Str(who, "look"), seated: !connected);
-            if (live != null) picture.Add(live);
-            else if (_portraits.TryGetValue(id, out var portrait))
+            bool alive = live != null && HasCharacter(live);
+            if (_portraits.TryGetValue(id, out var portrait))
             {
-                picture.style.backgroundImage = new StyleBackground(portrait);
+                if (!alive) picture.style.backgroundImage = new StyleBackground(portrait);
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
             }
             else AskPortrait(id);
+            if (live != null) picture.Add(live);
             frame.Add(picture);
-            if (!connected && live == null) frame.style.opacity = new StyleFloat(0.45f);
+            if (!connected && !alive) frame.style.opacity = new StyleFloat(0.45f);
             card.Add(frame);
 
             // What can be done with him.
@@ -1744,12 +1795,12 @@ namespace Heroes
             picture.style.flexGrow = new StyleFloat(1f);
             picture.style.marginLeft = new StyleLength(3f);
             var live = LivePortrait("panel", id, Str(who, "look"), seated: false);
-            if (live != null) picture.Add(live);
-            else if (_portraits.TryGetValue(id, out var portrait))
+            if (_portraits.TryGetValue(id, out var portrait))
             {
-                picture.style.backgroundImage = new StyleBackground(portrait);
+                if (live == null || !HasCharacter(live)) picture.style.backgroundImage = new StyleBackground(portrait);
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
             }
+            if (live != null) picture.Add(live);
             if (master) picture.Add(Crown());
             // On the portrait, what the game's party window says of a member, as it writes it: the
             // name above, then a label and its value a line.
