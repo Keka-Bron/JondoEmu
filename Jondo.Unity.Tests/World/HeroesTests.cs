@@ -193,6 +193,56 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// Taking a hero in hand at once: the same connection is the hero's from then on, where
+        /// the master stood, and the master is one of his heroes with the group's switches.
+        /// </summary>
+        [Fact]
+        public async Task A_hero_is_taken_in_hand_in_the_same_connection()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 11, "Mano-" + tag, 8);
+            long hero = Character(Account + 11, "Brazo-" + tag, 9);
+            long other = Character(Account + 11, "Pie-" + tag, 1);
+            await using var pipe = await ClientPipe.OpenAsync(Account + 11, master, Map, "Mano-" + tag);
+            // Whatever the server sends goes read, as a client reads it.
+            using var reading = new System.Threading.CancellationTokenSource();
+            var drain = Task.Run(async () =>
+            {
+                var buffer = new byte[65536];
+                try { while (!reading.IsCancellationRequested && await pipe.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                catch { }
+            });
+            try
+            {
+                using (SessionContext.Push(pipe.Session)) DatabaseManager.LoadCharacter(master);
+                pipe.Session.State.CellId = 300;
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, other));
+                Assert.True(Heroes.SetAutoPass(master, other, true));
+
+                Assert.Equal("hero", await HeroSwitch.SwitchAsync(pipe.Session, master + 999));
+                Assert.Equal("ok", await HeroSwitch.SwitchAsync(pipe.Session, hero));
+
+                Assert.Equal(hero, pipe.Session.State.CharacterId);
+                Assert.Equal(9, pipe.Session.State.Breed);
+                Assert.Equal(Map, pipe.Session.State.MapId);
+                Assert.Equal(300, pipe.Session.State.CellId);
+                Assert.Same(pipe.Session, SessionRegistry.FindByCharacter(hero));
+                Assert.Null(SessionRegistry.FindByCharacter(master));
+                Assert.Equal(new[] { master, other }, Heroes.Of(hero).Select(h => h.CharacterId));
+                Assert.True(Heroes.PassesOnHisOwn(other));
+                Assert.Null(Heroes.AsHero(hero));
+            }
+            finally
+            {
+                reading.Cancel();
+                Heroes.DisconnectAll(hero);
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
         [Fact]
         public async Task A_hero_comes_into_his_masters_fight_as_his_to_play()
         {

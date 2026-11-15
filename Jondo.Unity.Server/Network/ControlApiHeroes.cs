@@ -168,12 +168,19 @@ namespace Jondo.Unity.Server.Network
             });
         }
 
-        /// <summary>A hero to take in hand at the client's next character list (Heroes.AskSwitch).</summary>
+        /// <summary>
+        /// A hero taken in hand at once, in the same connection (HeroSwitch); with { later: 1 },
+        /// at the client's next character list instead (Heroes.AskSwitch).
+        /// </summary>
         private static Respuesta HeroesSwitch(string cuerpo, long account)
         {
             var me = InTheWorld(account);
             if (me == null) return Mal(409, "world");
-            return Heroes.AskSwitch(me, Numero(cuerpo, "id")) ? Bien(new { switching = true }) : Mal(409, "none");
+            long id = Numero(cuerpo, "id");
+            if (Numero(cuerpo, "later") != 0)
+                return Heroes.AskSwitch(me, id) ? Bien(new { switching = true }) : Mal(409, "none");
+            string result = HeroSwitch.SwitchAsync(me, id).GetAwaiter().GetResult();
+            return result == "ok" ? Bien(new { switched = true }) : Mal(409, result);
         }
 
         private static Respuesta HeroesAutoPass(string cuerpo, long account)

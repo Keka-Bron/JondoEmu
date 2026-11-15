@@ -65,7 +65,7 @@ namespace Heroes
             LoggerInstance.Msg(_token.Length > 0
                 ? "[Heroes] Ready: Ctrl+Tab opens the hero mode."
                 : "[Heroes] No session token from the launcher: the hero mode stays asleep.");
-            if (_token.Length > 0) { WatchMainMenu(); WatchActionBar(); }
+            if (_token.Length > 0) WatchActionBar();
         }
 
         public override void OnUpdate()
@@ -179,8 +179,6 @@ namespace Heroes
             ["card"] = L("{0}\n{1} · nivel {2}\nVida {3} / {4}\nPA {5} · PM {6}\nIniciativa {7}\nProspección {8}\nSabiduría {9}",
                          "{0}\n{1} · level {2}\nLife {3} / {4}\nAP {5} · MP {6}\nInitiative {7}\nProspecting {8}\nWisdom {9}",
                          "{0}\n{1} · niveau {2}\nVie {3} / {4}\nPA {5} · PM {6}\nInitiative {7}\nProspection {8}\nSagesse {9}"),
-            ["menu"] = L("Esc → Cambiar de personaje: el héroe se elegirá solo.", "Esc → Change character: the hero is picked by itself.",
-                         "Échap → Changer de personnage : le héros sera choisi tout seul."),
         };
 
         private static string T(string key, params object[] values)
@@ -884,89 +882,34 @@ namespace Heroes
 
         // ─── Taking a hero in hand ───────────────────────────────────────────────────────
 
-        /// <summary>The client's main menu, kept as it comes up: its «change character» is what takes a hero in hand.</summary>
-        private static Il2CppCore.UILogic.GameUICore.MainMenu _mainMenu;
-        private static bool _menuWatched, _toldNames;
-
         /// <summary>
-        /// Plays a hero from here on: the client changes to his character through its own main
-        /// menu's «change character», and the server gives the group back to him on his way in --
-        /// the one who led it is a hero of his then (Heroes.Regroup).
+        /// Plays a hero from here on, at once: the client becomes his, the one it was a hero of
+        /// his, the group around him.
         /// </summary>
         /// <remarks>
-        /// As Auralis's: the server is asked first (heroes/switch) and does the switch -- at the
-        /// client's next character list it picks the hero itself, the way it picks a character still
-        /// in a fight. The client only has to go back to its list: the main menu's «change
-        /// character», confirmed, with no dropdown pick (that one throws in the client's own code).
+        /// As Auralis's: one request, and the server does the switch in the same connection
+        /// (HeroSwitch) -- it sends the hero's selection and his state, and the map again; the
+        /// client is the hero from then on, with no character list in between.
         /// </remarks>
         private static void TakeInHand(long id, string name, VisualElement from)
         {
+            HideHint();
             Task.Run(async () =>
             {
-                var (code, _) = await AskAsync("heroes/switch", new Dictionary<string, object> { ["id"] = id });
+                var (code, body) = await AskAsync("heroes/switch", new Dictionary<string, object> { ["id"] = id });
                 _toUnity.Enqueue(() =>
                 {
-                    if (code != 200)
+                    if (code == 200)
                     {
-                        if (from != null) ShowHint(from, code == 0 ? T("unreachable") : T("error"));
+                        MelonLogger.Msg($"[Heroes] {name} taken in hand.");
+                        _nextPoll = 0f;
                         return;
                     }
-                    if (BackToTheList())
-                    {
-                        MelonLogger.Msg($"[Heroes] Taking {name} in hand: back to the character list, the server picks him.");
-                        return;
-                    }
-                    if (from != null) ShowHint(from, T("menu"));
+                    string why = body is JsonElement b ? Str(b, "error") : "";
+                    MelonLogger.Warning($"[Heroes] {name} could not be taken in hand: {code} {why}");
+                    if (from != null) ShowHint(from, code == 0 ? T("unreachable") : why == "fight" ? T("error.fight") : T("error"));
                 });
             });
-        }
-
-        /// <summary>The client back to its character list through its main menu, or false when it would not go.</summary>
-        private static bool BackToTheList()
-        {
-            if (_mainMenu == null) return false;
-            foreach (var (what, step) in new (string, Action)[]
-                     {
-                         ("OnConfirmChangeCharacter", () => _mainMenu.OnConfirmChangeCharacter()),
-                         ("OnChangeCharacter", () => _mainMenu.OnChangeCharacter()),
-                     })
-            {
-                try
-                {
-                    step();
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Warning($"[Heroes] MainMenu.{what}: {ex.Message}");
-                }
-            }
-            return false;
-        }
-
-        private static void WatchMainMenu()
-        {
-            if (_menuWatched) return;
-            _menuWatched = true;
-            var harmony = new HarmonyLib.Harmony("jondo.heroes.mainmenu");
-            var keep = new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(KeepMainMenu)));
-            foreach (string name in new[] { "OnEnable", "Load", "InitCharactersList" })
-            {
-                try
-                {
-                    var method = HarmonyLib.AccessTools.Method(typeof(Il2CppCore.UILogic.GameUICore.MainMenu), name);
-                    if (method != null) harmony.Patch(method, postfix: keep);
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Warning($"[Heroes] MainMenu.{name} not watched: {ex.Message}");
-                }
-            }
-        }
-
-        public static void KeepMainMenu(Il2CppCore.UILogic.GameUICore.MainMenu __instance)
-        {
-            if (__instance != null) _mainMenu = __instance;
         }
 
         // ─── The spell bar on three lines ────────────────────────────────────────────────
