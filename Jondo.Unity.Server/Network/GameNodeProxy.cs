@@ -86,17 +86,27 @@ namespace Jondo.Unity.Server.Network
                     // inwards: everything awaited from this point sees the same session without
                     // having to pass it by hand through two hundred signatures.
                     var sesion = new GameSession(stream);
-                    if (!SessionRegistry.Register(sesion))
+                    // Counted against its address until it presents a ticket, and given a time to
+                    // do it: a place in the registry is the server's capacity (ConnectionGuard).
+                    sesion.State.ClientIp = ConnectionGuard.AddressOf(client.Client);
+                    if (!ConnectionGuard.MayOpenSession(sesion.State.ClientIp))
                     {
-                        Console.WriteLine("[Game Node] Rejected connection: the 8-client limit is reached.");
+                        Console.WriteLine($"[Game Node] Rejected {sesion.State.ClientIp}: too many sessions with no ticket.");
                         return;
                     }
+                    if (!SessionRegistry.Register(sesion))
+                    {
+                        Console.WriteLine($"[Game Node] Rejected connection: the {Jondo.Unity.Launcher.Contract.ClientesEnTotal}-client limit is reached.");
+                        return;
+                    }
+                    ConnectionGuard.CloseUnless(client.Client, ConnectionGuard.Authentication, () => sesion.IsAuthenticated, "no ticket");
 
                     try
                     {
                         using (SessionContext.Push(sesion))
                         {
-                            byte[] payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stream);
+                            byte[] payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(
+                                stream, ConnectionGuard.UnauthenticatedFrame);
                             if (payload == null) return;
 
                             string payloadStr = Encoding.UTF8.GetString(payload);
@@ -168,7 +178,9 @@ namespace Jondo.Unity.Server.Network
                 }
 
                 packetTurn.Dispose();
-                payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stream);
+                // With no account behind it, a frame is small: the 8 MB ceiling is for who plays.
+                payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stream,
+                    session.IsAuthenticated ? Jondo.Protocol.NetworkMessage.MaxFrameLength : ConnectionGuard.UnauthenticatedFrame);
                 if (payload == null) break;
                 payloadStr = RoutingTextOf(payload, Encoding.UTF8.GetString(payload));
             }

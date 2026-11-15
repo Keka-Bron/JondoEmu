@@ -42,6 +42,22 @@ namespace Jondo.Unity.Tests.Protocol
         }
 
         [Fact]
+        public void A_socket_with_no_account_is_held_to_a_lower_ceiling()
+        {
+            // 0x8180 0x04 = 65537, one byte over what a socket that has not said who it is may
+            // announce: the array is made before the frame arrives, so nothing is read of it.
+            int ceiling = Jondo.Unity.Server.Network.ConnectionGuard.UnauthenticatedFrame;
+            byte[] over = { 0x81, 0x80, 0x04 };
+            Assert.Null(Jondo.Protocol.NetworkMessage.ReadFrameAsync(new MemoryStream(over), ceiling)
+                                                     .GetAwaiter().GetResult());
+
+            // And an ordinary frame passes under it.
+            byte[]? frame = Jondo.Protocol.NetworkMessage.ReadFrameAsync(
+                new MemoryStream(new byte[] { 0x03, 0x0A, 0x01, 0x41 }), ceiling).GetAwaiter().GetResult();
+            Assert.NotNull(frame);
+        }
+
+        [Fact]
         public void An_empty_stream_gives_nothing_rather_than_throwing()
         {
             // A socket that closes mid-handshake looks exactly like this, and it happens whenever
