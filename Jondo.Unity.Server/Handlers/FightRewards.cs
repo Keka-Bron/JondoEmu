@@ -129,7 +129,8 @@ namespace Jondo.Unity.Server.Handlers
                 // Who walked out gave the fight up: his side's win is not his, nor a part of its kamas.
                 if (fight.Gone.Contains(fighter.Id)) continue;
                 if (!fight.HaGanado(fighter.Id) && dream?.Finished != true) continue;
-                var session = SessionRegistry.FindByCharacter(fighter.Id);
+                // A hero is paid in his own session, which is in no registry (Managers.Heroes).
+                var session = SessionToPay(fighter.Id);
                 if (session != null) winners.Add((fighter, session));
             }
             if (winners.Count == 0) return;
@@ -195,6 +196,8 @@ namespace Jondo.Unity.Server.Handlers
                     Perfect = perfect,
                 };
             }
+            // A group with heroes may send its items to one of it (Heroes.LootTo).
+            if (dream == null) GatherHeroLoot(plan);
             // A Gigalodón fight's salt goes into the raid's pool, the same amount for every winner.
             if (dream == null) GuildRaidManager.ShareFightSalt(fight.FightId, plan.ToDictionary(p => p.Key, p => p.Value.Loot));
             _rewards[fight.FightId] = plan;

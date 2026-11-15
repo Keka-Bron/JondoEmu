@@ -71,6 +71,8 @@ namespace Jondo.Unity.Server.Handlers
                 [".sueño"] = "usage.dream",
                 [".dream"] = "usage.dream",
                 [".reve"] = "usage.dream",
+                [".heros"] = "usage.heroes",
+                [".heroes"] = "usage.heroes",
             };
 
         /// <summary>
@@ -206,6 +208,8 @@ namespace Jondo.Unity.Server.Handlers
                     case ".sueño":
                     case ".dream":
                     case ".reve": await DreamAsync(stream, rest, channel, accountId); break;
+                    case ".heros":
+                    case ".heroes": await HeroesProbeAsync(stream, rest, channel, accountId); break;
                 }
             }
             catch (Exception ex)
@@ -965,6 +969,59 @@ namespace Jondo.Unity.Server.Handlers
                 .GroupBy(i => i.ItemId)
                 .Select(g => (g.Key, g.Sum(i => i.Quantity) * times))
                 .ToList();
+
+        // ─── .heros ────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// ".heros &lt;class&gt; [class...]" (".heroes"): the hero mode's probe. A fight on the spot
+        /// with a JondoBot of each class given at one's side, played by hand from one's own client
+        /// as a hero would be (FightHandler.PlayAsHero), against as many JondoBots of random
+        /// classes played by the server. For seeing whether the client lets a character be played
+        /// by another one -- his bar, his turn, his spells. Administrators only.
+        /// </summary>
+        private static async Task HeroesProbeAsync(NetworkStream stream, string rest, int channel, long accountId)
+        {
+            var breeds = new List<int>();
+            foreach (string word in rest.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (!int.TryParse(word, NumberStyles.Integer, CultureInfo.InvariantCulture, out int breed)
+                    || !SpellTable.ClassBreeds.Contains(breed))
+                {
+                    await NotifyAsync(stream, Usage(".heros"), channel, accountId);
+                    return;
+                }
+                breeds.Add(breed);
+            }
+            if (breeds.Count == 0 || breeds.Count > 3)
+            {
+                await NotifyAsync(stream, Usage(".heros"), channel, accountId);
+                return;
+            }
+            if (GameState.IsInFight)
+            {
+                await NotifyAsync(stream, T("heroes.in_fight"), channel, accountId);
+                return;
+            }
+            var me = SessionRegistry.FindByCharacter(GameState.CharacterId);
+            if (me == null) return;
+
+            Jondo.Unity.World.Fights.Fighter Bot(int breed)
+            {
+                var spec = KoliseoBots.Create(breed);
+                var bot = KoliseoBots.BuildFighter(spec);
+                KoliseoBots.Forget(spec.Id);
+                return bot;
+            }
+            var heroes = breeds.Select(Bot).ToList();
+            foreach (var hero in heroes) FightHandler.PlayAsHero(hero, GameState.CharacterId);
+            var classes = SpellTable.ClassBreeds.ToList();
+            var foes = heroes.Select(_ => Bot(classes[Random.Shared.Next(classes.Count)])).ToList();
+
+            bool started = await FightHandler.InitiatePvpAsync(new List<GameSession> { me }, new List<GameSession>(),
+                                                               GameState.MapId, blueBots: heroes, redBots: foes);
+            await NotifyAsync(stream, started ? T("heroes.started", heroes.Count) : T("heroes.not_started"),
+                              channel, accountId);
+        }
 
         // ─── .sueno ────────────────────────────────────────────────────────────
 

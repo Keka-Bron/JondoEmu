@@ -153,7 +153,9 @@ public sealed class ConnectionTests
         Assert.Equal(7, accepted.Gfez);
         Assert.NotNull(accepted.Gffe);
         Assert.Equal(Enumerable.Range(0, 7), accepted.Gffc.Gfgx.Select(s => (int)s.Gfgr));
-        Assert.All(accepted.Gffc.Gfgx, s => Assert.Equal(5, s.Gfgs));
+        // The real server's five slots a category are ServerSettings.CharacterSlots here.
+        int slots = ConnectionService.MaxCharactersPerServer;
+        Assert.All(accepted.Gffc.Gfgx, s => Assert.Equal(slots, s.Gfgs));
         Assert.Equal(0, (int)accepted.Gffc.Gfgw[0].Gfhe[0].Gfin);
         Assert.Equal(18, (int)accepted.Gffc.Gfgw[1].Gfhe[0].Gfin);
         Assert.Equal("2026-08-11T12:00:00.000+02:00", accepted.Gffc.Gfgw[0].Gfhe[0].Gfiq);
@@ -166,7 +168,7 @@ public sealed class ConnectionTests
                 .Msg(3, Pb.New().Str(1, "Dummy").Var(4, 1).Str(5, "2026-08-11T12:00:00.000+02:00")))
             .Msg(1, Pb.New().Msg(1, Pb.New().Var(1, 291).Var(2, 1))   // not joinable: offline
                 .Msg(3, Pb.New().Str(1, "Other").Var(2, 18).Var(3, 1).Var(4, 201).Str(5, "2026-08-01T12:00:00.000+02:00")));
-        for (int category = 0; category < 7; category++) servers.Msg(2, Pb.New().VarIfNotZero(1, category).Var(2, 5));
+        for (int category = 0; category < 7; category++) servers.Msg(2, Pb.New().VarIfNotZero(1, category).Var(2, slots));
         byte[] legacy = Pb.New().Msg(2, Pb.New().Str(1, "0").Msg(3, Pb.New().Msg(1,
             Pb.New().Var(1, 7).Str(2, "Dummy").Str(3, "0007").Msg(4, servers).Str(5, "2027-08-11T12:00:00+02:00").EmptyMsg(6)))).Build();
         Assert.Equal(legacy, encoded);
@@ -192,7 +194,7 @@ public sealed class ConnectionTests
         var wire = mhh.Parser.ParseFrom(Codec.Encode(response)).Gfce.Gfcy.Gffu.Gffc;
         Assert.Equal(expected.Select(row => row.Value), wire.Gfgw.Select(server => (int)server.Gfhc.Gfhk));
         Assert.Equal(expected.Select(row => row.Value), wire.Gfgx.Select(slot => (int)slot.Gfgr));
-        Assert.All(wire.Gfgx, slot => Assert.Equal(5, slot.Gfgs));
+        Assert.All(wire.Gfgx, slot => Assert.Equal(ConnectionService.MaxCharactersPerServer, slot.Gfgs));
     }
 
     private sealed class Backend : IConnectionBackend

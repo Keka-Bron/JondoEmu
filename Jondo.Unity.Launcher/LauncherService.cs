@@ -487,7 +487,7 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>The mods the emulator ships, each in its own folder of the repository.</summary>
-        internal static readonly string[] ShippedMods = { "JondoFix", "Cazacabezas" };
+        internal static readonly string[] ShippedMods = { "JondoFix", "Cazacabezas", "Heroes" };
 
         /// <summary>
         /// The emulator's mods into the client's Mods, each when it differs from the one there.
@@ -496,8 +496,8 @@ namespace Jondo.Unity.Launcher
         /// What the mods change in the client -- the Koliseo window with the JondoBots' card, the
         /// head hunters' window, among the rest -- comes with the emulator, not with a new client:
         /// whoever has a client with MelonLoader gets it at the next launch. A client without
-        /// MelonLoader is left alone. A client already open holds the file; it is then updated at
-        /// the next launch.
+        /// MelonLoader is left alone. A client already open holds the file: it is set aside as
+        /// «.old» -- renaming a loaded file is allowed -- and the new one goes in its place.
         /// </remarks>
         internal static void InstallMod(string clientPath)
         {
@@ -512,10 +512,24 @@ namespace Jondo.Unity.Launcher
                     if (!File.Exists(shipped)) continue;
 
                     string installed = Path.Combine(mods, mod + ".dll");
+                    string aside = installed + ".old";
+                    // The one set aside last time, by a client that held it then: gone once nobody does.
+                    try { if (File.Exists(aside)) File.Delete(aside); } catch (IOException) { } catch (UnauthorizedAccessException) { }
                     if (File.Exists(installed) && SameContent(installed, shipped)) continue;
 
                     Directory.CreateDirectory(mods);
-                    File.Copy(shipped, installed, overwrite: true);
+                    try
+                    {
+                        File.Copy(shipped, installed, overwrite: true);
+                    }
+                    catch (IOException) when (File.Exists(installed) && !File.Exists(aside))
+                    {
+                        // A client open holds it: Windows lets a loaded file be renamed, not
+                        // overwritten. Set aside -- MelonLoader loads no «.old» -- the new one goes
+                        // in its place, for this launch's client and every one after.
+                        File.Move(installed, aside);
+                        File.Copy(shipped, installed, overwrite: true);
+                    }
                     Console.WriteLine($"[Launcher] {mod} updated in {mods}.");
                 }
                 catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)

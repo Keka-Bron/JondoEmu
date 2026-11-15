@@ -256,6 +256,13 @@ namespace Jondo.Unity.Server.Network
                                       other.State.Orientation, other.AccountId));
             }
 
+            // And the heroes standing beside the people on it, his own among them (HeroPresence).
+            foreach (var hero in HeroPresence.On(mapId))
+            {
+                if (hero.Character.Id == character.Id) continue;
+                jss.Msg(5, PlayerActor(hero.Character, hero.Cell, hero.Facing, hero.AccountId));
+            }
+
             // The monster groups already placed by the spawner.
             //
             // The shape is not the obvious one, and getting it wrong is what kept the map empty.

@@ -135,6 +135,8 @@ namespace Jondo.Unity.Server.Handlers
             var playerFighter = BuildPlayerFighter(fight);
             playerFighter.CellId = fight.BluePlacementCells.FirstOrDefault();
             fight.AddPlayer(playerFighter);
+            // And his heroes beside him, played from his client (FightHeroes.cs).
+            AddHeroes(fight, GameState.CharacterId);
 
             // Build Monster Fighters from real MobGroup data.
             // Fighter IDs for monsters MUST be sequential negative numbers per fight (-1, -2, -3...)
@@ -2515,7 +2517,43 @@ namespace Jondo.Unity.Server.Handlers
             if (!fighter.EsInvocado) return null;
             var owner = fight.Buscar(fighter.Invocador);
             if (owner == null || owner.IsMonster) return null;
-            return SessionRegistry.FindByCharacter(owner.Id);
+            return SessionRegistry.FindByCharacter(PlayerOf(owner));
+        }
+
+        /// <summary>
+        /// The character whose client plays this fighter's side of things: his own, or -- a hero,
+        /// an ally played by hand -- the one who plays him. A hero's summons go to his master.
+        /// </summary>
+        private static long PlayerOf(Fighter fighter)
+            => fighter.IsPlayedAlly && fighter.DrivenBy != 0 ? fighter.DrivenBy : fighter.Id;
+
+        /// <summary>
+        /// Makes a character fighter -- a JondoBot for now -- one <paramref name="by"/> plays by
+        /// hand from his client, as a hero would be: his class bar and his turns go there
+        /// (<see cref="PlayedAllyBar"/>), and his casts are his class's spells at their grades.
+        /// </summary>
+        internal static void PlayAsHero(Fighter fighter, long by)
+        {
+            fighter.DrivenBy = by;
+            fighter.IsPlayedAlly = true;
+            fighter.HechizosDeInvocado = fighter.SpellIds
+                .Select(spell => (spell, Math.Max(1, fighter.SpellGrades.TryGetValue(spell, out int grade) ? grade : 1)))
+                .ToList();
+        }
+
+        /// <summary>
+        /// The bar of an ally <paramref name="me"/> plays (jyy). A monster's -- Barnabé's -- is a
+        /// summon's. A character's -- a hero's -- is a character's, his class's spells and the
+        /// weapon on slot 0, with <paramref name="me"/> as who plays him in f4.
+        /// </summary>
+        private static byte[] PlayedAllyBar(Fighter played, long me)
+        {
+            if (!played.IsCharacter)
+                return Network.FightProtocol.BuildSummonSpellBar(played.Id, me, played.HechizosDeInvocado);
+            if (HeroBar(played, me) is { } heroBar) return heroBar;
+            var bar = new List<(int Slot, int Spell)> { (0, Network.FightProtocol.HechizoCuerpoACuerpo) };
+            for (int i = 0; i < played.HechizosDeInvocado.Count; i++) bar.Add((i + 1, played.HechizosDeInvocado[i].Spell));
+            return Network.FightProtocol.BuildSpellBar(played.Id, played.HechizosDeInvocado, bar, conArma: true, controllerId: me);
         }
 
         /// <summary>
@@ -2982,7 +3020,8 @@ namespace Jondo.Unity.Server.Handlers
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                     Network.FightProtocol.BuildCooldowns(summon.Id, RecargasDe(summon))));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
-                    Network.FightProtocol.BuildSummonSpellBar(summon.Id, me, summon.HechizosDeInvocado)));
+                    summon.IsPlayedAlly ? PlayedAllyBar(summon, me)
+                                        : Network.FightProtocol.BuildSummonSpellBar(summon.Id, me, summon.HechizosDeInvocado)));
             }
 
             var spots = new List<(int Cell, int Orientation, long Fighter)>();
@@ -3353,8 +3392,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                     Network.FightProtocol.BuildCooldowns(played.Id, RecargasDe(played))));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
-                    Network.FightProtocol.BuildSummonSpellBar(played.Id, me, played.HechizosDeInvocado)));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy, PlayedAllyBar(played, me)));
             }
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
@@ -4024,8 +4062,9 @@ namespace Jondo.Unity.Server.Handlers
                 // To his own client alone. Sent to everybody, every other person in a fight of
                 // several -- a koliseo, a duel, a group against monsters -- and every spectator
                 // got "you can play now" on somebody else's turn, its "pass your turn" button
-                // with it. A JondoBot has no client.
-                var his = fighter.IsBot ? null : SessionRegistry.FindByCharacter(fighter.Id);
+                // with it. A JondoBot has no client; one somebody plays -- a hero -- goes to his.
+                var his = fighter.IsPlayedAlly ? owner
+                        : fighter.IsBot ? null : SessionRegistry.FindByCharacter(fighter.Id);
                 if (his != null)
                     await his.SendAsync(ConnectionProtocol.Push(Op.Jyj, Network.FightProtocol.BuildYourTurn()));
             }
@@ -4052,6 +4091,15 @@ namespace Jondo.Unity.Server.Handlers
                                                && b.Vivo(fight.RoundNumber) && !b.Pendiente))
             {
                 Program.LogDebug($"[Fight] {fighter.Id} loses the turn: turn cancelled.");
+                await PassTurnAsync(stream);
+                return;
+            }
+
+            // A hero whose master switched on his automatic pass (the Heroes mod's group panel):
+            // his start-of-turn has gone out above, and the turn is handed on at once.
+            if (fighter.IsPlayedAlly && Managers.Heroes.PassesOnHisOwn(fighter.Id))
+            {
+                Program.LogDebug($"[Heroes] {fighter.Id} passes his turn on his own.");
                 await PassTurnAsync(stream);
                 return;
             }
@@ -4133,12 +4181,14 @@ namespace Jondo.Unity.Server.Handlers
                 if (summon.HandedToOwner) continue;
                 summon.HandedToOwner = true;
 
-                var owner = SessionRegistry.FindByCharacter(summon.Invocador);
+                var summoner = fight.Buscar(summon.Invocador);
+                long jugador = summoner != null ? PlayerOf(summoner) : summon.Invocador;
+                var owner = SessionRegistry.FindByCharacter(jugador);
                 if (owner == null) continue;
                 await owner.SendAsync(ConnectionProtocol.Push(Op.Jxc,
                     Network.FightProtocol.BuildCooldowns(summon.Id, RecargasDe(summon))));
                 await owner.SendAsync(ConnectionProtocol.Push(Op.Jyy,
-                    Network.FightProtocol.BuildSummonSpellBar(summon.Id, summon.Invocador, summon.HechizosDeInvocado)));
+                    Network.FightProtocol.BuildSummonSpellBar(summon.Id, jugador, summon.HechizosDeInvocado)));
                 Program.LogDebug($"[Fight] {summon.Id} is {summon.Invocador}'s to play now: its bar goes to him.");
             }
         }
@@ -5845,13 +5895,15 @@ namespace Jondo.Unity.Server.Handlers
             // seconds out with nobody able to move it or pass it.
             if (invocado.JuegaTurno && !invocado.PlaysOnItsOwn)
             {
+                // A hero's goes to his master, who plays him.
+                long jugador = PlayerOf(quienInvoca);
                 await ACadaUnoAsync(fight, async sesion =>
                 {
-                    if (sesion.State.CharacterId != quienInvoca.Id) return;
+                    if (sesion.State.CharacterId != jugador) return;
                     await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jxc,
                         Network.FightProtocol.BuildCooldowns(invocado.Id, RecargasDe(invocado))));
                     await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jyy,
-                        Network.FightProtocol.BuildSummonSpellBar(invocado.Id, quienInvoca.Id,
+                        Network.FightProtocol.BuildSummonSpellBar(invocado.Id, jugador,
                                                                   receta.Hechizos)));
                     await SendEverySpellModifiersAsync(packet => WriteFrameAsync(sesion.Stream, packet), fight,
                                                        invocado, receta.Hechizos.Select(h => h.Spell));
@@ -11546,6 +11598,7 @@ namespace Jondo.Unity.Server.Handlers
                 return TerminarParaUnoAsync(sesion.Stream, fight,
                                             fight.HaGanado(sesion.State.CharacterId), azulGana);
             });
+            HeroesFightOver(fight);
             ForgetRewards(fight);
             ForgetSurrenderVotes(fight);
             ChallengeWatcher.Forget(fight);
@@ -11553,6 +11606,8 @@ namespace Jondo.Unity.Server.Handlers
             // And the map: the people drawn again where they came back -- they went off it with
             // a kmu -- the count of fights one less, the group back or its replacement.
             foreach (var sesion in gente) await BackOnTheMapAsync(sesion);
+            // And their heroes beside them again, out of the fight with them (HeroPresence).
+            foreach (var sesion in gente) await HeroPresence.MasterMovedAsync(sesion, 0);
             await FightOffTheMapAsync(fight);
 
             await FightOverForTheWorldAsync(fight, azulGana);

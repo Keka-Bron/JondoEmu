@@ -187,46 +187,16 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                await RefuseAsync(stream, CreationRefused);
-                return;
-            }
-
-            // The slots the server list announces: so many per category of server, the client's
-            // «Clásico (5/5)». The client opens the creation screen all the same, so the count
-            // is kept here.
-            int held = SlotsTaken(DatabaseManager.GetServers(),
-                                  DatabaseManager.GetCharactersByAccountId(accountId), serverId);
-            if (held >= ConnectionService.MaxCharactersPerServer)
-            {
-                Console.WriteLine($"[Characters] Account {accountId} already has {held} characters in that " +
-                                  "category of server; no more are made.");
-                await RefuseAsync(stream, TooManyCharacters);
-                return;
-            }
-
-            if (!CharacterNames.IsValid(name))
-            {
-                Console.WriteLine($"[Characters] \"{name}\" breaks the naming rule.");
-                await RefuseAsync(stream, InvalidName);
-                return;
-            }
-
-            if (DatabaseManager.CharacterNameTaken(name))
-            {
-                Console.WriteLine($"[Characters] The name \"{name}\" is already taken.");
-                await RefuseAsync(stream, NameAlreadyTaken);
-                return;
-            }
-
-            long id = DatabaseManager.CreateCharacter(accountId, serverId, name, breed, sex, head,
-                                                      colors, TutorialMap, StartingLevel,
-                                                      ServerSettings.Current.StartingKamas, ServerSettings.Current.StartingScrollStats, StarterItems,
-                                                      TutorialCell);
+            var (id, why) = Make(accountId, serverId, name, breed, sex, head, colors);
             if (id == 0)
             {
-                await RefuseAsync(stream, CreationRefused);
+                await RefuseAsync(stream, why switch
+                {
+                    "full" => TooManyCharacters,
+                    "name" => InvalidName,
+                    "taken" => NameAlreadyTaken,
+                    _ => CreationRefused,
+                });
                 return;
             }
 
@@ -253,6 +223,51 @@ namespace Jondo.Unity.Server.Handlers
                               $"tutorial's statue, {(ServerSettings.Current.StartingAdventurerSet ? "with" : "without")} the " +
                               $"adventurer's set and with {ServerSettings.Current.StartingKamas} kamas.");
         }
+
+        /// <summary>
+        /// A character made on an account, by the creation screen's rules -- the one the creation
+        /// screen makes and the hero mode's (Network.ControlApiHeroes) alike: its id and "", or 0
+        /// and why not: empty, breed, full, name, taken, failed. Colours of -1 are the breed's.
+        /// </summary>
+        public static (long Id, string Why) Make(long accountId, int serverId, string name, int breed, int sex,
+                                                 int head, IReadOnlyList<long> colors)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return (0, "empty");
+            if (breed < 1 || sex is < 0 or > 1) return (0, "breed");
+
+            // The slots the server list announces: so many per category of server, the client's
+            // «Clásico (5/8)». The client opens the creation screen all the same, so the count
+            // is kept here.
+            int held = SlotsTaken(DatabaseManager.GetServers(),
+                                  DatabaseManager.GetCharactersByAccountId(accountId), serverId);
+            if (held >= ConnectionService.MaxCharactersPerServer)
+            {
+                Console.WriteLine($"[Characters] Account {accountId} already has {held} characters in that " +
+                                  "category of server; no more are made.");
+                return (0, "full");
+            }
+
+            if (!CharacterNames.IsValid(name))
+            {
+                Console.WriteLine($"[Characters] \"{name}\" breaks the naming rule.");
+                return (0, "name");
+            }
+
+            if (DatabaseManager.CharacterNameTaken(name))
+            {
+                Console.WriteLine($"[Characters] The name \"{name}\" is already taken.");
+                return (0, "taken");
+            }
+
+            long id = DatabaseManager.CreateCharacter(accountId, serverId, name, breed, sex, head,
+                                                      colors, TutorialMap, StartingLevel,
+                                                      ServerSettings.Current.StartingKamas, ServerSettings.Current.StartingScrollStats, StarterItems,
+                                                      TutorialCell);
+            return id == 0 ? (0, "failed") : (id, "");
+        }
+
+        /// <summary>A name for a new character, as the creation screen's die draws one.</summary>
+        public static string SuggestName() => RandomName();
 
         /// <summary>
         /// The reasons the kvb carries in f2 when it says no, as the client reads them (edr.wqk):

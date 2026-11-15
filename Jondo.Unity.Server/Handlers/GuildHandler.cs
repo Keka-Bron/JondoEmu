@@ -455,7 +455,7 @@ namespace Jondo.Unity.Server.Handlers
                 rows.Add(new GuildProtocol.MemberRow(member, character.Name, character.Level, character.AccountId,
                                                      character.Breed, Achievements.PointsOf(member.CharacterId),
                                                      GuildStore.ContributedBy(member.CharacterId),
-                                                     SessionRegistry.FindByCharacter(member.CharacterId) != null));
+                                                     SessionRegistry.IsOnline(member.CharacterId)));
             }
             return rows;
         }
@@ -1196,7 +1196,7 @@ namespace Jondo.Unity.Server.Handlers
             => GuildProtocol.BuildMemberUpdated(member, character.Name, character.Level, character.AccountId,
                                                 character.Breed, Achievements.PointsOf(member.CharacterId),
                                                 GuildStore.ContributedBy(member.CharacterId),
-                                                SessionRegistry.FindByCharacter(member.CharacterId) != null);
+                                                SessionRegistry.IsOnline(member.CharacterId));
 
         /// <summary>
         /// A line said on the guild channel (2) by a member: to the other members connected. It went

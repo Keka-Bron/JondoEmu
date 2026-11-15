@@ -20,7 +20,8 @@ internal abstract record ConnectionAction
 /// <summary>One instance per connection. Only stable protocol types enter the service.</summary>
 internal sealed class ConnectionService(IConnectionBackend backend)
 {
-    internal const int MaxCharactersPerServer = 5;
+    /// <summary>The characters an account may have per category of server (ServerSettings.CharacterSlots).</summary>
+    internal static int MaxCharactersPerServer => Math.Clamp(Jondo.Unity.Server.ServerSettings.Current.CharacterSlots, 1, 20);
     private long _accountId;
 
     public ConnectionAction Handle(ConnectionMessage message)

@@ -111,6 +111,28 @@ namespace Jondo.Unity.Server
         /// <summary>The prey's respite between two hunts, in minutes.</summary>
         public int HeadHuntRestMinutes { get; set; } = 30;
 
+        /// <summary>
+        /// The hero mode (<see cref="Managers.Heroes"/>): the other characters of one's account
+        /// connected beside one's own, fighting at one's side and played by hand in their turns.
+        /// </summary>
+        public bool HeroMode { get; set; } = true;
+
+        /// <summary>
+        /// Whether taking a hero in hand loads the map again in the client (Network.HeroSwitch).
+        /// Off, only the map's actors are told anew: quicker. Set in the file.
+        /// </summary>
+        public bool HeroSwitchReloadsMap { get; set; }
+
+        /// <summary>How many heroes a character may have connected at once, himself not counted.</summary>
+        public int HeroesMax { get; set; } = 7;
+
+        /// <summary>
+        /// How many characters an account may have per category of server: the server list's
+        /// «Clásico (5/8)». Eight by default, a whole group of heroes with its master; the real
+        /// server's is five. Not in the settings window, full at its smallest size: set in the file.
+        /// </summary>
+        public int CharacterSlots { get; set; } = 8;
+
         /// <summary>How many scrolled stats a player starts with.</summary>
         public int StartingScrollStats { get; set; } = Handlers.CharacterCreationHandler.ScrolledStat;
 

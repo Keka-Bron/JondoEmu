@@ -125,7 +125,7 @@ jobs:
       # The Windows zip, a folder that runs as it is unpacked, with the data taken by git archive
       # so that only what is versioned goes in and nothing the tests wrote (bases/, logs/): the
       # three .exe and everything the server reads next to it -- datos/ (world.zip among it),
-      # content/, launcher_assets/, the two mods (JondoFix, Cazacabezas) and the root marker. A
+      # content/, launcher_assets/, the three mods (JondoFix, Cazacabezas, Heroes) and the root marker. A
       # player whose server runs elsewhere takes the same zip and starts only the launcher.
       #
       # The folder is called JondoEmu because that is one of the names JondoFix looks for beside
@@ -149,7 +149,7 @@ jobs:
 
           New-ReleaseZip "Jondo-Full-$tag-win-x64" `
             -exes 'Jondo Emulator Launcher.exe', 'Jondo Server.exe', 'Jondo Studio.exe' `
-            -data '.jondo-root', 'datos', 'content', 'launcher_assets', 'JondoFix/JondoFix.dll', 'Cazacabezas/Cazacabezas.dll'
+            -data '.jondo-root', 'datos', 'content', 'launcher_assets', 'JondoFix/JondoFix.dll', 'Cazacabezas/Cazacabezas.dll', 'Heroes/Heroes.dll'
 
           Get-ChildItem release | Select-Object Name,Length
 

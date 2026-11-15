@@ -60,6 +60,8 @@
     <ProjectReference Include="..\Jondo.Unity.Protocol.Connection.Wire\Jondo.Unity.Protocol.Connection.Wire.csproj" />
     <ProjectReference Include="..\Jondo.Unity.Protocol.Game.Wire\Jondo.Unity.Protocol.Game.Wire.csproj" />
     <ProjectReference Include="..\Jondo.Unity.World\Jondo.Unity.World.csproj" />
+    <!-- The heroes' portraits for the Heroes mod, drawn as the launcher draws its team (ControlApiHeroes). -->
+    <ProjectReference Include="..\Jondo.Unity.Sprites\Jondo.Unity.Sprites.csproj" />
   </ItemGroup>
 
   <ItemGroup>

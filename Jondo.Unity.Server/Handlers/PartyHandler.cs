@@ -75,7 +75,9 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            if (Parties.IsInParty(guest.State.CharacterId))
+            // A party of his heroes alone does not keep him from another: it is let go for the
+            // invitation, and his heroes follow him into whichever party he ends in.
+            if (Parties.IsInParty(guest.State.CharacterId) && !OnlyHisHeroes(guest.State.CharacterId))
             {
                 Console.WriteLine($"[Party] {guest.State.CharacterName} is already in a party.");
                 return;
@@ -92,10 +94,12 @@ namespace Jondo.Unity.Server.Handlers
             bool nuevo = party == null;
             party ??= Parties.Create(meId);
 
+            if (Parties.IsInParty(guest.State.CharacterId)) await LetHeroesPartyGoAsync(guest);
             if (!Parties.Invite(party, guest.State.CharacterId, meId))
             {
                 Console.WriteLine($"[Party] Could not invite {guest.State.CharacterName}.");
                 if (nuevo) Parties.Dissolve(party);
+                await HeroesBackAsync(guest);
                 return;
             }
 
@@ -157,6 +161,9 @@ namespace Jondo.Unity.Server.Handlers
 
             Console.WriteLine($"[Party] {meName} joins party {party.Id} " +
                               $"({Parties.MembersOf(party).Count} members).");
+
+            // And his heroes in behind him, as long as there is room.
+            await HeroesBackAsync(SessionContext.Current);
         }
 
         // ─── Rejecting ──────────────────────────────────────────────────────────
@@ -195,6 +202,9 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             Console.WriteLine($"[Party] {SessionContext.State.CharacterName} turns down party {partyId}.");
+
+            // His heroes' party, let go for the invitation, back.
+            await HeroesBackAsync(SessionContext.Current);
         }
 
         // ─── Withdrawing an invitation ──────────────────────────────────────────
@@ -233,7 +243,10 @@ namespace Jondo.Unity.Server.Handlers
 
             var guest = SessionRegistry.FindByCharacter(guestId);
             if (guest != null)
+            {
                 await guest.SendAsync(ConnectionProtocol.Push(Op.Ilo, ConnectionProtocol.BuildInvitationClosed(partyId, meId)));
+                await HeroesBackAsync(guest);
+            }
 
             byte[] cancelled = ConnectionProtocol.Push("ind", Pb.New().Var(1, partyId).Var(2, meId).Var(3, guestId).Build());
             foreach (long member in Parties.MembersOf(party))
@@ -336,6 +349,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // Leaving a full group of the dungeon search by one's own will costs the search an hour.
             bool full = MatchmakingHandler.IsFull(party);
+            await HeroesOutAsync(party, meId);
             var salida = Parties.Leave(party, meId);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -346,6 +360,9 @@ namespace Jondo.Unity.Server.Handlers
 
             Console.WriteLine($"[Party] {SessionContext.State.CharacterName} leaves party " +
                               $"{partyId}{(salida.Dissolved ? " and it breaks up" : "")}.");
+
+            // His heroes go with him: a party of their own around him.
+            await HeroesBackAsync(SessionContext.Current);
         }
 
         // ─── Expelling ──────────────────────────────────────────────────────────
@@ -404,6 +421,13 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A hero of the leader's own put out is a hero let go: Heroes takes him off the party.
+            if (Heroes.AsHero(quien)?.MasterId == meId)
+            {
+                if (Heroes.Disconnect(meId, quien)) Console.WriteLine($"[Party] {meName} lets his hero {quien} go from party {partyId}.");
+                return;
+            }
+
             if (!await PutOutAsync(party, quien)) return;
             Console.WriteLine($"[Party] {meName} kicks {quien} out of party {partyId}.");
         }
@@ -416,6 +440,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!Parties.MembersOf(party).Contains(who)) return false;
             int partyId = party.Id;
+            await HeroesOutAsync(party, who);
             var salida = Parties.Leave(party, who);
 
             var echado = SessionRegistry.FindByCharacter(who);
@@ -428,6 +453,7 @@ namespace Jondo.Unity.Server.Handlers
             await AnnounceGoneAsync(party, partyId, salida);
             await MatchmakingHandler.LeftAsync(party, who, salida.Dissolved, penalised: false);
             if (salida.Dissolved) Console.WriteLine($"[Party] Party {partyId} breaks up.");
+            if (echado != null) await HeroesBackAsync(echado);
             return true;
         }
 
@@ -457,6 +483,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await guest.SendAsync(ConnectionProtocol.Push(Op.Ilo,
                     ConnectionProtocol.BuildInvitationClosed(partyId, hostId)));
+                await HeroesBackAsync(guest);
             }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -519,6 +546,8 @@ namespace Jondo.Unity.Server.Handlers
             int partyId = (int)VarField(ima, 3);
             var party = Parties.Get(partyId);
             if (party == null || party.LeaderId != SessionContext.State.CharacterId) return;
+            // A hero has no client to lead from.
+            if (Heroes.AsHero(nuevo) != null) return;
             if (!Parties.Promote(party, nuevo)) return;
 
             // The imk goes completely empty: it does not even carry a payload.
@@ -550,6 +579,127 @@ namespace Jondo.Unity.Server.Handlers
             var salida = Parties.Leave(party, characterId);
             await AnnounceGoneAsync(party, partyId, salida);
             await MatchmakingHandler.LeftAsync(party, characterId, salida.Dissolved, penalised: false);
+        }
+
+        // ─── Heroes ─────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// A hero connected (Managers.Heroes): into his master's party, the game's own window drawing
+        /// him with the others -- the party the master is in, or a new one he leads --, when it has
+        /// room. Nobody sends a hero anything: he has no client; the others get him as a member who
+        /// joins (ink), or the master the whole new party (ing).
+        /// </summary>
+        internal static async Task HeroJoinedAsync(GameSession master, long heroId)
+        {
+            long masterId = master.State.CharacterId;
+            if (Parties.Of(heroId) != null) return;
+            var party = Parties.IsInParty(masterId) ? Parties.Of(masterId) : null;
+            // An invitation of his own open: his heroes wait for his answer to it.
+            if (party == null && Parties.Of(masterId) != null) return;
+
+            bool fresh = party == null;
+            party ??= Parties.Create(masterId);
+            if (!Parties.Invite(party, heroId, masterId) || !Parties.Accept(party, heroId))
+            {
+                if (fresh) Parties.Dissolve(party);
+                else Parties.Refuse(party, heroId);
+                return;
+            }
+
+            if (fresh)
+            {
+                await master.SendAsync(ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
+                return;
+            }
+            byte[] joins = ConnectionProtocol.Push(Op.Ink, Pb.New().Var(1, party.Id).Msg(2, BuildMember(heroId)).Build());
+            foreach (long member in Parties.MembersOf(party))
+            {
+                if (member == heroId) continue;
+                var session = SessionRegistry.FindByCharacter(member);
+                if (session != null) await session.SendAsync(joins);
+            }
+        }
+
+        /// <summary>A hero let go: out of the party he was in, the others told as of any member put out.</summary>
+        internal static async Task HeroLeftAsync(long heroId)
+        {
+            var party = Parties.Of(heroId);
+            if (party == null) return;
+            if (Parties.IsInParty(heroId)) await PutOutAsync(party, heroId);
+            else Parties.Refuse(party, heroId);
+        }
+
+        /// <summary>A master going from his party -- leaving it, put out, changing character --: his heroes out first.</summary>
+        private static async Task HeroesOutAsync(Managers.Parties.Party party, long masterId)
+        {
+            foreach (var hero in Heroes.Of(masterId))
+                if (Parties.Of(hero.CharacterId) == party) await PutOutAsync(party, hero.CharacterId);
+        }
+
+        /// <summary>His heroes into the party he stands in now, or one of their own around him.</summary>
+        private static async Task HeroesBackAsync(GameSession? master)
+        {
+            if (master == null) return;
+            foreach (var hero in Heroes.Of(master.State.CharacterId))
+            {
+                var theirs = Parties.Of(hero.CharacterId);
+                if (theirs != null && theirs == Parties.Of(master.State.CharacterId)) continue;
+                if (theirs != null) await HeroLeftAsync(hero.CharacterId);
+                await HeroJoinedAsync(master, hero.CharacterId);
+            }
+        }
+
+        /// <summary>Whether the party a character is in is his and his heroes' alone.</summary>
+        private static bool OnlyHisHeroes(long characterId)
+        {
+            var party = Parties.Of(characterId);
+            return party != null && Parties.MembersOf(party).All(m => m == characterId || Heroes.AsHero(m)?.MasterId == characterId);
+        }
+
+        /// <summary>
+        /// A master's party of his heroes alone let go, for an invitation to another: he is told it
+        /// broke up (imy); his heroes come back with his answer (<see cref="HeroesBackAsync"/>).
+        /// </summary>
+        private static async Task LetHeroesPartyGoAsync(GameSession master)
+        {
+            var party = Parties.Of(master.State.CharacterId);
+            if (party == null || !OnlyHisHeroes(master.State.CharacterId)) return;
+            Parties.Dissolve(party);
+            await master.SendAsync(ConnectionProtocol.Push(Op.Imy, ConnectionProtocol.BuildPartyDissolved(party.Id)));
+        }
+
+        /// <summary>
+        /// A hero taken in hand (Network.HeroSwitch), the party held through it: it stays as it was,
+        /// the same characters, the one played now among them. Whoever of the
+        /// group did not come back goes from it; the one played takes the lead the character he
+        /// was had (a hero leads nobody), and his client, which a selection empties, is given the
+        /// party again.
+        /// </summary>
+        internal static async Task SwitchedAsync(GameSession session, long formerId, IReadOnlyCollection<long> held)
+        {
+            long me = session.State.CharacterId;
+            foreach (long id in held)
+                if (id != me && Heroes.AsHero(id) == null && Parties.Of(id) != null) await HeroLeftAsync(id);
+
+            var party = Parties.IsInParty(me) ? Parties.Of(me) : null;
+            if (party == null)
+            {
+                await HeroesBackAsync(session);
+                return;
+            }
+            if ((party.LeaderId == formerId || Heroes.AsHero(party.LeaderId) != null) && Parties.Promote(party, me))
+            {
+                byte[] leader = ConnectionProtocol.Push(Op.Ilx, ConnectionProtocol.BuildPartyLeader(me, party.Id));
+                foreach (long member in Parties.MembersOf(party))
+                {
+                    if (member == me) continue;
+                    var other = SessionRegistry.FindByCharacter(member);
+                    if (other != null) await other.SendAsync(leader);
+                }
+                await PartyFollowHandler.LeaderChangedAsync(party);
+            }
+            await session.SendAsync(ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
+            await HeroesBackAsync(session);
         }
 
         // ─── Pieces ─────────────────────────────────────────────────────────────
@@ -635,7 +785,7 @@ namespace Jondo.Unity.Server.Handlers
             var character = DatabaseManager.GetCharacterById(characterId);
             if (character == null) return Array.Empty<byte>();
 
-            var session = SessionRegistry.FindByCharacter(characterId);
+            var session = SessionRegistry.FindByCharacter(characterId) ?? Heroes.SessionOf(characterId);
 
             // The sex block is the same slot where the party puts its part: the sex in its f3
             // and the party's part in its f1.

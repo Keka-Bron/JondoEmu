@@ -164,13 +164,15 @@ namespace Jondo.Unity.Server.Managers
                 foreach (long follower in party.Followers.Where(f => f.Value == characterId).Select(f => f.Key).ToList())
                     party.Followers.Remove(follower);
 
+                // Somebody's hero (Heroes) leads nobody: he has no client to lead from.
                 if (party.LeaderId == characterId && party.Members.Count > 0)
                 {
-                    party.LeaderId = party.Members[0];
+                    party.LeaderId = party.Members.FirstOrDefault(m => Heroes.AsHero(m) == null, party.Members[0]);
                     newLeader = party.LeaderId;
                 }
 
-                dissolved = party.Members.Count <= 1;
+                // Nor is a party of heroes alone one: there is nobody left in it to play.
+                dissolved = party.Members.Count <= 1 || party.Members.All(m => Heroes.AsHero(m) != null);
                 remaining = new List<long>(party.Members);
             }
 

@@ -346,8 +346,18 @@ namespace Jondo.Unity.Server.Network
                 Program.LogDebug($"[Move] {ficha.Name}: {mapaQueDeja} -> {quien.MapId}. " +
                                  $"Told {seVa} on the map left and {llega} on the one found.");
             }
+
+            // His heroes go with him: off the map he left, at his side on this one.
+            await HeroPresence.MasterMovedAsync(quien, mapaQueDeja);
             return (seVa, llega);
         }
+
+        /// <summary>
+        /// Whether a character is in the world for the others -- his guild, his alliance --: played
+        /// from a client, or somebody's hero (Managers.Heroes).
+        /// </summary>
+        public static bool IsOnline(long characterId)
+            => FindByCharacter(characterId) != null || Managers.Heroes.AsHero(characterId) != null;
 
         /// <summary>
         /// A character gone from a map, told to everyone still on it: the kmu that takes him off

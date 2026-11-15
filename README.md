@@ -124,13 +124,13 @@ The official client talks to Ankama's servers and checks their SSL certificates.
 
 1. Get **MelonLoader 0.7.x** from [its releases page](https://github.com/LavaGang/MelonLoader/releases). 0.7.x is published as *Open-Beta*, so it shows up as a **pre-release** and the page's "Latest" tag points at 0.6.x. **0.6.x does not work with this client** — tick *show pre-releases* and take 0.7.x. This repository is tested against **0.7.3**.
 2. Run the installer and point it at your **`Dofus.exe`**. MelonLoader detects the rest (`Game Type: Il2cpp`, `Game Arch: x64`, `Runtime Type: net6`, Unity `6000.3.16f1`).
-3. Nothing to copy: every time the **launcher** starts the client it puts this repository's **`JondoFix/JondoFix.dll`** and **`Cazacabezas/Cazacabezas.dll`** into the client's **`Mods/`** folder if the ones there differ. Only if you start the client some other way, copy those files into `Mods/` yourself (next to `Dofus.exe`; create the folder if it is not there).
+3. Nothing to copy: every time the **launcher** starts the client it puts this repository's **`JondoFix/JondoFix.dll`**, **`Cazacabezas/Cazacabezas.dll`** and **`Heroes/Heroes.dll`** into the client's **`Mods/`** folder if the ones there differ. Only if you start the client some other way, copy those files into `Mods/` yourself (next to `Dofus.exe`; create the folder if it is not there).
 
 Afterwards:
 * The installer drops a **`version.dll`** next to `Dofus.exe`, which loads MelonLoader. Renaming it to `version.dll.disabled` turns the whole thing off so you can play the official game; renaming it back turns it on again.
 * MelonLoader writes a log per run under **`MelonLoader/Logs/`**. If the client starts but never reaches the emulator, look there first.
 
-What JondoFix does: sends the client's sockets, Named Pipes and DNS queries to `localhost` (ports `8888`, `5555`, `15881`, `6337`), accepts the local self-signed certificate, and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window and the [admin window (F10)](#-admin-window-f10). The second mod, **Cazacabezas**, is the [head hunters' window](#-head-hunters).
+What JondoFix does: sends the client's sockets, Named Pipes and DNS queries to `localhost` (ports `8888`, `5555`, `15881`, `6337`), accepts the local self-signed certificate, and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window and the [admin window (F10)](#-admin-window-f10). The second mod, **Cazacabezas**, is the [head hunters' window](#-head-hunters). The third, **Heroes**, is the [hero mode](docs/heroes.md)'s window (Ctrl+Tab).
 
 ### Step 4 — Run it
 
@@ -184,6 +184,7 @@ docs/                         technical documentation
 launcher_assets/              launcher artwork and music
 JondoFix/                     the MelonLoader mod, source and compiled dll
 Cazacabezas/                  the head hunters' mod, source and compiled dll
+Heroes/                       the hero mode's mod, source and compiled dll
 Jondo.Unity.*/                source code
 ```
 

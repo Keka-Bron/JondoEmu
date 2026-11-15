@@ -357,7 +357,7 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>
         /// A team fight for the harness: { allies: [breed...], foes: [breed...], blue: [slot...],
-        /// red: [slot...] }. The slot's character and the blue slots' on one side, the red slots'
+        /// red: [slot...], heroes: bool }. With heroes, the allies are played from the client. The slot's character and the blue slots' on one side, the red slots'
         /// in front, and JondoBots of the classes given filling either side -- each played by
         /// this slot's session (Fighter.DrivenBy), never by its own wits. Every real client still
         /// says it is ready (kaq) for the fight to start.
@@ -368,9 +368,11 @@ namespace Jondo.Unity.Server.Network
             if (session == null || session.Stream == null) return Mal(404, "offline");
             if (FightHandler.FightOf(session.State.CharacterId) != null) return Mal(409, "in-fight");
             var lists = new Dictionary<string, List<int>>();
+            bool heroes = false;
             try
             {
                 using var doc = System.Text.Json.JsonDocument.Parse(string.IsNullOrEmpty(cuerpo) ? "{}" : cuerpo);
+                heroes = doc.RootElement.TryGetProperty("heroes", out var h) && h.ValueKind == System.Text.Json.JsonValueKind.True;
                 foreach (string field in new[] { "allies", "foes", "blue", "red" })
                     lists[field] = doc.RootElement.TryGetProperty(field, out var a) && a.ValueKind == System.Text.Json.JsonValueKind.Array
                         ? a.EnumerateArray().Where(x => x.ValueKind == System.Text.Json.JsonValueKind.Number).Select(x => x.GetInt32()).ToList()
@@ -397,6 +399,11 @@ namespace Jondo.Unity.Server.Network
                 return bot;
             }).ToList();
             var allies = Bots("allies");
+            // The hero mode's probe: the allies are played from the client, as heroes would be --
+            // their class bar and their turn go to it (FightHandler.PlayedAllyBar), where a
+            // harness's bot gets neither and is played over the socket.
+            if (heroes)
+                foreach (var ally in allies) FightHandler.PlayAsHero(ally, session.State.CharacterId);
             var foes = Bots("foes");
             if (red.Count + foes.Count == 0) return Mal(400, "nobody-in-front");
 
