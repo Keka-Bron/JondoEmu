@@ -383,12 +383,31 @@ namespace Heroes
                 var known = _reframe.FirstOrDefault(r => r.Displayer.Pointer == displayer.Pointer);
                 if (known != null) forced = known.Forced;
                 IntPtr before = displayer.character != null ? displayer.character.Pointer : IntPtr.Zero;
-                Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
-                if (!_toldInventory)
-                    MelonLogger.Msg($"[Heroes] Its framing before: autosize {autosize}, forced {forced}, ratio {ratio}; " +
-                                    $"after the giving: autosize {displayer.autosize}, forced {displayer.forcedSize}, ratio {displayer.ratioPositioning}.");
-                _reframe.RemoveAll(r => r.Displayer.Pointer == displayer.Pointer);
-                _reframe.Add(new Reframed { Displayer = displayer, Forced = forced, Before = before });
+                // As the window drew its own: the animation it showed and the way it faced. The
+                // displayer sizes a character by its animation's data, and SetLookAndDirection's
+                // own animation drew him twice the size. (HeroesTuning.cfg's inventoryMode 0 is
+                // that way again; inventoryFlags the four yes-or-noes of GenerateEntity, as bits.)
+                string animation = displayer.m_lastAnimation;
+                var facing = (Il2Cpp.rc)1;
+                try { if (displayer.character != null) facing = displayer.character.fhpu; } catch { }
+                int mode = (int)Tune("inventoryMode", 1f), flags = (int)Tune("inventoryFlags", 0f);
+                if (mode == 0 || string.IsNullOrEmpty(animation))
+                {
+                    Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, facing, 0, _displayers, _entities);
+                    _reframe.RemoveAll(r => r.Displayer.Pointer == displayer.Pointer);
+                    _reframe.Add(new Reframed { Displayer = displayer, Forced = forced, Before = before });
+                }
+                else
+                {
+                    var playing = new Il2CppCore.Rendering.Entity.Animations.EntityAnimation(
+                        animation, facing, true, false, true, false, default(Il2Cpp.yb),
+                        default(Il2CppCore.Rendering.Entity.Animations.EntityAnimationPlaybackModeValue), false, false,
+                        new Il2CppSystem.Nullable<float>());
+                    displayer.GenerateEntity(id, entityLook, playing, (flags & 1) != 0, facing, animation,
+                                             (flags & 2) != 0, (flags & 4) != 0, (flags & 8) != 0);
+                }
+                MelonLogger.Msg($"[Heroes] The inventory's character given anew: mode {mode}, flags {flags}, animation «{animation}», facing {(int)facing}; " +
+                                $"autosize {autosize}, forced {forced}, ratio {ratio}.");
             }
             _toldInventory = true;
             Reframe();
