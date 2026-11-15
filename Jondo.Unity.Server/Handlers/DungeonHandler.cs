@@ -156,7 +156,11 @@ namespace Jondo.Unity.Server.Handlers
             // Somebody else on the map keeps the door: this one only stands there. Megustam
             // Laspelas works in the peasants' workshop, where Mawy Ingals keeps the Hungry
             // Sunflower Barn, and asking her about the bread took the character into the barn.
-            if (!options.Asks && Npcs.Of(mapId).Any(s => s.NpcId != state.OpenDialogueNpcId && DungeonDoor.For(s.NpcId).Asks))
+            // A keeper is one whose replies the client words as the door's or whose written
+            // conversation names them: Lorkos keeps the Minotot's door in the antechamber, and the
+            // Minotot's «¿Qué relación tienes tú con el dofus Púrpura?» took the character in.
+            bool Keeps(int npc) => DungeonDoor.For(npc).Asks || NamesItsDoors(npc, mapId);
+            if (!Keeps(state.OpenDialogueNpcId) && Npcs.Of(mapId).Any(s => s.NpcId != state.OpenDialogueNpcId && Keeps(s.NpcId)))
                 return false;
 
             bool freeEntryLeft = dungeon.OnKeyring
@@ -164,6 +168,7 @@ namespace Jondo.Unity.Server.Handlers
             // A written reply that names its door goes in by it (DialogueChoice.Door); any other
             // reply is one of the door's own or none.
             var written = WrittenDoor(door);
+            if (written == null && NamesItsDoors(state.OpenDialogueNpcId, mapId)) return false;
             if ((written ?? Chosen(dungeon, options, reply, freeEntryLeft)) is not EntryMethod method) return false;
 
             if (dungeon.MinLevel > 0 && state.CharacterLevel < dungeon.MinLevel)
@@ -356,6 +361,19 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         internal enum EntryMethod { Key, Keyring }
+
+        /// <summary>
+        /// Whether the guardian's written conversation on that map names its doors: then only
+        /// those replies open, whatever the client's wording says.
+        /// </summary>
+        /// <remarks>
+        /// Lorkos, at the centre of the Minotoror's labyrinth, words his door replies his own way
+        /// («Aceptar y utilizar la llave del laberinto.»), so the door found none and took every
+        /// answer as the way in -- «Informarte acerca del Minotauroro.» too. His written ones say
+        /// which reply is the door.
+        /// </remarks>
+        internal static bool NamesItsDoors(int npcId, long mapId)
+            => NpcDialogues.For(npcId, mapId)?.Lines.Any(line => line.Choices.Any(c => c.Door.Length > 0)) == true;
 
         /// <summary>The entry method a written reply's door names, or null when it names none.</summary>
         internal static EntryMethod? WrittenDoor(string door) => door switch

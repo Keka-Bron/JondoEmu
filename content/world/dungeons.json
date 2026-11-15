@@ -80,5 +80,71 @@
       23070211
     ],
     "why": "The Floribund Clearing (subarea 462, «Clairière de Floribonde» [-53,13]) where Doctor Morros takes you after his wife: «La femme perdue» (238) of Dofus pour les noobs, «téléporté dans un mini-donjon infesté de mobs», «6 x combats», every screenshot of them on «Île d'Otomaï (La clairière de Floribonde) -53,13», then «vous trouvez sa femme» there too; the quest's own text sends you to find her in the Dark Jungle. Its seven maps share [-53,13] and have no border, interactive or graph edge: rooms reached only by being sent. INFERRED order: the six fights by map id, Juana in the last."
+  },
+  "4": {
+    "name": "Centro del Laberinto del Minotauroro",
+    "minLevel": 110,
+    "optimalLevel": 120,
+    "difficulty": 2,
+    "entrance": 34473220,
+    "exit": 34476296,
+    "rooms": [
+      34473474
+    ],
+    "bosses": [
+      121
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        7924,
+        1
+      ]
+    ],
+    "autoGroup": 0,
+    "door": 1,
+    "roster": {
+      "34473474": [
+        668,
+        829,
+        830,
+        831,
+        832
+      ]
+    },
+    "why": "The Minotoror's room behind Lorkos, in the labyrinth's centre (34473220): «Taures et détours» (Dofus pour les noobs) goes in with the key and the two relics and beats the Minotoror (8663), then casts the spell at the antechamber's stone throne (8664). The catalogue counts the antechamber (34473476) as a fight room; it is the room after the boss (content/world/dungeon_exits.json), the Minotot's door, the throne and the Minotot are there. Lorkos takes the relics by his written replies (takesAll), so «required» keeps the key alone: the door spends the first of its items the character holds. Who the room is made of: subarea 210's monsters without the two bosses and its level 1 extra (3740). INFERRED exit: the Entrance (34476296), where the arch leads back to the island; the catalogue's 34476294 is a copy of it with no way out."
+  },
+  "53": {
+    "name": "Sala del Minotot",
+    "minLevel": 150,
+    "optimalLevel": 160,
+    "difficulty": 2,
+    "entrance": 34473476,
+    "exit": 34476296,
+    "rooms": [
+      34472450
+    ],
+    "bosses": [
+      827
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        8307,
+        1
+      ]
+    ],
+    "autoGroup": 0,
+    "door": 1,
+    "roster": {
+      "34472450": [
+        668,
+        829,
+        830,
+        831,
+        832
+      ]
+    },
+    "why": "The Minotot's room behind Lorkos in the antechamber: «tendrás que traerme la llave de su sala» (3211), the key of the Minotot's room (8307) or the keyring. The catalogue also lists the Minotoror's key and relics, and the door spends the first of them the character holds; they open the room before. Its group is the Minotot with the same family as the Minotoror's, not the Minotoror himself. INFERRED exit, as dungeon 4's."
   }
 }

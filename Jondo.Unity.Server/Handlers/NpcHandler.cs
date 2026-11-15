@@ -1169,6 +1169,20 @@ namespace Jondo.Unity.Server.Handlers
             return true;
         }
 
+        /// <summary>What a reply takes all at once (DialogueChoice.TakesAll), each with the chat's «Has perdido».</summary>
+        private static async Task TakeAllAsync(NetworkStream stream, DialogueChoice choice)
+        {
+            string count = choice.TakesCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            foreach (int item in choice.TakesAll)
+            {
+                await Managers.Equipment.TakeAsync(stream, item, choice.TakesCount);
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
+                        Managers.InfoMessages.ItemLost, count,
+                        item.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+            }
+        }
+
         /// <summary>What a reply hands over (DialogueChoice.Gives), with the chat's line.</summary>
         private static async Task GiveFromReplyAsync(NetworkStream stream, DialogueChoice choice)
         {
@@ -1501,15 +1515,10 @@ namespace Jondo.Unity.Server.Handlers
                     Console.WriteLine($"[NPC] Reply {reply}: something to hand over is missing; line {falta.Message}.");
                     return;
                 }
-                foreach (int item in elegidaAhora.TakesAll)
-                {
-                    await Managers.Equipment.TakeAsync(stream, item, elegidaAhora.TakesCount);
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
-                            Managers.InfoMessages.ItemLost,
-                            elegidaAhora.TakesCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                            item.ToString(System.Globalization.CultureInfo.InvariantCulture))));
-                }
+                // A door's reply hands them over only once the door has opened, below: Lorkos keeps
+                // the two relics with the key, and a door that stays shut -- no key, the week's
+                // keyring entry spent -- must not keep them.
+                if (elegidaAhora.Door.Length == 0) await TakeAllAsync(stream, elegidaAhora);
             }
 
             // The mark the reply leaves («marks»): the heap of filings that has given its handful.
@@ -1693,6 +1702,8 @@ namespace Jondo.Unity.Server.Handlers
             if (await DungeonHandler.AtTheDoorAsync(stream, dondeHabla, reply, elegidaAhora?.Door ?? ""))
             {
                 CerrarConversacion();
+                if (elegidaAhora != null && elegidaAhora.Door.Length > 0 && elegidaAhora.TakesAll.Count > 0)
+                    await TakeAllAsync(stream, elegidaAhora);
                 // Going in can be what hands a quest over: Klasmor's «Criptología».
                 if (startsAfterClosing != 0) await Managers.Quests.StartAsync(stream, startsAfterClosing);
                 return;

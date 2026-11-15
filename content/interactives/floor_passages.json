@@ -189,6 +189,20 @@
       "toMap": 122684929,
       "toCell": 361,
       "why": "As 85: the island's top step up to the dragon's tail."
+    },
+    {
+      "map": 152849,
+      "cell": 176,
+      "toMap": 34476296,
+      "toCell": 289,
+      "why": "The Minotoror's island [-42,-17]: the cave in the ruin is the labyrinth's way in («L'entrée se trouve sur l'Île du Minotoror en [-42,-17]», Dofus pour les noobs), and neither the 2.73 graph nor the client's elements hold a passage there. Stepping on 176, the floor before the cave's mouth, leads into the Entrance, the room of the phoenix, its grate (456366) and lever (456367); landing on 289, two steps from its arch."
+    },
+    {
+      "map": 34476296,
+      "cell": 263,
+      "toMap": 152849,
+      "toCell": 204,
+      "why": "And back: the arch in the Entrance's right wall, 263 its only walkable cell, out to the island before the cave (204, beside 176)."
     }
   ]
 }

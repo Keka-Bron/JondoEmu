@@ -208,6 +208,17 @@
         20677
       ],
       "why": "Kanígrula's cave: after the matriarch the winners are in the cave's exit room, where she stands beaten and «La risueña miaumiena» has them ask her for Pol («Une fois Kanigroula mise au tapis, celle-ci mécontente vous menace», Dofus pour les noobs, «Chachyène de vie»); her three «Salir de la Gruta de Kanígrula» leave. INFERRED cell, an open walkable one in front of her."
+    },
+    {
+      "dungeon": 4,
+      "bossRoom": 34473474,
+      "room": 34473476,
+      "cell": 357,
+      "npc": 783,
+      "replies": [
+        2835
+      ],
+      "why": "The Minotoror's labyrinth: after the Minotoror the winners are in the antechamber, where «Taures et détours» has them cast the spell at the stone throne («Rendez-vous dans l'antichambre et cliquez sur le trône de pierre», Dofus pour les noobs) and Lorkos congratulates them (3210); his «Salir» (2835) leaves. INFERRED cell, open floor before Lorkos (343)."
     }
   ]
 }

@@ -39206,6 +39206,247 @@
         }
       ],
       "why": "Narber Rihen Levihawa, Pandala's librarian: «Buenas, amigo de la cultura» (2926). «Le livre des Taures», Pandala's library [21,-27] («Parlez à Narber Rihen Levihawa ... Narber n'a malheureusement pas le livre ni idée de l'endroit ou il pourrait se trouver»): 21800, 18190, 21799, 18191, and «Adiós» (21798) is objective 8651."
+    },
+    {
+      "npc": 783,
+      "map": 152849,
+      "opening": 3201,
+      "lines": [
+        {
+          "message": 3201,
+          "choices": [
+            { "reply": 21855, "next": 18233, "quest": 1522, "beforeObjective": 8658 }
+          ]
+        },
+        {
+          "message": 18233,
+          "choices": [
+            { "reply": 21854, "next": 18234 }
+          ]
+        },
+        {
+          "message": 18234,
+          "choices": [
+            { "reply": 21853, "quest": 1522, "completes": 8658, "params": [[30, 8658]] }
+          ]
+        }
+      ],
+      "why": "«Taures et détours» (Dofus pour les noobs): «Parlez à Lorkos et dites lui que vous venez ici pour le Dofus Pourpre» (21855); he likes the nerve (18233) and sends the character to someone in the Sanctuary of a Hundred Detours (18234: the great flask by the labyrinth's entrance); «Seguiré tu consejo» (21853) is objective 8658. His other replies are the old labyrinth's tile guide, left out."
+    },
+    {
+      "npc": 783,
+      "map": 34476296,
+      "opening": 3201,
+      "lines": [
+        {
+          "message": 3201,
+          "choices": [
+            { "reply": 21858, "next": 18235, "quest": 1522, "beforeObjective": 8658 }
+          ]
+        },
+        {
+          "message": 18235,
+          "choices": [
+            { "reply": 21857, "next": 18236 }
+          ]
+        },
+        {
+          "message": 18236,
+          "choices": [
+            { "reply": 21856, "quest": 1522, "completes": 8658, "params": [[30, 8658]] }
+          ]
+        }
+      ],
+      "why": "Lorkos at the labyrinth's Entrance, where «Taures et détours» sends the character back once Apísafe is seen (objective 8661, «Vuelve a ver a Lorkos en la entrada del laberinto»; Dofus pour les noobs: «Retournez voir maintenant Lorkos dans l'entrée du Labyrinthe»), a talk binding in objectives.json. Whoever meets him here first gets the client's second copy of the island's exchange (21858, 18235, 21857, 18236, 21856), which also does 8658."
+    },
+    {
+      "npc": 2464,
+      "map": 136316674,
+      "opening": 18237,
+      "lines": [
+        {
+          "message": 18237,
+          "choices": [
+            { "reply": 21862, "next": 18238, "quest": 1522, "beforeObjective": 8660 },
+            { "reply": 21860, "next": 18242, "criterion": "Qf=1522" }
+          ]
+        },
+        {
+          "message": 18238,
+          "choices": [
+            { "reply": 21861, "next": 18239, "quest": 1522, "completes": 8660, "params": [[30, 8660]], "gives": 15413 }
+          ]
+        },
+        {
+          "message": 18239,
+          "choices": [
+            { "reply": 21864, "next": 18240 }
+          ]
+        },
+        {
+          "message": 18240,
+          "choices": [
+            { "reply": 21863 }
+          ]
+        },
+        {
+          "message": 18242,
+          "choices": [
+            { "reply": 21859 }
+          ]
+        }
+      ],
+      "why": "«Taures et détours» (Dofus pour les noobs): «Parlez alors à Apisaphé pour en apprendre davantage à son sujet»: who she is (21862, 18238), the Crimson Dofus (21861): she hands over her potion (18239, item 15413, objective 8660: the potion's own criterion asks for Qo>8660), and her recipe (21864, 18240; the hidden alchemist recipe opens with the same criterion). Once the quest is done «¿Cuál es la receta de tu pócima?» (21860, 18242) is the client's other copy of the recipe."
+    },
+    {
+      "npc": 2482,
+      "map": 34473476,
+      "opening": 18273,
+      "openings": [
+        { "after": 1522, "message": 31785 }
+      ],
+      "lines": [
+        {
+          "message": 18273,
+          "choices": [
+            { "reply": 21890, "next": 18274, "quest": 1522, "completes": 8665, "params": [[30, 8665]] }
+          ]
+        },
+        {
+          "message": 18274,
+          "choices": [
+            { "reply": 21889, "next": 18275 }
+          ]
+        },
+        {
+          "message": 18275,
+          "choices": [
+            { "reply": 21888, "next": 18276, "criterion": "PL>119" },
+            { "reply": 22212, "next": 18574, "criterion": "PL<120" }
+          ]
+        },
+        {
+          "message": 18276,
+          "choices": [
+            { "reply": 21887, "next": 18277 }
+          ]
+        },
+        {
+          "message": 18277,
+          "choices": [
+            { "reply": 21886, "next": 18278 }
+          ]
+        },
+        {
+          "message": 18278,
+          "choices": [
+            { "reply": 21885, "next": 18279 }
+          ]
+        },
+        {
+          "message": 18279,
+          "choices": [
+            { "reply": 21884, "startsQuest": 1523, "params": [[34, 1523]] }
+          ]
+        },
+        {
+          "message": 18574,
+          "choices": [
+            { "reply": 22211 }
+          ]
+        },
+        {
+          "message": 31785,
+          "choices": [
+            { "reply": 21891, "next": 18280, "criterion": "PL>119", "beforeQuest": 1523 },
+            { "reply": 38435, "criterion": "PL<120" }
+          ]
+        },
+        {
+          "message": 18280,
+          "choices": [
+            { "reply": 21894, "next": 18281 }
+          ]
+        },
+        {
+          "message": 18281,
+          "choices": [
+            { "reply": 21893, "next": 18282 }
+          ]
+        },
+        {
+          "message": 18282,
+          "choices": [
+            { "reply": 21892, "startsQuest": 1523, "params": [[34, 1523]] }
+          ]
+        }
+      ],
+      "why": "«Taures et détours» (Dofus pour les noobs): the spell cast at the stone throne reveals the Minotot (18273); «¿Qué relación tienes tú con el dofus Púrpura?» (21890) is objective 8665, which ends the quest: he is the labyrinth's true master and the Crimson Dofus's keeper (18274). «Si vous continuez votre dialogue avec le Minotot, vous obtiendrez alors la prochaine quête»: give it now (21889, 18275), the Book of the Taurs (21888, 18276), the mask of Totankama (21887, 18277, 21886, 18278), back soon (21885, 18279) and the tofu (21884) starts «El tesoro de Totankama», which asks for level 120 (PL>119): below it the client's young variant (22212, 18574, 22211) sends the character away, and back later he opens on 31785 with «Ya estoy listo» (21891, 18280-18282) or «Volver cuando hayas adquirido la experiencia necesaria» (38435)."
+    },
+    {
+      "npc": 783,
+      "map": 34473220,
+      "opening": 3208,
+      "lines": [
+        {
+          "message": 3208,
+          "choices": [
+            { "reply": 2837, "next": 3209, "criterion": "PO=8305&PO=8306" },
+            { "reply": 2842, "next": 3212 },
+            { "reply": 2834, "next": 10395 }
+          ]
+        },
+        {
+          "message": 3212,
+          "choices": [
+            { "reply": 2837, "next": 3209, "criterion": "PO=8305&PO=8306" },
+            { "reply": 2834, "next": 10395 }
+          ]
+        },
+        {
+          "message": 3209,
+          "choices": [
+            { "reply": 2838, "door": "key", "criterion": "PO=7924", "takesAll": [8305, 8306] },
+            { "reply": 6610, "door": "keyring", "criterion": "PO=10207", "takesAll": [8305, 8306] }
+          ]
+        },
+        {
+          "message": 10395,
+          "choices": [
+            { "reply": 2835, "teleport": 34476296 }
+          ]
+        }
+      ],
+      "why": "Lorkos in the labyrinth's centre, the Thirteenth Room (dungeon 4's entrance): «Casi has llegado al centro de este laberinto» (3208). The Minotoror needs the labyrinth's key and the two relics, the Mominotor's and the Deminoboule's (3212); «Enseñarle las reliquias» (2837) shows them and he takes both with the key (3209), «Aceptar y utilizar la llave del laberinto» (2838) or «... el manojo de llaves» (6610): the relics go only when the door opens. «Salir del laberinto» (2834, 10395, 2835) walks the character back to the Entrance. INFERRED: which message each reply answers; the client keeps no such link."
+    },
+    {
+      "npc": 783,
+      "map": 34473476,
+      "opening": 3210,
+      "lines": [
+        {
+          "message": 3210,
+          "choices": [
+            { "reply": 2840, "next": 3211 },
+            { "reply": 2843, "next": 3206 }
+          ]
+        },
+        {
+          "message": 3211,
+          "choices": [
+            { "reply": 2841, "door": "key", "criterion": "PO=8307" },
+            { "reply": 6625, "door": "keyring", "criterion": "PO=10207" },
+            { "reply": 2843, "next": 3206 }
+          ]
+        },
+        {
+          "message": 3206,
+          "choices": [
+            { "reply": 2835 }
+          ]
+        }
+      ],
+      "why": "Lorkos in the antechamber, where the Minotoror's winners stand (content/world/dungeon_exits.json): «has conseguido vencer a la terrible criatura» (3210). «Informarse acerca del Minotot» (2840, 3211): he wants the key of the Minotot's room, «Enfrentarse a Minotot» (2841) or «... y utilizar el manojo de llaves» (6625), dungeon 53's door. «Estoy listo para salir» (2843, 3206) and «Salir» (2835) leave the dungeon. INFERRED: which message each reply answers."
     }
   ]
 }

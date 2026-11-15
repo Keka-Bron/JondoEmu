@@ -4703,6 +4703,21 @@
       "orientation": 5,
       "criterion": "(Qa=1471&Qo>8197)|Qf=1471",
       "why": "Meriana, out of her disguise, and for the way back once the Dofus is taken."
+    },
+    {
+      "map": 34476296,
+      "npc": 783,
+      "cell": 259,
+      "orientation": 1,
+      "why": "Lorkos at the labyrinth's Entrance, by the great flask (218): objective 8661 of «Taures et détours» names this map («Vuelve a ver a Lorkos en la entrada del laberinto»). The cell is open floor beside the flask."
+    },
+    {
+      "map": 34473476,
+      "npc": 2482,
+      "cell": 271,
+      "orientation": 1,
+      "criterion": "Qo>8664&Qa!1523&Qf!1523",
+      "why": "The Minotot before the antechamber's stone throne (485366, cell 257) once the spell of «Taures et détours» has revealed him (8664; «Le Minotot fait alors son apparition», Dofus pour les noobs), until «El tesoro de Totankama» is taken from him."
     }
   ]
 }

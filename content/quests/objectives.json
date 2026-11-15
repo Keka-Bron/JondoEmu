@@ -5155,6 +5155,25 @@
     8199
    ],
    "why": "«Toma el dofus Esmeralda»: its pedestal (element 484174, cell 329). The Dofus itself is the reward of «Verde esmeralda» (achievement 1048), the whole chain's."
+  },
+  {
+   "objective": 8661,
+   "quest": 1522,
+   "kind": "talk",
+   "npc": 783,
+   "map": 34476296,
+   "afterObjectives": [8660],
+   "why": "«Vuelve a ver a Lorkos en la entrada del laberinto», a free-text objective: talking to Lorkos at the Entrance once Apísafe has given her potion (Dofus pour les noobs: «Retournez voir maintenant Lorkos dans l'entrée du Labyrinthe»)."
+  },
+  {
+   "objective": 8664,
+   "quest": 1522,
+   "kind": "click",
+   "elements": [{"map": 34473476, "element": 485366}],
+   "requires": [{"item": 15597, "count": 1}],
+   "afterObjectives": [8663],
+   "showsNpc": 2482,
+   "why": "«Lanza un sortilegio de verdad al trono de la antecámara del Minotauroro»: the stone throne is the antechamber's only element (485366, cell 257). Meriana's enchanted bone of Master Cuerbok (15597) is pointed at it and the incantation said (Dofus pour les noobs: «cliquez sur le trône de pierre. Le Minotot fait alors son apparition»), after the Minotoror (8663)."
   }
  ]
 }

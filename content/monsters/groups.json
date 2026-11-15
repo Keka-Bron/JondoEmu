@@ -45,7 +45,13 @@
     "Puch celestial (2785, grade 1) on Ganymed's platform 241438721, cell 327 facing 1, and a",
     "Jalatín celestial (8017) leading a Jalató celestial (2781), both grade 1, on the pen 241439745,",
     "cell 327 facing 3, as the jss of each map in that capture has them. The chafers of the last",
-    "room are NPCs there, not a group (content/npcs/spawns.json)."
+    "room are NPCs there, not a group (content/npcs/spawns.json).",
+    "",
+    "THE MINOTOROR'S LABYRINTH. The base's groups on the antechamber 34473476, the Entrance 34476296",
+    "and its copy 34476294 (subarea 210) hold the Minotoror (121) and the Minotot (827), the two",
+    "dungeon bosses, and go. The antechamber is the room after the Minotoror and the Minotot's door;",
+    "Lorkos and the great flask stand in the Entrance. The labyrinth's monsters live in its",
+    "twenty-five rooms (subarea 319)."
   ],
   "groups": [
     {
@@ -743,6 +749,51 @@
           "grade": 0
         }
       ]
+    },
+    {
+      "map": 34473476,
+      "group": -1002204,
+      "remove": true
+    },
+    {
+      "map": 34473476,
+      "group": -1002205,
+      "remove": true
+    },
+    {
+      "map": 34473476,
+      "group": -1002206,
+      "remove": true
+    },
+    {
+      "map": 34476296,
+      "group": -1002238,
+      "remove": true
+    },
+    {
+      "map": 34476296,
+      "group": -1002239,
+      "remove": true
+    },
+    {
+      "map": 34476296,
+      "group": -1002240,
+      "remove": true
+    },
+    {
+      "map": 34476296,
+      "group": -1002241,
+      "remove": true
+    },
+    {
+      "map": 34476294,
+      "group": -1002236,
+      "remove": true
+    },
+    {
+      "map": 34476294,
+      "group": -1002237,
+      "remove": true
     }
   ]
 }
