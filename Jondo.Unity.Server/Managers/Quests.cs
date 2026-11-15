@@ -591,6 +591,15 @@ namespace Jondo.Unity.Server.Managers
             var step = _book.Step(run.StepId);
             var objective = step?.Objectives.FirstOrDefault(o => o.Id == binding.ObjectiveId);
             if (step == null || objective == null || !Revealed(step, objective, run)) return false;
+            // What the gathering is done with: the eternales' powder comes off with Dlim's dust catcher.
+            foreach (var (needed, count) in binding.Requires)
+            {
+                if (Equipment.HowMany(needed) >= count) continue;
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                        InfoMessages.Warning, InfoMessages.MissingItem)));
+                return false;
+            }
             bool gave = false;
             var gives = binding.ElementItems.TryGetValue((mapId, elementId), out int own)
                 ? new[] { (own, 1) }
@@ -757,6 +766,19 @@ namespace Jondo.Unity.Server.Managers
                         ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
                             InfoMessages.ItemGained, count.ToString(CultureInfo.InvariantCulture),
                             item.ToString(CultureInfo.InvariantCulture))));
+                }
+                // Or that only wakes what guards it: the broken crate of «Remordimientos de eternala»
+                // brings out the araknespíritu whose drop is the spiritual cloth, and the objective is
+                // still the handing over to Dlim. Not once the cloth is carried, nor a second one.
+                if (binding.SpawnsMonster != 0 && !gave)
+                {
+                    var aimed = step.Objectives.First(o => o.Id == binding.ObjectiveId);
+                    if (aimed.ItemId != 0 && Equipment.HowMany(aimed.ItemId) >= Math.Max(1, aimed.ItemCount)) return false;
+                    if (MobSpawnManager.GetMobsForMap(SessionContext.State.MapId)
+                        .Any(g => g.Members.Any(m => m.Monster != null && m.Monster.Id == binding.SpawnsMonster)))
+                        return false;
+                    await SpawnAsync(stream, binding);
+                    return true;
                 }
                 return gave;
             }

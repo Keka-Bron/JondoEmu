@@ -40062,6 +40062,98 @@
         }
       ],
       "why": "Bibiblop in the Blop enclave's exit room, after the Royal Blop: «¿qué quieres hacer, salir de la mazmorra? Si tienes la llave del Antro del Blop Multicolor Real, te puedo llevar» (5410), the keyring (6623) or the key (4531) into the lair (dungeon 49, whose door is here); «Tomarte un tiempo para reflexionar» (15937) waits, and the map panel leaves."
+    },
+    {
+      "npc": 2333,
+      "map": 136316674,
+      "opening": 18362,
+      "lines": [
+        {
+          "message": 18362,
+          "choices": [
+            { "reply": 21993, "next": 18363, "beforeQuest": 1525 },
+            { "reply": 21992, "next": 18364, "beforeQuest": 1525 }
+          ]
+        },
+        {
+          "message": 18363,
+          "choices": [
+            { "reply": 21992, "next": 18364, "beforeQuest": 1525 }
+          ]
+        },
+        {
+          "message": 18364,
+          "choices": [
+            { "reply": 21991, "startsQuest": 1525, "params": [[34, 1525]] }
+          ]
+        }
+      ],
+      "why": "Ben Dedor in the Refuge, retired after years selling the island's goods (18362). For «Remordimientos de eternala» (Dofus pour les noobs: he sends you to his old supplier in Pandala): «¿Sabes dónde puedo encontrar eternalas?» (21993, 18363: everywhere, the souls of those lost in the labyrinth), «Necesito polvo de eternala» (21992, 18364: his supplier, a mystic zolla, settled in Pandala) and «Gracias por la información» (21991) hands the quest over; its own criterion (Qa=1523&Qo>8635) decides who is offered the first replies."
+    },
+    {
+      "npc": 2484,
+      "map": 206308867,
+      "opening": 18373,
+      "lines": [
+        {
+          "message": 18373,
+          "choices": [
+            { "reply": 22007, "next": 18374, "quest": 1525, "beforeObjective": 8637 },
+            { "reply": 22009, "next": 18380, "quest": 1525, "afterObjective": 8637, "beforeObjective": 8679, "criterion": "PO=7290&PO=15424&PO>15423,12", "completesAll": [8679, 8680, 8681], "params": [[30, 8681]] },
+            { "reply": 22012, "next": 18382, "quest": 1525, "afterObjective": 8681, "beforeObjective": 8682, "criterion": "PO!15422" }
+          ]
+        },
+        {
+          "message": 18374,
+          "choices": [
+            { "reply": 22006, "next": 18375 }
+          ]
+        },
+        {
+          "message": 18375,
+          "choices": [
+            { "reply": 22005, "next": 18376 }
+          ]
+        },
+        {
+          "message": 18376,
+          "choices": [
+            { "reply": 22004, "next": 18377 }
+          ]
+        },
+        {
+          "message": 18377,
+          "choices": [
+            { "reply": 22003, "next": 18378 },
+            { "reply": 22008, "quest": 1525, "completes": 8637, "params": [[30, 8637]] }
+          ]
+        },
+        {
+          "message": 18378,
+          "choices": [
+            { "reply": 22002, "quest": 1525, "completes": 8637, "params": [[30, 8637]] }
+          ]
+        },
+        {
+          "message": 18380,
+          "choices": [
+            { "reply": 22011, "next": 18381 }
+          ]
+        },
+        {
+          "message": 18381,
+          "choices": [
+            { "reply": 22010, "gives": 15422 }
+          ]
+        },
+        {
+          "message": 18382,
+          "choices": [
+            { "reply": 22013, "gives": 15422 }
+          ]
+        }
+      ],
+      "why": "Dlim Katchel, the zolla who listens to the spirits (18373), in Pandala [22,-28]. For «Remordimientos de eternala» (Dofus pour les noobs: she makes a dust catcher out of the resources brought): «Siento molestarte, pero es que necesito tu ayuda» (22007, 18374), «Estoy buscando polvo de eternala» (22006, 18375: Ben Dedor sent you), «¿Puedes ser un poco más precisa?» (22005, 18376: a dust catcher), «No hay problema...» (22004, 18377: sacred bamboo wood, spiritual cloth and firefux totems); «Voy a buscar los ingredientes» (22008, or 22002 after asking where the cloth is, 18378: the araknespíritus weave it, in the village's houses) is 8637. «Aquí tienes los objetos que he podido encontrar» (22009) with the stalk, the cloth and the thirteen totems hands them over (8679-8681); «Esperaré mientras lo haces» (22011, 18381) and «Gracias. Adiós» (22010) give the dust catcher (15422). Lost before the eternales are done, «¿Dónde está el atrapapolvo que me habías prometido?» (22012, 18382, 22013) gives another."
     }
   ]
 }

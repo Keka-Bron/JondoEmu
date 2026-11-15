@@ -5216,8 +5216,8 @@
    "replies": [21918],
    "afterObjectives": [8635],
    "anyOrder": true,
-   "requires": [{"item": 15419, "count": 5}],
-   "why": "«Enséñale las 5 dosis de polvo de eternala a Meriana», a free-text objective: done by showing her the items for the protection ritual (21918, «Aquí tienes los objetos necesarios para el ritual de protección») with the five doses of «Regrets d'éternailes» carried (Dofus pour les noobs: «Montrez alors les trois types de ressources à Mériana»)."
+   "requires": [{"item": 15419, "count": 1}, {"item": 15602, "count": 1}, {"item": 15603, "count": 1}, {"item": 15604, "count": 1}, {"item": 15605, "count": 1}],
+   "why": "«Enséñale las 5 dosis de polvo de eternala a Meriana», a free-text objective: done by showing her the items for the protection ritual (21918, «Aquí tienes los objetos necesarios para el ritual de protección») with the five doses carried, one of each eternale's powder (15419, 15602-15605) (Dofus pour les noobs: «Montrez alors les trois types de ressources à Mériana»)."
   },
   {
    "objective": 8691,
@@ -5267,6 +5267,34 @@
    "kind": "beat",
    "monster": 3757,
    "why": "«Vence a la tymadora Gria y a sus cómplices»: the ambush at Bibiblop's door (npc_fights.json); Gria drops the Insignia tymadora de Astrub (15594) by her own row (Qa=1524&Qo>8673)."
+  },
+  {
+   "objective": 8684,
+   "quest": 1525,
+   "kind": "talk",
+   "npc": 2484,
+   "map": 206308867,
+   "why": "«Encuentra a Dlim Katchel», a free-text objective: talking to her in Pandala [22,-28] (Dofus pour les noobs sends you to her at [22,-28])."
+  },
+  {
+   "objective": 8680,
+   "quest": 1525,
+   "kind": "click",
+   "elements": [{"map": 207621134, "element": 519875}],
+   "onlyGives": true,
+   "afterObjectives": [8637],
+   "spawns": {"monster": 3758, "count": 1, "attacks": true},
+   "why": "The spiritual cloth (15424) for Dlim: Dofus pour les noobs has the broken crate of the house at the top left of [20,-27] clicked; that crate, 519875 of map 207621134, wakes an araknespíritu (3758) that attacks; the client's own drop row gives the cloth at 100 % while the quest wants it (Qa=1525&Qo>8637&Qo<8680&PO!15424). The objective is still the handing over to Dlim."
+  },
+  {
+   "objective": 8682,
+   "quest": 1525,
+   "kind": "click",
+   "elements": [{"map": 152337, "element": 485527, "item": 15419}, {"map": 153363, "element": 485528, "item": 15602}, {"map": 151826, "element": 485529, "item": 15603}, {"map": 152336, "element": 485530, "item": 15604}, {"map": 153361, "element": 485533, "item": 15605}],
+   "givesEach": true,
+   "gives": [{"item": 15419, "count": 1}, {"item": 15602, "count": 1}, {"item": 15603, "count": 1}, {"item": 15604, "count": 1}, {"item": 15605, "count": 1}],
+   "requires": [{"item": 15422, "count": 1}],
+   "why": "«Utiliza el atrapapolvo para conseguir 5 dosis de polvo de eternala»: Dofus pour les noobs sends you with the dust catcher to [-41,-17] [-43,-17] [-41,-16] [-40,-18] [-43,-19] on the Minotoror's island, the eternales 485527, 485533, 485530, 485529 and 485528 of the client's maps there, one on each. The client has five «Polvo de eternala» (15419, 15602-15605): one from each eternale, which from which INFERRED. Done once the five are carried."
   }
  ]
 }
