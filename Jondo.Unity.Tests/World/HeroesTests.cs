@@ -100,6 +100,13 @@ namespace Jondo.Unity.Tests.World
                 Assert.True(fighter.IsReady);
                 Assert.True(fighter.IsCharacter);
                 Assert.Equal(1, fighter.Breed);
+                // His class's spells, his own, to cast from his master's client.
+                Assert.NotEmpty(fighter.HechizosDeInvocado);
+                var jyy = ProtoMessage.Parse(FightHandler.PlayedAllyBarForTests(fighter, master)).Fields;
+                Assert.Equal(hero, jyy.Single(f => f.FieldNumber == 3).VarIntValue);
+                Assert.Equal(master, jyy.Single(f => f.FieldNumber == 4).VarIntValue);
+                Assert.Equal(fighter.HechizosDeInvocado.Count + 1, jyy.Count(f => f.FieldNumber == 6));
+                Assert.True(jyy.Count(f => f.FieldNumber == 7) > 1);
                 Assert.NotEqual(fight.Azul.Single(f => f.Id == master).CellId, fighter.CellId);
                 Assert.True(Heroes.SessionOf(hero)!.State.IsInFight);
 

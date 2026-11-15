@@ -38,8 +38,11 @@ namespace Jondo.Unity.Server.Handlers
                 FightSpellLayout.Layout layout;
                 using (SessionContext.Push(hero.Session))
                 {
-                    fighter = BuildPlayerFighter(fight);
+                    // The bar first: drawing it writes the level it was given, and one never written
+                    // is only filled whole the first time. Kept then, as a player's first bar is.
                     layout = FightSpellLayout.ForFight(state.Breed, state.CharacterLevel, hero.Session.AccountId);
+                    SpellChoices.RememberBar(layout.Bar.Where(b => b.Spell != Network.FightProtocol.HechizoCuerpoACuerpo));
+                    fighter = BuildPlayerFighter(fight);
                     state.IsInFight = true;
                     state.FightId = fight.FightId;
                 }
@@ -57,6 +60,8 @@ namespace Jondo.Unity.Server.Handlers
             => _heroBars.TryGetValue(played.Id, out var layout)
                 ? Network.FightProtocol.BuildSpellBar(played.Id, layout.Spells, layout.Bar, layout.WithWeapon, controllerId: me)
                 : null;
+
+        internal static byte[] PlayedAllyBarForTests(Fighter played, long me) => PlayedAllyBar(played, me);
 
         /// <summary>A winner's session to pay: his own, or a hero's.</summary>
         private static GameSession? SessionToPay(long characterId)

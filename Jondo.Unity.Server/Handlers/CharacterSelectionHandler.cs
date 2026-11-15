@@ -31,8 +31,9 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// A hero's character into the current session -- one with no socket (Managers.Heroes) --:
-        /// his sheet, his bag and what he wears, as a selection loads them, and nothing of a
-        /// client's: no last visit, no last connection, no actor details for a map.
+        /// his sheet, his bag and what he wears, as a selection loads them, and his gear's bonuses
+        /// and his spells' variants and bar, as the way into the world does (GameEntryBackend);
+        /// nothing of a client's: no last visit, no last connection, no actor details for a map.
         /// </summary>
         internal static bool LoadForHero(long characterId)
         {
@@ -41,6 +42,8 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.ClearEquippedItems();
             foreach (var item in SessionContext.State.GetInventoryCopy())
                 Managers.Equipment.RememberWorn(item.Uid, item.Position, item.RawEffects);
+            Managers.Equipment.LoadFrom(characterId);
+            Managers.SpellChoices.LoadFrom(characterId);
             return true;
         }
 
