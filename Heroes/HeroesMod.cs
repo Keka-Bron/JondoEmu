@@ -458,14 +458,19 @@ namespace Heroes
                 var grid = root == null ? null : UQueryExtensions.Q(root, "gd_btnUis", (string)null);
                 if (grid == null || grid.panel == null) continue;
                 if (UQueryExtensions.Q(grid, "JondoHeroesMenuButton", (string)null) != null) return;
-                VisualElement model = grid.childCount > 0 ? grid[0] : null;
-                float w = model?.resolvedStyle.width ?? 0, h = model?.resolvedStyle.height ?? 0;
+                // The grid is a virtual one: its slots are in rows it makes from its data, not its
+                // own children. The button goes into the last row that holds slots, after them.
+                VisualElement row = null;
+                LastRowOfSlots(grid, ref row);
+                if (row == null) return;
+                VisualElement model = row[row.childCount - 1];
+                float w = model.resolvedStyle.width, h = model.resolvedStyle.height;
                 if (float.IsNaN(w) || w <= 0) w = 32f;
                 if (float.IsNaN(h) || h <= 0) h = 32f;
                 if (!_toldMenu)
                 {
                     _toldMenu = true;
-                    MelonLogger.Msg($"[Heroes] MENUS bar found: {grid.childCount} button(s) of {w}x{h}, {model?.resolvedStyle.position}.");
+                    MelonLogger.Msg($"[Heroes] MENUS bar: a row of {row.childCount} slot(s) of {w}x{h}.");
                 }
 
                 var button = new VisualElement();
@@ -487,8 +492,23 @@ namespace Heroes
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
                 button.Add(picture);
                 button.AddManipulator(new Clickable(Do(() => { if (_window != null) Close(); else Open(); })).Cast<IManipulator>());
-                grid.Add(button);
+                row.Add(button);
                 return;
+            }
+        }
+
+        /// <summary>The last element under <paramref name="element"/> whose children are the client's slots.</summary>
+        private static void LastRowOfSlots(VisualElement element, ref VisualElement row)
+        {
+            for (int i = 0; i < element.childCount; i++)
+            {
+                var child = element[i];
+                if (child.TryCast<Il2CppCore.UILogic.Components.Slots.Slot>() != null)
+                {
+                    row = element;
+                    continue;
+                }
+                LastRowOfSlots(child, ref row);
             }
         }
 
