@@ -669,20 +669,37 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// A master taking one of his heroes in hand (Network.HeroSwitch): his heroes are let go
-        /// already, and he goes from whatever party is left -- the character he was comes back as
-        /// a hero, into a party around the one he now plays.
+        /// A hero taken in hand (Network.HeroSwitch), the party held through it: it stays as it was,
+        /// as on Auralis -- the same characters, the one played now among them --. Whoever of the
+        /// group did not come back goes from it; the one played takes the lead the character he
+        /// was had (a hero leads nobody), and his client, which a selection empties, is given the
+        /// party again.
         /// </summary>
-        internal static async Task MasterSwitchingAsync(GameSession session, long masterId)
+        internal static async Task SwitchedAsync(GameSession session, long formerId, IReadOnlyCollection<long> held)
         {
-            var party = Parties.Of(masterId);
-            if (party == null) return;
-            if (!Parties.IsInParty(masterId)) { Parties.Refuse(party, masterId); return; }
-            int partyId = party.Id;
-            var salida = Parties.Leave(party, masterId);
-            await session.SendAsync(ConnectionProtocol.Push(Op.Ils, ConnectionProtocol.BuildPartyLeft(partyId)));
-            await AnnounceGoneAsync(party, partyId, salida);
-            await MatchmakingHandler.LeftAsync(party, masterId, salida.Dissolved, penalised: false);
+            long me = session.State.CharacterId;
+            foreach (long id in held)
+                if (id != me && Heroes.AsHero(id) == null && Parties.Of(id) != null) await HeroLeftAsync(id);
+
+            var party = Parties.IsInParty(me) ? Parties.Of(me) : null;
+            if (party == null)
+            {
+                await HeroesBackAsync(session);
+                return;
+            }
+            if ((party.LeaderId == formerId || Heroes.AsHero(party.LeaderId) != null) && Parties.Promote(party, me))
+            {
+                byte[] leader = ConnectionProtocol.Push(Op.Ilx, ConnectionProtocol.BuildPartyLeader(me, party.Id));
+                foreach (long member in Parties.MembersOf(party))
+                {
+                    if (member == me) continue;
+                    var other = SessionRegistry.FindByCharacter(member);
+                    if (other != null) await other.SendAsync(leader);
+                }
+                await PartyFollowHandler.LeaderChangedAsync(party);
+            }
+            await session.SendAsync(ConnectionProtocol.Push(Op.Ing, BuildParty(party)));
+            await HeroesBackAsync(session);
         }
 
         // ─── Pieces ─────────────────────────────────────────────────────────────

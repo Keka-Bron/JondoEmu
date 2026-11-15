@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
@@ -44,24 +45,49 @@ namespace Jondo.Unity.Server.Network
             long map = state.MapId;
             int cell = state.CellId, facing = state.Orientation;
 
+            // The party stays as it is, as on Auralis: the same characters in it, let go and
+            // taken back here without it being told; the one played now is given it afterwards.
+            var held = Parties.IsInParty(masterId)
+                ? group.Select(g => g.CharacterId).Append(masterId).ToList()
+                : new List<long>();
+            Heroes.HoldParty(held);
+            bool done = false;
+            try
+            {
+                done = await SwitchHeldAsync(session, masterId, heroId, group, lootTo, map, cell, facing);
+            }
+            finally
+            {
+                Heroes.ReleaseParty(held);
+            }
+            await Handlers.PartyHandler.SwitchedAsync(session, masterId, held);
+            return done ? "ok" : "hero";
+        }
+
+        /// <summary>The switch itself, the party held: true when the hero is the one in the world now.</summary>
+        private static async Task<bool> SwitchHeldAsync(GameSession session, long masterId, long heroId,
+                                                        List<(long CharacterId, bool AutoPass)> group, long lootTo,
+                                                        long map, int cell, int facing)
+        {
+            var state = session.State;
+
             // The master saved and off his map; his heroes let go and saved, the hero among them.
             DatabaseManager.SaveCurrentCharacter();
             await SessionRegistry.RemoveFromMapAsync(map, masterId, session.Id);
             Heroes.DisconnectAll(masterId);
-            await Handlers.PartyHandler.MasterSwitchingAsync(session, masterId);
 
             var backend = new GameEntryBackend();
             if (!backend.SelectCharacter(session, heroId))
             {
                 Console.WriteLine($"[Heroes] {heroId} could not be selected in place of {masterId}.");
-                return "hero";
+                return false;
             }
             // Where the master stood: a hero is at his side, not where he was last saved.
             state.MapId = map;
             state.CellId = cell;
             state.Orientation = facing;
             var character = backend.FindCharacter(heroId);
-            if (character == null) return "hero";
+            if (character == null) return false;
             backend.LoadCharacterState(session, character);
             DatabaseManager.SaveCurrentCharacter();
 
@@ -77,7 +103,7 @@ namespace Jondo.Unity.Server.Network
 
             Console.WriteLine($"[Heroes] {state.CharacterName} ({heroId}) taken in hand in place of {masterId}, " +
                               $"map {map} cell {cell}, {Heroes.Of(heroId).Count} hero(es).");
-            return "ok";
+            return true;
         }
     }
 }

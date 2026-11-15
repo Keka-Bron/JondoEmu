@@ -46,7 +46,9 @@ The heroes go wherever their master's party goes. Invited while in a party of hi
 master is free to answer: that party is let go, and his heroes come back into whichever he ends in
 (accepting, turning down, the invitation withdrawn). Leaving a party, or put out of it, he takes his
 heroes into one of their own around him. The leader putting out a hero of his own lets that hero go.
-Taking a hero in hand, the master leaves his party, and the group forms again around the one played.
+Taking a hero in hand leaves the party as it is, as on Auralis: the same characters stay in it --
+let go and taken back without it being told (`Heroes.HoldParty`) --, the one played takes the lead
+the other had, and his client is given the party again (`PartyHandler.SwitchedAsync`).
 
 The game's own «follow the leader» cannot move a hero (no client to walk): `HeroPresence` does.
 

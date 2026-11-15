@@ -223,14 +223,27 @@ namespace Jondo.Unity.Tests.World
             });
             try
             {
+                // With the maps loaded, a map not among them is left for a real one on selection:
+                // these tests' own map is lent a real one's. Loaded here, as a full run has them.
+                if (!MapManager.Maps.ContainsKey(RealMap)) MapManager.Initialize();
+                if (MapManager.Maps.TryGetValue(RealMap, out var real)) MapManager.Maps[Map] = real;
+                if (MapManager.WalkableCells.TryGetValue(RealMap, out var cells)) MapManager.WalkableCells[Map] = cells;
                 using (SessionContext.Push(pipe.Session)) DatabaseManager.LoadCharacter(master);
                 pipe.Session.State.CellId = 300;
                 Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
                 Assert.Equal("ok", Heroes.Connect(pipe.Session, other));
                 Assert.True(Heroes.SetAutoPass(master, other, true));
 
+                var party = Parties.Of(master);
+                Assert.NotNull(party);
+
                 Assert.Equal("hero", await HeroSwitch.SwitchAsync(pipe.Session, master + 999));
                 Assert.Equal("ok", await HeroSwitch.SwitchAsync(pipe.Session, hero));
+
+                // The same party, as on Auralis: nobody out of it, the one played now leading it.
+                Assert.Same(party, Parties.Of(hero));
+                Assert.Equal(hero, party!.LeaderId);
+                Assert.Equal(new[] { master, hero, other }.OrderBy(i => i), Parties.MembersOf(party).OrderBy(i => i));
 
                 Assert.Equal(hero, pipe.Session.State.CharacterId);
                 Assert.Equal(9, pipe.Session.State.Breed);

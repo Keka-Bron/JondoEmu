@@ -140,9 +140,25 @@ namespace Jondo.Unity.Server.Managers
             return "ok";
         }
 
+        /// <summary>The characters whose party is left as it is while a switch lets them go and takes them back.</summary>
+        private static readonly ConcurrentDictionary<long, byte> _partyHeld = new();
+
+        /// <summary>A switch begins (Network.HeroSwitch): these characters' party is not told of their going and coming.</summary>
+        public static void HoldParty(IEnumerable<long> characterIds)
+        {
+            foreach (long id in characterIds) _partyHeld[id] = 0;
+        }
+
+        /// <summary>The switch is over: their party is told again.</summary>
+        public static void ReleaseParty(IEnumerable<long> characterIds)
+        {
+            foreach (long id in characterIds) _partyHeld.TryRemove(id, out _);
+        }
+
         /// <summary>A hero into his master's party, or out of the one he was in: the game's own window (Handlers.PartyHandler).</summary>
         private static void InParty(Func<Task> change, long heroId)
         {
+            if (_partyHeld.ContainsKey(heroId)) return;
             try { change().GetAwaiter().GetResult(); }
             catch (Exception ex) { Console.WriteLine($"[Heroes] {heroId}'s party not told: {ex.Message}"); }
         }

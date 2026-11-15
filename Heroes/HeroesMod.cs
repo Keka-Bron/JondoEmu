@@ -542,79 +542,45 @@ namespace Heroes
         private static bool _toldMenu;
 
         /// <summary>
-        /// A Heroes button at the end of the MENUS bar's grid (BannerMenuBinding's gd_btnUis), the
-        /// size of its neighbours, put back whenever the client draws the bar again.
+        /// A Heroes button in the MENUS window's title bar, in the empty place on its left
+        /// (BannerMenu's header_left), put back whenever the client draws the window again.
         /// </summary>
+        /// <remarks>
+        /// Not in its grid of buttons (gd_btnUis): that is a scroll view as wide as its rows, and a
+        /// button put after a row's last slot was there all along, clipped out of sight.
+        /// </remarks>
         private static void PutMenuButton()
         {
             var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
-            var grids = new List<VisualElement>();
+            var places = new List<VisualElement>();
             for (int i = 0; i < documents.Length; i++)
             {
                 var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
-                if (root != null) Named(root, "gd_btnUis", grids);
+                if (root == null) continue;
+                var banners = new List<VisualElement>();
+                Named(root, "BannerMenu", banners);
+                foreach (var banner in banners) Named(banner, "header_left", places);
             }
-            // Told once the bar is drawn, not while it is still empty at the way in.
-            if (!_toldGrids && grids.Any(g => Kids(g) > 0))
+            foreach (var place in places)
             {
-                _toldGrids = true;
-                MelonLogger.Msg("[Heroes] MENUS grids: " + string.Join(" | ", grids.Select(g =>
-                    $"{Kids(g)} child(ren) {g.resolvedStyle.width}x{g.resolvedStyle.height} {(g.panel != null ? "shown" : "off")}")));
-                var banner = new List<VisualElement>();
-                for (int i = 0; i < documents.Length; i++)
-                {
-                    var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
-                    if (root != null) Named(root, "BannerMenu", banner);
-                }
-                foreach (var one in banner)
-                {
-                    var tree = new System.Text.StringBuilder();
-                    Describe(one, 0, tree);
-                    MelonLogger.Msg($"[Heroes] BannerMenu:\n{tree}");
-                }
-            }
-            foreach (var grid in grids)
-            {
-                if (grid.panel == null || Kids(grid) == 0) continue;
+                if (place.panel == null) continue;
                 var mine = new List<VisualElement>();
-                Named(grid, "JondoHeroesMenuButton", mine);
+                Named(place, "JondoHeroesMenuButton", mine);
                 if (mine.Count > 0) return;
-                // The grid is a virtual one: its slots are in rows it makes from its data, not its
-                // own children. The button goes into the last row that holds slots, after them.
-                VisualElement row = null;
-                LastRowOfSlots(grid, ref row);
-                if (row == null)
-                {
-                    if (!_toldTree)
-                    {
-                        _toldTree = true;
-                        var tree = new System.Text.StringBuilder();
-                        Describe(grid, 0, tree);
-                        MelonLogger.Msg($"[Heroes] MENUS grid, no row of buttons found in it:\n{tree}");
-                    }
-                    continue;
-                }
-                VisualElement model = Kid(row, Kids(row) - 1);
-                float w = model.resolvedStyle.width, h = model.resolvedStyle.height;
-                if (float.IsNaN(w) || w <= 0) w = 32f;
-                if (float.IsNaN(h) || h <= 0) h = 32f;
+                float h = place.resolvedStyle.height;
+                float size = float.IsNaN(h) || h < 18f ? 24f : Math.Min(h - 2f, 30f);
                 if (!_toldMenu)
                 {
                     _toldMenu = true;
-                    MelonLogger.Msg($"[Heroes] MENUS bar: a row of {Kids(row)} slot(s) of {w}x{h}, a {model.GetIl2CppType().Name}.");
+                    MelonLogger.Msg($"[Heroes] MENUS: the button in the title bar, {size}px.");
                 }
 
                 var button = new VisualElement();
                 button.name = "JondoHeroesMenuButton";
-                button.style.width = new StyleLength(w);
-                button.style.height = new StyleLength(h);
-                if (model != null)
-                {
-                    button.style.marginLeft = new StyleLength(model.resolvedStyle.marginLeft);
-                    button.style.marginRight = new StyleLength(model.resolvedStyle.marginRight);
-                    button.style.marginTop = new StyleLength(model.resolvedStyle.marginTop);
-                    button.style.marginBottom = new StyleLength(model.resolvedStyle.marginBottom);
-                }
+                button.style.width = new StyleLength(size);
+                button.style.height = new StyleLength(size);
+                button.style.alignSelf = new StyleEnum<Align>(Align.Center);
+                button.style.marginLeft = new StyleLength(4f);
                 var picture = new VisualElement();
                 picture.pickingMode = PickingMode.Ignore;
                 picture.style.flexGrow = new StyleFloat(1f);
@@ -631,12 +597,10 @@ namespace Heroes
                         if (_window != null) Close(); else Open();
                     })), TrickleDown.TrickleDown);
                 Hint(button, "hint.window");
-                row.hierarchy.Add(button);
+                place.hierarchy.Add(button);
                 return;
             }
         }
-
-        private static bool _toldTree, _toldGrids;
 
         /// <summary>Every element under <paramref name="element"/> with that name, the deepest first.</summary>
         private static void Named(VisualElement element, string name, List<VisualElement> into)
@@ -649,41 +613,6 @@ namespace Heroes
         // under its content container, which is what childCount and [i] read.
         private static int Kids(VisualElement element) => element.hierarchy.childCount;
         private static VisualElement Kid(VisualElement element, int i) => element.hierarchy.ElementAt(i);
-
-        /// <summary>
-        /// The last element under <paramref name="element"/> that holds a row of buttons: the
-        /// client's slots, or else three or more children of one kind and one size.
-        /// </summary>
-        private static void LastRowOfSlots(VisualElement element, ref VisualElement row)
-        {
-            if (IsRow(element)) row = element;
-            for (int i = 0; i < Kids(element); i++)
-            {
-                var child = Kid(element, i);
-                if (child.name == "JondoHeroesMenuButton") continue;
-                LastRowOfSlots(child, ref row);
-            }
-        }
-
-        private static bool IsRow(VisualElement element)
-        {
-            int count = 0;
-            string kind = null;
-            float width = -1f;
-            for (int i = 0; i < Kids(element); i++)
-            {
-                var child = Kid(element, i);
-                if (child.name == "JondoHeroesMenuButton") continue;
-                if (child.TryCast<Il2CppCore.UILogic.Components.Slots.Slot>() != null) return true;
-                string its = child.GetIl2CppType().Name;
-                float w = child.resolvedStyle.width;
-                if (kind == null) { kind = its; width = w; }
-                else if (its != kind || Math.Abs(w - width) > 1f) return false;
-                count++;
-            }
-            // Side by side, not layers of one button piled up: the row is as wide as all of them.
-            return count >= 3 && width > 8f && width < 120f && element.resolvedStyle.width >= width * count * 0.9f;
-        }
 
         private static void Describe(VisualElement element, int depth, System.Text.StringBuilder into)
         {
