@@ -89,6 +89,18 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>Points of characteristics given to one of its side.</summary>
             public int Buff { get; init; }
 
+            /// <summary>
+            /// The masks of its heals and boosts when each of them lands on the aimed cell alone;
+            /// none when one reaches a zone. Whom they may be aimed at: the Minotoror's Semillas
+            /// Mágicas boosts an allied summon only («j»), and aimed at one of his companions it
+            /// was six AP spent on nothing, every turn.
+            /// </summary>
+            public IReadOnlyList<string> SupportMasks { get; init; } = Array.Empty<string>();
+
+            /// <summary>Whether its heals and boosts, aimed at that one of its side, reach him (<see cref="SupportMasks"/>).</summary>
+            public bool Supports(Fighter caster, Fighter ally)
+                => SupportMasks.Count == 0 || SupportMasks.Any(mask => EffectEngine.CumpleLaMascara(caster, ally, mask));
+
             public bool Summons { get; init; }
 
             /// <summary>
@@ -780,7 +792,8 @@ namespace Jondo.Unity.Server.Managers
             else if (spell.Offensive)
                 foreach (var enemy in enemies) yield return (enemy, enemy.CellId);
             if (spell.Heal > 0 || spell.Buff > 0)
-                foreach (var ally in allies) yield return (ally, ally == monster ? from : ally.CellId);
+                foreach (var ally in allies.Where(ally => spell.Supports(monster, ally)))
+                    yield return (ally, ally == monster ? from : ally.CellId);
             if (spell.Summons)
             {
                 foreach (int cell in MapGeometry.GetNeighbors(from)) yield return (monster, cell);

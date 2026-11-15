@@ -155,6 +155,34 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Same(ally, action.Target);
         }
 
+        /// <summary>
+        /// A boost for allied summons only («j») goes to the summon, never to a companion that
+        /// is no summon: the Minotoror's Semillas Mágicas, cast on his Scaratos every turn.
+        /// </summary>
+        [Fact]
+        public void A_boost_for_summons_goes_to_a_summon_only()
+        {
+            var monster = Monster();
+            var companion = new Fighter { Id = -2, TeamId = 1, CellId = CellAt(Centre, 1), MaxHP = 1000, CurrentHP = 1000, IsMonster = true };
+            var player = Player(1, CellAt(Centre, 8));
+            var seeds = new MonsterTactics.Spell
+            {
+                Id = 246, Grade = 1, Cost = 6, MinRange = 1, MaxRange = 5, Buff = 150,
+                SupportMasks = new[] { "j" },
+            };
+
+            Assert.Null(MonsterTactics.Next(Board(monster, companion, player), monster, new[] { seeds }));
+
+            var tofu = new Fighter
+            {
+                Id = -3, TeamId = 1, CellId = CellAt(Centre, 2), MaxHP = 99, CurrentHP = 99,
+                IsMonster = true, Invocador = monster.Id,
+            };
+            var action = MonsterTactics.Next(Board(monster, companion, tofu, player), monster, new[] { seeds });
+
+            Assert.Same(tofu, action!.Target);
+        }
+
         /// <summary>A buff once a turn, a spell in its cooldown never, a spell at its cap per turn no more.</summary>
         [Fact]
         public void It_keeps_to_the_limits()

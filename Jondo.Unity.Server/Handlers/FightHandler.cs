@@ -10660,6 +10660,17 @@ namespace Jondo.Unity.Server.Handlers
                         buff += stat.Value;
                 }
 
+                // Whom its heals and boosts may be aimed at, when each lands on the aimed cell alone.
+                var supportRows = Managers.SpellEffects.De(spell, grade)
+                    .Where(e => e.EffectId is Jondo.Unity.World.Combat.EffectSupport.FireHeal
+                                           or Jondo.Unity.World.Combat.EffectSupport.HealPercent
+                                || data.StatEffects.Any(s => s.EffectId == e.EffectId && s.Value > 0
+                                                             && !HasMask(e.TargetMask ?? "", "A")))
+                    .ToList();
+                var supportMasks = supportRows.Count > 0 && supportRows.All(e => e.Forma == 'P')
+                    ? supportRows.Select(e => e.TargetMask ?? "").Distinct().ToList()
+                    : new List<string>();
+
                 spells.Add(new Managers.MonsterTactics.Spell
                 {
                     Id = spell,
@@ -10683,6 +10694,7 @@ namespace Jondo.Unity.Server.Handlers
                     Heal = heal,
                     Removal = removal,
                     Buff = buff,
+                    SupportMasks = supportMasks,
                     Summons = summons,
                     NeedsFreeCell = limits.NeedFreeCell,
                     RangeBoostable = (limits.Flags & Managers.SpellLevelFlags.RangeCanBeBoosted) != 0,
