@@ -92,7 +92,8 @@ public sealed class AfterSelectionFlowTests
             int carried = DatabaseManager.GetItemRealWeight(2411) + DatabaseManager.GetItemRealWeight(2414)
                 + 7 * DatabaseManager.GetItemRealWeight(303);
             Assert.True(carried > 0);
-            Assert.Equal(new InventoryWeightEvent(carried, 1100), Assert.Single(first.OfType<InventoryWeightEvent>()));
+            // Strength's five pods a point: the twenty allocated and scrolled, and the set's five (118).
+            Assert.Equal(new InventoryWeightEvent(carried, 1000 + 5 * (17 + 3) + 5 * 5), Assert.Single(first.OfType<InventoryWeightEvent>()));
             Assert.Equal(new StorageKamasUpdateEvent(9_000_000_001), Assert.Single(first.OfType<StorageKamasUpdateEvent>()));
             var set = Assert.Single(first.OfType<SetUpdateEvent>());
             Assert.Equal(1, set.SetId);

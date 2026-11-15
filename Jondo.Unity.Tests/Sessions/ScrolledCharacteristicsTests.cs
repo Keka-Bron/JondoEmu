@@ -110,7 +110,8 @@ namespace Jondo.Unity.Tests.Sessions
             Assert.Equal(new CharacterCharacteristicDetailed(50, 100, 0, 0, 0, 0), Stat(10));
             Assert.Equal(new CharacterCharacteristicDetailed(0, 100, 0, 0, 254, 0), Stat(12));
             Assert.Equal(35, Stat(27).Base);
-            Assert.Equal(1750, Stat(40).Base);
+            // The thousand, five a level since the first and five a point of strength.
+            Assert.Equal(1000 + 5 * 199 + 5 * 150, Stat(40).Base);
             Assert.Same(wrong, SessionContext.Actual);
         }
 
