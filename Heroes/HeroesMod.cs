@@ -1184,16 +1184,21 @@ namespace Heroes
                 // A creation from nothing has no start message: one, even empty, opened the screen
                 // as a character's modification («ces changements sont définitifs»). The other
                 // ways kept to try with the game running (HeroesTuning.cfg's creationMode: 1 to 4).
-                int mode = (int)Tune("creationMode", 0f);
+                int mode = (int)Tune("creationMode", 1f);
                 var start = mode == 0 ? null : new Il2Cpp.cgk(new Il2CppSystem.Collections.Generic.List<Il2Cpp.dsj>(),
                     new Il2CppSystem.Collections.Generic.List<Il2Cpp.dsj>(), null, mode == 2 || mode == 4, mode == 3 || mode == 4);
                 MelonLogger.Msg($"[Heroes] The game's own creation screen, start message {(mode == 0 ? "none" : "mode " + mode)}.");
-                _native = new Il2CppCore.UILogic.Auth.CharacterCreation(tree,
-                    (Il2Cpp.faa)_services[typeof(Il2Cpp.faa)], _entities, _displayers,
-                    (Il2Cpp.fbz)_services[typeof(Il2Cpp.fbz)], (Il2Cpp.ewt)_services[typeof(Il2Cpp.ewt)],
-                    (Il2Cpp.fbr)_services[typeof(Il2Cpp.fbr)], start, (Il2Cpp.fdj)_services[typeof(Il2Cpp.fdj)],
-                    (Il2Cpp.exd)_services[typeof(Il2Cpp.exd)], (Il2Cpp.fct)_services[typeof(Il2Cpp.fct)],
-                    (Il2Cpp.fca)_services[typeof(Il2Cpp.fca)], (Il2Cpp.eyy)_services[typeof(Il2Cpp.eyy)]);
+                _makingNative = true;
+                try
+                {
+                    _native = new Il2CppCore.UILogic.Auth.CharacterCreation(tree,
+                        (Il2Cpp.faa)_services[typeof(Il2Cpp.faa)], _entities, _displayers,
+                        (Il2Cpp.fbz)_services[typeof(Il2Cpp.fbz)], (Il2Cpp.ewt)_services[typeof(Il2Cpp.ewt)],
+                        (Il2Cpp.fbr)_services[typeof(Il2Cpp.fbr)], start, (Il2Cpp.fdj)_services[typeof(Il2Cpp.fdj)],
+                        (Il2Cpp.exd)_services[typeof(Il2Cpp.exd)], (Il2Cpp.fct)_services[typeof(Il2Cpp.fct)],
+                        (Il2Cpp.fca)_services[typeof(Il2Cpp.fca)], (Il2Cpp.eyy)_services[typeof(Il2Cpp.eyy)]);
+                }
+                finally { _makingNative = false; }
                 bool ready = _native.m_initialized;
                 if (!ready)
                 {
@@ -1225,6 +1230,12 @@ namespace Heroes
                           prefix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnNativeCreate))));
             harmony.Patch(HarmonyLib.AccessTools.Method(type, "RequestNameGeneration"),
                           prefix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnNativeName))));
+            try
+            {
+                harmony.Patch(HarmonyLib.AccessTools.Method(type, "ModifyCharacterSetUp"),
+                              prefix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnNativeModify))));
+            }
+            catch (Exception ex) { MelonLogger.Warning($"[Heroes] ModifyCharacterSetUp not watched: {ex.Message}"); }
         }
 
         private static bool IsOurs(Il2CppCore.UILogic.Auth.CharacterCreation screen)
@@ -1274,6 +1285,23 @@ namespace Heroes
                 });
             }
             catch (Exception ex) { MelonLogger.Warning($"[Heroes] The creation screen's JOUER: {ex}"); }
+            return false;
+        }
+
+        /// <summary>True while the mod's creation screen is being made: its instance is not known yet.</summary>
+        private static bool _makingNative;
+
+        /// <summary>
+        /// Harmony's prefix on CharacterCreation.ModifyCharacterSetUp: whatever start message is
+        /// given, the screen sets itself up as a character's modification («ces changements sont
+        /// définitifs»). The mod's own is set up as a first creation instead.
+        /// </summary>
+        public static bool OnNativeModify(Il2CppCore.UILogic.Auth.CharacterCreation __instance)
+        {
+            if (!_makingNative && !IsOurs(__instance)) return true;
+            MelonLogger.Msg("[Heroes] The creation screen was setting up a modification: a first creation instead.");
+            try { __instance.FirstCreationSetUp(); }
+            catch (Exception ex) { MelonLogger.Warning($"[Heroes] FirstCreationSetUp: {ex.Message}"); }
             return false;
         }
 
