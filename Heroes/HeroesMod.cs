@@ -1198,7 +1198,11 @@ namespace Heroes
                         (Il2Cpp.exd)_services[typeof(Il2Cpp.exd)], (Il2Cpp.fct)_services[typeof(Il2Cpp.fct)],
                         (Il2Cpp.fca)_services[typeof(Il2Cpp.fca)], (Il2Cpp.eyy)_services[typeof(Il2Cpp.eyy)]);
                 }
-                finally { _makingNative = false; }
+                finally
+                {
+                    _makingNative = false;
+                    _noPopupUntil = UnityEngine.Time.unscaledTime + 1.5f;
+                }
                 bool ready = _native.m_initialized;
                 if (!ready)
                 {
@@ -1236,6 +1240,13 @@ namespace Heroes
                               prefix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnNativeModify))));
             }
             catch (Exception ex) { MelonLogger.Warning($"[Heroes] ModifyCharacterSetUp not watched: {ex.Message}"); }
+            try
+            {
+                // The popups' service (fob), its showing of one (bdir).
+                harmony.Patch(HarmonyLib.AccessTools.Method(typeof(Il2Cpp.fob), "bdir"),
+                              prefix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnPopup))));
+            }
+            catch (Exception ex) { MelonLogger.Warning($"[Heroes] The popups not watched: {ex.Message}"); }
         }
 
         private static bool IsOurs(Il2CppCore.UILogic.Auth.CharacterCreation screen)
@@ -1290,6 +1301,22 @@ namespace Heroes
 
         /// <summary>True while the mod's creation screen is being made: its instance is not known yet.</summary>
         private static bool _makingNative;
+
+        /// <summary>Until when the creation screen's opening warning is kept from showing.</summary>
+        private static float _noPopupUntil;
+
+        /// <summary>
+        /// Harmony's prefix on the popups' service's showing: the creation screen, made in the
+        /// world, warns on opening that it «modifies the character, for good» -- it makes one, and
+        /// the warning is not shown. Only as the screen opens: any other popup is the game's own.
+        /// </summary>
+        public static bool OnPopup(ref int __result)
+        {
+            if (!_makingNative && UnityEngine.Time.unscaledTime > _noPopupUntil) return true;
+            MelonLogger.Msg("[Heroes] The creation screen's opening warning not shown.");
+            __result = 0;
+            return false;
+        }
 
         /// <summary>
         /// Harmony's prefix on CharacterCreation.ModifyCharacterSetUp: whatever start message is
