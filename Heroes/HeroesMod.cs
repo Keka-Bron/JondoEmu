@@ -542,64 +542,134 @@ namespace Heroes
         private static bool _toldMenu;
 
         /// <summary>
-        /// A Heroes button in the MENUS window's title bar, in the empty place on its left
-        /// (BannerMenu's header_left), put back whenever the client draws the window again.
+        /// A Heroes button in the MENUS window's grid (BannerMenuBinding's gd_btnUis), in the free
+        /// place after its last button, the size of the others; placed again every scan, as the
+        /// window is drawn again or resized, and put away when no place is free.
         /// </summary>
         /// <remarks>
-        /// Not in its grid of buttons (gd_btnUis): that is a scroll view as wide as its rows, and a
-        /// button put after a row's last slot was there all along, clipped out of sight.
+        /// Laid over the grid, not into one of its rows: the grid is a scroll view as wide as its
+        /// rows, and a button put after a row's last slot was there all along, clipped out of sight.
         /// </remarks>
         private static void PutMenuButton()
         {
             var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
-            var places = new List<VisualElement>();
+            var grids = new List<VisualElement>();
             for (int i = 0; i < documents.Length; i++)
             {
                 var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
-                if (root == null) continue;
-                var banners = new List<VisualElement>();
-                Named(root, "BannerMenu", banners);
-                foreach (var banner in banners) Named(banner, "header_left", places);
+                if (root != null) Named(root, "gd_btnUis", grids);
             }
-            foreach (var place in places)
+            foreach (var grid in grids)
             {
-                if (place.panel == null) continue;
+                if (grid.panel == null) continue;
                 var mine = new List<VisualElement>();
-                Named(place, "JondoHeroesMenuButton", mine);
-                if (mine.Count > 0) return;
-                float h = place.resolvedStyle.height;
-                float size = float.IsNaN(h) || h < 18f ? 24f : Math.Min(h - 2f, 30f);
-                if (!_toldMenu)
-                {
-                    _toldMenu = true;
-                    MelonLogger.Msg($"[Heroes] MENUS: the button in the title bar, {size}px.");
-                }
+                Named(grid, "JondoHeroesMenuButton", mine);
+                var button = mine.Count > 0 ? mine[0] : null;
 
-                var button = new VisualElement();
-                button.name = "JondoHeroesMenuButton";
-                button.style.width = new StyleLength(size);
-                button.style.height = new StyleLength(size);
-                button.style.alignSelf = new StyleEnum<Align>(Align.Center);
-                button.style.marginLeft = new StyleLength(4f);
-                var picture = new VisualElement();
-                picture.pickingMode = PickingMode.Ignore;
-                picture.style.flexGrow = new StyleFloat(1f);
-                picture.style.marginLeft = picture.style.marginRight = picture.style.marginTop = picture.style.marginBottom = new StyleLength(2f);
-                picture.style.backgroundImage = new StyleBackground(Icon());
-                picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
-                button.Add(picture);
-                // Taken at the press, before the slot grid's own handling -- its drag and its
-                // selection -- swallows the click a Clickable waits for.
-                button.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
-                    new Action<PointerDownEvent>(e =>
-                    {
-                        try { e.StopImmediatePropagation(); } catch { }
-                        if (_window != null) Close(); else Open();
-                    })), TrickleDown.TrickleDown);
-                Hint(button, "hint.window");
-                place.hierarchy.Add(button);
+                var place = FreePlace(grid);
+                if (place == null)
+                {
+                    if (button != null) button.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+                    continue;
+                }
+                button ??= MenuButton(grid);
+                var (left, top, size) = place.Value;
+                button.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+                button.style.left = new StyleLength(left);
+                button.style.top = new StyleLength(top);
+                button.style.width = new StyleLength(size.x);
+                button.style.height = new StyleLength(size.y);
                 return;
             }
+        }
+
+        /// <summary>
+        /// Where in the grid the place after its last button is -- left, top and size, the grid's
+        /// own --, or null when its last row is full. Its buttons are its slots that show
+        /// something: an empty slot shows less than most of them do.
+        /// </summary>
+        private static (float, float, UnityEngine.Vector2)? FreePlace(VisualElement grid)
+        {
+            var slots = new List<VisualElement>();
+            SlotsUnder(grid, slots);
+            slots = slots.Where(s => s.resolvedStyle.display != DisplayStyle.None && s.resolvedStyle.visibility == Visibility.Visible
+                                     && s.worldBound.width > 4f).ToList();
+            if (slots.Count < 2) return null;
+            var weight = slots.ToDictionary(s => s, Shows);
+            var sorted = weight.Values.OrderBy(v => v).ToList();
+            int usual = sorted[sorted.Count / 2];
+            var full = slots.Where(s => weight[s] >= usual)
+                            .OrderBy(s => Math.Round(s.worldBound.y)).ThenBy(s => s.worldBound.x).ToList();
+            if (full.Count < 2) return null;
+
+            float firstY = full[0].worldBound.y, lastY = full[^1].worldBound.y;
+            int perRow = full.Count(s => Math.Abs(s.worldBound.y - firstY) < 2f);
+            int inLast = full.Count(s => Math.Abs(s.worldBound.y - lastY) < 2f);
+            float step = full[1].worldBound.x - full[0].worldBound.x;
+            if (!_toldMenu)
+            {
+                _toldMenu = true;
+                MelonLogger.Msg($"[Heroes] MENUS: {slots.Count} slot(s), {full.Count} showing a button, " +
+                                $"{perRow} a row, {inLast} on the last; weights {string.Join(",", sorted)}.");
+            }
+            if (perRow < 2 || inLast >= perRow || step <= 0) return null;
+
+            var last = full[^1].worldBound;
+            var origin = grid.worldBound;
+            return (last.x + step - origin.x, last.y - origin.y, new UnityEngine.Vector2(last.width, last.height));
+        }
+
+        /// <summary>Every slot of the client's under an element, ours left out.</summary>
+        private static void SlotsUnder(VisualElement element, List<VisualElement> into)
+        {
+            for (int i = 0; i < Kids(element); i++)
+            {
+                var child = Kid(element, i);
+                if (child.name == "JondoHeroesMenuButton") continue;
+                if (child.TryCast<Il2CppCore.UILogic.Components.Slots.Slot>() != null) into.Add(child);
+                else SlotsUnder(child, into);
+            }
+        }
+
+        /// <summary>How much a slot shows: the elements in it that are shown, and the pictures among them.</summary>
+        private static int Shows(VisualElement element)
+        {
+            if (element.resolvedStyle.display == DisplayStyle.None || element.resolvedStyle.visibility != Visibility.Visible) return 0;
+            int count = 1;
+            try
+            {
+                var picture = element.resolvedStyle.backgroundImage;
+                if (picture.texture != null || picture.sprite != null || picture.vectorImage != null || picture.renderTexture != null) count++;
+            }
+            catch { }
+            for (int i = 0; i < Kids(element); i++) count += Shows(Kid(element, i));
+            return count;
+        }
+
+        /// <summary>The button itself, laid over the grid: its place is set by <see cref="PutMenuButton"/>.</summary>
+        private static VisualElement MenuButton(VisualElement grid)
+        {
+            var button = new VisualElement();
+            button.name = "JondoHeroesMenuButton";
+            button.style.position = new StyleEnum<Position>(Position.Absolute);
+            var picture = new VisualElement();
+            picture.pickingMode = PickingMode.Ignore;
+            picture.style.flexGrow = new StyleFloat(1f);
+            picture.style.marginLeft = picture.style.marginRight = picture.style.marginTop = picture.style.marginBottom = new StyleLength(2f);
+            picture.style.backgroundImage = new StyleBackground(Icon());
+            picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+            button.Add(picture);
+            // Taken at the press, before the slot grid's own handling -- its drag and its
+            // selection -- swallows the click a Clickable waits for.
+            button.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
+                new Action<PointerDownEvent>(e =>
+                {
+                    try { e.StopImmediatePropagation(); } catch { }
+                    if (_window != null) Close(); else Open();
+                })), TrickleDown.TrickleDown);
+            Hint(button, "hint.window");
+            grid.hierarchy.Add(button);
+            return button;
         }
 
         /// <summary>Every element under <paramref name="element"/> with that name, the deepest first.</summary>

@@ -251,13 +251,23 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(300, pipe.Session.State.CellId);
                 Assert.Same(pipe.Session, SessionRegistry.FindByCharacter(hero));
                 Assert.Null(SessionRegistry.FindByCharacter(master));
-                Assert.Equal(new[] { master, other }, Heroes.Of(hero).Select(h => h.CharacterId));
+                // The group in its round from the one after him: master, hero, other -- so other first.
+                Assert.Equal(new[] { other, master }, Heroes.Of(hero).Select(h => h.CharacterId));
                 Assert.True(Heroes.PassesOnHisOwn(other));
                 Assert.Null(Heroes.AsHero(hero));
+
+                // The first hero taken in hand each time, as Tab does, goes round them all.
+                Assert.Equal("ok", await HeroSwitch.SwitchAsync(pipe.Session, other));
+                Assert.Equal(new[] { master, hero }, Heroes.Of(other).Select(h => h.CharacterId));
+                Assert.Equal("ok", await HeroSwitch.SwitchAsync(pipe.Session, master));
+                Assert.Equal(new[] { hero, other }, Heroes.Of(master).Select(h => h.CharacterId));
+                Assert.Same(party, Parties.Of(master));
+                Assert.Equal(master, party.LeaderId);
             }
             finally
             {
                 reading.Cancel();
+                Heroes.DisconnectAll(other);
                 Heroes.DisconnectAll(hero);
                 Heroes.DisconnectAll(master);
                 SessionRegistry.Unregister(pipe.Session);

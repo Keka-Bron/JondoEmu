@@ -95,8 +95,13 @@ namespace Jondo.Unity.Server.Network
             await backend.AnnounceMapPresenceAsync(session, character);
             await backend.SendMapInitializationAsync(session, character);
 
-            // The group back, around the hero now: the one who led it first.
-            var members = new[] { (masterId, false) }.Concat(group.Where(g => g.CharacterId != heroId));
+            // The group back, around the hero now, in the round it makes: from the one after him to
+            // the one before, the master where he was in it. Taking the first hero in hand each time
+            // -- the mod's Tab -- goes round them all, not back and forth between two.
+            var ring = new List<(long CharacterId, bool AutoPass)> { (masterId, false) };
+            ring.AddRange(group);
+            int at = ring.FindIndex(m => m.CharacterId == heroId);
+            var members = Enumerable.Range(1, ring.Count - 1).Select(k => ring[(at + k) % ring.Count]);
             foreach (var (member, autoPass) in members)
                 if (Heroes.Connect(session, member) == "ok" && autoPass) Heroes.SetAutoPass(heroId, member, true);
             if (lootTo != 0) Heroes.SetLootTo(heroId, lootTo);
