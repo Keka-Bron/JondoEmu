@@ -65,6 +65,7 @@ namespace Heroes
             LoggerInstance.Msg(_token.Length > 0
                 ? "[Heroes] Ready: Ctrl+Tab opens the hero mode."
                 : "[Heroes] No session token from the launcher: the hero mode stays asleep.");
+            if (_token.Length > 0) WatchMainMenu();
         }
 
         public override void OnUpdate()
@@ -142,6 +143,9 @@ namespace Heroes
             ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
             ["auto"] = L("AUTO", "AUTO", "AUTO"),
             ["loot"] = L("BOTÍN", "LOOT", "BUTIN"),
+            ["play"] = L("JUGAR", "PLAY", "JOUER"),
+            ["menu"] = L("Abre una vez el menú (Esc) y vuelve a probar.", "Open the menu once (Esc) and try again.",
+                         "Ouvre une fois le menu (Échap) et réessaie."),
         };
 
         private static string T(string key, params object[] values)
@@ -642,7 +646,12 @@ namespace Heroes
                 bar.style.height = new StyleLength(24f);
                 bar.style.alignItems = new StyleEnum<Align>(Align.Center);
                 bar.Add(Tool(Do(() => { _folded = !_folded; if (_members != null) _members.style.display = new StyleEnum<DisplayStyle>(_folded ? DisplayStyle.None : DisplayStyle.Flex); }), "—"));
-                bar.Add(Tool(Do(() => { if (_window != null) Close(); else Open(); }), "≡"));
+                // The window's own icon, the MENUS button's: the game's font has no «≡».
+                var opener = Tool(Do(() => { if (_window != null) Close(); else Open(); }), "");
+                opener.style.backgroundImage = new StyleBackground(Icon());
+                opener.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+                opener.style.backgroundColor = new StyleColor(new UnityEngine.Color(0, 0, 0, 0));
+                bar.Add(opener);
                 _panel.Add(bar);
                 _members = new VisualElement();
                 _members.style.display = new StyleEnum<DisplayStyle>(_folded ? DisplayStyle.None : DisplayStyle.Flex);
@@ -697,8 +706,75 @@ namespace Heroes
                 tools.Add(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), T("auto"), auto));
             }
             tools.Add(Toggle(Do(() => Act("heroes/loot", id)), T("loot"), lootTo == id));
+            if (!master && !Bool(who, "inFight"))
+            {
+                string name = Str(who, "name");
+                tools.Add(Toggle(Do(() => TakeInHand(name)), T("play"), false));
+            }
             row.Add(tools);
             return row;
+        }
+
+        // ─── Taking a hero in hand ───────────────────────────────────────────────────────
+
+        /// <summary>The client's main menu, kept as it comes up: its «change character» is what takes a hero in hand.</summary>
+        private static Il2CppCore.UILogic.GameUICore.MainMenu _mainMenu;
+        private static bool _menuWatched;
+
+        /// <summary>
+        /// Plays a hero from here on: the client changes to his character through its own main
+        /// menu's «change character», and the server gives the group back to him on his way in --
+        /// the one who led it is a hero of his then (Heroes.Regroup).
+        /// </summary>
+        private static void TakeInHand(string name)
+        {
+            if (_mainMenu == null)
+            {
+                Say(T("menu"));
+                MelonLogger.Msg("[Heroes] No main menu kept yet: it is opened once with Esc.");
+                return;
+            }
+            try
+            {
+                _mainMenu.InitCharactersList();
+                if (_mainMenu.m_charsNames == null || !_mainMenu.m_charsNames.Contains(name))
+                {
+                    MelonLogger.Warning($"[Heroes] {name} is not in the main menu's characters.");
+                    return;
+                }
+                _mainMenu.OnCharacterSelection(name);
+                _mainMenu.OnConfirmCharacterSelection();
+                MelonLogger.Msg($"[Heroes] Taking {name} in hand.");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] {name} could not be taken in hand: {ex.Message}");
+            }
+        }
+
+        private static void WatchMainMenu()
+        {
+            if (_menuWatched) return;
+            _menuWatched = true;
+            var harmony = new HarmonyLib.Harmony("jondo.heroes.mainmenu");
+            var keep = new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(KeepMainMenu)));
+            foreach (string name in new[] { "OnEnable", "Load", "InitCharactersList" })
+            {
+                try
+                {
+                    var method = HarmonyLib.AccessTools.Method(typeof(Il2CppCore.UILogic.GameUICore.MainMenu), name);
+                    if (method != null) harmony.Patch(method, postfix: keep);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Warning($"[Heroes] MainMenu.{name} not watched: {ex.Message}");
+                }
+            }
+        }
+
+        public static void KeepMainMenu(Il2CppCore.UILogic.GameUICore.MainMenu __instance)
+        {
+            if (__instance != null) _mainMenu = __instance;
         }
 
         private static VisualElement Toggle(Il2CppSystem.Action click, string text, bool on)

@@ -120,6 +120,49 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// Taking a hero in hand is changing character: the client leaves and comes back with him,
+        /// and the group is his then, the one who led it a hero of his, the switches kept.
+        /// </summary>
+        [Fact]
+        public async Task Coming_back_as_one_of_the_group_takes_the_group_in_hand()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long first = Character(Account + 7, "Primero-" + tag, 8);
+            long second = Character(Account + 7, "Segundo-" + tag, 1);
+            long third = Character(Account + 7, "Tercero-" + tag, 9);
+            var pipe = await ClientPipe.OpenAsync(Account + 7, first, Map, "Primero-" + tag);
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, second));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, third));
+                Assert.True(Heroes.SetAutoPass(first, third, true));
+                Assert.True(Heroes.SetLootTo(first, third));
+                Heroes.DisconnectAll(pipe.Session);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+            finally
+            {
+                await pipe.DisposeAsync();
+            }
+
+            await using var back = await ClientPipe.OpenAsync(Account + 7, second, Map, "Segundo-" + tag);
+            try
+            {
+                Heroes.Regroup(back.Session);
+                var group = Heroes.Of(second).Select(h => h.CharacterId).ToList();
+                Assert.Equal(new[] { first, third }, group);
+                Assert.True(Heroes.PassesOnHisOwn(third));
+                Assert.False(Heroes.PassesOnHisOwn(first));
+                Assert.Equal(third, Heroes.LootTo(second));
+            }
+            finally
+            {
+                Heroes.DisconnectAll(second);
+                SessionRegistry.Unregister(back.Session);
+            }
+        }
+
         [Fact]
         public async Task A_hero_comes_into_his_masters_fight_as_his_to_play()
         {

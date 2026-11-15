@@ -193,6 +193,8 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
             await backend.AnnounceMapPresenceAsync(session, character);
 
         await backend.SendInitialStateAsync(session, character);
+        // The account's heroes, back around him when he comes from another of the group.
+        Heroes.Regroup(session);
         await backend.RestoreGuildRaidAsync(character.Id);
         await backend.NotifyGuildConnectionAsync(character.Id);
         await backend.NotifyFriendsAsync(session.AccountId);

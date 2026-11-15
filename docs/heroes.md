@@ -59,7 +59,15 @@ While a hero is connected, a **group panel** stands at the right of the screen: 
 portrait and life (his fighter's in a fight, his resting life outside one), a crown for the master,
 and two switches -- **AUTO**, a hero's turns passed by the server as they come, and **LOOT**, the
 group's items all to that one (each keeps his experience and kamas; `FightHandler.GatherHeroLoot`).
-It folds with its «—» button; «≡» opens the window.
+It folds with its «—» button; the Heroes icon beside it opens the window.
+
+**Taking a hero in hand** (the panel's **PLAY**) is changing character: the mod goes through the
+client's own main menu («change character», `MainMenu.OnCharacterSelection` and its confirmation,
+kept as the menu comes up), the client leaves and comes back with the hero. A master leaving the
+world leaves his group aside for his account for three minutes (`Heroes.DisconnectAll(session)`);
+whoever of it comes back into the world takes it back (`Heroes.Regroup`, on entry): the one who led
+it is a hero of his, the others are his heroes again with their switches. Quitting and coming back
+within the three minutes brings the group back the same way.
 
 | Route | Answers |
 |:---|:---|
@@ -80,7 +88,8 @@ All need the master in the world (`409 world`), with the session's own token.
 - A defeat's consequences on a hero beyond the fight; the master walking out of a fight leaves his
   heroes in it with nobody to play them.
 - Creating a character from the window.
-- The group panel's «follow», «show on the map» and «take this character in hand» of Auralis's.
+- The group panel's «follow» and «show on the map» of Auralis's.
+- PLAY needs the client's main menu to have come up once (Esc) since the game started.
 - The spell book (the client's own) shows the master's spells, not the hero's.
 
 The `.heros` command (administrators) still opens the probe's fight: JondoBots at one's side,

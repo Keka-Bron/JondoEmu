@@ -151,6 +151,51 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
+        /// <summary>A group whose master left the world, kept for a while for whoever of it comes back.</summary>
+        private sealed record Group(long MasterId, List<(long Id, bool AutoPass)> Heroes, long LootTo, DateTime LeftAt);
+
+        /// <summary>Each account's group left behind, until one of it comes back or it is too old.</summary>
+        private static readonly ConcurrentDictionary<long, Group> _leftBehind = new();
+
+        /// <summary>How long a group waits for one of its characters to come back into the world.</summary>
+        public static readonly TimeSpan GroupWaits = TimeSpan.FromMinutes(3);
+
+        /// <summary>
+        /// Every hero of a master let go as he leaves the world, the group kept aside for his
+        /// account (<see cref="Regroup"/>): changing character -- the client leaves and comes back
+        /// -- is how one takes another of the group in hand.
+        /// </summary>
+        public static void DisconnectAll(GameSession master)
+        {
+            long masterId = master.State.CharacterId;
+            var heroes = Of(masterId);
+            if (heroes.Count > 0 && master.AccountId > 0)
+                _leftBehind[master.AccountId] = new Group(masterId, heroes.Select(h => (h.CharacterId, h.AutoPass)).ToList(),
+                                                          LootTo(masterId), DateTime.UtcNow);
+            DisconnectAll(masterId);
+        }
+
+        /// <summary>
+        /// The account's group back around the character that has just come into the world: the one
+        /// who led it before is a hero now if it is another, and the heroes are his again with their
+        /// switches. Nothing when the group is too old or he comes back into a fight.
+        /// </summary>
+        public static void Regroup(GameSession me)
+        {
+            if (!On || !_leftBehind.TryRemove(me.AccountId, out var group)) return;
+            if (DateTime.UtcNow - group.LeftAt > GroupWaits || me.State.IsInFight) return;
+            long id = me.State.CharacterId;
+            var members = new List<(long Id, bool AutoPass)> { (group.MasterId, false) };
+            members.AddRange(group.Heroes);
+            foreach (var (member, autoPass) in members)
+            {
+                if (member == id) continue;
+                if (Connect(me, member) == "ok" && autoPass) SetAutoPass(id, member, true);
+            }
+            if (group.LootTo != 0) SetLootTo(id, group.LootTo);
+            Console.WriteLine($"[Heroes] {me.State.CharacterName} takes the group back: {Of(id).Count} hero(es).");
+        }
+
         /// <summary>
         /// Every hero of a master let go: he is leaving the world. A hero in a fight goes with
         /// it as his master does; he is saved off the arena all the same.
