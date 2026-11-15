@@ -1172,6 +1172,31 @@
       },
       "defeatFree": true,
       "why": "The same with the fourth scale set in the talisman: the reflection's second grade, with Clarividencia (4317)."
+    },
+    {
+      "npc": 4341,
+      "map": 192413700,
+      "reply": 37639,
+      "monsters": [
+        {
+          "monster": 3754,
+          "grade": 0
+        },
+        {
+          "monster": 3755,
+          "grade": 0
+        },
+        {
+          "monster": 3756,
+          "grade": 0
+        },
+        {
+          "monster": 3757,
+          "grade": 0
+        }
+      ],
+      "defeatFree": true,
+      "why": "«Le livre des Taures»: the rogues who spied on the character at Oz Dralett's (Dofus pour les noobs: «Au même moment vous vous faites attaquer par des roublards qui vous espionnaient. Le combat s'effectue seul.»): the quest's four rogues of the client's catalogue, Tymador Guy Sante, Buff Hon, Gullo and Tymadora Gria (3754-3757, race 50, levels 100-130), made with the chain's other quest monsters (3740-3759). Lost or won, the quest goes on: the reply already did its objective, and a defeat leaves the character in the room."
     }
   ]
 }

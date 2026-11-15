@@ -11513,6 +11513,8 @@
           "message": 31166,
           "choices": [
             { "reply": 37638, "quest": 1988, "completes": 13996, "params": [[30, 13996]], "next": 31167 },
+            { "reply": 37643, "next": 31170, "quest": 1521, "afterObjectives": [8633, 8650, 8651, 8652, 8653], "beforeObjective": 8654, "completes": 8654, "params": [[30, 8654]] },
+            { "reply": 37643, "next": 31170, "quest": 1521, "afterObjective": 8654, "beforeObjective": 8655 },
             { "reply": 37640 }
           ]
         },
@@ -11533,9 +11535,33 @@
           "choices": [
             { "reply": 37635 }
           ]
+        },
+        {
+          "message": 31170,
+          "choices": [
+            { "reply": 37642, "next": 31171 }
+          ]
+        },
+        {
+          "message": 31171,
+          "choices": [
+            { "reply": 37641, "next": 31172 }
+          ]
+        },
+        {
+          "message": 31172,
+          "choices": [
+            { "reply": 37640, "next": 31173 }
+          ]
+        },
+        {
+          "message": 31173,
+          "choices": [
+            { "reply": 37639, "quest": 1521, "completes": 8655, "params": [[30, 8655]] }
+          ]
         }
       ],
-      "why": "Oz Dralett, the old bookseller in the library's store room, by «L'histoire en mouvement»: the old texts on Rathrosk (13996), a book with cracked covers (31167), gone (31168), put by mistake in the parchment seller's crate (31169)."
+      "why": "Oz Dralett, the old bookseller in the library's store room, by «L'histoire en mouvement»: the old texts on Rathrosk (13996), a book with cracked covers (31167), gone (31168), put by mistake in the parchment seller's crate (31169). «Le livre des Taures» (Dofus pour les noobs): once the five libraries are asked, «Busco una copia de El libro de los toros» (37643) is the bookseller found in Astrub (8654); he has none (31170) but Master Cuerbok's library surely has one (31171, 31172), and «¿Qué es ese ruido?» (31173): «Dar la vuelta» (37639) is objective 8655 and the fight against the rogues who spied on the character («Perdre le combat n'a aucune influence, la quête se mettra tout de même à jour»)."
     },
     {
       "npc": 730,
@@ -24519,7 +24545,8 @@
             { "reply": 67044, "next": 50259, "quest": 2434, "afterObjective": 18438, "beforeObjective": 18423, "holds": 26202 },
             { "reply": 67053, "quest": 2434, "afterObjective": 18438, "beforeObjective": 18423, "criterion": "PO!26202" },
             { "reply": 63989, "next": 49090, "quest": 525, "afterObjective": 3593, "completesAll": [3594, 3618], "params": [[30, 3618]] },
-            { "reply": 63989, "next": 49090, "afterQuest": 525, "criterion": "Qa!526&Qf!526&Qa!527&Qf!527" }
+            { "reply": 63989, "next": 49090, "afterQuest": 525, "criterion": "Qa!526&Qf!526&Qa!527&Qf!527" },
+            { "reply": 63999, "next": 48069, "quest": 1521, "beforeObjective": 8650 }
           ]
         },
         {
@@ -24582,9 +24609,21 @@
           "choices": [
             { "reply": 65546, "startsQuest": 527, "params": [[34, 527]] }
           ]
+        },
+        {
+          "message": 48069,
+          "choices": [
+            { "reply": 63998, "next": 48070 }
+          ]
+        },
+        {
+          "message": 48070,
+          "choices": [
+            { "reply": 63997, "quest": 1521, "completes": 8650, "params": [[30, 8650]] }
+          ]
         }
       ],
-      "why": "Vayinklán in Bonta's library [-35,-57]: Dofus pour les noobs, «La Geste de Ratagnan», «Parlez à Marcelle Rouste pour en apprendre plus sur l'art de l'escrime bontarienne», the good blades, the year 290 and the heirs on the Promontory of the Skies (18423). Without D'Arratagnan beside you, «Darte cuenta de que D'Arratagnan no está contigo». And «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (63989) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 49090 says Gracia Malsana borrowed it, «¿Dónde está?» (65547) gets 49091 (upstairs), and «Darle las gracias al bibliotecario» (65546) starts «No dejes que tus hijos vaguen» (527), whose giver he is in the catalogue."
+      "why": "Vayinklán in Bonta's library [-35,-57]: Dofus pour les noobs, «La Geste de Ratagnan», «Parlez à Marcelle Rouste pour en apprendre plus sur l'art de l'escrime bontarienne», the good blades, the year 290 and the heirs on the Promontory of the Skies (18423). Without D'Arratagnan beside you, «Darte cuenta de que D'Arratagnan no está contigo». And «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (63989) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 49090 says Gracia Malsana borrowed it, «¿Dónde está?» (65547) gets 49091 (upstairs), and «Darle las gracias al bibliotecario» (65546) starts «No dejes que tus hijos vaguen» (527), whose giver he is in the catalogue. «Le livre des Taures», Bonta's library [-35,-57] («Parlez à Marcelle Rouste ... celle-ci n'a pas ce livre et de plus n'a aucune idée d'où vous pourriez en trouver un»): 63999, 48069, 63998, 48070, and «Adiós» (63997) is objective 8650."
     },
     {
       "npc": 6629,
@@ -30427,15 +30466,28 @@
         {
           "message": 678,
           "choices": [
+            { "reply": 21814, "next": 18201, "quest": 1521, "beforeObjective": 8653 },
             { "reply": 21812 }
           ]
         },
         {
           "message": 10212,
           "choices": []
+        },
+        {
+          "message": 18201,
+          "choices": [
+            { "reply": 21813, "next": 18202 }
+          ]
+        },
+        {
+          "message": 18202,
+          "choices": [
+            { "reply": 21812, "quest": 1521, "completes": 8653, "params": [[30, 8653]] }
+          ]
         }
       ],
-      "why": "Harry Stóteles and «El hijo pródigo»: «Permanecer impasible y enseñar el documento que habla de la juventud de Gúltar» (68372) gets his 51022 (an old work by H. Manbillin, which the library no longer has), «Vaya, me habría gustado consultarlo» (68374) his 51023 (the book was lent to a great temple master long ago), and «Ir a investigar a los templos de la ciudad de Amakna» (68373) closes «Ve a ver a Harry Stóteles». His other lines belong to other quests and come with them. The four replies of his first line are the ones Dofus pour les noobs' picture of «Le divin enfant» shows: «Gritar» (319, his 403 «¡¡¡Tssssssssst!!!», and «Perdón ya me callo»), «Susurrar» (320, his 678 «*suspira* ¿Qué quieres?», and «Adiós»), the document, and «Informarte sobre la ciudad de Amakna» (11038, his 10212 on the village's temples)."
+      "why": "Harry Stóteles and «El hijo pródigo»: «Permanecer impasible y enseñar el documento que habla de la juventud de Gúltar» (68372) gets his 51022 (an old work by H. Manbillin, which the library no longer has), «Vaya, me habría gustado consultarlo» (68374) his 51023 (the book was lent to a great temple master long ago), and «Ir a investigar a los templos de la ciudad de Amakna» (68373) closes «Ve a ver a Harry Stóteles». His other lines belong to other quests and come with them. The four replies of his first line are the ones Dofus pour les noobs' picture of «Le divin enfant» shows: «Gritar» (319, his 403 «¡¡¡Tssssssssst!!!», and «Perdón ya me callo»), «Susurrar» (320, his 678 «*suspira* ¿Qué quieres?», and «Adiós»), the document, and «Informarte sobre la ciudad de Amakna» (11038, his 10212 on the village's temples). «Le livre des Taures», after «Susurrar» (320, 678), Amakna's library [4,1] («Harry vous apprend alors que l'exemplaire du Livre des Taures qu'il avait à disparu il y a maintenant plusieurs années et il vous conseil d'aller voir à Astrub»): 21814, 18201, 21813, 18202, and «Adiós» (21812) is objective 8653."
     },
     {
       "npc": 6383,
@@ -30446,7 +30498,8 @@
           "message": 47368,
           "choices": [
             { "reply": 62873, "next": 47369, "quest": 525, "afterObjective": 3593, "completesAll": [3594, 3618], "params": [[30, 3618]] },
-            { "reply": 62873, "next": 47369, "afterQuest": 525, "criterion": "Qa!526&Qf!526&Qa!527&Qf!527" }
+            { "reply": 62873, "next": 47369, "afterQuest": 525, "criterion": "Qa!526&Qf!526&Qa!527&Qf!527" },
+            { "reply": 62880, "next": 47376, "quest": 1521, "beforeObjective": 8633 }
           ]
         },
         {
@@ -30460,9 +30513,21 @@
           "choices": [
             { "reply": 67161, "startsQuest": 526, "params": [[34, 526]] }
           ]
+        },
+        {
+          "message": 47376,
+          "choices": [
+            { "reply": 62879, "next": 47377 }
+          ]
+        },
+        {
+          "message": 47377,
+          "choices": [
+            { "reply": 62878, "quest": 1521, "completes": 8633, "params": [[30, 8633]] }
+          ]
         }
       ],
-      "why": "Fulgencio Ramiro, the librarian of Brakmar, and the end of «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (62873) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 47369 says Letalina Sigisbul has the copy, «¿Dónde está?» (62871) gets 47370 (at the militia), and «Ir a la milicia» (67161) starts «No dejes que tus hijos vaguen» (526), whose giver he is in the catalogue."
+      "why": "Fulgencio Ramiro, the librarian of Brakmar, and the end of «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (62873) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 47369 says Letalina Sigisbul has the copy, «¿Dónde está?» (62871) gets 47370 (at the militia), and «Ir a la milicia» (67161) starts «No dejes que tus hijos vaguen» (526), whose giver he is in the catalogue. «Le livre des Taures», Brakmar's library [-24,39] (Dofus pour les noobs: «Parlez à Jean-Sol Patre du livre des Taures. Celui-ci vous affirme qu'il l'a dans sa bibliothèque mais qu'une personne le lui a emprunté»): 62880, 47376, 62879, 47377, and «Adiós» (62878) is objective 8633."
     },
     {
       "npc": 1266,
@@ -34691,6 +34756,7 @@
           "choices": [
             { "reply": 13517, "next": 12023 },
             { "reply": 29571, "next": 24620, "quest": 1769, "beforeObjective": 11351, "criterion": "Qo>11318&Qo>11319&Qo>11320&Qo>11321" },
+            { "reply": 21804, "next": 18193, "quest": 1521, "beforeObjective": 8652 },
             { "reply": 13518 }
           ]
         },
@@ -34723,9 +34789,21 @@
           "choices": [
             { "reply": 29960, "quest": 1769, "completes": 11351, "params": [[30, 11351]] }
           ]
+        },
+        {
+          "message": 18193,
+          "choices": [
+            { "reply": 21803, "next": 18194 }
+          ]
+        },
+        {
+          "message": 18194,
+          "choices": [
+            { "reply": 21802, "quest": 1521, "completes": 8652, "params": [[30, 8652]] }
+          ]
         }
       ],
-      "why": "Doctor Bu, archivist of Sufokia [20,25]: doctor in literature and more (11932), «Seguir escuchando», time fascinates him (12023), «Hasta luego». «Lo que el tiempo se llevó» (1769) as the screenshots of Dofus pour les noobs, «Au temps l'emportent les landes» show it, once the four skeletons are searched: «¿Puedes fechar los objetos…?» (24620), «Impacientarte» (24621), «¿Puedes describir los objetos?», the chain of 636, the ball of 436, the abacus of 536, the score nobody can date (24622), «Explicarle el problema de Juan Luis Erra y de los baglitchs», several epochs a hundred years apart (24977), «Gracias por la información. Voy a ir a ver a Juan Luis.» (11351)."
+      "why": "Doctor Bu, archivist of Sufokia [20,25]: doctor in literature and more (11932), «Seguir escuchando», time fascinates him (12023), «Hasta luego». «Lo que el tiempo se llevó» (1769) as the screenshots of Dofus pour les noobs, «Au temps l'emportent les landes» show it, once the four skeletons are searched: «¿Puedes fechar los objetos…?» (24620), «Impacientarte» (24621), «¿Puedes describir los objetos?», the chain of 636, the ball of 436, the abacus of 536, the score nobody can date (24622), «Explicarle el problema de Juan Luis Erra y de los baglitchs», several epochs a hundred years apart (24977), «Gracias por la información. Voy a ir a ver a Juan Luis.» (11351). «Le livre des Taures», Sufokia's library [20,25] («Parlez cette fois-ci au Docteur Hou ... vous apprend que vous n'êtes pas le seul sur sa piste»): 21804, 18193, 21803, 18194, and «Adiós» (21802) is objective 8652."
     },
     {
       "npc": 2802,
@@ -36912,7 +36990,11 @@
             { "reply": 19945, "next": 16748, "quest": 1463, "beforeObjective": 8113, "takesAll": [14969, 14970, 14971, 14972, 14973, 14974], "completes": 8113 },
             { "reply": 19948, "next": 16749, "quest": 1463, "afterObjective": 8114, "beforeObjective": 8115, "completes": 8115 },
             { "reply": 19949, "quest": 1463, "afterObjective": 8115, "beforeObjective": 8116, "teleport": 221249538 },
-            { "reply": 19957, "next": 16753, "quest": 1463, "afterObjective": 8119, "beforeObjective": 8120, "holds": 14959, "completes": 8120 }
+            { "reply": 19957, "next": 16753, "quest": 1463, "afterObjective": 8119, "beforeObjective": 8120, "holds": 14959, "completes": 8120 },
+            { "reply": 21759, "next": 18151, "criterion": "Qf=1462&PL>89", "beforeQuest": 1521 },
+            { "reply": 21837, "next": 18221, "quest": 1521, "afterObjective": 8655, "beforeObjective": 8656 },
+            { "reply": 21843, "next": 18223, "quest": 1521, "afterObjective": 8656, "beforeObjective": 8657, "criterion": "PO=15417&PO=15596" },
+            { "reply": 21844, "next": 18226, "criterion": "Qf=1521", "beforeQuest": 1522 }
           ]
         },
         {
@@ -37144,9 +37226,70 @@
             { "reply": 20149, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471, "criterion": "PO=15006|PO=15007" },
             { "reply": 20148 }
           ]
+        },
+        {
+          "message": 18151,
+          "choices": [
+            { "reply": 21758, "next": 18152 }
+          ]
+        },
+        {
+          "message": 18152,
+          "choices": [
+            { "reply": 21757, "next": 18153 }
+          ]
+        },
+        {
+          "message": 18153,
+          "choices": [
+            { "reply": 21756, "startsQuest": 1521, "params": [[34, 1521]] }
+          ]
+        },
+        {
+          "message": 18221,
+          "choices": [
+            { "reply": 21836, "next": 18222 }
+          ]
+        },
+        {
+          "message": 18222,
+          "choices": [
+            { "reply": 21835, "quest": 1521, "completes": 8656, "params": [[30, 8656]] }
+          ]
+        },
+        {
+          "message": 18223,
+          "choices": [
+            { "reply": 21842, "next": 18224, "takesAll": [15417, 15596] }
+          ]
+        },
+        {
+          "message": 18224,
+          "choices": [
+            { "reply": 21841, "next": 18225, "quest": 1521, "completes": 8657, "params": [[30, 8657]], "gives": 15597 }
+          ]
+        },
+        {
+          "message": 18225,
+          "choices": [
+            { "reply": 21840, "startsQuest": 1522, "params": [[34, 1522]] }
+          ]
+        },
+        {
+          "message": 18226,
+          "choices": [
+            { "reply": 21846, "next": 18227, "criterion": "PO!15597", "gives": 15597 },
+            { "reply": 21846, "next": 18227, "criterion": "PO=15597" }
+          ]
+        },
+        {
+          "message": 18227,
+          "choices": [
+            { "reply": 21845, "startsQuest": 1522, "params": [[34, 1522]] }
+          ]
         }
       ],
-      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896). «Draconanthropie» ends with Prysmaradoth's talisman around the character's neck (16890, «te pone el colgante»): 20143 gives it, and «Destination finale» -- whose victory it is the key to (16954) -- gives it again on starting to one who finished the ritual without it."
+      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896). «Draconanthropie» ends with Prysmaradoth's talisman around the character's neck (16890, «te pone el colgante»): 20143 gives it, and «Destination finale» -- whose victory it is the key to (16954) -- gives it again on starting to one who finished the ritual without it. «Le livre des Taures» (Dofus pour les noobs): «Parlez à Mériana du Dofus Pourpre» (21759) from level 90 once «La magicienne des marécages» is done; the Minotoror guards it and a taur sorcerer's grimoire is needed (18152), there are copies in the great libraries (18153). Back from Astrub, «Mencionar al Maestro Cuerbok» (21837) sends the character to Cania and asks for one of his bones (18222). With the book and the bone (21843, 21842) she enchants the bone and hands it over (18224, «Guardar el hueso encantado», which ends the quest), and «Me voy a la Isla del Minotauroro» (21840) starts «Toro de rodeo». Whoever left before that is handed the bone again by «Estoy listo para ir al Laberinto del Minotauroro» (21844, 18226)."
     },
     {
       "npc": 2256,
@@ -39037,6 +39180,32 @@
         }
       ],
       "why": "Meriana, out of the hooded sorceress' cloak (16972, 16973), lets the character take the Dofus (20247). Once it is done she sends him back to the World of Twelve (16903, «Abandonar este lugar»): INFERRED, to the Temple of the Twelve in Astrub, where the portal to Incarnam is."
+    },
+    {
+      "npc": 704,
+      "map": 207622148,
+      "opening": 2926,
+      "lines": [
+        {
+          "message": 2926,
+          "choices": [
+            { "reply": 21800, "next": 18190, "quest": 1521, "beforeObjective": 8651 }
+          ]
+        },
+        {
+          "message": 18190,
+          "choices": [
+            { "reply": 21799, "next": 18191 }
+          ]
+        },
+        {
+          "message": 18191,
+          "choices": [
+            { "reply": 21798, "quest": 1521, "completes": 8651, "params": [[30, 8651]] }
+          ]
+        }
+      ],
+      "why": "Narber Rihen Levihawa, Pandala's librarian: «Buenas, amigo de la cultura» (2926). «Le livre des Taures», Pandala's library [21,-27] («Parlez à Narber Rihen Levihawa ... Narber n'a malheureusement pas le livre ni idée de l'endroit ou il pourrait se trouver»): 21800, 18190, 21799, 18191, and «Adiós» (21798) is objective 8651."
     }
   ]
 }
