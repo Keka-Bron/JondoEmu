@@ -109,7 +109,7 @@ Download it from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/do
 The live game is on 3.6.11.12 and Ankama's launcher only provides the current version, which this
 emulator does not support.
 
-**⬇️ [Dofus 3.6.10.11 — download](https://www.swisstransfer.com/dl/01a13ca0-ff03-7060-b3a6-b847936d1198)**
+**⬇️ [Dofus 3.6.10.11 — download](https://mega.nz/file/EIcmDRaK#lRP1LPKjc1fBLzRHDNWieTxPWNeufdNhE-OYEUTj_f0)**
 
 It is the stock Ankama client. Unpack it as a **`Cliente 3.6.10.11`** folder beside the emulator
 folder, which is where the launcher looks first; anywhere else works if you point **Settings** at
