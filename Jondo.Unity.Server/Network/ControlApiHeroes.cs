@@ -88,9 +88,11 @@ namespace Jondo.Unity.Server.Network
             var me = InTheWorld(account);
             if (me == null) return Mal(409, "world");
             string name = Texto(cuerpo, "name").Trim();
+            // The colours the creation screen chose, c1 to c6, as it sends them itself; the breed's for any not sent.
+            var colors = Enumerable.Range(1, 6)
+                .Select(i => cuerpo.Contains("\"c" + i + "\"") ? Numero(cuerpo, "c" + i) : -1L).ToList();
             var (id, why) = Handlers.CharacterCreationHandler.Make(account, me.ServerId, name, (int)Numero(cuerpo, "breed"),
-                                                                    (int)Numero(cuerpo, "sex"), (int)Numero(cuerpo, "head"),
-                                                                    Enumerable.Repeat(-1L, 6).ToList());
+                                                                    (int)Numero(cuerpo, "sex"), (int)Numero(cuerpo, "head"), colors);
             if (id == 0) return Mal(409, why);
             string connected = Heroes.Connect(me, id);
             Console.WriteLine($"[Heroes] {me.State.CharacterName} makes {name} ({id}) from the window; connected: {connected}.");

@@ -1088,7 +1088,8 @@ namespace Heroes
                 var close = window.header?.rightButton;
                 if (close != null) close.add_Clicked(Do(CloseNativeCreation));
                 _creationWindow = window;
-                BindCreation(tree);
+                // The game's own screen whole when its services can be had; bound by hand else.
+                if (!NativeCreation(tree)) BindCreation(tree);
             }
             catch (Exception ex)
             {
@@ -1098,8 +1099,209 @@ namespace Heroes
             }
         }
 
+        // ─── The game's own CharacterCreation, whole ─────────────────────────────────────
+
+        private static Il2CppCore.UILogic.Auth.CharacterCreation _native;
+        private static Dictionary<Type, object> _services;
+        private static bool _nativeBroken, _nativeHooked;
+
+        /// <summary>
+        /// The services the game's creation screen is built with, found as the entities' one was:
+        /// breadth first from the two the mod has, through the fields the services keep one another
+        /// in -- fields only, a property's getter being code of the game's run blind. Null with what
+        /// is missing logged when any is not reached.
+        /// </summary>
+        private static Dictionary<Type, object> FindServices(Type[] wanted)
+        {
+            var found = new Dictionary<Type, object>();
+            var natives = wanted.ToDictionary(w => w, w => Il2CppType.From(w));
+            var seen = new HashSet<IntPtr>();
+            var queue = new Queue<(IntPtr At, int Depth)>();
+            foreach (var start in new[] { _displayers.Pointer, _entities.Pointer })
+                if (seen.Add(start)) queue.Enqueue((start, 0));
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static
+                        | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+            int visited = 0;
+            while (queue.Count > 0 && visited < 8000 && found.Count < wanted.Length)
+            {
+                var (at, depth) = queue.Dequeue();
+                visited++;
+                Il2CppSystem.Type native;
+                try { native = new Il2CppSystem.Object(at).GetIl2CppType(); }
+                catch { continue; }
+                foreach (var want in wanted)
+                {
+                    if (found.ContainsKey(want) || !natives[want].IsAssignableFrom(native)) continue;
+                    try { found[want] = Activator.CreateInstance(want, at); } catch { }
+                }
+                if (depth >= 6) continue;
+                var managed = ManagedOf(native);
+                if (managed == null || managed.Namespace?.StartsWith("Il2CppSystem") == true || managed.Namespace?.StartsWith("UnityEngine") == true) continue;
+                object real;
+                try { real = Activator.CreateInstance(managed, at); }
+                catch { continue; }
+                foreach (var property in managed.GetProperties(flags))
+                {
+                    var type = property.PropertyType;
+                    if (!typeof(Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase).IsAssignableFrom(type)) continue;
+                    if (type.Namespace?.StartsWith("Il2CppSystem") == true || type.Namespace?.StartsWith("UnityEngine") == true) continue;
+                    if (property.GetIndexParameters().Length > 0 || property.GetMethod == null || property.GetMethod.IsStatic) continue;
+                    if (managed.GetField("NativeFieldInfoPtr_" + property.Name, flags) == null) continue;
+                    try
+                    {
+                        if (property.GetValue(real) is Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase held
+                            && held.Pointer != IntPtr.Zero && seen.Add(held.Pointer))
+                            queue.Enqueue((held.Pointer, depth + 1));
+                    }
+                    catch { }
+                }
+            }
+            var missing = wanted.Where(w => !found.ContainsKey(w)).Select(w => w.Name).ToList();
+            MelonLogger.Msg($"[Heroes] The creation screen's services: {found.Count} of {wanted.Length} found among {visited} object(s)" +
+                            (missing.Count > 0 ? $"; missing {string.Join(", ", missing)}." : "."));
+            return missing.Count > 0 ? null : found;
+        }
+
+        /// <summary>
+        /// The game's own creation screen made on the template's tree, as the character selection
+        /// makes it: everything in it is the game's -- the breeds, the roles, the heads, the colours,
+        /// the attitudes, the spells, the character on his platform. Only its end is the mod's: its
+        /// JOUER makes a hero (OnNativeCreate), and its name's die asks the server (OnNativeName).
+        /// False when it cannot be made: the screen is bound by hand instead.
+        /// </summary>
+        private static bool NativeCreation(VisualElement tree)
+        {
+            if (_nativeBroken || _displayers == null || _entities == null) return false;
+            try
+            {
+                _services ??= FindServices(new[]
+                {
+                    typeof(Il2Cpp.faa), typeof(Il2Cpp.fbz), typeof(Il2Cpp.ewt), typeof(Il2Cpp.fbr), typeof(Il2Cpp.fdj),
+                    typeof(Il2Cpp.exd), typeof(Il2Cpp.fct), typeof(Il2Cpp.fca), typeof(Il2Cpp.eyy),
+                });
+                if (_services == null) { _nativeBroken = true; return false; }
+                HookNative();
+                // A creation from nothing: no field asked or kept, no character to change.
+                var start = new Il2Cpp.cgk(new Il2CppSystem.Collections.Generic.List<Il2Cpp.dsj>(),
+                                           new Il2CppSystem.Collections.Generic.List<Il2Cpp.dsj>(), null, false, false);
+                _native = new Il2CppCore.UILogic.Auth.CharacterCreation(tree,
+                    (Il2Cpp.faa)_services[typeof(Il2Cpp.faa)], _entities, _displayers,
+                    (Il2Cpp.fbz)_services[typeof(Il2Cpp.fbz)], (Il2Cpp.ewt)_services[typeof(Il2Cpp.ewt)],
+                    (Il2Cpp.fbr)_services[typeof(Il2Cpp.fbr)], start, (Il2Cpp.fdj)_services[typeof(Il2Cpp.fdj)],
+                    (Il2Cpp.exd)_services[typeof(Il2Cpp.exd)], (Il2Cpp.fct)_services[typeof(Il2Cpp.fct)],
+                    (Il2Cpp.fca)_services[typeof(Il2Cpp.fca)], (Il2Cpp.eyy)_services[typeof(Il2Cpp.eyy)]);
+                bool ready = _native.m_initialized;
+                if (!ready)
+                {
+                    try { _native.OnEnable(); } catch (Exception ex) { MelonLogger.Warning($"[Heroes] CharacterCreation.OnEnable: {ex.Message}"); }
+                }
+                MelonLogger.Msg($"[Heroes] The game's own creation screen made: initialized {ready} at once, {_native.m_initialized} after enabling; " +
+                                $"breed {_native.m_breedId}, {(_native.m_breeds != null ? _native.m_breeds.Count : -1)} breed(s).");
+                foreach (string away in new[] { "parentChangeServer", "btnLeave" }) Show(UQueryExtensions.Q(tree, away, (string)null), false);
+                var play = UQueryExtensions.Q(tree, "btn_play", (string)null)?.TryCast<Il2CppCore.UILogic.Components.Figma.PlayButton>();
+                if (play != null) play.text = T("create.go");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _nativeBroken = true;
+                _native = null;
+                MelonLogger.Warning($"[Heroes] The game's own creation screen could not be made, bound by hand instead: {ex}");
+                return false;
+            }
+        }
+
+        private static void HookNative()
+        {
+            if (_nativeHooked) return;
+            _nativeHooked = true;
+            var harmony = new HarmonyLib.Harmony("jondo.heroes.creation");
+            var type = typeof(Il2CppCore.UILogic.Auth.CharacterCreation);
+            harmony.Patch(HarmonyLib.AccessTools.Method(type, "CreateCharacter"),
+                          prefix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnNativeCreate))));
+            harmony.Patch(HarmonyLib.AccessTools.Method(type, "RequestNameGeneration"),
+                          prefix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnNativeName))));
+        }
+
+        private static bool IsOurs(Il2CppCore.UILogic.Auth.CharacterCreation screen)
+            => _native != null && screen != null && screen.Pointer == _native.Pointer && _creationWindow != null;
+
+        /// <summary>
+        /// Harmony's prefix on CharacterCreation.CreateCharacter: on the mod's screen the character
+        /// is made a hero by the server (heroes/create) out of what the screen holds -- his name,
+        /// his breed, his sex, his head, his colours --; the selection's own screen goes its way.
+        /// </summary>
+        public static bool OnNativeCreate(Il2CppCore.UILogic.Auth.CharacterCreation __instance)
+        {
+            if (!IsOurs(__instance)) return true;
+            try
+            {
+                if (_cBusy) return false;
+                string name = (__instance.m_name ?? "").Trim();
+                if (name.Length == 0)
+                    name = (UQueryExtensions.Q(_creationWindow, "input_name", (string)null)?.TryCast<Il2CppCore.UILogic.Components.Figma.TextInput>()?.text ?? "").Trim();
+                var ask = new Dictionary<string, object>
+                {
+                    ["name"] = name, ["breed"] = __instance.m_breedId, ["sex"] = __instance.m_gender, ["head"] = (int)__instance.m_head,
+                };
+                var colors = __instance.m_colors;
+                for (int i = 0; colors != null && i < colors.Count && i < 6; i++) ask["c" + (i + 1)] = colors[i];
+                MelonLogger.Msg($"[Heroes] The creation screen asks for {name}: breed {__instance.m_breedId}, sex {__instance.m_gender}, head {__instance.m_head}, " +
+                                $"colours {(colors == null ? "none" : string.Join(",", Enumerable.Range(0, Math.Min(6, colors.Count)).Select(i => colors[i])))}.");
+                if (name.Length == 0) { NativeError(T("create.error.empty")); return false; }
+                _cBusy = true;
+                Task.Run(async () =>
+                {
+                    var (code, body) = await AskAsync("heroes/create", ask);
+                    _toUnity.Enqueue(() =>
+                    {
+                        _cBusy = false;
+                        if (code == 200 && body is JsonElement done)
+                        {
+                            CloseNativeCreation();
+                            Say(T(Bool(done, "connected") ? "create.done" : "create.doneAlone", name), good: true);
+                            _windowKey = null;
+                            Poll();
+                            return;
+                        }
+                        string why = body is JsonElement b ? Str(b, "error") : "";
+                        NativeError(code == 0 ? T("unreachable") : Texts.ContainsKey("create.error." + why) ? T("create.error." + why) : T("error"));
+                    });
+                });
+            }
+            catch (Exception ex) { MelonLogger.Warning($"[Heroes] The creation screen's JOUER: {ex}"); }
+            return false;
+        }
+
+        /// <summary>Harmony's prefix on CharacterCreation.RequestNameGeneration: on the mod's screen the server draws the name.</summary>
+        public static bool OnNativeName(Il2CppCore.UILogic.Auth.CharacterCreation __instance)
+        {
+            if (!IsOurs(__instance)) return true;
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync("heroes/name");
+                _toUnity.Enqueue(() =>
+                {
+                    if (code != 200 || body is not JsonElement b || _creationWindow == null) return;
+                    UQueryExtensions.Q(_creationWindow, "input_name", (string)null)?.TryCast<Il2CppCore.UILogic.Components.Figma.TextInput>()?.SetValue(Str(b, "name"));
+                });
+            });
+            return false;
+        }
+
+        private static void NativeError(string text)
+        {
+            var label = _creationWindow == null ? null : UQueryExtensions.Q(_creationWindow, "textInput_errorMessage", (string)null)?.TryCast<TextElement>();
+            if (label == null) { Say(text); return; }
+            label.text = text;
+            label.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+        }
+
         private static void CloseNativeCreation()
         {
+            // Its hooks let go (OnDisable); not Disable, which is the selection's way back.
+            try { if (_native != null) _native.OnDisable(); } catch { }
+            _native = null;
             try { _creationWindow?.RemoveFromHierarchy(); } catch { }
             _creationWindow = null;
             _cTree = null;
