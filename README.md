@@ -54,12 +54,13 @@ its spells must pass.
 
 | 🖥️ [Launcher](#%EF%B8%8F-launcher) | 🧩 [Server](#-server) | 🛠️ [Jondo Studio](#%EF%B8%8F-jondo-studio) |
 |:---|:---|:---|
-| The player's window, in Avalonia. A team of up to eight accounts, each with its character drawn from the client's own bones. | The emulator itself. Four listeners in one process, one session per socket, and guards that refuse to boot on bad data. | The world editor. Nine sections over the client's data, writing a reviewable diff instead of a 240 MB binary. |
+| The player's window, in Avalonia. A team of up to eight accounts, each with its character drawn from the client's own bones. | The emulator itself. Five listeners in one process, one session per socket, and guards that refuse to boot on bad data. | The world editor. Nine sections over the client's data, writing a reviewable diff instead of a 240 MB binary. |
 
 &nbsp;
 
 > **New here?** [Quick Start](#-quick-start) puts you in the game in four steps ·
-> [What you get](#-what-you-get) is what lands on disk
+> [What you get](#-what-you-get) is what lands on disk ·
+> [Playing together](#playing-together-over-the-network) opens your server to a friend's machine
 
 &nbsp;
 
@@ -152,6 +153,22 @@ The **ES / EN / FR** switch sets the language of the launcher *and* of the game.
 
 **`Jondo Studio.exe`** is the third executable and needs nothing else running. See [Jondo Studio](#%EF%B8%8F-jondo-studio).
 
+### Playing together over the network
+
+One machine runs the server; everybody else starts only the launcher.
+
+**On the server's machine**
+
+1. Change the test account's password or delete the account: anybody who knows it is an administrator.
+2. Open the server to the network: run `setx JONDO_PUBLIC_BIND 1` in a terminal, then start the launcher again. The server's log says *Network binding: the whole network*.
+3. Let the TCP ports **5555, 5556, 6337, 8888 and 15881** in: allow `Jondo Server.exe` when Windows asks. Over the internet, either forward those five ports on the router, or put every machine on one virtual network (Hamachi, ZeroTier, Tailscale…), which needs no forwarding.
+
+**On each other player's machine**
+
+1. The same client, MelonLoader and release zip as in Steps 2 and 3.
+2. Add a line `servidor=<address>` to `%APPDATA%\Jondo\lanzador.cfg`, with the server machine's address: its Hamachi, ZeroTier or Tailscale address, or its public IP when the ports are forwarded.
+3. Start the launcher. It starts no server of its own and takes the client to that address. Make an account on that server with **CREATE ACCOUNT**.
+
 ---
 
 ## 📂 What you get
@@ -204,7 +221,7 @@ or `./"Jondo Server"` from an unpacked server package. Use `--headless` for a te
 Linux sessions without a display select headless mode automatically.
 See [Server desktop and Linux deployment](docs/server-desktop.md) for requirements and publishing.
 
-- ✅ Four listeners in one process — Zaap (`8888`), game (`5555`), chat (`6337`) and HAAPI (`15881`)
+- ✅ Five listeners in one process — HAAPI (`8888`), Zaap (`15881`), game (`5555`), game node (`5556`) and chat (`6337`)
 - ✅ One session per socket: eight clients on one machine never see each other's state
 - ✅ Its own window with the live log, the counters and the connected clients
 - ✅ Startup checks that refuse to boot when the shipped data is inconsistent — see [Tests](#-tests)

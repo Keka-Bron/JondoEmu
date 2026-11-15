@@ -1331,6 +1331,11 @@ namespace Jondo.Unity.Server.Managers
             foreach (int questId in tutorial.Quests)
                 await Achievements.AfterQuestAsync(stream, questId);
 
+            // The mysterious voice's line is still on screen: the client takes it down only on a kld,
+            // and in the Dofusarium it would hang over the new character for good.
+            if (SessionContext.State.OpenDialogueNpcId != 0)
+                await Handlers.NpcHandler.CloseAsync(stream);
+
             if (tutorial.MapId != 0)
                 await Handlers.TeleportHandler.ToMapAsync(stream, tutorial.MapId, tutorial.Cell);
             Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} leaves the tutorial.");

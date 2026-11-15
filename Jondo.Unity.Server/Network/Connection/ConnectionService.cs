@@ -41,8 +41,10 @@ internal sealed class ConnectionService(IConnectionBackend backend)
                 // represented by the protocol but is not implemented by this backend.
                 return new ConnectionAction.Close();
             case SelectServerRequest selection:
-                if (_accountId <= 0 || !backend.IsServerJoinable(selection.ServerId))
-                    return new ConnectionAction.Close();
+                if (_accountId <= 0) return new ConnectionAction.Close();
+                // Refused in words: a bare close sends the client back to its title screen unexplained.
+                if (!backend.IsServerJoinable(selection.ServerId))
+                    return Reply(new SelectServerResponse(new SelectServerError(SelectServerErrorReason.Refused)), close: true);
                 return Reply(new SelectServerResponse(backend.IssueTicket(_accountId, selection.ServerId)), close: true);
             default:
                 return new ConnectionAction.Ignore();

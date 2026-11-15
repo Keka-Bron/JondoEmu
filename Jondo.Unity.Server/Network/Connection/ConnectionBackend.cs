@@ -41,10 +41,11 @@ internal static class ConnectionAccountProjection
     internal static ServerList ServerList(IReadOnlyList<DatabaseManager.DbServer> servers,
         IReadOnlyList<DbCharacter> characters, DateTimeOffset now)
         => new(servers.Select(server => new ServerInformation(
-            // Preserve the existing connection reply's default Online/Accessible values.
-            // DB Status is an HTTP enum (3=online), not the connection enum. HTTP owns
-            // the selection-screen availability, and Joinable is enforced before ticket issuance.
-            new ConnectionServer(server.Id, ConnectionServerStatus.Online, Category(server.Type)),
+            // DB Status is an HTTP enum (3=online), not the connection enum. What the client
+            // draws is this status: a server nobody can join shows as offline, or a new player
+            // picks it -- it is the first of its category -- and «Jugar» throws him back out.
+            new ConnectionServer(server.Id, server.Joinable ? ConnectionServerStatus.Online : ConnectionServerStatus.Offline,
+                Category(server.Type)),
             ServerAccessibility.Accessible,
             characters.Where(c => c.ServerId == server.Id).Select(c => new CharacterSummary(
                 c.Name, Breed(c.Breed), Gender(c.Sex), c.Level,

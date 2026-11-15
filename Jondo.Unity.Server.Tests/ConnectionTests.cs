@@ -48,25 +48,39 @@ public sealed class ConnectionTests
     [Theory]
     [InlineData("invalid-token")]
     [InlineData("selection-first")]
-    [InlineData("closed-server")]
     [InlineData("malformed")]
     public async Task Rejected_connections_close_without_issuing_tickets(string scenario)
     {
         var backend = new Backend();
         await using var socket = await Loopback.Start(backend);
-        if (scenario == "closed-server")
-        {
-            await socket.Stream.WriteAsync(Frame(new ConnectionRequest("a", new IdentificationRequest("", new TokenIdentification("token-a", null)))));
-            await socket.Read();
-        }
         byte[] request = scenario switch
         {
             "invalid-token" => Frame(new ConnectionRequest("a", new IdentificationRequest("", new TokenIdentification("wrong", null)))),
             "selection-first" => Frame(new ConnectionRequest("s", new SelectServerRequest(290))),
-            "closed-server" => Frame(new ConnectionRequest("s", new SelectServerRequest(291))),
             _ => new byte[] { 1, 0xff }
         };
         await socket.Stream.WriteAsync(request);
+        Assert.Equal(0, await socket.Stream.ReadAsync(new byte[1]).AsTask().WaitAsync(Timeout));
+        await socket.Completion.WaitAsync(Timeout);
+        Assert.Equal(0, backend.Tickets);
+    }
+
+    /// <summary>
+    /// A server nobody can join is refused in words before the socket closes: closed bare, the
+    /// client went back to its title screen with nothing said.
+    /// </summary>
+    [Fact]
+    public async Task A_closed_server_is_refused_before_the_socket_closes()
+    {
+        var backend = new Backend();
+        await using var socket = await Loopback.Start(backend);
+        await socket.Stream.WriteAsync(Frame(new ConnectionRequest("a", new IdentificationRequest("", new TokenIdentification("token-a", null)))));
+        await socket.Read();
+        await socket.Stream.WriteAsync(Frame(new ConnectionRequest("s", new SelectServerRequest(291))));
+        var refused = Assert.IsType<ConnectionResponse>(await socket.Read());
+        Assert.Equal("s", refused.CorrelationId);
+        var error = Assert.IsType<SelectServerError>(Assert.IsType<SelectServerResponse>(refused.Content).Result);
+        Assert.Equal(SelectServerErrorReason.Refused, error.Reason);
         Assert.Equal(0, await socket.Stream.ReadAsync(new byte[1]).AsTask().WaitAsync(Timeout));
         await socket.Completion.WaitAsync(Timeout);
         Assert.Equal(0, backend.Tickets);
@@ -150,7 +164,7 @@ public sealed class ConnectionTests
         var servers = Pb.New()
             .Msg(1, Pb.New().Msg(1, Pb.New().Var(1, 290).Var(3, 1))
                 .Msg(3, Pb.New().Str(1, "Dummy").Var(4, 1).Str(5, "2026-08-11T12:00:00.000+02:00")))
-            .Msg(1, Pb.New().Msg(1, Pb.New().Var(1, 291))
+            .Msg(1, Pb.New().Msg(1, Pb.New().Var(1, 291).Var(2, 1))   // not joinable: offline
                 .Msg(3, Pb.New().Str(1, "Other").Var(2, 18).Var(3, 1).Var(4, 201).Str(5, "2026-08-01T12:00:00.000+02:00")));
         for (int category = 0; category < 7; category++) servers.Msg(2, Pb.New().VarIfNotZero(1, category).Var(2, 5));
         byte[] legacy = Pb.New().Msg(2, Pb.New().Str(1, "0").Msg(3, Pb.New().Msg(1,
