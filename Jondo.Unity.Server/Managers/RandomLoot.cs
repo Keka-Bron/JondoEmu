@@ -34,7 +34,8 @@ namespace Jondo.Unity.Server.Managers
     /// to 5, 7, 10 and 11 are equipment, 6 consumables, 12 mounts and pets, category 5 cosmetics,
     /// and type 23 the dofus. A consumable is one the client lets you use and sell, which leaves out
     /// quest papers, obsolete dream items and full soul stones; equipment leaves out the ethereal
-    /// weapons, which break.
+    /// weapons, which break. Nothing kept for somebody in particular drops either: the game
+    /// masters' pieces, the unusable ones and those with a name (ItemCriteria.IsReserved).
     /// </remarks>
     public static class RandomLoot
     {
@@ -147,6 +148,7 @@ namespace Jondo.Unity.Server.Managers
                 command.CommandText = "SELECT it.Id, it.Type, it.Data FROM ItemTemplates it " +
                                       "WHERE EXISTS (SELECT 1 FROM Translations t WHERE t.Key = CAST(it.NameId AS TEXT));";
                 using var reader = command.ExecuteReader();
+                int reserved = 0;
                 while (reader.Read())
                 {
                     int type = reader.GetInt32(1);
@@ -155,8 +157,18 @@ namespace Jondo.Unity.Server.Managers
                     int level = data.RootElement.TryGetProperty("level", out var l) ? l.GetInt32() : 0;
                     int flags = data.RootElement.TryGetProperty("m_flags", out var f) ? f.GetInt32() : 0;
                     var rarity = RarityOf(type, flags);
-                    if (rarity != null) candidates.Add(new Candidate(reader.GetInt32(0), level, rarity.Value));
+                    if (rarity == null) continue;
+
+                    // Nor anybody's in particular: the game masters' pieces, the unusable ones and
+                    // those with a character's name (ItemCriteria.IsReserved). The Anillote del
+                    // Maestro Jambo, level 1 and +300 to every characteristic, dropped to anyone.
+                    string criterion = data.RootElement.TryGetProperty("criterions", out var c)
+                                       && c.ValueKind == JsonValueKind.String ? c.GetString() ?? "" : "";
+                    if (ItemCriteria.IsReserved(criterion)) { reserved++; continue; }
+
+                    candidates.Add(new Candidate(reader.GetInt32(0), level, rarity.Value));
                 }
+                if (reserved > 0) Console.WriteLine($"[RandomLoot] {reserved} items kept for somebody in particular never drop.");
             }
             catch (Exception ex)
             {
@@ -176,6 +188,9 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>For the tests: forget the items read, so the next roll reads them again.</summary>
         internal static void Forget() => _pools = null;
+
+        /// <summary>For the tests: whether an item is among those that can drop.</summary>
+        internal static bool CanDrop(int gid) => Pools.Values.Any(p => p.Any(c => c.Gid == gid));
 
         /// <summary>How many items of each rarity can drop, for the log.</summary>
         public static string Summary()

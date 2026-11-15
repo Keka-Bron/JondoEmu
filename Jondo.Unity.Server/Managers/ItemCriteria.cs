@@ -123,6 +123,17 @@ namespace Jondo.Unity.Server.Managers
 
                 return op switch
                 {
+                    // The account's rights (the client's AccountRightsCriterion): a player's are 0,
+                    // and the game masters' items ask for theirs, «PX=3|PX=5» on the Anillote del
+                    // Maestro Jambo (level 1, +300 to every characteristic and 2 AP). This server's
+                    // administrators hold no such number, so for them it is left unanswered and let
+                    // through; everybody else is 0 and does not wear them.
+                    "PX" => IsAdministrator() ? null : 0,
+
+                    // «BI=1», an unusable item (the client's UnusableItemCriterion, never met): the
+                    // Amuleto de Jiva, «PN~Silaisie&BI=1», was one person's and nobody else's.
+                    "BI" => 0,
+
                     // Every account is subscribed here: its end date is a year away (Subscription).
                     "PZ" => 1,
 
@@ -147,6 +158,36 @@ namespace Jondo.Unity.Server.Managers
                 "POE" => Equipment.HowManyWorn((int)key),
                 _ => Character.Count(op, key, flag),
             };
+
+            public bool? Text(string op, char comparison, string value)
+            {
+                switch (op)
+                {
+                    // «PX=A»: an administrator, the way «(Sc=968&SG=08&Sd>18&Sd<27)|PX=A» lets the
+                    // game masters wear the old John's hat out of its week.
+                    case "PX" when value == "A":
+                        return comparison == '!' ? !IsAdministrator() : IsAdministrator();
+
+                    // «PN~Silaisie»: the character's name, case aside.
+                    case "PN":
+                        bool same = string.Equals(S.CharacterName, value, System.StringComparison.OrdinalIgnoreCase);
+                        return comparison == '!' ? !same : same;
+
+                    default:
+                        return null;
+                }
+            }
+
+            private static bool IsAdministrator() => AdminSpells.Para(SessionContext.Current.AccountId);
         }
+
+        /// <summary>
+        /// Whether a criterion keeps an item for somebody in particular: the account's rights
+        /// (<c>PX</c>, the game masters' pieces), an unusable one (<c>BI</c>) or a character's name
+        /// (<c>PN</c>). Such an item is nobody's to find: the random loot never drops it, and a
+        /// character who cannot meet it has it taken off on entering the world.
+        /// </summary>
+        public static bool IsReserved(string criterion)
+            => !string.IsNullOrEmpty(criterion) && System.Text.RegularExpressions.Regex.IsMatch(criterion, @"(^|[&|(])(PX|BI|PN)[=!<>~]");
     }
 }

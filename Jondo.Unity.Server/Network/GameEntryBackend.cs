@@ -58,6 +58,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         Managers.Quests.LoadFrom(character.Id);
         Managers.Achievements.LoadFrom(character.Id);
         Managers.Emotes.LoadFrom(character.Id);
+        Managers.Equipment.TakeOffReserved();
         session.State.ElementsUsed = DatabaseManager.LoadElementsUsed(character.Id);
     }
 

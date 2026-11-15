@@ -187,6 +187,18 @@ namespace Jondo.Unity.Server.Handlers
                             Pb.New().Var(1, uid).Var(2, loSuyo!.Position).Build()));
                     return false;
                 }
+
+                // Nor what its criterion does not allow: the game masters' pieces («PX=3|PX=5»),
+                // an alignment's («Ps=1&Pa>20»), a class's («PG=3»), one sex's («PS=0»). Only the
+                // level was asked, so a level 5 player wore the Anillote del Maestro Jambo, +300 to
+                // every characteristic, as soon as the random loot dropped it. He is told why, as
+                // when he uses an item he may not (ItemCriteria.RefusalOf), and it goes back.
+                if (loSuyo != null && !await ItemUseHandler.CriterionHoldsAsync(stream, loSuyo))
+                {
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, loSuyo.Position).Build()));
+                    return false;
+                }
             }
 
             // One of a stack: a slot holds one, and the iuk asks for one (its f1). Moving the stack

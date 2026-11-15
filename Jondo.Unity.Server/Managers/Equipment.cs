@@ -476,6 +476,31 @@ namespace Jondo.Unity.Server.Managers
             => Network.TaxCollectorProtocol.SlotOfType.ContainsKey(Forgemagic.TemplateOf(template)?.Type ?? 0);
 
         /// <summary>A tax collector's piece worn by the character goes back to the bag, out of the worn cache.</summary>
+        /// <summary>
+        /// What the character wears but may not, among the items kept for somebody in particular
+        /// (ItemCriteria.IsReserved): back to the bag, on entering the world, once his quests and
+        /// achievements are read. A game master's piece the random loot dropped before it stopped
+        /// doing so, worn by a player, stops counting here. Other criteria are asked when putting
+        /// on, not again: a character keeps what he once could wear.
+        /// </summary>
+        public static List<Item> TakeOffReserved()
+        {
+            var moved = Items.Values.Where(i => IsWorn(i.Position)).Where(i =>
+            {
+                string criterion = DatabaseManager.GetItemTemplateCriterion(i.Template);
+                return ItemCriteria.IsReserved(criterion) && !ItemCriteria.Holds(criterion);
+            }).ToList();
+            foreach (var item in moved)
+            {
+                Move(item.Uid, Bag);
+                DatabaseManager.SaveItemPosition(item.Uid, Bag, SessionContext.State.CharacterId);
+                RememberWorn(item.Uid, Bag, (string?)null);
+                Console.WriteLine($"[Equipment] {SessionContext.State.CharacterName} may not wear item {item.Uid} " +
+                                  $"(template {item.Template}); back to the bag.");
+            }
+            return moved;
+        }
+
         private static List<Item> RepairTaxCollectorPieces()
         {
             var moved = Items.Values.Where(i => IsWorn(i.Position) && IsTaxCollectorPiece(i.Template)).ToList();

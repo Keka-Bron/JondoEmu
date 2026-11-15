@@ -98,6 +98,20 @@ namespace Jondo.Unity.Tests.Economy
             Assert.Contains("25 Legendary", summary);
         }
 
+        /// <summary>
+        /// The game masters' pieces and the named ones are nobody's to find: the Anillote del Maestro
+        /// Jambo (level 1, +300 to every characteristic, 2 AP) dropped to a level 5 player.
+        /// </summary>
+        [Fact]
+        public void Nothing_kept_for_somebody_in_particular_drops()
+        {
+            RandomLoot.Forget();
+            const int JambosRing = 9031, MightyCombatCat = 6894, SmallCombatCat = 6895, JivasAmulet = 2155;
+            foreach (int gid in new[] { JambosRing, MightyCombatCat, SmallCombatCat, JivasAmulet })
+                Assert.False(RandomLoot.CanDrop(gid), $"item {gid} can drop");
+            Assert.True(RandomLoot.CanDrop(629));   // Sombrero Puntiagudo, an ordinary hat
+        }
+
         [Fact]
         public void Nothing_drops_at_no_chance_and_two_to_five_at_certainty()
         {

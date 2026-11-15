@@ -68,6 +68,14 @@ namespace Jondo.Unity.World.Quests
         /// its dungeon" — and is empty otherwise. Null when the facts do not know it.
         /// </remarks>
         long? Count(string op, long key, string flag) => null;
+
+        /// <summary>
+        /// A term whose value is a word rather than a number: <c>PX=A</c>, the account's
+        /// administrator rights, and <c>PN~Silaisie</c>, the character's name, which only some
+        /// items carry. <paramref name="comparison"/> is the one written, <c>~</c> included (the
+        /// client's equal ignoring case). Null when the facts do not know it.
+        /// </summary>
+        bool? Text(string op, char comparison, string value) => null;
     }
 
     /// <summary>One term of a condition: <c>Ef&gt;3567,0</c> is Ef, '&gt;', ["3567", "0"].</summary>
@@ -237,7 +245,7 @@ namespace Jondo.Unity.World.Quests
             while (at + 2 < criterion.Length)
             {
                 if (!char.IsLetter(criterion[at]) || !char.IsLetter(criterion[at + 1])
-                    || criterion[at + 2] is not ('=' or '!' or '>' or '<' or 'E'))
+                    || criterion[at + 2] is not ('=' or '!' or '>' or '<' or 'E' or '~'))
                 {
                     at++;
                     continue;
@@ -249,7 +257,7 @@ namespace Jondo.Unity.World.Quests
 
                 int start = at;
                 while (at < criterion.Length && criterion[at] is not ('&' or '|' or '(' or ')')) at++;
-                terms.Add(new CriterionTerm(op, comparison == 'E' ? '=' : comparison,
+                terms.Add(new CriterionTerm(op, comparison is 'E' or '~' ? '=' : comparison,
                                             criterion.Substring(start, at - start).Split(',')));
             }
 
@@ -354,7 +362,11 @@ namespace Jondo.Unity.World.Quests
                 // — POE14271 and POE11563 — where every other PO term uses =, ! or >. It is
                 // Ankama's typo, not a fifth comparison, and it is accepted here only so that two
                 // conditions are not thrown away over it. PO is not understood anyway.
-                if (comparison is not ('=' or '!' or '>' or '<' or 'E'))
+                //
+                // And ~, the client's equal ignoring case, which only items carry: five of them,
+                // all «PN~» and a character's name, «PN~Silaisie&BI=1» on the Amuleto de Jiva.
+                // Not read, it broke the whole condition, and a broken condition is let through.
+                if (comparison is not ('=' or '!' or '>' or '<' or 'E' or '~'))
                 {
                     throw new FormatException("bad comparison");
                 }
@@ -393,7 +405,7 @@ namespace Jondo.Unity.World.Quests
                     throw new FormatException($"{op} with a value that is not a number");
                 }
 
-                return Judge(op, comparison, value);
+                return Judge(op, comparison == '~' ? '=' : comparison, value);
             }
 
             /// <summary>
@@ -414,7 +426,11 @@ namespace Jondo.Unity.World.Quests
                 bool worn = comparison == 'E';
                 if (worn) comparison = '=';
                 if (worn && op == "PO") op = "POE";
-                if (!long.TryParse(values[0], out long first)) return null;
+
+                // A word for a value -- «PX=A», «PN~Silaisie» -- is the facts' to read as it is.
+                if (!long.TryParse(values[0], out long first))
+                    return values.Count == 1 ? _facts.Text(op, comparison, values[0]) : null;
+                if (comparison == '~') comparison = '=';
 
                 // DD>7,31582: more than seven days since item 31582 was received -- the days first,
                 // the item second, the other way round from every other OP>key,n. The facts answer
