@@ -141,9 +141,6 @@ namespace Heroes
             ["error.off"] = L("El servidor no tiene activado el modo Héroe.", "The server has the hero mode off.", "Le serveur n'a pas activé le mode Héros."),
             ["error.none"] = L("No se puede desconectar ahora.", "It cannot be disconnected now.", "Impossible de le déconnecter maintenant."),
             ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
-            ["auto"] = L("AUTO", "AUTO", "AUTO"),
-            ["loot"] = L("BOTÍN", "LOOT", "BUTIN"),
-            ["play"] = L("JUGAR", "PLAY", "JOUER"),
             ["menu"] = L("Abre una vez el menú (Esc) y vuelve a probar.", "Open the menu once (Esc) and try again.",
                          "Ouvre une fois le menu (Échap) et réessaie."),
         };
@@ -466,7 +463,17 @@ namespace Heroes
                 // own children. The button goes into the last row that holds slots, after them.
                 VisualElement row = null;
                 LastRowOfSlots(grid, ref row);
-                if (row == null) return;
+                if (row == null)
+                {
+                    if (!_toldTree && grid.childCount > 0)
+                    {
+                        _toldTree = true;
+                        var tree = new System.Text.StringBuilder();
+                        Describe(grid, 0, tree);
+                        MelonLogger.Msg($"[Heroes] MENUS grid, no row of buttons found in it:\n{tree}");
+                    }
+                    return;
+                }
                 VisualElement model = row[row.childCount - 1];
                 float w = model.resolvedStyle.width, h = model.resolvedStyle.height;
                 if (float.IsNaN(w) || w <= 0) w = 32f;
@@ -501,19 +508,50 @@ namespace Heroes
             }
         }
 
-        /// <summary>The last element under <paramref name="element"/> whose children are the client's slots.</summary>
+        private static bool _toldTree;
+
+        /// <summary>
+        /// The last element under <paramref name="element"/> that holds a row of buttons: the
+        /// client's slots, or else three or more children of one kind and one size.
+        /// </summary>
         private static void LastRowOfSlots(VisualElement element, ref VisualElement row)
         {
+            if (IsRow(element)) row = element;
             for (int i = 0; i < element.childCount; i++)
             {
                 var child = element[i];
-                if (child.TryCast<Il2CppCore.UILogic.Components.Slots.Slot>() != null)
-                {
-                    row = element;
-                    continue;
-                }
+                if (child.name == "JondoHeroesMenuButton") continue;
                 LastRowOfSlots(child, ref row);
             }
+        }
+
+        private static bool IsRow(VisualElement element)
+        {
+            int count = 0;
+            string kind = null;
+            float width = -1f;
+            for (int i = 0; i < element.childCount; i++)
+            {
+                var child = element[i];
+                if (child.name == "JondoHeroesMenuButton") continue;
+                if (child.TryCast<Il2CppCore.UILogic.Components.Slots.Slot>() != null) return true;
+                string its = child.GetIl2CppType().Name;
+                float w = child.resolvedStyle.width;
+                if (kind == null) { kind = its; width = w; }
+                else if (its != kind || Math.Abs(w - width) > 1f) return false;
+                count++;
+            }
+            // Side by side, not layers of one button piled up: the row is as wide as all of them.
+            return count >= 3 && width > 8f && width < 120f && element.resolvedStyle.width >= width * count * 0.9f;
+        }
+
+        private static void Describe(VisualElement element, int depth, System.Text.StringBuilder into)
+        {
+            if (depth > 6 || into.Length > 6000) return;
+            into.Append(new string(' ', depth * 2)).Append(element.GetIl2CppType().Name).Append(" «").Append(element.name)
+                .Append("» ").Append(element.childCount).Append(" child(ren) ")
+                .Append(element.resolvedStyle.width).Append('x').Append(element.resolvedStyle.height).Append('\n');
+            for (int i = 0; i < element.childCount && i < 4; i++) Describe(element[i], depth + 1, into);
         }
 
         /// <summary>
@@ -703,13 +741,13 @@ namespace Heroes
             if (!master)
             {
                 bool auto = Bool(who, "autoPass");
-                tools.Add(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), T("auto"), auto));
+                tools.Add(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), Glyph(0), auto));
             }
-            tools.Add(Toggle(Do(() => Act("heroes/loot", id)), T("loot"), lootTo == id));
+            tools.Add(Toggle(Do(() => Act("heroes/loot", id)), Glyph(1), lootTo == id));
             if (!master && !Bool(who, "inFight"))
             {
                 string name = Str(who, "name");
-                tools.Add(Toggle(Do(() => TakeInHand(name)), T("play"), false));
+                tools.Add(Toggle(Do(() => TakeInHand(name)), Glyph(2), false));
             }
             row.Add(tools);
             return row;
@@ -719,7 +757,7 @@ namespace Heroes
 
         /// <summary>The client's main menu, kept as it comes up: its «change character» is what takes a hero in hand.</summary>
         private static Il2CppCore.UILogic.GameUICore.MainMenu _mainMenu;
-        private static bool _menuWatched;
+        private static bool _menuWatched, _toldNames;
 
         /// <summary>
         /// Plays a hero from here on: the client changes to his character through its own main
@@ -737,14 +775,26 @@ namespace Heroes
             try
             {
                 _mainMenu.InitCharactersList();
-                if (_mainMenu.m_charsNames == null || !_mainMenu.m_charsNames.Contains(name))
+                // The dropdown's entries carry more than the name -- its level, its server --: the
+                // one that holds it is the one to hand back.
+                var names = new List<string>();
+                var list = _mainMenu.m_charsNames;
+                for (int i = 0; list != null && i < list.Count; i++) names.Add(list[i] ?? "");
+                if (!_toldNames)
+                {
+                    _toldNames = true;
+                    MelonLogger.Msg($"[Heroes] The main menu's characters: {string.Join(" | ", names)}");
+                }
+                string entry = names.FirstOrDefault(n => n == name)
+                               ?? names.FirstOrDefault(n => n.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0);
+                if (entry == null)
                 {
                     MelonLogger.Warning($"[Heroes] {name} is not in the main menu's characters.");
                     return;
                 }
-                _mainMenu.OnCharacterSelection(name);
+                _mainMenu.OnCharacterSelection(entry);
                 _mainMenu.OnConfirmCharacterSelection();
-                MelonLogger.Msg($"[Heroes] Taking {name} in hand.");
+                MelonLogger.Msg($"[Heroes] Taking {name} in hand («{entry}»).");
             }
             catch (Exception ex)
             {
@@ -777,21 +827,124 @@ namespace Heroes
             if (__instance != null) _mainMenu = __instance;
         }
 
-        private static VisualElement Toggle(Il2CppSystem.Action click, string text, bool on)
+        private static VisualElement Toggle(Il2CppSystem.Action click, UnityEngine.Texture2D glyph, bool on)
         {
             var button = new VisualElement();
-            button.style.height = new StyleLength(22f);
+            button.style.height = new StyleLength(24f);
             button.style.marginTop = button.style.marginBottom = new StyleLength(2f);
-            button.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
             button.style.backgroundColor = new StyleColor(on ? new UnityEngine.Color(0.45f, 0.62f, 0.12f, 1f) : new UnityEngine.Color(0.28f, 0.28f, 0.40f, 1f));
             Round(button, 3f);
-            var label = Label(text, 9f, true);
-            label.style.unityTextAlign = new StyleEnum<UnityEngine.TextAnchor>(UnityEngine.TextAnchor.MiddleCenter);
-            label.style.marginBottom = new StyleLength(0f);
-            label.style.color = new StyleColor(on ? UnityEngine.Color.white : new UnityEngine.Color(0.75f, 0.75f, 0.85f, 1f));
-            button.Add(label);
+            var picture = new VisualElement();
+            picture.pickingMode = PickingMode.Ignore;
+            picture.style.flexGrow = new StyleFloat(1f);
+            picture.style.marginTop = picture.style.marginBottom = new StyleLength(2f);
+            picture.style.backgroundImage = new StyleBackground(glyph);
+            picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+            if (!on) picture.style.opacity = new StyleFloat(0.75f);
+            button.Add(picture);
             button.AddManipulator(new Clickable(click).Cast<IManipulator>());
             return button;
+        }
+
+        // ─── The panel's glyphs: a sword, a sack, a «play» ───────────────────────────────
+
+        private static readonly UnityEngine.Texture2D[] _glyphs = new UnityEngine.Texture2D[3];
+
+        /// <summary>
+        /// A glyph of the group panel, drawn here white with a dark edge: 0 the automatic pass (a
+        /// sword), 1 the loot recipient (a tied sack), 2 taking him in hand (a «play»).
+        /// </summary>
+        private static UnityEngine.Texture2D Glyph(int which)
+        {
+            if (_glyphs[which] != null) return _glyphs[which];
+            const int size = 32;
+            var edge = new UnityEngine.Color(0.16f, 0.09f, 0.05f, 1f);
+            var texture = new UnityEngine.Texture2D(size, size, UnityEngine.TextureFormat.RGBA32, false);
+            for (int py = 0; py < size; py++)
+                for (int px = 0; px < size; px++)
+                {
+                    float r = 0, g = 0, b = 0, a = 0;
+                    for (int sy = 0; sy < 3; sy++)
+                        for (int sx = 0; sx < 3; sx++)
+                        {
+                            float x = px + (sx + 0.5f) / 3f, y = py + (sy + 0.5f) / 3f;
+                            float d = which == 0 ? Sword(x, y) : which == 1 ? Sack(x, y) : Play(x, y);
+                            UnityEngine.Color c;
+                            if (which == 1 && Knot(x, y)) c = edge;
+                            else if (d < -1.1f) c = UnityEngine.Color.white;
+                            else if (d < 0.5f) c = edge;
+                            else continue;
+                            r += c.r; g += c.g; b += c.b; a += 1f;
+                        }
+                    texture.SetPixel(px, size - 1 - py, a > 0 ? new UnityEngine.Color(r / a, g / a, b / a, a / 9f) : new UnityEngine.Color(0, 0, 0, 0));
+                }
+            texture.Apply();
+            texture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
+            texture.hideFlags = UnityEngine.HideFlags.DontUnloadUnusedAsset;
+            return _glyphs[which] = texture;
+        }
+
+        private static float Circle(float x, float y, float cx, float cy, float r)
+            => (float)Math.Sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) - r;
+
+        private static float Capsule(float x, float y, float ax, float ay, float bx, float by, float r)
+        {
+            float px = x - ax, py = y - ay, dx = bx - ax, dy = by - ay;
+            float h = Math.Clamp((px * dx + py * dy) / (dx * dx + dy * dy), 0f, 1f);
+            float qx = px - dx * h, qy = py - dy * h;
+            return (float)Math.Sqrt(qx * qx + qy * qy) - r;
+        }
+
+        private static float Ellipse(float x, float y, float cx, float cy, float rx, float ry)
+        {
+            float dx = (x - cx) / rx, dy = (y - cy) / ry;
+            return ((float)Math.Sqrt(dx * dx + dy * dy) - 1f) * Math.Min(rx, ry);
+        }
+
+        private static float Box(float x, float y, float cx, float cy, float hw, float hh)
+        {
+            float qx = Math.Abs(x - cx) - hw, qy = Math.Abs(y - cy) - hh;
+            float ox = Math.Max(qx, 0f), oy = Math.Max(qy, 0f);
+            return (float)Math.Sqrt(ox * ox + oy * oy) + Math.Min(Math.Max(qx, qy), 0f);
+        }
+
+        /// <summary>A sword, point up and right: blade, guard, grip and pommel.</summary>
+        private static float Sword(float x, float y)
+        {
+            float d = Capsule(x, y, 11.5f, 20.5f, 25f, 7f, 2.7f);
+            d = Math.Min(d, Capsule(x, y, 6.5f, 16.5f, 15.5f, 25.5f, 2.3f));
+            d = Math.Min(d, Capsule(x, y, 11f, 21f, 6.5f, 25.5f, 2.2f));
+            return Math.Min(d, Circle(x, y, 5.5f, 26.5f, 3f));
+        }
+
+        /// <summary>A purse: a round body, its neck, its mouth flared.</summary>
+        private static float Sack(float x, float y)
+        {
+            float d = Ellipse(x, y, 16f, 21.5f, 10.5f, 8.5f);
+            d = Math.Min(d, Box(x, y, 16f, 12.8f, 3.4f, 2.4f));
+            return Math.Min(d, Ellipse(x, y, 16f, 8.3f, 6.5f, 3.2f));
+        }
+
+        /// <summary>The tie round the purse's neck, in the edge's colour.</summary>
+        private static bool Knot(float x, float y) => Capsule(x, y, 12f, 13.2f, 20f, 13.2f, 1.1f) < 0f;
+
+        /// <summary>A «play» triangle pointing right, its corners rounded.</summary>
+        private static float Play(float x, float y)
+        {
+            float[] vx = { 10f, 10f, 25f }, vy = { 7f, 25f, 16f };
+            float best = float.MaxValue;
+            int positive = 0, negative = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                int j = (i + 1) % 3;
+                float ex = vx[j] - vx[i], ey = vy[j] - vy[i], wx = x - vx[i], wy = y - vy[i];
+                float h = Math.Clamp((wx * ex + wy * ey) / (ex * ex + ey * ey), 0f, 1f);
+                float qx = wx - ex * h, qy = wy - ey * h;
+                best = Math.Min(best, qx * qx + qy * qy);
+                if (ex * wy - ey * wx >= 0) positive++; else negative++;
+            }
+            float d = (float)Math.Sqrt(best);
+            return (positive == 3 || negative == 3 ? -d : d) - 1.2f;
         }
 
         private static VisualElement Tool(Il2CppSystem.Action click, string text)
