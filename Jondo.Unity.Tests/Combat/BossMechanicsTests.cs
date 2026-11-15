@@ -314,5 +314,46 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Contains(outcomes, o => o.Fulmina && o.Sobre == friend);
             Assert.True(count.Buffs.TieneEstado(Invulnerable));
         }
+
+        /// <summary>
+        /// The mutatruz of «Cómo perder la pluma» (3727), off its behaviour spell Cebado (4843):
+        /// invulnerable, 99 of its 100 life gone at the start (1047), +10 vitality on every blow
+        /// (4842), and it blows itself up once it is no longer under 91% -- 1,001 of 1,100 after a
+        /// hundred blows, the guide's «pour le tuer il doit avoir 1000 PV, il explosera alors tout seul».
+        /// </summary>
+        [Fact]
+        public void The_mutatruz_blows_up_after_a_hundred_blows()
+        {
+            const int Mutatruz = 3727, Cebado = 4843, OnEveryBlow = 4842;
+            var fight = new FightInstance(1, 1);
+            var mutatruz = new Fighter
+            {
+                Id = -1, TeamId = 1, CellId = 300, MaxHP = 100, CurrentHP = 100, Level = 120,
+                IsMonster = true, MonsterId = Mutatruz, MaxAP = 9, CurrentAP = 9,
+            };
+            var player = Person(10, 0, 330);
+            fight.AddMonster(mutatruz); fight.AddPlayer(player);
+
+            var start = EffectEngine.Resolver(fight, mutatruz, Cebado, 1, mutatruz, EffectEngine.AlLanzar,
+                                              fight.RoundNumber, celdaApuntada: mutatruz.CellId);
+            Assert.True(mutatruz.Buffs.TieneEstado(Invulnerable));
+            var loss = Assert.Single(start, o => o.VidaQueSeVa > 0);
+            Assert.Equal(99, loss.VidaQueSeVa);
+            mutatruz.LoseLife(loss.VidaQueSeVa, mutatruz.Id);   // what the fight does with it
+            Assert.Equal(1, mutatruz.CurrentHP);
+
+            int blows = 0;
+            while (blows < 200)
+            {
+                blows++;
+                var hit = EffectEngine.Resolver(fight, mutatruz, OnEveryBlow, 1, mutatruz, EffectEngine.AlLanzar,
+                                                fight.RoundNumber, celdaApuntada: mutatruz.CellId);
+                if (hit.Any(o => o.Fulmina && o.Sobre == mutatruz)) break;
+                Assert.True(EffectEngine.LifeUnder(mutatruz, 91), $"still standing at {mutatruz.CurrentHP}/{mutatruz.MaxHP}");
+            }
+            Assert.InRange(blows, 100, 101);
+            Assert.False(EffectEngine.LifeUnder(mutatruz, 91));
+            Assert.True(mutatruz.CurrentHP >= 1000, $"{mutatruz.CurrentHP}/{mutatruz.MaxHP}");
+        }
     }
 }

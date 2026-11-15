@@ -1554,6 +1554,16 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«-N% HP» (9 spells). The die is the PERCENTAGE of the maximum life.</summary>
         private const int QuitaPorcentajeDeVida = 1048;
 
+        /// <summary>«-N PdV» (6 spells): N life gone, a fixed amount, without being a hit.</summary>
+        /// <remarks>
+        /// Measured on the Mutatruz of «Cómo perder la pluma»: 100 of life, its Cebado takes 99
+        /// at the start and every blow it takes gives it +10 vitality, and it blows up when it is
+        /// not under 91% (v91). Dofus pour les noobs: «pour le tuer il doit avoir 1000 PV» --
+        /// 1,001 of 1,100 after a hundred blows is exactly 91%. Taken off the maximum instead, it
+        /// would stand at 1 of 1 and blow up at the first blow.
+        /// </remarks>
+        private const int QuitaVida = 1047;
+
         /// <summary>«Transfers N% of his life» (7 spells).</summary>
         /// <remarks>
         /// The caster gives and the target receives. The die is the percentage of the giver's CURRENT life,
@@ -4335,6 +4345,19 @@ namespace Jondo.Unity.Server.Managers
                     Sobre = quienLanza, Caster = quienLanza, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
                     Glifo = puesto,
+                };
+            }
+
+            if (efecto.EffectId == QuitaVida)
+            {
+                if (sobre == null || !sobre.IsAlive) return null;
+                int cuanto = DelDado(efecto.DiceNum, efecto.DiceSide, efecto.Value);
+                if (cuanto <= 0) return null;
+                return new Outcome
+                {
+                    Sobre = sobre, Caster = quienLanza, Efecto = efecto,
+                    HechizoOrigen = hechizo, NivelOrigen = grado,
+                    VidaQueSeVa = cuanto,
                 };
             }
 

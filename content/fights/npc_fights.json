@@ -1197,6 +1197,12 @@
       ],
       "defeatFree": true,
       "why": "«Le livre des Taures»: the rogues who spied on the character at Oz Dralett's (Dofus pour les noobs: «Au même moment vous vous faites attaquer par des roublards qui vous espionnaient. Le combat s'effectue seul.»): the quest's four rogues of the client's catalogue, Tymador Guy Sante, Buff Hon, Gullo and Tymadora Gria (3754-3757, race 50, levels 100-130), made with the chain's other quest monsters (3740-3759). Lost or won, the quest goes on: the reply already did its objective, and a defeat leaves the character in the room."
-    }
+    },
+    { "npc": 2469, "map": 136446464, "reply": 22176,
+      "monsters": [ { "monster": 3727, "grade": 0 } ],
+      "why": "«Cómo perder la pluma»: Elbert's mutatruz, Lola (3727), whichever way the character answers («Defenderte» or «Huir»). Its starting spell Cebado (4843) makes it invulnerable, takes 99 of its 100 life and, on every blow, gives it +10 vitality and +20 power; it blows up once it is not under 91% (Dofus pour les noobs: «pour le tuer il doit avoir 1000 PV, il explosera alors tout seul»)." },
+    { "npc": 2469, "map": 136446464, "reply": 22177,
+      "monsters": [ { "monster": 3727, "grade": 0 } ],
+      "why": "«Cómo perder la pluma»: Elbert's mutatruz, Lola (3727), whichever way the character answers («Defenderte» or «Huir»). Its starting spell Cebado (4843) makes it invulnerable, takes 99 of its 100 life and, on every blow, gives it +10 vitality and +20 power; it blows up once it is not under 91% (Dofus pour les noobs: «pour le tuer il doit avoir 1000 PV, il explosera alors tout seul»)." }
   ]
 }

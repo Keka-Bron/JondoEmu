@@ -1505,8 +1505,9 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (e.EffectId >= Jondo.Unity.World.Combat.EffectSupport.FirstDamage && e.EffectId <= Jondo.Unity.World.Combat.EffectSupport.LastDamage
                          || lower.Contains("daños") && !lower.Contains("%") && e.Duration == 0 || lower.Contains("robo") && e.Duration == 0
-                         // "-N% PdV" (1048): life that goes at once, whatever duration the level writes.
-                         || e.EffectId == 1048)
+                         // "-N% PdV" (1048) and "-N PdV" (1047): life that goes at once, whatever
+                         // duration the level writes.
+                         || e.EffectId == 1048 || e.EffectId == 1047)
                 {
                     verdict = lostLife.Count > 0 ? "applied" : "missing";
                     observed = lostLife.Count > 0 ? "life lost: " + string.Join(", ", lostLife.Select(f => $"{roleOf(f)} {f.Id} {f.CurrentHP - before[f.Id].CurrentHP}")) + $" (dice {min}-{max})"

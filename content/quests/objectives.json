@@ -5174,6 +5174,68 @@
    "afterObjectives": [8663],
    "showsNpc": 2482,
    "why": "«Lanza un sortilegio de verdad al trono de la antecámara del Minotauroro»: the stone throne is the antechamber's only element (485366, cell 257). Meriana's enchanted bone of Master Cuerbok (15597) is pointed at it and the incantation said (Dofus pour les noobs: «cliquez sur le trône de pierre. Le Minotot fait alors son apparition»), after the Minotoror (8663)."
+  },
+  {
+   "objective": 8666,
+   "quest": 1523,
+   "kind": "order",
+   "afterObjectives": [8635],
+   "anyOrder": true,
+   "why": "«Enséñale una perla de leche dorada a Meriana», after the summary (8635). Dofus pour les noobs shows the tablet to Papolvo before Meriana's ritual and adds «Si vous avez déjà donné les ressources auparavant, passez à l'étape suivante»: the three items, the bag and the tablet go in any order between themselves, and the hunt (8671) after all of them."
+  },
+  {
+   "objective": 8668,
+   "quest": 1523,
+   "kind": "order",
+   "afterObjectives": [8635],
+   "anyOrder": true,
+   "why": "«Enséñale un anillo de Tot a Meriana», after the summary (8635). Dofus pour les noobs shows the tablet to Papolvo before Meriana's ritual and adds «Si vous avez déjà donné les ressources auparavant, passez à l'étape suivante»: the three items, the bag and the tablet go in any order between themselves, and the hunt (8671) after all of them."
+  },
+  {
+   "objective": 8670,
+   "quest": 1523,
+   "kind": "order",
+   "afterObjectives": [8635],
+   "anyOrder": true,
+   "why": "«Enséñale la tabla de Totankama a Papolvo», after the summary (8635). Dofus pour les noobs shows the tablet to Papolvo before Meriana's ritual and adds «Si vous avez déjà donné les ressources auparavant, passez à l'étape suivante»: the three items, the bag and the tablet go in any order between themselves, and the hunt (8671) after all of them."
+  },
+  {
+   "objective": 8669,
+   "anyOrder": true,
+   "quest": 1523,
+   "kind": "click",
+   "elements": [{"map": 134403, "element": 485525}],
+   "afterObjectives": [8666, 8667, 8668],
+   "afterElement": -1523001,
+   "why": "«Protégete contra la maldición de Totankama»: Meriana's ritual shuts the three items in a bag to bury in front of her cabin (18301, «Ve a enterrarlos delante de la casa»); Dofus pour les noobs: «Cliquez sur le rocher afin d'enterrer le sac». The rock is the stone by the flowers before the door (485525, cell 371 of the swamp map outside, 134403), once the bag is had (the ritual's mark). Dofus pour les noobs shows the tablet to Papolvo before Meriana's ritual and adds «Si vous avez déjà donné les ressources auparavant, passez à l'étape suivante»: the three items, the bag and the tablet go in any order between themselves, and the hunt (8671) after all of them."
+  },
+  {
+   "objective": 8667,
+   "quest": 1523,
+   "kind": "reply",
+   "replies": [21918],
+   "afterObjectives": [8635],
+   "anyOrder": true,
+   "requires": [{"item": 15419, "count": 5}],
+   "why": "«Enséñale las 5 dosis de polvo de eternala a Meriana», a free-text objective: done by showing her the items for the protection ritual (21918, «Aquí tienes los objetos necesarios para el ritual de protección») with the five doses of «Regrets d'éternailes» carried (Dofus pour les noobs: «Montrez alors les trois types de ressources à Mériana»)."
+  },
+  {
+   "objective": 8691,
+   "quest": 1527,
+   "kind": "enter",
+   "map": 136446464,
+   "afterObjectives": [8639],
+   "why": "«Entra en el laboratorio secreto», once Janseb has spoken of it (8639): the laboratory under the aviary (Dofus pour les noobs: «Vous trouverez le laboratoire secret en contre-bas du donjon»)."
+  },
+  {
+   "objective": 8697,
+   "quest": 1527,
+   "kind": "click",
+   "elements": [{"map": 99096071, "element": 517514}],
+   "afterObjectives": [8694],
+   "onlyGives": true,
+   "gives": [{"item": 15427, "count": 1}],
+   "why": "The surprising egg (15427): Dofus pour les noobs, «Allez tout d'abord au Chanil d'Amakna en [9,21] afin de récupérer un Oeuf Surprenant. Cliquez sur la cage»; Félix's 18554 sends to Yokashi's lodger near the Amakna kennel. The cage is the kennel's one interactive of a late graphic, 517514 (graphic 34621, cell 244 of the inside, 99096071); it only hands the egg over, the objective being done giving it to Meriana. INFERRED element."
   }
  ]
 }

@@ -4718,6 +4718,37 @@
       "orientation": 1,
       "criterion": "Qo>8664&Qa!1523&Qf!1523",
       "why": "The Minotot before the antechamber's stone throne (485366, cell 257) once the spell of «Taures et détours» has revealed him (8664; «Le Minotot fait alors son apparition», Dofus pour les noobs), until «El tesoro de Totankama» is taken from him."
+    },
+    {
+      "map": 132912128,
+      "npc": 2486,
+      "cell": 287,
+      "orientation": 1,
+      "why": "Janseb in the aviary's way out, by the wagon next to Orno Téligo (300): Dofus pour les noobs talks to him «avant d'en sortir»; Orno's 18539 «Encontrarás a Janseb en la pajarera». INFERRED cell."
+    },
+    {
+      "map": 136446464,
+      "npc": 2469,
+      "cell": 357,
+      "orientation": 7,
+      "criterion": "Qf!1527&Qo<8693",
+      "why": "Elbert Weskarre in the secret laboratory, facing his prisoner; he runs away once his mutatruz is beaten (Félix's 18551 «Weskara ha huido»)."
+    },
+    {
+      "map": 136446464,
+      "npc": 2485,
+      "cell": 344,
+      "orientation": 3,
+      "criterion": "Qf!1527&Qo<8694",
+      "why": "Félix Rodrifuente, Elbert's prisoner in the laboratory, until he has told the character about the three eggs (8694)."
+    },
+    {
+      "map": 122421248,
+      "npc": 2487,
+      "cell": 399,
+      "orientation": 1,
+      "criterion": "Qa=1527&Qo>8697",
+      "why": "Renemil Belok in Meriana's cabin once she has hit the tofu with her pan (8695-8697), until he has told where he goes (8698)."
     }
   ]
 }
