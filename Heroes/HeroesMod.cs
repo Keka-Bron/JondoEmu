@@ -449,7 +449,7 @@ namespace Heroes
 
             // Drawn again only when something in it changed: taken off and put back, the client's
             // displayers stop moving.
-            string key = list.GetRawText() + "|" + _portraits.Count + "|" + (_entities != null);
+            string key = Shape(list) + "|" + _portraits.Count + "|" + (_entities != null);
             if (key == _windowKey && _grid.childCount > 0) return;
             _windowKey = key;
 
@@ -583,8 +583,46 @@ namespace Heroes
             }
         }
 
+        /// <summary>A member's card lines out of the latest list, or null when he is not in it.</summary>
+        private static List<(string Label, string Value)> CardLines(long id)
+        {
+            if (!(_list is JsonElement list) || !list.TryGetProperty("characters", out var all)) return null;
+            foreach (var c in all.EnumerateArray()) if (Long(c, "id") == id) return CardLines(c);
+            return null;
+        }
+
+        private static List<(string Label, string Value)> CardLines(JsonElement who) => new List<(string, string)>
+        {
+            (T("card.class"), ClassOf(Int(who, "breed"))),
+            (T("card.level"), Int(who, "level").ToString()),
+            (T("card.prospecting"), Int(who, "prospecting").ToString()),
+            (T("card.life"), $"{Int(who, "life")} / {Int(who, "maxLife")}"),
+            (T("card.initiative"), Int(who, "initiative").ToString()),
+            (T("card.wisdom"), Int(who, "wisdom").ToString()),
+        };
+
+        /// <summary>Each member's life in the group panel, filled where it stands.</summary>
+        private static readonly Dictionary<long, VisualElement> _fills = new Dictionary<long, VisualElement>();
+
         /// <summary>What the window's cards were last drawn from (Render).</summary>
         private static string _windowKey;
+
+        /// <summary>
+        /// What a drawing of the group depends on, the life and the characteristics left out: they
+        /// change all along, and every drawing again starts the portraits' animations over.
+        /// </summary>
+        private static string Shape(JsonElement list)
+        {
+            var text = new System.Text.StringBuilder();
+            text.Append(Int(list, "max")).Append('|').Append(Bool(list, "inFight")).Append('|').Append(Long(list, "lootTo"))
+                .Append('|').Append(Int(list, "slotsLeft"));
+            if (list.TryGetProperty("characters", out var all))
+                foreach (var c in all.EnumerateArray())
+                    text.Append(';').Append(Long(c, "id")).Append(',').Append(Str(c, "name")).Append(',').Append(Int(c, "level"))
+                        .Append(',').Append(Bool(c, "master")).Append(Bool(c, "hero")).Append(Bool(c, "busy")).Append(Bool(c, "inFight"))
+                        .Append(Bool(c, "autoPass")).Append(',').Append(Str(c, "look"));
+            return text.ToString();
+        }
 
         private static readonly Dictionary<string, Type> _managedTypes = new Dictionary<string, Type>();
 
@@ -837,6 +875,16 @@ namespace Heroes
                 displayer.name = "JondoHeroesLivePortrait";
                 displayer.pickingMode = PickingMode.Ignore;
                 displayer.style.flexGrow = new StyleFloat(1f);
+                if (seated)
+                {
+                    // Seated, the client sizes him to his smaller pose and he comes out bigger than
+                    // the others standing: a smaller box, at the bottom of the picture, as he sits.
+                    displayer.style.flexGrow = new StyleFloat(0f);
+                    displayer.style.width = new StyleLength(new Length(70f, LengthUnit.Percent));
+                    displayer.style.height = new StyleLength(new Length(70f, LengthUnit.Percent));
+                    displayer.style.alignSelf = new StyleEnum<Align>(Align.Center);
+                    displayer.style.marginTop = new StyleLength(StyleKeyword.Auto);
+                }
                 // As the character selection draws its characters, which works with no more than
                 // the displaying service the mod has.
                 try { displayer.Init(_displayers, _entities); }
@@ -893,9 +941,9 @@ namespace Heroes
         {
             try
             {
+                // Its animation carried on where it was: not refreshed, which starts it over.
                 _displayers?.bdvx(displayer.Cast<Il2CppCore.UILogic.EntityDisplay.IEntityDisplayer>());
                 displayer.SetPause(false);
-                displayer.ForceRefresh();
             }
             catch (Exception ex)
             {
@@ -1737,9 +1785,19 @@ namespace Heroes
                 return;
             }
             // Drawn again only when something in it changed: a hint under the pointer stays.
-            string key = string.Join(";", group.Select(g => g.GetRawText())) + lootTo + ":" +
-                         string.Join(",", group.Select(g => _portraits.ContainsKey(Long(g, "id")) ? 1 : 0));
-            if (_panel != null && _panel.panel != null && key == _panelKey) return;
+            // Life left out: it changes all along, and is put in the gauges where they stand.
+            string key = Shape(_list.Value) + ":" +
+                         string.Join(",", group.Select(g => _portraits.ContainsKey(Long(g, "id")) ? 1 : 0)) + "|" + (_entities != null);
+            if (_panel != null && _panel.panel != null && key == _panelKey)
+            {
+                foreach (var who in group)
+                {
+                    if (!_fills.TryGetValue(Long(who, "id"), out var gaugeFill)) continue;
+                    int now = Int(who, "life"), top = Int(who, "maxLife");
+                    gaugeFill.style.height = new StyleLength(new Length(top > 0 ? Math.Clamp(100f * now / top, 0f, 100f) : 0f, LengthUnit.Percent));
+                }
+                return;
+            }
             _panelKey = key;
             HideHint();
             if (_panel == null || _panel.panel == null)
@@ -1906,6 +1964,7 @@ namespace Heroes
             fill.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.92f, 0.45f, 0.45f, 1f));
             Round(fill, 2f);
             gauge.Add(fill);
+            _fills[id] = fill;
             row.Add(gauge);
 
             var picture = new VisualElement();
@@ -1921,17 +1980,9 @@ namespace Heroes
             if (master) picture.Add(Crown());
             // On the portrait, what the game's party window says of a member, as it writes it: the
             // name above, then a label and its value a line.
+            // Read from the latest list as the pointer comes: the panel is not drawn again for life.
             string title = Str(who, "name").ToUpperInvariant();
-            var lines = new List<(string, string)>
-            {
-                (T("card.class"), ClassOf(Int(who, "breed"))),
-                (T("card.level"), Int(who, "level").ToString()),
-                (T("card.prospecting"), Int(who, "prospecting").ToString()),
-                (T("card.life"), $"{life} / {max}"),
-                (T("card.initiative"), Int(who, "initiative").ToString()),
-                (T("card.wisdom"), Int(who, "wisdom").ToString()),
-            };
-            HintCard(picture, title, lines);
+            HintCard(picture, title, () => CardLines(id) ?? CardLines(who));
             row.Add(picture);
 
             var tools = new VisualElement();
@@ -2501,12 +2552,12 @@ namespace Heroes
         /// A member's card, as the game's party window writes it on its portraits: the name in
         /// capitals, pale, then «label : value» a line, the value white and bold.
         /// </summary>
-        private static void HintCard(VisualElement target, string title, List<(string Label, string Value)> lines)
+        private static void HintCard(VisualElement target, string title, Func<List<(string Label, string Value)>> lines)
         {
             try
             {
                 target.RegisterCallback<PointerEnterEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerEnterEvent>>(
-                    new Action<PointerEnterEvent>(_ => ShowCard(target, title, lines))), TrickleDown.NoTrickleDown);
+                    new Action<PointerEnterEvent>(_ => ShowCard(target, title, lines()))), TrickleDown.NoTrickleDown);
                 target.RegisterCallback<PointerLeaveEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerLeaveEvent>>(
                     new Action<PointerLeaveEvent>(_ => HideHint())), TrickleDown.NoTrickleDown);
             }
