@@ -1429,6 +1429,9 @@ namespace Heroes
         private static float _cNextDraw;
         private static bool _toldFraming, _cFramed, _toldFreeze;
 
+        /// <summary>The platform's character's forced size: the template's 0.75 brought down to the native screen's look.</summary>
+        private const float PreviewSize = 0.32f;
+
         /// <summary>
         /// The look given to the platform's displayer, with the native screen's framing -- no
         /// fitting to the box, a scale of 0.6, as Auralis's notes have it -- set after: the giving
@@ -1459,11 +1462,14 @@ namespace Heroes
             try
             {
                 // Not fitted to the box, as the native screen has it: fitted, he was not drawn at all.
+                // His size is the displayer's forced size, not its box's: the box only cuts him off
+                // (shrunk, it cut his head). 0.75 in the template drew him some 2.4 times the
+                // native screen's size in this window; the box is left the client's own.
                 displayer.autosize = false;
-                float feet = displayer.ratioPositioning > 0f && displayer.ratioPositioning < 1f ? displayer.ratioPositioning : 0.7f;
-                displayer.style.transformOrigin = new StyleTransformOrigin(new TransformOrigin(
-                    new Length(50f, LengthUnit.Percent), new Length(feet * 100f, LengthUnit.Percent), 0f));
-                displayer.style.scale = new StyleScale(new Scale(new UnityEngine.Vector3(0.55f, 0.55f, 1f)));
+                displayer.forcedSize = PreviewSize;
+                displayer.style.scale = new StyleScale(StyleKeyword.Null);
+                displayer.style.transformOrigin = new StyleTransformOrigin(StyleKeyword.Null);
+                displayer.ForceRefreshSize();
                 _displayers?.bdvx(displayer.Cast<Il2CppCore.UILogic.EntityDisplay.IEntityDisplayer>());
                 displayer.SetPause(false);
             }
