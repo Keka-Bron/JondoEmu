@@ -21,7 +21,7 @@ namespace Jondo.Unity.Server.Network
     internal static class HeroPresence
     {
         /// <summary>A hero drawn on a map: who, where, facing where, and his account.</summary>
-        internal readonly record struct Shown(DatabaseManager.DbCharacter Character, int Cell, int Facing, long AccountId);
+        internal readonly record struct Shown(DbCharacter Character, int Cell, int Facing, long AccountId);
 
         /// <summary>The heroes standing on a map: those of the people on it, out of any fight.</summary>
         public static IEnumerable<Shown> On(long mapId)

@@ -26,7 +26,7 @@ namespace Jondo.Unity.Server.Network
             var mine = DatabaseManager.GetCharactersByAccountId(account, me.ServerId);
             // Their portraits drawn ahead, while the window is not open yet: the first drawing
             // opens the client's bundles and takes a while.
-            HeroPortraits.Warm(mine.Select(BreedLookTable.Drawable));
+            HeroPortraits.Warm(mine.Select(CharacterLookBuilder.Drawable));
             var characters = mine
                 .Select(c =>
                 {
@@ -109,7 +109,8 @@ namespace Jondo.Unity.Server.Network
             if (breed < 1 || sex is < 0 or > 1) return Mal(400, "breed");
             try
             {
-                return Bien(new { look = Convert.ToBase64String(BreedLookTable.BuildLook(breed, sex, head, onFoot: true)) });
+                return Bien(new { look = Convert.ToBase64String(CharacterLookBuilder.BuildLook(
+                    new DbCharacter { Breed = breed, Sex = sex, HeadId = head }, onFoot: true)) });
             }
             catch (Exception ex)
             {
@@ -126,9 +127,9 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>A character's EntityLook message in base64, on foot; "" when it cannot be made.</summary>
-        private static string LookOf(DatabaseManager.DbCharacter character)
+        private static string LookOf(DbCharacter character)
         {
-            try { return Convert.ToBase64String(BreedLookTable.BuildLook(character, onFoot: true)); }
+            try { return Convert.ToBase64String(CharacterLookBuilder.BuildLook(character, onFoot: true)); }
             catch { return ""; }
         }
 
@@ -140,8 +141,8 @@ namespace Jondo.Unity.Server.Network
                 var sheet = Handlers.FightHandler.SheetOf(session);
                 using (SessionContext.Push(session))
                 {
-                    int wisdom = session.State.TotalWisdom + Handlers.StatsHandler.GetEquipBonus(ConnectionProtocol.Stat.Wisdom);
-                    Equipment.Bonuses().TryGetValue(ConnectionProtocol.Stat.Prospecting, out long fromGear);
+                    int wisdom = session.State.TotalWisdom + session.Combat.GetEquipBonus(Stat.Wisdom);
+                    Equipment.Bonuses().TryGetValue(Stat.Prospecting, out long fromGear);
                     return (sheet.MaxAP, sheet.MaxMP, sheet.Initiative, 100 + session.State.TotalChance / 10 + (int)fromGear, wisdom);
                 }
             }
@@ -160,7 +161,7 @@ namespace Jondo.Unity.Server.Network
             {
                 using (SessionContext.Push(session))
                 {
-                    int max = Handlers.StatsHandler.GetPlayerMaxHp();
+                    int max = session.Combat.GetPlayerMaxHp();
                     return (RestingLife.LifeAt(id, max, DateTime.UtcNow), max);
                 }
             }
@@ -188,8 +189,8 @@ namespace Jondo.Unity.Server.Network
             List<SpellTable.KnownSpell> spells;
             using (SessionContext.Push(session))
             {
-                wisdom = state.TotalWisdom + Handlers.StatsHandler.GetEquipBonus(ConnectionProtocol.Stat.Wisdom);
-                Equipment.Bonuses().TryGetValue(ConnectionProtocol.Stat.Prospecting, out long fromGear);
+                wisdom = state.TotalWisdom + session.Combat.GetEquipBonus(Stat.Wisdom);
+                Equipment.Bonuses().TryGetValue(Stat.Prospecting, out long fromGear);
                 prospecting = 100 + state.TotalChance / 10 + (int)fromGear;
                 spells = SpellTable.KnownFor(state.Breed, state.CharacterLevel, SpellChoices.Chosen,
                                              LearnedSpells.For(id, session.AccountId));
@@ -284,7 +285,7 @@ namespace Jondo.Unity.Server.Network
             if (!DatabaseManager.CharacterBelongsToAccount(id, account)) return Mal(404, "character");
             var character = DatabaseManager.GetCharacterById(id);
             if (character == null) return Mal(404, "character");
-            byte[]? png = HeroPortraits.Of(BreedLookTable.Drawable(character));
+            byte[]? png = HeroPortraits.Of(CharacterLookBuilder.Drawable(character));
             return png == null ? Mal(404, "portrait") : Bien(new { id, png = Convert.ToBase64String(png) });
         }
     }
