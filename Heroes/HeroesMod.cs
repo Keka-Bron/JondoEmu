@@ -327,6 +327,7 @@ namespace Heroes
                         foreach (var one in all.EnumerateArray()) AskPortrait(Long(one, "id"));
                     Render();
                     try { RenderPanel(); } catch (Exception ex) { MelonLogger.Warning($"[Heroes] The group panel: {ex.Message}"); }
+                    try { MasterChanged(); } catch (Exception ex) { MelonLogger.Warning($"[Heroes] The inventory's character: {ex.Message}"); }
                     if (_switchBusy && _switchListed) { _switchListed = false; SwitchDone(); }
                 });
             });
@@ -334,6 +335,77 @@ namespace Heroes
 
         /// <summary>True once a switch has answered and the list after it is being read.</summary>
         private static bool _switchListed;
+
+        private static long _masterBefore;
+        private static bool _toldInventory;
+
+        /// <summary>
+        /// The character played has changed (a switch): the game's windows left open through it
+        /// -- the inventory -- go on drawing the one played before, their displayer never told of
+        /// another. Each of the game's displayers standing in such a window is given the new look.
+        /// </summary>
+        private static void MasterChanged()
+        {
+            if (!(_list is JsonElement list) || !list.TryGetProperty("characters", out var all)) return;
+            long id = 0;
+            string look = "";
+            foreach (var c in all.EnumerateArray())
+                if (Bool(c, "master")) { id = Long(c, "id"); look = Str(c, "look"); }
+            if (id == 0) return;
+            bool changed = _masterBefore != 0 && _masterBefore != id;
+            _masterBefore = id;
+            if (!changed || look.Length == 0 || _displayers == null || _entities == null) return;
+
+            var found = new List<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer>();
+            var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+            for (int i = 0; i < documents.Length; i++)
+            {
+                var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
+                if (root != null) GameDisplayers(root, found);
+            }
+            Il2CppCore.Rendering.Look.EntityLook entityLook = null;
+            foreach (var displayer in found)
+            {
+                string path = PathOf(displayer);
+                bool mine = path.IndexOf("inventory", StringComparison.OrdinalIgnoreCase) >= 0
+                            || path.IndexOf("equipment", StringComparison.OrdinalIgnoreCase) >= 0
+                            || path.IndexOf("storage", StringComparison.OrdinalIgnoreCase) >= 0
+                            || path.IndexOf("characterSheet", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (!_toldInventory)
+                    MelonLogger.Msg($"[Heroes] A displayer of the game's after a switch: {path} -> {(mine ? "given the new look" : "left")}.");
+                if (!mine) continue;
+                entityLook ??= LookOf(look);
+                Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
+            }
+            _toldInventory = true;
+        }
+
+        /// <summary>Every displayer of the game's own under an element: not the mod's, not in the mod's windows.</summary>
+        private static void GameDisplayers(VisualElement element, List<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer> into)
+        {
+            for (int i = 0; i < Kids(element); i++)
+            {
+                var child = Kid(element, i);
+                string name = child.name ?? "";
+                if (name.StartsWith("JondoHeroes")) continue;
+                var displayer = child.TryCast<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer>();
+                if (displayer != null)
+                {
+                    if (displayer.panel != null && displayer.resolvedStyle.display != DisplayStyle.None) into.Add(displayer);
+                    continue;
+                }
+                GameDisplayers(child, into);
+            }
+        }
+
+        /// <summary>The names an element stands under, itself first: where in the game's interface it is.</summary>
+        private static string PathOf(VisualElement element)
+        {
+            var names = new List<string>();
+            for (var at = element; at != null && names.Count < 14; at = at.hierarchy.parent)
+                if (!string.IsNullOrEmpty(at.name)) names.Add(at.name);
+            return string.Join(" < ", names);
+        }
 
         private static void AskPortrait(long id)
         {
