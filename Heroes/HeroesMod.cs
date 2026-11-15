@@ -141,6 +141,44 @@ namespace Heroes
             ["error.off"] = L("El servidor no tiene activado el modo Héroe.", "The server has the hero mode off.", "Le serveur n'a pas activé le mode Héros."),
             ["error.none"] = L("No se puede desconectar ahora.", "It cannot be disconnected now.", "Impossible de le déconnecter maintenant."),
             ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
+            ["hint.auto"] = L("Pase automático del turno", "Automatic turn pass", "Passage automatique du tour"),
+            ["hint.loot"] = L("Destinatario del botín", "Loot recipient", "Destinataire du butin"),
+            ["hint.play"] = L("Tomar el control de este personaje", "Take control of this character", "Prendre la main sur ce personnage"),
+            ["hint.fold"] = L("Plegar / desplegar el grupo", "Fold / unfold the group", "Replier / déplier le groupe"),
+            ["hint.window"] = L("Modo Héroe (Ctrl + Tab)", "Hero mode (Ctrl + Tab)", "Mode Héros (Ctrl + Tab)"),
+            ["hint.bag"] = L("Inventario", "Inventory", "Inventaire"),
+            ["hint.stats"] = L("Características", "Characteristics", "Caractéristiques"),
+            ["hint.spells"] = L("Hechizos", "Spells", "Sorts"),
+            ["equipped"] = L("EQUIPADO", "WORN", "ÉQUIPÉ"),
+            ["bagged"] = L("BOLSA", "BAG", "SAC"),
+            ["nothing"] = L("Nada.", "Nothing.", "Rien."),
+            ["spellLevel"] = L("nivel {0}", "level {0}", "niveau {0}"),
+            ["stat.level"] = L("Nivel", "Level", "Niveau"),
+            ["stat.xp"] = L("Experiencia", "Experience", "Expérience"),
+            ["stat.life"] = L("Vida", "Life", "Vie"),
+            ["stat.ap"] = L("PA", "AP", "PA"),
+            ["stat.mp"] = L("PM", "MP", "PM"),
+            ["stat.initiative"] = L("Iniciativa", "Initiative", "Initiative"),
+            ["stat.prospecting"] = L("Prospección", "Prospecting", "Prospection"),
+            ["stat.wisdom"] = L("Sabiduría", "Wisdom", "Sagesse"),
+            ["stat.strength"] = L("Fuerza", "Strength", "Force"),
+            ["stat.intelligence"] = L("Inteligencia", "Intelligence", "Intelligence"),
+            ["stat.chance"] = L("Suerte", "Chance", "Chance"),
+            ["stat.agility"] = L("Agilidad", "Agility", "Agilité"),
+            ["stat.vitality"] = L("Vitalidad", "Vitality", "Vitalité"),
+            ["stat.range"] = L("Alcance", "Range", "Portée"),
+            ["stat.power"] = L("Potencia", "Power", "Puissance"),
+            ["stat.critical"] = L("Críticos", "Critical", "Coups critiques"),
+            ["stat.summons"] = L("Invocaciones", "Summons", "Invocations"),
+            ["stat.resist"] = L("Resistencias", "Resistances", "Résistances"),
+            ["stat.resistValues"] = L("Neutral {0}% · Tierra {1}% · Fuego {2}% · Agua {3}% · Aire {4}%",
+                                      "Neutral {0}% · Earth {1}% · Fire {2}% · Water {3}% · Air {4}%",
+                                      "Neutre {0}% · Terre {1}% · Feu {2}% · Eau {3}% · Air {4}%"),
+            ["stat.points"] = L("Puntos por repartir", "Points to spend", "Points à répartir"),
+            ["stat.kamas"] = L("Kamas", "Kamas", "Kamas"),
+            ["card"] = L("{0}\n{1} · nivel {2}\nVida {3} / {4}\nPA {5} · PM {6}\nIniciativa {7}\nProspección {8}\nSabiduría {9}",
+                         "{0}\n{1} · level {2}\nLife {3} / {4}\nAP {5} · MP {6}\nInitiative {7}\nProspecting {8}\nWisdom {9}",
+                         "{0}\n{1} · niveau {2}\nVie {3} / {4}\nPA {5} · PM {6}\nInitiative {7}\nProspection {8}\nSagesse {9}"),
             ["menu"] = L("Abre una vez el menú (Esc) y vuelve a probar.", "Open the menu once (Esc) and try again.",
                          "Ouvre une fois le menu (Échap) et réessaie."),
         };
@@ -151,6 +189,23 @@ namespace Heroes
             string text = byLanguage.TryGetValue(Language, out var own) ? own : byLanguage["en"];
             return values.Length == 0 ? text : string.Format(CultureInfo.InvariantCulture, text, values);
         }
+
+        private static readonly Dictionary<int, string[]> Classes = new Dictionary<int, string[]>
+        {
+            [1] = new[] { "Feca", "Feca", "Féca" }, [2] = new[] { "Osamodas", "Osamodas", "Osamodas" },
+            [3] = new[] { "Anutrof", "Enutrof", "Enutrof" }, [4] = new[] { "Sram", "Sram", "Sram" },
+            [5] = new[] { "Xelor", "Xelor", "Xélor" }, [6] = new[] { "Zurcarák", "Ecaflip", "Ecaflip" },
+            [7] = new[] { "Aniripsa", "Eniripsa", "Eniripsa" }, [8] = new[] { "Yopuka", "Iop", "Iop" },
+            [9] = new[] { "Ocra", "Cra", "Crâ" }, [10] = new[] { "Sadida", "Sadida", "Sadida" },
+            [11] = new[] { "Sacrógrito", "Sacrier", "Sacrieur" }, [12] = new[] { "Pandawa", "Pandawa", "Pandawa" },
+            [13] = new[] { "Tymador", "Rogue", "Roublard" }, [14] = new[] { "Zobal", "Masqueraider", "Zobal" },
+            [15] = new[] { "Steamer", "Foggernaut", "Steamer" }, [16] = new[] { "Selatrop", "Eliotrope", "Eliotrope" },
+            [17] = new[] { "Hipermago", "Huppermage", "Huppermage" }, [18] = new[] { "Uginak", "Ouginak", "Ouginak" },
+            [20] = new[] { "Forjalanza", "Forgelance", "Forgelance" },
+        };
+
+        private static string ClassOf(int breed)
+            => Classes.TryGetValue(breed, out var names) ? names[Language == "fr" ? 2 : Language == "en" ? 1 : 0] : "";
 
         // ─── The server ──────────────────────────────────────────────────────────────────
 
@@ -430,8 +485,22 @@ namespace Heroes
             // What can be done with him.
             var foot = new VisualElement();
             foot.style.height = new StyleLength(44f);
+            foot.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
             foot.style.alignItems = new StyleEnum<Align>(Align.Center);
             foot.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+            // A hero's bag, sheet and spells, to look at.
+            if (hero)
+            {
+                string heroName = Str(who, "name");
+                for (int view = 0; view < 3; view++)
+                {
+                    int which = view;
+                    var icon = Toggle(Do(() => OpenSheet(id, heroName, which)), Glyph(3 + which), false);
+                    icon.style.width = new StyleLength(28f);
+                    icon.style.marginRight = new StyleLength(4f);
+                    foot.Add(Hint(icon, which == 0 ? "hint.bag" : which == 1 ? "hint.stats" : "hint.spells"));
+                }
+            }
             if (master) foot.Add(Note(T("master")));
             else if (Bool(who, "inFight")) foot.Add(Note(T("fighting")));
             else if (hero) foot.Add(Button(Do(() => Act("heroes/disconnect", id)), T("disconnect"), false, !masterFighting));
@@ -453,11 +522,33 @@ namespace Heroes
         private static void PutMenuButton()
         {
             var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+            var grids = new List<VisualElement>();
             for (int i = 0; i < documents.Length; i++)
             {
                 var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
-                var grid = root == null ? null : UQueryExtensions.Q(root, "gd_btnUis", (string)null);
-                if (grid == null || grid.panel == null) continue;
+                if (root != null) Named(root, "gd_btnUis", grids);
+            }
+            if (!_toldGrids && grids.Count > 0)
+            {
+                _toldGrids = true;
+                MelonLogger.Msg("[Heroes] MENUS grids: " + string.Join(" | ", grids.Select(g =>
+                    $"{g.childCount} child(ren) {g.resolvedStyle.width}x{g.resolvedStyle.height} {(g.panel != null ? "shown" : "off")}")));
+                var banner = new List<VisualElement>();
+                for (int i = 0; i < documents.Length; i++)
+                {
+                    var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
+                    if (root != null) Named(root, "BannerMenu", banner);
+                }
+                foreach (var one in banner)
+                {
+                    var tree = new System.Text.StringBuilder();
+                    Describe(one, 0, tree);
+                    MelonLogger.Msg($"[Heroes] BannerMenu:\n{tree}");
+                }
+            }
+            foreach (var grid in grids)
+            {
+                if (grid.panel == null) continue;
                 if (UQueryExtensions.Q(grid, "JondoHeroesMenuButton", (string)null) != null) return;
                 // The grid is a virtual one: its slots are in rows it makes from its data, not its
                 // own children. The button goes into the last row that holds slots, after them.
@@ -472,7 +563,7 @@ namespace Heroes
                         Describe(grid, 0, tree);
                         MelonLogger.Msg($"[Heroes] MENUS grid, no row of buttons found in it:\n{tree}");
                     }
-                    return;
+                    continue;
                 }
                 VisualElement model = row[row.childCount - 1];
                 float w = model.resolvedStyle.width, h = model.resolvedStyle.height;
@@ -508,7 +599,14 @@ namespace Heroes
             }
         }
 
-        private static bool _toldTree;
+        private static bool _toldTree, _toldGrids;
+
+        /// <summary>Every element under <paramref name="element"/> with that name, the deepest first.</summary>
+        private static void Named(VisualElement element, string name, List<VisualElement> into)
+        {
+            for (int i = 0; i < element.childCount; i++) Named(element[i], name, into);
+            if (element.name == name) into.Add(element);
+        }
 
         /// <summary>
         /// The last element under <paramref name="element"/> that holds a row of buttons: the
@@ -640,6 +738,7 @@ namespace Heroes
         private static VisualElement _panel;
         private static VisualElement _members;
         private static bool _folded;
+        private static string _panelKey;
 
         /// <summary>
         /// The group at the side of the screen while any hero is connected: each one's portrait and
@@ -658,8 +757,15 @@ namespace Heroes
             if (group.Count < 2)
             {
                 if (_panel != null) { try { _panel.RemoveFromHierarchy(); } catch { } _panel = null; }
+                _panelKey = null;
                 return;
             }
+            // Drawn again only when something in it changed: a hint under the pointer stays.
+            string key = string.Join(";", group.Select(g => g.GetRawText())) + lootTo + ":" +
+                         string.Join(",", group.Select(g => _portraits.ContainsKey(Long(g, "id")) ? 1 : 0));
+            if (_panel != null && _panel.panel != null && key == _panelKey) return;
+            _panelKey = key;
+            HideHint();
             if (_panel == null || _panel.panel == null)
             {
                 var layer = FindLayer();
@@ -683,13 +789,13 @@ namespace Heroes
                 bar.style.justifyContent = new StyleEnum<Justify>(Justify.SpaceBetween);
                 bar.style.height = new StyleLength(24f);
                 bar.style.alignItems = new StyleEnum<Align>(Align.Center);
-                bar.Add(Tool(Do(() => { _folded = !_folded; if (_members != null) _members.style.display = new StyleEnum<DisplayStyle>(_folded ? DisplayStyle.None : DisplayStyle.Flex); }), "—"));
+                bar.Add(Hint(Tool(Do(() => { _folded = !_folded; if (_members != null) _members.style.display = new StyleEnum<DisplayStyle>(_folded ? DisplayStyle.None : DisplayStyle.Flex); }), "—"), "hint.fold"));
                 // The window's own icon, the MENUS button's: the game's font has no «≡».
                 var opener = Tool(Do(() => { if (_window != null) Close(); else Open(); }), "");
                 opener.style.backgroundImage = new StyleBackground(Icon());
                 opener.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
                 opener.style.backgroundColor = new StyleColor(new UnityEngine.Color(0, 0, 0, 0));
-                bar.Add(opener);
+                bar.Add(Hint(opener, "hint.window"));
                 _panel.Add(bar);
                 _members = new VisualElement();
                 _members.style.display = new StyleEnum<DisplayStyle>(_folded ? DisplayStyle.None : DisplayStyle.Flex);
@@ -733,6 +839,10 @@ namespace Heroes
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
             }
             if (master) picture.Add(Crown());
+            // On the portrait, what a group's tooltip says of a member.
+            string card = T("card", Str(who, "name"), ClassOf(Int(who, "breed")), Int(who, "level"), life, max,
+                            Int(who, "ap"), Int(who, "mp"), Int(who, "initiative"), Int(who, "prospecting"), Int(who, "wisdom"));
+            HintText(picture, () => card);
             row.Add(picture);
 
             var tools = new VisualElement();
@@ -741,13 +851,13 @@ namespace Heroes
             if (!master)
             {
                 bool auto = Bool(who, "autoPass");
-                tools.Add(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), Glyph(0), auto));
+                tools.Add(Hint(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), Glyph(0), auto), "hint.auto"));
             }
-            tools.Add(Toggle(Do(() => Act("heroes/loot", id)), Glyph(1), lootTo == id));
+            tools.Add(Hint(Toggle(Do(() => Act("heroes/loot", id)), Glyph(1), lootTo == id), "hint.loot"));
             if (!master && !Bool(who, "inFight"))
             {
                 string name = Str(who, "name");
-                tools.Add(Toggle(Do(() => TakeInHand(name)), Glyph(2), false));
+                tools.Add(Hint(Toggle(Do(() => TakeInHand(name)), Glyph(2), false), "hint.play"));
             }
             row.Add(tools);
             return row;
@@ -792,13 +902,13 @@ namespace Heroes
                     MelonLogger.Warning($"[Heroes] {name} is not in the main menu's characters.");
                     return;
                 }
+                // The pick, as the dropdown makes it: the client asks its own confirmation then.
                 _mainMenu.OnCharacterSelection(entry);
-                _mainMenu.OnConfirmCharacterSelection();
                 MelonLogger.Msg($"[Heroes] Taking {name} in hand («{entry}»).");
             }
             catch (Exception ex)
             {
-                MelonLogger.Warning($"[Heroes] {name} could not be taken in hand: {ex.Message}");
+                MelonLogger.Warning($"[Heroes] {name} could not be taken in hand: {ex}");
             }
         }
 
@@ -846,13 +956,283 @@ namespace Heroes
             return button;
         }
 
+        // ─── A hero's sheet: his bag, his characteristics, his spells ────────────────────
+
+        private static WindowFigma _sheet;
+        private static ScrollView _sheetPage;
+
+        /// <summary>A window of its own for one of a hero's three sheets (0 bag, 1 characteristics, 2 spells).</summary>
+        private static void OpenSheet(long id, string name, int view)
+        {
+            try
+            {
+                CloseSheet();
+                var layer = FindLayer();
+                if (layer == null) return;
+                float w = layer.resolvedStyle.width, h = layer.resolvedStyle.height;
+                const float width = 460f;
+                float height = float.IsNaN(h) || h <= 0 ? 560f : Math.Min(560f, h - 60f);
+                var window = new WindowFigma(true, name + " · " + T(view == 0 ? "hint.bag" : view == 1 ? "hint.stats" : "hint.spells"), "", true);
+                window.showCloseButton = true;
+                window.name = "JondoHeroesSheet";
+                window.style.position = new StyleEnum<Position>(Position.Absolute);
+                window.style.width = new StyleLength(width);
+                window.style.height = new StyleLength(height);
+                window.style.left = new StyleLength(float.IsNaN(w) || w <= 0 ? 300f : Math.Max(0f, (w - width) / 2f + 60f));
+                window.style.top = new StyleLength(float.IsNaN(h) || h <= 0 ? 100f : Math.Max(0f, (h - height) / 2f + 30f));
+                _sheetPage = new ScrollView(ScrollViewMode.Vertical);
+                _sheetPage.style.flexGrow = new StyleFloat(1f);
+                _sheetPage.style.paddingLeft = _sheetPage.style.paddingRight = new StyleLength(18f);
+                _sheetPage.style.paddingTop = new StyleLength(12f);
+                _sheetPage.Add(Label(T("loading")));
+                window.Add(_sheetPage);
+                layer.Add(window);
+                window.BringToFront();
+                KeepEvents(window);
+                var close = window.header?.rightButton;
+                if (close != null) close.add_Clicked(Do(CloseSheet));
+                _sheet = window;
+                Task.Run(async () =>
+                {
+                    var (code, body) = await AskAsync("heroes/sheet", new Dictionary<string, object> { ["id"] = id });
+                    _toUnity.Enqueue(() => ShowSheet(view, code, body));
+                });
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] The sheet could not be opened: {ex}");
+                CloseSheet();
+            }
+        }
+
+        private static void CloseSheet()
+        {
+            try { _sheet?.RemoveFromHierarchy(); } catch { }
+            _sheet = null;
+            _sheetPage = null;
+        }
+
+        private static void ShowSheet(int view, int code, JsonElement? body)
+        {
+            if (_sheetPage == null) return;
+            _sheetPage.Clear();
+            if (code != 200 || body is not JsonElement s) { _sheetPage.Add(Label(code == 0 ? T("unreachable") : T("error"))); return; }
+            if (view == 1) { ShowCharacteristics(s); return; }
+            if (view == 2)
+            {
+                var spells = s.TryGetProperty("spells", out var list) ? list.EnumerateArray().ToList() : new List<JsonElement>();
+                if (spells.Count == 0) _sheetPage.Add(Label(T("nothing")));
+                foreach (var spell in spells)
+                {
+                    int spellId = Int(spell, "id");
+                    var (spellName, icon) = SpellOf(spellId);
+                    _sheetPage.Add(Line(IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType.Spell, icon),
+                                        spellName ?? ("#" + spellId), T("spellLevel", Int(spell, "grade"))));
+                }
+                return;
+            }
+            var items = s.TryGetProperty("items", out var all) ? all.EnumerateArray().ToList() : new List<JsonElement>();
+            const int Bag = 63;
+            foreach (var (title, part) in new[]
+                     {
+                         (T("equipped"), items.Where(i => Int(i, "position") != Bag).OrderBy(i => Int(i, "position")).ToList()),
+                         (T("bagged"), items.Where(i => Int(i, "position") == Bag).ToList()),
+                     })
+            {
+                var head = Label(title, 13f, true);
+                head.style.color = new StyleColor(Gold);
+                head.style.marginTop = new StyleLength(8f);
+                _sheetPage.Add(head);
+                if (part.Count == 0) _sheetPage.Add(Note(T("nothing")));
+                foreach (var item in part)
+                {
+                    int gid = Int(item, "gid"), quantity = Int(item, "quantity");
+                    var (itemName, icon) = ItemOf(gid);
+                    _sheetPage.Add(Line(IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType.Item, icon),
+                                        itemName ?? ("#" + gid), quantity > 1 ? "x" + quantity : ""));
+                }
+            }
+        }
+
+        private static void ShowCharacteristics(JsonElement s)
+        {
+            string N(string name) => Int(s, name).ToString("N0", CultureInfo.GetCultureInfo(Language == "en" ? "en-US" : Language == "fr" ? "fr-FR" : "es-ES"));
+            long xp = Long(s, "xp"), floor = Long(s, "xpFloor"), next = Long(s, "xpNext");
+            var rows = new List<(string, string)>
+            {
+                (T("stat.level"), ClassOf(Int(s, "breed")) + " · " + Int(s, "level")),
+                (T("stat.xp"), next > floor ? $"{xp - floor:N0} / {next - floor:N0}" : xp.ToString("N0")),
+                (T("stat.life"), N("life") + " / " + N("maxLife")),
+                (T("stat.ap"), N("ap")),
+                (T("stat.mp"), N("mp")),
+                (T("stat.initiative"), N("initiative")),
+                (T("stat.prospecting"), N("prospecting")),
+                (T("stat.wisdom"), N("wisdom")),
+                (T("stat.strength"), N("strength")),
+                (T("stat.intelligence"), N("intelligence")),
+                (T("stat.chance"), N("chance")),
+                (T("stat.agility"), N("agility")),
+                (T("stat.vitality"), N("vitality")),
+                (T("stat.range"), N("range")),
+                (T("stat.power"), N("power")),
+                (T("stat.critical"), N("critical")),
+                (T("stat.summons"), N("summons")),
+                (T("stat.points"), N("points")),
+                (T("stat.kamas"), Long(s, "kamas").ToString("N0")),
+            };
+            foreach (var (name, value) in rows) _sheetPage.Add(Line(null, name, value));
+            var resist = s.TryGetProperty("resist", out var r) ? r.EnumerateArray().Select(v => v.GetInt32()).ToArray() : new int[5];
+            if (resist.Length == 5)
+            {
+                _sheetPage.Add(Line(null, T("stat.resist"), ""));
+                _sheetPage.Add(Note(T("stat.resistValues", resist[0], resist[1], resist[2], resist[3], resist[4])));
+            }
+        }
+
+        /// <summary>A line of a sheet: an icon or none, a name, a value on the right.</summary>
+        private static VisualElement Line(VisualElement icon, string name, string value)
+        {
+            var row = new VisualElement();
+            row.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+            row.style.alignItems = new StyleEnum<Align>(Align.Center);
+            row.style.minHeight = new StyleLength(26f);
+            row.style.marginBottom = new StyleLength(2f);
+            if (icon != null) row.Add(icon);
+            var left = Label(name, 13f);
+            left.style.flexGrow = new StyleFloat(1f);
+            left.style.marginBottom = new StyleLength(0f);
+            row.Add(left);
+            var right = Label(value, 13f, true);
+            right.style.marginBottom = new StyleLength(0f);
+            row.Add(right);
+            return row;
+        }
+
+        private static (string Name, int Icon) SpellOf(int id)
+        {
+            try
+            {
+                var data = Il2CppCore.DataCenter.DataCenterModule.spellsDataRoot?.GetSpellById(id);
+                return data == null ? (null, 0) : (data.name, data.iconId);
+            }
+            catch { return (null, 0); }
+        }
+
+        private static (string Name, int Icon) ItemOf(int gid)
+        {
+            try
+            {
+                var data = Il2CppCore.DataCenter.DataCenterModule.itemsDataRoot?.GetItemById(gid);
+                return data == null ? (null, 0) : (data.name, data.iconId);
+            }
+            catch { return (null, 0); }
+        }
+
+        private static readonly Dictionary<Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType, Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntryType> _iconTypes =
+            new Dictionary<Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType, Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntryType>();
+        private static bool _noIcons;
+
+        /// <summary>An item's or a spell's picture in a tile of the client's own, as JondoFix's item window draws them.</summary>
+        private static VisualElement IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType kind, int iconId)
+        {
+            var place = new VisualElement();
+            place.style.width = place.style.height = new StyleLength(28f);
+            place.style.marginRight = new StyleLength(8f);
+            place.style.flexShrink = new StyleFloat(0f);
+            place.style.overflow = new StyleEnum<Overflow>(Overflow.Hidden);
+            place.pickingMode = PickingMode.Ignore;
+            if (_noIcons || iconId <= 0) return place;
+            try
+            {
+                if (!_iconTypes.TryGetValue(kind, out var type))
+                    _iconTypes[kind] = type = Il2CppCore.UILogic.Admin.AdminSelectItemUI.FindIconAddressableEntryType(kind);
+                var tile = new Il2CppCore.UILogic.Components.Slots.Tile();
+                tile.imgAddress = new Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntry(type, iconId);
+                tile.pickingMode = PickingMode.Ignore;
+                tile.style.width = tile.style.height = new StyleLength(28f);
+                place.Add(tile);
+            }
+            catch (Exception ex)
+            {
+                _noIcons = true;
+                MelonLogger.Warning($"[Heroes] No icons in the sheets: {ex.Message}");
+            }
+            return place;
+        }
+
+        // ─── The hints ───────────────────────────────────────────────────────────────────
+
+        private static VisualElement _hint;
+        private static DofusLabel _hintText;
+
+        /// <summary>A line saying what the element does, beside it while the pointer is on it.</summary>
+        private static VisualElement Hint(VisualElement target, string key) => HintText(target, () => T(key));
+
+        /// <summary>The same with any text, worked out as the pointer comes.</summary>
+        private static VisualElement HintText(VisualElement target, Func<string> text)
+        {
+            try
+            {
+                target.RegisterCallback<PointerEnterEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerEnterEvent>>(
+                    new Action<PointerEnterEvent>(_ => ShowHint(target, text()))), TrickleDown.NoTrickleDown);
+                target.RegisterCallback<PointerLeaveEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerLeaveEvent>>(
+                    new Action<PointerLeaveEvent>(_ => HideHint())), TrickleDown.NoTrickleDown);
+            }
+            catch { }
+            return target;
+        }
+
+        private static void ShowHint(VisualElement target, string text)
+        {
+            try
+            {
+                var layer = FindLayer();
+                if (layer == null) return;
+                if (_hint == null || _hint.panel == null)
+                {
+                    _hint = new VisualElement();
+                    _hint.name = "JondoHeroesHint";
+                    _hint.pickingMode = PickingMode.Ignore;
+                    _hint.style.position = new StyleEnum<Position>(Position.Absolute);
+                    _hint.style.paddingLeft = _hint.style.paddingRight = new StyleLength(10f);
+                    _hint.style.paddingTop = _hint.style.paddingBottom = new StyleLength(5f);
+                    _hint.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.10f, 0.10f, 0.16f, 0.95f));
+                    _hint.style.borderTopWidth = _hint.style.borderBottomWidth = _hint.style.borderLeftWidth = _hint.style.borderRightWidth = new StyleFloat(1f);
+                    var line = new UnityEngine.Color(0.45f, 0.45f, 0.60f, 1f);
+                    _hint.style.borderTopColor = _hint.style.borderBottomColor = _hint.style.borderLeftColor = _hint.style.borderRightColor = new StyleColor(line);
+                    Round(_hint, 3f);
+                    _hintText = Label("", 12f);
+                    _hintText.pickingMode = PickingMode.Ignore;
+                    _hintText.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
+                    _hintText.style.marginBottom = new StyleLength(0f);
+                    _hint.Add(_hintText);
+                    layer.Add(_hint);
+                }
+                _hintText.text = text;
+                // On its left: the group panel stands against the screen's right edge.
+                var at = target.worldBound;
+                float width = layer.resolvedStyle.width;
+                _hint.style.right = new StyleLength(Math.Max(0f, (float.IsNaN(width) ? 0f : width) - at.xMin + 6f));
+                _hint.style.top = new StyleLength(at.yMin);
+                _hint.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+                _hint.BringToFront();
+            }
+            catch { }
+        }
+
+        private static void HideHint()
+        {
+            try { if (_hint != null) _hint.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None); } catch { }
+        }
+
         // ─── The panel's glyphs: a sword, a sack, a «play» ───────────────────────────────
 
-        private static readonly UnityEngine.Texture2D[] _glyphs = new UnityEngine.Texture2D[3];
+        private static readonly UnityEngine.Texture2D[] _glyphs = new UnityEngine.Texture2D[6];
 
         /// <summary>
-        /// A glyph of the group panel, drawn here white with a dark edge: 0 the automatic pass (a
-        /// sword), 1 the loot recipient (a tied sack), 2 taking him in hand (a «play»).
+        /// A glyph, drawn here white with a dark edge: 0 the automatic pass (a sword), 1 the loot
+        /// recipient (a tied sack), 2 taking him in hand (a «play»), 3 his bag (a chest), 4 his
+        /// characteristics (three bars), 5 his spells (a star).
         /// </summary>
         private static UnityEngine.Texture2D Glyph(int which)
         {
@@ -868,9 +1248,13 @@ namespace Heroes
                         for (int sx = 0; sx < 3; sx++)
                         {
                             float x = px + (sx + 0.5f) / 3f, y = py + (sy + 0.5f) / 3f;
-                            float d = which == 0 ? Sword(x, y) : which == 1 ? Sack(x, y) : Play(x, y);
+                            float d = which switch
+                            {
+                                0 => Sword(x, y), 1 => Sack(x, y), 2 => Play(x, y),
+                                3 => Chest(x, y), 4 => Bars(x, y), _ => Star(x, y),
+                            };
                             UnityEngine.Color c;
-                            if (which == 1 && Knot(x, y)) c = edge;
+                            if ((which == 1 && Knot(x, y)) || (which == 3 && d < -1.1f && ChestLines(x, y))) c = edge;
                             else if (d < -1.1f) c = UnityEngine.Color.white;
                             else if (d < 0.5f) c = edge;
                             else continue;
@@ -927,6 +1311,32 @@ namespace Heroes
 
         /// <summary>The tie round the purse's neck, in the edge's colour.</summary>
         private static bool Knot(float x, float y) => Capsule(x, y, 12f, 13.2f, 20f, 13.2f, 1.1f) < 0f;
+
+        /// <summary>A chest: its body and its lid, a little rounded.</summary>
+        private static float Chest(float x, float y)
+            => Math.Min(Box(x, y, 16f, 20f, 11f, 7f) - 1f, Box(x, y, 16f, 10.5f, 11f, 3.5f) - 1.5f);
+
+        /// <summary>The chest's lid line and its lock, in the edge's colour.</summary>
+        private static bool ChestLines(float x, float y)
+            => Math.Abs(y - 14f) < 0.8f || Box(x, y, 16f, 15f, 2f, 2.6f) < 0f;
+
+        /// <summary>Three bars side by side, of three heights: the characteristics.</summary>
+        private static float Bars(float x, float y)
+        {
+            float d = Box(x, y, 8.5f, 21.5f, 2.6f, 5.5f) - 0.6f;
+            d = Math.Min(d, Box(x, y, 16f, 16.5f, 2.6f, 10.5f) - 0.6f);
+            return Math.Min(d, Box(x, y, 23.5f, 19f, 2.6f, 8f) - 0.6f);
+        }
+
+        /// <summary>A four-pointed star, its points long and thin: the spells.</summary>
+        private static float Star(float x, float y)
+        {
+            float dx = Math.Abs(x - 16f), dy = Math.Abs(y - 16f);
+            // Within each quarter, the star's edge runs from a point's tip to the waist between them.
+            float d = Math.Min(Capsule(dx, dy, 0f, 0f, 0f, 13f, 2.2f), Capsule(dx, dy, 0f, 0f, 13f, 0f, 2.2f));
+            float waist = ((dx + dy) - 9f) * 0.75f;
+            return Math.Min(d, waist);
+        }
 
         /// <summary>A «play» triangle pointing right, its corners rounded.</summary>
         private static float Play(float x, float y)
@@ -1128,7 +1538,7 @@ namespace Heroes
         private static bool _guardInstalled;
 
         /// <summary>Whether the pointer is on the window or on the group panel this frame.</summary>
-        public static bool PointerOver => Over(_window) || Over(_panel);
+        public static bool PointerOver => Over(_window) || Over(_panel) || Over(_sheet);
 
         private static bool Over(VisualElement element)
         {

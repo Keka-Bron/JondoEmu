@@ -77,6 +77,15 @@ namespace Jondo.Unity.Server.Handlers
         internal static byte[] PlayedAllyBarForTests(Fighter played, long me) => PlayedAllyBar(played, me);
 
         /// <summary>
+        /// A hero's sheet as he would fight with it -- life, points, characteristics, what his gear
+        /// gives -- read in his own session: the Heroes mod's characteristics window.
+        /// </summary>
+        internal static Fighter SheetOf(GameSession hero)
+        {
+            using (SessionContext.Push(hero)) return SheetFromState();
+        }
+
+        /// <summary>
         /// The items a master's group won, all to the one he named its loot recipient (Heroes.LootTo)
         /// when that one is among the winners: each keeps his experience and his kamas, the items
         /// -- the perfect pieces with them -- go to one bag.

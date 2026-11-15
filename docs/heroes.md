@@ -59,7 +59,13 @@ While a hero is connected, a **group panel** stands at the right of the screen: 
 portrait and life (his fighter's in a fight, his resting life outside one), a crown for the master,
 and two switches -- **AUTO**, a hero's turns passed by the server as they come, and **LOOT**, the
 group's items all to that one (each keeps his experience and kamas; `FightHandler.GatherHeroLoot`).
-It folds with its «—» button; the Heroes icon beside it opens the window.
+It folds with its «—» button; the Heroes icon beside it opens the window. Every switch says what it
+does under the pointer, in the game's language, and a portrait shows what a group's tooltip shows of
+a member: class, level, life, AP, MP, initiative, prospecting and wisdom.
+
+Each connected hero's card in the window has three more glyphs -- a chest, three bars, a star --
+that open his bag, his characteristics and his spells, to look at (`POST /api/heroes/sheet { id }`):
+ids from the server, named and drawn by the client's own data (`DataCenterModule`, its icon tiles).
 
 **Taking a hero in hand** (the panel's **PLAY**) is changing character: the mod goes through the
 client's own main menu («change character», `MainMenu.OnCharacterSelection` and its confirmation,

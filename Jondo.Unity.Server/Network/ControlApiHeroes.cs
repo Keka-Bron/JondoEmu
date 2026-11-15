@@ -33,6 +33,7 @@ namespace Jondo.Unity.Server.Network
                     bool master = c.Id == masterId;
                     var hero = Heroes.SessionOf(c.Id);
                     var (life, maxLife) = master ? LifeOf(me) : hero != null ? LifeOf(hero) : (0, 0);
+                    var stats = master ? StatsOf(me) : hero != null ? StatsOf(hero) : default;
                     return new
                     {
                         id = c.Id,
@@ -49,6 +50,11 @@ namespace Jondo.Unity.Server.Network
                         order = master ? -1 : heroes.IndexOf(c.Id),
                         life,
                         maxLife,
+                        ap = stats.Ap,
+                        mp = stats.Mp,
+                        initiative = stats.Initiative,
+                        prospecting = stats.Prospecting,
+                        wisdom = stats.Wisdom,
                         autoPass = Heroes.PassesOnHisOwn(c.Id),
                     };
                 })
@@ -63,6 +69,25 @@ namespace Jondo.Unity.Server.Network
                 lootTo = Heroes.LootTo(masterId),
                 characters,
             });
+        }
+
+        /// <summary>A connected character's points and what a group's tooltip shows of him.</summary>
+        private static (int Ap, int Mp, int Initiative, int Prospecting, int Wisdom) StatsOf(GameSession session)
+        {
+            try
+            {
+                var sheet = Handlers.FightHandler.SheetOf(session);
+                using (SessionContext.Push(session))
+                {
+                    int wisdom = session.State.TotalWisdom + Handlers.StatsHandler.GetEquipBonus(ConnectionProtocol.Stat.Wisdom);
+                    Equipment.Bonuses().TryGetValue(ConnectionProtocol.Stat.Prospecting, out long fromGear);
+                    return (sheet.MaxAP, sheet.MaxMP, sheet.Initiative, 100 + session.State.TotalChance / 10 + (int)fromGear, wisdom);
+                }
+            }
+            catch
+            {
+                return default;
+            }
         }
 
         /// <summary>A connected character's life: his fighter's in a fight, his resting life outside one.</summary>
@@ -82,6 +107,65 @@ namespace Jondo.Unity.Server.Network
             {
                 return (0, 0);
             }
+        }
+
+        /// <summary>
+        /// A hero's sheet for the mod's three windows: his characteristics, his spells and his bag,
+        /// as ids the client names and draws itself. Of a hero of his only.
+        /// </summary>
+        private static Respuesta HeroesSheet(string cuerpo, long account)
+        {
+            var me = InTheWorld(account);
+            if (me == null) return Mal(409, "world");
+            long id = Numero(cuerpo, "id");
+            var hero = Heroes.AsHero(id);
+            if (hero == null || hero.MasterId != me.State.CharacterId) return Mal(404, "hero");
+            var session = hero.Session;
+            var state = session.State;
+            var sheet = Handlers.FightHandler.SheetOf(session);
+            int wisdom, prospecting;
+            List<SpellTable.KnownSpell> spells;
+            using (SessionContext.Push(session))
+            {
+                wisdom = state.TotalWisdom + Handlers.StatsHandler.GetEquipBonus(ConnectionProtocol.Stat.Wisdom);
+                Equipment.Bonuses().TryGetValue(ConnectionProtocol.Stat.Prospecting, out long fromGear);
+                prospecting = 100 + state.TotalChance / 10 + (int)fromGear;
+                spells = SpellTable.KnownFor(state.Breed, state.CharacterLevel, SpellChoices.Chosen,
+                                             LearnedSpells.For(id, session.AccountId));
+            }
+            var (life, maxLife) = LifeOf(session);
+            int level = state.CharacterLevel;
+            return Bien(new
+            {
+                id,
+                name = state.CharacterName,
+                breed = state.Breed,
+                level,
+                xp = state.Experience,
+                xpFloor = ExperienceTable.LevelFloor(level),
+                xpNext = ExperienceTable.LevelFloor(level + 1),
+                kamas = state.Kamas,
+                points = state.CharacterRemainingPoints,
+                life,
+                maxLife,
+                ap = sheet.MaxAP,
+                mp = sheet.MaxMP,
+                initiative = sheet.Initiative,
+                prospecting,
+                wisdom,
+                strength = sheet.Strength,
+                intelligence = sheet.Intelligence,
+                chance = sheet.Chance,
+                agility = sheet.Agility,
+                vitality = sheet.Vitality,
+                range = sheet.Range,
+                power = sheet.Power,
+                critical = sheet.CriticalBonus,
+                summons = sheet.Otra(26),
+                resist = new[] { sheet.NeutralResPct, sheet.EarthResPct, sheet.FireResPct, sheet.WaterResPct, sheet.AirResPct },
+                spells = spells.Select(s => new { id = s.SpellId, grade = s.Grade }),
+                items = state.GetInventoryCopy().Select(i => new { gid = i.ItemId, quantity = i.Quantity, position = i.Position }),
+            });
         }
 
         private static Respuesta HeroesAutoPass(string cuerpo, long account)
