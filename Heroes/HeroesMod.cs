@@ -557,38 +557,99 @@ namespace Heroes
             for (int i = 0; i < documents.Length; i++)
             {
                 var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
-                if (root != null) Named(root, "gd_btnUis", grids);
+                if (root != null) GridsUnder(root, grids);
             }
-            foreach (var grid in grids)
-            {
-                if (grid.panel == null) continue;
-                var mine = new List<VisualElement>();
-                Named(grid, "JondoHeroesMenuButton", mine);
-                var button = mine.Count > 0 ? mine[0] : null;
+            grids = grids.Where(g => g.panel != null && g.resolvedStyle.display != DisplayStyle.None
+                                     && g.resolvedStyle.visibility == Visibility.Visible && g.worldBound.width > 4f).ToList();
+            var main = grids.FirstOrDefault(g => g.name == "gd_btnUis");
+            if (main == null) return;
 
-                var place = FreePlace(grid, out var model, out var other);
-                // No place free in the grid -- the window made narrow, its last row full --: the
-                // button goes into the title bar, beside its «⋮», rather than out of sight.
-                Spare(grid, place == null);
-                if (place == null)
-                {
-                    if (button != null) button.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
-                    continue;
-                }
-                button ??= MenuButton(grid);
-                var (left, top, size) = place.Value;
-                button.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
-                button.style.left = new StyleLength(left);
-                button.style.top = new StyleLength(top);
-                button.style.width = new StyleLength(size.x);
-                button.style.height = new StyleLength(size.y);
-                if (_dressedFor != size)
-                {
-                    _dressedFor = size;
-                    Dress(button, model, other, size);
-                }
+            // The menu's own grids: its grid of buttons first, then whatever holds the buttons it
+            // has no room for -- the «+»'s, the list it pops up --, as the game puts its own there.
+            var candidates = new List<VisualElement> { main };
+            candidates.AddRange(grids.Where(g => g != main && OfTheMenu(g)));
+            string key = string.Join(" | ", grids.Select(g => $"{g.name}{(candidates.Contains(g) ? "*" : "")}"));
+            if (key != _toldGrids)
+            {
+                _toldGrids = key;
+                MelonLogger.Msg($"[Heroes] Slot grids shown: {key}");
+            }
+
+            // Every button of theirs: the place found must be clear of all of them -- the «+» stands
+            // beside the grid's last row, where a free place would seem to be.
+            var theirs = new List<VisualElement>();
+            foreach (var grid in candidates) SlotsUnder(grid, theirs);
+
+            VisualElement host = null, model = null, other = null;
+            (float, float, UnityEngine.Vector2) place = default;
+            foreach (var grid in candidates)
+            {
+                var found = FreePlace(grid, out var m, out var o);
+                if (found == null) continue;
+                var (left, top, size) = found.Value;
+                var at = new UnityEngine.Rect(grid.worldBound.x + left + 2f, grid.worldBound.y + top + 2f, size.x - 4f, size.y - 4f);
+                if (theirs.Any(s => s.resolvedStyle.display != DisplayStyle.None && s.worldBound.Overlaps(at))) continue;
+                host = grid; model = m; other = o; place = found.Value;
+                break;
+            }
+
+            // Nowhere in the menu's grids, and no «+» to hold it as the game's own are held: the
+            // title bar, beside its «⋮», rather than out of sight.
+            bool more = grids.Any(g => g.name == "gd_additionalBtns" && Kids(g) > 0);
+            Spare(main, host == null && !more);
+            if (host == null)
+            {
+                if (_menuButton != null) _menuButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
                 return;
             }
+
+            if (_menuButton == null || _menuButton.panel == null) _menuButton = MenuButton(host);
+            else if (_menuButton.hierarchy.parent != host)
+            {
+                host.hierarchy.Add(_menuButton);
+                _dressedFor = default;
+            }
+            var (x, y, slot) = place;
+            _menuButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+            _menuButton.style.left = new StyleLength(x);
+            _menuButton.style.top = new StyleLength(y);
+            _menuButton.style.width = new StyleLength(slot.x);
+            _menuButton.style.height = new StyleLength(slot.y);
+            if (_dressedFor != slot)
+            {
+                _dressedFor = slot;
+                Dress(_menuButton, model, other, slot);
+            }
+        }
+
+        private static VisualElement _menuButton;
+        private static string _toldGrids;
+
+        /// <summary>Every slot grid of the client's under an element.</summary>
+        private static void GridsUnder(VisualElement element, List<VisualElement> into)
+        {
+            for (int i = 0; i < Kids(element); i++)
+            {
+                var child = Kid(element, i);
+                if (child.TryCast<Il2CppCore.UILogic.Components.Slots.SlotGrid>() != null) into.Add(child);
+                else GridsUnder(child, into);
+            }
+        }
+
+        /// <summary>
+        /// Whether a grid belongs to the MENUS window: under it, or named as its buttons' grids are
+        /// (gd_btnUis, gd_additionalBtns), or under something named for the banner -- the list the
+        /// «+» pops up may stand on a layer of its own.
+        /// </summary>
+        private static bool OfTheMenu(VisualElement grid)
+        {
+            if (grid.name != null && grid.name.IndexOf("btn", StringComparison.OrdinalIgnoreCase) >= 0) return true;
+            for (var up = grid.hierarchy.parent; up != null; up = up.hierarchy.parent)
+                if (up.name != null && (up.name.IndexOf("Banner", StringComparison.OrdinalIgnoreCase) >= 0
+                                        || up.name.IndexOf("moreBtn", StringComparison.OrdinalIgnoreCase) >= 0
+                                        || up.name.IndexOf("additional", StringComparison.OrdinalIgnoreCase) >= 0))
+                    return true;
+            return false;
         }
 
         /// <summary>The slot size the grid's button was last dressed for.</summary>
@@ -754,6 +815,9 @@ namespace Heroes
             int perRow = full.Count(s => Math.Abs(s.worldBound.y - firstY) < 2f);
             int inLast = full.Count(s => Math.Abs(s.worldBound.y - lastY) < 2f);
             float step = full[1].worldBound.x - full[0].worldBound.x;
+            // One row only -- the «+»'s list holding a few --: how many it takes is the grid's width's.
+            if (Math.Abs(lastY - firstY) < 2f && step > 0)
+                perRow = Math.Max(perRow, (int)Math.Floor((grid.worldBound.xMax - full[0].worldBound.x + 1f) / step));
             if (!_toldMenu)
             {
                 _toldMenu = true;
