@@ -65,7 +65,7 @@ namespace Heroes
             LoggerInstance.Msg(_token.Length > 0
                 ? "[Heroes] Ready: Ctrl+Tab opens the hero mode."
                 : "[Heroes] No session token from the launcher: the hero mode stays asleep.");
-            if (_token.Length > 0) WatchMainMenu();
+            if (_token.Length > 0) { WatchMainMenu(); WatchActionBar(); }
         }
 
         public override void OnUpdate()
@@ -179,8 +179,8 @@ namespace Heroes
             ["card"] = L("{0}\n{1} · nivel {2}\nVida {3} / {4}\nPA {5} · PM {6}\nIniciativa {7}\nProspección {8}\nSabiduría {9}",
                          "{0}\n{1} · level {2}\nLife {3} / {4}\nAP {5} · MP {6}\nInitiative {7}\nProspecting {8}\nWisdom {9}",
                          "{0}\n{1} · niveau {2}\nVie {3} / {4}\nPA {5} · PM {6}\nInitiative {7}\nProspection {8}\nSagesse {9}"),
-            ["menu"] = L("Abre una vez el menú (Esc) y vuelve a probar.", "Open the menu once (Esc) and try again.",
-                         "Ouvre une fois le menu (Échap) et réessaie."),
+            ["menu"] = L("Abre el menú (Esc) y, con él abierto, pulsa ▶.", "Open the menu (Esc) and, with it open, press ▶.",
+                         "Ouvre le menu (Échap) et, menu ouvert, clique sur ▶."),
         };
 
         private static string T(string key, params object[] values)
@@ -528,11 +528,12 @@ namespace Heroes
                 var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
                 if (root != null) Named(root, "gd_btnUis", grids);
             }
-            if (!_toldGrids && grids.Count > 0)
+            // Told once the bar is drawn, not while it is still empty at the way in.
+            if (!_toldGrids && grids.Any(g => Kids(g) > 0))
             {
                 _toldGrids = true;
                 MelonLogger.Msg("[Heroes] MENUS grids: " + string.Join(" | ", grids.Select(g =>
-                    $"{g.childCount} child(ren) {g.resolvedStyle.width}x{g.resolvedStyle.height} {(g.panel != null ? "shown" : "off")}")));
+                    $"{Kids(g)} child(ren) {g.resolvedStyle.width}x{g.resolvedStyle.height} {(g.panel != null ? "shown" : "off")}")));
                 var banner = new List<VisualElement>();
                 for (int i = 0; i < documents.Length; i++)
                 {
@@ -548,15 +549,17 @@ namespace Heroes
             }
             foreach (var grid in grids)
             {
-                if (grid.panel == null) continue;
-                if (UQueryExtensions.Q(grid, "JondoHeroesMenuButton", (string)null) != null) return;
+                if (grid.panel == null || Kids(grid) == 0) continue;
+                var mine = new List<VisualElement>();
+                Named(grid, "JondoHeroesMenuButton", mine);
+                if (mine.Count > 0) return;
                 // The grid is a virtual one: its slots are in rows it makes from its data, not its
                 // own children. The button goes into the last row that holds slots, after them.
                 VisualElement row = null;
                 LastRowOfSlots(grid, ref row);
                 if (row == null)
                 {
-                    if (!_toldTree && grid.childCount > 0)
+                    if (!_toldTree)
                     {
                         _toldTree = true;
                         var tree = new System.Text.StringBuilder();
@@ -565,14 +568,14 @@ namespace Heroes
                     }
                     continue;
                 }
-                VisualElement model = row[row.childCount - 1];
+                VisualElement model = Kid(row, Kids(row) - 1);
                 float w = model.resolvedStyle.width, h = model.resolvedStyle.height;
                 if (float.IsNaN(w) || w <= 0) w = 32f;
                 if (float.IsNaN(h) || h <= 0) h = 32f;
                 if (!_toldMenu)
                 {
                     _toldMenu = true;
-                    MelonLogger.Msg($"[Heroes] MENUS bar: a row of {row.childCount} slot(s) of {w}x{h}.");
+                    MelonLogger.Msg($"[Heroes] MENUS bar: a row of {Kids(row)} slot(s) of {w}x{h}, a {model.GetIl2CppType().Name}.");
                 }
 
                 var button = new VisualElement();
@@ -594,7 +597,7 @@ namespace Heroes
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
                 button.Add(picture);
                 button.AddManipulator(new Clickable(Do(() => { if (_window != null) Close(); else Open(); })).Cast<IManipulator>());
-                row.Add(button);
+                row.hierarchy.Add(button);
                 return;
             }
         }
@@ -604,9 +607,14 @@ namespace Heroes
         /// <summary>Every element under <paramref name="element"/> with that name, the deepest first.</summary>
         private static void Named(VisualElement element, string name, List<VisualElement> into)
         {
-            for (int i = 0; i < element.childCount; i++) Named(element[i], name, into);
+            for (int i = 0; i < Kids(element); i++) Named(Kid(element, i), name, into);
             if (element.name == name) into.Add(element);
         }
+
+        // An element's own children, its hierarchy's: a virtual grid's rows are there, and not
+        // under its content container, which is what childCount and [i] read.
+        private static int Kids(VisualElement element) => element.hierarchy.childCount;
+        private static VisualElement Kid(VisualElement element, int i) => element.hierarchy.ElementAt(i);
 
         /// <summary>
         /// The last element under <paramref name="element"/> that holds a row of buttons: the
@@ -615,9 +623,9 @@ namespace Heroes
         private static void LastRowOfSlots(VisualElement element, ref VisualElement row)
         {
             if (IsRow(element)) row = element;
-            for (int i = 0; i < element.childCount; i++)
+            for (int i = 0; i < Kids(element); i++)
             {
-                var child = element[i];
+                var child = Kid(element, i);
                 if (child.name == "JondoHeroesMenuButton") continue;
                 LastRowOfSlots(child, ref row);
             }
@@ -628,9 +636,9 @@ namespace Heroes
             int count = 0;
             string kind = null;
             float width = -1f;
-            for (int i = 0; i < element.childCount; i++)
+            for (int i = 0; i < Kids(element); i++)
             {
-                var child = element[i];
+                var child = Kid(element, i);
                 if (child.name == "JondoHeroesMenuButton") continue;
                 if (child.TryCast<Il2CppCore.UILogic.Components.Slots.Slot>() != null) return true;
                 string its = child.GetIl2CppType().Name;
@@ -647,9 +655,9 @@ namespace Heroes
         {
             if (depth > 6 || into.Length > 6000) return;
             into.Append(new string(' ', depth * 2)).Append(element.GetIl2CppType().Name).Append(" «").Append(element.name)
-                .Append("» ").Append(element.childCount).Append(" child(ren) ")
+                .Append("» ").Append(Kids(element)).Append(" child(ren) ")
                 .Append(element.resolvedStyle.width).Append('x').Append(element.resolvedStyle.height).Append('\n');
-            for (int i = 0; i < element.childCount && i < 4; i++) Describe(element[i], depth + 1, into);
+            for (int i = 0; i < Kids(element) && i < 4; i++) Describe(Kid(element, i), depth + 1, into);
         }
 
         /// <summary>
@@ -754,6 +762,7 @@ namespace Heroes
                 lootTo = Long(list, "lootTo");
                 group = all.EnumerateArray().Where(c => Bool(c, "master") || Bool(c, "hero")).ToList();
             }
+            SpellBarLines(group.Count >= 2);
             if (group.Count < 2)
             {
                 if (_panel != null) { try { _panel.RemoveFromHierarchy(); } catch { } _panel = null; }
@@ -857,7 +866,9 @@ namespace Heroes
             if (!master && !Bool(who, "inFight"))
             {
                 string name = Str(who, "name");
-                tools.Add(Hint(Toggle(Do(() => TakeInHand(name)), Glyph(2), false), "hint.play"));
+                VisualElement play = null;
+                play = Toggle(Do(() => TakeInHand(name, play)), Glyph(2), false);
+                tools.Add(Hint(play, "hint.play"));
             }
             row.Add(tools);
             return row;
@@ -874,11 +885,11 @@ namespace Heroes
         /// menu's «change character», and the server gives the group back to him on his way in --
         /// the one who led it is a hero of his then (Heroes.Regroup).
         /// </summary>
-        private static void TakeInHand(string name)
+        private static void TakeInHand(string name, VisualElement from)
         {
             if (_mainMenu == null)
             {
-                Say(T("menu"));
+                if (from != null) ShowHint(from, T("menu"));
                 MelonLogger.Msg("[Heroes] No main menu kept yet: it is opened once with Esc.");
                 return;
             }
@@ -908,7 +919,9 @@ namespace Heroes
             }
             catch (Exception ex)
             {
-                MelonLogger.Warning($"[Heroes] {name} could not be taken in hand: {ex}");
+                // The menu's pick wants the menu open: with it shut its dropdown is not there.
+                if (from != null) ShowHint(from, T("menu"));
+                MelonLogger.Warning($"[Heroes] {name} could not be taken in hand: {ex.Message}");
             }
         }
 
@@ -935,6 +948,65 @@ namespace Heroes
         public static void KeepMainMenu(Il2CppCore.UILogic.GameUICore.MainMenu __instance)
         {
             if (__instance != null) _mainMenu = __instance;
+        }
+
+        // ─── The spell bar on three lines ────────────────────────────────────────────────
+
+        private static Il2CppCore.UILogic.GameUICore.UIActionBar _actionBar;
+        private static int _linesBefore = -1;
+
+        /// <summary>
+        /// The client does not turn the pages of a bar that is not its character's: a hero's spells
+        /// past the second line could not be reached. While heroes are connected the bar shows three
+        /// lines -- thirty-nine slots, a whole class's spells --, and what the player had is put back
+        /// when the last one goes.
+        /// </summary>
+        private static void SpellBarLines(bool heroes)
+        {
+            var bar = _actionBar;
+            if (bar == null) return;
+            try
+            {
+                if (heroes && bar.m_nbLines < 3)
+                {
+                    _linesBefore = bar.m_nbLines;
+                    bar.SetLinesCount(3);
+                    MelonLogger.Msg($"[Heroes] The spell bar shows three lines while heroes are connected (it had {_linesBefore}).");
+                }
+                else if (!heroes && _linesBefore > 0)
+                {
+                    bar.SetLinesCount(_linesBefore);
+                    _linesBefore = -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] The spell bar's lines: {ex.Message}");
+                _actionBar = null;
+            }
+        }
+
+        private static void WatchActionBar()
+        {
+            var harmony = new HarmonyLib.Harmony("jondo.heroes.actionbar");
+            var keep = new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(KeepActionBar)));
+            foreach (string name in new[] { "RefreshPageIndex", "InitDisplayedLines", "RefreshDisplayedLines" })
+            {
+                try
+                {
+                    var method = HarmonyLib.AccessTools.Method(typeof(Il2CppCore.UILogic.GameUICore.UIActionBar), name);
+                    if (method != null) harmony.Patch(method, postfix: keep);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Warning($"[Heroes] UIActionBar.{name} not watched: {ex.Message}");
+                }
+            }
+        }
+
+        public static void KeepActionBar(Il2CppCore.UILogic.GameUICore.UIActionBar __instance)
+        {
+            if (__instance != null) _actionBar = __instance;
         }
 
         private static VisualElement Toggle(Il2CppSystem.Action click, UnityEngine.Texture2D glyph, bool on)
@@ -970,7 +1042,7 @@ namespace Heroes
                 var layer = FindLayer();
                 if (layer == null) return;
                 float w = layer.resolvedStyle.width, h = layer.resolvedStyle.height;
-                const float width = 460f;
+                const float width = 560f;
                 float height = float.IsNaN(h) || h <= 0 ? 560f : Math.Min(560f, h - 60f);
                 var window = new WindowFigma(true, name + " · " + T(view == 0 ? "hint.bag" : view == 1 ? "hint.stats" : "hint.spells"), "", true);
                 window.showCloseButton = true;
@@ -1017,20 +1089,157 @@ namespace Heroes
             if (_sheetPage == null) return;
             _sheetPage.Clear();
             if (code != 200 || body is not JsonElement s) { _sheetPage.Add(Label(code == 0 ? T("unreachable") : T("error"))); return; }
-            if (view == 1) { ShowCharacteristics(s); return; }
-            if (view == 2)
+            try
             {
-                var spells = s.TryGetProperty("spells", out var list) ? list.EnumerateArray().ToList() : new List<JsonElement>();
-                if (spells.Count == 0) _sheetPage.Add(Label(T("nothing")));
-                foreach (var spell in spells)
-                {
-                    int spellId = Int(spell, "id");
-                    var (spellName, icon) = SpellOf(spellId);
-                    _sheetPage.Add(Line(IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType.Spell, icon),
-                                        spellName ?? ("#" + spellId), T("spellLevel", Int(spell, "grade"))));
-                }
-                return;
+                if (view == 1) ShowCharacteristics(s);
+                else if (view == 2) ShowSpells(s);
+                else ShowBag(s);
             }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] The sheet could not be drawn: {ex}");
+                _sheetPage.Add(Label(T("error")));
+            }
+        }
+
+        /// <summary>
+        /// A number with its thousands apart, as the client writes them. By hand: the game runs
+        /// with no culture data, and asking for «fr-FR» throws.
+        /// </summary>
+        private static string Num(long value)
+        {
+            string digits = Math.Abs(value).ToString(CultureInfo.InvariantCulture);
+            var text = new System.Text.StringBuilder();
+            for (int i = 0; i < digits.Length; i++)
+            {
+                if (i > 0 && (digits.Length - i) % 3 == 0) text.Append(Language == "en" ? ',' : ' ');
+                text.Append(digits[i]);
+            }
+            return (value < 0 ? "-" : "") + text;
+        }
+
+        /// <summary>A box of the sheets: a dark panel with its title, as the client's windows group things.</summary>
+        private static VisualElement Section(string title)
+        {
+            var box = new VisualElement();
+            box.style.marginBottom = new StyleLength(10f);
+            box.style.paddingLeft = box.style.paddingRight = new StyleLength(10f);
+            box.style.paddingTop = box.style.paddingBottom = new StyleLength(8f);
+            box.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.13f, 0.13f, 0.20f, 0.95f));
+            Round(box, 4f);
+            if (!string.IsNullOrEmpty(title))
+            {
+                var head = Label(title, 12f, true);
+                head.style.color = new StyleColor(new UnityEngine.Color(0.75f, 0.75f, 0.85f, 1f));
+                head.style.letterSpacing = new StyleLength(1f);
+                box.Add(head);
+            }
+            _sheetPage.Add(box);
+            return box;
+        }
+
+        /// <summary>The characteristics as the client's sheet lays them out: experience, points, then the rest by kind.</summary>
+        private static void ShowCharacteristics(JsonElement s)
+        {
+            long xp = Long(s, "xp"), floor = Long(s, "xpFloor"), next = Long(s, "xpNext");
+            var top = Section("");
+            var who = Label(Str(s, "name"), 16f, true);
+            who.style.marginBottom = new StyleLength(0f);
+            top.Add(who);
+            top.Add(Note(ClassOf(Int(s, "breed")).ToUpperInvariant() + "  ·  " + T("level", Int(s, "level"))));
+            var xpLine = Line(null, T("stat.xp"), next > floor ? $"{Num(xp - floor)} / {Num(next - floor)}" : Num(xp));
+            xpLine.style.marginTop = new StyleLength(8f);
+            top.Add(xpLine);
+            top.Add(Gauge(next > floor ? (float)(xp - floor) / (next - floor) : 1f, new UnityEngine.Color(0.85f, 0.85f, 0.25f, 1f)));
+            top.Add(Line(null, T("stat.life"), Num(Int(s, "life")) + " / " + Num(Int(s, "maxLife"))));
+            top.Add(Gauge(Int(s, "maxLife") > 0 ? (float)Int(s, "life") / Int(s, "maxLife") : 0f, new UnityEngine.Color(0.90f, 0.40f, 0.40f, 1f)));
+
+            var points = Section("");
+            var row = new VisualElement();
+            row.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+            row.style.justifyContent = new StyleEnum<Justify>(Justify.SpaceAround);
+            foreach (var (name, value, color) in new[]
+                     {
+                         (T("stat.ap"), Int(s, "ap"), new UnityEngine.Color(0.45f, 0.75f, 1f, 1f)),
+                         (T("stat.mp"), Int(s, "mp"), new UnityEngine.Color(0.45f, 0.85f, 0.45f, 1f)),
+                         ("PO", Int(s, "range"), new UnityEngine.Color(0.40f, 0.85f, 0.80f, 1f)),
+                     })
+            {
+                var one = Label(name + "  " + Num(value), 16f, true);
+                one.style.color = new StyleColor(color);
+                one.style.marginBottom = new StyleLength(0f);
+                row.Add(one);
+            }
+            points.Add(row);
+
+            var elements = Section(T("hint.stats").ToUpperInvariant());
+            foreach (var (name, key, color) in new[]
+                     {
+                         (T("stat.vitality"), "vitality", new UnityEngine.Color(0.95f, 0.45f, 0.45f, 1f)),
+                         (T("stat.wisdom"), "wisdom", new UnityEngine.Color(0.75f, 0.55f, 0.95f, 1f)),
+                         (T("stat.strength"), "strength", new UnityEngine.Color(0.80f, 0.60f, 0.35f, 1f)),
+                         (T("stat.intelligence"), "intelligence", new UnityEngine.Color(1f, 0.55f, 0.25f, 1f)),
+                         (T("stat.chance"), "chance", new UnityEngine.Color(0.40f, 0.70f, 1f, 1f)),
+                         (T("stat.agility"), "agility", new UnityEngine.Color(0.45f, 0.85f, 0.45f, 1f)),
+                     })
+            {
+                var line = Line(Dot(color), name, Num(Int(s, key)));
+                elements.Add(line);
+            }
+
+            var more = Section("");
+            foreach (var (name, key) in new[]
+                     {
+                         (T("stat.initiative"), "initiative"), (T("stat.prospecting"), "prospecting"), (T("stat.power"), "power"),
+                         (T("stat.critical"), "critical"), (T("stat.summons"), "summons"),
+                     })
+                more.Add(Line(null, name, Num(Int(s, key))));
+            var resist = s.TryGetProperty("resist", out var r) ? r.EnumerateArray().Select(v => v.GetInt32()).ToArray() : new int[5];
+            if (resist.Length == 5) more.Add(Note(T("stat.resistValues", resist[0], resist[1], resist[2], resist[3], resist[4])));
+
+            var foot = Section("");
+            foot.Add(Line(null, T("stat.points"), Num(Int(s, "points"))));
+            foot.Add(Line(null, T("stat.kamas"), Num(Long(s, "kamas"))));
+        }
+
+        /// <summary>The spells as the client's spell book shows them: two columns of cards, each its icon and its name.</summary>
+        private static void ShowSpells(JsonElement s)
+        {
+            var spells = s.TryGetProperty("spells", out var list) ? list.EnumerateArray().ToList() : new List<JsonElement>();
+            if (spells.Count == 0) { _sheetPage.Add(Label(T("nothing"))); return; }
+            var grid = new VisualElement();
+            grid.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+            grid.style.flexWrap = new StyleEnum<Wrap>(Wrap.Wrap);
+            foreach (var spell in spells)
+            {
+                int spellId = Int(spell, "id");
+                var (spellName, icon) = SpellOf(spellId);
+                var card = new VisualElement();
+                card.style.width = new StyleLength(new Length(48f, LengthUnit.Percent));
+                card.style.marginRight = new StyleLength(new Length(2f, LengthUnit.Percent));
+                card.style.marginBottom = new StyleLength(6f);
+                card.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+                card.style.alignItems = new StyleEnum<Align>(Align.Center);
+                card.style.paddingLeft = card.style.paddingRight = new StyleLength(4f);
+                card.style.height = new StyleLength(38f);
+                card.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.17f, 0.18f, 0.29f, 1f));
+                card.style.borderTopWidth = card.style.borderBottomWidth = card.style.borderLeftWidth = card.style.borderRightWidth = new StyleFloat(1f);
+                var edge = new UnityEngine.Color(0.32f, 0.33f, 0.48f, 1f);
+                card.style.borderTopColor = card.style.borderBottomColor = card.style.borderLeftColor = card.style.borderRightColor = new StyleColor(edge);
+                Round(card, 4f);
+                card.Add(IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType.Spell, icon, 30f));
+                var name = Label(spellName ?? ("#" + spellId), 12f, true);
+                name.style.marginBottom = new StyleLength(0f);
+                name.style.flexShrink = new StyleFloat(1f);
+                card.Add(name);
+                grid.Add(card);
+            }
+            _sheetPage.Add(grid);
+        }
+
+        /// <summary>The bag as the client's inventory shows it: what he wears, then a grid of tiles with their quantities.</summary>
+        private static void ShowBag(JsonElement s)
+        {
             var items = s.TryGetProperty("items", out var all) ? all.EnumerateArray().ToList() : new List<JsonElement>();
             const int Bag = 63;
             foreach (var (title, part) in new[]
@@ -1039,54 +1248,73 @@ namespace Heroes
                          (T("bagged"), items.Where(i => Int(i, "position") == Bag).ToList()),
                      })
             {
-                var head = Label(title, 13f, true);
-                head.style.color = new StyleColor(Gold);
-                head.style.marginTop = new StyleLength(8f);
-                _sheetPage.Add(head);
-                if (part.Count == 0) _sheetPage.Add(Note(T("nothing")));
+                var box = Section(title);
+                if (part.Count == 0) { box.Add(Note(T("nothing"))); continue; }
+                var grid = new VisualElement();
+                grid.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+                grid.style.flexWrap = new StyleEnum<Wrap>(Wrap.Wrap);
                 foreach (var item in part)
                 {
                     int gid = Int(item, "gid"), quantity = Int(item, "quantity");
                     var (itemName, icon) = ItemOf(gid);
-                    _sheetPage.Add(Line(IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType.Item, icon),
-                                        itemName ?? ("#" + gid), quantity > 1 ? "x" + quantity : ""));
+                    var cell = new VisualElement();
+                    cell.style.width = cell.style.height = new StyleLength(54f);
+                    cell.style.marginRight = cell.style.marginBottom = new StyleLength(5f);
+                    cell.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.16f, 0.17f, 0.27f, 1f));
+                    cell.style.borderTopWidth = cell.style.borderBottomWidth = cell.style.borderLeftWidth = cell.style.borderRightWidth = new StyleFloat(1f);
+                    var edge = new UnityEngine.Color(0.30f, 0.31f, 0.45f, 1f);
+                    cell.style.borderTopColor = cell.style.borderBottomColor = cell.style.borderLeftColor = cell.style.borderRightColor = new StyleColor(edge);
+                    cell.style.alignItems = new StyleEnum<Align>(Align.Center);
+                    cell.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+                    Round(cell, 3f);
+                    var tile = IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType.Item, icon, 44f);
+                    tile.style.marginRight = new StyleLength(0f);
+                    cell.Add(tile);
+                    if (quantity > 1)
+                    {
+                        var count = Label(Num(quantity), 11f, true);
+                        count.pickingMode = PickingMode.Ignore;
+                        count.style.position = new StyleEnum<Position>(Position.Absolute);
+                        count.style.left = new StyleLength(3f);
+                        count.style.top = new StyleLength(1f);
+                        count.style.marginBottom = new StyleLength(0f);
+                        cell.Add(count);
+                    }
+                    string named = itemName ?? ("#" + gid);
+                    HintText(cell, () => quantity > 1 ? $"{named} x{Num(quantity)}" : named);
+                    grid.Add(cell);
                 }
+                box.Add(grid);
             }
+            var purse = Section("");
+            purse.Add(Line(null, T("stat.kamas"), Num(Long(s, "kamas"))));
         }
 
-        private static void ShowCharacteristics(JsonElement s)
+        private static VisualElement Gauge(float share, UnityEngine.Color color)
         {
-            string N(string name) => Int(s, name).ToString("N0", CultureInfo.GetCultureInfo(Language == "en" ? "en-US" : Language == "fr" ? "fr-FR" : "es-ES"));
-            long xp = Long(s, "xp"), floor = Long(s, "xpFloor"), next = Long(s, "xpNext");
-            var rows = new List<(string, string)>
-            {
-                (T("stat.level"), ClassOf(Int(s, "breed")) + " · " + Int(s, "level")),
-                (T("stat.xp"), next > floor ? $"{xp - floor:N0} / {next - floor:N0}" : xp.ToString("N0")),
-                (T("stat.life"), N("life") + " / " + N("maxLife")),
-                (T("stat.ap"), N("ap")),
-                (T("stat.mp"), N("mp")),
-                (T("stat.initiative"), N("initiative")),
-                (T("stat.prospecting"), N("prospecting")),
-                (T("stat.wisdom"), N("wisdom")),
-                (T("stat.strength"), N("strength")),
-                (T("stat.intelligence"), N("intelligence")),
-                (T("stat.chance"), N("chance")),
-                (T("stat.agility"), N("agility")),
-                (T("stat.vitality"), N("vitality")),
-                (T("stat.range"), N("range")),
-                (T("stat.power"), N("power")),
-                (T("stat.critical"), N("critical")),
-                (T("stat.summons"), N("summons")),
-                (T("stat.points"), N("points")),
-                (T("stat.kamas"), Long(s, "kamas").ToString("N0")),
-            };
-            foreach (var (name, value) in rows) _sheetPage.Add(Line(null, name, value));
-            var resist = s.TryGetProperty("resist", out var r) ? r.EnumerateArray().Select(v => v.GetInt32()).ToArray() : new int[5];
-            if (resist.Length == 5)
-            {
-                _sheetPage.Add(Line(null, T("stat.resist"), ""));
-                _sheetPage.Add(Note(T("stat.resistValues", resist[0], resist[1], resist[2], resist[3], resist[4])));
-            }
+            var bar = new VisualElement();
+            bar.style.height = new StyleLength(6f);
+            bar.style.marginBottom = new StyleLength(6f);
+            bar.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.08f, 0.08f, 0.12f, 1f));
+            Round(bar, 2f);
+            var fill = new VisualElement();
+            fill.style.width = new StyleLength(new Length(Math.Clamp(share, 0f, 1f) * 100f, LengthUnit.Percent));
+            fill.style.flexGrow = new StyleFloat(0f);
+            fill.style.height = new StyleLength(new Length(100f, LengthUnit.Percent));
+            fill.style.backgroundColor = new StyleColor(color);
+            Round(fill, 2f);
+            bar.Add(fill);
+            return bar;
+        }
+
+        private static VisualElement Dot(UnityEngine.Color color)
+        {
+            var dot = new VisualElement();
+            dot.style.width = dot.style.height = new StyleLength(12f);
+            dot.style.marginRight = new StyleLength(10f);
+            dot.style.backgroundColor = new StyleColor(color);
+            Round(dot, 6f);
+            return dot;
         }
 
         /// <summary>A line of a sheet: an icon or none, a name, a value on the right.</summary>
@@ -1133,10 +1361,10 @@ namespace Heroes
         private static bool _noIcons;
 
         /// <summary>An item's or a spell's picture in a tile of the client's own, as JondoFix's item window draws them.</summary>
-        private static VisualElement IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType kind, int iconId)
+        private static VisualElement IconTile(Il2CppCore.UILogic.Admin.AdminSelectItemUI.ResourceType kind, int iconId, float size = 28f)
         {
             var place = new VisualElement();
-            place.style.width = place.style.height = new StyleLength(28f);
+            place.style.width = place.style.height = new StyleLength(size);
             place.style.marginRight = new StyleLength(8f);
             place.style.flexShrink = new StyleFloat(0f);
             place.style.overflow = new StyleEnum<Overflow>(Overflow.Hidden);
@@ -1149,7 +1377,7 @@ namespace Heroes
                 var tile = new Il2CppCore.UILogic.Components.Slots.Tile();
                 tile.imgAddress = new Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntry(type, iconId);
                 tile.pickingMode = PickingMode.Ignore;
-                tile.style.width = tile.style.height = new StyleLength(28f);
+                tile.style.width = tile.style.height = new StyleLength(size);
                 place.Add(tile);
             }
             catch (Exception ex)
