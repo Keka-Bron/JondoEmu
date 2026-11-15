@@ -23,7 +23,15 @@ namespace Jondo.Unity.Tests.World
     public sealed class HeroesTests
     {
         private const long Account = 8_900_000_311;
-        private const long Map = 191105026;
+        /// <summary>
+        /// A map of these tests' own, no other test's connection on it: a hero connecting is drawn
+        /// for everybody on his map (HeroPresence), and on a map the others share, their pipes read
+        /// a jsn they never asked for.
+        /// </summary>
+        private const long Map = 990_311_001;
+
+        /// <summary>A real map whose walkable cells the walking test lends to <see cref="Map"/>.</summary>
+        private const long RealMap = 191105026;
 
         private static long Character(long account, string name, int breed) => DatabaseManager.CreateCharacter(account, 1, name, breed, 0, 1,
             new long[] { -1, -1, -1, -1, -1 }, Map, 50, 0, 0, Array.Empty<(int, int)>());
@@ -280,8 +288,9 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public async Task Heroes_follow_to_cells_of_their_own_beside_where_their_master_stops()
         {
-            if (!MapManager.WalkableCells.ContainsKey(Map)) MapManager.Initialize();
-            Assert.True(MapManager.WalkableCells.TryGetValue(Map, out var cells) && cells.Count >= 20);
+            if (!MapManager.WalkableCells.ContainsKey(RealMap)) MapManager.Initialize();
+            Assert.True(MapManager.WalkableCells.TryGetValue(RealMap, out var cells) && cells.Count >= 20);
+            MapManager.WalkableCells[Map] = cells;
             string tag = Guid.NewGuid().ToString("N")[..6];
             long master = Character(Account + 15, "Guia2-" + tag, 8);
             long first = Character(Account + 15, "Uno-" + tag, 9);
