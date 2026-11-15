@@ -1429,8 +1429,11 @@ namespace Heroes
         private static float _cNextDraw;
         private static bool _toldFraming, _cFramed, _toldFreeze;
 
-        /// <summary>The platform's character's forced size: the template's 0.75 brought down to the native screen's look.</summary>
-        private const float PreviewSize = 0.32f;
+        /// <summary>
+        /// The platform's character's forced size: the bigger it is the smaller he is drawn (0.32
+        /// drew him over twice the template's 0.75). 1.8 for the native screen's look in this window.
+        /// </summary>
+        private const float PreviewSize = 1.8f;
 
         /// <summary>
         /// The look given to the platform's displayer, with the native screen's framing -- no
