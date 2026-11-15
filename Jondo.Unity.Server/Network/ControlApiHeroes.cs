@@ -56,6 +56,9 @@ namespace Jondo.Unity.Server.Network
                         prospecting = stats.Prospecting,
                         wisdom = stats.Wisdom,
                         autoPass = Heroes.PassesOnHisOwn(c.Id),
+                        // His look as the game's protocol carries it, on foot: the mod draws him
+                        // with the client's own portrait, seated or standing.
+                        look = LookOf(c),
                     };
                 })
                 .OrderBy(c => c.master ? 0 : c.hero ? 1 : 2).ThenBy(c => c.order).ThenByDescending(c => c.level)
@@ -99,6 +102,13 @@ namespace Jondo.Unity.Server.Network
             string name = Handlers.CharacterCreationHandler.SuggestName();
             for (int i = 0; i < 10 && DatabaseManager.CharacterNameTaken(name); i++) name = Handlers.CharacterCreationHandler.SuggestName();
             return Bien(new { name });
+        }
+
+        /// <summary>A character's EntityLook message in base64, on foot; "" when it cannot be made.</summary>
+        private static string LookOf(DatabaseManager.DbCharacter character)
+        {
+            try { return Convert.ToBase64String(BreedLookTable.BuildLook(character, onFoot: true)); }
+            catch { return ""; }
         }
 
         /// <summary>A connected character's points and what a group's tooltip shows of him.</summary>

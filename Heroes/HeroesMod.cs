@@ -66,6 +66,7 @@ namespace Heroes
                 ? "[Heroes] Ready: Ctrl+Tab opens the hero mode."
                 : "[Heroes] No session token from the launcher: the hero mode stays asleep.");
             if (_token.Length > 0) WatchActionBar();
+            if (_token.Length > 0) WatchPortraits();
         }
 
         public override void OnUpdate()
@@ -85,6 +86,7 @@ namespace Heroes
                 _nextScan = now + 1f;
                 try { PutMenuButton(); } catch { }
                 try { KeepPanelInSight(); } catch { }
+                try { BorrowServices(); } catch { }
             }
             if (now >= _nextPoll && !_polling)
             {
@@ -467,6 +469,166 @@ namespace Heroes
             if (_footer != null) _footer.text = T("connected", Int(list, "connected"), 1 + max);
         }
 
+        // ─── The client's own portraits ──────────────────────────────────────────────────
+
+        // The services the client hands its portraits (EntityPortrait.InitEntityPortrait),
+        // borrowed off one of its own -- the party window's, the player's -- or as it hands them.
+        private static Il2Cpp.feu _entities;
+        private static Il2Cpp.fep _displayers;
+        private static Il2Cpp.fer _entityInfos;
+        private static Il2Cpp.fdf _menuDependencies;
+        private static Il2Cpp.fcg _menus;
+        private static bool _liveBroken, _toldLive;
+
+        /// <summary>Each living portrait, by where it stands and whose it is, with what it was made of.</summary>
+        private static readonly Dictionary<string, (string Key, VisualElement View)> _live = new Dictionary<string, (string, VisualElement)>();
+
+        /// <summary>The animation a character not in the world sits in, as Auralis's window has it.</summary>
+        private const string Seated = "AnimEmoteSit_Statique";
+
+        /// <summary>
+        /// The services off any portrait of the client's already on screen: the party window's,
+        /// the player's own. Tried at every scan until had.
+        /// </summary>
+        private static void BorrowServices()
+        {
+            if (_displayers != null || _liveBroken) return;
+            var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+            for (int i = 0; i < documents.Length && _displayers == null; i++)
+            {
+                var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
+                if (root != null) BorrowUnder(root);
+            }
+        }
+
+        private static void BorrowUnder(VisualElement element)
+        {
+            for (int i = 0; i < Kids(element) && _displayers == null; i++)
+            {
+                var child = Kid(element, i);
+                var portrait = child.TryCast<Il2CppCore.UILogic.Components.Figma.EntityPortrait>();
+                if (portrait != null && portrait.m_entityDisplayerService != null && portrait.m_entityService != null)
+                    Borrowed(portrait.m_entityService, portrait.m_entityDisplayerService, portrait.m_entityInfoService,
+                             portrait.m_playerContextMenuDependenciesService, portrait.m_contextMenuService, "a portrait on screen");
+                else BorrowUnder(child);
+            }
+        }
+
+        /// <summary>Harmony's postfix on EntityPortrait.InitEntityPortrait: the services as the client hands them.</summary>
+        public static void OnInitEntityPortrait(Il2Cpp.feu __0, Il2Cpp.fep __1, Il2Cpp.fer __2, Il2Cpp.fdf __3, Il2Cpp.fcg __4)
+        {
+            if (_displayers == null && __0 != null && __1 != null) Borrowed(__0, __1, __2, __3, __4, "InitEntityPortrait");
+        }
+
+        private static void Borrowed(Il2Cpp.feu entities, Il2Cpp.fep displayers, Il2Cpp.fer infos, Il2Cpp.fdf menuDependencies,
+                                     Il2Cpp.fcg menus, string from)
+        {
+            _entities = entities;
+            _displayers = displayers;
+            _entityInfos = infos;
+            _menuDependencies = menuDependencies;
+            _menus = menus;
+            MelonLogger.Msg($"[Heroes] The client's portraits are ours to use (services off {from}).");
+            _panelKey = null;
+            _nextPoll = 0f;
+        }
+
+        private static void WatchPortraits()
+        {
+            try
+            {
+                var harmony = new HarmonyLib.Harmony("jondo.heroes.portraits");
+                var method = HarmonyLib.AccessTools.Method(typeof(Il2CppCore.UILogic.Components.Figma.EntityPortrait), "InitEntityPortrait");
+                if (method != null) harmony.Patch(method, postfix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnInitEntityPortrait))));
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] InitEntityPortrait not watched: {ex.Message}");
+            }
+        }
+
+        private static Il2CppGoogle.Protobuf.MessageParser<Il2Cpp.lhg> _lookParser;
+
+        /// <summary>
+        /// A look as the client draws it, out of the protocol's EntityLook the server sends: read
+        /// with its own parser, turned into the rendering's look (vd.qse) and made whole (vf.qsi)
+        /// -- 3.6.10's names, the ones Auralis's own notes give for this version.
+        /// </summary>
+        private static Il2CppCore.Rendering.Look.EntityLook LookOf(string base64)
+        {
+            if (_lookParser == null)
+            {
+                foreach (var property in typeof(Il2Cpp.lhg).GetProperties(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
+                {
+                    if (property.PropertyType != typeof(Il2CppGoogle.Protobuf.MessageParser<Il2Cpp.lhg>)) continue;
+                    _lookParser = property.GetValue(null) as Il2CppGoogle.Protobuf.MessageParser<Il2Cpp.lhg>;
+                    if (_lookParser != null) break;
+                }
+                if (_lookParser == null) throw new InvalidOperationException("no parser for the protocol's EntityLook");
+            }
+            var protocol = _lookParser.ParseFrom(Convert.FromBase64String(base64));
+            var look = Il2Cpp.vd.qse(protocol) ?? throw new InvalidOperationException("vd.qse gave nothing");
+            try { look = Il2Cpp.vf.qsi(look) ?? look; } catch { }
+            return look;
+        }
+
+        /// <summary>
+        /// A character drawn alive by the client's own portrait (EntityPortrait), seated or in his
+        /// class's rest; kept from one drawing of the window to the next, made again only when his
+        /// look or his pose changes. Null when the client's portraits cannot be had: the caller
+        /// shows the server's drawing instead.
+        /// </summary>
+        private static VisualElement LivePortrait(string place, long id, string look, bool seated)
+        {
+            if (_liveBroken || _displayers == null || string.IsNullOrEmpty(look)) return null;
+            string where = place + ":" + id, key = look + (seated ? "|seated" : "|standing");
+            if (_live.TryGetValue(where, out var known))
+            {
+                if (known.Key == key && known.View != null)
+                {
+                    known.View.RemoveFromHierarchy();
+                    return known.View;
+                }
+                Release(known.View);
+                _live.Remove(where);
+            }
+            try
+            {
+                var entityLook = LookOf(look);
+                var portrait = new Il2CppCore.UILogic.Components.Figma.EntityPortrait();
+                portrait.name = "JondoHeroesLivePortrait";
+                portrait.pickingMode = PickingMode.Ignore;
+                portrait.style.flexGrow = new StyleFloat(1f);
+                portrait.InitEntityPortrait(_entities, _displayers, _entityInfos, _menuDependencies, _menus, false, false);
+                portrait.autoSize = true;
+                string animation = seated ? Seated : (Il2Cpp.so.pwt(entityLook, false) ?? "AnimStatique");
+                portrait.SetEntityLook(entityLook, id, animation, 1, false);
+                _live[where] = (key, portrait);
+                if (!_toldLive)
+                {
+                    _toldLive = true;
+                    MelonLogger.Msg($"[Heroes] A live portrait made: {id}, {animation}.");
+                }
+                return portrait;
+            }
+            catch (Exception ex)
+            {
+                _liveBroken = true;
+                MelonLogger.Warning($"[Heroes] The client's portraits could not be used, the drawn ones stay: {ex}");
+                return null;
+            }
+        }
+
+        private static void Release(VisualElement view)
+        {
+            try
+            {
+                view?.TryCast<Il2CppCore.UILogic.Components.Figma.EntityPortrait>()?.Release();
+                view?.RemoveFromHierarchy();
+            }
+            catch { }
+        }
+
         // ─── Making a hero ───────────────────────────────────────────────────────────────
 
         /// <summary>
@@ -702,14 +864,18 @@ namespace Heroes
             var picture = new VisualElement();
             picture.style.flexGrow = new StyleFloat(1f);
             picture.style.marginTop = picture.style.marginBottom = new StyleLength(10f);
-            if (_portraits.TryGetValue(id, out var portrait))
+            // The client's own portrait, alive: seated when he is not in the world, standing when
+            // he is. The server's still drawing when the client's cannot be had.
+            var live = LivePortrait("card", id, Str(who, "look"), seated: !connected);
+            if (live != null) picture.Add(live);
+            else if (_portraits.TryGetValue(id, out var portrait))
             {
                 picture.style.backgroundImage = new StyleBackground(portrait);
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
             }
             else AskPortrait(id);
             frame.Add(picture);
-            if (!connected) frame.style.opacity = new StyleFloat(0.45f);
+            if (!connected && live == null) frame.style.opacity = new StyleFloat(0.45f);
             card.Add(frame);
 
             // What can be done with him.
@@ -1401,7 +1567,9 @@ namespace Heroes
             var picture = new VisualElement();
             picture.style.flexGrow = new StyleFloat(1f);
             picture.style.marginLeft = new StyleLength(3f);
-            if (_portraits.TryGetValue(id, out var portrait))
+            var live = LivePortrait("panel", id, Str(who, "look"), seated: false);
+            if (live != null) picture.Add(live);
+            else if (_portraits.TryGetValue(id, out var portrait))
             {
                 picture.style.backgroundImage = new StyleBackground(portrait);
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
