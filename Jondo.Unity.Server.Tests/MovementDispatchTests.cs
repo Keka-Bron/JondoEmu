@@ -8,12 +8,12 @@ using Recipient = Jondo.Unity.Server.Tests.GameMessagingTests.Recipient;
 
 namespace Jondo.Unity.Server.Tests;
 
-public sealed class WorldMovementDispatchTests
+public sealed class MovementDispatchTests
 {
     private static readonly GameCodec Codec = new();
 
     private static Task<bool> Dispatch(GameSession session, byte[] bytes) =>
-        WorldMovementDispatch.TryHandleAsync(session, bytes, Codec.ReadEnvelope(bytes).Content.TypeUrl);
+        MovementDispatch.TryHandleAsync(session, GameNodeProxy.DecodeRequest(session, bytes));
 
     [Theory]
     [InlineData(-1)]
@@ -55,42 +55,64 @@ public sealed class WorldMovementDispatchTests
     [Theory]
     [InlineData("malformed")]
     [InlineData("wrong-kind")]
-    public async Task Bad_migrated_requests_are_consumed_without_mutating_state_or_falling_back(string scenario)
+    public async Task Bad_requests_do_not_claim_typed_handling_or_mutate_state(string scenario)
     {
         using var target = new Recipient(12_000_021);
         target.Session.State.CellId = 17;
         var root = hea.Parser.ParseFrom(Codec.Encode(new(new MapMovementRequest(target.Session.MapId, [42], false), 12)));
-        string typeUrl = root.Fllm.Fllg.TypeUrl;
         if (scenario == "malformed") root.Fllm.Fllg.Value = ByteString.CopyFrom([0x12, 0x01, 0x80]);
         else root.Flll = new hdx { Fllb = root.Fllm.Fllg.Clone() };
-        Assert.True(await WorldMovementDispatch.TryHandleAsync(target.Session, root.ToByteArray(), typeUrl));
+        Assert.False(await Dispatch(target.Session, root.ToByteArray()));
         Assert.Equal(17, target.Session.State.CellId);
         Assert.Empty(target.Packets);
     }
 
     [Fact]
-    public async Task Combat_and_unrelated_messages_do_not_enter_typed_world_handlers()
+    public async Task Combat_consumes_movement_without_entering_roleplay_handlers()
     {
         var codec = new GameMessagingTests.CountingCodec();
         using var target = new Recipient(12_000_022, codec);
         target.Session.State.IsInFight = true;
+        target.Session.State.CellId = 17;
+        target.Session.State.PendingMovementMapId = target.Session.MapId;
+        target.Session.State.PendingMovementCellId = 23;
+        int mapChanges = 0;
         foreach (var request in new GameRequest[] { new MapMovementRequest(target.Session.MapId, [1, 2], true),
-            new MapMovementCancelRequest(1), new MapMovementConfirmRequest() })
-            Assert.False(await Dispatch(target.Session, Codec.Encode(new(request, 1))));
+            new MapMovementCancelRequest(1), new MapMovementConfirmRequest(), new MapChangeRequest(42, false) })
+            Assert.True(await MovementDispatch.TryHandleAsync(target.Session,
+                GameNodeProxy.DecodeRequest(target.Session, Codec.Encode(new(request, 1))), () => mapChanges++));
+        Assert.Equal(17, target.Session.State.CellId);
+        Assert.Equal(target.Session.MapId, target.Session.State.PendingMovementMapId);
+        Assert.Equal(23, target.Session.State.PendingMovementCellId);
+        Assert.Equal(0, mapChanges);
         target.Session.State.IsInFight = false;
         Assert.False(await Dispatch(target.Session, Codec.Encode(new(new PingRequest(false), 2))));
-        Assert.Equal(0, codec.Decodes);
+        Assert.Equal(5, codec.Decodes);
         Assert.Empty(target.Packets);
     }
 
-    [Fact]
-    public async Task Requests_before_world_entry_are_consumed_without_decoding_or_responding()
+    [Theory]
+    [InlineData(0)] // No authentication.
+    [InlineData(1)] // No selected character.
+    [InlineData(2)] // Not in world.
+    public async Task Requests_before_world_entry_are_decoded_but_not_claimed_or_answered(int stage)
     {
         var codec = new GameMessagingTests.CountingCodec();
-        using var target = new Recipient(12_000_023, codec, enterWorld: false);
-        Assert.True(await Dispatch(target.Session, Codec.Encode(new(new MapMovementConfirmRequest(), 1))));
-        Assert.Equal(0, codec.Decodes);
-        Assert.Empty(target.Packets);
+        var packets = new List<byte[]>();
+        var session = new GameSession(codec, bytes => { packets.Add(bytes); return Task.CompletedTask; });
+        if (stage > 0) session.BindAccount(99_000_023, 1);
+        if (stage > 1) session.State.CharacterId = 99_000_023;
+        var entry = new GameEntryService(session, new GameEntryBackend());
+        foreach (var request in new GameRequest[] { new MapMovementRequest(42, [1, 2], false),
+            new MapMovementConfirmRequest(), new MapMovementCancelRequest(1), new MapChangeRequest(43, false) })
+        {
+            var frame = GameNodeProxy.DecodeRequest(session, Codec.Encode(new(request, 1)));
+            Assert.False(await MovementDispatch.TryHandleAsync(session, frame));
+            // The action is refused, but the outer dispatcher still owns its recognized type.
+            Assert.Equal(GameEntryResult.Handled, await GameNodeProxy.DispatchTypedAsync(session, frame, entry));
+        }
+        Assert.Equal(4, codec.Decodes);
+        Assert.Empty(packets);
     }
 
     [Fact]

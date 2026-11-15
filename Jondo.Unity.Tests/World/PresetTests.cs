@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -71,7 +73,7 @@ namespace Jondo.Unity.Tests.World
                     await PresetHandler.PlayerStateAsync(pipe.ToClient);
                     var own = Sub(await pipe.Next("ifz"), 1);
                     Assert.Equal(CharacterPresets.PlayerStateName, Text(own, 4));
-                    Assert.Equal(100, Column(Sub(own, 3), ConnectionProtocol.Stat.Strength)[1]);
+                    Assert.Equal(100, Column(Sub(own, 3), Stat.Strength)[1]);
                     // Life travels with its key at zero, as the maps of the capture write it.
                     Assert.Contains(Fields(Sub(own, 3)), f => Fields(f.BytesValue).Any(g => g.FieldNumber == 1 && g.WireType == 0 && g.VarIntValue == 0));
 
@@ -97,16 +99,16 @@ namespace Jondo.Unity.Tests.World
                     var iic = await pipe.Next("iic");
                     Assert.Equal(1, Fields(iic).First(f => f.FieldNumber == 4).VarIntValue);
                     var sheet = Sub(Sub(iic, 2), 2);
-                    Assert.Equal(30, Column(sheet, ConnectionProtocol.Stat.Strength)[6]);
-                    Assert.Equal(5 * 130, Column(sheet, ConnectionProtocol.Stat.Pods)[3]);
-                    Assert.Equal(ConnectionProtocol.PodsBeforeStrength(state), Column(sheet, ConnectionProtocol.Stat.Pods)[4]);
+                    Assert.Equal(30, Column(sheet, Stat.Strength)[6]);
+                    Assert.Equal(5 * 130, Column(sheet, Stat.Pods)[3]);
+                    Assert.Equal(ConnectionProtocol.PodsBeforeStrength(state), Column(sheet, Stat.Pods)[4]);
 
                     // Points: fifty in strength fit a level 200; five thousand do not.
                     await PresetHandler.PointsAsync(pipe.ToClient, ConnectionProtocol.Push("iha",
                         Pb.New().Str(1, uuid).Msg(2, Pb.New().Var(1, 10).Var(2, 50)).Build()));
                     var ijd = await pipe.Next("ijd");
                     Assert.Equal(1, Fields(ijd).First(f => f.FieldNumber == 3).VarIntValue);
-                    Assert.Equal(50, Column(Sub(ijd, 1), ConnectionProtocol.Stat.Strength)[2]);
+                    Assert.Equal(50, Column(Sub(ijd, 1), Stat.Strength)[2]);
                     await PresetHandler.PointsAsync(pipe.ToClient, ConnectionProtocol.Push("iha",
                         Pb.New().Str(1, uuid).Msg(2, Pb.New().Var(1, 10).Var(2, 5000)).Build()));
                     Assert.DoesNotContain(Fields(await pipe.Next("ijd")), f => f.FieldNumber == 3);
@@ -117,7 +119,7 @@ namespace Jondo.Unity.Tests.World
                     var saved = CharacterPresets.Find(character, uuid)!;
                     Assert.Equal("Fuerza", saved.Name);
                     Assert.Equal(amulet, saved.Items[0]);
-                    Assert.Equal(50, saved.Points[ConnectionProtocol.Stat.Strength]);
+                    Assert.Equal(50, saved.Points[Stat.Strength]);
 
                     // An edit thrown away: the build stays as saved.
                     await PresetHandler.RenameAsync(pipe.ToClient, ConnectionProtocol.Push("ihf",
@@ -130,11 +132,24 @@ namespace Jondo.Unity.Tests.World
                     // Put on: the amulet worn, the points spent, ihq last.
                     await PresetHandler.EquipAsync(pipe.ToClient, ConnectionProtocol.Push("iio", Pb.New().Str(1, uuid).Build()), Account);
                     var opcodes = new List<string>();
+                    var sheets = new List<CharacterCharacteristics>();
+                    var codec = new GameCodec();
                     for (int i = 0; i < 80 && (opcodes.Count == 0 || opcodes[^1] != "ihq"); i++)
-                        opcodes.Add((await pipe.NextAny()).Opcode);
+                    {
+                        byte[] frame = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(10));
+                        string opcode = ConnectionProtocol.ReadOpcode(frame)!;
+                        opcodes.Add(opcode);
+                        if (opcode == "kub") sheets.Add(Assert.IsType<CharacterCharacteristicsEvent>(codec.Decode(frame).Content).Stats);
+                    }
                     Assert.Equal("kub", opcodes[0]);
                     Assert.Contains("ivq", opcodes);
+                    Assert.DoesNotContain("krb", opcodes);
+                    Assert.Equal("kub", opcodes[^2]);
                     Assert.Equal("ihq", opcodes[^1]);
+                    Assert.Equal(2, sheets.Count);
+                    Assert.All(sheets, sheet => Assert.Equal(945,
+                        Assert.IsType<CharacterCharacteristicCaseDetailed>(sheet.Characteristics.Single(
+                            value => value.CharacteristicId == Stat.RemainingPoints).CharacteristicCase).Value.Base));
                     Assert.Equal(0, Equipment.ByUid(amulet)!.Position);
                     Assert.Equal(50, state.StatStrength);
 
@@ -148,6 +163,70 @@ namespace Jondo.Unity.Tests.World
                     Assert.Equal(1, Fields(await pipe.Next("ihc")).First(f => f.FieldNumber == 1).VarIntValue);
                     Assert.Empty(CharacterPresets.Of(character));
                 }
+            }
+            finally
+            {
+                CharacterPresets.Forget(character);
+                DatabaseManager.DeleteCharacter(character, Account);
+            }
+        }
+
+        [Fact]
+        public async Task Invalid_point_requests_leave_the_existing_draft_and_saved_distribution_unchanged()
+        {
+            long character = DatabaseManager.CreateCharacter(Account, 1, "Conjunto-Coste", 8, 0, 1,
+                new long[] { -1, -1, -1, -1, -1 }, 191105026, 200, 0, 0, Array.Empty<(int, int)>());
+            Assert.True(character > 0);
+            try
+            {
+                var preset = CharacterPresets.Create(character, new() { Name = "Valid", Points = new() { [Stat.Strength] = 50 } })!;
+                Assert.NotNull(preset);
+                await using var pipe = await ClientPipe.OpenAsync(Account, character, 990_100_044, "Conjunto-Coste");
+                pipe.Session.State.CharacterLevel = 200;
+                using var context = SessionContext.Push(pipe.Session);
+
+                foreach (long wisdom in new[] { -1L, 1_431_655_766L, int.MaxValue, (long)int.MaxValue + 1, 4_294_967_346L })
+                {
+                    byte[] wanted = Pb.New().Str(1, preset.Uuid)
+                        .Msg(2, Pb.New().Var(1, Stat.Strength).Var(2, 60))
+                        .Msg(2, Pb.New().Var(1, Stat.Wisdom).Var(2, wisdom)).Build();
+                    await PresetHandler.PointsAsync(pipe.ToClient, Request("iha", wanted, 71));
+                    byte[] refused = await pipe.Next("ijd");
+                    Assert.DoesNotContain(Fields(refused), field => field.FieldNumber == 3);
+                    Assert.Equal(50, Column(Sub(refused, 1), Stat.Strength)[2]);
+                    Assert.Equal(50, Assert.Single(CharacterPresets.ForEdit(character, preset.Uuid)!.Points).Value);
+                    Assert.Equal(50, Assert.Single(CharacterPresets.Find(character, preset.Uuid)!.Points).Value);
+                }
+            }
+            finally
+            {
+                CharacterPresets.Forget(character);
+                DatabaseManager.DeleteCharacter(character, Account);
+            }
+        }
+
+        [Fact]
+        public async Task Equipping_a_persisted_overflowing_distribution_keeps_the_characters_allocation()
+        {
+            long character = DatabaseManager.CreateCharacter(Account, 1, "Conjunto-Invalido", 8, 0, 1,
+                new long[] { -1, -1, -1, -1, -1 }, 191105026, 200, 0, 0, Array.Empty<(int, int)>());
+            Assert.True(character > 0);
+            try
+            {
+                var preset = CharacterPresets.Create(character, new() { Name = "Old invalid", Points = new() { [Stat.Wisdom] = 1_431_655_766 } })!;
+                Assert.NotNull(preset);
+                await using var pipe = await ClientPipe.OpenAsync(Account, character, 990_100_045, "Conjunto-Invalido");
+                var state = pipe.Session.State;
+                state.CharacterLevel = 200;
+                state.StatStrength = 41;
+                state.StatWisdom = 17;
+                state.CharacterRemainingPoints = 903;
+                using var context = SessionContext.Push(pipe.Session);
+                await PresetHandler.EquipAsync(pipe.ToClient, Request("iio", Pb.New().Str(1, preset.Uuid).Build(), 72), Account);
+                var opcodes = new List<string>();
+                do { opcodes.Add((await pipe.NextAny()).Opcode); } while (opcodes[^1] != "ihq" && opcodes.Count < 80);
+                Assert.Equal(new[] { "kub", "itg", "kub", "ihq" }, opcodes);
+                Assert.Equal((41, 17, 903), (state.StatStrength, state.StatWisdom, state.CharacterRemainingPoints));
             }
             finally
             {

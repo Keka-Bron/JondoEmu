@@ -1192,7 +1192,7 @@ namespace Jondo.Unity.Server.Handlers
         // ─── The note, the log and the directory ────────────────────────────────
 
         /// <summary>A member's entry brought up to date (jgz), with everything known about him.</summary>
-        private static byte[] MemberUpdated(GuildStore.Member member, DatabaseManager.DbCharacter character)
+        private static byte[] MemberUpdated(GuildStore.Member member, DbCharacter character)
             => GuildProtocol.BuildMemberUpdated(member, character.Name, character.Level, character.AccountId,
                                                 character.Breed, Achievements.PointsOf(member.CharacterId),
                                                 GuildStore.ContributedBy(member.CharacterId),

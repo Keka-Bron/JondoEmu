@@ -128,7 +128,7 @@ namespace Jondo.Unity.Server.Handlers
             me.RegenerationStartedUtc = now;
             if (gained > 0) Energy.Set(character, energy + gained);
 
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await WriteAsync(stream, ConnectionProtocol.BuildRegenerationStarted(ConnectionProtocol.RegenerationRateNow()));
             if (life > 0)
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,

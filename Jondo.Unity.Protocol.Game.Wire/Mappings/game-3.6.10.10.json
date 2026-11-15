@@ -3827,7 +3827,9 @@
       "name": "AlignmentExtendedInformation",
       "fields": {
         "gbuq": "Honor",
-        "gbur": "Attackable"
+        "gbur": "Attackable",
+        "gbus": "HonorNextGradeFloor",
+        "gbut": "HonorGradeFloor"
       },
       "oneofs": {},
       "ignoredStableMembers": [],

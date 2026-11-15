@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -39,28 +40,26 @@ namespace Jondo.Unity.Tests.Sessions
                 session.State.StatWisdom = 0;
                 session.State.ScrolledWisdom = 0;
 
-                var kub = ProtoMessage.Parse(ConnectionProtocol.BuildCharacteristics());
-                var body = ProtoMessage.Parse(kub.Fields.Single(f => f.FieldNumber == 2).BytesValue);
+                var body = CharacteristicsMessages.Live.Snapshot(session).Stats;
 
-                var strength = Detail(body, ConnectionProtocol.Stat.Strength);
-                Assert.Equal(398, Value(strength, 2));
-                Assert.Equal(100, Value(strength, 3));
+                var strength = Detail(body, Stat.Strength);
+                Assert.Equal(398, strength.Base);
+                Assert.Equal(100, strength.Additional);
 
                 // No points and with scrolls: only f3, which is what a proto3 does with a zero.
-                var vitality = Detail(body, ConnectionProtocol.Stat.Vitality);
-                Assert.Equal(0, Value(vitality, 2));
-                Assert.Equal(100, Value(vitality, 3));
+                var vitality = Detail(body, Stat.Vitality);
+                Assert.Equal(0, vitality.Base);
+                Assert.Equal(100, vitality.Additional);
 
                 // And with neither of the two, nothing at all.
-                var wisdom = Detail(body, ConnectionProtocol.Stat.Wisdom);
-                Assert.Equal(0, Value(wisdom, 2));
-                Assert.Equal(0, Value(wisdom, 3));
+                var wisdom = Detail(body, Stat.Wisdom);
+                Assert.Equal(0, wisdom.Base);
+                Assert.Equal(0, wisdom.Additional);
 
                 // What the game uses is the sum: 498 strength is 2,490 pods, on top of the
                 // thousand and the five a level (ConnectionProtocol.Capacity).
                 Assert.Equal(498, session.State.TotalStrength);
-                Assert.Equal(1000 + 5 * (session.State.CharacterLevel - 1) + 5 * 498,
-                             Value(Detail(body, ConnectionProtocol.Stat.Pods), 2));
+                Assert.Equal(1000 + 5 * (session.State.CharacterLevel - 1) + 5 * 498, Detail(body, Stat.Pods).Base);
             }
         }
 
@@ -80,15 +79,39 @@ namespace Jondo.Unity.Tests.Sessions
                 session.State.StatStrength = 50;
                 Equipment.Add(9_000_000_123, 17626, 1, 0, "[[124,254,0,0]]");
 
-                var kub = ProtoMessage.Parse(ConnectionProtocol.BuildCharacteristics());
-                var body = ProtoMessage.Parse(kub.Fields.Single(f => f.FieldNumber == 2).BytesValue);
+                var body = CharacteristicsMessages.Live.Snapshot(session).Stats;
 
-                Assert.Equal(35, Value(Detail(body, ConnectionProtocol.Stat.DodgeActionPoints), 2));
-                Assert.Equal(35, Value(Detail(body, ConnectionProtocol.Stat.WithdrawMovementPoints), 2));
-                Assert.Equal(50 + 100, Value(Detail(body, ConnectionProtocol.Stat.Initiative), 2));
-                Assert.Equal(100 + 10, Value(Detail(body, ConnectionProtocol.Stat.Prospecting), 2));
-                Assert.Equal(1000 + 5 * 199 + 5 * 50, Value(Detail(body, ConnectionProtocol.Stat.Pods), 2));
+                Assert.Equal(35, Detail(body, Stat.DodgeActionPoints).Base);
+                Assert.Equal(35, Detail(body, Stat.WithdrawMovementPoints).Base);
+                Assert.Equal(50 + 100, Detail(body, Stat.Initiative).Base);
+                Assert.Equal(100 + 10, Detail(body, Stat.Prospecting).Base);
+                Assert.Equal(1000 + 5 * 199 + 5 * 50, Detail(body, Stat.Pods).Base);
             }
+        }
+
+        [Fact]
+        public void Semantic_sheet_reads_equipment_and_scrolled_points_from_its_explicit_owner()
+        {
+            var own = GameSession.SinSocket();
+            own.State.CharacterLevel = 200;
+            own.State.StatStrength = 50;
+            own.State.ScrolledStrength = 100;
+            own.State.ScrolledWisdom = 100;
+            var item = new Equipment.Item { Position = 0, Template = 17626 };
+            item.Effects.Add(new Equipment.ItemEffect(124, 254, 0, 0));
+            own.State.EquipmentItems[9_000_000_124] = item;
+            var wrong = GameSession.SinSocket();
+            wrong.State.StatStrength = 999;
+            using var context = SessionContext.Push(wrong);
+
+            var sheet = CharacteristicsMessages.Live.Snapshot(own).Stats;
+            CharacterCharacteristicDetailed Stat(int id) => Assert.IsType<CharacterCharacteristicCaseDetailed>(
+                sheet.Characteristics.Single(entry => entry.CharacteristicId == id).CharacteristicCase).Value;
+            Assert.Equal(new CharacterCharacteristicDetailed(50, 100, 0, 0, 0, 0), Stat(10));
+            Assert.Equal(new CharacterCharacteristicDetailed(0, 100, 0, 0, 254, 0), Stat(12));
+            Assert.Equal(35, Stat(27).Base);
+            Assert.Equal(1750, Stat(40).Base);
+            Assert.Same(wrong, SessionContext.Actual);
         }
 
         /// <summary>
@@ -174,22 +197,8 @@ namespace Jondo.Unity.Tests.Sessions
             }
         }
 
-        private static ProtoMessage Detail(ProtoMessage body, int statId)
-        {
-            foreach (var field in body.Fields)
-            {
-                if (field.FieldNumber != 11 || field.WireType != 2) continue;
-                var entry = ProtoMessage.Parse(field.BytesValue);
-                long id = entry.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0)?.VarIntValue ?? 0;
-                if (id != statId) continue;
-                var detail = entry.Fields.FirstOrDefault(f => f.FieldNumber == 4 && f.WireType == 2);
-                return detail == null ? new ProtoMessage() : ProtoMessage.Parse(detail.BytesValue);
-            }
-
-            return new ProtoMessage();
-        }
-
-        private static long Value(ProtoMessage detail, int field)
-            => detail.Fields.FirstOrDefault(f => f.FieldNumber == field && f.WireType == 0)?.VarIntValue ?? 0;
+        private static CharacterCharacteristicDetailed Detail(CharacterCharacteristics body, int statId)
+            => Assert.IsType<CharacterCharacteristicCaseDetailed>(
+                body.Characteristics.Single(entry => entry.CharacteristicId == statId).CharacteristicCase).Value;
     }
 }

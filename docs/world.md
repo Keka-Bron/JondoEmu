@@ -617,11 +617,13 @@ integer left female characters stored as male while retaining their chosen femal
 The same `kvb` carrying a reason means no: 1 refused, 2 name taken, 3 the character limit (that last
 one from the capture of a failed creation). Colours arrive as six signed varints and −1 means
 "whatever the breed brings"; the client sends all six as −1 when the palette is untouched, which is
-what the original captures show. Custom values are bare RGB: creation resolves each -1 at its
-original position and adds the slot index before saving the palette in `Characters.Look`.
-Rebuilt looks recover that palette for selection, maps, combat and appearance updates; outfits
-strip the indices back off for their bare RGB colour lists. Existing current-layout looks with
-bare RGB from the old creation bug can also be read without rewriting the database.
+what the original captures show. Custom values are bare RGB: creation stores them in the fixed
+`Characters.Color1` through `Color6` columns, with NULL for inherited/default slots. Look construction
+resolves each default in place and adds slot indices only for the outgoing appearance. Selection,
+maps, combat and appearance updates use the same builder; outfits still supply bare RGB colour lists.
+One startup migration extracts historical bare/indexed palettes from `Characters.Look`, removes
+that obsolete blob column and records completion in one transaction. Fresh databases start with
+the six colour columns and record the same completion marker without changing their colours.
 
 A new character gets:
 
@@ -946,6 +948,10 @@ Not one. Most of them are `FightHandler`'s own; the last row and a few others ar
 transition path (`Handlers/MapChangeHandler.cs`, `Handlers/MapLoadHandler.cs`,
 `Handlers/StatsHandler.cs`, `Network/GameNodeProxy.cs`, `Network/TransitionPacketsBuilder.cs`). They
 are all the previous version of the protocol.
+
+**13 November 2026 update:** this is the historical scan. The obsolete stat/weight/capital
+builders and `krc`/old `isi`/`kkn` routes have since been removed, and `StatsHandler`
+was replaced by the session-owned `CombatCharacteristics`. See [the audit](stats-handler-audit.md).
 
 And the two the fight code reads as client requests travel the other way in reality. Measured on
 `Combate/combate contra poutch nivel 50…pcapng`:

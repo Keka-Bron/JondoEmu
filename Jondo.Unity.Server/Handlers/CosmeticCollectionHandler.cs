@@ -186,7 +186,7 @@ namespace Jondo.Unity.Server.Handlers
             var character = DatabaseManager.GetCharacterById(state.CharacterId);
             if (character == null) return;
             byte[] kmb = ConnectionProtocol.Push(Op.Kmb,
-                Pb.New().Bytes(1, BreedLookTable.MapLook(character)).Var(2, state.CharacterId).Build());
+                Pb.New().Bytes(1, CharacterLookBuilder.MapLook(character)).Var(2, state.CharacterId).Build());
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, kmb);
             await SessionRegistry.BroadcastToMapAsync(state.MapId, kmb, SessionContext.Current.Id);
         }

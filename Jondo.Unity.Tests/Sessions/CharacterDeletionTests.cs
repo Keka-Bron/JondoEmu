@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
@@ -38,55 +39,58 @@ namespace Jondo.Unity.Tests.Sessions
     /// </remarks>
     public class CharacterDeletionTests
     {
-        private static readonly List<DatabaseManager.DbCharacter> Two = new()
+        private static readonly List<DbCharacter> Two = new()
         {
-            new DatabaseManager.DbCharacter { Id = 100_001, Name = "Primero", Level = 1, Breed = 13 },
-            new DatabaseManager.DbCharacter { Id = 100_002, Name = "Segundo", Level = 1, Breed = 4 },
+            new DbCharacter { Id = 100_001, Name = "Primero", Level = 1, Breed = 13 },
+            new DbCharacter { Id = 100_002, Name = "Segundo", Level = 1, Breed = 4 },
         };
 
-        private static List<string> Opcodes(IEnumerable<byte[]> frames)
+        private static async Task<IReadOnlyList<GameFrame>> CaptureAsync(Func<GameSession, Task> send)
         {
-            const string Prefix = "type.ankama.com/";
-            var found = new List<string>();
-
-            foreach (byte[] frame in frames)
-            {
-                string ascii = System.Text.Encoding.ASCII.GetString(frame);
-                int at = ascii.IndexOf(Prefix, StringComparison.Ordinal);
-                if (at < 0 || at + Prefix.Length + 3 > ascii.Length) continue;
-
-                found.Add(ascii.Substring(at + Prefix.Length, 3));
-            }
-
-            return found;
+            var codec = new RecordingCodec();
+            var session = new GameSession(codec, _ => Task.CompletedTask);
+            session.BindAccount(8_919_099_002, 290);
+            await send(session);
+            return codec.Frames;
         }
 
-        // ------------------------------------------------------------------ the list travels whole
+        private static Task<IReadOnlyList<GameFrame>> RefreshAsync(IReadOnlyList<DbCharacter> characters)
+            => CaptureAsync(session => new CharacterListService(
+                new(_ => new([], 3, 1, [], [], [])), new(_ => { }, _ => [], () => [], _ => { }))
+                .SendAsync(session, characters));
 
-        [Fact]
-        public void The_list_is_five_frames_in_the_captured_order()
+        private static void AssertRefresh(IReadOnlyList<GameFrame> refresh, params long[] characterIds)
         {
-            Assert.Equal(new[] { Op.Kqp, Op.Kqp, Op.Kqp, Op.Kvi, Op.Jtg },
-                         Opcodes(ConnectionProtocol.CharacterListFrames(Two)).ToArray());
+            Assert.Equal(5, refresh.Count);
+            Assert.Equal(new GamePayload[] { new QueueStatusEvent(1, 1), new QueueStatusEvent(1, 0),
+                new QueueStatusEvent(0, 0) }, refresh.Take(3).Select(frame => frame.Content));
+            var list = Assert.IsType<CharacterListEvent>(refresh[3].Content);
+            Assert.Equal(characterIds, list.Characters.Select(character => character.Id));
+            Assert.IsType<GameActionItemListEvent>(refresh[4].Content);
+            Assert.All(refresh, frame => Assert.Null(frame.Uid));
         }
 
-        [Fact]
-        public void The_welcome_burst_still_ends_with_it()
-        {
-            // Factoring the frames out must not have moved them: the burst finishes with the list,
-            // and WelcomeBurstTests pins what comes before.
-            var burst = Opcodes(ConnectionProtocol.BuildWelcomeBurst(Two));
+        // ------------------------------------------------------------------ semantic list delivery
 
-            Assert.Equal(new[] { Op.Kqp, Op.Kqp, Op.Kqp, Op.Kvi, Op.Jtg },
-                         burst.Skip(burst.Count - 5).ToArray());
+        [Fact]
+        public async Task The_refresh_sends_three_queue_events_then_the_list_and_gifts()
+        {
+            AssertRefresh(await RefreshAsync(Two), 100_001, 100_002);
         }
 
         [Fact]
-        public void An_empty_account_gets_the_same_five()
+        public async Task The_production_welcome_ends_with_the_same_semantic_refresh_without_force_selection()
         {
-            // The state a deletion can leave behind. The frames are the same; only the kvi is bare.
-            Assert.Equal(5, ConnectionProtocol.CharacterListFrames(
-                new List<DatabaseManager.DbCharacter>()).Count);
+            var frames = await CaptureAsync(session => ConnectionProtocol.SendWelcomeAsync(session, Two, withList: true));
+            Assert.Contains(frames, frame => frame.Content is ServerSessionReadyEvent);
+            Assert.DoesNotContain(frames, frame => frame.Content is CharacterForceSelectionEvent);
+            AssertRefresh(frames.TakeLast(5).ToArray(), 100_001, 100_002);
+        }
+
+        [Fact]
+        public async Task An_empty_account_receives_an_empty_replacement_in_the_same_sequence()
+        {
+            AssertRefresh(await RefreshAsync([]));
         }
 
         // ------------------------------------------------------------------------- reading the id
@@ -141,6 +145,13 @@ namespace Jondo.Unity.Tests.Sessions
             Assert.Equal("", DatabaseManager.DeleteCharacter(100_002L, 0));
             Assert.Equal("", DatabaseManager.DeleteCharacter(0, 100_000_001L));
             Assert.Equal("", DatabaseManager.DeleteCharacter(-1, -1));
+        }
+
+        private sealed class RecordingCodec : IGameCodec
+        {
+            internal List<GameFrame> Frames { get; } = [];
+            public byte[] Encode(GameFrame frame) { Frames.Add(frame); return [0x42]; }
+            public GameFrame Decode(ReadOnlySpan<byte> payload) => throw new Exception("Unexpected list decode");
         }
     }
 }

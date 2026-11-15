@@ -1,7 +1,6 @@
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Protocol;
 using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -16,56 +15,13 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     public static class WorldEntry
     {
-        /// <summary>Every characteristic id in the measured catalogue, in catalogue order.</summary>
-        public static IReadOnlyList<int> CharacteristicIds => _characteristicIds;
-        private static readonly List<int> _characteristicIds = new List<int>();
-        private static readonly Dictionary<int, int> _containers = new Dictionary<int, int>();
-
-        public static int ContainerOf(int characteristicId)
-            => _containers.TryGetValue(characteristicId, out int field) ? field : 4;
-
-        /// <summary>
-        /// Loads the characteristics catalogue independently of world-entry packets.
-        /// The catalogue specifies both the declared ids and each value's container.
-        /// </summary>
-        public static void Initialize()
-        {
-            _characteristicIds.Clear();
-            _containers.Clear();
-            try
-            {
-                string path = Paths.CharacteristicFieldsJson;
-                if (!System.IO.File.Exists(path))
-                {
-                    Console.WriteLine("[World] datos/caracteristicas_kub.json is not there: the characteristics " +
-                                      "sheet will come out short.");
-                    return;
-                }
-
-                using var doc = System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(path));
-                foreach (var entry in doc.RootElement.EnumerateArray())
-                {
-                    int id = entry.GetProperty("id").GetInt32();
-                    int container = entry.GetProperty("hueco").GetInt32();
-                    if (!_characteristicIds.Contains(id)) _characteristicIds.Add(id);
-                    _containers[id] = container;
-                }
-
-                Console.WriteLine($"[World] {_characteristicIds.Count} characteristics read from " +
-                                  $"datos/caracteristicas_kub.json.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[World] Could not read the characteristics list: {ex.Message}");
-            }
-        }
-
         /// <summary>
         /// Initial state after selection: semantic sends, live feature hooks, then
         /// session-owned HAAPI identity and account gifts, without a client wait.
         /// </summary>
-        public static async Task<int> SendInitialStateAsync(GameSession session, DatabaseManager.DbCharacter character)
+        public static async Task<int> SendInitialStateAsync(GameSession session, DbCharacter character)
         {
+            using var context = SessionContext.Push(session);
             var stream = session.Stream ?? throw new InvalidOperationException("World entry requires a connected game session.");
             var initial = new GameEntryInitialMessages(
                 Managers.HavenBagStore.RoomsOf(character.Id), Managers.Merkasako.Themes,
@@ -116,28 +72,29 @@ namespace Jondo.Unity.Server.Network
             byte[]? sales = Handlers.MarketplaceHandler.SalesHistoryAtEntry(character.Id, SessionContext.Current.AccountId);
             if (sales != null) await EnviarAsync(stream, ConnectionProtocol.Push(Op.Las, sales));
 
-            await EnviarAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await session.SendAsync(CharacteristicsMessages.Live.Snapshot(session));
+            sent++;
             Console.WriteLine($"[World] Characteristics sent for {character.Name}: level " +
-                              $"{SessionContext.State.CharacterLevel}, {SessionContext.State.Kamas} kamas.");
-
-            Console.WriteLine($"[World] Initial state sent: {sent} directly constructed messages for " +
-                              $"{character.Name}.");
+                              $"{session.State.CharacterLevel}, {session.State.Kamas} kamas.");
 
             // Keep the continuation after the live hooks and characteristics, without
             // waiting for lqc. That later confirmation triggers map initialization.
-            return sent + await GameEntryContinuationMessages.Live.SendAsync(session);
+            int tail = await GameEntryContinuationMessages.Live.SendAsync(session);
+            Console.WriteLine($"[World] Initial state and continuation sent: {sent + tail} directly constructed messages for " +
+                              $"{character.Name}.");
+            return sent + tail;
         }
 
         /// <summary>Writes a frame through the entry projection and owning session's traffic log.</summary>
         private static Task EnviarAsync(NetworkStream stream, byte[] message)
             => GameEntryMessages.SendAsync(stream, message);
 
-        /// <summary>Direct current map, spell and shortcut state.</summary>
+        /// <summary>Sends map-entry state, then fresh characteristics and known zaaps.</summary>
         /// <param name="fightToRejoin">
         /// Set when the character is going straight back into a fight. The opening uses
         /// the fight context and arena, followed by the reconnection notice and actors.
         /// </param>
-        public static async Task<int> SendMapAsync(GameSession session, DatabaseManager.DbCharacter character, long mapId,
+        public static async Task<int> SendMapEntryStateAsync(GameSession session, DbCharacter character, long mapId,
                                                     Jondo.Unity.World.Fights.FightInstance? fightToRejoin = null)
         {
             using var context = SessionContext.Push(session);
@@ -147,6 +104,11 @@ namespace Jondo.Unity.Server.Network
                     ? Jondo.Unity.Protocol.Game.GameContext.RolePlay : Jondo.Unity.Protocol.Game.GameContext.Fight,
                 mapId, fightToRejoin == null ? null : SendReconnectionAsync);
 
+            // Snapshot after the map sequence commits the roleplay regeneration timestamp.
+            await session.SendAsync(CharacteristicsMessages.Live.Snapshot(session));
+            await session.SendAsync(EntryEnvironmentMessages.Live.Zaaps());
+            sent += 2;
+
             async Task<int> SendReconnectionAsync()
             {
                 await EnviarAsync(stream, ConnectionProtocol.Push(Op.Lqn,
@@ -155,15 +117,8 @@ namespace Jondo.Unity.Server.Network
                 return 2;
             }
 
-            // Repeat the characteristics at map entry; the client keeps this second sheet.
-            await EnviarAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
-
-            // Both entry snapshots use the same live catalogue policy for known zaaps.
-            var discovered = EntryEnvironmentMessages.Live.Zaaps();
-            await session.SendAsync(discovered);
-
             Console.WriteLine($"[World] Block 3 sent: {sent} messages, map {mapId}, characteristics " +
-                              $"resent, {discovered.Destinations.Count} zaaps descubiertos.");
+                              $"and known zaaps resent.");
             return sent;
         }
     }

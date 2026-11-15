@@ -29,11 +29,8 @@ namespace Jondo.Unity.Server.Handlers
     /// Each slot holds one thing, and this handler enforces it: whatever was already worn goes to
     /// the bag with its own ivq before the new one goes in.
     ///
-    /// Moving something also updates the cache of what is worn, which feeds
-    /// StatsHandler.GetEquipBonus and with it the FIGHT sheet -- maximum life, initiative --. Not the
-    /// characteristics one: that one is built with Equipment.Bonuses() over the real inventory and
-    /// was never stale through this road. The cache was, before, and the fight bonuses did not
-    /// arrive until the next character selection.
+    /// Moving something updates the inventory and the older worn-item view. Combat and the owner
+    /// characteristic sheet both read EquipmentItems through Equipment.BonusesOf, including sets.
     /// </summary>
     public static class EquipmentHandler
     {
@@ -283,8 +280,7 @@ namespace Jondo.Unity.Server.Handlers
             // only caught up on the next entry into the world.
             if (known && sheet)
             {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
                 // Put on or taken off while placing for a fight, the fight starts with it.
                 await FightHandler.RefreshPlacementSheetAsync(stream);
             }

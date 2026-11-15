@@ -82,6 +82,8 @@ namespace Jondo.Unity.Server.Network
         public NetworkStream? Stream { get; }
 
         public SessionState State { get; } = new SessionState();
+        /// <summary>Captures this owner's current human combat totals, independent of the ambient session.</summary>
+        public CombatCharacteristics Combat => new(this);
         public long AccountId { get; private set; }
         public int ServerId { get; private set; }
         public long CharacterId => State.CharacterId;

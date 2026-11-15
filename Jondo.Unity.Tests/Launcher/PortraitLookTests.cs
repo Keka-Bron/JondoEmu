@@ -48,12 +48,12 @@ namespace Jondo.Unity.Tests.Launcher
             // Female Cra with head 137, which is the one the test characters have. The id
             // at zero is "nobody": without a character in the base there is no equipment or cosmetics to add,
             // so what is left is exactly the body and the face.
-            var quien = new Jondo.Unity.Server.DatabaseManager.DbCharacter
+            var quien = new Jondo.Unity.Server.DbCharacter
             {
                 Id = 0, Name = "prueba", Breed = 9, Sex = 1, Level = 200, HeadId = 137,
             };
 
-            var look = NpcLook.Parse(Jondo.Unity.Server.Managers.BreedLookTable.Drawable(quien));
+            var look = NpcLook.Parse(Jondo.Unity.Server.Managers.CharacterLookBuilder.Drawable(quien));
 
             Assert.True(look.Valid);
             Assert.True(look.Humanoid);
@@ -61,7 +61,7 @@ namespace Jondo.Unity.Tests.Launcher
             // THE FIRST SKIN IS THE BODY: it is where the breed for choosing the rig comes from. Putting
             // anything else in front -- the head, a hat -- the rig is not found and
             // nothing is drawn, without a single error.
-            var suyo = Jondo.Unity.Server.Managers.BreedLookTable.Get(9, 1);
+            var suyo = Jondo.Unity.Server.Managers.BreedLookCatalog.Get(9, 1);
             Assert.NotNull(suyo);
             Assert.Equal((int)suyo!.Skins[0], look.Skins[0]);
             Assert.Equal(9, Breeds.Of(look.Skins[0]));
@@ -78,12 +78,12 @@ namespace Jondo.Unity.Tests.Launcher
         {
             // A breed that does not exist cannot compose anything, and has to return empty instead of
             // a half string the reader would take as valid.
-            var quien = new Jondo.Unity.Server.DatabaseManager.DbCharacter
+            var quien = new Jondo.Unity.Server.DbCharacter
             {
                 Id = 0, Name = "prueba", Breed = 999, Sex = 0,
             };
 
-            Assert.Equal("", Jondo.Unity.Server.Managers.BreedLookTable.Drawable(quien));
+            Assert.Equal("", Jondo.Unity.Server.Managers.CharacterLookBuilder.Drawable(quien));
         }
 
         [Fact]

@@ -1,5 +1,6 @@
 using System;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.World.Maps;
 
@@ -70,7 +71,7 @@ namespace Jondo.Unity.Server.Handlers
             int lost = ServerSettings.Current.NoEnergyLoss ? 0 : DefeatPenalty.EnergyLost(GameState.CharacterLevel, energy);
             Energy.Set(character, energy - lost);
 
-            int missing = DefeatPenalty.MissingLifeAfter(StatsHandler.GetPlayerMaxHp());
+            int missing = DefeatPenalty.MissingLifeAfter(SessionContext.Current.Combat.GetPlayerMaxHp());
             RestingLife.Set(character, missing, DateTime.UtcNow);
 
             var (map, cell) = SavePointOf(character);

@@ -259,14 +259,14 @@ namespace Jondo.Unity.Server.Network
         /// One characteristic of its sheet (lns), as the kub carries the player's: { f1 id, f4 { f2
         /// base, f7 what its equipment adds } }, or f5 { f1, f5 } for those the client reads there.
         /// </summary>
-        public static Pb Characteristic(int id, long baseValue, long bonus, int container)
+        public static Pb Characteristic(int id, long baseValue, long bonus)
         {
             var entry = Pb.New();
             if (id != 0) entry.Var(1, id);
-            switch (container)
+            switch (CharacteristicCatalogue.Default.KindOf(id))
             {
-                case 5: entry.Msg(5, Pb.New().Var(1, baseValue).VarIfNotZero(5, bonus)); break;
-                case 2: entry.Msg(2, Pb.New().VarIfNotZero(2, baseValue + bonus)); break;
+                case CharacteristicKind.Usable: entry.Msg(5, Pb.New().Var(1, baseValue).VarIfNotZero(5, bonus)); break;
+                case CharacteristicKind.Value: entry.Msg(2, Pb.New().VarIfNotZero(2, baseValue + bonus)); break;
                 default: entry.Msg(4, Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(7, bonus)); break;
             }
             return entry;

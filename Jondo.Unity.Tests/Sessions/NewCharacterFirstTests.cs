@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Jondo.Unity.Server;
-using DbCharacter = Jondo.Unity.Server.DatabaseManager.DbCharacter;
+using DbCharacter = Jondo.Unity.Server.DbCharacter;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Sessions

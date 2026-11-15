@@ -20,7 +20,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
             Console.WriteLine($"[Entry] Account {session.AccountId} came in again: {replaced} older connection(s) closed.");
     }
 
-    public IReadOnlyList<DatabaseManager.DbCharacter> GetCharacters(GameSession session)
+    public IReadOnlyList<DbCharacter> GetCharacters(GameSession session)
         => DatabaseManager.GetCharactersByAccountId(session.AccountId, session.ServerId);
 
     public bool CanResumeFight(long characterId) => FightHandler.FightToRejoin(characterId) != null;
@@ -42,19 +42,16 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         if (fight != null) await FightHandler.AbandonFromOutsideAsync(fight, characterId);
     }
 
-    public Task SendWelcomeAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withList)
+    public Task SendWelcomeAsync(GameSession session, IReadOnlyList<DbCharacter> characters, bool withList)
         => ConnectionProtocol.SendWelcomeAsync(session, characters, withList);
 
-    public Task SendCharacterListAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withInitialization)
-        => withInitialization
-            ? ConnectionProtocol.SendCharacterListAsync(session, characters)
-            : GameEntryMessages.SendAsync(session,
-                ConnectionProtocol.Push(Op.Kvi, ConnectionProtocol.BuildCharactersList(characters)));
+    public Task SendCharacterListAsync(GameSession session, IReadOnlyList<DbCharacter> characters, bool withInitialization)
+        => CharacterListService.Live.SendAsync(session, characters, withInitialization);
 
-    public DatabaseManager.DbCharacter? FindCharacter(long characterId)
+    public DbCharacter? FindCharacter(long characterId)
         => DatabaseManager.GetCharacterById(characterId);
 
-    public void LoadCharacterState(GameSession session, DatabaseManager.DbCharacter character)
+    public void LoadCharacterState(GameSession session, DbCharacter character)
     {
         Managers.Equipment.LoadFrom(character.Id);
         Managers.SpellChoices.LoadFrom(character.Id);
@@ -64,12 +61,12 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         session.State.ElementsUsed = DatabaseManager.LoadElementsUsed(character.Id);
     }
 
-    public Task AnnounceMapPresenceAsync(GameSession session, DatabaseManager.DbCharacter character)
+    public Task AnnounceMapPresenceAsync(GameSession session, DbCharacter character)
         => SessionRegistry.BroadcastToMapAsync(session.MapId,
             ConnectionProtocol.Push(Op.Jsn, ConnectionProtocol.BuildActorRefreshed(character,
                 session.State.CellId, session.State.Orientation, session.AccountId)), session.Id);
 
-    public Task SendInitialStateAsync(GameSession session, DatabaseManager.DbCharacter character)
+    public Task SendInitialStateAsync(GameSession session, DbCharacter character)
         => WorldEntry.SendInitialStateAsync(session, character);
 
     public Task RestoreGuildRaidAsync(long characterId)
@@ -81,10 +78,10 @@ internal sealed class GameEntryBackend : IGameEntryBackend
     public Task NotifyFriendsAsync(long accountId)
         => FriendsHandler.AnnouncePresenceAsync(accountId);
 
-    public Task RestoreRemodelAsync(GameSession session, DatabaseManager.DbCharacter character)
+    public Task RestoreRemodelAsync(GameSession session, DbCharacter character)
         => RemodelHandler.OnEnterWorldAsync(StreamOf(session), character);
 
-    public Task SendMapInitializationAsync(GameSession session, DatabaseManager.DbCharacter character)
+    public Task SendMapInitializationAsync(GameSession session, DbCharacter character)
     {
         // The character and the map go in the trace on purpose: when two clients enter at
         // once, it is the first thing to look at to know whether they have crossed.
@@ -94,8 +91,8 @@ internal sealed class GameEntryBackend : IGameEntryBackend
 
     private sealed class MapBackend : IGameEntryMapBackend
     {
-        public Task SendMapAsync(GameSession session, DatabaseManager.DbCharacter character)
-            => WorldEntry.SendMapAsync(session, character, session.MapId,
+        public Task SendMapAsync(GameSession session, DbCharacter character)
+            => WorldEntry.SendMapEntryStateAsync(session, character, session.MapId,
                 session.State.IsInFight ? FightHandler.FightOf(session.CharacterId) : null);
         // Available titles and ornaments, and which one is worn.
         public Task SendWardrobeAsync(GameSession session) => WardrobeHandler.SendOwnedAsync(StreamOf(session), session.AccountId);
@@ -163,7 +160,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         return false;
     }
 
-    public async Task SendMapInformationAsync(GameSession session, DatabaseManager.DbCharacter character)
+    public async Task SendMapInformationAsync(GameSession session, DbCharacter character)
     {
         var stream = StreamOf(session);
         var state = session.State;
@@ -225,7 +222,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         Console.WriteLine($"[Entry] Actors of map {session.MapId} sent: {character.Name} on cell {state.CellId}.");
     }
 
-    public Task TickAlterationsAsync(GameSession session) => AlterationHandler.TickAsync(StreamOf(session));
+    public Task TickAlterationsAsync(GameSession session) => AlterationHandler.TickAsync(session);
 
     public Task SendReturnToSelectionAsync(GameSession session)
         => session.SendAsync(ConnectionProtocol.Push(Op.Kqr, BuildReturnToken(session.AccountId)));

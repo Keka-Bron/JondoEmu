@@ -80,6 +80,8 @@ namespace Jondo.Unity.Server.Managers
                     if (characteristic < 0) continue;
 
                     int bonus = reader.IsDBNull(2) ? 1 : reader.GetInt32(2);
+                    // Zero describes an action (for example a weapon's AP cost), not a bonus.
+                    if (bonus == 0) continue;
                     _byId[reader.GetInt32(0)] = new Effect(characteristic, bonus < 0 ? -1 : 1);
                 }
 

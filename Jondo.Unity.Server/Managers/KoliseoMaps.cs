@@ -111,7 +111,7 @@ namespace Jondo.Unity.Server.Managers
 
         /// <remarks>
         /// The flag goes up after the load and not before, for the same reason as in
-        /// <see cref="BreedLookTable"/>: raised on entry, the lock-free fast path in
+        /// the former breed-look loader: raised on entry, the lock-free fast path in
         /// <see cref="EnsureLoaded"/> lets other threads walk the list while this one is still
         /// adding to it, and an arena that is there does not get counted.
         /// </remarks>

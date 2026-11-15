@@ -60,7 +60,7 @@ public sealed class MappedWorldMovementTests
             using (SessionContext.Push(observer.Session))
             {
                 using var turn = await mover.Session.EnterTurnAsync();
-                Assert.True(await WorldMovementDispatch.TryHandleAsync(mover.Session, bytes, "type.ankama.com/jrw"));
+                Assert.True(await MovementDispatch.TryHandleAsync(mover.Session, GameNodeProxy.DecodeRequest(mover.Session, bytes)));
                 Assert.Same(observer.Session, SessionContext.Actual);
             }
             Assert.Equal(114, mover.Session.State.CellId);
@@ -97,16 +97,16 @@ public sealed class MappedWorldMovementTests
         using (SessionContext.Push(other.Session))
         {
             var bad = Codec.Encode(new(new MapMovementCancelRequest(9999), 1));
-            Assert.True(await WorldMovementDispatch.TryHandleAsync(mover.Session, bad, "type.ankama.com/jqe"));
+            Assert.True(await MovementDispatch.TryHandleAsync(mover.Session, GameNodeProxy.DecodeRequest(mover.Session, bad)));
             Assert.Equal(414, mover.Session.State.CellId);
             var cancel = Codec.Encode(new(new MapMovementCancelRequest(stop), 2));
-            Assert.True(await WorldMovementDispatch.TryHandleAsync(mover.Session, cancel, "type.ankama.com/jqe"));
+            Assert.True(await MovementDispatch.TryHandleAsync(mover.Session, GameNodeProxy.DecodeRequest(mover.Session, cancel)));
             Assert.Equal(stop, mover.Session.State.CellId);
             Assert.False(WorldMoveHandler.TryTakeCompletedMovement(mover.Session.State, out _, out _));
             Assert.Empty(mover.Packets);
 
             var confirm = Codec.Encode(new(new MapMovementConfirmRequest(), -12));
-            Assert.True(await WorldMovementDispatch.TryHandleAsync(mover.Session, confirm, "type.ankama.com/jqi"));
+            Assert.True(await MovementDispatch.TryHandleAsync(mover.Session, GameNodeProxy.DecodeRequest(mover.Session, confirm)));
             Assert.Equal(-12, Codec.Decode(Assert.Single(mover.Packets)).Uid);
             Assert.Equal(MapId, other.Session.State.PendingMovementMapId);
             Assert.Equal(88, other.Session.State.PendingMovementCellId);

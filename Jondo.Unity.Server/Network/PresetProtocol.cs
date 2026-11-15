@@ -33,12 +33,12 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The six characteristics points are spent in.</summary>
         internal static readonly int[] Primaries =
         {
-            ConnectionProtocol.Stat.Strength, ConnectionProtocol.Stat.Vitality, ConnectionProtocol.Stat.Wisdom,
-            ConnectionProtocol.Stat.Chance, ConnectionProtocol.Stat.Agility, ConnectionProtocol.Stat.Intelligence,
+            Stat.Strength, Stat.Vitality, Stat.Wisdom,
+            Stat.Chance, Stat.Agility, Stat.Intelligence,
         };
 
         /// <summary>A build as the window draws it.</summary>
-        public static byte[] BuildPreset(DatabaseManager.DbCharacter character, CharacterPresets.Preset preset,
+        public static byte[] BuildPreset(DbCharacter character, CharacterPresets.Preset preset,
                                          bool playerState = false)
         {
             var placed = Placed(preset);
@@ -74,9 +74,9 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>igs { 1 the equipment look, 3 the appearance look }.</summary>
-        internal static byte[] Looks(DatabaseManager.DbCharacter character, IEnumerable<(int Position, Equipment.Item Item)> placed)
+        internal static byte[] Looks(DbCharacter character, IEnumerable<(int Position, Equipment.Item Item)> placed)
         {
-            var (equipment, appearance) = BreedLookTable.PresetLooks(character,
+            var (equipment, appearance) = CharacterLookBuilder.PresetLooks(character,
                 placed.Select(p => (p.Position, p.Item.Template)).ToList());
             return Pb.New().Bytes(1, equipment).Bytes(3, appearance).Build();
         }
@@ -90,12 +90,12 @@ namespace Jondo.Unity.Server.Network
             var state = SessionContext.State;
             var scrolls = new Dictionary<int, long>
             {
-                { ConnectionProtocol.Stat.Strength, state.ScrolledStrength },
-                { ConnectionProtocol.Stat.Vitality, state.ScrolledVitality },
-                { ConnectionProtocol.Stat.Wisdom, state.ScrolledWisdom },
-                { ConnectionProtocol.Stat.Chance, state.ScrolledChance },
-                { ConnectionProtocol.Stat.Agility, state.ScrolledAgility },
-                { ConnectionProtocol.Stat.Intelligence, state.ScrolledIntelligence },
+                { Stat.Strength, state.ScrolledStrength },
+                { Stat.Vitality, state.ScrolledVitality },
+                { Stat.Wisdom, state.ScrolledWisdom },
+                { Stat.Chance, state.ScrolledChance },
+                { Stat.Agility, state.ScrolledAgility },
+                { Stat.Intelligence, state.ScrolledIntelligence },
             };
             long Total(int id) => scrolls[id] + (points.TryGetValue(id, out int spent) ? spent : 0)
                                   + (equipment.TryGetValue(id, out long worn) ? worn : 0);
@@ -110,8 +110,8 @@ namespace Jondo.Unity.Server.Network
                 }
                 else
                 {
-                    value.VarIfNotZero(3, ConnectionProtocol.GivenByCharacteristics(id, Total))
-                         .VarIfNotZero(4, ConnectionProtocol.ValueOf(id, level));
+                    value.VarIfNotZero(3, CharacteristicRules.GivenByCharacteristics(id, Total))
+                         .VarIfNotZero(4, CharacteristicsMessages.Live.ValueOf(id, level, SessionContext.Current));
                 }
                 value.VarIfNotZero(6, equipment.TryGetValue(id, out long bonus) ? bonus : 0);
                 sheet.Msg(1, Pb.New().Var(1, id).Msg(2, value));
@@ -166,7 +166,7 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>ihb { repeated 1 { 1 uuid, 2 build } }: the character's builds, on entering the world.</summary>
-        public static byte[] BuildList(DatabaseManager.DbCharacter character, IEnumerable<CharacterPresets.Preset> presets)
+        public static byte[] BuildList(DbCharacter character, IEnumerable<CharacterPresets.Preset> presets)
         {
             var ihb = Pb.New();
             foreach (var preset in presets)

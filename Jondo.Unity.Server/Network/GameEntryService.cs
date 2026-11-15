@@ -7,24 +7,24 @@ internal interface IGameEntryBackend
 {
     bool BindTicket(GameSession session, IdentificationRequest request);
     Task CloseOtherSessionsAsync(GameSession session);
-    IReadOnlyList<DatabaseManager.DbCharacter> GetCharacters(GameSession session);
+    IReadOnlyList<DbCharacter> GetCharacters(GameSession session);
     bool CanResumeFight(long characterId);
     bool SelectCharacter(GameSession session, long characterId);
     bool ResumeFight(GameSession session, long characterId);
     Task AbandonFightAsync(long characterId);
-    Task SendWelcomeAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withList);
-    Task SendCharacterListAsync(GameSession session, IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withInitialization);
-    DatabaseManager.DbCharacter? FindCharacter(long characterId);
-    void LoadCharacterState(GameSession session, DatabaseManager.DbCharacter character);
-    Task AnnounceMapPresenceAsync(GameSession session, DatabaseManager.DbCharacter character);
-    Task SendInitialStateAsync(GameSession session, DatabaseManager.DbCharacter character);
+    Task SendWelcomeAsync(GameSession session, IReadOnlyList<DbCharacter> characters, bool withList);
+    Task SendCharacterListAsync(GameSession session, IReadOnlyList<DbCharacter> characters, bool withInitialization);
+    DbCharacter? FindCharacter(long characterId);
+    void LoadCharacterState(GameSession session, DbCharacter character);
+    Task AnnounceMapPresenceAsync(GameSession session, DbCharacter character);
+    Task SendInitialStateAsync(GameSession session, DbCharacter character);
     Task RestoreGuildRaidAsync(long characterId);
     Task NotifyGuildConnectionAsync(long characterId);
     Task NotifyFriendsAsync(long accountId);
-    Task RestoreRemodelAsync(GameSession session, DatabaseManager.DbCharacter character);
-    Task SendMapInitializationAsync(GameSession session, DatabaseManager.DbCharacter character);
+    Task RestoreRemodelAsync(GameSession session, DbCharacter character);
+    Task SendMapInitializationAsync(GameSession session, DbCharacter character);
     Task<bool> TrySendFightMapAsync(GameSession session, GameRequest request);
-    Task SendMapInformationAsync(GameSession session, DatabaseManager.DbCharacter character);
+    Task SendMapInformationAsync(GameSession session, DbCharacter character);
     Task TickAlterationsAsync(GameSession session);
     Task SendReturnToSelectionAsync(GameSession session);
     void PrepareReturnToSelection(GameSession session);
@@ -32,6 +32,7 @@ internal interface IGameEntryBackend
     string WelcomeMessage { get; }
 }
 
+// Handled means the typed handler owns the request, including refusals and intentional no-ops.
 internal enum GameEntryResult { Unhandled, Handled, Close }
 
 /// <summary>One entry lifecycle per session: identification, selection and map readiness.</summary>
@@ -107,8 +108,9 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
                 if (await backend.TrySendFightMapAsync(session, request)) return GameEntryResult.Handled;
                 return ready.MapId == session.MapId ? GameEntryResult.Handled : GameEntryResult.Close;
             case FightMapRequest:
-                return await backend.TrySendFightMapAsync(session, request)
-                    ? GameEntryResult.Handled : GameEntryResult.Unhandled;
+                // A stale readiness notification has no response, but still belongs to this handler.
+                await backend.TrySendFightMapAsync(session, request);
+                return GameEntryResult.Handled;
             case MapInformationRequest map:
                 if (await backend.TrySendFightMapAsync(session, request)) return GameEntryResult.Handled;
                 if (map.MapId != session.MapId) return GameEntryResult.Close;

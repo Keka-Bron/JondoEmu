@@ -4,7 +4,8 @@ Evidence snapshot: **10 November 2026**. Game profile **3.6.10.10**, using the
 **11-08-2026** wire identities. Client patches 3.6.10.10 and 3.6.10.11 share this
 Game profile. Tags, aliases and native evidence below belong to that build.
 Mapping status updated **11 November 2026**; capture/population evidence retains
-its original snapshot date.
+its original snapshot date. Welcome-settings omission policy and native-use finding
+updated **12 November 2026**.
 
 This inventory records fields with **proven non-default population** and an
 unused, unresolved or incomplete semantic-mapping status. Each entry has a
@@ -19,9 +20,10 @@ on every login. Values seen in one capture are observations, not initialization
 constants for every account.
 
 **Outbound construction policy:** indeterminate fields are treated as unused.
-The after-selection fields listed below are omitted, without a raw compatibility
-send. Native audit outcomes are retained as evidence provenance, not as a requirement
-to keep sending those values. Raw parsing still preserves historical data for inspection.
+The after-selection fields and welcome-settings extra listed below are omitted,
+without a raw compatibility send. Native audit outcomes are retained as evidence
+provenance, not as a requirement to keep sending those values. Raw parsing still
+preserves historical data for inspection.
 
 ## After-selection omission policy
 
@@ -51,6 +53,24 @@ native caller coverage. That is the recorded native finding; **unused/omit** is 
 explicit outbound policy applied to it. No new semantic names or bindings were
 invented for these fields. Unmigrated feature evidence below remains historical
 documentation rather than a requirement to add compatibility paths.
+
+## Welcome-settings omission policy
+
+`ConnectionProtocol.SendWelcomeAsync` constructs `ServerSettingsEvent` directly
+through the owning session's codec: arena leave-ban time **30**, `Classical` server
+type, free autopilot enabled, mono-account disabled, community **0**, and the
+session's launch language. Community is not a subscription or character-limit marker.
+
+The former `BuildHoy` wrote **200** to unmapped int32 tag **7** unconditionally.
+The **12 November 2026** decision explicitly omits this field from welcome settings,
+extending the indeterminate-field outbound omission policy to this send. Direct
+construction does not preserve that historical value or assign it a semantic name.
+
+MCP bootstrap and native classification were rechecked against **jondo-11-08-2026**:
+tag 7 / `fnaz`, property **193271**, backing field **263162** remains **indeterminate**.
+No usage witness was found, with incomplete native caller coverage. Omission is an
+outbound policy decision, not proof that the field is globally unused. Real-client
+welcome/selection acceptance remains to be checked.
 
 ## 1. Populated but unused in the inspected client flow
 
@@ -110,7 +130,7 @@ scalar names solely from the surrounding message name or builder parameter.
 
 | Owner / field | Non-default population evidence | Current finding |
 |---|---|---|
-| ServerSettingsEvent / `hoy`, tag **7**, int32 | **Code:** [`BuildHoy`](../Jondo.Unity.Server/Network/ConnectionProtocol.cs#L227-L235) writes **200** unconditionally. | Unmapped. The [welcome integration note](game-protocol.md#game-identification-selection-and-entry-migration) records why delivery retains its raw path; this is not an active remap task or a client-unused classification. |
+| ServerSettingsEvent / `hoy`, tag **7**, int32 | **Historical code:** the removed `BuildHoy` wrote **200** unconditionally. | **Omitted** under the [welcome-settings policy](#welcome-settings-omission-policy). Native finding remains indeterminate; this is not an active remap task or a client-unused classification. |
 | SocialEmblem / `lld`, tag **4**, int32, in alliance identity | **Code:** `AllianceProtocol.Emblem` writes stored `AllianceStore.Alliance.EmblemBackgroundShape` when nonzero. Creation/modification readers can persist that slot. This is conditional code evidence, not an official-capture population claim. | The August `SocialEmblem` contract represents tags 1/2/3/5; tag 4 remains unmapped. Historical storage labels do not establish its meaning. A typed alliance identity conversion would need to retain this populated slot before replacing that construction path. |
 | QuestFinished / `idr.idq.idp`, tag **1**, int32; root path `3[*] → 1` | **Code:** [`QuestProtocol.BuildJournal`](../Jondo.Unity.Server/Network/QuestProtocol.cs#L86-L89) writes **1** for each finished quest. The [same file's capture description](../Jondo.Unity.Server/Network/QuestProtocol.cs#L36-L64) records that finished-entry shape. | Indeterminate. A count-like interpretation is a historical lead, not a reviewed binding. ID-only conversion does not retain this value. |
 | ConfigurationEvent / `krj`, tag **1**, message | **Documented capture measurement:** the retired entry reconstruction contained the non-empty message `{1: 30, 2: 5, 3: 300}`. | **Unused/omit** under the [after-selection policy](#after-selection-omission-policy). Native finding remains indeterminate. The sibling guild configuration at tag 2 is constructed from server policy. |

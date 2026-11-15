@@ -50,11 +50,11 @@ namespace Jondo.Unity.Tests.Social
         }
 
         /// <summary>
-        /// The colours tab (lyl): the palette is kept in the look, -1 for the breed's own colour,
+        /// The colours tab (lyl): the palette is kept in six RGB columns, -1 for the breed's own colour,
         /// and answered lxc and lxd f1 1; more colours than the breed has get lxd without it.
         /// </summary>
         [Fact]
-        public async Task The_colours_tab_keeps_the_palette_in_the_look()
+        public async Task The_colours_tab_keeps_the_six_palette_choices()
         {
             long character = DatabaseManager.CreateCharacter(Account + 4, 1, "Color-Uno", 11, 0, 1,
                 new long[] { -1, -1, -1, -1, -1 }, 191105026, 50, 0, 0, Array.Empty<(int, int)>());
@@ -67,7 +67,7 @@ namespace Jondo.Unity.Tests.Social
                     byte[] Lyl(params long[] colors)
                         => ConnectionProtocol.Push(Op.Lyl, Pb.New().Msg(1, Pb.New().Packed(2, colors)).Build());
 
-                    var defaults = BreedLookTable.PlainColors(11, 0, null);
+                    var defaults = CharacterLookBuilder.PlainColors(11, 0, null);
                     var picked = new long[] { 0x112233, -1, 0x445566, -1, 0x778899 }
                         .Concat(Enumerable.Repeat(-1L, Math.Max(0, defaults.Count - 5))).Take(defaults.Count).ToArray();
 
@@ -75,14 +75,15 @@ namespace Jondo.Unity.Tests.Social
                     await pipe.Next(Op.Lxc);
                     Assert.Equal(1, Field(await pipe.Next(Op.Lxd), 1).VarIntValue);
 
-                    var kept = BreedLookTable.PlainColors(11, 0, BreedLookTable.SavedColors(DatabaseManager.GetCharacterById(character)!));
+                    var kept = CharacterLookBuilder.PlainColors(11, 0, CharacterLookBuilder.SavedColors(DatabaseManager.GetCharacterById(character)!));
+                    Assert.Equal(CharacterColors.FromRgb(picked), DatabaseManager.GetCharacterById(character)!.Colors);
                     var expected = picked.Select((c, i) => c >= 0 ? c : defaults[i]).ToList();
                     Assert.Equal(expected, kept);
 
                     // More colours than the breed has slots for: refused, the palette as it was.
                     await AppearanceHandler.ColorsAsync(pipe.ToClient, Lyl(Enumerable.Repeat(0x010101L, defaults.Count + 1).ToArray()));
                     Assert.DoesNotContain(ProtoMessage.Parse(await pipe.Next(Op.Lxd)).Fields, f => f.FieldNumber == 1);
-                    Assert.Equal(expected, BreedLookTable.PlainColors(11, 0, BreedLookTable.SavedColors(DatabaseManager.GetCharacterById(character)!)));
+                    Assert.Equal(expected, CharacterLookBuilder.PlainColors(11, 0, CharacterLookBuilder.SavedColors(DatabaseManager.GetCharacterById(character)!)));
                 }
             }
             finally
@@ -153,7 +154,7 @@ namespace Jondo.Unity.Tests.Social
                     await pipe.Next(Op.Lxc);
                     Assert.Equal(1, Field(await pipe.Next(Op.Lyz), 1).VarIntValue);
                     Assert.Equal(Retro, Wardrobe.BodyOf(character));
-                    string look = BreedLookTable.Drawable(DatabaseManager.GetCharacterById(character)!);
+                    string look = CharacterLookBuilder.Drawable(DatabaseManager.GetCharacterById(character)!);
                     Assert.StartsWith(RetroSkin + ",", look.Split('|')[1]);
 
                     foreach (int refused in new[] { Payable, Feca })

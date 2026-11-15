@@ -13,7 +13,7 @@ namespace Jondo.Unity.Server.Managers
     /// <remarks>
     /// The outfit being WORN is not kept here but in the live tables everything else reads -- the
     /// head in Characters, the body, idle, title and ornament in CharacterWardrobe, the garments in
-    /// CharacterAppearance, the colours in the look --; its row here holds only its name, icon and
+    /// CharacterAppearance, the colours in Color1 through Color6 --; its row here holds only its name, icon and
     /// number. The OTHER outfits are kept whole in their rows. Putting one on swaps: what is worn
     /// is written into its own row, and the chosen row into the live tables.
     /// </remarks>
@@ -120,11 +120,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>The look the character wears now, read from the live tables.</summary>
-        public static Look Worn(DatabaseManager.DbCharacter character)
+        public static Look Worn(DbCharacter character)
         {
             var (title, ornament) = Wardrobe.Of(character.Id);
             return new Look(character.HeadId, Wardrobe.BodyOf(character.Id), Wardrobe.IdleOf(character.Id),
-                            BreedLookTable.SavedColors(character), title, ornament,
+                            CharacterLookBuilder.SavedColors(character), title, ornament,
                             Wardrobe.AppearanceOf(character.Id), Wardrobe.AuraOf(character.Id));
         }
 
@@ -161,7 +161,7 @@ namespace Jondo.Unity.Server.Managers
         /// Puts on one of the character's kept outfits: what is worn goes into its own row, the
         /// chosen one into the live tables. Garments the account no longer owns are left off.
         /// </summary>
-        public static bool Equip(DatabaseManager.DbCharacter character, string uuid, Func<int, bool> owns)
+        public static bool Equip(DbCharacter character, string uuid, Func<int, bool> owns)
         {
             var outfits = Of(character.Id);
             string worn = outfits[0].Uuid;
@@ -180,8 +180,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>Writes a look into the live tables, the colours last so the look is built whole.</summary>
-        private static void Apply(DatabaseManager.DbCharacter character, Look look, Func<int, bool> owns)
+        private static void Apply(DbCharacter character, Look look, Func<int, bool> owns)
         {
+            var colors = CharacterColors.FromIndexed(look.Colors);
             if (look.Head > 0) DatabaseManager.SetCharacterHead(character.Id, look.Head);
             Wardrobe.SaveBody(character.Id, look.Body);
             Wardrobe.SaveIdle(character.Id, look.Idle);
@@ -200,9 +201,7 @@ namespace Jondo.Unity.Server.Managers
                 if (garment.Hidden) Wardrobe.SetHidden(character.Id, garment.Slot, true);
             }
 
-            int head = look.Head > 0 ? look.Head : character.HeadId;
-            DatabaseManager.SaveCharacterLook(character.Id,
-                BreedLookTable.BuildLook(character.Breed, character.Sex, head, look.Colors, characterId: character.Id));
+            DatabaseManager.SaveCharacterColors(character.Id, colors);
         }
 
         private static List<Outfit> Read(long characterId)

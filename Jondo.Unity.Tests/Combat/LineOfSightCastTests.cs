@@ -22,7 +22,7 @@ namespace Jondo.Unity.Tests.Combat
         {
             var active = (System.Collections.Concurrent.ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
                 .GetField("_activeFights", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!.GetValue(null)!;
-            active[fight.FightId] = fight;
+            Assert.True(active.TryAdd(fight.FightId, fight));
             try
             {
                 using (SessionContext.Push(mine.Session))

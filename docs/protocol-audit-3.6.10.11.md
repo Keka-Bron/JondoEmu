@@ -68,5 +68,9 @@ in the 756 captures and the client's senders in Ghidra.
 The Ankama friends -- the window's first section -- are not game messages: they go to the chat
 service (`ChatServer`, Spin over TLS on 6337), which only answered the login, with a frame length that left
 out its own header and the type byte, so the client hung up at once. It now speaks the transport and the
-friends' requests and events. And `kpa`, «ignore» in 3.6, still went to the character-list branch of an
-earlier protocol, which answered it with a character list.
+friends' requests and events.
+
+`kpa` adds a player to the ignored-player list. Native client analysis confirms
+this meaning through the context menu and party-invitation UI; see the
+[`kpa` evidence](opcodes.md#2131-ignore-player-kpa). It has no reviewed semantic
+binding, and its tag-2 enum remains unresolved.

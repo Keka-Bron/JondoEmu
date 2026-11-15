@@ -92,13 +92,13 @@ namespace Jondo.Unity.Tests.World
 
             using (SessionContext.Push(session))
             {
-                var character = new DatabaseManager.DbCharacter
+                var character = new DbCharacter
                 {
                     Id = session.State.CharacterId, Name = "Arbusto", Level = 50, Breed = 1, Sex = 0,
                 };
 
                 // The look: the camouflage's invisible bones (its f3).
-                Assert.Equal(761L, Varint(ProtoMessage.Parse(BreedLookTable.MapLook(character)), 3));
+                Assert.Equal(761L, Varint(ProtoMessage.Parse(CharacterLookBuilder.MapLook(character)), 3));
 
                 // The actor: f2 { f1 { f5 humanoid { f3 body { f5 options } } } } with f6 the followers.
                 var actor = ProtoMessage.Parse(ConnectionProtocol.BuildPlayerActorBlock(character, 300, 1, 1));

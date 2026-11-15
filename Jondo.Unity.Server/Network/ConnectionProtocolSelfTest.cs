@@ -379,7 +379,7 @@ namespace Jondo.Unity.Server.Network
                  }));
         }
 
-        private static readonly DatabaseManager.DbCharacter TestCharacter = new DatabaseManager.DbCharacter
+        private static readonly DbCharacter TestCharacter = new DbCharacter
         {
             Id = 4242424242L,
             Name = "Test",
@@ -391,54 +391,41 @@ namespace Jondo.Unity.Server.Network
         };
 
         /// <summary>
-        /// kvi: f1 (repeated) { f1 { f2: name, f3: level, f4 { f2: sex, f6: look, f7: breed } }, f2: id }
+        /// The semantic character-list snapshot, including its resolved appearance.
         /// </summary>
         private static void CheckCharactersList(List<string> failures)
         {
-            byte[] kvi = ConnectionProtocol.BuildCharactersList(new[] { TestCharacter });
-            var root = ProtoMessage.Parse(kvi);
-
-            var entry = Field(root, 1, 2);
-            if (entry == null) { failures.Add("kvi: the character entry (f1) is missing"); return; }
-
-            var entryMsg = ProtoMessage.Parse(entry.BytesValue);
-            if (Varint(entryMsg, 2) != TestCharacter.Id)
-                failures.Add("kvi: the character id is not in f2");
-
-            var details = Field(entryMsg, 1, 2);
-            if (details == null) { failures.Add("kvi: the character details (f1) are missing"); return; }
-
-            var detailsMsg = ProtoMessage.Parse(details.BytesValue);
-            if (Text(detailsMsg, 2) != TestCharacter.Name)
-                failures.Add("kvi: the name is not in f2 of the details");
-            if (Varint(detailsMsg, 3) != TestCharacter.Level)
-                failures.Add("kvi: the level is not in f3 of the details");
-
-            var traits = Field(detailsMsg, 4, 2);
-            if (traits == null) { failures.Add("kvi: the traits block (f4) is missing"); return; }
-
-            var traitsMsg = ProtoMessage.Parse(traits.BytesValue);
-            if (Varint(traitsMsg, 7) != TestCharacter.Breed)
-                failures.Add("kvi: the breed is not in f7 of the traits");
-
-            var sex = Field(traitsMsg, 2, 2);
-            if (sex == null) failures.Add("kvi: the sex block (f2) must always be present");
-            else if (Varint(ProtoMessage.Parse(sex.BytesValue), 3) != TestCharacter.Sex)
-                failures.Add("kvi: the sex is not in f3 inside its block");
-
-            var look = Field(traitsMsg, 6, 2);
-            if (look == null || look.BytesValue.Length == 0)
+            var characters = CharacterListMessages.Live.Snapshot(new[] { TestCharacter }).Characters;
+            if (characters.Count != 1)
             {
-                failures.Add("kvi: the look (f6) is missing. Generate breed_looks.json with tools/extract_breed_looks.py");
+                failures.Add("Character list: expected one character.");
+                return;
             }
-            else
+            var entry = characters[0];
+            if (entry.Id != TestCharacter.Id) failures.Add("Character list: incorrect character id.");
+            if (entry.ComplementCase is not CharacterComplementCaseCharacterBasicInformation basic)
             {
-                var lookMsg = ProtoMessage.Parse(look.BytesValue);
-                if (Field(lookMsg, 1, 2) == null) failures.Add("look: the colors (f1) are missing");
-                if (Varint(lookMsg, 2) != 3) failures.Add("look: f2 must be 3");
-                if (Varint(lookMsg, 3) == 0) failures.Add("look: the bonesId (f3) is missing");
-                if (Field(lookMsg, 6, 2) == null) failures.Add("look: the skins (f6) are missing");
+                failures.Add("Character list: basic information is missing.");
+                return;
             }
+            if (basic.Value.Name != TestCharacter.Name) failures.Add("Character list: incorrect name.");
+            if (basic.Value.Level != TestCharacter.Level) failures.Add("Character list: incorrect level.");
+            if (basic.Value.ComplementCase is not CharacterBasicInformationComplementCaseCharacterLook appearance)
+            {
+                failures.Add("Character list: appearance is missing.");
+                return;
+            }
+            if (appearance.Value.BreedId != TestCharacter.Breed) failures.Add("Character list: incorrect breed.");
+            if (appearance.Value.ComplementCase is not CharacterLookComplementCaseBaseInformation identity)
+                failures.Add("Character list: base information is missing.");
+            else if (identity.Value.Gender != Gender.Female)
+                failures.Add("Character list: incorrect gender.");
+
+            var look = appearance.Value.Look;
+            if (look.Colors.Count == 0) failures.Add("Character look: colors are missing.");
+            if (look.LookType != 3) failures.Add("Character look: expected look type 3.");
+            if (look.Bones == 0) failures.Add("Character look: bones are missing.");
+            if (look.Skins.Count == 0) failures.Add("Character look: skins are missing.");
         }
 
         /// <summary>The messages pushed by the server travel in field 1 of the frame.</summary>
@@ -512,13 +499,13 @@ namespace Jondo.Unity.Server.Network
             // wrong field, which is what left the characteristics button greyed out.
             foreach (int id in new[] { 1, 23 })
             {
-                if (WorldEntry.CharacteristicIds.Count > 0 && WorldEntry.ContainerOf(id) != 5)
-                    failures.Add($"kub: characteristic {id} should travel in f5, not f{WorldEntry.ContainerOf(id)}");
+                if (CharacteristicCatalogue.Default.KindOf(id) != CharacteristicKind.Usable)
+                    failures.Add($"kub: characteristic {id} should be Usable");
             }
             foreach (int id in new[] { 29, 47, 96 })
             {
-                if (WorldEntry.CharacteristicIds.Count > 0 && WorldEntry.ContainerOf(id) != 2)
-                    failures.Add($"kub: characteristic {id} should travel in f2, not f{WorldEntry.ContainerOf(id)}");
+                if (CharacteristicCatalogue.Default.KindOf(id) != CharacteristicKind.Value)
+                    failures.Add($"kub: characteristic {id} should be Value");
             }
         }
 

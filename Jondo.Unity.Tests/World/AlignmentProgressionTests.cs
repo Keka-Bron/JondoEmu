@@ -89,11 +89,9 @@ namespace Jondo.Unity.Tests.World
                 Assert.False(log.CanStart(433, out _));     // the first order asks Pa>19
                 Assert.False(log.CanStart(375, out _));     // Brâkmar's first
 
-                // The sheet's alignment block: f1 the level, f2 the side.
-                var kub = ProtoMessage.Parse(ConnectionProtocol.BuildCharacteristics());
-                var sheet = Sub(Sub(kub, 2), 9);
-                Assert.Equal(3, sheet.Fields.First(f => f.FieldNumber == 1).VarIntValue);
-                Assert.Equal(Alignments.Bonta, sheet.Fields.First(f => f.FieldNumber == 2).VarIntValue);
+                var sheet = CharacteristicsMessages.Live.Snapshot(pipe.Session).Stats.AlignmentInformation;
+                Assert.Equal(3, sheet.AlignmentQuestNumber);
+                Assert.Equal(Alignment.Angel, sheet.Alignment);
 
                 // A Néophyte, and the rank comes after an order's apprenticeship.
                 Assert.Equal(1, Alignments.Rank());

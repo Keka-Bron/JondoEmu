@@ -417,7 +417,7 @@ namespace Jondo.Unity.Server.Managers
                 Alignments.SetPvp(order.Target, true);
                 using (SessionContext.Push(prey))
                 {
-                    await prey.SendAsync(ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                    await CharacteristicsMessages.Live.SendAsync(prey);
                     await SlotLookHandler.RedrawAsync(prey.Stream);
                 }
             }

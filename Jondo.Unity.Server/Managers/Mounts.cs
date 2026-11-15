@@ -336,7 +336,7 @@ namespace Jondo.Unity.Server.Managers
             if (!IsRideable(itemGid)) return null;
 
             // It is ridden but it is not in the file: it is given the look of those of its type. Before,
-            // an empty Look was returned here, and since BreedLookTable requires non-zero bones
+            // an empty Look was returned here, and since CharacterLookBuilder requires non-zero bones
             // to consider someone mounted, recognising it made no difference: he still came out on foot.
             int tipo = TypeOf(itemGid);
             return tipo != 0 && _porTipo.TryGetValue(tipo, out var deSuTipo) ? deSuTipo : null;

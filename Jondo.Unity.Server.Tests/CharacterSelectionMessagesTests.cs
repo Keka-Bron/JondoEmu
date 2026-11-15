@@ -12,7 +12,7 @@ public sealed class CharacterSelectionMessagesTests
     [InlineData(1, Gender.Female, "2026-11-11T12:34:56Z")]
     public void Selection_uses_the_selected_identity_dates_and_complete_resolved_appearance(int sex, Gender gender, string connected)
     {
-        var character = new DatabaseManager.DbCharacter
+        var character = new DbCharacter
         {
             Id = 71_001, Name = "Selected", Level = 57, Breed = 18, Sex = sex, LastConnection = connected,
         };
@@ -55,7 +55,7 @@ public sealed class CharacterSelectionMessagesTests
     [Fact]
     public void On_foot_composition_keeps_body_palette_skins_and_size()
     {
-        var look = BreedLookTable.Compose(1, [110, 2172, 5044], [0x01112233, 0x02445566], [55]);
+        var look = CharacterLookBuilder.Compose(1, [110, 2172, 5044], [0x01112233, 0x02445566], [55]);
         Assert.Equal(3, look.LookType);
         Assert.Equal(1, look.Bones);
         Assert.Equal(new[] { 110, 2172, 5044 }, look.Skins);
@@ -67,7 +67,7 @@ public sealed class CharacterSelectionMessagesTests
     [Fact]
     public void Mount_composition_uses_mount_palette_and_size_with_the_character_as_rider()
     {
-        var look = BreedLookTable.Compose(1, [110, 2172], [0x01112233], [55],
+        var look = CharacterLookBuilder.Compose(1, [110, 2172], [0x01112233], [55],
             new Mounts.Look { Bones = 200, Colors = [0x01445566], Scale = 120 });
         Assert.Equal(200, look.Bones);
         Assert.Equal(new[] { 0x01445566 }, look.Colors);
@@ -85,7 +85,7 @@ public sealed class CharacterSelectionMessagesTests
     [Fact]
     public void Appearance_mount_overrides_root_bones_skin_and_size_without_replacing_the_rider()
     {
-        var look = BreedLookTable.Compose(1, [110, 2172], [0x01112233], [55],
+        var look = CharacterLookBuilder.Compose(1, [110, 2172], [0x01112233], [55],
             new Mounts.Look { Bones = 200, Colors = [0x01445566], Scale = 120 },
             new Cosmetics.PieceLook { Bones = 300, Skin = 800, Scale = 90 });
         Assert.Equal(300, look.Bones);

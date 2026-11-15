@@ -114,7 +114,7 @@ namespace Jondo.Unity.Server.Handlers
             => HaceFalta.TryGetValue(command, out int role) ? role : Roles.Administrador;
 
         /// <summary>The level at which the normal game ends; from there up it is Omega.</summary>
-        private const int MaxNormalLevel = StatsHandler.MaxLevelWithStats;
+        private const int MaxNormalLevel = CharacteristicRules.MaxLevelWithStats;
 
         /// <summary>
         /// Serves the line. Returns true when it was a command and so it must NOT be published in the
@@ -441,11 +441,10 @@ namespace Jondo.Unity.Server.Handlers
                 GameState.Experience = ExperienceTable.LevelFloor(newLevel);
             }
 
-            // The capital is five per level from the second, which is how StatsHandler and
-            // CharacteristicsHandler count it. Above 200 it freezes: Omega levels give no
+            // Capital follows the shared progression rule. Above 200 it freezes: Omega levels give no
             // points.
-            int capital = StatsHandler.TotalCapitalForLevel(Math.Min(newLevel, MaxNormalLevel));
-            GameState.CharacterRemainingPoints = Math.Max(0, capital - SpentCapital(capital));
+            int capital = CharacteristicRules.TotalCapitalForLevel(Math.Min(newLevel, MaxNormalLevel));
+            GameState.CharacterRemainingPoints = Math.Max(0, capital - SpentCapital());
 
             DatabaseManager.SaveCurrentCharacter();
 
@@ -460,8 +459,7 @@ namespace Jondo.Unity.Server.Handlers
             await NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iun,
                     ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State))));
-            await NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
 
             string spellNote = await RefreshSpellsAsync(stream, before);
             await FightHandler.RefreshPlayerSpellBarAsync(stream);
@@ -489,41 +487,14 @@ namespace Jondo.Unity.Server.Handlers
         /// anybody who had gone over a hundred in something, because from there on each point costs
         /// two.
         ///
-        /// Without that table loaded it falls back to StatsHandler's banded model, which gives the same
-        /// for the breeds whose price we know.
+        /// Shares the same breed bands and missing-data policy as live spending and presets.
         /// </summary>
-        private static int SpentCapital(int stopAfter = int.MaxValue)
+        private static int SpentCapital()
         {
-            if (!BreedStatCost.IsLoaded)
-            {
-                return StatsHandler.ComputeDistributionCost(
-                    GameState.StatStrength, GameState.StatIntelligence, GameState.StatChance,
-                    GameState.StatAgility, GameState.StatVitality, GameState.StatWisdom);
-            }
-
-            var sheet = new (string Name, int Points)[]
-            {
-                ("strength", GameState.StatStrength),
-                ("intelligence", GameState.StatIntelligence),
-                ("chance", GameState.StatChance),
-                ("agility", GameState.StatAgility),
-                ("vitality", GameState.StatVitality),
-                ("wisdom", GameState.StatWisdom),
-            };
-
-            int spent = 0;
-            foreach (var (name, points) in sheet)
-            {
-                for (int i = 0; i < points; i++)
-                {
-                    spent += Math.Max(1, BreedStatCost.PriceOf(GameState.Breed, name, i));
-                    // The caller only needs to know that no capital remains. This also prevents a
-                    // live-admin character with millions of points from turning a level change
-                    // into millions of table lookups.
-                    if (spent > stopAfter) return spent;
-                }
-            }
-            return spent;
+            long cost = CharacteristicRules.ComputeDistributionCost(
+                GameState.StatStrength, GameState.StatIntelligence, GameState.StatChance,
+                GameState.StatAgility, GameState.StatVitality, GameState.StatWisdom, GameState.Breed);
+            return checked((int)Math.Min(cost, int.MaxValue));
         }
 
         /// <summary>The spells the character has at a given level, by id and grade.</summary>
@@ -742,7 +713,7 @@ namespace Jondo.Unity.Server.Handlers
         // ─── .size ──────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// The size of the figure. It is stored on the character and BreedLookTable applies it when
+        /// The size of the figure. It is stored on the character and CharacterLookBuilder applies it when
         /// building the look; here it only has to be rebuilt, which is the two messages
         /// EquipmentHandler already sends when changing clothes: the jsn redraws the one on the map
         /// and the lxc the one on the sheet.

@@ -123,7 +123,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.True(Alignments.Of(me).PvpOn);   // kept in the base
 
                 // And the others see it: the actor's block carries the status and the grade.
-                var character = new DatabaseManager.DbCharacter { Id = me, Name = "Alado", Level = 120, Breed = 1 };
+                var character = new DbCharacter { Id = me, Name = "Alado", Level = 120, Breed = 1 };
                 var actor = ProtoMessage.Parse(ConnectionProtocol.BuildPlayerActorBlock(character, 300, 1, 1));
                 var block = Sub(Sub(Sub(Sub(Sub(actor, 2), 1), 5), 3), 1);
                 Assert.Equal(1, Sub(block, 3).Fields.First(f => f.FieldNumber == 2).VarIntValue);
@@ -172,7 +172,7 @@ namespace Jondo.Unity.Tests.World
         {
             const long me = 9_400_300_003;
             Alignments.Set(me, Alignments.Brakmar, Now);
-            var character = new DatabaseManager.DbCharacter { Id = me, Name = "Negro", Level = 120, Breed = 1 };
+                var character = new DbCharacter { Id = me, Name = "Negro", Level = 120, Breed = 1 };
             var actor = ProtoMessage.Parse(ConnectionProtocol.BuildPlayerActorBlock(character, 300, 1, 1));
             var body = Sub(Sub(Sub(Sub(actor, 2), 1), 5), 3);
             var identity = Sub(body, 1);

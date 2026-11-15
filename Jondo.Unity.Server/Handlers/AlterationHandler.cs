@@ -93,10 +93,12 @@ namespace Jondo.Unity.Server.Handlers
         /// The heartbeat's look at the clock: the timed alterations whose date has come, lost, and the
         /// sheet again if they gave something. Not in a fight, whose sheet is another.
         /// </summary>
-        public static async Task TickAsync(NetworkStream stream)
+        public static async Task TickAsync(GameSession session)
         {
-            var me = SessionContext.State;
+            using var context = SessionContext.Push(session);
+            var me = session.State;
             if (me.CharacterId == 0 || me.IsInFight || me.FightId != 0) return;
+            var stream = session.Stream ?? throw new InvalidOperationException("Alteration feature hooks require a connected game session.");
 
             var now = DateTime.UtcNow;
             var expired = Alterations.Expire(me.CharacterId, now);
@@ -111,7 +113,7 @@ namespace Jondo.Unity.Server.Handlers
             if (expired.Count == 0 && ended.Count == 0) return;
             foreach (var gone in expired) await TellLostAsync(stream, gone, now);
             if (ended.Count > 0 || expired.Any(GivesCharacteristics))
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+                await CharacteristicsMessages.Live.SendAsync(session);
         }
 
         /// <summary>

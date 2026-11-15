@@ -128,7 +128,7 @@ namespace Jondo.Unity.Server.Handlers
             if (gained > 0) Energy.Set(character, energy + gained);
             DatabaseManager.SaveCurrentCharacter();
 
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kub, ConnectionProtocol.BuildCharacteristics()));
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             if (life > 0)
                 await WriteAsync(stream, ConnectionProtocol.BuildRegenerationStarted(ConnectionProtocol.RegenerationRateNow()));
             foreach (var (characteristic, before, after) in gains)

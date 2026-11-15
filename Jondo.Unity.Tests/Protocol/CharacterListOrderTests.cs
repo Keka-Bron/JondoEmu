@@ -15,13 +15,11 @@ namespace Jondo.Unity.Tests.Protocol
     {
         private const long Account = 8_970_000_001;
 
-        private static DatabaseManager.DbCharacter Character(long id, string lastConnection)
+        private static DbCharacter Character(long id, string lastConnection)
             => new() { Id = id, AccountId = Account, Name = "Orden" + id, Level = 1, Breed = 1, LastConnection = lastConnection };
 
-        private static long[] IdsOf(byte[] kvi)
-            => ProtoMessage.Parse(kvi).Fields.Where(f => f.FieldNumber == 1)
-                .Select(e => ProtoMessage.Parse(e.BytesValue).Fields.Single(f => f.FieldNumber == 2).VarIntValue)
-                .ToArray();
+        private static long[] IdsOf(System.Collections.Generic.IReadOnlyList<DbCharacter> characters)
+            => CharacterListMessages.Live.Snapshot(characters).Characters.Select(character => character.Id).ToArray();
 
         [Fact]
         public void The_character_played_last_comes_first()
@@ -36,7 +34,7 @@ namespace Jondo.Unity.Tests.Protocol
                 Character(5, "2026-02-20T09:30:00.000+01:00"),
             };
 
-            Assert.Equal(new long[] { 4, 3, 1, 5, 2 }, IdsOf(ConnectionProtocol.BuildCharactersList(characters)));
+            Assert.Equal(new long[] { 4, 3, 1, 5, 2 }, IdsOf(characters));
         }
 
         [Fact]
@@ -75,7 +73,7 @@ namespace Jondo.Unity.Tests.Protocol
 
                 var list = DatabaseManager.GetCharactersByAccountId(Account, 1);
                 Assert.NotEmpty(list.Single(c => c.Id == fresh).LastConnection);
-                Assert.Equal(new[] { fresh, old }, IdsOf(ConnectionProtocol.BuildCharactersList(list)));
+                Assert.Equal(new[] { fresh, old }, IdsOf(list));
             }
             finally
             {

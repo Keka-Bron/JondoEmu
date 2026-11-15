@@ -229,11 +229,6 @@ namespace Jondo.Unity.Server
             Console.WriteLine("[+] Registering Fight Packet Handlers...");
             Handlers.FightHandler.RegisterHandlers();
 
-            Console.WriteLine("[+] Loading the world entry blocks...");
-            WorldEntry.Initialize();
-
-            // After the blocks and not before: part of what the check compares against the capture
-            // is read out of them, the characteristic containers among it.
             RegressionGuardTests.Run();
 
 

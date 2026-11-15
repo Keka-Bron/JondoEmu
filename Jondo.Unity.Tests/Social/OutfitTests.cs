@@ -97,7 +97,7 @@ namespace Jondo.Unity.Tests.Social
                     Assert.Equal(RetroIdle, Wardrobe.IdleOf(character));
                     var before = Outfits.Of(character).Single(o => o.Uuid == firstId);
                     Assert.Equal(Base, before.Kept!.Body);
-                    Assert.StartsWith("5881,", BreedLookTable.Drawable(DatabaseManager.GetCharacterById(character)!).Split('|')[1]);
+                    Assert.StartsWith("5881,", CharacterLookBuilder.Drawable(DatabaseManager.GetCharacterById(character)!).Split('|')[1]);
 
                     // The worn one is not thrown away; the other one is.
                     await AppearanceHandler.DeleteOutfitAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lyr, Pb.New().Str(2, kept).Build()));

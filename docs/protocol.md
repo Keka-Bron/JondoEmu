@@ -326,7 +326,7 @@ blocks carry 3 and **617 do not**, spread over fourteen opcodes; `iqj` carries s
 than 3 in all 73 of its blocks. The sub-entities settle it without any matcher at all, since they
 are looks by position: of the 4,062 hanging off an `f7`, **176 carry values other than 3** — 8, 4,
 26, 25, 20 and more — while being otherwise ordinary looks, colours and bones and scale and skins.
-What the field means is not known. The emulator writes a constant 3 (`BreedLookTable.LookType`)
+What the field means is not known. The emulator writes a constant 3 (`CharacterLookBuilder.LookType`)
 and nothing has gone wrong yet, which is the only argument for keeping it that way.
 
 **Attachment points**, from `f4`:
@@ -346,7 +346,7 @@ each) and 9 and 10 appear 512 times each. Sixty more values carry no index at al
 slot 0: that is the bare form described below. A breed's default palette is six colours — all 38
 breed-and-sex entries in `datos/breed_looks.json` carry exactly six — so slots 7 and up come from
 somewhere else.
-`BreedLookTable.IndexColors` builds the indexed form from bare rgb with
+`CharacterLookBuilder.IndexColors` builds the indexed form from bare rgb with
 `((i + 1) << 24) | (rgb & 0xFFFFFF)`.
 
 The same six colours travel **without** the index in a saved wardrobe outfit. Sending them indexed
@@ -405,12 +405,12 @@ Read it top down and the shape is unmistakable: the thing being drawn is a mount
 is cargo.
 
 The consequence for anyone writing a server: you cannot mount a character by patching a field. You
-have to build the tree the other way up. `BreedLookTable.BuildLook` does it in that order — assemble
+have to build the tree the other way up. `CharacterLookBuilder.BuildLook` does it in that order — assemble
 the character's own body first, then, if there is a mount with usable bones, wrap it:
 `Mounted(riderBytes, mount, …)` emits the mount's colours, bones and scale at the root and hangs the
 finished rider block off `f7 { f1: rider, f4: 2 }`.
 
-Two more rules that fall out of the same structure, both from `BreedLookTable`:
+Two more rules that fall out of the same structure, both from `CharacterLookBuilder`:
 
 - A **petmount** or an **appearance mount** overrides the root — that is how a dragoturkey ends up
   looking like something else. They replace the root's bones, scale and colours, and only appearance
@@ -539,10 +539,14 @@ Selection, inventory, professions, spells, shortcut bars and map state are now
 constructed directly. Entry no longer learns a captured identity, item signatures
 or characteristic structure from recorded packets.
 
-`WorldEntry.Initialize` loads `datos/caracteristicas_kub.json` independently. This
-measured catalogue supplies the characteristic ids and their value containers to
-`ConnectionProtocol.BuildCharacteristics`; character values come from live state.
-Deleting the entry reconstruction does not remove that catalogue.
+`CharacteristicCatalogue.Default` defines all 120 characteristic IDs, their semantic
+Value/Detailed/Usable cases and fixed base values in code. No external characteristic
+file or startup loading is needed. `CharacteristicsMessages` constructs owner-state
+snapshots directly at initial and map entry; the second snapshot observes the map
+sequence's regeneration timestamp. Gameplay refreshes send the same snapshot through
+`CharacteristicsMessages.SendAsync(session)` and the owning session's codec. Shared
+characteristic arithmetic lives in `CharacteristicRules`, outside the packet builders. See
+[characteristics snapshots](game-protocol.md#characteristics-snapshots) for policy and coverage.
 
 ---
 

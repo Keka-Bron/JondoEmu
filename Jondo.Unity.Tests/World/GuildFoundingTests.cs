@@ -72,8 +72,8 @@ namespace Jondo.Unity.Tests.World
         {
             var guild = GuildStore.Create(7001, "Jondo", 165, 8, 16744448, 9476018);
 
-            var founder = new DatabaseManager.DbCharacter { Id = 7001, Name = "Hero-Example", Level = 200, Breed = 11 };
-            var loner = new DatabaseManager.DbCharacter { Id = 7002, Name = "Solo", Level = 200, Breed = 11 };
+            var founder = new DbCharacter { Id = 7001, Name = "Hero-Example", Level = 200, Breed = 11 };
+            var loner = new DbCharacter { Id = 7002, Name = "Solo", Level = 200, Breed = 11 };
 
             var withGuild = GuildOption(ConnectionProtocol.BuildPlayerActorBlock(founder, 341, 5, 60000001));
             Assert.NotNull(withGuild);

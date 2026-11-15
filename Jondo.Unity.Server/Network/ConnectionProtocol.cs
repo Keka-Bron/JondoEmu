@@ -27,9 +27,6 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     public static class ConnectionProtocol
     {
-        // Compatibility framing for the older synchronous welcome/list callers.
-        // Gift construction is shared with direct session sends, never decoded from legacy bytes.
-        private static readonly Game.Wire.GameCodec LegacyCodec = new();
         public const string UriPrefix = "type.ankama.com/";
 
         // ─── Envelope ───────────────────────────────────────────────────────────
@@ -50,123 +47,20 @@ namespace Jondo.Unity.Server.Network
         // ─── Game server: welcome burst ─────────────────────────────────────────
 
         /// <summary>
-        /// The character list as it actually travels: three kqp, the list, and the gift catalogue.
+        /// Sends welcome messages through the owning session. Ordinary login includes
+        /// the character-list refresh; a resumable fight waits for the list request.
         /// </summary>
-        /// <remarks>
-        /// Five frames, never the kvi on its own. That is how every capture sends it -- in the
-        /// welcome burst, after a creation, and after a deletion -- and sending only the kvi is
-        /// what made a freshly created character invisible to the client.
-        ///
-        /// The symptom was ugly and easy to blame on the wrong thing: create a character, press
-        /// play, and the PREVIOUS character walked into the world. Nothing was mixed up
-        /// server-side; the selection arrived naming the old character and was honoured correctly,
-        /// because the client still held the list it had before the creation and sent the only
-        /// entry it knew. Going back to the selection screen refreshed it and everything worked,
-        /// which is exactly the shape of a stale list rather than a wrong lookup.
-        ///
-        /// Measured in "crear personaje - borrar personaje", where the real server answers a
-        /// successful kvb with the whole set again:
-        ///
-        /// <code>
-        ///   kvb (empty, success)  ->  kqp kqp kqp  kvi  jtg
-        ///   kvn (deleted)         ->  kqp kqp kqp  kvi  jtg
-        /// </code>
-        /// </remarks>
-        public static List<byte[]> CharacterListFrames(IReadOnlyList<DatabaseManager.DbCharacter> characters)
-            => new()
-            {
-                Push(Op.Kqp, Pb.New().Var(1, 1).Var(2, 1).Build()),
-                Push(Op.Kqp, Pb.New().Var(1, 1).Build()),
-                Push(Op.Kqp),
-                Push(Op.Kvi, BuildCharactersList(characters)),
-                LegacyCodec.Encode(new Game.GameFrame(GiftService.Live.Snapshot(
-                    characters.Count > 0 ? characters[0].AccountId : SessionContext.Current.AccountId))),
-            };
-
-        /// <summary>
-        /// The burst the real server sends as soon as the client presents the ticket, in the
-        /// same order as the capture. It ends with the character list.
-        ///
-        /// kvc and krv were deliberately not copied from the capture: there they are client
-        /// messages, and the previous version of this emulator sent them back to the client
-        /// by mistake.
-        /// </summary>
-        /// <param name="withList">
-        /// Whether the character list closes the burst. It does on an ordinary login; when a
-        /// character of the account is still in a fight the real burst stops at the krs, the
-        /// client asks with kvc, and the answer is the list followed by the kvd. Measured in the
-        /// two reconnection captures: "kra lqu hoy kqu mgq mgt hpd krs", then "kvc krv" from the
-        /// client, then "kvi kvd".
-        /// </param>
-        public static List<byte[]> BuildWelcomeBurst(IReadOnlyList<DatabaseManager.DbCharacter> characters,
-                                                     bool withList = true)
-        {
-            var burst = new List<byte[]>
-            {
-                Push(Op.Kra),
-                Push(Op.Lqu, Pb.New()
-                    .Var(1, ServerTimeMessages.TimezoneOffsetMinutes)
-                    .Var(2, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
-                    .Build()),
-                Push(Op.Hoy, BuildHoy()),
-                Push(Op.Kqu, Pb.New().Packed(1, ActiveFeatures).Build()),
-                // mgq without field 1. That field is the whole reason "create a character" was
-                // dark, and it is the one frame in the burst where this server said something the
-                // captures never say on an account that can create. Sorted by whether creation
-                // worked, every capture in "Autenticacion-Servidor-Personaje" falls on the right
-                // side of it:
-                //
-                //   10011801         creation succeeds        "creacion personaje-exito"
-                //   10011801         creation succeeds        "crear personaje - borrar personaje"
-                //   10011801         already in the world     "tutorial completo"
-                //   080110011801     refused, maximum reached "fallo por limite maximo"
-                //   080110011801     account sitting at 4/5   "eleccion servidor a eleccion personaje"
-                //
-                // The same account sends it in one session and not in another, so it is a state and
-                // not a property of the account. Ours sent it always, on every login, which is why
-                // an account with a single character was told it had reached its maximum -- and why
-                // an empty one could still make its first: one is a limit you have not hit yet.
-                //
-                // What field 1 means exactly is not decoded here, and the comment says so. What is
-                // measured is that no capture where creation works carries it.
-                Push(Op.Mgq, Pb.New().Var(2, 1).Var(3, 1).Build()),
-                Push(Op.Mgt, Pb.New().EmptyMsg(2).Build()),
-                Push(Op.Hpd, Pb.New().Var(1, 1).Build()),
-                Push(Op.Krs),
-                Push(Op.Mgz, Pb.New().VarIfNotZero(1, SubscriptionElapsedSeconds).Build()),
-
-                // A kvd DOES NOT GO HERE, and sending it was what had half the screen dead.
-                //
-                // It was put in by eye, with the reasoning that «it closes the character list» and
-                // that the create button was greyed out because the screen was missing its ending.
-                // It sounds right and it is the other way round. Measured on the captures: the kvd appears in THREE, and the
-                // three are of entering the world directly without going through the screen —reconnection to a
-                // fight and koliseo—, looking like this:
-                //
-                //   kvi(381)  kvd(0)  ipc  kva  mft        back to a fight
-                //   kra  kqu  kvd(0)  kva  ivx  hlm        koliseo, and there is not even a kvi
-                //
-                // And in the burst of the real character screen it IS NOT THERE: neither in the one of the
-                // account with four characters and the button active, nor in the one of the empty account that
-                // creates one, nor in the one that fails on the maximum limit. All three go kvi and then jtg.
-                //
-                // That is, the kvd means «do not stop here». Sending it always, the client
-                // built the screen as if it were passing through: the create character button lifeless
-                // and the change server one leading nowhere.
-            };
-
-            // The list closes the burst, framed the way it always travels.
-            if (withList) burst.AddRange(CharacterListFrames(characters));
-            return burst;
-        }
-
         internal static async System.Threading.Tasks.Task SendWelcomeAsync(GameSession session,
-            IReadOnlyList<DatabaseManager.DbCharacter> characters, bool withList)
+            IReadOnlyList<DbCharacter> characters, bool withList)
         {
             await session.SendAsync(new Game.AuthenticationTicketAcceptedEvent());
             await session.SendAsync(ServerTimeMessages.Snapshot());
-            // Settings still carry unmapped f7; retain that payload losslessly.
-            await GameEntryMessages.SendAsync(session, Push(Op.Hoy, BuildHoy(session.State.Language)));
+            // Community is not a subscription marker. The unnamed settings extra is
+            // omitted by policy; see docs/populated-unmapped-fields.md#welcome-settings-omission-policy.
+            await session.SendAsync(new Game.ServerSettingsEvent(
+                ArenaLeaveBanTime: 30, GameType: Game.ServerType.Classical,
+                HasFreeAutopilot: true, IsMonoAccount: false, Community: 0,
+                Language: session.State.Language));
             await session.SendAsync(new Game.OptionalFeaturesEvent(ActiveFeatures.Select(x => (int)x).ToArray()));
             await session.SendAsync(new Game.AccountCapabilitiesEvent(Game.CharacterCreationRights.Allowed,
                 true, Game.Hierarchy.RolePlayer));
@@ -177,16 +71,13 @@ namespace Jondo.Unity.Server.Network
             if (withList) await SendCharacterListAsync(session, characters);
         }
 
-        internal static async System.Threading.Tasks.Task SendCharacterListAsync(GameSession session,
-            IReadOnlyList<DatabaseManager.DbCharacter> characters)
-        {
-            await session.SendAsync(new Game.QueueStatusEvent(1, 1));
-            await session.SendAsync(new Game.QueueStatusEvent(1, 0));
-            await session.SendAsync(new Game.QueueStatusEvent(0, 0));
-            // Project only when the complete nested character/look data survives.
-            await GameEntryMessages.SendAsync(session, Push(Op.Kvi, BuildCharactersList(characters)));
-            await GiftService.Live.SendAsync(session);
-        }
+        /// <summary>
+        /// Queue updates, the semantic list, then current gifts. Sending only the list
+        /// after creation once left the client selecting its previously cached character.
+        /// </summary>
+        internal static System.Threading.Tasks.Task SendCharacterListAsync(GameSession session,
+            IReadOnlyList<DbCharacter> characters)
+            => CharacterListService.Live.SendAsync(session, characters);
 
         /// <summary>
         /// Elapsed subscribed seconds are not stored by the account backend.
@@ -201,70 +92,10 @@ namespace Jondo.Unity.Server.Network
         private static readonly long[] ActiveFeatures =
             { 3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150 };
 
-        /// <summary>
-        /// The game server's greeting, the frame that carries, among other things, what the account
-        /// is entitled to. The same values as the capture:
-        ///
-        ///   f1: 30   f2: 1   f3: 1   f6: language   f7: 200
-        /// </summary>
-        /// <remarks>
-        /// Field 5 is deliberately NOT written, and the reason is worth keeping because it was
-        /// added here once on a correlation and taken straight back out.
-        ///
-        /// Across the first six captures f5 appeared in exactly one of the two accounts recorded,
-        /// and that was the account holding four characters on a single server -- which reads like
-        /// a subscription marker and is not one. The capture "crear personaje - borrar personaje"
-        /// settles it: the SAME account, in three consecutive logins, creating an eleventh
-        /// character and deleting it again, sends
-        ///
-        /// <code>
-        ///   081e100118013202667238c801      no f5, and the create button is working
-        /// </code>
-        ///
-        /// So f5 comes and goes for one account between sessions and says nothing about what the
-        /// account may do. Sending it was copying a value nobody had decoded.
-        /// </remarks>
-        private static byte[] BuildHoy(string? language = null)
-        {
-            return Pb.New()
-                .Var(1, 30)
-                .Var(2, 1)
-                .Var(3, 1)
-                .Str(6, language ?? SessionContext.Actual?.State.Language ?? ClientLanguage)
-                .Var(7, 200)
-                .Build();
-        }
-
-
-
         /// <summary>The language the client is launched with.</summary>
         public const string ClientLanguage = "es";
 
         // ─── Character list (kvi) ───────────────────────────────────────────────
-
-        /// <summary>
-        /// List of the account's characters on the chosen server, the one played last first.
-        ///
-        ///   f1 (repeated) { f1 { f2: name
-        ///                        f3: level
-        ///                        f4 { f2: { f3: sex }   (present but empty when the sex is 0)
-        ///                             f6: look
-        ///                             f7: breed } }
-        ///                   f2: characterId }
-        /// </summary>
-        public static byte[] BuildCharactersList(IReadOnlyList<DatabaseManager.DbCharacter> characters)
-        {
-            var kvi = Pb.New();
-
-            foreach (var character in MostRecentFirst(characters))
-            {
-                kvi.Msg(1, Pb.New()
-                    .Msg(1, BuildCharacterDetails(character))
-                    .Var(2, character.Id));
-            }
-
-            return kvi.Build();
-        }
 
         /// <summary>
         /// The order the real server sends the list in, which the client shows as it comes.
@@ -276,415 +107,11 @@ namespace Jondo.Unity.Server.Network
         /// just created, already dated, heads the list. A character with no date goes last; equal
         /// dates keep the order they came in.
         /// </remarks>
-        internal static List<DatabaseManager.DbCharacter> MostRecentFirst(IEnumerable<DatabaseManager.DbCharacter> characters)
+        internal static List<DbCharacter> MostRecentFirst(IEnumerable<DbCharacter> characters)
             => characters.OrderByDescending(c => System.DateTimeOffset.TryParse(c.LastConnection,
                        System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None,
                        out var at) ? at : System.DateTimeOffset.MinValue)
                    .ToList();
-
-        /// <summary>
-        /// The character-list details block. Selection constructs semantic records directly.
-        ///
-        ///   f2: name, f3: level, f4 { f2: sex, f6: look, f7: breed }
-        ///
-        /// </summary>
-        private static Pb BuildCharacterDetails(DatabaseManager.DbCharacter character)
-        {
-            var traits = Pb.New();
-
-            // The sex block is always there: empty for sex 0, carrying f3 for sex 1.
-            if (character.Sex != 0) traits.Msg(2, Pb.New().Var(3, character.Sex));
-            else traits.EmptyMsg(2);
-
-            // With the id, so that on the selection screen he comes out mounted if he is. Without it the
-            // mount was only known for the character already playing.
-            traits.Bytes(6, BreedLookTable.BuildLook(character));
-            traits.VarIfNotZero(7, character.Breed);
-
-            return Pb.New()
-                .Str(2, character.Name)
-                .VarIfNotZero(3, character.Level)
-                .Msg(4, traits);
-        }
-
-        // ─── World: characteristics ─────────────────────────────────────────────
-
-        /// <summary>
-        /// Characteristic ids, worked out by lining the captured kub up against the character
-        /// sheet of the account it was recorded from. The five resistances settled it: the
-        /// capture carries 33, 39, 9, 37 and 14, and the sheet showed exactly those percentages
-        /// for earth, fire, water, air and neutral.
-        /// </summary>
-        public static class Stat
-        {
-            public const int LifePoints = 0;
-            public const int ActionPoints = 1;
-            /// <summary>Points still to be spent. Proved by the capture: 995 before spending
-            /// fifteen on the sheet, 980 after.</summary>
-            public const int RemainingPoints = 3;
-            public const int Strength = 10;
-            public const int Vitality = 11;
-            public const int Wisdom = 12;
-            public const int Chance = 13;
-            public const int Agility = 14;
-            public const int Intelligence = 15;
-            public const int Critical = 18;
-            public const int Range = 19;
-            public const int MovementPoints = 23;
-            public const int Power = 25;
-            public const int Summons = 26;
-            public const int DodgeActionPoints = 27;
-            public const int DodgeMovementPoints = 28;
-            public const int Pods = 40;
-            public const int Initiative = 44;
-
-            /// <summary>
-            /// The energy, "energyPoints" in the client's catalogue, and the gauge it fills,
-            /// "maxEnergyPoints". 47 was named Energy here and carried the 10,000 of the gauge,
-            /// while 29 went out at zero: every captured kub has 10000 in both, or 8000 in the 29
-            /// once a fight is lost. See <see cref="Managers.Energy"/>.
-            /// </summary>
-            public const int EnergyPoints = 29;
-            public const int MaxEnergyPoints = 47;
-
-            /// <summary>
-            /// "hitPointLoss": the life missing outside a fight, negative, in the f2 of its f4.
-            /// "f4 { f2: -576 }" after the defeats of the captures. See <see cref="Managers.RestingLife"/>.
-            /// </summary>
-            public const int HitPointLoss = 97;
-            public const int Prospecting = 48;
-            public const int Heals = 49;
-            public const int Escape = 78;
-            public const int Lock = 79;
-            public const int WithdrawActionPoints = 82;
-            public const int WithdrawMovementPoints = 83;
-            public const int Shield = 96;
-        }
-
-        /// <summary>
-        /// The four wisdom gives and the two agility gives, ten points of the characteristic for
-        /// one of each. They are not sent by anybody else and the client does not work them out on
-        /// its own, so with wisdom and agility spent the panel still read zero across the board.
-        ///
-        /// Which id is which comes from the client's own table, extracted by
-        /// extract_characteristics.py: 27 and 28 are the dodges, 82 and 83 the withdrawals, 78
-        /// escape and 79 lock. The same table is what showed 46 is the alignment rank and not
-        /// prospecting, which is 48.
-        /// </summary>
-        /// <remarks>
-        /// And three more, with the rule each follows, MEASURED in «Conjuntos/crear nuevo
-        /// conjunto…», whose builds carry this in a column of its own (PresetProtocol): five pods
-        /// a point of strength, the four elements to initiative and a tenth of chance to
-        /// prospecting -- 1,128 strength give 5,640 pods, 354 wisdom 35 dodge, 257 chance 25
-        /// prospecting and the elements 1,834 initiative. Those are the TOTALS, the equipment's
-        /// share included, and the kub of that same session carries each of them in its base:
-        /// 35 dodge, 1,834 initiative, 125 prospecting. The equipment was left out here and
-        /// initiative and prospecting were not given at all.
-        /// </remarks>
-        internal static long GivenByCharacteristics(int id, Func<int, long> total)
-        {
-            switch (id)
-            {
-                case Stat.DodgeActionPoints:
-                case Stat.DodgeMovementPoints:
-                case Stat.WithdrawActionPoints:
-                case Stat.WithdrawMovementPoints:
-                    return total(Stat.Wisdom) / 10;
-                case Stat.Escape:
-                case Stat.Lock:
-                    return total(Stat.Agility) / 10;
-                case Stat.Pods:
-                    return 5 * total(Stat.Strength);
-                case Stat.Initiative:
-                    return total(Stat.Strength) + total(Stat.Intelligence) + total(Stat.Chance) + total(Stat.Agility);
-                case Stat.Prospecting:
-                    return total(Stat.Chance) / 10;
-                default:
-                    return 0;
-            }
-        }
-
-        /// <summary>Points a character starts with, before anything is spent or equipped.</summary>
-        private const int BaseActionPoints = 6;
-        private const int BaseMovementPoints = 3;
-        internal const int BasePods = 1000;
-
-        /// <summary>
-        /// What every characteristic is worth on a character that has just been created, taken
-        /// from the kub of the character-creation capture. It is the only place where the game
-        /// shows its own defaults with nothing on top.
-        ///
-        /// This is what the -100% and the blanket 50% resistances were: a whole family of
-        /// characteristics that are percentages and start at 100, sent at zero. The client reads
-        /// zero and draws the difference against the hundred it expects.
-        ///
-        /// Anything not listed starts at zero, which is most of them.
-        ///
-        /// Characteristic 97 used to be here at -55 and is not any more. The creation capture does
-        /// carry it, but the played character of the other capture has it empty, so -55 is not a
-        /// default: it is something about a character that has only just been made.
-        /// </summary>
-        private static readonly Dictionary<int, long> FreshCharacter = new Dictionary<int, long>
-        {
-            { 48, 100 },
-            { 75, 10 },
-            { 107, 100 },
-            { 120, 100 }, { 121, 100 }, { 122, 100 }, { 123, 100 }, { 124, 100 }, { 125, 100 },
-            { 141, 100 }, { 142, 100 }, { 143, 100 },
-            { 150, 100 },
-        };
-
-        /// <summary>
-        /// Life a character has by its level alone, before vitality adds anything.
-        ///
-        /// The creation capture gives 55 at level 1 and the game's own rule is fifty plus five a
-        /// level, which lands exactly there. The captured level-154 character carries more than
-        /// the formula gives, and that surplus is what quests and parchments hand out over a
-        /// lifetime: ours will come from the database the day we store it.
-        /// </summary>
-        private static long BaseLife(int level) => Handlers.StatsHandler.BaseLifeForLevel(level);
-
-        /// <summary>
-        /// Characteristics of the character (kub). Without it the client shows the life bar at
-        /// 0/0 and every characteristic empty.
-        ///
-        ///   f2 { f1: experience, f4: ?, f7: floor of the level, f8: experience for the next one,
-        ///        f9 { ... }, f10: kamas,
-        ///        f11 (repeated) { f1: id, container { ... } } }
-        ///
-        /// The container is NOT the same for every characteristic, and getting that wrong is not
-        /// a cosmetic mistake. The client's own log, Player.log, caught it:
-        ///
-        ///   NullReferenceException at giq.bkjt (llp a) ... at ees.wuc (kub a)
-        ///
-        /// llp is one characteristic entry and kub is this message: putting a characteristic in
-        /// the wrong container leaves the client reading a field that is not there, it throws,
-        /// and the whole sheet dies with it. That is what greyed the characteristics button out
-        /// while the C key still opened the panel: the panel is built from client data, the
-        /// button is enabled by the handler that never finished.
-        ///
-        ///   f4 { f2: base, f3: from parchments, f7: from equipment }   almost all of them
-        ///   f5 { f1: base, f5: bonus }                                 1 and 23, action and movement
-        ///   f2 { f2: value }                                           29, 47 and 96
-        ///
-        /// Which id goes in which container is read off the captured kub rather than written
-        /// down here, the same as the list of ids: see WorldEntry.ContainerOf.
-        ///
-        /// f3 is not the constant 100 it looked like either. The captured character had exactly
-        /// 100 in all six primaries because it had drunk every parchment in the game, which is the
-        /// cap. Copying it made every characteristic of ours read a hundred points higher than
-        /// the database says, and the life bar with it.
-        /// </summary>
-        public static byte[] BuildCharacteristics()
-        {
-            int level = Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel;
-
-            // The three experience fields, and they are not in the order they look:
-            //
-            //   f1  where the NEXT level starts
-            //   f7  where this one started
-            //   f8  what the character has
-            //
-            // The kub of a character that has just been created settles it: f1 is 110 with f7 and
-            // f8 absent, and 110 is exactly the threshold of level 2. A brand new character has
-            // no experience, so f1 cannot be what it has; and f7 <= f8 <= f1 is the only reading
-            // that also fits the level 154 of the other capture.
-            //
-            // We had f1 and f8 the other way round, which handed the client an experience above
-            // the threshold it was being told to reach: hence a bar full to the brim and a
-            // "next level in 0 XP" at every level.
-            var body = Pb.New()
-                .VarIfNotZero(1, ExperienceTable.NextLevelFloor(level))
-                .Var(4, FreshUnknownF4)
-                .VarIfNotZero(7, ExperienceTable.LevelFloor(level))
-                .VarIfNotZero(8, Jondo.Unity.Server.Network.SessionContext.State.Experience)
-                .Bytes(9, AlignmentSheet())
-                .VarIfNotZero(10, Jondo.Unity.Server.Network.SessionContext.State.Kamas);
-
-            // The six the player spends points on: the base, which is the points, and beside it
-            // what the scrolls gave. The two travel in different fields and the client draws them
-            // as two lines, "Base" and "Adicional".
-            var primary = new Dictionary<int, long>
-            {
-                { Stat.Strength, Jondo.Unity.Server.Network.SessionContext.State.StatStrength },
-                { Stat.Vitality, Jondo.Unity.Server.Network.SessionContext.State.StatVitality },
-                { Stat.Wisdom, Jondo.Unity.Server.Network.SessionContext.State.StatWisdom },
-                { Stat.Chance, Jondo.Unity.Server.Network.SessionContext.State.StatChance },
-                { Stat.Agility, Jondo.Unity.Server.Network.SessionContext.State.StatAgility },
-                { Stat.Intelligence, Jondo.Unity.Server.Network.SessionContext.State.StatIntelligence },
-            };
-            var scrolled = new Dictionary<int, long>
-            {
-                { Stat.Strength, Jondo.Unity.Server.Network.SessionContext.State.ScrolledStrength },
-                { Stat.Vitality, Jondo.Unity.Server.Network.SessionContext.State.ScrolledVitality },
-                { Stat.Wisdom, Jondo.Unity.Server.Network.SessionContext.State.ScrolledWisdom },
-                { Stat.Chance, Jondo.Unity.Server.Network.SessionContext.State.ScrolledChance },
-                { Stat.Agility, Jondo.Unity.Server.Network.SessionContext.State.ScrolledAgility },
-                { Stat.Intelligence, Jondo.Unity.Server.Network.SessionContext.State.ScrolledIntelligence },
-            };
-
-            IReadOnlyList<int> ids = WorldEntry.CharacteristicIds;
-            if (ids.Count == 0)
-            {
-                // No capture to learn from: at least the ones we know about travel.
-                var fallback = new List<int>
-                {
-                    Stat.LifePoints, Stat.ActionPoints, Stat.RemainingPoints,
-                    Stat.MovementPoints, Stat.EnergyPoints, Stat.MaxEnergyPoints, Stat.Pods,
-                    Stat.Initiative, Stat.DodgeActionPoints, Stat.DodgeMovementPoints,
-                    Stat.WithdrawActionPoints, Stat.WithdrawMovementPoints, Stat.Escape, Stat.Lock
-                };
-                fallback.AddRange(primary.Keys);
-                fallback.AddRange(FreshCharacter.Keys);
-                ids = fallback;
-            }
-
-            // What the equipment adds, which travels in field 7 of each entry, and what the
-            // alterations add, in field 5: the larva race's kub carries «Influencia de Jibejan»'s
-            // +50 initiative there while it lasts, and drops it in the one after it is lost.
-            var fromEquipment = Managers.Equipment.Bonuses();
-            var fromAlterations = Managers.Alterations.Bonuses(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
-
-            // A mutated character's sheet is his monster grade's: its life, points and
-            // characteristics, and nothing of his own, his scrolls or his gear (Mutations).
-            var mutation = Managers.Mutations.Current();
-            var monster = mutation == null ? null : Managers.Mutations.SheetOf(mutation);
-            if (monster != null)
-            {
-                fromEquipment = new Dictionary<int, long>();
-                fromAlterations = new Dictionary<int, long>();
-                foreach (int key in scrolled.Keys.ToList()) scrolled[key] = 0;
-                primary[Stat.Strength] = monster.Strength;
-                primary[Stat.Vitality] = 0;
-                primary[Stat.Wisdom] = monster.Wisdom;
-                primary[Stat.Chance] = monster.Chance;
-                primary[Stat.Agility] = monster.Agility;
-                primary[Stat.Intelligence] = monster.Intelligence;
-                primary[Stat.LifePoints] = monster.LifePoints;
-                primary[Stat.ActionPoints] = monster.ActionPoints;
-                primary[Stat.MovementPoints] = monster.MovementPoints;
-            }
-
-            long Total(int stat) => (primary.TryGetValue(stat, out long p) ? p : 0)
-                                    + (scrolled.TryGetValue(stat, out long s) ? s : 0)
-                                    + (fromEquipment.TryGetValue(stat, out long e) ? e : 0)
-                                    + (fromAlterations.TryGetValue(stat, out long a) ? a : 0);
-
-            foreach (int id in ids)
-            {
-                long value = primary.TryGetValue(id, out long spent) ? spent : ValueOf(id, level);
-                if (monster == null && !primary.ContainsKey(id)) value += GivenByCharacteristics(id, Total);
-                fromEquipment.TryGetValue(id, out long equipped);
-                scrolled.TryGetValue(id, out long fromScrolls);
-                fromAlterations.TryGetValue(id, out long altered);
-
-                switch (WorldEntry.ContainerOf(id))
-                {
-                    case 5:
-                        // Action and movement points: f1 is the base, f5 whatever adds to it.
-                        body.Msg(11, Pb.New()
-                            .Var(1, id)
-                            .Msg(5, Pb.New().Var(1, value).VarIfNotZero(5, equipped + altered)));
-                        break;
-
-                    case 2:
-                        body.Msg(11, Pb.New().Var(1, id).Msg(2, Pb.New().VarIfNotZero(2, value)));
-                        break;
-
-                    default:
-                        AddStat(body, id, value, equipped, fromScrolls, altered);
-                        break;
-                }
-            }
-
-            return Pb.New().Msg(2, body).Build();
-        }
-
-        /// <summary>
-        /// Value of a characteristic that the player does not spend points on, before what the
-        /// characteristics give it (<see cref="GivenByCharacteristics"/>).
-        /// </summary>
-        internal static long ValueOf(int id, int level)
-        {
-            if (id == Stat.LifePoints) return BaseLife(level);
-            // The seventh action point comes at level 100: the real sheet of a level 200 has a
-            // base of 7 where a new character's has 6. It was always 6 here, so out of a fight a
-            // level 100 showed one point less than the fight then gave him.
-            if (id == Stat.ActionPoints)
-                return BaseActionPoints + (level >= Handlers.StatsHandler.LevelForSeventhAp ? 1 : 0);
-            if (id == Stat.MovementPoints) return BaseMovementPoints;
-            // Every character has one summon of his own: the real sheet's base is 1, with what
-            // the equipment adds beside it, and a fight counts the same one. Sent at zero, the
-            // sheet showed one summon less than the fight.
-            if (id == Stat.Summons) return Handlers.FightHandler.BasePlayerSummonLimit;
-            if (id == Stat.MaxEnergyPoints) return Jondo.Unity.World.Fights.DefeatPenalty.MaxEnergy;
-            if (id == Stat.EnergyPoints)
-                return Managers.Energy.Of(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
-            if (id == Stat.HitPointLoss)
-            {
-                // What was missing when the client's regeneration counter last started: it counts
-                // on from there by itself (the ktz of every return to roleplay).
-                var state = Jondo.Unity.Server.Network.SessionContext.State;
-                DateTime since = state.RegenerationStartedUtc == default ? DateTime.UtcNow : state.RegenerationStartedUtc;
-                return -Managers.RestingLife.MissingAt(state.CharacterId, since);
-            }
-            // The base; strength's five pods a point go on top (GivenByCharacteristics), which is
-            // what the capture shows: five points of strength moved this characteristic by twenty-five.
-            if (id == Stat.Pods) return PodsBeforeStrength(Jondo.Unity.Server.Network.SessionContext.Current?.State);
-            if (id == Stat.RemainingPoints) return Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints;
-            return FreshCharacter.TryGetValue(id, out long value) ? value : 0;
-        }
-
-        /// <summary>
-        /// A field of the body we cannot name yet, sent with the value a character has the day it
-        /// is created: f4 is 5 on a brand new character and 30 on the level 154 of the other
-        /// capture, so it grows with something.
-        /// </summary>
-        private const long FreshUnknownF4 = 5;
-
-        /// <summary>
-        /// The sheet's alignment block (f9, Alignments): { f2: 2, f3 { f3: 500 }, f5: 1 } on a brand
-        /// new character, { f1: 100, f2: 3, f3 { f3: 500 }, f5: 200 } on the level 200 Bontarian --
-        /// the alignment level its quests raised, the side, the next grade's honour, the level.
-        /// The honour block is { f1 the honour, f2 the aggression status, f3 the grade's ceiling, f4
-        /// its floor }: the alignment tab's bar is drawn between the last two. Its 500 with no
-        /// honour is the first grade's ceiling (<see cref="Managers.Honour"/>).
-        /// </summary>
-        private static byte[] AlignmentSheet()
-        {
-            var state = Jondo.Unity.Server.Network.SessionContext.State;
-            var alignment = Managers.Alignments.Of(state.CharacterId);
-            int grade = Math.Max(1, alignment.HonourGrade);
-            return Pb.New().VarIfNotZero(1, Managers.Alignments.Level())
-                     .Var(2, alignment.Side).Msg(3, Pb.New().VarIfNotZero(1, alignment.Honour)
-                                                           .VarIfNotZero(2, alignment.AggressionStatus)
-                                                           .Var(3, Managers.Honour.CeilingOf(grade))
-                                                           .VarIfNotZero(4, Managers.Honour.FloorOf(grade)))
-                     .VarIfNotZero(4, alignment.ShownGrade)
-                     .Var(5, Math.Max(1, Handlers.StatsHandler.StatLevel(state.CharacterLevel))).Build();
-        }
-
-        /// <summary>
-        /// One characteristic: f2 the base, f3 what the scrolls gave, f5 what the alterations add, f7
-        /// what the equipment adds.
-        /// </summary>
-        /// <remarks>
-        /// f3 is MEASURED: every scrolled character in the captures carries its scrolls there --
-        /// <c>f4 { f2: 398, f3: 100, f7: 499 }</c> is a real strength -- and a characteristic the
-        /// player never scrolled leaves it out, as proto3 does with a zero.
-        /// </remarks>
-        private static void AddStat(Pb body, int id, long value, long fromEquipment = 0, long fromScrolls = 0,
-                                    long fromAlterations = 0)
-        {
-            // Characteristic 0 is life, and it is the one entry of the real message that carries
-            // no id at all: proto3 leaves the field out when the value is zero, and zero is its
-            // id. Writing Var(1, 0) here would put a field the real one does not have.
-            var entry = Pb.New();
-            if (id != 0) entry.Var(1, id);
-            entry.Msg(4, Pb.New().VarIfNotZero(2, value).VarIfNotZero(3, fromScrolls)
-                                 .VarIfNotZero(5, fromAlterations).VarIfNotZero(7, fromEquipment));
-            body.Msg(11, entry);
-        }
 
         // ─── World: heartbeat ───────────────────────────────────────────────────
 
@@ -806,7 +233,7 @@ namespace Jondo.Unity.Server.Network
         /// NPCs and monster groups use negative contextual ids, which is how the client tells
         /// them from players.
         /// </summary>
-        public static byte[] BuildMapActors(long mapId, DatabaseManager.DbCharacter character,
+        public static byte[] BuildMapActors(long mapId, DbCharacter character,
                                             int cell, int facing, long accountId)
         {
             var jss = Pb.New().Var(2, mapId);
@@ -953,7 +380,7 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>The same, with Hardcore (the server's settings) putting every monster at twice its size.</summary>
         internal static Pb MonsterLook(string look, bool hardcore)
-            => BreedLookTable.WriteLook(SemanticMonsterLook(look, hardcore));
+            => CharacterLookBuilder.WriteLook(SemanticMonsterLook(look, hardcore));
 
         internal static Jondo.Unity.Protocol.Game.EntityLook SemanticMonsterLook(string look, bool hardcore)
         {
@@ -1611,20 +1038,29 @@ namespace Jondo.Unity.Server.Network
         /// What a character can carry: the thousand of a new character, five a level since the
         /// first -- the client's own level-up window shows «Pods +5» on every level --, five a
         /// level of each job since its first («Obtienes {2} pods adicionales», text 1120328), and
-        /// five a point of strength. It was the thousand and the strength alone, in a dozen copies.
+        /// five a point of strength -- allocated, scrolled, worn or from an alteration -- with the
+        /// pods the equipment gives on top: the sheet's pods characteristic, total. It was the
+        /// thousand and the strength alone, in a dozen copies.
         /// </summary>
         public static long Capacity(SessionState state)
-            => state == null ? BasePods
-               // Widened before the sum: points and scrolls near int.MaxValue add up past it.
-               : PodsBeforeStrength(state) + PodsPerLevel * ((long)state.StatStrength + state.ScrolledStrength);
+        {
+            if (state == null) return CharacteristicRules.BasePods;
+            var gear = Managers.Equipment.BonusesOf(state.EquipmentItems.Values.ToArray().Select(item => (item.Position, item)));
+            var temporary = Managers.Alterations.Bonuses(state.CharacterId);
+            // Widened before the sum: points and scrolls near int.MaxValue add up past it.
+            long strength = (long)state.StatStrength + state.ScrolledStrength
+                + gear.GetValueOrDefault(Stat.Strength) + temporary.GetValueOrDefault(Stat.Strength);
+            return PodsBeforeStrength(state) + PodsPerLevel * strength
+                + gear.GetValueOrDefault(Stat.Pods) + temporary.GetValueOrDefault(Stat.Pods);
+        }
 
         /// <summary>The same without the strength: the sheet's pods characteristic, which adds strength's on its own.</summary>
         public static long PodsBeforeStrength(SessionState state)
         {
-            if (state == null) return BasePods;
+            if (state == null) return CharacteristicRules.BasePods;
             long jobs = 0;
             foreach (var job in state.Jobs.Values.ToArray()) jobs += Math.Max(0, job.Level - 1);
-            return BasePods + PodsPerLevel * (Math.Max(1L, state.CharacterLevel) - 1) + PodsPerLevel * jobs;
+            return CharacteristicRules.BasePods + PodsPerLevel * (Math.Max(1L, state.CharacterLevel) - 1) + PodsPerLevel * jobs;
         }
 
         /// <summary>
@@ -1745,7 +1181,7 @@ namespace Jondo.Unity.Server.Network
         /// loose inside the jsn, which is a single actor. That is why it is here and not inside either of
         /// the two.
         /// </summary>
-        private static Pb PlayerActor(DatabaseManager.DbCharacter character, int cell, int facing,
+        private static Pb PlayerActor(DbCharacter character, int cell, int facing,
                                      long accountId)
         {
             // The order and the fields are those of a real jsn with a title on:
@@ -1769,7 +1205,7 @@ namespace Jondo.Unity.Server.Network
             var side = Pb.New().Var(2, alignment.Side);
             if (alignment.PvpOn) side.Msg(3, Pb.New().Var(2, alignment.AggressionStatus));
             side.VarIfNotZero(4, alignment.ShownGrade)
-                .VarIfNotZero(5, Handlers.StatsHandler.StatLevel(character.Level));
+                .VarIfNotZero(5, CharacteristicRules.StatLevel(character.Level));
             var cuerpo = mutation != null
                 ? Pb.New().Msg(2, Pb.New().Var(1, mutation.Grade).Var(2, mutation.Monster)).Var(3, accountId)
                 : Pb.New().Msg(1, side).Var(3, accountId);
@@ -1790,12 +1226,12 @@ namespace Jondo.Unity.Server.Network
                 .Msg(1, Pb.New().Var(1, cell).Var(2, facing))
                 .Msg(2, Pb.New()
                     .Msg(1, Pb.New().Msg(5, humanoid))
-                    .Bytes(3, BreedLookTable.MapLook(character)))
+                    .Bytes(3, CharacterLookBuilder.MapLook(character)))
                 .Var(3, character.Id);
         }
 
         /// <summary>Serialized actor block used by map snapshots outside this protocol builder.</summary>
-        public static byte[] BuildPlayerActorBlock(DatabaseManager.DbCharacter character, int cell,
+        public static byte[] BuildPlayerActorBlock(DbCharacter character, int cell,
                                                    int facing, long accountId)
             => PlayerActor(character, cell, facing, accountId).Build();
 
@@ -1816,7 +1252,7 @@ namespace Jondo.Unity.Server.Network
         ///
         /// The real server sends three in a row; one is enough.
         /// </summary>
-        public static byte[] BuildActorRefreshed(DatabaseManager.DbCharacter character, int cell,
+        public static byte[] BuildActorRefreshed(DbCharacter character, int cell,
                                                  int facing, long accountId)
             => Pb.New()
                 .Msg(1, PlayerActor(character, cell, facing, accountId))
@@ -1834,10 +1270,10 @@ namespace Jondo.Unity.Server.Network
         /// derived from the character's id: constant for him and different from anyone else's. If the
         /// client does not check it, it does not matter; if it checks it, at least it is consistent.
         /// </summary>
-        public static byte[] BuildLookChanged(DatabaseManager.DbCharacter character)
+        public static byte[] BuildLookChanged(DbCharacter character)
             => Pb.New()
                 .Str(1, LookIdOf(character.Id))
-                .Bytes(2, BreedLookTable.BuildLook(character, paraLaVentana: true))
+                .Bytes(2, CharacterLookBuilder.BuildLook(character, paraLaVentana: true))
                 .Build();
 
         /// <summary>
@@ -1851,11 +1287,11 @@ namespace Jondo.Unity.Server.Network
         /// f7 is the same uuid the preview's lxc carries, and f12 its same look:
         /// that is how the panel knows that what reaches it is its own.
         /// </summary>
-        public static byte[] BuildAppearanceState(DatabaseManager.DbCharacter character, string draftId)
+        public static byte[] BuildAppearanceState(DbCharacter character, string draftId)
             => Pb.New().Var(1, 1).Bytes(3, AppearanceBody(character, draftId)).Build();
 
         /// <summary>lwq { f1: the outfit being drafted }, the same block the lxo carries in its f3.</summary>
-        public static byte[] BuildDraftOutfit(DatabaseManager.DbCharacter character, string draftId)
+        public static byte[] BuildDraftOutfit(DbCharacter character, string draftId)
             => Pb.New().Bytes(1, AppearanceBody(character, draftId)).Build();
 
         /// <summary>Type-only aura notification; its former tag-1 value is no longer emitted.</summary>
@@ -1864,20 +1300,20 @@ namespace Jondo.Unity.Server.Network
             => Array.Empty<byte>();
 
         /// <summary>The worn outfit as the window drafts it, under the draft's own uuid.</summary>
-        private static byte[] AppearanceBody(DatabaseManager.DbCharacter character, string draftId)
+        private static byte[] AppearanceBody(DbCharacter character, string draftId)
             => OutfitBody(character, draftId, Managers.Outfits.Of(character.Id)[0], Managers.Outfits.Worn(character),
-                          BreedLookTable.BuildLook(character, paraLaVentana: true));
+                          CharacterLookBuilder.BuildLook(character, paraLaVentana: true));
 
         /// <summary>One of the character's outfits: the worn one from the live tables, the others as kept.</summary>
-        public static byte[] BuildOutfit(DatabaseManager.DbCharacter character, Managers.Outfits.Outfit outfit)
+        public static byte[] BuildOutfit(DbCharacter character, Managers.Outfits.Outfit outfit)
         {
             if (outfit.Kept is not { } kept)
                 return OutfitBody(character, outfit.Uuid, outfit, Managers.Outfits.Worn(character),
-                                  BreedLookTable.BuildLook(character, paraLaVentana: true));
+                                  CharacterLookBuilder.BuildLook(character, paraLaVentana: true));
 
             int head = kept.Head > 0 ? kept.Head : character.HeadId;
             return OutfitBody(character, outfit.Uuid, outfit, kept,
-                              BreedLookTable.OutfitLook(character, head, kept.Body, kept.Colors, kept.Garments));
+                              CharacterLookBuilder.OutfitLook(character, head, kept.Body, kept.Colors, kept.Garments));
         }
 
         /// <summary>
@@ -1895,7 +1331,7 @@ namespace Jondo.Unity.Server.Network
         /// An empty name is drawn as the window's own default. f9 is the aura, an emote id
         /// (lk::bno looks it up as one).
         /// </summary>
-        private static byte[] OutfitBody(DatabaseManager.DbCharacter character, string uuid,
+        private static byte[] OutfitBody(DbCharacter character, string uuid,
                                          Managers.Outfits.Outfit outfit, Managers.Outfits.Look look, byte[] drawn)
         {
             var body = Pb.New();
@@ -1903,7 +1339,7 @@ namespace Jondo.Unity.Server.Network
             // The outfit's colours, bare and without an index. Without this the client blows up on opening
             // the cosmetics window: its own log says so, ColorSet..ctor with the null
             // list, inside the lyt handler.
-            var colores = BreedLookTable.PlainColors(character.Breed, character.Sex, look.Colors);
+            var colores = CharacterLookBuilder.PlainColors(character.Breed, character.Sex, look.Colors);
             if (colores.Count > 0) body.Msg(1, Pb.New().Packed(2, colores));
 
             body
@@ -1944,7 +1380,7 @@ namespace Jondo.Unity.Server.Network
         /// left undrawn: it blows up in CosmeticUi.DisplayOutfit with a null reference because it does not
         /// have any outfit to show. It was seen in its own Player.log.
         /// </summary>
-        public static byte[] BuildOutfits(DatabaseManager.DbCharacter character)
+        public static byte[] BuildOutfits(DbCharacter character)
         {
             var outfits = Managers.Outfits.Of(character.Id);
             var pb = Pb.New();

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using Google.Protobuf;
 using Jondo.Unity.Protocol.Messages;
+using Jondo.Unity.Server.Database.Migrations;
+using Jondo.Unity.Server.Database;
 
 namespace Jondo.Unity.Server
 {
@@ -313,7 +315,12 @@ namespace Jondo.Unity.Server
                         Intelligence INTEGER NOT NULL DEFAULT 0,
                         Chance INTEGER NOT NULL DEFAULT 0,
                         Agility INTEGER NOT NULL DEFAULT 0,
-                        Look TEXT NOT NULL,
+                        Color1 INTEGER CHECK (Color1 IS NULL OR (typeof(Color1) = 'integer' AND Color1 BETWEEN 0 AND 16777215)),
+                        Color2 INTEGER CHECK (Color2 IS NULL OR (typeof(Color2) = 'integer' AND Color2 BETWEEN 0 AND 16777215)),
+                        Color3 INTEGER CHECK (Color3 IS NULL OR (typeof(Color3) = 'integer' AND Color3 BETWEEN 0 AND 16777215)),
+                        Color4 INTEGER CHECK (Color4 IS NULL OR (typeof(Color4) = 'integer' AND Color4 BETWEEN 0 AND 16777215)),
+                        Color5 INTEGER CHECK (Color5 IS NULL OR (typeof(Color5) = 'integer' AND Color5 BETWEEN 0 AND 16777215)),
+                        Color6 INTEGER CHECK (Color6 IS NULL OR (typeof(Color6) = 'integer' AND Color6 BETWEEN 0 AND 16777215)),
                         Orientation INTEGER NOT NULL DEFAULT 1,
                         Kamas INTEGER NOT NULL DEFAULT 0
                     );
@@ -721,6 +728,12 @@ namespace Jondo.Unity.Server
                 ";
                 createSpellBarLevel.ExecuteNonQuery();
 
+                // Complete the colour migration before inserting any new characters:
+                // old databases still have a NOT NULL Look column to backfill and remove.
+                // Initialize's verified backup has already completed; failures propagate.
+                if (CharacterColorsMigration.Apply(worldConnection))
+                    Console.WriteLine("[SQLite] Migration: Character colour storage is up to date.");
+
                 // Seed default character if empty
                 var checkChar = worldConnection.CreateCommand();
                 checkChar.CommandText = "SELECT COUNT(*) FROM Characters WHERE Id = 13825558;";
@@ -731,14 +744,15 @@ namespace Jondo.Unity.Server
                     seedChar.CommandText = @"
                         INSERT INTO Characters (
                             Id, AccountId, Name, Breed, Sex, Level, MapId, CellId, 
-                            RemainingPoints, Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look, Kamas
+                            RemainingPoints, Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Kamas,
+                            Color1, Color2, Color3, Color4, Color5, Color6
                         ) VALUES (
                             13825558, 188940901, $name, 9, 1, 40, 154010884, 280, 
-                            195, 0, 0, 0, 0, 0, 0, $look, 50000
+                            195, 0, 0, 0, 0, 0, 0, 50000,
+                            0xE6C5A2, 0xBDB2CB, 0x2E70A4, 0x121312, 0x080608, 0x92DBF5
                         );
                     ";
                     seedChar.Parameters.AddWithValue("$name", "[#KEKA-BRON#]");
-                    seedChar.Parameters.AddWithValue("$look", "080118032218A28B9B0FCBE5F615A4E1B91992A6C820888CA028F5B7CB342A035BE410420134320220013809");
                     seedChar.ExecuteNonQuery();
                 }
 
@@ -1917,22 +1931,6 @@ namespace Jondo.Unity.Server
 
         // --- Character Operations ---
 
-        public class DbCharacter
-        {
-            public long Id { get; set; }
-            public long AccountId { get; set; }
-            public int ServerId { get; set; } = DefaultServerId;
-            public string Name { get; set; }
-            public int Breed { get; set; }
-            public int Sex { get; set; }
-            public int Level { get; set; }
-            public string LookHex { get; set; }
-            /// <summary>ISO date of the last connection, empty if the character never logged in.</summary>
-            public string LastConnection { get; set; } = "";
-            /// <summary>Head chosen at creation. Its skin is part of the look.</summary>
-            public int HeadId { get; set; }
-        }
-
         /// <summary>
         /// The characters on an account. If a server is given, only the ones on that server.
         ///
@@ -1943,17 +1941,22 @@ namespace Jondo.Unity.Server
         /// </summary>
         public static List<DbCharacter> GetCharactersByAccountId(long accountId, int serverId = 0)
         {
-            var list = new List<DbCharacter>();
-            if (accountId <= 0) return list;
+            if (accountId <= 0) return new List<DbCharacter>();
 
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
+            return GetCharactersByAccountId(connection, accountId, serverId);
+        }
 
-            var command = connection.CreateCommand();
+        internal static List<DbCharacter> GetCharactersByAccountId(SqliteConnection connection, long accountId, int serverId = 0)
+        {
+            var list = new List<DbCharacter>();
+            if (accountId <= 0) return list;
+            using var command = connection.CreateCommand();
             command.CommandText =
-                "SELECT Id, Name, Breed, Sex, Level, Look, " +
+                "SELECT Id, Name, Breed, Sex, Level, " +
                 "COALESCE(ServerId, $defaultServer), COALESCE(LastConnection, ''), " +
-                "COALESCE(HeadId, 0) " +
+                "COALESCE(HeadId, 0), Color1, Color2, Color3, Color4, Color5, Color6 " +
                 "FROM Characters WHERE AccountId = $accId" +
                 (serverId > 0 ? " AND COALESCE(ServerId, $defaultServer) = $serverId" : "") +
                 " ORDER BY Id;";
@@ -1972,10 +1975,10 @@ namespace Jondo.Unity.Server
                     Breed = reader.GetInt32(2),
                     Sex = reader.GetInt32(3),
                     Level = reader.GetInt32(4),
-                    LookHex = reader.GetString(5),
-                    ServerId = reader.GetInt32(6),
-                    LastConnection = reader.GetString(7),
-                    HeadId = reader.GetInt32(8)
+                    ServerId = reader.GetInt32(5),
+                    LastConnection = reader.GetString(6),
+                    HeadId = reader.GetInt32(7),
+                    Colors = CharacterColorStorage.Read(reader, 8)
                 });
             }
 
@@ -1989,12 +1992,17 @@ namespace Jondo.Unity.Server
 
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
+            return GetCharacterById(connection, characterId);
+        }
 
-            var command = connection.CreateCommand();
+        internal static DbCharacter? GetCharacterById(SqliteConnection connection, long characterId)
+        {
+            if (characterId <= 0) return null;
+            using var command = connection.CreateCommand();
             command.CommandText =
-                "SELECT Id, AccountId, Name, Breed, Sex, Level, Look, " +
+                "SELECT Id, AccountId, Name, Breed, Sex, Level, " +
                 "COALESCE(ServerId, $defaultServer), COALESCE(LastConnection, ''), " +
-                "COALESCE(HeadId, 0) " +
+                "COALESCE(HeadId, 0), Color1, Color2, Color3, Color4, Color5, Color6 " +
                 "FROM Characters WHERE Id = $id;";
             command.Parameters.AddWithValue("$id", characterId);
             command.Parameters.AddWithValue("$defaultServer", DefaultServerId);
@@ -2010,10 +2018,10 @@ namespace Jondo.Unity.Server
                 Breed = reader.GetInt32(3),
                 Sex = reader.GetInt32(4),
                 Level = reader.GetInt32(5),
-                LookHex = reader.GetString(6),
-                ServerId = reader.GetInt32(7),
-                LastConnection = reader.GetString(8),
-                HeadId = reader.GetInt32(9)
+                ServerId = reader.GetInt32(6),
+                LastConnection = reader.GetString(7),
+                HeadId = reader.GetInt32(8),
+                Colors = CharacterColorStorage.Read(reader, 9)
             };
         }
 
@@ -2640,7 +2648,7 @@ namespace Jondo.Unity.Server
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT Name, Level, MapId, CellId, RemainingPoints, Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Look, Breed, Sex, Orientation, Kamas, Experience,
+                SELECT Name, Level, MapId, CellId, RemainingPoints, Vitality, Wisdom, Strength, Intelligence, Chance, Agility, Breed, Sex, Orientation, Kamas, Experience,
                        ScrolledVitality, ScrolledWisdom, ScrolledStrength, ScrolledIntelligence, ScrolledChance, ScrolledAgility
                 FROM Characters
                 WHERE Id = $charId;
@@ -2705,12 +2713,12 @@ namespace Jondo.Unity.Server
                                       $"They are put on {buena}.");
                     suyo.CellId = buena;
                 }
-                Jondo.Unity.Server.Network.SessionContext.State.Orientation = reader.IsDBNull(14) ? 1 : reader.GetInt32(14);
-                Jondo.Unity.Server.Network.SessionContext.State.Kamas = reader.IsDBNull(15) ? 0 : reader.GetInt64(15);
+                Jondo.Unity.Server.Network.SessionContext.State.Orientation = reader.IsDBNull(13) ? 1 : reader.GetInt32(13);
+                Jondo.Unity.Server.Network.SessionContext.State.Kamas = reader.IsDBNull(14) ? 0 : reader.GetInt64(14);
 
                 // If the character predates the column, give it the minimum experience that
                 // matches its level so the bar does not show up empty.
-                long storedXp = reader.IsDBNull(16) ? 0 : reader.GetInt64(16);
+                long storedXp = reader.IsDBNull(15) ? 0 : reader.GetInt64(15);
                 long levelFloor = ExperienceTable.LevelFloor(Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel);
                 Jondo.Unity.Server.Network.SessionContext.State.Experience = Math.Max(storedXp, levelFloor);
                 Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints = reader.GetInt32(4);
@@ -2720,24 +2728,14 @@ namespace Jondo.Unity.Server
                 Jondo.Unity.Server.Network.SessionContext.State.StatIntelligence = reader.GetInt32(8);
                 Jondo.Unity.Server.Network.SessionContext.State.StatChance = reader.GetInt32(9);
                 Jondo.Unity.Server.Network.SessionContext.State.StatAgility = reader.GetInt32(10);
-                Jondo.Unity.Server.Network.SessionContext.State.ScrolledVitality = reader.GetInt32(17);
-                Jondo.Unity.Server.Network.SessionContext.State.ScrolledWisdom = reader.GetInt32(18);
-                Jondo.Unity.Server.Network.SessionContext.State.ScrolledStrength = reader.GetInt32(19);
-                Jondo.Unity.Server.Network.SessionContext.State.ScrolledIntelligence = reader.GetInt32(20);
-                Jondo.Unity.Server.Network.SessionContext.State.ScrolledChance = reader.GetInt32(21);
-                Jondo.Unity.Server.Network.SessionContext.State.ScrolledAgility = reader.GetInt32(22);
-                Jondo.Unity.Server.Network.SessionContext.State.Breed = reader.GetInt32(12);
-                Jondo.Unity.Server.Network.SessionContext.State.Sex = reader.GetInt32(13);
-
-                string lookHex = reader.GetString(11);
-                byte[] lookBytes = ConvertHexStringToByteArray(lookHex);
-                Jondo.Unity.Server.Network.SessionContext.State.LookBytes = lookBytes;
-
-                // Reconstruct PlayerActorDetails (detailsMsg with look and humanoid name)
-                // detailsMsg has: Field 1 (Look), Field 2 (HumanoidMsg)
-                // HumanoidMsg has: Field 2 (HumanInformationsMsg)
-                // HumanInformationsMsg has: Field 3 (Name)
-                Jondo.Unity.Server.Network.SessionContext.State.PlayerActorDetails = ReconstructActorDetails(lookBytes, Jondo.Unity.Server.Network.SessionContext.State.CharacterName);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledVitality = reader.GetInt32(16);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledWisdom = reader.GetInt32(17);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledStrength = reader.GetInt32(18);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledIntelligence = reader.GetInt32(19);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledChance = reader.GetInt32(20);
+                Jondo.Unity.Server.Network.SessionContext.State.ScrolledAgility = reader.GetInt32(21);
+                Jondo.Unity.Server.Network.SessionContext.State.Breed = reader.GetInt32(11);
+                Jondo.Unity.Server.Network.SessionContext.State.Sex = reader.GetInt32(12);
 
                 // The professions, which live in their own table because they belong to the character
                 // and not to the client's catalogue.
@@ -2795,7 +2793,7 @@ namespace Jondo.Unity.Server
                                   "WHERE Id = $id;";
             command.Parameters.AddWithValue("$level", level);
             command.Parameters.AddWithValue("$xp", ExperienceTable.IsLoaded ? ExperienceTable.LevelFloor(level) : 0L);
-            command.Parameters.AddWithValue("$points", Handlers.StatsHandler.TotalCapitalForLevel(level));
+            command.Parameters.AddWithValue("$points", CharacteristicRules.TotalCapitalForLevel(level));
             command.Parameters.AddWithValue("$id", characterId);
             command.ExecuteNonQuery();
         }
@@ -2867,16 +2865,11 @@ namespace Jondo.Unity.Server
             command.ExecuteNonQuery();
         }
 
-        public static void SaveCharacterLook(long characterId, byte[] lookBytes)
+        public static void SaveCharacterColors(long characterId, CharacterColors colors)
         {
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
-
-            var command = connection.CreateCommand();
-            command.CommandText = "UPDATE Characters SET Look = $look WHERE Id = $id;";
-            command.Parameters.AddWithValue("$look", BitConverter.ToString(lookBytes).Replace("-", ""));
-            command.Parameters.AddWithValue("$id", characterId);
-            command.ExecuteNonQuery();
+            CharacterColorStorage.Save(connection, characterId, colors);
         }
 
         // --- Inventory Operations ---
@@ -3060,11 +3053,8 @@ namespace Jondo.Unity.Server
                     ? cellId
                     : MapManager.GetNearestWalkableCell(mapId, Managers.Interactives.ZaapOf(mapId).Cell);
 
-                // Resolve defaults in place, then store the indexed palette in Look. Dropping -1
-                // entries shifts every following colour into the wrong slot.
-                var propios = Managers.BreedLookTable.CreationColors(breed, sex, colors);
-                byte[] look = Managers.BreedLookTable.BuildLook(breed, sex, headId,
-                                                               propios, characterId: id);
+                // Persist only the six nullable RGB choices; looks are built at send time.
+                var palette = CharacterColors.FromRgb(colors);
 
                 // They are reserved before opening the transaction: NextItemUid queries the same
                 // database with another connection the first time and SQLite must not find it locked here.
@@ -3085,13 +3075,14 @@ namespace Jondo.Unity.Server
                          Vitality, Wisdom, Strength, Intelligence, Chance, Agility,
                          ScrolledVitality, ScrolledWisdom, ScrolledStrength,
                          ScrolledIntelligence, ScrolledChance, ScrolledAgility,
-                         Look, Orientation, Kamas, LastConnection)
+                         Orientation, Kamas, LastConnection, Color1, Color2, Color3, Color4, Color5, Color6)
                     VALUES ($id, $acc, $name, $breed, $sex, $level, $xp, $map, $cell, $points,
                             0, 0, 0, 0, 0, 0,
                             $stat, $stat, $stat, $stat, $stat, $stat,
-                            $look, 1, $kamas, $now);";
+                            1, $kamas, $now, $color1, $color2, $color3, $color4, $color5, $color6);";
+                CharacterColorStorage.Bind(insertar, palette);
                 insertar.Parameters.AddWithValue("$xp", ExperienceTable.IsLoaded ? ExperienceTable.LevelFloor(level) : 0L);
-                insertar.Parameters.AddWithValue("$points", Handlers.StatsHandler.TotalCapitalForLevel(level));
+                insertar.Parameters.AddWithValue("$points", CharacteristicRules.TotalCapitalForLevel(level));
                 insertar.Parameters.AddWithValue("$id", id);
                 insertar.Parameters.AddWithValue("$acc", accountId);
                 insertar.Parameters.AddWithValue("$name", name);
@@ -3101,9 +3092,6 @@ namespace Jondo.Unity.Server
                 insertar.Parameters.AddWithValue("$map", mapId);
                 insertar.Parameters.AddWithValue("$cell", cell);
                 insertar.Parameters.AddWithValue("$stat", stat);
-                // In hexadecimal, which is how the ones already there store it. In base64 the loader
-                // chokes: "Additional non-parsable characters are at the end of the string".
-                insertar.Parameters.AddWithValue("$look", Convert.ToHexString(look));
                 insertar.Parameters.AddWithValue("$kamas", kamas);
                 // Dated at its creation, as the real server's are: it is the newest, and so the
                 // first of the character list.
@@ -3581,69 +3569,6 @@ namespace Jondo.Unity.Server
         }
 
         // --- Helpers ---
-
-        private static byte[] ConvertHexStringToByteArray(string hex)
-        {
-            hex = hex.Replace("-", "");
-            byte[] bytes = new byte[hex.Length / 2];
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-            }
-            return bytes;
-        }
-
-        public static byte[] ReconstructActorDetails(byte[] lookBytes, string name)
-        {
-            try
-            {
-                var statsMsg = new Network.ProtoMessage();
-
-                // Field 1: breed & sex wrapper
-                var breedSexMsg = new Network.ProtoMessage();
-                breedSexMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Server.Network.SessionContext.State.Breed > 0 ? Jondo.Unity.Server.Network.SessionContext.State.Breed : 8 });
-                breedSexMsg.Fields.Add(new Network.ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = Jondo.Unity.Server.Network.SessionContext.State.Sex });
-                statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 1, WireType = 2, BytesValue = breedSexMsg.ToByteArray() });
-
-                // Field 2: Level
-                statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel > 0 ? Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel : 2 });
-
-                // Field 4: AccountId (using default 188940901L)
-                statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 188940901L });
-
-                // Field 5: alignment
-                var alignMsg = new Network.ProtoMessage();
-                alignMsg.Fields.Add(new Network.ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = 1 });
-                statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 5, WireType = 2, BytesValue = alignMsg.ToByteArray() });
-
-                // Field 7: constant 1
-                statsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = 1 });
-
-                // Build lgk (Player Desc)
-                var lgkMsg = new Network.ProtoMessage();
-                lgkMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 2, BytesValue = statsMsg.ToByteArray() });
-                lgkMsg.Fields.Add(new Network.ProtoField { FieldNumber = 3, WireType = 2, BytesValue = System.Text.Encoding.UTF8.GetBytes(name) });
-
-                // Build humanoidInfo wrapper (HumanInformations)
-                var humanoidInfo = new Network.ProtoMessage();
-                humanoidInfo.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 2, BytesValue = lgkMsg.ToByteArray() });
-
-                // Build detailsMsg (lgx)
-                var detailsMsg = new Network.ProtoMessage();
-                if (lookBytes != null && lookBytes.Length > 0)
-                {
-                    detailsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 1, WireType = 2, BytesValue = lookBytes });
-                }
-                detailsMsg.Fields.Add(new Network.ProtoField { FieldNumber = 2, WireType = 2, BytesValue = humanoidInfo.ToByteArray() });
-
-                return detailsMsg.ToByteArray();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[-] Error in ReconstructActorDetails: {ex.Message}");
-                return Array.Empty<byte>();
-            }
-        }
 
         public static List<long> GetItemTemplatePossibleEffects(int itemId)
         {

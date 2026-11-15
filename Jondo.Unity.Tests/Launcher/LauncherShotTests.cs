@@ -116,7 +116,7 @@ namespace Jondo.Unity.Tests.Launcher
             // the base: with their head, their equipment and their cosmetics. It is the only way
             // of seeing whether the portrait comes out whole, comes out naked or comes out as a colour strip.
             var personajes = new System.Collections.Generic.List<
-                Jondo.Unity.Server.DatabaseManager.DbCharacter>();
+                Jondo.Unity.Server.DbCharacter>();
 
             using (var conexion = new Microsoft.Data.Sqlite.SqliteConnection(
                        Jondo.Unity.Server.DatabaseManager.WorldConnectionString))
@@ -154,7 +154,7 @@ namespace Jondo.Unity.Tests.Launcher
 
             foreach (var quien in personajes)
             {
-                string look = Jondo.Unity.Server.Managers.BreedLookTable.Drawable(quien);
+                string look = Jondo.Unity.Server.Managers.CharacterLookBuilder.Drawable(quien);
                 if (look.Length == 0) continue;
 
                 var retrato = pintor.Of(look);
@@ -177,7 +177,7 @@ namespace Jondo.Unity.Tests.Launcher
             // breeds. This fixes nothing: it leaves the five on the table.
 
             var personajes = new System.Collections.Generic.List<
-                Jondo.Unity.Server.DatabaseManager.DbCharacter>();
+                Jondo.Unity.Server.DbCharacter>();
 
             using (var conexion = new Microsoft.Data.Sqlite.SqliteConnection(
                        Jondo.Unity.Server.DatabaseManager.WorldConnectionString))
@@ -212,7 +212,7 @@ namespace Jondo.Unity.Tests.Launcher
             // instead of a copied assumption.
             foreach (var quien in personajes)
             {
-                string look = Jondo.Unity.Server.Managers.BreedLookTable.Drawable(quien);
+                string look = Jondo.Unity.Server.Managers.CharacterLookBuilder.Drawable(quien);
                 if (look.Length == 0)
                 {
                     System.Console.WriteLine($"{quien.Name}: no look string, skipping it.");

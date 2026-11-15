@@ -146,9 +146,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The client has pressed PLAY on the creation screen.</summary>
-        public static async Task CreateAsync(NetworkStream stream, byte[] payload, long accountId,
-                                             int serverId)
+        public static async Task CreateAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream ?? throw new InvalidOperationException("Character creation requires a connected game session.");
+            long accountId = session.AccountId;
+            int serverId = session.ServerId;
             // Without an account nothing is created, and this was missing. The branch that gets here does
             // not look at isAuthenticated -- the one next to it does, and the selection one refuses
             // accountId<=0 and checks the owner as well --, CreateAsync did not look at the parameter, and
@@ -244,8 +247,7 @@ namespace Jondo.Unity.Server.Handlers
             // one already there.
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
 
-            foreach (byte[] frame in ConnectionProtocol.CharacterListFrames(characters))
-                await GameEntryMessages.SendAsync(stream, frame);
+            await ConnectionProtocol.SendCharacterListAsync(session, characters);
 
             Console.WriteLine($"[Characters] Created {name} (id {id}), breed {breed}, before the " +
                               $"tutorial's statue, {(ServerSettings.Current.StartingAdventurerSet ? "with" : "without")} the " +
@@ -267,7 +269,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <paramref name="serverId"/>: the slots are counted per category, not per server.
         /// </summary>
         public static int SlotsTaken(IEnumerable<DatabaseManager.DbServer> servers,
-                                     IEnumerable<DatabaseManager.DbCharacter> characters, int serverId)
+                                     IEnumerable<DbCharacter> characters, int serverId)
         {
             var known = servers.ToList();
             int category = known.FirstOrDefault(s => s.Id == serverId)?.Type ?? 1;

@@ -104,7 +104,7 @@ namespace Jondo.Unity.Tests.Protocol
                 new() { Id = 99, Type = 4 }, new() { Id = 50, Type = 5 },
             };
 
-            var list = ConnectionAccountProjection.ServerList(servers, new List<DatabaseManager.DbCharacter>(), DateTimeOffset.Now);
+            var list = ConnectionAccountProjection.ServerList(servers, new List<DbCharacter>(), DateTimeOffset.Now);
             return new ConnectionCodec().Encode(new ConnectionResponse("es", new IdentificationResponse(
                 new IdentificationSuccess(100_000_001, "Cuenta", "0001", list, "2027-08-29T15:54:43+02:00",
                     new AccountRights(false, false, false, false), null, null, null))));

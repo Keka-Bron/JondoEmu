@@ -25,7 +25,7 @@ public sealed class EntryChannelFlowTests
         var request = new ChatChannelSubscriptionRequest(active, [ChatChannel.General]);
         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(own.FromServer, wire.Encode(new(request, uid)));
         var input = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(own.ToClient).WaitAsync(TimeSpan.FromSeconds(5));
-        var decoded = GameEntryDispatch.Decode(own.Session, input, ConnectionProtocol.UriPrefix + "ktn");
+        var decoded = GameNodeProxy.DecodeRequest(own.Session, input);
         Assert.NotNull(decoded);
         Assert.Equal(uid, decoded.Uid);
         Assert.Equal(GameEntryResult.Handled, await new GameEntryService(own.Session, new GameEntryBackend()).HandleAsync(decoded));

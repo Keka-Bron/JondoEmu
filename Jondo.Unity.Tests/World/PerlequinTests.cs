@@ -61,14 +61,14 @@ namespace Jondo.Unity.Tests.World
                     Assert.InRange(BonusSlots.EndsAt(flavour.Effects), now + 3590, now + 3610);
 
                     // Still there before its end...
-                    await AlterationHandler.TickAsync(pipe.ToClient);
+                    await AlterationHandler.TickAsync(pipe.Session);
                     Assert.Contains(Equipment.All, i => i.Template == CitrusFlavour);
 
                     // ...and gone once it has come.
                     var ended = flavour.Effects.Select(e => e.Effect == AlterationCatalogue.Expiry
                         ? new Equipment.ItemEffect(e.Effect, now - 1, 0, 0) : e).ToList();
                     Assert.True(Equipment.Rewrite(flavour, flavour.Quantity, ended));
-                    await AlterationHandler.TickAsync(pipe.ToClient);
+                    await AlterationHandler.TickAsync(pipe.Session);
                     Assert.DoesNotContain(Equipment.All, i => i.Template == CitrusFlavour);
                 }
             }

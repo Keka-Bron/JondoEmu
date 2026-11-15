@@ -72,7 +72,7 @@ namespace Jondo.Unity.Server.Handlers
         private static long Number(List<ProtoField> fields, int number)
             => fields.FirstOrDefault(f => f.FieldNumber == number && f.WireType == 0)?.VarIntValue ?? 0;
 
-        private static DatabaseManager.DbCharacter? Character() => DatabaseManager.GetCharacterById(Me);
+        private static DbCharacter? Character() => DatabaseManager.GetCharacterById(Me);
 
         // ─── The character's state ──────────────────────────────────────────────
 
@@ -84,12 +84,12 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var item in Equipment.All)
                 if (Equipment.IsWorn(item.Position)) preset.Items[item.Position] = item.Uid;
 
-            preset.Points[ConnectionProtocol.Stat.Strength] = state.StatStrength;
-            preset.Points[ConnectionProtocol.Stat.Vitality] = state.StatVitality;
-            preset.Points[ConnectionProtocol.Stat.Wisdom] = state.StatWisdom;
-            preset.Points[ConnectionProtocol.Stat.Chance] = state.StatChance;
-            preset.Points[ConnectionProtocol.Stat.Agility] = state.StatAgility;
-            preset.Points[ConnectionProtocol.Stat.Intelligence] = state.StatIntelligence;
+            preset.Points[Stat.Strength] = state.StatStrength;
+            preset.Points[Stat.Vitality] = state.StatVitality;
+            preset.Points[Stat.Wisdom] = state.StatWisdom;
+            preset.Points[Stat.Chance] = state.StatChance;
+            preset.Points[Stat.Agility] = state.StatAgility;
+            preset.Points[Stat.Intelligence] = state.StatIntelligence;
 
             preset.Spells = SpellsOf(FightSpellLayout.Current(state.Breed, state.CharacterLevel, SessionContext.Current.AccountId));
             return preset;
@@ -262,7 +262,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// iha: the points spent, all six each time. Refused when they cost more than the
-        /// character's level gives, by the same tiers as the characteristics window (StatsHandler).
+        /// character's level gives, using the shared preset allocation-cost rules.
         /// </summary>
         public static async Task PointsAsync(NetworkStream stream, byte[] payload)
         {
@@ -272,14 +272,21 @@ namespace Jondo.Unity.Server.Handlers
             if (draft == null || character == null) return;
 
             var wanted = new SortedDictionary<int, int>();
+            bool valid = true;
             foreach (var entry in fields.Where(f => f.FieldNumber == 2 && f.WireType == 2))
             {
                 var pair = ProtoMessage.Parse(entry.BytesValue).Fields;
-                int stat = (int)Number(pair, 1), points = (int)Number(pair, 2);
-                if (PresetProtocol.Primaries.Contains(stat) && points >= 0) wanted[stat] = points;
+                long stat = Number(pair, 1), points = Number(pair, 2);
+                if (stat < int.MinValue || stat > int.MaxValue || !PresetProtocol.Primaries.Contains((int)stat)) continue;
+                if (points < 0 || points > int.MaxValue)
+                {
+                    valid = false;
+                    break;
+                }
+                wanted[(int)stat] = (int)points;
             }
 
-            bool fits = Fits(wanted, SessionContext.State.CharacterLevel);
+            bool fits = valid && Fits(wanted, SessionContext.State.CharacterLevel, SessionContext.State.Breed);
             if (fits) draft.Points = wanted;
             var sheet = PresetProtocol.Sheet(character.Level, draft.Points,
                                              Equipment.BonusesOf(PresetProtocol.Placed(draft)));
@@ -287,14 +294,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>Whether a distribution costs no more than the level's capital.</summary>
-        internal static bool Fits(IReadOnlyDictionary<int, int> points, int level)
+        internal static bool Fits(IReadOnlyDictionary<int, int> points, int level, int breed = 1)
         {
+            if (points.Any(pair => pair.Value < 0 || !PresetProtocol.Primaries.Contains(pair.Key))) return false;
             int Of(int stat) => points.TryGetValue(stat, out int value) ? value : 0;
-            int cost = StatsHandler.ComputeDistributionCost(
-                Of(ConnectionProtocol.Stat.Strength), Of(ConnectionProtocol.Stat.Intelligence),
-                Of(ConnectionProtocol.Stat.Chance), Of(ConnectionProtocol.Stat.Agility),
-                Of(ConnectionProtocol.Stat.Vitality), Of(ConnectionProtocol.Stat.Wisdom));
-            return cost >= 0 && cost <= StatsHandler.TotalCapitalForLevel(level);
+            long cost = CharacteristicRules.ComputeDistributionCost(
+                Of(Stat.Strength), Of(Stat.Intelligence),
+                Of(Stat.Chance), Of(Stat.Agility),
+                Of(Stat.Vitality), Of(Stat.Wisdom), breed);
+            return cost <= CharacteristicRules.TotalCapitalForLevel(level);
         }
 
         /// <summary>
@@ -378,21 +386,21 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // The points.
-            if (preset.Points.Count > 0 && Fits(preset.Points, state.CharacterLevel))
+            if (preset.Points.Count > 0 && Fits(preset.Points, state.CharacterLevel, state.Breed))
             {
                 int Of(int stat) => preset.Points.TryGetValue(stat, out int value) ? value : 0;
-                state.StatStrength = Of(ConnectionProtocol.Stat.Strength);
-                state.StatVitality = Of(ConnectionProtocol.Stat.Vitality);
-                state.StatWisdom = Of(ConnectionProtocol.Stat.Wisdom);
-                state.StatChance = Of(ConnectionProtocol.Stat.Chance);
-                state.StatAgility = Of(ConnectionProtocol.Stat.Agility);
-                state.StatIntelligence = Of(ConnectionProtocol.Stat.Intelligence);
-                state.CharacterRemainingPoints = StatsHandler.TotalCapitalForLevel(state.CharacterLevel)
-                    - StatsHandler.ComputeDistributionCost(state.StatStrength, state.StatIntelligence, state.StatChance,
-                                                           state.StatAgility, state.StatVitality, state.StatWisdom);
+                state.StatStrength = Of(Stat.Strength);
+                state.StatVitality = Of(Stat.Vitality);
+                state.StatWisdom = Of(Stat.Wisdom);
+                state.StatChance = Of(Stat.Chance);
+                state.StatAgility = Of(Stat.Agility);
+                state.StatIntelligence = Of(Stat.Intelligence);
+                state.CharacterRemainingPoints = CharacteristicRules.TotalCapitalForLevel(state.CharacterLevel)
+                    - checked((int)CharacteristicRules.ComputeDistributionCost(state.StatStrength, state.StatIntelligence, state.StatChance,
+                                                            state.StatAgility, state.StatVitality, state.StatWisdom, state.Breed));
                 DatabaseManager.SaveCurrentCharacter();
             }
-            await SendAsync(stream, Op.Kub, ConnectionProtocol.BuildCharacteristics());
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
 
             // The spells: each pair's half the build carries, then its bar.
             int changed = 0;
@@ -427,8 +435,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (await EquipmentHandler.MoveItemAsync(stream, uid, position, accountId, sheet: false)) moved++;
             }
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, StatsHandler.BuildKrbPacket(state.CharacterRemainingPoints));
-            await SendAsync(stream, Op.Kub, ConnectionProtocol.BuildCharacteristics());
+            await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             // A build put on while placing for a fight: the fight starts with its points and items.
             await FightHandler.RefreshPlacementSheetAsync(stream);
 

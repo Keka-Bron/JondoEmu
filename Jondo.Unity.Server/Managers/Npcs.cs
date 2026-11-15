@@ -827,7 +827,7 @@ namespace Jondo.Unity.Server.Managers
         /// pair form. Not one uses a flat list, so they were all coming out grey.
         ///
         /// On the wire the colour goes with its index in the high byte —(index &lt;&lt; 24) | rgb—,
-        /// which is the same arithmetic BreedLookTable.IndexColors does for the player's
+        /// which is the same arithmetic CharacterLookBuilder.IndexColors does for the player's
         /// character. The difference is where the index comes from: there it is the position in the
         /// list, and here it comes WRITTEN and is not consecutive. The Bontarian uses 2, 3, 4 and
         /// 6, and skips 1 and 5; numbering them by position, his tints would go to the

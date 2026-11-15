@@ -173,7 +173,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// The colours tab (lyl { f1 lvd { f2: the colours } }): the breed's palette, slot by slot,
         /// -1 for the breed's own colour -- the same lvd the outfit carries in its f1 --, kept in
-        /// the persisted look as the creation's are. The answer is lxd { f1: 1 }, which makes the
+        /// the six RGB columns as the creation's are. The answer is lxd { f1: 1 }, which makes the
         /// client copy the colours into its drafted outfit, and lxd without it for a palette that
         /// is not one (more colours than the breed has, or values past RGB). INFERRED from the
         /// client: no capture recolours a character.
@@ -190,14 +190,12 @@ namespace Jondo.Unity.Server.Handlers
                                            .Select(c => (long)(int)c));
 
             var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
-            int slots = character == null ? 0 : BreedLookTable.IndexedColors(character.Breed, character.Sex).Count;
+            int slots = character == null ? 0 : 6;
             bool taken = character != null && colors.Count > 0 && colors.Count <= slots
                          && colors.TrueForAll(c => c >= -1 && c <= 0xFFFFFF);
             if (taken)
             {
-                var palette = BreedLookTable.CreationColors(character!.Breed, character.Sex, colors);
-                DatabaseManager.SaveCharacterLook(character.Id,
-                    BreedLookTable.BuildLook(character.Breed, character.Sex, character.HeadId, palette, characterId: character.Id));
+                DatabaseManager.SaveCharacterColors(character!.Id, CharacterColors.FromRgb(colors));
                 await PreviewAsync(stream);
             }
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
@@ -407,9 +405,9 @@ namespace Jondo.Unity.Server.Handlers
                 var lvd = ProtoMessage.Parse(lwk).Fields.FirstOrDefault(f => f.FieldNumber == 6 && f.WireType == 2);
                 var colors = lvd == null ? new List<long>()
                     : BankHandler.PackedOrSingle(ProtoMessage.Parse(lvd.BytesValue).Fields, 2).Select(c => (long)(int)c).ToList();
-                if (colors.Count > 0 && colors.Count <= BreedLookTable.IndexedColors(character.Breed, character.Sex).Count
+                if (colors.Count > 0 && colors.Count <= 6
                     && colors.TrueForAll(c => c >= -1 && c <= 0xFFFFFF))
-                    look = look with { Colors = BreedLookTable.CreationColors(character.Breed, character.Sex, colors) };
+                    look = look with { Colors = CharacterLookBuilder.CreationColors(character.Breed, character.Sex, colors) };
 
                 outfit = Outfits.Create(character.Id, TextOf(lwk, 4), (int)NumberOf(lwk, 2), look);
             }
@@ -438,7 +436,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         private static async Task AnswerNewOutfitAsync(NetworkStream stream, byte[] frame,
-                                                       DatabaseManager.DbCharacter? character, Outfits.Outfit? outfit)
+                                                       DbCharacter? character, Outfits.Outfit? outfit)
         {
             var lxb = Pb.New();
             if (character != null && outfit != null)
@@ -482,7 +480,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The outfit being drafted: what is worn, with the title and ornament the window has picked.</summary>
-        private static Outfits.Look Drafted(DatabaseManager.DbCharacter character)
+        private static Outfits.Look Drafted(DbCharacter character)
         {
             var look = Outfits.Worn(character);
             var state = Jondo.Unity.Server.Network.SessionContext.State;

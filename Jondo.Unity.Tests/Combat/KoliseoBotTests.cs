@@ -87,7 +87,7 @@ namespace Jondo.Unity.Tests.Combat
                 {
                     Assert.NotNull(spec.LooksLike);
                     var npc = spec.LooksLike!;
-                    Assert.Contains(npc.Skins[0], new[] { BreedLookTable.Get(breed, 0)!.Skins[0], BreedLookTable.Get(breed, 1)!.Skins[0] });
+                    Assert.Contains(npc.Skins[0], new[] { BreedLookCatalog.Get(breed, 0)!.Skins[0], BreedLookCatalog.Get(breed, 1)!.Skins[0] });
                     var body = BodyOf(KoliseoBots.BuildFighter(spec).BotLook!);
                     Assert.Equal(npc.Skins[0], Packed(body, 6)[0]);
                 }

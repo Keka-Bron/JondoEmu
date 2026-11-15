@@ -38,13 +38,13 @@ namespace Jondo.Unity.Tests.Sessions
             => Assert.False(CharacterNames.IsValid(name));
 
         private static DatabaseManager.DbServer Server(int id, int type) => new() { Id = id, Type = type };
-        private static DatabaseManager.DbCharacter On(int server) => new() { ServerId = server, Name = "X" };
+        private static DbCharacter On(int server) => new() { ServerId = server, Name = "X" };
 
         [Fact]
         public void Slots_are_counted_per_category_of_server()
         {
             var servers = new List<DatabaseManager.DbServer> { Server(1, 1), Server(291, 1), Server(295, 0), Server(350, 3) };
-            var characters = new List<DatabaseManager.DbCharacter> { On(1), On(1), On(291), On(295), On(350), On(350) };
+            var characters = new List<DbCharacter> { On(1), On(1), On(291), On(295), On(350), On(350) };
 
             Assert.Equal(3, CharacterCreationHandler.SlotsTaken(servers, characters, 1));
             Assert.Equal(3, CharacterCreationHandler.SlotsTaken(servers, characters, 291));
@@ -55,7 +55,7 @@ namespace Jondo.Unity.Tests.Sessions
         [Fact]
         public void A_server_missing_from_the_list_counts_its_own_characters()
         {
-            var characters = new List<DatabaseManager.DbCharacter> { On(7), On(7) };
+            var characters = new List<DbCharacter> { On(7), On(7) };
             Assert.Equal(2, CharacterCreationHandler.SlotsTaken(new List<DatabaseManager.DbServer>(), characters, 7));
         }
     }

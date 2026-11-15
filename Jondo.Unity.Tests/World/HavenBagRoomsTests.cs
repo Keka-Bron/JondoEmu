@@ -99,7 +99,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(Merkasako.MapOfTheme(Merkasako.DefaultTheme), pipe.Session.State.MapId);
                 Assert.Equal(Merkasako.DefaultTheme, HavenBagStore.ThemeOfRoom(who, 1));
 
-                var me = new DatabaseManager.DbCharacter { Id = who, Name = "Dueno", Level = 200, Breed = 1 };
+                var me = new DbCharacter { Id = who, Name = "Dueno", Level = 200, Breed = 1 };
                 var jss = ProtoMessage.Parse(ConnectionProtocol.BuildMapActors(pipe.Session.State.MapId, me, 300, 1, who));
                 var bag = ProtoMessage.Parse(jss.Fields.Single(f => f.FieldNumber == 8).BytesValue);
                 var owner = ProtoMessage.Parse(bag.Fields.Single(f => f.FieldNumber == 5).BytesValue);

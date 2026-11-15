@@ -40,12 +40,7 @@ namespace Jondo.Unity.Server.Managers
         /// Whether there are cost tables to work with. Reads them in first, so this answers "is
         /// there price data" and not "has somebody remembered to call Initialize".
         /// </summary>
-        /// <remarks>
-        /// It has to load: CommandHandler asks this before charging for a characteristic point,
-        /// and falls back to its own count when the answer is no. A false here because nothing
-        /// had been read in yet would quietly charge the player a different price from the one
-        /// the window just quoted them.
-        /// </remarks>
+        /// <remarks>Pricing itself always ensures loading and shares one missing-data fallback.</remarks>
         public static bool IsLoaded { get { Ensure(); return _table.Count > 0; } }
 
         /// <summary>
@@ -84,7 +79,7 @@ namespace Jondo.Unity.Server.Managers
             if (!File.Exists(path))
             {
                 Console.WriteLine($"[BreedStatCost] WARNING: {Path.GetFileName(path)} is not there. " +
-                                  "Spending points will fall back to one point each; run " +
+                                  "Spending points will use the shared default bands; run " +
                                   "extract_breed_stats.py.");
                 return;
             }
@@ -108,7 +103,10 @@ namespace Jondo.Unity.Server.Managers
                             if (!pair.MoveNext()) continue;
                             bands.Add((from, pair.Current.GetInt32()));
                         }
-                        if (bands.Count > 0) characteristics[characteristic.Name] = bands;
+                        bands.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+                        if (bands.Count > 0 && bands[0].Item1 == 0 && bands.All(b => b.Item2 > 0)
+                            && bands.Select(b => b.Item1).Distinct().Count() == bands.Count)
+                            characteristics[characteristic.Name] = bands;
                     }
                     if (characteristics.Count > 0) _table[breedId] = characteristics;
                 }
@@ -123,21 +121,65 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// What the next point of a characteristic costs a character that already has
-        /// <paramref name="current"/> of it. One when there is no table, which is the cheapest
-        /// answer and never charges the player for something we cannot price.
+        /// <paramref name="current"/> of it. Missing breed data uses the same default bands
+        /// for spending, presets and commands.
         /// </summary>
         public static int PriceOf(int breed, string characteristic, int current)
         {
-            Ensure();
-            if (!_table.TryGetValue(breed, out var characteristics)) return 1;
-            if (!characteristics.TryGetValue(characteristic, out var bands)) return 1;
-
+            ArgumentOutOfRangeException.ThrowIfNegative(current);
+            var bands = Bands(breed, characteristic);
             int price = 1;
             foreach (var band in bands)
             {
                 if (current >= band.From) price = band.Price;
             }
             return price;
+        }
+
+        private static readonly List<(int From, int Price)> Elemental = [(0, 1), (100, 2), (200, 3), (300, 4)];
+        private static readonly List<(int From, int Price)> Vitality = [(0, 1)], Wisdom = [(0, 3)];
+
+        private static List<(int From, int Price)> Bands(int breed, string characteristic)
+        {
+            Ensure();
+            if (_table.TryGetValue(breed, out var characteristics) && characteristics.TryGetValue(characteristic, out var bands))
+                return bands;
+            return characteristic switch
+            {
+                "vitality" => Vitality, "wisdom" => Wisdom,
+                "strength" or "intelligence" or "chance" or "agility" => Elemental,
+                _ => throw new ArgumentOutOfRangeException(nameof(characteristic)),
+            };
+        }
+
+        /// <summary>Total price from zero, evaluated by bands rather than one lookup per point.</summary>
+        public static long CostOf(int breed, string characteristic, int points)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(points);
+            var bands = Bands(breed, characteristic);
+            long total = 0;
+            for (int i = 0; i < bands.Count && bands[i].From < points; i++)
+            {
+                int end = i + 1 < bands.Count ? Math.Min(points, bands[i + 1].From) : points;
+                total = checked(total + (long)(end - bands[i].From) * bands[i].Price);
+            }
+            return total;
+        }
+
+        /// <summary>A kum field is total capital paid, not gained points. Only exact purchases are valid.</summary>
+        public static bool TryBuy(int breed, string characteristic, int capital, out int points)
+        {
+            points = 0;
+            if (capital < 0) return false;
+            int low = 0, high = capital;
+            while (low < high)
+            {
+                int middle = low + (int)(((long)high - low + 1) / 2);
+                if (CostOf(breed, characteristic, middle) <= capital) low = middle;
+                else high = middle - 1;
+            }
+            points = low;
+            return CostOf(breed, characteristic, points) == capital;
         }
     }
 }

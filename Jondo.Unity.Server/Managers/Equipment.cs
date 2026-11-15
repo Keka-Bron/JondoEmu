@@ -26,8 +26,7 @@ namespace Jondo.Unity.Server.Managers
     /// exomaged ring, not the set bonuses. The effects go into field 7 of each characteristic of
     /// the kub, which is the one the client shows as coming from equipment.
     ///
-    /// Set bonuses are NOT in here. They depend on how many pieces of a set are worn at once, and
-    /// that lives in item_sets.json, which we do not have.
+    /// Set bonuses come from ItemSets and are included in BonusesOf for both combat and owner sheets.
     /// </summary>
     public static class Equipment
     {
@@ -703,11 +702,9 @@ namespace Jondo.Unity.Server.Managers
         /// The one place the worn-item cache is written.
         /// </summary>
         /// <remarks>
-        /// That cache — <c>SessionState.EquippedItems</c> — feeds <c>StatsHandler.GetEquipBonus</c>,
-        /// and through it the COMBAT sheet: maximum health, initiative, the lot. It is not what
-        /// builds the characteristic sheet, which comes from <see cref="Bonuses"/> over the real
-        /// inventory; getting those two the wrong way round is easy and the comment that used to
-        /// live on EquipmentHandler had them swapped.
+        /// This retains the older worn-item view for remaining legacy consumers. Combat and the
+        /// owner characteristic sheet now both use <see cref="BonusesOf"/> over EquipmentItems;
+        /// neither calculation depends on the older cache.
         ///
         /// It exists because there were THREE places filling that one dictionary — character
         /// selection, the inventory handler and the equipment handler — and the three disagreed

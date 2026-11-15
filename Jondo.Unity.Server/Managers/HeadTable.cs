@@ -42,7 +42,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Lazy loading: the first query reads the file.</summary>
         /// <remarks>
         /// The flag goes up after the load and not before, for the same reason as in
-        /// <see cref="BreedLookTable"/>: raised on entry, the lock-free fast path above lets
+        /// the former breed-look loader: raised on entry, the lock-free fast path above lets
         /// other threads read the dictionary while this one is still filling it, and a head that
         /// is there answers zero. A character built in that window comes out with no face, and
         /// says nothing about it.

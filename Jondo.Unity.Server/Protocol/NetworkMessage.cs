@@ -330,7 +330,6 @@ namespace Jondo.Protocol
                 case Op.Ksl: return ("Character Selection", "Character", "CharacterSelectionRequest (Request to enter the world)");
 
                 // === Context: World Loading ===
-                case Op.Kri: return ("World Loading", "Character", "CharacterStatsListMessage (Full stats and characteristics)");
                 case Op.Itp: return ("World Loading", "Interfaces", "ShortcutBarContentMessage (Keyboard shortcuts and UI bars)");
                 case "izn": return ("World Loading", "Interfaces", "ChatChannelsListMessage (Initialization of the local chat channels)");
                 case Op.Krh: return ("World Loading", "Sync", "ClientReadyForPackets (Ack that the client is ready)");
@@ -381,14 +380,7 @@ namespace Jondo.Protocol
                 case Op.Idf: return ("Guild", "Raids", "RaidStartPrompt (the start asked of a participant)");
                 case Op.Izu: return ("World Loading", "Sync", "QuestStepProgress (Current quest progress)");
 
-                // === Context: World Loading - kkn Burst ===
-                case "kkn": return ("World Loading", "Sync", "MapLoadCompleted (Notification that the graphics load finished)");
-                case "kkp": return ("World Loading", "Interfaces", "SocialStatusMessage (Configuration of the online social status)");
-                case Op.Kkm: return ("World Loading", "Interfaces", "SocialOptionsMessage (Friend notification settings)");
-                case "krb": return ("World Loading", "Character", "CharacterRemainingPoints (Confirmed remaining stat points)");
-                case Op.Ilc: return ("World Loading", "Sync", "ServerSettingsMessage (Regional settings of the server)");
-                case Op.Joh: return ("World Loading", "Map", "CurrentMapMessage (Confirms the Map ID to load into the scene)");
-                case Op.Hmd: return ("World Loading", "Inventory", "InventoryWeightMessage (Inventory carry pods)");
+                // === Context: Remaining legacy transitions ===
                 case Op.Lpj: return ("World Loading", "Sync", "SecondaryReadySignal (Signal that the secondary threads are ready)");
                 case Op.Lpe: return ("World Loading", "Sync", "SecondaryReadyConfirm (Ack that the secondary threads are ready)");
                 case "hmv": return ("World Loading", "Chat", "ChatChannelsListRequest (Request for the chat channels)");
@@ -406,9 +398,6 @@ namespace Jondo.Protocol
                 case "joi": return ("In Game", "Character", "PlayerMovementRequest (Cell-by-cell movement request)");
                 case "jpp": return ("In Game", "Character", "PlayerMovementConfirm (Confirms the destination cell was reached)");
                 case Op.Jos: return ("In Game", "Map", "MapChangeRequest (Request to cross the map boundary)");
-                case Op.Isi: return ("In Game", "Inventory", "ItemMovementRequest (Request to equip/move an item)");
-                case Op.Iry: return ("In Game", "Inventory", "ItemMovementConfirm (Confirmation that the item was equipped)");
-                case Op.Krc: return ("In Game", "Character", "StatsUpgradeRequest (Request to assign points to stats)");
                 case "kqn": return ("In Game", "Chat", "ChatSendRequest (Sending a chat message typed by the player)");
                 case Op.Kqp: return ("In Game", "Chat", "ChatBroadcastMessage (Broadcast of a chat message on the channel)");
 

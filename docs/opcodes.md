@@ -84,25 +84,28 @@ there, with the values the capture carries. Nothing has been invented to fill th
 ### 2.1 Authentication and the welcome burst
 
 The client reconnects to port 5555 with the ticket it was handed after picking a server. The
-server answers with a fixed burst that ends in the character list. Order matters: it is replayed in
-the order of the capture.
+server answers through `ConnectionProtocol.SendWelcomeAsync`, ending ordinary login
+with the session-owned character-list refresh. Order follows the measured sequence;
+messages are constructed from current policy/state rather than replayed. The Wire
+counts below remain the historical capture inventory; send-site references describe
+the current implementation. See [the typed protocol documentation](game-protocol.md).
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
 | `kqz` | C→S | 10 / 9 files | Presents the single-use ticket. Binds the session to an account and a server; an unknown ticket closes the connection. | `GameNodeProxy.HandleTicketPresentation` | `f2: ticket` |
 | `krt` | C→S | 7 / 6 files | Arrives together with `kqz`. Expects nothing back. | `GameNodeProxy` (empty branch) | — |
-| `kra` | S→C | 10 / 9 files | Opens the burst. | `ConnectionProtocol.BuildWelcomeBurst` | empty |
-| `lqu` | S→C | 735 / 91 files | Clock sync. Also sent on every map change. | `BuildWelcomeBurst`, `BuildMapClock` | `f1: 120` (sync rate), `f2: server clock, unix ms` |
-| `hoy` | S→C | 9 / 8 files | Game-server hello. `f5` is deliberately absent: it appears in none of the three startup captures. | `ConnectionProtocol.BuildHoy` | `f1: 30, f2: 1, f3: 1, f6: language, f7: 200` |
-| `kqu` | S→C | 11 / 9 files | Features enabled on the server, as opaque ids copied from the capture. | `BuildWelcomeBurst` | `f1: packed [3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150]` |
-| `mgq` | S→C | 9 / 8 files | *Not established.* | `BuildWelcomeBurst` | `f1: 1, f2: 1, f3: 1` |
-| `mgt` | S→C | 9 / 8 files | *Not established.* | `BuildWelcomeBurst` | `f2: {}` (empty submessage) |
-| `hpd` | S→C | 9 / 8 files | *Not established.* | `BuildWelcomeBurst` | `f1: 1` |
-| `krs` | S→C | 9 / 8 files | *Not established.* | `BuildWelcomeBurst` | empty |
-| `mgz` | S→C | 6 / 6 files | Identifier of the content catalogue. Opaque: the client only compares it against itself. | `BuildWelcomeBurst` | `f1: 304672615` |
-| `kqp` | S→C | 24 / 6 files | Sent three times in a row, with three different payloads. Meaning *not established*. | `BuildWelcomeBurst` | `f1:1, f2:1` then `f1:1` then empty |
-| `kvi` | S→C | 10 / 8 files | The account's characters on the chosen server. | `BuildCharactersList` | `f1 (rep) { f1 { f2: name, f3: level, f4 { f2 { f3: sex } }, f6: look, f7: breed }, f2: characterId }` |
-| `kvd` | S→C | 4 / 3 files | Closes the character list. Empty, immediately behind `kvi` in the real burst. It was not being sent, and it is the leading candidate for the dead create-character button: the client received the list and nothing saying the list was complete. | `BuildWelcomeBurst` | empty |
+| `kra` | S→C | 10 / 9 files | Opens the burst. | `ConnectionProtocol.SendWelcomeAsync` | `AuthenticationTicketAcceptedEvent` |
+| `lqu` | S→C | 735 / 91 files | Clock sync. Also sent on every map change. | `ConnectionProtocol.SendWelcomeAsync`, `ServerTimeMessages` | `TimeEvent`: timezone offset minutes and current Unix milliseconds |
+| `hoy` | S→C | 9 / 8 files | `ServerSettingsEvent`. Community defaults to 0; the unnamed tag-7 extra is omitted by the [welcome-settings policy](populated-unmapped-fields.md#welcome-settings-omission-policy). | `ConnectionProtocol.SendWelcomeAsync` (direct semantic send) | Arena leave-ban time 30, Classical, free autopilot, not mono-account, community 0, owning-session language. |
+| `kqu` | S→C | 11 / 9 files | Features enabled on the server, as opaque ids copied from the capture. | `ConnectionProtocol.SendWelcomeAsync` | `OptionalFeaturesEvent`: [3, 7, 13, 20, 23, 105, 124, 125, 126, 136, 143, 145, 150] |
+| `mgq` | S→C | 9 / 8 files | Current welcome policy allows character creation and advertises subscription/player hierarchy. | `ConnectionProtocol.SendWelcomeAsync` | `AccountCapabilitiesEvent(Allowed, true, RolePlayer)` |
+| `mgt` | S→C | 9 / 8 files | Account access flags. | `ConnectionProtocol.SendWelcomeAsync` | `AccountRightsEvent`: present rights block, all four flags false |
+| `hpd` | S→C | 9 / 8 files | Certified trust status. | `ConnectionProtocol.SendWelcomeAsync` | `TrustStatusEvent(true)` |
+| `krs` | S→C | 9 / 8 files | Game session ready. | `ConnectionProtocol.SendWelcomeAsync` | `ServerSessionReadyEvent` |
+| `mgz` | S→C | 6 / 6 files | Elapsed subscribed duration in seconds; current policy is zero while history is not stored. | `ConnectionProtocol.SendWelcomeAsync` | `AccountSubscriptionElapsedDurationUpdateEvent(0)` |
+| `kqp` | S→C | 24 / 6 files | Queue status, three updates before an ordinary list refresh. | `CharacterListService` | `QueueStatusEvent(1, 1)`, `(1, 0)`, `(0, 0)` |
+| `kvi` | S→C | 10 / 8 files | The account's characters on the chosen server, most recently played first. | `CharacterListMessages`, `CharacterListService` | `CharacterListEvent` with semantic identities and recursive looks |
+| `kvd` | S→C | 4 / 3 files | Force-selection continuation for an account-owned resumable fight; omitted on ordinary login. | `GameEntryService` | `CharacterForceSelectionEvent` |
 | `jtg` | S→C | 11 / 7 files | Current account's unclaimed gifts, including due veteran rewards; empty list clears prior state. | `GiftMessages`, `GiftService` | `f3 (rep) { f1 { f2: title, f3 { f2: quantity, f3: template } }, f2: packed redemption IDs }`; unused description tag 6 omitted |
 | `jby` | S→C | — | HAAPI session identity, allocated once per game connection. | `GameEntryContinuationMessages` | `f1: invariant decimal Int64 string` |
 | `kqq` | C→S | 3 / 3 files | The client is going back to the character or server screen. | `GameNodeProxy` | — |
@@ -119,10 +122,11 @@ client; they are deliberately not in the burst.
 | `kvz` | C→S | 2 / 2 files | Create a character. | `CharacterCreationHandler.CreateAsync` | read for name, breed, sex, look |
 | `kvb` | S→C | 2 / 2 files | Result of the creation. Empty on success; `f2` carries the refusal reason. | `CharacterCreationHandler` | empty, or `f2: reason` |
 | `kvk` | S→C | 8 / 2 files | A suggested character name (the dice button). | `CharacterCreationHandler.SuggestNameAsync` | `f1: name` |
-| `kvw` | C→S | 2 / 2 files | Select a character. The id is checked against the session's account: the client picks it, so it cannot be trusted. | `CharacterSelectionHandler` | read for character id |
-| `kvl` | C→S | 1 / 1 file | Same step straight after a successful creation — the client sends `kvl` behind `kvi` and enters the world without passing through the list. | `CharacterSelectionHandler` | read for character id |
+| `kvw` | C→S | 2 / 2 files | Select a character. The id is checked against the session's account and server. | `GameEntryDispatch`, `GameEntryService` | `CharacterSelectionRequest.CharacterId` |
+| `kvl` | C→S | 1 / 1 file | Same step straight after a successful creation — the client sends `kvl` behind `kvi` and enters the world without passing through the list. | `GameEntryDispatch`, `GameEntryService` | `CharacterFirstSelectionRequest(DoTutorial, CharacterId)` |
 | `kva` | S→C | 7 / 6 files | "You are now playing this character." Without it the client sits on the character screen with the hourglass up. Constructed directly as semantic selection success from server state. | `CharacterSelectionMessages.Success` | `f1 { f1 { f1: details, f2: characterId } }` |
-| `kpa` | C→S | 1 / 1 file | Character-list request. Dispatched, but seen once in 242 captures. | `CharacterSelectionHandler.HandleCharacterListRequest` | — |
+
+`CharacterListRequest` uses `kvc`.
 
 `kqu` is **not** a character-list request in 3.6.10.10, whatever older tables say: the server
 pushes it inside the welcome burst and the client never sends it.
@@ -148,12 +152,12 @@ its own stored capture to decide what to substitute, not reading the client.
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
 | `lqc` | C→S | 77 / 56 files | "Block 1 digested." The real server waits for this before sending block 2. | `GameNodeProxy` | — |
-| `jru` | S→C | 719 / 86 files | "Load this map." Sending it twice makes the client reload the world in a loop. | `BuildLoadMap`, `WorldEntry.SendMapAsync` | `f2: map id` |
+| `jru` | S→C | 719 / 86 files | "Load this map." Sending it twice makes the client reload the world in a loop. | `BuildLoadMap`, `WorldEntry.SendMapEntryStateAsync` | `f2: map id` |
 | `hjk` | S→C | 7 / 6 files | Travels with `jru` on every map change. | `BuildMapDiscovered` | `f1: packed [map id]` |
 | `jrh` | C→S | 690 / 86 files | "Who is on this map?" Unanswered, the map draws empty: no avatar, no NPCs, no monsters. | `GameNodeProxy` | — |
 | `jss` | S→C | 692 / 87 files | The actors. `f6` is not decoration: with a zero subarea the client throws inside `MapInfoUI.SetInfoFromSubarea` and loses the map name, the coordinates and the minimap marker. Actor type comes from which field appears inside `f2.f1` — `f5` player, `f7` NPC, `f4` monster group; NPCs and groups use negative contextual ids. | `BuildMapActors` | `f2: map id, f6: subarea id, f5 (rep) { f1 { f1: cell, f2: facing }, f2 {…what it is…}, f3: contextual id }` |
 | `lva` | S→C | 1071 / 88 files | "That is every actor." Empty, immediately behind `jss`. Without it the client never counts the map as loaded: it waits about two seconds, asks again with `knm`, `kno`, `kny`, and starts over. | `BuildActorsComplete` | empty |
-| `kub` | S→C | 188 / 54 files | The character sheet. The container field is **not** the same for every characteristic and getting it wrong kills the whole sheet with a `NullReferenceException` in the client's own log. Which id uses which container is read off the captured `kub`, not written down. Sent twice — once with the character, once with the map; the client keeps the second. | `BuildCharacteristics`, `WorldEntry.ContainerOf` | `f2 { f1: where the next level starts, f7: where this one started, f8: experience held, f10: kamas, f11 (rep) { f1: id, <container> {…} } }` — containers: `f4 {f2: base, f3: parchments, f7: equipment}` for most, `f5 {f1: base, f5: bonus}` for 1 and 23, `f2 {f2: value}` for 29, 47 and 96 |
+| `kub` | S→C | 188 / 54 files | The character sheet. The container field is **not** the same for every characteristic and getting it wrong kills the whole sheet with a `NullReferenceException` in the client's own log. `CharacteristicCatalogue.Default` defines the IDs, semantic kinds and fixed bases in code. Sent twice — once with the character, once with the map; the client keeps the second. | `CharacteristicsMessages.Snapshot`, `CharacteristicsMessages.SendAsync` | `f2 { f1: where the next level starts, f7: where this one started, f8: experience held, f10: kamas, f11 (rep) { f1: id, <container> {…} } }` — containers: `f4 {f2: base, f3: parchments, f7: equipment}` for most, `f5 {f1: base, f5: bonus}` for 1 and 23, `f2 {f2: value}` for 29, 47 and 96 |
 | `irq` | S→C | 93 / 11 files | Jobs. The id list is kept (it is game data); the captured progress is thrown away and every job goes out at level 1. | `WorldEntry.ResetJobs` | `f1 (rep) { f1: job id, f3: level, f4/f5: experience }` |
 | `hms` | S→C | 8 / 6 files | The spells the character has, each at the grade its level opens. | `SpellMessages` → `SpellsEvent` | Human/mutant `SpellItem` lists; explicit grade, spell ID and type |
 | `ivx` | S→C | 68 / 27 files | Semantic inventory snapshot from the owning session's loaded items and kamas. Slot zero is the amulet. | `InventoryMessages.Snapshot` | `f3 (rep) { f1: slot, f5 { f1: template, f2 (rep) {…value…, f11: effect}, f3: quantity, f4: uid } }` |
@@ -396,6 +400,34 @@ not a zero inside.
 
 A private message is a different message, `ktb`, and it carries its recipient. Not implemented.
 
+### 2.13.1 Ignore player (`kpa`)
+
+| Opcode | Dir | Wire | What it does | Native client handler | Payload |
+|---|---|---|---|---|---|
+| `kpa` | C→S | 1 / 1 file | Add a player to the ignored-player list. | `fhf.bezh` | `f1: lgf player target`; `f2: enum, meaning unresolved` |
+
+Evidence is scoped to analysis build **`jondo-11-08-2026`**, version **`11-08-2026`**.
+All addresses below are hexadecimal module-relative RVAs:
+
+- `PlayerMenuMaker.OnIgnorePlayer` (`0x49f1060`) publishes internal action `djv`
+  with `m_playerName` and an empty second string.
+- `fhf.Enable` (`0x5289180`) registers `djv` with `fhf.bezh` (`0x528db50`). That
+  handler validates the target, rejects self-targeting, checks an existing social
+  collection, then constructs `kpa`, fills its tag-1 target and submits it through
+  the network interface.
+- `JoinPartyUi.<InitUI>b__14_0` (`0x6150e40`) independently publishes the same
+  action for `m_fromName` when `m_ignoringNext` is enabled, before declining the
+  party invitation. This confirms the ignore-player meaning.
+- Target helper `gji.bklc` (`0x5660600`) builds `lgf` with either a single-name
+  branch or a two-part name/tag branch. `AddFriendUi.SendInvite` (`0x5fcb970`)
+  splits input on `#`, validates a four-digit tag and can publish the same action.
+
+`IgnoredAddRequest` is an inferred semantic name without a reviewed binding.
+Tag 1 (`kpa.fymh`, backing field `evnf`) is client-used. Tag 2
+(`kpa.fymi`, enum `kpa.koz.koy`) remains at its default in the inspected sends;
+field-use analysis classifies it as **indeterminate**, so its purpose and enum
+values remain unresolved.
+
 ### 2.14 Heartbeat
 
 | Opcode | Dir | Wire | What it does | Handler | Payload |
@@ -421,8 +453,8 @@ entry (or on `lqc`, whichever comes first) and the heartbeat gets its own answer
 
 ## 3. Implemented, but on a dead code path
 
-These 22 are inside the 128, yet the branch that emits or consumes them is keyed on a message the
-3.6.10.10 client never sends. Most belong to the 3.6.4.3 world-loading handshake (`kkn`, `lpj`,
+The branches below are keyed on messages the 3.6.10.10 client never sends.
+Most belong to the 3.6.4.3 world-loading handshake (`kkn`, `lpj`,
 `hmv`, `ibt`, `loy`) or to the old combat dispatch. Several are builders in
 `TransitionPacketsBuilder` that nothing calls at all — of its 48 public builders, **34 are never
 invoked** from anywhere in the solution. The fourteen that are called are all reached from
@@ -430,7 +462,6 @@ invoked** from anywhere in the solution. The fourteen that are called are all re
 
 | Opcode | Wire | Where it is in the code | Why it is dead |
 |---|---|---|---|
-| `jto` | S→C 7324 / 23 files | `GameNodeProxy` character-list branch | The **server** sends `jto`; the client never does. Only `kpa` reaches that branch. |
 | `jwe` | S→C 9463 / 23 files | `FightHandler` dispatch | Server-sent. Used as a client trigger. |
 | `jxw` | S→C 4933 / 23 files | `FightHandler` dispatch | Same. |
 | `jya` | S→C 3962 / 20 files | `FightHandler` emits it | Only reachable from the fight dispatch above. |
@@ -441,7 +472,6 @@ invoked** from anywhere in the solution. The fourteen that are called are all re
 | `jwm` | C→S 7 / 1 file | `FightHandler` builds it as a server message | Direction inverted: the client sends it. |
 | `hnk` | S→C 243 / 9 files | `TransitionPacketsBuilder.BuildHnkMessage` | Never called; the `hmv` branch uses a raw payload and `hmv` never arrives. |
 | `ilc` | S→C 5 / 3 files | `BuildIlcMessage` | Only called from the `kkn` branch. |
-| `isf` | S→C 7 / 2 files | `StatsHandler.BuildIsfPacket` | Reachable only from `krc` and from `isi`, neither of which arrives. |
 | `hhf` | S→C 1 / 1 file | `InventoryHandler` | Only reachable from `isi`, which never arrives. |
 | `kku` | S→C 2 / 2 files | `InventoryHandler` | Same. |
 | `luy` | C→S 1 / 1 file | `InventoryHandler`, `BuildLuyMessage` | Built as a server message; the client sends it. Builder never called. |
@@ -567,7 +597,6 @@ on every packet. Fifteen of them key a branch of their own, and those are the on
 
 | Opcode | Handler | Note |
 |---|---|---|
-| `kkn` | `GameNodeProxy` → 3.6.4.3 initialisation burst | Sends `kkp`, `kkm`, `krb`, `ilc`, `joh`, `lor`, `kri`, `hmd`, `itp`. |
 | `ibt` | `GameNodeProxy` → final burst | Sends `icg` ×3, `ith`, `klt`, `klp`. |
 | `hmv` | `GameNodeProxy` | Sends `hnk` and the `kqm` list. |
 | `lpj` | `GameNodeProxy` | Sends `lpe`. |
@@ -576,17 +605,13 @@ on every packet. Fifteen of them key a branch of their own, and those are the on
 | `jte` | `GameNodeProxy` | Answers with a hardcoded `jto` frame. |
 | `kkr` | `MapLoadHandler` | Old map-load request. |
 | `jos` `jpp` | `MapChangeHandler` | Old map change and movement confirm. Replaced by `jqk` and `jrw`. |
-| `isi` | `InventoryHandler` | Old item move. Replaced by `iuk`. |
-| `krc` | `StatsHandler` | Old stats upgrade. Replaced by `kum`. |
 | `kqn` | `ChatHandler` | Old chat. Replaced by `ktm`. |
 | `jxx` | `FightHandler` | Old fight dispatch. |
 | `iuw` | `DestroyItemHandler` | **Not a leftover.** Observed against the real client in the emulator's own traffic log, just not in the pcapng set. Genuinely implemented. |
 
-The other fourteen — `igx`, `ise`, `joi`, `jqf`, `jrb`, `jtk`, `jub`, `jyk`, `jyz`, `jza`, `knx`,
-`kpc`, `ksl`, `ksx` — carry no branch of their own. They ride along inside the `||` chains of the
-branches above: `ise`, `jtk` and `knx` share the authentication branch, `kpc` and `ksx` the
-character-list branch with `jto` and `kpa`, `ksl` the selection branch with `kvw`, `jqf` and `igx`
-the `kkr` branch, and `joi`, `jrb`, `jub`, `jyk`, `jyz` and `jza` the fight branch with `jxx`.
+Additional aliases share the `||` chains of the branches above: `ise`, `jtk` and `knx`
+share the authentication branch, `jqf` and `igx` the `kkr` branch, and `joi`, `jrb`,
+`jub`, `jyk`, `jyz` and `jza` the fight branch with `jxx`.
 Removing a whole branch therefore retires more than the one opcode that names it.
 
 **Seventy-seven are never dispatched.** They are constants, builders nothing calls, protobuf

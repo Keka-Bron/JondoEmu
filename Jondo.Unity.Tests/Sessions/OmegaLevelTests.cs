@@ -1,4 +1,4 @@
-using Jondo.Unity.Server.Handlers;
+using Jondo.Unity.Server;
 using Jondo.Unity.Server.Network;
 using System.Linq;
 using Xunit;
@@ -25,9 +25,9 @@ namespace Jondo.Unity.Tests.Sessions
         [InlineData(1000, 1050, 995)]
         public void Life_and_points_stop_at_level_200(int level, int life, int capital)
         {
-            Assert.Equal(life, StatsHandler.BaseLifeForLevel(level));
-            Assert.Equal(capital, StatsHandler.TotalCapitalForLevel(level));
-            Assert.Equal(life, ConnectionProtocol.ValueOf(ConnectionProtocol.Stat.LifePoints, level));
+            Assert.Equal(life, CharacteristicRules.BaseLifeForLevel(level));
+            Assert.Equal(capital, CharacteristicRules.TotalCapitalForLevel(level));
+            Assert.Equal(life, CharacteristicsMessages.Live.ValueOf(Stat.LifePoints, level, SessionContext.Current));
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Jondo.Unity.Tests.Sessions
         [InlineData(1000, 200)]
         public void The_map_actor_shows_the_level_up_to_200(int level, int shown)
         {
-            var character = new Jondo.Unity.Server.DatabaseManager.DbCharacter
+            var character = new Jondo.Unity.Server.DbCharacter
             {
                 Id = 7101, Name = "Omega", Level = level, Breed = 7,
             };

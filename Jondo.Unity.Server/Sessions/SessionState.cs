@@ -23,8 +23,6 @@ namespace Jondo.Unity.Server
 
         /// <summary>Null until the client supplies channel preferences; empty means all channels off.</summary>
         internal IReadOnlyList<Jondo.Unity.Protocol.Game.ChatChannel>? ActiveChatChannels { get; set; }
-        public byte[]? PlayerActorDetails { get; set; }
-        public byte[]? LookBytes { get; set; }
 
         // Positioning
         public long MapId { get; set; }
