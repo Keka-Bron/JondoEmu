@@ -102,33 +102,56 @@ namespace Heroes
                 if (_window != null) Close();
                 else Open();
             }
-            else if (NextPressed() && now >= _switchingUntil && !Typing())
+            else if (NextPressed() && !Typing())
             {
-                SwitchToNext(now);
+                // Pressed while a switch is on its way, the presses are kept: the next switch goes
+                // that many further round the group at once, so Tab can be hit as fast as one likes.
+                if (_switchBusy && now - _switchSince < 8f) _pendingTabs++;
+                else SwitchBy(1, now);
             }
         }
 
-        /// <summary>Until when a switch asked with Tab is on its way: the list is the old group's until then.</summary>
-        private static float _switchingUntil;
+        // A switch asked with Tab on its way -- until the group's list after it is read --, since
+        // when, and the presses made meanwhile.
+        private static bool _switchBusy;
+        private static float _switchSince;
+        private static int _pendingTabs;
+
+        /// <summary>Which reading of the list is the latest asked: one asked before a switch is the old group's, and dropped.</summary>
+        private static int _listAsked;
 
         /// <summary>
-        /// Tab: the next of the group taken in hand, in the order the account's characters come,
-        /// round to the first after the last; whoever is fighting is passed over.
+        /// Tab: the group's next taken in hand -- <paramref name="steps"/> further round it, in its
+        /// order, round to the first after the last; whoever is fighting is passed over.
         /// </summary>
-        private static void SwitchToNext(float now)
+        private static void SwitchBy(int steps, float now)
         {
             if (!(_list is JsonElement list) || !Bool(list, "on") || !list.TryGetProperty("characters", out var all)) return;
             var group = all.EnumerateArray().Where(c => Bool(c, "master") || Bool(c, "hero")).ToList();
             int me = group.FindIndex(c => Bool(c, "master"));
             if (group.Count < 2 || me < 0 || Bool(group[me], "inFight")) return;
-            for (int step = 1; step < group.Count; step++)
+            steps %= group.Count;
+            if (steps == 0) return;
+            for (int more = 0; more < group.Count; more++)
             {
-                var next = group[(me + step) % group.Count];
+                int at = (me + steps + more) % group.Count;
+                if (at == me) return;
+                var next = group[at];
                 if (Bool(next, "inFight")) continue;
-                _switchingUntil = now + 3f;
+                _switchBusy = true;
+                _switchSince = now;
                 TakeInHand(Long(next, "id"), Str(next, "name"), null);
                 return;
             }
+        }
+
+        /// <summary>The group's list read after a switch: the presses kept meanwhile are played.</summary>
+        private static void SwitchDone()
+        {
+            _switchBusy = false;
+            int kept = _pendingTabs;
+            _pendingTabs = 0;
+            if (kept > 0) SwitchBy(kept, UnityEngine.Time.unscaledTime);
         }
 
         // ─── The words ───────────────────────────────────────────────────────────────────
@@ -289,11 +312,14 @@ namespace Heroes
         private static void Poll()
         {
             _polling = true;
+            int asked = ++_listAsked;
             Task.Run(async () =>
             {
                 var (code, body) = await AskAsync("heroes/list");
                 _toUnity.Enqueue(() =>
                 {
+                    // Asked before a later one -- a switch's --: the old group's, dropped.
+                    if (asked != _listAsked) return;
                     _polling = false;
                     _listCode = code;
                     _list = code == 200 ? body : null;
@@ -301,9 +327,13 @@ namespace Heroes
                         foreach (var one in all.EnumerateArray()) AskPortrait(Long(one, "id"));
                     Render();
                     try { RenderPanel(); } catch (Exception ex) { MelonLogger.Warning($"[Heroes] The group panel: {ex.Message}"); }
+                    if (_switchBusy && _switchListed) { _switchListed = false; SwitchDone(); }
                 });
             });
         }
+
+        /// <summary>True once a switch has answered and the list after it is being read.</summary>
+        private static bool _switchListed;
 
         private static void AskPortrait(long id)
         {
@@ -2892,9 +2922,13 @@ namespace Heroes
                     if (code == 200)
                     {
                         MelonLogger.Msg($"[Heroes] {name} taken in hand.");
-                        _nextPoll = 0f;
+                        // The group as it is now read at once: Tab's next press goes by it.
+                        _switchListed = true;
+                        Poll();
                         return;
                     }
+                    _switchBusy = false;
+                    _pendingTabs = 0;
                     string why = body is JsonElement b ? Str(b, "error") : "";
                     MelonLogger.Warning($"[Heroes] {name} could not be taken in hand: {code} {why}");
                     if (from != null) ShowHint(from, code == 0 ? T("unreachable") : why == "fight" ? T("error.fight") : T("error"));
