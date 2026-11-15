@@ -35,6 +35,26 @@ For his guild and his alliance he is in the world (`SessionRegistry.IsOnline`): 
 show him connected, and they are told as he connects or is let go. His friends see his account
 playing, as they see any character of it.
 
+## In the game's party
+
+`Handlers/PartyHandler.cs`, its Heroes part. A connected hero is a member of his master's party,
+drawn in the game's own party window: the party the master is in, or a new one he leads (ing to
+him, ink to the others). A hero never leads -- the lead passes to somebody played, never to a hero,
+and a party of heroes alone breaks up --, and nobody sends a hero anything: he has no client.
+
+The heroes go wherever their master's party goes. Invited while in a party of his heroes alone, the
+master is free to answer: that party is let go, and his heroes come back into whichever he ends in
+(accepting, turning down, the invitation withdrawn). Leaving a party, or put out of it, he takes his
+heroes into one of their own around him. The leader putting out a hero of his own lets that hero go.
+Taking a hero in hand, the master leaves his party, and the group forms again around the one played.
+
+The game's own «follow the leader» cannot move a hero (no client to walk): `HeroPresence` does.
+
+## The mod's keys
+
+Ctrl+Tab opens and closes the window. Tab alone takes the next of the group in hand, in the order
+the account's characters come, passing over whoever fights; not while a text field has the keyboard.
+
 ## In a fight
 
 `Handlers/FightHeroes.cs`. When the master opens a fight against monsters, each of his heroes is
@@ -113,7 +133,6 @@ All need the master in the world (`409 world`), with the session's own token.
 ## Not yet
 
 - A switch to stop the heroes following, or to hide them from the map.
-- The heroes in a party of the game's own (its group window).
 - Joining a fight somebody else opened, a duel, the Koliseo, an aggression: only the master's own
   fights against monsters bring his heroes in.
 - A defeat's consequences on a hero beyond the fight; the master walking out of a fight leaves his

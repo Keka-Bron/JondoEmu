@@ -118,7 +118,7 @@ namespace Jondo.Unity.Server
         public bool HeroMode { get; set; } = true;
 
         /// <summary>How many heroes a character may have connected at once, himself not counted.</summary>
-        public int HeroesMax { get; set; } = 3;
+        public int HeroesMax { get; set; } = 7;
 
         /// <summary>How many scrolled stats a player starts with.</summary>
         public int StartingScrollStats { get; set; } = Handlers.CharacterCreationHandler.ScrolledStat;

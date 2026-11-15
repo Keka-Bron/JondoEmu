@@ -135,8 +135,16 @@ namespace Jondo.Unity.Server.Managers
             }
             Console.WriteLine($"[Heroes] {master.State.CharacterName} connects {SessionOf(heroId)?.State.CharacterName} ({heroId}) as a hero.");
             Appear(master, _byHero[heroId]);
+            InParty(() => Handlers.PartyHandler.HeroJoinedAsync(master, heroId), heroId);
             Announce(heroId);
             return "ok";
+        }
+
+        /// <summary>A hero into his master's party, or out of the one he was in: the game's own window (Handlers.PartyHandler).</summary>
+        private static void InParty(Func<Task> change, long heroId)
+        {
+            try { change().GetAwaiter().GetResult(); }
+            catch (Exception ex) { Console.WriteLine($"[Heroes] {heroId}'s party not told: {ex.Message}"); }
         }
 
         /// <summary>A hero at his master's side on the map, drawn for everybody there (Network.HeroPresence).</summary>
@@ -298,6 +306,7 @@ namespace Jondo.Unity.Server.Managers
         private static void Save(Hero hero)
         {
             Vanish(hero);
+            InParty(() => Handlers.PartyHandler.HeroLeftAsync(hero.CharacterId), hero.CharacterId);
             try
             {
                 using (SessionContext.Push(hero.Session))

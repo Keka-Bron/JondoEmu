@@ -328,6 +328,49 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// Heroes are in their master's party, the game's own window: he leads it, a hero never
+        /// does, and it breaks up when the last of them is let go.
+        /// </summary>
+        [Fact]
+        public async Task Heroes_are_in_their_masters_party_and_he_leads_it()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 17, "Jefe-" + tag, 8);
+            long first = Character(Account + 17, "Paje-" + tag, 9);
+            long second = Character(Account + 17, "Escudero-" + tag, 1);
+            await using var pipe = await ClientPipe.OpenAsync(Account + 17, master, Map, "Jefe-" + tag);
+            using var reading = new System.Threading.CancellationTokenSource();
+            var drain = Task.Run(async () =>
+            {
+                var buffer = new byte[65536];
+                try { while (!reading.IsCancellationRequested && await pipe.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                catch { }
+            });
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, first));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, second));
+
+                var party = Parties.Of(master);
+                Assert.NotNull(party);
+                Assert.Equal(master, party!.LeaderId);
+                Assert.Equal(new[] { master, first, second }, Parties.MembersOf(party));
+
+                Assert.True(Heroes.Disconnect(master, first));
+                Assert.Equal(new[] { master, second }, Parties.MembersOf(party));
+                Assert.True(Heroes.Disconnect(master, second));
+                Assert.Null(Parties.Of(master));
+                Assert.Null(Parties.Of(second));
+            }
+            finally
+            {
+                reading.Cancel();
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
         [Fact]
         public async Task A_hero_comes_into_his_masters_fight_as_his_to_play()
         {

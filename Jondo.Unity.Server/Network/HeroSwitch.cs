@@ -48,6 +48,7 @@ namespace Jondo.Unity.Server.Network
             DatabaseManager.SaveCurrentCharacter();
             await SessionRegistry.RemoveFromMapAsync(map, masterId, session.Id);
             Heroes.DisconnectAll(masterId);
+            await Handlers.PartyHandler.MasterSwitchingAsync(session, masterId);
 
             var backend = new GameEntryBackend();
             if (!backend.SelectCharacter(session, heroId))

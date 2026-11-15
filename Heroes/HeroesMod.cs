@@ -96,6 +96,33 @@ namespace Heroes
                 if (_window != null) Close();
                 else Open();
             }
+            else if (NextPressed() && now >= _switchingUntil && !Typing())
+            {
+                SwitchToNext(now);
+            }
+        }
+
+        /// <summary>Until when a switch asked with Tab is on its way: the list is the old group's until then.</summary>
+        private static float _switchingUntil;
+
+        /// <summary>
+        /// Tab: the next of the group taken in hand, in the order the account's characters come,
+        /// round to the first after the last; whoever is fighting is passed over.
+        /// </summary>
+        private static void SwitchToNext(float now)
+        {
+            if (!(_list is JsonElement list) || !Bool(list, "on") || !list.TryGetProperty("characters", out var all)) return;
+            var group = all.EnumerateArray().Where(c => Bool(c, "master") || Bool(c, "hero")).ToList();
+            int me = group.FindIndex(c => Bool(c, "master"));
+            if (group.Count < 2 || me < 0 || Bool(group[me], "inFight")) return;
+            for (int step = 1; step < group.Count; step++)
+            {
+                var next = group[(me + step) % group.Count];
+                if (Bool(next, "inFight")) continue;
+                _switchingUntil = now + 3f;
+                TakeInHand(Long(next, "id"), Str(next, "name"), null);
+                return;
+            }
         }
 
         // ─── The words ───────────────────────────────────────────────────────────────────
@@ -143,7 +170,8 @@ namespace Heroes
             ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
             ["hint.auto"] = L("Pase automático del turno", "Automatic turn pass", "Passage automatique du tour"),
             ["hint.loot"] = L("Destinatario del botín", "Loot recipient", "Destinataire du butin"),
-            ["hint.play"] = L("Tomar el control de este personaje", "Take control of this character", "Prendre la main sur ce personnage"),
+            ["hint.play"] = L("Tomar el control de este personaje (Tab: el siguiente)", "Take control of this character (Tab: the next one)",
+                              "Prendre la main sur ce personnage (Tab : le suivant)"),
             ["hint.fold"] = L("Plegar / desplegar el grupo", "Fold / unfold the group", "Replier / déplier le groupe"),
             ["hint.window"] = L("Modo Héroe (Ctrl + Tab)", "Hero mode (Ctrl + Tab)", "Mode Héros (Ctrl + Tab)"),
             ["hint.bag"] = L("Inventario", "Inventory", "Inventaire"),
@@ -1684,6 +1712,39 @@ namespace Heroes
             {
                 return false;
             }
+        }
+
+        /// <summary>Tab alone, neither Ctrl -- the window's -- nor Shift nor Alt held with it.</summary>
+        private static bool NextPressed()
+        {
+            try
+            {
+                var keyboard = UnityEngine.InputSystem.Keyboard.current;
+                return keyboard != null && keyboard.tabKey.wasPressedThisFrame
+                       && !keyboard.ctrlKey.isPressed && !keyboard.shiftKey.isPressed && !keyboard.altKey.isPressed;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>Whether a text field has the keyboard -- the chat, a search --: Tab is its own there.</summary>
+        private static bool Typing()
+        {
+            try
+            {
+                var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+                for (int i = 0; i < documents.Length; i++)
+                {
+                    var focused = documents[i]?.TryCast<UIDocument>()?.rootVisualElement?.panel?.focusController?.focusedElement;
+                    if (focused == null) continue;
+                    string type = focused.GetIl2CppType().Name;
+                    if (type.Contains("Text") || type.Contains("Input")) return true;
+                }
+            }
+            catch { }
+            return false;
         }
 
         /// <summary>The layer the client opens its own windows on (RootHigh), else the top document's root.</summary>
