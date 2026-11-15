@@ -699,15 +699,15 @@ played through.
 | Cania | `███████░░░` **69%** | 18/26 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
+| World Quests | `█░░░░░░░░░` **8%** | 12/145 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
-| World Quests | `░░░░░░░░░░` **5%** | 7/145 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
 | Pandala Island | `░░░░░░░░░░` **2%** | 1/55 |
 | Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
-| **All quests** | **16.2%** | **321/1976** |
+| **All quests** | **16.5%** | **326/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
