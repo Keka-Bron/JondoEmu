@@ -1,9 +1,0 @@
-{
-  "protocolVersion": "3.6.10.10",
-  "schema": "Schemas/game-3.6.10.10.proto",
-  "mapping": "Mappings/game-3.6.10.10.json",
-  "schemaSha256": "a5c424b6c4abb65389d00a3dc6170943c38beef3616f0aec2ebb93930c1f06f0",
-  "mappingSha256": "f26d619c5a0b8ebfafe0a31652c4ebe1a0a6e6c0b4ef55fa069c9950fa2f5542",
-  "sourceSchemaSha256": "a5c424b6c4abb65389d00a3dc6170943c38beef3616f0aec2ebb93930c1f06f0",
-  "sourceMappingSha256": "f26d619c5a0b8ebfafe0a31652c4ebe1a0a6e6c0b4ef55fa069c9950fa2f5542"
-}

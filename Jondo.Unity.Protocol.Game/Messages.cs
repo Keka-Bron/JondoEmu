@@ -1392,6 +1392,12 @@ public sealed record LifePointsRegenBeginEvent(int RegenRate) : GameEvent;
 
 public sealed record MapFightCountEvent(int FightCount) : GameEvent;
 
+public sealed record ShowChallengeEvent(FightCommonInformation FightInformation) : GameEvent;
+
+public sealed record RemoveChallengeEvent(int FightId) : GameEvent;
+
+public sealed record FightTeamRemoveMemberEvent(int FightId, Team Team, long CharacterId) : GameEvent;
+
 public sealed record MapNpcQuest(IReadOnlyList<NpcWithQuest> NpcsWithQuests, long MapId);
 
 public sealed record NotificationsEvent(IReadOnlyList<int> Flags) : GameEvent;

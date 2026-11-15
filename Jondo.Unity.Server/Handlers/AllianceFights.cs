@@ -174,10 +174,10 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (fight.CanJoin(FightInstance.Rojos, FightHandler.CapOf(fight)) != FightInstance.JoinRefusal.None) return;
 
-            long leftMap = me.MapId;
+            var leftMap = session.Map;
             if (!await FightHandler.JoinFightAsync(session, fight, FightInstance.Rojos, followingLeader: false)) return;
-            await SessionRegistry.BroadcastToMapAsync(leftMap, ConnectionProtocol.Push(Op.Kmu,
-                FightJoinProtocol.BuildActorHidden(me.CharacterId)), session.Id, fightId: 0);
+            await leftMap.SendAsync(new Jondo.Unity.Protocol.Game.ContextRemoveElementEvent(me.CharacterId),
+                session.Id, fightId: 0);
 
             await AllianceHandler.TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Mdx,
                 TaxCollectorProtocol.BuildFighterAdded(PersonOf(me.CharacterId), KeyOf(defence),

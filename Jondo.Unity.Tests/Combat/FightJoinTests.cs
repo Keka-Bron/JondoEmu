@@ -65,23 +65,6 @@ namespace Jondo.Unity.Tests.Combat
                          Hex(FightJoinProtocol.BuildJoinRefused(880000000007, FightJoinProtocol.RefusedPartyOnly)));
         }
 
-        /// <summary>Z frame 2632: the swords of a fight nobody locked, the monsters' side empty.</summary>
-        [Fact]
-        public void The_swords_are_the_fight_with_its_flags_and_its_two_sides()
-        {
-            const long watched = 52000000009;
-            var attackers = FightJoinProtocol.Team(0, watched, false,
-                new[] { FightJoinProtocol.PersonOnTeam(watched, 201, "Fighter1") });
-            var defenders = FightJoinProtocol.Team(1, -21200, true, Array.Empty<Pb>());
-
-            byte[] hpy = FightJoinProtocol.BuildFightShown(
-                FightJoinProtocol.FightOnMap(3331, FightRules.ContraMonstruos.TipoDelKam, 180, 182,
-                                             attackers, defenders));
-
-            Assert.Equal("0a490a04b401b60110041a23188990c4dbc10120012a180a160a0d08c901120846696768746572"
-                         + "31108990c4dbc1011a13100118b0dafeffffffffffff0120012a0030012a002a0030831a", Hex(hpy));
-        }
-
         /// <summary>F frames 139-141: the map's kae for each side, and the monsters' growing.</summary>
         [Fact]
         public void The_map_gets_each_side_as_a_kae()
@@ -118,16 +101,7 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void The_small_ones_are_the_captures()
         {
-            Assert.Equal("1001", Hex(FightJoinProtocol.BuildFightCount(1)));          // F 138
-            Assert.Equal("1003", Hex(FightJoinProtocol.BuildFightCount(3)));          // S 54
-            Assert.Equal("", Hex(FightJoinProtocol.BuildFightCount(0)));              // Hipermago 4984
-            Assert.Equal("089022", Hex(FightJoinProtocol.BuildFightHidden(4368)));    // J 857
-            Assert.Equal("08841a", Hex(FightJoinProtocol.BuildFightHidden(3332)));    // Z 2650
-            Assert.Equal("08d703100120ffffffffffffffffff01",
-                         Hex(FightJoinProtocol.BuildTeamMemberRemoved(471, 1, -1)));  // B 100
             Assert.Equal("08f7ffffffffffffffff01", Hex(FightJoinProtocol.BuildFighterRemoved(-9)));  // B 140
-            Assert.Equal("10f7ffffffffffffffff01", Hex(FightJoinProtocol.BuildActorHidden(-9)));     // B 141
-            Assert.Equal("10dee3feffffffffffff01", Hex(FightJoinProtocol.BuildActorHidden(Group))); // F 132
             Assert.Empty(FightJoinProtocol.BuildLeftFight());                                        // S 37
         }
 

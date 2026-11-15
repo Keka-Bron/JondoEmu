@@ -26,8 +26,8 @@ the precise client patch installed.
 | `Jondo.Unity.Server/Network/MovementDispatch.cs` | Typed roleplay and combat movement request dispatch |
 | `Jondo.Unity.Server/Diagnostics/GameTrafficFormatter.cs` | Best-effort typed live-log presentation |
 
-The imported schema contains 2,169 messages. The semantic mapping covers 533
-payload/common message types, 65 enums and 1,377 payload/common fields, plus the
+The imported schema contains 2,169 messages. The semantic mapping covers 536
+payload/common message types, 65 enums and 1,382 payload/common fields, plus the
 four Game envelope roles. JondoEmu's stable
 C# API defines semantic names, required/nullable members and explicit oneof case
 records. Nullable message members and explicit `None` cases preserve absence
@@ -300,8 +300,7 @@ correcting their reversed legacy arguments. Owners use the explicit absent
 `CharacterBasicInformation` complement. The maintained contracts now also permit absent
 `MonsterInGroupInformation.Look`; these are structural presence corrections to existing
 bindings, not new field-name research. The installed reviewed August schema/binding pair
-was explicitly reimported after adding the absent-complement policy, so provenance
-records the actual maintained inputs used for that import.
+includes the absent-complement construction policy.
 
 `MapPresenceService` sends typed player arrivals and presentation refreshes and typed
 directional departures/removals. Border travel, teleports, zaaps, houses and bags capture
@@ -372,6 +371,48 @@ legacy look writers delegate to the same rules. The two-argument
 its unused one-argument overload is removed. Those live
 consumers are tracked migration work in the handoff, rather than unused alternate
 map builders retained for tests.
+
+### Shared map/fight presence and reconnection opening
+
+`FightHandler` directly constructs map fight flags, counts, incremental teams,
+member removals and option changes. Full map snapshots and incremental fight
+presence share `TeamSnapshotOf`; the initial monster-side flag snapshot and team
+update retain a selected-empty member list, followed by growing monster teams.
+Collectors keep their name-ID branch and whole-side updates. Entry omits a zero
+fight count, while fight completion explicitly sends zero. Flags disappear when
+placement ends without changing the count.
+
+Map delivery uses `fightId: 0` and each recipient's codec with isolated failures.
+Mirrored team/option/member updates retain the separate fighter/spectator audience
+and pending-sequence opening. The initial own-team sends still propagate failure
+before map delivery. Dungeon and placement board removals keep `kar` before the
+semantic actor/member removals and the existing trailing board/team updates.
+
+Spectator and remote alliance-defender departures use captured map instances with
+encode-once `Map.SendAsync` delivery. The defender's old map is captured before joining mutates map
+state; its removal remains before the alliance-list notice. Dream goblin/group
+removals go only to the owning session, preserving mutation, delivery and
+persistence order and failure propagation.
+
+`WorldEntry` calls `EntryInformationMessages.SendFightReconnectionAsync` directly
+after map time and before spells: warning/error text **184** with the character's
+name, then an empty `AreaFightModifierUpdateEvent`. No raw construction or entry
+projection remains in that opening hook.
+
+Removed the obsolete `MapEntryOf`, `FightJoinProtocol.FightOnMap`,
+`BuildFightShown`, `BuildFightHidden`, `BuildFightCount`, `BuildActorHidden`,
+`BuildTeamMemberRemoved` and `ConnectionProtocol.BuildBackInTheFight` builders.
+Shared raw team serializers still serve the remaining fight board/window work.
+`MapFightContractTests` now owns the independent flag/count/removal/reconnection
+wire fixtures; `MapFightPresenceTests` and `CollectorPrismPresenceTests` cover live
+ordering, audiences and failed-recipient isolation. The reconnection hook's codec
+and transport boundaries are covered in `GameEntryMapMessagesTests`.
+
+The three added local bindings are `ShowChallengeEvent`
+(`FightInformation`), `RemoveChallengeEvent` and `FightTeamRemoveMemberEvent`.
+Their wire fields match the reviewed August mappings. Full preparation/resume/spectator
+snapshots and feature-hook migrations remain tracked in the handoff. Targeted
+real-client checks are pending.
 
 ### Retired map/transition routes
 
@@ -869,8 +910,7 @@ Legacy gain/loss serializers consume the same semantic entry/effect builders.
 
 `ObjectEffectCaseNone` explicitly represents an unset effect-value oneof. It differs
 from `ObjectEffectCaseValueInt(0)` and a present-empty dice value. The binding uses
-`noneType`, with no wire-schema or field-number change. The installed mapping hash
-in provenance is updated; the original imported-source hash is retained.
+`noneType`, with no wire-schema or field-number change.
 The alteration reference row passed the lossless semantic-scope audit. Action-only
 effects have dedicated semantic and protocol-presence regressions. This does not
 classify unrelated unmapped data as unused.
@@ -1324,9 +1364,8 @@ python3 Jondo.Unity.Protocol.Game.Wire/Import/import-remap.py \
 The adapter preserves existing C# member names and construction policies and adds
 new reviewed bindings. Migrate changed type identities, maintained oneof case names
 and intentional member renames explicitly in the models/bindings before importing.
-The normal importer publishes the adapted C# mapping and records its provenance;
-the source mapping checksum describes that adapted input. Generated conversions
-are validated by the subsequent build.
+The normal importer validates and publishes the adapted C# mapping. Generated
+conversions are validated by the subsequent build.
 
 The importer accepts Game's proto3 schema subset (messages, enums, maps, oneofs,
 optional/repeated fields and field attributes). It checks wire references and
@@ -1337,9 +1376,8 @@ original Any/dispatch identities, including dotted names. Tags, wire types,
 cardinality, presence, enum numbers and oneofs are preserved; unsupported schema
 syntax is rejected rather than silently removed.
 
-`Import/game-3.6.10.10.provenance.json` records the protocol version, project-relative
-schema/mapping paths, and SHA-256 hashes of the input and installed artifacts.
-Input validation finishes before writes; publication of the several files is
+The importer publishes the normalized schema and C# binding mapping.
+Input validation finishes before writes; publication of the two files is
 sequential. Build the wire project afterwards for authoritative descriptor and
 stable C# type validation. Importing a new version does not register it as a
 supported runtime profile; that requires an explicit profile/build change.

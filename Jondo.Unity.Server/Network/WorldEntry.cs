@@ -98,7 +98,7 @@ namespace Jondo.Unity.Server.Network
                                                     Jondo.Unity.World.Fights.FightInstance? fightToRejoin = null)
         {
             using var context = SessionContext.Push(session);
-            var stream = session.Stream ?? throw new InvalidOperationException("Map entry requires a connected game session.");
+            _ = session.Stream ?? throw new InvalidOperationException("Map entry requires a connected game session.");
             int sent = await GameEntryMapMessages.Live.SendAsync(session,
                 MapEntryOpeningMessages.Live, fightToRejoin == null
                     ? Jondo.Unity.Protocol.Game.GameContext.RolePlay : Jondo.Unity.Protocol.Game.GameContext.Fight,
@@ -109,13 +109,8 @@ namespace Jondo.Unity.Server.Network
             await session.SendAsync(EntryEnvironmentMessages.Live.Zaaps());
             sent += 2;
 
-            async Task<int> SendReconnectionAsync()
-            {
-                await EnviarAsync(stream, ConnectionProtocol.Push(Op.Lqn,
-                    ConnectionProtocol.BuildBackInTheFight(character.Name)));
-                await EnviarAsync(stream, ConnectionProtocol.BuildActorsComplete());
-                return 2;
-            }
+            Task<int> SendReconnectionAsync()
+                => EntryInformationMessages.SendFightReconnectionAsync(session, character.Name);
 
             Console.WriteLine($"[World] Block 3 sent: {sent} messages, map {mapId}, characteristics " +
                               $"and known zaaps resent.");

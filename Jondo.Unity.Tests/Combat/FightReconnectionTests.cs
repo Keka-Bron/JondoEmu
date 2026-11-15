@@ -43,15 +43,6 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal("1801200128bc033004", Hex(FightProtocol.BuildFightSummary(4, 444)));
         }
 
-        /// <summary>The lqn behind the lqu of the fight-flavoured map block.</summary>
-        [Fact]
-        public void Back_in_the_fight_is_text_184_of_type_1()
-        {
-            byte[] lqn = ConnectionProtocol.BuildBackInTheFight("Hero-Example");
-
-            Assert.Equal("080110b801220c4865726f2d4578616d706c65", Hex(lqn));
-        }
-
         /// <summary>
         /// The capture: the turn of 350 started 21.8 seconds before the burst and the burst
         /// says 132. Ours counts the same way, and never below zero.

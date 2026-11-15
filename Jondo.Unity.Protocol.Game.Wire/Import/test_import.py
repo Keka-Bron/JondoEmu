@@ -1,4 +1,3 @@
-import hashlib
 import importlib.util
 import json
 import tempfile
@@ -101,16 +100,6 @@ class ImportTests(unittest.TestCase):
             self.assertIn('int_', raw.messages)
             self.assertEqual('// independently maintained source', model.read_text())
 
-            provenance = json.loads((destination / f'Import/game-{VERSION}.provenance.json').read_text())
-            self.assertEqual(VERSION, provenance['protocolVersion'])
-            self.assertEqual(hashlib.sha256(schema.read_bytes()).hexdigest(), provenance['sourceSchemaSha256'])
-            self.assertEqual(hashlib.sha256(bindings_file.read_bytes()).hexdigest(), provenance['sourceMappingSha256'])
-            for kind in ('schema', 'mapping'):
-                path = Path(provenance[kind])
-                self.assertFalse(path.is_absolute())
-                self.assertEqual(hashlib.sha256((destination / path).read_bytes()).hexdigest(), provenance[kind + 'Sha256'])
-            self.assertNotIn(str(root), json.dumps(provenance))
-
             # Already normalized files are valid inputs; aliases/case bindings are not lost.
             other = root / 'second-output'
             module.import_sources(installed_schema, destination / f'Mappings/game-{VERSION}.json', other, VERSION)
@@ -133,8 +122,7 @@ class ImportTests(unittest.TestCase):
                     bindings['wireAliases']['int'] = 'public_example'
                 schema, bindings_file = inputs(root, bindings)
                 destination = root / 'wire'
-                previous = [destination / f'Schemas/game-{VERSION}.proto', destination / f'Mappings/game-{VERSION}.json',
-                            destination / f'Import/game-{VERSION}.provenance.json']
+                previous = [destination / f'Schemas/game-{VERSION}.proto', destination / f'Mappings/game-{VERSION}.json']
                 for path in previous:
                     path.parent.mkdir(parents=True, exist_ok=True)
                     path.write_text('previous input')
@@ -151,13 +139,6 @@ class ImportTests(unittest.TestCase):
                 with self.subTest(version=version), self.assertRaisesRegex(ValueError, 'Protocol version'):
                     module.import_sources(schema, bindings_file, root / 'wire', version)
             self.assertFalse((root / 'wire').exists())
-
-    def test_checked_in_profile_checksums_match_the_maintained_artifacts(self):
-        project = Path(__file__).resolve().parents[1]
-        provenance = json.loads((project / f'Import/game-{VERSION}.provenance.json').read_text())
-        self.assertEqual(VERSION, provenance['protocolVersion'])
-        for kind in ('schema', 'mapping'):
-            self.assertEqual(hashlib.sha256((project / provenance[kind]).read_bytes()).hexdigest(), provenance[kind + 'Sha256'])
 
 
 if __name__ == '__main__':

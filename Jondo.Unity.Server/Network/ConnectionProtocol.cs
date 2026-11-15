@@ -906,14 +906,6 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildNotice(string text)
             => BuildInfoMessage(Managers.InfoMessages.Info, Managers.InfoMessages.FreeText, text ?? "");
 
-        /// <summary>
-        /// "{0} acaba de volver a conectarse al combate." (lqn, type 1, text 184). The real
-        /// server sends it right behind the lqu of the tactical map when somebody reconnects
-        /// into his fight, in both reconnection captures, before the lva.
-        /// </summary>
-        public static byte[] BuildBackInTheFight(string name)
-            => BuildInfoMessage(Managers.InfoMessages.Warning, Managers.InfoMessages.BackInTheFight, name);
-
         /// <summary>The same, saying what type it is.</summary>
         public static byte[] BuildInfoMessage(int type, int messageId, params string[] parameters)
         {

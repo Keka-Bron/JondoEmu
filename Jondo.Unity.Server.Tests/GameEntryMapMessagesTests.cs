@@ -67,15 +67,18 @@ public sealed class GameEntryMapMessagesTests
             hooks++;
             Assert.Equal(new MapCurrentEvent(MapId), own.Codec.Frames[^2].Content);
             Assert.Equal(new TimeEvent(120, 1_794_456_789_123), own.Codec.Frames[^1].Content);
-            await own.Session.SendAsync(new TextInformationEvent(TextInformationType.TextInformationMessage, 71_001, ["Returning"]));
-            await own.Session.SendAsync(new AreaFightModifierUpdateEvent([]));
-            return 2;
+            return await EntryInformationMessages.SendFightReconnectionAsync(own.Session, "Returning");
         });
 
         Assert.Equal(34, sent);
         Assert.Equal(1, hooks);
         Assert.DoesNotContain(own.Codec.Frames, frame => frame.Content is LifePointsRegenBeginEvent or NpcsMapQuestStatusUpdateEvent);
         Assert.Equal(new ContextCreationEvent(GameContext.Fight), own.Codec.Frames[4].Content);
+        var notice = Assert.IsType<TextInformationEvent>(own.Codec.Frames[7].Content);
+        Assert.Equal(TextInformationType.TextInformationError, notice.MessageType);
+        Assert.Equal(184, notice.MessageId);
+        Assert.Equal(new[] { "Returning" }, notice.Parameters);
+        Assert.Empty(Assert.IsType<AreaFightModifierUpdateEvent>(own.Codec.Frames[8].Content).SpellPairs);
         Assert.IsType<SpellsEvent>(own.Codec.Frames[9].Content);
         Assert.Equal(ShortcutBar.Spell, Assert.IsType<ShortcutBarContentEvent>(own.Codec.Frames[10].Content).BarType);
         Assert.Equal(ShortcutBar.General, Assert.IsType<ShortcutBarContentEvent>(own.Codec.Frames[11].Content).BarType);
@@ -225,6 +228,32 @@ public sealed class GameEntryMapMessagesTests
         Assert.DoesNotContain(own.Codec.Frames, frame => frame.Content is SpellsEvent or ShortcutBarContentEvent);
         Assert.DoesNotContain(own.Codec.Frames, frame => frame.Content is CommunityChannelEvent or ChannelUpdateEvent or BakApiKeyEvent);
         Assert.Equal(default, own.Session.State.RegenerationStartedUtc);
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task Reconnection_notice_or_modifier_delivery_failure_stops_the_actual_hook_and_following_spells(bool modifier, bool transport)
+    {
+        bool Failed(GameFrame frame) => modifier ? frame.Content is AreaFightModifierUpdateEvent : frame.Content is TextInformationEvent;
+        var failure = new IOException("reconnection delivery failed");
+        var own = new Recipient(frame => !transport && Failed(frame) ? failure : null,
+            frame => transport && Failed(frame) ? Task.FromException(failure) : Task.CompletedTask);
+        var other = new Recipient();
+        using var scope = SessionContext.Push(other.Session);
+        using var turn = await own.Session.EnterTurnAsync();
+        Assert.Same(failure, await Assert.ThrowsAsync<IOException>(() => Default.SendAsync(own.Session,
+            MapEntryOpeningMessagesTests.Empty, GameContext.Fight, MapId,
+            () => EntryInformationMessages.SendFightReconnectionAsync(own.Session, "Returning"))));
+        Assert.True(Failed(own.Codec.Frames[^1]));
+        Assert.Single(own.Codec.Frames, Failed);
+        Assert.DoesNotContain(own.Codec.Frames, frame => frame.Content is SpellsEvent or ShortcutBarContentEvent);
+        Assert.Empty(other.Codec.Frames);
+        Assert.Same(other.Session, SessionContext.Actual);
+        Assert.Equal(0, own.Session.UnoCadaVez.CurrentCount);
+        Assert.Equal(0, own.Codec.Decodes);
     }
 
     private sealed class Clock(Func<DateTimeOffset> now) : TimeProvider

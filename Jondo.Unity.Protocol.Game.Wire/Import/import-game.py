@@ -5,7 +5,6 @@ This maintenance command is independent of normal MSBuild generation. Stable
 C# models remain maintained source; the subsequent build validates their types.
 """
 import argparse
-import hashlib
 import json
 import re
 from pathlib import Path
@@ -253,15 +252,9 @@ def import_sources(schema_path, mapping_path, destination, version):
     mapping = normalize_mapping(schema, json.loads(mapping_bytes, object_pairs_hook=unique))
     bindings = json.dumps(mapping, indent=2) + '\n'
     schema_name, mapping_name = f'Schemas/game-{version}.proto', f'Mappings/game-{version}.json'
-    provenance = {'protocolVersion': version, 'schema': schema_name, 'mapping': mapping_name,
-                  'schemaSha256': hashlib.sha256(normalized.encode()).hexdigest(),
-                  'mappingSha256': hashlib.sha256(bindings.encode()).hexdigest(),
-                  'sourceSchemaSha256': hashlib.sha256(schema_bytes).hexdigest(),
-                  'sourceMappingSha256': hashlib.sha256(mapping_bytes).hexdigest()}
-    files = {destination / schema_name: normalized, destination / mapping_name: bindings,
-             destination / f'Import/game-{version}.provenance.json': json.dumps(provenance, indent=2) + '\n'}
+    files = {destination / schema_name: normalized, destination / mapping_name: bindings}
     # Read and validate both inputs before replacing any output. Stable model
-    # source is not an import output. Paths in provenance are project-relative.
+    # source is not an import output.
     for path, text in files.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding='utf-8', newline='\n')

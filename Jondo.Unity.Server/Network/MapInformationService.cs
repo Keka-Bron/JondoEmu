@@ -107,7 +107,7 @@ internal sealed class MapInformationService(IMapInformationBackend backend)
         public Task SendActorsAsync(GameSession session, DbCharacter character)
             => MapInformationMessages.Live.SendAsync(session, character);
 
-        public Task SendFightCountAsync(GameSession session) => FightHandler.SendFightCountAsync(StreamOf(session), session.MapId);
+        public Task SendFightCountAsync(GameSession session) => FightHandler.SendFightCountAsync(session, session.MapId);
         public bool IsHavenBag(long mapId) => Managers.Merkasako.IsHavenBag(mapId);
         public Task SendFurnitureAsync(GameSession session) => MerkasakoHandler.SendFurnitureAsync(StreamOf(session));
         public Task RestoreRaidStagingsAsync(GameSession session)

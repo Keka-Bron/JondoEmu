@@ -101,8 +101,8 @@ namespace Jondo.Unity.Server.Handlers
             _spectators.GetOrAdd(fight!.FightId, _ => new ConcurrentDictionary<long, byte>())[me.CharacterId] = 0;
 
             // Off the map he stands on, as somebody going into a fight goes off it.
-            await SessionRegistry.BroadcastToMapAsync(state.MapId, ConnectionProtocol.Push(Op.Kmu,
-                FightJoinProtocol.BuildActorHidden(me.CharacterId)), me.Id, fightId: 0);
+            await me.Map.SendAsync(new Jondo.Unity.Protocol.Game.ContextRemoveElementEvent(me.CharacterId),
+                me.Id, fightId: 0);
 
             state.RoleplayMapId = state.MapId;
             state.RoleplayCellId = state.CellId;

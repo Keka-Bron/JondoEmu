@@ -286,6 +286,9 @@ namespace Jondo.Unity.Server.Network
         internal static Task<int> SendToAsync(IReadOnlyList<GameSession> targets, byte[] packet)
             => SendToAsync(targets, target => target.SendAsync(packet));
 
+        internal static Task<int> SendToAsync(IReadOnlyList<GameSession> targets, GameEvent message)
+            => SendToAsync(targets, target => target.SendAsync(message));
+
         private static async Task<int> SendToAsync(IReadOnlyList<GameSession> targets, Func<GameSession, Task> send)
         {
             var results = await Task.WhenAll(targets.Select(async target =>

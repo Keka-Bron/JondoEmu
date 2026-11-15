@@ -113,11 +113,12 @@ public sealed class TypedActorNotificationTests
         using (await observer.Session.EnterTurnAsync())
             await ((Task)typeof(FightHandler).GetMethod("FightOffTheMapAsync", PrivateStatic)!.Invoke(null, [fight])!)
                 .WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.Equal(FightJoinProtocol.BuildFightCount(0), await observer.Next("jqz"));
+        Assert.Equal(new byte[] { 0x71 }, await Read(observer));
+        Assert.Equal(new MapFightCountEvent(0), codec.Frames[0].Content);
         if (members > 0)
         {
             Assert.Equal(new byte[] { 0x71 }, await Read(observer));
-            var actor = Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(Assert.Single(codec.Frames).Content).Actors);
+            var actor = Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(codec.Frames[1].Content).Actors);
             Assert.Equal(group.MobId, actor.ActorId);
             Assert.Equal(312, actor.Disposition.CellId);
             var identity = Assert.IsType<RolePlayActorCaseMonsterGroupActor>(
@@ -126,7 +127,7 @@ public sealed class TypedActorNotificationTests
             Assert.Null(identity.Identification.MainCreature.Look);
             Assert.Equal(members - 1, identity.Identification.Underlings.Count);
         }
-        else Assert.Empty(codec.Frames);
+        else Assert.Single(codec.Frames);
         Assert.False(observer.FromServer.DataAvailable);
         Assert.False(fighter.FromServer.DataAvailable);
         Assert.False(elsewhere.FromServer.DataAvailable);

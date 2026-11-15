@@ -6,6 +6,15 @@ namespace Jondo.Unity.Server.Network;
 
 internal static class EntryInformationMessages
 {
+    /// <summary>Reconnection notice, then modifiers; called immediately after map time and before spells.</summary>
+    internal static async Task<int> SendFightReconnectionAsync(GameSession session, string name)
+    {
+        await session.SendAsync(new TextInformationEvent(TextInformationType.TextInformationError,
+            InfoMessages.BackInTheFight, [name]));
+        await session.SendAsync(new AreaFightModifierUpdateEvent([]));
+        return 2;
+    }
+
     internal static TextInformationEvent InitialWarning()
         => new(TextInformationType.TextInformationError, InfoMessages.InitialEntryWarning, []);
 

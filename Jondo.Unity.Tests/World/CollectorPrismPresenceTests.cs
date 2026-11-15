@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
 using System.Reflection;
+using Jondo.Unity.Protocol;
 using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -241,6 +243,63 @@ public sealed class CollectorPrismPresenceTests : IDisposable
         Assert.Equal(next, state.NextEvolutionDate);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Remote_alliance_defender_leaves_the_captured_map_before_the_alliance_list_notice(bool failOwnTeam)
+    {
+        MapManager.Initialize();
+        Interactives.Initialize();
+        const long fightId = 7_966_003, oldMap = Map + 20, arena = Map + 30;
+        var alliance = Alliance();
+        var active = (ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
+            .GetField("_activeFights", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
+        var fight = new FightInstance(fightId, Map, arena)
+        {
+            Reglas = FightRules.ContraRecaudador, DefenderLeaderId = -20006, TaxCollectorUuid = "presence-collector",
+        };
+        fight.SetPlacementCells([312, 313], [352, 353]);
+        fight.AddPlayer(new() { Id = Owner + 50, Name = "Attacker", CurrentHP = 100, MaxHP = 100 });
+        fight.AddMonster(new() { Id = -1, IsMonster = true, CurrentHP = 100, MaxHP = 100, TaxCollectorFirstName = 35, TaxCollectorLastName = 109 });
+        AllianceFights.Open(fight, TaxCollectorProtocol.FightOfTaxCollector, Map, alliance.Id, Pb.New);
+        Assert.True(active.TryAdd(fightId, fight));
+        var codec = new RecordingCodec { FailTeam = failOwnTeam, UseWireEncoding = true };
+        await using var own = await ClientPipe.OpenAsync(Account, Owner, oldMap, "Defender", codec);
+        using var oldPeer = new Recipient(Owner + 1, oldMap);
+        using var otherFight = new Recipient(Owner + 2, oldMap, fightId: fightId + 1);
+        using var roleplay = new Recipient(Owner + 3, Map);
+        AllianceStore.Join(Owner + 1, alliance.Id);
+        try
+        {
+            using (SessionContext.Push(own.Session))
+            using (await own.Session.EnterTurnAsync())
+            using (await oldPeer.Session.EnterTurnAsync())
+            {
+                var request = ConnectionProtocol.Push(Op.Mer,
+                    Pb.New().Msg(1, TaxCollectorProtocol.FightKey(TaxCollectorProtocol.FightOfTaxCollector, Map, fightId)).Build());
+                await AllianceFights.JoinAsync(own.ToClient, request).WaitAsync(TimeSpan.FromSeconds(10));
+            }
+            // A failed mirrored fight-team delivery is isolated; the completed join still
+            // removes the defender from his old map before notifying alliance observers.
+            var removal = new GameCodec().Decode(oldPeer.Packets[0]);
+            Assert.Equal(new ContextRemoveElementEvent(Owner), removal.Content);
+            Assert.Null(removal.Uid);
+            Assert.Empty(oldPeer.Codec.Frames);
+            Assert.Single(codec.Frames, frame => frame.Content is ContextRemoveElementEvent);
+            Assert.Equal(new[] { "kmu", "mdx" }, oldPeer.Labels);
+            Assert.Empty(otherFight.Packets);
+            Assert.Equal(arena, own.Session.MapId);
+            Assert.Equal(oldMap, own.Session.State.RoleplayMapId);
+            Assert.Equal(fightId, own.Session.State.FightId);
+            Assert.Contains(roleplay.Codec.Frames, frame => frame.Content is ContextRemoveElementEvent { ElementId: Owner });
+        }
+        finally
+        {
+            active.TryRemove(fightId, out _);
+            await AllianceFights.CloseAsync(fight);
+        }
+    }
+
     private static AllianceStore.Alliance Alliance() => AllianceStore.Create(Owner, "Presence", "PRS", 104, 8, 12345, 97, 11862276);
     private static void SetMap(int area) => MapManager.Maps[Map] = new() { MapId = Map, SubAreaId = area, Outdoor = true };
     private static Task<byte[]> Read(ClientPipe pipe)
@@ -277,11 +336,13 @@ public sealed class CollectorPrismPresenceTests : IDisposable
     {
         internal List<GameFrame> Frames = [];
         internal bool Fail;
+        internal bool FailTeam;
+        internal bool UseWireEncoding;
         public byte[] Encode(GameFrame frame)
         {
             Frames.Add(frame);
-            if (Fail) throw new IOException("recipient codec failed");
-            return [0x71, checked((byte)Frames.Count)];
+            if (Fail || FailTeam && frame.Content is FightTeamUpdateEvent) throw new IOException("recipient codec failed");
+            return UseWireEncoding ? new GameCodec().Encode(frame) : [0x71, checked((byte)Frames.Count)];
         }
         public GameFrame Decode(ReadOnlySpan<byte> payload) => throw new InvalidOperationException("Unexpected presence decode");
     }

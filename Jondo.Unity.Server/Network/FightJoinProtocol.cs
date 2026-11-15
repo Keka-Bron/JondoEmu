@@ -277,69 +277,10 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Msg(1, team).Var(2, fightId).Build();
 
         /// <summary>
-        /// A fight in its placement, as it lies on the map: what hpy carries in its f1 and what
-        /// each f12 of a jss is (S 53, J 840).
-        ///
-        ///   f1: the two flags' cells, packed, the attackers' first
-        ///   f2: the kind of fight, the same number as the kam's -- 4 against monsters; missing
-        ///       for a challenge
-        ///   f3: the attackers' team     f3: the defenders' team
-        ///   f5: the attackers' options  f5: the defenders' options
-        ///   f6: the fight
-        ///
-        /// The options are empty for a side nobody locked, as Z carries them ("2a002a00"). Of what
-        /// goes in them only one thing is measured: a side restricted to its party is { f4: 1 } (the
-        /// fight 4368 of J 840); the other options' fields are not known and are left out. The
-        /// flag cells are the attacker's cell and the group's (F: [71, 73] with the group drawn on
-        /// 71 before it went off; B: [228, 200], Rover1's path ending on 228 and the group on 200).
-        /// </summary>
-        public static Pb FightOnMap(long fightId, int kind, int attackersFlag, int defendersFlag,
-                                    Pb attackers, Pb defenders,
-                                    bool attackersPartyOnly = false, bool defendersPartyOnly = false)
-            => Pb.New()
-                .Packed(1, new long[] { attackersFlag, defendersFlag })
-                .VarIfNotZero(2, kind)
-                .Msg(3, attackers)
-                .Msg(3, defenders)
-                .Msg(5, Pb.New().VarIfNotZero(4, attackersPartyOnly ? 1 : 0))
-                .Msg(5, Pb.New().VarIfNotZero(4, defendersPartyOnly ? 1 : 0))
-                .Var(6, fightId);
-
-        /// <summary>The swords appear on the map (hpy): { f1: the fight on the map }.</summary>
-        public static byte[] BuildFightShown(Pb fight) => Pb.New().Msg(1, fight).Build();
-
-        /// <summary>
-        /// The swords go (hpr): { f1: the fight }. When the placement is over, not when the fight
-        /// is: "08841a" at Z 2650, "089022" at J 857. A fight in progress is only counted.
-        /// </summary>
-        public static byte[] BuildFightHidden(long fightId) => Pb.New().Var(1, fightId).Build();
-
-        /// <summary>
-        /// How many fights the map has (jqz): { f2: how many }, right behind the jss of a map
-        /// that has any and on the map whenever the number changes. "1001" in F 138, "1003"
-        /// behind the jss of S 53, and EMPTY when it drops to nothing (Hipermago 4984).
-        /// </summary>
-        public static byte[] BuildFightCount(int count) => Pb.New().VarIfNotZero(2, count).Build();
-
-        /// <summary>
-        /// A member taken off a team, for the map (jzw): { f1: the fight, f2: the team, f4: who }.
-        /// "08d703100120ffffffffffffffffff01" at B 100: monster -1 off team 1 of fight 471.
-        /// </summary>
-        public static byte[] BuildTeamMemberRemoved(long fightId, int team, long fighter)
-            => Pb.New().Var(1, fightId).VarIfNotZero(2, team).Var(4, fighter).Build();
-
-        /// <summary>
         /// A fighter taken off the board, for the fighters (kar): { f1: who }.
         /// "08f7ffffffffffffffff01" at B 140, monster -9 going when the fourth player came in.
         /// </summary>
         public static byte[] BuildFighterRemoved(long fighter) => Pb.New().Var(1, fighter).Build();
-
-        /// <summary>
-        /// An actor goes off the map (kmu): { f2: who }. The group and the attacker when a fight
-        /// opens (F 132-133), each one who joins (B 96, 108), and the monster going with its kar
-        /// (B 141, "10f7ffffffffffffffff01"). The same shape as FightProtocol.BuildFightAgainst.
-        /// </summary>
-        public static byte[] BuildActorHidden(long actor) => Pb.New().Var(2, actor).Build();
 
         /// <summary>
         /// "You are out of the fight" (jxa), empty: the first thing the one who leaves from the

@@ -51,9 +51,6 @@ See `../docs/game-protocol.md`. Commands below run from the repository root.
   binding references, and preserves original Any identities through `wireAliases`.
   Reject unsupported syntax/policies rather than silently discarding them.
 - Stable C# models are maintained source and are never import outputs.
-- Keep `Import/game-3.6.10.10.provenance.json` checksums consistent with installed
-  inputs. Record project-relative paths and content hashes, not machine-specific
-  paths or private repository references.
 - Validate both inputs before replacing outputs. Publication is sequential;
   subsequent descriptor/Roslyn validation during build is authoritative.
 

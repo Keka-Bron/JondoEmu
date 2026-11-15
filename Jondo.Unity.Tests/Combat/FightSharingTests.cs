@@ -77,9 +77,11 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public void A_side_kept_to_its_party_shows_on_the_map()
         {
-            var open = Server.Network.FightJoinProtocol.FightOnMap(9, 4, 71, 73,
-                Server.Network.Pb.New(), Server.Network.Pb.New(), attackersPartyOnly: true).Build();
-            Assert.Contains("2a0220012a00", Convert.ToHexString(open).ToLowerInvariant());
+            var fight = Fight(9_968_000_021);
+            fight.SetOption(FightInstance.Azules, FightInstance.OptionPartyOnly, true);
+            var open = FightHandler.MapSnapshotOf(fight);
+            Assert.True(open.TeamsOptions[0].IsRestrictedToParty);
+            Assert.False(open.TeamsOptions[1].IsRestrictedToParty);
         }
 
         private static FightInstance Fight(long player)

@@ -4,6 +4,41 @@
   "className": "GameBindings",
   "conversionException": "GameConversionException",
   "messages": {
+    "hpy": {
+      "name": "ShowChallengeEvent",
+      "fields": {
+        "fnfb": "FightInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "hpr": {
+      "name": "RemoveChallengeEvent",
+      "fields": {
+        "fndw": "FightId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "jzw": {
+      "name": "FightTeamRemoveMemberEvent",
+      "fields": {
+        "fwhd": "FightId",
+        "fwhe": "Team",
+        "fwhg": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
     "hms": {
       "name": "SpellsEvent",
       "fields": {

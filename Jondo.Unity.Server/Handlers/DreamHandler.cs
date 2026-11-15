@@ -451,7 +451,8 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static async Task GoblinPowerAsync(NetworkStream stream, IReadOnlyList<long> actions)
         {
-            var sueno = Dreams.De(GameState.CharacterId);
+            var session = SessionContext.Current;
+            var sueno = Dreams.De(session.CharacterId);
             var sala = sueno?.SalaActual;
             if (sueno == null || sala == null || sala.Goblin == 0 || sala.GoblinGone)
             {
@@ -464,14 +465,14 @@ namespace Jondo.Unity.Server.Handlers
             {
                 sala.GoblinGone = true;
                 foreach (long actor in Managers.Npcs.QuitarDelSueno(sala.MapaDeLaSala, goblin))
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorRemoved(actor));
+                    await session.SendAsync(new Jondo.Unity.Protocol.Game.ContextRemoveElementEvent(actor));
             }
 
             if (actions.Contains(ClearDreamRoom))
             {
                 long group = Dreams.ClearRoom(sala);
                 if (group != 0)
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorRemoved(group));
+                    await session.SendAsync(new Jondo.Unity.Protocol.Game.ContextRemoveElementEvent(group));
             }
 
             if (actions.Contains(TeleportToPrecedentDreamRoom) && Dreams.GoBack(sueno) is { } before)

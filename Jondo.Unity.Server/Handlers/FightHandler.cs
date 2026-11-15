@@ -7145,6 +7145,17 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
+        /// <summary>The same event through each fighter/spectator's codec, with the existing failure isolation.</summary>
+        private static async Task ATodosAsync(FightInstance fight, Jondo.Unity.Protocol.Game.GameEvent message)
+        {
+            await AbrirLoDebidoAsync(fight);
+            foreach (var session in Publico(fight).Concat(SpectatorsOf(fight)))
+            {
+                try { await session.SendAsync(message); }
+                catch (Exception ex) { Program.LogDebug($"[Fight] Could not write to {session.Id}: {ex.Message}"); }
+            }
+        }
+
         /// <summary>
         /// A frame for the people of ONE side: whoever is looking from the other side does
         /// not get it. What the Tymadura's visibility switch needs -- see the cast below.

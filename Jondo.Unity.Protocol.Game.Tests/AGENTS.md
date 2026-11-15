@@ -15,8 +15,8 @@ See `../docs/game-protocol.md`. Commands below run from the repository root.
 - General conversion-generator coverage belongs in
   `Jondo.Unity.Protocol.Connection.Tests/GeneratorTests.cs`; Game envelope and
   endpoint-dispatch coverage belongs here.
-- Import normalization/reference/provenance tests live in
-  `Jondo.Unity.Protocol.Game.Wire/Import/test_import.py` and use temporary inputs.
+- Import normalization/reference tests live under
+  `Jondo.Unity.Protocol.Game.Wire/Import/` and use temporary inputs.
 - Session delivery, map audiences, logger fallback/redaction and live routing
   belong in `Jondo.Unity.Server.Tests`. Database-backed movement/instance checks
   belong in `Jondo.Unity.Tests` with the appropriate shared-state collection.
