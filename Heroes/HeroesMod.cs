@@ -478,7 +478,8 @@ namespace Heroes
         private static Il2Cpp.fer _entityInfos;
         private static Il2Cpp.fdf _menuDependencies;
         private static Il2Cpp.fcg _menus;
-        private static bool _liveBroken, _toldLive;
+        private static bool _liveBroken, _toldLive, _portraitFailed;
+        private static int _borrowScans;
 
         /// <summary>Each living portrait, by where it stands and whose it is, with what it was made of.</summary>
         private static readonly Dictionary<string, (string Key, VisualElement View)> _live = new Dictionary<string, (string, VisualElement)>();
@@ -492,9 +493,11 @@ namespace Heroes
         /// </summary>
         private static void BorrowServices()
         {
-            if (_displayers != null || _liveBroken) return;
+            if ((_displayers != null && _entities != null) || _liveBroken) return;
+            // The displaying service had, the entities' one is looked for a while longer only.
+            if (_displayers != null && ++_borrowScans > 60) return;
             var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
-            for (int i = 0; i < documents.Length && _displayers == null; i++)
+            for (int i = 0; i < documents.Length && (_displayers == null || _entities == null); i++)
             {
                 var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
                 if (root != null) BorrowUnder(root);
@@ -503,14 +506,24 @@ namespace Heroes
 
         private static void BorrowUnder(VisualElement element)
         {
-            for (int i = 0; i < Kids(element) && _displayers == null; i++)
+            for (int i = 0; i < Kids(element) && (_displayers == null || _entities == null); i++)
             {
                 var child = Kid(element, i);
                 var portrait = child.TryCast<Il2CppCore.UILogic.Components.Figma.EntityPortrait>();
                 if (portrait != null && portrait.m_entityDisplayerService != null && portrait.m_entityService != null)
+                {
                     Borrowed(portrait.m_entityService, portrait.m_entityDisplayerService, portrait.m_entityInfoService,
                              portrait.m_playerContextMenuDependenciesService, portrait.m_contextMenuService, "a portrait on screen");
-                else BorrowUnder(child);
+                    continue;
+                }
+                // The inventory's own character, drawn by a displayer: the displaying service only.
+                var displayer = child.TryCast<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer>();
+                if (displayer != null && displayer.m_entityDisplayerService != null)
+                {
+                    Borrowed(null, displayer.m_entityDisplayerService, null, null, null, "a displayer on screen");
+                    continue;
+                }
+                BorrowUnder(child);
             }
         }
 
@@ -525,6 +538,8 @@ namespace Heroes
                                      Il2Cpp.fcg menus, string from)
         {
             bool first = _displayers == null;
+            if (_entities == null && entities != null && !first)
+                MelonLogger.Msg($"[Heroes] The entities' service had too (off {from}).");
             _entities ??= entities;
             _displayers ??= displayers;
             _entityInfos ??= infos;
@@ -641,31 +656,71 @@ namespace Heroes
                 Release(known.View);
                 _live.Remove(where);
             }
+            Il2CppCore.Rendering.Look.EntityLook entityLook;
+            string animation;
             try
             {
-                var entityLook = LookOf(look);
-                var portrait = new Il2CppCore.UILogic.Components.Figma.EntityPortrait();
-                portrait.name = "JondoHeroesLivePortrait";
-                portrait.pickingMode = PickingMode.Ignore;
-                portrait.style.flexGrow = new StyleFloat(1f);
-                portrait.InitEntityPortrait(_entities, _displayers, _entityInfos, _menuDependencies, _menus, false, false);
-                portrait.autoSize = true;
-                string animation = seated ? Seated : (Il2Cpp.so.pwt(entityLook, false) ?? "AnimStatique");
-                portrait.SetEntityLook(entityLook, id, animation, 1, false);
-                _live[where] = (key, portrait);
-                if (!_toldLive)
-                {
-                    _toldLive = true;
-                    MelonLogger.Msg($"[Heroes] A live portrait made: {id}, {animation}.");
-                }
-                return portrait;
+                entityLook = LookOf(look);
+                animation = seated ? Seated : (Il2Cpp.so.pwt(entityLook, false) ?? "AnimStatique");
             }
             catch (Exception ex)
             {
                 _liveBroken = true;
-                MelonLogger.Warning($"[Heroes] The client's portraits could not be used, the drawn ones stay: {ex}");
+                MelonLogger.Warning($"[Heroes] A look could not be read for the client's portraits, the drawn ones stay: {ex}");
                 return null;
             }
+
+            // The client's portrait first, as its party window draws its members.
+            if (!_portraitFailed)
+            {
+                try
+                {
+                    var portrait = new Il2CppCore.UILogic.Components.Figma.EntityPortrait();
+                    portrait.name = "JondoHeroesLivePortrait";
+                    portrait.pickingMode = PickingMode.Ignore;
+                    portrait.style.flexGrow = new StyleFloat(1f);
+                    portrait.InitEntityPortrait(_entities, _displayers, _entityInfos, _menuDependencies, _menus, false, false);
+                    portrait.autoSize = true;
+                    portrait.SetEntityLook(entityLook, id, animation, 1, false);
+                    _live[where] = (key, portrait);
+                    Told($"portrait {id} {animation} (entities {(_entities != null ? "yes" : "no")})");
+                    return portrait;
+                }
+                catch (Exception ex)
+                {
+                    _portraitFailed = true;
+                    MelonLogger.Warning($"[Heroes] EntityPortrait refused ({(_entities != null ? "with" : "without")} the entities' service), trying a displayer: {ex.Message}");
+                }
+            }
+
+            // Else a displayer of its own, given its look as the client's screens give theirs
+            // (UIUtils' SetLookAndDirection): standing in its rest, the pose not ours to choose.
+            try
+            {
+                var displayer = new Il2CppCore.UILogic.EntityDisplay.EntityDisplayer();
+                displayer.name = "JondoHeroesLivePortrait";
+                displayer.pickingMode = PickingMode.Ignore;
+                displayer.style.flexGrow = new StyleFloat(1f);
+                displayer.Init(_displayers, _entities);
+                displayer.autosize = true;
+                Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
+                _live[where] = (key, displayer);
+                Told($"displayer {id} (entities {(_entities != null ? "yes" : "no")})");
+                return displayer;
+            }
+            catch (Exception ex)
+            {
+                _liveBroken = true;
+                MelonLogger.Warning($"[Heroes] The client's displayer refused too, the drawn portraits stay: {ex}");
+                return null;
+            }
+        }
+
+        private static void Told(string what)
+        {
+            if (_toldLive) return;
+            _toldLive = true;
+            MelonLogger.Msg($"[Heroes] A live portrait made: {what}.");
         }
 
         private static void Release(VisualElement view)
