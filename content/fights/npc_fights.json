@@ -1203,6 +1203,12 @@
       "why": "«Cómo perder la pluma»: Elbert's mutatruz, Lola (3727), whichever way the character answers («Defenderte» or «Huir»). Its starting spell Cebado (4843) makes it invulnerable, takes 99 of its 100 life and, on every blow, gives it +10 vitality and +20 power; it blows up once it is not under 91% (Dofus pour les noobs: «pour le tuer il doit avoir 1000 PV, il explosera alors tout seul»)." },
     { "npc": 2469, "map": 136446464, "reply": 22177,
       "monsters": [ { "monster": 3727, "grade": 0 } ],
-      "why": "«Cómo perder la pluma»: Elbert's mutatruz, Lola (3727), whichever way the character answers («Defenderte» or «Huir»). Its starting spell Cebado (4843) makes it invulnerable, takes 99 of its 100 life and, on every blow, gives it +10 vitality and +20 power; it blows up once it is not under 91% (Dofus pour les noobs: «pour le tuer il doit avoir 1000 PV, il explosera alors tout seul»)." }
+      "why": "«Cómo perder la pluma»: Elbert's mutatruz, Lola (3727), whichever way the character answers («Defenderte» or «Huir»). Its starting spell Cebado (4843) makes it invulnerable, takes 99 of its 100 life and, on every blow, gives it +10 vitality and +20 power; it blows up once it is not under 91% (Dofus pour les noobs: «pour le tuer il doit avoir 1000 PV, il explosera alors tout seul»)." },
+    { "npc": 1034, "map": 166985728, "reply": 21930,
+      "monsters": [ { "monster": 3757, "grade": 0 }, { "monster": 3754, "grade": 0 }, { "monster": 3755, "grade": 0 }, { "monster": 3756, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 3793, "grade": 0 } ],
+      "alliesPlayed": true,
+      "why": "«A la leche caliente, batir de repente»: tymadora Gria (3757) and her accomplices Guy Sante, Buff Hon and Gullo (3754-3756) ambush the character at Bibiblop's door, and Gavroch (3793) fights beside him: Dofus pour les noobs, «Vous serez aidé par Gavroch que vous pourrez contrôler... ATTENTION : Il ne doit pas mourir»." }
   ]
 }

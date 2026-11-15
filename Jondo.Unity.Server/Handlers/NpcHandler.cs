@@ -882,6 +882,10 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static DialogueLine? OpeningFor(Jondo.Unity.World.Content.NpcDialogue escrito)
         {
+            // An NPC still sulking at a wrong reply says so and nothing more (NpcSulks).
+            if (escrito.SulkLine != 0 && Managers.NpcSulks.Sulking(SessionContext.State.CharacterId, escrito.NpcId))
+                return new DialogueLine { Message = escrito.SulkLine };
+
             var diario = SessionContext.State.Quests;
             return LineFor(escrito, (breed, active, finished, onStep, objectiveDone) =>
                 escrito.OpeningFor(breed, active, finished, onStep, objectiveDone,
@@ -1662,6 +1666,10 @@ namespace Jondo.Unity.Server.Handlers
             if (elegidaAhora != null && elegidaAhora.Says != 0 && !sinPagar)
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildInfoMessage(Managers.InfoMessages.Info, elegidaAhora.Says)));
+
+            // A wrong reply the NPC sulks at: Gorco's cauldron.
+            if (elegidaAhora != null && elegidaAhora.Sulks > 0)
+                Managers.NpcSulks.Start(SessionContext.State.CharacterId, SessionContext.State.OpenDialogueNpcId, elegidaAhora.Sulks);
 
             // Somebody who comes in on a reply that does no objective: Vey Gana's «Darle los
             // ingredientes.» draws the country doll out of the barn.

@@ -3421,7 +3421,15 @@ namespace Jondo.Unity.Server.Handlers
                                                     string which)
         {
             var losers = side.Where(f => f.IsAlive).ToList();
-            if (losers.Count == 0) return;
+            if (losers.Count == 0)
+            {
+                // Nobody of it is left standing -- the blow that ended it was the side's last
+                // one, as when the player had already died and the ally who had to live fell
+                // after him --: the fight is over the usual way. Returning here left it
+                // waiting for an end nobody would send.
+                await CheckFightOverAsync(stream, fight);
+                return;
+            }
             var author = (fight.CurrentFighter ?? losers[0]).Id;
             PararElReloj(fight);
 

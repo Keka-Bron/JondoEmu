@@ -61,7 +61,9 @@
     },
     {
       "npc": 7580,
-      "alsoSoldBy": [ 2142 ],
+      "alsoSoldBy": [
+        2142
+      ],
       "items": [
         {
           "gid": 1575,
@@ -366,6 +368,30 @@
         }
       ],
       "why": "The bounty hunter's three copies of the map of Cania, paid in primatons (datos/tiendas_en_fichas.json): «vous pourrez alors acheter chaque fragment au Chasseur de primes en [5,-6] pour 3 x Primaton unité» (Dofus pour les noobs)."
+    },
+    {
+      "npc": 2487,
+      "items": [
+        {
+          "gid": 15394
+        },
+        {
+          "gid": 15395
+        },
+        {
+          "gid": 15396
+        },
+        {
+          "gid": 15397
+        },
+        {
+          "gid": 15398
+        },
+        {
+          "gid": 33513
+        }
+      ],
+      "why": "Renemil Belok's pieces of the tablet of Totankama, paid in archaeological treasures (32378, datos/tiendas_en_fichas.json): «Chaque Morceau de tablette de Totankama x/5 s'achète en échange de 5 x Trésor archéologique» and, for the treasures to spare, «1 x Incantation volatile de Destinos qui est un consommable qui vous transforme en Tofu» (33513; Dofus pour les noobs, «Le trésor de Totankama»). INFERRED: the incantation's price, the pieces' five."
     }
   ]
 }

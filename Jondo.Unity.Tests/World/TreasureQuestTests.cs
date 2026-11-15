@@ -202,6 +202,23 @@ namespace Jondo.Unity.Tests.World
             if (fissure != null) Assert.Equal(TreasureHunts.NoQuestFound, TreasureHuntHandler.LegendaryAnswer(fissure, false, 1));
         }
 
+        /// <summary>
+        /// The tablet of Totankama is studied only with «El tesoro de Totankama» under way, as its
+        /// description says; a hunt whose map says nothing of a quest asks for none.
+        /// </summary>
+        [Fact]
+        public void The_tablet_of_totankama_needs_its_quest()
+        {
+            var totankama = LegendaryHunts.All.FirstOrDefault(h => h.MapItem == 15391);
+            if (totankama == null) return;   // no client data
+            Assert.Equal(1523, LegendaryHunts.QuestOf(totankama));
+            Assert.Equal(new[] { 8669, 8670 }, LegendaryHunts.ObjectivesBefore(totankama));
+            Assert.Equal(TreasureHunts.NotAvailable, TreasureHuntHandler.LegendaryAnswer(totankama, false, 1, questUnderWay: false));
+            Assert.Equal(TreasureHunts.RequestOk, TreasureHuntHandler.LegendaryAnswer(totankama, false, 1, questUnderWay: true));
+            var gein = LegendaryHunts.Of(5);
+            if (gein != null) Assert.Equal(0, LegendaryHunts.QuestOf(gein));
+        }
+
         /// <summary>The planning table's message: the ids, packed in f1.</summary>
         [Fact]
         public void The_planning_tables_hunts_travel_packed()

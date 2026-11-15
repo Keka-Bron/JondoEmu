@@ -55,6 +55,30 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(FightState.Ongoing, fight.State);
         }
 
+        /// <summary>
+        /// The player had died and the ally who had to live kept the side standing; when the ally
+        /// fell too, the side that "falls at once" had nobody left in it, and the fight waited
+        /// for an end that never came. It ends the usual way: a jxh, then the client's jwz.
+        /// </summary>
+        [Fact]
+        public async Task The_ally_who_had_to_live_falling_last_still_ends_the_fight()
+        {
+            await using var wire = await PortalTests.Wire.Open(Player);
+            var fight = AgainstABot(out var human, out var bot);
+            var ally = new Fighter { Id = -1, IsMonster = true, MaxHP = 500, CurrentHP = 500, Level = 50 };
+            fight.AddPlayer(ally);
+            fight.AlliesMustLive = true;
+            human.CurrentHP = 0;
+            ally.CurrentHP = 0;
+            fight.WonByEffect = FightInstance.Rojos;
+
+            Assert.True(await FightHandler.EffectEndedTheFightAsync(null!, fight));
+
+            var (op, _) = Assert.Single(await wire.Drain());
+            Assert.Equal(Op.Jxh, op);
+            Assert.Equal(FightInstance.WaitsForTheJwz, fight.FinPendiente);
+        }
+
         [Fact]
         public async Task A_fight_with_both_sides_standing_asks_nothing()
         {

@@ -294,6 +294,14 @@ namespace Jondo.Unity.World.Content
         public int Says { get; init; }
 
         /// <summary>
+        /// Minutes the NPC refuses to talk after this reply, or zero: a wrong step at Gorco's
+        /// cauldron in «A la leche caliente, batir de repente» has him sulk («Moâ bouder, na !»),
+        /// and Dofus pour les noobs has to wait about ten minutes before talking to him again.
+        /// While it lasts the NPC opens on its tree's <see cref="NpcDialogue.SulkLine"/>.
+        /// </summary>
+        public int Sulks { get; init; }
+
+        /// <summary>
         /// A condition on the character, in the client's criterion language, for the reply to be
         /// offered: «PS=1» a woman, «PE=14» who knows the crossed-arms attitude, «Pw>1499» with that
         /// many pods free -- the right answers to the guardian of the bridge of death, which are not
@@ -789,6 +797,12 @@ namespace Jondo.Unity.World.Content
         public IReadOnlyList<DialoguePush> Pushes { get; init; } = Array.Empty<DialoguePush>();
 
         /// <summary>
+        /// The line it says, with nothing to answer, while it sulks after a reply that
+        /// <see cref="DialogueChoice.Sulks"/>: Gorco's «¡Yo no hablar a ti!». Zero when it never sulks.
+        /// </summary>
+        public long SulkLine { get; init; }
+
+        /// <summary>
         /// The line it opens with for this character: the first opening that holds, or else
         /// <see cref="First"/>. A line it opens on that is not one of its lines comes back bare,
         /// with no replies -- the client draws its Leave.
@@ -1123,6 +1137,7 @@ namespace Jondo.Unity.World.Content
                         Opening = Number(entry, "opening"),
                         Openings = ReadOpenings(entry),
                         Pushes = ReadPushes(entry),
+                        SulkLine = Number(entry, "sulkLine"),
                         Lines = ReadLines(entry, report, npcId),
                         Why = Text(entry, "why"),
                         ByHand = entry.TryGetProperty("_byHand", out var byHand) && byHand.ValueKind == JsonValueKind.True,
@@ -1235,6 +1250,7 @@ namespace Jondo.Unity.World.Content
                             AlsoGives = Numbers(choice, "alsoGives").Select(o => (int)o).ToArray(),
                             GivesKamas = Number(choice, "givesKamas"),
                             Says = (int)Number(choice, "says"),
+                            Sulks = (int)Number(choice, "sulks"),
                             Criterion = choice.TryGetProperty("criterion", out var crit) && crit.ValueKind == JsonValueKind.String
                                         ? crit.GetString() ?? "" : "",
                             Stagings = Numbers(choice, "stagings").Select(o => (int)o).ToArray(),
@@ -1308,6 +1324,7 @@ namespace Jondo.Unity.World.Content
                     writer.WriteNumber("map", dialogue.MapId);
                     if (dialogue.Opening != 0) writer.WriteNumber("opening", dialogue.Opening);
                     if (dialogue.ByHand) writer.WriteBoolean("_byHand", true);
+                    if (dialogue.SulkLine != 0) writer.WriteNumber("sulkLine", dialogue.SulkLine);
                     if (dialogue.SourceNote.Length > 0) writer.WriteString("_source", dialogue.SourceNote);
                     if (dialogue.Openings.Count > 0)
                     {
@@ -1483,6 +1500,7 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.GivesKamas != 0) writer.WriteNumber("givesKamas", choice.GivesKamas);
                             if (choice.Says != 0) writer.WriteNumber("says", choice.Says);
+                            if (choice.Sulks != 0) writer.WriteNumber("sulks", choice.Sulks);
                             if (choice.Criterion.Length > 0) writer.WriteString("criterion", choice.Criterion);
                             if (choice.Door.Length > 0) writer.WriteString("door", choice.Door);
                             WriteIds(writer, "stagings", choice.Stagings);

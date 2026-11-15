@@ -351,7 +351,7 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(2, LevelOf(leader))
                 .VarIfNotZero(4, GradeOf(leader)));
 
-            if (group.Modular) AddAlternatives(creatures, group.Members);
+            if (group.Modular) AddAlternatives(creatures, group.Members, group.Leaders);
 
             return Pb.New()
                 .Msg(1, Pb.New().Var(1, group.CellId).Var(2, group.Orientation))
@@ -565,8 +565,15 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static void AddInteractiveElements(Pb jss, long mapId, long viewerAccountId)
         {
+            // A bare element a quest makes usable goes out once, with the quest's skill, not twice:
+            // bare from the client's data and again by the quest -- the golden milk bucket of «A la
+            // leche caliente, batir de repente» (485519, type -1 and no skill of its own).
+            var questOnes = QuestElementsShown(mapId).Select(shown => shown.ElementId).ToHashSet();
             foreach (var interactive in Managers.InteractiveRegistry.OnMap(mapId))
+            {
+                if (interactive.Actions.Count == 0 && questOnes.Contains(interactive.Element.Id)) continue;
                 Declare(jss, interactive, viewerAccountId);
+            }
 
             AddQuestElements(jss, mapId);
             AddReadableElements(jss, mapId);
@@ -649,6 +656,25 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static void AddQuestElements(Pb jss, long mapId)
         {
+            foreach (var (binding, elementId) in QuestElementsShown(mapId))
+            {
+                var element = Managers.Interactives.ByElementId(mapId, elementId);
+
+                jss.Msg(11, Pb.New()
+                    .Var(1, 1)
+                    .Msg(4, Pb.New()
+                        .Var(1, Managers.Interactives.SkillInstanceOf(elementId))
+                        .Var(2, binding.SkillId))
+                    .Var(5, elementId)
+                    .Var(6, binding.TypeId));
+
+                DeclarePlacement(jss, element, Managers.ResourceState.Full);
+            }
+        }
+
+        /// <summary>The quest elements of this map the character of the session is shown, and whose they are.</summary>
+        private static IEnumerable<(Jondo.Unity.World.Quests.QuestBinding Binding, int ElementId)> QuestElementsShown(long mapId)
+        {
             foreach (var binding in Managers.Quests.Bindings.OnMap(mapId))
             {
                 if (!Managers.Quests.ShouldSee(binding)) continue;
@@ -661,19 +687,8 @@ namespace Jondo.Unity.Server.Network
                 foreach (var (where, elementId) in offered)
                 {
                     if (where != mapId) continue;
-
-                    var element = Managers.Interactives.ByElementId(mapId, elementId);
-                    if (element.Id == 0) continue;
-
-                    jss.Msg(11, Pb.New()
-                        .Var(1, 1)
-                        .Msg(4, Pb.New()
-                            .Var(1, Managers.Interactives.SkillInstanceOf(elementId))
-                            .Var(2, binding.SkillId))
-                        .Var(5, elementId)
-                        .Var(6, binding.TypeId));
-
-                    DeclarePlacement(jss, element, Managers.ResourceState.Full);
+                    if (Managers.Interactives.ByElementId(mapId, elementId).Id == 0) continue;
+                    yield return (binding, elementId);
                 }
             }
         }
@@ -878,15 +893,21 @@ namespace Jondo.Unity.Server.Network
         /// Measured on the five rooms of the jalatós capture: one alternative for 1 player with
         /// the first four of the eight, then 5, 6, 7 and 8 with the first five to eight -- none
         /// for 2, 3 or 4, which fight the four of the first. Members with no look of their own,
-        /// like the leader.
+        /// like the leader. A group whose first <paramref name="leaders"/> always come shows them
+        /// all from the first alternative on, and no alternative that would show the same.
         /// </summary>
-        internal static void AddAlternatives(Pb creatures, IReadOnlyList<Managers.MobSpawnManager.MobMember> members)
+        internal static void AddAlternatives(Pb creatures, IReadOnlyList<Managers.MobSpawnManager.MobMember> members,
+                                             int leaders = 0)
         {
+            int last = 0;
             for (int size = Managers.MobSpawnManager.DungeonMinimum;
                  size <= Math.Min(members.Count, Managers.MobSpawnManager.DungeonGroupSize); size++)
             {
+                int shown = Math.Max(size, Math.Min(leaders, members.Count));
+                if (shown == last) continue;
+                last = shown;
                 var alternative = Pb.New();
-                for (int i = 0; i < size; i++)
+                for (int i = 0; i < shown; i++)
                 {
                     alternative.Msg(1, Pb.New()
                         .Var(1, members[i].Monster.Id)

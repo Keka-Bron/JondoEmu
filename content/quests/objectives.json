@@ -5236,6 +5236,37 @@
    "onlyGives": true,
    "gives": [{"item": 15427, "count": 1}],
    "why": "The surprising egg (15427): Dofus pour les noobs, «Allez tout d'abord au Chanil d'Amakna en [9,21] afin de récupérer un Oeuf Surprenant. Cliquez sur la cage»; Félix's 18554 sends to Yokashi's lodger near the Amakna kennel. The cage is the kennel's one interactive of a late graphic, 517514 (graphic 34621, cell 244 of the inside, 99096071); it only hands the egg over, the objective being done giving it to Meriana. INFERRED element."
+  },
+  {
+   "objective": 8671,
+   "quest": 1523,
+   "kind": "beat",
+   "monster": 404,
+   "afterObjectives": [8666, 8667, 8668, 8669, 8670],
+   "why": "«Estudia la tabla de Totankama para lanzarte a la búsqueda del tesoro»: the legendary hunt «Tesoro de Totankama» (its map item is the tablet, 15391, at the Mesa de planificación) ends against the Momia Nova (404), whose defeat hands the Cofre de Totankama (15399); Dofus pour les noobs: «Vous pouvez maintenant vous lancer dans une chasse légendaire en [-25,-36] à l'aide de la tablette... il vous faudra une fois la chasse arrivée à sa fin affronter la Momie Nova». After the three items, the bag and the tablet."
+  },
+  {
+   "objective": 8700,
+   "quest": 1523,
+   "kind": "click",
+   "elements": [{"map": 136316416, "element": 511668}],
+   "afterObjectives": [8699],
+   "why": "«Toma el dofus Púrpura»: the Dofus on its stele in the middle of the room (element 511668, graphic 403207, cell 315); Dofus pour les noobs: «Vous pouvez maintenant prendre le Dofus Pourpre posé sur son socle. Sauf que... non c'est un piège»."
+  },
+  {
+   "objective": 8636,
+   "quest": 1524,
+   "kind": "click",
+   "elements": [{"map": 136316674, "element": 485519}],
+   "gives": [{"item": 15593, "count": 1}],
+   "why": "«Consigue leche dorada»: the bucket behind Apísafe (her 18306 «Tengo leche dorada recién exprimida en el cubo que hay detrás de mí»; Dofus pour les noobs: «Pour le lait doré, cliquez sur le seau dans la même pièce»), the refuge's one interactive besides its way out (485519, cell 187), gives the golden milk (15593)."
+  },
+  {
+   "objective": 8674,
+   "quest": 1524,
+   "kind": "beat",
+   "monster": 3757,
+   "why": "«Vence a la tymadora Gria y a sus cómplices»: the ambush at Bibiblop's door (npc_fights.json); Gria drops the Insignia tymadora de Astrub (15594) by her own row (Qa=1524&Qo>8673)."
   }
  ]
 }

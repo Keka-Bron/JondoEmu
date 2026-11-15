@@ -1492,6 +1492,7 @@ namespace Jondo.Unity.Server.Managers
 
             // And the green mark of the one who just gave it is switched off.
             await SendMarksAsync(stream, SessionContext.State.MapId);
+            await RedrawQuestElementsAsync(stream, questId);
 
             // A treasure quest of Dhain's: the box beside him offers its hunt.
             await Handlers.TreasureHuntHandler.OnQuestStartedAsync(stream, questId);
@@ -1537,6 +1538,40 @@ namespace Jondo.Unity.Server.Managers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Idu,
                     QuestProtocol.BuildQuestStep(questId, run.StepId, objectives, run.Done)));
+        }
+
+        /// <summary>
+        /// The map's elements again, when the quest that just started or moved has one on the map
+        /// the character stands on.
+        /// </summary>
+        /// <remarks>
+        /// A quest's elements go out with the map, on arrival (ConnectionProtocol.AddQuestElements),
+        /// and only to whoever should see them then. Taking «A la leche caliente, batir de repente»
+        /// from Apísafe is done beside the golden milk bucket it asks for, and the bucket stayed
+        /// unclickable until the character left the refuge and came back. The same for an element
+        /// a later objective of the same map reveals.
+        /// </remarks>
+        private static async Task RedrawQuestElementsAsync(NetworkStream stream, int questId)
+        {
+            long mapId = SessionContext.State.MapId;
+            if (mapId == 0 || SessionContext.State.IsInFight) return;
+            bool hasOne = false;
+            foreach (var binding in Bindings.OnMap(mapId))
+            {
+                if (binding.QuestId != questId) continue;
+                foreach (var (where, _) in binding.Elements) hasOne |= where == mapId;
+                foreach (var (where, _) in binding.Props) hasOne |= where == mapId;
+            }
+            if (!hasOne) return;
+
+            var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
+            if (ficha == null) return;
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Jss, ConnectionProtocol.BuildMapActors(
+                    mapId, ficha, SessionContext.State.CellId, SessionContext.State.Orientation,
+                    SessionContext.Current.AccountId)));
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorsComplete());
+            Console.WriteLine($"[Quests] Elements of map {mapId} sent again for quest {questId}.");
         }
 
         /// <summary>
@@ -2029,6 +2064,7 @@ namespace Jondo.Unity.Server.Managers
 
                 // And the marks again, as after every ieb and idz of the captures.
                 if (move.ObjectiveTicked || move.StepFinished) await SendMarksAsync(stream, SessionContext.State.MapId);
+                if (move.ObjectiveTicked || move.StepFinished) await RedrawQuestElementsAsync(stream, questId);
             }
             else
             {

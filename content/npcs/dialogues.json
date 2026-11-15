@@ -37012,6 +37012,9 @@
       "npc": 2205,
       "map": 122421248,
       "opening": 16694,
+      "openings": [
+        { "quest": 1524, "objective": 8676, "pending": 8677, "message": 18317 }
+      ],
       "lines": [
         {
           "message": 16694,
@@ -37436,9 +37439,22 @@
             { "reply": 22184, "criterion": "PO=15576", "takes": 15576, "showsNpc": 2487 },
             { "reply": 22184, "criterion": "PO!15576", "showsNpc": 2487 }
           ]
+        },
+        {
+          "message": 18317,
+          "choices": [
+            { "reply": 21942, "next": 18318 },
+            { "reply": 21943 }
+          ]
+        },
+        {
+          "message": 18318,
+          "choices": [
+            { "reply": 21941, "quest": 1524, "completes": 8677, "params": [[30, 8677]] }
+          ]
         }
       ],
-      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896). «Draconanthropie» ends with Prysmaradoth's talisman around the character's neck (16890, «te pone el colgante»): 20143 gives it, and «Destination finale» -- whose victory it is the key to (16954) -- gives it again on starting to one who finished the ritual without it. «Le livre des Taures» (Dofus pour les noobs): «Parlez à Mériana du Dofus Pourpre» (21759) from level 90 once «La magicienne des marécages» is done; the Minotoror guards it and a taur sorcerer's grimoire is needed (18152), there are copies in the great libraries (18153). Back from Astrub, «Mencionar al Maestro Cuerbok» (21837) sends the character to Cania and asks for one of his bones (18222). With the book and the bone (21843, 21842) she enchants the bone and hands it over (18224, «Guardar el hueso encantado», which ends the quest), and «Me voy a la Isla del Minotauroro» (21840) starts «Toro de rodeo». Whoever left before that is handed the bone again by «Estoy listo para ir al Laberinto del Minotauroro» (21844, 18226). For «El tesoro de Totankama» (Dofus pour les noobs, «Le trésor de Totankama»): «Résumez alors à Mériana votre rencontre avec le Minotot» (21915, 18295, «Seguir escuchando» 21914, 18296, «Cuéntame más sobre estos objetos» 21913, 18297: Kerubim for the ring) and «Ir en busca de los objetos» (21916) is 8635. «Montrez alors les trois types de ressources à Mériana» (21918): all three lead to «Podemos comenzar» (18298), fewer to «necesito todos los objetos» (18299) and mark what was shown (8666, 8668; the dust, 8667, asks for five doses). «Mériana procède alors à un rituel étrange et vous donne ensuite une sac dans lequel elle à enfermé vos objets»: «Estoy listo para el ritual» (21921), the bag (18300, «Esperar unos instantes» 21920, 18301) and «Seguir sus instrucciones» (21919) takes the pearl, the five doses and the ring (and marks the bag as had); asked again before burying it she repeats it (82818, 60267, 82817). For «Cómo perder la pluma» (Dofus pour les noobs, «Comment perdre ses plumes»): «Parlez à Mériana pour lui dire qu'un tofu c'est introduit dans sa cabane» (22162, 18532), the ritual in the Book of the Taurs (22161, 18533, 22160, 18534, 22159, 18535: three eggs), «¿Sabes dónde puedo encontrarlos?» (22157, 18536, Félix Rodrifuente in Cania) and «Voy a Cania» (22156) takes the quest; «Me ocuparé de él más tarde... o jamás» (22158) leaves it. Back with the eggs (22188): without all three she waits (18555, 22183); with them «Están los tres»... she counts them, the pan (22186 hands the three eggs over, 8695-8697), the omelette (18557, «Reprimir un grito de sorpresa» 22185) and the pan on the tofu's head (18558): «Escuchar una especie de trueno» (22184) takes the follower and Renemil Belok is there. The client's «Hay un tofu en tu casa» (22155) and its «ocúpate primero de la perla de leche dorada» (18531) belong to an older order where the pearl came first; the quest's start criterion ((Qa=1523&Qo>8635)|Qf=1523) opens the tofu right after the summary, so they are left out."
+      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896). «Draconanthropie» ends with Prysmaradoth's talisman around the character's neck (16890, «te pone el colgante»): 20143 gives it, and «Destination finale» -- whose victory it is the key to (16954) -- gives it again on starting to one who finished the ritual without it. «Le livre des Taures» (Dofus pour les noobs): «Parlez à Mériana du Dofus Pourpre» (21759) from level 90 once «La magicienne des marécages» is done; the Minotoror guards it and a taur sorcerer's grimoire is needed (18152), there are copies in the great libraries (18153). Back from Astrub, «Mencionar al Maestro Cuerbok» (21837) sends the character to Cania and asks for one of his bones (18222). With the book and the bone (21843, 21842) she enchants the bone and hands it over (18224, «Guardar el hueso encantado», which ends the quest), and «Me voy a la Isla del Minotauroro» (21840) starts «Toro de rodeo». Whoever left before that is handed the bone again by «Estoy listo para ir al Laberinto del Minotauroro» (21844, 18226). For «El tesoro de Totankama» (Dofus pour les noobs, «Le trésor de Totankama»): «Résumez alors à Mériana votre rencontre avec le Minotot» (21915, 18295, «Seguir escuchando» 21914, 18296, «Cuéntame más sobre estos objetos» 21913, 18297: Kerubim for the ring) and «Ir en busca de los objetos» (21916) is 8635. «Montrez alors les trois types de ressources à Mériana» (21918): all three lead to «Podemos comenzar» (18298), fewer to «necesito todos los objetos» (18299) and mark what was shown (8666, 8668; the dust, 8667, asks for five doses). «Mériana procède alors à un rituel étrange et vous donne ensuite une sac dans lequel elle à enfermé vos objets»: «Estoy listo para el ritual» (21921), the bag (18300, «Esperar unos instantes» 21920, 18301) and «Seguir sus instrucciones» (21919) takes the pearl, the five doses and the ring (and marks the bag as had); asked again before burying it she repeats it (82818, 60267, 82817). For «Cómo perder la pluma» (Dofus pour les noobs, «Comment perdre ses plumes»): «Parlez à Mériana pour lui dire qu'un tofu c'est introduit dans sa cabane» (22162, 18532), the ritual in the Book of the Taurs (22161, 18533, 22160, 18534, 22159, 18535: three eggs), «¿Sabes dónde puedo encontrarlos?» (22157, 18536, Félix Rodrifuente in Cania) and «Voy a Cania» (22156) takes the quest; «Me ocuparé de él más tarde... o jamás» (22158) leaves it. Back with the eggs (22188): without all three she waits (18555, 22183); with them «Están los tres»... she counts them, the pan (22186 hands the three eggs over, 8695-8697), the omelette (18557, «Reprimir un grito de sorpresa» 22185) and the pan on the tofu's head (18558): «Escuchar una especie de trueno» (22184) takes the follower and Renemil Belok is there. The client's «Hay un tofu en tu casa» (22155) and its «ocúpate primero de la perla de leche dorada» (18531) belong to an older order where the pearl came first; the quest's start criterion ((Qa=1523&Qo>8635)|Qf=1523) opens the tofu right after the summary, so they are left out. «A la leche caliente, batir de repente»: once the royal multicoloured blop is beaten (8676) she is making a magic bag (18317); «Voy a necesitar el caldero para la perla de leche» (21942, 18318: Gorco will help, the cauldron must be at the right heat) and «Voy a ver a Gorco» (21941) is 8677 (Dofus pour les noobs: «Rapportez alors la ressource à Mériana... Demandez alors à Mériana un Chaudron magique»); «Siento haberte molestado» (21943) leaves."
     },
     {
       "npc": 2256,
@@ -38848,41 +38864,6 @@
       "why": "The bounty hunter of Amakna's militia (Dofus pour les noobs, «Les bandits de Cania»): «Rendez-vous dans la milice du château d'Amakna en [5,-6] où vous rencontrerez un Chasseur de primes qui vous proposera de vous donner 1 x Primaton, pour chaque recherchés de niveau inférieur ou égal à 120 que vous aurez capturé « Se déclarer intéressé »» -- «Vous ne pouvez obtenir que 9 primatons maximum»; past nine he is only impressed (the second line of each criminal). One primaton per criminal (a mark each), until the bandits are found (1469 over). His 32 criminals are the 32 of the guide's list, matched to their wanted quests by name; each reply's line is the one of the same rank among his messages (Sam Sagaz's gardener and ring, Ogivol, Brumen and so on name themselves). The copies of the map of Cania are bought from him for three primatons («Chaque fragment de la carte coûte 3 x Primaton», content/npcs/shops.json); a scale shown is traded for a copy and a scale fragment for a primaton, the copies for one another, and after «Draconanthropie» each spare primaton for a box of fragments. INFERRED: which line answers which reply where the texts leave it open, and where he stands."
     },
     {
-      "npc": 2240,
-      "map": 122421248,
-      "opening": 16734,
-      "lines": [
-        {
-          "message": 16734,
-          "choices": [
-            { "reply": 20272, "next": 16992, "criterion": "PO=14993|PO=14994|PO=14995" },
-            { "reply": 19931 }
-          ]
-        },
-        {
-          "message": 16992,
-          "choices": [
-            { "reply": 20269, "next": 16993, "takes": 14993, "gives": 14996, "givesCount": 3 },
-            { "reply": 20270, "next": 16994, "takes": 14994, "gives": 14997, "givesCount": 3 },
-            { "reply": 20271, "next": 16995, "takes": 14995, "gives": 14998, "givesCount": 3 }
-          ]
-        },
-        {
-          "message": 16993,
-          "choices": []
-        },
-        {
-          "message": 16994,
-          "choices": []
-        },
-        {
-          "message": 16995,
-          "choices": []
-        }
-      ],
-      "why": "Flado, the goblin of Meriana's cabin: «Tú tener demasiadas escamas inútiles. Yo conocer la forma de romperlas» -- a scale of Prysmaradoth broken into fragments (bitten, stamped on, squeezed), which the bounty hunter takes for a primaton each, so that one who has finished the quest can help another without the fight («il est possible d'éviter l'affrontement en récupérant des fragments d'écailles», Dofus pour les noobs). INFERRED: three fragments a scale, the hunter giving a copy for a scale and a copy costing three primatons; where he stands."
-    },
-    {
       "npc": 890,
       "map": 153357316,
       "opening": 3849,
@@ -39364,7 +39345,8 @@
         {
           "message": 3201,
           "choices": [
-            { "reply": 21855, "next": 18233, "quest": 1522, "beforeObjective": 8658 }
+            { "reply": 21855, "next": 18233, "quest": 1522, "beforeObjective": 8658 },
+            { "reply": 22060, "next": 18584, "quest": 1523, "afterObjective": 8671, "beforeObjective": 8672, "criterion": "PO=15400" }
           ]
         },
         {
@@ -39378,9 +39360,15 @@
           "choices": [
             { "reply": 21853, "quest": 1522, "completes": 8658, "params": [[30, 8658]] }
           ]
+        },
+        {
+          "message": 18584,
+          "choices": [
+            { "reply": 21879, "teleport": 136317698 }
+          ]
         }
       ],
-      "why": "«Taures et détours» (Dofus pour les noobs): «Parlez à Lorkos et dites lui que vous venez ici pour le Dofus Pourpre» (21855); he likes the nerve (18233) and sends the character to someone in the Sanctuary of a Hundred Detours (18234: the great flask by the labyrinth's entrance); «Seguiré tu consejo» (21853) is objective 8658. His other replies are the old labyrinth's tile guide, left out."
+      "why": "«Taures et détours» (Dofus pour les noobs): «Parlez à Lorkos et dites lui que vous venez ici pour le Dofus Pourpre» (21855); he likes the nerve (18233) and sends the character to someone in the Sanctuary of a Hundred Detours (18234: the great flask by the labyrinth's entrance); «Seguiré tu consejo» (21853) is objective 8658. His other replies are the old labyrinth's tile guide, left out. With the mask of Totankama (8671 done, 8672 not), «Llévame ante el Minotot» (22060): «¡Veo que te las has apañado bien! Te llevaré discretamente hasta la antecámara, ¡sígueme!» (18584) and «Seguir a Lorkos» (21879) takes the character to the antechamber where the Minotot waits (136317698); Dofus pour les noobs: «Parlez à Lorkos pour accéder à la salle où se trouve le Minotot»."
     },
     {
       "npc": 783,
@@ -39390,7 +39378,8 @@
         {
           "message": 3201,
           "choices": [
-            { "reply": 21858, "next": 18235, "quest": 1522, "beforeObjective": 8658 }
+            { "reply": 21858, "next": 18235, "quest": 1522, "beforeObjective": 8658 },
+            { "reply": 22061, "next": 18585, "quest": 1523, "afterObjective": 8671, "beforeObjective": 8672, "criterion": "PO=15400" }
           ]
         },
         {
@@ -39404,9 +39393,15 @@
           "choices": [
             { "reply": 21856, "quest": 1522, "completes": 8658, "params": [[30, 8658]] }
           ]
+        },
+        {
+          "message": 18585,
+          "choices": [
+            { "reply": 21879, "teleport": 136317698 }
+          ]
         }
       ],
-      "why": "Lorkos at the labyrinth's Entrance, where «Taures et détours» sends the character back once Apísafe is seen (objective 8661, «Vuelve a ver a Lorkos en la entrada del laberinto»; Dofus pour les noobs: «Retournez voir maintenant Lorkos dans l'entrée du Labyrinthe»), a talk binding in objectives.json. Whoever meets him here first gets the client's second copy of the island's exchange (21858, 18235, 21857, 18236, 21856), which also does 8658."
+      "why": "Lorkos at the labyrinth's Entrance, where «Taures et détours» sends the character back once Apísafe is seen (objective 8661, «Vuelve a ver a Lorkos en la entrada del laberinto»; Dofus pour les noobs: «Retournez voir maintenant Lorkos dans l'entrée du Labyrinthe»), a talk binding in objectives.json. Whoever meets him here first gets the client's second copy of the island's exchange (21858, 18235, 21857, 18236, 21856), which also does 8658. With the mask of Totankama (8671 done, 8672 not), «Llévame ante el Minotot» (22061): «¡Veo que te las has apañado bien! Te llevaré discretamente hasta la antecámara, ¡sígueme!» (18585) and «Seguir a Lorkos» (21879) takes the character to the antechamber where the Minotot waits (136317698); Dofus pour les noobs: «Parlez à Lorkos pour accéder à la salle où se trouve le Minotot»."
     },
     {
       "npc": 2464,
@@ -39417,7 +39412,8 @@
           "message": 18237,
           "choices": [
             { "reply": 21862, "next": 18238, "quest": 1522, "beforeObjective": 8660 },
-            { "reply": 21860, "next": 18242, "criterion": "Qf=1522" }
+            { "reply": 21860, "next": 18242, "criterion": "Qf=1522" },
+            { "reply": 21929, "next": 18304, "beforeQuest": 1524 }
           ]
         },
         {
@@ -39443,9 +39439,27 @@
           "choices": [
             { "reply": 21859 }
           ]
+        },
+        {
+          "message": 18304,
+          "choices": [
+            { "reply": 21928, "next": 18305 }
+          ]
+        },
+        {
+          "message": 18305,
+          "choices": [
+            { "reply": 21927, "next": 18306 }
+          ]
+        },
+        {
+          "message": 18306,
+          "choices": [
+            { "reply": 21926, "startsQuest": 1524, "params": [[34, 1524]] }
+          ]
         }
       ],
-      "why": "«Taures et détours» (Dofus pour les noobs): «Parlez alors à Apisaphé pour en apprendre davantage à son sujet»: who she is (21862, 18238), the Crimson Dofus (21861): she hands over her potion (18239, item 15413, objective 8660: the potion's own criterion asks for Qo>8660), and her recipe (21864, 18240; the hidden alchemist recipe opens with the same criterion). Once the quest is done «¿Cuál es la receta de tu pócima?» (21860, 18242) is the client's other copy of the recipe."
+      "why": "«Taures et détours» (Dofus pour les noobs): «Parlez alors à Apisaphé pour en apprendre davantage à son sujet»: who she is (21862, 18238), the Crimson Dofus (21861): she hands over her potion (18239, item 15413, objective 8660: the potion's own criterion asks for Qo>8660), and her recipe (21864, 18240; the hidden alchemist recipe opens with the same criterion). Once the quest is done «¿Cuál es la receta de tu pócima?» (21860, 18242) is the client's other copy of the recipe. «A la leche caliente, batir de repente» (Dofus pour les noobs: «Parlez alors à Apisaphé pour savoir ou vous pouvez trouver du lait doré. Dites alors à Apisaphé que ce que vous souhaitez c'est une perle de lait»): «¿Sabes dónde puedo encontrar leche dorada?» (21929, 18304: the drink she serves the wounded), «En realidad, lo que busco es una perla de leche dorada» (21928, 18305: it needs a magic cauldron), «Yo conozco a alguien que tiene un caldero así» (21927, 18306: the golden milk in the bucket behind her, and a bit of royal multicoloured blop) and «Gracias por tu ayuda» (21926) hands the quest over; its own criterion (Qa=1523&Qo>8635) decides who is offered the first reply."
     },
     {
       "npc": 2482,
@@ -39730,6 +39744,324 @@
         }
       ],
       "why": "Renemil Belok in Meriana's cabin once the omelette has broken the curse (8695-8697; Dofus pour les noobs: «Le tofu se transforme en Éner Brelloq, parlez lui alors pour savoir qui il est»): his thanks (18559), «Cuéntame cosas sobre ti» (82195, 59918: a treasure hunter the Minotot turned into a tofu), «Mencionar la máscara de Totankama» (82193, 59919: the tablet's pieces for archaeological treasures; «Évoquer le masque de Totankama»), «¿Dónde puedo encontrar ese tipo de objetos?» (82189, 59921: the Cofre de los Tesoros, where he is going; «Demander où dénicher de tels objets») and then «Te deseo buena suerte aunque hayas perdido las plumas» (82192, 59922: he settles in the Cégita house, «Bueno, ¡hasta luego!» 82194) or «Tomo nota de la información, adiós» (82190) is 8698. The client's older lines (18560, 18561, 22189-22192) trade the pieces for desert roses and are left out; 59920 is his line at the Cofre."
+    },
+    {
+      "npc": 2487,
+      "map": 128453121,
+      "opening": 59918,
+      "lines": [
+        {
+          "message": 59918,
+          "choices": [
+            { "reply": 82193, "next": 59919 },
+            { "reply": 82187 }
+          ]
+        },
+        {
+          "message": 59919,
+          "choices": [
+            { "reply": 82189, "next": 59920 },
+            { "reply": 82187 }
+          ]
+        },
+        {
+          "message": 59920,
+          "choices": [
+            { "reply": 82190 }
+          ]
+        }
+      ],
+      "why": "Renemil Belok at the Cofre de los Tesoros: who he is (59918), «Mencionar la máscara de Totankama» (82193, 59919: the tablet's pieces for archaeological treasures), «¿Dónde puedo encontrar ese tipo de objetos?» (82189, 59920: «¡Estás en el Cofre de los Tesoros!... Dirígete a Dhain», and the dungeon guardians) and «Tomo nota de la información, adiós» (82190); «Marcharte» (82187) leaves. His shop (action 11) sells the pieces (content/npcs/shops.json)."
+    },
+    {
+      "npc": 2482,
+      "map": 136317698,
+      "opening": 18273,
+      "lines": [
+        {
+          "message": 18273,
+          "choices": [
+            { "reply": 21925, "next": 18303, "quest": 1523, "afterObjective": 8671, "beforeObjective": 8672, "criterion": "PO=15400" },
+            { "reply": 22120, "quest": 1523, "afterObjective": 8672, "teleport": 136316416 }
+          ]
+        },
+        {
+          "message": 18303,
+          "names": true,
+          "choices": [
+            { "reply": 21924, "quest": 1523, "completes": 8672, "params": [[30, 8672]], "takes": 15400, "teleport": 136316416 }
+          ]
+        }
+      ],
+      "why": "The Minotot in the antechamber, for «El tesoro de Totankama»: «Mira, la máscara de Totankama» (21925) with the mask, «¡La máscara esculpida por mi ilustre ancestro!... te llevaré a la sala secreta que guarda el huevo del dragón de fuego» (18303) and «Toma la máscara» (21924) hands it over (8672) and takes the character to the Dofus room (136316416, 8699); Dofus pour les noobs: «Montrez alors le Masque au Minotot et confiez-le lui afin qu'il vous mène au Dofus Pourpre». «Quiero volver a la sala del dofus Púrpura» (22120) takes one back there until the quest is over."
+    },
+    {
+      "npc": 2348,
+      "map": 128452097,
+      "opening": 17513,
+      "lines": [
+        {
+          "message": 17513,
+          "choices": [
+            { "reply": 21923, "next": 18302, "quest": 1523, "afterObjective": 8635, "beforeObjective": 8670, "criterion": "PO=15391" },
+            { "reply": 20976, "next": 17514 },
+            { "reply": 20977 }
+          ]
+        },
+        {
+          "message": 18302,
+          "choices": [
+            { "reply": 21922, "quest": 1523, "completes": 8670, "params": [[30, 8670]] }
+          ]
+        },
+        {
+          "message": 17514,
+          "choices": [
+            { "reply": 20975 }
+          ]
+        }
+      ],
+      "why": "Papolvo (Tatine): her greeting (17513), «¿Cuál es tu papel en la familia Terra?» (20976, 17514, «Despedirte antes de irte» 20975) and «Despedirte antes de irte» (20977). For «El tesoro de Totankama», «Enseñarle la tabla de Totankama» (21923) with the tablet carried: «Si descifras las indicaciones grabadas en esta tabla...» (18302) and «Irte» (21922) is 8670; Dofus pour les noobs: «Une fois la tablette assemblée, il vous faut la montrer à Tatine». Her other lines (Vardo, the statuettes of Sumens, Araknas's stones, the temporal assimilator) belong to other quests."
+    },
+    {
+      "npc": 1034,
+      "map": 166985728,
+      "opening": 5402,
+      "openings": [
+        { "quest": 1524, "objective": 8673, "pending": 8674, "message": 18307 }
+      ],
+      "lines": [
+        {
+          "message": 5402,
+          "choices": [
+            { "reply": 6623, "door": "keyring" },
+            { "reply": 4531, "door": "key" }
+          ]
+        },
+        {
+          "message": 18307,
+          "choices": [
+            { "reply": 21930, "quest": 1524, "afterObjective": 8673, "beforeObjective": 8674 }
+          ]
+        }
+      ],
+      "why": "Bibiblop at the Blop dungeon's door: his song and the door (5402; the keyring 6623 and the key 4531, the two the guardian offers by himself). For «A la leche caliente, batir de repente», once he has been seen (8673) and until the tymadores are beaten (8674), the same song ends on «Ah, creo que te están esperando...» (18307) and «Defenderte contra el ataque inminente» (21930) is the ambush (npc_fights.json; Dofus pour les noobs: «Parlez alors à Bibiblop et soudain vous subirez une agression gratuite de 4 roublards»)."
+    },
+    {
+      "npc": 2466,
+      "map": 166985728,
+      "opening": 18315,
+      "lines": [
+        {
+          "message": 18315,
+          "choices": [
+            { "reply": 21940, "next": 18316, "quest": 1524, "afterObjective": 8674, "beforeObjective": 8675 },
+            { "reply": 21938, "quest": 1524, "completes": 8675, "params": [[30, 8675]], "afterObjective": 8674 }
+          ]
+        },
+        {
+          "message": 18316,
+          "choices": [
+            { "reply": 21939, "quest": 1524, "completes": 8675, "params": [[30, 8675]] }
+          ]
+        }
+      ],
+      "why": "Gavroch at the Blop dungeon's door once the tymadores are beaten (8674): «¡Cuatro contra uno es hacer trampas!» (18315); «¿Qué haces aquí, tan lejos del laberinto?» (21940, 18316: he is exploring the World of Twelve and hitting blops) and «Buena suerte y gracias de nuevo. Adiós» (21939), or straight away «Gracias por tu ayuda» (21938), is 8675 (Dofus pour les noobs: «Remerciez alors Gavroch de vous avoir aidé... Gavroch vous apprend qu'il visite le continent et qu'il aime frapper les blops»)."
+    },
+    {
+      "npc": 2240,
+      "map": 134403,
+      "opening": 16734,
+      "lines": [
+        {
+          "message": 16734,
+          "choices": [
+            { "reply": 20272, "next": 16992, "criterion": "PO=14993|PO=14994|PO=14995" },
+            { "reply": 19931 },
+            { "reply": 21959, "next": 18335, "quest": 1524, "afterObjective": 8677, "beforeObjective": 8678, "criterion": "PO!15599" }
+          ]
+        },
+        {
+          "message": 16992,
+          "choices": [
+            { "reply": 20269, "next": 16993, "takes": 14993, "gives": 14996, "givesCount": 3 },
+            { "reply": 20270, "next": 16994, "takes": 14994, "gives": 14997, "givesCount": 3 },
+            { "reply": 20271, "next": 16995, "takes": 14995, "gives": 14998, "givesCount": 3 }
+          ]
+        },
+        {
+          "message": 16993,
+          "choices": []
+        },
+        {
+          "message": 16994,
+          "choices": []
+        },
+        {
+          "message": 16995,
+          "choices": []
+        },
+        {
+          "message": 18335,
+          "choices": [
+            { "reply": 21958, "gives": 15599 }
+          ]
+        }
+      ],
+      "why": "Flado, the goblin of Meriana's cabin: «Tú tener demasiadas escamas inútiles. Yo conocer la forma de romperlas» -- a scale of Prysmaradoth broken into fragments (bitten, stamped on, squeezed), which the bounty hunter takes for a primaton each, so that one who has finished the quest can help another without the fight («il est possible d'éviter l'affrontement en récupérant des fragments d'écailles», Dofus pour les noobs). INFERRED: three fragments a scale, the hunter giving a copy for a scale and a copy costing three primatons; where he stands. Outside Meriana's cabin (Dofus pour les noobs, «Il faut battre le lait quand il est chaud»: «Sortez de la cabane et parlez à Arlo pour lui demander de l'etork», Arlo being Flado; Gorco's 18337 «Tú hablar con Flado, él dar a ti»): «Necesito acac» (21959) once Meriana has lent the cauldron (8677), «¿Tú querer practicar magia goblin?» (18335) and «Agarrar la acac de goblin» (21958) gives the acac de gob (15599)."
+    },
+    {
+      "npc": 2239,
+      "map": 122421248,
+      "opening": 16733,
+      "sulkLine": 18345,
+      "lines": [
+        {
+          "message": 16733,
+          "choices": [
+            { "reply": 21962, "next": 18336, "quest": 1524, "afterObjective": 8677, "beforeObjective": 8678, "criterion": "PO=15593&PO=15421" },
+            { "reply": 19930 }
+          ]
+        },
+        {
+          "message": 18336,
+          "choices": [
+            { "reply": 21961, "next": 18337, "criterion": "PO!15599" },
+            { "reply": 21981, "next": 18349, "criterion": "PO=15599" }
+          ]
+        },
+        {
+          "message": 18337,
+          "choices": [
+            { "reply": 21960 }
+          ]
+        },
+        {
+          "message": 18349,
+          "choices": [
+            { "reply": 21980, "next": 18350 }
+          ]
+        },
+        {
+          "message": 18350,
+          "choices": [
+            { "reply": 21976, "next": 18351, "sulks": 10 },
+            { "reply": 21979, "next": 18352 }
+          ]
+        },
+        {
+          "message": 18351,
+          "choices": []
+        },
+        {
+          "message": 18352,
+          "choices": [
+            { "reply": 21978, "next": 18353, "sulks": 10 },
+            { "reply": 21977, "next": 18355 }
+          ]
+        },
+        {
+          "message": 18353,
+          "choices": []
+        },
+        {
+          "message": 18355,
+          "choices": [
+            { "reply": 21988, "next": 18357 },
+            { "reply": 21984, "next": 18356, "sulks": 10 }
+          ]
+        },
+        {
+          "message": 18356,
+          "choices": []
+        },
+        {
+          "message": 18357,
+          "choices": [
+            { "reply": 21987, "next": 18358 }
+          ]
+        },
+        {
+          "message": 18358,
+          "choices": [
+            { "reply": 21986, "next": 18359 },
+            { "reply": 21990, "next": 18361, "sulks": 10 }
+          ]
+        },
+        {
+          "message": 18361,
+          "choices": []
+        },
+        {
+          "message": 18359,
+          "choices": [
+            { "reply": 21985, "quest": 1524, "completes": 8678, "params": [[30, 8678]], "takesAll": [15593, 15421, 15599], "gives": 15418 }
+          ]
+        }
+      ],
+      "why": "Gorco, Meriana's goblin, at her cauldron (Dofus pour les noobs, «Il faut battre le lait quand il est chaud»: «Lired présent dans la cabane cette fois-ci et demandez lui de vous aider à cristalliser la perle. Donnez lui l'etork pour garder la température du feu du chaudron convenable et suivez ses conseils», Lired being Gorco). «Te necesito para cristalizar una perla en el caldero» (21962) once Meriana has lent it (8677) and with the golden milk and the blop's bit, «¿Tú tener los ingredientes?» (18336): without the acac «Aquí traigo la leche dorada y el cacho de blop» (21961) sends to Flado (18337, «Me voy a ver a Flado» 21960), with it «Aquí tienes la acac de goblin» (21981) hands the dented ladle over (18349, «Estoy listo» 21980). He blows on the embers: wait twice («Esperar», 21979, 21977) while the fire is not hot enough (18350, 18352) and plunge the ladle once he goes red as the embers (18355, 21988); shake it when told (18357, 21987), knock it against the cauldron (18358, 21986) and «Quitar la tapadera del cazo abollado» (18359, 21985) takes the three ingredients and gives the golden milk pearl (15418): 8678. Plunging too early (21976, 21978: 18351, 18353), waiting past his signal (21984: 18356) or hitting him with the ladle (21990: 18361) and he sulks: «Si vous vous trompez dans les choix de réponse, il faudra attendre 10 minutes environ pour lui reparler», his «¡Yo no hablar a ti!» (18345) meanwhile. The ingredients stay in the bag until the pearl is made."
+    },
+    {
+      "npc": 1034,
+      "map": 166990848,
+      "opening": 5403,
+      "lines": [
+        {
+          "message": 5403,
+          "choices": [
+            { "reply": 4532, "next": 13779 },
+            { "reply": 4534, "next": 13781 },
+            { "reply": 4533, "next": 13778 },
+            { "reply": 4535, "next": 13780 },
+            { "reply": 15937 }
+          ]
+        },
+        {
+          "message": 13779,
+          "choices": [
+            { "reply": 20292, "teleport": 166988802 },
+            { "reply": 20293 }
+          ]
+        },
+        {
+          "message": 13781,
+          "choices": [
+            { "reply": 20292, "teleport": 166985730 },
+            { "reply": 20293 }
+          ]
+        },
+        {
+          "message": 13778,
+          "choices": [
+            { "reply": 20292, "teleport": 166986754 },
+            { "reply": 20293 }
+          ]
+        },
+        {
+          "message": 13780,
+          "choices": [
+            { "reply": 20292, "teleport": 166987778 },
+            { "reply": 20293 }
+          ]
+        }
+      ],
+      "why": "Bibiblop in the Blop enclave's hall, after the fourth room: his song and «¿a qué sala quieres ir?» (5403), a room for each Royal Blop (4532 to 4535), each asked again («¿Seguro que quieres enfrentarte a...?», 13778 to 13781) before it takes the character there; Dofus pour les noobs, «Clos des Blops»: «Après la quatrième salle, vous pouvez choisir le Boss que vous voulez affronter parmi les 4 Blops Royaux. Une fois le Blop Royal choisi vaincu, vous pouvez décider de combattre le Blop Multicolore ou de quitter le donjon». «Tomarte un tiempo para reflexionar» (15937) waits. INFERRED: the «Sí»/«No» pair (20292/20293) of the two the client has."
+    },
+    {
+      "npc": 1034,
+      "map": 166989826,
+      "opening": 5410,
+      "lines": [
+        {
+          "message": 5410,
+          "choices": [
+            { "reply": 6623, "door": "keyring" },
+            { "reply": 4531, "door": "key" },
+            { "reply": 15937 }
+          ]
+        }
+      ],
+      "why": "Bibiblop in the Blop enclave's exit room, after the Royal Blop: «¿qué quieres hacer, salir de la mazmorra? Si tienes la llave del Antro del Blop Multicolor Real, te puedo llevar» (5410), the keyring (6623) or the key (4531) into the lair (dungeon 49, whose door is here); «Tomarte un tiempo para reflexionar» (15937) waits, and the map panel leaves."
     }
   ]
 }

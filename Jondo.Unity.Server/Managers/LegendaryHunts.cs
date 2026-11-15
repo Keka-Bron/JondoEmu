@@ -46,6 +46,34 @@ namespace Jondo.Unity.Server.Managers
             return null;
         }
 
+        /// <summary>
+        /// The quest a hunt's map can be studied for only while it is under way, by the map item.
+        /// </summary>
+        /// <remarks>
+        /// The maps' own descriptions say so: the «Tabla de Totankama» (15391), «Debes tener la misión
+        /// «El tesoro de Totankama» activada para poder estudiar la tabla» (1523), and the map of the
+        /// bandits of Cania (23743), «Debes tener la misión «Los bandidos de Cania» en curso para poder
+        /// estudiar el mapa» (1469). No other legendary map carries such a line.
+        ///
+        /// The tablet asks besides for the curse warded off and the tablet shown to Papolvo (8669,
+        /// 8670): «il vous faudra vous prémunir de la malédiction avant de vous lancer dans cette
+        /// chasse» (Dofus pour les noobs). The hunt spends the tablet, and showing it to Papolvo
+        /// needs it in the bag: set out on earlier, the quest would be left asking for a tablet
+        /// that is gone.
+        /// </remarks>
+        private static readonly Dictionary<int, (int Quest, int[] Objectives)> QuestByMapItem = new()
+        {
+            [15391] = (1523, new[] { 8669, 8670 }),
+            [23743] = (1469, Array.Empty<int>()),
+        };
+
+        /// <summary>The quest that must be under way to set out on this hunt, or 0.</summary>
+        public static int QuestOf(Definition hunt) => QuestByMapItem.TryGetValue(hunt.MapItem, out var asked) ? asked.Quest : 0;
+
+        /// <summary>The objectives of that quest that must be done before setting out on this hunt.</summary>
+        public static IReadOnlyList<int> ObjectivesBefore(Definition hunt)
+            => QuestByMapItem.TryGetValue(hunt.MapItem, out var asked) ? asked.Objectives : Array.Empty<int>();
+
         /// <summary>The company written by hand, relative to the content root.</summary>
         public const string CompanyFile = "quests/legendary_company.json";
 

@@ -396,10 +396,12 @@ namespace Jondo.Unity.Server.Managers
                     !grados.TryGetProperty("Array", out var lista)) return null;
 
                 JsonElement? elegido = null;
+                int gradeIndex = 0, position = 0;
                 foreach (var g in lista.EnumerateArray())
                 {
-                    if (Entero(g, "grade") == grado) { elegido = g; break; }
+                    if (Entero(g, "grade") == grado) { elegido = g; gradeIndex = position; break; }
                     elegido ??= g;
+                    position++;
                 }
                 if (elegido == null) return null;
                 var gr = elegido.Value;
@@ -440,7 +442,7 @@ namespace Jondo.Unity.Server.Managers
 
                 bool juega = (Entero(doc.RootElement, "m_flags") & CanPlayFlag) != 0;
                 bool tackles = (Entero(doc.RootElement, "m_flags") & MonsterFlags.CanTackle) != 0;
-                var hechizos = HechizosDe(doc.RootElement, grado);
+                var hechizos = HechizosDe(doc.RootElement, gradeIndex);
 
                 return new Summon
                 {
@@ -503,10 +505,20 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// The template's spells at the grade this summon's grade opens. "spells" is the list of
-        /// spell ids and "spellGrades" one string per spell, "s,g;s,g;..." pairs of spell grade
-        /// and monster grade. A spell with no usable pair is cast at grade 1.
+        /// spell ids and "spellGrades" one string per spell, "g,level;g,level;..." with one pair
+        /// per monster grade, in the order of "grades": the spell's grade and the monster's level
+        /// at that grade -- as <see cref="DatabaseManager"/> reads them for the monsters on the
+        /// maps. A spell whose pair says grade 0 is not had at that grade; one with no usable pair
+        /// is cast at grade 1.
         /// </summary>
-        private static IReadOnlyList<(int Spell, int Grade)> HechizosDe(JsonElement raiz, int grado)
+        /// <remarks>
+        /// The second number was read as the monster's grade, and it is its level: 52 to 60 for a
+        /// Blop, which no grade ever matched, so every summoned monster cast its spells at grade 1
+        /// -- a Blop Griotte called by a Royal Blop invoked Coco biblops (Biblopición at grade 1)
+        /// and struck in air. Where it did match, by chance, it took the last of the pairs whose
+        /// level was the grade's number.
+        /// </remarks>
+        internal static IReadOnlyList<(int Spell, int Grade)> HechizosDe(JsonElement raiz, int gradeIndex)
         {
             var salida = new List<(int, int)>();
             if (!raiz.TryGetProperty("spells", out var hechizos) ||
@@ -525,14 +537,12 @@ namespace Jondo.Unity.Server.Managers
                 int gradoDelHechizo = 1;
                 if (i < grados.Count)
                 {
-                    foreach (string par in grados[i].Split(';'))
+                    var pares = grados[i].Split(';', StringSplitOptions.RemoveEmptyEntries);
+                    if (pares.Length > 0 &&
+                        int.TryParse(pares[Math.Clamp(gradeIndex, 0, pares.Length - 1)].Split(',')[0], out int sg))
                     {
-                        var partes = par.Split(',');
-                        if (partes.Length == 2 && int.TryParse(partes[0], out int sg) &&
-                            int.TryParse(partes[1], out int mg) && mg == grado)
-                        {
-                            gradoDelHechizo = Math.Max(1, sg);
-                        }
+                        if (sg <= 0) { i++; continue; }
+                        gradoDelHechizo = sg;
                     }
                 }
                 salida.Add((hechizo, gradoDelHechizo));

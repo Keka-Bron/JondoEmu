@@ -118,7 +118,10 @@ namespace Jondo.Unity.Server.Managers
             /// </summary>
             public Dictionary<long, List<int>> WrittenRoster { get; } = new();
 
-            /// <summary>Whether its boss is fought alone in his room (<see cref="BossFightsAlone"/>).</summary>
+            /// <summary>
+            /// Whether its bosses are fought alone in their room (<see cref="BossFightsAlone"/>, or
+            /// «bossAlone» in content/world/dungeons.json), and all of them by whoever comes in.
+            /// </summary>
             public bool BossAlone { get; set; }
         }
 
@@ -765,7 +768,7 @@ namespace Jondo.Unity.Server.Managers
                         ExitMapId = Long(entry.Value, "exit"),
                         Authored = authored,
                         KeepsADoor = authored && Number(entry.Value, "door") != 0,
-                        BossAlone = BossFightsAlone.Contains(id),
+                        BossAlone = BossFightsAlone.Contains(id) || (authored && Number(entry.Value, "bossAlone") != 0),
                     };
 
                     if (entry.Value.TryGetProperty("rooms", out var rooms))

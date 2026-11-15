@@ -219,6 +219,51 @@
         2835
       ],
       "why": "The Minotoror's labyrinth: after the Minotoror the winners are in the antechamber, where «Taures et détours» has them cast the spell at the stone throne («Rendez-vous dans l'antichambre et cliquez sur le trône de pierre», Dofus pour les noobs) and Lorkos congratulates them (3210); his «Salir» (2835) leaves. INFERRED cell, open floor before Lorkos (343)."
+    },
+    {
+      "dungeon": 11,
+      "bossRoom": 166989824,
+      "room": 166990848,
+      "cell": 315,
+      "npc": 1034,
+      "replies": [],
+      "why": "The Blop enclave: after the fourth room the players are in Bibiblop's hall, where he lets them choose the Royal Blop («Une fois la salle 4 terminée vous pouvez choisir la couleur du Blop Royal que vous souhaitez affronter en parlant à Bibiblop», Dofus pour les noobs); the map panel leaves. INFERRED cell, open floor near Bibiblop (343)."
+    },
+    {
+      "dungeon": 9003,
+      "bossRoom": 166988802,
+      "room": 166989826,
+      "cell": 255,
+      "npc": 1034,
+      "replies": [],
+      "why": "After the Blop Coco Real, the enclave's exit room, where Bibiblop takes the key holders into the Royal Rainbow Blop's lair («Une fois le boss vaincu, vous pouvez choisir de combattre le Blop Multicolore... ou de simplement sortir en parlant de nouveau à Bibiblop», Dofus pour les noobs); the map panel leaves. INFERRED cell, open floor near Bibiblop (227)."
+    },
+    {
+      "dungeon": 9004,
+      "bossRoom": 166985730,
+      "room": 166989826,
+      "cell": 255,
+      "npc": 1034,
+      "replies": [],
+      "why": "After the Blop Índigo Real, the enclave's exit room, where Bibiblop takes the key holders into the Royal Rainbow Blop's lair («Une fois le boss vaincu, vous pouvez choisir de combattre le Blop Multicolore... ou de simplement sortir en parlant de nouveau à Bibiblop», Dofus pour les noobs); the map panel leaves. INFERRED cell, open floor near Bibiblop (227)."
+    },
+    {
+      "dungeon": 9005,
+      "bossRoom": 166986754,
+      "room": 166989826,
+      "cell": 255,
+      "npc": 1034,
+      "replies": [],
+      "why": "After the Blop Guinda Real, the enclave's exit room, where Bibiblop takes the key holders into the Royal Rainbow Blop's lair («Une fois le boss vaincu, vous pouvez choisir de combattre le Blop Multicolore... ou de simplement sortir en parlant de nouveau à Bibiblop», Dofus pour les noobs); the map panel leaves. INFERRED cell, open floor near Bibiblop (227)."
+    },
+    {
+      "dungeon": 9006,
+      "bossRoom": 166987778,
+      "room": 166989826,
+      "cell": 255,
+      "npc": 1034,
+      "replies": [],
+      "why": "After the Blop Reineta Real, the enclave's exit room, where Bibiblop takes the key holders into the Royal Rainbow Blop's lair («Une fois le boss vaincu, vous pouvez choisir de combattre le Blop Multicolore... ou de simplement sortir en parlant de nouveau à Bibiblop», Dofus pour les noobs); the map panel leaves. INFERRED cell, open floor near Bibiblop (227)."
     }
   ]
 }

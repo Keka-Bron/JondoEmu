@@ -327,6 +327,7 @@ namespace Jondo.Unity.Server.Network
             Managers.LootBoxes.Forget();
             Managers.LegendaryHunts.ForgetCompany();
             Managers.TokenShops.Initialize();
+            Managers.NpcShops.Initialize();
             Managers.DungeonExitRooms.Forget();
             Managers.FightWinAlterations.Forget();
             Managers.MonsterSummonCaps.Reload();

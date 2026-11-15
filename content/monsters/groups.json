@@ -51,7 +51,12 @@
     "and its copy 34476294 (subarea 210) hold the Minotoror (121) and the Minotot (827), the two",
     "dungeon bosses, and go. The antechamber is the room after the Minotoror and the Minotot's door;",
     "Lorkos and the great flask stand in the Entrance. The labyrinth's monsters live in its",
-    "twenty-five rooms (subarea 319)."
+    "twenty-five rooms (subarea 319).",
+    "",
+    "THE BLOP ENCLAVE. Bibiblop's hall 166990848, where the Royal Blop is chosen after the fourth room,",
+    "and the exit room 166989826, where he takes whoever holds its key into the Royal Rainbow Blop's lair,",
+    "hold no fight (Dofus pour les noobs, «Clos des Blops»): the base's groups there, the subarea's roster",
+    "with Royal Blops among them, go. The rooms' own groups are the dungeons' (content/world/dungeons.json)."
   ],
   "groups": [
     {
@@ -793,6 +798,31 @@
     {
       "map": 34476294,
       "group": -1002237,
+      "remove": true
+    },
+    {
+      "map": 166990848,
+      "group": -1024289,
+      "remove": true
+    },
+    {
+      "map": 166990848,
+      "group": -1024290,
+      "remove": true
+    },
+    {
+      "map": 166989826,
+      "group": -1024283,
+      "remove": true
+    },
+    {
+      "map": 166989826,
+      "group": -1024284,
+      "remove": true
+    },
+    {
+      "map": 166989826,
+      "group": -1024285,
       "remove": true
     }
   ]

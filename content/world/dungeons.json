@@ -146,5 +146,169 @@
       ]
     },
     "why": "The Minotot's room behind Lorkos in the antechamber: «tendrás que traerme la llave de su sala» (3211), the key of the Minotot's room (8307) or the keyring. The catalogue also lists the Minotoror's key and relics, and the door spends the first of them the character holds; they open the room before. Its group is the Minotot with the same family as the Minotoror's, not the Minotoror himself. INFERRED exit, as dungeon 4's."
+  },
+  "11": {
+    "name": "Enclave de los Blops",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 1,
+    "entrance": 166985728,
+    "exit": 166985728,
+    "rooms": [
+      166986752,
+      166987776,
+      166988800,
+      166989824
+    ],
+    "bosses": [],
+    "keyring": 1,
+    "required": [
+      [
+        9248,
+        1
+      ]
+    ],
+    "autoGroup": 0,
+    "door": 1,
+    "roster": {
+      "166986752": [273, 274, 275, 276, 1181, 1182, 1183],
+      "166987776": [273, 274, 275, 276, 1181, 1182, 1183],
+      "166988800": [273, 274, 275, 276, 1181, 1182, 1183],
+      "166989824": [273, 274, 275, 276, 1181, 1182, 1183]
+    },
+    "why": "The enclave's four fight rooms (Sala 1 to 4), whose last leads to Bibiblop's hall (dungeon_exits.json), where each Royal Blop's room is chosen (dungeons 9003 to 9006): Dofus pour les noobs, «Clos des Blops»: «Après la quatrième salle, vous pouvez choisir le Boss que vous voulez affronter parmi les 4 Blops Royaux. Une fois le Blop Royal choisi vaincu, vous pouvez décider de combattre le Blop Multicolore ou de quitter le donjon». The catalogue chained its ten rooms by their names, with the hall, the exit room and the four Royal rooms after the fourth, and no Royal Blop in any of them. Its rooms are the subarea's blops without the Royal ones. Bibiblop keeps the door at the entrance (5402)."
+  },
+  "49": {
+    "name": "Antro del Blop Multicolor Real",
+    "minLevel": 110,
+    "optimalLevel": 120,
+    "difficulty": 3,
+    "entrance": 166989826,
+    "exit": 166985728,
+    "rooms": [
+      166990850
+    ],
+    "bosses": [
+      1188,
+      1184,
+      1185,
+      1186,
+      1187
+    ],
+    "bossAlone": 1,
+    "keyring": 1,
+    "required": [
+      [
+        9254,
+        1
+      ]
+    ],
+    "autoGroup": 0,
+    "door": 1,
+    "why": "The Royal Rainbow Blop's lair, entered from the enclave's exit room: «Pour rentrer dans ce donjon il faut au préalable être dans la salle de sortie du donjon Clos des Blops... Enfin, parlez à Bibiblop pour entrer» (Dofus pour les noobs, «Antre du Blop Multicolore Royal»), whose 5410 offers it to whoever holds its key (9254) or the keyring; the Royal Rainbow Blop «sera accompagné des 4 Blops Royaux». Its five are all bosses and come whole to whoever comes in, alone or not («le Blop Multicolore qui sera accompagné des 4 Blops Royaux», «Clos des Blops»): drawn from a roster of the four, the group came with two Indigo and two Coco and, alone, without the Reinette. The catalogue gave it the enclave's entrance, where the enclave's own door was always the one opened, and listed the enclave's key with its own, either of which the door spends."
+  },
+  "9003": {
+    "name": "Sala del Blop Coco Real",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 1,
+    "entrance": 166990848,
+    "exit": 166985728,
+    "rooms": [
+      166988802
+    ],
+    "bosses": [
+      1184
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "166988802": [
+        273,
+        274,
+        275,
+        276
+      ]
+    },
+    "why": "The Blop Coco Real's room of the Blop enclave, chosen at Bibiblop in the hall (dungeon 11): Dofus pour les noobs, «Clos des Blops»: «Après la quatrième salle, vous pouvez choisir le Boss que vous voulez affronter parmi les 4 Blops Royaux. Une fois le Blop Royal choisi vaincu, vous pouvez décider de combattre le Blop Multicolore ou de quitter le donjon»; with the classic blops («Les Blops classiques de leur côté...»). Its win leads to the exit room (dungeon_exits.json)."
+  },
+  "9004": {
+    "name": "Sala del Blop Índigo Real",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 1,
+    "entrance": 166990848,
+    "exit": 166985728,
+    "rooms": [
+      166985730
+    ],
+    "bosses": [
+      1186
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "166985730": [
+        273,
+        274,
+        275,
+        276
+      ]
+    },
+    "why": "The Blop Índigo Real's room of the Blop enclave, chosen at Bibiblop in the hall (dungeon 11): Dofus pour les noobs, «Clos des Blops»: «Après la quatrième salle, vous pouvez choisir le Boss que vous voulez affronter parmi les 4 Blops Royaux. Une fois le Blop Royal choisi vaincu, vous pouvez décider de combattre le Blop Multicolore ou de quitter le donjon»; with the classic blops («Les Blops classiques de leur côté...»). Its win leads to the exit room (dungeon_exits.json)."
+  },
+  "9005": {
+    "name": "Sala del Blop Guinda Real",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 1,
+    "entrance": 166990848,
+    "exit": 166985728,
+    "rooms": [
+      166986754
+    ],
+    "bosses": [
+      1185
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "166986754": [
+        273,
+        274,
+        275,
+        276
+      ]
+    },
+    "why": "The Blop Guinda Real's room of the Blop enclave, chosen at Bibiblop in the hall (dungeon 11): Dofus pour les noobs, «Clos des Blops»: «Après la quatrième salle, vous pouvez choisir le Boss que vous voulez affronter parmi les 4 Blops Royaux. Une fois le Blop Royal choisi vaincu, vous pouvez décider de combattre le Blop Multicolore ou de quitter le donjon»; with the classic blops («Les Blops classiques de leur côté...»). Its win leads to the exit room (dungeon_exits.json)."
+  },
+  "9006": {
+    "name": "Sala del Blop Reineta Real",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 1,
+    "entrance": 166990848,
+    "exit": 166985728,
+    "rooms": [
+      166987778
+    ],
+    "bosses": [
+      1187
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "166987778": [
+        273,
+        274,
+        275,
+        276
+      ]
+    },
+    "why": "The Blop Reineta Real's room of the Blop enclave, chosen at Bibiblop in the hall (dungeon 11): Dofus pour les noobs, «Clos des Blops»: «Après la quatrième salle, vous pouvez choisir le Boss que vous voulez affronter parmi les 4 Blops Royaux. Une fois le Blop Royal choisi vaincu, vous pouvez décider de combattre le Blop Multicolore ou de quitter le donjon»; with the classic blops («Les Blops classiques de leur côté...»). Its win leads to the exit room (dungeon_exits.json)."
   }
 }

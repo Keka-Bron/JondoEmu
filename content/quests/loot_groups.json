@@ -1295,6 +1295,25 @@
         }
       ],
       "why": "Caja de fragmentos de cazador (32381), the bounty hunter's box for a spare primaton: «Cette boîte vous donnera comme son nom l'indique des fragments de cartes de chasse aux trésors» (Dofus pour les noobs). INFERRED: one fragment, equally likely, of the legendary hunts that came with it (65 to 94, whose maps sit by the box's id)."
+    },
+    {
+      "id": 41,
+      "displayChances": false,
+      "items": [
+        {
+          "itemId": 15400,
+          "weight": -1.0,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": 13052,
+          "weight": -1.0,
+          "minQuantity": 540,
+          "maxQuantity": 540
+        }
+      ],
+      "why": "Cofre de Totankama (15399), the legendary hunt's chest: «A la fin du combat, vous obtenez un Coffre de Totankama qui en l'ouvrant vous révélera le Masque Maudit de Totankama et quelques roses des sables en bonus» (Dofus pour les noobs). The client's file has the other legendary chests (42 Lonyon, 43 Tortacia, 44 Dremoan, 48 Ali Grothor): each its hunt's item and sebuscalines (13052). INFERRED: 540 of them, the number of the other level 130 hunt's chest (Ali Grothor, 48)."
     }
   ]
 }

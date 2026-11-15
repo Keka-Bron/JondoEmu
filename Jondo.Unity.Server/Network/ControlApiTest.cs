@@ -83,7 +83,7 @@ namespace Jondo.Unity.Server.Network
                 "stage" => TestStage(cuerpo),
                 "spell" => TestSpell(cuerpo),
                 "refresh" => TestRefresh(cuerpo),
-                "endturn" => TestEndTurn(),
+                "endturn" => TestEndTurn(cuerpo),
                 "scenario" => TestScenario(cuerpo),
                 "scenarios" => TestScenarios(cuerpo),
                 "team" => TestTeam(cuerpo),
@@ -896,7 +896,12 @@ namespace Jondo.Unity.Server.Network
         /// the monsters play in between, and every spell they cast is judged as the player's are
         /// -- effect by effect against the board -- through FightHandler's cast watch.
         /// </summary>
-        private static Respuesta TestEndTurn()
+        /// <param name="cuerpo">
+        /// { allies: 1 } stops at the turn of an ally the character plays (Fighter.IsPlayedAlly:
+        /// Gavroch in «A la leche caliente, batir de repente») instead of handing it on unplayed,
+        /// for the harness to play it.
+        /// </param>
+        private static Respuesta TestEndTurn(string cuerpo)
         {
             var session = TestSessionOnline();
             if (session == null || session.Stream == null) return Mal(404, "offline");
@@ -904,6 +909,7 @@ namespace Jondo.Unity.Server.Network
             if (fight == null) return Mal(409, "no-fight");
             var me = fight.Buscar(session.State.CharacterId);
             if (me == null) return Mal(404, "fighter");
+            bool stopAtAllies = Numero(cuerpo, "allies") != 0;
 
             var casts = new List<object>();
             var gate = new object();
@@ -976,6 +982,13 @@ namespace Jondo.Unity.Server.Network
                     if (FightHandler.FightOf(session.State.CharacterId) != fight || !me.IsAlive) break;
                     if (fight.CurrentFighter != startedOn || fight.RoundNumber > roundBefore) leftIt = true;
                     if (leftIt && fight.CurrentFighter?.Id == me.Id) { back = true; WaitTillItBegins(fight, me); break; }
+                    if (stopAtAllies && leftIt && fight.CurrentFighter is { IsPlayedAlly: true, IsAlive: true } ally
+                        && ally.ControlledBy(me.Id))
+                    {
+                        back = true;
+                        WaitTillItBegins(fight, ally);
+                        break;
+                    }
                     // A turn this slot plays and nobody else would -- its summons', a team test's
                     // JondoBots' -- is handed on at once, as their player would, not left to its clock.
                     var current = fight.CurrentFighter;

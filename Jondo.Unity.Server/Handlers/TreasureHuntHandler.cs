@@ -215,14 +215,29 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// What a planning table answers a legendary hunt asked for: «une seule à la fois», and its
-        /// map in the bag, which the hunt takes -- «en cas de défaite … vous récupérez la carte».
+        /// map in the bag, which the hunt takes -- «en cas de défaite … vous récupérez la carte» --,
+        /// and the quest its map is studied for under way, when it has one (LegendaryHunts.QuestOf).
         /// </summary>
-        public static int LegendaryAnswer(LegendaryHunts.Definition? legendary, bool alreadyHunting, int maps)
+        public static int LegendaryAnswer(LegendaryHunts.Definition? legendary, bool alreadyHunting, int maps,
+                                          bool questUnderWay = true)
         {
             if (legendary == null || TravelersTower.LegendaryOf(legendary.Id) != null) return TreasureHunts.NoQuestFound;
             if (alreadyHunting) return TreasureHunts.AlreadyHaveQuest;
-            if (maps < 1) return TreasureHunts.NotAvailable;
+            if (maps < 1 || !questUnderWay) return TreasureHunts.NotAvailable;
             return TreasureHunts.RequestOk;
+        }
+
+        /// <summary>
+        /// Whether the quest the hunt's map asks for, if any, is under way for this character, with
+        /// the objectives it asks for before the hunt done.
+        /// </summary>
+        private static bool QuestUnderWay(LegendaryHunts.Definition? legendary)
+        {
+            int quest = legendary == null ? 0 : LegendaryHunts.QuestOf(legendary);
+            if (quest == 0) return true;
+            var log = SessionContext.State.Quests;
+            if (log == null || !log.Active(quest)) return false;
+            return LegendaryHunts.ObjectivesBefore(legendary!).All(log.ObjectiveDone);
         }
 
         /// <summary>The planning table used: its window, with the hunts it offers (hhg).</summary>
@@ -242,7 +257,8 @@ namespace Jondo.Unity.Server.Handlers
             var state = SessionContext.State;
             var legendary = LegendaryHunts.Of(TreasureHuntProtocol.ReadLegendaryAsked(body));
             int answer = LegendaryAnswer(legendary, TreasureHunts.Get(state.CharacterId, TreasureHunts.Legendary) != null,
-                                         legendary == null ? 0 : Equipment.HowMany(legendary.MapItem));
+                                         legendary == null ? 0 : Equipment.HowMany(legendary.MapItem),
+                                         QuestUnderWay(legendary));
 
             TreasureHunts.Hunt? hunt = null;
             if (answer == TreasureHunts.RequestOk && await Equipment.TakeAsync(stream, legendary!.MapItem, 1))

@@ -149,6 +149,13 @@ namespace Jondo.Unity.Server.Managers
             /// clamp(fighters, 4, 8) -- see <see cref="MembersFor"/>. Drawn with its alternatives.
             /// </summary>
             public bool Modular { get; set; }
+
+            /// <summary>
+            /// How many of its first members come into every fight, whatever its size: a room fought
+            /// by its bosses alone brings them all -- the Royal Rainbow Blop with the four Royal
+            /// Blops, five, to a player who comes alone. Zero for any other group.
+            /// </summary>
+            public int Leaders { get; set; }
         }
 
         private static Dictionary<int, MonsterData> _monsters = new Dictionary<int, MonsterData>();
@@ -561,6 +568,7 @@ namespace Jondo.Unity.Server.Managers
                 CellId = cell ?? MapManager.GetNearestWalkableCell(room, Handlers.TeleportHandler.MapCentre),
                 Members = members,
                 Modular = true,
+                Leaders = bossRoom && dungeon.BossAlone ? members.Count : 0,
             };
         }
 
@@ -699,12 +707,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// Who of a group comes into a fight: all of an ordinary group; of a dungeon room's, the
         /// first <c>clamp(fighters, 4, 8)</c> -- four for a player alone, one more each from the
-        /// fifth, as the jss's alternatives say.
+        /// fifth, as the jss's alternatives say; never fewer than its <see cref="MobGroup.Leaders"/>.
         /// </summary>
         public static List<MobMember> MembersFor(MobGroup group, int fighters)
             => !group.Modular
                 ? group.Members
-                : group.Members.Take(Math.Clamp(fighters, DungeonMinimum, DungeonGroupSize)).ToList();
+                : group.Members.Take(Math.Max(group.Leaders, Math.Clamp(fighters, DungeonMinimum, DungeonGroupSize))).ToList();
 
 
         /// <summary>
@@ -1080,6 +1088,7 @@ namespace Jondo.Unity.Server.Managers
             CellId = group.CellId,
             Orientation = group.Orientation,
             Modular = group.Modular,
+            Leaders = group.Leaders,
             Members = group.Members.Select(m => new MobMember { Monster = m.Monster, GradeIndex = m.GradeIndex, Level = m.Level }).ToList(),
         };
 

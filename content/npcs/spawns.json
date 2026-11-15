@@ -4612,13 +4612,6 @@
       "why": "The bounty hunter («Chasseur de primes»), «dans la milice du château d'Amakna en [5,-6]» (Dofus pour les noobs, «Les bandits de Cania»). INFERRED: the hall the castle's door leads into, on a stool by the long table -- «Me estoy tomando un respiro»."
     },
     {
-      "map": 122421248,
-      "npc": 2240,
-      "cell": 325,
-      "orientation": 1,
-      "why": "Flado, Meriana's goblin, who blames Gorco for the treacle («¡Gorco haber robado melaza!»). INFERRED: in her cabin beside the cauldron, where Gorco stands too."
-    },
-    {
       "map": 153357316,
       "npc": 890,
       "cell": 371,
@@ -4749,6 +4742,51 @@
       "orientation": 1,
       "criterion": "Qa=1527&Qo>8697",
       "why": "Renemil Belok in Meriana's cabin once she has hit the tofu with her pan (8695-8697), until he has told where he goes (8698)."
+    },
+    {
+      "map": 128453121,
+      "npc": 2487,
+      "cell": 358,
+      "orientation": 3,
+      "criterion": "Qf=1527",
+      "why": "Renemil Belok once «Cómo perder la pluma» is over: «Voy a instalarme en la casa de la familia Cágita. Si me buscas, ¡estaré en el Cofre de los Tesoros!» (59922); Dofus pour les noobs: «Ces morceaux de tablette de Totankama s'achètent auprès de Éner Brelloq en [-24,-36] dans la salle de droite de la Malle aux Trésors» (128453121 is the room at [-24,-36]). INFERRED: the cell, on the walkway before the shelves."
+    },
+    {
+      "map": 136317698,
+      "npc": 2482,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=1523&Qo>8671",
+      "why": "The Minotot waiting for the mask in the antechamber Lorkos leads to (objective 8672 names this map, 136317698): «Ramenez ce masque au Minotot... Parlez à Lorkos pour accéder à la salle où se trouve le Minotot» (Dofus pour les noobs), once the legendary hunt is won (8671). INFERRED: the cell, before the ruined throne."
+    },
+    {
+      "map": 128452097,
+      "npc": 2345,
+      "cell": 383,
+      "remove": true,
+      "why": "Dhain stands beside his Anutrof box (484993, cell 290; «la caja de Anutrof que está junto a mí»), on 305 as authored: the derived placement on 383, by the planning table, would make him stand twice in his own room."
+    },
+    {
+      "map": 134403,
+      "npc": 2240,
+      "cell": 388,
+      "orientation": 3,
+      "why": "Flado outside Meriana's cabin, on the porch by its door (347): Dofus pour les noobs, «Sortez de la cabane et parlez à Arlo», Arlo being Flado; Gorco's 18337 «Tú hablar con Flado». INFERRED cell."
+    },
+    {
+      "map": 122421248,
+      "npc": 2239,
+      "cell": 325,
+      "orientation": 1,
+      "why": "Gorco in Meriana's cabin, beside her cauldron: Dofus pour les noobs, «Lired présent dans la cabane», Lired being Gorco, who blows on its embers. INFERRED cell."
+    },
+    {
+      "map": 166985728,
+      "npc": 2466,
+      "cell": 191,
+      "orientation": 1,
+      "criterion": "Qa=1524&Qo>8674&Qo<8675",
+      "why": "Gavroch at the Blop dungeon's door, beside Bibiblop (164), once the tymadores are beaten (8674) and until he is thanked (8675): Dofus pour les noobs, «Remerciez alors Gavroch de vous avoir aidé». INFERRED cell."
     }
   ]
 }

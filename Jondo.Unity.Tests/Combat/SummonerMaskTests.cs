@@ -329,7 +329,11 @@ namespace Jondo.Unity.Tests.Combat
             var bot = Summons.De(3120, 3);
 
             Assert.Equal(new[] { (30938, 1), (13453, 3), (13451, 3), (13452, 3) }, bot.Hechizos);
-            Assert.Equal(new[] { (31154, 3), (31156, 3) }, Summons.De(8070, 1).Hechizos);
+            // The Tofu (8070) has its three grades at level 1, «1,1;2,1;3,1»: each grade its own,
+            // as the Osamodas' Invocación de Tofu (31115) calls it at grades 1 to 3 -- not the
+            // last pair whose level is the grade's number, three for all of them.
+            Assert.Equal(new[] { (31154, 1), (31156, 1) }, Summons.De(8070, 1).Hechizos);
+            Assert.Equal(new[] { (31154, 3), (31156, 3) }, Summons.De(8070, 3).Hechizos);
         }
 
         /// <summary>The owner's jyy for the Tymobot -12 of the capture, slot by slot.</summary>
