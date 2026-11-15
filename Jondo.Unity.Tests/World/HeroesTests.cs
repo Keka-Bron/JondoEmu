@@ -243,6 +243,36 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>A connected hero stands on his master's map beside him, and is in the world for his guild.</summary>
+        [Fact]
+        public async Task A_hero_stands_beside_his_master_and_is_online()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 13, "Sol-" + tag, 8);
+            long hero = Character(Account + 13, "Sombra-" + tag, 9);
+            await using var pipe = await ClientPipe.OpenAsync(Account + 13, master, Map, "Sol-" + tag);
+            try
+            {
+                pipe.Session.State.CellId = 300;
+                Assert.False(SessionRegistry.IsOnline(hero));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+
+                Assert.True(SessionRegistry.IsOnline(hero));
+                var shown = Assert.Single(HeroPresence.On(Map), h => h.Character.Id == hero);
+                Assert.NotEqual(-1, shown.Cell);
+                Assert.Equal(Map, Heroes.SessionOf(hero)!.State.MapId);
+
+                Assert.True(Heroes.Disconnect(master, hero));
+                Assert.False(SessionRegistry.IsOnline(hero));
+                Assert.DoesNotContain(HeroPresence.On(Map), h => h.Character.Id == hero);
+            }
+            finally
+            {
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
         [Fact]
         public async Task A_hero_comes_into_his_masters_fight_as_his_to_play()
         {

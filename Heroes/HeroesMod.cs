@@ -1353,7 +1353,6 @@ namespace Heroes
         // ─── The hints ───────────────────────────────────────────────────────────────────
 
         private static VisualElement _hint;
-        private static DofusLabel _hintText;
 
         /// <summary>A line saying what the element does, beside it while the pointer is on it.</summary>
         private static VisualElement Hint(VisualElement target, string key) => HintText(target, () => T(key));
@@ -1391,14 +1390,20 @@ namespace Heroes
                     var line = new UnityEngine.Color(0.45f, 0.45f, 0.60f, 1f);
                     _hint.style.borderTopColor = _hint.style.borderBottomColor = _hint.style.borderLeftColor = _hint.style.borderRightColor = new StyleColor(line);
                     Round(_hint, 3f);
-                    _hintText = Label("", 12f);
-                    _hintText.pickingMode = PickingMode.Ignore;
-                    _hintText.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
-                    _hintText.style.marginBottom = new StyleLength(0f);
-                    _hint.Add(_hintText);
                     layer.Add(_hint);
                 }
-                _hintText.text = text;
+                // A label a line: one label with line breaks in it is measured one line high, and
+                // the rest spilled out of the box.
+                _hint.Clear();
+                string[] lines = (text ?? "").Split('\n');
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var line = Label(lines[i], 12f, i == 0 && lines.Length > 1);
+                    line.pickingMode = PickingMode.Ignore;
+                    line.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
+                    line.style.marginBottom = new StyleLength(i == 0 && lines.Length > 1 ? 3f : 0f);
+                    _hint.Add(line);
+                }
                 // On its left: the group panel stands against the screen's right edge.
                 var at = target.worldBound;
                 float width = layer.resolvedStyle.width;

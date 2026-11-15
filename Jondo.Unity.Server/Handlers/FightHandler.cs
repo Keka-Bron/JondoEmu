@@ -11485,6 +11485,8 @@ namespace Jondo.Unity.Server.Handlers
             // And the map: the people drawn again where they came back -- they went off it with
             // a kmu -- the count of fights one less, the group back or its replacement.
             foreach (var sesion in gente) await BackOnTheMapAsync(sesion);
+            // And their heroes beside them again, out of the fight with them (HeroPresence).
+            foreach (var sesion in gente) await HeroPresence.MasterMovedAsync(sesion, 0);
             await FightOffTheMapAsync(fight);
 
             await FightOverForTheWorldAsync(fight, azulGana);

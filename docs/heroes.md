@@ -21,6 +21,20 @@ writes the hero's when run inside it.
 - The master leaving the world takes his heroes with him, each saved (`SessionTeardown`).
 - A hero chosen from a client of his own stops being a hero (`CharacterSelectionHandler`).
 
+## On the map, and in the world for the others
+
+`Network/HeroPresence.cs`. A connected hero stands on his master's map, on a free walkable cell
+beside him, and is drawn for everybody there: every map's actor list carries the heroes of the
+people on it (`ConnectionProtocol.BuildMapActors`), a hero connecting is drawn (jsn) and one let go
+taken off (kmu). He walks after his master -- the master's own walk, the first hero stopping one step
+short of its end, the next two -- and goes with him from one map to the next
+(`SessionRegistry.AnunciarMudanzaAsync`). In a fight he is off the map, and back beside his master
+when it is over.
+
+For his guild and his alliance he is in the world (`SessionRegistry.IsOnline`): their member lists
+show him connected, and they are told as he connects or is let go. His friends see his account
+playing, as they see any character of it.
+
 ## In a fight
 
 `Handlers/FightHeroes.cs`. When the master opens a fight against monsters, each of his heroes is
@@ -98,7 +112,8 @@ All need the master in the world (`409 world`), with the session's own token.
 
 ## Not yet
 
-- Heroes on the map: they do not follow the master or show beside him.
+- A switch to stop the heroes following, or to hide them from the map.
+- The heroes in a party of the game's own (its group window).
 - Joining a fight somebody else opened, a duel, the Koliseo, an aggression: only the master's own
   fights against monsters bring his heroes in.
 - A defeat's consequences on a hero beyond the fight; the master walking out of a fight leaves his

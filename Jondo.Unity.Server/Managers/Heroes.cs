@@ -134,7 +134,38 @@ namespace Jondo.Unity.Server.Managers
                 _byHero[heroId] = hero;
             }
             Console.WriteLine($"[Heroes] {master.State.CharacterName} connects {SessionOf(heroId)?.State.CharacterName} ({heroId}) as a hero.");
+            Appear(master, _byHero[heroId]);
+            Announce(heroId);
             return "ok";
+        }
+
+        /// <summary>A hero at his master's side on the map, drawn for everybody there (Network.HeroPresence).</summary>
+        private static void Appear(GameSession master, Hero hero)
+        {
+            if (master.Stream == null) return;
+            try { Network.HeroPresence.ArriveAsync(master, hero).GetAwaiter().GetResult(); }
+            catch (Exception ex) { Console.WriteLine($"[Heroes] {hero.CharacterId} could not appear: {ex.Message}"); }
+        }
+
+        /// <summary>A hero let go, off the map he stood on.</summary>
+        private static void Vanish(Hero hero)
+        {
+            try { Network.HeroPresence.LeaveAsync(hero).GetAwaiter().GetResult(); }
+            catch (Exception ex) { Console.WriteLine($"[Heroes] {hero.CharacterId} could not vanish: {ex.Message}"); }
+        }
+
+        /// <summary>His guild and his alliance see him as he stands now, in the world or not.</summary>
+        private static void Announce(long characterId)
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Handlers.GuildHandler.TellConnectionAsync(characterId, SessionRegistry.IsOnline(characterId));
+                    await Handlers.AllianceHandler.HeroConnectionAsync(characterId);
+                }
+                catch (Exception ex) { Console.WriteLine($"[Heroes] {characterId}'s guild and alliance not told: {ex.Message}"); }
+            });
         }
 
         /// <summary>Disconnects a hero of his: saved as he stands. False when he is not one of his.</summary>
@@ -263,8 +294,10 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>A hero let go, already forgotten: off his map, saved, and his guild and alliance told.</summary>
         private static void Save(Hero hero)
         {
+            Vanish(hero);
             try
             {
                 using (SessionContext.Push(hero.Session))
@@ -278,6 +311,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 Console.WriteLine($"[Heroes] Could not save hero {hero.CharacterId}: {ex.Message}");
             }
+            Announce(hero.CharacterId);
         }
     }
 }

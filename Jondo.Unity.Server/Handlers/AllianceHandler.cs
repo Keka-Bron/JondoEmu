@@ -1351,6 +1351,16 @@ namespace Jondo.Unity.Server.Handlers
             await ConnectionChangedAsync(alliance, characterId, online: true);
         }
 
+        /// <summary>
+        /// A hero connected or let go (Managers.Heroes): the others see his line as he stands,
+        /// in the world or not, and on connecting whoever asked to be warned is.
+        /// </summary>
+        public static async Task HeroConnectionAsync(long characterId)
+        {
+            var alliance = AllianceStore.AllianceOf(characterId);
+            if (alliance != null) await ConnectionChangedAsync(alliance, characterId, SessionRegistry.IsOnline(characterId));
+        }
+
         /// <summary>A member who disconnects: the others see him so; his invitations go.</summary>
         public static async Task DisconnectedAsync(long characterId)
         {
@@ -1420,7 +1430,7 @@ namespace Jondo.Unity.Server.Handlers
             return new AllianceProtocol.MemberRow(member, character.Name, character.Level, character.AccountId,
                                                   character.Breed, character.Sex,
                                                   Achievements.PointsOf(member.CharacterId),
-                                                  online ?? SessionRegistry.FindByCharacter(member.CharacterId) != null,
+                                                  online ?? SessionRegistry.IsOnline(member.CharacterId),
                                                   KothRoles.HeldRoleOf(member.CharacterId));
         }
 
@@ -1432,7 +1442,7 @@ namespace Jondo.Unity.Server.Handlers
             if (character == null) return null;
             return new AllianceProtocol.ApplicationRow(application, character.Name, character.Level, character.AccountId,
                                                        character.Breed, character.Sex,
-                                                       SessionRegistry.FindByCharacter(application.CharacterId) != null);
+                                                       SessionRegistry.IsOnline(application.CharacterId));
         }
 
         /// <summary>A frame for every member connected but one. Returns how many got it.</summary>

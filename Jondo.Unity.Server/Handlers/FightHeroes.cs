@@ -46,6 +46,8 @@ namespace Jondo.Unity.Server.Handlers
                     state.IsInFight = true;
                     state.FightId = fight.FightId;
                 }
+                // Off the map he stood on beside his master: he is in the fight now.
+                try { HeroPresence.LeaveAsync(hero).GetAwaiter().GetResult(); } catch { }
                 fighter.IsReady = true;
                 PlayAsHero(fighter, masterId);
                 fighter.HechizosDeInvocado = layout.Spells.ToList();
