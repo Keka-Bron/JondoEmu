@@ -15,6 +15,11 @@ namespace Jondo.Unity.Tests.World
     /// The hero mode: the account's other characters connected beside the one in the world, each
     /// in a session of his own with no socket, and into his master's fights as his to play.
     /// </summary>
+    /// <remarks>
+    /// With the item and equipment tests: connecting a hero loads his bag and what he wears
+    /// (Equipment), which they read too.
+    /// </remarks>
+    [Collection("forgemagic")]
     public sealed class HeroesTests
     {
         private const long Account = 8_900_000_311;
@@ -160,6 +165,31 @@ namespace Jondo.Unity.Tests.World
             {
                 Heroes.DisconnectAll(second);
                 SessionRegistry.Unregister(back.Session);
+            }
+        }
+
+        /// <summary>Taking a hero in hand is asked of the server, which hands him to the next way in, once.</summary>
+        [Fact]
+        public async Task A_hero_asked_for_is_the_one_the_next_way_in_picks()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 9, "Rey-" + tag, 8);
+            long hero = Character(Account + 9, "Valido-" + tag, 1);
+            await using var pipe = await ClientPipe.OpenAsync(Account + 9, master, Map, "Rey-" + tag);
+            try
+            {
+                Assert.False(Heroes.AskSwitch(pipe.Session, hero));   // not a hero of his yet
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+                Assert.True(Heroes.AskSwitch(pipe.Session, hero));
+                Assert.True(Heroes.SwitchPending(Account + 9));
+                Assert.Equal(hero, Heroes.TakeSwitch(Account + 9));
+                Assert.False(Heroes.SwitchPending(Account + 9));
+                Assert.Equal(0, Heroes.TakeSwitch(Account + 9));
+            }
+            finally
+            {
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
             }
         }
 

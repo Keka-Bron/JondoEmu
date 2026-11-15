@@ -151,6 +151,33 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
+        /// <summary>The hero each account asked to take in hand, and when: the next way in selects him.</summary>
+        private static readonly ConcurrentDictionary<long, (long Hero, DateTime At)> _switchTo = new();
+
+        /// <summary>How long a switch waits for the client to come back to its character list.</summary>
+        public static readonly TimeSpan SwitchWaits = TimeSpan.FromMinutes(2);
+
+        /// <summary>
+        /// Taking a hero in hand, as Auralis's server does it: the hero is remembered for the account,
+        /// and when its client comes back to the character list the server picks him for it -- the
+        /// way a character still in a fight is picked (kvd, then kwb). False when he is not a hero of his.
+        /// </summary>
+        public static bool AskSwitch(GameSession master, long heroId)
+        {
+            if (AsHero(heroId)?.MasterId != master.State.CharacterId || master.State.IsInFight) return false;
+            _switchTo[master.AccountId] = (heroId, DateTime.UtcNow);
+            Console.WriteLine($"[Heroes] {master.State.CharacterName} asks to take {heroId} in hand.");
+            return true;
+        }
+
+        /// <summary>Whether the account's client is to be handed a hero at its character list.</summary>
+        public static bool SwitchPending(long accountId)
+            => _switchTo.TryGetValue(accountId, out var ask) && DateTime.UtcNow - ask.At <= SwitchWaits;
+
+        /// <summary>The hero the account's client is to be handed, taken: zero when none waits.</summary>
+        public static long TakeSwitch(long accountId)
+            => _switchTo.TryRemove(accountId, out var ask) && DateTime.UtcNow - ask.At <= SwitchWaits ? ask.Hero : 0;
+
         /// <summary>A group whose master left the world, kept for a while for whoever of it comes back.</summary>
         private sealed record Group(long MasterId, List<(long Id, bool AutoPass)> Heroes, long LootTo, DateTime LeftAt);
 

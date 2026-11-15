@@ -179,8 +179,8 @@ namespace Heroes
             ["card"] = L("{0}\n{1} · nivel {2}\nVida {3} / {4}\nPA {5} · PM {6}\nIniciativa {7}\nProspección {8}\nSabiduría {9}",
                          "{0}\n{1} · level {2}\nLife {3} / {4}\nAP {5} · MP {6}\nInitiative {7}\nProspecting {8}\nWisdom {9}",
                          "{0}\n{1} · niveau {2}\nVie {3} / {4}\nPA {5} · PM {6}\nInitiative {7}\nProspection {8}\nSagesse {9}"),
-            ["menu"] = L("Abre el menú (Esc) y, con él abierto, pulsa ▶.", "Open the menu (Esc) and, with it open, press ▶.",
-                         "Ouvre le menu (Échap) et, menu ouvert, clique sur ▶."),
+            ["menu"] = L("Esc → Cambiar de personaje: el héroe se elegirá solo.", "Esc → Change character: the hero is picked by itself.",
+                         "Échap → Changer de personnage : le héros sera choisi tout seul."),
         };
 
         private static string T(string key, params object[] values)
@@ -596,7 +596,15 @@ namespace Heroes
                 picture.style.backgroundImage = new StyleBackground(Icon());
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
                 button.Add(picture);
-                button.AddManipulator(new Clickable(Do(() => { if (_window != null) Close(); else Open(); })).Cast<IManipulator>());
+                // Taken at the press, before the slot grid's own handling -- its drag and its
+                // selection -- swallows the click a Clickable waits for.
+                button.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
+                    new Action<PointerDownEvent>(e =>
+                    {
+                        try { e.StopImmediatePropagation(); } catch { }
+                        if (_window != null) Close(); else Open();
+                    })), TrickleDown.TrickleDown);
+                Hint(button, "hint.window");
                 row.hierarchy.Add(button);
                 return;
             }
@@ -867,7 +875,7 @@ namespace Heroes
             {
                 string name = Str(who, "name");
                 VisualElement play = null;
-                play = Toggle(Do(() => TakeInHand(name, play)), Glyph(2), false);
+                play = Toggle(Do(() => TakeInHand(id, name, play)), Glyph(2), false);
                 tools.Add(Hint(play, "hint.play"));
             }
             row.Add(tools);
@@ -885,44 +893,55 @@ namespace Heroes
         /// menu's «change character», and the server gives the group back to him on his way in --
         /// the one who led it is a hero of his then (Heroes.Regroup).
         /// </summary>
-        private static void TakeInHand(string name, VisualElement from)
+        /// <remarks>
+        /// As Auralis's: the server is asked first (heroes/switch) and does the switch -- at the
+        /// client's next character list it picks the hero itself, the way it picks a character still
+        /// in a fight. The client only has to go back to its list: the main menu's «change
+        /// character», confirmed, with no dropdown pick (that one throws in the client's own code).
+        /// </remarks>
+        private static void TakeInHand(long id, string name, VisualElement from)
         {
-            if (_mainMenu == null)
+            Task.Run(async () =>
             {
-                if (from != null) ShowHint(from, T("menu"));
-                MelonLogger.Msg("[Heroes] No main menu kept yet: it is opened once with Esc.");
-                return;
-            }
-            try
-            {
-                _mainMenu.InitCharactersList();
-                // The dropdown's entries carry more than the name -- its level, its server --: the
-                // one that holds it is the one to hand back.
-                var names = new List<string>();
-                var list = _mainMenu.m_charsNames;
-                for (int i = 0; list != null && i < list.Count; i++) names.Add(list[i] ?? "");
-                if (!_toldNames)
+                var (code, _) = await AskAsync("heroes/switch", new Dictionary<string, object> { ["id"] = id });
+                _toUnity.Enqueue(() =>
                 {
-                    _toldNames = true;
-                    MelonLogger.Msg($"[Heroes] The main menu's characters: {string.Join(" | ", names)}");
-                }
-                string entry = names.FirstOrDefault(n => n == name)
-                               ?? names.FirstOrDefault(n => n.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0);
-                if (entry == null)
-                {
-                    MelonLogger.Warning($"[Heroes] {name} is not in the main menu's characters.");
-                    return;
-                }
-                // The pick, as the dropdown makes it: the client asks its own confirmation then.
-                _mainMenu.OnCharacterSelection(entry);
-                MelonLogger.Msg($"[Heroes] Taking {name} in hand («{entry}»).");
-            }
-            catch (Exception ex)
+                    if (code != 200)
+                    {
+                        if (from != null) ShowHint(from, code == 0 ? T("unreachable") : T("error"));
+                        return;
+                    }
+                    if (BackToTheList())
+                    {
+                        MelonLogger.Msg($"[Heroes] Taking {name} in hand: back to the character list, the server picks him.");
+                        return;
+                    }
+                    if (from != null) ShowHint(from, T("menu"));
+                });
+            });
+        }
+
+        /// <summary>The client back to its character list through its main menu, or false when it would not go.</summary>
+        private static bool BackToTheList()
+        {
+            if (_mainMenu == null) return false;
+            foreach (var (what, step) in new (string, Action)[]
+                     {
+                         ("OnConfirmChangeCharacter", () => _mainMenu.OnConfirmChangeCharacter()),
+                         ("OnChangeCharacter", () => _mainMenu.OnChangeCharacter()),
+                     })
             {
-                // The menu's pick wants the menu open: with it shut its dropdown is not there.
-                if (from != null) ShowHint(from, T("menu"));
-                MelonLogger.Warning($"[Heroes] {name} could not be taken in hand: {ex.Message}");
+                try
+                {
+                    step();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Warning($"[Heroes] MainMenu.{what}: {ex.Message}");
+                }
             }
+            return false;
         }
 
         private static void WatchMainMenu()

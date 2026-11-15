@@ -67,9 +67,13 @@ Each connected hero's card in the window has three more glyphs -- a chest, three
 that open his bag, his characteristics and his spells, to look at (`POST /api/heroes/sheet { id }`):
 ids from the server, named and drawn by the client's own data (`DataCenterModule`, its icon tiles).
 
-**Taking a hero in hand** (the panel's **PLAY**) is changing character: the mod goes through the
-client's own main menu («change character», `MainMenu.OnCharacterSelection` and its confirmation,
-kept as the menu comes up), the client leaves and comes back with the hero. A master leaving the
+**Taking a hero in hand** (the panel's **PLAY**) is changing character, done by the server as
+Auralis's does it: the mod asks `POST /api/heroes/switch { id }` (`Heroes.AskSwitch`, two minutes),
+then sends the client back to its character list through its main menu's «change character»
+(`MainMenu.OnConfirmChangeCharacter`; the menu's dropdown pick throws in the client's own code). At
+that list the server picks the hero itself, the way it picks a character still in a fight -- the list
+with its kvd, the client's kwb, `GameEntryService.ResumeAsync`. Going back to the list by hand
+(Esc → change character) after PLAY does the same. A master leaving the
 world leaves his group aside for his account for three minutes (`Heroes.DisconnectAll(session)`);
 whoever of it comes back into the world takes it back (`Heroes.Regroup`, on entry): the one who led
 it is a hero of his, the others are his heroes again with their switches. Quitting and coming back
@@ -95,7 +99,8 @@ All need the master in the world (`409 world`), with the session's own token.
   heroes in it with nobody to play them.
 - Creating a character from the window.
 - The group panel's «follow» and «show on the map» of Auralis's.
-- PLAY needs the client's main menu to have come up once (Esc) since the game started.
+- PLAY sends the client back to its list only once its main menu has come up (Esc); otherwise it is
+  done by hand, Esc → change character, and the server still picks the hero.
 - The spell book (the client's own) shows the master's spells, not the hero's.
 
 The `.heros` command (administrators) still opens the probe's fight: JondoBots at one's side,

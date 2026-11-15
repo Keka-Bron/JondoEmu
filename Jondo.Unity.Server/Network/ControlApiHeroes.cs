@@ -168,6 +168,14 @@ namespace Jondo.Unity.Server.Network
             });
         }
 
+        /// <summary>A hero to take in hand at the client's next character list (Heroes.AskSwitch).</summary>
+        private static Respuesta HeroesSwitch(string cuerpo, long account)
+        {
+            var me = InTheWorld(account);
+            if (me == null) return Mal(409, "world");
+            return Heroes.AskSwitch(me, Numero(cuerpo, "id")) ? Bien(new { switching = true }) : Mal(409, "none");
+        }
+
         private static Respuesta HeroesAutoPass(string cuerpo, long account)
         {
             var me = InTheWorld(account);
