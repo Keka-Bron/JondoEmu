@@ -97,6 +97,20 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (uid == 0) return;
 
+            // Nothing is put on or taken off once a fight has begun: only its placement lets the
+            // gear change. The iuk was served at any moment, and the worn cache it rewrites is the
+            // one the combat sheet reads.
+            var state = SessionContext.State;
+            if (state.IsInFight && FightHandler.FightOf(state.CharacterId) is { } fight
+                && fight.State != Jondo.Unity.World.Fights.FightState.Placement)
+            {
+                Console.WriteLine($"[Equipment] {state.CharacterName} cannot move item {uid} in a fight under way.");
+                if (Managers.Equipment.ByUid(uid) is { } stays)
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, stays.Position).Build()));
+                return;
+            }
+
             // Food dropped on the worn pet: a legendary pet's status or its power (LegendaryPets).
             if (position == Managers.LegendaryPets.PetSlot && await FeedLegendaryPetAsync(stream, uid)) return;
 
@@ -134,14 +148,25 @@ namespace Jondo.Unity.Server.Handlers
                     return false;
                 }
 
+                // A slot takes its own kind: the position is the client's number, and a ring on the
+                // head or a resource on a finger counted on the sheet (Equipment.MayGoIn).
+                if (loSuyo != null && !Managers.Equipment.MayGoIn(loSuyo.Template, position))
+                {
+                    Console.WriteLine($"[Equipment] Item {uid} (template {loSuyo.Template}) does not go in slot {position}. It is not put on.");
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, loSuyo.Position).Build()));
+                    return false;
+                }
+
                 // A set's piece is worn once: a second Gelano does not go on the other finger while
                 // the first is on one. A ring of no set can be worn twice (732). The slot it goes to
                 // does not count -- what is there comes off --, nor the item itself, moved between rings.
-                if (loSuyo != null && Managers.ItemSets.SetsOf(loSuyo.Template).Count > 0
+                // A dofus or a trophy is worn once too, set or not.
+                if (loSuyo != null && (Managers.ItemSets.SetsOf(loSuyo.Template).Count > 0 || Managers.Equipment.IsDofus(loSuyo.Template))
                     && Managers.Equipment.All.Any(i => i.Uid != uid && i.Template == loSuyo.Template
                                                        && i.Position != position && Managers.Equipment.IsWorn(i.Position)))
                 {
-                    Console.WriteLine($"[Equipment] Item {uid} is a set's piece already worn. It is not put on twice.");
+                    Console.WriteLine($"[Equipment] Item {uid} is a set's piece or a dofus already worn. It is not put on twice.");
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Ivq, Pb.New().Var(1, uid).Var(2, loSuyo.Position).Build()));
                     return false;

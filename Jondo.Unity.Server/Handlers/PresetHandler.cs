@@ -321,7 +321,8 @@ namespace Jondo.Unity.Server.Handlers
             else if (placed)
             {
                 var item = Equipment.ByUid(uid);
-                placed = item != null && !Equipment.IsTaxCollectorPiece(item.Template);
+                placed = item != null && !Equipment.IsTaxCollectorPiece(item.Template)
+                         && Equipment.MayGoIn(item.Template, position);
                 if (placed)
                 {
                     foreach (int other in draft.Items.Where(p => p.Value == uid).Select(p => p.Key).ToList())

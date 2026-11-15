@@ -102,6 +102,44 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static bool CountsOnSheet(int position) => IsWorn(position) || BonusSlots.IsBonusSlot(position);
 
+        /// <summary>
+        /// The worn slots an item family (super type) goes in: amulet 0, weapon 1, the rings 2 and 4,
+        /// belt 3, boots 5, hat 6, cloak 7, pet or mount 8, the dofus and trophies 9 to 14, shield 15
+        /// -- the slots the captures' ivx carry them in. A family not here is worn nowhere.
+        /// </summary>
+        private static readonly Dictionary<int, int[]> SlotsOfFamily = new()
+        {
+            [1] = new[] { 0 }, [2] = new[] { 1 }, [3] = new[] { 2, 4 }, [4] = new[] { 3 }, [5] = new[] { 5 },
+            [7] = new[] { 15 }, [10] = new[] { 6 }, [11] = new[] { 7 }, [12] = new[] { 8 },
+            [DofusFamily] = new[] { 9, 10, 11, 12, 13, 14 },
+        };
+
+        /// <summary>The family of the dofus, the trophies and the prysmaradites: one of each is worn.</summary>
+        public const int DofusFamily = 13;
+
+        /// <summary>
+        /// Whether the client may move an item of this template to a position. The slot is the
+        /// client's number and nothing looked at it: a ring went on the head, a resource on a
+        /// finger, and anything at all into a bonus slot, where nothing is ever thrown out to make
+        /// room -- each counted on the sheet. A worn slot takes its own family only; a bonus slot
+        /// is filled by the server (BonusItemHandler.PlaceAsync), never by a move. A position that
+        /// adds nothing to the sheet -- the nets' 31 -- is left as it was.
+        /// </summary>
+        public static bool MayGoIn(int template, int position)
+        {
+            if (BonusSlots.IsBonusSlot(position)) return false;
+            if (!IsWorn(position)) return true;
+
+            int? family = RandomLoot.FamilyOf(Forgemagic.TemplateOf(template)?.Type ?? 0);
+            // With no item types read, nothing has a family: refusing then would undress everybody.
+            if (family == null) return !RandomLoot.KnowsTypes;
+            return SlotsOfFamily.TryGetValue(family.Value, out var slots) && Array.IndexOf(slots, position) >= 0;
+        }
+
+        /// <summary>Whether a template is a dofus, a trophy or a prysmaradite.</summary>
+        public static bool IsDofus(int template)
+            => RandomLoot.FamilyOf(Forgemagic.TemplateOf(template)?.Type ?? 0) == DofusFamily;
+
         /// <summary>What a character is wearing, by slot, for ANY character and not only for the
         /// one playing.</summary>
         /// <remarks>
