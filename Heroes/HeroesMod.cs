@@ -1214,11 +1214,9 @@ namespace Heroes
                 catch { continue; }
                 string prefix = kind?.pathPrefix ?? "";
                 seen.Add(prefix);
-                string low = prefix.ToLowerInvariant();
-                if (_breedImages == null && low.Contains("breed") && (low.Contains("head") || low.Contains("portrait") || low.Contains("icon")))
-                    _breedImages = kind;
-                else if (_headImages == null && low.Contains("head") && !low.Contains("breed"))
-                    _headImages = kind;
+                // The breeds' portraits by breed and sex, the heads by their asset (3.6.10's log).
+                if (prefix == "classes/heads/small/Head_{0}{1}") _breedImages = kind;
+                else if (prefix == "cosmetics/{0}") _headImages = kind;
             }
             MelonLogger.Msg($"[Heroes] The game's addressable kinds: {string.Join(" | ", seen)}; breeds {(_breedImages?.pathPrefix ?? "none")}, heads {(_headImages?.pathPrefix ?? "none")}.");
         }
