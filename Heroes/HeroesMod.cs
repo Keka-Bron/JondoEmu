@@ -156,6 +156,7 @@ namespace Heroes
             ["create"] = L("CREAR UN HÉROE", "CREATE A HERO", "CRÉER UN HÉROS"),
             ["create.title"] = L("Nuevo héroe", "New hero", "Nouveau héros"),
             ["create.window"] = L("Crear un personaje", "Create a character", "Créer un personnage"),
+            ["create.face"] = L("ROSTRO", "FACE", "VISAGE"),
             ["create.class"] = L("CLASE", "CLASS", "CLASSE"),
             ["create.sex"] = L("SEXO", "SEX", "SEXE"),
             ["create.male"] = L("Masculino", "Male", "Masculin"),
@@ -1085,13 +1086,7 @@ namespace Heroes
                 var close = window.header?.rightButton;
                 if (close != null) close.add_Clicked(Do(CloseNativeCreation));
                 _creationWindow = window;
-                if (!_toldCreationTree)
-                {
-                    _toldCreationTree = true;
-                    var parts = new System.Text.StringBuilder();
-                    Parts(tree, 0, parts);
-                    MelonLogger.Msg($"[Heroes] The creation screen's parts:\n{parts}");
-                }
+                BindCreation(tree);
             }
             catch (Exception ex)
             {
@@ -1105,6 +1100,334 @@ namespace Heroes
         {
             try { _creationWindow?.RemoveFromHierarchy(); } catch { }
             _creationWindow = null;
+            _cTree = null;
+        }
+
+        // The screen as it is filled: its tree, the breeds and heads the game's data has, what is chosen.
+        private static VisualElement _cTree;
+        private static readonly List<(int Id, string Name, string Description, int Complexity)> _cBreeds = new List<(int, string, string, int)>();
+        private static readonly List<(int Id, string Asset)> _cHeads = new List<(int, string)>();
+        private static readonly List<Il2CppCore.UILogic.Components.Slots.Slot> _cBreedSlots = new List<Il2CppCore.UILogic.Components.Slots.Slot>();
+        private static readonly List<Il2CppCore.UILogic.Components.Slots.Slot> _cHeadSlots = new List<Il2CppCore.UILogic.Components.Slots.Slot>();
+        private static int _cBreed = 8, _cSex, _cHead, _cDirection = 1;
+        private static bool _cBusy;
+        private static Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntryType _breedImages, _headImages;
+
+        private static T Part<T>(string name) where T : Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase
+        {
+            var found = _cTree == null ? null : UQueryExtensions.Q(_cTree, name, (string)null);
+            return found?.TryCast<T>();
+        }
+
+        private static VisualElement Part(string name) => _cTree == null ? null : UQueryExtensions.Q(_cTree, name, (string)null);
+
+        private static void Show(VisualElement element, bool shown)
+        {
+            if (element != null) element.style.display = new StyleEnum<DisplayStyle>(shown ? DisplayStyle.Flex : DisplayStyle.None);
+        }
+
+        private static void OnClick(VisualElement element, Action action)
+        {
+            if (element == null) return;
+            element.RegisterCallback<ClickEvent>(DelegateSupport.ConvertDelegate<EventCallback<ClickEvent>>(new Action<ClickEvent>(_ =>
+            {
+                try { action(); }
+                catch (Exception ex) { MelonLogger.Warning($"[Heroes] {ex.Message}"); }
+            })), TrickleDown.NoTrickleDown);
+        }
+
+        private static void SetText(string name, string text)
+        {
+            var label = Part<TextElement>(name);
+            if (label != null) label.text = text;
+        }
+
+        /// <summary>
+        /// The screen filled from the game's own data, as its own screen fills it: the breeds
+        /// (DataCenter's breeds, their images out of the game's addressables), the sex, the heads
+        /// for them, the character on his platform, a name, and the button that makes him. What the
+        /// hero mode does not use yet -- the server's choice, the attitudes, the colours, the spells
+        /// -- put away.
+        /// </summary>
+        private static void BindCreation(VisualElement tree)
+        {
+            _cTree = tree;
+            _cBusy = false;
+            foreach (string away in new[] { "parentChangeServer", "btnLeave", "bloc_attitude", "btn_showSpells", "btn_mechanics",
+                                            "ctr_colors", "lbl_corps", "ctr_corps", "tg_showEquipment", "lbl_helpToChoose",
+                                            "window_spells", "window_mechanics" })
+                Show(Part(away), false);
+            var role = Part("tg_role_damageDealer");
+            Show(role?.hierarchy.parent, false);
+
+            SetText("lbl_breedTitle", T("create.class"));
+            SetText("lbl_visage", T("create.face"));
+            SetText("lbl_playerNameTitle", T("create.namePlaceholder"));
+            var play = Part<Il2CppCore.UILogic.Components.Figma.PlayButton>("btn_play");
+            if (play != null)
+            {
+                play.text = T("create.go");
+                play.add_Clicked(Do(CreateFromScreen));
+            }
+            ChooseImageTypes();
+            LoadBreeds();
+            BindBreedSlots();
+            OnClick(Part("btn_previous"), () => StepBreed(-1));
+            OnClick(Part("btn_next"), () => StepBreed(1));
+            OnClick(Part("btn_rotateLeft"), () => { _cDirection = (_cDirection + 7) % 8; RefreshPreview(); });
+            OnClick(Part("btn_rotateRight"), () => { _cDirection = (_cDirection + 1) % 8; RefreshPreview(); });
+
+            var gender = Part<Il2CppCore.UILogic.Components.Figma.Switch>("switch_gender");
+            if (gender != null)
+            {
+                gender.SetValueWithoutNotify(_cSex == 0);
+                gender.add_clicked(Do(() =>
+                {
+                    _cSex = gender.isChecked ? 0 : 1;
+                    _cHead = 0;
+                    RefreshBreed();
+                }));
+            }
+
+            var input = Part<Il2CppCore.UILogic.Components.Figma.TextInput>("input_name");
+            if (input != null) input.placeholderText = T("create.namePlaceholder");
+            OnClick(Part("btn_generateName"), AskScreenName);
+            Show(Part("textInput_button"), false);
+            if (!_cBreeds.Any(b => b.Id == _cBreed) && _cBreeds.Count > 0) _cBreed = _cBreeds[0].Id;
+            RefreshBreed();
+            AskScreenName();
+        }
+
+        /// <summary>
+        /// Which of the game's addressable kinds hold the breeds' images and the heads': 3.6.10 keeps
+        /// them on rd, nameless; their path prefixes tell. All of them logged once.
+        /// </summary>
+        private static void ChooseImageTypes()
+        {
+            if (_breedImages != null || _headImages != null) return;
+            var seen = new List<string>();
+            foreach (var property in typeof(Il2Cpp.rd).GetProperties(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public))
+            {
+                if (property.PropertyType != typeof(Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntryType)) continue;
+                Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntryType kind;
+                try { kind = (Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntryType)property.GetValue(null); }
+                catch { continue; }
+                string prefix = kind?.pathPrefix ?? "";
+                seen.Add(prefix);
+                string low = prefix.ToLowerInvariant();
+                if (_breedImages == null && low.Contains("breed") && (low.Contains("head") || low.Contains("portrait") || low.Contains("icon")))
+                    _breedImages = kind;
+                else if (_headImages == null && low.Contains("head") && !low.Contains("breed"))
+                    _headImages = kind;
+            }
+            MelonLogger.Msg($"[Heroes] The game's addressable kinds: {string.Join(" | ", seen)}; breeds {(_breedImages?.pathPrefix ?? "none")}, heads {(_headImages?.pathPrefix ?? "none")}.");
+        }
+
+        /// <summary>The breeds the hero mode knows, out of the game's data, in its own order.</summary>
+        private static void LoadBreeds()
+        {
+            _cBreeds.Clear();
+            try
+            {
+                var all = Il2CppCore.DataCenter.DataCenterModule.breedsDataRoot.GetObjects();
+                var found = new List<(int Id, string Name, string Description, int Complexity, int Order)>();
+                foreach (var breed in all)
+                {
+                    if (breed == null || !Classes.ContainsKey(breed.id)) continue;
+                    found.Add((breed.id, breed.shortName ?? ClassOf(breed.id), breed.description ?? "", breed.complexity, breed.sortIndex));
+                }
+                foreach (var b in found.OrderBy(b => b.Order)) _cBreeds.Add((b.Id, b.Name, b.Description, b.Complexity));
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] The game's breeds could not be read, the mod's own instead: {ex.Message}");
+            }
+            if (_cBreeds.Count == 0)
+                foreach (int id in Classes.Keys.OrderBy(k => k)) _cBreeds.Add((id, ClassOf(id), "", 0));
+        }
+
+        private static void BindBreedSlots()
+        {
+            _cBreedSlots.Clear();
+            var container = Part("ctr_breeds");
+            if (container == null) return;
+            var slots = new List<Il2CppCore.UILogic.Components.Slots.Slot>();
+            Il2CppCore.UILogic.Components.Slots.Slot random = null;
+            for (int i = 0; i < Kids(container); i++)
+            {
+                var slot = Kid(container, i).TryCast<Il2CppCore.UILogic.Components.Slots.Slot>();
+                if (slot == null) continue;
+                if (slot.name == "btn_randomBreed") random = slot;
+                else slots.Add(slot);
+            }
+            for (int i = 0; i < slots.Count; i++)
+            {
+                var slot = slots[i];
+                if (i >= _cBreeds.Count) { Show(slot, false); continue; }
+                int id = _cBreeds[i].Id;
+                slot.isFilled = true;
+                OnClick(slot, () => { _cBreed = id; _cHead = 0; RefreshBreed(); });
+                _cBreedSlots.Add(slot);
+            }
+            if (random != null)
+                OnClick(random, () =>
+                {
+                    _cBreed = _cBreeds[new Random().Next(_cBreeds.Count)].Id;
+                    _cHead = 0;
+                    RefreshBreed();
+                });
+        }
+
+        private static void StepBreed(int step)
+        {
+            int at = _cBreeds.FindIndex(b => b.Id == _cBreed);
+            if (at < 0 || _cBreeds.Count == 0) return;
+            _cBreed = _cBreeds[(at + step + _cBreeds.Count) % _cBreeds.Count].Id;
+            _cHead = 0;
+            RefreshBreed();
+        }
+
+        /// <summary>Everything that follows the breed and the sex: the slots' images and selection, the texts, the heads, the character.</summary>
+        private static void RefreshBreed()
+        {
+            if (_cTree == null) return;
+            for (int i = 0; i < _cBreedSlots.Count && i < _cBreeds.Count; i++)
+            {
+                var slot = _cBreedSlots[i];
+                slot.isSelected = _cBreeds[i].Id == _cBreed;
+                if (_breedImages != null && slot.tile != null)
+                    try { slot.tile.imgAddress = new Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntry(_breedImages, _cBreeds[i].Id, _cSex); } catch { }
+            }
+            var breed = _cBreeds.FirstOrDefault(b => b.Id == _cBreed);
+            SetText("lbl_breed", (breed.Name ?? ClassOf(_cBreed)).ToUpperInvariant());
+            SetText("lbl_breedInfo", breed.Description ?? "");
+            SetText("lbl_archetype", ClassOf(_cBreed));
+            for (int i = 1; i <= 5; i++) Show(Part("icon_complexity_" + i), i <= Math.Max(1, breed.Complexity));
+            RefreshHeads();
+            RefreshPreview();
+        }
+
+        /// <summary>The heads the game offers at creation for the breed and the sex, in its order.</summary>
+        private static void RefreshHeads()
+        {
+            _cHeads.Clear();
+            try
+            {
+                var all = Il2CppCore.DataCenter.DataCenterModule.headsDataRoot.GetObjects();
+                var found = new List<(int Id, string Asset, int Order)>();
+                foreach (var head in all)
+                    if (head != null && head.breed == _cBreed && head.gender == _cSex && head.availableAtCreation)
+                        found.Add((head.id, head.assetId ?? "", head.order));
+                foreach (var h in found.OrderBy(h => h.Order)) _cHeads.Add((h.Id, h.Asset));
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] The game's heads could not be read: {ex.Message}");
+            }
+            if (_cHead == 0 && _cHeads.Count > 0) _cHead = _cHeads[0].Id;
+
+            var container = Part("ctr_heads");
+            if (container == null) return;
+            if (_cHeadSlots.Count == 0 || _cHeadSlots[0].panel == null)
+            {
+                _cHeadSlots.Clear();
+                for (int i = 0; i < Kids(container); i++)
+                {
+                    var slot = Kid(container, i).TryCast<Il2CppCore.UILogic.Components.Slots.Slot>();
+                    if (slot == null) continue;
+                    int at = _cHeadSlots.Count;
+                    OnClick(slot, () => { if (at < _cHeads.Count) { _cHead = _cHeads[at].Id; RefreshHeadSelection(); RefreshPreview(); } });
+                    _cHeadSlots.Add(slot);
+                }
+            }
+            for (int i = 0; i < _cHeadSlots.Count; i++)
+            {
+                var slot = _cHeadSlots[i];
+                bool shown = i < _cHeads.Count;
+                Show(slot, shown);
+                if (!shown) continue;
+                slot.isFilled = true;
+                if (_headImages != null && slot.tile != null)
+                    try { slot.tile.imgAddress = new Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntry(_headImages, _cHeads[i].Asset, false); } catch { }
+            }
+            RefreshHeadSelection();
+        }
+
+        private static void RefreshHeadSelection()
+        {
+            for (int i = 0; i < _cHeadSlots.Count && i < _cHeads.Count; i++) _cHeadSlots[i].isSelected = _cHeads[i].Id == _cHead;
+        }
+
+        /// <summary>The character on the platform: the look the server makes of the choice, drawn by the screen's own displayer.</summary>
+        private static void RefreshPreview()
+        {
+            var displayer = Part<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer>("ed_chara");
+            if (displayer == null || _displayers == null || _entities == null) return;
+            int breed = _cBreed, sex = _cSex, head = _cHead, direction = _cDirection;
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync("heroes/preview", new Dictionary<string, object> { ["breed"] = breed, ["sex"] = sex, ["head"] = head });
+                _toUnity.Enqueue(() =>
+                {
+                    if (code != 200 || body is not JsonElement b || _cTree == null) return;
+                    if (breed != _cBreed || sex != _cSex || head != _cHead) return;
+                    try
+                    {
+                        var look = LookOf(Str(b, "look"));
+                        Il2CppCore.UI.UIUtils.pcb(displayer, look, (Il2Cpp.rc)direction, 0, _displayers, _entities);
+                    }
+                    catch (Exception ex) { MelonLogger.Warning($"[Heroes] The creation's character could not be drawn: {ex.Message}"); }
+                });
+            });
+        }
+
+        private static void AskScreenName()
+        {
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync("heroes/name");
+                _toUnity.Enqueue(() =>
+                {
+                    if (code != 200 || body is not JsonElement b || _cTree == null) return;
+                    Part<Il2CppCore.UILogic.Components.Figma.TextInput>("input_name")?.SetValue(Str(b, "name"));
+                });
+            });
+        }
+
+        private static void ScreenError(string text)
+        {
+            SetText("textInput_errorMessage", text);
+            Show(Part("textInput_errorMessage"), !string.IsNullOrEmpty(text));
+        }
+
+        /// <summary>The screen's CRÉER: the hero made by the server on the creation screen's rules and connected beside his master.</summary>
+        private static void CreateFromScreen()
+        {
+            if (_cBusy || _cTree == null) return;
+            string name = (Part<Il2CppCore.UILogic.Components.Figma.TextInput>("input_name")?.text ?? "").Trim();
+            if (name.Length == 0) { ScreenError(T("create.error.empty")); return; }
+            _cBusy = true;
+            ScreenError("");
+            var ask = new Dictionary<string, object> { ["name"] = name, ["breed"] = _cBreed, ["sex"] = _cSex, ["head"] = _cHead };
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync("heroes/create", ask);
+                _toUnity.Enqueue(() =>
+                {
+                    _cBusy = false;
+                    if (code == 200 && body is JsonElement done)
+                    {
+                        MelonLogger.Msg($"[Heroes] {name} made from the creation screen.");
+                        CloseNativeCreation();
+                        Say(T(Bool(done, "connected") ? "create.done" : "create.doneAlone", name), good: true);
+                        _windowKey = null;
+                        Poll();
+                        return;
+                    }
+                    string why = body is JsonElement b ? Str(b, "error") : "";
+                    ScreenError(code == 0 ? T("unreachable") : Texts.ContainsKey("create.error." + why) ? T("create.error." + why) : T("error"));
+                });
+            });
         }
 
         /// <summary>Every named part of a tree, its type and its depth, a line each: the creation screen's map.</summary>

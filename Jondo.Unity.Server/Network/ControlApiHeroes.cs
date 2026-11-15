@@ -89,11 +89,30 @@ namespace Jondo.Unity.Server.Network
             if (me == null) return Mal(409, "world");
             string name = Texto(cuerpo, "name").Trim();
             var (id, why) = Handlers.CharacterCreationHandler.Make(account, me.ServerId, name, (int)Numero(cuerpo, "breed"),
-                                                                    (int)Numero(cuerpo, "sex"), 0, Enumerable.Repeat(-1L, 6).ToList());
+                                                                    (int)Numero(cuerpo, "sex"), (int)Numero(cuerpo, "head"),
+                                                                    Enumerable.Repeat(-1L, 6).ToList());
             if (id == 0) return Mal(409, why);
             string connected = Heroes.Connect(me, id);
             Console.WriteLine($"[Heroes] {me.State.CharacterName} makes {name} ({id}) from the window; connected: {connected}.");
             return Bien(new { id, connected = connected == "ok", why = connected });
+        }
+
+        /// <summary>
+        /// The look a hero being made would have -- a breed, a sex, a head, his breed's colours --,
+        /// as the protocol's EntityLook in base64: the creation screen's platform draws it.
+        /// </summary>
+        private static Respuesta HeroesPreview(string cuerpo)
+        {
+            int breed = (int)Numero(cuerpo, "breed"), sex = (int)Numero(cuerpo, "sex"), head = (int)Numero(cuerpo, "head");
+            if (breed < 1 || sex is < 0 or > 1) return Mal(400, "breed");
+            try
+            {
+                return Bien(new { look = Convert.ToBase64String(BreedLookTable.BuildLook(breed, sex, head, onFoot: true)) });
+            }
+            catch (Exception ex)
+            {
+                return Mal(500, ex.Message);
+            }
         }
 
         /// <summary>A name for a new hero, as the creation screen's die draws one: one nobody has.</summary>
