@@ -60,6 +60,31 @@ namespace Jondo.Unity.Tests.Launcher
             Assert.True(LauncherService.SameContent(Path.Combine(_client, "Mods", "Heroes.dll"), shipped));
         }
 
+        /// <summary>
+        /// A client open holds its mod as a loaded file holds it: it can be renamed, not
+        /// overwritten. The old one is set aside and the new one goes in its place.
+        /// </summary>
+        [Fact]
+        public void A_mod_a_client_holds_is_set_aside_and_replaced()
+        {
+            if (!OperatingSystem.IsWindows() || !File.Exists(Shipped)) return;
+            Directory.CreateDirectory(Path.Combine(_client, "MelonLoader"));
+            Directory.CreateDirectory(Path.Combine(_client, "Mods"));
+            string installed = Path.Combine(_client, "Mods", "JondoFix.dll");
+            File.WriteAllText(installed, "an old mod, loaded");
+
+            using (new FileStream(installed, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete))
+            {
+                LauncherService.InstallMod(Path.Combine(_client, "Dofus.exe"));
+                Assert.True(LauncherService.SameContent(installed, Shipped));
+                Assert.True(File.Exists(installed + ".old"));
+            }
+
+            // The next launch, nobody holding it: the one set aside is gone.
+            LauncherService.InstallMod(Path.Combine(_client, "Dofus.exe"));
+            Assert.False(File.Exists(installed + ".old"));
+        }
+
         [Fact]
         public void A_client_without_melonloader_is_left_alone()
         {
