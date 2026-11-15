@@ -264,6 +264,15 @@
       "npc": 1034,
       "replies": [],
       "why": "After the Blop Reineta Real, the enclave's exit room, where Bibiblop takes the key holders into the Royal Rainbow Blop's lair («Une fois le boss vaincu, vous pouvez choisir de combattre le Blop Multicolore... ou de simplement sortir en parlant de nouveau à Bibiblop», Dofus pour les noobs); the map panel leaves. INFERRED cell, open floor near Bibiblop (227)."
+    },
+    {
+      "dungeon": 81,
+      "bossRoom": 136578048,
+      "room": 136579072,
+      "cell": 372,
+      "npc": 2449,
+      "replies": [21896],
+      "why": "The Ring del Capitán Eskarlata: after the ring, the captain's dressing room (136579072, his statues at its door, where the client's quests find him), where «L'anneau de Tot» has you ask him a reward («ATTENTION : Ne sortez pas tout de suite à la fin du donjon», Dofus pour les noobs); «Salir del Ring del Capitán Eskarlata» leaves. INFERRED cell, on the carpet."
     }
   ]
 }

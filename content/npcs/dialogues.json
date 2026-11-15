@@ -742,7 +742,8 @@
             { "reply": 14832, "next": 12878, "quest": 1198 },
             { "reply": 21556, "next": 17965, "beforeQuest": 1517, "criterion": "OA=586&PL>109" },
             { "reply": 21560, "quest": 1517, "completes": 8537, "params": [[30, 8537]], "next": 17970, "holds": 15317 },
-            { "reply": 26687 }
+            { "reply": 26687 },
+            { "reply": 22081, "next": 18449, "beforeQuest": 1526 }
           ]
         },
         {
@@ -1151,9 +1152,39 @@
           "choices": [
             { "reply": 20015 }
           ]
+        },
+        {
+          "message": 18449,
+          "choices": [
+            { "reply": 22080, "next": 18450, "beforeQuest": 1526 }
+          ]
+        },
+        {
+          "message": 18450,
+          "choices": [
+            { "reply": 22079, "next": 18451, "beforeQuest": 1526 }
+          ]
+        },
+        {
+          "message": 18451,
+          "choices": [
+            { "reply": 22078, "next": 18452, "beforeQuest": 1526 }
+          ]
+        },
+        {
+          "message": 18452,
+          "choices": [
+            { "reply": 22077, "next": 18908, "beforeQuest": 1526 }
+          ]
+        },
+        {
+          "message": 18908,
+          "choices": [
+            { "reply": 19316, "startsQuest": 1526, "params": [[34, 1526]] }
+          ]
         }
       ],
-      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881). «Un huevo para Zurcarák» (1517, Dofus pour les noobs «Un œuf pour Ecaflip»: level 130, after the achievement «Ángeles y demonios» -- «Faire le keke», 586 --, at his home in Astrub [3,-17]): «¿Cómo estás?» (21556) gets «¡Te has convertido en todo un Keké!» (17965); taken as a compliment (21554) he asks a favour (17966), «¿Qué favor?» (21553) is a fertilised egg of Thor Pestruz from the nest in Cania's natural park, against the dotruz (17967), «¿Y qué vas a hacer con el huevo?» (21551) is a present for his father Zurcarák (17968), hiding the surprise (21557) he asks again (17969), and «Me voy a Cania» (21558) starts the quest; «Tomártelo como un insulto e irte» (21555) and «No, gracias. Adiós» (21552) leave. With the egg, «Aquí tienes el huevo fecundado de Thor Pestruz» (21560) hands it over (8537) and gets the dotruz (17970, the step's reward), «Despedirte e irte con tu dotruz» (21559). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «posez lui des questions au sujet de Nabur»): the master of arms (16808), killed by Dark Vlad though he took a dofus from him (16809), and his youth's love in the first village of Amakna, on the dragoeufs' peninsula (16810)."
+      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881). «Un huevo para Zurcarák» (1517, Dofus pour les noobs «Un œuf pour Ecaflip»: level 130, after the achievement «Ángeles y demonios» -- «Faire le keke», 586 --, at his home in Astrub [3,-17]): «¿Cómo estás?» (21556) gets «¡Te has convertido en todo un Keké!» (17965); taken as a compliment (21554) he asks a favour (17966), «¿Qué favor?» (21553) is a fertilised egg of Thor Pestruz from the nest in Cania's natural park, against the dotruz (17967), «¿Y qué vas a hacer con el huevo?» (21551) is a present for his father Zurcarák (17968), hiding the surprise (21557) he asks again (17969), and «Me voy a Cania» (21558) starts the quest; «Tomártelo como un insulto e irte» (21555) and «No, gracias. Adiós» (21552) leave. With the egg, «Aquí tienes el huevo fecundado de Thor Pestruz» (21560) hands it over (8537) and gets the dotruz (17970, the step's reward), «Despedirte e irte con tu dotruz» (21559). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «posez lui des questions au sujet de Nabur»): the master of arms (16808), killed by Dark Vlad though he took a dofus from him (16809), and his youth's love in the first village of Amakna, on the dragoeufs' peninsula (16810). «L'anneau de Tot» (Dofus pour les noobs: you tell him Meriana sends you; he sold his last ring to a client and asks you not to take it by force): «Vengo de parte de Meriana» (22081, 18449), «Meriana necesita un anillo de Tot para un ritual» (22080, 18450: his register), «Esperar» (22079, 18451: sold to one of his best clients), «¿Cómo se llama el cliente?» (22078, 18452: Nanoc Elyod, near Madrestam), «Gracias por tu ayuda» (22077, 18908: the Purple dofus guessed) and «Despedirte antes de irte» (19316) hands the quest over; its own criterion (Qa=1523&Qo>8635) decides who is offered the first reply."
     },
     {
       "npc": 4310,
@@ -40154,6 +40185,221 @@
         }
       ],
       "why": "Dlim Katchel, the zolla who listens to the spirits (18373), in Pandala [22,-28]. For «Remordimientos de eternala» (Dofus pour les noobs: she makes a dust catcher out of the resources brought): «Siento molestarte, pero es que necesito tu ayuda» (22007, 18374), «Estoy buscando polvo de eternala» (22006, 18375: Ben Dedor sent you), «¿Puedes ser un poco más precisa?» (22005, 18376: a dust catcher), «No hay problema...» (22004, 18377: sacred bamboo wood, spiritual cloth and firefux totems); «Voy a buscar los ingredientes» (22008, or 22002 after asking where the cloth is, 18378: the araknespíritus weave it, in the village's houses) is 8637. «Aquí tienes los objetos que he podido encontrar» (22009) with the stalk, the cloth and the thirteen totems hands them over (8679-8681); «Esperaré mientras lo haces» (22011, 18381) and «Gracias. Adiós» (22010) give the dust catcher (15422). Lost before the eternales are done, «¿Dónde está el atrapapolvo que me habías prometido?» (22012, 18382, 22013) gives another."
+    },
+    {
+      "npc": 2472,
+      "map": 68421638,
+      "opening": 18459,
+      "lines": [
+        {
+          "message": 18459,
+          "choices": [
+            { "reply": 22091, "next": 18460, "quest": 1526, "beforeObjective": 8638 }
+          ]
+        },
+        {
+          "message": 18460,
+          "choices": [
+            { "reply": 22090, "next": 18461 }
+          ]
+        },
+        {
+          "message": 18461,
+          "choices": [
+            { "reply": 22089, "next": 18462 }
+          ]
+        },
+        {
+          "message": 18462,
+          "choices": [
+            { "reply": 22088, "next": 18463 }
+          ]
+        },
+        {
+          "message": 18463,
+          "choices": [
+            { "reply": 22087, "quest": 1526, "completes": 8638, "params": [[30, 8638]] }
+          ]
+        }
+      ],
+      "why": "Nanoc Elyod, the zurcarák collector Kerubim sold the ring to, at [11,-1] (18459). For «El anillo de Tot» (Dofus pour les noobs: you greet him, speak of Kerubim, ask for the ring against a curse; he lost it at a game against a sram called Karta): «Hola. ¿Te dice algo el nombre de Kerubim Crepin?» (22091, 18460), «Estoy buscando un anillo de Tot» (22090, 18461), «No, en realidad la necesito para contrarrestar una maldición» (22089, 18462: lost at Bris K), «¿Quién lo ha ganado?» (22088, 18463: Karta, on the Minotoror's island) and «Gracias, voy a la isla entonces» (22087) is 8638."
+    },
+    {
+      "npc": 2332,
+      "map": 136316674,
+      "opening": 18464,
+      "lines": [
+        {
+          "message": 18464,
+          "choices": [
+            { "reply": 22100, "next": 18465, "quest": 1526, "afterObjective": 8638, "beforeObjective": 8683 }
+          ]
+        },
+        {
+          "message": 18465,
+          "choices": [
+            { "reply": 22098, "next": 18466 },
+            { "reply": 22099 }
+          ]
+        },
+        {
+          "message": 18466,
+          "choices": [
+            { "reply": 22096, "next": 18468 },
+            { "reply": 22097, "next": 18471 },
+            { "reply": 22092, "next": 18467 }
+          ]
+        },
+        {
+          "message": 18467,
+          "choices": [
+            { "reply": 22099 }
+          ]
+        },
+        {
+          "message": 18471,
+          "choices": [
+            { "reply": 22096, "next": 18468 },
+            { "reply": 22099 }
+          ]
+        },
+        {
+          "message": 18468,
+          "choices": [
+            { "reply": 22095, "next": 18469 }
+          ]
+        },
+        {
+          "message": 18469,
+          "choices": [
+            { "reply": 22094, "next": 18470 }
+          ]
+        },
+        {
+          "message": 18470,
+          "choices": [
+            { "reply": 22093, "quest": 1526, "completes": 8683, "params": [[30, 8683]] }
+          ]
+        }
+      ],
+      "why": "Karta, the sram who won the ring at Bris K, in the Refuge [-42,-17] (18464). For «El anillo de Tot» (Dofus pour les noobs: ask why she is in a bad mood, say you want the ring against a curse, she guesses the Totankama treasure and tells you a relic trafficker of Sramvil has it): «¿Qué te preocupa?» (22100, 18465), «Lo cierto es que estoy interesado en un anillo que ganaste jugando» (22098, 18466: what for?). «Quiero conjurar una potente maldición» (22096, 18468) goes on; «Quiero regalárselo a una tía mía» (22097, 18471: she does not believe a word) and «Eso no es asunto tuyo» (22092, 18467: then nothing more to say) do not; that 18471 lets the curse be told after is INFERRED. «Shh...» (22095, 18469: the trafficker, the Torturer's tavern), «¿Cómo puedo ir a Sramvil?» (22094, 18470: the dimensional travellers' portals) and «Voy a buscar un portal» (22093) is 8683. «Irte» (22099) leaves."
+    },
+    {
+      "npc": 2488,
+      "map": 137367552,
+      "opening": 18472,
+      "lines": [
+        {
+          "message": 18472,
+          "choices": [
+            { "reply": 22106, "next": 18475, "quest": 1526, "beforeObjective": 8687, "criterion": "PO!15578" },
+            { "reply": 22102, "next": 18474, "quest": 1526, "beforeObjective": 8688, "criterion": "PO=15578" },
+            { "reply": 22107, "next": 18473 },
+            { "reply": 22103, "teleport": 137366528 }
+          ]
+        },
+        {
+          "message": 18475,
+          "choices": [
+            { "reply": 22104, "next": 18476, "buyItem": 15578, "buyPrice": 1000, "showsNpc": 2520 },
+            { "reply": 22105 }
+          ]
+        },
+        {
+          "message": 18476,
+          "choices": []
+        },
+        {
+          "message": 18474,
+          "choices": [
+            { "reply": 22101 }
+          ]
+        },
+        {
+          "message": 18473,
+          "choices": [
+            { "reply": 22103, "teleport": 137366528 }
+          ]
+        }
+      ],
+      "why": "Severrisueño, the Torturer, keeps the tavern of Sramvil [5,2] (18472). For «El anillo de Tot» (Dofus pour les noobs: buy him a triple beer for 1000 kamas and Vantarde Smis appears): «¿Conoces a un traficante de reliquias?» (22106, 18475: Vantarde only comes at night, but for a good customer...), «Vale, te compro un vaso» (22104) buys the «Cerveza triple del Torturador» (15578) for 1000 kamas and brings Vantarde in (18476); «No, gracias. Adiós» (22105) does not. With the beer in the bag, the same question (22102, 18474: he sits at that table) and «Voy a hablar con él» (22101). «¡Vaya! ¿Qué hace un torturador como tú llevando una taberna?» (22107, 18473) is his story. «Salir de la taberna» (22103) leads out to the alley; that it is his is the client's, where it lands INFERRED."
+    },
+    {
+      "npc": 2520,
+      "map": 137367552,
+      "opening": 18478,
+      "openings": [
+        { "quest": 1526, "objective": 8687, "pending": 8688, "message": 18477 }
+      ],
+      "lines": [
+        {
+          "message": 18478,
+          "choices": [
+            { "reply": 22116, "next": 18479, "quest": 1526, "beforeObjective": 8687 }
+          ]
+        },
+        {
+          "message": 18479,
+          "choices": [
+            { "reply": 22115, "next": 18480, "holds": 15444, "takes": 15444, "quest": 1526, "completes": 8687, "params": [[30, 8687]] },
+            { "reply": 22110 }
+          ]
+        },
+        {
+          "message": 18480,
+          "choices": [
+            { "reply": 22114, "next": 18481 }
+          ]
+        },
+        {
+          "message": 18481,
+          "choices": [
+            { "reply": 22113, "next": 18482 }
+          ]
+        },
+        {
+          "message": 18482,
+          "choices": [
+            { "reply": 22111 },
+            { "reply": 22112 }
+          ]
+        },
+        {
+          "message": 18477,
+          "choices": [
+            { "reply": 22108 },
+            { "reply": 22109 }
+          ]
+        }
+      ],
+      "why": "Vantarde Smis, the relic trafficker, at the Torturer's table once the beer is bought (18478). For «El anillo de Tot» (Dofus pour les noobs: he asks for a skull to see your motivation, says he sold the ring and will not name the buyer, so you attack him): «Quiero hacerme con un anillo de Tot» (22116, 18479), «Aquí tienes la calavera» (22115) hands over the skull (15444) and is 8687 (18480: sold to another client), «Gruñir y preguntarle el nombre del cliente» (22114, 18481), «Devuélveme entonces la calavera» (22113, 18482) and «Atacar al estafador» (22111) is the fight; «Encogerte de hombros e irte» (22112) leaves, and coming back he warns you off (18477) with the same two: «Atacar al estafador» (22108) or leave (22109). «Irte en busca de una calavera» (22110) leaves without one."
+    },
+    {
+      "npc": 2449,
+      "map": 136579072,
+      "opening": 18284,
+      "lines": [
+        {
+          "message": 18284,
+          "choices": [
+            { "reply": 22119, "next": 18483, "quest": 1526, "afterObjective": 8689, "beforeObjective": 8690 },
+            { "reply": 21896 }
+          ]
+        },
+        {
+          "message": 18483,
+          "choices": [
+            { "reply": 22118, "next": 18484 }
+          ]
+        },
+        {
+          "message": 18484,
+          "choices": [
+            { "reply": 22117, "gives": 15420, "quest": 1526, "completes": 8690, "params": [[30, 8690]] }
+          ]
+        }
+      ],
+      "why": "Captain Eskarlata after the ring, in his dressing room (18284: what a punch). For «El anillo de Tot» (Dofus pour les noobs: at the end of the dungeon, before leaving, ask him a reward for beating him; he gives the ring): «Una victoria tan sublime como la mía merece una buena recompensa» (22119, 18483), «Me gustaría tener un anillo de Tot» (22118, 18484: he bought one thinking it magic) and «Gracias. Adiós» (22117) gives the «Anillo de Tot» (15420) and is 8690. «Salir del Ring del Capitán Eskarlata» (21896) leaves the dungeon (content/world/dungeon_exits.json)."
     }
   ]
 }

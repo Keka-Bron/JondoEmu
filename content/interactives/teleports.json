@@ -613,6 +613,17 @@
       "toCell": 397,
       "criterion": "PO=15005",
       "why": "The trapdoor of the Incarnam militia's tower down to the orbalantir's room, opened by the captain's key (15005, «Darle las gracias y buscar la trampilla»)."
+    },
+    {
+      "map": 134221826,
+      "element": 485454,
+      "cell": 343,
+      "gfx": 46672,
+      "type": -1,
+      "skill": 184,
+      "toMap": 136577024,
+      "toCell": 465,
+      "why": "The Ring del Capitán Eskarlata (dungeon 81) had no way in: its street [6,3] (134221826) is the catalogue's exit and its antechamber (136577024, Tak Hillero's) its entrance, and nothing led from one to the other. The street's one element, 485454 in the mouth of the giant skull the carpet runs to, is the door («Rendez-vous en [6,3] afin d'effectuer le donjon», Dofus pour les noobs). INFERRED landing, on the antechamber's carpet."
     }
   ]
 }

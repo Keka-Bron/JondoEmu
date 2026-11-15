@@ -4787,6 +4787,21 @@
       "orientation": 1,
       "criterion": "Qa=1524&Qo>8674&Qo<8675",
       "why": "Gavroch at the Blop dungeon's door, beside Bibiblop (164), once the tymadores are beaten (8674) and until he is thanked (8675): Dofus pour les noobs, «Remerciez alors Gavroch de vous avoir aidé». INFERRED cell."
+    },
+    {
+      "map": 137367552,
+      "npc": 2520,
+      "cell": 398,
+      "orientation": 1,
+      "criterion": "Qa=1526&Qo<8688&PO=15578",
+      "why": "Vantarde Smis at the tavern's middle table, «Está sentado en esa mesa de ahí» (18474), once the triple beer is bought (Dofus pour les noobs: «acheter une bière triple pour 1000 kamas et ainsi faire apparaitre» him) and until he is beaten. INFERRED cell, beside the table."
+    },
+    {
+      "map": 137367552,
+      "npc": 2488,
+      "cell": 362,
+      "orientation": 3,
+      "why": "Severrisueño behind his bar in the Torturer's tavern [5,2]: he stood nowhere. INFERRED cell: behind the counter, on the floor with the crossed bones, where the skull arch over the bar does not hide him (on 333, under it, only his legs showed); facing the room."
     }
   ]
 }

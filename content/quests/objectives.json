@@ -698,7 +698,7 @@
    "monster": 5296,
    "map": 192676864,
    "afterObjectives": [14206],
-   "why": "«Encuentra raratones en los alrededores de la biblioteca»: the mice of the cellar (5296)."
+   "why": "«Encuentra raratones en los alrededores de la biblioteca»: the mice of the cellar (5296). Found by beating them once; the cheese for 14208 (19763) falls from them after that, its own row wanting this objective done (Qo>14207), as the loot is rolled before the fight ticks it."
   },
   {
    "objective": 13858,
@@ -5295,6 +5295,28 @@
    "gives": [{"item": 15419, "count": 1}, {"item": 15602, "count": 1}, {"item": 15603, "count": 1}, {"item": 15604, "count": 1}, {"item": 15605, "count": 1}],
    "requires": [{"item": 15422, "count": 1}],
    "why": "«Utiliza el atrapapolvo para conseguir 5 dosis de polvo de eternala»: Dofus pour les noobs sends you with the dust catcher to [-41,-17] [-43,-17] [-41,-16] [-40,-18] [-43,-19] on the Minotoror's island, the eternales 485527, 485533, 485530, 485529 and 485528 of the client's maps there, one on each. The client has five «Polvo de eternala» (15419, 15602-15605): one from each eternale, which from which INFERRED. Done once the five are carried."
+  },
+  {
+   "objective": 8685,
+   "quest": 1526,
+   "kind": "enter",
+   "map": 134351108,
+   "why": "«Entra en Sramvil, la dimensión del dios Sram»: arriving on the map the Travellers' portal lands on (TravelersTower.Dimensions, 134351108)."
+  },
+  {
+   "objective": 8686,
+   "quest": 1526,
+   "kind": "enter",
+   "map": 137367552,
+   "why": "«Encuentra la entrada de la Taberna del Torturador»: going in through its door, the street's arch (content/interactives/floor_passages.json), to the tavern [5,2], 137367552, the map of the next two objectives."
+  },
+  {
+   "objective": 8688,
+   "quest": 1526,
+   "kind": "beat",
+   "monster": 3763,
+   "map": 137367552,
+   "why": "«Consigue el nombre del comprador»: beating Vantarde Smis (3763), whose note (15595) names the captain; the note falls in the same fight (the loot is rolled before the quests are told). Dofus pour les noobs: whoever is in the fight and has given him the skull gets it."
   }
  ]
 }

@@ -203,6 +203,27 @@
       "toMap": 152849,
       "toCell": 204,
       "why": "And back: the arch in the Entrance's right wall, 263 its only walkable cell, out to the island before the cave (204, beside 176)."
+    },
+    {
+      "map": 137366528,
+      "cell": 374,
+      "toMap": 137367552,
+      "toCell": 158,
+      "why": "The Torturer's tavern [5,2] of Sramvil (137367552) had no way in: nothing joins it to the street before it (137366528), and neither map hangs a door element. Its door is the street's arch under the mug sign, up the steps; 359 and 374, the two top cells of those steps under the arch, lead down into the tavern, a cellar whose way in is the walkable corridor running up to its back wall (103-215). «El anillo de Tot» asks you to find it («Encuentra la entrada de la Taberna del Torturador»). INFERRED landing, inside that corridor."
+    },
+    {
+      "map": 137366528,
+      "cell": 359,
+      "toMap": 137367552,
+      "toCell": 158,
+      "why": "The other top cell of the tavern's steps (see 374): a click on the doorway itself stops the character here."
+    },
+    {
+      "map": 137367552,
+      "cell": 103,
+      "toMap": 137366528,
+      "toCell": 403,
+      "why": "And out of the tavern: the top of its back corridor, at the wall, leads up to the street, landing at the foot of the arch's steps (403). INFERRED."
     }
   ]
 }

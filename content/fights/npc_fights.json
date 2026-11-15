@@ -1209,6 +1209,12 @@
       "alliesMustLive": true,
       "allies": [ { "monster": 3793, "grade": 0 } ],
       "alliesPlayed": true,
-      "why": "«A la leche caliente, batir de repente»: tymadora Gria (3757) and her accomplices Guy Sante, Buff Hon and Gullo (3754-3756) ambush the character at Bibiblop's door, and Gavroch (3793) fights beside him: Dofus pour les noobs, «Vous serez aidé par Gavroch que vous pourrez contrôler... ATTENTION : Il ne doit pas mourir»." }
+      "why": "«A la leche caliente, batir de repente»: tymadora Gria (3757) and her accomplices Guy Sante, Buff Hon and Gullo (3754-3756) ambush the character at Bibiblop's door, and Gavroch (3793) fights beside him: Dofus pour les noobs, «Vous serez aidé par Gavroch que vous pourrez contrôler... ATTENTION : Il ne doit pas mourir»." },
+    { "npc": 2520, "map": 137367552, "reply": 22111,
+      "monsters": [ { "monster": 3763, "grade": 0 } ],
+      "why": "«Atacar al estafador»: Vantarde Smis (3763) alone; his own drop row gives the note found on him (15595) while 8688 is to do (Qa=1526&Qo>8687&Qo<8688&PO!15595)." },
+    { "npc": 2520, "map": 137367552, "reply": 22108,
+      "monsters": [ { "monster": 3763, "grade": 0 } ],
+      "why": "«Atacar al estafador»: Vantarde Smis (3763) alone; his own drop row gives the note found on him (15595) while 8688 is to do (Qa=1526&Qo>8687&Qo<8688&PO!15595)." }
   ]
 }
