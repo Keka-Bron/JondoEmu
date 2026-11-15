@@ -1,0 +1,16 @@
+{
+  "_comment": [
+    "How many summons a monster controls at once (Managers.MonsterSummonCaps). A monster has no summon",
+    "capacity in the client's data, so without a row here it summons as often as its spells let it.",
+    "Each row is a guide's word, quoted in its why.",
+    "",
+    "  monster   the monster template",
+    "  cap       the summon capacity it has, counted as a player's: each summon takes its summonCost"
+  ],
+  "caps": [
+    {
+      "monster": 289, "cap": 1,
+      "why": "Master Cuerbok's Invocación de Cuerbok (629, once a turn): «Invoque un Corbac. Il ne peut y avoir qu'un seul Corbac invoqué sur le terrain [...] Si ce Corbac est éliminé, il peut en réinvoquer un directement au tour suivant» (Dofus pour les noobs, «Bibliothèque du Maître Corbac»). The crow (281) costs 1."
+    }
+  ]
+}

@@ -6270,6 +6270,21 @@ namespace Jondo.Unity.Server.Handlers
                     hasta = Math.Max(hasta, suya);
                     if (c.HookUntil is { } targetTurn) hasta = Math.Max(hasta, targetTurn);
                 }
+                // And for as long as what the same cast left on that bearer, as a player spell's
+                // hook lives: Master Cuerbok's Caparazón de Alas puts its look, -12 AP and -5 MP on
+                // him for two turns, and its rows with no duration of their own -- 400 returned
+                // when hit, its grade 2 cast at the start of his turn -- went with the round of
+                // the cast, so his next turn under the shell hurt nobody (Dofus pour les noobs:
+                // «quand il commence son tour sous l'effet de ce sort, il inflige 135 de dégâts»).
+                if (hasta >= 0)
+                {
+                    foreach (var c in consecuencias)
+                    {
+                        if (c.Buff == null || c.Sobre != grupo.Key.Sobre || c.HechizoOrigen != grupo.Key.HechizoOrigen
+                            || c.NivelOrigen != grupo.Key.NivelOrigen) continue;
+                        hasta = Math.Max(hasta, c.Buff.CaducaEnRonda);
+                    }
+                }
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico);
             }
@@ -7127,7 +7142,8 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static int SummonLimitFor(Fighter fighter, int round)
         {
-            int innate = fighter.IsMonster ? 0 : BasePlayerSummonLimit;
+            // A monster has none of its own, unless a guide caps it: Master Cuerbok's one crow.
+            int innate = fighter.IsMonster ? Managers.MonsterSummonCaps.For(fighter.MonsterId) : BasePlayerSummonLimit;
             int equipmentOrTemplate = fighter.Otra(CaracteristicaDeInvocaciones);
             int buffs = fighter.Buffs.De(CaracteristicaDeInvocaciones, round);
             return Math.Max(0, innate + equipmentOrTemplate + buffs);

@@ -329,6 +329,7 @@ namespace Jondo.Unity.Server.Network
             Managers.TokenShops.Initialize();
             Managers.DungeonExitRooms.Forget();
             Managers.FightWinAlterations.Forget();
+            Managers.MonsterSummonCaps.Reload();
             Managers.Readables.Forget();
             Managers.InteractiveWays.Forget();
             Managers.TeleportManager.Initialize();
