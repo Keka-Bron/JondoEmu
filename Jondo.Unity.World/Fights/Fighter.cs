@@ -268,6 +268,15 @@ namespace Jondo.Unity.World.Fights
         public int AccumulatedApLoss { get; set; } = 0;
 
         /// <summary>
+        /// The AP and MP this fighter's turn started with, the buffs on it counted; null before his
+        /// first. What "per AP / MP used" reads its points against: from the maximum, a point a
+        /// glyph took off him before his turn was a point spent, and Bloproyección burnt him for a
+        /// step he never took.
+        /// </summary>
+        public int? APAtTurnStart { get; set; }
+        public int? MPAtTurnStart { get; set; }
+
+        /// <summary>
         /// Whether its template lets it tackle: the <c>CanTackle</c> bit (128) of a monster's or a
         /// summon's <c>m_flags</c>. People always can. The training dummies are among the 358
         /// templates without it, and walking away from one never costs a point in the class
@@ -565,6 +574,8 @@ namespace Jondo.Unity.World.Fights
         {
             CurrentAP = Math.Max(0, MaxAP + Buffs.De(CaracteristicaDePuntosDeAccion, ronda));
             CurrentMP = Math.Max(0, MaxMP + Buffs.De(CaracteristicaDePuntosDeMovimiento, ronda));
+            APAtTurnStart = CurrentAP;
+            MPAtTurnStart = CurrentMP;
             AccumulatedMpLoss = 0;
             AccumulatedApLoss = 0;
         }

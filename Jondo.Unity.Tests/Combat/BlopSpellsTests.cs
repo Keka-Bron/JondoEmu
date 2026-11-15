@@ -58,6 +58,22 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(hook.Vivo(round + 2));     // and no other
         }
 
+        /// <summary>
+        /// "Por cada PM utilizado" counts from what his turn started with: the MP a Blifo took off
+        /// him before it is not one he used. Two steps of three are two, not the three short of his four.
+        /// </summary>
+        [Fact]
+        public void A_point_taken_before_the_turn_is_not_one_used()
+        {
+            var me = Person(10, 262);
+            me.MaxMP = 4; me.MPAtTurnStart = 3; me.CurrentMP = 1;
+            var poison = new SpellEffect { EffectId = 1140, DiceNum = 1, DiceSide = 4 };
+            Assert.Equal(8, EffectEngine.BaseDelModo(poison, 0, new Fighter(), me, new FightInstance(1, 1)));
+
+            me.MPAtTurnStart = null;                 // before his first turn: from the maximum
+            Assert.Equal(12, EffectEngine.BaseDelModo(poison, 0, new Fighter(), me, new FightInstance(1, 1)));
+        }
+
         /// <summary>The same row on one still to play this round goes off on that turn, and on no later one.</summary>
         [Fact]
         public void The_projection_s_poison_on_one_still_to_play_is_for_this_round()
