@@ -665,11 +665,37 @@ namespace Heroes
             button.Clear();
             bool icon = false;
             if (model != null) Layers(model, other, model.worldBound, button, ref icon);
-            if (icon) return;
-            var picture = Layer(size.x * 0.14f, size.y * 0.14f, size.x * 0.72f, size.y * 0.72f);
-            picture.style.backgroundImage = new StyleBackground(Figure());
-            picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
-            button.Add(picture);
+            if (!icon)
+            {
+                var picture = Layer(size.x * 0.14f, size.y * 0.14f, size.x * 0.72f, size.y * 0.72f);
+                picture.style.backgroundImage = new StyleBackground(Figure());
+                picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+                button.Add(picture);
+            }
+
+            // The light the pointer turns on: the frame's shape, a little paler.
+            float radius = 0f;
+            for (int i = 0; i < button.childCount && radius <= 0f; i++)
+                radius = button[i].style.borderTopLeftRadius.value.value;
+            var light = Layer(0f, 0f, size.x, size.y);
+            light.name = "JondoHeroesLight";
+            light.style.backgroundColor = new StyleColor(new UnityEngine.Color(1f, 1f, 1f, 0.16f));
+            light.style.borderTopLeftRadius = light.style.borderTopRightRadius =
+                light.style.borderBottomLeftRadius = light.style.borderBottomRightRadius = new StyleLength(radius > 0f ? radius : 4f);
+            light.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+            button.Add(light);
+        }
+
+        /// <summary>The button lit or not, as the pointer is on it or not.</summary>
+        private static void Lit(VisualElement button, bool on)
+        {
+            try
+            {
+                var light = new List<VisualElement>();
+                Named(button, "JondoHeroesLight", light);
+                foreach (var one in light) one.style.display = new StyleEnum<DisplayStyle>(on ? DisplayStyle.Flex : DisplayStyle.None);
+            }
+            catch { }
         }
 
         private static void Layers(VisualElement a, VisualElement b, UnityEngine.Rect origin, VisualElement into, ref bool icon)
@@ -773,7 +799,7 @@ namespace Heroes
                 spare.style.backgroundImage = new StyleBackground(Figure());
                 spare.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
                 Pressed(spare);
-                Hint(spare, "hint.window");
+                MenuHint(spare);
                 places[0].hierarchy.Insert(0, spare);
             }
             spare.style.display = new StyleEnum<DisplayStyle>(shown ? DisplayStyle.Flex : DisplayStyle.None);
@@ -872,7 +898,12 @@ namespace Heroes
             // Dressed once placed, at the size it takes (Dress).
             _dressedFor = default;
             Pressed(button);
-            Hint(button, "hint.window");
+            MenuHint(button);
+            // Lit under the pointer, as the game's own buttons are (the light laid by Dress).
+            button.RegisterCallback<PointerEnterEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerEnterEvent>>(
+                new Action<PointerEnterEvent>(_ => Lit(button, true))), TrickleDown.NoTrickleDown);
+            button.RegisterCallback<PointerLeaveEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerLeaveEvent>>(
+                new Action<PointerLeaveEvent>(_ => Lit(button, false))), TrickleDown.NoTrickleDown);
             grid.hierarchy.Add(button);
             return button;
         }
@@ -1663,13 +1694,70 @@ namespace Heroes
                     line.style.marginBottom = new StyleLength(i == 0 && lines.Length > 1 ? 3f : 0f);
                     _hint.Add(line);
                 }
-                // On its left: the group panel stands against the screen's right edge.
+                // On its left: the group panel stands against the screen's right edge. What the
+                // MENUS button's hint set (ShowMenuHint) undone.
                 var at = target.worldBound;
                 float width = layer.resolvedStyle.width;
+                _hint.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
+                _hint.style.left = new StyleLength(StyleKeyword.Auto);
+                _hint.style.bottom = new StyleLength(StyleKeyword.Auto);
+                _hint.style.translate = new StyleTranslate(StyleKeyword.Null);
                 _hint.style.right = new StyleLength(Math.Max(0f, (float.IsNaN(width) ? 0f : width) - at.xMin + 6f));
                 _hint.style.top = new StyleLength(at.yMin);
                 _hint.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
                 _hint.BringToFront();
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// The MENUS button's hint as the game writes its buttons': the name, then the key in a box
+        /// of its own, above the button and centred on it.
+        /// </summary>
+        private static VisualElement MenuHint(VisualElement target)
+        {
+            try
+            {
+                target.RegisterCallback<PointerEnterEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerEnterEvent>>(
+                    new Action<PointerEnterEvent>(_ => ShowMenuHint(target))), TrickleDown.NoTrickleDown);
+                target.RegisterCallback<PointerLeaveEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerLeaveEvent>>(
+                    new Action<PointerLeaveEvent>(_ => HideHint())), TrickleDown.NoTrickleDown);
+            }
+            catch { }
+            return target;
+        }
+
+        private static void ShowMenuHint(VisualElement target)
+        {
+            ShowHint(target, T("title"));
+            try
+            {
+                if (_hint == null || _hint.panel == null) return;
+                _hint.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+                _hint.style.alignItems = new StyleEnum<Align>(Align.Center);
+                var key = new VisualElement();
+                key.pickingMode = PickingMode.Ignore;
+                key.style.marginLeft = new StyleLength(8f);
+                key.style.paddingLeft = key.style.paddingRight = new StyleLength(5f);
+                key.style.paddingTop = key.style.paddingBottom = new StyleLength(1f);
+                key.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.30f, 0.30f, 0.42f, 1f));
+                Round(key, 3f);
+                var keys = Label("Ctrl + Tab", 11f);
+                keys.pickingMode = PickingMode.Ignore;
+                keys.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
+                keys.style.marginBottom = new StyleLength(0f);
+                key.Add(keys);
+                _hint.Add(key);
+
+                // Above the button, its middle on the button's.
+                var layer = _hint.hierarchy.parent;
+                var at = target.worldBound;
+                float height = layer?.resolvedStyle.height ?? float.NaN;
+                _hint.style.right = new StyleLength(StyleKeyword.Auto);
+                _hint.style.top = new StyleLength(StyleKeyword.Auto);
+                _hint.style.left = new StyleLength(at.center.x);
+                _hint.style.bottom = new StyleLength(float.IsNaN(height) ? 0f : height - at.yMin + 4f);
+                _hint.style.translate = new StyleTranslate(new Translate(new Length(-50f, LengthUnit.Percent), new Length(0f), 0f));
             }
             catch { }
         }
