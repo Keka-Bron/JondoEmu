@@ -49,6 +49,18 @@ namespace Jondo.Unity.Tests.Launcher
         }
 
         [Fact]
+        public void The_heroes_mod_goes_in_too()
+        {
+            string shipped = Path.Combine(Paths.Root, "Heroes", "Heroes.dll");
+            if (!File.Exists(shipped)) return;
+            Directory.CreateDirectory(Path.Combine(_client, "MelonLoader"));
+
+            LauncherService.InstallMod(Path.Combine(_client, "Dofus.exe"));
+
+            Assert.True(LauncherService.SameContent(Path.Combine(_client, "Mods", "Heroes.dll"), shipped));
+        }
+
+        [Fact]
         public void A_client_without_melonloader_is_left_alone()
         {
             if (!File.Exists(Shipped)) return;

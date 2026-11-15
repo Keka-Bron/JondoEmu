@@ -487,7 +487,7 @@ namespace Jondo.Unity.Launcher
         }
 
         /// <summary>The mods the emulator ships, each in its own folder of the repository.</summary>
-        internal static readonly string[] ShippedMods = { "JondoFix", "Cazacabezas" };
+        internal static readonly string[] ShippedMods = { "JondoFix", "Cazacabezas", "Heroes" };
 
         /// <summary>
         /// The emulator's mods into the client's Mods, each when it differs from the one there.

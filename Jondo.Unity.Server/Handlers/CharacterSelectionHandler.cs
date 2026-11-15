@@ -30,6 +30,21 @@ namespace Jondo.Unity.Server.Handlers
         private static readonly Dictionary<int, int> StatIdByEffectActionId = EffectActionIdByStatId.ToDictionary(k => k.Value, v => v.Key);
 
         /// <summary>
+        /// A hero's character into the current session -- one with no socket (Managers.Heroes) --:
+        /// his sheet, his bag and what he wears, as a selection loads them, and nothing of a
+        /// client's: no last visit, no last connection, no actor details for a map.
+        /// </summary>
+        internal static bool LoadForHero(long characterId)
+        {
+            if (!DatabaseManager.LoadCharacter(characterId)) return false;
+            SessionContext.State.SetInventory(DatabaseManager.LoadInventory(characterId));
+            SessionContext.State.ClearEquippedItems();
+            foreach (var item in SessionContext.State.GetInventoryCopy())
+                Managers.Equipment.RememberWorn(item.Uid, item.Position, item.RawEffects);
+            return true;
+        }
+
+        /// <summary>
         /// Loads the selected character after checking the resolved account's ownership.
         /// The entry service supplies the id from a typed request or a resumable fight.
         /// </summary>
@@ -64,6 +79,9 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             Console.WriteLine($"[Game Node] Selected character {characterIdToLoad}.");
+
+            // Somebody's hero until now: he is played from a client of his own from here on.
+            Managers.Heroes.Release(characterIdToLoad);
 
             // A sex change potion used last time: done now, before the character is read.
             Managers.CharacterRemodel.ApplySexChange(characterIdToLoad);

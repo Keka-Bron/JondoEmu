@@ -135,6 +135,8 @@ namespace Jondo.Unity.Server.Handlers
             var playerFighter = BuildPlayerFighter(fight);
             playerFighter.CellId = fight.BluePlacementCells.FirstOrDefault();
             fight.AddPlayer(playerFighter);
+            // And his heroes beside him, played from his client (FightHeroes.cs).
+            AddHeroes(fight, GameState.CharacterId);
 
             // Build Monster Fighters from real MobGroup data.
             // Fighter IDs for monsters MUST be sequential negative numbers per fight (-1, -2, -3...)
@@ -2541,6 +2543,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!played.IsCharacter)
                 return Network.FightProtocol.BuildSummonSpellBar(played.Id, me, played.HechizosDeInvocado);
+            if (HeroBar(played, me) is { } heroBar) return heroBar;
             var bar = new List<(int Slot, int Spell)> { (0, Network.FightProtocol.HechizoCuerpoACuerpo) };
             for (int i = 0; i < played.HechizosDeInvocado.Count; i++) bar.Add((i + 1, played.HechizosDeInvocado[i].Spell));
             return Network.FightProtocol.BuildSpellBar(played.Id, played.HechizosDeInvocado, bar, conArma: true, controllerId: me);
@@ -11454,6 +11457,7 @@ namespace Jondo.Unity.Server.Handlers
                 return TerminarParaUnoAsync(sesion.Stream, fight,
                                             fight.HaGanado(sesion.State.CharacterId), azulGana);
             });
+            HeroesFightOver(fight);
             ForgetRewards(fight);
             ForgetSurrenderVotes(fight);
             ChallengeWatcher.Forget(fight);

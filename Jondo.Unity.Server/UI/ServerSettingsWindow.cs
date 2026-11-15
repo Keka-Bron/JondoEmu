@@ -78,7 +78,11 @@ internal sealed class ServerSettingsWindow : Window
         var loot = Toggle("RandomLoot", "RandomLootHint", s.RandomLoot, v => { s.RandomLoot = v; LootState(v); });
         LootState(s.RandomLoot);
         var lootCard = Card("Loot", loot, chance, rarities, levels);
-        var modes = Card("Modes", Toggle("Hardcore", "HardcoreHint", s.Hardcore, v => s.Hardcore = v), hunters, huntMinutes, restMinutes);
+        var heroesMax = Number("HeroesMax", null, s.HeroesMax, 1, Managers.Heroes.Most, 1, "", v => s.HeroesMax = (int)v);
+        var heroes = Toggle("HeroMode", "HeroModeHint", s.HeroMode, v => { s.HeroMode = v; heroesMax.IsEnabled = v; });
+        heroesMax.IsEnabled = s.HeroMode;
+        var modes = Card("Modes", Toggle("Hardcore", "HardcoreHint", s.Hardcore, v => s.Hardcore = v), hunters, huntMinutes, restMinutes,
+                         heroes, heroesMax);
         var raids = Card("Raids",
             Number("RaidMin", "RaidMinHint", s.RaidMinPlayers, 0, 16, 1, "", v => s.RaidMinPlayers = (int)v),
             Number("Matchmaking", "MatchmakingHint", s.MatchmakingGroupSize, 0, 4, 1, "", v => s.MatchmakingGroupSize = (int)v));

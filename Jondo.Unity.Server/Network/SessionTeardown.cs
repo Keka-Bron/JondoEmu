@@ -58,6 +58,9 @@ namespace Jondo.Unity.Server.Network
             try { await TradeHandler.AbandonAsync(session); } catch { }
             try { await ArtisanHandler.LeftAsync(session); } catch { }
 
+            // His heroes go with him, each saved.
+            if (session.State.CharacterId > 0) Managers.Heroes.DisconnectAll(session.State.CharacterId);
+
             if (session.State.CharacterId > 0)
             {
                 try

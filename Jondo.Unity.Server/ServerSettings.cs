@@ -111,6 +111,15 @@ namespace Jondo.Unity.Server
         /// <summary>The prey's respite between two hunts, in minutes.</summary>
         public int HeadHuntRestMinutes { get; set; } = 30;
 
+        /// <summary>
+        /// The hero mode (<see cref="Managers.Heroes"/>): the other characters of one's account
+        /// connected beside one's own, fighting at one's side and played by hand in their turns.
+        /// </summary>
+        public bool HeroMode { get; set; } = true;
+
+        /// <summary>How many heroes a character may have connected at once, himself not counted.</summary>
+        public int HeroesMax { get; set; } = 3;
+
         /// <summary>How many scrolled stats a player starts with.</summary>
         public int StartingScrollStats { get; set; } = Handlers.CharacterCreationHandler.ScrolledStat;
 

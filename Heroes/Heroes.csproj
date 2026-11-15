@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <!-- Where the Dofus client is, as for Cazacabezas:
+
+           dotnet build Heroes -p:DofusClientDir="D:\whatever\Dofus"
+
+         or with the DOFUS_CLIENT_DIR environment variable; else the known names next to the
+         repository. -->
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And '$(DOFUS_CLIENT_DIR)' != ''">$(DOFUS_CLIENT_DIR)</DofusClientDir>
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.11')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.11'))</DofusClientDir>
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.10')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\Cliente 3.6.10.10'))</DofusClientDir>
+    <DofusClientDir Condition="'$(DofusClientDir)' == '' And Exists('$(MSBuildProjectDirectory)\..\..\DofusClient-3.6.10.10')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\DofusClient-3.6.10.10'))</DofusClientDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(DofusClientDir)\MelonLoader\net6\*.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="$(DofusClientDir)\MelonLoader\Il2CppAssemblies\*.dll">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Kept beside the project, where the launcher takes it from for every client's Mods
+       (LauncherService.ShippedMods), and copied into this machine's client when there is one;
+       -p:SkipModDeploy=true skips the second. -->
+  <Target Name="GuardarMod" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)" OverwriteReadOnlyFiles="true" />
+  </Target>
+
+  <Target Name="DesplegarMod" AfterTargets="Build"
+          Condition="'$(SkipModDeploy)' != 'true' And Exists('$(DofusClientDir)\Mods')">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DofusClientDir)\Mods"
+          OverwriteReadOnlyFiles="true" />
+    <Message Text="[Deploy] Heroes.dll en $(DofusClientDir)\Mods." Importance="high" />
+  </Target>
+</Project>

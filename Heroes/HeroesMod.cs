@@ -1,0 +1,656 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Il2CppCore.UILogic.Components;
+using Il2CppCore.UILogic.Components.Figma;
+using Il2CppInterop.Runtime;
+using MelonLoader;
+using UnityEngine.UIElements;
+
+[assembly: MelonInfo(typeof(Heroes.HeroesMod), "Heroes", "1.0.0", "Jondo")]
+[assembly: MelonGame("Ankama", "Dofus")]
+
+namespace Heroes
+{
+    /// <summary>
+    /// The hero mode's window on the client: the account's characters as cards, the one in the
+    /// world -- the master -- first, then his heroes, then the others to connect beside him.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Everything is the server's (Jondo's Managers.Heroes): it asks the control API with the
+    /// account's own session token, which the launcher hands the client as JONDO_PLAYER_TOKEN.
+    /// The portraits are the server's too, drawn from the client's own bones as the launcher
+    /// draws its team. The heroes themselves are played in the fights by the client as it is:
+    /// their bar and their turns come to it as a summon's do.
+    /// </para>
+    /// <para>
+    /// Opened and closed with Ctrl+Tab. Built from the client's own pieces, as Cazacabezas is.
+    /// </para>
+    /// </remarks>
+    public class HeroesMod : MelonMod
+    {
+        private const string Api = "http://127.0.0.1:8888/api/";
+        private const int Places = 8;
+        private static readonly HttpClient _http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        private static readonly ConcurrentQueue<Action> _toUnity = new ConcurrentQueue<Action>();
+
+        private static string _token = "";
+        private static string _language;
+
+        private static JsonElement? _list;
+        private static int _listCode = -1;
+        private static bool _polling;
+        private static float _nextPoll;
+
+        private static readonly Dictionary<long, UnityEngine.Texture2D> _portraits = new Dictionary<long, UnityEngine.Texture2D>();
+        private static readonly HashSet<long> _asked = new HashSet<long>();
+        private static UnityEngine.Texture2D _glow;
+
+        private static WindowFigma _window;
+        private static VisualElement _grid;
+        private static DofusLabel _footer;
+        private static DofusLabel _say;
+
+        public override void OnInitializeMelon()
+        {
+            _token = (Environment.GetEnvironmentVariable("JONDO_PLAYER_TOKEN")
+                      ?? Environment.GetEnvironmentVariable("JONDO_CONTROL_TOKEN") ?? "").Trim();
+            LoggerInstance.Msg(_token.Length > 0
+                ? "[Heroes] Ready: Ctrl+Tab opens the hero mode."
+                : "[Heroes] No session token from the launcher: the hero mode stays asleep.");
+        }
+
+        public override void OnUpdate()
+        {
+            if (_token.Length == 0) return;
+            while (_toUnity.TryDequeue(out var action))
+            {
+                try { action(); }
+                catch (Exception ex) { MelonLogger.Warning($"[Heroes] {ex.Message}"); }
+            }
+
+            if (_window != null)
+            {
+                float now = UnityEngine.Time.unscaledTime;
+                if (now >= _nextPoll && !_polling)
+                {
+                    _nextPoll = now + 3f;
+                    Poll();
+                }
+            }
+            if (ShortcutPressed())
+            {
+                if (_window != null) Close();
+                else Open();
+            }
+        }
+
+        // ─── The words ───────────────────────────────────────────────────────────────────
+
+        private static string Language
+        {
+            get
+            {
+                if (_language != null) return _language;
+                string[] args = Environment.GetCommandLineArgs();
+                for (int i = 0; i + 1 < args.Length; i++)
+                    if (string.Equals(args[i], "--langCode", StringComparison.OrdinalIgnoreCase))
+                        return _language = args[i + 1].Trim().ToLowerInvariant();
+                return _language = "es";
+            }
+        }
+
+        private static Dictionary<string, string> L(string es, string en, string fr)
+            => new Dictionary<string, string> { ["es"] = es, ["en"] = en, ["fr"] = fr };
+
+        private static readonly Dictionary<string, Dictionary<string, string>> Texts = new Dictionary<string, Dictionary<string, string>>
+        {
+            ["title"] = L("Modo Héroe", "Hero mode", "Mode Héros"),
+            ["level"] = L("Niv. {0}", "Lvl. {0}", "Niv. {0}"),
+            ["connected"] = L("{0} / {1} HÉROES CONECTADOS", "{0} / {1} HEROES CONNECTED", "{0} / {1} HÉROS CONNECTÉS"),
+            ["connect"] = L("CONECTAR", "CONNECT", "CONNECTER"),
+            ["disconnect"] = L("DESCONECTAR", "DISCONNECT", "DÉCONNECTER"),
+            ["master"] = L("Tú", "You", "Vous"),
+            ["busy"] = L("En juego en otro cliente", "Playing on another client", "En jeu sur un autre client"),
+            ["fighting"] = L("En combate", "In a fight", "En combat"),
+            ["off"] = L("El servidor no tiene activado el modo Héroe.", "The server has the hero mode off.", "Le serveur n'a pas activé le mode Héros."),
+            ["world"] = L("Entra en el mundo con un personaje.", "Enter the world with a character.", "Entre dans le monde avec un personnage."),
+            ["unreachable"] = L("No se puede hablar con el servidor.", "The server cannot be reached.", "Le serveur est injoignable."),
+            ["loading"] = L("Preguntando al servidor...", "Asking the server...", "Demande au serveur..."),
+            ["hint"] = L("Tus héroes combaten a tu lado: los juegas tú en sus turnos.", "Your heroes fight at your side: you play them in their turns.",
+                         "Vos héros combattent à vos côtés : vous les jouez à leur tour."),
+            ["error.full"] = L("Ya tienes todos los héroes que permite el servidor.", "You already have as many heroes as the server allows.",
+                               "Vous avez déjà autant de héros que le serveur le permet."),
+            ["error.online"] = L("Ese personaje está en juego en otro cliente.", "That character is playing on another client.",
+                                 "Ce personnage est en jeu sur un autre client."),
+            ["error.fight"] = L("No se puede durante un combate.", "Not during a fight.", "Impossible pendant un combat."),
+            ["error.already"] = L("Ese personaje ya es un héroe.", "That character is a hero already.", "Ce personnage est déjà un héros."),
+            ["error.off"] = L("El servidor no tiene activado el modo Héroe.", "The server has the hero mode off.", "Le serveur n'a pas activé le mode Héros."),
+            ["error.none"] = L("No se puede desconectar ahora.", "It cannot be disconnected now.", "Impossible de le déconnecter maintenant."),
+            ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
+        };
+
+        private static string T(string key, params object[] values)
+        {
+            if (!Texts.TryGetValue(key, out var byLanguage)) return key;
+            string text = byLanguage.TryGetValue(Language, out var own) ? own : byLanguage["en"];
+            return values.Length == 0 ? text : string.Format(CultureInfo.InvariantCulture, text, values);
+        }
+
+        // ─── The server ──────────────────────────────────────────────────────────────────
+
+        private static async Task<(int Code, JsonElement? Body)> AskAsync(string route, Dictionary<string, object> body = null)
+        {
+            body ??= new Dictionary<string, object>();
+            body["token"] = _token;
+            try
+            {
+                using var content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+                using var response = await _http.PostAsync(Api + route, content);
+                string text = await response.Content.ReadAsStringAsync();
+                JsonElement? parsed = null;
+                try { parsed = JsonDocument.Parse(text).RootElement.Clone(); } catch { }
+                return ((int)response.StatusCode, parsed);
+            }
+            catch
+            {
+                return (0, null);
+            }
+        }
+
+        private static void Poll()
+        {
+            _polling = true;
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync("heroes/list");
+                _toUnity.Enqueue(() =>
+                {
+                    _polling = false;
+                    _listCode = code;
+                    _list = code == 200 ? body : null;
+                    Render();
+                });
+            });
+        }
+
+        private static void AskPortrait(long id)
+        {
+            if (!_asked.Add(id)) return;
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync("heroes/portrait", new Dictionary<string, object> { ["id"] = id });
+                if (code != 200 || body is not JsonElement b) return;
+                string png = Str(b, "png");
+                if (png.Length == 0) return;
+                byte[] bytes;
+                try { bytes = Convert.FromBase64String(png); } catch { return; }
+                _toUnity.Enqueue(() =>
+                {
+                    var texture = new UnityEngine.Texture2D(2, 2);
+                    if (!UnityEngine.ImageConversion.LoadImage(texture, bytes)) return;
+                    texture.hideFlags = UnityEngine.HideFlags.DontUnloadUnusedAsset;
+                    _portraits[id] = texture;
+                    Render();
+                });
+            });
+        }
+
+        private static void Act(string route, long id)
+        {
+            Say("");
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync(route, new Dictionary<string, object> { ["id"] = id });
+                _toUnity.Enqueue(() =>
+                {
+                    if (code == 0) Say(T("unreachable"));
+                    else if (code != 200)
+                    {
+                        string why = body is JsonElement b ? Str(b, "error") : "";
+                        Say(Texts.ContainsKey("error." + why) ? T("error." + why) : T("error"));
+                    }
+                    Poll();
+                });
+            });
+        }
+
+        private static bool Bool(JsonElement e, string name) => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.True;
+        private static int Int(JsonElement e, string name) => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.Number ? v.GetInt32() : 0;
+        private static long Long(JsonElement e, string name) => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.Number ? v.GetInt64() : 0;
+        private static string Str(JsonElement e, string name) => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
+
+        // ─── The window ──────────────────────────────────────────────────────────────────
+
+        private static void Open()
+        {
+            try
+            {
+                var layer = FindLayer();
+                if (layer == null) return;
+                InstallInputGuard();
+                float w = layer.resolvedStyle.width, h = layer.resolvedStyle.height;
+                float width = float.IsNaN(w) || w <= 0 ? 1060f : Math.Min(1060f, w - 40f);
+                float height = float.IsNaN(h) || h <= 0 ? 780f : Math.Min(780f, h - 40f);
+
+                var window = new WindowFigma(true, T("title") + "   Ctrl + Tab", "", true);
+                window.showCloseButton = true;
+                window.name = "JondoHeroes";
+                window.style.position = new StyleEnum<Position>(Position.Absolute);
+                window.style.width = new StyleLength(width);
+                window.style.height = new StyleLength(height);
+                window.style.left = new StyleLength(float.IsNaN(w) || w <= 0 ? 150f : Math.Max(0f, (w - width) / 2f));
+                window.style.top = new StyleLength(float.IsNaN(h) || h <= 0 ? 60f : Math.Max(0f, (h - height) / 2f));
+
+                var body = new VisualElement();
+                body.style.flexGrow = new StyleFloat(1f);
+                body.style.paddingLeft = new StyleLength(16f);
+                body.style.paddingRight = new StyleLength(16f);
+                body.style.paddingTop = new StyleLength(12f);
+                body.style.paddingBottom = new StyleLength(4f);
+                _grid = new VisualElement();
+                _grid.style.flexGrow = new StyleFloat(1f);
+                body.Add(_grid);
+                _say = Label("", 13f);
+                _say.style.unityTextAlign = new StyleEnum<UnityEngine.TextAnchor>(UnityEngine.TextAnchor.MiddleCenter);
+                _say.style.color = new StyleColor(Red);
+                body.Add(_say);
+                window.Add(body);
+
+                var footer = new VisualElement();
+                footer.style.height = new StyleLength(34f);
+                footer.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+                footer.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.36f, 0.36f, 0.52f, 0.9f));
+                _footer = Label("", 13f);
+                _footer.style.unityTextAlign = new StyleEnum<UnityEngine.TextAnchor>(UnityEngine.TextAnchor.MiddleCenter);
+                _footer.style.color = new StyleColor(new UnityEngine.Color(0.80f, 0.80f, 0.90f, 1f));
+                _footer.style.letterSpacing = new StyleLength(2f);
+                _footer.style.marginBottom = new StyleLength(0f);
+                footer.Add(_footer);
+                window.Add(footer);
+
+                layer.Add(window);
+                window.BringToFront();
+                KeepEvents(window);
+                var close = window.header?.rightButton;
+                if (close != null) close.add_Clicked(Do(Close));
+                _window = window;
+                Render();
+                _nextPoll = 0f;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] The window could not be opened: {ex}");
+                Close();
+            }
+        }
+
+        private static void Close()
+        {
+            try { _window?.RemoveFromHierarchy(); } catch { }
+            _window = null;
+            _grid = null;
+            _footer = null;
+            _say = null;
+        }
+
+        private static void Say(string text)
+        {
+            if (_say != null) _say.text = text;
+        }
+
+        /// <summary>The cards: the master, his heroes, the others of the account, and empty places to eight.</summary>
+        private static void Render()
+        {
+            if (_grid == null) return;
+            _grid.Clear();
+            if (_listCode == -1 && _list == null) { _grid.Add(Label(T("loading"))); return; }
+            if (_listCode == 0) { _grid.Add(Label(T("unreachable"))); return; }
+            if (_list is not JsonElement list || !list.TryGetProperty("characters", out var characters))
+            {
+                _grid.Add(Label(T("world")));
+                return;
+            }
+            if (!Bool(list, "on")) { _grid.Add(Label(T("off"))); return; }
+
+            int max = Int(list, "max");
+            bool roomLeft = Int(list, "connected") < 1 + max;
+            bool masterFighting = Bool(list, "inFight");
+            var all = characters.EnumerateArray().ToList();
+            for (int row = 0; row < 2; row++)
+            {
+                var line = new VisualElement();
+                line.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+                line.style.flexGrow = new StyleFloat(1f);
+                line.style.flexBasis = new StyleLength(0f);
+                for (int column = 0; column < 4; column++)
+                {
+                    int at = row * 4 + column;
+                    line.Add(at < all.Count && at < Places ? Card(all[at], roomLeft, masterFighting) : Empty());
+                }
+                _grid.Add(line);
+            }
+            if (_footer != null) _footer.text = T("connected", Int(list, "connected"), 1 + max);
+        }
+
+        private static VisualElement Place()
+        {
+            var place = new VisualElement();
+            place.style.flexGrow = new StyleFloat(1f);
+            place.style.flexBasis = new StyleLength(0f);
+            place.style.marginLeft = new StyleLength(6f);
+            place.style.marginRight = new StyleLength(6f);
+            place.style.marginTop = new StyleLength(6f);
+            place.style.marginBottom = new StyleLength(6f);
+            return place;
+        }
+
+        private static VisualElement Empty()
+        {
+            var place = Place();
+            place.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.13f, 0.14f, 0.22f, 0.55f));
+            Round(place, 3f);
+            return place;
+        }
+
+        private static VisualElement Card(JsonElement who, bool roomLeft, bool masterFighting)
+        {
+            long id = Long(who, "id");
+            bool master = Bool(who, "master"), hero = Bool(who, "hero"), busy = Bool(who, "busy");
+            bool connected = master || hero;
+
+            var card = Place();
+            card.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.11f, 0.11f, 0.17f, 0.95f));
+            card.style.borderTopWidth = card.style.borderBottomWidth = card.style.borderLeftWidth = card.style.borderRightWidth = new StyleFloat(2f);
+            var edge = master ? new UnityEngine.Color(0.85f, 0.70f, 0.30f, 1f)
+                     : hero ? new UnityEngine.Color(0.40f, 0.40f, 0.52f, 1f)
+                     : new UnityEngine.Color(0.22f, 0.22f, 0.30f, 1f);
+            card.style.borderTopColor = card.style.borderBottomColor = card.style.borderLeftColor = card.style.borderRightColor = new StyleColor(edge);
+            Round(card, 3f);
+
+            // The head: the name and the level, a crown for the master, a light for the connected.
+            var head = new VisualElement();
+            head.style.height = new StyleLength(50f);
+            head.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+            head.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.24f, 0.24f, 0.32f, 1f));
+            var name = Label(Str(who, "name"), 15f, true);
+            name.style.unityTextAlign = new StyleEnum<UnityEngine.TextAnchor>(UnityEngine.TextAnchor.MiddleCenter);
+            name.style.marginBottom = new StyleLength(0f);
+            if (master) name.style.color = new StyleColor(Gold);
+            head.Add(name);
+            var level = Label(T("level", Int(who, "level")), 12f);
+            level.style.unityTextAlign = new StyleEnum<UnityEngine.TextAnchor>(UnityEngine.TextAnchor.MiddleCenter);
+            level.style.color = new StyleColor(new UnityEngine.Color(0.70f, 0.70f, 0.78f, 1f));
+            level.style.marginBottom = new StyleLength(0f);
+            head.Add(level);
+            if (master) head.Add(Crown());
+            head.Add(Light(connected));
+            card.Add(head);
+
+            // The portrait, on its glow.
+            var frame = new VisualElement();
+            frame.style.flexGrow = new StyleFloat(1f);
+            frame.style.marginLeft = frame.style.marginRight = frame.style.marginTop = new StyleLength(8f);
+            frame.style.backgroundImage = new StyleBackground(Glow());
+            frame.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Cover));
+            var picture = new VisualElement();
+            picture.style.flexGrow = new StyleFloat(1f);
+            picture.style.marginTop = picture.style.marginBottom = new StyleLength(10f);
+            if (_portraits.TryGetValue(id, out var portrait))
+            {
+                picture.style.backgroundImage = new StyleBackground(portrait);
+                picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+            }
+            else AskPortrait(id);
+            frame.Add(picture);
+            if (!connected) frame.style.opacity = new StyleFloat(0.45f);
+            card.Add(frame);
+
+            // What can be done with him.
+            var foot = new VisualElement();
+            foot.style.height = new StyleLength(44f);
+            foot.style.alignItems = new StyleEnum<Align>(Align.Center);
+            foot.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+            if (master) foot.Add(Note(T("master")));
+            else if (Bool(who, "inFight")) foot.Add(Note(T("fighting")));
+            else if (hero) foot.Add(Button(Do(() => Act("heroes/disconnect", id)), T("disconnect"), false, !masterFighting));
+            else if (busy) foot.Add(Note(T("busy")));
+            else foot.Add(Button(Do(() => Act("heroes/connect", id)), T("connect"), true, roomLeft && !masterFighting));
+            card.Add(foot);
+            return card;
+        }
+
+        private static VisualElement Crown()
+        {
+            var crown = new VisualElement();
+            crown.style.position = new StyleEnum<Position>(Position.Absolute);
+            crown.style.left = new StyleLength(10f);
+            crown.style.top = new StyleLength(10f);
+            crown.style.width = new StyleLength(14f);
+            crown.style.height = new StyleLength(10f);
+            crown.style.backgroundColor = new StyleColor(Gold);
+            crown.style.borderBottomLeftRadius = crown.style.borderBottomRightRadius = new StyleLength(2f);
+            crown.style.borderTopLeftRadius = crown.style.borderTopRightRadius = new StyleLength(5f);
+            return crown;
+        }
+
+        private static VisualElement Light(bool on)
+        {
+            var light = new VisualElement();
+            light.style.position = new StyleEnum<Position>(Position.Absolute);
+            light.style.right = new StyleLength(12f);
+            light.style.top = new StyleLength(12f);
+            light.style.width = light.style.height = new StyleLength(8f);
+            light.style.backgroundColor = new StyleColor(on ? new UnityEngine.Color(0.80f, 0.95f, 0.10f, 1f) : new UnityEngine.Color(0.35f, 0.35f, 0.42f, 1f));
+            Round(light, 4f);
+            return light;
+        }
+
+        /// <summary>The glow behind a portrait: green in the middle, the night's blue on the edges, drawn once.</summary>
+        private static UnityEngine.Texture2D Glow()
+        {
+            if (_glow != null) return _glow;
+            const int size = 64;
+            var texture = new UnityEngine.Texture2D(size, size);
+            var middle = new UnityEngine.Color(0.36f, 0.70f, 0.52f, 1f);
+            var edge = new UnityEngine.Color(0.24f, 0.30f, 0.42f, 1f);
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                {
+                    float dx = (x - size / 2f) / (size / 2f), dy = (y - size * 0.45f) / (size / 2f);
+                    float t = Math.Min(1f, (float)Math.Sqrt(dx * dx * 0.8f + dy * dy));
+                    texture.SetPixel(x, y, UnityEngine.Color.Lerp(middle, edge, t * t));
+                }
+            texture.Apply();
+            texture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
+            texture.hideFlags = UnityEngine.HideFlags.DontUnloadUnusedAsset;
+            return _glow = texture;
+        }
+
+        // ─── The client's pieces ─────────────────────────────────────────────────────────
+
+        private static readonly UnityEngine.Color Gold = new UnityEngine.Color(1f, 0.82f, 0.35f, 1f);
+        private static readonly UnityEngine.Color Red = new UnityEngine.Color(1f, 0.45f, 0.40f, 1f);
+
+        private static void Round(VisualElement element, float radius)
+        {
+            element.style.borderTopLeftRadius = element.style.borderTopRightRadius = new StyleLength(radius);
+            element.style.borderBottomLeftRadius = element.style.borderBottomRightRadius = new StyleLength(radius);
+        }
+
+        private static DofusLabel Label(string text, float size = 14f, bool bold = false)
+        {
+            var label = new DofusLabel();
+            label.text = text;
+            label.AddToClassList("textShort_largeRegular");
+            label.AddToClassList("textColor_white_white100");
+            label.style.fontSize = new StyleLength(size);
+            if (bold) label.style.unityFontStyleAndWeight = new StyleEnum<UnityEngine.FontStyle>(UnityEngine.FontStyle.Bold);
+            label.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.Normal);
+            label.style.marginBottom = new StyleLength(4f);
+            return label;
+        }
+
+        private static DofusLabel Note(string text)
+        {
+            var note = Label(text, 12f);
+            note.style.color = new StyleColor(new UnityEngine.Color(0.70f, 0.70f, 0.78f, 1f));
+            note.style.marginBottom = new StyleLength(0f);
+            return note;
+        }
+
+        private static VisualElement Button(Il2CppSystem.Action click, string text, bool strong, bool enabled)
+        {
+            var button = new VisualElement();
+            button.style.paddingLeft = button.style.paddingRight = new StyleLength(16f);
+            button.style.paddingTop = button.style.paddingBottom = new StyleLength(6f);
+            button.style.backgroundColor = new StyleColor(strong
+                ? new UnityEngine.Color(0.45f, 0.62f, 0.12f, 1f)
+                : new UnityEngine.Color(0.36f, 0.36f, 0.48f, 1f));
+            Round(button, 4f);
+            var label = Label(text, 12f, true);
+            label.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
+            label.style.marginBottom = new StyleLength(0f);
+            button.Add(label);
+            if (enabled) button.AddManipulator(new Clickable(click).Cast<IManipulator>());
+            else button.style.opacity = new StyleFloat(0.4f);
+            return button;
+        }
+
+        private static Il2CppSystem.Action Do(Action action)
+            => DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(new Action(() =>
+            {
+                try { action(); }
+                catch (Exception ex) { MelonLogger.Warning($"[Heroes] {ex.Message}"); }
+            }));
+
+        private static bool ShortcutPressed()
+        {
+            try
+            {
+                var keyboard = UnityEngine.InputSystem.Keyboard.current;
+                return keyboard != null && keyboard.tabKey.wasPressedThisFrame
+                       && (keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>The layer the client opens its own windows on (RootHigh), else the top document's root.</summary>
+        private static VisualElement FindLayer()
+        {
+            VisualElement high = null, topRoot = null;
+            float topOrder = float.MinValue;
+            var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+            for (int i = 0; i < documents.Length; i++)
+            {
+                var document = documents[i]?.TryCast<UIDocument>();
+                var root = document?.rootVisualElement;
+                if (root == null) continue;
+                if (high == null)
+                {
+                    var named = UQueryExtensions.Q(root, "RootHigh", (string)null);
+                    if (named != null && named.panel != null) high = named;
+                }
+                float width = root.resolvedStyle.width;
+                if (!float.IsNaN(width) && width > 0 && document.sortingOrder >= topOrder)
+                {
+                    topOrder = document.sortingOrder;
+                    topRoot = root;
+                }
+            }
+            return high ?? topRoot;
+        }
+
+        private static void KeepEvents(VisualElement window)
+        {
+            try { window.RegisterCallback<PointerDownEvent>(Stop<PointerDownEvent>(), TrickleDown.NoTrickleDown); } catch { }
+            try { window.RegisterCallback<PointerUpEvent>(Stop<PointerUpEvent>(), TrickleDown.NoTrickleDown); } catch { }
+            try { window.RegisterCallback<MouseDownEvent>(Stop<MouseDownEvent>(), TrickleDown.NoTrickleDown); } catch { }
+            try { window.RegisterCallback<MouseUpEvent>(Stop<MouseUpEvent>(), TrickleDown.NoTrickleDown); } catch { }
+            try { window.RegisterCallback<ClickEvent>(Stop<ClickEvent>(), TrickleDown.NoTrickleDown); } catch { }
+            try { window.RegisterCallback<WheelEvent>(Stop<WheelEvent>(), TrickleDown.NoTrickleDown); } catch { }
+        }
+
+        private static EventCallback<T> Stop<T>() where T : EventBase<T>, new()
+            => DelegateSupport.ConvertDelegate<EventCallback<T>>(new Action<T>(e =>
+            {
+                try { e.StopPropagation(); } catch { }
+            }));
+
+        // ─── The mouse is the window's ───────────────────────────────────────────────────
+
+        private static bool _guardInstalled;
+
+        /// <summary>Whether the pointer is on the window this frame.</summary>
+        public static bool PointerOver
+        {
+            get
+            {
+                if (_window == null) return false;
+                try
+                {
+                    var mouse = UnityEngine.InputSystem.Mouse.current;
+                    var panel = _window.panel;
+                    if (mouse == null || panel == null) return false;
+                    var at = mouse.position.ReadValue();
+                    var onPanel = RuntimePanelUtils.ScreenToPanel(panel, new UnityEngine.Vector2(at.x, UnityEngine.Screen.height - at.y));
+                    return _window.worldBound.Contains(onPanel);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// A click on the window is not a click on the map: while the pointer is on it the game's
+        /// InputUtility says «over the interface» and reports no button, as Cazacabezas does.
+        /// </summary>
+        private static void InstallInputGuard()
+        {
+            if (_guardInstalled) return;
+            _guardInstalled = true;
+            var harmony = new HarmonyLib.Harmony("jondo.heroes.input");
+            var overUi = new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(SayOverUi)));
+            var noButton = new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(SayNoButton)));
+            var type = typeof(Il2CppAnkama.Utilities.InputUtility);
+            void Patch(string name, HarmonyLib.HarmonyMethod postfix)
+            {
+                try
+                {
+                    var method = HarmonyLib.AccessTools.Method(type, name);
+                    if (method != null) harmony.Patch(method, postfix: postfix);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Warning($"[Heroes] InputUtility.{name} not guarded: {ex.Message}");
+                }
+            }
+            Patch("get_isPointerOverUI", overUi);
+            foreach (string name in new[] { "GetPointerDown", "IsPointerDown", "GetPointerUp", "GetSecondaryDown", "IsSecondaryDown",
+                                            "GetSecondaryUp", "GetTertiaryDown", "IsTertiaryDown", "GetTertiaryUp" })
+                Patch(name, noButton);
+        }
+
+        public static void SayOverUi(ref bool __result)
+        {
+            if (PointerOver) __result = true;
+        }
+
+        public static void SayNoButton(ref bool __result)
+        {
+            if (PointerOver) __result = false;
+        }
+    }
+}
