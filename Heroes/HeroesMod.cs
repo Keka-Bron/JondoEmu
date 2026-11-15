@@ -479,7 +479,9 @@ namespace Heroes
         private static Il2Cpp.fer _entityInfos;
         private static Il2Cpp.fdf _menuDependencies;
         private static Il2Cpp.fcg _menus;
-        private static bool _liveBroken, _toldLive, _portraitFailed;
+        // EntityPortrait.SetEntityLook falls over inside (asynchronously, past any catch) with the
+        // services the mod has: the displayer, as the character selection draws its characters.
+        private static bool _liveBroken, _toldLive, _portraitFailed = true;
         private static int _borrowScans;
 
         /// <summary>Each living portrait, by where it stands and whose it is, with what it was made of.</summary>
@@ -659,7 +661,6 @@ namespace Heroes
                 // Whatever was made without it, made again with it.
                 foreach (var made in _live.Values) Release(made.View);
                 _live.Clear();
-                _portraitFailed = false;
                 _toldLive = false;
                 _panelKey = null;
                 _nextPoll = 0f;
