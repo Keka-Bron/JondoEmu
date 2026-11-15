@@ -539,7 +539,7 @@ namespace Heroes
         // ─── The menus' button ───────────────────────────────────────────────────────────
 
         private static UnityEngine.Texture2D _icon;
-        private static bool _toldMenu;
+        private static string _toldMenu;
 
         /// <summary>
         /// A Heroes button in the MENUS window's grid (BannerMenuBinding's gd_btnUis), in the free
@@ -575,20 +575,12 @@ namespace Heroes
                 MelonLogger.Msg($"[Heroes] Slot grids shown: {key}");
             }
 
-            // Every button of theirs: the place found must be clear of all of them -- the «+» stands
-            // beside the grid's last row, where a free place would seem to be.
-            var theirs = new List<VisualElement>();
-            foreach (var grid in candidates) SlotsUnder(grid, theirs);
-
             VisualElement host = null, model = null, other = null;
             (float, float, UnityEngine.Vector2) place = default;
             foreach (var grid in candidates)
             {
                 var found = FreePlace(grid, out var m, out var o);
                 if (found == null) continue;
-                var (left, top, size) = found.Value;
-                var at = new UnityEngine.Rect(grid.worldBound.x + left + 2f, grid.worldBound.y + top + 2f, size.x - 4f, size.y - 4f);
-                if (theirs.Any(s => s.resolvedStyle.display != DisplayStyle.None && s.worldBound.Overlaps(at))) continue;
                 host = grid; model = m; other = o; place = found.Value;
                 break;
             }
@@ -818,48 +810,53 @@ namespace Heroes
                 })), TrickleDown.TrickleDown);
 
         /// <summary>
-        /// Where in the grid the place after its last button is -- left, top and size, the grid's
-        /// own --, or null when its last row is full. Its buttons are its slots that show
-        /// something: an empty slot shows less than most of them do.
+        /// The grid's first empty slot after its last button -- left, top and size, the grid's own
+        /// --, or null when there is none, or when it is in a row out of sight. The grid fills its
+        /// last row with empty slots; a button's slot shows more than an empty one does.
         /// </summary>
+        /// <remarks>
+        /// The window made narrow, the grid shows its first rows and a «+» that unfolds the rest
+        /// upwards: an empty slot in a row folded away is out of the scroll view's sight, and the
+        /// button with it, as the game's own buttons in that row are.
+        /// </remarks>
         private static (float, float, UnityEngine.Vector2)? FreePlace(VisualElement grid, out VisualElement model, out VisualElement other)
         {
             model = other = null;
             var slots = new List<VisualElement>();
             SlotsUnder(grid, slots);
             slots = slots.Where(s => s.resolvedStyle.display != DisplayStyle.None && s.resolvedStyle.visibility == Visibility.Visible
-                                     && s.worldBound.width > 4f).ToList();
+                                     && s.worldBound.width > 4f)
+                         .OrderBy(s => Math.Round(s.worldBound.y)).ThenBy(s => s.worldBound.x).ToList();
             if (slots.Count < 2) return null;
             var weight = slots.ToDictionary(s => s, Shows);
             var sorted = weight.Values.OrderBy(v => v).ToList();
             int usual = sorted[sorted.Count / 2];
-            var full = slots.Where(s => weight[s] >= usual)
-                            .OrderBy(s => Math.Round(s.worldBound.y)).ThenBy(s => s.worldBound.x).ToList();
+            var full = slots.Where(s => weight[s] >= usual).ToList();
             if (full.Count < 2) return null;
+            int lastFull = slots.IndexOf(full[^1]);
+            var free = slots.Skip(lastFull + 1).FirstOrDefault(s => weight[s] < usual);
 
-            float firstY = full[0].worldBound.y, lastY = full[^1].worldBound.y;
-            int perRow = full.Count(s => Math.Abs(s.worldBound.y - firstY) < 2f);
-            int inLast = full.Count(s => Math.Abs(s.worldBound.y - lastY) < 2f);
-            float step = full[1].worldBound.x - full[0].worldBound.x;
-            // One row only -- the «+»'s list holding a few --: how many it takes is the grid's width's.
-            if (Math.Abs(lastY - firstY) < 2f && step > 0)
-                perRow = Math.Max(perRow, (int)Math.Floor((grid.worldBound.xMax - full[0].worldBound.x + 1f) / step));
-            if (!_toldMenu)
+            var viewports = new List<VisualElement>();
+            Named(grid, "unity-content-viewport", viewports);
+            var sight = viewports.Count > 0 ? viewports[0].worldBound : grid.worldBound;
+            bool seen = free != null && sight.Contains(free.worldBound.center);
+            string told = $"{grid.name}: {slots.Count} slot(s), {full.Count} showing a button, " +
+                          $"{(free == null ? "none free" : seen ? "one free in sight" : "one free out of sight")}";
+            if (told != _toldMenu)
             {
-                _toldMenu = true;
-                MelonLogger.Msg($"[Heroes] MENUS: {slots.Count} slot(s), {full.Count} showing a button, " +
-                                $"{perRow} a row, {inLast} on the last; weights {string.Join(",", sorted)}.");
+                _toldMenu = told;
+                MelonLogger.Msg($"[Heroes] MENUS {told}; weights {string.Join(",", sorted)}.");
             }
-            if (perRow < 2 || inLast >= perRow || step <= 0) return null;
+            if (!seen) return null;
 
             // The look is copied off two plain slots -- no warning dot on them, which shows more.
             var plain = full.Where(s => weight[s] == usual).Take(2).ToList();
             model = plain.Count > 0 ? plain[0] : full[0];
             other = plain.Count > 1 ? plain[1] : full[1];
 
-            var last = full[^1].worldBound;
+            var at = free.worldBound;
             var origin = grid.worldBound;
-            return (last.x + step - origin.x, last.y - origin.y, new UnityEngine.Vector2(last.width, last.height));
+            return (at.x - origin.x, at.y - origin.y, new UnityEngine.Vector2(at.width, at.height));
         }
 
         /// <summary>Every slot of the client's under an element, ours left out.</summary>
