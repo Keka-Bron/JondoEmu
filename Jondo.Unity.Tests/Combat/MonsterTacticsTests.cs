@@ -61,6 +61,54 @@ namespace Jondo.Unity.Tests.Combat
             Assert.InRange(MapGeometry.Distance(action.From, player.CellId), 1, 2);
         }
 
+        /// <summary>The cell at these offsets from another, on the diamond grid's own axes.</summary>
+        private static int Offset(int from, int dx, int dy)
+        {
+            var (x, y) = MapGeometry.CellToPoint(from);
+            foreach (int cell in Enumerable.Range(0, 560))
+                if (MapGeometry.CellToPoint(cell) == (x + dx, y + dy)) return cell;
+            return -1;
+        }
+
+        /// <summary>
+        /// A spell cast in diagonal reaches only the diagonals: Dark Vlad's Llamas Diagonales does
+        /// not touch whoever stands straight in front of him, and does whoever stands on one.
+        /// </summary>
+        [Fact]
+        public void A_diagonal_spell_reaches_only_the_diagonals()
+        {
+            var diagonal = new MonsterTactics.Spell
+            {
+                Id = 4309, Grade = 1, Cost = 2, MinRange = 2, MaxRange = 63, Damage = 1800, InDiagonal = true,
+            };
+
+            var monster = Monster(mp: 0);
+            var straight = Player(1, Offset(Centre, 0, -5));
+            Assert.Null(MonsterTactics.Next(Board(monster, straight), monster, new[] { diagonal }));
+
+            monster = Monster(mp: 0);
+            var aslant = Player(2, Offset(Centre, 3, -3));
+            var action = MonsterTactics.Next(Board(monster, aslant), monster, new[] { diagonal });
+            Assert.NotNull(action);
+            Assert.Same(aslant, action!.Target);
+
+            // A diagonal cell is as far as one of its offsets: three, inside a range of 2 to 3.
+            var short_ = new MonsterTactics.Spell
+            {
+                Id = 4309, Grade = 1, Cost = 2, MinRange = 2, MaxRange = 3, Damage = 1800, InDiagonal = true,
+            };
+            monster = Monster(mp: 0);
+            Assert.NotNull(MonsterTactics.Next(Board(monster, aslant), monster, new[] { short_ }));
+
+            // In line AND in diagonal: either.
+            var both = new MonsterTactics.Spell
+            {
+                Id = 4309, Grade = 1, Cost = 2, MinRange = 2, MaxRange = 63, Damage = 1800, InDiagonal = true, InLine = true,
+            };
+            monster = Monster(mp: 0);
+            Assert.NotNull(MonsterTactics.Next(Board(monster, straight), monster, new[] { both }));
+        }
+
         /// <summary>No line of sight from here: it moves round rather than giving up the spell.</summary>
         [Fact]
         public void It_looks_for_a_line_of_sight()

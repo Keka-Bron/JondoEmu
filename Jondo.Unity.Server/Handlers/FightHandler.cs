@@ -10653,6 +10653,8 @@ namespace Jondo.Unity.Server.Handlers
                     MaxRange = data.MaxRange,
                     NeedsLineOfSight = data.NeedsLineOfSight,
                     InLine = data.CastInLine,
+                    InDiagonal = (limits.Flags & Managers.SpellLevelFlags.CastInDiagonal) != 0,
+                    ProportionalDiagonal = (limits.Flags & Managers.SpellLevelFlags.ProportionalDiagonal) != 0,
                     PerTurn = limits.PorTurno > 0 ? limits.PorTurno : data.MaxCastPerTurn,
                     PerTarget = limits.PorObjetivo > 0 ? limits.PorObjetivo : data.MaxCastPerTarget,
                     Damage = !damages ? 0

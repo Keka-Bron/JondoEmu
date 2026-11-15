@@ -50,6 +50,16 @@ namespace Jondo.Unity.Server.Managers
             public int MaxRange { get; init; }
             public bool NeedsLineOfSight { get; init; }
             public bool InLine { get; init; }
+
+            /// <summary>
+            /// Whether its level casts it along the diagonals (CastInDiagonal): alone, only there --
+            /// the client's range is the cross of the two diagonals, and Dark Vlad's Llamas
+            /// Diagonales is dodged by standing off them; with <see cref="InLine"/>, along either.
+            /// A diagonal cell is as far as one of its offsets, unless the level counts it walked
+            /// (<see cref="ProportionalDiagonal"/>).
+            /// </summary>
+            public bool InDiagonal { get; init; }
+            public bool ProportionalDiagonal { get; init; }
             public int PerTurn { get; init; }
             public int PerTarget { get; init; }
 
@@ -805,9 +815,11 @@ namespace Jondo.Unity.Server.Managers
 
             if (spell.NeedsFreeCell && (board.Occupied(aim) || aim == from || !board.Walkable(aim))) return false;
 
-            int distance = MapGeometry.Distance(from, aim);
+            int distance = spell.InDiagonal
+                ? MapGeometry.CastDistance(from, aim, diagonal: true, spell.ProportionalDiagonal)
+                : MapGeometry.Distance(from, aim);
             if (distance < spell.MinRange || distance > spell.ReachFor(monster)) return false;
-            if (spell.InLine && !InLine(from, aim)) return false;
+            if (!OnItsLines(spell, from, aim)) return false;
             if (spell.NeedsLineOfSight && distance > 1 && !board.Sees(from, aim)) return false;
 
             if (spell.PerTarget > 0 && monster.LanzadosPorObjetivo.TryGetValue((spell.Id, target.Id), out int onIt)
@@ -2096,5 +2108,22 @@ namespace Jondo.Unity.Server.Managers
             var (bx, by) = MapGeometry.CellToPoint(b);
             return ax == bx || ay == by;
         }
+
+        /// <summary>As far along one axis as along the other: a diagonal of the diamond grid.</summary>
+        private static bool OnDiagonal(int a, int b)
+        {
+            var (ax, ay) = MapGeometry.CellToPoint(a);
+            var (bx, by) = MapGeometry.CellToPoint(b);
+            return Math.Abs(ax - bx) == Math.Abs(ay - by);
+        }
+
+        /// <summary>
+        /// Whether the aimed cell lies where the spell's level lets it be cast: anywhere, along the
+        /// straight lines (CastInLine), along the diagonals (CastInDiagonal) or along both.
+        /// </summary>
+        internal static bool OnItsLines(Spell spell, int from, int aim)
+            => !spell.InLine && !spell.InDiagonal
+               || spell.InLine && InLine(from, aim)
+               || spell.InDiagonal && OnDiagonal(from, aim);
     }
 }
