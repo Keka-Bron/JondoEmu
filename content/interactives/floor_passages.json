@@ -147,6 +147,48 @@
       "toMap": 221249538,
       "toCell": 535,
       "why": "Dark Vlad's maze [-5,17]: the stone stairs up the tumulus to the Elm Clearing (221249538), the clearing of «Ver a Dark Vlad y morir... o no» and «Letalina». Dofus pour les noobs: «vous rendre au centre de celui-ci dans la clairière du Dark Vlad en [-5,17] en montant les escaliers vers la clairière». The client's map gives the stairs no border; INFERRED cells: 218, the walkable foot of the stairs, and 535, the top of the clearing's own stairs down (536, 549 and 550 are its bottom border back to [-5,17])."
+    },
+    {
+      "map": 122684929,
+      "cell": 391,
+      "toMap": 122685953,
+      "toCell": 114,
+      "why": "The dragon's tail on Incarnam (122684929), down its stairs to Dark Vlad's island (122685953), «Destinación final» (1471). The client marks the stairs' foot, 391 and 405, with an arrow, its sign of a way out (the 2.73 world graph's cell transition is on 391, and lands on 85, an arrow cell itself). Landing on 114, one step below the island's top step."
+    },
+    {
+      "map": 122684929,
+      "cell": 405,
+      "toMap": 122685953,
+      "toCell": 114,
+      "why": "As 391: the stairs' foot down to Dark Vlad's island."
+    },
+    {
+      "map": 122685953,
+      "cell": 71,
+      "toMap": 122684929,
+      "toCell": 361,
+      "why": "As 85: the island's top step up to the dragon's tail."
+    },
+    {
+      "map": 122685953,
+      "cell": 85,
+      "toMap": 122684929,
+      "toCell": 361,
+      "why": "And back up: the island's top step, 71, 85, 98 and 112, carries the client's arrow (the graph's transition is on 85, landing on 391, the tail's own arrow cell). Landing on 361, the top of the tail's stairs, where the server puts whoever arrives (377, lower down, is not among the cells it counts walkable)."
+    },
+    {
+      "map": 122685953,
+      "cell": 98,
+      "toMap": 122684929,
+      "toCell": 361,
+      "why": "As 85: the island's top step up to the dragon's tail."
+    },
+    {
+      "map": 122685953,
+      "cell": 112,
+      "toMap": 122684929,
+      "toCell": 361,
+      "why": "As 85: the island's top step up to the dragon's tail."
     }
   ]
 }

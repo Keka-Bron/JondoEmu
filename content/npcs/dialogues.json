@@ -4760,6 +4760,9 @@
             { "reply": 25067, "quest": 1646, "completes": 9849, "params": [[30, 9849]], "next": 20890, "afterObjectives": [9846, 9847, 9848] },
             { "reply": 25071, "quest": 1647, "completes": 9851, "params": [[30, 9851]], "next": 20891, "afterObjective": 9850 },
             { "reply": 25073, "quest": 1648, "completes": 9858, "params": [[30, 9858]], "next": 20894, "afterObjective": 9857 },
+            { "reply": 25077, "next": 20895, "quest": 1471, "afterObjective": 8181, "beforeObjective": 8182 },
+            { "reply": 25079, "next": 20898, "quest": 1471, "afterObjective": 8187, "beforeObjective": 8188 },
+            { "reply": 25081, "next": 20899, "quest": 1471, "afterObjective": 8191, "beforeObjective": 8192, "holds": 15005, "completesAll": [8192] },
             { "reply": 25038 }
           ]
         },
@@ -4888,9 +4891,39 @@
           "choices": [
             { "reply": 25072 }
           ]
+        },
+        {
+          "message": 20895,
+          "choices": [
+            { "reply": 25076, "next": 20896 }
+          ]
+        },
+        {
+          "message": 20896,
+          "choices": [
+            { "reply": 25075, "next": 20897 }
+          ]
+        },
+        {
+          "message": 20897,
+          "choices": [
+            { "reply": 25074, "quest": 1471, "completes": 8182, "params": [[30, 8182]] }
+          ]
+        },
+        {
+          "message": 20898,
+          "choices": [
+            { "reply": 25078, "quest": 1471, "completes": 8188, "params": [[30, 8188]], "gives": 15005 }
+          ]
+        },
+        {
+          "message": 20899,
+          "choices": [
+            { "reply": 25080 }
+          ]
         }
       ],
-      "why": "The captain of the kerubims, from his own lines and replies, by Dofus pour les noobs («Le village dans les nuages», «Mise à l'épreuve» to «Des chafers qui marchent»). Each report is the reply that does the «go back and see the captain» objective (effect 30) and leads to the next mission's line, the one the catalogue names; who closed the window before taking it is greeted with that line. «Proponer tus servicios.» is the trials another day; «Estoy listo para una misión.» is 1643 another day (20884-20886)."
+      "why": "The captain of the kerubims, from his own lines and replies, by Dofus pour les noobs («Le village dans les nuages», «Mise à l'épreuve» to «Des chafers qui marchent»). Each report is the reply that does the «go back and see the captain» objective (effect 30) and leads to the next mission's line, the one the catalogue names; who closed the window before taking it is greeted with that line. «Proponer tus servicios.» is the trials another day; «Estoy listo para una misión.» is 1643 another day (20884-20886). «Destination finale»: questioned on Dark Vlad (25077) he sends the character to Riguait at the cemetery; told what Pupahen said (25079) he hands over the key of the orbalantir's room under the tower's trapdoor (25078); given it back (25081) he speaks of a mysterious woman's message (20899)."
     },
     {
       "npc": 2886,
@@ -37064,7 +37097,7 @@
         {
           "message": 16889,
           "choices": [
-            { "reply": 20143, "next": 16890, "quest": 1470, "afterObjectives": [8177, 8178, 8179], "completes": 8180 }
+            { "reply": 20143, "next": 16890, "quest": 1470, "afterObjectives": [8177, 8178, 8179], "completes": 8180, "gives": 15006 }
           ]
         },
         {
@@ -37088,7 +37121,8 @@
         {
           "message": 16893,
           "choices": [
-            { "reply": 20139, "next": 16894, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471 }
+            { "reply": 20139, "next": 16894, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471, "criterion": "PO!15006&PO!15007", "gives": 15006 },
+            { "reply": 20139, "next": 16894, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471, "criterion": "PO=15006|PO=15007" }
           ]
         },
         {
@@ -37106,12 +37140,13 @@
         {
           "message": 16896,
           "choices": [
-            { "reply": 20149, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471 },
+            { "reply": 20149, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471, "criterion": "PO!15006&PO!15007", "gives": 15006 },
+            { "reply": 20149, "startsQuest": 1471, "params": [[34, 1471]], "beforeQuest": 1471, "criterion": "PO=15006|PO=15007" },
             { "reply": 20148 }
           ]
         }
       ],
-      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896)."
+      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896). «Draconanthropie» ends with Prysmaradoth's talisman around the character's neck (16890, «te pone el colgante»): 20143 gives it, and «Destination finale» -- whose victory it is the key to (16954) -- gives it again on starting to one who finished the ritual without it."
     },
     {
       "npc": 2256,
@@ -38554,6 +38589,454 @@
         }
       ],
       "why": "Flado, the goblin of Meriana's cabin: «Tú tener demasiadas escamas inútiles. Yo conocer la forma de romperlas» -- a scale of Prysmaradoth broken into fragments (bitten, stamped on, squeezed), which the bounty hunter takes for a primaton each, so that one who has finished the quest can help another without the fight («il est possible d'éviter l'affrontement en récupérant des fragments d'écailles», Dofus pour les noobs). INFERRED: three fragments a scale, the hunter giving a copy for a scale and a copy costing three primatons; where he stands."
+    },
+    {
+      "npc": 890,
+      "map": 153357316,
+      "opening": 3849,
+      "lines": [
+        {
+          "message": 3849,
+          "choices": [
+            { "reply": 20169, "next": 16914, "quest": 1471, "afterObjective": 0, "beforeObjective": 8181 }
+          ]
+        },
+        {
+          "message": 16914,
+          "choices": [
+            { "reply": 20168, "next": 16915, "holds": 8543, "takes": 8543 },
+            { "reply": 20164 }
+          ]
+        },
+        {
+          "message": 16915,
+          "choices": [
+            { "reply": 20167, "next": 16916 }
+          ]
+        },
+        {
+          "message": 16916,
+          "choices": [
+            { "reply": 20166, "next": 16917 }
+          ]
+        },
+        {
+          "message": 16917,
+          "choices": [
+            { "reply": 20165, "quest": 1471, "completes": 8181, "params": [[30, 8181]] }
+          ]
+        }
+      ],
+      "why": "«Destination finale» (Dofus pour les noobs): «Rendez-vous à la taverne d'Incarnam en [0,-3] et parlez au Client de la taverne. Il vous demande une limonade» -- Grobid sells it for a kama (25034) -- and tells of the fire at the take-off area and of Dark Vlad (16916, 16917). Without a lemonade he waits for one (20164)."
+    },
+    {
+      "npc": 862,
+      "map": 153880064,
+      "opening": 3693,
+      "lines": [
+        {
+          "message": 3693,
+          "choices": [
+            { "reply": 20186, "next": 16924, "quest": 1471, "afterObjective": 8182, "beforeObjective": 8183 }
+          ]
+        },
+        {
+          "message": 16924,
+          "choices": [
+            { "reply": 20185, "next": 16925 }
+          ]
+        },
+        {
+          "message": 16925,
+          "choices": [
+            { "reply": 20184, "next": 16926 }
+          ]
+        },
+        {
+          "message": 16926,
+          "choices": [
+            { "reply": 20183, "next": 16927, "buyPrice": 1000 },
+            { "reply": 20178 }
+          ]
+        },
+        {
+          "message": 16927,
+          "choices": [
+            { "reply": 20182, "next": 16928 }
+          ]
+        },
+        {
+          "message": 16928,
+          "choices": [
+            { "reply": 20181, "next": 16929 }
+          ]
+        },
+        {
+          "message": 16929,
+          "choices": [
+            { "reply": 20180, "next": 16930 }
+          ]
+        },
+        {
+          "message": 16930,
+          "choices": [
+            { "reply": 20179, "quest": 1471, "completes": 8183, "params": [[30, 8183]] }
+          ]
+        }
+      ],
+      "why": "«Destination finale»: the kerub militiaman Riguait tells for 1,000 kamas (16926, «Darle 1000 kamas») how Dark Vlad raised a bandit of the Three Skulls out of his grave (16928, 16929), and where the grave is (16930)."
+    },
+    {
+      "npc": 2258,
+      "map": 153880578,
+      "opening": 16904,
+      "lines": [
+        {
+          "message": 16904,
+          "choices": [
+            { "reply": 20159 },
+            { "reply": 20160 }
+          ]
+        }
+      ],
+      "why": "The chafer bandit Riguait saw coming out of his grave (Dofus pour les noobs: «Allez en [3,1] et parlez au Bandit chafer pour l'affronter»). «Atacar.» starts the fight (content/fights/npc_fights.json); his bone knife (15003) drops while the quest asks for it. INFERRED: where he stands."
+    },
+    {
+      "npc": 2231,
+      "map": 153880321,
+      "opening": 16907,
+      "lines": [
+        {
+          "message": 16907,
+          "choices": [
+            { "reply": 20189, "next": 16931, "quest": 1471, "afterObjective": 8186, "beforeObjective": 8187, "holds": 14999 },
+            { "reply": 20190, "next": 16933, "quest": 1471, "afterObjective": 8186, "beforeObjective": 8187, "holds": 15004 }
+          ]
+        },
+        {
+          "message": 16931,
+          "choices": [
+            { "reply": 20188, "next": 16932 }
+          ]
+        },
+        {
+          "message": 16932,
+          "choices": [
+            { "reply": 20187, "quest": 1471, "completes": 8187, "params": [[30, 8187]], "holds": 14999, "takes": 14999 }
+          ]
+        },
+        {
+          "message": 16933,
+          "choices": [
+            { "reply": 20192, "next": 16934 }
+          ]
+        },
+        {
+          "message": 16934,
+          "choices": [
+            { "reply": 20191, "quest": 1471, "completes": 8187, "params": [[30, 8187]], "holds": 15004, "takes": 15004 }
+          ]
+        }
+      ],
+      "why": "Pupahen Cráneo, whose ghost stays at the stele once the Three Skulls are beaten: shown the cursed skull the bandits of Cania kept (14999, «Los bandidos de Cania») or the spectral bone his fight drops (15004), he tells of Dark Vlad (16932, 16934) for it back."
+    },
+    {
+      "npc": 2207,
+      "map": 81527303,
+      "opening": 16908,
+      "lines": [
+        {
+          "message": 16908,
+          "choices": [
+            { "reply": 20201, "next": 16940, "quest": 1471, "afterObjective": 8189, "beforeObjective": 8190, "completes": 8190, "params": [[30, 8190]], "buyPrice": 100 },
+            { "reply": 20201, "next": 16940, "quest": 1471, "afterObjective": 8190, "beforeObjective": 8191, "buyPrice": 100 },
+            { "reply": 20200 }
+          ]
+        },
+        {
+          "message": 16940,
+          "choices": [
+            { "reply": 20202, "next": 16942 },
+            { "reply": 20203, "next": 16943 },
+            { "reply": 20204, "next": 16944 }
+          ]
+        },
+        {
+          "message": 16942,
+          "choices": [
+            { "reply": 20205, "says": 432 },
+            { "reply": 20206, "says": 431 }
+          ]
+        },
+        {
+          "message": 16943,
+          "choices": [
+            { "reply": 20207, "says": 430 },
+            { "reply": 20208, "says": 433 }
+          ]
+        },
+        {
+          "message": 16944,
+          "choices": [
+            { "reply": 20216, "next": 16950 },
+            { "reply": 20210, "says": 429, "teleport": 88080644 }
+          ]
+        },
+        {
+          "message": 16950,
+          "choices": [
+            { "reply": 20215, "next": 16951 }
+          ]
+        },
+        {
+          "message": 16951,
+          "choices": [
+            { "reply": 20214, "next": 16952 }
+          ]
+        },
+        {
+          "message": 16952,
+          "choices": [
+            { "reply": 20213, "next": 16953 }
+          ]
+        },
+        {
+          "message": 16953,
+          "choices": [
+            { "reply": 20212, "next": 16954 }
+          ]
+        },
+        {
+          "message": 16954,
+          "choices": [
+            { "reply": 20211, "quest": 1471, "completes": 8191, "params": [[30, 8191]] }
+          ]
+        }
+      ],
+      "why": "The orbalantir under the Incarnam militia's tower: 100 kamas in its crucible open it (16940) and three figures turn -- the ears, then the mouth, then the eyes reach Meriana (16950-16954), «Une fois l'orbalantir activé, il faut tourner la statue qui se couvre les oreilles, puis celle de la bouche, puis celle des yeux» (Dofus pour les noobs). Every other order shows a vision in the chat and shuts it (infos 429-433), and a new try costs another 100 kamas (the second 20201, once 8190 is done). INFERRED: which vision goes with which order; the demented laughter (429) takes the character to the Evil Forest's edge [1,19]."
+    },
+    {
+      "npc": 2232,
+      "map": 154010884,
+      "opening": 16906,
+      "lines": [
+        {
+          "message": 16906,
+          "choices": [
+            { "reply": 20231, "next": 16957, "quest": 1471, "afterObjective": 8192, "beforeObjective": 8193 },
+            { "reply": 20244 }
+          ]
+        },
+        {
+          "message": 16957,
+          "choices": [
+            { "reply": 20222, "next": 16958 },
+            { "reply": 20228, "next": 16959 },
+            { "reply": 20230, "next": 16962 }
+          ]
+        },
+        {
+          "message": 16958,
+          "choices": [
+            { "reply": 20221, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16962,
+          "choices": [
+            { "reply": 20223, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16959,
+          "choices": [
+            { "reply": 20224, "next": 16960 },
+            { "reply": 20226, "next": 16961 },
+            { "reply": 20227, "next": 16963 }
+          ]
+        },
+        {
+          "message": 16960,
+          "choices": [
+            { "reply": 20225, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16961,
+          "choices": [
+            { "reply": 20229, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16963,
+          "choices": [
+            { "reply": 20233, "next": 16964 },
+            { "reply": 20235, "next": 16965 },
+            { "reply": 20243, "next": 16969 },
+            { "reply": 20241, "next": 16966 }
+          ]
+        },
+        {
+          "message": 16964,
+          "choices": [
+            { "reply": 20232, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16965,
+          "choices": [
+            { "reply": 20234, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16969,
+          "choices": [
+            { "reply": 20242, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16966,
+          "choices": [
+            { "reply": 20240, "next": 16967 },
+            { "reply": 20236, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16967,
+          "choices": [
+            { "reply": 20238, "next": 16968, "holds": 15006, "takes": 15006, "gives": 15007 },
+            { "reply": 20239, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        },
+        {
+          "message": 16968,
+          "choices": [
+            { "reply": 20237, "quest": 1471, "completes": 8193, "params": [[30, 8193]] }
+          ]
+        }
+      ],
+      "why": "The mysterious stranger the captain was told of (20899): every answer ends the talk, but only the silent, clear-sighted one who names Aerafal as the Dofus' maker (16959, 16963, 16966) gets the scale of clairvoyance, the fourth of the talisman (15006 → 15007), whose power the reflection of Prysmaradoth then casts (Clarividencia, 4317). INFERRED: where she waits, [-2,-4]."
+    },
+    {
+      "npc": 2206,
+      "map": 153880836,
+      "opening": 16731,
+      "lines": [
+        {
+          "message": 16731,
+          "choices": [
+            { "reply": 20155, "quest": 1471, "afterObjective": 8194, "beforeObjective": 8195, "completes": 8195, "params": [[30, 8195]], "teleport": 122683905 },
+            { "reply": 20155, "quest": 1471, "afterObjective": 8195, "beforeObjective": 8197, "teleport": 122683905 },
+            { "reply": 19928 }
+          ]
+        }
+      ],
+      "why": "Strig, Meriana's owl, by the sky balloon of the take-off area (16954: «Strig te guiará. Encuéntrate con ella cerca del área de despegue, al este de Incarnam»): it flies the character under the vault of clouds, to the dragon's tail, and back there again after a defeat until Dark Vlad is beaten."
+    },
+    {
+      "npc": 2206,
+      "map": 122683905,
+      "opening": 16731,
+      "lines": [
+        {
+          "message": 16731,
+          "choices": [
+            { "reply": 20156, "teleport": 153880836 },
+            { "reply": 19928 }
+          ]
+        }
+      ],
+      "why": "Strig where the balloon lands below the dragon's tail: «Subir al globo y seguir a Strig hasta el área de despegue»."
+    },
+    {
+      "npc": 673,
+      "map": 122685953,
+      "opening": 16869,
+      "lines": [
+        {
+          "message": 16869,
+          "choices": [
+            { "reply": 20163, "next": 16905, "quest": 1471, "afterObjective": 8196, "beforeObjective": 8197 }
+          ]
+        },
+        {
+          "message": 16905,
+          "choices": [
+            { "reply": 20161, "criterion": "PO=15006" },
+            { "reply": 20162, "criterion": "PO=15007" }
+          ]
+        }
+      ],
+      "why": "Dark Vlad at the tip of the dragon's tail: «Estoy aquí por el dofus Esmeralda» and the talisman glows -- the character fights him as the reflection of Prysmaradoth (content/fights/npc_fights.json), with the fourth scale's Clarividencia when the stranger set it in the talisman."
+    },
+    {
+      "npc": 2257,
+      "map": 122685953,
+      "opening": 16902,
+      "lines": [
+        {
+          "message": 16902,
+          "choices": [
+            { "reply": 20157 }
+          ]
+        }
+      ],
+      "why": "The hooded sorceress beside Dark Vlad, who is Meriana in disguise (16973)."
+    },
+    {
+      "npc": 5336,
+      "map": 122685953,
+      "opening": 50995,
+      "lines": [
+        {
+          "message": 50995,
+          "choices": [
+            { "reply": 68323, "next": 50996, "quest": 1471, "afterObjective": 8197, "beforeObjective": 8198 }
+          ]
+        },
+        {
+          "message": 50996,
+          "choices": [
+            { "reply": 68322, "quest": 1471, "completes": 8198, "params": [[30, 8198]] }
+          ]
+        }
+      ],
+      "why": "Gúltar, freed from Dark Vlad once he is beaten (50995: «Por fin, soy libre... Y te lo debo a ti»)."
+    },
+    {
+      "npc": 2205,
+      "map": 122685953,
+      "opening": 16972,
+      "openings": [
+        { "criterion": "Qf=1471", "message": 16903 }
+      ],
+      "lines": [
+        {
+          "message": 16972,
+          "choices": [
+            { "reply": 20249, "next": 16973, "quest": 1471, "afterObjective": 8198, "beforeObjective": 8199 }
+          ]
+        },
+        {
+          "message": 16973,
+          "choices": [
+            { "reply": 20248, "next": 16974 }
+          ]
+        },
+        {
+          "message": 16974,
+          "choices": [
+            { "reply": 20247, "quest": 1471, "completes": 8199, "params": [[30, 8199]] }
+          ]
+        },
+        {
+          "message": 16903,
+          "choices": [
+            { "reply": 20158, "teleport": 192416776 }
+          ]
+        }
+      ],
+      "why": "Meriana, out of the hooded sorceress' cloak (16972, 16973), lets the character take the Dofus (20247). Once it is done she sends him back to the World of Twelve (16903, «Abandonar este lugar»): INFERRED, to the Temple of the Twelve in Astrub, where the portal to Incarnam is."
     }
   ]
 }

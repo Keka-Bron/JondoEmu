@@ -601,6 +601,18 @@
     {"map": 95685123, "element": 1570001, "npc": 1570, "cell": 357, "gfx": 1570001, "type": -1, "skill": 339, "toMap": 101713429, "toCell": 455, "why": "Jacoba's «Protestar con ímpetu»: «¡Guardias! Escoltad a #1 hasta la prisión» (17149); the guide's next screenshots have the character inside a cell of the castle prison [6,-5], Lokusta outside it. INFERRED landing, inside the cell's bars."},
     {"map": 209192193, "element": 518613, "cell": 331, "gfx": 65767, "type": 0, "skill": 114, "toMap": 207618056, "toCell": 534, "criterion": "Qo>16275|Qf=2192", "why": "Behind the waterfall of [21,-33] into the receptacle's cave: «Les personnes n'ayant pas fait cette quête ou n'étant pas à ce niveau de la quête ne peuvent pas entrer dans la caverne !» (Dofus pour les noobs, «Le réceptacle des Dofus»), so from the assistant's shortcut (16275) of «El receptáculo de los dofus» on."},
     {"map": 207618056, "element": 518611, "cell": 152, "gfx": 61015, "type": 0, "skill": 114, "toMap": 207619080, "toCell": 462, "why": "The cave's stairs up to the receptacle. The 2.73 world graph sends them to 207621128, one of the two copies of the room the level 200 quests use (2048, 2050, 2406, 2409); every other quest names 207619080 (1784, 2179, 2192, 2412, 2413, 2422), whose own stairs come back down here."},
-    {"map": 209190912, "element": 5563001, "npc": 5563, "cell": 273, "gfx": 5563001, "type": -1, "skill": 339, "toMap": 209192193, "toCell": 345, "why": "The shaman's assistant's shortcut, «Seguir al ayudante del chamán»: before the cave [21,-33] («Une fois arrivé devant la caverne en [21,-33]», Dofus pour les noobs, «Le réceptacle des Dofus»). INFERRED landing, beside the waterfall."}
+    {"map": 209190912, "element": 5563001, "npc": 5563, "cell": 273, "gfx": 5563001, "type": -1, "skill": 339, "toMap": 209192193, "toCell": 345, "why": "The shaman's assistant's shortcut, «Seguir al ayudante del chamán»: before the cave [21,-33] («Une fois arrivé devant la caverne en [21,-33]», Dofus pour les noobs, «Le réceptacle des Dofus»). INFERRED landing, beside the waterfall."},
+    {
+      "map": 153356294,
+      "element": 489319,
+      "cell": 340,
+      "gfx": 49548,
+      "type": 0,
+      "skill": 114,
+      "toMap": 81527303,
+      "toCell": 397,
+      "criterion": "PO=15005",
+      "why": "The trapdoor of the Incarnam militia's tower down to the orbalantir's room, opened by the captain's key (15005, «Darle las gracias y buscar la trampilla»)."
+    }
   ]
 }

@@ -4617,6 +4617,92 @@
       "cell": 325,
       "orientation": 1,
       "why": "Flado, Meriana's goblin, who blames Gorco for the treacle («¡Gorco haber robado melaza!»). INFERRED: in her cabin beside the cauldron, where Gorco stands too."
+    },
+    {
+      "map": 153357316,
+      "npc": 890,
+      "cell": 371,
+      "orientation": 1,
+      "why": "The tavern's customer, «à la taverne d'Incarnam en [0,-3]» (Dofus pour les noobs, «Destination finale»). INFERRED: by the round table."
+    },
+    {
+      "map": 153880578,
+      "npc": 2258,
+      "cell": 258,
+      "orientation": 3,
+      "criterion": "Qa=1471&Qo>8183&Qo<8184",
+      "why": "The chafer bandit, «en [3,1]» (Dofus pour les noobs), while he is to be beaten."
+    },
+    {
+      "map": 153880321,
+      "npc": 2231,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=1471&Qo>8186&Qo<8187",
+      "why": "Pupahen Cráneo's ghost, at the stele of the Three Skulls once they are beaten; the cell of the derived placement, which stood there for everybody."
+    },
+    {
+      "map": 81527303,
+      "npc": 2207,
+      "cell": 357,
+      "orientation": 1,
+      "why": "The orbalantir, on the pedestal in the middle of the room under the militia's tower."
+    },
+    {
+      "map": 154010884,
+      "npc": 2232,
+      "cell": 400,
+      "orientation": 3,
+      "criterion": "Qa=1471&Qo>8192&Qo<8193",
+      "why": "The mysterious stranger, «en [-2,-4]» (Dofus pour les noobs, «Destination finale»)."
+    },
+    {
+      "map": 153880836,
+      "npc": 2206,
+      "cell": 386,
+      "orientation": 3,
+      "criterion": "Qa=1471&Qo>8193&Qo<8197",
+      "why": "Strig by the sky balloon of the take-off area [4,-4]."
+    },
+    {
+      "map": 122683905,
+      "npc": 2206,
+      "cell": 384,
+      "orientation": 3,
+      "criterion": "Qa=1471",
+      "why": "Strig where the balloon lands, to fly back."
+    },
+    {
+      "map": 122685953,
+      "npc": 673,
+      "cell": 343,
+      "orientation": 5,
+      "criterion": "Qa=1471&Qo<8197",
+      "why": "Dark Vlad before the Emerald Dofus' pedestal, until he is beaten."
+    },
+    {
+      "map": 122685953,
+      "npc": 2257,
+      "cell": 357,
+      "orientation": 5,
+      "criterion": "Qa=1471&Qo<8197",
+      "why": "The hooded sorceress beside him."
+    },
+    {
+      "map": 122685953,
+      "npc": 5336,
+      "cell": 315,
+      "orientation": 5,
+      "criterion": "Qa=1471&Qo>8197",
+      "why": "Gúltar, once Dark Vlad is beaten; the cell of the derived placement, which stood there for everybody."
+    },
+    {
+      "map": 122685953,
+      "npc": 2205,
+      "cell": 345,
+      "orientation": 5,
+      "criterion": "(Qa=1471&Qo>8197)|Qf=1471",
+      "why": "Meriana, out of her disguise, and for the way back once the Dofus is taken."
     }
   ]
 }

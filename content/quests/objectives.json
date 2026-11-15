@@ -5100,6 +5100,61 @@
     8166
    ],
    "why": "«Utiliza la brújula de Meriana y dirígete al lugar que indica»: the compass's reference 190, Astrub's phoenix [2,-14] (Dofus pour les noobs, «Naissance d'une vocation»: «La boussole se met à vous indiquer une position au Sud d'Astrub, plus précisément en [2,-14]»), where Nistracolamus stands."
+  },
+  {
+   "objective": 8185,
+   "quest": 1471,
+   "kind": "enter",
+   "map": 153880321,
+   "why": "«Descubre el mapa: Estelas de los Tres Cráneos», a map the catalogue does not name: [3,-1], where Riguait places the grave (16930)."
+  },
+  {
+   "objective": 8186,
+   "quest": 1471,
+   "kind": "beat",
+   "monster": 3604,
+   "map": 153880321,
+   "elements": [
+    {
+     "map": 153880321,
+     "element": 489398
+    }
+   ],
+   "requires": [
+    {
+     "item": 15003,
+     "count": 1
+    }
+   ],
+   "spends": true,
+   "spawns": {
+    "monster": 3604,
+    "count": 1,
+    "with": [
+     3605,
+     3606
+    ],
+    "attacks": true
+   },
+   "afterObjectives": [
+    8185
+   ],
+   "why": "«Vencer a los Tres Cráneos»: the bandit's bone knife at the stele's skull (element 489398, graphic 50135) calls Pupahen, Mbota and Etroza Cráneo (3604-3606) out of the ground (Dofus pour les noobs: «utilisez le Couteau en os sur la stèle»)."
+  },
+  {
+   "objective": 8200,
+   "quest": 1471,
+   "kind": "click",
+   "elements": [
+    {
+     "map": 122685953,
+     "element": 484174
+    }
+   ],
+   "afterObjectives": [
+    8199
+   ],
+   "why": "«Toma el dofus Esmeralda»: its pedestal (element 484174, cell 329). The Dofus itself is the reward of «Verde esmeralda» (achievement 1048), the whole chain's."
   }
  ]
 }
