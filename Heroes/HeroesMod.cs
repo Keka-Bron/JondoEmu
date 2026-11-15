@@ -1155,6 +1155,7 @@ namespace Heroes
         {
             _cTree = tree;
             _cBusy = false;
+            _toldFraming = false;
             foreach (string away in new[] { "parentChangeServer", "btnLeave", "bloc_attitude", "btn_showSpells", "btn_mechanics",
                                             "ctr_colors", "lbl_corps", "ctr_corps", "tg_showEquipment", "lbl_helpToChoose",
                                             "window_spells", "window_mechanics" })
@@ -1440,6 +1441,7 @@ namespace Heroes
             _cDrawn++;
             _cFramed = false;
             _cNextDraw = UnityEngine.Time.unscaledTime + 0.5f;
+            try { displayer.autosize = false; } catch { }
             try { displayer.DestroyCharacterIfNeeded(); } catch { }
             Il2CppCore.UI.UIUtils.pcb(displayer, _cLook, (Il2Cpp.rc)direction, 0, _displayers, _entities);
             Frame(displayer);
@@ -1456,6 +1458,8 @@ namespace Heroes
         {
             try
             {
+                // Not fitted to the box, as the native screen has it: fitted, he was not drawn at all.
+                displayer.autosize = false;
                 float feet = displayer.ratioPositioning > 0f && displayer.ratioPositioning < 1f ? displayer.ratioPositioning : 0.7f;
                 displayer.style.transformOrigin = new StyleTransformOrigin(new TransformOrigin(
                     new Length(50f, LengthUnit.Percent), new Length(feet * 100f, LengthUnit.Percent), 0f));
@@ -1494,7 +1498,9 @@ namespace Heroes
                 {
                     _toldFraming = true;
                     MelonLogger.Msg($"[Heroes] The creation's character: autosize {displayer.autosize}, scale {displayer.scale}, " +
-                                    $"forced {displayer.forcedSize}, ratio {displayer.ratioPositioning}, box {displayer.worldBound}, after {_cDrawn} giving(s).");
+                                    $"style scale {displayer.resolvedStyle.scale.value.x}, forced {displayer.forcedSize}, ratio {displayer.ratioPositioning}, " +
+                                    $"box {displayer.worldBound}, layout {displayer.layout}, texture {(displayer.m_renderTexture != null ? displayer.m_renderTexture.width + "x" + displayer.m_renderTexture.height : "none")}, " +
+                                    $"after {_cDrawn} giving(s).");
                 }
                 return;
             }
