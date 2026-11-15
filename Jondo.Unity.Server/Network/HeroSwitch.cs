@@ -13,10 +13,9 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     /// <remarks>
     /// <para>
-    /// How Auralis's server does it, read off a capture of theirs (2026-11-15, two switches): on
-    /// their mod's one request the server sends, mid-session, the burst a character's selection
+    /// On the mod's one request the server sends, mid-session, the burst a character's selection
     /// sends -- the «character selected» with the hero's id, his sheet, his bag, his spells, his
-    /// shortcuts -- and the map's actors again; the client takes a second selection while in the
+    /// shortcuts -- and the map's actors anew; the client takes a second selection while in the
     /// world and is the hero from then on. Nothing goes back to the character list.
     /// </para>
     /// <para>
@@ -46,7 +45,7 @@ namespace Jondo.Unity.Server.Network
             long map = state.MapId;
             int cell = state.CellId, facing = state.Orientation;
 
-            // The party stays as it is, as on Auralis: the same characters in it, let go and
+            // The party stays as it is: the same characters in it, let go and
             // taken back here without it being told; the one played now is given it afterwards.
             var held = Parties.IsInParty(masterId)
                 ? group.Select(g => g.CharacterId).Append(masterId).ToList()
@@ -72,12 +71,14 @@ namespace Jondo.Unity.Server.Network
         {
             var state = session.State;
 
-            // The master saved and off his map; his heroes let go and saved, the hero among them.
+            // The master saved and off his map; the hero taken let go and saved. The other heroes
+            // stay as they stand, his from now on: nobody else is taken off the map and drawn again.
             DatabaseManager.SaveCurrentCharacter();
             // With no map loaded again his own client is told too: the actor it played goes.
             bool reload = ServerSettings.Current.HeroSwitchReloadsMap;
             await SessionRegistry.RemoveFromMapAsync(map, masterId, reload ? session.Id : Guid.Empty);
-            Heroes.DisconnectAll(masterId);
+            int place = Heroes.HandOver(masterId, heroId);
+            if (place < 0) return false;
 
             var backend = new GameEntryBackend();
             if (!backend.SelectCharacter(session, heroId))
@@ -96,7 +97,7 @@ namespace Jondo.Unity.Server.Network
 
             await backend.SendInitialStateAsync(session, character);
             await backend.AnnounceMapPresenceAsync(session, character);
-            // As Auralis's capture has it, the map is not loaded again: the actors on it are only
+            // The map is not loaded again: the actors on it are only
             // told anew -- the one played before gone, the one played now drawn where he stood --,
             // which is what makes a switch quick. The whole map again when the setting asks for it.
             if (reload) await backend.SendMapInitializationAsync(session, character);
@@ -104,15 +105,10 @@ namespace Jondo.Unity.Server.Network
                 await session.SendAsync(ConnectionProtocol.Push(Op.Jsn,
                     ConnectionProtocol.BuildActorRefreshed(character, cell, facing, session.AccountId)));
 
-            // The group back, around the hero now, in the round it makes: from the one after him to
-            // the one before, the master where he was in it. Taking the first hero in hand each time
-            // -- the mod's Tab -- goes round them all, not back and forth between two.
-            var ring = new List<(long CharacterId, bool AutoPass)> { (masterId, false) };
-            ring.AddRange(group);
-            int at = ring.FindIndex(m => m.CharacterId == heroId);
-            var members = Enumerable.Range(1, ring.Count - 1).Select(k => ring[(at + k) % ring.Count]);
-            foreach (var (member, autoPass) in members)
-                if (Heroes.Connect(session, member) == "ok" && autoPass) Heroes.SetAutoPass(heroId, member, true);
+            // The one played before back as a hero, where he was in the group's round: the others
+            // are in it from the one after the hero taken (Heroes.HandOver). Taking the first hero
+            // in hand each time -- the mod's Tab -- goes round them all, not back and forth.
+            if (Heroes.Connect(session, masterId) == "ok") Heroes.PlaceAt(heroId, masterId, place);
             if (lootTo != 0) Heroes.SetLootTo(heroId, lootTo);
 
             Console.WriteLine($"[Heroes] {state.CharacterName} ({heroId}) taken in hand in place of {masterId}, " +

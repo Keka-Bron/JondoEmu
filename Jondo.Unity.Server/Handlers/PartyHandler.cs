@@ -670,7 +670,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// A hero taken in hand (Network.HeroSwitch), the party held through it: it stays as it was,
-        /// as on Auralis -- the same characters, the one played now among them --. Whoever of the
+        /// the same characters, the one played now among them. Whoever of the
         /// group did not come back goes from it; the one played takes the lead the character he
         /// was had (a hero leads nobody), and his client, which a selection empties, is given the
         /// party again.

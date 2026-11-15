@@ -79,8 +79,8 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// A character made on the account from the window, as Auralis's mod does it -- a name, a
-        /// breed and a sex, the breed's colours --, and connected as a hero at once when there is
+        /// A character made on the account from the window -- a name, a breed, a sex, a head and
+        /// his colours, the breed's for any not sent --, and connected as a hero at once when there is
         /// room. Why not, else: the creation's (CharacterCreationHandler.Make).
         /// </summary>
         private static Respuesta HeroesCreate(string cuerpo, long account)

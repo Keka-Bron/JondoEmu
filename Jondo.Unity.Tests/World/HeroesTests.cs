@@ -240,7 +240,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal("hero", await HeroSwitch.SwitchAsync(pipe.Session, master + 999));
                 Assert.Equal("ok", await HeroSwitch.SwitchAsync(pipe.Session, hero));
 
-                // The same party, as on Auralis: nobody out of it, the one played now leading it.
+                // The same party: nobody out of it, the one played now leading it.
                 Assert.Same(party, Parties.Of(hero));
                 Assert.Equal(hero, party!.LeaderId);
                 Assert.Equal(new[] { master, hero, other }.OrderBy(i => i), Parties.MembersOf(party).OrderBy(i => i));
@@ -395,7 +395,7 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// A hero made from the window, as Auralis's mod makes one: by the creation screen's rules
+        /// A hero made from the window: by the creation screen's rules
         /// -- a name that follows them, one nobody has, a slot left on the account --, with his
         /// class's colours, and connected beside his master at once.
         /// </summary>

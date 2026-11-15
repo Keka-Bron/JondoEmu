@@ -46,7 +46,7 @@ The heroes go wherever their master's party goes. Invited while in a party of hi
 master is free to answer: that party is let go, and his heroes come back into whichever he ends in
 (accepting, turning down, the invitation withdrawn). Leaving a party, or put out of it, he takes his
 heroes into one of their own around him. The leader putting out a hero of his own lets that hero go.
-Taking a hero in hand leaves the party as it is, as on Auralis: the same characters stay in it --
+Taking a hero in hand leaves the party as it is: the same characters stay in it --
 let go and taken back without it being told (`Heroes.HoldParty`) --, the one played takes the lead
 the other had, and his client is given the party again (`PartyHandler.SwitchedAsync`).
 
@@ -54,12 +54,11 @@ The game's own «follow the leader» cannot move a hero (no client to walk): `He
 
 ## Making a hero
 
-As Auralis's mod does it (their capture, 2026-11-15: a name, a breed, a sex and six colours of -1
-sent; the character made, its id and the list again sent back; connected by a request of its own).
 The window's empty places, as many as the account has character slots left, each offer to make a
-hero: a class, a sex and a name -- the server draws one on asking --. `heroes/create` makes him by
-the creation screen's own rules (`CharacterCreationHandler.Make`: the name's rule, a name nobody
-has, a slot left), with his class's colours, and connects him as a hero at once when there is room.
+hero. `heroes/create` makes him by the creation screen's own rules (`CharacterCreationHandler.Make`:
+the name's rule, a name nobody has, a slot left) with the name, the breed, the sex, the head and the
+colours chosen -- the breed's for any not sent --, and connects him as a hero at once when there is
+room; `heroes/name` draws a name nobody has.
 
 The screen is the game's own (`HeroesMod`'s «The game's own CharacterCreation, whole»): its template
 (`Assets/UI/Auth/characterCreation.uxml`) cloned into a window over the world and the game's
@@ -131,15 +130,16 @@ Each connected hero's card in the window has three more glyphs -- a chest, three
 that open his bag, his characteristics and his spells, to look at (`POST /api/heroes/sheet { id }`):
 ids from the server, named and drawn by the client's own data (`DataCenterModule`, its icon tiles).
 
-**Taking a hero in hand** (the panel's **PLAY**) happens at once, in the same connection, as
-Auralis's does it -- read off a capture of theirs (2026-11-15, two switches): on their mod's one
-request their server sends, mid-session, the burst a selection sends (the «character selected» with
-the hero's id, his sheet, bag, spells and shortcuts) and the map's actors again, and their client
-takes a second selection while in the world. `POST /api/heroes/switch { id }` does the same here
-(`HeroSwitch`): the master saved and taken off his map, the hero selected into the same session
-where the master stood, the selection's initial state (`WorldEntry.SendInitialStateAsync`), the
-same map's block again (the client loads it once more and asks for its actors), and the group back
-around the hero, the master a hero of his, the switches kept.
+**Taking a hero in hand** (the panel's **PLAY**, or Tab) happens at once, in the same connection:
+`POST /api/heroes/switch { id }` (`HeroSwitch`). The master is saved and taken off his map, the hero
+selected into the same session where the master stood, and the client sent, mid-session, the burst
+a selection sends (the «character selected» with the hero's id, his sheet, bag, spells and
+shortcuts); it takes a second selection while in the world. The map is not loaded again: the actor
+played before is taken off for his own client too and the one played now drawn where he stood
+(`ServerSettings.HeroSwitchReloadsMap` brings the whole map back). Only the two of them change
+hands: the other heroes stay as they stand, on the map and with their switches, the new one's heroes
+from then on (`Heroes.HandOver`), and the one played before comes back as a hero at his place in
+the group's round, so that Tab goes round them all.
 
 `{ id, later: 1 }` asks for it at the client's next character list instead (`Heroes.AskSwitch`):
 the server picks the hero there itself, the way it picks a character still in a fight (the list with
@@ -167,10 +167,7 @@ All need the master in the world (`409 world`), with the session's own token.
   fights against monsters bring his heroes in.
 - A defeat's consequences on a hero beyond the fight; the master walking out of a fight leaves his
   heroes in it with nobody to play them.
-- Creating a character from the window.
-- The group panel's «follow» and «show on the map» of Auralis's.
-- PLAY reloads the map where Auralis's does not: sending the map's actors and the shortcuts alone,
-  as theirs does, is not measured on the 3.6.10.11 client yet.
+- The group panel's own «follow» and «show on the map» switches.
 - The spell book (the client's own) shows the master's spells, not the hero's.
 
 The `.heros` command (administrators) still opens the probe's fight: JondoBots at one's side,

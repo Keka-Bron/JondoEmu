@@ -527,7 +527,7 @@ namespace Heroes
         /// <summary>Each living portrait, by where it stands and whose it is, with what it was made of.</summary>
         private static readonly Dictionary<string, (string Key, VisualElement View)> _live = new Dictionary<string, (string, VisualElement)>();
 
-        /// <summary>The animation a character not in the world sits in, as Auralis's window has it.</summary>
+        /// <summary>The animation a character not in the world sits in.</summary>
         private const string Seated = "AnimEmoteSit_Statique";
 
         /// <summary>
@@ -822,7 +822,7 @@ namespace Heroes
         /// <summary>
         /// A look as the client draws it, out of the protocol's EntityLook the server sends: read
         /// with its own parser, turned into the rendering's look (vd.qse) and made whole (vf.qsi)
-        /// -- 3.6.10's names, the ones Auralis's own notes give for this version.
+        /// -- 3.6.10's names for them.
         /// </summary>
         private static Il2CppCore.Rendering.Look.EntityLook LookOf(string base64)
         {
@@ -1076,10 +1076,9 @@ namespace Heroes
         private static bool _toldCreationTree;
 
         /// <summary>
-        /// The game's own character creation screen, as Auralis's mod shows it: its template
-        /// (characterCreation.uxml) in a window over the world. This first step shows it and logs
-        /// what it is made of, for its parts to be bound; the mod's own form stays behind it when
-        /// the template cannot be had.
+        /// The game's own character creation screen: its template (characterCreation.uxml) in a
+        /// window over the world, the game's CharacterCreation made on it (NativeCreation), or
+        /// bound by hand when that cannot be; the mod's own form when the template cannot be had.
         /// </summary>
         private static void OpenNativeCreation()
         {
@@ -1768,8 +1767,7 @@ namespace Heroes
         }
 
         /// <summary>
-        /// The look given to the platform's displayer, with the native screen's framing -- no
-        /// fitting to the box, a scale of 0.6, as Auralis's notes have it -- set after: the giving
+        /// The look given to the platform's displayer, its framing (Frame) set after: the giving
         /// sets its own. A breed's first look only starts its loading and shows nothing; it is
         /// given again (WatchPreview) until its character is there.
         /// </summary>
@@ -1929,7 +1927,7 @@ namespace Heroes
         }
 
         /// <summary>
-        /// A name, a class and a sex, as Auralis's mod asks them: the server makes the character with
+        /// The mod's own form, a name, a class and a sex: the server makes the character with
         /// its class's colours, on the creation screen's rules, and connects it as a hero at once.
         /// </summary>
         private static void RenderCreation()
@@ -2907,9 +2905,9 @@ namespace Heroes
         /// his, the group around him.
         /// </summary>
         /// <remarks>
-        /// As Auralis's: one request, and the server does the switch in the same connection
-        /// (HeroSwitch) -- it sends the hero's selection and his state, and the map again; the
-        /// client is the hero from then on, with no character list in between.
+        /// One request, and the server does the switch in the same connection (HeroSwitch) -- it
+        /// sends the hero's selection and his state, and the map's actors anew; the client is the
+        /// hero from then on, with no character list in between.
         /// </remarks>
         private static void TakeInHand(long id, string name, VisualElement from)
         {

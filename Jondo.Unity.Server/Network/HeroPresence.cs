@@ -13,7 +13,7 @@ namespace Jondo.Unity.Server.Network
     /// him, going with him from one map to the next, and gone while they fight.
     /// </summary>
     /// <remarks>
-    /// As Auralis's heroes stand beside their master and follow him («Mes héros me suivent»). A
+    /// The heroes stand beside their master and follow him. A
     /// hero has no client: his actor is the server's to put on the map (jsn), to walk (jsj, the
     /// master's own walk, ending a few steps behind him) and to take off (kmu), and every map's
     /// actor list carries the heroes of the people on it (ConnectionProtocol.BuildMapActors).

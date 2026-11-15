@@ -34,7 +34,7 @@ namespace Jondo.Unity.Server.Managers
         public sealed class Hero
         {
             public long CharacterId { get; init; }
-            public long MasterId { get; init; }
+            public long MasterId { get; internal set; }
             public GameSession Session { get; init; } = null!;
             public DateTime Since { get; init; } = DateTime.UtcNow;
 
@@ -213,7 +213,7 @@ namespace Jondo.Unity.Server.Managers
         public static readonly TimeSpan SwitchWaits = TimeSpan.FromMinutes(2);
 
         /// <summary>
-        /// Taking a hero in hand, as Auralis's server does it: the hero is remembered for the account,
+        /// Taking a hero in hand at the character list: the hero is remembered for the account,
         /// and when its client comes back to the character list the server picks him for it -- the
         /// way a character still in a fight is picked (kvd, then kwb). False when he is not a hero of his.
         /// </summary>
@@ -293,6 +293,49 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var hero in gone) Forget(hero);
             }
             foreach (var hero in gone) Save(hero);
+        }
+
+        /// <summary>
+        /// A master taking one of his heroes in hand (Network.HeroSwitch): that hero is let go and
+        /// saved -- the master's client is about to be him --, and the others stay as they stand,
+        /// on the map and in their fights' order, his heroes from now on. They are left in the
+        /// group's round from the one after him; where in it the master he was comes back as a
+        /// hero is returned (<see cref="PlaceAt"/>), or -1 when the hero is not his.
+        /// </summary>
+        public static int HandOver(long masterId, long heroId)
+        {
+            Hero? taken;
+            int place;
+            lock (_lock)
+            {
+                if (!_byHero.TryGetValue(heroId, out taken) || taken.MasterId != masterId) return -1;
+                if (!_byMaster.TryGetValue(masterId, out var list)) return -1;
+                int at = list.FindIndex(h => h.CharacterId == heroId);
+                // The round: the master, then his heroes; from the one after the hero taken.
+                var others = list.Skip(at + 1).Concat(list.Take(at)).ToList();
+                place = list.Count - 1 - at;
+                _lootTo.TryRemove(masterId, out _);
+                _byHero.TryRemove(heroId, out _);
+                _byMaster.TryRemove(masterId, out _);
+                foreach (var other in others) other.MasterId = heroId;
+                if (others.Count > 0) _byMaster[heroId] = others;
+            }
+            Save(taken);
+            return place;
+        }
+
+        /// <summary>A hero just connected moved to his place in his master's heroes' order.</summary>
+        public static void PlaceAt(long masterId, long heroId, int place)
+        {
+            lock (_lock)
+            {
+                if (!_byMaster.TryGetValue(masterId, out var list)) return;
+                int at = list.FindIndex(h => h.CharacterId == heroId);
+                if (at < 0) return;
+                var hero = list[at];
+                list.RemoveAt(at);
+                list.Insert(Math.Clamp(place, 0, list.Count), hero);
+            }
         }
 
         /// <summary>

@@ -119,7 +119,7 @@ namespace Jondo.Unity.Server
 
         /// <summary>
         /// Whether taking a hero in hand loads the map again in the client (Network.HeroSwitch).
-        /// Off, only the map's actors are told anew, as Auralis's server does: quicker. Set in the file.
+        /// Off, only the map's actors are told anew: quicker. Set in the file.
         /// </summary>
         public bool HeroSwitchReloadsMap { get; set; }
 
