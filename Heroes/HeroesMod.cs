@@ -517,27 +517,36 @@ namespace Heroes
         /// <summary>Harmony's postfix on EntityPortrait.InitEntityPortrait: the services as the client hands them.</summary>
         public static void OnInitEntityPortrait(Il2Cpp.feu __0, Il2Cpp.fep __1, Il2Cpp.fer __2, Il2Cpp.fdf __3, Il2Cpp.fcg __4)
         {
-            if (_displayers == null && __0 != null && __1 != null) Borrowed(__0, __1, __2, __3, __4, "InitEntityPortrait");
+            if (__0 != null && __1 != null) Borrowed(__0, __1, __2, __3, __4, "InitEntityPortrait");
         }
 
+        /// <summary>The services had, each kept once had: a later source fills in what an earlier one lacked.</summary>
         private static void Borrowed(Il2Cpp.feu entities, Il2Cpp.fep displayers, Il2Cpp.fer infos, Il2Cpp.fdf menuDependencies,
                                      Il2Cpp.fcg menus, string from)
         {
-            _entities = entities;
-            _displayers = displayers;
-            _entityInfos = infos;
-            _menuDependencies = menuDependencies;
-            _menus = menus;
-            MelonLogger.Msg($"[Heroes] The client's portraits are ours to use (services off {from}).");
+            bool first = _displayers == null;
+            _entities ??= entities;
+            _displayers ??= displayers;
+            _entityInfos ??= infos;
+            _menuDependencies ??= menuDependencies;
+            _menus ??= menus;
+            if (!first) return;
+            MelonLogger.Msg($"[Heroes] The client's portraits are ours to use (services off {from}; " +
+                            $"infos {(infos != null ? "yes" : "no")}, menus {(menus != null ? "yes" : "no")}).");
             _panelKey = null;
             _nextPoll = 0f;
         }
 
+        /// <summary>
+        /// Where the services are had: as the client hands them to a portrait of its own, and as it
+        /// builds the screens it hands them to -- the character selection first, shown at every way
+        /// in, before the world; the inventory, the character sheet, the party window after.
+        /// </summary>
         private static void WatchPortraits()
         {
+            var harmony = new HarmonyLib.Harmony("jondo.heroes.portraits");
             try
             {
-                var harmony = new HarmonyLib.Harmony("jondo.heroes.portraits");
                 var method = HarmonyLib.AccessTools.Method(typeof(Il2CppCore.UILogic.Components.Figma.EntityPortrait), "InitEntityPortrait");
                 if (method != null) harmony.Patch(method, postfix: new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnInitEntityPortrait))));
             }
@@ -545,6 +554,44 @@ namespace Heroes
             {
                 MelonLogger.Warning($"[Heroes] InitEntityPortrait not watched: {ex.Message}");
             }
+            var takeArgs = new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnScreenBuilt)));
+            foreach (var screen in new[]
+            {
+                typeof(Il2CppCore.UILogic.Connection.CharacterSelection),
+                typeof(Il2CppCore.UILogic.Inventory.Uis.PlayerInventory.EquipmentUi),
+                typeof(Il2CppCore.UILogic.CharacterSheet.UICharacterSheet),
+                typeof(Il2CppCore.UILogic.Party.PartyDisplayUi),
+                typeof(Il2CppCore.UILogic.Party.PartyMember),
+            })
+            {
+                foreach (var ctor in screen.GetConstructors())
+                {
+                    if (ctor.GetParameters().Length < 2) continue;
+                    try { harmony.Patch(ctor, postfix: takeArgs); }
+                    catch (Exception ex) { MelonLogger.Warning($"[Heroes] {screen.Name} not watched: {ex.Message}"); }
+                }
+            }
+        }
+
+        /// <summary>Harmony's postfix on those screens' constructors: whichever of the services they were handed.</summary>
+        public static void OnScreenBuilt(object[] __args, System.Reflection.MethodBase __originalMethod)
+        {
+            try
+            {
+                if (__args == null || (_displayers != null && _entityInfos != null && _menus != null && _menuDependencies != null)) return;
+                Il2Cpp.feu entities = null; Il2Cpp.fep displayers = null; Il2Cpp.fer infos = null; Il2Cpp.fdf dependencies = null; Il2Cpp.fcg menus = null;
+                foreach (var arg in __args)
+                {
+                    if (arg is Il2Cpp.feu e) entities = e;
+                    else if (arg is Il2Cpp.fep d) displayers = d;
+                    else if (arg is Il2Cpp.fer i) infos = i;
+                    else if (arg is Il2Cpp.fdf m) dependencies = m;
+                    else if (arg is Il2Cpp.fcg c) menus = c;
+                }
+                if (entities != null && displayers != null)
+                    Borrowed(entities, displayers, infos, dependencies, menus, __originalMethod?.DeclaringType?.Name ?? "a screen");
+            }
+            catch { }
         }
 
         private static Il2CppGoogle.Protobuf.MessageParser<Il2Cpp.lhg> _lookParser;
