@@ -3206,6 +3206,10 @@ namespace Jondo.Unity.Server.Handlers
             if (fight.State != Jondo.Unity.World.Fights.FightState.Ongoing) fight.StartFight();
             fight.CancelPlacementTimer();
 
+            // A dimension dungeon's boss is fought in waves, as many monsters each as the first
+            // now that the people who fight are known.
+            PlanDimensionWaves(fight);
+
             // The placement is over: the swords go from the map (hpr). Nobody joins any more.
             await SwordsGoneAsync(fight);
 
@@ -3261,6 +3265,9 @@ namespace Jondo.Unity.Server.Handlers
 
                     // Belladona's chess: the players turned into its pieces, its glyphs laid.
                     await Managers.GuildRaidEfedra.OnFightStartedAsync(stream, fight);
+
+                    // A dimension dungeon's timeline shows its waves from the first turn.
+                    await FirstDimensionWaveAsync(fight);
 
                     await AskToConfirmAsync(stream, fight);
                 }
@@ -10649,6 +10656,7 @@ namespace Jondo.Unity.Server.Handlers
                 var limits = LimitesDeGrado(spell, grade);
 
                 bool damages = false, hurtsAllies = false, summons = false, mechanics = false, mechanicsOnEnemies = false;
+                bool hooks = false, hooksOnEnemies = false, doesSomethingAtOnce = false;
                 int zone = 0, removal = 0, buff = 0;
                 Managers.SpellEffect? zoneRow = null;
                 double heal = 0, pickedDamage = 0;
@@ -10692,6 +10700,24 @@ namespace Jondo.Unity.Server.Handlers
                         mechanics = true;
                         if (enemies) mechanicsOnEnemies = true;
                     }
+                    else if (!Managers.EffectEngine.EsMarcadorDeGuion(effect.EffectId) && !effect.ForClientOnly)
+                    {
+                        hooks = true;
+                        if (enemies) hooksOnEnemies = true;
+                    }
+                    if (string.Equals(effect.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)
+                        && !Managers.EffectEngine.EsMarcadorDeGuion(effect.EffectId) && !effect.ForClientOnly)
+                        doesSomethingAtOnce = true;
+                }
+
+                // A spell that only hooks rows on somebody, to go off later, is a mechanic all the
+                // same: the Sramurái's Sentido del Deber (4727) is one row waiting on its caster
+                // being hurt (D), to give a movement point to everybody round him. Weighed as
+                // nothing, it was never cast.
+                if (hooks && !doesSomethingAtOnce)
+                {
+                    mechanics = true;
+                    if (hooksOnEnemies) mechanicsOnEnemies = true;
                 }
 
                 foreach (var stat in data.StatEffects)
@@ -11097,13 +11123,108 @@ namespace Jondo.Unity.Server.Handlers
 
             int wave = fight.WaveNumber + 1;
             int turnsBeforeNext = fight.TimedWaves.Count > 0 ? fight.TimedWaves[0].Turns : 0;
-            int arrivals = await BringWaveAsync(stream, fight, group, wave, turnsBeforeNext, _ => { });
+            int arrivals = await BringWaveAsync(stream, fight, group, wave, turnsBeforeNext, monster =>
+            {
+                // A dimension dungeon's later waves come with a quarter less life.
+                if (fight.WaveLifePercent is > 0 and < 100)
+                {
+                    monster.MaxHP = Math.Max(1, monster.MaxHP * fight.WaveLifePercent / 100);
+                    monster.CurrentHP = monster.MaxHP;
+                }
+            });
             if (arrivals == 0) return false;
 
             fight.WaveNumber = wave;
             fight.NextWaveRound = fight.RoundNumber + turnsBeforeNext;
+            await ShieldArrivalsAsync(fight, wave);
             Program.LogDebug($"[Fight] Wave {wave}: {arrivals} monster(s); {fight.TimedWaves.Count} still to come.");
             return true;
+        }
+
+        /// <summary>
+        /// A dimension dungeon's fight (<see cref="Managers.DimensionDungeons"/>) gets its later
+        /// waves here, when placement is over and the people who fight are known: each as many
+        /// monsters as the first -- the room group's first clamp(people, 4, 8), the boss leading --,
+        /// drawn from that group, the first of them five turns on. With them, the state every
+        /// newcomer comes under and the life it comes with.
+        /// </summary>
+        internal static void PlanDimensionWaves(FightInstance fight)
+        {
+            if (fight.TimedWaves.Count > 0 || !Managers.DimensionDungeons.FightsInWaves(fight.RoleplayMapId)) return;
+            if (!_onTheMap.TryGetValue(fight.FightId, out var where) || where.Group == null) return;
+            var dungeon = Managers.DungeonManager.OfRoom(fight.RoleplayMapId);
+            if (dungeon == null) return;
+
+            int size = MobSpawnManager.MembersFor(where.Group, fight.PeopleIn(FightInstance.Azules)).Count;
+            var waves = Managers.DimensionDungeons.Plan(where.Group.Members, dungeon.Bosses, size, fight.FightId);
+            if (waves.Count == 0) return;
+
+            var rules = Managers.DimensionDungeons.Current;
+            fight.TimedWaves.AddRange(waves);
+            fight.NextWaveRound = FirstRound + waves[0].Turns;
+            fight.WaveArrivalState = rules.ArrivalState;
+            fight.WaveLifePercent = rules.LifePercentFromSecondWave;
+            Program.LogDebug($"[Dungeon] Fight #{fight.FightId} in {dungeon.Name}: {waves.Count} more wave(s) " +
+                             $"of {size}, every {waves[0].Turns} turns.");
+        }
+
+        /// <summary>
+        /// A dimension dungeon's first wave on the timeline, with the turns before the second: the
+        /// jyb that later makes each wave the current one, here for the monsters the fight started
+        /// with (wave 0, as their blocks carry it). The client keeps the wave and the count from it.
+        /// </summary>
+        private static async Task FirstDimensionWaveAsync(FightInstance fight)
+        {
+            if (fight.WaveArrivalState == 0 || fight.TimedWaves.Count == 0) return;
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jyb,
+                Network.FightProtocol.BuildNewWave(FightInstance.Rojos, fight.WaveNumber, fight.TimedWaves[0].Turns)));
+        }
+
+        /// <summary>
+        /// A dimension dungeon's newcomers under the fight's <see cref="FightInstance.WaveArrivalState"/>,
+        /// each until its first turn is over (<see cref="ArrivalShieldEndsAsync"/>), the rows told to
+        /// the board in a sequence of their own. The row does not run out by the round: the order
+        /// is rebuilt when they come, and a newcomer's first turn may fall in the next round.
+        /// </summary>
+        private static async Task ShieldArrivalsAsync(FightInstance fight, int wave)
+        {
+            int state = fight.WaveArrivalState;
+            if (state == 0) return;
+            var arrivals = fight.Rojo.Where(f => f.IsAlive && f.Wave == wave && !f.EsInvocado).ToList();
+            if (arrivals.Count == 0) return;
+
+            await InASequenceAsync(fight, arrivals[0].Id, async () =>
+            {
+                foreach (var who in arrivals)
+                {
+                    var row = who.Buffs.Poner(new Buff
+                    {
+                        EffectId = Jondo.Unity.World.Combat.EffectSupport.AddState, Estado = state, Cuanto = state, Quien = who.Id,
+                        Disparador = Managers.EffectEngine.AlLanzar, CaducaEnRonda = -1, EmpiezaEnRonda = fight.RoundNumber,
+                    }, fight.SiguienteEmbrujo);
+                    who.Buffs.PonerEstado(state);
+                    fight.ArrivalShields[who.Id] = row.Numero;
+                    var (categoria, boost) = DatabaseManager.EffectFamily(row.EffectId);
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxm, Network.FightProtocol.BuildBuff(
+                        who.Id, who.Id, row.Numero, row.EffectId, row.EffectUid, state, 0, 0, 0, row.Disparador, 1, 0,
+                        Network.FightProtocol.FamiliaDelEmbrujo(row.EffectId, categoria, boost), 1, false)));
+                }
+            });
+            Program.LogDebug($"[Fight] Wave {wave}: {arrivals.Count} newcomer(s) under state {state} until their first turn ends.");
+        }
+
+        /// <summary>
+        /// The end of a newcomer's first turn: its arrival state goes (<see cref="ShieldArrivalsAsync"/>),
+        /// told to the board as an expired row is, inside a sequence.
+        /// </summary>
+        internal static async Task ArrivalShieldEndsAsync(FightInstance fight, Fighter ending)
+        {
+            if (!fight.ArrivalShields.Remove(ending.Id, out int numero)) return;
+            var row = ending.Buffs.Puestos.FirstOrDefault(b => b.Numero == numero);
+            if (row == null || !ending.Buffs.QuitarFila(row)) return;
+            await InASequenceAsync(fight, ending.Id, () => ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
+                Network.FightProtocol.BuildBuffGone(ending.Id, row.Numero))));
+            Program.LogDebug($"[Fight] {ending.Id}'s first turn is over: its arrival state {row.Estado} goes.");
         }
 
         /// <summary>
@@ -11530,10 +11651,6 @@ namespace Jondo.Unity.Server.Handlers
             // What it returns is the bonus of the met ones, added up, as a percentage.
             int extraDeRetos = await ChallengeWatcher.FightEndedAsync(stream, fight, won);
 
-            // And the quests that asked for defeating something, for the same reason: this is where
-            // it is known that it really fell, and the client is not trusted on that.
-            await QuestWatcher.FightEndedAsync(stream, fight, won);
-
             // And the mark an NPC's fight leaves on whoever wins it (npc_fights.json «marks»):
             // the moguis of a heap of filings beaten, the heap lets its handful be taken.
             if (won && fight.WinMarks != 0 && Network.SessionContext.State.ElementsUsed.Add(fight.WinMarks))
@@ -11602,6 +11719,13 @@ namespace Jondo.Unity.Server.Handlers
             {
                 loot = won ? RollFightLoot(fight, extraDeRetos, out caidos) : new Dictionary<int, int>();
             }
+
+            // And the quests that asked for defeating something: this is where it is known that it
+            // really fell, and the client is not trusted on that. After the loot, not before: the
+            // client's drop rows of a quest's monster want its objective still to do -- Vantarde's
+            // note «Qo>8687&Qo<8688», the reliquaries of 1696 «Qo>10560&Qo<10561» --, and ticked
+            // first, the very fight that does it never let them fall.
+            await QuestWatcher.FightEndedAsync(stream, fight, won);
 
             // The koliseo pays ITS OWN, planned with the rest (PlanKoliseo): there are no monsters in
             // front to get experience, kamas or a loot table from, the koliseo pays for winning, and
@@ -12148,6 +12272,9 @@ namespace Jondo.Unity.Server.Handlers
 
             // And the turn-end glyphs under him (402).
             await TurnEndGlyphsAsync(stream, fight, ending);
+
+            // A dimension dungeon's newcomer was invulnerable until this, its first turn, ended.
+            await ArrivalShieldEndsAsync(fight, ending);
 
             // A turn-end effect can be the one that empties a side -- a poison, a Tymobot that
             // was the last of its team -- and then there is no next turn to hand out.

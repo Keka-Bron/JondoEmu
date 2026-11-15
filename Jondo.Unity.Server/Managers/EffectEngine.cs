@@ -2569,7 +2569,14 @@ namespace Jondo.Unity.Server.Managers
                             // as the last of the round, burns "por cada PM utilizado" at the end of
                             // the player's next turn. Armed to the next round alone, it was gone by
                             // the time he ended it, and nobody ever paid for a step.
-                            HookUntil = efecto.Duration == 0 && portador != caster && WaitsOnATurn(efecto)
+                            //
+                            // And one with no duration on its own caster, waiting on a blow or a
+                            // move of somebody else's (not on a turn): it lives to his next turn,
+                            // through everybody else's. The Sramurái's Sentido del Deber (4727)
+                            // hooks "when hurt" on himself; armed to the next round alone, cast
+                            // as the round's last turn, it was gone before anybody could hit him.
+                            HookUntil = efecto.Duration == 0
+                                        && (portador != caster ? WaitsOnATurn(efecto) : !WaitsOnATurn(efecto))
                                 ? UntilTheirNextTurn(combat, portador, round)
                                 : null,
                         });
@@ -4328,6 +4335,16 @@ namespace Jondo.Unity.Server.Managers
                 if (sobre != quienLanza && celdaApuntada >= 0) return null;
                 if (celdaApuntada < 0) return null;
                 if (efecto.DiceNum <= 0) return null;
+
+                // The same trap twice on the same spot is one: the Trabucador lays its Aislamiento
+                // round itself at the end of every turn (4730), and standing still it piled one
+                // on another, each pushing two cells -- «le piège du Tromblion» (Dofus pour les
+                // noobs) is one. Its ring leaves out its own cell, so the rule against a trap on a
+                // trapped cell never stopped it.
+                if (efecto.EffectId == Trampa
+                    && combate.Glifos.Any(g => !g.Gastado && g.Tipo == Trampa && g.Dueno == quienLanza.Id
+                                               && g.HechizoQueLoPuso == hechizo && g.Centro == celdaApuntada))
+                    return null;
 
                 var huella = CasillasDelEfecto(efecto, quienLanza.CellId, celdaApuntada);
                 if (hechizo == ForgelanceCombat.LanceAura && efecto.DiceSide == 2

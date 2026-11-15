@@ -1,0 +1,34 @@
+{
+  "_comment": [
+    "The dungeons of the divine dimensions: one room, its boss fought in waves (Managers/DimensionDungeons.cs).",
+    "The rules are the same for all of them, after Dofus pour les noobs' pages of these dungeons; the",
+    "Osavora ones, written for Dofus 3, state them most fully. Five waves, the next one every five turns",
+    "(turns 1, 6, 11, 16 and 21) or at once when nobody is left in front. Each wave has as many monsters",
+    "as there are fighters, and the first is led by the boss. Every monster that comes in is invulnerable",
+    "until the end of its first turn, and from the second wave on it comes with a quarter less life.",
+    "INFERRED: the state that makes them invulnerable (56, the client's own «Invulnerable»), the size of",
+    "a wave for fewer than four people (the modular dungeons' four), and who comes in the later waves",
+    "(drawn from the boss room's own monsters, as its group is)."
+  ],
+  "waves": 5,
+  "everyTurns": 5,
+  "arrivalState": 56,
+  "lifePercentFromSecondWave": 75,
+  "dungeons": [
+    { "dungeon": 76, "name": "Palacio del Rey Nidas", "dimension": "Enutrosor" },
+    { "dungeon": 77, "name": "Fábrica de Maleféscof", "dimension": "Enutrosor" },
+    { "dungeon": 79, "name": "Galería de Perfósil", "dimension": "Enutrosor" },
+    { "dungeon": 81, "name": "Ring del Capitán Eskarlata", "dimension": "Srambad" },
+    { "dungeon": 82, "name": "Cueva de Toxoliat", "dimension": "Srambad" },
+    { "dungeon": 83, "name": "Trono de la Corte Tenebrosa", "dimension": "Srambad" },
+    { "dungeon": 85, "name": "Megalito de Fraktal", "dimension": "Xelorium" },
+    { "dungeon": 86, "name": "Relojarium de XLII", "dimension": "Xelorium" },
+    { "dungeon": 87, "name": "Ojo de Vórtex", "dimension": "Xelorium" },
+    { "dungeon": 93, "name": "Miausoleo de Piojoporojo", "dimension": "Ecaflipus" },
+    { "dungeon": 94, "name": "Plataforma de Ush", "dimension": "Ecaflipus" },
+    { "dungeon": 95, "name": "Reto de Miauvizor", "dimension": "Ecaflipus" },
+    { "dungeon": 163, "name": "Puesto de Control del Bzupervibzor", "dimension": "Osavora" },
+    { "dungeon": 164, "name": "Coto del Venerable", "dimension": "Osavora" },
+    { "dungeon": 165, "name": "Altar de la Despedazadora", "dimension": "Osavora" }
+  ]
+}

@@ -245,6 +245,57 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// And one that asks for a free cell goes beside the enemy, never on him: Vantarde Smis's
+        /// Tymadura Vil, his copies where he lands, was aimed at the enemy's own cell and never cast.
+        /// </summary>
+        [Fact]
+        public void It_aims_mechanics_that_want_a_free_cell_beside_the_enemy()
+        {
+            var monster = Monster();
+            var player = Player(1, CellAt(Centre, 3));
+            var illusions = new MonsterTactics.Spell
+            {
+                Id = 11, Grade = 1, Cost = 3, MinRange = 1, MaxRange = 6, Utility = 40, UtilityOnEnemies = true,
+                NeedsFreeCell = true,
+            };
+
+            var action = MonsterTactics.Next(Board(monster, player), monster, new[] { illusions });
+            Assert.NotNull(action);
+            Assert.Same(player, action!.Target);
+            Assert.NotEqual(player.CellId, action.TargetCell);
+            Assert.Contains(action.TargetCell, MapGeometry.GetNeighbors(player.CellId));
+        }
+
+        /// <summary>
+        /// A leap whose blow falls round where it lands goes as far from its target as its zone
+        /// reaches: the Elsumo's Salto de Luna (C2), its foe walled in on all four sides, was never
+        /// cast for want of a free cell beside him.
+        /// </summary>
+        [Fact]
+        public void A_leap_with_a_zone_lands_off_a_walled_in_enemy()
+        {
+            var monster = Monster(ap: 6, mp: 0);
+            int walledIn = CellAt(Centre, 3);
+            var player = Player(1, walledIn);
+            var wall = MapGeometry.GetNeighbors(walledIn)
+                .Select((cell, i) => new Fighter
+                {
+                    Id = -10 - i, TeamId = 1, CellId = cell, MaxHP = 1000, CurrentHP = 1000, Level = 100, IsMonster = true,
+                })
+                .ToArray();
+            var moonLeap = new MonsterTactics.Spell
+            {
+                Id = 4733, Grade = 1, Cost = 3, MinRange = 1, MaxRange = 3, Damage = 37, Zone = 2, NeedsFreeCell = true,
+            };
+
+            var action = MonsterTactics.Next(Board(new[] { monster, player }.Concat(wall).ToArray()), monster, new[] { moonLeap });
+            Assert.NotNull(action);
+            Assert.Same(player, action!.Target);
+            Assert.Equal(2, MapGeometry.Distance(action.TargetCell, walledIn));
+            Assert.DoesNotContain(action.TargetCell, wall.Select(w => w.CellId));
+        }
+
+        /// <summary>
         /// Placed at the end: a ranged one at its spell's reach, a melee one against the weakest, and
         /// one about to die as far away as it can get.
         /// </summary>

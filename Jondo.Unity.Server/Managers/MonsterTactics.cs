@@ -785,8 +785,12 @@ namespace Jondo.Unity.Server.Managers
             }
             if (spell.Offensive && spell.NeedsFreeCell)
             {
+                // A leap whose blow falls round where it lands reaches its target from as far as
+                // its zone goes: the Elsumo's Salto de Luna (C2), its only foe walled in by the
+                // captain's men in the Ring, found no free cell beside him and never jumped. Hit()
+                // keeps the zone's shape when the cast is weighed.
                 foreach (var enemy in enemies)
-                    foreach (int cell in MapGeometry.GetNeighbors(enemy.CellId))
+                    foreach (int cell in Around(enemy.CellId, Math.Max(1, spell.Zone)))
                         yield return (enemy, cell);
             }
             else if (spell.Offensive)
@@ -810,13 +814,33 @@ namespace Jondo.Unity.Server.Managers
             }
             if (spell.Utility > 0)
             {
-                if (spell.UtilityOnEnemies)
+                // One that asks for a free cell is aimed beside the enemy, never on him: Vantarde
+                // Smis's Tymadura Vil (1097, copies of him where he lands) was aimed at the
+                // enemy's own cell, refused there every time and never cast.
+                if (spell.UtilityOnEnemies && spell.NeedsFreeCell)
+                {
+                    if (!spell.Offensive)
+                        foreach (var enemy in enemies)
+                            foreach (int cell in MapGeometry.GetNeighbors(enemy.CellId))
+                                yield return (enemy, cell);
+                }
+                else if (spell.UtilityOnEnemies)
                 {
                     if (!spell.Offensive) foreach (var enemy in enemies) yield return (enemy, enemy.CellId);
                 }
                 else yield return (monster, from);
             }
         }
+
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<(int Cell, int Radius), int[]> AroundCache = new();
+
+        /// <summary>The cells one to <paramref name="radius"/> away from a cell, by the fight's distance.</summary>
+        private static IEnumerable<int> Around(int cell, int radius)
+            => radius <= 1
+                ? MapGeometry.GetNeighbors(cell)
+                : AroundCache.GetOrAdd((cell, radius), key => Enumerable.Range(0, MapGeometry.MaxCells)
+                    .Where(c => c != key.Cell && MapGeometry.Distance(key.Cell, c) <= key.Radius)
+                    .ToArray());
 
         private static bool CanCast(Board board, Spell spell, Fighter monster, int from, int aim, Fighter target)
         {

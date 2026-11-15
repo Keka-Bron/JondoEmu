@@ -1047,6 +1047,25 @@ namespace Jondo.Unity.World.Fights
         public int NextWaveRound { get; set; }
 
         /// <summary>
+        /// The state every monster of a later wave comes in with, until the end of its first turn;
+        /// zero for none. A dimension dungeon's (Managers.DimensionDungeons): Dofus pour les noobs
+        /// has each newcomer invulnerable until its first turn is over.
+        /// </summary>
+        public int WaveArrivalState { get; set; }
+
+        /// <summary>
+        /// How much of its life a monster of a later wave comes in with, in percent: a dimension
+        /// dungeon's come with a quarter less from the second wave on.
+        /// </summary>
+        public int WaveLifePercent { get; set; } = 100;
+
+        /// <summary>
+        /// The newcomers still under <see cref="WaveArrivalState"/>, by fighter: the number of the
+        /// row that holds it, taken away when that fighter's first turn ends.
+        /// </summary>
+        public Dictionary<long, int> ArrivalShields { get; } = new Dictionary<long, int>();
+
+        /// <summary>
         /// Where winning leaves the players, when not the map they fought from: the trap room of
         /// «¡Cuidado con la bestia!», whose false floor has given way once the creature is down
         /// (content/fights/npc_fights.json, «winMap»). Zero for every other fight.
