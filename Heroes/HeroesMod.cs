@@ -95,6 +95,7 @@ namespace Heroes
                 if (_listCode == 401) _nextPoll = now + 120f;
                 Poll();
             }
+            try { WatchPreview(); } catch { }
             if (ShortcutPressed())
             {
                 if (_window != null) Close();
@@ -1101,6 +1102,7 @@ namespace Heroes
             try { _creationWindow?.RemoveFromHierarchy(); } catch { }
             _creationWindow = null;
             _cTree = null;
+            _cLook = null;
         }
 
         // The screen as it is filled: its tree, the breeds and heads the game's data has, what is chosen.
@@ -1411,17 +1413,70 @@ namespace Heroes
                     if (breed != _cBreed || sex != _cSex || head != _cHead) return;
                     try
                     {
-                        var look = LookOf(Str(b, "look"));
-                        // The native screen's own framing, as Auralis's notes have it: no fitting
-                        // to the box, a scale of 0.6. The character before taken away first.
-                        displayer.autosize = false;
-                        displayer.scale = 0.6f;
-                        try { displayer.DestroyCharacterIfNeeded(); } catch { }
-                        Il2CppCore.UI.UIUtils.pcb(displayer, look, (Il2Cpp.rc)direction, 0, _displayers, _entities);
+                        _cLook = LookOf(Str(b, "look"));
+                        _cDrawn = 0;
+                        DrawPreview(displayer, direction);
                     }
                     catch (Exception ex) { MelonLogger.Warning($"[Heroes] The creation's character could not be drawn: {ex.Message}"); }
                 });
             });
+        }
+
+        // The look on the platform, how many times it was given, and when it is given again.
+        private static Il2CppCore.Rendering.Look.EntityLook _cLook;
+        private static int _cDrawn;
+        private static float _cNextDraw;
+        private static bool _toldFraming, _cFramed;
+
+        /// <summary>
+        /// The look given to the platform's displayer, with the native screen's framing -- no
+        /// fitting to the box, a scale of 0.6, as Auralis's notes have it -- set after: the giving
+        /// sets its own. A breed's first look only starts its loading and shows nothing; it is
+        /// given again (WatchPreview) until its character is there.
+        /// </summary>
+        private static void DrawPreview(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer displayer, int direction)
+        {
+            if (_cLook == null) return;
+            _cDrawn++;
+            _cFramed = false;
+            _cNextDraw = UnityEngine.Time.unscaledTime + 0.5f;
+            try { displayer.DestroyCharacterIfNeeded(); } catch { }
+            Il2CppCore.UI.UIUtils.pcb(displayer, _cLook, (Il2Cpp.rc)direction, 0, _displayers, _entities);
+            Frame(displayer);
+        }
+
+        private static void Frame(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer displayer)
+        {
+            try
+            {
+                displayer.autosize = false;
+                displayer.scale = 0.6f;
+                displayer.ForceRefreshSize();
+            }
+            catch { }
+        }
+
+        /// <summary>Every frame while the creation screen is open: the platform's character given again until he is there.</summary>
+        private static void WatchPreview()
+        {
+            if (_cTree == null || _cLook == null) return;
+            var displayer = Part<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer>("ed_chara");
+            if (displayer == null) return;
+            if (displayer.character != null)
+            {
+                if (_cFramed) return;
+                _cFramed = true;
+                Frame(displayer);
+                if (!_toldFraming)
+                {
+                    _toldFraming = true;
+                    MelonLogger.Msg($"[Heroes] The creation's character: autosize {displayer.autosize}, scale {displayer.scale}, " +
+                                    $"forced {displayer.forcedSize}, ratio {displayer.ratioPositioning}, box {displayer.worldBound}, after {_cDrawn} giving(s).");
+                }
+                return;
+            }
+            if (_cDrawn >= 6 || UnityEngine.Time.unscaledTime < _cNextDraw) return;
+            DrawPreview(displayer, _cDirection);
         }
 
         private static void AskScreenName()
