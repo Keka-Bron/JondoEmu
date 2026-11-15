@@ -61,6 +61,21 @@ hero: a class, a sex and a name -- the server draws one on asking --. `heroes/cr
 the creation screen's own rules (`CharacterCreationHandler.Make`: the name's rule, a name nobody
 has, a slot left), with his class's colours, and connects him as a hero at once when there is room.
 
+The screen is the game's own (`HeroesMod`'s «The game's own CharacterCreation, whole»): its template
+(`Assets/UI/Auth/characterCreation.uxml`) cloned into a window over the world and the game's
+`CharacterCreation` class made on it, so the breeds, the roles, the heads, the colours, the attitudes
+and the spells are all the client's. Its twelve services are found breadth first through the fields
+the services keep one another in, from the displaying one taken off a displayer on screen. Three
+things of it are turned: `CreateCharacter` asks `heroes/create` with the name, the breed, the sex,
+the head and the six colours the screen holds; `RequestNameGeneration` asks `heroes/name`; and the
+popup it opens with -- «this modifies your character for good», the world's way into it -- is not
+shown. When the class cannot be made the mod binds the template by hand (breeds, sex, heads, name),
+and when the template cannot be had it shows a form of its own.
+
+The window's portraits and the group panel's are the client's own `EntityDisplayer`s, alive: seated
+(`AnimEmoteSit_Statique`) for a character not in the world. `UserData\HeroesTuning.cfg` («name =
+value» a line) is read again whenever it changes, for sizes to be set with the game running.
+
 The slots per account are a setting (`ServerSettings.CharacterSlots`, 8 by default: a whole group
 of heroes with its master; the real server's is five); the server list announces them. It is set in
 `config\server_settings.json`: the settings window is full at its smallest size.

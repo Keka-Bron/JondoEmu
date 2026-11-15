@@ -2906,6 +2906,7 @@ namespace Heroes
 
         private static Il2CppCore.UILogic.GameUICore.UIActionBar _actionBar;
         private static int _linesBefore = -1;
+        private static bool _linesForced;
 
         /// <summary>
         /// The client does not turn the pages of a bar that is not its character's: a hero's spells
@@ -2919,15 +2920,23 @@ namespace Heroes
             if (bar == null) return;
             try
             {
-                if (heroes && bar.m_nbLines < 3)
+                // Once, as the first hero connects: set back to fewer by the player afterwards, the
+                // bar is his to keep so.
+                if (heroes && !_linesForced)
                 {
-                    _linesBefore = bar.m_nbLines;
-                    bar.SetLinesCount(3);
-                    MelonLogger.Msg($"[Heroes] The spell bar shows three lines while heroes are connected (it had {_linesBefore}).");
+                    _linesForced = true;
+                    if (bar.m_nbLines < 3)
+                    {
+                        _linesBefore = bar.m_nbLines;
+                        bar.SetLinesCount(3);
+                        MelonLogger.Msg($"[Heroes] The spell bar shows three lines while heroes are connected (it had {_linesBefore}).");
+                    }
                 }
-                else if (!heroes && _linesBefore > 0)
+                else if (!heroes && _linesForced)
                 {
-                    bar.SetLinesCount(_linesBefore);
+                    _linesForced = false;
+                    // What he had before, unless he chose his own number meanwhile.
+                    if (_linesBefore > 0 && bar.m_nbLines == 3) bar.SetLinesCount(_linesBefore);
                     _linesBefore = -1;
                 }
             }
@@ -2978,6 +2987,7 @@ namespace Heroes
             if (!on) picture.style.opacity = new StyleFloat(0.75f);
             button.Add(picture);
             button.AddManipulator(new Clickable(click).Cast<IManipulator>());
+            Lively(button);
             return button;
         }
 
@@ -3707,6 +3717,7 @@ namespace Heroes
             label.style.marginBottom = new StyleLength(0f);
             tool.Add(label);
             tool.AddManipulator(new Clickable(click).Cast<IManipulator>());
+            Lively(tool);
             return tool;
         }
 
@@ -3731,9 +3742,46 @@ namespace Heroes
             light.style.right = new StyleLength(12f);
             light.style.top = new StyleLength(12f);
             light.style.width = light.style.height = new StyleLength(8f);
-            light.style.backgroundColor = new StyleColor(on ? new UnityEngine.Color(0.80f, 0.95f, 0.10f, 1f) : new UnityEngine.Color(0.35f, 0.35f, 0.42f, 1f));
+            light.style.backgroundColor = new StyleColor(on ? new UnityEngine.Color(0.80f, 0.95f, 0.10f, 1f) : new UnityEngine.Color(0.90f, 0.25f, 0.22f, 1f));
             Round(light, 4f);
             return light;
+        }
+
+        /// <summary>
+        /// A button lit under the pointer and darker while pressed, as the game's own are: its
+        /// colour as it stands when the pointer comes, put back when it goes.
+        /// </summary>
+        private static void Lively(VisualElement button)
+        {
+            UnityEngine.Color rest = default;
+            bool over = false;
+            void Paint(float towardsWhite, float towardsBlack)
+            {
+                var c = UnityEngine.Color.Lerp(UnityEngine.Color.Lerp(rest, UnityEngine.Color.white, towardsWhite), UnityEngine.Color.black, towardsBlack);
+                c.a = rest.a;
+                button.style.backgroundColor = new StyleColor(c);
+            }
+            try
+            {
+                button.RegisterCallback<PointerEnterEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerEnterEvent>>(
+                    new Action<PointerEnterEvent>(_ =>
+                    {
+                        if (!over) rest = button.resolvedStyle.backgroundColor;
+                        over = true;
+                        Paint(0.22f, 0f);
+                    })), TrickleDown.NoTrickleDown);
+                button.RegisterCallback<PointerLeaveEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerLeaveEvent>>(
+                    new Action<PointerLeaveEvent>(_ =>
+                    {
+                        if (over) button.style.backgroundColor = new StyleColor(rest);
+                        over = false;
+                    })), TrickleDown.NoTrickleDown);
+                button.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
+                    new Action<PointerDownEvent>(_ => { if (over) Paint(0f, 0.18f); })), TrickleDown.TrickleDown);
+                button.RegisterCallback<PointerUpEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerUpEvent>>(
+                    new Action<PointerUpEvent>(_ => { if (over) Paint(0.22f, 0f); })), TrickleDown.TrickleDown);
+            }
+            catch { }
         }
 
         /// <summary>The glow behind a portrait: green in the middle, the night's blue on the edges, drawn once.</summary>
@@ -3802,7 +3850,11 @@ namespace Heroes
             label.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
             label.style.marginBottom = new StyleLength(0f);
             button.Add(label);
-            if (enabled) button.AddManipulator(new Clickable(click).Cast<IManipulator>());
+            if (enabled)
+            {
+                button.AddManipulator(new Clickable(click).Cast<IManipulator>());
+                Lively(button);
+            }
             else button.style.opacity = new StyleFloat(0.4f);
             return button;
         }
