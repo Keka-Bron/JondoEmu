@@ -115,6 +115,12 @@ namespace Jondo.Unity.Server.Managers
             return types;
         }
 
+        /// <summary>An item type's family (super type), or null when the client's data does not list it.</summary>
+        public static int? FamilyOf(int type) => Types.TryGetValue(type, out var t) ? t.Family : null;
+
+        /// <summary>Whether the item types were read at all: without them no type has a family.</summary>
+        public static bool KnowsTypes => Types.Count > 0;
+
         /// <summary>The items that can drop, by rarity, read once.</summary>
         private static Dictionary<Rarity, List<Candidate>> Pools
         {

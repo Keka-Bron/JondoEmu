@@ -21,7 +21,8 @@ namespace Jondo.Unity.Tests.World
     public sealed class PresetTests
     {
         private const long Account = 8_900_000_041;
-        private const int Template = 17626;
+        /// <summary>An amulet of no set (type 1): slot 0 takes nothing else (Equipment.MayGoIn).</summary>
+        private const int Template = 70;
 
         private static List<ProtoField> Fields(byte[] message) => ProtoMessage.Parse(message).Fields;
 
