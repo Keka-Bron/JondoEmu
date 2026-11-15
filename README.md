@@ -714,7 +714,7 @@ played through.
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Krosmoz | `██████████` **100%** | 18/18 |
 | Cania | `███████░░░` **69%** | 18/26 |
-| World Quests | `█░░░░░░░░░` **11%** | 16/145 |
+| World Quests | `█░░░░░░░░░` **12%** | 17/145 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Moon Island | `██████████` **100%** | 10/10 |
@@ -724,7 +724,7 @@ played through.
 | Brakmar | `██████████` **100%** | 5/5 |
 | Pandala Island | `░░░░░░░░░░` **2%** | 1/55 |
 | Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
-| **All quests** | **16.7%** | **330/1976** |
+| **All quests** | **16.8%** | **331/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
