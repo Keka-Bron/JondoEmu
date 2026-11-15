@@ -1204,7 +1204,7 @@ namespace Heroes
         /// </summary>
         private static void ChooseImageTypes()
         {
-            if (_breedImages != null || _headImages != null) return;
+            if (_breedImages != null && _headImages != null && _symbolImages != null) return;
             var seen = new List<string>();
             foreach (var property in typeof(Il2Cpp.rd).GetProperties(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public))
             {
@@ -1217,6 +1217,7 @@ namespace Heroes
                 // The breeds' portraits by breed and sex, the heads by their asset (3.6.10's log).
                 if (prefix == "classes/heads/small/Head_{0}{1}") _breedImages = kind;
                 else if (prefix == "cosmetics/{0}") _headImages = kind;
+                else if (prefix == "classes/symbol_{0}") _symbolImages = kind;
             }
             MelonLogger.Msg($"[Heroes] The game's addressable kinds: {string.Join(" | ", seen)}; breeds {(_breedImages?.pathPrefix ?? "none")}, heads {(_headImages?.pathPrefix ?? "none")}.");
         }
@@ -1268,6 +1269,15 @@ namespace Heroes
                 _cBreedSlots.Add(slot);
             }
             if (random != null)
+            {
+                try
+                {
+                    random.iconValue = Il2CppCore.UILogic.Components.Figma.FigmaIcons.random;
+                    random.isFilled = false;
+                }
+                catch (Exception ex) { MelonLogger.Warning($"[Heroes] The random breed's icon: {ex.Message}"); }
+            }
+            if (random != null)
                 OnClick(random, () =>
                 {
                     _cBreed = _cBreeds[new Random().Next(_cBreeds.Count)].Id;
@@ -1297,12 +1307,42 @@ namespace Heroes
                     try { slot.tile.imgAddress = new Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntry(_breedImages, _cBreeds[i].Id, _cSex); } catch { }
             }
             var breed = _cBreeds.FirstOrDefault(b => b.Id == _cBreed);
+            BreedSymbol();
             SetText("lbl_breed", (breed.Name ?? ClassOf(_cBreed)).ToUpperInvariant());
             SetText("lbl_breedInfo", breed.Description ?? "");
             SetText("lbl_archetype", ClassOf(_cBreed));
             for (int i = 1; i <= 5; i++) Show(Part("icon_complexity_" + i), i <= Math.Max(1, breed.Complexity));
             RefreshHeads();
             RefreshPreview();
+        }
+
+        private static Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntryType _symbolImages;
+
+        /// <summary>
+        /// The breed's symbol over its name: the game's classes/symbol_{0} image, shown by a tile of
+        /// its own laid over the template's, whose own picture is the template's breed's.
+        /// </summary>
+        private static void BreedSymbol()
+        {
+            var place = Part("tx_breedSymbol");
+            if (place == null || _symbolImages == null) return;
+            try
+            {
+                var tile = Part<Il2CppCore.UILogic.Components.Slots.Tile>("JondoHeroesBreedSymbol");
+                if (tile == null)
+                {
+                    tile = new Il2CppCore.UILogic.Components.Slots.Tile();
+                    tile.name = "JondoHeroesBreedSymbol";
+                    tile.pickingMode = PickingMode.Ignore;
+                    tile.style.position = new StyleEnum<Position>(Position.Absolute);
+                    tile.style.left = tile.style.top = new StyleLength(0f);
+                    tile.style.width = tile.style.height = new StyleLength(new Length(100f, LengthUnit.Percent));
+                    place.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                    place.Add(tile);
+                }
+                tile.imgAddress = new Il2CppAnkama.AddressableUtilities.Runtime.AddressableEntry(_symbolImages, _cBreed);
+            }
+            catch (Exception ex) { MelonLogger.Warning($"[Heroes] The breed's symbol: {ex.Message}"); }
         }
 
         /// <summary>The heads the game offers at creation for the breed and the sex, in its order.</summary>
@@ -1372,6 +1412,11 @@ namespace Heroes
                     try
                     {
                         var look = LookOf(Str(b, "look"));
+                        // The native screen's own framing, as Auralis's notes have it: no fitting
+                        // to the box, a scale of 0.6. The character before taken away first.
+                        displayer.autosize = false;
+                        displayer.scale = 0.6f;
+                        try { displayer.DestroyCharacterIfNeeded(); } catch { }
                         Il2CppCore.UI.UIUtils.pcb(displayer, look, (Il2Cpp.rc)direction, 0, _displayers, _entities);
                     }
                     catch (Exception ex) { MelonLogger.Warning($"[Heroes] The creation's character could not be drawn: {ex.Message}"); }
