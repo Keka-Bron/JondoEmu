@@ -894,6 +894,14 @@ namespace Heroes
                 // displaying service had stopped moving it.
                 displayer.RegisterCallback<AttachToPanelEvent>(DelegateSupport.ConvertDelegate<EventCallback<AttachToPanelEvent>>(
                     new Action<AttachToPanelEvent>(_ => Revive(displayer))), TrickleDown.NoTrickleDown);
+                // Its picture sized to its box as the box gets its size: made before the group panel
+                // was laid out, it stayed tiny.
+                displayer.RegisterCallback<GeometryChangedEvent>(DelegateSupport.ConvertDelegate<EventCallback<GeometryChangedEvent>>(
+                    new Action<GeometryChangedEvent>(e =>
+                    {
+                        if (Math.Abs(e.oldRect.width - e.newRect.width) < 1f && Math.Abs(e.oldRect.height - e.newRect.height) < 1f) return;
+                        try { displayer.ForceRefreshSize(); } catch { }
+                    })), TrickleDown.NoTrickleDown);
                 if (!seated || !Seat(displayer, id, entityLook))
                     Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
                 _live[where] = (key, displayer);
