@@ -1,8 +1,14 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
+using Jondo.Unity.Protocol;
+using Jondo.Unity.Server;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
+using Jondo.Unity.Tests.Economy;
 using Jondo.Unity.World.Content;
 using Xunit;
 
@@ -102,6 +108,39 @@ namespace Jondo.Unity.Tests.Content
             Assert.Equal(8678, lid.Completes);
             Assert.Equal(15418, lid.Gives);
             Assert.Equal(new[] { 15593, 15421, 15599 }, lid.TakesAll);
+        }
+
+        /// <summary>
+        /// Sulking, he says his line and offers nothing of his: the client's own «Marcharte.» closes
+        /// it. His template's last reply went with it, «Tomar el pedazo de papel y darle las gracias
+        /// al goblin».
+        /// </summary>
+        [Fact]
+        public async Task A_sulking_npc_offers_no_reply_of_his_template()
+        {
+            const long Cabin = 122421248, Character = 8_923_100_071;
+            if (MapManager.GetMapInfo(Cabin) == null) MapManager.Initialize();
+            Npcs.Initialize();
+            var gorco = Npcs.OnMap(Cabin).FirstOrDefault(n => n.NpcId == 2239);
+            if (gorco == null) return;                       // no map data
+            NpcSulks.Start(Character, 2239, 10);
+            try
+            {
+                await using var pipe = await ClientPipe.OpenAsync(8_923_000_071, Character, Cabin);
+                using (SessionContext.Push(pipe.Session))
+                {
+                    await NpcHandler.InteractAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Iov,
+                        Pb.New().Var(1, Npcs.Talk).Var(2, Cabin).Var(3, gorco.ContextualId).Build()));
+                    await pipe.Next(Op.Ioc);
+                    var question = ProtoMessage.Parse(await pipe.Next(Op.Ios)).Fields;
+                    Assert.Contains(question, f => f.FieldNumber == 1 && f.WireType == 0 && f.VarIntValue == 18345);
+                    Assert.DoesNotContain(question, f => f.FieldNumber == 2);
+                }
+            }
+            finally
+            {
+                NpcSulks.Forget();
+            }
         }
     }
 }

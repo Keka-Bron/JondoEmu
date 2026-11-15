@@ -363,8 +363,11 @@ namespace Jondo.Unity.Server.Handlers
             // A guardian with no written tree and no door reply left -- no key, no keyring -- says his
             // line with nothing to answer, and the client's cross closes it: PreguntarAsync's fallback,
             // his template's last reply, is Rotabla's «Retourner dans cette salle.» again.
+            // A sulking NPC's line is no line of his tree: it goes as itself, with the client's own
+            // «Marcharte.», not his template's last reply -- Gorco's «¡Yo no hablar a ti!» offered
+            // «Tomar el pedazo de papel y darle las gracias al goblin».
             await PreguntarAsync(stream, pregunta, respuestas, doorOnly && respuestas.Length == 0 ? null : template,
-                                 escrito?.Line(pregunta), banker);
+                                 escrito?.Line(pregunta) ?? primera, banker);
 
             Console.WriteLine($"[NPC] Dialog of {npc.NpcId}: question {pregunta}, " +
                               $"{Math.Max(respuestas.Length, 1)} replies" +
