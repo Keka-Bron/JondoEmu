@@ -97,6 +97,7 @@ namespace Heroes
                 Poll();
             }
             try { WatchPreview(); } catch { }
+            if (_reframe.Count > 0) { try { Reframe(); } catch { } }
             if (ShortcutPressed())
             {
                 if (_window != null) Close();
@@ -375,9 +376,44 @@ namespace Heroes
                     MelonLogger.Msg($"[Heroes] A displayer of the game's after a switch: {path} -> {(mine ? "given the new look" : "left")}.");
                 if (!mine) continue;
                 entityLook ??= LookOf(look);
+                // Its own framing kept: the giving sets one of its own, and he came out too big.
+                bool autosize = displayer.autosize;
+                float forced = displayer.forcedSize, ratio = displayer.ratioPositioning;
                 Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
+                if (!_toldInventory)
+                    MelonLogger.Msg($"[Heroes] Its framing before: autosize {autosize}, forced {forced}, ratio {ratio}; " +
+                                    $"after the giving: autosize {displayer.autosize}, forced {displayer.forcedSize}, ratio {displayer.ratioPositioning}.");
+                _reframe.Add((displayer, autosize, forced, ratio, UnityEngine.Time.unscaledTime + 2f));
             }
             _toldInventory = true;
+            Reframe();
+        }
+
+        /// <summary>The game's displayers given a look by the mod, and the framing each had, put back for a while after.</summary>
+        private static readonly List<(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer Displayer, bool Autosize, float Forced, float Ratio, float Until)> _reframe
+            = new List<(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer, bool, float, float, float)>();
+
+        /// <summary>Every scan and at once: the framing kept put back on each, until its time is out.</summary>
+        private static void Reframe()
+        {
+            for (int i = _reframe.Count - 1; i >= 0; i--)
+            {
+                var (displayer, autosize, forced, ratio, until) = _reframe[i];
+                try
+                {
+                    if (displayer.panel == null) { _reframe.RemoveAt(i); continue; }
+                    if (displayer.autosize != autosize || Math.Abs(displayer.forcedSize - forced) > 0.001f
+                        || Math.Abs(displayer.ratioPositioning - ratio) > 0.001f)
+                    {
+                        displayer.autosize = autosize;
+                        displayer.forcedSize = forced;
+                        displayer.ratioPositioning = ratio;
+                        displayer.ForceRefreshSize();
+                    }
+                }
+                catch { _reframe.RemoveAt(i); continue; }
+                if (UnityEngine.Time.unscaledTime > until) _reframe.RemoveAt(i);
+            }
         }
 
         /// <summary>Every displayer of the game's own under an element: not the mod's, not in the mod's windows.</summary>
