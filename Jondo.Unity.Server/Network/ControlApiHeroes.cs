@@ -23,11 +23,16 @@ namespace Jondo.Unity.Server.Network
             if (me == null) return Mal(409, "world");
             long masterId = me.State.CharacterId;
             var heroes = Heroes.Of(masterId).Select(h => h.CharacterId).ToList();
-            var characters = DatabaseManager.GetCharactersByAccountId(account, me.ServerId)
+            var mine = DatabaseManager.GetCharactersByAccountId(account, me.ServerId);
+            // Their portraits drawn ahead, while the window is not open yet: the first drawing
+            // opens the client's bundles and takes a while.
+            HeroPortraits.Warm(mine.Select(BreedLookTable.Drawable));
+            var characters = mine
                 .Select(c =>
                 {
                     bool master = c.Id == masterId;
                     var hero = Heroes.SessionOf(c.Id);
+                    var (life, maxLife) = master ? LifeOf(me) : hero != null ? LifeOf(hero) : (0, 0);
                     return new
                     {
                         id = c.Id,
@@ -42,6 +47,9 @@ namespace Jondo.Unity.Server.Network
                                && (SessionRegistry.FindByCharacter(c.Id) != null || Heroes.AsHero(c.Id) != null),
                         inFight = hero?.State.IsInFight ?? false,
                         order = master ? -1 : heroes.IndexOf(c.Id),
+                        life,
+                        maxLife,
+                        autoPass = Heroes.PassesOnHisOwn(c.Id),
                     };
                 })
                 .OrderBy(c => c.master ? 0 : c.hero ? 1 : 2).ThenBy(c => c.order).ThenByDescending(c => c.level)
@@ -52,8 +60,44 @@ namespace Jondo.Unity.Server.Network
                 max = Heroes.Max,
                 connected = 1 + heroes.Count,
                 inFight = me.State.IsInFight,
+                lootTo = Heroes.LootTo(masterId),
                 characters,
             });
+        }
+
+        /// <summary>A connected character's life: his fighter's in a fight, his resting life outside one.</summary>
+        private static (int Life, int Max) LifeOf(GameSession session)
+        {
+            long id = session.State.CharacterId;
+            if (Handlers.FightHandler.FightOf(id)?.Buscar(id) is { } fighter) return (Math.Max(0, fighter.CurrentHP), fighter.MaxHP);
+            try
+            {
+                using (SessionContext.Push(session))
+                {
+                    int max = Handlers.StatsHandler.GetPlayerMaxHp();
+                    return (RestingLife.LifeAt(id, max, DateTime.UtcNow), max);
+                }
+            }
+            catch
+            {
+                return (0, 0);
+            }
+        }
+
+        private static Respuesta HeroesAutoPass(string cuerpo, long account)
+        {
+            var me = InTheWorld(account);
+            if (me == null) return Mal(409, "world");
+            bool on = Numero(cuerpo, "on") != 0;
+            return Heroes.SetAutoPass(me.State.CharacterId, Numero(cuerpo, "id"), on) ? Bien(new { autoPass = on }) : Mal(409, "none");
+        }
+
+        private static Respuesta HeroesLootTo(string cuerpo, long account)
+        {
+            var me = InTheWorld(account);
+            if (me == null) return Mal(409, "world");
+            long masterId = me.State.CharacterId;
+            return Heroes.SetLootTo(masterId, Numero(cuerpo, "id")) ? Bien(new { lootTo = Heroes.LootTo(masterId) }) : Mal(409, "none");
         }
 
         private static Respuesta HeroesConnect(string cuerpo, long account)
@@ -94,6 +138,24 @@ namespace Jondo.Unity.Server.Network
         private static readonly object _lock = new();
         private static readonly Dictionary<string, byte[]?> _drawn = new();
         private static Jondo.Unity.Sprites.NpcSprites? _drawer;
+
+        private static readonly HashSet<string> _warming = new();
+
+        /// <summary>The looks drawn in the background, each once, so that asking for them later is instant.</summary>
+        public static void Warm(IEnumerable<string> looks)
+        {
+            var todo = new List<string>();
+            lock (_lock)
+            {
+                foreach (string look in looks)
+                    if (!string.IsNullOrEmpty(look) && !_drawn.ContainsKey(look) && _warming.Add(look)) todo.Add(look);
+            }
+            if (todo.Count == 0) return;
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                foreach (string look in todo) Of(look);
+            });
+        }
 
         /// <summary>The PNG of a look, or null when it cannot be drawn here (no client, no display).</summary>
         public static byte[]? Of(string look)

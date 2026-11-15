@@ -2517,8 +2517,15 @@ namespace Jondo.Unity.Server.Handlers
             if (!fighter.EsInvocado) return null;
             var owner = fight.Buscar(fighter.Invocador);
             if (owner == null || owner.IsMonster) return null;
-            return SessionRegistry.FindByCharacter(owner.Id);
+            return SessionRegistry.FindByCharacter(PlayerOf(owner));
         }
+
+        /// <summary>
+        /// The character whose client plays this fighter's side of things: his own, or -- a hero,
+        /// an ally played by hand -- the one who plays him. A hero's summons go to his master.
+        /// </summary>
+        private static long PlayerOf(Fighter fighter)
+            => fighter.IsPlayedAlly && fighter.DrivenBy != 0 ? fighter.DrivenBy : fighter.Id;
 
         /// <summary>
         /// Makes a character fighter -- a JondoBot for now -- one <paramref name="by"/> plays by
@@ -4081,6 +4088,15 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // A hero whose master switched on his automatic pass (the Heroes mod's group panel):
+            // his start-of-turn has gone out above, and the turn is handed on at once.
+            if (fighter.IsPlayedAlly && Managers.Heroes.PassesOnHisOwn(fighter.Id))
+            {
+                Program.LogDebug($"[Heroes] {fighter.Id} passes his turn on his own.");
+                await PassTurnAsync(stream);
+                return;
+            }
+
             // Turned to the other side (Domi Reversi, 3107): this turn is played for the side that
             // turned it, so not against it, and then it is its own again. Nothing of how the real
             // server plays it for that side is captured: it plays nothing.
@@ -4158,12 +4174,14 @@ namespace Jondo.Unity.Server.Handlers
                 if (summon.HandedToOwner) continue;
                 summon.HandedToOwner = true;
 
-                var owner = SessionRegistry.FindByCharacter(summon.Invocador);
+                var summoner = fight.Buscar(summon.Invocador);
+                long jugador = summoner != null ? PlayerOf(summoner) : summon.Invocador;
+                var owner = SessionRegistry.FindByCharacter(jugador);
                 if (owner == null) continue;
                 await owner.SendAsync(ConnectionProtocol.Push(Op.Jxc,
                     Network.FightProtocol.BuildCooldowns(summon.Id, RecargasDe(summon))));
                 await owner.SendAsync(ConnectionProtocol.Push(Op.Jyy,
-                    Network.FightProtocol.BuildSummonSpellBar(summon.Id, summon.Invocador, summon.HechizosDeInvocado)));
+                    Network.FightProtocol.BuildSummonSpellBar(summon.Id, jugador, summon.HechizosDeInvocado)));
                 Program.LogDebug($"[Fight] {summon.Id} is {summon.Invocador}'s to play now: its bar goes to him.");
             }
         }
@@ -5870,13 +5888,15 @@ namespace Jondo.Unity.Server.Handlers
             // seconds out with nobody able to move it or pass it.
             if (invocado.JuegaTurno && !invocado.PlaysOnItsOwn)
             {
+                // A hero's goes to his master, who plays him.
+                long jugador = PlayerOf(quienInvoca);
                 await ACadaUnoAsync(fight, async sesion =>
                 {
-                    if (sesion.State.CharacterId != quienInvoca.Id) return;
+                    if (sesion.State.CharacterId != jugador) return;
                     await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jxc,
                         Network.FightProtocol.BuildCooldowns(invocado.Id, RecargasDe(invocado))));
                     await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jyy,
-                        Network.FightProtocol.BuildSummonSpellBar(invocado.Id, quienInvoca.Id,
+                        Network.FightProtocol.BuildSummonSpellBar(invocado.Id, jugador,
                                                                   receta.Hechizos)));
                     await SendEverySpellModifiersAsync(packet => WriteFrameAsync(sesion.Stream, packet), fight,
                                                        invocado, receta.Hechizos.Select(h => h.Spell));

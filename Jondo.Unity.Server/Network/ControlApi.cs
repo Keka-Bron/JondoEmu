@@ -92,6 +92,8 @@ namespace Jondo.Unity.Server.Network
                     case Prefijo + "heroes/connect": return ConSesion(cuerpo, cuenta => HeroesConnect(cuerpo, cuenta));
                     case Prefijo + "heroes/disconnect": return ConSesion(cuerpo, cuenta => HeroesDisconnect(cuerpo, cuenta));
                     case Prefijo + "heroes/portrait": return ConSesion(cuerpo, cuenta => HeroesPortrait(cuerpo, cuenta));
+                    case Prefijo + "heroes/autopass": return ConSesion(cuerpo, cuenta => HeroesAutoPass(cuerpo, cuenta));
+                    case Prefijo + "heroes/loot": return ConSesion(cuerpo, cuenta => HeroesLootTo(cuerpo, cuenta));
 
                     // ─── Administration ─────────────────────────────────────────────────────
                     // They command the server, not an account. Role 4 and it is checked here,

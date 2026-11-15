@@ -32,6 +32,12 @@ side, ready. He is a *played ally* (`Fighter.IsPlayedAlly`, `DrivenBy` = the mas
 - his turn's `jyj` goes to the master's client, and the master's `jrw`, `jwh` and `jxy` then move,
   cast and pass for him -- the `jwh` names no caster, the fight's turn does.
 
+His bar is his own layout packed: the weapon on slot 0, his spells after it with no gaps, then
+what he knows and did not place -- the master's client does not turn the pages of a bar that is not
+its character's. A hero's summons are the master's to play as well: their bar, their turn and their
+clock go to the master's client (`FightHandler.PlayerOf`); with nobody found to play one, its turn
+had no clock and never ended.
+
 The 3.6.10.11 client does all of it with no patch: its `CurrentPlayedFighterService` and the slave
 fight panels are what play a controlled summon. Measured on 2026-11-15 with the `.heros` probe: two
 heroes moved, cast their class spells and passed their turns from the master's client.
@@ -43,9 +49,17 @@ kamas, items -- and he is saved where his master stands (`HeroesFightOver`).
 ## The Heroes mod
 
 `Heroes/`, a MelonLoader mod built like Cazacabezas, which the launcher puts in every client's
-`Mods/`. **Ctrl+Tab** opens a window of eight cards: the master (gold, a crown), his heroes (a light
-on), the account's other characters to connect, empty places. Portraits are drawn by the server from
-the client's own bones, as the launcher draws its team (`Jondo.Unity.Sprites`).
+`Mods/`. **Ctrl+Tab**, or its button at the end of the MENUS bar (`gd_btnUis`, an icon the mod
+draws), opens a window of eight cards: the master (gold, a crown), his heroes (a light on), the
+account's other characters to connect, empty places. Portraits are drawn by the server from the
+client's own bones, as the launcher draws its team (`Jondo.Unity.Sprites`), in the background as soon
+as the list is asked for, and the mod asks for it all along, so they are there at the first opening.
+
+While a hero is connected, a **group panel** stands at the right of the screen: each member's
+portrait and life (his fighter's in a fight, his resting life outside one), a crown for the master,
+and two switches -- **AUTO**, a hero's turns passed by the server as they come, and **LOOT**, the
+group's items all to that one (each keeps his experience and kamas; `FightHandler.GatherHeroLoot`).
+It folds with its «—» button; «≡» opens the window.
 
 | Route | Answers |
 |:---|:---|
@@ -53,6 +67,8 @@ the client's own bones, as the launcher draws its team (`Jondo.Unity.Sprites`).
 | `POST /api/heroes/connect` `{ id }` | `ok`, or why not: `off`, `self`, `account`, `online`, `already`, `full`, `fight`, `missing` |
 | `POST /api/heroes/disconnect` `{ id }` | `none` when he is not one or is fighting |
 | `POST /api/heroes/portrait` `{ id }` | `{ png }` in base64, or 404 when it cannot be drawn |
+| `POST /api/heroes/autopass` `{ id, on }` | a hero's turns passed on their own, or not |
+| `POST /api/heroes/loot` `{ id }` | the group's items to him; the same one again, back to each his own |
 
 All need the master in the world (`409 world`), with the session's own token.
 
@@ -64,6 +80,8 @@ All need the master in the world (`409 world`), with the session's own token.
 - A defeat's consequences on a hero beyond the fight; the master walking out of a fight leaves his
   heroes in it with nobody to play them.
 - Creating a character from the window.
+- The group panel's «follow», «show on the map» and «take this character in hand» of Auralis's.
+- The spell book (the client's own) shows the master's spells, not the hero's.
 
 The `.heros` command (administrators) still opens the probe's fight: JondoBots at one's side,
 played as heroes, against as many JondoBots.

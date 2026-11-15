@@ -47,7 +47,7 @@ namespace Heroes
         private static JsonElement? _list;
         private static int _listCode = -1;
         private static bool _polling;
-        private static float _nextPoll;
+        private static float _nextPoll, _nextScan;
 
         private static readonly Dictionary<long, UnityEngine.Texture2D> _portraits = new Dictionary<long, UnityEngine.Texture2D>();
         private static readonly HashSet<long> _asked = new HashSet<long>();
@@ -76,14 +76,19 @@ namespace Heroes
                 catch (Exception ex) { MelonLogger.Warning($"[Heroes] {ex.Message}"); }
             }
 
-            if (_window != null)
+            // Asked all along, not only with the window open: the group panel shows the life of
+            // the group, and the portraits are fetched ahead of the window's first opening.
+            float now = UnityEngine.Time.unscaledTime;
+            if (now >= _nextScan)
             {
-                float now = UnityEngine.Time.unscaledTime;
-                if (now >= _nextPoll && !_polling)
-                {
-                    _nextPoll = now + 3f;
-                    Poll();
-                }
+                _nextScan = now + 1f;
+                try { PutMenuButton(); } catch { }
+            }
+            if (now >= _nextPoll && !_polling)
+            {
+                _nextPoll = now + (_window != null || _panel != null ? 3f : 8f);
+                if (_listCode == 401) _nextPoll = now + 120f;
+                Poll();
             }
             if (ShortcutPressed())
             {
@@ -135,6 +140,8 @@ namespace Heroes
             ["error.off"] = L("El servidor no tiene activado el modo Héroe.", "The server has the hero mode off.", "Le serveur n'a pas activé le mode Héros."),
             ["error.none"] = L("No se puede desconectar ahora.", "It cannot be disconnected now.", "Impossible de le déconnecter maintenant."),
             ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
+            ["auto"] = L("AUTO", "AUTO", "AUTO"),
+            ["loot"] = L("BOTÍN", "LOOT", "BUTIN"),
         };
 
         private static string T(string key, params object[] values)
@@ -176,7 +183,10 @@ namespace Heroes
                     _polling = false;
                     _listCode = code;
                     _list = code == 200 ? body : null;
+                    if (_list is JsonElement l && l.TryGetProperty("characters", out var all))
+                        foreach (var one in all.EnumerateArray()) AskPortrait(Long(one, "id"));
                     Render();
+                    try { RenderPanel(); } catch (Exception ex) { MelonLogger.Warning($"[Heroes] The group panel: {ex.Message}"); }
                 });
             });
         }
@@ -199,16 +209,19 @@ namespace Heroes
                     texture.hideFlags = UnityEngine.HideFlags.DontUnloadUnusedAsset;
                     _portraits[id] = texture;
                     Render();
+                    try { RenderPanel(); } catch { }
                 });
             });
         }
 
-        private static void Act(string route, long id)
+        private static void Act(string route, long id, Dictionary<string, object> more = null)
         {
             Say("");
+            var ask = more ?? new Dictionary<string, object>();
+            ask["id"] = id;
             Task.Run(async () =>
             {
-                var (code, body) = await AskAsync(route, new Dictionary<string, object> { ["id"] = id });
+                var (code, body) = await AskAsync(route, ask);
                 _toUnity.Enqueue(() =>
                 {
                     if (code == 0) Say(T("unreachable"));
@@ -427,6 +440,280 @@ namespace Heroes
             return card;
         }
 
+        // ─── The menus' button ───────────────────────────────────────────────────────────
+
+        private static UnityEngine.Texture2D _icon;
+        private static bool _toldMenu;
+
+        /// <summary>
+        /// A Heroes button at the end of the MENUS bar's grid (BannerMenuBinding's gd_btnUis), the
+        /// size of its neighbours, put back whenever the client draws the bar again.
+        /// </summary>
+        private static void PutMenuButton()
+        {
+            var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+            for (int i = 0; i < documents.Length; i++)
+            {
+                var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
+                var grid = root == null ? null : UQueryExtensions.Q(root, "gd_btnUis", (string)null);
+                if (grid == null || grid.panel == null) continue;
+                if (UQueryExtensions.Q(grid, "JondoHeroesMenuButton", (string)null) != null) return;
+                VisualElement model = grid.childCount > 0 ? grid[0] : null;
+                float w = model?.resolvedStyle.width ?? 0, h = model?.resolvedStyle.height ?? 0;
+                if (float.IsNaN(w) || w <= 0) w = 32f;
+                if (float.IsNaN(h) || h <= 0) h = 32f;
+                if (!_toldMenu)
+                {
+                    _toldMenu = true;
+                    MelonLogger.Msg($"[Heroes] MENUS bar found: {grid.childCount} button(s) of {w}x{h}, {model?.resolvedStyle.position}.");
+                }
+
+                var button = new VisualElement();
+                button.name = "JondoHeroesMenuButton";
+                button.style.width = new StyleLength(w);
+                button.style.height = new StyleLength(h);
+                if (model != null)
+                {
+                    button.style.marginLeft = new StyleLength(model.resolvedStyle.marginLeft);
+                    button.style.marginRight = new StyleLength(model.resolvedStyle.marginRight);
+                    button.style.marginTop = new StyleLength(model.resolvedStyle.marginTop);
+                    button.style.marginBottom = new StyleLength(model.resolvedStyle.marginBottom);
+                }
+                var picture = new VisualElement();
+                picture.pickingMode = PickingMode.Ignore;
+                picture.style.flexGrow = new StyleFloat(1f);
+                picture.style.marginLeft = picture.style.marginRight = picture.style.marginTop = picture.style.marginBottom = new StyleLength(2f);
+                picture.style.backgroundImage = new StyleBackground(Icon());
+                picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+                button.Add(picture);
+                button.AddManipulator(new Clickable(Do(() => { if (_window != null) Close(); else Open(); })).Cast<IManipulator>());
+                grid.Add(button);
+                return;
+            }
+        }
+
+        /// <summary>
+        /// The button's icon, drawn here: a gold square like the bar's others, two heroes' busts
+        /// side by side and a crown on the one in front. Three by three samples a pixel.
+        /// </summary>
+        private static UnityEngine.Texture2D Icon()
+        {
+            if (_icon != null) return _icon;
+            const int size = 64;
+            var outline = new UnityEngine.Color(0.36f, 0.17f, 0.04f, 1f);
+            var texture = new UnityEngine.Texture2D(size, size, UnityEngine.TextureFormat.RGBA32, false);
+            for (int py = 0; py < size; py++)
+                for (int px = 0; px < size; px++)
+                {
+                    float r = 0, g = 0, b = 0, a = 0;
+                    for (int sy = 0; sy < 3; sy++)
+                        for (int sx = 0; sx < 3; sx++)
+                        {
+                            float x = px + (sx + 0.5f) / 3f, y = py + (sy + 0.5f) / 3f;
+                            var c = IconAt(x, y, outline);
+                            r += c.r * c.a; g += c.g * c.a; b += c.b * c.a; a += c.a;
+                        }
+                    var color = a > 0 ? new UnityEngine.Color(r / a, g / a, b / a, a / 9f) : new UnityEngine.Color(0, 0, 0, 0);
+                    texture.SetPixel(px, size - 1 - py, color);
+                }
+            texture.Apply();
+            texture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
+            texture.hideFlags = UnityEngine.HideFlags.DontUnloadUnusedAsset;
+            return _icon = texture;
+        }
+
+        /// <summary>The icon at a point, y going down: the last shape that holds it wins.</summary>
+        private static UnityEngine.Color IconAt(float x, float y, UnityEngine.Color outline)
+        {
+            var color = new UnityEngine.Color(0, 0, 0, 0);
+            // The square, gold at the top and orange at the bottom, with its dark edge.
+            float box = RoundBox(x - 32f, y - 32f, 29f, 29f, 11f);
+            if (box > 0f) return color;
+            color = box > -2.2f ? outline : UnityEngine.Color.Lerp(new UnityEngine.Color(1f, 0.80f, 0.32f, 1f), new UnityEngine.Color(0.90f, 0.42f, 0.08f, 1f), y / 64f);
+            // The hero behind, a little paler, and the one in front.
+            color = Bust(x, y, 23f, 25f, 7.5f, color, new UnityEngine.Color(0.98f, 0.88f, 0.70f, 1f), outline);
+            color = Bust(x, y, 38f, 29f, 8.5f, color, UnityEngine.Color.white, outline);
+            // His crown: a band and three points over his head.
+            if (InCrown(x, y, 38f, 16f)) color = new UnityEngine.Color(1f, 0.88f, 0.22f, 1f);
+            else if (InCrown(x, y, 38f, 16f, 1.4f)) color = outline;
+            // Nothing may spill over the square's edge.
+            return box > -2.2f ? outline : color;
+        }
+
+        private static UnityEngine.Color Bust(float x, float y, float cx, float headY, float headR,
+                                              UnityEngine.Color under, UnityEngine.Color fill, UnityEngine.Color outline)
+        {
+            float head = (float)Math.Sqrt((x - cx) * (x - cx) + (y - headY) * (y - headY)) - headR;
+            float rx = headR * 1.75f, ry = headR * 1.30f, sy = headY + headR * 2.55f;
+            float dx = (x - cx) / rx, dy = (y - sy) / ry;
+            float shoulders = ((float)Math.Sqrt(dx * dx + dy * dy) - 1f) * Math.Min(rx, ry);
+            if (y > sy) shoulders = Math.Abs(x - cx) - rx;   // straight down to the square's edge
+            float d = Math.Min(head, shoulders);
+            if (d < -1.6f) return fill;
+            if (d < 0.6f) return outline;
+            return under;
+        }
+
+        private static bool InCrown(float x, float y, float cx, float top, float grow = 0f)
+        {
+            float left = cx - 7f - grow, right = cx + 7f + grow, bottom = top + 7f + grow, band = top + 3.5f;
+            if (x < left || x > right || y > bottom || y < top - grow) return false;
+            if (y >= band) return true;
+            // Three points: their tips at the edges and in the middle.
+            float t = (x - left) / (right - left);
+            float tri = Math.Abs(((t * 2f) % 1f) * 2f - 1f);
+            float tipY = top - grow + (1f - tri) * (band - top + grow);
+            return y >= tipY;
+        }
+
+        private static float RoundBox(float x, float y, float hw, float hh, float r)
+        {
+            float qx = Math.Abs(x) - hw + r, qy = Math.Abs(y) - hh + r;
+            float ox = Math.Max(qx, 0f), oy = Math.Max(qy, 0f);
+            return (float)Math.Sqrt(ox * ox + oy * oy) + Math.Min(Math.Max(qx, qy), 0f) - r;
+        }
+
+        // ─── The group panel ─────────────────────────────────────────────────────────────
+
+        private static VisualElement _panel;
+        private static VisualElement _members;
+        private static bool _folded;
+
+        /// <summary>
+        /// The group at the side of the screen while any hero is connected: each one's portrait and
+        /// life, a crown for the master, and for each the automatic pass of his turns (heroes) and
+        /// whether the group's items go to him.
+        /// </summary>
+        private static void RenderPanel()
+        {
+            var group = new List<JsonElement>();
+            long lootTo = 0;
+            if (_list is JsonElement list && Bool(list, "on") && list.TryGetProperty("characters", out var all))
+            {
+                lootTo = Long(list, "lootTo");
+                group = all.EnumerateArray().Where(c => Bool(c, "master") || Bool(c, "hero")).ToList();
+            }
+            if (group.Count < 2)
+            {
+                if (_panel != null) { try { _panel.RemoveFromHierarchy(); } catch { } _panel = null; }
+                return;
+            }
+            if (_panel == null || _panel.panel == null)
+            {
+                var layer = FindLayer();
+                if (layer == null) return;
+                InstallInputGuard();
+                _panel = new VisualElement();
+                _panel.name = "JondoHeroesGroup";
+                _panel.style.position = new StyleEnum<Position>(Position.Absolute);
+                _panel.style.right = new StyleLength(8f);
+                _panel.style.top = new StyleLength(170f);
+                _panel.style.width = new StyleLength(112f);
+                _panel.style.paddingLeft = _panel.style.paddingRight = _panel.style.paddingBottom = new StyleLength(4f);
+                _panel.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.16f, 0.16f, 0.27f, 0.92f));
+                _panel.style.borderTopWidth = _panel.style.borderBottomWidth = _panel.style.borderLeftWidth = _panel.style.borderRightWidth = new StyleFloat(1f);
+                var line = new UnityEngine.Color(0.40f, 0.40f, 0.55f, 1f);
+                _panel.style.borderTopColor = _panel.style.borderBottomColor = _panel.style.borderLeftColor = _panel.style.borderRightColor = new StyleColor(line);
+                Round(_panel, 3f);
+
+                var bar = new VisualElement();
+                bar.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+                bar.style.justifyContent = new StyleEnum<Justify>(Justify.SpaceBetween);
+                bar.style.height = new StyleLength(24f);
+                bar.style.alignItems = new StyleEnum<Align>(Align.Center);
+                bar.Add(Tool(Do(() => { _folded = !_folded; if (_members != null) _members.style.display = new StyleEnum<DisplayStyle>(_folded ? DisplayStyle.None : DisplayStyle.Flex); }), "—"));
+                bar.Add(Tool(Do(() => { if (_window != null) Close(); else Open(); }), "≡"));
+                _panel.Add(bar);
+                _members = new VisualElement();
+                _members.style.display = new StyleEnum<DisplayStyle>(_folded ? DisplayStyle.None : DisplayStyle.Flex);
+                _panel.Add(_members);
+                KeepEvents(_panel);
+                layer.Add(_panel);
+            }
+            _members.Clear();
+            foreach (var who in group) _members.Add(Member(who, lootTo));
+        }
+
+        private static VisualElement Member(JsonElement who, long lootTo)
+        {
+            long id = Long(who, "id");
+            bool master = Bool(who, "master");
+            var row = new VisualElement();
+            row.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+            row.style.height = new StyleLength(96f);
+            row.style.marginTop = new StyleLength(4f);
+
+            // His life, upright, filled from the bottom.
+            int life = Int(who, "life"), max = Int(who, "maxLife");
+            var gauge = new VisualElement();
+            gauge.style.width = new StyleLength(7f);
+            gauge.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.10f, 0.08f, 0.12f, 1f));
+            gauge.style.justifyContent = new StyleEnum<Justify>(Justify.FlexEnd);
+            Round(gauge, 2f);
+            var fill = new VisualElement();
+            fill.style.height = new StyleLength(new Length(max > 0 ? Math.Clamp(100f * life / max, 0f, 100f) : 0f, LengthUnit.Percent));
+            fill.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.92f, 0.45f, 0.45f, 1f));
+            Round(fill, 2f);
+            gauge.Add(fill);
+            row.Add(gauge);
+
+            var picture = new VisualElement();
+            picture.style.flexGrow = new StyleFloat(1f);
+            picture.style.marginLeft = new StyleLength(3f);
+            if (_portraits.TryGetValue(id, out var portrait))
+            {
+                picture.style.backgroundImage = new StyleBackground(portrait);
+                picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
+            }
+            if (master) picture.Add(Crown());
+            row.Add(picture);
+
+            var tools = new VisualElement();
+            tools.style.width = new StyleLength(38f);
+            tools.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+            if (!master)
+            {
+                bool auto = Bool(who, "autoPass");
+                tools.Add(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), T("auto"), auto));
+            }
+            tools.Add(Toggle(Do(() => Act("heroes/loot", id)), T("loot"), lootTo == id));
+            row.Add(tools);
+            return row;
+        }
+
+        private static VisualElement Toggle(Il2CppSystem.Action click, string text, bool on)
+        {
+            var button = new VisualElement();
+            button.style.height = new StyleLength(22f);
+            button.style.marginTop = button.style.marginBottom = new StyleLength(2f);
+            button.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+            button.style.backgroundColor = new StyleColor(on ? new UnityEngine.Color(0.45f, 0.62f, 0.12f, 1f) : new UnityEngine.Color(0.28f, 0.28f, 0.40f, 1f));
+            Round(button, 3f);
+            var label = Label(text, 9f, true);
+            label.style.unityTextAlign = new StyleEnum<UnityEngine.TextAnchor>(UnityEngine.TextAnchor.MiddleCenter);
+            label.style.marginBottom = new StyleLength(0f);
+            label.style.color = new StyleColor(on ? UnityEngine.Color.white : new UnityEngine.Color(0.75f, 0.75f, 0.85f, 1f));
+            button.Add(label);
+            button.AddManipulator(new Clickable(click).Cast<IManipulator>());
+            return button;
+        }
+
+        private static VisualElement Tool(Il2CppSystem.Action click, string text)
+        {
+            var tool = new VisualElement();
+            tool.style.width = new StyleLength(24f);
+            tool.style.height = new StyleLength(20f);
+            tool.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+            tool.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.30f, 0.30f, 0.44f, 1f));
+            Round(tool, 3f);
+            var label = Label(text, 12f, true);
+            label.style.unityTextAlign = new StyleEnum<UnityEngine.TextAnchor>(UnityEngine.TextAnchor.MiddleCenter);
+            label.style.marginBottom = new StyleLength(0f);
+            tool.Add(label);
+            tool.AddManipulator(new Clickable(click).Cast<IManipulator>());
+            return tool;
+        }
+
         private static VisualElement Crown()
         {
             var crown = new VisualElement();
@@ -591,25 +878,24 @@ namespace Heroes
 
         private static bool _guardInstalled;
 
-        /// <summary>Whether the pointer is on the window this frame.</summary>
-        public static bool PointerOver
+        /// <summary>Whether the pointer is on the window or on the group panel this frame.</summary>
+        public static bool PointerOver => Over(_window) || Over(_panel);
+
+        private static bool Over(VisualElement element)
         {
-            get
+            if (element == null) return false;
+            try
             {
-                if (_window == null) return false;
-                try
-                {
-                    var mouse = UnityEngine.InputSystem.Mouse.current;
-                    var panel = _window.panel;
-                    if (mouse == null || panel == null) return false;
-                    var at = mouse.position.ReadValue();
-                    var onPanel = RuntimePanelUtils.ScreenToPanel(panel, new UnityEngine.Vector2(at.x, UnityEngine.Screen.height - at.y));
-                    return _window.worldBound.Contains(onPanel);
-                }
-                catch
-                {
-                    return false;
-                }
+                var mouse = UnityEngine.InputSystem.Mouse.current;
+                var panel = element.panel;
+                if (mouse == null || panel == null) return false;
+                var at = mouse.position.ReadValue();
+                var onPanel = RuntimePanelUtils.ScreenToPanel(panel, new UnityEngine.Vector2(at.x, UnityEngine.Screen.height - at.y));
+                return element.worldBound.Contains(onPanel);
+            }
+            catch
+            {
+                return false;
             }
         }
 

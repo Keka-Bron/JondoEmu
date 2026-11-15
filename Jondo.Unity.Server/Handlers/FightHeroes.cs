@@ -55,13 +55,50 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        /// <summary>A hero's own bar for his master's client, or null for an ally who is no hero.</summary>
+        /// <summary>
+        /// A hero's own bar for his master's client, or null for an ally who is no hero. Packed:
+        /// the weapon on slot 0 and his spells after it in his own order, with no gaps -- the
+        /// master's client does not turn the pages of a bar that is not its character's, so what
+        /// is past the first page cannot be reached.
+        /// </summary>
         private static byte[]? HeroBar(Fighter played, long me)
-            => _heroBars.TryGetValue(played.Id, out var layout)
-                ? Network.FightProtocol.BuildSpellBar(played.Id, layout.Spells, layout.Bar, layout.WithWeapon, controllerId: me)
-                : null;
+        {
+            if (!_heroBars.TryGetValue(played.Id, out var layout)) return null;
+            var packed = new List<(int Slot, int Spell)>();
+            if (layout.WithWeapon) packed.Add((0, Network.FightProtocol.HechizoCuerpoACuerpo));
+            foreach (var (_, spell) in layout.Bar.Where(b => b.Spell != Network.FightProtocol.HechizoCuerpoACuerpo).OrderBy(b => b.Slot))
+                packed.Add((packed.Count, spell));
+            // What he knows and did not put on his bar comes after, so that every spell he has is in hand.
+            foreach (var (spell, _) in layout.Spells)
+                if (!packed.Any(p => p.Spell == spell)) packed.Add((packed.Count, spell));
+            return Network.FightProtocol.BuildSpellBar(played.Id, layout.Spells, packed, layout.WithWeapon, controllerId: me);
+        }
 
         internal static byte[] PlayedAllyBarForTests(Fighter played, long me) => PlayedAllyBar(played, me);
+
+        /// <summary>
+        /// The items a master's group won, all to the one he named its loot recipient (Heroes.LootTo)
+        /// when that one is among the winners: each keeps his experience and his kamas, the items
+        /// -- the perfect pieces with them -- go to one bag.
+        /// </summary>
+        internal static void GatherHeroLoot(Dictionary<long, Reward> plan)
+        {
+            var masters = plan.Keys.Select(id => Heroes.AsHero(id)?.MasterId ?? id).Distinct().ToList();
+            foreach (long master in masters)
+            {
+                long to = Heroes.LootTo(master);
+                if (to == 0 || !plan.TryGetValue(to, out var recipient)) continue;
+                foreach (var (id, reward) in plan)
+                {
+                    if (id == to || (id != master && Heroes.AsHero(id)?.MasterId != master)) continue;
+                    foreach (var (gid, count) in reward.Loot)
+                        recipient.Loot[gid] = recipient.Loot.TryGetValue(gid, out int had) ? had + count : count;
+                    recipient.Perfect.AddRange(reward.Perfect);
+                    reward.Loot = new Dictionary<int, int>();
+                    reward.Perfect = new List<RandomLoot.Drop>();
+                }
+            }
+        }
 
         /// <summary>A winner's session to pay: his own, or a hero's.</summary>
         private static GameSession? SessionToPay(long characterId)

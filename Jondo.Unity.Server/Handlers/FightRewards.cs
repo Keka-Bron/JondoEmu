@@ -196,6 +196,8 @@ namespace Jondo.Unity.Server.Handlers
                     Perfect = perfect,
                 };
             }
+            // A group with heroes may send its items to one of it (Heroes.LootTo).
+            if (dream == null) GatherHeroLoot(plan);
             // A Gigalodón fight's salt goes into the raid's pool, the same amount for every winner.
             if (dream == null) GuildRaidManager.ShareFightSalt(fight.FightId, plan.ToDictionary(p => p.Key, p => p.Value.Loot));
             _rewards[fight.FightId] = plan;

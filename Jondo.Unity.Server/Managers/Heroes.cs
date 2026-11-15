@@ -37,7 +37,47 @@ namespace Jondo.Unity.Server.Managers
             public long MasterId { get; init; }
             public GameSession Session { get; init; } = null!;
             public DateTime Since { get; init; } = DateTime.UtcNow;
+
+            /// <summary>His turns passed by the server as they come: the group panel's «automatic pass».</summary>
+            public bool AutoPass { get; set; }
         }
+
+        /// <summary>
+        /// Who of each master's group takes the items all of them win -- himself or one of his
+        /// heroes --; absent, each takes his own: the group panel's «loot recipient».
+        /// </summary>
+        private static readonly ConcurrentDictionary<long, long> _lootTo = new();
+
+        /// <summary>Whom the master's group's items go to, or zero when each keeps his own.</summary>
+        public static long LootTo(long masterId) => _lootTo.TryGetValue(masterId, out long to) ? to : 0;
+
+        /// <summary>
+        /// The group's items to one of it -- the master or a hero of his --, or back to each his
+        /// own with zero or with the one who has them already. False for anybody else.
+        /// </summary>
+        public static bool SetLootTo(long masterId, long characterId)
+        {
+            if (characterId == 0 || LootTo(masterId) == characterId)
+            {
+                _lootTo.TryRemove(masterId, out _);
+                return true;
+            }
+            if (characterId != masterId && AsHero(characterId)?.MasterId != masterId) return false;
+            _lootTo[masterId] = characterId;
+            return true;
+        }
+
+        /// <summary>A hero of his passes his turns on his own, or not. False when he is not one of his.</summary>
+        public static bool SetAutoPass(long masterId, long heroId, bool on)
+        {
+            var hero = AsHero(heroId);
+            if (hero == null || hero.MasterId != masterId) return false;
+            hero.AutoPass = on;
+            return true;
+        }
+
+        /// <summary>Whether this fighter is a hero whose turns pass on their own.</summary>
+        public static bool PassesOnHisOwn(long characterId) => AsHero(characterId)?.AutoPass == true;
 
         /// <summary>Each master's heroes, in the order they were connected.</summary>
         private static readonly ConcurrentDictionary<long, List<Hero>> _byMaster = new();
@@ -120,6 +160,7 @@ namespace Jondo.Unity.Server.Managers
             List<Hero> gone;
             lock (_lock)
             {
+                _lootTo.TryRemove(masterId, out _);
                 if (!_byMaster.TryGetValue(masterId, out var list)) return;
                 gone = list.ToList();
                 foreach (var hero in gone) Forget(hero);
@@ -142,6 +183,7 @@ namespace Jondo.Unity.Server.Managers
         private static void Forget(Hero hero)
         {
             _byHero.TryRemove(hero.CharacterId, out _);
+            if (LootTo(hero.MasterId) == hero.CharacterId) _lootTo.TryRemove(hero.MasterId, out _);
             if (_byMaster.TryGetValue(hero.MasterId, out var list))
             {
                 list.RemoveAll(h => h.CharacterId == hero.CharacterId);

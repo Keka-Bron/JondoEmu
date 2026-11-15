@@ -78,6 +78,49 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
+        public async Task The_group_panels_switches_pass_a_heros_turns_and_send_the_items_to_one()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account, "Guia-" + tag, 8);
+            long hero = Character(Account, "Paje-" + tag, 9);
+            await using var pipe = await ClientPipe.OpenAsync(Account, master, Map, "Guia-" + tag);
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+
+                Assert.False(Heroes.SetAutoPass(master + 1, hero, true));
+                Assert.True(Heroes.SetAutoPass(master, hero, true));
+                Assert.True(Heroes.PassesOnHisOwn(hero));
+                Assert.False(Heroes.PassesOnHisOwn(master));
+
+                Assert.False(Heroes.SetLootTo(master, master + 999));
+                Assert.True(Heroes.SetLootTo(master, hero));
+                var plan = new System.Collections.Generic.Dictionary<long, FightHandler.Reward>
+                {
+                    [master] = new() { Xp = 100, Kamas = 10, Loot = new() { [287] = 2, [6903] = 1 } },
+                    [hero] = new() { Xp = 50, Kamas = 5, Loot = new() { [287] = 1 } },
+                    [777] = new() { Xp = 1, Kamas = 1, Loot = new() { [287] = 4 } },   // somebody else's
+                };
+                FightHandler.GatherHeroLoot(plan);
+                Assert.Empty(plan[master].Loot);
+                Assert.Equal(3, plan[hero].Loot[287]);
+                Assert.Equal(1, plan[hero].Loot[6903]);
+                Assert.Equal(100, plan[master].Xp);   // each keeps his experience and kamas
+                Assert.Equal(10, plan[master].Kamas);
+                Assert.Equal(4, plan[777].Loot[287]);
+
+                // The same one again: back to each his own.
+                Assert.True(Heroes.SetLootTo(master, hero));
+                Assert.Equal(0, Heroes.LootTo(master));
+            }
+            finally
+            {
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
+        [Fact]
         public async Task A_hero_comes_into_his_masters_fight_as_his_to_play()
         {
             string tag = Guid.NewGuid().ToString("N")[..6];
