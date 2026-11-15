@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
 
 namespace Jondo.Unity.Server.Network
@@ -73,7 +74,9 @@ namespace Jondo.Unity.Server.Network
 
             // The master saved and off his map; his heroes let go and saved, the hero among them.
             DatabaseManager.SaveCurrentCharacter();
-            await SessionRegistry.RemoveFromMapAsync(map, masterId, session.Id);
+            // With no map loaded again his own client is told too: the actor it played goes.
+            bool reload = ServerSettings.Current.HeroSwitchReloadsMap;
+            await SessionRegistry.RemoveFromMapAsync(map, masterId, reload ? session.Id : Guid.Empty);
             Heroes.DisconnectAll(masterId);
 
             var backend = new GameEntryBackend();
@@ -93,7 +96,13 @@ namespace Jondo.Unity.Server.Network
 
             await backend.SendInitialStateAsync(session, character);
             await backend.AnnounceMapPresenceAsync(session, character);
-            await backend.SendMapInitializationAsync(session, character);
+            // As Auralis's capture has it, the map is not loaded again: the actors on it are only
+            // told anew -- the one played before gone, the one played now drawn where he stood --,
+            // which is what makes a switch quick. The whole map again when the setting asks for it.
+            if (reload) await backend.SendMapInitializationAsync(session, character);
+            else
+                await session.SendAsync(ConnectionProtocol.Push(Op.Jsn,
+                    ConnectionProtocol.BuildActorRefreshed(character, cell, facing, session.AccountId)));
 
             // The group back, around the hero now, in the round it makes: from the one after him to
             // the one before, the master where he was in it. Taking the first hero in hand each time

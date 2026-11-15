@@ -117,6 +117,12 @@ namespace Jondo.Unity.Server
         /// </summary>
         public bool HeroMode { get; set; } = true;
 
+        /// <summary>
+        /// Whether taking a hero in hand loads the map again in the client (Network.HeroSwitch).
+        /// Off, only the map's actors are told anew, as Auralis's server does: quicker. Set in the file.
+        /// </summary>
+        public bool HeroSwitchReloadsMap { get; set; }
+
         /// <summary>How many heroes a character may have connected at once, himself not counted.</summary>
         public int HeroesMax { get; set; } = 7;
 
