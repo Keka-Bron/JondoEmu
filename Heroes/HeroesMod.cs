@@ -84,6 +84,7 @@ namespace Heroes
             {
                 _nextScan = now + 1f;
                 try { PutMenuButton(); } catch { }
+                try { KeepPanelInSight(); } catch { }
             }
             if (now >= _nextPoll && !_polling)
             {
@@ -1066,7 +1067,7 @@ namespace Heroes
                 _panel.Add(_members);
                 KeepEvents(_panel);
                 layer.Add(_panel);
-                Draggable(bar, layer);
+                Draggable(_panel, layer);
                 PanelPrefs();
                 if (_panelX.Value >= 0f && _panelY.Value >= 0f) PlacePanel(layer, _panelX.Value, _panelY.Value);
             }
@@ -1090,17 +1091,35 @@ namespace Heroes
             _panelY = category.CreateEntry("PanelY", -1f);
         }
 
+        /// <summary>The name of the panel's buttons: a press on one is the button's, not a drag.</summary>
+        private const string Pressable = "JondoHeroesPressable";
+
         /// <summary>
-        /// The panel taken by its top bar -- the bar itself, between its buttons, which are their
-        /// own -- and carried with the pointer; the moves and the release are read on the layer,
-        /// so a quick pointer leaving the bar does not drop it.
+        /// The panel taken anywhere but on its buttons -- its top bar, its frame, a portrait --
+        /// and carried with the pointer; the moves and the release are read on the layer, so a
+        /// quick pointer leaving the panel does not drop it. A double click puts it back where it
+        /// starts, against the right edge.
         /// </summary>
-        private static void Draggable(VisualElement bar, VisualElement layer)
+        private static void Draggable(VisualElement panel, VisualElement layer)
         {
-            bar.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
+            panel.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
                 new Action<PointerDownEvent>(e =>
                 {
-                    if (e.target == null || e.target.Pointer != bar.Pointer || _panel == null) return;
+                    if (e.target == null || _panel == null) return;
+                    for (var on = e.target.TryCast<VisualElement>(); on != null && on.Pointer != panel.Pointer; on = on.hierarchy.parent)
+                        if (on.name == Pressable) return;
+                    if (e.clickCount >= 2)
+                    {
+                        _dragging = false;
+                        PanelPrefs();
+                        _panelX.Value = _panelY.Value = -1f;
+                        MelonPreferences.Save();
+                        _panel.style.left = new StyleLength(StyleKeyword.Auto);
+                        _panel.style.right = new StyleLength(8f);
+                        _panel.style.top = new StyleLength(170f);
+                        return;
+                    }
+                    _panel.BringToFront();
                     _dragging = true;
                     _dragFrom = new UnityEngine.Vector2(e.position.x, e.position.y);
                     var at = _panel.worldBound;
@@ -1128,6 +1147,20 @@ namespace Heroes
                 })), TrickleDown.TrickleDown);
         }
 
+        /// <summary>
+        /// The panel moved back inside the screen when the game's window is made smaller: a place
+        /// kept from a bigger one could leave it out of reach.
+        /// </summary>
+        private static void KeepPanelInSight()
+        {
+            if (_panel == null || _panel.panel == null || _dragging) return;
+            if (_panel.style.left.keyword == StyleKeyword.Auto) return;
+            var layer = _panel.hierarchy.parent;
+            if (layer == null) return;
+            float x = _panel.resolvedStyle.left, y = _panel.resolvedStyle.top;
+            PlacePanel(layer, x, y);
+        }
+
         /// <summary>The panel at a place on the layer, kept inside it.</summary>
         private static void PlacePanel(VisualElement layer, float x, float y)
         {
@@ -1135,7 +1168,7 @@ namespace Heroes
             float width = layer.resolvedStyle.width, height = layer.resolvedStyle.height;
             float w = _panel.resolvedStyle.width, h = _panel.resolvedStyle.height;
             if (!float.IsNaN(width) && !float.IsNaN(w)) x = Math.Clamp(x, 0f, Math.Max(0f, width - w));
-            if (!float.IsNaN(height)) y = Math.Clamp(y, 0f, Math.Max(0f, height - 30f));
+            if (!float.IsNaN(height)) y = Math.Clamp(y, 0f, Math.Max(0f, height - (float.IsNaN(h) || h <= 0f ? 30f : h)));
             _panel.style.right = new StyleLength(StyleKeyword.Auto);
             _panel.style.left = new StyleLength(x);
             _panel.style.top = new StyleLength(y);
@@ -1302,6 +1335,7 @@ namespace Heroes
         private static VisualElement Toggle(Il2CppSystem.Action click, UnityEngine.Texture2D glyph, bool on)
         {
             var button = new VisualElement();
+            button.name = Pressable;
             button.style.height = new StyleLength(24f);
             button.style.marginTop = button.style.marginBottom = new StyleLength(2f);
             button.style.backgroundColor = new StyleColor(on ? new UnityEngine.Color(0.45f, 0.62f, 0.12f, 1f) : new UnityEngine.Color(0.28f, 0.28f, 0.40f, 1f));
@@ -2007,6 +2041,7 @@ namespace Heroes
         private static VisualElement Tool(Il2CppSystem.Action click, string text)
         {
             var tool = new VisualElement();
+            tool.name = Pressable;
             tool.style.width = new StyleLength(24f);
             tool.style.height = new StyleLength(20f);
             tool.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
