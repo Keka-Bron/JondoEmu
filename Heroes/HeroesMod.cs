@@ -170,10 +170,9 @@ namespace Heroes
             ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
             ["hint.auto"] = L("Pase automático del turno", "Automatic turn pass", "Passage automatique du tour"),
             ["hint.loot"] = L("Destinatario del botín", "Loot recipient", "Destinataire du butin"),
-            ["hint.play"] = L("Tomar el control de este personaje (Tab: el siguiente)", "Take control of this character (Tab: the next one)",
-                              "Prendre la main sur ce personnage (Tab : le suivant)"),
+            ["hint.play"] = L("Tomar el control de este personaje", "Take control of this character", "Prendre la main sur ce personnage"),
             ["hint.fold"] = L("Plegar / desplegar el grupo", "Fold / unfold the group", "Replier / déplier le groupe"),
-            ["hint.window"] = L("Modo Héroe (Ctrl + Tab)", "Hero mode (Ctrl + Tab)", "Mode Héros (Ctrl + Tab)"),
+            ["hint.window"] = L("Modo Héroe", "Hero mode", "Mode Héros"),
             ["card.class"] = L("Clase", "Class", "Classe"),
             ["card.level"] = L("Nivel", "Level", "Niveau"),
             ["card.prospecting"] = L("Prospección", "Prospecting", "Prospection"),
@@ -860,7 +859,7 @@ namespace Heroes
             // Dressed once placed, at the size it takes (Dress).
             _dressedFor = default;
             Pressed(button);
-            MenuHint(button);
+            Hint(button, "hint.window");
             // Lit under the pointer, as the game's own buttons are (the light laid by Dress).
             button.RegisterCallback<PointerEnterEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerEnterEvent>>(
                 new Action<PointerEnterEvent>(_ => Lit(button, true))), TrickleDown.NoTrickleDown);
@@ -1687,8 +1686,8 @@ namespace Heroes
 
         private static VisualElement _hint;
 
-        /// <summary>A line saying what the element does, beside it while the pointer is on it.</summary>
-        private static VisualElement Hint(VisualElement target, string key) => HintText(target, () => T(key));
+        /// <summary>A line saying what the button does, above it while the pointer is on it, its key beside.</summary>
+        private static VisualElement Hint(VisualElement target, string key) => ButtonHint(target, () => T(key), KeysOf(key));
 
         /// <summary>The same with any text, worked out as the pointer comes.</summary>
         private static VisualElement HintText(VisualElement target, Func<string> text)
@@ -1718,11 +1717,9 @@ namespace Heroes
                     _hint.style.position = new StyleEnum<Position>(Position.Absolute);
                     _hint.style.paddingLeft = _hint.style.paddingRight = new StyleLength(10f);
                     _hint.style.paddingTop = _hint.style.paddingBottom = new StyleLength(5f);
-                    _hint.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.10f, 0.10f, 0.16f, 0.95f));
-                    _hint.style.borderTopWidth = _hint.style.borderBottomWidth = _hint.style.borderLeftWidth = _hint.style.borderRightWidth = new StyleFloat(1f);
-                    var line = new UnityEngine.Color(0.45f, 0.45f, 0.60f, 1f);
-                    _hint.style.borderTopColor = _hint.style.borderBottomColor = _hint.style.borderLeftColor = _hint.style.borderRightColor = new StyleColor(line);
-                    Round(_hint, 3f);
+                    // The game's hints: a dark slate box, rounded, with no edge drawn.
+                    _hint.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.12f, 0.12f, 0.17f, 0.96f));
+                    Round(_hint, 5f);
                     layer.Add(_hint);
                 }
                 // A label a line: one label with line breaks in it is measured one line high, and
@@ -1738,7 +1735,7 @@ namespace Heroes
                     _hint.Add(line);
                 }
                 // On its left: the group panel stands against the screen's right edge. What the
-                // MENUS button's hint set (ShowMenuHint) undone.
+                // buttons' hints set (ShowButtonHint) undone.
                 var at = target.worldBound;
                 float width = layer.resolvedStyle.width;
                 _hint.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
@@ -1807,16 +1804,24 @@ namespace Heroes
             catch { }
         }
 
+        /// <summary>The keys a button's hint shows beside its words, as the game's do: none for most.</summary>
+        private static string KeysOf(string key) => key switch
+        {
+            "hint.window" => "Ctrl + Tab",
+            "hint.play" => "Tab",
+            _ => null,
+        };
+
         /// <summary>
-        /// The MENUS button's hint as the game writes its buttons': the name, then the key in a box
-        /// of its own, above the button and centred on it.
+        /// A button's hint as the game writes its buttons': the words, then the key in a box of its
+        /// own when it has one, above the button and centred on it.
         /// </summary>
-        private static VisualElement MenuHint(VisualElement target)
+        private static VisualElement ButtonHint(VisualElement target, Func<string> text, string keys)
         {
             try
             {
                 target.RegisterCallback<PointerEnterEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerEnterEvent>>(
-                    new Action<PointerEnterEvent>(_ => ShowMenuHint(target))), TrickleDown.NoTrickleDown);
+                    new Action<PointerEnterEvent>(_ => ShowButtonHint(target, text(), keys))), TrickleDown.NoTrickleDown);
                 target.RegisterCallback<PointerLeaveEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerLeaveEvent>>(
                     new Action<PointerLeaveEvent>(_ => HideHint())), TrickleDown.NoTrickleDown);
             }
@@ -1824,27 +1829,30 @@ namespace Heroes
             return target;
         }
 
-        private static void ShowMenuHint(VisualElement target)
+        private static void ShowButtonHint(VisualElement target, string text, string keys)
         {
-            ShowHint(target, T("title"));
+            ShowHint(target, text);
             try
             {
                 if (_hint == null || _hint.panel == null) return;
                 _hint.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
                 _hint.style.alignItems = new StyleEnum<Align>(Align.Center);
-                var key = new VisualElement();
-                key.pickingMode = PickingMode.Ignore;
-                key.style.marginLeft = new StyleLength(8f);
-                key.style.paddingLeft = key.style.paddingRight = new StyleLength(5f);
-                key.style.paddingTop = key.style.paddingBottom = new StyleLength(1f);
-                key.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.30f, 0.30f, 0.42f, 1f));
-                Round(key, 3f);
-                var keys = Label("Ctrl + Tab", 11f);
-                keys.pickingMode = PickingMode.Ignore;
-                keys.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
-                keys.style.marginBottom = new StyleLength(0f);
-                key.Add(keys);
-                _hint.Add(key);
+                if (!string.IsNullOrEmpty(keys))
+                {
+                    var key = new VisualElement();
+                    key.pickingMode = PickingMode.Ignore;
+                    key.style.marginLeft = new StyleLength(8f);
+                    key.style.paddingLeft = key.style.paddingRight = new StyleLength(5f);
+                    key.style.paddingTop = key.style.paddingBottom = new StyleLength(1f);
+                    key.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.30f, 0.30f, 0.42f, 1f));
+                    Round(key, 3f);
+                    var words = Label(keys, 11f);
+                    words.pickingMode = PickingMode.Ignore;
+                    words.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
+                    words.style.marginBottom = new StyleLength(0f);
+                    key.Add(words);
+                    _hint.Add(key);
+                }
 
                 // Above the button, its middle on the button's.
                 var layer = _hint.hierarchy.parent;
