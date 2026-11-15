@@ -88,6 +88,7 @@ namespace Heroes
                 try { KeepPanelInSight(); } catch { }
                 try { BorrowServices(); } catch { }
                 try { WatchLive(); } catch { }
+                try { ReadTuning(); } catch { }
             }
             if (now >= _nextPoll && !_polling)
             {
@@ -883,8 +884,8 @@ namespace Heroes
                     // Seated, the client sizes him to his smaller pose and he comes out bigger than
                     // the others standing: a smaller box, at the bottom of the picture, as he sits.
                     displayer.style.flexGrow = new StyleFloat(0f);
-                    displayer.style.width = new StyleLength(new Length(70f, LengthUnit.Percent));
-                    displayer.style.height = new StyleLength(new Length(70f, LengthUnit.Percent));
+                    displayer.style.width = new StyleLength(new Length(Tune("seatedBox", 70f), LengthUnit.Percent));
+                    displayer.style.height = new StyleLength(new Length(Tune("seatedBox", 70f), LengthUnit.Percent));
                     displayer.style.alignSelf = new StyleEnum<Align>(Align.Center);
                     displayer.style.marginTop = new StyleLength(StyleKeyword.Auto);
                 }
@@ -1433,7 +1434,47 @@ namespace Heroes
         /// The platform's character's forced size: the bigger it is the smaller he is drawn (0.32
         /// drew him over twice the template's 0.75). 1.8 for the native screen's look in this window.
         /// </summary>
-        private const float PreviewSize = 1.8f;
+        private static float PreviewSize => Tune("previewSize", 1.8f);
+
+        // ─── Tuning without a restart ────────────────────────────────────────────────────
+
+        private static readonly Dictionary<string, float> _tuning = new Dictionary<string, float>();
+        private static DateTime _tuningRead;
+
+        private static string TuningFile => System.IO.Path.Combine(MelonLoader.Utils.MelonEnvironment.UserDataDirectory, "HeroesTuning.cfg");
+
+        /// <summary>
+        /// A number the mod draws with, out of UserData\HeroesTuning.cfg («name = value» a line)
+        /// when it is there, else its default: read again whenever the file changes, so a size is
+        /// set right with the game running. Code itself is only changed by a restart.
+        /// </summary>
+        private static float Tune(string name, float byDefault)
+            => _tuning.TryGetValue(name, out float value) ? value : byDefault;
+
+        /// <summary>Every scan: the file read again when it changed, and what is on screen drawn again with it.</summary>
+        private static void ReadTuning()
+        {
+            string file = TuningFile;
+            if (!System.IO.File.Exists(file)) return;
+            var written = System.IO.File.GetLastWriteTimeUtc(file);
+            if (written == _tuningRead) return;
+            _tuningRead = written;
+            _tuning.Clear();
+            foreach (string line in System.IO.File.ReadAllLines(file))
+            {
+                string[] parts = line.Split('=');
+                if (parts.Length == 2 && float.TryParse(parts[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
+                    _tuning[parts[0].Trim()] = value;
+            }
+            MelonLogger.Msg($"[Heroes] Tuning read: {string.Join(", ", _tuning.Select(t => t.Key + " = " + t.Value.ToString(CultureInfo.InvariantCulture)))}");
+            // Drawn again with it: the creation's character framed, the portraits made anew.
+            _cFramed = false;
+            foreach (var made in _live.Values) Release(made.View);
+            _live.Clear();
+            _windowKey = null;
+            _panelKey = null;
+            _nextPoll = 0f;
+        }
 
         /// <summary>
         /// The look given to the platform's displayer, with the native screen's framing -- no
@@ -2534,9 +2575,10 @@ namespace Heroes
                 live.style.position = new StyleEnum<Position>(Position.Absolute);
                 live.style.top = new StyleLength(0f);
                 live.style.height = new StyleLength(new Length(100f, LengthUnit.Percent));
-                live.style.width = new StyleLength(96f);
+                float box = Tune("panelBox", 96f);
+                live.style.width = new StyleLength(box);
                 live.style.left = new StyleLength(new Length(50f, LengthUnit.Percent));
-                live.style.marginLeft = new StyleLength(-48f);
+                live.style.marginLeft = new StyleLength(-box / 2f);
                 picture.Add(live);
             }
             if (master) picture.Add(Crown());
