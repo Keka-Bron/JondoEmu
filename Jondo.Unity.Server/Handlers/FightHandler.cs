@@ -10749,8 +10749,9 @@ namespace Jondo.Unity.Server.Handlers
                     Utility = !damages && heal == 0 && removal == 0 && buff == 0 && !summons && mechanics
                         ? 25 + monster.Level / 10.0 : 0,
                     UtilityOnEnemies = mechanicsOnEnemies,
-                    // A class spell -- a JondoBot's -- is weighed row by row, as the engine reads it.
-                    Rows = Managers.PlayerSpells.Contains(spell)
+                    // A class spell -- a JondoBot's -- is weighed row by row, as the engine reads it;
+                    // and so is a monster's that only hides its own side (HidesItsSideOnly).
+                    Rows = Managers.PlayerSpells.Contains(spell) || HidesItsSideOnly(spell, grade)
                         ? Managers.SpellEffects.De(spell, grade)
                         : Array.Empty<Managers.SpellEffect>(),
                 });
@@ -10764,6 +10765,41 @@ namespace Jondo.Unity.Server.Handlers
         /// looked for a blow.
         /// </summary>
         private static readonly HashSet<int> BlowsInAPickedElement = new() { 2822, 2828, 2832, 2890 };
+
+        /// <summary>
+        /// Whether all a spell does is make invisible others of its caster's side: the Blop's
+        /// Oculta Biblop, its biblops out of sight («Cache Biblop», Dofus pour les noobs). The
+        /// summary weighs a spell of pure mechanics on the caster or on the enemy, never on one of
+        /// its side, and the Blops never cast it. Weighed by its rows instead, each one it hides
+        /// is worth a share of his life (MonsterTactics.ValueOfRows).
+        /// </summary>
+        internal static bool HidesItsSideOnly(int spell, int grade)
+        {
+            var working = Managers.SpellEffects.De(spell, grade)
+                .Where(e => !Managers.EffectEngine.EsMarcadorDeGuion(e.EffectId) && !e.ForClientOnly)
+                .ToList();
+            return working.Count > 0
+                   && working.All(e => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Visibility
+                                       && NamesItsSideOnly(e.TargetMask ?? ""));
+        }
+
+        /// <summary>
+        /// Whether a mask names somebody of the caster's side other than him -- a lowercase class,
+        /// «a», «i», «h» -- and nobody of the other side, an uppercase one. «c» and «C» are the
+        /// caster; longer parts are conditions on whoever the classes name.
+        /// </summary>
+        private static bool NamesItsSideOnly(string mask)
+        {
+            bool own = false;
+            foreach (var raw in mask.Split(','))
+            {
+                string part = raw.Trim().TrimStart('*');
+                if (part.Length != 1 || part is "c" or "C") continue;
+                if (char.IsUpper(part[0])) return false;
+                own = true;
+            }
+            return own;
+        }
 
         private static bool HasMask(string mask, string who)
         {

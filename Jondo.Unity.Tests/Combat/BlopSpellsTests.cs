@@ -132,6 +132,56 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(720, indigo.CurrentHP);
         }
 
+        /// <summary>
+        /// Oculta Biblop hides the Blop's biblops («Cache Biblop»): a spell of pure mechanics on
+        /// others of its side, which the summary never aimed anywhere but at the Blop himself, out
+        /// of its range. Weighed by its rows, hiding the two biblops is worth casting.
+        /// </summary>
+        [Fact]
+        public void A_blop_hides_its_biblops()
+        {
+            const int OcultaBiblop = 472, Biblop = 278;
+            if (SpellEffects.De(OcultaBiblop, 2).Count == 0) return;
+            Assert.True(FightHandler.HidesItsSideOnly(OcultaBiblop, 2));
+
+            var fight = new FightInstance(1, 1);
+            var blop = Blop(-1, BlopCoco, 300);
+            blop.SpellIds.Add(OcultaBiblop);
+            blop.SpellGrades[OcultaBiblop] = 2;
+            Fighter Summon(long id, int cell) => new()
+            {
+                Id = id, TeamId = 1, CellId = cell, MaxHP = 210, CurrentHP = 210, Level = 54, IsMonster = true,
+                MonsterId = Biblop, Invocador = blop.Id, SummonCost = 1, MaxAP = 5, CurrentAP = 5, MaxMP = 4, CurrentMP = 4,
+            };
+            var near = Summon(-5, 301);
+            var further = Summon(-6, 330);
+            var me = Person(10, 500);
+            fight.AddPlayer(me); fight.AddMonster(blop); fight.AddMonster(near); fight.AddMonster(further);
+            var board = new MonsterTactics.Board
+            {
+                Fighters = new[] { blop, near, further, me },
+                Reach = (row, caster, from, aim) => EffectEngine.ReachOf(fight, caster, row, from, aim),
+                CanSummon = (c, t, g) => FightHandler.FitsTheSummonLimit(fight, c, t, g),
+            };
+
+            var hide = Assert.Single(FightHandler.TacticsOf(blop));
+            Assert.True(hide.HasRows);
+            var options = MonsterTactics.Options(board, blop, new[] { hide });
+            Assert.Contains(options, o => o.Spell?.Id == OcultaBiblop && o.Score > 0);
+        }
+
+        /// <summary>Only a spell that hides its own side alone is weighed so: not one that hides the caster, nor the enemy.</summary>
+        [Fact]
+        public void Hiding_oneself_or_the_enemy_is_left_to_the_summary()
+        {
+            foreach (var (spell, mask) in new[] { (5255, "C"), (12381, "A"), (309, "a,A") })
+            {
+                var rows = SpellEffects.De(spell, 1);
+                if (rows.Count == 0 || rows.Any(r => r.TargetMask != mask)) continue;
+                Assert.False(FightHandler.HidesItsSideOnly(spell, 1));
+            }
+        }
+
         /// <summary>The few monster turn glyphs whose spell draws something else keep their zone round the one caught.</summary>
         [Fact]
         public void A_turn_glyph_whose_spell_draws_another_shape_is_not_taken_for_its_own()
