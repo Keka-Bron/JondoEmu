@@ -155,6 +155,7 @@ namespace Heroes
             ["connect"] = L("CONECTAR", "CONNECT", "CONNECTER"),
             ["create"] = L("CREAR UN HÉROE", "CREATE A HERO", "CRÉER UN HÉROS"),
             ["create.title"] = L("Nuevo héroe", "New hero", "Nouveau héros"),
+            ["create.window"] = L("Crear un personaje", "Create a character", "Créer un personnage"),
             ["create.class"] = L("CLASE", "CLASS", "CLASSE"),
             ["create.sex"] = L("SEXO", "SEX", "SEXE"),
             ["create.male"] = L("Masculino", "Male", "Masculin"),
@@ -1035,6 +1036,87 @@ namespace Heroes
         private static int _newBreed = 8, _newSex;
         private static string _newName = "";
 
+        // ─── The game's own creation screen ─────────────────────────────────────────────
+
+        private const string CreationTemplate = "Assets/UI/Auth/characterCreation.uxml";
+        private static WindowFigma _creationWindow;
+        private static bool _toldCreationTree;
+
+        /// <summary>
+        /// The game's own character creation screen, as Auralis's mod shows it: its template
+        /// (characterCreation.uxml) in a window over the world. This first step shows it and logs
+        /// what it is made of, for its parts to be bound; the mod's own form stays behind it when
+        /// the template cannot be had.
+        /// </summary>
+        private static void OpenNativeCreation()
+        {
+            if (_creationWindow != null && _creationWindow.panel != null) { _creationWindow.BringToFront(); return; }
+            try
+            {
+                var layer = FindLayer();
+                if (layer == null) return;
+                var settings = Il2CppCore.UILogic.Components.DofusUISettings.GetSettings();
+                var asset = settings?.InstantiateTemplate(CreationTemplate);
+                if (asset == null)
+                {
+                    MelonLogger.Warning($"[Heroes] The creation screen's template ({CreationTemplate}) could not be had: the mod's form instead.");
+                    StartCreation();
+                    return;
+                }
+                float w = layer.resolvedStyle.width, h = layer.resolvedStyle.height;
+                float width = float.IsNaN(w) || w <= 0 ? 1600f : w * 0.92f;
+                float height = float.IsNaN(h) || h <= 0 ? 900f : h * 0.92f;
+                var window = new WindowFigma(true, T("create.window"), "", true);
+                window.showCloseButton = true;
+                window.name = "JondoHeroesCreation";
+                window.style.position = new StyleEnum<Position>(Position.Absolute);
+                window.style.width = new StyleLength(width);
+                window.style.height = new StyleLength(height);
+                window.style.left = new StyleLength(float.IsNaN(w) || w <= 0 ? 40f : (w - width) / 2f);
+                window.style.top = new StyleLength(float.IsNaN(h) || h <= 0 ? 30f : (h - height) / 2f);
+
+                var tree = asset.CloneTree();
+                tree.name = "JondoHeroesCreationTree";
+                tree.style.flexGrow = new StyleFloat(1f);
+                window.Add(tree);
+                layer.Add(window);
+                window.BringToFront();
+                KeepEvents(window);
+                var close = window.header?.rightButton;
+                if (close != null) close.add_Clicked(Do(CloseNativeCreation));
+                _creationWindow = window;
+                if (!_toldCreationTree)
+                {
+                    _toldCreationTree = true;
+                    var parts = new System.Text.StringBuilder();
+                    Parts(tree, 0, parts);
+                    MelonLogger.Msg($"[Heroes] The creation screen's parts:\n{parts}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] The creation screen could not be opened, the mod's form instead: {ex}");
+                CloseNativeCreation();
+                StartCreation();
+            }
+        }
+
+        private static void CloseNativeCreation()
+        {
+            try { _creationWindow?.RemoveFromHierarchy(); } catch { }
+            _creationWindow = null;
+        }
+
+        /// <summary>Every named part of a tree, its type and its depth, a line each: the creation screen's map.</summary>
+        private static void Parts(VisualElement element, int depth, System.Text.StringBuilder into)
+        {
+            if (into.Length > 30000 || depth > 14) return;
+            if (!string.IsNullOrEmpty(element.name))
+                into.Append(new string(' ', depth)).Append(element.GetIl2CppType().Name).Append(" #").Append(element.name)
+                    .Append(" (").Append(Kids(element)).Append(")\n");
+            for (int i = 0; i < Kids(element); i++) Parts(Kid(element, i), depth + 1, into);
+        }
+
         private static void StartCreation()
         {
             _windowKey = null;
@@ -1215,7 +1297,7 @@ namespace Heroes
             plus.style.color = new StyleColor(new UnityEngine.Color(0.55f, 0.57f, 0.70f, 1f));
             plus.style.marginBottom = new StyleLength(8f);
             place.Add(plus);
-            place.Add(Button(Do(StartCreation), T("create"), true, true));
+            place.Add(Button(Do(OpenNativeCreation), T("create"), true, true));
             return place;
         }
 
@@ -3064,7 +3146,7 @@ namespace Heroes
         private static bool _guardInstalled;
 
         /// <summary>Whether the pointer is on the window or on the group panel this frame.</summary>
-        public static bool PointerOver => Over(_window) || Over(_panel) || Over(_sheet);
+        public static bool PointerOver => Over(_window) || Over(_panel) || Over(_sheet) || Over(_creationWindow);
 
         private static bool Over(VisualElement element)
         {
