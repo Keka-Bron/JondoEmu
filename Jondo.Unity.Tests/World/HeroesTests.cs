@@ -273,6 +273,52 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// The master walks: each hero walks to a cell of his own beside where the master stops --
+        /// not onto him, not onto another hero, not back to where the master set off.
+        /// </summary>
+        [Fact]
+        public async Task Heroes_follow_to_cells_of_their_own_beside_where_their_master_stops()
+        {
+            if (!MapManager.WalkableCells.ContainsKey(Map)) MapManager.Initialize();
+            Assert.True(MapManager.WalkableCells.TryGetValue(Map, out var cells) && cells.Count >= 20);
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 15, "Guia2-" + tag, 8);
+            long first = Character(Account + 15, "Uno-" + tag, 9);
+            long second = Character(Account + 15, "Dos-" + tag, 1);
+            await using var pipe = await ClientPipe.OpenAsync(Account + 15, master, Map, "Guia2-" + tag);
+            using var reading = new System.Threading.CancellationTokenSource();
+            var drain = Task.Run(async () =>
+            {
+                var buffer = new byte[65536];
+                try { while (!reading.IsCancellationRequested && await pipe.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                catch { }
+            });
+            try
+            {
+                int start = cells[0], end = cells[cells.Count / 2];
+                pipe.Session.State.CellId = start;
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, first));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, second));
+
+                pipe.Session.State.CellId = end;
+                await HeroPresence.MasterWalkedAsync(pipe.Session, new List<int> { start, end });
+
+                int a = Heroes.SessionOf(first)!.State.CellId, b = Heroes.SessionOf(second)!.State.CellId;
+                Assert.NotEqual(end, a);
+                Assert.NotEqual(end, b);
+                Assert.NotEqual(a, b);
+                Assert.True(Jondo.Unity.World.Maps.MapGeometry.Distance(end, a) <= 3);
+                Assert.True(Jondo.Unity.World.Maps.MapGeometry.Distance(end, b) <= 3);
+            }
+            finally
+            {
+                reading.Cancel();
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
         [Fact]
         public async Task A_hero_comes_into_his_masters_fight_as_his_to_play()
         {

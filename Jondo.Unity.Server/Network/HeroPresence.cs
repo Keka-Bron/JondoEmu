@@ -72,27 +72,47 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// The master walked: each hero walks his walk after him and stops short of its end -- the
-        /// first one step behind, the next two --, all on the cells the master walked.
+        /// The master walked: each hero walks after him to a free cell beside where he stops, by
+        /// his own shortest way there, every cell of it. The client's walk names only the cells it
+        /// turns on, so the master's own path, cut short, sent the heroes back to where he set off.
         /// </summary>
         public static async Task MasterWalkedAsync(GameSession master, IReadOnlyList<int> cells)
         {
             if (cells.Count == 0) return;
-            int behind = 1;
+            long map = master.State.MapId;
+            if (!MapManager.WalkableCells.TryGetValue(map, out var cellsOfMap)) return;
+            var walkable = new HashSet<int>(cellsOfMap);
+            int end = cells[^1];
+            var taken = new HashSet<int> { end };
             foreach (var hero in Heroes.Of(master.CharacterId))
             {
                 var state = hero.Session.State;
-                if (state.IsInFight || state.MapId != master.State.MapId) continue;
-                int stop = Math.Max(0, cells.Count - 1 - behind);
-                var path = new List<int> { state.CellId };
-                for (int i = 0; i <= stop; i++) if (path[^1] != cells[i]) path.Add(cells[i]);
-                behind++;
-                if (path.Count < 2) continue;
-                state.CellId = path[^1];
+                if (state.IsInFight || state.MapId != map) continue;
+                int target = NearestFree(end, walkable, taken);
+                taken.Add(target);
+                if (target == state.CellId) continue;
+                var path = Jondo.Unity.World.Maps.MapGeometry.FindShortestPath(state.CellId, target, walkable);
+                if (path.Count < 2) path = new List<int> { state.CellId, target };
+                state.CellId = target;
                 state.Orientation = master.State.Orientation;
                 try { await master.Map.SendAsync(new GameMapMovementEvent(path, hero.CharacterId, false, Pace: 0)); }
                 catch (Exception ex) { Program.LogDebug($"[Heroes] {hero.CharacterId} could not follow: {ex.Message}"); }
             }
+        }
+
+        /// <summary>The walkable cell nearest a cell, past it and not taken; the cell itself when none is.</summary>
+        private static int NearestFree(int cell, HashSet<int> walkable, HashSet<int> taken)
+        {
+            int best = cell, bestDistance = int.MaxValue;
+            foreach (int candidate in walkable)
+            {
+                if (taken.Contains(candidate)) continue;
+                int distance = Jondo.Unity.World.Maps.MapGeometry.Distance(cell, candidate);
+                if (distance < 1 || distance >= bestDistance) continue;
+                best = candidate;
+                bestDistance = distance;
+            }
+            return best;
         }
 
         /// <summary>A hero's actor drawn on his map for everybody on it, his master too (jsn).</summary>
@@ -109,22 +129,16 @@ namespace Jondo.Unity.Server.Network
             catch (Exception ex) { Program.LogDebug($"[Heroes] {hero.CharacterId} could not be drawn: {ex.Message}"); }
         }
 
-        /// <summary>
-        /// A walkable cell next to the master's, one no other hero of his stands on; his own when
-        /// none is free. The cells around a cell are ±14, ±1 and ±28 away on the map's grid.
-        /// </summary>
+        /// <summary>The walkable cell nearest the master's that neither he nor another hero of his stands on.</summary>
         private static int BesideOf(GameSession master, long heroId)
         {
             int cell = master.State.CellId;
-            if (!MapManager.WalkableCells.TryGetValue(master.State.MapId, out var walkable)) return cell;
+            if (!MapManager.WalkableCells.TryGetValue(master.State.MapId, out var cellsOfMap)) return cell;
+            var walkable = new HashSet<int>(cellsOfMap);
             var taken = Heroes.Of(master.CharacterId).Where(h => h.CharacterId != heroId && h.Session.State.MapId == master.State.MapId)
                               .Select(h => h.Session.State.CellId).ToHashSet();
-            foreach (int step in new[] { 14, -14, 1, -1, 15, -15, 13, -13, 28, -28 })
-            {
-                int next = cell + step;
-                if (walkable.Contains(next) && !taken.Contains(next)) return next;
-            }
-            return cell;
+            taken.Add(cell);
+            return NearestFree(cell, walkable, taken);
         }
     }
 }
