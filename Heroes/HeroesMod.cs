@@ -174,6 +174,14 @@ namespace Heroes
                               "Prendre la main sur ce personnage (Tab : le suivant)"),
             ["hint.fold"] = L("Plegar / desplegar el grupo", "Fold / unfold the group", "Replier / déplier le groupe"),
             ["hint.window"] = L("Modo Héroe (Ctrl + Tab)", "Hero mode (Ctrl + Tab)", "Mode Héros (Ctrl + Tab)"),
+            ["card.class"] = L("Clase", "Class", "Classe"),
+            ["card.level"] = L("Nivel", "Level", "Niveau"),
+            ["card.prospecting"] = L("Prospección", "Prospecting", "Prospection"),
+            ["card.life"] = L("PV", "HP", "PV"),
+            ["card.initiative"] = L("Iniciativa", "Initiative", "Initiative"),
+            ["card.ap"] = L("PA", "AP", "PA"),
+            ["card.mp"] = L("PM", "MP", "PM"),
+            ["card.wisdom"] = L("Sabiduría", "Wisdom", "Sagesse"),
             ["hint.bag"] = L("Inventario", "Inventory", "Inventaire"),
             ["hint.stats"] = L("Características", "Characteristics", "Caractéristiques"),
             ["hint.spells"] = L("Hechizos", "Spells", "Sorts"),
@@ -204,9 +212,6 @@ namespace Heroes
                                       "Neutre {0}% · Terre {1}% · Feu {2}% · Eau {3}% · Air {4}%"),
             ["stat.points"] = L("Puntos por repartir", "Points to spend", "Points à répartir"),
             ["stat.kamas"] = L("Kamas", "Kamas", "Kamas"),
-            ["card"] = L("{0}\n{1} · nivel {2}\nVida {3} / {4}\nPA {5} · PM {6}\nIniciativa {7}\nProspección {8}\nSabiduría {9}",
-                         "{0}\n{1} · level {2}\nLife {3} / {4}\nAP {5} · MP {6}\nInitiative {7}\nProspecting {8}\nWisdom {9}",
-                         "{0}\n{1} · niveau {2}\nVie {3} / {4}\nPA {5} · PM {6}\nInitiative {7}\nProspection {8}\nSagesse {9}"),
         };
 
         private static string T(string key, params object[] values)
@@ -1064,9 +1069,79 @@ namespace Heroes
                 _panel.Add(_members);
                 KeepEvents(_panel);
                 layer.Add(_panel);
+                Draggable(bar, layer);
+                PanelPrefs();
+                if (_panelX.Value >= 0f && _panelY.Value >= 0f) PlacePanel(layer, _panelX.Value, _panelY.Value);
             }
             _members.Clear();
             foreach (var who in group) _members.Add(Member(who, lootTo));
+        }
+
+        // ─── Moving the group panel ──────────────────────────────────────────────────────
+
+        private static MelonPreferences_Entry<float> _panelX, _panelY;
+        private static bool _dragging;
+        private static UnityEngine.Vector2 _dragFrom, _panelFrom;
+        private static VisualElement _dragLayer;
+
+        /// <summary>Where the player left the panel, kept from one session to the next (UserData\MelonPreferences.cfg).</summary>
+        private static void PanelPrefs()
+        {
+            if (_panelX != null) return;
+            var category = MelonPreferences.CreateCategory("Heroes");
+            _panelX = category.CreateEntry("PanelX", -1f);
+            _panelY = category.CreateEntry("PanelY", -1f);
+        }
+
+        /// <summary>
+        /// The panel taken by its top bar -- the bar itself, between its buttons, which are their
+        /// own -- and carried with the pointer; the moves and the release are read on the layer,
+        /// so a quick pointer leaving the bar does not drop it.
+        /// </summary>
+        private static void Draggable(VisualElement bar, VisualElement layer)
+        {
+            bar.RegisterCallback<PointerDownEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerDownEvent>>(
+                new Action<PointerDownEvent>(e =>
+                {
+                    if (e.target == null || e.target.Pointer != bar.Pointer || _panel == null) return;
+                    _dragging = true;
+                    _dragFrom = new UnityEngine.Vector2(e.position.x, e.position.y);
+                    var at = _panel.worldBound;
+                    var origin = layer.worldBound;
+                    _panelFrom = new UnityEngine.Vector2(at.x - origin.x, at.y - origin.y);
+                })), TrickleDown.NoTrickleDown);
+            if (_dragLayer != null && _dragLayer.Pointer == layer.Pointer) return;
+            _dragLayer = layer;
+            layer.RegisterCallback<PointerMoveEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerMoveEvent>>(
+                new Action<PointerMoveEvent>(e =>
+                {
+                    if (!_dragging) return;
+                    PlacePanel(layer, _panelFrom.x + e.position.x - _dragFrom.x, _panelFrom.y + e.position.y - _dragFrom.y);
+                })), TrickleDown.TrickleDown);
+            layer.RegisterCallback<PointerUpEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerUpEvent>>(
+                new Action<PointerUpEvent>(_ =>
+                {
+                    if (!_dragging) return;
+                    _dragging = false;
+                    if (_panel == null) return;
+                    PanelPrefs();
+                    _panelX.Value = _panel.resolvedStyle.left;
+                    _panelY.Value = _panel.resolvedStyle.top;
+                    MelonPreferences.Save();
+                })), TrickleDown.TrickleDown);
+        }
+
+        /// <summary>The panel at a place on the layer, kept inside it.</summary>
+        private static void PlacePanel(VisualElement layer, float x, float y)
+        {
+            if (_panel == null) return;
+            float width = layer.resolvedStyle.width, height = layer.resolvedStyle.height;
+            float w = _panel.resolvedStyle.width, h = _panel.resolvedStyle.height;
+            if (!float.IsNaN(width) && !float.IsNaN(w)) x = Math.Clamp(x, 0f, Math.Max(0f, width - w));
+            if (!float.IsNaN(height)) y = Math.Clamp(y, 0f, Math.Max(0f, height - 30f));
+            _panel.style.right = new StyleLength(StyleKeyword.Auto);
+            _panel.style.left = new StyleLength(x);
+            _panel.style.top = new StyleLength(y);
         }
 
         private static VisualElement Member(JsonElement who, long lootTo)
@@ -1101,10 +1176,21 @@ namespace Heroes
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
             }
             if (master) picture.Add(Crown());
-            // On the portrait, what a group's tooltip says of a member.
-            string card = T("card", Str(who, "name"), ClassOf(Int(who, "breed")), Int(who, "level"), life, max,
-                            Int(who, "ap"), Int(who, "mp"), Int(who, "initiative"), Int(who, "prospecting"), Int(who, "wisdom"));
-            HintText(picture, () => card);
+            // On the portrait, what the game's party window says of a member, as it writes it: the
+            // name above, then a label and its value a line.
+            string title = Str(who, "name").ToUpperInvariant();
+            var lines = new List<(string, string)>
+            {
+                (T("card.class"), ClassOf(Int(who, "breed"))),
+                (T("card.level"), Int(who, "level").ToString()),
+                (T("card.prospecting"), Int(who, "prospecting").ToString()),
+                (T("card.life"), $"{life} / {max}"),
+                (T("card.initiative"), Int(who, "initiative").ToString()),
+                (T("card.ap"), Int(who, "ap").ToString()),
+                (T("card.mp"), Int(who, "mp").ToString()),
+                (T("card.wisdom"), Int(who, "wisdom").ToString()),
+            };
+            HintCard(picture, title, lines);
             row.Add(picture);
 
             var tools = new VisualElement();
@@ -1663,6 +1749,60 @@ namespace Heroes
                 _hint.style.top = new StyleLength(at.yMin);
                 _hint.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
                 _hint.BringToFront();
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// A member's card, as the game's party window writes it on its portraits: the name in
+        /// capitals, pale, then «label : value» a line, the value white and bold.
+        /// </summary>
+        private static void HintCard(VisualElement target, string title, List<(string Label, string Value)> lines)
+        {
+            try
+            {
+                target.RegisterCallback<PointerEnterEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerEnterEvent>>(
+                    new Action<PointerEnterEvent>(_ => ShowCard(target, title, lines))), TrickleDown.NoTrickleDown);
+                target.RegisterCallback<PointerLeaveEvent>(DelegateSupport.ConvertDelegate<EventCallback<PointerLeaveEvent>>(
+                    new Action<PointerLeaveEvent>(_ => HideHint())), TrickleDown.NoTrickleDown);
+            }
+            catch { }
+        }
+
+        private static void ShowCard(VisualElement target, string title, List<(string Label, string Value)> lines)
+        {
+            ShowHint(target, "");
+            try
+            {
+                if (_hint == null || _hint.panel == null) return;
+                _hint.Clear();
+                var pale = new UnityEngine.Color(0.66f, 0.68f, 0.78f, 1f);
+                var head = Label(title, 12f);
+                head.pickingMode = PickingMode.Ignore;
+                head.style.color = new StyleColor(pale);
+                head.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
+                head.style.marginBottom = new StyleLength(4f);
+                _hint.Add(head);
+                foreach (var (label, value) in lines)
+                {
+                    var row = new VisualElement();
+                    row.pickingMode = PickingMode.Ignore;
+                    row.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+                    row.style.marginBottom = new StyleLength(1f);
+                    var name = Label(label + " : ", 13f);
+                    name.pickingMode = PickingMode.Ignore;
+                    name.style.color = new StyleColor(pale);
+                    name.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
+                    name.style.marginBottom = new StyleLength(0f);
+                    var it = Label(value, 13f, true);
+                    it.pickingMode = PickingMode.Ignore;
+                    it.style.color = new StyleColor(UnityEngine.Color.white);
+                    it.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
+                    it.style.marginBottom = new StyleLength(0f);
+                    row.Add(name);
+                    row.Add(it);
+                    _hint.Add(row);
+                }
             }
             catch { }
         }
