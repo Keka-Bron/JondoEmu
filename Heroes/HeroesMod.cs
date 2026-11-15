@@ -1984,7 +1984,20 @@ namespace Heroes
                 if (live == null || !HasCharacter(live)) picture.style.backgroundImage = new StyleBackground(portrait);
                 picture.style.backgroundSize = new StyleBackgroundSize(new BackgroundSize(BackgroundSizeType.Contain));
             }
-            if (live != null) picture.Add(live);
+            if (live != null)
+            {
+                // The panel's picture is narrow: fitted to its width, the character came out tiny.
+                // A box as wide as it is high, centred, its sides cut off by the picture, and the
+                // client sizes him to the height.
+                picture.style.overflow = new StyleEnum<Overflow>(Overflow.Hidden);
+                live.style.position = new StyleEnum<Position>(Position.Absolute);
+                live.style.top = new StyleLength(0f);
+                live.style.height = new StyleLength(new Length(100f, LengthUnit.Percent));
+                live.style.width = new StyleLength(96f);
+                live.style.left = new StyleLength(new Length(50f, LengthUnit.Percent));
+                live.style.marginLeft = new StyleLength(-48f);
+                picture.Add(live);
+            }
             if (master) picture.Add(Crown());
             // On the portrait, what the game's party window says of a member, as it writes it: the
             // name above, then a label and its value a line.
