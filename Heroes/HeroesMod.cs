@@ -554,33 +554,18 @@ namespace Heroes
                     }
                 }
 
-                var native = new Il2CppSystem.Object(_displayers.Pointer).GetIl2CppType();
-                Type managed = null;
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                // The services hold one another: from the displaying one, through what each holds,
+                // to one that is the entities' service.
+                var path = FindEntities(_displayers.Pointer, out int visited);
+                if (_entities != null)
                 {
-                    managed = assembly.GetType("Il2Cpp." + native.Name) ?? assembly.GetType(native.FullName);
-                    if (managed != null) break;
-                }
-                var found = new List<string>();
-                if (managed != null)
-                {
-                    object real = Activator.CreateInstance(managed, _displayers.Pointer);
-                    foreach (var property in managed.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
-                    {
-                        found.Add(property.PropertyType.Name);
-                        if (property.PropertyType != typeof(Il2Cpp.feu)) continue;
-                        if (property.GetValue(real) is Il2Cpp.feu entities)
-                        {
-                            Borrowed(entities, null, null, null, null, $"the displaying service's {managed.Name}.{property.Name}");
-                            return;
-                        }
-                    }
+                    MelonLogger.Msg($"[Heroes] The entities' service found through {path} ({visited} object(s) looked at).");
+                    return;
                 }
                 if (!_toldDisplayers)
                 {
                     _toldDisplayers = true;
-                    MelonLogger.Msg($"[Heroes] No entities' service yet: the displaying service is {native.FullName}" +
-                                    $"{(managed == null ? " (no managed type)" : "")}, holding {string.Join(",", found)}; " +
+                    MelonLogger.Msg($"[Heroes] No entities' service among {visited} object(s) the displaying service leads to; " +
                                     $"{kept?.Count ?? 0} displayer(s) kept.");
                 }
             }
@@ -588,6 +573,73 @@ namespace Heroes
             {
                 if (!_toldDisplayers) { _toldDisplayers = true; MelonLogger.Warning($"[Heroes] The displayers looked into in vain: {ex.Message}"); }
             }
+        }
+
+        private static readonly Dictionary<string, Type> _managedTypes = new Dictionary<string, Type>();
+
+        /// <summary>The interop type of a native class, by its name: null when there is none.</summary>
+        private static Type ManagedOf(Il2CppSystem.Type native)
+        {
+            string name = native.FullName ?? native.Name;
+            if (_managedTypes.TryGetValue(name, out var known)) return known;
+            Type managed = null;
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (!assembly.GetName().Name.StartsWith("Il2Cpp")) continue;
+                managed = assembly.GetType(native.Namespace?.Length > 0 ? "Il2Cpp" + native.FullName : "Il2Cpp." + native.Name)
+                          ?? assembly.GetType("Il2Cpp." + native.FullName) ?? assembly.GetType(native.FullName);
+                if (managed != null) break;
+            }
+            _managedTypes[name] = managed;
+            return managed;
+        }
+
+        /// <summary>
+        /// Breadth first through what the services hold -- their fields, as the interop shows them
+        /// --, four steps at most, a few hundred objects, each once: the first that is the entities'
+        /// service is borrowed. The path to it, for the log.
+        /// </summary>
+        private static string FindEntities(IntPtr start, out int visited)
+        {
+            visited = 0;
+            var wanted = Il2CppType.Of<Il2Cpp.feu>();
+            var seen = new HashSet<IntPtr> { start };
+            var queue = new Queue<(IntPtr At, string Path, int Depth)>();
+            queue.Enqueue((start, "fep", 0));
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+            while (queue.Count > 0 && visited < 400)
+            {
+                var (at, path, depth) = queue.Dequeue();
+                visited++;
+                Il2CppSystem.Type native;
+                try { native = new Il2CppSystem.Object(at).GetIl2CppType(); }
+                catch { continue; }
+                if (wanted.IsAssignableFrom(native))
+                {
+                    Borrowed(new Il2Cpp.feu(at), null, null, null, null, path);
+                    return path + " (" + native.Name + ")";
+                }
+                if (depth >= 4) continue;
+                var managed = ManagedOf(native);
+                if (managed == null) continue;
+                object real;
+                try { real = Activator.CreateInstance(managed, at); }
+                catch { continue; }
+                foreach (var property in managed.GetProperties(flags))
+                {
+                    var type = property.PropertyType;
+                    if (!typeof(Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase).IsAssignableFrom(type)) continue;
+                    if (property.GetIndexParameters().Length > 0 || type.Namespace?.StartsWith("Il2CppSystem") == true) continue;
+                    try
+                    {
+                        if (property.GetValue(real) is Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase held
+                            && held.Pointer != IntPtr.Zero && seen.Add(held.Pointer))
+                            queue.Enqueue((held.Pointer, path + "." + property.Name, depth + 1));
+                    }
+                    catch { }
+                }
+            }
+            return null;
         }
 
         /// <summary>Harmony's postfix on EntityPortrait.InitEntityPortrait: the services as the client hands them.</summary>
@@ -716,7 +768,8 @@ namespace Heroes
         /// </summary>
         private static VisualElement LivePortrait(string place, long id, string look, bool seated)
         {
-            if (_liveBroken || _displayers == null || string.IsNullOrEmpty(look)) return null;
+            // Both services or none: without the entities' one the client's displayer refuses (Init).
+            if (_liveBroken || _displayers == null || _entities == null || string.IsNullOrEmpty(look)) return null;
             string where = place + ":" + id, key = look + (seated ? "|seated" : "|standing");
             if (_live.TryGetValue(where, out var known))
             {
