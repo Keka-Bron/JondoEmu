@@ -178,8 +178,6 @@ namespace Heroes
             ["card.prospecting"] = L("Prospección", "Prospecting", "Prospection"),
             ["card.life"] = L("PV", "HP", "PV"),
             ["card.initiative"] = L("Iniciativa", "Initiative", "Initiative"),
-            ["card.ap"] = L("PA", "AP", "PA"),
-            ["card.mp"] = L("PM", "MP", "PM"),
             ["card.wisdom"] = L("Sabiduría", "Wisdom", "Sagesse"),
             ["hint.bag"] = L("Inventario", "Inventory", "Inventaire"),
             ["hint.stats"] = L("Características", "Characteristics", "Caractéristiques"),
@@ -1185,8 +1183,6 @@ namespace Heroes
                 (T("card.prospecting"), Int(who, "prospecting").ToString()),
                 (T("card.life"), $"{life} / {max}"),
                 (T("card.initiative"), Int(who, "initiative").ToString()),
-                (T("card.ap"), Int(who, "ap").ToString()),
-                (T("card.mp"), Int(who, "mp").ToString()),
                 (T("card.wisdom"), Int(who, "wisdom").ToString()),
             };
             HintCard(picture, title, lines);
@@ -1739,6 +1735,7 @@ namespace Heroes
                 var at = target.worldBound;
                 float width = layer.resolvedStyle.width;
                 _hint.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
+                _hint.style.alignItems = new StyleEnum<Align>(Align.FlexStart);
                 _hint.style.left = new StyleLength(StyleKeyword.Auto);
                 _hint.style.bottom = new StyleLength(StyleKeyword.Auto);
                 _hint.style.translate = new StyleTranslate(StyleKeyword.Null);
@@ -1779,6 +1776,8 @@ namespace Heroes
                 head.style.color = new StyleColor(pale);
                 head.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
                 head.style.marginBottom = new StyleLength(4f);
+                head.style.alignSelf = new StyleEnum<Align>(Align.FlexStart);
+                head.style.unityTextAlign = new StyleEnum<UnityEngine.TextAnchor>(UnityEngine.TextAnchor.MiddleLeft);
                 _hint.Add(head);
                 foreach (var (label, value) in lines)
                 {
@@ -1786,7 +1785,8 @@ namespace Heroes
                     row.pickingMode = PickingMode.Ignore;
                     row.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
                     row.style.marginBottom = new StyleLength(1f);
-                    var name = Label(label + " : ", 13f);
+                    // A space that does not break: a label's last plain space is trimmed off.
+                    var name = Label(label + " : ", 13f);
                     name.pickingMode = PickingMode.Ignore;
                     name.style.color = new StyleColor(pale);
                     name.style.whiteSpace = new StyleEnum<WhiteSpace>(WhiteSpace.NoWrap);
