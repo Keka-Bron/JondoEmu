@@ -4851,6 +4851,39 @@ namespace Jondo.Unity.Server.Handlers
                && Managers.PlayerSpells.Contains(glifo.HechizoQueLoPuso);
 
         /// <summary>
+        /// A monster's turn glyph whose spell draws the glyph's own shape again, every row of it:
+        /// that shape is the glyph's, not a blast round whoever stands on it, and it takes the one
+        /// it caught alone, as a class one does. The Blops' Blifo lays a cross of five cells that
+        /// casts 7176, a cross too: aimed at a Blop ending its turn on one arm, the cross burnt the
+        /// player next to it, off the glyph. Dofus pour les noobs (Clos des Blops): «Si un
+        /// personnage termine son tour dedans, il subit 60 de dégâts». 92 of the 97 monster turn
+        /// glyphs draw their own shape or a single cell; the five that draw something else (a
+        /// ring, a wider square) keep their zone round the one caught.
+        /// </summary>
+        internal static bool EsGlifoDeTurnoConSuForma(Jondo.Unity.World.Fights.Glifo glifo)
+        {
+            if ((glifo.Tipo != 401 && glifo.Tipo != 402) || Managers.BombWalls.IsWall(glifo)
+                || glifo.ZoneShape == 'P') return false;
+            var filas = Managers.SpellEffects.De(glifo.Hechizo, glifo.Grado)
+                .Where(e => e.Disparadores().All(d => string.Equals(d, Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+            return filas.Count > 0
+                   && filas.All(e => e.Forma == glifo.ZoneShape && e.Tamano == glifo.ZoneSize && e.TamanoMinimo == 0);
+        }
+
+        /// <summary>The turn-end glyphs (402) under whoever ends his turn, each one that catches him.</summary>
+        internal static async Task TurnEndGlyphsAsync(NetworkStream stream, FightInstance fight, Fighter ending)
+        {
+            if (!ending.IsAlive) return;
+            foreach (var glifo in fight.LosQueAcaban(ending.CellId))
+            {
+                if (!GlyphCatches(fight, glifo, ending, false)) continue;
+                await FireOneGlyphAsync(stream, fight, glifo, ending, alPisar: false);
+                if (!ending.IsAlive) break;
+            }
+        }
+
+        /// <summary>
         /// Fires ONE glyph on ONE fighter: tells the client, hits, and applies the rest.
         /// </summary>
         /// <remarks>
@@ -4892,7 +4925,7 @@ namespace Jondo.Unity.Server.Handlers
             // written down here, and only a displacement ever reads it.
             if (Managers.BombWalls.IsWall(glifo)) fight.WallHitThisTurn.Add(quien.Id);
 
-            Program.LogDebug($"[Fight] {quien.Id} {(alPisar ? "steps on" : "starts the turn on")} " +
+            Program.LogDebug($"[Fight] {quien.Id} {(alPisar ? "steps on" : glifo.Cuando == Jondo.Unity.World.Fights.Disparo.AlAcabarElTurno ? "ends the turn on" : "starts the turn on")} " +
                              $"glyph {glifo.Id} of {glifo.Dueno}: casts spell " +
                              $"{glifo.Hechizo} grade {glifo.Grado}.");
 
@@ -4934,7 +4967,7 @@ namespace Jondo.Unity.Server.Handlers
                 // Inestabilidad's capture the enemy starting his turn on it goes back alone (frames
                 // 354-355) and no 3620 reaches the Xelor, whose own trigger of it sends him back and
                 // puts the 3620 that keeps it from going off again (frames 101-122).
-                bool soloElQueCae = EsGlifoDeTurnoDeClase(glifo);
+                bool soloElQueCae = EsGlifoDeTurnoDeClase(glifo) || EsGlifoDeTurnoConSuForma(glifo);
                 // Set off by its owner (Trashumancia, Posicion Defensiva), a glyph that hurts goes off
                 // over its ground: "danos inmediatos a todos los enemigos en su interior". Cast on the
                 // Feca alone it hurt the Feca, and nobody inside. A glyph that only moves (the
@@ -4943,6 +4976,10 @@ namespace Jondo.Unity.Server.Handlers
                     && Managers.SpellEffects.De(glifo.Hechizo, glifo.Grado).Any(e => Managers.EffectEngine.EsDeDano(e.EffectId)))
                     soloElQueCae = false;
                 if (soloElQueCae && quien != dueno) tirada = tirada.Where(f => !EsDelLanzador(f)).ToList();
+                // And a monster's takes him only through the rows whose mask names him: a Blop that
+                // ends his turn on his fellow's Blifo is no enemy of it, and does not burn.
+                if (soloElQueCae && !EsGlifoDeTurnoDeClase(glifo))
+                    tirada = tirada.Where(f => Managers.EffectEngine.LeNombra(fight, dueno, quien, f)).ToList();
 
                 await HurtAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, quien,
                                 celdaApuntada: celda, tirada: tirada, soloAlObjetivo: soloElQueCae);
@@ -12074,15 +12111,7 @@ namespace Jondo.Unity.Server.Handlers
             await EngancheAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
 
             // And the turn-end glyphs under him (402).
-            if (ending.IsAlive)
-            {
-                foreach (var glifo in fight.LosQueAcaban(ending.CellId))
-                {
-                    if (!GlyphCatches(fight, glifo, ending, false)) continue;
-                    await FireOneGlyphAsync(stream, fight, glifo, ending, alPisar: false);
-                    if (!ending.IsAlive) break;
-                }
-            }
+            await TurnEndGlyphsAsync(stream, fight, ending);
 
             // A turn-end effect can be the one that empties a side -- a poison, a Tymobot that
             // was the last of its team -- and then there is no next turn to hand out.

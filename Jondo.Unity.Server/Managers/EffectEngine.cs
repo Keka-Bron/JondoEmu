@@ -2562,6 +2562,14 @@ namespace Jondo.Unity.Server.Managers
                             Sobre = portador, Caster = caster, Efecto = efecto,
                             HechizoOrigen = spell, NivelOrigen = grade,
                             EnganchePendiente = true, FilaArmada = true,
+                            // A row with no duration that waits on a turn of someone else lives to
+                            // that turn, as a class spell's does: the Blopiseta's Bloproyección, cast
+                            // as the last of the round, burns "por cada PM utilizado" at the end of
+                            // the player's next turn. Armed to the next round alone, it was gone by
+                            // the time he ended it, and nobody ever paid for a step.
+                            HookUntil = efecto.Duration == 0 && portador != caster && WaitsOnATurn(efecto)
+                                ? UntilTheirNextTurn(combat, portador, round)
+                                : null,
                         });
                     }
                     if (!leToca) continue;
@@ -3369,6 +3377,13 @@ namespace Jondo.Unity.Server.Managers
         ///
         /// A letter this engine does not read is let through, never fallen back on the target.
         /// </summary>
+        /// <summary>
+        /// Whether a row of <paramref name="quienLanza"/>'s, aimed at <paramref name="quien"/>'s own
+        /// cell, names him -- his side, his kind, his states, as the mask reads them.
+        /// </summary>
+        internal static bool LeNombra(FightInstance combate, Fighter quienLanza, Fighter quien, SpellEffect efecto)
+            => AQuien(combate, quienLanza, quien, efecto, quien.CellId).Contains(quien);
+
         private static IEnumerable<Fighter> AQuien(FightInstance combate, Fighter quienLanza,
                                                    Fighter objetivo, SpellEffect efecto,
                                                    int celdaApuntada = -1,
