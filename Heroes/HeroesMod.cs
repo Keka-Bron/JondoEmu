@@ -447,6 +447,12 @@ namespace Heroes
             }
             if (!Bool(list, "on")) { _grid.Add(Label(T("off"))); return; }
 
+            // Drawn again only when something in it changed: taken off and put back, the client's
+            // displayers stop moving.
+            string key = list.GetRawText() + "|" + _portraits.Count + "|" + (_entities != null);
+            if (key == _windowKey && _grid.childCount > 0) return;
+            _windowKey = key;
+
             int max = Int(list, "max");
             bool roomLeft = Int(list, "connected") < 1 + max;
             bool masterFighting = Bool(list, "inFight");
@@ -576,6 +582,9 @@ namespace Heroes
                 if (!_toldDisplayers) { _toldDisplayers = true; MelonLogger.Warning($"[Heroes] The displayers looked into in vain: {ex.Message}"); }
             }
         }
+
+        /// <summary>What the window's cards were last drawn from (Render).</summary>
+        private static string _windowKey;
 
         private static readonly Dictionary<string, Type> _managedTypes = new Dictionary<string, Type>();
 
@@ -833,9 +842,14 @@ namespace Heroes
                 try { displayer.Init(_displayers, _entities); }
                 catch (Exception ex) { MelonLogger.Warning($"[Heroes] EntityDisplayer.Init refused, its look given all the same: {ex.Message}"); }
                 displayer.autosize = true;
-                Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
+                // Put back in a window drawn again, it is given its turn again: taken off, the
+                // displaying service had stopped moving it.
+                displayer.RegisterCallback<AttachToPanelEvent>(DelegateSupport.ConvertDelegate<EventCallback<AttachToPanelEvent>>(
+                    new Action<AttachToPanelEvent>(_ => Revive(displayer))), TrickleDown.NoTrickleDown);
+                if (!seated || !Seat(displayer, id, entityLook))
+                    Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
                 _live[where] = (key, displayer);
-                Told($"displayer {id} (entities {(_entities != null ? "yes" : "no")})");
+                Told($"displayer {id} {(seated && !_seatFailed ? "seated" : "standing")}");
                 return displayer;
             }
             catch (Exception ex)
@@ -845,6 +859,53 @@ namespace Heroes
                 return null;
             }
         }
+
+        private static bool _seatFailed;
+
+        /// <summary>
+        /// A character made seated: the displayer's own GenerateEntity with the seated animation,
+        /// looping, facing the viewer. False when it refuses: he is given his look standing instead.
+        /// </summary>
+        private static bool Seat(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer displayer, long id,
+                                 Il2CppCore.Rendering.Look.EntityLook look)
+        {
+            if (_seatFailed) return false;
+            try
+            {
+                displayer.Init(_displayers, _entities);
+                var animation = new Il2CppCore.Rendering.Entity.Animations.EntityAnimation(
+                    Seated, (Il2Cpp.rc)1, true, false, true, false, default(Il2Cpp.yb),
+                    default(Il2CppCore.Rendering.Entity.Animations.EntityAnimationPlaybackModeValue), false, false,
+                    new Il2CppSystem.Nullable<float>());
+                displayer.GenerateEntity(id, look, animation, false, (Il2Cpp.rc)1, Seated, false, false, false);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _seatFailed = true;
+                MelonLogger.Warning($"[Heroes] The seated pose refused, standing instead: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>A displayer put back on screen: in the displaying service's keeping again, moving.</summary>
+        private static void Revive(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer displayer)
+        {
+            try
+            {
+                _displayers?.bdvx(displayer.Cast<Il2CppCore.UILogic.EntityDisplay.IEntityDisplayer>());
+                displayer.SetPause(false);
+                displayer.ForceRefresh();
+            }
+            catch (Exception ex)
+            {
+                if (_toldRevive) return;
+                _toldRevive = true;
+                MelonLogger.Warning($"[Heroes] A displayer could not be given its turn again: {ex.Message}");
+            }
+        }
+
+        private static bool _toldRevive;
 
         /// <summary>Whether a live portrait has its character made, and draws him.</summary>
         private static bool HasCharacter(VisualElement view)
@@ -920,6 +981,7 @@ namespace Heroes
 
         private static void StartCreation()
         {
+            _windowKey = null;
             _creating = true;
             _creationBuilt = false;
             _newName = "";
@@ -930,6 +992,7 @@ namespace Heroes
 
         private static void StopCreation()
         {
+            _windowKey = null;
             _creating = false;
             _creationBuilt = false;
             _creationBusy = false;
