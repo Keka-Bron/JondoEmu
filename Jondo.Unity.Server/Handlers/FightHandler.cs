@@ -2519,6 +2519,34 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Makes a character fighter -- a JondoBot for now -- one <paramref name="by"/> plays by
+        /// hand from his client, as a hero would be: his class bar and his turns go there
+        /// (<see cref="PlayedAllyBar"/>), and his casts are his class's spells at their grades.
+        /// </summary>
+        internal static void PlayAsHero(Fighter fighter, long by)
+        {
+            fighter.DrivenBy = by;
+            fighter.IsPlayedAlly = true;
+            fighter.HechizosDeInvocado = fighter.SpellIds
+                .Select(spell => (spell, Math.Max(1, fighter.SpellGrades.TryGetValue(spell, out int grade) ? grade : 1)))
+                .ToList();
+        }
+
+        /// <summary>
+        /// The bar of an ally <paramref name="me"/> plays (jyy). A monster's -- Barnabé's -- is a
+        /// summon's. A character's -- a hero's -- is a character's, his class's spells and the
+        /// weapon on slot 0, with <paramref name="me"/> as who plays him in f4.
+        /// </summary>
+        private static byte[] PlayedAllyBar(Fighter played, long me)
+        {
+            if (!played.IsCharacter)
+                return Network.FightProtocol.BuildSummonSpellBar(played.Id, me, played.HechizosDeInvocado);
+            var bar = new List<(int Slot, int Spell)> { (0, Network.FightProtocol.HechizoCuerpoACuerpo) };
+            for (int i = 0; i < played.HechizosDeInvocado.Count; i++) bar.Add((i + 1, played.HechizosDeInvocado[i].Spell));
+            return Network.FightProtocol.BuildSpellBar(played.Id, played.HechizosDeInvocado, bar, conArma: true, controllerId: me);
+        }
+
+        /// <summary>
         /// Whose end-of-fight numbers a fighter's deeds go to: his own when he is a person,
         /// his summoner's when he is that person's summon, nobody's for a monster.
         /// </summary>
@@ -2982,7 +3010,8 @@ namespace Jondo.Unity.Server.Handlers
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                     Network.FightProtocol.BuildCooldowns(summon.Id, RecargasDe(summon))));
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
-                    Network.FightProtocol.BuildSummonSpellBar(summon.Id, me, summon.HechizosDeInvocado)));
+                    summon.IsPlayedAlly ? PlayedAllyBar(summon, me)
+                                        : Network.FightProtocol.BuildSummonSpellBar(summon.Id, me, summon.HechizosDeInvocado)));
             }
 
             var spots = new List<(int Cell, int Orientation, long Fighter)>();
@@ -3346,8 +3375,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
                     Network.FightProtocol.BuildCooldowns(played.Id, RecargasDe(played))));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
-                    Network.FightProtocol.BuildSummonSpellBar(played.Id, me, played.HechizosDeInvocado)));
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy, PlayedAllyBar(played, me)));
             }
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
@@ -4017,8 +4045,9 @@ namespace Jondo.Unity.Server.Handlers
                 // To his own client alone. Sent to everybody, every other person in a fight of
                 // several -- a koliseo, a duel, a group against monsters -- and every spectator
                 // got "you can play now" on somebody else's turn, its "pass your turn" button
-                // with it. A JondoBot has no client.
-                var his = fighter.IsBot ? null : SessionRegistry.FindByCharacter(fighter.Id);
+                // with it. A JondoBot has no client; one somebody plays -- a hero -- goes to his.
+                var his = fighter.IsPlayedAlly ? owner
+                        : fighter.IsBot ? null : SessionRegistry.FindByCharacter(fighter.Id);
                 if (his != null)
                     await his.SendAsync(ConnectionProtocol.Push(Op.Jyj, Network.FightProtocol.BuildYourTurn()));
             }

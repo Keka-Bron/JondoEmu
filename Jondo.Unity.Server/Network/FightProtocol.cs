@@ -2604,12 +2604,16 @@ namespace Jondo.Unity.Server.Network
         ///   f6 (repeated) { f1: the grade, f3: the spell, f4: 1 }
         ///
         /// f3 and f4 carry the same fighter in the captures; what separates them is not known,
-        /// because they have never been seen different.
+        /// because they have never been seen different. A summon's bar carries its owner in f4
+        /// (<see cref="BuildSummonSpellBar"/>), so f4 is read as who plays it: a character
+        /// played by another one -- a hero -- goes with his player there.
         /// </summary>
+        /// <param name="controllerId">Who plays him, when it is not himself; null for his own bar.</param>
         public static byte[] BuildSpellBar(long fighterId, IEnumerable<(int Spell, int Grade)> spells,
-                                           IEnumerable<(int Slot, int Spell)> bar, bool conArma = true)
+                                           IEnumerable<(int Slot, int Spell)> bar, bool conArma = true,
+                                           long? controllerId = null)
         {
-            var jyy = Pb.New().Var(3, fighterId).Var(4, fighterId);
+            var jyy = Pb.New().Var(3, fighterId).Var(4, controllerId ?? fighterId);
 
             // Melee goes first in the list, with the number omitted —it is spell
             // ZERO, "Puñetazo", which is in the base as SpellTemplates.Id 0— and the origin at 2.
