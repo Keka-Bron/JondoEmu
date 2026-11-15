@@ -1181,9 +1181,13 @@ namespace Heroes
                 });
                 if (_services == null) { _nativeBroken = true; return false; }
                 HookNative();
-                // A creation from nothing: no field asked or kept, no character to change.
-                var start = new Il2Cpp.cgk(new Il2CppSystem.Collections.Generic.List<Il2Cpp.dsj>(),
-                                           new Il2CppSystem.Collections.Generic.List<Il2Cpp.dsj>(), null, false, false);
+                // A creation from nothing has no start message: one, even empty, opened the screen
+                // as a character's modification («ces changements sont définitifs»). The other
+                // ways kept to try with the game running (HeroesTuning.cfg's creationMode: 1 to 4).
+                int mode = (int)Tune("creationMode", 0f);
+                var start = mode == 0 ? null : new Il2Cpp.cgk(new Il2CppSystem.Collections.Generic.List<Il2Cpp.dsj>(),
+                    new Il2CppSystem.Collections.Generic.List<Il2Cpp.dsj>(), null, mode == 2 || mode == 4, mode == 3 || mode == 4);
+                MelonLogger.Msg($"[Heroes] The game's own creation screen, start message {(mode == 0 ? "none" : "mode " + mode)}.");
                 _native = new Il2CppCore.UILogic.Auth.CharacterCreation(tree,
                     (Il2Cpp.faa)_services[typeof(Il2Cpp.faa)], _entities, _displayers,
                     (Il2Cpp.fbz)_services[typeof(Il2Cpp.fbz)], (Il2Cpp.ewt)_services[typeof(Il2Cpp.ewt)],
@@ -1204,9 +1208,9 @@ namespace Heroes
             }
             catch (Exception ex)
             {
-                _nativeBroken = true;
+                // Not for good: another start message may do, tried at the next opening.
                 _native = null;
-                MelonLogger.Warning($"[Heroes] The game's own creation screen could not be made, bound by hand instead: {ex}");
+                MelonLogger.Warning($"[Heroes] The game's own creation screen could not be made, bound by hand instead: {ex.Message}");
                 return false;
             }
         }
