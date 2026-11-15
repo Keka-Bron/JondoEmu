@@ -52,7 +52,8 @@ public sealed class CharacteristicsMessagesTests
         Assert.Equal(new CharacterCharacteristicDetailed(41, 17, -3, 0, 23, 0), Detail(stats, 10));
         Assert.Equal(new CharacterCharacteristicDetailed(31, 19, 0, 0, 0, 0), Detail(stats, 11));
         Assert.Equal(new CharacterCharacteristicDetailed(820, 0, 0, 0, 0, 0), Detail(stats, 0));
-        Assert.Equal(new CharacterCharacteristicDetailed(1390, 0, 5, 0, 31, 0), Detail(stats, 40));
+        // The pods' base: the thousand, five a level since the first and five a point of strength.
+        Assert.Equal(new CharacterCharacteristicDetailed(1000 + 5 * (154 - 1) + 5 * (41 + 17 + 23 - 3), 0, 5, 0, 31, 0), Detail(stats, 40));
         Assert.Equal(new CharacterCharacteristicDetailed(208, 0, 50, 0, 0, 0), Detail(stats, 44));
         Assert.Equal(47, Detail(stats, 3).Base);
         foreach (int id in new[] { 27, 28, 82, 83 }) Assert.Equal(13, Detail(stats, id).Base);

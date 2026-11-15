@@ -41,6 +41,27 @@ namespace Jondo.Unity.Tests
         }
 
         /// <summary>
+        /// The characters' colours in their own columns, as the server leaves them when it starts
+        /// (DatabaseManager.Initialize): the zip's base -- the CI's -- still has the old Look
+        /// column, and every test that creates a character failed on «no column named Color1».
+        /// </summary>
+        [ModuleInitializer]
+        internal static void CharacterColorsMigrated()
+        {
+            try
+            {
+                if (!File.Exists(Paths.WorldDb)) return;
+                using var db = new SqliteConnection(Paths.WorldConnectionString);
+                db.Open();
+                Jondo.Unity.Server.Database.Migrations.CharacterColorsMigration.Apply(db);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Tests] world.db's character colours could not be migrated: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// No traffic log for the tests: every frame a handler writes went into logs/ as «S->C», and a
         /// test run is enough of them to rotate the real sessions out of the files
         /// TrafficLogAgainstTheRealFileTests reads.
