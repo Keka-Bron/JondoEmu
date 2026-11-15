@@ -83,7 +83,20 @@ namespace Jondo.Unity.Server.Network
                     Console.WriteLine($"[+] Client connected to Game Server ({client.Client.RemoteEndPoint})");
                     var clientStream = client.GetStream();
 
-                    byte[] firstPayload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(clientStream);
+                    // Counted against its address until it says who it is, and given a time to say
+                    // anything at all (ConnectionGuard).
+                    using var waiting = ConnectionGuard.Enter(client.Client);
+                    if (waiting == null)
+                    {
+                        Console.WriteLine($"[Game Server] Rejected {ConnectionGuard.AddressOf(client.Client)}: too many sockets with no ticket.");
+                        return;
+                    }
+                    bool spoke = false;
+                    ConnectionGuard.CloseUnless(client.Client, ConnectionGuard.FirstFrame, () => spoke, "no first frame");
+
+                    byte[] firstPayload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(
+                        clientStream, ConnectionGuard.UnauthenticatedFrame);
+                    spoke = true;
                     if (firstPayload == null) return;
 
                     LogTraffic("C->S", firstPayload, firstPayload.Length);
@@ -94,6 +107,8 @@ namespace Jondo.Unity.Server.Network
                         // Game phase. It starts with kqz (the ticket) and carries on with
                         // character selection and world entry over this same connection.
                         Console.WriteLine("[+] Detected Game Node protocol on port 5555!");
+                        // From here it is counted as a session with no ticket, not as a waiting socket.
+                        waiting.Dispose();
                         await HandleBoundGameSessionAsync(clientStream, firstPayload, firstPayloadStr);
                     }
                     else
@@ -141,14 +156,21 @@ namespace Jondo.Unity.Server.Network
             {
                 Quiet = Bots.SimulatedPlayers.IsBotSocket(stream.Socket?.RemoteEndPoint),
             };
-            if (!SessionRegistry.Register(session))
+            // Where he comes from, to be able to tell him the next time he logs in -- and before he
+            // is registered, so that the sessions with no ticket of his address can be counted.
+            session.State.ClientIp = RemoteIp(stream);
+            if (!ConnectionGuard.MayOpenSession(session.State.ClientIp))
             {
-                Console.WriteLine("[Game Server] Rejected game connection: the 8-client limit is reached.");
+                Console.WriteLine($"[Game Server] Rejected {session.State.ClientIp}: too many sessions with no ticket.");
                 return;
             }
-
-            // Where he comes from, to be able to tell him the next time he logs in.
-            session.State.ClientIp = RemoteIp(stream);
+            if (!SessionRegistry.Register(session))
+            {
+                Console.WriteLine($"[Game Server] Rejected game connection: the {Jondo.Unity.Launcher.Contract.ClientesEnTotal}-client limit is reached.");
+                return;
+            }
+            // A place in the registry is the server's capacity: it is not kept without a ticket.
+            ConnectionGuard.CloseUnless(stream.Socket, ConnectionGuard.Authentication, () => session.IsAuthenticated, "no ticket");
 
             Console.WriteLine($"[Game Server] Socket bound to session {session.Id}.");
 

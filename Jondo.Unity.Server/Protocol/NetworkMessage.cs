@@ -24,8 +24,16 @@ namespace Jondo.Protocol
         /// </summary>
         public const int MaxFrameLength = 8 * 1024 * 1024;
 
-        public static async Task<byte[]> ReadFrameAsync(Stream stream)
+        public static Task<byte[]> ReadFrameAsync(Stream stream) => ReadFrameAsync(stream, MaxFrameLength);
+
+        /// <summary>
+        /// The same with a lower ceiling: what a socket that has not said who it is may announce.
+        /// The array is made before a byte of the frame arrives, so the ceiling is what an idle
+        /// socket can make the server hold.
+        /// </summary>
+        public static async Task<byte[]> ReadFrameAsync(Stream stream, int maxLength)
         {
+            maxLength = Math.Min(maxLength, MaxFrameLength);
             // Read VarInt length
             int length = 0;
             int shift = 0;
@@ -47,7 +55,7 @@ namespace Jondo.Protocol
 
             // And what it asks for has to fit under the ceiling. The overflow of the or above can
             // leave length negative, so both sides are checked.
-            if (length < 0 || length > MaxFrameLength) return null;
+            if (length < 0 || length > MaxFrameLength || length > maxLength) return null;
 
             // Read payload
             byte[] payload = new byte[length];
