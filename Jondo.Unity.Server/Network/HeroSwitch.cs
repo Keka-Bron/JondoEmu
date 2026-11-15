@@ -104,6 +104,9 @@ namespace Jondo.Unity.Server.Network
             else
                 await session.SendAsync(ConnectionProtocol.Push(Op.Jsn,
                     ConnectionProtocol.BuildActorRefreshed(character, cell, facing, session.AccountId)));
+            // His look told as a change of gear tells it: an inventory left open kept drawing the
+            // one played before over the new one's bag.
+            await session.SendAsync(ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
 
             // The one played before back as a hero, where he was in the group's round: the others
             // are in it from the one after the hero taken (Heroes.HandOver). Taking the first hero
