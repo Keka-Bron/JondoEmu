@@ -555,6 +555,7 @@ namespace Heroes
                 MelonLogger.Warning($"[Heroes] InitEntityPortrait not watched: {ex.Message}");
             }
             var takeArgs = new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(OnScreenBuilt)));
+            int watched = 0;
             foreach (var screen in new[]
             {
                 typeof(Il2CppCore.UILogic.Connection.CharacterSelection),
@@ -567,10 +568,11 @@ namespace Heroes
                 foreach (var ctor in screen.GetConstructors())
                 {
                     if (ctor.GetParameters().Length < 2) continue;
-                    try { harmony.Patch(ctor, postfix: takeArgs); }
+                    try { harmony.Patch(ctor, postfix: takeArgs); watched++; }
                     catch (Exception ex) { MelonLogger.Warning($"[Heroes] {screen.Name} not watched: {ex.Message}"); }
                 }
             }
+            MelonLogger.Msg($"[Heroes] Watching {watched} screen constructor(s) and InitEntityPortrait for the portraits' services.");
         }
 
         /// <summary>Harmony's postfix on those screens' constructors: whichever of the services they were handed.</summary>
