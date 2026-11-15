@@ -379,40 +379,68 @@ namespace Heroes
                 // Its own framing kept: the giving sets one of its own, and he came out too big.
                 bool autosize = displayer.autosize;
                 float forced = displayer.forcedSize, ratio = displayer.ratioPositioning;
+                // Given a look by the mod already, its own forced size is the one kept then.
+                var known = _reframe.FirstOrDefault(r => r.Displayer.Pointer == displayer.Pointer);
+                if (known != null) forced = known.Forced;
+                IntPtr before = displayer.character != null ? displayer.character.Pointer : IntPtr.Zero;
                 Il2CppCore.UI.UIUtils.pcb(displayer, entityLook, (Il2Cpp.rc)1, 0, _displayers, _entities);
                 if (!_toldInventory)
                     MelonLogger.Msg($"[Heroes] Its framing before: autosize {autosize}, forced {forced}, ratio {ratio}; " +
                                     $"after the giving: autosize {displayer.autosize}, forced {displayer.forcedSize}, ratio {displayer.ratioPositioning}.");
-                _reframe.Add((displayer, autosize, forced, ratio, UnityEngine.Time.unscaledTime + 2f));
+                _reframe.RemoveAll(r => r.Displayer.Pointer == displayer.Pointer);
+                _reframe.Add(new Reframed { Displayer = displayer, Forced = forced, Before = before });
             }
             _toldInventory = true;
             Reframe();
         }
 
-        /// <summary>The game's displayers given a look by the mod, and the framing each had, put back for a while after.</summary>
-        private static readonly List<(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer Displayer, bool Autosize, float Forced, float Ratio, float Until)> _reframe
-            = new List<(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer, bool, float, float, float)>();
+        /// <summary>One of the game's displayers the mod gave a look: its own forced size, and the character the mod's giving made.</summary>
+        private sealed class Reframed
+        {
+            public Il2CppCore.UILogic.EntityDisplay.EntityDisplayer Displayer;
+            public float Forced;
+            public IntPtr Before, Ours;
+        }
 
-        /// <summary>Every scan and at once: the framing kept put back on each, until its time is out.</summary>
+        private static readonly List<Reframed> _reframe = new List<Reframed>();
+
+        /// <summary>
+        /// The mod's giving of a look draws a character some twice the size the game's own way
+        /// draws him at the same forced size -- which the bigger it is the smaller he is drawn --:
+        /// while the character shown is the mod's the forced size is that much bigger
+        /// (HeroesTuning.cfg's inventorySize), and the game's own back as soon as the game draws
+        /// its own again -- a change of gear --, so its own is never drawn small.
+        /// </summary>
         private static void Reframe()
         {
             for (int i = _reframe.Count - 1; i >= 0; i--)
             {
-                var (displayer, autosize, forced, ratio, until) = _reframe[i];
+                var one = _reframe[i];
                 try
                 {
-                    if (displayer.panel == null) { _reframe.RemoveAt(i); continue; }
-                    if (displayer.autosize != autosize || Math.Abs(displayer.forcedSize - forced) > 0.001f
-                        || Math.Abs(displayer.ratioPositioning - ratio) > 0.001f)
+                    var displayer = one.Displayer;
+                    if (displayer.panel == null) { displayer.forcedSize = one.Forced; _reframe.RemoveAt(i); continue; }
+                    var character = displayer.character;
+                    float wanted = one.Forced * Tune("inventorySize", 2f);
+                    if (one.Ours == IntPtr.Zero)
                     {
-                        displayer.autosize = autosize;
-                        displayer.forcedSize = forced;
-                        displayer.ratioPositioning = ratio;
+                        // The one shown before the giving is not the mod's: its own comes after.
+                        if (character != null && character.Pointer != one.Before) one.Ours = character.Pointer;
+                    }
+                    else if (character == null || character.Pointer != one.Ours)
+                    {
+                        displayer.forcedSize = one.Forced;
+                        displayer.ForceRefreshSize();
+                        _reframe.RemoveAt(i);
+                        continue;
+                    }
+                    if (Math.Abs(displayer.forcedSize - wanted) > 0.001f)
+                    {
+                        displayer.forcedSize = wanted;
                         displayer.ForceRefreshSize();
                     }
                 }
-                catch { _reframe.RemoveAt(i); continue; }
-                if (UnityEngine.Time.unscaledTime > until) _reframe.RemoveAt(i);
+                catch { _reframe.RemoveAt(i); }
             }
         }
 
