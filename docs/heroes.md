@@ -52,6 +52,19 @@ the other had, and his client is given the party again (`PartyHandler.SwitchedAs
 
 The game's own «follow the leader» cannot move a hero (no client to walk): `HeroPresence` does.
 
+## Making a hero
+
+As Auralis's mod does it (their capture, 2026-11-15: a name, a breed, a sex and six colours of -1
+sent; the character made, its id and the list again sent back; connected by a request of its own).
+The window's empty places, as many as the account has character slots left, each offer to make a
+hero: a class, a sex and a name -- the server draws one on asking --. `heroes/create` makes him by
+the creation screen's own rules (`CharacterCreationHandler.Make`: the name's rule, a name nobody
+has, a slot left), with his class's colours, and connects him as a hero at once when there is room.
+
+The slots per account are a setting (`ServerSettings.CharacterSlots`, 8 by default: a whole group
+of heroes with its master; the real server's is five); the server list announces them. It is set in
+`config\server_settings.json`: the settings window is full at its smallest size.
+
 ## The mod's keys
 
 Ctrl+Tab opens and closes the window. Tab alone takes the next of the group in hand, in the order

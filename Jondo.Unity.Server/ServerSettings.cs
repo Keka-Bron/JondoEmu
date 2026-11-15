@@ -120,6 +120,13 @@ namespace Jondo.Unity.Server
         /// <summary>How many heroes a character may have connected at once, himself not counted.</summary>
         public int HeroesMax { get; set; } = 7;
 
+        /// <summary>
+        /// How many characters an account may have per category of server: the server list's
+        /// «Clásico (5/8)». Eight by default, a whole group of heroes with its master; the real
+        /// server's is five. Not in the settings window, full at its smallest size: set in the file.
+        /// </summary>
+        public int CharacterSlots { get; set; } = 8;
+
         /// <summary>How many scrolled stats a player starts with.</summary>
         public int StartingScrollStats { get; set; } = Handlers.CharacterCreationHandler.ScrolledStat;
 

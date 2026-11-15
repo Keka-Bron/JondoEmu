@@ -161,12 +161,12 @@ namespace Jondo.Unity.Tests.Protocol
         }
 
         [Fact]
-        public void The_slot_table_is_seven_categories_of_five()
+        public void The_slot_table_is_seven_categories_of_the_slots_set()
         {
-            // Byte for byte what the real server sends, and the reason five is not a chosen number.
-            Assert.Equal(
-                new List<(int, int)> { (0, 5), (1, 5), (2, 5), (3, 5), (4, 5), (5, 5), (6, 5) },
-                SlotTable());
+            // The real server's shape -- seven categories, the same slots in each --; its five
+            // slots are ServerSettings.CharacterSlots here, eight by default for a hero group.
+            int slots = ConnectionService.MaxCharactersPerServer;
+            Assert.Equal(Enumerable.Range(0, 7).Select(category => (category, slots)).ToList(), SlotTable());
         }
 
         [Fact]
@@ -175,7 +175,7 @@ namespace Jondo.Unity.Tests.Protocol
             // The failure this guards against: advertising a category with no slots of its own.
             // It would leave the client to invent a budget, and inventing one is exactly the
             // symptom being chased.
-            Assert.Contains(SlotTable(), row => row.Type == 1 && row.Slots == 5);
+            Assert.Contains(SlotTable(), row => row.Type == 1 && row.Slots == ConnectionService.MaxCharactersPerServer);
         }
     }
 }

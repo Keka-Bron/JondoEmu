@@ -60,6 +60,8 @@ namespace Jondo.Unity.Server.Network
                 })
                 .OrderBy(c => c.master ? 0 : c.hero ? 1 : 2).ThenBy(c => c.order).ThenByDescending(c => c.level)
                 .ToList();
+            int taken = Handlers.CharacterCreationHandler.SlotsTaken(DatabaseManager.GetServers(),
+                                                                       DatabaseManager.GetCharactersByAccountId(account), me.ServerId);
             return Bien(new
             {
                 on = Heroes.On,
@@ -67,8 +69,36 @@ namespace Jondo.Unity.Server.Network
                 connected = 1 + heroes.Count,
                 inFight = me.State.IsInFight,
                 lootTo = Heroes.LootTo(masterId),
+                // How many more characters the account may make: the window's «create» on its free places.
+                slotsLeft = Math.Max(0, Connection.ConnectionService.MaxCharactersPerServer - taken),
                 characters,
             });
+        }
+
+        /// <summary>
+        /// A character made on the account from the window, as Auralis's mod does it -- a name, a
+        /// breed and a sex, the breed's colours --, and connected as a hero at once when there is
+        /// room. Why not, else: the creation's (CharacterCreationHandler.Make).
+        /// </summary>
+        private static Respuesta HeroesCreate(string cuerpo, long account)
+        {
+            var me = InTheWorld(account);
+            if (me == null) return Mal(409, "world");
+            string name = Texto(cuerpo, "name").Trim();
+            var (id, why) = Handlers.CharacterCreationHandler.Make(account, me.ServerId, name, (int)Numero(cuerpo, "breed"),
+                                                                    (int)Numero(cuerpo, "sex"), 0, Enumerable.Repeat(-1L, 6).ToList());
+            if (id == 0) return Mal(409, why);
+            string connected = Heroes.Connect(me, id);
+            Console.WriteLine($"[Heroes] {me.State.CharacterName} makes {name} ({id}) from the window; connected: {connected}.");
+            return Bien(new { id, connected = connected == "ok", why = connected });
+        }
+
+        /// <summary>A name for a new hero, as the creation screen's die draws one: one nobody has.</summary>
+        private static Respuesta HeroesName(long account)
+        {
+            string name = Handlers.CharacterCreationHandler.SuggestName();
+            for (int i = 0; i < 10 && DatabaseManager.CharacterNameTaken(name); i++) name = Handlers.CharacterCreationHandler.SuggestName();
+            return Bien(new { name });
         }
 
         /// <summary>A connected character's points and what a group's tooltip shows of him.</summary>

@@ -394,6 +394,57 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// A hero made from the window, as Auralis's mod makes one: by the creation screen's rules
+        /// -- a name that follows them, one nobody has, a slot left on the account --, with his
+        /// class's colours, and connected beside his master at once.
+        /// </summary>
+        [Fact]
+        public async Task A_hero_is_made_by_the_creation_rules_and_connected_at_once()
+        {
+            // An account of its own each run: the slots are counted on it.
+            long account = Account + 100_000 + Random.Shared.Next(1_000_000);
+            string letters = new string(Enumerable.Range(0, 7).Select(_ => (char)('a' + Random.Shared.Next(26))).ToArray());
+            long master = Character(account, "Padre-" + letters, 8);
+            await using var pipe = await ClientPipe.OpenAsync(account, master, Map, "Padre-" + letters);
+            using var reading = new System.Threading.CancellationTokenSource();
+            var drain = Task.Run(async () =>
+            {
+                var buffer = new byte[65536];
+                try { while (!reading.IsCancellationRequested && await pipe.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                catch { }
+            });
+            var colors = Enumerable.Repeat(-1L, 6).ToList();
+            try
+            {
+                Assert.Equal("name", CharacterCreationHandler.Make(account, 1, "no-capital" + letters, 5, 0, 0, colors).Why);
+                Assert.Equal("taken", CharacterCreationHandler.Make(account, 1, "Padre-" + letters, 5, 0, 0, colors).Why);
+                Assert.Equal("breed", CharacterCreationHandler.Make(account, 1, "Hijo-" + letters, 0, 0, 0, colors).Why);
+
+                var (id, why) = CharacterCreationHandler.Make(account, 1, "Hijo-" + letters, 5, 1, 0, colors);
+                Assert.Equal("", why);
+                var made = DatabaseManager.GetCharacterById(id);
+                Assert.NotNull(made);
+                Assert.Equal(5, made!.Breed);
+                Assert.Equal(1, made.Sex);
+                Assert.Equal(1, made.Level);
+
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, id));
+                Assert.Equal(new[] { id }, Heroes.Of(master).Select(h => h.CharacterId));
+
+                // The slots run out: ServerSettings.CharacterSlots, two made already.
+                for (int i = 0; i < Jondo.Unity.Server.Network.Connection.ConnectionService.MaxCharactersPerServer - 2; i++)
+                    Assert.Equal("", CharacterCreationHandler.Make(account, 1, $"Otro-{letters}-{(char)('a' + i)}", 1, 0, 0, colors).Why);
+                Assert.Equal("full", CharacterCreationHandler.Make(account, 1, "Ultimo-" + letters, 1, 0, 0, colors).Why);
+            }
+            finally
+            {
+                reading.Cancel();
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
         [Fact]
         public async Task A_hero_comes_into_his_masters_fight_as_his_to_play()
         {

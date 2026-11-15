@@ -150,6 +150,28 @@ namespace Heroes
             ["level"] = L("Niv. {0}", "Lvl. {0}", "Niv. {0}"),
             ["connected"] = L("{0} / {1} HÉROES CONECTADOS", "{0} / {1} HEROES CONNECTED", "{0} / {1} HÉROS CONNECTÉS"),
             ["connect"] = L("CONECTAR", "CONNECT", "CONNECTER"),
+            ["create"] = L("CREAR UN HÉROE", "CREATE A HERO", "CRÉER UN HÉROS"),
+            ["create.title"] = L("Nuevo héroe", "New hero", "Nouveau héros"),
+            ["create.class"] = L("CLASE", "CLASS", "CLASSE"),
+            ["create.sex"] = L("SEXO", "SEX", "SEXE"),
+            ["create.male"] = L("Masculino", "Male", "Masculin"),
+            ["create.female"] = L("Femenino", "Female", "Féminin"),
+            ["create.name"] = L("NOMBRE", "NAME", "NOM"),
+            ["create.namePlaceholder"] = L("Nombre del héroe", "The hero's name", "Nom du héros"),
+            ["create.random"] = L("AL AZAR", "RANDOM", "AU HASARD"),
+            ["create.cancel"] = L("CANCELAR", "CANCEL", "ANNULER"),
+            ["create.go"] = L("CREAR", "CREATE", "CRÉER"),
+            ["create.working"] = L("Creando…", "Creating…", "Création…"),
+            ["create.done"] = L("{0} se une al grupo.", "{0} joins the group.", "{0} rejoint le groupe."),
+            ["create.doneAlone"] = L("{0} ha sido creado.", "{0} has been created.", "{0} a été créé."),
+            ["create.error.empty"] = L("Escribe un nombre.", "Write a name.", "Écris un nom."),
+            ["create.error.name"] = L("Ese nombre no sigue las reglas: una mayúscula, letras, hasta dos guiones.",
+                                      "That name breaks the rules: a capital, letters, up to two hyphens.",
+                                      "Ce nom ne respecte pas les règles : une majuscule, des lettres, deux tirets au plus."),
+            ["create.error.taken"] = L("Ese nombre ya está cogido.", "That name is already taken.", "Ce nom est déjà pris."),
+            ["create.error.full"] = L("La cuenta no tiene más sitios de personaje.", "The account has no character slot left.",
+                                      "Le compte n'a plus de place de personnage."),
+            ["create.error.breed"] = L("Elige una clase.", "Choose a class.", "Choisis une classe."),
             ["disconnect"] = L("DESCONECTAR", "DISCONNECT", "DÉCONNECTER"),
             ["master"] = L("Tú", "You", "Vous"),
             ["busy"] = L("En juego en otro cliente", "Playing on another client", "En jeu sur un autre client"),
@@ -394,20 +416,24 @@ namespace Heroes
         {
             try { _window?.RemoveFromHierarchy(); } catch { }
             _window = null;
+            _creating = _creationBuilt = false;
             _grid = null;
             _footer = null;
             _say = null;
         }
 
-        private static void Say(string text)
+        private static void Say(string text, bool good = false)
         {
-            if (_say != null) _say.text = text;
+            if (_say == null) return;
+            _say.text = text;
+            _say.style.color = new StyleColor(good ? new UnityEngine.Color(0.56f, 0.93f, 0.56f, 1f) : Red);
         }
 
         /// <summary>The cards: the master, his heroes, the others of the account, and empty places to eight.</summary>
         private static void Render()
         {
             if (_grid == null) return;
+            if (_creating) { RenderCreation(); return; }
             _grid.Clear();
             if (_listCode == -1 && _list == null) { _grid.Add(Label(T("loading"))); return; }
             if (_listCode == 0) { _grid.Add(Label(T("unreachable"))); return; }
@@ -422,6 +448,8 @@ namespace Heroes
             bool roomLeft = Int(list, "connected") < 1 + max;
             bool masterFighting = Bool(list, "inFight");
             var all = characters.EnumerateArray().ToList();
+            // The account's free character slots, each an empty place one can make a hero on.
+            int canMake = Int(list, "slotsLeft");
             for (int row = 0; row < 2; row++)
             {
                 var line = new VisualElement();
@@ -431,11 +459,175 @@ namespace Heroes
                 for (int column = 0; column < 4; column++)
                 {
                     int at = row * 4 + column;
-                    line.Add(at < all.Count && at < Places ? Card(all[at], roomLeft, masterFighting) : Empty());
+                    if (at < all.Count && at < Places) line.Add(Card(all[at], roomLeft, masterFighting));
+                    else line.Add(Empty(canMake-- > 0 && !masterFighting));
                 }
                 _grid.Add(line);
             }
             if (_footer != null) _footer.text = T("connected", Int(list, "connected"), 1 + max);
+        }
+
+        // ─── Making a hero ───────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Whether the window shows the making of a hero instead of its cards -- built once, not
+        /// again at every refresh of the list, which would take the keyboard from the name.
+        /// </summary>
+        private static bool _creating, _creationBuilt, _creationBusy;
+        private static int _newBreed = 8, _newSex;
+        private static string _newName = "";
+
+        private static void StartCreation()
+        {
+            _creating = true;
+            _creationBuilt = false;
+            _newName = "";
+            Say("");
+            Render();
+            AskName();
+        }
+
+        private static void StopCreation()
+        {
+            _creating = false;
+            _creationBuilt = false;
+            _creationBusy = false;
+            Render();
+        }
+
+        /// <summary>
+        /// A name, a class and a sex, as Auralis's mod asks them: the server makes the character with
+        /// its class's colours, on the creation screen's rules, and connects it as a hero at once.
+        /// </summary>
+        private static void RenderCreation()
+        {
+            if (_creationBuilt) return;
+            _creationBuilt = true;
+            _grid.Clear();
+            var box = new VisualElement();
+            box.style.flexGrow = new StyleFloat(1f);
+            box.style.paddingLeft = box.style.paddingRight = new StyleLength(40f);
+            box.style.paddingTop = new StyleLength(10f);
+
+            var title = Label(T("create.title"), 20f, true);
+            title.style.marginBottom = new StyleLength(14f);
+            box.Add(title);
+
+            box.Add(Caption(T("create.class")));
+            var classes = new VisualElement();
+            classes.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+            classes.style.flexWrap = new StyleEnum<Wrap>(Wrap.Wrap);
+            classes.style.marginBottom = new StyleLength(14f);
+            foreach (int breed in Classes.Keys.OrderBy(k => k))
+            {
+                int which = breed;
+                var choice = Button(Do(() => { _newBreed = which; _creationBuilt = false; RenderCreation(); }),
+                                    ClassOf(breed), breed == _newBreed, true);
+                choice.style.width = new StyleLength(130f);
+                choice.style.marginRight = choice.style.marginBottom = new StyleLength(6f);
+                classes.Add(choice);
+            }
+            box.Add(classes);
+
+            box.Add(Caption(T("create.sex")));
+            var sexes = new VisualElement();
+            sexes.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+            sexes.style.marginBottom = new StyleLength(14f);
+            for (int sex = 0; sex < 2; sex++)
+            {
+                int which = sex;
+                var choice = Button(Do(() => { _newSex = which; _creationBuilt = false; RenderCreation(); }),
+                                    T(sex == 0 ? "create.male" : "create.female"), sex == _newSex, true);
+                choice.style.width = new StyleLength(130f);
+                choice.style.marginRight = new StyleLength(6f);
+                sexes.Add(choice);
+            }
+            box.Add(sexes);
+
+            box.Add(Caption(T("create.name")));
+            var naming = new VisualElement();
+            naming.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+            naming.style.alignItems = new StyleEnum<Align>(Align.Center);
+            naming.style.marginBottom = new StyleLength(18f);
+            var field = new Il2CppCore.UILogic.Components.DofusTextField();
+            field.name = "JondoHeroesNewName";
+            field.maxLength = 20;
+            field.placeholder = T("create.namePlaceholder");
+            field.text = _newName;
+            field.style.width = new StyleLength(280f);
+            field.style.marginRight = new StyleLength(8f);
+            field.RegisterValueChangedCallback(DelegateSupport.ConvertDelegate<EventCallback<ChangeEvent<string>>>(
+                new Action<ChangeEvent<string>>(e => _newName = e.newValue ?? "")));
+            naming.Add(field);
+            naming.Add(Button(Do(AskName), T("create.random"), false, true));
+            box.Add(naming);
+
+            var actions = new VisualElement();
+            actions.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+            var cancel = Button(Do(StopCreation), T("create.cancel"), false, !_creationBusy);
+            cancel.style.marginRight = new StyleLength(8f);
+            actions.Add(cancel);
+            actions.Add(Button(Do(Create), T(_creationBusy ? "create.working" : "create.go"), true, !_creationBusy));
+            box.Add(actions);
+            _grid.Add(box);
+        }
+
+        private static DofusLabel Caption(string text)
+        {
+            var caption = Label(text, 12f, true);
+            caption.style.color = new StyleColor(new UnityEngine.Color(0.66f, 0.68f, 0.78f, 1f));
+            caption.style.letterSpacing = new StyleLength(1.5f);
+            caption.style.marginBottom = new StyleLength(6f);
+            return caption;
+        }
+
+        /// <summary>A name the server draws, one nobody has, into the field.</summary>
+        private static void AskName()
+        {
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync("heroes/name");
+                _toUnity.Enqueue(() =>
+                {
+                    if (code != 200 || body is not JsonElement b || !_creating) return;
+                    _newName = Str(b, "name");
+                    var fields = new List<VisualElement>();
+                    if (_grid != null) Named(_grid, "JondoHeroesNewName", fields);
+                    foreach (var one in fields) one.TryCast<Il2CppCore.UILogic.Components.DofusTextField>()?.SetValueWithoutNotify(_newName);
+                });
+            });
+        }
+
+        private static void Create()
+        {
+            if (_creationBusy) return;
+            string name = (_newName ?? "").Trim();
+            if (name.Length == 0) { Say(T("create.error.empty")); return; }
+            _creationBusy = true;
+            _creationBuilt = false;
+            Say("");
+            RenderCreation();
+            var ask = new Dictionary<string, object> { ["name"] = name, ["breed"] = _newBreed, ["sex"] = _newSex };
+            Task.Run(async () =>
+            {
+                var (code, body) = await AskAsync("heroes/create", ask);
+                _toUnity.Enqueue(() =>
+                {
+                    _creationBusy = false;
+                    if (code == 200 && body is JsonElement done)
+                    {
+                        MelonLogger.Msg($"[Heroes] {name} made from the window.");
+                        StopCreation();
+                        Say(T(Bool(done, "connected") ? "create.done" : "create.doneAlone", name), good: true);
+                        Poll();
+                        return;
+                    }
+                    string why = body is JsonElement b ? Str(b, "error") : "";
+                    _creationBuilt = false;
+                    RenderCreation();
+                    Say(code == 0 ? T("unreachable") : Texts.ContainsKey("create.error." + why) ? T("create.error." + why) : T("error"));
+                });
+            });
         }
 
         private static VisualElement Place()
@@ -450,11 +642,20 @@ namespace Heroes
             return place;
         }
 
-        private static VisualElement Empty()
+        /// <summary>An empty place; with <paramref name="canMake"/>, one a hero can be made on: a «+» and its button.</summary>
+        private static VisualElement Empty(bool canMake = false)
         {
             var place = Place();
             place.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.13f, 0.14f, 0.22f, 0.55f));
             Round(place, 3f);
+            if (!canMake) return place;
+            place.style.alignItems = new StyleEnum<Align>(Align.Center);
+            place.style.justifyContent = new StyleEnum<Justify>(Justify.Center);
+            var plus = Label("+", 48f, true);
+            plus.style.color = new StyleColor(new UnityEngine.Color(0.55f, 0.57f, 0.70f, 1f));
+            plus.style.marginBottom = new StyleLength(8f);
+            place.Add(plus);
+            place.Add(Button(Do(StartCreation), T("create"), true, true));
             return place;
         }
 
