@@ -1426,7 +1426,7 @@ namespace Heroes
         private static Il2CppCore.Rendering.Look.EntityLook _cLook;
         private static int _cDrawn;
         private static float _cNextDraw;
-        private static bool _toldFraming, _cFramed;
+        private static bool _toldFraming, _cFramed, _toldFreeze;
 
         /// <summary>
         /// The look given to the platform's displayer, with the native screen's framing -- no
@@ -1445,15 +1445,25 @@ namespace Heroes
             Frame(displayer);
         }
 
+        /// <summary>
+        /// The platform's displayer made to fit the window: the template's box is 1200 pixels, the
+        /// native full screen's, and the character drawn to it filled the window. The box itself is
+        /// shrunk around where the feet stand -- its ratio down it -- so he stands on the platform,
+        /// the size the native screen shows him. It is given to the displaying service too, which
+        /// moves the displayers it keeps: left out, the character stopped after a few seconds.
+        /// </summary>
         private static void Frame(Il2CppCore.UILogic.EntityDisplay.EntityDisplayer displayer)
         {
             try
             {
-                displayer.autosize = false;
-                displayer.scale = 0.6f;
-                displayer.ForceRefreshSize();
+                float feet = displayer.ratioPositioning > 0f && displayer.ratioPositioning < 1f ? displayer.ratioPositioning : 0.7f;
+                displayer.style.transformOrigin = new StyleTransformOrigin(new TransformOrigin(
+                    new Length(50f, LengthUnit.Percent), new Length(feet * 100f, LengthUnit.Percent), 0f));
+                displayer.style.scale = new StyleScale(new Scale(new UnityEngine.Vector3(0.55f, 0.55f, 1f)));
+                _displayers?.bdvx(displayer.Cast<Il2CppCore.UILogic.EntityDisplay.IEntityDisplayer>());
+                displayer.SetPause(false);
             }
-            catch { }
+            catch (Exception ex) { MelonLogger.Warning($"[Heroes] The creation's character not framed: {ex.Message}"); }
         }
 
         /// <summary>Every frame while the creation screen is open: the platform's character given again until he is there.</summary>
@@ -1464,6 +1474,19 @@ namespace Heroes
             if (displayer == null) return;
             if (displayer.character != null)
             {
+                // Kept moving: whatever pauses or freezes it is undone.
+                try
+                {
+                    bool frozen = displayer.freezeUpdate, paused = displayer.m_isPaused;
+                    if (frozen) displayer.freezeUpdate = false;
+                    if (paused) displayer.SetPause(false);
+                    if ((frozen || paused) && !_toldFreeze)
+                    {
+                        _toldFreeze = true;
+                        MelonLogger.Msg($"[Heroes] The creation's character was {(frozen ? "frozen" : "")}{(frozen && paused ? " and " : "")}{(paused ? "paused" : "")}: set moving again.");
+                    }
+                }
+                catch { }
                 if (_cFramed) return;
                 _cFramed = true;
                 Frame(displayer);
