@@ -70,10 +70,31 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private const int Dismounts = 949;
 
-        /// <summary>Whether an item sets or takes alterations, and nothing else.</summary>
-        internal static bool GivesAlterations(IReadOnlyList<DatabaseManager.ItemEffectData> effects)
+        /// <summary>
+        /// Whether an item sets or takes alterations, and nothing else. <paramref name="own"/> is the
+        /// item's own template: an idol of the Turquoise Dofus's blessings -- «Ídolo de Viti chamuscado»,
+        /// 28444 -- sets its alteration (238) and also carries a «Gana x1» of itself, which is the item
+        /// kept (<see cref="KeepsItself"/>), and its 1175, the idol's spell, whose only line is a marker
+        /// (effect 666) and whose description is what the fight under it is like. Neither is anything
+        /// else to do.
+        /// </summary>
+        internal static bool GivesAlterations(IReadOnlyList<DatabaseManager.ItemEffectData> effects, int own = 0)
             => effects.Any(e => e.EffectId is GainAlteration or LoseAlteration)
-               && effects.All(e => e.EffectId is GainAlteration or LoseAlteration || Markers.Contains(e.EffectId));
+               && effects.All(e => e.EffectId is GainAlteration or LoseAlteration || Markers.Contains(e.EffectId)
+                                   || (e.EffectId == Alterations.FightSpell && effects.Any(g => g.EffectId == GainAlteration))
+                                   || GivesBack(e, own));
+
+        /// <summary>
+        /// Whether using the item leaves it where it was: one «Gana x1» of the item itself. The idols are
+        /// not lost on use -- «vous ne perdez pas l'idole tant que la quête n'est pas finie», and a fight
+        /// lost is fought again with the same idol --; spending one and giving one back is keeping it.
+        /// </summary>
+        internal static bool KeepsItself(IReadOnlyList<DatabaseManager.ItemEffectData> effects, int own)
+            => own != 0 && effects.Any(e => GivesBack(e, own));
+
+        private static bool GivesBack(DatabaseManager.ItemEffectData effect, int own)
+            => own != 0 && Math.Max(1, effect.DiceSide) == 1
+               && ((effect.EffectId == GainItems && effect.Value == own) || (effect.EffectId == GainItem && effect.DiceNum == own));
 
         /// <summary>
         /// The items an item gives and how many of each, or null when it does anything else besides.
@@ -100,7 +121,8 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task<bool> TryUseAsync(NetworkStream stream, Equipment.Item item)
         {
             var effects = DatabaseManager.GetItemEffectsData(DatabaseManager.GetItemTemplatePossibleEffects(item.Template));
-            if (GivesAlterations(effects)) return await SetAlterationsAsync(stream, item, effects);
+            if (GivesAlterations(effects, item.Template))
+                return await SetAlterationsAsync(stream, item, effects, KeepsItself(effects, item.Template));
 
             var given = GivenItems(effects, item.Template);
             if (given == null || given.Count == 0) return false;
@@ -127,9 +149,13 @@ namespace Jondo.Unity.Server.Handlers
             return null;
         }
 
-        /// <summary>The alterations set and taken: lzs for each, then the item spent, the kub and the weight.</summary>
+        /// <summary>
+        /// The alterations set and taken: lzs for each, then the item spent -- not when it
+        /// <paramref name="kept"/> itself --, the kub and the weight.
+        /// </summary>
         private static async Task<bool> SetAlterationsAsync(NetworkStream stream, Equipment.Item item,
-                                                            IReadOnlyList<DatabaseManager.ItemEffectData> effects)
+                                                            IReadOnlyList<DatabaseManager.ItemEffectData> effects,
+                                                            bool kept = false)
         {
             var me = SessionContext.State;
             if (me.IsInFight || me.FightId != 0) return true;
@@ -143,7 +169,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (int alteration in losses) await AlterationHandler.LoseAsync(stream, alteration);
             foreach (int alteration in gains) await AlterationHandler.GainAsync(stream, alteration);
 
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
+            if (!kept && !await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
             await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await ItemUseHandler.WeighAsync(stream);
 

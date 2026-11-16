@@ -3643,7 +3643,14 @@ namespace Jondo.Unity.Server
         /// "criterions" -- «Ox=10&amp;(SL&gt;40&amp;SL&lt;61)» for the 60 tax collector potion. Empty when it
         /// asks nothing.
         /// </summary>
-        public static string GetItemTemplateCriterion(int itemId)
+        public static string GetItemTemplateCriterion(int itemId) => GetItemTemplateCriterion(itemId, "criterions");
+
+        /// <summary>
+        /// One of a template's criteria by its field: "criterions" to use it, "craftFeasibleCriterion"
+        /// to craft it -- «Qa=1660&amp;PO!28444», the idol of Viti only while its blessing is under way
+        /// and only one at a time. Empty when it asks nothing.
+        /// </summary>
+        public static string GetItemTemplateCriterion(int itemId, string field)
         {
             try
             {
@@ -3655,14 +3662,14 @@ namespace Jondo.Unity.Server
                 var data = command.ExecuteScalar();
                 if (data == null || data == DBNull.Value) return "";
                 using var doc = System.Text.Json.JsonDocument.Parse(data.ToString()!);
-                return doc.RootElement.TryGetProperty("criterions", out var criterion)
+                return doc.RootElement.TryGetProperty(field, out var criterion)
                        && criterion.ValueKind == System.Text.Json.JsonValueKind.String
                     ? criterion.GetString() ?? ""
                     : "";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[-] Error reading the criterion of ItemTemplate {itemId}: {ex.Message}");
+                Console.WriteLine($"[-] Error reading the {field} of ItemTemplate {itemId}: {ex.Message}");
                 return "";
             }
         }

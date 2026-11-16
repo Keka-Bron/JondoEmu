@@ -92,6 +92,10 @@ namespace Jondo.Unity.Server.Handlers
                     // it did not. Type 14 is the one that adds up across fights.
                     if (objective.InOneFight && killed < objective.Needed) continue;
 
+                    // Under an idol's alteration, when it says: read before the fight's count
+                    // brings the alteration down (AlterationHandler.AfterFightAsync comes after).
+                    if (!UnderItsAlteration(objective)) continue;
+
                     // Not while something else of its step comes first -- a holy water to use, an
                     // item to hand over --: fights side by side, and talks, do not hold it back.
                     if (BehindOtherWork(step, objective, run)) continue;
@@ -121,6 +125,15 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
         }
+
+        /// <summary>
+        /// Whether the character fought under the alteration the objective asks for, when it asks for
+        /// one: an idol of the Turquoise Dofus's blessings used in the boss's room. Its one fight is
+        /// still on the list when the quests are told; the count brings it down afterwards.
+        /// </summary>
+        internal static bool UnderItsAlteration(QuestObjective objective, long? characterId = null)
+            => objective.UnderAlteration == 0
+               || Alterations.Has(characterId ?? SessionContext.State.CharacterId, objective.UnderAlteration);
 
         /// <summary>
         /// Whether a fight objective still has, before it in its step, something pending that is

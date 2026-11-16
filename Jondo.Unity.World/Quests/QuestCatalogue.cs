@@ -64,6 +64,17 @@ namespace Jondo.Unity.World.Quests
         /// </remarks>
         public bool InOneFight => TypeId is QuestCatalogue.BeatInOneFight or QuestCatalogue.BeatOnMap;
 
+        /// <summary>
+        /// The alteration the fight has to be won under, or zero: parameter3 of a type 6. Thirteen of
+        /// the 788 carry one, all of them the Turquoise Dofus's blessings -- 10045 is [6249, 1, 0, 238],
+        /// the Founoroshi beaten under «Ídolo de Viti chamuscado» (alteration 238), which the idol
+        /// 28444 sets in the boss's room; «vous devez impérativement vous procurer les idoles et utiliser
+        /// les idoles avant de faire les combats avec l'altération».
+        /// </summary>
+        public int UnderAlteration => TypeId == QuestCatalogue.BeatInOneFight && Parameters.Count > 3
+            ? Parameters[3]
+            : 0;
+
         /// <summary>How many it takes. One for everything that is not a count.</summary>
         public int Needed => QuestCatalogue.NamesAMonster(TypeId) && Parameters.Count > 1
             ? Math.Max(1, Parameters[1])
