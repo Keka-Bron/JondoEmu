@@ -76,6 +76,44 @@ namespace Jondo.Unity.Server.Handlers
                               $"with {string.Join(", ", members.Skip(1))}.");
         }
 
+        /// <summary>
+        /// The zone bonus an open anomaly's zone carries: «Quand l'anomalie ouvre, le bonus du
+        /// territoire passe à 120% pendant toute la durée de l'anomalie» (Dofus pour les noobs).
+        /// No other zone bonus is kept here.
+        /// </summary>
+        public const int AnomalyZoneBonus = 120;
+
+        /// <summary>
+        /// The world map's «Anomalies, bonus d'expérience et de butin» panel asks (lzh,
+        /// AnomalySubareaInformationRequest, empty) each time it opens, and fills itself from the
+        /// answer: lzl, AnomalySubareaInformationEvent, f1 a repeated lzj { f1 the zone's bonus, f2 the
+        /// subarea, f3 whether an anomaly is open there, f4 when it closes, in milliseconds }.
+        /// Nothing answered it, and the panel stayed empty.
+        /// </summary>
+        /// <remarks>
+        /// Read off the client (Cpp2IL of 3.6.10.11): enw.badu takes the lzl into gv.mxh, which puts
+        /// f2 in the field the notifications (eui.bcnk) look the subarea up with -- after testing f3 --,
+        /// f1, f3 and f4 beside it. That f1 is the bonus and f4 the closing is INFERRED: Dofus 2's
+        /// AnomalySubareaInformation was { subAreaId, rewardRate, hasAnomaly, anomalyClosingTime }, the
+        /// same four in kind, and the lzi this server sends carries its closing in milliseconds.
+        /// Only the open anomalies are listed: no other zone bonus is kept here.
+        /// </remarks>
+        public static Task SubareaInformationAsync(NetworkStream stream)
+            => WriteAsync(stream, ConnectionProtocol.Push("lzl", BuildSubareaInformation(DateTimeOffset.UtcNow)));
+
+        /// <summary>The lzl: each open anomaly's zone, its bonus, and when it closes.</summary>
+        internal static byte[] BuildSubareaInformation(DateTimeOffset now)
+        {
+            var lzl = Pb.New();
+            long nowMs = now.ToUnixTimeMilliseconds();
+            foreach (var anomaly in Anomalies.All)
+            {
+                long closes = nowMs + Anomalies.MinutesLeft(anomaly.SubAreaId) * 60_000L;
+                lzl.Msg(1, Pb.New().Var(1, AnomalyZoneBonus).Var(2, anomaly.SubAreaId).Var(3, 1).Var(4, closes));
+            }
+            return lzl.Build();
+        }
+
         /// <summary>A map drawn: the anomaly of its zone, the vestige of its zaap, the notice on coming in.</summary>
         public static async Task OnMapLoadedAsync(NetworkStream stream, long mapId)
         {

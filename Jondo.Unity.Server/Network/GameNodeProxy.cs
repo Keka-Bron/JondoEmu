@@ -1404,8 +1404,11 @@ namespace Jondo.Unity.Server.Network
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lzh)))
                 {
-                    // The alterations, asked for on entering the world: this character's, from the base.
+                    // AnomalySubareaInformationRequest: on entering the world, and each time the world
+                    // map's anomalies panel opens. It was taken for the alterations alone, which still
+                    // go here as before; the panel's own answer is the lzl.
                     await AlterationHandler.ListAsync(session);
+                    await AnomalyHandler.SubareaInformationAsync(stream);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
