@@ -515,6 +515,8 @@ namespace Jondo.Unity.Server.Managers
                 for (int index = 0; index < dungeon.Rooms.Count; index++)
                 {
                     long room = dungeon.Rooms[index];
+                    // A room only walked through keeps nobody, not even what the base put there.
+                    if (dungeon.EmptyRooms.Contains(room)) { _mapMobs.Remove(room); empty++; continue; }
                     _mapMobs.TryGetValue(room, out var before);
                     bool bossRoom = room == dungeon.LastRoom && dungeon.Bosses.Count > 0;
                     long id = bossRoom ? PrimerJefe - bosses
@@ -542,6 +544,21 @@ namespace Jondo.Unity.Server.Managers
                                                     IReadOnlyList<int> fallback, long id, int? cell)
         {
             long room = dungeon.Rooms[index];
+            if (dungeon.EmptyRooms.Contains(room)) return null;
+            if (dungeon.AloneRooms.TryGetValue(room, out var alone))
+            {
+                var them = alone.Where(m => _monsters.TryGetValue(m, out var d) && d.Grades.Count > 0)
+                                .Select(m => MemberAt(_monsters[m], RoomGrade(index, dungeon.Rooms.Count))).ToList();
+                if (them.Count == 0) return null;
+                return new MobGroup
+                {
+                    MobId = id,
+                    CellId = cell ?? MapManager.GetNearestWalkableCell(room, Handlers.TeleportHandler.MapCentre),
+                    Members = them,
+                    Modular = true,
+                    Leaders = them.Count,
+                };
+            }
             var bosses = new HashSet<int>(dungeon.Bosses);
             bool bossRoom = room == dungeon.LastRoom && dungeon.Bosses.Count > 0;
 

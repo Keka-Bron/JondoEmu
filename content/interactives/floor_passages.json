@@ -231,6 +231,27 @@
       "toMap": 149428224,
       "toCell": 131,
       "why": "Out of the disenchanted thicket: the top of its path, under the light, leads back behind the big tree of the Soft Oak Clearing's exit room, landing by the way in (490835, cell 117). The client's map draws no element there. INFERRED cells."
+    },
+    {
+      "map": 72352768,
+      "cell": 305,
+      "toMap": 72353792,
+      "toCell": 280,
+      "why": "The Dragon Pig's Den, Second Room: its round door on the right wall (element 472890, cell 306, which is not walked on) leads to the Third Room; the 2.73 graph has the passages of the other empty rooms and not this one. Two cells before the door, 305 and 320. INFERRED arrival, the graph's own for the den's rooms."
+    },
+    {
+      "map": 72352768,
+      "cell": 320,
+      "toMap": 72353792,
+      "toCell": 280,
+      "why": "The Dragon Pig's Den, Second Room: the other cell before its round door (see 305)."
+    },
+    {
+      "map": 72354816,
+      "cell": 403,
+      "toMap": 72355840,
+      "toCell": 280,
+      "why": "The Dragon Pig's Den, Fourth Room: the way on under its right arch, where the client's map has element 460371 on the floor, leads to the Fifth Room; the 2.73 graph does not have it. INFERRED arrival, the graph's own for the den's rooms."
     }
   ]
 }

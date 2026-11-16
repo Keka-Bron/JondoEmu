@@ -119,6 +119,21 @@ namespace Jondo.Unity.Server.Managers
             public Dictionary<long, List<int>> WrittenRoster { get; } = new();
 
             /// <summary>
+            /// The rooms of a hand-written dungeon that are only walked through (content/world/dungeons.json
+            /// «empty»): nobody is put in them, and the door at their far side leads on. The Dragon
+            /// Pig's Den alternates them with its fights -- «Rien de spécial dans cette salle
+            /// continuez jusque la prochaine» (Dofus pour les noobs, «Antre du Dragon Cochon»).
+            /// </summary>
+            public HashSet<long> EmptyRooms { get; } = new();
+
+            /// <summary>
+            /// The rooms of a hand-written dungeon whose monsters are fought alone, all of them and
+            /// nobody else (content/world/dungeons.json «alone»): the Dragon Pig's Den's eleventh,
+            /// its mini-boss the Gorgouille, whose side of the map has one starting cell.
+            /// </summary>
+            public Dictionary<long, List<int>> AloneRooms { get; } = new();
+
+            /// <summary>
             /// Whether its bosses are fought alone in their room (<see cref="BossFightsAlone"/>, or
             /// «bossAlone» in content/world/dungeons.json), and all of them by whoever comes in.
             /// </summary>
@@ -801,6 +816,23 @@ namespace Jondo.Unity.Server.Managers
                             if (!long.TryParse(room.Name, out long map) || room.Value.ValueKind != JsonValueKind.Array) continue;
                             dungeon.WrittenQuarry[map] = room.Value.EnumerateArray()
                                 .Where(m => m.TryGetInt32(out _)).Select(m => m.GetInt32()).ToList();
+                        }
+                    }
+
+                    if (authored && entry.Value.TryGetProperty("empty", out var empty) && empty.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var room in empty.EnumerateArray())
+                            if (room.TryGetInt64(out long map)) dungeon.EmptyRooms.Add(map);
+                    }
+
+                    if (authored && entry.Value.TryGetProperty("alone", out var alone) && alone.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var room in alone.EnumerateObject())
+                        {
+                            if (!long.TryParse(room.Name, out long map) || room.Value.ValueKind != JsonValueKind.Array) continue;
+                            var monsters = room.Value.EnumerateArray()
+                                .Where(m => m.TryGetInt32(out _)).Select(m => m.GetInt32()).Where(m => m > 0).ToList();
+                            if (monsters.Count > 0) dungeon.AloneRooms[map] = monsters;
                         }
                     }
 

@@ -9,7 +9,10 @@
     "who takes the key or the keyring (DungeonHandler), where a mini-dungeon's NPC lets you in by his",
     "own tree. «quarry»: room -> the monsters its fight brings besides the boss, as the quests'",
     "objectives put theirs (DungeonManager.Dungeon.WrittenQuarry). «roster»: room -> who its group is",
-    "made of, in the place of its subarea's monsters (DungeonManager.Dungeon.WrittenRoster)."
+    "made of, in the place of its subarea's monsters (DungeonManager.Dungeon.WrittenRoster).",
+    "«empty»: the rooms only walked through, with nobody in them; the door at their far side leads",
+    "on (DungeonManager.Dungeon.EmptyRooms). «alone»: room -> the monsters fought there, all of them",
+    "and nobody else (DungeonManager.Dungeon.AloneRooms)."
   ],
   "3": {
     "name": "Biblioteca del Maestro Cuerbok",
@@ -52,6 +55,57 @@
       ]
     },
     "why": "Lord Crow's library as Ankama remade it on 21 January 2025 (Dofus pour les noobs, «Bibliothèque du Maître Corbac»): one walks its sixteen rooms freely (content/interactives/teleports.json), beats its three unique monsters for their feathers (content/fights/win_alterations.json), and Virgil, in the First Room [-15,-61], «Montrer les plumes, et utiliser le trousseau de clefs», lets the holder of the three in with the key or the keyring: «une salle avec le Capsaalocke et la salle du Maître Corbac». The catalogue's three rooms are kept: the throne room (159125512) is the boss's, where «Voler dans les plumes» (1775) has him beaten (11394), and its antechamber (159124488) is where Natacha waits after it (11395), the room after the boss (content/world/dungeon_exits.json). INFERRED: Capsálocke's room is the remaining one, the Library Annexe (159121666), since no objective names his map (11392). Who each of the two rooms is made of: «chaque monstre a un nom différent s'il accompagne le Capsaloocke ou le Maître Corbac [...] Les monstres qui accompagnent le Maître Corbac sont les mêmes que ceux que vous devez trouver dans la Bibliothèque»; the client's subarea 211 lists both sets together, Capsálocke's being the Bebesangres, the Jefe cuerbok and the Cuerbok adiestrado (4578-4580, of subarea 211 alone) and the Master's the library's three unique monsters (823-825)."
+  },
+  "6": {
+    "name": "Antro del Dragocerdo",
+    "minLevel": 90,
+    "optimalLevel": 100,
+    "difficulty": 2,
+    "entrance": 72221696,
+    "exit": 72221696,
+    "rooms": [
+      72351744,
+      72352768,
+      72353792,
+      72354816,
+      72355840,
+      72356864,
+      72357888,
+      72358146,
+      72358912,
+      72359170,
+      72359936,
+      72360960,
+      72361984
+    ],
+    "empty": [72351744, 72352768, 72354816, 72356864, 72358146, 72359170, 72360960],
+    "bosses": [
+      113
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        7511,
+        1
+      ],
+      [
+        8320,
+        1
+      ]
+    ],
+    "autoGroup": 0,
+    "door": 1,
+    "roster": {
+      "72353792": [603, 3304],
+      "72355840": [603, 3304, 601],
+      "72357888": [603, 3304, 601],
+      "72358912": [603, 3304, 601, 600],
+      "72361984": [603, 3304, 601, 600]
+    },
+    "alone": {
+      "72359936": [3137]
+    },
+    "why": "The den's thirteen rooms in the order their names give (First to Thirteenth Room), its fights in every other one: Dofus pour les noobs, «Antre du Dragon Cochon»: the first two are crossed quickly, «sinon vous obtiendrez une malédiction assez gênante : Gaz Méphitique»; the third brings Cerdos de Farle and Cerdos serranos (603, 3304), the fifth adds the Don dórgano (601), the seventh is the same, the ninth adds the Don dessangre (600); the fourth, sixth, eighth, tenth and twelfth are empty («Rien de spécial dans cette salle continuez jusque la prochaine»); the eleventh is the mini-boss, the Marranórgola (3137) alone -- its side of the map has one starting cell --, and the thirteenth the Dragocerdo. The catalogue put a group in every room, the Marranórgola in the first. The doors of the empty rooms are the 2.73 graph's floor passages, and content/interactives/floor_passages.json for the second and fourth. INFERRED: the boss's companions, the rooms' grades. The porco of the entrance (784) keeps the door."
   },
   "9001": {
     "name": "Laboratorio Secreto",
