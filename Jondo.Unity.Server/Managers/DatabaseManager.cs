@@ -2476,6 +2476,35 @@ namespace Jondo.Unity.Server
             }
         }
 
+        /// <summary>The memberships a deletion leaves alone, which it takes out through their own handlers.</summary>
+        private static readonly HashSet<string> MembershipTables = new() { "AllianceMembers", "GuildMembers" };
+
+        /// <summary>
+        /// The characters a membership table still names that Characters has not got: deleted
+        /// while the deletion kept those rows. Empty for a table that is not one, or not there.
+        /// </summary>
+        public static List<long> GoneCharactersIn(string table)
+        {
+            var gone = new List<long>();
+            if (!MembershipTables.Contains(table)) return gone;
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                // The table's name is one of the two above, never anything from outside.
+                command.CommandText = $"SELECT m.CharacterId FROM \"{table}\" m " +
+                                      "WHERE NOT EXISTS (SELECT 1 FROM Characters c WHERE c.Id = m.CharacterId);";
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) gone.Add(reader.GetInt64(0));
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"[DatabaseManager] Could not look for the gone members of {table}: {ex.Message}");
+            }
+            return gone;
+        }
+
         /// <summary>Checks that a character really does belong to the account asking for it.</summary>
         public static bool CharacterBelongsToAccount(long characterId, long accountId)
         {

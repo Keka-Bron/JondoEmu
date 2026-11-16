@@ -221,6 +221,10 @@ namespace Jondo.Unity.Server
             // After the quests: 259 achievements are earned by finishing one, and the catalogue is indexed
             // by quest when loaded.
             Managers.Achievements.Load();
+            // The alliances' and guilds' members whose character was deleted before a deletion took
+            // them out: out now, a leader's rank handed on and an emptied alliance dissolved.
+            Handlers.AllianceHandler.SweepGoneMembers();
+            Handlers.GuildHandler.SweepGoneMembers();
             // Behind the quests as well: the Almanax offerings are quests, and the calendar finds
             // their giver in the quest catalogue.
             Managers.Almanax.Load();

@@ -70,6 +70,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>«Solo los personajes de nivel 50 o superior podrán unirse a una alianza.»</summary>
         public const int JoinTooLow = 698;
 
+        /// <summary>«Tu alianza ya ha alcanzado el número máximo de miembros y no permite nuevas incorporaciones.»</summary>
+        public const int AllianceFull = 670;
+
         /// <summary>«No dispones de los derechos de alianza requeridos.»</summary>
         public const int MissingRight = 383;
 
@@ -415,6 +418,11 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
             if (profile.Recruitment != AllianceStore.RecruitmentOpen) return;
+            if (AllianceStore.IsFull(alliance.Id))
+            {
+                await WarnAsync(stream, AllianceFull);
+                return;
+            }
 
             AllianceStore.Join(who, alliance.Id);
             await WelcomeAsync(SessionContext.Current, alliance);
@@ -483,21 +491,56 @@ namespace Jondo.Unity.Server.Handlers
             if (departure == null) return;
 
             await GoneAsync(stream, departure.Alliance, who);
+            await DepartedAsync(departure, who, SessionContext.State.CharacterName ?? "");
+        }
+
+        /// <summary>
+        /// What follows somebody's going, for the others: the alliance's tax collectors and prisms
+        /// when it is dissolved; else his line gone, «{0} ha abandonado la alianza», and a new
+        /// leader's rank.
+        /// </summary>
+        private static async Task DepartedAsync(AllianceStore.Departure departure, long who, string name)
+        {
+            var alliance = departure.Alliance;
             if (departure.Dissolved)
             {
-                await TaxCollectorHandler.AllianceDissolvedAsync(departure.Alliance.Id);
-                await PrismHandler.AllianceDissolvedAsync(departure.Alliance.Id);
+                await TaxCollectorHandler.AllianceDissolvedAsync(alliance.Id);
+                await PrismHandler.AllianceDissolvedAsync(alliance.Id);
             }
-            if (!departure.Dissolved)
+            else
             {
-                var alliance = departure.Alliance;
                 await TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Mby, AllianceProtocol.BuildMemberGone(who)));
-                await TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Lqn,
-                    ConnectionProtocol.BuildSystemMessage(HasLeft, SessionContext.State.CharacterName ?? "")));
+                if (name.Length > 0)
+                    await TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(HasLeft, name)));
                 if (departure.NewLeader != 0) await RankChangedAsync(alliance, departure.NewLeader);
             }
-            Console.WriteLine($"[Alliance] {SessionContext.State.CharacterName} leaves «{departure.Alliance.Name}»" +
-                              (departure.Dissolved ? ", which is dissolved." : "."));
+            Console.WriteLine($"[Alliance] {(name.Length > 0 ? name : who.ToString())} leaves «{alliance.Name}»" +
+                              (departure.Dissolved ? ", which is dissolved." : departure.NewLeader != 0 ? $"; {departure.NewLeader} leads it now." : "."));
+        }
+
+        /// <summary>
+        /// A character deleted, out of his alliance as if he had left it: the leader's rank to the
+        /// next in line, the alliance gone with its last member. The deletion keeps the alliances'
+        /// rows (DatabaseManager.DeleteCharacter), so he stayed a member nobody could see -- counted
+        /// in the directory, and an alliance whose leader he was had none any more.
+        /// </summary>
+        public static async Task CharacterGoneAsync(long characterId, string name)
+        {
+            var departure = AllianceStore.Leave(characterId);
+            if (departure != null) await DepartedAsync(departure, characterId, name ?? "");
+        }
+
+        /// <summary>
+        /// At startup, the members whose character is gone -- deleted before a deletion took them
+        /// out --, out as <see cref="CharacterGoneAsync"/> takes them. Returns how many.
+        /// </summary>
+        public static int SweepGoneMembers()
+        {
+            var gone = DatabaseManager.GoneCharactersIn("AllianceMembers");
+            foreach (long characterId in gone)
+                CharacterGoneAsync(characterId, "").GetAwaiter().GetResult();
+            if (gone.Count > 0) Console.WriteLine($"[Alliance] {gone.Count} member(s) without a character taken out of their alliance.");
+            return gone.Count;
         }
 
         /// <summary>
@@ -823,8 +866,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>«No dispones de los derechos de alianza requeridos.»</summary>
-        private static Task RefusedAsync(NetworkStream stream)
-            => WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, MissingRight)));
+        private static Task RefusedAsync(NetworkStream stream) => WarnAsync(stream, MissingRight);
+
+        /// <summary>A warning (lqn, type 1) by its information id.</summary>
+        private static Task WarnAsync(NetworkStream stream, int messageId)
+            => WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, messageId)));
 
         // ─── The alliance message and the bulletin ──────────────────────────────
 
@@ -1030,6 +1076,12 @@ namespace Jondo.Unity.Server.Handlers
                 await RefusedAsync(stream);
                 return;
             }
+            // Full, an application is not accepted: it waits for a place.
+            if (accepted && AllianceStore.IsFull(alliance.Id))
+            {
+                await WarnAsync(stream, AllianceFull);
+                return;
+            }
 
             AllianceStore.DropApplication(applicant);
             await ApplicationGoneAsync(application, who);
@@ -1131,6 +1183,12 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            if (AllianceStore.IsFull(alliance.Id))
+            {
+                await WarnAsync(stream, AllianceFull);
+                return;
+            }
+
             var invited = SessionRegistry.FindByCharacter(target);
             var character = DatabaseManager.GetCharacterById(target);
             if (invited?.Stream == null || character == null || target == who ||
@@ -1176,8 +1234,13 @@ namespace Jondo.Unity.Server.Handlers
             var inviterSession = SessionRegistry.FindByCharacter(invitation.Inviter);
             string invitedName = DatabaseManager.GetCharacterById(invitedId)?.Name ?? "";
             string inviterName = DatabaseManager.GetCharacterById(invitation.Inviter)?.Name ?? "";
-            bool joins = accepted && alliance != null && AllianceStore.AllianceOf(invitedId) == null;
+            // Filled up since the invitation: refused, and the invited told why.
+            bool full = accepted && alliance != null && AllianceStore.IsFull(alliance.Id);
+            bool joins = accepted && alliance != null && AllianceStore.AllianceOf(invitedId) == null && !full;
             int state = joins ? AllianceProtocol.InvitationAccepted : AllianceProtocol.InvitationRefused;
+            if (full && invitedSession?.Stream != null)
+                await invitedSession.SendAsync(ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, AllianceFull)));
 
             if (inviterSession != null)
                 await inviterSession.SendAsync(ConnectionProtocol.Push(Op.Mbq,

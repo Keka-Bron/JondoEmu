@@ -326,6 +326,16 @@ namespace Jondo.Unity.Server.Managers
             return rank != null && rank.Rights.Contains(right);
         }
 
+        /// <summary>
+        /// The most members an alliance holds: the directory shows each one's count out of it
+        /// («3/250»), and the client has «Tu alianza ya ha alcanzado el número máximo de miembros y
+        /// no permite nuevas incorporaciones» (information 670) for whoever would go past it.
+        /// </summary>
+        public const int MaxMembers = 250;
+
+        /// <summary>Whether the alliance has as many members as it may hold.</summary>
+        public static bool IsFull(long allianceId) => Members(allianceId).Count >= MaxMembers;
+
         /// <summary>Joins a character to an alliance at a rank, the newcomers' unless told otherwise.</summary>
         public static Member Join(long characterId, long allianceId, int rank = RankNewcomer)
         {
@@ -388,10 +398,24 @@ namespace Jondo.Unity.Server.Managers
             long newLeader = 0;
             if (rank == RankLeader && left.All(m => m.Rank != RankLeader))
             {
-                newLeader = left[0].CharacterId;
+                newLeader = NextInLine(alliance.Id, left);
                 SetRank(newLeader, RankLeader);
             }
             return new Departure(alliance, newLeader, false);
+        }
+
+        /// <summary>
+        /// Who takes over from a leader: the member of the best rank -- the first in the ranks'
+        /// order, not the lowest rank id: a rank created later has a higher id wherever it is put
+        /// --, then the longest there.
+        /// </summary>
+        internal static long NextInLine(long allianceId, IReadOnlyList<Member> members)
+        {
+            var order = Ranks(allianceId).ToDictionary(r => r.Id, r => r.Order);
+            return members.OrderBy(m => order.TryGetValue(m.Rank, out int o) ? o : int.MaxValue)
+                          .ThenBy(m => m.JoinedUtcMs)
+                          .ThenBy(m => m.CharacterId)
+                          .First().CharacterId;
         }
 
         private static void Dissolve(SqliteConnection conexion, long allianceId)
@@ -608,7 +632,8 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// Removes a rank, its members going to another; the ranks below it close the gap. Returns
-        /// false for a rank that cannot go -- the leader's, the newcomers', or one that is not there.
+        /// false for a rank that cannot go -- the leader's, the newcomers', or one that is not there
+        /// --, and for the leader's as where its members go: that made as many leaders as it had.
         /// </summary>
         public static bool RemoveRank(long allianceId, int rankId, int replacementId)
         {
@@ -617,6 +642,7 @@ namespace Jondo.Unity.Server.Managers
             var replacement = ranks.FirstOrDefault(r => r.Id == replacementId);
             if (removed == null || replacement == null || removed == replacement) return false;
             if (removed.Id == RankLeader || removed.Id == RankNewcomer || !removed.Flag) return false;
+            if (replacement.Id == RankLeader) return false;
 
             using var conexion = Open();
             var move = conexion.CreateCommand();
