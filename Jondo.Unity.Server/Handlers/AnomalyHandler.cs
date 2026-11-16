@@ -43,8 +43,6 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The subarea of the last map each character loaded.</summary>
         private static readonly ConcurrentDictionary<long, int> _lastSubArea = new();
 
-        private static readonly Random _dice = new();
-
         /// <summary>
         /// Where a travel to an anomaly leaves the character in session, and noted as his: its place's
         /// entry and arrival cell (-1 when not measured), or the measured landing when there is no place.
@@ -67,7 +65,8 @@ namespace Jondo.Unity.Server.Handlers
             if (place == null) return;
             if (MobSpawnManager.GetMobsForMap(mapId).Any(g => g.Members.Any(m => m.Monster?.Id == place.Guardian))) return;
 
-            var members = AnomalyPlaces.GroupOf(place, _dice);
+            // The same group for the anomaly's whole cycle, fight after fight.
+            var members = AnomalyPlaces.GroupOf(place, new Random(AnomalyPlaces.GroupSeed(place, DateTimeOffset.UtcNow)));
             int cell = place.Group?.Cell > 0 ? place.Group.Cell : -1;
             var group = MobSpawnManager.SpawnComposed(mapId, members.Select(m => (m, 0)), cell);
             if (group == null) return;

@@ -45,6 +45,34 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// An uchronic elixir is the side's, its strongest: a guardian's rows -- the temporal loops
+        /// at 3 % minor, 5 % improved or major, 1 % without --, rolled for a character who drank
+        /// nothing beside one who drank the major, go by the major alone.
+        /// </summary>
+        [Fact]
+        public void The_strongest_elixir_of_the_side_counts_for_everyone_on_it()
+        {
+            var session = GameSession.SinSocket();
+            session.State.CharacterId = 9_400_000_011;
+            using (SessionContext.Push(session))
+            {
+                var fight = new FightInstance(9_400_011, 191105026);
+                var me = new Fighter { Id = session.State.CharacterId, MaxHP = 100, CurrentHP = 100 };
+                var ally = new Fighter { Id = 9_400_000_012, MaxHP = 100, CurrentHP = 100 };
+                fight.AddPlayer(me);
+                fight.AddPlayer(ally);
+                ally.Buffs.PonerEstado(3383);
+                ally.Buffs.PonerEstado(3385);
+
+                Assert.Equal(3, AnomalyLoot.SideElixir(fight, me.Id));
+                Assert.True(FightHandler.SeLoLleva(fight, "HA=51|HS=3384|HA=52|HS=3385"));   // 5 %
+                Assert.False(FightHandler.SeLoLleva(fight, "HA=50|HS=3383"));                 // 3 %: not the strongest
+                Assert.False(FightHandler.SeLoLleva(fight, "HA!50&HS!3383&HA!51&HS!3384&HA!52&HS!3385"));   // 1 %
+                Assert.True(FightHandler.SeLoLleva(fight, "HA=52|HS=3385"));                  // the relic's 0.5 %
+            }
+        }
+
         /// <summary>The Almanax's «en todas las zonas influenciadas por una anomalía temporal» (its criterion 13).</summary>
         [Fact]
         public void The_almanax_knows_an_anomaly_s_zones()

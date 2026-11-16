@@ -47,14 +47,58 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public void A_guardian_with_no_measured_group_takes_one_of_each_family()
         {
-            var brakmar = AnomalyPlaces.All.FirstOrDefault(p => p.Guardian == 5663);   // Julith
-            if (brakmar == null) return;
-            var group = AnomalyPlaces.GroupOf(brakmar, new Random(7));
+            var tower = AnomalyPlaces.All.FirstOrDefault(p => p.Guardian == 5684);   // Agonie, Mineral Tower
+            if (tower == null) return;
+            var group = AnomalyPlaces.GroupOf(tower, new Random(7));
             Assert.Equal(4, group.Count);
-            Assert.Equal(5663, group[0]);
+            Assert.Equal(5684, group[0]);
             Assert.InRange(group[1], 5714, 5718);   // a brutoforme
             Assert.InRange(group[2], 5719, 5723);   // a cublaforme
             Assert.InRange(group[3], 5709, 5713);   // a kaxaforme
+        }
+
+        /// <summary>Julith brings a fourth chronomorph: two of one family.</summary>
+        [Fact]
+        public void Julith_comes_with_four_chronomorphs()
+        {
+            var brakmar = AnomalyPlaces.All.FirstOrDefault(p => p.Guardian == AnomalyPlaces.Julith);
+            if (brakmar == null) return;
+            var group = AnomalyPlaces.GroupOf(brakmar, new Random(7));
+            Assert.Equal(5, group.Count);
+            Assert.Equal(AnomalyPlaces.Julith, group[0]);
+            Assert.All(group.Skip(1), m => Assert.True(AnomalyPlaces.IsChronomorph(m)));
+        }
+
+        /// <summary>A place's group is the same through the anomaly's cycle: the same dice, the same three.</summary>
+        [Fact]
+        public void A_guardians_group_stays_the_same_through_the_cycle()
+        {
+            var tower = AnomalyPlaces.All.FirstOrDefault(p => p.Guardian == 5684);
+            if (tower == null || Anomalies.Duration <= 0) return;
+            var now = DateTimeOffset.FromUnixTimeSeconds(1_786_573_500);
+            var first = AnomalyPlaces.GroupOf(tower, new Random(AnomalyPlaces.GroupSeed(tower, now)));
+            Assert.Equal(first, AnomalyPlaces.GroupOf(tower, new Random(AnomalyPlaces.GroupSeed(tower, now.AddSeconds(30)))));
+        }
+
+        /// <summary>
+        /// The anomaly fragment's rates (Dofus pour les noobs): 40 % off a chronomorph in the
+        /// guardian's room, nothing off the guardian; 1, 5, 10 and 20 % in an anomaly's zone by the
+        /// side's elixir; nothing elsewhere. The elixir rows are named by state or alteration.
+        /// </summary>
+        [Fact]
+        public void The_fragments_drop_at_the_guides_rates()
+        {
+            if (AnomalyPlaces.All.Count == 0) return;
+            Assert.Equal(40, AnomalyLoot.FragmentChance(5714, inRoom: true, inZone: false, elixir: 0));
+            Assert.Equal(0, AnomalyLoot.FragmentChance(5663, inRoom: true, inZone: false, elixir: 3));
+            Assert.Equal(new double[] { 1, 5, 10, 20 },
+                Enumerable.Range(0, 4).Select(e => AnomalyLoot.FragmentChance(102, false, true, e)));
+            Assert.Equal(0, AnomalyLoot.FragmentChance(102, false, false, 3));
+
+            Assert.Equal(1, AnomalyLoot.ElixirNamed("HS", 3383));
+            Assert.Equal(3, AnomalyLoot.ElixirNamed("HA", 52));
+            Assert.Null(AnomalyLoot.ElixirNamed("HS", 3382));
+            Assert.Null(AnomalyLoot.ElixirNamed("PL", 50));
         }
 
         [Fact]
