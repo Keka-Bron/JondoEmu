@@ -4802,6 +4802,20 @@
       "cell": 362,
       "orientation": 3,
       "why": "Severrisueño behind his bar in the Torturer's tavern [5,2]: he stood nowhere. INFERRED cell: behind the counter, on the floor with the crossed bones, where the skull arch over the bar does not hide him (on 333, under it, only his legs showed); facing the room."
+    },
+    {
+      "map": 153878787,
+      "npc": 2899,
+      "cell": 354,
+      "remove": true,
+      "why": "Berbe Unin, giver of «Productos naturales» (1649), stood on the cell right in front of the Incarnam tavern's door [0,-3]. The door (element 489329, cell 326) can only be reached from 325, 340 and 354, so he took one of the three and covered the door: a click on it picked him instead of the door, going in and coming out."
+    },
+    {
+      "map": 153878787,
+      "npc": 2899,
+      "cell": 345,
+      "orientation": 3,
+      "why": "Berbe Unin moved a few cells to the right of the door, against the tavern's front under its windows, between the terrace's tables: still by the tavern, out of the way of its door, facing the path."
     }
   ]
 }
