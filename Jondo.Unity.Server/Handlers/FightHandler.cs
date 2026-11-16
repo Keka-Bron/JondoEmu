@@ -72,6 +72,8 @@ namespace Jondo.Unity.Server.Handlers
             GameState.CurrentFightMobId = mobGroup.MobId;
 
             long fightId = System.Threading.Interlocked.Increment(ref _nextFightId);
+            // A board the fight is sent to on purpose -- a quest's arena -- rather than the map's own.
+            bool namedArena = arenaMapId > 0;
             if (arenaMapId <= 0) arenaMapId = Managers.GuildRaidGuardians.ArenaOf(mobGroup, mapId);
             if (arenaMapId <= 0) arenaMapId = MapManager.ResolveArenaMapId(mapId);
             var fight = new FightInstance(fightId, mapId, arenaMapId);
@@ -128,6 +130,15 @@ namespace Jondo.Unity.Server.Handlers
                 && marked.Red.Count > 0 && marked.Blue.Count >= mobGroup.Members.Count)
             {
                 fight.SetPlacementCells(marked.Red, marked.Blue);
+            }
+            // And a quest's arena that flags its own placement is placed as its map marks it, when
+            // both sides fit (MapPlacements): the Laberinto de las almas puts the soulless mummy on
+            // the maze's one way in and the age-old minogolem in its corner. Drawn like any other
+            // map, the mummy stood halfway along the maze and the minogolem beside its only path.
+            else if (namedArena && Managers.MapPlacements.Fitting(arenaMapId, 1 + (allies?.Count ?? 0),
+                                                                  mobGroup.Members.Count) is { } own)
+            {
+                fight.SetPlacementCells(own.Blue, own.Red);
             }
 
             // The four elementals IN FULL: what the player has put in points plus what the
@@ -10794,6 +10805,19 @@ namespace Jondo.Unity.Server.Handlers
                     ? supportRows.Select(e => e.TargetMask ?? "").Distinct().ToList()
                     : new List<string>();
 
+                // Whom its mechanics are aimed at when they name one of its side by template, each
+                // on the aimed cell alone: the age-old minogolem's Sustitución swaps him with the
+                // salt, gold or blood one, the one his state names ("a,F3743,*E200").
+                var allyRows = Managers.SpellEffects.De(spell, grade)
+                    .Where(e => string.Equals(e.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)
+                                && !Managers.EffectEngine.EsMarcadorDeGuion(e.EffectId) && !e.ForClientOnly
+                                && HasMask(e.TargetMask ?? "", "a") && !HasMask(e.TargetMask ?? "", "A")
+                                && (e.TargetMask ?? "").Split(',').Any(t => t.Trim() is { Length: > 1 } p && p[0] == 'F' && char.IsDigit(p[1])))
+                    .ToList();
+                var utilityAllyMasks = allyRows.Count > 0 && allyRows.All(e => e.Forma == 'P')
+                    ? allyRows.Select(e => e.TargetMask ?? "").Distinct().ToList()
+                    : new List<string>();
+
                 spells.Add(new Managers.MonsterTactics.Spell
                 {
                     Id = spell,
@@ -10818,6 +10842,7 @@ namespace Jondo.Unity.Server.Handlers
                     Removal = removal,
                     Buff = buff,
                     SupportMasks = supportMasks,
+                    UtilityAllyMasks = utilityAllyMasks,
                     Summons = summons,
                     NeedsFreeCell = limits.NeedFreeCell,
                     RangeBoostable = (limits.Flags & Managers.SpellLevelFlags.RangeCanBeBoosted) != 0,

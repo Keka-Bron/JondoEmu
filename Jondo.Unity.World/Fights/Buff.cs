@@ -470,6 +470,12 @@ namespace Jondo.Unity.World.Fights
         /// Those that do NOT expire by round stay as they are: a permanent buff is not shortened,
         /// because it has nothing to shorten, and subtracting rounds from a zero would leave it expired in the
         /// past round and it would drop entirely.
+        ///
+        /// Nor are the rows still waiting on their delay (<see cref="Buff.Pendiente"/>): the real
+        /// server keeps them hidden from the panel the 1075 is applied to, and they have not
+        /// begun. The age-old minogolem's Sustitución carries "-1" for the state that named the
+        /// one it swapped with; shortening the waiting ones as well dropped the next round's state
+        /// before it was put, and it stopped swapping one round in two.
         /// </remarks>
         public int Acortar(int rondas, int ahora)
         {
@@ -478,7 +484,7 @@ namespace Jondo.Unity.World.Fights
             var caidos = new List<Buff>();
             foreach (var embrujo in _puestos)
             {
-                if (embrujo.CaducaEnRonda <= 0) continue;
+                if (embrujo.CaducaEnRonda <= 0 || embrujo.Pendiente) continue;
 
                 embrujo.CaducaEnRonda -= rondas;
                 if (embrujo.CaducaEnRonda <= ahora) caidos.Add(embrujo);

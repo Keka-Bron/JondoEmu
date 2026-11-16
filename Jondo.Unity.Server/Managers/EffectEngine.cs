@@ -1309,6 +1309,12 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         internal const int MarcadorDeGuion = 3793;
 
+        /// <summary>
+        /// 793: the candidate casts a spell, as 792 has it, the monsters' own. Under a turn's
+        /// trigger with a delay and no duration it goes off once, in the round of its delay.
+        /// </summary>
+        internal const int CastsOnTheTurnOnce = 793;
+
         /// <summary>3792: 3793's immediate sibling. No characteristic or damage to apply.</summary>
         /// <remarks>
         /// 165 rows in 48 spells, and they are the same animal. Measured over the 164 rows that have a spell
@@ -1855,6 +1861,30 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// The cells an effect covers: the ones a ';' zone names, or its shape around the cell.
         /// </summary>
+        /// <summary>
+        /// The aimed cell and the <paramref name="size"/> cells past it, away from the caster, along
+        /// the one of its four neighbours that best carries on the caster's way to it: where a
+        /// summon on a line zone comes out (see the summons in Resolver).
+        /// </summary>
+        internal static List<int> BehindInItsMelee(int from, int aimed, int size)
+        {
+            var cells = new List<int> { aimed };
+            var (ax, ay) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(from);
+            var (bx, by) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(aimed);
+            int dx = bx - ax, dy = by - ay;
+            if (dx == 0 && dy == 0) return cells;
+            var (stepX, stepY) = new[] { (1, 0), (0, -1), (-1, 0), (0, 1) }
+                .OrderByDescending(d => d.Item1 * dx + d.Item2 * dy).First();
+            for (int i = 1, x = bx, y = by; i <= size; i++)
+            {
+                x += stepX; y += stepY;
+                int next = Jondo.Unity.World.Maps.MapGeometry.PointToCell(x, y);
+                if (next < 0) break;
+                cells.Add(next);
+            }
+            return cells;
+        }
+
         internal static List<int> CasillasDelEfecto(SpellEffect efecto, int desde, int centro)
             => efecto.Forma == FormaDeCeldasFijas && efecto.CeldasFijas.Count > 0
                 ? new List<int>(efecto.CeldasFijas)
@@ -2691,6 +2721,20 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
 
+                // And a monster's 793 under a turn's trigger, with a delay and no duration, goes off
+                // once, in the round its delay names, however long the hook it rides on lasts. The
+                // age-old minogolem's starting spell (4762) has "793 4759 under TB, delay 1": the
+                // first draw of the states that say which corner it goes to each turn, after which
+                // 4788 draws the next four rounds and casts itself again every four. Hooked for
+                // good with its behaviour, 4759 went off at every turn start, each draw on top of
+                // the others, and the minogolem stood in two states at once.
+                if (rondaDelEnganche >= 0 && efecto.EffectId == CastsOnTheTurnOnce && efecto.Delay > 0
+                    && efecto.Duration == 0 && WaitsOnATurn(efecto) && !PlayerSpells.Contains(spell)
+                    && round > rondaDelEnganche + efecto.Delay)
+                {
+                    continue;
+                }
+
                 // And an item's is over once a later script marker's round has come. Prisanacion
                 // "cura un 60% de los danos enemigos sufridos en el primer turno, un 30% en el
                 // segundo turno y un 10% en el tercer turno": three casts under D, of delay 0, 1
@@ -2858,6 +2902,24 @@ namespace Jondo.Unity.Server.Managers
                                  : EsInvocacion(efecto.EffectId)
                                      ? efecto.CeldasFijas.Take(efecto.Value > 0 && efecto.Value < 999 ? efecto.Value : int.MaxValue).ToList()
                                      : new List<int> { efecto.CeldasFijas[0] };
+
+                    // A summon whose zone is a line from the aimed cell comes out on that line's
+                    // first free cell, past whoever stands on the aimed one, and nowhere when there
+                    // is none. The age-old minogolem's Pared (4763, "181 3744 on L1") is aimed at the
+                    // soulless mummy and raises its Murito on the cell behind her, on the far side
+                    // from him -- «si cette case n'est pas libre, pas de mur» (Dofus pour les noobs).
+                    // Put next to her wherever there was room, the wall came out on her own side.
+                    // The line goes through her melee, the four cells next to her: «sur la case de
+                    // votre corps-à-corps opposée à ce Minogolem».
+                    if (!fijas && EsInvocacion(efecto.EffectId) && efecto.Forma == Jondo.Unity.World.Maps.Zone.Linea
+                        && efecto.Tamano >= 1 && aimedCell >= 0)
+                    {
+                        var walkable = MapManager.GetFightWalkable(combat.ArenaMapId);
+                        int libre = BehindInItsMelee(caster.CellId, aimedCell, efecto.Tamano)
+                            .FirstOrDefault(cell => (walkable == null || walkable.Contains(cell)) && EnLaCasilla(combat, cell) == null, -1);
+                        if (libre < 0) continue;
+                        dondeVan = new List<int> { libre };
+                    }
                     foreach (int alSuelo in dondeVan)
                     {
                         var puesta = Aplicar(combat, caster, caster, spell, grade, efecto,

@@ -111,6 +111,28 @@ namespace Jondo.Unity.Server.Managers
             /// </summary>
             public double Utility { get; init; }
 
+            /// <summary>
+            /// The masks of its mechanics that name one of its side by template, each landing on the
+            /// aimed cell alone: whom it is aimed at instead of itself. The age-old minogolem's
+            /// Sustitución swaps him with the salt, gold or blood one ("a,F3743,*E200"...), and cast
+            /// on himself -- out of its range of one to sixty-three -- it was never cast.
+            /// </summary>
+            public IReadOnlyList<string> UtilityAllyMasks { get; init; } = Array.Empty<string>();
+
+            /// <summary>
+            /// Whether a mask aimed at one of its side holds for this caster and that fighter, the
+            /// caster's own conditions (the starred ones) with it.
+            /// </summary>
+            public bool UtilityReaches(Fighter caster, Fighter ally)
+                => UtilityAllyMasks.Any(mask => EffectEngine.CumpleLaMascara(caster, ally, mask)
+                                                && EffectEngine.CasterQualifies(caster, mask));
+
+            /// <summary>
+            /// Whether those masks put a condition on the caster: a step of the boss's own script,
+            /// cast when its state says so and before anything else of the turn.
+            /// </summary>
+            public bool UtilityScripted => UtilityAllyMasks.Any(mask => mask.Contains('*'));
+
             /// <summary>The level asks for a free cell: a leap lands NEXT to its target, never on him.</summary>
             public bool NeedsFreeCell { get; init; }
             public bool UtilityOnEnemies { get; init; }
@@ -828,6 +850,11 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (!spell.Offensive) foreach (var enemy in enemies) yield return (enemy, enemy.CellId);
                 }
+                else if (spell.UtilityAllyMasks.Count > 0)
+                {
+                    foreach (var ally in allies.Where(a => a != monster && spell.UtilityReaches(monster, a)))
+                        yield return (ally, ally.CellId);
+                }
                 else yield return (monster, from);
             }
         }
@@ -912,6 +939,12 @@ namespace Jondo.Unity.Server.Managers
             // worth nothing.
             if (spell.Utility > 0 && spell.OnSelf && spell.UtilityOnEnemies)
                 value += OwnZoneUtility(spell);
+            else if (spell.Utility > 0 && spell.UtilityAllyMasks.Count > 0)
+            {
+                // Aimed at the one of its side its masks name; a step of its script goes first.
+                if (!onEnemy && target != monster && spell.UtilityReaches(monster, target))
+                    value += spell.Utility + (spell.UtilityScripted ? ScriptedStep : 0);
+            }
             else if (spell.Utility > 0 && (spell.UtilityOnEnemies ? onEnemy : target == monster))
                 value += spell.Utility;
 
@@ -1034,6 +1067,13 @@ namespace Jondo.Unity.Server.Managers
             EffectSupport.StepBack, EffectSupport.StepForward, 1021, 1022, 1023, 1104, 1105, 1106,
             EffectSupport.Carry, EffectSupport.Throw,
         };
+
+        /// <summary>
+        /// What a step of a boss's script is worth on top of its utility: more than any blow, so
+        /// that it is played first -- the age-old minogolem goes to its next corner and raises its
+        /// wall from there, not from the one it leaves.
+        /// </summary>
+        private const double ScriptedStep = 1000;
 
         /// <summary>How many of the cells nearest the enemy are kept for summons, and of the likeliest for traps.</summary>
         private const int SummonCellsKept = 40;
