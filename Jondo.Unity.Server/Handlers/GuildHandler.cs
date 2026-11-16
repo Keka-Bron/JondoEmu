@@ -1364,12 +1364,39 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task LeaveAsync(NetworkStream stream, long who)
         {
             if (who == 0) return;
-            var guild = GuildStore.GuildOf(who);
-            if (GuildStore.Leave(who) == null) return;
+            var departure = GuildStore.Leave(who);
+            if (departure == null) return;
 
             await GoneAsync(stream, who);
-            if (guild != null) await RefreshEveryoneAsync(guild, who);
-            Console.WriteLine($"[Guild] {SessionContext.State.CharacterName} leaves «{guild?.Name}».");
+            await DepartedAsync(departure, who);
+            Console.WriteLine($"[Guild] {SessionContext.State.CharacterName} leaves «{departure.Guild.Name}».");
+        }
+
+        /// <summary>
+        /// What follows somebody's going, for the others: when the guild is dissolved, its
+        /// applicants told as refused; else the list for everybody, and a new leader's entry.
+        /// </summary>
+        private static async Task DepartedAsync(GuildStore.Departure departure, long who)
+        {
+            var guild = departure.Guild;
+            if (departure.Dissolved)
+            {
+                foreach (long applicant in departure.Applicants)
+                {
+                    var session = SessionRegistry.FindByCharacter(applicant);
+                    if (session != null)
+                        await session.SendAsync(ConnectionProtocol.Push(Op.Jmp, GuildProtocol.BuildApplicationAnswered(guild, false)));
+                }
+                return;
+            }
+
+            await RefreshEveryoneAsync(guild, who);
+            if (departure.NewLeader == 0) return;
+            var leader = GuildStore.MemberOf(departure.NewLeader);
+            var character = DatabaseManager.GetCharacterById(departure.NewLeader);
+            if (leader != null && character != null)
+                await TellEveryoneAsync(guild, ConnectionProtocol.Push(Op.Jgz, MemberUpdated(leader, character)));
+            Console.WriteLine($"[Guild] «{guild.Name}»: {departure.NewLeader} leads it now.");
         }
 
         /// <summary>
@@ -1445,6 +1472,7 @@ namespace Jondo.Unity.Server.Handlers
             if (target.Rank == GuildStore.RankLeader) return "guild.kick.noright";
             string targetName = DatabaseManager.GetCharacterById(target.CharacterId)?.Name ?? target.CharacterId.ToString();
 
+            // Never the leader nor the last one (the kicker is still in): no succession, no dissolution.
             GuildStore.Leave(target.CharacterId);
 
             var kicked = SessionRegistry.FindByCharacter(target.CharacterId);
@@ -1467,18 +1495,23 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static async Task CharacterGoneAsync(long characterId)
         {
-            var guild = GuildStore.GuildOf(characterId);
-            if (guild == null || GuildStore.Leave(characterId) == null) return;
-            await RefreshEveryoneAsync(guild, characterId);
-            Console.WriteLine($"[Guild] {characterId} leaves «{guild.Name}»: the character is deleted.");
+            var departure = GuildStore.Leave(characterId);
+            if (departure == null) return;
+            await DepartedAsync(departure, characterId);
+            Console.WriteLine($"[Guild] {characterId} leaves «{departure.Guild.Name}»: the character is deleted.");
         }
 
-        /// <summary>At startup, the members whose character is gone, out of their guild. Returns how many.</summary>
+        /// <summary>
+        /// At startup, the members whose character is gone, out of their guild as <see cref="CharacterGoneAsync"/>
+        /// takes them, and the guilds already left with nobody dissolved. Returns how many members.
+        /// </summary>
         public static int SweepGoneMembers()
         {
             var gone = DatabaseManager.GoneCharactersIn("GuildMembers");
-            foreach (long characterId in gone) GuildStore.Leave(characterId);
+            foreach (long characterId in gone) CharacterGoneAsync(characterId).GetAwaiter().GetResult();
             if (gone.Count > 0) Console.WriteLine($"[Guild] {gone.Count} member(s) without a character taken out of their guild.");
+            int empty = GuildStore.DissolveEmpty();
+            if (empty > 0) Console.WriteLine($"[Guild] {empty} guild(s) with nobody in them dissolved.");
             return gone.Count;
         }
 

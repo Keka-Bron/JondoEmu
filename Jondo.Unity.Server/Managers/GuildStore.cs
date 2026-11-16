@@ -1327,11 +1327,114 @@ namespace Jondo.Unity.Server.Managers
             return level;
         }
 
-        /// <summary>Takes a character out of his guild. Returns the guild he left, or null if he had none.</summary>
-        public static Guild Leave(long characterId)
+        /// <summary>The outcome of somebody leaving a guild, for whoever has to tell the others.</summary>
+        /// <param name="NewLeader">Who took the leader's rank over, or zero.</param>
+        /// <param name="Applicants">Whose applications went with a dissolved guild.</param>
+        public sealed record Departure(Guild Guild, long NewLeader, bool Dissolved, IReadOnlyList<long> Applicants);
+
+        /// <summary>
+        /// Takes a character out of his guild. A leader who leaves hands the guild to the member next
+        /// in line -- the best rank in the ranks' order, then the longest there --, and the last one
+        /// to leave takes the guild with him (<see cref="Dissolve"/>): neither was done, and a guild
+        /// lost its leader for good, or stayed in the directory with nobody in it. Null if he had none.
+        /// </summary>
+        public static Departure Leave(long characterId)
         {
             var guild = GuildOf(characterId);
             if (guild == null) return null;
+            int rank = RankOf(characterId);
+            LeaveOnly(characterId, guild);
+
+            var left = Members(guild.Id);
+            if (left.Count == 0) return new Departure(guild, 0, true, Dissolve(guild.Id));
+
+            long newLeader = 0;
+            if (rank == RankLeader && left.All(m => m.Rank != RankLeader))
+            {
+                newLeader = NextInLine(guild.Id, left);
+                SetRank(newLeader, RankLeader);
+            }
+            return new Departure(guild, newLeader, false, Array.Empty<long>());
+        }
+
+        /// <summary>Who takes over from a leader: the best rank by the ranks' order, then the longest there.</summary>
+        internal static long NextInLine(long guildId, IReadOnlyList<Member> members)
+        {
+            var order = Ranks(guildId).ToDictionary(r => r.Id, r => r.Order);
+            return members.OrderBy(m => order.TryGetValue(m.Rank, out int o) ? o : int.MaxValue)
+                          .ThenBy(m => m.JoinedUtcMs)
+                          .ThenBy(m => m.CharacterId)
+                          .First().CharacterId;
+        }
+
+        /// <summary>
+        /// A guild with nobody left, gone with everything that is its: every Guild table's rows of it
+        /// -- ranks, journal, applications, missions, notices, profile... --, its chest, and the houses
+        /// still shared with it no longer shared. Returns the characters whose applications went.
+        /// </summary>
+        /// <remarks>
+        /// The tables are read off the schema, the ones named Guild* with a GuildId: a table added
+        /// later goes too. Houses keep their rows -- a house is its owner's -- and only stop being shared.
+        /// </remarks>
+        public static List<long> Dissolve(long guildId)
+        {
+            var applicants = Applications(guildId).Select(a => a.CharacterId).ToList();
+            int chest, houses;
+            using (var conexion = Open())
+            {
+                var tables = new List<string>();
+                var schema = conexion.CreateCommand();
+                schema.CommandText = "SELECT m.name FROM sqlite_master m JOIN pragma_table_info(m.name) p " +
+                                     "WHERE m.type = 'table' AND p.name = 'GuildId' AND m.name LIKE 'Guild%';";
+                using (var reader = schema.ExecuteReader())
+                    while (reader.Read()) tables.Add(reader.GetString(0));
+
+                using var transaction = conexion.BeginTransaction();
+                foreach (string table in tables)
+                {
+                    var delete = conexion.CreateCommand();
+                    delete.Transaction = transaction;
+                    // The table's name comes from the schema, never from outside.
+                    delete.CommandText = $"DELETE FROM \"{table}\" WHERE GuildId = $g;";
+                    delete.Parameters.AddWithValue("$g", guildId);
+                    delete.ExecuteNonQuery();
+                }
+                var guild = conexion.CreateCommand();
+                guild.Transaction = transaction;
+                guild.CommandText = "DELETE FROM Guilds WHERE Id = $g;";
+                guild.Parameters.AddWithValue("$g", guildId);
+                guild.ExecuteNonQuery();
+
+                // Its chest (StorageStacks.GuildChest) and the houses shared with it (HouseStore): in
+                // the same base as the guild's, and on its connection, so that a test's guild never
+                // empties the real chest of a guild with the same id.
+                chest = Run(conexion, transaction, $"DELETE FROM {StorageStacks.SharedTable} WHERE Storage LIKE $p;",
+                            ("$p", $"guild:{guildId}:%"));
+                houses = Run(conexion, transaction, "UPDATE Houses SET GuildId = 0, GuildRights = 0 WHERE GuildId = $g;",
+                             ("$g", guildId));
+                transaction.Commit();
+            }
+
+            Console.WriteLine($"[Guild] Guild {guildId} dissolved: nobody left in it" +
+                              (chest > 0 ? $", {chest} stack(s) of its chest gone with it" : "") +
+                              (houses > 0 ? $", {houses} house(s) no longer shared" : "") + ".");
+            return applicants;
+        }
+
+        /// <summary>A statement on a table that may not be there yet: how many rows it touched, zero when it is not.</summary>
+        private static int Run(SqliteConnection conexion, SqliteTransaction transaction, string sql, params (string Name, object Value)[] parameters)
+        {
+            var command = conexion.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = sql;
+            foreach (var (name, value) in parameters) command.Parameters.AddWithValue(name, value);
+            try { return command.ExecuteNonQuery(); }
+            catch (SqliteException) { return 0; }
+        }
+
+        /// <summary>The member's row out, his leaving in the journal, and his account's houses no longer the guild's.</summary>
+        private static void LeaveOnly(long characterId, Guild guild)
+        {
             using var conexion = Open();
             var borra = conexion.CreateCommand();
             borra.CommandText = "DELETE FROM GuildMembers WHERE CharacterId = $c;";
@@ -1345,7 +1448,17 @@ namespace Jondo.Unity.Server.Managers
             // His account's houses are not the guild's any more: 1/277 tells the guild so.
             long account = DatabaseManager.GetCharacterById(characterId)?.AccountId ?? 0;
             if (account > 0) HouseStore.StopSharing(guild.Id, account);
-            return guild;
+        }
+
+        /// <summary>
+        /// At startup, the guilds with nobody in them -- emptied before a guild's last member took it
+        /// with him --, dissolved. Returns how many.
+        /// </summary>
+        public static int DissolveEmpty()
+        {
+            var empty = AllGuilds().Where(g => Members(g.Id).Count == 0).Select(g => g.Id).ToList();
+            foreach (long guildId in empty) Dissolve(guildId);
+            return empty.Count;
         }
     }
 }
