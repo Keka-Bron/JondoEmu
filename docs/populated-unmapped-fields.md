@@ -7,6 +7,7 @@ Mapping status updated **11 November 2026**; capture/population evidence retains
 its original snapshot date. Welcome-settings omission policy and native-use finding
 updated **12 November 2026**. Guild-hall selection boolean classification and
 installed customization-field coverage updated **13 November 2026**.
+Quest-journal construction policy updated **16 November 2026**.
 
 This inventory records fields with **proven non-default population** and an
 unused, unresolved or incomplete semantic-mapping status. Each entry has a
@@ -158,7 +159,7 @@ scalar names solely from the surrounding message name or builder parameter.
 |---|---|---|
 | ServerSettingsEvent / `hoy`, tag **7**, int32 | **Historical code:** the removed `BuildHoy` wrote **200** unconditionally. | **Omitted** under the [welcome-settings policy](#welcome-settings-omission-policy). Native finding remains indeterminate; this is not an active remap task or a client-unused classification. |
 | SocialEmblem / `lld`, tag **4**, int32, in alliance identity | **Code:** `AllianceProtocol.Emblem` writes stored `AllianceStore.Alliance.EmblemBackgroundShape` when nonzero. Creation/modification readers can persist that slot. This is conditional code evidence, not an official-capture population claim. | The August contract represents tags 1/2/3/5; tag 4 remains unmapped. Renewed MCP classification is indeterminate with incomplete native caller coverage. Direct map actor construction omits it under the map construction policy below; standalone alliance serializers retain their own construction paths. |
-| QuestFinished / `idr.idq.idp`, tag **1**, int32; root path `3[*] → 1` | **Code:** [`QuestProtocol.BuildJournal`](../Jondo.Unity.Server/Network/QuestProtocol.cs#L86-L89) writes **1** for each finished quest. The [same file's capture description](../Jondo.Unity.Server/Network/QuestProtocol.cs#L36-L64) records that finished-entry shape. | Indeterminate. A count-like interpretation is a historical lead, not a reviewed binding. ID-only conversion does not retain this value. |
+| QuestFinished / `idr.idq.idp`, tag **1**, int32; root path `3[*] → 1` | **Historical code:** the removed `QuestProtocol.BuildJournal` wrote **1** for each finished quest. Its capture description recorded the same shape; historical payload fixtures are retained in [`QuestStateContractTests`](../Jondo.Unity.Protocol.Game.Tests/QuestStateContractTests.cs). | **Omitted** under the [quest-journal construction policy](#quest-journal-construction-policy). Native finding remains indeterminate; the count-like interpretation is not a reviewed binding. |
 | ConfigurationEvent / `krj`, tag **1**, message | **Documented capture measurement:** the retired entry reconstruction contained the non-empty message `{1: 30, 2: 5, 3: 300}`. | **Unused/omit** under the [after-selection policy](#after-selection-omission-policy). Native finding remains indeterminate. The sibling guild configuration at tag 2 is constructed from server policy. |
 | InfiniteDreamStateEvent / `izg`, tag **17**, int32 | **Code:** [`BuildDreamState`](../Jondo.Unity.Server/Network/DreamProtocol.cs#L429-L433) uses `VarIfNotZero(17, sueno.Arena)`. [`Dreams.StartingArenas`](../Jondo.Unity.Server/Managers/Dreams.cs#L251) returns **1** for the supported starting-arena branch, and [new-dream initialization](../Jondo.Unity.Server/Managers/Dreams.cs#L1078-L1096) stores that result in `Arena`. | Populated raw-only. The builder's life/arena interpretation has not completed the semantic evidence gate. |
 | InfiniteDreamMonster / `izg.izf.ize`, tag **3**, int32; root path `3[*] → 3` | **Documentation:** [`Dreams.DreamerLevel`](../Jondo.Unity.Server/Managers/Dreams.cs#L2403-L2409) describes captured monster level **303** alongside dreamer level 353. **Code:** [`BeastEntry`](../Jondo.Unity.Server/Network/DreamProtocol.cs#L269-L278) writes `beast.Level`, supplied by [`DreamHandler.BestiaryOf`](../Jondo.Unity.Server/Handlers/DreamHandler.cs#L658-L675). | The builder's proposed level field remains unmapped; the inspected native conversion did not establish its individual use/meaning. |
@@ -186,6 +187,32 @@ remap tasks.
 no compatibility path is introduced for them. Other rows retain historical producer
 and native findings for their feature scopes. Builder labels such as `Arena` and
 `Level` do not independently prove protocol semantics.
+
+## Quest-journal construction policy
+
+The **16 November 2026** journal/followed/marks migration applies the existing
+indeterminate-field omission rule. `QuestMessages` constructs the mapped quest
+IDs, step IDs and objective pending flags from current character state. Objective
+declaration order is retained; dialog parameters are empty and completion messages
+remain absent, matching the former journal builder's inputs.
+
+- `QuestFinished` tag **1** / `fowh`, property **194504**, is omitted. The retired
+  writer's constant **1** is historical population evidence, not an established
+  count field. Its recorded native finding remains **indeterminate**, with no
+  positive business-use witness; this migration does not claim global non-use.
+- `QuestsEvent` tag **2** / `fown`, `QuestActive` tag **1** / `fpal`, and
+  `QuestActiveDetails` tag **3** / `fpah` remain unset. The retired journal writer
+  did not populate them. No new names or compatibility fields are introduced.
+- Finished IDs are supplied as `QuestFinished` entries. The mapped
+  `ReinitializedDoneQuestsId` list remains empty under the existing server policy.
+  Standard protobuf encoding omits an empty packed list instead of reproducing
+  the old writer's explicit `22 00`; an empty journal event is still sent.
+
+The maintained contracts and these unmapped fields were rechecked through MCP for
+**jondo-11-08-2026**. This is direct construction under the documented policy, not
+a lossless reproduction of the legacy finished-entry bytes. Independent fixtures
+separate historical raw retention from intentional semantic omissions and empty
+packed-list normalization. Real-client journal/tracker acceptance remains pending.
 
 ## Spell-book construction policy
 

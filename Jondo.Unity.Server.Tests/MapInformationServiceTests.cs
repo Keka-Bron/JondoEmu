@@ -164,6 +164,50 @@ public sealed class MapInformationServiceTests
         Assert.Empty(h.Codec.Frames);
     }
 
+    [Fact]
+    public async Task Typed_quest_marks_precede_actors_on_each_repeatable_map_reply()
+    {
+        var h = new Harness { QuestState = new QuestStateService(new QuestBackend()) };
+        await h.Service.SendAsync(h.Session, h.Character);
+        h.Session.State.MapId++;
+        await h.Service.SendAsync(h.Session, h.Character);
+
+        var expected = MapSequence.ToList();
+        expected.Insert(expected.IndexOf("actors"), "marks-event");
+        Assert.Equal(expected.Concat(expected), h.Calls);
+        Assert.Equal(4, h.Codec.Frames.Count);
+        Assert.Equal(9_000_000_001, Assert.Single(Assert.IsType<NpcsMapQuestStatusUpdateEvent>(h.Codec.Frames[0].Content).MapInformation).MapId);
+        Assert.IsType<AreaFightModifierUpdateEvent>(h.Codec.Frames[1].Content);
+        Assert.Equal(9_000_000_002, Assert.Single(Assert.IsType<NpcsMapQuestStatusUpdateEvent>(h.Codec.Frames[2].Content).MapInformation).MapId);
+        Assert.IsType<AreaFightModifierUpdateEvent>(h.Codec.Frames[3].Content);
+        Assert.Equal(0, h.Codec.Decodes);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Typed_mark_delivery_failure_stops_before_map_actors_and_arrival_processing(bool transport)
+    {
+        var h = new Harness { QuestState = new QuestStateService(new QuestBackend()), FailCodec = !transport, FailTransport = transport };
+        Assert.Same(h.Failure, await Assert.ThrowsAsync<IOException>(() => h.Service.SendAsync(h.Session, h.Character)));
+        Assert.Equal(new[] { "forget", "dream", "prepare-anomaly", "marks", "marks-event" }, h.Calls);
+        Assert.Empty(h.ActorSources);
+        Assert.Single(h.Codec.Frames);
+        Assert.Equal(transport ? 1 : 0, h.Sends);
+    }
+
+    private sealed class QuestBackend : IQuestStateBackend
+    {
+        public QuestsEvent? Journal(GameSession session) => throw new InvalidOperationException("Map replies do not resend the journal.");
+        public IReadOnlyList<int> Followed(long characterId) => throw new InvalidOperationException("Map replies do not read the tracker.");
+        public void Unfollow(long characterId, int questId) => throw new InvalidOperationException("Map replies do not clean the tracker.");
+        public NpcsMapQuestStatusUpdateEvent? Marks(GameSession session, long mapId)
+        {
+            Assert.Equal(session.MapId, mapId);
+            return QuestMessages.Marks(mapId, [(-20_000L, [81_001], [81_002])]);
+        }
+    }
+
     private sealed class Harness : IMapInformationBackend
     {
         internal List<string> Calls { get; } = [];
@@ -176,12 +220,20 @@ public sealed class MapInformationServiceTests
         internal int Sends;
         internal string? FailAt;
         internal Func<Task>? BeforeActors;
+        internal QuestStateService? QuestState;
         internal IOException Failure { get; } = new("map operation failed");
 
         internal Harness()
         {
             Codec = new(frame =>
             {
+                if (frame.Content is NpcsMapQuestStatusUpdateEvent)
+                {
+                    Assert.NotNull(QuestState);
+                    Calls.Add("marks-event");
+                    if (FailCodec) throw Failure;
+                    return;
+                }
                 Assert.IsType<AreaFightModifierUpdateEvent>(frame.Content);
                 Calls.Add("modifier");
                 if (FailCodec) throw Failure;
@@ -211,7 +263,11 @@ public sealed class MapInformationServiceTests
         public void ForgetInteractions(GameSession session) => Record("forget", session);
         public Task RestoreDreamAsync(GameSession session) => Hook("dream", session);
         public void PrepareAnomaly(long mapId) { Assert.Equal(Session.MapId, mapId); Record("prepare-anomaly", Session); }
-        public Task SendMarksAsync(GameSession session) => Hook("marks", session);
+        public async Task SendMarksAsync(GameSession session)
+        {
+            await Hook("marks", session);
+            if (QuestState != null) await QuestState.SendMarksAsync(session, session.MapId);
+        }
         public async Task SendActorsAsync(GameSession session, DbCharacter character)
         {
             Record("actors", session);

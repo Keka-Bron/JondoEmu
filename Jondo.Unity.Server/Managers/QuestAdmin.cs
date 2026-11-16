@@ -25,7 +25,7 @@ namespace Jondo.Unity.Server.Managers
             for (int guard = 0; guard < 40 && log.Active(quest); guard++) log.FinishStep(quest);
             Quests.SaveAsItStands(quest);
             if (wasActive) await DropFromTheBoxAsync(stream, quest);
-            await Quests.SendJournalAsync(stream);
+            await Quests.SendJournalAsync(SessionContext.Current);
         }
 
         /// <summary>The quest wiped out of the character's journal, to play it again.</summary>
@@ -35,7 +35,7 @@ namespace Jondo.Unity.Server.Managers
             if (log == null) return;
             if (log.Active(quest)) await DropFromTheBoxAsync(stream, quest);
             Quests.Forget(quest);
-            await Quests.SendJournalAsync(stream);
+            await Quests.SendJournalAsync(SessionContext.Current);
         }
 
         /// <summary>

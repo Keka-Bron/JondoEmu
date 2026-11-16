@@ -83,7 +83,7 @@ namespace Jondo.Unity.Tests.Quests
                 }
 
                 // And the journal sent on entering the world carries the followed box even empty: it replaces the client's.
-                using (SessionContext.Push(pipe.Session)) await QuestEngine.SendJournalAsync(pipe.ToClient, box: true);
+                using (SessionContext.Push(pipe.Session)) await QuestEngine.SendJournalAsync(pipe.Session, box: true);
                 (string Opcode, byte[] Payload) last = default;
                 while (true)
                 {

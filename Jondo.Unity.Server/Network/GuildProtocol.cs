@@ -338,12 +338,6 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// The contributions left this week (jla): 5, 4, 3 in the contributing capture,
-        /// one less for each one, and empty in a guild that has none.
-        /// </summary>
-        public static byte[] BuildContributionsLeft(int left) => Pb.New().VarIfNotZero(1, left).Build();
-
-        /// <summary>
         /// The guild's week (jfl): f1 its tier, f2 its activity points, f3 the member's token cap,
         /// f4 his tokens of the week and f5 the tier waiting for next week.
         /// </summary>

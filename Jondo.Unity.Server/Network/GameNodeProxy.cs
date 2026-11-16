@@ -315,7 +315,7 @@ namespace Jondo.Unity.Server.Network
                 // A document's «start the quest» button.
                 else if (payloadStr == Op.Uri("ido")) await QuestHandler.StartFromDocumentAsync(stream, payload);
                 // The item tooltips' average prices.
-                else if (payloadStr == Op.Uri("ivp")) await MarketplaceHandler.AveragePricesAsync(stream);
+                else if (payloadStr == Op.Uri("ivp")) await MarketplaceHandler.AveragePricesAsync(session);
                 // The «Cours du marché» window, an item's price history.
                 else if (payloadStr == Op.Uri(Op.Itj)) await MarketplaceHandler.PriceHistoryAsync(stream, payload);
                 // The transfer buttons: everything, what is already there, a selection -- onto a
@@ -876,7 +876,7 @@ namespace Jondo.Unity.Server.Network
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jiy)))
                 {
                     // The directory sheet or the contributions left, depending on the tab.
-                    await Handlers.GuildHandler.TabAsync(stream, payload);
+                    await Handlers.GuildHandler.TabAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jfp)))
                 {
@@ -988,7 +988,7 @@ namespace Jondo.Unity.Server.Network
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlb)))
                 {
                     // Contributing to the guild.
-                    await Handlers.GuildHandler.ContributeAsync(stream, payload);
+                    await Handlers.GuildHandler.ContributeAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyc)))
                 {
@@ -1023,7 +1023,7 @@ namespace Jondo.Unity.Server.Network
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyx)))
                 {
                     // Leaving the dream.
-                    await DreamHandler.LeaveAsync(stream, payload);
+                    await DreamHandler.LeaveAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iwt)))
                     await DreamHandler.InviteGroupAsync(stream);

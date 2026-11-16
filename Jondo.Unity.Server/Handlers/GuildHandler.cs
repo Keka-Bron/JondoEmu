@@ -614,8 +614,9 @@ namespace Jondo.Unity.Server.Handlers
         /// without f2, the header (jhh) and the remaining contributions (jla), the two the opening
         /// burst's captures have between the jfp's jff and the jml's jgu.
         /// </summary>
-        public static async Task TabAsync(NetworkStream stream, byte[] frame)
+        public static async Task TabAsync(GameSession session, byte[] frame)
         {
+            using var context = SessionContext.Push(session);
             byte[] jiy = ConnectionProtocol.ReadPayload(frame, Op.Jiy);
             if (jiy == null) return;
 
@@ -625,19 +626,18 @@ namespace Jondo.Unity.Server.Handlers
                 if (field.FieldNumber == 2 && field.WireType == 0) tab = field.VarIntValue;
             }
 
-            long who = SessionContext.State.CharacterId;
+            long who = session.CharacterId;
             var guild = who == 0 ? null : GuildStore.GuildOf(who);
             if (guild == null) return;
 
             if (tab == ProfileTab)
             {
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Jci, ProfileOf(guild)));
+                await session.SendAsync(ConnectionProtocol.Push(Op.Jci, ProfileOf(guild)));
             }
             else if (tab == 0)
             {
-                await GuildStateService.Live.SendHeaderAsync(SessionContext.Current, guild);
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Jla,
-                    GuildProtocol.BuildContributionsLeft(GuildStore.ContributionsLeft(who))));
+                await GuildStateService.Live.SendHeaderAsync(session, guild);
+                await session.SendAsync(new Jondo.Unity.Protocol.Game.GuildContributionLeftEvent(GuildStore.ContributionsLeft(who)));
             }
         }
 
@@ -1646,15 +1646,17 @@ namespace Jondo.Unity.Server.Handlers
         /// Only with a tier chosen, as the client has it: without one its button says to choose a
         /// tier in the missions tab first.
         /// </remarks>
-        public static async Task ContributeAsync(NetworkStream stream, byte[] frame)
+        public static async Task ContributeAsync(GameSession session, byte[] frame)
         {
-            long who = SessionContext.State.CharacterId;
+            using var context = SessionContext.Push(session);
+            long who = session.CharacterId;
             var guild = who == 0 ? null : GuildStore.GuildOf(who);
             if (guild == null) return;
             if (GameState.Kamas < GuildStore.ContributionKamas) return;
             var now = DateTimeOffset.UtcNow;
             if (!GuildActivity.Of(guild.Id, now).HasActivity) return;
 
+            var stream = session.Stream ?? throw new InvalidOperationException("Guild contributions require a connected game session.");
             int left = GuildStore.Contribute(who, guild.Id);
             if (left < 0) return;   // he had none left this week
 
@@ -1679,7 +1681,7 @@ namespace Jondo.Unity.Server.Handlers
             if (credited.Tokens > 0) await ItemUseHandler.WeighAsync(stream);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jle,
                 GuildProtocol.BuildContribution(GuildStore.ContributionKamas, left)));
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jla, GuildProtocol.BuildContributionsLeft(left)));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.GuildContributionLeftEvent(left));
 
             // A milestone reached moves the guild's experience, and maybe its level: everybody's header.
             if (credited.Experience > 0) await GuildStateService.Live.TellHeaderAsync(GuildStore.GuildOf(who));

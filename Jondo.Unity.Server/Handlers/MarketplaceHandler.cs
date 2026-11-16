@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -268,16 +269,11 @@ namespace Jondo.Unity.Server.Handlers
         /// server's answer to every one of the captures' 140 ivp. The client replaces its whole
         /// table with it (elx), so an item missing from it reads «average price unavailable».
         /// </summary>
-        public static Task AveragePricesAsync(NetworkStream stream)
-            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push("ivi", BuildAveragePrices()));
-
-        internal static byte[] BuildAveragePrices()
-        {
-            var ivi = Pb.New();
-            foreach (var (gid, price) in MarketplaceListings.AveragePrices())
-                ivi.Msg(2, Pb.New().Var(1, gid).Var(2, price));
-            return ivi.Build();
-        }
+        public static Task AveragePricesAsync(GameSession session)
+            => session.SendAsync(new Game.ObjectAveragePricesEvent(
+                MarketplaceListings.AveragePrices()
+                    .Select(row => new Game.ObjectAveragePrice(row.Gid, row.Price))
+                    .ToArray()));
 
         /// <summary>
         /// The «Cours du marché» window (MarketPrice) asks for an item's price history with itj

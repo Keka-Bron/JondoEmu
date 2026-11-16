@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Xunit;
@@ -24,6 +25,18 @@ namespace Jondo.Unity.Tests.Protocol
     public class QuestProtocolTests
     {
         private static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
+
+        // These captured mark assertions now exercise semantic construction and the
+        // production codec; the old mark builder is retired. Independent protocol
+        // fixtures also live in QuestStateContractTests in the Game protocol suite.
+        private static byte[] Marks(long mapId, IEnumerable<(long Actor, IReadOnlyList<int> Offers, IReadOnlyList<int> InProgress)> actors)
+        {
+            var codec = new GameCodec();
+            return codec.ReadEnvelope(codec.Encode(new(QuestMessages.Marks(mapId, actors)))).Content.Value.ToByteArray();
+        }
+
+        private static byte[] Marks(long mapId, IEnumerable<(long Actor, IReadOnlyList<int> Offers)> actors)
+            => Marks(mapId, actors.Select(actor => (actor.Actor, actor.Offers, (IReadOnlyList<int>)Array.Empty<int>())));
 
         [Fact]
         public void A_quest_starting_is_one_varint()
@@ -108,7 +121,7 @@ namespace Jondo.Unity.Tests.Protocol
             //       1202cf13      f2, 2 bytes packed: varint 2511
             //       20e0...       f4: the actor id
             //     1881...       f3: the map
-            string built = Hex(QuestProtocol.BuildQuestMarks(
+            string built = Hex(Marks(
                 241438721, new[] { (-20001L, (IReadOnlyList<int>)new[] { 2511 }) }));
 
             Assert.Contains("cf13", built);        // quest 2511, packed
@@ -136,7 +149,7 @@ namespace Jondo.Unity.Tests.Protocol
             //       20 e0e3feffffffffffff01       f4: -20000
             //     18 8294d068                   f3: map 219417090
             Assert.Equal("0a16120f1202fb1220e0e3feffffffffffff01188294d068",
-                         Hex(QuestProtocol.BuildQuestMarks(
+                         Hex(Marks(
                              219417090, new[] { (-20000L, (IReadOnlyList<int>)new[] { 2427 }) })));
         }
 
@@ -164,10 +177,10 @@ namespace Jondo.Unity.Tests.Protocol
             // It mattered less than it looks, because iom is not what draws the mark over an NPC's
             // head at all; that rides in the actor's own record in the jss. But an index that
             // disagrees with the thing it indexes is a trap for the next person.
-            string built = Hex(QuestProtocol.BuildQuestMarks(
+            string built = Hex(Marks(
                 1, new[] { (-20001L, (IReadOnlyList<int>)System.Array.Empty<int>()) }));
 
-            Assert.DoesNotContain("1200", built);
+            Assert.Equal("", built);
         }
 
         [Fact]
@@ -176,7 +189,7 @@ namespace Jondo.Unity.Tests.Protocol
             // Packed is how the captures carry them - one length-delimited field with the varints
             // end to end - not one field per quest. Written the other way the client reads one
             // quest and drops the rest.
-            string built = Hex(QuestProtocol.BuildQuestMarks(
+            string built = Hex(Marks(
                 1, new[] { (-20001L, (IReadOnlyList<int>)new[] { 26, 2546 }) }));
 
             Assert.Contains("12031af213", built);
@@ -195,10 +208,10 @@ namespace Jondo.Unity.Tests.Protocol
             //     18 81b09073                   f3: map 241440769
             IReadOnlyList<int> none = Array.Empty<int>();
             Assert.Equal("0a16120f1a02c61320e0e3feffffffffffff011881b09073",
-                         Hex(QuestProtocol.BuildQuestMarks(
+                         Hex(Marks(
                              241440769, new[] { (-20000L, none, (IReadOnlyList<int>)new[] { 2502 }) })));
             Assert.Equal("0a1812111a04c613dd0c20e0e3feffffffffffff011881b09073",
-                         Hex(QuestProtocol.BuildQuestMarks(
+                         Hex(Marks(
                              241440769, new[] { (-20000L, none, (IReadOnlyList<int>)new[] { 2502, 1629 }) })));
         }
 
@@ -206,7 +219,7 @@ namespace Jondo.Unity.Tests.Protocol
         public void An_actor_with_a_quest_to_offer_and_one_under_way_carries_both_in_order()
         {
             IReadOnlyList<int> offered = new[] { 2511 }, underWay = new[] { 2502 };
-            string built = Hex(QuestProtocol.BuildQuestMarks(1, new[] { (-20001L, offered, underWay) }));
+            string built = Hex(Marks(1, new[] { (-20001L, offered, underWay) }));
 
             Assert.Contains("1202cf131a02c613", built);   // f2 [2511], then f3 [2502]
         }

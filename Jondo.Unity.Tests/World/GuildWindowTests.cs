@@ -294,12 +294,10 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(20, back.MinLevel);
         }
 
-        /// <summary>The contributions left and a new guild's jff, as in the opening.</summary>
+        /// <summary>A new guild's jff, as in the opening.</summary>
         [Fact]
         public void The_window_opening_frames_are_the_capture()
         {
-            Assert.Equal("0805", Hex(GuildProtocol.BuildContributionsLeft(5)));
-            Assert.Equal("", Hex(GuildProtocol.BuildContributionsLeft(0)));
             Assert.Equal("1a00", Hex(GuildProtocol.BuildWeek(null, 250, 0)));
         }
 
@@ -355,7 +353,7 @@ namespace Jondo.Unity.Tests.World
             using (SessionContext.Push(wire.Session))
             {
                 await GuildHandler.OpenWindowAsync(wire.Session.Stream!);
-                await GuildHandler.TabAsync(wire.Session.Stream!, ConnectionProtocol.Push(Op.Jiy, Array.Empty<byte>()));
+                await GuildHandler.TabAsync(wire.Session, ConnectionProtocol.Push(Op.Jiy, Array.Empty<byte>()));
                 await GuildHandler.MembersAsync(wire.Session.Stream!, ConnectionProtocol.Push(Op.Jml, Array.Empty<byte>()));
             }
 

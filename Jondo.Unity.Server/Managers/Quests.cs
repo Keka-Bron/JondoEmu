@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Quests;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Managers
 {
@@ -1455,7 +1456,7 @@ namespace Jondo.Unity.Server.Managers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
             FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
-            await SendJournalAsync(stream);
+            await SendJournalAsync(SessionContext.Current);
             await Achievements.AfterQuestAsync(stream, questId);
             Console.WriteLine($"[Quests] Quest {questId} ends with nothing paid.");
             return true;
@@ -1486,7 +1487,7 @@ namespace Jondo.Unity.Server.Managers
                     ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
             }
-            await SendJournalAsync(stream);
+            await SendJournalAsync(SessionContext.Current);
 
             foreach (int item in tutorial.Items)
             {
@@ -1675,7 +1676,7 @@ namespace Jondo.Unity.Server.Managers
             if (stream == null) return true;
 
             // And the green mark of the one who just gave it is switched off.
-            await SendMarksAsync(stream, SessionContext.State.MapId);
+            await SendMarksAsync(SessionContext.Current, SessionContext.State.MapId);
             await RedrawQuestElementsAsync(stream, questId);
 
             // A treasure quest of Dhain's: the box beside him offers its hunt.
@@ -1795,9 +1796,8 @@ namespace Jondo.Unity.Server.Managers
         /// is the same message with an empty list — that is how the captures do it, and 235 of the
         /// 380 of them are exactly that.
         ///
-        /// Every NPC on the map is named, including the ones with nothing: an actor left out is an
-        /// actor the client has heard nothing about, so it goes on drawing whatever it was told
-        /// last time. Saying "this one has none" is the only way to take a mark away.
+        /// Only NPCs with offered or in-progress quests are named. An empty replacement clears
+        /// the index; NPC appearances carry their own markers separately.
         ///
         /// The question asked per NPC is the real one — <see cref="QuestLog.CanStart"/> — so a
         /// quest whose level or prerequisite is not met does not light the mark up.
@@ -1809,25 +1809,16 @@ namespace Jondo.Unity.Server.Managers
         /// never goes out however long the player talks, because the line that hands the quest over
         /// is not one anybody can reach.
         /// </remarks>
-        public static async Task SendMarksAsync(NetworkStream stream, long mapId)
+        public static Task SendMarksAsync(GameSession session, long mapId)
+            => QuestStateService.Live.SendMarksAsync(session, mapId);
+
+        internal static Game.NpcsMapQuestStatusUpdateEvent? MarksSnapshot(GameSession session, long mapId)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
-            if (log == null || _book == null || mapId == 0) return;
+            if (log == null || _book == null || mapId == 0) return null;
 
             var here = Npcs.OnMap(mapId);
-            if (here.Count == 0)
-            {
-                // An EMPTY frame, not silence. "iom (0)" is what the real server sends on entering
-                // a map with nobody to mark, and it turns up in 20 of the captures -- every single
-                // map load has one. Saying nothing is not the same thing: the client would go on
-                // drawing whatever the previous map told it, so a mark could follow the player
-                // around. The payload is genuinely zero bytes, map id included, which is why this
-                // does not go through BuildQuestMarks.
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Iom, Array.Empty<byte>()));
-                return;
-            }
-
             // Only the ones that have something. The iom is an index, not a census: in the 145 real
             // frames there is not one named actor with an empty list. Whoever stops having anything
             // disappears from the index, and that is what removes his mark.
@@ -1841,30 +1832,7 @@ namespace Jondo.Unity.Server.Managers
                 if (offers.Count > 0 || waiting.Count > 0) marks.Add((npc.ContextualId, offers, waiting));
             }
 
-            // And if on this map nobody is left with anything, the empty frame, which is how
-            // Ankama says it on entering a map with no marks: "iom (0)", zero bytes of body.
-            byte[] cuerpo = marks.Count > 0
-                ? QuestProtocol.BuildQuestMarks(mapId, marks)
-                : Array.Empty<byte>();
-
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iom, cuerpo));
-
-            // It is said out loud because the absence of a mark has TWO causes that look the same —nothing
-            // has been sent, or the empty list has been sent— and telling them apart meant opening the
-            // traffic log and decoding the iom by hand. With this line one sees at a glance whether
-            // the NPC has nothing to offer or whether it is the sending that does not arrive.
-            int conMarca = 0, ofrecidas = 0, enCurso = 0;
-            foreach (var (_, quests, waiting) in marks)
-            {
-                enCurso += waiting.Count;
-                if (quests.Count == 0) continue;
-                conMarca++;
-                ofrecidas += quests.Count;
-            }
-
-            Console.WriteLine($"[Quests] Marks of map {mapId}: {conMarca} of {marks.Count} NPCs " +
-                              $"with something to offer, {ofrecidas} quest(s); {enCurso} under way waiting on them.");
+            return QuestMessages.Marks(mapId, marks);
         }
 
         /// <summary>
@@ -2116,7 +2084,7 @@ namespace Jondo.Unity.Server.Managers
             = new Dictionary<int, List<(int, long)>>();
 
         /// <summary>
-        /// Sends this character's whole quest journal, one idu per quest under way.
+        /// Sends this character's whole journal, then the followed tracker only at entry.
         /// </summary>
         /// <remarks>
         /// Sent on entering the world, in place of what the replayed capture used to carry. That
@@ -2125,7 +2093,7 @@ namespace Jondo.Unity.Server.Managers
         /// logged in was shown a stranger's quest journal, and once there was an engine those
         /// quests would also have been ones the server did not think they had.
         ///
-        /// Nothing is sent for a character with no quests, which is what a new one looks like.
+        /// A loaded but empty journal is still sent as a replacement.
         ///
         /// The followed quests' box (iel) goes with it only on entering the world («box»): later
         /// in the session the client adds what an iel brings to what its box already shows, and
@@ -2133,26 +2101,27 @@ namespace Jondo.Unity.Server.Managers
         /// quests once more. Once in the world the client keeps the box itself: it follows a quest
         /// as it starts, and the ied of a finished one takes it out.
         /// </remarks>
-        public static async Task SendJournalAsync(NetworkStream stream, bool box = false)
-        {
-            var log = Log;
-            if (log == null) return;
+        public static Task SendJournalAsync(GameSession session, bool box = false)
+            => QuestStateService.Live.SendJournalAsync(session, box);
 
-            if (_book == null) return;
+        internal static Game.QuestsEvent? JournalSnapshot(GameSession session)
+        {
+            using var context = SessionContext.Push(session);
+            var log = Log;
+            var book = _book;
+            if (log == null || book == null) return null;
 
             // One idr with the lot, which is how the captured block does it, rather than one idu
             // per quest. Sending it even when it is empty matters: the client fills the window from
             // this message, and an empty one is what says "this character has no journal".
-            var doing = new List<(int, int, IReadOnlyList<int>, IReadOnlyCollection<int>)>();
+            var doing = new List<Game.QuestActive>();
             foreach (var run in log.Doing())
             {
-                var step = _book.Step(run.StepId);
+                var step = book.Step(run.StepId);
                 if (step == null) continue;
 
-                var objectives = new List<int>(step.Objectives.Count);
-                foreach (var objective in step.Objectives) objectives.Add(objective.Id);
-
-                doing.Add((run.QuestId, run.StepId, Shown(log, run, objectives), run.Done));
+                var objectives = step.Objectives.Select(objective => objective.Id).ToArray();
+                doing.Add(QuestMessages.Active(run.QuestId, run.StepId, Shown(log, run, objectives), run.Done));
             }
 
             var finished = new List<int>();
@@ -2161,27 +2130,7 @@ namespace Jondo.Unity.Server.Managers
                 if (pair.Value.Finished) finished.Add(pair.Key);
             }
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Idr, QuestProtocol.BuildJournal(doing, finished)));
-
-            Console.WriteLine($"[Quests] Journal sent: {doing.Count} in progress, {finished.Count} done.");
-            if (!box) return;
-
-            // And the followed quests' box, which the client fills from its own message (iel), in
-            // the order they were taken up. Only those still in progress: a finished one leaves it.
-            var followed = new List<(int, int, IReadOnlyList<int>, IReadOnlyCollection<int>)>();
-            long me = SessionContext.State.CharacterId;
-            foreach (int questId in new List<int>(FollowedQuests.Of(me)))
-            {
-                int at = doing.FindIndex(d => d.Item1 == questId);
-                if (at >= 0) followed.Add(doing[at]);
-                // Finished before quests closed with their ied, and still kept as followed.
-                else FollowedQuests.Unfollow(me, questId);
-            }
-            // Always, even empty: iel replaces the client's box, and a box the client still held
-            // went on asking for an objective long done.
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iel, QuestProtocol.BuildFollowed(followed)));
+            return QuestMessages.Journal(doing, finished);
         }
 
         /// <summary>
@@ -2278,7 +2227,7 @@ namespace Jondo.Unity.Server.Managers
                 // And the marks again, as after every ieb and idz of the captures.
                 if (stream != null && (move.ObjectiveTicked || move.StepFinished))
                 {
-                    await SendMarksAsync(stream, SessionContext.State.MapId);
+                    await SendMarksAsync(SessionContext.Current, SessionContext.State.MapId);
                     await RedrawQuestElementsAsync(stream, questId);
                 }
             }
@@ -2297,7 +2246,7 @@ namespace Jondo.Unity.Server.Managers
                     ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
                 if (move.StepFinished) await PayAsync(stream, move.FinishedStep);
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
-                if (stream != null) await SendMarksAsync(stream, SessionContext.State.MapId);
+                if (stream != null) await SendMarksAsync(SessionContext.Current, SessionContext.State.MapId);
 
                 // An Almanax offering is made once a day: the day is written down, so the same
                 // quest is not handed out again until the saint comes round next year.

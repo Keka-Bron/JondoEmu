@@ -102,10 +102,10 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         // Available titles and ornaments, and which one is worn.
         public Task SendWardrobeAsync(GameSession session) => WardrobeHandler.SendOwnedAsync(StreamOf(session), session.AccountId);
         public Task SendHousesAsync(GameSession session) => HouseHandler.SendAccountHousesAsync(StreamOf(session));
-        public Task SendJournalAsync(GameSession session) => Managers.Quests.SendJournalAsync(StreamOf(session), box: true);
+        public Task SendJournalAsync(GameSession session) => Managers.Quests.SendJournalAsync(session, box: true);
         public Task SendAchievementsAsync(GameSession session) => Managers.Achievements.SendListAsync(StreamOf(session));
         public Task SendPresetsAsync(GameSession session) => PresetHandler.SendListAsync(StreamOf(session));
-        public Task SendMarksAsync(GameSession session) => Managers.Quests.SendMarksAsync(StreamOf(session), session.MapId);
+        public Task SendMarksAsync(GameSession session) => Managers.Quests.SendMarksAsync(session, session.MapId);
     }
 
     public async Task<bool> TrySendFightMapAsync(GameSession session, GameRequest request)

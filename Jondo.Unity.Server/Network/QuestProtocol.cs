@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// The three messages the server sends about quests, built the way the captures have them.
+    /// Remaining incremental quest notifications and step replies. Journal, followed
+    /// quests and map marks use QuestMessages and QuestStateService directly.
     /// </summary>
     /// <remarks>
     /// Every shape here was read off the 401 Wireshark captures rather than guessed, and the thing
@@ -48,79 +48,6 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Var(1, questId).Build();
 
         /// <summary>
-        /// The whole journal in one message (idr): what is under way and what is done.
-        ///
-        ///   f1 (repeated) { f2: the objectives and the step, f3: quest id }   under way
-        ///   f3 (repeated) { f1: 1, f2: quest id }                             finished
-        ///   f4  packed varints                                              more finished ones
-        ///
-        /// No outer wrapper, unlike idu. What looks like one when reading the frame by hand is the
-        /// envelope's own <c>Any.value</c>, and mistaking it for a field of the message would put
-        /// the whole journal one level too deep.
-        /// </summary>
-        /// <remarks>
-        /// This is the message that fills the quest window on entering the world, and it is the one
-        /// that was still handing every player somebody else's journal. The captured block carries
-        /// 261 <c>idu</c> frames AND one <c>idr</c> holding the same 261 inside it plus 548
-        /// finished, so taking only the <c>idu</c> out of the replay changed nothing that the
-        /// player could see: 261 in progress and 622 finished still arrived, none of them theirs,
-        /// and every quest in Incarnam and Astrub showed as already done — which is also why no NPC
-        /// carried a green mark and none of them would hand anything over.
-        ///
-        /// The shape is measured, not guessed: all 261 f1 ids and all 548 f3 ids are real quests,
-        /// and the two counts are exactly what the client prints on its two tabs.
-        ///
-        /// <b>f4 is a second list of finished quests</b>, packed rather than one submessage each,
-        /// and the arithmetic is what says so: the capture carries 548 in f3 and 74 in f4, and the
-        /// client prints <em>Terminadas (622)</em>. 548 + 74 = 622, exactly. What separates the two
-        /// lists is not known — none of the 74 appears in f3, and 13 of them are also in the
-        /// in-progress list, so it is not simply "the rest of them" — so everything finished goes in
-        /// f3 and f4 is left empty. A character of this server has nothing to put there anyway.
-        /// </remarks>
-        public static byte[] BuildJournal(
-            IEnumerable<(int Quest, int Step, IReadOnlyList<int> Objectives, IReadOnlyCollection<int> Done)> doing,
-            IEnumerable<int> finished)
-        {
-            var inner = Pb.New();
-
-            foreach (var (quest, step, objectives, done) in doing)
-            {
-                var body = Pb.New();
-                foreach (int objective in objectives)
-                {
-                    var entry = Pb.New().Var(2, objective);
-                    if (!done.Contains(objective)) entry.Var(4, 1);
-                    body.Msg(1, entry);
-                }
-
-                body.Var(2, step);
-                inner.Msg(1, Pb.New().Msg(2, body).Var(3, quest));
-            }
-
-            foreach (int quest in finished)
-            {
-                inner.Msg(3, Pb.New().Var(1, 1).Var(2, quest));
-            }
-
-            inner.EmptyMsg(4);
-            return inner.Build();
-        }
-
-        /// <summary>
-        /// The followed quests' box (iel): f1, one per quest, the same entry as the journal's in
-        /// progress. Measured on the world-entry capture's frame, quests 1869 and 2406.
-        /// </summary>
-        public static byte[] BuildFollowed(
-            IEnumerable<(int Quest, int Step, IReadOnlyList<int> Objectives, IReadOnlyCollection<int> Done)> followed)
-        {
-            // BuildJournal's f1 entries, without its lists of finished quests.
-            var iel = Pb.New();
-            foreach (var field in ProtoMessage.Parse(BuildJournal(followed, Array.Empty<int>())).Fields)
-                if (field.FieldNumber == 1) iel.Bytes(1, field.BytesValue);
-            return iel.Build();
-        }
-
-        /// <summary>
         /// A step has been validated (idz).
         ///
         ///   f1: quest id
@@ -142,67 +69,6 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public static byte[] BuildObjectiveValidated(int questId, int objectiveId)
             => Pb.New().Var(1, questId).Var(2, objectiveId).Build();
-
-        /// <summary>
-        /// Which actors on a map have a quest to hand out (iom): the green mark over an NPC.
-        ///
-        ///   f1 { f2 (repeated) { f2: packed quest ids, f4: actor id }
-        ///        f3: map id }
-        /// </summary>
-        /// <remarks>
-        /// Measured over the 380 captured frames: every one of the 294 numbers they carry is a real
-        /// quest id, all 294. And the mark going out is in there too — in the tutorial one actor
-        /// arrives carrying [2511] and later the same actor arrives with an empty list, which is
-        /// the moment the quest is taken. 235 of the 380 are empty, so an empty list is how the
-        /// mark is cleared rather than something to leave out.
-        ///
-        /// An actor with nothing to offer is sent WITH an empty list on purpose. Leaving it out
-        /// would say nothing about it, and the client would go on drawing the mark it was told
-        /// about last time.
-        /// </remarks>
-        public static byte[] BuildQuestMarks(long mapId,
-                                             IEnumerable<(long Actor, IReadOnlyList<int> Quests)> actors)
-            => BuildQuestMarks(mapId, actors.Select(a => (a.Actor, a.Quests, (IReadOnlyList<int>)Array.Empty<int>())));
-
-        /// <summary>
-        /// The same with the quests under way that want something from each actor, in f3. 89 of
-        /// the 472 captured iom carry it -- the tutorial's 2502 on its NPC, then 2502 and 1629
-        /// together --, and they go out after every ieb, idz, ief and ied. It is not what draws
-        /// the question mark over the NPC's head: that rides in the actor list, and a talk
-        /// objective revealed on arriving at the map (Lord Crow's library) got no mark from it.
-        ///
-        ///   f1 { f2 (repeated) { f2: packed quests offered, f3: packed quests under way, f4: actor id }
-        ///        f3: map id }
-        /// </summary>
-        public static byte[] BuildQuestMarks(long mapId,
-                                             IEnumerable<(long Actor, IReadOnlyList<int> Offers, IReadOnlyList<int> InProgress)> actors)
-        {
-            var inner = Pb.New();
-            foreach (var (actor, quests, inProgress) in actors)
-            {
-                // Named only if it has something. Pb.Packed with an empty list writes 1200 -f2 with
-                // zero length- and that byte pair does not appear once in the 145 real iom
-                // frames. A mark is removed by disappearing from the index, not by figuring in it with zero.
-                if (quests.Count == 0 && inProgress.Count == 0) continue;
-
-                var block = Pb.New();
-
-                // Packed, which is how the captures carry them: one length-delimited field with the
-                // varints end to end, not one field per quest.
-                // No empty list. An actor that has nothing is not named: the byte pair
-                // 1200 -f2 with zero length- does not appear once in the 145 real iom frames
-                // measured, and removing a mark is done by sending the whole iom empty, not by naming
-                // the actor with a list of zero.
-                if (quests.Count > 0) block.Packed(2, quests.Select(q => (long)q).ToList());
-                if (inProgress.Count > 0) block.Packed(3, inProgress.Select(q => (long)q).ToList());
-
-                block.Var(4, actor);
-                inner.Msg(2, block);
-            }
-
-            inner.Var(3, mapId);
-            return Pb.New().Msg(1, inner).Build();
-        }
 
         /// <summary>
         /// Where a quest has got to (idu), in answer to the client's ieo.

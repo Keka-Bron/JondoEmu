@@ -135,6 +135,14 @@ sends, including any write timeout.
 
 ## Incoming request boundary and compatibility routing
 
+Guild-tab and post-contribution allowance notifications construct
+`GuildContributionLeftEvent` directly through the explicit owner's codec, retaining
+header/result ordering and zero allowances. `MarketplaceHandler.AveragePricesAsync`
+constructs and sends `ObjectAveragePricesEvent` inline from a detached snapshot of
+the current table, including an empty replacement and int64 prices.
+These sends have no intermediate raw builder or projection. Their existing incoming
+request routing/parsing stays at the compatibility boundary described below.
+
 `GameNodeProxy` attempts semantic request decoding once per packet through the owning
 session's codec, under its existing session turn. This is generic decoding, without
 feature-specific alias allowlists. It dispatches the decoded request to typed entry,
@@ -257,6 +265,41 @@ locks; roleplay map actors are never sent into an active fight. Map-information
 updates remain repeatable on travel. Initial state, map-opening sequences and roleplay
 map snapshots now construct their messages directly; remaining feature hooks, welcome
 settings and character-management requests/acknowledgments still use compatibility paths.
+
+### Quest journal, followed tracker and map marks
+
+`Quests.SendJournalAsync(GameSession, box)` and `SendMarksAsync(GameSession, mapId)`
+delegate to `QuestStateService`. `QuestMessages` constructs detached active entries,
+finished IDs and map-mark lists from current state; live sources scope ambient quest
+and NPC queries to the explicit owner. Sends reuse the caller's turn and owner codec.
+
+The journal sends first, including an empty loaded journal. Only entry (`box: true`)
+then reads the persisted followed order, removes stale/missing-step/finished entries,
+and sends the tracker, even empty. It reuses the same detached active records rather
+than serializing and reparsing a journal. Failed journal delivery prevents tracker
+reads/cleanup; failed tracker delivery retains cleanup already performed. Existing
+storage-layer error handling remains at its source boundary.
+
+Map marks retain offered/in-progress quest order and checked contextual NPC IDs,
+with int64 map IDs. NPCs with neither list are omitted. No marks sends an empty event
+with no map block, including on repeat map loads. Marks stay before map actors, and a
+mark-send failure stops the remaining map reply. Dream exit also sends its empty mark
+clear through the explicit owner's codec, after the dream-state clear and before the
+acknowledgment and guest departures.
+
+`QuestProtocol.BuildJournal`, `BuildFollowed` and both `BuildQuestMarks` overloads are
+removed. Incremental quest notifications and step-information replies retain their
+current routing and builders. The journal omits the indeterminate finished-entry
+tag-1 constant under the [construction policy](populated-unmapped-fields.md#quest-journal-construction-policy);
+the empty reinitialized-done list also uses normal protobuf encoding. No bindings
+changed and no lossless legacy-byte claim is made for those deliberate differences.
+
+`QuestStateTests`, `QuestStateFlowTests`, `QuestStateContractTests` and map-service
+coverage exercise opaque codecs, live framed sends, owner isolation, ordering,
+detachment, empty replacements, numeric widths and source/cleanup/delivery failures.
+`GroupDreamTests` checks dream clear → typed mark clear → acknowledgment ordering
+and that a failed mark clear stops the acknowledgment and guest departures.
+Targeted real-client journal, tracker and marker checks remain pending.
 
 ### Map-information service
 

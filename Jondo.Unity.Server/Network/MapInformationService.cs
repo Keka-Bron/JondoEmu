@@ -102,7 +102,7 @@ internal sealed class MapInformationService(IMapInformationBackend backend)
 
         public Task RestoreDreamAsync(GameSession session) => DreamHandler.OnMapLoadedAsync(StreamOf(session));
         public void PrepareAnomaly(long mapId) => AnomalyHandler.BeforeMapLoaded(mapId);
-        public Task SendMarksAsync(GameSession session) => Managers.Quests.SendMarksAsync(StreamOf(session), session.MapId);
+        public Task SendMarksAsync(GameSession session) => Managers.Quests.SendMarksAsync(session, session.MapId);
 
         public Task SendActorsAsync(GameSession session, DbCharacter character)
             => MapInformationMessages.Live.SendAsync(session, character);

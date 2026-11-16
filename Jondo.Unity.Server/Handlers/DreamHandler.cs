@@ -906,8 +906,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>Leaving the dream (iyx) and going back to where he was.</summary>
-        public static async Task LeaveAsync(NetworkStream stream, byte[] payload)
+        public static async Task LeaveAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream ?? throw new InvalidOperationException("Leaving a dream requires a connected game session.");
             // A guest leaves his host's dream, as the invitation capture's does: the way out (jru),
             // ixg, and the iyb «0801».
             if (IsGuest(GameState.CharacterId))
@@ -940,8 +942,7 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ixg));
             MarkLeft();
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iom));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.NpcsMapQuestStatusUpdateEvent([]));
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Iyb, DreamProtocol.BuildLeft(),

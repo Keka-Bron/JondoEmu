@@ -74,17 +74,142 @@ public sealed class GuildStateFlowTests : IDisposable
         using var context = SessionContext.Push(pipe.Session);
         await GuildHandler.OpenWindowAsync(pipe.ToClient);
         Assert.NotEqual(nameof(GuildGeneralInformationEvent), GameBindings.StableName(Codec.ReadEnvelope(await Packet(pipe)).Alias));
-        await GuildHandler.TabAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Jiy, []));
+        await GuildHandler.TabAsync(pipe.Session, ConnectionProtocol.Push(Op.Jiy, []));
         var first = Assert.IsType<GuildGeneralInformationEvent>(Codec.Decode(await Packet(pipe)).Content);
         Assert.Null(first.HallId);
         Assert.Equal(1, first.MembersCount);
-        await Packet(pipe); // untouched contributions-left notification
+        Assert.Equal(new GuildContributionLeftEvent(5), Codec.Decode(await Packet(pipe)).Content);
         GuildHalls.Choose(guild.Id, 83_004, DateTimeOffset.UtcNow);
         GuildHalls.SetTheme(guild.Id, 83_099);
-        await GuildHandler.TabAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Jiy, []));
+        await GuildHandler.TabAsync(pipe.Session, ConnectionProtocol.Push(Op.Jiy, []));
         Assert.Equal(83_004, Assert.IsType<GuildGeneralInformationEvent>(Codec.Decode(await Packet(pipe)).Content).HallId);
-        await Packet(pipe);
+        Assert.Equal(new GuildContributionLeftEvent(5), Codec.Decode(await Packet(pipe)).Content);
         await pipe.Quiet();
+    }
+
+    [Theory]
+    [InlineData(0, 5)]
+    [InlineData(2, 3)]
+    [InlineData(5, 0)]
+    public async Task Window_sends_header_then_typed_allowance_through_the_explicit_owners_framed_codec(int done, int left)
+    {
+        var guild = Create();
+        for (int i = 0; i < done; i++) GuildStore.Contribute(Leader, guild.Id);
+        var codec = new RecordingCodec();
+        await using var pipe = await ClientPipe.OpenAsync(8_195_111, Leader, 8_195_211, codec: codec);
+        var wrong = GameSession.SinSocket();
+        wrong.State.CharacterId = Member;
+        using var context = SessionContext.Push(wrong);
+        using var turn = await pipe.Session.EnterTurnAsync();
+
+        await GuildHandler.TabAsync(pipe.Session, ConnectionProtocol.Push(Op.Jiy, [])).WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.Collection(codec.Frames,
+            frame => { Assert.IsType<GuildGeneralInformationEvent>(frame.Content); Assert.Null(frame.Uid); },
+            frame => { Assert.Equal(new GuildContributionLeftEvent(left), frame.Content); Assert.Null(frame.Uid); });
+        Assert.Equal(RecordingCodec.Token(1), await Packet(pipe));
+        Assert.Equal(RecordingCodec.Token(2), await Packet(pipe));
+        Assert.False(pipe.FromServer.DataAvailable);
+        Assert.Equal(0, codec.Decodes);
+        Assert.Same(wrong, SessionContext.Actual);
+        Assert.Equal(0, pipe.Session.UnoCadaVez.CurrentCount);
+    }
+
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(0, false)]
+    [InlineData(1, true)]
+    [InlineData(1, false)]
+    public async Task Window_codec_or_transport_failure_stops_at_that_event_without_retry(int failAt, bool codecFailure)
+    {
+        Create();
+        var failure = new IOException("guild window delivery failed");
+        var codec = new RecordingCodec { Failure = codecFailure ? frame =>
+            (frame.Content is GuildContributionLeftEvent ? 1 : 0) == failAt ? failure : null : null };
+        var delivered = new List<byte[]>();
+        int sends = 0;
+        var own = new GameSession(codec, packet =>
+        {
+            if (sends++ == failAt && !codecFailure) return Task.FromException(failure);
+            delivered.Add(packet);
+            return Task.CompletedTask;
+        });
+        own.State.CharacterId = Leader;
+        var wrong = GameSession.SinSocket();
+        using var context = SessionContext.Push(wrong);
+        using var turn = await own.EnterTurnAsync();
+
+        Assert.Same(failure, await Assert.ThrowsAsync<IOException>(() => GuildHandler.TabAsync(own, ConnectionProtocol.Push(Op.Jiy, []))));
+
+        Assert.Equal(failAt + 1, codec.Frames.Count);
+        Assert.Equal(failAt, delivered.Count);
+        Assert.Equal(codecFailure ? failAt : failAt + 1, sends);
+        Assert.Equal(0, codec.Decodes);
+        Assert.Same(wrong, SessionContext.Actual);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Window_does_not_send_an_allowance_for_a_guildless_owner_or_a_different_tab(bool guilded)
+    {
+        if (guilded) Create();
+        var codec = new RecordingCodec();
+        var packets = new List<byte[]>();
+        var own = new GameSession(codec, packet => { packets.Add(packet); return Task.CompletedTask; });
+        own.State.CharacterId = Leader;
+        await GuildHandler.TabAsync(own, ConnectionProtocol.Push(Op.Jiy, guilded ? Pb.New().Var(2, 99).Build() : []));
+        Assert.Empty(codec.Frames);
+        Assert.Empty(packets);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Contribution_keeps_result_then_typed_allowance_then_milestone_header_and_stops_after_allowance_failure(bool fail)
+    {
+        const long account = 8_195_511;
+        long who = Character(account, "Typed-Contribution");
+        try
+        {
+            var guild = Create(who);
+            var now = DateTimeOffset.UtcNow;
+            GuildActivity.Choose(guild.Id, 1, [], now);
+            Assert.Equal(0, GuildActivity.Credit(guild, who, 0, 5000 - GuildActivity.ContributionActivityPoints, now).Experience);
+            var failure = new IOException("allowance encoding failed");
+            var codec = new RecordingCodec { Failure = fail ? frame => frame.Content is GuildContributionLeftEvent ? failure : null : null };
+            await using var pipe = await ClientPipe.OpenAsync(account, who, 8_195_221, codec: codec);
+            pipe.Session.State.Kamas = GuildStore.ContributionKamas * 2;
+            var wrong = GameSession.SinSocket();
+            wrong.State.Kamas = 17;
+            using var context = SessionContext.Push(wrong);
+            using var turn = await pipe.Session.EnterTurnAsync();
+
+            var action = GuildHandler.ContributeAsync(pipe.Session, ConnectionProtocol.Push(Op.Jlb, []));
+            if (fail) Assert.Same(failure, await Assert.ThrowsAsync<IOException>(() => action));
+            else await action.WaitAsync(TimeSpan.FromSeconds(5));
+
+            await UntilLegacy(pipe, Op.Jle);
+            Assert.Equal(new GuildContributionLeftEvent(4), codec.Frames[0].Content);
+            Assert.All(codec.Frames, frame => Assert.Null(frame.Uid));
+            if (fail) Assert.Single(codec.Frames);
+            else
+            {
+                Assert.Equal(RecordingCodec.Token(1), await Packet(pipe));
+                Assert.Equal(RecordingCodec.Token(2), await Packet(pipe));
+                Assert.Equal(40, Assert.IsType<GuildGeneralInformationEvent>(codec.Frames[1].Content).Experience);
+                Assert.Equal(2, codec.Frames.Count);
+            }
+            Assert.False(pipe.FromServer.DataAvailable);
+            Assert.Equal(GuildStore.ContributionKamas, pipe.Session.State.Kamas);
+            Assert.Equal(4, GuildStore.ContributionsLeft(who));
+            Assert.Equal(40, GuildStore.ById(guild.Id).Experience);
+            Assert.Equal(17, wrong.State.Kamas);
+            Assert.Equal(0, codec.Decodes);
+            Assert.Same(wrong, SessionContext.Actual);
+            Assert.Equal(0, pipe.Session.UnoCadaVez.CurrentCount);
+        }
+        finally { DatabaseManager.DeleteCharacter(who, account); }
     }
 
     [Fact]
@@ -181,7 +306,7 @@ public sealed class GuildStateFlowTests : IDisposable
             else
             {
                 pipe.Session.State.Kamas = GuildStore.ContributionKamas * 2;
-                await GuildHandler.ContributeAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Jlb, []));
+                await GuildHandler.ContributeAsync(pipe.Session, ConnectionProtocol.Push(Op.Jlb, []));
             }
             var prefix = new List<byte[]>();
             GuildGeneralInformationEvent? header = null;
@@ -266,6 +391,25 @@ public sealed class GuildStateFlowTests : IDisposable
         internal readonly List<GameFrame> Frames = [];
         public byte[] Encode(GameFrame frame) { Frames.Add(frame); return Codec.Encode(frame); }
         public GameFrame Decode(ReadOnlySpan<byte> packet) => Codec.Decode(packet);
+    }
+
+    private sealed class RecordingCodec : IGameCodec
+    {
+        internal readonly List<GameFrame> Frames = [];
+        internal Func<GameFrame, Exception?>? Failure;
+        internal int Decodes;
+        internal static byte[] Token(int index) => [0xC7, 0x63, checked((byte)index)];
+        public byte[] Encode(GameFrame frame)
+        {
+            Frames.Add(frame);
+            if (Failure?.Invoke(frame) is { } failure) throw failure;
+            return Token(Frames.Count);
+        }
+        public GameFrame Decode(ReadOnlySpan<byte> packet)
+        {
+            Decodes++;
+            throw new InvalidOperationException("Guild delivery must not decode an intermediate packet.");
+        }
     }
 
     private static long Character(long account, string name) => DatabaseManager.CreateCharacter(account, 1, name, 4, 0, 1,

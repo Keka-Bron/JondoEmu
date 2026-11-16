@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -266,6 +267,105 @@ namespace Jondo.Unity.Tests.Economy
             => As(session, () => MarketplaceHandler.BuyAsync(ConnectionProtocol.Push(Op.Kbm,
                 Pb.New().Var(1, offer).Var(2, price).Var(3, lot).Build())));
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Average_prices_reply_uses_the_owners_framed_codec_and_preserves_live_int64_prices(bool fail)
+        {
+            const int gid = 9_195_001;
+            const long account = 8_195_701, price = 8_000_000_003;
+            MarketplaceListings.Initialize();
+            using var connection = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseManager.WorldConnectionString);
+            connection.Open();
+            using var insert = connection.CreateCommand();
+            insert.CommandText = "INSERT INTO MarketplaceSales (House, Gid, Quantity, Price, SellerAccountId, BuyerCharacterId, SoldAt) VALUES (1264, $gid, 1, $price, $account, 8195702, 0);";
+            insert.Parameters.AddWithValue("$gid", gid);
+            insert.Parameters.AddWithValue("$price", price);
+            insert.Parameters.AddWithValue("$account", account);
+            insert.ExecuteNonQuery();
+            try
+            {
+                var codec = new PriceCodec(fail);
+                await using var pipe = await ClientPipe.OpenAsync(account, 8_195_702, 191105026, codec: codec);
+                var wrong = GameSession.SinSocket();
+                using var context = SessionContext.Push(wrong);
+                using var turn = await pipe.Session.EnterTurnAsync();
+
+                if (fail) Assert.Same(codec.Failure, await Assert.ThrowsAsync<System.IO.IOException>(() => MarketplaceHandler.AveragePricesAsync(pipe.Session)));
+                else
+                {
+                    await MarketplaceHandler.AveragePricesAsync(pipe.Session).WaitAsync(TimeSpan.FromSeconds(5));
+                    Assert.Equal(PriceCodec.Token, await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
+                }
+                var frame = Assert.Single(codec.Frames);
+                var prices = Assert.IsType<ObjectAveragePricesEvent>(frame.Content).ObjectsAveragePrices;
+                Assert.Equal(new ObjectAveragePrice(gid, price), Assert.Single(prices, entry => entry.ObjectGid == gid));
+                Assert.Equal(MarketplaceListings.AveragePrices().Select(row => new ObjectAveragePrice(row.Gid, row.Price)), prices);
+                Assert.Null(frame.Uid);
+                Assert.Equal(0, codec.Decodes);
+                Assert.Same(wrong, SessionContext.Actual);
+                Assert.Equal(0, pipe.Session.UnoCadaVez.CurrentCount);
+                Assert.False(pipe.FromServer.DataAvailable);
+                if (!fail)
+                {
+                    using var update = connection.CreateCommand();
+                    update.CommandText = "UPDATE MarketplaceSales SET Price = $price WHERE SellerAccountId = $account;";
+                    update.Parameters.AddWithValue("$price", price + 73);
+                    update.Parameters.AddWithValue("$account", account);
+                    update.ExecuteNonQuery();
+                    await MarketplaceHandler.AveragePricesAsync(pipe.Session);
+                    Assert.Equal(PriceCodec.Token, await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
+                    var refreshed = Assert.IsType<ObjectAveragePricesEvent>(codec.Frames[1].Content).ObjectsAveragePrices;
+                    Assert.Equal(price + 73, Assert.Single(refreshed, entry => entry.ObjectGid == gid).AveragePrice);
+                    Assert.Equal(price, Assert.Single(prices, entry => entry.ObjectGid == gid).AveragePrice);
+                    Assert.Equal(2, codec.Frames.Count);
+                    Assert.Equal(0, codec.Decodes);
+                }
+            }
+            finally
+            {
+                using var clean = connection.CreateCommand();
+                clean.CommandText = "DELETE FROM MarketplaceSales WHERE SellerAccountId = $account;";
+                clean.Parameters.AddWithValue("$account", account);
+                clean.ExecuteNonQuery();
+            }
+        }
+
+        [Fact]
+        public async Task Average_prices_transport_failure_propagates_without_retry_or_raw_fallback()
+        {
+            MarketplaceListings.Initialize();
+            var codec = new PriceCodec(false);
+            var failure = new System.IO.IOException("price transport failed");
+            int sends = 0;
+            var session = new GameSession(codec, _ => { sends++; return Task.FromException(failure); });
+
+            Assert.Same(failure, await Assert.ThrowsAsync<System.IO.IOException>(() => MarketplaceHandler.AveragePricesAsync(session)));
+            Assert.Single(codec.Frames);
+            Assert.Equal(1, sends);
+            Assert.Equal(0, codec.Decodes);
+        }
+
+        private sealed class PriceCodec(bool fail) : IGameCodec
+        {
+            internal static readonly byte[] Token = [0xC7, 0x64];
+            internal readonly List<GameFrame> Frames = [];
+            internal readonly System.IO.IOException Failure = new("price encoding failed");
+            internal int Decodes;
+            public byte[] Encode(GameFrame frame)
+            {
+                Frames.Add(frame);
+                Assert.IsType<ObjectAveragePricesEvent>(frame.Content);
+                if (fail) throw Failure;
+                return Token;
+            }
+            public GameFrame Decode(ReadOnlySpan<byte> packet)
+            {
+                Decodes++;
+                throw new InvalidOperationException("Average prices must not decode an intermediate packet.");
+            }
+        }
+
         private static Task Follow(GameSession session, int gid)
             => As(session, () => MarketplaceHandler.ItemAsync(ConnectionProtocol.Push(Op.Keh,
                 Pb.New().Var(1, gid).Var(2, 1).Build())));
@@ -377,10 +477,12 @@ namespace Jondo.Unity.Tests.Economy
 
             // And the item tooltips' average prices (ivi, the answer to ivp) have the rune at
             // what it sells for, as the seller's window does.
-            var ivi = ProtoMessage.Parse(MarketplaceHandler.BuildAveragePrices()).Fields
-                .Select(f => ProtoMessage.Parse(f.BytesValue).Fields).ToList();
-            var rune = Assert.Single(ivi, e => e.Single(x => x.FieldNumber == 1).VarIntValue == 1523);
-            Assert.Equal(MarketplaceListings.AveragePrice(1523), rune.Single(x => x.FieldNumber == 2).VarIntValue);
+            var priceCodec = new PriceCodec(false);
+            var priceRecipient = new GameSession(priceCodec, _ => Task.CompletedTask);
+            await MarketplaceHandler.AveragePricesAsync(priceRecipient);
+            var prices = Assert.IsType<ObjectAveragePricesEvent>(Assert.Single(priceCodec.Frames).Content);
+            var rune = Assert.Single(prices.ObjectsAveragePrices, entry => entry.ObjectGid == 1523);
+            Assert.Equal(MarketplaceListings.AveragePrice(1523), rune.AveragePrice);
             Assert.True(MarketplaceListings.AveragePrice(1523) > 0);
 
             // A tax collector's worth is by these averages: three runes are worth three of their

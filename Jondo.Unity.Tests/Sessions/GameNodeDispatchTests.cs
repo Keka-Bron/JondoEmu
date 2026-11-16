@@ -88,6 +88,23 @@ public sealed class GameNodeDispatchTests
     }
 
     [Fact]
+    public async Task Average_prices_request_reaches_the_live_sender_and_encodes_its_event_through_the_session_codec()
+    {
+        var codec = new CountingCodec();
+        await using var pipe = await Pipe.OpenAsync(codec);
+        pipe.Start(Wire.Encode(new(new ObjectAveragePricesRequest(), -73)));
+
+        var reply = Wire.Decode(await pipe.Next());
+        Assert.IsType<ObjectAveragePricesEvent>(reply.Content);
+        Assert.Null(reply.Uid);
+        await pipe.Finish();
+
+        Assert.Equal(1, codec.Decodes);
+        Assert.Equal(1, codec.Encodes);
+        Assert.False(pipe.ClientStream.DataAvailable);
+    }
+
+    [Fact]
     public async Task Retired_map_and_transition_aliases_only_reach_diagnostics_and_leave_the_connection_usable()
     {
         string[] retired = ["kkr", "jqf", "igx", "joi", "jos", "jpp", "loy", "lpj", "hmv", "ibt"];
