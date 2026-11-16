@@ -12406,7 +12406,7 @@
           "message": 22047,
           "choices": [
             { "reply": 37531, "quest": 1965, "completes": 14015, "params": [[30, 14015]], "next": 31085 },
-            { "reply": 36842, "quest": 1986, "completes": 13844, "params": [[30, 13844]], "next": 30537, "afterObjective": 13843 },
+            { "reply": 36842, "quest": 1986, "completes": 13844, "params": [[30, 13844]], "next": 30537, "afterObjectives": [13837, 13839, 13841, 13843] },
             { "reply": 26551, "next": 22048 }
           ]
         },
