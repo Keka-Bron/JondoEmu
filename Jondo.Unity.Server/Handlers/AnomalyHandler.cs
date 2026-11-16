@@ -76,6 +76,80 @@ namespace Jondo.Unity.Server.Handlers
                               $"with {string.Join(", ", members.Skip(1))}.");
         }
 
+        /// <summary>
+        /// The zone bonus an open anomaly's zone carries: «Quand l'anomalie ouvre, le bonus du
+        /// territoire passe à 120% pendant toute la durée de l'anomalie» (Dofus pour les noobs).
+        /// No other zone bonus is kept here.
+        /// </summary>
+        public const int AnomalyZoneBonus = 120;
+
+        /// <summary>
+        /// The bonus to experience and loot a fight on this map gets: <see cref="AnomalyZoneBonus"/>
+        /// in an open anomaly's zone, nothing elsewhere -- no other zone bonus is kept here.
+        /// </summary>
+        public static int ZoneBonusAt(long mapId)
+            => mapId > 0 && Anomalies.TryGet(DatabaseManager.SubAreaOfMap(mapId), out _) ? AnomalyZoneBonus : 0;
+
+        /// <summary>
+        /// A drop's chance with the zone's bonus: one more multiplier, as the challenges' -- «Il
+        /// existe de nombreux bonus que l'on appelle multiplicatifs [...] Il faut donc multiplier
+        /// notre Chance d'obtention [...] par tous ces multiplicateurs» (Dofus pour les noobs,
+        /// «Butin et prospection») --, capped at 100 %.
+        /// </summary>
+        public static double WithZoneBonus(double chance, int bonus)
+            => bonus > 0 ? Math.Min(100.0, chance * (100.0 + bonus) / 100.0) : chance;
+
+        /// <summary>Some experience with the zone's bonus.</summary>
+        public static long WithZoneBonus(long xp, int bonus)
+            => bonus > 0 && xp > 0 ? xp + xp * bonus / 100 : xp;
+
+        /// <summary>
+        /// The map's zone bonus, for the map's widget (lvb, f1 the rate): the client's MapInfoUI shows
+        /// it beside the level -- «un bonus d'expérience et de butin de {0}% est actif sur ce
+        /// territoire» -- from the rate of the last lvb (ehl.xwy, OnMapRewardRate). Nothing sent it,
+        /// and an anomaly's zone said 0 %. Its f2, a list of int64, is not known and not sent.
+        /// </summary>
+        public static Task ZoneBonusAsync(NetworkStream stream, long mapId)
+            => WriteAsync(stream, ConnectionProtocol.Push("lvb", Pb.New().VarIfNotZero(1, ZoneBonusAt(mapId)).Build()));
+
+        /// <summary>
+        /// The world map's «Anomalies, bonus d'expérience et de butin» panel's list (lzh,
+        /// AnomalySubareaInformationRequest, empty, on entering the world): the lzl,
+        /// AnomalySubareaInformationEvent, f1 a repeated lzj { f1 the zone's bonus, f2 the subarea,
+        /// f3 whether an anomaly is open there, f4 when it closes, in milliseconds }. Nothing
+        /// answered it, and the panel stayed empty.
+        /// </summary>
+        /// <remarks>
+        /// MEASURED on an official 3.7 server (content/anomalies/bonus_zones.json): the empty request
+        /// answered with all 297 zones, { has anomaly, bonus 1-120 -- absent for 0 --, subarea,
+        /// closing in ms }, the closings within the two hours after. The 3.6 client numbers the same
+        /// four otherwise: its eui.bcnk looks the subarea up with f2, after testing the bool, f3 (gv.mxh,
+        /// Cpp2IL of 3.6.10.11); the bonus is the other int, f1, the closing the long, f4. Every zone
+        /// goes, as the official server sends it: with only the anomalies' zones the world map's window
+        /// threw on opening. No zone bonus is kept here: 0 but in an open anomaly's zone, 120.
+        /// </remarks>
+        public static Task SubareaInformationAsync(NetworkStream stream)
+            => WriteAsync(stream, ConnectionProtocol.Push("lzl", BuildSubareaInformation(DateTimeOffset.UtcNow)));
+
+        /// <summary>The lzl: every zone of the panel, with its bonus, and for an open anomaly's when it closes.</summary>
+        internal static byte[] BuildSubareaInformation(DateTimeOffset now)
+        {
+            var lzl = Pb.New();
+            long nowMs = now.ToUnixTimeMilliseconds();
+            var zones = AnomalyZones.SubAreas.Concat(Anomalies.All.Select(a => a.SubAreaId)).Distinct();
+            foreach (int subArea in zones)
+            {
+                var entry = Pb.New();
+                if (Anomalies.TryGet(subArea, out _))
+                    entry.Var(1, AnomalyZoneBonus).Var(2, subArea).Var(3, 1)
+                         .Var(4, nowMs + Anomalies.MinutesLeft(subArea) * 60_000L);
+                else
+                    entry.Var(2, subArea);
+                lzl.Msg(1, entry);
+            }
+            return lzl.Build();
+        }
+
         /// <summary>A map drawn: the anomaly of its zone, the vestige of its zaap, the notice on coming in.</summary>
         public static async Task OnMapLoadedAsync(NetworkStream stream, long mapId)
         {
@@ -84,6 +158,9 @@ namespace Jondo.Unity.Server.Handlers
             int subArea = DatabaseManager.SubAreaOfMap(mapId);
             _lastSubArea.TryGetValue(me, out int before);
             _lastSubArea[me] = subArea;
+
+            // The zone's bonus, on every map: 0 again after an anomaly's zone is left.
+            await ZoneBonusAsync(stream, mapId);
 
             if (Anomalies.TryGet(subArea, out _))
             {

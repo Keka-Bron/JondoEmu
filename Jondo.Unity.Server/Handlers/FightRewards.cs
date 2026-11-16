@@ -197,6 +197,14 @@ namespace Jondo.Unity.Server.Handlers
                         xp = CombatExperience.WithCharacterBonus(xp, CombatExperience.AlliancePrismBonusPercent);
                     xp = ServerSettings.WithBonus(ConElExtra(xp, extra), ServerSettings.Current.ExperienceBonusPercent);
                     using (SessionContext.Push(session)) xp = WithAlmanaxExperience(xp, paying, fight.RoleplayMapId, inDungeon);
+                    // An open anomaly's zone: its 120 % (AnomalyHandler.ZoneBonusAt).
+                    int zoneBonus = AnomalyHandler.ZoneBonusAt(fight.RoleplayMapId);
+                    if (zoneBonus > 0)
+                    {
+                        long before = xp;
+                        xp = AnomalyHandler.WithZoneBonus(xp, zoneBonus);
+                        Program.LogDebug($"[Anomalies] The zone's {zoneBonus} % more: {before} -> {xp} experience.");
+                    }
                 }
                 // A dream's fight pays its intensity's experience: the XP percentage the panel shows
                 // under the dream's name (the izg's f22, the client's xpBonus), 50 % in a Rêve I and

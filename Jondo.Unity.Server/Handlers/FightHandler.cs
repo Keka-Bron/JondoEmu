@@ -13097,6 +13097,8 @@ namespace Jondo.Unity.Server.Handlers
             var loot = new Dictionary<int, int>();
             var worn = Managers.Equipment.WornTemplates();
             bool inDungeon = DungeonManager.IsRoom(fight.RoleplayMapId);
+            // An open anomaly's zone: its 120 %, on the rows prospecting raises.
+            int zoneBonus = AnomalyHandler.ZoneBonusAt(fight.RoleplayMapId);
             // His prospecting, which the client's tooltip applies to the monster's own table.
             double prospecting = DropMultiplier(ProspectingNow());
 
@@ -13137,8 +13139,10 @@ namespace Jondo.Unity.Server.Handlers
                     // A quest's item to whoever is on it.
                     if (!SeLoLleva(fight, drop.ReceiverCriterion, Held, monster.MonsterId)) continue;
 
-                    // Prospecting first, as the tooltip: «obtention de base» times its multiplier.
-                    double chance = drop.NoProspecting ? drop.PercentDrop : Math.Min(100.0, drop.PercentDrop * prospecting);
+                    // Prospecting first, as the tooltip: «obtention de base» times its multiplier; and
+                    // the zone's bonus, another multiplier, where nothing is to modify it either.
+                    double chance = drop.NoProspecting ? drop.PercentDrop
+                        : AnomalyHandler.WithZoneBonus(Math.Min(100.0, drop.PercentDrop * prospecting), zoneBonus);
 
                     // In the loot the bonus raises the PROBABILITY of a drop, not the quantity: it is
                     // one roll per item and per monster, and what the challenge improves is the luck.
