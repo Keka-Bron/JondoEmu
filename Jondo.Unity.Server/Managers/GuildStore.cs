@@ -560,6 +560,16 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Rank 1 is the leader's: the one the founder carries in the capture's jgw and jgu.</summary>
         public const int RankLeader = 1;
 
+        /// <summary>
+        /// The most members a guild holds: the 350 the client's directory and card count it out of
+        /// («0/350»), its constant beside the alliances' 250 (dvc, Cpp2IL of 3.6.10.11); and «Tu gremio
+        /// está lleno, no puedes aceptar miembros nuevos» (Translations 1095155).
+        /// </summary>
+        public const int MaxMembers = 350;
+
+        /// <summary>Whether the guild has as many members as it may hold.</summary>
+        public static bool IsFull(long guildId) => Members(guildId).Count >= MaxMembers;
+
         public static Member Join(long characterId, long guildId, int rank = RankNewcomer)
         {
             using var conexion = Open();

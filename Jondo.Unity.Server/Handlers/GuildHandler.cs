@@ -47,6 +47,14 @@ namespace Jondo.Unity.Server.Handlers
             => await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
 
         /// <summary>
+        /// A refusal in the chat, red and bold, as the dungeon's are: the client has no information
+        /// message for a full guild, only its window's own line (Translations 1095155).
+        /// </summary>
+        private static Task NoticeAsync(NetworkStream stream, string text)
+            => WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                ConnectionProtocol.BuildNotice($"<color=#FF0000><b>{text}</b></color>")));
+
+        /// <summary>
         /// The temple's altar: it has been pressed, and the founding editor is opened for the player.
         /// </summary>
         /// <remarks>
@@ -1732,6 +1740,12 @@ namespace Jondo.Unity.Server.Handlers
 
             var application = GuildStore.ApplicationOf(guild.Id, applicant);
             if (application == null) return;
+            // Full, an application is not accepted: it waits for a place.
+            if (accepted && GuildStore.IsFull(guild.Id))
+            {
+                await NoticeAsync(stream, CommandTexts.Get("guild.full"));
+                return;
+            }
             GuildStore.DropApplication(guild.Id, applicant);
             await ApplicationMovedAsync(guild, application, GuildProtocol.ApplicationGone, who);
             if (!accepted)
@@ -1862,7 +1876,13 @@ namespace Jondo.Unity.Server.Handlers
 
             var session = SessionRegistry.FindByCharacter(target);
             if (session == null) return;
-            if (await InviteAsync(who, session) != null) return;
+            string refused = await InviteAsync(who, session);
+            if (refused == "guild.full")
+            {
+                await NoticeAsync(stream, CommandTexts.Get(refused));
+                return;
+            }
+            if (refused != null) return;
 
             var invited = DatabaseManager.GetCharacterById(target);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jin,
@@ -1887,6 +1907,7 @@ namespace Jondo.Unity.Server.Handlers
             if (guild == null) return "guild.invite.noguild";
             if (!GuildStore.HasRight(inviterCharacterId, GuildStore.ManageApplicationsRight)) return "guild.invite.noright";
             if (GuildStore.GuildOf(session.CharacterId) != null) return "guild.invite.hasguild";
+            if (GuildStore.IsFull(guild.Id)) return "guild.full";
 
             var inviter = DatabaseManager.GetCharacterById(inviterCharacterId);
             await session.SendAsync(ConnectionProtocol.Push(Op.Jiq,
@@ -1916,6 +1937,12 @@ namespace Jondo.Unity.Server.Handlers
             bool accepts = jiz != null && FieldValue(jiz, 1) == 1;
             if (!accepts) return;
             if (GuildStore.GuildOf(who) != null) return;
+            // Filled up since the invitation.
+            if (GuildStore.IsFull(invitation.Guild))
+            {
+                await NoticeAsync(stream, CommandTexts.Get("guild.full.join"));
+                return;
+            }
 
             GuildStore.Join(who, invitation.Guild);
             var guild = GuildStore.GuildOf(who);
@@ -1960,6 +1987,11 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
             if (SessionContext.State.CharacterLevel < profile.MinLevel) return;
+            if (GuildStore.IsFull(guild.Id))
+            {
+                await NoticeAsync(stream, CommandTexts.Get("guild.full.join"));
+                return;
+            }
 
             foreach (var application in GuildStore.ApplicationsBy(who))
             {
