@@ -710,7 +710,7 @@ played through.
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
 | Incarnam | `██████████` **100%** | 24/24 |
 | Wabbit Islands | `██████████` **100%** | 23/23 |
-| World Quests | `██░░░░░░░░` **15%** | 22/145 |
+| World Quests | `██░░░░░░░░` **16%** | 23/145 |
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Krosmoz | `██████████` **100%** | 18/18 |
 | Cania | `███████░░░` **69%** | 18/26 |
@@ -723,7 +723,7 @@ played through.
 | Brakmar | `██████████` **100%** | 5/5 |
 | Pandala Island | `░░░░░░░░░░` **2%** | 1/55 |
 | Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
-| **All quests** | **17.0%** | **336/1976** |
+| **All quests** | **17.1%** | **337/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
