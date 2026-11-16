@@ -67,6 +67,15 @@
       ],
       "criterion": "PO!17016&PO!17017&PO!17018",
       "why": "Melancolía: the first fight against a tree of the thicket. Dofus pour les noobs («Plongeon et dragon»): «les arbres que vous allez combattre sont tristes et vont vous donner leur tristesse. Ainsi pour chaque combat effectué vous aurez : 1 combat : Mélancolie. 2 combats : Tristesse. 3 combats : Désespoir». «Si vous réussissez en 1 combat vous n'aurez que un malus de 5 tours» (its 5 fights)."
+    },
+    {
+      "item": 16889,
+      "percent": 100,
+      "monsters": [
+        4045
+      ],
+      "criterion": "Qa=1654&Qo>9982&PO=16888&PO!16889",
+      "why": "«Extinción de los fuegos» (1654): Bolgrot's spirit beaten (9983), the Hoja de Aguabrial (16888) the character carries comes out of his fire as the Hoja ardiente de Aguabrial (16889), «la lágrima ardiente» Meriana is shown («Esta es la lágrima ardiente de Aguabrial», 25810), where she keeps the plain blade. No table of the client's carries it."
     }
   ]
 }

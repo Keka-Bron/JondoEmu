@@ -11826,6 +11826,36 @@
           ]
         },
         {
+          "message": 21596,
+          "choices": [
+            { "reply": 25945, "next": 21597 }
+          ]
+        },
+        {
+          "message": 21597,
+          "choices": [
+            { "reply": 25944, "quest": 1654, "completes": 10130, "params": [[30, 10130]] }
+          ]
+        },
+        {
+          "message": 21598,
+          "choices": [
+            { "reply": 25946 }
+          ]
+        },
+        {
+          "message": 21599,
+          "choices": [
+            { "reply": 25949, "next": 21600 }
+          ]
+        },
+        {
+          "message": 21600,
+          "choices": [
+            { "reply": 25948 }
+          ]
+        },
+        {
           "message": 31186,
           "choices": [
             { "reply": 37662, "next": 31187 }
@@ -11914,7 +11944,7 @@
           "choices": []
         }
       ],
-      "why": "The Mage of Zo, creator of the Almanax, in the alchemists' workshop [3,-21], from his own lines and replies, by «Restauration rapide» of Dofus pour les noobs: the burnt book shown (14000), a bibliomancy spell of three weeks (31186, 31187) or the short one with century-old bark and gobbly milk (31188), the stump south of Tainela and the gobball farm (31189); the milk and the bark handed over (14003), the disguise he took them for (31190, 31191), the book given, the spell (31192, 31193) and the enchanted bark for Primir (31194, 19686). «Golémancien»: whether the character made every part (30538), the quintain set down for its enchanting (30539, 13846), the spell (30540, 30541), animated for Badufron (30542, 19645). «Zobal Hibaba et les 40 Roublards»: forty spark potions, too busy watching the apprentices: Nibe Lula (8771: 4642)."
+      "why": "The Mage of Zo, creator of the Almanax, in the alchemists' workshop [3,-21], from his own lines and replies, by «Restauration rapide» of Dofus pour les noobs: the burnt book shown (14000), a bibliomancy spell of three weeks (31186, 31187) or the short one with century-old bark and gobbly milk (31188), the stump south of Tainela and the gobball farm (31189); the milk and the bark handed over (14003), the disguise he took them for (31190, 31191), the book given, the spell (31192, 31193) and the enchanted bark for Primir (31194, 19686). «Golémancien»: whether the character made every part (30538), the quintain set down for its enchanting (30539, 13846), the spell (30540, 30541), animated for Badufron (30542, 19645). «Zobal Hibaba et les 40 Roublards»: forty spark potions, too busy watching the apprentices: Nibe Lula (8771: 4642). «Extinción de los fuegos» (1654): «Vengo de parte de Meriana» (25943): the astral shadow and the obscure dimension's creatures (21596), «Escuchar más» (25945): see Giro Sintuerca (21597), «Voy a ver a Giro Sintuerca» (25944) is 10130; «Esta es la piel de obscuranti» (25947) is 9973: now the shamanic smoke and the magic thread (21598), «Voy a buscar los componentes» (25946); «Aquí tienes los componentes que he podido encontrar» (25950) hands the skin, the smoke and the thread over (9974, 9975) and gets the Velo astral (16947), worked on in the astral plane (21599, 21600)."
     },
     {
       "npc": 4442,
@@ -37108,7 +37138,8 @@
             { "reply": 25787, "next": 21479, "criterion": "Qf=1462&PL>79", "beforeQuest": 1653 },
             { "reply": 25795, "next": 21490, "criterion": "Qf=1653&PL>119", "beforeQuest": 1654 },
             { "reply": 25802, "next": 21494, "quest": 1654, "afterObjective": 9975, "beforeObjective": 9976, "criterion": "PO=16947", "completes": 9976, "params": [[30, 9976]], "gives": 17080 },
-            { "reply": 25810, "next": 21496, "quest": 1654, "afterObjective": 9983, "beforeObjective": 9984, "criterion": "PO=16889" },
+            { "reply": 25810, "next": 21496, "quest": 1654, "afterObjective": 9983, "beforeObjective": 9984, "criterion": "PO=16889&PO=16888", "takes": 16888 },
+            { "reply": 25810, "next": 21496, "quest": 1654, "afterObjective": 9983, "beforeObjective": 9984, "criterion": "PO=16889&PO!16888" },
             { "reply": 25812, "next": 21504, "criterion": "Qf=1654&PL>129", "beforeQuest": 1656 }
           ]
         },

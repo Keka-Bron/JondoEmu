@@ -5581,30 +5581,6 @@
       9979
     ],
     "why": "«Lee el pergamino de Mami Ayuto» (564802): the other half (17081), read on the top of the rock. With both read the portal opens (teleports.json)."
-  },
-  {
-    "objective": 9983,
-    "quest": 1654,
-    "kind": "beat",
-    "monster": 4045,
-    "map": 154142209,
-    "requires": [
-      {
-        "item": 16888,
-        "count": 1
-      }
-    ],
-    "spends": true,
-    "gives": [
-      {
-        "item": 16889,
-        "count": 1
-      }
-    ],
-    "afterObjectives": [
-      9982
-    ],
-    "why": "«Vence a Espíritu de Bolgrot»: the dagger born of Aguabrial's tear (16888) is put out in Bolgrot's fire and comes back as the Hoja ardiente de Aguabrial (16889), the «lágrima ardiente» Meriana is shown (25810)."
   }
 ]
 }
