@@ -5878,7 +5878,13 @@ namespace Jondo.Unity.Server.Managers
             for (int i = 0; i < rows.Count && firstBlow < 0; i++)
                 if (EsDeDano(rows[i].EffectId) && IsImmediate(rows[i])) firstBlow = i;
             for (int i = 0; i < firstBlow; i++)
-                if (RaisesTheSpell(spell, rows[i], 0) || SetsUpWithoutMoving(rows[i])) ahead.Add(rows[i]);
+            {
+                var row = rows[i];
+                // The T mask reads the swaps already made in this resolution. Keep these rows
+                // with the teleport so Perturbación can apply Telefrag and refund AP.
+                if ((row.TargetMask ?? "").Split(',', StringSplitOptions.TrimEntries).Contains("T")) continue;
+                if (RaisesTheSpell(spell, row, 0) || SetsUpWithoutMoving(row)) ahead.Add(row);
+            }
             return ahead;
         }
 

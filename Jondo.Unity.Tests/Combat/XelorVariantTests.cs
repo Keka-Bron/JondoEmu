@@ -45,6 +45,32 @@ namespace Jondo.Unity.Tests.Combat
             return fight;
         }
 
+        [Theory]
+        [InlineData(true, 5)]
+        [InlineData(false, 3)]
+        public async Task Perturbation_refunds_AP_and_marks_both_fighters_only_on_a_swap(
+            bool occupiedDestination, int expectedAp)
+        {
+            const int Perturbation = 13288, EnemyTelefrag = 251;
+            var xelor = Character(330);
+            xelor.Level = 3;
+            xelor.CurrentAP = xelor.MaxAP = 6;
+            var target = Monster(-5, 345);
+            var other = Monster(-4, occupiedDestination ? 316 : 302);
+            var fight = Board(xelor, target, other);
+            var (grade, _, cost) = SpellEffects.GradoDe(Perturbation, xelor.Level);
+            var effects = EffectEngine.EfectosSorteados(Perturbation, grade, false);
+
+            Assert.True(await FightHandler.TryPayCastCostAsync(fight, xelor, effects, cost, _ => Task.CompletedTask));
+            await FightHandler.CastEffectsAsync(null, fight, xelor, Perturbation, grade, target, 345, false, effects);
+
+            Assert.Equal(316, target.CellId);
+            Assert.Equal(occupiedDestination ? 345 : 302, other.CellId);
+            Assert.Equal(occupiedDestination, target.Buffs.TieneEstado(EnemyTelefrag));
+            Assert.Equal(occupiedDestination, other.Buffs.TieneEstado(EnemyTelefrag));
+            Assert.Equal(expectedAp, xelor.CurrentAP);
+        }
+
         /// <summary>
         /// Remanencia on oneself: "teletransporta al objetivo a su posición anterior por cada PM que
         /// utilice", at the end of the turn for an ally. Every step hooks 30846 at grade 2 once more,
