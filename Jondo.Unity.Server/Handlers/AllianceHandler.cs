@@ -1057,7 +1057,7 @@ namespace Jondo.Unity.Server.Handlers
                               (accepted ? "accepted." : "refused."));
         }
 
-        /// <summary>An alliance's card from the directory (mck): f1 its uuid; the mcl with its leader.</summary>
+        /// <summary>An alliance's card from the directory (mck): f1 its uuid; the mcl with its members.</summary>
         public static async Task CardAsync(NetworkStream stream, byte[] frame)
         {
             byte[] mck = ConnectionProtocol.ReadPayload(frame, Op.Mck);
@@ -1068,13 +1068,34 @@ namespace Jondo.Unity.Server.Handlers
 
             var alliance = AllianceStore.ByUuid(uuid);
             if (alliance == null) return;
-            var leader = RowOf(AllianceStore.LeaderOf(alliance.Id));
-            var shown = leader == null
-                ? Array.Empty<(AllianceProtocol.MemberRow, AllianceStore.Rank)>()
-                : new[] { (leader.Value, AllianceStore.Ranks(alliance.Id).FirstOrDefault(r => r.Id == leader.Value.Member.Rank)) };
+            var shown = CardMembers(alliance.Id);
+            long leaderId = shown.Where(s => s.Row.Member.Rank == AllianceStore.RankLeader)
+                                 .Select(s => s.Row.Member.CharacterId).FirstOrDefault();
             var prisms = PrismStore.OfAlliance(alliance.Id).Select(p => p.SubAreaId).ToList();
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Mcl, AllianceProtocol.BuildCardView(
-                alliance, CardOf(alliance), shown, prisms, leader?.Member.CharacterId ?? 0)));
+                alliance, CardOf(alliance), shown, prisms, leaderId)));
+        }
+
+        /// <summary>
+        /// The members an alliance's card shows in its «Miembros» tab, each with his rank: all of
+        /// them, by their rank's order and then by who joined first. It showed the leader alone,
+        /// and nobody at all when the leader's character was gone. A member whose character is
+        /// gone is left out.
+        /// </summary>
+        internal static List<(AllianceProtocol.MemberRow Row, AllianceStore.Rank Rank)> CardMembers(
+            long allianceId, Func<AllianceStore.Member, AllianceProtocol.MemberRow?> rowOf = null)
+        {
+            rowOf ??= m => RowOf(m);
+            var ranks = AllianceStore.Ranks(allianceId);
+            var shown = new List<(AllianceProtocol.MemberRow Row, AllianceStore.Rank Rank)>();
+            foreach (var member in AllianceStore.Members(allianceId))
+            {
+                if (rowOf(member) is not { } row) continue;
+                shown.Add((row, ranks.FirstOrDefault(r => r.Id == member.Rank)));
+            }
+            return shown.OrderBy(s => s.Rank?.Order ?? int.MaxValue)
+                        .ThenBy(s => s.Row.Member.JoinedUtcMs)
+                        .ToList();
         }
 
         // ─── Invitations ────────────────────────────────────────────────────────

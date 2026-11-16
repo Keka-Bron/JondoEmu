@@ -367,6 +367,33 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// The card's «Miembros» tab lists every member, by his rank's order: it showed the leader
+        /// alone, and nobody when the leader's character was gone -- «Test Perco», whose leader was
+        /// deleted, showed an empty tab. A member whose character is gone is left out.
+        /// </summary>
+        [Fact]
+        public void The_card_lists_every_member_by_rank_and_leaves_out_the_gone()
+        {
+            var alliance = AllianceStore.Create(8420, "Test Perco", "SLEY", 408, 27, 3116544, 0, 15859463);
+            AllianceStore.Join(8421, alliance.Id, rank: 4);
+            AllianceStore.Join(8422, alliance.Id, rank: 2);
+
+            AllianceProtocol.MemberRow? Row(AllianceStore.Member m)
+                => new AllianceProtocol.MemberRow(m, $"Member {m.CharacterId}", 200, 1, 9, 1, 0, false);
+
+            var all = AllianceHandler.CardMembers(alliance.Id, Row);
+            Assert.Equal(new long[] { 8420, 8422, 8421 }, all.Select(s => s.Row.Member.CharacterId));
+            Assert.All(all, s => Assert.NotNull(s.Rank));
+
+            // The leader's character gone: the others are still shown.
+            var withoutLeader = AllianceHandler.CardMembers(alliance.Id, m => m.CharacterId == 8420 ? null : Row(m));
+            Assert.Equal(new long[] { 8422, 8421 }, withoutLeader.Select(s => s.Row.Member.CharacterId));
+
+            var mcl = ProtoMessage.Parse(AllianceProtocol.BuildCardView(alliance, Pb.New(), withoutLeader));
+            Assert.Equal(2, mcl.Fields.Count(f => f.FieldNumber == 1));
+        }
+
+        /// <summary>
         /// The «Alliance fight» switch: kept per character, answered with the hon {f5 status}, 4
         /// when on and nothing when off -- its f1 is a prequalification's end, none here --, and
         /// carried by the map's actor (f1 of its alliance option).
