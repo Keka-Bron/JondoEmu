@@ -18,9 +18,9 @@ namespace Jondo.Unity.Server.Managers
     /// gênante : Gaz Méphitique» (Dofus pour les noobs, «Antre du Dragon Cochon»).
     /// </summary>
     /// <remarks>
-    /// Checked on every map the character loads and on the heartbeat the client sends every five
-    /// seconds (AlterationHandler.TickAsync). The warning goes when he leaves the rooms; a curse he
-    /// was given stays, and counts its fights down as any other.
+    /// Checked on every map the character loads, when each step's time is up, and on the client's
+    /// heartbeat when one comes (AlterationHandler.TickAsync). The warning goes when he leaves the
+    /// rooms; a curse he was given stays, and counts its fights down as any other.
     /// </remarks>
     public static class LingeringRooms
     {
@@ -68,7 +68,9 @@ namespace Jondo.Unity.Server.Managers
                 await CheckAsync(stream, characterId, mapId);
                 return;
             }
-            _inside[characterId] = (found.Dungeon, DateTime.UtcNow, 0);
+            var since = DateTime.UtcNow;
+            _inside[characterId] = (found.Dungeon, since, 0);
+            foreach (var (seconds, _) in found.Rule.Steps) Remind(characterId, since, seconds);
             if (found.Rule.Warning != 0 && Equipment.HowMany(found.Rule.Warning) == 0)
             {
                 await QuestFollowers.GiveAsync(stream, found.Rule.Warning, 1);
@@ -96,6 +98,30 @@ namespace Jondo.Unity.Server.Managers
             int curse = found.Rule.Steps[step - 1].Item;
             if (Equipment.HowMany(curse) == 0) await QuestFollowers.GiveAsync(stream, curse, 1);
             Console.WriteLine($"[Dungeon] {characterId} lingered in the rooms of dungeon {found.Dungeon}: cursed with {curse}.");
+        }
+
+        /// <summary>
+        /// A look at him when a step's time is up: the client's heartbeat does not come in the world,
+        /// so the time spent in the rooms is counted here. A reminder for a stay that has ended -- he
+        /// left, or came in again since -- does nothing.
+        /// </summary>
+        private static void Remind(long characterId, DateTime since, int seconds)
+        {
+            _ = Task.Delay(TimeSpan.FromSeconds(seconds + 1)).ContinueWith(async _ =>
+            {
+                try
+                {
+                    if (!_inside.TryGetValue(characterId, out var there) || there.Since != since) return;
+                    var session = Network.SessionRegistry.FindByCharacter(characterId);
+                    if (session?.Stream == null || session.State.IsInFight) return;
+                    using var context = Network.SessionContext.Push(session);
+                    await CheckAsync(session.Stream, characterId, session.State.MapId);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Dungeon] The rooms not to linger in could not look at {characterId}: {ex.Message}");
+                }
+            }, TaskScheduler.Default);
         }
 
         private static async Task TakeIfHeldAsync(NetworkStream stream, int template)
