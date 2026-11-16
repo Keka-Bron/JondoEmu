@@ -1099,13 +1099,16 @@ namespace Jondo.Unity.World.Fights
         public int TriggerDepth { get; set; }
 
         /// <summary>
-        /// The hooked spells going off right now, by spell, and how many of them: while one is
-        /// resolving, what it sets off does not set off another of the same spell. The Cerdo
-        /// serrano's Flecha Dolorosa leaves «6 a 10 de daños de aire» on whoever suffers air
-        /// damage; that blow is air damage too, and four of them on one character, one from each
-        /// serrano, answered each other down to the depth limit -- 134 blows in one cast.
+        /// The hooked spells going off right now, by spell and the trigger they answer, and how
+        /// many of them: while one is resolving, what it sets off does not set off another of
+        /// the same spell for the same trigger. The Cerdo serrano's Flecha Dolorosa leaves «6 a
+        /// 10 de daños de aire» on whoever suffers air damage; that blow is air damage too, and
+        /// four of them on one character, one from each serrano, answered each other down to the
+        /// depth limit -- 134 blows in one cast. Another trigger of the same spell still answers:
+        /// the Osavora season's counter, hooked on the blows, reaches its last state, and the
+        /// hook on that state coming into force casts the season's reaction.
         /// </summary>
-        public Dictionary<int, int> HooksResolving { get; } = new();
+        public Dictionary<(int Spell, string Trigger), int> HooksResolving { get; } = new();
 
         /// <summary>
         /// The telefrags of the spell being resolved: who swapped cells with whom through a
