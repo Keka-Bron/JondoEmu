@@ -337,6 +337,20 @@ namespace Jondo.Unity.Server.Handlers
             => effects.FirstOrDefault(e => e.EffectId == StartQuestEffect && e.Value > 0)?.Value ?? 0;
 
         /// <summary>
+        /// Whether a quest-starting item's criterion holds, its own quest's «Qc» left to the start
+        /// (<see cref="Quests.StartAsync"/> asks whether the quest can be taken, with what this
+        /// server can judge of it); every other term as the resolver answers it.
+        /// </summary>
+        internal static bool StartCriterionHolds(string criterion, int questId, Jondo.Unity.World.Content.Criterion.Resolver resolver)
+        {
+            if (string.IsNullOrWhiteSpace(criterion)) return true;
+            return Jondo.Unity.World.Content.Criterion.Met(criterion, condition =>
+                condition.Code == "Qc" && condition.Value == questId
+                    ? (condition.Operator == '=' ? Jondo.Unity.World.Content.Answer.True : Jondo.Unity.World.Content.Answer.False)
+                    : resolver(condition));
+        }
+
+        /// <summary>
         /// An item that starts a quest, used: the quest starts under the same conditions as from an
         /// NPC, and the item stays (the feather of 555 and the gum of 600 are handed over later).
         /// One already in hand gets info 626, as the document's button does. False when the item
@@ -347,12 +361,23 @@ namespace Jondo.Unity.Server.Handlers
             int questId = QuestStartedBy(DatabaseManager.GetItemEffectsData(
                 DatabaseManager.GetItemTemplatePossibleEffects(item.Template)));
             if (questId == 0) return false;
-            if (!await CriterionHoldsAsync(stream, item)) return true;
 
             if (Quests.Log?.Active(questId) == true)
             {
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, QuestHandler.AlreadyStarted)));
+                return true;
+            }
+
+            // Its criterion: 20 of the 22 carry «Qc» for the very quest they start (the feather's
+            // «Qc=555&Qa!555»), «can be started now», which the start itself judges just below --
+            // and which the item criterion reader took for «finished», refusing every one of them.
+            string criterion = DatabaseManager.GetItemTemplateCriterion(item.Template);
+            if (!StartCriterionHolds(criterion, questId, PlayerCriteria.ResolverFor(SessionContext.State.MapId)))
+            {
+                await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.RequirementsNotMet)));
+                Console.WriteLine($"[Items] {SessionContext.State.CharacterName} cannot start quest {questId} with item {item.Template}: «{criterion}».");
                 return true;
             }
 

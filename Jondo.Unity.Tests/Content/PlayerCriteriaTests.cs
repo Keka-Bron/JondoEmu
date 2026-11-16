@@ -267,6 +267,31 @@ namespace Jondo.Unity.Tests.Content
             Assert.True(Met("Pm=98567687|PO!1", facts));
         }
 
+        /// <summary>
+        /// The vibrating feather that starts 555 carries «Qc=555&amp;Qa!555»: its own quest's «Qc» is left
+        /// to the start (Quests.StartAsync), the rest judged; the gum of 1508 asks «Qf=1507».
+        /// </summary>
+        [Fact]
+        public void A_quest_item_criterion_leaves_its_own_quest_to_the_start()
+        {
+            bool inHand = false, finished1507 = false;
+            Criterion.Resolver facts = c => c.Code switch
+            {
+                "Qa" => (inHand == (c.Operator == '=')) ? Answer.True : Answer.False,
+                "Qf" => (finished1507 == (c.Operator == '=')) ? Answer.True : Answer.False,
+                _ => Answer.Unknown,
+            };
+            Assert.True(Jondo.Unity.Server.Handlers.ItemUseHandler.StartCriterionHolds("Qc=555&Qa!555", 555, facts));
+            inHand = true;
+            Assert.False(Jondo.Unity.Server.Handlers.ItemUseHandler.StartCriterionHolds("Qc=555&Qa!555", 555, facts));
+            Assert.False(Jondo.Unity.Server.Handlers.ItemUseHandler.StartCriterionHolds("Qf=1507", 1508, facts));
+            finished1507 = true;
+            Assert.True(Jondo.Unity.Server.Handlers.ItemUseHandler.StartCriterionHolds("Qf=1507", 1508, facts));
+            Assert.True(Jondo.Unity.Server.Handlers.ItemUseHandler.StartCriterionHolds("", 1854, facts));
+            // Another quest's «Qc» is still the resolver's to answer: unknown here, so not met.
+            Assert.False(Jondo.Unity.Server.Handlers.ItemUseHandler.StartCriterionHolds("Qc=556", 555, facts));
+        }
+
         [Fact]
         public void Qc_checks_quest_availability_separately_from_completion()
         {

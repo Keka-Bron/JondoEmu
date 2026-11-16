@@ -728,9 +728,11 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (Equipment.HowManyWorn(item) >= count) continue;
                     Console.WriteLine($"[Quests] Objective {binding.ObjectiveId} asks for {item} worn and it is not.");
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
-                            InfoMessages.Warning, InfoMessages.MissingItem)));
+                    // Silent on a hello or on arriving, as for what is carried.
+                    if (binding.Kind != QuestBindingKind.Talk && binding.Kind != QuestBindingKind.Enter)
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                            ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                                InfoMessages.Warning, InfoMessages.MissingItem)));
                     return false;
                 }
                 return true;
