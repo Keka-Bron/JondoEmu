@@ -1264,7 +1264,7 @@ namespace Jondo.Unity.Server.Managers
                         // Moved straight away from the caster, or toward him: what is planned after
                         // reads where they are -- the enemy pulled into reach.
                         bool away = id != EffectSupport.Pull;
-                        foreach (var who in reached.Where(w => w != caster && !SpellStates.PinsInPlace(w)).ToList())
+                        foreach (var who in reached.Where(w => w != caster && !SpellStates.PinsInPlace(w) && !MonsterFlags.TemplatePinsInPlace(w)).ToList())
                         {
                             var (cell, short_) = Slide(who, from, Math.Max(1, row.DiceNum), away);
                             if (cell != who.CellId) Moved(who, cell);

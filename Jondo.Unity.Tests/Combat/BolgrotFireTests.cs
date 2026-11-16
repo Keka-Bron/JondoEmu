@@ -258,6 +258,42 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// The astral jump pushes whatever stands around its landing one cell away, but Bolgrot's
+        /// spirit has no CanBePushed bit in its template's m_flags (4045: 33872, against the fires'
+        /// 40720), so it stays where it is. It used to be driven about with the fires.
+        /// </summary>
+        [Fact]
+        public async Task The_astral_jump_drives_a_fire_but_not_Bolgrot()
+        {
+            const int Jump = 5703;
+            if (SpellEffects.De(Jump, 1).Count == 0 || MonsterFlags.Of(Bolgrot) < 0 || MonsterFlags.Of(Fire) < 0) return;
+
+            async Task<int> CellAfterTheJumpAsync(int template)
+            {
+                var fight = new FightInstance(1, 1);
+                var shadow = new Fighter
+                {
+                    Id = 10, TeamId = 0, CellId = 300, MaxHP = 40, CurrentHP = 40, Level = 160,
+                    MaxAP = 10, CurrentAP = 10,
+                };
+                var beside = new Fighter
+                {
+                    Id = -1, TeamId = 1, CellId = 330, MaxHP = 1, CurrentHP = 1, Level = 1,
+                    IsMonster = true, MonsterId = template,
+                };
+                fight.AddPlayer(shadow); fight.AddMonster(beside);
+                beside.Buffs.PonerEstado(272);
+                await FightHandler.AplicarEfectosAsync(null, fight, shadow, Jump, 1, null,
+                                                       EffectEngine.AlLanzar, 315);
+                Assert.Equal(315, shadow.CellId);
+                return beside.CellId;
+            }
+
+            Assert.NotEqual(330, await CellAfterTheJumpAsync(Fire));
+            Assert.Equal(330, await CellAfterTheJumpAsync(Bolgrot));
+        }
+
+        /// <summary>
         /// A fire's 5705, as an attitude or as a fight gives it: its behaviour spell, cast as it
         /// comes in, its MA row armed on itself.
         /// </summary>

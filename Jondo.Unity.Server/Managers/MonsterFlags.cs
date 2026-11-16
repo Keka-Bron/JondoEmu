@@ -22,6 +22,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>MonsterFlags.CanTackle: the creature holds whoever tries to walk away from it.</summary>
         public const long CanTackle = 128;
 
+        /// <summary>MonsterFlags.CanBePushed: pushes and pulls move the creature.</summary>
+        public const long CanBePushed = 256;
+
         private static readonly ConcurrentDictionary<int, long> _flags = new();
 
         /// <summary>The template's m_flags, or -1 when the template is not in world.db.</summary>
@@ -57,5 +60,21 @@ namespace Jondo.Unity.Server.Managers
             long flags = Of(templateId);
             return flags < 0 || (flags & CanTackle) != 0;
         }
+
+        /// <summary>
+        /// Whether pushes and pulls move a creature of this template. 288 of the 5,134 templates
+        /// lack the bit, and almost none of them are fought as plain monsters. Bolgrot's spirit
+        /// (4045) is one, and it stays where it is while the astral shadow's jumps drive its fires
+        /// about. A template world.db does not have is taken as pushable.
+        /// </summary>
+        public static bool AllowsPush(int templateId)
+        {
+            long flags = Of(templateId);
+            return flags < 0 || (flags & CanBePushed) != 0;
+        }
+
+        /// <summary>Whether the fighter is a monster or summon whose template keeps it from being pushed.</summary>
+        public static bool TemplatePinsInPlace(Jondo.Unity.World.Fights.Fighter who)
+            => who != null && who.IsMonster && who.MonsterId > 0 && !AllowsPush(who.MonsterId);
     }
 }

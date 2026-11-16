@@ -5138,6 +5138,11 @@ namespace Jondo.Unity.Server.Managers
                 if (efecto.EffectId != EmpujeForzado && efecto.EffectId != TironForzado &&
                     (sobre.Buffs.TieneEstado(Indesplazable) || SpellStates.PinsInPlace(sobre))) return null;
 
+                // And a creature whose template has no CanBePushed bit is never pushed or pulled,
+                // not even by a forced push: Bolgrot's spirit stays put while every astral jump
+                // drives the fires one cell. Stepping back or forward is the caster's own move.
+                if (!alLanzador && MonsterFlags.TemplatePinsInPlace(sobre)) return null;
+
                 var ocupadas = new HashSet<int>();
                 foreach (var otro in Todos(combate))
                     if (otro != null && otro.IsAlive && !otro.EstaCargado && otro != sobre) ocupadas.Add(otro.CellId);
