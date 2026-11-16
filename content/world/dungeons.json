@@ -12,7 +12,8 @@
     "made of, in the place of its subarea's monsters (DungeonManager.Dungeon.WrittenRoster).",
     "«empty»: the rooms only walked through, with nobody in them; the door at their far side leads",
     "on (DungeonManager.Dungeon.EmptyRooms). «alone»: room -> the monsters fought there, all of them",
-    "and nobody else (DungeonManager.Dungeon.AloneRooms)."
+    "and nobody else (DungeonManager.Dungeon.AloneRooms). «lingering»: the rooms not to stay in, the",
+    "curse that warns whoever comes in and the curses earned by the seconds spent there (LingeringRooms)."
   ],
   "3": {
     "name": "Biblioteca del Maestro Cuerbok",
@@ -105,7 +106,15 @@
     "alone": {
       "72359936": [3137]
     },
-    "why": "The den's thirteen rooms in the order their names give (First to Thirteenth Room), its fights in every other one: Dofus pour les noobs, «Antre du Dragon Cochon»: the first two are crossed quickly, «sinon vous obtiendrez une malédiction assez gênante : Gaz Méphitique»; the third brings Cerdos de Farle and Cerdos serranos (603, 3304), the fifth adds the Don dórgano (601), the seventh is the same, the ninth adds the Don dessangre (600); the fourth, sixth, eighth, tenth and twelfth are empty («Rien de spécial dans cette salle continuez jusque la prochaine»); the eleventh is the mini-boss, the Marranórgola (3137) alone -- its side of the map has one starting cell --, and the thirteenth the Dragocerdo. The catalogue put a group in every room, the Marranórgola in the first. The doors of the empty rooms are the 2.73 graph's floor passages, and content/interactives/floor_passages.json for the second and fourth. INFERRED: the boss's companions, the rooms' grades. The porco of the entrance (784) keeps the door."
+    "lingering": {
+      "rooms": [72351744, 72352768],
+      "warning": 13284,
+      "steps": [
+        { "seconds": 60, "item": 13282 },
+        { "seconds": 120, "item": 13283 }
+      ]
+    },
+    "why": "The den's thirteen rooms in the order their names give (First to Thirteenth Room), its fights in every other one: Dofus pour les noobs, «Antre du Dragon Cochon»: the first two are crossed quickly, «sinon vous obtiendrez une malédiction assez gênante : Gaz Méphitique»; the third brings Cerdos de Farle and Cerdos serranos (603, 3304), the fifth adds the Don dórgano (601), the seventh is the same, the ninth adds the Don dessangre (600); the fourth, sixth, eighth, tenth and twelfth are empty («Rien de spécial dans cette salle continuez jusque la prochaine»); the eleventh is the mini-boss, the Marranórgola (3137) alone -- its side of the map has one starting cell --, and the thirteenth the Dragocerdo. The catalogue put a group in every room, the Marranórgola in the first. The doors of the empty rooms are the 2.73 graph's floor passages, and content/interactives/floor_passages.json for the second and fourth. INFERRED: the boss's companions, the rooms' grades. The first two rooms are not to be lingered in: whoever comes in carries «Efluvios nauseabundos» (13284, «Si respiras mucho tiempo los gases de esta sala, sufrirás las consecuencias»), which goes when he reaches the third; still in them, it turns into «Gas mefistofélico» (13282) and then «Gas mefistofélico potente» (13283), four fights each -- INFERRED times, 60 and 120 seconds. The porco of the entrance (784) keeps the door."
   },
   "9001": {
     "name": "Laboratorio Secreto",

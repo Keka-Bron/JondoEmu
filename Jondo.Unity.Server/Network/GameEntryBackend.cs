@@ -216,6 +216,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         await Managers.Quests.OnMapEnteredAsync(stream, session.MapId, map?.SubAreaId ?? 0);
         await Managers.Achievements.OnMapEnteredAsync(stream, session.MapId, map?.SubAreaId ?? 0);
         await ConquestHandler.OnMapEnteredAsync(stream, session.CharacterId, map?.SubAreaId ?? 0);
+        await Managers.LingeringRooms.OnMapEnteredAsync(stream, session.CharacterId, session.MapId);
         await PhantomHandler.OnMapLoadedAsync(stream);
         await Managers.MapStagings.ShowAsync(stream, Managers.MapStagings.OnArrival(session.MapId));
         // What a fight dropped for the bonus slots -- a mutation, a curse --, now that he is back.

@@ -134,6 +134,12 @@ namespace Jondo.Unity.Server.Managers
             public Dictionary<long, List<int>> AloneRooms { get; } = new();
 
             /// <summary>
+            /// Its rooms not to linger in, if it has any (content/world/dungeons.json «lingering»,
+            /// <see cref="LingeringRooms"/>): the Dragon Pig's Den's two gas rooms.
+            /// </summary>
+            public LingeringRooms.Rule? Lingering { get; set; }
+
+            /// <summary>
             /// Whether its bosses are fought alone in their room (<see cref="BossFightsAlone"/>, or
             /// «bossAlone» in content/world/dungeons.json), and all of them by whoever comes in.
             /// </summary>
@@ -834,6 +840,20 @@ namespace Jondo.Unity.Server.Managers
                                 .Where(m => m.TryGetInt32(out _)).Select(m => m.GetInt32()).Where(m => m > 0).ToList();
                             if (monsters.Count > 0) dungeon.AloneRooms[map] = monsters;
                         }
+                    }
+
+                    if (authored && entry.Value.TryGetProperty("lingering", out var lingering) && lingering.ValueKind == JsonValueKind.Object)
+                    {
+                        var rule = new LingeringRooms.Rule { Warning = Number(lingering, "warning") };
+                        if (lingering.TryGetProperty("rooms", out var gasRooms) && gasRooms.ValueKind == JsonValueKind.Array)
+                            foreach (var room in gasRooms.EnumerateArray())
+                                if (room.TryGetInt64(out long map)) rule.Rooms.Add(map);
+                        if (lingering.TryGetProperty("steps", out var steps) && steps.ValueKind == JsonValueKind.Array)
+                            foreach (var step in steps.EnumerateArray())
+                                if (Number(step, "seconds") > 0 && Number(step, "item") != 0)
+                                    rule.Steps.Add((Number(step, "seconds"), Number(step, "item")));
+                        rule.Steps.Sort((a, b) => a.Seconds.CompareTo(b.Seconds));
+                        if (rule.Rooms.Count > 0) dungeon.Lingering = rule;
                     }
 
                     if (entry.Value.TryGetProperty("roster", out var roster) && roster.ValueKind == JsonValueKind.Object)

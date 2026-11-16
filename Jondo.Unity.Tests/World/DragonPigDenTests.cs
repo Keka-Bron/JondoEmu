@@ -61,5 +61,21 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(Dragocerdo, boss.Members[0].Monster.Id);
             Assert.DoesNotContain(boss.Members, m => m.Monster.Id == Marranorgola);
         }
+
+        [Fact]
+        public void The_two_gas_rooms_warn_and_curse_whoever_lingers()
+        {
+            Load();
+            var gas = DungeonManager.Get(6)!.Lingering!;
+            Assert.Equal(new[] { FirstRoom, SecondRoom }, gas.Rooms.OrderBy(r => r));
+            Assert.Equal(13284, gas.Warning);
+            Assert.Equal((6, gas), LingeringRooms.RuleOf(SecondRoom)!.Value);
+            Assert.Null(LingeringRooms.RuleOf(ThirdRoom));
+            Assert.Equal(0, LingeringRooms.StepAfter(gas, 59));
+            Assert.Equal(1, LingeringRooms.StepAfter(gas, 60));
+            Assert.Equal(13282, gas.Steps[0].Item);
+            Assert.Equal(2, LingeringRooms.StepAfter(gas, 600));
+            Assert.Equal(13283, gas.Steps[1].Item);
+        }
     }
 }

@@ -100,6 +100,9 @@ namespace Jondo.Unity.Server.Handlers
             if (me.CharacterId == 0 || me.IsInFight || me.FightId != 0) return;
             var stream = session.Stream ?? throw new InvalidOperationException("Alteration feature hooks require a connected game session.");
 
+            // The rooms not to linger in: the curse the time spent in them has earned.
+            await LingeringRooms.CheckAsync(stream, me.CharacterId, me.MapId);
+
             var now = DateTime.UtcNow;
             var expired = Alterations.Expire(me.CharacterId, now);
 
