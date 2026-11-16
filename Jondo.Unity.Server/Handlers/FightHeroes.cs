@@ -142,6 +142,8 @@ namespace Jondo.Unity.Server.Handlers
                         // What the achievements count, in his own tallies as in his master's: looked
                         // at when he is at his side again (Achievements.ForHeroAsync).
                         AchievementWatcher.FightEnded(fight, fight.HaGanado(fighter.Id));
+                        // And the boss challenges met, done for him too: not imposed on him again.
+                        ChallengeWatcher.RecordDoneFor(fight, fighter.Id);
                         GameState.IsInFight = false;
                         hero.Session.State.FightId = 0;
                         var master = SessionRegistry.FindByCharacter(hero.MasterId);
