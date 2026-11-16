@@ -15,7 +15,8 @@ namespace Jondo.Unity.Server.Managers
     /// <para>
     /// The rules are the client's own (Translations 1149998). Any character of level 50 or more
     /// recycles. A recipe's item and a dungeon guardian's drop give more. At the neutral prism the
-    /// nuggets are all the player's; while collecting a tax collector they are split between the
+    /// player gets 60 % of the nuggets and the rest is destroyed (update 3.3, RecycleHandler.NeutralPrismShare);
+    /// while collecting a tax collector they are split between the
     /// player and his alliance's pot, half each, and controlling territories next to the tax
     /// collector's gives more.
     /// </para>

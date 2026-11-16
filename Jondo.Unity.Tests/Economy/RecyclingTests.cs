@@ -112,15 +112,17 @@ namespace Jondo.Unity.Tests.Economy
                     var stack = Equipment.Create(Resource, 20, Array.Empty<Equipment.ItemEffect>())!;
                     await RecycleHandler.OpenAtPrismAsync(pipe.ToClient, RecycleHandler.PrismElement, RecycleHandler.RecycleSkill);
                     await pipe.Next(Op.Iwn);
+                    // 60 % to the player, none to his alliance: the 40 % left is destroyed (update 3.3).
                     var kga = await pipe.Next("kga");
-                    Assert.Equal(100, Var(kga, 2));
+                    Assert.Equal(60, Var(kga, 2));
                     Assert.Equal(0, Var(kga, 5));
 
                     Assert.True(await WorkshopHandler.MoveAsync(pipe.ToClient, Kcr(20, stack.Uid)));
                     await pipe.Next(Op.Kfb);
 
-                    long expected = (long)Math.Floor(Recycling.NuggetsOf(Resource, 20,
-                        MapManager.GetMapInfo(RecycleHandler.PrismMap)!.SubAreaId));
+                    double whole = Recycling.NuggetsOf(Resource, 20, MapManager.GetMapInfo(RecycleHandler.PrismMap)!.SubAreaId);
+                    long expected = Recycling.Split(whole, RecycleHandler.NeutralPrismShare, 0, 1.0).Player;
+                    Assert.True(expected > 0 && expected < (long)Math.Floor(whole));
                     Assert.True(await WorkshopHandler.CraftAsync(pipe.ToClient, Kep()));
                     var kgh = await Until(pipe, "kgh");
                     Assert.Equal(expected, Var(kgh, 2));
