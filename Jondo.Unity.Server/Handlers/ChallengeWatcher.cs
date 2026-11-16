@@ -908,6 +908,17 @@ namespace Jondo.Unity.Server.Handlers
         public static IReadOnlyCollection<int> WonIn(FightInstance fight)
             => _ends.TryGetValue(fight.FightId, out var end) ? end.Won : (IReadOnlyCollection<int>)System.Array.Empty<int>();
 
+        /// <summary>
+        /// The challenges of this fight that carry an achievement, written down as done for one more
+        /// of its characters -- a hero, who has no stream to go through <see cref="FightEndedAsync"/>
+        /// --, as they are for each player: the place does not impose them on him again.
+        /// </summary>
+        public static void RecordDoneFor(FightInstance fight, long characterId)
+        {
+            if (!_ends.TryGetValue(fight.FightId, out var end)) return;
+            foreach (int done in end.Achievements) DatabaseManager.MarkChallengeDone(characterId, done);
+        }
+
         /// <summary>The fight is over for everybody: its verdicts go.</summary>
         public static void Forget(FightInstance fight)
         {

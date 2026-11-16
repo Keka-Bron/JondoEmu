@@ -3089,72 +3089,87 @@ namespace Heroes
             });
         }
 
-        // ─── The spell bar on three lines ────────────────────────────────────────────────
+        // ─── The spell bar's pages for a hero ────────────────────────────────────────────
 
-        private static Il2CppCore.UILogic.GameUICore.UIActionBar _actionBar;
-        private static int _linesBefore = -1;
-        private static bool _linesForced;
+        /// <summary>Whether heroes are connected: the spell bar's pages turn for them.</summary>
+        private static bool _heroesOn;
+
+        /// <summary>Inside RefreshPageIndex for the main bar, heroes connected: the bar is not «a slave's» there.</summary>
+        private static int _pagingDepth;
+
+        private static void SpellBarLines(bool heroes) => _heroesOn = heroes;
 
         /// <summary>
-        /// The client does not turn the pages of a bar that is not its character's: a hero's spells
-        /// past the second line could not be reached. While heroes are connected the bar shows three
-        /// lines -- thirty-nine slots, a whole class's spells --, and what the player had is put back
-        /// when the last one goes.
+        /// The client does not turn the pages of the bar while it shows a controlled entity's spells
+        /// in a fight (UIActionBar, Cpp2IL of 3.6.10.11): the main bar on its spells, when fkg.bgbl()
+        /// and m_updateUiFromSlaves, has get_m_currentPageIndex answer 0, set_m_currentPageIndex do
+        /// nothing, and RefreshPageIndex hide the arrows (its last page 0). Made for a summon's few
+        /// spells; a hero has a whole class's, and those past the first page could not be reached.
+        /// While heroes are connected the page is the bar's own spells page, read and written as for
+        /// one's own character, and the arrows are reckoned so -- GetItemSlotIndexInGrid already
+        /// places slot «page × lines × 12» on it.
         /// </summary>
-        private static void SpellBarLines(bool heroes)
-        {
-            var bar = _actionBar;
-            if (bar == null) return;
-            try
-            {
-                // Once, as the first hero connects: set back to fewer by the player afterwards, the
-                // bar is his to keep so.
-                if (heroes && !_linesForced)
-                {
-                    _linesForced = true;
-                    if (bar.m_nbLines < 3)
-                    {
-                        _linesBefore = bar.m_nbLines;
-                        bar.SetLinesCount(3);
-                        MelonLogger.Msg($"[Heroes] The spell bar shows three lines while heroes are connected (it had {_linesBefore}).");
-                    }
-                }
-                else if (!heroes && _linesForced)
-                {
-                    _linesForced = false;
-                    // What he had before, unless he chose his own number meanwhile.
-                    if (_linesBefore > 0 && bar.m_nbLines == 3) bar.SetLinesCount(_linesBefore);
-                    _linesBefore = -1;
-                }
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Warning($"[Heroes] The spell bar's lines: {ex.Message}");
-                _actionBar = null;
-            }
-        }
-
         private static void WatchActionBar()
         {
             var harmony = new HarmonyLib.Harmony("jondo.heroes.actionbar");
-            var keep = new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(nameof(KeepActionBar)));
-            foreach (string name in new[] { "RefreshPageIndex", "InitDisplayedLines", "RefreshDisplayedLines" })
+            var bar = typeof(Il2CppCore.UILogic.GameUICore.UIActionBar);
+            void Patch(string name, string prefix = null, string postfix = null)
             {
                 try
                 {
-                    var method = HarmonyLib.AccessTools.Method(typeof(Il2CppCore.UILogic.GameUICore.UIActionBar), name);
-                    if (method != null) harmony.Patch(method, postfix: keep);
+                    var method = HarmonyLib.AccessTools.Method(bar, name);
+                    if (method == null) { MelonLogger.Warning($"[Heroes] UIActionBar.{name} not found."); return; }
+                    harmony.Patch(method,
+                        prefix: prefix == null ? null : new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(prefix)),
+                        postfix: postfix == null ? null : new HarmonyLib.HarmonyMethod(typeof(HeroesMod).GetMethod(postfix)));
                 }
                 catch (Exception ex)
                 {
                     MelonLogger.Warning($"[Heroes] UIActionBar.{name} not watched: {ex.Message}");
                 }
             }
+            Patch("get_m_currentPageIndex", prefix: nameof(HeroPageRead));
+            Patch("set_m_currentPageIndex", prefix: nameof(HeroPageWritten));
+            Patch("RefreshPageIndex", prefix: nameof(PageArrowsIn), postfix: nameof(PageArrowsOut));
+            Patch("get_m_updateUiFromSlaves", prefix: nameof(NotASlavesBar));
         }
 
-        public static void KeepActionBar(Il2CppCore.UILogic.GameUICore.UIActionBar __instance)
+        /// <summary>The main bar, on its spells, while heroes are connected: the one whose pages are theirs to turn.</summary>
+        private static bool HeroPaging(Il2CppCore.UILogic.GameUICore.UIActionBar bar)
         {
-            if (__instance != null) _actionBar = __instance;
+            try { return _heroesOn && bar != null && bar.m_id == 0 && Convert.ToInt32(bar.m_currentGridEnum) == 1; }
+            catch { return false; }
+        }
+
+        public static bool HeroPageRead(Il2CppCore.UILogic.GameUICore.UIActionBar __instance, ref int __result)
+        {
+            if (!HeroPaging(__instance)) return true;
+            __result = __instance.m_pageSpellsIndex;
+            return false;
+        }
+
+        public static bool HeroPageWritten(Il2CppCore.UILogic.GameUICore.UIActionBar __instance, int value)
+        {
+            if (!HeroPaging(__instance)) return true;
+            __instance.m_pageSpellsIndex = value;
+            return false;
+        }
+
+        public static void PageArrowsIn(Il2CppCore.UILogic.GameUICore.UIActionBar __instance)
+        {
+            if (HeroPaging(__instance)) _pagingDepth++;
+        }
+
+        public static void PageArrowsOut(Il2CppCore.UILogic.GameUICore.UIActionBar __instance)
+        {
+            if (_pagingDepth > 0 && HeroPaging(__instance)) _pagingDepth--;
+        }
+
+        public static bool NotASlavesBar(ref bool __result)
+        {
+            if (_pagingDepth <= 0) return true;
+            __result = false;
+            return false;
         }
 
         private static VisualElement Toggle(Il2CppSystem.Action click, UnityEngine.Texture2D glyph, bool on)

@@ -139,6 +139,11 @@ namespace Jondo.Unity.Server.Handlers
                             if (reward.Loot.Count > 0)
                                 EntregarBotin(GuildRaidManager.ForTheBag(GameState.CharacterId, reward.Loot), out _, reward.Perfect);
                         }
+                        // What the achievements count, in his own tallies as in his master's: looked
+                        // at when he is at his side again (Achievements.ForHeroAsync).
+                        AchievementWatcher.FightEnded(fight, fight.HaGanado(fighter.Id));
+                        // And the boss challenges met, done for him too: not imposed on him again.
+                        ChallengeWatcher.RecordDoneFor(fight, fighter.Id);
                         GameState.IsInFight = false;
                         hero.Session.State.FightId = 0;
                         bool won = fight.SigueVivo(fighter.TeamId);
