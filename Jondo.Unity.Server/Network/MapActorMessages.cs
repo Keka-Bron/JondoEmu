@@ -149,11 +149,7 @@ internal static class MapActorMessages
     internal static ActorPositionInformation Prism(PrismStore.Prism prism, AllianceStore.Alliance alliance)
         => Roleplay(prism.ContextId, prism.CellId, prism.Direction,
             MonsterMessages.Look(PrismProtocol.LookString(alliance), false),
-            new RolePlayActorCasePrismActor(new(null,
-                prism.State == PrismStore.Normal || prism.NextChangeUtcMs <= 0 ? prism.PlacedUtcMs : prism.NextChangeUtcMs,
-                prism.State switch { 0 => PrismState.Normal, 1 => PrismState.Weakened, 2 => PrismState.Vulnerable, 3 => PrismState.Protected,
-                    _ => throw new InvalidOperationException($"Unsupported prism state {prism.State}.") },
-                prism.PlacedUtcMs / 1000, Alliance(alliance), null)));
+            new RolePlayActorCasePrismActor(PrismMessages.Live.State(prism, alliance)));
 
     internal static ActorPositionInformation? Portal(DimensionPortals.Portal portal)
     {

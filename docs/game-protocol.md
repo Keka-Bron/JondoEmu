@@ -301,6 +301,40 @@ detachment, empty replacements, numeric widths and source/cleanup/delivery failu
 and that a failed mark clear stops the acknowledgment and guest departures.
 Targeted real-client journal, tracker and marker checks remain pending.
 
+### Account/guild house lists and world prism list
+
+`HouseHandler.SendAccountHousesAsync(GameSession)` and `SendGuildHousesAsync(GameSession)`
+send `HouseAccountEvent` / `GuildHousesEvent` directly through the owner codec.
+`HouseListMessages` constructs detached account/guild oneof branches in store order,
+skipping unknown doors and retaining house/model/instance identity, int64 street map IDs
+and optional prices, coordinates and guild rights. Full plaques share `MapHouseMessages`
+instance construction with map plaques and add rooms, chests and checked int32 skills.
+List plaques exclude nested guild information. Sale, admin and door locks remain distinct;
+the historical source policy still supplies admin lock from the access code and door lock
+from owner presence, rather than conflating them with sale state.
+
+An empty account list always sends. Guild members get even an empty guild list; absent
+membership or a failed membership lookup omits that send. Sale, purchase and guild-share
+handlers now take and scope the explicit owner; their list refresh stays at the same point
+in the existing burst. Seller notifications capture one detached account snapshot, send
+purchase/chest notices before the list and encode with each matching recipient's codec,
+retaining per-recipient log-and-continue failure handling. Guild founding's empty house-list
+reset is typed too, after item consumption and before the founding result/ranks burst.
+
+`PrismHandler.OnWorldEntryAsync(GameSession)` sends `PrismListEvent` from `PrismMessages`.
+It preserves subarea order, skips missing alliances and sends an empty replacement when
+there are no prisms. Own-alliance information includes an optional remaining-crystal count,
+including zero, and a crystal/inventory/item structure even with no crystal equipped.
+Equipped crystals retain template effects, quantity one, the checked int32 synthetic UID
+and the reviewed protective/no-crystal enum. Foreign views omit both owner-only fields.
+Map IDs and evolution dates are int64; placement dates remain seconds rather than
+milliseconds. Map prism actors share the same foreign-state semantic factory.
+
+The world list follows the [prism-list construction policy](populated-unmapped-fields.md#prism-list-construction-policy):
+localized tag 5 is indeterminate and deliberately omitted, while the mapped nested alliance
+UID is retained. The existing emblem-tag-4 omission policy applies here too. No binding
+changes or blanket lossless-legacy-byte claim accompany this conversion.
+
 ### Map-information service
 
 `GameEntryBackend.SendMapInformationAsync` delegates to `MapInformationService`.
@@ -376,45 +410,6 @@ The direct map path applies the documented omission policy to indeterminate
 alliance-emblem tag 4 and haven-bag tag 3; it does not claim lossless reproduction of
 those former raw values. See [the map construction policy](populated-unmapped-fields.md#map-snapshot-construction-policy).
 
-`MapInformationServiceTests`, `MapInformationMessagesTests` and `MapPresenceServiceTests`
-cover ordering, owner/context isolation, detached populated snapshots, repeatable replies,
-audiences, and source/codec/transport failure boundaries with opaque recording codecs.
-`MapActorContractTests` supplies independent populated protocol fixtures for all actor
-identity branches and absence versus present-empty looks/owner complements. The database
-and framed `TypedMapSnapshotTests` check live owner codecs, repeated bag snapshots,
-instance isolation and fighting-player exclusion. Automated coverage does not replace
-targeted real-client map/presence checks.
-
-The retired map-construction tree has been removed: `BuildMapActors`, its private
-NPC/interactive declaration helpers, `BuildActorRefreshed`, the map-only feature
-`AddToMap` adapters, and the old hall/house/bag/portal snapshot serializers. There
-is no test-only `SessionRegistry.LeaveNotices` alternate; its captured departure
-expectations now run against `MapPresenceService` and the production codec. The
-house street/interior byte fixtures moved to `MapHouseContractTests`, and world
-tests assert typed house copies, bag ownership and portal actors. The raw
-`MonsterGroupActor`, `NpcActor`, `BuildNpcShown`, `AddAlternatives` and `AddQuestMarker`
-tree is also removed. Captured dungeon-alternative and NPC quest-marker fixtures now
-exercise the Game codec in `MapActorContractTests` and `NpcQuestMarkerTests`.
-`TypedActorNotificationTests` checks the actual standalone NPC and fight-end sends
-with opaque codecs and framed transports, including hidden entrances, ordering,
-empty monster groups and appearance failures.
-
-`TaxCollectorProtocol.Actor`/`BuildShown` and `PrismProtocol.Actor`/`BuildShown`
-are removed. Their independent captured actor fixtures now run in
-`MapActorContractTests`; world tests use typed factories for catalogue name IDs,
-placement/evolution dates and alliance looks. `CollectorPrismPresenceTests` exercises
-actual placement, fight restoration, collection/defeat, dissolution and conquest
-send paths with opaque recording codecs, including owner failure, failed-recipient
-isolation, roleplay filtering, notification order and detached state snapshots.
-
-`MonsterMessages` owns the shared semantic look, level and grade rules. Typed actor
-snapshots, character replacement looks and chat links use it directly; surviving
-legacy look writers delegate to the same rules. The two-argument
-`MonsterLook` adapter serves combat, prism and collector packets;
-its unused one-argument overload is removed. Those live
-consumers are tracked migration work in the handoff, rather than unused alternate
-map builders retained for tests.
-
 ### Shared map/fight presence and reconnection opening
 
 `FightHandler` directly constructs map fight flags, counts, incremental teams,
@@ -450,35 +445,6 @@ Shared raw team serializers still serve the remaining fight board/window work.
 wire fixtures; `MapFightPresenceTests` and `CollectorPrismPresenceTests` cover live
 ordering, audiences and failed-recipient isolation. The reconnection hook's codec
 and transport boundaries are covered in `GameEntryMapMessagesTests`.
-
-The three added local bindings are `ShowChallengeEvent`
-(`FightInformation`), `RemoveChallengeEvent` and `FightTeamRemoveMemberEvent`.
-Their wire fields match the reviewed August mappings. Full preparation/resume/spectator
-snapshots and feature-hook migrations remain tracked in the handoff. Targeted
-real-client checks are pending.
-
-### Retired map/transition routes
-
-The previous-protocol `kkr`/`jqf`/`igx`, `joi`/`jos`/`jpp` and
-`loy`/`lpj`/`hmv`/`ibt` branches have been removed from `GameNodeProxy`.
-`MapLoadHandler`, `MapChangeHandler`, `TransitionPacketsBuilder` and
-`TransitionPayloads` are deleted, along with the branch-only burst flag and
-`ConnectionProtocol.BuildPlayerActorBlock`/private player-option assembly tree.
-
-Supported clients use `jrh` for map information and `jrw`/`jqi`/`jqk` for
-walking, confirmation and map changes, through `GameEntryService`,
-`MovementDispatch` and `WorldMoveHandler`. Existing authentication, selection,
-fight-readiness and UID rules continue to belong to those handlers. Retired aliases
-fall through to the existing unhandled-packet diagnostics; no compatibility response
-or state mutation is attached to them.
-
-Creation palettes, capped/Omega levels, PvP alignment, guild/alliance identity,
-auras and followers now exercise `MapActorMessages.Player` in their world tests.
-Independent player wire fixtures remain in `MapActorContractTests`. Shared fight
-startup remains available to live monster attacks, aggression and scripted encounters.
-`GameNodeDispatchTests` sends all ten retired aliases through the real packet loop,
-checks unhandled diagnostics and unchanged map state with no compatibility replies,
-then verifies a current typed ping on the same connection.
 
 ### HAAPI identity and gift continuation
 

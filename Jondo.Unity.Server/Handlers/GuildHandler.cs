@@ -326,7 +326,7 @@ namespace Jondo.Unity.Server.Handlers
             var guild = GuildStore.Create(founderCharacterId, name, symbol, symbolColor, background, symbolRgb);
 
             // jjs, jhq, jco, jgw, khi, jgu, jhh: the capture's order.
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jjs, System.Array.Empty<byte>()));
+            await SessionContext.Current.SendAsync(new Jondo.Unity.Protocol.Game.GuildHousesEvent([]));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhq, System.Array.Empty<byte>()));
             await GuildRankService.Live.SendAsync(SessionContext.Current, guild.Id);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jgw,

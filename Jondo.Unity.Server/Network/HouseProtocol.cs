@@ -164,19 +164,6 @@ namespace Jondo.Unity.Server.Network
             public int GuildRights { get; init; }
         }
 
-        /// <summary>
-        /// The account's houses (jaa): f1 (repeated) { f2: house, f4: model, f6 { f1 { f1: map,
-        /// f2: x, f4: subarea, f5: y }, f2: full plaque } }. Frame 18 of the sale, 22 of the
-        /// withdrawal; empty for an account with none, which is what the character-creation
-        /// captures send at the world entry.
-        /// </summary>
-        public static byte[] BuildAccountHouses(IEnumerable<Owned> houses)
-        {
-            var jaa = Pb.New();
-            foreach (var house in houses) jaa.Msg(1, Lpx(house));
-            return jaa.Build();
-        }
-
         /// <summary>Where a house of a list stands (lgl): { f1: street map, f2: x, f4: subarea, f5: y }.</summary>
         private static Pb Where(Owned house)
             => Pb.New()
@@ -184,18 +171,6 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(2, house.WorldX)
                 .VarIfNotZero(4, house.SubAreaId)
                 .VarIfNotZero(5, house.WorldY);
-
-        /// <summary>
-        /// One of the account's houses (lpx, its oneof's f6): { f1: where, f2: full plaque }. A list's
-        /// plaque never carries the guild, not even of a house shared with one (the captured jaa).
-        /// </summary>
-        private static Pb Lpx(Owned house)
-            => Pb.New()
-                .Var(2, house.HouseId)
-                .Var(4, house.Model)
-                .Msg(6, Pb.New()
-                    .Msg(1, Where(house))
-                    .Msg(2, Build(house.Plaque, true, withGuild: false)));
 
         /// <summary>
         /// One of the guild's houses (lpx, its oneof's f5): { f2: full plaque, f3: the guild's rights,
@@ -210,14 +185,6 @@ namespace Jondo.Unity.Server.Network
                     .Msg(2, Build(house.Plaque, true, withGuild: false))
                     .VarIfNotZero(3, house.GuildRights)
                     .Msg(5, Where(house)));
-
-        /// <summary>The guild's houses (jjs): { f2: lpx each }, the client's fft fills the «Casas» tab from it.</summary>
-        public static byte[] BuildGuildHouses(IEnumerable<Owned> houses)
-        {
-            var jjs = Pb.New();
-            foreach (var house in houses) jjs.Msg(2, GuildLpx(house));
-            return jjs.Build();
-        }
 
         /// <summary>One of the guild's houses, shared or changed (jjp): { f1: lpx }.</summary>
         public static byte[] BuildGuildHouse(Owned house) => Pb.New().Msg(1, GuildLpx(house)).Build();

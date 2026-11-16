@@ -52,7 +52,7 @@ namespace Jondo.Unity.Server.Network
             await Handlers.FriendsHandler.OnWorldEntryAsync(session);
 
             // The world's prisms, for the world map (ife): everybody gets them, alliance or not.
-            await Handlers.PrismHandler.OnWorldEntryAsync(stream);
+            await Handlers.PrismHandler.OnWorldEntryAsync(session);
 
             // What happened to his tax collectors while he was away (hkx).
             await Handlers.TaxCollectorHandler.OnWorldEntryAsync(stream, character.Id);
@@ -67,7 +67,7 @@ namespace Jondo.Unity.Server.Network
             Handlers.HouseHandler.OnWorldEntry(SessionContext.Current.AccountId);
 
             // The guild's houses, for the guild window's «Casas» tab (jjs).
-            await Handlers.HouseHandler.SendGuildHousesAsync(stream, character.Id);
+            await Handlers.HouseHandler.SendGuildHousesAsync(session);
 
             byte[]? sales = Handlers.MarketplaceHandler.SalesHistoryAtEntry(character.Id, SessionContext.Current.AccountId);
             if (sales != null) await EnviarAsync(stream, ConnectionProtocol.Push(Op.Las, sales));

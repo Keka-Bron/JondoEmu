@@ -314,8 +314,13 @@ public sealed class AllianceRankFlowTests : IDisposable
             Assert.Empty(ownCodec.Encoded);
             Assert.Collection(joiningCodec.Encoded,
                 frame => Assert.IsType<AllianceRanksEvent>(frame.Content),
+                frame => Assert.Equal(who, Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(frame.Content).Actors).ActorId),
+                frame => Assert.Equal(who, Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(frame.Content).Actors).ActorId),
                 frame => Assert.IsType<AllianceMotdEvent>(frame.Content),
                 frame => Assert.IsType<AllianceBulletinEvent>(frame.Content));
+            // Refresh encodes once for the owner and once for the captured map audience,
+            // even when no other recipient shares that map. Both use the same snapshot.
+            Assert.Same(joiningCodec.Encoded[1].Content, joiningCodec.Encoded[2].Content);
             Assert.Equal(alliance.Id, AllianceStore.AllianceOf(who)!.Id);
         }
         finally

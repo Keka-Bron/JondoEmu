@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -61,13 +62,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(Hex("0a21200138a09ce30942140a0c4f776e65724163636f756e7412043030303148016016109cf31f1a039df31f"),
                          HouseProtocol.BuildChanged(House, new long[] { Door }, CapturedPlaque(20_500_000)));                 // 17, 20
 
-            var owned = new HouseProtocol.Owned
-            {
-                HouseId = House, Model = 442, StreetMapId = 212601864, WorldX = -30, WorldY = -53, SubAreaId = 973,
-                Plaque = CapturedPlaque(20_500_000),
-            };
-            Assert.Equal(Hex("0a54109cf31f20ba03324b0a1e088898b06510e2ffffffffffffffff0120cd0728cbffffffffffffffff0112292001300338a09ce30942140a0c4f776e65724163636f756e74120430303031480150025a02d3026016"),
-                         HouseProtocol.BuildAccountHouses(new[] { owned }));                                               // 18
+            // The account-list fixture (frame 18) lives in HouseListContractTests.
             Assert.Equal(Hex("120c4f776e65724163636f756e74189cf31f2a043030303130a09ce3094016"),
                          HouseProtocol.BuildSellingUpdate("OwnerAccount", "0001", House, 20_500_000, Instance));           // 19
             Assert.Equal(Hex("0803"), ConnectionProtocol.BuildDialogClosed(HouseProtocol.SaleClosed));                    // 21
@@ -82,39 +77,8 @@ namespace Jondo.Unity.Tests.World
                          HouseProtocol.BuildInfo(CapturedPlaque(21_500_000)));                                                 // 5
 
             // ...and afterwards everything goes without a price (frames 22-23).
-            var owned = new HouseProtocol.Owned
-            {
-                HouseId = House, Model = 442, StreetMapId = 212601864, WorldX = -30, WorldY = -53, SubAreaId = 973,
-                Plaque = CapturedPlaque(),
-            };
-            Assert.Equal(Hex("0a4f109cf31f20ba0332460a1e088898b06510e2ffffffffffffffff0120cd0728cbffffffffffffffff0112242001300342140a0c4f776e65724163636f756e74120430303031480150025a02d3026016"),
-                         HouseProtocol.BuildAccountHouses(new[] { owned }));
             Assert.Equal(Hex("120c4f776e65724163636f756e74189cf31f2a04303030314016"),
                          HouseProtocol.BuildSellingUpdate("OwnerAccount", "0001", House, 0, Instance));
-
-            // An account with no house: jaa empty, as at the world entry of a new account.
-            Assert.Empty(HouseProtocol.BuildAccountHouses(Array.Empty<HouseProtocol.Owned>()));
-        }
-
-        /// <summary>
-        /// The guild's houses as the world entry of «desde eleccion servidor...» lists them (jjs):
-        /// in the oneof's f5, the guild's rights after the plaque -- guildHouse's 505 -- and the plaque
-        /// without the guild, though the house is shared with it.
-        /// </summary>
-        [Fact]
-        public void The_guild_s_houses_are_the_capture()
-        {
-            var guildHouse = new HouseProtocol.Owned
-            {
-                HouseId = 519601, Model = 424, StreetMapId = 219415040, WorldX = -25, WorldY = 34, SubAreaId = 977,
-                GuildRights = 505,
-                Plaque = new HouseProtocol.Plaque
-                {
-                    Instance = 16, OwnerName = "owner2", OwnerTag = "0002", Locked = true, Rooms = 3, Chests = 2, Skills = new long[] { 339 }, GuildBlock = new byte[] { 0x08, 0x01 },
-                },
-            };
-            Assert.Equal(Hex("124510b1db1f20a8032a3c1220200128013003420e0a066f776e657232120430303032480150025a02d302601018f9032a15088084d06810e7ffffffffffffffff0120d1072822"),
-                         HouseProtocol.BuildGuildHouses(new[] { guildHouse }));
         }
 
         /// <summary>«Ir» takes one to his own houses, and to his guild's when they share the teleport.</summary>
@@ -648,8 +612,12 @@ namespace Jondo.Unity.Tests.World
             int houseId = Houses.HouseIdOf(Street, DoorElement);
             var interactive = DoorOf(door);
 
-            await using var a = await ClientPipe.OpenAsync(ownerAccount, owner, Street, "Owner");
-            await using var b = await ClientPipe.OpenAsync(strangerAccount, stranger, Street, "Stranger");
+            var ownerCodec = new HouseDeliveryCodec();
+            var buyerCodec = new HouseDeliveryCodec();
+            await using var a = await ClientPipe.OpenAsync(ownerAccount, owner, Street, "Owner", ownerCodec);
+            await using var b = await ClientPipe.OpenAsync(strangerAccount, stranger, Street, "Stranger", buyerCodec);
+            var failingSellerCodec = new HouseDeliveryCodec { FailLists = true };
+            await using var failingSeller = await ClientPipe.OpenAsync(ownerAccount, owner + 100, 0, "OtherSellerCharacter", failingSellerCodec);
             a.Session.State.Kamas = 3_000_000;
             b.Session.State.Kamas = 30_000_000;
             try
@@ -664,9 +632,9 @@ namespace Jondo.Unity.Tests.World
                     Assert.Equal(HouseProtocol.BuildSaleWindow(true, houseId, Houses.FirstInstance, 2_500_000), await a.Next(Op.Khr));
 
                     // A number that is not the price buys nothing.
-                    Assert.False(await HouseHandler.BuyAsync(a.ToClient, Frame(Op.Jal, Pb.New().Var(1, 1234).Build()), Op.Jal));
+                    Assert.False(await HouseHandler.BuyAsync(a.Session, Frame(Op.Jal, Pb.New().Var(1, 1234).Build()), Op.Jal));
 
-                    Assert.True(await HouseHandler.BuyAsync(a.ToClient, Frame(Op.Jad, Pb.New().Var(1, 2_500_000).Build()), Op.Jad));
+                    Assert.True(await HouseHandler.BuyAsync(a.Session, Frame(Op.Jad, Pb.New().Var(1, 2_500_000).Build()), Op.Jad));
                     Assert.Equal(ConnectionProtocol.BuildKamas(500_000), await a.Next(Op.Ivf));
                     // «Has perdido 2.500.000 kamas.» in the buyer's chat.
                     Assert.Equal(ConnectionProtocol.BuildSystemMessage(InfoMessages.KamasLost, "2500000"), await a.Next(Op.Lqn));
@@ -696,7 +664,7 @@ namespace Jondo.Unity.Tests.World
                     var info = ProtoMessage.Parse(await a.Next(Op.Izr)).Fields.Single();
                     Assert.Equal(1, info.FieldNumber);
 
-                    Assert.True(await HouseHandler.SellAsync(a.ToClient, Frame(Op.Jan, Hex("08a09ce30910011801"))));
+                    Assert.True(await HouseHandler.SellAsync(a.Session, Frame(Op.Jan, Hex("08a09ce30910011801"))));
                     var burst = await a.Take(9);
                     Assert.Equal(new[] { Op.Iwm, Op.Izz, Op.Jjt, Op.Iwm, Op.Izz, Op.Jaa, Op.Izu, Op.Izz, Op.Kld },
                                  burst.Select(f => f.Opcode));
@@ -760,7 +728,7 @@ namespace Jondo.Unity.Tests.World
                     await HouseHandler.UseDoorAsync(b.ToClient, interactive, Skill(interactive, Houses.BuySkill), Houses.FirstInstance);
                     await b.Next(Op.Iwn);
                     Assert.Equal(HouseProtocol.BuildSaleWindow(true, houseId, Houses.FirstInstance, 20_500_000), await b.Next(Op.Khr));
-                    Assert.True(await HouseHandler.BuyAsync(b.ToClient, Frame(Op.Jal, Pb.New().Var(1, 20_500_000).Build()), Op.Jal));
+                    Assert.True(await HouseHandler.BuyAsync(b.Session, Frame(Op.Jal, Pb.New().Var(1, 20_500_000).Build()), Op.Jal));
                     Assert.Equal(ConnectionProtocol.BuildKamas(9_500_000), await b.Next(Op.Ivf));
                     Assert.Equal(ConnectionProtocol.BuildSystemMessage(InfoMessages.KamasLost, "20500000"), await b.Next(Op.Lqn));
                     await b.Take(4);   // iwm, izz, jaa, kld
@@ -777,12 +745,35 @@ namespace Jondo.Unity.Tests.World
                 await a.Next(Op.Izz);
                 Assert.Equal(ConnectionProtocol.BuildInfoMessage(4, 5, "20500000", "Stranger"), await a.Next(Op.Lqn));
                 Assert.Empty(await a.Next(Op.Jaa));
+                var ownerLists = ownerCodec.Frames.Select(frame => frame.Content).OfType<HouseAccountEvent>().ToArray();
+                Assert.Equal(3, ownerLists.Length); // purchase, sale, seller refresh
+                Assert.Single(ownerLists[0].Houses);
+                Assert.Equal(20_500_000, Assert.IsType<HouseInformationCaseHouseAccount>(Assert.Single(ownerLists[1].Houses).InformationCase).Value.HouseInformation.Price);
+                Assert.Empty(ownerLists[2].Houses);
+                var buyerList = Assert.Single(buyerCodec.Frames.Select(frame => frame.Content).OfType<HouseAccountEvent>());
+                Assert.Single(buyerList.Houses);
+                await failingSeller.Next(Op.Lqn);
+                Assert.Empty(Assert.Single(failingSellerCodec.Frames.Select(frame => frame.Content).OfType<HouseAccountEvent>()).Houses);
+                Assert.False(failingSeller.FromServer.DataAvailable);
             }
             finally
             {
                 Forget(ownerAccount, strangerAccount);
                 Restore(saved);
             }
+        }
+
+        private sealed class HouseDeliveryCodec : IGameCodec
+        {
+            internal readonly List<GameFrame> Frames = [];
+            internal bool FailLists;
+            public byte[] Encode(GameFrame frame)
+            {
+                Frames.Add(frame);
+                if (FailLists && frame.Content is HouseAccountEvent) throw new System.IO.IOException("seller list encoding failed");
+                return new GameCodec().Encode(frame);
+            }
+            public GameFrame Decode(ReadOnlySpan<byte> packet) => throw new InvalidOperationException("House sends must not reparse packets.");
         }
 
         /// <summary>
@@ -819,7 +810,7 @@ namespace Jondo.Unity.Tests.World
                     await HouseHandler.UseDoorAsync(a.ToClient, interactive, Skill(interactive, Houses.BuySkill), 1);
                     await a.Next(Op.Iwn);
                     Assert.Equal(HouseProtocol.BuildSaleWindow(true, houseId, 1, 2_500_000), await a.Next(Op.Khr));
-                    Assert.True(await HouseHandler.BuyAsync(a.ToClient, Frame(Op.Jad, Pb.New().Var(1, 2_500_000).Build()), Op.Jad));
+                    Assert.True(await HouseHandler.BuyAsync(a.Session, Frame(Op.Jad, Pb.New().Var(1, 2_500_000).Build()), Op.Jad));
                     await a.Take(5);   // ivf, iwm, izz, jaa, kld
                 }
                 await b.Take(2);       // iwm, izz
@@ -839,7 +830,7 @@ namespace Jondo.Unity.Tests.World
                     await HouseHandler.UseDoorAsync(b.ToClient, interactive, Skill(interactive, Houses.BuySkill), 2);
                     await b.Next(Op.Iwn);
                     Assert.Equal(HouseProtocol.BuildSaleWindow(true, houseId, 2, 2_500_000), await b.Next(Op.Khr));
-                    Assert.True(await HouseHandler.BuyAsync(b.ToClient, Frame(Op.Jad, Pb.New().Var(1, 2_500_000).Build()), Op.Jad));
+                    Assert.True(await HouseHandler.BuyAsync(b.Session, Frame(Op.Jad, Pb.New().Var(1, 2_500_000).Build()), Op.Jad));
                     await b.Take(5);
 
                     // Selling A's copy is not B's to do: no window opens.

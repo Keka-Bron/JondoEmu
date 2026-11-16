@@ -145,14 +145,6 @@ namespace Jondo.Unity.Server.Network
                 .Str(5, alliance.Uuid);
         }
 
-        /// <summary>Every prism of the world (ife): { f1 each one }, at world entry.</summary>
-        public static byte[] BuildAll(IEnumerable<Pb> prisms)
-        {
-            var ife = Pb.New();
-            foreach (var prism in prisms) ife.Msg(1, prism);
-            return ife.Build();
-        }
-
         /// <summary>One placed or changed (ifa): { f2 the prism }, as in «usar emoticonos».</summary>
         public static byte[] BuildChanged(Pb prism) => Pb.New().Msg(2, prism).Build();
 

@@ -24,18 +24,24 @@ internal static class MapHouseMessages
             new HouseInformationCaseHouseInside(new(new(street?.PosX ?? 0, street?.PosY ?? 0), Instance(house, door)))));
     }
 
-    private static HouseInstance Instance(HouseStore.House house, Houses.Door door)
+    internal static HouseInstance Instance(HouseStore.House house, Houses.Door door, bool full = false, bool withGuild = true)
     {
         var (name, tag) = house.Owned ? HouseHandler.AccountTagOf(house.AccountId) : ("", "");
         GuildInformation? guild = null;
         // Match the existing plaque's optional social lookup failure policy.
-        if (house.SharedWithGuild)
+        if (withGuild && house.SharedWithGuild)
         {
             try { if (GuildStore.ById(house.GuildId) is { } shared) guild = GuildStateMessages.Information(shared); }
             catch { }
         }
-        return Instance(house.Instance, name, tag, HouseStore.AskingPrice(house, door.Price),
+        var result = Instance(house.Instance, name, tag, HouseStore.AskingPrice(house, door.Price),
             house.Owned && house.Locked, guild);
+        return !full ? result : result with
+        {
+            RoomsCount = door.Rooms,
+            ChestsCount = Houses.ChestCountOf(door.InteriorMapId),
+            SkillsId = Houses.PlaqueSkillsOf(door.InteriorMapId).Select(value => checked((int)value)).ToArray(),
+        };
     }
 
     internal static HouseInstance Instance(int instance, string ownerName, string ownerTag, long price, bool adminLocked, GuildInformation? guild)

@@ -158,17 +158,8 @@ namespace Jondo.Unity.Server.Handlers
         // ─── The world's prisms ─────────────────────────────────────────────────
 
         /// <summary>Every prism of the world at world entry (ife), for the world map.</summary>
-        public static async Task OnWorldEntryAsync(NetworkStream stream)
-        {
-            long mine = AllianceStore.AllianceOf(SessionContext.State.CharacterId)?.Id ?? 0;
-            var prisms = new List<Pb>();
-            foreach (var prism in PrismStore.All())
-            {
-                var alliance = AllianceStore.ById(prism.AllianceId);
-                if (alliance != null) prisms.Add(PrismProtocol.Information(prism, alliance, own: alliance.Id == mine));
-            }
-            await SendAsync(stream, ConnectionProtocol.Push(Op.Ife, PrismProtocol.BuildAll(prisms)));
-        }
+        public static Task OnWorldEntryAsync(GameSession session)
+            => session.SendAsync(PrismMessages.Live.Snapshot(session));
 
         /// <summary>
         /// Talking to it (iov 3 on its actor): the dialogue opens (ioc) and asks the prism's

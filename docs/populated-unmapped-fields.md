@@ -8,6 +8,7 @@ its original snapshot date. Welcome-settings omission policy and native-use find
 updated **12 November 2026**. Guild-hall selection boolean classification and
 installed customization-field coverage updated **13 November 2026**.
 Quest-journal construction policy updated **16 November 2026**.
+Prism-list construction policy updated **16 November 2026**.
 
 This inventory records fields with **proven non-default population** and an
 unused, unresolved or incomplete semantic-mapping status. Each entry has a
@@ -257,8 +258,35 @@ only the reviewed semantic fields. In particular:
 These are explicit outbound omission/construction decisions for the migrated map
 path, not proven-unused native classifications or claims of lossless legacy-byte
 reproduction. They follow the handoff's omission rule for indeterminate values;
-population alone does not reopen a field-remapping task. Other alliance, world-list,
-equipment/crystal and haven-bag feature serializers remain separate migration work.
+population alone does not reopen a field-remapping task. The direct world prism list
+also follows this emblem policy. Other alliance, incremental prism, equipment/crystal
+and haven-bag feature serializers remain separate migration work.
+
+## Prism-list construction policy
+
+`PrismHandler.OnWorldEntryAsync` constructs `PrismListEvent` / `ife` directly from
+current prism/alliance stores through `PrismMessages`, using the owning session's
+codec. It deliberately omits `PrismLocalizedInformation` / `lhm` tag **5** (`gbbt`,
+property **202746**, backing field **277721**) under the indeterminate-field policy.
+
+- **Historical local population:** `PrismProtocol.Information` writes the alliance's
+  UUID at tag 5 for world lists and other prism information. This is producer evidence,
+  not a semantic name or proof that the client consumes this duplicate string.
+- **Native review:** the **16 November 2026** `jondo-11-08-2026` MCP bootstrap confirms
+  that tag 5 remains unmapped. `code.identify_decoys` found no business-use witness and
+  reported incomplete native caller coverage; its classification is **indeterminate**.
+- **Construction decision:** omit the localized tag-5 string, with no raw fallback.
+  Retain the reviewed alliance UID under `PrismInformation.alliance_information`.
+  Nested alliance emblems use reviewed tag 2 and omit indeterminate tag 4 under the
+  map snapshot policy above. This is an omission decision, not globally proven non-use
+  or a claim of lossless legacy-byte reproduction.
+
+Foreign views omit both owner-only crystal fields. Own views retain optional zero
+remaining crystals and a present crystal → inventory → empty item when no crystal is
+equipped; those nested wrappers are not omitted with the duplicate UUID. Equipped
+crystals use semantic item effects and checked int32 synthetic item UIDs. Other
+unmapped list/crystal fields were not populated by the retired world-list path and
+remain unset; no gameplay meaning is inferred for them.
 
 ## Keeping the inventory reproducible
 
