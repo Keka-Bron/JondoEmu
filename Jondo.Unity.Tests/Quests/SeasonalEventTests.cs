@@ -26,5 +26,21 @@ namespace Jondo.Unity.Tests.Quests
         [InlineData(842, 2026, 6, 6, true)]
         public void Each_switch_is_on_when_it_should(int criterion, int year, int month, int day, bool on)
             => Assert.Equal(on, SeasonalEvents.IsOn(criterion, new DateTime(year, month, day, 12, 0, 0)));
+
+        /// <summary>An event held open by the test API is on out of its dates, and back to them when let go.</summary>
+        [Fact]
+        public void An_event_held_open_is_on_out_of_season()
+        {
+            var november = new DateTime(2026, 11, 16, 12, 0, 0);
+            Assert.False(SeasonalEvents.IsOn(SeasonalEvents.Vulkania, november));
+            SeasonalEvents.ForcedOn[SeasonalEvents.Vulkania] = true;
+            try
+            {
+                Assert.True(SeasonalEvents.IsOn(SeasonalEvents.Vulkania, november));
+                Assert.False(SeasonalEvents.IsOn(SeasonalEvents.Halouine, november));
+            }
+            finally { SeasonalEvents.ForcedOn.TryRemove(SeasonalEvents.Vulkania, out _); }
+            Assert.False(SeasonalEvents.IsOn(SeasonalEvents.Vulkania, november));
+        }
     }
 }

@@ -360,6 +360,30 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
+        /// { event, on }: a yearly event («Sc», SeasonalEvents) held open whatever the day, or let
+        /// go back to its dates. Answers the events held open.
+        /// </summary>
+        private static Respuesta TestSeason(string cuerpo)
+        {
+            int season = (int)Numero(cuerpo, "event");
+            if (!Managers.SeasonalEvents.IsEvent(season)) return Mal(404, $"event {season}");
+            if (HeldOpen(cuerpo)) Managers.SeasonalEvents.ForcedOn[season] = true;
+            else Managers.SeasonalEvents.ForcedOn.TryRemove(season, out _);
+            return Bien(new { forced = Managers.SeasonalEvents.ForcedOn.Keys.OrderBy(k => k).ToList() });
+        }
+
+        /// <summary>«on» false lets the event go back to its dates; anything else holds it open.</summary>
+        private static bool HeldOpen(string cuerpo)
+        {
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(cuerpo.Length == 0 ? "{}" : cuerpo);
+                return !(doc.RootElement.TryGetProperty("on", out var on) && on.ValueKind == System.Text.Json.JsonValueKind.False);
+            }
+            catch { return true; }
+        }
+
+        /// <summary>
         /// { quest, op }: a quest's scene set -- "start" it as an NPC hands it over, "finish" it
         /// whole (a quest another one asks for), "forget" it to play it again.
         /// </summary>

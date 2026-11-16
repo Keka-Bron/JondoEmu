@@ -45,10 +45,17 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Whether that «Sc» is met on that day: an event while it runs, anything else always.</summary>
         public static bool IsOn(int criterion, DateTime now)
         {
+            if (ForcedOn.ContainsKey(criterion)) return true;
             if (!Windows.TryGetValue(criterion, out var window)) return true;
             var (start, end) = window(now.Year);
             return now.Date >= start && now.Date < end;
         }
+
+        /// <summary>
+        /// The events held open whatever the day, by the test API only (route «season»): Vulkania's
+        /// quests are played in November that way. Empty in a normal run, and forgotten on restart.
+        /// </summary>
+        internal static readonly System.Collections.Concurrent.ConcurrentDictionary<int, bool> ForcedOn = new();
 
         /// <summary>Whether that value is one of the yearly events.</summary>
         public static bool IsEvent(int criterion) => Windows.ContainsKey(criterion);
