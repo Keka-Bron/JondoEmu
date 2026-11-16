@@ -74,25 +74,32 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// The world map's anomalies panel: one lzj per open anomaly, { f1 its zone's 120 %, f2 the
-        /// subarea, f3 open, f4 its closing in milliseconds within the anomaly's two hours }.
+        /// The world map's anomalies panel: every zone the official server lists (297), each an lzj
+        /// { f2 the subarea } -- and an open anomaly's { f1 its zone's 120 %, f2, f3 open, f4 its
+        /// closing in milliseconds within the anomaly's two hours }.
         /// </summary>
         [Fact]
-        public void The_anomalies_panel_lists_each_open_anomaly()
+        public void The_anomalies_panel_lists_every_zone_and_each_open_anomaly()
         {
-            if (Anomalies.All.Count == 0) return;
+            if (Anomalies.All.Count == 0 || AnomalyZones.SubAreas.Count == 0) return;
+            Assert.Equal(297, AnomalyZones.SubAreas.Count);
             var now = DateTimeOffset.FromUnixTimeSeconds(1_786_573_500);
             var entries = Jondo.Unity.Server.Network.ProtoMessage.Parse(AnomalyHandler.BuildSubareaInformation(now))
-                .Fields.Where(f => f.FieldNumber == 1).ToList();
-            Assert.Equal(Anomalies.All.Count, entries.Count);
+                .Fields.Where(f => f.FieldNumber == 1)
+                .Select(f => Jondo.Unity.Server.Network.ProtoMessage.Parse(f.BytesValue).Fields
+                    .ToDictionary(x => x.FieldNumber, x => x.VarIntValue))
+                .ToList();
+            Assert.Equal(AnomalyZones.SubAreas.Union(Anomalies.All.Select(a => a.SubAreaId)).Count(), entries.Count);
 
-            var first = Jondo.Unity.Server.Network.ProtoMessage.Parse(entries[0].BytesValue).Fields;
-            long Field(int n) => first.Single(f => f.FieldNumber == n).VarIntValue;
-            Assert.Equal(AnomalyHandler.AnomalyZoneBonus, Field(1));
-            Assert.Equal(Anomalies.All[0].SubAreaId, Field(2));
-            Assert.Equal(1, Field(3));
-            long left = Field(4) - now.ToUnixTimeMilliseconds();
-            Assert.InRange(left, 60_000, Anomalies.Duration * 60_000L);
+            var open = entries.Where(e => e.ContainsKey(3)).ToList();
+            Assert.Equal(Anomalies.All.Count, open.Count);
+            foreach (var e in open)
+            {
+                Assert.Equal(AnomalyHandler.AnomalyZoneBonus, e[1]);
+                Assert.True(Anomalies.TryGet((int)e[2], out _));
+                Assert.InRange(e[4] - now.ToUnixTimeMilliseconds(), 60_000, Anomalies.Duration * 60_000L);
+            }
+            Assert.All(entries.Where(e => !e.ContainsKey(3)), e => Assert.Equal(new[] { 2 }, e.Keys));
         }
 
         /// <summary>The capture read the clocks at 22:26 UTC on 12 August: «00», «26» and «4», «26».</summary>

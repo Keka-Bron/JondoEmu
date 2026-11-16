@@ -84,32 +84,39 @@ namespace Jondo.Unity.Server.Handlers
         public const int AnomalyZoneBonus = 120;
 
         /// <summary>
-        /// The world map's «Anomalies, bonus d'expérience et de butin» panel asks (lzh,
-        /// AnomalySubareaInformationRequest, empty) each time it opens, and fills itself from the
-        /// answer: lzl, AnomalySubareaInformationEvent, f1 a repeated lzj { f1 the zone's bonus, f2 the
-        /// subarea, f3 whether an anomaly is open there, f4 when it closes, in milliseconds }.
-        /// Nothing answered it, and the panel stayed empty.
+        /// The world map's «Anomalies, bonus d'expérience et de butin» panel's list (lzh,
+        /// AnomalySubareaInformationRequest, empty, on entering the world): the lzl,
+        /// AnomalySubareaInformationEvent, f1 a repeated lzj { f1 the zone's bonus, f2 the subarea,
+        /// f3 whether an anomaly is open there, f4 when it closes, in milliseconds }. Nothing
+        /// answered it, and the panel stayed empty.
         /// </summary>
         /// <remarks>
-        /// Read off the client (Cpp2IL of 3.6.10.11): enw.badu takes the lzl into gv.mxh, which puts
-        /// f2 in the field the notifications (eui.bcnk) look the subarea up with -- after testing f3 --,
-        /// f1, f3 and f4 beside it. That f1 is the bonus and f4 the closing is INFERRED: Dofus 2's
-        /// AnomalySubareaInformation was { subAreaId, rewardRate, hasAnomaly, anomalyClosingTime }, the
-        /// same four in kind, and the lzi this server sends carries its closing in milliseconds.
-        /// Only the open anomalies are listed: no other zone bonus is kept here.
+        /// MEASURED on an official 3.7 server (content/anomalies/bonus_zones.json): the empty request
+        /// answered with all 297 zones, { has anomaly, bonus 1-120 -- absent for 0 --, subarea,
+        /// closing in ms }, the closings within the two hours after. The 3.6 client numbers the same
+        /// four otherwise: its eui.bcnk looks the subarea up with f2, after testing the bool, f3 (gv.mxh,
+        /// Cpp2IL of 3.6.10.11); the bonus is the other int, f1, the closing the long, f4. Every zone
+        /// goes, as the official server sends it: with only the anomalies' zones the world map's window
+        /// threw on opening. No zone bonus is kept here: 0 but in an open anomaly's zone, 120.
         /// </remarks>
         public static Task SubareaInformationAsync(NetworkStream stream)
             => WriteAsync(stream, ConnectionProtocol.Push("lzl", BuildSubareaInformation(DateTimeOffset.UtcNow)));
 
-        /// <summary>The lzl: each open anomaly's zone, its bonus, and when it closes.</summary>
+        /// <summary>The lzl: every zone of the panel, with its bonus, and for an open anomaly's when it closes.</summary>
         internal static byte[] BuildSubareaInformation(DateTimeOffset now)
         {
             var lzl = Pb.New();
             long nowMs = now.ToUnixTimeMilliseconds();
-            foreach (var anomaly in Anomalies.All)
+            var zones = AnomalyZones.SubAreas.Concat(Anomalies.All.Select(a => a.SubAreaId)).Distinct();
+            foreach (int subArea in zones)
             {
-                long closes = nowMs + Anomalies.MinutesLeft(anomaly.SubAreaId) * 60_000L;
-                lzl.Msg(1, Pb.New().Var(1, AnomalyZoneBonus).Var(2, anomaly.SubAreaId).Var(3, 1).Var(4, closes));
+                var entry = Pb.New();
+                if (Anomalies.TryGet(subArea, out _))
+                    entry.Var(1, AnomalyZoneBonus).Var(2, subArea).Var(3, 1)
+                         .Var(4, nowMs + Anomalies.MinutesLeft(subArea) * 60_000L);
+                else
+                    entry.Var(2, subArea);
+                lzl.Msg(1, entry);
             }
             return lzl.Build();
         }
