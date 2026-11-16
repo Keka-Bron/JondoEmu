@@ -659,6 +659,40 @@
       "toCell": 436,
       "criterion": "(Qa=1653&Qo>9960)|Qf=1653",
       "why": "The pool in the middle of the sanctuary (element 489514) leads down to Aguabrial's cave once its guardian is beaten (9960, «Dragones y chapuzonas»); before that it brings her out (objectives.json). Lands on the cave's rock ledge. INFERRED landing."
+    },
+    {
+      "map": 154141187,
+      "element": 490845,
+      "cell": 188,
+      "gfx": 49604,
+      "type": -1,
+      "skill": 114,
+      "toMap": 154142209,
+      "toCell": 371,
+      "criterion": "(Qa=1654&Qo>9980&Qo>10131)|Qf=1654",
+      "why": "The portal on the top of the Rock of the Sacrificed (element 490845), opened by the two halves of the incantation (9980, 10131, «Extinción de los fuegos»), leads to the abyssal dimension (154142209), Bolgrot's prison. INFERRED landing, before his spirit."
+    },
+    {
+      "map": 154272259,
+      "element": 489665,
+      "cell": 161,
+      "gfx": 49610,
+      "type": -1,
+      "skill": 114,
+      "toMap": 154141187,
+      "toCell": 479,
+      "why": "The Rock of the Sacrificed: the path up from Girle's landing (element 489665) to its top (154141187), as the world graph 2.73 has it, landing at the top of the stairs: the graph lands on the element's own cell, which is not walkable."
+    },
+    {
+      "map": 154141187,
+      "element": 489664,
+      "cell": 521,
+      "gfx": 49609,
+      "type": -1,
+      "skill": 114,
+      "toMap": 154272259,
+      "toCell": 175,
+      "why": "The way down from the top of the Rock of the Sacrificed (element 489664, the stairs) to Girle's landing (154272259), as the world graph 2.73 has it, landing under the path: the graph lands on the element's own cell, which is not walkable."
     }
   ]
 }

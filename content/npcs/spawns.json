@@ -4929,6 +4929,58 @@
         "orientation": 7,
         "criterion": "Qa=1653&Qo>9962",
         "why": "Ereziah Melkewel, come in behind the character on the ledge as Aguabrial asks the alchemist's opinion («¿Qué opinas, alquimista?», 21581; «Girarse para ver quién ha aparecido», 25928), until the quest is over. INFERRED cell."
+      },
+      {
+        "map": 190841858,
+        "npc": 2974,
+        "cell": 287,
+        "remove": true
+      },
+      {
+        "map": 190841858,
+        "npc": 2974,
+        "cell": 354,
+        "orientation": 3,
+        "criterion": "(Qa=1654&Qo>9966)|Qf=1654",
+        "why": "Snuffles, the ghost of the tomb left of the path in the Field of Rest, out of it once the tomb is clicked (9966). INFERRED cell, beside his tomb (element 515588, cell 352)."
+      },
+      {
+        "map": 190840834,
+        "npc": 3012,
+        "cell": 332,
+        "orientation": 7,
+        "criterion": "Qa=1654&Qo>9967&Qo<9968",
+        "why": "The Fuego furibundo by Gotonto's tomb, from the kick (9967) until it is beaten (9968). INFERRED cell, before the tomb (element 515589, cell 318)."
+      },
+      {
+        "map": 88214295,
+        "npc": 2873,
+        "cell": 360,
+        "orientation": 1,
+        "why": "An Amakna guard outside the Sram temple [-4,0], «Pregunta a los guardias de los templos» (9969): «¡Estás delante del templo de la Sombra de Sram!» (21613). INFERRED cell, off the way to the door (element 472949, cell 317)."
+      },
+      {
+        "map": 183768068,
+        "npc": 3013,
+        "cell": 246,
+        "orientation": 5,
+        "criterion": "Qa=1654&Qo>9971&Qo<9972",
+        "why": "The Solitario obscuranti in the Sram temple's room, drawn by the lantern's fire (9971) until it is beaten (9972). INFERRED cell, before the lantern (element 511863, cell 164)."
+      },
+      {
+        "map": 54531099,
+        "npc": 2975,
+        "cell": 343,
+        "orientation": 5,
+        "why": "Drachir Garfield, among the tailors of Frigost's village [-76,-40], who works on magic fabrics: «pude continuar mis investigaciones sobre telas mágicas» (21633); Dofus pour les noobs («Extinction des feux»): the magic thread is with Drachir Garfield, Frigost tailors. INFERRED cell."
+      },
+      {
+        "map": 154272259,
+        "npc": 383,
+        "cell": 259,
+        "orientation": 3,
+        "criterion": "(Qa=1654&Qo>9978)|Qf=1654",
+        "why": "Girle Pylot at the foot of the Rock of the Sacrificed, by her transporter, to take the character back to the imps' village. INFERRED cell, on the rock's one patch of ground."
       }
     ]
 }

@@ -1272,6 +1272,64 @@
         }
       ],
       "why": "«Atacar al árbol» with its sadness or its despair on: the disenchanted thicket's tree (4167), alone, at the character's level; Dofus pour les noobs («Plongeon et dragon»): «En combattant vous aurez à chaque combat une chance d'être transformé»."
+    },
+    {
+      "npc": 3012,
+      "map": 190840834,
+      "reply": 25963,
+      "monsters": [
+        {
+          "monster": 4133,
+          "grade": 0
+        },
+        {
+          "monster": 4175,
+          "grade": 0
+        }
+      ],
+      "why": "«Extinción de los fuegos» (1654): the Fuego furibundo «*parece darse cuenta de que tú profanaste la tumba de Gotonto y te ataca*» (21612), «Defenderte» (25963): the fire spirit and the gargoyle, «Vence al fuego espiritual y a la gárgrola» (9968)."
+    },
+    {
+      "npc": 3013,
+      "map": 183768068,
+      "reply": 25977,
+      "monsters": [
+        {
+          "monster": 4135,
+          "grade": 0
+        }
+      ],
+      "why": "«Extinción de los fuegos» (1654): the Solitario obscuranti «*te embiste mientras gruñe*» (21625), «Defenderte» (25977): «Vence a Solitario obscuranti» (9972); its skin (16946) drops on its own criterion."
+    },
+    {
+      "npc": 383,
+      "map": 154272257,
+      "reply": 25912,
+      "monsters": [
+        {
+          "monster": 4136,
+          "grade": 0
+        }
+      ],
+      "marks": -1654001,
+      "why": "«Extinción de los fuegos» (1654): on the way to the Rock of the Sacrificed «¡Eh! ¿¡qué es esa cosa!?» (21573), «Dar la vuelta» (25912): the Sombra vengadora (4136); once it is beaten Girle flies on (21574). Dofus pour les noobs («Extinction des feux»): a beast attacks on the way."
+    },
+    {
+      "npc": 2957,
+      "map": 154142209,
+      "reply": 25995,
+      "monsters": [
+        {
+          "monster": 4045,
+          "grade": 1
+        }
+      ],
+      "incarnates": {
+        "monster": 4044,
+        "grade": 1
+      },
+      "defeatFree": true,
+      "why": "«Extinción de los fuegos» (1654): «Ponerse el velo astral y luchar contra Bolgrot» (25995): alone, as the Sombra Astral (4044: 40 life, 10 AP, no MP; Salto Astral, Salto Doble, Inmovilismo) against Bolgrot's spirit (4045), whose Fuego de Bolgrot (5704, its starting spell) lays the glyphs that call his fires (4043) for six turns and keeps him alive while one burns. Dofus pour les noobs («Extinction des feux»): a tactical fight, the fires killed by jumping on them; losing costs nothing."
     }
   ]
 }

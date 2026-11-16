@@ -5495,6 +5495,116 @@
       9959
     ],
     "why": "«Vence a Guardiana del santuario»: the pool in the middle of the hall (element 489514, cell 412) brings the sanctuary's guardian (4131) out against whoever clicks it; Dofus pour les noobs («Plongeon et dragon»): «Enfin cliquez au centre de la map. Un combat se lancera alors». Once she is beaten the pool leads down to the cave (teleports.json)."
+  },
+  {
+    "objective": 9966,
+    "quest": 1654,
+    "kind": "click",
+    "elements": [
+      {
+        "map": 190841858,
+        "element": 515588
+      }
+    ],
+    "afterObjectives": [
+      9965
+    ],
+    "showsNpc": 2974,
+    "why": "«#1» (557311): the Field of Rest [-1,-12], the tombstone left of the path (element 515588, cell 352) brings out its ghost, Snuffles (2974); Dofus pour les noobs («Extinction des feux»): click the tomb and the ghost appears."
+  },
+  {
+    "objective": 9967,
+    "quest": 1654,
+    "kind": "click",
+    "elements": [
+      {
+        "map": 190840834,
+        "element": 515589
+      }
+    ],
+    "afterObjectives": [
+      10158
+    ],
+    "showsNpc": 3012,
+    "why": "«#1» (550657): Gotonto the goblin's tomb at [-3,-12] (element 515589, cell 318, the coconut on it), kicked as Snuffles says («Lo único que tienes que hacer es darle una patadita a la tumba de Gotonto», 21610), brings out the will-o'-wisp, the Fuego furibundo (3012)."
+  },
+  {
+    "objective": 9968,
+    "quest": 1654,
+    "kind": "beat",
+    "monster": 4133,
+    "map": 190840834,
+    "afterObjectives": [
+      9967
+    ],
+    "why": "«Vence al fuego espiritual y a la gárgrola» (550662): the Fuego furibundo (4133) and the Gárgrola concienzuda (4175) by Gotonto's tomb (npc_fights.json, «Defenderte»). The fire's own drop, its criterion this quest, is the Fuego interno brillante (17085)."
+  },
+  {
+    "objective": 9971,
+    "quest": 1654,
+    "kind": "click",
+    "elements": [
+      {
+        "map": 183768068,
+        "element": 511863
+      }
+    ],
+    "requires": [
+      {
+        "item": 17085,
+        "count": 1
+      }
+    ],
+    "spends": true,
+    "afterObjectives": [
+      9969
+    ],
+    "showsNpc": 3013,
+    "why": "«Coloca el fuego en el templo» (550667): the lantern at the back of the Sram temple's room (element 511863, cell 164) takes the Fuego interno brillante (17085), and the obscuranti the guard saw go in comes to its light: the Solitario obscuranti (3013); Dofus pour les noobs («Extinction des feux»): click the lantern at the back of the room, then talk to the obscurantus to fight it."
+  },
+  {
+    "objective": 9980,
+    "quest": 1654,
+    "kind": "use",
+    "map": 154141187,
+    "afterObjectives": [
+      9979
+    ],
+    "why": "«Lee el pergamino de Meriana» (556160): her half of the incantation (17080, its effect 30 this objective, its own condition the top of the Rock of the Sacrificed) read there."
+  },
+  {
+    "objective": 10131,
+    "quest": 1654,
+    "kind": "use",
+    "map": 154141187,
+    "afterObjectives": [
+      9979
+    ],
+    "why": "«Lee el pergamino de Mami Ayuto» (564802): the other half (17081), read on the top of the rock. With both read the portal opens (teleports.json)."
+  },
+  {
+    "objective": 9983,
+    "quest": 1654,
+    "kind": "beat",
+    "monster": 4045,
+    "map": 154142209,
+    "requires": [
+      {
+        "item": 16888,
+        "count": 1
+      }
+    ],
+    "spends": true,
+    "gives": [
+      {
+        "item": 16889,
+        "count": 1
+      }
+    ],
+    "afterObjectives": [
+      9982
+    ],
+    "why": "«Vence a Espíritu de Bolgrot»: the dagger born of Aguabrial's tear (16888) is put out in Bolgrot's fire and comes back as the Hoja ardiente de Aguabrial (16889), the «lágrima ardiente» Meriana is shown (25810)."
   }
 ]
 }
