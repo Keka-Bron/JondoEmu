@@ -151,10 +151,15 @@ namespace Jondo.Unity.Server.Managers
             return (possessed, unpossessed);
         }
 
-        /// <summary>The two shares of some nuggets, rounded down: the player's and the alliance's.</summary>
+        /// <summary>
+        /// The two shares of some nuggets, the player's and the alliance's, rounded as the window
+        /// rounds the total it promises: RecycleUi.UpdateGrid shows Math.Round of its
+        /// m_myFinalNugget, the nuggets times the share times the prism's bonus. Rounded down, an
+        /// amber the neutral prism's window showed at 3 gave 2.
+        /// </summary>
         public static (long Player, long Alliance) Split(double nuggets, int percentToPlayer, int percentToAlliance, double bonus)
-            => ((long)Math.Floor(nuggets * percentToPlayer / 100.0 * bonus),
-                (long)Math.Floor(nuggets * percentToAlliance / 100.0 * bonus));
+            => ((long)Math.Round(nuggets * percentToPlayer / 100.0 * bonus),
+                (long)Math.Round(nuggets * percentToAlliance / 100.0 * bonus));
 
         private static bool DroppedByBossesOnly(ItemRecycling data)
             => data.DroppedBy.Length > 0 && data.DroppedBy.All(Dreams.IsBoss);

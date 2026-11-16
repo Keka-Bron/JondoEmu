@@ -88,6 +88,9 @@ namespace Jondo.Unity.Tests.Economy
             Assert.Equal(1.0, Recycling.AdjacencyBonus(0, 0));
             Assert.Equal(1.125, Recycling.AdjacencyBonus(1, 3));
             Assert.Equal((5L, 5L), Recycling.Split(10.9, 50, 50, 1.0));
+            // Rounded as the window's total is (Math.Round): 4.3 at 60 % is 2.58, shown and given as 3.
+            Assert.Equal((3L, 0L), Recycling.Split(4.3, 60, 0, 1.0));
+            Assert.Equal((2L, 2L), Recycling.Split(4.2, 50, 50, 1.0));
         }
 
         [Fact]
@@ -122,7 +125,7 @@ namespace Jondo.Unity.Tests.Economy
 
                     double whole = Recycling.NuggetsOf(Resource, 20, MapManager.GetMapInfo(RecycleHandler.PrismMap)!.SubAreaId);
                     long expected = Recycling.Split(whole, RecycleHandler.NeutralPrismShare, 0, 1.0).Player;
-                    Assert.True(expected > 0 && expected < (long)Math.Floor(whole));
+                    Assert.True(expected > 0 && expected < whole, $"{expected} of {whole}");
                     Assert.True(await WorkshopHandler.CraftAsync(pipe.ToClient, Kep()));
                     var kgh = await Until(pipe, "kgh");
                     Assert.Equal(expected, Var(kgh, 2));
