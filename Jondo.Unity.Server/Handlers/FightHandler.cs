@@ -4454,12 +4454,29 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static void AguantaSuTurno(FightInstance fight, Fighter quienEmpieza, Fighter portador)
         {
-            if (quienEmpieza.UltimoEmbrujoDeSuTurno < 0) return;
             foreach (var embrujo in portador.Buffs.Puestos)
             {
-                if (embrujo.Quien == quienEmpieza.Id && !embrujo.Pendiente
-                    && embrujo.CaducaEnRonda == fight.RoundNumber
-                    && embrujo.Numero > quienEmpieza.UltimoEmbrujoDeSuTurno)
+                if (embrujo.Quien != quienEmpieza.Id || embrujo.Pendiente) continue;
+                bool sinceHisLastTurn = embrujo.Numero > quienEmpieza.UltimoEmbrujoDeSuTurno;
+
+                // Put in this round before his turn -- a glyph of his at the start of a turn
+                // ahead of his -- the row lives his turn of this round as its first. Counted from
+                // the next round it lived one of his turns more, and the Gorgouille's glyph,
+                // «up to 4 AP» to whoever starts his turn on it, took 4 more: the row of the turn
+                // before was still on, its caster playing after the player (Dofus pour les
+                // noobs, «Antre du Dragon Cochon»).
+                if (sinceHisLastTurn && !embrujo.CountsHisTurnThisRound
+                    && embrujo.Numero > fight.LastBuffBeforeThisRound
+                    && embrujo.EmpiezaEnRonda == fight.RoundNumber
+                    && embrujo.CaducaEnRonda > fight.RoundNumber)
+                {
+                    embrujo.CaducaEnRonda--;
+                    embrujo.CountsHisTurnThisRound = true;
+                }
+
+                if (embrujo.CaducaEnRonda == fight.RoundNumber
+                    && (embrujo.CountsHisTurnThisRound
+                        || (quienEmpieza.UltimoEmbrujoDeSuTurno >= 0 && sinceHisLastTurn)))
                     embrujo.CaeAlAcabarSuTurno = true;
             }
         }

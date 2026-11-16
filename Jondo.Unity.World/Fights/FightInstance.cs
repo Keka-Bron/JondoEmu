@@ -389,6 +389,9 @@ namespace Jondo.Unity.World.Fights
         /// <summary>The number the last buff got.</summary>
         public int UltimoEmbrujo => _ultimoEmbrujo;
 
+        /// <summary>The number the last buff had got when this round began: the later ones were put in it.</summary>
+        public int LastBuffBeforeThisRound { get; private set; }
+
         /// <summary>
         /// The spell being cast at the top of the resolution now, and the last buff number
         /// before it began: what its own 406 on itself must leave alone (EffectEngine).
@@ -1559,6 +1562,7 @@ namespace Jondo.Unity.World.Fights
                 {
                     CurrentTurnIndex = 0;
                     RoundNumber++;
+                    LastBuffBeforeThisRound = _ultimoEmbrujo;
                     StartsNewRound = true;
 
                     // A fight that ends at a set round (FightRules.EndsAtRound): its players' side falls.

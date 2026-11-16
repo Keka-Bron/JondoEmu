@@ -121,6 +121,13 @@ namespace Jondo.Unity.World.Fights
         public bool CaeAlAcabarSuTurno { get; set; }
 
         /// <summary>
+        /// A row its caster put in this round before his own turn: that turn is the first it lives,
+        /// so it drops a round earlier than its duration counted from the round it was put
+        /// (FightHandler.AguantaSuTurno). Set once, so that an additional turn does not count twice.
+        /// </summary>
+        public bool CountsHisTurnThisRound { get; set; }
+
+        /// <summary>
         /// The round in which it STARTS to count. For almost all it is the cast's; for the
         /// delayed ones, that many rounds later as the effect's delay says.
         ///

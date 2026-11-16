@@ -51,6 +51,64 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(kralamoure.Buffs.TieneEstado(WaterState));
         }
 
+        /// <summary>
+        /// The Gorgouille's glyph takes «up to 4 AP» from whoever starts his turn on it, for that
+        /// turn. The row is hers and is put in the player's turn, ahead of hers in the round: it
+        /// falls once her turn is over, and the player starts his next turn with his points.
+        /// Counted from the next round, it was still on at that start and the glyph took 4 more.
+        /// </summary>
+        [Fact]
+        public void A_glyph_row_put_before_its_casters_turn_falls_once_that_turn_is_over()
+        {
+            var fight = new FightInstance(1, 1);
+            var player = Person(10, 0, 438);
+            var gorgouille = Person(-3, 1, 384);
+            fight.AddPlayer(player); fight.AddOpponent(gorgouille);
+
+            // The player starts his turn on her glyph: -4 AP, for one turn, put by her.
+            var minus = new Buff
+            {
+                EffectId = 1079, Cuanto = -4, Quien = gorgouille.Id, HechizoOrigen = 2936, NivelOrigen = 1,
+                CaducaEnRonda = fight.RoundNumber + 1, EmpiezaEnRonda = fight.RoundNumber,
+            };
+            player.Buffs.Poner(minus, fight.SiguienteEmbrujo);
+            player.UltimoEmbrujoDeSuTurno = fight.UltimoEmbrujo;   // his turn is over
+
+            // Her turn starts: the row stays through it...
+            FightHandler.AguantaSuTurno(fight, gorgouille, player);
+            Assert.Empty(player.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, gorgouille, row)));
+
+            // ...and falls at the next start, the player's.
+            FightHandler.AguantaSuTurno(fight, player, player);
+            Assert.Single(player.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, player, row)));
+        }
+
+        /// <summary>
+        /// A reaction put on himself in the round, before his first turn, still lives through
+        /// that turn: the state the Kraken gives the Kralamoure when the player, ahead of him,
+        /// hits him, lets him summon the tentacle on his turn.
+        /// </summary>
+        [Fact]
+        public void A_reaction_before_his_first_turn_lives_through_it()
+        {
+            var fight = new FightInstance(1, 1);
+            var player = Person(10, 0, 438);
+            var kralamoure = Person(-1, 1, 344);
+            fight.AddPlayer(player); fight.AddOpponent(kralamoure);
+
+            kralamoure.Buffs.PonerEstado(WaterState);
+            var row = State(kralamoure, fight.RoundNumber + 1);
+            row.EmpiezaEnRonda = fight.RoundNumber;
+            kralamoure.Buffs.Poner(row, fight.SiguienteEmbrujo);
+
+            FightHandler.AguantaSuTurno(fight, kralamoure, kralamoure);
+            Assert.Empty(kralamoure.Buffs.Barrer(fight.RoundNumber, r => FightHandler.LeTocaCaer(fight, kralamoure, r)));
+            Assert.True(kralamoure.Buffs.TieneEstado(WaterState));
+
+            FightHandler.AguantaSuTurno(fight, player, kralamoure);
+            Assert.Single(kralamoure.Buffs.Barrer(fight.RoundNumber, r => FightHandler.LeTocaCaer(fight, player, r)));
+        }
+
         [Fact]
         public void A_row_put_in_his_own_turn_still_falls_at_his_next()
         {
