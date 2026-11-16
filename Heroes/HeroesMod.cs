@@ -2892,6 +2892,7 @@ namespace Heroes
             var category = MelonPreferences.CreateCategory("Heroes");
             _panelX = category.CreateEntry("PanelX", -1f);
             _panelY = category.CreateEntry("PanelY", -1f);
+            _barOnceThree = category.CreateEntry("SpellBarSetToThreeLines", false);
         }
 
         /// <summary>The name of the panel's buttons: a press on one is the button's, not a drag.</summary>
@@ -3095,6 +3096,9 @@ namespace Heroes
         private static int _linesBefore = -1;
         private static bool _linesForced;
 
+        /// <summary>Whether the bar was ever set to three lines for the heroes: once, and never again after a restart.</summary>
+        private static MelonPreferences_Entry<bool> _barOnceThree;
+
         /// <summary>
         /// The client does not turn the pages of a bar that is not its character's: a hero's spells
         /// past the second line could not be reached. While heroes are connected the bar shows three
@@ -3107,13 +3111,17 @@ namespace Heroes
             if (bar == null) return;
             try
             {
-                // Once, as the first hero connects: set back to fewer by the player afterwards, the
-                // bar is his to keep so.
+                // Once, the first time heroes are ever connected: set back to fewer by the player
+                // afterwards, the bar is his to keep so -- after a restart too, which set it to three
+                // again every time the game was launched.
+                PanelPrefs();
                 if (heroes && !_linesForced)
                 {
                     _linesForced = true;
-                    if (bar.m_nbLines < 3)
+                    if (bar.m_nbLines < 3 && !_barOnceThree.Value)
                     {
+                        _barOnceThree.Value = true;
+                        MelonPreferences.Save();
                         _linesBefore = bar.m_nbLines;
                         bar.SetLinesCount(3);
                         MelonLogger.Msg($"[Heroes] The spell bar shows three lines while heroes are connected (it had {_linesBefore}).");
