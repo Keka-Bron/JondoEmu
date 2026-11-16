@@ -4949,6 +4949,32 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), dueno.Id, Network.FightProtocol.GlyphSequence)));
         }
 
+        /// <summary>
+        /// A monster's glyph its owner sets off («Activa los glifos», 1026): it goes off where it
+        /// lies, on whoever stands in it, or, with nobody there, on its own cell. Bolgrot's Fuego
+        /// lays glyphs at the start of his turn and sets them off at the next, each bringing out a
+        /// fire (5704 grade 4, a summon of 4043) on its empty cell; set off only under their owner,
+        /// as a class one is, they were dispelled one turn after another and no fire ever came out.
+        /// The Pyramid's curse (7869) sets off the glyph of 8139, which brings its last fallen ally
+        /// back, the same way.
+        /// </summary>
+        private static async Task FireMonsterGlyphWhereItLiesAsync(NetworkStream stream, FightInstance fight,
+                                                                   Jondo.Unity.World.Fights.Glifo glifo, Fighter dueno)
+        {
+            if (!dueno.IsAlive) return;
+            var encima = TodosLosCombatientes(fight).Where(f => f != null && f.IsAlive && glifo.Cubre(f.CellId)).ToList();
+            if (encima.Count == 0)
+            {
+                await FireEmptyRuneAsync(stream, fight, glifo, dueno);
+                return;
+            }
+            foreach (var quien in encima)
+            {
+                if (!quien.IsAlive || !GlyphCatches(fight, glifo, quien, false)) continue;
+                await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar: false);
+            }
+        }
+
         /// <summary>A class spell's turn glyph (401, 402): it takes whoever it caught, alone.</summary>
         private static bool EsGlifoDeTurnoDeClase(Jondo.Unity.World.Fights.Glifo glifo)
             => (glifo.Tipo == 401 || glifo.Tipo == 402) && !Managers.BombWalls.IsWall(glifo)
@@ -8032,12 +8058,19 @@ namespace Jondo.Unity.Server.Handlers
                         // on its activator standing in it and from its centre -- Inestabilidad's capture,
                         // frame 101: "307 {f1 290, f2 the Xelor, f4 7}", the Xelor alone sent back, with
                         // the enemy on the glyph's very centre left where he was.
-                        var suyos = fight.Glifos.Where(g => g.Dueno == activador.Id && g.Tipo != 2022 && g.Tipo != 400
+                        var suyos = (c.GlifosAlActivar ?? fight.Glifos).Where(g => g.Dueno == activador.Id && g.Tipo != 2022 && g.Tipo != 400
                                                             && g.Cuando != Jondo.Unity.World.Fights.Disparo.AlPonerse
                                                             && (c.Efecto.Value == 0 || g.HechizoQueLoPuso == c.Efecto.Value))
                                                 .ToList();
                         foreach (var glifo in suyos)
                         {
+                            if (!Managers.PlayerSpells.Contains(glifo.HechizoQueLoPuso))
+                            {
+                                if (c.CeldasActivadas != null && !glifo.Casillas.Any(c.CeldasActivadas.Contains)) continue;
+                                await FireMonsterGlyphWhereItLiesAsync(stream, fight, glifo, activador);
+                                continue;
+                            }
+                            if (!fight.Glifos.Contains(glifo)) continue;
                             if (!activador.IsAlive || !glifo.Cubre(activador.CellId)) continue;
                             await FireOneGlyphAsync(stream, fight, glifo, activador, alPisar: false,
                                                     celda: glifo.Centro >= 0 ? glifo.Centro : activador.CellId,

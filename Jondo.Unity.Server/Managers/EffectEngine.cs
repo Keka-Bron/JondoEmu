@@ -134,9 +134,19 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// The cells whose runes a 2023 sets off: its zone round the aimed cell -- Runificación's
         /// one rune, the one under each fighter its sub-cast reaches --, or null for every rune of
-        /// the caster's (a zone over the whole map: Sobrecarga Rúnica's «todas las runas»).
+        /// the caster's (a zone over the whole map: Sobrecarga Rúnica's «todas las runas»). A
+        /// 1026's too, for a monster's glyphs: Selección uncovers the one blop on the cell aimed
+        /// at, and Bolgrot's Fuego, over the whole map, sets all of his off.
         /// </summary>
         public IReadOnlyCollection<int> CeldasActivadas { get; init; }
+
+        /// <summary>
+        /// The caster's glyphs on the board when the spell reached its 1026. A later row of the
+        /// same spell may dispel them («Activa los glifos», then «Disipa los glifos»: Bolgrot's
+        /// Fuego, Pacto Maléfico, the Pyramid's curse), and the engine takes them off as it
+        /// resolves that row, before the fight sets these off.
+        /// </summary>
+        public IReadOnlyList<Jondo.Unity.World.Fights.Glifo> GlifosAlActivar { get; init; }
 
         /// <summary>The life, in percent, the last ally to fall comes back with (780, 1034); zero for any other outcome.</summary>
         public int Revive { get; init; }
@@ -4308,8 +4318,10 @@ namespace Jondo.Unity.Server.Managers
                     HechizoOrigen = hechizo, NivelOrigen = grado, ActivaSuelo = efecto.EffectId,
                     EstadosAlActivar = Todos(combate).Where(f => f != null)
                                                      .ToDictionary(f => f.Id, f => new HashSet<int>(f.Buffs.Estados)),
-                    CeldasActivadas = efecto.EffectId != ActivaLasRunas
-                                      || efecto.Forma is Jondo.Unity.World.Maps.Zone.TodoElMapa or Jondo.Unity.World.Maps.Zone.WholeMap
+                    GlifosAlActivar = efecto.EffectId == ActivaLosGlifos
+                        ? combate.Glifos.Where(g => g.Dueno == quienLanza.Id).ToList()
+                        : null,
+                    CeldasActivadas = efecto.Forma is Jondo.Unity.World.Maps.Zone.TodoElMapa or Jondo.Unity.World.Maps.Zone.WholeMap
                         ? null
                         : CasillasDelEfecto(efecto, quienLanza.CellId, celdaApuntada >= 0 ? celdaApuntada : quienLanza.CellId),
                 };
