@@ -260,6 +260,30 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal("2026-09-08", GuildStore.WeekOf(new DateTimeOffset(2026, 9, 14, 23, 0, 0, TimeSpan.Zero)));
         }
 
+        /// <summary>A guild is full at 350 members, the «/350» the directory and the card show.</summary>
+        [Fact]
+        public void A_guild_is_full_at_three_hundred_and_fifty()
+        {
+            string file = Path.Combine(Path.GetTempPath(), $"jondo-guild-{Guid.NewGuid():N}.db");
+            GuildStore.ConnectionStringOverride = $"Data Source={file}";
+            try
+            {
+                var guild = GuildStore.Create(7_400_000, "Pleine", 165, 8, 16744448, 9476018);
+                for (int i = 1; i < GuildStore.MaxMembers - 1; i++) GuildStore.Join(7_400_000 + i, guild.Id);
+                Assert.False(GuildStore.IsFull(guild.Id));
+
+                GuildStore.Join(7_400_000 + GuildStore.MaxMembers - 1, guild.Id);
+                Assert.Equal(GuildStore.MaxMembers, GuildStore.Members(guild.Id).Count);
+                Assert.True(GuildStore.IsFull(guild.Id));
+            }
+            finally
+            {
+                GuildStore.ConnectionStringOverride = null;
+                TestDatabases.ReleasePool(file);
+                try { File.Delete(file); } catch (IOException) { }
+            }
+        }
+
         /// <summary>
         /// The store, over a pass-through base: creating leaves the founder inside with rank 1, the
         /// guild is read by his character and leaving takes him out.
