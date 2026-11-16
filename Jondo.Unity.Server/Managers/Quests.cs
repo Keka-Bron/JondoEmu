@@ -266,6 +266,10 @@ namespace Jondo.Unity.Server.Managers
                     // Done by one of his replies, not by hello (DialogueChoice.Completes).
                     if (tree != null && tree.HasReplyFor(objective.Id)) continue;
                     if (NpcDialogues.AnyHasReplyFor(npcId, objective.Id)) continue;
+                    // Or by a reply a binding names: Icar Orval's five feathers of «Vuela, amiga,
+                    // vuela alto» go with «aquí tienes» (31640), and a hello with them in the bag
+                    // closed the hand-in before the reply was ever shown.
+                    if (Bindings.Of(objective.Id)?.Kind == QuestBindingKind.Reply) continue;
                     if (offering && (npcId == Almanax.Giver || !Handlers.AlmanaxOfferingHandler.MaySeeTheSaint(run.QuestId))) continue;
                     if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId
                         && StandsOn(npcId, objective.MapId)) continue;
