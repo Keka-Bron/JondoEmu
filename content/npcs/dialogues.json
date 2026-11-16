@@ -42069,7 +42069,7 @@
           "message": 7601,
           "choices": [
             { "reply": 70388 },
-            { "reply": 70392, "quest": 2484, "next": 7598 },
+            { "reply": 70392, "quest": 2484, "next": 7598, "completes": 18913, "params": [[30, 18913]] },
             { "reply": 70389 }
           ]
         },
@@ -42086,7 +42086,7 @@
           ]
         }
       ],
-      "why": "Bob the Enutrof in his house (anomaly of the old Road of the Rock). Dofus pour les noobs («Le petit Manitou»): he boasts of his riches (7593, 7594), his hunting pupils (7595) and offers the zoth Manitou's sign for beating it (7596); «Aprovechar esta oportunidad de tener un nuevo compañero» (7598) starts the quest and he warns about the summoned spirits (7597); «Enfrentarse al zoth Manitú» (7600/70388) goes into the chamber; with the Tanga del zoth Manitú (10902, a 100% drop of the Manitou while the quest is active) «Ya he vencido» (70392) hands it in, reward line 7598."
+      "why": "Bob the Enutrof in his house (anomaly of the old Road of the Rock). Dofus pour les noobs («Le petit Manitou»): he boasts of his riches (7593, 7594), his hunting pupils (7595) and offers the zoth Manitou's sign for beating it (7596); «Aprovechar esta oportunidad de tener un nuevo compañero» (7598) starts the quest and he warns about the summoned spirits (7597); «Enfrentarse al zoth Manitú» (7600/70388) goes into the chamber; with the Tanga del zoth Manitú (10902, a 100% drop of the Manitou while the quest is active) «Ya he vencido» (70392) hands it in, reward line 7598. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 1264,
@@ -42114,15 +42114,19 @@
         {
           "message": 7692,
           "choices": [
-            { "reply": 7723, "quest": 613, "completes": 3669, "params": [[30, 3669]], "next": 7709 }
+            { "reply": 7723, "quest": 613, "completes": 3669, "params": [[30, 3669]], "next": 7709 },
+            { "reply": 7738, "next": 7709, "criterion": "Qf=613", "beforeQuest": 614 },
+            { "reply": 7846 }
           ]
         },
         {
           "message": 7709,
-          "choices": []
+          "choices": [
+            { "reply": 8156, "startsQuest": 614, "params": [[34, 614]] }
+          ]
         }
       ],
-      "why": "«Una alcaldesa de hielo» (613): talking to the mayor ends it (3669), she gives the list of the town's people to meet (7709, «Si deseas conocer mejor la región»); Dofus pour les noobs «La maire de glace»: «La quête se termine en lui adressant la parole»."
+      "why": "«Una alcaldesa de hielo» (613): talking to the mayor ends it (3669), she gives the list of the town's people to meet (7709, «Si deseas conocer mejor la región»); Dofus pour les noobs «La maire de glace»: «La quête se termine en lui adressant la parole». «Full contact» (614, Dofus pour les noobs «Full Contact»: «Parlez à Maire Cantille: elle vous demande de rencontrer la plupart des habitants»): its step line 7709 is reached right after 613 (7723) or, later, by «¿Qué puedes contarme sobre Frigost?» (7738); «Vale.» (8156) on it starts 614. «Hasta luego.» (7846) leaves. INFERRED: which of her replies sits on 7709 and on the greeting."
     },
     {
       "npc": 1236,
@@ -42566,7 +42570,7 @@
         {
           "message": 26373,
           "choices": [
-            { "reply": 31640, "quest": 1820, "next": 26374 },
+            { "reply": 31640, "quest": 1820, "next": 26374, "completes": 12017, "completesAll": [12011, 12015, 12016, 12017], "params": [[30, 12017]] },
             { "reply": 31679 }
           ]
         },
@@ -42577,7 +42581,7 @@
           ]
         }
       ],
-      "why": "Icar Orval (Icar Mélite in Dofus pour les noobs («Vol au-dessus d'un coucou»)) on the Scarafeuille plain, right of the zaap. 26369-26372: she dreams of touching the sun (replies 31637, 31636, 31638 in the order of her lines); «De acuerdo, te ayudaré» (31639, PL>19) starts the quest; 26373 asks for the intact wings of the four colours (18456-18459, 5 each, drops of the Scarafeuilles while Qa=1820); «Aquí tienes las alas» (31640) hands them over, line 26374."
+      "why": "Icar Orval (Icar Mélite in Dofus pour les noobs («Vol au-dessus d'un coucou»)) on the Scarafeuille plain, right of the zaap. 26369-26372: she dreams of touching the sun (replies 31637, 31636, 31638 in the order of her lines); «De acuerdo, te ayudaré» (31639, PL>19) starts the quest; 26373 asks for the intact wings of the four colours (18456-18459, 5 each, drops of the Scarafeuilles while Qa=1820); «Aquí tienes las alas» (31640) hands them over, line 26374. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 1239,
@@ -42802,13 +42806,15 @@
         {
           "message": 8074,
           "choices": [
-            { "reply": 8064, "startsQuest": 570, "params": [[34, 570]], "criterion": "PL>139" }
+            { "reply": 8064, "startsQuest": 570, "params": [[34, 570]], "criterion": "PL>139" },
+            { "reply": 8199, "quest": 660, "completes": 4043, "params": [[30, 4043]], "next": 8191, "holds": 11542 }
           ]
         },
         {
           "message": 8210,
           "choices": [
-            { "reply": 8065, "quest": 570, "completes": 3974, "params": [[30, 3974]], "next": 8075, "completesAll": [3974, 3975], "holds": 11162, "holdsCount": 40, "criterion": "PO>11163,4" }
+            { "reply": 8065, "quest": 570, "completes": 3974, "params": [[30, 3974]], "next": 8075, "completesAll": [3974, 3975], "holds": 11162, "holdsCount": 40, "criterion": "PO>11163,4" },
+            { "reply": 8199, "quest": 660, "completes": 4043, "params": [[30, 4043]], "next": 8191, "holds": 11542 }
           ]
         },
         {
@@ -42818,13 +42824,15 @@
         {
           "message": 8076,
           "choices": [
-            { "reply": 8067, "startsQuest": 571, "params": [[34, 571]], "criterion": "PL>139" }
+            { "reply": 8067, "startsQuest": 571, "params": [[34, 571]], "criterion": "PL>139" },
+            { "reply": 8199, "quest": 660, "completes": 4043, "params": [[30, 4043]], "next": 8191, "holds": 11542 }
           ]
         },
         {
           "message": 8211,
           "choices": [
-            { "reply": 8069, "quest": 571, "completes": 3976, "params": [[30, 3976]], "next": 8077, "completesAll": [3976, 3977], "holds": 11164, "holdsCount": 40, "criterion": "PO>11165,0" }
+            { "reply": 8069, "quest": 571, "completes": 3976, "params": [[30, 3976]], "next": 8077, "completesAll": [3976, 3977], "holds": 11164, "holdsCount": 40, "criterion": "PO>11165,0" },
+            { "reply": 8199, "quest": 660, "completes": 4043, "params": [[30, 4043]], "next": 8191, "holds": 11542 }
           ]
         },
         {
@@ -42833,10 +42841,13 @@
         },
         {
           "message": 8212,
-          "choices": []
+          "choices": [
+            { "reply": 8199, "quest": 660, "completes": 4043, "params": [[30, 4043]], "next": 8191, "holds": 11542 },
+            { "reply": 7846 }
+          ]
         }
       ],
-      "why": "Bisale Vinlenta (Eric Azaraille), the alchemist of the Frigost greenhouse [-76,-40]: «Ciento veintitrés flores que no son como las demás» (566-569, Dofus pour les noobs «Ciento veintitrés flores que no son como las demás»). The default line (7831) is his refusal to talk farming; «¿Necesitas ayuda?» (7885) leads to the first request (7874: yuca lelé, tulipán Acea, campanilla de invierno), «Vale, voy a buscarlo.» (7886) is 566 and «Toma las plantas.» (7887) hands the three objectives over (3799-3801; thanks 7875). The next requests are his openings once the last is done (567: 7876, rosa Nelson and mimosa modas, thanks 7877; 568: 7878, ruibarbo de papá, thanks 7879; 569: 8070, sauce berreón, thanks 8073) with his reminders while under way (8207-8209). The reply texts of the later requests are the client's own accept and hand-in replies (7891, 7889, 8068, 7892, 8061, 8062). «Envío» (660): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8199 (4043) and his thanks (8191) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» Second part of the alchemist's series (570 «¡Mi reino por un jardín de rosas!» and 571 «Flores enrojecedoras», Dofus pour les noobs «Ciento veintitrés flores que no son como las demás»): once 569 is done his opening is the offer of 570 (8074, «Ir por las flores.» 8064, 40 and 5 flowers), reminder 8210, hand-in «Toma las plantas.» 8065 with thanks 8075; then 571 (offer 8076, accept 8067, reminder 8211, hand-in 8069, thanks 8077); his line after is 8212. Accept replies 8064/8067 are inferred from the client's reply order."
+      "why": "Bisale Vinlenta (Eric Azaraille), the alchemist of the Frigost greenhouse [-76,-40]: «Ciento veintitrés flores que no son como las demás» (566-569, Dofus pour les noobs «Ciento veintitrés flores que no son como las demás»). The default line (7831) is his refusal to talk farming; «¿Necesitas ayuda?» (7885) leads to the first request (7874: yuca lelé, tulipán Acea, campanilla de invierno), «Vale, voy a buscarlo.» (7886) is 566 and «Toma las plantas.» (7887) hands the three objectives over (3799-3801; thanks 7875). The next requests are his openings once the last is done (567: 7876, rosa Nelson and mimosa modas, thanks 7877; 568: 7878, ruibarbo de papá, thanks 7879; 569: 8070, sauce berreón, thanks 8073) with his reminders while under way (8207-8209). The reply texts of the later requests are the client's own accept and hand-in replies (7891, 7889, 8068, 7892, 8061, 8062). «Envío» (660): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8199 (4043) and his thanks (8191) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» Second part of the alchemist's series (570 «¡Mi reino por un jardín de rosas!» and 571 «Flores enrojecedoras», Dofus pour les noobs «Ciento veintitrés flores que no son como las demás»): once 569 is done his opening is the offer of 570 (8074, «Ir por las flores.» 8064, 40 and 5 flowers), reminder 8210, hand-in «Toma las plantas.» 8065 with thanks 8075; then 571 (offer 8076, accept 8067, reminder 8211, hand-in 8069, thanks 8077); his line after is 8212. Accept replies 8064/8067 are inferred from the client's reply order. Review fix: the letter hand-in of «Tercer envío» (660, reply 8199 -> 8191, bring objective 4043) is also offered on the openings 8074, 8210, 8076, 8211 and 8212, so it stays reachable after 569 and after 571; the closing line 8212 also gets «Hasta luego.» (7846)."
     },
     {
       "npc": 5813,
@@ -42953,7 +42964,7 @@
         {
           "message": 26396,
           "choices": [
-            { "reply": 31671, "quest": 1824, "next": 26397 },
+            { "reply": 31671, "quest": 1824, "next": 26397, "completes": 12024, "completesAll": [12023, 12024], "params": [[30, 12024]] },
             { "reply": 31672 }
           ]
         },
@@ -42970,7 +42981,7 @@
           ]
         }
       ],
-      "why": "Joela Robuchón (Joëlle Raiebuchon in Dofus pour les noobs («Des étoiles dans l'estomac»)) in Sufokia [16,25]. 26394: «¿Tienes algo original para mí?» (31668) leads to her new recipe (26395); «Eso me interesa» / «Nunca digo no a un plato gratis» (31667/31666, PL>9) start the quest and 26396 asks for 5 crab claws and 10 Rano starfish powders; «Aquí tienes los ingredientes» (31671) hands them over, 26397 'a moment', 31670 then 26398 the surimi."
+      "why": "Joela Robuchón (Joëlle Raiebuchon in Dofus pour les noobs («Des étoiles dans l'estomac»)) in Sufokia [16,25]. 26394: «¿Tienes algo original para mí?» (31668) leads to her new recipe (26395); «Eso me interesa» / «Nunca digo no a un plato gratis» (31667/31666, PL>9) start the quest and 26396 asks for 5 crab claws and 10 Rano starfish powders; «Aquí tienes los ingredientes» (31671) hands them over, 26397 'a moment', 31670 then 26398 the surimi. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 1276,
@@ -43047,6 +43058,7 @@
           "message": 26385,
           "choices": [
             { "reply": 31649, "startsQuest": 1821, "params": [[34, 1821]], "next": 26385, "minLevel": 20 },
+            { "reply": 31653, "quest": 1821, "next": 26386, "completes": 12035, "completesAll": [12031, 12032, 12033, 12034, 12035], "params": [[30, 12035]] },
             { "reply": 31654 }
           ]
         },
@@ -43058,7 +43070,7 @@
           ]
         }
       ],
-      "why": "Atencio Firmes (Edgar Davou in Dofus pour les noobs («Voleurs en série»)), Sufokia bay [15,22]. 26383: «¿Qué camino he de tomar?» (31651) leads to the wave of thefts (26384), «¿Te puedo ayudar?» (31650) to 26385 (the step's own text: the Tymadores bandits of the north), «Me ocupo de ello ahora mismo» (31649, PL>19) starts the quest; with the five stolen objects (18460, 18466-18469) «He encontrado los objetos robados» (31653) hands them over, line 26386."
+      "why": "Atencio Firmes (Edgar Davou in Dofus pour les noobs («Voleurs en série»)), Sufokia bay [15,22]. 26383: «¿Qué camino he de tomar?» (31651) leads to the wave of thefts (26384), «¿Te puedo ayudar?» (31650) to 26385 (the step's own text: the Tymadores bandits of the north), «Me ocupo de ello ahora mismo» (31649, PL>19) starts the quest; with the five stolen objects (18460, 18466-18469) «He encontrado los objetos robados» (31653) hands them over, line 26386. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 3668,
@@ -43079,7 +43091,7 @@
           "message": 26380,
           "choices": [
             { "reply": 31646, "startsQuest": 1822, "params": [[34, 1822]], "minLevel": 40 },
-            { "reply": 31647, "quest": 1822, "next": 26382 }
+            { "reply": 31647, "quest": 1822, "next": 26382, "completes": 12037, "completesAll": [12020, 12038, 12037], "params": [[30, 12037]] }
           ]
         },
         {
@@ -43087,7 +43099,7 @@
           "choices": []
         }
       ],
-      "why": "Miaumiaucito rosa (Petit Chacha Péron Rose in Dofus pour les noobs («Moins on en a et plus on l'étale»)), jelly peninsula [6,30]. 26379 Miau, «Comprender el meollo de la cuestión metafísica» (31645) to 26380, «Ir en busca de respuestas y de mermeladas» (31646, PL>39) starts the quest; with ten jams of each colour (18477, 18475, 18474, 100% off the jellies) «Darle la mermelada» (31647) hands them over, line 26382."
+      "why": "Miaumiaucito rosa (Petit Chacha Péron Rose in Dofus pour les noobs («Moins on en a et plus on l'étale»)), jelly peninsula [6,30]. 26379 Miau, «Comprender el meollo de la cuestión metafísica» (31645) to 26380, «Ir en busca de respuestas y de mermeladas» (31646, PL>39) starts the quest; with ten jams of each colour (18477, 18475, 18474, 100% off the jellies) «Darle la mermelada» (31647) hands them over, line 26382. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 1279,
@@ -43117,29 +43129,33 @@
       "map": 0,
       "opening": 7714,
       "openings": [
-        { "quest": 685, "message": 7781 }
+        { "quest": 685, "message": 8533 }
       ],
       "lines": [
         {
           "message": 7714,
           "choices": [
-            { "reply": 7798, "startsQuest": 685, "params": [[34, 685]], "next": 7781, "criterion": "PL>99&Qf=674" },
-            { "reply": 8206, "quest": 667, "completes": 4050, "params": [[30, 4050]], "next": 8198, "holds": 11542 }
-          ]
-        },
-        {
-          "message": 7781,
-          "choices": [
-            { "reply": 7799, "quest": 685, "completes": 4508, "params": [[30, 4508]], "holds": 11201 },
+            { "reply": 8580, "startsQuest": 685, "params": [[34, 685]], "next": 8533, "criterion": "Qf=674" },
             { "reply": 8206, "quest": 667, "completes": 4050, "params": [[30, 4050]], "next": 8198, "holds": 11542 }
           ]
         },
         {
           "message": 8198,
           "choices": []
+        },
+        {
+          "message": 8533,
+          "choices": [
+            { "reply": 8581, "quest": 685, "completes": 4508, "params": [[30, 4508]], "holds": 11201, "next": 8534 },
+            { "reply": 8206, "quest": 667, "completes": 4050, "params": [[30, 4050]], "next": 8198, "holds": 11542 }
+          ]
+        },
+        {
+          "message": 8534,
+          "choices": []
         }
       ],
-      "why": "Albert Pess (Albert Paisse), Frigost's doctor at the frost port [-80,-45]: «No hay vacuna para los malos» (685, Dofus pour les noobs «Pas de vaccin pour les vilains»), the weekly renewal of the vaccine once «La enfermedad» (674) is done. «Renovar la vacuna contra el guesfguiado.» (7798) starts it and he asks for a new jalamut blood sample (7781, which is also his line while it is under way); «Toma la muestra.» (7799) hands it over (4508). The server criterion Sc=702 of the quest (once a week) is not modelled here. «Envío» (667): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8206 (4050) and his thanks (8198) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage»"
+      "why": "Albert Pess (Albert Paisse), Frigost's doctor at the frost port [-80,-45]: «No hay vacuna para los malos» (685, Dofus pour les noobs «Pas de vaccin pour les vilains»), the weekly renewal of the vaccine once «La enfermedad» (674) is done. «¿En qué puedo ayudarte?» (8580) starts it and he asks for a new jalamut blood sample (8533, the step's own dialog, also his line while it is under way); «Toma la muestra de sangre.» (8581) hands it over (4508) and he thanks (8534). The server criterion Sc=702 of the quest (once a week) is not modelled here. «Envío» (667): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8206 (4050) and his thanks (8198) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage»"
     },
     {
       "npc": 3300,
@@ -43182,7 +43198,7 @@
           "message": 24279,
           "choices": [
             { "reply": 29169, "startsQuest": 1753, "params": [[34, 1753]], "minLevel": 180 },
-            { "reply": 29173, "quest": 1753, "next": 24280 },
+            { "reply": 29173, "quest": 1753, "next": 24280, "completes": 11205, "params": [[30, 11205]] },
             { "reply": 74595 }
           ]
         },
@@ -43193,7 +43209,7 @@
           ]
         }
       ],
-      "why": "Althar Kurnia (Jett Saite in Dofus pour les noobs («Droit de cuissage»)), Sufokia [21,24]. 24275-24278: the merchant's boasting, replies 29168, 29172, 29171, 29170 in the order of his lines; 24279 (the step's own text) asks for the trithon haunches, «Acepto» (29169, PL>179) starts the quest; «Toma: las ancas de trithón» (29173) hands over the forty (18074), line 24280."
+      "why": "Althar Kurnia (Jett Saite in Dofus pour les noobs («Droit de cuissage»)), Sufokia [21,24]. 24275-24278: the merchant's boasting, replies 29168, 29172, 29171, 29170 in the order of his lines; 24279 (the step's own text) asks for the trithon haunches, «Acepto» (29169, PL>179) starts the quest; «Toma: las ancas de trithón» (29173) hands over the forty (18074), line 24280. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 3301,
@@ -43231,7 +43247,7 @@
         {
           "message": 24285,
           "choices": [
-            { "reply": 29178, "quest": 1754, "next": 24286 }
+            { "reply": 29178, "quest": 1754, "next": 24286, "completes": 11206, "params": [[30, 11206]] }
           ]
         },
         {
@@ -43239,7 +43255,7 @@
           "choices": []
         }
       ],
-      "why": "Dan Wich on the sunken map 168558596 (quest 1754 follows 1751; no DPLN page, 404): his suspicion of Umra Tawil (24281, 24282), «La verdad es que he ayudado a Umra Tawil» (29176) and «Solo le falta la página 751» (29175) lead to 24284, the step's own text asking for the pages stolen from the servants of the unspeakable; «Acepto» (29174) starts the quest, 24285 is the waiting line and «Aquí tienes las páginas indescifrables» (29178) hands over the forty (18075), line 24286."
+      "why": "Dan Wich on the sunken map 168558596 (quest 1754 follows 1751; no DPLN page, 404): his suspicion of Umra Tawil (24281, 24282), «La verdad es que he ayudado a Umra Tawil» (29176) and «Solo le falta la página 751» (29175) lead to 24284, the step's own text asking for the pages stolen from the servants of the unspeakable; «Acepto» (29174) starts the quest, 24285 is the waiting line and «Aquí tienes las páginas indescifrables» (29178) hands over the forty (18075), line 24286. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 3252,
@@ -43277,7 +43293,7 @@
         {
           "message": 24290,
           "choices": [
-            { "reply": 29183, "quest": 1755, "next": 24291 }
+            { "reply": 29183, "quest": 1755, "next": 24291, "completes": 11208, "params": [[30, 11208]] }
           ]
         },
         {
@@ -43286,7 +43302,7 @@
           "choices": []
         }
       ],
-      "why": "Marina Anclanaje (Marine Ancrenage in Dofus pour les noobs («Nos chairs voisines»)), submerged city [22,28]. Her opening 24027 (shared with the previous chain, quest 1734, whose replies are not written here) offers «Hablemos de ocupaciones» (29182): the Sea Council and the regulation of the species (24287, 24288), «Suponer que es la afortunada ganadora» (29180), 24289 asks for a volunteer, «Acepto» (29179, PL>179) starts the quest; 24290 asks for the aquatic meat (18076 x40); «Aquí tienes las carnes acuáticas» (29183) hands it over, line 24291. INFERRED: the opening line 24027 for 29182."
+      "why": "Marina Anclanaje (Marine Ancrenage in Dofus pour les noobs («Nos chairs voisines»)), submerged city [22,28]. Her opening 24027 (shared with the previous chain, quest 1734, whose replies are not written here) offers «Hablemos de ocupaciones» (29182): the Sea Council and the regulation of the species (24287, 24288), «Suponer que es la afortunada ganadora» (29180), 24289 asks for a volunteer, «Acepto» (29179, PL>179) starts the quest; 24290 asks for the aquatic meat (18076 x40); «Aquí tienes las carnes acuáticas» (29183) hands it over, line 24291. INFERRED: the opening line 24027 for 29182. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 3246,
@@ -43682,7 +43698,9 @@
       "lines": [
         {
           "message": 8167,
-          "choices": []
+          "choices": [
+            { "reply": 7846 }
+          ]
         },
         {
           "message": 8187,
@@ -43700,7 +43718,8 @@
             { "reply": 8196, "startsQuest": 668, "params": [[34, 668]], "next": 8188, "gives": 11542, "criterion": "PO>11540,109&Qf=667&Qf!668" },
             { "reply": 8196, "startsQuest": 669, "params": [[34, 669]], "next": 8188, "gives": 11542, "criterion": "PO>11540,119&Qf=668&Qf!669" },
             { "reply": 8196, "startsQuest": 670, "params": [[34, 670]], "next": 8188, "gives": 11542, "criterion": "PO>11540,129&Qf=669&Qf!670" },
-            { "reply": 8196, "startsQuest": 671, "params": [[34, 671]], "next": 8188, "gives": 11542, "criterion": "PO>11540,139&Qf=670&Qf!671" }
+            { "reply": 8196, "startsQuest": 671, "params": [[34, 671]], "next": 8188, "gives": 11542, "criterion": "PO>11540,139&Qf=670&Qf!671" },
+            { "reply": 7846 }
           ]
         },
         {
@@ -43708,7 +43727,7 @@
           "choices": []
         }
       ],
-      "why": "Chuck 'Niuk' Palah in the Taverne du Paradis Frigostien's cellar [-77,-38]: «Primer envío» to «Decimocuarto envío» (658-671, Dofus pour les noobs «Premier postage» ... «Quatorzième postage»): with ten more soaps of the fight club (Jabón de Frigost 11540) than the last time, he asks (8187) for a letter to be delivered in person; «Vale.» (8196) starts the next one of the series and gives the letter (11542), 8188 is his whisper. The soaps come from «El club de la pelea» (656), whose bets and fights are not authored here."
+      "why": "Chuck 'Niuk' Palah in the Taverne du Paradis Frigostien's cellar [-77,-38]: «Primer envío» to «Decimocuarto envío» (658-671, Dofus pour les noobs «Premier postage» ... «Quatorzième postage»): with ten more soaps of the fight club (Jabón de Frigost 11540) than the last time, he asks (8187) for a letter to be delivered in person; «Vale.» (8196) starts the next one of the series and gives the letter (11542), 8188 is his whisper. The soaps come from «El club de la pelea» (656), whose bets and fights are not authored here. Review fix: «Hasta luego.» (7846) on lines 8167 and 8187 so the talk is never left without a reply."
     },
     {
       "npc": 1240,
@@ -43870,7 +43889,7 @@
     {
       "npc": 1260,
       "map": 0,
-      "opening": 7733,
+      "opening": 7712,
       "openings": [
         { "after": 571, "before": 572, "message": 8125 },
         { "quest": 572, "message": 8125 },
@@ -43880,18 +43899,30 @@
         { "quest": 574, "message": 8301 },
         { "after": 574, "before": 575, "message": 8303 },
         { "quest": 575, "message": 8303 },
-        { "after": 575, "message": 8304 }
+        { "after": 575, "message": 8304 },
+        { "quest": 531, "message": 7733 }
       ],
       "lines": [
         {
+          "message": 7712,
+          "choices": [
+            { "reply": 7725, "next": 7733, "criterion": "Qf!531" },
+            { "reply": 7846 }
+          ]
+        },
+        {
           "message": 7733,
-          "choices": []
+          "choices": [
+            { "reply": 7726, "startsQuest": 531, "params": [[34, 531]], "criterion": "PL>99&PJ>26,199&Qa!531&Qf!531" },
+            { "reply": 7727, "quest": 531, "completes": 3657, "params": [[30, 3657]], "next": 7734, "holds": 13108, "holdsCount": 10, "criterion": "PO>13108,9" }
+          ]
         },
         {
           "message": 8125,
           "choices": [
-            { "reply": 8114, "startsQuest": 572, "params": [[34, 572]], "criterion": "PL>139&Qa!572" },
-            { "reply": 8115, "quest": 572, "completes": 3997, "params": [[30, 3997]], "next": 8128, "completesAll": [3997, 3998], "holds": 11166, "holdsCount": 40, "criterion": "PO>11167,4" }
+            { "reply": 8114, "startsQuest": 572, "params": [[34, 572]], "criterion": "PL>149&Qa!572" },
+            { "reply": 8115, "quest": 572, "completes": 3997, "params": [[30, 3997]], "next": 8128, "completesAll": [3997, 3998], "holds": 11166, "holdsCount": 40, "criterion": "PO>11167,4" },
+            { "reply": 7725, "next": 7733, "criterion": "Qf!531" }
           ]
         },
         {
@@ -43901,15 +43932,17 @@
         {
           "message": 8299,
           "choices": [
-            { "reply": 8332, "startsQuest": 573, "params": [[34, 573]], "criterion": "PL>149&Qa!573" },
-            { "reply": 8333, "quest": 573, "completes": 4131, "params": [[30, 4131]], "completesAll": [4131, 4132], "holds": 11168, "holdsCount": 40, "criterion": "PO>11169,4" }
+            { "reply": 8332, "startsQuest": 573, "params": [[34, 573]], "criterion": "PL>159&Qa!573" },
+            { "reply": 8333, "quest": 573, "completes": 4131, "params": [[30, 4131]], "completesAll": [4131, 4132], "holds": 11168, "holdsCount": 40, "criterion": "PO>11169,4" },
+            { "reply": 7725, "next": 7733, "criterion": "Qf!531" }
           ]
         },
         {
           "message": 8301,
           "choices": [
-            { "reply": 8335, "startsQuest": 574, "params": [[34, 574]], "criterion": "PL>159&Qa!574" },
-            { "reply": 8336, "quest": 574, "completes": 4133, "params": [[30, 4133]], "next": 8302, "completesAll": [4133, 4134], "holds": 11170, "holdsCount": 40, "criterion": "PO>11171,4" }
+            { "reply": 8335, "startsQuest": 574, "params": [[34, 574]], "criterion": "PL>169&Qa!574" },
+            { "reply": 8336, "quest": 574, "completes": 4133, "params": [[30, 4133]], "next": 8302, "completesAll": [4133, 4134], "holds": 11170, "holdsCount": 40, "criterion": "PO>11171,4" },
+            { "reply": 7725, "next": 7733, "criterion": "Qf!531" }
           ]
         },
         {
@@ -43920,15 +43953,22 @@
           "message": 8303,
           "choices": [
             { "reply": 8337, "startsQuest": 575, "params": [[34, 575]], "criterion": "PL>169&Qa!575" },
-            { "reply": 8338, "quest": 575, "completes": 4135, "params": [[30, 4135]], "next": 8304, "completesAll": [4135, 4136], "holds": 11172, "holdsCount": 40, "criterion": "PO>11173,4" }
+            { "reply": 8338, "quest": 575, "completes": 4135, "params": [[30, 4135]], "next": 8304, "completesAll": [4135, 4136], "holds": 11172, "holdsCount": 40, "criterion": "PO>11173,4" },
+            { "reply": 7725, "next": 7733, "criterion": "Qf!531" }
           ]
         },
         {
           "message": 8304,
+          "choices": [
+            { "reply": 7725, "next": 7733, "criterion": "Qf!531" }
+          ]
+        },
+        {
+          "message": 7734,
           "choices": []
         }
       ],
-      "why": "Eric Azaraille's botanical favours (572 «Feliz como un lirio», 573 «En el nombre de la micosis», 574 «El colmo de Los Colmillos», 575 «Villa floreada», Dofus pour les noobs «Ciento veintitrés flores que no son como las demás»): after 571 his opening is the offer of 572 (8125, lilies; thanks 8128), then 573 (offer 8299, no thanks line of its own: the client folds it into the next offer), 574 (offer 8301, thanks 8302) and 575 (offer 8303, thanks 8304). The offers double as reminders (no separate client line). Accept replies (8114, 8332, 8335, 8337) are inferred: the client's «Aceptar.» precedes each hand-in reply (8115, 8333, 8336, 8338). Server criterion Sc=702 not modelled."
+      "why": "Eric Azaraille's botanical favours (572 «Feliz como un lirio», 573 «En el nombre de la micosis», 574 «El colmo de Los Colmillos», 575 «Villa floreada», Dofus pour les noobs «Ciento veintitrés flores que no son como las demás»): after 571 his opening is the offer of 572 (8125, lilies; thanks 8128), then 573 (offer 8299, no thanks line of its own: the client folds it into the next offer), 574 (offer 8301, thanks 8302) and 575 (offer 8303, thanks 8304). The offers double as reminders (no separate client line). Accept replies (8114, 8332, 8335, 8337) are inferred: the client's «Aceptar.» precedes each hand-in reply (8115, 8333, 8336, 8338). Server criterion Sc=702 not modelled. Review fix: his default opening is the client's line 7712 (7725 «¿Puedo ayudarte en algo?» -> 7733, the pitch of «Panecillos floreados» 531, accept 7726; hand-in 7727 with 10 of 13108 -> thanks 7734; 7846 «Hasta luego.»); 7725 is also offered on the lines of 572-575 so 531 stays reachable. Start criteria of 572/573/574 now PL>149/159/169 as in the quests."
     },
     {
       "npc": 1461,
@@ -43953,10 +43993,10 @@
         {
           "message": 9229,
           "choices": [
-            { "reply": 9414, "quest": 720, "next": 9208, "holds": 12456, "holdsCount": 20 },
-            { "reply": 9419, "quest": 721, "next": 9223, "holds": 12457, "holdsCount": 20 },
-            { "reply": 9445, "quest": 722, "next": 9227, "holds": 12458, "holdsCount": 20 },
-            { "reply": 9450, "quest": 723, "next": 9208, "holds": 12459, "holdsCount": 20 }
+            { "reply": 9414, "quest": 720, "next": 9208, "holds": 12456, "holdsCount": 20, "completes": 4757, "params": [[30, 4757]] },
+            { "reply": 9419, "quest": 721, "next": 9223, "holds": 12457, "holdsCount": 20, "completes": 4758, "params": [[30, 4758]] },
+            { "reply": 9445, "quest": 722, "next": 9227, "holds": 12458, "holdsCount": 20, "completes": 4759, "params": [[30, 4759]] },
+            { "reply": 9450, "quest": 723, "next": 9208, "holds": 12459, "holdsCount": 20, "completes": 4760, "params": [[30, 4760]] }
           ]
         },
         {
@@ -44005,7 +44045,7 @@
           ]
         }
       ],
-      "why": "Conso Lería at the Vulkania craters' desk (map 74973185): the four «Explota Vulkaniano» quests (720 tourists PL<51, 721 amateurs, 722 specialists, 723 experts PL>150), one per level band. «Preguntarle cómo puedes obtener el sello de la actividad Explota Vulkaniano» (9458, 9459, 9451) hands the band's quest out, her step line is 9229 («traerme 20 laskas de cascasaurios»), «Darle las laskas de cascasaurios» (9414, 9419, 9445, 9450) takes them and the stamp line follows (9208, 9223, 9227: «aquí tienes el sello... ¿Cuál te gusta más?») with the four keepsakes as replies (no effect: «no tienen ninguna utilidad»). The assignment of reply and thanks-line variants to the bands is INFERRED (the client lists three of each for four bands); 723 reuses 9451 and 9450. The rest of her talk (Grozilla and Grasmera's lair, the hearts donation, the rooms' state) is not authored here. No DPLN page for 720 (404). Correction: a reply repeated across choices is matched by its first choice only, so each level band has its own opening line carrying its own ask reply (9210 band 1, 9211 band 2, 9225 band 3, 9183 band 4; INFERRED, the texts being the desk's four introductions). The hand-in replies are offered only while the 20 laskas are carried (holds), so the stamp line cannot be reached without them."
+      "why": "Conso Lería at the Vulkania craters' desk (map 74973185): the four «Explota Vulkaniano» quests (720 tourists PL<51, 721 amateurs, 722 specialists, 723 experts PL>150), one per level band. «Preguntarle cómo puedes obtener el sello de la actividad Explota Vulkaniano» (9458, 9459, 9451) hands the band's quest out, her step line is 9229 («traerme 20 laskas de cascasaurios»), «Darle las laskas de cascasaurios» (9414, 9419, 9445, 9450) takes them and the stamp line follows (9208, 9223, 9227: «aquí tienes el sello... ¿Cuál te gusta más?») with the four keepsakes as replies (no effect: «no tienen ninguna utilidad»). The assignment of reply and thanks-line variants to the bands is INFERRED (the client lists three of each for four bands); 723 reuses 9451 and 9450. The rest of her talk (Grozilla and Grasmera's lair, the hearts donation, the rooms' state) is not authored here. No DPLN page for 720 (404). Correction: a reply repeated across choices is matched by its first choice only, so each level band has its own opening line carrying its own ask reply (9210 band 1, 9211 band 2, 9225 band 3, 9183 band 4; INFERRED, the texts being the desk's four introductions). The hand-in replies are offered only while the 20 laskas are carried (holds), so the stamp line cannot be reached without them. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 1285,
@@ -44032,7 +44072,7 @@
         {
           "message": 9264,
           "choices": [
-            { "reply": 9513, "quest": 759, "next": 9273 },
+            { "reply": 9513, "quest": 759, "next": 9273, "completes": 4805, "params": [[30, 4805]] },
             { "reply": 9505 }
           ]
         },
@@ -44041,7 +44081,7 @@
           "choices": []
         }
       ],
-      "why": "Mar Bella, the barmaid of the Bar Akouda islet ([-44,44]), «Casktel gratis» (759): «Darle el vale para el casktel gratis.» (9513) hands in the voucher (12580, objective 4805) and she serves the welcome cocktail (9273); Dofus pour les noobs «Coquetel gratuit»: «Montrez votre bon pour un coquetel gratuit à Juju». The weighing and Stak lines (13207.., 9506) belong to other quests."
+      "why": "Mar Bella, the barmaid of the Bar Akouda islet ([-44,44]), «Casktel gratis» (759): «Darle el vale para el casktel gratis.» (9513) hands in the voucher (12580, objective 4805) and she serves the welcome cocktail (9273); Dofus pour les noobs «Coquetel gratuit»: «Montrez votre bon pour un coquetel gratuit à Juju». The weighing and Stak lines (13207.., 9506) belong to other quests. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
     {
       "npc": 1418,
@@ -44060,11 +44100,16 @@
         {
           "message": 10494,
           "choices": [
-            { "reply": 11525, "quest": 871, "gives": 12931, "criterion": "PO!12931" }
+            { "reply": 11525, "quest": 871, "gives": 12931, "criterion": "PO!12931&Qo<5345" },
+            { "reply": 11526, "startsQuest": 872, "params": [[34, 872]], "next": 10495 }
           ]
+        },
+        {
+          "message": 10495,
+          "choices": []
         }
       ],
-      "why": "«Los Weyes Magos en apuros» (871): «¿Tienes problemas?» (11524) hands the quest out; Gas Paw tells of M.O. Elmen Delsako's escape (10494) and «Vale.» (11525) hands over the broken cañóngüino's box (12931); «Comme les Was Mages ont galéré»: «Gas Pawd ... vous envoie le faire réparer par Glutilitayr»."
+      "why": "«Los Weyes Magos en apuros» (871): «¿Tienes problemas?» (11524) hands the quest out; Gas Paw tells of M.O. Elmen Delsako's escape (10494) and «Vale.» (11525) hands over the broken cañóngüino's box (12931); «Comme les Was Mages ont galéré»: «Gas Pawd ... vous envoie le faire réparer par Glutilitayr». «La estrella de los Weyes Magos» (872) shares 871's step line 10494: «¿Qué puedes contarme de la estrella de los Weyes Magos?» (11526) starts it and leads to the star's story (10495). The broken box (11525) is given only until it has been handed to Glutilitayr (Qo<5345). INFERRED: 11526 as 872's start."
     },
     {
       "npc": 1531,
@@ -44074,8 +44119,8 @@
         {
           "message": 10496,
           "choices": [
-            { "reply": 11527, "quest": 871, "holds": 12931, "next": 10497 },
-            { "reply": 11528, "quest": 871, "holds": 12932, "holdsCount": 10, "next": 10498 }
+            { "reply": 11527, "quest": 871, "holds": 12931, "next": 10497, "completes": 5345, "params": [[30, 5345]] },
+            { "reply": 11528, "quest": 871, "holds": 12932, "holdsCount": 10, "next": 10498, "completes": 5346, "params": [[30, 5346]] }
           ]
         },
         {
@@ -44085,11 +44130,11 @@
         {
           "message": 10498,
           "choices": [
-            { "reply": 11529 }
+            { "reply": 11529, "startsQuest": 879, "params": [[34, 879]] }
           ]
         }
       ],
-      "why": "«Los Weyes Magos en apuros» (871): Glutilitayr (Duendegmático) takes the box («¿Puedes reparar el cañóngüino?», 11527, 5345) and asks for spare parts (10497), then takes the ten pieces («Toma las piezas de recambio.», 11528, 5346) and sends the character to Balt Azaw (10498, the first line of 879); «Comme les Was Mages ont galéré»."
+      "why": "«Los Weyes Magos en apuros» (871): Glutilitayr (Duendegmático) takes the box («¿Puedes reparar el cañóngüino?», 11527, 5345) and asks for spare parts (10497), then takes the ten pieces («Toma las piezas de recambio.», 11528, 5346) and sends the character to Balt Azaw (10498, the first line of 879); «Comme les Was Mages ont galéré». The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them). Line 10498 is 879's step dialog («Engrasar bien para tirar mejor», Qf=871&Qa=878): its reply 11529 starts 879 once 871 is finished, which the binding's «starts» could not (871 was still open then)."
     },
     {
       "npc": 5654,
@@ -44247,9 +44292,12 @@
           "message": 8699,
           "choices": [
             { "reply": 11501, "startsQuest": 853, "params": [[34, 853], [34, 854], [34, 855], [34, 856]], "next": 10484, "criterion": "Qa=878&Qa!853&Qa!854&Qa!855&Qa!856" },
-            { "reply": 11497, "next": 10483, "criterion": "PO>12901,6|PO>12903,6|PO>12905,6|PO>12906,6" },
+            { "reply": 11497, "next": 10483, "criterion": "PO>12901,6", "completes": 5340, "params": [[30, 5340]], "quest": 853 },
+            { "reply": 11497, "next": 10483, "criterion": "PO>12903,6", "completes": 5341, "params": [[30, 5341]], "quest": 854 },
+            { "reply": 11497, "next": 10483, "criterion": "PO>12905,6", "completes": 5342, "params": [[30, 5342]], "quest": 855 },
+            { "reply": 11497, "next": 10483, "criterion": "PO>12906,6", "completes": 5343, "params": [[30, 5343]], "quest": 856 },
             { "reply": 11500, "startsQuest": 877, "params": [[34, 877]], "next": 10482, "criterion": "Qa=878&Qa!877" },
-            { "reply": 11499, "quest": 877, "next": 10480, "criterion": "PO>12901,6&PO>12903,6&PO>12905,6&PO>12906,6" }
+            { "reply": 11499, "quest": 877, "next": 10480, "criterion": "PO>12901,6&PO>12903,6&PO>12905,6&PO>12906,6", "completes": 5339, "completesAll": [5336, 5337, 5338, 5339], "params": [[30, 5339]] }
           ]
         },
         {
@@ -44277,7 +44325,7 @@
           ]
         }
       ],
-      "why": "«Duendebre tiene mal corazón», «Renodolfo está achispado y colorado», «Keprinus no quiere quedarse sin antenas», «Oogly Betugy siempre saca tajada» (853-856) and «La estrella de los gruñones» (877), Scooger (Groocse in Dofus pour les noobs «Glugubrr a un mauvais fond», «L'Étoile des Grincheux»): «¿Qué puedes contarme sobre los sets de los gruñones?» (11501) starts the four loot quests (10484: «Tráeme lo que han robado»); «He terminado mi trabajo.» (11497) hands in the seven buttons of each boss (10483); the star quest is asked with 11500 (10482) and paid with «*Agarrar la estrella*» (11499, 10480). Which reply starts or ends which of the four is INFERRED: the client gives one reply for the four."
+      "why": "«Duendebre tiene mal corazón», «Renodolfo está achispado y colorado», «Keprinus no quiere quedarse sin antenas», «Oogly Betugy siempre saca tajada» (853-856) and «La estrella de los gruñones» (877), Scooger (Groocse in Dofus pour les noobs «Glugubrr a un mauvais fond», «L'Étoile des Grincheux»): «¿Qué puedes contarme sobre los sets de los gruñones?» (11501) starts the four loot quests (10484: «Tráeme lo que han robado»); «He terminado mi trabajo.» (11497) hands in the seven buttons of each boss (10483); the star quest is asked with 11500 (10482) and paid with «*Agarrar la estrella*» (11499, 10480). Which reply starts or ends which of the four is INFERRED: the client gives one reply for the four. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them). The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them). 11497 is one choice per loot quest (853-856), each completing its own objective."
     },
     {
       "npc": 795,
