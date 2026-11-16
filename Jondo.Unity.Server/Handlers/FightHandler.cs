@@ -13024,9 +13024,8 @@ namespace Jondo.Unity.Server.Handlers
         /// grade. The red piwi chief, for instance, drops a red piwi feather at 100 %, sesame
         /// seeds at 18 % and a pouch of lemons at 3 %.
         ///
-        /// What is NOT applied yet: prospecting. In the real game the probability is multiplied by
-        /// the character's prospecting divided by 100, but prospecting from the gear is not being
-        /// computed, so the base percentage is used (equivalent to 100 prospecting).
+        /// Prospecting multiplies a row's chance as the client's tooltips do, from ×1 to ×2.5
+        /// (<see cref="DropMultiplier"/>), but for the rows that say it does not.
         /// </summary>
         private static Dictionary<int, int> RollFightLoot(FightInstance fight, int extra,
                                                           out List<PlayerItem> caidos)
@@ -13050,6 +13049,8 @@ namespace Jondo.Unity.Server.Handlers
             var loot = new Dictionary<int, int>();
             var worn = Managers.Equipment.WornTemplates();
             bool inDungeon = DungeonManager.IsRoom(fight.RoleplayMapId);
+            // His prospecting, which the client's tooltip applies to the monster's own table.
+            double prospecting = DropMultiplier(ProspectingNow());
 
             // SUMMONS do not pay. They go into their summoner's side with IsMonster set, so a
             // monster that summons would put its creature into this loop: it would take its own
@@ -13088,11 +13089,14 @@ namespace Jondo.Unity.Server.Handlers
                     // A quest's item to whoever is on it.
                     if (!SeLoLleva(fight, drop.ReceiverCriterion, Held, monster.MonsterId)) continue;
 
+                    // Prospecting first, as the tooltip: «obtention de base» times its multiplier.
+                    double chance = drop.NoProspecting ? drop.PercentDrop : Math.Min(100.0, drop.PercentDrop * prospecting);
+
                     // In the loot the bonus raises the PROBABILITY of a drop, not the quantity: it is
                     // one roll per item and per monster, and what the challenge improves is the luck.
                     double probabilidad = extra > 0
-                        ? Math.Min(100.0, drop.PercentDrop * (100.0 + extra) / 100.0)
-                        : drop.PercentDrop;
+                        ? Math.Min(100.0, chance * (100.0 + extra) / 100.0)
+                        : chance;
                     probabilidad = ServerSettings.ChanceWithBonus(WithAlmanax(probabilidad), ServerSettings.Current.DropBonusPercent);
                     if (TirarPorcentaje() >= probabilidad) continue;
                     loot.TryGetValue(drop.ObjectId, out int q);

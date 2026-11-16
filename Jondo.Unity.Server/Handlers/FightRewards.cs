@@ -72,11 +72,29 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Prospecting: a hundred, a tenth of chance, and what the gear gives.</summary>
         private static int ProspectingOf(GameSession session)
         {
-            using (SessionContext.Push(session))
-            {
-                Equipment.Bonuses().TryGetValue(Stat.Prospecting, out long fromGear);
-                return 100 + session.State.TotalChance / 10 + (int)fromGear;
-            }
+            using (SessionContext.Push(session)) return ProspectingNow();
+        }
+
+        /// <summary>The prospecting of the session in context.</summary>
+        private static int ProspectingNow()
+        {
+            Equipment.Bonuses().TryGetValue(Stat.Prospecting, out long fromGear);
+            return (int)Math.Clamp(100L + SessionContext.State.TotalChance / 10 + fromGear, int.MinValue, int.MaxValue);
+        }
+
+        /// <summary>
+        /// What prospecting multiplies a drop's chance by: the client's own formula, Lua 106 of its
+        /// luaformulasdataroot, which its bestiary and item tooltips apply to the prospecting above
+        /// a hundred (BestiaryTabUI.GetFinalDropCoeff, Cpp2IL of 3.6.10.11). A curve that starts at
+        /// ×1 for a hundred and stops at ×2.5 -- about ×2.24 at 400, ×2.47 at 600 --, the cap the
+        /// game has had since 2.71 («le coeff de drop est capé à x2.5»).
+        /// </summary>
+        internal static double DropMultiplier(int prospecting)
+        {
+            const double slope = 85, half = 150, top = 117, maxMultiplier = 1.5, toOne = 0.26;
+            double bonus = prospecting - 100;
+            double curve = top * (1 / (1 + Math.Exp(-((bonus - half) / slope)))) / 100;
+            return Math.Min(2.5, Math.Max(1, 1 + maxMultiplier * curve - toOne));
         }
 
         /// <summary>
