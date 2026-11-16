@@ -135,5 +135,20 @@ namespace Jondo.Unity.Tests.Quests
             Assert.Equal((16953, 1), Assert.Single(binding!.Worn));
             Assert.Equal((17066, 1), Assert.Single(binding.Requires));
         }
+
+        [Fact]
+        public void A_walk_row_can_name_the_cells_it_ends_on()
+        {
+            // Pandawelo comes in when the Pandasamblea's carpet is stepped on, not on any step.
+            var book = Read(@"{ ""bindings"": [
+                { ""objective"": 16384, ""quest"": 2150, ""kind"": ""walk"", ""map"": 207618050, ""cells"": [ 301, 315 ] },
+                { ""objective"": 19534, ""quest"": 2502, ""kind"": ""walk"", ""map"": 153092354 } ] }");
+
+            var carpet = book.Of(16384)!;
+            Assert.Equal(new[] { 301, 315 }, carpet.Cells);
+            Assert.True(Jondo.Unity.Server.Managers.Quests.EndsOn(carpet, 315));
+            Assert.False(Jondo.Unity.Server.Managers.Quests.EndsOn(carpet, 302));
+            Assert.True(Jondo.Unity.Server.Managers.Quests.EndsOn(book.Of(19534)!, 302));
+        }
     }
 }

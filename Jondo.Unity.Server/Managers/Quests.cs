@@ -1054,7 +1054,7 @@ namespace Jondo.Unity.Server.Managers
         /// The character has finished a walk on a map: an objective bound as «walk» there is done.
         /// The guided tutorial's 19534 closes this way, server-side, after the client's jqi.
         /// </summary>
-        public static async Task OnWalkedAsync(NetworkStream stream, long mapId)
+        public static async Task OnWalkedAsync(NetworkStream stream, long mapId, int cellId = -1)
         {
             var log = Log;
             if (log == null || _book == null || mapId == 0) return;
@@ -1067,10 +1067,15 @@ namespace Jondo.Unity.Server.Managers
                 {
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Walk || binding.MapId != mapId) continue;
+                    if (!EndsOn(binding, cellId)) continue;
                     await CloseAsync(stream, binding);
                 }
             }
         }
+
+        /// <summary>Whether a walk that ended on this cell is the one a «walk» binding asks for.</summary>
+        internal static bool EndsOn(QuestBinding binding, int cellId)
+            => binding.Cells.Count == 0 || binding.Cells.Contains(cellId);
 
         /// <summary>
         /// A document has been read: an objective bound to reading every one of its elements closes
