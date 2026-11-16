@@ -6820,10 +6820,15 @@ namespace Jondo.Unity.Server.Handlers
                     // row on him and was hooked on top.
                     if (quien.Buffs.Actitudes.Contains(enganche.Hechizo)) continue;
 
+                    // Not from what a hook of the same spell, still resolving, has set off: a
+                    // reaction does not answer itself (FightInstance.HooksResolving).
+                    if (fight.HooksResolving.TryGetValue(enganche.Hechizo, out int resolving) && resolving > 0) continue;
+
                     // Its rows go off as the cast that put it: through portals or not, to the
                     // masks' R and r (Extinción's poison).
                     bool castThroughPortal = fight.CastThroughPortal;
                     fight.CastThroughPortal = enganche.ThroughPortal;
+                    fight.HooksResolving[enganche.Hechizo] = resolving + 1;
                     try
                     {
                         await FireHookAsync(stream, fight, quien, disparador, enganche);
@@ -6831,6 +6836,7 @@ namespace Jondo.Unity.Server.Handlers
                     finally
                     {
                         fight.CastThroughPortal = castThroughPortal;
+                        if (--fight.HooksResolving[enganche.Hechizo] <= 0) fight.HooksResolving.Remove(enganche.Hechizo);
                     }
                 }
             });
