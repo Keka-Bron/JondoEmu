@@ -157,9 +157,11 @@ namespace Jondo.Unity.Tests.Combat
         /// and a Salto Doble, whose burn row every fire on the board casts, killed her.
         /// </summary>
         [Theory]
-        [InlineData(5707, 300)]   // Salto Doble, two cells off
-        [InlineData(5703, 315)]   // Salto Astral, next to the fire
-        public async Task A_fire_pushed_off_and_drawn_back_beside_her_does_not_burn_her(int jump, int from)
+        [InlineData(5707, 300, false)]   // Salto Doble, two cells off
+        [InlineData(5703, 315, false)]   // Salto Astral, next to the fire
+        [InlineData(5707, 300, true)]    // the same, the fires armed as a fight arms them
+        [InlineData(5703, 315, true)]
+        public async Task A_fire_pushed_off_and_drawn_back_beside_her_does_not_burn_her(int jump, int from, bool asBehaviour)
         {
             if (SpellEffects.De(jump, 1).Count == 0 || SpellEffects.De(5705, 1).Count == 0) return;
             var fight = new FightInstance(1, 1);
@@ -187,8 +189,8 @@ namespace Jondo.Unity.Tests.Combat
             fight.AddPlayer(shadow); fight.AddMonster(bolgrot); fight.AddMonster(fire); fight.AddMonster(beyond);
             shadow.Buffs.PonerEstado(272);
             bolgrot.Buffs.PonerEstado(272);
-            fire.Buffs.PonerActitud(5705);
-            beyond.Buffs.PonerActitud(5705);
+            await GiveItsFireSpellAsync(fight, fire, asBehaviour);
+            await GiveItsFireSpellAsync(fight, beyond, asBehaviour);
 
             await FightHandler.AplicarEfectosAsync(null, fight, shadow, jump, 1, fire,
                                                    EffectEngine.AlLanzar, fire.CellId);
@@ -200,6 +202,75 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(shadow.IsAlive);
             // And the jump takes the mark off again: it is this jump's alone.
             Assert.False(beyond.Buffs.TieneEstado(272));
+        }
+
+        /// <summary>
+        /// Round six of a real fight: Inmovilismo has drawn Bolgrot next to the fire the shadow
+        /// then jumps on, and a fire beside it that nothing had moved (no 272) is pushed off and
+        /// drawn back with Bolgrot. Drawn back, it is marked, and it must not burn her. In the
+        /// fight the fires carry 5705 as their behaviour, cast as they come in and its row armed
+        /// on themselves; only an attitude was looked at, and that fire burned her.
+        /// </summary>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task A_fire_drawn_back_with_Bolgrot_beside_the_landing_does_not_burn_her(bool asBehaviour)
+        {
+            const int Jump = 5703;
+            if (SpellEffects.De(Jump, 1).Count == 0 || SpellEffects.De(5705, 1).Count == 0) return;
+            var fight = new FightInstance(1, 1);
+            var shadow = new Fighter
+            {
+                Id = 10, TeamId = 0, CellId = 270, MaxHP = 40, CurrentHP = 12, Level = 160,
+                MaxAP = 10, CurrentAP = 4,
+            };
+            var bolgrot = new Fighter
+            {
+                Id = -1, TeamId = 1, CellId = 256, MaxHP = 1, CurrentHP = 1, Level = 1,
+                IsMonster = true, MonsterId = Bolgrot,
+            };
+            fight.AddPlayer(shadow); fight.AddMonster(bolgrot);
+            var fires = new System.Collections.Generic.Dictionary<int, Fighter>();
+            foreach (var (id, cell, marked) in new[] { (-18, 242, false), (-19, 257, true), (-20, 188, true),
+                                                        (-21, 243, true), (-22, 284, true), (-24, 116, true),
+                                                        (-25, 88, true) })
+            {
+                var f = new Fighter
+                {
+                    Id = id, TeamId = 1, CellId = cell, MaxHP = 1, CurrentHP = 1, Level = 1,
+                    IsMonster = true, MonsterId = Fire, Invocador = bolgrot.Id,
+                };
+                fight.AddMonster(f);
+                await GiveItsFireSpellAsync(fight, f, asBehaviour);
+                if (marked) f.Buffs.PonerEstado(272);
+                fires[id] = f;
+            }
+            shadow.Buffs.PonerEstado(272);
+            bolgrot.Buffs.PonerEstado(272);
+
+            await FightHandler.AplicarEfectosAsync(null, fight, shadow, Jump, 1, fires[-19],
+                                                   EffectEngine.AlLanzar, 257);
+
+            Assert.False(fires[-19].IsAlive);
+            Assert.Equal(257, shadow.CellId);
+            Assert.Equal(242, fires[-18].CellId);
+            Assert.True(shadow.IsAlive);
+        }
+
+        /// <summary>
+        /// A fire's 5705, as an attitude or as a fight gives it: its behaviour spell, cast as it
+        /// comes in, its MA row armed on itself.
+        /// </summary>
+        private static async Task GiveItsFireSpellAsync(FightInstance fight, Fighter fire, bool asBehaviour)
+        {
+            if (!asBehaviour)
+            {
+                fire.Buffs.PonerActitud(5705);
+                return;
+            }
+            fire.Conducta = (5705, 1);
+            await FightHandler.LanzarLaConductaAsync(null, fight, fire);
+            Assert.Contains(fire.Buffs.ActiveSpells, hook => hook.Hechizo == 5705);
         }
 
         /// <summary>A share of the life taken (Último Aliento's -50%) still never kills as it lands.</summary>

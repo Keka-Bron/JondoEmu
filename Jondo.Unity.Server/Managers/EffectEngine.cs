@@ -4096,42 +4096,66 @@ namespace Jondo.Unity.Server.Managers
         /// could not be drawn in, «bloquée», as the guide has it. Marked at the end, the fires
         /// the jump had just drawn in were judged without the state: a Salto Doble, whose burn
         /// row every fire on the board casts, killed her off a fire pushed and drawn back.
-        /// Anything else in the attitude, or a hook of somebody's on him for MA, leaves it all
-        /// to the end of the cast, as before.
         /// </summary>
+        /// <remarks>
+        /// The attitude is either an item's or a summon's spell given as one (Buffs.Actitudes), or
+        /// a monster's behaviour spell, cast as it comes in and its MA rows armed on itself
+        /// (Buffs.ArmarFilas, its own id as the caster) -- which is how the fires really carry
+        /// 5705: with only the first looked at, they were never marked in a real fight, and a
+        /// fire pushed off and drawn back beside the shadow burned her in round six. Anything
+        /// else under MA -- a row that is not a state on himself, a delay, a hook somebody else
+        /// put on him -- leaves it all to the end of the cast, as before.
+        /// </remarks>
         private static List<Outcome> MarksOfBeingDrawnIn(FightInstance combat, Fighter drawn, int round, int depth)
         {
-            if (drawn == null || !drawn.IsAlive || drawn.Buffs.Actitudes.Count == 0) return null;
+            if (drawn == null || !drawn.IsAlive) return null;
 
             static bool OnBeingDrawnIn(SpellEffect row)
                 => row.Disparadores().Any(d => string.Equals(d, AlSerAtraido, StringComparison.OrdinalIgnoreCase));
-
-            foreach (var hook in drawn.Buffs.ActiveSpells)
-            {
-                if (drawn.Buffs.Actitudes.Contains(hook.Hechizo)) continue;
-                if (SpellEffects.De(hook.Hechizo, hook.Grado).Any(OnBeingDrawnIn)) return null;
-            }
+            static bool IsAMarkOnHimself(SpellEffect row)
+                => row.EffectId is EffectSupport.AddState or EffectSupport.RemoveState
+                   && row.Delay <= 0
+                   && string.Equals((row.TargetMask ?? "").Trim(), "C", StringComparison.Ordinal);
 
             var answering = new List<(int Spell, int Grade)>();
+            foreach (var hook in drawn.Buffs.ActiveSpells)
+            {
+                if (drawn.Buffs.Actitudes.Contains(hook.Hechizo) || !hook.Vivo(round)) continue;
+                var rows = SpellEffects.De(hook.Hechizo, hook.Grado).Where(OnBeingDrawnIn).ToList();
+                if (hook.Filas != null) rows = rows.Where(row => hook.Filas.Contains(ArmedRowKey(row))).ToList();
+                if (rows.Count == 0) continue;
+                // Only his own behaviour, armed whole, at the plain grade, is answered here.
+                bool his = hook.Lanzador == 0 || hook.Lanzador == drawn.Id;
+                bool whole = hook.Filas == null
+                             || SpellEffects.De(hook.Hechizo, hook.Grado).Where(OnBeingDrawnIn)
+                                            .All(row => hook.Filas.Contains(ArmedRowKey(row)));
+                if (!his || !whole || hook.Critico || !rows.All(IsAMarkOnHimself)) return null;
+                if (!answering.Contains((hook.Hechizo, hook.Grado))) answering.Add((hook.Hechizo, hook.Grado));
+            }
+
             foreach (int attitude in drawn.Buffs.Actitudes)
             {
                 int grade = drawn.Buffs.GradoDeActitud(attitude);
                 var rows = SpellEffects.De(attitude, grade).Where(OnBeingDrawnIn).ToList();
                 if (rows.Count == 0) continue;
-                if (!rows.All(row => row.EffectId is EffectSupport.AddState or EffectSupport.RemoveState
-                                     && row.Delay <= 0
-                                     && string.Equals((row.TargetMask ?? "").Trim(), "C", StringComparison.Ordinal)))
-                    return null;
-                answering.Add((attitude, grade));
+                if (!rows.All(IsAMarkOnHimself)) return null;
+                if (!answering.Contains((attitude, grade))) answering.Add((attitude, grade));
             }
             if (answering.Count == 0) return null;
 
             var marks = new List<Outcome>();
-            foreach (var (attitude, grade) in answering)
-                marks.AddRange(Resolver(combat, drawn, attitude, grade, drawn, AlSerAtraido, round,
+            foreach (var (spell, grade) in answering)
+                marks.AddRange(Resolver(combat, drawn, spell, grade, drawn, AlSerAtraido, round,
                                         depth + 1, drawn.CellId, armar: false));
             return marks;
         }
+
+        /// <summary>
+        /// The key an armed row is held by in a hook (Buffs.ArmarFilas): its effect uid, or its
+        /// place when it has none.
+        /// </summary>
+        internal static int ArmedRowKey(SpellEffect row)
+            => row.EffectUid != 0 ? row.EffectUid : -1 - (row.EffectId * 31 + row.DiceNum);
 
         private static IEnumerable<Fighter> Todos(FightInstance combate)
         {

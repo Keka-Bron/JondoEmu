@@ -6547,8 +6547,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The key an armed row is held by: its effect uid, or its place when it has none.</summary>
-        private static int ClaveDeFila(Managers.SpellEffect fila)
-            => fila.EffectUid != 0 ? fila.EffectUid : -1 - (fila.EffectId * 31 + fila.DiceNum);
+        private static int ClaveDeFila(Managers.SpellEffect fila) => Managers.EffectEngine.ArmedRowKey(fila);
 
         /// <summary>The rows of an armed hook that wait on this trigger.</summary>
         private static List<Managers.SpellEffect> FilasArmadas(Jondo.Unity.World.Fights.Buffs.ActiveSpell enganche,
