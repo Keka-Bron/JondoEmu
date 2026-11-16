@@ -296,7 +296,7 @@ namespace Jondo.Unity.Server.Handlers
                 ? LasQueTocan(primera)
                 : SinArbolEscrito(template!);
 
-            // And if this NPC guards a dungeon's door, his two options up front.
+            // And if this NPC guards a dungeon's door, his fresh entry options up front.
             //
             // Without this, a guardian without a written tree falls into SinArbolEscrito, which
             // returns THE LAST answer of the template and nothing else: Mawy Ingals declares nineteen
@@ -336,6 +336,9 @@ namespace Jondo.Unity.Server.Handlers
             // key without the key.
             respuestas = respuestas.Where(r => !DungeonHandler.KeyringOfferedForNothing(npc.NpcId, mapId, r)
                                                && !DungeonHandler.KeyOfferedForNothing(npc.NpcId, mapId, r)).ToArray();
+
+            long resume = DungeonHandler.ResumeReply(npc.NpcId, mapId, SessionContext.State.CharacterId);
+            if (resume != 0 && !respuestas.Contains(resume)) respuestas = respuestas.Append(resume).ToArray();
 
             // And a jailer takes the criminals carried and sells the news of those still out.
             long[] wanted = WantedHandler.OpeningReplies(npc.NpcId, mapId);
@@ -1250,6 +1253,8 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (field.FieldNumber == 1 && field.WireType == 0) reply = field.VarIntValue;
             }
+
+            if (await DungeonHandler.TryResumeAsync(stream, reply)) return;
 
             // A dimension's portal: its one reply goes through it.
             if (await DimensionPortalHandler.ReplyAsync(stream, reply)) return;

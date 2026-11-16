@@ -32,6 +32,8 @@ namespace Jondo.Unity.Tests
                     using var pragma = db.CreateCommand();
                     pragma.CommandText = "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;";
                     pragma.ExecuteNonQuery();
+                    if (file == Paths.WorldDb)
+                        Jondo.Unity.Server.Managers.DungeonProgress.EnsureTable(db);
                 }
                 catch (Exception ex)
                 {

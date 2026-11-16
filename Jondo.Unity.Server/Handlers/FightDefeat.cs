@@ -76,7 +76,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var (map, cell) = SavePointOf(character);
             Program.LogDebug($"[Fight] {character} lost: -{lost} energy ({energy - lost} left), " +
-                             $"{missing} life missing, back to map {map} cell {cell}.");
+                             $"{missing} life missing.");
             return new DefeatOutcome(lost, energy - lost, missing, map, cell);
         }
 

@@ -8,6 +8,7 @@ using Google.Protobuf;
 using Jondo.Unity.Protocol.Messages;
 using Jondo.Unity.Server.Database.Migrations;
 using Jondo.Unity.Server.Database;
+using Jondo.Unity.Server.Managers;
 
 namespace Jondo.Unity.Server
 {
@@ -673,6 +674,8 @@ namespace Jondo.Unity.Server
                     );
                 ";
                 createKeyring.ExecuteNonQuery();
+
+                DungeonProgress.EnsureTable(worldConnection);
 
                 // The interactives this character has ever used.
                 //
@@ -2306,7 +2309,7 @@ namespace Jondo.Unity.Server
             "CharacterWardrobe", "CharacterAppearance", "CharacterOutfits", "CharacterJobs", "CharacterCrafterSettings",
             "CharacterDreams",
             "CharacterChallenges", "CharacterQuests", "CharacterAchievements",
-            "CharacterKeyring", "CharacterElements",
+            "CharacterKeyring", "CharacterDungeonProgress", "CharacterElements",
             "CharacterEnergy", "CharacterExperienceLimit",
             "CharacterSavedPositions", "CharacterPresets", "CharacterItemShortcuts", "CharacterPendingChanges",
         };

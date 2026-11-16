@@ -11940,8 +11940,8 @@ namespace Jondo.Unity.Server.Handlers
                              $"level {GameState.CharacterLevel}), {kamas} kamas and {loot.Count} kind(s) of item.");
 
             // What losing costs, against monsters (FightDefeat.cs): the energy, half the life, and
-            // the way back to the save point. Applied before the kub, which is what shows the
-            // first two. Any other end gives the life back whole, as it always has.
+            // the saved Zaap to use if there is no more specific destination. Apply the penalties
+            // before the kub, which shows the energy and life.
             var defeat = !gane && DefeatCostsIn(fight) ? ApplyDefeat() : null;
             if (defeat == null) Managers.RestingLife.Clear(GameState.CharacterId);
 
@@ -12016,19 +12016,27 @@ namespace Jondo.Unity.Server.Handlers
                 : fight.RoleplayMapId;
             LeaveFight();
 
-            // A loser does not go back where he fought: he goes to his save point, beside its
-            // zaap. Set after LeaveFight, which puts him back on the map he left. A prisoner
-            // does not: a lost fight is no way out of jail, and he goes back to his cell.
-            // Nor does one who falls in a conquest: he stays where he fought, a tomb
-            // (ConquestHandler.StaysAsTomb).
-            if (defeat != null && MapManager.GetMapInfo(defeat.SavePointMap) != null
+            long dungeonEntrance = 0;
+            if (fight.Reglas.AvanzaDeSala && (won || defeat != null))
+                dungeonEntrance = DungeonHandler.RecordFightProgress(GameState.CharacterId, fight.RoleplayMapId, won);
+
+            // A loser returns to the dungeon entrance or the saved Zaap. LeaveFight has restored
+            // the combat's roleplay map, so set the destination here before sending the new map.
+            if (defeat != null
                 && !Managers.Jail.IsJailed(Network.SessionContext.State.CharacterId)
                 && !ConquestHandler.StaysAsTomb(fight, Network.SessionContext.State.CharacterId))
             {
-                back = defeat.SavePointMap;
-                Network.SessionContext.State.MapId = defeat.SavePointMap;
-                Network.SessionContext.State.CellId = defeat.SavePointCell;
-                DatabaseManager.SaveCurrentCharacter();
+                bool atDungeon = dungeonEntrance != 0 && MapManager.GetMapInfo(dungeonEntrance) != null;
+                long destination = atDungeon ? dungeonEntrance : defeat.SavePointMap;
+                if (MapManager.GetMapInfo(destination) != null)
+                {
+                    back = destination;
+                    Network.SessionContext.State.MapId = destination;
+                    Network.SessionContext.State.CellId = atDungeon
+                        ? MapManager.GetNearestWalkableCell(destination, TeleportHandler.MapCentre)
+                        : defeat.SavePointCell;
+                    DatabaseManager.SaveCurrentCharacter();
+                }
             }
 
             // Lost inside the Gigalodón: back to the top of the abyss, without the treasures he
