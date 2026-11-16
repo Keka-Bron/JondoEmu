@@ -239,7 +239,61 @@ namespace Jondo.Unity.Server.Handlers
             await NpcHandler.CloseAsync(stream);
 
             Console.WriteLine($"[Dungeon] Enters {dungeon.Name}, room 1 of {dungeon.Rooms.Count}.");
-            await TeleportHandler.ToMapAsync(stream, dungeon.FirstRoom);
+            return await EnterNewRunAsync(stream, dungeon, dungeon.FirstRoom, heroWays);
+        }
+
+        private static async Task<bool> EnterNewRunAsync(NetworkStream stream, DungeonManager.Dungeon dungeon,
+                                                         long room, List<HeroWay> heroWays)
+        {
+            if (await TeleportHandler.ToMapAsync(stream, room) < 0) return false;
+
+            DungeonProgress.SetRoom(SessionContext.State.CharacterId, dungeon, room);
+            foreach (var way in heroWays)
+                DungeonProgress.SetRoom(way.Hero.CharacterId, dungeon, room);
+            return true;
+        }
+
+        internal static long ResumeRoom(DungeonManager.Dungeon dungeon, long characterId)
+        {
+            long room = DungeonProgress.SavedRoom(characterId, dungeon);
+            return room != 0 && MapManager.GetMapInfo(room) != null ? room : 0;
+        }
+
+        internal static long ResumeReply(int npcId, long mapId, long characterId)
+        {
+            long reply = DungeonDoor.For(npcId).Resume;
+            var dungeon = DungeonManager.AtEntrance(mapId);
+            return reply != 0 && dungeon != null && ResumeRoom(dungeon, characterId) != 0 ? reply : 0;
+        }
+
+        // A resume reply is handled here even if the checkpoint disappeared after the window opened.
+        internal static async Task<bool> TryResumeAsync(NetworkStream stream, long reply)
+        {
+            var state = SessionContext.State;
+            if (reply == 0 || reply != DungeonDoor.For(state.OpenDialogueNpcId).Resume) return false;
+            var dungeon = DungeonManager.AtEntrance(state.OpenDialogueMapId);
+            if (dungeon == null) return false;
+            if (state.IsInFight || state.OpenDialogueMapId != state.MapId) return true;
+
+            long room = ResumeRoom(dungeon, state.CharacterId);
+            if (room == 0) return true;
+            if (await Jail.KeepsInAsync(stream) || await HeadHunts.HoldsAsync(stream, HeadHunts.Hold.Dungeon))
+                return true;
+            if (dungeon.MinLevel > state.CharacterLevel)
+            {
+                await WarnAsync(stream, NotHighEnough);
+                return true;
+            }
+
+            // TeleportHandler moves following heroes with the master, so each needs this checkpoint.
+            if (Following(state.CharacterId).Any(hero => DungeonProgress.SavedRoom(hero.CharacterId, dungeon) != room))
+            {
+                await TellAsync(stream, CommandTexts.Get("dungeon.heroes_resume_room"));
+                return true;
+            }
+
+            await NpcHandler.CloseAsync(stream);
+            await TeleportHandler.ToMapAsync(stream, room);
             return true;
         }
 
@@ -301,7 +355,24 @@ namespace Jondo.Unity.Server.Handlers
             long to = room != 0 && dungeon.Rooms.Contains(room) ? room : dungeon.FirstRoom;
             Console.WriteLine($"[Dungeon] {state.CharacterName} enters {dungeon.Name} by the search, " +
                               $"room {dungeon.Rooms.IndexOf(to) + 1} of {dungeon.Rooms.Count}.");
-            return await TeleportHandler.ToMapAsync(stream, to) >= 0;
+            return await EnterNewRunAsync(stream, dungeon, to, heroWays);
+        }
+
+        // Called before the fight sends its return map. A win saves the next room, or clears the
+        // checkpoint after the boss. A defeat saves the room the character fought in.
+        internal static long RecordFightProgress(long characterId, long room, bool won)
+        {
+            var dungeon = DungeonManager.OfRoom(room);
+            if (dungeon == null || (dungeon.Authored && !dungeon.KeepsADoor)) return 0;
+
+            DungeonProgress.SetRoom(characterId, dungeon, won ? DungeonManager.NextRoom(dungeon, room) : room);
+            if (won) return 0;
+
+            long entrance = dungeon.EntranceMapId;
+            if (entrance != 0 && !DungeonManager.IsRoom(entrance) && MapManager.GetMapInfo(entrance) != null)
+                return entrance;
+            long exit = DungeonManager.WayOut(dungeon);
+            return DungeonManager.IsRoom(exit) ? 0 : exit;
         }
 
         /// <summary>

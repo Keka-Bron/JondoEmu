@@ -141,6 +141,9 @@ namespace Jondo.Unity.Server.Handlers
                         }
                         GameState.IsInFight = false;
                         hero.Session.State.FightId = 0;
+                        bool won = fight.SigueVivo(fighter.TeamId);
+                        if (fight.Reglas.AvanzaDeSala && (won || DefeatCostsIn(fight)))
+                            DungeonHandler.RecordFightProgress(fighter.Id, fight.RoleplayMapId, won);
                         var master = SessionRegistry.FindByCharacter(hero.MasterId);
                         if (master != null)
                         {

@@ -35,32 +35,12 @@ namespace Jondo.Unity.Tests.World
             try
             {
                 await using var pipe = await ClientPipe.OpenAsync(account, character, BossRoom);
-                var fight = new FightInstance(character, BossRoom);
-                fight.AddPlayer(new Fighter { Id = character, TeamId = 0, CellId = 300,
-                    Level = 1, MaxHP = 100, CurrentHP = 100 });
-                fight.AddMonster(new Fighter { Id = -1, TeamId = 1, CellId = 314,
-                    MonsterId = 4051, IsMonster = true, Level = 1, MaxHP = 1, CurrentHP = 0 });
-                pipe.Session.State.IsInFight = true;
-                pipe.Session.State.RoleplayMapId = BossRoom;
-                pipe.Session.State.RoleplayCellId = 300;
-
-                using (SessionContext.Push(pipe.Session))
-                {
-                    var finish = typeof(FightHandler).GetMethod("TerminarParaUnoAsync",
-                        BindingFlags.Static | BindingFlags.NonPublic)!;
-                    await (Task)finish.Invoke(null, new object[] { pipe.ToClient, fight, true, true })!;
-                }
+                await FinishFightAsync(pipe, character, won: true);
 
                 Assert.False(pipe.Session.State.IsInFight);
                 Assert.Equal(ExitRoom, pipe.Session.State.MapId);
                 Assert.Equal(382, pipe.Session.State.CellId);
-                while (true)
-                {
-                    var (op, body) = await pipe.NextAny();
-                    if (op != Op.Jru) continue;
-                    Assert.Equal(ExitRoom, Number(body, 2));
-                    break;
-                }
+                Assert.Equal(ExitRoom, Number(await LoadMapAsync(pipe), 2));
                 Assert.False(DungeonManager.IsRoom(ExitRoom));
                 Assert.False(DungeonHandler.IsBossRoom(ExitRoom));
                 Assert.Equal(Outside, DungeonManager.WayOut(DungeonManager.Get(90)!));
@@ -68,6 +48,91 @@ namespace Jondo.Unity.Tests.World
             finally
             {
                 DatabaseManager.DeleteCharacter(character, account);
+            }
+        }
+
+        [Fact]
+        public async Task Boss_defeat_returns_to_the_guardian_and_the_saved_room_survives_reconnect()
+        {
+            const long account = 8_923_000_034, resume = 24967;
+            Load();
+            Npcs.Initialize();
+            DungeonDoor.Initialize();
+            var dungeon = DungeonManager.Get(90)!;
+            var guardian = Assert.Single(Npcs.OnMap(Outside), n => n.NpcId == 2907);
+            long character = DatabaseManager.CreateCharacter(account, 1, "Kardorim-Reprise", 5, 0, 1,
+                new long[] { -1, -1, -1, -1, -1 }, BossRoom, 300, 0, 0, Array.Empty<(int, int)>());
+            Assert.True(character > 0);
+            try
+            {
+                Assert.Equal(0, DungeonHandler.ResumeReply(guardian.NpcId, Outside, character));
+                await using (var defeated = await ClientPipe.OpenAsync(account, character, BossRoom))
+                {
+                    await FinishFightAsync(defeated, character, won: false);
+                    Assert.Equal(Outside, defeated.Session.State.MapId);
+                    Assert.Equal(Outside, Number(await LoadMapAsync(defeated), 2));
+                }
+
+                Assert.Equal(Outside, DatabaseManager.MapOfOffline(character));
+                Assert.Equal(BossRoom, DungeonProgress.SavedRoom(character, dungeon));
+                Assert.Equal(0, DungeonHandler.ResumeReply(guardian.NpcId, Outside, character + 1));
+
+                await using var resumed = await ClientPipe.OpenAsync(account, character, Outside);
+                resumed.Session.State.CharacterLevel = 5;
+                using (SessionContext.Push(resumed.Session))
+                {
+                    Assert.Empty(Equipment.All);
+                    await NpcHandler.InteractAsync(resumed.ToClient, ConnectionProtocol.Push(Op.Iov,
+                        Pb.New().Var(1, Npcs.Talk).Var(2, Outside).Var(3, guardian.ContextualId).Build()));
+                    await resumed.Next(Op.Ioc);
+                    var options = ProtoMessage.Parse(await resumed.Next(Op.Ios)).Fields;
+                    Assert.Contains(options, f => f.FieldNumber == 2 && Number(f.BytesValue, 1) == resume);
+
+                    await NpcHandler.ReplyAsync(resumed.ToClient,
+                        ConnectionProtocol.Push(Op.Ioy, Pb.New().Var(1, resume).Build()));
+                    await resumed.Next(Op.Kld);
+                    Assert.Equal(BossRoom, Number(await LoadMapAsync(resumed), 2));
+                    Assert.Equal(BossRoom, resumed.Session.State.MapId);
+                    Assert.False(NpcHandler.IsDialogueOpen);
+                    Assert.Empty(Equipment.All);
+                }
+
+                await FinishFightAsync(resumed, character, won: true);
+                Assert.Equal(ExitRoom, Number(await LoadMapAsync(resumed), 2));
+                Assert.Equal(0, DungeonProgress.SavedRoom(character, dungeon));
+                Assert.Equal(0, DungeonHandler.ResumeReply(guardian.NpcId, Outside, character));
+            }
+            finally
+            {
+                DatabaseManager.DeleteCharacter(character, account);
+            }
+        }
+
+        private static async Task FinishFightAsync(ClientPipe pipe, long character, bool won)
+        {
+            var fight = new FightInstance(character, BossRoom);
+            fight.AddPlayer(new Fighter { Id = character, TeamId = 0, CellId = 300,
+                Level = 5, MaxHP = 100, CurrentHP = won ? 100 : 0 });
+            fight.AddMonster(new Fighter { Id = -1, TeamId = 1, CellId = 314,
+                MonsterId = 4051, IsMonster = true, Level = 1, MaxHP = 1, CurrentHP = won ? 0 : 1 });
+            pipe.Session.State.IsInFight = true;
+            pipe.Session.State.RoleplayMapId = BossRoom;
+            pipe.Session.State.RoleplayCellId = 300;
+
+            using (SessionContext.Push(pipe.Session))
+            {
+                var finish = typeof(FightHandler).GetMethod("TerminarParaUnoAsync",
+                    BindingFlags.Static | BindingFlags.NonPublic)!;
+                await (Task)finish.Invoke(null, new object[] { pipe.ToClient, fight, won, won })!;
+            }
+        }
+
+        private static async Task<byte[]> LoadMapAsync(ClientPipe pipe)
+        {
+            while (true)
+            {
+                var (op, body) = await pipe.NextAny();
+                if (op == Op.Jru) return body;
             }
         }
 

@@ -5,12 +5,12 @@ using Microsoft.Data.Sqlite;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// The two replies a dungeon guardian offers: the keyring, and the loose key.
+    /// The replies a dungeon guardian uses for fresh entry and resuming a saved room.
     /// </summary>
     /// <remarks>
     /// The guardian was showing one option, "No.", because with no authored tree the server falls
     /// back to the last reply in the template. Mawy Ingals, who guards the Granero del Girasol
-    /// Hambriento, declares nineteen of them, and two are the ones that matter:
+    /// Hambriento, declares nineteen of them, including these:
     ///
     /// <code>
     ///    6615  Utilizar el manojo de llaves.
@@ -109,6 +109,8 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>"Darle la llave y entrar.", or zero.</summary>
             public long Key { get; init; }
 
+            public long Resume { get; init; }
+
             /// <summary>Whether the guardian declared more than one of either, so the pick is a guess.</summary>
             public bool Ambiguous { get; init; }
 
@@ -131,12 +133,11 @@ namespace Jondo.Unity.Server.Managers
         private static readonly Options Empty = new Options();
 
         /// <summary>
-        /// Reads the client's text table once and works out each guardian's two replies.
+        /// Reads the client's text table once and works out each guardian's entry replies.
         /// </summary>
         /// <remarks>
         /// Done at boot rather than per conversation: it is one pass over the NPC templates already
-        /// in memory plus one query for the handful of translation keys that carry those two
-        /// sentences, and doing it while somebody is stood at a door would be a database round trip
+        /// in memory and queries for translation keys. Doing it while somebody is stood at a door would be a database round trip
         /// in the middle of a dialogue.
         /// </remarks>
         public static void Initialize()
@@ -151,18 +152,12 @@ namespace Jondo.Unity.Server.Managers
             // «Sí.» and «Sí, ...», not every sentence that opens with those letters («Sígueme»).
             var yes = TextKeysSaying(YesWording + ".");
             yes.UnionWith(TextKeysSaying(YesWording + ","));
-
-            if (keyring.Count == 0 && key.Count == 0)
-            {
-                Console.WriteLine("[Dungeon] The door lines were not found: " +
-                                  "the guardians will offer neither key nor keyring.");
-                return;
-            }
+            var resume = TextKeysSaying("Retomar % donde % dejaste");
 
             int ambiguos = 0;
             foreach (var template in Npcs.Templates)
             {
-                var options = Pick(template.Replies, template.ReplyTexts, keyring, key, yes);
+                var options = Pick(template.Replies, template.ReplyTexts, keyring, key, yes, resume);
                 if (options == null) continue;
 
                 if (options.Ambiguous) ambiguos++;
@@ -176,7 +171,7 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// One guardian's two replies, picked out of everything it can say. Null when it says neither.
+        /// A guardian's entry replies, picked out of everything it can say.
         /// </summary>
         /// <remarks>
         /// Its own method so it can be driven with a real guardian's declared replies in a test
@@ -186,9 +181,10 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static Options? Pick(long[] replies, long[] texts,
                                     ISet<long> keyringTexts, ISet<long> keyTexts,
-                                    ISet<long>? yesTexts = null)
+                                    ISet<long>? yesTexts = null, ISet<long>? resumeTexts = null)
         {
             long conManojo = 0, conLlave = 0;
+            long resume = 0;
             int cuantosManojo = 0, cuantasLlaves = 0;
             var yes = new HashSet<long>();
 
@@ -199,6 +195,9 @@ namespace Jondo.Unity.Server.Managers
                 long text = texts![i];
                 if (yesTexts != null && yesTexts.Contains(text)) yes.Add(reply);
                 if (reply >= Expedition) continue;
+
+                if (resumeTexts?.Contains(text) == true && (resume == 0 || reply < resume))
+                    resume = reply;
 
                 if (keyringTexts.Contains(text))
                 {
@@ -212,12 +211,13 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
 
-            if (conManojo == 0 && conLlave == 0) return null;
+            if (conManojo == 0 && conLlave == 0 && resume == 0) return null;
 
             return new Options
             {
                 Keyring = conManojo,
                 Key = conLlave,
+                Resume = resume,
                 Ambiguous = cuantosManojo > 1 || cuantasLlaves > 1,
                 Yes = yes,
             };
