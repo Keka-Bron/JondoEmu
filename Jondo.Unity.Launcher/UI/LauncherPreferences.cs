@@ -95,15 +95,18 @@ namespace Jondo.Unity.Launcher.UI
 
         public static Language Language
         {
-            get => Leer().TryGetValue(ClaveIdioma, out string? v)
-                ? v.Trim().ToLowerInvariant() switch
-                {
-                    "en" => UI.Language.En,
-                    "fr" => UI.Language.Fr,
-                    _ => UI.Language.Es,
-                }
-                : UI.Language.Es;
+            get => Leer().TryGetValue(ClaveIdioma, out string? v) ? LauncherTexts.Parse(v) : DelSistema();
             set => Escribir(ClaveIdioma, LauncherTexts.Code(value));
+        }
+
+        /// <summary>
+        /// The first time, before anyone has chosen: the system's language when the launcher speaks
+        /// it, so the installer greets a Brazilian in Portuguese; Spanish otherwise, as always.
+        /// </summary>
+        private static Language DelSistema()
+        {
+            string sistema = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            return LauncherTexts.Parse(sistema);
         }
 
         // ─── The game's language ────────────────────────────────────────────────
@@ -163,13 +166,13 @@ namespace Jondo.Unity.Launcher.UI
         public static LauncherTexts Textos => LauncherTexts.Get(Language);
 
         /// <summary>Whether the server is this machine's, which is what decides whether it can be started.</summary>
-        public static bool ServerIsLocal
+        public static bool ServerIsLocal => IsThisMachine(ServerHost);
+
+        /// <summary>Whether an address is this machine: empty (the default), 127.0.0.1 or localhost.</summary>
+        public static bool IsThisMachine(string host)
         {
-            get
-            {
-                string donde = ServerHost;
-                return donde == Contract.LocalIp || donde.Equals("localhost", StringComparison.OrdinalIgnoreCase);
-            }
+            string donde = (host ?? "").Trim();
+            return donde.Length == 0 || donde == Contract.LocalIp || donde.Equals("localhost", StringComparison.OrdinalIgnoreCase);
         }
 
         // ─── Texture packs ─────────────────────────────────────────────────────

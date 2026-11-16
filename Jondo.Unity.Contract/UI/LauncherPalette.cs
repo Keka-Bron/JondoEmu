@@ -116,5 +116,40 @@ namespace Jondo.Unity.Launcher.UI
         public const uint LogNormal = 0xFFD1BA86;
 
         public const uint LogTime = 0xFF7A6548;
+
+        // ─── The launcher's surfaces (the 2026 redesign) ─────────────────────
+        //
+        // The art stays the ground; what is read sits on panels dark enough to read on, and
+        // the cards inside a panel are a step lighter than it. Hairlines are the gold at a fifth.
+
+        /// <summary>The panels over the art: the top bar, the team, the settings.</summary>
+        public const uint SurfaceFill = 0xF0110A06;
+
+        /// <summary>A card inside a panel: a settings section, the step in hand.</summary>
+        public const uint SurfaceRaised = 0xFF1B120B;
+
+        /// <summary>A card under the pointer.</summary>
+        public const uint SurfaceHover = 0xFF271A10;
+
+        /// <summary>Wells: fields, grooves, the inside of a segmented control.</summary>
+        public const uint SurfaceSunken = 0xB3070402;
+
+        /// <summary>The thin lines that separate, and the edge of a card.</summary>
+        public const uint Hairline = 0x33E6C280;
+
+        /// <summary>The edge of what is chosen or under the pointer.</summary>
+        public const uint HairlineStrong = 0x99D4AF37;
+
+        /// <summary>Text that explains: under a title, beside a value.</summary>
+        public const uint TextSecondary = 0xFFC2AD86;
+
+        /// <summary>Text that only situates: captions, units, the time a step took.</summary>
+        public const uint TextTertiary = 0xFF8F7A5A;
+
+        /// <summary>What deletes or stopped.</summary>
+        public const uint Danger = 0xFFE5604D;
+
+        /// <summary>What needs a look but did not fail.</summary>
+        public const uint Warning = 0xFFE6A23C;
     }
 }

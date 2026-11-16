@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Jondo.Unity.Launcher.Packs;
+using Jondo.Unity.Launcher.UI.Widgets;
 
 namespace Jondo.Unity.Launcher.UI
 {
@@ -31,16 +32,16 @@ namespace Jondo.Unity.Launcher.UI
             public string? Note { get; set; }
 
             public Border Root { get; set; } = null!;
-            public TextBlock Name { get; } = new() { FontSize = 13, FontWeight = FontWeight.Bold };
-            public TextBlock Size { get; } = new() { FontSize = 11, VerticalAlignment = VerticalAlignment.Center };
+            public TextBlock Name { get; } = new() { FontSize = 13.5, FontWeight = FontWeight.SemiBold };
+            public TextBlock Size { get; } = new() { FontSize = 11.5, VerticalAlignment = VerticalAlignment.Center };
             public TextBlock Hint { get; } = new() { Classes = { "pie" } };
-            public TextBlock State { get; } = new() { FontSize = 11, TextWrapping = TextWrapping.Wrap };
-            public ProgressBar Bar { get; } = new() { Minimum = 0, Maximum = 1, Height = 6, MinHeight = 6 };
-            public TextBlock ActionText { get; } = new() { FontSize = 11.5, FontWeight = FontWeight.Bold };
-            public Button Action { get; } = new() { Classes = { "launcher", "green" }, Height = 30, MinWidth = 110 };
-            public TextBlock RemoveText { get; } = new() { FontSize = 11.5, FontWeight = FontWeight.Bold };
-            public Button Remove { get; } = new() { Classes = { "launcher", "danger" }, Height = 30, MinWidth = 90 };
-            public CheckBox Use { get; } = new() { FontSize = 11.5 };
+            public TextBlock State { get; } = new() { FontSize = 12, TextWrapping = TextWrapping.Wrap };
+            public ProgressStrip Bar { get; } = new() { Height = 6 };
+            public TextBlock ActionText { get; } = new();
+            public Button Action { get; } = new() { Classes = { "secondary" }, MinHeight = 32, Height = 32, MinWidth = 104 };
+            public TextBlock RemoveText { get; } = new();
+            public Button Remove { get; } = new() { Classes = { "danger" }, MinHeight = 32, Height = 32, MinWidth = 84 };
+            public CheckBox Use { get; } = new() { FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
         }
 
         private readonly List<PackRow> _filasDePacks = new();
@@ -53,7 +54,7 @@ namespace Jondo.Unity.Launcher.UI
 
         private void RefrescarPacks()
         {
-            RotuloGraficos.Text = Textos.Graficos(_idioma).ToUpperInvariant();
+            RotuloGraficos.Text = Textos.Graficos(_idioma);
             PieGraficos.Text = Textos.PieGraficos(_idioma);
 
             if (_filasDePacks.Count == 0)
@@ -80,15 +81,10 @@ namespace Jondo.Unity.Launcher.UI
             var fila = new PackRow(pack);
 
             fila.Name.Foreground = new SolidColorBrush(LauncherSkin.CardText);
-            fila.Size.Foreground = new SolidColorBrush(LauncherSkin.MutedGold);
-            fila.State.Foreground = new SolidColorBrush(LauncherSkin.SoftGold);
-            fila.Use.Foreground = new SolidColorBrush(LauncherSkin.SoftGold);
-            fila.Bar.Foreground = new SolidColorBrush(LauncherSkin.Gold);
-            fila.Bar.Background = new SolidColorBrush(Color.FromArgb(64, 0, 0, 0));
+            fila.Size.Foreground = new SolidColorBrush(LauncherSkin.TextTertiary);
+            fila.State.Foreground = new SolidColorBrush(LauncherSkin.TextSecondary);
             fila.ActionText.HorizontalAlignment = HorizontalAlignment.Center;
             fila.RemoveText.HorizontalAlignment = HorizontalAlignment.Center;
-            fila.Action.Padding = new Avalonia.Thickness(12, 0);
-            fila.Remove.Padding = new Avalonia.Thickness(12, 0);
             fila.Action.Content = fila.ActionText;
             fila.Remove.Content = fila.RemoveText;
 
@@ -107,13 +103,21 @@ namespace Jondo.Unity.Launcher.UI
             cabecera.Children.Add(fila.Name);
             cabecera.Children.Add(fila.Size);
 
+            // What can be done with it, and under that whether the game is offered it.
+            fila.Remove.Margin = new Avalonia.Thickness(8, 0, 0, 0);
+            var acciones = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Children = { fila.Action, fila.Remove },
+            };
+
             fila.Root = new Border
             {
-                CornerRadius = new Avalonia.CornerRadius(4),
+                CornerRadius = new Avalonia.CornerRadius(10),
                 BorderThickness = new Avalonia.Thickness(1),
-                BorderBrush = new SolidColorBrush(LauncherSkin.BorderBrown),
-                Background = new SolidColorBrush(Color.FromArgb(0xBE, 0x20, 0x13, 0x0B)),
-                Padding = new Avalonia.Thickness(10, 8),
+                BorderBrush = new SolidColorBrush(LauncherSkin.Hairline),
+                Background = new SolidColorBrush(Color.FromUInt32(LauncherPalette.SurfaceSunken)),
+                Padding = new Avalonia.Thickness(14, 12),
                 Child = new StackPanel
                 {
                     Spacing = 6,
@@ -123,12 +127,8 @@ namespace Jondo.Unity.Launcher.UI
                         fila.Hint,
                         fila.State,
                         fila.Bar,
-                        new StackPanel
-                        {
-                            Orientation = Orientation.Horizontal,
-                            Spacing = 8,
-                            Children = { fila.Action, fila.Remove },
-                        },
+                        new Border { Height = 2 },
+                        acciones,
                         fila.Use,
                     },
                 },
@@ -153,7 +153,8 @@ namespace Jondo.Unity.Launcher.UI
                 : fila.Note ?? Textos.EstadoDePack(_idioma, estado);
 
             fila.Bar.IsVisible = trabajando;
-            fila.Bar.Value = trabajando && _packProgreso is { } p ? p.Fraction : 0;
+            fila.Bar.Fraction = trabajando && _packProgreso is { } p ? p.Fraction : 0;
+            fila.Bar.Working = trabajando;
 
             // While working, the same button cancels. Removing cannot be cancelled half way.
             fila.ActionText.Text = trabajando ? Textos.Cancelar(_idioma) : Textos.AccionDePack(_idioma, estado.State);

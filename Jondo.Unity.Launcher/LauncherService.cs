@@ -458,6 +458,9 @@ namespace Jondo.Unity.Launcher
             start.Environment.Remove("JONDO_CONTROL_TOKEN");
             start.Environment.Remove("JONDO_ACCOUNT_ROLE");
             start.Environment.Remove("JONDO_PLAYER_TOKEN");
+            // The mods find the emulator's data here: an installed client is not beside the
+            // emulator's folder, where JondoFix used to look for it.
+            start.Environment["JONDO_EMULATOR_ROOT"] = Paths.Root;
             if (installation.IsWindows) start.ArgumentList.Add("-force-d3d11");
             foreach (string argument in new[] { "-screen-fullscreen", "0", "-screen-width",
                 width.ToString(System.Globalization.CultureInfo.InvariantCulture), "-screen-height",

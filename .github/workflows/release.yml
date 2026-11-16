@@ -118,40 +118,24 @@ jobs:
           foreach ($project in $projects) {
             dotnet publish "$project/$project.csproj" --configuration Release --no-restore `
               -p:Version=${{ steps.version.outputs.version }} `
+              -p:JondoRepository=${{ github.repository }} `
               -p:SkipTests=true
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
-      # The Windows zip, a folder that runs as it is unpacked, with the data taken by git archive
-      # so that only what is versioned goes in and nothing the tests wrote (bases/, logs/): the
-      # three .exe and everything the server reads next to it -- datos/ (world.zip among it),
-      # content/, launcher_assets/, the three mods (JondoFix, Cazacabezas, Heroes) and the root marker. A
-      # player whose server runs elsewhere takes the same zip and starts only the launcher.
-      #
-      # The folder is called JondoEmu because that is one of the names JondoFix looks for beside
-      # the client's folder when JONDO_EMULATOR_ROOT is not set.
+      # The Windows release: the full zip (a folder that runs as it is unpacked, JondoEmu/ at its
+      # root), the three executables as assets of their own, the setup players download (the
+      # launcher, self-contained) and the manifest the launcher updates from -- every file with
+      # its hash, the versioned ones fetched from the repository at the tag. See the script.
       - name: Package
         shell: pwsh
         run: |
-          $tag = '${{ steps.version.outputs.tag }}'
-          New-Item -ItemType Directory -Force release | Out-Null
-
-          function New-ReleaseZip([string]$name, [string[]]$exes, [string[]]$data) {
-            $stage = "stage/$name/JondoEmu"
-            New-Item -ItemType Directory -Force $stage | Out-Null
-            git archive --format=tar --output="stage/$name.tar" HEAD -- $data
-            if ($LASTEXITCODE -ne 0) { throw "git archive failed for $name" }
-            tar -xf "stage/$name.tar" -C $stage
-            if ($LASTEXITCODE -ne 0) { throw "tar failed for $name" }
-            Copy-Item -LiteralPath $exes -Destination $stage
-            Compress-Archive -Path $stage -DestinationPath "release/$name.zip"
-          }
-
-          New-ReleaseZip "Jondo-Full-$tag-win-x64" `
-            -exes 'Jondo Emulator Launcher.exe', 'Jondo Server.exe', 'Jondo Studio.exe' `
-            -data '.jondo-root', 'datos', 'content', 'launcher_assets', 'JondoFix/JondoFix.dll', 'Cazacabezas/Cazacabezas.dll', 'Heroes/Heroes.dll'
-
-          Get-ChildItem release | Select-Object Name,Length
+          ./.github/scripts/New-JondoRelease.ps1 -Tag '${{ steps.version.outputs.tag }}' -Platform win-x64 -OutDir release `
+            -Executables @{
+              'Jondo Emulator Launcher.exe' = 'Jondo Emulator Launcher.exe'
+              'Jondo Server.exe' = 'Jondo Server.exe'
+              'Jondo Studio.exe' = 'Jondo Studio.exe'
+            }
 
       - name: Create draft release
         uses: ncipollo/release-action@v1
@@ -161,13 +145,14 @@ jobs:
           commit: ${{ steps.version.outputs.sha }}
           draft: true
           generateReleaseNotes: true
-          artifacts: release/*.zip,TestResults/tests.trx
+          artifacts: release/*.zip,release/*.exe,release/*.json,TestResults/tests.trx
           artifactErrorsFailBuild: true
 
-  # The Linux zip: the same folder as the Windows Full zip, with the three tools built for
-  # linux-x64 and without the two mods (the native Linux client has no mod loader). The server's
-  # publish runs the whole test suite first, here on Linux. zip keeps the executables' Unix
-  # permissions, so they run as unpacked.
+  # The Linux release: the same folder as the Windows one with the three tools built for
+  # linux-x64 (the mods ride along unused: the native Linux client has no mod loader), its
+  # executables as assets, its setup and its manifest. The server's publish runs the whole test
+  # suite first, here on Linux. zip keeps the executables' Unix permissions, so they run as
+  # unpacked.
   linux:
     needs: release
     runs-on: ubuntu-latest
@@ -188,25 +173,21 @@ jobs:
           for project in Jondo.Unity.Launcher Jondo.Unity.Studio; do
             dotnet publish "$project/$project.csproj" --configuration Release -r linux-x64 \
               --artifacts-path host-artifacts -p:Version=${{ needs.release.outputs.version }} \
+              -p:JondoRepository=${{ github.repository }} \
               -p:SkipTests=true -p:SkipRootDeploy=true --nologo
           done
       - name: Package
-        env:
-          TAG: ${{ needs.release.outputs.tag }}
+        shell: pwsh
         run: |
-          stage="host-artifacts/stage/JondoEmu"
-          mkdir -p "$stage" host-artifacts/release
-          git archive HEAD -- .jondo-root datos content launcher_assets | tar -xf - -C "$stage"
-          cp 'host-artifacts/publish/Jondo.Unity.Server/release_linux-x64/Jondo Server' \
-             'host-artifacts/publish/Jondo.Unity.Launcher/release_linux-x64/Jondo Emulator Launcher' \
-             'host-artifacts/publish/Jondo.Unity.Studio/release_linux-x64/Jondo Studio' "$stage/"
-          chmod +x "$stage/Jondo Server" "$stage/Jondo Emulator Launcher" "$stage/Jondo Studio"
-          cp docs/linux-desktop.md "$stage/README-linux.md"
-          command -v zip >/dev/null || sudo apt-get install -y zip
-          (cd host-artifacts/stage && zip -qr "../release/Jondo-Full-$TAG-linux-x64.zip" JondoEmu)
-          ls -l host-artifacts/release
-      - name: Attach the Linux zip to the draft release
+          $published = 'host-artifacts/publish'
+          ./.github/scripts/New-JondoRelease.ps1 -Tag '${{ needs.release.outputs.tag }}' -Platform linux-x64 -OutDir host-artifacts/release `
+            -Executables @{
+              'Jondo Server' = "$published/Jondo.Unity.Server/release_linux-x64/Jondo Server"
+              'Jondo Emulator Launcher' = "$published/Jondo.Unity.Launcher/release_linux-x64/Jondo Emulator Launcher"
+              'Jondo Studio' = "$published/Jondo.Unity.Studio/release_linux-x64/Jondo Studio"
+            }
+      - name: Attach the Linux files to the draft release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.release.outputs.tag }}
-        run: gh release upload "$TAG" "host-artifacts/release/Jondo-Full-$TAG-linux-x64.zip"
+        run: gh release upload "$TAG" host-artifacts/release/*

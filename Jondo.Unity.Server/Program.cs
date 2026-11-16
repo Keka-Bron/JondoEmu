@@ -1,4 +1,4 @@
-﻿using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -32,6 +32,9 @@ namespace Jondo.Unity.Server
                 Thread.Sleep(2500);
                 return;
             }
+
+            // The launcher's updater asks it to close this way before replacing its files.
+            using var stopSignal = Contract.ListenForStop("JondoEmuServidor", () => RequestShutdown("the updater asked"));
 
             try
             {

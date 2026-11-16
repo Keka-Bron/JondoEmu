@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Jondo.Unity.Launcher.UI.Widgets;
 
 namespace Jondo.Unity.Launcher.UI
 {
@@ -9,136 +11,148 @@ namespace Jondo.Unity.Launcher.UI
     /// The launcher's modal notice, with the launcher's face.
     /// </summary>
     /// <remarks>
-    /// Avalonia brings no message box, and that turns out to be an advantage: the Windows Forms one was the
-    /// system's and appeared in the middle of the wood and gold card with its usual grey. This one
-    /// is painted with the same palette as the rest.
+    /// Avalonia brings no message box, and that turns out to be an advantage: the system's one
+    /// appeared over the art with its usual grey. This one is a card of the launcher: its icon on
+    /// a tile, the title, the message, and the buttons at the bottom right -- the one that goes on
+    /// last, as a dialog does.
     /// </remarks>
     internal static class Dialogs
     {
         public static async Task ShowAsync(Window owner, string title, string message, string accept)
         {
-            var boton = new Button
-            {
-                Classes = { "launcher", "green" },
-                Height = 36,
-                MinWidth = 120,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Content = new TextBlock
-                {
-                    Text = accept,
-                    FontWeight = FontWeight.Bold,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                },
-            };
-
-            var ventana = new Window
-            {
-                Title = title,
-                SizeToContent = SizeToContent.WidthAndHeight,
-                CanResize = false,
-                ShowInTaskbar = false,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Background = new SolidColorBrush(LauncherSkin.Of(LauncherPalette.Background)),
-                FontFamily = LauncherSkin.Title,
-                Content = new Border
-                {
-                    BorderThickness = new Avalonia.Thickness(2),
-                    BorderBrush = new SolidColorBrush(LauncherSkin.GoldBorder),
-                    CornerRadius = new Avalonia.CornerRadius(10),
-                    Background = new SolidColorBrush(LauncherSkin.CardFill),
-                    Padding = new Avalonia.Thickness(24),
-                    Child = new StackPanel
-                    {
-                        Spacing = 18,
-                        MaxWidth = 380,
-                        Children =
-                        {
-                            new TextBlock
-                            {
-                                Text = message,
-                                TextWrapping = TextWrapping.Wrap,
-                                TextAlignment = TextAlignment.Center,
-                                FontSize = 13,
-                                Foreground = new SolidColorBrush(LauncherSkin.BaseText),
-                            },
-                            boton,
-                        },
-                    },
-                },
-            };
-
-            boton.Click += (_, _) => ventana.Close();
+            var ok = Boton(Textos.Frase(accept), "launcher", "green");
+            var ventana = Ventana(owner, title, message, "info", ok);
+            ok.Click += (_, _) => ventana.Close();
             await ventana.ShowDialog(owner);
         }
 
         /// <summary>A yes/no question with the launcher's look. True only when "yes" is pressed.</summary>
-        /// <remarks>The "yes" button is the red one: this is asked before deleting things.</remarks>
-        public static async Task<bool> ConfirmAsync(Window owner, string title, string message, string yes, string no)
+        /// <param name="peligro">
+        /// True when "yes" deletes or loses something: then it is the red button. An update or a
+        /// change of server is asked too, but it is no deletion, and it goes in green.
+        /// </param>
+        public static async Task<bool> ConfirmAsync(Window owner, string title, string message, string yes, string no,
+                                                    bool peligro = true)
         {
             bool answer = false;
+            var confirm = peligro ? Boton(Textos.Frase(yes), "danger") : Boton(Textos.Frase(yes), "launcher", "green");
+            var cancel = Boton(Textos.Frase(no), "secondary");
+            var ventana = Ventana(owner, title, message, peligro ? "alert" : "info", cancel, confirm);
+            confirm.Click += (_, _) => { answer = true; ventana.Close(); };
+            cancel.Click += (_, _) => ventana.Close();
+            await ventana.ShowDialog(owner);
+            return answer;
+        }
 
-            Button Make(string text, string colour) => new Button
+        private static Button Boton(string text, params string[] classes)
+        {
+            var boton = new Button
             {
-                Classes = { "launcher", colour },
-                Height = 36,
-                MinWidth = 120,
+                Height = 38,
+                MinWidth = 110,
+                Padding = new Thickness(18, 0),
                 Content = new TextBlock
                 {
                     Text = text,
-                    FontWeight = FontWeight.Bold,
+                    FontWeight = FontWeight.SemiBold,
+                    FontSize = 13,
                     HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
                 },
             };
+            foreach (string c in classes) boton.Classes.Add(c);
+            return boton;
+        }
 
-            var confirm = Make(yes, "danger");
-            var cancel = Make(no, "purple");
+        private static Window Ventana(Window owner, string title, string message, string icon, params Button[] buttons)
+        {
+            // Most questions come with the window's own title, which says nothing: then the
+            // message is the heading.
+            bool conTitulo = title != owner.Title;
+            bool alerta = icon == "alert";
+            var tono = alerta ? LauncherSkin.Danger : LauncherSkin.Gold;
 
-            var ventana = new Window
+            var cabecera = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
+            var tile = new Border
+            {
+                Width = 40,
+                Height = 40,
+                CornerRadius = new CornerRadius(11),
+                Background = new SolidColorBrush(tono, 0.15),
+                BorderBrush = new SolidColorBrush(tono, 0.3),
+                BorderThickness = new Thickness(1),
+                VerticalAlignment = VerticalAlignment.Top,
+                Child = new Icon
+                {
+                    Kind = icon,
+                    Width = 20,
+                    Height = 20,
+                    Foreground = new SolidColorBrush(tono),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                },
+            };
+            var textos = new StackPanel
+            {
+                Spacing = 6,
+                Margin = new Thickness(14, 0, 0, 0),
+                Children =
+                {
+                    new TextBlock
+                    {
+                        IsVisible = conTitulo,
+                        Text = title,
+                        FontSize = 16,
+                        FontWeight = FontWeight.SemiBold,
+                        FontFamily = LauncherSkin.Display,
+                        Foreground = new SolidColorBrush(LauncherSkin.CardText),
+                        TextWrapping = TextWrapping.Wrap,
+                    },
+                    new TextBlock
+                    {
+                        Text = message,
+                        FontSize = conTitulo ? 13 : 14,
+                        LineHeight = conTitulo ? 19 : 20,
+                        Margin = new Thickness(0, conTitulo ? 0 : 9, 0, 0),
+                        TextWrapping = TextWrapping.Wrap,
+                        Foreground = new SolidColorBrush(conTitulo ? LauncherSkin.TextSecondary : LauncherSkin.CardText),
+                    },
+                },
+            };
+            Grid.SetColumn(textos, 1);
+            cabecera.Children.Add(tile);
+            cabecera.Children.Add(textos);
+
+            var fila = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 10,
+                HorizontalAlignment = HorizontalAlignment.Right,
+            };
+            foreach (var b in buttons) fila.Children.Add(b);
+
+            return new Window
             {
                 Title = title,
                 SizeToContent = SizeToContent.WidthAndHeight,
                 CanResize = false,
                 ShowInTaskbar = false,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Background = new SolidColorBrush(LauncherSkin.Of(LauncherPalette.Background)),
-                FontFamily = LauncherSkin.Title,
+                Background = new SolidColorBrush(LauncherSkin.SurfaceRaised),
+                FontFamily = LauncherSkin.Ui,
                 Content = new Border
                 {
-                    BorderThickness = new Avalonia.Thickness(2),
-                    BorderBrush = new SolidColorBrush(LauncherSkin.GoldBorder),
-                    CornerRadius = new Avalonia.CornerRadius(10),
-                    Background = new SolidColorBrush(LauncherSkin.CardFill),
-                    Padding = new Avalonia.Thickness(24),
+                    BorderThickness = new Thickness(0, 1, 0, 0),
+                    BorderBrush = new SolidColorBrush(LauncherSkin.Hairline),
+                    Padding = new Thickness(24, 22, 24, 20),
                     Child = new StackPanel
                     {
-                        Spacing = 18,
-                        MaxWidth = 380,
-                        Children =
-                        {
-                            new TextBlock
-                            {
-                                Text = message,
-                                TextWrapping = TextWrapping.Wrap,
-                                TextAlignment = TextAlignment.Center,
-                                FontSize = 13,
-                                Foreground = new SolidColorBrush(LauncherSkin.BaseText),
-                            },
-                            new StackPanel
-                            {
-                                Orientation = Orientation.Horizontal,
-                                Spacing = 12,
-                                HorizontalAlignment = HorizontalAlignment.Center,
-                                Children = { cancel, confirm },
-                            },
-                        },
+                        Spacing = 22,
+                        Width = 440,
+                        Children = { cabecera, fila },
                     },
                 },
             };
-
-            confirm.Click += (_, _) => { answer = true; ventana.Close(); };
-            cancel.Click += (_, _) => ventana.Close();
-            await ventana.ShowDialog(owner);
-            return answer;
         }
     }
 }

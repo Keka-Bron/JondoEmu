@@ -1,14 +1,14 @@
 namespace Jondo.Unity.Launcher.UI
 {
     /// <summary>
-    /// The labels the new interface brought, in the three languages.
+    /// The labels the new interface brought, in the launcher's four languages.
     /// </summary>
     /// <remarks>
     /// They go apart from <see cref="LauncherTexts"/> on purpose: that catalogue is shared by the
     /// launcher and the server, and putting texts in it that only one launcher screen uses would
     /// fatten it for nobody. The day one of them is needed in both places, it moves.
     ///
-    /// No dictionaries nor files: each label has a <c>switch</c> that keeps the three translations together.
+    /// No dictionaries nor files: each label has a <c>switch</c> that keeps its translations together.
     /// </remarks>
     internal static class Textos
     {
@@ -16,6 +16,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "PLAY",
             Language.Fr => "JOUER",
+            Language.Pt => "JOGAR",
             _ => "JUGAR",
         };
 
@@ -23,6 +24,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "ACCOUNTS",
             Language.Fr => "COMPTES",
+            Language.Pt => "CONTAS",
             _ => "CUENTAS",
         };
 
@@ -30,6 +32,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "SETTINGS",
             Language.Fr => "OPTIONS",
+            Language.Pt => "CONFIGURAÇÕES",
             _ => "AJUSTES",
         };
 
@@ -37,6 +40,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Language",
             Language.Fr => "Langue",
+            Language.Pt => "Idioma",
             _ => "Idioma",
         };
 
@@ -44,6 +48,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Music",
             Language.Fr => "Musique",
+            Language.Pt => "Música",
             _ => "Música",
         };
 
@@ -51,6 +56,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Dofus client",
             Language.Fr => "Client Dofus",
+            Language.Pt => "Cliente do Dofus",
             _ => "Cliente de Dofus",
         };
 
@@ -58,6 +64,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Configure client for Jondo",
             Language.Fr => "Configurer le client pour Jondo",
+            Language.Pt => "Configurar o cliente para o Jondo",
             _ => "Configurar cliente para Jondo",
         };
 
@@ -65,6 +72,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Client preferences directory (XDG_CONFIG_HOME)",
             Language.Fr => "Dossier des préférences du client (XDG_CONFIG_HOME)",
+            Language.Pt => "Pasta de preferências do cliente (XDG_CONFIG_HOME)",
             _ => "Directorio de preferencias del cliente (XDG_CONFIG_HOME)",
         };
 
@@ -72,21 +80,15 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Saved accounts",
             Language.Fr => "Comptes enregistrés",
+            Language.Pt => "Contas salvas",
             _ => "Cuentas guardadas",
-        };
-
-        /// <summary>That the language also rules over the game, which is what one does not guess.</summary>
-        public static string PieIdioma(Language i) => i switch
-        {
-            Language.En => "The launcher's texts. The game follows it unless another language is chosen below.",
-            Language.Fr => "Les textes du lanceur. Le jeu la suit, sauf si une autre langue est choisie plus bas.",
-            _ => "Los textos del lanzador. El juego lo sigue, salvo que se elija otro idioma debajo.",
         };
 
         public static string IdiomaDelJuego(Language i) => i switch
         {
             Language.En => "Game language",
             Language.Fr => "Langue du jeu",
+            Language.Pt => "Idioma do jogo",
             _ => "Idioma del juego",
         };
 
@@ -94,6 +96,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Every language the client brings. The game starts in it.",
             Language.Fr => "Toutes les langues du client. Le jeu démarre dans celle-ci.",
+            Language.Pt => "Todos os idiomas que o cliente traz. O jogo abre nele.",
             _ => "Todos los idiomas que trae el cliente. El juego arranca en él.",
         };
 
@@ -102,6 +105,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => $"Same as the launcher ({nombre})",
             Language.Fr => $"Comme le lanceur ({nombre})",
+            Language.Pt => $"Igual ao launcher ({nombre})",
             _ => $"Igual que el lanzador ({nombre})",
         };
 
@@ -109,6 +113,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Only needed if the game is not next to the launcher.",
             Language.Fr => "Utile seulement si le jeu n'est pas à côté du lanceur.",
+            Language.Pt => "Só é necessário se o jogo não estiver junto do launcher.",
             _ => "Sólo hace falta si el juego no está junto al lanzador.",
         };
 
@@ -116,15 +121,17 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Removes the accounts ticked on the Play screen. Accounts already in game are kept.",
             Language.Fr => "Retire les comptes cochés dans l'écran Jouer. Ceux déjà en jeu sont conservés.",
+            Language.Pt => "Remove as contas marcadas na tela Jogar. As que já estão no jogo ficam.",
             _ => "Quita las cuentas marcadas en la pantalla de jugar. Las que ya están en el juego se quedan.",
         };
 
-        /// <summary>What is shown when there is no stored account yet.</summary>
+        /// <summary>What is shown when there is no stored account yet, under the heading that says so.</summary>
         public static string EquipoVacio(Language i) => i switch
         {
-            Language.En => "No accounts yet. Add one and it will stay here for next time.",
-            Language.Fr => "Aucun compte pour l'instant. Ajoutes-en un et il restera ici.",
-            _ => "Todavía no hay ninguna cuenta. Añade una y se quedará aquí para la próxima vez.",
+            Language.En => "Add one and it will stay here for next time.",
+            Language.Fr => "Ajoutes-en un et il restera ici pour la prochaine fois.",
+            Language.Pt => "Adicione uma e ela ficará aqui para a próxima vez.",
+            _ => "Añade una y se quedará aquí para la próxima vez.",
         };
 
         /// <summary>How many of the marked ones are already playing, said in a way that is understood.</summary>
@@ -132,6 +139,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => $"{marcadas} ticked · {enJuego} already in game",
             Language.Fr => $"{marcadas} cochés · {enJuego} déjà en jeu",
+            Language.Pt => $"{marcadas} marcada(s) · {enJuego} já no jogo",
             _ => $"{marcadas} marcada(s) · {enJuego} ya en el juego",
         };
 
@@ -139,6 +147,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Level",
             Language.Fr => "Niveau",
+            Language.Pt => "Nível",
             _ => "Nivel",
         };
 
@@ -147,6 +156,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Turn music off",
             Language.Fr => "Couper la musique",
+            Language.Pt => "Desligar a música",
             _ => "Apagar la música",
         };
 
@@ -154,6 +164,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Turn music on",
             Language.Fr => "Activer la musique",
+            Language.Pt => "Ligar a música",
             _ => "Encender la música",
         };
 
@@ -163,6 +174,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Graphics",
             Language.Fr => "Graphismes",
+            Language.Pt => "Gráficos",
             _ => "Gráficos",
         };
 
@@ -174,6 +186,8 @@ namespace Jondo.Unity.Launcher.UI
             Language.Fr => "Téléchargés depuis les serveurs d'Ankama pour la version de ton client. Choisis le pack dans " +
                            "les options du jeu, « (Expérimental) Packs de textures pour les décors » ; il s'applique " +
                            "au prochain changement de carte.",
+            Language.Pt => "Baixados dos servidores da Ankama para a versão do seu cliente. O pacote é escolhido nas opções do jogo, " +
+                           "em “(Experimental) Pacotes de texturas para os cenários”; vale a partir da próxima troca de mapa.",
             _ => "Se descargan de los servidores de Ankama para la versión de tu cliente. El pack se elige en las " +
                  "opciones del juego, en «(Experimental) Packs de texturas para los entornos», y se aplica en el " +
                  "próximo cambio de mapa.",
@@ -183,11 +197,13 @@ namespace Jondo.Unity.Launcher.UI
             ? i switch
             {
                 Language.En => "HD pack",
+                Language.Pt => "Pacote HD",
                 _ => "Pack HD",
             }
             : i switch
             {
                 Language.En => "4K pack",
+                Language.Pt => "Pacote 4K",
                 _ => "Pack 4K",
             };
 
@@ -197,12 +213,14 @@ namespace Jondo.Unity.Launcher.UI
             {
                 Language.En => "For mid-range configurations and resolutions up to 1920 × 1080.",
                 Language.Fr => "Pour les configurations milieu de gamme et les résolutions jusqu'à 1920 × 1080.",
+                Language.Pt => "Para configurações intermediárias e resoluções de até 1920 × 1080.",
                 _ => "Para configuraciones de gama media y resoluciones de hasta 1920 × 1080.",
             }
             : i switch
             {
                 Language.En => "Only for recent configurations above 1920 × 1080. Not recommended for multi-accounting.",
                 Language.Fr => "Uniquement pour les configurations récentes au-delà de 1920 × 1080. Vivement déconseillé en multi-compte.",
+                Language.Pt => "Só para configurações recentes acima de 1920 × 1080. Nada recomendado para multiconta.",
                 _ => "Solo para configuraciones recientes por encima de 1920 × 1080. Nada recomendado en multicuenta.",
             };
 
@@ -212,42 +230,49 @@ namespace Jondo.Unity.Launcher.UI
             {
                 Language.En => "Dofus client not found",
                 Language.Fr => "Client Dofus introuvable",
+                Language.Pt => "Cliente do Dofus não encontrado",
                 _ => "No se encuentra el cliente de Dofus",
             },
             Packs.PackState.NoVersion => i switch
             {
                 Language.En => "The client's version file cannot be read",
                 Language.Fr => "Le fichier de version du client est illisible",
+                Language.Pt => "Não é possível ler o arquivo de versão do cliente",
                 _ => "No se puede leer el fichero de versión del cliente",
             },
             Packs.PackState.Missing => i switch
             {
                 Language.En => "Not installed",
                 Language.Fr => "Non installé",
+                Language.Pt => "Não instalado",
                 _ => "Sin instalar",
             },
             Packs.PackState.Partial => i switch
             {
                 Language.En => "Incomplete: resume to finish it",
                 Language.Fr => "Incomplet : reprends pour le terminer",
+                Language.Pt => "Incompleto: retome para terminar",
                 _ => "A medias: reanuda para terminarlo",
             },
             Packs.PackState.Unverified when s.VerifiedVersion.Length > 0 => i switch
             {
                 Language.En => $"Verified for {s.VerifiedVersion}; the client is now {s.ClientVersion}. Verify it again",
                 Language.Fr => $"Vérifié pour {s.VerifiedVersion} ; le client est maintenant en {s.ClientVersion}. Vérifie-le à nouveau",
+                Language.Pt => $"Verificado para a {s.VerifiedVersion}; o cliente agora é a {s.ClientVersion}. Verifique de novo",
                 _ => $"Verificado para la {s.VerifiedVersion}; el cliente ya es la {s.ClientVersion}. Vuelve a verificarlo",
             },
             Packs.PackState.Unverified => i switch
             {
                 Language.En => $"On disk, not verified for {s.ClientVersion}",
                 Language.Fr => $"Sur le disque, non vérifié pour {s.ClientVersion}",
+                Language.Pt => $"No disco, sem verificar para a {s.ClientVersion}",
                 _ => $"En el disco, sin verificar para la {s.ClientVersion}",
             },
             _ => i switch
             {
                 Language.En => $"Installed and verified for {s.ClientVersion}",
                 Language.Fr => $"Installé et vérifié pour {s.ClientVersion}",
+                Language.Pt => $"Instalado e verificado para a {s.ClientVersion}",
                 _ => $"Instalado y verificado para la {s.ClientVersion}",
             },
         };
@@ -261,24 +286,28 @@ namespace Jondo.Unity.Launcher.UI
                 {
                     Language.En => "Reading Ankama's index… " + percent,
                     Language.Fr => "Lecture de l'index d'Ankama… " + percent,
+                    Language.Pt => "Lendo o índice da Ankama… " + percent,
                     _ => "Leyendo el índice de Ankama… " + percent,
                 },
                 Packs.PackPhase.Checking => i switch
                 {
                     Language.En => "Checking the files on disk… " + percent,
                     Language.Fr => "Vérification des fichiers présents… " + percent,
+                    Language.Pt => "Verificando os arquivos do disco… " + percent,
                     _ => "Comprobando los ficheros del disco… " + percent,
                 },
                 Packs.PackPhase.Downloading => i switch
                 {
                     Language.En => $"Downloading… {percent} · {Tamano(p.Done)} of {Tamano(p.Total)} · {Tamano((long)p.BytesPerSecond)}/s",
                     Language.Fr => $"Téléchargement… {percent} · {Tamano(p.Done)} sur {Tamano(p.Total)} · {Tamano((long)p.BytesPerSecond)}/s",
+                    Language.Pt => $"Baixando… {percent} · {Tamano(p.Done)} de {Tamano(p.Total)} · {Tamano((long)p.BytesPerSecond)}/s",
                     _ => $"Descargando… {percent} · {Tamano(p.Done)} de {Tamano(p.Total)} · {Tamano((long)p.BytesPerSecond)}/s",
                 },
                 _ => i switch
                 {
                     Language.En => "Verifying… " + percent,
                     Language.Fr => "Vérification… " + percent,
+                    Language.Pt => "Verificando… " + percent,
                     _ => "Verificando… " + percent,
                 },
             };
@@ -291,18 +320,21 @@ namespace Jondo.Unity.Launcher.UI
             {
                 Language.En => "Resume",
                 Language.Fr => "Reprendre",
+                Language.Pt => "Retomar",
                 _ => "Reanudar",
             },
             Packs.PackState.Unverified or Packs.PackState.Installed => i switch
             {
                 Language.En => "Verify",
                 Language.Fr => "Vérifier",
+                Language.Pt => "Verificar",
                 _ => "Verificar",
             },
             _ => i switch
             {
                 Language.En => "Download",
                 Language.Fr => "Télécharger",
+                Language.Pt => "Baixar",
                 _ => "Descargar",
             },
         };
@@ -311,6 +343,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Cancel",
             Language.Fr => "Annuler",
+            Language.Pt => "Cancelar",
             _ => "Cancelar",
         };
 
@@ -318,6 +351,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Remove",
             Language.Fr => "Supprimer",
+            Language.Pt => "Remover",
             _ => "Quitar",
         };
 
@@ -325,6 +359,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Offer it to the game",
             Language.Fr => "Le proposer au jeu",
+            Language.Pt => "Oferecer ao jogo",
             _ => "Ofrecérselo al juego",
         };
 
@@ -332,6 +367,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Paused. Resume continues where it stopped.",
             Language.Fr => "En pause. Reprendre continue là où il s'est arrêté.",
+            Language.Pt => "Em pausa. Retomar continua de onde parou.",
             _ => "En pausa. Reanudar sigue donde se quedó.",
         };
 
@@ -343,6 +379,7 @@ namespace Jondo.Unity.Launcher.UI
             {
                 Language.En => $"Remove the {name}{frees}? You can download it again later.",
                 Language.Fr => $"Supprimer le {name}{frees} ? Tu pourras le télécharger à nouveau plus tard.",
+                Language.Pt => $"Remover o {name}{frees}? Você pode baixá-lo de novo depois.",
                 _ => $"¿Quitar el {name}{frees}? Se puede volver a descargar más adelante.",
             };
         }
@@ -354,54 +391,63 @@ namespace Jondo.Unity.Launcher.UI
             {
                 Language.En => $"{ClientInstallation.ExecutableName} was not found. Choose where the client is first.",
                 Language.Fr => $"{ClientInstallation.ExecutableName} est introuvable. Indique d'abord où est le client.",
+                Language.Pt => $"{ClientInstallation.ExecutableName} não foi encontrado. Escolha primeiro onde está o cliente.",
                 _ => $"No se encuentra {ClientInstallation.ExecutableName}. Elige primero dónde está el cliente.",
             },
             Packs.PackError.NoVersion => i switch
             {
                 Language.En => $"The client's version cannot be read ({e.Detail}), so the pack cannot be matched to it. Nothing was downloaded.",
                 Language.Fr => $"Impossible de lire la version du client ({e.Detail}) : le pack ne peut pas lui être associé. Rien n'a été téléchargé.",
+                Language.Pt => $"Não é possível ler a versão do cliente ({e.Detail}), então não há com o que associar o pacote. Nada foi baixado.",
                 _ => $"No se puede leer la versión del cliente ({e.Detail}), así que no hay con qué casar el pack. No se ha descargado nada.",
             },
             Packs.PackError.ManifestUnavailable => i switch
             {
                 Language.En => $"Ankama's servers did not give the index for this client version ({e.Detail}). Nothing was downloaded.",
                 Language.Fr => $"Les serveurs d'Ankama n'ont pas fourni l'index de cette version du client ({e.Detail}). Rien n'a été téléchargé.",
+                Language.Pt => $"Os servidores da Ankama não forneceram o índice desta versão do cliente ({e.Detail}). Nada foi baixado.",
                 _ => $"Los servidores de Ankama no han dado el índice de esta versión del cliente ({e.Detail}). No se ha descargado nada.",
             },
             Packs.PackError.ManifestCorrupt or Packs.PackError.FragmentMissing or Packs.PackError.BadManifest => i switch
             {
                 Language.En => $"Ankama's index for this client version cannot be used ({e.Detail}).",
                 Language.Fr => $"L'index d'Ankama pour cette version du client est inutilisable ({e.Detail}).",
+                Language.Pt => $"O índice da Ankama para esta versão do cliente não pode ser usado ({e.Detail}).",
                 _ => $"El índice de Ankama para esta versión del cliente no sirve ({e.Detail}).",
             },
             Packs.PackError.ClientRunning => i switch
             {
                 Language.En => "Close Dofus first: the game keeps the texture files open.",
                 Language.Fr => "Ferme d'abord Dofus : le jeu garde les fichiers de textures ouverts.",
+                Language.Pt => "Feche o Dofus antes: o jogo mantém os arquivos de textura abertos.",
                 _ => "Cierra antes Dofus: el juego tiene abiertos los ficheros de texturas.",
             },
             Packs.PackError.NotEnoughSpace => i switch
             {
                 Language.En => $"Not enough disk space: {Tamano(e.Needed)} needed, {Tamano(e.Free)} free.",
                 Language.Fr => $"Pas assez d'espace disque : {Tamano(e.Needed)} nécessaires, {Tamano(e.Free)} libres.",
+                Language.Pt => $"Não há espaço no disco: são necessários {Tamano(e.Needed)} e há {Tamano(e.Free)} livres.",
                 _ => $"No hay sitio en el disco: hacen falta {Tamano(e.Needed)} y hay {Tamano(e.Free)} libres.",
             },
             Packs.PackError.VerifyFailed => i switch
             {
                 Language.En => $"{e.Detail} did not match Ankama's hash and will be downloaded again. Press Resume.",
                 Language.Fr => $"{e.Detail} ne correspond pas à l'empreinte d'Ankama et sera retéléchargé. Appuie sur Reprendre.",
+                Language.Pt => $"{e.Detail} não confere com o hash da Ankama e será baixado de novo. Clique em Retomar.",
                 _ => $"{e.Detail} no cuadra con la huella de Ankama y se volverá a descargar. Pulsa Reanudar.",
             },
             Packs.PackError.DiskError => i switch
             {
                 Language.En => $"Could not write to the disk: {e.Detail}",
                 Language.Fr => $"Impossible d'écrire sur le disque : {e.Detail}",
+                Language.Pt => $"Não foi possível gravar no disco: {e.Detail}",
                 _ => $"No se ha podido escribir en el disco: {e.Detail}",
             },
             _ => i switch
             {
                 Language.En => $"The download stopped after several attempts ({e.Detail}). Resume continues where it stopped.",
                 Language.Fr => $"Le téléchargement s'est arrêté après plusieurs essais ({e.Detail}). Reprendre continue là où il s'est arrêté.",
+                Language.Pt => $"O download parou depois de várias tentativas ({e.Detail}). Retomar continua de onde parou.",
                 _ => $"La descarga se ha parado tras varios intentos ({e.Detail}). Reanudar sigue donde se quedó.",
             },
         };
@@ -412,6 +458,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => $"{ClientInstallation.ExecutableName} is no longer where it was left — choose where it is",
             Language.Fr => $"{ClientInstallation.ExecutableName} n'est plus là où il était — indique où il est",
+            Language.Pt => $"{ClientInstallation.ExecutableName} não está mais onde estava — escolha onde ele está",
             _ => $"{ClientInstallation.ExecutableName} ya no está donde se dejó — elige dónde está",
         };
 
@@ -419,6 +466,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => $"{ClientInstallation.ExecutableName} cannot be found — choose where it is",
             Language.Fr => $"{ClientInstallation.ExecutableName} est introuvable — indique où il est",
+            Language.Pt => $"{ClientInstallation.ExecutableName} não foi encontrado — escolha onde ele está",
             _ => $"No se encuentra {ClientInstallation.ExecutableName} — elige dónde está",
         };
 
@@ -426,6 +474,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Where is the Dofus client?",
             Language.Fr => "Où est le client Dofus ?",
+            Language.Pt => "Onde está o cliente do Dofus?",
             _ => "¿Dónde está el cliente de Dofus?",
         };
 
@@ -438,6 +487,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "There is no refresh token to use.",
             Language.Fr => "Il n'y a aucun jeton de renouvellement à utiliser.",
+            Language.Pt => "Não há token de renovação para usar.",
             _ => "No hay vale de renovación que usar.",
         };
 
@@ -445,6 +495,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Timed out waiting for the website.",
             Language.Fr => "Le délai d'attente du site web est dépassé.",
+            Language.Pt => "O tempo de espera pelo site se esgotou.",
             _ => "Se ha agotado el tiempo esperando a la web.",
         };
 
@@ -452,6 +503,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => $"The website refused the sign-in: {error}",
             Language.Fr => $"Le site web a refusé la connexion : {error}",
+            Language.Pt => $"O site recusou a entrada: {error}",
             _ => $"La web ha rechazado la entrada: {error}",
         };
 
@@ -459,6 +511,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "The answer does not belong to this request.",
             Language.Fr => "La réponse ne correspond pas à cette demande.",
+            Language.Pt => "A resposta não corresponde a este pedido.",
             _ => "La respuesta no corresponde a esta petición.",
         };
 
@@ -466,6 +519,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => $"The website answered {status} when asked for the tokens.",
             Language.Fr => $"Le site web a répondu {status} à la demande des jetons.",
+            Language.Pt => $"O site respondeu {status} ao pedir os tokens.",
             _ => $"La web ha contestado {status} al pedir los vales.",
         };
 
@@ -473,6 +527,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "The website returned no access token.",
             Language.Fr => "Le site web n'a renvoyé aucun jeton d'accès.",
+            Language.Pt => "O site não devolveu nenhum token de acesso.",
             _ => "La web no ha devuelto ningún vale de acceso.",
         };
 
@@ -480,6 +535,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "The website answered something that cannot be understood.",
             Language.Fr => "Le site web a répondu quelque chose d'incompréhensible.",
+            Language.Pt => "O site respondeu algo que não dá para entender.",
             _ => "La web ha contestado algo que no se entiende.",
         };
 
@@ -487,6 +543,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => $"Could not open the browser: {error}",
             Language.Fr => $"Impossible d'ouvrir le navigateur : {error}",
+            Language.Pt => $"Não foi possível abrir o navegador: {error}",
             _ => $"No se ha podido abrir el navegador: {error}",
         };
 
@@ -494,6 +551,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Could not sign in",
             Language.Fr => "Connexion impossible",
+            Language.Pt => "Não foi possível entrar",
             _ => "No se ha podido entrar",
         };
 
@@ -501,6 +559,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Unexpected answer",
             Language.Fr => "Réponse inattendue",
+            Language.Pt => "Resposta inesperada",
             _ => "Respuesta inesperada",
         };
 
@@ -508,6 +567,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "The request identifier does not match.",
             Language.Fr => "L'identifiant de la demande ne correspond pas.",
+            Language.Pt => "O identificador do pedido não coincide.",
             _ => "El identificador de la petición no coincide.",
         };
 
@@ -515,6 +575,7 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "Done",
             Language.Fr => "C'est fait",
+            Language.Pt => "Pronto",
             _ => "Ya está",
         };
 
@@ -522,7 +583,74 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "You can close this tab and go back to the launcher.",
             Language.Fr => "Tu peux fermer cet onglet et revenir au lanceur.",
+            Language.Pt => "Você pode fechar esta aba e voltar ao launcher.",
             _ => "Puedes cerrar esta pestaña y volver al lanzador.",
+        };
+
+        // ─── The 2026 interface: headings and the lines under them ─────────────
+
+        private static string T(Language i, string es, string en, string fr, string pt) => i switch
+        {
+            Language.En => en,
+            Language.Fr => fr,
+            Language.Pt => pt,
+            _ => es,
+        };
+
+        /// <summary>An all-capitals label of the shared catalogue, as a heading is written: "INICIAR SESIÓN" is "Iniciar sesión".</summary>
+        public static string Frase(string texto)
+        {
+            string t = (texto ?? "").Trim();
+            if (t.Length == 0) return t;
+            var c = System.Globalization.CultureInfo.CurrentCulture;
+            string lower = t.ToLower(c);
+            int first = 0;
+            while (first < lower.Length && !char.IsLetter(lower[first])) first++;
+            if (first >= lower.Length) return lower;
+            return lower.Substring(0, first) + char.ToUpper(lower[first], c) + lower.Substring(first + 1);
+        }
+
+        public static string TuEquipo(Language i) => T(i, "Tu equipo", "Your team", "Ton équipe", "Sua equipe");
+        public static string SinCuentas(Language i) => T(i, "Aún no hay cuentas", "No accounts yet", "Aucun compte pour l'instant", "Ainda não há contas");
+        public static string AnadirCuenta(Language i) => T(i, "Añadir otra cuenta", "Add another account", "Ajouter un autre compte", "Adicionar outra conta");
+        public static string PrimeraCuenta(Language i) => T(i, "AÑADIR UNA CUENTA", "ADD AN ACCOUNT", "AJOUTER UN COMPTE", "ADICIONAR UMA CONTA");
+
+        public static string TituloCuentas(Language i) => T(i, "Añade una cuenta", "Add an account", "Ajoute un compte", "Adicione uma conta");
+        public static string IntroCuentas(Language i)
+            => T(i, "Entra con una cuenta de este servidor o crea una nueva. El equipo admite hasta 8.",
+                    "Log in with an account on this server or create a new one. The team holds up to 8.",
+                    "Connecte-toi avec un compte de ce serveur ou crées-en un. L'équipe en accepte jusqu'à 8.",
+                    "Entre com uma conta deste servidor ou crie uma nova. A equipe aceita até 8.");
+        public static string PieCuentas(Language i)
+            => T(i, "La sesión de cada cuenta se guarda cifrada en este equipo. La contraseña no se guarda.",
+                    "Each account's session is stored encrypted on this computer. The password is not stored.",
+                    "La session de chaque compte est enregistrée chiffrée sur cet ordinateur. Le mot de passe ne l'est pas.",
+                    "A sessão de cada conta fica salva criptografada neste computador. A senha não é salva.");
+
+        public static string General(Language i) => T(i, "General", "General", "Général", "Geral");
+        public static string DescGeneral(Language i)
+            => T(i, "El idioma del launcher y el del juego.", "The launcher's language and the game's.", "La langue du lanceur et celle du jeu.",
+                    "O idioma do launcher e o do jogo.");
+        public static string DescCliente(Language i)
+            => T(i, "El Dofus 3.6 que se abre al jugar.", "The Dofus 3.6 that opens when you play.", "Le Dofus 3.6 qui s'ouvre quand tu joues.",
+                    "O Dofus 3.6 que abre ao jogar.");
+        public static string DescServidor(Language i)
+            => T(i, "Dónde está el servidor al que se conecta el juego.", "Where the server the game connects to is.", "Où se trouve le serveur auquel le jeu se connecte.",
+                    "Onde está o servidor ao qual o jogo se conecta.");
+
+        public static string Caducada(Language i) => T(i, "SESIÓN CADUCADA", "SESSION EXPIRED", "SESSION EXPIRÉE", "SESSÃO EXPIRADA");
+
+        public static string Estado(Language i, bool enLinea)
+            => enLinea ? T(i, "Servidor en línea", "Server online", "Serveur en ligne", "Servidor on-line")
+                       : T(i, "Servidor sin conexión", "Server offline", "Serveur hors ligne", "Servidor off-line");
+
+        /// <summary>The launcher's language as a dropdown line: its own name, whatever the launcher is in.</summary>
+        public static string NombreDelIdioma(Language i) => i switch
+        {
+            Language.En => "English",
+            Language.Fr => "Français",
+            Language.Pt => "Português",
+            _ => "Español",
         };
 
         /// <summary>A size the way a player reads it.</summary>

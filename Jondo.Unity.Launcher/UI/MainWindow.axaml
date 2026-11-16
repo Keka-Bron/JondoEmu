@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:w="clr-namespace:Jondo.Unity.Launcher.UI.Widgets"
         x:Class="Jondo.Unity.Launcher.UI.MainWindow"
@@ -7,11 +7,13 @@
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}"
-        FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif">
+        FontFamily="Segoe UI Variable Text, Segoe UI, Noto Sans, DejaVu Sans, sans-serif"
+        FontSize="13">
 
-  <!-- The background drawing is seen whole: the panel takes a strip on the left and the rest is left
-       clear. Before, the card was 350 wide and carried EVERYTHING inside — logging in, the team, the language,
-       the client path and the status — stacked in one column. -->
+  <!-- The art is the ground and is seen whole; a bar runs along the top with the sign, the
+       sections and the status, and each section puts its panel over the art: the team and the
+       accounts in a column on the left, the settings across the window with every group in view,
+       the installer and its progress in the middle. -->
   <Panel>
     <Image x:Name="Fondo" Stretch="UniformToFill" />
 
@@ -19,252 +21,694 @@
       <Border.Background>
         <RadialGradientBrush GradientOrigin="50%,50%" Center="50%,50%" RadiusX="75%" RadiusY="75%">
           <GradientStop Color="#03000000" Offset="0" />
-          <GradientStop Color="#4D000000" Offset="1" />
+          <GradientStop Color="#59000000" Offset="1" />
         </RadialGradientBrush>
       </Border.Background>
     </Border>
 
-    <!-- The sparks go in front of the drawing and behind the panel: they are seen falling around
-         the card without getting in the way of anything that has to be read. -->
+    <!-- The sparks go in front of the art and behind the panels. -->
     <w:StarField />
 
-    <Border x:Name="Panel" Width="440" Margin="56,44"
-            HorizontalAlignment="Left" VerticalAlignment="Center"
-            CornerRadius="14" BorderThickness="2"
-            BorderBrush="{DynamicResource GoldBorderBrush}"
-            Background="{DynamicResource CardFillBrush}"
-            ClipToBounds="True">
-      <DockPanel>
+    <Grid x:Name="Raiz" RowDefinitions="64,*">
 
-        <!-- ═══ The header: who you are and whether the server answers ════ -->
-        <Border DockPanel.Dock="Top" Background="{DynamicResource BarFillBrush}"
-                BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LightBrownBrush}"
-                Padding="20,14">
-          <StackPanel Spacing="10">
-            <w:LogoBanner Height="62" HorizontalAlignment="Stretch" />
+      <!-- ═══ The top bar ═══════════════════════════════════════════════════ -->
+      <Border x:Name="BarraSuperior" Grid.Row="0"
+              Background="{DynamicResource SurfaceBrush}"
+              BorderBrush="{DynamicResource HairlineBrush}" BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="18,0,16,0">
+          <w:LogoBanner Grid.Column="0" Width="190" Height="50" VerticalAlignment="Center" />
 
-            <!-- The status, at the top and with its dot. It was at the very bottom in small print, and it is the
-                 first thing one has to know: if it does not answer, nothing else is of use. -->
-            <Border CornerRadius="20" Padding="12,5" HorizontalAlignment="Center"
-                    Background="#40000000">
-              <StackPanel Orientation="Horizontal" Spacing="7">
-                <w:StatusDot x:Name="PuntoEstado" VerticalAlignment="Center" />
-                <TextBlock x:Name="TextoEstado" VerticalAlignment="Center"
-                           FontSize="10.5" FontWeight="Bold" />
+          <StackPanel x:Name="Secciones" Grid.Column="1" Orientation="Horizontal" Margin="26,0,0,0">
+            <Button x:Name="SeccionJugar" Classes="nav" Click="AlPulsarSeccion" Tag="jugar">
+              <StackPanel Orientation="Horizontal" Spacing="9">
+                <w:Icon Kind="play" Width="15" Height="15" VerticalAlignment="Center" />
+                <TextBlock x:Name="TextoSeccionJugar" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button x:Name="SeccionCuentas" Classes="nav" Click="AlPulsarSeccion" Tag="cuentas">
+              <StackPanel Orientation="Horizontal" Spacing="9">
+                <w:Icon Kind="users" Width="17" Height="17" VerticalAlignment="Center" />
+                <TextBlock x:Name="TextoSeccionCuentas" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button x:Name="SeccionAjustes" Classes="nav" Click="AlPulsarSeccion" Tag="ajustes">
+              <StackPanel Orientation="Horizontal" Spacing="9">
+                <w:Icon Kind="sliders" Width="17" Height="17" VerticalAlignment="Center" />
+                <TextBlock x:Name="TextoSeccionAjustes" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <!-- The setup's language, where the sections go once installed. -->
+            <Border x:Name="IdiomaInstalador" Classes="segment" IsVisible="False">
+              <StackPanel Orientation="Horizontal" Spacing="2">
+                <Button x:Name="InstalarEs" Classes="seg" Click="AlPulsarIdioma" Tag="es" MinHeight="28">
+                  <StackPanel Orientation="Horizontal" Spacing="7">
+                    <w:FlagIcon Code="es" VerticalAlignment="Center" />
+                    <TextBlock Text="ES" VerticalAlignment="Center" FontSize="11.5" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="InstalarEn" Classes="seg" Click="AlPulsarIdioma" Tag="en" MinHeight="28">
+                  <StackPanel Orientation="Horizontal" Spacing="7">
+                    <w:FlagIcon Code="en" VerticalAlignment="Center" />
+                    <TextBlock Text="EN" VerticalAlignment="Center" FontSize="11.5" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="InstalarFr" Classes="seg" Click="AlPulsarIdioma" Tag="fr" MinHeight="28">
+                  <StackPanel Orientation="Horizontal" Spacing="7">
+                    <w:FlagIcon Code="fr" VerticalAlignment="Center" />
+                    <TextBlock Text="FR" VerticalAlignment="Center" FontSize="11.5" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="InstalarPt" Classes="seg" Click="AlPulsarIdioma" Tag="pt" MinHeight="28">
+                  <StackPanel Orientation="Horizontal" Spacing="7">
+                    <w:FlagIcon Code="pt" VerticalAlignment="Center" />
+                    <TextBlock Text="PT" VerticalAlignment="Center" FontSize="11.5" />
+                  </StackPanel>
+                </Button>
               </StackPanel>
             </Border>
+
+            <!-- Whether the server answers: if it does not, nothing else is of use. -->
+            <Border x:Name="PildoraEstado" Height="38" CornerRadius="19" Padding="14,0" BorderThickness="1"
+                    Background="{DynamicResource SurfaceSunkenBrush}" BorderBrush="{DynamicResource HairlineBrush}">
+              <StackPanel Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
+                <w:StatusDot x:Name="PuntoEstado" Width="12" Height="12" VerticalAlignment="Center" />
+                <TextBlock x:Name="TextoEstado" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold" />
+              </StackPanel>
+            </Border>
+
+            <Button x:Name="BotonMusica" Classes="icon" Click="AlPulsarMusica">
+              <w:Icon x:Name="IconoAltavoz" Kind="sound" Width="18" Height="18" />
+            </Button>
           </StackPanel>
-        </Border>
-
-        <!-- ═══ The sections ═══════════════════════════════════════════════ -->
-        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*,*" Height="42">
-          <Button x:Name="SeccionJugar" Classes="seccion" Grid.Column="0" Click="AlPulsarSeccion" Tag="jugar" />
-          <Button x:Name="SeccionCuentas" Classes="seccion" Grid.Column="1" Click="AlPulsarSeccion" Tag="cuentas" />
-          <Button x:Name="SeccionAjustes" Classes="seccion" Grid.Column="2" Click="AlPulsarSeccion" Tag="ajustes" />
         </Grid>
-        <Border DockPanel.Dock="Top" Height="2" Background="{DynamicResource LightBrownBrush}" />
+      </Border>
 
-        <!-- ═══ The notice, when there is one ══════════════════════════════ -->
-        <Border x:Name="Aviso" DockPanel.Dock="Top" IsVisible="False"
-                CornerRadius="5" BorderThickness="1" Padding="12" Margin="20,16,20,0"
-                Background="{DynamicResource AlertBackgroundBrush}"
-                BorderBrush="{DynamicResource RedBrush}">
-          <TextBlock x:Name="TextoAviso" TextWrapping="Wrap" TextAlignment="Center"
-                     FontSize="12.5" Foreground="{DynamicResource AlertTextBrush}" />
-        </Border>
+      <!-- ═══ What each section shows ═══════════════════════════════════════ -->
+      <Panel x:Name="Contenido" Grid.Row="1">
 
-        <!-- ═══ The body ═══════════════════════════════════════════════════ -->
-        <Panel Margin="20" MinHeight="360">
-
-          <!-- ─── PLAY ──────────────────────────────────────────────────── -->
-          <DockPanel x:Name="PanelJugar">
-            <StackPanel DockPanel.Dock="Top" Spacing="3">
-              <TextBlock x:Name="TituloEquipo" FontSize="17"
-                         Foreground="{DynamicResource HighlightTextBrush}" />
-              <TextBlock x:Name="ResumenEquipo" FontSize="12"
-                         Foreground="{DynamicResource MutedGoldBrush}" Margin="0,0,0,12" />
-            </StackPanel>
+        <!-- ─── PLAY ────────────────────────────────────────────────────── -->
+        <Border x:Name="PanelJugar" Classes="panel" Width="440"
+                HorizontalAlignment="Left" Margin="24,24,0,24">
+          <DockPanel Margin="22,20,22,22">
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+              <StackPanel Grid.Column="0">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <TextBlock x:Name="TituloEquipo" Classes="h1" VerticalAlignment="Center" />
+                  <Border x:Name="CuentaEquipo" Classes="pill" Background="#26D4AF37">
+                    <TextBlock x:Name="TextoCuentaEquipo" Foreground="{DynamicResource GoldBrush}" />
+                  </Border>
+                </StackPanel>
+                <TextBlock x:Name="ResumenEquipo" Classes="desc" Margin="0,4,0,0" />
+              </StackPanel>
+              <Button x:Name="BotonTodas" Grid.Column="1" Classes="ghost" VerticalAlignment="Bottom"
+                      Margin="0,0,-8,-4" Click="AlPulsarTodas">
+                <TextBlock x:Name="TextoTodas" />
+              </Button>
+            </Grid>
 
             <!-- The big button at the very bottom, always in the same place whatever falls
                  above it: it is what one comes to press. -->
-            <StackPanel DockPanel.Dock="Bottom" Spacing="10" Margin="0,14,0,0">
-              <Button x:Name="BotonJugar" Classes="launcher green" Height="52"
+            <StackPanel DockPanel.Dock="Bottom" Spacing="10" Margin="0,16,0,0">
+              <Button x:Name="BotonJugar" Classes="launcher green" Height="58"
                       HorizontalAlignment="Stretch" Click="AlPulsarJugar">
-                <w:SpacedText x:Name="TextoJugar" Spacing="2" Shadow="True" FontSize="17"
-                              FontWeight="Bold" Foreground="White" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                  <w:Icon x:Name="IconoJugar" Kind="play" Width="18" Height="18" VerticalAlignment="Center" />
+                  <w:SpacedText x:Name="TextoJugar" Spacing="2" Shadow="True" FontSize="17" VerticalAlignment="Center"
+                                FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif"
+                                FontWeight="Bold" Foreground="White" />
+                </StackPanel>
               </Button>
-              <!-- The two actions alongside, in a row. The add-account one was only on the
-                   ACCOUNTS tab, and with the team in front nothing said how to add another: one had
-                   to deduce that the place was the tab next door. -->
-              <Grid ColumnDefinitions="*,Auto">
-                <Button x:Name="BotonTodas" Classes="link" Grid.Column="0"
-                        HorizontalContentAlignment="Left" Click="AlPulsarTodas">
-                  <TextBlock x:Name="TextoTodas" FontSize="11.5"
-                             Foreground="{DynamicResource GoldBrush}" />
-                </Button>
-                <Button x:Name="AnadirOtra" Classes="link" Grid.Column="1"
-                        HorizontalAlignment="Right" Click="AlPulsarIrACuentas">
-                  <TextBlock x:Name="TextoAnadirOtra" FontSize="11.5"
-                             Foreground="{DynamicResource SoftGoldBrush}" />
-                </Button>
-              </Grid>
+              <Button x:Name="AnadirOtra" Classes="secondary" HorizontalAlignment="Stretch" Height="40"
+                      Click="AlPulsarIrACuentas">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <w:Icon Kind="user-plus" Width="16" Height="16" VerticalAlignment="Center" />
+                  <TextBlock x:Name="TextoAnadirOtra" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
             </StackPanel>
 
-            <!-- If there are no accounts yet, the shortcut goes here instead of an empty list. -->
+            <!-- If there are no accounts yet, what to do goes here instead of an empty list. -->
             <Panel>
-              <ScrollViewer x:Name="ListaDeCuentas" VerticalScrollBarVisibility="Auto">
+              <ScrollViewer x:Name="ListaDeCuentas" VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Disabled">
                 <StackPanel x:Name="FilasDeCuentas" Spacing="8" />
               </ScrollViewer>
 
               <StackPanel x:Name="EquipoVacio" IsVisible="False" Spacing="14"
-                          VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock x:Name="TextoEquipoVacio" TextWrapping="Wrap" TextAlignment="Center"
-                           FontSize="13" MaxWidth="300"
-                           Foreground="{DynamicResource LightBrownTextBrush}" />
-                <Button x:Name="BotonPrimeraCuenta" Classes="launcher purple" Height="42"
-                        Width="240" Click="AlPulsarIrACuentas">
-                  <w:SpacedText x:Name="TextoPrimeraCuenta" Spacing="1" FontSize="13"
+                          VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="320">
+                <Border Classes="tile" Width="56" Height="56" CornerRadius="16" HorizontalAlignment="Center">
+                  <w:Icon Kind="users" Width="26" Height="26" />
+                </Border>
+                <TextBlock x:Name="TituloEquipoVacio" Classes="h2" FontSize="16" HorizontalAlignment="Center" />
+                <TextBlock x:Name="TextoEquipoVacio" Classes="desc" TextAlignment="Center" />
+                <Button x:Name="BotonPrimeraCuenta" Classes="launcher purple" Height="44" Margin="0,6,0,0"
+                        HorizontalAlignment="Stretch" Click="AlPulsarIrACuentas">
+                  <w:SpacedText x:Name="TextoPrimeraCuenta" Spacing="1" FontSize="13" Shadow="True"
+                                FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif"
                                 FontWeight="Bold" Foreground="White" />
                 </Button>
               </StackPanel>
             </Panel>
           </DockPanel>
+        </Border>
 
-          <!-- ─── ACCOUNTS ──────────────────────────────────────────────── -->
-          <DockPanel x:Name="PanelCuentas" IsVisible="False">
-            <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*" Height="34" Margin="0,0,0,18">
-              <Button x:Name="PestanaEntrar" Classes="tab" Grid.Column="0"
-                      HorizontalAlignment="Stretch" Click="AlPulsarPestanaEntrar" />
-              <Button x:Name="PestanaRegistro" Classes="tab" Grid.Column="1"
-                      HorizontalAlignment="Stretch" Click="AlPulsarPestanaRegistro" />
-            </Grid>
+        <!-- ─── ACCOUNTS ────────────────────────────────────────────────── -->
+        <Border x:Name="PanelCuentas" Classes="panel" Width="440" IsVisible="False"
+                HorizontalAlignment="Left" Margin="24,24,0,24">
+          <DockPanel Margin="22,20,22,22">
+            <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,18">
+              <TextBlock x:Name="TituloCuentas" Classes="h1" />
+              <TextBlock x:Name="IntroCuentas" Classes="desc" />
+            </StackPanel>
+
+            <Border DockPanel.Dock="Top" Classes="segment" HorizontalAlignment="Stretch" Margin="0,0,0,22">
+              <Grid ColumnDefinitions="*,*">
+                <Button x:Name="PestanaEntrar" Classes="seg" Grid.Column="0" Height="36"
+                        HorizontalAlignment="Stretch" Click="AlPulsarPestanaEntrar">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <w:Icon Kind="login" Width="15" Height="15" VerticalAlignment="Center" />
+                    <TextBlock x:Name="TextoPestanaEntrar" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="PestanaRegistro" Classes="seg" Grid.Column="1" Height="36"
+                        HorizontalAlignment="Stretch" Click="AlPulsarPestanaRegistro">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <w:Icon Kind="user-plus" Width="15" Height="15" VerticalAlignment="Center" />
+                    <TextBlock x:Name="TextoPestanaRegistro" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+              </Grid>
+            </Border>
+
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,16,0,0">
+              <w:Icon Kind="key" Width="14" Height="14" VerticalAlignment="Top" Margin="0,1,0,0"
+                      Foreground="{DynamicResource TextTertiaryBrush}" />
+              <TextBlock x:Name="PieCuentas" Classes="pie" MaxWidth="360" />
+            </StackPanel>
 
             <Panel>
-            <StackPanel x:Name="FormularioEntrar" VerticalAlignment="Top">
-              <TextBlock x:Name="RotuloUsuario" Classes="label" />
-              <TextBox x:Name="CampoUsuario" Classes="field" Margin="0,0,0,14"
-                       KeyDown="AlPulsarTeclaEnEntrar" />
-              <TextBlock x:Name="RotuloClave" Classes="label" />
-              <TextBox x:Name="CampoClave" Classes="field" PasswordChar="•" Margin="0,0,0,14"
-                       KeyDown="AlPulsarTeclaEnEntrar" />
-              <Button x:Name="BotonConectar" Classes="launcher green" Height="46"
-                      HorizontalAlignment="Stretch" Margin="0,8,0,0" Click="AlPulsarConectar">
-                <w:SpacedText x:Name="TextoConectar" Spacing="2" Shadow="True" FontSize="16"
-                              FontWeight="Bold" Foreground="White" />
-              </Button>
-            </StackPanel>
+              <StackPanel x:Name="FormularioEntrar" VerticalAlignment="Top">
+                <TextBlock x:Name="RotuloUsuario" Classes="label" />
+                <TextBox x:Name="CampoUsuario" Classes="field" Margin="0,0,0,16"
+                         KeyDown="AlPulsarTeclaEnEntrar" />
+                <TextBlock x:Name="RotuloClave" Classes="label" />
+                <TextBox x:Name="CampoClave" Classes="field" PasswordChar="•" Margin="0,0,0,16"
+                         KeyDown="AlPulsarTeclaEnEntrar" />
+                <Button x:Name="BotonConectar" Classes="launcher green" Height="48"
+                        HorizontalAlignment="Stretch" Margin="0,8,0,0" Click="AlPulsarConectar">
+                  <w:SpacedText x:Name="TextoConectar" Spacing="2" Shadow="True" FontSize="15"
+                                FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif"
+                                FontWeight="Bold" Foreground="White" />
+                </Button>
+              </StackPanel>
 
-            <StackPanel x:Name="FormularioRegistro" IsVisible="False" VerticalAlignment="Top">
-              <TextBlock x:Name="RotuloNuevoUsuario" Classes="label" />
-              <TextBox x:Name="CampoNuevoUsuario" Classes="field" Margin="0,0,0,12"
-                       KeyDown="AlPulsarTeclaEnRegistro" />
-              <TextBlock x:Name="RotuloNuevaClave" Classes="label" />
-              <TextBox x:Name="CampoNuevaClave" Classes="field" PasswordChar="•" Margin="0,0,0,12"
-                       KeyDown="AlPulsarTeclaEnRegistro" />
-              <TextBlock x:Name="RotuloApodo" Classes="label" />
-              <TextBox x:Name="CampoApodo" Classes="field" Margin="0,0,0,12"
-                       KeyDown="AlPulsarTeclaEnRegistro" />
-              <Button x:Name="BotonCrear" Classes="launcher purple" Height="46"
-                      HorizontalAlignment="Stretch" Margin="0,8,0,0" Click="AlPulsarCrear">
-                <w:SpacedText x:Name="TextoCrear" Spacing="2" Shadow="True" FontSize="16"
-                              FontWeight="Bold" Foreground="White" />
-              </Button>
-            </StackPanel>
+              <StackPanel x:Name="FormularioRegistro" IsVisible="False" VerticalAlignment="Top">
+                <TextBlock x:Name="RotuloNuevoUsuario" Classes="label" />
+                <TextBox x:Name="CampoNuevoUsuario" Classes="field" Margin="0,0,0,16"
+                         KeyDown="AlPulsarTeclaEnRegistro" />
+                <TextBlock x:Name="RotuloNuevaClave" Classes="label" />
+                <TextBox x:Name="CampoNuevaClave" Classes="field" PasswordChar="•" Margin="0,0,0,16"
+                         KeyDown="AlPulsarTeclaEnRegistro" />
+                <TextBlock x:Name="RotuloApodo" Classes="label" />
+                <TextBox x:Name="CampoApodo" Classes="field" Margin="0,0,0,16"
+                         KeyDown="AlPulsarTeclaEnRegistro" />
+                <Button x:Name="BotonCrear" Classes="launcher purple" Height="48"
+                        HorizontalAlignment="Stretch" Margin="0,8,0,0" Click="AlPulsarCrear">
+                  <w:SpacedText x:Name="TextoCrear" Spacing="2" Shadow="True" FontSize="15"
+                                FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif"
+                                FontWeight="Bold" Foreground="White" />
+                </Button>
+              </StackPanel>
             </Panel>
           </DockPanel>
+        </Border>
 
-          <!-- ─── SETTINGS ──────────────────────────────────────────────── -->
-          <ScrollViewer x:Name="PanelAjustes" IsVisible="False" VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="20">
+        <!-- ─── SETTINGS: every group in view, in three columns ─────────── -->
+        <Border x:Name="PanelAjustes" Classes="panel" IsVisible="False" Margin="24" MaxWidth="1360"
+                VerticalAlignment="Top">
+          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <!-- No heading: the tab above already says where this is, and the room is the cards'. -->
+            <StackPanel Margin="22">
+              <Grid ColumnDefinitions="*,16,*,16,*">
 
-              <StackPanel Spacing="8">
-                <TextBlock x:Name="RotuloIdioma" Classes="label" />
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <Button x:Name="BotonEs" Classes="chip" Click="AlPulsarIdioma" Tag="es">
-                    <StackPanel Orientation="Horizontal" Spacing="7">
-                      <w:FlagIcon Code="es" VerticalAlignment="Center" />
-                      <TextBlock Text="Español" VerticalAlignment="Center" FontSize="12" />
+                <!-- Column 1: language, the client and the stored accounts. -->
+                <StackPanel Grid.Column="0" Spacing="16">
+                  <Border Classes="card">
+                    <StackPanel Spacing="14">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="tile"><w:Icon Kind="globe" /></Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock x:Name="TituloGeneral" Classes="h2" />
+                          <TextBlock x:Name="DescGeneral" Classes="pie" />
+                        </StackPanel>
+                      </Grid>
+
+                      <!-- The launcher's own language: a dropdown like the game's, as four
+                           names side by side no longer fit the card. -->
+                      <StackPanel>
+                        <TextBlock x:Name="RotuloIdioma" Classes="label" />
+                        <ComboBox x:Name="SelectorIdioma" Classes="field" SelectionChanged="AlElegirIdioma" />
+                      </StackPanel>
+
+                      <!-- The game's language, apart from the launcher's: every pack the client
+                           brings. The options are filled in MainWindow.axaml.cs. -->
+                      <StackPanel>
+                        <TextBlock x:Name="RotuloIdiomaJuego" Classes="label" />
+                        <ComboBox x:Name="SelectorIdiomaJuego" Classes="field"
+                                  SelectionChanged="AlElegirIdiomaDelJuego" />
+                      </StackPanel>
                     </StackPanel>
-                  </Button>
-                  <Button x:Name="BotonEn" Classes="chip" Click="AlPulsarIdioma" Tag="en">
-                    <StackPanel Orientation="Horizontal" Spacing="7">
-                      <w:FlagIcon Code="en" VerticalAlignment="Center" />
-                      <TextBlock Text="English" VerticalAlignment="Center" FontSize="12" />
+                  </Border>
+
+                  <Border Classes="card">
+                    <StackPanel Spacing="14">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="tile"><w:Icon Kind="monitor" /></Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock x:Name="RotuloCliente" Classes="h2" />
+                          <TextBlock x:Name="DescCliente" Classes="pie" />
+                        </StackPanel>
+                      </Grid>
+                      <StackPanel>
+                        <Button x:Name="BotonRuta" Classes="path" Click="AlPulsarRuta">
+                          <Grid ColumnDefinitions="Auto,*,Auto">
+                            <w:Icon Kind="folder" Width="16" Height="16" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TextoRuta" Grid.Column="1" Margin="10,0" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis" />
+                            <w:Icon Grid.Column="2" Kind="chevron-right" Width="14" Height="14" VerticalAlignment="Center"
+                                    Foreground="{DynamicResource TextTertiaryBrush}" />
+                          </Grid>
+                        </Button>
+                        <TextBlock x:Name="PieCliente" Classes="pie" Margin="0,6,0,0" />
+                      </StackPanel>
+                      <StackPanel x:Name="NativeClientSettings" Spacing="8" IsVisible="False">
+                        <Button x:Name="ConfigureClient" Classes="secondary" HorizontalAlignment="Left"
+                                Click="ConfigureNativeClient" />
+                        <TextBlock x:Name="ClientConfigLabel" Classes="label" />
+                        <TextBox x:Name="ClientConfigPath" Classes="field" LostFocus="SaveClientConfigPath" />
+                      </StackPanel>
                     </StackPanel>
-                  </Button>
-                  <Button x:Name="BotonFr" Classes="chip" Click="AlPulsarIdioma" Tag="fr">
-                    <StackPanel Orientation="Horizontal" Spacing="7">
-                      <w:FlagIcon Code="fr" VerticalAlignment="Center" />
-                      <TextBlock Text="Français" VerticalAlignment="Center" FontSize="12" />
+                  </Border>
+                  <Border Classes="card">
+                    <StackPanel Spacing="14">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="tile"><w:Icon Kind="users" /></Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock x:Name="RotuloCuentasGuardadas" Classes="h2" />
+                          <TextBlock x:Name="PieCuentasGuardadas" Classes="pie" />
+                        </StackPanel>
+                      </Grid>
+                      <Button x:Name="QuitarCuentas" Classes="danger" HorizontalAlignment="Stretch"
+                              Click="AlPulsarQuitarCuentas">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <w:Icon Kind="trash" Width="15" Height="15" VerticalAlignment="Center" />
+                          <TextBlock x:Name="TextoQuitarCuentas" VerticalAlignment="Center" />
+                        </StackPanel>
+                      </Button>
                     </StackPanel>
-                  </Button>
+                  </Border>
                 </StackPanel>
-                <TextBlock x:Name="PieIdioma" Classes="pie" />
-              </StackPanel>
 
-              <!-- The game's language, apart from the launcher's: every pack the client brings.
-                   The options are filled in MainWindow.axaml.cs, from the client's I18n folder. -->
-              <StackPanel Spacing="8">
-                <TextBlock x:Name="RotuloIdiomaJuego" Classes="label" />
-                <ComboBox x:Name="SelectorIdiomaJuego" Classes="field"
-                          SelectionChanged="AlElegirIdiomaDelJuego" />
-                <TextBlock x:Name="PieIdiomaJuego" Classes="pie" />
-              </StackPanel>
+                <!-- Column 2: the scenery packs. -->
+                <StackPanel Grid.Column="2" Spacing="16">
+                  <Border Classes="card">
+                    <StackPanel Spacing="14">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="tile"><w:Icon Kind="image" /></Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock x:Name="RotuloGraficos" Classes="h2" />
+                          <TextBlock x:Name="PieGraficos" Classes="pie" />
+                        </StackPanel>
+                      </Grid>
+                      <!-- One row per pack, built in MainWindow.Packs.cs. -->
+                      <StackPanel x:Name="FilasDePacks" Spacing="10" />
+                    </StackPanel>
+                  </Border>
 
-              <StackPanel Spacing="8">
-                <TextBlock x:Name="RotuloMusica" Classes="label" />
-                <Button x:Name="BotonMusica" Classes="chip" HorizontalAlignment="Left"
-                        Click="AlPulsarMusica">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Path x:Name="IconoAltavoz" Width="14" Height="14" Stretch="Uniform"
-                          Fill="{Binding $parent[Button].Foreground}"
-                          Data="M 3,6 L 6,6 L 10,2 L 10,14 L 6,10 L 3,10 Z" />
-                    <TextBlock x:Name="TextoMusica" VerticalAlignment="Center" FontSize="12" />
-                  </StackPanel>
-                </Button>
-              </StackPanel>
-
-              <StackPanel Spacing="8">
-                <TextBlock x:Name="RotuloCliente" Classes="label" />
-                <Button x:Name="BotonRuta" Classes="path" Height="34" Click="AlPulsarRuta">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Path Width="14" Height="14" Stretch="Uniform"
-                          Fill="{Binding $parent[Button].Foreground}"
-                          Data="M 1,3 L 6,3 L 7.5,5 L 15,5 L 15,13 L 1,13 Z" />
-                    <TextBlock x:Name="TextoRuta" VerticalAlignment="Center" FontSize="11"
-                               TextTrimming="CharacterEllipsis" />
-                  </StackPanel>
-                </Button>
-                <TextBlock x:Name="PieCliente" Classes="pie" />
-                <StackPanel x:Name="NativeClientSettings" Spacing="8" IsVisible="False">
-                  <Button x:Name="ConfigureClient" Classes="chip" Click="ConfigureNativeClient" />
-                  <TextBlock x:Name="ClientConfigLabel" Classes="label" />
-                  <TextBox x:Name="ClientConfigPath" Classes="field" LostFocus="SaveClientConfigPath" />
                 </StackPanel>
+
+                <!-- Column 3: where the server is, and the installation. -->
+                <StackPanel Grid.Column="4" Spacing="16">
+                  <Border Classes="card">
+                    <StackPanel Spacing="14">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="tile"><w:Icon Kind="server" /></Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock x:Name="RotuloServidorAjustes" Classes="h2" />
+                          <TextBlock x:Name="DescServidor" Classes="pie" />
+                        </StackPanel>
+                      </Grid>
+                      <Border Classes="segment" HorizontalAlignment="Stretch">
+                        <Grid ColumnDefinitions="*,*">
+                          <Button x:Name="AjusteServidorLocal" Classes="seg" Grid.Column="0" HorizontalAlignment="Stretch"
+                                  Click="AlElegirServidorAjustes" Tag="local">
+                            <TextBlock x:Name="TextoAjusteLocal" />
+                          </Button>
+                          <Button x:Name="AjusteServidorRemoto" Classes="seg" Grid.Column="1" HorizontalAlignment="Stretch"
+                                  Click="AlElegirServidorAjustes" Tag="remoto">
+                            <TextBlock x:Name="TextoAjusteRemoto" TextTrimming="CharacterEllipsis" />
+                          </Button>
+                        </Grid>
+                      </Border>
+                      <TextBox x:Name="CampoServidorAjustes" Classes="field" />
+                      <Button x:Name="GuardarServidor" Classes="secondary" HorizontalAlignment="Right" MinWidth="110"
+                              Click="AlGuardarServidor" />
+                    </StackPanel>
+                  </Border>
+
+                  <!-- The installation: its version, where its updates come from, repair, uninstall. -->
+                  <Border x:Name="AjustesInstalacion" Classes="card">
+                    <StackPanel Spacing="14">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="tile"><w:Icon Kind="box" /></Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock x:Name="RotuloInstalacion" Classes="h2" />
+                          <TextBlock x:Name="TextoVersionInstalada" Classes="pie" />
+                        </StackPanel>
+                      </Grid>
+                      <StackPanel>
+                        <TextBlock x:Name="RotuloRepositorioAjustes" Classes="label" />
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBox x:Name="CampoRepositorioAjustes" Classes="field" Grid.Column="0" />
+                          <Button x:Name="GuardarRepositorio" Classes="secondary" Grid.Column="1" Margin="8,0,0,0"
+                                  Height="38" Click="AlGuardarRepositorio" />
+                        </Grid>
+                      </StackPanel>
+                      <Button x:Name="BuscarActualizaciones" Classes="secondary" HorizontalAlignment="Stretch"
+                              Click="AlBuscarActualizaciones">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <w:Icon Kind="refresh" Width="15" Height="15" VerticalAlignment="Center" />
+                          <TextBlock x:Name="TextoBuscarActualizaciones" VerticalAlignment="Center" />
+                        </StackPanel>
+                      </Button>
+                      <Grid ColumnDefinitions="*,8,*">
+                        <Button x:Name="RepararInstalacion" Classes="secondary" Grid.Column="0" HorizontalAlignment="Stretch"
+                                Click="AlRepararInstalacion">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <w:Icon Kind="wrench" Width="15" Height="15" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TextoRepararInstalacion" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                          </StackPanel>
+                        </Button>
+                        <Button x:Name="Desinstalar" Classes="danger" Grid.Column="2" HorizontalAlignment="Stretch"
+                                Click="AlPulsarDesinstalar">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <w:Icon Kind="trash" Width="15" Height="15" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TextoDesinstalar" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                          </StackPanel>
+                        </Button>
+                      </Grid>
+                      <TextBlock x:Name="PieInstalacion" Classes="pie" />
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </ScrollViewer>
+        </Border>
+
+        <!-- ─── INSTALL (the downloaded setup) ──────────────────────────── -->
+        <Border x:Name="PanelInstalar" Classes="panel" IsVisible="False" MaxWidth="1240"
+                VerticalAlignment="Center" Margin="24,16">
+          <Grid RowDefinitions="*,Auto">
+          <ScrollViewer x:Name="DesplazaInstalar" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28,22,28,16" Spacing="16">
+              <!-- No eyebrow: the title already says what this is, and the height is worth more
+                   to the three columns, which must fit without scrolling. -->
+              <StackPanel Spacing="4">
+                <TextBlock x:Name="TituloInstalar" Classes="h1" FontSize="24" />
+                <TextBlock x:Name="IntroInstalar" Classes="desc" FontSize="13" />
               </StackPanel>
 
-              <!-- The optional HD and 4K scenery packs. The rows are built in MainWindow.Packs.cs,
-                   one per pack, because their buttons change with the state of each pack. -->
-              <StackPanel Spacing="8">
-                <TextBlock x:Name="RotuloGraficos" Classes="label" />
-                <StackPanel x:Name="FilasDePacks" Spacing="8" />
-                <TextBlock x:Name="PieGraficos" Classes="pie" />
-              </StackPanel>
+              <!-- Three columns across the whole panel, so that everything fits on one screen
+                   with nothing to scroll: where it goes and where updates come from, the
+                   client, the server. -->
+              <Grid ColumnDefinitions="*,16,*,16,*">
+                <StackPanel Grid.Column="0" Spacing="16">
+                  <!-- Where it goes. -->
+                  <Border Classes="card">
+                    <StackPanel Spacing="14">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="tile"><w:Icon Kind="folder" /></Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock x:Name="RotuloCarpeta" Classes="h2" />
+                          <TextBlock x:Name="DescCarpeta" Classes="pie" />
+                        </StackPanel>
+                      </Grid>
+                      <Button x:Name="BotonCarpeta" Classes="path" Click="AlPulsarCarpeta">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                          <w:Icon Kind="folder" Width="16" Height="16" VerticalAlignment="Center" />
+                          <TextBlock x:Name="TextoCarpeta" Grid.Column="1" Margin="10,0" VerticalAlignment="Center"
+                                     TextTrimming="CharacterEllipsis" Foreground="{DynamicResource CardTextBrush}" />
+                          <w:Icon Grid.Column="2" Kind="chevron-right" Width="14" Height="14" VerticalAlignment="Center"
+                                  Foreground="{DynamicResource TextTertiaryBrush}" />
+                        </Grid>
+                      </Button>
+                      <Grid x:Name="AvisoCarpeta" ColumnDefinitions="Auto,*">
+                        <w:Icon Kind="info" Width="14" Height="14" VerticalAlignment="Top" Margin="0,1,0,0"
+                                Foreground="{DynamicResource WarningBrush}" />
+                        <TextBlock x:Name="PieCarpeta" Grid.Column="1" Margin="8,0,0,0" Classes="pie" />
+                      </Grid>
+                      <!-- How full that drive is. -->
+                      <StackPanel x:Name="CajaDisco" Spacing="8">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                          <w:Icon Kind="drive" Width="15" Height="15" VerticalAlignment="Center"
+                                  Foreground="{DynamicResource TextSecondaryBrush}" />
+                          <TextBlock x:Name="TextoDisco" Grid.Column="1" Margin="8,0,0,0" FontSize="12"
+                                     VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+                          <TextBlock x:Name="LibreDisco" Grid.Column="2" FontSize="12" FontWeight="SemiBold"
+                                     VerticalAlignment="Center" Foreground="{DynamicResource CardTextBrush}" />
+                        </Grid>
+                        <w:ProgressStrip x:Name="BarraDisco" Height="5" />
+                      </StackPanel>
+                    </StackPanel>
+                  </Border>
 
-              <StackPanel Spacing="8">
-                <TextBlock x:Name="RotuloCuentasGuardadas" Classes="label" />
-                <Button x:Name="QuitarCuentas" Classes="launcher danger" Height="38"
-                        HorizontalAlignment="Stretch" Click="AlPulsarQuitarCuentas">
-                  <TextBlock x:Name="TextoQuitarCuentas" FontSize="12.5" FontWeight="Bold" />
-                </Button>
-                <TextBlock x:Name="PieCuentasGuardadas" Classes="pie" />
-              </StackPanel>
+                  <!-- Where the updates come from. -->
+                  <Border Classes="card">
+                    <StackPanel Spacing="12">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="tile"><w:Icon Kind="branch" /></Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock x:Name="RotuloRepositorio" Classes="h2" />
+                          <TextBlock x:Name="PieRepositorio" Classes="pie" />
+                        </StackPanel>
+                      </Grid>
+                      <TextBox x:Name="CampoRepositorio" Classes="field" />
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+
+                <!-- The Dofus client. -->
+                <Border Classes="card" Grid.Column="2">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="Auto,*">
+                      <Border Classes="tile"><w:Icon Kind="monitor" /></Border>
+                      <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock x:Name="RotuloClienteInstalar" Classes="h2" />
+                        <TextBlock x:Name="DescClienteInstalar" Classes="pie" />
+                      </StackPanel>
+                    </Grid>
+                    <StackPanel Spacing="8">
+                      <Button x:Name="OpcionTengoCliente" Classes="option" Click="AlElegirCliente" Tag="tengo">
+                        <Grid ColumnDefinitions="Auto,*">
+                          <Border Classes="radio"><Ellipse Classes="dot" /></Border>
+                          <StackPanel Grid.Column="1">
+                            <TextBlock x:Name="TextoTengoCliente" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DescTengoCliente" Classes="desc" />
+                          </StackPanel>
+                        </Grid>
+                      </Button>
+                      <Button x:Name="OpcionDescargarCliente" Classes="option" Click="AlElegirCliente" Tag="descargar">
+                        <Grid ColumnDefinitions="Auto,*">
+                          <Border Classes="radio"><Ellipse Classes="dot" /></Border>
+                          <StackPanel Grid.Column="1">
+                            <TextBlock x:Name="TextoDescargarCliente" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DescDescargarCliente" Classes="desc" />
+                          </StackPanel>
+                        </Grid>
+                      </Button>
+                    </StackPanel>
+                    <Button x:Name="BotonClienteInstalar" Classes="path" Click="AlPulsarClienteInstalar">
+                      <Grid ColumnDefinitions="Auto,*,Auto">
+                        <w:Icon Kind="folder" Width="16" Height="16" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TextoClienteInstalar" Grid.Column="1" Margin="10,0" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" Foreground="{DynamicResource CardTextBrush}" />
+                        <w:Icon Grid.Column="2" Kind="chevron-right" Width="14" Height="14" VerticalAlignment="Center"
+                                Foreground="{DynamicResource TextTertiaryBrush}" />
+                      </Grid>
+                    </Button>
+                    <TextBlock x:Name="PieClienteInstalar" Classes="pie" />
+                  </StackPanel>
+                </Border>
+
+                <!-- Where the server is. -->
+                <Border Classes="card" Grid.Column="4">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="Auto,*">
+                      <Border Classes="tile"><w:Icon Kind="server" /></Border>
+                      <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock x:Name="RotuloServidorInstalar" Classes="h2" />
+                        <TextBlock x:Name="DescServidorInstalar" Classes="pie" />
+                      </StackPanel>
+                    </Grid>
+                    <StackPanel Spacing="8">
+                      <Button x:Name="OpcionServidorLocal" Classes="option" Click="AlElegirServidor" Tag="local">
+                        <Grid ColumnDefinitions="Auto,*">
+                          <Border Classes="radio"><Ellipse Classes="dot" /></Border>
+                          <StackPanel Grid.Column="1">
+                            <TextBlock x:Name="TextoServidorLocal" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DescServidorLocal" Classes="desc" />
+                          </StackPanel>
+                        </Grid>
+                      </Button>
+                      <Button x:Name="OpcionServidorRemoto" Classes="option" Click="AlElegirServidor" Tag="remoto">
+                        <Grid ColumnDefinitions="Auto,*">
+                          <Border Classes="radio"><Ellipse Classes="dot" /></Border>
+                          <StackPanel Grid.Column="1">
+                            <TextBlock x:Name="TextoServidorRemoto" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DescServidorRemoto" Classes="desc" />
+                          </StackPanel>
+                        </Grid>
+                      </Button>
+                    </StackPanel>
+                    <TextBox x:Name="CampoServidorInstalar" Classes="field" />
+                  </StackPanel>
+                </Border>
+              </Grid>
 
             </StackPanel>
           </ScrollViewer>
 
-        </Panel>
-      </DockPanel>
-    </Border>
+            <!-- The way out stays in sight however low the window is. -->
+            <StackPanel Grid.Row="1">
+              <Border Classes="rule" Margin="28,0" />
+              <Border Padding="0,14,0,0">
+              <Grid ColumnDefinitions="*,Auto" Margin="28,0,28,18">
+                <Button x:Name="OpcionAccesos" Classes="check" Grid.Column="0" VerticalAlignment="Center"
+                        Click="AlPulsarAccesos">
+                  <StackPanel Orientation="Horizontal">
+                    <Border Classes="box"><w:Icon Classes="tick" Kind="check" /></Border>
+                    <TextBlock x:Name="TextoAccesos" VerticalAlignment="Center" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="BotonInstalar" Classes="launcher green" Grid.Column="1" Height="50" MinWidth="280"
+                        Click="AlPulsarInstalar">
+                  <StackPanel Orientation="Horizontal" Spacing="12">
+                    <w:Icon Kind="download" Width="18" Height="18" VerticalAlignment="Center" />
+                    <w:SpacedText x:Name="TextoInstalar" Spacing="2" Shadow="True" FontSize="17" VerticalAlignment="Center"
+                                  FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif"
+                                  FontWeight="Bold" Foreground="White" />
+                  </StackPanel>
+                </Button>
+              </Grid>
+              </Border>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- ─── PROGRESS (installing, updating, repairing) ──────────────── -->
+        <Border x:Name="PanelProgreso" Classes="panel" IsVisible="False" MaxWidth="920"
+                VerticalAlignment="Center" Margin="24">
+          <StackPanel Margin="30,26,30,28">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Grid.Column="0" Spacing="6">
+                <TextBlock x:Name="EyebrowProgreso" Classes="eyebrow" />
+                <TextBlock x:Name="TituloProgreso" Classes="h1" FontSize="24" />
+              </StackPanel>
+              <TextBlock x:Name="PorcentajeTotal" Grid.Column="1" VerticalAlignment="Bottom"
+                         FontFamily="Segoe UI Variable Display, Segoe UI, Noto Sans, DejaVu Sans, sans-serif"
+                         FontSize="32" FontWeight="SemiBold" Margin="0,0,0,-4"
+                         Foreground="{DynamicResource HighlightTextBrush}" />
+            </Grid>
+            <w:ProgressStrip x:Name="BarraTotal" Height="10" Margin="0,16,0,8" />
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="PasoActual" Grid.Column="0" Classes="pie" FontSize="12" />
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                <w:Icon Kind="clock" Width="13" Height="13" VerticalAlignment="Center"
+                        Foreground="{DynamicResource TextTertiaryBrush}" />
+                <TextBlock x:Name="TiempoTotal" Classes="pie" FontSize="12" VerticalAlignment="Center" />
+              </StackPanel>
+            </Grid>
+
+            <!-- Every step as a node on one line: done, running, ahead. Pointing at one shows it below. -->
+            <w:StepTrail x:Name="RastroDePasos" Margin="-6,22,-6,4" />
+
+            <!-- The step in hand (or the one pointed at): what it is, how far, how long. -->
+            <Border x:Name="TarjetaPaso" Classes="card" Margin="0,12,0,0" Padding="20,16,20,18">
+              <StackPanel>
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                  <TextBlock x:Name="NumeroPaso" Grid.Column="0" Classes="eyebrow" VerticalAlignment="Center"
+                             Foreground="{DynamicResource TextTertiaryBrush}" />
+                  <Border x:Name="ChipPaso" Grid.Column="1" Classes="pill" Margin="12,0,0,0">
+                    <TextBlock x:Name="TextoChipPaso" />
+                  </Border>
+                  <TextBlock x:Name="TiempoPaso" Grid.Column="3" Classes="pie" FontSize="12" VerticalAlignment="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                  <TextBlock x:Name="TituloPaso" Grid.Column="0" FontSize="17" FontWeight="SemiBold"
+                             TextTrimming="CharacterEllipsis" Foreground="{DynamicResource CardTextBrush}" />
+                  <TextBlock x:Name="PorcentajePaso" Grid.Column="1" FontSize="17" FontWeight="SemiBold"
+                             Margin="12,0,0,0" Foreground="{DynamicResource GoldBrush}" />
+                </Grid>
+                <TextBlock x:Name="DetallePaso" Classes="desc" Margin="0,4,0,0" MaxLines="2"
+                           TextTrimming="CharacterEllipsis" />
+                <w:ProgressStrip x:Name="BarraPaso" Height="6" Margin="0,14,0,0" />
+              </StackPanel>
+            </Border>
+            <StackPanel x:Name="FilaSiguiente" Orientation="Horizontal" Spacing="6" Margin="4,10,0,0">
+              <w:Icon Kind="chevron-right" Width="13" Height="13" VerticalAlignment="Center"
+                      Foreground="{DynamicResource TextTertiaryBrush}" />
+              <TextBlock x:Name="SiguientePaso" Classes="pie" FontSize="12" VerticalAlignment="Center" />
+            </StackPanel>
+
+            <!-- At the end: every step and what it took. -->
+            <Border x:Name="CajaResumen" Classes="card" Margin="0,12,0,0" IsVisible="False" Padding="18,14">
+              <Grid x:Name="ResumenPasos" />
+            </Border>
+
+            <TextBlock x:Name="NotaProgreso" Classes="desc" Margin="0,18,0,0" FontSize="13" />
+            <StackPanel x:Name="BotonesProgreso" Orientation="Horizontal" Spacing="10" Margin="0,20,0,0"
+                        HorizontalAlignment="Right">
+              <Button x:Name="BotonVolver" Classes="ghost" IsVisible="False" Click="AlPulsarVolver" Height="48">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <w:Icon Kind="arrow-left" Width="15" Height="15" VerticalAlignment="Center" />
+                  <TextBlock x:Name="TextoVolver" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button x:Name="BotonProgreso" Classes="launcher green" Height="50" MinWidth="260" IsVisible="False"
+                      Click="AlPulsarBotonProgreso">
+                <w:SpacedText x:Name="TextoBotonProgreso" Spacing="2" Shadow="True" FontSize="15"
+                              FontFamily="Cinzel, Trebuchet MS, Segoe UI, sans-serif"
+                              FontWeight="Bold" Foreground="White" />
+              </Button>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- ─── The notice: a toast at the top, with what it is in its stripe ── -->
+        <Border x:Name="Aviso" IsVisible="False" ZIndex="10"
+                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="24,18,24,0" MaxWidth="520"
+                CornerRadius="12" BorderThickness="1" ClipToBounds="True"
+                Background="{DynamicResource SurfaceRaisedBrush}"
+                BorderBrush="{DynamicResource HairlineStrongBrush}"
+                BoxShadow="0 16 40 0 #C0000000">
+          <Grid ColumnDefinitions="4,Auto,*,Auto">
+            <Border x:Name="FranjaAviso" Grid.Column="0" Background="{DynamicResource DangerBrush}" />
+            <w:Icon x:Name="IconoAviso" Grid.Column="1" Kind="alert" Width="18" Height="18"
+                    Margin="14,14,0,0" VerticalAlignment="Top" Foreground="{DynamicResource DangerBrush}" />
+            <TextBlock x:Name="TextoAviso" Grid.Column="2" TextWrapping="Wrap" FontSize="13" LineHeight="19"
+                       Margin="12,13,8,14" VerticalAlignment="Center"
+                       Foreground="{DynamicResource CardTextBrush}" />
+            <Button x:Name="CerrarAviso" Grid.Column="3" Classes="ghost" Padding="9" Margin="0,6,6,6"
+                    VerticalAlignment="Top" Click="AlCerrarAviso">
+              <w:Icon Kind="close" Width="13" Height="13" />
+            </Button>
+          </Grid>
+        </Border>
+      </Panel>
+    </Grid>
   </Panel>
 </Window>

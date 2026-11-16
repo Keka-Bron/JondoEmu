@@ -30,9 +30,62 @@ namespace Jondo.Unity.Launcher
         /// <summary>What the server's executable, which lives alongside, is called.</summary>
         public static string EjecutableDelServidor => OperatingSystem.IsWindows() ? "Jondo Server.exe" : "Jondo Server";
 
+        /// <summary>What the launcher is this time, from what is beside it.</summary>
+        internal enum LaunchMode
+        {
+            /// <summary>Nothing beside it: it is the downloaded setup, and the window installs.</summary>
+            Setup,
+
+            /// <summary>An install.json beside it: an installation, kept up to date from its repository.</summary>
+            Installed,
+
+            /// <summary>The emulator's folder without install.json: unpacked by hand or a developer's checkout. Never updated.</summary>
+            Portable,
+        }
+
+        internal static LaunchMode Mode { get; private set; }
+
+        /// <summary>The installation this launcher belongs to, when it is <see cref="LaunchMode.Installed"/>.</summary>
+        internal static Setup.InstallLayout? Installation { get; private set; }
+
+        /// <summary>The release it was just updated to, when it was started again for that.</summary>
+        internal static string JustUpdatedTo { get; private set; } = "";
+
+        /// <summary>Started by Windows' installed apps to uninstall: the window only asks and hands it over.</summary>
+        internal static bool UninstallRequested { get; private set; }
+
+        /// <summary>Why the relay to the remote server could not be set up, for the window to say; empty when it was.</summary>
+        internal static string RelayError { get; private set; } = "";
+
         [STAThread]
         private static int Main(string[] args)
         {
+            // The part of the setup that needs an administrator: a process of its own, no window.
+            if (Array.IndexOf(args, "--elevated-setup") >= 0) return Setup.SystemIntegration.ElevatedMain(args);
+            if (Array.IndexOf(args, "--uninstall-run") >= 0) return Setup.Uninstaller.RunMain(args);
+
+            // Started again by the one before it (after an update, after the setup): it waits for that one to be gone.
+            WaitForThePreviousOne(args);
+
+            Installation = Setup.InstallLayout.Current;
+            string here = Path.GetDirectoryName(Environment.ProcessPath ?? "") ?? "";
+            Mode = Array.IndexOf(args, "--setup") >= 0 ? LaunchMode.Setup
+                 : Installation != null ? LaunchMode.Installed
+                 : File.Exists(Path.Combine(here, Setup.InstallLayout.RootMarker)) || Environment.GetEnvironmentVariable("JONDO_EMULATOR_ROOT") is { Length: > 0 }
+                     ? LaunchMode.Portable
+                     : LaunchMode.Setup;
+            int updated = Array.IndexOf(args, "--updated");
+            if (updated >= 0 && updated + 1 < args.Length) JustUpdatedTo = args[updated + 1];
+            if (Installation != null) Setup.InstallLayout.RemoveLeftovers(Installation.Root);
+
+            if (Array.IndexOf(args, "--uninstall") >= 0)
+            {
+                if (Installation == null) return 1;
+                UninstallRequested = true;
+                BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+                return 0;
+            }
+
             if (!Contract.CogerElSitio("JondoEmuLanzador"))
             {
                 // And it is brought to the front, which is what whoever has just double-clicked expects.
@@ -48,6 +101,14 @@ namespace Jondo.Unity.Launcher
             try
             {
                 using var activation = new LauncherActivation();
+                Console.WriteLine($"[Launcher] {Mode}{(Installation != null ? " at " + Installation.Root : "")}.");
+                if (Mode == LaunchMode.Setup)
+                {
+                    // Nothing to connect to yet: the window installs first.
+                    BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+                    return 0;
+                }
+
                 if (!UI.LauncherPreferences.ServerIsLocal)
                 {
                     try
@@ -56,9 +117,11 @@ namespace Jondo.Unity.Launcher
                     }
                     catch (Exception ex)
                     {
+                        // The window still opens and says why -- ports held by a server on this
+                        // machine, most often. Closing without a word left the player with nothing.
                         Console.WriteLine($"[Launcher] Could not set up the relay to " +
                                           $"{UI.LauncherPreferences.ServerHost}: {ex.Message}");
-                        return 1;
+                        RelayError = ex.Message;
                     }
                     Console.WriteLine($"[Launcher] Local relay active to " +
                                       $"{UI.LauncherPreferences.ServerHost}.");
@@ -118,28 +181,70 @@ namespace Jondo.Unity.Launcher
             Console.WriteLine("[Launcher] No server listening; starting the one alongside.");
             try
             {
-                // Truly detached: the system starts it, without inheriting the launcher's console nor
-                // descriptors, so closing the launcher afterwards does not take it down with
-                // it.
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = servidor,
-                    WorkingDirectory = aquí ?? "",
-                    UseShellExecute = true,
-                });
+                if (!await StartServerAsync(servidor, aquí ?? "")) Console.WriteLine("[Launcher] The server never answered.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Launcher] Could not start the server: {ex.Message}");
-                return;
             }
+        }
+
+        /// <summary>
+        /// Starts a server and waits for it to answer: false when it never does. The setup's last
+        /// step uses it too, so the launcher it opens finds the server already there.
+        /// </summary>
+        internal static async Task<bool> StartServerAsync(string executable, string workingDirectory)
+        {
+            // Truly detached: the system starts it, without inheriting the launcher's console nor
+            // descriptors, so closing the launcher afterwards does not take it down with it.
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = executable,
+                WorkingDirectory = workingDirectory,
+                UseShellExecute = true,
+            });
 
             // With patience: the server reads the base, the managers and the maps before opening a
             // single port, and that is several seconds from cold.
-            if (!await Task.Run(() => Network.ControlClient.EsperarAlServidor(Network.ControlClient.PlazoDeArranque)))
+            return await Task.Run(() => Network.ControlClient.EsperarAlServidor(Network.ControlClient.PlazoDeArranque));
+        }
+
+        /// <summary>
+        /// With <c>--after PID</c>, waits up to half a minute for that process to end: the launcher
+        /// that started this one (the setup, or itself before an update) still holds the single
+        /// instance and the files.
+        /// </summary>
+        private static void WaitForThePreviousOne(string[] args)
+        {
+            int at = Array.IndexOf(args, "--after");
+            if (at < 0 || at + 1 >= args.Length || !int.TryParse(args[at + 1], out int pid)) return;
+            try
             {
-                Console.WriteLine("[Launcher] The server never answered.");
+                using var previous = Process.GetProcessById(pid);
+                previous.WaitForExit(30_000);
             }
+            catch (ArgumentException) { }          // already gone
+            catch (InvalidOperationException) { }
+        }
+
+        /// <summary>
+        /// Starts another launcher -- the installed one after the setup, the new one after an
+        /// update -- that waits for this one to end; then this one closes.
+        /// </summary>
+        internal static void StartAgain(string executable, params string[] extra)
+        {
+            var start = new ProcessStartInfo(executable)
+            {
+                WorkingDirectory = Path.GetDirectoryName(executable) ?? "",
+                UseShellExecute = false,
+            };
+            start.ArgumentList.Add("--after");
+            start.ArgumentList.Add(Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            foreach (string argument in extra) start.ArgumentList.Add(argument);
+            // The setup's own JONDO_EMULATOR_ROOT, if any, must not follow it into the installation.
+            start.Environment.Remove("JONDO_EMULATOR_ROOT");
+            Process.Start(start);
+            Console.WriteLine($"[Launcher] Starting {executable} again; this one closes.");
         }
 
         // ─── The closing ────────────────────────────────────────────────────────────────────

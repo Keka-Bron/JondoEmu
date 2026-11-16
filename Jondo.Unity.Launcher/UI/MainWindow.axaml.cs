@@ -79,10 +79,17 @@ namespace Jondo.Unity.Launcher.UI
         private string _firmaDeActivas = "";
 
         /// <summary>One line of the game languages' dropdown. An empty code is "the launcher's".</summary>
-        private sealed record IdiomaDelJuego(string Codigo, string Bandera, string Nombre);
+        private sealed record IdiomaDelJuego(string Codigo, string Bandera, string Nombre)
+        {
+            /// <summary>What a screen reader says for the line: its name, not the record.</summary>
+            public override string ToString() => Nombre;
+        }
 
         /// <summary>While the dropdown is being refilled, its SelectionChanged is not the player's.</summary>
         private bool _rellenandoIdiomas;
+
+        /// <summary>The languages the launcher itself speaks, in the order its dropdown lists them.</summary>
+        private static readonly Language[] IdiomasDelLanzador = { Language.Es, Language.En, Language.Fr, Language.Pt };
 
         /// <summary>Whoever draws the portraits, taking them from the Dofus client's bones.</summary>
         /// <remarks>
@@ -107,9 +114,9 @@ namespace Jondo.Unity.Launcher.UI
             NativeClientSettings.IsVisible = OperatingSystem.IsLinux();
             ClientConfigPath.Text = LauncherPreferences.ClientConfigDirectory;
 
-            // The flag and the name, as in the language chips; the same template draws the closed
-            // box, so the chosen one shows with its flag too.
-            SelectorIdiomaJuego.ItemTemplate = new FuncDataTemplate<IdiomaDelJuego>((opcion, _) =>
+            // The flag and the name; the same template draws the closed box, so the chosen one
+            // shows with its flag too. Both dropdowns, the launcher's and the game's, share it.
+            var conBandera = new FuncDataTemplate<IdiomaDelJuego>((opcion, _) =>
                 new StackPanel
                 {
                     Orientation = Avalonia.Layout.Orientation.Horizontal,
@@ -117,23 +124,14 @@ namespace Jondo.Unity.Launcher.UI
                     Children =
                     {
                         new FlagIcon { Code = opcion?.Bandera ?? "", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
-                        new TextBlock { Text = opcion?.Nombre ?? "", FontSize = 12, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
+                        new TextBlock { Text = opcion?.Nombre ?? "", FontSize = 13, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
                     },
                 });
-
-            // The flag and the name, as in the language chips; the same template draws the closed
-            // box, so the chosen one shows with its flag too.
-            SelectorIdiomaJuego.ItemTemplate = new FuncDataTemplate<IdiomaDelJuego>((opcion, _) =>
-                new StackPanel
-                {
-                    Orientation = Avalonia.Layout.Orientation.Horizontal,
-                    Spacing = 8,
-                    Children =
-                    {
-                        new FlagIcon { Code = opcion?.Bandera ?? "", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
-                        new TextBlock { Text = opcion?.Nombre ?? "", FontSize = 12, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center },
-                    },
-                });
+            SelectorIdiomaJuego.ItemTemplate = conBandera;
+            SelectorIdioma.ItemTemplate = conBandera;
+            SelectorIdioma.ItemsSource = IdiomasDelLanzador
+                .Select(l => new IdiomaDelJuego(LauncherTexts.Code(l), LauncherTexts.Code(l), Textos.NombreDelIdioma(l)))
+                .ToList();
 
             Fondo.Source = LauncherSkin.LoadImage("bg.jpg");
             _reloj.Tick += (_, _) => MirarElEstado();
@@ -300,7 +298,7 @@ namespace Jondo.Unity.Launcher.UI
             Recolocar();
 
             // The music starts on its own, just like the web interface's autoplay.
-            _musica = new MusicPlayer(Path.Combine(LauncherSkin.AssetsFolder, "theme.mp3"));
+            _musica = new MusicPlayer(LauncherSkin.AssetPath("theme.mp3") ?? Path.Combine(LauncherSkin.AssetsFolder, "theme.mp3"));
             if (_musica.Available) _musica.Play();
             RefrescarBotonDeMusica();
 
@@ -308,9 +306,10 @@ namespace Jondo.Unity.Launcher.UI
             _reloj.Start();
 
             AlFrente();
+            PrepararElModo();
 
-            // And the stored accounts, with the window already on screen.
-            _ = CargarLasCuentasAsync();
+            // And the stored accounts, with the window already on screen. The setup has none yet.
+            if (Program.Mode != Program.LaunchMode.Setup && !Program.UninstallRequested) _ = CargarLasCuentasAsync();
         }
 
         /// <summary>
@@ -348,8 +347,11 @@ namespace Jondo.Unity.Launcher.UI
         protected override void OnClosed(EventArgs e)
         {
             _reloj.Stop();
-            // A pack download in flight stops here; its journal keeps what was done.
+            _relojProgreso.Stop();
+            // A pack download in flight stops here; its journal keeps what was done. An install or
+            // an update too: every download resumes, and a step left halfway is done again.
             _packCancelar?.Cancel();
+            _cancelarTrabajo?.Cancel();
             _musica?.Dispose();
             _retratos.Dispose();
             base.OnClosed(e);
@@ -366,6 +368,9 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Shows the section due and switches off the other two.</summary>
         private void Recolocar()
         {
+            // The installer and the progress of an update take the whole card.
+            if (RecolocarInstalador()) return;
+
             PanelJugar.IsVisible = _seccion == Seccion.Jugar;
             PanelCuentas.IsVisible = _seccion == Seccion.Cuentas;
             PanelAjustes.IsVisible = _seccion == Seccion.Ajustes;
@@ -384,7 +389,7 @@ namespace Jondo.Unity.Launcher.UI
             bool hayCuentas = _cuentas.Count > 0;
             ListaDeCuentas.IsVisible = hayCuentas;
             EquipoVacio.IsVisible = !hayCuentas;
-            BotonJugar.IsVisible = hayCuentas;
+            BotonJugar.IsVisible = hayCuentas || _actualizacion != null;
             BotonTodas.IsVisible = hayCuentas;
 
             // And with the team full it greys out instead of hiding, with the reason on top:
@@ -422,18 +427,27 @@ namespace Jondo.Unity.Launcher.UI
 
         private void AplicarIdioma()
         {
-            BotonEs.Classes.Set("on", _idioma == Language.Es);
-            BotonEn.Classes.Set("on", _idioma == Language.En);
-            BotonFr.Classes.Set("on", _idioma == Language.Fr);
+            _rellenandoIdiomas = true;
+            try { SelectorIdioma.SelectedIndex = Array.IndexOf(IdiomasDelLanzador, _idioma); }
+            finally { _rellenandoIdiomas = false; }
 
-            PestanaEntrar.Content = Etiqueta(_textos.LoginTab, 1, bold: true);
-            PestanaRegistro.Content = Etiqueta(_textos.RegisterTab, 1, bold: true);
+            // The top bar's sections.
+            TextoSeccionJugar.Text = Textos.Frase(Textos.Jugar(_idioma));
+            TextoSeccionCuentas.Text = Textos.Frase(Textos.Cuentas(_idioma));
+            TextoSeccionAjustes.Text = Textos.Frase(Textos.Ajustes(_idioma));
 
-            RotuloUsuario.Text = _textos.UsernameLabel.ToUpperInvariant();
-            RotuloClave.Text = _textos.PasswordLabel.ToUpperInvariant();
-            RotuloNuevoUsuario.Text = _textos.NewUsernameLabel.ToUpperInvariant();
-            RotuloNuevaClave.Text = _textos.NewPasswordLabel.ToUpperInvariant();
-            RotuloApodo.Text = _textos.NicknameLabel.ToUpperInvariant();
+            // Accounts: the heading, the two tabs, the fields.
+            TituloCuentas.Text = Textos.TituloCuentas(_idioma);
+            IntroCuentas.Text = Textos.IntroCuentas(_idioma);
+            PieCuentas.Text = Textos.PieCuentas(_idioma);
+            TextoPestanaEntrar.Text = Textos.Frase(_textos.LoginTab);
+            TextoPestanaRegistro.Text = Textos.Frase(_textos.RegisterTab);
+
+            RotuloUsuario.Text = _textos.UsernameLabel;
+            RotuloClave.Text = _textos.PasswordLabel;
+            RotuloNuevoUsuario.Text = _textos.NewUsernameLabel;
+            RotuloNuevaClave.Text = _textos.NewPasswordLabel;
+            RotuloApodo.Text = _textos.NicknameLabel;
 
             CampoUsuario.Watermark = _textos.UsernamePlaceholder;
             CampoClave.Watermark = "••••••••";
@@ -443,30 +457,29 @@ namespace Jondo.Unity.Launcher.UI
 
             TextoConectar.Text = _textos.ConnectButton;
             TextoCrear.Text = _textos.CreateButton;
+
+            // Settings: the page, then each card's title and what it is for.
+            TituloGeneral.Text = Textos.General(_idioma);
+            DescGeneral.Text = Textos.DescGeneral(_idioma);
+            RotuloIdioma.Text = Textos.Idioma(_idioma);
+            RotuloIdiomaJuego.Text = Textos.IdiomaDelJuego(_idioma);
+            RotuloCliente.Text = Textos.Cliente(_idioma);
+            DescCliente.Text = Textos.DescCliente(_idioma);
+            DescServidor.Text = Textos.DescServidor(_idioma);
+            RotuloCuentasGuardadas.Text = Textos.CuentasGuardadas(_idioma);
             TextoQuitarCuentas.Text = _textos.RemoveSelected;
 
-            // The titles of the three sections and those of the settings. They go here and not in the XAML
-            // because they change with the language like everything else.
-            SeccionJugar.Content = Etiqueta(Textos.Jugar(_idioma), 1.5, bold: true);
-            SeccionCuentas.Content = Etiqueta(Textos.Cuentas(_idioma), 1.5, bold: true);
-            SeccionAjustes.Content = Etiqueta(Textos.Ajustes(_idioma), 1.5, bold: true);
-
-            RotuloIdioma.Text = Textos.Idioma(_idioma).ToUpperInvariant();
-            RotuloIdiomaJuego.Text = Textos.IdiomaDelJuego(_idioma).ToUpperInvariant();
-            RotuloMusica.Text = Textos.Musica(_idioma).ToUpperInvariant();
-            RotuloCliente.Text = Textos.Cliente(_idioma).ToUpperInvariant();
-            RotuloCuentasGuardadas.Text = Textos.CuentasGuardadas(_idioma).ToUpperInvariant();
-
-            PieIdioma.Text = Textos.PieIdioma(_idioma);
-            PieIdiomaJuego.Text = Textos.PieIdiomaDelJuego(_idioma);
+            ToolTip.SetTip(SelectorIdiomaJuego, Textos.PieIdiomaDelJuego(_idioma));
             PieCliente.Text = Textos.PieCliente(_idioma);
             ConfigureClient.Content = Textos.ConfigurarCliente(_idioma);
             ClientConfigLabel.Text = Textos.DirectorioPreferenciasCliente(_idioma);
             PieCuentasGuardadas.Text = Textos.PieCuentasGuardadas(_idioma);
 
+            // Play: the empty state and the shortcut beside the big button.
+            TituloEquipoVacio.Text = Textos.SinCuentas(_idioma);
             TextoEquipoVacio.Text = Textos.EquipoVacio(_idioma);
-            TextoPrimeraCuenta.Text = _textos.AddAccountButton;
-            TextoAnadirOtra.Text = _textos.AddAccountButton;
+            TextoPrimeraCuenta.Text = Textos.PrimeraCuenta(_idioma);
+            TextoAnadirOtra.Text = Textos.AnadirCuenta(_idioma);
 
             // The game's language is the --langCode it starts with. That is why the path row shows
             // it, so one does not have to guess which language it will open in.
@@ -476,19 +489,8 @@ namespace Jondo.Unity.Launcher.UI
             RefrescarBotonDeMusica();
             RefrescarEstado();
             RefrescarPacks();
+            AplicarTextosInstalador();
         }
-
-        /// <summary>The tabs' spaced title, which on the website was the letter-spacing.</summary>
-        private SpacedText Etiqueta(string texto, double separacion, bool bold) => new SpacedText
-        {
-            Text = texto,
-            Spacing = separacion,
-            Shadow = true,
-            FontSize = 12,
-            FontWeight = bold ? FontWeight.Bold : FontWeight.Normal,
-            FontFamily = LauncherSkin.Title,
-            Foreground = new SolidColorBrush(LauncherSkin.CardText),
-        };
 
         private void RefrescarRutaDelCliente()
         {
@@ -501,19 +503,19 @@ namespace Jondo.Unity.Launcher.UI
                 TextoRuta.Text = guardada.Length > 0
                     ? Textos.ClientMoved(_idioma)
                     : Textos.ClientNotFound(_idioma);
-                BotonRuta.Foreground = new SolidColorBrush(Color.FromRgb(236, 120, 96));
+                TextoRuta.Foreground = new SolidColorBrush(LauncherSkin.Danger);
             }
             else
             {
                 TextoRuta.Text = Recortar(ruta) + "   ·   " + idioma;
-                BotonRuta.Foreground = new SolidColorBrush(LauncherSkin.Gold);
+                TextoRuta.Foreground = new SolidColorBrush(LauncherSkin.CardText);
             }
         }
 
         /// <summary>Long paths cut in the middle: the end is what identifies the file.</summary>
         private static string Recortar(string ruta)
         {
-            const int tope = 46;
+            const int tope = 40;
             if (ruta.Length <= tope) return ruta;
             return ruta.Substring(0, 12) + "…" + ruta.Substring(ruta.Length - (tope - 13));
         }
@@ -522,14 +524,25 @@ namespace Jondo.Unity.Launcher.UI
         {
             int elegidas = _cuentas.Count(a => a.Selected);
 
-            TituloEquipo.Text = string.Format(_textos.TeamTitle, _cuentas.Count);
+            TituloEquipo.Text = Textos.TuEquipo(_idioma);
+            TextoCuentaEquipo.Text = $"{_cuentas.Count}/{LauncherService.MaximumClients}";
+            CuentaEquipo.IsVisible = _cuentas.Count > 0;
             // «2 seleccionado(s) · 0 activo(s)» did not say what «activo» was. Now it says.
             ResumenEquipo.Text = Textos.Resumen(_idioma, elegidas, LauncherService.ActiveCount);
-            TextoJugar.Text = string.Format(_textos.LaunchSelected, elegidas);
-            TextoTodas.Text = elegidas == _cuentas.Count && elegidas > 0
+            TextoTodas.Text = Textos.Frase(elegidas == _cuentas.Count && elegidas > 0
                 ? _textos.DeselectAll
-                : _textos.SelectAll;
+                : _textos.SelectAll);
 
+            // With a newer release out, the button updates instead: nothing is played on an old version.
+            if (_actualizacion is { } nueva)
+            {
+                TextoJugar.Text = SetupTexts.UpdateButton(_idioma, nueva.Release.Tag);
+                IconoJugar.Kind = "download";
+                BotonJugar.IsEnabled = !_trabajando;
+                return;
+            }
+            TextoJugar.Text = string.Format(_textos.LaunchSelected, elegidas);
+            IconoJugar.Kind = "play";
             BotonJugar.IsEnabled = _servidorEnLinea && elegidas > 0 && !_ocupado;
         }
 
@@ -571,38 +584,48 @@ namespace Jondo.Unity.Launcher.UI
         /// </remarks>
         private Control FichaDe(TeamAccount cuenta, bool jugando)
         {
-            var marca = new TextBlock
-            {
-                Text = cuenta.Selected ? "✔" : "",
-                FontSize = 15,
-                FontWeight = FontWeight.Bold,
-                Foreground = new SolidColorBrush(LauncherSkin.LightGold),
-                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-            };
-
+            // The tick: a box like the rest of the launcher's, filled gold when the account goes.
             var casilla = new Border
             {
-                Width = 24,
-                Height = 24,
-                CornerRadius = new Avalonia.CornerRadius(4),
-                BorderThickness = new Avalonia.Thickness(2),
-                BorderBrush = new SolidColorBrush(cuenta.Selected ? LauncherSkin.LightGold : LauncherSkin.BorderBrown),
-                Background = new SolidColorBrush(cuenta.Selected ? LauncherSkin.LightBrown : Color.FromArgb(90, 0, 0, 0)),
+                Width = 20,
+                Height = 20,
+                CornerRadius = new Avalonia.CornerRadius(6),
+                BorderThickness = new Avalonia.Thickness(1.5),
+                BorderBrush = new SolidColorBrush(cuenta.Selected ? LauncherSkin.Gold : LauncherSkin.TextTertiary),
+                Background = cuenta.Selected
+                    ? new SolidColorBrush(LauncherSkin.Gold)
+                    : new SolidColorBrush(Color.FromArgb(0xB3, 7, 4, 2)),
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                Child = marca,
+                Child = cuenta.Selected
+                    ? new Icon
+                    {
+                        Kind = "check", Width = 14, Height = 14, Stroke = 3,
+                        Foreground = new SolidColorBrush(Color.FromRgb(0x1A, 0x10, 0x05)),
+                    }
+                    : null,
             };
 
             // The portraits come out at about 75 by 96, so the slot goes with that proportion and the
-            // character fits WHOLE. With a squarer box aligned to the bottom one saw its
-            // legs and little else.
+            // character fits WHOLE.
             var hueco = new Border
             {
-                Width = 50,
-                Height = 64,
-                CornerRadius = new Avalonia.CornerRadius(5),
-                Background = new SolidColorBrush(Color.FromArgb(80, 0, 0, 0)),
+                Width = 46,
+                Height = 58,
+                CornerRadius = new Avalonia.CornerRadius(8),
+                BorderThickness = new Avalonia.Thickness(1),
+                BorderBrush = new SolidColorBrush(LauncherSkin.Hairline),
+                Background = new LinearGradientBrush
+                {
+                    StartPoint = new Avalonia.RelativePoint(0, 0, Avalonia.RelativeUnit.Relative),
+                    EndPoint = new Avalonia.RelativePoint(0, 1, Avalonia.RelativeUnit.Relative),
+                    GradientStops =
+                    {
+                        new GradientStop(Color.FromArgb(0x40, 0xD4, 0xAF, 0x37), 0),
+                        new GradientStop(Color.FromArgb(0x80, 0, 0, 0), 1),
+                    },
+                },
                 ClipToBounds = true,
+                Margin = new Avalonia.Thickness(12, 0, 12, 0),
                 Child = cuenta.Retrato != null
                     ? new Image
                     {
@@ -614,7 +637,8 @@ namespace Jondo.Unity.Launcher.UI
                     {
                         Text = Inicial(cuenta),
                         FontSize = 20,
-                        Foreground = new SolidColorBrush(LauncherSkin.BorderBrown),
+                        FontWeight = FontWeight.SemiBold,
+                        Foreground = new SolidColorBrush(LauncherSkin.MutedGold),
                         HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                         VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
                     },
@@ -624,15 +648,15 @@ namespace Jondo.Unity.Launcher.UI
 
             var letras = new StackPanel
             {
-                Spacing = 2,
+                Spacing = 3,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
                 Children =
                 {
                     new TextBlock
                     {
                         Text = nombre,
-                        FontSize = 13.5,
-                        FontWeight = FontWeight.Bold,
+                        FontSize = 14,
+                        FontWeight = FontWeight.SemiBold,
                         TextTrimming = TextTrimming.CharacterEllipsis,
                     },
                     new TextBlock
@@ -640,8 +664,8 @@ namespace Jondo.Unity.Launcher.UI
                         Text = cuenta.Personaje != null
                             ? $"{Textos.Nivel(_idioma)} {cuenta.Personaje.Level}  ·  #{cuenta.AccountId}"
                             : $"#{cuenta.AccountId}",
-                        FontSize = 10.5,
-                        Foreground = new SolidColorBrush(LauncherSkin.MutedGold),
+                        FontSize = 11.5,
+                        Foreground = new SolidColorBrush(LauncherSkin.TextSecondary),
                     },
                 },
             };
@@ -650,30 +674,26 @@ namespace Jondo.Unity.Launcher.UI
             Grid.SetColumn(casilla, 0);
             Grid.SetColumn(hueco, 1);
             Grid.SetColumn(letras, 2);
-            hueco.Margin = new Avalonia.Thickness(10, 0, 10, 0);
-
             dentro.Children.Add(casilla);
             dentro.Children.Add(hueco);
             dentro.Children.Add(letras);
 
-            if (jugando)
+            // What state the account is in, as a pill: playing, or a session to log in again.
+            string? marca = null;
+            Color color = default;
+            if (jugando) (marca, color) = (_textos.InGame, LauncherSkin.OnlineGreen);
+            else if (cuenta.SessionExpired) (marca, color) = (Textos.Caducada(_idioma), LauncherSkin.Warning);
+            if (marca != null)
             {
-                var enJuego = new Border
+                var pildora = new Border
                 {
-                    CornerRadius = new Avalonia.CornerRadius(10),
-                    Padding = new Avalonia.Thickness(8, 3),
-                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                    Background = new SolidColorBrush(Color.FromArgb(70, 80, 200, 80)),
-                    Child = new TextBlock
-                    {
-                        Text = _textos.InGame,
-                        FontSize = 9.5,
-                        FontWeight = FontWeight.Bold,
-                        Foreground = new SolidColorBrush(LauncherSkin.OnlineGreen),
-                    },
+                    Classes = { "pill" },
+                    Background = new SolidColorBrush(color, 0.16),
+                    Margin = new Avalonia.Thickness(8, 0, 0, 0),
+                    Child = new TextBlock { Text = marca, Foreground = new SolidColorBrush(color) },
                 };
-                Grid.SetColumn(enJuego, 3);
-                dentro.Children.Add(enJuego);
+                Grid.SetColumn(pildora, 3);
+                dentro.Children.Add(pildora);
             }
 
             return dentro;
@@ -693,28 +713,47 @@ namespace Jondo.Unity.Launcher.UI
         private void RefrescarEstado()
         {
             PuntoEstado.Online = _servidorEnLinea;
-            TextoEstado.Text = _servidorEnLinea ? _textos.StatusOnline : _textos.StatusOffline;
-            TextoEstado.Foreground = new SolidColorBrush(
-                _servidorEnLinea ? LauncherSkin.OnlineGreen : LauncherSkin.Red);
+            TextoEstado.Text = Textos.Estado(_idioma, _servidorEnLinea);
+            TextoEstado.Foreground = new SolidColorBrush(_servidorEnLinea ? LauncherSkin.CardText : Color.FromRgb(0xF2, 0xA4, 0x96));
+            PildoraEstado.BorderBrush = new SolidColorBrush(_servidorEnLinea ? LauncherSkin.OnlineGreen : LauncherSkin.Danger, 0.35);
+            ToolTip.SetTip(PildoraEstado, LauncherPreferences.ServerIsLocal ? LauncherService.LocalIp : LauncherPreferences.ServerHost);
         }
 
         private void RefrescarBotonDeMusica()
         {
-            // It said «MÚSICA: ON», which is its state and not what happens on pressing it. A button is
-            // named after what it does.
+            // The tip says what pressing it DOES, not how it is.
             bool sonando = _musica?.Playing ?? false;
-            TextoMusica.Text = sonando ? Textos.ApagarMusica(_idioma) : Textos.EncenderMusica(_idioma);
-            IconoAltavoz.Opacity = sonando ? 1 : 0.45;
+            IconoAltavoz.Kind = sonando ? "sound" : "mute";
+            ToolTip.SetTip(BotonMusica, sonando ? Textos.ApagarMusica(_idioma) : Textos.EncenderMusica(_idioma));
             BotonMusica.Classes.Set("on", sonando);
         }
 
-        private void Avisar(string mensaje)
+        /// <summary>What a notice is: a stop, good news, or something to do.</summary>
+        private enum Tono { Error, Bien, Atencion }
+
+        private void Avisar(string mensaje, bool bueno = false) => Avisar(mensaje, bueno ? Tono.Bien : Tono.Error);
+
+        /// <summary>The toast at the top: the message, and in its stripe and icon what kind it is.</summary>
+        private void Avisar(string mensaje, Tono tono)
         {
             TextoAviso.Text = string.IsNullOrWhiteSpace(mensaje) ? _textos.GenericError : mensaje;
+            Color color = tono switch
+            {
+                Tono.Bien => LauncherSkin.OnlineGreen,
+                Tono.Atencion => LauncherSkin.Warning,
+                _ => LauncherSkin.Danger,
+            };
+            var brocha = new SolidColorBrush(color);
+            FranjaAviso.Background = brocha;
+            IconoAviso.Foreground = brocha;
+            IconoAviso.Kind = tono switch { Tono.Bien => "check", Tono.Atencion => "info", _ => "alert" };
+            Aviso.BorderBrush = new SolidColorBrush(color, 0.45);
             Aviso.IsVisible = true;
         }
 
         private void QuitarElAviso() => Aviso.IsVisible = false;
+
+        private void AlCerrarAviso(object? remitente, Avalonia.Interactivity.RoutedEventArgs e) => QuitarElAviso();
 
         /// <summary>
         /// Greys out the fields while they cannot be used.
@@ -742,6 +781,13 @@ namespace Jondo.Unity.Launcher.UI
 
         private void MirarElEstado()
         {
+            // The setup has no server to ask about yet.
+            if (Program.Mode == Program.LaunchMode.Setup || Program.UninstallRequested)
+            {
+                _musica?.KeepLooping();
+                return;
+            }
+
             bool enLinea;
             try
             {
@@ -784,14 +830,17 @@ namespace Jondo.Unity.Launcher.UI
 
         private void AlPulsarIdioma(object? remitente, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            string codigo = (remitente as Button)?.Tag as string ?? "es";
-            Language nuevo = codigo switch
-            {
-                "en" => Language.En,
-                "fr" => Language.Fr,
-                _ => Language.Es,
-            };
+            CambiarDeIdioma(LauncherTexts.Parse((remitente as Button)?.Tag as string));
+        }
 
+        private void AlElegirIdioma(object? remitente, SelectionChangedEventArgs e)
+        {
+            if (_rellenandoIdiomas) return;
+            if (SelectorIdioma.SelectedItem is IdiomaDelJuego opcion) CambiarDeIdioma(LauncherTexts.Parse(opcion.Codigo));
+        }
+
+        private void CambiarDeIdioma(Language nuevo)
+        {
             if (_idioma == nuevo) return;
 
             _idioma = nuevo;
@@ -877,7 +926,7 @@ namespace Jondo.Unity.Launcher.UI
             => _ = RegistrarAsync();
 
         private void AlPulsarJugar(object? remitente, Avalonia.Interactivity.RoutedEventArgs e)
-            => _ = JugarAsync();
+            => _ = _actualizacion != null ? ActualizarAsync() : JugarAsync();
 
         private void AlPulsarQuitarCuentas(object? remitente, Avalonia.Interactivity.RoutedEventArgs e)
         {

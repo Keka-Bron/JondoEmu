@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Avalonia.Controls;
 using Button = Avalonia.Controls.Button;
@@ -55,6 +55,7 @@ namespace Jondo.Unity.Tests.Launcher
             var ventana = new MainWindow { Width = 1280, Height = 800 };
             ventana.Show();
 
+            ventana.MostrarSeccionDeMentira("jugar");
             var pestana = ventana.GetControl<Button>(boton);
             Assert.NotNull(pestana);
             pestana!.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(
@@ -76,11 +77,103 @@ namespace Jondo.Unity.Tests.Launcher
             ventana.Show();
 
             ventana.MeterCuentasDeMentira(3);
+            ventana.MostrarSeccionDeMentira("jugar");
 
             string carpeta = System.IO.Path.Combine(RaizDeLaSolucion(), "capturas-lanzador");
             System.IO.Directory.CreateDirectory(carpeta);
             ventana.CaptureRenderedFrame()!
                    .Save(System.IO.Path.Combine(carpeta, "seccion-jugar.png"));
+            ventana.Close();
+        }
+
+        [AvaloniaTheory]
+        [InlineData(1280, 720, false)]
+        [InlineData(1280, 720, true)]
+        [InlineData(1100, 700, true)]
+        [InlineData(1920, 1080, true)]
+        public void Una_foto_de_los_ajustes(int ancho, int alto, bool instalado)
+        {
+            var ventana = new MainWindow { Width = ancho, Height = alto };
+            ventana.Show();
+            ventana.MostrarSeccionDeMentira("ajustes", instalado);
+            Guardar(ventana, $"ajustes-{ancho}x{alto}{(instalado ? "-instalado" : "")}.png");
+        }
+
+        [AvaloniaTheory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Una_foto_del_instalador(bool descargar)
+        {
+            var ventana = new MainWindow { Width = 1280, Height = 800 };
+            ventana.Show();
+            ventana.MostrarInstaladorDeMentira(descargar);
+            Guardar(ventana, descargar ? "instalador-descargar.png" : "instalador.png");
+        }
+
+        /// <summary>The launcher's fourth language, on the three screens with the most text.</summary>
+        [AvaloniaTheory]
+        [InlineData("instalador")]
+        [InlineData("ajustes")]
+        [InlineData("progreso")]
+        [InlineData("jugar")]
+        public void Una_foto_en_portugues(string pantalla)
+        {
+            var ventana = new MainWindow { Width = 1280, Height = 720 };
+            ventana.Show();
+            ventana.HablarDeMentira(Language.Pt);
+            switch (pantalla)
+            {
+                case "instalador": ventana.MostrarInstaladorDeMentira(false); break;
+                case "progreso": ventana.MostrarProgresoDeMentira(8, 0.42); break;
+                default: ventana.MostrarSeccionDeMentira(pantalla, instalado: true); break;
+            }
+            Guardar(ventana, $"pt-{pantalla}.png");
+        }
+
+        [AvaloniaTheory]
+        [InlineData("progreso", 8, 0.42, false, false)]
+        [InlineData("progreso-inicio", 2, 0.65, false, false)]
+        [InlineData("progreso-fallo", 8, 0.37, true, false)]
+        [InlineData("progreso-fin", 0, 0, false, true)]
+        public void Una_foto_del_progreso(string nombre, int corriendo, double fraccion, bool fallo, bool terminado)
+        {
+            var ventana = new MainWindow { Width = 1280, Height = 800 };
+            ventana.Show();
+            ventana.MostrarProgresoDeMentira(corriendo, fraccion, fallo, terminado);
+            Guardar(ventana, nombre + ".png");
+        }
+
+        [AvaloniaTheory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void Una_foto_de_un_aviso(int tono)
+        {
+            var ventana = new MainWindow { Width = 1280, Height = 800 };
+            ventana.Show();
+            ventana.MeterCuentasDeMentira(3);
+            ventana.MostrarSeccionDeMentira("jugar");
+            ventana.AvisarDeMentira(tono switch
+            {
+                1 => "Actualizado a v9.0.1.",
+                2 => "Hay una versión nueva (v9.0.2; tienes la v9.0.1). Actualiza para poder jugar. 2 archivo(s) · 4.1 MB",
+                _ => "El servidor no responde. Espera a que termine de arrancar o vuelve a abrirlo.",
+            }, tono);
+            Guardar(ventana, $"aviso-{tono}.png");
+        }
+
+        /// <summary>Lets the animations reach their values, then saves the frame.</summary>
+        private static void Guardar(Avalonia.Controls.Window ventana, string archivo)
+        {
+            for (int i = 0; i < 90; i++)
+            {
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                Avalonia.Headless.AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+            }
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            string carpeta = Path.Combine(RaizDeLaSolucion(), "capturas-lanzador");
+            Directory.CreateDirectory(carpeta);
+            ventana.CaptureRenderedFrame()!.Save(Path.Combine(carpeta, archivo));
             ventana.Close();
         }
 

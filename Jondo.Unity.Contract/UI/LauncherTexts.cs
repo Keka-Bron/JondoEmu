@@ -9,7 +9,9 @@ namespace Jondo.Unity.Launcher.UI
     {
         Es,
         En,
-        Fr
+        Fr,
+        /// <summary>Brazilian Portuguese, the variant the Dofus client's pt pack is written in.</summary>
+        Pt
     }
 
     /// <summary>
@@ -319,6 +321,79 @@ namespace Jondo.Unity.Launcher.UI
                 StatWorldMaps = "Cartes",
                 StatWorldGroups = "Groupes",
                 StatWorldNpcs = "PNJ"
+            },
+            [Language.Pt] = new LauncherTexts
+            {
+                LoginTab = "ENTRAR",
+                RegisterTab = "CRIAR CONTA",
+                UsernameLabel = "Usuário",
+                PasswordLabel = "Senha",
+                NewUsernameLabel = "Novo usuário",
+                NewPasswordLabel = "Senha",
+                NicknameLabel = "Apelido",
+                ConnectButton = "ENTRAR E CONECTAR",
+                CreateButton = "CRIAR CONTA",
+                Welcome = "BEM-VINDO,",
+                Subscription = "★ Assinatura ilimitada ★",
+                PlayButton = "JOGAR",
+                LogOutButton = "Sair",
+                AddAccountButton = "+ ADICIONAR OUTRA CONTA",
+                TeamAccountsFormat = "★ Equipe: {0} conta(s) ★",
+                TeamTitle = "EQUIPE ({0}/8)",
+                SelectAll = "SELECIONAR TUDO",
+                DeselectAll = "DESMARCAR TUDO",
+                LaunchSelected = "INICIAR SELEÇÃO ({0})",
+                RemoveSelected = "Remover seleção",
+                MaxAccountsError = "A equipe já tem o máximo de 8 contas.",
+                SelectAccountError = "Selecione pelo menos uma conta.",
+                BackToTeam = "← VOLTAR À EQUIPE",
+                TeamSummaryFormat = "{0} marcada(s) · {1} já no jogo",
+                InGame = "NO JOGO",
+                StatusChecking = "VERIFICANDO STATUS...",
+                StatusOnline = "SERVIDOR DE JOGO: ON-LINE",
+                StatusOffline = "SERVIDOR DE JOGO: OFF-LINE",
+                AccountCreatedMessage = "Conta criada com sucesso! Agora você já pode entrar.",
+                DialogAccept = "OK",
+                ClientStartedMessage = "Cliente do jogo iniciado com sucesso!",
+                ClearButton = "LIMPAR",
+                MusicOn = "MÚSICA: LIGADA",
+                MusicOff = "MÚSICA: DESLIGADA",
+                UsernamePlaceholder = "usuário",
+                NewUsernamePlaceholder = "3-32 caracteres",
+                NicknamePlaceholder = "Apelido",
+                AutoScroll = "Rolagem automática",
+                GenericError = "Erro.",
+                SessionExpiredError = "A sessão desta conta expirou. Entre com ela de novo antes de jogar.",
+                ClientStartFailed = "Não foi possível iniciar o cliente do Dofus.",
+                AccountAlreadyRunning = "Esta conta já tem um cliente aberto.",
+                MaxClientsError = "Já há 8 clientes abertos, que é o máximo.",
+                ClientNotFound = "O executável do cliente do Dofus não foi encontrado. Selecione-o com o botão do caminho do cliente.",
+                AccountCreated = "Conta criada.",
+                ServidorSinResponder = "O servidor não responde. Espere ele terminar de iniciar ou abra-o de novo.",
+                PermissionDenied = "Esta conta não tem permissão para esta operação.",
+                StatPlayers = "Jogadores",
+                StatClients = "Clientes",
+                StatFights = "Combates",
+                StatMaps = "Mapas",
+                StatMemory = "Memória",
+                StatUptime = "Tempo ligado",
+                StopServer = "PARAR O SERVIDOR",
+                ServerSettingsButton = "CONFIGURAÇÕES",
+                StopServerConfirm = "Parar o servidor?",
+                StopServerWithPlayers = "{0} jogador(es) conectado(s) vão perder a conexão.\n\nParar o servidor?",
+                GroupWorld = "MUNDO",
+                GroupNetwork = "REDE",
+                GroupMachine = "MÁQUINA",
+                GroupLoaded = "CARREGADO",
+                StatInWorld = "Num mapa",
+                StatSent = "Enviado",
+                StatReceived = "Recebido",
+                StatRate = "Agora",
+                StatCpu = "CPU",
+                StatThreads = "Threads",
+                StatWorldMaps = "Mapas",
+                StatWorldGroups = "Grupos",
+                StatWorldNpcs = "PNJs"
             }
         };
 
@@ -330,7 +405,17 @@ namespace Jondo.Unity.Launcher.UI
         {
             Language.En => "en",
             Language.Fr => "fr",
+            Language.Pt => "pt",
             _ => "es"
+        };
+
+        /// <summary>The language of a two-letter code; Spanish for one it does not know.</summary>
+        public static Language Parse(string? code) => code?.Trim().ToLowerInvariant() switch
+        {
+            "en" => Language.En,
+            "fr" => Language.Fr,
+            "pt" => Language.Pt,
+            _ => Language.Es
         };
 
         // The preferences are kept by LauncherPreferences. This stays as a shortcut because it is

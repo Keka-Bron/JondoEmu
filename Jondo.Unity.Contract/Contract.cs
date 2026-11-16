@@ -98,5 +98,66 @@ namespace Jondo.Unity.Launcher
             _candado?.Dispose();
             _candado = null;
         }
+
+        // ─── Asking a program to close ─────────────────────────────────────────────────────
+        //
+        // The launcher's updater has to stop the local server before it replaces its files, and
+        // the server's window asks for confirmation when it is closed. So the server listens for a
+        // named signal of this session and closes on it as Ctrl+C would close it; only a program of
+        // the same user and session can raise it. Windows only: on Linux the updater sends SIGTERM,
+        // which the server already handles the same way.
+
+        private static string StopSignalName(string name) => @"Local\" + name + ".Stop";
+
+        /// <summary>Calls <paramref name="onStop"/> when another program asks this one to close. Null where it cannot listen.</summary>
+        public static IDisposable? ListenForStop(string name, Action onStop)
+        {
+            if (!OperatingSystem.IsWindows()) return null;
+            try
+            {
+                var signal = new EventWaitHandle(false, EventResetMode.ManualReset, StopSignalName(name));
+                var registration = ThreadPool.RegisterWaitForSingleObject(signal, (_, _) => onStop(), null,
+                    Timeout.Infinite, executeOnlyOnce: true);
+                return new StopListener(signal, registration);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or WaitHandleCannotBeOpenedException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>Asks the program listening under that name to close. False when none is listening.</summary>
+        public static bool RequestStop(string name)
+        {
+            if (!OperatingSystem.IsWindows()) return false;
+            try
+            {
+                if (!EventWaitHandle.TryOpenExisting(StopSignalName(name), out var signal)) return false;
+                using (signal) signal.Set();
+                return true;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or WaitHandleCannotBeOpenedException)
+            {
+                return false;
+            }
+        }
+
+        private sealed class StopListener : IDisposable
+        {
+            private readonly EventWaitHandle _signal;
+            private readonly RegisteredWaitHandle _registration;
+
+            public StopListener(EventWaitHandle signal, RegisteredWaitHandle registration)
+            {
+                _signal = signal;
+                _registration = registration;
+            }
+
+            public void Dispose()
+            {
+                _registration.Unregister(null);
+                _signal.Dispose();
+            }
+        }
     }
 }

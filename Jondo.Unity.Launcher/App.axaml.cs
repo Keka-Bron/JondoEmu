@@ -72,6 +72,19 @@ namespace Jondo.Unity.Launcher
             PonerBrocha("AlertBackgroundBrush", LauncherPalette.AlertBackground);
             PonerBrocha("AlertTextBrush", LauncherPalette.AlertText);
             PonerBrocha("LightBrownTextBrush", LauncherPalette.LightBrownText);
+
+            // The redesign's surfaces and text tiers.
+            PonerBrocha("SurfaceBrush", LauncherPalette.SurfaceFill);
+            PonerBrocha("SurfaceRaisedBrush", LauncherPalette.SurfaceRaised);
+            PonerBrocha("SurfaceHoverBrush", LauncherPalette.SurfaceHover);
+            PonerBrocha("SurfaceSunkenBrush", LauncherPalette.SurfaceSunken);
+            PonerBrocha("HairlineBrush", LauncherPalette.Hairline);
+            PonerBrocha("HairlineStrongBrush", LauncherPalette.HairlineStrong);
+            PonerBrocha("TextSecondaryBrush", LauncherPalette.TextSecondary);
+            PonerBrocha("TextTertiaryBrush", LauncherPalette.TextTertiary);
+            PonerBrocha("DangerBrush", LauncherPalette.Danger);
+            PonerBrocha("WarningBrush", LauncherPalette.Warning);
+            PonerBrocha("SuccessBrush", LauncherPalette.OnlineGreen);
         }
 
         private void Poner(string name, uint argb) => Resources[name] = Color.FromUInt32(argb);

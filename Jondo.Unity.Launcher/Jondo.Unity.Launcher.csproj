@@ -17,11 +17,20 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <!-- THIS is the one handed out to the players. It references the contract and NOTHING ELSE: no
          database, no maps, no protocol handlers, no effects catalogue. A single file,
-         as before, so that whoever downloads it sees an .exe and not a folder of dlls. -->
+         as before, so that whoever downloads it sees an .exe and not a folder of dlls.
+         It is also the installer, run on machines with no .NET yet: so it carries its own
+         runtime, compressed inside the file, and installs the shared one the server and
+         MelonLoader need. -->
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
-    <SelfContained>false</SelfContained>
+    <!-- Only the published file carries the runtime: built as a reference (the tests), it is a plain assembly. -->
+    <SelfContained Condition="'$(_IsPublishing)' == 'true'">true</SelfContained>
+    <SelfContained Condition="'$(_IsPublishing)' != 'true'">false</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
+    <EnableCompressionInSingleFile Condition="'$(_IsPublishing)' == 'true'">true</EnableCompressionInSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- The GitHub repository updates are looked for in until the player names another; the
+         release workflow passes its own. -->
+    <JondoRepository Condition="'$(JondoRepository)' == ''">Keka-Bron/JondoEmu</JondoRepository>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
@@ -33,6 +42,15 @@
          has a high-severity security advisory (GHSA-xrw6-gwf8-vvr9). It is raised by hand, which is
          the same Studio already did for the same reason. -->
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
+    <!-- The client comes as a 7z; the emulator's release as a zip. -->
+    <PackageReference Include="SharpCompress" Version="0.50.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="JondoRepository" Value="$(JondoRepository)" />
+    <!-- The background and the theme inside the executable: the setup is downloaded alone. -->
+    <EmbeddedResource Include="../launcher_assets/bg.jpg" LogicalName="JondoAssets.bg.jpg" />
+    <EmbeddedResource Include="../launcher_assets/theme.mp3" LogicalName="JondoAssets.theme.mp3" />
   </ItemGroup>
 
   <ItemGroup>

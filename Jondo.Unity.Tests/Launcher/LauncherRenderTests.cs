@@ -186,5 +186,40 @@ namespace Jondo.Unity.Tests.Launcher
             ventana.CaptureRenderedFrame();
             ventana.Close();
         }
+
+        /// <summary>
+        /// The installer shows everything at once: at the smallest window the launcher allows, at
+        /// 1280x720, and at what a maximized window leaves on a 1920x1080 screen at 150 %, in every
+        /// language, its panel has nothing to scroll.
+        /// </summary>
+        [AvaloniaTheory]
+        [InlineData(1280, 656, "es", true)]
+        [InlineData(1280, 656, "fr", true)]
+        [InlineData(1280, 656, "pt", false)]
+        [InlineData(1280, 720, "es", false)]
+        [InlineData(1280, 720, "es", true)]
+        [InlineData(1280, 720, "en", true)]
+        [InlineData(1280, 720, "fr", true)]
+        [InlineData(1280, 720, "pt", true)]
+        [InlineData(1100, 700, "es", false)]
+        [InlineData(1100, 700, "es", true)]
+        [InlineData(1100, 700, "en", false)]
+        [InlineData(1100, 700, "fr", false)]
+        [InlineData(1100, 700, "fr", true)]
+        [InlineData(1100, 700, "pt", false)]
+        [InlineData(1100, 700, "pt", true)]
+        public void El_instalador_cabe_sin_desplazarse(int ancho, int alto, string idioma, bool descargar)
+        {
+            var ventana = new MainWindow { Width = ancho, Height = alto, MinHeight = 0 };
+            ventana.Show();
+            ventana.HablarDeMentira(LauncherTexts.Parse(idioma));
+            ventana.MostrarInstaladorDeMentira(descargar);
+            ventana.CaptureRenderedFrame();
+
+            var desplaza = ventana.FindControl<ScrollViewer>("DesplazaInstalar")!;
+            Assert.True(desplaza.Extent.Height <= desplaza.Viewport.Height + 0.5,
+                        $"{desplaza.Extent.Height:0} of content in {desplaza.Viewport.Height:0} of panel");
+            ventana.Close();
+        }
     }
 }
