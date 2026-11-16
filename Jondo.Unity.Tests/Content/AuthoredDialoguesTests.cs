@@ -331,6 +331,37 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
+        public void A_reply_that_does_a_hand_over_leaves_its_item_to_the_objective()
+        {
+            if (!Available) return;
+
+            // An objective that asks for an item to be handed over takes it itself, and only if it
+            // is carried. A reply that also takes it takes it first, so the objective finds the bag
+            // empty and stays open, with the item gone: the Minotot's «Toma la máscara» kept the
+            // mask of Totankama and never counted it.
+            var book = new QuestCatalogue();
+            if (!book.Ready) return;
+
+            var wrong = new List<string>();
+            foreach (var tree in Trees())
+            {
+                foreach (var line in tree.Lines)
+                {
+                    foreach (var choice in line.Choices)
+                    {
+                        if (choice.Completes == 0 || choice.Takes == 0) continue;
+                        var objective = book.Objective(choice.Completes);
+                        if (objective == null || !objective.ConsumesItems || objective.ItemId != choice.Takes) continue;
+                        wrong.Add($"npc {tree.NpcId}: reply {choice.Reply} takes {choice.Takes}, " +
+                                  $"which its objective {choice.Completes} takes itself");
+                    }
+                }
+            }
+
+            Assert.True(wrong.Count == 0, string.Join(Environment.NewLine, wrong));
+        }
+
+        [Fact]
         public void A_reply_is_never_both_the_way_in_and_gated_behind_the_quest()
         {
             if (!Available) return;

@@ -115,5 +115,28 @@ namespace Jondo.Unity.Tests.Quests
                 Clean();
             }
         }
+
+        /// <summary>
+        /// «El tesoro de Totankama» (1523) wants «las 5 dosis de polvo de eternala»: the five powders
+        /// above, one of each eternale. Meriana's ritual offers itself only to whoever holds all of
+        /// them with the pearl and the ring, and takes one of each.
+        /// </summary>
+        [Fact]
+        public void Merianas_ritual_takes_one_powder_of_each_eternale()
+        {
+            var tree = NpcDialogues.For(2205, 122421248);
+            if (tree == null) return;
+            var held = new[] { 15418, 15420 }.Concat(Eternales.Select(e => e.Item)).OrderBy(i => i).ToArray();
+
+            var ritual = tree.Line(18301)?.Choice(21919);
+            Assert.NotNull(ritual);
+            Assert.Equal(held, ritual.TakesAll.OrderBy(i => i).ToArray());
+            Assert.Equal(1, ritual.TakesCount);
+            Assert.Equal(0, ritual.Takes);
+
+            var offer = tree.Line(tree.Opening)!.Choices.Single(c => c.Reply == 21918 && c.Next == 18298);
+            foreach (int item in held) Assert.Contains($"PO={item}", offer.Criterion);
+            Assert.DoesNotContain("PO>", offer.Criterion);
+        }
     }
 }

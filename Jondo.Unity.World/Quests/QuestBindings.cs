@@ -276,6 +276,13 @@ namespace Jondo.Unity.World.Quests
         public bool OverridesMap { get; init; }
 
         /// <summary>
+        /// The fight pressing one of its elements starts, for a «beat» row whose monsters are not
+        /// on the map («fight»), or null: the Purple Dofus's stele of «Como alma en pena» takes the
+        /// character to a labyrinth room as the soulless mummy, to face the age-old minogolem.
+        /// </summary>
+        public QuestBindingFight? Fight { get; init; }
+
+        /// <summary>
         /// An NPC of the map who comes in once it is done: «Haz salir a la rata de su escondite»
         /// brings the Rata Nsiosa (2912) out, a jsn right after the ieb in «Matarratas»' capture.
         /// </summary>
@@ -353,6 +360,14 @@ namespace Jondo.Unity.World.Quests
         public const int DefaultType = -1;
     }
 
+    /// <summary>
+    /// The fight a «beat» row's element starts away from the map («fight»): where it is fought,
+    /// the monster the character fights as, and where a win or a loss leaves him -- what an NPC's
+    /// reply says in content/fights/npc_fights.json, said by an element.
+    /// </summary>
+    public sealed record QuestBindingFight(long ArenaMapId, int Incarnates, int IncarnationGrade,
+                                           bool DefeatFree, long WinMapId, int WinCellId);
+
     /// <summary>Every binding there is, indexed the two ways the server asks for them.</summary>
     public sealed class QuestBindingBook
     {
@@ -408,9 +423,10 @@ namespace Jondo.Unity.World.Quests
 
             // Only an element to click is the quest's own, drawn and pressed as such; the elements
             // of a «read» binding are the world's readables (the Dofusarium's statues), already there.
-            // A beat binding's element brings its monsters out (the old stump of «Restauración rápida»).
+            // A beat binding's element brings its monsters out (the old stump of «Restauración rápida»),
+            // or takes the character to where they are fought (the Purple Dofus's stele).
             if (binding.Kind != QuestBindingKind.Click
-                && !(binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0))
+                && !(binding.Kind == QuestBindingKind.Beat && (binding.SpawnsMonster != 0 || binding.Fight != null)))
             {
                 IndexProps(binding);
                 return;
@@ -632,6 +648,17 @@ namespace Jondo.Unity.World.Quests
                                && overrides.ValueKind == JsonValueKind.True,
                 ItemId = Int(row, "item"),
                 SkillId = skill == 0 ? QuestBinding.DefaultSkill : skill,
+                Fight = row.TryGetProperty("fight", out var fight) && fight.ValueKind == JsonValueKind.Object
+                    ? new QuestBindingFight(
+                        Long(fight, "arena"),
+                        fight.TryGetProperty("incarnates", out var incarnates) && incarnates.ValueKind == JsonValueKind.Object
+                            ? Int(incarnates, "monster") : 0,
+                        fight.TryGetProperty("incarnates", out var grade) && grade.ValueKind == JsonValueKind.Object
+                            ? Math.Max(1, Int(grade, "grade")) : 1,
+                        fight.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
+                        Long(fight, "winMap"),
+                        Int(fight, "winCell"))
+                    : null,
 
                 // Not `Int(...) == 0 ? default : value`, because -1 IS the default and 0 is a
                 // legitimate type: whether the row said anything has to be asked separately.

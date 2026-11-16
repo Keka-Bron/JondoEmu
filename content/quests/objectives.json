@@ -5300,7 +5300,26 @@
    "kind": "click",
    "elements": [{"map": 136316416, "element": 511668}],
    "afterObjectives": [8699],
-   "why": "«Toma el dofus Púrpura»: the Dofus on its stele in the middle of the room (element 511668, graphic 403207, cell 315); Dofus pour les noobs: «Vous pouvez maintenant prendre le Dofus Pourpre posé sur son socle. Sauf que... non c'est un piège»."
+   "thenStarts": 1528,
+   "why": "«Toma el dofus Púrpura»: the Dofus on its stele in the middle of the room (element 511668, graphic 403207, cell 315); Dofus pour les noobs: «Vous pouvez maintenant prendre le Dofus Pourpre posé sur son socle. Sauf que... non c'est un piège». The trap is the next quest, «Como alma en pena» (1528), which has no giver and whose condition is this one finished: it starts here."
+  },
+  {
+   "objective": 8711,
+   "quest": 1529,
+   "kind": "click",
+   "elements": [{"map": 136316416, "element": 511668}],
+   "afterObjectives": [8710],
+   "why": "«Toma el dofus Púrpura», the last of «El poder detrás del trono»: the Dofus on its stele (element 511668, cell 315) once Sun Rinos is beaten, Gavroch's «¡Agarra el dofus, tú eres el nuevo guardián!» (18599); Dofus pour les noobs («Le pouvoir derrière le trône»): «Après le combat, il ne vous reste plus qu'à prendre le Dofus Pourpre». The achievement «Púrpura profundo» (1101) hands the Dofus (694)."
+  },
+  {
+   "objective": 8640,
+   "quest": 1528,
+   "kind": "beat",
+   "monsters": [3740],
+   "map": 136317440,
+   "elements": [{"map": 136316416, "element": 511668}],
+   "fight": {"arena": 136317440, "incarnates": {"monster": 3751, "grade": 1}, "defeatFree": true, "winMap": 34476296, "winCell": 273},
+   "why": "«Vence a Minogólem secular x 1 en un solo combate» on 136317440, the Labyrinth of Souls room: Dofus pour les noobs («Une âme en peine»): «Cliquer sur la stèle où repose le Dofus Pourpre vous téléportera dans une salle du labyrinthe. Vous incarnerez une \"Momie sans âme\" et affronterez le Minogolem séculaire», «Perdre le combat ne vous coûte pas d'énergie, vous réapparaissez sur la map». The mummy is the client's 3751 (50 life, 10 AP, 1 MP; Desplazamiento Rápido, Desfase, Placidez, Ragequit); the minogolem's starting spell (4762) calls the salt, gold and blood ones to the corners (cells 27, 532, 559) and paints the green cell (20) whose trap (4761 -> 4760) kills it when the mummy reaches it. A win leaves the character by Lorkos at the labyrinth's entrance, «de vuelta a la casilla de partida» as he says (18562); a loss, back by the stele."
   },
   {
    "objective": 8636,

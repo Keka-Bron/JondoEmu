@@ -239,6 +239,9 @@ namespace Jondo.Unity.Tests.Quests
                         // Or brings them out when its map is entered (the tame trool of Raxitik's pit).
                         bool bringsOut = binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0
                                          && (binding.Elements.Count > 0 || binding.MapId != 0);
+                        // Or whose element starts the fight on another board (the stele of the
+                        // Purple Dofus and the Laberinto de las almas): the fight closes it too.
+                        bringsOut |= binding.Kind == QuestBindingKind.Beat && binding.Fight != null && binding.Elements.Count > 0;
                         // Nor a click that only hands its item over (Hel Munster's jar of magic potion).
                         bringsOut |= binding.Kind == QuestBindingKind.Click && binding.OnlyGives;
                         if (objective.TypeId != QuestCatalogue.FreeText && !namelessMap && !bringsOut

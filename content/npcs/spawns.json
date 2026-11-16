@@ -4752,6 +4752,46 @@
       "why": "Renemil Belok once «Cómo perder la pluma» is over: «Voy a instalarme en la casa de la familia Cágita. Si me buscas, ¡estaré en el Cofre de los Tesoros!» (59922); Dofus pour les noobs: «Ces morceaux de tablette de Totankama s'achètent auprès de Éner Brelloq en [-24,-36] dans la salle de droite de la Malle aux Trésors» (128453121 is the room at [-24,-36]). INFERRED: the cell, on the walkway before the shelves."
     },
     {
+      "map": 55053312,
+      "npc": 2466,
+      "cell": 466,
+      "orientation": 1,
+      "criterion": "Qa=1529&Qo>8703&Qo<8705",
+      "why": "Gavroch in the Royal Mastogob's sixth room, the boss's (objective 8705 names it), from Bibiblop's word until the Jalamut Real is beaten: «Encuentra a Gavroch en el Invernáculo de Jalamut Real» (8704); Dofus pour les noobs («Le pouvoir derrière le trône»): «Avant de lancer le combat contre le RM il faut parler au PNJ». INFERRED cell, on the room's left, away from the boss."
+    },
+    {
+      "map": 55054336,
+      "npc": 2466,
+      "cell": 468,
+      "orientation": 1,
+      "criterion": "Qa=1529&Qo>8705&Qo<8706",
+      "why": "Gavroch at the greenhouse's exit (objective 8706 names this map) once the Jalamut Real is beaten: «¡Guau, ha sido genial!» (18579). INFERRED cell."
+    },
+    {
+      "map": 136317698,
+      "npc": 2466,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=1529&Qo>8707",
+      "why": "Gavroch in the antechamber where Lorkos leads whoever shows him the throne key (objective 8708 names this map): «Otnirebal ha cambiado la decoración» (18596), and the stairs behind the throne. The Minotot's cell, before the ruined throne: the Minotot is kept busy elsewhere by Apísafe (18571)."
+    },
+    {
+      "map": 136316416,
+      "npc": 2466,
+      "cell": 298,
+      "orientation": 1,
+      "criterion": "(Qa=1529&Qo>8708)|Qf=1529",
+      "why": "Gavroch in the Dofus room once the stairs are open, and for the way back up once the Dofus is taken (18608). INFERRED cell, by the arrival (296)."
+    },
+    {
+      "map": 136316416,
+      "npc": 4331,
+      "cell": 345,
+      "orientation": 5,
+      "criterion": "Qa=1529&Qo>8708&Qo<8710",
+      "why": "Sun Rinos by the Purple Dofus (objectives 8709 and 8710 name this map), until he is beaten; Dofus pour les noobs («Le pouvoir derrière le trône»): «Dans la salle du Dofus, vous y trouverez Soun Rinos». INFERRED cell, across the stele (315) from the arrival."
+    },
+    {
       "map": 136317698,
       "npc": 2482,
       "cell": 286,

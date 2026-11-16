@@ -531,6 +531,13 @@ namespace Jondo.Unity.Server.Managers
             foreach (var binding in Bindings.At(mapId, elementId))
             {
                 if (binding.AfterElement != 0 && !SessionContext.State.ElementsUsed.Contains(binding.AfterElement)) continue;
+                // A fight fought elsewhere: the Purple Dofus's stele of «Como alma en pena» takes the
+                // character to the labyrinth room where the age-old minogolem waits.
+                if (binding.Kind == QuestBindingKind.Beat && binding.Fight != null)
+                {
+                    if (await FightElsewhereAsync(stream, binding)) { moved = true; break; }
+                    continue;
+                }
                 // A fight's element: pressing it brings the monsters out, and beating them is what
                 // does the objective (the old stump of «Restauración rápida» and its two milimulous).
                 if (binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0)
@@ -650,6 +657,40 @@ namespace Jondo.Unity.Server.Managers
                 if (!run.Done.Contains(before) && !log.ObjectiveDone(before)) return false;
             }
             await SpawnAsync(stream, binding);
+            return true;
+        }
+
+        /// <summary>
+        /// Starts the fight a «beat» row's element names («fight»): its monsters, on its arena, the
+        /// character as the monster it incarnates; a win leaves him on the row's win map, a loss --
+        /// free when the row says so -- where he pressed. Only while the objective is his to do.
+        /// </summary>
+        private static async Task<bool> FightElsewhereAsync(NetworkStream stream, QuestBinding binding)
+        {
+            var log = Log;
+            var fight = binding.Fight;
+            if (log == null || _book == null || fight == null || binding.AnyOfMonsters.Count == 0) return false;
+            var run = log.Run(binding.QuestId);
+            if (run == null || run.Finished || run.Done.Contains(binding.ObjectiveId)) return false;
+            var step = _book.Step(run.StepId);
+            var objective = step?.Objectives.FirstOrDefault(o => o.Id == binding.ObjectiveId);
+            if (step == null || objective == null || !Revealed(step, objective, run)) return false;
+            foreach (int before in binding.AfterObjectives)
+            {
+                if (!run.Done.Contains(before) && !log.ObjectiveDone(before)) return false;
+            }
+
+            var group = MobSpawnManager.ComposeOffMap(binding.AnyOfMonsters.Select(m => (m, 0)));
+            if (group == null) return false;
+            if (fight.Incarnates != 0)
+                Handlers.FightHandler.IncarnateInNextFight(GameState.CharacterId, fight.Incarnates,
+                                                           fight.IncarnationGrade, false);
+            await Handlers.FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
+                arenaMapId: fight.ArenaMapId, winMapId: fight.WinMapId, winCellId: fight.WinCellId,
+                defeatFree: fight.DefeatFree);
+            // Taken by the fight when it was built; one that did not start leaves none for the next.
+            Handlers.FightHandler.TakeNextIncarnation(GameState.CharacterId);
+            Console.WriteLine($"[Quests] Objective {binding.ObjectiveId}: its fight on {fight.ArenaMapId}.");
             return true;
         }
 
