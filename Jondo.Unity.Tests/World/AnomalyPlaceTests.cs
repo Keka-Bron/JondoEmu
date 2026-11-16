@@ -102,6 +102,26 @@ namespace Jondo.Unity.Tests.World
             Assert.All(entries.Where(e => !e.ContainsKey(3)), e => Assert.Equal(new[] { 2 }, e.Keys));
         }
 
+        /// <summary>
+        /// An open anomaly's zone gives 120 % more experience and loot chance -- the chance capped at
+        /// 100 % --; elsewhere nothing, and the map's widget is told the zone's rate (lvb).
+        /// </summary>
+        [Fact]
+        public void An_anomalys_zone_gives_its_bonus_and_nowhere_else()
+        {
+            Assert.Equal(2.2, AnomalyHandler.WithZoneBonus(1.0, 120), 6);
+            Assert.Equal(100.0, AnomalyHandler.WithZoneBonus(60.0, 120));
+            Assert.Equal(1.0, AnomalyHandler.WithZoneBonus(1.0, 0));
+            Assert.Equal(220L, AnomalyHandler.WithZoneBonus(100L, 120));
+            Assert.Equal(100L, AnomalyHandler.WithZoneBonus(100L, 0));
+
+            if (Anomalies.All.Count == 0) return;
+            long zoneMap = DatabaseManager.MapsOfSubArea(Anomalies.All[0].SubAreaId).DefaultIfEmpty(0).Min();
+            if (zoneMap == 0) return;
+            Assert.Equal(AnomalyHandler.AnomalyZoneBonus, AnomalyHandler.ZoneBonusAt(zoneMap));
+            Assert.Equal(0, AnomalyHandler.ZoneBonusAt(191105026));   // Astrub
+        }
+
         /// <summary>The capture read the clocks at 22:26 UTC on 12 August: «00», «26» and «4», «26».</summary>
         [Fact]
         public void The_clocks_say_what_the_capture_read()
