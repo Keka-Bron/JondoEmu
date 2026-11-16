@@ -7589,13 +7589,27 @@ namespace Jondo.Unity.Server.Handlers
                 // starting top, every bar sat what had been eroded under the server's once a sheet
                 // had gone out mid-fight (54 under after 54 eroded); against the top of now, over
                 // it by whatever was eroded since that sheet. Before any, the starting top.
-                int topTold = quien.LifeTopTold >= 0 ? quien.LifeTopTold : quien.MaxHP + quien.VidaErosionada;
                 await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jxw,
-                    Network.FightProtocol.BuildLifeSheet(quien.Id, quien.CurrentHP - topTold, 0)));
+                    Network.FightProtocol.BuildLifeSheet(quien.Id, LifeToldAgainstTheTop(quien), 0)));
                 await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Jwi,
                     Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
                                                            Network.FightProtocol.SheetSequence)));
             });
+        }
+
+        /// <summary>
+        /// The number of the life sheet (97): his life against the top the client draws -- the
+        /// top his full sheet last gave it, moved by every row of vitality on him, which the
+        /// client adds to its bar by itself. Told against the bare top, a loss of vitality went
+        /// off the bar twice: the astral shadow at 18 of 18 after 22 jumps drew -4.
+        /// </summary>
+        internal static int LifeToldAgainstTheTop(Fighter quien)
+        {
+            int vitality = quien.Buffs.Puestos.Where(Fighter.IsVitalityRow).Sum(r => r.Cuanto);
+            // Before any full sheet, the top he started with: his maximum of now, which the rows
+            // of vitality have moved, back where they found it and with what was eroded.
+            int topTold = quien.LifeTopTold >= 0 ? quien.LifeTopTold : quien.MaxHP + quien.VidaErosionada - vitality;
+            return quien.CurrentHP - (topTold + vitality);
         }
 
         /// <summary>Absorbs damage with shield points, reports how much was consumed and refreshes the total.</summary>

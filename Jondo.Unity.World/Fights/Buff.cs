@@ -174,6 +174,14 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public bool Pendiente { get; set; }
 
+        /// <summary>
+        /// A row of vitality put as a SHARE of the life (1078, 1033, 2844 -- Último Aliento's
+        /// "-50% de vitalidad máxima"): it never takes him down as it lands. A flat loss does --
+        /// the astral shadow's every jump costs a point of vitality, and the one that leaves her
+        /// at none loses the fight.
+        /// </summary>
+        public bool ShareOfLife { get; set; }
+
         // A delayed sub-cast fixed to the original aimed cell rather than its buff bearer.
         public int? PendingCastCell { get; init; }
 

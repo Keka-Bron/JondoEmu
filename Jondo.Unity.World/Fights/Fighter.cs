@@ -492,7 +492,10 @@ namespace Jondo.Unity.World.Fights
                 if (fila.EffectId == ShieldRow) Desescudar(fila.Cuanto);
                 if (IsVitalityRow(fila)) MoveLife(-fila.Cuanto, fila.Quien, canKill: true);
             };
-            Buffs.AlPonerse = fila => { if (IsVitalityRow(fila)) MoveLife(fila.Cuanto, fila.Quien, canKill: false); };
+            Buffs.AlPonerse = fila =>
+            {
+                if (IsVitalityRow(fila)) MoveLife(fila.Cuanto, fila.Quien, canKill: !fila.ShareOfLife);
+            };
         }
 
         /// <summary>The characteristic vitality is.</summary>
@@ -538,9 +541,9 @@ namespace Jondo.Unity.World.Fights
         /// at 100 who had 1,000 of it and then lost 150 of life dies when it goes.
         /// </summary>
         /// <remarks>
-        /// A malus put on him never kills: Último Aliento's "-50% de vitalidad máxima" is a share
-        /// of a life above zero, and leaves him at one point at the least. Only life he was given
-        /// and loses again can take more than he has.
+        /// A share put on him never kills: Último Aliento's "-50% de vitalidad máxima" is a share
+        /// of a life above zero, and leaves him at one point at the least (Buff.ShareOfLife). A
+        /// flat loss does, and so does life he was given and loses again.
         /// </remarks>
         private void MoveLife(int delta, long by, bool canKill)
         {

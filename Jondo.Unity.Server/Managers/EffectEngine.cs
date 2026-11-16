@@ -4832,6 +4832,7 @@ namespace Jondo.Unity.Server.Managers
                     Disparador = AlLanzar,
                     CaducaEnRonda = Caduca(efecto, ronda),
                     EmpiezaEnRonda = Empieza(efecto, ronda),
+                    ShareOfLife = true,
                 }, combate.SiguienteEmbrujo);
 
                 return new Outcome
