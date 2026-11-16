@@ -55,6 +55,17 @@ namespace Jondo.Unity.Server.Network
         private static readonly ConcurrentDictionary<string, long> Tokens =
             new(StringComparer.OrdinalIgnoreCase);
         private static readonly ConcurrentDictionary<long, Launch> ByAccount = new();
+
+        /// <summary>
+        /// The game sessions of the launches the sweep released, by session, with when: the client
+        /// may well be alive at its title screen (<see cref="TryGetByGameSession"/>).
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, (Launch Launch, DateTime When)> Retired =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>How long a released launch's sessions are kept for the client to come back with.</summary>
+        internal static readonly TimeSpan KeptRetired = TimeSpan.FromDays(1);
+
         private static readonly object RegistrationGate = new();
         private static int _nextInstanceId;
 
@@ -104,6 +115,8 @@ namespace Jondo.Unity.Server.Network
                 };
                 ByHash[hash] = launch;
                 ByAccount[accountId] = launch;
+                // A new client of the account: a released one does not come back after it.
+                ForgetRetired(accountId);
                 RegisterToken(accountId, launcherToken);
                 return launch;
             }
@@ -134,13 +147,50 @@ namespace Jondo.Unity.Server.Network
             lock (RegistrationGate)
             {
                 launch = null;
-                if (string.IsNullOrWhiteSpace(gameSession) || !ByGameSession.TryGetValue(gameSession, out var found)
-                    || !IsCurrent(found)) return false;
+                if (string.IsNullOrWhiteSpace(gameSession)) return false;
+                if (!ByGameSession.TryGetValue(gameSession, out var found) && !TryResume(gameSession, out found))
+                    return false;
+                if (!IsCurrent(found)) return false;
 
                 found.LastSeenUtc = DateTime.UtcNow;
                 launch = found;
                 return true;
             }
+        }
+
+        /// <summary>
+        /// A launch the sweep released whose client comes back with its session. Nothing tells a
+        /// client waiting at its title screen from a dead one -- it sends nothing to the server until
+        /// «Jouer» -- so the sweep released it, and «Jouer» then hung on an unknown session until
+        /// the game was started again. It is the same client, the session being a random secret only
+        /// it holds, so it gets its launch back, unless the account has another one meanwhile.
+        /// Called under the gate.
+        /// </summary>
+        private static bool TryResume(string gameSession, out Launch found)
+        {
+            found = null!;
+            if (!Retired.TryGetValue(gameSession, out var retired)) return false;
+            var launch = retired.Launch;
+            if (ByAccount.ContainsKey(launch.AccountId)) return false;
+
+            ByHash[launch.Hash] = launch;
+            ByAccount[launch.AccountId] = launch;
+            foreach (var pair in Retired.Where(p => ReferenceEquals(p.Value.Launch, launch)).ToList())
+            {
+                ByGameSession[pair.Key] = launch;
+                Retired.TryRemove(pair.Key, out _);
+            }
+            Console.WriteLine($"[Launches] Account {launch.AccountId} is back with its released launch {launch.InstanceId}.");
+            found = launch;
+            return true;
+        }
+
+        /// <summary>Drops the released sessions of an account, or of one launch of it.</summary>
+        private static void ForgetRetired(long accountId, string? hash = null)
+        {
+            foreach (var pair in Retired.Where(p => p.Value.Launch.AccountId == accountId
+                                                     && (hash == null || p.Value.Launch.Hash == hash)).ToList())
+                Retired.TryRemove(pair.Key, out _);
         }
 
         private static bool IsCurrent(Launch launch)
@@ -221,6 +271,7 @@ namespace Jondo.Unity.Server.Network
                 ByHash.Clear();
                 ByAccount.Clear();
                 ByGameSession.Clear();
+                Retired.Clear();
                 Tokens.Clear();
             }
         }
@@ -234,6 +285,8 @@ namespace Jondo.Unity.Server.Network
             {
                 if (ByAccount.TryGetValue(accountId, out var launch) && launch.InstanceId == instanceId
                     && string.Equals(launch.Hash, hash, StringComparison.Ordinal)) Remove(launch);
+                // The client has exited: whatever the sweep kept of it will not come back.
+                ForgetRetired(accountId, hash);
             }
         }
 
@@ -274,12 +327,19 @@ namespace Jondo.Unity.Server.Network
                     // An idle connected account remains active even without a recent Zaap call.
                     if (SessionRegistry.HasConnected(launch.AccountId)) continue;
 
+                    // Kept aside rather than forgotten: a client at its title screen is just as quiet.
+                    foreach (var sesion in ByGameSession.Where(p => ReferenceEquals(p.Value, launch)).ToList())
+                        Retired[sesion.Key] = (launch, ahora);
                     Remove(launch);
                     soltados++;
                     Console.WriteLine($"[Launches] Account {launch.AccountId} has gone " +
                                       $"{(ahora - visto).TotalMinutes:0} min without a sign of life. It is released.");
                 }
             }
+
+            // And what was kept a day ago has had its chance.
+            foreach (var pair in Retired.Where(p => ahora - p.Value.When > KeptRetired).ToList())
+                Retired.TryRemove(pair.Key, out _);
             return soltados;
         }
 

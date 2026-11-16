@@ -102,6 +102,52 @@ namespace Jondo.Unity.Tests.Security
             Assert.Equal(Account, second.AccountId);
         }
 
+        /// <summary>A launch through the handshake, then released by the sweep: its session.</summary>
+        private static (ClientLaunchRegistry.Launch Launch, string Session) Released(string hash)
+        {
+            var launch = Launch(hash);
+            Assert.True(ClientLaunchRegistry.TryConnect(launch.InstanceId, hash, out string session));
+            Assert.Equal(1, ClientLaunchRegistry.SoltarLosCaducados(TimeSpan.Zero));
+            return (launch, session);
+        }
+
+        [Fact]
+        public void A_released_client_that_comes_back_with_its_session_gets_its_launch_back()
+        {
+            // Back at the title screen, the client sends nothing until «Jouer»: the sweep released it,
+            // and «Jouer» hung on an unknown session until the game was started again.
+            var (launch, session) = Released(Guid.NewGuid().ToString("N"));
+
+            Assert.True(ClientLaunchRegistry.TryGetByGameSession(session, out var found));
+            Assert.Same(launch, found);
+            Assert.True(ClientLaunchRegistry.TryGetByAccount(Account, out _));
+
+            // And the account is busy again: no second client of it.
+            Assert.Throws<InvalidOperationException>(
+                () => ClientLaunchRegistry.Register(Account, "", Guid.NewGuid().ToString("N"), "es"));
+        }
+
+        [Fact]
+        public void Not_once_the_account_has_been_launched_again()
+        {
+            var (_, session) = Released(Guid.NewGuid().ToString("N"));
+            var second = ClientLaunchRegistry.Register(Account, "", Guid.NewGuid().ToString("N"), "es");
+
+            Assert.False(ClientLaunchRegistry.TryGetByGameSession(session, out _));
+            Assert.True(ClientLaunchRegistry.TryGetByAccount(Account, out var current));
+            Assert.Same(second, current);
+        }
+
+        [Fact]
+        public void Nor_once_its_launcher_has_said_it_exited()
+        {
+            string hash = Guid.NewGuid().ToString("N");
+            var (launch, session) = Released(hash);
+            ClientLaunchRegistry.RemoveByAccount(Account, launch.InstanceId, hash);
+
+            Assert.False(ClientLaunchRegistry.TryGetByGameSession(session, out _));
+        }
+
         [Fact]
         public void A_second_launch_of_a_live_account_is_still_refused()
         {
