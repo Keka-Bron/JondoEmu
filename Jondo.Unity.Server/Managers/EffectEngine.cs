@@ -157,6 +157,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Effect 141: kills the target, with no calculation in between.</summary>
         public bool Fulmina { get; init; }
 
+        /// <summary>
+        /// A pull whose bearer's own marks for being drawn in (MA) went on while the cast was
+        /// resolved (EffectEngine.MarksOfBeingDrawnIn): its MA is not fired again at the end.
+        /// </summary>
+        public bool DrawnInAnswered { get; set; }
+
         /// <summary>The double a 180 has just put on the board, for the fight to announce.</summary>
         public Fighter Doble { get; init; }
 
@@ -3319,6 +3325,18 @@ namespace Jondo.Unity.Server.Managers
                     if (hecho == null) continue;
                     fuera.Add(hecho);
 
+                    // Drawn in, a fighter whose own attitude marks him for it carries the mark
+                    // for the rest of the cast: see MarksOfBeingDrawnIn.
+                    if (hecho.Mueve && efecto.EffectId == EffectSupport.Pull && hecho.Sobre != null)
+                    {
+                        var marks = MarksOfBeingDrawnIn(combat, hecho.Sobre, round, depth);
+                        if (marks != null)
+                        {
+                            fuera.AddRange(marks);
+                            hecho.DrawnInAnswered = true;
+                        }
+                    }
+
                     // An effect can chain another spell: it is how the attitudes hook on.
                     //
                     // WHO casts the child and WHERE it is aimed come from the table above, the
@@ -4067,6 +4085,52 @@ namespace Jondo.Unity.Server.Managers
                 bool enLaZona = dentro.Contains(CeldaDe(quien)) || quien.ExtraCells.Any(dentro.Contains);
                 if (enLaZona && LoVe(quien)) yield return quien;
             }
+        }
+
+        /// <summary>
+        /// What a fighter's own attitude does when he is drawn in (MA), when all of it is a state
+        /// put on or taken off himself: resolved at once, where the pull happens, and not once the
+        /// whole cast has been applied as the other hooks are. The rows after the pull ask for
+        /// it. Bolgrot's fires take state 272 when they are pulled (5705), and the astral jump
+        /// then has every fire next to the shadow burn her "if it lacks 272" -- the one that
+        /// could not be drawn in, «bloquée», as the guide has it. Marked at the end, the fires
+        /// the jump had just drawn in were judged without the state: a Salto Doble, whose burn
+        /// row every fire on the board casts, killed her off a fire pushed and drawn back.
+        /// Anything else in the attitude, or a hook of somebody's on him for MA, leaves it all
+        /// to the end of the cast, as before.
+        /// </summary>
+        private static List<Outcome> MarksOfBeingDrawnIn(FightInstance combat, Fighter drawn, int round, int depth)
+        {
+            if (drawn == null || !drawn.IsAlive || drawn.Buffs.Actitudes.Count == 0) return null;
+
+            static bool OnBeingDrawnIn(SpellEffect row)
+                => row.Disparadores().Any(d => string.Equals(d, AlSerAtraido, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var hook in drawn.Buffs.ActiveSpells)
+            {
+                if (drawn.Buffs.Actitudes.Contains(hook.Hechizo)) continue;
+                if (SpellEffects.De(hook.Hechizo, hook.Grado).Any(OnBeingDrawnIn)) return null;
+            }
+
+            var answering = new List<(int Spell, int Grade)>();
+            foreach (int attitude in drawn.Buffs.Actitudes)
+            {
+                int grade = drawn.Buffs.GradoDeActitud(attitude);
+                var rows = SpellEffects.De(attitude, grade).Where(OnBeingDrawnIn).ToList();
+                if (rows.Count == 0) continue;
+                if (!rows.All(row => row.EffectId is EffectSupport.AddState or EffectSupport.RemoveState
+                                     && row.Delay <= 0
+                                     && string.Equals((row.TargetMask ?? "").Trim(), "C", StringComparison.Ordinal)))
+                    return null;
+                answering.Add((attitude, grade));
+            }
+            if (answering.Count == 0) return null;
+
+            var marks = new List<Outcome>();
+            foreach (var (attitude, grade) in answering)
+                marks.AddRange(Resolver(combat, drawn, attitude, grade, drawn, AlSerAtraido, round,
+                                        depth + 1, drawn.CellId, armar: false));
+            return marks;
         }
 
         private static IEnumerable<Fighter> Todos(FightInstance combate)

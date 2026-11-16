@@ -8728,8 +8728,10 @@ namespace Jondo.Unity.Server.Handlers
                     Disparo(c.Sobre, Managers.EffectEngine.AlSerMovido, quienLanza);
                     // Drawn in (MA): Imantación's combo "solo si las bombas son desplazadas" by its
                     // pull. And the caster moved somebody else (PO).
+                    // Unless what it sets off on him already went on as the cast was resolved.
                     if (c.Efecto.EffectId is Jondo.Unity.World.Combat.EffectSupport.Pull
-                                         or Jondo.Unity.World.Combat.EffectSupport.PullToTargetCell or 1022)
+                                         or Jondo.Unity.World.Combat.EffectSupport.PullToTargetCell or 1022
+                        && !c.DrawnInAnswered)
                         Disparo(c.Sobre, Managers.EffectEngine.AlSerAtraido, quienLanza);
                     if (c.Sobre != quienLanza) Disparo(quienLanza, Managers.EffectEngine.AlDesplazarAOtro, c.Sobre);
 

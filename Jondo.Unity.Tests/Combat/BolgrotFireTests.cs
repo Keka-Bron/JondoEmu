@@ -150,6 +150,58 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(0, FightHandler.LifeToldAgainstTheTop(shadow));
         }
 
+        /// <summary>
+        /// A fire next to the one the shadow lands on is pushed off and drawn back beside her, and
+        /// drawn in it takes state 272 (its 5705, under MA) -- before the jump's burn row asks for
+        /// it. Marked only once the whole jump had been applied, it was judged without the state,
+        /// and a Salto Doble, whose burn row every fire on the board casts, killed her.
+        /// </summary>
+        [Theory]
+        [InlineData(5707, 300)]   // Salto Doble, two cells off
+        [InlineData(5703, 315)]   // Salto Astral, next to the fire
+        public async Task A_fire_pushed_off_and_drawn_back_beside_her_does_not_burn_her(int jump, int from)
+        {
+            if (SpellEffects.De(jump, 1).Count == 0 || SpellEffects.De(5705, 1).Count == 0) return;
+            var fight = new FightInstance(1, 1);
+            var shadow = new Fighter
+            {
+                Id = 10, TeamId = 0, CellId = from, MaxHP = 40, CurrentHP = 40, Level = 160,
+                MaxAP = 10, CurrentAP = 10,
+            };
+            var bolgrot = new Fighter
+            {
+                Id = -1, TeamId = 1, CellId = 475, MaxHP = 1, CurrentHP = 1, Level = 1,
+                IsMonster = true, MonsterId = Bolgrot,
+            };
+            // The fire she lands on, and one beyond it, in line.
+            var fire = new Fighter
+            {
+                Id = -2, TeamId = 1, CellId = 329, MaxHP = 1, CurrentHP = 1, Level = 1,
+                IsMonster = true, MonsterId = Fire, Invocador = bolgrot.Id,
+            };
+            var beyond = new Fighter
+            {
+                Id = -3, TeamId = 1, CellId = 344, MaxHP = 1, CurrentHP = 1, Level = 1,
+                IsMonster = true, MonsterId = Fire, Invocador = bolgrot.Id,
+            };
+            fight.AddPlayer(shadow); fight.AddMonster(bolgrot); fight.AddMonster(fire); fight.AddMonster(beyond);
+            shadow.Buffs.PonerEstado(272);
+            bolgrot.Buffs.PonerEstado(272);
+            fire.Buffs.PonerActitud(5705);
+            beyond.Buffs.PonerActitud(5705);
+
+            await FightHandler.AplicarEfectosAsync(null, fight, shadow, jump, 1, fire,
+                                                   EffectEngine.AlLanzar, fire.CellId);
+
+            Assert.False(fire.IsAlive);
+            Assert.Equal(329, shadow.CellId);
+            Assert.True(beyond.IsAlive);
+            Assert.Equal(344, beyond.CellId);
+            Assert.True(shadow.IsAlive);
+            // And the jump takes the mark off again: it is this jump's alone.
+            Assert.False(beyond.Buffs.TieneEstado(272));
+        }
+
         /// <summary>A share of the life taken (Último Aliento's -50%) still never kills as it lands.</summary>
         [Fact]
         public void A_share_of_the_life_taken_leaves_one_point()
