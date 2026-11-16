@@ -41468,6 +41468,7 @@
           "message": 21638,
           "choices": [
             {"reply": 25995, "quest": 1654, "afterObjective": 9981, "beforeObjective": 9983, "criterion": "PO=16947", "completes": 9982, "params": [[30, 9982]]},
+            {"reply": 25995, "quest": 1654, "afterObjective": 9982, "beforeObjective": 9983, "criterion": "PO=16947"},
             {"reply": 26570, "teleport": 154141187}
           ]
         },
@@ -41478,7 +41479,7 @@
           ]
         }
       ],
-      "why": "Bolgrot's spirit in the abyssal dimension: «Noto una presencia familiar alrededor de ti... ¡la de mi detestado señor!» (21638). «Extinción de los fuegos» (1654): «Ponerse el velo astral y luchar contra Bolgrot» (25995), with the Velo astral (16947), is 9982 and the fight (npc_fights.json), offered again until he is beaten (9983); «Voy a salir de la dimensión abisal» (26570) goes back up to the top of the rock. Beaten, «*gruñe de rabia*» (22066), and «Voy a salir de la dimensión abisal» (26571)."
+      "why": "Bolgrot's spirit in the abyssal dimension: «Noto una presencia familiar alrededor de ti... ¡la de mi detestado señor!» (21638). «Extinción de los fuegos» (1654): «Ponerse el velo astral y luchar contra Bolgrot» (25995), with the Velo astral (16947), is 9982 and the fight (npc_fights.json); once the veil is on, the same reply is offered again, doing nothing more than the fight, until he is beaten (9983) -- a reply whose objective is done is not shown; «Voy a salir de la dimensión abisal» (26570) goes back up to the top of the rock. Beaten, «*gruñe de rabia*» (22066), and «Voy a salir de la dimensión abisal» (26571)."
     }
   ]
 }

@@ -2426,8 +2426,10 @@ namespace Jondo.Unity.Server.Managers
             if (!armar) combate.SinArmar++;
             var raizDeFuera = combate.RootCaster;
             int hechizoRaizDeFuera = combate.CastRootSpell, filasDeFuera = combate.CastRowsAfter;
+            var struckDownOutside = combate.StruckDownThisCast;
             if (hondo == 0)
             {
+                combate.StruckDownThisCast = new HashSet<long>();
                 combate.RootCaster = quienLanza;
                 combate.CastRootSpell = hechizo;
                 combate.CastRowsAfter = combate.UltimoEmbrujo;
@@ -2461,6 +2463,7 @@ namespace Jondo.Unity.Server.Managers
                 combate.RootCaster = raizDeFuera;
                 combate.CastRootSpell = hechizoRaizDeFuera;
                 combate.CastRowsAfter = filasDeFuera;
+                combate.StruckDownThisCast = struckDownOutside;
             }
         }
 
@@ -3911,6 +3914,8 @@ namespace Jondo.Unity.Server.Managers
             foreach (var quien in candidatos)
             {
                 if (quien == null) continue;
+                // Struck down by an earlier row of this cast: no longer anybody's target.
+                if (quien != quienLanza && combate.StruckDownThisCast.Contains(quien.Id)) continue;
                 IReadOnlySet<int> susEstados = estados != null && estados.TryGetValue(quien, out var alEntrar)
                     ? alEntrar
                     : quien.Buffs.Estados as IReadOnlySet<int> ?? new HashSet<int>(quien.Buffs.Estados);
@@ -4003,7 +4008,8 @@ namespace Jondo.Unity.Server.Managers
             if (casilla < 0) return null;
             foreach (var quien in Todos(combate))
             {
-                if (quien != null && quien.IsAlive && !quien.EstaCargado && quien.CellId == casilla) return quien;
+                if (quien != null && quien.IsAlive && !quien.EstaCargado && quien.CellId == casilla
+                    && !combate.StruckDownThisCast.Contains(quien.Id)) return quien;
             }
             return null;
         }
@@ -4163,6 +4169,8 @@ namespace Jondo.Unity.Server.Managers
                 // beacon died the moment she was born.
                 if (efecto.Delay > 0) return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda);
 
+                // Dead from here on for the rest of the cast, though the death is applied later.
+                combate.StruckDownThisCast.Add(sobre.Id);
                 return new Outcome
                 {
                     Sobre = sobre,
@@ -4942,7 +4950,8 @@ namespace Jondo.Unity.Server.Managers
 
                 foreach (var otro in Todos(combate))
                 {
-                    if (otro != null && otro.IsAlive && otro.CellId == celdaApuntada) return null;
+                    if (otro != null && otro.IsAlive && otro.CellId == celdaApuntada
+                        && !combate.StruckDownThisCast.Contains(otro.Id)) return null;
                 }
 
                 int deDonde = sobre.CellId;

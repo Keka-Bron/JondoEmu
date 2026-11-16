@@ -51,5 +51,43 @@ namespace Jondo.Unity.Tests.Combat
             Assert.DoesNotContain(glyph, fight.Glifos);
             Assert.Equal(40, shadow.CurrentHP);
         }
+
+        /// <summary>
+        /// Salto Astral (5703) puts out the fire it is aimed at (141) and then teleports the shadow
+        /// onto its cell. The rows of a cast are resolved before they are applied, and the fire,
+        /// still counted alive, kept its cell: the shadow stayed beside it and the doomed fire's
+        /// own rows killed her.
+        /// </summary>
+        [Fact]
+        public async Task The_astral_jump_lands_on_the_fire_it_puts_out()
+        {
+            const int Jump = 5703;
+            if (SpellEffects.De(Jump, 1).Count == 0) return;
+            var fight = new FightInstance(1, 1);
+            var shadow = new Fighter
+            {
+                Id = 10, TeamId = 0, CellId = 300, MaxHP = 40, CurrentHP = 40, Level = 160,
+                MaxAP = 10, CurrentAP = 10,
+            };
+            var bolgrot = new Fighter
+            {
+                Id = -1, TeamId = 1, CellId = 475, MaxHP = 1, CurrentHP = 1, Level = 1,
+                IsMonster = true, MonsterId = Bolgrot,
+            };
+            var fire = new Fighter
+            {
+                Id = -2, TeamId = 1, CellId = 315, MaxHP = 1, CurrentHP = 1, Level = 1,
+                IsMonster = true, MonsterId = Fire, Invocador = bolgrot.Id,
+            };
+            fight.AddPlayer(shadow); fight.AddMonster(bolgrot); fight.AddMonster(fire);
+
+            await FightHandler.AplicarEfectosAsync(null, fight, shadow, Jump, 1, fire,
+                                                   EffectEngine.AlLanzar, fire.CellId);
+
+            Assert.False(fire.IsAlive);
+            Assert.Equal(315, shadow.CellId);
+            Assert.True(shadow.IsAlive);
+            Assert.Empty(fight.StruckDownThisCast);
+        }
     }
 }

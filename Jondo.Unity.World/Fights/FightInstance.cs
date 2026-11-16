@@ -1161,6 +1161,15 @@ namespace Jondo.Unity.World.Fights
         public HashSet<long> TeleportsFallidos { get; set; } = new HashSet<long>();
 
         /// <summary>
+        /// The fighters a "kill the target" row (141) of the cast being resolved has struck down.
+        /// The rows of a cast are all resolved before any of them is applied, so whoever such a
+        /// row kills still counts as alive for the rows after it: Salto Astral kills the fire it
+        /// is aimed at and then teleports the shadow onto its cell, which looked taken, and the
+        /// doomed fire still answered the jump's later rows as if it were there.
+        /// </summary>
+        public HashSet<long> StruckDownThisCast { get; set; } = new HashSet<long>();
+
+        /// <summary>
         /// Whether the cast being resolved went through a portal: what the masks' R and r ask,
         /// set for as long as a spell cast at a portal is resolved at the other end.
         /// </summary>
