@@ -4692,7 +4692,10 @@ namespace Jondo.Unity.Server
                     else if (e.TryGetProperty("percentDropForGrade1", out var p1)) pct = p1.GetDouble();
                     if (pct <= 0) continue;
 
-                    drops.Add(new MonsterDrop { ObjectId = oid.GetInt32(), PercentDrop = pct, ReceiverCriterion = criterion });
+                    bool noProspecting = e.TryGetProperty("disableDropModificator", out var off)
+                                         && off.ValueKind == System.Text.Json.JsonValueKind.Number && off.GetInt32() != 0;
+                    drops.Add(new MonsterDrop { ObjectId = oid.GetInt32(), PercentDrop = pct, ReceiverCriterion = criterion,
+                                                NoProspecting = noProspecting });
                 }
             }
             catch (Exception ex)
@@ -6318,6 +6321,12 @@ namespace Jondo.Unity.Server
         public int ObjectId { get; set; }
         /// <summary>Drop chance, as a percentage, for the monster's grade.</summary>
         public double PercentDrop { get; set; }
+
+        /// <summary>
+        /// The row's «disableDropModificator»: prospecting does not raise its chance (309 of the
+        /// monsters' 13,561 rows, the client's DropResult.disableDropModificator).
+        /// </summary>
+        public bool NoProspecting { get; set; }
 
         /// <summary>
         /// What the receiver has to satisfy to get it, in the client's own criterion language, or
