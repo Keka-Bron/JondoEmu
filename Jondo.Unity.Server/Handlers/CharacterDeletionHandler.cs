@@ -117,6 +117,17 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             }
 
+            // Out of his alliance and his guild first, as if he left them -- a leader's rank to the
+            // next in line, an alliance gone with its last member --: the deletion keeps their rows,
+            // and he stayed a member nobody could see. Before it, while his name and his account
+            // are still there for the guild's log and its houses; and only for one of this account.
+            if (DatabaseManager.CharacterBelongsToAccount(characterId, accountId))
+            {
+                string leaving = DatabaseManager.GetCharacterById(characterId)?.Name ?? "";
+                await AllianceHandler.CharacterGoneAsync(characterId, leaving);
+                await GuildHandler.CharacterGoneAsync(characterId);
+            }
+
             string name = DatabaseManager.DeleteCharacter(characterId, accountId);
             if (name.Length > 0) Managers.HeadHunts.Erase(characterId);
             if (name.Length == 0)

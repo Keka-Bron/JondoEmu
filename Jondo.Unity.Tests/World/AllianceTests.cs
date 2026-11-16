@@ -367,6 +367,76 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// A leader leaving hands the alliance to the best rank by the ranks' order, not by the
+        /// lowest rank id: a rank created later, put right under the leader, has a higher id than
+        /// the newcomers' and went after them.
+        /// </summary>
+        [Fact]
+        public void The_next_leader_is_of_the_best_rank_by_order_not_by_id()
+        {
+            var alliance = AllianceStore.Create(8430, "Succession", "SUC", 408, 27, 3116544, 0, 15859463);
+            AllianceStore.Join(8431, alliance.Id, AllianceStore.RankNewcomer);
+            var right = AllianceStore.CreateRank(alliance.Id, "Bras droit", 116, AllianceStore.RankLeader);
+            Assert.True(right.Id > AllianceStore.RankNewcomer);
+            AllianceStore.Join(8432, alliance.Id, right.Id);
+
+            var departure = AllianceStore.Leave(8430);
+            Assert.False(departure.Dissolved);
+            Assert.Equal(8432, departure.NewLeader);
+            Assert.Equal(AllianceStore.RankLeader, AllianceStore.RankOf(8432));
+            Assert.Equal(AllianceStore.RankNewcomer, AllianceStore.RankOf(8431));
+        }
+
+        /// <summary>A rank removed cannot send its members to the leader's: that made several leaders.</summary>
+        [Fact]
+        public void A_removed_ranks_members_never_become_leaders()
+        {
+            var alliance = AllianceStore.Create(8440, "Un seul chef", "UNC", 408, 27, 3116544, 0, 15859463);
+            var extra = AllianceStore.CreateRank(alliance.Id, "Officier", 116, AllianceStore.RankLeader);
+            AllianceStore.Join(8441, alliance.Id, extra.Id);
+
+            Assert.False(AllianceStore.RemoveRank(alliance.Id, extra.Id, AllianceStore.RankLeader));
+            Assert.Equal(extra.Id, AllianceStore.RankOf(8441));
+
+            Assert.True(AllianceStore.RemoveRank(alliance.Id, extra.Id, AllianceStore.RankNewcomer));
+            Assert.Equal(AllianceStore.RankNewcomer, AllianceStore.RankOf(8441));
+            Assert.Single(AllianceStore.Members(alliance.Id), m => m.Rank == AllianceStore.RankLeader);
+        }
+
+        /// <summary>An alliance is full at 250 members, the «/250» the directory shows.</summary>
+        [Fact]
+        public void An_alliance_is_full_at_two_hundred_and_fifty()
+        {
+            var alliance = AllianceStore.Create(8_450_000, "Pleine", "PLE", 408, 27, 3116544, 0, 15859463);
+            for (int i = 1; i < AllianceStore.MaxMembers - 1; i++) AllianceStore.Join(8_450_000 + i, alliance.Id);
+            Assert.False(AllianceStore.IsFull(alliance.Id));
+
+            AllianceStore.Join(8_450_000 + AllianceStore.MaxMembers - 1, alliance.Id);
+            Assert.Equal(AllianceStore.MaxMembers, AllianceStore.Members(alliance.Id).Count);
+            Assert.True(AllianceStore.IsFull(alliance.Id));
+        }
+
+        /// <summary>
+        /// A deleted character's alliance: the leader's rank to the next in line, and with the last
+        /// member gone the alliance with him -- what a deletion, keeping the alliances' rows, left
+        /// undone.
+        /// </summary>
+        [Fact]
+        public async Task A_deleted_character_leaves_his_alliance_and_its_leadership()
+        {
+            var alliance = AllianceStore.Create(8460, "Fantôme", "FAN", 408, 27, 3116544, 0, 15859463);
+            AllianceStore.Join(8461, alliance.Id);
+
+            await AllianceHandler.CharacterGoneAsync(8460, "");
+            Assert.Null(AllianceStore.MemberOf(8460));
+            Assert.Equal(AllianceStore.RankLeader, AllianceStore.RankOf(8461));
+            Assert.NotNull(AllianceStore.ById(alliance.Id));
+
+            AllianceStore.Leave(8461);
+            Assert.Null(AllianceStore.ById(alliance.Id));
+        }
+
+        /// <summary>
         /// The «Alliance fight» switch: kept per character, answered with the hon {f5 status}, 4
         /// when on and nothing when off -- its f1 is a prequalification's end, none here --, and
         /// carried by the map's actor (f1 of its alliance option).

@@ -1462,6 +1462,27 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// A character deleted, out of his guild as if he had left it. The deletion keeps the
+        /// guilds' rows (DatabaseManager.DeleteCharacter), so he stayed a member in its list.
+        /// </summary>
+        public static async Task CharacterGoneAsync(long characterId)
+        {
+            var guild = GuildStore.GuildOf(characterId);
+            if (guild == null || GuildStore.Leave(characterId) == null) return;
+            await RefreshEveryoneAsync(guild, characterId);
+            Console.WriteLine($"[Guild] {characterId} leaves «{guild.Name}»: the character is deleted.");
+        }
+
+        /// <summary>At startup, the members whose character is gone, out of their guild. Returns how many.</summary>
+        public static int SweepGoneMembers()
+        {
+            var gone = DatabaseManager.GoneCharactersIn("GuildMembers");
+            foreach (long characterId in gone) GuildStore.Leave(characterId);
+            if (gone.Count > 0) Console.WriteLine($"[Guild] {gone.Count} member(s) without a character taken out of their guild.");
+            return gone.Count;
+        }
+
+        /// <summary>
         /// Brings the window up to date for everybody in the guild who is connected: the member list and
         /// the header with how many they are. It is what is needed when somebody joins or leaves.
         /// </summary>
