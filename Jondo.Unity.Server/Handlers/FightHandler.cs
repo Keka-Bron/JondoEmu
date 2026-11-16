@@ -4272,6 +4272,18 @@ namespace Jondo.Unity.Server.Handlers
                 var caster = fight.Buscar(result.CasterId) ?? result.Target;
                 var waiting = result.Waiting;
 
+                // A waiting removal is rolled when its round comes: what was dodged goes out first,
+                // as at the cast, and one dodged whole is nothing more than that.
+                if (result.PointsDodged > 0)
+                {
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildPointsDodged(caster.Id,
+                            waiting.Caracteristica == ActionPointsCharacteristic ? ActionPointsCharacteristic : MovementPointsCharacteristic,
+                            result.Target.Id, result.PointsDodged)));
+                    Program.LogDebug($"[POINTS] {result.Target.Id} dodges {result.PointsDodged} point(s) of the waiting " +
+                                     $"effect {waiting.EffectId} of spell {waiting.HechizoOrigen}.");
+                }
+
                 if (result.Replays)
                 {
                     var applied = Managers.EffectEngine.ResolvePending(fight, caster, result, fight.RoundNumber);
@@ -4354,12 +4366,16 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 else if (result.Live != null)
                 {
-                    var (categoria, boost) = DatabaseManager.EffectFamily(waiting.EffectId);
-                    int familia = Network.FightProtocol.FamiliaDelEmbrujo(waiting.EffectId, categoria, boost);
+                    // A landed removal goes out as the loss it turned out to be, as at the cast.
+                    int effect = result.WireEffect != 0 ? result.WireEffect : waiting.EffectId;
+                    int dice = result.WireEffect != 0 ? -result.Live.Cuanto : waiting.Dado;
+                    int side = result.WireEffect != 0 ? 0 : waiting.Cara;
+                    var (categoria, boost) = DatabaseManager.EffectFamily(effect);
+                    int familia = Network.FightProtocol.FamiliaDelEmbrujo(effect, categoria, boost);
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxm,
                         Network.FightProtocol.BuildBuff(
-                            result.Target.Id, caster.Id, result.Live.Numero, waiting.EffectId, waiting.EffectUid,
-                            waiting.Valor, waiting.Dado, waiting.Cara, waiting.HechizoOrigen,
+                            result.Target.Id, caster.Id, result.Live.Numero, effect, waiting.EffectUid,
+                            waiting.Valor, dice, side, waiting.HechizoOrigen,
                             Managers.EffectEngine.Esperando, result.Live.CaducaEnRonda, waiting.Dispellable,
                             familia, waiting.NivelOrigen, critico: waiting.Critico, padre: waiting.Numero)));
                     Program.LogDebug($"[Fight] The delay of buff {waiting.Numero} on {result.Target.Id} is up: " +

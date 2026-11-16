@@ -321,6 +321,13 @@ namespace Jondo.Unity.Server.Managers
         public long CasterId { get; init; }
         public Buff Waiting { get; init; } = null!;
         public Buff Live { get; init; }
+
+        /// <summary>The points a waiting removal rolled against the target's dodge and missed.</summary>
+        public int PointsDodged { get; init; }
+
+        /// <summary>A waiting removal that landed goes out as -N AP (168) or -N MP (169), 0 otherwise.</summary>
+        public int WireEffect { get; init; }
+
         public bool Kills => Waiting.EffectId == EffectEngine.MataAlObjetivo;
         public bool Marks => Waiting.EffectId == EffectEngine.MarcadorDeGuion;
 
@@ -5536,9 +5543,14 @@ namespace Jondo.Unity.Server.Managers
             // dodges goes out as a 308/309 and what lands as a "-N PA/PM" row with the N that
             // landed. Nothing rolled, nothing dodged, every removal took every point: that is
             // how it was, and how it is not in the game.
+            //
+            // A removal that waits is rolled when its round comes (Activate), against the dodge
+            // the target has then. Rolled at the cast, a dodge left no waiting row at all: the
+            // Cerdo serrano's Flecha Localizadora, «-2 PM» two rounds later, went missing one
+            // cast in three.
             int esquivados = 0, efectoEnElCable = 0;
             if (cantidad < 0 && (caracteristica == PuntosDeAccion || caracteristica == PuntosDeMovimiento)
-                && EsRetiradaEsquivable(efecto.EffectId))
+                && EsRetiradaEsquivable(efecto.EffectId) && efecto.Delay <= 0)
             {
                 int cuentan = PuntosQueCuentan(combate, sobre, caracteristica, ronda);
                 int pedidos = Math.Min(-cantidad, cuentan);
@@ -5845,6 +5857,25 @@ namespace Jondo.Unity.Server.Managers
             if (waiting.EffectId == PonerEstado && target.IsAlive)
                 target.Buffs.PonerEstado(waiting.Valor != 0 ? waiting.Valor : waiting.Dado);
 
+            // A removal of points is rolled now, point by point, against the target's dodge
+            // (see Aplicar): what is dodged goes out as such, what lands is the row.
+            int cuanto = waiting.Cuanto, esquivados = 0, enElCable = 0;
+            if (cuanto < 0 && target.IsAlive && EsRetiradaEsquivable(waiting.EffectId)
+                && (waiting.Caracteristica == PuntosDeAccion || waiting.Caracteristica == PuntosDeMovimiento))
+            {
+                int cuentan = PuntosQueCuentan(combat, target, waiting.Caracteristica, round);
+                int pedidos = Math.Min(-cuanto, cuentan);
+                var caster = Todos(combat).FirstOrDefault(f => f != null && f.Id == waiting.Quien);
+                int maximo = waiting.Caracteristica == PuntosDeAccion ? target.MaxAP : target.MaxMP;
+                int perdidos = caster == null ? pedidos
+                    : PuntosQuePierde(caster, target, waiting.Caracteristica, pedidos, cuentan, maximo, round);
+                esquivados = pedidos - perdidos;
+                cuanto = -perdidos;
+                enElCable = PerdidaEnElCable(waiting.Caracteristica);
+                if (perdidos == 0)
+                    return new PendingActivation { Target = target, CasterId = waiting.Quien, Waiting = waiting, PointsDodged = esquivados };
+            }
+
             if (waiting.EffectId != MataAlObjetivo && waiting.EffectId != MarcadorDeGuion
                 && !EsDeLaFamiliaDeSublanzar(waiting.EffectId) && !EsDeDano(waiting.EffectId)
                 && !EsVueltaAtras(waiting.EffectId)
@@ -5856,7 +5887,7 @@ namespace Jondo.Unity.Server.Managers
                     EffectUid = waiting.EffectUid,
                     MaxStacks = waiting.MaxStacks,
                     Caracteristica = waiting.Caracteristica,
-                    Cuanto = waiting.Cuanto,
+                    Cuanto = cuanto,
                     Dado = waiting.Dado,
                     Cara = waiting.Cara,
                     Valor = waiting.Valor,
@@ -5875,6 +5906,7 @@ namespace Jondo.Unity.Server.Managers
             return new PendingActivation
             {
                 Target = target, CasterId = waiting.Quien, Waiting = waiting, Live = live,
+                PointsDodged = esquivados, WireEffect = live != null ? enElCable : 0,
             };
         }
 
