@@ -41,8 +41,8 @@ namespace Jondo.Unity.Server.Handlers
     /// </para>
     /// <list type="bullet">
     ///   <item>At the neutral prism beside the Temple of Alliances: interactive type 451 «Prisma
-    ///     neutral», skill 457 «Reciclar recursos», element 539669. Level 50, everything to the
-    ///     player.</item>
+    ///     neutral», skill 457 «Reciclar recursos», element 539669. Level 50; 60 % to the player and
+    ///     none to his alliance, the rest destroyed (see <see cref="NeutralPrismShare"/>).</item>
     ///   <item>When collecting a tax collector: its bag already in the window, half to the player and
     ///     half to the pot. «Se calcula a partir del conjunto de recicladores utilizados por la
     ///     alianza» (1094889): the prism modules that would change it do not exist here, so it is
@@ -79,6 +79,14 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The tax collector's even split.</summary>
         public const int TaxCollectorShare = 50;
 
+        /// <summary>
+        /// The player's part at the neutral prism: «Le taux de recyclage est de 60% pour le joueur
+        /// et 40% pour le prisme» (update 3.3), the 40 % going to nobody -- «on en obtient que 60%
+        /// et le reste est supprimé» (the official forum) --, as the client's help has it too: «las
+        /// pepitas no se comparten con su alianza» (Translations 1149998).
+        /// </summary>
+        public const int NeutralPrismShare = 60;
+
         /// <summary>Where the tax collector's items are numbered in the window, clear of the bag's uids.</summary>
         private const long LootUidBase = 2_100_000_000;
 
@@ -111,7 +119,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            var session = new Session { ToPlayer = 100, ToAlliance = 0, SubAreaId = SubAreaOf(me.MapId) };
+            var session = new Session { ToPlayer = NeutralPrismShare, ToAlliance = 0, SubAreaId = SubAreaOf(me.MapId) };
             me.Workshop = new WorkshopHandler.Bench { ElementId = elementId, SkillId = skillId, Recycle = session };
             await Write(stream, "kga", BuildOpened(session));
             Console.WriteLine($"[Recycling] {me.CharacterName} opens the neutral prism.");
