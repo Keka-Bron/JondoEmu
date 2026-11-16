@@ -22,12 +22,12 @@ namespace Jondo.Unity.Server.Handlers
     public static class AchievementHandler
     {
         /// <summary>The client wants the reward of an achievement (mga): f1 the achievement, or -1 for all.</summary>
-        public static async Task ClaimAsync(NetworkStream stream, byte[] payload)
+        public static async Task ClaimAsync(GameSession session, byte[] payload)
         {
             byte[]? mga = ConnectionProtocol.ReadPayload(payload, Op.Mga);
             if (mga == null) return;
 
-            await Achievements.ClaimAsync(stream, AchievementProtocol.ReadClaim(mga));
+            await Achievements.ClaimAsync(session, AchievementProtocol.ReadClaim(mga));
         }
 
         /// <summary>The window has opened (mfe, empty).</summary>

@@ -92,8 +92,10 @@ namespace Jondo.Unity.Server.Handlers
         /// sent from a separate task that first checks he is still where he was. The network thread is
         /// not blocked: blocking it would leave the player unable even to walk.
         /// </summary>
-        public static async Task GatherAsync(NetworkStream stream, int elementId, int skillId)
+        public static async Task GatherAsync(GameSession session, int elementId, int skillId)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             long mapId = SessionContext.State.MapId;
             if (!Resources.TryGet(mapId, elementId, out var resource))
             {
@@ -138,8 +140,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildGatherStarted(
                     elementId, Resources.GatherTenths, skillId, characterId)));
 
-            var session = SessionContext.Current;
-            _ = Task.Run(() => FinishAsync(session, stream, resource, skillId, instance, jobLevel));
+            _ = Task.Run(() => FinishAsync(session, resource, skillId, instance, jobLevel));
         }
 
         /// <summary>The resource spent, and drawn depleted with its skill switched off.</summary>
@@ -156,10 +157,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The second batch, three seconds later.</summary>
-        private static async Task FinishAsync(GameSession session, NetworkStream stream,
+        private static async Task FinishAsync(GameSession session,
                                               Resources.Resource resource, int skillId,
                                               int instance, int jobLevel)
         {
+            var stream = session.Stream;
             try
             {
                 await Task.Delay(Resources.GatherTenths * 100);
@@ -253,7 +255,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 // The new level goes before the experience, as the wheat that took the farmer to
                 // level 2 sends it: isz, then irq.
-                if (subeNivel) await WorkshopHandler.SendLevelUpAsync(stream, resource.JobId, nivel);
+                if (subeNivel) await WorkshopHandler.SendLevelUpAsync(session, resource.JobId, nivel);
 
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Irq, ConnectionProtocol.BuildJobExperience(
@@ -261,7 +263,7 @@ namespace Jondo.Unity.Server.Handlers
                         JobExperience.Floor(nivel), total)));
 
                 // The job achievements: "Alcanzar el nivel 10 en 1 oficio" and its kind.
-                if (subeNivel) await Managers.Achievements.AfterJobLevelAsync(stream);
+                if (subeNivel) await Managers.Achievements.AfterJobLevelAsync(session);
 
                 await DepletedAsync(stream, resource, skillId, instance);
 
@@ -270,7 +272,7 @@ namespace Jondo.Unity.Server.Handlers
                 await Managers.HarvestDrops.OnGatheredAsync(stream, resource.ItemId, resource.MapId);
 
                 // A quest that asked for this gathering here (the tutorial's jobs room).
-                await Managers.Quests.OnGatheredAsync(stream, resource.ItemId, resource.MapId);
+                await Managers.Quests.OnGatheredAsync(session, resource.ItemId, resource.MapId);
 
                 // And maybe the resource's protector, which attacks there and then (ResourceProtectors).
                 await ResourceProtectors.MayComeOutAsync(stream, resource.ItemId, nivel);

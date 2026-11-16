@@ -130,7 +130,7 @@ namespace Jondo.Unity.Server.Handlers
                 TravelProtocol.BuildDelayedUse(item.Template, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), me.CharacterId)));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hpq, TravelProtocol.BuildDelayFinished(me.CharacterId)));
             if (await GuildHallHandler.GoToOwnHallAsync(stream))
-                await ItemUseHandler.SpendOneAsync(stream, item.Uid);
+                await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid);
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Jondo.Unity.Server.Handlers
             long from = SessionContext.State.MapId;
             int landed = await TeleportHandler.ToMapAsync(stream, mapId, cellId);
             if (landed < 0) return;
-            await ItemUseHandler.SpendOneAsync(stream, itemUid);
+            await ItemUseHandler.SpendOneAsync(SessionContext.Current, itemUid);
             Console.WriteLine($"[Travel] {SessionContext.State.CharacterName}: {from} -> {mapId}, cell {landed}.");
         }
 
@@ -181,7 +181,7 @@ namespace Jondo.Unity.Server.Handlers
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hpp,
                 TravelProtocol.BuildDelayedUse(item.Template, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), me.CharacterId)));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hpq, TravelProtocol.BuildDelayFinished(me.CharacterId)));
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid)) return;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid)) return;
             await HouseHandler.GoHomeAsync(stream, door.Value, instance);
         }
 
@@ -220,7 +220,7 @@ namespace Jondo.Unity.Server.Handlers
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hpp,
                 TravelProtocol.BuildDelayedUse(item.Template, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), me.CharacterId)));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hpq, TravelProtocol.BuildDelayFinished(me.CharacterId)));
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid)) return;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid)) return;
             await HouseHandler.GoHomeAsync(stream, door.Value, instance);
         }
 

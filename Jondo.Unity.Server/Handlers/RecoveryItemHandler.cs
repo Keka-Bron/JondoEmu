@@ -122,7 +122,7 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
 
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid, weigh: false)) return true;
 
             RestingLife.Set(character, missing - life, now);
             me.RegenerationStartedUtc = now;

@@ -82,13 +82,13 @@ namespace Jondo.Unity.Tests.World
                 using (SessionContext.Push(resumed.Session))
                 {
                     Assert.Empty(Equipment.All);
-                    await NpcHandler.InteractAsync(resumed.ToClient, ConnectionProtocol.Push(Op.Iov,
+                    await NpcHandler.InteractAsync(resumed.Session, ConnectionProtocol.Push(Op.Iov,
                         Pb.New().Var(1, Npcs.Talk).Var(2, Outside).Var(3, guardian.ContextualId).Build()));
                     await resumed.Next(Op.Ioc);
                     var options = ProtoMessage.Parse(await resumed.Next(Op.Ios)).Fields;
                     Assert.Contains(options, f => f.FieldNumber == 2 && Number(f.BytesValue, 1) == resume);
 
-                    await NpcHandler.ReplyAsync(resumed.ToClient,
+                    await NpcHandler.ReplyAsync(resumed.Session,
                         ConnectionProtocol.Push(Op.Ioy, Pb.New().Var(1, resume).Build()));
                     await resumed.Next(Op.Kld);
                     Assert.Equal(BossRoom, Number(await LoadMapAsync(resumed), 2));
@@ -123,7 +123,7 @@ namespace Jondo.Unity.Tests.World
             {
                 var finish = typeof(FightHandler).GetMethod("TerminarParaUnoAsync",
                     BindingFlags.Static | BindingFlags.NonPublic)!;
-                await (Task)finish.Invoke(null, new object[] { pipe.ToClient, fight, won, won })!;
+                await (Task)finish.Invoke(null, new object[] { pipe.Session, fight, won, won })!;
             }
         }
 
@@ -147,7 +147,7 @@ namespace Jondo.Unity.Tests.World
             await using var pipe = await ClientPipe.OpenAsync(8_923_000_032, 8_923_100_032, ExitRoom);
             using (SessionContext.Push(pipe.Session))
             {
-                await NpcHandler.InteractAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Iov,
+                await NpcHandler.InteractAsync(pipe.Session, ConnectionProtocol.Push(Op.Iov,
                     Pb.New().Var(1, Npcs.Talk).Var(2, ExitRoom).Var(3, npc.ContextualId).Build()));
                 await pipe.Next(Op.Ioc);
                 var question = await pipe.Next(Op.Ios);
@@ -155,7 +155,7 @@ namespace Jondo.Unity.Tests.World
                     && Number(f.BytesValue, 1) == reply);
                 Assert.Equal(ExitRoom, pipe.Session.State.MapId);
 
-                await NpcHandler.ReplyAsync(pipe.ToClient,
+                await NpcHandler.ReplyAsync(pipe.Session,
                     ConnectionProtocol.Push(Op.Ioy, Pb.New().Var(1, reply).Build()));
                 Assert.Equal(1, Number(await pipe.Next(Op.Kld), 1));
                 await pipe.Next(Op.Jsd);

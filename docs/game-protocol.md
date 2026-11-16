@@ -301,6 +301,50 @@ detachment, empty replacements, numeric widths and source/cleanup/delivery failu
 and that a failed mark clear stops the acknowledgment and guest departures.
 Targeted real-client journal, tracker and marker checks remain pending.
 
+### Achievement snapshots and earned notifications
+
+`Achievements.SendListAsync(GameSession)` delegates to `AchievementStateService`.
+`AchievementMessages` constructs detached `AchievementsEvent` snapshots from the
+existing sorted account-wide list: achiever IDs retain their owner fallback, claimed
+entries omit the optional finished level, and unclaimed entries retain their earned
+level or current-level fallback, capped at 200. The unpopulated pioneer rank stays at
+its default. Loaded empty lists send; absent logs omit delivery. List delivery precedes
+checking existing progress, updating the level-checked marker and announcing unlocks.
+A list-send failure still stops checking and all later entry hooks.
+
+Earned delivery uses `AchievementFinishedEvent` and
+`AchievementFinishedInformationEvent`, sharing an immutable `AchievedAchievement`.
+Each achievement retains credit → level note → persistence attempt → own notification
+→ map notification order. `DatabaseManager.SaveAchievement` retains its existing
+log-and-continue policy for ordinary SQLite write errors; propagated source/setup or
+delivery failures still stop later steps. A failed own send retains prior credit and
+persistence and prevents its map notification and later announcements.
+
+Triggers for quests/objectives, levels, crafting/jobs, map arrivals and counted actions
+now pass the source session explicitly. Deferred counts use `defer: true`, retaining
+their tally/pending behavior until a map check. Each map recipient encodes with its own
+codec through the semantic `SessionRegistry.BroadcastToMapAsync` overload, preserving
+source map-instance filtering, source exclusion and isolated recipient failures without
+acquiring recipient gameplay turns. The existing inferred audience policy is retained:
+a fighting source omits the map notice, while recipient fight IDs are not filtered.
+
+The owning operations carry that session too. In particular,
+`WorkshopHandler.GiveJobExperienceAsync(GameSession, ...)` uses the same owner for job
+progress, persistence, level-up/experience delivery and the achievement check. Crafting,
+smithmagic, job scrolls, breeding and ride rewards thread it through their calls.
+Gathering retains the session across its delayed completion and acquires its existing
+turn there. Item use/spending, guild rewards, quest mutations/rewards, NPC quest
+interactions, achievement claims and per-player fight completion have session-taking
+entry points; packet-loop and control-API callers supply their session. Legacy state
+queries run inside that owner's `SessionContext.Push` scope, which is restored on
+success and failure. These operations reuse caller-owned turns.
+
+`ForHeroAsync(master, hero)` keeps source and recipient separate: hero facts, credit,
+level and persistence remain the hero's, and the own event uses the master's codec.
+Account synchronization and each-character exceptions retain their original timing,
+including pending/level mutations before delivery and master-log updates after successful
+announcements. The existing streamless-master omission remains.
+
 ### Account/guild house lists and world prism list
 
 `HouseHandler.SendAccountHousesAsync(GameSession)` and `SendGuildHousesAsync(GameSession)`

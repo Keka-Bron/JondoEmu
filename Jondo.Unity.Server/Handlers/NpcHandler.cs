@@ -91,8 +91,10 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// The client has clicked an NPC (iov). Depending on the action, the shop or the dialogue opens.
         /// </summary>
-        public static async Task InteractAsync(NetworkStream stream, byte[] payload)
+        public static async Task InteractAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             byte[]? iov = ConnectionProtocol.ReadPayload(payload, Op.Iov);
             if (iov == null) return;
 
@@ -136,7 +138,7 @@ namespace Jondo.Unity.Server.Handlers
 
             if (action == Npcs.Talk)
             {
-                await OpenDialogAsync(stream, npc, mapId);
+                await OpenDialogAsync(session, npc, mapId);
                 return;
             }
 
@@ -183,8 +185,9 @@ namespace Jondo.Unity.Server.Handlers
         /// says. If not, the usual is done: the template's sentence and ALL its answers at once, which is
         /// what makes Snori Nairb offer thirty-nine.
         /// </summary>
-        private static async Task OpenDialogAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
+        private static async Task OpenDialogAsync(GameSession session, Npcs.Spawn npc, long mapId)
         {
+            var stream = session.Stream;
             // Is it a luminomachine? Then neither template nor written tree: what it says and what it
             // offers come from the light the floor has and the salt the player carries.
             if (npc.NpcId == Luminomachine.NpcId)
@@ -258,7 +261,7 @@ namespace Jondo.Unity.Server.Handlers
                 SessionContext.State.OpenDialogueMapId = mapId;
                 SessionContext.State.OpenDialogueMessage = question;
                 await PreguntarAsync(stream, question, replies, lineParameters: texts);
-                await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
+                await Managers.Quests.OnTalkingToAsync(session, npc.NpcId);
                 Console.WriteLine($"[NPC] Dialog of {npc.NpcId}: question {question}, {replies.Length} replies (the Almanax).");
                 return;
             }
@@ -277,7 +280,7 @@ namespace Jondo.Unity.Server.Handlers
             // an item handed over on a hello -- is done BEFORE he chooses what to say: the old
             // quests' NPC answers the hand-over with the next step's line straight away (Guemado
             // Elwapo's «Gracias por las patatas» as the sacks change hands).
-            await Managers.Quests.OnTalkingToAsync(stream, npc.NpcId);
+            await Managers.Quests.OnTalkingToAsync(session, npc.NpcId);
 
             var template = Npcs.TemplateOf(npc.NpcId);
             var escrito = NpcDialogues.For(npc.NpcId, mapId);
@@ -920,8 +923,10 @@ namespace Jondo.Unity.Server.Handlers
         /// guided tutorial's voice presents the class's god as soon as the first steps are walked.
         /// The capture has idz 3226 and then, with no iov between, ioc and ios 60333.
         /// </summary>
-        public static async Task PushAfterStepAsync(NetworkStream stream, int stepId)
+        public static async Task PushAfterStepAsync(GameSession session, int stepId)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             long mapId = SessionContext.State.MapId;
             foreach (var puesto in Npcs.Of(mapId))
             {
@@ -972,9 +977,9 @@ namespace Jondo.Unity.Server.Handlers
             await session.SendAsync(MapActorMessages.NpcShown(spawn, mapId));
         }
 
-        private static async Task ComesInAndSpeaksAsync(NetworkStream stream, int npcId, long thenLine = 0)
+        private static async Task ComesInAndSpeaksAsync(GameSession session, int npcId, long thenLine = 0)
         {
-            var session = SessionContext.Current;
+            var stream = session.Stream;
             long mapId = session.MapId;
             // Coming in is appearing: one who hides until then (Ramy in the conduits of the palace's
             // kitchen) stands on the map for nobody before his entrance.
@@ -998,7 +1003,7 @@ namespace Jondo.Unity.Server.Handlers
             SessionContext.State.OpenDialogueMapId = mapId;
             SessionContext.State.OpenDialogueMessage = line.Message;
             await PreguntarAsync(stream, line.Message, LasQueTocan(line), Npcs.TemplateOf(npcId), line);
-            await Managers.Quests.OnTalkingToAsync(stream, npcId);
+            await Managers.Quests.OnTalkingToAsync(session, npcId);
             Console.WriteLine($"[NPC] {npcId} comes in and speaks: question {line.Message}.");
         }
 
@@ -1235,41 +1240,41 @@ namespace Jondo.Unity.Server.Handlers
                && choice.Door.Length == 0 && choice.TeleportsTo == 0 && choice.TeleportPassage == 0
                && !choice.ReturnsHome && SeLeOfrece(choice);
 
-        private static async Task StartQuestFromReplyAsync(NetworkStream stream, int npcId, DialogueChoice choice)
+        private static async Task StartQuestFromReplyAsync(GameSession session, int npcId, DialogueChoice choice)
         {
-            bool started = await Quests.StartAsync(stream, choice.StartsQuest);
+            bool started = await Quests.StartAsync(session, choice.StartsQuest);
             bool completed = choice.Completes != 0
-                && await Quests.CompleteByReplyAsync(stream, choice.StartsQuest, choice.Completes);
+                && await Quests.CompleteByReplyAsync(session, choice.StartsQuest, choice.Completes);
             if (!started) return;
 
             await Heroes.ShareQuestActionAsync(async hero =>
             {
-                if (!CanShareQuestReply(npcId, choice) || !await Quests.StartAsync(hero.Stream!, choice.StartsQuest)) return;
+                if (!CanShareQuestReply(npcId, choice) || !await Quests.StartAsync(hero, choice.StartsQuest)) return;
 
                 await GiveFromReplyAsync(hero.Stream!, choice);
                 if (completed)
                 {
                     int stepId = Quests.Book?.Of(choice.StartsQuest)?.Steps.FirstOrDefault()?.Id ?? 0;
                     if (Quests.SharedObjective(choice.StartsQuest, stepId, choice.Completes, out _))
-                        await Quests.CompleteByReplyAsync(hero.Stream!, choice.StartsQuest, choice.Completes);
+                        await Quests.CompleteByReplyAsync(hero, choice.StartsQuest, choice.Completes);
                 }
             });
         }
 
-        private static async Task<bool> CompleteQuestFromReplyAsync(NetworkStream stream, int npcId, DialogueChoice choice,
+        private static async Task<bool> CompleteQuestFromReplyAsync(GameSession session, int npcId, DialogueChoice choice,
                                                                     int objectiveId, bool giveFromReply = false)
         {
             var book = Quests.Book;
             var objective = book?.Objective(objectiveId);
             var step = objective == null ? null : book!.Step(objective.StepId);
-            if (!await Quests.CompleteByReplyAsync(stream, choice.Quest, objectiveId)) return false;
+            if (!await Quests.CompleteByReplyAsync(session, choice.Quest, objectiveId)) return false;
             if (step == null) return true;
 
             await Heroes.ShareQuestActionAsync(async hero =>
             {
                 if (!CanShareQuestReply(npcId, choice) || !Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _))
                     return;
-                if (await Quests.CompleteByReplyAsync(hero.Stream!, step.QuestId, objectiveId) && giveFromReply)
+                if (await Quests.CompleteByReplyAsync(hero, step.QuestId, objectiveId) && giveFromReply)
                     await GiveFromReplyAsync(hero.Stream!, choice);
             });
             return true;
@@ -1291,8 +1296,10 @@ namespace Jondo.Unity.Server.Handlers
         /// The dialogue always closes, accepted or refused: the kld goes out all four times in the capture
         /// and goes AHEAD of the kamas.
         /// </summary>
-        public static async Task ReplyAsync(NetworkStream stream, byte[] payload)
+        public static async Task ReplyAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             byte[]? ioy = ConnectionProtocol.ReadPayload(payload, Op.Ioy);
             if (ioy == null) return;
 
@@ -1336,16 +1343,16 @@ namespace Jondo.Unity.Server.Handlers
                 // And what the reply does besides, before the fight takes the character away: «Ve a
                 // ver a Klaus Konbah» is done by choosing to defend oneself.
                 if (fightChoice != null && fightChoice.Completes != 0)
-                    await Managers.Quests.CompleteByReplyAsync(stream, fightChoice.Quest, fightChoice.Completes);
+                    await Managers.Quests.CompleteByReplyAsync(session, fightChoice.Quest, fightChoice.Completes);
                 // And the quest it hands over, first: the prince of Wey's «À votre service» starts
                 // «Le Pwince Monseigneuw» and the fight against the fat tofu at once, and the fight's
                 // first objective has to be in hand when the fight ends.
                 if (fightChoice != null && fightChoice.StartsQuest != 0)
-                    await Managers.Quests.StartAsync(stream, fightChoice.StartsQuest);
+                    await Managers.Quests.StartAsync(session, fightChoice.StartsQuest);
                 // Or the quest it ends there and then, with nothing paid: Gobatchef's goblins called
                 // in for whoever sides with the bworks.
                 if (fightChoice != null && fightChoice.Forfeits != 0)
-                    await Managers.Quests.ForfeitAsync(stream, fightChoice.Forfeits);
+                    await Managers.Quests.ForfeitAsync(session, fightChoice.Forfeits);
                 // And its stagings: the tutorial's camera on the Celestial Puch.
                 if (fightChoice != null && fightChoice.Stagings.Count > 0)
                     await Managers.MapStagings.PlayAsync(stream, fightChoice.Stagings);
@@ -1511,7 +1518,7 @@ namespace Jondo.Unity.Server.Handlers
                 var exitChoice = NpcDialogues.For(dialogueState.OpenDialogueNpcId, dialogueState.OpenDialogueMapId)
                                              ?.Line(dialogueState.OpenDialogueMessage)?.Choice(reply, SeLeOfrece);
                 if (exitChoice != null && exitChoice.Completes != 0 && SeLeOfrece(exitChoice))
-                    await Managers.Quests.CompleteByReplyAsync(stream, exitChoice.Quest, exitChoice.Completes);
+                    await Managers.Quests.CompleteByReplyAsync(session, exitChoice.Quest, exitChoice.Completes);
                 CerrarConversacion();
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
@@ -1702,7 +1709,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
                     completesAfterClosing = elegidaAhora.Completes;
-                else if (await CompleteQuestFromReplyAsync(stream, questNpcId, elegidaAhora, elegidaAhora.Completes, giveFromReply: true))
+                else if (await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora, elegidaAhora.Completes, giveFromReply: true))
                 {
                     await GiveFromReplyAsync(stream, elegidaAhora);
                     // And whoever comes in as it is said (Abel Hoz at the bank).
@@ -1719,7 +1726,7 @@ namespace Jondo.Unity.Server.Handlers
             if (elegidaAhora != null && elegidaAhora.CompletesAll.Count > 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
             {
                 foreach (int objective in elegidaAhora.CompletesAll)
-                    await CompleteQuestFromReplyAsync(stream, questNpcId, elegidaAhora, objective);
+                    await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora, objective);
             }
 
             // What the reply prints in the chat: the orbalantir's visions, its figures turned wrong.
@@ -1740,7 +1747,7 @@ namespace Jondo.Unity.Server.Handlers
             // A quest the reply ends there and then, with nothing paid: the goblin sold to the mulou of
             // «Titi Gobelait le magobelin».
             if (elegidaAhora != null && elegidaAhora.Forfeits != 0 && !sinPagar)
-                await Managers.Quests.ForfeitAsync(stream, elegidaAhora.Forfeits);
+                await Managers.Quests.ForfeitAsync(session, elegidaAhora.Forfeits);
 
             if (elegidaAhora != null && elegidaAhora.StartsQuest != 0)
             {
@@ -1749,16 +1756,16 @@ namespace Jondo.Unity.Server.Handlers
                 if (closesHere) startsAfterClosing = elegidaAhora.StartsQuest;
                 else
                 {
-                    await StartQuestFromReplyAsync(stream, questNpcId, elegidaAhora);
+                    await StartQuestFromReplyAsync(session, questNpcId, elegidaAhora);
                 }
             }
             else if (frase == null)
             {
-                await Managers.Quests.OnReplyAsync(stream, SessionContext.State.OpenDialogueMessage);
+                await Managers.Quests.OnReplyAsync(session, SessionContext.State.OpenDialogueMessage);
             }
 
             // And an objective that is this very reply: Noken wishing the character luck.
-            await Managers.Quests.OnReplyChosenAsync(stream, reply,
+            await Managers.Quests.OnReplyChosenAsync(session, reply,
                 () => elegidaAhora == null ? Quests.CanShareNpc(questNpcId) : CanShareQuestReply(questNpcId, elegidaAhora));
 
             // And does this NPC guard a dungeon's door? If he goes in, the conversation has ended in a
@@ -1771,7 +1778,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (elegidaAhora != null && elegidaAhora.Door.Length > 0 && elegidaAhora.TakesAll.Count > 0)
                     await TakeAllAsync(stream, elegidaAhora);
                 // Going in can be what hands a quest over: Klasmor's «Criptología».
-                if (startsAfterClosing != 0) await Managers.Quests.StartAsync(stream, startsAfterClosing);
+                if (startsAfterClosing != 0) await Managers.Quests.StartAsync(session, startsAfterClosing);
                 return;
             }
 
@@ -1861,7 +1868,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             if (completesAfterClosing != 0
-                && await CompleteQuestFromReplyAsync(stream, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true))
+                && await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true))
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
                 // Whoever comes in once it is said and the window is shut: Selim Llenneb back in
@@ -1871,14 +1878,14 @@ namespace Jondo.Unity.Server.Handlers
 
             if (startsAfterClosing != 0)
             {
-                await StartQuestFromReplyAsync(stream, questNpcId, elegidaAhora!);
+                await StartQuestFromReplyAsync(session, questNpcId, elegidaAhora!);
                 return;
             }
 
             // And an NPC who comes in and speaks once this one is done (Darmas, then Ganymed).
             if (elegidaAhora != null && elegidaAhora.ThenNpc != 0)
             {
-                await ComesInAndSpeaksAsync(stream, elegidaAhora.ThenNpc, elegidaAhora.ThenLine);
+                await ComesInAndSpeaksAsync(session, elegidaAhora.ThenNpc, elegidaAhora.ThenLine);
                 return;
             }
 

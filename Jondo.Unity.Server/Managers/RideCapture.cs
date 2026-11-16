@@ -121,8 +121,11 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>The fight over, for the character being served: won, his catches become rides in his bag.</summary>
-        public static async Task FightEndedAsync(NetworkStream stream, FightInstance fight, long characterId, bool won)
+        public static async Task FightEndedAsync(GameSession session, FightInstance fight, bool won)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
+            long characterId = session.CharacterId;
             var rides = won ? RidesOf(fight.FightId, characterId) : new Dictionary<int, int>();
             int caught = 0;
             foreach (var (rideId, count) in rides)
@@ -133,12 +136,12 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (!await Equipment.GiveAsync(stream, ride.Item, 1)) continue;
                     caught++;
-                    await Achievements.CountAsync(null, "HD", ride.Item);   // «Cazamonturas», back on the map
+                    await Achievements.CountAsync(session, "HD", ride.Item, defer: true);   // «Cazamonturas», back on the map
                 }
             }
             if (caught > 0)
             {
-                await Handlers.WorkshopHandler.GiveJobExperienceAsync(stream, Breeding.BreederJob, (long)ExperiencePerRide * caught);
+                await Handlers.WorkshopHandler.GiveJobExperienceAsync(session, Breeding.BreederJob, (long)ExperiencePerRide * caught);
                 Console.WriteLine($"[Breeding] {characterId} catches {caught} ride(s).");
             }
             Forget(fight.FightId, characterId);

@@ -67,19 +67,19 @@ namespace Jondo.Unity.Tests.Quests
                     log.Restore(Quest, Step, null, finished: false);
 
                     // Before Dlim has asked for the cloth, the crate is nothing.
-                    Assert.False(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, CrateMap, Crate));
+                    Assert.False(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, CrateMap, Crate));
                     Assert.False(OnTheMap(CrateMap));
 
                     log.Tick(Quest, FindDlim);
                     log.Tick(Quest, SeeDlim);
-                    bool placed = await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, CrateMap, Crate);
+                    bool placed = await QuestEngine.OnInteractiveUsedAsync(pipe.Session, CrateMap, Crate);
                     if (MobSpawnManager.GetMonsterData(Araknespirit) != null)
                     {
                         Assert.True(placed);
                         Assert.True(OnTheMap(CrateMap));
                         // The objective is still the handing over, and a second press wakes no second one.
                         Assert.DoesNotContain(Cloth, log.Run(Quest)!.Done);
-                        Assert.False(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, CrateMap, Crate));
+                        Assert.False(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, CrateMap, Crate));
                         Assert.Single(MobSpawnManager.GetMobsForMap(CrateMap),
                                       g => g.Members.Any(m => m.Monster?.Id == Araknespirit));
                         foreach (var group in MobSpawnManager.GetMobsForMap(CrateMap)
@@ -89,21 +89,21 @@ namespace Jondo.Unity.Tests.Quests
 
                     // With the cloth already in the bag, the crate keeps its spirit.
                     Assert.True(await Equipment.GiveAsync(pipe.ToClient, SpiritualCloth, 1));
-                    Assert.False(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, CrateMap, Crate));
+                    Assert.False(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, CrateMap, Crate));
                     Assert.False(OnTheMap(CrateMap));
 
                     // Dlim's three objectives handed over: the eternales.
                     foreach (int handed in new[] { 8679, Cloth, 8681 }) log.Tick(Quest, handed);
                     var (map, element, item) = Eternales[0];
                     pipe.Session.State.MapId = map;
-                    Assert.False(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, map, element));
+                    Assert.False(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, map, element));
                     Assert.Equal(0, Equipment.HowMany(item));
 
                     Assert.True(await Equipment.GiveAsync(pipe.ToClient, DustCatcher, 1));
                     foreach (var (m, e, i) in Eternales)
                     {
                         pipe.Session.State.MapId = m;
-                        Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, m, e));
+                        Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, m, e));
                         Assert.Equal(1, Equipment.HowMany(i));
                     }
                     // The last of the step: the five powders end the quest.

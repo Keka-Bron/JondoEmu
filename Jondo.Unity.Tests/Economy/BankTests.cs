@@ -628,14 +628,14 @@ namespace Jondo.Unity.Tests.Economy
                 using (SessionContext.Push(player))
                 {
                     // Frame 72, the click on the banker, byte for byte.
-                    await NpcHandler.InteractAsync(toClient,
+                    await NpcHandler.InteractAsync(player,
                         ConnectionProtocol.Push(Op.Iov, Hex("08031080a0c06718e0e3feffffffffffff01")));
 
                     Assert.Equal(Hex("2080a0c06728e0e3feffffffffffff01"), await Next(fromServer, Op.Ioc));                // 73
                     Assert.Equal(Hex("08c2f502120908aff0031a0308c401120408b0f0031a0431333937"), await Next(fromServer, Op.Ios)); // 74
 
                     // Frame 79, "Quiero consultar mi cofre."
-                    await NpcHandler.ReplyAsync(toClient, ConnectionProtocol.Push(Op.Ioy, Hex("08aff003")));
+                    await NpcHandler.ReplyAsync(player, ConnectionProtocol.Push(Op.Ioy, Hex("08aff003")));
 
                     Assert.Equal(Hex("0801"), await Next(fromServer, Op.Kld));                  // 80
                     Assert.Equal(Hex("1014220431333937"), await Next(fromServer, Op.Lqn));      // 81

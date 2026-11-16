@@ -71,7 +71,7 @@ namespace Jondo.Unity.Tests.Quests
 
                     // Choosing it does the soul brought and leaves the other four to do; the stone goes.
                     foreach (int objective in Souls)
-                        await QuestEngine.CompleteByReplyAsync(pipe.ToClient, Quest, objective);
+                        await QuestEngine.CompleteByReplyAsync(pipe.Session, Quest, objective);
                     Assert.True(log.ObjectiveDone(Souls[0]));
                     Assert.All(Souls.Skip(1), objective => Assert.False(log.ObjectiveDone(objective)));
                     Assert.DoesNotContain(Equipment.All, item => item.Effects.Any(e => e.Effect == SoulCapture.SoulEffect));

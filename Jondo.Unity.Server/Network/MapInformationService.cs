@@ -120,9 +120,9 @@ internal sealed class MapInformationService(IMapInformationBackend backend)
             => GuildHallHandler.OnMapLoadedAsync(StreamOf(session), session.CharacterId, session.MapId);
         public int SubAreaOf(long mapId) => MapManager.GetMapInfo(mapId)?.SubAreaId ?? 0;
         public Task EnterQuestMapAsync(GameSession session, int subAreaId)
-            => Managers.Quests.OnMapEnteredAsync(StreamOf(session), session.MapId, subAreaId);
+            => Managers.Quests.OnMapEnteredAsync(session, session.MapId, subAreaId);
         public Task EnterAchievementMapAsync(GameSession session, int subAreaId)
-            => Managers.Achievements.OnMapEnteredAsync(StreamOf(session), session.MapId, subAreaId);
+            => Managers.Achievements.OnMapEnteredAsync(session, session.MapId, subAreaId);
         public Task EnterConquestMapAsync(GameSession session, int subAreaId)
             => ConquestHandler.OnMapEnteredAsync(StreamOf(session), session.CharacterId, subAreaId);
         public Task EnterLingeringRoomAsync(GameSession session)

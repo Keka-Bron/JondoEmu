@@ -301,7 +301,7 @@ public sealed class GuildStateFlowTests : IDisposable
             using var context = SessionContext.Push(pipe.Session);
             using var turn = await pipe.Session.EnterTurnAsync();
             if (mission)
-                await GuildMissionWatcher.CountAsync(pipe.ToClient, guild, who,
+                await GuildMissionWatcher.CountAsync(pipe.Session, guild,
                     new Dictionary<int, int> { [GuildMissions.ObjectiveOf(selected.Objectives[0]).MonsterId] = 1 }, pipe.Session.MapId, now);
             else
             {

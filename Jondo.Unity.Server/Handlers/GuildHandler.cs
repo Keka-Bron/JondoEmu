@@ -265,7 +265,7 @@ namespace Jondo.Unity.Server.Handlers
                 else if (byName != null && byName.Id != guild.Id) result = ResultNameUsed;
             }
             if (result == ResultOk && emblem != null && !potion.Emblem) result = ResultRequirementUnmet;
-            if (result == ResultOk && !await ItemUseHandler.SpendOneAsync(stream, potion.Uid)) result = ResultRequirementUnmet;
+            if (result == ResultOk && !await ItemUseHandler.SpendOneAsync(SessionContext.Current, potion.Uid)) result = ResultRequirementUnmet;
 
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhq, BuildResult(result)));
             if (result != ResultOk) return;
@@ -1674,7 +1674,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await TellEveryoneAsync(guild, ConnectionProtocol.Push(Op.Jgz, MemberUpdated(me, myself)));
             }
-            await GuildMissionWatcher.GiveTokensAsync(stream, credited.Tokens, weigh: false);
+            await GuildMissionWatcher.GiveTokensAsync(session, credited.Tokens, weigh: false);
             await GuildMissionWatcher.TellTheWeekAsync(guild, now);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jia,
                 GuildProtocol.BuildGuildKamas(GuildStore.GuildOf(who).GuildKamas)));

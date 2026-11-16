@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.Server.Managers;
@@ -41,8 +40,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <b>Losing counts for nothing.</b> Every one of these objective types is worded as
         /// beating something.
         /// </remarks>
-        public static async Task FightEndedAsync(NetworkStream stream, FightInstance fight, bool won)
+        public static async Task FightEndedAsync(GameSession session, FightInstance fight, bool won)
         {
+            using var context = SessionContext.Push(session);
             if (!won) return;
 
             var log = Quests.Log;
@@ -69,15 +69,15 @@ namespace Jondo.Unity.Server.Handlers
             long mapId = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : SessionContext.State.MapId;
 
             var shared = new HashSet<(int QuestId, int StepId, int ObjectiveId)>();
-            await CreditKillsAsync(stream, beaten, mapId, shared, isHero: false);
+            await CreditKillsAsync(session, beaten, mapId, shared, isHero: false);
             if (shared.Count == 0) return;
 
             await Heroes.ShareQuestActionAsync(
-                hero => CreditKillsAsync(hero.Stream!, beaten, mapId, shared, isHero: true),
+                hero => CreditKillsAsync(hero, beaten, mapId, shared, isHero: true),
                 hero => hero.Session.State.FightId == fight.FightId && fight.HaGanado(hero.CharacterId));
         }
 
-        private static async Task CreditKillsAsync(NetworkStream stream, Dictionary<int, int> beaten, long mapId,
+        private static async Task CreditKillsAsync(GameSession session, Dictionary<int, int> beaten, long mapId,
                                                    HashSet<(int QuestId, int StepId, int ObjectiveId)> shared, bool isHero)
         {
             var log = Quests.Log;
@@ -126,7 +126,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (BehindOtherWork(step, objective, run)) continue;
 
                     if (CanCredit(run, step, objective))
-                        await Quests.TickAsync(stream, run.QuestId, objective.Id, killed);
+                        await Quests.TickAsync(session, run.QuestId, objective.Id, killed);
                 }
 
                 // And the free-text ones that are a fight in all but the catalogue's type.
@@ -149,7 +149,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (binding.Times > 1 && !Quests.CountTowards(run, objective.Id, binding.Times))
                         continue;
 
-                    await Quests.TickAsync(stream, run.QuestId, objective.Id);
+                    await Quests.TickAsync(session, run.QuestId, objective.Id);
                 }
             }
         }

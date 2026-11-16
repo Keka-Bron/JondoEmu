@@ -69,7 +69,7 @@ namespace Jondo.Unity.Server.Handlers
             await LookChangedAsync(stream);
             Console.WriteLine($"[Phantoms] {SessionContext.State.CharacterName} rises at the phoenix of map {mapId}.");
 
-            await Managers.Quests.OnInteractiveUsedAsync(stream, mapId, elementId);
+            await Managers.Quests.OnInteractiveUsedAsync(SessionContext.Current, mapId, elementId);
             return true;
         }
 

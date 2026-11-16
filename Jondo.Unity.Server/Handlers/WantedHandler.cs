@@ -49,7 +49,7 @@ namespace Jondo.Unity.Server.Handlers
                 var criminal = WantedPosters.ByMonster(monster);
                 if (criminal == null || Quests.Log is not { } log || !Wants(log, criminal)) continue;
 
-                await Quests.TickAsync(stream, criminal.Quest, criminal.Catch);
+                await Quests.TickAsync(SessionContext.Current, criminal.Quest, criminal.Catch);
                 await TakeAlongAsync(stream, criminal);
                 var away = WantedPosters.Captured(monster, fight.RoleplayMapId, fight.DefenderLeaderId, Now, _dice);
                 Console.WriteLine($"[Wanted] {SessionContext.State.CharacterName} takes criminal {monster} " +
@@ -138,7 +138,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (Carries(log, criminal) && (criminal.Map == 0 || criminal.Map == mapId))
                 {
                     await LetGoAsync(stream, criminal);
-                    await Quests.TickAsync(stream, criminal.Quest, criminal.Deliver);
+                    await Quests.TickAsync(SessionContext.Current, criminal.Quest, criminal.Deliver);
                     Console.WriteLine($"[Wanted] {SessionContext.State.CharacterName} hands criminal " +
                                       $"{criminal.Monster} to jailer {npc}.");
                 }

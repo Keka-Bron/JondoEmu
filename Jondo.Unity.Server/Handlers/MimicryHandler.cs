@@ -66,8 +66,8 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // Spent before anything is kept, so a failure halfway loses nothing that was not paid for.
-            if (!await ItemUseHandler.SpendOneAsync(stream, mimicryUid, weigh: false)
-                || !await ItemUseHandler.SpendOneAsync(stream, hostUid, weigh: false))
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, mimicryUid, weigh: false)
+                || !await ItemUseHandler.SpendOneAsync(SessionContext.Current, hostUid, weigh: false))
             {
                 await WriteAsync(stream, "hmh", Pb.New().Var(2, Failure).Build());
                 return;

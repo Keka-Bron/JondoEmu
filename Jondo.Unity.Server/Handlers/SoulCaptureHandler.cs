@@ -50,7 +50,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            if (!await ItemUseHandler.SpendOneAsync(stream, stone.Uid)) return;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, stone.Uid)) return;
             foreach (var full in stones) await GrantAsync(stream, full);
             Console.WriteLine($"[Souls] {SessionContext.State.CharacterName} captures {souls.Count} soul(s) in {stones.Count} stone(s).");
         }

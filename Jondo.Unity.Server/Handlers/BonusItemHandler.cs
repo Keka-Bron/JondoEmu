@@ -169,7 +169,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (int alteration in losses) await AlterationHandler.LoseAsync(stream, alteration);
             foreach (int alteration in gains) await AlterationHandler.GainAsync(stream, alteration);
 
-            if (!kept && !await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
+            if (!kept && !await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid, weigh: false)) return true;
             await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
             await ItemUseHandler.WeighAsync(stream);
 
@@ -191,7 +191,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var typed = given.Select(g => (g.Template, g.Quantity, Type: DatabaseManager.GetItemTemplateType(g.Template)))
                              .ToList();
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid, weigh: false)) return true;
             if (typed.Any(g => g.Type == BonusSlots.BoostFoodType)) await AlterationHandler.DropCandyEffectsAsync(stream);
             if (DatabaseManager.GetItemEffectsData(DatabaseManager.GetItemTemplatePossibleEffects(item.Template))
                                .Any(e => e.EffectId == Dismounts))

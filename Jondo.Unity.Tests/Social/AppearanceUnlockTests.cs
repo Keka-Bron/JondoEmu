@@ -73,7 +73,7 @@ namespace Jondo.Unity.Tests.Social
 
                     // Used: spent, and lyb puts both heads in the faces' list (kind 1).
                     long uid = Give(character, OcraFace);
-                    await ItemUseHandler.UseAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Iuu, Pb.New().Var(3, uid).Build()));
+                    await ItemUseHandler.UseAsync(pipe.Session, ConnectionProtocol.Push(Op.Iuu, Pb.New().Var(3, uid).Build()));
                     byte[] lyb = (await Until(pipe, "lyb", "none"))!;
                     Assert.Equal((long)AppearanceUnlocks.Kind.Head, (long)Field(lyb, 4)!.VarIntValue);
                     Assert.Equal(new long[] { Male, Female }, Packed(lyb, 1).OrderBy(x => x));
@@ -90,7 +90,7 @@ namespace Jondo.Unity.Tests.Social
 
                     // A second one unlocks nothing new: it stays in the bag.
                     long again = Give(character, OcraFace);
-                    await ItemUseHandler.UseAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Iuu, Pb.New().Var(3, again).Build()));
+                    await ItemUseHandler.UseAsync(pipe.Session, ConnectionProtocol.Push(Op.Iuu, Pb.New().Var(3, again).Build()));
                     await pipe.Quiet();
                     Assert.NotNull(Equipment.ByUid(again));
                 }

@@ -11792,7 +11792,7 @@ namespace Jondo.Unity.Server.Handlers
             bool blueWins = quitter.TeamId != FightInstance.Azules;
 
             fight.Gone.Add(quitter.Id);
-            await TerminarParaUnoAsync(stream, fight, gane: false, azulGana: blueWins);
+            await TerminarParaUnoAsync(SessionContext.Current, fight, gane: false, azulGana: blueWins);
             await BackOnTheMapAsync(SessionContext.Current);
             Program.LogDebug($"[Fight] {quitter.Id} left fight #{fight.FightId}, which goes on without him.");
 
@@ -11882,7 +11882,7 @@ namespace Jondo.Unity.Server.Handlers
             RecordLadder(fight);
             await ACadaUnoAsync(fight, sesion =>
             {
-                return TerminarParaUnoAsync(sesion.Stream, fight,
+                return TerminarParaUnoAsync(sesion, fight,
                                             fight.HaGanado(sesion.State.CharacterId), azulGana);
             });
             HeroesFightOver(fight);
@@ -11978,9 +11978,11 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The end of the fight as ONE of the people who were in it lives it.</summary>
         /// <param name="gane">Whether whoever receives this won.</param>
         /// <param name="azulGana">Whether the blue team won, which is what goes in the results list.</param>
-        private static async Task TerminarParaUnoAsync(NetworkStream stream, FightInstance fight,
+        private static async Task TerminarParaUnoAsync(GameSession session, FightInstance fight,
                                                        bool gane, bool azulGana)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             bool alliesAlive = gane;
 
             // What is won. The experience starts from what each monster declares in its sheet
@@ -12005,10 +12007,10 @@ namespace Jondo.Unity.Server.Handlers
             await Managers.GuildRaidManager.FightEndedAsync(fight, GameState.CharacterId, won);
 
             // And the wild rides he caught with his net, in his bag if the fight was won.
-            await Managers.RideCapture.FightEndedAsync(stream, fight, GameState.CharacterId, won);
+            await Managers.RideCapture.FightEndedAsync(session, fight, won);
 
             // And his guild's weekly missions that asked for what fell.
-            await GuildMissionWatcher.FightEndedAsync(stream, fight, won);
+            await GuildMissionWatcher.FightEndedAsync(session, fight, won);
 
             // And a divine dimension's fissure beaten: its portal, and the hunt that led to it over.
             await TreasureHuntHandler.FightEndedAsync(stream, fight, won);
@@ -12067,7 +12069,7 @@ namespace Jondo.Unity.Server.Handlers
             // client's drop rows of a quest's monster want its objective still to do -- Vantarde's
             // note «Qo>8687&Qo<8688», the reliquaries of 1696 «Qo>10560&Qo<10561» --, and ticked
             // first, the very fight that does it never let them fall.
-            await QuestWatcher.FightEndedAsync(stream, fight, won);
+            await QuestWatcher.FightEndedAsync(session, fight, won);
 
             // The koliseo pays ITS OWN, planned with the rest (PlanKoliseo): there are no monsters in
             // front to get experience, kamas or a loot table from, the koliseo pays for winning, and

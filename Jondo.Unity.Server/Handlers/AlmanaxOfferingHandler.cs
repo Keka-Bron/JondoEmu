@@ -211,7 +211,7 @@ namespace Jondo.Unity.Server.Handlers
                 // -ni más, ni menos-»: more than asked, and he does not know which to take.
                 if (carried > wanted) return (TooMany, new[] { Goodbye }, Array.Empty<string>());
                 if (!await Equipment.TakeAsync(stream, current.Bring.ItemId, wanted)) return Close;
-                await QuestEngine.TickAsync(stream, current.Quest, current.Bring.Id);
+                await QuestEngine.TickAsync(SessionContext.Current, current.Quest, current.Bring.Id);
                 Console.WriteLine($"[Almanax] {Me} makes the offering of quest {current.Quest}.");
                 return (OfferingMade, new[] { GoAndPray }, new[] { Me });
             }
@@ -219,7 +219,7 @@ namespace Jondo.Unity.Server.Handlers
             if (reply == SpokeWithTheSpirit && current?.Back != null && RunOf(current.Quest) is { } back
                 && Done(back, current.Bring) && Done(back, current.Prayer) && Done(back, current.Saint) && !Done(back, current.Back))
             {
-                await QuestEngine.TickAsync(stream, current.Quest, current.Back.Id);
+                await QuestEngine.TickAsync(SessionContext.Current, current.Quest, current.Back.Id);
                 return (Rewarded, new[] { Goodbye }, Array.Empty<string>());
             }
 
@@ -230,7 +230,7 @@ namespace Jondo.Unity.Server.Handlers
                 var objective = QuestEngine.Book?.Of(dragon.Quest)?.Steps.SelectMany(s => s.Objectives)
                                            .FirstOrDefault(o => o.ConsumesItems && o.ItemId == dragon.Page);
                 if (objective == null || !await Equipment.TakeAsync(stream, dragon.Page, dragon.Pages)) return Close;
-                await QuestEngine.TickAsync(stream, dragon.Quest, objective.Id);
+                await QuestEngine.TickAsync(SessionContext.Current, dragon.Quest, objective.Id);
                 return (DolmanaxGiven, new[] { MissionOver }, Array.Empty<string>());
             }
 
@@ -244,10 +244,10 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The day's offering taken, and «El año del dragón» with the first one: «Si deseas hablar con el espíritu…, debes hacerle una ofrenda».</summary>
         private static async Task<(long, long[], string[])> TakeAsync(NetworkStream stream, Offering today)
         {
-            if (!await QuestEngine.StartAsync(stream, today.Quest)) return Close;
+            if (!await QuestEngine.StartAsync(SessionContext.Current, today.Quest)) return Close;
 
             int dragon = Almanax.Dragon.Quest;
-            if (dragon != 0 && QuestEngine.Log?.Run(dragon) == null) await QuestEngine.StartAsync(stream, dragon);
+            if (dragon != 0 && QuestEngine.Log?.Run(dragon) == null) await QuestEngine.StartAsync(SessionContext.Current, dragon);
 
             // And what the saint wants, in his words, if a line of his says it.
             var saint = SaintLinesOf(Almanax.Today()?.Saint ?? 0);
@@ -279,7 +279,7 @@ namespace Jondo.Unity.Server.Handlers
             var today = Current();
             if (today?.Prayer == null || !MayPray()) return true;
 
-            await QuestEngine.TickAsync(stream, today.Quest, today.Prayer.Id);
+            await QuestEngine.TickAsync(SessionContext.Current, today.Quest, today.Prayer.Id);
             Console.WriteLine($"[Almanax] {Me} prays at the altar of map {mapId}.");
             return true;
         }

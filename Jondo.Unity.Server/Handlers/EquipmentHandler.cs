@@ -68,7 +68,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Iuj, AlterationProtocol.BuildSlotItemChanged(pet)));
-            await ItemUseHandler.SpendOneAsync(stream, uid);
+            await ItemUseHandler.SpendOneAsync(SessionContext.Current, uid);
             Console.WriteLine($"[Legendary pets] {SessionContext.State.CharacterName}'s pet {pet.Uid} " +
                               (what.GivesStatus ? "is legendary now." : $"has the power of spell {what.Spell} now."));
             return true;

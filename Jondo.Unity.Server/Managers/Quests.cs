@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Network;
@@ -46,8 +45,8 @@ namespace Jondo.Unity.Server.Managers
         public const int QuestUpdatedMessage = 55;
 
         /// <summary>An info line naming a quest: lqn 54, 55 or 56.</summary>
-        private static Task TellAsync(NetworkStream stream, int message, int questId)
-            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+        private static Task TellAsync(GameSession session, int message, int questId)
+            => session.SendAsync(
                 ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
                     InfoMessages.Info, message, questId.ToString(CultureInfo.InvariantCulture))));
 
@@ -214,15 +213,16 @@ namespace Jondo.Unity.Server.Managers
         /// the honest fix when it matters is to say so in the tree; until then a quest line should
         /// be written with one reply.
         /// </remarks>
-        public static async Task OnReplyAsync(NetworkStream stream, long dialogId)
+        public static async Task OnReplyAsync(GameSession session, long dialogId)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || dialogId <= 0) return;
 
             int npcId = SessionContext.State.OpenDialogueNpcId;
             foreach (var step in StepsHandedOverBy(dialogId))
             {
-                await StartSharedAsync(stream, step.QuestId, () => CanShareNpc(npcId));
+                await StartSharedAsync(session, step.QuestId, () => CanShareNpc(npcId));
             }
 
             // The Almanax offering and «El año del dragón» are Ontoral's own replies now
@@ -241,8 +241,9 @@ namespace Jondo.Unity.Server.Managers
         /// Only the step in hand is looked at, which <see cref="QuestLog.Tick"/> enforces anyway:
         /// walking past an NPC a later step will want must not skip the steps in between.
         /// </remarks>
-        public static async Task OnTalkingToAsync(NetworkStream stream, int npcId)
+        public static async Task OnTalkingToAsync(GameSession session, int npcId)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null || npcId == 0) return;
 
@@ -254,12 +255,12 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var objective in step.Objectives)
                 {
                     if (objective.NpcId != npcId) continue;
-                    if (!await CompleteNpcObjectiveAsync(stream, step, objective, run, npcId)) continue;
+                    if (!await CompleteNpcObjectiveAsync(session, step, objective, run, npcId)) continue;
 
                     await Heroes.ShareQuestActionAsync(async hero =>
                     {
                         if (CanShareNpc(npcId) && SharedObjective(run.QuestId, step.Id, objective.Id, out var pending))
-                            await CompleteNpcObjectiveAsync(hero.Stream!, step, objective, pending, npcId);
+                            await CompleteNpcObjectiveAsync(hero, step, objective, pending, npcId);
                     });
                 }
 
@@ -274,7 +275,7 @@ namespace Jondo.Unity.Server.Managers
                     if (binding.NpcId != npcId) continue;
                     if (binding.MapId != 0 && binding.MapId != SessionContext.State.MapId) continue;
 
-                    await CloseSharedAsync(stream, binding, () => CanShareNpc(npcId));
+                    await CloseSharedAsync(session, binding, () => CanShareNpc(npcId));
                 }
             }
         }
@@ -282,7 +283,7 @@ namespace Jondo.Unity.Server.Managers
         internal static bool CanShareNpc(int npcId)
             => Npcs.OnMap(SessionContext.State.MapId).Any(spawn => spawn.NpcId == npcId);
 
-        private static async Task<bool> CompleteNpcObjectiveAsync(NetworkStream stream, QuestStep step,
+        private static async Task<bool> CompleteNpcObjectiveAsync(GameSession session, QuestStep step,
                                                                   QuestObjective objective, QuestRun run, int npcId)
         {
             if (run.Finished || run.StepId != step.Id || run.Done.Contains(objective.Id)) return false;
@@ -299,10 +300,10 @@ namespace Jondo.Unity.Server.Managers
 
             if (objective.ItemId != 0 && objective.ConsumesItems
                 && Handlers.DungeonHandler.TakesAtTheDoor(npcId, mapId, objective.ItemId)) return false;
-            if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) return false;
-            if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) return false;
+            if (objective.ItemId != 0 && !await HandOverAsync(session, objective)) return false;
+            if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(session, objective)) return false;
 
-            await TickAsync(stream, run.QuestId, objective.Id);
+            await TickAsync(session, run.QuestId, objective.Id);
             return true;
         }
 
@@ -429,8 +430,9 @@ namespace Jondo.Unity.Server.Managers
             });
         }
 
-        private static async Task<bool> HandOverAsync(NetworkStream stream, QuestObjective objective)
+        private static async Task<bool> HandOverAsync(GameSession session, QuestObjective objective)
         {
+            var stream = session.Stream;
             int wanted = Math.Max(1, objective.ItemCount);
             if (Equipment.HowMany(objective.ItemId) < wanted) return false;
 
@@ -455,8 +457,9 @@ namespace Jondo.Unity.Server.Managers
         /// first, so that a stone full of others is the last to go. Silent when they are not there,
         /// as the items are.
         /// </remarks>
-        private static async Task<bool> HandOverSoulsAsync(NetworkStream stream, QuestObjective objective)
+        private static async Task<bool> HandOverSoulsAsync(GameSession session, QuestObjective objective)
         {
+            var stream = session.Stream;
             int monster = objective.SoulMonster, wanted = objective.SoulCount;
             int SoulsIn(Equipment.Item stone) => stone.Effects.Count(e => e.Effect == SoulCapture.SoulEffect && e.Value == monster);
 
@@ -471,7 +474,7 @@ namespace Jondo.Unity.Server.Managers
                 int each = SoulsIn(stone);
                 for (int n = Math.Max(1, stone.Quantity); n > 0 && still > 0; n--)
                 {
-                    if (!await Handlers.ItemUseHandler.SpendOneAsync(stream, stone.Uid)) return false;
+                    if (!await Handlers.ItemUseHandler.SpendOneAsync(session, stone.Uid)) return false;
                     still -= each;
                 }
                 if (still <= 0) break;
@@ -510,8 +513,10 @@ namespace Jondo.Unity.Server.Managers
         ///
         /// Returns whether anything happened, so the caller knows whether the click was answered.
         /// </remarks>
-        public static async Task<bool> OnInteractiveUsedAsync(NetworkStream stream, long mapId, int elementId, int skillInstanceId = 0)
+        public static async Task<bool> OnInteractiveUsedAsync(GameSession session, long mapId, int elementId, int skillInstanceId = 0)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var log = Log;
             if (log == null || _book == null) return false;
 
@@ -524,7 +529,7 @@ namespace Jondo.Unity.Server.Managers
                 var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
                 if (ficha != null)
                 {
-                    await MapInformationService.Live.RefreshActorsAsync(SessionContext.Current, ficha);
+                    await MapInformationService.Live.RefreshActorsAsync(session, ficha);
                 }
                 Console.WriteLine($"[Quests] Element {elementId} of map {mapId} used for the scene.");
                 return true;
@@ -539,14 +544,14 @@ namespace Jondo.Unity.Server.Managers
                 // character to the labyrinth room where the age-old minogolem waits.
                 if (binding.Kind == QuestBindingKind.Beat && binding.Fight != null)
                 {
-                    if (await FightElsewhereAsync(stream, binding)) { moved = true; break; }
+                    if (await FightElsewhereAsync(session, binding)) { moved = true; break; }
                     continue;
                 }
                 // A fight's element: pressing it brings the monsters out, and beating them is what
                 // does the objective (the old stump of «Restauración rápida» and its two milimulous).
                 if (binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0)
                 {
-                    if (await BringOutAsync(stream, binding)) { moved = true; break; }
+                    if (await BringOutAsync(session, binding)) { moved = true; break; }
                     continue;
                 }
                 if (binding.Kind != QuestBindingKind.Click) continue;
@@ -558,17 +563,17 @@ namespace Jondo.Unity.Server.Managers
                 if (binding.GivesEach)
                 {
                     if (SessionContext.State.QuestElementsTaken.Contains((binding.ObjectiveId, elementId))) continue;
-                    if (await GiveEachAsync(stream, binding, mapId, elementId))
+                    if (await GiveEachAsync(session, binding, mapId, elementId))
                     {
                         SessionContext.State.QuestElementsTaken.Add((binding.ObjectiveId, elementId));
                         // What guards the element: the dostrogo a dodoune egg wakes up, now and then.
                         if (binding.SpawnsMonster != 0
                             && (binding.SpawnsChance == 0 || Random.Shared.Next(100) < binding.SpawnsChance))
-                            await SpawnAsync(stream, binding);
+                            await SpawnAsync(session, binding);
                         // Without «onlyGives» the gathering IS the objective: «Recoge tres maderas de
                         // cuerbok» is done once each of the three trunks' wood is in the bag.
                         if (!binding.OnlyGives && CarriesEveryOne(binding))
-                            await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
+                            await TickAsync(session, binding.QuestId, binding.ObjectiveId);
                         moved = true;
                         break;
                     }
@@ -591,7 +596,7 @@ namespace Jondo.Unity.Server.Managers
                         break;
                     }
                 }
-                if (await CloseSharedAsync(stream, binding,
+                if (await CloseSharedAsync(session, binding,
                     () => binding.AfterElement == 0 || SessionContext.State.ElementsUsed.Contains(binding.AfterElement)))
                 {
                     moved = true;
@@ -635,8 +640,9 @@ namespace Jondo.Unity.Server.Managers
         /// One of a «givesEach» row's items, when its objective is the character's to do and fewer
         /// than the row's count are carried. Nothing is marked.
         /// </summary>
-        private static async Task<bool> GiveEachAsync(NetworkStream stream, QuestBinding binding, long mapId, int elementId)
+        private static async Task<bool> GiveEachAsync(GameSession session, QuestBinding binding, long mapId, int elementId)
         {
+            var stream = session.Stream;
             var log = Log;
             if (log == null || _book == null) return false;
             var run = log.Run(binding.QuestId);
@@ -693,8 +699,9 @@ namespace Jondo.Unity.Server.Managers
         /// Brings out a beat binding's monsters, when its objective is the character's to do now:
         /// nothing is marked, the fight does it.
         /// </summary>
-        private static async Task<bool> BringOutAsync(NetworkStream stream, QuestBinding binding)
+        private static async Task<bool> BringOutAsync(GameSession session, QuestBinding binding)
         {
+            var stream = session.Stream;
             var log = Log;
             if (log == null || _book == null) return false;
             var run = log.Run(binding.QuestId);
@@ -706,7 +713,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (!run.Done.Contains(before) && !log.ObjectiveDone(before)) return false;
             }
-            await SpawnAsync(stream, binding);
+            await SpawnAsync(session, binding);
             return true;
         }
 
@@ -715,8 +722,9 @@ namespace Jondo.Unity.Server.Managers
         /// character as the monster it incarnates; a win leaves him on the row's win map, a loss --
         /// free when the row says so -- where he pressed. Only while the objective is his to do.
         /// </summary>
-        private static async Task<bool> FightElsewhereAsync(NetworkStream stream, QuestBinding binding)
+        private static async Task<bool> FightElsewhereAsync(GameSession session, QuestBinding binding)
         {
+            var stream = session.Stream;
             var log = Log;
             var fight = binding.Fight;
             if (log == null || _book == null || fight == null || binding.AnyOfMonsters.Count == 0) return false;
@@ -744,11 +752,11 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
-        private static async Task<bool> CloseSharedAsync(NetworkStream stream, QuestBinding binding,
+        private static async Task<bool> CloseSharedAsync(GameSession session, QuestBinding binding,
                                                           Func<bool>? canShare = null)
         {
             int stepId = Log?.Run(binding.QuestId)?.StepId ?? 0;
-            if (!await CloseAsync(stream, binding)) return false;
+            if (!await CloseAsync(session, binding)) return false;
 
             if (binding.SpawnsMonster == 0 && !binding.OnlyGives)
             {
@@ -758,11 +766,11 @@ namespace Jondo.Unity.Server.Managers
 
                     if (binding.Starts != 0)
                     {
-                        await CloseAsync(hero.Stream!, binding);
+                        await CloseAsync(hero, binding);
                     }
                     else if (SharedObjective(binding.QuestId, stepId, binding.ObjectiveId, out _))
                     {
-                        await CloseAsync(hero.Stream!, binding);
+                        await CloseAsync(hero, binding);
                     }
                 });
             }
@@ -781,8 +789,9 @@ namespace Jondo.Unity.Server.Managers
                    && Revealed(step, objective, run);
         }
 
-        private static async Task<bool> CloseAsync(NetworkStream stream, QuestBinding binding)
+        private static async Task<bool> CloseAsync(GameSession session, QuestBinding binding)
         {
+            var stream = session.Stream;
             var log = Log;
             if (log == null || _book == null) return false;
 
@@ -829,7 +838,7 @@ namespace Jondo.Unity.Server.Managers
                 if (!await CarriesWhatItAsksAsync()) return false;
 
                 Console.WriteLine($"[Quests] Quest {binding.Starts} starts on clicking an element.");
-                if (!await StartAsync(stream, binding.Starts)) return false;
+                if (!await StartAsync(session, binding.Starts)) return false;
                 // And what it hands over with the quest: the Moonies' first parchment, found among
                 // the wreck's books.
                 foreach (var (item, count) in binding.Gives)
@@ -849,7 +858,7 @@ namespace Jondo.Unity.Server.Managers
                     foreach (var same in Bindings.At(where, element))
                     {
                         if (same.QuestId == binding.Starts && same.Starts == 0 && same.Kind == QuestBindingKind.Click)
-                            await CloseAsync(stream, same);
+                            await CloseAsync(session, same);
                     }
                 }
                 return true;
@@ -919,7 +928,7 @@ namespace Jondo.Unity.Server.Managers
                     if (MobSpawnManager.GetMobsForMap(SessionContext.State.MapId)
                         .Any(g => g.Members.Any(m => m.Monster != null && m.Monster.Id == binding.SpawnsMonster)))
                         return false;
-                    await SpawnAsync(stream, binding);
+                    await SpawnAsync(session, binding);
                     return true;
                 }
                 return gave;
@@ -930,7 +939,7 @@ namespace Jondo.Unity.Server.Managers
             // and the client only validates «Equipa a tu personaje» for items that arrive with that
             // step already in hand.
             bool talkFirst = binding.Kind == QuestBindingKind.Talk || binding.Kind == QuestBindingKind.Reply;
-            if (talkFirst) await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
+            if (talkFirst) await TickAsync(session, binding.QuestId, binding.ObjectiveId);
             foreach (var (item, count) in binding.Gives)
             {
                 if (await QuestFollowers.GiveAsync(stream, item, count))
@@ -950,18 +959,18 @@ namespace Jondo.Unity.Server.Managers
 
             // And what is required is spent, if the row says so. After handing out and before marking,
             // for the same reason: spending the lemonade and then having the rest fail would be the worst of all.
-            if (binding.SpendsRequired) await SpendAsync(stream, binding);
+            if (binding.SpendsRequired) await SpendAsync(session, binding);
 
-            if (!talkFirst) await TickAsync(stream, binding.QuestId, binding.ObjectiveId);
+            if (!talkFirst) await TickAsync(session, binding.QuestId, binding.ObjectiveId);
 
             if (binding.SpawnsMonster != 0)
-                await SpawnAsync(stream, binding);
+                await SpawnAsync(session, binding);
 
             if (binding.ShowsNpc != 0)
-                await Handlers.NpcHandler.ComesInAsync(SessionContext.Current, binding.ShowsNpc);
+                await Handlers.NpcHandler.ComesInAsync(session, binding.ShowsNpc);
 
             if (binding.ThenStarts != 0 && log.Run(binding.ThenStarts) == null)
-                await StartAsync(stream, binding.ThenStarts);
+                await StartAsync(session, binding.ThenStarts);
 
             return true;
         }
@@ -977,8 +986,9 @@ namespace Jondo.Unity.Server.Managers
         /// It is only sent to whoever triggered it. It is his quest, his element and his creature; nothing
         /// appears for the others in the middle of the map.
         /// </remarks>
-        private static async Task SpawnAsync(NetworkStream stream, QuestBinding binding)
+        private static async Task SpawnAsync(GameSession session, QuestBinding binding)
         {
+            var stream = session.Stream;
             long mapId = SessionContext.State.MapId;
             var grupo = MobSpawnManager.SpawnNamed(mapId, binding.SpawnsMonster, binding.SpawnsCount, binding.SpawnsWithAll.ToArray());
 
@@ -992,7 +1002,7 @@ namespace Jondo.Unity.Server.Managers
             var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
             if (ficha == null) return;
 
-            await MapInformationService.Live.RefreshActorsAsync(SessionContext.Current, ficha);
+            await MapInformationService.Live.RefreshActorsAsync(session, ficha);
 
             Console.WriteLine($"[Quests] Monster {binding.SpawnsMonster} comes out " +
                               $"(x{binding.SpawnsCount}) on cell {grupo.CellId}.");
@@ -1056,9 +1066,10 @@ namespace Jondo.Unity.Server.Managers
         /// so walking to the next map left every NPC on it unmarked until the next relog — which
         /// looked exactly like "this map has no quests".
         /// </remarks>
-        public static async Task OnMapEnteredAsync(NetworkStream stream, long mapId, int subAreaId)
+        public static async Task OnMapEnteredAsync(GameSession session, long mapId, int subAreaId)
         {
-            await OldCharacterReachesTheDofusariumAsync(stream, mapId);
+            using var context = SessionContext.Push(session);
+            await OldCharacterReachesTheDofusariumAsync(session, mapId);
             var log = Log;
 
             // A quest the map itself hands out: «Des pwinces pas très charmants» starts on going
@@ -1070,7 +1081,7 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var starter in Bindings.StartedOn(mapId))
                 {
                     if (log.Run(starter.Starts) != null) continue;
-                    if (!await StartSharedAsync(stream, starter.Starts, () => Log?.Run(starter.Starts) == null)) continue;
+                    if (!await StartSharedAsync(session, starter.Starts, () => Log?.Run(starter.Starts) == null)) continue;
                     Console.WriteLine($"[Quests] Quest {starter.Starts} starts on arriving on {mapId}.");
                 }
             }
@@ -1091,11 +1102,11 @@ namespace Jondo.Unity.Server.Managers
                         // for the rose much later -- it used to tick on the first visit.
                         if (here && !run.Done.Contains(objective.Id) && Revealed(step, objective, run))
                         {
-                            await TickAsync(stream, run.QuestId, objective.Id);
+                            await TickAsync(session, run.QuestId, objective.Id);
                             await Heroes.ShareQuestActionAsync(async hero =>
                             {
                                 if (SharedObjective(run.QuestId, step.Id, objective.Id, out _))
-                                    await TickAsync(hero.Stream!, run.QuestId, objective.Id);
+                                    await TickAsync(hero, run.QuestId, objective.Id);
                             });
                         }
                     }
@@ -1113,7 +1124,7 @@ namespace Jondo.Unity.Server.Managers
                         // bridge is crossed and the palace seen, ticked ahead of both.
                         if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
 
-                        await CloseSharedAsync(stream, binding);
+                        await CloseSharedAsync(session, binding);
                     }
 
                     // And a «beat» row with no element to press: its monsters come out when the
@@ -1126,7 +1137,7 @@ namespace Jondo.Unity.Server.Managers
                         if (binding.Elements.Count > 0 || binding.MapId != mapId) continue;
                         if (MobSpawnManager.GetMobsForMap(mapId).Any(g => g.Members.Any(m => m.Monster != null && m.Monster.Id == binding.SpawnsMonster)))
                             continue;
-                        await BringOutAsync(stream, binding);
+                        await BringOutAsync(session, binding);
                     }
                 }
             }
@@ -1140,8 +1151,9 @@ namespace Jondo.Unity.Server.Managers
         /// The character has finished a walk on a map: an objective bound as «walk» there is done.
         /// The guided tutorial's 19534 closes this way, server-side, after the client's jqi.
         /// </summary>
-        public static async Task OnWalkedAsync(NetworkStream stream, long mapId, int cellId = -1)
+        public static async Task OnWalkedAsync(GameSession session, long mapId, int cellId = -1)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null || mapId == 0) return;
 
@@ -1154,7 +1166,7 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Walk || binding.MapId != mapId) continue;
                     if (!EndsOn(binding, cellId)) continue;
-                    await CloseSharedAsync(stream, binding, () => EndsOn(binding, SessionContext.State.CellId));
+                    await CloseSharedAsync(session, binding, () => EndsOn(binding, SessionContext.State.CellId));
                 }
             }
         }
@@ -1167,8 +1179,9 @@ namespace Jondo.Unity.Server.Managers
         /// A document has been read: an objective bound to reading every one of its elements closes
         /// once the last is read (the Dofusarium's statues, the temple's book).
         /// </summary>
-        public static async Task OnReadAsync(NetworkStream stream, long mapId)
+        public static async Task OnReadAsync(GameSession session, long mapId)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null) return;
             var used = SessionContext.State.ElementsUsed;
@@ -1186,7 +1199,7 @@ namespace Jondo.Unity.Server.Managers
                     {
                         if (!used.Contains(element)) { all = false; break; }
                     }
-                    if (all) await CloseAsync(stream, binding);
+                    if (all) await CloseAsync(session, binding);
                 }
             }
         }
@@ -1196,8 +1209,9 @@ namespace Jondo.Unity.Server.Managers
         /// closes. The blank book of «Las primeras impresiones son engañosas», leafed through to its
         /// empty last page, sends the character back to complain to Primir.
         /// </summary>
-        public static async Task OnItemReadAsync(NetworkStream stream, int itemId)
+        public static async Task OnItemReadAsync(GameSession session, int itemId)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null || itemId == 0) return;
             foreach (var run in new List<QuestRun>(log.Doing()))
@@ -1209,7 +1223,7 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Read || binding.ItemId != itemId) continue;
                     if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
-                    await CloseAsync(stream, binding);
+                    await CloseAsync(session, binding);
                 }
             }
         }
@@ -1222,8 +1236,9 @@ namespace Jondo.Unity.Server.Managers
         /// The keyring does not count: no key changed hands. Tassa wants the laboratory's key the
         /// first time, and the keyring does not stand in for it.
         /// </remarks>
-        public static async Task OnKeyHandedOverAsync(NetworkStream stream, int npcId, int itemId)
+        public static async Task OnKeyHandedOverAsync(GameSession session, int npcId, int itemId)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null || npcId == 0 || itemId == 0) return;
             foreach (var run in new List<QuestRun>(log.Doing()))
@@ -1234,7 +1249,7 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (objective.NpcId != npcId || objective.ItemId != itemId || !objective.ConsumesItems) continue;
                     if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
-                    await TickAsync(stream, run.QuestId, objective.Id);
+                    await TickAsync(session, run.QuestId, objective.Id);
                     return;
                 }
             }
@@ -1244,8 +1259,9 @@ namespace Jondo.Unity.Server.Managers
         /// A reply that does a conversation objective (DialogueChoice.Completes) has been chosen:
         /// it is done if it is in hand and has come up, and what it asks to be handed over is.
         /// </summary>
-        public static async Task<bool> CompleteByReplyAsync(NetworkStream stream, int questId, int objectiveId)
+        public static async Task<bool> CompleteByReplyAsync(GameSession session, int questId, int objectiveId)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null || objectiveId == 0) return false;
 
@@ -1271,14 +1287,14 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (objective.Id != objectiveId) continue;
                 if (!Revealed(step, objective, run)) return false;
-                if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) return false;
-                if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) return false;
-                if (!await UsedWithWhatItTakesAsync(stream, objectiveId)) return false;
-                await TickAsync(stream, questId, objectiveId);
+                if (objective.ItemId != 0 && !await HandOverAsync(session, objective)) return false;
+                if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(session, objective)) return false;
+                if (!await UsedWithWhatItTakesAsync(session, objectiveId)) return false;
+                await TickAsync(session, questId, objectiveId);
                 // Whoever the use brings out: the spirit the holy water calls up.
                 var used = Bindings.Of(objectiveId);
                 if (used != null && used.Kind == QuestBindingKind.Use && used.ShowsNpc != 0)
-                    await Handlers.NpcHandler.ComesInAsync(SessionContext.Current, used.ShowsNpc);
+                    await Handlers.NpcHandler.ComesInAsync(session, used.ShowsNpc);
                 return true;
             }
             return false;
@@ -1289,8 +1305,9 @@ namespace Jondo.Unity.Server.Managers
         /// says so -- spent (<see cref="QuestBindingKind.Use"/>). True when the objective has no
         /// such binding.
         /// </summary>
-        private static async Task<bool> UsedWithWhatItTakesAsync(NetworkStream stream, int objectiveId)
+        private static async Task<bool> UsedWithWhatItTakesAsync(GameSession session, int objectiveId)
         {
+            var stream = session.Stream;
             var binding = Bindings.Of(objectiveId);
             if (binding == null || binding.Kind != QuestBindingKind.Use) return true;
             // Where the objective says, when it names a place the item carries no condition for:
@@ -1313,7 +1330,7 @@ namespace Jondo.Unity.Server.Managers
                         InfoMessages.Warning, InfoMessages.MissingItem)));
                 return false;
             }
-            if (binding.SpendsRequired) await SpendAsync(stream, binding);
+            if (binding.SpendsRequired) await SpendAsync(session, binding);
             return true;
         }
 
@@ -1321,8 +1338,9 @@ namespace Jondo.Unity.Server.Managers
         /// Takes what a binding spends, each with the «Has perdido» the client words (lqn 22),
         /// as when a conversation takes an item: the Bonta honey left in the bear-man's barrels.
         /// </summary>
-        private static async Task SpendAsync(NetworkStream stream, QuestBinding binding)
+        private static async Task SpendAsync(GameSession session, QuestBinding binding)
         {
+            var stream = session.Stream;
             foreach (var (item, count) in binding.Requires)
             {
                 if (!await QuestFollowers.TakeAsync(stream, item, count)) continue;
@@ -1336,8 +1354,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// A reply has been chosen in a conversation: an objective bound to it closes.
         /// </summary>
-        public static async Task OnReplyChosenAsync(NetworkStream stream, long reply, Func<bool>? canShare = null)
+        public static async Task OnReplyChosenAsync(GameSession session, long reply, Func<bool>? canShare = null)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null || reply <= 0) return;
             foreach (var run in new List<QuestRun>(log.Doing()))
@@ -1349,8 +1368,8 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Reply) continue;
                     if (!binding.Replies.Contains((int)reply)) continue;
-                    if (canShare == null) await CloseAsync(stream, binding);
-                    else await CloseSharedAsync(stream, binding, canShare);
+                    if (canShare == null) await CloseAsync(session, binding);
+                    else await CloseSharedAsync(session, binding, canShare);
                 }
             }
         }
@@ -1359,8 +1378,9 @@ namespace Jondo.Unity.Server.Managers
         /// Something has been gathered on a map: an objective bound to gathering it there closes
         /// (the tutorial's five resources of the jobs room).
         /// </summary>
-        public static async Task OnGatheredAsync(NetworkStream stream, int itemId, long mapId)
+        public static async Task OnGatheredAsync(GameSession session, int itemId, long mapId)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null) return;
             foreach (var run in new List<QuestRun>(log.Doing()))
@@ -1372,7 +1392,7 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Gather || binding.ItemId != itemId) continue;
                     if (binding.MapId != 0 && binding.MapId != mapId) continue;
-                    await CloseAsync(stream, binding);
+                    await CloseAsync(session, binding);
                 }
             }
         }
@@ -1381,8 +1401,9 @@ namespace Jondo.Unity.Server.Managers
         /// A workshop has been closed after making these items: «Fabricar #2 #1 y cerrar la
         /// interfaz» (type 17) is done for each the bench made enough of.
         /// </summary>
-        public static async Task OnCraftedAsync(NetworkStream stream, IReadOnlyDictionary<int, int> made)
+        public static async Task OnCraftedAsync(GameSession session, IReadOnlyDictionary<int, int> made)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null || _book == null) return;
             foreach (var run in new List<QuestRun>(log.Doing()))
@@ -1396,7 +1417,7 @@ namespace Jondo.Unity.Server.Managers
                     // count (Dofus pour les noobs warns of exactly that).
                     if (!Revealed(step, objective, run)) continue;
                     if (!made.TryGetValue(objective.ItemId, out int count) || count < objective.ItemCount) continue;
-                    await TickAsync(stream, run.QuestId, objective.Id);
+                    await TickAsync(session, run.QuestId, objective.Id);
                 }
             }
         }
@@ -1405,7 +1426,7 @@ namespace Jondo.Unity.Server.Managers
         /// Closes the objectives in hand bound to others being done (QuestBindingKind.Objectives):
         /// the tutorial's 19253, once 1629's five resources are gathered.
         /// </summary>
-        private static async Task AfterObjectivesAsync(NetworkStream stream)
+        private static async Task AfterObjectivesAsync(GameSession session)
         {
             var log = Log;
             if (log == null || _book == null) return;
@@ -1423,7 +1444,7 @@ namespace Jondo.Unity.Server.Managers
                     {
                         if (!log.ObjectiveDone(needed)) { all = false; break; }
                     }
-                    if (all) await CloseAsync(stream, binding);
+                    if (all) await CloseAsync(session, binding);
                 }
             }
         }
@@ -1444,26 +1465,30 @@ namespace Jondo.Unity.Server.Managers
         /// «La quête se termine dès que vous lancez le combat. Pour ce choix vous obtenez aucune
         /// récompense» (Dofus pour les noobs, «Les Gobelins de la Manufacture»).
         /// </summary>
-        public static async Task<bool> ForfeitAsync(NetworkStream stream, int questId)
+        public static async Task<bool> ForfeitAsync(GameSession session, int questId)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var log = Log;
             if (log == null || questId == 0 || log.Finished(questId)) return false;
             var run = log.Run(questId) ?? log.Start(questId);
             if (run == null) return false;
             for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
             Save(questId, run);
-            await TellAsync(stream, QuestFinishedMessage, questId);
+            await TellAsync(session, QuestFinishedMessage, questId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
             FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
-            await SendJournalAsync(SessionContext.Current);
-            await Achievements.AfterQuestAsync(stream, questId);
+            await SendJournalAsync(session);
+            await Achievements.AfterQuestAsync(session, questId);
             Console.WriteLine($"[Quests] Quest {questId} ends with nothing paid.");
             return true;
         }
 
-        public static async Task LeaveTutorialAsync(NetworkStream stream)
+        public static async Task LeaveTutorialAsync(GameSession session)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var log = Log;
             var tutorial = TutorialContent.Load();
             if (log == null || tutorial == null) return;
@@ -1482,12 +1507,12 @@ namespace Jondo.Unity.Server.Managers
                 if (run == null) continue;
                 for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
                 Save(questId, run);
-                await TellAsync(stream, QuestFinishedMessage, questId);
+                await TellAsync(session, QuestFinishedMessage, questId);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
             }
-            await SendJournalAsync(SessionContext.Current);
+            await SendJournalAsync(session);
 
             foreach (int item in tutorial.Items)
             {
@@ -1499,7 +1524,7 @@ namespace Jondo.Unity.Server.Managers
             }
 
             foreach (int questId in tutorial.Quests)
-                await Achievements.AfterQuestAsync(stream, questId);
+                await Achievements.AfterQuestAsync(session, questId);
 
             // The mysterious voice's line is still on screen: the client takes it down only on a kld,
             // and in the Dofusarium it would hang over the new character for good.
@@ -1536,8 +1561,9 @@ namespace Jondo.Unity.Server.Managers
         /// A character who did the tutorial before 3.6 validates the quests 3.6 added to it on
         /// reaching the Dofusarium (content/quests/tutorial.json, «oldCharacters»).
         /// </summary>
-        private static async Task OldCharacterReachesTheDofusariumAsync(NetworkStream stream, long mapId)
+        private static async Task OldCharacterReachesTheDofusariumAsync(GameSession session, long mapId)
         {
+            var stream = session.Stream;
             var log = Log;
             if (log == null || mapId == 0) return;
             var tutorial = TutorialContent.Load();
@@ -1553,10 +1579,10 @@ namespace Jondo.Unity.Server.Managers
                 if (run == null) continue;
                 for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
                 Save(questId, run);
-                await TellAsync(stream, QuestFinishedMessage, questId);
+                await TellAsync(session, QuestFinishedMessage, questId);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
-                await Achievements.AfterQuestAsync(stream, questId);
+                await Achievements.AfterQuestAsync(session, questId);
             }
             Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} validates the tutorial's new quests in the Dofusarium.");
         }
@@ -1615,13 +1641,14 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        internal static async Task<bool> StartSharedAsync(NetworkStream stream, int questId, Func<bool>? canShare = null)
+        internal static async Task<bool> StartSharedAsync(GameSession session, int questId, Func<bool>? canShare = null)
         {
-            if (!await StartAsync(stream, questId)) return false;
+            using var context = SessionContext.Push(session);
+            if (!await StartAsync(session, questId)) return false;
             await Heroes.ShareQuestActionAsync(async hero =>
             {
                 if (canShare?.Invoke() != false)
-                    await StartAsync(hero.Stream!, questId);
+                    await StartAsync(hero, questId);
             });
             return true;
         }
@@ -1629,8 +1656,10 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// Starts a quest and tells the client, if the character is allowed it.
         /// </summary>
-        public static async Task<bool> StartAsync(NetworkStream stream, int questId)
+        public static async Task<bool> StartAsync(GameSession session, int questId)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var log = Log;
             if (log == null) return false;
 
@@ -1665,19 +1694,19 @@ namespace Jondo.Unity.Server.Managers
 
             Save(questId, run);
 
-            await TellAsync(stream, QuestStartedMessage, questId);
+            await TellAsync(session, QuestStartedMessage, questId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ief, QuestProtocol.BuildQuestStarted(questId)));
 
             // A hero's run, socketless, settles the objectives that are not his all the same
             // (SendStepAsync writes nothing without a stream): «Consejo de clase» started for a
             // hero by his master's talk asks his own class's master only.
-            await SendStepAsync(stream, questId);
+            await SendStepAsync(session, questId);
             if (stream == null) return true;
 
             // And the green mark of the one who just gave it is switched off.
-            await SendMarksAsync(SessionContext.Current, SessionContext.State.MapId);
-            await RedrawQuestElementsAsync(stream, questId);
+            await SendMarksAsync(session, session.MapId);
+            await RedrawQuestElementsAsync(session, questId);
 
             // A treasure quest of Dhain's: the box beside him offers its hunt.
             await Handlers.TreasureHuntHandler.OnQuestStartedAsync(stream, questId);
@@ -1729,8 +1758,10 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// Tells the client where a quest has got to (idu), which is what the ieo asks for.
         /// </summary>
-        public static async Task SendStepAsync(NetworkStream stream, int questId)
+        public static async Task SendStepAsync(GameSession session, int questId)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var log = Log;
             var run = log?.Run(questId);
             if (log == null || run == null || run.Finished || _book == null) return;
@@ -1769,8 +1800,9 @@ namespace Jondo.Unity.Server.Managers
         /// unclickable until the character left the refuge and came back. The same for an element
         /// a later objective of the same map reveals.
         /// </remarks>
-        private static async Task RedrawQuestElementsAsync(NetworkStream stream, int questId)
+        private static async Task RedrawQuestElementsAsync(GameSession session, int questId)
         {
+            var stream = session.Stream;
             long mapId = SessionContext.State.MapId;
             if (mapId == 0 || SessionContext.State.IsInFight) return;
             bool hasOne = false;
@@ -1784,7 +1816,7 @@ namespace Jondo.Unity.Server.Managers
 
             var ficha = DatabaseManager.GetCharacterById(GameState.CharacterId);
             if (ficha == null) return;
-            await MapInformationService.Live.RefreshActorsAsync(SessionContext.Current, ficha);
+            await MapInformationService.Live.RefreshActorsAsync(session, ficha);
             Console.WriteLine($"[Quests] Elements of map {mapId} sent again for quest {questId}.");
         }
 
@@ -2157,16 +2189,18 @@ namespace Jondo.Unity.Server.Managers
             return false;
         }
 
-        public static async Task TickAsync(NetworkStream stream, int questId, int objectiveId,
+        public static async Task TickAsync(GameSession session, int questId, int objectiveId,
                                            int amount = 0)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var log = Log;
             if (log == null) return;
 
             var move = log.Tick(questId, objectiveId, amount);
             if (move.Nothing) return;
 
-            await AfterMoveAsync(stream, questId, move);
+            await AfterMoveAsync(session, questId, move);
 
             // What an «order» row says comes of the objective once done: Escualo El Rojo's
             // boot-licking potion, brewed from the ingredients handed over on a hello. And what a
@@ -2176,7 +2210,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 // What it hands over is taken, when the row says so: the fat tofu's egg and the
                 // fattening potion left with Vil Smis («Tomber sur un bec»).
-                if (binding.SpendsRequired) await SpendAsync(stream, binding);
+                if (binding.SpendsRequired) await SpendAsync(session, binding);
                 foreach (var (item, count) in binding.Gives)
                 {
                     if (!await QuestFollowers.GiveAsync(stream, item, count)) continue;
@@ -2188,8 +2222,9 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
-        private static async Task AfterMoveAsync(NetworkStream stream, int questId, QuestMove move)
+        private static async Task AfterMoveAsync(GameSession session, int questId, QuestMove move)
         {
+            var stream = session.Stream;
             var run = Log?.Run(questId);
             if (run == null) return;
 
@@ -2200,7 +2235,7 @@ namespace Jondo.Unity.Server.Managers
                 // idz names the step that WAS in hand, not the one now in hand, and it goes out
                 // before the next step does. The tutorial shows that order 21 times, each after
                 // the lqn 55 that names the quest.
-                await TellAsync(stream, QuestUpdatedMessage, questId);
+                await TellAsync(session, QuestUpdatedMessage, questId);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Idz,
                         QuestProtocol.BuildStepValidated(questId, move.FinishedStep)));
@@ -2209,7 +2244,7 @@ namespace Jondo.Unity.Server.Managers
             {
                 // An objective done with more of the step to go: lqn 55 and ieb, as the tutorial's
                 // 2511 and 1629 go, objective by objective.
-                await TellAsync(stream, QuestUpdatedMessage, questId);
+                await TellAsync(session, QuestUpdatedMessage, questId);
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Ieb,
                         QuestProtocol.BuildObjectiveValidated(questId, move.TickedObjective)));
@@ -2218,17 +2253,17 @@ namespace Jondo.Unity.Server.Managers
             // A step that leaves the quest under way pays before the next step goes out; the quest's
             // last one pays after «misión terminada» and ied, as «Matarratas»' capture closes:
             // lqn 56, ied 1633, then lqn 45 with the kamas and lqn 21 with the items.
-            if (move.StepFinished && !move.QuestFinished) await PayAsync(stream, move.FinishedStep);
+            if (move.StepFinished && !move.QuestFinished) await PayAsync(session, move.FinishedStep);
 
             if (!move.QuestFinished)
             {
-                await SendStepAsync(stream, questId);   // settles a hero's foreign objectives too
+                await SendStepAsync(session, questId);   // settles a hero's foreign objectives too
 
                 // And the marks again, as after every ieb and idz of the captures.
                 if (stream != null && (move.ObjectiveTicked || move.StepFinished))
                 {
-                    await SendMarksAsync(SessionContext.Current, SessionContext.State.MapId);
-                    await RedrawQuestElementsAsync(stream, questId);
+                    await SendMarksAsync(session, session.MapId);
+                    await RedrawQuestElementsAsync(session, questId);
                 }
             }
             else
@@ -2244,9 +2279,9 @@ namespace Jondo.Unity.Server.Managers
                         InfoMessages.Info, QuestFinishedMessage, questId.ToString(CultureInfo.InvariantCulture))));
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
-                if (move.StepFinished) await PayAsync(stream, move.FinishedStep);
+                if (move.StepFinished) await PayAsync(session, move.FinishedStep);
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
-                if (stream != null) await SendMarksAsync(SessionContext.Current, SessionContext.State.MapId);
+                if (stream != null) await SendMarksAsync(session, session.MapId);
 
                 // An Almanax offering is made once a day: the day is written down, so the same
                 // quest is not handed out again until the saint comes round next year.
@@ -2270,20 +2305,20 @@ namespace Jondo.Unity.Server.Managers
 
                 // And whatever that finished quest has earned. 259 achievements hang from finishing one, and
                 // the tutorial's 8518 «Primer tiempo» is literally (Qf=2511).
-                await Achievements.AfterQuestAsync(stream, questId);
+                await Achievements.AfterQuestAsync(session, questId);
             }
 
             // What a validated objective earns (Qo): the tutorial's «Primer tiempo» follows idz 3173.
             if (move.TickedObjective != 0)
             {
-                await Achievements.AfterObjectiveAsync(stream, move.TickedObjective);
-                await AfterObjectivesAsync(stream);
+                await Achievements.AfterObjectiveAsync(session, move.TickedObjective);
+                await AfterObjectivesAsync(session);
             }
 
             // And an NPC of the map who speaks on his own once that step is done (the tutorial's
             // voice, idz 3226 then ioc and ios with no iov between).
             if (move.StepFinished && stream != null)
-                await Handlers.NpcHandler.PushAfterStepAsync(stream, move.FinishedStep);
+                await Handlers.NpcHandler.PushAfterStepAsync(session, move.FinishedStep);
         }
 
         /// <summary>
@@ -2303,8 +2338,9 @@ namespace Jondo.Unity.Server.Managers
         /// know, must not leave a quest half advanced — the step is already validated by the time
         /// this runs, on purpose.
         /// </remarks>
-        private static async Task PayAsync(NetworkStream stream, int stepId)
+        private static async Task PayAsync(GameSession session, int stepId)
         {
+            var stream = session.Stream;
             var step = _book?.Step(stepId);
             if (step == null || step.Rewards.Count == 0) return;
 
@@ -2323,7 +2359,7 @@ namespace Jondo.Unity.Server.Managers
                 kamas += RewardFormula.Kamas(reward.KamasScale ? level : step.OptimalLevel,
                                              reward.KamasRatio, step.Duration);
                 items.AddRange(reward.Items);
-                foreach (int emote in reward.Emotes) await Emotes.LearnAsync(SessionContext.Current, emote);
+                foreach (int emote in reward.Emotes) await Emotes.LearnAsync(session, emote);
             }
 
             // The Almanax days that raise what quests pay, when they do so unconditionally.
@@ -2360,7 +2396,7 @@ namespace Jondo.Unity.Server.Managers
                 Console.WriteLine($"[Quests] Step {stepId} pays {experience} experience and {kamas} kamas.");
             }
 
-            if (levelled) await Achievements.AfterLevelAsync(stream);
+            if (levelled) await Achievements.AfterLevelAsync(session);
         }
 
         /// <summary>A finished quest taken out of the character's log, so that it is offered again.</summary>

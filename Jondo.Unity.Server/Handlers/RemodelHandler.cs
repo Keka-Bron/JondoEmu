@@ -53,7 +53,7 @@ namespace Jondo.Unity.Server.Handlers
                 await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(Popup, ChangeAlreadyWaiting));
                 return true;
             }
-            await ItemUseHandler.SpendOneAsync(stream, item.Uid);
+            await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid);
             await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(Popup,
                 change == CharacterRemodel.Change.Name ? NameNextTime : SexNextTime));
             Console.WriteLine($"[Remodel] {SessionContext.State.CharacterName} will change {change} on the next connection.");

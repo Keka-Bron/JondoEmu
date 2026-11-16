@@ -198,8 +198,7 @@ namespace Jondo.Unity.Server.Handlers
             // «Fabricar #2 #1 y cerrar la interfaz»: the tutorial's ring (9662, 19254), validated
             // in the capture once the bench is closed.
             if (bench != null && bench.Made.Count > 0)
-                await Managers.Quests.OnCraftedAsync(
-                    session.Stream ?? throw new InvalidOperationException("Craft quest updates require a connected session."), bench.Made);
+                await Managers.Quests.OnCraftedAsync(session, bench.Made);
         }
 
         /// <summary>Nothing open survives a map change; a commission or a trade ends for both.</summary>
@@ -322,8 +321,10 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>kep in a workshop: the craft button, or the magus' "apply the rune in the slot".</summary>
         /// <returns>False when no workshop is open, so a trade gets it.</returns>
-        public static async Task<bool> CraftAsync(NetworkStream stream, byte[] payload)
+        public static async Task<bool> CraftAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var bench = SessionContext.State.Workshop;
             if (bench == null) return false;
             byte[]? kep = ConnectionProtocol.ReadPayload(payload, Op.Kep);
@@ -337,7 +338,7 @@ namespace Jondo.Unity.Server.Handlers
 
             if (bench.Magus)
             {
-                await ApplySlottedRuneAsync(stream, bench);
+                await ApplySlottedRuneAsync(session, bench);
                 return true;
             }
 
@@ -398,7 +399,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (item != null && owed.TryGetValue(item.Template, out int left) && left > 0)
                 {
                     int take = Math.Min(left, item.Quantity);
-                    if (await ConsumeAsync(SessionContext.Current, item, take)) owed[item.Template] = left - take;
+                    if (await ConsumeAsync(session, item, take)) owed[item.Template] = left - take;
                 }
                 await SendAsync(stream, Op.Kfs, WorkshopProtocol.BuildRemoved(uid));
             }
@@ -409,7 +410,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     if (owed[gid] <= 0) break;
                     int take = Math.Min(owed[gid], stack.Quantity);
-                    if (await ConsumeAsync(SessionContext.Current, stack, take)) owed[gid] -= take;
+                    if (await ConsumeAsync(session, stack, take)) owed[gid] -= take;
                 }
             }
 
@@ -418,7 +419,7 @@ namespace Jondo.Unity.Server.Handlers
             if (owed.Values.Any(unspent => unspent > 0))
             {
                 await SendAsync(stream, Op.Kdr, WorkshopProtocol.BuildImpossible());
-                await SendPodsAsync(SessionContext.Current);
+                await SendPodsAsync(session);
                 Console.WriteLine($"[Workshop] Craft of {recipe.ResultId} stopped: some ingredients could not be spent.");
                 return true;
             }
@@ -435,12 +436,12 @@ namespace Jondo.Unity.Server.Handlers
             if (recipe.JobId != BaseJob)
             {
                 experience = JobExperience.Craft(jobLevel, recipe.ResultLevel) * count;
-                await GiveJobExperienceAsync(stream, recipe.JobId, experience);
+                await GiveJobExperienceAsync(session, recipe.JobId, experience);
             }
-            await SendPodsAsync(SessionContext.Current);
+            await SendPodsAsync(session);
 
             // "Fabricar 1 objeto": the tutorial earns it right here, after the ring.
-            await Managers.Achievements.AfterCraftAsync(stream, count);
+            await Managers.Achievements.AfterCraftAsync(session, count);
 
             // And what a quest asks to have made, once the bench is closed (CloseAsync).
             bench.Made.TryGetValue(recipe.ResultId, out int madeHere);
@@ -609,8 +610,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>kcj: one rune out of the bag, straight onto the item on the magus table.</summary>
-        public static async Task RuneAsync(NetworkStream stream, byte[] payload)
+        public static async Task RuneAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
             var bench = SessionContext.State.Workshop;
             byte[]? kcj = ConnectionProtocol.ReadPayload(payload, Op.Kcj);
             if (bench == null || !bench.Magus || kcj == null) return;
@@ -621,16 +623,16 @@ namespace Jondo.Unity.Server.Handlers
                 Console.WriteLine("[Workshop] Rune refused: no such rune in the bag.");
                 return;
             }
-            await ApplyAsync(stream, bench, SessionContext.Current, rune, typed: true);
+            await ApplyAsync(session, bench, session, rune, typed: true);
         }
 
         /// <summary>kep on a magus table: the rune in the slot goes onto the item.</summary>
-        private static async Task ApplySlottedRuneAsync(NetworkStream stream, Bench bench)
+        private static async Task ApplySlottedRuneAsync(GameSession session, Bench bench)
         {
             if (bench.RuneSlot is not { } slot) return;
             var owner = slot.Customers && bench.Commission != null
                 ? SessionRegistry.FindByCharacter(bench.Commission.CustomerId)
-                : SessionContext.Current;
+                : session;
             if (owner == null) return;
             var rune = CommissionHandler.As(owner, () => Equipment.ByUid(slot.Uid));
             if (rune == null || rune.Position != Equipment.Bag)
@@ -638,21 +640,22 @@ namespace Jondo.Unity.Server.Handlers
                 bench.RuneSlot = null;
                 return;
             }
-            await ApplyAsync(stream, bench, owner, rune, typed: false);
+            await ApplyAsync(session, bench, owner, rune, typed: false);
         }
 
         /// <summary>
         /// One rune on the item on the table, from whichever bag it comes, and the item written in
         /// whichever bag it lives. On a commission's table the customer sees every step too.
         /// </summary>
-        private static async Task ApplyAsync(NetworkStream stream, Bench bench, GameSession runeOwner,
-                                             Equipment.Item rune, bool typed)
+        private static async Task ApplyAsync(GameSession crafter, Bench bench, GameSession runeOwner,
+                                              Equipment.Item rune, bool typed)
         {
+            using var context = SessionContext.Push(crafter);
+            var stream = crafter.Stream;
             var commission = bench.Commission;
             if (commission != null) await commission.Gate.WaitAsync();
             try
             {
-                var crafter = SessionContext.Current;
                 var customer = commission == null ? null : SessionRegistry.FindByCharacter(commission.CustomerId);
                 var itemOwner = commission == null ? crafter : customer;
                 if (itemOwner == null || (commission != null && commission.Ended)) return;
@@ -751,7 +754,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     int level = crafter.State.JobLevel(skill.ParentJobId);
                     experience = JobExperience.Magus(level, template.Level);
-                    await GiveJobExperienceAsync(stream, skill.ParentJobId, experience);
+                    await GiveJobExperienceAsync(crafter, skill.ParentJobId, experience);
                 }
 
                 // 3. The rune is spent, out of whoever's bag it came, and leaves the table -- unless
@@ -838,13 +841,15 @@ namespace Jondo.Unity.Server.Handlers
         // ─── The grinder ────────────────────────────────────────────────────────────────────
 
         /// <summary>kbj: everything on the grinder breaks into runes.</summary>
-        public static async Task BreakAsync(NetworkStream stream, byte[] payload)
+        public static async Task BreakAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var bench = SessionContext.State.Workshop;
             byte[]? kbj = ConnectionProtocol.ReadPayload(payload, Op.Kbj);
             if (bench == null || !bench.Breaker || kbj == null || bench.Slots.Count == 0) return;
 
-            var me = SessionContext.Current;
+            var me = session;
             int focus = FocusOf(kbj);
             await SendAsync(stream, Op.Kgt, WorkshopProtocol.BuildReady(true, me.CharacterId));
 
@@ -877,7 +882,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var (rune, n) in gained) await GiveAsync(stream, rune, n);
             await SendPodsAsync(me);
             await SendAsync(stream, Op.Kfp, WorkshopProtocol.BuildBroken(report));
-            await Managers.Achievements.CountAsync(stream, "Eu", 0, brokenUnits);   // «¿Y si lo parto?»
+            await Managers.Achievements.CountAsync(session, "Eu", 0, brokenUnits, defer: stream == null);   // «¿Y si lo parto?»
             Console.WriteLine($"[Workshop] Broke {report.Count} item(s){(focus != 0 ? $", focus on effect {focus}" : "")}: " +
                               string.Join(", ", gained.Select(g => $"{g.Value} x {g.Key}")) + ".");
         }
@@ -952,8 +957,9 @@ namespace Jondo.Unity.Server.Handlers
         /// Whether the bonuses apply -- the Almanax's and the server's (JobExperienceBonusPercent): they do
         /// to what is earned working, not to a job scroll's fixed figure.
         /// </param>
-        public static async Task GiveJobExperienceAsync(NetworkStream stream, int jobId, long amount, bool bonus = true)
+        public static async Task GiveJobExperienceAsync(GameSession session, int jobId, long amount, bool bonus = true)
         {
+            using var context = SessionContext.Push(session);
             if (amount <= 0) return;
             if (bonus)
             {
@@ -961,19 +967,19 @@ namespace Jondo.Unity.Server.Handlers
                                                     Managers.Almanax.Where.AtWork(jobId));
                 amount = ServerSettings.WithBonus(amount, ServerSettings.Current.JobExperienceBonusPercent);
             }
-            bool up = SessionContext.State.AddJobExperience(jobId, amount, out long total, out int level);
-            DatabaseManager.SaveJobExperience(SessionContext.State.CharacterId, jobId, total);
-            if (up) await SendLevelUpAsync(stream, jobId, level);
-            await SendAsync(stream, Op.Irq, ConnectionProtocol.BuildJobExperience(
+            bool up = session.State.AddJobExperience(jobId, amount, out long total, out int level);
+            DatabaseManager.SaveJobExperience(session.CharacterId, jobId, total);
+            if (up) await SendLevelUpAsync(session, jobId, level);
+            await SendAsync(session, Op.Irq, ConnectionProtocol.BuildJobExperience(
                 jobId, JobExperience.Next(level), level, JobExperience.Floor(level), total));
-            if (up) await Managers.Achievements.AfterJobLevelAsync(stream);
+            if (up) await Managers.Achievements.AfterJobLevelAsync(session);
         }
 
         /// <summary>isz: the job's new level and all of its skills, the way the tutorial's ring sends it.</summary>
-        public static Task SendLevelUpAsync(NetworkStream stream, int jobId, int level)
+        public static Task SendLevelUpAsync(GameSession session, int jobId, int level)
         {
             var description = ProfessionMessages.Description(jobId, level, SkillManager.ForJob(jobId));
-            return SendAsync(stream, Op.Isz, WorkshopProtocol.BuildJobLevelUp(level, description));
+            return SendAsync(session, Op.Isz, WorkshopProtocol.BuildJobLevelUp(level, description));
         }
 
         /// <summary>

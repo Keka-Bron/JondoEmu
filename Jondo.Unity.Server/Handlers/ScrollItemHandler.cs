@@ -117,7 +117,7 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
 
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid, weigh: false)) return true;
 
             foreach (var (characteristic, _, after) in gains) characteristic.Set(me, after);
             if (life > 0)

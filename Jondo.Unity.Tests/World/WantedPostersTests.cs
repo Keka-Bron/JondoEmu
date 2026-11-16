@@ -83,8 +83,11 @@ namespace Jondo.Unity.Tests.World
         {
             if (!File.Exists(Paths.WorldDb) || !File.Exists(Paths.WantedJson)) return;
             LoadTheRealOnes();
-            if (MobSpawnManager.GetMonsterData(31) == null) MobSpawnManager.InitializeAndSpawnAll();
-            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            // Other suites load definitions without spawning the world. Exercise that state too.
+            MobSpawnManager.EnsureMonsterData();
+            Assert.NotNull(MobSpawnManager.GetMonsterData(31));
+            // Placement needs actual world groups; loaded monster definitions do not imply that.
+            MobSpawnManager.InitializeAndSpawnAll();
 
             Assert.True(MobSpawnManager.PlaceCriminalsNow() > 0);
             var at = WantedPosters.WhereIs(3761);

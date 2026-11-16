@@ -98,7 +98,7 @@ namespace Jondo.Unity.Server.Handlers
                 await SendAsync(stream, Op.Hla, TaxCollectorProtocol.BuildError(TaxCollectorProtocol.ErrorAlreadyOnMap));
                 return true;
             }
-            await ItemUseHandler.SpendOneAsync(stream, item.Uid);
+            await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid);
 
             // It starts with the alliance's default spells, the personalization tab's preset.
             TaxCollectorStore.SetSpells(tc, TaxCollectorStore.PresetOf(alliance.Id));

@@ -608,7 +608,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.RequirementsNotMet)));
                 return true;
             }
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid)) return true;
             foreach (var tomb in risen)
             {
                 long id = tomb.State.CharacterId;
@@ -638,7 +638,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.RequirementsNotMet)));
                 return true;
             }
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid)) return true;
             foreach (var tomb in freed) await FreeAsync(war, tomb);
             Program.LogDebug($"[Conquest] Gravedigger {me.State.CharacterName} frees {freed.Count} soul(s).");
             await SendRolesAsync(war);
@@ -702,7 +702,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.RequirementsNotMet)));
                 return true;
             }
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid)) return true;
             war.Sentinels[id] = me.State.MapId;
             Program.LogDebug($"[Conquest] Sentinel {me.State.CharacterName} stands guard on map {me.State.MapId}.");
             return true;
@@ -764,7 +764,7 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
             if (!war.ScoutCarried.TryGetValue(id, out int carried) || carried <= 0) return true;
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid)) return true;
 
             long handed = Conquests.HandIn(war, id, war.Admitted[id].Alliance);
             Program.LogDebug($"[Conquest] Scout {me.State.CharacterName} hands in {handed} point(s) on the prism's map.");

@@ -54,18 +54,23 @@ namespace Jondo.Unity.Tests.Quests
                 {
                     pipe.Session.State.CharacterLevel = 30;
                     QuestEngine.LoadFrom(Character);
-                    Assert.True(await QuestEngine.StartAsync(pipe.ToClient, Pair));
+                    var wrong = GameSession.SinSocket();
+                    wrong.State.CharacterId = Character + 1;
+                    using var unrelated = SessionContext.Push(wrong);
+                    Assert.True(await QuestEngine.StartAsync(pipe.Session, Pair));
                     FollowedQuests.Follow(Character, Pair);
 
                     // Each recruiter's objective is done by her talk's last reply («Gracias por la
                     // explicación»), as content/npcs/dialogues.json writes it.
-                    await QuestEngine.CompleteByReplyAsync(pipe.ToClient, Pair, BontaObjective);
-                    Assert.True(QuestEngine.Log!.Active(Pair));
+                    await QuestEngine.CompleteByReplyAsync(pipe.Session, Pair, BontaObjective);
+                    Assert.True(pipe.Session.State.Quests!.Active(Pair));
 
                     pipe.Session.State.MapId = BrakmarRecruiterMap;
-                    await QuestEngine.CompleteByReplyAsync(pipe.ToClient, Pair, BrakmarObjective);
-                    Assert.False(QuestEngine.Log!.Active(Pair));
+                    await QuestEngine.CompleteByReplyAsync(pipe.Session, Pair, BrakmarObjective);
+                    Assert.False(pipe.Session.State.Quests!.Active(Pair));
                     Assert.DoesNotContain(Pair, FollowedQuests.Of(Character));
+                    Assert.Same(wrong, SessionContext.Actual);
+                    Assert.Null(wrong.State.Quests);
                 }
 
                 // Read on to the close: the starts, the steps and the reward come before it.

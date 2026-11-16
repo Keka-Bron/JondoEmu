@@ -159,7 +159,7 @@ namespace Jondo.Unity.Tests.Sessions
 
                     // Pandala route capture, frames 2643-2646: mga -1 then kub, kuf {545}, mfs.
                     // The base 520 with the character's 5 % bonus, as the capture pays it.
-                    await AchievementHandler.ClaimAsync(at.ToClient,
+                    await AchievementHandler.ClaimAsync(at.Player,
                         ConnectionProtocol.Push(Op.Mga, Hex("08ffffffffffffffffff01")));
 
                     await at.NextAsync(Op.Kub);
@@ -168,7 +168,7 @@ namespace Jondo.Unity.Tests.Sessions
                     Assert.Equal(ExperienceTable.LevelFloor(200) + 545, at.Player.State.Experience);
 
                     // Paid once: a second claim finds nothing owed and says nothing.
-                    await AchievementHandler.ClaimAsync(at.ToClient,
+                    await AchievementHandler.ClaimAsync(at.Player,
                         ConnectionProtocol.Push(Op.Mga, Hex("08a046")));
                     await at.NothingAsync();
 
@@ -241,7 +241,7 @@ namespace Jondo.Unity.Tests.Sessions
                     // quest 965, "PL>19&Ad=11", on 26 September. His other replies take nothing.
                     Assert.Equal(1625, Almanax.Giver);
                     at.Player.State.OpenDialogueNpcId = 1625;
-                    await QuestEngine.OnReplyAsync(at.ToClient, 12047);
+                    await QuestEngine.OnReplyAsync(at.Player, 12047);
                     Assert.Null(QuestEngine.Log!.Run(965));
                     await AlmanaxOfferingHandler.ReplyAsync(at.ToClient, AlmanaxOfferingHandler.WillingToOffer);
                     // «Nueva misión» (lqn 54) goes before every ief of the tutorial capture.
@@ -316,13 +316,13 @@ namespace Jondo.Unity.Tests.Sessions
 
                     // Today's offering made: one page.
                     foreach (var objective in QuestEngine.Book!.Of(965)!.Steps[0].Objectives)
-                        await QuestEngine.TickAsync(at.ToClient, 965, objective.Id);
+                        await QuestEngine.TickAsync(at.Player, 965, objective.Id);
                     Assert.False(QuestEngine.Log!.Active(965));
                     Assert.Equal(1, Equipment.HowMany(13345));
 
                     // A year of them, brought to Ontoral: the pages go, the Dolmanax comes.
                     Assert.True(await Equipment.GiveAsync(at.ToClient, 13345, 364));
-                    await QuestEngine.OnTalkingToAsync(at.ToClient, 1625);
+                    await QuestEngine.OnTalkingToAsync(at.Player, 1625);
                     Assert.True(QuestEngine.Log!.Active(954));   // a hello hands nothing over
                     Assert.Contains(AlmanaxOfferingHandler.ShowThePages, AlmanaxOfferingHandler.Opening().Replies);
                     Assert.Equal(AlmanaxOfferingHandler.Proud,

@@ -329,7 +329,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (result == AllianceProtocol.CreationOk && emblem != null && !potion.Emblem)
                 result = AllianceProtocol.CreationRequirementUnmet;
-            if (result == AllianceProtocol.CreationOk && !await ItemUseHandler.SpendOneAsync(stream, potion.Uid))
+            if (result == AllianceProtocol.CreationOk && !await ItemUseHandler.SpendOneAsync(SessionContext.Current, potion.Uid))
                 result = AllianceProtocol.CreationRequirementUnmet;
 
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Mcn, AllianceProtocol.BuildModificationResult(result)));

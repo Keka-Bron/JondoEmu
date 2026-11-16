@@ -97,7 +97,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, ZoneTaken)));
                 return true;
             }
-            await ItemUseHandler.SpendOneAsync(stream, item.Uid);
+            await ItemUseHandler.SpendOneAsync(session, item.Uid);
 
             var shown = MapActorMessages.PrismShown(prism, alliance);
             await session.SendAsync(shown);
@@ -333,7 +333,7 @@ namespace Jondo.Unity.Server.Handlers
                 await SendAsync(stream, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, StateForbids)));
                 return true;
             }
-            if (!await ItemUseHandler.SpendOneAsync(stream, uid)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, uid)) return true;
 
             PrismStore.SetCrystal(prism, item.Template, prism.CrystalsUsed + 1);
             await ConquestHandler.ChangeStateAsync(prism, PrismStore.Pacified,

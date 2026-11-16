@@ -552,10 +552,10 @@ namespace Jondo.Unity.Server.Network
                         // In an NPC's barter, the ready button makes the swap.
                         else if (op == Op.Kep && SessionContext.State.Workshop == null && SessionContext.State.Barter != null)
                             await NpcBarterHandler.ReadyAsync(stream, frame);
-                        else if (op == Op.Kep) await WorkshopHandler.CraftAsync(stream, frame);
+                        else if (op == Op.Kep) await WorkshopHandler.CraftAsync(session, frame);
                         // An NPC clicked for one of its actions (Gobiere Trokeur's «Intercambiar»), and a
                         // stack laid on his barter's table.
-                        else if (op == Op.Iov) await NpcHandler.InteractAsync(stream, frame);
+                        else if (op == Op.Iov) await NpcHandler.InteractAsync(session, frame);
                         // Or on a workshop's bench, the one opened last: a paper and a thing on the
                         // gift-wrapping table, though a harness never closed an earlier barter.
                         else if (op == Op.Kcr)
@@ -564,7 +564,7 @@ namespace Jondo.Unity.Server.Network
                             else await NpcBarterHandler.MoveAsync(stream, frame);
                         }
                         // An item used from the bag: a quest's potion drunk before talking to someone.
-                        else if (op == Op.Iuu) await ItemUseHandler.UseAsync(stream, frame);
+                        else if (op == Op.Iuu) await ItemUseHandler.UseAsync(session, frame);
                         // An item put on or taken off, as dragging it to its slot sends: a quest's cannon
                         // that asks for a helmet and wings worn.
                         else if (op == Op.Iuk) await EquipmentHandler.MoveAsync(stream, frame);
@@ -578,7 +578,7 @@ namespace Jondo.Unity.Server.Network
                         // keyboard does not reach a harness client in the background.
                         else if (op == Op.Kee) await TradeHandler.KamasAsync(stream, frame);
                         // A document's «start the quest» button (a wanted poster's), with the document open.
-                        else if (op == "ido") await QuestHandler.StartFromDocumentAsync(stream, frame);
+                        else if (op == "ido") await QuestHandler.StartFromDocumentAsync(session, frame);
                         else throw new InvalidOperationException($"op {op} is not one the harness sends");
                     }
                     finally

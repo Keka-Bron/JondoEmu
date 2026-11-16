@@ -538,8 +538,10 @@ namespace Jondo.Unity.Server.Handlers
             return capacity != 0 ? capacity : Almanax.NewbornCapacity(dice);
         }
 
-        public static async Task BreedAsync(NetworkStream stream, byte[] frame)
+        public static async Task BreedAsync(GameSession session, byte[] frame)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             byte[] payload = ConnectionProtocol.ReadPayload(frame, Op.Htu);
             if (payload == null) return;
             var (first, second, makinaUid) = BreedingProtocol.ReadMating(payload);
@@ -581,10 +583,10 @@ namespace Jondo.Unity.Server.Handlers
             Stable.Save(a);
             Stable.Save(b);
 
-            await Achievements.CountAsync(stream, "EB", 0, children.Count);   // «Hacer que nazcan 10 monturas»
+            await Achievements.CountAsync(session, "EB", 0, children.Count, defer: stream == null);   // «Hacer que nazcan 10 monturas»
             int tokens = target ? preview.Tokens : 0;
             if (tokens > 0) await Equipment.GiveAsync(stream, Mating.Geneticha, tokens);
-            if (preview.Experience > 0) await WorkshopHandler.GiveJobExperienceAsync(stream, Breeding.BreederJob, preview.Experience);
+            if (preview.Experience > 0) await WorkshopHandler.GiveJobExperienceAsync(session, Breeding.BreederJob, preview.Experience);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Hsu,
                 BreedingProtocol.BuildBred(tokens, children, preview.Experience, target, new[] { a, b })));
             Console.WriteLine($"[Breeding] {SessionContext.State.CharacterName} breeds {a.Uid} and {b.Uid}: " +

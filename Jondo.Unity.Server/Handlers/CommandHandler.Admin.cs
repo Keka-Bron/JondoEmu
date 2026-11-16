@@ -737,7 +737,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             switch (op)
             {
-                case "start": await Quests.StartAsync(stream, quest); break;
+                case "start": await Quests.StartAsync(SessionContext.Current, quest); break;
                 case "finish": await QuestAdmin.FinishAsync(stream, quest); break;
                 case "forget": await QuestAdmin.ForgetAsync(stream, quest); break;
             }

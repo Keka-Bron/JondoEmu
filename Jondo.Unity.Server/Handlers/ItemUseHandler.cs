@@ -30,8 +30,9 @@ namespace Jondo.Unity.Server.Handlers
     /// </summary>
     public static class ItemUseHandler
     {
-        public static async Task UseAsync(NetworkStream stream, byte[] payload)
+        public static async Task UseAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
             byte[]? iuu = ConnectionProtocol.ReadPayload(payload, Op.Iuu);
             if (iuu == null) return;
 
@@ -40,7 +41,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (field.FieldNumber == 3 && field.WireType == 0) uid = field.VarIntValue;
             if (uid == 0) return;
 
-            await UseOneAsync(stream, uid);
+            await UseOneAsync(session, uid);
         }
 
         /// <summary>
@@ -49,8 +50,9 @@ namespace Jondo.Unity.Server.Handlers
         /// double click uses it, until the count is reached or the stack is gone; one use that
         /// spends nothing -- a book read, an item refused -- stops it, so it is not done again.
         /// </summary>
-        public static async Task UseSeveralAsync(NetworkStream stream, byte[] payload)
+        public static async Task UseSeveralAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
             byte[]? ivs = ConnectionProtocol.ReadPayload(payload, Op.Ivs);
             if (ivs == null) return;
 
@@ -68,14 +70,15 @@ namespace Jondo.Unity.Server.Handlers
             {
                 int before = Equipment.ByUid(uid)?.Quantity ?? 0;
                 if (before <= 0) break;
-                await UseOneAsync(stream, uid);
+                await UseOneAsync(session, uid);
                 if ((Equipment.ByUid(uid)?.Quantity ?? 0) >= before) break;
             }
             Console.WriteLine($"[Items] {SessionContext.State.CharacterName} uses {used} of {count} asked of uid {uid}.");
         }
 
-        private static async Task UseOneAsync(NetworkStream stream, long uid)
+        private static async Task UseOneAsync(GameSession session, long uid)
         {
+            var stream = session.Stream;
             var item = Equipment.ByUid(uid);
             if (item == null || item.Quantity <= 0) return;
 
@@ -103,7 +106,7 @@ namespace Jondo.Unity.Server.Handlers
             if (await ScrollItemHandler.TryUseAsync(stream, item)) return;
 
             // A book: its document opens, and the book stays.
-            if (await ReadingItemHandler.TryReadAsync(stream, item)) return;
+            if (await ReadingItemHandler.TryReadAsync(session, item)) return;
 
             // A compass: a flag on the world map where its map reference is, and the compass stays.
             if (await CompassItemHandler.TryUseAsync(stream, item)) return;
@@ -126,7 +129,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (!await CriterionHoldsAsync(stream, item)) return;
                 bool any = false;
                 foreach (var effect in objectiveEffects)
-                    any |= await Quests.CompleteByReplyAsync(stream, 0, effect.Value);
+                    any |= await Quests.CompleteByReplyAsync(session, 0, effect.Value);
                 if (any)
                 {
                     // And what it turns into, «Gana x#2 #3»: the next spirit's holy water, the sacred
@@ -176,7 +179,7 @@ namespace Jondo.Unity.Server.Handlers
             if (await AttitudeItemHandler.TryUseAsync(stream, item)) return;
 
             // An experience scroll, the character's or a job's.
-            if (await ExperienceItemHandler.TryUseAsync(stream, item)) return;
+            if (await ExperienceItemHandler.TryUseAsync(session, item)) return;
 
             // A candy, a dragobone, an elixir: an alteration, or a boost food in its slot.
             if (await BonusItemHandler.TryUseAsync(stream, item)) return;
@@ -195,7 +198,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 long kamas = KamasOf(purse);
                 if (kamas <= 0 || !await CriterionHoldsAsync(stream, item)) return;
-                if (!await SpendOneAsync(stream, uid)) return;
+                if (!await SpendOneAsync(session, uid)) return;
                 await Managers.CharacterRewards.GiveKamasAsync(stream, kamas);
                 Console.WriteLine($"[Items] Purse {item.Template} (uid {uid}) opened: {kamas} kamas.");
                 return;
@@ -207,13 +210,13 @@ namespace Jondo.Unity.Server.Handlers
             var objectives = QuestObjectivesOf(item.Template);
             if (box is not { } opened)
             {
-                if (objectives.Count > 0 && await TickQuestObjectivesAsync(stream, objectives)) return;
+                if (objectives.Count > 0 && await TickQuestObjectivesAsync(session, objectives)) return;
                 Console.WriteLine($"[Items] Using item {item.Template} (uid {uid}) is not handled yet.");
                 return;
             }
 
             long character = SessionContext.State.CharacterId;
-            if (!await SpendOneAsync(stream, uid)) return;
+            if (!await SpendOneAsync(session, uid)) return;
 
             var given = LootBoxes.Open(opened.Group, opened.Draws, Random.Shared);
             foreach (var (gid, quantity) in given)
@@ -233,7 +236,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (effect.EffectId != ExperienceItemHandler.JobExperienceEffect || effect.DiceSide <= 0 || effect.Value <= 0) continue;
                 if (!JobManager.TryGet(effect.DiceSide, out _)) continue;
-                await WorkshopHandler.GiveJobExperienceAsync(stream, effect.DiceSide, effect.Value, bonus: false);
+                await WorkshopHandler.GiveJobExperienceAsync(session, effect.DiceSide, effect.Value, bonus: false);
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildSystemMessage(InfoMessages.JobExperienceGained, effect.Value.ToString(),
                                                           effect.DiceSide.ToString())));
@@ -242,7 +245,7 @@ namespace Jondo.Unity.Server.Handlers
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Iun,
                 ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State))));
 
-            await TickQuestObjectivesAsync(stream, objectives);
+            await TickQuestObjectivesAsync(session, objectives);
 
             Console.WriteLine($"[Items] {character} opens a {item.Template} (group {opened.Group.Id}): " +
                               string.Join(", ", given.ConvertAll(g => $"{g.Quantity} x {g.ItemId}")) + ".");
@@ -266,8 +269,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// Each objective ticked for the quest in hand that stands at its step. False when none was.
         /// </summary>
-        internal static async Task<bool> TickQuestObjectivesAsync(NetworkStream stream, IEnumerable<int> objectives)
+        internal static async Task<bool> TickQuestObjectivesAsync(GameSession session, IEnumerable<int> objectives)
         {
+            using var context = SessionContext.Push(session);
             var log = Quests.Log;
             var book = Quests.Book;
             if (log == null || book == null) return false;
@@ -277,7 +281,7 @@ namespace Jondo.Unity.Server.Handlers
                 var objective = book.Objective(id);
                 var step = objective == null ? null : book.Step(objective.StepId);
                 if (step == null || !log.Active(step.QuestId) || log.Run(step.QuestId)?.StepId != step.Id) continue;
-                await Quests.TickAsync(stream, step.QuestId, id);
+                await Quests.TickAsync(session, step.QuestId, id);
                 ticked = true;
             }
             return ticked;
@@ -294,18 +298,20 @@ namespace Jondo.Unity.Server.Handlers
         /// kept drawing it until it was closed and opened again. Destroying an item, which never
         /// had that trouble, sends the same two.
         /// </remarks>
-        internal static async Task<bool> SpendOneAsync(NetworkStream stream, long uid, bool weigh = true)
+        internal static async Task<bool> SpendOneAsync(GameSession session, long uid, bool weigh = true)
         {
+            using var context = SessionContext.Push(session);
             var item = Equipment.ByUid(uid);
             if (item == null || item.Quantity <= 0) return false;
             int left = item.Quantity - 1;
-            if (!DatabaseManager.DestroyCharacterItem(SessionContext.State.CharacterId, uid, 1)) return false;
+            if (!DatabaseManager.DestroyCharacterItem(session.CharacterId, uid, 1)) return false;
             Equipment.Remove(uid, 1);
-            await Achievements.CountAsync(stream, "EI", item.Template);   // «Dulces de Nawidad»: each one used
-            await WriteAsync(stream, left > 0
+            await Achievements.CountAsync(session, "EI", item.Template, defer: session.Stream == null);   // «Dulces de Nawidad»: each one used
+            await session.SendAsync(left > 0
                 ? ConnectionProtocol.Push(Op.Ivj, ConnectionProtocol.BuildItemQuantity(uid, left))
                 : ConnectionProtocol.Push(Op.Ium, ConnectionProtocol.BuildItemGone(uid)));
-            if (weigh) await WeighAsync(stream);
+            if (weigh) await session.SendAsync(ConnectionProtocol.Push(Op.Iun,
+                ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(session.State), ConnectionProtocol.Capacity(session.State))));
             return true;
         }
 
@@ -381,7 +387,7 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
 
-            if (!await Quests.StartSharedAsync(stream, questId, () =>
+            if (!await Quests.StartSharedAsync(SessionContext.Current, questId, () =>
                 Equipment.HowMany(item.Template) > 0
                 && StartCriterionHolds(criterion, questId, PlayerCriteria.ResolverFor(SessionContext.State.MapId))))
                 Console.WriteLine($"[Items] {SessionContext.State.CharacterName} cannot start quest {questId} with item {item.Template}.");

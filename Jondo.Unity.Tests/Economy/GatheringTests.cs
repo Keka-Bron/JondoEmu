@@ -60,7 +60,7 @@ namespace Jondo.Unity.Tests.Economy
                 var finish = typeof(GatheringHandler).GetMethod("FinishAsync",
                     BindingFlags.Static | BindingFlags.NonPublic)!;
                 await (Task)finish.Invoke(null, new object[]
-                    { pipe.Session, pipe.ToClient, resource, resource.SkillId, 911090, 1 })!;
+                    { pipe.Session, resource, resource.SkillId, 911090, 1 })!;
 
                 var saved = Assert.Single(DatabaseManager.LoadInventory(Character), i => i.ItemId == ResourceItem);
                 Assert.True(saved.Quantity > stored);

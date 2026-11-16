@@ -59,7 +59,7 @@ namespace Jondo.Unity.Tests.Quests
                 {
                     pipe.Session.State.CharacterLevel = 200;
                     QuestEngine.LoadFrom(Character);
-                    await QuestEngine.LeaveTutorialAsync(pipe.ToClient);
+                    await QuestEngine.LeaveTutorialAsync(pipe.Session);
 
                     foreach (int quest in TutorialQuests)
                     {
@@ -91,7 +91,7 @@ namespace Jondo.Unity.Tests.Quests
                 {
                     pipe.Session.State.CharacterLevel = 1;
                     QuestEngine.LoadFrom(Character);
-                    await QuestEngine.LeaveTutorialAsync(pipe.ToClient);
+                    await QuestEngine.LeaveTutorialAsync(pipe.Session);
 
                     foreach (int quest in TutorialQuests)
                         Assert.True(QuestEngine.Log!.Finished(quest), $"tutorial quest {quest} was not validated");

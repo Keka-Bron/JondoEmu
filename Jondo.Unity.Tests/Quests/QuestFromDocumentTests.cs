@@ -52,11 +52,11 @@ namespace Jondo.Unity.Tests.Quests
                     QuestEngine.LoadFrom(Character);
 
                     // No document open: the button does not exist, nothing starts.
-                    await QuestHandler.StartFromDocumentAsync(pipe.ToClient, Ido(Poster));
+                    await QuestHandler.StartFromDocumentAsync(pipe.Session, Ido(Poster));
                     Assert.False(QuestEngine.Log!.Active(Poster));
 
                     pipe.Session.State.DocumentOpen = true;
-                    await QuestHandler.StartFromDocumentAsync(pipe.ToClient, Ido(Poster));
+                    await QuestHandler.StartFromDocumentAsync(pipe.Session, Ido(Poster));
                     // «Nueva misión» (lqn 54) goes before every ief of the tutorial capture.
                     await pipe.Next(Op.Lqn);
                     Assert.Equal(QuestProtocol.BuildQuestStarted(Poster), await pipe.Next(Op.Ief));
@@ -64,7 +64,7 @@ namespace Jondo.Unity.Tests.Quests
                     await pipe.Next(Op.Idu);
 
                     // Again: «No puedes empezar una misión ya empezada», as the capture answers.
-                    await QuestHandler.StartFromDocumentAsync(pipe.ToClient, Ido(Poster));
+                    await QuestHandler.StartFromDocumentAsync(pipe.Session, Ido(Poster));
                     while (true)
                     {
                         var (opcode, body) = await pipe.NextAny();
@@ -75,7 +75,7 @@ namespace Jondo.Unity.Tests.Quests
 
                     // Followed (iec), the box comes back with it on entering the world (iel); no
                     // longer followed (idv), it does not.
-                    await QuestHandler.DetailAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Iec,
+                    await QuestHandler.DetailAsync(pipe.Session, ConnectionProtocol.Push(Op.Iec,
                         Pb.New().Var(1, Poster).Var(2, -1).Build()));
                     await pipe.Next(Op.Idu);
                     await QuestEngine.SendJournalAsync(pipe.Session, box: true);

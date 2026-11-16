@@ -20,7 +20,7 @@ namespace Jondo.Unity.Server.Managers
         {
             var log = SessionContext.State.Quests;
             if (log == null) return;
-            if (!log.Active(quest) && !log.Finished(quest)) await Quests.StartAsync(stream, quest);
+            if (!log.Active(quest) && !log.Finished(quest)) await Quests.StartAsync(SessionContext.Current, quest);
             bool wasActive = log.Active(quest);
             for (int guard = 0; guard < 40 && log.Active(quest); guard++) log.FinishStep(quest);
             Quests.SaveAsItStands(quest);

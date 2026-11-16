@@ -57,7 +57,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (!await ItemUseHandler.CriterionHoldsAsync(stream, item)) return true;
 
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid, weigh: false)) return true;
             LearnedSpells.Learn(me.CharacterId, spell);
             SpellChoices.PlaceLearned(me.Breed, me.CharacterLevel, spell);
 

@@ -10,8 +10,10 @@ namespace Jondo.Unity.Server.Handlers
     /// <summary>Single door for the <c>iwo</c> requests the client sends.</summary>
     public static class InteractiveActionHandler
     {
-        public static async Task UseAsync(NetworkStream stream, byte[] payload)
+        public static async Task UseAsync(GameSession session, byte[] payload)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             byte[]? iwo = ConnectionProtocol.ReadPayload(payload, Op.Iwo);
             if (iwo == null) return;
 
@@ -92,7 +94,7 @@ namespace Jondo.Unity.Server.Handlers
                 // And a quest that asked to read it (the Dofusarium's statues, the temple's book).
                 if (!lectura.Asks)
                 {
-                    await Managers.Quests.OnReadAsync(stream, mapId);
+                    await Managers.Quests.OnReadAsync(session, mapId);
                     // The temple's statue beside the book now offers the way back to Astrub.
                     await InteractiveWaysHandler.RefreshAsync(stream, mapId);
                 }
@@ -107,7 +109,7 @@ namespace Jondo.Unity.Server.Handlers
             // A phoenix: a soul rises, and only then does the quest that asked for it hear of it.
             if (await PhantomHandler.TryPhoenixAsync(stream, mapId, elementId)) return;
 
-            if (await Managers.Quests.OnInteractiveUsedAsync(stream, mapId, elementId, skillInstanceId))
+            if (await Managers.Quests.OnInteractiveUsedAsync(session, mapId, elementId, skillInstanceId))
             {
                 // A statue prayed at no longer offers «Rezar».
                 if (InteractiveWays.Has(mapId, elementId)) await InteractiveWaysHandler.RefreshAsync(stream, mapId);
@@ -184,10 +186,10 @@ namespace Jondo.Unity.Server.Handlers
                     await TeleportHandler.UseAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
                 case InteractiveActionKind.Gather:
-                    await GatheringHandler.GatherAsync(stream, interactive.Element.Id, action.SkillId);
+                    await GatheringHandler.GatherAsync(session, interactive.Element.Id, action.SkillId);
                     break;
                 case InteractiveActionKind.Workshop:
-                    await WorkshopHandler.OpenAsync(SessionContext.Current, interactive.Element.Id, action.SkillId);
+                    await WorkshopHandler.OpenAsync(session, interactive.Element.Id, action.SkillId);
                     break;
                 case InteractiveActionKind.GuildFounding:
                     await GuildHandler.OpenFoundingAsync(stream, interactive.Element.Id, action.SkillId);

@@ -314,7 +314,15 @@ namespace Jondo.Unity.Tests.World
                     Assert.True(DungeonHandler.TryTakeTheKey(dungeon, DungeonHandler.EntryMethod.Key,
                         true, out long selected, out _));
 
-                    Assert.True(await ItemUseHandler.SpendOneAsync(pipe.ToClient, selected, weigh: false));
+                    var wrong = GameSession.SinSocket();
+                    wrong.State.CharacterId = character + 1000;
+                    using (SessionContext.Push(wrong))
+                    {
+                        Equipment.Add(uid, 999999, quantity + 10, Equipment.Bag, null);
+                        Assert.True(await ItemUseHandler.SpendOneAsync(pipe.Session, selected, weigh: false));
+                        Assert.Equal(quantity + 10, Equipment.ByUid(uid)!.Quantity);
+                        Assert.Same(wrong, SessionContext.Actual);
+                    }
                     Assert.Equal(quantity - 1, Equipment.ByUid(uid)?.Quantity ?? 0);
                     Assert.Equal(1, Equipment.ByUid(1)!.Quantity);
                     Assert.Equal(quantity > 1

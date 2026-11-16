@@ -42,8 +42,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>A book used: its document opens. False when the item is no such thing.</summary>
-        public static async Task<bool> TryReadAsync(NetworkStream stream, Equipment.Item item)
+        public static async Task<bool> TryReadAsync(GameSession session, Equipment.Item item)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var effects = DatabaseManager.GetItemEffectsData(
                 DatabaseManager.GetItemTemplatePossibleEffects(item.Template));
             int document = DocumentOf(effects);
@@ -54,9 +56,9 @@ namespace Jondo.Unity.Server.Handlers
 
             // And the objective it validates, when the quest is in hand: reading the recipe.
             foreach (var effect in effects.Where(e => e.EffectId == ObjectiveEffect && e.Value != 0))
-                await Quests.CompleteByReplyAsync(stream, 0, effect.Value);
+                await Quests.CompleteByReplyAsync(session, 0, effect.Value);
             // Or the one a binding ties to reading this book (content/quests/objectives.json).
-            await Quests.OnItemReadAsync(stream, item.Template);
+            await Quests.OnItemReadAsync(session, item.Template);
             return true;
         }
 

@@ -204,7 +204,7 @@ namespace Jondo.Unity.Server.Handlers
             if (uid != 0)
             {
                 // Spend one key and announce the remaining stack, or the removal of its last unit.
-                if (!await ItemUseHandler.SpendOneAsync(stream, uid, weigh: false))
+                if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, uid, weigh: false))
                 {
                     await TellAsync(stream, CommandTexts.Get("dungeon.missing_item"));
                     return false;
@@ -213,7 +213,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 // The key went into the guardian's hand: a quest that asks for it to be given to
                 // him has had it (TakesAtTheDoor).
-                await Managers.Quests.OnKeyHandedOverAsync(stream, state.OpenDialogueNpcId, item);
+                await Managers.Quests.OnKeyHandedOverAsync(SessionContext.Current, state.OpenDialogueNpcId, item);
             }
 
             if (method == EntryMethod.Keyring)
@@ -346,7 +346,7 @@ namespace Jondo.Unity.Server.Handlers
             if (await WaysForHeroesAsync(stream, dungeon, uid != 0, DateTime.Now) is not { } heroWays) return false;
             if (uid != 0)
             {
-                if (!await ItemUseHandler.SpendOneAsync(stream, uid)) return false;
+                if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, uid)) return false;
                 Console.WriteLine($"[Dungeon] {dungeon.Name}: one unit of item {item} is spent by the search.");
             }
             if (method == EntryMethod.Keyring) DungeonKeyring.SpendFreeEntry(state.CharacterId, dungeon.Id, DateTime.Now);

@@ -427,7 +427,7 @@ namespace Jondo.Unity.Server.Handlers
             state.Jobs[job] = new JobExperience.Progress { JobId = job, Experience = experience };
             DatabaseManager.SaveJobExperience(state.CharacterId, job, experience);
 
-            if (level != before) await WorkshopHandler.SendLevelUpAsync(stream, job, level);
+            if (level != before) await WorkshopHandler.SendLevelUpAsync(Network.SessionContext.Current, job, level);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Irq, ConnectionProtocol.BuildJobExperience(
                     job, JobExperience.Next(level), level, JobExperience.Floor(level), experience)));

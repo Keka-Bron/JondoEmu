@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -49,18 +48,19 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The guild's tokens are an item: the contributing capture's lqn 21 names it.</summary>
         public const int TokenItem = 32441;
 
-        private static Task WriteAsync(NetworkStream stream, byte[] frame)
-            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
+        private static Task WriteAsync(GameSession session, byte[] frame)
+            => session.SendAsync(frame);
 
         /// <summary>
         /// A fight is over for the member: what it beat goes to his guild's missions. Only a won
         /// fight counts, and only monsters -- summons are not beaten, they are made up.
         /// </summary>
-        public static async Task FightEndedAsync(NetworkStream stream, FightInstance fight, bool won)
+        public static async Task FightEndedAsync(GameSession session, FightInstance fight, bool won)
         {
+            using var context = SessionContext.Push(session);
             try
             {
-                await CountFightAsync(stream, fight, won);
+                await CountFightAsync(session, fight, won);
             }
             catch (Exception ex)
             {
@@ -69,7 +69,7 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        private static async Task CountFightAsync(NetworkStream stream, FightInstance fight, bool won)
+        private static async Task CountFightAsync(GameSession session, FightInstance fight, bool won)
         {
             long who = SessionContext.State.CharacterId;
             var guild = who == 0 ? null : GuildStore.GuildOf(who);
@@ -79,12 +79,12 @@ namespace Jondo.Unity.Server.Handlers
             var dream = DreamHandler.PayOf(fight, won);
             if (dream != null && dream.Finished)
             {
-                await DreamBandDoneAsync(stream, dream.Difficulty, Dreams.Bands);
-                if (dream.Trial > 0) await MoveAsync(stream, guild, who, objective => TrialWorth(objective, dream.Trial), DateTimeOffset.UtcNow);
+                await DreamBandDoneAsync(session, dream.Difficulty, Dreams.Bands);
+                if (dream.Trial > 0) await MoveAsync(session, guild, who, objective => TrialWorth(objective, dream.Trial), DateTimeOffset.UtcNow);
             }
             if (!won) return;
 
-            await CountAnomalyAsync(stream, guild, who, fight);
+            await CountAnomalyAsync(session, guild, who, fight);
 
             var beaten = new Dictionary<int, int>();
             foreach (var monster in fight.Rojo)
@@ -97,7 +97,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // The map the fight was about, not the arena it was fought in (see QuestWatcher).
             long mapId = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : SessionContext.State.MapId;
-            await CountAsync(stream, guild, who, beaten, mapId, DateTimeOffset.UtcNow);
+            await CountAsync(session, guild, beaten, mapId, DateTimeOffset.UtcNow);
         }
 
         /// <summary>
@@ -123,27 +123,29 @@ namespace Jondo.Unity.Server.Handlers
         /// The member's missions moved by what he beat on a map: each one told as it now stands, and
         /// the ones this did rewarded.
         /// </summary>
-        public static Task CountAsync(NetworkStream stream, GuildStore.Guild guild, long who,
+        public static Task CountAsync(GameSession session, GuildStore.Guild guild,
                                       IReadOnlyDictionary<int, int> beaten, long mapId, DateTimeOffset now)
         {
+            using var context = SessionContext.Push(session);
             bool inDungeon = DungeonManager.IsRoom(mapId);
             int subArea = DatabaseManager.SubAreaOfMap(mapId);
             int area = subArea > 0 ? Interactives.AreaOfSubArea(subArea) : 0;
-            return MoveAsync(stream, guild, who, objective => Worth(objective, beaten, inDungeon, subArea, area), now);
+            return MoveAsync(session, guild, session.CharacterId, objective => Worth(objective, beaten, inDungeon, subArea, area), now);
         }
 
         /// <summary>
         /// A band of a dream finished at a difficulty: the dream missions that asked for that band
         /// at that intensity are done. Not the trials' (a seed): see <see cref="TrialWorth"/>.
         /// </summary>
-        public static async Task DreamBandDoneAsync(NetworkStream stream, int difficulty, int band)
+        public static async Task DreamBandDoneAsync(GameSession session, int difficulty, int band)
         {
+            using var context = SessionContext.Push(session);
             try
             {
                 long who = SessionContext.State.CharacterId;
                 var guild = who == 0 ? null : GuildStore.GuildOf(who);
                 if (guild == null) return;
-                await MoveAsync(stream, guild, who, objective => DreamWorth(objective, difficulty, band), DateTimeOffset.UtcNow);
+                await MoveAsync(session, guild, who, objective => DreamWorth(objective, difficulty, band), DateTimeOffset.UtcNow);
             }
             catch (Exception ex)
             {
@@ -171,7 +173,7 @@ namespace Jondo.Unity.Server.Handlers
             return dungeonGuardian ? 1 : 0;
         }
 
-        private static async Task CountAnomalyAsync(NetworkStream stream, GuildStore.Guild guild, long who, FightInstance fight)
+        private static async Task CountAnomalyAsync(GameSession session, GuildStore.Guild guild, long who, FightInstance fight)
         {
             long mapId = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : SessionContext.State.MapId;
             if (!Anomalies.TryGet(DatabaseManager.SubAreaOfMap(mapId), out var anomaly)) return;
@@ -181,7 +183,7 @@ namespace Jondo.Unity.Server.Handlers
             var monsters = fight.Rojo.Where(m => !m.EsInvocado && m.MonsterId > 0).ToList();
             bool guardian = monsters.Any(m => DungeonManager.IsBoss(m.MonsterId));
             var loot = FightHandler.RewardOf(fight, who)?.Loot ?? new Dictionary<int, int>();
-            await MoveAsync(stream, guild, who,
+            await MoveAsync(session, guild, who,
                 objective => AnomalyWorth(objective, anomaly.Level, elixir, monsters.Count, guardian, loot),
                 DateTimeOffset.UtcNow);
         }
@@ -199,7 +201,7 @@ namespace Jondo.Unity.Server.Handlers
         /// The member's missions moved by what each objective says something was worth: each one
         /// told as it now stands, and the ones this did rewarded.
         /// </summary>
-        private static async Task MoveAsync(NetworkStream stream, GuildStore.Guild guild, long who,
+        private static async Task MoveAsync(GameSession session, GuildStore.Guild guild, long who,
                                             Func<GuildMissions.Objective, int> worthOf, DateTimeOffset now)
         {
             var missions = GuildMissions.Of(guild.Id, now);
@@ -210,13 +212,13 @@ namespace Jondo.Unity.Server.Handlers
                 if (moved == null) continue;
 
                 var interested = SubscribersOf(guild.Id, now);
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Jdc,
+                await WriteAsync(session, ConnectionProtocol.Push(Op.Jdc,
                     GuildProtocol.BuildMissionChanged(mission, moved.Value.Now, interested.GetValueOrDefault(mission.Slot))));
                 if (!moved.Value.JustDone) continue;
                 string doneBy = DatabaseManager.GetCharacterById(who)?.Name ?? "";
                 GuildStore.Log(guild.Id, GuildLogProtocol.MissionComplete,
                     GuildLogProtocol.MissionCompleteLine(who, doneBy, mission.MissionId), who, doneBy);
-                await RewardAsync(stream, guild, who, mission, now);
+                await RewardAsync(session, guild, who, mission, now);
                 // Done shows as a tick by his name in the others' list of the interested.
                 if (GuildMissions.InterestOf(guild.Id, now).GetValueOrDefault(mission.Slot)?.Contains(who) == true)
                     await TellMissionAsync(guild, mission, now, except: who);
@@ -228,7 +230,7 @@ namespace Jondo.Unity.Server.Handlers
         /// guild (<see cref="GuildActivity.Credit"/>), the week to everybody, and the header when a
         /// milestone gave the guild experience.
         /// </summary>
-        private static async Task RewardAsync(NetworkStream stream, GuildStore.Guild guild, long who,
+        private static async Task RewardAsync(GameSession session, GuildStore.Guild guild, long who,
                                               GuildMissions.Drawn mission, DateTimeOffset now)
         {
             var data = GuildMissions.MissionOf(mission.MissionId);
@@ -236,9 +238,9 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Guild] {who} does mission {mission.MissionId} of «{guild.Name}»: " +
                               $"{credited.Tokens} token(s), {credited.Points} activity point(s).");
 
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Jen, GuildProtocol.BuildMissionDone(mission.MissionId)));
-            if (data != null) await Achievements.CountAsync(stream, "NC", data.SuperCategoryId);   // «Aspirante de los encargos»
-            await GiveTokensAsync(stream, credited.Tokens);
+            await WriteAsync(session, ConnectionProtocol.Push(Op.Jen, GuildProtocol.BuildMissionDone(mission.MissionId)));
+            if (data != null) await Achievements.CountAsync(session, "NC", data.SuperCategoryId, defer: session.Stream == null);   // «Aspirante de los encargos»
+            await GiveTokensAsync(session, credited.Tokens);
             await TellTheWeekAsync(guild, now);
             if (credited.Experience > 0)
             {
@@ -291,14 +293,16 @@ namespace Jondo.Unity.Server.Handlers
         /// Tokens into the bag, as the contributing capture has them: the stack of 32441 (ivj, or a
         /// new one), the «Has conseguido» line, and the weight unless the caller weighs later.
         /// </summary>
-        public static async Task GiveTokensAsync(NetworkStream stream, int tokens, bool weigh = true)
+        public static async Task GiveTokensAsync(GameSession session, int tokens, bool weigh = true)
         {
+            using var context = SessionContext.Push(session);
             if (tokens <= 0) return;
-            if (!await WorkshopHandler.GiveAsync(stream, TokenItem, tokens)) return;
-            await Achievements.CountAsync(stream, "NT", 0, tokens);   // «Gremichas obtenidas»
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+            if (!await WorkshopHandler.GiveAsync(session.Stream, TokenItem, tokens)) return;
+            await Achievements.CountAsync(session, "NT", 0, tokens, defer: session.Stream == null);   // «Gremichas obtenidas»
+            await WriteAsync(session, ConnectionProtocol.Push(Op.Lqn,
                 ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained, tokens.ToString(), TokenItem.ToString())));
-            if (weigh) await ItemUseHandler.WeighAsync(stream);
+            if (weigh) await WriteAsync(session, ConnectionProtocol.Push(Op.Iun,
+                ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(session.State), ConnectionProtocol.Capacity(session.State))));
         }
 
         /// <summary>

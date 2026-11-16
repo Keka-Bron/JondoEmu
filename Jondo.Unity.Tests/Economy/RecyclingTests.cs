@@ -126,7 +126,7 @@ namespace Jondo.Unity.Tests.Economy
                     double whole = Recycling.NuggetsOf(Resource, 20, MapManager.GetMapInfo(RecycleHandler.PrismMap)!.SubAreaId);
                     long expected = Recycling.Split(whole, RecycleHandler.NeutralPrismShare, 0, 1.0).Player;
                     Assert.True(expected > 0 && expected < whole, $"{expected} of {whole}");
-                    Assert.True(await WorkshopHandler.CraftAsync(pipe.ToClient, Kep()));
+                    Assert.True(await WorkshopHandler.CraftAsync(pipe.Session, Kep()));
                     var kgh = await Until(pipe, "kgh");
                     Assert.Equal(expected, Var(kgh, 2));
                     Assert.Equal(0, Var(kgh, 1));
@@ -260,7 +260,7 @@ namespace Jondo.Unity.Tests.Economy
                     var session = a.Session.State.Workshop!.Recycle!;
                     var (player, toPot) = Recycling.Split(Recycling.NuggetsOf(Resource, 100, subArea), 50, 50, session.Bonus);
                     Assert.True(player > 0 && toPot > 0);
-                    await WorkshopHandler.CraftAsync(a.ToClient, Kep());
+                    await WorkshopHandler.CraftAsync(a.Session, Kep());
                     var kgh = await Until(a, "kgh");
                     Assert.Equal(toPot, Var(kgh, 1));
                     Assert.Equal(player, Var(kgh, 2));

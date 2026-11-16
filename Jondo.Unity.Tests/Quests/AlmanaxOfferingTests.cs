@@ -91,8 +91,8 @@ namespace Jondo.Unity.Tests.Quests
                     Assert.True(QuestEngine.Log!.Active(Quest));
 
                     // A hello closes nothing: neither the offering, nor the return, nor the saint.
-                    await QuestEngine.OnTalkingToAsync(pipe.ToClient, Almanax.Giver);
-                    await QuestEngine.OnTalkingToAsync(pipe.ToClient, Kacinka);
+                    await QuestEngine.OnTalkingToAsync(pipe.Session, Almanax.Giver);
+                    await QuestEngine.OnTalkingToAsync(pipe.Session, Kacinka);
                     Assert.Empty(QuestEngine.Log!.Run(Quest)!.Done);
 
                     // Two fibres: «ni más, ni menos». One: «Haré esta ofrenda en tu nombre, #1».
@@ -107,7 +107,7 @@ namespace Jondo.Unity.Tests.Quests
                     Assert.Contains(Bring, QuestEngine.Log!.Run(Quest)!.Done);
 
                     // The saint before the prayer: nobody has shown up.
-                    await QuestEngine.OnTalkingToAsync(pipe.ToClient, Kacinka);
+                    await QuestEngine.OnTalkingToAsync(pipe.Session, Kacinka);
                     Assert.DoesNotContain(Saint, QuestEngine.Log!.Run(Quest)!.Done);
 
                     // The day's room's altar: the prayer.
@@ -120,13 +120,13 @@ namespace Jondo.Unity.Tests.Quests
                     }
                     else
                     {
-                        await QuestEngine.TickAsync(pipe.ToClient, Quest, Prayer);   // no map data here
+                        await QuestEngine.TickAsync(pipe.Session, Quest, Prayer);   // no map data here
                     }
                     Assert.Contains(Prayer, QuestEngine.Log!.Run(Quest)!.Done);
                     Assert.False(Offering.MayPray());
 
                     // Now the saint is seen, and Ontoral hears about it.
-                    await QuestEngine.OnTalkingToAsync(pipe.ToClient, Kacinka);
+                    await QuestEngine.OnTalkingToAsync(pipe.Session, Kacinka);
                     Assert.Contains(Saint, QuestEngine.Log!.Run(Quest)!.Done);
                     Assert.Contains(Offering.SpokeWithTheSpirit, Offering.Opening().Replies);
                     var rewarded = await Offering.ReplyAsync(pipe.ToClient, Offering.SpokeWithTheSpirit);

@@ -56,7 +56,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.AttitudeAlreadyKnown)));
                 return true;
             }
-            await ItemUseHandler.SpendOneAsync(stream, item.Uid);
+            await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid);
             return true;
         }
     }

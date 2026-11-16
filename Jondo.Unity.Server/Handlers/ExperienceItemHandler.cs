@@ -54,10 +54,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>An experience scroll used: false when the item is no such thing.</summary>
-        public static async Task<bool> TryUseAsync(NetworkStream stream, Equipment.Item item)
+        public static async Task<bool> TryUseAsync(GameSession session, Equipment.Item item)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var effects = DatabaseManager.GetItemEffectsData(DatabaseManager.GetItemTemplatePossibleEffects(item.Template));
-            if (JobScrollOf(effects) is { } jobs) return await TrainAsync(stream, item, jobs);
+            if (JobScrollOf(effects) is { } jobs) return await TrainAsync(session, item, jobs);
             if (!GivesExperience(effects)) return false;
 
             var me = SessionContext.State;
@@ -74,7 +76,7 @@ namespace Jondo.Unity.Server.Handlers
             int energy = Energy.Of(character);
             var (life, gained) = recovery == null ? (0, 0) : RecoveryItemHandler.WouldGive(recovery, missing, energy, Random.Shared);
 
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(session, item.Uid, weigh: false)) return true;
 
             if (life > 0)
             {
@@ -91,7 +93,7 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.BuildSystemMessage(InfoMessages.EnergyRecovered, gained.ToString())));
             await ItemUseHandler.WeighAsync(stream);
             CharacterRewards.Save();
-            if (levelled) await Achievements.AfterLevelAsync(stream);
+            if (levelled) await Achievements.AfterLevelAsync(session);
 
             Console.WriteLine($"[Items] {me.CharacterName} uses {item.Template}: +{experience} experience" +
                               (gained > 0 ? $", +{gained} energy" : "") + (levelled ? $", level {me.CharacterLevel}." : "."));
@@ -103,9 +105,10 @@ namespace Jondo.Unity.Server.Handlers
         /// for what is earned working --, with the job's level-up and «Has ganado {0} XP en el oficio de
         /// $job{1}». A job this client does not have keeps the scroll.
         /// </summary>
-        private static async Task<bool> TrainAsync(NetworkStream stream, Equipment.Item item,
+        private static async Task<bool> TrainAsync(GameSession session, Equipment.Item item,
                                                    IReadOnlyList<(int Job, long Points)> jobs)
         {
+            var stream = session.Stream;
             var me = SessionContext.State;
             if (me.IsInFight || me.FightId != 0) return true;
             if (jobs.Any(j => !JobManager.TryGet(j.Job, out _)))
@@ -114,11 +117,11 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
             if (!await ItemUseHandler.CriterionHoldsAsync(stream, item)) return true;
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid, weigh: false)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(session, item.Uid, weigh: false)) return true;
 
             foreach (var (job, points) in jobs)
             {
-                await WorkshopHandler.GiveJobExperienceAsync(stream, job, points, bonus: false);
+                await WorkshopHandler.GiveJobExperienceAsync(session, job, points, bonus: false);
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildSystemMessage(InfoMessages.JobExperienceGained, points.ToString(), job.ToString())));
             }

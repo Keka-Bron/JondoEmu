@@ -49,7 +49,7 @@ namespace Jondo.Unity.Tests.Quests
                 await WorkshopHandler.CloseAsync(pipe.Session);
                 Assert.False(QuestEngine.Log!.ObjectiveDone(craft));
 
-                Assert.True(await QuestEngine.CompleteByReplyAsync(pipe.ToClient, quest, recipe));
+                Assert.True(await QuestEngine.CompleteByReplyAsync(pipe.Session, quest, recipe));
                 RecordCraft(pipe, cake);
                 await WorkshopHandler.CloseAsync(pipe.Session);
                 Assert.True(QuestEngine.Log.ObjectiveDone(craft));
@@ -103,14 +103,14 @@ namespace Jondo.Unity.Tests.Quests
                 var run = QuestEngine.Log!.Run(1986)!;
                 run.Done.UnionWith(new[] { 13836, 13838, 13840, 13842, 13837, 13841, 13843 });
                 Assert.True(QuestEngine.NotYetRevealed(instructions));
-                Assert.False(await QuestEngine.CompleteByReplyAsync(pipe.ToClient, 1986, instructions));
+                Assert.False(await QuestEngine.CompleteByReplyAsync(pipe.Session, 1986, instructions));
 
                 run.Done.Add(13839);
                 RecordCraft(pipe, dummy);
                 await WorkshopHandler.CloseAsync(pipe.Session);
                 Assert.DoesNotContain(craft, run.Done);
 
-                Assert.True(await QuestEngine.CompleteByReplyAsync(pipe.ToClient, 1986, instructions));
+                Assert.True(await QuestEngine.CompleteByReplyAsync(pipe.Session, 1986, instructions));
                 RecordCraft(pipe, dummy);
                 await WorkshopHandler.CloseAsync(pipe.Session);
                 Assert.Contains(craft, run.Done);

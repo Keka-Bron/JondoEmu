@@ -127,7 +127,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (way.PaidBy == masterId)
                 {
                     if (!TryTakeTheKey(dungeon, EntryMethod.Key, false, out long uid, out _) || uid == 0
-                        || !await ItemUseHandler.SpendOneAsync(stream, uid, weigh: false))
+                        || !await ItemUseHandler.SpendOneAsync(SessionContext.Current, uid, weigh: false))
                         return false;
                 }
                 else

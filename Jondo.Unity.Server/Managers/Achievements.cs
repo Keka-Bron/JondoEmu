@@ -174,19 +174,8 @@ namespace Jondo.Unity.Server.Managers
         /// The character's achievements (mft), in place of the recorded account's 954, and then
         /// whatever they had already done without it being recognised.
         /// </summary>
-        public static async Task SendListAsync(NetworkStream stream)
-        {
-            var log = Log;
-            if (log == null) return;
-
-            var state = SessionContext.State;
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Mft, AchievementProtocol.BuildList(ListOf(log, state.CharacterId, state.CharacterLevel))));
-
-            var earned = log.CheckEverything();
-            state.AchievementLevelChecked = state.CharacterLevel;
-            await AnnounceAsync(stream, earned);
-        }
+        public static Task SendListAsync(GameSession session)
+            => AchievementStateService.Live.SendListAsync(session);
 
         /// <summary>
         /// The list mft carries: every achievement of the account, sorted, each with the character
@@ -217,14 +206,15 @@ namespace Jondo.Unity.Server.Managers
         // ─── What moves them ─────────────────────────────────────────────────────
 
         /// <summary>A quest has just been finished. Grant whatever that earned.</summary>
-        public static Task AfterQuestAsync(NetworkStream stream, int questId)
+        public static Task AfterQuestAsync(GameSession session, int questId)
         {
+            using var context = SessionContext.Push(session);
             var book = _book;
             if (book == null) return Task.CompletedTask;
 
             // An alignment quest or an apprenticeship moves what «Pa>19» and «Pr=2|...» ask.
             var (level, rank) = Alignments.Moves(questId);
-            return CheckAsync(stream, book.WaitingOn("Qf", questId)
+            return CheckAsync(session, book.WaitingOn("Qf", questId)
                 .Concat(book.WaitingOn("Qc", questId))
                 .Concat(book.WaitingOn("QF", questId))
                 .Concat(book.WaitingOn("QQ"))
@@ -236,12 +226,12 @@ namespace Jondo.Unity.Server.Managers
         /// A quest objective has just been validated: the achievements waiting on it (Qo). The
         /// tutorial's «Primer tiempo» is earned this way, on 2502's objective 19173.
         /// </summary>
-        public static Task AfterObjectiveAsync(NetworkStream stream, int objectiveId)
+        public static Task AfterObjectiveAsync(GameSession session, int objectiveId)
         {
             var book = _book;
             if (book == null) return Task.CompletedTask;
             var waiting = book.WaitingOn("Qo", objectiveId);
-            return waiting.Count == 0 ? Task.CompletedTask : CheckAsync(stream, waiting);
+            return waiting.Count == 0 ? Task.CompletedTask : CheckAsync(session, waiting);
         }
 
         /// <summary>
@@ -254,8 +244,9 @@ namespace Jondo.Unity.Server.Managers
         /// The level is looked at here too, and only when it changed, because this is where a
         /// character comes back to after the fight that gave it.
         /// </remarks>
-        public static async Task OnMapEnteredAsync(NetworkStream stream, long mapId, int subAreaId)
+        public static async Task OnMapEnteredAsync(GameSession session, long mapId, int subAreaId)
         {
+            using var context = SessionContext.Push(session);
             var book = _book;
             var state = SessionContext.State;
             if (book == null || Log == null) return;
@@ -295,7 +286,7 @@ namespace Jondo.Unity.Server.Managers
             candidates.AddRange(state.AchievementsPending);
             state.AchievementsPending.Clear();
 
-            await CheckAsync(stream, candidates);
+            await CheckAsync(session, candidates);
         }
 
         /// <summary>
@@ -334,7 +325,7 @@ namespace Jondo.Unity.Server.Managers
                         if (book.Of(id)?.EachCharacter != true) log.Restore(id, account.WasClaimed(id), account.AchieverOf(id));
 
                 var earned = log.CheckAll(candidates.Distinct());
-                await AnnounceAsync(master.Stream, earned);
+                await AchievementStateService.Live.AnnounceAsync(hero, master, earned);
 
                 if (account == null) return;
                 foreach (int id in earned)
@@ -347,12 +338,12 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>The character's level went up. The level achievements, looked at now.</summary>
-        public static Task AfterLevelAsync(NetworkStream stream)
+        public static Task AfterLevelAsync(GameSession session)
         {
             var book = _book;
             if (book == null) return Task.CompletedTask;
-            SessionContext.State.AchievementLevelChecked = SessionContext.State.CharacterLevel;
-            return CheckAsync(stream, book.WaitingOn("PL"));
+            session.State.AchievementLevelChecked = session.State.CharacterLevel;
+            return CheckAsync(session, book.WaitingOn("PL"));
         }
 
         /// <summary>Items crafted: the tally, and the achievements that count it or a job level.</summary>
@@ -361,23 +352,24 @@ namespace Jondo.Unity.Server.Managers
         /// ring is crafted — after the job's level-up and the character sheet, which is where this
         /// is called from.
         /// </remarks>
-        public static Task AfterCraftAsync(NetworkStream stream, int count)
+        public static Task AfterCraftAsync(GameSession session, int count)
         {
+            using var context = SessionContext.Push(session);
             var book = _book;
             if (book == null || count <= 0) return Task.CompletedTask;
 
             SetTally(AchievementCatalogue.CraftKey, 0, Tally(AchievementCatalogue.CraftKey, 0) + count);
-            return CheckAsync(stream, book.WaitingOn(AchievementCatalogue.CraftKey)
+            return CheckAsync(session, book.WaitingOn(AchievementCatalogue.CraftKey)
                 .Concat(book.WaitingOn(AchievementCatalogue.JobKey))
                 .Concat(book.WaitingOn("EC")));
         }
 
         /// <summary>A job's level went up: the achievements that want jobs at a level.</summary>
-        public static Task AfterJobLevelAsync(NetworkStream stream)
+        public static Task AfterJobLevelAsync(GameSession session)
         {
             var book = _book;
             if (book == null) return Task.CompletedTask;
-            return CheckAsync(stream, book.WaitingOn(AchievementCatalogue.JobKey));
+            return CheckAsync(session, book.WaitingOn(AchievementCatalogue.JobKey));
         }
 
         /// <summary>
@@ -483,21 +475,22 @@ namespace Jondo.Unity.Server.Managers
         /// done (its super category), <c>NT</c> guild tokens obtained, <c>EI</c> an item used,
         /// <c>Eu</c> items broken into runes, <c>EJ</c> a dream trial won (its achievement) -- and
         /// the achievements waiting on it are looked at
-        /// now; with no stream, back on the map, as a fight's are.
+        /// now; deferred checks run back on the map, as a fight's do.
         /// </summary>
-        public static async Task CountAsync(NetworkStream? stream, string kind, long key, long by = 1)
+        public static async Task CountAsync(GameSession session, string kind, long key, long by = 1, bool defer = false)
         {
+            using var context = SessionContext.Push(session);
             var book = _book;
             if (book == null || Log == null || by <= 0 || SessionContext.State.CharacterId == 0) return;
 
             SetTally(kind, key, Tally(kind, key) + by);
             var waiting = book.WaitingOn(kind, key).Concat(Totals.Contains(kind) ? book.WaitingOn(kind) : Array.Empty<int>()).ToList();
-            if (stream == null)
+            if (defer)
             {
                 SessionContext.State.AchievementsPending.UnionWith(waiting);
                 return;
             }
-            await CheckAsync(stream, waiting);
+            await CheckAsync(session, waiting);
         }
 
         /// <summary>The kinds judged as one number (NT&gt;99), whatever key their term carries.</summary>
@@ -533,8 +526,9 @@ namespace Jondo.Unity.Server.Managers
         private const string DungeonKind = "EMd";
 
         /// <summary>Looks at these achievements and announces the ones earned.</summary>
-        private static async Task CheckAsync(NetworkStream stream, IEnumerable<int> candidates)
+        private static async Task CheckAsync(GameSession session, IEnumerable<int> candidates)
         {
+            using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null) return;
             if (stream == null)
@@ -544,40 +538,7 @@ namespace Jondo.Unity.Server.Managers
             }
 
             var earned = log.CheckAll(candidates.Distinct());
-            await AnnounceAsync(stream, earned);
-        }
-
-        /// <summary>
-        /// Tells the client achievements are earned (mfu, one each) and writes them down.
-        /// </summary>
-        /// <remarks>
-        /// Only mfu. The captures never follow an mfu with an mfs: that comes after the claim, with
-        /// the character sheet the reward changed. The level in mfu is the character's, 1 and 2 in
-        /// the tutorial and 200 in the long-route capture.
-        /// </remarks>
-        private static async Task AnnounceAsync(NetworkStream stream, IReadOnlyList<int> earned)
-        {
-            var state = SessionContext.State;
-            foreach (int achievementId in earned)
-            {
-                Log?.Credit(achievementId, state.CharacterId);
-                Log?.NoteLevel(achievementId, LevelOnTheWire(state.CharacterLevel));
-                DatabaseManager.SaveAchievement(state.CharacterId, achievementId, claimed: false,
-                                                level: LevelOnTheWire(state.CharacterLevel));
-
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Mfu, AchievementProtocol.BuildEarned(
-                        LevelOnTheWire(state.CharacterLevel), state.CharacterId, achievementId)));
-
-                // And whoever stands by reads it in his chat. INFERRED: no capture has an mgc, and
-                // the map is who the client's own line («ha desbloqueado el logro») suits.
-                if (SessionContext.Current is { } me && !state.IsInFight)
-                    await SessionRegistry.BroadcastToMapAsync(state.MapId, ConnectionProtocol.Push(Op.Mgc,
-                        AchievementProtocol.BuildUnlockedBy(state.CharacterId, state.CharacterName,
-                                                            LevelOnTheWire(state.CharacterLevel), achievementId)), me.Id);
-
-                Console.WriteLine($"[Achievements] {state.CharacterName} earns {achievementId}.");
-            }
+            await AchievementStateService.Live.AnnounceAsync(session, session, earned);
         }
 
         // ─── The window ───────────────────────────────────────────────────────────
@@ -688,8 +649,10 @@ namespace Jondo.Unity.Server.Managers
         /// Every character is offered all 539 titles and 167 ornaments already (see Titles); the
         /// titles a claim pays are written down for the character as well.
         /// </remarks>
-        public static async Task ClaimAsync(NetworkStream stream, int achievementId)
+        public static async Task ClaimAsync(GameSession session, int achievementId)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream;
             var log = Log;
             if (log == null || _book == null) return;
 
@@ -738,7 +701,7 @@ namespace Jondo.Unity.Server.Managers
                     }
                 }
 
-                foreach (int emote in payout.Emotes) await Emotes.LearnAsync(SessionContext.Current, emote);
+                foreach (int emote in payout.Emotes) await Emotes.LearnAsync(session, emote);
 
                 if (payout.Experience > 0 || payout.Kamas > 0) CharacterRewards.Save();
 
@@ -753,7 +716,7 @@ namespace Jondo.Unity.Server.Managers
                                       : "."));
             }
 
-            if (levelled) await AfterLevelAsync(stream);
+            if (levelled) await AfterLevelAsync(session);
         }
 
         // ─── Tallies ──────────────────────────────────────────────────────────────

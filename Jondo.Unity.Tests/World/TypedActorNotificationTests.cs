@@ -61,7 +61,7 @@ public sealed class TypedActorNotificationTests
         {
             Assert.DoesNotContain(npc.Spawn, Npcs.OnMap(npc.Spawn.MapId));
             var sending = (Task)typeof(NpcHandler).GetMethod("ComesInAndSpeaksAsync", PrivateStatic)!
-                .Invoke(null, [own.ToClient, npc.Spawn.NpcId, NpcFixture.Line])!;
+                .Invoke(null, [own.Session, npc.Spawn.NpcId, NpcFixture.Line])!;
             if (fail) await Assert.ThrowsAsync<IOException>(() => sending);
             else await sending;
         }

@@ -141,7 +141,7 @@ namespace Jondo.Unity.Server.Network
             }
             long action = Numero(cuerpo, "action");
             if (action == 0) action = Npcs.Talk;
-            var lines = RunInSession(session, stream => NpcHandler.InteractAsync(stream,
+            var lines = RunInSession(session, _ => NpcHandler.InteractAsync(session,
                 ClientFrame(Op.Iov, Pb.New().Var(1, action).Var(2, map).Var(3, actor).Build())));
             return Bien(DialogueNow(session, lines));
         }
@@ -152,7 +152,7 @@ namespace Jondo.Unity.Server.Network
             var session = TestSessionOnline();
             if (session == null) return Mal(404, "offline");
             long reply = Numero(cuerpo, "reply");
-            var lines = RunInSession(session, stream => NpcHandler.ReplyAsync(stream,
+            var lines = RunInSession(session, _ => NpcHandler.ReplyAsync(session,
                 ClientFrame(Op.Ioy, Pb.New().Var(1, reply).Build())));
             return Bien(DialogueNow(session, lines));
         }
@@ -184,7 +184,7 @@ namespace Jondo.Unity.Server.Network
             {
                 uid = Managers.Equipment.All.FirstOrDefault(i => i.Template == template && i.Quantity > 0)?.Uid ?? 0;
                 if (uid != 0)
-                    await ItemUseHandler.UseAsync(stream, ClientFrame(Op.Iuu, Pb.New().Var(3, uid).Build()));
+                    await ItemUseHandler.UseAsync(session, ClientFrame(Op.Iuu, Pb.New().Var(3, uid).Build()));
             });
             if (uid == 0) return Mal(404, $"item {template} not carried");
             return Bien(new { item = template, uid, lines = lines.Select(l => l.Length > 220 ? l[..220] : l).ToList() });
@@ -245,7 +245,7 @@ namespace Jondo.Unity.Server.Network
             // A quest's element travels in the character's own jss, not in the registry
             // (MapInteractiveMessages.Snapshot), with the instance every element has.
             if (skill == 0) skill = Interactives.SkillInstanceOf(element);
-            var lines = RunInSession(session, stream => InteractiveActionHandler.UseAsync(stream,
+            var lines = RunInSession(session, _ => InteractiveActionHandler.UseAsync(session,
                 ClientFrame(Op.Iwo, Pb.New().Var(1, skill).Var(2, element).Build())));
             return Bien(new { element, skill, dialogue = DialogueNow(session), lines = lines.Select(l => l.Length > 220 ? l[..220] : l).ToList() });
         }
@@ -368,7 +368,7 @@ namespace Jondo.Unity.Server.Network
             switch (op)
             {
                 case "start":
-                    lines = RunInSession(session, stream => Quests.StartAsync(stream, quest));
+                    lines = RunInSession(session, _ => Quests.StartAsync(session, quest));
                     break;
                 case "finish":
                     lines = RunInSession(session, stream => QuestAdmin.FinishAsync(stream, quest));
@@ -380,7 +380,7 @@ namespace Jondo.Unity.Server.Network
                     // One objective of the step in hand marked done, to try a later one again
                     // without replaying what comes before it.
                     int objective = (int)Numero(cuerpo, "objective");
-                    lines = RunInSession(session, stream => Quests.TickAsync(stream, quest, objective));
+                    lines = RunInSession(session, _ => Quests.TickAsync(session, quest, objective));
                     break;
                 default:
                     return Mal(400, "op: start, finish, forget or tick");

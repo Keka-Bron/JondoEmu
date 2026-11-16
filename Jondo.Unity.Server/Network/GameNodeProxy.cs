@@ -313,7 +313,7 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri("idv")) QuestHandler.Unfollow(payload);
                 else if (payloadStr == Op.Uri("iek")) QuestHandler.Reorder(payload);
                 // A document's «start the quest» button.
-                else if (payloadStr == Op.Uri("ido")) await QuestHandler.StartFromDocumentAsync(stream, payload);
+                else if (payloadStr == Op.Uri("ido")) await QuestHandler.StartFromDocumentAsync(session, payload);
                 // The item tooltips' average prices.
                 else if (payloadStr == Op.Uri("ivp")) await MarketplaceHandler.AveragePricesAsync(session);
                 // The «Cours du marché» window, an item's price history.
@@ -568,7 +568,7 @@ namespace Jondo.Unity.Server.Network
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Hsa)))
                     await Handlers.BreedingHandler.PreviewMatingAsync(stream, payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Htu)))
-                    await Handlers.BreedingHandler.BreedAsync(stream, payload);
+                    await Handlers.BreedingHandler.BreedAsync(session, payload);
                 // The alliance: see Handlers.AllianceHandler.
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Mdk)))
                     await Handlers.AllianceHandler.CreateAsync(stream, payload);
@@ -1035,7 +1035,7 @@ namespace Jondo.Unity.Server.Network
                 {
                     // All the elements go through the same registry; it decides which action is
                     // behind without mixing data between maps or between sockets.
-                    await InteractiveActionHandler.UseAsync(stream, payload);
+                    await InteractiveActionHandler.UseAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Izv)))
                 {
@@ -1219,17 +1219,17 @@ namespace Jondo.Unity.Server.Network
                     if (!await CommissionHandler.ReadyAsync(stream, payload)
                         && !await TradeHandler.ReadyAsync(stream, payload)
                         && !await NpcBarterHandler.ReadyAsync(stream, payload))
-                        await WorkshopHandler.CraftAsync(stream, payload);
+                        await WorkshopHandler.CraftAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kcj)))
                 {
                     // A rune on the magus table.
-                    await WorkshopHandler.RuneAsync(stream, payload);
+                    await WorkshopHandler.RuneAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kbj)))
                 {
                     // Break what is on the grinder.
-                    await WorkshopHandler.BreakAsync(stream, payload);
+                    await WorkshopHandler.BreakAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kbl)))
                 {
@@ -1388,12 +1388,12 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Iuu)))
                 {
                     // Using an item: a box, an alliance's potion or prism, a travel item.
-                    await ItemUseHandler.UseAsync(stream, payload);
+                    await ItemUseHandler.UseAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Ivs)))
                 {
                     // «Utiliser plusieurs»: the same item used several times.
-                    await ItemUseHandler.UseSeveralAsync(stream, payload);
+                    await ItemUseHandler.UseSeveralAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Itw)))
                 {
@@ -1512,12 +1512,12 @@ namespace Jondo.Unity.Server.Network
                     // He has clicked an NPC: depending on the action, the shop or the dialogue opens for him. With
                     // a marketplace open and no NPC, it is its buy or sell button.
                     if (!await MarketplaceHandler.ModeAsync(payload))
-                        await NpcHandler.InteractAsync(stream, payload);
+                        await NpcHandler.InteractAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Ioy)))
                 {
                     // He has chosen a reply in the dialogue.
-                    await NpcHandler.ReplyAsync(stream, payload);
+                    await NpcHandler.ReplyAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kea)))
                 {
@@ -1532,12 +1532,12 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri(Op.Idt) || payloadStr.Contains(Op.Uri(Op.Idt)))
                 {
                     // «Abandonar el tutorial» confirmed: its quests validated, the set given.
-                    await Managers.Quests.LeaveTutorialAsync(stream);
+                    await Managers.Quests.LeaveTutorialAsync(session);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Ieo)))
                 {
                     // Which step is this quest on? It is answered with the idu.
-                    await QuestHandler.StepAsync(stream, payload);
+                    await QuestHandler.StepAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri("mfb")))
                 {
@@ -1548,17 +1548,17 @@ namespace Jondo.Unity.Server.Network
                 {
                     // The client considers an objective met. It is the one who knows: the free-text
                     // ones ask for pressing something in the interface and nothing of that is seen here.
-                    await QuestHandler.ObjectiveAsync(stream, payload);
+                    await QuestHandler.ObjectiveAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Iec)))
                 {
                     // He asks about one of his quests, right after taking it.
-                    await QuestHandler.DetailAsync(stream, payload);
+                    await QuestHandler.DetailAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Mga)))
                 {
                     // He has pressed the button to claim an achievement. -1 is «all the ones you owe me».
-                    await AchievementHandler.ClaimAsync(stream, payload);
+                    await AchievementHandler.ClaimAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Mfe)))
                 {

@@ -88,7 +88,7 @@ public sealed class EmoteLearningFlowTests
                     && candidate.Payout.Emotes.All(id => catalogue.Of(id) != null && !pipe.Session.State.Emotes.Contains(id)));
             log.Restore(reward.Id, claimed: false);
 
-            await Achievements.ClaimAsync(pipe.ToClient, reward.Id);
+            await Achievements.ClaimAsync(pipe.Session, reward.Id);
             var learned = new System.Collections.Generic.List<int>();
             bool resultReceived = false;
             for (int i = 0; i < 32 && !resultReceived; i++)
@@ -106,7 +106,7 @@ public sealed class EmoteLearningFlowTests
             Assert.True(resultReceived);
             Assert.Equal(reward.Payout.Emotes.Distinct(), learned);
             Assert.Equal(learned.Order(), DatabaseManager.LoadEmotes(RewardLearner).Order());
-            await Achievements.ClaimAsync(pipe.ToClient, reward.Id);
+            await Achievements.ClaimAsync(pipe.Session, reward.Id);
             await pipe.Quiet();
         }
         finally { Clean(RewardLearner); }

@@ -158,7 +158,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.Empty(RideCapture.RidesOf(fight.FightId, ally.Id));
 
                 // Lost: nothing, and the fight's catches are forgotten.
-                await RideCapture.FightEndedAsync(null!, fight, breeder.Id, won: false);
+                await RideCapture.FightEndedAsync(player, fight, won: false);
                 Assert.Empty(RideCapture.RidesOf(fight.FightId, breeder.Id));
                 Assert.True(RideCapture.MayCast(fight, breeder, spell));
             }

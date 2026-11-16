@@ -36,7 +36,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 Uid = item.Uid, Gid = item.Template, Quantity = 1, Effects = Forgemagic.Serialize(item.Effects),
             };
-            if (!await ItemUseHandler.SpendOneAsync(stream, item.Uid)) return true;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid)) return true;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push("lyb", Pb.New()
                 .Packed(1, added.ConvertAll(id => (long)id))
                 .Msg(3, CosmeticCollectionHandler.Body(entry))

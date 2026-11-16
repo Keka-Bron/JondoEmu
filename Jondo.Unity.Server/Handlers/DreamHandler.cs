@@ -375,7 +375,7 @@ namespace Jondo.Unity.Server.Handlers
                                   $"{sueno.Salas.Count} rooms in all.");
 
                 // And the band it closes is done: the guild missions that asked for it.
-                await GuildMissionWatcher.DreamBandDoneAsync(stream, sueno.Dificultad, sala.Franja);
+                await GuildMissionWatcher.DreamBandDoneAsync(SessionContext.Current, sueno.Dificultad, sala.Franja);
             }
 
             Persist(sueno);
@@ -1178,7 +1178,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var session = SessionRegistry.FindByCharacter(characterId);
             if (session == null) return;
-            using (SessionContext.Push(session)) _ = Achievements.CountAsync(null, "EJ", achievement);
+            _ = Achievements.CountAsync(session, "EJ", achievement, defer: true);
         }
 
         private static List<long> PlayersOf(Jondo.Unity.World.Fights.FightInstance fight)

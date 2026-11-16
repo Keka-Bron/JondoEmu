@@ -4,7 +4,8 @@ using Jondo.Unity.World.Achievements;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// The achievement messages, both ways.
+    /// Legacy achievement window/reward messages and request parsing.
+    /// Entry lists and earned notifications use AchievementMessages / AchievementStateService.
     /// </summary>
     /// <remarks>
     /// Read off the captures, and tied to the client's own code where the captures are silent.
@@ -28,29 +29,6 @@ namespace Jondo.Unity.Server.Network
     public static class AchievementProtocol
     {
         /// <summary>
-        /// An achievement has been earned (mfu).
-        ///
-        ///   f1 { f1: the CHARACTER's level, f2: character id, f3: achievement id }
-        /// </summary>
-        /// <remarks>
-        /// The level is the character's and not the achievement's, which is the one thing here that
-        /// would have been guessed wrong. The tutorial capture sends 1 and then 2, for a player who
-        /// was levelling; the long-route capture sends 200 fifteen times, for achievements whose
-        /// own declared levels are 30, 50, 110 and 140.
-        /// </remarks>
-        public static byte[] BuildEarned(int characterLevel, long characterId, int achievementId)
-            => Pb.New().Msg(1, Entry(characterLevel, characterId, achievementId)).Build();
-
-        /// <summary>
-        /// Somebody else earned one (mgc): «{0} ha desbloqueado el logro $achievement{1}.» in the chat,
-        /// his name a link to his menu (epj.bapt, ui.achievement.characterUnlocksAchievement).
-        ///
-        ///   f1: character id, f2: his name, f3: the mfu's entry
-        /// </summary>
-        public static byte[] BuildUnlockedBy(long characterId, string name, int characterLevel, int achievementId)
-            => Pb.New().Var(1, characterId).Str(2, name ?? "").Msg(3, Entry(characterLevel, characterId, achievementId)).Build();
-
-        /// <summary>
         /// An achievement has been paid for (mfs).
         ///
         ///   f2: 1
@@ -65,32 +43,6 @@ namespace Jondo.Unity.Server.Network
         /// </remarks>
         public static byte[] BuildRewarded(int achievementId, int state = 1)
             => Pb.New().Var(2, state).Var(4, achievementId).Build();
-
-        /// <summary>
-        /// Every achievement the ACCOUNT has, on entering the world (mft).
-        ///
-        ///   f1 (repeated) { f2: the character of the account that achieved it, f3: achievement id }
-        /// </summary>
-        /// <remarks>
-        /// Measured in six captures, up to 986 entries, and no entry carries a level there: those
-        /// characters had been paid for everything. An achievement earned and not yet paid for is
-        /// sent the way mfu sends it, with the character's level in f1 — INFERRED: it is the only
-        /// thing that tells the two apart in this message, and the client uses the same inner
-        /// record for both.
-        /// </remarks>
-        public static byte[] BuildList(IEnumerable<(int Achievement, long AchievedBy, int UnclaimedLevel)> achievements)
-        {
-            var list = Pb.New();
-            foreach (var (achievement, achievedBy, level) in achievements)
-            {
-                list.Msg(1, Entry(level, achievedBy, achievement));
-            }
-
-            return list.Build();
-        }
-
-        private static Pb Entry(int level, long characterId, int achievementId)
-            => Pb.New().VarIfNotZero(1, level).Var(2, characterId).Var(3, achievementId);
 
         /// <summary>
         /// Every achievement of one category, with how far each objective has got (mfo).

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -43,7 +44,8 @@ namespace Jondo.Unity.Tests.Sessions
 
             try
             {
-                await using var pipe = await ClientPipe.OpenAsync(Account, Master, 1);
+                var codec = new RecordingCodec();
+                await using var pipe = await ClientPipe.OpenAsync(Account, Master, 1, codec: codec);
                 var master = pipe.Session;
                 master.State.CharacterLevel = 1;
                 using (SessionContext.Push(master)) Achievements.LoadFrom(Master);
@@ -54,26 +56,104 @@ namespace Jondo.Unity.Tests.Sessions
                 hero.State.CharacterLevel = 200;
                 using (SessionContext.Push(hero)) Achievements.LoadFrom(Hero);
 
+                // Account-wide credit is shared, but each-character achievements stay each his own.
+                var book = hero.State.Achievements!.Book;
+                int each = book.All().First(achievement => achievement.EachCharacter).Id;
+                master.State.Achievements!.Restore(each, true, Master);
+                hero.State.Achievements.Restore(each, false, Hero);
+                master.State.Achievements.Restore(3, true, Master);
+
+                var wrong = GameSession.SinSocket();
+                using var context = SessionContext.Push(wrong);
+                using var turn = await master.EnterTurnAsync();
                 // His level, never looked at since he was connected: the level achievements.
                 await Achievements.ForHeroAsync(master, hero);
-                var earned = hero.State.Achievements!.Earned.ToList();
+                var earned = hero.State.Achievements!.Earned.Except(new[] { each, 3 }).ToList();
                 Assert.NotEmpty(earned);
-                // Told on his master's client, one mfu each.
-                foreach (var _ in earned) await pipe.Next(Op.Mfu);
+                // Told through his master's codec, with the hero's credit and capped level.
+                Assert.Equal(earned.Count, codec.Frames.Count);
+                foreach (var frame in codec.Frames)
+                {
+                    var achievement = Assert.IsType<AchievementFinishedEvent>(frame.Content).Achievement!;
+                    Assert.Contains(achievement.AchievementId, earned);
+                    Assert.Equal(Hero, achievement.AchievedBy);
+                    Assert.Equal(200, achievement.FinishedLevel);
+                    Assert.Equal(0, achievement.PioneerRank);
+                    Assert.Null(frame.Uid);
+                    Assert.Equal(RecordingCodec.Token, await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
+                }
 
                 // The account's now, credited to him.
                 var account = master.State.Achievements!;
                 Assert.All(earned, id => Assert.Equal(Hero, account.AchieverOf(id)));
+                Assert.All(earned, id => Assert.Equal(200, account.LevelOf(id)));
+                Assert.True(account.WasClaimed(each));
+                Assert.False(hero.State.Achievements.WasClaimed(each));
+                Assert.Equal(Hero, hero.State.Achievements.AchieverOf(each));
+                Assert.Equal(Master, hero.State.Achievements.AchieverOf(3));
+                Assert.True(hero.State.Achievements.WasClaimed(3));
+                Assert.Equal(0, master.UnoCadaVez.CurrentCount);
+                Assert.Same(wrong, SessionContext.Actual);
 
                 // Looked at again, nothing new: no achievement is earned twice.
                 hero.State.AchievementLevelChecked = 0;
                 await Achievements.ForHeroAsync(master, hero);
+                Assert.Equal(earned.Count, codec.Frames.Count);
+                Assert.Equal(0, codec.Decodes);
                 await pipe.Quiet();
             }
             finally
             {
                 Forget();
             }
+        }
+
+        [Fact]
+        public async Task A_failed_hero_notification_keeps_hero_persistence_and_pending_timing_before_master_synchronization()
+        {
+            if (!File.Exists(Paths.WorldDb) || !File.Exists(Paths.AchievementsJson)) return;
+            Achievements.Load();
+            Forget();
+            try
+            {
+                var codec = new RecordingCodec { Fail = true };
+                await using var pipe = await ClientPipe.OpenAsync(Account, Master, 1, codec: codec);
+                var master = pipe.Session;
+                master.State.CharacterLevel = 1;
+                using (SessionContext.Push(master)) Achievements.LoadFrom(Master);
+                var hero = GameSession.SinSocket();
+                hero.State.CharacterId = Hero;
+                hero.State.CharacterLevel = 247;
+                using (SessionContext.Push(hero)) Achievements.LoadFrom(Hero);
+                hero.State.AchievementsPending.Add(3);
+                using var turn = await master.EnterTurnAsync();
+
+                Assert.Same(codec.Failure, await Assert.ThrowsAsync<IOException>(() => Achievements.ForHeroAsync(master, hero)));
+                var first = Assert.IsType<AchievementFinishedEvent>(Assert.Single(codec.Frames).Content).Achievement!;
+                Assert.Equal(Hero, first.AchievedBy);
+                Assert.Equal(200, first.FinishedLevel);
+                Assert.Equal(Hero, hero.State.Achievements!.AchieverOf(first.AchievementId));
+                Assert.Equal(200, hero.State.Achievements.LevelOf(first.AchievementId));
+                Assert.Equal((first.AchievementId, false), Assert.Single(DatabaseManager.LoadAchievements(Hero)));
+                Assert.Empty(DatabaseManager.LoadAchievements(Master));
+                Assert.Empty(master.State.Achievements!.Earned);
+                Assert.Empty(hero.State.AchievementsPending);
+                Assert.Equal(247, hero.State.AchievementLevelChecked);
+                Assert.Equal(0, master.UnoCadaVez.CurrentCount);
+                Assert.False(pipe.FromServer.DataAvailable);
+            }
+            finally { Forget(); }
+        }
+
+        private sealed class RecordingCodec : IGameCodec
+        {
+            internal static readonly byte[] Token = [0xA8, 0x71];
+            internal readonly System.Collections.Generic.List<GameFrame> Frames = [];
+            internal readonly IOException Failure = new("hero achievement encoding failed");
+            internal bool Fail;
+            internal int Decodes;
+            public byte[] Encode(GameFrame frame) { Frames.Add(frame); if (Fail) throw Failure; return Token; }
+            public GameFrame Decode(ReadOnlySpan<byte> packet) { Decodes++; throw new InvalidOperationException("Hero achievements must use the recipient codec directly."); }
         }
     }
 }

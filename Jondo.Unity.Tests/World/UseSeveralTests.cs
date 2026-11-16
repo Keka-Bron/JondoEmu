@@ -43,12 +43,12 @@ namespace Jondo.Unity.Tests.World
                     long kamas = pipe.Session.State.Kamas;
 
                     // Three of five: two left, three thousand kamas.
-                    await ItemUseHandler.UseSeveralAsync(pipe.ToClient, Ivs(uid, 3));
+                    await ItemUseHandler.UseSeveralAsync(pipe.Session, Ivs(uid, 3));
                     Assert.Equal(2, Equipment.ByUid(uid)!.Quantity);
                     Assert.Equal(kamas + 3000, pipe.Session.State.Kamas);
 
                     // Ten asked of the two left: both, and the stack is gone.
-                    await ItemUseHandler.UseSeveralAsync(pipe.ToClient, Ivs(uid, 10));
+                    await ItemUseHandler.UseSeveralAsync(pipe.Session, Ivs(uid, 10));
                     Assert.Null(Equipment.ByUid(uid));
                     Assert.Equal(kamas + 5000, pipe.Session.State.Kamas);
                 }
