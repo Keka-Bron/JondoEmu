@@ -288,10 +288,108 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(7001, member.CharacterId);
                 Assert.Equal(1, member.Rank);
 
-                Assert.Equal(guild.Id, GuildStore.Leave(7001).Id);
+                var departure = GuildStore.Leave(7001);
+                Assert.Equal(guild.Id, departure.Guild.Id);
                 Assert.Null(GuildStore.GuildOf(7001));
                 Assert.Equal(0, GuildStore.RankOf(7001));
                 Assert.Empty(GuildStore.Members(guild.Id));
+                // The last one out takes the guild with him.
+                Assert.True(departure.Dissolved);
+                Assert.Null(GuildStore.ById(guild.Id));
+            }
+            finally
+            {
+                GuildStore.ConnectionStringOverride = null;
+                TestDatabases.ReleasePool(file);
+                try { File.Delete(file); } catch (IOException) { }
+            }
+        }
+
+        /// <summary>
+        /// A leader leaving hands the guild to the best rank by the ranks' order, then the longest
+        /// there: nobody took it, and a guild lost its leader for good.
+        /// </summary>
+        [Fact]
+        public void A_leaving_leader_hands_the_guild_on()
+        {
+            string file = Path.Combine(Path.GetTempPath(), $"jondo-guild-{Guid.NewGuid():N}.db");
+            GuildStore.ConnectionStringOverride = $"Data Source={file}";
+            try
+            {
+                var guild = GuildStore.Create(7201, "Relève", 165, 8, 16744448, 9476018);
+                GuildStore.Join(7202, guild.Id, GuildStore.RankNewcomer);
+                GuildStore.Join(7203, guild.Id, 2);
+                GuildStore.Join(7204, guild.Id, 2);
+
+                var departure = GuildStore.Leave(7201);
+                Assert.False(departure.Dissolved);
+                Assert.Equal(7203, departure.NewLeader);
+                Assert.Equal(GuildStore.RankLeader, GuildStore.RankOf(7203));
+                Assert.Single(GuildStore.Members(guild.Id), m => m.Rank == GuildStore.RankLeader);
+                Assert.NotNull(GuildStore.ById(guild.Id));
+
+                // Somebody else than the leader leaving changes nobody's rank.
+                Assert.Equal(0, GuildStore.Leave(7202).NewLeader);
+            }
+            finally
+            {
+                GuildStore.ConnectionStringOverride = null;
+                TestDatabases.ReleasePool(file);
+                try { File.Delete(file); } catch (IOException) { }
+            }
+        }
+
+        /// <summary>
+        /// A guild dissolved goes with everything that is its -- ranks, applications, chest -- and
+        /// its applicants are named; another guild's chest and shared houses are left alone, and so
+        /// are the houses' rows. An empty guild found at startup is dissolved.
+        /// </summary>
+        [Fact]
+        public void A_dissolved_guild_takes_what_is_its_and_nothing_else()
+        {
+            string file = Path.Combine(Path.GetTempPath(), $"jondo-guild-{Guid.NewGuid():N}.db");
+            GuildStore.ConnectionStringOverride = $"Data Source={file}";
+            try
+            {
+                var gone = GuildStore.Create(7301, "Partie", 165, 8, 16744448, 9476018);
+                var kept = GuildStore.Create(7302, "Restée", 165, 8, 16744448, 9476018);
+                GuildStore.Apply(7303, gone.Id, "hello");
+                using (var conexion = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={file}"))
+                {
+                    conexion.Open();
+                    var setup = conexion.CreateCommand();
+                    setup.CommandText = $@"
+                        CREATE TABLE {StorageStacks.SharedTable} (Storage TEXT, Uid INTEGER, Gid INTEGER, Quantity INTEGER, Effects TEXT);
+                        INSERT INTO {StorageStacks.SharedTable} VALUES ('guild:{gone.Id}:1', 1, 289, 3, ''), ('guild:{kept.Id}:1', 2, 289, 5, '');
+                        CREATE TABLE Houses (MapId INTEGER, AccountId INTEGER, GuildId INTEGER, GuildRights INTEGER);
+                        INSERT INTO Houses VALUES (1, 10, {gone.Id}, 7), (2, 11, {kept.Id}, 7);";
+                    setup.ExecuteNonQuery();
+                }
+
+                var departure = GuildStore.Leave(7301);
+                Assert.True(departure.Dissolved);
+                Assert.Equal(new long[] { 7303 }, departure.Applicants);
+                Assert.Null(GuildStore.ById(gone.Id));
+                Assert.Empty(GuildStore.Applications(gone.Id));
+                Assert.NotNull(GuildStore.ById(kept.Id));
+
+                using (var conexion = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={file}"))
+                {
+                    conexion.Open();
+                    long Scalar(string sql) { var c = conexion.CreateCommand(); c.CommandText = sql; return (long)c.ExecuteScalar(); }
+                    Assert.Equal(0, Scalar($"SELECT COUNT(*) FROM {StorageStacks.SharedTable} WHERE Storage = 'guild:{gone.Id}:1';"));
+                    Assert.Equal(1, Scalar($"SELECT COUNT(*) FROM {StorageStacks.SharedTable} WHERE Storage = 'guild:{kept.Id}:1';"));
+                    Assert.Equal(2, Scalar("SELECT COUNT(*) FROM Houses;"));
+                    Assert.Equal(0, Scalar($"SELECT COUNT(*) FROM Houses WHERE GuildId = {gone.Id};"));
+                    Assert.Equal(1, Scalar($"SELECT COUNT(*) FROM Houses WHERE GuildId = {kept.Id};"));
+
+                    // An empty guild left from before: dissolved at startup.
+                    var empty = conexion.CreateCommand();
+                    empty.CommandText = $"DELETE FROM GuildMembers WHERE GuildId = {kept.Id};";
+                    empty.ExecuteNonQuery();
+                }
+                Assert.Equal(1, GuildStore.DissolveEmpty());
+                Assert.Null(GuildStore.ById(kept.Id));
             }
             finally
             {
