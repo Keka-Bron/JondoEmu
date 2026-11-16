@@ -75,6 +75,7 @@ namespace Jondo.Unity.Tests.Combat
             player.UltimoEmbrujoDeSuTurno = fight.UltimoEmbrujo;   // his turn is over
 
             // Her turn starts: the row stays through it...
+            fight.LastBuffBeforeThisTurn = fight.UltimoEmbrujo;
             FightHandler.AguantaSuTurno(fight, gorgouille, player);
             Assert.Empty(player.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, gorgouille, row)));
 
@@ -101,6 +102,7 @@ namespace Jondo.Unity.Tests.Combat
             row.EmpiezaEnRonda = fight.RoundNumber;
             kralamoure.Buffs.Poner(row, fight.SiguienteEmbrujo);
 
+            fight.LastBuffBeforeThisTurn = fight.UltimoEmbrujo;   // his turn starts
             FightHandler.AguantaSuTurno(fight, kralamoure, kralamoure);
             Assert.Empty(kralamoure.Buffs.Barrer(fight.RoundNumber, r => FightHandler.LeTocaCaer(fight, kralamoure, r)));
             Assert.True(kralamoure.Buffs.TieneEstado(WaterState));

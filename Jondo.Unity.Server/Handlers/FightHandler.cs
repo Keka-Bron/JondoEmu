@@ -4464,9 +4464,12 @@ namespace Jondo.Unity.Server.Handlers
                 // the next round it lived one of his turns more, and the Gorgouille's glyph,
                 // «up to 4 AP» to whoever starts his turn on it, took 4 more: the row of the turn
                 // before was still on, its caster playing after the player (Dofus pour les
-                // noobs, «Antre du Dragon Cochon»).
+                // noobs, «Antre du Dragon Cochon»). Not a row put at this turn's own start: a
+                // delayed one coming on as his turn opens the round -- Precipitación's «-3 PA» to
+                // the ally, in the ally's next turn -- is his, of this turn.
                 if (sinceHisLastTurn && !embrujo.CountsHisTurnThisRound
                     && embrujo.Numero > fight.LastBuffBeforeThisRound
+                    && embrujo.Numero <= fight.LastBuffBeforeThisTurn
                     && embrujo.EmpiezaEnRonda == fight.RoundNumber
                     && embrujo.CaducaEnRonda > fight.RoundNumber)
                 {

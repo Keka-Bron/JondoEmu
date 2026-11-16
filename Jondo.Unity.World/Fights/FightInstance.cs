@@ -393,6 +393,12 @@ namespace Jondo.Unity.World.Fights
         public int LastBuffBeforeThisRound { get; private set; }
 
         /// <summary>
+        /// The number the last buff had got when this turn began: the later ones were put at its
+        /// start or in it, the earlier ones in the turns before.
+        /// </summary>
+        public int LastBuffBeforeThisTurn { get; set; }
+
+        /// <summary>
         /// The spell being cast at the top of the resolution now, and the last buff number
         /// before it began: what its own 406 on itself must leave alone (EffectEngine).
         /// </summary>
@@ -1524,6 +1530,7 @@ namespace Jondo.Unity.World.Fights
 
             // Whoever was playing ends his turn: the rows he puts from now on are put outside it.
             if (CurrentFighter != null) CurrentFighter.UltimoEmbrujoDeSuTurno = _ultimoEmbrujo;
+            LastBuffBeforeThisTurn = _ultimoEmbrujo;
 
             // This is where the turn really changes, so this is where the counters are emptied. Before,
             // they were emptied in ResetTurnCastCounters, which only HandleTurnReadyAck calls, which nobody
