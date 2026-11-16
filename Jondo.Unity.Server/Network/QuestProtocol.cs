@@ -231,13 +231,13 @@ namespace Jondo.Unity.Server.Network
         /// for the ones outstanding, because proto3 drops zeroes and an objective with no f4 is
         /// exactly how the captures say "done".
         ///
-        /// <b>One deliberate difference from Ankama's server.</b> Theirs sends a growing prefix of
-        /// the step's objectives — step 3183 declares four and the capture shows two, then four —
-        /// so objectives appear as they become relevant. This sends the step's whole list at once,
-        /// because which of them Ankama considers revealed is not in any data the emulator has, and
-        /// showing a player the rest of the list early is a smaller wrong than hiding an objective
-        /// they need. The order is the step's own declaration order, which the captures match
-        /// exactly.
+        /// <b>Where it differs from Ankama's server.</b> Theirs sends a growing prefix of the step's
+        /// objectives — step 3183 declares four and the capture shows two, then four — so objectives
+        /// appear as they become relevant. Which of them Ankama considers revealed is not in any data
+        /// the client has; the only thing that says it is a written binding that waits for others
+        /// (Quests.Shown holds those back). Every other objective goes out at once, because showing a
+        /// player the rest of the list early is a smaller wrong than hiding one they need. The order
+        /// is the step's own declaration order, which the captures match exactly.
         /// </remarks>
         public static byte[] BuildQuestStep(int questId, int stepId, IEnumerable<int> objectives,
                                             IReadOnlyCollection<int> done)
