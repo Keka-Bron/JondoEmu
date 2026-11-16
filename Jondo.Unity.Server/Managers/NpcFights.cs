@@ -97,6 +97,13 @@ namespace Jondo.Unity.Server.Managers
             /// </summary>
             public IReadOnlyList<Jondo.Unity.World.Fights.FightInstance.TimedWave> Waves { get; init; }
                 = Array.Empty<Jondo.Unity.World.Fights.FightInstance.TimedWave>();
+
+            /// <summary>
+            /// What the quest adds to the fight («grants», «passives», «states», «winState»): see
+            /// <see cref="Jondo.Unity.World.Fights.FightInstance.QuestRules"/>.
+            /// </summary>
+            public Jondo.Unity.World.Fights.FightInstance.QuestRules Rules { get; init; }
+                = Jondo.Unity.World.Fights.FightInstance.QuestRules.None;
         }
 
         private static List<Fight>? _fights;
@@ -159,6 +166,7 @@ namespace Jondo.Unity.Server.Managers
                                 Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
                                             ? criterion.GetString() ?? "" : "",
                                 Waves = Waves(row),
+                                Rules = RulesOf(row),
                             });
                         }
                     }
@@ -182,6 +190,33 @@ namespace Jondo.Unity.Server.Managers
                     waves.Add(new Jondo.Unity.World.Fights.FightInstance.TimedWave(Math.Max(1, (int)Long(wave, "turns")), members));
             }
             return waves;
+        }
+
+        /// <summary>
+        /// A row's quest rules: «grants» [spell...], «passives» [{ monster, spell }], «states»
+        /// [{ monster, state }] and «winState».
+        /// </summary>
+        internal static Jondo.Unity.World.Fights.FightInstance.QuestRules RulesOf(JsonElement row)
+        {
+            var grants = new List<int>();
+            if (row.TryGetProperty("grants", out var list) && list.ValueKind == JsonValueKind.Array)
+                foreach (var spell in list.EnumerateArray())
+                    if (spell.ValueKind == JsonValueKind.Number && spell.GetInt32() > 0) grants.Add(spell.GetInt32());
+            var rules = new Jondo.Unity.World.Fights.FightInstance.QuestRules(
+                grants, Pairs(row, "passives", "spell"), Pairs(row, "states", "state"), (int)Long(row, "winState"));
+            return rules.IsEmpty ? Jondo.Unity.World.Fights.FightInstance.QuestRules.None : rules;
+        }
+
+        private static List<(int, int)> Pairs(JsonElement row, string name, string what)
+        {
+            var found = new List<(int, int)>();
+            if (!row.TryGetProperty(name, out var list) || list.ValueKind != JsonValueKind.Array) return found;
+            foreach (var pair in list.EnumerateArray())
+            {
+                int monster = (int)Long(pair, "monster"), value = (int)Long(pair, what);
+                if (monster != 0 && value != 0) found.Add((monster, value));
+            }
+            return found;
         }
 
         private static List<(int, int)> Members(JsonElement row, string name)

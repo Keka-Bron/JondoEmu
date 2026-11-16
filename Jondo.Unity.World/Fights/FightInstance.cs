@@ -1049,6 +1049,44 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public List<TimedWave> TimedWaves { get; } = new List<TimedWave>();
 
+        /// <summary>
+        /// The rules a quest's fight adds to the data, none for every other fight: the spells the
+        /// player is lent, the monsters' own passives and states, and the state that wins it.
+        /// </summary>
+        /// <param name="Grants">Spells on the player's bar for the fight: the Yokai Nana of «En la
+        /// encrucijada de los mundos» (16932), «un sort temporaire».</param>
+        /// <param name="Passives">A monster's attitude, cast at the start like its own: Master
+        /// Kuatinbe's Pandasiman (17066), «lancé dès le début du combat».</param>
+        /// <param name="States">A monster's state from the start, for good: the library's yokais
+        /// are invulnerable (56).</param>
+        /// <param name="WinState">The state every enemy must hold at once for the fight to be won,
+        /// or zero: the five yokais Somnolent (1923) «durant le même tour».</param>
+        public sealed record QuestRules(IReadOnlyList<int> Grants,
+                                        IReadOnlyList<(int Monster, int Spell)> Passives,
+                                        IReadOnlyList<(int Monster, int State)> States,
+                                        int WinState)
+        {
+            /// <summary>No rules at all.</summary>
+            public static readonly QuestRules None = new(Array.Empty<int>(), Array.Empty<(int, int)>(), Array.Empty<(int, int)>(), 0);
+
+            /// <summary>Whether there is nothing to apply.</summary>
+            public bool IsEmpty => Grants.Count == 0 && Passives.Count == 0 && States.Count == 0 && WinState == 0;
+        }
+
+        /// <summary>The state every enemy must hold at once to win (<see cref="QuestRules.WinState"/>), or zero.</summary>
+        public int WinState { get; set; }
+
+        /// <summary>
+        /// Whether the enemies have lost by <see cref="WinState"/>: every living one, summons apart,
+        /// holds it at the same moment. False with no such state or nobody left.
+        /// </summary>
+        public bool EnemiesAllHoldTheWinState()
+        {
+            if (WinState == 0) return false;
+            var standing = Rojo.Where(f => f.IsAlive && !f.EsInvocado).ToList();
+            return standing.Count > 0 && standing.All(f => f.Buffs.TieneEstado(WinState));
+        }
+
         /// <summary>The wave last brought in: zero for the monsters the fight started with.</summary>
         public int WaveNumber { get; set; }
 

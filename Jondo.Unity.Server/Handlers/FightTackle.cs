@@ -97,6 +97,9 @@ namespace Jondo.Unity.Server.Handlers
             fighter.Otras[Tackle.TackleCharacteristic] = agility / AgilityPerPoint + tackleBonus;
         }
 
+        /// <summary>The trigger a fighter's spells wait on to be tackled: «T».</summary>
+        internal const string TackledTrigger = "T";
+
         /// <summary>
         /// Who holds <paramref name="mover"/> on <paramref name="cell"/>, and what leaving it
         /// takes out of the points given. Nobody and nothing when he cannot be held.
@@ -163,6 +166,9 @@ namespace Jondo.Unity.Server.Handlers
                         stretch = new List<int> { here };
                     }
                     await PayTackleAsync(fight, mover, tacklers, loss);
+                    // And what being held sets off on him (trigger T): Master Kuatinbe's
+                    // Pandasiman drops his invulnerability when he flees and is tackled (17066 -> 17067).
+                    if (stream != null) await DispararAsync(stream, fight, mover, TackledTrigger);
                     movementLeft = mover.CurrentMP;
                 }
 

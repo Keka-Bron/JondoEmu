@@ -190,6 +190,9 @@ namespace Jondo.Unity.Server.Handlers
                 fight.AddMonster(BuildMonsterFighter(member, monFighterId, monCellId));
             }
 
+            // A quest's own rules on top of the data: Kuatinbe's Pandasiman, the Yokai Nana lent.
+            ApplyRules(fight, playerFighter, TakeNextRules(GameState.CharacterId));
+
             // On a dream's last room this is the Fin du rêve: its first wave at its level.
             DreamHandler.OnFightCreated(fight);
 
@@ -11668,7 +11671,8 @@ namespace Jondo.Unity.Server.Handlers
                                                              int esperarAcuse = 0, bool alreadyAsked = false)
         {
             bool alliesAlive = fight.SigueVivo(FightInstance.Azules);
-            bool enemiesAlive = fight.SigueVivo(FightInstance.Rojos);
+            // A quest's fight may be won without a kill: the five yokais asleep at once.
+            bool enemiesAlive = fight.SigueVivo(FightInstance.Rojos) && !fight.EnemiesAllHoldTheWinState();
 
             // The Fin du rêve does not end with a wave: the next one comes in.
             if (alliesAlive && !enemiesAlive && await NextDreamWaveAsync(stream, fight)) return false;

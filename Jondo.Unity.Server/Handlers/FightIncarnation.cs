@@ -98,6 +98,39 @@ namespace Jondo.Unity.Server.Handlers
         internal static IReadOnlyList<FightInstance.TimedWave>? TakeNextWaves(long characterId)
             => _nextWaves.TryRemove(characterId, out var waves) ? waves : null;
 
+        /// <summary>The quest rules waiting for their fight, by character.</summary>
+        private static readonly ConcurrentDictionary<long, FightInstance.QuestRules> _nextRules = new();
+
+        /// <summary>Gives <paramref name="characterId"/>'s next fight a quest's rules (NpcFights).</summary>
+        internal static void RulesInNextFight(long characterId, FightInstance.QuestRules rules)
+            => _nextRules[characterId] = rules;
+
+        /// <summary>The quest rules waiting for this character's fight, taken so that they go to one fight only.</summary>
+        internal static FightInstance.QuestRules? TakeNextRules(long characterId)
+            => _nextRules.TryRemove(characterId, out var rules) ? rules : null;
+
+        /// <summary>
+        /// A quest's rules put on a fight just built: its winning state, the spells lent to the
+        /// player and, on each monster of the template named, its passive and its states.
+        /// </summary>
+        internal static void ApplyRules(FightInstance fight, Fighter player, FightInstance.QuestRules? rules)
+        {
+            if (rules == null || rules.IsEmpty) return;
+            fight.WinState = rules.WinState;
+            foreach (int spell in rules.Grants)
+            {
+                player.GrantedSpells.RemoveAll(g => g.Spell == spell);
+                player.GrantedSpells.Add((spell, 1));
+            }
+            foreach (var monster in fight.Rojo.Where(f => f.IsMonster))
+            {
+                foreach (var (template, spell) in rules.Passives)
+                    if (monster.MonsterId == template) monster.Buffs.PonerActitud(spell);
+                foreach (var (template, state) in rules.States)
+                    if (monster.MonsterId == template) monster.Buffs.PonerEstado(state);
+            }
+        }
+
         /// <summary>
         /// Makes <paramref name="player"/> fight as <paramref name="monsterId"/> at the grade
         /// <paramref name="gradeIndex"/>, its sheet brought to <paramref name="level"/> when it is

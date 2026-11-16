@@ -1315,6 +1315,8 @@ namespace Jondo.Unity.Server.Handlers
                                                       npcFight.IncarnationGrade, npcFight.IncarnationInvulnerable);
                 // And the waves that come in later: Dark Vlad's chafers.
                 if (npcFight.Waves.Count > 0) FightHandler.WavesInNextFight(GameState.CharacterId, npcFight.Waves);
+                // And what the quest adds to it: the Yokai Nana lent, Kuatinbe's Pandasiman.
+                if (!npcFight.Rules.IsEmpty) FightHandler.RulesInNextFight(GameState.CharacterId, npcFight.Rules);
                 await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
                     arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),
                     alliesMustLive: npcFight.AlliesMustLive,
@@ -1324,6 +1326,7 @@ namespace Jondo.Unity.Server.Handlers
                 // Taken by the fight when it was built; one that did not start leaves none for the next.
                 FightHandler.TakeNextIncarnation(GameState.CharacterId);
                 FightHandler.TakeNextWaves(GameState.CharacterId);
+                FightHandler.TakeNextRules(GameState.CharacterId);
                 return;
             }
 
