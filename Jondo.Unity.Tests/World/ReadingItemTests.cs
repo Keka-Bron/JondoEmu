@@ -30,6 +30,18 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// Effect 34 starts the quest in its value (22 items: the vibrating feather of 555, the gum
+        /// of 600...); an item without it starts none.
+        /// </summary>
+        [Fact]
+        public void An_item_starts_the_quest_in_its_effect_34()
+        {
+            Assert.Equal(555, ItemUseHandler.QuestStartedBy(new[] { new DatabaseManager.ItemEffectData { EffectId = 34, Value = 555 } }.ToList()));
+            Assert.Equal(0, ItemUseHandler.QuestStartedBy(new[] { Effect(620, 217), Effect(30, 1) }.ToList()));
+            Assert.Equal(0, ItemUseHandler.QuestStartedBy(new[] { new DatabaseManager.ItemEffectData { EffectId = 34 } }.ToList()));
+        }
+
+        /// <summary>
         /// The Escudo de Feca opened and closed as the capture does: kkt { f2: 217 }, and to the close
         /// button's kla an empty kld; a second kla is no longer the document's.
         /// </summary>

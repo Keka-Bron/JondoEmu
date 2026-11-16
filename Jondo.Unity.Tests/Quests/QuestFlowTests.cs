@@ -120,5 +120,20 @@ namespace Jondo.Unity.Tests.Quests
 
             Assert.Equal((8259, 1), binding!.Requires[0]);
         }
+
+        [Fact]
+        public void A_row_can_ask_for_an_item_worn()
+        {
+            // The South totem's bush only answers the Pala del Clan Terra held as the weapon:
+            // carrying it is not enough, so the row names it under "worn" as well.
+            var binding = Read(@"{ ""bindings"": [
+                { ""objective"": 10000, ""quest"": 1656,
+                  ""requires"": [ { ""item"": 17066 } ],
+                  ""worn"": [ { ""item"": 16953 } ],
+                  ""elements"": [ { ""map"": 72618500, ""element"": 2 } ] } ] }").Of(10000);
+
+            Assert.Equal((16953, 1), Assert.Single(binding!.Worn));
+            Assert.Equal((17066, 1), Assert.Single(binding.Requires));
+        }
     }
 }

@@ -720,6 +720,15 @@ namespace Jondo.Unity.Server.Managers
                                 InfoMessages.Warning, InfoMessages.MissingItem)));
                     return false;
                 }
+                foreach (var (item, count) in binding.Worn)
+                {
+                    if (Equipment.HowManyWorn(item) >= count) continue;
+                    Console.WriteLine($"[Quests] Objective {binding.ObjectiveId} asks for {item} worn and it is not.");
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                            InfoMessages.Warning, InfoMessages.MissingItem)));
+                    return false;
+                }
                 return true;
             }
 

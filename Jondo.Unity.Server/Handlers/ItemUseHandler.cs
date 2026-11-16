@@ -108,6 +108,11 @@ namespace Jondo.Unity.Server.Handlers
             // A compass: a flag on the world map where its map reference is, and the compass stays.
             if (await CompassItemHandler.TryUseAsync(stream, item)) return;
 
+            // An item that starts a quest (effect 34, the quest in its value): the vibrating feather
+            // of «Un gros cube, un p'ti cube» (555) is double-clicked to take the quest, and stays in
+            // the bag until it is handed over.
+            if (await TryStartQuestAsync(stream, item)) return;
+
             // A quest item whose use is an objective (effect 30): the signalling fairy of «Aquí
             // huele a gas» makes its noise in the mine (13995) and is gone.
             var itemEffects = DatabaseManager.GetItemEffectsData(
@@ -322,6 +327,38 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, ItemCriteria.RefusalOf(criterion))));
             Console.WriteLine($"[Items] {SessionContext.State.CharacterName} cannot use item {item.Template}: «{criterion}».");
             return false;
+        }
+
+        /// <summary>The client's «start a quest» effect: its value is the quest.</summary>
+        internal const int StartQuestEffect = 34;
+
+        /// <summary>The quest an item starts, or zero when it starts none.</summary>
+        internal static int QuestStartedBy(IReadOnlyList<DatabaseManager.ItemEffectData> effects)
+            => effects.FirstOrDefault(e => e.EffectId == StartQuestEffect && e.Value > 0)?.Value ?? 0;
+
+        /// <summary>
+        /// An item that starts a quest, used: the quest starts under the same conditions as from an
+        /// NPC, and the item stays (the feather of 555 and the gum of 600 are handed over later).
+        /// One already in hand gets info 626, as the document's button does. False when the item
+        /// starts no quest.
+        /// </summary>
+        private static async Task<bool> TryStartQuestAsync(NetworkStream stream, Equipment.Item item)
+        {
+            int questId = QuestStartedBy(DatabaseManager.GetItemEffectsData(
+                DatabaseManager.GetItemTemplatePossibleEffects(item.Template)));
+            if (questId == 0) return false;
+            if (!await CriterionHoldsAsync(stream, item)) return true;
+
+            if (Quests.Log?.Active(questId) == true)
+            {
+                await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, QuestHandler.AlreadyStarted)));
+                return true;
+            }
+
+            if (!await Quests.StartAsync(stream, questId))
+                Console.WriteLine($"[Items] {SessionContext.State.CharacterName} cannot start quest {questId} with item {item.Template}.");
+            return true;
         }
 
         /// <summary>

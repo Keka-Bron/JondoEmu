@@ -196,6 +196,14 @@ namespace Jondo.Unity.World.Quests
         public IReadOnlyList<(int Item, int Count)> Requires { get; init; }
             = Array.Empty<(int, int)>();
 
+        /// <summary>What has to be worn, not just carried, for the element to respond.</summary>
+        /// <remarks>
+        /// «Esto parece el Sur»: the South totem only comes out of its bush to the Pala del Clan Terra
+        /// held as the weapon. A worn item is carried too, so a row may name it in both lists.
+        /// </remarks>
+        public IReadOnlyList<(int Item, int Count)> Worn { get; init; }
+            = Array.Empty<(int, int)>();
+
         /// <summary>Whether what is required is spent on using it. By default not: carrying it is enough.</summary>
         public bool SpendsRequired { get; init; }
 
@@ -576,6 +584,16 @@ namespace Jondo.Unity.World.Quests
                 }
             }
 
+            var worn = new List<(int, int)>();
+            if (row.TryGetProperty("worn", out var wornRows) && wornRows.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var one in wornRows.EnumerateArray())
+                {
+                    int item = Int(one, "item");
+                    if (item != 0) worn.Add((item, Math.Max(1, Int(one, "count"))));
+                }
+            }
+
             int spawnMonster = 0, spawnCount = 0, spawnWith = 0;
             var spawnWithAll = new List<int>();
             bool spawnAttacks = false;
@@ -623,6 +641,7 @@ namespace Jondo.Unity.World.Quests
                 ElementSays = elementSays,
                 Gives = gives,
                 Requires = requires,
+                Worn = worn,
                 SpendsRequired = row.TryGetProperty("spends", out var spends)
                                  && spends.ValueKind == JsonValueKind.True,
                 SpawnsMonster = spawnMonster,
