@@ -82,7 +82,7 @@ its spells must pass.
 
 ## 🚀 Quick Start
 
-**⬇️ Download `JondoEmu-Setup-win-x64.exe` from the [latest release](../../releases/latest) and run it.** That one window installs and configures everything: nothing has to be compiled, unpacked or copied by hand. On Linux the same file is `JondoEmu-Setup-linux-x64`.
+**⬇️ [Download `JondoEmu-Setup-win-x64.exe`](../../releases/latest/download/JondoEmu-Setup-win-x64.exe)** (always the latest release) **and run it.** That one window installs and configures everything: nothing has to be compiled, unpacked or copied by hand. On Linux the same file is `JondoEmu-Setup-linux-x64`.
 
 Before it starts, the installer asks three things, each with a default:
 
@@ -191,8 +191,9 @@ Player and administrator actions are logged in `logs/activity.jsonl`. Credential
 ✅ done · 🟡 partial · 🚧 in progress · ❌ missing
 
 ### 🖥️ Launcher
-<img width="2560" height="1512" alt="image" src="https://github.com/user-attachments/assets/68e0e721-b36c-4524-b5d6-660fd5beb3c0" />
-<img width="2560" height="1504" alt="image" src="https://github.com/user-attachments/assets/86f835e0-f161-4f51-af42-a810a192f150" />
+<img width="1280" height="720" alt="The installer: folder, client and server" src="docs/images/launcher-installer.png" />
+<img width="1280" height="720" alt="Installing, step by step" src="docs/images/launcher-progress.png" />
+<img width="1280" height="720" alt="The team of accounts, ready to play" src="docs/images/launcher-team.png" />
 
 Built with **Avalonia**, the same toolkit as the Studio.
 

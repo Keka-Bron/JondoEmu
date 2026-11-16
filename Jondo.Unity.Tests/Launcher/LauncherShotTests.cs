@@ -130,6 +130,32 @@ namespace Jondo.Unity.Tests.Launcher
             Guardar(ventana, $"pt-{pantalla}.png");
         }
 
+        /// <summary>The README's pictures: the installer, its progress, the team and the settings, in English.</summary>
+        [AvaloniaTheory]
+        [InlineData("instalador")]
+        [InlineData("progreso")]
+        [InlineData("jugar")]
+        [InlineData("ajustes")]
+        public void Una_foto_en_ingles(string pantalla)
+        {
+            // English numbers too («76.5 %»), whatever the machine's own culture.
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+            var ventana = new MainWindow { Width = 1280, Height = 720 };
+            ventana.Show();
+            ventana.HablarDeMentira(Language.En);
+            switch (pantalla)
+            {
+                case "instalador": ventana.MostrarInstaladorDeMentira(true); break;
+                case "progreso": ventana.MostrarProgresoDeMentira(8, 0.42); break;
+                case "jugar":
+                    ventana.MeterCuentasDeMentira(3);
+                    ventana.MostrarSeccionDeMentira("jugar");
+                    break;
+                default: ventana.MostrarSeccionDeMentira(pantalla, instalado: true); break;
+            }
+            Guardar(ventana, $"en-{pantalla}.png");
+        }
+
         [AvaloniaTheory]
         [InlineData("progreso", 8, 0.42, false, false)]
         [InlineData("progreso-inicio", 2, 0.65, false, false)]
