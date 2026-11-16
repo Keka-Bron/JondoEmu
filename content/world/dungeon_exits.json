@@ -293,6 +293,51 @@
         2864
       ],
       "why": "The Dragon Pig's Den: after the Dragon Pig the winners are in its throne room, the den's exit (72363008, «Sala del trono del Dragocerdo», objective 9948), where «Dragones y chapuzonas» has them find the toothed key («Dans la salle de sortie, pensez à récupérer la Clef Dentée à gauche du Trône puis sortez», Dofus pour les noobs («Plongeon et dragon»)); the porco who keeps the den's doors (784) takes them out: «Me he fijado como luchabas...» (3231), «Salir.» (2864). INFERRED landing."
+    },
+    {
+      "dungeon": 36,
+      "bossRoom": 66589184,
+      "room": 66590208,
+      "cell": 297,
+      "npc": 795,
+      "replies": [8720],
+      "why": "The post-boss room of Nawidad's dungeon 36 (66590208): Héctor Nawidad is waiting there (the client's «Termina la mazmorra de Nawidad», objective 4566 of quest 705) and «Salir» (8720) takes the winners out. INFERRED landing cell; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+    },
+    {
+      "dungeon": 37,
+      "bossRoom": 66850816,
+      "room": 66851840,
+      "cell": 297,
+      "npc": 795,
+      "replies": [8721],
+      "why": "The post-boss room of Nawidad's dungeon 37 (66851840): Héctor Nawidad is waiting there (the client's «Termina la mazmorra de Nawidad», objective 4568 of quest 706) and «Salir» (8721) takes the winners out. INFERRED landing cell; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+    },
+    {
+      "dungeon": 38,
+      "bossRoom": 66326528,
+      "room": 66327552,
+      "cell": 297,
+      "npc": 795,
+      "replies": [8722],
+      "why": "The post-boss room of Nawidad's dungeon 38 (66327552): Héctor Nawidad is waiting there (the client's «Termina la mazmorra de Nawidad», objective 4570 of quest 707) and «Salir» (8722) takes the winners out. INFERRED landing cell; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+    },
+    {
+      "dungeon": 59,
+      "bossRoom": 62919680,
+      "room": 62920704,
+      "cell": 297,
+      "npc": 1391,
+      "replies": [8451],
+      "why": "The post-boss room of the Cil's Den (dungeon 59): quest 624 «Canozzirujana» (Dofus pour les noobs, the Frigost dungeon quests) has an objective, 4257, that names this map (62920704) after the boss 2968; the client's line 8428 is the guardian's thanks and «Salir» (8451) takes the winners out. INFERRED landing cell."
+    },
+    {
+      "dungeon": 61,
+      "bossRoom": 62135816,
+      "room": 62136840,
+      "cell": 297,
+      "npc": 1394,
+      "replies": [8479],
+      "why": "The post-boss room of the Golosotes' Antechamber (dungeon 61): quest 626 «Allá arriba, en el pico helado...» (Dofus pour les noobs, the Frigost dungeon quests) has an objective, 4285, that names this map (62136840) after the boss 2864; the client line 8460 is the guardian thanks and «Salir de la Antecámara de los Golosotes» (8479) takes the winners out. INFERRED landing cell."
     }
   ]
 }

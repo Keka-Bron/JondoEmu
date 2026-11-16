@@ -693,6 +693,78 @@
       "toMap": 154272259,
       "toCell": 175,
       "why": "The way down from the top of the Rock of the Sacrificed (element 489664, the stairs) to Girle's landing (154272259), as the world graph 2.73 has it, landing under the path: the graph lands on the element's own cell, which is not walkable."
+    },
+    {
+      "map": 207619076,
+      "element": 518637,
+      "cell": 216,
+      "gfx": 36613,
+      "type": -1,
+      "skill": 184,
+      "toMap": 207618048,
+      "toCell": 427,
+      "criterion": "Qa=2150&Qo<16368",
+      "why": "Pantruku's remedy, the jar on his counter in the Pandazaap tavern [20,-29] (element 518637, gfx 36613, beside Pantruku on 217; the map data gives it no skill, so the passage's own 184 «Utilizar»). While «En la encrucijada de los mundos» (2150) has Pandawelo still to be heard (16368), drinking from it wakes one in the Ether, the crossing of the worlds (207618048), on 427 in front of Pandawelo and the two flames. Dofus pour les noobs («À la croisée des mondes»): «Cliquez sur le bocal posé sur le comptoir du tavernier. Vous êtes téléporté dans l'Ether». INFERRED: which counter element is the jar."
+    },
+    {
+      "map": 207618048,
+      "element": 557001,
+      "npc": 5570,
+      "cell": 330,
+      "gfx": 0,
+      "type": -1,
+      "skill": 0,
+      "toMap": 207619076,
+      "toCell": 273,
+      "why": "Pandawelo's «Notar que la voz de Pandawelo se aleja.» (53339) in the vision: back in the Pandazaap tavern (207619076), on 273, the walkable cell in front of Pantruku's counter. Dofus pour les noobs («À la croisée des mondes»): «Vous êtes de retour dans la taverne»."
+    },
+    {
+      "map": 207624192,
+      "element": 557002,
+      "npc": 5570,
+      "cell": 257,
+      "gfx": 0,
+      "type": -1,
+      "skill": 0,
+      "toMap": 207618048,
+      "toCell": 427,
+      "why": "Pandawelo's «Beber una jarra de Pandasahi.» (53352) or «… de Pandaporo.» (53353) in the Pandassembly hall: into the Ether (207618048) on 427, where he waits again with the dragons Imagiro and Orukam. Dofus pour les noobs («À la croisée des mondes»): «Vous êtes téléporté dans l'Éther à la croisée des mondes où vous retrouvez Le Grandapan et deux dragons»."
+    },
+    {
+      "map": 207618048,
+      "element": 557003,
+      "npc": 5570,
+      "cell": 330,
+      "gfx": 0,
+      "type": -1,
+      "skill": 0,
+      "toMap": 207624192,
+      "toCell": 175,
+      "why": "Pandawelo's «Volver al Mundo de los Doce.» (53346) in the Ether: back to the Pandassembly hall (207624192), on 175 beside its door (518658, cell 161, not walkable)."
+    },
+    {
+      "map": 207618048,
+      "element": 559801,
+      "npc": 5598,
+      "cell": 359,
+      "gfx": 0,
+      "type": -1,
+      "skill": 0,
+      "toMap": 207624192,
+      "toCell": 175,
+      "why": "Orukam's «Disponerte a plantearle una última pregunta.» (53467): the dragon throws the character out of the Ether, back to the Pandassembly hall (207624192) on 175 beside its door, whence the audience room and the Daimia. Dofus pour les noobs («À la croisée des mondes»): «La conversation se finie brutalement, le dragon vous expulse. Retournez dans la salle de droite et parlez à Daimya Hikomi»."
+    },
+    {
+      "map": 207623168,
+      "element": 558402,
+      "npc": 5584,
+      "cell": 296,
+      "gfx": 0,
+      "type": -1,
+      "skill": 0,
+      "toMap": 207624194,
+      "toCell": 388,
+      "why": "Samurai Hagiyo (Samouraï Holi) in the Pandarin's office: «Saludar al samurái y entrar en la sala.» (52743) or «Entrar en la sala de audiencia.» (52740) into the audience room (207624194), on 388 beside its right mat (402, the floor passage back to this office in the 2.73 graph). The office has no door of its own into the audience room."
     }
   ]
 }

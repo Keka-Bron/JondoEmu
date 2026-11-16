@@ -703,6 +703,12 @@
       "element": 482832,
       "document": 364,
       "why": "The official document in front of the alliances temple [14,36]: Makia Vhelika's edict «en nombre del rey Allister» on the Treaty of the Six (document 364, the only one of the client's documents about it). Reading it is «¡Huele a podrido en el reino de Amakna!»'s 7906 (objectives.json)."
+    },
+    {
+      "map": 204998658,
+      "element": 519724,
+      "document": 637,
+      "why": "The bounty poster at the centre of Akwadala [21,-21] (element 519724, graphic 44450, cell 271): document 637, the 100 kamas per kuapa contract whose link «Responder a la llamada e ir a combatir kuapas.» (text 866600) is the client's own event:startquest,2171. Dofus pour les noobs («Cent kamas pour un Kwapa»): read the poster in the middle of the map and click the link."
     }
   ]
 }

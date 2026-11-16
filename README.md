@@ -704,26 +704,31 @@ played through.
 
 | Area | Played | Quests |
 |---|:---|:---:|
+| Frigost Island | `███░░░░░░░` **26%** | 59/228 |
 | Astrub | `██████████` **100%** | 51/51 |
 | Class Temple | `██████████` **100%** | 39/39 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
+| World Quests | `██░░░░░░░░` **17%** | 25/145 |
 | Incarnam | `██████████` **100%** | 24/24 |
-| World Quests | `██░░░░░░░░` **17%** | 24/145 |
 | Wabbit Islands | `██████████` **100%** | 23/23 |
 | Vigilantes | `██████████` **100%** | 21/21 |
+| Cania | `███████░░░` **73%** | 19/26 |
 | Krosmoz | `██████████` **100%** | 18/18 |
-| Cania | `███████░░░` **69%** | 18/26 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Moon Island | `██████████` **100%** | 10/10 |
+| Sufokia | `██░░░░░░░░` **18%** | 10/57 |
+| Pandala Island | `██░░░░░░░░` **16%** | 9/55 |
+| Kwismas | `█░░░░░░░░░` **11%** | 9/79 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
+| Bonta Alignment | `█░░░░░░░░░` **5%** | 6/115 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| Pandala Island | `░░░░░░░░░░` **2%** | 1/55 |
 | Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
-| **All quests** | **17.1%** | **338/1976** |
+| Archipelago of Vulkania | `░░░░░░░░░░` **2%** | 1/60 |
+| **All quests** | **21.9%** | **433/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

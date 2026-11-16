@@ -4981,6 +4981,480 @@
         "orientation": 3,
         "criterion": "(Qa=1654&Qo>9978)|Qf=1654",
         "why": "Girle Pylot at the foot of the Rock of the Sacrificed, by her transporter, to take the character back to the imps' village. INFERRED cell, on the rock's one patch of ground."
-      }
+      },
+    {
+      "map": 56623104,
+      "npc": 1236,
+      "cell": 331,
+      "orientation": 3,
+      "criterion": "Qa=612",
+      "why": "Captain Ardier aboard the Sanguinario, first stop of the crossing (612, 3697). INFERRED cell beside the arrival cell 317."
+    },
+    {
+      "map": 56624128,
+      "npc": 1236,
+      "cell": 331,
+      "orientation": 3,
+      "criterion": "Qa=612",
+      "why": "Captain Ardier aboard the Sanguinario, second stop (612, 3698). INFERRED cell."
+    },
+    {
+      "map": 56625152,
+      "npc": 1236,
+      "cell": 331,
+      "orientation": 3,
+      "criterion": "Qa=612",
+      "why": "Captain Ardier aboard the Sanguinario, third stop (612, 3699). INFERRED cell."
+    },
+    {
+      "map": 54175012,
+      "npc": 1236,
+      "cell": 258,
+      "orientation": 3,
+      "criterion": "Qa=612|Qf=612",
+      "why": "Captain Ardier at Frigost's port [-81,-37], where the crossing ends (612, 3700); Dofus pour les noobs «La terre banquise»: «en [-34,-16] ou en [-81,-37]». INFERRED cell."
+    },
+    {
+      "map": 55836672,
+      "npc": 1275,
+      "cell": 412,
+      "orientation": 3,
+      "why": "Carrie Elawaca (Kyrie Lawache) at the entrance of the Mansot dungeon [-64,-55] (Dofus pour les noobs «Un gros cube, un p'ti cube»: «se trouve à l'entrée du donjon Mansot en [-64,-55]»). INFERRED cell, open floor off the lake crane's landing."
+    },
+    {
+      "map": 217057280,
+      "npc": 2976,
+      "cell": 345,
+      "orientation": 3,
+      "why": "Rio of the Terra Cógita clan, at a table of the Feubuk tavern [-35,-56]; Dofus pour les noobs («On dirait le Sud»)."
+    },
+    {
+      "map": 217055236,
+      "npc": 2976,
+      "cell": 409,
+      "orientation": 1,
+      "why": "Rio at the anvil by the forge of the smiths' workshop of Bonta [-30,-56] (21649); Dofus pour les noobs («On dirait le Sud»): «Allez dans l'atelier des forgerons en [-30,-56]»."
+    },
+    {
+      "map": 217055236,
+      "npc": 2977,
+      "cell": 427,
+      "orientation": 1,
+      "criterion": "Qo>9992&Qo<9993",
+      "why": "Pulguita in the smiths' workshop once Rio has handed over the shovel; Dofus pour les noobs («On dirait le Sud»): «une pupuce semble vous faire signe, suivez la!»."
+    },
+    {
+      "map": 212600325,
+      "npc": 2977,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qo>9993&Qo<9995",
+      "why": "Pulguita waiting at [-32,-55] (9994); Dofus pour les noobs («On dirait le Sud»)."
+    },
+    {
+      "map": 212730370,
+      "npc": 2977,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qo>9994&Qo<9996",
+      "why": "Pulguita waiting at [-35,-57] (9995); Dofus pour les noobs («On dirait le Sud»)."
+    },
+    {
+      "map": 212732163,
+      "npc": 2978,
+      "cell": 344,
+      "orientation": 1,
+      "why": "Joris Jurgen by the entrance of the palace of Bonta [-36,-60]; Dofus pour les noobs («On dirait le Sud»): «la Pupuce vous conduit finalement jusqu'à l'entrée du Palais de Bonta en [-36,-60] ou vous trouverez Joris Jurgen»."
+    },
+    {
+      "map": 72619524,
+      "npc": 2979,
+      "cell": 143,
+      "orientation": 1,
+      "why": "Pytch's disciple praying by the altar of the south [1,34]; Dofus pour les noobs («On dirait le Sud»): «Parlez à la Disciple de Pytch qui est en train de prier»."
+    },
+    {
+      "map": 170133512,
+      "npc": 3246,
+      "cell": 372,
+      "orientation": 3,
+      "why": "Queen Victoria in the throne room of Sufokia's palace [23,24] (map 170133512), the giver of quest 1760 (quests_3.6.10.10.json) beside King Talas (cell 370). INFERRED cell, the next walkable one right of the king."
+    },
+    {
+      "map": 58465798,
+      "npc": 1243,
+      "cell": 369,
+      "orientation": 3,
+      "why": "Capitán Imoso (Capitaine Gneux) in the lighthouse of the Frigost fields [-85,-36] (Dofus pour les noobs «Los monólogos de la vacuna»: «le Capitaine Gneux au phare en [-85,-36]»); the letter of «Cuarto envío» (661) goes to him. INFERRED cell."
+    },
+    {
+      "map": 54789135,
+      "npc": 1263,
+      "cell": 331,
+      "orientation": 3,
+      "why": "Quentin Flush in Lisa Kaya's tavern [-81,-41] (Dofus pour les noobs «Quinto envío»: «Quentin Flush que vous pourrez trouver dans la taverne de Lisa Kaya en [-81,-41]»). INFERRED cell."
+    },
+    {
+      "map": 54171467,
+      "npc": 1371,
+      "cell": 229,
+      "orientation": 3,
+      "why": "Nukoben Colombo (Aimé Ryckeno) in the Buried Village [-75,-75], where «Duodécimo envío» (669) delivers («au village enseveli en [-75,-75]»). INFERRED cell."
+    },
+    {
+      "map": 54172488,
+      "npc": 1377,
+      "cell": 120,
+      "orientation": 3,
+      "why": "Marta Angaha (Surlah Taite) in the Buried Village [-77,-72], where «Decimotercer envío» (670) delivers. INFERRED cell."
+    },
+    {
+      "map": 59770888,
+      "npc": 1383,
+      "cell": 342,
+      "orientation": 3,
+      "why": "Salah Connol in the tavern El Último Refugio [-78,-75], where «Decimocuarto envío» (671) delivers («la taverne du Dernier Refuge en [-78,-75]»). INFERRED cell."
+    },
+    {
+      "map": 206176769,
+      "npc": 5659,
+      "cell": 345,
+      "orientation": 1,
+      "why": "Iki Karu by her lantern tree in Feudala [16,-36] (Dofus pour les noobs («Des lueurs de désespoir»)). INFERRED cell, beside the tree (element 520050)."
+    },
+    {
+      "map": 66590208,
+      "npc": 795,
+      "cell": 304,
+      "orientation": 3,
+      "why": "Héctor Nawidad in the post-boss room of dungeon 36 (Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»): the dungeon quest asks to reach this room and he takes the winners out. INFERRED cell."
+    },
+    {
+      "map": 66851840,
+      "npc": 795,
+      "cell": 303,
+      "orientation": 3,
+      "why": "Héctor Nawidad in the post-boss room of dungeon 37 (Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»): the dungeon quest asks to reach this room and he takes the winners out. INFERRED cell."
+    },
+    {
+      "map": 66327552,
+      "npc": 795,
+      "cell": 303,
+      "orientation": 3,
+      "why": "Héctor Nawidad in the post-boss room of dungeon 38 (Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»): the dungeon quest asks to reach this room and he takes the winners out. INFERRED cell."
+    },
+    {
+      "map": 209456134,
+      "npc": 5558,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "(PL>89&Qf=2149&Qo<16262)|(Qa=2164&Qo<16262)|Qf=2164",
+      "why": "Florawa in the garden of the alchemists' workshop [23,-29] (the derived cell 315 kept), gone from the garden while she is escorted (after 16262). Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205522436,
+      "npc": 5558,
+      "cell": 374,
+      "orientation": 1,
+      "criterion": "Qa=2164&Qo>16262&Qo<16266",
+      "why": "Florawa escorted to the clearing [27,-31] (16263-16266), INFERRED cell beside the sprout. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205522436,
+      "npc": 5555,
+      "cell": 370,
+      "orientation": 1,
+      "criterion": "Qo<16254",
+      "why": "Flor sedienta of the clearing [27,-31], until it has been watered (16254). INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205522436,
+      "npc": 5556,
+      "cell": 344,
+      "orientation": 1,
+      "criterion": "Qo>16254|Qf=2164",
+      "why": "Flor-espíritu of the clearing, in the derived cell 344, from the watering on (16254). Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205522436,
+      "npc": 5567,
+      "cell": 401,
+      "orientation": 1,
+      "why": "Florecilla azul of the clearing's flower beds [27,-31]. INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205522436,
+      "npc": 5568,
+      "cell": 360,
+      "orientation": 1,
+      "criterion": "Qo>16259|Qf=2164",
+      "why": "Brote aletargado of the clearing, noticed by the spirit once the little flowers have talked (after 16259). INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 207618058,
+      "npc": 5557,
+      "cell": 342,
+      "orientation": 1,
+      "why": "Sobomori in her house [24,-31], at the cauldron. INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 207618058,
+      "npc": 5572,
+      "cell": 316,
+      "orientation": 1,
+      "why": "Flor parlanchina, the house plant of Sobomori [24,-31]. INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205520900,
+      "npc": 5573,
+      "cell": 430,
+      "orientation": 1,
+      "why": "Flor tímida hidden in front of Sobomori's house [24,-31] («la flor tímida que está oculta enfrente de mi casa», 41648). INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205520897,
+      "npc": 5574,
+      "cell": 371,
+      "orientation": 1,
+      "why": "Cazador furtivo borracho at [24,-34]. INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205521415,
+      "npc": 5576,
+      "cell": 246,
+      "orientation": 1,
+      "why": "Sapodagua at [25,-28]. INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 217319426,
+      "npc": 184,
+      "cell": 301,
+      "orientation": 1,
+      "why": "Tarche, the big militiaman letting off steam in Bonta's training room (client text 923, quest 55 step 679). He stood nowhere. INFERRED cell: the centre of the room's walkable cells."
+    },
+    {
+      "map": 217058304,
+      "npc": 6404,
+      "cell": 384,
+      "orientation": 3,
+      "why": "Doña Claudia, the star waitress of Bonta's Bagrutte inn [-29,-59] (client text 47078, quest 56 step 680). She stood nowhere. INFERRED cell: a free walkable cell of the inn."
+    },
+    {
+      "map": 212601865,
+      "npc": 6403,
+      "cell": 429,
+      "orientation": 3,
+      "why": "Ned Etsith, the dental-surgery enthusiast of Bonta at [-30,-52] near the hunters' workshop (client text 47085, quest 58 step 682 map 212601865; Dofus pour les noobs («Ned le dentiste»)). He stood nowhere. INFERRED cell: open pavement in front of the butcher's shop."
+    },
+    {
+      "map": 207618048,
+      "npc": 5570,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "(Qa=2150&Qo<16368)|(Qa=2150&Qo>16512&Qo<16385)",
+      "why": "Pandawelo in the Ether, the crossing of the worlds [21,-33], during «En la encrucijada de los mundos» (2150): in the vision until heard (16368), and again after the Pandasahi or Pandaporo (16512) until Orukam has spoken (16385). Dofus pour les noobs («À la croisée des mondes»). INFERRED cell: the walkable middle of the Ether's rock, between the two flames."
+    },
+    {
+      "map": 207618048,
+      "npc": 5633,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qa=2150&Qo<16368",
+      "why": "The Llama clara (5633, «crepita con una energía creadora», 40977) beside Pandawelo in the vision of 2150 until he is heard (16368): «Le Grandapan qui semble parler à deux flammes» (Dofus pour les noobs, «À la croisée des mondes»). INFERRED cell, left of Pandawelo."
+    },
+    {
+      "map": 207618048,
+      "npc": 5634,
+      "cell": 359,
+      "orientation": 3,
+      "criterion": "Qa=2150&Qo<16368",
+      "why": "The Llama oscura (5634, «crepita con una energía destructora», 40978) beside Pandawelo in the vision of 2150 until he is heard (16368). Dofus pour les noobs («À la croisée des mondes»). INFERRED cell, right of Pandawelo."
+    },
+    {
+      "map": 207618048,
+      "npc": 5597,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qa=2150&Qo>16512&Qo<16385",
+      "why": "Imagiro, the white dragon, in the Ether after the Pandasahi or Pandaporo of 2150 (16512) until Orukam has spoken (16385): «Commencez par parler à Imagiro le dragon blanc» (Dofus pour les noobs, «À la croisée des mondes»). INFERRED cell, where the light flame stood."
+    },
+    {
+      "map": 207618048,
+      "npc": 5598,
+      "cell": 359,
+      "orientation": 3,
+      "criterion": "Qa=2150&Qo>16512&Qo<16385",
+      "why": "Orukam, the black dragon, in the Ether after the Pandasahi or Pandaporo of 2150 (16512) until he has spoken (16385): «Parlez ensuite à Orukam, le dragon noir» (Dofus pour les noobs, «À la croisée des mondes»). INFERRED cell, where the dark flame stood."
+    },
+    {
+      "map": 207624192,
+      "npc": 5570,
+      "cell": 257,
+      "orientation": 3,
+      "criterion": "Qa=2150&Qo>16383&Qo<16512",
+      "why": "Pandawelo manifested in the Pandassembly hall once the Daimia has called him (2150's 16383, her «Seguir las instrucciones de la Daimia», 53430, brings him in) until the drink (16512): «Placez-vous sur le tapis devant l'estrade pour voir Le Grandapan faire son apparition» (Dofus pour les noobs, «À la croisée des mondes»). INFERRED cell: the estrade's walkable edge behind the mat (270)."
+    },
+    {
+      "map": 207624194,
+      "npc": 5560,
+      "cell": 300,
+      "orientation": 3,
+      "why": "Daimia Hikomi in the audience room of the bamboo palace (207624194, «la salle de droite»), where 2150 has her met (16380) and gone back to (16386), and where she gives 2151-2155 and 2197. Dofus pour les noobs («À la croisée des mondes»): «Enfin parlez à la Daimya Hikomi et inclinez-vous devant elle». INFERRED cell: the walkable floor beside her cushion (314) behind the screen."
+    },
+    {
+      "map": 207623168,
+      "npc": 5584,
+      "cell": 296,
+      "orientation": 1,
+      "why": "Samurai Hagiyo (Samouraï Holi) guarding the way from the Pandarin's office (207623168) into the audience room: «Dirígete a los samuráis que están guardando la entrada de la sala de audiencias» (Pandarín Sudopong, 40935); «Parlez alors au Samouraï Holi pour lui demander de vous laisser passer» (Dofus pour les noobs, «À la croisée des mondes»). INFERRED cell: by the left wall, where the 2.73 graph's way back from the audience room lands (280, not walkable in 3.6)."
+    },
+    {
+      "map": 207623172,
+      "npc": 5647,
+      "cell": 340,
+      "orientation": 1,
+      "criterion": "Qa=2150&Qo>16372&Qo<16373&Ue=-2150001",
+      "why": "The Yokai ruidoso upstairs in the library [21,-27] (207623172), once Narber has sent the character up (his «Dirigirte hacia las risas y las voces», 53362, mark -2150001), until the yokais are quiet (16373). Dofus pour les noobs («À la croisée des mondes»): «il faudra parler à l'un des Yokai bruyant, hilare ou braillard». INFERRED cell."
+    },
+    {
+      "map": 207623172,
+      "npc": 5648,
+      "cell": 398,
+      "orientation": 1,
+      "criterion": "Qa=2150&Qo>16372&Qo<16373&Ue=-2150001",
+      "why": "The Yokai tronchado upstairs in the library (207623172), from Narber's «Dirigirte hacia las risas y las voces» (53362, mark -2150001) until the yokais are quiet (16373). Dofus pour les noobs («À la croisée des mondes»). INFERRED cell."
+    },
+    {
+      "map": 207623172,
+      "npc": 5649,
+      "cell": 402,
+      "orientation": 3,
+      "criterion": "Qa=2150&Qo>16372&Qo<16373&Ue=-2150001",
+      "why": "The Yokai escandaloso upstairs in the library (207623172), from Narber's «Dirigirte hacia las risas y las voces» (53362, mark -2150001) until the yokais are quiet (16373). Dofus pour les noobs («À la croisée des mondes»). INFERRED cell."
+    },
+    {
+      "map": 206308354,
+      "npc": 5650,
+      "cell": 304,
+      "orientation": 3,
+      "why": "Ghao Zuo, steward of the consumables marketplace of Pandala [21,-29] (206308354, the objectives 16375 and 16376 name it): «Direction l'hôtel de vente des consommables en [21,-29] pour parler à Ghao Zuo» (Dofus pour les noobs, «À la croisée des mondes»). INFERRED cell: in front of the marketplace stall (element 519826 on 292)."
+    },
+    {
+      "map": 206308354,
+      "npc": 5652,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=2150&Qo<16375&Ue=-2150002",
+      "why": "The Yokai voraz at the marketplace (206308354) once Ghao Zuo has set out the food (53380 or 53385, mark -2150002), until it has eaten and vanished (16375): «Parlez alors au Yokai vorace qui vient s'emparer du plat» (Dofus pour les noobs, «À la croisée des mondes»). INFERRED cell, by the stalls."
+    },
+    {
+      "map": 207620098,
+      "npc": 5665,
+      "cell": 328,
+      "orientation": 1,
+      "criterion": "Qa=2150&Qo>16372&Qo<16377",
+      "why": "The Yokai influenciable in the bank's basement (207620098), «attiré par les kamas scintillants à côté de lui», from the Pandarin's tasks (16372) until the pandisidents are beaten (16377). Dofus pour les noobs («À la croisée des mondes»). INFERRED cell: beside the heap of coins."
+    },
+    {
+      "map": 217058304,
+      "npc": 194,
+      "cell": 343,
+      "orientation": 1,
+      "why": "Han Torcha, Tarche's brother and Bonta militiaman, on the map the client gives for quest 59 objective 1485 (type 6, monster 314) (client texts 47086/47087/48836; client data only (no Dofus pour les noobs page for «Entrenamiento con Torcha»)). He stood nowhere. INFERRED cell: a free cell of that map."
+    },
+    {
+      "map": 205259778,
+      "npc": 5615,
+      "cell": 311,
+      "orientation": 1,
+      "why": "Tanuha Ping at [24,-24], the Alfar's pottery, in the open at the foot of the pots (cell 176 was lost among the pagoda's tanuki decor). INFERRED cell. Dofus pour les noobs («Dites-le avec des fleurs»)."
+    },
+    {
+      "map": 205521924,
+      "npc": 5578,
+      "cell": 437,
+      "orientation": 1,
+      "criterion": "PL>89&Qf=2149&Qo<16654&PO!23353",
+      "why": "Inataba at [26,-31], the quest giver (the catalogue's giver map); gone once the escort starts (he follows: item 23353). INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 207619074,
+      "npc": 5578,
+      "cell": 400,
+      "orientation": 1,
+      "criterion": "Qa=2161&Qo>16653&Qo<16656",
+      "why": "Inataba in the alchemists' workshop [23,-29] after the escort, until he is walked to the shaman's house. INFERRED cell (inside, beside the alembics). Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 207619072,
+      "npc": 5578,
+      "cell": 357,
+      "orientation": 1,
+      "criterion": "Qa=2161&Qo>16656&Qo<16665",
+      "why": "Inataba beside his wife in the shaman's house [20,-27]. INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 205522438,
+      "npc": 5578,
+      "cell": 341,
+      "orientation": 1,
+      "criterion": "Qa=2161&Qo>16665&Qo<16669",
+      "why": "Inataba at the silver willow [27,-29] after the loggers, until he drinks the philtre. INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 205522438,
+      "npc": 5580,
+      "cell": 342,
+      "orientation": 1,
+      "criterion": "Qo>16669|Qf=2161",
+      "why": "Inataba as a willow once he has drunk the philtre (16669), beside the silver willow [27,-29]. INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 206307844,
+      "npc": 5579,
+      "cell": 342,
+      "remove": true,
+      "why": "Hides the derived layer's Yinagi, put on the objectives' outdoor map; she lies inside the shaman's house."
+    },
+    {
+      "map": 207619072,
+      "npc": 5579,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "Qa=2161&Qo>16655&Qo<16665",
+      "why": "Yinagi lying in the shaman's house [20,-27] («Direction la maison du chaman en [20,-27] pour rencontrer Yinagi», Dofus pour les noobs («Le saule du promeneur»)). INFERRED cell, by the bed."
+    },
+    {
+      "map": 205522438,
+      "npc": 5579,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=2161&Qo>16665&Qo<16666",
+      "why": "Yinagi at the silver willow [27,-29] after the loggers, until she fuses with it (16666). INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 205522438,
+      "npc": 5763,
+      "cell": 385,
+      "orientation": 1,
+      "criterion": "Qa=2161&Qo>16664&Qo<16665",
+      "why": "The threatening logger at the silver willow [27,-29] (16665). INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 205522438,
+      "npc": 5778,
+      "cell": 371,
+      "orientation": 1,
+      "criterion": "Qa=2161&Qo>16664&Qo<16665",
+      "why": "One of the loggers of the gang at the silver willow (42061, «Qué suplicio...»). INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 205522438,
+      "npc": 5779,
+      "cell": 399,
+      "orientation": 1,
+      "criterion": "Qa=2161&Qo>16664&Qo<16665",
+      "why": "One of the loggers of the gang at the silver willow (42062). INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    }
     ]
 }

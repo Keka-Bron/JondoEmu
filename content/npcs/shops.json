@@ -392,6 +392,16 @@
         }
       ],
       "why": "Renemil Belok's pieces of the tablet of Totankama, paid in archaeological treasures (32378, datos/tiendas_en_fichas.json): «Chaque Morceau de tablette de Totankama x/5 s'achète en échange de 5 x Trésor archéologique» and, for the treasures to spare, «1 x Incantation volatile de Destinos qui est un consommable qui vous transforme en Tofu» (33513; Dofus pour les noobs, «Le trésor de Totankama»). INFERRED: the incantation's price, the pieces' five."
+    },
+    {
+      "npc": 240,
+      "items": [{"gid": 1895}],
+      "why": "Nek Feubuk, the Feubuk tavern's keeper (actions 1 and 3: he sells and talks), serves its beer: Dofus pour les noobs («On dirait le Sud»): «acheter 1 x Bière du Feubuk à Nek Feubuk»."
+    },
+    {
+      "npc": 5595,
+      "items": [{"gid": 7045, "price": 40}, {"gid": 23179, "price": 40}, {"gid": 23180, "price": 40}],
+      "why": "Pantruku, keeper of the Pandazaap tavern [20,-29] (actions 1 and 3: he sells and talks), serves the Pandaburg (7045), the Pandasahi (23179) and the Pandaporo (23180), each at its template price (40). Dofus pour les noobs («À la croisée des mondes»): «La Pandaburg peut s'acheter à la taverne en [20,-29]» and «Pandazahi ou du Pandaporo (achat taverne en [20,-29])». INFERRED: the rest of his catalogue."
     }
   ]
 }

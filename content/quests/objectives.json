@@ -5581,6 +5581,734 @@
       9979
     ],
     "why": "«Lee el pergamino de Mami Ayuto» (564802): the other half (17081), read on the top of the rock. With both read the portal opens (teleports.json)."
+  },
+  {
+   "objective": 18913,
+   "quest": 2484,
+   "kind": "reply",
+   "replies": [70392],
+   "requires": [{"item": 10902, "count": 1}],
+   "spends": true,
+   "why": "«#1» (type 3, item 10902): Bob takes the Tanga del zoth Manitú (a 100% drop of the Manitou while the quest is active) at «Ya he venido al zoth Manitú» (70392), reward line 7598; Dofus pour les noobs («Le petit Manitou»)."
+  },
+  {
+   "objective": 9985,
+   "quest": 1656,
+   "kind": "enter",
+   "map": 217057280,
+   "why": "«Encuentra a Ario en Bonta» (564116): Rio drinks in the Feubuk tavern of Bonta [-35,-56]; Dofus pour les noobs («On dirait le Sud»): «Allez à la rencontre de Riome en [-35,-56] dans la taverne du Feubuk»."
+  },
+  {
+   "objective": 9996,
+   "quest": 1656,
+   "kind": "enter",
+   "map": 212732163,
+   "afterObjectives": [9995],
+   "why": "«Sigue a Pulguita todo lo que haga falta» (556162): the flea leads on to the entrance of the palace of Bonta [-36,-60], where Joris Jurgen waits; Dofus pour les noobs («On dirait le Sud»)."
+  },
+  {
+   "objective": 9994,
+   "quest": 1656,
+   "kind": "enter",
+   "map": 212600325,
+   "afterObjectives": [9993],
+   "why": "«Sigue a Pulguita» (550707): she waits at [-32,-55]; Dofus pour les noobs («On dirait le Sud»): «Allez en [-32,-55], endroit ou la pupuce continuera a vous demander de la suivre»."
+  },
+  {
+   "objective": 9995,
+   "quest": 1656,
+   "kind": "enter",
+   "map": 212730370,
+   "afterObjectives": [9994],
+   "why": "«Sigue de nuevo a Pulguita» (550703): on to [-35,-57]; Dofus pour les noobs («On dirait le Sud»): «On continue à suivre la Pupuce jusqu'en [-35,-57]»."
+  },
+  {
+   "objective": 9998,
+   "quest": 1656,
+   "kind": "enter",
+   "map": 72619524,
+   "afterObjectives": [10133],
+   "why": "«Encuentra el altar del Sur» (550706): Pytch's altar of the south at [1,34], where his disciple prays; Dofus pour les noobs («On dirait le Sud»): «Allez au Sud en [1,34]»."
+  },
+  {
+   "objective": 10000,
+   "quest": 1656,
+   "kind": "click",
+   "elements": [{"map": 72618500, "element": 490914}],
+   "requires": [{"item": 17066, "count": 1}, {"item": 16890, "count": 1}],
+   "worn": [{"item": 16953, "count": 1}],
+   "gives": [{"item": 16894, "count": 1}],
+   "afterObjectives": [9999],
+   "why": "«Desentierra el tótem del Sur» (550676): the bush at [-1,34] (element 490914, cell 99) gives up the Tótem del Sur (16894) to whoever carries Pytch's blessing (17066) and Meriana's mark (16890, «No te olvides de la marca de bruja», 21511) and holds the Pala del Clan Terra (16953) as the weapon. Dofus pour les noobs («On dirait le Sud»): «équipez la Pelle du Clan Terra à votre CàC et allez en [-1,34]. Enfin cliquez sur le buisson pour déterrer le Totem du Sud»."
+  },
+  {
+   "objective": 12011,
+   "quest": 1820,
+   "kind": "reply",
+   "replies": [31640],
+   "requires": [{"item": 18458, "count": 5}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18458 x5, npc 3663): Icar Orval takes the five intact wings at «Aquí tienes las alas» (31640), line 26374; Dofus pour les noobs («Vol au-dessus d'un coucou»)."
+  },
+  {
+   "objective": 12015,
+   "quest": 1820,
+   "kind": "reply",
+   "replies": [31640],
+   "requires": [{"item": 18457, "count": 5}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18457 x5, npc 3663): Icar Orval takes the five intact wings at «Aquí tienes las alas» (31640), line 26374; Dofus pour les noobs («Vol au-dessus d'un coucou»)."
+  },
+  {
+   "objective": 12016,
+   "quest": 1820,
+   "kind": "reply",
+   "replies": [31640],
+   "requires": [{"item": 18459, "count": 5}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18459 x5, npc 3663): Icar Orval takes the five intact wings at «Aquí tienes las alas» (31640), line 26374; Dofus pour les noobs («Vol au-dessus d'un coucou»)."
+  },
+  {
+   "objective": 12017,
+   "quest": 1820,
+   "kind": "reply",
+   "replies": [31640],
+   "requires": [{"item": 18456, "count": 5}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18456 x5, npc 3663): Icar Orval takes the five intact wings at «Aquí tienes las alas» (31640), line 26374; Dofus pour les noobs («Vol au-dessus d'un coucou»)."
+  },
+  {
+   "objective": 12023,
+   "quest": 1824,
+   "kind": "reply",
+   "replies": [31671],
+   "requires": [{"item": 379, "count": 5}],
+   "spends": true,
+   "why": "«#1» (type 3, item 379 x5, npc 3666): Joela takes them at «Aquí tienes los ingredientes» (31671); Dofus pour les noobs («Des étoiles dans l'estomac»)."
+  },
+  {
+   "objective": 12024,
+   "quest": 1824,
+   "kind": "reply",
+   "replies": [31671],
+   "requires": [{"item": 18470, "count": 10}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18470 x10, npc 3666): Joela takes them at «Aquí tienes los ingredientes» (31671); Dofus pour les noobs («Des étoiles dans l'estomac»)."
+  },
+  {
+   "objective": 12031,
+   "quest": 1821,
+   "kind": "reply",
+   "replies": [31653],
+   "requires": [{"item": 18460, "count": 1}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18460, npc 3664): Atencio takes the stolen object at «He encontrado los objetos robados» (31653); Dofus pour les noobs («Voleurs en série»)."
+  },
+  {
+   "objective": 12032,
+   "quest": 1821,
+   "kind": "reply",
+   "replies": [31653],
+   "requires": [{"item": 18466, "count": 1}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18466, npc 3664): Atencio takes the stolen object at «He encontrado los objetos robados» (31653); Dofus pour les noobs («Voleurs en série»)."
+  },
+  {
+   "objective": 12033,
+   "quest": 1821,
+   "kind": "reply",
+   "replies": [31653],
+   "requires": [{"item": 18467, "count": 1}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18467, npc 3664): Atencio takes the stolen object at «He encontrado los objetos robados» (31653); Dofus pour les noobs («Voleurs en série»)."
+  },
+  {
+   "objective": 12034,
+   "quest": 1821,
+   "kind": "reply",
+   "replies": [31653],
+   "requires": [{"item": 18468, "count": 1}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18468, npc 3664): Atencio takes the stolen object at «He encontrado los objetos robados» (31653); Dofus pour les noobs («Voleurs en série»)."
+  },
+  {
+   "objective": 12035,
+   "quest": 1821,
+   "kind": "reply",
+   "replies": [31653],
+   "requires": [{"item": 18469, "count": 1}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18469, npc 3664): Atencio takes the stolen object at «He encontrado los objetos robados» (31653); Dofus pour les noobs («Voleurs en série»)."
+  },
+  {
+   "objective": 12020,
+   "quest": 1822,
+   "kind": "reply",
+   "replies": [31647],
+   "requires": [{"item": 18477, "count": 10}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18477 x10, npc 3668): the cat takes the jam at «Darle la mermelada» (31647); Dofus pour les noobs («Moins on en a et plus on l'étale»)."
+  },
+  {
+   "objective": 12038,
+   "quest": 1822,
+   "kind": "reply",
+   "replies": [31647],
+   "requires": [{"item": 18475, "count": 10}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18475 x10, npc 3668): the cat takes the jam at «Darle la mermelada» (31647); Dofus pour les noobs («Moins on en a et plus on l'étale»)."
+  },
+  {
+   "objective": 12037,
+   "quest": 1822,
+   "kind": "reply",
+   "replies": [31647],
+   "requires": [{"item": 18474, "count": 10}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18474 x10, npc 3668): the cat takes the jam at «Darle la mermelada» (31647); Dofus pour les noobs («Moins on en a et plus on l'étale»)."
+  },
+  {
+   "objective": 11205,
+   "quest": 1753,
+   "kind": "reply",
+   "replies": [29173],
+   "requires": [{"item": 18074, "count": 40}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18074 x40, npc 3300): Althar takes the forty trithon haunches at «Toma: las ancas de trithón» (29173); Dofus pour les noobs («Droit de cuissage»)."
+  },
+  {
+   "objective": 11206,
+   "quest": 1754,
+   "kind": "reply",
+   "replies": [29178],
+   "requires": [{"item": 18075, "count": 40}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18075 x40, npc 3301): Dan Wich takes the forty undecipherable pages at «Aquí tienes las páginas indescifrables» (29178), line 24286."
+  },
+  {
+   "objective": 11208,
+   "quest": 1755,
+   "kind": "reply",
+   "replies": [29183],
+   "requires": [{"item": 18076, "count": 40}],
+   "spends": true,
+   "why": "«#1» (type 3, item 18076 x40, npc 3252): Marina takes the forty aquatic meats at «Aquí tienes las carnes acuáticas» (29183); Dofus pour les noobs («Nos chairs voisines»)."
+  },
+  {
+   "objective": 7957,
+   "quest": 1440,
+   "kind": "beat",
+   "monster": 3539,
+   "map": 117707777,
+   "why": "«#1» (type 6, monster 3539 x1): the fight started with the guard's own reply (19508), alone (Dofus pour les noobs (Bosko Tho / Bazano))."
+  },
+  {
+   "objective": 7958,
+   "quest": 1441,
+   "kind": "beat",
+   "monster": 3541,
+   "map": 117705226,
+   "why": "«#1» (type 6, monster 3541 x1): the fight started with the guard's own reply (19511), alone (Dofus pour les noobs (Kralab Rah / Brad Zoduro))."
+  },
+  {
+   "objective": 4757,
+   "quest": 720,
+   "kind": "reply",
+   "replies": [9414],
+   "requires": [{"item": 12456, "count": 20}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12456 x20, npc 1461): Conso Lería takes the 20 laskas of cascasaurio at «Darle las laskas de cascasaurios» (9414), the monster's own drop under Qa=720&PO<12456,20 in its crater («Explota Vulkaniano»); client text 9229."
+  },
+  {
+   "objective": 4758,
+   "quest": 721,
+   "kind": "reply",
+   "replies": [9419],
+   "requires": [{"item": 12457, "count": 20}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12457 x20, npc 1461): Conso Lería takes the 20 laskas of cascasaurio at «Darle las laskas de cascasaurios» (9419), the monster's own drop under Qa=721&PO<12457,20 in its crater («Explota Vulkaniano»); client text 9229."
+  },
+  {
+   "objective": 4759,
+   "quest": 722,
+   "kind": "reply",
+   "replies": [9445],
+   "requires": [{"item": 12458, "count": 20}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12458 x20, npc 1461): Conso Lería takes the 20 laskas of cascasaurio at «Darle las laskas de cascasaurios» (9445), the monster's own drop under Qa=722&PO<12458,20 in its crater («Explota Vulkaniano»); client text 9229."
+  },
+  {
+   "objective": 4760,
+   "quest": 723,
+   "kind": "reply",
+   "replies": [9450],
+   "requires": [{"item": 12459, "count": 20}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12459 x20, npc 1461): Conso Lería takes the 20 laskas of cascasaurio at «Darle las laskas de cascasaurios» (9450), the monster's own drop under Qa=723&PO<12459,20 in its crater («Explota Vulkaniano»); client text 9229."
+  },
+  {
+   "objective": 4805,
+   "quest": 759,
+   "kind": "reply",
+   "replies": [9513],
+   "requires": [{"item": 12580, "count": 1}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12580, npc 1456): the barmaid takes the voucher at «Darle el vale para el casktel gratis.» (9513); Dofus pour les noobs «Coquetel gratuit». The reward (the Coquetel enséfal) is the step's."
+  },
+  {
+   "objective": 5345,
+   "quest": 871,
+   "kind": "reply",
+   "replies": [11527],
+   "requires": [{"item": 12931, "count": 1}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12931, npc 1531): the glutin takes the cañóngüino's box at 11527; «Comme les Was Mages ont galéré»."
+  },
+  {
+   "objective": 5346,
+   "quest": 871,
+   "kind": "reply",
+   "replies": [11528],
+   "afterObjectives": [5345],
+   "starts": 879,
+   "requires": [{"item": 12932, "count": 10}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12932 x10, npc 1531): the ten spare parts (dropped by the glutins of the character's level band under Qa=871&Qo>5345) at 11528; 879 follows with 10498; «Comme les Was Mages ont galéré»."
+  },
+  {
+   "objective": 16515,
+   "quest": 2174,
+   "kind": "beat",
+   "monster": 6241,
+   "map": 206045188,
+   "why": "«Deshazte de los parásitos» (16515): the parasites of the lantern tree of [17,-33] beaten alone (npc_fights.json); Dofus pour les noobs («Des lueurs de désespoir»)."
+  },
+  {
+   "objective": 16516,
+   "quest": 2174,
+   "kind": "beat",
+   "monster": 6241,
+   "map": 206045186,
+   "why": "«Deshazte de los parásitos» (16516): the parasites of the lantern tree of [17,-35] beaten alone (npc_fights.json); Dofus pour les noobs («Des lueurs de désespoir»)."
+  },
+  {
+   "objective": 16517,
+   "quest": 2174,
+   "kind": "beat",
+   "monster": 6241,
+   "map": 206176769,
+   "why": "«Deshazte de los parásitos» (16517): the parasites of the lantern tree of [16,-36] beaten alone (npc_fights.json); Dofus pour les noobs («Des lueurs de désespoir»)."
+  },
+  {
+   "objective": 16520,
+   "quest": 2174,
+   "kind": "click",
+   "elements": [{"map": 206045702, "element": 518402}, {"map": 206045702, "element": 518486}],
+   "afterObjectives": [16519],
+   "why": "«Enciende los palitos de incienso con las llamas del altar sagrado»: the candle on the altar of [18,-31] (the map's two decor elements, 518402 and 518486); Dofus pour les noobs («Des lueurs de désespoir»)."
+  },
+  {
+   "objective": 16521,
+   "quest": 2174,
+   "kind": "click",
+   "elements": [{"map": 206176775, "element": 520059}],
+   "afterObjectives": [16520],
+   "anyOrder": true,
+   "why": "«Enciende un palito de incienso a los pies del árbol linterna» (16521): the lantern tree of [16,-30] ([520059]); Dofus pour les noobs («Des lueurs de désespoir»)."
+  },
+  {
+   "objective": 16522,
+   "quest": 2174,
+   "kind": "click",
+   "elements": [{"map": 206045700, "element": 520054}],
+   "afterObjectives": [16520],
+   "anyOrder": true,
+   "why": "«Enciende un palito de incienso a los pies del árbol linterna» (16522): the lantern tree of [18,-33] ([520054]); Dofus pour les noobs («Des lueurs de désespoir»)."
+  },
+  {
+   "objective": 16523,
+   "quest": 2174,
+   "kind": "click",
+   "elements": [{"map": 206176773, "element": 520057}, {"map": 206176773, "element": 520058}],
+   "afterObjectives": [16520],
+   "anyOrder": true,
+   "why": "«Enciende un palito de incienso a los pies del árbol linterna» (16523): the lantern tree of [16,-32] ([520057, 520058]); Dofus pour les noobs («Des lueurs de désespoir»)."
+  },
+  {
+   "objective": 16524,
+   "quest": 2174,
+   "kind": "click",
+   "elements": [{"map": 206177796, "element": 520056}],
+   "afterObjectives": [16520],
+   "anyOrder": true,
+   "why": "«Enciende un palito de incienso a los pies del árbol linterna» (16524): the lantern tree of [14,-33] ([520056]); Dofus pour les noobs («Des lueurs de désespoir»)."
+  },
+  {
+   "objective": 5340,
+   "quest": 853,
+   "kind": "reply",
+   "replies": [11497],
+   "requires": [{"item": 12901, "count": 7}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12901 x7, npc 1416): Scooger takes the seven loot sacks of one grumbler at «He terminado mi trabajo.» (11497); Dofus pour les noobs «Glugubrr a un mauvais fond»."
+  },
+  {
+   "objective": 5341,
+   "quest": 854,
+   "kind": "reply",
+   "replies": [11497],
+   "requires": [{"item": 12903, "count": 7}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12903 x7, npc 1416): Scooger takes the seven loot sacks of one grumbler at «He terminado mi trabajo.» (11497); Dofus pour les noobs «Glugubrr a un mauvais fond»."
+  },
+  {
+   "objective": 5342,
+   "quest": 855,
+   "kind": "reply",
+   "replies": [11497],
+   "requires": [{"item": 12905, "count": 7}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12905 x7, npc 1416): Scooger takes the seven loot sacks of one grumbler at «He terminado mi trabajo.» (11497); Dofus pour les noobs «Glugubrr a un mauvais fond»."
+  },
+  {
+   "objective": 5343,
+   "quest": 856,
+   "kind": "reply",
+   "replies": [11497],
+   "requires": [{"item": 12906, "count": 7}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12906 x7, npc 1416): Scooger takes the seven loot sacks of one grumbler at «He terminado mi trabajo.» (11497); Dofus pour les noobs «Glugubrr a un mauvais fond»."
+  },
+  {
+   "objective": 5336,
+   "quest": 877,
+   "kind": "reply",
+   "replies": [11499],
+   "requires": [{"item": 12901, "count": 7}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12901 x7, npc 1416): the star of the grumblers costs seven of each loot (10479, 10482), taken at 11499; Dofus pour les noobs «L'Étoile des Grincheux»."
+  },
+  {
+   "objective": 5337,
+   "quest": 877,
+   "kind": "reply",
+   "replies": [11499],
+   "requires": [{"item": 12903, "count": 7}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12903 x7, npc 1416): the star of the grumblers costs seven of each loot (10479, 10482), taken at 11499; Dofus pour les noobs «L'Étoile des Grincheux»."
+  },
+  {
+   "objective": 5338,
+   "quest": 877,
+   "kind": "reply",
+   "replies": [11499],
+   "requires": [{"item": 12905, "count": 7}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12905 x7, npc 1416): the star of the grumblers costs seven of each loot (10479, 10482), taken at 11499; Dofus pour les noobs «L'Étoile des Grincheux»."
+  },
+  {
+   "objective": 5339,
+   "quest": 877,
+   "kind": "reply",
+   "replies": [11499],
+   "requires": [{"item": 12906, "count": 7}],
+   "spends": true,
+   "why": "«#1» (type 3, item 12906 x7, npc 1416): the star of the grumblers costs seven of each loot (10479, 10482), taken at 11499; Dofus pour les noobs «L'Étoile des Grincheux»."
+  },
+  {
+   "objective": 4565,
+   "quest": 705,
+   "kind": "beat",
+   "monster": 1179,
+   "map": 66589184,
+   "why": "«Termina la mazmorra de Nawidad» (quest 705): the boss of the dungeon's last room (66589184) is monster 1179; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+  },
+  {
+   "objective": 4566,
+   "quest": 705,
+   "kind": "enter",
+   "map": 66590208,
+   "afterObjectives": [4565],
+   "why": "«Termina la mazmorra de Nawidad» (quest 705): closes on stepping into the post-boss room 66590208; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+  },
+  {
+   "objective": 4567,
+   "quest": 706,
+   "kind": "beat",
+   "monster": 872,
+   "map": 66850816,
+   "why": "«Termina la mazmorra de Nawidad» (quest 706): the boss of the dungeon's last room (66850816) is monster 872; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+  },
+  {
+   "objective": 4568,
+   "quest": 706,
+   "kind": "enter",
+   "map": 66851840,
+   "afterObjectives": [4567],
+   "why": "«Termina la mazmorra de Nawidad» (quest 706): closes on stepping into the post-boss room 66851840; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+  },
+  {
+   "objective": 4569,
+   "quest": 707,
+   "kind": "beat",
+   "monster": 1194,
+   "map": 66326528,
+   "why": "«Termina la mazmorra de Nawidad» (quest 707): the boss of the dungeon's last room (66326528) is monster 1194; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+  },
+  {
+   "objective": 4570,
+   "quest": 707,
+   "kind": "enter",
+   "map": 66327552,
+   "afterObjectives": [4569],
+   "why": "«Termina la mazmorra de Nawidad» (quest 707): closes on stepping into the post-boss room 66327552; Dofus pour les noobs «Sapik épique et Colégram» / «Petit Papa Nowel» / «Vilain petit n'enfant»."
+  },
+  {
+   "objective": 5366,
+   "quest": 873,
+   "kind": "beat",
+   "monster": 1179,
+   "map": 66589184,
+   "why": "«#1» (type 6, monster 1179): Pikabeto in the dungeon's last room (66589184); Dofus pour les noobs «L'Étoile du Sapik»."
+  },
+  {
+   "objective": 5367,
+   "quest": 873,
+   "kind": "enter",
+   "map": 66590208,
+   "afterObjectives": [5366],
+   "why": "«Pino grande de Nawidad» (94768, type 4): the post-boss room 66590208 where Héctor waits; Dofus pour les noobs «L'Étoile du Sapik»."
+  },
+  {
+   "objective": 16252,
+   "quest": 2164,
+   "kind": "enter",
+   "map": 205522436,
+   "why": "«Encuentra las flores azules en el bosque de Plantala»: the clearing of the blue flowers [27,-31], the map the next objectives carry; Dofus pour les noobs («Dites-le avec des fleurs»)."
+  },
+  {
+   "objective": 16263,
+   "quest": 2164,
+   "kind": "enter",
+   "map": 205522436,
+   "afterObjectives": [16262],
+   "why": "«Escolta a la aprendiz hasta los macizos de flores»: the clearing [27,-31], with Florawa following (the follower item 23030); Dofus pour les noobs («Dites-le avec des fleurs»)."
+  },
+  {
+   "objective": 1480,
+   "quest": 55,
+   "kind": "beat",
+   "monster": 286,
+   "map": 217319426,
+   "why": "«Tarche» (type 6, monster 286 x1): the fight started with his reply 667 (client data only (no Dofus pour les noobs page for «Entrenamiento con Tarche»)). The tuft 1726 drops under Qa=55 (monster drops)."
+  },
+  {
+   "objective": 16253,
+   "quest": 2164,
+   "kind": "click",
+   "elements": [{"map": 205520896, "element": 519623}],
+   "afterObjectives": [16317],
+   "gives": [{"item": 23031, "count": 1}],
+   "why": "«Consigue agua espiritual de Plantala»: the peaceful waterfall of [24,-35], «cliquez sur la cascade paisible pour récupérer 1 x Eau spirituelle de Plantala» (Dofus pour les noobs («Dites-le avec des fleurs»)). The map's own data holds element 519623 (graphic 66744, cell 386, a quest element: its id is in the batch of this zone's quest elements, 5196xx); INFERRED to be the waterfall."
+  },
+  {
+   "objective": 1484,
+   "quest": 58,
+   "kind": "reply",
+   "replies": [65489],
+   "requires": [{"item": 1870, "count": 32}],
+   "why": "«Consigue los dientes de chafer y llévaselos a Ned Etsith» (client text 928340): exactly 32 Dientes de chafer (1870, 100% drop of every chafer while the Arrancador de dientes 1869 is carried) handed to Ned at «Toma, los 32 dientes de chafer» (65489, the reply takes them); Dofus pour les noobs («Ned le dentiste»)."
+  },
+  {
+   "objective": 16367,
+   "quest": 2150,
+   "kind": "enter",
+   "map": 207618048,
+   "overridesMap": true,
+   "why": "«Bébete el remedio de Pantruku»: drinking from the jar on Pantruku's counter (element 518637, the passage in interactives/teleports.json) wakes one in the Ether, the crossing of the worlds [21,-33] (207618048), so arriving there does it. Dofus pour les noobs: «Cliquez sur le bocal posé sur le comptoir du tavernier. Vous êtes téléporté dans l'Ether à la croisée des mondes». The objective names the tavern (207619076), hence overridesMap."
+  },
+  {
+   "objective": 16370,
+   "quest": 2150,
+   "kind": "order",
+   "afterObjectives": [16369],
+   "why": "«Encuentra al chamán del pueblo de Pandala» comes after telling Pantruku about the vision (16369, type 1, which never holds anything back on its own); Surivitna's «Hablar de tu visión y de Pandawelo» (53314) does it. Dofus pour les noobs («À la croisée des mondes»)."
+  },
+  {
+   "objective": 16371,
+   "quest": 2150,
+   "kind": "enter",
+   "map": 207623168,
+   "why": "«Entra en el palacio de bambú»: the Pandarin's office in the bamboo palace [22,-29] (207623168), the objective's own map. Dofus pour les noobs («À la croisée des mondes»): «Direction le palais de bambou en [22,-29]»."
+  },
+  {
+   "objective": 16373,
+   "quest": 2150,
+   "kind": "beat",
+   "monsters": [6237, 6238, 6239],
+   "map": 207623172,
+   "anyOrder": true,
+   "why": "«Haz que los yokais de la biblioteca se callen»: the fight upstairs in the library (207623172) against the Yokai ruidoso, tronchado and escandaloso (6237-6239), started by any of the three NPC yokais (npc_fights.json). One of the Pandarin's three tasks, done in any order (Dofus pour les noobs («À la croisée des mondes»): «l'ordre dans lequel vous faites ces tâches n'a pas d'importance»)."
+  },
+  {
+   "objective": 16374,
+   "quest": 2150,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [16373],
+   "why": "«Obtén una recomendación del bibliotecario»: once the yokais are quiet, Narber's «Gracias, ¡hasta luego!» (53365) does it and hands over his recommendation (23136). Dofus pour les noobs («À la croisée des mondes»)."
+  },
+  {
+   "objective": 16375,
+   "quest": 2150,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Calma el apetito de los yokais que están devorando las provisiones del mercadillo»: done by the Yokai voraz's «Ver como el yokai desaparece.» (53395) after Ghao Zuo has set out the filtunga or the hundred burgregs. Dofus pour les noobs («À la croisée des mondes»)."
+  },
+  {
+   "objective": 16376,
+   "quest": 2150,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [16375],
+   "why": "«Obtén una recomendación del mayordomo»: Ghao Zuo's «Gracias, ¡hasta luego!» (53388) once the yokais are fed, with his recommendation (23143). Dofus pour les noobs («À la croisée des mondes»)."
+  },
+  {
+   "objective": 16377,
+   "quest": 2150,
+   "kind": "beat",
+   "monsters": [6244, 6245, 6246],
+   "map": 207620098,
+   "overridesMap": true,
+   "anyOrder": true,
+   "why": "«Desbarata los planes de los pandisidentes»: the fight in the bank's basement (207620098, down the stairs right of the bank [20,-30]) against the Pandulokaze codicioso, the Rōnin sin blanca and the Consejero destituido (6244-6246), started by the Yokai influenciable's «Enfrentarte a los pandisidentes una vez que el espíritu ha desaparecido.» (53416). The objective names the street outside (206307841), hence overridesMap. Dofus pour les noobs («À la croisée des mondes»): «Allez devant la Banque en [20,-30] et entrez dans le sous-sol via les escaliers sur la droite de la banque»."
+  },
+  {
+   "objective": 16378,
+   "quest": 2150,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [16377],
+   "why": "«Obtén una recomendación del banquero»: Yendong's «Gracias, ¡hasta luego!» (53424) after the pandisidents, with his recommendation (23165). Dofus pour les noobs («À la croisée des mondes»)."
+  },
+  {
+   "objective": 16545,
+   "quest": 2150,
+   "kind": "order",
+   "afterObjectives": [16380],
+   "why": "Master Kuatinbe (type 1) is seen once the Daimia has sent the character to him (16380): his «Me envía la Daimia para que pase la prueba del Pandasiman» (53450 or 53454) does it, not a hello. Dofus pour les noobs («À la croisée des mondes»)."
+  },
+  {
+   "objective": 16381,
+   "quest": 2150,
+   "kind": "order",
+   "afterObjectives": [16545],
+   "why": "«Fabrica Pandascudo» (type 17, item 23094): after Kuatinbe's instructions (16545), the shield forged by the character (Fabricante level 10, skill 156) in the Pandala workshop [23,-28] (207618050, element 518531). Dofus pour les noobs («À la croisée des mondes»): «Le bouclier doit absolument être fabriqué dans l'atelier des façonneurs du Village de Pandala»."
+  },
+  {
+   "objective": 16382,
+   "quest": 2150,
+   "kind": "beat",
+   "monster": 6250,
+   "map": 207622146,
+   "afterObjectives": [16381],
+   "worn": [{"item": 23094, "count": 1}],
+   "why": "«Supera la prueba del maestro Kuatinbe»: beating Master Kuatinbe (6250) on the dojo's tatami [20,-31] (207622146), the Pandascudo (23094) worn throughout. Dofus pour les noobs («À la croisée des mondes»): «il faut obligatoirement garder votre Pandaclier équipé sinon la quête ne se mettra pas à jour»."
+  },
+  {
+   "objective": 16383,
+   "quest": 2150,
+   "kind": "order",
+   "afterObjectives": [16382],
+   "worn": [{"item": 23094, "count": 1}],
+   "why": "«Ve a ver a la Daimia a la sala de la Pandasamblea»: after the test, the Daimia in the Pandassembly hall (207624192), reached over the left mat of the audience room with the Pandascudo worn (floor passage POE23094,1); her «Mira mi escudo: he superado la prueba del Pandasiman.» (53431, criterion POE23094,1) does it. Dofus pour les noobs («À la croisée des mondes»): «équipez de nouveau votre Pandaclier pour aller dans la Pandassemblée (salle de gauche)»."
+  },
+  {
+   "objective": 16512,
+   "quest": 2150,
+   "kind": "order",
+   "afterObjectives": [16384],
+   "why": "«Tómate una jarra de Pandasahi o de Pandaporo y deja que Pandawelo te guíe» comes after bowing to Pandawelo (16384, type 1, which never holds anything back); his «Beber una jarra de Pandasahi.» (53352) or «… de Pandaporo.» (53353) does it, taking the drink (23179 or 23180) and leading into the Ether. Dofus pour les noobs («À la croisée des mondes»)."
+  },
+  {
+   "objective": 16265,
+   "quest": 2164,
+   "kind": "click",
+   "onlyGives": true,
+   "givesEach": true,
+   "anyOrder": true,
+   "afterObjectives": [16264],
+   "elements": [{"map": 205261570, "element": 518964}, {"map": 205261057, "element": 518638}, {"map": 205260033, "element": 518642}],
+   "gives": [{"item": 32275, "count": 3}],
+   "why": "«Obtén un recipiente de los tanukis»: the sandy rocks of [27,-28], [26,-27] and [24,-27] hand over a Rosa del desierto de Pandala each (32275, three in all, one per rock); the objective itself is done by Tanuha's reply (54234). Dofus pour les noobs («Dites-le avec des fleurs»). The elements are INFERRED: in [26,-27] and [24,-27] the stone heaps of graphic 66421 that carry no skill of their own (518638, 518642; 519626 and 519635 were tried: one is a mining node asking for level 100, the other is not usable); [27,-28] holds only three silicate nodes (518963-518965), 518964 is used."
+  },
+  {
+   "objective": 1485,
+   "quest": 59,
+   "kind": "beat",
+   "monster": 314,
+   "map": 217058304,
+   "why": "«Han Torcha» (type 6, monster 314 x1): fight started with his reply 65076 (client data only (no Dofus pour les noobs page for «Entrenamiento con Torcha»)). The tuft 1744 drops under Qa=59 (monster drops)."
+  },
+  {
+   "objective": 1487,
+   "quest": 60,
+   "kind": "reply",
+   "replies": [62441],
+   "requires": [{"item": 1878, "count": 1}, {"item": 1895, "count": 1}],
+   "why": "«Dale la carta y una cerveza de Feubuk a Amayiro» (client text 890971): both the special card (1878) and the Cerveza del Feubuk (1895) handed over at «Toma la carta especial y una cerveza» (62441, the reply takes them); client data only (no Dofus pour les noobs page for «Cartas especiales de Amayiro»)."
+  },
+  {
+   "objective": 16653,
+   "quest": 2161,
+   "kind": "beat",
+   "monsters": [6323, 6320, 6321, 6318],
+   "map": 205521924,
+   "afterObjectives": [16652],
+   "why": "«Protege a los aldeanos de las plantalas agresivas»: the fight vs Ranífar, Floristilo, Bulbomatorral and Bambuto (npc_fights.json, reply 54533); Dofus pour les noobs («Le saule du promeneur»)."
+  },
+  {
+   "objective": 16654,
+   "quest": 2161,
+   "kind": "enter",
+   "map": 206309378,
+   "afterObjectives": [16653],
+   "why": "«Escolta a Inataba hasta el taller de alquimistas»: the objective's own map, the outdoor [23,-29] that holds the workshop's door, with the follower 23353 walking along; Dofus pour les noobs («Le saule du promeneur»)."
+  },
+  {
+   "objective": 16656,
+   "quest": 2161,
+   "kind": "enter",
+   "map": 206307844,
+   "afterObjectives": [16655],
+   "why": "«Ve a ver a Yinagi junto con Inataba»: the objective's own map, the outdoor [20,-27] that holds the shaman's house, with the follower walking along; Dofus pour les noobs («Le saule du promeneur»)."
+  },
+  {
+   "objective": 16662,
+   "quest": 2161,
+   "kind": "click",
+   "elements": [{"map": 205522438, "element": 519719}, {"map": 205522438, "element": 519720}],
+   "afterObjectives": [16661],
+   "gives": [{"item": 23349, "count": 1}],
+   "why": "«Inspecciona el sauce plateado en busca de pistas»: «cliquez sur les buissons au centre gauche de la map» (Dofus pour les noobs («Le saule du promeneur»)) hands over the branch with the ribbon (23349). The map has two bush elements of graphic 1029 on the left (519719 at cell 71, 519720 at cell 308, both in the quest batch of ids 5197xx): INFERRED, either closes it."
+  },
+  {
+   "objective": 16665,
+   "quest": 2161,
+   "kind": "beat",
+   "monsters": [6340],
+   "map": 205522438,
+   "afterObjectives": [16664],
+   "why": "«Protege el sauce plateado de los leñadores»: the fight vs the loggers (npc_fights.json, reply 54576); Dofus pour les noobs («Le saule du promeneur»)."
+  },
+  {
+   "objective": 3662,
+   "quest": 542,
+   "kind": "beat",
+   "monsters": [2894],
+   "map": 54537249,
+   "spawns": {"monster": 2894, "count": 8},
+   "why": "«Vence a 8 ratas kenopintamos» (type 6, monster 2894 x8): Dofus pour les noobs «Pauvre Kiki»: «Descendez à la cave ! Et attaquez le groupe de rats». The group stands in the cellar 54537249 under the house (the stairs, element 457184, of the village map 54536225)."
   }
 ]
 }
