@@ -32,8 +32,10 @@ client and does not need to be exposed unless a separate compatibility setup use
 
 ## Player machine
 
-Set the server in `%APPDATA%\Jondo\lanzador.cfg` on Windows or
-`$XDG_CONFIG_HOME/Jondo/lanzador.cfg` on Linux (normally `~/.config/Jondo/lanzador.cfg`):
+Pick **On another machine (VPS, LAN…)** in the installer, or later under **Server** in the
+launcher's **Settings**, and type the server's address. The launcher keeps it in
+`%APPDATA%\Jondo\lanzador.cfg` on Windows or `$XDG_CONFIG_HOME/Jondo/lanzador.cfg` on Linux
+(normally `~/.config/Jondo/lanzador.cfg`), where it can also be written by hand:
 
 ```text
 servidor=server.example.net

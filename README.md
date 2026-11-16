@@ -1,8 +1,8 @@
 High-performance server emulator for **Dofus 3 Unity (Client 3.6.10.11)** written in C# (**.NET 10**), with decoupled modular projects, a SQLite data layer, a combat engine driven entirely by client data — PvM, duels and Koliseo — a cross-platform launcher and a world editor.
 
 > ⚠️ **Runs against Dofus 3 clients 3.6.10.11 and 3.6.10.10.** The live game is on 3.6.11.12, so the
-> official launcher does not provide a client that works here — [Step 2](#step-2--get-the-361011-client)
-> has a download. Ankama renames every protobuf message on some patches; the toolchain for that is in
+> official launcher does not provide a client that works here — the [installer](#-quick-start)
+> downloads the right one. Ankama renames every protobuf message on some patches; the toolchain for that is in
 > [Surviving the next patch](#-surviving-the-next-patch).
 
 ## 🧙 Class spells: debug status
@@ -58,7 +58,7 @@ its spells must pass.
 
 &nbsp;
 
-> **New here?** [Quick Start](#-quick-start) puts you in the game in four steps ·
+> **New here?** [Quick Start](#-quick-start) is one installer that leaves everything ready ·
 > [What you get](#-what-you-get) is what lands on disk ·
 > [Playing together](#playing-together-over-the-network) opens your server to a friend's machine
 
@@ -82,80 +82,75 @@ its spells must pass.
 
 ## 🚀 Quick Start
 
-**Docker:** the server also runs as a headless container: `docker compose up -d --build`. See
-[Jondo Server in Docker](docs/docker.md). Running it natively is unchanged.
+**⬇️ Download `JondoEmu-Setup-win-x64.exe` from the [latest release](../../releases/latest) and run it.** That one window installs and configures everything: nothing has to be compiled, unpacked or copied by hand. On Linux the same file is `JondoEmu-Setup-linux-x64`.
 
-**Linux source users:** all four desktop tools have a native Linux workflow. See
-[Linux desktop setup](docs/linux-desktop.md) for building, configuring `Dofus.x64`
-without a mod loader, and desktop verification. Linux players can also take the Linux zip below.
+Before it starts, the installer asks three things, each with a default:
 
-**Nothing has to be compiled.** The launcher ships as a single ready-to-run executable with every dependency inside it, and the world database ships compressed and extracts itself on first run.
+* **Installation folder**: `C:\Program Files\JondoEmu` (Windows asks for permission once), or `~/.local/share/JondoEmu` on Linux.
+* **Dofus 3.6 client**: download it, from Ankama's official CDN or from the link below, or **I already have it** and choose your `Dofus.exe`.
+* **Server**: **On this computer**, or **On another machine (VPS, LAN…)** with its IP or name.
 
-**⬇️ Download a zip from the [Releases page](../../releases)** and unpack it anywhere. No need to clone this repository to play.
+Then it goes through each step with an animated progress bar, the step's name, its percentage and an estimated time:
 
-* **`Jondo-Full-vX.Y.Z-win-x64.zip`**: the whole emulator, with the launcher, the server, Jondo Studio and the data they read. A player whose server runs on another machine takes the same zip and starts only the launcher, pointed at it with a `servidor=<address>` line in `%APPDATA%\Jondo\lanzador.cfg`.
-* **`Jondo-Full-vX.Y.Z-linux-x64.zip`**: the same as the Windows Full zip, built for Linux, without the two mods (the native Linux client has none). It needs the .NET 10 runtime and the native `Dofus.x64`; see its `README-linux.md`.
+1. Find the latest version on GitHub
+2. Download .NET 10, only if the machine lacks it (from Microsoft, hash-checked)
+3. Prepare the folder and the shortcuts
+4. Download and install the emulator
+5. Check or download the Dofus client
+6. Install MelonLoader 0.7.3 into the client
+7. Install Jondo's mods (JondoFix, Cazacabezas, Heroes) into the client's `Mods/`
+8. The client's first decompilation: MelonLoader's first start, the long one, run hidden
+9. Prepare the world database
+10. Start the server, when it runs on this computer
 
-Either one unpacks as a **`JondoEmu`** folder. Keep that name and put it beside the client's folder from Step 2: that is where JondoFix looks for it.
+Steps 6 to 8 are Windows only: the native Linux client has no mod loader.
 
-> **Antivirus warnings.** Several engines, Microsoft Defender among them since November 2026, flag the **v0.1.0** launcher as a generic trojan (`Gen:Variant.Midie`, `Trojan:Win32/Yomal!rfn`). It is a false positive: the release is built by GitHub Actions from this repository's source. Take the latest release, whose launcher is a new build. Why it happens and how it is reported: **[`docs/antivirus.md`](docs/antivirus.md)**.
+When it is done the launcher opens on its sign-in screen with the server online. Sign in or **CREATE ACCOUNT**, tick one or several accounts of the team and press play. Up to eight Dofus clients can run at once.
 
-### Step 1 — Install the .NET 10 runtime
+**Updates.** Each time it starts, the launcher looks at the releases of its GitHub repository. When a newer one is out, the game cannot be played until you press **UPDATE TO vX.Y.Z**: it stops the server, downloads only the files that changed (the whole release when most did) and puts them in place. Accounts, characters and settings stay: `bases/`, `config/` and `logs/` are never touched. The mods reach the client the next time it starts.
 
-Download it from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/10.0). The *Desktop Runtime* is the one you want.
+**Settings** holds the same choices for later: the server (this computer or another machine's address), the update repository (`owner/name`, this one by default, for forks), the installed version with **Check for updates**, and **Uninstall**, which can take the client along or leave it.
 
-### Step 2 — Get the 3.6.10.11 client
+The launcher speaks Spanish, English, French and Portuguese and starts in the system's language; the game's own language is chosen apart in **Settings**.
 
-The live game is on 3.6.11.12 and Ankama's launcher only provides the current version, which this
-emulator does not support.
+### The test account
 
-**⬇️ [Dofus 3.6.10.11 — download](https://mega.nz/file/EIcmDRaK#lRP1LPKjc1fBLzRHDNWieTxPWNeufdNhE-OYEUTj_f0)**
-
-It is the stock Ankama client. Unpack it as a **`Cliente 3.6.10.11`** folder beside the emulator
-folder, which is where the launcher looks first; anywhere else works if you point **Settings** at
-your `Dofus.exe`.
-
-A 3.6.10.11 or 3.6.10.10 install from before the patch also works — keep the official launcher
-from updating it.
-
-### Step 3 — Point the Dofus client at the emulator
-
-The official client talks to Ankama's servers and checks their SSL certificates. **JondoFix**, a MelonLoader mod, redirects it to your machine instead. It comes already built in this repository.
-
-1. Get **MelonLoader 0.7.x** from [its releases page](https://github.com/LavaGang/MelonLoader/releases). 0.7.x is published as *Open-Beta*, so it shows up as a **pre-release** and the page's "Latest" tag points at 0.6.x. **0.6.x does not work with this client** — tick *show pre-releases* and take 0.7.x. This repository is tested against **0.7.3**.
-2. Run the installer and point it at your **`Dofus.exe`**. MelonLoader detects the rest (`Game Type: Il2cpp`, `Game Arch: x64`, `Runtime Type: net6`, Unity `6000.3.16f1`).
-3. Nothing to copy: every time the **launcher** starts the client it puts this repository's **`JondoFix/JondoFix.dll`**, **`Cazacabezas/Cazacabezas.dll`** and **`Heroes/Heroes.dll`** into the client's **`Mods/`** folder if the ones there differ. Only if you start the client some other way, copy those files into `Mods/` yourself (next to `Dofus.exe`; create the folder if it is not there).
-
-Afterwards:
-* The installer drops a **`version.dll`** next to `Dofus.exe`, which loads MelonLoader. Renaming it to `version.dll.disabled` turns the whole thing off so you can play the official game; renaming it back turns it on again.
-* MelonLoader writes a log per run under **`MelonLoader/Logs/`**. If the client starts but never reaches the emulator, look there first.
-
-What JondoFix does: sends the client's sockets, Named Pipes and DNS queries to `localhost` (ports `8888`, `5555`, `15881`, `6337`), accepts the local self-signed certificate, and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window and the [admin window (F10)](#-admin-window-f10). The second mod, **Cazacabezas**, is the [head hunters' window](#-head-hunters). The third, **Heroes**, is the [hero mode](docs/heroes.md)'s window (Ctrl+Tab).
-
-### Step 4 — Run it
-
-Double-click **`Jondo Emulator Launcher.exe`**. It launches **`Jondo Server.exe`** itself, in its own window with the log and the counters.
-
-On the first run it unpacks `datos/world.zip` into `bases/world.db` (about 240 MB) and creates `bases/auth.db` with a test account. Sign in to add an account to the launcher's team, tick one or several saved profiles, then press **Launch selected**. Up to eight independent Dofus clients can be active at once.
+On its first start the server unpacks `datos/world.zip` into `bases/world.db` (about 240 MB) and creates `bases/auth.db` with a test account:
 
 ```
 Account: keka
 Password: test
 ```
 
-The test account is an **administrator**, so every command and the [admin window (F10)](#-admin-window-f10) can be tried with it, and it comes with characters already made. For a player account of your own, use **CREATE ACCOUNT** in the launcher.
+It is an **administrator**, so every command and the [admin window (F10)](#-admin-window-f10) can be tried with it, and it comes with characters already made. For a player account of your own, use **CREATE ACCOUNT** in the launcher.
 
 > ⚠️ The test account's password is published right here. Before opening a server to other machines (`JONDO_PUBLIC_BIND=1`), change it or delete the account: anybody who knows it is an administrator.
 
-`world.zip` is only unpacked when there is no `bases/world.db` yet. To get the characters of a newer download over an older installation, delete `bases/world.db` (and with it the characters made on it) before starting.
+### The Dofus client
 
-The **ES / EN / FR** switch sets the language of the launcher *and* of the game.
+The live game is on 3.6.11.12 and Ankama's launcher only provides the current version, which this emulator does not support. The installer fetches 3.6.10.11 by itself; the same client is here:
+
+**⬇️ [Dofus 3.6.10.11 — download](https://mega.nz/file/EIcmDRaK#lRP1LPKjc1fBLzRHDNWieTxPWNeufdNhE-OYEUTj_f0)**
+
+It is the stock Ankama client. A 3.6.10.11 or 3.6.10.10 install from before the patch also works: keep the official launcher from updating it.
+
+What the mods do: **JondoFix** sends the client's sockets, Named Pipes and DNS queries to the emulator (ports `8888`, `5555`, `15881`, `6337`), accepts its self-signed certificate and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window and the [admin window (F10)](#-admin-window-f10). **Cazacabezas** is the [head hunters' window](#-head-hunters) and **Heroes** the [hero mode](docs/heroes.md)'s window (Ctrl+Tab). The launcher puts the three into the client's `Mods/` each time it starts it, if the ones there differ.
+
+MelonLoader drops a **`version.dll`** next to `Dofus.exe`: renaming it to `version.dll.disabled` turns the mods off to play the official game, and renaming it back turns them on. It writes a log per run under **`MelonLoader/Logs/`**: if the client starts but never reaches the emulator, look there first.
+
+> **Antivirus warnings.** Several engines, Microsoft Defender among them since November 2026, flag the **v0.1.0** launcher as a generic trojan (`Gen:Variant.Midie`, `Trojan:Win32/Yomal!rfn`). It is a false positive: the release is built by GitHub Actions from this repository's source. Take the latest release, whose launcher is a new build. Why it happens and how it is reported: **[`docs/antivirus.md`](docs/antivirus.md)**.
+
+### Other ways to run it
+
+* **The full zip.** Each release also has `Jondo-Full-vX.Y.Z-win-x64.zip` and `Jondo-Full-vX.Y.Z-linux-x64.zip`: the same `JondoEmu` folder, unpacked by hand. Then install **MelonLoader 0.7.x** yourself from [its releases page](https://github.com/LavaGang/MelonLoader/releases), pointed at your `Dofus.exe` (it is published as a pre-release: tick *show pre-releases*, since **0.6.x does not work with this client**), and start **`Jondo Emulator Launcher.exe`**. The .NET 10 *Desktop Runtime* comes from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/10.0).
+* **Docker:** the server also runs as a headless container: `docker compose up -d --build`. See [Jondo Server in Docker](docs/docker.md).
+* **Linux from source:** all four desktop tools have a native Linux workflow. See [Linux desktop setup](docs/linux-desktop.md) for building, configuring `Dofus.x64` without a mod loader, and desktop verification.
 
 **`Jondo Studio.exe`** is the third executable and needs nothing else running. See [Jondo Studio](#%EF%B8%8F-jondo-studio).
 
 ### Playing together over the network
 
-One machine runs the server; everybody else starts only the launcher.
+One machine runs the server; everybody else only installs and starts the launcher.
 
 **On the server's machine**
 
@@ -165,9 +160,8 @@ One machine runs the server; everybody else starts only the launcher.
 
 **On each other player's machine**
 
-1. The same client, MelonLoader and release zip as in Steps 2 and 3.
-2. Add a line `servidor=<address>` to `%APPDATA%\Jondo\lanzador.cfg`, with the server machine's address: its Hamachi, ZeroTier or Tailscale address, or its public IP when the ports are forwarded.
-3. Start the launcher. It starts no server of its own and takes the client to that address. Make an account on that server with **CREATE ACCOUNT**.
+1. Run the setup and pick **On another machine (VPS, LAN…)** with the server machine's address: its Hamachi, ZeroTier or Tailscale address, or its public IP when the ports are forwarded. It can be changed later in **Settings**.
+2. The launcher starts no server of its own and takes the client to that address. Make an account on that server with **CREATE ACCOUNT**.
 
 ---
 
@@ -206,7 +200,10 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ Account cards with the character drawn in them, as they look in the world: head, equipment and cosmetics
 - ✅ A team of up to 8 accounts, one independent Dofus process each
 - ✅ Account creation and login; saved credentials are encrypted
-- ✅ Embedded server log; single-file deployment; ES/EN/FR
+- ✅ Embedded server log; single-file deployment; ES/EN/FR/PT
+- ✅ One-click installer: .NET 10, the emulator, the Dofus client (from Ankama's CDN or the README's link, or one already on disk), MelonLoader, the mods and the client's first decompilation, each step with its progress bar, percentage and estimated time
+- ✅ Updates from the repository's GitHub releases, required before playing: only the files that changed, or the whole release when most did
+- ✅ Server on this computer, started by the launcher, or on another machine (VPS, LAN); update repository and uninstall in *Settings*
 - ✅ HD and 4K scenery packs from Ankama's own CDN for the client's version: resumable and verified downloads
 - ✅ Animated neon sign and falling stars
 - 🚧 OAuth sign-in
