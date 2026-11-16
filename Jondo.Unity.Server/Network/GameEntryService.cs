@@ -43,6 +43,12 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
     // turns out to be a heartbeat that repeats every five seconds.
     private bool _hasSentMapInitialization;
 
+    // The welcome burst of this connection already carried the list, so the kvc the client sends
+    // right behind it gets no answer, as on the real server. Answering it sent the list twice, and
+    // with no character yet each list opens the creation screen: when the first one was still
+    // loading, the second one stayed queued and opened the screen again over the tutorial.
+    private bool _listWentInWelcome;
+
     public async Task<GameEntryResult> HandleAsync(GameFrame frame)
     {
         if (frame.Content is not GameRequest request || request is not (IdentificationRequest
@@ -61,6 +67,11 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
             case IdentificationRequest identification:
                 return await IdentifyAsync(identification);
             case CharacterListRequest:
+                if (_listWentInWelcome)
+                {
+                    _listWentInWelcome = false;
+                    return GameEntryResult.Handled;
+                }
                 await SendCharacterListAsync();
                 return GameEntryResult.Handled;
             case CharacterSelectionRequest selected:
@@ -138,6 +149,7 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         // Or a hero the account asked to take in hand (Heroes.AskSwitch): picked the same way.
         bool resumable = characters.Any(c => backend.CanResumeFight(c.Id)) || Heroes.SwitchPending(session.AccountId);
         await backend.SendWelcomeAsync(session, characters, withList: !resumable);
+        _listWentInWelcome = !resumable;
         return GameEntryResult.Handled;
     }
 

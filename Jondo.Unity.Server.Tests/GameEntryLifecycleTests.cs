@@ -68,6 +68,31 @@ public sealed class GameEntryLifecycleTests
     }
 
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Character_list_request_after_a_welcome_with_the_list_gets_no_second_list(bool resumable)
+    {
+        var h = new Harness(authenticated: false);
+        if (resumable) h.Backend.Resumable.Add(h.Character.Id);
+        var ticket = SessionRegistry.Issue(h.Character.AccountId, h.Character.ServerId, "fr");
+        Assert.Equal(GameEntryResult.Handled, await h.Send(new IdentificationRequest(ticket.Value, "en")));
+        h.Backend.Calls.Clear();
+        h.Packets.Clear();
+
+        Assert.Equal(GameEntryResult.Handled, await h.Send(new CharacterListRequest(), int.MinValue));
+
+        // Ordinary entry: the burst carried the list and the kvc behind it is not answered.
+        // A fight to resume: the burst went without the list, which goes now with the kvd.
+        Assert.Equal(resumable ? new[] { "kvi", "kvd" } : Array.Empty<string>(), h.Aliases());
+        Assert.Equal(resumable, h.Backend.Calls.Contains("list"));
+
+        // A later request is answered again.
+        h.Packets.Clear();
+        Assert.Equal(GameEntryResult.Handled, await h.Send(new CharacterListRequest(), int.MinValue));
+        Assert.Contains("kvi", h.Aliases());
+    }
+
+    [Theory]
     [InlineData("ordinary")]
     [InlineData("first-tutorial")]
     [InlineData("first-no-tutorial")]
