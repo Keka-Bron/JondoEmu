@@ -282,6 +282,17 @@
       "npc": 1285,
       "replies": [7712, 7713, 7714],
       "why": "The Royal Mastogob's Greenhouse: after the Jalamut Real the winners are under the dome of its exit room («Royal Mastogob's Greenhouse - Exit»), where «Le pouvoir derrière le trône» has them talk to Gavroch (objective 8706 names this map), and Topordo Spesos, the host who let them in, takes them out: his three «Salir de la mazmorra» leave. No door is drawn in the room and the client shows no map panel exit there. INFERRED cell, before the round table."
+    },
+    {
+      "dungeon": 6,
+      "bossRoom": 72361984,
+      "room": 72363008,
+      "cell": 343,
+      "npc": 784,
+      "replies": [
+        2864
+      ],
+      "why": "The Dragon Pig's Den: after the Dragon Pig the winners are in its throne room, the den's exit (72363008, «Sala del trono del Dragocerdo», objective 9948), where «Dragones y chapuzonas» has them find the toothed key («Dans la salle de sortie, pensez à récupérer la Clef Dentée à gauche du Trône puis sortez», Dofus pour les noobs («Plongeon et dragon»)); the porco who keeps the den's doors (784) takes them out: «Me he fijado como luchabas...» (3231), «Salir.» (2864). INFERRED landing."
     }
   ]
 }

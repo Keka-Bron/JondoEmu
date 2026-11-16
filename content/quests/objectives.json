@@ -5385,6 +5385,116 @@
    "monster": 3763,
    "map": 137367552,
    "why": "«Consigue el nombre del comprador»: beating Vantarde Smis (3763), whose note (15595) names the captain; the note falls in the same fight (the loot is rolled before the quests are told). Dofus pour les noobs: whoever is in the fight and has given him the skull gets it."
+  },
+  {
+    "objective": 9949,
+    "quest": 1653,
+    "kind": "click",
+    "elements": [
+      {
+        "map": 72363008,
+        "element": 490988
+      }
+    ],
+    "gives": [
+      {
+        "item": 16899,
+        "count": 1
+      }
+    ],
+    "afterObjectives": [
+      9948
+    ],
+    "why": "«Obtén la llave dentada»: in the Dragon Pig's throne room, the den's exit (72363008), left of the throne (element 490988, cell 254, the room's one graphic drawn for the quest); Dofus pour les noobs («Plongeon et dragon»): «Dans la salle de sortie, pensez à récupérer la Clef Dentée à gauche du Trône». The rolling pig's head (490989) and the big-snouted statue (490990) are the porco's wrong hints."
+  },
+  {
+    "objective": 9952,
+    "quest": 1653,
+    "kind": "click",
+    "elements": [
+      {
+        "map": 154142211,
+        "element": 490830
+      }
+    ],
+    "requires": [
+      {
+        "item": 17015,
+        "count": 1
+      }
+    ],
+    "gives": [
+      {
+        "item": 16898,
+        "count": 1
+      }
+    ],
+    "afterObjectives": [
+      9951
+    ],
+    "why": "«Obtén la llave zarposa»: the stele in the middle of the disenchanted thicket (element 490830, cell 344) answers only an abraknyde (the «Transformación en abráknido», 17015, which the thicket's trees give); Dofus pour les noobs («Plongeon et dragon»): «Pour récupérer la clef il faut vous transformer en Abraknyde... Une fois transformé en Abraknyde, vous pouvez cliquez sur la stèle au centre et récupérer une Clef Griffue». The transformation is not spent: it ends at the next fight."
+  },
+  {
+    "objective": 9958,
+    "quest": 1653,
+    "kind": "click",
+    "elements": [
+      {
+        "map": 154141441,
+        "element": 490939
+      },
+      {
+        "map": 154141441,
+        "element": 490940
+      }
+    ],
+    "requires": [
+      {
+        "item": 16898,
+        "count": 1
+      },
+      {
+        "item": 16899,
+        "count": 1
+      }
+    ],
+    "spends": true,
+    "afterObjectives": [
+      9957
+    ],
+    "why": "«Entra en el santuario de la isla misteriosa»: the two keyholes beside the sanctuary's door (elements 490939 and 490940, cells 243 and 330, the same graphic) take the clawed and the toothed keys; Dofus pour les noobs («Plongeon et dragon»): «Traversez la première map puis activez la porte en insérant les deux clefs dans leur emplacement respectif». The door (490934) then lets in (teleports.json)."
+  },
+  {
+    "objective": 9959,
+    "quest": 1653,
+    "kind": "enter",
+    "map": 154142465,
+    "afterObjectives": [
+      9958
+    ],
+    "why": "«Encuentra el camino hacia la cueva de Aguabrial»: inside the sanctuary (154142465), the hall around the pool the way to the cave goes through."
+  },
+  {
+    "objective": 9960,
+    "quest": 1653,
+    "kind": "beat",
+    "monster": 4131,
+    "map": 154142465,
+    "elements": [
+      {
+        "map": 154142465,
+        "element": 489514
+      }
+    ],
+    "spawns": {
+      "monster": 4131,
+      "count": 1,
+      "attacks": true
+    },
+    "afterObjectives": [
+      9959
+    ],
+    "why": "«Vence a Guardiana del santuario»: the pool in the middle of the hall (element 489514, cell 412) brings the sanctuary's guardian (4131) out against whoever clicks it; Dofus pour les noobs («Plongeon et dragon»): «Enfin cliquez au centre de la map. Un combat se lancera alors». Once she is beaten the pool leads down to the cave (teleports.json)."
   }
- ]
+]
 }

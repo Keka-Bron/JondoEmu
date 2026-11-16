@@ -37058,7 +37058,8 @@
       "map": 122421248,
       "opening": 16694,
       "openings": [
-        { "quest": 1524, "objective": 8676, "pending": 8677, "message": 18317 }
+        { "quest": 1524, "objective": 8676, "pending": 8677, "message": 18317 },
+        { "quest": 1653, "objective": 9963, "pending": 9964, "message": 21484 }
       ],
       "lines": [
         {
@@ -37087,7 +37088,50 @@
             { "reply": 82818, "next": 60267, "quest": 1523, "afterElement": -1523001, "beforeObjective": 8669 },
             { "reply": 22162, "next": 18532, "beforeQuest": 1527 },
             { "reply": 22188, "next": 18555, "quest": 1527, "afterObjective": 8694, "beforeObjective": 8695, "criterion": "PO!15425|PO!15426|PO!15427" },
-            { "reply": 22188, "next": 18556, "quest": 1527, "afterObjective": 8694, "beforeObjective": 8695, "criterion": "PO=15425&PO=15426&PO=15427" }
+            { "reply": 22188, "next": 18556, "quest": 1527, "afterObjective": 8694, "beforeObjective": 8695, "criterion": "PO=15425&PO=15426&PO=15427" },
+            { "reply": 25787, "next": 21479, "criterion": "Qf=1462&PL>79", "beforeQuest": 1653 }
+          ]
+        },
+        {
+          "message": 21479,
+          "choices": [
+            { "reply": 25786, "next": 21480 }
+          ]
+        },
+        {
+          "message": 21480,
+          "choices": [
+            { "reply": 25785, "next": 21481 }
+          ]
+        },
+        {
+          "message": 21481,
+          "choices": [
+            { "reply": 25784, "next": 21482 }
+          ]
+        },
+        {
+          "message": 21482,
+          "choices": [
+            { "reply": 25783, "next": 21483 }
+          ]
+        },
+        {
+          "message": 21483,
+          "choices": [
+            { "reply": 25782, "startsQuest": 1653, "params": [[34, 1653]] }
+          ]
+        },
+        {
+          "message": 21484,
+          "choices": [
+            { "reply": 25793, "next": 21489, "quest": 1653, "completes": 9964, "params": [[30, 9964]] }
+          ]
+        },
+        {
+          "message": 21489,
+          "choices": [
+            { "reply": 25792 }
           ]
         },
         {
@@ -37499,7 +37543,7 @@
           ]
         }
       ],
-      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896). «Draconanthropie» ends with Prysmaradoth's talisman around the character's neck (16890, «te pone el colgante»): 20143 gives it, and «Destination finale» -- whose victory it is the key to (16954) -- gives it again on starting to one who finished the ritual without it. «Le livre des Taures» (Dofus pour les noobs): «Parlez à Mériana du Dofus Pourpre» (21759) from level 90 once «La magicienne des marécages» is done; the Minotoror guards it and a taur sorcerer's grimoire is needed (18152), there are copies in the great libraries (18153). Back from Astrub, «Mencionar al Maestro Cuerbok» (21837) sends the character to Cania and asks for one of his bones (18222). With the book and the bone (21843, 21842) she enchants the bone and hands it over (18224, «Guardar el hueso encantado», which ends the quest), and «Me voy a la Isla del Minotauroro» (21840) starts «Toro de rodeo». Whoever left before that is handed the bone again by «Estoy listo para ir al Laberinto del Minotauroro» (21844, 18226). For «El tesoro de Totankama» (Dofus pour les noobs, «Le trésor de Totankama»): «Résumez alors à Mériana votre rencontre avec le Minotot» (21915, 18295, «Seguir escuchando» 21914, 18296, «Cuéntame más sobre estos objetos» 21913, 18297: Kerubim for the ring) and «Ir en busca de los objetos» (21916) is 8635. «Montrez alors les trois types de ressources à Mériana» (21918): all three lead to «Podemos comenzar» (18298), fewer to «necesito todos los objetos» (18299) and mark what was shown (8666, 8668; the dust, 8667, asks for five doses). «Mériana procède alors à un rituel étrange et vous donne ensuite une sac dans lequel elle à enfermé vos objets»: «Estoy listo para el ritual» (21921), the bag (18300, «Esperar unos instantes» 21920, 18301) and «Seguir sus instrucciones» (21919) takes the pearl, the five doses and the ring (and marks the bag as had); the five doses are one of each eternale's powder (15419, 15602-15605, «Remordimientos de eternala»), so both the offer and the taking ask for one of each; asked again before burying it she repeats it (82818, 60267, 82817). For «Cómo perder la pluma» (Dofus pour les noobs, «Comment perdre ses plumes»): «Parlez à Mériana pour lui dire qu'un tofu c'est introduit dans sa cabane» (22162, 18532), the ritual in the Book of the Taurs (22161, 18533, 22160, 18534, 22159, 18535: three eggs), «¿Sabes dónde puedo encontrarlos?» (22157, 18536, Félix Rodrifuente in Cania) and «Voy a Cania» (22156) takes the quest; «Me ocuparé de él más tarde... o jamás» (22158) leaves it. Back with the eggs (22188): without all three she waits (18555, 22183); with them «Están los tres»... she counts them, the pan (22186 hands the three eggs over, 8695-8697), the omelette (18557, «Reprimir un grito de sorpresa» 22185) and the pan on the tofu's head (18558): «Escuchar una especie de trueno» (22184) takes the follower and Renemil Belok is there. The client's «Hay un tofu en tu casa» (22155) and its «ocúpate primero de la perla de leche dorada» (18531) belong to an older order where the pearl came first; the quest's start criterion ((Qa=1523&Qo>8635)|Qf=1523) opens the tofu right after the summary, so they are left out. «A la leche caliente, batir de repente»: once the royal multicoloured blop is beaten (8676) she is making a magic bag (18317); «Voy a necesitar el caldero para la perla de leche» (21942, 18318: Gorco will help, the cauldron must be at the right heat) and «Voy a ver a Gorco» (21941) is 8677 (Dofus pour les noobs: «Rapportez alors la ressource à Mériana... Demandez alors à Mériana un Chaudron magique»); «Siento haberte molestado» (21943) leaves."
+      "why": "Meriana in her cabin (Dofus pour les noobs, «La magicienne des marécages»): «Dire que vous êtes envoyé par Ronald le Sage Lenald» ends the quest, and she already knows the character is the chosen one who will gather the six primordial Dofus («Balbucear que es tu deseo más preciado»). From level 40 she goes straight on to the Emerald Dofus and Dark Vlad, «Retourner voir le Dark Vlad, toujours sans mourir» («Parlez à Mériana dans sa cabane afin de débuter la première de la série de quêtes consacrées au Dofus Émeraude»: the ingredients of her potion); below it she sends him away until he is no longer a novice (16696). Whoever left before that is offered the same words again (19904, 16702-16705). For «Volver a ver a Dark Vlad, y seguir sin morirse» (Dofus pour les noobs, «Retourner voir le Dark Vlad, toujours sans mourir»): she takes the six ingredients from the swamps and puts them in her cauldron («Aquí tienes los ingredientes»), the potion tasted she sends him to the heart of the forest («Elle... va maintenant vous téléporter directement au centre de la forêt maléfique»; later, 19949), and shown Dark Vlad's letter she gives him her memoriometer, the compass that points at the places Dark Vlad went (14978). For «Naissance d'une vocation» (Dofus pour les noobs, «Naissance d'une vocation»: «Mériana vous apprend que le Dark Vlad est beaucoup plus puissant que habituellement. Elle décide donc de vous faire changer de tactique pour le vaincre et la quête se termine»): shown the melted compass, she wonders why her potion failed and offers her whole cauldron (16873); not a good idea, and she owns she underestimated him (16874). Another tactic, once the character is stronger (16875). For «Les bandits de Cania» (Dofus pour les noobs): she will turn the character into a dragon with Prysmaradoth's talisman, whose power lies in three scales the three bandits of Cania hold (16876-16878); bounty hunters have tried to catch them, and Amakna's militia may know more (16879). Below level 80 she sends him to grow stronger first (16875) and offers it again when he is (20131, 16880). Shown the three scales («¡Tengo las tres escamas de Prismaradona!»), the quest ends; they are only shown, so they stay in the bag for the hunter's trades. For «Draconantropía» (Dofus pour les noobs, «Draconanthropie»): shown the three scales she goes on to the receptacle (16885) and where to find it (16886), the quest's own step text, and hands over a Pócima de Gisgul (17766) to reach the tower; «Retomar tu misión» (20137) brings back whoever left before that. With the obsidian pendant, the enchanted ring of Maxilubo and the flower of the tormented in the bag, «He encontrado todo lo que me has pedido» leads to the ritual: the three handed over (8177-8179), a hair pulled, the talisman put together and the body felt changing (8180), «elle vous le passe au cou pour le tester». Going on with her starts «Destinación final» (16891-16894; «Si vous continuez le dialogue avec Mériana, vous lancerez la quête suivante»); «Estoy preparado para partir de nuevo» (20147) gives the same words to whoever left first (16895, 16896). «Draconanthropie» ends with Prysmaradoth's talisman around the character's neck (16890, «te pone el colgante»): 20143 gives it, and «Destination finale» -- whose victory it is the key to (16954) -- gives it again on starting to one who finished the ritual without it. «Le livre des Taures» (Dofus pour les noobs): «Parlez à Mériana du Dofus Pourpre» (21759) from level 90 once «La magicienne des marécages» is done; the Minotoror guards it and a taur sorcerer's grimoire is needed (18152), there are copies in the great libraries (18153). Back from Astrub, «Mencionar al Maestro Cuerbok» (21837) sends the character to Cania and asks for one of his bones (18222). With the book and the bone (21843, 21842) she enchants the bone and hands it over (18224, «Guardar el hueso encantado», which ends the quest), and «Me voy a la Isla del Minotauroro» (21840) starts «Toro de rodeo». Whoever left before that is handed the bone again by «Estoy listo para ir al Laberinto del Minotauroro» (21844, 18226). For «El tesoro de Totankama» (Dofus pour les noobs, «Le trésor de Totankama»): «Résumez alors à Mériana votre rencontre avec le Minotot» (21915, 18295, «Seguir escuchando» 21914, 18296, «Cuéntame más sobre estos objetos» 21913, 18297: Kerubim for the ring) and «Ir en busca de los objetos» (21916) is 8635. «Montrez alors les trois types de ressources à Mériana» (21918): all three lead to «Podemos comenzar» (18298), fewer to «necesito todos los objetos» (18299) and mark what was shown (8666, 8668; the dust, 8667, asks for five doses). «Mériana procède alors à un rituel étrange et vous donne ensuite une sac dans lequel elle à enfermé vos objets»: «Estoy listo para el ritual» (21921), the bag (18300, «Esperar unos instantes» 21920, 18301) and «Seguir sus instrucciones» (21919) takes the pearl, the five doses and the ring (and marks the bag as had); the five doses are one of each eternale's powder (15419, 15602-15605, «Remordimientos de eternala»), so both the offer and the taking ask for one of each; asked again before burying it she repeats it (82818, 60267, 82817). For «Cómo perder la pluma» (Dofus pour les noobs, «Comment perdre ses plumes»): «Parlez à Mériana pour lui dire qu'un tofu c'est introduit dans sa cabane» (22162, 18532), the ritual in the Book of the Taurs (22161, 18533, 22160, 18534, 22159, 18535: three eggs), «¿Sabes dónde puedo encontrarlos?» (22157, 18536, Félix Rodrifuente in Cania) and «Voy a Cania» (22156) takes the quest; «Me ocuparé de él más tarde... o jamás» (22158) leaves it. Back with the eggs (22188): without all three she waits (18555, 22183); with them «Están los tres»... she counts them, the pan (22186 hands the three eggs over, 8695-8697), the omelette (18557, «Reprimir un grito de sorpresa» 22185) and the pan on the tofu's head (18558): «Escuchar una especie de trueno» (22184) takes the follower and Renemil Belok is there. The client's «Hay un tofu en tu casa» (22155) and its «ocúpate primero de la perla de leche dorada» (18531) belong to an older order where the pearl came first; the quest's start criterion ((Qa=1523&Qo>8635)|Qf=1523) opens the tofu right after the summary, so they are left out. «A la leche caliente, batir de repente»: once the royal multicoloured blop is beaten (8676) she is making a magic bag (18317); «Voy a necesitar el caldero para la perla de leche» (21942, 18318: Gorco will help, the cauldron must be at the right heat) and «Voy a ver a Gorco» (21941) is 8677. «Dragones y chapuzonas» (1653), the Turquoise Dofus: «Hablar del dofus Turquesa» (25787): the water dragon's egg in the keeping of two creatures of Amakna (21479), a witch who took it to raise an old monster and lies under the waves (21480), back with its owner, the primordial dragon Aguabrial, who looks for a new guardian (21481), the two keys of his sanctuary with the Dofus' old guardians, the Dragon Pig and the Soft Oak (21482, the step's line), Mami Ayuto of the imps' village on the coast of Cania once they are found (21483), and «Voy a empezar la misión» (25782) takes the quest; Dofus pour les noobs («Plongeon et dragon»): «Allez voir la sorcière Mériana et parlez avec elle du Dofus Turquoise». Back from the cave (9964): «Ereziah y Aguabrial han decidido que era mejor contarte la verdad» (21484), «Hablar de la lágrima de Aguabrial» (25793) is 9964: the tear thrown into Bolgrot's fire, when the time comes (21489), «Me iré de aventuras para hacerme más fuerte» (25792) (Dofus pour les noobs: «Rapportez alors la ressource à Mériana... Demandez alors à Mériana un Chaudron magique»); «Siento haberte molestado» (21943) leaves."
     },
     {
       "npc": 2256,
@@ -40651,6 +40695,335 @@
         }
       ],
       "why": "Sun Rinos by the Purple Dofus (1529): «¿Pensabas que te iba a dejar apropiarte del dofus? ¡Es mío!» (31779), «¿Cómo has entrado aquí?» (38433) is 8709, «Habla con Sun Rinos»: the blast through the labyrinth (31780); «Sun Rinos, el rey de los tymadores» (38430): the head of Astrub's syndicate, for Vil Smis (31781), «Te propongo un acuerdo amistoso» (38429): «una vez me haya deshecho del minovillo...» (31782); or «Sun Rinos, el paleto» (38432): «Voy a ocuparme de ti y del canijo que te acompaña» (31783). «Proteger a Gavroch de los ataques de Sun Rinos» (38428, 38431) is the fight (content/fights/npc_fights.json), and «Enfrentarte a Sun Rinos y proteger a Gavroch» (38434) the fight again."
+    },
+    {
+      "npc": 784,
+      "map": 72363008,
+      "opening": 3231,
+      "lines": [
+        {
+          "message": 3231,
+          "choices": [
+            {"reply": 25857, "next": 21535, "quest": 1653, "afterObjective": 9948, "beforeObjective": 9949},
+            {"reply": 2864}
+          ]
+        },
+        {
+          "message": 21535,
+          "choices": [
+            {"reply": 25853},
+            {"reply": 25854, "next": 21536, "buyPrice": 100},
+            {"reply": 25855, "next": 21537, "buyPrice": 1000},
+            {"reply": 25856, "next": 21538, "buyPrice": 10000}
+          ]
+        },
+        {
+          "message": 21536,
+          "choices": []
+        },
+        {
+          "message": 21537,
+          "choices": []
+        },
+        {
+          "message": 21538,
+          "choices": []
+        }
+      ],
+      "why": "The porco of the Dragon Pig's Den doors in the throne room, its exit: «Me he fijado como luchabas...» (3231), and his «Salir.» (2864) takes the winners out (dungeon_exits.json). «Dragones y chapuzonas» (1653): «¿Sabes dónde está escondida la llave del santuario de Aguabrial?» (25857), until the toothed key is found (9949): a selective memory a few kamas may help (21535); «No pienso darte ni un kama» (25853) gets nothing, «Ten, 100 kamas» (25854) not generous enough, a statue with a big snout (21536), «Ten, 1000 kamas» (25855) under the rolling pig's head (21537), «Ten, 10 000 kamas» (25856) left of the throne (21538), where it is (Dofus pour les noobs («Plongeon et dragon»): «à gauche du Trône»). Which sum buys which hint is INFERRED, by the order of the lines."
+    },
+    {
+      "npc": 3010,
+      "map": 154142211,
+      "opening": 21543,
+      "lines": [
+        {
+          "message": 21543,
+          "choices": [
+            {"reply": 25871, "next": 21544, "criterion": "PO!17016&PO!17017&PO!17018", "gives": 17016},
+            {"reply": 25863, "criterion": "PO!17016&PO!17017&PO!17018"},
+            {"reply": 25867, "criterion": "PO!17016&PO!17017&PO!17018"},
+            {"reply": 25872, "next": 21548, "criterion": "PO=17016&PO!17017&PO!17018", "gives": 17017},
+            {"reply": 25884, "criterion": "PO=17016&PO!17017&PO!17018"},
+            {"reply": 25875, "criterion": "PO=17016&PO!17017&PO!17018"},
+            {"reply": 25878, "next": 21551, "criterion": "PO=17017&PO!17018", "gives": 17018, "alsoGives": [17015]},
+            {"reply": 25885, "criterion": "PO=17017&PO!17018"},
+            {"reply": 25880, "criterion": "PO=17017&PO!17018"},
+            {"reply": 25885, "criterion": "PO=17018"},
+            {"reply": 25886, "criterion": "PO=17018"}
+          ]
+        },
+        {
+          "message": 21544,
+          "choices": [
+            {"reply": 25870, "next": 21545},
+            {"reply": 25864}
+          ]
+        },
+        {
+          "message": 21545,
+          "choices": [
+            {"reply": 25869, "next": 21546},
+            {"reply": 25865}
+          ]
+        },
+        {
+          "message": 21546,
+          "choices": [
+            {"reply": 25868, "next": 21547},
+            {"reply": 25866}
+          ]
+        },
+        {
+          "message": 21547,
+          "choices": []
+        },
+        {
+          "message": 21548,
+          "choices": [
+            {"reply": 25877, "next": 21549},
+            {"reply": 25873}
+          ]
+        },
+        {
+          "message": 21549,
+          "choices": [
+            {"reply": 25876, "next": 21550},
+            {"reply": 25874}
+          ]
+        },
+        {
+          "message": 21550,
+          "choices": []
+        },
+        {
+          "message": 21551,
+          "choices": [
+            {"reply": 25881, "next": 21552},
+            {"reply": 25879}
+          ]
+        },
+        {
+          "message": 21552,
+          "choices": []
+        }
+      ],
+      "why": "A tree of the disenchanted thicket (3010), behind the Soft Oak Clearing's exit room: it moves its branches slowly (21543). Dofus pour les noobs («Plongeon et dragon»): «Il n'est pas nécessaire d'attaquer les arbres du bosquet, vous pouvez décider de simplement leur parler. Cependant si vous décidez de leur parler vous obtiendrez 3 malus au total», «ou leur parler trois fois (mais vous allez cumuler les malus)». Talking hands its sadness one at a time: «Hablar con el árbol» first the Melancolía (25871: a sigh, a sob, despair and remorse, 21544-21547, with «Vaya, qué nostalgia me ha entrado... Mejor me alejo» and the other ways off on each), with it on the Tristeza (25872: a sob, despair, remorse, 21548-21550), with that on the Desesperanza and the abraknyde's transformation (25878: despair and remorse, 21551-21552), as the three chains of lines get shorter and sadder. «Atacar al árbol» (25863, 25884, 25885) is a fight against it (npc_fights.json), whose loot holds the transformation (its own row, 30 %) and the next sadness (fight_drops.json); with the despair on, only the fight or «Vale, ya me alejo» (25886). Which reply goes with which line is INFERRED from their order."
+    },
+    {
+      "npc": 389,
+      "map": 14551301,
+      "opening": 1627,
+      "openings": [ {"quest": 1653, "objective": 9953, "pending": 9954, "message": 1628} ],
+      "lines": [
+        {
+          "message": 1628,
+          "choices": [
+            {"reply": 25892, "next": 21557, "quest": 1653, "beforeObjective": 9954}
+          ]
+        },
+        {
+          "message": 21557,
+          "choices": [
+            {"reply": 25891, "next": 21558, "quest": 1653, "completes": 9954, "params": [[30, 9954]], "gives": 16948}
+          ]
+        },
+        {
+          "message": 21558,
+          "choices": [
+            {"reply": 25890, "next": 21559},
+            {"reply": 25889}
+          ]
+        },
+        {
+          "message": 21559,
+          "choices": [
+            {"reply": 25888},
+            {"reply": 25887, "teleport": 154272257}
+          ]
+        },
+        {
+          "message": 1627,
+          "choices": []
+        }
+      ],
+      "why": "Mami Ayuto on the imps' platform at the village gate: «Mientras vele por ellos, los salteadorillos estarán seguros» (1627). «Dragones y chapuzonas» (1653), once the gate is reached (9953): «¡OYE, TITI, ALTO!» (1628), «Vengo de parte de Meriana» (25892): Strig told her of the adventurer, smaller than she thought; it is not her the character has to convince (21557); «Aceptar la pócima» (25891) is 9954 and gives the Pócima de Ayuto (16948), her own elixir that brings one back here (21558); «¿Conoces la receta de la pócima?» (25890) its ingredients (21559), «Voy a ver a Girle» (25889), «Encogerse de hombros e irse» (25888) or «Acercarse a la jaula suspendida» (25887), down to the workshop platform; Dofus pour les noobs («Plongeon et dragon»): «Mama Ayuto vous confie une potion pour vous téléporter ici... Utilisez alors la potion que vous avez obtenue ou bien (conseillé) descendez les escaliers»."
+    },
+    {
+      "npc": 383,
+      "map": 154272257,
+      "opening": 21570,
+      "lines": [
+        {
+          "message": 21570,
+          "choices": [
+            {"reply": 25909, "next": 21571, "criterion": "(Qa=1653&Qo>9955)|Qf=1653"}
+          ]
+        },
+        {
+          "message": 21571,
+          "choices": [
+            {"reply": 25908, "quest": 1653, "beforeObjective": 9956, "completes": 9956, "params": [[30, 9956]], "teleport": 154272513},
+            {"reply": 25908, "criterion": "(Qa=1653&Qo>9956)|Qf=1653", "teleport": 154272513}
+          ]
+        }
+      ],
+      "why": "Girle Pylot on the workshop platform: the imps are the masters of the air too, their transporters reach where nothing else does (21570). «Dragones y chapuzonas» (1653): «Necesito entrar en el santuario de Aguabrial» (25909): next stop, the mysterious island (21571), and «Vale, ya subo al transportador salteadorillo» (25908) is 9956 and flies there; Dofus pour les noobs («Plongeon et dragon»): «Parlez à Girle Pylote la brigandine afin qu'elle vous conduise dans le sanctuaire d'Aguabrial». The flight stays offered once she has been seen, and after the quest."
+    },
+    {
+      "npc": 383,
+      "map": 154272513,
+      "opening": 21570,
+      "lines": [
+        {
+          "message": 21570,
+          "choices": [
+            {"reply": 25911, "next": 21572}
+          ]
+        },
+        {
+          "message": 21572,
+          "choices": [
+            {"reply": 25910, "teleport": 154272257}
+          ]
+        }
+      ],
+      "why": "Girle Pylot on the mysterious island, by her transporter: «Quiero volver al pueblo de los salteadorillos» (25911), «¡Vuelta a casa!» (21572), and «Vale, ya subo al transportador salteadorillo» (25910) flies back to the workshop platform."
+    },
+    {
+      "npc": 2953,
+      "map": 154143489,
+      "opening": 21576,
+      "openings": [ {"quest": 1653, "objective": 9962, "message": 21582}, {"after": 1653, "message": 21582} ],
+      "lines": [
+        {
+          "message": 21576,
+          "choices": [
+            {"reply": 25920, "next": 21577, "quest": 1653, "beforeObjective": 9962}
+          ]
+        },
+        {
+          "message": 21577,
+          "choices": [
+            {"reply": 25919, "next": 21583},
+            {"reply": 25923, "next": 21578}
+          ]
+        },
+        {
+          "message": 21583,
+          "choices": [
+            {"reply": 25923, "next": 21578},
+            {"reply": 25929}
+          ]
+        },
+        {
+          "message": 21578,
+          "choices": [
+            {"reply": 25922, "next": 21579},
+            {"reply": 25921, "next": 21580}
+          ]
+        },
+        {
+          "message": 21579,
+          "choices": [
+            {"reply": 25921, "next": 21580},
+            {"reply": 25926, "next": 21581},
+            {"reply": 25925, "next": 21581},
+            {"reply": 25927, "next": 21581}
+          ]
+        },
+        {
+          "message": 21580,
+          "choices": [
+            {"reply": 25926, "next": 21581},
+            {"reply": 25925, "next": 21581},
+            {"reply": 25927, "next": 21581},
+            {"reply": 25924, "next": 21579}
+          ]
+        },
+        {
+          "message": 21581,
+          "choices": [
+            {"reply": 25928, "quest": 1653, "completes": 9962, "params": [[30, 9962]], "showsNpc": 2954}
+          ]
+        },
+        {
+          "message": 21582,
+          "choices": [
+            {"reply": 25929}
+          ]
+        }
+      ],
+      "why": "Aguabrial in his cave: «¿Quién osa molestar a Aguabrial?» (21576). «Dragones y chapuzonas» (1653): «Estoy aquí por el dofus Turquesa» (25920): the Twelve's obsession with the dofus (21577); «Yo soy grande y fuerte, y tengo mucho poder» (25919) gets «jamás confiaría su huevo a un simple aventurero» (21583), «Me envía Meriana» (25923): what would the character sacrifice (21578); «Voy a pensarlo durante unos segundos» (25922, 25924: «¿Cuál es tu respuesta?», 21579), «Entregaré una importante suma de mi fortuna personal» (25921: too little for a dragon, 21580), and a life, freedom or a destiny given (25925, 25927, 25926): Aguabrial believes in destiny and in sacrifice, «¿Qué opinas, alquimista?» (21581); «Girarse para ver quién ha aparecido» (25928) is 9962, and Ereziah is there. Once seen, «Aguabrial te volverá a ver en su debido momento» (21582). Which reply goes with which line is INFERRED from their order."
+    },
+    {
+      "npc": 2954,
+      "map": 154143489,
+      "opening": 21586,
+      "openings": [ {"quest": 1653, "objective": 9963, "message": 21595} ],
+      "lines": [
+        {
+          "message": 21586,
+          "choices": [
+            {"reply": 25942, "next": 21587, "quest": 1653, "afterObjective": 9962, "beforeObjective": 9963}
+          ]
+        },
+        {
+          "message": 21587,
+          "choices": [
+            {"reply": 25941, "next": 21588}
+          ]
+        },
+        {
+          "message": 21588,
+          "choices": [
+            {"reply": 25940, "next": 21589}
+          ]
+        },
+        {
+          "message": 21589,
+          "choices": [
+            {"reply": 25939, "next": 21590}
+          ]
+        },
+        {
+          "message": 21590,
+          "choices": [
+            {"reply": 25938, "next": 21591}
+          ]
+        },
+        {
+          "message": 21591,
+          "choices": [
+            {"reply": 25937, "next": 21592}
+          ]
+        },
+        {
+          "message": 21592,
+          "choices": [
+            {"reply": 25936, "next": 21593}
+          ]
+        },
+        {
+          "message": 21593,
+          "choices": [
+            {"reply": 25935, "next": 21594}
+          ]
+        },
+        {
+          "message": 21594,
+          "choices": [
+            {"reply": 25934, "next": 21595, "quest": 1653, "completes": 9963, "params": [[30, 9963]], "gives": 16888}
+          ]
+        },
+        {
+          "message": 21595,
+          "choices": [
+            {"reply": 25933, "teleport": 154272513}
+          ]
+        }
+      ],
+      "why": "Ereziah Melkewel in Aguabrial's cave, «Dragones y chapuzonas» (1653): few mortals have stood before the water dragon (21586), «¿Qué más me puedes contar?» (25942): an alchemist, among other things, who saw the dofus change hands (21587), «Es cierto» (25941): did Meriana say who the witch was (21588), «No tenía ni idea» (25940): Furyha, the old guardian of Amakna's west, her daughter (21589), «¡...!» (25939): Bolgrot, Djaul's black-hearted dragon, Aguabrial's offspring (21590), «Escuchar el rugido del dragón del agua» (25938, 21591), «Escuchar más» (25937, 21592), «Seguir escuchando» (25936): Furyha's soul still burnt by Bolgrot's fire (21593), «¿Cómo apago el fuego de Bolgrot?» (25935): the dagger born of Aguabrial's tear (21594), «Tomar la daga» (25934) is 9963 and gives the Hoja de Aguabrial (16888): go back to Meriana (21595), and «Salir de la caverna» (25933) goes up to the island, where Girle waits."
     }
   ]
 }

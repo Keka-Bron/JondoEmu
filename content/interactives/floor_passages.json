@@ -224,6 +224,13 @@
       "toMap": 137366528,
       "toCell": 403,
       "why": "And out of the tavern: the top of its back corridor, at the wall, leads up to the street, landing at the foot of the arch's steps (403). INFERRED."
+    },
+    {
+      "map": 154142211,
+      "cell": 146,
+      "toMap": 149428224,
+      "toCell": 131,
+      "why": "Out of the disenchanted thicket: the top of its path, under the light, leads back behind the big tree of the Soft Oak Clearing's exit room, landing by the way in (490835, cell 117). The client's map draws no element there. INFERRED cells."
     }
   ]
 }

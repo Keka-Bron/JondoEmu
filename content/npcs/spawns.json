@@ -4863,6 +4863,72 @@
       "cell": 345,
       "orientation": 3,
       "why": "Berbe Unin moved a few cells to the right of the door, against the tavern's front under its windows, between the terrace's tables: still by the tavern, out of the way of its door, facing the path."
-    }
-  ]
+    },
+      {
+        "map": 72363008,
+        "npc": 784,
+        "cell": 301,
+        "orientation": 3,
+        "why": "The porco of the Dragon Pig's Den doors in its throne room, the den's exit, where the winners are: «Me he fijado como luchabas y francamente me has impresionado... supongo que quieres que te saque de aquí» (3231). INFERRED cell, in the circle before the throne."
+      },
+      {
+        "map": 154142211,
+        "npc": 3010,
+        "cell": 315,
+        "orientation": 1,
+        "why": "A tree of the disenchanted thicket, around the stele: «Il n'est pas nécessaire d'attaquer les arbres du bosquet, vous pouvez décider de simplement leur parler» (Dofus pour les noobs («Plongeon et dragon»)). INFERRED cell."
+      },
+      {
+        "map": 154142211,
+        "npc": 3010,
+        "cell": 374,
+        "orientation": 5,
+        "why": "Another tree of the thicket, on the stele's other side. INFERRED cell."
+      },
+      {
+        "map": 154142211,
+        "npc": 3010,
+        "cell": 398,
+        "orientation": 7,
+        "why": "A third tree of the thicket, below the stele. INFERRED cell."
+      },
+      {
+        "map": 14551301,
+        "npc": 389,
+        "cell": 259,
+        "orientation": 1,
+        "why": "Mami Ayuto on the imps' platform at the village gate [-19,-23] (objective 9954 names this map), watching over her imps: «Montez l'échelle et parlez à Mama Ayuto de la part de Mériana» (Dofus pour les noobs («Plongeon et dragon»)). INFERRED cell, in the middle of the platform."
+      },
+      {
+        "map": 154272257,
+        "npc": 383,
+        "cell": 246,
+        "orientation": 1,
+        "criterion": "(Qa=1653&Qo>9955)|Qf=1653",
+        "why": "Girle Pylot on the workshop platform (objective 9956 names this map), by the imps' flying transporter, from the character's arrival there: «Parlez à Girle Pylote la brigandine afin qu'elle vous conduise dans le sanctuaire d'Aguabrial» (Dofus pour les noobs («Plongeon et dragon»)). INFERRED cell."
+      },
+      {
+        "map": 154272513,
+        "npc": 383,
+        "cell": 371,
+        "orientation": 1,
+        "criterion": "(Qa=1653&Qo>9956)|Qf=1653",
+        "why": "Girle Pylot on the mysterious island [36,-3], at the foot of her transporter's ladder, to take the character back to the village. INFERRED cell."
+      },
+      {
+        "map": 154143489,
+        "npc": 2953,
+        "cell": 358,
+        "orientation": 3,
+        "why": "Aguabrial in the pool of his cave (objective 9962 names this map), facing the rock ledge one comes in on. INFERRED cell."
+      },
+      {
+        "map": 154143489,
+        "npc": 2954,
+        "cell": 450,
+        "orientation": 7,
+        "criterion": "Qa=1653&Qo>9962",
+        "why": "Ereziah Melkewel, come in behind the character on the ledge as Aguabrial asks the alchemist's opinion («¿Qué opinas, alquimista?», 21581; «Girarse para ver quién ha aparecido», 25928), until the quest is over. INFERRED cell."
+      }
+    ]
 }

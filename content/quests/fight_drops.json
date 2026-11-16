@@ -40,6 +40,33 @@
       "percent": 5,
       "criterion": "Qa=1198",
       "why": "Lotape de cola: off any monster while «Reír a base de palos» is in hand («Caramel/Fraise/Citron/Orange/Kola: se dropent sur tous types de monstres si la quête est activée»); never once it is done («Une fois la quête terminée, vous ne pourrez plus drop de Rabmarac»)."
+    },
+    {
+      "item": 17018,
+      "percent": 100,
+      "monsters": [
+        4167
+      ],
+      "criterion": "PO=17017&PO!17018",
+      "why": "Desesperanza: the third fight against a tree of the thicket, its sadness on. Dofus pour les noobs («Plongeon et dragon»): «les arbres que vous allez combattre sont tristes et vont vous donner leur tristesse. Ainsi pour chaque combat effectué vous aurez : 1 combat : Mélancolie. 2 combats : Tristesse. 3 combats : Désespoir». The rows go from the last to the first: what one rolls counts for the next ones, and the other order hands all three at once."
+    },
+    {
+      "item": 17017,
+      "percent": 100,
+      "monsters": [
+        4167
+      ],
+      "criterion": "PO=17016&PO!17017&PO!17018",
+      "why": "Tristeza: the second fight against a tree of the thicket, its melancholy on. Dofus pour les noobs («Plongeon et dragon»): «les arbres que vous allez combattre sont tristes et vont vous donner leur tristesse. Ainsi pour chaque combat effectué vous aurez : 1 combat : Mélancolie. 2 combats : Tristesse. 3 combats : Désespoir»."
+    },
+    {
+      "item": 17016,
+      "percent": 100,
+      "monsters": [
+        4167
+      ],
+      "criterion": "PO!17016&PO!17017&PO!17018",
+      "why": "Melancolía: the first fight against a tree of the thicket. Dofus pour les noobs («Plongeon et dragon»): «les arbres que vous allez combattre sont tristes et vont vous donner leur tristesse. Ainsi pour chaque combat effectué vous aurez : 1 combat : Mélancolie. 2 combats : Tristesse. 3 combats : Désespoir». «Si vous réussissez en 1 combat vous n'aurez que un malus de 5 tours» (its 5 fights)."
     }
   ]
 }

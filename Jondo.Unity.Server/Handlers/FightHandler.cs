@@ -13078,6 +13078,7 @@ namespace Jondo.Unity.Server.Handlers
                 // de palos», caramel to cola, off every creature while the quest is in hand.
                 foreach (var drop in Enumerable.Repeat(Managers.QuestFightDrops.All, passes).SelectMany(t => t))
                 {
+                    if (!drop.From(monster.MonsterId)) continue;
                     if (!SeLoLleva(fight, drop.Criterion, Held, monster.MonsterId)) continue;
 
                     double probabilidad = extra > 0

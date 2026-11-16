@@ -624,6 +624,41 @@
       "toMap": 136577024,
       "toCell": 465,
       "why": "The Ring del Capitán Eskarlata (dungeon 81) had no way in: its street [6,3] (134221826) is the catalogue's exit and its antechamber (136577024, Tak Hillero's) its entrance, and nothing led from one to the other. The street's one element, 485454 in the mouth of the giant skull the carpet runs to, is the door («Rendez-vous en [6,3] afin d'effectuer le donjon», Dofus pour les noobs). INFERRED landing, on the antechamber's carpet."
+    },
+    {
+      "map": 149428224,
+      "element": 490835,
+      "cell": 117,
+      "gfx": 49598,
+      "type": -1,
+      "skill": 114,
+      "toMap": 154142211,
+      "toCell": 174,
+      "why": "The Soft Oak Clearing's exit room [-14,-13]: the way behind the big tree (element 490835, cell 117) to the disenchanted thicket (154142211), «Avant de sortir du donjon, passez derrière le grand arbre pour arriver dans une salle avec un stèle» (Dofus pour les noobs («Plongeon et dragon»)). Lands at the top of the thicket's path. INFERRED landing."
+    },
+    {
+      "map": 154141441,
+      "element": 490934,
+      "cell": 233,
+      "gfx": 50368,
+      "type": -1,
+      "skill": 114,
+      "toMap": 154142465,
+      "toCell": 511,
+      "criterion": "(Qa=1653&Qo>9958)|Qf=1653",
+      "why": "The mysterious island's sanctuary door [37,-3] (element 490934), shut until the clawed and the toothed keys are in their keyholes (9958, «Dragones y chapuzonas»), open from then on. Lands at the bottom of the hall. INFERRED landing."
+    },
+    {
+      "map": 154142465,
+      "element": 489514,
+      "cell": 412,
+      "gfx": 49593,
+      "type": -1,
+      "skill": 114,
+      "toMap": 154143489,
+      "toCell": 436,
+      "criterion": "(Qa=1653&Qo>9960)|Qf=1653",
+      "why": "The pool in the middle of the sanctuary (element 489514) leads down to Aguabrial's cave once its guardian is beaten (9960, «Dragones y chapuzonas»); before that it brings her out (objectives.json). Lands on the cave's rock ledge. INFERRED landing."
     }
   ]
 }

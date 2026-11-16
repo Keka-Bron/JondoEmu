@@ -1233,6 +1233,45 @@
       "why": "«Atacar al estafador»: Vantarde Smis (3763) alone; his own drop row gives the note found on him (15595) while 8688 is to do (Qa=1526&Qo>8687&Qo<8688&PO!15595)." },
     { "npc": 2520, "map": 137367552, "reply": 22108,
       "monsters": [ { "monster": 3763, "grade": 0 } ],
-      "why": "«Atacar al estafador»: Vantarde Smis (3763) alone; his own drop row gives the note found on him (15595) while 8688 is to do (Qa=1526&Qo>8687&Qo<8688&PO!15595)." }
+      "why": "«Atacar al estafador»: Vantarde Smis (3763) alone; his own drop row gives the note found on him (15595) while 8688 is to do (Qa=1526&Qo>8687&Qo<8688&PO!15595)." },
+    {
+      "npc": 3010,
+      "map": 154142211,
+      "reply": 25863,
+      "byLevel": true,
+      "monsters": [
+        {
+          "monster": 4167,
+          "grade": 0
+        }
+      ],
+      "why": "«Atacar al árbol» before any of its sadness: the disenchanted thicket's tree (4167), alone, at the character's level; Dofus pour les noobs («Plongeon et dragon»): «En combattant vous aurez à chaque combat une chance d'être transformé»."
+    },
+    {
+      "npc": 3010,
+      "map": 154142211,
+      "reply": 25884,
+      "byLevel": true,
+      "monsters": [
+        {
+          "monster": 4167,
+          "grade": 0
+        }
+      ],
+      "why": "«Atacar al árbol» with its melancholy on: the disenchanted thicket's tree (4167), alone, at the character's level; Dofus pour les noobs («Plongeon et dragon»): «En combattant vous aurez à chaque combat une chance d'être transformé»."
+    },
+    {
+      "npc": 3010,
+      "map": 154142211,
+      "reply": 25885,
+      "byLevel": true,
+      "monsters": [
+        {
+          "monster": 4167,
+          "grade": 0
+        }
+      ],
+      "why": "«Atacar al árbol» with its sadness or its despair on: the disenchanted thicket's tree (4167), alone, at the character's level; Dofus pour les noobs («Plongeon et dragon»): «En combattant vous aurez à chaque combat une chance d'être transformé»."
+    }
   ]
 }

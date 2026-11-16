@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using Jondo.Unity.Launcher;
 
@@ -15,7 +16,9 @@ namespace Jondo.Unity.Server.Managers
     /// The other five flavours are not on any table, and yet «se dropent sur tous types de monstres
     /// si la quête est activée» (Dofus pour les noobs): the server hands them out on its own. This
     /// file is those rows, one roll per row and per monster beaten, read with the same criterion
-    /// reader as the monsters' loot.
+    /// reader as the monsters' loot. A row may name the monsters it drops from: the disenchanted
+    /// thicket's trees of «Dragones y chapuzonas» hand their sadness over fight after fight, and
+    /// no table of theirs carries it.
     /// </remarks>
     public static class QuestFightDrops
     {
@@ -28,6 +31,12 @@ namespace Jondo.Unity.Server.Managers
             public int Item { get; init; }
             public double Percent { get; init; }
             public string Criterion { get; init; } = "";
+
+            /// <summary>The monsters it drops from; any monster when empty.</summary>
+            public IReadOnlyList<int> Monsters { get; init; } = Array.Empty<int>();
+
+            /// <summary>Whether beating this monster rolls it.</summary>
+            public bool From(int monster) => Monsters.Count == 0 || Monsters.Contains(monster);
         }
 
         private static List<Drop>? _drops;
@@ -55,6 +64,9 @@ namespace Jondo.Unity.Server.Managers
                                     Item = row.GetProperty("item").GetInt32(),
                                     Percent = row.GetProperty("percent").GetDouble(),
                                     Criterion = row.TryGetProperty("criterion", out var criterion) ? criterion.GetString() ?? "" : "",
+                                    Monsters = row.TryGetProperty("monsters", out var monsters) && monsters.ValueKind == JsonValueKind.Array
+                                        ? monsters.EnumerateArray().Select(m => m.GetInt32()).ToArray()
+                                        : Array.Empty<int>(),
                                 });
                             }
                         }
