@@ -44,6 +44,8 @@ namespace Jondo.Unity.Server.Handlers
                 Managers.Equipment.RememberWorn(item.Uid, item.Position, item.RawEffects);
             Managers.Equipment.LoadFrom(characterId);
             Managers.SpellChoices.LoadFrom(characterId);
+            // His achievements and his own tallies: his fights count for him (Achievements.ForHeroAsync).
+            Managers.Achievements.LoadFrom(characterId);
             return true;
         }
 

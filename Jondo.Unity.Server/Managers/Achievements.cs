@@ -298,6 +298,54 @@ namespace Jondo.Unity.Server.Managers
             await CheckAsync(stream, candidates);
         }
 
+        /// <summary>
+        /// A hero at his master's side again (Network.HeroPresence): what his fights set aside and
+        /// his level, looked at in his own session and announced on his master's client.
+        /// </summary>
+        /// <remarks>
+        /// The achievements are the account's, and the master's log stands for the account while
+        /// the group lasts: what it earned since the hero was connected is his before he is looked
+        /// at, and what he earns is the master's after, so that neither earns one twice. The ones
+        /// each character earns for himself (EachCharacter) stay each his own.
+        /// </remarks>
+        public static async Task ForHeroAsync(GameSession master, GameSession hero)
+        {
+            var book = _book;
+            var account = master.State.Achievements;
+            if (book == null || master.Stream == null) return;
+
+            using (SessionContext.Push(hero))
+            {
+                var state = SessionContext.State;
+                var log = Log;
+                if (log == null) return;
+
+                var candidates = new List<int>(state.AchievementsPending);
+                state.AchievementsPending.Clear();
+                if (state.AchievementLevelChecked != state.CharacterLevel)
+                {
+                    state.AchievementLevelChecked = state.CharacterLevel;
+                    candidates.AddRange(book.WaitingOn("PL"));
+                }
+                if (candidates.Count == 0) return;
+
+                if (account != null)
+                    foreach (int id in account.Earned.ToList())
+                        if (book.Of(id)?.EachCharacter != true) log.Restore(id, account.WasClaimed(id), account.AchieverOf(id));
+
+                var earned = log.CheckAll(candidates.Distinct());
+                await AnnounceAsync(master.Stream, earned);
+
+                if (account == null) return;
+                foreach (int id in earned)
+                {
+                    if (book.Of(id)?.EachCharacter == true) continue;
+                    account.Restore(id, false, state.CharacterId);
+                    account.NoteLevel(id, LevelOnTheWire(state.CharacterLevel));
+                }
+            }
+        }
+
         /// <summary>The character's level went up. The level achievements, looked at now.</summary>
         public static Task AfterLevelAsync(NetworkStream stream)
         {
