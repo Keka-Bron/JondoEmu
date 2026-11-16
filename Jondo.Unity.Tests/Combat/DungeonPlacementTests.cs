@@ -28,6 +28,26 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(board, MapManager.ResolveArenaMapId(room));
         }
 
+        /// <summary>
+        /// The Royal Mastogob's Greenhouse: each room on the arena called as it is, and the sixth,
+        /// the boss's, on the one arena drawn with its dome, sunflowers and orange tree. Matched by
+        /// the walkable cells, the first, fourth and sixth rooms were all sent to the third room's
+        /// board, and the boss stood among its walkways, with no way to anybody.
+        /// </summary>
+        [Theory]
+        [InlineData(55050240, 55050246)]   // first room
+        [InlineData(55050242, 55051270)]   // second room
+        [InlineData(55052290, 55052294)]   // third room
+        [InlineData(55052288, 55053318)]   // fourth room
+        [InlineData(55053312, 55054342)]   // sixth room, the boss
+        public void Each_Royal_Mastogob_room_fights_on_its_own_board(long room, long board)
+        {
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            if (DungeonPlacements.BoardOf(room) == 0 || !MapManager.Maps.ContainsKey(board)) return;   // no data
+
+            Assert.Equal(board, MapManager.ResolveArenaMapId(room));
+        }
+
         /// <summary>Room 2: the players in the middle, the monsters by pairs at the four corners.</summary>
         [Fact]
         public void A_dungeon_room_is_placed_on_its_board_s_own_cells_every_time()

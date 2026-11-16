@@ -12,13 +12,18 @@ namespace Jondo.Unity.Server.Managers
     /// </summary>
     /// <remarks>
     /// The client marks a map's placement in its cellsData[], its red and blue flags, as it does the
-    /// koliseo arenas' (<see cref="KoliseoMaps"/>). A room has twin arenas in its subarea, its
-    /// placement a cell or a row off; the board is the twin whose cells share the most with the
-    /// room's (datos/mazmorras_colocacion.json, extract_dungeon_placements.py). Measured on the
-    /// Royal Gobball's five rooms against the real game's screenshots: each room's own cells are
-    /// the real ones, and the subarea's arena MapManager picked by its rule was another room's twin
-    /// for four of them -- another room's scenery and placement. And the fight was drawn anew like
-    /// any other, where the game keeps a room's placement the same every time.
+    /// koliseo arenas' (<see cref="KoliseoMaps"/>). A room has twin arenas in its subarea, maps with
+    /// no place in the world, its placement a cell or a row off; the board is the one arena called
+    /// as the room is, or else the one whose graphics share the most with the room's
+    /// (datos/mazmorras_colocacion.json, extract_dungeon_placements.py). Measured on the Royal
+    /// Gobball's five rooms against the real game's screenshots: each room's own board is the real
+    /// one, and the subarea's arena MapManager picked by its rule was another room's twin for four
+    /// of them -- another room's scenery and placement. And the fight was drawn anew like any
+    /// other, where the game keeps a room's placement the same every time.
+    ///
+    /// The walkable cells were compared before, and they mislead: a room is drawn for walking and
+    /// its board for fighting, so their floors differ while their pictures are the same. They sent
+    /// the Royal Mastogob's boss to fight among his third room's walkways, not under his dome.
     ///
     /// <b>Mind the names, they cross over</b>, as in the koliseo: the client's red cells are our
     /// BLUE team (team 0, the kba's f1), its blue ones our red. The file keeps the client's names
