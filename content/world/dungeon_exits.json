@@ -273,6 +273,15 @@
       "npc": 2449,
       "replies": [21896],
       "why": "The Ring del Capitán Eskarlata: after the ring, the captain's dressing room (136579072, his statues at its door, where the client's quests find him), where «L'anneau de Tot» has you ask him a reward («ATTENTION : Ne sortez pas tout de suite à la fin du donjon», Dofus pour les noobs); «Salir del Ring del Capitán Eskarlata» leaves. INFERRED cell, on the carpet."
+    },
+    {
+      "dungeon": 54,
+      "bossRoom": 55053312,
+      "room": 55054336,
+      "cell": 440,
+      "npc": 1285,
+      "replies": [7712, 7713, 7714],
+      "why": "The Royal Mastogob's Greenhouse: after the Jalamut Real the winners are under the dome of its exit room («Royal Mastogob's Greenhouse - Exit»), where «Le pouvoir derrière le trône» has them talk to Gavroch (objective 8706 names this map), and Topordo Spesos, the host who let them in, takes them out: his three «Salir de la mazmorra» leave. No door is drawn in the room and the client shows no map panel exit there. INFERRED cell, before the round table."
     }
   ]
 }

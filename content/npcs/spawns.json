@@ -4768,6 +4768,13 @@
       "why": "Gavroch at the greenhouse's exit (objective 8706 names this map) once the Jalamut Real is beaten: «¡Guau, ha sido genial!» (18579). INFERRED cell."
     },
     {
+      "map": 55054336,
+      "npc": 1285,
+      "cell": 410,
+      "orientation": 1,
+      "why": "Topordo Spesos, the greenhouse's host, in its exit room after the Jalamut Real: «Me ha gustado mucho cómo has calentado a esos jalamuts» (7695) and his «Salir de la mazmorra» (7712-7714), as the Kwakerback host waits in the Kwakwa's nest exit room; the room has no door and the client gives it no map panel exit. INFERRED cell, by the round table."
+    },
+    {
       "map": 136317698,
       "npc": 2466,
       "cell": 286,

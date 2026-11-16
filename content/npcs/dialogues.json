@@ -16496,6 +16496,20 @@
       "why": "The Kwakerback host in the Kwakwa's nest exit room [-4,-7]: how were the kwaks, any eggs? (8507); his «Salir» leaves (dungeon_exits.json)."
     },
     {
+      "npc": 1285,
+      "map": 55054336,
+      "opening": 7695,
+      "lines": [
+        {
+          "message": 7695,
+          "choices": [
+            { "reply": 7712 }
+          ]
+        }
+      ],
+      "why": "Topordo Spesos in the Royal Mastogob's Greenhouse exit room: the jalamuts warmed up, he hopes it calmed their ardour (7695); his «Salir de la mazmorra» leaves (dungeon_exits.json)."
+    },
+    {
       "npc": 897,
       "map": 0,
       "opening": 3909,
