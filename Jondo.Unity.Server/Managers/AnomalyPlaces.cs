@@ -76,8 +76,22 @@ namespace Jondo.Unity.Server.Managers
         public static long ArenaOf(long roomMapId) => ByRoom(roomMapId)?.Arena ?? 0;
 
         /// <summary>
+        /// The most people a guardian's fight takes: «Elles peuvent être réalisées avec quatre
+        /// personnages maximum» (Dofus pour les noobs, «Les Anomalies Temporelles»).
+        /// </summary>
+        public const int PeopleCap = 4;
+
+        /// <summary>Julith, whose mechanics bring a fourth chronomorph: two of one family.</summary>
+        public const int Julith = 5663;
+
+        /// <summary>Whether a monster is a chronomorph: a brutoforme, a cublaforme or a kaxaforme.</summary>
+        public static bool IsChronomorph(int monsterId) => Load().Families.Any(f => f.Contains(monsterId));
+
+        /// <summary>
         /// A guardian's group: the guardian and his companions, the measured ones or else one of each
-        /// family -- a brutoforme, a cublaforme and a kaxaforme -- drawn.
+        /// family -- a brutoforme, a cublaforme and a kaxaforme -- drawn, and for Julith one more of
+        /// any: «Julith étant accompagné de 4 chronomorphes à cause de sa mécanique, il y aura 2
+        /// chronomorphes d'un même type dans le combat» (Dofus pour les noobs).
         /// </summary>
         public static List<int> GroupOf(Place place, Random dice)
         {
@@ -87,9 +101,29 @@ namespace Jondo.Unity.Server.Managers
                 members.AddRange(place.Group.Members);
                 return members;
             }
-            foreach (var family in Load().Families)
-                if (family.Count > 0) members.Add(family[dice.Next(family.Count)]);
+            var families = Load().Families.Where(f => f.Count > 0).ToList();
+            foreach (var family in families) members.Add(family[dice.Next(family.Count)]);
+            if (place.Guardian == Julith && families.Count > 0)
+            {
+                var again = families[dice.Next(families.Count)];
+                members.Add(again[dice.Next(again.Count)]);
+            }
             return members;
+        }
+
+        /// <summary>
+        /// The dice a place's group is drawn with: the same for the whole cycle of the anomaly that
+        /// opens on it -- «Le chronomorphe est choisi aléatoirement quand l'anomalie s'ouvre et la
+        /// composition du groupe reste la même pour toute la durée de l'anomalie» (Dofus pour les
+        /// noobs) --, so that every fight with its guardian meets the same three.
+        /// </summary>
+        public static int GroupSeed(Place place, DateTimeOffset now)
+        {
+            var opening = Anomalies.All.Where(a => Of(a.SubAreaId, now) == place).OrderBy(a => a.SubAreaId).ToList();
+            int subArea = opening.Count > 0 ? opening[0].SubAreaId : 0;
+            long cycle = opening.Count > 0 ? Cycle(subArea, now)
+                       : Anomalies.Duration > 0 ? now.ToUnixTimeSeconds() / 60 / Anomalies.Duration : 0;
+            return unchecked((int)(place.Room * 2654435761L ^ cycle * 40503L ^ subArea * 97L));
         }
 
         private static Document Load()

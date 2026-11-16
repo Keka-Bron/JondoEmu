@@ -146,6 +146,8 @@ namespace Jondo.Unity.Server.Handlers
             var playerFighter = BuildPlayerFighter(fight);
             playerFighter.CellId = fight.BluePlacementCells.FirstOrDefault();
             fight.AddPlayer(playerFighter);
+            // A temporal anomaly's guardian is fought by four at most, heroes counted.
+            if (Managers.AnomalyPlaces.ByRoom(mapId) != null) fight.PeopleCap = Managers.AnomalyPlaces.PeopleCap;
             // And his heroes beside him, played from his client (FightHeroes.cs).
             AddHeroes(fight, GameState.CharacterId);
 
@@ -13101,6 +13103,9 @@ namespace Jondo.Unity.Server.Handlers
             int zoneBonus = AnomalyHandler.ZoneBonusAt(fight.RoleplayMapId);
             // His prospecting, which the client's tooltip applies to the monster's own table.
             double prospecting = DropMultiplier(ProspectingNow());
+            // The anomaly fragments: where the fight is and the side's elixir (Managers.AnomalyLoot).
+            var (inAnomalyRoom, inAnomalyZone) = Managers.AnomalyLoot.WhereFought(fight.RoleplayMapId);
+            int sideElixir = inAnomalyRoom || inAnomalyZone ? Managers.AnomalyLoot.SideElixir(fight, GameState.CharacterId) : 0;
 
             // SUMMONS do not pay. They go into their summoner's side with IsMonster set, so a
             // monster that summons would put its creature into this loop: it would take its own
@@ -13161,6 +13166,8 @@ namespace Jondo.Unity.Server.Handlers
                 // seven gems --, so without this a raid is a place where nothing drops.
                 foreach (var drop in Enumerable.Repeat(DatabaseManager.GetMonsterGlobalDrops(monster.MonsterId), passes).SelectMany(t => t))
                 {
+                    // The anomaly fragment's row is the client's display of it: rolled below instead.
+                    if (drop.ObjectId == Managers.AnomalyLoot.Fragment) continue;
                     if (!SeLoLleva(fight, drop.ReceiverCriterion, Held, monster.MonsterId)) continue;
 
                     double probabilidad = extra > 0
@@ -13171,6 +13178,13 @@ namespace Jondo.Unity.Server.Handlers
                     loot.TryGetValue(drop.ObjectId, out int q);
                     loot[drop.ObjectId] = q + 1;
                 }
+
+                // And an anomaly fragment, at its own rate and nothing else's -- no challenge, no
+                // Almanax, no bonus --, three at most per fight (Managers.AnomalyLoot).
+                double fragment = Managers.AnomalyLoot.FragmentChance(monster.MonsterId, inAnomalyRoom, inAnomalyZone, sideElixir);
+                loot.TryGetValue(Managers.AnomalyLoot.Fragment, out int fragments);
+                if (fragment > 0 && fragments < Managers.AnomalyLoot.MostPerFight && TirarPorcentaje() < fragment)
+                    loot[Managers.AnomalyLoot.Fragment] = fragments + 1;
 
                 // And what any monster drops while a quest asks for it, which no table of the
                 // client's carries (content/quests/fight_drops.json): the Lotapes of «Reír a base
@@ -13249,8 +13263,18 @@ namespace Jondo.Unity.Server.Handlers
             var me = fight.Buscar(GameState.CharacterId);
             var player = Managers.PlayerCriteria.ResolverFor(mapId, held, monsterId,
                 playerAlive: me?.IsAlive, soulStoneFight: fight.SoulStoneFight);
+            int? sideElixir = null;
             return Jondo.Unity.World.Content.Criterion.Met(criterion, condition =>
             {
+                // An uchronic elixir is the side's, its strongest (Managers.AnomalyLoot): a row
+                // naming one is met by whoever is on a side that has it, whoever drank it.
+                if (Managers.AnomalyLoot.ElixirNamed(condition.Code, (long)condition.Value) is int named
+                    && condition.Operator is '=' or '!')
+                {
+                    sideElixir ??= Managers.AnomalyLoot.SideElixir(fight, GameState.CharacterId);
+                    return (sideElixir == named) == (condition.Operator == '=')
+                        ? Jondo.Unity.World.Content.Answer.True : Jondo.Unity.World.Content.Answer.False;
+                }
                 var answer = raid(condition);
                 if (answer != Jondo.Unity.World.Content.Answer.Unknown) return answer;
                 answer = player(condition);

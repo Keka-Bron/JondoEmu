@@ -34,6 +34,8 @@ namespace Jondo.Unity.Server.Handlers
             {
                 var state = hero.Session.State;
                 if (state.IsInFight) continue;
+                // No more than the fight's side takes (a temporal anomaly's four): the rest stay out.
+                if (fight.Aliados(masterId).Count(f => !f.IsMonster && !f.EsInvocado) >= CapOf(fight)) break;
                 Fighter fighter;
                 FightSpellLayout.Layout layout;
                 using (SessionContext.Push(hero.Session))
