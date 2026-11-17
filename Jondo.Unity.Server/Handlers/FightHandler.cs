@@ -3842,15 +3842,7 @@ namespace Jondo.Unity.Server.Handlers
             // anybody's, as before. Measured on the rounds a monster opens: thirteen rows of
             // the player fall at his own turn against one at the monster's, and fifty-seven
             // rows of summons at the summon's.
-            var caducados = new List<(Fighter Quien, Jondo.Unity.World.Fights.Buff Caido)>();
-            foreach (var quien in TodosLosCombatientes(fight))
-            {
-                AguantaSuTurno(fight, fighter, quien);
-                foreach (var caido in quien.Buffs.Barrer(fight.RoundNumber, embrujo => LeTocaCaer(fight, fighter, embrujo)))
-                {
-                    caducados.Add((quien, caido));
-                }
-            }
+            var caducados = TurnStartSweep(fight, fighter);
 
             if (caducados.Count > 0)
             {
@@ -4462,6 +4454,37 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// What falls as <paramref name="quienEmpieza"/>'s turn starts, on everybody: the rows whose
+        /// round has come and whose caster this is (<see cref="LeTocaCaer"/>). Returned for their
+        /// jya, which the turn start sends. The hooks that last as their rows' own duration
+        /// (<see cref="Jondo.Unity.World.Fights.Buffs.ActiveSpell.FallsAtItsCastersTurn"/>) fall
+        /// here too, by the same rule; unlike a buff, nothing is sent for them.
+        /// </summary>
+        /// <remarks>
+        /// A hook armed outside its caster's turn is not held through his next one as
+        /// <see cref="AguantaSuTurno"/> holds a row: it falls at his turn start in its round.
+        /// </remarks>
+        internal static List<(Fighter Quien, Jondo.Unity.World.Fights.Buff Caido)> TurnStartSweep(FightInstance fight,
+                                                                                                   Fighter quienEmpieza)
+        {
+            var caducados = new List<(Fighter Quien, Jondo.Unity.World.Fights.Buff Caido)>();
+            if (quienEmpieza == null) return caducados;
+            foreach (var quien in TodosLosCombatientes(fight))
+            {
+                AguantaSuTurno(fight, quienEmpieza, quien);
+                foreach (var caido in quien.Buffs.Barrer(fight.RoundNumber, embrujo => LeTocaCaer(fight, quienEmpieza, embrujo)))
+                {
+                    caducados.Add((quien, caido));
+                }
+                quien.Buffs.ActiveSpells.RemoveAll(enganche => enganche.FallsAtItsCastersTurn
+                                                              && enganche.CaducaEnRonda >= 0
+                                                              && enganche.CaducaEnRonda <= fight.RoundNumber
+                                                              && ItsCastersTurnHasCome(fight, quienEmpieza, enganche.Lanzador));
+            }
+            return caducados;
+        }
+
+        /// <summary>
         /// A row its caster put after his last turn ended -- a reaction to a blow in somebody
         /// else's turn -- lives through his next one and falls once it is over, at the next turn
         /// start of anybody else (<see cref="LeTocaCaer"/>). Falling at the next, it never lived one
@@ -4514,8 +4537,18 @@ namespace Jondo.Unity.Server.Handlers
         {
             // Kept through its caster's turn (AguantaSuTurno): it falls at whoever's start comes next.
             if (embrujo.CaeAlAcabarSuTurno) return embrujo.Quien != quienEmpieza.Id;
-            if (embrujo.Quien == 0 || embrujo.Quien == quienEmpieza.Id) return true;
-            var quienLoPuso = fight.Buscar(embrujo.Quien);
+            return ItsCastersTurnHasCome(fight, quienEmpieza, embrujo.Quien);
+        }
+
+        /// <summary>
+        /// Whether <paramref name="quienEmpieza"/>'s turn start is the one at which what
+        /// <paramref name="casterId"/> put falls: his own, his owner's when he is a summon that
+        /// never plays, anybody's when he is gone or nobody in particular.
+        /// </summary>
+        private static bool ItsCastersTurnHasCome(FightInstance fight, Fighter quienEmpieza, long casterId)
+        {
+            if (casterId == 0 || casterId == quienEmpieza.Id) return true;
+            var quienLoPuso = fight.Buscar(casterId);
             if (quienLoPuso == null || !quienLoPuso.IsAlive) return true;
             if (quienLoPuso.EsInvocado && !quienLoPuso.JuegaTurno) return quienLoPuso.Invocador == quienEmpieza.Id;
             return false;
@@ -6463,11 +6496,15 @@ namespace Jondo.Unity.Server.Handlers
             {
                 bool deConducta = conducta;
                 int hasta = ronda + 1;
+                // The latest round a row's own duration reaches: a hook lasting just that falls as
+                // that row would as a buff, at its caster's turn start in that round.
+                int byOwnDuration = -1;
                 foreach (var c in grupo)
                 {
                     int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda, deConducta);
                     if (suya < 0) { hasta = -1; break; }
                     hasta = Math.Max(hasta, suya);
+                    if (c.Efecto != null && c.Efecto.Duration > 0) byOwnDuration = Math.Max(byOwnDuration, suya);
                     if (c.HookUntil is { } targetTurn) hasta = Math.Max(hasta, targetTurn);
                 }
                 // And for as long as what the same cast left on that bearer, as a player spell's
@@ -6486,7 +6523,8 @@ namespace Jondo.Unity.Server.Handlers
                     }
                 }
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
-                                                 ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico);
+                                                 ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico,
+                                                 fallsAtItsCastersTurn: hasta >= 0 && hasta == byOwnDuration);
             }
 
             // Every spell this cast ran that still has rows under a trigger, AT ITS GRADE: one

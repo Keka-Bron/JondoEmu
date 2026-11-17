@@ -350,7 +350,17 @@ namespace Jondo.Unity.World.Fights
             /// </summary>
             public bool ThroughPortal { get; set; }
 
-            public bool Vivo(int ronda) => CaducaEnRonda < 0 || ronda < CaducaEnRonda;
+            public bool Vivo(int ronda) => CaducaEnRonda < 0 || ronda < CaducaEnRonda
+                                           || (FallsAtItsCastersTurn && ronda == CaducaEnRonda);
+
+            /// <summary>
+            /// Whether it lasts as a row of its duration does: through the round it falls in, up to its
+            /// caster's turn there, where the turn start's sweep takes it (FightHandler.TurnStartSweep)
+            /// -- not from that round's first turn. Tejossus's Baikal, "+10% final damage under DM,
+            /// duration 1", cast as the round's last turn, is his until his next turn: the players who
+            /// play before it hit him with it on.
+            /// </summary>
+            public bool FallsAtItsCastersTurn { get; set; }
 
             /// <summary>
             /// How many times it goes off when its trigger comes: once per occurrence of the
@@ -379,15 +389,25 @@ namespace Jondo.Unity.World.Fights
         /// Arms rows of a spell on this fighter, in their caster's name: added to the hook that
         /// caster already has here with that spell, or a new one. Lasts the longest of the two.
         /// </summary>
+        /// <param name="fallsAtItsCastersTurn">See <see cref="ActiveSpell.FallsAtItsCastersTurn"/>.</param>
         public void ArmarFilas(int hechizo, int grado, int caducaEnRonda, long lanzador, int puestoEnRonda,
-                               IEnumerable<int> filas, bool critico = false)
+                               IEnumerable<int> filas, bool critico = false, bool fallsAtItsCastersTurn = false)
         {
             var ya = ActiveSpells.FirstOrDefault(e => e.Filas != null && e.Hechizo == hechizo && e.Lanzador == lanzador);
             if (ya != null)
             {
                 foreach (int fila in filas) ya.Filas.Add(fila);
                 ya.Grado = grado;
-                if (ya.CaducaEnRonda >= 0) ya.CaducaEnRonda = caducaEnRonda < 0 ? -1 : Math.Max(ya.CaducaEnRonda, caducaEnRonda);
+                if (ya.CaducaEnRonda >= 0)
+                {
+                    if (caducaEnRonda < 0) ya.CaducaEnRonda = -1;
+                    else if (caducaEnRonda > ya.CaducaEnRonda)
+                    {
+                        ya.CaducaEnRonda = caducaEnRonda;
+                        ya.FallsAtItsCastersTurn = fallsAtItsCastersTurn;
+                    }
+                    else if (caducaEnRonda == ya.CaducaEnRonda) ya.FallsAtItsCastersTurn |= fallsAtItsCastersTurn;
+                }
                 ya.PuestoEnRonda = puestoEnRonda;
                 return;
             }
@@ -395,6 +415,7 @@ namespace Jondo.Unity.World.Fights
             {
                 Hechizo = hechizo, Grado = grado, CaducaEnRonda = caducaEnRonda, Lanzador = lanzador,
                 PuestoEnRonda = puestoEnRonda, Critico = critico, Filas = new HashSet<int>(filas),
+                FallsAtItsCastersTurn = fallsAtItsCastersTurn && caducaEnRonda >= 0,
             });
         }
 

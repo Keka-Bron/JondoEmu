@@ -3969,7 +3969,8 @@ namespace Jondo.Unity.Server.Managers
                 // "h,P" from a bomb lands on its Tymador. Anybody else is not the caster's, and
                 // let through, he met both of the Eniripsa's ánimo branches, "a,p" for the
                 // characters and "a,P,f7371,f7370" for her summons: the bonus twice, +4 AP.
-                else if (ownSummonsOnly && !(quienLanza.EsInvocado && quien.Id == quienLanza.Invocador)) vale = false;
+                else if (ownSummonsOnly && !(quienLanza.EsInvocado && quien.Id == quienLanza.Invocador)
+                         && !OfTheSameGroup(quienLanza, quien, requiredMonsterTemplates)) vale = false;
                 foreach (int estado in pideEstado) if (!susEstados.Contains(estado)) vale = false;
                 foreach (int estado in pideNoEstado) if (susEstados.Contains(estado)) vale = false;
                 foreach (int pct in lifeBelow) if (!LifeUnder(quien, pct)) vale = false;
@@ -3987,6 +3988,23 @@ namespace Jondo.Unity.Server.Managers
                 if (vale) yield return quien;
             }
         }
+
+        /// <summary>
+        /// "P" between two monsters placed together, neither of them anybody's summon: the companion
+        /// a row names by its template is the caster's own, as a summoner is his summon's. The Yomi's
+        /// and the Yokai's starting spells (669, 668) tell the Tengu Gélifux they stand -- "950 5332"
+        /// and "950 5331" on "a,P,F2967" over the whole board -- and his Firuleta del Amor summons the
+        /// other one while he carries either state. The Tengu summons them, and they stand in his
+        /// groups as well: read as "his summoner" alone, a Yomi of his own group told him nothing, and
+        /// he summoned a second Yomi beside it. Only a row that names its target by template (F):
+        /// a bare "a,P" or "m,P" of a placed monster -- a Pesadilla's invulnerability, a captain's
+        /// orders -- still reaches its summons alone. Inferred from the Tengu's kit: no capture shows it.
+        /// </summary>
+        private static bool OfTheSameGroup(Fighter caster, Fighter target, List<int> namedTemplates)
+            => namedTemplates.Count > 0
+               && caster != target && caster.TeamId == target.TeamId
+               && caster.IsMonster && !caster.EsInvocado
+               && target.IsMonster && !target.EsInvocado;
 
         /// <summary>Whether the caster meets the conditions a row puts on him (its starred letters).</summary>
         internal static bool CasterMeets(Fighter caster, SpellEffect row) => CasterQualifies(caster, row.TargetMask, null);
