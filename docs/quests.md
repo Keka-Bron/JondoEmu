@@ -185,10 +185,14 @@ quest 58  Ps=1&Pa=3&PL>29&Qf=57
 There are 18 types. The engine closes them in two ways:
 
 **The client says so** (`idw`). Type 0 ones are free text —5,670 of the 15,547— and ask for clicking
-something in the interface, which the server never hears about. It is believed, and the risk is bounded in
-`QuestLog.Tick`: it only accepts an objective **of the step the character is really on**, so
-the worst a lying client can do is finish a quest it already has, in the order in
-which that quest is written.
+something in the interface, which the server never hears about. The client is believed about those
+and nothing else (`QuestClaims`): a type 0 objective that a binding row ties to something the server
+sees, and every other type, is the server's to finish, and an `idw` for one is ignored. The 16 `idw`
+of the captures are all type 0, all from the guided tutorial. `QuestLog.Tick` also only accepts an
+objective **of the step the character is really on**.
+
+Until 2026-11-17 the client was believed about any objective of its step: a single `idw` won a fight
+objective or handed over items that were never carried, and paid the quest's reward.
 
 **The server counts it** (end of fight). Three types name a monster, and in all three
 `parameter0` is the monster and `parameter1` how many:
