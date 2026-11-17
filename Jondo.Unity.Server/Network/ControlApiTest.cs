@@ -87,6 +87,7 @@ namespace Jondo.Unity.Server.Network
                 "scenario" => TestScenario(cuerpo),
                 "scenarios" => TestScenarios(cuerpo),
                 "team" => TestTeam(cuerpo),
+                "monsters" => TestMonsters(cuerpo),
                 "state" => TestState(cuerpo),
                 "items" => TestItemList(cuerpo),
                 "item" => TestItem(cuerpo),
@@ -427,6 +428,37 @@ namespace Jondo.Unity.Server.Network
                              foes = foes.Select(b => new { b.Id, b.Breed }).ToList(),
                              blue = blue.Select(s => s.State.CharacterId).ToList(), red = red.Select(s => s.State.CharacterId).ToList(), lines })
                 : Mal(500, "not-started");
+        }
+
+        /// <summary>
+        /// A fight against the monsters given, as an NPC's fight would start it: { foes: [monster
+        /// id...], grade?: n, map?: arena }. For the fights a quest reaches only after a long
+        /// conversation (the sectarians of "El campo alucinado").
+        /// </summary>
+        private static Respuesta TestMonsters(string cuerpo)
+        {
+            var session = TestSessionOnline();
+            if (session == null || session.Stream == null) return Mal(404, "offline");
+            if (FightHandler.FightOf(session.State.CharacterId) != null) return Mal(409, "in-fight");
+            var foes = new List<int>();
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(string.IsNullOrEmpty(cuerpo) ? "{}" : cuerpo);
+                if (doc.RootElement.TryGetProperty("foes", out var a) && a.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    foes = a.EnumerateArray().Where(x => x.ValueKind == System.Text.Json.JsonValueKind.Number).Select(x => x.GetInt32()).ToList();
+            }
+            catch (System.Text.Json.JsonException) { return Mal(400, "json"); }
+            int grade = (int)Numero(cuerpo, "grade");
+            var group = MobSpawnManager.ComposeOffMap(foes.Select(m => (m, grade)).ToList());
+            if (group == null) return Mal(404, "no-monsters");
+            long arena = Numero(cuerpo, "map");
+            var lines = RunInSession(session, async stream =>
+            {
+                await FightHandler.InitiateFightFromMobCollision(stream, group, session.State.MapId,
+                    arenaMapId: arena > 0 ? arena : 0);
+            });
+            var fight = FightHandler.FightOf(session.State.CharacterId);
+            return fight != null ? Bien(new { id = fight.FightId, lines }) : Mal(500, "not-started");
         }
 
         /// <summary>The monster groups on the character's map: what a click on one attacks (hqa, its id).</summary>
