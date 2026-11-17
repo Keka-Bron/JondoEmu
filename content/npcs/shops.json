@@ -50,6 +50,18 @@
     "seller (7519), the fair ticket (30328) Yova Etna asks for and the Gladiatrool one (30449); Rubén Paket",
     "Hado (1573), the wrapping papers his workshop makes presents of (GiftWrapping)."
   ],
+  "_wiki_import": {
+    "source": "Dofus Wiki (Fandom), retrieved 2026-11-17. Community catalogues, not verified against the current official server.",
+    "excludedNpc": 7092,
+    "excludedNpcName": "Gobswallop",
+    "excludedItems": [
+      "Of Sauroshells and Dreggons",
+      "The Legend of Grozilla and Grasmera",
+      "How to Breed and Mount Your Dragoturkey"
+    ],
+    "note": "Excluded books have no confirmed current item IDs. Gobswallop has no verified catalogue. Groom Hat uses the equipment item 6660, distinct from ceremonial item 15777.",
+    "purchaseConditions": "An optional item criterion gates both catalogue visibility and purchase, scoped to that vendor."
+  },
   "shops": [
     {
       "npc": 7030,
@@ -402,6 +414,387 @@
       "npc": 5595,
       "items": [{"gid": 7045, "price": 40}, {"gid": 23179, "price": 40}, {"gid": 23180, "price": 40}],
       "why": "Pantruku, keeper of the Pandazaap tavern [20,-29] (actions 1 and 3: he sells and talks), serves the Pandaburg (7045), the Pandasahi (23179) and the Pandaporo (23180), each at its template price (40). Dofus pour les noobs («À la croisée des mondes»): «La Pandaburg peut s'acheter à la taverne en [20,-29]» and «Pandazahi ou du Pandaporo (achat taverne en [20,-29])». INFERRED: the rest of his catalogue."
+    },
+    {
+      "npc": 81,
+      "items": [
+        {"gid": 351, "price": 20}
+      ],
+      "why": "Linda Malibou: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Linda_Malibou. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 115,
+      "items": [
+        {"gid": 6765, "price": 4}
+      ],
+      "why": "Aga Dou: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Aga_Dou. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 127,
+      "items": [
+        {"gid": 1717, "price": 50},
+        {"gid": 2173, "price": 50},
+        {"gid": 1716, "price": 50},
+        {"gid": 1715, "price": 50},
+        {"gid": 23121, "price": 100},
+        {"gid": 1512, "price": 150},
+        {"gid": 1625, "price": 150},
+        {"gid": 1567, "price": 150}
+      ],
+      "why": "Harry Stottel: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Harry_Stottel. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 163,
+      "items": [
+        {"gid": 6662, "price": 100},
+        {"gid": 6660, "price": 100}
+      ],
+      "why": "Priest: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Priest. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 166,
+      "items": [
+        {"gid": 1459, "price": 5},
+        {"gid": 1460, "price": 10},
+        {"gid": 1468, "price": 100}
+      ],
+      "why": "Uba Tesse: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Uba_Tesse. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 176,
+      "items": [
+        {"gid": 1572, "price": 100},
+        {"gid": 1634, "price": 100},
+        {"gid": 1567, "price": 150}
+      ],
+      "why": "Hel Munster: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Hel_Munster. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 201,
+      "items": [
+        {"gid": 1459, "price": 5},
+        {"gid": 1460, "price": 10},
+        {"gid": 1468, "price": 100}
+      ],
+      "why": "Larry Poller: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Larry_Poller. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 221,
+      "items": [
+        {"gid": 6601, "price": 1}
+      ],
+      "why": "Moob Tsinhcetoryp: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Moob_Tsinhcetoryp. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 236,
+      "items": [
+        {"gid": 6765, "price": 4}
+      ],
+      "why": "Connie Vini: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Connie_Vini. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 244,
+      "items": [
+        {"gid": 2085, "price": 20}
+      ],
+      "why": "Kikim Indabutt: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Kikim_Indabutt. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 280,
+      "items": [
+        {"gid": 1459, "price": 5},
+        {"gid": 1460, "price": 10},
+        {"gid": 1468, "price": 100}
+      ],
+      "why": "Sotsiah Peh: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Sotsiah_Peh. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 293,
+      "items": [
+        {"gid": 2086, "price": 20}
+      ],
+      "why": "Agatha Atyusirvis: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Agatha_Atyusirvis. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 295,
+      "items": [
+        {"gid": 2089, "price": 20}
+      ],
+      "why": "Chef Pinchaut: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Chef_Pinchaut. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 312,
+      "items": [
+        {"gid": 2044, "price": 20}
+      ],
+      "why": "Burnd Nettik: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Burnd_Nettik. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 322,
+      "items": [
+        {"gid": 16840, "price": 20}
+      ],
+      "why": "Kro Burk: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Kro_Burk. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 326,
+      "items": [
+        {"gid": 16839, "price": 20}
+      ],
+      "why": "Malicia Misery: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Malicia_Misery. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 328,
+      "items": [
+        {"gid": 16837, "price": 20}
+      ],
+      "why": "Alcey Itoevrywoan: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Alcey_Itoevrywoan. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 502,
+      "items": [
+        {"gid": 6765, "price": 4}
+      ],
+      "why": "Seth Sourcet: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Seth_Sourcet. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 681,
+      "items": [
+        {"gid": 7149, "price": 200},
+        {"gid": 7147, "price": 200},
+        {"gid": 7148, "price": 200}
+      ],
+      "why": "Stayfun Bonnawa: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Stayfun_Bonnawa. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 704,
+      "items": [
+        {"gid": 7363, "price": 50},
+        {"gid": 7366, "price": 50},
+        {"gid": 8011, "price": 50},
+        {"gid": 7362, "price": 50},
+        {"gid": 7364, "price": 50},
+        {"gid": 7365, "price": 50},
+        {"gid": 7360, "price": 50},
+        {"gid": 7371, "price": 50},
+        {"gid": 7361, "price": 50},
+        {"gid": 7359, "price": 50},
+        {"gid": 23207, "price": 50},
+        {"gid": 7372, "price": 50}
+      ],
+      "why": "Dick Kerboo Brandtawa: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Dick_Kerboo_Brandtawa. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 711,
+      "items": [
+        {"gid": 7517, "price": 20}
+      ],
+      "why": "Ripate Inkeeper: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Ripate_Inkeeper. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 730,
+      "items": [
+        {"gid": 7366, "price": 50},
+        {"gid": 8011, "price": 50}
+      ],
+      "why": "Virgil Onamaz: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Virgil_Onamaz. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 771,
+      "items": [
+        {"gid": 7799, "price": 1000}
+      ],
+      "why": "Smakko: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Smakko. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 825,
+      "items": [
+        {"gid": 20799, "price": 200},
+        {"gid": 6670, "price": 300}
+      ],
+      "why": "Gordo McRamsay: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Gordo_McRamsay. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 1244,
+      "items": [
+        {"gid": 11370, "price": 2}
+      ],
+      "why": "Walter Aygo: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Walter_Aygo. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 1260,
+      "items": [
+        {"gid": 1459, "price": 5},
+        {"gid": 1460, "price": 10},
+        {"gid": 1468, "price": 100}
+      ],
+      "why": "Jon Burrowman: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Jon_Burrowman. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 1272,
+      "items": [
+        {"gid": 6765, "price": 4},
+        {"gid": 11568, "price": 10},
+        {"gid": 1334, "price": 1000}
+      ],
+      "why": "Ernest Laye: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Ernest_Laye. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 1447,
+      "items": [
+        {"gid": 12585, "price": 49},
+        {"gid": 12589, "price": 49},
+        {"gid": 12584, "price": 99},
+        {"gid": 12582, "price": 99},
+        {"gid": 12583, "price": 99},
+        {"gid": 12586, "price": 199},
+        {"gid": 12587, "price": 199}
+      ],
+      "why": "Ivan Hartvigg: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Ivan_Hartvigg. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 1590,
+      "items": [
+        {"gid": 7363, "price": 50},
+        {"gid": 7366, "price": 50},
+        {"gid": 8011, "price": 50},
+        {"gid": 7362, "price": 50},
+        {"gid": 7364, "price": 50},
+        {"gid": 7365, "price": 50},
+        {"gid": 7360, "price": 50},
+        {"gid": 7371, "price": 50},
+        {"gid": 7361, "price": 50},
+        {"gid": 7359, "price": 50},
+        {"gid": 7372, "price": 50},
+        {"gid": 12772, "price": 2000},
+        {"gid": 12773, "price": 2000}
+      ],
+      "why": "Doctor Hoo: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Doctor_Hoo. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 1600,
+      "items": [
+        {"gid": 6765, "price": 4}
+      ],
+      "why": "Jake Combes: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Jake_Combes. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 2488,
+      "items": [
+        {"gid": 15577, "price": 60}
+      ],
+      "why": "Sevrain the Torturer: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Sevrain_the_Torturer. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 3517,
+      "items": [
+        {"gid": 18535, "price": 20}
+      ],
+      "why": "Ovee Haych: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Ovee_Haych. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 3627,
+      "items": [
+        {"gid": 18536, "price": 20}
+      ],
+      "why": "Pikmama: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Pikmama. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 3865,
+      "items": [
+        {"gid": 18811, "price": 20}
+      ],
+      "why": "Drenba: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Drenba. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 3877,
+      "items": [
+        {"gid": 18810, "price": 20}
+      ],
+      "why": "Metally Cutey: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Metally_Cutey. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 4310,
+      "items": [
+        {"gid": 7363, "price": 50},
+        {"gid": 7362, "price": 50},
+        {"gid": 7364, "price": 50},
+        {"gid": 7365, "price": 50},
+        {"gid": 7360, "price": 50},
+        {"gid": 7371, "price": 50},
+        {"gid": 7361, "price": 50},
+        {"gid": 7359, "price": 50},
+        {"gid": 19701, "price": 50},
+        {"gid": 7372, "price": 50},
+        {"gid": 20038, "price": 500},
+        {"gid": 20328, "price": 500},
+        {"gid": 20329, "price": 500},
+        {"gid": 20039, "price": 500},
+        {"gid": 20764, "price": 1000}
+      ],
+      "why": "Aisling: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Aisling. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 4344,
+      "items": [
+        {"gid": 1459, "price": 5},
+        {"gid": 1460, "price": 10},
+        {"gid": 1468, "price": 100}
+      ],
+      "why": "Dragonsly: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Dragonsly. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 4353,
+      "items": [
+        {"gid": 1339, "price": 1000},
+        {"gid": 1324, "price": 1000}
+      ],
+      "why": "Sirea: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Sirea. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 4361,
+      "items": [
+        {"gid": 6765, "price": 4},
+        {"gid": 6857, "price": 40}
+      ],
+      "why": "Tek Abir: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Tek_Abir. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 4504,
+      "items": [
+        {"gid": 19962, "price": 100},
+        {"gid": 19961, "price": 200},
+        {"gid": 20020, "price": 500},
+        {"gid": 19954, "price": 1000}
+      ],
+      "why": "Lambik: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Lambik. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 5992,
+      "items": [
+        {"gid": 7047, "price": 20, "criterion": "PG=12"},
+        {"gid": 7055, "price": 20},
+        {"gid": 23180, "price": 40},
+        {"gid": 23179, "price": 40},
+        {"gid": 23972, "price": 100},
+        {"gid": 24007, "price": 200},
+        {"gid": 7053, "price": 200, "criterion": "Qf=2406"},
+        {"gid": 24008, "price": 2000},
+        {"gid": 23844, "price": 2000, "criterion": "Qf=2158"},
+        {"gid": 24021, "price": 2000, "criterion": "Qa=2200|Qf=2200"}
+      ],
+      "why": "Urakoru: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Urakoru. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 6383,
+      "items": [
+        {"gid": 7934, "price": 10},
+        {"gid": 10678, "price": 10},
+        {"gid": 7879, "price": 10},
+        {"gid": 12772, "price": 2000},
+        {"gid": 12773, "price": 2000}
+      ],
+      "why": "Liam Nesswiltee: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Liam_Nesswiltee. Community wiki source; current official stock has not been verified."
     }
   ]
 }
