@@ -762,6 +762,7 @@ namespace Jondo.Unity.Server.Managers
 
                 foreach (var clave in escritos.ErasedKeys)
                 {
+                    _erasedByFile.Add((clave.MapId, clave.GroupId));
                     if (!_mapMobs.TryGetValue(clave.MapId, out var aqui)) continue;
                     quitados += aqui.RemoveAll(grupo => grupo.MobId == clave.GroupId);
                 }
@@ -812,6 +813,7 @@ namespace Jondo.Unity.Server.Managers
                     // here knowingly.
                     aqui.RemoveAll(otro => otro.MobId == escrito.GroupId);
                     aqui.Add(grupo);
+                    _placedByFile.Add((escrito.MapId, escrito.GroupId));
                     puestos++;
                 }
             }
@@ -1090,6 +1092,55 @@ namespace Jondo.Unity.Server.Managers
                 var group = CloneOf(original);
                 mobs.Add(group);
                 return group;
+            }
+        }
+
+        /// <summary>The groups content/monsters/groups.json placed, by map, and the base groups it erased.</summary>
+        private static HashSet<(long Map, long Group)> _placedByFile = new();
+        private static readonly HashSet<(long Map, long Group)> _erasedByFile = new();
+
+        /// <summary>
+        /// content/monsters/groups.json read again with the server running (the content reload):
+        /// the groups the file placed before are taken off their maps, the file's groups are put
+        /// back as it now writes them -- and recorded as their maps' loaded groups, so a beaten one
+        /// comes back as written --, and a base group it now erases goes. The maps' other groups
+        /// stay as they are; a client sees the change on entering the map again.
+        /// </summary>
+        /// <remarks>
+        /// The file used to be read at the start only, so a group written for a quest stood
+        /// nowhere until the server was restarted.
+        /// </remarks>
+        public static (int Placed, int Removed) ReloadWritten()
+        {
+            lock (_candado)
+            {
+                foreach (var (map, id) in _placedByFile)
+                {
+                    if (_mapMobs.TryGetValue(map, out var here)) here.RemoveAll(g => g.MobId == id);
+                    if (_asLoaded.TryGetValue(map, out var loaded)) loaded.RemoveAll(g => g.MobId == id);
+                }
+                _placedByFile = new HashSet<(long Map, long Group)>();
+
+                var result = AplicarLosEscritos();
+
+                foreach (var (map, id) in _placedByFile)
+                {
+                    var group = _mapMobs[map].First(g => g.MobId == id);
+                    if (!_asLoaded.TryGetValue(map, out var loaded))
+                    {
+                        loaded = new List<MobGroup>();
+                        _asLoaded[map] = loaded;
+                    }
+                    loaded.Add(CloneOf(group));
+                }
+                foreach (var (map, id) in _erasedByFile)
+                {
+                    if (_asLoaded.TryGetValue(map, out var loaded)) loaded.RemoveAll(g => g.MobId == id);
+                }
+
+                if (_placedByFile.Count > 0) ActorIds.ReservarMonstruosHasta(_placedByFile.Min(k => k.Group));
+                Console.WriteLine($"[MobSpawnManager] Written groups read again: {result.Puestos} placed, {result.Quitados} erased.");
+                return result;
             }
         }
 

@@ -150,5 +150,26 @@ namespace Jondo.Unity.Tests.Quests
             Assert.False(Jondo.Unity.Server.Managers.Quests.EndsOn(carpet, 302));
             Assert.True(Jondo.Unity.Server.Managers.Quests.EndsOn(book.Of(19534)!, 302));
         }
+
+        [Fact]
+        public void A_click_row_can_wait_minutes_after_an_objective()
+        {
+            // «Claro como el aguardiente»: the vat is opened an hour after the brew was put to ferment.
+            var book = Read(@"{ ""bindings"": [
+                { ""objective"": 16733, ""quest"": 2170, ""kind"": ""click"", ""elements"": [ { ""map"": 1, ""element"": 2 } ], ""waited"": [ 16732, 60 ] } ] }");
+            var vat = book.Of(16733)!;
+            Assert.Equal(new[] { 16732, 60 }, vat.Waited);
+            if (!System.IO.File.Exists(Jondo.Unity.Launcher.Paths.QuestsJson)) return;
+
+            var log = new Jondo.Unity.World.Quests.QuestLog(new Jondo.Unity.World.Quests.QuestCatalogue(), () => 200, () => 1);
+            if (log.Start(2170) == null) return;
+            var run = log.Run(2170)!;
+            Assert.False(Jondo.Unity.Server.Managers.Quests.WaitedEnough(vat, log));   // not put to ferment yet
+            run.Done.Add(16732);
+            run.DoneAt[16732] = System.DateTime.Now.AddMinutes(-59);
+            Assert.False(Jondo.Unity.Server.Managers.Quests.WaitedEnough(vat, log));
+            run.DoneAt[16732] = System.DateTime.Now.AddMinutes(-61);
+            Assert.True(Jondo.Unity.Server.Managers.Quests.WaitedEnough(vat, log));
+        }
     }
 }

@@ -274,6 +274,13 @@ namespace Jondo.Unity.World.Quests
         /// </summary>
         public IReadOnlyList<int> Cells { get; init; } = Array.Empty<int>();
 
+        /// <summary>
+        /// An objective and a number of minutes: the row only closes its objective once that
+        /// objective is done and that long has gone by, as a reply's «waited» does. In «Claro como el
+        /// aguardiente» the vat is opened an hour after the brew was put to ferment.
+        /// </summary>
+        public IReadOnlyList<int> Waited { get; init; } = Array.Empty<int>();
+
         /// <summary>The replies that close it, for <see cref="QuestBindingKind.Reply"/>.</summary>
         public IReadOnlyList<int> Replies { get; init; } = Array.Empty<int>();
 
@@ -662,6 +669,7 @@ namespace Jondo.Unity.World.Quests
                 ThenStarts = Int(row, "thenStarts"),
                 AfterObjectives = Ints(row, "afterObjectives"),
                 Cells = Ints(row, "cells"),
+                Waited = Ints(row, "waited"),
                 Replies = Ints(row, "replies"),
                 AnyOrder = row.TryGetProperty("anyOrder", out var anyOrder) && anyOrder.ValueKind == JsonValueKind.True,
                 ShowsNpc = Int(row, "showsNpc"),

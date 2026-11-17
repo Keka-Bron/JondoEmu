@@ -634,6 +634,10 @@ namespace Jondo.Unity.Server.Managers
             return gave;
         }
 
+        /// <summary>Whether a row's «waited» objective is done and its minutes have gone by; true without one.</summary>
+        internal static bool WaitedEnough(QuestBinding binding, QuestLog log)
+            => binding.Waited.Count != 2 || log.WaitedSince(binding.Waited[0], binding.Waited[1]);
+
         /// <summary>
         /// Marks a bound objective off, if this character is really on it.
         /// </summary>
@@ -795,6 +799,9 @@ namespace Jondo.Unity.Server.Managers
                     if (!run.Done.Contains(before) && !log.ObjectiveDone(before)) return false;
                 }
             }
+
+            // And the time it waits after one of them: the brew ferments for an hour first.
+            if (!WaitedEnough(binding, log)) return false;
 
             if (!await CarriesWhatItAsksAsync()) return false;
 
