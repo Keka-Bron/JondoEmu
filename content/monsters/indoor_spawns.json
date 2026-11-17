@@ -1,0 +1,52 @@
+{
+  "_comment": [
+    "Indoor maps where ordinary monster groups can spawn and respawn.",
+    "Use map IDs because a subarea can contain both combat and peaceful rooms.",
+    "MapMobs is generated from subarea rosters, so a seeded group alone is not evidence.",
+    "Dungeon rooms use their own rules. This list only overrides the indoor filter."
+  ],
+  "zones": [
+    {
+      "name": "Incarnam Mine",
+      "why": "All seven mine rooms in subarea 778. Aminitas drop the powder for A Bit of Pigment.",
+      "maps": [153357312, 153357314, 153357318, 153358336, 153358338, 153358342, 153358344]
+    },
+    {
+      "name": "Astrub Sewers",
+      "why": "The eight explorable sewer maps in subarea 100, whose client roster contains Astrub rats and sewer arachnees.",
+      "maps": [101713415, 101714439, 101715461, 101715463, 101715465, 101716487, 101716489, 101717512]
+    },
+    {
+      "name": "Astrub Underground",
+      "why": "The public tunnels and the three Astrub Mine rooms in subarea 99. De terre et de crocs sends players to hunt Sick Arachnees here. The client roster also includes Sick Tofus. Leave the separate interior at [4,-15] outside the list.",
+      "maps": [101712387, 101713409, 101713411, 101713413, 188482052, 188483076, 188484100]
+    },
+    {
+      "name": "Dragon Pig's Maze",
+      "why": "The open maze has Porco groups (Dofus2.org, Antre du Dragon Cochon). Select the outer 24 rooms of the 5 by 5 grid in subarea 200 from the client map data. Fwed's central room [4,35] and the entrance corridors stay empty.",
+      "maps": [
+        72090624, 72091648, 72092672, 72093696, 72094720,
+        72090626, 72091650, 72092674, 72093698, 72094722,
+        72090628, 72091652, 72093700, 72094724,
+        72090630, 72091654, 72092678, 72093702, 72094726,
+        72090632, 72091656, 72092680, 72093704, 72094728
+      ]
+    },
+    {
+      "name": "Lord Crow's Library",
+      "why": "The first of the 16 free-roaming rooms after the January 2025 rework. All three unique monsters can appear in this room. The other 15 rooms are already marked outdoor in the client data.",
+      "maps": [159121408]
+    },
+    {
+      "name": "Labyrinth of the Minotoror",
+      "why": "The 24 monster rooms in subarea 319. Room 13 contains the entrance to the boss and has no groups.",
+      "maps": [
+        34475272, 34474248, 34473224, 34341128, 34342152,
+        34475270, 34474246, 34473222, 34341126, 34342150,
+        34475268, 34474244, 34341124, 34342148,
+        34475266, 34474242, 34473218, 34341122, 34342146,
+        34475008, 34473984, 34472960, 34340864, 34341888
+      ]
+    }
+  ]
+}

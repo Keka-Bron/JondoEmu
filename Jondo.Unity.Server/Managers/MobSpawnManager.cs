@@ -11,29 +11,17 @@ namespace Jondo.Unity.Server.Managers
 {
     public static class MobSpawnManager
     {
+        private const string IndoorCombatMapsFile = "monsters/indoor_spawns.json";
+
         /// <summary>The banned maps, kept so that the repopulator respects them too.</summary>
         private static HashSet<long> _vetados = new HashSet<long>();
 
         /// <summary>
         /// The maps where a monster is NOT placed, however much the table has them.
         ///
-        /// They are seen while playing: pios inside a house, inside a bank, inside a shop and
-        /// standing on top of the village zaap. Measured over the 38,744 placed groups: 9,331
-        /// —24.1 %— are on an indoor map.
-        ///
-        /// The rule is two lists and one exception, and the exception is the important one:
-        ///
-        ///   INDOORS         MapPositions.Outdoor = 0, which is 4,165 maps
-        ///   WITH A ZAAP     the 62 of the travel point catalogue; 53 had monsters on top
-        ///   EXCEPT DUNGEON  753 of the 763 dungeon rooms are marked «indoors»
-        ///
-        /// Without that exception, banning indoors WOULD EMPTY THE WHOLE DUNGEONS: they are 2,290
-        /// groups, and a dungeon without creatures is not a dungeon. With it, 7,214 groups are removed
-        /// (18.6 %) spread over 2,393 maps, and the 763 rooms stay as they are.
-        ///
-        /// It is filtered ON LOADING and not by deleting rows from the database on purpose: world.db is regenerated and
-        /// distributed compressed, so a deletion would be lost in the next regeneration and
-        /// one would have to remember to repeat it. With this there is nothing to remember.
+        /// MapMobs is generated from subarea rosters, so it also seeds houses, banks and shops.
+        /// The indoor filter allows the combat maps listed in content/monsters/indoor_spawns.json.
+        /// Zaaps and arenas are then vetoed independently. Dungeon rooms keep their existing exception.
         /// </summary>
         private static HashSet<long> MapasSinMonstruos(Microsoft.Data.Sqlite.SqliteConnection connection)
         {
@@ -57,6 +45,24 @@ namespace Jondo.Unity.Server.Managers
             {
                 Program.LogDebug($"[MobSpawnManager] Could not read where monsters do not go: {ex.Message}");
                 return new HashSet<long>();
+            }
+
+            try
+            {
+                string path = Paths.ContentFile(IndoorCombatMapsFile);
+                if (File.Exists(path))
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+                    var combatMaps = doc.RootElement.GetProperty("zones").EnumerateArray()
+                        .SelectMany(zone => zone.GetProperty("maps").EnumerateArray())
+                        .Select(map => map.GetInt64())
+                        .ToArray();
+                    vetados.ExceptWith(combatMaps);
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[MobSpawnManager] Could not read {IndoorCombatMapsFile}: {ex.Message}");
             }
 
             // The zaaps come from the travel point catalogue. The file is read here instead of
@@ -1834,6 +1840,9 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         private static int PlaceUniques()
         {
+            // Two roaming monsters may share a group. Each needs its own slot.
+            static bool IsOrdinary(MobMember member) => !UniqueMonsters.Is(member.Monster?.Id ?? 0);
+
             var due = UniqueMonsters.Due((monster, map, group) =>
                 _mapMobs.TryGetValue(map, out var groups)
                 && groups.Any(g => g.MobId == group && g.Members.Any(m => m.Monster?.Id == monster)));
@@ -1848,7 +1857,8 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (!_mapMobs.TryGetValue(mapId, out var groups)) continue;
                     foreach (var group in groups)
-                        if (group.Members.Count > 0 && !group.Modular && !Handlers.FightHandler.IsGroupFighting(group.MobId))
+                        if (!group.Modular && !Handlers.FightHandler.IsGroupFighting(group.MobId)
+                            && group.Members.Any(IsOrdinary))
                             candidates.Add((mapId, group));
                 }
                 if (candidates.Count == 0) continue;
@@ -1858,7 +1868,13 @@ namespace Jondo.Unity.Server.Managers
                 // A new list, as for the criminals: the groups are read outside the lock.
                 var members = new List<MobMember>(chosen.Members);
                 int slot = members.FindIndex(m => m.Monster?.Id == unique.Ordinary);
-                if (slot < 0) slot = _rand.Next(members.Count);
+                if (slot < 0)
+                {
+                    var ordinarySlots = Enumerable.Range(0, members.Count)
+                        .Where(index => IsOrdinary(members[index]))
+                        .ToArray();
+                    slot = ordinarySlots[_rand.Next(ordinarySlots.Length)];
+                }
                 members[slot] = new MobMember
                 {
                     Monster = data,

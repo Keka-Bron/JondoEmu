@@ -93,6 +93,112 @@ namespace Jondo.Unity.Tests.World
                          "the map outside is open air and does carry monsters");
         }
 
+        [Theory]
+        [InlineData(153358338L)] // Mine entrance at [2, -4]
+        [InlineData(153358344L)] // Mine entrance at [3, -4]
+        public void Incarnam_mine_spawns_and_replenishes_aminitas(long mapId)
+        {
+            if (!World()) return;
+            const int Aminita = 4107;
+
+            Assert.False(MobSpawnManager.IsVetoed(mapId));
+            Assert.True(MobSpawnManager.LoadedGroups(mapId) > 0);
+            var group = MobSpawnManager.GetMobsForMap(mapId).First();
+            Assert.NotEmpty(group.Members);
+            Assert.All(group.Members, member => Assert.Equal(Aminita, member.Monster.Id));
+
+            try
+            {
+                MobSpawnManager.RemoveMobGroup(mapId, group.MobId);
+                var replacement = Assert.IsType<MobSpawnManager.MobGroup>(MobSpawnManager.RespawnOneGroup(mapId));
+                Assert.NotEmpty(replacement.Members);
+                Assert.All(replacement.Members, member => Assert.Equal(Aminita, member.Monster.Id));
+            }
+            finally
+            {
+                MobSpawnManager.RestoreMap(mapId);
+            }
+        }
+
+        [Fact]
+        public void Astrub_sewers_load_and_replenish_their_groups()
+        {
+            if (!World()) return;
+            const long sewer = 101715463;
+            int[] sewerMonsters = { 255, 465, 475, 2334, 2350, 2393, 3205 };
+
+            Assert.False(MobSpawnManager.IsVetoed(sewer));
+            Assert.True(MobSpawnManager.LoadedGroups(sewer) > 0);
+            var group = MobSpawnManager.GetMobsForMap(sewer).First();
+            try
+            {
+                MobSpawnManager.RemoveMobGroup(sewer, group.MobId);
+                var replacement = Assert.IsType<MobSpawnManager.MobGroup>(MobSpawnManager.RespawnOneGroup(sewer));
+                Assert.NotEmpty(replacement.Members);
+                Assert.All(replacement.Members, member => Assert.Contains(member.Monster.Id, sewerMonsters));
+            }
+            finally
+            {
+                MobSpawnManager.RestoreMap(sewer);
+            }
+        }
+
+        [Theory]
+        [InlineData(188483076L)] // Astrub Underground
+        [InlineData(72091650L)] // Dragon Pig's Maze
+        [InlineData(159121408L)] // Lord Crow's Library, first room
+        public void Indoor_combat_maps_load_and_replenish_their_groups(long mapId)
+        {
+            if (!World()) return;
+
+            Assert.False(MobSpawnManager.IsVetoed(mapId));
+            Assert.True(MobSpawnManager.LoadedGroups(mapId) > 0);
+            var group = MobSpawnManager.GetMobsForMap(mapId).First();
+            Assert.NotEmpty(group.Members);
+            try
+            {
+                MobSpawnManager.RemoveMobGroup(mapId, group.MobId);
+                var replacement = Assert.IsType<MobSpawnManager.MobGroup>(MobSpawnManager.RespawnOneGroup(mapId));
+                Assert.NotEmpty(replacement.Members);
+            }
+            finally
+            {
+                MobSpawnManager.RestoreMap(mapId);
+            }
+        }
+
+        [Theory]
+        [InlineData(72092676L)] // Dragon Pig's Maze, Fwed's central room
+        [InlineData(72221696L)] // Dragon Pig's Den entrance
+        [InlineData(106695186L)] // Wabbit Princes' scripted fight room
+        public void Scripted_and_entrance_rooms_stay_free_of_roaming_groups(long mapId)
+        {
+            if (!World()) return;
+            Assert.True(MobSpawnManager.IsVetoed(mapId));
+            Assert.Empty(MobSpawnManager.GetMobsForMap(mapId));
+        }
+
+        [Fact]
+        public void The_labyrinth_has_two_unique_guardians_and_an_empty_central_room()
+        {
+            if (!World()) return;
+            const long centralRoom = 34473220;
+            const int mumminotor = 831, deminoball = 832;
+
+            Assert.True(MobSpawnManager.IsVetoed(centralRoom));
+            Assert.Empty(MobSpawnManager.GetMobsForMap(centralRoom));
+
+            var rooms = UniqueMonsters.All.Single(monster => monster.Monster == mumminotor).Maps;
+            Assert.Equal(24, rooms.Count);
+            Assert.All(rooms, room => Assert.True(MobSpawnManager.LoadedGroups(room) > 0));
+            var monsters = rooms.SelectMany(MobSpawnManager.GetMobsForMap)
+                .SelectMany(group => group.Members)
+                .Select(member => member.Monster.Id)
+                .ToList();
+            Assert.Single(monsters, id => id == mumminotor);
+            Assert.Single(monsters, id => id == deminoball);
+        }
+
         [Fact]
         public void A_vetoed_map_stays_empty_however_many_times_it_is_asked()
         {
