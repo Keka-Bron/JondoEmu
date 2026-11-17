@@ -74,8 +74,10 @@ namespace Jondo.Unity.Server.Handlers
         /// Creating a guild (jjg): f1 the emblem {symbol, symbol colour, background, background colour},
         /// f2 the name, as the editor leaves them. It goes through <see cref="FoundAsync"/>.
         /// </summary>
-        public static async Task CreateAsync(NetworkStream stream, byte[] frame)
+        public static async Task CreateAsync(GameSession session, byte[] frame)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream!;
             byte[] jjg = ConnectionProtocol.ReadPayload(frame, Op.Jjg);
             if (jjg == null) return;
 
@@ -109,7 +111,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            string fallo = await FoundAsync(stream, SessionContext.State.CharacterId, name,
+            string fallo = await FoundAsync(session, name,
                                             symbol, symbolColor, background, symbolRgb);
             if (fallo != null)
             {
@@ -293,8 +295,8 @@ namespace Jondo.Unity.Server.Handlers
         /// Founds through the command, without an editor: the same road with the capture's emblem.
         /// Returns the error message's key, or null if it was created.
         /// </summary>
-        public static Task<string> CreateFromCommandAsync(NetworkStream stream, long founderCharacterId, string name)
-            => FoundAsync(stream, founderCharacterId, name, DefaultEmblemSymbol, DefaultEmblemSymbolColor,
+        public static Task<string> CreateFromCommandAsync(GameSession session, string name)
+            => FoundAsync(session, name, DefaultEmblemSymbol, DefaultEmblemSymbolColor,
                           DefaultEmblemBackground, DefaultEmblemSymbolRgb);
 
         /// <summary>
@@ -311,9 +313,12 @@ namespace Jondo.Unity.Server.Handlers
         /// The guildalogem is spent LAST, once everything else has happened: a founding that fails over
         /// the name cannot leave the player without the stone.
         /// </remarks>
-        private static async Task<string> FoundAsync(NetworkStream stream, long founderCharacterId, string name,
-                                                     int symbol, int symbolColor, int background, int symbolRgb)
+        private static async Task<string> FoundAsync(GameSession session, string name,
+                                                      int symbol, int symbolColor, int background, int symbolRgb)
         {
+            using var context = SessionContext.Push(session);
+            var stream = session.Stream!;
+            long founderCharacterId = session.CharacterId;
             if (founderCharacterId == 0) return "guild.create.nocharacter";
             if (GuildStore.GuildOf(founderCharacterId) != null) return "guild.create.hasguild";
 
@@ -326,15 +331,15 @@ namespace Jondo.Unity.Server.Handlers
             var guild = GuildStore.Create(founderCharacterId, name, symbol, symbolColor, background, symbolRgb);
 
             // jjs, jhq, jco, jgw, khi, jgu, jhh: the capture's order.
-            await SessionContext.Current.SendAsync(new Jondo.Unity.Protocol.Game.GuildHousesEvent([]));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.GuildHousesEvent([]));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jhq, System.Array.Empty<byte>()));
-            await GuildRankService.Live.SendAsync(SessionContext.Current, guild.Id);
+            await GuildRankService.Live.SendAsync(session, guild.Id);
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Jgw,
                 GuildProtocol.BuildGuildJoined(guild, GuildStore.RankOf(founderCharacterId))));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Khi, GuildProtocol.BuildGoneNotice()));
             var members = GuildStore.Members(guild.Id);
-            await WriteAsync(stream, MembersFrame(members));
-            await SessionContext.Current.SendAsync(GuildStateService.Live.Header(guild, members.Count));
+            await session.SendAsync(GuildRosterMessages.Live.Snapshot(members));
+            await session.SendAsync(GuildStateService.Live.Header(guild, members.Count));
             await RedrawAsync(stream, founderCharacterId);
 
             Console.WriteLine($"[Guild] {SessionContext.State.CharacterName} founds «{name}» " +
@@ -382,7 +387,7 @@ namespace Jondo.Unity.Server.Handlers
             await GuildRankService.Live.SendAsync(session, guild.Id);
             await session.SendAsync(ConnectionProtocol.Push(Op.Jgw,
                 GuildProtocol.BuildGuildJoined(guild, rank)));
-            await session.SendAsync(MembersFrame(members));
+            await session.SendAsync(GuildRosterMessages.Live.Snapshot(members));
             await session.SendAsync(GuildStateService.Live.Header(guild, members.Count));
 
             // And its notices, written or not written.
@@ -403,7 +408,7 @@ namespace Jondo.Unity.Server.Handlers
             await GuildRankService.Live.SendAsync(session, guild.Id);
             await session.SendAsync(GuildStateService.Live.Membership(guild, rank, characterId));
             await session.SendAsync(GuildStateService.Live.Header(guild, members.Count));
-            await session.SendAsync(MembersFrame(members));
+            await session.SendAsync(GuildRosterMessages.Live.Snapshot(members));
             Console.WriteLine($"[World] Guild sent for {session.State.CharacterName}: {guild.Name} ({members.Count} members).");
         }
 
@@ -444,13 +449,6 @@ namespace Jondo.Unity.Server.Handlers
             await TellEveryoneAsync(guild, frameOf(notice));
             Console.WriteLine($"[Guild] «{guild.Name}»'s {(kind == GuildStore.NoticeKind.Bulletin ? "bulletin" : "message of the day")} written by {notice.AuthorName}.");
         }
-
-        /// <summary>
-        /// The member list, ONE jgu with every member's name, level and account: the client takes
-        /// each jgu as the whole list (<see cref="GuildProtocol.BuildMembers"/>).
-        /// </summary>
-        public static byte[] MembersFrame(List<GuildStore.Member> members)
-            => ConnectionProtocol.Push(Op.Jgu, GuildProtocol.BuildMembers(MemberRows(members)));
 
         /// <summary>The members as their lists carry them: name, level, breed, points, whether on line.</summary>
         private static List<GuildProtocol.MemberRow> MemberRows(List<GuildStore.Member> members)
@@ -526,18 +524,19 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The members (jml {f1: true}): one jgu per member. The jml of the perks tab and of
+        /// The members (jml {f1: true}): one full-list replacement. The jml of the perks tab and of
         /// closing the window come empty, and the capture answers them nothing.
         /// </summary>
-        public static async Task MembersAsync(NetworkStream stream, byte[] frame)
+        public static async Task MembersAsync(GameSession session, byte[] frame)
         {
+            using var context = SessionContext.Push(session);
             byte[] jml = ConnectionProtocol.ReadPayload(frame, Op.Jml);
             if (jml == null || FieldValue(jml, 1) == 0) return;
 
-            long who = SessionContext.State.CharacterId;
+            long who = session.CharacterId;
             var guild = who == 0 ? null : GuildStore.GuildOf(who);
             if (guild == null) return;
-            await WriteAsync(stream, MembersFrame(GuildStore.Members(guild.Id)));
+            await session.SendAsync(GuildRosterMessages.Live.Snapshot(GuildStore.Members(guild.Id)));
         }
 
         /// <summary>
@@ -1526,7 +1525,7 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task RefreshEveryoneAsync(GuildStore.Guild guild, long exceptCharacter = 0)
         {
             var members = GuildStore.Members(guild.Id);
-            byte[] list = MembersFrame(members);
+            var list = GuildRosterMessages.Live.Snapshot(members);
             var header = GuildStateService.Live.Header(guild, members.Count);
 
             foreach (var member in members)
@@ -2016,7 +2015,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await GuildRankService.Live.SendAsync(session, guild.Id);
             await session.SendAsync(ConnectionProtocol.Push(Op.Jgw, GuildProtocol.BuildGuildJoined(guild, rank)));
-            await session.SendAsync(MembersFrame(members));
+            await session.SendAsync(GuildRosterMessages.Live.Snapshot(members));
             await session.SendAsync(GuildStateService.Live.Header(guild, members.Count));
             await RedrawAsync(null, characterId);
             await session.SendAsync(ConnectionProtocol.Push(Op.Jij, GuildProtocol.BuildJoinDone()));

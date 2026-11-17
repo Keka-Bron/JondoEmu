@@ -58,23 +58,6 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        /// <summary>
-        /// The chat's community, its language (the client's ChatView.SetCommunity): hos { 2 community }
-        /// answered hou { 1 community }. MEASURED in «Autenticacion-Servidor-Personaje/crear personaje -
-        /// borrar personaje», frames 121-123, on entering the world: hos 2, hou 2. There is one chat
-        /// for all here, so the choice is only acknowledged.
-        /// </summary>
-        public static Task CommunityAsync(NetworkStream stream, byte[] payload)
-        {
-            byte[]? hos = ConnectionProtocol.ReadPayload(payload, "hos");
-            if (hos == null) return Task.CompletedTask;
-            long community = 0;
-            foreach (var field in ProtoMessage.Parse(hos).Fields)
-                if (field.FieldNumber == 2 && field.WireType == 0) community = field.VarIntValue;
-            return Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("hou", Pb.New().VarIfNotZero(1, community).Build()));
-        }
-
         /// <summary>Builds a kqp (ChatServerMessage) broadcast packet.</summary>
         public static byte[] BuildChatBroadcastPacket(string messageText, string senderName, int channel = 0)
         {

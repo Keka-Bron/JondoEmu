@@ -104,6 +104,25 @@ public sealed class GameNodeDispatchTests
         Assert.False(pipe.ClientStream.DataAvailable);
     }
 
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(2, -71)]
+    public async Task Community_selection_sends_a_uidless_event_on_the_live_connection(int community, int uid)
+    {
+        var codec = new CountingCodec();
+        await using var pipe = await Pipe.OpenAsync(codec);
+        pipe.Start(Wire.Encode(new(new ChatCommunitySelectionRequest(community), uid)));
+
+        var reply = Wire.Decode(await pipe.Next());
+        Assert.IsType<CommunityChannelEvent>(reply.Content);
+        Assert.Null(reply.Uid);
+        await pipe.Finish();
+
+        Assert.Equal(1, codec.Decodes);
+        Assert.Equal(1, codec.Encodes);
+        Assert.False(pipe.ClientStream.DataAvailable);
+    }
+
     [Fact]
     public async Task Retired_map_and_transition_aliases_only_reach_diagnostics_and_leave_the_connection_usable()
     {

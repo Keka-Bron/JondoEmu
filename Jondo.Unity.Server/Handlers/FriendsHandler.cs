@@ -69,42 +69,16 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>A contact's state as the real server sends it: unknown, he is not a mutual friend.</summary>
         private const int UnknownState = 3;
 
-        private const int Offline = 0, Roleplay = 1, InFight = 2;
-
         // ─── the lists ───────────────────────────────────────────────────────────────────────
 
-        public static Task SendMutualAsync(NetworkStream stream)
-            => Write(stream, "kqg", BuildMutual(SessionContext.Current.AccountId));
+        public static Task SendMutualAsync(GameSession session)
+            => FriendListService.Live.SendMutualAsync(session);
 
-        public static Task SendContactsAsync(NetworkStream stream)
-            => Write(stream, "koj", BuildContacts(SessionContext.Current.AccountId));
+        public static Task SendContactsAsync(GameSession session)
+            => FriendListService.Live.SendContactsAsync(session);
 
         public static Task SendBlockedAsync(NetworkStream stream)
             => Write(stream, "koi", BuildBlocked(SessionContext.Current.AccountId));
-
-        /// <summary>kqg: the mutual friends, with the character of those playing.</summary>
-        public static byte[] BuildMutual(long accountId)
-        {
-            var kqg = Pb.New();
-            foreach (long other in Contacts.ContactsOf(accountId))
-            {
-                if (!Contacts.IsContact(other, accountId)) continue;
-                kqg.Msg(1, MutualEntry(other));
-            }
-            return kqg.Build();
-        }
-
-        /// <summary>koj: the contacts that have not added this account back.</summary>
-        public static byte[] BuildContacts(long accountId)
-        {
-            var koj = Pb.New();
-            foreach (long other in Contacts.ContactsOf(accountId))
-            {
-                if (Contacts.IsContact(other, accountId)) continue;
-                koj.Msg(2, ContactEntry(other));
-            }
-            return koj.Build();
-        }
 
         /// <summary>koi: the blocked players, in its second list.</summary>
         public static byte[] BuildBlocked(long accountId)
@@ -118,15 +92,16 @@ namespace Jondo.Unity.Server.Handlers
         // ─── adding ──────────────────────────────────────────────────────────────────────────
 
         /// <summary>koq: add a contact.</summary>
-        public static async Task AddContactAsync(NetworkStream stream, byte[] payload)
+        public static async Task AddContactAsync(GameSession session, byte[] payload)
         {
-            long me = SessionContext.Current.AccountId;
+            using var context = SessionContext.Push(session);
+            long me = session.AccountId;
             long other = TargetOf(ConnectionProtocol.ReadPayload(payload, "koq"), 2);
             int refusal = Refusal(me, other, Contacts.IsContact(me, other),
                                   Contacts.IsBlocked(me, other) || Contacts.IsBlocked(other, me));
             if (refusal != 0)
             {
-                await Write(stream, "kqc", Pb.New().Var(2, refusal).Build());
+                await session.SendAsync(ConnectionProtocol.Push("kqc", Pb.New().Var(2, refusal).Build()));
                 Console.WriteLine($"[Friends] Account {me} cannot add {other} as a contact: reason {refusal}.");
                 return;
             }
@@ -136,12 +111,12 @@ namespace Jondo.Unity.Server.Handlers
             {
                 // Both have added each other: the other moves from the contacts to the mutual
                 // friends, on both sides.
-                await RefreshFriendshipAsync(stream, me);
+                await FriendListService.Live.RefreshAsync(session);
                 await RefreshFriendshipOfAsync(other);
             }
             else
             {
-                await Write(stream, "koh", Pb.New().Msg(1, ContactEntry(other)).Build());
+                await session.SendAsync(ConnectionProtocol.Push("koh", Pb.New().Msg(1, ContactEntry(other)).Build()));
             }
             Console.WriteLine($"[Friends] Account {me} added {other} as a contact.");
         }
@@ -225,24 +200,8 @@ namespace Jondo.Unity.Server.Handlers
         /// Someone came into the world or left it: his mutual friends who are playing get their
         /// list again, which shows him playing or not.
         /// </summary>
-        public static async Task AnnouncePresenceAsync(long accountId)
-        {
-            if (accountId <= 0) return;
-            foreach (long other in Contacts.ContactsOf(accountId))
-            {
-                if (!Contacts.IsContact(other, accountId)) continue;
-                var session = Playing(other);
-                if (session == null) continue;
-                try
-                {
-                    await session.SendAsync(ConnectionProtocol.Push("kqg", BuildMutual(other)));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[Friends] Could not tell {other} about {accountId}: {ex.Message}");
-                }
-            }
-        }
+        public static Task AnnouncePresenceAsync(long accountId)
+            => FriendListService.Live.AnnouncePresenceAsync(accountId);
 
         /// <summary>
         /// A socket of the account closed. When it was the last one, the session's ignored list goes
@@ -264,38 +223,6 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── the entries ─────────────────────────────────────────────────────────────────────
 
-        private static Pb MutualEntry(long other)
-        {
-            var kqm = Pb.New().Var(1, other).Var(2, -1);
-            var session = Playing(other);
-            if (session == null)
-            {
-                kqm.VarIfNotZero(4, HoursOffline(other));
-            }
-            else
-            {
-                var state = session.State;
-                kqm.Msg(5, Pb.New()
-                        .Msg(1, ChatStatusHandler.Of(state))
-                        .Var(5, Math.Max(1, state.CharacterLevel))
-                        .VarIfNotZero(9, state.Breed)
-                        .Var(11, state.CharacterId)
-                        .VarIfNotZero(13, state.Sex)
-                        .Str(14, state.CharacterName)
-                        .VarIfNotZero(12, SharesHavenBagWithFriends(state.CharacterId) ? 1 : 0))
-                   .Var(6, state.IsInFight ? InFight : Roleplay);
-            }
-            return kqm.Msg(7, Tag(other));
-        }
-
-        /// <summary>
-        /// Whether the friend's haven bag is open to his friends: kqk f12, which shows the line's
-        /// «Visitar el merkasako de este personaje» (FriendsUI.SetFriendsInfo, ic +200). In the real
-        /// server's lists it goes with whatever map the friend is on.
-        /// </summary>
-        private static bool SharesHavenBagWithFriends(long characterId)
-            => (HavenBagStore.SharedOf(characterId) & HavenBagStore.SharedWithFriends) != 0;
-
         private static Pb ContactEntry(long other)
             => Pb.New().Var(2, other).Msg(4, Tag(other)).Var(5, UnknownState);
 
@@ -307,19 +234,6 @@ namespace Jondo.Unity.Server.Handlers
         {
             var (name, tag) = HouseHandler.AccountTagOf(accountId);
             return Pb.New().Str(1, name).Str(2, tag);
-        }
-
-        /// <summary>The hours since any of the account's characters last played; zero if unknown.</summary>
-        private static long HoursOffline(long accountId)
-        {
-            DateTimeOffset? last = null;
-            foreach (var character in DatabaseManager.GetCharactersByAccountId(accountId))
-            {
-                if (!DateTimeOffset.TryParse(character.LastConnection, out var when)) continue;
-                if (last == null || when > last) last = when;
-            }
-            if (last == null) return 0;
-            return Math.Max(0, (long)(DateTimeOffset.Now - last.Value).TotalHours);
         }
 
         private static GameSession? Playing(long accountId)
@@ -450,28 +364,9 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── sending ─────────────────────────────────────────────────────────────────────────
 
-        /// <summary>Both lists that a friendship moves between, to this account's client.</summary>
-        private static async Task RefreshFriendshipAsync(NetworkStream stream, long accountId)
-        {
-            await Write(stream, "kqg", BuildMutual(accountId));
-            await Write(stream, "koj", BuildContacts(accountId));
-        }
-
         /// <summary>The same for another account, if he is playing.</summary>
-        private static async Task RefreshFriendshipOfAsync(long accountId)
-        {
-            var session = Playing(accountId);
-            if (session == null) return;
-            try
-            {
-                await session.SendAsync(ConnectionProtocol.Push("kqg", BuildMutual(accountId)));
-                await session.SendAsync(ConnectionProtocol.Push("koj", BuildContacts(accountId)));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Friends] Could not refresh the lists of {accountId}: {ex.Message}");
-            }
-        }
+        private static Task RefreshFriendshipOfAsync(long accountId)
+            => FriendListService.Live.RefreshOfAsync(accountId);
 
         private static Task Write(NetworkStream stream, string opcode, byte[] message)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(opcode, message));

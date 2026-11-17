@@ -1186,6 +1186,34 @@ protocol fixtures pin all seven event aliases/payloads, notice presence/Unicode,
 packed and unpacked lists, opaque channel slots, signed integer boundaries and the
 subscription request's signed correlation IDs.
 
+### Guild roster and startup social lists
+
+`GuildRosterMessages` directly constructs full `GuildMembersEvent` replacements for
+entry, windows, joining/founding and member refreshes. The **11-08-2026** Game
+export supplies the `GuildMember`, `GuildMemberHistory` and `PlayerNote` bindings.
+Present-empty wrappers are retained; mood smiley has no roster source and stays
+at its default, and indeterminate alignment is omitted.
+The reviewed social-member fields receive actual account, enrollment date, gender
+and connection state, correcting the legacy writer's reversed/misassigned values.
+Snapshots are detached, source/member order and missing-character filtering remain,
+and each recipient uses its own codec with existing sequential failure boundaries.
+
+The same export supplies `FriendListEvent` / `AcquaintanceListEvent` (`kqg` / `koj`)
+and their nested bindings. MCP graph/native receivers establish full-list
+replacement semantics. Fields without a producer value stay at their defaults or
+absent. `FriendListService` owns snapshots, request sends, mutation
+refreshes and presence delivery. Empty lists send; reciprocity and source order,
+offline hours, status and playing-character data remain. Own failures propagate;
+remote refreshes log/stop within that recipient, while presence fanout logs/continues.
+`GameNodeProxy` dispatches `ChatCommunitySelectionRequest` (`hos`) through the
+typed request path and sends `CommunityChannelEvent()` through the owner's codec,
+applying the entry omission policy to request-driven sends too.
+
+`MembersFrame`, `GuildProtocol.BuildMember` / `BuildMembers` and the raw mutual/contact
+list builders are removed. Incremental guild/card and other social action packets
+retain their separate live consumers. See the [construction policy](populated-unmapped-fields.md#guild-roster-and-startup-social-construction-policy).
+Targeted client acceptance and new traffic remain pending.
+
 `AllianceRankMessages` directly constructs `AllianceRanksEvent` using the reviewed
 `RankInformation` records: stored names/IDs, `Flag` as `Modifiable`, integer rights,
 graphics and display order. Arrays are detached from mutable rank/right lists;

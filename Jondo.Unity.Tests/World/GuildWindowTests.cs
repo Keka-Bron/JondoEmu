@@ -50,31 +50,7 @@ namespace Jondo.Unity.Tests.World
             CharacterId = 300000000001, GuildId = 42043, Rank = 1, JoinedUtcMs = 1786567982202, Note = note, NoteMs = noteMs,
         };
 
-        [Fact]
-        public void The_founders_row_is_the_capture()
-        {
-            Assert.Equal("0a3d0a34120c4865726f2d4578616d706c6518e2022a211001180120faf8ffbdff33300b3a09089e3f1200180342004202080150818ece1c1081f092cbdd08",
-                         Hex(GuildProtocol.BuildMember(Recorder(), "Hero-Example", 354, 60000001, breed: 11, achievementPoints: 8094)));
-        }
-
-        /// <summary>
-        /// The list goes whole, every member an f1 of ONE jgu: the client replaces its list with
-        /// each jgu, and one per member left it holding only the last.
-        /// </summary>
-        [Fact]
-        public void The_member_list_goes_in_one_message()
-        {
-            var second = new GuildStore.Member { CharacterId = 300000000002, GuildId = 42043, Rank = 4, JoinedUtcMs = 1786567999999 };
-            byte[] list = GuildProtocol.BuildMembers(new[]
-            {
-                new GuildProtocol.MemberRow(Recorder(), "Hero-Example", 354, 60000001, 11, 8094, 0, true),
-                new GuildProtocol.MemberRow(second, "Player-Alpha", 200, 60000002, 10, 55, 0, false),
-            });
-            var entries = ProtoMessage.Parse(list).Fields.Where(f => f.FieldNumber == 1).ToList();
-            Assert.Equal(2, entries.Count);
-            Assert.StartsWith(Hex(GuildProtocol.BuildMember(Recorder(), "Hero-Example", 354, 60000001, breed: 11,
-                                                            achievementPoints: 8094)), Hex(list));
-        }
+        // GuildRosterTests and GuildRosterFlowTests cover full lists; incremental jgz remains legacy below.
 
         /// <summary>
         /// And the same, brought up to date after a contribution and the note «hola»: the jgz of «muchas
@@ -354,7 +330,7 @@ namespace Jondo.Unity.Tests.World
             {
                 await GuildHandler.OpenWindowAsync(wire.Session.Stream!);
                 await GuildHandler.TabAsync(wire.Session, ConnectionProtocol.Push(Op.Jiy, Array.Empty<byte>()));
-                await GuildHandler.MembersAsync(wire.Session.Stream!, ConnectionProtocol.Push(Op.Jml, Array.Empty<byte>()));
+                await GuildHandler.MembersAsync(wire.Session, ConnectionProtocol.Push(Op.Jml, Array.Empty<byte>()));
             }
 
             var ops = (await wire.Drain()).Select(f => f.Op).ToList();

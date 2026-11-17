@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -39,6 +40,81 @@ namespace Jondo.Unity.Tests.Social
 
         private static byte[] ById(string op, int field, long account)
             => ConnectionProtocol.Push(op, Pb.New().Var(field, account).Build());
+
+        [Fact]
+        public async Task Live_lists_use_the_explicit_account_and_framed_codec_on_repeated_and_empty_refreshes()
+        {
+            Forget();
+            var codec = new RecordingCodec();
+            await using var a = await ClientPipe.OpenAsync(AccountA, 8_870_100_031, Map, "Typed-Uno", codec: codec);
+            await using var b = await ClientPipe.OpenAsync(AccountB, 8_870_100_032, Map, "Typed-Dos");
+            try
+            {
+                Contacts.Add(AccountA, AccountB, Contacts.Contact);
+                Contacts.Add(AccountB, AccountA, Contacts.Contact);
+                Contacts.Add(AccountA, AccountC, Contacts.Contact);
+                b.Session.State.CharacterLevel = 57;
+                b.Session.State.Breed = 8;
+                using var context = SessionContext.Push(b.Session);
+                using var turn = await a.Session.EnterTurnAsync();
+                await FriendsHandler.SendMutualAsync(a.Session);
+                await FriendsHandler.SendContactsAsync(a.Session);
+                Assert.Equal(new byte[] { 0x7b, 1 }, await Packet(a));
+                Assert.Equal(new byte[] { 0x7b, 2 }, await Packet(a));
+                var mutual = Assert.IsType<FriendListEvent>(codec.Frames[0].Content);
+                Assert.Equal(AccountB, Assert.Single(mutual.Friends).AccountId);
+                Assert.Equal("Typed-Dos", mutual.Friends[0].OnlineInformation!.CharacterName);
+                Assert.Equal(AccountC, Assert.Single(Assert.IsType<AcquaintanceListEvent>(codec.Frames[1].Content).Acquaintances).AccountId);
+                Contacts.Remove(AccountA, AccountB, Contacts.Contact);
+                Contacts.Remove(AccountA, AccountC, Contacts.Contact);
+                await FriendsHandler.SendMutualAsync(a.Session);
+                await FriendsHandler.SendContactsAsync(a.Session);
+                Assert.Equal(new byte[] { 0x7b, 3 }, await Packet(a));
+                Assert.Equal(new byte[] { 0x7b, 4 }, await Packet(a));
+                Assert.Empty(Assert.IsType<FriendListEvent>(codec.Frames[2].Content).Friends);
+                Assert.Empty(Assert.IsType<AcquaintanceListEvent>(codec.Frames[3].Content).Acquaintances);
+                Assert.Equal("Typed-Dos", mutual.Friends[0].OnlineInformation!.CharacterName);
+                Assert.Same(b.Session, SessionContext.Actual);
+                Assert.False(b.FromServer.DataAvailable);
+            }
+            finally { Forget(); }
+        }
+
+        [Fact]
+        public async Task Adding_a_mutual_contact_persists_before_failed_owner_list_delivery_and_stops_remote_refresh()
+        {
+            Forget();
+            var codec = new RecordingCodec { Fail = true };
+            await using var a = await ClientPipe.OpenAsync(AccountA, 8_870_100_041, Map, "Failed-Uno", codec: codec);
+            await using var b = await ClientPipe.OpenAsync(AccountB, 8_870_100_042, Map, "Failed-Dos");
+            try
+            {
+                Contacts.Add(AccountB, AccountA, Contacts.Contact);
+                using var context = SessionContext.Push(b.Session);
+                using var turn = await a.Session.EnterTurnAsync();
+                await Assert.ThrowsAsync<System.IO.IOException>(() => FriendsHandler.AddContactAsync(a.Session, ByName("koq", 2, "Failed-Dos")));
+                Assert.True(Contacts.AreMutual(AccountA, AccountB));
+                Assert.IsType<FriendListEvent>(Assert.Single(codec.Frames).Content);
+                Assert.False(a.FromServer.DataAvailable);
+                Assert.False(b.FromServer.DataAvailable);
+                Assert.Same(b.Session, SessionContext.Actual);
+            }
+            finally { Forget(); }
+        }
+
+        private static Task<byte[]> Packet(ClientPipe pipe) => Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(System.TimeSpan.FromSeconds(5));
+        private sealed class RecordingCodec : Jondo.Unity.Protocol.Game.IGameCodec
+        {
+            internal readonly System.Collections.Generic.List<Jondo.Unity.Protocol.Game.GameFrame> Frames = new();
+            internal bool Fail;
+            public byte[] Encode(Jondo.Unity.Protocol.Game.GameFrame frame)
+            {
+                Frames.Add(frame);
+                if (Fail) throw new System.IO.IOException("friend owner encoding");
+                return new byte[] { 0x7b, checked((byte)Frames.Count) };
+            }
+            public Jondo.Unity.Protocol.Game.GameFrame Decode(System.ReadOnlySpan<byte> frame) => throw new System.InvalidOperationException("No friend list projection expected.");
+        }
 
         /// <summary>
         /// «Avertir quand mes amis se connectent» (koe { f1 enable }): kept per account, and a
@@ -109,24 +185,24 @@ namespace Jondo.Unity.Tests.Social
 
             using (SessionContext.Push(a.Session))
             {
-                await FriendsHandler.AddContactAsync(a.ToClient, ByName("koq", 2, "amigo-dos"));
+                await FriendsHandler.AddContactAsync(a.Session, ByName("koq", 2, "amigo-dos"));
                 var kpr = Sub(Parse(await a.Next("koh")), 1);
                 Assert.Equal(AccountB, Var(kpr, 2));
                 Assert.Equal(3, Var(kpr, 5));
 
-                await FriendsHandler.SendMutualAsync(a.ToClient);
+                await FriendsHandler.SendMutualAsync(a.Session);
                 Assert.Empty(Accounts(await a.Next("kqg"), 1, 1));
-                await FriendsHandler.SendContactsAsync(a.ToClient);
+                await FriendsHandler.SendContactsAsync(a.Session);
                 Assert.Equal(new[] { AccountB }, Accounts(await a.Next("koj"), 2, 2));
 
                 // Twice is refused: already in the list.
-                await FriendsHandler.AddContactAsync(a.ToClient, ByName("koq", 2, "Amigo-Dos"));
+                await FriendsHandler.AddContactAsync(a.Session, ByName("koq", 2, "Amigo-Dos"));
                 Assert.Equal(FriendsHandler.AlreadyInList, Var(Parse(await a.Next("kqc")), 2));
             }
 
             using (SessionContext.Push(b.Session))
             {
-                await FriendsHandler.AddContactAsync(b.ToClient, ByName("koq", 2, "Amigo-Uno"));
+                await FriendsHandler.AddContactAsync(b.Session, ByName("koq", 2, "Amigo-Uno"));
                 Assert.Equal(new[] { AccountA }, Accounts(await b.Next("kqg"), 1, 1));
                 Assert.Empty(Accounts(await b.Next("koj"), 2, 2));
             }
@@ -175,7 +251,7 @@ namespace Jondo.Unity.Tests.Social
                 Assert.Equal(FriendsHandler.NotFound, Var(Sub(Parse(await a.Next("knv")), 1), 3));
 
                 // A blocked player cannot be a contact as well.
-                await FriendsHandler.AddContactAsync(a.ToClient, ByName("koq", 2, "Bloquea-Tres"));
+                await FriendsHandler.AddContactAsync(a.Session, ByName("koq", 2, "Bloquea-Tres"));
                 Assert.Equal(FriendsHandler.Conflicting, Var(Parse(await a.Next("kqc")), 2));
 
                 await FriendsHandler.SendBlockedAsync(a.ToClient);

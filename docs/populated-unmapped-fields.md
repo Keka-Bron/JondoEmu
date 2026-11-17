@@ -10,6 +10,7 @@ installed customization-field coverage updated **13 November 2026**.
 Quest-journal construction policy updated **16 November 2026**.
 Prism-list construction policy updated **16 November 2026**.
 Wardrobe construction policy updated **17 November 2026**.
+Guild-roster/startup-social construction policy updated **17 November 2026**.
 
 This inventory records fields with **proven non-default population** and an
 unused, unresolved or incomplete semantic-mapping status. Each entry has a
@@ -137,7 +138,7 @@ or meaning of its scalar.
 |---|---|---|---|
 | OutfitAuraChangedEvent / `lym` | Tag **1**, optional int32 | **Documented capture measurement:** **206** in the retired entry reconstruction. **Historical code:** `BuildAura` emitted the field when `aura != 0`; it now returns an empty payload. | **Unused/omit** under the [after-selection policy](#after-selection-omission-policy). Native finding: no positive business consumer; indeterminate caller coverage. |
 | OrnamentSelectedEvent / `hif` | Tag **1**, int32 | **Documented capture measurement:** **135** in the retired entry reconstruction. `BuildOrnamentUpdated` now returns an empty payload. | **Unused/omit** under the [after-selection policy](#after-selection-omission-policy). Native finding: no positive business consumer; indeterminate caller coverage. |
-| CommunityChannelEvent / `hou` | Tag **1**, int32 | **Documented capture measurement:** **2** in the retired entry reconstruction. | Parser registration is known. The deeper generic/native investigation did not establish an ordinary business subscriber; global non-use is not proved. |
+| CommunityChannelEvent / `hou` | Tag **1**, int32 | **Documented capture measurement:** **2** in the retired entry reconstruction; the 15 November emulator reply carried **1**. | **Omitted** at both entry and request-driven owner sends. Renewed MCP classification remains indeterminate, with no use witness and incomplete native caller coverage. |
 | TitleSelectionErrorEvent / `hii` | Tag **1**, enum | **Documented capture measurement:** numeric value **2** in the retired entry reconstruction. | A registered handler exists, but inspection did not establish a message-rooted load of this enum into logging/gameplay state. |
 | TitleSelectedEvent / `hid` | Tag **1**, int32 | **Historical code:** the retired `BuildTitleUpdated` wrote a nonzero title ID unless `Wardrobe.None` (0). The 15 November emulator capture carried **77**. This is local producer/traffic evidence, not an official-server capture value. | **Omitted** under the [wardrobe construction policy](#wardrobe-construction-policy). Renewed MCP review remains indeterminate, with no positive business-use witness. |
 
@@ -146,8 +147,8 @@ For `hou`, neither acknowledgement semantics nor a `community` field mapping is
 established. Incomplete native-call coverage prevents a global non-use conclusion
 for these scalar payloads.
 
-Map entry now constructs `CommunityChannelEvent()` directly and omits the recorded
-tag-1 value. This is an explicit type-only outbound policy; the native-use finding
+Map entry and the `hos`-driven owner reply construct `CommunityChannelEvent()` directly
+and omit tag 1. This is an explicit type-only outbound policy; the native-use finding
 remains indeterminate and no field name or acknowledgement meaning is inferred.
 
 **Handling:** apply the omission policy above rather than retaining aura/ornament
@@ -329,6 +330,32 @@ with checked int32 item UIDs. Empty lists are still replacements. Storage read
 errors retain each store's existing log-and-partial/empty policy; propagated source,
 codec and own-send failures stop subsequent delivery. Targeted real-client wardrobe
 and cosmetic acceptance and a fresh traffic capture remain pending.
+
+## Guild-roster and startup-social construction policy
+
+The **17 November 2026** migration constructs `jgu`, `hou`, `kqg` and `koj` directly,
+with no raw projection/fallback. The **11-08-2026** export supplies the `GuildMember`
+bindings for achievement points, history (weekly/total guildatons), mood smiley,
+haven-bag sharing and notes. Present-empty history/note/status wrappers are retained.
+The historical guild-member tag **3** constant **3** remains indeterminate and is
+omitted. Tag **4** (`MoodSmileyId`) has no roster source and stays at the protobuf
+default. Note tag 3 stays unset too.
+
+Direct rosters also correct the legacy writer's social-field assignments using the
+reviewed `SocialMember` contract: actual **account at tag 4**, **gender at tag 9**,
+**join date at tag 10**, and actual offline/roleplay/fight **state at tag 3**.
+This deliberately does not reproduce the reversed date/account or offline-as-gender
+bytes. Incremental guild updates/cards remain separate legacy consumers.
+
+Community tag **1** remains unmapped (property **193247**, backing **263124**).
+Renewed classification found no business witness and incomplete caller coverage;
+omit it in the request-driven notification as at entry, without inferring an
+acknowledgement meaning or claiming global non-use.
+
+Friend and acquaintance lists use the same export's semantic contracts. The
+source's populated fields are supplied directly. Bound fields without a source
+value are absent or default; the remaining unmapped fields stay raw-only. Targeted
+real-client acceptance and a new capture remain pending.
 
 ## Keeping the inventory reproducible
 

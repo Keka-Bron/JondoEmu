@@ -4,6 +4,90 @@
   "className": "GameBindings",
   "conversionException": "GameConversionException",
   "messages": {
+    "kqg": {
+      "name": "FriendListEvent",
+      "fields": {
+        "fypx": "Friends"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kqm": {
+      "name": "FriendInformation",
+      "fields": {
+        "fyrd": "AccountId",
+        "fyre": "LeagueId",
+        "fyrg": "DurationSinceLastConnectionHours",
+        "fyrh": "OnlineInformation",
+        "fyri": "State",
+        "fyrj": "AccountTag"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kqk": {
+      "name": "FriendOnlineInformation",
+      "fields": {
+        "fyqm": "Status",
+        "fyqn": "LadderPosition",
+        "fyqo": "Alliance",
+        "fyqq": "CharacterLevel",
+        "fyqr": "Guild",
+        "fyqt": "AchievementPoints",
+        "fyqu": "BreedId",
+        "fyqv": "MoodSmileyId",
+        "fyqw": "CharacterId",
+        "fyqx": "HavenBagShared",
+        "fyqy": "Gender",
+        "fyqz": "CharacterName"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "koj": {
+      "name": "AcquaintanceListEvent",
+      "fields": {
+        "fykl": "Acquaintances"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kpr": {
+      "name": "AcquaintanceInformation",
+      "fields": {
+        "fyom": "Online",
+        "fyon": "AccountId",
+        "fyop": "AccountTag",
+        "fyoq": "State"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kpp": {
+      "name": "AcquaintanceOnlineInformation",
+      "fields": {
+        "fyof": "MoodSmileyId",
+        "fyog": "CharacterName",
+        "fyoh": "CharacterId",
+        "fyoi": "Status"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
     "hpy": {
       "name": "ShowChallengeEvent",
       "fields": {
@@ -4412,7 +4496,35 @@
     },
     "lol": {
       "name": "GuildMember",
-      "fields": {},
+      "fields": {
+        "gchs": "AchievementPoints",
+        "gcht": "History",
+        "gchv": "MoodSmileyId",
+        "gchw": "HavenBagShared",
+        "gchx": "Note"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "loj": {
+      "name": "GuildMemberHistory",
+      "fields": {
+        "gchn": "WeeklyGuildatons",
+        "gcho": "TotalGuildatons"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "loi": {
+      "name": "PlayerNote",
+      "fields": {
+        "gchh": "Content",
+        "gchi": "LastEditDate"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],

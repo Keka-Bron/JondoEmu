@@ -127,9 +127,12 @@ public sealed class GuildRankFlowTests : IDisposable
             Assert.Equal(ConnectionProtocol.Push(Op.Jgw, GuildProtocol.BuildGuildJoined(guild, GuildStore.RankNewcomer)), memberPackets[2]);
             Assert.DoesNotContain(leaderPackets, IsRanks);
             Assert.Single(memberPackets, IsRanks);
-            Assert.IsType<GuildGeneralInformationEvent>(Assert.Single(leaderCodec.Encoded).Content);
+            Assert.Collection(leaderCodec.Encoded,
+                frame => Assert.IsType<GuildMembersEvent>(frame.Content),
+                frame => Assert.IsType<GuildGeneralInformationEvent>(frame.Content));
             Assert.Collection(memberCodec.Encoded,
                 frame => Assert.IsType<GuildRanksEvent>(frame.Content),
+                frame => Assert.IsType<GuildMembersEvent>(frame.Content),
                 frame => Assert.IsType<GuildGeneralInformationEvent>(frame.Content));
             Assert.Equal(guild.Id, GuildStore.GuildOf(Member)!.Id);
         }

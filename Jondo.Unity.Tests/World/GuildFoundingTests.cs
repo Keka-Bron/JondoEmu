@@ -104,7 +104,7 @@ namespace Jondo.Unity.Tests.World
                 using var context = SessionContext.Push(pipe.Session);
                 using var turn = await pipe.Session.EnterTurnAsync();
                 Equipment.Add(item.Uid, GuildHandler.GuildalogemTemplate, 1, Equipment.Bag, null);
-                var founding = GuildHandler.CreateFromCommandAsync(pipe.ToClient, founder, "TypedHouseGuild");
+                var founding = GuildHandler.CreateFromCommandAsync(pipe.Session, "TypedHouseGuild");
                 if (fail) await Assert.ThrowsAsync<IOException>(() => founding);
                 else Assert.Null(await founding.WaitAsync(TimeSpan.FromSeconds(5)));
                 await pipe.Next(Op.Ium);
@@ -119,8 +119,9 @@ namespace Jondo.Unity.Tests.World
                     Assert.Equal(new byte[] { 0x73, 2 }, await Packet(pipe));
                     await pipe.Next(Op.Jgw);
                     await pipe.Next(Op.Khi);
-                    await pipe.Next(Op.Jgu);
                     Assert.Equal(new byte[] { 0x73, 3 }, await Packet(pipe));
+                    Assert.IsType<GuildMembersEvent>(codec.Frames[2].Content);
+                    Assert.Equal(new byte[] { 0x73, 4 }, await Packet(pipe));
                 }
                 else Assert.Single(codec.Frames);
                 Assert.Equal(0, pipe.Session.UnoCadaVez.CurrentCount);

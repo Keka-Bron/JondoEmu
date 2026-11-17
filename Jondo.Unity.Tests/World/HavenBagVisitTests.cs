@@ -170,12 +170,17 @@ namespace Jondo.Unity.Tests.World
         public void The_guild_list_carries_the_bag_open_to_the_guild()
         {
             var member = new GuildStore.Member { CharacterId = _owner, Rank = 1 };
-            string Entry() => Convert.ToHexString(GuildProtocol.BuildMember(member, "Anfitrion-Saco", 50, OwnerAccount, 8, 0));
+            Jondo.Unity.Protocol.Game.GuildMember Entry()
+            {
+                var row = Assert.Single(GuildRosterMessages.Live.Snapshot(new[] { member }).Members);
+                var basic = Assert.IsType<Jondo.Unity.Protocol.Game.CharacterComplementCaseCharacterBasicInformation>(row.ComplementCase).Value;
+                return Assert.IsType<Jondo.Unity.Protocol.Game.CharacterBasicInformationComplementCaseSocialMember>(basic.ComplementCase).Value.GuildMember!;
+            }
 
             HavenBagStore.SetShared(_owner, HavenBagStore.SharedWithFriends);
-            Assert.Contains("18034200", Entry());          // f7 { f2 {}, f3 3, f8 {} }: no f5
+            Assert.False(Entry().HavenBagShared);
             HavenBagStore.SetShared(_owner, HavenBagStore.SharedWithGuild);
-            Assert.Contains("180328014200", Entry());      // f3 3, f5 1, f8 {}
+            Assert.True(Entry().HavenBagShared);
         }
     }
 }

@@ -729,7 +729,11 @@ public sealed record GuildInformationRequest(GuildInformationType InformationTyp
 
 public enum GuildInformationType { InfoGeneral, InfoMembers, InfoBoosts, InfoPaddocks, InfoHouses, InfoRecruitment, InfoLogbook }
 
-public sealed record GuildMember();
+public sealed record GuildMember(int AchievementPoints, GuildMemberHistory? History, int MoodSmileyId, bool HavenBagShared, PlayerNote? Note);
+
+public sealed record GuildMemberHistory(int WeeklyGuildatons, int TotalGuildatons);
+
+public sealed record PlayerNote(string Content, long LastEditDate);
 
 public sealed record GuildMemberWarnOnConnectionStartRequest() : GameRequest;
 
@@ -1184,6 +1188,21 @@ public sealed record TrustStatusEvent(bool Certified) : GameEvent;
 // Reviewed entry payloads and dependencies. Nullable messages preserve absence;
 // type-only records do not imply coverage of their populated raw fields.
 public sealed record AccountTag(string Nickname, string Tag);
+
+public sealed record FriendListEvent(IReadOnlyList<FriendInformation> Friends) : GameEvent;
+
+public sealed record FriendInformation(long AccountId, int LeagueId, long DurationSinceLastConnectionHours,
+    FriendOnlineInformation? OnlineInformation, CharacterState State, AccountTag? AccountTag);
+
+public sealed record FriendOnlineInformation(CharacterStatus? Status, int LadderPosition, AllianceInformation? Alliance,
+    int CharacterLevel, GuildInformation? Guild, int AchievementPoints, int BreedId, int MoodSmileyId,
+    long CharacterId, bool HavenBagShared, Gender Gender, string CharacterName);
+
+public sealed record AcquaintanceListEvent(IReadOnlyList<AcquaintanceInformation> Acquaintances) : GameEvent;
+
+public sealed record AcquaintanceInformation(AcquaintanceOnlineInformation? Online, long AccountId, AccountTag? AccountTag, CharacterState State);
+
+public sealed record AcquaintanceOnlineInformation(int MoodSmileyId, string CharacterName, long CharacterId, CharacterStatus? Status);
 
 public sealed record AchievedAchievement(int? FinishedLevel, long AchievedBy, int AchievementId, int PioneerRank);
 

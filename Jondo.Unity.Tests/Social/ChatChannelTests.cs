@@ -10,8 +10,7 @@ using Xunit;
 namespace Jondo.Unity.Tests.Social
 {
     /// <summary>
-    /// Alone: a server-wide line reaches every session registered, those of the tests running
-    /// beside -- ChatCommunityTests read it in place of its own answer.
+    /// Run alone because server-wide lines also reach sessions registered by other tests.
     /// </summary>
     [CollectionDefinition("server-wide chat", DisableParallelization = true)]
     public sealed class ServerWideChatCollection { }

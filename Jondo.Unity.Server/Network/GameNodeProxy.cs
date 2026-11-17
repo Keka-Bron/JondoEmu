@@ -283,10 +283,10 @@ namespace Jondo.Unity.Server.Network
                 }
                 // The friends window's in-game lists, and adding to and removing from them. kpa used
                 // to be the character list request of an earlier protocol; in 3.6 it is «ignore».
-                else if (payloadStr == Op.Uri("knm")) await FriendsHandler.SendMutualAsync(stream);
-                else if (payloadStr == Op.Uri("kno")) await FriendsHandler.SendContactsAsync(stream);
+                else if (payloadStr == Op.Uri("knm")) await FriendsHandler.SendMutualAsync(session);
+                else if (payloadStr == Op.Uri("kno")) await FriendsHandler.SendContactsAsync(session);
                 else if (payloadStr == Op.Uri("kny")) await FriendsHandler.SendBlockedAsync(stream);
-                else if (payloadStr == Op.Uri("koq")) await FriendsHandler.AddContactAsync(stream, payload);
+                else if (payloadStr == Op.Uri("koq")) await FriendsHandler.AddContactAsync(session, payload);
                 else if (payloadStr == Op.Uri("kog")) await FriendsHandler.RemoveContactAsync(stream, payload);
                 else if (payloadStr == Op.Uri("kok")) await FriendsHandler.BlockAsync(stream, payload);
                 else if (payloadStr == Op.Uri("kqd")) await FriendsHandler.UnblockAsync(stream, payload);
@@ -359,8 +359,6 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri(Op.Ijg)) await EntityPingHandler.PingAsync(stream, payload);
                 // Its background, picked in the card's own window.
                 else if (payloadStr == Op.Uri("kye")) await PlayerCardHandler.SetBackgroundAsync(payload);
-                // The chat's community, acknowledged.
-                else if (payloadStr == Op.Uri("hos")) await ChatHandler.CommunityAsync(stream, payload);
                 // The cosmetics collection: items into it and back out.
                 else if (payloadStr == Op.Uri("lyn")) await CosmeticCollectionHandler.AddAsync(stream, payload);
                 else if (payloadStr == Op.Uri("lxh")) await CosmeticCollectionHandler.RemoveAsync(stream, payload, sessionAccountId);
@@ -529,7 +527,7 @@ namespace Jondo.Unity.Server.Network
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jjg)))
                 {
                     // Creating a guild.
-                    await Handlers.GuildHandler.CreateAsync(stream, payload);
+                    await Handlers.GuildHandler.CreateAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jho)))
                 {
@@ -695,7 +693,7 @@ namespace Jondo.Unity.Server.Network
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jml)))
                 {
                     // The guild window's members.
-                    await Handlers.GuildHandler.MembersAsync(stream, payload);
+                    await Handlers.GuildHandler.MembersAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Jlk)))
                 {
@@ -1746,6 +1744,10 @@ namespace Jondo.Unity.Server.Network
                     or Game.MapInformationRequest or Game.FightMapRequest or Game.PingRequest
                     or Game.ChatChannelSubscriptionRequest:
                     return await entryService.HandleAsync(frame);
+                case Game.ChatCommunitySelectionRequest:
+                    // The server does not track the selection or echo it in the unmapped event fields.
+                    await session.SendAsync(new Game.CommunityChannelEvent());
+                    break;
                 case Game.CharacterCharacteristicUpgradeRequest request:
                     await (characteristics ?? CharacteristicsHandler.Live).SpendAsync(session, request);
                     break;

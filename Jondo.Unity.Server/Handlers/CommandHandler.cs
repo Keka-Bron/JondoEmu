@@ -1272,9 +1272,8 @@ namespace Jondo.Unity.Server.Handlers
                     return;
                 }
 
-                long founder = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
                 string name = crear[1].Trim();
-                string? fallo = await Handlers.GuildHandler.CreateFromCommandAsync(stream, founder, name);
+                string? fallo = await Handlers.GuildHandler.CreateFromCommandAsync(SessionContext.Current, name);
                 await NotifyAsync(stream,
                     fallo == null ? T("guild.create.done", name) : T(fallo, name),
                     channel, accountId);
