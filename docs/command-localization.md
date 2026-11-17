@@ -27,7 +27,10 @@ player-facing replies produced by `CommandHandler`:
 - kamas, level, spell and size results;
 - teleport, relative-map and shop results;
 - item and item-set validation and creation;
-- unknown-packet summaries and row labels.
+- unknown-packet summaries and row labels;
+- the staff's commands (`.who`, `.jail`, `.mute`, `.ban`, `.announce`, `.quest`, ... -- see
+  `admin-menu.md`). What a command says to ANOTHER player (a mute or warning notice, an announcement)
+  is written in that player's language (`CommandTexts.Get(language, ...)`), not the staff's.
 
 Server-console diagnostics are not translated. They are operational logs rather than text shown to
 a player, and keeping them stable makes searches and support instructions predictable.

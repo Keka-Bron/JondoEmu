@@ -172,6 +172,8 @@ namespace Jondo.Unity.Server
             Managers.DungeonPlacements.Initialize();
             // The jail's sentences still running, and the clock that ends them.
             Managers.Jail.Initialize();
+            // The bans of the staff's ".ban", kept across restarts (the mutes are not).
+            Managers.Sanctions.Initialize();
             Managers.Dreams.Initialize();
             Managers.Merkasako.Initialize();
             Managers.Zaapis.Initialize();

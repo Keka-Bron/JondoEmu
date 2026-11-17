@@ -11,7 +11,13 @@ internal sealed class GameEntryBackend : IGameEntryBackend
     private static readonly GameEntryMapInitialization MapInitialization = new(new MapBackend());
 
     public bool BindTicket(GameSession session, IdentificationRequest request)
-        => GameEntryDispatch.BindTicket(session, request);
+    {
+        if (!GameEntryDispatch.BindTicket(session, request)) return false;
+        // A banned account's ticket is refused as an unknown one: the connection closes (".ban").
+        if (!Managers.Sanctions.IsBanned(session.AccountId)) return true;
+        Console.WriteLine($"[Entry] Account {session.AccountId} is banned: connection refused.");
+        return false;
+    }
 
     public async Task CloseOtherSessionsAsync(GameSession session)
     {
