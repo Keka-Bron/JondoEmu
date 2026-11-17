@@ -79,7 +79,7 @@ namespace Jondo.Unity.Tests.Social
                     Assert.Equal(new long[] { Male, Female }, Packed(lyb, 1).OrderBy(x => x));
                     Assert.Null(Equipment.ByUid(uid));
                     Assert.Equal(new long[] { Male, Female },
-                                 Packed(CosmeticCollectionHandler.BuildCollection(Account), 3).OrderBy(x => x));
+                                 CosmeticCollectionMessages.Live.ForAccount(Account).Heads.Select(id => (long)id).OrderBy(x => x));
 
                     // The tab takes the male head now; the female one is not this character's sex.
                     await AppearanceHandler.FaceAsync(pipe.ToClient, Lwl(Male));

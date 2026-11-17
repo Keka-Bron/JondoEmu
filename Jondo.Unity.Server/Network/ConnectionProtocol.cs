@@ -452,92 +452,12 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>The worn outfit as the window drafts it, under the draft's own uuid.</summary>
         private static byte[] AppearanceBody(DbCharacter character, string draftId)
-            => OutfitBody(character, draftId, Managers.Outfits.Of(character.Id)[0], Managers.Outfits.Worn(character),
-                          CharacterLookBuilder.BuildLook(character, paraLaVentana: true));
+            => WardrobeMessages.Write(WardrobeMessages.Live.Outfit(character,
+                Managers.Outfits.Of(character.Id)[0] with { Kept = null }, draftId));
 
         /// <summary>One of the character's outfits: the worn one from the live tables, the others as kept.</summary>
         public static byte[] BuildOutfit(DbCharacter character, Managers.Outfits.Outfit outfit)
-        {
-            if (outfit.Kept is not { } kept)
-                return OutfitBody(character, outfit.Uuid, outfit, Managers.Outfits.Worn(character),
-                                  CharacterLookBuilder.BuildLook(character, paraLaVentana: true));
-
-            int head = kept.Head > 0 ? kept.Head : character.HeadId;
-            return OutfitBody(character, outfit.Uuid, outfit, kept,
-                              CharacterLookBuilder.OutfitLook(character, head, kept.Body, kept.Colors, kept.Garments));
-        }
-
-        /// <summary>
-        /// A wardrobe OUTFIT (lzc): the block the lyt repeats, the lxo answers an outfit put on
-        /// with, the lwq drafts and the lxb hands back a new one in. Read off lk::bno, which makes
-        /// the client's outfit of it:
-        ///
-        ///   f1 lvd { f2: colours }   f3: when made         f5: body        f6: favourite
-        ///   f7: uuid                 f8: idle              f10: title      f11: its number
-        ///   f12: the look            f13: name             f14: slots hidden (packed lwh)
-        ///   f15: icon                f16: ornament         f17 (map) { f1: slot, f2 { f2: garment } }
-        ///
-        /// The capture's lyt agrees: its worn outfit carries body 26 and idle 3 -- the Sacrier's
-        /// base body and the plain idle -- and the kept one body 66, idle 25, a name and icon 1.
-        /// An empty name is drawn as the window's own default. f9 is the aura, an emote id
-        /// (lk::bno looks it up as one).
-        /// </summary>
-        private static byte[] OutfitBody(DbCharacter character, string uuid,
-                                         Managers.Outfits.Outfit outfit, Managers.Outfits.Look look, byte[] drawn)
-        {
-            var body = Pb.New();
-
-            // The outfit's colours, bare and without an index. Without this the client blows up on opening
-            // the cosmetics window: its own log says so, ColorSet..ctor with the null
-            // list, inside the lyt handler.
-            var colores = CharacterLookBuilder.PlainColors(character.Breed, character.Sex, look.Colors);
-            if (colores.Count > 0) body.Msg(1, Pb.New().Packed(2, colores));
-
-            body
-                .Str(3, outfit.Created.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ"))
-                .VarIfNotZero(5, look.Body > 0 ? look.Body : BodyTable.BaseOf(character.Breed, character.Sex))
-                .VarIfNotZero(6, outfit.Favorite ? 1 : 0)
-                .Str(7, uuid)
-                .Var(8, look.Idle > 0 ? look.Idle : IdleTable.Plain)
-                .VarIfNotZero(9, look.Aura)
-                .VarIfNotZero(10, look.Title)
-                .VarIfNotZero(11, outfit.Number)
-                .Bytes(12, drawn);
-            if (outfit.Name.Length > 0) body.Str(13, outfit.Name);
-
-            var hidden = new List<long>();
-            foreach (var worn in look.Garments) if (worn.Hidden) hidden.Add(worn.Slot);
-            if (hidden.Count > 0) body.Packed(14, hidden);
-
-            body.Var(15, outfit.Icon).VarIfNotZero(16, look.Ornament);
-
-            foreach (var worn in look.Garments)
-            {
-                if (worn.Gid == 0) continue;   // a hidden empty slot: no garment to show
-                body.Msg(17, Pb.New()
-                    .VarIfNotZero(1, worn.Slot)
-                    .Msg(2, Pb.New().Var(2, worn.Gid)));
-            }
-
-            return body.Build();
-        }
-
-        /// <summary>
-        /// The wardrobe outfits (lyt), which arrive on entering the world.
-        ///
-        ///   f1 (repeated): each outfit, the worn one included     f2: the one being worn
-        ///
-        /// IT HAS TO BE SENT NO MATTER WHAT. Without it, the client opens the cosmetics window, makes its sound, and is
-        /// left undrawn: it blows up in CosmeticUi.DisplayOutfit with a null reference because it does not
-        /// have any outfit to show. It was seen in its own Player.log.
-        /// </summary>
-        public static byte[] BuildOutfits(DbCharacter character)
-        {
-            var outfits = Managers.Outfits.Of(character.Id);
-            var pb = Pb.New();
-            foreach (var outfit in outfits) pb.Bytes(1, BuildOutfit(character, outfit));
-            return pb.Bytes(2, BuildOutfit(character, outfits[0])).Build();
-        }
+            => WardrobeMessages.Write(WardrobeMessages.Live.Outfit(character, outfit));
 
         /// <summary>The character's first outfit's uuid, different from the preview's.</summary>
         internal static string OutfitIdOf(long characterId) => LookIdOf(characterId * 17 + 3);
@@ -1019,27 +939,6 @@ namespace Jondo.Unity.Server.Network
             => ItemEffectMessages.FromCatalogue.Effect(effect) is { } entry ? ItemEffectMessages.Write(entry) : null;
 
         // ─── World: titles and ornaments ────────────────────────────────────────
-
-        /// <summary>
-        /// What one HAS (hhy). The client already carries the whole catalogue inside; what is not in
-        /// this list it draws in grey.
-        ///
-        ///   f1: [titles]   f2: [ornaments]   both packed
-        ///
-        /// It goes out only once, on entering the world. In the capture of a freshly created character
-        /// it arrives with zero bytes: he has none yet.
-        /// </summary>
-        public static byte[] BuildTitlesOwned(IEnumerable<long> titles, IEnumerable<long> ornaments)
-            => Pb.New().Packed(1, titles).Packed(2, ornaments).Build();
-
-        /// <summary>
-        /// The title worn (hid). With nothing equipped the message goes EMPTY —not with a zero
-        /// inside—, which is how the real server says "none". The separate ornament notification
-        /// omits its unused scalar under the policy linked below.
-        /// </summary>
-        public static byte[] BuildTitleUpdated(int titleId)
-            => titleId == Managers.Wardrobe.None ? Array.Empty<byte>()
-                                                 : Pb.New().Var(1, titleId).Build();
 
         public static byte[] BuildOrnamentUpdated(int ornamentId)
             // Unused by project policy; see docs/populated-unmapped-fields.md#after-selection-omission-policy.

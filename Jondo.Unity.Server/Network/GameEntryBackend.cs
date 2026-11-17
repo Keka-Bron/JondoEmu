@@ -100,7 +100,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
             => WorldEntry.SendMapEntryStateAsync(session, character, session.MapId,
                 session.State.IsInFight ? FightHandler.FightOf(session.CharacterId) : null);
         // Available titles and ornaments, and which one is worn.
-        public Task SendWardrobeAsync(GameSession session) => WardrobeHandler.SendOwnedAsync(StreamOf(session), session.AccountId);
+        public Task SendWardrobeAsync(GameSession session) => WardrobeHandler.SendOwnedAsync(session);
         public Task SendHousesAsync(GameSession session) => HouseHandler.SendAccountHousesAsync(session);
         public Task SendJournalAsync(GameSession session) => Managers.Quests.SendJournalAsync(session, box: true);
         public Task SendAchievementsAsync(GameSession session) => Managers.Achievements.SendListAsync(session);

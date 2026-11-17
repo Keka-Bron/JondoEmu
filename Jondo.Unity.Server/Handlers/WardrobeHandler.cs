@@ -90,17 +90,18 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The Save button. This is where the draft becomes what is worn.</summary>
-        public static async Task SaveAsync(NetworkStream stream, byte[] frame, long accountId)
+        public static async Task SaveAsync(GameSession owner, byte[] frame)
         {
+            using var context = SessionContext.Push(owner);
             EnsureDraft();
 
             long who = Jondo.Unity.Server.Network.SessionContext.State.CharacterId;
             Wardrobe.SaveTitle(who, SessionContext.State.WardrobeDraftTitle);
             Wardrobe.SaveOrnament(who, SessionContext.State.WardrobeDraftOrnament);
 
-            await AnnounceAsync(stream, accountId);
+            await AnnounceAsync(owner);
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await owner.SendAsync(
                 ConnectionProtocol.Answer(Op.Lyu, Pb.New().Var(1, 1).Build(),
                                           ConnectionProtocol.RequestId(frame)));
 
@@ -112,51 +113,9 @@ namespace Jondo.Unity.Server.Handlers
         /// What the client is told when something changes: the title, the ornament and the whole actor,
         /// which is what makes the name repaint with its frame.
         /// </summary>
-        public static async Task AnnounceAsync(NetworkStream stream, long accountId)
-        {
-            var (title, ornament) = Wardrobe.Of(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
-
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Hid, ConnectionProtocol.BuildTitleUpdated(title)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Hif, ConnectionProtocol.BuildOrnamentUpdated(ornament)));
-
-            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
-            if (character == null) return;
-
-            // The rest of the map with it: the title and the ornament are seen over his name.
-            await MapPresenceService.Live.RefreshAsync(SessionContext.Current, character, includeMap: !SessionContext.State.IsInFight);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
-        }
+        public static Task AnnounceAsync(GameSession owner) => WardrobeStateService.Live.AnnounceAsync(owner);
 
         /// <summary>Everything one has, sent once on entering the world.</summary>
-        public static async Task SendOwnedAsync(NetworkStream stream, long accountId)
-        {
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Hhy, ConnectionProtocol.BuildTitlesOwned(
-                    Titles.All, Titles.AllOrnaments)));
-
-            // The account's cosmetics collection, which the capture sends right before the sets.
-            await CosmeticCollectionHandler.SendAsync(stream, accountId);
-
-            // The wardrobe's sets. Without this the cosmetics window makes its sound but never gets
-            // drawn: the client has no set to show and falls over.
-            var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
-            if (character != null)
-            {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Lyt, ConnectionProtocol.BuildOutfits(character)));
-
-                // The aura worn, right after the outfits as in the captures.
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Lym, ConnectionProtocol.BuildAura(Wardrobe.AuraOf(character.Id))));
-            }
-
-            await AnnounceAsync(stream, accountId);
-
-            Console.WriteLine($"[Appearances] {Titles.All.Count} titles and " +
-                              $"{Titles.AllOrnaments.Count} ornaments offered.");
-        }
+        public static Task SendOwnedAsync(GameSession owner) => WardrobeStateService.Live.SendOwnedAsync(owner);
     }
 }

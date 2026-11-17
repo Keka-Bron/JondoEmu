@@ -63,11 +63,15 @@ public static class CharacterLookBuilder
     /// <summary>A saved outfit's body and garments over the character's current equipment, on foot.</summary>
     public static byte[] OutfitLook(DbCharacter character, int headId, int bodyId,
         IReadOnlyList<long> colors, IReadOnlyList<Wardrobe.Worn> garments)
-        => WriteLook(Build(character, CharacterLookPurpose.SavedOutfit, new()
+        => WriteLook(SemanticOutfitLook(character, headId, bodyId, colors, garments)).Build();
+
+    internal static EntityLook SemanticOutfitLook(DbCharacter character, int headId, int bodyId,
+        IReadOnlyList<long> colors, IReadOnlyList<Wardrobe.Worn> garments)
+        => Build(character, CharacterLookPurpose.SavedOutfit, new()
         {
             HeadId = headId, BodyId = bodyId, Garments = garments,
             Colors = colors.Count > 0 ? colors : IndexColors(BreedLookCatalog.Get(character.Breed, character.Sex)?.Colors),
-        })).Build();
+        });
 
     /// <summary>The selected body and head at the character's size, without equipment or attachments.</summary>
     public static byte[] BareLook(DbCharacter character)

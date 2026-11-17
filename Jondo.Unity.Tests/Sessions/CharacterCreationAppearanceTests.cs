@@ -89,10 +89,13 @@ namespace Jondo.Unity.Tests.Sessions
                 byte[] appearance = At(ConnectionProtocol.BuildAppearanceState(character, "draft"), 3);
                 Assert.Equal(Rgb, Packed(At(appearance, 1, 2)));
                 CheckLook(At(appearance, 12));
-                foreach (var outfit in ProtoMessage.Parse(ConnectionProtocol.BuildOutfits(character)).Fields)
+                foreach (var outfit in WardrobeMessages.Live.Snapshot(SessionContext.Current, character, Outfits.Of(character.Id)).Outfits)
                 {
-                    Assert.Equal(Rgb, Packed(At(outfit.BytesValue, 1, 2)));
-                    CheckLook(At(outfit.BytesValue, 12));
+                    Assert.Equal(Rgb, outfit.Colors!.Colors.Select(value => (long)value));
+                    Assert.Equal(head, outfit.HeadId);
+                    Assert.Equal(Indexed.Select(value => (int)value), outfit.EntityLook!.Colors);
+                    Assert.Equal(new[] { (int)body, (int)headSkin }, outfit.EntityLook.Skins);
+                    Assert.Equal(new[] { (int)scale }, outfit.EntityLook.Scales);
                 }
                 Assert.Contains("2=#E80006", CharacterLookBuilder.Drawable(character));
             }

@@ -45,26 +45,9 @@ namespace Jondo.Unity.Server.Handlers
             return body.Var(3, Math.Max(1, entry.Quantity)).Var(4, entry.Uid);
         }
 
-        /// <summary>
-        /// lwt { 3 heads, 4 poses, 5 bodies, repeated 6 item }: the account's collection, on entering
-        /// the world, with the faces, poses and bodies it has unlocked (<see cref="AppearanceUnlocks"/>)
-        /// in the lists the appearance window's tabs read (eqq::bbhb keeps them).
-        /// </summary>
-        public static byte[] BuildCollection(long accountId)
-        {
-            var lwt = Pb.New();
-            foreach (var (field, kind) in new[] { (3, AppearanceUnlocks.Kind.Head), (4, AppearanceUnlocks.Kind.Idle),
-                                                  (5, AppearanceUnlocks.Kind.Body) })
-            {
-                var ids = AppearanceUnlocks.All(accountId, kind);
-                if (ids.Count > 0) lwt.Packed(field, ids.ConvertAll(id => (long)id));
-            }
-            foreach (var entry in CosmeticCollection.Of(accountId)) lwt.Msg(6, Body(entry));
-            return lwt.Build();
-        }
-
-        public static Task SendAsync(NetworkStream stream, long accountId)
-            => WriteAsync(stream, "lwt", BuildCollection(accountId));
+        /// <summary>The account's collection and unlocked heads, idles and bodies; empty lists replace state.</summary>
+        public static Task SendAsync(GameSession owner)
+            => owner.SendAsync(CosmeticCollectionMessages.Live.ForAccount(owner.AccountId));
 
         private static byte[] Pods()
             => ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(Jondo.Unity.Server.Network.SessionContext.State), ConnectionProtocol.Capacity(Jondo.Unity.Server.Network.SessionContext.State));

@@ -29,7 +29,7 @@ internal sealed class MapPresenceService(IMapPresenceBackend backend)
         var message = backend.Refreshed(session, character);
         var audience = session.Map;
         await session.SendAsync(message);
-        if (includeMap) await audience.SendAsync(message, exceptSessionId: session.Id);
+        if (includeMap) await SessionRegistry.SendToAsync(audience.Recipients(session.Id), message);
     }
 
     internal async Task<(int seVa, int llega)> TravelAsync(GameSession session, GameMapAudience previousMap, int? direction = null)

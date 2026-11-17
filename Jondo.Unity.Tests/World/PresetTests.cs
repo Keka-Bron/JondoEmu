@@ -131,7 +131,7 @@ namespace Jondo.Unity.Tests.World
                     Assert.False(CharacterPresets.HasDraft(character, uuid));
 
                     // Put on: the amulet worn, the points spent, ihq last.
-                    await PresetHandler.EquipAsync(pipe.ToClient, ConnectionProtocol.Push("iio", Pb.New().Str(1, uuid).Build()), Account);
+                    await PresetHandler.EquipAsync(pipe.Session, ConnectionProtocol.Push("iio", Pb.New().Str(1, uuid).Build()));
                     var opcodes = new List<string>();
                     var sheets = new List<CharacterCharacteristics>();
                     var codec = new GameCodec();
@@ -223,7 +223,7 @@ namespace Jondo.Unity.Tests.World
                 state.StatWisdom = 17;
                 state.CharacterRemainingPoints = 903;
                 using var context = SessionContext.Push(pipe.Session);
-                await PresetHandler.EquipAsync(pipe.ToClient, Request("iio", Pb.New().Str(1, preset.Uuid).Build(), 72), Account);
+                await PresetHandler.EquipAsync(pipe.Session, Request("iio", Pb.New().Str(1, preset.Uuid).Build(), 72));
                 var opcodes = new List<string>();
                 do { opcodes.Add((await pipe.NextAny()).Opcode); } while (opcodes[^1] != "ihq" && opcodes.Count < 80);
                 Assert.Equal(new[] { "kub", "itg", "kub", "ihq" }, opcodes);

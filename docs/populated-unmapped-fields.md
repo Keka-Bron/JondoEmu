@@ -9,6 +9,7 @@ updated **12 November 2026**. Guild-hall selection boolean classification and
 installed customization-field coverage updated **13 November 2026**.
 Quest-journal construction policy updated **16 November 2026**.
 Prism-list construction policy updated **16 November 2026**.
+Wardrobe construction policy updated **17 November 2026**.
 
 This inventory records fields with **proven non-default population** and an
 unused, unresolved or incomplete semantic-mapping status. Each entry has a
@@ -138,7 +139,7 @@ or meaning of its scalar.
 | OrnamentSelectedEvent / `hif` | Tag **1**, int32 | **Documented capture measurement:** **135** in the retired entry reconstruction. `BuildOrnamentUpdated` now returns an empty payload. | **Unused/omit** under the [after-selection policy](#after-selection-omission-policy). Native finding: no positive business consumer; indeterminate caller coverage. |
 | CommunityChannelEvent / `hou` | Tag **1**, int32 | **Documented capture measurement:** **2** in the retired entry reconstruction. | Parser registration is known. The deeper generic/native investigation did not establish an ordinary business subscriber; global non-use is not proved. |
 | TitleSelectionErrorEvent / `hii` | Tag **1**, enum | **Documented capture measurement:** numeric value **2** in the retired entry reconstruction. | A registered handler exists, but inspection did not establish a message-rooted load of this enum into logging/gameplay state. |
-| TitleSelectedEvent / `hid` | Tag **1**, int32 | **Code:** [`BuildTitleUpdated`](../Jondo.Unity.Server/Network/ConnectionProtocol.cs#L2585-L2595) returns an empty payload for `Wardrobe.None`, otherwise writes `titleId`. [`Wardrobe.None` is 0](../Jondo.Unity.Server/Managers/Wardrobe.cs#L21-L24), so the populated branch supplies a nonzero value. This row is code evidence, not a quoted official-capture value. | Type-only recognition. No positive business reader for the scalar was established. |
+| TitleSelectedEvent / `hid` | Tag **1**, int32 | **Historical code:** the retired `BuildTitleUpdated` wrote a nonzero title ID unless `Wardrobe.None` (0). The 15 November emulator capture carried **77**. This is local producer/traffic evidence, not an official-server capture value. | **Omitted** under the [wardrobe construction policy](#wardrobe-construction-policy). Renewed MCP review remains indeterminate, with no positive business-use witness. |
 
 The `hii` enum declares values 0/1/2, but their meanings are not established here.
 For `hou`, neither acknowledgement semantics nor a `community` field mapping is
@@ -287,6 +288,47 @@ equipped; those nested wrappers are not omitted with the duplicate UUID. Equippe
 crystals use semantic item effects and checked int32 synthetic item UIDs. Other
 unmapped list/crystal fields were not populated by the retired world-list path and
 remain unset; no gameplay meaning is inferred for them.
+
+## Wardrobe construction policy
+
+The **17 November 2026** wardrobe/cosmetic migration constructs `hhy`, `lwt`, `lyt`,
+`lym`, `hid`, `hif` and `lxc` directly at the owning entry/announcement send sites.
+It follows the existing indeterminate-field omission rule and corrects one source
+assignment using the reviewed August contract:
+
+- `Outfit` / `lzc` tag **11** is **`head_id`**, property **204662**, backing field
+  **280676**, offset **92**. The former writer's `outfit.Number` was a server sorting
+  ordinal, not a head identifier. Direct outfits supply the live character head or
+  saved head, falling back to the character head when the saved head is nonpositive.
+  The still-legacy window/action adapters share this same semantic outfit factory.
+  `Number` continues to determine store/list ordering only.
+- MCP bootstrap for **jondo-11-08-2026** reconfirmed the head mapping. Native
+  conversion `Core.lk.biw` at **`0x622fc60`** loads `lzc.feol` into its outfit state;
+  P-code records the offset-92 load at **`0x622ff2a`**. This corroborates client use
+  and does not establish a separate ordinal field.
+- `TitleSelectedEvent` / `hid` tag **1** (`flzt`, property **192563**, backing field
+  **262071**) remains unmapped. Renewed `code.identify_decoys` found no use witness
+  and reported incomplete native caller coverage: **indeterminate**, not proven
+  global non-use. Send an empty semantic notification under the omission rule,
+  including when a title is worn. The mapped outfit title and actor title option
+  remain populated from actual character state.
+- The existing aura/ornament notification and extra-look omissions remain: empty
+  `lym` / `hif`, and only owned identifier plus mapped look for `lxc`. `Outfit` tag 4
+  and cosmetic inventory tags 1/2 were not populated by the retired list builders
+  and remain unset. No new semantic fields or bindings are introduced.
+
+Outfits retain worn-first/store order, the current-outfit copy, UTC-formatted stored
+creation date at `LastModified`, body/idle fallback, plain RGB palette values,
+recursive appearance looks, hidden slots and garment templates. Zero source aura,
+title and ornament values remain absent optional fields; optional skin values are
+not invented. Missing palette data stays absent. No lossless reproduction of the
+historical ordinal/title-scalar bytes is claimed.
+
+Cosmetics retain account unlock/collection order, effects and minimum quantity one,
+with checked int32 item UIDs. Empty lists are still replacements. Storage read
+errors retain each store's existing log-and-partial/empty policy; propagated source,
+codec and own-send failures stop subsequent delivery. Targeted real-client wardrobe
+and cosmetic acceptance and a fresh traffic capture remain pending.
 
 ## Keeping the inventory reproducible
 

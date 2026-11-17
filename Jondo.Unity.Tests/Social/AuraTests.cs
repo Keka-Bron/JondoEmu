@@ -83,8 +83,8 @@ namespace Jondo.Unity.Tests.Social
                     }
 
                     // The outfit carries it in its f9.
-                    byte[] outfit = Field(ConnectionProtocol.BuildOutfits(me), 2)!.BytesValue;
-                    Assert.Equal(Power, (int)Field(outfit, 9)!.VarIntValue);
+                    var outfit = WardrobeMessages.Live.Snapshot(pipe.Session, me, Outfits.Of(character)).Current!;
+                    Assert.Equal(Power, outfit.AuraEmoteId);
 
                     // Taken off.
                     await AppearanceHandler.AuraAsync(pipe.ToClient, Lxw(0));

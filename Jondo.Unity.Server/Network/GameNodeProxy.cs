@@ -377,7 +377,7 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri("igo")) await PresetHandler.DiscardAsync(stream, payload);
                 else if (payloadStr == Op.Uri("iin")) await PresetHandler.UpdateAsync(stream, payload);
                 else if (payloadStr == Op.Uri("iiy")) await PresetHandler.DeleteAsync(stream, payload);
-                else if (payloadStr == Op.Uri("iio")) await PresetHandler.EquipAsync(stream, payload, sessionAccountId);
+                else if (payloadStr == Op.Uri("iio")) await PresetHandler.EquipAsync(session, payload);
                 else if (payloadStr == Op.Uri("ihg")) await PresetHandler.OutfitAsync(stream, payload);
                 // The Rename window's new name, after a name change potion.
                 else if (payloadStr == Op.Uri("lvw")) await RemodelHandler.RenameAsync(stream, payload, sessionAccountId);
@@ -1293,7 +1293,7 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Lyy)))
                 {
                     // Putting on an outfit; the worn one's is the window's state.
-                    await AppearanceHandler.EquipAsync(stream, payload, sessionAccountId);
+                    await AppearanceHandler.EquipAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Lwk)))
                 {
@@ -1373,7 +1373,7 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Lxs)))
                 {
                     // That window's Save button.
-                    await WardrobeHandler.SaveAsync(stream, payload, sessionAccountId);
+                    await WardrobeHandler.SaveAsync(session, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Iuw)))
                 {

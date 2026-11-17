@@ -85,15 +85,42 @@ public sealed class MapPresenceServiceTests
     {
         const long mapId = 91_000_021;
         var codec = new Codec();
+        var peerCodec = new Codec();
         using var own = new GameMessagingTests.Recipient(mapId, codec);
-        using var peer = new GameMessagingTests.Recipient(mapId);
+        using var peer = new GameMessagingTests.Recipient(mapId, peerCodec);
         var backend = new Backend(own.Session, 0);
         await new MapPresenceService(backend).RefreshAsync(own.Session, backend.Character, includeMap);
         Assert.Single(own.Packets);
         Assert.Equal(includeMap ? 1 : 0, peer.Packets.Count);
-        Assert.Equal(includeMap ? 2 : 1, codec.Frames.Count);
+        Assert.Single(codec.Frames);
+        Assert.Equal(includeMap ? 1 : 0, peerCodec.Frames.Count);
+        Assert.All(peerCodec.Frames, frame => Assert.IsType<GameRolePlayShowActorsEvent>(frame.Content));
         Assert.All(codec.Frames, frame => Assert.IsType<GameRolePlayShowActorsEvent>(frame.Content));
         Assert.Equal(new[] { "actor" }, backend.Calls);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Presentation_recipient_failures_are_isolated_without_taking_recipient_turns(bool transport)
+    {
+        const long mapId = 91_000_025;
+        var failure = new IOException("peer refresh failed");
+        var brokenCodec = new Codec { Failure = transport ? null : failure };
+        var goodCodec = new Codec();
+        using var own = new GameMessagingTests.Recipient(mapId, new Codec());
+        using var broken = new GameMessagingTests.Recipient(mapId, brokenCodec,
+            send: transport ? _ => Task.FromException(failure) : null);
+        using var good = new GameMessagingTests.Recipient(mapId, goodCodec);
+        var backend = new Backend(own.Session, 0);
+        using var turn = await good.Session.EnterTurnAsync();
+        await new MapPresenceService(backend).RefreshAsync(own.Session, backend.Character).WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Single(own.Packets);
+        Assert.Single(brokenCodec.Frames);
+        Assert.IsType<GameRolePlayShowActorsEvent>(Assert.Single(goodCodec.Frames).Content);
+        Assert.Single(good.Packets);
+        Assert.True(SessionRegistry.TryGet(broken.Session.Id, out _));
+        Assert.Equal(0, good.Session.UnoCadaVez.CurrentCount);
     }
 
     [Fact]

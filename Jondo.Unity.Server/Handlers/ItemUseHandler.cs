@@ -114,7 +114,7 @@ namespace Jondo.Unity.Server.Handlers
             // An item that starts a quest (effect 34, the quest in its value): the vibrating feather
             // of «Un gros cube, un p'ti cube» (555) is double-clicked to take the quest, and stays in
             // the bag until it is handed over.
-            if (await TryStartQuestAsync(stream, item)) return;
+            if (await TryStartQuestAsync(session, item)) return;
 
             // A quest item whose use is an objective (effect 30): the signalling fairy of «Aquí
             // huele a gas» makes its noise in the mine (13995) and is gone.
@@ -362,8 +362,9 @@ namespace Jondo.Unity.Server.Handlers
         /// One already in hand gets info 626, as the document's button does. False when the item
         /// starts no quest.
         /// </summary>
-        private static async Task<bool> TryStartQuestAsync(NetworkStream stream, Equipment.Item item)
+        private static async Task<bool> TryStartQuestAsync(GameSession session, Equipment.Item item)
         {
+            var stream = session.Stream!;
             int questId = QuestStartedBy(DatabaseManager.GetItemEffectsData(
                 DatabaseManager.GetItemTemplatePossibleEffects(item.Template)));
             if (questId == 0) return false;
@@ -387,7 +388,7 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
 
-            if (!await Quests.StartSharedAsync(SessionContext.Current, questId, () =>
+            if (!await Quests.StartSharedAsync(session, questId, () =>
                 Equipment.HowMany(item.Template) > 0
                 && StartCriterionHolds(criterion, questId, PlayerCriteria.ResolverFor(SessionContext.State.MapId))))
                 Console.WriteLine($"[Items] {SessionContext.State.CharacterName} cannot start quest {questId} with item {item.Template}.");

@@ -65,8 +65,8 @@ namespace Jondo.Unity.Tests.World
                     Assert.True(CosmeticCollection.Has(Account, Ring));
 
                     // The entry's lwt carries it, effects and all.
-                    var lwt = Fields(CosmeticCollectionHandler.BuildCollection(Account));
-                    Assert.Single(lwt, f => f.FieldNumber == 6);
+                    var lwt = CosmeticCollectionMessages.Live.ForAccount(Account);
+                    Assert.Equal(Ring, Assert.Single(lwt.Objects).Gid);
 
                     // A second ring of the same template stays in the bag.
                     long second = DatabaseManager.NextItemUid();

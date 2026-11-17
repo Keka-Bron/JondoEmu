@@ -50,12 +50,12 @@ namespace Jondo.Unity.Tests.Social
                 {
                     // The first outfit, the worn one: the breed's base body and the plain idle.
                     var me = DatabaseManager.GetCharacterById(character)!;
-                    var lyt = ProtoMessage.Parse(ConnectionProtocol.BuildOutfits(me)).Fields;
-                    byte[] first = Assert.Single(lyt, f => f.FieldNumber == 1).BytesValue;
-                    string firstId = Text(first, 7);
+                    var first = Assert.Single(WardrobeMessages.Live.Snapshot(pipe.Session, me, Outfits.Of(character)).Outfits);
+                    string firstId = first.Uuid;
                     Assert.Equal(ConnectionProtocol.OutfitIdOf(character), firstId);
-                    Assert.Equal(Base, (int)Field(first, 5)!.VarIntValue);
-                    Assert.Equal(IdleTable.Plain, (int)Field(first, 8)!.VarIntValue);
+                    Assert.Equal(Base, first.BodyId);
+                    Assert.Equal(me.HeadId, first.HeadId);
+                    Assert.Equal(IdleTable.Plain, first.IdleId);
 
                     // Dressed «retro», kept as a new outfit with its name and icon.
                     await AppearanceHandler.BodyAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lyo, Pb.New().Var(2, Retro).Build()));
@@ -90,7 +90,7 @@ namespace Jondo.Unity.Tests.Social
                     Assert.Equal(Retro, stored.Kept!.Body);
 
                     // Put on: the live tables take the kept look, the first outfit keeps what was worn.
-                    await AppearanceHandler.EquipAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lyy, Pb.New().Str(1, kept).Build()), Account);
+                    await AppearanceHandler.EquipAsync(pipe.Session, ConnectionProtocol.Push(Op.Lyy, Pb.New().Str(1, kept).Build()));
                     Assert.Equal(1, (int)Field(await Until(pipe, Op.Lxo), 1)!.VarIntValue);
                     Assert.Equal(kept, Outfits.EquippedOf(character));
                     Assert.Equal(Retro, Wardrobe.BodyOf(character));
@@ -115,8 +115,8 @@ namespace Jondo.Unity.Tests.Social
                     Assert.Equal(2, Outfits.Of(character).Count);
 
                     // An outfit that is not one's own cannot be put on.
-                    await AppearanceHandler.EquipAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lyy,
-                        Pb.New().Str(1, Guid.NewGuid().ToString()).Build()), Account);
+                    await AppearanceHandler.EquipAsync(pipe.Session, ConnectionProtocol.Push(Op.Lyy,
+                        Pb.New().Str(1, Guid.NewGuid().ToString()).Build()));
                     Assert.Null(Field(await pipe.Next(Op.Lxo), 1));
                     Assert.Equal(kept, Outfits.EquippedOf(character));
                 }
@@ -168,7 +168,7 @@ namespace Jondo.Unity.Tests.Social
                     Assert.Equal(retro.Uuid, CharacterPresets.Find(character, build)!.Outfit);
 
                     // Put on, the build puts the outfit on.
-                    await PresetHandler.EquipAsync(pipe.ToClient, ConnectionProtocol.Push("iio", Pb.New().Str(1, build).Build()), Account + 1);
+                    await PresetHandler.EquipAsync(pipe.Session, ConnectionProtocol.Push("iio", Pb.New().Str(1, build).Build()));
                     await Until(pipe, "ihq");
                     Assert.Equal(retro.Uuid, Outfits.EquippedOf(character));
                     Assert.Equal(Retro, Wardrobe.BodyOf(character));

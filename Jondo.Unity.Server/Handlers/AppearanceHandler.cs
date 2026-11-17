@@ -360,8 +360,10 @@ namespace Jondo.Unity.Server.Handlers
         /// too. The lxo's handler (eqq::bbgm) looks the uuid up in its list -- «Invalid outfit to
         /// equip id» otherwise -- and marks it worn; without f1 it shows ui.cosmetic.error.outfitEquipped.
         /// </summary>
-        public static async Task EquipAsync(NetworkStream stream, byte[] frame, long accountId)
+        public static async Task EquipAsync(GameSession owner, byte[] frame)
         {
+            using var context = SessionContext.Push(owner);
+            var stream = owner.Stream!;
             var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             if (character == null) return;
 
@@ -379,7 +381,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 // The title and ornament the window drafts are the new outfit's now.
                 Jondo.Unity.Server.Network.SessionContext.State.IsWardrobeDraftLoaded = false;
-                await WardrobeHandler.AnnounceAsync(stream, accountId);
+                await WardrobeHandler.AnnounceAsync(owner);
                 await SlotLookHandler.RedrawAsync(stream);
                 Console.WriteLine($"[Appearances] Outfit {uuid} put on.");
             }
