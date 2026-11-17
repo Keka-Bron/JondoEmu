@@ -311,16 +311,22 @@ public sealed class AllianceRankFlowTests : IDisposable
             Assert.Equal("Recrue", Rank(snapshot, AllianceStore.RankNewcomer).Name);
             Assert.Equal("Gardien", Rank(snapshot, custom.Id).Name);
             Assert.Equal(ConnectionProtocol.Push(Op.Mbz, AllianceProtocol.BuildMembership(alliance, AllianceStore.RankNewcomer)), await Packet(joining));
+            Assert.Equal(AllianceHandler.InformationFrame(alliance), await Packet(joining));
+            Assert.Equal(ConnectionProtocol.Push(Op.Mca, AllianceProtocol.BuildJoined(alliance, AllianceStore.RankNewcomer)), await Packet(joining));
+            Assert.Equal(ConnectionProtocol.Push(Op.Khi, AllianceProtocol.BuildEmote()), await Packet(joining));
+            var redraw = Assert.IsType<GameRolePlayShowActorsEvent>(Codec.Decode(await Packet(joining)).Content);
+            Assert.Equal(who, Assert.Single(redraw.Actors).ActorId);
+            Assert.IsType<AllianceMotdEvent>(Codec.Decode(await Packet(joining)).Content);
+            Assert.IsType<AllianceBulletinEvent>(Codec.Decode(await Packet(joining)).Content);
+            await joining.Quiet();
+
             Assert.Empty(ownCodec.Encoded);
+            // The joiner gets one redraw; map refreshes are encoded by each actual peer's codec.
             Assert.Collection(joiningCodec.Encoded,
                 frame => Assert.IsType<AllianceRanksEvent>(frame.Content),
                 frame => Assert.Equal(who, Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(frame.Content).Actors).ActorId),
-                frame => Assert.Equal(who, Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(frame.Content).Actors).ActorId),
                 frame => Assert.IsType<AllianceMotdEvent>(frame.Content),
                 frame => Assert.IsType<AllianceBulletinEvent>(frame.Content));
-            // Refresh encodes once for the owner and once for the captured map audience,
-            // even when no other recipient shares that map. Both use the same snapshot.
-            Assert.Same(joiningCodec.Encoded[1].Content, joiningCodec.Encoded[2].Content);
             Assert.Equal(alliance.Id, AllianceStore.AllianceOf(who)!.Id);
         }
         finally

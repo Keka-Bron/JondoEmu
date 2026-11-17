@@ -105,7 +105,7 @@ namespace Jondo.Unity.Tests.World
                 {
                     QuestEngine.LoadFrom(master);
                     pipe.Session.State.DocumentOpen = true;
-                    await QuestHandler.StartFromDocumentAsync(pipe.ToClient,
+                    await QuestHandler.StartFromDocumentAsync(pipe.Session,
                         ConnectionProtocol.Push("ido", Pb.New().Var(1, posterQuest).Build()));
 
                     Assert.True(QuestEngine.Log!.Active(posterQuest));
@@ -113,19 +113,19 @@ namespace Jondo.Unity.Tests.World
                     Assert.False(ineligible.Quests!.Active(posterQuest));
                     Assert.False(disabled.Quests!.Active(posterQuest));
 
-                    Assert.True(await QuestEngine.StartSharedAsync(pipe.ToClient, cellarQuest));
+                    Assert.True(await QuestEngine.StartSharedAsync(pipe.Session, cellarQuest));
                     Assert.True(eligible.Quests.Active(cellarQuest));
                     Assert.True(ineligible.Quests.Active(cellarQuest));
                     Assert.True(Heroes.SetQuestSync(master, lowLevel, false));
                     eligible.MapId = ineligible.MapId = pipe.Session.State.MapId = cellar;
 
-                    Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, cellar, tap));
+                    Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, cellar, tap));
                     Assert.True(QuestEngine.Log.ObjectiveDone(inspectCellar));
                     Assert.True(eligible.Quests.ObjectiveDone(inspectCellar));
                     Assert.False(ineligible.Quests.ObjectiveDone(inspectCellar));
 
                     Assert.True(await Equipment.GiveAsync(pipe.ToClient, lemonade, 1));
-                    Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, cellar, tap));
+                    Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, cellar, tap));
                     Assert.True(QuestEngine.Log.ObjectiveDone(lureRat));
                     Assert.False(eligible.Quests.ObjectiveDone(lureRat));
                 }

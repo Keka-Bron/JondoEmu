@@ -1702,7 +1702,7 @@ namespace Jondo.Unity.Server.Managers
             // (SendStepAsync writes nothing without a stream): «Consejo de clase» started for a
             // hero by his master's talk asks his own class's master only.
             await SendStepAsync(session, questId);
-            if (stream == null) return true;
+            if (!session.HasTransport) return true;
 
             // And the green mark of the one who just gave it is switched off.
             await SendMarksAsync(session, session.MapId);
@@ -2260,7 +2260,7 @@ namespace Jondo.Unity.Server.Managers
                 await SendStepAsync(session, questId);   // settles a hero's foreign objectives too
 
                 // And the marks again, as after every ieb and idz of the captures.
-                if (stream != null && (move.ObjectiveTicked || move.StepFinished))
+                if (session.HasTransport && (move.ObjectiveTicked || move.StepFinished))
                 {
                     await SendMarksAsync(session, session.MapId);
                     await RedrawQuestElementsAsync(session, questId);
@@ -2281,7 +2281,7 @@ namespace Jondo.Unity.Server.Managers
                     ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
                 if (move.StepFinished) await PayAsync(session, move.FinishedStep);
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
-                if (stream != null) await SendMarksAsync(session, session.MapId);
+                if (session.HasTransport) await SendMarksAsync(session, session.MapId);
 
                 // An Almanax offering is made once a day: the day is written down, so the same
                 // quest is not handed out again until the saint comes round next year.

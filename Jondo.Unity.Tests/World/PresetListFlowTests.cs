@@ -13,6 +13,8 @@ namespace Jondo.Unity.Tests.World;
 public sealed class PresetListFlowTests : IDisposable
 {
     private const long Account = 8_976_000_001, Map = 191105026;
+    // Keep live pipes off the shared map so parallel tests cannot broadcast to them.
+    private const long TestMap = 8_976_100_001;
     private readonly long _owner, _other;
 
     public PresetListFlowTests()
@@ -51,7 +53,7 @@ public sealed class PresetListFlowTests : IDisposable
         CharacterPresets.ForEdit(_owner, first.Uuid)!.Name = "Unsaved draft";
 
         var codec = new RecordingCodec();
-        await using var pipe = await ClientPipe.OpenAsync(Account, _owner, Map, codec: codec);
+        await using var pipe = await ClientPipe.OpenAsync(Account, _owner, TestMap, codec: codec);
         var item = new Equipment.Item { Uid = int.MaxValue, Template = 70, Position = Equipment.Bag };
         item.Effects.Add(new(118, 30, 0, 0));
         pipe.Session.State.EquipmentItems[item.Uid] = item;
@@ -110,7 +112,7 @@ public sealed class PresetListFlowTests : IDisposable
     public async Task Real_framed_lists_deliver_empty_replacements_and_populated_owner_data(bool populated)
     {
         var preset = populated ? Save(_owner, "Framed", "2026-08-09T18:20:27.527350937Z") : null;
-        await using var pipe = await ClientPipe.OpenAsync(Account, _owner, Map);
+        await using var pipe = await ClientPipe.OpenAsync(Account, _owner, TestMap);
         if (preset != null)
         {
             preset.Items[0] = 0;

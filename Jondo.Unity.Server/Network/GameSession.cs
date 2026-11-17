@@ -80,6 +80,7 @@ namespace Jondo.Unity.Server.Network
         // connection identity across character changes, independently of the registry GUID.
         internal long HaapiSessionUid { get; } = Interlocked.Increment(ref _nextHaapiSessionUid);
         public NetworkStream? Stream { get; }
+        internal bool HasTransport => Stream != null || _sendPacket != null;
 
         public SessionState State { get; } = new SessionState();
         /// <summary>Captures this owner's current human combat totals, independent of the ambient session.</summary>

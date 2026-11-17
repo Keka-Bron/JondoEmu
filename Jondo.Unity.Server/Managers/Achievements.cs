@@ -531,7 +531,7 @@ namespace Jondo.Unity.Server.Managers
             using var context = SessionContext.Push(session);
             var log = Log;
             if (log == null) return;
-            if (stream == null)
+            if (!session.HasTransport)
             {
                 SessionContext.State.AchievementsPending.UnionWith(candidates);
                 return;
