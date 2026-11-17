@@ -709,15 +709,15 @@ played through.
 | Class Temple | `██████████` **100%** | 39/39 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
-| World Quests | `██░░░░░░░░` **17%** | 25/145 |
+| World Quests | `██░░░░░░░░` **18%** | 26/145 |
 | Incarnam | `██████████` **100%** | 24/24 |
 | Wabbit Islands | `██████████` **100%** | 23/23 |
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Cania | `███████░░░` **73%** | 19/26 |
 | Krosmoz | `██████████` **100%** | 18/18 |
 | Otomai Island | `██████████` **100%** | 14/14 |
+| Pandala Island | `███░░░░░░░` **25%** | 14/55 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
-| Pandala Island | `██░░░░░░░░` **22%** | 12/55 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Sufokia | `██░░░░░░░░` **18%** | 10/57 |
 | Kwismas | `█░░░░░░░░░` **13%** | 10/79 |
@@ -728,7 +728,7 @@ played through.
 | Brakmar | `██████████` **100%** | 5/5 |
 | Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
 | Archipelago of Vulkania | `░░░░░░░░░░` **2%** | 1/60 |
-| **All quests** | **22.2%** | **439/1976** |
+| **All quests** | **22.4%** | **442/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

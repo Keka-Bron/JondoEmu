@@ -709,6 +709,12 @@
       "element": 519724,
       "document": 637,
       "why": "The bounty poster at the centre of Akwadala [21,-21] (element 519724, graphic 44450, cell 271): document 637, the 100 kamas per kuapa contract whose link «Responder a la llamada e ir a combatir kuapas.» (text 866600) is the client's own event:startquest,2171. Dofus pour les noobs («Cent kamas pour un Kwapa»): read the poster in the middle of the map and click the link."
+    },
+    {
+      "map": 207623172,
+      "element": 518646,
+      "document": 632,
+      "why": "«Más leña al fuego» (2151, 16388): the books at the foot of the low table upstairs in the library [21,-27] open the copy of the bamboo exploitation register (document 632; the torn original page is 633, item 23206). Dofus pour les noobs («Sous le bois de sa colère»): «D'après le registre vous pouvez voir que chaque année les bûcherons bûchent environ un tiers de la densité de bois»."
     }
   ]
 }

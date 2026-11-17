@@ -829,6 +829,54 @@
       "map": 219152644,
       "group": -1036053,
       "remove": true
-    }
+    },
+  {
+   "map": 209192706,
+   "group": -2177001,
+   "cell": 232,
+   "orientation": 3,
+   "members": [{"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}],
+   "why": "One of the six groups of insects round the secluded spot [22,-34] that «Questions existentielles» (2177, 16718) asks to clear (Dofus pour les noobs («Questions existentielles»)). INFERRED: the cells, the sizes and the mix of Moskito insistente / Araknawa insistente."
+  },
+  {
+   "map": 209192706,
+   "group": -2177002,
+   "cell": 258,
+   "orientation": 3,
+   "members": [{"monster": 6364, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}],
+   "why": "One of the six groups of insects round the secluded spot [22,-34] that «Questions existentielles» (2177, 16718) asks to clear (Dofus pour les noobs («Questions existentielles»)). INFERRED: the cells, the sizes and the mix of Moskito insistente / Araknawa insistente."
+  },
+  {
+   "map": 209192706,
+   "group": -2177003,
+   "cell": 284,
+   "orientation": 3,
+   "members": [{"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}],
+   "why": "One of the six groups of insects round the secluded spot [22,-34] that «Questions existentielles» (2177, 16718) asks to clear (Dofus pour les noobs («Questions existentielles»)). INFERRED: the cells, the sizes and the mix of Moskito insistente / Araknawa insistente."
+  },
+  {
+   "map": 209192706,
+   "group": -2177004,
+   "cell": 205,
+   "orientation": 3,
+   "members": [{"monster": 6364, "grade": 0}, {"monster": 6364, "grade": 0}, {"monster": 6365, "grade": 0}],
+   "why": "One of the six groups of insects round the secluded spot [22,-34] that «Questions existentielles» (2177, 16718) asks to clear (Dofus pour les noobs («Questions existentielles»)). INFERRED: the cells, the sizes and the mix of Moskito insistente / Araknawa insistente."
+  },
+  {
+   "map": 209192706,
+   "group": -2177005,
+   "cell": 301,
+   "orientation": 3,
+   "members": [{"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6364, "grade": 0}],
+   "why": "One of the six groups of insects round the secluded spot [22,-34] that «Questions existentielles» (2177, 16718) asks to clear (Dofus pour les noobs («Questions existentielles»)). INFERRED: the cells, the sizes and the mix of Moskito insistente / Araknawa insistente."
+  },
+  {
+   "map": 209192706,
+   "group": -2177006,
+   "cell": 268,
+   "orientation": 3,
+   "members": [{"monster": 6364, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}],
+   "why": "One of the six groups of insects round the secluded spot [22,-34] that «Questions existentielles» (2177, 16718) asks to clear (Dofus pour les noobs («Questions existentielles»)). INFERRED: the cells, the sizes and the mix of Moskito insistente / Araknawa insistente."
+  }
   ]
 }

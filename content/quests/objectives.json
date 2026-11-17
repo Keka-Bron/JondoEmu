@@ -5851,9 +5851,9 @@
    "givesEach": true,
    "anyOrder": true,
    "afterObjectives": [16264],
-   "elements": [{"map": 205261570, "element": 518964}, {"map": 205261057, "element": 518638}, {"map": 205260033, "element": 518642}],
+   "elements": [{"map": 205261570, "element": 518964}, {"map": 205261057, "element": 518640}, {"map": 205260033, "element": 518642}],
    "gives": [{"item": 32275, "count": 3}],
-   "why": "«Obtén un recipiente de los tanukis»: the sandy rocks of [27,-28], [26,-27] and [24,-27] hand over a Rosa del desierto de Pandala each (32275, three in all, one per rock); the objective itself is done by Tanuha's reply (54234). Dofus pour les noobs («Dites-le avec des fleurs»). The elements are INFERRED: in [26,-27] and [24,-27] the stone heaps of graphic 66421 that carry no skill of their own (518638, 518642; 519626 and 519635 were tried: one is a mining node asking for level 100, the other is not usable); [27,-28] holds only three silicate nodes (518963-518965), 518964 is used."
+   "why": "«Obtén un recipiente de los tanukis»: the sandy rocks of [27,-28], [26,-27] and [24,-27] hand over a Rosa del desierto de Pandala each (32275, three in all, one per rock); the objective itself is done by Tanuha's reply (54234). Dofus pour les noobs («Dites-le avec des fleurs»). The elements are INFERRED: in [26,-27] and [24,-27] the stone heaps of graphic 66421 that carry no skill of their own (518638, 518642; 519626 and 519635 were tried: one is a mining node asking for level 100, the other is not usable); [27,-28] holds only three silicate nodes (518963-518965), 518964 is used. Review fix: in [26,-27] the rose takes the heap 518640 (cell 559, right side) because «L'égalité des sexes» (2168) takes 518638 (cell 336, the left edge) for its «petit caillou plat à gauche de la map»; [24,-27] has a single heap (518642), shared by the rose and the pebble of 2168 (each needs its own quest in hand)."
   },
   {
    "objective": 1487,
@@ -6037,14 +6037,6 @@
    "why": "The Zampívoro oscuro (4164) comes out in the dark clearing while the quest wants him beaten, with Nabrisa in his belly; Dofus pour les noobs («L'ombre et la proie»): «défier le Gloutovore Obscur qui tient en son ventre l'eniripsa que vous recherchez. Le combat peut se faire à plusieurs»."
   },
   {
-   "objective": 10148,
-   "quest": 1665,
-   "kind": "enter",
-   "map": 219152384,
-   "afterObjectives": [10147],
-   "why": "«Escolta a Nabrisa hasta el palacio de Bonta» (564818): the palace hall where Gabi Lan stands, with Nabrisa following (the follower item 17076 she gives on «Escoltar a Nabrisa»); Dofus pour les noobs («L'ombre et la proie»): «Vous obtenez Nabrisa en personnage suiveuse afin de la ramener à la citée Blanche»."
-  },
-  {
    "objective": 12026,
    "quest": 1823,
    "kind": "reply",
@@ -6174,8 +6166,10 @@
    "kind": "click",
    "afterObjectives": [16732],
    "elements": [{"map": 207619086, "element": 519615}],
+   "requires": [{"item": 23538, "count": 1}],
+   "spends": true,
    "gives": [{"item": 23053, "count": 1}],
-   "why": "«Obtén el shake cuando haya terminado de fermentarse»: «cliquez sur la cuve pour récupérer un Shaké d'exception» (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): the vat (element 519615, under the big green still). The hour's wait is NOT enforced (a click row has no wait): the engine only waits on replies."
+   "why": "«Obtén el shake cuando haya terminado de fermentarse»: «cliquez sur la cuve pour récupérer un Shaké d'exception» (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): the vat (element 519615, under the big green still), filled with the empty bottle Arumichi hands over (23538, spent; review fix). The hour's wait is NOT enforced (a click row has no wait): the engine only waits on replies."
   },
   {
    "objective": 16736,
@@ -6194,19 +6188,165 @@
    "why": "«Busca a los agresores en el puerto de Akwadala»: the bar fight against the drunk sailors of the tavern (npc_fights.json) is what does it (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): «Un combat se lance, il s'effectue seul»."
   },
   {
-   "objective": 16739,
-   "quest": 2170,
-   "kind": "enter",
-   "map": 207619086,
-   "afterObjectives": [16738],
-   "why": "«Escolta al aprendiz hasta la destilería»: arriving at the distillery [20,-25] once the sailors gave in (16738); the follower is his escorted placement (spawns.json) (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»))."
-  },
-  {
    "objective": 5344,
    "quest": 872,
    "kind": "beat",
    "monster": 3221,
    "why": "«Ayuda a los Weyes Magos a protegerse de M.O. Elmen Delsako» (886554): Gas Paw's line 10494 says he escaped and threatens the Weyes Magos; he is beaten in «¡M.O. Pardy!» (880, objective 5360 against monster 3221 at Mel Chiow's map 66060548). The reward star 12865 is given «por haber ayudado a los Weyes Magos». INFERRED: no walkthrough page names the closer."
+  },
+  {
+   "objective": 16714,
+   "quest": 2177,
+   "kind": "enter",
+   "map": 209192199,
+   "why": "«Escolta a Seijin Zena a la cumbre de Airedala» (847544): arriving at [21,-39] with the kozaru (the escorted placement of spawns.json). Dofus pour les noobs («Questions existentielles»): [21,-39], the summit of Aerdala."
+  },
+  {
+   "objective": 16715,
+   "quest": 2177,
+   "kind": "enter",
+   "map": 209193219,
+   "afterObjectives": [16748],
+   "why": "«Escolta a Seijin Zena hasta delante de la estatua del Gran Puda» (847545): arriving at [23,-35] after the summit's talk. Dofus pour les noobs («Questions existentielles»)."
+  },
+  {
+   "objective": 16716,
+   "quest": 2177,
+   "kind": "enter",
+   "map": 209192193,
+   "afterObjectives": [16749],
+   "why": "«Escolta a Seijin Zena hasta los pies de la cascada» (847546): arriving at [21,-33] after the statue's talk. Dofus pour les noobs («Questions existentielles»)."
+  },
+  {
+   "objective": 16717,
+   "quest": 2177,
+   "kind": "enter",
+   "map": 209192706,
+   "afterObjectives": [16750],
+   "why": "«Escolta a Seijin Zena a un lugar apartado» (847547): arriving at [22,-34] after the waterfall's talk. Dofus pour les noobs («Questions existentielles»)."
+  },
+  {
+   "objective": 16720,
+   "quest": 2177,
+   "kind": "use",
+   "map": 209191424,
+   "afterObjectives": [16719],
+   "why": "«Haz que sople el viento en el árbol flauta mediante el abanico grande» (847557): the Gran abanico (23498, its effect 30 is this objective, its own condition the map [20,-32]) used there; it turns into the second fan (23510). Dofus pour les noobs («Questions existentielles»)."
+  },
+  {
+   "objective": 16721,
+   "quest": 2177,
+   "kind": "use",
+   "map": 209192195,
+   "afterObjectives": [16720],
+   "why": "The second fan (23510, effect 30 = 16721, condition the map [21,-35]) used before the second flute tree (847558); it turns into the third (23511)."
+  },
+  {
+   "objective": 16722,
+   "quest": 2177,
+   "kind": "use",
+   "map": 209192197,
+   "afterObjectives": [16721],
+   "why": "The third fan (23511, effect 30 = 16722) used before the third flute tree [21,-37] (847559); it is gone."
+  },
+  {
+   "objective": 16718,
+   "quest": 2177,
+   "kind": "beat",
+   "monsters": [6365, 6364],
+   "times": 6,
+   "map": 209192706,
+   "afterObjectives": [16751],
+   "why": "«Despeja las inmediaciones de insectos, que desconcentran a Seijin Zena» (847548): the six fights against the groups of Moskito insistente (6365) and Araknawa insistente (6364) of the secluded spot (groups.json, six written groups), after Zena's request (16751); «Au total il y a 6 combats à faire pour éliminer tous les moustiques» (Dofus pour les noobs («Questions existentielles»))."
+  },
+  {
+   "objective": 10148,
+   "quest": 1665,
+   "kind": "enter",
+   "map": 219152384,
+   "afterObjectives": [10147],
+   "requires": [{"item": 17076, "count": 1}],
+   "spends": true,
+   "showsNpc": 3004,
+   "why": "«Escolta a Nabrisa hasta el palacio de Bonta» (564818): the palace hall where Gabi Lan stands, with Nabrisa following (the follower item 17076 she gives on «Escoltar a Nabrisa», «811: 1 fight left»), so only with the follower carried -- a fight on the way loses her and she waits again in the dark clearing --; there she stops following (17076 taken back) and comes in by Gabi Lan, «Gracias por escoltarme hasta Bonta» (21804), as Soki at the end of his walk (14205). Dofus pour les noobs («L'ombre et la proie»): «Vous obtenez Nabrisa en personnage suiveuse afin de la ramener à la citée Blanche. Retournez au Palais de Bonta en [-36,-60]»."
+  },
+  {
+   "objective": 16388,
+   "quest": 2151,
+   "kind": "read",
+   "elements": [{"map": 207623172, "element": 518646}],
+   "afterObjectives": [16387],
+   "why": "«Consulta el registro de la biblioteca»: the books at the foot of the low table on the right upstairs in the library [21,-27] (207623172, element 518646, gfx 32822, cell 357), the copy of the bamboo register (document 632, content/world/readables.json), after Kykori has pointed to it (16387, her 41262). Dofus pour les noobs («Sous le bois de sa colère»): «Montez à l'étage et cliquez sur les livres au pied de la table basse à droite». INFERRED: which of the floor's five elements are those books (518646 is the only one at the low table's foot on the right)."
+  },
+  {
+   "objective": 16391,
+   "quest": 2151,
+   "kind": "enter",
+   "map": 205521925,
+   "afterObjectives": [16390],
+   "why": "«Descubre la explotación»: arriving before the Bambusería [26,-30] (205521925, the objective's own map) once Takeono has said Kykori went there (16390, 41277). Dofus pour les noobs («Sous le bois de sa colère»): «Allez donc en [26,-30] devant le donjon de la Bambusai de Damadrya»."
+  },
+  {
+   "objective": 16392,
+   "quest": 2151,
+   "kind": "beat",
+   "monsters": [6270, 6268, 6269],
+   "map": 205521925,
+   "afterObjectives": [16391],
+   "spawns": {"monster": 6270, "count": 1, "with": [6268, 6269], "attacks": true},
+   "why": "«Deshazte de los bambutos»: on arriving before the Bambusería (205521925) the bambutos attack: the Bambuto rencial (6270), maturgo (6268) and atruhanador (6269), the first wave. Dofus pour les noobs («Sous le bois de sa colère»): «dès que vous arrivez sur la map vous êtes agressé. Un combat à vague se lance … Vague 1 : 1 x Bambouto rentiel + 1 x Bambouto maturge + 1 x Bambouto nitruant. Vague 2 : 1 x Bambouto maturge + 1 x Bambouto nitruant (dans 3 tours). Vague 3 : 1 x Bambouto rentiel (dans 5 tours)». GAP: waves 2 and 3 are not run, the engine's timed waves only exist on NPC fight rows (NpcHandler -> FightHandler.WavesInNextFight), not on a quest binding's arrival aggression."
+  },
+  {
+   "objective": 16394,
+   "quest": 2151,
+   "kind": "click",
+   "elements": [{"map": 208669696, "element": 518703}],
+   "afterObjectives": [16393],
+   "gives": [{"item": 23206, "count": 1}],
+   "why": "«Explora para encontrar el rastro de Kykori»: in room 4 of the Bambusería de Kodámade (208669696), the skeleton under the tent (element 518703, gfx 62168, cell 256, the room's only element) and, beside it, the torn page of the register (23206, «Página del registro», whose use reads document 633 and does 16395 by its effect 30). Dofus pour les noobs («Sous le bois de sa colère»): «vous rendre dans la salle 4 ou vous devrez cliquer sur le squelette sous la tente … vous trouvez à côté d'elle un morceau de papier». The objective names the entrance (205521925); the element carries its own map."
+  },
+  {
+   "objective": 16396,
+   "quest": 2151,
+   "kind": "enter",
+   "map": 208670720,
+   "afterObjectives": [16395],
+   "why": "«Sigue explorando»: reaching the boss room of the Bambusería (208670720, the objective's own map) once the page has been read (16395). Dofus pour les noobs («Sous le bois de sa colère»): «Pensez bien à lire le document avant de continuer le donjon sinon votre quête ne se mettra pas à jour et vous devrez refaire le donjon !»."
+  },
+  {
+   "objective": 16397,
+   "quest": 2151,
+   "kind": "beat",
+   "monsters": [6326],
+   "map": 208670720,
+   "afterObjectives": [16396],
+   "why": "«Enfréntate a la guardiana»: beating Kodámade (6326), the Bambusería's boss, in her room (208670720). Dofus pour les noobs («Sous le bois de sa colère»): «Continuez votre donjon jusqu'à la salle du Boss et affrontez la gardienne de la bambusaie : Damadrya»."
+  },
+  {
+   "objective": 16400,
+   "quest": 2151,
+   "kind": "beat",
+   "monsters": [6263, 6264],
+   "map": 206438914,
+   "why": "«Vence a Kykori y a su cómplice»: Kykori (6263) and the Negociante amakneano (6264) on the village's lakeside [18,-29] (206438914), the fight the amakneano's «Entender la indirecta y prepararte para combatir.» (53730) opens (content/fights/npc_fights.json). Dofus pour les noobs («Sous le bois de sa colère»): «Suite à votre refus, l'amaknéen vous menace … Un combat se lance»."
+  },
+  {
+   "objective": 16405,
+   "quest": 2151,
+   "kind": "beat",
+   "monsters": [6267],
+   "map": 205521923,
+   "afterObjectives": [16404],
+   "why": "«Aplasta los frutos podridos»: the rotten fruits (6267) at the foot of the Kudemenju tree [26,-32] (205521923), the fight the fallen fruit's «Me encanta la compota, ¡así que a desgajar!» (53792) opens. Dofus pour les noobs («Sous le bois de sa colère»): «Répondre que vous adorez la compote et dégainer votre arme … Un combat se lance»."
+  },
+  {
+   "objective": 16407,
+   "quest": 2151,
+   "kind": "enter",
+   "map": 207622154,
+   "overridesMap": true,
+   "afterObjectives": [16406],
+   "why": "«Cómete un gajo y entra en el árbol»: the Gajo de fruto kudemenju (23495, effect 826 travel 385) takes the character into the spirits' clearing (207622154, cell 406), so arriving there does it. The objective names the tree's map (205521923), hence overridesMap. Dofus pour les noobs («Sous le bois de sa colère»): «utilisez le Quartier de fruit Goroku … afin de vous téléporter dans un autre monde»."
   }
 ]
 }
