@@ -108,6 +108,12 @@ namespace Jondo.Unity.Server.Network
                 "quest" => TestQuest(cuerpo),
                 "season" => TestSeason(cuerpo),
                 "reload" => TestReload(),
+                // A slot played without the Dofus client, and the console (ControlApiHeadless.cs).
+                "headless" => TestHeadless(cuerpo),
+                "headless/stop" => TestHeadlessStop(),
+                "headless/send" => TestHeadlessSend(cuerpo),
+                "headless/frames" => TestHeadlessFrames(cuerpo),
+                "logs" => TestLogs(cuerpo),
                 _ => Mal(404, "ruta"),
             };
         }

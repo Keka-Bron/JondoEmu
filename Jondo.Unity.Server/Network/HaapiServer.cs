@@ -71,7 +71,10 @@ namespace Jondo.Unity.Server.Network
         /// exactly the same; they are simply not logged.
         /// </summary>
         private static bool EsLatido(string path)
-            => path == Contract.Prefijo + "estado" || path == Contract.Prefijo + "activos";
+            => path == Contract.Prefijo + "estado" || path == Contract.Prefijo + "activos"
+               // Reading the log, or a headless client's frames, writes nothing to it: a tool that
+               // polls them would otherwise read mostly its own polling.
+               || path == Contract.Prefijo + "test/logs" || path == Contract.Prefijo + "test/headless/frames";
 
         /// <summary>The largest thing accepted as a body. The biggest JSON of these routes does not reach 1 KB.</summary>
         private const int TopeDelCuerpo = 64 * 1024;

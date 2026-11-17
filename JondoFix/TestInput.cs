@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -235,6 +236,15 @@ namespace JondoFix
                         });
                         return;
                     }
+                    case "shot":
+                    {
+                        // After whatever was asked before it has been played, at the end of a frame:
+                        // a picture of the window as JPEG, no wider than asked (1600 by default).
+                        int widest = Int(1, 1600);
+                        string path = Path.Combine(Path.GetTempPath(), $"jondo-shot-{_port}.jpg");
+                        Then(() => MelonCoroutines.Start(Shot(request, path, widest)));
+                        return;
+                    }
                     case "move":
                         Then(() => Pointer(Int(1), Int(2), _buttons), 2);
                         break;
@@ -312,6 +322,50 @@ namespace JondoFix
             catch (Exception ex)
             {
                 request.Reply = "error: " + ex.Message;
+                request.Done.Set();
+            }
+        }
+
+        /// <summary>
+        /// The window as the person sees it, written to <paramref name="path"/>: read once the frame
+        /// has been drawn, scaled down to <paramref name="widest"/> pixels across, and answered with
+        /// the picture's size and the window's, to turn a point on it into one to click.
+        /// </summary>
+        private static IEnumerator Shot(Request request, string path, int widest)
+        {
+            yield return new WaitForEndOfFrame();
+            Texture2D full = null, small = null;
+            RenderTexture scaled = null;
+            try
+            {
+                full = ScreenCapture.CaptureScreenshotAsTexture();
+                var picture = full;
+                if (widest > 0 && full.width > widest)
+                {
+                    int width = widest, height = Math.Max(1, full.height * widest / full.width);
+                    scaled = RenderTexture.GetTemporary(width, height);
+                    Graphics.Blit(full, scaled);
+                    var previous = RenderTexture.active;
+                    RenderTexture.active = scaled;
+                    small = new Texture2D(width, height, TextureFormat.RGB24, false);
+                    small.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                    small.Apply();
+                    RenderTexture.active = previous;
+                    picture = small;
+                }
+                byte[] jpeg = ImageConversion.EncodeToJPG(picture, 80);
+                File.WriteAllBytes(path, jpeg);
+                request.Reply = $"ok {path} {picture.width} {picture.height} {Screen.width} {Screen.height}";
+            }
+            catch (Exception ex)
+            {
+                request.Reply = "error: " + ex.Message;
+            }
+            finally
+            {
+                if (scaled != null) RenderTexture.ReleaseTemporary(scaled);
+                if (full != null) UnityEngine.Object.Destroy(full);
+                if (small != null) UnityEngine.Object.Destroy(small);
                 request.Done.Set();
             }
         }
