@@ -94,7 +94,6 @@ namespace Jondo.Unity.Tests.Commands
         [InlineData(".stats")]
         [InlineData(".spawn")]
         [InlineData(".remove")]
-        [InlineData(".gift")]
         [InlineData(".kamas")]
         [InlineData(".level")]
         public void A_game_master_touches_the_character_and_the_map(string command)
@@ -104,12 +103,35 @@ namespace Jondo.Unity.Tests.Commands
         [InlineData(".ban")]
         [InlineData(".unban")]
         [InlineData(".bans")]
+        [InlineData(".gift")]
         [InlineData(".announce")]
         [InlineData(".save")]
         [InlineData(".reload")]
         [InlineData(".shutdown")]
         public void An_administrator_rules_the_server(string command)
             => Assert.Equal(Roles.Administrador, CommandHandler.RequiredRole(command));
+
+        [Theory]
+        [InlineData(Roles.Moderador, Roles.Jugador, true)]
+        [InlineData(Roles.GameMaster, Roles.Moderador, true)]
+        [InlineData(Roles.Administrador, Roles.GameMaster, true)]
+        [InlineData(Roles.Moderador, Roles.Moderador, false)]
+        [InlineData(Roles.Moderador, Roles.Administrador, false)]
+        [InlineData(Roles.GameMaster, Roles.Administrador, false)]
+        [InlineData(Roles.Administrador, Roles.Administrador, false)]
+        public void Staff_act_only_on_lower_roles(int staff, int target, bool allowed)
+            => Assert.Equal(allowed, CommandHandler.MayActOn(staff, 1, target, 2));
+
+        [Fact]
+        public void Staff_always_act_on_their_own_account()
+            => Assert.True(CommandHandler.MayActOn(Roles.Moderador, 7, Roles.Moderador, 7));
+
+        [Fact]
+        public void The_last_word_is_read_for_a_forced_name()
+        {
+            Assert.Equal("@Cible", CommandHandler.LastWordOf("100000 @Cible"));
+            Assert.Equal("", CommandHandler.LastWordOf("   "));
+        }
 
         /// <summary>A command nobody gave a role to is the administrator's: the safe side to be wrong on.</summary>
         [Fact]

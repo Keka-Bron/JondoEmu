@@ -167,8 +167,9 @@ namespace Jondo.Unity.Server.Handlers
                 [".stats"] = Roles.GameMaster,
                 [".spawn"] = Roles.GameMaster,
                 [".remove"] = Roles.GameMaster,
-                [".gift"] = Roles.GameMaster,
                 // The server itself: an administrator's. Written out although it is the default.
+                // A gift creates any item on an account, like .item: an administrator's.
+                [".gift"] = Roles.Administrador,
                 [".announce"] = Roles.Administrador,
                 [".save"] = Roles.Administrador,
                 [".reload"] = Roles.Administrador,
@@ -269,6 +270,13 @@ namespace Jondo.Unity.Server.Handlers
                     {
                         other = FindOnline(name);
                         rest = stripped;
+                    }
+                    else if (LastWordOf(rest).StartsWith("@", StringComparison.Ordinal))
+                    {
+                        // "@Name" is a player and nothing else: one who is not connected is not a
+                        // reason to run the command on the staff instead.
+                        await NotifyAsync(stream, T("admin.no_player", LastWordOf(rest)[1..]), channel, accountId);
+                        return true;
                     }
                 }
 

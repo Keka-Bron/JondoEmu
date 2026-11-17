@@ -19,47 +19,47 @@
     <!-- ═══ Modération ═══ -->
     <item type="menu" label="&lt;color=#7fd0ff&gt;Moderación&lt;/color&gt;">
       <item type="static" label="Desplazamientos"/>
-      <item type="sendcommand" label="Teletransportarme hasta %p" command="goto %p" help="Va al mapa y la casilla de %p"/>
-      <item type="sendcommand" label="Traer a %p hasta mí" command="summon %p" help="Teletransporta a %p a mi casilla"/>
+      <item type="sendcommand" label="Teletransportarme hasta %p" command="goto @%p" help="Va al mapa y la casilla de %p"/>
+      <item type="sendcommand" label="Traer a %p hasta mí" command="summon @%p" help="Teletransporta a %p a mi casilla"/>
       <item type="separator"/>
       <item type="static" label="&lt;color=#d9d9d9&gt;Información&lt;/color&gt;"/>
-      <item type="sendcommand" label="Ficha de %p" command="whois %p" help="Nivel, cuenta, rol, mapa, kamas, estado"/>
-      <item type="sendcommand" label="¿Dónde está %p?" command="where %p"/>
+      <item type="sendcommand" label="Ficha de %p" command="whois @%p" help="Nivel, cuenta, rol, mapa, kamas, estado"/>
+      <item type="sendcommand" label="¿Dónde está %p?" command="where @%p"/>
       <item type="separator"/>
       <item type="static" label="Prisión"/>
-      <item type="sendcommand" label="&lt;color=#ffb366&gt;Encarcelar a %p (10 min)&lt;/color&gt;" command="jail %p" help="La prisión de los GM: 10 minutos, sin salida ni otro canal que el general"/>
-      <item type="sendcommand" label="Sacar a %p de la prisión" command="unjail %p"/>
+      <item type="sendcommand" label="&lt;color=#ffb366&gt;Encarcelar a %p (10 min)&lt;/color&gt;" command="jail @%p" help="La prisión de los GM: 10 minutos, sin salida ni otro canal que el general"/>
+      <item type="sendcommand" label="Sacar a %p de la prisión" command="unjail @%p"/>
       <item type="sendcommand" label="¿Quién está en prisión?" command="jailed"/>
       <item type="separator"/>
       <item type="menu" label="Silenciar">
         <item type="static" label="Silenciar: %p"/>
-        <item type="sendcommand" label="5 minutos" command="mute %p 5m"/>
-        <item type="sendcommand" label="30 minutos" command="mute %p 30m"/>
-        <item type="sendcommand" label="2 horas" command="mute %p 2h"/>
-        <item type="sendcommand" label="1 día" command="mute %p 1d"/>
-        <item type="preparecommand" label="Duración libre..." command="mute %p " help="mute &lt;joueur&gt; [duración]: 30, 30m, 12h, 7d"/>
+        <item type="sendcommand" label="5 minutos" command="mute @%p 5m"/>
+        <item type="sendcommand" label="30 minutos" command="mute @%p 30m"/>
+        <item type="sendcommand" label="2 horas" command="mute @%p 2h"/>
+        <item type="sendcommand" label="1 día" command="mute @%p 1d"/>
+        <item type="preparecommand" label="Duración libre..." command="mute @%p " help="mute &lt;joueur&gt; [duración]: 30, 30m, 12h, 7d"/>
         <item type="separator"/>
-        <item type="sendcommand" label="Devolver la palabra" command="unmute %p"/>
+        <item type="sendcommand" label="Devolver la palabra" command="unmute @%p"/>
       </item>
       <item type="menu" label="Advertir">
         <item type="static" label="Advertir a %p"/>
-        <item type="sendcommand" label="Insulto" command="warn %p Los insultos están prohibidos."/>
-        <item type="sendcommand" label="Flood / spam" command="warn %p Por favor, deja de repetir tus mensajes."/>
-        <item type="sendcommand" label="Última advertencia" command="warn %p Esta es una última advertencia antes de una sanción."/>
-        <item type="preparecommand" label="Mensaje libre..." command="warn %p " help="warn &lt;joueur&gt; &lt;message&gt;"/>
+        <item type="sendcommand" label="Insulto" command="warn @%p Los insultos están prohibidos."/>
+        <item type="sendcommand" label="Flood / spam" command="warn @%p Por favor, deja de repetir tus mensajes."/>
+        <item type="sendcommand" label="Última advertencia" command="warn @%p Esta es una última advertencia antes de una sanción."/>
+        <item type="preparecommand" label="Mensaje libre..." command="warn @%p " help="warn &lt;joueur&gt; &lt;message&gt;"/>
       </item>
-      <item type="sendcommand" label="Expulsar a %p" command="kick %p" help="Cierra su conexión (puede volver)"/>
+      <item type="sendcommand" label="Expulsar a %p" command="kick @%p" help="Cierra su conexión (puede volver)"/>
       <item type="separator"/>
       <item type="menu" label="&lt;color=#ff7070&gt;Banear (administrador)&lt;/color&gt;">
         <item type="static" label="Banear la CUENTA de %p"/>
         <item type="menu" label="Confirmar: 1 día">
-          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p 1 día&lt;/color&gt;" command="ban %p 1d"/>
+          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p 1 día&lt;/color&gt;" command="ban @%p 1d"/>
         </item>
         <item type="menu" label="Confirmar: 7 días">
-          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p 7 días&lt;/color&gt;" command="ban %p 7d"/>
+          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p 7 días&lt;/color&gt;" command="ban @%p 7d"/>
         </item>
         <item type="menu" label="Confirmar: para siempre">
-          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p para siempre&lt;/color&gt;" command="ban %p"/>
+          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p para siempre&lt;/color&gt;" command="ban @%p"/>
         </item>
         <item type="separator"/>
         <item type="preparecommand" label="Levantar un baneo..." command="unban " help="unban &lt;nombre del personaje baneado&gt;"/>
@@ -71,18 +71,18 @@
     <item type="menu" label="&lt;color=#9be37f&gt;Personaje&lt;/color&gt;">
       <item type="static" label="Personaje: %p"/>
       <item type="menu" label="Kamas">
-        <item type="sendcommand" label="+ 100 000" command="kamas 100000 %p"/>
-        <item type="sendcommand" label="+ 1 000 000" command="kamas 1000000 %p"/>
-        <item type="sendcommand" label="+ 100 000 000" command="kamas 100000000 %p"/>
-        <item type="sendcommand" label="- 1 000 000" command="kamas -1000000 %p"/>
+        <item type="sendcommand" label="+ 100 000" command="kamas 100000 @%p"/>
+        <item type="sendcommand" label="+ 1 000 000" command="kamas 1000000 @%p"/>
+        <item type="sendcommand" label="+ 100 000 000" command="kamas 100000000 @%p"/>
+        <item type="sendcommand" label="- 1 000 000" command="kamas -1000000 @%p"/>
         <item type="preparecommand" label="Cantidad libre..." command="kamas " help="kamas &lt;montant&gt; [jugador]"/>
       </item>
       <item type="menu" label="Nivel">
-        <item type="sendcommand" label="Nivel 1" command="level 1 %p"/>
-        <item type="sendcommand" label="Nivel 50" command="level 50 %p"/>
-        <item type="sendcommand" label="Nivel 100" command="level 100 %p"/>
-        <item type="sendcommand" label="Nivel 150" command="level 150 %p"/>
-        <item type="sendcommand" label="Nivel 200" command="level 200 %p"/>
+        <item type="sendcommand" label="Nivel 1" command="level 1 @%p"/>
+        <item type="sendcommand" label="Nivel 50" command="level 50 @%p"/>
+        <item type="sendcommand" label="Nivel 100" command="level 100 @%p"/>
+        <item type="sendcommand" label="Nivel 150" command="level 150 @%p"/>
+        <item type="sendcommand" label="Nivel 200" command="level 200 @%p"/>
         <item type="preparecommand" label="Nivel libre..." command="level " help="level &lt;niveau&gt; [jugador]"/>
       </item>
       <item type="menu" label="Características base">
@@ -94,24 +94,24 @@
         <item type="preparecommand" label="Agilidad..." command="stats agi "/>
       </item>
       <item type="menu" label="Vida y energía">
-        <item type="sendcommand" label="Curar a %p (toda la vida)" command="heal %p"/>
-        <item type="sendcommand" label="Energía al máximo" command="energy 10000 %p"/>
-        <item type="sendcommand" label="Energía a 1000" command="energy 1000 %p"/>
+        <item type="sendcommand" label="Curar a %p (toda la vida)" command="heal @%p"/>
+        <item type="sendcommand" label="Energía al máximo" command="energy 10000 @%p"/>
+        <item type="sendcommand" label="Energía a 1000" command="energy 1000 @%p"/>
         <item type="preparecommand" label="Energía libre..." command="energy " help="energy [valor] [jugador]"/>
       </item>
       <item type="menu" label="Apariencia">
-        <item type="sendcommand" label="Tamaño 50 %" command="size 50 %p"/>
-        <item type="sendcommand" label="Tamaño 100 % (normal)" command="size 100 %p"/>
-        <item type="sendcommand" label="Tamaño 200 %" command="size 200 %p"/>
+        <item type="sendcommand" label="Tamaño 50 %" command="size 50 @%p"/>
+        <item type="sendcommand" label="Tamaño 100 % (normal)" command="size 100 @%p"/>
+        <item type="sendcommand" label="Tamaño 200 %" command="size 200 @%p"/>
         <item type="preparecommand" label="Tamaño libre..." command="size " help="size &lt;pourcentage&gt; [jugador]"/>
       </item>
       <item type="menu" label="Oficios">
-        <item type="sendcommand" label="Todos los oficios a nivel 100" command="oficios 100 %p"/>
-        <item type="sendcommand" label="Todos los oficios a nivel 200" command="oficios 200 %p"/>
+        <item type="sendcommand" label="Todos los oficios a nivel 100" command="oficios 100 @%p"/>
+        <item type="sendcommand" label="Todos los oficios a nivel 200" command="oficios 200 @%p"/>
         <item type="preparecommand" label="Un oficio..." command="oficio " help="oficio &lt;id del oficio&gt; &lt;niveau&gt; [jugador]"/>
       </item>
       <item type="menu" label="Objetos (administrador)">
-        <item type="sendcommand" label="Elegir un objeto (catálogo)..." command="item #item %p" help="Abre el selector de objetos: id y cantidad"/>
+        <item type="sendcommand" label="Elegir un objeto (catálogo)..." command="item #item @%p" help="Abre el selector de objetos: id y cantidad"/>
         <item type="preparecommand" label="Objeto por id..." command="item " help="item &lt;id&gt; [cantidad] [max|random] [jugador]"/>
         <item type="preparecommand" label="Panoplia..." command="itemset " help="itemset &lt;id de panoplia&gt; [jugador]"/>
         <item type="preparecommand" label="Ingredientes de una receta..." command="receta " help="receta &lt;id del objeto&gt; [veces] [jugador]"/>
@@ -169,7 +169,7 @@
       <item type="sendcommand" label="Este mapa" command="mapinfo"/>
       <item type="sendcommand" label="Jugadores conectados" command="who"/>
       <item type="sendcommand" label="Versión del servidor" command="version"/>
-      <item type="sendcommand" label="Ficha de %p" command="whois %p"/>
+      <item type="sendcommand" label="Ficha de %p" command="whois @%p"/>
       <item type="sendcommand" label="Ayuda de la consola (todos los comandos)" command="help"/>
     </item>
 

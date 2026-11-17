@@ -125,7 +125,9 @@ namespace Jondo.Unity.Tests.Commands
                 foreach (var token in command.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (token.StartsWith('#')) Assert.True(Selectors.Contains(token), $"'{token}' opens no selector");
-                    if (token.StartsWith('%')) Assert.Equal("%p", token);
+                    // The clicked player always goes as "@%p": a name like Max or All is then never
+                    // read as an option word, and one who has gone stops the command.
+                    if (token.Contains('%')) Assert.Equal("@%p", token);
                 }
             }
         }
@@ -135,7 +137,7 @@ namespace Jondo.Unity.Tests.Commands
         {
             // "#item" gives an id, "#npc" an id, "#monster" an id: the commands read them first and the player last.
             var withSelector = Items(language).Where(i => i.Command.Contains('#')).Select(i => i.Command).ToList();
-            Assert.Contains("item #item %p", withSelector);
+            Assert.Contains("item #item @%p", withSelector);
             Assert.All(withSelector, c => Assert.True(c.StartsWith("item ") || c.StartsWith("spawn "), c));
         }
 
@@ -189,7 +191,7 @@ namespace Jondo.Unity.Tests.Commands
         {
             static string Shape((XElement Item, string Type, string Command, string[] Path) i)
             {
-                string verb = i.Command.StartsWith("warn %p ") || i.Command.StartsWith("announce ")
+                string verb = i.Command.StartsWith("warn @%p ") || i.Command.StartsWith("announce ")
                     ? string.Join(' ', i.Command.Split(' ').Take(i.Command.StartsWith("warn") ? 2 : 1))
                     : i.Command;
                 return $"{i.Path.Length}|{i.Type}|{verb}";

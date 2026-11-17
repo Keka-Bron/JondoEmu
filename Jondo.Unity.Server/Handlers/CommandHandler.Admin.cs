@@ -111,13 +111,35 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// A command of the existing set run for another character: refused if he is fighting, and
-        /// answered to the staff, since what the command tells goes to whoever it ran for.
+        /// Whether the staff may act on a character: its own, or one whose account has a lower role.
+        /// A moderator does not jail, kick, mute or summon an administrator, nor does a game master
+        /// change his kamas: whoever is sanctioned could not lift it himself (a prisoner runs no
+        /// command at all).
+        /// </summary>
+        internal static bool MayActOn(int staffRole, long staffAccount, int targetRole, long targetAccount)
+            => staffAccount == targetAccount || staffRole > targetRole;
+
+        /// <summary><see cref="MayActOn"/> for the session serving the command, told to the staff when refused.</summary>
+        private static async Task<bool> OutranksAsync(NetworkStream stream, GameSession target, int channel)
+        {
+            long mine = SessionContext.Current.AccountId;
+            if (MayActOn(DatabaseManager.GetAccountRole(mine), mine,
+                         DatabaseManager.GetAccountRole(target.AccountId), target.AccountId))
+                return true;
+            await NotifyAsync(stream, T("admin.outranked", target.State.CharacterName ?? ""), channel, 0);
+            return false;
+        }
+
+        /// <summary>
+        /// A command of the existing set run for another character: refused if he is fighting or
+        /// does not rank below the staff, and answered to the staff, since what the command tells
+        /// goes to whoever it ran for.
         /// </summary>
         private static async Task RunOnOtherAsync(NetworkStream staffStream, GameSession target, string command,
                                                   string rest, int channel)
         {
             string name = target.State.CharacterName ?? "";
+            if (!await OutranksAsync(staffStream, target, channel)) return;
             if (target.State.IsInFight)
             {
                 await NotifyAsync(staffStream, T("admin.in_fight", name), channel, 0);
@@ -190,6 +212,14 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
             await act(player, name);
+        }
+
+        /// <summary>The last word of the arguments, or "" when there are none.</summary>
+        internal static string LastWordOf(string rest)
+        {
+            string trimmed = (rest ?? "").Trim();
+            int cut = trimmed.LastIndexOfAny(new[] { ' ', '\t' });
+            return cut < 0 ? trimmed : trimmed[(cut + 1)..];
         }
 
         /// <summary>The first word of the arguments, and what comes after it.</summary>
@@ -298,6 +328,7 @@ namespace Jondo.Unity.Server.Handlers
                 await NotifyAsync(stream, T("admin.self"), channel, 0);
                 return;
             }
+            if (!await OutranksAsync(stream, player, channel)) return;
             if (player.State.IsInFight || GameState.IsInFight)
             {
                 await NotifyAsync(stream, T("admin.in_fight", player.State.IsInFight ? name : staff), channel, 0);
@@ -337,6 +368,7 @@ namespace Jondo.Unity.Server.Handlers
                 await NotifyAsync(stream, T("admin.self"), channel, 0);
                 return;
             }
+            if (!await OutranksAsync(stream, player, channel)) return;
             // No warden: the call would take the staff session's turn to walk him to the corridor,
             // and that turn is the one this command is running on.
             var (refusal, sentence) = await Jail.LockUpAsync(player, null);
@@ -394,6 +426,7 @@ namespace Jondo.Unity.Server.Handlers
                 await NotifyAsync(stream, T("admin.self"), channel, 0);
                 return;
             }
+            if (!await OutranksAsync(stream, player, channel)) return;
             // The socket is closed as the second connection of an account closes the first one: the
             // session's own way out saves the character.
             try { player.Stream?.Dispose(); } catch { }
@@ -430,6 +463,7 @@ namespace Jondo.Unity.Server.Handlers
                 await NotifyAsync(stream, T("admin.self"), channel, 0);
                 return;
             }
+            if (!await OutranksAsync(stream, player, channel)) return;
 
             Sanctions.Mute(player.CharacterId, time);
             int minutes = (int)Math.Ceiling(time.TotalMinutes);
@@ -725,8 +759,20 @@ namespace Jondo.Unity.Server.Handlers
             await NotifyAsync(stream, T("quests.result", doing.Count, string.Join(", ", doing), finished), channel, 0);
         }
 
+        /// <summary>
+        /// The character's sheet is not touched in a fight, the staff's own neither: the fight keeps
+        /// its own life and characteristics, as <see cref="RunOnOtherAsync"/> already says for others.
+        /// </summary>
+        private static async Task<bool> NotInAFightAsync(NetworkStream stream, int channel)
+        {
+            if (!GameState.IsInFight) return true;
+            await NotifyAsync(stream, T("admin.in_fight", GameState.CharacterName ?? ""), channel, 0);
+            return false;
+        }
+
         private static async Task EnergyAsync(NetworkStream stream, string rest, int channel)
         {
+            if (!await NotInAFightAsync(stream, channel)) return;
             int wanted = DefeatPenalty.MaxEnergy;
             if (rest.Trim().Length > 0 && !int.TryParse(rest.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out wanted))
             {
@@ -741,6 +787,7 @@ namespace Jondo.Unity.Server.Handlers
 
         private static async Task HealAsync(NetworkStream stream, int channel)
         {
+            if (!await NotInAFightAsync(stream, channel)) return;
             long id = GameState.CharacterId;
             RestingLife.Set(id, 0, DateTime.UtcNow);
             await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
@@ -765,6 +812,7 @@ namespace Jondo.Unity.Server.Handlers
 
         private static async Task StatsAsync(NetworkStream stream, string rest, int channel)
         {
+            if (!await NotInAFightAsync(stream, channel)) return;
             var parts = rest.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2 || !TryParseStat(parts[0], out string stat)
                 || !int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out int value))
@@ -867,7 +915,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
             ActivityJournal.Current.Write("admin.removed", SessionContext.Current.AccountId, GameState.CharacterId,
-                new { map = mapId, tipo = kind, id });
+                new { map = mapId, kind, id });
             await MapAdmin.RefreshAsync(mapId);
             await NotifyAsync(stream, T("remove.done", kind, id), channel, 0);
         }
@@ -899,7 +947,7 @@ namespace Jondo.Unity.Server.Handlers
                                  CommandTexts.Get(language, "gift.description"));
             if (id == 0)
             {
-                await NotifyAsync(stream, T("admin.refused", gid), channel, 0);
+                await NotifyAsync(stream, T("admin.refused", target.State.CharacterName ?? ""), channel, 0);
                 return;
             }
             await GiftHandler.TellAsync(target.AccountId);

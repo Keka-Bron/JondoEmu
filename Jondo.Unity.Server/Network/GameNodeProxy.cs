@@ -1645,7 +1645,7 @@ namespace Jondo.Unity.Server.Network
                     // Which step is this quest on? It is answered with the idu.
                     await QuestHandler.StepAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri("mfb")))
+                else if (isAuthenticated && payloadStr.Contains(Op.Uri("mfb")))
                 {
                     // A line typed in the client's own staff console.
                     await StaffConsoleHandler.HandleAsync(stream, payload);

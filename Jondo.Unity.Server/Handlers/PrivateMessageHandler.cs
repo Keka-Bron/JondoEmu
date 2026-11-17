@@ -80,6 +80,15 @@ namespace Jondo.Unity.Server.Handlers
 
             string from = SessionContext.State.CharacterName;
 
+            // A moderator's mute (".mute") silences the whispers too, with the chat's own notice.
+            if (Sanctions.IsMuted(SessionContext.State.CharacterId))
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(
+                    CommandTexts.Get("sanction.muted_now", Sanctions.MinutesLeft(SessionContext.State.CharacterId)))));
+                await RefuseAsync(stream);
+                return;
+            }
+
             // Not to oneself. It is exactly the measured case: the real server answers ktl 2.
             if (string.Equals(target, from, StringComparison.OrdinalIgnoreCase))
             {
