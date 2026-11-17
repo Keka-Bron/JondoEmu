@@ -5956,7 +5956,7 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSummon(
                     quienInvoca.Id, invocado.Id, celda, FacingOf(fight, invocado),
                     receta.PlantillaDelAspecto, plantilla, receta.Grado, FullSheetOf(invocado),
-                    efectoQueInvoca, look: MonsterLook(invocado))));
+                    team: invocado.TeamId, efecto: efectoQueInvoca, look: MonsterLook(invocado))));
 
             // And after it, the list of fighters again: it is what registers the summon in the
             // client and puts it in the carousel.
@@ -6736,8 +6736,8 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildSummon(
                     quien.Id, muerto.Id, donde, FacingOf(fight, muerto),
-                    muerto.MonsterId, muerto.MonsterId, muerto.GradeIndex + 1, FullSheetOf(muerto), efecto,
-                    look: MonsterLook(muerto))));
+                    muerto.MonsterId, muerto.MonsterId, muerto.GradeIndex + 1, FullSheetOf(muerto),
+                    team: muerto.TeamId, efecto: efecto, look: MonsterLook(muerto))));
             await ReenviarLaListaAsync(stream, fight);
 
             var zombi = muerto.Buffs.Poner(new Jondo.Unity.World.Fights.Buff
