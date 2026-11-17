@@ -13,15 +13,28 @@ namespace Jondo.Unity.Server.Managers
     {
         private const string IndoorCombatMapsFile = "monsters/indoor_spawns.json";
 
+        /// <summary>MapInformationFlags.CapabilityAllowMonsterRespawn: monsters stand and come back on the map.</summary>
+        private const int CapabilityAllowMonsterRespawn = 1 << 13;
+
         /// <summary>The banned maps, kept so that the repopulator respects them too.</summary>
         private static HashSet<long> _vetados = new HashSet<long>();
 
         /// <summary>
         /// The maps where a monster is NOT placed, however much the table has them.
         ///
-        /// MapMobs is generated from subarea rosters, so it also seeds houses, banks and shops.
-        /// The indoor filter allows the combat maps listed in content/monsters/indoor_spawns.json.
-        /// Zaaps and arenas are then vetoed independently. Dungeon rooms keep their existing exception.
+        /// MapMobs is generated from subarea rosters, so it also seeds houses, banks and shops:
+        /// pios inside a house, a bank or a shop, and on top of the village zaap. The rule:
+        ///
+        ///   INDOORS         MapPositions.Outdoor = 0
+        ///   EXCEPT          the indoor combat maps of content/monsters/indoor_spawns.json -- mines,
+        ///                   sewers, mazes -- that the client lets monsters respawn on (map flag
+        ///                   0x2000, CapabilityAllowMonsterRespawn)
+        ///   WITH A ZAAP     the travel point catalogue's maps
+        ///   ARENAS          a fight's board
+        ///   EXCEPT DUNGEON  the dungeon rooms, nearly all marked «indoors», keep their monsters
+        ///
+        /// It is filtered ON LOADING and not by deleting rows from the database on purpose: world.db
+        /// is regenerated and distributed compressed, and a deletion would be lost.
         /// </summary>
         private static HashSet<long> MapasSinMonstruos(Microsoft.Data.Sqlite.SqliteConnection connection)
         {
@@ -57,7 +70,19 @@ namespace Jondo.Unity.Server.Managers
                         .SelectMany(zone => zone.GetProperty("maps").EnumerateArray())
                         .Select(map => map.GetInt64())
                         .ToArray();
-                    vetados.ExceptWith(combatMaps);
+                    // Only where the client lets monsters respawn: the list cannot override it.
+                    // The first room of Lord Crow's library, where Virgil lets a player in, lacks
+                    // the flag that its fifteen rooms beyond carry.
+                    var respawning = new HashSet<long>();
+                    if (combatMaps.Length > 0)
+                    {
+                        Recoger("SELECT Id FROM MapTemplates WHERE Id IN (" + string.Join(",", combatMaps) + ") " +
+                                $"AND (json_extract(Data, '$.m_flags') & {CapabilityAllowMonsterRespawn}) != 0;",
+                                respawning);
+                    }
+                    foreach (long skipped in combatMaps.Where(m => !respawning.Contains(m)))
+                        Console.WriteLine($"[MobSpawnManager] {IndoorCombatMapsFile}: map {skipped} does not let monsters respawn; left without groups.");
+                    vetados.ExceptWith(respawning);
                 }
             }
             catch (Exception ex)

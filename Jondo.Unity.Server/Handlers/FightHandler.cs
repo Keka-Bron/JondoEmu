@@ -6099,7 +6099,7 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildDouble(dueno.Id, doble.Id, doble.CellId, FacingOf(fight, doble),
                                                   NormalFightLook(doble), doble.Name, doble.Level,
-                                                  FullSheetOf(doble, conTraza: false))));
+                                                  FullSheetOf(doble, conTraza: false), team: doble.TeamId)));
             await ReenviarLaListaAsync(stream, fight);
             await ACadaUnoAsync(fight, async sesion =>
             {
@@ -8673,12 +8673,12 @@ namespace Jondo.Unity.Server.Handlers
                             Network.FightProtocol.BuildIllusion(
                                 quienLanza.Id, copia.Id, copia.CellId, FacingOf(fight, copia),
                                 c.CasillaDesde, FacingOf(fight, quienLanza),
-                                Network.FightProtocol.IllusionSheet(quienLanza.Level), look)));
+                                Network.FightProtocol.IllusionSheet(quienLanza.Level), look, team: quienLanza.TeamId)));
                         await ASuBandoAsync(fight, elOtroBando, ConnectionProtocol.Push(Op.Jwe,
                             Network.FightProtocol.BuildIllusion(
                                 quienLanza.Id, copia.Id, copia.CellId, FacingOf(fight, copia),
                                 c.CasillaDesde, FacingOf(fight, quienLanza),
-                                suFicha, look, identity: comoEl)));
+                                suFicha, look, identity: comoEl, team: quienLanza.TeamId)));
                     }
                     Program.LogDebug($"[Fight] {quienLanza.Id} jumps from {c.CasillaDesde} to " +
                                      $"{c.CasillaHasta} and leaves {c.Ilusiones.Count} illusions.");

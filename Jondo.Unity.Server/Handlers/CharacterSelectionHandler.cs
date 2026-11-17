@@ -47,6 +47,8 @@ namespace Jondo.Unity.Server.Handlers
             // His achievements and his own tallies: his fights count for him (Achievements.ForHeroAsync).
             Managers.Achievements.LoadFrom(characterId);
             Managers.Quests.LoadFrom(characterId);
+            // And the elements he has used and the marks he holds, which his quests' rows read.
+            SessionContext.State.ElementsUsed = DatabaseManager.LoadElementsUsed(characterId);
             return true;
         }
 

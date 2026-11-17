@@ -1802,11 +1802,13 @@ namespace Jondo.Unity.Server.Network
         ///   f5 { f2 { f1: name, f2: level } }
         ///
         /// -- and the sheet in the monsters' mould, as for any summon. Frame 16 of "sram-doble":
-        /// the Sram's look and "Fighter2" at 200, on 258 facing 5, as -4.
+        /// the Sram's look and "Fighter2" at 200, on 258 facing 5, as -4. The team goes where a
+        /// summon's does (f2, left out for blue): a red side's double is on its owner's side.
         /// </summary>
         public static byte[] BuildDouble(long quienInvoca, long quienEs, int celda, int orientacion,
                                          byte[] look, string nombre, int nivel,
-                                         IEnumerable<(int Characteristic, long Base, long Gear)> ficha)
+                                         IEnumerable<(int Characteristic, long Base, long Gear)> ficha,
+                                         int team = 0)
         {
             var stats = Pb.New()
                 .Var(1, quienInvoca)
@@ -1819,6 +1821,7 @@ namespace Jondo.Unity.Server.Network
 
             var cuerpo = Pb.New()
                 .Msg(1, Pb.New()
+                    .VarIfNotZero(2, team)
                     .Var(3, 1)
                     .Msg(4, Pb.New()
                         .Msg(1, Pb.New().Var(1, celda).VarIfNotZero(2, orientacion).Var(4, 0))
@@ -1946,10 +1949,11 @@ namespace Jondo.Unity.Server.Network
         /// with his life as it stands, his look -- and the copy's own id where the person's
         /// would go. Null keeps the captured shape.
         /// </param>
+        /// <param name="team">The caster's side, where a summon's block carries it (f2, left out for blue).</param>
         public static byte[] BuildIllusion(long author, long illusionId, int cell, int orientation,
                                            int originalCell, int originalOrientation,
                                            IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
-                                           byte[] look, Pb identity = null)
+                                           byte[] look, Pb identity = null, int team = 0)
         {
             var stats = Pb.New().Var(3, SheetKind);
             foreach (var (characteristic, baseValue, gear) in sheet)
@@ -1957,6 +1961,7 @@ namespace Jondo.Unity.Server.Network
                 stats.Msg(5, SheetEntry(characteristic, baseValue, gear, isMonster: identity == null));
             }
             var original = Pb.New()
+                .VarIfNotZero(2, team)
                 .Var(3, 1)
                 .Msg(4, Pb.New()
                     .Msg(1, Pb.New().Var(1, originalCell).VarIfNotZero(2, originalOrientation).Var(4, 0))

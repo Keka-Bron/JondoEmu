@@ -33,11 +33,6 @@
       ]
     },
     {
-      "name": "Lord Crow's Library",
-      "why": "The first of the 16 free-roaming rooms after the January 2025 rework. All three unique monsters can appear in this room. The other 15 rooms are already marked outdoor in the client data.",
-      "maps": [159121408]
-    },
-    {
       "name": "Labyrinth of the Minotoror",
       "why": "The 24 monster rooms in subarea 319. Room 13 contains the entrance to the boss and has no groups.",
       "maps": [

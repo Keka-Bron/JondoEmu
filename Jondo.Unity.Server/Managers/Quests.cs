@@ -1640,9 +1640,11 @@ namespace Jondo.Unity.Server.Managers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ief, QuestProtocol.BuildQuestStarted(questId)));
 
-            if (stream == null) return true;
-
+            // A hero's run, socketless, settles the objectives that are not his all the same
+            // (SendStepAsync writes nothing without a stream): «Consejo de clase» started for a
+            // hero by his master's talk asks his own class's master only.
             await SendStepAsync(stream, questId);
+            if (stream == null) return true;
 
             // And the green mark of the one who just gave it is switched off.
             await SendMarksAsync(stream, SessionContext.State.MapId);
@@ -2247,7 +2249,7 @@ namespace Jondo.Unity.Server.Managers
 
             if (!move.QuestFinished)
             {
-                if (stream != null) await SendStepAsync(stream, questId);
+                await SendStepAsync(stream, questId);   // settles a hero's foreign objectives too
 
                 // And the marks again, as after every ieb and idz of the captures.
                 if (stream != null && (move.ObjectiveTicked || move.StepFinished))

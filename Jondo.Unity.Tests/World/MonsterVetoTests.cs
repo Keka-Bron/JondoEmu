@@ -146,7 +146,6 @@ namespace Jondo.Unity.Tests.World
         [Theory]
         [InlineData(188483076L)] // Astrub Underground
         [InlineData(72091650L)] // Dragon Pig's Maze
-        [InlineData(159121408L)] // Lord Crow's Library, first room
         public void Indoor_combat_maps_load_and_replenish_their_groups(long mapId)
         {
             if (!World()) return;
@@ -171,6 +170,7 @@ namespace Jondo.Unity.Tests.World
         [InlineData(72092676L)] // Dragon Pig's Maze, Fwed's central room
         [InlineData(72221696L)] // Dragon Pig's Den entrance
         [InlineData(106695186L)] // Wabbit Princes' scripted fight room
+        [InlineData(159121408L)] // Lord Crow's Library, first room: no respawn flag in the client
         public void Scripted_and_entrance_rooms_stay_free_of_roaming_groups(long mapId)
         {
             if (!World()) return;
