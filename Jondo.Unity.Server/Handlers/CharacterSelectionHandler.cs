@@ -46,6 +46,7 @@ namespace Jondo.Unity.Server.Handlers
             Managers.SpellChoices.LoadFrom(characterId);
             // His achievements and his own tallies: his fights count for him (Achievements.ForHeroAsync).
             Managers.Achievements.LoadFrom(characterId);
+            Managers.Quests.LoadFrom(characterId);
             return true;
         }
 

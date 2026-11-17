@@ -127,7 +127,9 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            if (!await Quests.StartAsync(stream, questId))
+            int itemTemplate = SessionContext.State.DocumentItemTemplate;
+            if (!await Quests.StartSharedAsync(stream, questId, () => itemTemplate == 0
+                || (Equipment.HowMany(itemTemplate) > 0 && ItemCriteria.Holds(DatabaseManager.GetItemTemplateCriterion(itemTemplate)))))
                 Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} cannot start quest {questId} from a document.");
         }
 

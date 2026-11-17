@@ -1227,6 +1227,52 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
+        private static bool CanShareQuestReply(int npcId, DialogueChoice choice)
+            => Quests.CanShareNpc(npcId) && choice.BuysItem == 0 && choice.BuysPrice == 0
+               && choice.Takes == 0 && choice.TakesAll.Count == 0 && choice.Marks == 0
+               && choice.Door.Length == 0 && choice.TeleportsTo == 0 && choice.TeleportPassage == 0
+               && !choice.ReturnsHome && SeLeOfrece(choice);
+
+        private static async Task StartQuestFromReplyAsync(NetworkStream stream, int npcId, DialogueChoice choice)
+        {
+            bool started = await Quests.StartAsync(stream, choice.StartsQuest);
+            bool completed = choice.Completes != 0
+                && await Quests.CompleteByReplyAsync(stream, choice.StartsQuest, choice.Completes);
+            if (!started) return;
+
+            await Heroes.ShareQuestActionAsync(async hero =>
+            {
+                if (!CanShareQuestReply(npcId, choice) || !await Quests.StartAsync(hero.Stream!, choice.StartsQuest)) return;
+
+                await GiveFromReplyAsync(hero.Stream!, choice);
+                if (completed)
+                {
+                    int stepId = Quests.Book?.Of(choice.StartsQuest)?.Steps.FirstOrDefault()?.Id ?? 0;
+                    if (Quests.SharedObjective(choice.StartsQuest, stepId, choice.Completes, out _))
+                        await Quests.CompleteByReplyAsync(hero.Stream!, choice.StartsQuest, choice.Completes);
+                }
+            });
+        }
+
+        private static async Task<bool> CompleteQuestFromReplyAsync(NetworkStream stream, int npcId, DialogueChoice choice,
+                                                                    int objectiveId, bool giveFromReply = false)
+        {
+            var book = Quests.Book;
+            var objective = book?.Objective(objectiveId);
+            var step = objective == null ? null : book!.Step(objective.StepId);
+            if (!await Quests.CompleteByReplyAsync(stream, choice.Quest, objectiveId)) return false;
+            if (step == null) return true;
+
+            await Heroes.ShareQuestActionAsync(async hero =>
+            {
+                if (!CanShareQuestReply(npcId, choice) || !Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _))
+                    return;
+                if (await Quests.CompleteByReplyAsync(hero.Stream!, step.QuestId, objectiveId) && giveFromReply)
+                    await GiveFromReplyAsync(hero.Stream!, choice);
+            });
+            return true;
+        }
+
         /// <summary>There stops being an open conversation.</summary>
         private static void CerrarConversacion()
         {
@@ -1648,12 +1694,13 @@ namespace Jondo.Unity.Server.Handlers
             // A reply that does a conversation objective: before the next line when it goes on,
             // after the window closes when it ends it -- «He neutralizado a la rata.» is kld, then
             // lqn 56 and ied 1633 in the capture.
+            int questNpcId = SessionContext.State.OpenDialogueNpcId;
             int completesAfterClosing = 0;
             if (elegidaAhora != null && elegidaAhora.Completes != 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
             {
                 if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
                     completesAfterClosing = elegidaAhora.Completes;
-                else if (await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.Quest, elegidaAhora.Completes))
+                else if (await CompleteQuestFromReplyAsync(stream, questNpcId, elegidaAhora, elegidaAhora.Completes, giveFromReply: true))
                 {
                     await GiveFromReplyAsync(stream, elegidaAhora);
                     // And whoever comes in as it is said (Abel Hoz at the bank).
@@ -1670,7 +1717,7 @@ namespace Jondo.Unity.Server.Handlers
             if (elegidaAhora != null && elegidaAhora.CompletesAll.Count > 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
             {
                 foreach (int objective in elegidaAhora.CompletesAll)
-                    await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.Quest, objective);
+                    await CompleteQuestFromReplyAsync(stream, questNpcId, elegidaAhora, objective);
             }
 
             // What the reply prints in the chat: the orbalantir's visions, its figures turned wrong.
@@ -1700,10 +1747,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (closesHere) startsAfterClosing = elegidaAhora.StartsQuest;
                 else
                 {
-                    await Managers.Quests.StartAsync(stream, elegidaAhora.StartsQuest);
-                    // And its first objective, when it is talking to whoever hands it over.
-                    if (elegidaAhora.Completes != 0)
-                        await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora.StartsQuest, elegidaAhora.Completes);
+                    await StartQuestFromReplyAsync(stream, questNpcId, elegidaAhora);
                 }
             }
             else if (frase == null)
@@ -1712,7 +1756,8 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // And an objective that is this very reply: Noken wishing the character luck.
-            await Managers.Quests.OnReplyChosenAsync(stream, reply);
+            await Managers.Quests.OnReplyChosenAsync(stream, reply,
+                () => elegidaAhora == null ? Quests.CanShareNpc(questNpcId) : CanShareQuestReply(questNpcId, elegidaAhora));
 
             // And does this NPC guard a dungeon's door? If he goes in, the conversation has ended in a
             // map change and there is nothing more to tell him.
@@ -1814,7 +1859,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             if (completesAfterClosing != 0
-                && await Managers.Quests.CompleteByReplyAsync(stream, elegidaAhora!.Quest, completesAfterClosing))
+                && await CompleteQuestFromReplyAsync(stream, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true))
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
                 // Whoever comes in once it is said and the window is shut: Selim Llenneb back in
@@ -1824,9 +1869,7 @@ namespace Jondo.Unity.Server.Handlers
 
             if (startsAfterClosing != 0)
             {
-                await Managers.Quests.StartAsync(stream, startsAfterClosing);
-                if (elegidaAhora!.Completes != 0)
-                    await Managers.Quests.CompleteByReplyAsync(stream, startsAfterClosing, elegidaAhora.Completes);
+                await StartQuestFromReplyAsync(stream, questNpcId, elegidaAhora!);
                 return;
             }
 

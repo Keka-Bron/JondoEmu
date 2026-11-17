@@ -68,6 +68,31 @@ namespace Jondo.Unity.Server.Handlers
             // (ResolveArenaMapId), so reading that left every dungeon-boss kill unchecked.
             long mapId = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : SessionContext.State.MapId;
 
+            var shared = new HashSet<(int QuestId, int StepId, int ObjectiveId)>();
+            await CreditKillsAsync(stream, beaten, mapId, shared, isHero: false);
+            if (shared.Count == 0) return;
+
+            await Heroes.ShareQuestActionAsync(
+                hero => CreditKillsAsync(hero.Stream!, beaten, mapId, shared, isHero: true),
+                hero => hero.Session.State.FightId == fight.FightId && fight.HaGanado(hero.CharacterId));
+        }
+
+        private static async Task CreditKillsAsync(NetworkStream stream, Dictionary<int, int> beaten, long mapId,
+                                                   HashSet<(int QuestId, int StepId, int ObjectiveId)> shared, bool isHero)
+        {
+            var log = Quests.Log;
+            var book = Quests.Book;
+            if (log == null || book == null) return;
+
+            bool CanCredit(QuestRun run, QuestStep step, QuestObjective objective)
+            {
+                if (run.Finished || run.StepId != step.Id || run.Done.Contains(objective.Id)) return false;
+                var key = (run.QuestId, step.Id, objective.Id);
+                if (isHero) return shared.Contains(key);
+                shared.Add(key);
+                return true;
+            }
+
             // The quests in hand are copied out first: ticking an objective can finish a step and
             // a quest, which changes the log, and walking a collection that is being changed is
             // how this would throw in front of a player at the end of a fight.
@@ -100,7 +125,8 @@ namespace Jondo.Unity.Server.Handlers
                     // item to hand over --: fights side by side, and talks, do not hold it back.
                     if (BehindOtherWork(step, objective, run)) continue;
 
-                    await Quests.TickAsync(stream, run.QuestId, objective.Id, killed);
+                    if (CanCredit(run, step, objective))
+                        await Quests.TickAsync(stream, run.QuestId, objective.Id, killed);
                 }
 
                 // And the free-text ones that are a fight in all but the catalogue's type.
@@ -116,6 +142,8 @@ namespace Jondo.Unity.Server.Handlers
                         continue;
                     if (binding.AfterObjectives.Any(before => !run.Done.Contains(before) && !log.ObjectiveDone(before)))
                         continue;
+
+                    if (!CanCredit(run, step, objective)) continue;
 
                     // Several fights for one objective: each one counted, the last one ticks it.
                     if (binding.Times > 1 && !Quests.CountTowards(run, objective.Id, binding.Times))
