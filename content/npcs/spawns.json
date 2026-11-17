@@ -5507,10 +5507,10 @@
     {
       "map": 221251588,
       "npc": 6744,
-      "cell": 356,
+      "cell": 314,
       "orientation": 3,
       "criterion": "Qa=2453&Ue=-2453010&Ue!-2453013",
-      "why": "The Emanation of Fab'hub-Niggrath on the altar, from the blood Wilbur spills (mark -2453010) until it fuses with the bouftou (mark -2453013): «l'Émanation de Shushub-Niggrath apparue sur l'autel» (Dofus pour les noobs, «La campagne hallucinée»). INFERRED cell."
+      "why": "The Emanation of Fab'hub-Niggrath on the altar, from the blood Wilbur spills (mark -2453010) until it fuses with the bouftou (mark -2453013), on 314 above the altar and not on its own cell 356: its look is bone 6834, the glowing-orb effect shared by eight NPC templates, and the real client draws neither it nor Wilbur beside it when it stands on 356 or 357 (behind the altar's decor) but shows it on 200 and 314 (screenshots in bugs/foret-malefique/mecaniques-capturas): «l'Émanation de Shushub-Niggrath apparue sur l'autel» (Dofus pour les noobs, «La campagne hallucinée»). INFERRED cell."
     },
     {
       "map": 221251588,
