@@ -1,0 +1,31 @@
+{
+  "_comment": [
+    "Indoor maps where ordinary monster groups can spawn and respawn.",
+    "Use map IDs because a subarea can contain both combat and peaceful rooms.",
+    "MapMobs is generated from subarea rosters, so a seeded group alone is not evidence.",
+    "Dungeon rooms use their own rules. This list only overrides the indoor filter."
+  ],
+  "zones": [
+    {
+      "name": "Incarnam Mine",
+      "why": "All seven mine rooms in subarea 778. Aminitas drop the powder for A Bit of Pigment.",
+      "maps": [153357312, 153357314, 153357318, 153358336, 153358338, 153358342, 153358344]
+    },
+    {
+      "name": "Astrub Sewers",
+      "why": "The eight explorable sewer maps in subarea 100, whose client roster contains Astrub rats and sewer arachnees.",
+      "maps": [101713415, 101714439, 101715461, 101715463, 101715465, 101716487, 101716489, 101717512]
+    },
+    {
+      "name": "Labyrinth of the Minotoror",
+      "why": "The 24 monster rooms in subarea 319. Room 13 contains the entrance to the boss and has no groups.",
+      "maps": [
+        34475272, 34474248, 34473224, 34341128, 34342152,
+        34475270, 34474246, 34473222, 34341126, 34342150,
+        34475268, 34474244, 34341124, 34342148,
+        34475266, 34474242, 34473218, 34341122, 34342146,
+        34475008, 34473984, 34472960, 34340864, 34341888
+      ]
+    }
+  ]
+}

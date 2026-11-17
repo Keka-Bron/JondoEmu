@@ -119,11 +119,10 @@ namespace Jondo.Unity.Tests.World
             if (!File.Exists(path)) return;
 
             var rows = UniqueMonsters.Parse(File.ReadAllText(path)).ToDictionary(r => r.Monster);
-            Assert.Equal(new[] { 823, 824, 825 }, rows.Keys.OrderBy(k => k));
             Assert.Equal(820, rows[823].Ordinary);   // Zorio, el Zorrowapo
             Assert.Equal(818, rows[824].Ordinary);   // Horacio, el Cuerbok Domesticado
             Assert.Equal(819, rows[825].Ordinary);   // Kondonio, el Bebedor
-            Assert.All(rows.Values, row => Assert.Equal(16, row.Maps.Count));
+            Assert.All(new[] { 823, 824, 825 }, id => Assert.Equal(16, rows[id].Maps.Count));
         }
 
         private static void Use(params UniqueMonsters.Unique[] rows) => UniqueMonsters.Use(rows);

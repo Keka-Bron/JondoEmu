@@ -121,6 +121,50 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
+        public void Astrub_sewers_load_and_replenish_their_groups()
+        {
+            if (!World()) return;
+            const long sewer = 101715463;
+            int[] sewerMonsters = { 255, 465, 475, 2334, 2350, 2393, 3205 };
+
+            Assert.False(MobSpawnManager.IsVetoed(sewer));
+            Assert.True(MobSpawnManager.LoadedGroups(sewer) > 0);
+            var group = MobSpawnManager.GetMobsForMap(sewer).First();
+            try
+            {
+                MobSpawnManager.RemoveMobGroup(sewer, group.MobId);
+                var replacement = Assert.IsType<MobSpawnManager.MobGroup>(MobSpawnManager.RespawnOneGroup(sewer));
+                Assert.NotEmpty(replacement.Members);
+                Assert.All(replacement.Members, member => Assert.Contains(member.Monster.Id, sewerMonsters));
+            }
+            finally
+            {
+                MobSpawnManager.RestoreMap(sewer);
+            }
+        }
+
+        [Fact]
+        public void The_labyrinth_has_two_unique_guardians_and_an_empty_central_room()
+        {
+            if (!World()) return;
+            const long centralRoom = 34473220;
+            const int mumminotor = 831, deminoball = 832;
+
+            Assert.True(MobSpawnManager.IsVetoed(centralRoom));
+            Assert.Empty(MobSpawnManager.GetMobsForMap(centralRoom));
+
+            var rooms = UniqueMonsters.All.Single(monster => monster.Monster == mumminotor).Maps;
+            Assert.Equal(24, rooms.Count);
+            Assert.All(rooms, room => Assert.True(MobSpawnManager.LoadedGroups(room) > 0));
+            var monsters = rooms.SelectMany(MobSpawnManager.GetMobsForMap)
+                .SelectMany(group => group.Members)
+                .Select(member => member.Monster.Id)
+                .ToList();
+            Assert.Single(monsters, id => id == mumminotor);
+            Assert.Single(monsters, id => id == deminoball);
+        }
+
+        [Fact]
         public void A_vetoed_map_stays_empty_however_many_times_it_is_asked()
         {
             if (!World()) return;

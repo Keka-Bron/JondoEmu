@@ -16,7 +16,10 @@
     "they are a named version of. The guide gives no respawn time: INFERRED, back at once, so that",
     "«attendre qu'il repop» is only the wait for the fight that holds it. The Master's companions in",
     "his throne room are the same three (the guide again); a dungeon room's composed group is not",
-    "touched."
+    "touched.",
+    "",
+    "MINOTOROR LABYRINTH. Mumminotor and Deminoball each roam the 24 combat rooms and drop a relic.",
+    "They can return on the next map load. Minovillo and Escarato fill their ordinary group slots."
   ],
   "uniques": [
     {
@@ -33,6 +36,28 @@
       "monster": 825, "ordinary": 819, "respawnMinutes": 0,
       "maps": [159121408, 159122432, 159123456, 159124480, 159121410, 159122434, 159123458, 159124482, 159121412, 159122436, 159123460, 159124484, 159121414, 159122438, 159123462, 159124486],
       "why": "Kondonio, el Bebedor (Kapotie le Buveur), a Bebedor's (Buveur's) named version; the library's sixteen rooms."
+    },
+    {
+      "monster": 831, "ordinary": 668, "respawnMinutes": 0,
+      "maps": [
+        34475272, 34474248, 34473224, 34341128, 34342152,
+        34475270, 34474246, 34473222, 34341126, 34342150,
+        34475268, 34474244, 34341124, 34342148,
+        34475266, 34474242, 34473218, 34341122, 34342146,
+        34475008, 34473984, 34472960, 34340864, 34341888
+      ],
+      "why": "Mumminotor carries the Mummified Relic."
+    },
+    {
+      "monster": 832, "ordinary": 830, "respawnMinutes": 0,
+      "maps": [
+        34475272, 34474248, 34473224, 34341128, 34342152,
+        34475270, 34474246, 34473222, 34341126, 34342150,
+        34475268, 34474244, 34341124, 34342148,
+        34475266, 34474242, 34473218, 34341122, 34342146,
+        34475008, 34473984, 34472960, 34340864, 34341888
+      ],
+      "why": "Deminoball carries the Deminoball Relic."
     }
   ]
 }
