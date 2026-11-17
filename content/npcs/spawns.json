@@ -5882,10 +5882,10 @@
     {
       "map": 221251588,
       "npc": 6745,
-      "cell": 356,
+      "cell": 314,
       "orientation": 3,
       "criterion": "Qa=2453&Ue=-2453013&Ue!-2453015",
-      "why": "The Abomination of Fab'hub-Niggrath on the altar, born of the fusion (mark -2453013) until the demoness leaves its body (mark -2453015): Dofus pour les noobs, «La campagne hallucinée». INFERRED cell."
+      "why": "The Abomination of Fab'hub-Niggrath on the altar, born of the fusion (mark -2453013) until the demoness leaves its body (mark -2453015): Dofus pour les noobs, «La campagne hallucinée». INFERRED cell. On 314, as the Emanation before it: the client does not draw what stands on the altar cells 356 and 357, behind the altar's decor."
     },
     {
       "map": 221251588,
@@ -6036,8 +6036,7 @@
       "npc": 2217,
       "cell": 411,
       "orientation": 3,
-      "criterion": "Qa=2451&Qo>18575&Qo<18576",
-      "why": "Hell Mina in the Tertre du long sommeil's post-boss room (220729859), where the character speaks to her once the dungeon is won («Arrête-la si tu peux», objective 18576; Dofus pour les noobs, «Arrête-la si tu peux»: «Une fois le donjon terminé, parlez à Hell Mina»), from the boss (18575) until she is spoken to (18576). INFERRED cell."
+      "why": "Hell Mina in the Tertre du long sommeil's post-boss room (220729859), where the character speaks to her once the dungeon is won («Arrête-la si tu peux», objective 18576; Dofus pour les noobs, «Arrête-la si tu peux»: «Une fois le donjon terminé, parlez à Hell Mina»), from the boss (18575) until she is spoken to (18576). INFERRED cell. She stands there for every winner, as the NPCs of the other exit rooms do: whoever is not on the quest still leaves through her «exit» reply (68025)."
     }
     ]
 }

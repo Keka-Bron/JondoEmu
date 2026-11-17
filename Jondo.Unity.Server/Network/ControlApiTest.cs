@@ -435,7 +435,7 @@ namespace Jondo.Unity.Server.Network
         /// id...], grade?: n, map?: arena }. For the fights a quest reaches only after a long
         /// conversation (the sectarians of "El campo alucinado").
         /// </summary>
-        private static Respuesta TestMonsters(string cuerpo)
+        private static Respuesta TestMonsters(string body)
         {
             var session = TestSessionOnline();
             if (session == null || session.Stream == null) return Mal(404, "offline");
@@ -443,15 +443,15 @@ namespace Jondo.Unity.Server.Network
             var foes = new List<int>();
             try
             {
-                using var doc = System.Text.Json.JsonDocument.Parse(string.IsNullOrEmpty(cuerpo) ? "{}" : cuerpo);
+                using var doc = System.Text.Json.JsonDocument.Parse(string.IsNullOrEmpty(body) ? "{}" : body);
                 if (doc.RootElement.TryGetProperty("foes", out var a) && a.ValueKind == System.Text.Json.JsonValueKind.Array)
                     foes = a.EnumerateArray().Where(x => x.ValueKind == System.Text.Json.JsonValueKind.Number).Select(x => x.GetInt32()).ToList();
             }
             catch (System.Text.Json.JsonException) { return Mal(400, "json"); }
-            int grade = (int)Numero(cuerpo, "grade");
+            int grade = (int)Numero(body, "grade");
             var group = MobSpawnManager.ComposeOffMap(foes.Select(m => (m, grade)).ToList());
             if (group == null) return Mal(404, "no-monsters");
-            long arena = Numero(cuerpo, "map");
+            long arena = Numero(body, "map");
             var lines = RunInSession(session, async stream =>
             {
                 await FightHandler.InitiateFightFromMobCollision(stream, group, session.State.MapId,

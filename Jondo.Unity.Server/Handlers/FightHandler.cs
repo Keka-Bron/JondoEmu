@@ -5534,10 +5534,15 @@ namespace Jondo.Unity.Server.Handlers
             // Not a player's domestication spell: it asks for one of the net states (HS=7105|7106|7107|
             // 7114) that the client's initial spell 32711 puts on the net's wearer, and nothing here
             // casts it, so the capture net «Arrête-la si tu peux» asks for could never be used. The net
-            // being worn is what lets him cast it (RideCapture.MayCast: once a fight).
+            // being worn is what lets him cast it (RideCapture.MayCast: once a fight). Only those
+            // net states are taken as held: the rest of the condition, and a state that keeps him
+            // from casting at all, still count.
             bool netCast = !caster.IsMonster && Managers.RideCapture.IsDomestication(spell)
                            && Managers.RideCapture.SpellOfEquippedNet() == spell;
-            if (spell != 0 && !netCast && !Managers.SpellCriteria.Allows(caster, spell, grade))
+            Func<int, bool>? netStates = netCast
+                ? state => Managers.SpellCriteria.Requires(Managers.SpellCriteria.Of(spell, grade), state)
+                : null;
+            if (spell != 0 && !Managers.SpellCriteria.Allows(caster, spell, grade, netStates))
             {
                 Program.LogDebug($"[Fight] Spell {spell} is not for the caster's states now " +
                                  $"(condition \"{Managers.SpellCriteria.Of(spell, grade)}\", states {string.Join(",", caster.Buffs.Estados)}).");

@@ -271,8 +271,8 @@
       "map": 221251588,
       "cell": 380,
       "toMap": 220988932,
-      "toCell": 290,
-      "why": "The way out of the Black Tree (221251588): the cave's bright opening at the left of the room's drawing, on cell 380 (the map has no border to walk out of and no element for it), leading back in front of the trunk, [-2,17], cell 290. Dofus pour les noobs, «La campagne hallucinée»: «Trae de vuelta al rebaño» needs the character out of the tree and back at the Coin des Bouftous [2,12]. INFERRED cells."
+      "toCell": 317,
+      "why": "The way out of the Black Tree (221251588): the cave's bright opening at the left of the room's drawing, on cell 380 (the map has no border to walk out of and no element for it), leading back in front of the trunk, [-2,17], cell 290. Dofus pour les noobs, «La campagne hallucinée»: «Trae de vuelta al rebaño» needs the character out of the tree and back at the Coin des Bouftous [2,12]. INFERRED cells. Landing on 317, two steps from the trunk: 290 itself is a sectarian's cell while 2453 is in hand, and 289, 275 and 304 hold the other three."
     }
   ]
 }

@@ -1111,10 +1111,10 @@ namespace Jondo.Unity.Server.Managers
              : deConducta || WaitsForeverOnDeath(fila) ? -1 : ronda + 1;
 
         /// <summary>Whether a row with no duration of its own waits on its bearer's death for as long as the fight lasts.</summary>
-        internal static bool WaitsForeverOnDeath(SpellEffect fila)
-            => fila.TriggerDuration >= NoLimitTriggerDuration
-               && fila.Disparadores().Count() > 0
-               && fila.Disparadores().All(d => string.Equals(d, AlMorir, StringComparison.OrdinalIgnoreCase));
+        internal static bool WaitsForeverOnDeath(SpellEffect row)
+            => row.TriggerDuration >= NoLimitTriggerDuration
+               && row.Disparadores().Count() > 0
+               && row.Disparadores().All(d => string.Equals(d, AlMorir, StringComparison.OrdinalIgnoreCase));
 
         /// <summary>The client's effectTriggerDuration for «as long as it lasts».</summary>
         private const int NoLimitTriggerDuration = 63;
@@ -2594,8 +2594,8 @@ namespace Jondo.Unity.Server.Managers
                 if (luchador == null) continue;
                 estadosAlEmpezar[luchador] = new HashSet<int>(luchador.Buffs.Estados);
                 // The glyphs of a turn start judge the states that fall at that start as held.
-                if (combat.StatesBeforeTheSweep is { } antesDelBarrido && antesDelBarrido.Id == luchador.Id)
-                    estadosAlEmpezar[luchador].UnionWith(antesDelBarrido.States);
+                if (combat.StatesBeforeTheSweep is { } beforeTheSweep && beforeTheSweep.Id == luchador.Id)
+                    estadosAlEmpezar[luchador].UnionWith(beforeTheSweep.States);
             }
 
             // The effects that go by chance: they are drawn BEFORE walking anything, and the ones

@@ -41,10 +41,17 @@ namespace Jondo.Unity.Server.Managers
         /// throws, all of them <c>HS=3</c>. The flag was read and applied nowhere: a carrying
         /// JondoBot cast whatever it liked, and a silenced monster too.
         /// </remarks>
-        public static bool Allows(Fighter caster, int spell, int grade)
+        /// <param name="alsoHeld">
+        /// States taken as held besides the caster's own (null: none): the net states a worn
+        /// capture net stands for, which nothing here puts on its wearer.
+        /// </param>
+        public static bool Allows(Fighter caster, int spell, int grade, Func<int, bool>? alsoHeld = null)
         {
             string criterion = Of(spell, grade);
-            if (criterion.Length > 0 && !Holds(criterion, caster.Buffs.TieneEstado)) return false;
+            Func<int, bool> held = alsoHeld == null
+                ? caster.Buffs.TieneEstado
+                : state => caster.Buffs.TieneEstado(state) || alsoHeld(state);
+            if (criterion.Length > 0 && !Holds(criterion, held)) return false;
             foreach (int state in caster.Buffs.Estados)
                 if (SpellStates.Of(state)?.PreventsSpellCast == true && !Requires(criterion, state)) return false;
             return true;

@@ -18,15 +18,15 @@ namespace Jondo.Unity.Server.Network
         /// character (the account's first when none is named). Every other test route then plays it
         /// as it plays a real client's.
         /// </summary>
-        private static Respuesta TestHeadless(string cuerpo)
+        private static Respuesta TestHeadless(string body)
         {
             long account = TestAccount();
             string login = TestLoginNow;
             int slot = _testSlot;
             if (SessionRegistry.All().Any(s => s.AccountId == account) && HeadlessClient.Of(slot) == null)
                 return Mal(409, "a client is already connected for this slot");
-            bool autoReady = !cuerpo.Contains("\"autoReady\":false");
-            var (client, error) = Task.Run(() => HeadlessClient.ConnectAsync(slot, account, login, Texto(cuerpo, "character"), autoReady))
+            bool autoReady = !body.Contains("\"autoReady\":false");
+            var (client, error) = Task.Run(() => HeadlessClient.ConnectAsync(slot, account, login, Texto(body, "character"), autoReady))
                 .GetAwaiter().GetResult();
             if (client == null) return Mal(error is "no-characters" || error!.StartsWith("no-character-") ? 404 : 502, error);
             var session = SessionRegistry.FindByCharacter(client.CharacterId);
@@ -47,16 +47,16 @@ namespace Jondo.Unity.Server.Network
         /// the server sent back while waiting. Fields by number: a number is a varint, a string a
         /// string, a list of numbers a packed field, an object a submessage.
         /// </summary>
-        private static Respuesta TestHeadlessSend(string cuerpo)
+        private static Respuesta TestHeadlessSend(string body)
         {
             var client = HeadlessClient.Of(_testSlot);
             if (client == null) return Mal(404, "no headless client for this slot");
-            string op = Texto(cuerpo, "op");
+            string op = Texto(body, "op");
             if (op.Length == 0) return Mal(400, "op");
             byte[] payload;
             try
             {
-                using var doc = JsonDocument.Parse(cuerpo);
+                using var doc = JsonDocument.Parse(body);
                 string hex = doc.RootElement.TryGetProperty("hex", out var h) && h.ValueKind == JsonValueKind.String ? h.GetString() ?? "" : "";
                 payload = hex.Length > 0 ? Convert.FromHexString(hex)
                     : doc.RootElement.TryGetProperty("fields", out var fields) && fields.ValueKind == JsonValueKind.Object
@@ -67,7 +67,7 @@ namespace Jondo.Unity.Server.Network
             {
                 return Mal(400, ex.Message);
             }
-            int waitMs = (int)Math.Clamp(Numero(cuerpo, "waitMs") is var w && w > 0 ? w : 1000, 0, 15000);
+            int waitMs = (int)Math.Clamp(Numero(body, "waitMs") is var w && w > 0 ? w : 1000, 0, 15000);
             long mark = client.LastFrame;
             Task.Run(() => client.SendAsync(op, payload)).GetAwaiter().GetResult();
             System.Threading.Thread.Sleep(waitMs);
@@ -75,16 +75,16 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>{ since?, most? }: the frames the server sent the headless client after <c>since</c>.</summary>
-        private static Respuesta TestHeadlessFrames(string cuerpo)
+        private static Respuesta TestHeadlessFrames(string body)
         {
             var client = HeadlessClient.Of(_testSlot);
             if (client == null) return Mal(404, "no headless client for this slot");
-            int most = (int)Math.Clamp(Numero(cuerpo, "most") is var m && m > 0 ? m : 200, 1, 2000);
-            return Bien(new { lastFrame = client.LastFrame, frames = FramesView(client, Numero(cuerpo, "since"), most) });
+            int most = (int)Math.Clamp(Numero(body, "most") is var m && m > 0 ? m : 200, 1, 2000);
+            return Bien(new { lastFrame = client.LastFrame, frames = FramesView(client, Numero(body, "since"), most) });
         }
 
         /// <summary>{ since? }: the server's console lines after that id, as the launcher's window reads them.</summary>
-        private static Respuesta TestLogs(string cuerpo) => new Respuesta(200, ConsoleLogBuffer.GetLogsJson(Numero(cuerpo, "since")));
+        private static Respuesta TestLogs(string body) => new Respuesta(200, ConsoleLogBuffer.GetLogsJson(Numero(body, "since")));
 
         private static object FramesView(HeadlessClient client, long since, int most)
             => client.FramesSince(since).TakeLast(most).Select(f => new
