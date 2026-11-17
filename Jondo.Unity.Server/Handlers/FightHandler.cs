@@ -5833,6 +5833,18 @@ namespace Jondo.Unity.Server.Handlers
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya, Network.FightProtocol.BuildBuffGone(who.Id, row.Numero)));
         }
 
+        /// <summary>
+        /// Puts a summon's spells on their grade's InitialCooldown, the wait they are born with.
+        /// </summary>
+        internal static void SpellsBornWaiting(Fighter summon)
+        {
+            foreach (var (spell, grade) in summon.HechizosDeInvocado)
+            {
+                int wait = LimitesDeGrado(spell, Math.Max(1, grade)).EsperaInicial;
+                if (wait > 0) summon.Recarga[spell] = wait;
+            }
+        }
+
         private static async Task<Fighter> InvocarAsync(NetworkStream stream, FightInstance fight,
                                                Fighter quienInvoca, int plantilla, int grado,
                                                int celdaApuntada,
@@ -5940,6 +5952,12 @@ namespace Jondo.Unity.Server.Handlers
             // that is why in the captures the first plays and the second does not appear even once
             // in the carousel.
             Managers.Summons.Characteristics(invocado, receta, quienInvoca);
+
+            // The spells it is born waiting on, as a placed monster's are: their grade's
+            // InitialCooldown. The Hamrack's Bandazo (682) waits 4 and blows up on its 4th turn;
+            // without the wait it was cast on the first and the Hamrack died before anyone could
+            // use it.
+            SpellsBornWaiting(invocado);
 
             // In a dream, its people's summons fight with its bonuses too: "Les compagnons et les
             // invocations profiteront également de ces bonus".
