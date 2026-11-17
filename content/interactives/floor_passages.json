@@ -266,6 +266,13 @@
       "toMap": 156500992,
       "toCell": 198,
       "why": "The dark clearing's way back to the totem of [31,6]: the 2.73 graph only has the way in, and the clearing has no other exit."
+    },
+    {
+      "map": 221251588,
+      "cell": 380,
+      "toMap": 220988932,
+      "toCell": 290,
+      "why": "The way out of the Black Tree (221251588): the cave's bright opening at the left of the room's drawing, on cell 380 (the map has no border to walk out of and no element for it), leading back in front of the trunk, [-2,17], cell 290. Dofus pour les noobs, «La campagne hallucinée»: «Trae de vuelta al rebaño» needs the character out of the tree and back at the Coin des Bouftous [2,12]. INFERRED cells."
     }
   ]
 }

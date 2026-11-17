@@ -169,6 +169,36 @@ namespace Jondo.Unity.Tests.Quests
         }
 
         [Fact]
+        public void A_row_marked_all_asks_for_every_map_of_its_list_and_one_element_of_each()
+        {
+            // «Sigue la pista de las bayas» (2451, 18566): the bushes of four maps are inspected, and
+            // the map with two berry bushes takes either; a row that does not say it keeps the
+            // «any one of them» reading.
+            string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".json");
+            File.WriteAllText(path, """
+            { "bindings": [
+              { "objective": 18566, "quest": 2451, "all": true, "elements": [
+                  {"map": 1, "element": 10}, {"map": 2, "element": 20}, {"map": 2, "element": 21} ] },
+              { "objective": 9820, "quest": 1, "elements": [ {"map": 3, "element": 30}, {"map": 4, "element": 40} ] }
+            ] }
+            """);
+
+            try
+            {
+                var book = QuestBindingContent.Load(path);
+                var all = book.Of(18566)!;
+                Assert.True(all.AllMaps);
+                Assert.Equal(2, all.Elements.Select(e => e.MapId).Distinct().Count());
+                Assert.Single(book.At(2, 21));
+                Assert.False(book.Of(9820)!.AllMaps);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [Fact]
         public void The_line_said_changes_while_its_item_is_carried()
         {
             // The Bontarian at Bonta's gates: thanks for the escort (440), or running off without

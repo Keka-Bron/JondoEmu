@@ -21,7 +21,9 @@ namespace Jondo.Unity.Server.Network
         private static readonly string[] Secretos =
         {
             "clave", "password", "contrasena", "contraseña", "pass",
-            "token", "secreto", "secret", "ticket", "hash", "gameSession", "sessionId"
+            "token", "secreto", "secret", "ticket", "hash", "gameSession", "sessionId",
+            // The test harness's key (JONDO_TEST_KEY), in the body of every /api/test call.
+            "key"
         };
 
         private static readonly Regex EnJson = new Regex(

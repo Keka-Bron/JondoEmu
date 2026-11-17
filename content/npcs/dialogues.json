@@ -49735,6 +49735,1218 @@
         }
       ],
       "why": "The Daimia's servant in the audience room (207624194) in «Más leña al fuego» (2151), once she has sent for him (16401): «Cuida muy bien de este brote de bambú, aventurero.» (41251); «No te preocupes por el bambú sagrado, lo llevaré con cuidado.» (53718) hands over the Brote de bambú sagrado (23096) and does 16402. Otherwise his service line (41252). Dofus pour les noobs («Sous le bois de sa colère»): «Parlez au Serviteur de la Daimya dans la même pièce afin de récupérer la Pousse de bambou sacrée»."
+    },
+    {
+      "npc": 6684,
+      "map": 0,
+      "opening": 50782,
+      "lines": [
+        {
+          "message": 50782,
+          "choices": [
+            { "reply": 68087, "next": 50783, "quest": 2453, "afterObjective": 18555, "beforeObjective": 18556 },
+            { "reply": 68082 }
+          ]
+        },
+        {
+          "message": 50783,
+          "choices": [
+            { "reply": 68086, "next": 50784 }
+          ]
+        },
+        {
+          "message": 50784,
+          "choices": [
+            { "reply": 68085, "next": 50785 }
+          ]
+        },
+        {
+          "message": 50785,
+          "choices": [
+            { "reply": 68084, "next": 50786 }
+          ]
+        },
+        {
+          "message": 50786,
+          "choices": [
+            { "reply": 68083, "quest": 2453, "completes": 18556, "params": [[30, 18556]] }
+          ]
+        }
+      ],
+      "why": "Trevor Kender, the countryman on the edge of the Evil Forest [1,17]. «El campo alucinado» (2453), «Ve a ver a Trevor Kender» (18556) (Dofus pour les noobs, «La campagne hallucinée»: «Essayer d'aborder la question des bouftous»): «Hablemos sobre los jalatós...» (68087) draws his rant (50783), his defence (50784), the hooded ones and the vanished miller Wilbur (50785) and his warning (50786); the last reply, «Tomar nota mental de la advertencia y buscar rastros del rebaño.» (68083), does the objective. INFERRED: which reply follows which line (the guide gives the story, not the replies; ordered by what each answers)."
+    },
+    {
+      "npc": 6691,
+      "map": 0,
+      "opening": 50802,
+      "openings": [
+        { "quest": 2453, "objective": 18562, "message": 50982 },
+        { "quest": 2453, "criterion": "Ue=-2453008", "holds": 26766, "message": 50856 },
+        { "quest": 2453, "criterion": "Ue=-2453007", "holds": 26766, "message": 50855 },
+        { "holds": 26766, "message": 50801 }
+      ],
+      "lines": [
+        {
+          "message": 50802,
+          "choices": [
+            { "reply": 68105, "next": 50803, "quest": 2453, "afterObjective": 18557, "beforeObjective": 18558, "beforeElement": -2453001, "marks": -2453001, "marksReached": [-2453004, -2453001, 3], "completes": 18558, "params": [[30, 18558]] },
+            { "reply": 68105, "next": 50803, "quest": 2453, "afterObjective": 18557, "beforeObjective": 18558, "beforeElement": -2453001, "marks": -2453001 },
+            { "reply": 68105, "next": 50803 },
+            { "reply": 68116, "next": 50813, "quest": 2453, "afterObjective": 18558, "beforeObjective": 18559 },
+            { "reply": 68103 }
+          ]
+        },
+        {
+          "message": 50803,
+          "choices": [
+            { "reply": 68104, "next": 50804 }
+          ]
+        },
+        {
+          "message": 50804,
+          "choices": [
+            { "reply": 68103 }
+          ]
+        },
+        {
+          "message": 50813,
+          "choices": [
+            { "reply": 68115 }
+          ]
+        },
+        {
+          "message": 50801,
+          "choices": [
+            { "reply": 68172, "next": 50853, "quest": 2453, "afterObjective": 18559 }
+          ]
+        },
+        {
+          "message": 50853,
+          "choices": [
+            { "reply": 68171, "next": 50854 }
+          ]
+        },
+        {
+          "message": 50854,
+          "choices": [
+            { "reply": 68170, "next": 50855, "marks": -2453007 }
+          ]
+        },
+        {
+          "message": 50855,
+          "choices": [
+            { "reply": 68173, "teleport": 221251588, "marks": -2453008 }
+          ]
+        },
+        {
+          "message": 50856,
+          "choices": [
+            { "reply": 68169, "teleport": 221251588 }
+          ]
+        },
+        {
+          "message": 50982,
+          "choices": [
+            { "reply": 68169, "teleport": 221251588 }
+          ]
+        }
+      ],
+      "why": "Sectario de Jalépona at the entrance of the Black Tree [-2,17], the one in front of the trunk. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «Interroga a los sectarios junto al árbol» (18558) -- he explains that the goddess is the little goddess of the bouftous and that one is sacrificed each full moon (50803, «¿Quién es Jalépona?», 68105); the objective is done once all four have been talked to. Disguised as one of them (the costume, 26766), «Jalépona me ha hecho llegar información capital» (68172) draws his suspicion (50853), holding his gaze is not enough (68171, 50854) and warning him that if the plans fail it will be for his lack of faith (68170) lets the character in (50855, «Penetrar en el árbol negro», 68173, into the tree, 221251588; the mark -2453008 says the character has been in, 50856); the catalogue's «Descubre el mapa: Interior del Árbol Negro de las Mil Pezuñas» (18560) names [-2,17] itself, not the inside, and is done on arriving there with the costume; the guide: «il vous refuse l'entrée car le Haut-Sectateur ne souhaite pas être dérangé. Il faudra alors insister et prétendre que Boufona vous a parlé». INFERRED: which reply follows which line, and 50856/50982/68169 as the ways back in (the guide has no replies for them); his boredom with the lie of the roaming bouftou (68116, 50813)."
+    },
+    {
+      "npc": 6692,
+      "map": 0,
+      "opening": 50859,
+      "openings": [
+        { "quest": 2453, "criterion": "Ue=-2453015", "message": 50935 },
+        { "quest": 2453, "criterion": "Ue=-2453014", "message": 50936 },
+        { "quest": 2453, "criterion": "Ue=-2453013", "message": 50877 },
+        { "quest": 2453, "criterion": "Ue=-2453011", "message": 50875 }
+      ],
+      "lines": [
+        {
+          "message": 50859,
+          "choices": [
+            { "reply": 68179, "next": 50860, "quest": 2453, "afterObjective": 18560, "beforeObjective": 18561 }
+          ]
+        },
+        {
+          "message": 50860,
+          "choices": [
+            { "reply": 68178, "next": 50861, "takes": 26766 },
+            { "reply": 68178, "next": 50861 }
+          ]
+        },
+        {
+          "message": 50861,
+          "choices": [
+            { "reply": 68177, "next": 50862 }
+          ]
+        },
+        {
+          "message": 50862,
+          "choices": [
+            { "reply": 68176, "next": 50863 }
+          ]
+        },
+        {
+          "message": 50863,
+          "choices": [
+            { "reply": 68175, "next": 50864 }
+          ]
+        },
+        {
+          "message": 50864,
+          "choices": [
+            { "reply": 68174, "marks": -2453010, "showsNpc": 6744 }
+          ]
+        },
+        {
+          "message": 50875,
+          "choices": [
+            { "reply": 68187, "next": 50872 }
+          ]
+        },
+        {
+          "message": 50872,
+          "choices": []
+        },
+        {
+          "message": 50877,
+          "choices": []
+        },
+        {
+          "message": 50936,
+          "choices": []
+        },
+        {
+          "message": 50935,
+          "choices": [
+            { "reply": 68262, "next": 50941 }
+          ]
+        },
+        {
+          "message": 50941,
+          "choices": [
+            { "reply": 68261, "next": 50942 }
+          ]
+        },
+        {
+          "message": 50942,
+          "choices": [
+            { "reply": 68260, "next": 50943 }
+          ]
+        },
+        {
+          "message": 50943,
+          "choices": [
+            { "reply": 68259, "next": 50944 }
+          ]
+        },
+        {
+          "message": 50944,
+          "choices": [
+            { "reply": 68258, "marks": -2453016, "leaves": true, "showsNpc": 6755 }
+          ]
+        }
+      ],
+      "why": "Alto sectario Wilbur, the miller turned high sectarian, performing the ritual in the Black Tree (221251588). «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «Descubre las intenciones de Wilbur» (18561). «Te ordeno que detengas este ritual» (68179, 50860), «Quitarte el disfraz» (68178: the costume goes, 50861), he freezes under the goddess's voice (50862), is delirious (50863), spills his blood (50864) and the roots hold the character: the Emanation rises. Later he celebrates (50875) and cries out at the bouftou (68187, 50872), calls his sectarians (50877), lies unconscious after their fight (50936) and, once the abomination is beaten, coughs «Fab'hub-Niggrath es inmortal» (50935): «Lo único que tengo que hacer es quemar el árbol» -- the wind puts out the flame, the twigs bar the way (68260, 68259) and he flees, «ya suponía yo que esas arpías nos estarían observando» (50944, 68258). INFERRED: which reply follows which line (ordered by what each answers); the marks (-2453010...-2453016) say where the scene stands."
+    },
+    {
+      "npc": 6710,
+      "map": 0,
+      "opening": 50787,
+      "openings": [
+        { "after": 2453, "message": 50985 },
+        { "quest": 2453, "objective": 18563, "holds": 26799, "message": 50986 }
+      ],
+      "lines": [
+        {
+          "message": 50787,
+          "choices": [
+            { "reply": 68088, "next": 50788, "beforeQuest": 2453 },
+            { "reply": 68089, "next": 50794, "quest": 2453, "afterObjective": 18550, "beforeObjective": 18555 }
+          ]
+        },
+        {
+          "message": 50788,
+          "choices": [
+            { "reply": 68093, "next": 50789 }
+          ]
+        },
+        {
+          "message": 50789,
+          "choices": [
+            { "reply": 68094, "next": 50790 }
+          ]
+        },
+        {
+          "message": 50790,
+          "choices": [
+            { "reply": 68092, "next": 50791 }
+          ]
+        },
+        {
+          "message": 50791,
+          "choices": [
+            { "reply": 68095, "next": 50792 }
+          ]
+        },
+        {
+          "message": 50792,
+          "choices": [
+            { "reply": 68091, "startsQuest": 2453, "params": [[34, 2453]], "next": 50793 }
+          ]
+        },
+        {
+          "message": 50793,
+          "choices": [
+            { "reply": 68090 }
+          ]
+        },
+        {
+          "message": 50794,
+          "choices": [
+            { "reply": 68102, "next": 50795, "quest": 2453, "completes": 18555, "takes": 26689, "params": [[30, 18555]] }
+          ]
+        },
+        {
+          "message": 50795,
+          "choices": [
+            { "reply": 68101, "next": 50796 }
+          ]
+        },
+        {
+          "message": 50796,
+          "choices": [
+            { "reply": 68100, "next": 50797 }
+          ]
+        },
+        {
+          "message": 50797,
+          "choices": [
+            { "reply": 68099, "next": 50798 }
+          ]
+        },
+        {
+          "message": 50798,
+          "choices": [
+            { "reply": 68098, "next": 50799 }
+          ]
+        },
+        {
+          "message": 50799,
+          "choices": [
+            { "reply": 68097, "next": 50800 }
+          ]
+        },
+        {
+          "message": 50800,
+          "choices": [
+            { "reply": 68096 }
+          ]
+        },
+        {
+          "message": 50985,
+          "choices": [
+            { "reply": 68308 }
+          ]
+        },
+        {
+          "message": 50986,
+          "choices": [
+            { "reply": 68307, "next": 50987, "quest": 2453, "holds": 26799 }
+          ]
+        },
+        {
+          "message": 50987,
+          "choices": [
+            { "reply": 68306, "next": 50988 }
+          ]
+        },
+        {
+          "message": 50988,
+          "choices": [
+            { "reply": 68305, "next": 50989 }
+          ]
+        },
+        {
+          "message": 50989,
+          "choices": [
+            { "reply": 68304, "quest": 2453, "completes": 18564, "takes": 26799, "params": [[30, 18564]] }
+          ]
+        }
+      ],
+      "why": "Yeleka Yrehn, the shepherdess of the Coin des Bouftous [2,12]. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): she hands it over on line 50792 (the step's dialogue), after her nightmare (50788), the others who saw the creature (50789), the seneschal who will not listen (50790) and her doubt (50791): «Llevaré a cabo la investigación» (68091) starts it. Back with the clues (18555, «Vuelve a ver a Yeleka Yrehn»): «Contarle lo que has descubierto a la ganadera» (68089) hands her the flask (26689, 68102), the pheromones of a jalalínea (50795), her suspicion of Trevor Kender (50796-50798), of the hunters (50799) and where to find him (50800). With the herd back (the follower 26799, from the panicked bouftou of the tree) she thanks the character (50986-50989); the last reply, «Despedirte de la pastora...» (68304), does «Trae de vuelta al rebaño» (18564) and ends the quest; afterwards 50985. INFERRED: which reply follows which line (the guide gives the story, not the replies; ordered by what each answers)."
+    },
+    {
+      "npc": 6714,
+      "map": 0,
+      "opening": 50806,
+      "openings": [
+        { "quest": 2453, "objective": 18562, "message": 50983 },
+        { "quest": 2453, "objective": 18560, "holds": 26766, "message": 50857 }
+      ],
+      "lines": [
+        {
+          "message": 50806,
+          "choices": [
+            { "reply": 68108, "next": 50807, "quest": 2453, "afterObjective": 18557, "beforeObjective": 18558, "beforeElement": -2453002, "marks": -2453002, "marksReached": [-2453004, -2453001, 3], "completes": 18558, "params": [[30, 18558]] },
+            { "reply": 68108, "next": 50807, "quest": 2453, "afterObjective": 18557, "beforeObjective": 18558, "beforeElement": -2453002, "marks": -2453002 },
+            { "reply": 68108, "next": 50807 },
+            { "reply": 68120, "next": 50815, "quest": 2453, "afterObjective": 18558, "beforeObjective": 18559 },
+            { "reply": 68107 }
+          ]
+        },
+        {
+          "message": 50807,
+          "choices": [
+            { "reply": 68107 }
+          ]
+        },
+        {
+          "message": 50815,
+          "choices": [
+            { "reply": 68119 }
+          ]
+        },
+        {
+          "message": 50857,
+          "choices": []
+        },
+        {
+          "message": 50983,
+          "choices": []
+        }
+      ],
+      "why": "Sectario de Jalépona on the left of the clearing [-2,17]. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «le Sectateur de Boufona à gauche vous fait comprendre qu'un sacrifice de bouftou va bientôt avoir lieu» (50806: «La diosa pronto estará saciada y podrá despertar!»), one of the four to talk to (18558, mark on «¿De qué hablas?», 68108, and his refusal to say more, 50807). The lie of the bouftou roaming the forest (68120) only makes him count his flock (50815). INFERRED: which reply follows which line."
+    },
+    {
+      "npc": 6715,
+      "map": 0,
+      "opening": 50808,
+      "openings": [
+        { "quest": 2453, "objective": 18562, "message": 50984 },
+        { "quest": 2453, "objective": 18560, "holds": 26766, "message": 50858 }
+      ],
+      "lines": [
+        {
+          "message": 50808,
+          "choices": [
+            { "reply": 68109, "quest": 2453, "afterObjective": 18557, "beforeObjective": 18558, "beforeElement": -2453003, "marks": -2453003, "marksReached": [-2453004, -2453001, 3], "completes": 18558, "params": [[30, 18558]] },
+            { "reply": 68109, "quest": 2453, "afterObjective": 18557, "beforeObjective": 18558, "beforeElement": -2453003, "marks": -2453003 },
+            { "reply": 68109 },
+            { "reply": 68118, "next": 50814, "quest": 2453, "afterObjective": 18558, "beforeObjective": 18559 }
+          ]
+        },
+        {
+          "message": 50814,
+          "choices": [
+            { "reply": 68117 }
+          ]
+        },
+        {
+          "message": 50858,
+          "choices": []
+        },
+        {
+          "message": 50984,
+          "choices": []
+        }
+      ],
+      "why": "Sectario de Jalépona at the bottom of the clearing [-2,17]. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «le Sectateur de Boufona en bas explique que tous les adeptes portent le même vêtement, une bure en laine» (50808), one of the four to talk to (18558, mark on «Anotar esta información», 68109). The lie of the bouftou roaming the forest (68118) gets «una planta acabará silenciando a la pobre bestia» (50814). INFERRED: which reply follows which line."
+    },
+    {
+      "npc": 6716,
+      "map": 0,
+      "opening": 50805,
+      "lines": [
+        {
+          "message": 50805,
+          "choices": [
+            { "reply": 68106, "quest": 2453, "afterObjective": 18557, "beforeObjective": 18558, "beforeElement": -2453004, "marks": -2453004, "marksReached": [-2453004, -2453001, 3], "completes": 18558, "params": [[30, 18558]] },
+            { "reply": 68106, "quest": 2453, "afterObjective": 18557, "beforeObjective": 18558, "beforeElement": -2453004, "marks": -2453004 },
+            { "reply": 68106 },
+            { "reply": 68114, "next": 50811, "quest": 2453, "afterObjective": 18558, "beforeObjective": 18559 }
+          ]
+        },
+        {
+          "message": 50811,
+          "choices": [
+            { "reply": 68113, "next": 50812 }
+          ]
+        },
+        {
+          "message": 50812,
+          "choices": [
+            { "reply": 68112, "marks": -2453005, "leaves": true }
+          ]
+        }
+      ],
+      "why": "Sectario de Jalépona with the robe of green ornaments, on the right of the clearing [-2,17]. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «le Sectateur de Boufona sur la droite vous parle de leur chef le Haut-Sectateur» (50805), one of the four to talk to (18558, mark on «Rechazar la invitación», 68106). To get his robe: «faites lui croire qu'un bouftou se ballade librement au sud-est de la forêt afin de l'attirer à l'écart»: «He visto un jalató paseando por el bosque» (68114, 50811), «Al sureste de aquí» (68113, 50812) and he goes off (68112; the mark keeps him from this map and he stands on [0,18], where the character follows). INFERRED: which reply follows which line."
+    },
+    {
+      "npc": 6716,
+      "map": 220989957,
+      "opening": 50835,
+      "openings": [
+        { "quest": 2453, "criterion": "Ue=-2453006", "message": 50834 }
+      ],
+      "lines": [
+        {
+          "message": 50835,
+          "choices": [
+            { "reply": 68146, "next": 50837, "cells": [311, 296, 310], "quest": 2453, "afterObjective": 18558, "beforeObjective": 18559 },
+            { "reply": 68146, "next": 50836 }
+          ]
+        },
+        {
+          "message": 50836,
+          "choices": []
+        },
+        {
+          "message": 50837,
+          "choices": [
+            { "reply": 68148, "next": 50834 }
+          ]
+        },
+        {
+          "message": 50834,
+          "choices": [
+            { "reply": 68147, "quest": 2453, "beforeElement": -2453006, "marks": -2453006, "completes": 18559, "gives": 26766, "params": [[30, 18559]] },
+            { "reply": 68186, "quest": 2453, "afterElement": -2453006, "criterion": "PO!26766", "gives": 26766 }
+          ]
+        }
+      ],
+      "why": "The lured sectarian, on [0,18] (map 220989957). «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «placez-vous sur la cellule derrière le Sectateur de Boufona» and «parlez au Sectateur de Boufona pour l'assommer et lui voler ses vêtements»: from the cell behind him «Acercarte con discreción de espaldas al sectario» (68146) leads on to the blow (50837, «Noquear al fanático», 68148) and to the stolen costume (50834, «Robarle el uniforme mientras babea en el suelo», 68147: «Disfrazado de sectario de Jalépona», 26766, and «Encuentra la manera de acceder al interior del árbol», 18559); from any other cell he is too far (50836). «Si jamais vous perdez l'apparence, vous pouvez la récupérer de nouveau à cette position en [0,18]»: knocked out, 50834 and «Volver a robarle su uniforme» (68186) give it again. INFERRED: which reply follows which line, and the cells."
+    },
+    {
+      "npc": 6744,
+      "map": 0,
+      "opening": 50865,
+      "openings": [
+        { "quest": 2453, "criterion": "Ue=-2453012", "message": 50873 }
+      ],
+      "lines": [
+        {
+          "message": 50865,
+          "choices": [
+            { "reply": 68181, "next": 50866 }
+          ]
+        },
+        {
+          "message": 50866,
+          "choices": [
+            { "reply": 68180, "marks": -2453011 }
+          ]
+        },
+        {
+          "message": 50873,
+          "choices": [
+            { "reply": 68185, "next": 50874 }
+          ]
+        },
+        {
+          "message": 50874,
+          "choices": [
+            { "reply": 68184, "quest": 2453, "marks": -2453013, "completes": 18561, "params": [[30, 18561]], "leaves": true, "showsNpc": 6745 }
+          ]
+        }
+      ],
+      "why": "Emanación de Fab'hub-Niggrath, the red sphere that rises from Wilbur's blood. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «Parlez à l'Émanation de Shushub-Niggrath apparue sur l'autel pour assister impuissant à l'invocation» (50865, 68181: the demoness's voice thanks Wilbur, 50866, and a bleat is heard, 68180), then, once the captive bouftou has broken its cage, «Reparlez à l'Émanation» (50873, 68185: she cannot stop the transfer; 50874, 68184: she fuses with the bouftou in a blast, the roots loosen): «Descubre las intenciones de Wilbur» (18561) is done and the Abomination stands there. INFERRED: which reply follows which line."
+    },
+    {
+      "npc": 6745,
+      "map": 0,
+      "opening": 50876,
+      "openings": [
+        { "quest": 2453, "objective": 18562, "message": 50890 }
+      ],
+      "lines": [
+        {
+          "message": 50876,
+          "choices": [
+            { "reply": 68200, "next": 50889, "quest": 2453, "beforeElement": -2453014 },
+            { "reply": 68192, "next": 50878, "quest": 2453, "afterElement": -2453014 }
+          ]
+        },
+        {
+          "message": 50889,
+          "choices": [
+            { "reply": 68199 }
+          ]
+        },
+        {
+          "message": 50878,
+          "choices": [
+            { "reply": 68191, "next": 50879 }
+          ]
+        },
+        {
+          "message": 50879,
+          "choices": [
+            { "reply": 68190, "next": 50880 }
+          ]
+        },
+        {
+          "message": 50880,
+          "choices": [
+            { "reply": 68189, "next": 50881 }
+          ]
+        },
+        {
+          "message": 50881,
+          "choices": [
+            { "reply": 68188, "next": 50882 }
+          ]
+        },
+        {
+          "message": 50882,
+          "choices": [
+            { "reply": 68193, "next": 50884 }
+          ]
+        },
+        {
+          "message": 50884,
+          "choices": [
+            { "reply": 68198, "next": 50888 },
+            { "reply": 70401 }
+          ]
+        },
+        {
+          "message": 50888,
+          "choices": [
+            { "reply": 68197 },
+            { "reply": 70400 }
+          ]
+        },
+        {
+          "message": 50890,
+          "choices": [
+            { "reply": 68253, "next": 50934 }
+          ]
+        },
+        {
+          "message": 50934,
+          "choices": [
+            { "reply": 68252, "marks": -2453015, "leaves": true }
+          ]
+        }
+      ],
+      "why": "Abominación de Fab'hub-Niggrath, the demoness fused with the bouftou. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «Parlez à l'Abomination... Cependant les Sectateurs ont répondu présents à l'appel de leur chef et s'interposent. Un combat se lance» (50876, 68200, 50889, 68199: first fight, Wilbur and his four sectarians). Afterwards «Une fois le combat terminé, reparlez à l'Abomination» (68192, 50878): they were pawns (50878), she is a demoness (50879, 68191), someone killed her (50880, 68190), she offers a pact (68189, 50881, 68188, 50882) and the character refuses (68193, 50884, 68198, 50888): «Un combat se lance» (68197: second fight, the Abomination alone). 70400 and 70401 leave before it, as the client carries them («Dudar y retroceder», «Comprobar el equipo»). Once beaten, «reparlez à l'Abomination pour regarder la démone quitter le corps du bouftou» (50890, 68253, 50934, 68252). INFERRED: which reply follows which line, and where 70400/70401 stand."
+    },
+    {
+      "npc": 6746,
+      "map": 0,
+      "opening": 50867,
+      "lines": [
+        {
+          "message": 50867,
+          "choices": [
+            { "reply": 68183, "next": 50868, "quest": 2453, "afterElement": -2453011 }
+          ]
+        },
+        {
+          "message": 50868,
+          "choices": [
+            { "reply": 68182, "quest": 2453, "marks": -2453012, "leaves": true, "showsNpc": 6747, "alsoShows": [6748] }
+          ]
+        }
+      ],
+      "why": "Jalató en cautividad, the caged bouftou that breaks out. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «Soudain l'un des bouftous, le Bouftou en captivité, enfermé dans les cages tout autour se met à gesticuler de peur, parvient à casser sa cage et s'enfuit» (50867, 68183, 50868, 68182): the broken cage stays (6748) and the panicked bouftou runs between Wilbur and the Emanation (6747), who will fuse with it."
+    },
+    {
+      "npc": 6747,
+      "map": 0,
+      "opening": 50871,
+      "openings": [
+        { "quest": 2453, "objective": 18563, "message": 50937 }
+      ],
+      "lines": [
+        {
+          "message": 50871,
+          "choices": []
+        },
+        {
+          "message": 50937,
+          "choices": [
+            { "reply": 68254, "quest": 2453, "afterObjective": 18563, "criterion": "PO!26799", "gives": 26799, "leaves": true }
+          ]
+        }
+      ],
+      "why": "Jalató en pánico, the bouftou that bolts between Wilbur and the Emanation (50871) and, with the cages open, the one the herd follows. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «Parlez à un Bouftou paniqué afin d'inviter le troupeau à vous suivre pour les reconduire en lieu sûr» (50937, «Indicarles a los jalatós que te sigan...», 68254): the follower «Rebaño de jalatós» (26799), which Yeleka Yrehn takes back."
+    },
+    {
+      "npc": 6755,
+      "map": 0,
+      "opening": 50938,
+      "lines": [
+        {
+          "message": 50938,
+          "choices": [
+            { "reply": 68257, "next": 50939 }
+          ]
+        },
+        {
+          "message": 50939,
+          "choices": [
+            { "reply": 68256, "next": 50940 }
+          ]
+        },
+        {
+          "message": 50940,
+          "choices": [
+            { "reply": 68255, "quest": 2453, "completes": 18563, "params": [[30, 18563]], "leaves": true, "showsNpc": 6747, "alsoShows": [6748] }
+          ]
+        }
+      ],
+      "why": "Montón de ramitas, the twigs of the harpies that watch the forest. «El campo alucinado» (2453) (Dofus pour les noobs, «La campagne hallucinée»): «Parlez au Tas de brindilles pour savoir qui est derrière tout ceci, mais ces dernières se mettent de nouveau à virevolter jusqu'à briser les verrous des cages des bouftous retenus captifs avant de disparaître» (50938, 68257, 50939, 68256, 50940, 68255): «Asegúrate de que ya no hay amenaza» (18563) is done and the broken cages and the panicked bouftou are there. INFERRED: which reply follows which line."
+    },
+    {
+      "npc": 6736,
+      "map": 0,
+      "opening": 50823,
+      "openings": [
+        { "quest": 2452, "objective": 18590, "pending": 18591, "message": 50841 },
+        { "quest": 2452, "objective": 18583, "pending": 18584, "message": 50839 },
+        { "quest": 2452, "message": 50838 },
+        { "after": 2452, "message": 50842 }
+      ],
+      "lines": [
+        {
+          "message": 50823,
+          "choices": [
+            { "reply": 68135, "next": 50824 }
+          ]
+        },
+        {
+          "message": 50824,
+          "choices": [
+            { "reply": 68134, "next": 50825 }
+          ]
+        },
+        {
+          "message": 50825,
+          "choices": [
+            { "reply": 68133, "next": 50826 }
+          ]
+        },
+        {
+          "message": 50826,
+          "choices": [
+            { "reply": 68132, "next": 50827 }
+          ]
+        },
+        {
+          "message": 50827,
+          "choices": [
+            { "reply": 68130, "startsQuest": 2452, "params": [[34, 2452]] },
+            { "reply": 68131 }
+          ]
+        },
+        {
+          "message": 50838,
+          "choices": [
+            { "reply": 68150, "next": 50839, "quest": 2452, "beforeObjective": 18583 },
+            { "reply": 68152, "next": 50840, "quest": 2452, "afterObjective": 18584, "beforeObjective": 18585 }
+          ]
+        },
+        {
+          "message": 50839,
+          "choices": [
+            { "reply": 68149, "quest": 2452, "beforeObjective": 18583, "completes": 18583, "params": [[30, 18583]] },
+            { "reply": 68149 }
+          ]
+        },
+        {
+          "message": 50840,
+          "choices": [
+            { "reply": 68151, "quest": 2452, "beforeObjective": 18585, "completes": 18585, "params": [[30, 18585]] },
+            { "reply": 68151 }
+          ]
+        },
+        {
+          "message": 50841,
+          "choices": [
+            { "reply": 68154, "next": 50842 }
+          ]
+        },
+        {
+          "message": 50842,
+          "choices": [
+            { "reply": 68153, "quest": 2452, "beforeObjective": 18591, "completes": 18591, "params": [[30, 18591]] }
+          ]
+        }
+      ],
+      "why": "Malsetego (Malzerbego), the malter who wants to do good, on the Enchanted Edge [0,15] (221512706), in the Maze [-1,19] and on [-5,20]. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Confiar en el malter y aceptar entrar en el bosque» (68130) starts the quest after his warning about the maze and the malters (50823), «¿Qué es un malter?» (68135, 50824), why he tells it (68134, 50825), «¿Esto no será una mentira...?» (68133, 50826) and the apology (68132, 50827). In the maze, «Y ¿cómo piensas hacerlo?» (68150) draws his plan (50839); «Aceptar y marcharte en busca del lugar del que ha hablado Pedri Dísimo» (68149) closes «Habla con Malsetego» (18583). Back from the fishing rods, «He encontrado el lugar al suroeste» (68152, 50840) and «Puedes confiar en mí» (68151) close 18585. After the wave fight (50841, 68154, 50842) «Voy a ocuparme de Pedri Dísimo» (68153) closes 18591. INFERRED: which reply follows which line (the template carries the lines and replies, not their pairing), and 50842 as his words once the quest is over -- the template carries no other line for that moment, and his farewell speech («Si he logrado convencerte...») stands as a parting word -- with no reply: 68153 («Voy a ocuparme de Pedri Dísimo, hasta luego») is the player's word to close the quest and means nothing after it, so it is offered only while 18591 is pending; the objective ids each reply closes are the order of the guide."
+    },
+    {
+      "npc": 6741,
+      "map": 0,
+      "opening": 50844,
+      "openings": [
+        { "quest": 2452, "objective": 18591, "message": 50847 },
+        { "after": 2452, "message": 50847 }
+      ],
+      "lines": [
+        {
+          "message": 50844,
+          "choices": [
+            { "reply": 68158, "next": 50845 }
+          ]
+        },
+        {
+          "message": 50845,
+          "choices": [
+            { "reply": 68157, "next": 50846 }
+          ]
+        },
+        {
+          "message": 50846,
+          "choices": [
+            { "reply": 68156, "quest": 2452, "beforeObjective": 18582, "completes": 18582, "params": [[30, 18582]] },
+            { "reply": 68156 }
+          ]
+        },
+        {
+          "message": 50847,
+          "choices": [
+            { "reply": 68161, "next": 50848 }
+          ]
+        },
+        {
+          "message": 50848,
+          "choices": [
+            { "reply": 68160, "next": 50849 }
+          ]
+        },
+        {
+          "message": 50849,
+          "choices": [
+            { "reply": 68159, "quest": 2452, "afterObjective": 18591, "beforeObjective": 18592, "completes": 18592, "params": [[30, 18592]] },
+            { "reply": 68159 }
+          ]
+        }
+      ],
+      "why": "Pedri Dísimo (Edgar Hé in French), the fisherman lost in the Maze [-1,19] (220989446) and, once saved, on the shore [-7,21] (221643270). «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): in the maze «¿Va todo bien?» (68158) shows him reading his notes (50844, 50845), «¿Qué voz?» (68157) tells the voice by the water that sent him to the heart of the forest (50846) and the character hearing Malsetego say a malter must have put the idea in his head (68156) finishes «Busca a un docero perdido» (18582). On the shore, «¿Cómo fue tu huida?» (68161, 50847, 50848), «a veces, no hay que fiarse de las apariencias» (68160, 50849) and «Inclinarte y dejarlo con su vida tranquila» (68159) close «Asegúrate de que Pedri Dísimo ha llegado bien a destino» (18592), the last, which ends the quest. INFERRED: which reply follows which line, and 50847 with 68159 as his words after the quest."
+    },
+    {
+      "npc": 6737,
+      "map": 220988934,
+      "opening": 50829,
+      "lines": [
+        {
+          "message": 50829,
+          "choices": [
+            { "reply": 68137 }
+          ]
+        }
+      ],
+      "why": "Malseto opresor (Malzerb oppressant) on 220988934, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Dans un premier temps, allez sur la map à gauche en [-2,19] et parlez au Malzerb oppressant qui barre la route du douzien pour l'attaquer lui et ses acolytes» (50829, «Atacar a los malsetos»). The reply (68137) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 6738,
+      "map": 220988935,
+      "opening": 50830,
+      "lines": [
+        {
+          "message": 50830,
+          "choices": [
+            { "reply": 68138 }
+          ]
+        }
+      ],
+      "why": "Maltrío perseguidor (Maltrio persécuteur) on 220988935, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «continuez votre chemin en descendant en [-2,20] où un nouveau groupe de Malter barre votre route. Parlez au Maltrio persécuteur pour l'attaquer lui et ses compagnons» (50830, «Atacar a los maltríos»). The reply (68138) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 6740,
+      "map": 220988423,
+      "opening": 50828,
+      "lines": [
+        {
+          "message": 50828,
+          "choices": [
+            { "reply": 68136 }
+          ]
+        }
+      ],
+      "why": "Malpincho tiránico (Malépik tyrannique) on 220988423, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «continuez vers la gauche en [-3,20] pour vous heurter cette fois à des Malépik. Parlez au Malépik tyrannique pour l'attaquer lui et sa clique» (50828, «Atacar a los malpinchos»). The reply (68136) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 6739,
+      "map": 220987911,
+      "opening": 50831,
+      "lines": [
+        {
+          "message": 50831,
+          "choices": [
+            { "reply": 68139 }
+          ]
+        }
+      ],
+      "why": "Maltuerzo acosador (Malalfa harceleur) on 220987911, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Continuez vers l'ouest en [-4,20] où des malalfas font jouer de leur muscles. Parlez au Malalfa harceleur pour l'attaquer lui et ses copains» (50831, «Atacar a los maltuerzos»). The reply (68139) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 6738,
+      "map": 220987399,
+      "opening": 50830,
+      "lines": [
+        {
+          "message": 50830,
+          "choices": [
+            { "reply": 68141 }
+          ]
+        }
+      ],
+      "why": "Maltrío perseguidor (Maltrio persécuteur) on 220987399, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Enfin continuez jusqu'en [-5,20]... Un dernier combat est sur le point d'avoir lieu, Malzerbego viendra vous aider. Parlez au Maltrio persécuteur pour lancer le combat» (50830, «Combatir a los malters al lado de Malsetego»). The reply (68141) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 2217,
+      "map": 220987906,
+      "opening": 50713,
+      "lines": [
+        {
+          "message": 50713,
+          "choices": [
+            {
+              "reply": 67974,
+              "next": 50714
+            }
+          ]
+        },
+        {
+          "message": 50714,
+          "choices": [
+            {
+              "reply": 67979,
+              "next": 50715
+            }
+          ]
+        },
+        {
+          "message": 50715,
+          "choices": [
+            {
+              "reply": 67978,
+              "next": 50716
+            }
+          ]
+        },
+        {
+          "message": 50716,
+          "choices": [
+            {
+              "reply": 67977,
+              "next": 50717
+            }
+          ]
+        },
+        {
+          "message": 50717,
+          "choices": [
+            {
+              "reply": 67976,
+              "next": 50718
+            }
+          ]
+        },
+        {
+          "message": 50718,
+          "choices": [
+            {
+              "reply": 67975,
+              "startsQuest": 2451,
+              "leaves": true,
+              "params": [
+                [
+                  34,
+                  2451
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "why": "Hell Mina (2217) at the burning bush of the maze [-4,15] (220987906), where «Arrête-la si tu peux» (2451) starts (Dofus pour les noobs, «Arrête-la si tu peux»): «Hell Mina qui semble tenter d'évacuer sa frustration en tapant à foison sur un buisson ardent. Elle vous apprend que sa karne, Karnhell a encore fugué... elle ne veut pas vous en dire plus sur ce qu'elle protège et tente de vous faire oublier ce qu'elle a dit. Promettez-lui donc de lui trouver et de lui ramener sa karne en échange d'informations... Hell Mina ne vous prend pas au sérieux». The lines are the NPC's own, in the order the text asks for: she is caught beating the bush (50713, «¿Algo va mal?» 67974), complains of her karne (50714, «cuéntame qué estás vigilando» 67979), denies guarding anything (50715, «Deja de marear el pischis» 67978), threatens (50716), the deal («Te propongo un trato» 67977) she scoffs at (50717), the promise («Te aseguro que encontraré a tu karne» 67976) she answers with a warning (50718), and «Ver como la yopuka da un último golpe al arbusto, luego seguirla...» (67975) starts the quest as she leaves. INFERRED: the pairing of replies and lines."
+    },
+    {
+      "npc": 6717,
+      "map": 220989443,
+      "opening": 50708,
+      "openings": [
+        {
+          "quest": 2451,
+          "objective": 18570,
+          "pending": 18571,
+          "message": 50749
+        },
+        {
+          "quest": 2451,
+          "objective": 18569,
+          "pending": 18570,
+          "message": 50725
+        },
+        {
+          "quest": 2451,
+          "objective": 18567,
+          "pending": 18569,
+          "message": 50719
+        }
+      ],
+      "lines": [
+        {
+          "message": 50719,
+          "choices": [
+            {
+              "reply": 67984,
+              "next": 50721,
+              "quest": 2451,
+              "beforeObjective": 18569
+            },
+            {
+              "reply": 67985,
+              "next": 50720
+            },
+            {
+              "reply": 67980,
+              "next": 50720
+            }
+          ]
+        },
+        {
+          "message": 50720,
+          "choices": [
+            {
+              "reply": 68033
+            }
+          ]
+        },
+        {
+          "message": 50721,
+          "choices": [
+            {
+              "reply": 67983,
+              "next": 50722
+            }
+          ]
+        },
+        {
+          "message": 50722,
+          "choices": [
+            {
+              "reply": 67982,
+              "next": 50723
+            }
+          ]
+        },
+        {
+          "message": 50723,
+          "choices": [
+            {
+              "reply": 67981,
+              "quest": 2451,
+              "beforeObjective": 18569,
+              "completes": 18569,
+              "params": [
+                [
+                  30,
+                  18569
+                ]
+              ]
+            },
+            {
+              "reply": 67981
+            }
+          ]
+        },
+        {
+          "message": 50725,
+          "choices": [
+            {
+              "reply": 67988,
+              "next": 50724,
+              "quest": 2451,
+              "beforeObjective": 18570,
+              "holds": 26698,
+              "holdsCount": 20,
+              "completes": 18570,
+              "params": [
+                [
+                  30,
+                  18570
+                ]
+              ]
+            },
+            {
+              "reply": 68033
+            }
+          ]
+        },
+        {
+          "message": 50724,
+          "choices": [
+            {
+              "reply": 67989,
+              "next": 50749
+            }
+          ]
+        },
+        {
+          "message": 50749,
+          "choices": [
+            {
+              "reply": 81506,
+              "quest": 2451,
+              "beforeObjective": 18571,
+              "criterion": "PO=32521"
+            },
+            {
+              "reply": 67986,
+              "criterion": "PO!32521"
+            },
+            {
+              "reply": 68033
+            }
+          ]
+        },
+        {
+          "message": 50708,
+          "choices": [
+            {
+              "reply": 81505
+            }
+          ]
+        }
+      ],
+      "why": "Karnhell (6717), Hell Mina's karne, in the maze [-1,16] (220989443). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): once she is out of the bush, «Lui parler doucement pour la rassurer» (67984, 50719; the clumsy 67985 and 67980 only make her ready to bite, 50720) and the three lines of her sadness -- 50721, the malters' glares over the crushed berries (50722, «¿Los malters te han robado bayas?» 67982) and her teeth bared at them (50723) -- end on «Comprender que si le quitas bayas a los malters, podrás ganarte la confianza de la karne» (67981), the objective 18569. With the twenty berries («Darle bayas a la karne», 67988, 50725) she eats them (50724) and the net is understood to be needed («Comprender que debes equiparte con una red de captura universal», 67989, 50749); «Tratar de domar a la karne» (81506) starts the capture fight when the Red de captura universal (32521) is carried, otherwise 67986 repeats that the net is needed. INFERRED: which reply follows which line (the template carries the lines and replies, not their pairing), and the net being asked for in the conversation (the guide says only that it has to be equipped)."
+    },
+    {
+      "npc": 2217,
+      "map": 221250562,
+      "opening": 50601,
+      "openings": [
+        {
+          "quest": 2451,
+          "objective": 18572,
+          "pending": 18573,
+          "message": 50707
+        }
+      ],
+      "lines": [
+        {
+          "message": 50601,
+          "choices": [
+            {
+              "reply": 67838,
+              "door": "keyring"
+            },
+            {
+              "reply": 67833,
+              "door": "key"
+            }
+          ]
+        },
+        {
+          "message": 50707,
+          "choices": [
+            {
+              "reply": 68016,
+              "next": 50737,
+              "quest": 2451,
+              "beforeObjective": 18573
+            }
+          ]
+        },
+        {
+          "message": 50737,
+          "choices": [
+            {
+              "reply": 68015,
+              "next": 50738
+            }
+          ]
+        },
+        {
+          "message": 50738,
+          "choices": [
+            {
+              "reply": 68014,
+              "next": 50739
+            }
+          ]
+        },
+        {
+          "message": 50739,
+          "choices": [
+            {
+              "reply": 68013,
+              "next": 50740
+            }
+          ]
+        },
+        {
+          "message": 50740,
+          "choices": [
+            {
+              "reply": 68167,
+              "quest": 2451,
+              "beforeObjective": 18573,
+              "completes": 18573,
+              "params": [
+                [
+                  30,
+                  18573
+                ]
+              ]
+            },
+            {
+              "reply": 68167
+            }
+          ]
+        }
+      ],
+      "why": "Hell Mina (2217) at the Tertre du long sommeil's entrance [-3,19] (221250562). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): with Karnhell brought, «Indiquer que vous avez retrouvé Karnhell et lui rappeler le marché» (68016, 50737: «yo nunca he aceptado»), «Insistir» (68015, 50738), «Permanecer estoico para que Hell Mina no se dé cuenta de que habla demasiado» (68014) -- she lets slip the secret of the amber block (50739: «Hell Mina a la langue bien pendue et sans le vouloir vous avoue que le tumulus renferme une chose précieuse enfermée dans un bloc d'ambre») --, «¿Puedo ver el bloque más de cerca?» (68013, 50740) and «Ir en busca de algo para entrar en el túmulo y tomarle la palabra» (68167) closes the talk (objective 18573). Hell Mina has no key or keyring reply of the kind the server finds by wording, so without this her door took every answer as the way in (and spent the keyring's free entry on a quest reply): her opening 50601 (the guardian who lets nobody in or out) names the doors, «*le enseñas tu manojo de llaves*» (67838, the keyring) and «Demostrar lo contrario utilizando tu llave» (67833, the key). INFERRED: which of her replies is which door. INFERRED: the pairing of replies and lines, and 50707 as her greeting."
+    },
+    {
+      "npc": 2217,
+      "map": 220729859,
+      "opening": 50743,
+      "lines": [
+        {
+          "message": 50743,
+          "choices": [
+            {
+              "reply": 68023,
+              "next": 50743
+            },
+            {
+              "reply": 68024,
+              "next": 50744
+            }
+          ]
+        },
+        {
+          "message": 50744,
+          "choices": [
+            {
+              "reply": 68025,
+              "quest": 2451,
+              "beforeObjective": 18576,
+              "completes": 18576,
+              "params": [
+                [
+                  30,
+                  18576
+                ]
+              ]
+            },
+            {
+              "reply": 68025
+            }
+          ]
+        }
+      ],
+      "why": "Hell Mina (2217) in the Tertre du long sommeil's post-boss room (220729859), beaten («No creas que me has vencido», 50743). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): «Hell Mina qui vous intime de ne pas vous approcher de l'ambre «Jeter un regard circulaire autour de vous» (68023). Intéressez-vous alors à Kharnel sa karne en lui faisant un signe (68024)... Hell Mina vous fait comprendre que c'est sa karne car elle a peur que vous la lui voliez» (50744, «¡Es MI karne!»); «Te pido disculpas...» (68025) ends the talk, the quest and, as the room's exit reply, the dungeon. INFERRED: the pairing of replies and lines; looking around (68023) only leads back to her opening."
     }
   ]
 }

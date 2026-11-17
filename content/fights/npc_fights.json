@@ -1474,6 +1474,42 @@
       "why": "«Más leña al fuego» (2151, 16405): The fallen fruit's «Me encanta la compota, ¡así que a desgajar!» (53792) opens the fight at the foot of the Kudemenju tree against the rotten fruits (6267: 16988-16991), which drop the Pepitas espirituales (23494) and the Gajo de fruto kudemenju (23495) by their own client loot rows. Dofus pour les noobs («Sous le bois de sa colère»): «vous risquez de vous faire attaquer par les autres fruits pourris … Un combat se lance». INFERRED: three rotten fruits (the page's images are not read)." },
     { "npc": 5676, "map": 205521923, "reply": 53797,
       "monsters": [ { "monster": 6267, "grade": 0 }, { "monster": 6267, "grade": 0 }, { "monster": 6267, "grade": 0 } ],
-      "why": "«Más leña al fuego» (2151, 16405): The fallen fruit's «Desenvainar tu arma y enfrentarte a los frutos podridos.» (53797, once it has been talked to) opens the fight at the foot of the Kudemenju tree against the rotten fruits (6267: 16988-16991), which drop the Pepitas espirituales (23494) and the Gajo de fruto kudemenju (23495) by their own client loot rows. Dofus pour les noobs («Sous le bois de sa colère»): «vous risquez de vous faire attaquer par les autres fruits pourris … Un combat se lance». INFERRED: three rotten fruits (the page's images are not read)." }
+      "why": "«Más leña al fuego» (2151, 16405): The fallen fruit's «Desenvainar tu arma y enfrentarte a los frutos podridos.» (53797, once it has been talked to) opens the fight at the foot of the Kudemenju tree against the rotten fruits (6267: 16988-16991), which drop the Pepitas espirituales (23494) and the Gajo de fruto kudemenju (23495) by their own client loot rows. Dofus pour les noobs («Sous le bois de sa colère»): «vous risquez de vous faire attaquer par les autres fruits pourris … Un combat se lance». INFERRED: three rotten fruits (the page's images are not read)." },
+    { "npc": 6745, "map": 221251588, "reply": 68199, "marks": -2453014,
+      "monsters": [ { "monster": 6940, "grade": 0 }, { "monster": 6941, "grade": 0 }, { "monster": 6971, "grade": 0 }, { "monster": 6972, "grade": 0 }, { "monster": 6973, "grade": 0 } ],
+      "why": "«El campo alucinado» (2453): «Pasar a la fuerza.» -- «les Sectateurs ont répondu présents à l'appel de leur chef et s'interposent. Un combat se lance, il peut se faire à plusieurs»: Wilbur (Alto sectario, 6940) and the four Sectarios de Jalépona (6941, 6971, 6972, 6973), the white, red, purple and green robes (their threshold at 1 life point and the boost each leaves on dying, and Wilbur's invulnerable state while one of them lives, are the monsters' own spells; Dofus pour les noobs, «La campagne hallucinée»). The win leaves the mark -2453014, which the Abomination's dialogue asks for." },
+    { "npc": 6745, "map": 221251588, "reply": 68197,
+      "monsters": [ { "monster": 6939, "grade": 0 } ],
+      "why": "«El campo alucinado» (2453): «Decir que no tenías intención de huir y enfrentarte a la abominación.» -- the Abomination of Fab'hub-Niggrath alone, 9,600 life points, a threshold at 4,800 (Dofus pour les noobs, «La campagne hallucinée»: «Un combat se lance, il peut se faire à plusieurs»), with its own spells (Ébullition primitive, Ruée des mille bouftons, Fécondité malsaine, Chope d'un autre monde, Brume malsaine)." },
+    { "npc": 6737, "map": 220988934, "reply": 68137,
+      "monsters": [ { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 } ],
+      "why": "«El mal que hace bien» (2452): «Atacar a los malsetos» (68137) on [-2,19]: the Malzerb oppressant «et ses acolytes», four of the same malter (the forum's «4 groupes de 4 Malters (4 exemplaires du même...)»; Dofus pour les noobs, «Le mal qui fait bien»). Their spells and the invisibility with a copy are the monsters' own." },
+    { "npc": 6738, "map": 220988935, "reply": 68138,
+      "monsters": [ { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 } ],
+      "why": "«El mal que hace bien» (2452): «Atacar a los maltríos» (68138) on [-2,20]: the Maltrio persécuteur «et ses compagnons», four of the same malter (Dofus pour les noobs, «Le mal qui fait bien»)." },
+    { "npc": 6740, "map": 220988423, "reply": 68136,
+      "monsters": [ { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 } ],
+      "why": "«El mal que hace bien» (2452): «Atacar a los malpinchos» (68136) on [-3,20]: the Malépik tyrannique «et sa clique», four of the same malter (Dofus pour les noobs, «Le mal qui fait bien»)." },
+    { "npc": 6739, "map": 220987911, "reply": 68139,
+      "monsters": [ { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 } ],
+      "why": "«El mal que hace bien» (2452): «Atacar a los maltuerzos» (68139) on [-4,20]: the Malalfa harceleur «et ses copains», four of the same malter (Dofus pour les noobs, «Le mal qui fait bien»)." },
+    { "npc": 6738, "map": 220987399, "reply": 68141,
+      "allies": [ { "monster": 6966, "grade": 0 } ],
+      "monsters": [ { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 } ],
+      "waves": [ { "turns": 3, "monsters": [ { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6967, "grade": 0 } ] },
+                 { "turns": 5, "monsters": [ { "monster": 6970, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 } ] } ],
+      "why": "«El mal que hace bien» (2452): «Combatir a los malters al lado de Malsetego» (68141) on [-5,20]: Dofus pour les noobs, «Le mal qui fait bien», «Un combat à vagues se lance, il peut se faire à plusieurs. Vague 1 : 2 x Malalfa harceleur + 2 x Malépik tyrannique + 2 x Maltrio persécuteur + 2 x Malzerb oppressant. Vague 2 (dans 3 tours) : 3 x Malalfa harceleur + 1 x Malépik tyrannique + 3 x Maltrio persécuteur + 1 x Malzerb oppressant. Vague 3 (dans 5 tours) : 1 x Malalfa harceleur + 3 x Malépik tyrannique + 1 x Maltrio persécuteur + 3 x Malzerb oppressant». Malsetego (monster 6966) fights beside the character; «NOTE : Si votre allié Malzerbego meurt, le combat ne se termine pas et vous pouvez continuer», so alliesMustLive stays off." },
+    {
+      "npc": 6717,
+      "map": 220989443,
+      "reply": 81506,
+      "monsters": [
+        {
+          "monster": 6965,
+          "grade": 0
+        }
+      ],
+      "why": "«Arrête-la si tu peux» (2451): «Tratar de domar a la karne» (81506) with the Red de captura universal on: «Un combat se lance, il s'effectue seul. Karnhell a 17000PV de base et 15% de résistances dans chaque élément, ainsi que l'état Invulnérable pour toute la durée du combat! Dès le début du combat, elle pose un glyphe rouge en damier sur toute la map» (Dofus pour les noobs, «Arrête-la si tu peux»). Karnhell (6965) alone; her spells (Tu m'attraperas pas!, Envolée sauvage, Attraction sauvage, Échappée sauvage) are the monster's own."
+    }
   ]
 }

@@ -184,6 +184,12 @@ characteristics, chat, spells and equipment. It also tracks what is done and wha
 *Go there* when something fails before you reach the world, or when you want to know which exact
 message changed since the previous version.
 
+**[`mcp.md`](mcp.md)** — Debugging with an AI agent.
+The MCP server an agent drives the emulator through: the server started from source, a test
+character in the world without the client (`HeadlessClient`), and the real client clicked, read and
+photographed through JondoFix's input port.
+*Go there* to set it up for OpenCode or Claude Code, or before adding a test route.
+
 ---
 
 ## Contributing

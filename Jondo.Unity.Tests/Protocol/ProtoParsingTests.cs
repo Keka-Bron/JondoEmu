@@ -64,5 +64,23 @@ namespace Jondo.Unity.Tests.Protocol
             Assert.Equal(7L, parsed.Fields[0].VarIntValue);
             Assert.Equal(9L, parsed.Fields[1].VarIntValue);
         }
+
+        [Fact]
+        public void A_number_written_as_text_is_shown_as_text()
+        {
+            // The quest reward's lqn: «Has ganado 50960 kamas». The five ASCII bytes also parse as
+            // a field 6 of four fixed bytes, and the log showed { 2: 45 4: { 6: 0x } }.
+            var lqn = Pb.New().Var(2, 45).Str(4, "50960").Build();
+
+            Assert.Equal("{ 2: 45 4: \"50960\" }", ProtoMessage.Parse(lqn).Compact());
+        }
+
+        [Fact]
+        public void A_fixed_field_shows_its_value()
+        {
+            var fixed32 = new byte[] { 0x0D, 0x78, 0x56, 0x34, 0x12 };
+
+            Assert.Equal("{ 1: 0x12345678 }", ProtoMessage.Parse(fixed32).Compact());
+        }
     }
 }

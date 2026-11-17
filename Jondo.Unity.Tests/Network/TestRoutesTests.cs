@@ -13,7 +13,8 @@ namespace Jondo.Unity.Tests.Network
         public void Without_a_test_key_the_test_routes_are_not_there()
         {
             Assert.Equal("", ControlApi.TestKey);
-            foreach (string route in new[] { "launch", "token", "session", "fight", "cast", "inject", "refresh", "status" })
+            foreach (string route in new[] { "launch", "token", "session", "fight", "cast", "inject", "refresh", "status",
+                                             "headless", "headless/send", "headless/frames", "headless/stop", "logs" })
             {
                 var answer = ControlApi.Responder("/api/test/" + route, "POST", "{\"key\":\"\"}");
                 Assert.NotNull(answer);

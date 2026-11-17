@@ -33,6 +33,16 @@ namespace Jondo.Unity.Tests.Security
         }
 
         [Fact]
+        public void The_test_harness_key_is_covered()
+        {
+            // Every /api/test body carries it, and with it every test route is open.
+            string covered = Censura.Cuerpo("{\"text\":\".item 39 1\",\"key\":\"8A5D2581B7331FE9\"}");
+
+            Assert.DoesNotContain("8A5D2581B7331FE9", covered);
+            Assert.Contains(".item 39 1", covered);
+        }
+
+        [Fact]
         public void A_session_identifier_is_not_written_whole()
         {
             Assert.DoesNotContain("1a4b8e", Censura.Valor("2f9c1a4b8e"));

@@ -184,6 +184,14 @@ namespace Jondo.Unity.World.Quests
         /// </remarks>
         public int TypeId { get; init; } = DefaultType;
 
+        /// <summary>
+        /// Every MAP of <see cref="Elements"/> needs one of its elements pressed, not just one element
+        /// of the list ("all"): the berry bushes of «Arrête-la si tu peux» are inspected one map after
+        /// the other, «Sigue la pista de las bayas» being a single objective. A map with two bushes
+        /// (the guide does not say which is meant) takes either.
+        /// </summary>
+        public bool AllMaps { get; init; }
+
         /// <summary>Items the click puts in the bag, if any: template and how many.</summary>
         public IReadOnlyList<(int Item, int Count)> Gives { get; init; }
             = Array.Empty<(int, int)>();
@@ -679,6 +687,7 @@ namespace Jondo.Unity.World.Quests
                     : (0, 0),
                 OnlyGives = row.TryGetProperty("onlyGives", out var only) && only.ValueKind == JsonValueKind.True,
                 GivesEach = row.TryGetProperty("givesEach", out var each) && each.ValueKind == JsonValueKind.True,
+                AllMaps = row.TryGetProperty("all", out var allMaps) && allMaps.ValueKind == JsonValueKind.True,
                 OverridesMap = row.TryGetProperty("overridesMap", out var overrides)
                                && overrides.ValueKind == JsonValueKind.True,
                 ItemId = Int(row, "item"),

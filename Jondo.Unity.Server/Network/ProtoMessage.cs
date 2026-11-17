@@ -180,8 +180,9 @@ namespace Jondo.Unity.Server.Network
                 }
                 else
                 {
-                    // The fixed 32 and 64 bit ones: shown raw, which is what they are.
-                    sb.Append("0x").Append(Convert.ToHexString(field.BytesValue).ToLowerInvariant());
+                    // The fixed 32 and 64 bit ones: shown raw, which is what they are. Their value
+                    // is in Fixed32Value/Fixed64Value, not in BytesValue, which they leave empty.
+                    sb.Append("0x").Append(field.WireType == 5 ? field.Fixed32Value.ToString("x8") : field.Fixed64Value.ToString("x16"));
                 }
 
                 sb.Append(' ');
@@ -191,6 +192,16 @@ namespace Jondo.Unity.Server.Network
 
         private static void Bytes(System.Text.StringBuilder sb, ProtoField field, int budget)
         {
+            // Printable ASCII is a string. Short strings parse as submessages by chance -- an lqn's
+            // «50960» kamas is 35 30 39 36 30, a field 6 of four fixed bytes -- and were shown as
+            // { 6: 0x... }, which read as a broken message. A real submessage's first tag is
+            // almost always below 0x20 (fields 1 to 3), which is not printable.
+            if (field.BytesValue.Length > 0 && field.BytesValue.All(b => b >= 0x20 && b < 0x7f))
+            {
+                sb.Append('"').Append(System.Text.Encoding.ASCII.GetString(field.BytesValue)).Append('"');
+                return;
+            }
+
             // A submessage first, because it is what says the most. If it does not parse, text is tried, and
             // if not that either, hexadecimal: the same order as the tree dump, so that both
             // views tell the same about the same packet.

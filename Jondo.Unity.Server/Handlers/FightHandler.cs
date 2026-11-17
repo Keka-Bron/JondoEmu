@@ -922,6 +922,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     playerFighter.Buffs.PonerActitud(hechizo);
                 }
+
                 // At the grade his level gives it: the passives grow with the character -- the
                 // Pandawa's power when carrying is +10% at grade 1 and +50% at grade 6, from level
                 // 187 ("este bonus cambia con el nivel del pandawa"). Put at grade 1, every
@@ -3842,6 +3843,10 @@ namespace Jondo.Unity.Server.Handlers
             // anybody's, as before. Measured on the rounds a monster opens: thirteen rows of
             // the player fall at his own turn against one at the monster's, and fifty-seven
             // rows of summons at the summon's.
+            // The states held before the sweep, for the glyphs fired under him further down: kept
+            // aside here, and in force only while those glyphs fire (StatesBeforeTheSweep), so the
+            // hooks of the states that fall now still see them gone.
+            var statesBeforeTheSweep = (fighter.Id, new HashSet<int>(fighter.Buffs.Estados));
             var caducados = TurnStartSweep(fight, fighter);
 
             if (caducados.Count > 0)
@@ -3980,7 +3985,9 @@ namespace Jondo.Unity.Server.Handlers
             // the line below, and with the 307 that belongs to them instead of the 306.
             await ReconciliarLosMurosAsync(stream, fight, fireOnBirth: false);
             await QuitarLosGlifosCaducadosAsync(fight, fighter);
-            await DispararLosGlifosAsync(stream, fight, fighter, alPisar: false);
+            fight.StatesBeforeTheSweep = statesBeforeTheSweep;
+            try { await DispararLosGlifosAsync(stream, fight, fighter, alPisar: false); }
+            finally { fight.StatesBeforeTheSweep = null; }
             if (await EffectEndedTheFightAsync(stream, fight)) return;
 
             // AND IF IT KILLED HIM, THE TURN STILL HAS TO MOVE ON. This returned bare, and a
@@ -5524,7 +5531,13 @@ namespace Jondo.Unity.Server.Handlers
             // casting at all (preventsSpellCast): a carrying Pandawa throws and does nothing else,
             // «excepto los que le permiten lanzar a la entidad». Only the monsters' and the
             // JondoBots' casts asked this; a player's went through whatever he carried.
-            if (spell != 0 && !Managers.SpellCriteria.Allows(caster, spell, grade))
+            // Not a player's domestication spell: it asks for one of the net states (HS=7105|7106|7107|
+            // 7114) that the client's initial spell 32711 puts on the net's wearer, and nothing here
+            // casts it, so the capture net «Arrête-la si tu peux» asks for could never be used. The net
+            // being worn is what lets him cast it (RideCapture.MayCast: once a fight).
+            bool netCast = !caster.IsMonster && Managers.RideCapture.IsDomestication(spell)
+                           && Managers.RideCapture.SpellOfEquippedNet() == spell;
+            if (spell != 0 && !netCast && !Managers.SpellCriteria.Allows(caster, spell, grade))
             {
                 Program.LogDebug($"[Fight] Spell {spell} is not for the caster's states now " +
                                  $"(condition \"{Managers.SpellCriteria.Of(spell, grade)}\", states {string.Join(",", caster.Buffs.Estados)}).");
@@ -10376,6 +10389,10 @@ namespace Jondo.Unity.Server.Handlers
                                                  caster);
                 await ChallengeWatcher.AllyDiedAsync(stream, fight, target, caster);
 
+                // A 141 on its own caster (21990) puts its boosts on the others at the same cast:
+                // they are what the death is FOR (Dofus pour les noobs: the sectarian "meurt ...
+                // en boostant le Haut-Sectateur"), and they stay because their rows are written
+                // to outlive their caster (dispellable 3, Buffs.OutlivesItsCaster).
                 await CaenSusInvocadosAsync(stream, fight, target);
                 await ReenviarLaListaAsync(stream, fight);
 

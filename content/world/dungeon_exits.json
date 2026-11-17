@@ -368,6 +368,17 @@
       "npc": 5606,
       "replies": [53778, 53779, 53787],
       "why": "The Bambusería de Kodámade: after Kodámade the winners are in her clearing (208670722), where «Más leña al fuego» has them hear her (Dofus pour les noobs («Sous le bois de sa colère»): «Une fois le combat terminé, parlez à Damadrya pour « En savoir plus sur elle »») and leave «pour partir à la poursuite de Kykori»; «Salir de la Bambusería.» (53778), «… para ir en busca de Kykori.» (53779) and «Darle las gracias y salir de la Bambusería.» (53787) leave. INFERRED cell."
+    },
+    {
+      "dungeon": 139,
+      "bossRoom": 220729857,
+      "room": 220729859,
+      "cell": 454,
+      "npc": 2217,
+      "replies": [
+        68025
+      ],
+      "why": "The post-boss room of the Tertre du long sommeil (dungeon 139): quest 2451 «Arrête-la si tu peux» has an objective, 18576, that names this map (220729859) after the boss (Hell Mina, 107): «Une fois le donjon terminé, parlez à Hell Mina» (Dofus pour les noobs, «Arrête-la si tu peux»); her last reply there (68025, «Te pido disculpas...») takes the winners out. INFERRED landing cell."
     }
   ]
 }

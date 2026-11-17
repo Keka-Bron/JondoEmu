@@ -5822,6 +5822,222 @@
       "orientation": 3,
       "criterion": "Qo>10146&Qo<10148&PO!17076",
       "why": "Nabrisa in the dark clearing once the Zampívoro oscuro is beaten, until she is escorted into the palace (10148), and only while she is not following the character (follower item 17076 not carried): she becomes the follower on «Escoltar a Nabrisa» and leaves the clearing; whoever loses her in a fight (its «811: 1 fight left») finds her here again and «Escoltar a Nabrisa» (26203) gives her back. Dofus pour les noobs («L'ombre et la proie»): «Une fois la bête vaincue, Nabrisa apparait et vous remercie» and «Vous obtenez Nabrisa en personnage suiveuse afin de la ramener à la citée Blanche»."
+    },
+    {
+      "map": 220988932,
+      "npc": 6691,
+      "cell": 290,
+      "orientation": 7,
+      "criterion": "Qa=2453",
+      "why": "«El campo alucinado» (2453), Dofus pour les noobs, «La campagne hallucinée»: the four Sectateurs de Boufona (Sectario de Jalépona) stand at the foot of the Black Tree [-2,17], the one in front of the trunk entrance, the one on the right with the green robe, the one on the left and the one at the bottom, for whoever has the quest. This one guards the trunk. INFERRED cell."
+    },
+    {
+      "map": 220988932,
+      "npc": 6716,
+      "cell": 289,
+      "orientation": 3,
+      "criterion": "Qa=2453&Ue!-2453005",
+      "why": "«El campo alucinado» (2453), Dofus pour les noobs, «La campagne hallucinée»: the four Sectateurs de Boufona (Sectario de Jalépona) stand at the foot of the Black Tree [-2,17], the one in front of the trunk entrance, the one on the right with the green robe, the one on the left and the one at the bottom, for whoever has the quest. This one has the robe of green ornaments and goes off when lured away (mark -2453005, his dialogue). INFERRED cell."
+    },
+    {
+      "map": 220988932,
+      "npc": 6714,
+      "cell": 275,
+      "orientation": 3,
+      "criterion": "Qa=2453",
+      "why": "«El campo alucinado» (2453), Dofus pour les noobs, «La campagne hallucinée»: the four Sectateurs de Boufona (Sectario de Jalépona) stand at the foot of the Black Tree [-2,17], the one in front of the trunk entrance, the one on the right with the green robe, the one on the left and the one at the bottom, for whoever has the quest. This one stands on the left. INFERRED cell."
+    },
+    {
+      "map": 220988932,
+      "npc": 6715,
+      "cell": 304,
+      "orientation": 1,
+      "criterion": "Qa=2453",
+      "why": "«El campo alucinado» (2453), Dofus pour les noobs, «La campagne hallucinée»: the four Sectateurs de Boufona (Sectario de Jalépona) stand at the foot of the Black Tree [-2,17], the one in front of the trunk entrance, the one on the right with the green robe, the one on the left and the one at the bottom, for whoever has the quest. This one stands at the bottom. INFERRED cell."
+    },
+    {
+      "map": 220989957,
+      "npc": 6716,
+      "cell": 297,
+      "orientation": 7,
+      "criterion": "Qa=2453&Ue=-2453005",
+      "why": "The sectarian lured away «au sud-est de la forêt» ([0,18]), standing with his back to the cell below him (311) for whoever has the quest and has sent him there (mark -2453005): «placez-vous sur la cellule derrière le Sectateur de Boufona» (Dofus pour les noobs, «La campagne hallucinée»). INFERRED cell."
+    },
+    {
+      "map": 221251588,
+      "npc": 6692,
+      "cell": 328,
+      "orientation": 3,
+      "criterion": "Qa=2453&Ue!-2453016",
+      "why": "Alto sectario Wilbur at the altar of the Black Tree (221251588), north of it, doing his ritual; he flees at the end (mark -2453016, his dialogue): Dofus pour les noobs, «La campagne hallucinée». INFERRED cell."
+    },
+    {
+      "map": 221251588,
+      "npc": 6744,
+      "cell": 314,
+      "orientation": 3,
+      "criterion": "Qa=2453&Ue=-2453010&Ue!-2453013",
+      "why": "The Emanation of Fab'hub-Niggrath on the altar, from the blood Wilbur spills (mark -2453010) until it fuses with the bouftou (mark -2453013), on 314 above the altar and not on its own cell 356: its look is bone 6834, the glowing-orb effect shared by eight NPC templates, and the real client draws neither it nor Wilbur beside it when it stands on 356 or 357 (behind the altar's decor) but shows it on 200 and 314 (screenshots in bugs/foret-malefique/mecaniques-capturas): «l'Émanation de Shushub-Niggrath apparue sur l'autel» (Dofus pour les noobs, «La campagne hallucinée»). INFERRED cell."
+    },
+    {
+      "map": 221251588,
+      "npc": 6745,
+      "cell": 356,
+      "orientation": 3,
+      "criterion": "Qa=2453&Ue=-2453013&Ue!-2453015",
+      "why": "The Abomination of Fab'hub-Niggrath on the altar, born of the fusion (mark -2453013) until the demoness leaves its body (mark -2453015): Dofus pour les noobs, «La campagne hallucinée». INFERRED cell."
+    },
+    {
+      "map": 221251588,
+      "npc": 6746,
+      "cell": 187,
+      "orientation": 3,
+      "criterion": "Qa=2453&Ue!-2453012",
+      "why": "The caged bouftou among the cages round the room (top left in the room's drawing): «Bouftou en captivité» (Dofus pour les noobs, «La campagne hallucinée»), until it breaks out (mark -2453012). INFERRED cell."
+    },
+    {
+      "map": 221251588,
+      "npc": 6748,
+      "cell": 187,
+      "orientation": 3,
+      "criterion": "Qa=2453&Ue=-2453012",
+      "why": "The broken cage the bouftou leaves behind (mark -2453012): «Jaula destruida» (Dofus pour les noobs, «La campagne hallucinée»). INFERRED cell."
+    },
+    {
+      "map": 221251588,
+      "npc": 6747,
+      "cell": 342,
+      "orientation": 7,
+      "criterion": "Qa=2453&Ue=-2453012&Ue!-2453013",
+      "why": "The panicked bouftou «pass[ing] between the emanation and the high sectarian» (mark -2453012, until the fusion at -2453013), by the altar: Dofus pour les noobs, «La campagne hallucinée». INFERRED cell."
+    },
+    {
+      "map": 221251588,
+      "npc": 6755,
+      "cell": 329,
+      "orientation": 3,
+      "criterion": "Qa=2453&Ue=-2453016&Qo<18563",
+      "why": "The heap of twigs that bars the way when Wilbur flees (mark -2453016) until the character has spoken to it (objective 18563): «Tas de brindilles» (Dofus pour les noobs, «La campagne hallucinée»). INFERRED cell."
+    },
+    {
+      "map": 221251588,
+      "npc": 6747,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=2453&Qo>18563&Qo<18564",
+      "why": "The panicked bouftou that invites the herd to follow, once the twigs have broken the cages (18563) and until the herd is back with Yeleka Yrehn (18564): «Bouftou paniqué» (Dofus pour les noobs, «La campagne hallucinée»). INFERRED cell."
+    },
+    {
+      "map": 221512706,
+      "npc": 6736,
+      "cell": 262,
+      "orientation": 3,
+      "criterion": "Qa!2452",
+      "why": "Malsetego (Malzerbego) at the edge of the Evil Forest, the Enchanted Edge [0,15] (221512706), where «El mal que hace bien» (2452) starts and where he goes back to his post once it is over («il retourne à son poste»), but not while it is under way: he follows the character into the maze (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220989446,
+      "npc": 6741,
+      "cell": 244,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo<18585",
+      "why": "Pedri Dísimo (Edgar Hé), the lost fisherman with his notes, in the Maze [-1,19] (220989446) (Dofus pour les noobs, «Le mal qui fait bien»: «allez en [-1,19] pour rencontrer un douzien, Edgar Hé»), until the character has promised to clear the way (18585). INFERRED cell."
+    },
+    {
+      "map": 220989446,
+      "npc": 6736,
+      "cell": 245,
+      "orientation": 7,
+      "criterion": "Qa=2452&Qo<18585",
+      "why": "Malsetego at Pedri Dísimo's side in the Maze [-1,19] (220989446): «Malzerbego qui vous a suivi jusqu'ici» (Dofus pour les noobs, «Le mal qui fait bien»), until the character has promised to clear the way (18585). INFERRED cell."
+    },
+    {
+      "map": 220988934,
+      "npc": 6737,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18585&Qo<18586",
+      "why": "The Malseto opresor (Malzerb oppressant) who bars the way to the fisherman on [-2,19] (220988934), first of the four fights, from the promise (18585) until his group is beaten (18586) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220988935,
+      "npc": 6738,
+      "cell": 355,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18586&Qo<18587",
+      "why": "The Maltrío perseguidor (Maltrio persécuteur) who bars the way on [-2,20] (220988935), second fight, until his group is beaten (18587) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220988423,
+      "npc": 6740,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18587&Qo<18588",
+      "why": "The Malpincho tiránico (Malépik tyrannique) who bars the way on [-3,20] (220988423), third fight, until his group is beaten (18588) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220987911,
+      "npc": 6739,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18588&Qo<18589",
+      "why": "The Maltuerzo acosador (Malalfa harceleur) who bars the way on [-4,20] (220987911), fourth fight, until his group is beaten (18589) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220987399,
+      "npc": 6738,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18589&Qo<18590",
+      "why": "The Maltrío perseguidor (Maltrio persécuteur) who leads the horde on [-5,20] (220987399), the wave fight, until it is beaten (18590) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220987399,
+      "npc": 6736,
+      "cell": 316,
+      "orientation": 7,
+      "criterion": "Qa=2452&Qo>18590&Qo<18591",
+      "why": "Malsetego on [-5,20] (220987399) after the wave fight, where the character speaks to him («parlez à Malzerbego sur la même map»), until he has said goodbye (18591) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 221643270,
+      "npc": 6741,
+      "cell": 288,
+      "orientation": 3,
+      "criterion": "(Qa=2452&Qo>18591)|Qf=2452",
+      "why": "Pedri Dísimo back on the shore [-7,21] (221643270), where he fished, once Malsetego has sent the character to see him (18591) and for good after the quest («Je me contenterai de venir ici pique-niquer»): «allez en [-7,21] pour parler à Edgar Hé» (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220987906,
+      "npc": 2217,
+      "cell": 410,
+      "orientation": 3,
+      "criterion": "Qa!2451&Qf!2451",
+      "why": "Hell Mina by the burning bush of the maze [-4,15] (220987906), where «Arrête-la si tu peux» (2451) starts (Dofus pour les noobs, «Arrête-la si tu peux»: «la quête se lance en [-4,15] auprès de Hell Mina qui semble tenter d'évacuer sa frustration en tapant à foison sur un buisson ardent»); she goes back to the tumulus («Vuelvo al túmulo») once the quest is taken, and does not come back. INFERRED cell: beside the map's bushes."
+    },
+    {
+      "map": 220989443,
+      "npc": 6717,
+      "cell": 343,
+      "orientation": 1,
+      "remove": true,
+      "why": "The derived layer placed Karnhell here for good («wanted by quest 2451»); she only comes out of the bush while the quest is on (the next row)."
+    },
+    {
+      "map": 220989443,
+      "npc": 6717,
+      "cell": 344,
+      "orientation": 1,
+      "criterion": "Qa=2451&Qo>18567&Qo<18571",
+      "why": "Karnhell, who comes out behind the character at the last bush of the maze [-1,16] (220989443) (Dofus pour les noobs, «Arrête-la si tu peux»: «soudain une créature mécontente de ce gâchis fait son apparition derrière vous»), from the bush (18567) until she is tamed (18571) and walks behind the character. INFERRED cell: beside her derived one."
+    },
+    {
+      "map": 220729859,
+      "npc": 2217,
+      "cell": 411,
+      "orientation": 3,
+      "criterion": "Qa=2451&Qo>18575&Qo<18576",
+      "why": "Hell Mina in the Tertre du long sommeil's post-boss room (220729859), where the character speaks to her once the dungeon is won («Arrête-la si tu peux», objective 18576; Dofus pour les noobs, «Arrête-la si tu peux»: «Une fois le donjon terminé, parlez à Hell Mina»), from the boss (18575) until she is spoken to (18576). INFERRED cell."
     }
     ]
 }
