@@ -768,8 +768,8 @@
     {
       "map": 153879040,
       "npc": 2908,
-      "cell": 231,
-      "orientation": 1,
+      "cell": 384,
+      "orientation": 3,
       "why": "Kruella Troz «en [1,0]» (Dofus pour les noobs, «Leçon d'humilité»). No capture places her: INFERRED, on the walkable cell nearest the middle of the map's walkable ground, every neighbour walkable."
     },
     {

@@ -5298,8 +5298,8 @@
 {
 "map": 153879811,
 "npc": 2881,
-"cell": 287,
-"orientation": 1,
+"cell": 323,
+"orientation": 3,
 "why": "wanted by quest 1637"
 },
 {
@@ -8955,7 +8955,7 @@
 {
 "map": 191105024,
 "npc": 4329,
-"cell": 425,
+"cell": 388,
 "orientation": 1,
 "why": "gives quest 1960"
 },
