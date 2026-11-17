@@ -89,8 +89,10 @@ namespace Jondo.Protocol
         /// </summary>
         public static Action<byte[]>? FrameTap;
 
-        public static async Task WriteFrameAsync(Stream stream, byte[] payload)
+        public static async Task WriteFrameAsync(Stream? stream, byte[] payload)
         {
+            if (stream == null) return;
+
             FrameTap?.Invoke(payload);
             using var ms = new MemoryStream();
             var codedStream = new CodedOutputStream(ms);

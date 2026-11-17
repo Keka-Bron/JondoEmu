@@ -218,9 +218,10 @@ namespace Jondo.Unity.Server.Managers
             var log = Log;
             if (log == null || dialogId <= 0) return;
 
+            int npcId = SessionContext.State.OpenDialogueNpcId;
             foreach (var step in StepsHandedOverBy(dialogId))
             {
-                await StartAsync(stream, step.QuestId);
+                await StartSharedAsync(stream, step.QuestId, () => CanShareNpc(npcId));
             }
 
             // The Almanax offering and «El año del dragón» are Ontoral's own replies now
@@ -249,44 +250,19 @@ namespace Jondo.Unity.Server.Managers
                 var step = _book.Step(run.StepId);
                 if (step == null) continue;
 
-                // The offering goes in its order and through Ontoral's replies: the item handed
-                // over with «Entregarle la ofrenda», the coming back with «Responderle que has
-                // hablado con el espíritu del día», the 365 pages with their own reply. On a hello
-                // the whole offering closed at once, the prayer still to say. Only the saint is
-                // seen by talking to him, and only once the prayer has been said.
-                bool offering = Almanax.IsOffering(run.QuestId);
-                if (run.QuestId == Almanax.Dragon.Quest) continue;
-
-                var tree = NpcDialogues.For(npcId, SessionContext.State.MapId);
                 foreach (var objective in step.Objectives)
                 {
                     if (objective.NpcId != npcId) continue;
-                    if (!Revealed(step, objective, run)) continue;
+                    if (!await CompleteNpcObjectiveAsync(stream, step, objective, run, npcId)) continue;
 
-                    // Done by one of his replies, not by hello (DialogueChoice.Completes).
-                    if (tree != null && tree.HasReplyFor(objective.Id)) continue;
-                    if (NpcDialogues.AnyHasReplyFor(npcId, objective.Id)) continue;
-                    // Or by a reply a binding names: Icar Orval's five feathers of «Vuela, amiga,
-                    // vuela alto» go with «aquí tienes» (31640), and a hello with them in the bag
-                    // closed the hand-in before the reply was ever shown.
-                    if (Bindings.Of(objective.Id)?.Kind == QuestBindingKind.Reply) continue;
-                    if (offering && (npcId == Almanax.Giver || !Handlers.AlmanaxOfferingHandler.MaySeeTheSaint(run.QuestId))) continue;
-                    if (objective.MapId != 0 && objective.MapId != SessionContext.State.MapId
-                        && StandsOn(npcId, objective.MapId)) continue;
-
-                    // The key of the dungeon he keeps is given at his door, by going in.
-                    if (objective.ItemId != 0 && objective.ConsumesItems
-                        && Handlers.DungeonHandler.TakesAtTheDoor(npcId, SessionContext.State.MapId, objective.ItemId)) continue;
-
-                    // "Bring me five ortie" and "show me the ring" name the same NPC as "come and
-                    // see me", and turning up empty-handed must not tick them off.
-                    if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) continue;
-
-                    // Nor "bring me the soul of a Jalató Real": it used to close on a hello.
-                    if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) continue;
-
-                    await TickAsync(stream, run.QuestId, objective.Id);
+                    await Heroes.ShareQuestActionAsync(async hero =>
+                    {
+                        if (CanShareNpc(npcId) && SharedObjective(run.QuestId, step.Id, objective.Id, out var pending))
+                            await CompleteNpcObjectiveAsync(hero.Stream!, step, objective, pending, npcId);
+                    });
                 }
+
+                if (run.QuestId == Almanax.Dragon.Quest) continue;
 
                 // And the free-text ones that are a conversation in all but the catalogue's type:
                 // "Parler à un vieux de la vieille" is a talk objective Ankama wrote as prose.
@@ -297,9 +273,36 @@ namespace Jondo.Unity.Server.Managers
                     if (binding.NpcId != npcId) continue;
                     if (binding.MapId != 0 && binding.MapId != SessionContext.State.MapId) continue;
 
-                    await CloseAsync(stream, binding);
+                    await CloseSharedAsync(stream, binding, () => CanShareNpc(npcId));
                 }
             }
+        }
+
+        internal static bool CanShareNpc(int npcId)
+            => Npcs.OnMap(SessionContext.State.MapId).Any(spawn => spawn.NpcId == npcId);
+
+        private static async Task<bool> CompleteNpcObjectiveAsync(NetworkStream stream, QuestStep step,
+                                                                  QuestObjective objective, QuestRun run, int npcId)
+        {
+            if (run.Finished || run.StepId != step.Id || run.Done.Contains(objective.Id)) return false;
+            if (run.QuestId == Almanax.Dragon.Quest || !Revealed(step, objective, run)) return false;
+
+            long mapId = SessionContext.State.MapId;
+            var tree = NpcDialogues.For(npcId, mapId);
+            // Authored replies and the Almanax offering handle their own hand-ins.
+            if (tree?.HasReplyFor(objective.Id) == true || NpcDialogues.AnyHasReplyFor(npcId, objective.Id)) return false;
+            if (Bindings.Of(objective.Id)?.Kind == QuestBindingKind.Reply) return false;
+            if (Almanax.IsOffering(run.QuestId)
+                && (npcId == Almanax.Giver || !Handlers.AlmanaxOfferingHandler.MaySeeTheSaint(run.QuestId))) return false;
+            if (objective.MapId != 0 && objective.MapId != mapId && StandsOn(npcId, objective.MapId)) return false;
+
+            if (objective.ItemId != 0 && objective.ConsumesItems
+                && Handlers.DungeonHandler.TakesAtTheDoor(npcId, mapId, objective.ItemId)) return false;
+            if (objective.ItemId != 0 && !await HandOverAsync(stream, objective)) return false;
+            if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(stream, objective)) return false;
+
+            await TickAsync(stream, run.QuestId, objective.Id);
+            return true;
         }
 
         /// <summary>
@@ -574,7 +577,12 @@ namespace Jondo.Unity.Server.Managers
                     }
                     continue;
                 }
-                if (await CloseAsync(stream, binding)) { moved = true; break; }
+                if (await CloseSharedAsync(stream, binding,
+                    () => binding.AfterElement == 0 || SessionContext.State.ElementsUsed.Contains(binding.AfterElement)))
+                {
+                    moved = true;
+                    break;
+                }
             }
 
             return moved;
@@ -700,6 +708,43 @@ namespace Jondo.Unity.Server.Managers
             Handlers.FightHandler.TakeNextIncarnation(GameState.CharacterId);
             Console.WriteLine($"[Quests] Objective {binding.ObjectiveId}: its fight on {fight.ArenaMapId}.");
             return true;
+        }
+
+        private static async Task<bool> CloseSharedAsync(NetworkStream stream, QuestBinding binding,
+                                                          Func<bool>? canShare = null)
+        {
+            int stepId = Log?.Run(binding.QuestId)?.StepId ?? 0;
+            if (!await CloseAsync(stream, binding)) return false;
+
+            if (binding.SpawnsMonster == 0 && !binding.OnlyGives)
+            {
+                await Heroes.ShareQuestActionAsync(async hero =>
+                {
+                    if (canShare?.Invoke() == false) return;
+
+                    if (binding.Starts != 0)
+                    {
+                        await CloseAsync(hero.Stream!, binding);
+                    }
+                    else if (SharedObjective(binding.QuestId, stepId, binding.ObjectiveId, out _))
+                    {
+                        await CloseAsync(hero.Stream!, binding);
+                    }
+                });
+            }
+            return true;
+        }
+
+        internal static bool SharedObjective(int questId, int stepId, int objectiveId, out QuestRun run)
+        {
+            run = Log?.Run(questId)!;
+            if (run == null || run.Finished || run.StepId != stepId || run.Done.Contains(objectiveId))
+                return false;
+
+            var step = _book?.Step(stepId);
+            var objective = step?.Objectives.FirstOrDefault(o => o.Id == objectiveId);
+            return step != null && objective != null && AppliesTo(Log!, objectiveId)
+                   && Revealed(step, objective, run);
         }
 
         private static async Task<bool> CloseAsync(NetworkStream stream, QuestBinding binding)
@@ -996,7 +1041,7 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var starter in Bindings.StartedOn(mapId))
                 {
                     if (log.Run(starter.Starts) != null) continue;
-                    if (!await StartAsync(stream, starter.Starts)) continue;
+                    if (!await StartSharedAsync(stream, starter.Starts, () => Log?.Run(starter.Starts) == null)) continue;
                     Console.WriteLine($"[Quests] Quest {starter.Starts} starts on arriving on {mapId}.");
                 }
             }
@@ -1018,7 +1063,12 @@ namespace Jondo.Unity.Server.Managers
                         if (here && !run.Done.Contains(objective.Id) && Revealed(step, objective, run))
                         {
                             await TickAsync(stream, run.QuestId, objective.Id);
-                                }
+                            await Heroes.ShareQuestActionAsync(async hero =>
+                            {
+                                if (SharedObjective(run.QuestId, step.Id, objective.Id, out _))
+                                    await TickAsync(hero.Stream!, run.QuestId, objective.Id);
+                            });
+                        }
                     }
 
                     // And the free-text ones that are an arrival: "Pénétrer dans l'antre du
@@ -1034,8 +1084,8 @@ namespace Jondo.Unity.Server.Managers
                         // bridge is crossed and the palace seen, ticked ahead of both.
                         if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
 
-                        await CloseAsync(stream, binding);
-                        }
+                        await CloseSharedAsync(stream, binding);
+                    }
 
                     // And a «beat» row with no element to press: its monsters come out when the
                     // character arrives on its map, once it is theirs to do -- the old gorkoko of «Un
@@ -1075,7 +1125,7 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Walk || binding.MapId != mapId) continue;
                     if (!EndsOn(binding, cellId)) continue;
-                    await CloseAsync(stream, binding);
+                    await CloseSharedAsync(stream, binding, () => EndsOn(binding, SessionContext.State.CellId));
                 }
             }
         }
@@ -1257,7 +1307,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// A reply has been chosen in a conversation: an objective bound to it closes.
         /// </summary>
-        public static async Task OnReplyChosenAsync(NetworkStream stream, long reply)
+        public static async Task OnReplyChosenAsync(NetworkStream stream, long reply, Func<bool>? canShare = null)
         {
             var log = Log;
             if (log == null || _book == null || reply <= 0) return;
@@ -1270,7 +1320,8 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Reply) continue;
                     if (!binding.Replies.Contains((int)reply)) continue;
-                    await CloseAsync(stream, binding);
+                    if (canShare == null) await CloseAsync(stream, binding);
+                    else await CloseSharedAsync(stream, binding, canShare);
                 }
             }
         }
@@ -1535,6 +1586,17 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        internal static async Task<bool> StartSharedAsync(NetworkStream stream, int questId, Func<bool>? canShare = null)
+        {
+            if (!await StartAsync(stream, questId)) return false;
+            await Heroes.ShareQuestActionAsync(async hero =>
+            {
+                if (canShare?.Invoke() != false)
+                    await StartAsync(hero.Stream!, questId);
+            });
+            return true;
+        }
+
         /// <summary>
         /// Starts a quest and tells the client, if the character is allowed it.
         /// </summary>
@@ -1577,6 +1639,8 @@ namespace Jondo.Unity.Server.Managers
             await TellAsync(stream, QuestStartedMessage, questId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Ief, QuestProtocol.BuildQuestStarted(questId)));
+
+            if (stream == null) return true;
 
             await SendStepAsync(stream, questId);
 
@@ -2183,11 +2247,14 @@ namespace Jondo.Unity.Server.Managers
 
             if (!move.QuestFinished)
             {
-                await SendStepAsync(stream, questId);
+                if (stream != null) await SendStepAsync(stream, questId);
 
                 // And the marks again, as after every ieb and idz of the captures.
-                if (move.ObjectiveTicked || move.StepFinished) await SendMarksAsync(stream, SessionContext.State.MapId);
-                if (move.ObjectiveTicked || move.StepFinished) await RedrawQuestElementsAsync(stream, questId);
+                if (stream != null && (move.ObjectiveTicked || move.StepFinished))
+                {
+                    await SendMarksAsync(stream, SessionContext.State.MapId);
+                    await RedrawQuestElementsAsync(stream, questId);
+                }
             }
             else
             {
@@ -2204,7 +2271,7 @@ namespace Jondo.Unity.Server.Managers
                     ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
                 if (move.StepFinished) await PayAsync(stream, move.FinishedStep);
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
-                await SendMarksAsync(stream, SessionContext.State.MapId);
+                if (stream != null) await SendMarksAsync(stream, SessionContext.State.MapId);
 
                 // An Almanax offering is made once a day: the day is written down, so the same
                 // quest is not handed out again until the saint comes round next year.
@@ -2240,7 +2307,7 @@ namespace Jondo.Unity.Server.Managers
 
             // And an NPC of the map who speaks on his own once that step is done (the tutorial's
             // voice, idz 3226 then ioc and ios with no iov between).
-            if (move.StepFinished)
+            if (move.StepFinished && stream != null)
                 await Handlers.NpcHandler.PushAfterStepAsync(stream, move.FinishedStep);
         }
 

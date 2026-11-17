@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -8,6 +9,7 @@ using Jondo.Unity.Server.Network;
 using Jondo.Unity.Tests.Economy;
 using Jondo.Unity.World.Fights;
 using Xunit;
+using QuestEngine = Jondo.Unity.Server.Managers.Quests;
 
 namespace Jondo.Unity.Tests.World
 {
@@ -67,6 +69,80 @@ namespace Jondo.Unity.Tests.World
             {
                 Heroes.DisconnectAll(master);
                 SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
+        [Fact]
+        public async Task Quest_sharing_respects_opt_in_and_each_heros_quest_requirements()
+        {
+            const int posterQuest = 1565;
+            const int cellarQuest = 1633, inspectCellar = 9895, lureRat = 9769;
+            const long cellar = 153358340;
+            const int tap = 489505, lemonade = 8543;
+            QuestEngine.Load();
+
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account, "Maestro-" + tag, 8);
+            long optedIn = Character(Account, "Sigue-" + tag, 1);
+            long lowLevel = Character(Account, "Nivel-" + tag, 1);
+            long optedOut = Character(Account, "Solo-" + tag, 1);
+            await using var pipe = await ClientPipe.OpenAsync(Account, master, Map, "Maestro-" + tag);
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, optedIn));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, lowLevel));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, optedOut));
+                Assert.False(Heroes.SetQuestSync(master + 1, optedIn, true));
+                Assert.True(Heroes.SetQuestSync(master, optedIn, true));
+                Assert.True(Heroes.SetQuestSync(master, lowLevel, true));
+
+                var eligible = Heroes.SessionOf(optedIn)!.State;
+                var ineligible = Heroes.SessionOf(lowLevel)!.State;
+                var disabled = Heroes.SessionOf(optedOut)!.State;
+                eligible.CharacterLevel = disabled.CharacterLevel = pipe.Session.State.CharacterLevel = 150;
+
+                using (SessionContext.Push(pipe.Session))
+                {
+                    QuestEngine.LoadFrom(master);
+                    pipe.Session.State.DocumentOpen = true;
+                    await QuestHandler.StartFromDocumentAsync(pipe.ToClient,
+                        ConnectionProtocol.Push("ido", Pb.New().Var(1, posterQuest).Build()));
+
+                    Assert.True(QuestEngine.Log!.Active(posterQuest));
+                    Assert.True(eligible.Quests!.Active(posterQuest));
+                    Assert.False(ineligible.Quests!.Active(posterQuest));
+                    Assert.False(disabled.Quests!.Active(posterQuest));
+
+                    Assert.True(await QuestEngine.StartSharedAsync(pipe.ToClient, cellarQuest));
+                    Assert.True(eligible.Quests.Active(cellarQuest));
+                    Assert.True(ineligible.Quests.Active(cellarQuest));
+                    Assert.True(Heroes.SetQuestSync(master, lowLevel, false));
+                    eligible.MapId = ineligible.MapId = pipe.Session.State.MapId = cellar;
+
+                    Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, cellar, tap));
+                    Assert.True(QuestEngine.Log.ObjectiveDone(inspectCellar));
+                    Assert.True(eligible.Quests.ObjectiveDone(inspectCellar));
+                    Assert.False(ineligible.Quests.ObjectiveDone(inspectCellar));
+
+                    Assert.True(await Equipment.GiveAsync(pipe.ToClient, lemonade, 1));
+                    Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.ToClient, cellar, tap));
+                    Assert.True(QuestEngine.Log.ObjectiveDone(lureRat));
+                    Assert.False(eligible.Quests.ObjectiveDone(lureRat));
+                }
+
+                Assert.True(Heroes.Disconnect(master, optedIn));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, optedIn));
+                Assert.True(Heroes.SharesQuests(optedIn));
+                Assert.True(Heroes.SessionOf(optedIn)!.State.Quests!.ObjectiveDone(inspectCellar));
+            }
+            finally
+            {
+                Heroes.SetQuestSync(master, optedIn, false);
+                Heroes.SetQuestSync(master, lowLevel, false);
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+                foreach (long character in new[] { master, optedIn, lowLevel, optedOut })
+                    DatabaseManager.DeleteCharacter(character, Account);
             }
         }
 

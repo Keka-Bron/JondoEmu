@@ -222,6 +222,7 @@ namespace Heroes
             ["error.off"] = L("El servidor no tiene activado el modo Héroe.", "The server has the hero mode off.", "Le serveur n'a pas activé le mode Héros."),
             ["error.none"] = L("No se puede desconectar ahora.", "It cannot be disconnected now.", "Impossible de le déconnecter maintenant."),
             ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
+            ["hint.quests"] = L("Compartir misiones", "Share quest progress", "Partager la progression des quêtes"),
             ["hint.auto"] = L("Pase automático del turno", "Automatic turn pass", "Passage automatique du tour"),
             ["hint.loot"] = L("Destinatario del botín", "Loot recipient", "Destinataire du butin"),
             ["hint.play"] = L("Tomar el control de este personaje", "Take control of this character", "Prendre la main sur ce personnage"),
@@ -809,7 +810,8 @@ namespace Heroes
                 foreach (var c in all.EnumerateArray())
                     text.Append(';').Append(Long(c, "id")).Append(',').Append(Str(c, "name")).Append(',').Append(Int(c, "level"))
                         .Append(',').Append(Bool(c, "master")).Append(Bool(c, "hero")).Append(Bool(c, "busy")).Append(Bool(c, "inFight"))
-                        .Append(Bool(c, "autoPass")).Append(',').Append(Str(c, "look"));
+                        .Append(Bool(c, "autoPass")).Append(',').Append(Bool(c, "questSync"))
+                        .Append(',').Append(Str(c, "look"));
             return text.ToString();
         }
 
@@ -3039,14 +3041,16 @@ namespace Heroes
             if (!master)
             {
                 bool auto = Bool(who, "autoPass");
-                tools.Add(Hint(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), Glyph(0), auto), "hint.auto"));
+                tools.Add(Hint(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), Glyph(0), auto, height: 20f), "hint.auto"));
+                bool questSync = Bool(who, "questSync");
+                tools.Add(Hint(Toggle(Do(() => Act("heroes/quests", id, new Dictionary<string, object> { ["on"] = questSync ? 0 : 1 })), Glyph(6), questSync, height: 20f), "hint.quests"));
             }
-            tools.Add(Hint(Toggle(Do(() => Act("heroes/loot", id)), Glyph(1), lootTo == id), "hint.loot"));
+            tools.Add(Hint(Toggle(Do(() => Act("heroes/loot", id)), Glyph(1), lootTo == id, height: 20f), "hint.loot"));
             if (!master && !Bool(who, "inFight"))
             {
                 string name = Str(who, "name");
                 VisualElement play = null;
-                play = Toggle(Do(() => TakeInHand(id, name, play)), Glyph(2), false);
+                play = Toggle(Do(() => TakeInHand(id, name, play)), Glyph(2), false, height: 20f);
                 tools.Add(Hint(play, "hint.play"));
             }
             row.Add(tools);
@@ -3172,11 +3176,11 @@ namespace Heroes
             return false;
         }
 
-        private static VisualElement Toggle(Il2CppSystem.Action click, UnityEngine.Texture2D glyph, bool on)
+        private static VisualElement Toggle(Il2CppSystem.Action click, UnityEngine.Texture2D glyph, bool on, float height = 24f)
         {
             var button = new VisualElement();
             button.name = Pressable;
-            button.style.height = new StyleLength(24f);
+            button.style.height = new StyleLength(height);
             button.style.marginTop = button.style.marginBottom = new StyleLength(2f);
             button.style.backgroundColor = new StyleColor(on ? new UnityEngine.Color(0.45f, 0.62f, 0.12f, 1f) : new UnityEngine.Color(0.28f, 0.28f, 0.40f, 1f));
             Round(button, 3f);
@@ -3775,12 +3779,12 @@ namespace Heroes
 
         // ─── The panel's glyphs: a sword, a sack, a «play» ───────────────────────────────
 
-        private static readonly UnityEngine.Texture2D[] _glyphs = new UnityEngine.Texture2D[6];
+        private static readonly UnityEngine.Texture2D[] _glyphs = new UnityEngine.Texture2D[7];
 
         /// <summary>
         /// A glyph, drawn here white with a dark edge: 0 the automatic pass (a sword), 1 the loot
         /// recipient (a tied sack), 2 taking him in hand (a «play»), 3 his bag (a chest), 4 his
-        /// characteristics (three bars), 5 his spells (a star).
+        /// characteristics (three bars), 5 his spells (a star), 6 quest sharing (a checklist).
         /// </summary>
         private static UnityEngine.Texture2D Glyph(int which)
         {
@@ -3799,10 +3803,11 @@ namespace Heroes
                             float d = which switch
                             {
                                 0 => Sword(x, y), 1 => Sack(x, y), 2 => Play(x, y),
-                                3 => Chest(x, y), 4 => Bars(x, y), _ => Star(x, y),
+                                3 => Chest(x, y), 4 => Bars(x, y), 5 => Star(x, y), _ => Box(x, y, 16f, 16f, 10f, 12f),
                             };
                             UnityEngine.Color c;
-                            if ((which == 1 && Knot(x, y)) || (which == 3 && d < -1.1f && ChestLines(x, y))) c = edge;
+                            if ((which == 1 && Knot(x, y)) || (which == 3 && d < -1.1f && ChestLines(x, y))
+                                || (which == 6 && QuestLines(x, y))) c = edge;
                             else if (d < -1.1f) c = UnityEngine.Color.white;
                             else if (d < 0.5f) c = edge;
                             else continue;
@@ -3815,6 +3820,11 @@ namespace Heroes
             texture.hideFlags = UnityEngine.HideFlags.DontUnloadUnusedAsset;
             return _glyphs[which] = texture;
         }
+
+        private static bool QuestLines(float x, float y)
+            => Box(x, y, 16f, 10f, 6f, 1f) < 0f
+               || Capsule(x, y, 11f, 17f, 14f, 21f, 1f) < 0f
+               || Capsule(x, y, 14f, 21f, 21f, 15f, 1f) < 0f;
 
         private static float Circle(float x, float y, float cx, float cy, float r)
             => (float)Math.Sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) - r;

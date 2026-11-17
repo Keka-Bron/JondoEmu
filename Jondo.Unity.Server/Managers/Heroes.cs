@@ -79,6 +79,51 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Whether this fighter is a hero whose turns pass on their own.</summary>
         public static bool PassesOnHisOwn(long characterId) => AsHero(characterId)?.AutoPass == true;
 
+        // Keep the character's choice when it switches between leader and hero.
+        private static readonly ConcurrentDictionary<long, byte> _questSync = new();
+
+        internal static bool SharesQuests(long characterId) => _questSync.ContainsKey(characterId);
+
+        internal static bool SetQuestSync(long masterId, long heroId, bool on)
+        {
+            lock (_lock)
+            {
+                if (AsHero(heroId)?.MasterId != masterId) return false;
+                if (on) _questSync[heroId] = 0;
+                else _questSync.TryRemove(heroId, out _);
+                return true;
+            }
+        }
+
+        internal static async Task ShareQuestActionAsync(Func<GameSession, Task> apply,
+                                                         Func<Hero, bool>? participates = null)
+        {
+            var master = SessionContext.Current;
+            long masterId = master.CharacterId;
+            if (!On || masterId == 0 || AsHero(masterId) != null) return;
+
+            foreach (var hero in Of(masterId))
+            {
+                if (!SharesQuests(hero.CharacterId) || AsHero(hero.CharacterId) != hero || hero.MasterId != masterId)
+                    continue;
+                bool eligible = participates?.Invoke(hero)
+                    ?? (hero.Session.MapId == master.MapId && !hero.Session.State.IsInFight && !master.State.IsInFight);
+                if (!eligible) continue;
+
+                try
+                {
+                    using (SessionContext.Push(hero.Session))
+                        await apply(hero.Session);
+                    if (hero.Session.State.AchievementsPending.Count > 0)
+                        await Achievements.ForHeroAsync(master, hero.Session);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Heroes] Quest sharing failed for {hero.CharacterId}: {ex.Message}");
+                }
+            }
+        }
+
         /// <summary>Each master's heroes, in the order they were connected.</summary>
         private static readonly ConcurrentDictionary<long, List<Hero>> _byMaster = new();
 

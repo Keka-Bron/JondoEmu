@@ -120,11 +120,18 @@ as the list is asked for, and the mod asks for it all along, so they are there a
 
 While a hero is connected, a **group panel** stands at the right of the screen: each member's
 portrait and life (his fighter's in a fight, his resting life outside one), a crown for the master,
-and two switches -- **AUTO**, a hero's turns passed by the server as they come, and **LOOT**, the
-group's items all to that one (each keeps his experience and kamas; `FightHandler.GatherHeroLoot`).
+and switches for passing a hero's turns automatically, sharing quest progress, and choosing who
+receives the group's loot. Everyone keeps their own experience and kamas.
 It folds with its «—» button; the Heroes icon beside it opens the window. Every switch says what it
 does under the pointer, in the game's language, and a portrait shows what a group's tooltip shows of
 a member: class, level, life, AP, MP, initiative, prospecting and wisdom.
+
+**Share quest progress** is the checklist button on each connected hero. It starts eligible
+quests and advances matching objectives when the active character talks to an NPC, uses a
+quest object, discovers a location, or wins a fight the hero joined. Each hero uses their
+own quest log, prerequisites and inventory, and receives their own quest rewards. Actions
+such as crafting and paid or teleporting replies still require playing the character.
+The switch starts off and stays with the character across hero swaps until the server restarts.
 
 Each connected hero's card in the window has three more glyphs -- a chest, three bars, a star --
 that open his bag, his characteristics and his spells, to look at (`POST /api/heroes/sheet { id }`):

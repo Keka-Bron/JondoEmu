@@ -260,6 +260,7 @@ namespace Jondo.Unity.Server
         /// is its own, answered with the empty kld of «abrir libro el escudo de feca y leerlo».
         /// </summary>
         public bool DocumentOpen { get; set; }
+        public int DocumentItemTemplate { get; set; }
 
         /// <summary>
         /// The criminal whose report a jailer was just paid for, so his «Listen carefully» -- one

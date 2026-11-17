@@ -50,7 +50,7 @@ namespace Jondo.Unity.Server.Handlers
             if (document == 0) return false;
             if (!await ItemUseHandler.CriterionHoldsAsync(stream, item)) return true;
 
-            await OpenAsync(stream, document);
+            await OpenAsync(stream, document, item.Template);
 
             // And the objective it validates, when the quest is in hand: reading the recipe.
             foreach (var effect in effects.Where(e => e.EffectId == ObjectiveEffect && e.Value != 0))
@@ -61,9 +61,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>A document opened (kkt { f2 }), its close button awaited.</summary>
-        internal static async Task OpenAsync(NetworkStream stream, int document)
+        internal static async Task OpenAsync(NetworkStream stream, int document, int itemTemplate = 0)
         {
             SessionContext.State.DocumentOpen = true;
+            SessionContext.State.DocumentItemTemplate = itemTemplate;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kkt, Pb.New().Var(2, document).Build()));
         }
@@ -76,6 +77,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!SessionContext.State.DocumentOpen) return false;
             SessionContext.State.DocumentOpen = false;
+            SessionContext.State.DocumentItemTemplate = 0;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kld));
             return true;
         }

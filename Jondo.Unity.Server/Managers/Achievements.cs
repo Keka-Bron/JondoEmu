@@ -537,6 +537,11 @@ namespace Jondo.Unity.Server.Managers
         {
             var log = Log;
             if (log == null) return;
+            if (stream == null)
+            {
+                SessionContext.State.AchievementsPending.UnionWith(candidates);
+                return;
+            }
 
             var earned = log.CheckAll(candidates.Distinct());
             await AnnounceAsync(stream, earned);

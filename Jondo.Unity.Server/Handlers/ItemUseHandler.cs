@@ -381,7 +381,9 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
 
-            if (!await Quests.StartAsync(stream, questId))
+            if (!await Quests.StartSharedAsync(stream, questId, () =>
+                Equipment.HowMany(item.Template) > 0
+                && StartCriterionHolds(criterion, questId, PlayerCriteria.ResolverFor(SessionContext.State.MapId))))
                 Console.WriteLine($"[Items] {SessionContext.State.CharacterName} cannot start quest {questId} with item {item.Template}.");
             return true;
         }

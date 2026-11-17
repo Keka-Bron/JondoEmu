@@ -56,6 +56,7 @@ namespace Jondo.Unity.Server.Network
                         prospecting = stats.Prospecting,
                         wisdom = stats.Wisdom,
                         autoPass = Heroes.PassesOnHisOwn(c.Id),
+                        questSync = heroes.Contains(c.Id) && Heroes.SharesQuests(c.Id),
                         // His look as the game's protocol carries it, on foot: the mod draws him
                         // with the client's own portrait, seated or standing.
                         look = LookOf(c),
@@ -253,6 +254,17 @@ namespace Jondo.Unity.Server.Network
             return Heroes.SetAutoPass(me.State.CharacterId, Numero(cuerpo, "id"), on) ? Bien(new { autoPass = on }) : Mal(409, "none");
         }
 
+        private static Respuesta HeroesQuestSync(string cuerpo, long account)
+        {
+            var me = InTheWorld(account);
+            if (me == null) return Mal(409, "world");
+            using var turn = me.EnterTurnAsync().GetAwaiter().GetResult();
+            bool on = Numero(cuerpo, "on") != 0;
+            return Heroes.SetQuestSync(me.CharacterId, Numero(cuerpo, "id"), on)
+                ? Bien(new { questSync = on })
+                : Mal(409, "none");
+        }
+
         private static Respuesta HeroesLootTo(string cuerpo, long account)
         {
             var me = InTheWorld(account);
@@ -273,6 +285,7 @@ namespace Jondo.Unity.Server.Network
         {
             var me = InTheWorld(account);
             if (me == null) return Mal(409, "world");
+            using var turn = me.EnterTurnAsync().GetAwaiter().GetResult();
             return Heroes.Disconnect(me.State.CharacterId, Numero(cuerpo, "id"))
                 ? Bien(new { disconnected = true })
                 : Mal(409, "none");
