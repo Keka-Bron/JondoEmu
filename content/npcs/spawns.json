@@ -5566,21 +5566,6 @@
       "why": "Aunt Zilda by the apprentice's stall in the fishermen's quarter [-35,-54] (the derived cell 244 is the roof); Dofus pour les noobs («L'ombre et la proie»)."
     },
     {
-      "map": 212598790,
-      "npc": 3009,
-      "cell": 231,
-      "orientation": 3,
-      "why": "Michalem the cat up on the round house's roof with the plush tofu; aunt Zilda's «Subir hasta el miaumiau» (26207) brings him in. Dofus pour les noobs («L'ombre et la proie»): «un chacha s'est approprié un tofu en peluche ayant appartenu à l'eniripsa disparue»."
-    },
-    {
-      "map": 157810688,
-      "npc": 3004,
-      "cell": 343,
-      "orientation": 3,
-      "criterion": "Qo>10146&Qo<10147",
-      "why": "Nabrisa in the dark clearing once the Zampívoro oscuro is beaten, until she follows the character; Dofus pour les noobs («L'ombre et la proie»): «Une fois la bête vaincue, Nabrisa apparait et vous remercie»."
-    },
-    {
       "map": 219152644,
       "npc": 3004,
       "cell": 356,
@@ -5697,6 +5682,146 @@
       "orientation": 3,
       "criterion": "Qa=2170&Qo>16739&Qo<16741",
       "why": "The rescued apprentice back in the distillery (escorted, 16739) until the decree is delivered (16741). INFERRED cell, beside the master."
+    },
+    {
+      "map": 209192199,
+      "npc": 5798,
+      "cell": 344,
+      "orientation": 3,
+      "criterion": "Qo>16714&Qo<16715",
+      "why": "Seijin Zena escorted to the summit of Aerdala [21,-39], from the arrival (16714) until the statue is reached (16715). INFERRED cell."
+    },
+    {
+      "map": 209193219,
+      "npc": 5798,
+      "cell": 332,
+      "orientation": 3,
+      "criterion": "Qo>16715&Qo<16716",
+      "why": "Seijin Zena escorted in front of the statue of the Great Pudah [23,-35] (16715), until the waterfall (16716). INFERRED cell."
+    },
+    {
+      "map": 209192706,
+      "npc": 5798,
+      "cell": 149,
+      "orientation": 3,
+      "criterion": "Qo>16717",
+      "why": "Seijin Zena at the secluded spot [22,-34]: escorted there (16717), meditating until the end and after the quest (the measured placement on cell 149, which the row only gates). Dofus pour les noobs («Questions existentielles»)."
+    },
+    {
+      "map": 209191684,
+      "npc": 5798,
+      "cell": 283,
+      "orientation": 3,
+      "criterion": "Qo<16714",
+      "why": "Seijin Zena at [20,-36], where he gives «Questions existentielles» (givers 209191684) and until the character gets him to the summit (16714). INFERRED cell, moved from 299 (hidden behind the tent) to 283 above the bridge. Dofus pour les noobs («Questions existentielles»)."
+    },
+    {
+      "map": 209192193,
+      "npc": 5798,
+      "cell": 297,
+      "orientation": 3,
+      "criterion": "Qo>16716&Qo<16717",
+      "why": "Seijin Zena escorted to the foot of the waterfall [21,-33] (16716), until the secluded spot (16717). INFERRED cell, moved from 394 (hidden behind a bamboo) to 297 on the path in front of the falls."
+    },
+    {
+      "map": 212598790,
+      "npc": 3009,
+      "cell": 231,
+      "remove": true
+    },
+    {
+      "map": 212598790,
+      "npc": 3009,
+      "cell": 290,
+      "orientation": 3,
+      "why": "Michalem the cat with Nabrisa's plush tofu, on the open ground east of the round house of the fishermen's quarter [-35,-54] (cell 231, north of the house, is drawn behind its roof); aunt Zilda's «Subir hasta el miaumiau» (26207) brings him in. INFERRED cell. Dofus pour les noobs («L'ombre et la proie»): «Parlez à Chalem sur la même map»."
+    },
+    {
+      "map": 156893704,
+      "npc": 3015,
+      "cell": 245,
+      "orientation": 1,
+      "criterion": "(Qf=1666)|Qa=1667|Qf=1667|Qa=1666|Qf=1666|Qa=1665",
+      "why": "The Equipo Turist-A's employee on the isle of Moon's beach [34,12]: the derived layer's cell and quests (1666, 1667), and also while «La sombra del reino» (1665) is in hand, whose «Pregúntale a un agente de viajes por la isla de Moon» (10139) is asked of her (26218). Dofus pour les noobs («L'ombre et la proie»): «Commencez par rencontrer l'agent de voyage en [34,12]»."
+    },
+    {
+      "map": 156894216,
+      "npc": 151,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "(Qf=1667)|Qa=1668|Qf=1668|Qa=1667|Qf=1667|Qa=1665",
+      "why": "Propanzón Crizoe, the lone tourist of the isle of Moon [33,12]: the derived layer's cell and quests (1667, 1668), and also while «La sombra del reino» (1665) is in hand, whose «Pregúntale a un turista solo por la isla de Moon» (10140) is asked of him (26220). Dofus pour les noobs («L'ombre et la proie»): «Allez maintenant voir un touriste esseulé en [33,12] (map de gauche)»."
+    },
+    {
+      "map": 219152384,
+      "npc": 3004,
+      "cell": 302,
+      "orientation": 1,
+      "criterion": "Qo>10148&Qo<10149",
+      "why": "Nabrisa escorted into the palace hall (10148), two steps from Gabi Lan, until he takes her to the conjuration room (10149): «Gracias por escoltarme hasta Bonta... pero siento que mis problemas no han terminado.» (21804). INFERRED cell. Dofus pour les noobs («L'ombre et la proie»): «Retournez au Palais de Bonta en [-36,-60]. Annoncez à Jed Reivrepel que votre mission est un succès»."
+    },
+    {
+      "map": 205520902,
+      "npc": 5602,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "(Qa!2151&Qf!2151)|(Qa=2151&Qo<16389)",
+      "why": "Kykori, forewoman of the Bambusería, in the woodcutters' workshop [24,-29] (205520902, the cell of datos/npc_spawns_derived.json) until the scribe has told of the forged register (16389): then she has left (Takeono's 41274 «Ha salido»), and after «Más leña al fuego» (2151) she is unmasked. Dofus pour les noobs («Sous le bois de sa colère»): «Commencez par aller voir la contremaître de la bambusai Kykori en [24,-29]»."
+    },
+    {
+      "map": 205520902,
+      "npc": 5671,
+      "cell": 316,
+      "orientation": 3,
+      "why": "Takeono, woodcutter of the workshop [24,-29] (205520902; his greeting 40904 «Sin la madera del mango, un hacha no es más que un hierro inútil.»), whom 2151 has the character come back to (16390) and 2154 asks for bamboo. Dofus pour les noobs («Sous le bois de sa colère»): «Retournez à l'atelier des bûcherons en [24,-29] et parlez à Takeono». INFERRED cell: the open floor right of the workbench."
+    },
+    {
+      "map": 206308356,
+      "npc": 5603,
+      "cell": 344,
+      "orientation": 3,
+      "criterion": "Qa=2151&Qo>16388&Qo<16389",
+      "why": "Shoshy (Chochi), the scribe, outside the library [21,-27] (206308356) once the register has been read (16388) until he has spoken (16389). Dofus pour les noobs («Sous le bois de sa colère»): «Soudain le scribe vous fait signe et souhaite vous parler à l'extérieur. Sortez donc de la bibliothèque et parlez à Chochi». INFERRED cell: by the writing table in front of the library."
+    },
+    {
+      "map": 206438914,
+      "npc": 5602,
+      "cell": 344,
+      "orientation": 1,
+      "criterion": "Qa=2151&Qo>16398&Qo<16400",
+      "why": "Kykori on the village's lakeside [18,-29] (206438914), talking with the amakneano, from Kodámade's «Salir de la Bambusería para ir en busca de Kykori.» (16398) until both are beaten (16400). Dofus pour les noobs («Sous le bois de sa colère»): «Rendez-vous en [18,-29] et parlez à Kykori … Soudain la personne avec qui elle discutait vous interpelle». INFERRED cell."
+    },
+    {
+      "map": 206438914,
+      "npc": 5673,
+      "cell": 358,
+      "orientation": 5,
+      "criterion": "Qa=2151&Qo>16398&Qo<16400",
+      "why": "The Negociante amakneano facing Kykori on the lakeside [18,-29] (206438914) from 16398 until both are beaten (16400). Dofus pour les noobs («Sous le bois de sa colère»): «Parlez au Négociant amaknéen». INFERRED cell."
+    },
+    {
+      "map": 207624194,
+      "npc": 5674,
+      "cell": 333,
+      "orientation": 3,
+      "criterion": "Qa=2151&Qo>16401&Qo<16402",
+      "why": "The Daimia's servant in the audience room (207624194), called by her «Agradecerle su ayuda y esperar al sirviente.» (53712, 16401), until he has handed over the sacred bamboo shoot (16402). Dofus pour les noobs («Sous le bois de sa colère»): «Parlez au Serviteur de la Daimya dans la même pièce afin de récupérer la Pousse de bambou sacrée». INFERRED cell, beside the Daimia."
+    },
+    {
+      "map": 205521923,
+      "npc": 5676,
+      "cell": 384,
+      "orientation": 3,
+      "criterion": "Qa=2151&Qo>16403&Qo<16405",
+      "why": "The fallen fruit of the Kudemenju tree at its foot [26,-32] (205521923) once Kodámade has accepted the shoot (16403) until the rotten fruits are crushed (16405). Dofus pour les noobs («Sous le bois de sa colère»): «Rendez-vous en [26,-32] pour parler au Fruit de l'arbre Goroku qui est tombé de l'arbre à force de rire». INFERRED cell: the middle of the walkable clearing."
+    },
+    {
+      "map": 157810688,
+      "npc": 3004,
+      "cell": 343,
+      "orientation": 3,
+      "criterion": "Qo>10146&Qo<10148&PO!17076",
+      "why": "Nabrisa in the dark clearing once the Zampívoro oscuro is beaten, until she is escorted into the palace (10148), and only while she is not following the character (follower item 17076 not carried): she becomes the follower on «Escoltar a Nabrisa» and leaves the clearing; whoever loses her in a fight (its «811: 1 fight left») finds her here again and «Escoltar a Nabrisa» (26203) gives her back. Dofus pour les noobs («L'ombre et la proie»): «Une fois la bête vaincue, Nabrisa apparait et vous remercie» and «Vous obtenez Nabrisa en personnage suiveuse afin de la ramener à la citée Blanche»."
     }
     ]
 }

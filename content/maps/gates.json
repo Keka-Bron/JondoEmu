@@ -27,6 +27,122 @@
       "announce": [0, 1479],
       "drawsState": false,
       "why": "The Giant Kralamoure's lair, [-60,-8] in the Tourbière nauséabonde (dungeon 31). In the game 48 characters stand on the plates of four rooms of Otomai's island ([-52,15], [-49,9], [-56,4], [-55,11]), then one on the plate in front of the lair: «la grille s'ouvre», for about forty minutes (Dofus pour les noobs, dofus-portals). A server of a handful of players never gathers 49, so here the plate in front of the lair opens it alone: a CHOICE, not the game's rule. The plate is cell 376, measured by the player standing on the brown slab. The gate is element 453562, graphic 849, on cell 317: not walkable, and nothing walkable behind it -- it is itself the way in, a passage to the first room in content/interactives/teleports.json, which lets through only while the gate stands open (PlateGates.MayPass). Without this entry it was never declared, so never drawn: the lair looked open and could not be entered. Its opening is announced to the whole server with the client's own «Les portes de l'Antre du Kralamoure Géant se sont ouvertes» (info message type 0, 1479). drawsState false: its element keeps its map drawing, which already looks open; drawn with the open state 1 it stopped being clickable -- the plate opened it and no click came any more --, so the passage itself refuses while it is shut."
+    },
+    {
+      "map": 99094017,
+      "elements": [474834],
+      "obstacles": [],
+      "plates": [343],
+      "openSeconds": 60,
+      "drawsState": false,
+      "why": "Quest 26 step 1, the library's cellar [4,1], first room: Dofus pour les noobs, «Manuscrit de Terra Cogita» «Pour ouvrir ces salles vous devez être minimum 7. Placez vous sur les cases avec un point violet» -- the room's plates 315, 328, 342, 343, 344, 371 and the lever 474833 (graphic 857, cell 330). One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. The way on is element 474834 (graphic 4760 on 273, not walkable): clicked, a passage already in the world's data to 99095041; drawsState false so it stays clickable, and the passage refuses while the gate is shut. INFERRED: 343, the middle plate, as the one."
+    },
+    {
+      "map": 99095041,
+      "elements": [474836, 505304],
+      "obstacles": [256],
+      "plates": [328],
+      "openSeconds": 60,
+      "why": "Quest 26 step 1, the library's cellar, second room: plates 300, 314, 327, 328, 329, 356 and lever 474835 (857 on 382), Dofus pour les noobs, «Manuscrit de Terra Cogita». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. The door is 474836 (graphic 1095) on 256, not walkable while shut; open, 256 walks and its sun 505304 (graphic 3507, same cell) leads to the last room (content/interactives/teleports.json). The sun is a gate element too, so a click on it is refused while shut. INFERRED: 328 as the one plate."
+    },
+    {
+      "map": 88213269,
+      "elements": [473022],
+      "obstacles": [],
+      "plates": [516],
+      "openSeconds": 60,
+      "drawsState": false,
+      "why": "Quest 26 step 2, the cave at [-2,2]: its entrance grille 473022 (graphic 1071 on 256, no walkable cell around it) opens from the flat stone on 516, Dofus pour les noobs, «Manuscrit de Terra Cogita»: «Vous devrez être minimum 10 pour ouvrir toutes les salles». The grille is itself the way in, a passage in teleports.json that lets through only while open, as the Kralamoure's. INFERRED: the stone as the plate."
+    },
+    {
+      "map": 97258013,
+      "elements": [474350, 505268],
+      "obstacles": [270],
+      "plates": [328],
+      "openSeconds": 60,
+      "why": "Quest 26 step 2, the [-2,2] cave's first room: plates 301, 315, 328, 342, 343, 355, 357, 372, 386 and lever 474349 (857 on 272), Dofus pour les noobs, «Manuscrit de Terra Cogita». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. Door 474350 (1095) and its sun 505268 (3507) on 270: open, 270 walks and the sun leads on. INFERRED: 328 as the one plate."
+    },
+    {
+      "map": 97259037,
+      "elements": [474351, 505255],
+      "obstacles": [284],
+      "plates": [327],
+      "openSeconds": 60,
+      "why": "Quest 26 step 2, the [-2,2] cave's second room: plates 300, 314, 327, 341, 342, 354, 356, 371, 385 and lever 474352 (857 on 302), Dofus pour les noobs, «Manuscrit de Terra Cogita». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. Door 474351 (1095) and its sun 505255 (3507) on 284: open, 284 walks and the sun leads to the last room. INFERRED: 327 as the one plate."
+    },
+    {
+      "map": 33818112,
+      "elements": [446295, 503790],
+      "obstacles": [256],
+      "plates": [328],
+      "openSeconds": 60,
+      "why": "Quest 26 step 3, the [-2,-6] cave's first room: the plates «colorié en violet» in an X, 314, 315, 328, 342, 343, and lever 446294 (857 on 244), Dofus pour les noobs, «Manuscrit de Terra Cogita». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. Door 446295 (graphic 844) on 256 shuts the only way to the sun 503790 on 241 (the world's passage to the next room); the sun is a gate element so a click on it waits too. INFERRED: 328, the X's centre."
+    },
+    {
+      "map": 33819648,
+      "elements": [446297, 503785],
+      "obstacles": [283],
+      "plates": [384],
+      "openSeconds": 60,
+      "why": "Quest 26 step 3, the [-2,-6] cave's second room: plates 355, 357, 370, 371, 384, 398, 399, 411, 413 and lever 446296 (857 on 202), Dofus pour les noobs, «Manuscrit de Terra Cogita». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. Door 446297 (844) on 283 shuts the only way to the sun 503785 on 268, the world's passage to the last room. INFERRED: 384, the centre plate."
+    },
+    {
+      "map": 84410368,
+      "elements": [473075],
+      "obstacles": [],
+      "plates": [361],
+      "openSeconds": 60,
+      "drawsState": false,
+      "why": "Quest 26 step 4, the cave at [-6,24]: its grille 473075 (graphic 1071 on 355, no walkable cell around it), Dofus pour les noobs, «Manuscrit de Terra Cogita» «placez vous sur les dalles munies d'un point violet pour ouvrir les grilles». The guide's outdoor plate sits about cell 347, not walkable in this client: INFERRED 361, the nearest walkable cell before the mouth. The grille is itself the way in (teleports.json), letting through only while open."
+    },
+    {
+      "map": 86246410,
+      "elements": [474959, 504424],
+      "obstacles": [213, 199],
+      "plates": [358],
+      "openSeconds": 60,
+      "why": "Quest 26 step 4, the [-6,24] cave's first room: plates 317, 331, 358, 400, 401, 415 and lever 474958 (857 on 245), Dofus pour les noobs, «Manuscrit de Terra Cogita». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. Door 474959 (844) on 213 and, behind it, the sun 504424 (3507) on 199, neither walkable in the client's data: both open with the gate and the sun leads on. INFERRED: 358 as the one plate, 199 opened with the door."
+    },
+    {
+      "map": 86247434,
+      "elements": [474961, 504416],
+      "obstacles": [284, 285],
+      "plates": [342],
+      "openSeconds": 60,
+      "why": "Quest 26 step 4, the [-6,24] cave's second room: plates 300, 315, 342, 383, 384, 399 and lever 474960 (857 on 303), Dofus pour les noobs, «Manuscrit de Terra Cogita». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. Door 474961 (844) on 285; the walk past it to the sun 504416 on 212 (the world's passage to the last room) goes through 284, so both cells open. INFERRED: 284 with the door, 342 as the one plate."
+    },
+    {
+      "map": 104859139,
+      "elements": [477761, 505516],
+      "obstacles": [270],
+      "plates": [358],
+      "openSeconds": 60,
+      "why": "Quest 26 step 5, the bworks' cave at [-6,5], first room: plates 344, 357, 358, 372 and lever 477760 (857 on 232), Dofus pour les noobs, «Manuscrit de Terra Cogita» «placez vous sur les dalles colorié en violet. Prévoyez 5 personnages minimum». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. Door 477761 (1095) and its sun 505516 (3507) on 270. INFERRED: 358 as the one plate."
+    },
+    {
+      "map": 104860163,
+      "elements": [477763, 504473],
+      "obstacles": [255],
+      "plates": [372],
+      "openSeconds": 60,
+      "why": "Quest 26 step 5, the bworks' cave, second room: plates 299, 368, 372, 412 and lever 477762 (857 on 289), Dofus pour les noobs, «Manuscrit de Terra Cogita». One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. Door 477763 (1095) and its sun 504473 (3507) on 255. INFERRED: 372 as the one plate (the four plates read off the guide's picture, medium confidence)."
+    },
+    {
+      "map": 188485128,
+      "elements": [516104],
+      "obstacles": [227],
+      "plates": [285],
+      "openSeconds": 60,
+      "why": "Quest 26 step 6, the giant sudoku room of the Astrub mine [10,-19]: Dofus pour les noobs, «Manuscrit de Terra Cogita» «Il faut placer un personnage sur chacune des cases vide où devrait se trouver le chiffre 9 ... 8 de vos personnages sur les cases rouges et un autre personnage devra activer le levier pour ouvrir la grille en bois» -- the red cells 285, 287, 302, 358, 367, 369, 414, 440 (each completes a row, a column and a box of the drawn grid), lever 516208 on 296. One plate opens it here: the game wants a character on every marked plate at once and another on the lever, a CHOICE for a server of a handful of players, as the Kralamoure's lair. The wooden grille is 516104 (graphic 1095) on 227: open, it walks and leads to the totem room (teleports.json). INFERRED: 285 as the one plate."
+    },
+    {
+      "map": 185862147,
+      "elements": [511509],
+      "obstacles": [],
+      "plates": [319],
+      "openSeconds": 300,
+      "drawsState": false,
+      "why": "Quest 26 step 3, the cave at [-2,-6]: Dofus pour les noobs, «Manuscrit de Terra Cogita»: «Placez un personnage en haut de la colline sur la dalle pour ouvrir la grille à tous vos autres personnages (le personnage en haut de la colline n'aura pas le temps de revenir en bas pour entrer)» -- the slab on the hill, 319. The hill is its own walking zone (the client's linked zone 32, entered from the neighbouring maps), so whoever stands on it must go round to come down: five minutes open, so he may go in himself, a CHOICE (the game wants a second character). The grille is 511509 (graphic 1071) on 240 at the cave mouth, drawn and clicked as the [-2,2] cave's; it is itself the way in (teleports.json) and refuses while shut. The sun 511487 beside it is invisible and could not be clicked in the client."
     }
   ]
 }
