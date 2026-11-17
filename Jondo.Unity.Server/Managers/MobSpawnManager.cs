@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using System.Linq;
+using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Maps;
 
 namespace Jondo.Unity.Server.Managers
@@ -156,6 +159,9 @@ namespace Jondo.Unity.Server.Managers
             /// Blops, five, to a player who comes alone. Zero for any other group.
             /// </summary>
             public int Leaders { get; set; }
+
+            /// <summary>Whether this group can walk around its map outside combat.</summary>
+            internal bool CanRoam { get; init; }
         }
 
         private static Dictionary<int, MonsterData> _monsters = new Dictionary<int, MonsterData>();
@@ -305,7 +311,8 @@ namespace Jondo.Unity.Server.Managers
 
                     var group = new MobGroup {
                         MobId = mobId,
-                        CellId = cellId
+                        CellId = cellId,
+                        CanRoam = true
                     };
 
                     try {
@@ -586,6 +593,7 @@ namespace Jondo.Unity.Server.Managers
                 Members = members,
                 Modular = true,
                 Leaders = bossRoom && dungeon.BossAlone ? members.Count : 0,
+                CanRoam = true,
             };
         }
 
@@ -925,7 +933,8 @@ namespace Jondo.Unity.Server.Managers
             var group = new MobGroup
             {
                 MobId = ActorIds.NuevoMonstruo(),
-                CellId = cellId
+                CellId = cellId,
+                CanRoam = true
             };
 
             int groupSize = _rand.Next(1, 9); // 1 to 8 monsters, just like in Dofus
@@ -1106,6 +1115,7 @@ namespace Jondo.Unity.Server.Managers
             Orientation = group.Orientation,
             Modular = group.Modular,
             Leaders = group.Leaders,
+            CanRoam = group.CanRoam,
             Members = group.Members.Select(m => new MobMember { Monster = m.Monster, GradeIndex = m.GradeIndex, Level = m.Level }).ToList(),
         };
 
@@ -1438,6 +1448,83 @@ namespace Jondo.Unity.Server.Managers
             }
             Console.WriteLine($"[MobSpawnManager] {moved} group(s) of MapMobs moved off cells nobody can stand on.");
             return moved;
+        }
+
+        internal static async Task RoamAsync()
+        {
+            var occupiedMaps = SessionRegistry.InWorld()
+                .Where(SessionRegistry.StandsOnTheMap)
+                .GroupBy(session => session.MapId);
+            foreach (var map in occupiedMaps)
+            {
+                var audience = map.First().Map;
+                if (audience.MapId != map.Key) continue;
+
+                var occupied = map.Where(session => session.MapId == map.Key)
+                    .Select(session => session.State.CellId).ToHashSet();
+                if (occupied.Count == 0) continue;
+                foreach (var movement in WalkGroups(map.Key, occupied))
+                    await audience.SendAsync(
+                        new GameMapMovementEvent(movement.Cells, movement.ActorId, false, Pace: 1),
+                        fightId: 0);
+            }
+        }
+
+        private static List<(long ActorId, List<int> Cells)> WalkGroups(long mapId, HashSet<int> occupied)
+        {
+            var movements = new List<(long ActorId, List<int> Cells)>();
+            // Apply the same movement rules to groups on indoor and outdoor maps.
+            lock (_candado)
+            {
+                if (!_mapMobs.TryGetValue(mapId, out var groups)) return movements;
+                var candidates = groups.Where(g => g.CanRoam && g.Members.Count > 0 &&
+                    !Handlers.FightHandler.IsGroupFighting(g.MobId) && Random.Shared.Next(3) == 0).ToList();
+                if (candidates.Count == 0) return movements;
+
+                if (!MapManager.WalkableCells.TryGetValue(mapId, out var walkable) ||
+                    walkable.Count == 0) return movements;
+
+                // Spawn cells need room on all sides. A walk can use a narrow passage.
+                var npcs = Npcs.CellsOn(mapId);
+                var allowed = walkable.ToHashSet();
+                allowed.ExceptWith(npcs);
+                allowed.ExceptWith(Interactives.ElementsOf(mapId).Where(e => e.Cell != 0).Select(e => e.Cell));
+                allowed.ExceptWith(occupied);
+                allowed.ExceptWith(groups.Select(g => g.CellId));
+
+                foreach (var group in candidates)
+                {
+                    int preferredLength = Random.Shared.Next(2, 6);
+                    var nearby = allowed.Where(cell => MapGeometry.Distance(group.CellId, cell) <= 5).ToHashSet();
+                    var destinations = nearby
+                        .Select(cell => (Cell: cell, Distance: MapGeometry.Distance(group.CellId, cell)))
+                        .Where(target => target.Distance >= 2 &&
+                            npcs.All(npc => MapGeometry.Distance(target.Cell, npc) > NpcClearance))
+                        .OrderBy(target => Math.Abs(target.Distance - preferredLength))
+                        .ThenBy(_ => Random.Shared.Next());
+
+                    var cells = destinations
+                        .Select(target => MapGeometry.FindShortestPath(group.CellId, target.Cell, nearby))
+                        .FirstOrDefault(path => path.Count is >= 3 and <= 6);
+                    if (cells == null) continue;
+
+                    // Groups can animate at the same time, so reserve the full path for this tick.
+                    allowed.ExceptWith(cells);
+                    var (x, y) = MapGeometry.CellToPoint(cells[^2]);
+                    var (lastX, lastY) = MapGeometry.CellToPoint(cells[^1]);
+                    group.Orientation = (lastX - x, lastY - y) switch
+                    {
+                        (1, 0) => 1,
+                        (0, -1) => 3,
+                        (-1, 0) => 5,
+                        _ => 7
+                    };
+                    group.CellId = cells[^1];
+                    movements.Add((group.MobId, cells));
+                }
+            }
+
+            return movements;
         }
 
         public static List<int> GetInnerWalkableCells(long mapId)
