@@ -139,11 +139,31 @@ namespace Jondo.Unity.Server.Managers
             EndFarFromAllies3,
             EndFarFromAllies4,
             BeginOrEndInLineWithEnemy,
+            KardorimSpecial,
+            EnemiesStartAdjacentFromRound2,
+            EnemiesStartInAllySightFromRound2,
+            StartAdjacentToBossFromRound2AndKillBossLast,
+            RataCortadaDamageBetweenTurns,
+            MalaSemillaSummonSecondTurn,
+            LasoberanaEggKilledBeforeNextTurn,
+            RasgabolasMenoresMaxTwoAtBossTurn,
+            EnemySwapsWithAllyBetweenTurns,
+            EveryEnemyUsesNoMpTurnBeforeDeath,
+            MalamebaMustDieBeforeItsTurn,
+            PikabetoAtMostOneKepikaAtTurnEnd,
 
             // Who falls, and when.
             NoEnemyKilledBeforeRound6,
             NobodyKilledBeforeRound6,
             NoEnemySummonKilledByAlly,
+            NoAllySummonKilledByEnemy,
+            IncurableFightersOnlyKill,
+            AtMostTwoEnemyResurrections,
+            BossLastAndBelowHalfForOtherKills,
+            KeepAshiMagariAlive,
+            KeepSummonedScythesAlive,
+            KeepCelestialSummonsAlive,
+            ClearWaveBeforeNextArrival,
 
             // Heals.
             NoHealEnemies,
@@ -158,9 +178,54 @@ namespace Jondo.Unity.Server.Managers
             NoDamageToEnemySummons,
             NoDamageWhileEnemySummons,
             BossUntouchedUntilAlone,
+            MinotauroroUntouchedWhileTofuAlive,
+            DamageInLine,
+            DamageInLineOrDiagonal,
+            DamageOnlyToAdjacentFighters,
+            DamageFarFromAllies,
+            DamageFarFromEnemies,
+            NoEnemyFriendlyFire,
+            MaxiluboThreeHitsPerEnemy,
+            UshOneHitPerEnemyPerRound,
+            OnlyDamageBossUntilItDies,
+            OnlyDamageBossWhileRoyalCarrotIsAlive,
+            NoDamageToCucurbiturrets,
+
+            // Displacement.
+            NoEnemyPushOrPull,
+            NoAllyDisplacement,
+            PasarLaEsponjaEachRound,
+            NoPacifistAllies,
+            EggshellsBeforeThirdTurnAndNoExplosionDamage,
+            NoDamageAfterDisplacingSameTurn,
+            EnemiesDisplacedBeforeDamage,
+            EnemyDisplacedAtMostOncePerTurn,
+            NoHamrackDamageToAllies,
+            NoZombieDisplacementByAllies,
+            NoNearbyZombieKills,
+            NoKaoRocksWhenEnemyDies,
+            NoKawabungaOnAllies,
+            NoDestinosOnAllies,
+            SpiritLanternOnlyOnShogun,
+            NoSpiritLanternCast,
+            NoGuerrilleroDamageToAllies,
+            NoNanoimpatienceV,
+            NoEarlyNecronyx,
+            NoDiseasedAllyDamage,
+            DownfallDamageOnlyToShinLarva,
+            PapaNoesPuppetBeforeBoss,
+            NoLifeLossForDarkliMoonTotems,
+            EachAllyEntersChocomatosis,
+            NoAllyTransformedByTrankitronko,
+            PuppetsKilledInSummonOrder,
+            OnlyKillNanoimpatienceIII,
+            DoNotKillOrDisplaceWarfareWeapons,
         }
 
         /// <summary>Challenge → its rule. The numbers are those of the 3.6.10.10 client's table.</summary>
+        // Ilyzaelle's Special (1085) is still unimplemented. The fight needs Ilyzaelle's own wave schedule.
+        // Bzupervibzor's Special (2090) is still unimplemented. Its boss-specific invulnerability
+        // needs to be modeled so the rule can check it when the second wave arrives.
         private static readonly Dictionary<int, BossRule> _byHand = new()
         {
             [1037] = BossRule.EndInLineWithEnemy,          // Roblenlace
@@ -175,12 +240,32 @@ namespace Jondo.Unity.Server.Managers
             [1061] = BossRule.EndFarFromAllies3,           // Mind my paws
             [1053] = BossRule.EndFarFromAllies4,           // Frozen autonomy
             [1074] = BossRule.BeginOrEndInLineWithEnemy,   // There are people around here
+            [977] = BossRule.KardorimSpecial,
+            [986] = BossRule.EnemiesStartAdjacentFromRound2,
+            [1016] = BossRule.EnemiesStartInAllySightFromRound2,
+            [989] = BossRule.StartAdjacentToBossFromRound2AndKillBossLast,
+            [1021] = BossRule.RataCortadaDamageBetweenTurns,
+            [978] = BossRule.MalaSemillaSummonSecondTurn,
+            [1012] = BossRule.LasoberanaEggKilledBeforeNextTurn,
+            [1020] = BossRule.RasgabolasMenoresMaxTwoAtBossTurn,
+            [1081] = BossRule.EnemySwapsWithAllyBetweenTurns,
+            [1026] = BossRule.EveryEnemyUsesNoMpTurnBeforeDeath,
+            [1077] = BossRule.MalamebaMustDieBeforeItsTurn,
+            [1278] = BossRule.PikabetoAtMostOneKepikaAtTurnEnd,
 
             [525] = BossRule.NoEnemyKilledBeforeRound6,    // Domakuroptimisation
             [528] = BossRule.NobodyKilledBeforeRound6,     // Dorigamisericordia
             [1100] = BossRule.NoEnemySummonKilledByAlly,   // Cascasaur protection
             [1101] = BossRule.NoEnemySummonKilledByAlly,
             [1102] = BossRule.NoEnemySummonKilledByAlly,
+            [1067] = BossRule.NoAllySummonKilledByEnemy,
+            [987] = BossRule.IncurableFightersOnlyKill,
+            [1083] = BossRule.AtMostTwoEnemyResurrections,
+            [988] = BossRule.BossLastAndBelowHalfForOtherKills,
+            [981] = BossRule.KeepAshiMagariAlive,
+            [1091] = BossRule.KeepSummonedScythesAlive,
+            [1097] = BossRule.KeepCelestialSummonsAlive,
+            [1055] = BossRule.ClearWaveBeforeNextArrival,
 
             [980] = BossRule.NoHealEnemies,                // Un milubo en el corral
             [1063] = BossRule.NoHealAllies,                // Allies sent to the future
@@ -207,6 +292,48 @@ namespace Jondo.Unity.Server.Managers
             [1103] = BossRule.NoDamageToEnemySummons,      // Cascasaur protection, Grozilla's
             [1003] = BossRule.NoDamageWhileEnemySummons,   // Real cracks
             [1022] = BossRule.BossUntouchedUntilAlone,     // Ratcovery
+            [1028] = BossRule.MinotauroroUntouchedWhileTofuAlive,
+            [984] = BossRule.DamageInLine,
+            [1075] = BossRule.DamageInLineOrDiagonal,
+            [997] = BossRule.DamageOnlyToAdjacentFighters,
+            [1005] = BossRule.DamageFarFromAllies,
+            [1010] = BossRule.DamageFarFromEnemies,
+            [1029] = BossRule.NoEnemyFriendlyFire,
+            [1015] = BossRule.MaxiluboThreeHitsPerEnemy,
+            [1051] = BossRule.UshOneHitPerEnemyPerRound,
+            [1030] = BossRule.OnlyDamageBossUntilItDies,
+            [1002] = BossRule.OnlyDamageBossWhileRoyalCarrotIsAlive,
+            [1036] = BossRule.NoDamageToCucurbiturrets,
+            [1049] = BossRule.NoEnemyPushOrPull,
+            [1267] = BossRule.NoAllyDisplacement,
+            [979] = BossRule.PasarLaEsponjaEachRound,
+            [1070] = BossRule.NoPacifistAllies,
+            [1072] = BossRule.NoPacifistAllies,
+            [1031] = BossRule.EggshellsBeforeThirdTurnAndNoExplosionDamage,
+            [1032] = BossRule.NoDamageAfterDisplacingSameTurn,
+            [1035] = BossRule.EnemiesDisplacedBeforeDamage,
+            [1038] = BossRule.EnemyDisplacedAtMostOncePerTurn,
+            [1044] = BossRule.NoHamrackDamageToAllies,
+            [1065] = BossRule.NoZombieDisplacementByAllies,
+            [1069] = BossRule.NoNearbyZombieKills,
+            [1406] = BossRule.NoKaoRocksWhenEnemyDies,
+            [1043] = BossRule.NoKawabungaOnAllies,
+            [1048] = BossRule.NoDestinosOnAllies,
+            [1052] = BossRule.SpiritLanternOnlyOnShogun,
+            [1057] = BossRule.NoSpiritLanternCast,
+            [1034] = BossRule.NoGuerrilleroDamageToAllies,
+            [1068] = BossRule.NoNanoimpatienceV,
+            [1086] = BossRule.NoEarlyNecronyx,
+            [1087] = BossRule.NoEarlyNecronyx,
+            [1090] = BossRule.NoDiseasedAllyDamage,
+            [991] = BossRule.DownfallDamageOnlyToShinLarva,
+            [1280] = BossRule.PapaNoesPuppetBeforeBoss,
+            [1018] = BossRule.NoLifeLossForDarkliMoonTotems,
+            [1405] = BossRule.EachAllyEntersChocomatosis,
+            [1014] = BossRule.NoAllyTransformedByTrankitronko,
+            [1019] = BossRule.PuppetsKilledInSummonOrder,
+            [1088] = BossRule.OnlyKillNanoimpatienceIII,
+            [1093] = BossRule.DoNotKillOrDisplaceWarfareWeapons,
         };
 
         /// <summary>"Matar a {0} en último lugar", said only in the description: its own boss, last.</summary>
@@ -288,10 +415,10 @@ namespace Jondo.Unity.Server.Managers
                 }
                 else if (limit.Success) challenge.TurnLimit = int.Parse(limit.Groups[1].Value);
                 else if (byCriterion.TryGetValue(challenge.Completion, out int twin)) challenge.Kind = twin;
+                else if (_byHand.TryGetValue(challenge.Id, out var rule)) challenge.Rule = rule;
                 else if (challenge.Completion == Scripted)
                 {
-                    if (_byHand.TryGetValue(challenge.Id, out var rule)) challenge.Rule = rule;
-                    else if (Array.IndexOf(_killBossLast, challenge.Id) >= 0) challenge.KillLast = challenge.Monsters;
+                    if (Array.IndexOf(_killBossLast, challenge.Id) >= 0) challenge.KillLast = challenge.Monsters;
                     else if (Array.IndexOf(_beforeRound6, challenge.Id) >= 0) challenge.TurnLimit = 6;
                     else if (challenge.Id == InLineWithAlly && watched.ContainsKey(SameLineage)) challenge.Kind = SameLineage;
                     else if (byName.TryGetValue(challenge.Name, out int namesake)) challenge.Kind = namesake;

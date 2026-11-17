@@ -104,18 +104,91 @@ namespace Jondo.Unity.Tests.Content
             Assert.Equal(ChallengeWatcher.MismoLinaje, Challenges.KindOf(1080));
         }
 
+        [Theory]
+        [InlineData(4051, 977)]
+        [InlineData(799, 978)]
+        [InlineData(928, 979)]
+        [InlineData(2975, 981)]
+        [InlineData(800, 984)]
+        [InlineData(6903, 986)]
+        [InlineData(792, 987)]
+        [InlineData(252, 988)]
+        [InlineData(1027, 989)]
+        [InlineData(457, 991)]
+        [InlineData(2960, 997)]
+        [InlineData(180, 1002)]
+        [InlineData(3100, 1005)]
+        [InlineData(173, 1010)]
+        [InlineData(3996, 1012)]
+        [InlineData(670, 1014)]
+        [InlineData(232, 1015)]
+        [InlineData(5819, 1016)]
+        [InlineData(226, 1018)]
+        [InlineData(3476, 1019)]
+        [InlineData(1071, 1020)]
+        [InlineData(940, 1021)]
+        [InlineData(382, 1026)]
+        [InlineData(121, 1028)]
+        [InlineData(3852, 1029)]
+        [InlineData(1188, 1030)]
+        [InlineData(854, 1031)]
+        [InlineData(2854, 1032)]
+        [InlineData(4609, 1034)]
+        [InlineData(3618, 1035)]
+        [InlineData(6256, 1036)]
+        [InlineData(6218, 1038)]
+        [InlineData(943, 1043)]
+        [InlineData(2877, 1044)]
+        [InlineData(827, 1048)]
+        [InlineData(2924, 1049)]
+        [InlineData(4264, 1051)]
+        [InlineData(6388, 1052)]
+        [InlineData(3849, 1055)]
+        [InlineData(6394, 1057)]
+        [InlineData(2942, 1065)]
+        [InlineData(4803, 1067)]
+        [InlineData(7219, 1068)]
+        [InlineData(3409, 1069)]
+        [InlineData(3384, 1070)]
+        [InlineData(3397, 1072)]
+        [InlineData(3648, 1075)]
+        [InlineData(3828, 1077)]
+        [InlineData(4453, 1081)]
+        [InlineData(4744, 1083)]
+        [InlineData(5110, 1086)]
+        [InlineData(5100, 1087)]
+        [InlineData(5319, 1088)]
+        [InlineData(6026, 1090)]
+        [InlineData(5955, 1091)]
+        [InlineData(6014, 1093)]
+        [InlineData(6792, 1097)]
+        [InlineData(3306, 1267)]
+        [InlineData(1179, 1278)]
+        [InlineData(1194, 1280)]
+        [InlineData(5653, 1405)]
+        [InlineData(5666, 1406)]
+        public void Supported_specials_are_imposed_in_their_boss_fights(int bossId, int specialId)
+        {
+            Load();
+
+            Assert.Contains(Challenges.Imposed(new[] { bossId }, new int[0], 2, 4),
+                            challenge => challenge.Id == specialId);
+            Assert.DoesNotContain(Challenges.Imposed(new[] { bossId }, new[] { specialId }, 2, 4),
+                                  challenge => challenge.Id == specialId);
+        }
+
         [Fact]
-        public void Every_hand_wired_challenge_is_a_scripted_boss_challenge()
+        public void Every_hand_wired_challenge_has_its_expected_boss_criterion()
         {
             if (!Available) return;
             Load();
 
-            // A hand-wired id that is not "Ma=1" in the table would be silently ignored: this
-            // is what catches a typo in the list, or a table that moved under it.
+            // Catch mistyped ids and changes to the challenge catalogue.
             foreach (int id in Challenges.HandWired)
             {
                 var reto = Challenges.Get(id);
-                Assert.True(reto != null && reto.NeedsMonster && reto.Completion == "Ma=1" && reto.Judged,
+                string criterion = id == 1030 ? "CK#1188,1&Ma=1" : "Ma=1";
+                Assert.True(reto != null && reto.NeedsMonster && reto.Completion == criterion && reto.Judged,
                             $"challenge {id}");
             }
         }
