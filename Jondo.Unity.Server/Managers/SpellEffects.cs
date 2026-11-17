@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
@@ -219,6 +220,9 @@ namespace Jondo.Unity.Server.Managers
         {
             Jondo.Unity.World.Fights.Buffs.UidDeLaPila = StackUidOf;
             Jondo.Unity.World.Fights.Buffs.DispellableOfItsRow = row => DispellableOf(row.HechizoOrigen, row.NivelOrigen, row.EffectUid);
+            Jondo.Unity.World.Fights.Buffs.HookOutlivesItsCaster = hook =>
+                hook.Filas is { Count: > 0 } rows
+                && rows.All(uid => DispellableOf(hook.Hechizo, hook.Grado, uid) >= Jondo.Unity.World.Fights.Buffs.DispellableByStrongDispelOnly);
         }
 
         /// <summary>

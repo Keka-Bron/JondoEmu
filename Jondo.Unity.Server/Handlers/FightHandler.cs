@@ -6469,11 +6469,20 @@ namespace Jondo.Unity.Server.Handlers
         /// <param name="critico">Whether the cast was critical: the hook fires with the critical lists.</param>
         /// <param name="throughPortal">Whether the cast went through portals: the hook's rows go off as its rows would.</param>
         /// <param name="offATrigger">Whether this ran off a trigger: each occurrence hooks once more, up to the spell's cap.</param>
+        /// <param name="inItsCastersTurn">
+        /// Whether the cast is made in its caster's own turn. Only then does a hook of its rows' own
+        /// duration last up to his turn in its last round
+        /// (<see cref="Jondo.Unity.World.Fights.Buffs.ActiveSpell.FallsAtItsCastersTurn"/>): a
+        /// reaction in somebody else's turn falls at its last round's start, as before, which
+        /// is where a buff of the same reaction, shortened by <see cref="AguantaSuTurno"/>, is gone
+        /// too -- the Kílerat's poison on a hit, three ticks and not four.
+        /// </param>
         internal static void EngancharLoPendiente(List<Managers.Outcome> consecuencias,
                                                   int hechizo, int grado, long lanzador, int ronda,
                                                   bool incluirElPropio = true, bool critico = false,
                                                   bool conducta = false, bool throughPortal = false,
-                                                  bool offATrigger = false, int celda = -1)
+                                                  bool offATrigger = false, int celda = -1,
+                                                  bool inItsCastersTurn = true)
         {
             // Off a trigger, every occurrence is a cast of its own, and what it hooks piles up to
             // the spell's maxStack (-1: no cap) once per bearer: Remanencia's "por cada PM que
@@ -6524,7 +6533,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico,
-                                                 fallsAtItsCastersTurn: hasta >= 0 && hasta == byOwnDuration);
+                                                 fallsAtItsCastersTurn: inItsCastersTurn && hasta >= 0 && hasta == byOwnDuration);
             }
 
             // Every spell this cast ran that still has rows under a trigger, AT ITS GRADE: one
@@ -7988,7 +7997,9 @@ namespace Jondo.Unity.Server.Handlers
             EngancharLoPendiente(consecuencias, hechizo, grado, quienLanza.Id, fight.RoundNumber,
                                  incluirElPropio: alLanzar, critico: critico, conducta: conducta,
                                  throughPortal: fight.CastThroughPortal, offATrigger: !alLanzar,
-                                 celda: celdaApuntada);
+                                 celda: celdaApuntada,
+                                 inItsCastersTurn: fight.CurrentFighter == null
+                                                   || ItsCastersTurnHasCome(fight, fight.CurrentFighter, quienLanza.Id));
 
             var fichas = new HashSet<(long Quien, int Caracteristica)>();
             var vidasCambiadas = new Dictionary<long, Fighter>();
@@ -8839,6 +8850,10 @@ namespace Jondo.Unity.Server.Handlers
                         && !c.Sobre.Buffs.TieneEstado(quitado.Estado))
                         Disparo(c.Sobre, Managers.EffectEngine.AlQuitarseElEstado(quitado.Estado), quienLanza);
                     if (quitado.Apariencia != 0) quitaApariencia = true;
+                    // A shield row taken -- a dispel of the Ecaflip's Castillo de Naipes -- takes
+                    // its points with it (Buffs.AlIrse), and the sheet has to say so.
+                    if (quitado.EffectId == Managers.EffectEngine.ShieldPanelEffect)
+                        fichas.Add((c.Sobre.Id, Managers.EffectEngine.ShieldCharacteristic));
                     if (quitado.Caracteristica != 0 &&
                         quitado.Caracteristica != ActionPointsCharacteristic &&
                         quitado.Caracteristica != MovementPointsCharacteristic)

@@ -434,7 +434,9 @@ namespace Jondo.Unity.World.Fights
             var quitados = _puestos.FindAll(goes);
             _puestos.RemoveAll(goes);
             SeVan(quitados);
-            ActiveSpells.RemoveAll(e => e.Lanzador == quien);
+            // A hook goes with him as its rows would: on a death, the hooks whose every row outlives
+            // its caster stay (HookOutlivesItsCaster), or a state that stays would lose its switch.
+            ActiveSpells.RemoveAll(e => e.Lanzador == quien && (outlivesHim == null || !HookOutlivesItsCaster(e)));
             foreach (var quitado in quitados)
             {
                 if (quitado.Estado == 0 || quitado.EffectId == Jondo.Unity.World.Combat.EffectSupport.DisableState) continue;
@@ -598,6 +600,15 @@ namespace Jondo.Unity.World.Fights
         /// the server's spell catalogue; <see cref="Poner"/> asks it for every row put without one.
         /// </summary>
         public static Func<Buff, int> DispellableOfItsRow { get; set; } = _ => 0;
+
+        /// <summary>
+        /// Whether an armed hook stays when its caster dies: every row it holds is a 3 or a 4, as
+        /// <see cref="OutlivesItsCaster"/> keeps a row. Mizz Frizz's opening spell (3517) puts her
+        /// allies' Invulnerabilidad Glacial (935) and arms on everybody the push hook (793 11943)
+        /// that switches it off, both 3s: kill her first, and the state without its hook would hold
+        /// for good. Set by the server's spell catalogue; a hook of no listed rows goes.
+        /// </summary>
+        public static Func<ActiveSpell, bool> HookOutlivesItsCaster { get; set; } = _ => false;
 
         /// <summary>
         /// Takes off every row that can be dispelled (<see cref="TakenByADispel"/>) and the states
