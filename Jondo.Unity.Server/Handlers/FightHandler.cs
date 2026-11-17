@@ -10993,6 +10993,16 @@ namespace Jondo.Unity.Server.Handlers
                     ? allyRows.Select(e => e.TargetMask ?? "").Distinct().ToList()
                     : new List<string>();
 
+                // A blow that spares its own side and sets a state on one of its side it names: the
+                // state is the point, the blow comes with it. Ben el Ripata's Hamrack has Timonel
+                // (2618) for its one move, aimed at Ben beside it: it takes his invulnerability (952
+                // 56) and gives him 276, hurts the enemies round him and kills the Hamrack. Weighed
+                // as a blow, it was thrown at a character and the Hamrack died for nothing.
+                bool namedAllyStep = damages && !hurtsAllies && utilityAllyMasks.Count > 0
+                                     && allyRows.Any(e => e.EffectId is Jondo.Unity.World.Combat.EffectSupport.AddState
+                                                                     or Jondo.Unity.World.Combat.EffectSupport.RemoveState
+                                                                     or Jondo.Unity.World.Combat.EffectSupport.DisableState);
+
                 spells.Add(new Managers.MonsterTactics.Spell
                 {
                     Id = spell,
@@ -11024,8 +11034,9 @@ namespace Jondo.Unity.Server.Handlers
                     ThroughPortals = (limits.Flags & Managers.SpellLevelFlags.PortalProjectionForbidden) == 0
                                      && !Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.DesactivaUnPortal),
                     Interval = limits.Intervalo,
-                    Utility = !damages && heal == 0 && removal == 0 && buff == 0 && !summons && mechanics
+                    Utility = (!damages && heal == 0 && removal == 0 && buff == 0 && !summons && mechanics) || namedAllyStep
                         ? 25 + monster.Level / 10.0 : 0,
+                    NamedAllyStep = namedAllyStep,
                     UtilityOnEnemies = mechanicsOnEnemies,
                     // A class spell -- a JondoBot's -- is weighed row by row, as the engine reads it;
                     // and so is a monster's that only hides its own side (HidesItsSideOnly).

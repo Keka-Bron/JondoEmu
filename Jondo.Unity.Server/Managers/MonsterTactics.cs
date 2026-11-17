@@ -131,7 +131,13 @@ namespace Jondo.Unity.Server.Managers
             /// Whether those masks put a condition on the caster: a step of the boss's own script,
             /// cast when its state says so and before anything else of the turn.
             /// </summary>
-            public bool UtilityScripted => UtilityAllyMasks.Any(mask => mask.Contains('*'));
+            public bool UtilityScripted => NamedAllyStep || UtilityAllyMasks.Any(mask => mask.Contains('*'));
+
+            /// <summary>
+            /// A blow that spares its own side with a state for one of its side it names on the aimed
+            /// cell: aimed at that one, as a step of the boss's script, and the blow round him on top.
+            /// </summary>
+            public bool NamedAllyStep { get; init; }
 
             /// <summary>The level asks for a free cell: a leap lands NEXT to its target, never on him.</summary>
             public bool NeedsFreeCell { get; init; }
@@ -901,7 +907,13 @@ namespace Jondo.Unity.Server.Managers
             // A spell that hurts whoever stands on the aimed cell is never aimed at one of its
             // own, whatever else it gives: the JondoBot's Bumerán Pérfido "buffed" its own summon
             // to death.
-            if (!onEnemy && target != monster && spell.Damage > 0 && Hit(spell, from, aim, target)) return 0;
+            bool namedAlly = spell.NamedAllyStep && !onEnemy && target != monster && spell.UtilityReaches(monster, target);
+            if (!onEnemy && target != monster && spell.Damage > 0 && Hit(spell, from, aim, target) && !namedAlly) return 0;
+
+            // Aimed at the one of its side it names, the blow lands round him on the enemies only.
+            if (namedAlly && spell.Damage > 0)
+                foreach (var hit in enemies.Where(e => Hit(spell, from, aim, e)))
+                    value += Worth(spell, monster, hit);
 
             if (spell.Damage > 0 && (onEnemy || spell.OnSelf))
             {
