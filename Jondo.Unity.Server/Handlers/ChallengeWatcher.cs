@@ -41,7 +41,7 @@ namespace Jondo.Unity.Server.Handlers
     /// offers. «Asesino a sueldo» (35) is watched: its target goes through the <c>kwm</c> and a new
     /// one is pointed out as each falls.
     /// </summary>
-    public static class ChallengeWatcher
+    public static partial class ChallengeWatcher
     {
         // The ones this watcher knows how to follow. The rest are not offered.
         public const int Primero = 3;
@@ -167,6 +167,11 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     foreach (var ally in fight.Azul) notes.StartCells[ally.Id] = ally.CellId;
                 }
+                if (RuleInPlay(fight, Challenges.BossRule.EachAllyEntersChocomatosis))
+                    notes.AlliesWithoutChocomatosis ??= fight.Azul
+                        .Where(ally => !ally.EsInvocado && !ally.IsMonster)
+                        .Select(ally => ally.Id)
+                        .ToHashSet();
             }
 
             foreach (int reto in SenalanAlEmpezar)
@@ -186,6 +191,7 @@ namespace Jondo.Unity.Server.Handlers
             fight.TurnTackledMp = 0;
             fight.KillCells.Clear();
             Notes(fight).TurnKills = 0;
+            Notes(fight).MaxiluboHits?.Clear();
 
             // "Hay gente por aquí" lets one choose: begin OR end the turn in line with an enemy.
             if (quien.TeamId == 0 && fight.ChallengesFixed.Count > 0)
@@ -200,6 +206,8 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static async Task RoundStartedAsync(NetworkStream stream, FightInstance fight)
         {
+            await EarlySpecialRoundStartedAsync(stream, fight, fight.RoundNumber - 1);
+
             // A boss's "Dúo", "Trío" and "Crono": win in FEWER than N turns. Once round N begins
             // it can no longer be done, and it is said then, which is when it happens.
             foreach (var (id, _) in fight.ChallengesFixed.ToArray())
@@ -234,6 +242,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (quien.TeamId != 0 || !Alguno(fight)) return;
 
+            MidSpecialAllyTurnStarted(fight, quien);
+
             if (fight.RoundNumber >= 2)
             {
                 foreach (int id in WithRule(fight, Challenges.BossRule.StartAdjacentToBossFromRound2AndKillBossLast))
@@ -265,6 +275,9 @@ namespace Jondo.Unity.Server.Handlers
             if (!Alguno(fight)) return;
             if (quien.TeamId != 0)
             {
+                await EarlySpecialTurnEndedAsync(stream, fight, quien);
+                LateSpecialEnemyTurnEnded(fight, quien);
+                MidSpecialEnemyTurnEnded(fight, quien);
                 if (quien.MonsterId == Kardorim && quien.IsAlive &&
                     (Adyacente(fight, quien, 0) || Adyacente(fight, quien, 1)))
                 {
@@ -404,6 +417,10 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!Alguno(fight) || enemigo.TeamId == 0) return;
 
+            await EarlySpecialEnemyTurnStartedAsync(stream, fight, enemigo);
+            await LateSpecialEnemyTurnStartedAsync(stream, fight, enemigo);
+            await MidSpecialEnemyTurnStartedAsync(stream, fight, enemigo);
+
             if (fight.RoundNumber >= 2 && enemigo.IsAlive && AnyRule(fight))
             {
                 if (!Adyacente(fight, enemigo, 0) && !Adyacente(fight, enemigo, 1))
@@ -439,12 +456,27 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!Alguno(fight)) return;
 
+            if (quien.TeamId == 1 && quienPega is { TeamId: 0 } && (cuanto > 0 || shieldLoss > 0))
+            {
+                await CountSpecialDamageLinesAsync(stream, fight, quienPega, quien);
+                await CheckDiseaseDamageAsync(stream, fight, quienPega, quien);
+
+                // Hundimiento (506) applies 4256, which Special spell 25955 checks on the attacker.
+                if (quien.MonsterId != 457 && quienPega.Buffs.TieneEstado(4256))
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.DownfallDamageOnlyToShinLarva,
+                                         $"{quienPega.Name} damages another enemy while affected by Downfall");
+            }
+
             if (quien.TeamId == 1 && quien.MonsterId == Chadarib && (cuanto > 0 || shieldLoss > 0))
                 await BreakRuleAsync(stream, fight, Challenges.BossRule.KardorimSpecial,
                                      $"{quien.Name} takes damage");
             if (cuanto <= 0) return;
 
+            EarlySpecialEnemyDamaged(fight, quien, cuanto);
+            await TotemLifeLostAsync(stream, fight, quien);
+            await MidSpecialDamageAsync(stream, fight, quien, quienPega);
             await BossDamageAsync(stream, fight, quien, quienPega, elemento);
+            await EarlySpecialBossDamagedAsync(stream, fight, quien, cuanto);
 
             if (quien.TeamId == 0)
             {
@@ -491,10 +523,52 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Push damage travels with no element: that is how the fight sends it.</summary>
         private const int PushElement = -1;
 
+        private static async Task CountSpecialDamageLinesAsync(NetworkStream stream, FightInstance fight,
+                                                                Fighter source, Fighter target)
+        {
+            await CountMaxiluboHitAsync(stream, fight, source, target);
+
+            if (RuleInPlay(fight, Challenges.BossRule.UshOneHitPerEnemyPerRound))
+            {
+                var rounds = Notes(fight).UshLastHitRound ??= new();
+                if (rounds.TryGetValue(target.Id, out int lastRound) && lastRound == fight.RoundNumber)
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.UshOneHitPerEnemyPerRound,
+                                         $"{target.Name} takes another hit in round {lastRound}");
+                rounds[target.Id] = fight.RoundNumber;
+            }
+        }
+
+        internal static async Task CountMaxiluboHitAsync(NetworkStream stream, FightInstance fight,
+                                                          Fighter source, Fighter target)
+        {
+            if (source.TeamId != 0 || target.TeamId != 1
+                || !RuleInPlay(fight, Challenges.BossRule.MaxiluboThreeHitsPerEnemy)) return;
+            var hits = Notes(fight).MaxiluboHits ??= new();
+            var pair = (source.Id, target.Id);
+            int count = hits.GetValueOrDefault(pair) + 1;
+            hits[pair] = count;
+            if (count > 3)
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.MaxiluboThreeHitsPerEnemy,
+                                     $"{source.Name} hits {target.Name} more than three times in a turn");
+        }
+
+        internal static Task AppearanceChangedAsync(NetworkStream stream, FightInstance fight, Fighter target,
+                                                    int spell, int appearance)
+        {
+            // Soplido del Trankitronko (607) applies the Jalatrancueva appearance (876).
+            if (target.TeamId != 0 || spell != 607 || appearance != 876) return Task.CompletedTask;
+            return BreakRuleAsync(stream, fight, Challenges.BossRule.NoAllyTransformedByTrankitronko,
+                                  $"{target.Name} is transformed into a Jalatrancueva");
+        }
+
         public static async Task DisplacedAsync(NetworkStream stream, FightInstance fight, Fighter target,
                                                 Fighter source, bool pushed = false, bool pulled = false)
         {
             if (!Alguno(fight)) return;
+
+            EarlySpecialDisplaced(fight, target, pushed, pulled);
+            await MidSpecialDisplacedAsync(stream, fight, target, source);
+            await WarWeaponDisplacedAsync(stream, fight, target, source);
 
             if (target.TeamId == 0 && target != source)
                 await BreakRuleAsync(stream, fight, Challenges.BossRule.NoAllyDisplacement,
@@ -754,6 +828,13 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!Alguno(fight) || victima.TeamId == 0) return;
 
+            await EarlySpecialMonsterDiedAsync(stream, fight, victima);
+            await EarlySpecialDiedAsync(stream, fight, victima, quienRemata);
+            await PuppetDiedAsync(stream, fight, victima);
+            await DazahkAndWarEnemyDiedAsync(stream, fight, victima, quienRemata);
+            await MidSpecialZombieEnemyDiedAsync(stream, fight, victima, victima.Buffs.TieneEstado(74));
+            await MidSpecialKaoEnemyDiedAsync(stream, fight, victima);
+
             fight.Wounded.Remove(victima.Id);
             fight.KilledOnRound[victima.Id] = fight.RoundNumber;
             if (quienRemata != null && quienRemata.TeamId == 0)
@@ -977,6 +1058,12 @@ namespace Jondo.Unity.Server.Handlers
             var end = new EndVerdict();
             _ends[fight.FightId] = end;
 
+            if (won && Notes(fight).AlliesWithoutChocomatosis is { Count: > 0 })
+            {
+                foreach (int id in WithRule(fight, Challenges.BossRule.EachAllyEntersChocomatosis))
+                    await BreakOneAsync(stream, fight, id, "an ally never entered Chocomatosis", record: end.Frames);
+            }
+
             // These two can only be judged at the end, because until it is over it cannot be known.
 
             // Distribution: every ally has to have finished somebody off.
@@ -1093,6 +1180,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The fight is over for everybody: its verdicts go.</summary>
         public static void Forget(FightInstance fight)
         {
+            ForgetMidSpecials(fight);
             _ends.TryRemove(fight.FightId, out _);
             _notes.TryRemove(fight.FightId, out _);
         }
@@ -1116,6 +1204,10 @@ namespace Jondo.Unity.Server.Handlers
 
             /// <summary>The kills of whoever plays, in this turn: Two for one.</summary>
             public int TurnKills { get; set; }
+
+            public Dictionary<(long Source, long Target), int>? MaxiluboHits { get; set; }
+            public Dictionary<long, int>? UshLastHitRound { get; set; }
+            public HashSet<long>? AlliesWithoutChocomatosis { get; set; }
         }
 
         private static readonly ConcurrentDictionary<long, FightNotes> _notes = new ConcurrentDictionary<long, FightNotes>();
@@ -1133,6 +1225,10 @@ namespace Jondo.Unity.Server.Handlers
             }
             return found;
         }
+
+        private static bool RuleInPlay(FightInstance fight, Challenges.BossRule rule)
+            => fight.ChallengesFixed.Any(challenge => !fight.ChallengesBroken.Contains(challenge.Id)
+                && Challenges.Get(challenge.Id)?.Rule == rule);
 
         /// <summary>Whether one with a boss rule is still in play: so as not to work things out for nothing.</summary>
         private static bool AnyRule(FightInstance fight)

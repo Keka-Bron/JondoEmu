@@ -158,9 +158,14 @@ Boss rooms impose the achievement challenges that the fight can judge for the mo
 Kardorim's Special checks the boss's position at the end of its turn and protects its Chadaribs
 from damage and pushback.
 
-Across the 130 achievements titled “(especial)” in the 3.6.10.10 client catalogue, 53 have both a
-fight rule and a matching boss in the emulator's dungeon data. Of the rest, 73 need complete fight
+Across the 136 achievements titled “(especial)” in the 3.6.10.10 client catalogue, 100 have both a
+fight rule and a matching boss in the emulator's dungeon data. Of the rest, 32 need complete fight
 rules, and the four Grozilla and Grasmera variants have rules but lack matching dungeon boss entries.
+The extracted spell data contains the original Special scripts. Their failure effects carry the
+challenge ID, and their trigger and target fields identify conditions such as state entry and
+specific monster templates. Some checks still need engine support, including ability-linked targets,
+failed displacement attempts, and the encounter-specific waves or invulnerability in Ilyzaelle and
+Bzupervibzor.
 
 Already implemented:
 - the guardian's replies: only the key's and the keyring's let one in (`DungeonHandler.DoorReplies`,

@@ -236,5 +236,271 @@ namespace Jondo.Unity.Tests.Combat
 
             Assert.Equal(broken, fight.ChallengesBroken.Contains(special));
         }
+
+        [Fact]
+        public async Task Maxilubo_counts_damage_lines_per_attacker_and_enemy_on_each_turn()
+        {
+            Load();
+            const int special = 1015;
+            const long characterId = 8_960_100_091;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, first, second, enemy) = Fight(special, characterId - 1);
+
+            try
+            {
+                for (int i = 0; i < 3; i++)
+                    await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, enemy, 10, first, 1);
+                await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, fight.Rojo[1], 10, first, 1);
+                await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, enemy, 10, second, 1);
+                Assert.DoesNotContain(special, fight.ChallengesBroken);
+
+                ChallengeWatcher.TurnStarted(fight, first);
+                for (int i = 0; i < 3; i++)
+                    await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, enemy, 10, first, 1);
+                Assert.DoesNotContain(special, fight.ChallengesBroken);
+                await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, enemy, 0, first, 1, shieldLoss: 10);
+                Assert.Contains(special, fight.ChallengesBroken);
+            }
+            finally { ChallengeWatcher.Forget(fight); }
+        }
+
+        [Fact]
+        public async Task Ush_counts_damage_across_allied_turns_in_the_same_round()
+        {
+            Load();
+            const int special = 1051;
+            const long characterId = 8_960_100_101;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, first, second, enemy) = Fight(special, characterId - 1);
+            fight.StartFight();
+
+            try
+            {
+                await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, enemy, 10, first, 1);
+                int firstRound = fight.RoundNumber;
+                for (int i = 0; i < fight.TurnOrder.Count; i++) fight.NextTurn();
+                Assert.Equal(firstRound + 1, fight.RoundNumber);
+                await ChallengeWatcher.RoundStartedAsync(pipe.ToClient, fight);
+
+                await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, enemy, 10, first, 1);
+                Assert.DoesNotContain(special, fight.ChallengesBroken);
+                ChallengeWatcher.TurnStarted(fight, second);
+                await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, enemy, 10, second, 1);
+                Assert.Contains(special, fight.ChallengesBroken);
+            }
+            finally { ChallengeWatcher.Forget(fight); }
+        }
+
+        [Fact]
+        public async Task Hungry_Sunflower_summons_get_one_turn_each()
+        {
+            Load();
+            const int special = 978;
+            const long characterId = 8_960_100_111;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, _, _, sunflower) = Fight(special, characterId - 1);
+            sunflower.MonsterId = 799;
+            var first = fight.Rojo[1];
+            first.Invocador = sunflower.Id;
+            var second = new Fighter { Id = -3, TeamId = 1, Invocador = sunflower.Id, CurrentHP = 100 };
+            fight.AddMonster(second);
+
+            await ChallengeWatcher.EnemyTurnStartedAsync(pipe.ToClient, fight, first);
+            await ChallengeWatcher.EnemyTurnStartedAsync(pipe.ToClient, fight, second);
+            Assert.DoesNotContain(special, fight.ChallengesBroken);
+            await ChallengeWatcher.EnemyTurnStartedAsync(pipe.ToClient, fight, first);
+            Assert.Contains(special, fight.ChallengesBroken);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Mob_Lasponja_must_be_pushed_or_pulled_in_the_round_it_dies(bool pushed)
+        {
+            Load();
+            const int special = 979;
+            long characterId = pushed ? 8_960_100_121 : 8_960_100_131;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, ally, _, boss) = Fight(special, characterId - 1);
+            boss.MonsterId = 928;
+            fight.StartFight();
+            for (int i = 0; i < fight.TurnOrder.Count; i++) fight.NextTurn();
+            Assert.Equal(2, fight.RoundNumber);
+
+            try
+            {
+                await ChallengeWatcher.DisplacedAsync(pipe.ToClient, fight, boss, ally, pushed: pushed);
+                boss.CurrentHP = 0;
+                await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, boss, false, ally);
+                Assert.Equal(!pushed, fight.ChallengesBroken.Contains(special));
+            }
+            finally { ChallengeWatcher.Forget(fight); }
+        }
+
+        [Fact]
+        public async Task Cocabulia_counts_turn_starts_for_its_actual_shells()
+        {
+            Load();
+            const int special = 1031;
+            const long characterId = 8_960_100_141;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, _, _, boss) = Fight(special, characterId - 1);
+            boss.MonsterId = 854;
+            var shell = fight.Rojo[1];
+            shell.MonsterId = 5815;
+
+            try
+            {
+                for (int i = 0; i < 3; i++)
+                    await ChallengeWatcher.EnemyTurnStartedAsync(pipe.ToClient, fight, boss);
+                for (int i = 0; i < 2; i++)
+                    await ChallengeWatcher.EnemyTurnStartedAsync(pipe.ToClient, fight, shell);
+                Assert.DoesNotContain(special, fight.ChallengesBroken);
+                await ChallengeWatcher.EnemyTurnStartedAsync(pipe.ToClient, fight, shell);
+                Assert.Contains(special, fight.ChallengesBroken);
+            }
+            finally { ChallengeWatcher.Forget(fight); }
+        }
+
+        [Theory]
+        [InlineData(5499, true)]
+        [InlineData(1191, false)]
+        public async Task Papa_No_es_requires_a_puppet_before_the_boss(int templateId, bool broken)
+        {
+            Load();
+            const int special = 1280;
+            long characterId = 8_960_100_150 + templateId;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, ally, _, boss) = Fight(special, characterId - 1);
+            boss.MonsterId = 1194;
+            var other = fight.Rojo[1];
+            other.MonsterId = templateId;
+            other.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, other, false, ally);
+            boss.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, boss, false, ally);
+            Assert.Equal(broken, fight.ChallengesBroken.Contains(special));
+        }
+
+        [Fact]
+        public async Task Necronyx_checks_enemy_state_entry_only_while_the_boss_is_alive()
+        {
+            Load();
+            const int special = 1086;
+            const long characterId = 8_960_100_161;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, ally, _, boss) = Fight(special, characterId - 1);
+            boss.MonsterId = 5110;
+            var other = fight.Rojo[1];
+
+            await ChallengeWatcher.LateSpecialStateAddedAsync(pipe.ToClient, fight, ally, 571);
+            await ChallengeWatcher.LateSpecialStateAddedAsync(pipe.ToClient, fight, boss, 571);
+            Assert.DoesNotContain(special, fight.ChallengesBroken);
+            await ChallengeWatcher.LateSpecialStateAddedAsync(pipe.ToClient, fight, other, 571);
+            Assert.Contains(special, fight.ChallengesBroken);
+
+            var (after, _, _, defeatedBoss) = Fight(special, characterId + 1);
+            defeatedBoss.MonsterId = 5110;
+            defeatedBoss.CurrentHP = 0;
+            await ChallengeWatcher.LateSpecialStateAddedAsync(pipe.ToClient, after, after.Rojo[1], 571);
+            Assert.DoesNotContain(special, after.ChallengesBroken);
+        }
+
+        [Fact]
+        public async Task Trankitronko_breaks_when_its_spell_transforms_an_ally()
+        {
+            Load();
+            const int special = 1014;
+            const long characterId = 8_960_100_171;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, ally, _, enemy) = Fight(special, characterId - 1);
+            enemy.MonsterId = 670;
+
+            await ChallengeWatcher.AppearanceChangedAsync(pipe.ToClient, fight, enemy, 607, 876);
+            await ChallengeWatcher.AppearanceChangedAsync(pipe.ToClient, fight, ally, 607, 0);
+            await ChallengeWatcher.AppearanceChangedAsync(pipe.ToClient, fight, ally, 606, 876);
+            Assert.DoesNotContain(special, fight.ChallengesBroken);
+
+            var transformation = SpellEffects.De(607, 1).Single(row => row.EffectId == 149);
+            await FightHandler.CastEffectsAsync(pipe.ToClient, fight, enemy, 607, 1, ally, ally.CellId,
+                                                false, new[] { transformation });
+            Assert.Contains(special, fight.ChallengesBroken);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Puppet_Master_requires_summon_order_even_after_the_victim_reaches_zero_life(bool reversed)
+        {
+            Load();
+            const int special = 1019;
+            long characterId = reversed ? 8_960_100_181 : 8_960_100_191;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, ally, _, boss) = Fight(special, characterId - 1);
+            boss.MonsterId = 3476;
+            var first = new Fighter { Id = -3, MonsterId = 3478, CurrentHP = 100 };
+            var second = new Fighter { Id = -4, MonsterId = 3477, CurrentHP = 100 };
+            fight.Invocar(first, boss);
+            ChallengeWatcher.PuppetSummoned(fight, first, boss);
+            fight.Invocar(second, boss);
+            ChallengeWatcher.PuppetSummoned(fight, second, boss);
+
+            var victim = reversed ? second : first;
+            victim.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, victim, false, ally);
+            Assert.Equal(reversed, fight.ChallengesBroken.Contains(special));
+            ChallengeWatcher.Forget(fight);
+        }
+
+        [Fact]
+        public async Task Dazahk_checks_the_Nanoimpatience_state_of_the_enemy_that_dies()
+        {
+            Load();
+            const int special = 1088;
+            const long characterId = 8_960_100_201;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, ally, _, enemy) = Fight(special, characterId - 1);
+            enemy.Buffs.PonerEstado(695);
+            enemy.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, enemy, false, ally);
+            Assert.DoesNotContain(special, fight.ChallengesBroken);
+
+            var other = fight.Rojo[1];
+            other.CurrentHP = 0;
+            await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, other, false, ally);
+            Assert.Contains(special, fight.ChallengesBroken);
+            ChallengeWatcher.Forget(fight);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task War_breaks_when_an_ally_moves_or_kills_a_weapon(bool killed)
+        {
+            Load();
+            const int special = 1093;
+            long characterId = killed ? 8_960_100_211 : 8_960_100_221;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, ally, _, weapon) = Fight(special, characterId - 1);
+            weapon.MonsterId = 6010;
+            var other = fight.Rojo[1];
+
+            await ChallengeWatcher.DisplacedAsync(pipe.ToClient, fight, weapon, other);
+            await ChallengeWatcher.DisplacedAsync(pipe.ToClient, fight, other, ally);
+            Assert.DoesNotContain(special, fight.ChallengesBroken);
+
+            if (killed)
+            {
+                weapon.CurrentHP = 0;
+                await ChallengeWatcher.DiedAsync(pipe.ToClient, fight, weapon, false, ally);
+            }
+            else
+            {
+                await ChallengeWatcher.DisplacedAsync(pipe.ToClient, fight, weapon, ally);
+            }
+
+            Assert.Contains(special, fight.ChallengesBroken);
+            ChallengeWatcher.Forget(fight);
+        }
     }
 }

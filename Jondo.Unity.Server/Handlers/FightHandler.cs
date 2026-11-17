@@ -4371,6 +4371,13 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 else if (result.Live != null)
                 {
+                    await ChallengeWatcher.MidSpecialEffectAppliedAsync(stream, fight, result.Target, waiting.HechizoOrigen);
+                    if (result.Live.EffectId == World.Combat.EffectSupport.AddState)
+                    {
+                        await ChallengeWatcher.MidSpecialStateAddedAsync(stream, fight, result.Target, result.Live.Estado);
+                        await ChallengeWatcher.LateSpecialStateAddedAsync(stream, fight, result.Target, result.Live.Estado);
+                    }
+
                     // A landed removal goes out as the loss it turned out to be, as at the cast.
                     int effect = result.WireEffect != 0 ? result.WireEffect : waiting.EffectId;
                     int dice = result.WireEffect != 0 ? -result.Live.Cuanto : waiting.Dado;
@@ -5621,6 +5628,7 @@ namespace Jondo.Unity.Server.Handlers
             // Versatile (do not repeat an action) and the two about finishing off before changing target.
             await ChallengeWatcher.CastAsync(stream, fight, caster, spell, victim,
                                              esteTurno + 1);
+            await ChallengeWatcher.MidSpecialForbiddenSpellCastAsync(stream, fight, caster, spell);
             int intervalo = Managers.SpellModifiers.CastInterval(caster, spell, limites.Intervalo, fight.RoundNumber);
             if (intervalo > 0) caster.Recarga[spell] = intervalo;
             // Each ally whose wait it set is told, as the cooldown effects tell their bearer (jxc).
@@ -6732,6 +6740,7 @@ namespace Jondo.Unity.Server.Handlers
             muerto.CurrentAP = muerto.MaxAP;
             muerto.CurrentMP = muerto.MaxMP;
             fight.RebuildTurnOrderKeepingCurrent();
+            await ChallengeWatcher.LateSpecialEnemyResurrectedAsync(stream, fight, muerto);
 
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildSummon(
@@ -8006,6 +8015,9 @@ namespace Jondo.Unity.Server.Handlers
 
                 if (c.EnganchePendiente) continue;
 
+                if (c.Sobre is { IsAlive: true } && c.Buff is not { Pendiente: true })
+                    await ChallengeWatcher.MidSpecialEffectAppliedAsync(stream, fight, c.Sobre, c.HechizoOrigen);
+
                 if (c.CambiaLaRecarga)
                 {
                     if (!c.Sobre.IsMonster)
@@ -8272,6 +8284,8 @@ namespace Jondo.Unity.Server.Handlers
                     // Libación's 30% of 1,280 landed on 281, its own 1075 having taken a vitality
                     // bonus away in between. More than he has, and he falls with the cast.
                     c.Sobre.LoseLife(absorcion.Remaining, (c.Caster ?? quienLanza).Id);
+                    if (c.Sobre.CurrentHP < leQuedaba || c.Sobre.PendingDeath)
+                        await ChallengeWatcher.TotemLifeLostAsync(stream, fight, c.Sobre);
                     Program.LogDebug($"[Fight] {c.Sobre.Id} loses {c.VidaQueSeVa} life " +
                                      $"({leQuedaba} -> {c.Sobre.CurrentHP}) to effect " +
                                      $"{c.Efecto.EffectId}.");
@@ -8536,6 +8550,7 @@ namespace Jondo.Unity.Server.Handlers
                                                    GradoDeLaInvocacion(c, hechizo, grado),
                                                    c.CasillaDeLaInvocacion >= 0 ? c.CasillaDeLaInvocacion : celdaApuntada,
                                                    c.Efecto.EffectId);
+                    if (nuevo != null) ChallengeWatcher.PuppetSummoned(fight, nuevo, invoca);
                     await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, nuevo);
                     if (nuevo != null) await RevisarLosRecuentosAsync(stream, fight);
                     // The summoner has summoned (CI), with the new one as what set it off -- the "u"
@@ -8621,6 +8636,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 if (c.Carga)
                 {
+                    await ChallengeWatcher.DisplacedAsync(stream, fight, c.Sobre, c.Caster ?? quienLanza);
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildCarry(quienLanza.Id, c.CasillaDesde, c.Sobre.Id)));
                     Program.LogDebug($"[Fight] {quienLanza.Id} carries {c.Sobre.Id} from cell {c.CasillaDesde}.");
@@ -8637,13 +8653,14 @@ namespace Jondo.Unity.Server.Handlers
                 if (c.Mueve || c.Lanza)
                 {
                     int effect = c.Efecto.EffectId;
-                    await ChallengeWatcher.DisplacedAsync(stream, fight, c.Sobre, quienLanza,
+                    var displacementSource = c.Caster ?? quienLanza;
+                    await ChallengeWatcher.DisplacedAsync(stream, fight, c.Sobre, displacementSource,
                         pushed: effect is World.Combat.EffectSupport.Push or World.Combat.EffectSupport.PushWithoutDamage
                             or World.Combat.EffectSupport.PushToTargetCell or 1021,
                         pulled: effect is World.Combat.EffectSupport.Pull or World.Combat.EffectSupport.PullToTargetCell
                             or 1022);
                     if (c.MueveTambien)
-                        await ChallengeWatcher.DisplacedAsync(stream, fight, c.Tambien, quienLanza);
+                        await ChallengeWatcher.DisplacedAsync(stream, fight, c.Tambien, displacementSource);
                 }
 
                 if (c.Lanza)
@@ -8661,6 +8678,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 if (c.Mueve && c.MueveTambien && c.Efecto.EffectId == Jondo.Unity.World.Combat.EffectSupport.SwapPositions)
                 {
+                    ChallengeWatcher.LateSpecialPositionsSwapped(fight, c.Sobre, c.Tambien);
                     // A swap is ONE frame for the two: jwe 8 with the caster's old cell, the
                     // other and his old cell. Measured on Jugarreta and Impostura; two slides
                     // was what we sent.
@@ -8686,6 +8704,8 @@ namespace Jondo.Unity.Server.Handlers
                 // what sets off Premonición's "1160 under MS|TP" on its target, its telefrag.
                 if (c.Mueve && EsTeletransporte(c.Efecto.EffectId) && c.Tambien != null)
                 {
+                    if (c.MueveTambien)
+                        ChallengeWatcher.LateSpecialPositionsSwapped(fight, c.Sobre, c.Tambien);
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                         Network.FightProtocol.BuildSwap(c.Sobre.Id, c.CasillaDesde, c.Tambien.Id, c.CasillaDesdeDelOtro)));
                     Program.LogDebug($"[Fight] Spell {hechizo} teleports {c.Sobre.Id} from cell {c.CasillaDesde} " +
@@ -8941,6 +8961,8 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     Disparo(c.Sobre, Managers.EffectEngine.AlPonerseElEstado(c.Buff.Estado), quienLanza);
                     Disparo(c.Sobre, Managers.EffectEngine.AlActivarseElEstado(c.Buff.Estado), quienLanza);
+                    await ChallengeWatcher.MidSpecialStateAddedAsync(stream, fight, c.Sobre, c.Buff.Estado);
+                    await ChallengeWatcher.LateSpecialStateAddedAsync(stream, fight, c.Sobre, c.Buff.Estado);
                 }
 
                 if (Managers.ForgelanceCombat.Is(c.Sobre)
@@ -8954,6 +8976,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 if (c.Apariencia != 0)
                 {
+                    await ChallengeWatcher.AppearanceChangedAsync(stream, fight, c.Sobre, c.HechizoOrigen, c.Apariencia);
                     await AnnounceAppearanceAsync(stream, c.Sobre, c.Apariencia, fight);
                 }
 
@@ -9835,6 +9858,7 @@ namespace Jondo.Unity.Server.Handlers
 
             if (!fulmina && Managers.SpellStates.ShieldsFromBlow(target, lejos))
             {
+                await ChallengeWatcher.CountMaxiluboHitAsync(stream, fight, caster, target);
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDamage(caster.Id, efecto.EffectId, target.Id, 0, elemento)));
                 Program.LogDebug($"[Fight] {target.Id} is invulnerable: effect {efecto.EffectId} " +
@@ -10145,6 +10169,8 @@ namespace Jondo.Unity.Server.Handlers
             await ChallengeWatcher.DamagedAsync(stream, fight, target, aplicado, caster, elemento,
                 direct: !fromTurnTrigger && fight.CurrentDamageSource == Jondo.Unity.World.Fights.DamageSource.Direct,
                 shieldLoss: escudoPerdido);
+            if (aplicado > 0 || escudoPerdido > 0)
+                await ChallengeWatcher.MidSpecialGuerrilleroDamageAsync(stream, fight, target, caster, spell);
 
             // And EROSION: besides the life of now, each hit takes a pinch off the cap.
             //
