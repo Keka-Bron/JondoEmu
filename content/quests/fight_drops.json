@@ -76,6 +76,24 @@
       ],
       "criterion": "Qa=1654&Qo>9982&PO=16888&PO!16889",
       "why": "«Extinción de los fuegos» (1654): Bolgrot's spirit beaten (9983), the Hoja de Aguabrial (16888) the character carries comes out of his fire as the Hoja ardiente de Aguabrial (16889), «la lágrima ardiente» Meriana is shown («Esta es la lágrima ardiente de Aguabrial», 25810), where she keeps the plain blade. No table of the client's carries it."
+    },
+    {
+      "item": 23484,
+      "percent": 100,
+      "monsters": [
+        6301
+      ],
+      "criterion": "Qa=2167&Qo<16600&PO!23484",
+      "why": "«Las metamorfosis de un tanuki» (2167): the Ladrón tanuki (6301) beaten with the soul stone leaves the Alma del ladrón tanuki (23484) (Dofus pour les noobs: «vous obtenez une âme du Voleur Tanuki»). The item's own drop criterion (Qo=16601&Pm=205259266) is its use condition, so its client drop never passes in the arena."
+    },
+    {
+      "item": 23052,
+      "percent": 100,
+      "monsters": [
+        6372
+      ],
+      "criterion": "Qa=2170&Qo=16730&PO!23052",
+      "why": "«Claro como el aguardiente» (2170): the bucket's fight against the three kuapas leaves the Agua clara (23052) (Dofus pour les noobs: click the bucket, a fight alone, then bring the water to Arumichi)."
     }
   ]
 }

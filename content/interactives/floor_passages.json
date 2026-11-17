@@ -252,6 +252,20 @@
       "toMap": 72355840,
       "toCell": 280,
       "why": "The Dragon Pig's Den, Fourth Room: the way on under its right arch, where the client's map has element 460371 on the floor, leads to the Fifth Room; the 2.73 graph does not have it. INFERRED arrival, the graph's own for the den's rooms."
+    },
+    {
+      "map": 156500992,
+      "cell": 183,
+      "toMap": 157810688,
+      "toCell": 282,
+      "why": "Behind the totem of [31,6] into the dark clearing, as the 2.73 graph has it, but arriving on 282: the graph's 280 is no walkable cell of the clearing."
+    },
+    {
+      "map": 157810688,
+      "cell": 240,
+      "toMap": 156500992,
+      "toCell": 198,
+      "why": "The dark clearing's way back to the totem of [31,6]: the 2.73 graph only has the way in, and the clearing has no other exit."
     }
   ]
 }

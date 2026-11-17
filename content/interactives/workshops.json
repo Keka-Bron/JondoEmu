@@ -55,6 +55,14 @@
         246
       ],
       "why": "Bowis' workshop in [5,1]: «Examina el taller para descubrir las cantidades exactas» (Bowis, 16768; Dofus pour les noobs, «Qui botte les fesses des Bottes Fesses ?»: «Allez ensuite fabriquer les semelles de vent dans l'atelier spécial de Bowisse»). The client's skill 246, «Fabricar suelas», crafts the Suelas de viento (14980) and nothing else: 6 alas de escarahoja blanco, 8 semillas de la discordia, 10 plumas de kwak de viento, 2 piedras de esmeralda and 4 resinas. The element is the quest's own (484125, cell 315); the client names no interactive for the skill, so the type is the quest elements' -1."
+    },
+    {
+      "map": 88083220,
+      "element": 532236,
+      "gfx": 49573,
+      "type": 13,
+      "skills": [415],
+      "why": "Harmonie Daule's idol bench in her camp beside the Amakna church [6,3]: «Pour cela il faut se rendre en [6,3], là où une Huppermage spécialisée dans les idoles s'est installée. Il faudra crafter chaque idole nécessaire pour la quête. Pour cela il faut utiliser l'atelier spécial prévu à cet effet en [6,3] «Fabriquer une Idole»» (Dofus pour les noobs, «La bénédiction de Viti»); her own «Puedes fabricarlo usando mi mesa de trabajo» (55758). Skill 415 «Fabricar un ídolo» makes the thirteen idols, each one only while its quest asks for it (craftFeasibleCriterion «Qa=1660&PO!28444»). The element is the table of idols at cell 238, the only element of the map with no known type (gfx 49573). INFERRED type: 13, the plain workbench's."
     }
   ]
 }
