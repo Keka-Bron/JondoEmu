@@ -93,6 +93,33 @@ namespace Jondo.Unity.Tests.World
                          "the map outside is open air and does carry monsters");
         }
 
+        [Theory]
+        [InlineData(153358338L)] // Mine entrance at [2, -4]
+        [InlineData(153358344L)] // Mine entrance at [3, -4]
+        public void Incarnam_mine_spawns_and_replenishes_aminitas(long mapId)
+        {
+            if (!World()) return;
+            const int Aminita = 4107;
+
+            Assert.False(MobSpawnManager.IsVetoed(mapId));
+            Assert.True(MobSpawnManager.LoadedGroups(mapId) > 0);
+            var group = MobSpawnManager.GetMobsForMap(mapId).First();
+            Assert.NotEmpty(group.Members);
+            Assert.All(group.Members, member => Assert.Equal(Aminita, member.Monster.Id));
+
+            try
+            {
+                MobSpawnManager.RemoveMobGroup(mapId, group.MobId);
+                var replacement = Assert.IsType<MobSpawnManager.MobGroup>(MobSpawnManager.RespawnOneGroup(mapId));
+                Assert.NotEmpty(replacement.Members);
+                Assert.All(replacement.Members, member => Assert.Equal(Aminita, member.Monster.Id));
+            }
+            finally
+            {
+                MobSpawnManager.RestoreMap(mapId);
+            }
+        }
+
         [Fact]
         public void A_vetoed_map_stays_empty_however_many_times_it_is_asked()
         {

@@ -9,6 +9,8 @@ namespace Jondo.Unity.Server.Managers
 {
     public static class MobSpawnManager
     {
+        private const int IncarnamMineSubArea = 778;
+
         /// <summary>The banned maps, kept so that the repopulator respects them too.</summary>
         private static HashSet<long> _vetados = new HashSet<long>();
 
@@ -19,9 +21,9 @@ namespace Jondo.Unity.Server.Managers
         /// standing on top of the village zaap. Measured over the 38,744 placed groups: 9,331
         /// —24.1 %— are on an indoor map.
         ///
-        /// The rule is two lists and one exception, and the exception is the important one:
+        /// The indoor filter allows Incarnam's mine, where Aminitas drop the powder for A Bit of Pigment.
         ///
-        ///   INDOORS         MapPositions.Outdoor = 0, which is 4,165 maps
+        ///   INDOORS         MapPositions.Outdoor = 0 outside Incarnam's mine
         ///   WITH A ZAAP     the 62 of the travel point catalogue; 53 had monsters on top
         ///   EXCEPT DUNGEON  753 of the 763 dungeon rooms are marked «indoors»
         ///
@@ -49,7 +51,8 @@ namespace Jondo.Unity.Server.Managers
             try
             {
                 Recoger("SELECT MapId FROM DungeonRooms;", salas);
-                Recoger("SELECT MapId FROM MapPositions WHERE Outdoor = 0;", vetados);
+                Recoger("SELECT MapId FROM MapPositions WHERE Outdoor = 0 " +
+                        $"AND SubAreaId IS NOT {IncarnamMineSubArea};", vetados);
             }
             catch (Exception ex)
             {
