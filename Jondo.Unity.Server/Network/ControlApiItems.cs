@@ -19,7 +19,7 @@ namespace Jondo.Unity.Server.Network
         private const int LegendaryFlag = 2048, DofusType = 23, PrismaraditeType = 217, TrophyType = 151;
 
         /// <summary>The equipment positions the harness uses: the weapon, the first Dofus slot, the shield.</summary>
-        private static readonly int[] HarnessPositions = { 1, 9, 15 };
+        private static readonly int[] HarnessPositions = { 1, 9, 15, 31 };
 
         /// <summary>The item types worn in the weapon's hand.</summary>
         private static readonly HashSet<int> WeaponTypes = new() { 2, 3, 4, 5, 6, 7, 8, 19, 20, 21, 22, 114, 271 };
@@ -121,7 +121,10 @@ namespace Jondo.Unity.Server.Network
             var item = none ? null : ItemOf(gid);
             string effects = "[]";
             if (!none && (item == null || !DatabaseManager.TryGetItemTemplateEffects(gid, out effects))) return Mal(404, "item");
-            int position = item == null ? 0 : WeaponTypes.Contains(item.Value.Type) ? 1 : item.Value.Type == 82 ? 15 : 9;
+            // A capture net goes in the combat consumables' slot, the only one RideCapture reads.
+            int position = item == null ? 0
+                : Breeding.NetByItem(gid) != null ? Managers.RideCapture.ConsumableSlot
+                : WeaponTypes.Contains(item.Value.Type) ? 1 : item.Value.Type == 82 ? 15 : 9;
             using (var connection = new SqliteConnection(DatabaseManager.WorldConnectionString))
             {
                 connection.Open();
