@@ -1098,12 +1098,26 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// How long an armed row lives on its bearer: its own duration, for good at -1, and at 0
         /// to the next round -- or for good when it comes from a behaviour spell, which is the
-        /// monster's for the whole fight.
+        /// monster's for the whole fight. A row waiting on its bearer's death with the client's
+        /// "no limit" trigger duration (63, the value of 4,692 rows against 1 to 10 for the real
+        /// round counts) stays too: a Malterego's «when I fall, my summoner loses 3 MP, 40 % of
+        /// its resistances and half its damage» (21477) was armed to the next round, and the copy
+        /// that died any later took its penalty with it. Only the death trigger: the turn and
+        /// blow rows of a 63 keep their reading.
         /// </summary>
         public static int CaducidadDeLaFila(SpellEffect fila, int ronda, bool deConducta)
             => fila.Duration < 0 ? -1
              : fila.Duration > 0 ? ronda + fila.Duration
-             : deConducta ? -1 : ronda + 1;
+             : deConducta || WaitsForeverOnDeath(fila) ? -1 : ronda + 1;
+
+        /// <summary>Whether a row with no duration of its own waits on its bearer's death for as long as the fight lasts.</summary>
+        internal static bool WaitsForeverOnDeath(SpellEffect fila)
+            => fila.TriggerDuration >= NoLimitTriggerDuration
+               && fila.Disparadores().Count() > 0
+               && fila.Disparadores().All(d => string.Equals(d, AlMorir, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>The client's effectTriggerDuration for «as long as it lasts».</summary>
+        private const int NoLimitTriggerDuration = 63;
 
         /// <summary>
         /// The mark that hooks a sub-cast's child on its target when the child has rows waiting on
