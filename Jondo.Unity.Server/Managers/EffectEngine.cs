@@ -2285,13 +2285,24 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// The bearer takes the damage of a collision: his own push into something (PD), or
-        /// somebody pushed into him (PPD). Klim's Galuchat waits on PPD, and the guide lifts his
-        /// invulnerability by pushing an entity into him; Obsidiantre's Obligación waits on PMD,
-        /// which the guide lifts the same way -- so PMD is taken for the same collision. Inferred.
+        /// somebody pushed into him (PPD). Klim's Galuchat waits on PPD on himself ("c"), and the
+        /// guide lifts his invulnerability by pushing an entity into him.
         /// </summary>
         public const string AlChocarEmpujado = "PD";
         public const string AlChocarleUnEmpujado = "PPD";
-        public const string AlChocarleUnEmpujadoM = "PMD";
+
+        /// <summary>
+        /// The bearer, pushed, crashes into another fighter (PMD): the PUSHED one's trigger, not the
+        /// wall's. Obsidiantre's Obligación (673) arms its two 792 under PMD on his enemies ("A") and
+        /// on his other allies ("g") over the whole board, never on him; their children are cast by
+        /// the one pushed around himself -- 676's "952 on A,F2924, X1" is the Obsidiantre next to
+        /// him, 672 heals the allies next to the monster pushed. Fired on the one pushed into, as it
+        /// used to be, it went off on the boss, who carries neither, and nothing ever happened.
+        /// Percusión's "+50% incurable damage under PMD on A" is armed the same way on the one its
+        /// push then sends off. Whether a crash into a wall sets it off too is not read: the guide
+        /// only pushes somebody into the boss.
+        /// </summary>
+        public const string CrashedIntoAFighter = "PMD";
 
         /// <summary>The bearer loses AP (APA) or MP (MPA) to an enemy.</summary>
         public const string AlPerderPA = "APA";

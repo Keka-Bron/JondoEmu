@@ -10456,7 +10456,8 @@ namespace Jondo.Unity.Server.Handlers
             // whoever pushed him: a blow from afar. Bastión's ranged invulnerability spares the
             // second, Barricada's melee one the first.
             bool desdeLejos = c.CasillaDesde >= 0 && c.CasillaHasta >= 0 && c.CasillaDesde != c.CasillaHasta;
-            await UnEstampadoAsync(stream, fight, quienEmpuja, c.Sobre, c.CollisionDamage, desdeLejos: desdeLejos);
+            await UnEstampadoAsync(stream, fight, quienEmpuja, c.Sobre, c.CollisionDamage, desdeLejos: desdeLejos,
+                                   crashedInto: c.Blocker);
 
             if (c.Blocker != null && c.CollisionDamageToBlocker > 0)
             {
@@ -10466,26 +10467,31 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>A single collision hit, against a single target.</summary>
+        /// <param name="crashedInto">For the one pushed: the fighter he crashed into, if it was one.</param>
         internal static async Task UnEstampadoAsync(NetworkStream stream, FightInstance fight,
                                                    Fighter quienEmpuja, Fighter quien, int dano,
-                                                   bool indirecto = false, bool desdeLejos = false)
+                                                   bool indirecto = false, bool desdeLejos = false,
+                                                   Fighter crashedInto = null)
         {
             if (quien == null || !quien.IsAlive || dano <= 0) return;
 
-            // The collision is a trigger whatever it costs: PD on the one pushed, PPD and PMD on
-            // the one he was pushed into. Klim and Obsidiantre are made vulnerable exactly so --
-            // somebody pushed into them -- while they are invulnerable, so it goes off first.
+            // The collision is a trigger whatever it costs: PD on the one pushed, and PMD too when he
+            // crashed into a fighter; PPD on the one he was pushed into. Klim and Obsidiantre are
+            // made vulnerable exactly so -- somebody pushed into them -- while they are invulnerable,
+            // so it goes off first: Klim's Galuchat waits on PPD on himself, Obsidiantre's Obligación
+            // on PMD on the ones pushed (see EffectEngine.CrashedIntoAFighter).
             {
                 var antes = fight.TriggeringAttacker;
                 fight.TriggeringAttacker = quienEmpuja;
                 if (indirecto)
                 {
                     await DispararAsync(stream, fight, quien, Managers.EffectEngine.AlChocarleUnEmpujado);
-                    await DispararAsync(stream, fight, quien, Managers.EffectEngine.AlChocarleUnEmpujadoM);
                 }
                 else
                 {
                     await DispararAsync(stream, fight, quien, Managers.EffectEngine.AlChocarEmpujado);
+                    if (crashedInto != null && crashedInto != quien && quien.IsAlive)
+                        await DispararAsync(stream, fight, quien, Managers.EffectEngine.CrashedIntoAFighter);
                     // And on the one who pushed him: he dealt push damage (CPD).
                     if (quienEmpuja != null && quienEmpuja != quien && quienEmpuja.IsAlive)
                     {
@@ -10584,10 +10590,12 @@ namespace Jondo.Unity.Server.Handlers
             // not be paid for.
             if (muerto != null && (EsDelBandoDeLosMonstruos(fight, muerto) || muerto.EsInvocado))
             {
+                // All but what is written to outlive him (dispellable 3 or 4): the Super-güino a
+                // dying ally of Morsagüino Real casts on him is his for the rest of the fight.
                 foreach (var otro in TodosLosCombatientes(fight).ToList())
                 {
                     if (otro == null || otro == muerto || !otro.IsAlive) continue;
-                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id);
+                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id, OutlivesItsCaster);
                     foreach (var quitado in quitados)
                     {
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
@@ -10628,6 +10636,27 @@ namespace Jondo.Unity.Server.Handlers
                 // And out of the carousel, so that their turn never comes.
                 fight.RebuildTurnOrderOnFighterDeath();
             }
+        }
+
+        /// <summary>
+        /// Whether a row stays when whoever put it dies: the catalogue writes it dispellable 3 (by a
+        /// strong dispel only) or 4 (never). The row's own number when it carries one, else its
+        /// spell row's, found by its uid: most rows are put without it. A death takes the 1s and
+        /// the 2s -- a Pépite's mark on Crunchidor, an Éclat's invulnerability on its escort are
+        /// 2s -- and the Super-güino (2609), the 3s a dying ally of Morsagüino Real casts on him.
+        /// </summary>
+        internal static bool OutlivesItsCaster(Jondo.Unity.World.Fights.Buff row)
+        {
+            int dispellable = row.Dispellable;
+            if (dispellable == 0 && row.EffectUid != 0 && row.HechizoOrigen != 0)
+            {
+                var itsRow = (row.Critico ? Managers.SpellEffects.Criticos(row.HechizoOrigen, row.NivelOrigen)
+                                                                .FirstOrDefault(r => r.EffectUid == row.EffectUid) : null)
+                             ?? Managers.SpellEffects.De(row.HechizoOrigen, row.NivelOrigen)
+                                                     .FirstOrDefault(r => r.EffectUid == row.EffectUid);
+                dispellable = itsRow?.Dispellable ?? 0;
+            }
+            return dispellable >= Jondo.Unity.World.Fights.Buffs.DispellableByStrongDispelOnly;
         }
 
         /// <summary>

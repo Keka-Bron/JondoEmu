@@ -396,10 +396,15 @@ namespace Jondo.Unity.World.Fights
         /// rows he armed here. For a monster's death -- a Pépite's mark on Crunchidor, an Éclat's
         /// invulnerability on its escort did not outlive them, and here they did.
         /// </summary>
-        public List<Buff> QuitarLoDe(long quien)
+        /// <param name="outlivesHim">
+        /// The rows that stay all the same: the ones written to outlive their caster's death (see
+        /// <see cref="DispellableByStrongDispelOnly"/>). Without it, every row of his goes.
+        /// </param>
+        public List<Buff> QuitarLoDe(long quien, Func<Buff, bool> outlivesHim = null)
         {
-            var quitados = _puestos.FindAll(e => e.Quien == quien && !e.Pendiente);
-            _puestos.RemoveAll(e => e.Quien == quien && !e.Pendiente);
+            bool goes(Buff e) => e.Quien == quien && !e.Pendiente && (outlivesHim == null || !outlivesHim(e));
+            var quitados = _puestos.FindAll(goes);
+            _puestos.RemoveAll(goes);
             SeVan(quitados);
             ActiveSpells.RemoveAll(e => e.Lanzador == quien);
             foreach (var quitado in quitados)
@@ -528,6 +533,14 @@ namespace Jondo.Unity.World.Fights
             SeVan(quitados);
             return quitados;
         }
+
+        /// <summary>
+        /// The catalogue's "dispellable" of a row that only a strong dispel takes (3); past it, 4,
+        /// nothing does. 1 is dispellable, 2 dispellable and gone with its caster's death; a 3 or
+        /// a 4 outlives its caster -- the client's own rule for a dead fighter's buffs, where only
+        /// the 1s and the 2s go.
+        /// </summary>
+        public const int DispellableByStrongDispelOnly = 3;
 
         /// <summary>
         /// Takes off every row that can be dispelled -- a dispellable of one, the catalogue's
