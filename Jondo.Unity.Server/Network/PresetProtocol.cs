@@ -22,14 +22,6 @@ namespace Jondo.Unity.Server.Network
     /// </summary>
     public static class PresetProtocol
     {
-        /// <summary>The characteristics a build's sheet carries, in the order the real one does.</summary>
-        internal static readonly int[] SheetIds =
-        {
-            0, 1, 10, 11, 12, 141, 13, 142, 14, 15, 16, 18, 19, 23, 25, 26, 27, 28, 33, 34, 35, 36, 37,
-            40, 44, 48, 49, 54, 55, 56, 57, 58, 75, 78, 79, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92,
-            120, 121, 122, 123, 124, 125,
-        };
-
         /// <summary>The six characteristics points are spent in.</summary>
         internal static readonly int[] Primaries =
         {
@@ -87,34 +79,14 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         internal static Pb Sheet(int level, IReadOnlyDictionary<int, int> points, IReadOnlyDictionary<int, long> equipment)
         {
-            var state = SessionContext.State;
-            var scrolls = new Dictionary<int, long>
-            {
-                { Stat.Strength, state.ScrolledStrength },
-                { Stat.Vitality, state.ScrolledVitality },
-                { Stat.Wisdom, state.ScrolledWisdom },
-                { Stat.Chance, state.ScrolledChance },
-                { Stat.Agility, state.ScrolledAgility },
-                { Stat.Intelligence, state.ScrolledIntelligence },
-            };
-            long Total(int id) => scrolls[id] + (points.TryGetValue(id, out int spent) ? spent : 0)
-                                  + (equipment.TryGetValue(id, out long worn) ? worn : 0);
-
+            var snapshot = PresetMessages.Live.Characteristics(SessionContext.Current, level, points, equipment);
             var sheet = Pb.New();
-            foreach (int id in SheetIds)
+            foreach (var (id, value) in snapshot.CharacteristicDetailsById)
             {
-                var value = Pb.New();
-                if (scrolls.TryGetValue(id, out long scrolled))
-                {
-                    value.VarIfNotZero(1, scrolled).VarIfNotZero(2, points.TryGetValue(id, out int spent) ? spent : 0);
-                }
-                else
-                {
-                    value.VarIfNotZero(3, CharacteristicRules.GivenByCharacteristics(id, Total))
-                         .VarIfNotZero(4, CharacteristicsMessages.Live.ValueOf(id, level, SessionContext.Current));
-                }
-                value.VarIfNotZero(6, equipment.TryGetValue(id, out long bonus) ? bonus : 0);
-                sheet.Msg(1, Pb.New().Var(1, id).Msg(2, value));
+                var columns = Pb.New().VarIfNotZero(1, value.FromInitialBonus).VarIfNotZero(2, value.FromAllocated)
+                    .VarIfNotZero(3, value.FromBonus).VarIfNotZero(4, value.FromBase).VarIfNotZero(6, value.FromEquipment);
+                if (value.Limit is { } limit) columns.Var(5, limit);
+                sheet.Msg(1, Pb.New().Var(1, id).Msg(2, columns));
             }
             return sheet;
         }
@@ -163,15 +135,6 @@ namespace Jondo.Unity.Server.Network
                 spells[spell] = slots.Distinct().OrderBy(s => s).ToList();
             }
             return spells;
-        }
-
-        /// <summary>ihb { repeated 1 { 1 uuid, 2 build } }: the character's builds, on entering the world.</summary>
-        public static byte[] BuildList(DbCharacter character, IEnumerable<CharacterPresets.Preset> presets)
-        {
-            var ihb = Pb.New();
-            foreach (var preset in presets)
-                ihb.Msg(1, Pb.New().Str(1, preset.Uuid).Bytes(2, BuildPreset(character, preset)));
-            return ihb.Build();
         }
 
         /// <summary>ihq { 2 0 }: «it is on». The zero is written, as the capture writes it.</summary>

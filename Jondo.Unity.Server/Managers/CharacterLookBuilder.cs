@@ -80,9 +80,16 @@ public static class CharacterLookBuilder
     public static (byte[] Equipment, byte[] Appearance) PresetLooks(DbCharacter character,
         IReadOnlyList<(int Slot, int Template)> worn)
     {
+        var (equipment, appearance) = SemanticPresetLooks(character, worn);
+        return (WriteLook(equipment, LookWireFormat.PresetEquipment).Build(), WriteLook(appearance).Build());
+    }
+
+    public static (EntityLook Equipment, EntityLook Appearance) SemanticPresetLooks(DbCharacter character,
+        IReadOnlyList<(int Slot, int Template)> worn)
+    {
         var overrides = new CharacterLookOverrides { Equipment = worn, Colors = SavedColors(character) };
-        return (WriteLook(Build(character, CharacterLookPurpose.PresetEquipment, overrides), LookWireFormat.PresetEquipment).Build(),
-            WriteLook(Build(character, CharacterLookPurpose.PresetAppearance, overrides)).Build());
+        return (Build(character, CharacterLookPurpose.PresetEquipment, overrides) with { LookType = 0 },
+            Build(character, CharacterLookPurpose.PresetAppearance, overrides));
     }
 
     private static ResolvedLook Resolve(DbCharacter character, CharacterLookPurpose purpose,

@@ -155,7 +155,7 @@ namespace Jondo.Unity.Tests.World
                     Assert.Equal(50, state.StatStrength);
 
                     // On entering the world: the list.
-                    await PresetHandler.SendListAsync(pipe.ToClient);
+                    await PresetHandler.SendListAsync(pipe.Session);
                     var ihb = await pipe.Next("ihb");
                     Assert.Equal(uuid, Text(Fields(ihb).Single(f => f.FieldNumber == 1).BytesValue, 1));
 

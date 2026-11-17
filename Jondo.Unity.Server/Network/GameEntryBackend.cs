@@ -104,7 +104,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         public Task SendHousesAsync(GameSession session) => HouseHandler.SendAccountHousesAsync(session);
         public Task SendJournalAsync(GameSession session) => Managers.Quests.SendJournalAsync(session, box: true);
         public Task SendAchievementsAsync(GameSession session) => Managers.Achievements.SendListAsync(session);
-        public Task SendPresetsAsync(GameSession session) => PresetHandler.SendListAsync(StreamOf(session));
+        public Task SendPresetsAsync(GameSession session) => PresetHandler.SendListAsync(session);
         public Task SendMarksAsync(GameSession session) => Managers.Quests.SendMarksAsync(session, session.MapId);
     }
 
