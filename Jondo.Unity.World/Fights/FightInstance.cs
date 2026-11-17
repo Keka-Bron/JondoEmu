@@ -1208,6 +1208,16 @@ namespace Jondo.Unity.World.Fights
         public HashSet<long> StruckDownThisCast { get; set; } = new HashSet<long>();
 
         /// <summary>
+        /// The states a fighter held just before the rows that expire at the start of ITS turn were
+        /// swept, for as long as the glyphs under it are fired (null otherwise). A glyph's state
+        /// conditions (E, e) read them as held: Karnhell's «Tu m'attraperas pas !» climbs her from
+        /// Chasseur chassé I to V by "state I -> II" rows that last ONE round, so the glyph has to
+        /// see the I that falls at this very turn start, or she is back at I every turn and the
+        /// guide's «la monter en état V» is out of reach.
+        /// </summary>
+        public (long Id, HashSet<int> States)? StatesBeforeTheSweep { get; set; }
+
+        /// <summary>
         /// Whether the cast being resolved went through a portal: what the masks' R and r ask,
         /// set for as long as a spell cast at a portal is resolved at the other end.
         /// </summary>

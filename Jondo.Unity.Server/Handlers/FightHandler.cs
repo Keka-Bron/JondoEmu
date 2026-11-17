@@ -3844,6 +3844,7 @@ namespace Jondo.Unity.Server.Handlers
             // the player fall at his own turn against one at the monster's, and fifty-seven
             // rows of summons at the summon's.
             var caducados = new List<(Fighter Quien, Jondo.Unity.World.Fights.Buff Caido)>();
+            fight.StatesBeforeTheSweep = (fighter.Id, new HashSet<int>(fighter.Buffs.Estados));
             foreach (var quien in TodosLosCombatientes(fight))
             {
                 AguantaSuTurno(fight, fighter, quien);
@@ -3989,7 +3990,8 @@ namespace Jondo.Unity.Server.Handlers
             // the line below, and with the 307 that belongs to them instead of the 306.
             await ReconciliarLosMurosAsync(stream, fight, fireOnBirth: false);
             await QuitarLosGlifosCaducadosAsync(fight, fighter);
-            await DispararLosGlifosAsync(stream, fight, fighter, alPisar: false);
+            try { await DispararLosGlifosAsync(stream, fight, fighter, alPisar: false); }
+            finally { fight.StatesBeforeTheSweep = null; }
             if (await EffectEndedTheFightAsync(stream, fight)) return;
 
             // AND IF IT KILLED HIM, THE TURN STILL HAS TO MOVE ON. This returned bare, and a

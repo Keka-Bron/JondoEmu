@@ -2566,8 +2566,11 @@ namespace Jondo.Unity.Server.Managers
             var estadosAlEmpezar = new Dictionary<Fighter, HashSet<int>>();
             foreach (var luchador in Todos(combat))
             {
-                if (luchador != null)
-                    estadosAlEmpezar[luchador] = new HashSet<int>(luchador.Buffs.Estados);
+                if (luchador == null) continue;
+                estadosAlEmpezar[luchador] = new HashSet<int>(luchador.Buffs.Estados);
+                // The glyphs of a turn start judge the states that fall at that start as held.
+                if (combat.StatesBeforeTheSweep is { } antesDelBarrido && antesDelBarrido.Id == luchador.Id)
+                    estadosAlEmpezar[luchador].UnionWith(antesDelBarrido.States);
             }
 
             // The effects that go by chance: they are drawn BEFORE walking anything, and the ones
