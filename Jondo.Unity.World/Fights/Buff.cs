@@ -396,10 +396,17 @@ namespace Jondo.Unity.World.Fights
         /// rows he armed here. For a monster's death -- a Pépite's mark on Crunchidor, an Éclat's
         /// invulnerability on its escort did not outlive them, and here they did.
         /// </summary>
-        public List<Buff> QuitarLoDe(long quien)
+        /// <param name="quien">The fighter whose doing goes.</param>
+        /// <param name="exceptOfSpell">
+        /// A spell whose rows stay (0: none): the rows the caster's own death spell left on others
+        /// -- a sectarian's «Dévotion monstrueuse» kills it AND boosts Wilbur, and the boost has to
+        /// outlive the one who gave it.
+        /// </param>
+        public List<Buff> QuitarLoDe(long quien, int exceptOfSpell = 0)
         {
-            var quitados = _puestos.FindAll(e => e.Quien == quien && !e.Pendiente);
-            _puestos.RemoveAll(e => e.Quien == quien && !e.Pendiente);
+            bool Goes(Buff e) => e.Quien == quien && !e.Pendiente && (exceptOfSpell == 0 || e.HechizoOrigen != exceptOfSpell);
+            var quitados = _puestos.FindAll(Goes);
+            _puestos.RemoveAll(Goes);
             SeVan(quitados);
             ActiveSpells.RemoveAll(e => e.Lanzador == quien);
             foreach (var quitado in quitados)

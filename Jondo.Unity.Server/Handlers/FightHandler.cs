@@ -10273,7 +10273,11 @@ namespace Jondo.Unity.Server.Handlers
                                                  caster);
                 await ChallengeWatcher.AllyDiedAsync(stream, fight, target);
 
-                await CaenSusInvocadosAsync(stream, fight, target);
+                // A 141 on its own caster (21990) puts its boosts on the others at the same cast:
+                // they were resolved with the kill and are what the death is FOR (Dofus pour les
+                // noobs: the sectarian "meurt ... en boostant le Haut-Sectateur"), so they stay.
+                await CaenSusInvocadosAsync(stream, fight, target,
+                                            fulmina && caster == target ? spell : 0);
                 await ReenviarLaListaAsync(stream, fight);
 
                 // And if the one who fell was a bomb, the wall it held up falls with it. Without
@@ -10558,7 +10562,7 @@ namespace Jondo.Unity.Server.Handlers
         /// outlive its Cra nor gets to play the turn it had pending.
         /// </summary>
         internal static async Task CaenSusInvocadosAsync(NetworkStream stream, FightInstance fight,
-                                                        Fighter muerto)
+                                                        Fighter muerto, int keepRowsOfSpell = 0)
         {
             if (muerto != null && !fight.Muertos.Contains(muerto)) fight.Muertos.Add(muerto);
 
@@ -10576,7 +10580,7 @@ namespace Jondo.Unity.Server.Handlers
                 foreach (var otro in TodosLosCombatientes(fight).ToList())
                 {
                     if (otro == null || otro == muerto || !otro.IsAlive) continue;
-                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id);
+                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id, keepRowsOfSpell);
                     foreach (var quitado in quitados)
                     {
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
