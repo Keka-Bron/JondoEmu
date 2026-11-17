@@ -635,7 +635,7 @@ namespace Jondo.Unity.Server.Managers
                 Members = members,
                 Modular = true,
                 Leaders = bossRoom && dungeon.BossAlone ? members.Count : 0,
-                CanRoam = true,
+                // A dungeon room's group waits where the room puts it: it does not roam.
             };
         }
 
@@ -1675,8 +1675,11 @@ namespace Jondo.Unity.Server.Managers
                 if (!MapManager.WalkableCells.TryGetValue(mapId, out var walkable) ||
                     walkable.Count == 0) return movements;
 
-                // Spawn cells need room on all sides. A walk can use a narrow passage.
+                // Spawn cells need room on all sides. A walk can use a narrow passage, but it
+                // ends where a group may stand (GetGroupCells): off the borders, where it would
+                // hide the map's exits, and clear of the NPCs.
                 var npcs = Npcs.CellsOn(mapId);
+                var spots = GetGroupCells(mapId).ToHashSet();
                 var allowed = walkable.ToHashSet();
                 allowed.ExceptWith(npcs);
                 allowed.ExceptWith(Interactives.ElementsOf(mapId).Where(e => e.Cell != 0).Select(e => e.Cell));
@@ -1689,8 +1692,7 @@ namespace Jondo.Unity.Server.Managers
                     var nearby = allowed.Where(cell => MapGeometry.Distance(group.CellId, cell) <= 5).ToHashSet();
                     var destinations = nearby
                         .Select(cell => (Cell: cell, Distance: MapGeometry.Distance(group.CellId, cell)))
-                        .Where(target => target.Distance >= 2 &&
-                            npcs.All(npc => MapGeometry.Distance(target.Cell, npc) > NpcClearance))
+                        .Where(target => target.Distance >= 2 && spots.Contains(target.Cell))
                         .OrderBy(target => Math.Abs(target.Distance - preferredLength))
                         .ThenBy(_ => Random.Shared.Next());
 

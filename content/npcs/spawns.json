@@ -770,7 +770,7 @@
       "npc": 2908,
       "cell": 384,
       "orientation": 3,
-      "why": "Kruella Troz «en [1,0]» (Dofus pour les noobs, «Leçon d'humilité»). No capture places her: INFERRED, on the walkable cell nearest the middle of the map's walkable ground, every neighbour walkable."
+      "why": "Kruella Troz «en [1,0]» (Dofus pour les noobs, «Leçon d'humilité»). No capture places her: cell 384 facing 3, as a contributor placed her in the game (PR #174), instead of the earlier inferred cell 231."
     },
     {
       "map": 153356288,

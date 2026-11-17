@@ -49,6 +49,16 @@ namespace Jondo.Unity.Tests.Quests
         }
 
         [Fact]
+        public void An_escort_with_no_binding_is_the_clients_to_finish()
+        {
+            // Type 10's parameter is a text: the server has nobody to follow, so it cannot finish
+            // one itself, and refusing the client's word would leave those quests stuck.
+            Assert.True(QuestClaims.ClientMayClaim(Objective(QuestCatalogue.Escort), null));
+            var bound = new QuestBinding { ObjectiveId = 1, QuestId = 1, Kind = QuestBindingKind.Talk };
+            Assert.False(QuestClaims.ClientMayClaim(Objective(QuestCatalogue.Escort), bound));
+        }
+
+        [Fact]
         public void An_order_row_says_nothing_about_who_finishes_it()
         {
             var binding = new QuestBinding { ObjectiveId = 1, QuestId = 1, Kind = QuestBindingKind.Order };

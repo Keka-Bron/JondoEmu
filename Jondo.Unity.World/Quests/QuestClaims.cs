@@ -20,13 +20,17 @@ namespace Jondo.Unity.World.Quests
     public static class QuestClaims
     {
         /// <summary>
-        /// Whether the client's word is enough to finish <paramref name="objective"/>: free text,
-        /// with nothing the server watches for it. An «order» row only says where the objective
-        /// stands among its step's others, not what finishes it.
+        /// Whether the client's word is enough to finish <paramref name="objective"/>: free text or
+        /// an escort, with nothing the server watches for it. An «order» row only says where the
+        /// objective stands among its step's others, not what finishes it.
         /// </summary>
+        /// <remarks>
+        /// An escort (type 10) is as blind to the server as free text: its parameter is a text, not
+        /// who is escorted, and no binding row names one, so the client's word is all there is.
+        /// </remarks>
         public static bool ClientMayClaim(QuestObjective? objective, QuestBinding? binding)
             => objective != null
-               && objective.TypeId == QuestCatalogue.FreeText
+               && (objective.TypeId == QuestCatalogue.FreeText || objective.TypeId == QuestCatalogue.Escort)
                && (binding == null || binding.Kind == QuestBindingKind.Order);
     }
 }

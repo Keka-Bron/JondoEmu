@@ -363,6 +363,12 @@ namespace Jondo.Unity.World.Quests
         /// <summary>"Beat #2 x #1 on map #3 in one fight". 88 objectives.</summary>
         public const int BeatOnMap = 16;
 
+        /// <summary>
+        /// Escort somebody. 26 objectives, whose parameter is only a text: nothing in the data says
+        /// who is escorted or where to, so, like free text, the server cannot see it happen.
+        /// </summary>
+        public const int Escort = 10;
+
         /// <summary>The three objective types whose parameter0 is a monster id.</summary>
         private static readonly HashSet<int> MonsterTypes
             = new HashSet<int> { BeatInOneFight, BeatAnywhere, BeatOnMap };
