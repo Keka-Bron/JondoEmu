@@ -681,7 +681,7 @@ An alliance is made of characters, not guilds.
 <img width="1700" height="930" alt="image" src="https://github.com/user-attachments/assets/02254e58-ec87-4839-82ac-f142ec5ef9cd" />
 
 - ✅ **38,744 monster groups**, respawned and kept populated, across **562 sub-areas**
-- ✅ Ordinary monster groups stay off zaaps and spawn indoors on dungeon maps and the combat maps in `content/monsters/indoor_spawns.json`
+- ✅ No monsters in houses, shops or on zaaps; they stand in dungeons and in indoor hunting grounds (mines, sewers, mazes)
 - 🟡 371 monsters have no spells in the client's own data: summoned objects, and six that roam (eggs, spirits)
 - ✅ Dialogue trees authored in `content/npcs/dialogues.json`
 <img width="1138" height="694" alt="image" src="https://github.com/user-attachments/assets/fc1182c3-a261-4bcd-9532-84a2ceda8dc8" />
