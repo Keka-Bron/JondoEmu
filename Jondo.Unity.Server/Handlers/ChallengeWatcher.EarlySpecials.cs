@@ -13,8 +13,8 @@ namespace Jondo.Unity.Server.Handlers
         private const int HungrySunflower = 799;
         private const int Lasoberana = 3996;
         private const int TregenariaEgg = 3997;
-        private const int SilfElRasgabolMayor = 1071;
-        private const int RasgabolMenor = 1084;
+        private const int SilfGreaterRasgabol = 1071;
+        private const int LesserRasgabol = 1084;
         private const int Minotauroro = 121;
         private const int TofuLance = 120;
         private const int Pikabeto = 1179;
@@ -25,6 +25,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             public int LastLasponjaDisplacedRound;
             public readonly System.Collections.Generic.Dictionary<long, int> HungrySunflowerSummonTurnStarts = new();
+            public readonly System.Collections.Generic.Dictionary<long, int> EggTurnStarts = new();
             public readonly System.Collections.Generic.HashSet<long> EnemiesCompletedTurn = new();
             public readonly System.Collections.Generic.HashSet<long> EnemiesDamagedSinceTurn = new();
             public readonly System.Collections.Generic.HashSet<long> EnemiesHadTurnWithoutMp = new();
@@ -37,7 +38,7 @@ namespace Jondo.Unity.Server.Handlers
         public static void EarlySpecialDisplaced(FightInstance fight, Fighter target, bool pushed, bool pulled)
         {
             if ((!pushed && !pulled) || target.MonsterId != MobLasponja
-                || !RuleInPlay(fight, Challenges.BossRule.PasarLaEsponjaEachRound)) return;
+                || !RuleInPlay(fight, Challenges.BossRule.PushOrPullLasponjaEachRound)) return;
             var state = EarlySpecialStates.GetValue(fight, _ => new EarlySpecialState());
             lock (state) state.LastLasponjaDisplacedRound = fight.RoundNumber;
         }
@@ -46,14 +47,14 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task EarlySpecialRoundStartedAsync(NetworkStream stream, FightInstance fight,
                                                                 int previousRound)
         {
-            if (!RuleInPlay(fight, Challenges.BossRule.PasarLaEsponjaEachRound) || previousRound < 2) return;
+            if (!RuleInPlay(fight, Challenges.BossRule.PushOrPullLasponjaEachRound) || previousRound < 2) return;
             var state = EarlySpecialStates.GetValue(fight, _ => new EarlySpecialState());
             int displacedRound;
             lock (state) displacedRound = state.LastLasponjaDisplacedRound;
             if (fight.Rojo.Exists(enemy => enemy.IsAlive && enemy.MonsterId == MobLasponja)
                 && displacedRound != previousRound)
             {
-                await BreakRuleAsync(stream, fight, Challenges.BossRule.PasarLaEsponjaEachRound,
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.PushOrPullLasponjaEachRound,
                     $"Mob Lasponja was not pushed or pulled during global round {previousRound}");
             }
         }
@@ -63,12 +64,12 @@ namespace Jondo.Unity.Server.Handlers
                                                                Fighter victim)
         {
             if (victim.MonsterId != MobLasponja || fight.RoundNumber < 2
-                || !RuleInPlay(fight, Challenges.BossRule.PasarLaEsponjaEachRound)) return;
+                || !RuleInPlay(fight, Challenges.BossRule.PushOrPullLasponjaEachRound)) return;
             var state = EarlySpecialStates.GetValue(fight, _ => new EarlySpecialState());
             int displacedRound;
             lock (state) displacedRound = state.LastLasponjaDisplacedRound;
             if (displacedRound != fight.RoundNumber)
-                await BreakRuleAsync(stream, fight, Challenges.BossRule.PasarLaEsponjaEachRound,
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.PushOrPullLasponjaEachRound,
                     $"Mob Lasponja dies in global round {fight.RoundNumber} before being pushed or pulled");
         }
 
@@ -157,11 +158,11 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task EarlySpecialEnemyTurnStartedAsync(NetworkStream stream, FightInstance fight,
                                                                     Fighter enemy)
         {
-            if (enemy.MonsterId == SilfElRasgabolMayor && enemy.IsAlive
-                && RuleInPlay(fight, Challenges.BossRule.RasgabolasMenoresMaxTwoAtBossTurn)
-                && fight.Rojo.Count(monster => monster.IsAlive && monster.MonsterId == RasgabolMenor) > 2)
+            if (enemy.MonsterId == SilfGreaterRasgabol && enemy.IsAlive
+                && RuleInPlay(fight, Challenges.BossRule.LesserRasgabolasMaxTwoAtBossTurn)
+                && fight.Rojo.Count(monster => monster.IsAlive && monster.MonsterId == LesserRasgabol) > 2)
             {
-                await BreakRuleAsync(stream, fight, Challenges.BossRule.RasgabolasMenoresMaxTwoAtBossTurn,
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.LesserRasgabolasMaxTwoAtBossTurn,
                     "more than two lesser Rasgabolas are alive when Silf starts its turn");
             }
 
@@ -181,12 +182,23 @@ namespace Jondo.Unity.Server.Handlers
                         $"a Hungry Sunflower summon {enemy.Name} begins its second turn");
             }
 
+            // The client's script (spell 26025) watches the egg's turn starts with a delay of one,
+            // as Cocabulia's shells (26020, delay two) are let off two: the egg plays right after
+            // Lasoberaña, so its first turn is free and its second one breaks the challenge.
             if (enemy.MonsterId == TregenariaEgg && enemy.IsAlive && enemy.EsInvocado
                 && IsSummonedBy(fight, enemy, Lasoberana)
                 && RuleInPlay(fight, Challenges.BossRule.LasoberanaEggKilledBeforeNextTurn))
             {
-                await BreakRuleAsync(stream, fight, Challenges.BossRule.LasoberanaEggKilledBeforeNextTurn,
-                    "a Tregenaria egg summoned by Lasoberaña begins its turn");
+                var eggState = EarlySpecialStates.GetValue(fight, _ => new EarlySpecialState());
+                int eggStarts;
+                lock (eggState)
+                {
+                    eggStarts = eggState.EggTurnStarts.GetValueOrDefault(enemy.Id) + 1;
+                    eggState.EggTurnStarts[enemy.Id] = eggStarts;
+                }
+                if (eggStarts >= 2)
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.LasoberanaEggKilledBeforeNextTurn,
+                        "a Tregenaria egg summoned by Lasoberaña begins its second turn");
             }
 
             if (enemy.TeamId == 0 || !enemy.IsAlive

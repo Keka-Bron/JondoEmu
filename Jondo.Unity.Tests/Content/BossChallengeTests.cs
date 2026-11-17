@@ -169,6 +169,7 @@ namespace Jondo.Unity.Tests.Content
         [InlineData(5666, 1406)]
         public void Supported_specials_are_imposed_in_their_boss_fights(int bossId, int specialId)
         {
+            if (!Available) return;
             Load();
 
             Assert.Contains(Challenges.Imposed(new[] { bossId }, new int[0], 2, 4),

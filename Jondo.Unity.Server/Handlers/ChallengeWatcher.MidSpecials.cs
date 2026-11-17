@@ -241,11 +241,14 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        /// <summary>Call when a non-summoned enemy dies; Kao rocks are summons and remain in fight.Rojo.</summary>
+        /// <summary>
+        /// Call when an enemy dies. The client's script (spell 29370) fails on any death while a Kao
+        /// rock stands, a summon's too; only the rocks themselves do not count.
+        /// </summary>
         public static async Task MidSpecialKaoEnemyDiedAsync(NetworkStream stream, FightInstance fight,
                                                               Fighter victim)
         {
-            if (HasSpecial(fight, 1406) && victim.TeamId == 1 && !victim.EsInvocado
+            if (HasSpecial(fight, 1406) && victim.TeamId == 1
                 && victim.MonsterId != KaoRock
                 && fight.Rojo.Any(enemy => enemy.MonsterId == KaoRock && enemy.IsAlive))
                 await BreakOneAsync(stream, fight, 1406,

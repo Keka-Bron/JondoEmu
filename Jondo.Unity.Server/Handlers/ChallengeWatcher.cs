@@ -244,7 +244,7 @@ namespace Jondo.Unity.Server.Handlers
 
             MidSpecialAllyTurnStarted(fight, quien);
 
-            if (fight.RoundNumber >= 2)
+            if (!FirstTurnOf(fight, quien))
             {
                 foreach (int id in WithRule(fight, Challenges.BossRule.StartAdjacentToBossFromRound2AndKillBossLast))
                 {
@@ -412,6 +412,21 @@ namespace Jondo.Unity.Server.Handlers
         /// An ENEMY's turn starts. It is only needed for Blitzkrieg: whoever you hit, you finish off
         /// before his turn comes.
         /// </summary>
+        /// <summary>The fighters that have started a turn, fight by fight.</summary>
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<FightInstance, HashSet<long>> TurnsStarted = new();
+
+        /// <summary>
+        /// Whether this is the fighter's first turn start in the fight. The client's scripts for the
+        /// specials judged «from the second turn» (spells 25944, 26029, 25953) watch each fighter's
+        /// turn starts with a delay of one: a summon that comes in later is let off its own first
+        /// turn, as everybody is in round one.
+        /// </summary>
+        private static bool FirstTurnOf(FightInstance fight, Fighter fighter)
+        {
+            var started = TurnsStarted.GetValue(fight, _ => new HashSet<long>());
+            lock (started) return started.Add(fighter.Id);
+        }
+
         public static async Task EnemyTurnStartedAsync(NetworkStream stream, FightInstance fight,
                                                        Fighter enemigo)
         {
@@ -421,7 +436,7 @@ namespace Jondo.Unity.Server.Handlers
             await LateSpecialEnemyTurnStartedAsync(stream, fight, enemigo);
             await MidSpecialEnemyTurnStartedAsync(stream, fight, enemigo);
 
-            if (fight.RoundNumber >= 2 && enemigo.IsAlive && AnyRule(fight))
+            if (!FirstTurnOf(fight, enemigo) && enemigo.IsAlive && AnyRule(fight))
             {
                 if (!Adyacente(fight, enemigo, 0) && !Adyacente(fight, enemigo, 1))
                     await BreakRuleAsync(stream, fight, Challenges.BossRule.EnemiesStartAdjacentFromRound2,
@@ -625,13 +640,17 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            if (quien.MonsterId is 6233 or 6234) // The two Cucurbiturret variants.
+            // The client's script (spell 26080) watches the Cucurbiturret 6233 alone; 6234 is
+            // another monster of the fight.
+            if (quien.MonsterId == 6233)
                 await BreakRuleAsync(stream, fight, Challenges.BossRule.NoDamageToCucurbiturrets,
                                      $"{quien.Name} takes damage");
 
             foreach (int id in WithRule(fight, Challenges.BossRule.OnlyDamageBossUntilItDies))
             {
-                if (quienPega is { TeamId: 0 } && OtherThanLivingBoss(fight, quien, id))
+                // Whoever deals it: the client's script (spell 26075) fails on any damage to an
+                // enemy other than the boss, its own side's included.
+                if (OtherThanLivingBoss(fight, quien, id))
                     await BreakOneAsync(stream, fight, id, $"{quien.Name} takes damage before the boss dies");
             }
 
