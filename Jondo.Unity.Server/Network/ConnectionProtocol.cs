@@ -1101,7 +1101,10 @@ namespace Jondo.Unity.Server.Network
             if (state == null) return 0;
             long carried = 0;
             foreach (var item in state.EquipmentItems.Values.ToArray())
-                carried += (long)DatabaseManager.GetItemRealWeight(item.Template) * Math.Max(1, item.Quantity);
+                // Not the invisible items (type 203): the client cannot see them, so their pod would
+                // be a weight with nothing to show for it.
+                if (!Managers.Equipment.IsInvisible(item.Template))
+                    carried += (long)DatabaseManager.GetItemRealWeight(item.Template) * Math.Max(1, item.Quantity);
             return carried;
         }
 
@@ -2068,6 +2071,8 @@ namespace Jondo.Unity.Server.Network
             var iwb = Pb.New();
             foreach (var item in items)
             {
+                if (Managers.InvisibleItems.Conceal(item.Gid, item.Uid)) continue;
+
                 var body = Pb.New().Var(1, item.Gid);
                 foreach (var effect in Managers.Equipment.ParseEffects(item.Effects))
                 {

@@ -2165,10 +2165,12 @@ namespace Jondo.Unity.Server.Network
                 if (result.Spoils != null)
                 {
                     botin.VarIfNotZero(1, result.Spoils.Kamas);
-                    if (result.Spoils.Items.Count > 0)
+                    // The invisible items (type 203) are won but not listed: the screen would name them.
+                    var shown = result.Spoils.Items.Where(drop => !Managers.Equipment.IsInvisible(drop.Gid)).ToList();
+                    if (shown.Count > 0)
                     {
                         var objetos = Pb.New();
-                        foreach (var (quantity, gid) in result.Spoils.Items)
+                        foreach (var (quantity, gid) in shown)
                         {
                             objetos.Msg(1, Pb.New().Var(2, quantity).Var(4, gid));
                         }
