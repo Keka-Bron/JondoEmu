@@ -218,6 +218,23 @@ namespace Jondo.Unity.Server.Managers
         static SpellEffects()
         {
             Jondo.Unity.World.Fights.Buffs.UidDeLaPila = StackUidOf;
+            Jondo.Unity.World.Fights.Buffs.DispellableOfItsRow = row => DispellableOf(row.HechizoOrigen, row.NivelOrigen, row.EffectUid);
+        }
+
+        /// <summary>
+        /// The "dispellable" of a spell's row by its effect uid, in the normal list or the critical
+        /// one, or zero when the spell has no such row -- an effect of the engine's own, a weapon
+        /// line. Every one of the catalogue's 127,300 rows has a uid of its own, so the spell, the
+        /// grade and the uid name one row.
+        /// </summary>
+        public static int DispellableOf(int spell, int grade, int effectUid)
+        {
+            if (spell == 0 || effectUid == 0) return 0;
+            foreach (var row in De(spell, grade))
+                if (row.EffectUid == effectUid) return row.Dispellable;
+            foreach (var row in Criticos(spell, grade))
+                if (row.EffectUid == effectUid) return row.Dispellable;
+            return 0;
         }
 
         public static IReadOnlyList<SpellEffect> De(int hechizo, int grado)

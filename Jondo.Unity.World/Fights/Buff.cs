@@ -199,6 +199,13 @@ namespace Jondo.Unity.World.Fights
         public int Dado { get; set; }
         public int Cara { get; set; }
         public int Valor { get; set; }
+
+        /// <summary>
+        /// The catalogue's "dispellable" of the spell row this one was put from (see
+        /// <see cref="Buffs.DispellableByADispel"/> and the three after it), filled from that row
+        /// as it is put when its creator left it out. Zero is a row of the engine's own, from no
+        /// spell row: nothing dispels it.
+        /// </summary>
         public int Dispellable { get; set; }
 
         /// <summary>How many rounds a pending row lasts once it goes off.</summary>
@@ -398,7 +405,7 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         /// <param name="outlivesHim">
         /// The rows that stay all the same: the ones written to outlive their caster's death (see
-        /// <see cref="DispellableByStrongDispelOnly"/>). Without it, every row of his goes.
+        /// <see cref="OutlivesItsCaster"/>). Without it, every row of his goes.
         /// </param>
         public List<Buff> QuitarLoDe(long quien, Func<Buff, bool> outlivesHim = null)
         {
@@ -535,21 +542,50 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// The catalogue's "dispellable" of a row that only a strong dispel takes (3); past it, 4,
-        /// nothing does. 1 is dispellable, 2 dispellable and gone with its caster's death; a 3 or
-        /// a 4 outlives its caster -- the client's own rule for a dead fighter's buffs, where only
-        /// the 1s and the 2s go.
+        /// The catalogue's "dispellable" of a spell row, which the client receives minus one as its
+        /// EffectDissipationState (Dissipated, DissipatedByDeath, DissipatedByStrongDispel,
+        /// ReallyNotDissipated). A dispel (132) takes the 1s alone; its caster's death takes the 1s
+        /// and the 2s; a 3 waits for a strong dispel, which no effect of the 3.6 catalogue is; a 4
+        /// stays for good. The effects that name a spell or a row -- 406, 1406, 2406 -- take its
+        /// rows whatever their number.
         /// </summary>
+        /// <remarks>
+        /// A 2 is NOT dispellable, the client's own texts say so. The catalogue writes the Xelor's
+        /// Telefrag (Momificación's 950 of 3622) and the Huppermage's elemental states
+        /// (Lanzallamas' 950 of 290) as 2s, and their class guides say they cannot be removed "mediante
+        /// el desembrujo"; Rayo Alfa, every lasting row of it a 2, says "NO PUEDE DESEMBRUJARSE". The
+        /// Zobal's shields, which his guide calls dispellable, are all 1s.
+        /// </remarks>
+        public const int DispellableByADispel = 1;
+        public const int DispellableByDeath = 2;
         public const int DispellableByStrongDispelOnly = 3;
+        public const int NeverDispellable = 4;
+
+        /// <summary>Whether a dispel (132) takes this row: a 1, and not one still waiting on its delay.</summary>
+        public static bool TakenByADispel(Buff row) => row.Dispellable == DispellableByADispel && !row.Pendiente;
 
         /// <summary>
-        /// Takes off every row that can be dispelled -- a dispellable of one, the catalogue's
-        /// "dispellable" -- and the states only those rows held. For effect 132.
+        /// Whether a row stays when whoever put it dies: a 3 or a 4, and a death takes the rest.
+        /// The Super-güino (2609) a dying ally of Morsagüino Real casts on him is all 3s, his for
+        /// the rest of the fight.
+        /// </summary>
+        public static bool OutlivesItsCaster(Buff row) => row.Dispellable >= DispellableByStrongDispelOnly;
+
+        /// <summary>
+        /// The "dispellable" of the spell row a row was put from, by its spell, grade and effect uid
+        /// (the uids are unique across the whole catalogue), or zero for one of no spell row. Set by
+        /// the server's spell catalogue; <see cref="Poner"/> asks it for every row put without one.
+        /// </summary>
+        public static Func<Buff, int> DispellableOfItsRow { get; set; } = _ => 0;
+
+        /// <summary>
+        /// Takes off every row that can be dispelled (<see cref="TakenByADispel"/>) and the states
+        /// only those rows held. For effect 132.
         /// </summary>
         public List<Buff> QuitarLosDesembrujables()
         {
-            var quitados = _puestos.FindAll(e => e.Dispellable == 1 && !e.Pendiente);
-            _puestos.RemoveAll(e => e.Dispellable == 1 && !e.Pendiente);
+            var quitados = _puestos.FindAll(TakenByADispel);
+            _puestos.RemoveAll(TakenByADispel);
             SeVan(quitados);
             foreach (var quitado in quitados)
             {
@@ -721,6 +757,11 @@ namespace Jondo.Unity.World.Fights
         public Buff Poner(Buff embrujo, Func<int> siguienteNumero)
         {
             Relevados.Clear();
+
+            // Every row of a spell carries its row's "dispellable", whoever made it: twelve of the
+            // engine's fifteen ways of putting a spell's row left it out, and a dispel, which takes
+            // the 1s alone, took almost nothing a spell had put.
+            if (embrujo.Dispellable == 0) embrujo.Dispellable = DispellableOfItsRow(embrujo);
 
             int tope = embrujo.MaxStacks;
             if (embrujo.Apila && tope <= 1) tope = -1;

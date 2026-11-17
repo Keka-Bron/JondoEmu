@@ -10595,7 +10595,7 @@ namespace Jondo.Unity.Server.Handlers
                 foreach (var otro in TodosLosCombatientes(fight).ToList())
                 {
                     if (otro == null || otro == muerto || !otro.IsAlive) continue;
-                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id, OutlivesItsCaster);
+                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id, Jondo.Unity.World.Fights.Buffs.OutlivesItsCaster);
                     foreach (var quitado in quitados)
                     {
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
@@ -10636,27 +10636,6 @@ namespace Jondo.Unity.Server.Handlers
                 // And out of the carousel, so that their turn never comes.
                 fight.RebuildTurnOrderOnFighterDeath();
             }
-        }
-
-        /// <summary>
-        /// Whether a row stays when whoever put it dies: the catalogue writes it dispellable 3 (by a
-        /// strong dispel only) or 4 (never). The row's own number when it carries one, else its
-        /// spell row's, found by its uid: most rows are put without it. A death takes the 1s and
-        /// the 2s -- a Pépite's mark on Crunchidor, an Éclat's invulnerability on its escort are
-        /// 2s -- and the Super-güino (2609), the 3s a dying ally of Morsagüino Real casts on him.
-        /// </summary>
-        internal static bool OutlivesItsCaster(Jondo.Unity.World.Fights.Buff row)
-        {
-            int dispellable = row.Dispellable;
-            if (dispellable == 0 && row.EffectUid != 0 && row.HechizoOrigen != 0)
-            {
-                var itsRow = (row.Critico ? Managers.SpellEffects.Criticos(row.HechizoOrigen, row.NivelOrigen)
-                                                                .FirstOrDefault(r => r.EffectUid == row.EffectUid) : null)
-                             ?? Managers.SpellEffects.De(row.HechizoOrigen, row.NivelOrigen)
-                                                     .FirstOrDefault(r => r.EffectUid == row.EffectUid);
-                dispellable = itsRow?.Dispellable ?? 0;
-            }
-            return dispellable >= Jondo.Unity.World.Fights.Buffs.DispellableByStrongDispelOnly;
         }
 
         /// <summary>

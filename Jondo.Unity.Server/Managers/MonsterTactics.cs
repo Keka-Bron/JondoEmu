@@ -1800,7 +1800,7 @@ namespace Jondo.Unity.Server.Managers
             double worth = 0;
             foreach (var row in who.Buffs.Puestos)
             {
-                if (row.Dispellable != 1 || row.Pendiente) continue;
+                if (!Buffs.TakenByADispel(row)) continue;
                 double turns = Math.Max(1, row.Duracion);
                 if (row.Estado != 0 && row.EffectId == EffectSupport.AddState)
                 {
