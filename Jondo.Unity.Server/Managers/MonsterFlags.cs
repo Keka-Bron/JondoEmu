@@ -73,6 +73,20 @@ namespace Jondo.Unity.Server.Managers
             return flags < 0 || (flags & CanBePushed) != 0;
         }
 
+        /// <summary>
+        /// Whether a creature of this template takes its turns. Of the 5,134 templates, 204 lack
+        /// the bit, nearly all of them summons (<see cref="Summons.CanPlayFlag"/> reads it for
+        /// those). One is fought as a monster of its own: Furyha (4074), the angry soul of the
+        /// Turquoise Dofus's last quest, who stands still while the astral shadow holds out and
+        /// only her own spell's delayed rows move her (DPLN, «Une âme en colère»: «elle ne bouge
+        /// pas jusqu'au tour 31»). A template world.db does not have is taken as one that plays.
+        /// </summary>
+        public static bool AllowsPlay(int templateId)
+        {
+            long flags = Of(templateId);
+            return flags < 0 || (flags & Summons.CanPlayFlag) != 0;
+        }
+
         /// <summary>Whether the fighter is a monster or summon whose template keeps it from being pushed.</summary>
         public static bool TemplatePinsInPlace(Jondo.Unity.World.Fights.Fighter who)
             => who != null && who.IsMonster && who.MonsterId > 0 && !AllowsPush(who.MonsterId);

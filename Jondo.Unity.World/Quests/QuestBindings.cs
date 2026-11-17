@@ -442,7 +442,11 @@ namespace Jondo.Unity.World.Quests
 
         public void Add(QuestBinding binding)
         {
-            _byObjective[binding.ObjectiveId] = binding;
+            // An element that only hands over or only takes leaves its objective to the row that
+            // closes it: the four pillars of Furyha's rock each take a totem while «Coloca los
+            // tótems y sopla en la caracola» is the conch's to close. Reached by its element.
+            if (!binding.OnlyGives || !_byObjective.ContainsKey(binding.ObjectiveId))
+                _byObjective[binding.ObjectiveId] = binding;
 
             if (binding.Kind == QuestBindingKind.Enter && binding.Starts != 0 && binding.MapId != 0)
             {

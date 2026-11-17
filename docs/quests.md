@@ -208,6 +208,13 @@ Summons do not count. They are on the opposing side with `IsMonster` set, and th
 tripped over that twice: a summoning monster was paying kamas for creatures it made
 itself.
 
+**An element that only hands over or takes** (`"onlyGives": true` in `content/quests/objectives.json`)
+leaves its objective alone. With `gives` it hands the items over once; with `requires` and
+`"spends": true` and nothing to give, it only takes what it asks for. The four pillars of Furyha's rock
+in «Oración en los tiempos de cólera» (1663) each take a totem. Such a row may share its objective
+with the row that closes it (the conch, 10070). The objective belongs to the closing row, and the
+element finds its own row.
+
 ---
 
 ## 5. What is stored

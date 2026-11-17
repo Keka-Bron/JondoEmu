@@ -907,6 +907,15 @@ namespace Jondo.Unity.Server.Managers
             // An element that only hands something over: given once, the objective left alone.
             if (binding.OnlyGives)
             {
+                // Or that only takes what it asks for: each of the four pillars of Furyha's rock
+                // takes its totem («Placez vos totems sur chaque piliers», DPLN, «Une âme en
+                // colère»), and the step is the conch's, used once no totem is carried.
+                if (binding.SpendsRequired && (binding.Gives?.Count ?? 0) == 0 && binding.SpawnsMonster == 0)
+                {
+                    await SpendAsync(stream, binding);
+                    return true;
+                }
+
                 bool gave = false;
                 foreach (var (item, count) in binding.Gives)
                 {

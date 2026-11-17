@@ -142,6 +142,35 @@ namespace Jondo.Unity.Tests.Quests
         }
 
         [Fact]
+        public void An_element_that_only_takes_leaves_its_objective_to_the_closing_row()
+        {
+            // «Coloca los tótems y sopla en la caracola» (10070): the conch closes it, and each
+            // pillar of the rock (490938 among them) only takes its totem.
+            var book = new QuestBindingBook();
+            var conch = new QuestBinding { ObjectiveId = 10070, QuestId = 1663, Kind = QuestBindingKind.Use, MapId = 154141187 };
+            var pillar = new QuestBinding
+            {
+                ObjectiveId = 10070,
+                QuestId = 1663,
+                Kind = QuestBindingKind.Click,
+                OnlyGives = true,
+                SpendsRequired = true,
+                Elements = new List<(long, int)> { (154141187, 490938) },
+            };
+            book.Add(conch);
+            book.Add(pillar);
+
+            Assert.Same(conch, book.Of(10070));
+            Assert.Same(pillar, Assert.Single(book.At(154141187, 490938)));
+
+            // Read the other way round, the closing row still wins the objective.
+            var reversed = new QuestBindingBook();
+            reversed.Add(pillar);
+            reversed.Add(conch);
+            Assert.Same(conch, reversed.Of(10070));
+        }
+
+        [Fact]
         public void A_row_that_says_nothing_about_type_gets_minus_one_and_not_zero()
         {
             // The one field where "not written" and "written as zero" cannot be told apart by

@@ -4042,6 +4042,7 @@ namespace Jondo.Unity.Server.Handlers
             await ActitudesAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
             await EngancheAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
             fighter.LeHanPegado = false;
+            await NonPlayingSummonsAnswerAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
 
             // A poison can kill here, at the start of its victim's turn -- a JondoBot Sram's
             // Arsénico does. Nothing looked: the dead player was handed his turn and the fight
@@ -4103,6 +4104,19 @@ namespace Jondo.Unity.Server.Handlers
             // capture, jzc, its cast, jyt, jxh, a quarter of a second. A summon that CAN act is
             // its owner's to play by hand, always; an AI for it would be an option the player
             // switches on, and nothing of that is measured.
+            // A fight's own monster whose template does not play (no CanPlay): what fires at its
+            // turn start has gone out above, and the turn is handed on. Furyha (4074) stands
+            // still while the astral shadow holds out; the delayed rows of her own spell (5778)
+            // move her at round 31. Played by the monsters' wits, she walked from round 2 and
+            // struck down the spirits and the shadow.
+            if (fighter.IsMonster && !fighter.EsInvocado && !fighter.IsPlayedAlly && fighter.MonsterId > 0
+                && !Managers.MonsterFlags.AllowsPlay(fighter.MonsterId))
+            {
+                Program.LogDebug($"[Fight] {fighter.Id} (template {fighter.MonsterId}) does not play: the turn is passed.");
+                await PassTurnAsync(stream);
+                return;
+            }
+
             // "Turno cancelado" (140): a live row of it and this turn is lost, handed on at once.
             if (fighter.Buffs.Puestos.Any(b => b.EffectId == Managers.EffectEngine.TurnoCancelado
                                                && b.Vivo(fight.RoundNumber) && !b.Pendiente))
@@ -9487,6 +9501,30 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// The summons of <paramref name="owner"/> that never take a turn answer the turn start
+        /// or end of their summoner with their own spell, as what they put already falls at his
+        /// turn (<see cref="ItsCastersTurnHasCome"/>). Kelpi (4063, no CanPlay) has Motivación
+        /// (6184): a TB row whose child gives its summoner one AP, «Kelpe vous donne 1 PA par
+        /// tour» (DPLN, «Une âme en colère»); asked only at its own turn, which never comes, it
+        /// never gave it. Only the attitude -- the summon's own spell -- answers: what others
+        /// hooked on it (a Tymador's bombs) keeps going as before.
+        /// </summary>
+        private static async Task NonPlayingSummonsAnswerAsync(NetworkStream stream, FightInstance fight,
+                                                               Fighter owner, string trigger)
+        {
+            if (owner == null) return;
+            var summons = TodosLosCombatientes(fight)
+                .Where(f => f != null && f.IsAlive && f.EsInvocado && !f.JuegaTurno && f.Invocador == owner.Id
+                            && f.Buffs.Actitudes.Count > 0)
+                .ToList();
+            foreach (var summon in summons)
+            {
+                if (!summon.IsAlive) continue;
+                await ActitudesAsync(stream, fight, summon, trigger);
+            }
+        }
+
+        /// <summary>
         /// The attitudes the items give, fired at their moment.
         ///
         /// Each dofus and each trophy gives a "spell" through its effect 1175, and that spell says when
@@ -12706,6 +12744,7 @@ namespace Jondo.Unity.Server.Handlers
             // takes off the "I have been hit" state, so that the next turn checks it clean again.
             await ActitudesAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
             await EngancheAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
+            await NonPlayingSummonsAnswerAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
 
             // And the turn-end glyphs under him (402).
             await TurnEndGlyphsAsync(stream, fight, ending);
