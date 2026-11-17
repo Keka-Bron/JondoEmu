@@ -37,7 +37,9 @@ internal sealed class AfterSelectionMessages(
     {
         long carried = 0;
         foreach (var item in state.EquipmentItems.Values)
-            carried = checked(carried + (long)itemWeight(item.Template) * Math.Max(1, item.Quantity));
+            // The invisible items (type 203) weigh nothing the player could see: some carry 1 pod.
+            if (!Equipment.IsInvisible(item.Template))
+                carried = checked(carried + (long)itemWeight(item.Template) * Math.Max(1, item.Quantity));
 
         // The capacity every refresh sends (ConnectionProtocol.Capacity): levels, jobs, strength.
         // Arithmetic is widened before multiplication and checked at the int32 wire boundary.

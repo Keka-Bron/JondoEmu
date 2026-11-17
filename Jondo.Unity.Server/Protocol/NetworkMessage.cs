@@ -91,6 +91,10 @@ namespace Jondo.Protocol
 
         public static async Task WriteFrameAsync(Stream stream, byte[] payload)
         {
+            // Every item message goes out through here: the one place that can keep the client
+            // from hearing about the invisible items (type 203) whoever built the frame.
+            if (Jondo.Unity.Server.Managers.InvisibleItems.Hides(payload)) return;
+
             FrameTap?.Invoke(payload);
             using var ms = new MemoryStream();
             var codedStream = new CodedOutputStream(ms);

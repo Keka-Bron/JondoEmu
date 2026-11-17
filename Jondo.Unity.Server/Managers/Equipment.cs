@@ -95,6 +95,25 @@ namespace Jondo.Unity.Server.Managers
         public static bool IsWorn(int position) => position >= 0 && position <= LastWornSlot;
 
         /// <summary>
+        /// The client's item type 203, «Objeto invisible» (datos/item_types_3.6.10.11.json: super type
+        /// 26, not in the encyclopedia). Ankama uses it for quest progress flags, 3,072 templates,
+        /// most of them named like «[!] Quête 2453 Objet 001».
+        /// </summary>
+        public const int InvisibleType = 203;
+
+        /// <summary>Whether an item type is the invisible one.</summary>
+        public static bool IsInvisibleType(int type) => type == InvisibleType;
+
+        /// <summary>
+        /// Whether an item is a hidden flag (type 203). The server keeps, counts, tests (the PO criterion)
+        /// and removes them like any other item, but the client has no filter of its own and would
+        /// list them in the bag and the chat, which the real server never does: nothing about
+        /// them goes on the wire (<see cref="InvisibleItems"/>). An unknown template is not invisible.
+        /// </summary>
+        public static bool IsInvisible(int gid)
+            => Forgemagic.TemplateOf(gid) is { } template && IsInvisibleType(template.Type);
+
+        /// <summary>
         /// Whether what is in a slot adds to the sheet: the worn ones, and the bonus slots past them
         /// -- a candy's boost food, a blessing (<see cref="BonusSlots"/>) --, which are worn by nobody
         /// and drawn on nobody but count all the same.

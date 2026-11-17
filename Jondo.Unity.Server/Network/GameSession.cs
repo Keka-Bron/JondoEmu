@@ -121,7 +121,9 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public Task SendAsync(byte[] packet)
         {
-            if (_sendPacket != null) return _sendPacket(packet);
+            // The same filter as the frame writer's, for the sessions that do not write to a stream.
+            if (_sendPacket != null)
+                return Jondo.Unity.Server.Managers.InvisibleItems.Hides(packet) ? Task.CompletedTask : _sendPacket(packet);
             if (Stream != null) return Jondo.Protocol.NetworkMessage.WriteFrameAsync(Stream, packet);
             Jondo.Protocol.NetworkMessage.FrameTap?.Invoke(packet);
             return Task.CompletedTask;
