@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using Xunit;
 
@@ -77,6 +78,36 @@ namespace Jondo.Unity.Tests.Combat
         {
             Assert.Equal(650, Summons.CaracteristicaDelInvocado(600, 50, 0));
             Assert.Equal(1790, Summons.CaracteristicaDelInvocado(600, 50, 190));
+        }
+
+        [Theory]
+        [InlineData(FightInstance.Azules)]
+        [InlineData(FightInstance.Rojos)]
+        public async Task A_summon_spawn_packet_carries_its_summoners_team(int team)
+        {
+            const long playerId = 8_950_000_303;
+            await using var wire = await PortalTests.Wire.Open(playerId);
+            var fight = new FightInstance(8_950_303, 1, 1);
+            var player = new Fighter { Id = playerId, CellId = 230, MaxHP = 3000, CurrentHP = 3000, Level = 200 };
+            var enemy = new Fighter { Id = -99, CellId = 232, MaxHP = 3000, CurrentHP = 3000, Level = 190, IsMonster = true };
+            fight.AddPlayer(player);
+            fight.AddMonster(enemy);
+
+            var summoner = team == FightInstance.Azules ? player : enemy;
+            var summon = await FightHandler.SummonAsync(wire.Session.Stream, fight, summoner, 3563, 1, 231);
+            Assert.NotNull(summon);
+            Assert.Equal(team, summon.TeamId);
+
+            var action = Assert.Single((await wire.Drain()).Where(f => f.Op == Op.Jwe)
+                .Select(f => ProtoMessage.Parse(f.Payload)),
+                m => m.Fields.Any(f => f.FieldNumber == 14 && f.VarIntValue == FightProtocol.Invoca));
+
+            // Three wrappers enclose the fighter, whose first field holds its placement and team.
+            var placement = action;
+            for (int depth = 0; depth < 4; depth++)
+                placement = ProtoMessage.Parse(placement.Fields.Single(f => f.FieldNumber == 1).BytesValue);
+
+            Assert.Equal((long)team, placement.Fields.SingleOrDefault(f => f.FieldNumber == 2)?.VarIntValue ?? 0);
         }
 
         /// <summary>

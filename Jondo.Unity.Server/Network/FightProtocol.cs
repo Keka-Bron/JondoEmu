@@ -1722,7 +1722,7 @@ namespace Jondo.Unity.Server.Network
         /// on top. Measured byte by byte against the Cra's Baliza de Supervivencia:
         ///
         ///   f1 { f1 { f1 {
-        ///     f1 { f3: 1, f4 { f1 { f1: cell, f2: orientation, f4: 0 }, f3: who it is } }
+        ///     f1 { f2: team (omitted for blue), f3: 1, f4 { f1 { f1: cell, f2: orientation, f4: 0 }, f3: who it is } }
         ///     f2: 0                          the identifier slot, zero as in a monster
         ///     f3 { f2: 3, f3: the LOOK template }
         ///     f5 { f3 { f2: the CREATURE template, f3: its grade } }
@@ -1742,7 +1742,7 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildSummon(long quienInvoca, long quienEs, int celda, int orientacion,
                                          int plantillaDelAspecto, int plantillaDelBicho, int grado,
                                          IEnumerable<(int Characteristic, long Base, long Gear)> ficha,
-                                         int efecto = Invoca, byte[] look = null)
+                                         int team, int efecto = Invoca, byte[] look = null)
         {
             var stats = Pb.New()
                 .Var(1, quienInvoca)
@@ -1755,6 +1755,7 @@ namespace Jondo.Unity.Server.Network
 
             var cuerpo = Pb.New()
                 .Msg(1, Pb.New()
+                    .VarIfNotZero(2, team)
                     .Var(3, 1)
                     .Msg(4, Pb.New()
                         .Msg(1, Pb.New().Var(1, celda).VarIfNotZero(2, orientacion).Var(4, 0))
