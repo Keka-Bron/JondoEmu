@@ -5982,6 +5982,75 @@
    "replies": [],
    "afterObjectives": [18563],
    "why": "«Trae de vuelta al rebaño de Yeleka Yrehn»: the herd (the follower «Rebaño de jalatós», 26799, from the panicked bouftou) brought back to Yeleka Yrehn [2,12] (Dofus pour les noobs, «La campagne hallucinée»): «Retournez en [2,12] auprès de Yeleka Yrehn pour lui rendre ses bouftous»; done by her last reply (68304), which ends the quest."
+  },
+  {
+   "objective": 18582,
+   "quest": 2452,
+   "kind": "reply",
+   "replies": [],
+   "why": "«Busca a un docero perdido en el Bosque Maléfico»: «allez en [-1,19] pour rencontrer un douzien, Edgar Hé» (Dofus pour les noobs, «Le mal qui fait bien»). Done by the last reply of his first talk (68156, the character hearing Malsetego blame a malter for the voice); no reply listed, so the objective is the server's and not the client's."
+  },
+  {
+   "objective": 18584,
+   "quest": 2452,
+   "kind": "click",
+   "elements": [{"map": 221643270, "element": 524300}],
+   "afterObjectives": [18583],
+   "why": "«Encuentra el lugar que mencionó Pedri Dísimo»: «rendez-vous à l'orée de la forêt en [-7,21]... examiner les cannes à pêche en cliquant dessus» (Dofus pour les noobs, «Le mal qui fait bien»): the fishing rods are element 524300 of 221643270 (graphic 49286, cell 384 in the client's map), clicked once Malsetego has asked the character to find the place (18583)."
+  },
+  {
+   "objective": 18586,
+   "quest": 2452,
+   "kind": "beat",
+   "monster": 6967,
+   "map": 220988934,
+   "afterObjectives": [18585],
+   "why": "«Deshazte de los malsetos que le cortan el paso a Pedri Dísimo»: the Malzerb oppressant's group on [-2,19] (Dofus pour les noobs, «Le mal qui fait bien»), fought through the NPC's reply (content/fights/npc_fights.json)."
+  },
+  {
+   "objective": 18587,
+   "quest": 2452,
+   "kind": "beat",
+   "monster": 6968,
+   "map": 220988935,
+   "afterObjectives": [18586],
+   "why": "«Deshazte de los maltríos que le cortan el paso a Pedri Dísimo»: the Maltrio persécuteur's group on [-2,20] (Dofus pour les noobs, «Le mal qui fait bien»), fought through the NPC's reply."
+  },
+  {
+   "objective": 18588,
+   "quest": 2452,
+   "kind": "beat",
+   "monster": 6969,
+   "map": 220988423,
+   "afterObjectives": [18587],
+   "why": "«Deshazte de los malpinchos que le cortan el paso a Pedri Dísimo»: the Malépik tyrannique's group on [-3,20] (Dofus pour les noobs, «Le mal qui fait bien»), fought through the NPC's reply."
+  },
+  {
+   "objective": 18589,
+   "quest": 2452,
+   "kind": "beat",
+   "monster": 6970,
+   "map": 220987911,
+   "afterObjectives": [18588],
+   "why": "«Deshazte de los maltuerzos que le cortan el paso a Pedri Dísimo»: the Malalfa harceleur's group on [-4,20] (Dofus pour les noobs, «Le mal qui fait bien»), fought through the NPC's reply."
+  },
+  {
+   "objective": 18590,
+   "quest": 2452,
+   "kind": "beat",
+   "monster": 6967,
+   "map": 220987399,
+   "afterObjectives": [18589],
+   "why": "«Procura que Pedri Dísimo salga del dédalo aliándose con Malsetego»: the wave fight on [-5,20] with Malsetego as an ally (Dofus pour les noobs, «Le mal qui fait bien»: «Un combat à vagues se lance»); the Malzerb oppressant is in all three waves."
+  },
+  {
+   "objective": 18592,
+   "quest": 2452,
+   "kind": "reply",
+   "replies": [],
+   "afterObjectives": [18591],
+   "why": "«Asegúrate de que Pedri Dísimo ha llegado bien a destino»: «allez donc en [-7,21] pour parler à Edgar Hé» (Dofus pour les noobs, «Le mal qui fait bien»); done by the last reply of his talk (68159), which ends the quest."
   }
+
 ]
 }

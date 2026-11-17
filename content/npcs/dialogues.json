@@ -47291,6 +47291,206 @@
         }
       ],
       "why": "Lzonciyo, the militia officer of the buried village's bounty board (679 «Los indeseables», Dofus pour les noobs «Les indésirables»/«Collecte sanglante»): the client's greeting is 8429, «Cuéntame más cosas.» (8624) leads to the offer (8430: bring the creatures with a price on them), «Preguntar qué monstruos todavía no han sido capturados y apresados.» (8452) starts it. He then receives the four captured souls: Fuji Gélifux 8453 (thanks 8434), Dremoan 8454 (8435), Tejash 8455 (8436), Huini Golosote 8456 (8437); the last objective is to speak to him again (8432, his gift). INFERRED: which line follows which reply; the hour criterion SH and Sc=702 are not modelled."
+    },
+    {
+      "npc": 6736,
+      "map": 0,
+      "opening": 50823,
+      "openings": [
+        { "quest": 2452, "objective": 18590, "pending": 18591, "message": 50841 },
+        { "quest": 2452, "objective": 18583, "pending": 18584, "message": 50839 },
+        { "quest": 2452, "message": 50838 },
+        { "after": 2452, "message": 50842 }
+      ],
+      "lines": [
+        {
+          "message": 50823,
+          "choices": [
+            { "reply": 68135, "next": 50824 }
+          ]
+        },
+        {
+          "message": 50824,
+          "choices": [
+            { "reply": 68134, "next": 50825 }
+          ]
+        },
+        {
+          "message": 50825,
+          "choices": [
+            { "reply": 68133, "next": 50826 }
+          ]
+        },
+        {
+          "message": 50826,
+          "choices": [
+            { "reply": 68132, "next": 50827 }
+          ]
+        },
+        {
+          "message": 50827,
+          "choices": [
+            { "reply": 68130, "startsQuest": 2452, "params": [[34, 2452]] },
+            { "reply": 68131 }
+          ]
+        },
+        {
+          "message": 50838,
+          "choices": [
+            { "reply": 68150, "next": 50839, "quest": 2452, "beforeObjective": 18583 },
+            { "reply": 68152, "next": 50840, "quest": 2452, "afterObjective": 18584, "beforeObjective": 18585 }
+          ]
+        },
+        {
+          "message": 50839,
+          "choices": [
+            { "reply": 68149, "quest": 2452, "beforeObjective": 18583, "completes": 18583, "params": [[30, 18583]] },
+            { "reply": 68149 }
+          ]
+        },
+        {
+          "message": 50840,
+          "choices": [
+            { "reply": 68151, "quest": 2452, "beforeObjective": 18585, "completes": 18585, "params": [[30, 18585]] },
+            { "reply": 68151 }
+          ]
+        },
+        {
+          "message": 50841,
+          "choices": [
+            { "reply": 68154, "next": 50842 }
+          ]
+        },
+        {
+          "message": 50842,
+          "choices": [
+            { "reply": 68153, "quest": 2452, "beforeObjective": 18591, "completes": 18591, "params": [[30, 18591]] },
+            { "reply": 68153 }
+          ]
+        }
+      ],
+      "why": "Malsetego (Malzerbego), the malter who wants to do good, on the Enchanted Edge [0,15] (221512706), in the Maze [-1,19] and on [-5,20]. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Confiar en el malter y aceptar entrar en el bosque» (68130) starts the quest after his warning about the maze and the malters (50823), «¿Qué es un malter?» (68135, 50824), why he tells it (68134, 50825), «¿Esto no será una mentira...?» (68133, 50826) and the apology (68132, 50827). In the maze, «Y ¿cómo piensas hacerlo?» (68150) draws his plan (50839); «Aceptar y marcharte en busca del lugar del que ha hablado Pedri Dísimo» (68149) closes «Habla con Malsetego» (18583). Back from the fishing rods, «He encontrado el lugar al suroeste» (68152, 50840) and «Puedes confiar en mí» (68151) close 18585. After the wave fight (50841, 68154, 50842) «Voy a ocuparme de Pedri Dísimo» (68153) closes 18591. INFERRED: which reply follows which line (the template carries the lines and replies, not their pairing), and 50842 with 68153 as his words once the quest is over; the objective ids each reply closes are the order of the guide."
+    },
+    {
+      "npc": 6741,
+      "map": 0,
+      "opening": 50844,
+      "openings": [
+        { "quest": 2452, "objective": 18591, "message": 50847 },
+        { "after": 2452, "message": 50847 }
+      ],
+      "lines": [
+        {
+          "message": 50844,
+          "choices": [
+            { "reply": 68158, "next": 50845 }
+          ]
+        },
+        {
+          "message": 50845,
+          "choices": [
+            { "reply": 68157, "next": 50846 }
+          ]
+        },
+        {
+          "message": 50846,
+          "choices": [
+            { "reply": 68156, "quest": 2452, "beforeObjective": 18582, "completes": 18582, "params": [[30, 18582]] },
+            { "reply": 68156 }
+          ]
+        },
+        {
+          "message": 50847,
+          "choices": [
+            { "reply": 68161, "next": 50848 }
+          ]
+        },
+        {
+          "message": 50848,
+          "choices": [
+            { "reply": 68160, "next": 50849 }
+          ]
+        },
+        {
+          "message": 50849,
+          "choices": [
+            { "reply": 68159, "quest": 2452, "afterObjective": 18591, "beforeObjective": 18592, "completes": 18592, "params": [[30, 18592]] },
+            { "reply": 68159 }
+          ]
+        }
+      ],
+      "why": "Pedri Dísimo (Edgar Hé in French), the fisherman lost in the Maze [-1,19] (220989446) and, once saved, on the shore [-7,21] (221643270). «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): in the maze «¿Va todo bien?» (68158) shows him reading his notes (50844, 50845), «¿Qué voz?» (68157) tells the voice by the water that sent him to the heart of the forest (50846) and the character hearing Malsetego say a malter must have put the idea in his head (68156) finishes «Busca a un docero perdido» (18582). On the shore, «¿Cómo fue tu huida?» (68161, 50847, 50848), «a veces, no hay que fiarse de las apariencias» (68160, 50849) and «Inclinarte y dejarlo con su vida tranquila» (68159) close «Asegúrate de que Pedri Dísimo ha llegado bien a destino» (18592), the last, which ends the quest. INFERRED: which reply follows which line, and 50847 with 68159 as his words after the quest."
+    },
+    {
+      "npc": 6737,
+      "map": 220988934,
+      "opening": 50829,
+      "lines": [
+        {
+          "message": 50829,
+          "choices": [
+            { "reply": 68137 }
+          ]
+        }
+      ],
+      "why": "Malseto opresor (Malzerb oppressant) on 220988934, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Dans un premier temps, allez sur la map à gauche en [-2,19] et parlez au Malzerb oppressant qui barre la route du douzien pour l'attaquer lui et ses acolytes» (50829, «Atacar a los malsetos»). The reply (68137) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 6738,
+      "map": 220988935,
+      "opening": 50830,
+      "lines": [
+        {
+          "message": 50830,
+          "choices": [
+            { "reply": 68138 }
+          ]
+        }
+      ],
+      "why": "Maltrío perseguidor (Maltrio persécuteur) on 220988935, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «continuez votre chemin en descendant en [-2,20] où un nouveau groupe de Malter barre votre route. Parlez au Maltrio persécuteur pour l'attaquer lui et ses compagnons» (50830, «Atacar a los maltríos»). The reply (68138) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 6740,
+      "map": 220988423,
+      "opening": 50828,
+      "lines": [
+        {
+          "message": 50828,
+          "choices": [
+            { "reply": 68136 }
+          ]
+        }
+      ],
+      "why": "Malpincho tiránico (Malépik tyrannique) on 220988423, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «continuez vers la gauche en [-3,20] pour vous heurter cette fois à des Malépik. Parlez au Malépik tyrannique pour l'attaquer lui et sa clique» (50828, «Atacar a los malpinchos»). The reply (68136) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 6739,
+      "map": 220987911,
+      "opening": 50831,
+      "lines": [
+        {
+          "message": 50831,
+          "choices": [
+            { "reply": 68139 }
+          ]
+        }
+      ],
+      "why": "Maltuerzo acosador (Malalfa harceleur) on 220987911, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Continuez vers l'ouest en [-4,20] où des malalfas font jouer de leur muscles. Parlez au Malalfa harceleur pour l'attaquer lui et ses copains» (50831, «Atacar a los maltuerzos»). The reply (68139) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 6738,
+      "map": 220987399,
+      "opening": 50830,
+      "lines": [
+        {
+          "message": 50830,
+          "choices": [
+            { "reply": 68141 }
+          ]
+        }
+      ],
+      "why": "Maltrío perseguidor (Maltrio persécuteur) on 220987399, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Enfin continuez jusqu'en [-5,20]... Un dernier combat est sur le point d'avoir lieu, Malzerbego viendra vous aider. Parlez au Maltrio persécuteur pour lancer le combat» (50830, «Combatir a los malters al lado de Malsetego»). The reply (68141) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
     }
+
   ]
 }

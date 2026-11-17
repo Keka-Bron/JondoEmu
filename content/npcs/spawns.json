@@ -5559,6 +5559,87 @@
       "orientation": 1,
       "criterion": "Qa=2453&Qo>18563&Qo<18564",
       "why": "The panicked bouftou that invites the herd to follow, once the twigs have broken the cages (18563) and until the herd is back with Yeleka Yrehn (18564): «Bouftou paniqué» (Dofus pour les noobs, «La campagne hallucinée»). INFERRED cell."
+    },
+    {
+      "map": 221512706,
+      "npc": 6736,
+      "cell": 262,
+      "orientation": 3,
+      "criterion": "Qa!2452",
+      "why": "Malsetego (Malzerbego) at the edge of the Evil Forest, the Enchanted Edge [0,15] (221512706), where «El mal que hace bien» (2452) starts and where he goes back to his post once it is over («il retourne à son poste»), but not while it is under way: he follows the character into the maze (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220989446,
+      "npc": 6741,
+      "cell": 244,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo<18585",
+      "why": "Pedri Dísimo (Edgar Hé), the lost fisherman with his notes, in the Maze [-1,19] (220989446) (Dofus pour les noobs, «Le mal qui fait bien»: «allez en [-1,19] pour rencontrer un douzien, Edgar Hé»), until the character has promised to clear the way (18585). INFERRED cell."
+    },
+    {
+      "map": 220989446,
+      "npc": 6736,
+      "cell": 245,
+      "orientation": 7,
+      "criterion": "Qa=2452&Qo<18585",
+      "why": "Malsetego at Pedri Dísimo's side in the Maze [-1,19] (220989446): «Malzerbego qui vous a suivi jusqu'ici» (Dofus pour les noobs, «Le mal qui fait bien»), until the character has promised to clear the way (18585). INFERRED cell."
+    },
+    {
+      "map": 220988934,
+      "npc": 6737,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18585&Qo<18586",
+      "why": "The Malseto opresor (Malzerb oppressant) who bars the way to the fisherman on [-2,19] (220988934), first of the four fights, from the promise (18585) until his group is beaten (18586) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220988935,
+      "npc": 6738,
+      "cell": 355,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18586&Qo<18587",
+      "why": "The Maltrío perseguidor (Maltrio persécuteur) who bars the way on [-2,20] (220988935), second fight, until his group is beaten (18587) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220988423,
+      "npc": 6740,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18587&Qo<18588",
+      "why": "The Malpincho tiránico (Malépik tyrannique) who bars the way on [-3,20] (220988423), third fight, until his group is beaten (18588) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220987911,
+      "npc": 6739,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18588&Qo<18589",
+      "why": "The Maltuerzo acosador (Malalfa harceleur) who bars the way on [-4,20] (220987911), fourth fight, until his group is beaten (18589) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220987399,
+      "npc": 6738,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2452&Qo>18589&Qo<18590",
+      "why": "The Maltrío perseguidor (Maltrio persécuteur) who leads the horde on [-5,20] (220987399), the wave fight, until it is beaten (18590) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220987399,
+      "npc": 6736,
+      "cell": 316,
+      "orientation": 7,
+      "criterion": "Qa=2452&Qo>18590&Qo<18591",
+      "why": "Malsetego on [-5,20] (220987399) after the wave fight, where the character speaks to him («parlez à Malzerbego sur la même map»), until he has said goodbye (18591) (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 221643270,
+      "npc": 6741,
+      "cell": 288,
+      "orientation": 3,
+      "criterion": "(Qa=2452&Qo>18591)|Qf=2452",
+      "why": "Pedri Dísimo back on the shore [-7,21] (221643270), where he fished, once Malsetego has sent the character to see him (18591) and for good after the quest («Je me contenterai de venir ici pique-niquer»): «allez en [-7,21] pour parler à Edgar Hé» (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
     }
+
     ]
 }
