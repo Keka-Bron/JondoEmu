@@ -521,6 +521,10 @@
    "look": "{6049}",
    "from": "npc chtigre domesticado"
   },
+  "1832": {
+   "look": "{6853||1=8931360,2=7130498}",
+   "from": "monster Sectario de Jalépona (6941), the look of the sectarian whose robe «Disfrazado de sectario de Jalépona» is stolen on [0,18] (quest 2453); INFERRED the colours (the 6716 look)"
+  },
   "2028": {
    "look": "{537|||100}",
    "from": "monster 927 estrella del mar Rano"
@@ -1389,9 +1393,6 @@
   ],
   "1829": [
    "Luz y ámbar"
-  ],
-  "1832": [
-   "Disfrazado de sectario de Jalépona"
   ],
   "2021": [
    "Castigo de amarrador"

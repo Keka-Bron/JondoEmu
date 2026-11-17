@@ -5914,6 +5914,74 @@
    "map": 54537249,
    "spawns": {"monster": 2894, "count": 8},
    "why": "«Vence a 8 ratas kenopintamos» (type 6, monster 2894 x8): Dofus pour les noobs «Pauvre Kiki»: «Descendez à la cave ! Et attaquez le groupe de rats». The group stands in the cellar 54537249 under the house (the stairs, element 457184, of the village map 54536225)."
+  },
+  {
+   "objective": 18550,
+   "quest": 2453,
+   "kind": "click",
+   "elements": [{"map": 88081163, "element": 524209, "item": 26687}, {"map": 88081162, "element": 524206, "item": 26688}, {"map": 88080649, "element": 524208, "item": 26689}],
+   "givesEach": true,
+   "anyOrder": true,
+   "gives": [{"item": 26687, "count": 1}, {"item": 26688, "count": 1}, {"item": 26689, "count": 1}],
+   "why": "«Inspecciona los alrededores»: «commencez par inspecter le morceau d'étoffe présent sur la clôture» [2,12] (element 524209, graphic 40644), «inspectez les traces de sabots» [2,13] (524206, graphic 41901) and «récupérez le flacon vide malodorant» [1,14] (524208, graphic 50969) (Dofus pour les noobs, «La campagne hallucinée»). The objective is done once all three are had, in any order. Each leaves its quest item: the client's «[!] Quête 2453 Objet 001» and «002» (26687, 26688; INFERRED which is which) and «Frasco vacío maloliente» (26689), which Yeleka Yrehn is handed."
+  },
+  {
+   "objective": 18557,
+   "quest": 2453,
+   "kind": "click",
+   "elements": [{"map": 221512707, "element": 524308, "item": 26690}, {"map": 220989956, "element": 524210, "item": 26691}, {"map": 220989444, "element": 524255, "item": 26692}],
+   "givesEach": true,
+   "anyOrder": true,
+   "afterObjectives": [18556],
+   "gives": [{"item": 26690, "count": 1}, {"item": 26691, "count": 1}, {"item": 26692, "count": 1}],
+   "why": "«Busca pistas en el Bosque Maléfico», once Trevor Kender has been seen: «allez en [0,16], où vous pourrez inspecter des traces de sabots» (524308, graphic 41901, like the first hoofprints), «descendez en [0,17]... Inspectez la plante carnivore repue en bas à droite» (524210, graphic 304845, cell 486) and «allez sur la gauche en [-1,17] où vous pourrez examiner des traces de sang de bouftou en bas à gauche» (524255, graphic 61247, cell 492, the red stains at the bottom left of the map's drawing) (Dofus pour les noobs, «La campagne hallucinée»). Done once all three are had, in any order; each leaves a quest item (26690-26692, «[!] Quête 2453 Objet 004-006»; INFERRED which is which)."
+  },
+  {
+   "objective": 18558,
+   "quest": 2453,
+   "kind": "reply",
+   "replies": [],
+   "why": "«Interroga a los sectarios junto al árbol»: «Parlez à chacun des quatre Sectateur de Boufona» (Dofus pour les noobs, «La campagne hallucinée»). Done by the dialogues of the four (6691, 6714, 6715, 6716), the one that talks to the last of them (their marks -2453001 to -2453004, «completes»); no reply of its own, so that it is the server's and not the client's."
+  },
+  {
+   "objective": 18559,
+   "quest": 2453,
+   "kind": "reply",
+   "replies": [],
+   "why": "«Encuentra la manera de acceder al interior del árbol»: «Parlez au Sectateur de Boufona pour l'assommer et lui voler ses vêtements. Vous voilà méconnaissable prêt à infiltrer les autres Sectateurs» (Dofus pour les noobs, «La campagne hallucinée»): the costume from the sectarian knocked out on [0,18], «Robarle el uniforme mientras babea en el suelo» (68147). INFERRED that this is what the objective asks for rather than the talk with the guard (the guide gives no other step before «Interior del Árbol»)."
+  },
+  {
+   "objective": 18561,
+   "quest": 2453,
+   "kind": "reply",
+   "replies": [],
+   "afterObjectives": [18560],
+   "why": "«Descubre las intenciones de Wilbur»: the invocation of Fab'hub-Niggrath he performs, up to the fusion of the demoness with the bouftou, «Reparlez à l'Émanation de Shushub-Niggrath» (Dofus pour les noobs, «La campagne hallucinée»); done by the Emanation's last reply (68184)."
+  },
+  {
+   "objective": 18562,
+   "quest": 2453,
+   "kind": "beat",
+   "monster": 6939,
+   "map": 221251588,
+   "afterObjectives": [18561],
+   "why": "«Vence a la abominación»: the second fight, the Abomination of Fab'hub-Niggrath alone (Dofus pour les noobs, «La campagne hallucinée»: «Un combat se lance, il peut se faire à plusieurs»); the first, against Wilbur and his four sectarians (content/fights/npc_fights.json), is no objective."
+  },
+  {
+   "objective": 18563,
+   "quest": 2453,
+   "kind": "reply",
+   "replies": [],
+   "afterObjectives": [18562],
+   "why": "«Asegúrate de que ya no hay amenaza»: «Parlez au Tas de brindilles pour savoir qui est derrière tout ceci» (Dofus pour les noobs, «La campagne hallucinée»); done by its last reply (68255), as the twigs break the cages' locks."
+  },
+  {
+   "objective": 18564,
+   "quest": 2453,
+   "kind": "reply",
+   "replies": [],
+   "afterObjectives": [18563],
+   "why": "«Trae de vuelta al rebaño de Yeleka Yrehn»: the herd (the follower «Rebaño de jalatós», 26799, from the panicked bouftou) brought back to Yeleka Yrehn [2,12] (Dofus pour les noobs, «La campagne hallucinée»): «Retournez en [2,12] auprès de Yeleka Yrehn pour lui rendre ses bouftous»; done by her last reply (68304), which ends the quest."
   }
 ]
 }

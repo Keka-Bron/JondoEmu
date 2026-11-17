@@ -1403,6 +1403,12 @@
       "why": "«Le saule du promeneur»: «Proteger a Inataba de los plantalas rabiosos» (54533): DPLN lists the spells of the plantalas that attack him: Anfibofetón and Bactracura (Ranífar 6323, the walkthrough's Grenufar), Narigoma, Pistiro and Petalodela (Floristilo 6320), Bulbozarza, Nectagotamiento and Yucaón (Bulbomatorral 6321), Bambufido, Fotosíntesis and Buen Tallo (Bambuto 6318). Fought alone. The group is those four; DPLN. " },
     { "npc": 5763, "map": 205522438, "reply": 54576,
       "monsters": [ { "monster": 6340, "grade": 0 }, { "monster": 6340, "grade": 0 }, { "monster": 6340, "grade": 0 } ],
-      "why": "«Le saule du promeneur»: «Afirmar que no puedes dejarlos que actúen y prepararte para el combate» (54576): the loggers at the silver willow (monster 6340, Leñador amenazador). DPLN gives no spell list; the gang of three (the three logger NPCs 5763, 5778, 5779) is INFERRED." }
+      "why": "«Le saule du promeneur»: «Afirmar que no puedes dejarlos que actúen y prepararte para el combate» (54576): the loggers at the silver willow (monster 6340, Leñador amenazador). DPLN gives no spell list; the gang of three (the three logger NPCs 5763, 5778, 5779) is INFERRED." },
+    { "npc": 6745, "map": 221251588, "reply": 68199, "marks": -2453014,
+      "monsters": [ { "monster": 6940, "grade": 0 }, { "monster": 6941, "grade": 0 }, { "monster": 6971, "grade": 0 }, { "monster": 6972, "grade": 0 }, { "monster": 6973, "grade": 0 } ],
+      "why": "«El campo alucinado» (2453): «Pasar a la fuerza.» -- «les Sectateurs ont répondu présents à l'appel de leur chef et s'interposent. Un combat se lance, il peut se faire à plusieurs»: Wilbur (Alto sectario, 6940) and the four Sectarios de Jalépona (6941, 6971, 6972, 6973), the white, red, purple and green robes (their threshold at 1 life point and the boost each leaves on dying, and Wilbur's invulnerable state while one of them lives, are the monsters' own spells; Dofus pour les noobs, «La campagne hallucinée»). The win leaves the mark -2453014, which the Abomination's dialogue asks for." },
+    { "npc": 6745, "map": 221251588, "reply": 68197,
+      "monsters": [ { "monster": 6939, "grade": 0 } ],
+      "why": "«El campo alucinado» (2453): «Decir que no tenías intención de huir y enfrentarte a la abominación.» -- the Abomination of Fab'hub-Niggrath alone, 9,600 life points, a threshold at 4,800 (Dofus pour les noobs, «La campagne hallucinée»: «Un combat se lance, il peut se faire à plusieurs»), with its own spells (Ébullition primitive, Ruée des mille bouftons, Fécondité malsaine, Chope d'un autre monde, Brume malsaine)." }
   ]
 }
