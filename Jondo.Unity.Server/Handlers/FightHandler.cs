@@ -922,6 +922,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     playerFighter.Buffs.PonerActitud(hechizo);
                 }
+
                 // At the grade his level gives it: the passives grow with the character -- the
                 // Pandawa's power when carrying is +10% at grade 1 and +50% at grade 6, from level
                 // 187 ("este bonus cambia con el nivel del pandawa"). Put at grade 1, every
@@ -5484,7 +5485,13 @@ namespace Jondo.Unity.Server.Handlers
             // casting at all (preventsSpellCast): a carrying Pandawa throws and does nothing else,
             // «excepto los que le permiten lanzar a la entidad». Only the monsters' and the
             // JondoBots' casts asked this; a player's went through whatever he carried.
-            if (spell != 0 && !Managers.SpellCriteria.Allows(caster, spell, grade))
+            // Not a player's domestication spell: it asks for one of the net states (HS=7105|7106|7107|
+            // 7114) that the client's initial spell 32711 puts on the net's wearer, and nothing here
+            // casts it, so the capture net «Arrête-la si tu peux» asks for could never be used. The net
+            // being worn is what lets him cast it (RideCapture.MayCast: once a fight).
+            bool netCast = !caster.IsMonster && Managers.RideCapture.IsDomestication(spell)
+                           && Managers.RideCapture.SpellOfEquippedNet() == spell;
+            if (spell != 0 && !netCast && !Managers.SpellCriteria.Allows(caster, spell, grade))
             {
                 Program.LogDebug($"[Fight] Spell {spell} is not for the caster's states now " +
                                  $"(condition \"{Managers.SpellCriteria.Of(spell, grade)}\", states {string.Join(",", caster.Buffs.Estados)}).");

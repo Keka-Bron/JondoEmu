@@ -5639,7 +5639,38 @@
       "orientation": 3,
       "criterion": "(Qa=2452&Qo>18591)|Qf=2452",
       "why": "Pedri Dísimo back on the shore [-7,21] (221643270), where he fished, once Malsetego has sent the character to see him (18591) and for good after the quest («Je me contenterai de venir ici pique-niquer»): «allez en [-7,21] pour parler à Edgar Hé» (Dofus pour les noobs, «Le mal qui fait bien»). INFERRED cell."
+    },
+    {
+      "map": 220987906,
+      "npc": 2217,
+      "cell": 410,
+      "orientation": 3,
+      "criterion": "Qa!2451&Qf!2451",
+      "why": "Hell Mina by the burning bush of the maze [-4,15] (220987906), where «Arrête-la si tu peux» (2451) starts (Dofus pour les noobs, «Arrête-la si tu peux»: «la quête se lance en [-4,15] auprès de Hell Mina qui semble tenter d'évacuer sa frustration en tapant à foison sur un buisson ardent»); she goes back to the tumulus («Vuelvo al túmulo») once the quest is taken, and does not come back. INFERRED cell: beside the map's bushes."
+    },
+    {
+      "map": 220989443,
+      "npc": 6717,
+      "cell": 343,
+      "orientation": 1,
+      "remove": true,
+      "why": "The derived layer placed Karnhell here for good («wanted by quest 2451»); she only comes out of the bush while the quest is on (the next row)."
+    },
+    {
+      "map": 220989443,
+      "npc": 6717,
+      "cell": 344,
+      "orientation": 1,
+      "criterion": "Qa=2451&Qo>18567&Qo<18571",
+      "why": "Karnhell, who comes out behind the character at the last bush of the maze [-1,16] (220989443) (Dofus pour les noobs, «Arrête-la si tu peux»: «soudain une créature mécontente de ce gâchis fait son apparition derrière vous»), from the bush (18567) until she is tamed (18571) and walks behind the character. INFERRED cell: beside her derived one."
+    },
+    {
+      "map": 220729859,
+      "npc": 2217,
+      "cell": 411,
+      "orientation": 3,
+      "criterion": "Qa=2451&Qo>18575&Qo<18576",
+      "why": "Hell Mina in the Tertre du long sommeil's post-boss room (220729859), where the character speaks to her once the dungeon is won («Arrête-la si tu peux», objective 18576; Dofus pour les noobs, «Arrête-la si tu peux»: «Une fois le donjon terminé, parlez à Hell Mina»), from the boss (18575) until she is spoken to (18576). INFERRED cell."
     }
-
-    ]
+  ]
 }

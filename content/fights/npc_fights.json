@@ -1427,7 +1427,18 @@
       "monsters": [ { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 } ],
       "waves": [ { "turns": 3, "monsters": [ { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 }, { "monster": 6970, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6967, "grade": 0 } ] },
                  { "turns": 5, "monsters": [ { "monster": 6970, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6969, "grade": 0 }, { "monster": 6968, "grade": 0 }, { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 }, { "monster": 6967, "grade": 0 } ] } ],
-      "why": "«El mal que hace bien» (2452): «Combatir a los malters al lado de Malsetego» (68141) on [-5,20]: Dofus pour les noobs, «Le mal qui fait bien», «Un combat à vagues se lance, il peut se faire à plusieurs. Vague 1 : 2 x Malalfa harceleur + 2 x Malépik tyrannique + 2 x Maltrio persécuteur + 2 x Malzerb oppressant. Vague 2 (dans 3 tours) : 3 x Malalfa harceleur + 1 x Malépik tyrannique + 3 x Maltrio persécuteur + 1 x Malzerb oppressant. Vague 3 (dans 5 tours) : 1 x Malalfa harceleur + 3 x Malépik tyrannique + 1 x Maltrio persécuteur + 3 x Malzerb oppressant». Malsetego (monster 6966) fights beside the character; «NOTE : Si votre allié Malzerbego meurt, le combat ne se termine pas et vous pouvez continuer», so alliesMustLive stays off." }
-
+      "why": "«El mal que hace bien» (2452): «Combatir a los malters al lado de Malsetego» (68141) on [-5,20]: Dofus pour les noobs, «Le mal qui fait bien», «Un combat à vagues se lance, il peut se faire à plusieurs. Vague 1 : 2 x Malalfa harceleur + 2 x Malépik tyrannique + 2 x Maltrio persécuteur + 2 x Malzerb oppressant. Vague 2 (dans 3 tours) : 3 x Malalfa harceleur + 1 x Malépik tyrannique + 3 x Maltrio persécuteur + 1 x Malzerb oppressant. Vague 3 (dans 5 tours) : 1 x Malalfa harceleur + 3 x Malépik tyrannique + 1 x Maltrio persécuteur + 3 x Malzerb oppressant». Malsetego (monster 6966) fights beside the character; «NOTE : Si votre allié Malzerbego meurt, le combat ne se termine pas et vous pouvez continuer», so alliesMustLive stays off." },
+    {
+      "npc": 6717,
+      "map": 220989443,
+      "reply": 81506,
+      "monsters": [
+        {
+          "monster": 6965,
+          "grade": 0
+        }
+      ],
+      "why": "«Arrête-la si tu peux» (2451): «Tratar de domar a la karne» (81506) with the Red de captura universal on: «Un combat se lance, il s'effectue seul. Karnhell a 17000PV de base et 15% de résistances dans chaque élément, ainsi que l'état Invulnérable pour toute la durée du combat! Dès le début du combat, elle pose un glyphe rouge en damier sur toute la map» (Dofus pour les noobs, «Arrête-la si tu peux»). Karnhell (6965) alone; her spells (Tu m'attraperas pas!, Envolée sauvage, Attraction sauvage, Échappée sauvage) are the monster's own."
+    }
   ]
 }

@@ -574,10 +574,47 @@ namespace Jondo.Unity.Server.Managers
                     }
                     continue;
                 }
+                // One press per map of the row's list, and the objective is done with the last map's:
+                // the four bushes of «Sigue la pista de las bayas». Noted for the session only, as the
+                // elements of a «givesEach» row are; a character who comes back inspects them again.
+                if (binding.AllMaps)
+                {
+                    if (!InHand(binding)) continue;
+                    var taken = SessionContext.State.QuestElementsTaken;
+                    taken.Add((binding.ObjectiveId, elementId));
+                    bool everyMap = binding.Elements.GroupBy(e => e.MapId)
+                        .All(maps => maps.Any(e => taken.Contains((binding.ObjectiveId, e.ElementId))));
+                    if (!everyMap)
+                    {
+                        Console.WriteLine($"[Quests] Objective {binding.ObjectiveId}: element {elementId} of map {mapId} inspected, more to go.");
+                        moved = true;
+                        break;
+                    }
+                }
                 if (await CloseAsync(stream, binding)) { moved = true; break; }
             }
 
             return moved;
+        }
+
+        /// <summary>
+        /// Whether a binding's objective is the character's to do now: its quest under way, the objective
+        /// on the step in hand, revealed, not done, and every objective it waits for done.
+        /// </summary>
+        private static bool InHand(QuestBinding binding)
+        {
+            var log = Log;
+            if (log == null || _book == null) return false;
+            var run = log.Run(binding.QuestId);
+            if (run == null || run.Finished || run.Done.Contains(binding.ObjectiveId)) return false;
+            var step = _book.Step(run.StepId);
+            var objective = step?.Objectives.FirstOrDefault(o => o.Id == binding.ObjectiveId);
+            if (step == null || objective == null || !Revealed(step, objective, run)) return false;
+            foreach (int before in binding.AfterObjectives)
+            {
+                if (!run.Done.Contains(before) && !log.ObjectiveDone(before)) return false;
+            }
+            return true;
         }
 
         /// <summary>

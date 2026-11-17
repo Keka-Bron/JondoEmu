@@ -47490,7 +47490,354 @@
         }
       ],
       "why": "Maltrío perseguidor (Maltrio persécuteur) on 220987399, one of the malters that bar the way of the fisherman Pedri Dísimo. «El mal que hace bien» (2452) (Dofus pour les noobs, «Le mal qui fait bien»): «Enfin continuez jusqu'en [-5,20]... Un dernier combat est sur le point d'avoir lieu, Malzerbego viendra vous aider. Parlez au Maltrio persécuteur pour lancer le combat» (50830, «Combatir a los malters al lado de Malsetego»). The reply (68141) starts the fight (content/fights/npc_fights.json). INFERRED: the reply the guide's «parlez au ... pour l'attaquer» means is the «Atacar a los ...» one of this NPC's two."
+    },
+    {
+      "npc": 2217,
+      "map": 220987906,
+      "opening": 50713,
+      "lines": [
+        {
+          "message": 50713,
+          "choices": [
+            {
+              "reply": 67974,
+              "next": 50714
+            }
+          ]
+        },
+        {
+          "message": 50714,
+          "choices": [
+            {
+              "reply": 67979,
+              "next": 50715
+            }
+          ]
+        },
+        {
+          "message": 50715,
+          "choices": [
+            {
+              "reply": 67978,
+              "next": 50716
+            }
+          ]
+        },
+        {
+          "message": 50716,
+          "choices": [
+            {
+              "reply": 67977,
+              "next": 50717
+            }
+          ]
+        },
+        {
+          "message": 50717,
+          "choices": [
+            {
+              "reply": 67976,
+              "next": 50718
+            }
+          ]
+        },
+        {
+          "message": 50718,
+          "choices": [
+            {
+              "reply": 67975,
+              "startsQuest": 2451,
+              "leaves": true,
+              "params": [
+                [
+                  34,
+                  2451
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "why": "Hell Mina (2217) at the burning bush of the maze [-4,15] (220987906), where «Arrête-la si tu peux» (2451) starts (Dofus pour les noobs, «Arrête-la si tu peux»): «Hell Mina qui semble tenter d'évacuer sa frustration en tapant à foison sur un buisson ardent. Elle vous apprend que sa karne, Karnhell a encore fugué... elle ne veut pas vous en dire plus sur ce qu'elle protège et tente de vous faire oublier ce qu'elle a dit. Promettez-lui donc de lui trouver et de lui ramener sa karne en échange d'informations... Hell Mina ne vous prend pas au sérieux». The lines are the NPC's own, in the order the text asks for: she is caught beating the bush (50713, «¿Algo va mal?» 67974), complains of her karne (50714, «cuéntame qué estás vigilando» 67979), denies guarding anything (50715, «Deja de marear el pischis» 67978), threatens (50716), the deal («Te propongo un trato» 67977) she scoffs at (50717), the promise («Te aseguro que encontraré a tu karne» 67976) she answers with a warning (50718), and «Ver como la yopuka da un último golpe al arbusto, luego seguirla...» (67975) starts the quest as she leaves. INFERRED: the pairing of replies and lines."
+    },
+    {
+      "npc": 6717,
+      "map": 220989443,
+      "opening": 50708,
+      "openings": [
+        {
+          "quest": 2451,
+          "objective": 18570,
+          "pending": 18571,
+          "message": 50749
+        },
+        {
+          "quest": 2451,
+          "objective": 18569,
+          "pending": 18570,
+          "message": 50725
+        },
+        {
+          "quest": 2451,
+          "objective": 18567,
+          "pending": 18569,
+          "message": 50719
+        }
+      ],
+      "lines": [
+        {
+          "message": 50719,
+          "choices": [
+            {
+              "reply": 67984,
+              "next": 50721,
+              "quest": 2451,
+              "beforeObjective": 18569
+            },
+            {
+              "reply": 67985,
+              "next": 50720
+            },
+            {
+              "reply": 67980,
+              "next": 50720
+            }
+          ]
+        },
+        {
+          "message": 50720,
+          "choices": [
+            {
+              "reply": 68033
+            }
+          ]
+        },
+        {
+          "message": 50721,
+          "choices": [
+            {
+              "reply": 67983,
+              "next": 50722
+            }
+          ]
+        },
+        {
+          "message": 50722,
+          "choices": [
+            {
+              "reply": 67982,
+              "next": 50723
+            }
+          ]
+        },
+        {
+          "message": 50723,
+          "choices": [
+            {
+              "reply": 67981,
+              "quest": 2451,
+              "beforeObjective": 18569,
+              "completes": 18569,
+              "params": [
+                [
+                  30,
+                  18569
+                ]
+              ]
+            },
+            {
+              "reply": 67981
+            }
+          ]
+        },
+        {
+          "message": 50725,
+          "choices": [
+            {
+              "reply": 67988,
+              "next": 50724,
+              "quest": 2451,
+              "beforeObjective": 18570,
+              "holds": 26698,
+              "holdsCount": 20,
+              "completes": 18570,
+              "params": [
+                [
+                  30,
+                  18570
+                ]
+              ]
+            },
+            {
+              "reply": 68033
+            }
+          ]
+        },
+        {
+          "message": 50724,
+          "choices": [
+            {
+              "reply": 67989,
+              "next": 50749
+            }
+          ]
+        },
+        {
+          "message": 50749,
+          "choices": [
+            {
+              "reply": 81506,
+              "quest": 2451,
+              "beforeObjective": 18571,
+              "criterion": "PO=32521"
+            },
+            {
+              "reply": 67986,
+              "criterion": "PO!32521"
+            },
+            {
+              "reply": 68033
+            }
+          ]
+        },
+        {
+          "message": 50708,
+          "choices": [
+            {
+              "reply": 81505
+            }
+          ]
+        }
+      ],
+      "why": "Karnhell (6717), Hell Mina's karne, in the maze [-1,16] (220989443). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): once she is out of the bush, «Lui parler doucement pour la rassurer» (67984, 50719; the clumsy 67985 and 67980 only make her ready to bite, 50720) and the three lines of her sadness -- 50721, the malters' glares over the crushed berries (50722, «¿Los malters te han robado bayas?» 67982) and her teeth bared at them (50723) -- end on «Comprender que si le quitas bayas a los malters, podrás ganarte la confianza de la karne» (67981), the objective 18569. With the twenty berries («Darle bayas a la karne», 67988, 50725) she eats them (50724) and the net is understood to be needed («Comprender que debes equiparte con una red de captura universal», 67989, 50749); «Tratar de domar a la karne» (81506) starts the capture fight when the Red de captura universal (32521) is carried, otherwise 67986 repeats that the net is needed. INFERRED: which reply follows which line (the template carries the lines and replies, not their pairing), and the net being asked for in the conversation (the guide says only that it has to be equipped)."
+    },
+    {
+      "npc": 2217,
+      "map": 221250562,
+      "opening": 50601,
+      "openings": [
+        {
+          "quest": 2451,
+          "objective": 18572,
+          "pending": 18573,
+          "message": 50707
+        }
+      ],
+      "lines": [
+        {
+          "message": 50601,
+          "choices": [
+            {
+              "reply": 67838,
+              "door": "keyring"
+            },
+            {
+              "reply": 67833,
+              "door": "key"
+            }
+          ]
+        },
+        {
+          "message": 50707,
+          "choices": [
+            {
+              "reply": 68016,
+              "next": 50737,
+              "quest": 2451,
+              "beforeObjective": 18573
+            }
+          ]
+        },
+        {
+          "message": 50737,
+          "choices": [
+            {
+              "reply": 68015,
+              "next": 50738
+            }
+          ]
+        },
+        {
+          "message": 50738,
+          "choices": [
+            {
+              "reply": 68014,
+              "next": 50739
+            }
+          ]
+        },
+        {
+          "message": 50739,
+          "choices": [
+            {
+              "reply": 68013,
+              "next": 50740
+            }
+          ]
+        },
+        {
+          "message": 50740,
+          "choices": [
+            {
+              "reply": 68167,
+              "quest": 2451,
+              "beforeObjective": 18573,
+              "completes": 18573,
+              "params": [
+                [
+                  30,
+                  18573
+                ]
+              ]
+            },
+            {
+              "reply": 68167
+            }
+          ]
+        }
+      ],
+      "why": "Hell Mina (2217) at the Tertre du long sommeil's entrance [-3,19] (221250562). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): with Karnhell brought, «Indiquer que vous avez retrouvé Karnhell et lui rappeler le marché» (68016, 50737: «yo nunca he aceptado»), «Insistir» (68015, 50738), «Permanecer estoico para que Hell Mina no se dé cuenta de que habla demasiado» (68014) -- she lets slip the secret of the amber block (50739: «Hell Mina a la langue bien pendue et sans le vouloir vous avoue que le tumulus renferme une chose précieuse enfermée dans un bloc d'ambre») --, «¿Puedo ver el bloque más de cerca?» (68013, 50740) and «Ir en busca de algo para entrar en el túmulo y tomarle la palabra» (68167) closes the talk (objective 18573). Hell Mina has no key or keyring reply of the kind the server finds by wording, so without this her door took every answer as the way in (and spent the keyring's free entry on a quest reply): her opening 50601 (the guardian who lets nobody in or out) names the doors, «*le enseñas tu manojo de llaves*» (67838, the keyring) and «Demostrar lo contrario utilizando tu llave» (67833, the key). INFERRED: which of her replies is which door. INFERRED: the pairing of replies and lines, and 50707 as her greeting."
+    },
+    {
+      "npc": 2217,
+      "map": 220729859,
+      "opening": 50743,
+      "lines": [
+        {
+          "message": 50743,
+          "choices": [
+            {
+              "reply": 68023,
+              "next": 50743
+            },
+            {
+              "reply": 68024,
+              "next": 50744
+            }
+          ]
+        },
+        {
+          "message": 50744,
+          "choices": [
+            {
+              "reply": 68025,
+              "quest": 2451,
+              "beforeObjective": 18576,
+              "completes": 18576,
+              "params": [
+                [
+                  30,
+                  18576
+                ]
+              ]
+            },
+            {
+              "reply": 68025
+            }
+          ]
+        }
+      ],
+      "why": "Hell Mina (2217) in the Tertre du long sommeil's post-boss room (220729859), beaten («No creas que me has vencido», 50743). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): «Hell Mina qui vous intime de ne pas vous approcher de l'ambre «Jeter un regard circulaire autour de vous» (68023). Intéressez-vous alors à Kharnel sa karne en lui faisant un signe (68024)... Hell Mina vous fait comprendre que c'est sa karne car elle a peur que vous la lui voliez» (50744, «¡Es MI karne!»); «Te pido disculpas...» (68025) ends the talk, the quest and, as the room's exit reply, the dungeon. INFERRED: the pairing of replies and lines; looking around (68023) only leads back to her opening."
     }
-
   ]
 }

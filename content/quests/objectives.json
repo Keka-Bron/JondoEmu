@@ -6050,7 +6050,131 @@
    "replies": [],
    "afterObjectives": [18591],
    "why": "«Asegúrate de que Pedri Dísimo ha llegado bien a destino»: «allez donc en [-7,21] pour parler à Edgar Hé» (Dofus pour les noobs, «Le mal qui fait bien»); done by the last reply of his talk (68159), which ends the quest."
+  },
+  {
+    "objective": 18565,
+    "quest": 2451,
+    "kind": "click",
+    "elements": [
+      {
+        "map": 220987906,
+        "element": 524258
+      },
+      {
+        "map": 220987906,
+        "element": 524260
+      }
+    ],
+    "why": "«Busca indicios del paso de Karnhell en El Bosque Maléfico»: «Sur la map actuelle en [-4,15], commencez donc par inspecter le buisson de baies à droite» (Dofus pour les noobs, «Arrête-la si tu peux»). The map carries two berry bushes (524258, 524260, graphics 47538 and 47537), neither with a skill; either is accepted because the guide does not say which of the two is «à droite». Done on the map where Hell Mina gives the quest."
+  },
+  {
+    "objective": 18566,
+    "quest": 2451,
+    "kind": "click",
+    "all": true,
+    "afterObjectives": [
+      18565
+    ],
+    "elements": [
+      {
+        "map": 220987905,
+        "element": 524256
+      },
+      {
+        "map": 220988417,
+        "element": 524257
+      },
+      {
+        "map": 220988418,
+        "element": 524258
+      },
+      {
+        "map": 220988418,
+        "element": 524260
+      },
+      {
+        "map": 220988931,
+        "element": 524263
+      }
+    ],
+    "why": "«Sigue la pista de las bayas»: the four bushes the karne ate, in the guide's order -- [-4,14] «les baies au pied de l'arbre à gauche» (220987905, 524256), [-3,14] «les baies au centre» (220988417, 524257), [-3,15] «le buisson de baies en bas à gauche» (220988418, 524258 or 524260: two berry bushes, either does) and [-2,16] «le buisson de baies à droite» (220988931, 524263) (Dofus pour les noobs, «Arrête-la si tu peux»). The objective closes once every map of the list has had one of its bushes inspected (\"all\": the server notes each press), in any order."
+  },
+  {
+    "objective": 18567,
+    "quest": 2451,
+    "kind": "click",
+    "afterObjectives": [
+      18566
+    ],
+    "showsNpc": 6717,
+    "elements": [
+      {
+        "map": 220989443,
+        "element": 524263
+      },
+      {
+        "map": 220989443,
+        "element": 524289
+      }
+    ],
+    "why": "«Trata de sacar de su escondite a Karnhell»: «Allez à droite en [-1,16] et examinez l'arbuste de baies en haut à droite. Vous remarquez des baies écrasées au sol suite à un affrontement et soudain une créature mécontente de ce gâchis fait son apparition derrière vous» (Dofus pour les noobs, «Arrête-la si tu peux»): the bush is 524263 (graphic 47540, top of the map; 524289 is the other bush, accepted too), and Karnhell (NPC 6717) comes in when it is done."
+  },
+  {
+    "objective": 18569,
+    "quest": 2451,
+    "kind": "reply",
+    "replies": [],
+    "afterObjectives": [
+      18567
+    ],
+    "why": "«Busca un modo de ganarte la confianza de la karne»: «Parlez à Karnhell «Lui parler doucement pour la rassurer»... la karne ne semble pas agressive envers vous mais plutôt en colère contre les malters qui lui ont volé ses baies» (Dofus pour les noobs, «Arrête-la si tu peux»). Done by the last reply of her talk (67981, «Comprender que si le quitas bayas a los malters, podrás ganarte la confianza de la karne»); no reply listed, so the objective is the server's and not the client's."
+  },
+  {
+    "objective": 18571,
+    "quest": 2451,
+    "kind": "beat",
+    "monster": 6965,
+    "map": 220989443,
+    "afterObjectives": [
+      18570
+    ],
+    "why": "«Doma a Karnhell»: «Un combat se lance, il s'effectue seul... Karnhell a 17000PV de base et 15% de résistances... l'état Invulnérable pour toute la durée du combat» (Dofus pour les noobs, «Arrête-la si tu peux»). Started by her reply «Tratar de domar a la karne» (content/fights/npc_fights.json); winning leaves Karnhell (26728, her loot row «Qo=18571&PO!26728», 100 %) walking behind the character."
+  },
+  {
+    "objective": 18572,
+    "quest": 2451,
+    "kind": "enter",
+    "map": 221250562,
+    "afterObjectives": [
+      18571
+    ],
+    "requires": [
+      {
+        "item": 26728,
+        "count": 1
+      }
+    ],
+    "why": "«Lleva a Karnhell hasta Hell Mina»: «Une fois le combat terminé, Karnhell vous suit, il faut donc la conduire en [-3,19] auprès de Hell Mina» (Dofus pour les noobs, «Arrête-la si tu peux»). Closes on arriving at [-3,19] (221250562, the dungeon's entrance) with Karnhell, the follower 26728, in tow."
+  },
+  {
+    "objective": 18581,
+    "quest": 2451,
+    "kind": "enter",
+    "map": 220725761,
+    "overridesMap": true,
+    "afterObjectives": [
+      18573
+    ],
+    "why": "«Sigue a Hell Mina hasta el interior del túmulo»: «Afin que la quête se mette à jour, il faut absolument entrer dans la salle 1 du donjon» (Dofus pour les noobs, «Arrête-la si tu peux»). The objective carries the entrance map; it closes on arriving in the dungeon's first room (220725761)."
+  },
+  {
+    "objective": 18575,
+    "quest": 2451,
+    "kind": "order",
+    "afterObjectives": [
+      18581
+    ],
+    "why": "«Vence a Hell Mina» (type 6, monster 107, dungeon only): «il faut entrer dans le donjon Tertre du long sommeil et vaincre Hell Mina» (Dofus pour les noobs, «Arrête-la si tu peux»). The server counts the boss won in the dungeon's last room (220729857); this row only orders it after the first room has been entered."
   }
-
 ]
 }
