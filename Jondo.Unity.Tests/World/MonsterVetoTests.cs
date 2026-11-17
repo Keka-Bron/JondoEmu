@@ -143,6 +143,41 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        [Theory]
+        [InlineData(188483076L)] // Astrub Underground
+        [InlineData(72091650L)] // Dragon Pig's Maze
+        [InlineData(159121408L)] // Lord Crow's Library, first room
+        public void Indoor_combat_maps_load_and_replenish_their_groups(long mapId)
+        {
+            if (!World()) return;
+
+            Assert.False(MobSpawnManager.IsVetoed(mapId));
+            Assert.True(MobSpawnManager.LoadedGroups(mapId) > 0);
+            var group = MobSpawnManager.GetMobsForMap(mapId).First();
+            Assert.NotEmpty(group.Members);
+            try
+            {
+                MobSpawnManager.RemoveMobGroup(mapId, group.MobId);
+                var replacement = Assert.IsType<MobSpawnManager.MobGroup>(MobSpawnManager.RespawnOneGroup(mapId));
+                Assert.NotEmpty(replacement.Members);
+            }
+            finally
+            {
+                MobSpawnManager.RestoreMap(mapId);
+            }
+        }
+
+        [Theory]
+        [InlineData(72092676L)] // Dragon Pig's Maze, Fwed's central room
+        [InlineData(72221696L)] // Dragon Pig's Den entrance
+        [InlineData(106695186L)] // Wabbit Princes' scripted fight room
+        public void Scripted_and_entrance_rooms_stay_free_of_roaming_groups(long mapId)
+        {
+            if (!World()) return;
+            Assert.True(MobSpawnManager.IsVetoed(mapId));
+            Assert.Empty(MobSpawnManager.GetMobsForMap(mapId));
+        }
+
         [Fact]
         public void The_labyrinth_has_two_unique_guardians_and_an_empty_central_room()
         {
