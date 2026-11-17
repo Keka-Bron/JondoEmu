@@ -326,9 +326,20 @@ namespace Jondo.Unity.Server
                 },
                 null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
 
+            using var monsterWalks = new System.Threading.Timer(
+                _ =>
+                {
+                    if (Interlocked.Exchange(ref _mobRoamingTicking, 1) != 0) return;
+                    try { Managers.MobSpawnManager.RoamAsync().GetAwaiter().GetResult(); }
+                    catch (Exception ex) { Console.WriteLine($"[Mob movement] {ex.Message}"); }
+                    finally { Interlocked.Exchange(ref _mobRoamingTicking, 0); }
+                },
+                null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+
             _ready = true;
 
             await _shutdown.Task;
+            await monsterWalks.DisposeAsync();
             await launchCleanup.DisposeAsync();
             await matchmaking.DisposeAsync();
             await conquests.DisposeAsync();
@@ -375,6 +386,7 @@ namespace Jondo.Unity.Server
         private static int _koliseoTicking;
         private static int _conquestTicking;
         private static int _headHuntsTicking;
+        private static int _mobRoamingTicking;
 
         /// <summary>The argument a restarted run gets: the process id of the run it replaces.</summary>
         private const string RestartAfter = "--restart-after";
