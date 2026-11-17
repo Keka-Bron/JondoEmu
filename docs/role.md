@@ -78,9 +78,14 @@ not a literal number. This keeps that rule synchronized with the central role de
 
 The chat-command permission table currently assigns:
 
-- role 2: `.teleport`;
+- role 2: `.teleport`, and the staff's information, movement and sanction commands of the admin menu:
+  `.who`, `.whoami`, `.whois`, `.where`, `.mapinfo`, `.version`, `.goto`, `.summon`, `.jail`, `.unjail`,
+  `.jailed`, `.kick`, `.mute`, `.unmute`, `.warn`;
 - role 4: `.kamas`, `.level`, `.size`, `.shop`;
 - role 4: `.oficio` and `.oficios` too (one job, or every job, at a level);
+- role 4: `.quest`, `.quests`, `.energy`, `.heal`, `.stats`, `.spawn`, `.remove`, `.gift`;
+- role 5: `.ban`, `.unban`, `.bans`, `.announce`, `.save`, `.reload`, `.shutdown`;
+  the whole list, with their syntax, is in `admin-menu.md`;
 - role 5: `.relative`, `.item`, `.itemset`, `.receta`, forgegod mode under its three names, `.forjadios`,
   `.forgegod` and `.forgedieu`, and the dream skip under its four, `.sueno`, `.sueño`, `.dream` and
   `.reve`, these two written into the table explicitly rather than left to the default.

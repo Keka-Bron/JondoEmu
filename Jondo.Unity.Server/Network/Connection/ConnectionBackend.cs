@@ -17,7 +17,11 @@ internal sealed class ConnectionBackend : IConnectionBackend
         Console.WriteLine($"[Connection Server] Account {accountId}: {servers.Count} server(s), {characters.Count} character(s).");
         return new IdentificationSuccess(accountId, account?.Nickname ?? "Jondo", GameServerProxy.BuildAccountTag(accountId),
             ConnectionAccountProjection.ServerList(servers, characters, DateTimeOffset.Now),
-            Subscription.EndDateFor(accountId), new AccountRights(false, false, false, false), null, null, null);
+            Subscription.EndDateFor(accountId),
+            // The client builds its admin menu (ffa.bdwh) from the identification's rights: only
+            // the second flag matters, and it is the staff's (moderator and above).
+            new AccountRights(false, DatabaseManager.GetAccountRole(accountId) >= (int)Jondo.Unity.Protocol.Game.Hierarchy.RoleModerator,
+                false, false), null, null, null);
     }
 
     public bool IsServerJoinable(int serverId) => DatabaseManager.IsServerJoinable(serverId);

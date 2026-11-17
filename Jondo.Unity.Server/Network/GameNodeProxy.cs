@@ -424,13 +424,19 @@ namespace Jondo.Unity.Server.Network
 
                         // A prisoner speaks on the general channel only; private messages come by
                         // ktb and are not stopped. See Managers.Jail.
-                        bool muted = text.Length > 0 && !consumed
-                                     && !Managers.Jail.MaySpeakOn(SessionContext.State.CharacterId, channel);
+                        bool gagged = text.Length > 0 && !consumed
+                                      && Managers.Sanctions.IsMuted(SessionContext.State.CharacterId);
+                        bool muted = gagged || (text.Length > 0 && !consumed
+                                     && !Managers.Jail.MaySpeakOn(SessionContext.State.CharacterId, channel));
                         if (muted)
                         {
+                            // A moderator's mute (".mute") silences every channel; the prison's only
+                            // the ones beyond the general one, each with its own notice.
                             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                                 ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(
-                                    Handlers.CommandTexts.Get("jail.channel"))));
+                                    Handlers.CommandTexts.Get(gagged ? "sanction.muted_now" : "jail.channel",
+                                        gagged ? new object[] { Managers.Sanctions.MinutesLeft(SessionContext.State.CharacterId) }
+                                               : Array.Empty<object>()))));
                         }
 
                         // Trade and recruitment take a line every two minutes (ChatChannels): one
@@ -1638,6 +1644,11 @@ namespace Jondo.Unity.Server.Network
                 {
                     // Which step is this quest on? It is answered with the idu.
                     await QuestHandler.StepAsync(stream, payload);
+                }
+                else if (payloadStr.Contains(Op.Uri("mfb")))
+                {
+                    // A line typed in the client's own staff console.
+                    await StaffConsoleHandler.HandleAsync(stream, payload);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Idw)))
                 {

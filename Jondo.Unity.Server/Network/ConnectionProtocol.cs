@@ -62,9 +62,17 @@ namespace Jondo.Unity.Server.Network
                 HasFreeAutopilot: true, IsMonoAccount: false, Community: 0,
                 Language: session.State.Language));
             await session.SendAsync(new Game.OptionalFeaturesEvent(ActiveFeatures.Select(x => (int)x).ToArray()));
+            // The account's own rank: the client keeps its console and admin menu for the staff's.
+            // Roles 1 to 5 are the protocol's ranks in the same order (RolePlayer .. RoleAdmin).
+            int role = Jondo.Unity.Server.DatabaseManager.GetAccountRole(session.AccountId);
+            var rank = role is >= (int)Game.Hierarchy.RolePlayer and <= (int)Game.Hierarchy.RoleAdmin
+                ? (Game.Hierarchy)role
+                : Game.Hierarchy.RolePlayer;
             await session.SendAsync(new Game.AccountCapabilitiesEvent(Game.CharacterCreationRights.Allowed,
-                true, Game.Hierarchy.RolePlayer));
-            await session.SendAsync(new Game.AccountRightsEvent(new Game.AccountRights(false, false, false, false)));
+                true, rank));
+            // ShowConsole: the client's own staff console, for a moderator and above.
+            await session.SendAsync(new Game.AccountRightsEvent(new Game.AccountRights(
+                ShowConsole: rank >= Game.Hierarchy.RoleModerator, false, false, false)));
             await session.SendAsync(new Game.TrustStatusEvent(Certified: true));
             await session.SendAsync(new Game.ServerSessionReadyEvent());
             await session.SendAsync(new Game.AccountSubscriptionElapsedDurationUpdateEvent(SubscriptionElapsedSeconds));

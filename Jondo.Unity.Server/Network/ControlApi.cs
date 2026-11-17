@@ -259,13 +259,7 @@ namespace Jondo.Unity.Server.Network
 
                     if (sheetChanged || kamasChanged)
                     {
-                        DatabaseManager.SaveCurrentCharacter();
-                        CharacteristicsMessages.Live.SendAsync(sesion).GetAwaiter().GetResult();
-                        sesion.SendAsync(ConnectionProtocol.Push(Op.Ivf,
-                            ConnectionProtocol.BuildKamas(estado.Kamas))).GetAwaiter().GetResult();
-                        sesion.SendAsync(ConnectionProtocol.Push(Op.Iun,
-                            ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(estado), ConnectionProtocol.Capacity(estado))))
-                            .GetAwaiter().GetResult();
+                        CommandHandler.RefreshSheetAsync(sesion).GetAwaiter().GetResult();
                     }
 
                     // A delivery failure has to be stated. GrantItemAsync returns null when

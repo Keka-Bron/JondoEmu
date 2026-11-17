@@ -19,6 +19,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- The client's admin menu (see StaffConsole.InstallAdminMenuFile). -->
+    <EmbeddedResource Include="Admin\menuadmin.fr.xml" LogicalName="menuadmin.fr.xml" WithCulture="false" />
+    <EmbeddedResource Include="Admin\menuadmin.en.xml" LogicalName="menuadmin.en.xml" WithCulture="false" />
+    <EmbeddedResource Include="Admin\menuadmin.es.xml" LogicalName="menuadmin.es.xml" WithCulture="false" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Reference all assemblies in MelonLoader net6 folder for 3.6.10.10 -->
     <Reference Include="$(DofusClientDir)\MelonLoader\net6\*.dll">
       <Private>false</Private>

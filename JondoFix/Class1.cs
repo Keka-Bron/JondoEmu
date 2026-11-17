@@ -423,6 +423,7 @@ namespace JondoFix
         public override void OnInitializeMelon()
         {
             TestInput.Start(LoggerInstance);
+            StaffConsole.HookAdminMenu(LoggerInstance);
             LoadItemNames();
             LoadVendorNames();
             UseLocalRedirect = IsEmulatorActive();
@@ -763,6 +764,7 @@ namespace JondoFix
             {
                 try { AdminItemsUi.Tick(); }
                 catch (Exception ex) { LoggerInstance.Warning($"[JondoFix] Item window: {ex.Message}"); }
+                StaffConsole.Tick(LoggerInstance);
             }
 
             if (UseLocalRedirect && !itemMappingsLoadedFromClient)

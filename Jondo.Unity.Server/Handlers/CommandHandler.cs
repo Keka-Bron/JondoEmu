@@ -41,7 +41,7 @@ namespace Jondo.Unity.Server.Handlers
     /// pushes anything. Everything new goes through Push, which is field 1, the one for the messages
     /// the server sends on its own.
     /// </summary>
-    public static class CommandHandler
+    public static partial class CommandHandler
     {
         /// <summary>
         /// The commands that exist and the key of their usage text. It rules in two places: it decides
@@ -73,6 +73,37 @@ namespace Jondo.Unity.Server.Handlers
                 [".reve"] = "usage.dream",
                 [".heros"] = "usage.heroes",
                 [".heroes"] = "usage.heroes",
+                // The staff's commands (CommandHandler.Admin.cs): what the admin menu of the client runs.
+                [".who"] = "usage.who",
+                [".whoami"] = "usage.whoami",
+                [".whois"] = "usage.whois",
+                [".where"] = "usage.where",
+                [".mapinfo"] = "usage.mapinfo",
+                [".version"] = "usage.version",
+                [".goto"] = "usage.goto",
+                [".summon"] = "usage.summon",
+                [".jail"] = "usage.jail",
+                [".unjail"] = "usage.unjail",
+                [".jailed"] = "usage.jailed",
+                [".kick"] = "usage.kick",
+                [".mute"] = "usage.mute",
+                [".unmute"] = "usage.unmute",
+                [".warn"] = "usage.warn",
+                [".ban"] = "usage.ban",
+                [".unban"] = "usage.unban",
+                [".bans"] = "usage.bans",
+                [".announce"] = "usage.announce",
+                [".save"] = "usage.save",
+                [".reload"] = "usage.reload",
+                [".shutdown"] = "usage.shutdown",
+                [".quest"] = "usage.quest",
+                [".quests"] = "usage.quests",
+                [".energy"] = "usage.energy",
+                [".heal"] = "usage.heal",
+                [".stats"] = "usage.stats",
+                [".spawn"] = "usage.spawn",
+                [".remove"] = "usage.remove",
+                [".gift"] = "usage.gift",
             };
 
         /// <summary>
@@ -106,12 +137,54 @@ namespace Jondo.Unity.Server.Handlers
                 [".size"] = Roles.GameMaster,
                 [".shop"] = Roles.GameMaster,
                 [".gremio"] = Roles.Jugador,
+
+                // Information and moving about, to go and help somebody: a moderator's.
+                [".who"] = Roles.Moderador,
+                [".whoami"] = Roles.Moderador,
+                [".whois"] = Roles.Moderador,
+                [".where"] = Roles.Moderador,
+                [".mapinfo"] = Roles.Moderador,
+                [".version"] = Roles.Moderador,
+                [".goto"] = Roles.Moderador,
+                [".summon"] = Roles.Moderador,
+                // Sanctions that end by themselves or with a word: a moderator's. The ban is for
+                // good until lifted, and is an account's, so it is the administrator's.
+                [".jail"] = Roles.Moderador,
+                [".unjail"] = Roles.Moderador,
+                [".jailed"] = Roles.Moderador,
+                [".kick"] = Roles.Moderador,
+                [".mute"] = Roles.Moderador,
+                [".unmute"] = Roles.Moderador,
+                [".warn"] = Roles.Moderador,
+                [".ban"] = Roles.Administrador,
+                [".unban"] = Roles.Administrador,
+                [".bans"] = Roles.Administrador,
+                // The character and the map under the feet: a game master's, like .kamas and .level.
+                [".quest"] = Roles.GameMaster,
+                [".quests"] = Roles.GameMaster,
+                [".energy"] = Roles.GameMaster,
+                [".heal"] = Roles.GameMaster,
+                [".stats"] = Roles.GameMaster,
+                [".spawn"] = Roles.GameMaster,
+                [".remove"] = Roles.GameMaster,
+                [".gift"] = Roles.GameMaster,
+                // The server itself: an administrator's. Written out although it is the default.
+                [".announce"] = Roles.Administrador,
+                [".save"] = Roles.Administrador,
+                [".reload"] = Roles.Administrador,
+                [".shutdown"] = Roles.Administrador,
             };
 
         /// <summary>
         /// The role a command asks for: its row in the table, or Administrator for one without --
         /// the safe side to be wrong on.
         /// </summary>
+        /// <summary>The commands that exist, for the staff console's help.</summary>
+        internal static System.Collections.Generic.IEnumerable<string> Names => Uso.Keys;
+
+        /// <summary>Each command and the catalogue key of its usage text, for the tests.</summary>
+        internal static IReadOnlyDictionary<string, string> UsageKeys => Uso;
+
         internal static int RequiredRole(string command)
             => HaceFalta.TryGetValue(command, out int role) ? role : Roles.Administrador;
 
@@ -186,31 +259,23 @@ namespace Jondo.Unity.Server.Handlers
 
             try
             {
-                switch (command)
+                // A command that changes a character may name another connected one as its last
+                // word: it then runs as that character (CommandHandler.Admin.cs).
+                GameSession? other = null;
+                if (Targetable.Contains(command))
                 {
-                    case ".kamas": await KamasAsync(stream, rest, channel, accountId); break;
-                    case ".level": await LevelAsync(stream, rest, channel, accountId); break;
-                    case ".teleport": await TeleportAsync(stream, rest, channel, accountId); break;
-                    case ".relative": await RelativeAsync(stream, rest, channel, accountId); break;
-                    case ".shop": await ShopAsync(stream, channel, accountId); break;
-                    case ".size": await SizeAsync(stream, rest, channel, accountId); break;
-                    case ".item": await ItemAsync(stream, rest, channel, accountId); break;
-                    case ".itemset": await ItemSetAsync(stream, rest, channel, accountId); break;
-                    case ".receta": await RecipeAsync(stream, rest, channel, accountId); break;
-                    case ".packets": await PacketsAsync(stream, rest, channel, accountId); break;
-                    case ".gremio": await GremioAsync(stream, rest, channel, accountId); break;
-                    case ".oficio": await JobAsync(stream, rest, channel, accountId); break;
-                    case ".oficios": await AllJobsAsync(stream, rest, channel, accountId); break;
-                    case ".forjadios":
-                    case ".forgegod":
-                    case ".forgedieu": await ForgeGodAsync(stream, rest, channel, accountId); break;
-                    case ".sueno":
-                    case ".sueño":
-                    case ".dream":
-                    case ".reve": await DreamAsync(stream, rest, channel, accountId); break;
-                    case ".heros":
-                    case ".heroes": await HeroesProbeAsync(stream, rest, channel, accountId); break;
+                    var (stripped, name) = SplitTarget(rest, n => FindOnline(n) != null);
+                    if (name != null)
+                    {
+                        other = FindOnline(name);
+                        rest = stripped;
+                    }
                 }
+
+                if (other != null && !ReferenceEquals(other, Network.SessionContext.Current))
+                    await RunOnOtherAsync(stream, other, command, rest, channel);
+                else
+                    await DispatchAsync(command, stream, rest, channel, accountId);
             }
             catch (Exception ex)
             {
@@ -222,6 +287,40 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Runs a command that exists, as the session it is given: the staff's own, or another
+        /// character's when the staff named one (<see cref="RunOnOtherAsync"/>).
+        /// </summary>
+        private static async Task DispatchAsync(string command, NetworkStream stream, string rest, int channel, long accountId)
+        {
+            switch (command)
+            {
+                case ".kamas": await KamasAsync(stream, rest, channel, accountId); break;
+                case ".level": await LevelAsync(stream, rest, channel, accountId); break;
+                case ".teleport": await TeleportAsync(stream, rest, channel, accountId); break;
+                case ".relative": await RelativeAsync(stream, rest, channel, accountId); break;
+                case ".shop": await ShopAsync(stream, channel, accountId); break;
+                case ".size": await SizeAsync(stream, rest, channel, accountId); break;
+                case ".item": await ItemAsync(stream, rest, channel, accountId); break;
+                case ".itemset": await ItemSetAsync(stream, rest, channel, accountId); break;
+                case ".receta": await RecipeAsync(stream, rest, channel, accountId); break;
+                case ".packets": await PacketsAsync(stream, rest, channel, accountId); break;
+                case ".gremio": await GremioAsync(stream, rest, channel, accountId); break;
+                case ".oficio": await JobAsync(stream, rest, channel, accountId); break;
+                case ".oficios": await AllJobsAsync(stream, rest, channel, accountId); break;
+                case ".forjadios":
+                case ".forgegod":
+                case ".forgedieu": await ForgeGodAsync(stream, rest, channel, accountId); break;
+                case ".sueno":
+                case ".sueño":
+                case ".dream":
+                case ".reve": await DreamAsync(stream, rest, channel, accountId); break;
+                case ".heros":
+                case ".heroes": await HeroesProbeAsync(stream, rest, channel, accountId); break;
+                default: await AdminAsync(command, stream, rest, channel, accountId); break;
+            }
         }
 
         // ─── .kamas ─────────────────────────────────────────────────────────────

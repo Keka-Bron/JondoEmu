@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Jondo's admin menu: the client's own one (Core.UILogic.Admin.AdminMenu). It is the first entry of
+  the context menu of a character (right click on it); every "sendcommand" goes out as the staff
+  console's line (F11) and the server's CommandHandler answers it, so each command= below is a
+  command the server knows (a test reads this file and checks it: AdminMenuTests).
+  JondoFix writes this file to <persistentDataPath>/Admin/menuadmin.xml when the client starts.
+  Format and commands: docs/admin-menu.md.
+
+  %p is the name of the character that was clicked (one's own when one clicks oneself); #item,
+  #monster, #npc... open the client's selector window and are replaced by the choice.
+  Commands about a player take the name first (jail %p); commands that change a character take it
+  last (kamas 1000000 %p). Dangerous ones (ban, shutdown) sit behind a "Confirmer" submenu.
+-->
+<menu>
+  <item type="menu" label="&lt;color=#ffcc33&gt;Jondo - Admin&lt;/color&gt;">
+    <item type="static" label="Objetivo: %p"/>
+
+    <!-- ═══ Modération ═══ -->
+    <item type="menu" label="&lt;color=#7fd0ff&gt;Moderación&lt;/color&gt;">
+      <item type="static" label="Desplazamientos"/>
+      <item type="sendcommand" label="Teletransportarme hasta %p" command="goto %p" help="Va al mapa y la casilla de %p"/>
+      <item type="sendcommand" label="Traer a %p hasta mí" command="summon %p" help="Teletransporta a %p a mi casilla"/>
+      <item type="separator"/>
+      <item type="static" label="&lt;color=#d9d9d9&gt;Información&lt;/color&gt;"/>
+      <item type="sendcommand" label="Ficha de %p" command="whois %p" help="Nivel, cuenta, rol, mapa, kamas, estado"/>
+      <item type="sendcommand" label="¿Dónde está %p?" command="where %p"/>
+      <item type="separator"/>
+      <item type="static" label="Prisión"/>
+      <item type="sendcommand" label="&lt;color=#ffb366&gt;Encarcelar a %p (10 min)&lt;/color&gt;" command="jail %p" help="La prisión de los GM: 10 minutos, sin salida ni otro canal que el general"/>
+      <item type="sendcommand" label="Sacar a %p de la prisión" command="unjail %p"/>
+      <item type="sendcommand" label="¿Quién está en prisión?" command="jailed"/>
+      <item type="separator"/>
+      <item type="menu" label="Silenciar">
+        <item type="static" label="Silenciar: %p"/>
+        <item type="sendcommand" label="5 minutos" command="mute %p 5m"/>
+        <item type="sendcommand" label="30 minutos" command="mute %p 30m"/>
+        <item type="sendcommand" label="2 horas" command="mute %p 2h"/>
+        <item type="sendcommand" label="1 día" command="mute %p 1d"/>
+        <item type="preparecommand" label="Duración libre..." command="mute %p " help="mute &lt;joueur&gt; [duración]: 30, 30m, 12h, 7d"/>
+        <item type="separator"/>
+        <item type="sendcommand" label="Devolver la palabra" command="unmute %p"/>
+      </item>
+      <item type="menu" label="Advertir">
+        <item type="static" label="Advertir a %p"/>
+        <item type="sendcommand" label="Insulto" command="warn %p Los insultos están prohibidos."/>
+        <item type="sendcommand" label="Flood / spam" command="warn %p Por favor, deja de repetir tus mensajes."/>
+        <item type="sendcommand" label="Última advertencia" command="warn %p Esta es una última advertencia antes de una sanción."/>
+        <item type="preparecommand" label="Mensaje libre..." command="warn %p " help="warn &lt;joueur&gt; &lt;message&gt;"/>
+      </item>
+      <item type="sendcommand" label="Expulsar a %p" command="kick %p" help="Cierra su conexión (puede volver)"/>
+      <item type="separator"/>
+      <item type="menu" label="&lt;color=#ff7070&gt;Banear (administrador)&lt;/color&gt;">
+        <item type="static" label="Banear la CUENTA de %p"/>
+        <item type="menu" label="Confirmar: 1 día">
+          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p 1 día&lt;/color&gt;" command="ban %p 1d"/>
+        </item>
+        <item type="menu" label="Confirmar: 7 días">
+          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p 7 días&lt;/color&gt;" command="ban %p 7d"/>
+        </item>
+        <item type="menu" label="Confirmar: para siempre">
+          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, banear a %p para siempre&lt;/color&gt;" command="ban %p"/>
+        </item>
+        <item type="separator"/>
+        <item type="preparecommand" label="Levantar un baneo..." command="unban " help="unban &lt;nombre del personaje baneado&gt;"/>
+        <item type="sendcommand" label="Cuentas baneadas" command="bans"/>
+      </item>
+    </item>
+
+    <!-- ═══ Personnage ═══ -->
+    <item type="menu" label="&lt;color=#9be37f&gt;Personaje&lt;/color&gt;">
+      <item type="static" label="Personaje: %p"/>
+      <item type="menu" label="Kamas">
+        <item type="sendcommand" label="+ 100 000" command="kamas 100000 %p"/>
+        <item type="sendcommand" label="+ 1 000 000" command="kamas 1000000 %p"/>
+        <item type="sendcommand" label="+ 100 000 000" command="kamas 100000000 %p"/>
+        <item type="sendcommand" label="- 1 000 000" command="kamas -1000000 %p"/>
+        <item type="preparecommand" label="Cantidad libre..." command="kamas " help="kamas &lt;montant&gt; [jugador]"/>
+      </item>
+      <item type="menu" label="Nivel">
+        <item type="sendcommand" label="Nivel 1" command="level 1 %p"/>
+        <item type="sendcommand" label="Nivel 50" command="level 50 %p"/>
+        <item type="sendcommand" label="Nivel 100" command="level 100 %p"/>
+        <item type="sendcommand" label="Nivel 150" command="level 150 %p"/>
+        <item type="sendcommand" label="Nivel 200" command="level 200 %p"/>
+        <item type="preparecommand" label="Nivel libre..." command="level " help="level &lt;niveau&gt; [jugador]"/>
+      </item>
+      <item type="menu" label="Características base">
+        <item type="preparecommand" label="Vitalidad..." command="stats vit " help="stats vit &lt;valeur&gt; [jugador]"/>
+        <item type="preparecommand" label="Sabiduría..." command="stats sag "/>
+        <item type="preparecommand" label="Fuerza..." command="stats for "/>
+        <item type="preparecommand" label="Inteligencia..." command="stats int "/>
+        <item type="preparecommand" label="Suerte..." command="stats cha "/>
+        <item type="preparecommand" label="Agilidad..." command="stats agi "/>
+      </item>
+      <item type="menu" label="Vida y energía">
+        <item type="sendcommand" label="Curar a %p (toda la vida)" command="heal %p"/>
+        <item type="sendcommand" label="Energía al máximo" command="energy 10000 %p"/>
+        <item type="sendcommand" label="Energía a 1000" command="energy 1000 %p"/>
+        <item type="preparecommand" label="Energía libre..." command="energy " help="energy [valor] [jugador]"/>
+      </item>
+      <item type="menu" label="Apariencia">
+        <item type="sendcommand" label="Tamaño 50 %" command="size 50 %p"/>
+        <item type="sendcommand" label="Tamaño 100 % (normal)" command="size 100 %p"/>
+        <item type="sendcommand" label="Tamaño 200 %" command="size 200 %p"/>
+        <item type="preparecommand" label="Tamaño libre..." command="size " help="size &lt;pourcentage&gt; [jugador]"/>
+      </item>
+      <item type="menu" label="Oficios">
+        <item type="sendcommand" label="Todos los oficios a nivel 100" command="oficios 100 %p"/>
+        <item type="sendcommand" label="Todos los oficios a nivel 200" command="oficios 200 %p"/>
+        <item type="preparecommand" label="Un oficio..." command="oficio " help="oficio &lt;id del oficio&gt; &lt;niveau&gt; [jugador]"/>
+      </item>
+      <item type="menu" label="Objetos (administrador)">
+        <item type="sendcommand" label="Elegir un objeto (catálogo)..." command="item #item %p" help="Abre el selector de objetos: id y cantidad"/>
+        <item type="preparecommand" label="Objeto por id..." command="item " help="item &lt;id&gt; [cantidad] [max|random] [jugador]"/>
+        <item type="preparecommand" label="Panoplia..." command="itemset " help="itemset &lt;id de panoplia&gt; [jugador]"/>
+        <item type="preparecommand" label="Ingredientes de una receta..." command="receta " help="receta &lt;id del objeto&gt; [veces] [jugador]"/>
+        <item type="preparecommand" label="Regalo (ventana de regalos)..." command="gift " help="gift &lt;id&gt; [cantidad] [jugador]: la cuenta lo recoge en el juego"/>
+      </item>
+      <item type="menu" label="Misiones">
+        <item type="static" label="Misiones de %p"/>
+        <item type="sendcommand" label="Mis misiones en curso" command="quests"/>
+        <item type="preparecommand" label="Empezar una misión..." command="quest start " help="quest start &lt;id&gt; [jugador]"/>
+        <item type="preparecommand" label="Terminar una misión..." command="quest finish " help="quest finish &lt;id&gt; [jugador]"/>
+        <item type="preparecommand" label="Olvidar una misión..." command="quest forget " help="quest forget &lt;id&gt; [jugador]: para volver a jugarla"/>
+      </item>
+      <item type="menu" label="Héroes (administrador)">
+        <item type="sendcommand" label="Un héroe Yopuka" command="heros 8"/>
+        <item type="sendcommand" label="Dos héroes: Feca y Aniripsa" command="heros 1 7"/>
+        <item type="preparecommand" label="Clases..." command="heros " help="heros &lt;classe&gt; [clase...]"/>
+      </item>
+    </item>
+
+    <!-- ═══ Monde ═══ -->
+    <item type="menu" label="&lt;color=#ffb366&gt;Mundo&lt;/color&gt;">
+      <item type="menu" label="Teletransporte">
+        <item type="sendcommand" label="Astrub [4,-19]" command="teleport [4,-19]"/>
+        <item type="sendcommand" label="Bonta [-26,-36]" command="teleport [-26,-36]"/>
+        <item type="sendcommand" label="Brakmar [-26,35]" command="teleport [-26,35]"/>
+        <item type="sendcommand" label="Aldea de Amakna [-1,0]" command="teleport [-1,0]"/>
+        <item type="sendcommand" label="Tienda (PNJ vendedores)" command="shop"/>
+        <item type="sendcommand" label="Mapa siguiente, mismas coordenadas (administrador)" command="relative" help="Interiores, casas: recorre los mapas del mismo punto"/>
+        <item type="preparecommand" label="Coordenadas o id de mapa..." command="teleport " help="teleport [x,y] o teleport &lt;id de mapa&gt;"/>
+      </item>
+      <item type="menu" label="Monstruos y PNJ">
+        <item type="static" label="En mi casilla"/>
+        <item type="sendcommand" label="Monstruo (catálogo)..." command="spawn monster #monster" help="Abre el selector de monstruos"/>
+        <item type="sendcommand" label="PNJ (catálogo)..." command="spawn npc #npc" help="Abre el selector de PNJ"/>
+        <item type="preparecommand" label="Grupo de monstruos por id..." command="spawn monster " help="spawn monster &lt;id&gt;[:grado] [&lt;id&gt;[:grado]...]: hasta ocho"/>
+        <item type="separator"/>
+        <item type="sendcommand" label="Lo que hay en el mapa" command="mapinfo" help="Lista los ids que retirar"/>
+        <item type="preparecommand" label="Retirar un PNJ..." command="remove npc " help="remove npc &lt;id&gt;"/>
+        <item type="preparecommand" label="Retirar un grupo de monstruos..." command="remove group " help="remove group &lt;id&gt;"/>
+      </item>
+      <item type="menu" label="Misiones (pruebas)">
+        <item type="sendcommand" label="Misiones en curso" command="quests"/>
+        <item type="preparecommand" label="Empezar..." command="quest start "/>
+        <item type="preparecommand" label="Terminar..." command="quest finish "/>
+        <item type="preparecommand" label="Olvidar..." command="quest forget "/>
+        <item type="separator"/>
+        <item type="sendcommand" label="Recargar el contenido (administrador)" command="reload" help="Vuelve a leer los archivos de contenido sin reiniciar"/>
+      </item>
+    </item>
+
+    <!-- ═══ Informations ═══ -->
+    <item type="menu" label="Información">
+      <item type="sendcommand" label="¿Quién soy?" command="whoami"/>
+      <item type="sendcommand" label="¿Dónde estoy? (mapa, casilla)" command="where"/>
+      <item type="sendcommand" label="Este mapa" command="mapinfo"/>
+      <item type="sendcommand" label="Jugadores conectados" command="who"/>
+      <item type="sendcommand" label="Versión del servidor" command="version"/>
+      <item type="sendcommand" label="Ficha de %p" command="whois %p"/>
+      <item type="sendcommand" label="Ayuda de la consola (todos los comandos)" command="help"/>
+    </item>
+
+    <!-- ═══ Serveur (administrateur) ═══ -->
+    <item type="menu" label="&lt;color=#ff7070&gt;Servidor (administrador)&lt;/color&gt;">
+      <item type="menu" label="Anuncios">
+        <item type="preparecommand" label="Anuncio libre..." command="announce " help="announce &lt;texte&gt;: un mensaje a todos los conectados"/>
+        <item type="sendcommand" label="Mantenimiento inminente" command="announce Pronto habrá un mantenimiento."/>
+        <item type="sendcommand" label="El servidor vuelve" command="announce El servidor vuelve a estar disponible, gracias por vuestra paciencia."/>
+      </item>
+      <item type="sendcommand" label="Guardar los personajes" command="save"/>
+      <item type="sendcommand" label="Recargar el contenido" command="reload" help="PNJ, misiones, interactivos, tiendas: sin reiniciar"/>
+      <item type="separator"/>
+      <item type="menu" label="&lt;color=#ff7070&gt;Detener el servidor&lt;/color&gt;">
+        <item type="static" label="&lt;color=#ff7070&gt;ATENCIÓN&lt;/color&gt;"/>
+        <item type="menu" label="Confirmar: en 5 minutos">
+          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, detener en 5 minutos&lt;/color&gt;" command="shutdown 5"/>
+        </item>
+        <item type="menu" label="Confirmar: ahora">
+          <item type="sendcommand" label="&lt;color=#ff7070&gt;Sí, detener AHORA&lt;/color&gt;" command="shutdown"/>
+        </item>
+        <item type="sendcommand" label="Cancelar la detención programada" command="shutdown cancel"/>
+      </item>
+    </item>
+
+    <item type="separator"/>
+    <item type="loadxml" label="Recargar este menú" help="Vuelve a leer menuadmin.xml sin reiniciar el cliente"/>
+  </item>
+</menu>
