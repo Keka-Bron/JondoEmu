@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.World.Quests;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -17,12 +18,12 @@ namespace Jondo.Unity.Server.Handlers
     /// repository's own notes filed <c>ieo</c>/<c>idu</c> as interactive-element traffic and
     /// <c>idz</c>/<c>idw</c> as connection extras; that was an old guess and it is wrong.
     ///
-    /// <b>The client is trusted about objectives, and it has to be.</b> <c>idw</c> is the client
+    /// <b>The client is trusted about some objectives, and it has to be.</b> <c>idw</c> is the client
     /// saying an objective is finished, and 5,670 of the game's 15,547 objectives are free text —
-    /// "click the thing" — which the server never sees happen. <see cref="QuestLog.Tick"/> is what
-    /// keeps that from being a hole: it accepts an objective only if it belongs to the step the
-    /// character is actually on, so the worst a lying client can do is finish a quest it already
-    /// has, in the order that quest was written.
+    /// "click the thing" — which the server never sees happen. Two things keep that from being a
+    /// hole: <see cref="QuestClaims"/> takes the client's word only for a free-text objective nothing
+    /// on the server watches, and <see cref="QuestLog.Tick"/> only for one of the step the character
+    /// is actually on.
     /// </remarks>
     public static class QuestHandler
     {
@@ -53,6 +54,15 @@ namespace Jondo.Unity.Server.Handlers
             int questId = Field(idw, 1);
             int objectiveId = Field(idw, 2);
             if (questId == 0 || objectiveId == 0) return;
+
+            // Only an objective the client alone can know is done (QuestClaims): a fight, an item
+            // handed over or anything else the server works out is not taken on its word.
+            if (!QuestClaims.ClientMayClaim(Quests.Book?.Objective(objectiveId), Quests.Bindings.Of(objectiveId)))
+            {
+                Console.WriteLine($"[Quest] {SessionContext.State.CharacterName} claimed objective {objectiveId} " +
+                                  $"of quest {questId}, which the client cannot finish. Ignored.");
+                return;
+            }
 
             await Quests.TickAsync(stream, questId, objectiveId);
         }
