@@ -408,5 +408,59 @@ namespace Jondo.Unity.Tests.World
                 ForgetAlterations();
             }
         }
+
+        // ─── The Turquoise Dofus's idols ────────────────────────────────────────────────
+
+        /// <summary>
+        /// «Ídolo de Viti chamuscado» (28444): its alteration (238), a «Gana x1» of itself and its
+        /// spell (1175, 28438). It sets the alteration and stays in the bag; a «Gana» of another item
+        /// beside an alteration is still something else, and so is a spell with no alteration.
+        /// </summary>
+        [Fact]
+        public void An_idol_sets_its_alteration_and_is_kept()
+        {
+            var idol = new[] { Effect(2892, 238), Effect(209, 0, 1, 28444), Effect(1175, 28438, 1) };
+            Assert.True(BonusItemHandler.GivesAlterations(idol, 28444));
+            Assert.True(BonusItemHandler.KeepsItself(idol, 28444));
+
+            Assert.False(BonusItemHandler.GivesAlterations(idol, 28447));
+            Assert.False(BonusItemHandler.GivesAlterations(new[] { Effect(2892, 238), Effect(209, 0, 1, 28447) }, 28444));
+            Assert.False(BonusItemHandler.GivesAlterations(new[] { Effect(2892, 238), Effect(209, 0, 2, 28444) }, 28444));
+            Assert.False(BonusItemHandler.KeepsItself(new[] { Effect(2892, 624), Effect(2892, 625) }, 13351));
+        }
+
+        /// <summary>
+        /// The Founoroshi of «La bendición de Viti» (10045, [6249, 1, 0, 238]) counts under the idol's
+        /// alteration and not without it; a plain type 6 asks for none.
+        /// </summary>
+        [Fact]
+        public void A_blessing_boss_counts_under_its_idol()
+        {
+            if (Of(238) == null) return;
+            var founoroshi = new Jondo.Unity.World.Quests.QuestObjective { Id = 10045, TypeId = 6, Parameters = new[] { 6249, 1, 0, 238 } };
+            var plain = new Jondo.Unity.World.Quests.QuestObjective { Id = 1, TypeId = 6, Parameters = new[] { 6249, 1 } };
+            Assert.Equal(238, founoroshi.UnderAlteration);
+            Assert.Equal(0, plain.UnderAlteration);
+
+            ForgetAlterations();
+            try
+            {
+                Assert.False(QuestWatcher.UnderItsAlteration(founoroshi, Eater));
+                Assert.True(QuestWatcher.UnderItsAlteration(plain, Eater));
+
+                // The idol's one fight: had through the fight, gone after its count.
+                var idol = Alterations.Gain(Eater, 238, DateTime.UtcNow);
+                Assert.NotNull(idol);
+                Assert.Equal(Alterations.Kind.Fights, idol!.Kind);
+                Assert.True(QuestWatcher.UnderItsAlteration(founoroshi, Eater));
+                Alterations.CountFight(Eater, won: true);
+                Alterations.Forget(Eater);
+                Assert.False(QuestWatcher.UnderItsAlteration(founoroshi, Eater));
+            }
+            finally
+            {
+                ForgetAlterations();
+            }
+        }
     }
 }

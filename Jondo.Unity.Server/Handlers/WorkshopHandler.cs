@@ -372,6 +372,7 @@ namespace Jondo.Unity.Server.Handlers
                                 ? $"job {recipe.JobId} is level {jobLevel}, the recipe asks {recipe.ResultLevel}"
                             : template == null ? $"no template for {recipe.ResultId}"
                             : count <= 0 ? "the bag does not hold one craft's worth"
+                            : !CraftAllowed(recipe.ResultId, out string asks) ? $"{recipe.ResultId} asks «{asks}» to be crafted"
                             : null;
             if (refusal != null)
             {
@@ -1015,6 +1016,16 @@ namespace Jondo.Unity.Server.Handlers
                             .OrderBy(i => i.Uid).ToList();
 
         private static int BagCount(int gid) => BagStacksOf(gid).Sum(i => i.Quantity);
+
+        /// <summary>
+        /// Whether the result's own craft criterion holds: the idols of Harmonie Daule's bench ask
+        /// «Qa=1660&amp;PO!28444», their blessing under way and none in hand. Most recipes ask nothing.
+        /// </summary>
+        private static bool CraftAllowed(int resultId, out string criterion)
+        {
+            criterion = DatabaseManager.GetItemTemplateCriterion(resultId, "craftFeasibleCriterion");
+            return Managers.ItemCriteria.Holds(criterion);
+        }
 
         private static long VarOf(byte[] body, int field)
         {

@@ -340,6 +340,18 @@
       "why": "The post-boss room of the Golosotes' Antechamber (dungeon 61): quest 626 «Allá arriba, en el pico helado...» (Dofus pour les noobs, the Frigost dungeon quests) has an objective, 4285, that names this map (62136840) after the boss 2864; the client line 8460 is the guardian thanks and «Salir de la Antecámara de los Golosotes» (8479) takes the winners out. INFERRED landing cell."
     },
     {
+      "dungeon": 55,
+      "bossRoom": 56102912,
+      "room": 56103936,
+      "cell": 297,
+      "npc": 1300,
+      "replies": [
+        7851,
+        7902
+      ],
+      "why": "The post-boss room of the Royal Morsagüino's Excavation (dungeon 55): after the boss 2848 the winners stand in map 56103936 [-64,-55], which the client names in objectives 4510 and 4529, and Waldos (1300) waits there (Dofus pour les noobs «Las joyas de la corona»: «reparlez à Waldos afin de quitter le donjon»). His line 7837 is the towel before leaving; «Salir de la Excavación de Morsagüino Real» (7851) and «Salir» (7902) take the winners out. INFERRED landing cell."
+    },
+    {
       "dungeon": 139,
       "bossRoom": 220729857,
       "room": 220729859,

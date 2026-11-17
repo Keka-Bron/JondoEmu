@@ -5916,6 +5916,299 @@
    "why": "«Vence a 8 ratas kenopintamos» (type 6, monster 2894 x8): Dofus pour les noobs «Pauvre Kiki»: «Descendez à la cave ! Et attaquez le groupe de rats». The group stands in the cellar 54537249 under the house (the stairs, element 457184, of the village map 54536225)."
   },
   {
+   "objective": 16593,
+   "quest": 2167,
+   "kind": "click",
+   "onlyGives": true,
+   "elements": [{"map": 207618062, "element": 519514}],
+   "gives": [{"item": 23323, "count": 1}],
+   "why": "«Cliquez sur le verre de lait de bambou fermenté sur la table pour obtenir un Verre plein» (Dofus pour les noobs («Les métamorphoses d'un Tanuki»)): the glass on the low table of the Osakwa Inn [20,-20] hands the Vaso lleno (23323) while the letter is still to deliver (16593). INFERRED element: the one interactive of the map without a skill (graphic 36675, cell 341, by the table with cups)."
+  },
+  {
+   "objective": 16611,
+   "quest": 2167,
+   "kind": "beat",
+   "monster": 6300,
+   "map": 207618062,
+   "afterObjectives": [16593],
+   "why": "«Salda la deuda del ayudante de Surivitna» by the fists: beating Sakwaba's guards (npc_fights.json, 54420/54423) does it; paying (54419/54422) does it by the reply. Dofus pour les noobs («Les métamorphoses d'un Tanuki»)."
+  },
+  {
+   "objective": 16595,
+   "quest": 2167,
+   "kind": "click",
+   "elements": [{"map": 205261057, "element": 519726}],
+   "afterObjectives": [16594],
+   "why": "«Examina el arte tanuki en busca del ladrón»: the stone blocks at the base of the big statue of [26,-27] (DPLN: «cliquez sur les blocs de pierre à la base de la grosse statue»). INFERRED element: graphic 61899 at cell 340, at the statue's foot (the map's other stone heaps, 518638 and 518640, serve «Díselo con flores»)."
+  },
+  {
+   "objective": 16597,
+   "quest": 2167,
+   "kind": "click",
+   "elements": [{"map": 205261312, "element": 519633}],
+   "afterObjectives": [16596],
+   "why": "«Toca las obras de arte tanukis» (1/3): the rocks beside the drill of [27,-26] (DPLN: first touch; a fight against an animated sculpture or a teleport, not reproduced: the touch ticks it). INFERRED element: the crystal beside the drill (graphic 250332, cell 135), the map's only interactive without a skill."
+  },
+  {
+   "objective": 16598,
+   "quest": 2167,
+   "kind": "click",
+   "elements": [{"map": 205260290, "element": 519634}],
+   "afterObjectives": [16597],
+   "why": "«Toca las obras de arte tanukis» (2/3): the little pile of stacked stones at the top of [25,-24] (DPLN). INFERRED element: graphic 66403 at cell 119, the stack at the top of the map."
+  },
+  {
+   "objective": 16599,
+   "quest": 2167,
+   "kind": "click",
+   "elements": [{"map": 205260545, "element": 519635}],
+   "afterObjectives": [16598],
+   "showsNpc": 5700,
+   "why": "«Toca las obras de arte tanukis» (3/3): the pottery at the top of [25,-27]; the thief appears (DPLN). INFERRED element: graphic 66423 at cell 227, the pottery."
+  },
+  {
+   "objective": 16696,
+   "quest": 2167,
+   "kind": "beat",
+   "monster": 6301,
+   "map": 205260545,
+   "afterObjectives": [16599],
+   "why": "«Captura el alma del ladrón tanuki»: beating the Ladrón tanuki (6301) with the soul stone; it drops the Alma del ladrón tanuki (23484). Dofus pour les noobs («Les métamorphoses d'un Tanuki»)."
+  },
+  {
+   "objective": 10136,
+   "quest": 1665,
+   "kind": "enter",
+   "map": 212598790,
+   "afterObjectives": [10135],
+   "why": "«Encuentra la tienda del aprendiz en el barrio de los pescadores» (569119): the fishermen's quarter of Bonta [-35,-54], where aunt Zilda keeps the apprentice's stall; Dofus pour les noobs («L'ombre et la proie»): «Allez à la rencontre de la tante de la jeune apprentie Eniripsa en [-35,-54] dans le quartier Havres d'ivoire»."
+  },
+  {
+   "objective": 10139,
+   "quest": 1665,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Pregúntale a un agente de viajes por la isla de Moon»: the four islanders of Moon are asked in any order (Dofus pour les noobs («L'ombre et la proie») goes agent, tourist, kanábola, pirate)."
+  },
+  {
+   "objective": 10140,
+   "quest": 1665,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Pregúntale a un turista solo por la isla de Moon»: the four islanders of Moon are asked in any order (Dofus pour les noobs («L'ombre et la proie») goes agent, tourist, kanábola, pirate)."
+  },
+  {
+   "objective": 10141,
+   "quest": 1665,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Pregúntale a un indígena simpático por la isla de Moon»: the four islanders of Moon are asked in any order (Dofus pour les noobs («L'ombre et la proie») goes agent, tourist, kanábola, pirate)."
+  },
+  {
+   "objective": 10142,
+   "quest": 1665,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "«Pregúntale a un pirata loco por la isla de Moon»: the four islanders of Moon are asked in any order (Dofus pour les noobs («L'ombre et la proie») goes agent, tourist, kanábola, pirate)."
+  },
+  {
+   "objective": 10143,
+   "quest": 1665,
+   "kind": "enter",
+   "map": 156499968,
+   "afterObjectives": [10139, 10140, 10141, 10142],
+   "why": "«Explora el centro de la isla de Moon» (564830): the Forbidden Jungle [29,6] at the foot of the Moon tree, once the four islanders have been asked; Dofus pour les noobs («L'ombre et la proie»): «Allez dans la Jungle interdite en [29,6]»."
+  },
+  {
+   "objective": 10145,
+   "quest": 1665,
+   "kind": "enter",
+   "map": 157810688,
+   "afterObjectives": [10144],
+   "why": "«Entrar en el claro oscuro» (564825): behind the totem of [31,6] (the 2.73 graph's cell 183 of 156500992) lies the dark clearing; Dofus pour les noobs («L'ombre et la proie»): «Allez en [31,6]. Faufilez vous derrière le totem afin d'entrer dans la Clairière obscure»."
+  },
+  {
+   "objective": 10146,
+   "quest": 1665,
+   "kind": "beat",
+   "monsters": [4164],
+   "map": 157810688,
+   "spawns": {"monster": 4164, "count": 1},
+   "why": "The Zampívoro oscuro (4164) comes out in the dark clearing while the quest wants him beaten, with Nabrisa in his belly; Dofus pour les noobs («L'ombre et la proie»): «défier le Gloutovore Obscur qui tient en son ventre l'eniripsa que vous recherchez. Le combat peut se faire à plusieurs»."
+  },
+  {
+   "objective": 10148,
+   "quest": 1665,
+   "kind": "enter",
+   "map": 219152384,
+   "afterObjectives": [10147],
+   "why": "«Escolta a Nabrisa hasta el palacio de Bonta» (564818): the palace hall where Gabi Lan stands, with Nabrisa following (the follower item 17076 she gives on «Escoltar a Nabrisa»); Dofus pour les noobs («L'ombre et la proie»): «Vous obtenez Nabrisa en personnage suiveuse afin de la ramener à la citée Blanche»."
+  },
+  {
+   "objective": 12026,
+   "quest": 1823,
+   "kind": "reply",
+   "replies": [31664],
+   "afterObjectives": [12025],
+   "requires": [{"item": 18473, "count": 5}],
+   "spends": true,
+   "why": "«Dale 5 panes al first recolector» (type 0): the collector takes five zizanesque breads (18473) at «He encontrado estos panes» (31664); Dofus pour les noobs («Distribution de pains zizanesques»)."
+  },
+  {
+   "objective": 12027,
+   "quest": 1823,
+   "kind": "reply",
+   "replies": [31680],
+   "afterObjectives": [12026],
+   "requires": [{"item": 18473, "count": 5}],
+   "spends": true,
+   "why": "«Dale 5 panes al second recolector» (type 0): the collector takes five zizanesque breads (18473) at «He encontrado estos panes» (31680); Dofus pour les noobs («Distribution de pains zizanesques»)."
+  },
+  {
+   "objective": 12028,
+   "quest": 1823,
+   "kind": "reply",
+   "replies": [31682],
+   "afterObjectives": [12027],
+   "requires": [{"item": 18473, "count": 5}],
+   "spends": true,
+   "why": "«Dale 5 panes al third recolector» (type 0): the collector takes five zizanesque breads (18473) at «He encontrado estos panes» (31682); Dofus pour les noobs («Distribution de pains zizanesques»)."
+  },
+  {
+   "objective": 12029,
+   "quest": 1823,
+   "kind": "reply",
+   "replies": [31685],
+   "afterObjectives": [12028],
+   "requires": [{"item": 18473, "count": 5}],
+   "spends": true,
+   "why": "«Dale 5 panes al last recolector» (type 0): the collector takes five zizanesque breads (18473) at «He encontrado estos panes» (31685); Dofus pour les noobs («Distribution de pains zizanesques»)."
+  },
+  {
+   "objective": 16580,
+   "quest": 2168,
+   "kind": "enter",
+   "map": 205258753,
+   "afterObjectives": [16584],
+   "why": "«Escolta a Tanuwu Kang hasta los pancubas»: arriving at the pandawas' map [22,-25] after he agreed to follow (16584). The follower is his escorted placement (spawns.json); Dofus pour les noobs («L'égalité des sexes»)."
+  },
+  {
+   "objective": 16583,
+   "quest": 2168,
+   "kind": "enter",
+   "map": 205258753,
+   "afterObjectives": [16582, 16580],
+   "why": "«Escolta a Tanuli Huan hasta los pancubas»: arriving at [22,-25] after the pebbles (16582), once the male is escorted (DPLN: bring each tanuki before recruiting the other)."
+  },
+  {
+   "objective": 16582,
+   "quest": 2168,
+   "kind": "click",
+   "onlyGives": true,
+   "givesEach": true,
+   "anyOrder": true,
+   "afterObjectives": [16581],
+   "elements": [{"map": 205260290, "element": 519609}, {"map": 205260289, "element": 518641}, {"map": 205260288, "element": 518640}, {"map": 205260033, "element": 518642}, {"map": 205261057, "element": 518638}],
+   "gives": [{"item": 23244, "count": 5}],
+   "why": "The round stone at [25,-24] and the small stones at [25,-25], [25,-26], [24,-27] and [26,-27] (Dofus pour les noobs («L'égalité des sexes»)): a Guijarro plano (23244) from each, five in all; the objective is done handing them to Tanuli Huan. The elements are INFERRED: the stone heaps of graphic 66421 that carry no skill (518641, 518640, 518642, 518638) and 519609 (graphic 66402) for the round stone at [25,-24]."
+  },
+  {
+   "objective": 16590,
+   "quest": 2168,
+   "kind": "beat",
+   "monsters": [6295, 6296, 6297, 6298, 6299],
+   "map": 205258753,
+   "afterObjectives": [16589],
+   "why": "«Zanja el debate por la fuerza»: winning the fight Wotta starts (npc_fights.json, 54137-54139) against Jiugwi, Chiwhan, Wotta or the tanukis, depending on the side taken. Dofus pour les noobs («L'égalité des sexes»)."
+  },
+  {
+   "objective": 10002,
+   "quest": 1657,
+   "kind": "click",
+   "elements": [{"map": 54160716, "element": 480557}],
+   "why": "«Encuentra las cenizas de Badmorva en las orillas La Cuna de Alma» (550675): «Cliquez alors sur le tonneau qui doit contenir les cendres de Badmorva échoué sur le rivage. Le Spectre de Badmorva apparaîtra alors» (Dofus pour les noobs, «La méchante sorcière de l'Est», [-54,-76]). The barrel is element 480557 at cell 285, on the shore by the wreck where Badmorva's ghost stands (cell 341)."
+  },
+  {
+   "objective": 10011,
+   "quest": 1657,
+   "kind": "enter",
+   "map": 205522437,
+   "afterObjectives": [10010],
+   "why": "«Encuentra el altar del Este» (550664): «Partez à la recherche de l'autel de l'Est qui se trouve en [27,-30]. Parlez alors au Disciple de Viti» (Dofus pour les noobs); the disciple's map is 205522437."
+  },
+  {
+   "objective": 10013,
+   "quest": 1657,
+   "kind": "click",
+   "elements": [{"map": 190582785, "element": 515592}],
+   "requires": [{"item": 16891, "count": 1}, {"item": 17067, "count": 1}],
+   "worn": [{"item": 16953, "count": 1}],
+   "gives": [{"item": 16895, "count": 1}],
+   "afterObjectives": [10012],
+   "why": "«Desentierra el tótem del Este» (550663): «Commencez par équiper la Pelle du Clan Terra à la place de votre corps à corps. Pour déterrer le totem de l'Est, allez en [11,-13] [...] et cliquez sur le rocher au centre de la map. Vous obtenez le Totem de l'Est» (Dofus pour les noobs). The rock is element 515592 at cell 297; like the south's (10000), it asks for Badmorva's mark (16891) and Viti's blessing (17067) and gives the Tótem del Este (16895)."
+  },
+  {
+   "objective": 16730,
+   "quest": 2170,
+   "kind": "click",
+   "onlyGives": true,
+   "afterObjectives": [16729],
+   "elements": [{"map": 204998401, "element": 519738}],
+   "spawns": {"monster": 6371, "with": [6370, 6372], "attacks": true},
+   "why": "«Entrega 1 agua clara» (type 3, item 23052): «allez en [20,-24] et cliquez sur le seau pour récupérer de l'eau. Un combat se lance, il s'effectue seul» (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): the bucket (element 519738, the batch beside the distillery's) starts the fight against the three kuapas (the ambush variants Kukumi 6371, Kuakai 6370, Kuanuto 6372, one of each spell set of the DPLN's list; the map's own groups hold the wandering ones, which would stop the spawn); the water comes off the fight (fight_drops.json) and Arumichi's reply takes it."
+  },
+  {
+   "objective": 16731,
+   "quest": 2170,
+   "kind": "click",
+   "afterObjectives": [16730],
+   "elements": [{"map": 207619086, "element": 519739}],
+   "requires": [{"item": 7018, "count": 50}],
+   "spends": true,
+   "gives": [{"item": 23054, "count": 1}],
+   "why": "«Pule arroz en la destilería»: «cliquez sur le Polisseur à riz pour polir les 50 riz» (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): the mill of the distillery (element 519739, gfx 302853) with the fifty Arroz (7018), which it spends for the Arroz pulido (23054)."
+  },
+  {
+   "objective": 16733,
+   "quest": 2170,
+   "kind": "click",
+   "afterObjectives": [16732],
+   "elements": [{"map": 207619086, "element": 519615}],
+   "gives": [{"item": 23053, "count": 1}],
+   "why": "«Obtén el shake cuando haya terminado de fermentarse»: «cliquez sur la cuve pour récupérer un Shaké d'exception» (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): the vat (element 519615, under the big green still). The hour's wait is NOT enforced (a click row has no wait): the engine only waits on replies."
+  },
+  {
+   "objective": 16736,
+   "quest": 2170,
+   "kind": "order",
+   "props": [{"map": 207619086, "element": 519740}, {"map": 207619086, "element": 519741}, {"map": 207619086, "element": 519742}],
+   "why": "«Busca pistas acerca de los agresores»: the table with the signs of a struggle, the big wooden barrel behind Arumichi and the open barrel beside the three barrels (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)), props of the scene; Arumichi's «Enseñarle el resultado de tu investigación.» (55290) is offered after the last one (the open barrel, 519742). The elements are INFERRED from the map's five quest elements (table 519740, barrel 519741, open barrel 519742)."
+  },
+  {
+   "objective": 16737,
+   "quest": 2170,
+   "kind": "beat",
+   "monster": 6261,
+   "map": 207618062,
+   "afterObjectives": [16736],
+   "why": "«Busca a los agresores en el puerto de Akwadala»: the bar fight against the drunk sailors of the tavern (npc_fights.json) is what does it (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): «Un combat se lance, il s'effectue seul»."
+  },
+  {
+   "objective": 16739,
+   "quest": 2170,
+   "kind": "enter",
+   "map": 207619086,
+   "afterObjectives": [16738],
+   "why": "«Escolta al aprendiz hasta la destilería»: arriving at the distillery [20,-25] once the sailors gave in (16738); the follower is his escorted placement (spawns.json) (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»))."
+  },
+  {
+   "objective": 5344,
+   "quest": 872,
+   "kind": "beat",
+   "monster": 3221,
+   "why": "«Ayuda a los Weyes Magos a protegerse de M.O. Elmen Delsako» (886554): Gas Paw's line 10494 says he escaped and threatens the Weyes Magos; he is beaten in «¡M.O. Pardy!» (880, objective 5360 against monster 3221 at Mel Chiow's map 66060548). The reward star 12865 is given «por haber ayudado a los Weyes Magos». INFERRED: no walkthrough page names the closer."
+  },
+  {
    "objective": 18550,
    "quest": 2453,
    "kind": "click",

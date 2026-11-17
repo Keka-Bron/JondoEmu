@@ -1091,7 +1091,7 @@ namespace Jondo.Unity.Server.Managers
         /// The character has finished a walk on a map: an objective bound as «walk» there is done.
         /// The guided tutorial's 19534 closes this way, server-side, after the client's jqi.
         /// </summary>
-        public static async Task OnWalkedAsync(NetworkStream stream, long mapId)
+        public static async Task OnWalkedAsync(NetworkStream stream, long mapId, int cellId = -1)
         {
             var log = Log;
             if (log == null || _book == null || mapId == 0) return;
@@ -1104,10 +1104,15 @@ namespace Jondo.Unity.Server.Managers
                 {
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Walk || binding.MapId != mapId) continue;
+                    if (!EndsOn(binding, cellId)) continue;
                     await CloseAsync(stream, binding);
                 }
             }
         }
+
+        /// <summary>Whether a walk that ended on this cell is the one a «walk» binding asks for.</summary>
+        internal static bool EndsOn(QuestBinding binding, int cellId)
+            => binding.Cells.Count == 0 || binding.Cells.Contains(cellId);
 
         /// <summary>
         /// A document has been read: an objective bound to reading every one of its elements closes
@@ -1624,6 +1629,39 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// The objectives of a step the client is shown: the done ones, and the outstanding ones the
+        /// character has reached -- one whose binding waits for others (afterObjectives) is held back
+        /// until they are done.
+        /// </summary>
+        /// <remarks>
+        /// The real server reveals a step's objectives as they become relevant (a growing prefix, see
+        /// QuestProtocol.BuildQuestStep). Which ones it holds back is not in the client's data, but a
+        /// binding that waits for others says it for the quests written here: «En la encrucijada de los
+        /// mundos» listed the audience with the Daimia and the shield to craft from the start, while
+        /// the game only lets them be done after the three recommendations. An «objectives» binding
+        /// (closed by others being done) is shown as before. If holding back would leave the step with
+        /// nothing outstanding on screen, the whole list goes out: a step that looks finished and is
+        /// not is worse than one shown early.
+        /// </remarks>
+        internal static List<int> Shown(IReadOnlyList<int> objectives, IReadOnlyCollection<int> done,
+                                        Func<int, QuestBinding?> bindingOf, Func<int, bool> doneElsewhere)
+        {
+            bool Reached(int objective)
+            {
+                var binding = bindingOf(objective);
+                return binding == null || binding.Kind == QuestBindingKind.Objectives
+                    || binding.AfterObjectives.All(before => done.Contains(before) || doneElsewhere(before));
+            }
+
+            var shown = objectives.Where(o => done.Contains(o) || Reached(o)).ToList();
+            return shown.Any(o => !done.Contains(o)) ? shown : objectives.ToList();
+        }
+
+        /// <summary>The same, for a quest of this character's journal.</summary>
+        private static List<int> Shown(QuestLog log, QuestRun run, IReadOnlyList<int> objectives)
+            => Shown(objectives, run.Done, Bindings.Of, before => log.ObjectiveDone(before));
+
+        /// <summary>
         /// Tells the client where a quest has got to (idu), which is what the ieo asks for.
         /// </summary>
         public static async Task SendStepAsync(NetworkStream stream, int questId)
@@ -1652,7 +1690,7 @@ namespace Jondo.Unity.Server.Managers
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Idu,
-                    QuestProtocol.BuildQuestStep(questId, run.StepId, objectives, run.Done)));
+                    QuestProtocol.BuildQuestStep(questId, run.StepId, Shown(log, run, objectives), run.Done)));
         }
 
         /// <summary>
@@ -2054,7 +2092,7 @@ namespace Jondo.Unity.Server.Managers
                 var objectives = new List<int>(step.Objectives.Count);
                 foreach (var objective in step.Objectives) objectives.Add(objective.Id);
 
-                doing.Add((run.QuestId, run.StepId, objectives, run.Done));
+                doing.Add((run.QuestId, run.StepId, Shown(log, run, objectives), run.Done));
             }
 
             var finished = new List<int>();

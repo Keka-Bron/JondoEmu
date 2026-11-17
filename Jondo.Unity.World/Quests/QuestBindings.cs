@@ -275,6 +275,13 @@ namespace Jondo.Unity.World.Quests
         /// </summary>
         public IReadOnlyList<int> AfterObjectives { get; init; } = Array.Empty<int>();
 
+        /// <summary>
+        /// For <see cref="QuestBindingKind.Walk"/>: the cells a walk has to end on, none for any cell
+        /// of the map. In «En la encrucijada de los mundos» Pandawelo comes in when the character
+        /// steps onto the Pandasamblea's carpet, not on any step taken there.
+        /// </summary>
+        public IReadOnlyList<int> Cells { get; init; } = Array.Empty<int>();
+
         /// <summary>The replies that close it, for <see cref="QuestBindingKind.Reply"/>.</summary>
         public IReadOnlyList<int> Replies { get; init; } = Array.Empty<int>();
 
@@ -662,6 +669,7 @@ namespace Jondo.Unity.World.Quests
                 Starts = Int(row, "starts"),
                 ThenStarts = Int(row, "thenStarts"),
                 AfterObjectives = Ints(row, "afterObjectives"),
+                Cells = Ints(row, "cells"),
                 Replies = Ints(row, "replies"),
                 AnyOrder = row.TryGetProperty("anyOrder", out var anyOrder) && anyOrder.ValueKind == JsonValueKind.True,
                 ShowsNpc = Int(row, "showsNpc"),

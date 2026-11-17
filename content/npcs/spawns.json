@@ -5283,8 +5283,8 @@
       "npc": 5598,
       "cell": 359,
       "orientation": 3,
-      "criterion": "Qa=2150&Qo>16512&Qo<16385",
-      "why": "Orukam, the black dragon, in the Ether after the Pandasahi or Pandaporo of 2150 (16512) until he has spoken (16385): «Parlez ensuite à Orukam, le dragon noir» (Dofus pour les noobs, «À la croisée des mondes»). INFERRED cell, where the dark flame stood."
+      "criterion": "(Qa=2150&Qo>16512&Qo<16385)|(Qa=2197&Qo>16574)",
+      "why": "Orukam, the black dragon, in the Ether after the Pandasahi or Pandaporo of 2150 (16512) until he has spoken (16385): «Parlez ensuite à Orukam, le dragon noir» (Dofus pour les noobs, «À la croisée des mondes»). And in «Sudando tinta» (2197) once Pandawelo's drink has taken the character back to the Ether (16574), for the ink dofus (16575): «Une fois dans l'Éther à la croisée des mondes parlez au dragon noir Orukam pour lui montrer que vous avez récupéré son Dofus» (Dofus pour les noobs, «Sang d'encre»). INFERRED cell, where the dark flame stood."
     },
     {
       "map": 207624192,
@@ -5455,6 +5455,248 @@
       "orientation": 1,
       "criterion": "Qa=2161&Qo>16664&Qo<16665",
       "why": "One of the loggers of the gang at the silver willow (42062). INFERRED cell. Dofus pour les noobs («Le saule du promeneur»)."
+    },
+    {
+      "map": 207624192,
+      "npc": 5598,
+      "cell": 356,
+      "remove": true,
+      "why": "Not wanted: datos/npc_spawns_derived.json put Orukam in the Pandassembly hall (207624192, cell 356, no criterion) because 2197's objective 16575 names that map, so the black dragon stood there for everyone. He waits in the Ether instead (207618048, cell 359, the 2150 row, now also gated for 2197): «Une fois dans l'Éther à la croisée des mondes parlez au dragon noir Orukam» (Dofus pour les noobs, «Sang d'encre»)."
+    },
+    {
+      "map": 56103936,
+      "npc": 1300,
+      "cell": 311,
+      "orientation": 1,
+      "why": "Waldos in the post-boss room of the Royal Morsagüino's Excavation (Dofus pour les noobs «Las joyas de la corona»: «reparlez à Waldos afin de quitter le donjon»; the client's line 7837 and his exit replies 7851/7902). INFERRED cell, next to the landing cell 297."
+    },
+    {
+      "map": 62920704,
+      "npc": 1391,
+      "cell": 311,
+      "orientation": 1,
+      "why": "Silvia Canozzi in the post-boss room of the Cil's Den (Dofus pour les noobs «Sans ma barbe, quelle barbe»: «vous pouvez ressortir du donjon en parlant de nouveau à Sylvie Barbe»; the client's line 8428 and reply 8451). INFERRED cell, next to the landing cell 297."
+    },
+    {
+      "map": 62136840,
+      "npc": 1394,
+      "cell": 311,
+      "orientation": 1,
+      "why": "Billy Beja in the post-boss room of the Golosotes' Antechamber (Dofus pour les noobs «Le pic qui glace»: «parlez à Willy La Bille afin de sortir»; the client's line 8460 and reply 8479). INFERRED cell, next to the landing cell 297."
+    },
+    {
+      "map": 85985792,
+      "npc": 1518,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qa=849&Qo<5325",
+      "why": "Duendebre in his lair, only while quest 849 is under way (client objective 5324 names him). INFERRED cell: the client has no placement for this NPC; the lair map is the one of the walkthrough's coordinates."
+    },
+    {
+      "map": 85984770,
+      "npc": 1519,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=850&Qo<5328",
+      "why": "Renodolfo in his lair, only while quest 850 is under way (client objective 5327 names him). INFERRED cell: the client has no placement for this NPC; the lair map is the one of the walkthrough's coordinates."
+    },
+    {
+      "map": 85983746,
+      "npc": 1520,
+      "cell": 270,
+      "orientation": 1,
+      "criterion": "Qa=851&Qo<5331",
+      "why": "Keprinus in his lair, only while quest 851 is under way (client objective 5330 names him). INFERRED cell: the client has no placement for this NPC; the lair map is the one of the walkthrough's coordinates."
+    },
+    {
+      "map": 85985794,
+      "npc": 1521,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=852&Qo<5334",
+      "why": "Oogly Betugy in her refuge, only while quest 852 is under way (client objective 5333 names her). INFERRED cell: the client has no placement for this NPC."
+    },
+    {
+      "map": 205259266,
+      "npc": 5700,
+      "cell": 300,
+      "remove": true
+    },
+    {
+      "map": 205259266,
+      "npc": 5700,
+      "cell": 299,
+      "orientation": 3,
+      "criterion": "Qa=2167&Qo>16601&Qo<16602",
+      "why": "The thief's freed soul beside the pandawa [23,-24], from the release (16601) until the amulet is handed back (16602). INFERRED cell, the derived 300 moved one aside."
+    },
+    {
+      "map": 205260545,
+      "npc": 5700,
+      "cell": 241,
+      "orientation": 3,
+      "criterion": "Qa=2167&Qo>16599&Qo<16696",
+      "why": "The tanuki thief out of the pottery of [25,-27] (DPLN: «le voleur fait son apparition»), from the third touch (16599) until it is caught (16696). INFERRED cell, in front of the pottery (element 519635, cell 227)."
+    },
+    {
+      "map": 219152384,
+      "npc": 2935,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Gabi Lan, el Terraymar, the hypermage who keeps the way to the king, in the palace hall past its first room; Dofus pour les noobs («L'ombre et la proie»): «Entrez dans le Palais et franchissez la première salle. Parlez alors à Jed Reivrepel»."
+    },
+    {
+      "map": 219152644,
+      "npc": 2935,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Gabi Lan at the head of the conjuration room's circle, facing the apprentice; Dofus pour les noobs («L'ombre et la proie»): «Dans la salle de conjuration commencez par vous placer devant Jed»."
+    },
+    {
+      "map": 212598790,
+      "npc": 3003,
+      "cell": 244,
+      "remove": true
+    },
+    {
+      "map": 212598790,
+      "npc": 3003,
+      "cell": 386,
+      "orientation": 3,
+      "why": "Aunt Zilda by the apprentice's stall in the fishermen's quarter [-35,-54] (the derived cell 244 is the roof); Dofus pour les noobs («L'ombre et la proie»)."
+    },
+    {
+      "map": 212598790,
+      "npc": 3009,
+      "cell": 231,
+      "orientation": 3,
+      "why": "Michalem the cat up on the round house's roof with the plush tofu; aunt Zilda's «Subir hasta el miaumiau» (26207) brings him in. Dofus pour les noobs («L'ombre et la proie»): «un chacha s'est approprié un tofu en peluche ayant appartenu à l'eniripsa disparue»."
+    },
+    {
+      "map": 157810688,
+      "npc": 3004,
+      "cell": 343,
+      "orientation": 3,
+      "criterion": "Qo>10146&Qo<10147",
+      "why": "Nabrisa in the dark clearing once the Zampívoro oscuro is beaten, until she follows the character; Dofus pour les noobs («L'ombre et la proie»): «Une fois la bête vaincue, Nabrisa apparait et vous remercie»."
+    },
+    {
+      "map": 219152644,
+      "npc": 3004,
+      "cell": 356,
+      "orientation": 5,
+      "criterion": "Qo>10149&Qo<10152",
+      "why": "Nabrisa in the middle of the conjuration room's circle for the exorcism, the character between her and Gabi Lan; Dofus pour les noobs («L'ombre et la proie»)."
+    },
+    {
+      "map": 219152644,
+      "npc": 3006,
+      "cell": 356,
+      "orientation": 5,
+      "criterion": "Qo>10152|Qf=1665",
+      "why": "Nabrisa freed of the shadow: «Gracias por todo lo que has hecho por mí... ¡Espero volver a verte cuando sea hipermaga!» (21800)."
+    },
+    {
+      "map": 88086275,
+      "npc": 3665,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1823&Qo>12025&Qo<12026",
+      "why": "The first bread collector (objective 12026): visible only while the bread is to be handed to him, in the walkthrough's order. INFERRED cell. Dofus pour les noobs («Distribution de pains zizanesques»)."
+    },
+    {
+      "map": 88087814,
+      "npc": 3665,
+      "cell": 299,
+      "orientation": 1,
+      "criterion": "Qa=1823&Qo>12026&Qo<12027",
+      "why": "The second bread collector (objective 12027): visible only while the bread is to be handed to him, in the walkthrough's order. INFERRED cell. Dofus pour les noobs («Distribution de pains zizanesques»)."
+    },
+    {
+      "map": 88087304,
+      "npc": 3665,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1823&Qo>12027&Qo<12028",
+      "why": "The third bread collector (objective 12028): visible only while the bread is to be handed to him, in the walkthrough's order. INFERRED cell. Dofus pour les noobs («Distribution de pains zizanesques»)."
+    },
+    {
+      "map": 88086795,
+      "npc": 3665,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1823&Qo>12028&Qo<12029",
+      "why": "The last bread collector (objective 12029): visible only while the bread is to be handed to him, in the walkthrough's order. INFERRED cell. Dofus pour les noobs («Distribution de pains zizanesques»)."
+    },
+    {
+      "map": 205261312,
+      "npc": 5708,
+      "cell": 218,
+      "orientation": 1,
+      "criterion": "Qo<16584|Qo>16590|Qf=2168",
+      "why": "Tanuwu Kang by his statue at [27,-26], until he agrees to follow (16584) and again once the debate is over (16590). INFERRED cell (open sand by the statue). Dofus pour les noobs («L'égalité des sexes»)."
+    },
+    {
+      "map": 205258753,
+      "npc": 5708,
+      "cell": 331,
+      "orientation": 3,
+      "criterion": "Qa=2168&Qo>16584&Qo<16590",
+      "why": "Tanuwu Kang escorted to the pandawas' map [22,-25], from his agreement (16584) until the fight is won (16590). INFERRED cell beside Wotta."
+    },
+    {
+      "map": 205260801,
+      "npc": 5707,
+      "cell": 331,
+      "orientation": 1,
+      "criterion": "Qo<16582|Qo>16590|Qf=2168",
+      "why": "Tanuli Huan at her pebble stall at [26,-25], until the pebbles are handed over (16582) and again once the debate is over. INFERRED cell. Dofus pour les noobs («L'égalité des sexes»)."
+    },
+    {
+      "map": 205258753,
+      "npc": 5707,
+      "cell": 359,
+      "orientation": 3,
+      "criterion": "Qa=2168&Qo>16582&Qo<16590",
+      "why": "Tanuli Huan escorted to [22,-25], from the pebbles (16582) until the fight is won (16590). INFERRED cell beside Chiwhan."
+    },
+    {
+      "map": 205261569,
+      "npc": 5728,
+      "cell": 270,
+      "orientation": 1,
+      "criterion": "Qa=2168&Qo>16578&Qo<16579",
+      "why": "The Boo recalcitrante of [27,-27], from Tanuwu's agreement (16578) until it is beaten (16579). INFERRED cell. Dofus pour les noobs («L'égalité des sexes»)."
+    },
+    {
+      "map": 88083220,
+      "npc": 7124,
+      "cell": 213,
+      "orientation": 1,
+      "why": "Harmonie Daule, the hypermage of the idols, «située près de l'église d'Amakna» (DofusDB, «La bénédiction de Viti»), «en [6,3], là où une Huppermage spécialisée dans les idoles s'est installée» (Dofus pour les noobs). Her camp is the desk, the crates and the idol bench west of the church. INFERRED cell: 213, the grass in front of the camp, facing the path."
+    },
+    {
+      "map": 207618062,
+      "npc": 5816,
+      "cell": 385,
+      "orientation": 1,
+      "why": "The drunk sailor of the Osakwa Inn [20,-20] (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)). INFERRED cell: the carpet in the middle of the hall."
+    },
+    {
+      "map": 207618062,
+      "npc": 5581,
+      "cell": 340,
+      "orientation": 1,
+      "criterion": "Qa=2170&Qo>16738&Qo<16739",
+      "why": "The apprentice, freed once the sailors have given in (16738) until he is escorted home (16739): «Parlez à l'Apprenti brasseur pour le délivrer» (Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)). INFERRED cell: the left of the hall."
+    },
+    {
+      "map": 207619086,
+      "npc": 5581,
+      "cell": 303,
+      "orientation": 3,
+      "criterion": "Qa=2170&Qo>16739&Qo<16741",
+      "why": "The rescued apprentice back in the distillery (escorted, 16739) until the decree is delivered (16741). INFERRED cell, beside the master."
     },
     {
       "map": 220988932,
@@ -5672,5 +5914,5 @@
       "criterion": "Qa=2451&Qo>18575&Qo<18576",
       "why": "Hell Mina in the Tertre du long sommeil's post-boss room (220729859), where the character speaks to her once the dungeon is won («Arrête-la si tu peux», objective 18576; Dofus pour les noobs, «Arrête-la si tu peux»: «Une fois le donjon terminé, parlez à Hell Mina»), from the boss (18575) until she is spoken to (18576). INFERRED cell."
     }
-  ]
+    ]
 }
