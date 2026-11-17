@@ -46198,7 +46198,7 @@
         {
           "message": 41033,
           "choices": [
-            { "reply": 53441, "next": 41234, "canStart": 2151 },
+            { "reply": 53441, "next": 41234, "beforeQuest": 2151, "criterion": "PL>89" },
             { "reply": 53441, "criterion": "PL<90|Qa=2151|Qf=2151" }
           ]
         },
