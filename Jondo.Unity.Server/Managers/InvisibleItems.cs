@@ -50,8 +50,12 @@ namespace Jondo.Unity.Server.Managers
 
         // ─── The frames ─────────────────────────────────────────────────────────────────────
 
-        private static readonly string Iua = Op.Uri(Op.Iua), Itd = Op.Uri(Op.Itd), Ivj = Op.Uri(Op.Ivj),
-                                       Ium = Op.Uri(Op.Ium), Itc = Op.Uri(Op.Itc), Lqn = Op.Uri(Op.Lqn);
+        // As bytes: every frame the server writes goes through Hides, and comparing the url's bytes
+        // allocates nothing for the movements and fights that make up most of them.
+        private static readonly byte[] Iua = Url(Op.Iua), Itd = Url(Op.Itd), Ivj = Url(Op.Ivj),
+                                       Ium = Url(Op.Ium), Itc = Url(Op.Itc), Lqn = Url(Op.Lqn);
+
+        private static byte[] Url(string op) => Encoding.ASCII.GetBytes(Op.Uri(op));
 
         /// <summary>
         /// Whether a frame about to be written tells the client about an invisible item and must
@@ -61,11 +65,11 @@ namespace Jondo.Unity.Server.Managers
         {
             try
             {
-                if (!TryReadAny(frame, out string url, out var message)) return false;
-                if (url == Iua || url == Itd) return Arrival(message);
-                if (url == Ivj) return Quantity(message);
-                if (url == Ium || url == Itc) return Varint(message, 1) is long gone && IsHidden(gone);
-                if (url == Lqn) return Gained(message);
+                if (!TryReadAny(frame, out var url, out var message)) return false;
+                if (url.SequenceEqual(Iua) || url.SequenceEqual(Itd)) return Arrival(message);
+                if (url.SequenceEqual(Ivj)) return Quantity(message);
+                if (url.SequenceEqual(Ium) || url.SequenceEqual(Itc)) return Varint(message, 1) is long gone && IsHidden(gone);
+                if (url.SequenceEqual(Lqn)) return Gained(message);
             }
             catch (Exception)
             {
@@ -106,9 +110,9 @@ namespace Jondo.Unity.Server.Managers
 
         // ─── A small reader: only what the checks above need ──────────────────────────────────
 
-        private static bool TryReadAny(ReadOnlySpan<byte> frame, out string url, out ReadOnlySpan<byte> message)
+        private static bool TryReadAny(ReadOnlySpan<byte> frame, out ReadOnlySpan<byte> url, out ReadOnlySpan<byte> message)
         {
-            url = "";
+            url = default;
             message = default;
             ReadOnlySpan<byte> envelope = default;
             bool found = false;
@@ -122,7 +126,7 @@ namespace Jondo.Unity.Server.Managers
             while (Next(any, ref pos, out int field, out int wire, out _, out var bytes))
             {
                 if (wire != 2) continue;
-                if (field == 1) { url = Encoding.UTF8.GetString(bytes); hasUrl = true; }
+                if (field == 1) { url = bytes; hasUrl = true; }
                 else if (field == 2) message = bytes;
             }
             return hasUrl;
