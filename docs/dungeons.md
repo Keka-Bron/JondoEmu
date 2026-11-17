@@ -153,10 +153,16 @@ They now go in the right order.
 
 ## 6. What is missing
 
-Not missing any more:
-- the dungeon challenges. The 684 flagged `solo_mazmorra` all name a monster, and the boss room imposes
-  those of the monsters in front (`ChallengeHandler.ImposeAsync`), bonus at zero, as the anomaly's
-  capture shows;
+Boss rooms impose the achievement challenges that the fight can judge for the monsters present
+(`ChallengeHandler.ImposeAsync`). These have a zero combat bonus and are omitted once completed.
+Kardorim's Special checks the boss's position at the end of its turn and protects its Chadaribs
+from damage and pushback.
+
+Across the 130 achievements titled “(especial)” in the 3.6.10.10 client catalogue, 53 have both a
+fight rule and a matching boss in the emulator's dungeon data. Of the rest, 73 need complete fight
+rules, and the four Grozilla and Grasmera variants have rules but lack matching dungeon boss entries.
+
+Already implemented:
 - the guardian's replies: only the key's and the keyring's let one in (`DungeonHandler.DoorReplies`,
   `DungeonDoor`), any other answer leaves the player outside;
 - the group search: the announcements and the automatic matchmaking of the dungeons' lobby.

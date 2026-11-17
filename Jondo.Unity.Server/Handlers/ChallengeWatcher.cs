@@ -84,6 +84,14 @@ namespace Jondo.Unity.Server.Handlers
         public const int CadaUnoConSuMonstruo = 46;
         public const int Espejo = 966;
 
+        private const int Kardorim = 4051;
+        private const int Chadarib = 4052;
+        private const int RoyalCarrot = 3458;
+        private const int AshiMagari = 2976;
+        private const int Scythetic = 5979;
+        private const int Boncherub = 6793;
+        private const int Brakdevil = 6794;
+
         /// <summary>
         /// The ones that can be watched, and the percentage they are given IF theirs has never come
         /// over the wire.
@@ -209,6 +217,14 @@ namespace Jondo.Unity.Server.Handlers
                 await SenalarAsync(stream, fight, Imprevisible, UnEnemigoVivo(fight));
         }
 
+        public static async Task WaveArrivedAsync(NetworkStream stream, FightInstance fight, int wave)
+        {
+            if (WithRule(fight, Challenges.BossRule.ClearWaveBeforeNextArrival).Count == 0) return;
+            if (fight.Rojo.Any(enemy => enemy.IsAlive && !enemy.EsInvocado && enemy.Wave < wave))
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.ClearWaveBeforeNextArrival,
+                                     "a new wave arrives before the previous one is defeated");
+        }
+
         /// <summary>
         /// An ally is about to play: Assassin's Eye points out the enemy nearest to him, which is what
         /// its description asks for, «the closest to him at the start of each turn».
@@ -216,7 +232,19 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task AllyTurnStartedAsync(NetworkStream stream, FightInstance fight,
                                                       Fighter quien)
         {
-            if (quien.TeamId != 0 || !Vivo(fight, AsesinoAOjo)) return;
+            if (quien.TeamId != 0 || !Alguno(fight)) return;
+
+            if (fight.RoundNumber >= 2)
+            {
+                foreach (int id in WithRule(fight, Challenges.BossRule.StartAdjacentToBossFromRound2AndKillBossLast))
+                {
+                    if (!fight.Rojo.Any(enemy => enemy.IsAlive && Challenges.Get(id)!.Monsters.Contains(enemy.MonsterId)
+                        && MapGeometry.Distance(quien.CellId, enemy.CellId) == 1))
+                        await BreakOneAsync(stream, fight, id, $"{quien.Name} starts away from the boss");
+                }
+            }
+
+            if (!Vivo(fight, AsesinoAOjo)) return;
 
             Fighter? masCerca = null;
             int mejor = int.MaxValue;
@@ -234,7 +262,17 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static async Task TurnEndedAsync(NetworkStream stream, FightInstance fight, Fighter quien)
         {
-            if (!Alguno(fight) || quien.TeamId != 0) return;
+            if (!Alguno(fight)) return;
+            if (quien.TeamId != 0)
+            {
+                if (quien.MonsterId == Kardorim && quien.IsAlive &&
+                    (Adyacente(fight, quien, 0) || Adyacente(fight, quien, 1)))
+                {
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.KardorimSpecial,
+                                         $"{quien.Name} ends next to another fighter");
+                }
+                return;
+            }
 
             // Zombi: exactly one MP a turn. The MP lost getting out of a tackle do not count, its
             // description says (1008205), so they are taken off what he spent.
@@ -366,6 +404,24 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!Alguno(fight) || enemigo.TeamId == 0) return;
 
+            if (fight.RoundNumber >= 2 && enemigo.IsAlive && AnyRule(fight))
+            {
+                if (!Adyacente(fight, enemigo, 0) && !Adyacente(fight, enemigo, 1))
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.EnemiesStartAdjacentFromRound2,
+                                         $"{enemigo.Name} starts away from every fighter");
+
+                if (WithRule(fight, Challenges.BossRule.EnemiesStartInAllySightFromRound2).Count > 0)
+                {
+                    MapManager.LosBlockingCells.TryGetValue(fight.MapId, out var blockers);
+                    if (!fight.Azul.Any(ally => ally.IsAlive &&
+                        MapGeometry.HasLineOfSight(ally.CellId, enemigo.CellId, blockers)))
+                    {
+                        await BreakRuleAsync(stream, fight, Challenges.BossRule.EnemiesStartInAllySightFromRound2,
+                                             $"{enemigo.Name} starts out of every ally's sight");
+                    }
+                }
+            }
+
             if (Vivo(fight, Blitzkrieg) && enemigo.IsAlive && fight.Wounded.Contains(enemigo.Id))
             {
                 await BreakAsync(stream, fight, Blitzkrieg,
@@ -379,9 +435,14 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static async Task DamagedAsync(NetworkStream stream, FightInstance fight,
                                               Fighter quien, int cuanto, Fighter quienPega, int elemento,
-                                              bool direct = false)
+                                              bool direct = false, int shieldLoss = 0)
         {
-            if (!Alguno(fight) || cuanto <= 0) return;
+            if (!Alguno(fight)) return;
+
+            if (quien.TeamId == 1 && quien.MonsterId == Chadarib && (cuanto > 0 || shieldLoss > 0))
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.KardorimSpecial,
+                                     $"{quien.Name} takes damage");
+            if (cuanto <= 0) return;
 
             await BossDamageAsync(stream, fight, quien, quienPega, elemento);
 
@@ -430,6 +491,23 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Push damage travels with no element: that is how the fight sends it.</summary>
         private const int PushElement = -1;
 
+        public static async Task DisplacedAsync(NetworkStream stream, FightInstance fight, Fighter target,
+                                                Fighter source, bool pushed = false, bool pulled = false)
+        {
+            if (!Alguno(fight)) return;
+
+            if (target.TeamId == 0 && target != source)
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoAllyDisplacement,
+                                     $"{target.Name} is displaced");
+
+            if (target.TeamId != 1 || (!pushed && !pulled)) return;
+            await BreakRuleAsync(stream, fight, Challenges.BossRule.NoEnemyPushOrPull,
+                                 $"{target.Name} is pushed or pulled");
+            if (pushed && target.MonsterId == Chadarib)
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.KardorimSpecial,
+                                     $"{target.Name} is pushed");
+        }
+
         /// <summary>
         /// The boss challenges that look at a blow: where it is dealt from, to whom, and with what.
         ///
@@ -442,6 +520,27 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!AnyRule(fight)) return;
 
+            if (quienPega is { TeamId: 0 })
+            {
+                var (sourceX, sourceY) = MapGeometry.CellToPoint(quienPega.CellId);
+                var (targetX, targetY) = MapGeometry.CellToPoint(quien.CellId);
+                bool inLine = sourceX == targetX || sourceY == targetY;
+                bool diagonal = Math.Abs(sourceX - targetX) == Math.Abs(sourceY - targetY);
+                if (!inLine && !diagonal)
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.DamageInLineOrDiagonal,
+                                         $"{quienPega.Name} deals damage off the line and diagonal");
+
+                if (quien.TeamId == 1 && !inLine)
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.DamageInLine,
+                                         $"{quienPega.Name} deals damage off the line");
+                if (quien.TeamId == 1 && Nearest(fight.Azul, quienPega) <= 3)
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.DamageFarFromAllies,
+                                         $"{quienPega.Name} deals damage within 3 cells of an ally");
+                if (quien.TeamId == 1 && Nearest(fight.Rojo, quienPega) <= 3)
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.DamageFarFromEnemies,
+                                         $"{quienPega.Name} deals damage within 3 cells of an enemy");
+            }
+
             if (quien.TeamId == 0)
             {
                 if (elemento == PushElement)
@@ -451,6 +550,31 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 return;
             }
+
+            if (quien.MonsterId is 6233 or 6234) // The two Cucurbiturret variants.
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoDamageToCucurbiturrets,
+                                     $"{quien.Name} takes damage");
+
+            foreach (int id in WithRule(fight, Challenges.BossRule.OnlyDamageBossUntilItDies))
+            {
+                if (quienPega is { TeamId: 0 } && OtherThanLivingBoss(fight, quien, id))
+                    await BreakOneAsync(stream, fight, id, $"{quien.Name} takes damage before the boss dies");
+            }
+
+            foreach (int id in WithRule(fight, Challenges.BossRule.OnlyDamageBossWhileRoyalCarrotIsAlive))
+            {
+                if (!Challenges.Get(id)!.Monsters.Contains(quien.MonsterId) &&
+                    fight.Rojo.Any(enemy => enemy.IsAlive && enemy.MonsterId == RoyalCarrot))
+                    await BreakOneAsync(stream, fight, id, $"{quien.Name} takes damage while a Royal Carrot is alive");
+            }
+
+            if (!Adyacente(fight, quien, 0) && !Adyacente(fight, quien, 1))
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.DamageOnlyToAdjacentFighters,
+                                     $"{quien.Name} takes damage while away from every fighter");
+
+            if (quienPega is { TeamId: 1 } && quienPega != quien)
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoEnemyFriendlyFire,
+                                     $"{quienPega.Name} damages its ally {quien.Name}");
 
             if (elemento == PushElement)
             {
@@ -507,6 +631,13 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
+        private static bool OtherThanLivingBoss(FightInstance fight, Fighter target, int challengeId)
+        {
+            var bosses = Challenges.Get(challengeId)!.Monsters;
+            return !bosses.Contains(target.MonsterId) &&
+                   fight.Rojo.Any(enemy => enemy.IsAlive && bosses.Contains(enemy.MonsterId));
+        }
+
         /// <summary>
         /// A heal. Heartless only allows healing oneself: if the healer and the healed are different
         /// allies, it breaks.
@@ -529,9 +660,14 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>An ALLY dies. Only Survivor looks at it.</summary>
-        public static async Task AllyDiedAsync(NetworkStream stream, FightInstance fight, Fighter quien)
+        public static async Task AllyDiedAsync(NetworkStream stream, FightInstance fight, Fighter quien,
+                                               Fighter? killer)
         {
             if (!Alguno(fight) || quien.TeamId != 0) return;
+
+            if (quien.EsInvocado && killer is { TeamId: 1 })
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.NoAllySummonKilledByEnemy,
+                                     $"{killer.Name} kills the allied summon {quien.Name}");
 
             if (!quien.EsInvocado && fight.RoundNumber < 6)
             {
@@ -645,6 +781,41 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var uno in fight.Rojo) if (uno.IsAlive) { quedanEnemigos = true; break; }
 
             await KillOrderAsync(stream, fight, victima);
+
+            foreach (int id in WithRule(fight, Challenges.BossRule.StartAdjacentToBossFromRound2AndKillBossLast))
+            {
+                if (quedanEnemigos && Challenges.Get(id)!.Monsters.Contains(victima.MonsterId))
+                    await BreakOneAsync(stream, fight, id, $"{victima.Name} dies before the other enemies");
+            }
+
+            foreach (int id in WithRule(fight, Challenges.BossRule.OnlyDamageBossUntilItDies))
+            {
+                if (OtherThanLivingBoss(fight, victima, id))
+                    await BreakOneAsync(stream, fight, id, $"{victima.Name} dies before the boss");
+            }
+
+            if (victima.MonsterId == AshiMagari)
+                await BreakRuleAsync(stream, fight, Challenges.BossRule.KeepAshiMagariAlive, $"{victima.Name} dies");
+
+            if (quienRemata is { TeamId: 0 })
+            {
+                if (victima.MonsterId == Scythetic && victima.EsInvocado)
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.KeepSummonedScythesAlive,
+                                         $"{quienRemata.Name} kills {victima.Name}");
+                if (victima.MonsterId is Boncherub or Brakdevil)
+                    await BreakRuleAsync(stream, fight, Challenges.BossRule.KeepCelestialSummonsAlive,
+                                         $"{quienRemata.Name} kills {victima.Name}");
+            }
+
+            foreach (int id in WithRule(fight, Challenges.BossRule.BossLastAndBelowHalfForOtherKills))
+            {
+                var bossIds = Challenges.Get(id)!.Monsters;
+                bool bossDied = bossIds.Contains(victima.MonsterId);
+                bool failed = bossDied ? quedanEnemigos : !fight.Rojo.Any(enemy =>
+                    bossIds.Contains(enemy.MonsterId) && enemy.IsAlive && 2L * enemy.CurrentHP < enemy.MaxHP);
+                if (failed)
+                    await BreakOneAsync(stream, fight, id, $"{victima.Name} falls before the boss condition is met");
+            }
 
             // The boss challenges that look at who falls: nobody before round 6, and the enemy
             // summons, which no ally may finish off.

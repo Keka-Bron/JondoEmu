@@ -139,11 +139,21 @@ namespace Jondo.Unity.Server.Managers
             EndFarFromAllies3,
             EndFarFromAllies4,
             BeginOrEndInLineWithEnemy,
+            KardorimSpecial,
+            EnemiesStartAdjacentFromRound2,
+            EnemiesStartInAllySightFromRound2,
+            StartAdjacentToBossFromRound2AndKillBossLast,
 
             // Who falls, and when.
             NoEnemyKilledBeforeRound6,
             NobodyKilledBeforeRound6,
             NoEnemySummonKilledByAlly,
+            NoAllySummonKilledByEnemy,
+            BossLastAndBelowHalfForOtherKills,
+            KeepAshiMagariAlive,
+            KeepSummonedScythesAlive,
+            KeepCelestialSummonsAlive,
+            ClearWaveBeforeNextArrival,
 
             // Heals.
             NoHealEnemies,
@@ -158,6 +168,19 @@ namespace Jondo.Unity.Server.Managers
             NoDamageToEnemySummons,
             NoDamageWhileEnemySummons,
             BossUntouchedUntilAlone,
+            DamageInLine,
+            DamageInLineOrDiagonal,
+            DamageOnlyToAdjacentFighters,
+            DamageFarFromAllies,
+            DamageFarFromEnemies,
+            NoEnemyFriendlyFire,
+            OnlyDamageBossUntilItDies,
+            OnlyDamageBossWhileRoyalCarrotIsAlive,
+            NoDamageToCucurbiturrets,
+
+            // Displacement.
+            NoEnemyPushOrPull,
+            NoAllyDisplacement,
         }
 
         /// <summary>Challenge → its rule. The numbers are those of the 3.6.10.10 client's table.</summary>
@@ -175,12 +198,22 @@ namespace Jondo.Unity.Server.Managers
             [1061] = BossRule.EndFarFromAllies3,           // Mind my paws
             [1053] = BossRule.EndFarFromAllies4,           // Frozen autonomy
             [1074] = BossRule.BeginOrEndInLineWithEnemy,   // There are people around here
+            [977] = BossRule.KardorimSpecial,
+            [986] = BossRule.EnemiesStartAdjacentFromRound2,
+            [1016] = BossRule.EnemiesStartInAllySightFromRound2,
+            [989] = BossRule.StartAdjacentToBossFromRound2AndKillBossLast,
 
             [525] = BossRule.NoEnemyKilledBeforeRound6,    // Domakuroptimisation
             [528] = BossRule.NobodyKilledBeforeRound6,     // Dorigamisericordia
             [1100] = BossRule.NoEnemySummonKilledByAlly,   // Cascasaur protection
             [1101] = BossRule.NoEnemySummonKilledByAlly,
             [1102] = BossRule.NoEnemySummonKilledByAlly,
+            [1067] = BossRule.NoAllySummonKilledByEnemy,
+            [988] = BossRule.BossLastAndBelowHalfForOtherKills,
+            [981] = BossRule.KeepAshiMagariAlive,
+            [1091] = BossRule.KeepSummonedScythesAlive,
+            [1097] = BossRule.KeepCelestialSummonsAlive,
+            [1055] = BossRule.ClearWaveBeforeNextArrival,
 
             [980] = BossRule.NoHealEnemies,                // Un milubo en el corral
             [1063] = BossRule.NoHealAllies,                // Allies sent to the future
@@ -207,6 +240,17 @@ namespace Jondo.Unity.Server.Managers
             [1103] = BossRule.NoDamageToEnemySummons,      // Cascasaur protection, Grozilla's
             [1003] = BossRule.NoDamageWhileEnemySummons,   // Real cracks
             [1022] = BossRule.BossUntouchedUntilAlone,     // Ratcovery
+            [984] = BossRule.DamageInLine,
+            [1075] = BossRule.DamageInLineOrDiagonal,
+            [997] = BossRule.DamageOnlyToAdjacentFighters,
+            [1005] = BossRule.DamageFarFromAllies,
+            [1010] = BossRule.DamageFarFromEnemies,
+            [1029] = BossRule.NoEnemyFriendlyFire,
+            [1030] = BossRule.OnlyDamageBossUntilItDies,
+            [1002] = BossRule.OnlyDamageBossWhileRoyalCarrotIsAlive,
+            [1036] = BossRule.NoDamageToCucurbiturrets,
+            [1049] = BossRule.NoEnemyPushOrPull,
+            [1267] = BossRule.NoAllyDisplacement,
         };
 
         /// <summary>"Matar a {0} en último lugar", said only in the description: its own boss, last.</summary>
@@ -288,10 +332,10 @@ namespace Jondo.Unity.Server.Managers
                 }
                 else if (limit.Success) challenge.TurnLimit = int.Parse(limit.Groups[1].Value);
                 else if (byCriterion.TryGetValue(challenge.Completion, out int twin)) challenge.Kind = twin;
+                else if (_byHand.TryGetValue(challenge.Id, out var rule)) challenge.Rule = rule;
                 else if (challenge.Completion == Scripted)
                 {
-                    if (_byHand.TryGetValue(challenge.Id, out var rule)) challenge.Rule = rule;
-                    else if (Array.IndexOf(_killBossLast, challenge.Id) >= 0) challenge.KillLast = challenge.Monsters;
+                    if (Array.IndexOf(_killBossLast, challenge.Id) >= 0) challenge.KillLast = challenge.Monsters;
                     else if (Array.IndexOf(_beforeRound6, challenge.Id) >= 0) challenge.TurnLimit = 6;
                     else if (challenge.Id == InLineWithAlly && watched.ContainsKey(SameLineage)) challenge.Kind = SameLineage;
                     else if (byName.TryGetValue(challenge.Name, out int namesake)) challenge.Kind = namesake;

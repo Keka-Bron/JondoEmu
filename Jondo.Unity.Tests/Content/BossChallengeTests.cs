@@ -104,18 +104,50 @@ namespace Jondo.Unity.Tests.Content
             Assert.Equal(ChallengeWatcher.MismoLinaje, Challenges.KindOf(1080));
         }
 
+        [Theory]
+        [InlineData(4051, 977)]
+        [InlineData(2975, 981)]
+        [InlineData(800, 984)]
+        [InlineData(6903, 986)]
+        [InlineData(252, 988)]
+        [InlineData(1027, 989)]
+        [InlineData(2960, 997)]
+        [InlineData(180, 1002)]
+        [InlineData(3100, 1005)]
+        [InlineData(173, 1010)]
+        [InlineData(5819, 1016)]
+        [InlineData(3852, 1029)]
+        [InlineData(1188, 1030)]
+        [InlineData(6256, 1036)]
+        [InlineData(2924, 1049)]
+        [InlineData(3849, 1055)]
+        [InlineData(4803, 1067)]
+        [InlineData(3648, 1075)]
+        [InlineData(5955, 1091)]
+        [InlineData(6792, 1097)]
+        [InlineData(3306, 1267)]
+        public void Supported_specials_are_imposed_in_their_boss_fights(int bossId, int specialId)
+        {
+            Load();
+
+            Assert.Contains(Challenges.Imposed(new[] { bossId }, new int[0], 2, 4),
+                            challenge => challenge.Id == specialId);
+            Assert.DoesNotContain(Challenges.Imposed(new[] { bossId }, new[] { specialId }, 2, 4),
+                                  challenge => challenge.Id == specialId);
+        }
+
         [Fact]
-        public void Every_hand_wired_challenge_is_a_scripted_boss_challenge()
+        public void Every_hand_wired_challenge_has_its_expected_boss_criterion()
         {
             if (!Available) return;
             Load();
 
-            // A hand-wired id that is not "Ma=1" in the table would be silently ignored: this
-            // is what catches a typo in the list, or a table that moved under it.
+            // Catch mistyped ids and changes to the challenge catalogue.
             foreach (int id in Challenges.HandWired)
             {
                 var reto = Challenges.Get(id);
-                Assert.True(reto != null && reto.NeedsMonster && reto.Completion == "Ma=1" && reto.Judged,
+                string criterion = id == 1030 ? "CK#1188,1&Ma=1" : "Ma=1";
+                Assert.True(reto != null && reto.NeedsMonster && reto.Completion == criterion && reto.Judged,
                             $"challenge {id}");
             }
         }

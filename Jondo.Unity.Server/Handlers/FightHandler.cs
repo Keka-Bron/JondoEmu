@@ -7857,7 +7857,7 @@ namespace Jondo.Unity.Server.Handlers
                     Network.FightProtocol.BuildDeath(killer.Id, quien.Id)));
                 Program.LogDebug($"[Fight] {quien.Id} runs out of life: what went with no blow took more than he had.");
                 await ChallengeWatcher.DiedAsync(stream, fight, quien, false, killer);
-                await ChallengeWatcher.AllyDiedAsync(stream, fight, quien);
+                await ChallengeWatcher.AllyDiedAsync(stream, fight, quien, killer);
                 await CaenSusInvocadosAsync(stream, fight, quien);
                 await ReenviarLaListaAsync(stream, fight);
                 await ReconciliarLosMurosAsync(stream, fight);
@@ -8634,6 +8634,18 @@ namespace Jondo.Unity.Server.Handlers
                     Disparo(c.Sobre, Managers.EffectEngine.AlActivarseElEstado(Jondo.Unity.World.Combat.EffectSupport.CarriedState), quienLanza);
                     continue;
                 }
+                if (c.Mueve || c.Lanza)
+                {
+                    int effect = c.Efecto.EffectId;
+                    await ChallengeWatcher.DisplacedAsync(stream, fight, c.Sobre, quienLanza,
+                        pushed: effect is World.Combat.EffectSupport.Push or World.Combat.EffectSupport.PushWithoutDamage
+                            or World.Combat.EffectSupport.PushToTargetCell or 1021,
+                        pulled: effect is World.Combat.EffectSupport.Pull or World.Combat.EffectSupport.PullToTargetCell
+                            or 1022);
+                    if (c.MueveTambien)
+                        await ChallengeWatcher.DisplacedAsync(stream, fight, c.Tambien, quienLanza);
+                }
+
                 if (c.Lanza)
                 {
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
@@ -10131,7 +10143,8 @@ namespace Jondo.Unity.Server.Handlers
             // This is where Untouchable breaks -- if the one losing life is an ally -- and Elemental.
             // A hit of one's own cast, not a glyph's, a trap's nor a poison's, is direct (Clean hands).
             await ChallengeWatcher.DamagedAsync(stream, fight, target, aplicado, caster, elemento,
-                direct: !fromTurnTrigger && fight.CurrentDamageSource == Jondo.Unity.World.Fights.DamageSource.Direct);
+                direct: !fromTurnTrigger && fight.CurrentDamageSource == Jondo.Unity.World.Fights.DamageSource.Direct,
+                shieldLoss: escudoPerdido);
 
             // And EROSION: besides the life of now, each hit takes a pinch off the cap.
             //
@@ -10264,7 +10277,7 @@ namespace Jondo.Unity.Server.Handlers
                 await ChallengeWatcher.DiedAsync(stream, fight, target,
                                                  spell == Network.FightProtocol.HechizoCuerpoACuerpo,
                                                  caster);
-                await ChallengeWatcher.AllyDiedAsync(stream, fight, target);
+                await ChallengeWatcher.AllyDiedAsync(stream, fight, target, caster);
 
                 await CaenSusInvocadosAsync(stream, fight, target);
                 await ReenviarLaListaAsync(stream, fight);
@@ -10400,7 +10413,8 @@ namespace Jondo.Unity.Server.Handlers
             int porciento = quien.Otra(Fighter.CaracteristicaDeErosion)
                           + quien.Buffs.De(Fighter.CaracteristicaDeErosion, fight.RoundNumber);
             int erosionado = quien.Erosionar(dano, porciento);
-            await ChallengeWatcher.DamagedAsync(stream, fight, quien, aplicado, caster, elemento);
+            await ChallengeWatcher.DamagedAsync(stream, fight, quien, aplicado, caster, elemento,
+                                                shieldLoss: absorcion.ShieldLoss);
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildDamage(caster.Id, efecto, quien.Id, aplicado, elemento,
                                                   erosionado, absorcion.ShieldLoss)));
@@ -10411,7 +10425,7 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildDeath(caster.Id, quien.Id)));
             await ChallengeWatcher.DiedAsync(stream, fight, quien, false, caster);
-            await ChallengeWatcher.AllyDiedAsync(stream, fight, quien);
+            await ChallengeWatcher.AllyDiedAsync(stream, fight, quien, caster);
             await CaenSusInvocadosAsync(stream, fight, quien);
             await ReenviarLaListaAsync(stream, fight);
             await AlMatarAsync(stream, fight, caster, quien);
@@ -10510,7 +10524,8 @@ namespace Jondo.Unity.Server.Handlers
                             quien.Buffs.De(Fighter.CaracteristicaDeErosion, fight.RoundNumber);
             int erosionado = quien.Erosionar(dano, porciento);
 
-            await ChallengeWatcher.DamagedAsync(stream, fight, quien, aplicado, quienEmpuja, -1);
+            await ChallengeWatcher.DamagedAsync(stream, fight, quien, aplicado, quienEmpuja, -1,
+                                                shieldLoss: absorcion.ShieldLoss);
 
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                 Network.FightProtocol.BuildPushDamage(quienEmpuja.Id, quien.Id, aplicado, erosionado,
@@ -10538,7 +10553,7 @@ namespace Jondo.Unity.Server.Handlers
             Program.LogDebug($"[Fight] {quien.Id} runs out of life from the push crash.");
 
             await ChallengeWatcher.DiedAsync(stream, fight, quien, false, quienEmpuja);
-            await ChallengeWatcher.AllyDiedAsync(stream, fight, quien);
+            await ChallengeWatcher.AllyDiedAsync(stream, fight, quien, quienEmpuja);
             await CaenSusInvocadosAsync(stream, fight, quien);
             await ReenviarLaListaAsync(stream, fight);
             await AlMatarAsync(stream, fight, quienEmpuja, quien);
@@ -11309,6 +11324,7 @@ namespace Jondo.Unity.Server.Handlers
 
             fight.WaveNumber = wave;
             fight.NextWaveRound = fight.RoundNumber + turnsBeforeNext;
+            await ChallengeWatcher.WaveArrivedAsync(stream, fight, wave);
             await ShieldArrivalsAsync(fight, wave);
             Program.LogDebug($"[Fight] Wave {wave}: {arrivals} monster(s); {fight.TimedWaves.Count} still to come.");
             return true;

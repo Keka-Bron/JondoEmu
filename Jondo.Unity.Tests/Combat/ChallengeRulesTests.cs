@@ -179,5 +179,62 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Contains(chadalidFirst, other.ChallengesBroken);
             Assert.DoesNotContain(chadalidFirst, other.ChallengesMet);
         }
+
+        [Theory]
+        [InlineData("boss ends beside a player", true)]
+        [InlineData("boss ends beside a monster", true)]
+        [InlineData("boss ends alone", false)]
+        [InlineData("Chadarib takes damage", true)]
+        [InlineData("Chadarib loses shields", true)]
+        [InlineData("boss takes damage", false)]
+        [InlineData("Chadarib is pushed", true)]
+        [InlineData("Chadarib is pulled", false)]
+        public async Task Kardorim_special_checks_boss_position_and_protects_chadaribs(string action, bool broken)
+        {
+            Load();
+            const int special = 977;
+            const long characterId = 8_960_100_081;
+            await using var pipe = await ClientPipe.OpenAsync(characterId, characterId, 191105026, "Uno");
+            var (fight, player, _, boss) = Fight(special, characterId - 1);
+            boss.MonsterId = 4051;
+            var chadarib = new Fighter
+            {
+                Id = -3, TeamId = 1, MonsterId = 4052, IsMonster = true, Invocador = boss.Id,
+                CellId = 550, MaxHP = 100, CurrentHP = 100, Name = "Chadarib"
+            };
+            fight.AddMonster(chadarib);
+
+            switch (action)
+            {
+                case "boss ends beside a player":
+                    player.CellId = MapGeometry.GetNeighbors(boss.CellId).First();
+                    await ChallengeWatcher.TurnEndedAsync(pipe.ToClient, fight, boss);
+                    break;
+                case "boss ends beside a monster":
+                    chadarib.CellId = MapGeometry.GetNeighbors(boss.CellId).First();
+                    await ChallengeWatcher.TurnEndedAsync(pipe.ToClient, fight, boss);
+                    break;
+                case "boss ends alone":
+                    await ChallengeWatcher.TurnEndedAsync(pipe.ToClient, fight, boss);
+                    break;
+                case "Chadarib takes damage":
+                    await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, chadarib, 10, player, 1);
+                    break;
+                case "Chadarib loses shields":
+                    await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, chadarib, 0, player, 1, shieldLoss: 10);
+                    break;
+                case "boss takes damage":
+                    await ChallengeWatcher.DamagedAsync(pipe.ToClient, fight, boss, 10, player, 1);
+                    break;
+                case "Chadarib is pushed":
+                    await ChallengeWatcher.DisplacedAsync(pipe.ToClient, fight, chadarib, player, pushed: true);
+                    break;
+                case "Chadarib is pulled":
+                    await ChallengeWatcher.DisplacedAsync(pipe.ToClient, fight, chadarib, player, pulled: true);
+                    break;
+            }
+
+            Assert.Equal(broken, fight.ChallengesBroken.Contains(special));
+        }
     }
 }
