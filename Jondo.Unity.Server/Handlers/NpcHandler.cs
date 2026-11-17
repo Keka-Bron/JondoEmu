@@ -153,10 +153,11 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The whole catalogue, in one go, which is how the real server sends it.</summary>
         private static async Task OpenShopAsync(NetworkStream stream, Npcs.Spawn npc)
         {
-            var catalogue = NpcShops.CatalogueOf(npc.NpcId);
+            var catalogue = NpcShops.CatalogueFor(npc.NpcId,
+                criterion => PlayerCriteria.Met(criterion, SessionContext.State.MapId));
             if (catalogue.Count == 0)
             {
-                Console.WriteLine($"[NPC] {npc.NpcId} has a shop action but sells nothing.");
+                Console.WriteLine($"[NPC] {npc.NpcId} has no available shop items.");
                 return;
             }
 
@@ -2010,12 +2011,8 @@ namespace Jondo.Unity.Server.Handlers
 
             // That the vendor who is open really has it: the catalogue is sent by us, so asking for
             // something else is not a valid purchase.
-            bool onSale = false;
-            foreach (int sold in NpcShops.CatalogueOf(OpenShopNpc))
-            {
-                if (sold == gid) { onSale = true; break; }
-            }
-            if (!onSale)
+            if (!NpcShops.CanBuy(OpenShopNpc, gid,
+                    criterion => PlayerCriteria.Met(criterion, SessionContext.State.MapId)))
             {
                 Console.WriteLine($"[NPC] Vendor {OpenShopNpc} does not sell item {gid}.");
                 return;

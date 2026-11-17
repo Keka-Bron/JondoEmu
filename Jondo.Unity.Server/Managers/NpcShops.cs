@@ -32,6 +32,7 @@ namespace Jondo.Unity.Server.Managers
 
         private static readonly Dictionary<int, int[]> _byNpc = new();
         private static readonly Dictionary<int, long> _prices = new();
+        private static readonly Dictionary<int, Dictionary<int, string>> _criteria = new();
         private static readonly Dictionary<int, List<(int Id, int DiceNum, int DiceSide, int Value, int Category)>> _effects = new();
 
         public static int Count => _byNpc.Count;
@@ -42,6 +43,7 @@ namespace Jondo.Unity.Server.Managers
         {
             _byNpc.Clear();
             _prices.Clear();
+            _criteria.Clear();
             Items = 0;
 
             string path = Paths.NpcShopsJson;
@@ -238,6 +240,7 @@ namespace Jondo.Unity.Server.Managers
                     if (!shop.TryGetProperty("npc", out var npc) || !shop.TryGetProperty("items", out var items)) continue;
 
                     var gids = new List<int>();
+                    var criteria = new Dictionary<int, string>();
                     foreach (var item in items.EnumerateArray())
                     {
                         if (!item.TryGetProperty("gid", out var gid)) continue;
@@ -245,10 +248,13 @@ namespace Jondo.Unity.Server.Managers
                         if (id <= 0 || gids.Contains(id)) continue;
                         gids.Add(id);
                         if (item.TryGetProperty("price", out var price)) _prices[id] = price.GetInt64();
+                        if (item.TryGetProperty("criterion", out var criterion))
+                            criteria[id] = criterion.GetString() ?? "";
                     }
 
                     if (gids.Count == 0) continue;
                     _byNpc[npc.GetInt32()] = gids.ToArray();
+                    _criteria[npc.GetInt32()] = criteria;
                     vendors++;
 
                     // The same catalogue for other vendors, written once: "alsoSoldBy": [2142].
@@ -257,6 +263,7 @@ namespace Jondo.Unity.Server.Managers
                         foreach (var other in others.EnumerateArray())
                         {
                             _byNpc[other.GetInt32()] = gids.ToArray();
+                            _criteria[other.GetInt32()] = criteria;
                             vendors++;
                         }
                     }
@@ -275,6 +282,7 @@ namespace Jondo.Unity.Server.Managers
         {
             _byNpc.Clear();
             _prices.Clear();
+            _criteria.Clear();
             _effects.Clear();
         }
 
@@ -287,6 +295,20 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>What that NPC has for sale, in the order the real server sent it.</summary>
         public static IReadOnlyList<int> CatalogueOf(int npcId)
             => _byNpc.TryGetValue(npcId, out var gids) ? gids : (IReadOnlyList<int>)Array.Empty<int>();
+
+        /// <summary>The items this character may buy from this vendor.</summary>
+        public static IReadOnlyList<int> CatalogueFor(int npcId, Func<string, bool> meets)
+            => CatalogueOf(npcId).Where(gid => CanBuy(npcId, gid, meets)).ToArray();
+
+        /// <summary>Check the catalogue and its purchase condition again when buying.</summary>
+        public static bool CanBuy(int npcId, int gid, Func<string, bool> meets)
+        {
+            if (!CatalogueOf(npcId).Contains(gid)) return false;
+            return !_criteria.TryGetValue(npcId, out var criteria)
+                || !criteria.TryGetValue(gid, out string criterion)
+                || string.IsNullOrWhiteSpace(criterion)
+                || meets(criterion);
+        }
 
         public static bool Sells(int npcId) => _byNpc.ContainsKey(npcId);
 
