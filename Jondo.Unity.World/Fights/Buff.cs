@@ -446,10 +446,13 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>Records that this spell is still on, or extends the one already there.</summary>
+        /// <param name="fallsAtItsCastersTurn">See <see cref="ActiveSpell.FallsAtItsCastersTurn"/>: for a
+        /// hook lasting as the rows its cast left, which fall at their caster's turn start.</param>
         public void Enganchar(int hechizo, int grado, int caducaEnRonda, long lanzador = 0, int puestoEnRonda = 0,
                               bool critico = false, bool throughPortal = false, int apilarHasta = 0,
-                              int celda = -1)
+                              int celda = -1, bool fallsAtItsCastersTurn = false)
         {
+            fallsAtItsCastersTurn &= caducaEnRonda >= 0;
             var ya = _enganchesPorHechizo(hechizo);
             if (ya != null)
             {
@@ -461,6 +464,7 @@ namespace Jondo.Unity.World.Fights
                 ya.Veces = !deEstaRonda ? 1 : seApila ? ya.Veces + 1 : ya.Veces;
                 ya.Grado = grado;
                 ya.CaducaEnRonda = caducaEnRonda;
+                ya.FallsAtItsCastersTurn = fallsAtItsCastersTurn;
                 ya.Lanzador = lanzador;
                 ya.PuestoEnRonda = puestoEnRonda;
                 ya.Critico = critico;
@@ -472,6 +476,7 @@ namespace Jondo.Unity.World.Fights
             {
                 Hechizo = hechizo, Grado = grado, CaducaEnRonda = caducaEnRonda, Lanzador = lanzador,
                 PuestoEnRonda = puestoEnRonda, Critico = critico, ThroughPortal = throughPortal, Celda = celda,
+                FallsAtItsCastersTurn = fallsAtItsCastersTurn,
             });
         }
 
@@ -526,15 +531,23 @@ namespace Jondo.Unity.World.Fights
         /// begun. The age-old minogolem's Sustitución carries "-1" for the state that named the
         /// one it swapped with; shortening the waiting ones as well dropped the next round's state
         /// before it was put, and it stopped swapping one round in two.
+        ///
+        /// Only the rows a dispel would take (<see cref="TakenByADispel"/>): the client shortens no
+        /// other off its jwe 1075, and the 2s, 3s and 4s are written so they stay. Regulador cast on
+        /// a Xelor in telefrag took off its own "+1 cast per turn" (a 3) and his "+2 AP once a
+        /// turn" locks (2s), and he gained AP again and again in the same turn.
+        ///
+        /// A spell whose last row falls takes its hooks with it, as a 406 does: Aguja's poison
+        /// still went off on a telefrag after its 2328 had fallen.
         /// </remarks>
-        public int Acortar(int rondas, int ahora)
+        public List<Buff> Acortar(int rondas, int ahora)
         {
-            if (rondas <= 0) return 0;
-
             var caidos = new List<Buff>();
+            if (rondas <= 0) return caidos;
+
             foreach (var embrujo in _puestos)
             {
-                if (embrujo.CaducaEnRonda <= 0 || embrujo.Pendiente) continue;
+                if (embrujo.CaducaEnRonda <= 0 || !TakenByADispel(embrujo)) continue;
 
                 embrujo.CaducaEnRonda -= rondas;
                 if (embrujo.CaducaEnRonda <= ahora) caidos.Add(embrujo);
@@ -548,7 +561,11 @@ namespace Jondo.Unity.World.Fights
                 if (muerto.Estado == 0 || muerto.EffectId == Jondo.Unity.World.Combat.EffectSupport.DisableState) continue;
                 if (!SigueHabiendo(muerto.Estado)) _estados.Remove(muerto.Estado);
             }
-            return caidos.Count;
+            foreach (int hechizo in caidos.Select(c => c.HechizoOrigen).Where(h => h != 0).Distinct())
+            {
+                if (!_puestos.Exists(e => e.HechizoOrigen == hechizo)) Desenganchar(hechizo);
+            }
+            return caidos;
         }
 
         /// <summary>
@@ -1028,11 +1045,12 @@ namespace Jondo.Unity.World.Fights
         /// Removes and returns the first pending row whose round has come, in the order they were
         /// put, or null. Like the delayed heals, before the expiry sweep: a pending row's expiry is
         /// its activation round, and the sweep would take it as merely expired. One at a time, so
-        /// that what one of them does can still reach the ones behind it.
+        /// that what one of them does can still reach the ones behind it. <paramref name="atThisTurn"/>,
+        /// when given, says which of the due rows go off at the turn starting now.
         /// </summary>
-        public Buff TakeFirstDuePending(int round)
+        public Buff TakeFirstDuePending(int round, Func<Buff, bool> atThisTurn = null)
         {
-            int i = _puestos.FindIndex(e => e.Pendiente && round >= e.EmpiezaEnRonda);
+            int i = _puestos.FindIndex(e => e.Pendiente && round >= e.EmpiezaEnRonda && (atThisTurn == null || atThisTurn(e)));
             if (i < 0) return null;
             var due = _puestos[i];
             _puestos.RemoveAt(i);

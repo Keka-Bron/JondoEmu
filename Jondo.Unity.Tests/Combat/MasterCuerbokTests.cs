@@ -60,7 +60,10 @@ namespace Jondo.Unity.Tests.Combat
 
             var hook = Assert.Single(boss.Buffs.ActiveSpells, h => h.Hechizo == Shell && h.Filas != null);
             Assert.True(hook.Vivo(round + 1));      // his next turn, still in the shell
-            Assert.False(hook.Vivo(round + 2));     // gone with the look
+            // Gone with the look: in round + 2, at his own turn start, as that row falls.
+            Assert.Equal(lookUntil, hook.CaducaEnRonda);
+            Assert.True(hook.FallsAtItsCastersTurn);
+            Assert.False(hook.Vivo(round + 3));
         }
 
         /// <summary>One crow at a time: the content caps him, and nothing else of his side.</summary>

@@ -178,8 +178,10 @@ namespace Jondo.Unity.Tests.Combat
             fight.AddMonster(salt);
             int now = fight.RoundNumber;
 
+            // Its rows are 1s in the catalogue, as a dispel would take: the 1075 shortens those alone.
             golem.Buffs.Poner(new Buff { EffectId = 950, Estado = 201, HechizoOrigen = FirstDraw, NivelOrigen = 1,
-                                         Quien = golem.Id, EmpiezaEnRonda = now, CaducaEnRonda = now + 1 },
+                                         Quien = golem.Id, EmpiezaEnRonda = now, CaducaEnRonda = now + 1,
+                                         Dispellable = Buffs.DispellableByADispel },
                               fight.SiguienteEmbrujo);
             golem.Buffs.PonerEstado(201);
             golem.Buffs.Poner(new Buff { EffectId = 950, Estado = 202, HechizoOrigen = FirstDraw, NivelOrigen = 1,

@@ -899,7 +899,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 var suyos = Managers.FightSpellLayout.ForFight(GameState.Breed, GameState.CharacterLevel,
                                                               SessionContext.Current.AccountId).Spells;
-                var propios = Managers.ClassPassives.ForFight(GameState.Breed, suyos);
+                var propios = Managers.ClassPassives.ForFight(GameState.Breed, suyos, GameState.CharacterLevel);
                 playerFighter.MastersSummons = suyos.Any(s => s.Spell == Managers.Summons.SummonMastery);
                 int pasivo = Managers.ClassPassives.PassiveOf(GameState.Breed);
                 foreach (var (hechizo, grado) in propios)
@@ -4252,16 +4252,29 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The waiting rows whose round has come, at the first turn of that round: the kill of a
-        /// beacon goes out as a death, the script marker as its jwe, a +1 MP as a live row that
-        /// names the waiting one, and then every waiting row falls with its jya. The order and
-        /// the frames are those of the Baliza de Supervivencia and Paso de Cacería captures.
+        /// The waiting rows whose round has come, at their caster's turn start in that round: the
+        /// kill of a beacon goes out as a death, the script marker as its jwe, a +1 MP as a live
+        /// row that names the waiting one, and then every waiting row falls with its jya. The
+        /// order and the frames are those of the Baliza de Supervivencia and Paso de Cacería
+        /// captures.
         /// </summary>
+        /// <remarks>
+        /// A delay is counted in its caster's turns, as a duration is (<see cref="LeTocaCaer"/>):
+        /// the row goes off at his turn start, at his owner's for a summon that never plays, and
+        /// at anybody's once he is gone. Gone off at whichever turn opened the round, the Xelor's
+        /// delayed rows came early for whoever plays before him: Borroso's "+2 PA" landed while
+        /// its "-2 PA" was still on (none lost, then two given), El Tiempo Vuela and Premonición
+        /// moved their fighters before the Xelor's turn.
+        /// </remarks>
         internal static async Task ApplyDuePendingAsync(NetworkStream stream, FightInstance fight)
         {
+            var starting = fight.CurrentFighter;
+            Func<Jondo.Unity.World.Fights.Buff, bool> atThisTurn = starting == null ? null
+                : waiting => ItsCastersTurnHasCome(fight, starting, waiting.Quien);
+
             // Taken one at a time: what one does -- a 406 from a waiting sub-cast -- can still
             // cancel the ones behind it (see EffectEngine.ActivateNextDuePending).
-            var first = Managers.EffectEngine.ActivateNextDuePending(fight, fight.RoundNumber);
+            var first = Managers.EffectEngine.ActivateNextDuePending(fight, fight.RoundNumber, atThisTurn);
             if (first == null) return;
             var due = new List<Managers.PendingActivation>();
 
@@ -4270,7 +4283,7 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSequenceStart(sequenceOwner, Network.FightProtocol.ActionSequence)));
 
             for (var result = first; result != null;
-                 result = Managers.EffectEngine.ActivateNextDuePending(fight, fight.RoundNumber))
+                 result = Managers.EffectEngine.ActivateNextDuePending(fight, fight.RoundNumber, atThisTurn))
             {
                 due.Add(result);
                 var caster = fight.Buscar(result.CasterId) ?? result.Target;
@@ -4319,13 +4332,18 @@ namespace Jondo.Unity.Server.Handlers
                     Program.LogDebug($"[Fight] The delay is up: {caster.Id} casts {waiting.Dado} " +
                                      $"(grade {Math.Max(1, waiting.Cara)}) on {result.Target.Id}, from spell " +
                                      $"{waiting.HechizoOrigen}, in round {fight.RoundNumber}.");
-                    if (waiting.PendingCastCell is int cell)
+                    // A child aimed at the parent's cell goes off on that cell, whoever stands there
+                    // now (EffectEngine.Pendiente's castCell): Premonición takes the Xelor to the
+                    // glyph, Reloj de Bolsillo lays its glyph where it was cast. Off the bearer's
+                    // cell, the Xelor went to his own cell, and the glyph followed the enemy.
+                    var aimedAt = waiting.PendingCastCell is int fixedCell ? VictimAt(fight, caster, fixedCell) : result.Target;
+                    int aimedCell = waiting.PendingCastCell ?? result.Target.CellId;
+                    if (waiting.PendingCastCell.HasValue && Managers.ForgelanceCombat.IsActor(fight, caster))
                     {
-                        var target = VictimAt(fight, caster, cell);
                         int grade = Math.Max(1, waiting.Cara);
-                        await AnnounceForgelanceChildAsync(fight, caster, waiting.Dado, grade, cell, target);
-                        await AplicarEfectosAsync(stream, fight, caster, waiting.Dado, grade, target,
-                            Managers.EffectEngine.AlLanzar, cell, waiting.Critico, orderedForgelance: true);
+                        await AnnounceForgelanceChildAsync(fight, caster, waiting.Dado, grade, aimedCell, aimedAt);
+                        await AplicarEfectosAsync(stream, fight, caster, waiting.Dado, grade, aimedAt,
+                            Managers.EffectEngine.AlLanzar, aimedCell, waiting.Critico, orderedForgelance: true);
                     }
                     else if (Managers.PlayerSpells.Contains(waiting.Dado))
                     {
@@ -4336,14 +4354,14 @@ namespace Jondo.Unity.Server.Handlers
                         var filas = Managers.EffectEngine.EfectosDeLaTirada(waiting.Dado, cara, waiting.Critico);
                         if (filas.Any(f => Managers.EffectEngine.EsDeDano(f.EffectId)))
                         {
-                            await LanzarPorOrdenAsync(stream, fight, caster, waiting.Dado, cara, result.Target,
-                                                      result.Target.CellId, Managers.EffectEngine.AlLanzar, filas,
+                            await LanzarPorOrdenAsync(stream, fight, caster, waiting.Dado, cara, aimedAt,
+                                                      aimedCell, Managers.EffectEngine.AlLanzar, filas,
                                                       waiting.Critico);
                         }
                         else
                         {
                             await AplicarEfectosAsync(stream, fight, caster, waiting.Dado, cara,
-                                                      result.Target, Managers.EffectEngine.AlLanzar, result.Target.CellId);
+                                                      aimedAt, Managers.EffectEngine.AlLanzar, aimedCell, waiting.Critico);
                         }
                     }
                     else
@@ -4354,8 +4372,8 @@ namespace Jondo.Unity.Server.Handlers
                                             || (caster.Conducta.Spell != 0 && caster.Conducta.Spell == waiting.HechizoOrigen);
                         await LanzarPorOrdenAsync(stream, fight, caster, waiting.Dado, Math.Max(1, waiting.Cara),
                                                   result.Target, result.Target.CellId, Managers.EffectEngine.AlLanzar,
-                                                  Managers.EffectEngine.EfectosSorteados(waiting.Dado, Math.Max(1, waiting.Cara), false),
-                                                  conducta: deSuConducta);
+                                                  Managers.EffectEngine.EfectosSorteados(waiting.Dado, Math.Max(1, waiting.Cara), waiting.Critico),
+                                                  waiting.Critico, conducta: deSuConducta);
                     }
                 }
                 else if (result.Marks)
@@ -5509,6 +5527,15 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
+            // And along its lines, when its level asks for them (CastInLine, CastInDiagonal): the
+            // client offers no other cell, but a jwh asking for one went through -- Rayo Oscuro,
+            // Tañido and Congelación were cast off their line from any diagonal cell.
+            if (spell != 0 && !Managers.SpellLevelFlags.OnItsLines(limites.Flags, caster.CellId, cell))
+            {
+                Program.LogDebug($"[Fight] Spell {spell}: cell {cell} is off its lines from {caster.CellId}.");
+                return;
+            }
+
             // And it must SEE the cell when its level says so (CastTestLos), the weapon always: the
             // client never offers a cell behind a wall or a fighter, and nothing here stopped a
             // jwh that asked for one -- a driven JondoBot, the harness, a forged message cast
@@ -6548,6 +6575,10 @@ namespace Jondo.Unity.Server.Handlers
                 // when hit, its grade 2 cast at the start of his turn -- went with the round of
                 // the cast, so his next turn under the shell hurt nobody (Dofus pour les noobs:
                 // «quand il commence son tour sous l'effet de ce sort, il inflige 135 de dégâts»).
+                // Those rows fall at their caster's turn start too, and so does a hook lasting as
+                // they do: Aguja's poison lasts as its 2328, and the second tick was lost on an
+                // enemy who plays before the Xelor.
+                int byTheRowsLeft = -1;
                 if (hasta >= 0)
                 {
                     foreach (var c in consecuencias)
@@ -6555,11 +6586,13 @@ namespace Jondo.Unity.Server.Handlers
                         if (c.Buff == null || c.Sobre != grupo.Key.Sobre || c.HechizoOrigen != grupo.Key.HechizoOrigen
                             || c.NivelOrigen != grupo.Key.NivelOrigen) continue;
                         hasta = Math.Max(hasta, c.Buff.CaducaEnRonda);
+                        byTheRowsLeft = Math.Max(byTheRowsLeft, c.Buff.CaducaEnRonda);
                     }
                 }
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico,
-                                                 fallsAtItsCastersTurn: inItsCastersTurn && hasta >= 0 && hasta == byOwnDuration);
+                                                 fallsAtItsCastersTurn: inItsCastersTurn && hasta >= 0
+                                                                        && (hasta == byOwnDuration || hasta == byTheRowsLeft));
             }
 
             // Every spell this cast ran that still has rows under a trigger, AT ITS GRADE: one
@@ -6630,14 +6663,23 @@ namespace Jondo.Unity.Server.Handlers
 
                 foreach (var (quien, cuando) in hasta)
                 {
+                    // Not twice: a child that armed its waiting rows on him above, from inside the
+                    // chain, is his already. Aguja's 30842 arms its "TB" poison and leaves its 2328
+                    // too, and hooked again off that row the poison burnt twice a turn.
+                    if (consecuencias.Any(c => c.FilaArmada && c.Sobre == quien && c.HechizoOrigen == cual
+                                               && c.NivelOrigen == enGrado)) continue;
                     // Its caster is the one who cast it on THIS bearer, as the rows say.
                     long quienLoLanzo = lanzador;
                     foreach (var c in consecuencias)
                     {
                         if (c.HechizoOrigen == cual && c.NivelOrigen == enGrado && c.Sobre == quien && c.Caster != null) { quienLoLanzo = c.Caster.Id; break; }
                     }
+                    // As long as those rows, which fall at their caster's turn start: not at the
+                    // round's first trigger on him. Remanencia's hook went at the turn start of an
+                    // enemy quicker than the Xelor, its 6135 still on him.
                     quien.Buffs.Enganchar(cual, enGrado, cuando, quienLoLanzo, ronda, critico, throughPortal,
-                                          ApilarHasta(quien, cual, enGrado), celda);
+                                          ApilarHasta(quien, cual, enGrado), celda,
+                                          fallsAtItsCastersTurn: inItsCastersTurn);
                 }
             }
         }
@@ -8393,6 +8435,20 @@ namespace Jondo.Unity.Server.Handlers
                                                                    -c.RondasAcortadas)));
                     Program.LogDebug($"[Fight] {c.Sobre.Id}'s buffs lose {c.RondasAcortadas} round(s) " +
                                      $"to spell {c.HechizoOrigen}; {c.EmbrujosCaidos} drop.");
+                    // The client drops the rows that fell off this frame by itself; what they gave
+                    // goes out again, as for a dispel: the sheet here, the spell modifiers' hnd or
+                    // hnk after the cast (BuffsQuitados).
+                    foreach (var caido in c.BuffsQuitados)
+                    {
+                        if (caido.Estado != 0 && caido.EffectId == Jondo.Unity.World.Combat.EffectSupport.AddState
+                            && !c.Sobre.Buffs.TieneEstado(caido.Estado))
+                            Disparo(c.Sobre, Managers.EffectEngine.AlQuitarseElEstado(caido.Estado), quienLanza);
+                        if (caido.EffectId == Managers.EffectEngine.ShieldPanelEffect)
+                            fichas.Add((c.Sobre.Id, Managers.EffectEngine.ShieldCharacteristic));
+                        else if (caido.Caracteristica != 0 && caido.Caracteristica != ActionPointsCharacteristic
+                                 && caido.Caracteristica != MovementPointsCharacteristic)
+                            fichas.Add((c.Sobre.Id, caido.Caracteristica));
+                    }
                     continue;
                 }
 
@@ -9045,8 +9101,9 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 if (c.Buff.Estado != 0 && c.Efecto.EffectId == Jondo.Unity.World.Combat.EffectSupport.AddState
                     && !(c.Relevados?.Any(r => r.Estado == c.Buff.Estado) ?? false)
-                    && c.Sobre.Buffs.Puestos.Count(b => b.Estado == c.Buff.Estado
-                                                       && b.EffectId == Jondo.Unity.World.Combat.EffectSupport.AddState) == 1)
+                    && (c.EstadoNuevo
+                        || c.Sobre.Buffs.Puestos.Count(b => b.Estado == c.Buff.Estado
+                                                          && b.EffectId == Jondo.Unity.World.Combat.EffectSupport.AddState) == 1))
                 {
                     Disparo(c.Sobre, Managers.EffectEngine.AlPonerseElEstado(c.Buff.Estado), quienLanza);
                     Disparo(c.Sobre, Managers.EffectEngine.AlActivarseElEstado(c.Buff.Estado), quienLanza);

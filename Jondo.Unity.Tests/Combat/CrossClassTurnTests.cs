@@ -54,7 +54,7 @@ namespace Jondo.Unity.Tests.Combat
                 .SelectMany(p => new[] { (p.Base, SpellTable.GradeFor(p.Base, 200)), (p.Variant, SpellTable.GradeFor(p.Variant, 200)) })
                 .Where(s => s.Item1 > 0 && s.Item2 > 0).ToList();
             int passive = ClassPassives.PassiveOf(breed);
-            foreach (var (spell, grade) in ClassPassives.ForFight(breed, known))
+            foreach (var (spell, grade) in ClassPassives.ForFight(breed, known, 200))
                 if (spell != passive) f.Buffs.PonerActitud(spell, grade);
             if (passive != 0) f.Buffs.PonerActitud(passive, SpellTable.PassiveGrade(passive, 200));
             return f;

@@ -57,7 +57,8 @@ namespace Jondo.Unity.Tests.Combat
         public async Task Conjuro_shortens_the_effects_on_its_target()
         {
             var (fight, sela, _, foe) = Board();
-            var row = foe.Buffs.Poner(new Buff { EffectId = 111, Caracteristica = 1, Cuanto = 1, CaducaEnRonda = 4, EmpiezaEnRonda = 0, Disparador = "I", HechizoOrigen = 1 }, () => 1);
+            var row = foe.Buffs.Poner(new Buff { EffectId = 111, Caracteristica = 1, Cuanto = 1, CaducaEnRonda = 4, EmpiezaEnRonda = 0, Disparador = "I", HechizoOrigen = 1,
+                                                 Dispellable = Buffs.DispellableByADispel }, () => 1);
             await FightHandler.CastEffectsAsync(null, fight, sela, 14622, 2, foe, foe.CellId, false,
                                                 EffectEngine.EfectosSorteados(14622, 2, false));
             _out.WriteLine($"Conjuro: the row now ends in round {row.CaducaEnRonda} (was 4)");

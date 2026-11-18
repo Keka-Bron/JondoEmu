@@ -60,7 +60,9 @@ namespace Jondo.Unity.Server.Managers
         /// them: one per known spell that shares its icon with a spell of the class's initial spell
         /// type, at the character's grade of the known spell, and then the class passive.
         /// </summary>
-        public static List<(int Spell, int Grade)> ForFight(int breed, IEnumerable<(int Spell, int Grade)> known)
+        /// <param name="level">The character's level, for the initial spells whose grades open with
+        /// it (see below); 0 when unknown.</param>
+        public static List<(int Spell, int Grade)> ForFight(int breed, IEnumerable<(int Spell, int Grade)> known, int level = 0)
         {
             Load();
             var fuera = new List<(int, int)>();
@@ -85,6 +87,16 @@ namespace Jondo.Unity.Server.Managers
                         if (initial == entry.Passive || initial == spell) continue;
                         if (initialIcon != icon) continue;
                         if (fuera.Any(f => f.Item1 == initial)) continue;
+                        // One whose grades open with the character's level is at his level's: the
+                        // Xelor's passive Syncro (24941) shares its icon with Syncro (13247), two
+                        // grades, and was put at grade 2 of its thirteen -- the eleven telefrag
+                        // states of the higher grades were never given, and eleven spells never
+                        // grew the syncro.
+                        if (level > 0 && SpellTable.GradesSpreadOverLevels(initial))
+                        {
+                            fuera.Add((initial, SpellTable.PassiveGrade(initial, level)));
+                            continue;
+                        }
                         // Variant initialization can have a single rank even when the playable
                         // spell has several. Keep the matching rank where it exists (bombs).
                         int available = SpellTable.GradeFor(initial, int.MaxValue);

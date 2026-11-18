@@ -46,6 +46,14 @@ public class SadidaLifecycleTests
         await FightHandler.ApplyDuePendingAsync(null, fight);
     }
 
+    // Up to a fighter's turn start in a round: a delay is counted in its caster's turns.
+    private static async Task AdvanceTo(FightInstance fight, int round, Fighter whose)
+    {
+        for (int turn = 0; turn < 50 && (fight.RoundNumber < round || fight.CurrentFighter != whose); turn++) fight.NextTurn();
+        Assert.True(fight.RoundNumber >= round && fight.CurrentFighter == whose, "the fight never got to that turn");
+        await FightHandler.ApplyDuePendingAsync(null, fight);
+    }
+
     private static Fighter SummonOf(FightInstance fight, int template)
         => Assert.Single(fight.Todos, f => f.IsAlive && f.MonsterId == template);
 
@@ -258,12 +266,12 @@ public class SadidaLifecycleTests
         Assert.DoesNotContain(5419, doll.Buffs.Estados);
         Assert.DoesNotContain(5420, doll.Buffs.Estados);
         Assert.Equal(630, birthHP);
-        await Advance(fight, 2);
+        await AdvanceTo(fight, 2, doll);
         Assert.DoesNotContain(5418, doll.Buffs.Estados);
         Assert.Contains(5419, doll.Buffs.Estados);
         Assert.DoesNotContain(5420, doll.Buffs.Estados);
         Assert.Equal(birthHP + birthHP / 2, doll.MaxHP);
-        await Advance(fight, 3);
+        await AdvanceTo(fight, 3, doll);
         Assert.DoesNotContain(5419, doll.Buffs.Estados);
         Assert.Contains(5420, doll.Buffs.Estados);
         Assert.Equal(birthHP * 5 / 2, doll.MaxHP);
