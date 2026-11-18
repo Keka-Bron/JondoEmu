@@ -57,7 +57,8 @@ public sealed class CharacterLookConfigurationTests : IDisposable
         var world = Parse(CharacterLookBuilder.MapLook(character));
         Assert.Equal(3025, Bone(world));
         Assert.Equal(new long[] { 6, 2 }, Children(world).Select(child => Number(child, 4)));
-        Assert.Equal(170, Bone(ChildLook(Children(world)[0])));
+        // The power aura (22) below level 200 is its level 100 bones.
+        Assert.Equal(Cosmetics.PowerAuraBelow200Bones, Bone(ChildLook(Children(world)[0])));
         var rider = ChildLook(Children(world)[1]);
         Assert.Equal(2, Bone(rider));
         AssertBody(rider, 5881, [1791, 3494]);

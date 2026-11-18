@@ -6709,7 +6709,9 @@
     },
     "lym": {
       "name": "OutfitAuraChangedEvent",
-      "fields": {},
+      "fields": {
+        "gdvc": "AuraEmoteId"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],

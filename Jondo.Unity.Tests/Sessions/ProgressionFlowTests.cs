@@ -387,7 +387,8 @@ namespace Jondo.Unity.Tests.Sessions
         /// An aura clicked in the attitudes is shown, not played: the character redrawn with it (jsn,
         /// its option f5 { f1 { f1 aura } }), and taken off with the next step --
         /// «Apariencias\utilizar aura de septango-luego cancelarla caminando un paso». The client's
-        /// own khl for the main aura (f2 set) gets no answer, as in the captures.
+        /// own khl (f2 set) shows only the main aura: it is how «Activer automatiquement mon aura
+        /// de face» asks for it.
         /// </summary>
         [Fact]
         public async Task An_aura_from_the_attitudes_shows_until_the_next_step()
@@ -423,11 +424,18 @@ namespace Jondo.Unity.Tests.Sessions
                     // A step: without it.
                     await SlotLookHandler.OnMovingAsync(pipe.ToClient);
                     Assert.False(Carries(await pipe.Next(Op.Jsn)));
+
+                    // Once it is the main aura, the client's own khl facing the screen shows it.
+                    Wardrobe.SaveAura(character, Septango);
+                    await EmoteHandler.PlayAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Khl, Hex("08ce011001")));
+                    Assert.Equal(Septango, Wardrobe.ShownBy(character));
+                    Assert.True(Carries(await pipe.Next(Op.Jsn)));
                 }
             }
             finally
             {
                 Wardrobe.StopShowing(character);
+                Wardrobe.SaveAura(character, Wardrobe.None);
                 DatabaseManager.DeleteCharacter(character, Account);
             }
         }

@@ -1403,7 +1403,7 @@ public sealed record OrnamentSelectedEvent() : GameEvent;
 
 public sealed record Outfit(ColorPalette? Colors, bool HarnessColorsEnabled, string LastModified, int BodyId, bool Favorite, string Uuid, int IdleId, int? AuraEmoteId, int? TitleId, int HeadId, EntityLook? EntityLook, string Name, IReadOnlyList<ObjectSlot> HiddenSlots, int PictogramId, int? OrnamentId, IReadOnlyDictionary<int, SkinOutfit> Objects);
 
-public sealed record OutfitAuraChangedEvent() : GameEvent;
+public sealed record OutfitAuraChangedEvent(int? AuraEmoteId) : GameEvent;
 
 public sealed record OutfitLookUpdatedEvent(string OutfitId, EntityLook? Look) : GameEvent;
 

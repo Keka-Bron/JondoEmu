@@ -79,11 +79,14 @@ namespace Jondo.Unity.Server.Managers
             // An aura is not played but shown: «Activar mi aura». Clicked in the attitudes, the real
             // server redraws the character with it -- jsn with the aura's option f5 { f1 { f1 aura } }
             // and its subentity, «utilizar aura de septango-luego cancelarla caminando un paso» --
-            // and takes it off with the next step. The client's own khl for the main aura, f2 set,
-            // is answered by nobody: it draws that one itself. Refusing both, an aura never showed.
+            // and takes it off with the next step. The client's own khl, f2 set, is the main aura
+            // (the one lym told it) asked for when the character faces the screen, «Activer
+            // automatiquement mon aura de face»: seen in game, it shows only once the character is
+            // redrawn with it, as a clicked one. Any other aura it names is not shown.
             if (emote?.Aura == true)
             {
-                if (automatic || !state.Emotes.Contains(emoteId)) return;
+                if (!state.Emotes.Contains(emoteId)) return;
+                if (automatic && emoteId != Wardrobe.AuraOf(state.CharacterId)) return;
                 Wardrobe.Show(state.CharacterId, emoteId);
                 await Handlers.SlotLookHandler.RedrawAsync(stream);
                 Program.LogDebug($"[Attitudes] {state.CharacterName} shows aura {emoteId}.");

@@ -3,7 +3,7 @@
   "schema": "Schemas/game-3.6.10.10.proto",
   "mapping": "Mappings/game-3.6.10.10.json",
   "schemaSha256": "a5c424b6c4abb65389d00a3dc6170943c38beef3616f0aec2ebb93930c1f06f0",
-  "mappingSha256": "b699b9ee2b7d48b7921cfe75d78569f21439f200d4732ad28b4f46da89e8404d",
+  "mappingSha256": "9fa417affca7e99819df098413a8fbdb66b72253ccabcb59da0dbb3239d88192",
   "sourceSchemaSha256": "edfaf6ce93b3ec999c7a2c2e13a2ad5e1d9a2a21ee0b4b86d2819ad6f6050da3",
   "sourceMappingSha256": "b699b9ee2b7d48b7921cfe75d78569f21439f200d4732ad28b4f46da89e8404d"
 }

@@ -200,7 +200,7 @@ namespace Jondo.Unity.Tests.World
                         () => InventoryMessages.FromCatalogue.Snapshot(session.State), () => new([]), () => new(81_001),
                         () => EntryInformationMessages.PreviousConnection(session.State.PreviousVisit),
                         new(_ => 0, _ => [], _ => 0, ItemEffectMessages.FromCatalogue),
-                        new(() => new(0), () => new(null), () => new(null), () => new("", null)));
+                        new(() => new(0), () => new(null), () => new(null), () => new(null), () => new("", null)));
                     await initial.SendAsync(session);
                     return Assert.Single(messages.OfType<AlterationsEvent>());
                 }

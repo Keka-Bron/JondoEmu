@@ -61,7 +61,7 @@ namespace Jondo.Unity.Tests.Social
                     await AppearanceHandler.BodyAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lyo, Pb.New().Var(2, Retro).Build()));
                     await Until(pipe, Op.Lyz);
                     await AppearanceHandler.IdleAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lwu, Pb.New().Var(1, RetroIdle).Build()));
-                    await Until(pipe, Op.Lwn);
+                    await Until(pipe, Op.Jsn); // lwn, then the character redrawn with it
 
                     await AppearanceHandler.CreateOutfitAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lwk,
                         Pb.New().Var(1, 1).Var(2, 7).Str(4, "Ceremonia").Build()));
@@ -79,7 +79,7 @@ namespace Jondo.Unity.Tests.Social
                     await AppearanceHandler.BodyAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lyo, Pb.New().Var(2, Base).Build()));
                     await Until(pipe, Op.Lyz);
                     await AppearanceHandler.IdleAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lwu, Pb.New().Var(1, IdleTable.Plain).Build()));
-                    await Until(pipe, Op.Lwn);
+                    await Until(pipe, Op.Jsn);
 
                     // Renamed, starred and given another icon.
                     await AppearanceHandler.UpdateOutfitAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Lxt,

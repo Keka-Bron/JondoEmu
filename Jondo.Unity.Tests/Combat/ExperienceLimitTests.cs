@@ -69,7 +69,7 @@ namespace Jondo.Unity.Tests.Combat
                     () => InventoryMessages.FromCatalogue.Snapshot(session.State), () => new([]), () => new(81_001),
                     () => EntryInformationMessages.PreviousConnection(session.State.PreviousVisit),
                     new(_ => 0, _ => [], _ => 0, ItemEffectMessages.FromCatalogue),
-                    new(() => new(0), () => new(null), () => new(null), () => new("", null)));
+                    new(() => new(0), () => new(null), () => new(null), () => new(null), () => new("", null)));
                 await initial.SendAsync(session);
                 return Assert.Single(packets.Select(packet => codec.Decode(packet).Content)
                     .OfType<ServerExperienceModifierEvent>());

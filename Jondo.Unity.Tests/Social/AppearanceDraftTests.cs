@@ -94,7 +94,8 @@ namespace Jondo.Unity.Tests.Social
 
         /// <summary>
         /// The idles tab (lwu): the Sacrier's «Retro» idle (24) and the plain one (3) are taken with
-        /// lwn f2 1; its «NewAge» one (25), not known, and a Feca's (4) get lwn without it.
+        /// lwn f2 1 and the character redrawn with it in his look's f2; its «NewAge» one (25), not
+        /// known, and a Feca's (4) get lwn without it.
         /// </summary>
         [Fact]
         public async Task The_idles_tab_takes_the_known_idle_of_ones_breed()
@@ -116,6 +117,11 @@ namespace Jondo.Unity.Tests.Social
                         await AppearanceHandler.IdleAsync(pipe.ToClient, Lwu(taken));
                         Assert.Equal(1, Field(await pipe.Next(Op.Lwn), 2).VarIntValue);
                         Assert.Equal(taken, Wardrobe.IdleOf(character));
+
+                        // Redrawn for the map with it: the idle is the look's f2 (jsn f1 → actor f2 → f3 look).
+                        byte[] actor = Field(await pipe.Next(Op.Jsn), 1).BytesValue;
+                        byte[] look = Field(Field(actor, 2).BytesValue, 3).BytesValue;
+                        Assert.Equal(taken, (int)Field(look, 2).VarIntValue);
                     }
                     foreach (int refused in new[] { NewAge, Feca })
                     {

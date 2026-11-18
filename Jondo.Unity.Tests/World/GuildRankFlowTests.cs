@@ -52,7 +52,7 @@ public sealed class GuildRankFlowTests : IDisposable
             () => InventoryMessages.FromCatalogue.Snapshot(session.State), () => new([]), () => new(81_001),
             () => EntryInformationMessages.PreviousConnection(session.State.PreviousVisit),
             new(_ => 0, _ => [], _ => 0, ItemEffectMessages.FromCatalogue),
-            new(() => new(0), () => new(null), () => new(null), () => new("", null)));
+            new(() => new(0), () => new(null), () => new(null), () => new(null), () => new("", null)));
         using var wrongContext = SessionContext.Push(GameSession.SinSocket());
         using var turn = await session.EnterTurnAsync();
         await initial.SendAsync(session);

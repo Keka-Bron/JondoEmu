@@ -103,6 +103,13 @@ public static class CharacterLookBuilder
             HeadTable.SkinFor(overrides.HeadId ?? character.HeadId, character.Breed, character.Sex),
             colors, scales, equipment, garments);
 
+        // The look's f2 ("LookType", 3 in every capture) is the idle the character plays: the client
+        // copies it into its look (vd::bqd) and EntityAnimator looks it up in IdlesDataRoot, 3 being
+        // the plain one. In game it is the one the appearance window picked.
+        if (purpose is CharacterLookPurpose.Normal or CharacterLookPurpose.Map
+            && owner > 0 && Wardrobe.IdleOf(owner) is var idle && idle > 0)
+            body = body with { LookType = idle };
+
         EntityLook? mount = null;
         if (policy.Mount && !overrides.OnFoot)
         {
@@ -113,7 +120,8 @@ public static class CharacterLookBuilder
                 mount = BuildMountLook(ridden, appearance);
         }
 
-        int auraBones = policy.Aura ? Cosmetics.AuraBones(Wardrobe.ShownBy(owner)) : 0;
+        int auraLevel = owner == character.Id ? character.Level : SessionContext.State.CharacterLevel;
+        int auraBones = policy.Aura ? Cosmetics.AuraBones(Wardrobe.ShownBy(owner), auraLevel) : 0;
         bool includePets = policy.Pets && (mount == null || policy.MountedPets);
         return new(body, mount, AttachmentsFor(includePets ? garments : [], colors, auraBones));
     }

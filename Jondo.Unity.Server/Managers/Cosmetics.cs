@@ -496,13 +496,24 @@ namespace Jondo.Unity.Server.Managers
             return _mounts.TryGetValue(gid, out var m) ? m : null;
         }
 
+        /// <summary>The power aura (emote 22), which grows with its wearer.</summary>
+        public const int PowerAura = 22;
+
+        /// <summary>
+        /// The power aura's bones below level 200 (the level 100 one); from 200 on it is the 170
+        /// the catalogue measured. Seen in game: the 169 is the aura a level 100 to 199 wears.
+        /// </summary>
+        public const int PowerAuraBelow200Bones = 169;
+
         /// <summary>
         /// The bones an aura hangs from binding point 6, measured by pairing each lym with the kmb
         /// after it; zero for an aura never seen on the wire, which only its wearer then sees.
+        /// The power aura is the level 100 one until its wearer reaches 200.
         /// </summary>
-        public static int AuraBones(int aura)
+        public static int AuraBones(int aura, int level)
         {
             Ensure();
+            if (aura == PowerAura && level < 200) return PowerAuraBelow200Bones;
             return _auras.TryGetValue(aura, out int bones) ? bones : 0;
         }
 

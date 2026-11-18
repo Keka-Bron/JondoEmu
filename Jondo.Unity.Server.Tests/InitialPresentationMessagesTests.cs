@@ -9,7 +9,7 @@ public sealed class InitialPresentationMessagesTests
 {
     private static readonly GameCodec Wire = new();
     internal static InitialPresentationMessages Empty { get; } = new(
-        () => new(0), () => new(null), () => new(null), () => new("", null));
+        () => new(0), () => new(null), () => new(null), () => new(null), () => new("", null));
 
     [Fact]
     public void Live_configuration_is_explicit_server_policy_with_distinct_tokens_and_rewards()
@@ -60,10 +60,19 @@ public sealed class InitialPresentationMessagesTests
     [InlineData(0)]
     [InlineData(206)]
     [InlineData(int.MaxValue)]
-    public void Shared_legacy_writers_also_omit_the_unused_aura_and_ornament_values(int value)
+    public void Shared_legacy_writer_also_omits_the_unused_ornament_value(int value)
+        => Assert.Empty(ConnectionProtocol.BuildOrnamentUpdated(value));
+
+    [Fact]
+    public void Aura_carries_the_main_aura_and_none_is_absent()
     {
-        Assert.Empty(ConnectionProtocol.BuildAura(value));
-        Assert.Empty(ConnectionProtocol.BuildOrnamentUpdated(value));
+        // The client reads lym's tag 1 as the main aura: «Activer automatiquement mon aura de
+        // face» shows nothing without it.
+        Assert.Empty(ConnectionProtocol.BuildAura(0));
+        Assert.Equal(new byte[] { 0x08, 0xce, 0x01 }, ConnectionProtocol.BuildAura(206));
+        Assert.Null(InitialPresentationMessages.Aura(0).AuraEmoteId);
+        Assert.Equal(206, InitialPresentationMessages.Aura(206).AuraEmoteId);
+        Assert.Null(Empty.Aura().AuraEmoteId);
     }
 
     [Fact]
@@ -76,7 +85,7 @@ public sealed class InitialPresentationMessagesTests
         var children = new List<SubEntityInformation> { new(child, 2, SubEntityBindingPointCategory.HookPointCategoryMountDriver) };
         var root = new EntityLook(colors, 3, 71_001, [100], skins, children);
         var messages = new InitialPresentationMessages(() => new(int.MinValue),
-            () => new(new(4, palettes, 13)), () => new(null), () => new("owned-look", root));
+            () => new(new(4, palettes, 13)), () => new(null), () => new(null), () => new("owned-look", root));
         var appearance = messages.Colors();
         var look = messages.Look();
         colors.Clear();
@@ -109,12 +118,13 @@ public sealed class InitialPresentationMessagesTests
             () => { Read("capabilities"); return new(unchecked((int)0x80000001)); },
             () => { Read("colors"); return new(new(2, [new([-1, 0x112233])], 17)); },
             () => { Read("configuration"); return new(policy); },
+            () => { Read("aura"); return new(206); },
             () => { Read("look"); return new("owner-look", new([0x01112233], 3, 71_001, [55], [81_001], [])); });
         using var context = SessionContext.Push(wrong.Session);
         using var turn = await own.Session.EnterTurnAsync();
         int sent = await Initial(own.Session.State, messages).SendAsync(own.Session).WaitAsync(TimeSpan.FromSeconds(5));
         Assert.Equal(32, sent);
-        Assert.Equal(new[] { "capabilities", "configuration", "colors", "look" }, reads);
+        Assert.Equal(new[] { "capabilities", "configuration", "colors", "aura", "look" }, reads);
         Assert.Equal(sent, own.Codec.Frames.Count);
         Assert.Equal(sent, own.Packets.Count);
         Assert.Equal(0, own.Codec.Decodes);
@@ -123,6 +133,7 @@ public sealed class InitialPresentationMessagesTests
         Assert.Same(wrong.Session, SessionContext.Actual);
         var events = own.Codec.Frames.Select(frame => frame.Content).ToArray();
         Assert.Equal(policy, Assert.Single(events.OfType<ConfigurationEvent>()).GuildConfiguration);
+        Assert.Equal(206, Assert.Single(events.OfType<OutfitAuraChangedEvent>()).AuraEmoteId);
         Assert.Equal(unchecked((int)0x80000001), Assert.Single(events.OfType<CharacterCapabilitiesEvent>()).GuildEmblemSymbolCategory);
         int sequence = Array.FindIndex(events, item => item is SequenceNumberEvent);
         Assert.IsType<InventoryWeightEvent>(events[sequence - 1]);
@@ -164,6 +175,7 @@ public sealed class InitialPresentationMessagesTests
     [InlineData("capabilities")]
     [InlineData("configuration")]
     [InlineData("colors")]
+    [InlineData("aura")]
     [InlineData("look")]
     public async Task Source_failure_stops_before_its_send_without_retry(string source)
     {
@@ -172,7 +184,8 @@ public sealed class InitialPresentationMessagesTests
         void Read(string name) { if (name == source) { reads++; throw failure; } }
         var messages = new InitialPresentationMessages(
             () => { Read("capabilities"); return new(0); }, () => { Read("colors"); return new(null); },
-            () => { Read("configuration"); return new(null); }, () => { Read("look"); return new("", null); });
+            () => { Read("configuration"); return new(null); }, () => { Read("aura"); return new(null); },
+            () => { Read("look"); return new("", null); });
         var own = new Recipient();
         var wrong = new Recipient();
         using var context = SessionContext.Push(wrong.Session);
@@ -180,7 +193,8 @@ public sealed class InitialPresentationMessagesTests
         Assert.Equal(1, reads);
         Assert.Same(wrong.Session, SessionContext.Actual);
         Type absent = source switch { "capabilities" => typeof(CharacterCapabilitiesEvent), "configuration" => typeof(ConfigurationEvent),
-            "colors" => typeof(CharacterAppearanceCollectionEvent), _ => typeof(OutfitLookUpdatedEvent) };
+            "colors" => typeof(CharacterAppearanceCollectionEvent), "aura" => typeof(OutfitAuraChangedEvent),
+            _ => typeof(OutfitLookUpdatedEvent) };
         Assert.DoesNotContain(own.Codec.Frames, frame => frame.Content.GetType() == absent);
     }
 
