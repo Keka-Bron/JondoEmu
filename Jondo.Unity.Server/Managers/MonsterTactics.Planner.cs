@@ -792,7 +792,7 @@ namespace Jondo.Unity.Server.Managers
                 var telefrags = _real.Telefrags?.Invoke();
                 var before = telefrags?.ToList();
                 telefrags?.Clear();
-                _spellTelefrags = 0;
+                _spellSwaps.Clear();
                 var wallsBefore = WallCells();
                 var stood = Board.Fighters.Concat(_summoned).Where(f => f.IsAlive).Distinct().ToDictionary(f => f, f => f.CellId);
                 // Aimed at a portal, it goes through the network: cast from the way out, landing
@@ -824,7 +824,8 @@ namespace Jondo.Unity.Server.Managers
                 if (!step.Spell.HasRows) Summary(step);
             }
 
-            private int _spellTelefrags;
+            /// <summary>The pairs the cast under way has swapped, the lower id first: one is not swapped back.</summary>
+            private readonly HashSet<(long, long)> _spellSwaps = new();
 
             /// <summary>What the cast under way's damage and healing are multiplied by: the portals' bonus.</summary>
             private double _boost = 1;
@@ -865,27 +866,32 @@ namespace Jondo.Unity.Server.Managers
             private long OccupantOf(int at)
                 => Board.Fighters.Concat(_summoned).FirstOrDefault(f => f.IsAlive && !f.EstaCargado && f.CellId == at)?.Id ?? 0;
 
-            /// <summary>Whether nothing moves a fighter: Indesplazable, or a state that says so -- as the engine reads it.</summary>
-            private static bool Pinned(Fighter who)
+            /// <summary>
+            /// Whether nothing moves a fighter -- Indesplazable, or a state that says so --, or, with
+            /// <paramref name="orSwaps"/>, nobody trades places with him (cantSwitchPosition, the
+            /// Pesanteur): as the engine reads them (EffectEngine.NoSeDejaLlevar, NoSeDejaMover).
+            /// </summary>
+            private static bool Pinned(Fighter who, bool orSwaps = true)
             {
                 if (who.Buffs.TieneEstado(IndesplazableState)) return true;
                 foreach (int state in who.Buffs.Estados)
                 {
                     var flags = SpellStates.Of(state);
-                    if (flags != null && (flags.CantBeMoved || flags.CantSwitchPosition)) return true;
+                    if (flags != null && (flags.CantBeMoved || (orSwaps && flags.CantSwitchPosition))) return true;
                 }
                 return false;
             }
 
             /// <summary>
             /// A teleport to a cell, as the engine's own (EffectEngine.TeletransportarConTelefrag): a
-            /// free cell he lands on; a taken one swaps the two -- a TELEFRAG, one a spell, noted for
-            /// the «T» of its rows --; nobody pinned goes anywhere. Undoing the last move (1100) does
-            /// not count as a move of its own.
+            /// free cell he lands on; a taken one swaps the two -- a TELEFRAG, noted for the «T» of
+            /// its rows, once a pair a cast --; nobody pinned goes anywhere, and a Pesanteur goes to a
+            /// free cell but swaps with nobody. Undoing the last move (1100) does not count as a move
+            /// of its own.
             /// </summary>
             private void Teleport(Fighter who, int cell, bool undoing = false)
             {
-                if (!who.IsAlive || cell < 0 || cell == who.CellId || Pinned(who)) return;
+                if (!who.IsAlive || cell < 0 || cell == who.CellId || Pinned(who, orSwaps: false)) return;
                 if (!MapGeometry.IsValid(cell) || !_real.Walkable(cell)) return;
                 var there = Board.Fighters.FirstOrDefault(f => f.IsAlive && f != who && f.CellId == cell);
                 int from = who.CellId;
@@ -894,10 +900,11 @@ namespace Jondo.Unity.Server.Managers
                     Moved(who, cell, remember: !undoing);
                     return;
                 }
-                if (_spellTelefrags > 0 || Pinned(there)) return;
+                var pair = who.Id < there.Id ? (who.Id, there.Id) : (there.Id, who.Id);
+                if (_spellSwaps.Contains(pair) || Pinned(who) || Pinned(there)) return;
                 Moved(who, cell, remember: !undoing);
                 Moved(there, from);
-                _spellTelefrags++;
+                _spellSwaps.Add(pair);
                 var telefrags = _real.Telefrags?.Invoke();
                 if (telefrags != null)
                 {

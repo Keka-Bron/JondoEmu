@@ -17,9 +17,10 @@ namespace Jondo.Unity.Tests.Combat
     /// Xelor's that the sub-spell giving them checks («*e») as the cast began.
     /// </summary>
     /// <remarks>
-    /// One known gap, on purpose: Arenas del Tiempo's bounce «desde la posición inicial de cada
-    /// objetivo» to the nearest entity is not played on the copy. El Tiempo Vuela's teleport, «en el
-    /// siguiente turno», waits on both now.
+    /// No gap left. Arenas del Tiempo was one: its bounce to the nearest entity swapped the pair its
+    /// blow had just swapped back, on the engine and not on the copy, until a cast stopped swapping
+    /// the same pair twice (FightInstance.SwapsOfTheCast). El Tiempo Vuela's teleport, «en el
+    /// siguiente turno», waits on both.
     /// </remarks>
     [Collection("MapManager")]
     public class XelorParityTests
@@ -64,9 +65,6 @@ namespace Jondo.Unity.Tests.Combat
             => string.Join(" ", new[] { w.Xelor, w.Enemy, w.Third }.Where(f => f != null)
                 .Select(f => $"{f!.Id}@{f.CellId}[{string.Join(",", f.Buffs.Estados.Where(s => s is 251 or 244 or 2328 or 3622).OrderBy(s => s))}]"))
                + $" AP+{w.Xelor.CurrentAP - 12 + given}";
-
-        /// <summary>Arenas del Tiempo (bounce): see the remarks.</summary>
-        private static readonly HashSet<int> KnownGaps = new() { 13292 };
 
         [Fact]
         public void The_copy_of_the_fight_teleports_as_the_engine_does()
@@ -117,7 +115,7 @@ namespace Jondo.Unity.Tests.Combat
                         {
                             differ++;
                             _out.WriteLine($"{spell} g{grade} d{distance} third {third}: engine {byEngine} | sim {bySim}");
-                            if (!KnownGaps.Contains(spell)) wrong.Add($"{spell} d{distance} third {third}: engine {byEngine}, copy {bySim}");
+                            wrong.Add($"{spell} d{distance} third {third}: engine {byEngine}, copy {bySim}");
                         }
                     }
                 }

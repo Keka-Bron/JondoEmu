@@ -680,6 +680,34 @@ namespace Jondo.Unity.Tests.Combat
             Assert.NotEqual(302, target.CellId);
         }
 
+        /// <summary>
+        /// Rolbac sends everybody on the map back a cell, and each one whose cell is taken swaps with
+        /// whoever stands there: two pairs, two swaps in one cast. Held to one swap per cast, the
+        /// second enemy stayed where he was.
+        /// </summary>
+        [Fact]
+        public async Task Rolbac_swaps_every_pair_whose_cell_is_taken()
+        {
+            const int Rolbac = 13262;
+            var (grade, _, _) = SpellEffects.GradoDe(Rolbac, 200);
+            var xelor = Character(250);
+            var first = Monster(-1, 300);
+            var second = Monster(-2, 400);
+            var onFirstsCell = Monster(-3, 301);
+            var onSecondsCell = Monster(-4, 401);
+            var fight = Board(xelor, first, second, onFirstsCell, onSecondsCell);
+            first.Andar(new[] { 301, 300 });
+            second.Andar(new[] { 401, 400 });
+
+            await FightHandler.CastEffectsAsync(null, fight, xelor, Rolbac, grade, xelor, xelor.CellId, false,
+                                                EffectEngine.EfectosSorteados(Rolbac, grade, false));
+
+            Assert.Equal(301, first.CellId);
+            Assert.Equal(300, onFirstsCell.CellId);
+            Assert.Equal(401, second.CellId);
+            Assert.Equal(400, onSecondsCell.CellId);
+        }
+
         /// <summary>The frame, as the Eniripsa captures send it: f3 who, f14 1075, f19 { f1 -1, f2 whose }.</summary>
         [Fact]
         public void The_effects_duration_frame_is_the_capture_s()

@@ -1683,7 +1683,11 @@ namespace Jondo.Unity.Server.Managers
         /// client's own words on the Xelor: "se generan cuando dos entidades intercambian
         /// posiciones debido a los efectos de teletransportación de un hechizo". The two swap
         /// and are noted in the spell's telefrags, which the T of the masks reads -- Kontatrás
-        /// loses his invulnerability exactly so. One telefrag per spell, as the sheet says.
+        /// loses his invulnerability exactly so. Every pair a cast takes onto each other swaps:
+        /// Rolbac sends everybody on the map back a cell, and each one whose cell is taken trades
+        /// it. Held to one swap per cast, the rest stayed where they were. "Un hechizo solo puede
+        /// generar y activar un único telefrag por lanzamiento" is the gain, not the swaps: the
+        /// +2 AP and the syncro's growth already keep to once a turn by their own states.
         /// </summary>
         /// <remarks>
         /// Nobody pinned to the floor goes anywhere -- the Indesplazable (97) and the states the
@@ -1734,7 +1738,7 @@ namespace Jondo.Unity.Server.Managers
             }
 
             var pareja = sobre.Id < ocupante.Id ? (sobre.Id, ocupante.Id) : (ocupante.Id, sobre.Id);
-            if (combate.Telefrags.Count > 0 || combate.SwapsOfTheCast.Contains(pareja)
+            if (combate.SwapsOfTheCast.Contains(pareja)
                 || NoSeDejaMover(sobre) || NoSeDejaMover(ocupante)) return null;
 
             Llevar(sobre, destino);
@@ -2566,8 +2570,7 @@ namespace Jondo.Unity.Server.Managers
                     Efecto = new SpellEffect { Triggers = AlLanzar },
                 });
 
-            // The telefrags this spell makes are its own: "un hechizo solo puede generar y
-            // activar un único telefrag por lanzamiento", and a child spell's T reads the child's.
+            // The telefrags this spell makes are its own: a child spell's T reads the child's.
             var telefragsDeFuera = combat.Telefrags;
             combat.Telefrags = new Dictionary<long, long>();
             // But a pair swapped in this cast is not swapped back by one of its sub-casts.
