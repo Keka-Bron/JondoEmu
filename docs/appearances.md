@@ -476,7 +476,7 @@ Nine tables plus a comment block. Keys are item ids as strings.
 | `slotsVariante` | 61 | living object → `{ variant → slot }`. 543 pairs in total. |
 | `pets` | 242 | item → sub-entity for binding point 1. |
 | `mounts` | 272 | item → root override. 151 petsmounts + 121 mounts. |
-| `auras` | 28 | aura id → bones; see section 15 for which are confirmed. |
+| `auras` | 27 | aura id → bones; see section 15 for which are confirmed. |
 | `titles` | 476 | title ids the real server accepted. |
 | `ornaments` | 166 | ornament ids the real server accepted. |
 
@@ -682,7 +682,7 @@ runs and checked in game, one aura at a time (18 November 2026):
 - `171`–`175` (Oméga 100 to 500) are `4829`–`4833`, in order.
 - `202`–`207` (Nordes, Mériana, Rathrosk, Djaul, Septange, Rimanda) are `5141`, `5142`, `5139`,
   `5140`, `5138`, `5143`.
-- `324` (Temporelle) is `9247` and `325` (Eliacube) `9246`.
+- `324` (Temporelle) is `9247`, `325` (Eliacube) `9246` and `319` (Confettis) `9228`.
 - The others in the table show an aura in game, but which aura has not been confirmed. Bones
   `269`, `1831`–`1833` and `9564` with the same signature are props (a penguin, a fir tree, a cat,
   a present, a ghost), not auras.
