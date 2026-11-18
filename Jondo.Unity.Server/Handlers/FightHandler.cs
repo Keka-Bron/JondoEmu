@@ -6709,9 +6709,28 @@ namespace Jondo.Unity.Server.Handlers
                                                     IReadOnlyList<Managers.SpellEffect> tirada)
         {
             tirada = await BoostsFirstAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
-            await HurtAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
+            int blowsAt;
+            (tirada, blowsAt) = await TeleportsFirstAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
+            await HurtAsync(stream, fight, caster, spell, grade, victim, blowsAt, critico, tirada);
             await AplicarEfectosAsync(stream, fight, caster, spell, grade, victim,
                                       Managers.EffectEngine.AlLanzar, cell, critico, tirada);
+        }
+
+        /// <summary>
+        /// A cast that teleports before it hits resolves those rows first, in their order (see
+        /// <see cref="Managers.EffectEngine.TeleportsBeforeTheBlows"/>). Returns the draw without them,
+        /// and where the blows land: on the target where the teleport left him, as when he survives.
+        /// </summary>
+        internal static async Task<(IReadOnlyList<Managers.SpellEffect> Remaining, int BlowsAt)> TeleportsFirstAsync(
+            NetworkStream stream, FightInstance fight, Fighter caster, int spell, int grade,
+            Fighter target, int cell, bool critico, IReadOnlyList<Managers.SpellEffect> tirada)
+        {
+            var first = Managers.EffectEngine.TeleportsBeforeTheBlows(spell, tirada);
+            if (first.Count == 0) return (tirada, cell);
+            await AplicarEfectosAsync(stream, fight, caster, spell, grade, target,
+                                      Managers.EffectEngine.AlLanzar, cell, critico, first);
+            int blowsAt = target != null && target.IsAlive && target.CellId != cell ? target.CellId : cell;
+            return (tirada.Where(row => !first.Contains(row)).ToList(), blowsAt);
         }
 
         /// <summary>
@@ -11407,8 +11426,11 @@ namespace Jondo.Unity.Server.Handlers
                     {
                         tirada = await BoostsFirstAsync(stream, fight, monster, spell, monsterGrade, objetivo,
                                                         aim, critico, tirada);
+                        int blowsAt;
+                        (tirada, blowsAt) = await TeleportsFirstAsync(stream, fight, monster, spell, monsterGrade,
+                                                                      objetivo, aim, critico, tirada);
                         await HurtAsync(stream, fight, monster, spell, monsterGrade, objetivo,
-                                        aim, critico, tirada: tirada);
+                                        blowsAt, critico, tirada: tirada);
 
                         // And its effects, the same as when the player casts. This was missing: the monster's
                         // turn only worked out damage, so the penalties its spells leave -- the range Picoteo

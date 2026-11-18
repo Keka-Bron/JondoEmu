@@ -616,6 +616,70 @@ namespace Jondo.Unity.Tests.Combat
             }
         }
 
+        /// <summary>
+        /// Golpe de Xelor writes its teleport before its blow, and the game walks the rows in that
+        /// order: the target is sent to the mirror cell, swaps with whoever stands there (telefrag,
+        /// +2 AP), and only then is hit -- where he landed. Dealt first, a blow that killed him left
+        /// nobody to teleport: no swap, no telefrag, no AP. Alive or dead, he swaps; alive, he still
+        /// takes the blow.
+        /// </summary>
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Golpe_de_xelor_swaps_before_its_blow_even_when_it_kills(bool kills)
+        {
+            const int Golpe = 13252, EnemyTelefrag = 251;
+            var (grade, _, _) = SpellEffects.GradoDe(Golpe, 200);
+
+            // Where the teleport sends the target, on a board with nobody in the way.
+            var probe = Board(Character(300), Monster(-1, 328));
+            var probed = probe.Todos.Single(f => f.Id == -1);
+            await FightHandler.AplicarEfectosAsync(null, probe, probe.Todos.Single(f => f.Id == Xelor), Golpe, grade,
+                                                   probed, EffectEngine.AlLanzar, 328);
+            int mirror = probed.CellId;
+            Assert.NotEqual(328, mirror);
+
+            var xelor = Character(300);
+            var target = Monster(-1, 328);
+            var occupant = Monster(-2, mirror);
+            var fight = Board(xelor, target, occupant);
+            if (kills) target.CurrentHP = 1;
+            int apBefore = xelor.CurrentAP, lifeBefore = target.CurrentHP;
+
+            await FightHandler.CastEffectsAsync(null, fight, xelor, Golpe, grade, target, 328, false,
+                                                EffectEngine.EfectosSorteados(Golpe, grade, false));
+
+            Assert.Equal(mirror, target.CellId);
+            Assert.Equal(328, occupant.CellId);
+            Assert.True(occupant.Buffs.TieneEstado(EnemyTelefrag));
+            Assert.Equal(apBefore + 2, xelor.CurrentAP);
+            if (kills) Assert.False(target.IsAlive);
+            else Assert.True(target.CurrentHP < lifeBefore, "the target that survived took no blow");
+        }
+
+        /// <summary>
+        /// Polvo Temporal mirrors the telefragged in its circle about the aimed cell, through a
+        /// sub-cast (2794, 13317 at grade 2) written ahead of its fire: the enemy it kills is still
+        /// moved first, as the rows are written.
+        /// </summary>
+        [Fact]
+        public async Task Polvo_temporal_teleports_before_its_fire_even_when_it_kills()
+        {
+            const int Polvo = 13257, EnemyTelefrag = 251;
+            var (grade, _, _) = SpellEffects.GradoDe(Polvo, 200);
+            var xelor = Character(250);
+            var target = Monster(-1, 302);
+            var fight = Board(xelor, target);
+            target.Buffs.PonerEstado(EnemyTelefrag);
+            target.CurrentHP = 1;
+
+            await FightHandler.CastEffectsAsync(null, fight, xelor, Polvo, grade, target, 301, false,
+                                                EffectEngine.EfectosSorteados(Polvo, grade, false));
+
+            Assert.False(target.IsAlive);
+            Assert.NotEqual(302, target.CellId);
+        }
+
         /// <summary>The frame, as the Eniripsa captures send it: f3 who, f14 1075, f19 { f1 -1, f2 whose }.</summary>
         [Fact]
         public void The_effects_duration_frame_is_the_capture_s()

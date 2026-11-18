@@ -56,7 +56,7 @@ chained sub-spells against what each spell's sheet says.
 | Class | How | Bugs found | Fixed | Still open |
 |---|---|:---:|:---:|---|
 | Foggernaut | Played by hand ([#100](https://github.com/Keka-Bron/JondoEmu/issues/100)) | 9 | 9 | — |
-| Xelor | Multi-turn audit of all 44 spells, then fixes: 30/44 with no known bug | 14 | 10 | Damage dealt before teleports on a killing blow (7 spells); Momification and Syncro looks; Inestabilidad and Rollback disputed |
+| Xelor | Multi-turn audit of all 44 spells, then fixes, checked in a fight: 37/44 with no known bug | 14 | 11 | Momification and Syncro looks; Inestabilidad and Rollback disputed; Espaciotiempo's return cut twice by resistances; Arenas del Tiempo's bounce in the monsters' AI |
 
 ---
 

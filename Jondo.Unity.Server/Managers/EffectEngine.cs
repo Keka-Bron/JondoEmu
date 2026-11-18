@@ -6221,6 +6221,55 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// The rows of a cast to resolve before its blows when it teleports first: every immediate
+        /// row written ahead of its first blow, in their order, once one of them is a teleport. Empty
+        /// otherwise, and when a row after them reads the swaps (a "T" in its mask), which must stay
+        /// in the teleport's own resolution.
+        /// </summary>
+        /// <remarks>
+        /// The game walks a spell's rows top to bottom, and the Xelor's teleport-and-hit spells write
+        /// the teleport first: Golpe de Xelor's 1105, then the telefrag's 2160 and 1160 on "T", then
+        /// its 97 (as DofusDB lists them, order 0 to 4). Dealt first, a blow that killed its target
+        /// left nobody to teleport: no swap, no telefrag, no +2 AP, and Péndulo's circle hit around
+        /// the cell he had left. Gelure, Polvo Temporal, Engranaje, Cuentagotas, Distorsión, Golpe de
+        /// Xelor and Péndulo have this shape.
+        /// </remarks>
+        public static IReadOnlyList<SpellEffect> TeleportsBeforeTheBlows(int spell, IReadOnlyList<SpellEffect> rows)
+        {
+            var ahead = new List<SpellEffect>();
+            if (spell == 0 || rows == null) return ahead;
+            int firstBlow = -1;
+            for (int i = 0; i < rows.Count && firstBlow < 0; i++)
+                if (EsDeDano(rows[i].EffectId) && IsImmediate(rows[i])) firstBlow = i;
+            if (firstBlow <= 0) return ahead;
+
+            for (int i = 0; i < firstBlow; i++)
+                if (IsImmediate(rows[i])) ahead.Add(rows[i]);
+            if (!ahead.Any(row => Teleports(row, 0))) return new List<SpellEffect>();
+            for (int i = firstBlow; i < rows.Count; i++)
+                if ((rows[i].TargetMask ?? "").Split(',', StringSplitOptions.TrimEntries).Contains("T"))
+                    return new List<SpellEffect>();
+            return ahead;
+        }
+
+        /// <summary>
+        /// Whether a row teleports somebody, by itself or through the spell it casts: Polvo Temporal's
+        /// "2794 13317" teleports with 13317's grade 2, written ahead of its fire.
+        /// </summary>
+        private static bool Teleports(SpellEffect row, int depth)
+        {
+            if (TeleportEffects.Contains(row.EffectId)) return true;
+            if (depth >= 3 || row.DiceNum <= 0 || !EsDeLaFamiliaDeSublanzar(row.EffectId)) return false;
+            return SpellEffects.De(row.DiceNum, Math.Max(1, row.DiceSide)).Any(child => Teleports(child, depth + 1));
+        }
+
+        /// <summary>The teleports: the plain one and the symmetric, back-a-cell and swap-or-teleport ones.</summary>
+        private static readonly HashSet<int> TeleportEffects = new()
+        {
+            EffectSupport.Teleport, 1099, 1100, 1101, 1104, 1105, 1106,
+        };
+
+        /// <summary>
         /// An immediate row written ahead of the blows that moves nobody, by itself or by what it
         /// casts: a state, a mark, a sub-cast. Resolved after the blows it was lost whenever they
         /// killed the target. The Sadida's Ronce infects its target and marks it and its caster
