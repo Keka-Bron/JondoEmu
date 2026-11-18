@@ -139,7 +139,10 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>That seller's token shop, or null if it charges in kamas like everyone.</summary>
         public static Shop? Of(int npcTemplateId)
-            => _byNpc.TryGetValue(npcTemplateId, out var shop) ? shop : null;
+        {
+            var shop = NpcShops.AuthoredPricingOf(npcTemplateId) ?? _byNpc.GetValueOrDefault(npcTemplateId);
+            return shop is { TokenGid: > 0 } ? shop : null;
+        }
 
         /// <summary>
         /// How many tokens an item costs in that shop.

@@ -153,8 +153,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The whole catalogue, in one go, which is how the real server sends it.</summary>
         private static async Task OpenShopAsync(NetworkStream stream, Npcs.Spawn npc)
         {
+            var subscribedDays = new Lazy<double>(ShopSubscriptionDays);
             var catalogue = NpcShops.CatalogueFor(npc.NpcId,
-                criterion => PlayerCriteria.Met(criterion, SessionContext.State.MapId));
+                criterion => PlayerCriteria.Met(criterion, SessionContext.State.MapId), () => subscribedDays.Value);
             if (catalogue.Count == 0)
             {
                 Console.WriteLine($"[NPC] {npc.NpcId} has no available shop items.");
@@ -167,7 +168,7 @@ namespace Jondo.Unity.Server.Handlers
             // If this vendor charges in tokens, the client is told which the currency is. Without
             // this f3 does not travel and the client draws the price in kamas, which is the usual.
             var tokenShop = TokenShops.Of(npc.NpcId);
-            byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue, tokenShop);
+            byte[] kbd = ConnectionProtocol.BuildShop(npc.ContextualId, catalogue, tokenShop, npc.NpcId);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Kbd, kbd));
 
@@ -175,6 +176,10 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[NPC] Shop of {npc.NpcId}: {catalogue.Count} items, " +
                               $"{kbd.Length} bytes, paid in {moneda}.");
         }
+
+        private static double ShopSubscriptionDays()
+            => VeteranRewards.SubscribedDays(DatabaseManager.GetSubscriptionEnd(SessionContext.Current.AccountId),
+                                             DateTimeOffset.UtcNow);
 
         /// <summary>
         /// The dialogue window and its first question.
@@ -2055,7 +2060,7 @@ namespace Jondo.Unity.Server.Handlers
             // That the vendor who is open really has it: the catalogue is sent by us, so asking for
             // something else is not a valid purchase.
             if (!NpcShops.CanBuy(OpenShopNpc, gid,
-                    criterion => PlayerCriteria.Met(criterion, SessionContext.State.MapId)))
+                    criterion => PlayerCriteria.Met(criterion, SessionContext.State.MapId), ShopSubscriptionDays, quantity))
             {
                 Console.WriteLine($"[NPC] Vendor {OpenShopNpc} does not sell item {gid}.");
                 return;
@@ -2063,7 +2068,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // What is paid with here. Without a token shop it is the usual: kamas.
             var tokenShop = TokenShops.Of(OpenShopNpc);
-            long unit = tokenShop == null ? NpcShops.PriceOf(gid) : TokenShops.PriceOf(tokenShop, gid);
+            long unit = tokenShop == null ? NpcShops.PriceOf(OpenShopNpc, gid) : TokenShops.PriceOf(tokenShop, gid);
             long price;
             try
             {
@@ -2108,10 +2113,12 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             long uid = NextUid();
-            string effects = NpcShops.EffectsOf(gid);
+            string effects = NpcShops.PurchasedEffects(OpenShopNpc, gid, DateTimeOffset.UtcNow);
 
-            if (!DatabaseManager.InsertCharacterItem(uid, GameState.CharacterId, gid, (int)quantity,
-                                                     Equipment.Bag, effects))
+            if (tokenShop == null
+                ? !DatabaseManager.InsertCharacterItem(uid, GameState.CharacterId, gid, (int)quantity, Equipment.Bag, effects)
+                : !DatabaseManager.BuyWithTokens(GameState.CharacterId, uid, gid, (int)quantity, effects,
+                    tokenUid, tokenShop.TokenGid, (int)price, tokenLeft))
             {
                 Console.WriteLine($"[NPC] Item {gid} could not be saved.");
                 return;
@@ -2126,9 +2133,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             else
             {
-                // Tokens are spent by removing them from the inventory, the same as when destroying part
-                // of a stack. If the purchase takes the last one, DestroyCharacterItem deletes the row.
-                DatabaseManager.DestroyCharacterItem(GameState.CharacterId, tokenUid, (int)price);
+                // SQLite has already paid for the item. Bring the session's two inventory views up to date.
                 Equipment.Remove(tokenUid, (int)price);
                 tokenLeft -= (int)price;
                 GameState.SetInventory(DatabaseManager.LoadInventory(GameState.CharacterId));
@@ -2240,7 +2245,8 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var (uid, wanted) in sales)
             {
                 var item = Equipment.ByUid(uid);
-                if (item == null || item.Position != Equipment.Bag) continue;
+                if (item == null || item.Position != Equipment.Bag
+                    || ItemBinding.BlocksTransfer(item.Effects, DateTimeOffset.UtcNow)) continue;
                 int quantity = Math.Min(wanted, item.Quantity);
                 int left = item.Quantity - quantity;
                 if (!DatabaseManager.DestroyCharacterItem(GameState.CharacterId, uid, quantity)) continue;

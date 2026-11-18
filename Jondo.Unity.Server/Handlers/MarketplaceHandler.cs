@@ -414,7 +414,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var item = Equipment.ByUid(uid);
             if (item == null || item.Position != Equipment.Bag || price <= 0 || house.LotIndex(lot) < 0
-                || item.Quantity < lot)
+                || item.Quantity < lot || ItemBinding.BlocksTransfer(item.Effects, DateTimeOffset.UtcNow))
             {
                 Console.WriteLine($"[Marketplaces] {me.CharacterId} cannot put {uid} x{lot} on sale at {price}.");
                 return;

@@ -295,7 +295,9 @@ namespace Jondo.Unity.Server.Managers
                         position = reader.IsDBNull(2) ? Equipment.Bag : reader.GetInt32(2);
                         effects = reader.IsDBNull(3) ? "" : reader.GetString(3);
                     }
-                    if (position != Equipment.Bag || have <= 0) return null;
+                    if (position != Equipment.Bag || have <= 0
+                        || (place.Table == SharedTable && ItemBinding.BlocksTransfer(Equipment.ParseEffects(effects), DateTimeOffset.UtcNow)))
+                        return null;
 
                     int moving = Math.Min(quantity, have);
                     using var transaction = connection.BeginTransaction();

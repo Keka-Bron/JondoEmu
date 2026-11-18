@@ -3358,16 +3358,7 @@ namespace Jondo.Unity.Server
                 using var connection = new SqliteConnection(WorldConnectionString);
                 connection.Open();
 
-                var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO CharacterItems " +
-                                      "(CharacterId, Uid, Gid, Quantity, Position, Effects) " +
-                                      "VALUES ($id, $uid, $gid, $n, $pos, $e);";
-                command.Parameters.AddWithValue("$id", characterId);
-                command.Parameters.AddWithValue("$uid", uid);
-                command.Parameters.AddWithValue("$gid", gid);
-                command.Parameters.AddWithValue("$n", Math.Max(1, quantity));
-                command.Parameters.AddWithValue("$pos", position);
-                command.Parameters.AddWithValue("$e", (object?)effects ?? DBNull.Value);
+                using var command = NewCharacterItem(connection, uid, characterId, gid, quantity, position, effects);
                 command.ExecuteNonQuery();
                 return true;
             }
@@ -3380,6 +3371,67 @@ namespace Jondo.Unity.Server
             catch (Exception ex)
             {
                 Console.WriteLine($"[SQLite] Could not create item {uid}: {ex.Message}");
+                return false;
+            }
+        }
+
+        private static SqliteCommand NewCharacterItem(SqliteConnection connection, long uid, long characterId,
+                                                      int gid, int quantity, int position, string? effects)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = "INSERT INTO CharacterItems (CharacterId, Uid, Gid, Quantity, Position, Effects) " +
+                                  "VALUES ($id, $uid, $gid, $n, $pos, $e);";
+            command.Parameters.AddWithValue("$id", characterId);
+            command.Parameters.AddWithValue("$uid", uid);
+            command.Parameters.AddWithValue("$gid", gid);
+            command.Parameters.AddWithValue("$n", Math.Max(1, quantity));
+            command.Parameters.AddWithValue("$pos", position);
+            command.Parameters.AddWithValue("$e", (object?)effects ?? DBNull.Value);
+            return command;
+        }
+
+        internal static bool BuyWithTokens(long characterId, long uid, int gid, int quantity, string effects,
+                                           long tokenUid, int tokenGid, int price, int expectedBalance)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                using var transaction = connection.BeginTransaction();
+                using var debit = connection.CreateCommand();
+                debit.Transaction = transaction;
+                debit.CommandText = """
+                    UPDATE CharacterItems SET Quantity = Quantity - $price
+                    WHERE CharacterId = $id AND Uid = $token AND Gid = $currency
+                      AND Position = $bag AND Quantity = $balance AND Quantity >= $price
+                    RETURNING Quantity;
+                    """;
+                debit.Parameters.AddWithValue("$price", price);
+                debit.Parameters.AddWithValue("$id", characterId);
+                debit.Parameters.AddWithValue("$token", tokenUid);
+                debit.Parameters.AddWithValue("$currency", tokenGid);
+                debit.Parameters.AddWithValue("$bag", Equipment.Bag);
+                debit.Parameters.AddWithValue("$balance", expectedBalance);
+                if (debit.ExecuteScalar() is not long balance) return false;
+                if (balance == 0)
+                {
+                    using var empty = connection.CreateCommand();
+                    empty.Transaction = transaction;
+                    empty.CommandText = "DELETE FROM CharacterItems WHERE CharacterId = $id AND Uid = $token AND Quantity = 0;";
+                    empty.Parameters.AddWithValue("$id", characterId);
+                    empty.Parameters.AddWithValue("$token", tokenUid);
+                    empty.ExecuteNonQuery();
+                }
+
+                using var item = NewCharacterItem(connection, uid, characterId, gid, quantity, Equipment.Bag, effects);
+                item.Transaction = transaction;
+                item.ExecuteNonQuery();
+                transaction.Commit();
+                return true;
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine($"[SQLite] Token purchase of item {gid} could not be saved: {ex.Message}");
                 return false;
             }
         }

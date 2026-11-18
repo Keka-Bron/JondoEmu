@@ -32,7 +32,9 @@ namespace Jondo.Unity.Server.Managers
 
         private static readonly Dictionary<int, int[]> _byNpc = new();
         private static readonly Dictionary<int, long> _prices = new();
-        private static readonly Dictionary<int, Dictionary<int, string>> _criteria = new();
+        private sealed record PurchaseRule(string Criterion, int MinimumSubscriptionDays, bool Single);
+        private static readonly Dictionary<int, Dictionary<int, PurchaseRule>> _rules = new();
+        private static readonly Dictionary<int, TokenShops.Shop> _pricedCatalogues = new();
         private static readonly Dictionary<int, List<(int Id, int DiceNum, int DiceSide, int Value, int Category)>> _effects = new();
 
         public static int Count => _byNpc.Count;
@@ -43,7 +45,8 @@ namespace Jondo.Unity.Server.Managers
         {
             _byNpc.Clear();
             _prices.Clear();
-            _criteria.Clear();
+            _rules.Clear();
+            _pricedCatalogues.Clear();
             Items = 0;
 
             string path = Paths.NpcShopsJson;
@@ -222,8 +225,8 @@ namespace Jondo.Unity.Server.Managers
         /// <remarks>
         /// datos/npc_shops.json is remade by a tool, so a seller added there is
         /// lost on the next pass without a word; ours lives in content/npcs/shops.json
-        /// and is laid ON TOP at start. A written seller replaces its whole catalogue -it is
-        /// what has been decided it sells- and a written price is that item's wherever it is sold.
+        /// and is laid on top at start. If a catalogue declares a currency (0 means kamas),
+        /// prices are specific to that seller. Older catalogues keep global item prices.
         /// </remarks>
         internal static void ApplyAuthored(string path)
         {
@@ -240,31 +243,50 @@ namespace Jondo.Unity.Server.Managers
                     if (!shop.TryGetProperty("npc", out var npc) || !shop.TryGetProperty("items", out var items)) continue;
 
                     var gids = new List<int>();
-                    var criteria = new Dictionary<int, string>();
+                    var rules = new Dictionary<int, PurchaseRule>();
+                    TokenShops.Shop? local = shop.TryGetProperty("currency", out var currency)
+                        ? new() { TokenGid = currency.GetInt32() }
+                        : null;
+                    if (local is { TokenGid: < 0 }) continue;
                     foreach (var item in items.EnumerateArray())
                     {
                         if (!item.TryGetProperty("gid", out var gid)) continue;
                         int id = gid.GetInt32();
                         if (id <= 0 || gids.Contains(id)) continue;
+                        bool hasPrice = item.TryGetProperty("price", out var price);
+                        if (local != null)
+                        {
+                            if (!hasPrice || !price.TryGetInt64(out long cost) || cost <= 0) continue;
+                            local.Prices[id] = cost;
+                        }
+                        else if (hasPrice) _prices[id] = price.GetInt64();
                         gids.Add(id);
-                        if (item.TryGetProperty("price", out var price)) _prices[id] = price.GetInt64();
-                        if (item.TryGetProperty("criterion", out var criterion))
-                            criteria[id] = criterion.GetString() ?? "";
+                        string criterion = item.TryGetProperty("criterion", out var condition)
+                            ? condition.GetString() ?? "" : "";
+                        int subscription = item.TryGetProperty("minimumSubscriptionDays", out var days)
+                            ? days.GetInt32() : 0;
+                        bool single = item.TryGetProperty("single", out var max) && max.GetBoolean();
+                        if (criterion.Length > 0 || subscription != 0 || single)
+                            rules[id] = new(criterion, subscription, single);
                     }
 
                     if (gids.Count == 0) continue;
-                    _byNpc[npc.GetInt32()] = gids.ToArray();
-                    _criteria[npc.GetInt32()] = criteria;
-                    vendors++;
+                    void Register(int seller)
+                    {
+                        _byNpc[seller] = gids.ToArray();
+                        _rules[seller] = rules;
+                        if (local == null) _pricedCatalogues.Remove(seller);
+                        else _pricedCatalogues[seller] = local;
+                        vendors++;
+                    }
+                    Register(npc.GetInt32());
 
                     // The same catalogue for other vendors, written once: "alsoSoldBy": [2142].
                     if (shop.TryGetProperty("alsoSoldBy", out var others))
                     {
                         foreach (var other in others.EnumerateArray())
                         {
-                            _byNpc[other.GetInt32()] = gids.ToArray();
-                            _criteria[other.GetInt32()] = criteria;
-                            vendors++;
+                            Register(other.GetInt32());
                         }
                     }
                 }
@@ -282,7 +304,8 @@ namespace Jondo.Unity.Server.Managers
         {
             _byNpc.Clear();
             _prices.Clear();
-            _criteria.Clear();
+            _rules.Clear();
+            _pricedCatalogues.Clear();
             _effects.Clear();
         }
 
@@ -292,23 +315,35 @@ namespace Jondo.Unity.Server.Managers
                 ? "[" + string.Join(",", rows.Select(r => DatabaseManager.FreshEffect(r.Id, r.DiceNum, r.DiceSide, r.Value, r.Category))) + "]"
                 : "[]";
 
+        internal static string PurchasedEffects(int npcId, int gid, DateTimeOffset boughtAt)
+            => _pricedCatalogues.ContainsKey(npcId)
+                ? ItemBinding.OnPurchase(EffectsOf(gid), boughtAt)
+                : EffectsOf(gid);
+
+        internal static TokenShops.Shop? AuthoredPricingOf(int npcId)
+            => _pricedCatalogues.GetValueOrDefault(npcId);
+
         /// <summary>What that NPC has for sale, in the order the real server sent it.</summary>
         public static IReadOnlyList<int> CatalogueOf(int npcId)
             => _byNpc.TryGetValue(npcId, out var gids) ? gids : (IReadOnlyList<int>)Array.Empty<int>();
 
         /// <summary>The items this character may buy from this vendor.</summary>
-        public static IReadOnlyList<int> CatalogueFor(int npcId, Func<string, bool> meets)
-            => CatalogueOf(npcId).Where(gid => CanBuy(npcId, gid, meets)).ToArray();
+        public static IReadOnlyList<int> CatalogueFor(int npcId, Func<string, bool> meets,
+                                                      Func<double>? subscribedDays = null)
+            => CatalogueOf(npcId).Where(gid => MeetsRules(npcId, gid, meets, subscribedDays, 1)).ToArray();
 
         /// <summary>Check the catalogue and its purchase condition again when buying.</summary>
-        public static bool CanBuy(int npcId, int gid, Func<string, bool> meets)
-        {
-            if (!CatalogueOf(npcId).Contains(gid)) return false;
-            return !_criteria.TryGetValue(npcId, out var criteria)
-                || !criteria.TryGetValue(gid, out string criterion)
-                || string.IsNullOrWhiteSpace(criterion)
-                || meets(criterion);
-        }
+        public static bool CanBuy(int npcId, int gid, Func<string, bool> meets,
+                                  Func<double>? subscribedDays = null, long quantity = 1)
+            => CatalogueOf(npcId).Contains(gid) && MeetsRules(npcId, gid, meets, subscribedDays, quantity);
+
+        private static bool MeetsRules(int npcId, int gid, Func<string, bool> meets,
+                                       Func<double>? subscribedDays, long quantity)
+            => !_rules.TryGetValue(npcId, out var rules) || !rules.TryGetValue(gid, out var rule)
+            || ((!rule.Single || quantity == 1)
+                && (rule.MinimumSubscriptionDays == 0
+                    || (rule.MinimumSubscriptionDays > 0 && subscribedDays?.Invoke() >= rule.MinimumSubscriptionDays))
+                && (string.IsNullOrWhiteSpace(rule.Criterion) || meets(rule.Criterion)));
 
         public static bool Sells(int npcId) => _byNpc.ContainsKey(npcId);
 
@@ -319,6 +354,10 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static long PriceOf(int gid)
             => _prices.TryGetValue(gid, out long price) ? price : DefaultPrice;
+
+        public static long PriceOf(int npcId, int gid)
+            => _pricedCatalogues.TryGetValue(npcId, out var shop) && shop.TokenGid == 0
+                && shop.Prices.TryGetValue(gid, out long price) ? price : PriceOf(gid);
 
         /// <summary>A vendor buys back at a tenth of the item's own price: «se vend à 30 000k à un PNJ […] 1/10 du prix».</summary>
         public const int BuyBackDivisor = 10;
