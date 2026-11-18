@@ -50,6 +50,8 @@
     "lines send one to, at the right-hand corner of the room's counter. No capture shows the room."
   ],
   "spawns": [
+    { "map": 103547392, "npc": 2140, "cell": 371, "remove": true },
+    { "map": 103547392, "npc": 2140, "cell": 246, "orientation": 1 },
     { "map": 241441793, "npc": 7581, "cell": 246, "orientation": 3, "criterion": "Qa=1630&Qo>10016" },
     {
       "map": 153880835,
