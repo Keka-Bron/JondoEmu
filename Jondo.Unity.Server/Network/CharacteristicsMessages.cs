@@ -45,6 +45,12 @@ internal sealed class CharacteristicsMessages(ICharacteristicsMessagesBackend ba
         };
         var equipment = new Dictionary<int, long>(backend.EquipmentBonuses(session));
         var alterations = new Dictionary<int, long>(backend.AlterationBonuses(characterId));
+        // The AP and MP reduction a game master gave himself (".stats retpa|retpm"), shown as the
+        // temporary part it is: the fight adds it in FightHandler.RellenarLaFicha.
+        if (state.StaffApReduction != 0)
+            alterations[Stat.WithdrawActionPoints] = alterations.GetValueOrDefault(Stat.WithdrawActionPoints) + state.StaffApReduction;
+        if (state.StaffMpReduction != 0)
+            alterations[Stat.WithdrawMovementPoints] = alterations.GetValueOrDefault(Stat.WithdrawMovementPoints) + state.StaffMpReduction;
         var monster = backend.MutationSheet(session);
         if (monster != null)
         {

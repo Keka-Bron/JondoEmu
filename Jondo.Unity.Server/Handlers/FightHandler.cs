@@ -1718,8 +1718,10 @@ namespace Jondo.Unity.Server.Handlers
             Poner(79, agilidad / PorCadaDiez);    // placaje
             Poner(27, sabiduria / PorCadaDiez);   // action point dodge
             Poner(28, sabiduria / PorCadaDiez);   // movement point dodge
-            Poner(82, sabiduria / PorCadaDiez);   // retira PA: a tenth of wisdom, plus the gear's 410/411
-            Poner(83, sabiduria / PorCadaDiez);   // MP reduction: likewise, 412/413
+            // Retira PA: a tenth of wisdom, plus the gear's 410/411; MP reduction likewise, 412/413.
+            // And what a game master gave himself with ".stats retpa|retpm".
+            Poner(82, sabiduria / PorCadaDiez + Network.SessionContext.State.StaffApReduction);
+            Poner(83, sabiduria / PorCadaDiez + Network.SessionContext.State.StaffMpReduction);
             Poner(12, GameState.TotalWisdom);     // wisdom
             Poner(49, 0);                         // flat heals
             Poner(26, 0);                         // summons
