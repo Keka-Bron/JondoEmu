@@ -239,6 +239,29 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// Inestabilidad goes off however far from its glyph the Xelor makes or spends his telefrag:
+        /// its 1026 is on the whole board, and the glyph takes him alone back a cell. Held to its
+        /// owner standing in it, a telefrag made from outside set nothing off.
+        /// </summary>
+        [Fact]
+        public async Task Inestabilidad_goes_off_with_the_xelor_out_of_its_glyph()
+        {
+            var xelor = Character(300);
+            var enemy = Monster(-1, 100);
+            var fight = Board(xelor, enemy);
+
+            await FightHandler.AplicarEfectosAsync(null, fight, xelor, 13301, 1, null, EffectEngine.AlLanzar, 300);
+            xelor.Andar(new[] { 440, 455, 470 });
+            Assert.DoesNotContain(fight.Glifos, g => g.Cubre(xelor.CellId));
+
+            await FightHandler.AplicarEfectosAsync(null, fight, xelor, 13325, 1, xelor, EffectEngine.AlLanzar, xelor.CellId);
+
+            Assert.Equal(455, xelor.CellId);
+            Assert.True(xelor.Buffs.TieneEstado(3620));
+            Assert.Equal(100, enemy.CellId);
+        }
+
+        /// <summary>
         /// Reloj de Bolsillo's glyph is laid on the enemy's cell a turn later, and its turn-end blow
         /// burns that circle (frames 2215-2327 of its capture), wherever the Xelor stands: the
         /// aura's "2794 C" is hooked on him as it is laid, with the glyph's cell. Fired only when he

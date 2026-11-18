@@ -8247,7 +8247,11 @@ namespace Jondo.Unity.Server.Handlers
                                 continue;
                             }
                             if (!fight.Glifos.Contains(glifo)) continue;
-                            if (!activador.IsAlive || !glifo.Cubre(activador.CellId)) continue;
+                            // Wherever he stands: Inestabilidad goes off as soon as the Xelor makes or
+                            // spends a telefrag, in its glyph or out of it -- its 1026 is on the whole
+                            // board -- and takes him alone back a cell. Held to its owner standing in
+                            // it, a telefrag made from outside set nothing off.
+                            if (!activador.IsAlive) continue;
                             await FireOneGlyphAsync(stream, fight, glifo, activador, alPisar: false,
                                                     celda: glifo.Centro >= 0 ? glifo.Centro : activador.CellId,
                                                     setOffByItsOwner: true);
