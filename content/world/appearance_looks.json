@@ -909,6 +909,26 @@
    "look": "{446|||120}",
    "from": "monster regalo animado"
   },
+  "2735": {
+   "look": "{8140}",
+   "from": "the Xelor's syncro grown 1 time(s): the bones after its own 8139 (Fin de los Tiempos, effect 149 on E3959)"
+  },
+  "2736": {
+   "look": "{8141}",
+   "from": "the Xelor's syncro grown 2 time(s): the bones after its own 8139 (Fin de los Tiempos, effect 149 on E3961)"
+  },
+  "2737": {
+   "look": "{8142}",
+   "from": "the Xelor's syncro grown 3 time(s): the bones after its own 8139 (Fin de los Tiempos, effect 149 on E3963)"
+  },
+  "2738": {
+   "look": "{8143}",
+   "from": "the Xelor's syncro grown 4 time(s): the bones after its own 8139 (Fin de los Tiempos, effect 149 on E3965)"
+  },
+  "2739": {
+   "look": "{8144}",
+   "from": "the Xelor's syncro grown 5 time(s): the bones after its own 8139 (Fin de los Tiempos, effect 149 on E3967)"
+  },
   "2824": {
    "look": "{5768|||100}",
    "from": "monster 6550 tsukumogami"
@@ -956,6 +976,10 @@
   "2846": {
    "look": "{9091}",
    "from": "monster 7983 nitrool"
+  },
+  "2849": {
+   "look": "{113}",
+   "from": "monster 3751 momia sin alma: the Xelor's Momificacion and 25a Hora"
   },
   "2868": {
    "look": "{287|||110}",
