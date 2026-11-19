@@ -769,7 +769,7 @@ namespace Jondo.Unity.Server.Network
         /// to come from the same place, and that is why both come from here.
         /// </summary>
         public static byte[] BuildShop(long contextualId, IEnumerable<int> gids,
-                                       Managers.TokenShops.Shop? tokenShop = null)
+                                       Managers.TokenShops.Shop? tokenShop = null, int npcId = 0)
         {
             var kbd = Pb.New();
             foreach (int gid in gids)
@@ -778,7 +778,7 @@ namespace Jondo.Unity.Server.Network
                     .Var(1, gid)
                     .Msg(3, Pb.New()
                         .VarIfNotZero(2, tokenShop == null
-                            ? Managers.NpcShops.PriceOf(gid)
+                            ? Managers.NpcShops.PriceOf(npcId, gid)
                             : Managers.TokenShops.PriceOf(tokenShop, gid))
                         .Var(3, ShopUnlimited));
 

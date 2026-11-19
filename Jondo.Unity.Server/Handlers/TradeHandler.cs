@@ -188,7 +188,8 @@ namespace Jondo.Unity.Server.Handlers
             var offer = trade.OfferOf(me.CharacterId);
             int index = offer.FindIndex(o => o.Uid == uid);
             int had = index >= 0 ? offer[index].Quantity : 0;
-            int now = item == null || item.Position != Equipment.Bag ? 0 : (int)Math.Clamp(wanted, 0, item.Quantity);
+            int now = item == null || item.Position != Equipment.Bag || ItemBinding.BlocksTransfer(item.Effects, DateTimeOffset.UtcNow)
+                ? 0 : (int)Math.Clamp(wanted, 0, item.Quantity);
             if (now == had) return false;
 
             if (now == 0)
@@ -439,7 +440,8 @@ namespace Jondo.Unity.Server.Handlers
             => CommissionHandler.As(side, () =>
                 side.State.Kamas >= trade.KamasOf(side.CharacterId)
                 && trade.OfferOf(side.CharacterId).All(o =>
-                    Equipment.ByUid(o.Uid) is { } item && item.Position == Equipment.Bag && item.Quantity >= o.Quantity));
+                    Equipment.ByUid(o.Uid) is { } item && item.Position == Equipment.Bag && item.Quantity >= o.Quantity
+                    && !ItemBinding.BlocksTransfer(item.Effects, DateTimeOffset.UtcNow)));
 
         /// <summary>One side's stacks to the other: gone from the giver's bag, into the receiver's.</summary>
         private static async Task HandOverAsync(Trade trade, GameSession giver, GameSession receiver)
@@ -463,7 +465,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             long me = SessionContext.State.CharacterId;
             var stored = HavenBagStore.FromInventory(me, uid);
-            if (stored == null || stored.Quantity < quantity) return null;
+            if (stored == null || stored.Quantity < quantity
+                || ItemBinding.BlocksTransfer(Equipment.ParseEffects(stored.Effects), DateTimeOffset.UtcNow)) return null;
             if (!DatabaseManager.DestroyCharacterItem(me, uid, quantity)) return null;
             Equipment.Remove(uid, quantity);
 

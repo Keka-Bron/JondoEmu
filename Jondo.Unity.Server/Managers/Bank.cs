@@ -493,7 +493,8 @@ namespace Jondo.Unity.Server.Managers
                     position = reader.IsDBNull(2) ? Equipment.Bag : reader.GetInt32(2);
                     effects = reader.IsDBNull(3) ? "" : reader.GetString(3);
                 }
-                if (position != Equipment.Bag || have <= 0) return null;
+                if (position != Equipment.Bag || have <= 0 || ItemBinding.CharacterOnly(Equipment.ParseEffects(effects)))
+                    return null;
 
                 int moving = Math.Min(quantity, have);
 

@@ -12,6 +12,8 @@ internal sealed class ItemEffectMessages(Func<int, long, long, long, (int Field,
     {
         // Internal smithmagic metadata is never a client effect.
         if (effect.Effect <= 0) return null;
+        if (ItemBinding.IndefiniteAccountLink(effect))
+            return new(ItemBinding.Account, new ObjectEffectCaseNone());
         if (!string.IsNullOrEmpty(effect.Text))
             return new(effect.Effect, new ObjectEffectCaseValueString(effect.Text));
 
