@@ -71,7 +71,7 @@ namespace Jondo.Unity.Tests.Launcher
             using var json = JsonDocument.Parse("""
                 { "tag_name": "v0.3.0", "name": "v0.3.0", "body": "notes", "published_at": "2026-11-15T10:00:00Z",
                   "assets": [ { "name": "manifest-win-x64.json", "browser_download_url": "https://x/m.json", "size": 1234 },
-                              { "name": "Jondo-Full-v0.3.0-win-x64.zip", "browser_download_url": "https://x/f.zip", "size": 99 } ] }
+                              { "name": "JondoEmu-v0.3.0-win-x64.zip", "browser_download_url": "https://x/f.zip", "size": 99 } ] }
                 """);
             var release = ReleaseFeed.Parse(json.RootElement);
             Assert.Equal("v0.3.0", release.Tag);

@@ -72,7 +72,9 @@ $files = foreach ($file in (Get-ChildItem -LiteralPath $stage -Recurse -File -Fo
     [pscustomobject]$entry
 }
 
-$full = "Jondo-Full-$Tag-$Platform.zip"
+# «JondoEmu-v1.0.12-win-x64.zip»: after the setup in the release's list, which sorts by name, so
+# the file to download comes first. The launcher reads the name from the manifest.
+$full = "JondoEmu-$Tag-$Platform.zip"
 $manifest = [ordered]@{
     version  = $Tag
     platform = $Platform

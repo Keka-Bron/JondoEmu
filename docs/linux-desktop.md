@@ -1,7 +1,7 @@
 # Running the desktop tools on Linux
 
 Launcher, Server, Studio and Deobfuscator use Avalonia and .NET 10 on Linux x64.
-Take `Jondo-Full-<tag>-linux-x64.zip` from a release -- the launcher, the server and
+Take `JondoEmu-<tag>-linux-x64.zip` from a release -- the launcher, the server and
 Studio ready to run, with the data they read -- or run them from a source checkout or
 local publish output.
 

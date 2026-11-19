@@ -155,7 +155,7 @@ jobs:
             - **Windows:** [**JondoEmu-Setup-win-x64.exe**](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/JondoEmu-Setup-win-x64.exe)
             - **Linux:** [**JondoEmu-Setup-linux-x64**](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/JondoEmu-Setup-linux-x64) (make it executable first: `chmod +x JondoEmu-Setup-linux-x64`)
 
-            Download the one for your system and run it: it installs the emulator, fetches the Dofus client and keeps everything up to date. **The other files are what it downloads by itself; you do not need them.** `Jondo-Full-…zip` is the same folder ready to unpack, for installing by hand.
+            Download the one for your system and run it: it installs the emulator, fetches the Dofus client and keeps everything up to date. **The other files are what it downloads by itself; you do not need them.** `JondoEmu-${{ steps.version.outputs.tag }}-win-x64.zip` and `-linux-x64.zip` are the same folder ready to unpack, for installing by hand.
 
           artifacts: release/*.zip,release/*.exe,release/*.json
           artifactErrorsFailBuild: true

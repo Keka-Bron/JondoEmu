@@ -152,7 +152,7 @@ MelonLoader drops a **`version.dll`** next to `Dofus.exe`: renaming it to `versi
 
 ### Other ways to run it
 
-* **The full zip.** Each release also has `Jondo-Full-vX.Y.Z-win-x64.zip` and `Jondo-Full-vX.Y.Z-linux-x64.zip`: the same `JondoEmu` folder, unpacked by hand. Then install **MelonLoader 0.7.x** yourself from [its releases page](https://github.com/LavaGang/MelonLoader/releases), pointed at your `Dofus.exe` (it is published as a pre-release: tick *show pre-releases*, since **0.6.x does not work with this client**), and start **`Jondo Emulator Launcher.exe`**. The .NET 10 *Desktop Runtime* comes from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/10.0).
+* **The full zip.** Each release also has `JondoEmu-vX.Y.Z-win-x64.zip` and `JondoEmu-vX.Y.Z-linux-x64.zip`: the same `JondoEmu` folder, unpacked by hand. Then install **MelonLoader 0.7.x** yourself from [its releases page](https://github.com/LavaGang/MelonLoader/releases), pointed at your `Dofus.exe` (it is published as a pre-release: tick *show pre-releases*, since **0.6.x does not work with this client**), and start **`Jondo Emulator Launcher.exe`**. The .NET 10 *Desktop Runtime* comes from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/10.0).
 * **Docker:** the server also runs as a headless container: `docker compose up -d --build`. See [Jondo Server in Docker](docs/docker.md).
 * **Linux from source:** all four desktop tools have a native Linux workflow. See [Linux desktop setup](docs/linux-desktop.md) for building, configuring `Dofus.x64` without a mod loader, and desktop verification.
 

@@ -24,7 +24,7 @@ namespace Jondo.Unity.Launcher.Setup
         public string Version { get; set; } = "";
         public string Platform { get; set; } = "";
 
-        /// <summary>The zip with the whole folder, «Jondo-Full-v0.2.34-win-x64.zip»; its root folder is JondoEmu/.</summary>
+        /// <summary>The zip with the whole folder, «JondoEmu-v1.0.12-win-x64.zip»; its root folder is JondoEmu/.</summary>
         public string Full { get; set; } = "";
 
         /// <summary>The setup's own asset, the launcher under the name players download.</summary>

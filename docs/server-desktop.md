@@ -68,7 +68,7 @@ Publishing runs the general, server/desktop and connection-protocol tests on bot
 and Windows. `-p:SkipRootDeploy=true` prevents
 a Windows publish from copying the executable to the checkout root.
 
-Each release carries `Jondo-Full-<tag>-linux-x64.zip`: the server, the launcher and Studio
+Each release carries `JondoEmu-<tag>-linux-x64.zip`: the server, the launcher and Studio
 built for Linux, with the data they read. It requires the .NET runtime. The Windows zip
 carries the same three for Windows.
 
