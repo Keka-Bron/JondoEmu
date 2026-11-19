@@ -483,6 +483,12 @@ namespace Jondo.Unity.Launcher
                 Directory.CreateDirectory(logs);
                 start.Environment["XDG_CONFIG_HOME"] = config;
                 start.Environment["ZAAP_LOGS_PATH"] = logs;
+                // On a Wayland session the client's screen plugin (libScreenManagerNativeProxy) takes
+                // its Wayland path when it sees WAYLAND_DISPLAY, while Unity itself draws through X11.
+                // Wayland never tells a client where its window is, so TryGetCurrentDisplayIndex
+                // fails, the options load asks DisplayConfiguration for display -1 and the client
+                // stops on its loading screen. Without it the plugin uses X11 (XWayland) like Unity.
+                start.Environment.Remove("WAYLAND_DISPLAY");
                 start.ArgumentList.Add("-logFile");
                 start.ArgumentList.Add(Path.Combine(logs, "player.log"));
             }

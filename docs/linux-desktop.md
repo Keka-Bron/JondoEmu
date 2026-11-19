@@ -80,7 +80,10 @@ output outside the repository. That directory must contain `.jondo-root`.
    Point it to an existing configuration base to reuse your client preferences.
 4. Sign in, select accounts and launch them. Each process receives its own Jondo
    instance ID/hash and `ZAAP_*` environment. Linux launches omit Direct3D and
-   MelonLoader arguments. Each launch gets a separate Unity `player.log` under
+   MelonLoader arguments, and drop `WAYLAND_DISPLAY`: on a Wayland session the client's
+   screen plugin would take its Wayland path, which cannot tell where the window is, and
+   the client would stop on its loading screen (`DisplayConfiguration.GetDisplayInfo(-1)`).
+   Unity draws through XWayland either way. Each launch gets a separate Unity `player.log` under
    `<emulator-root>/logs/client-<instance>-<unique-id>/`.
 
 Jondo's HTTP/config/control endpoint uses `8888`, TCP Zaap

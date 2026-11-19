@@ -55,8 +55,18 @@ public sealed class NativeClientTests : IDisposable
     public void Native_launch_arguments_preserve_paths_and_credentials_without_windows_flags()
     {
         var client = Client();
-        var start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 17,
-            "hash with spaces", "fr", "--hdReady", Path.Combine(_root, "shared preferences"), Path.Combine(_root, "logs"));
+        string? wayland = Environment.GetEnvironmentVariable("WAYLAND_DISPLAY");
+        Environment.SetEnvironmentVariable("WAYLAND_DISPLAY", "wayland-test");
+        System.Diagnostics.ProcessStartInfo start;
+        try
+        {
+            start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 17,
+                "hash with spaces", "fr", "--hdReady", Path.Combine(_root, "shared preferences"), Path.Combine(_root, "logs"));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("WAYLAND_DISPLAY", wayland);
+        }
         Assert.False(start.UseShellExecute);
         Assert.Equal(client.Root, start.WorkingDirectory);
         Assert.Equal("hash with spaces", start.Environment["ZAAP_HASH"]);
@@ -66,6 +76,8 @@ public sealed class NativeClientTests : IDisposable
         Assert.DoesNotContain(start.ArgumentList, arg => arg.Contains("melonloader"));
         Assert.Contains("--hdReady", start.ArgumentList);
         Assert.True(Directory.Exists(start.Environment["XDG_CONFIG_HOME"]));
+        // The screen plugin must not take its Wayland path: it cannot find the window there.
+        Assert.False(start.Environment.ContainsKey("WAYLAND_DISPLAY"));
         Assert.Contains(Path.Combine(start.Environment["ZAAP_LOGS_PATH"]!, "player.log"), start.ArgumentList);
         var second = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 18,
             "other", "fr", "", start.Environment["XDG_CONFIG_HOME"]!, Path.Combine(_root, "logs"));
