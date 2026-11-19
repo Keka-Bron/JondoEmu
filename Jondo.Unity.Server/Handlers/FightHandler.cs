@@ -13390,12 +13390,21 @@ namespace Jondo.Unity.Server.Handlers
         /// The roll alone, for the player of this session, delivering nothing: what
         /// <see cref="PlanRewards"/> rolls for each winner before anybody is shown the end.
         /// The random loot's perfect pieces, which are in the loot too, are also listed in
-        /// <paramref name="perfect"/>, so the delivery gives them their exo.
+        /// <paramref name="perfect"/>, so the delivery gives them their exo. What fell off a row with
+        /// a criterion he met -- a quest's item -- is also counted in <paramref name="own"/>: his
+        /// alone, which a loot recipient does not take (GatherHeroLoot).
         /// </summary>
         private static Dictionary<int, int> RollLoot(FightInstance fight, int extra,
-                                                     List<Managers.RandomLoot.Drop> perfect = null)
+                                                     List<Managers.RandomLoot.Drop> perfect = null,
+                                                     Dictionary<int, int> own = null)
         {
             var loot = new Dictionary<int, int>();
+            void Own(string criterion, int item)
+            {
+                if (own == null || string.IsNullOrWhiteSpace(criterion)) return;
+                own.TryGetValue(item, out int had);
+                own[item] = had + 1;
+            }
             var worn = Managers.Equipment.WornTemplates();
             bool inDungeon = DungeonManager.IsRoom(fight.RoleplayMapId);
             // An open anomaly's zone: its 120 %, on the rows prospecting raises.
@@ -13457,6 +13466,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (TirarPorcentaje() >= probabilidad) continue;
                     loot.TryGetValue(drop.ObjectId, out int q);
                     loot[drop.ObjectId] = q + 1;
+                    Own(drop.ReceiverCriterion, drop.ObjectId);
                 }
 
                 // And the GLOBAL table, which is the other one it has and that was not being read. That
@@ -13476,6 +13486,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (TirarPorcentaje() >= probabilidad) continue;
                     loot.TryGetValue(drop.ObjectId, out int q);
                     loot[drop.ObjectId] = q + 1;
+                    Own(drop.ReceiverCriterion, drop.ObjectId);
                 }
 
                 // And an anomaly fragment, at its own rate and nothing else's -- no challenge, no
@@ -13500,6 +13511,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (TirarPorcentaje() >= probabilidad) continue;
                     loot.TryGetValue(drop.Item, out int q);
                     loot[drop.Item] = q + 1;
+                    Own(drop.Criterion, drop.Item);
                 }
 
                 // And the server's random loot (its settings), which the challenges and the drop

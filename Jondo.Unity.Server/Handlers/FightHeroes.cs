@@ -92,7 +92,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// The items a master's group won, all to the one he named its loot recipient (Heroes.LootTo)
         /// when that one is among the winners: each keeps his experience and his kamas, the items
-        /// -- the perfect pieces with them -- go to one bag.
+        /// -- the perfect pieces with them -- go to one bag. But for what dropped for him alone
+        /// (Reward.Own), a quest's item: the fight then ticks his objective, its row's criterion no
+        /// longer lets it fall, and in another's bag it left him with a quest he could not finish.
         /// </summary>
         internal static void GatherHeroLoot(Dictionary<long, Reward> plan)
         {
@@ -104,10 +106,16 @@ namespace Jondo.Unity.Server.Handlers
                 foreach (var (id, reward) in plan)
                 {
                     if (id == to || (id != master && Heroes.AsHero(id)?.MasterId != master)) continue;
+                    var kept = new Dictionary<int, int>();
                     foreach (var (gid, count) in reward.Loot)
-                        recipient.Loot[gid] = recipient.Loot.TryGetValue(gid, out int had) ? had + count : count;
+                    {
+                        int own = Math.Min(count, reward.Own.TryGetValue(gid, out int mine) ? mine : 0);
+                        if (own > 0) kept[gid] = own;
+                        if (count - own > 0)
+                            recipient.Loot[gid] = (recipient.Loot.TryGetValue(gid, out int had) ? had : 0) + count - own;
+                    }
                     recipient.Perfect.AddRange(reward.Perfect);
-                    reward.Loot = new Dictionary<int, int>();
+                    reward.Loot = kept;
                     reward.Perfect = new List<RandomLoot.Drop>();
                 }
             }

@@ -45,6 +45,12 @@ namespace Jondo.Unity.Server.Handlers
 
             /// <summary>The perfect pieces of the random loot inside <see cref="Loot"/>, with their exo.</summary>
             public List<RandomLoot.Drop> Perfect { get; set; } = new();
+
+            /// <summary>
+            /// What of <see cref="Loot"/> dropped for him alone, off a row with a criterion he met --
+            /// a quest's item, mostly --: never sent to a loot recipient (GatherHeroLoot).
+            /// </summary>
+            public Dictionary<int, int> Own { get; set; } = new();
         }
 
         /// <summary>The group bonus to experience, by how many players count for it.</summary>
@@ -176,8 +182,9 @@ namespace Jondo.Unity.Server.Handlers
                 var (fighter, session) = winners[i];
                 Dictionary<int, int> loot;
                 var perfect = new List<RandomLoot.Drop>();
+                var own = new Dictionary<int, int>();
                 if (dream != null) loot = DreamLootOf(fight, dream);
-                else using (SessionContext.Push(session)) loot = RollLoot(fight, extra, perfect);
+                else using (SessionContext.Push(session)) loot = RollLoot(fight, extra, perfect, own);
 
                 // A dream pays its own, the same to everyone. Elsewhere the group is the players of
                 // his side who are still in the fight -- standing or not --, not who walked out.
@@ -220,6 +227,7 @@ namespace Jondo.Unity.Server.Handlers
                     Kamas = dream != null ? 0 : shared ? KamasShare(kamasAlone, prospectings[i], prospectings) : kamasAlone,
                     Loot = loot,
                     Perfect = perfect,
+                    Own = own,
                 };
             }
             // A group with heroes may send its items to one of it (Heroes.LootTo).
