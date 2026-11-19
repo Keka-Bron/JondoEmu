@@ -715,6 +715,12 @@
       "element": 518646,
       "document": 632,
       "why": "«Más leña al fuego» (2151, 16388): the books at the foot of the low table upstairs in the library [21,-27] open the copy of the bamboo exploitation register (document 632; the torn original page is 633, item 23206). Dofus pour les noobs («Sous le bois de sa colère»): «D'après le registre vous pouvez voir que chaque année les bûcherons bûchent environ un tiers de la densité de bois»."
+    },
+    {
+      "map": 122422272,
+      "element": 516598,
+      "document": 17,
+      "why": "The books on the right of Meriana's cellar (element 516598, cell 461, graphic 32824): La Leyenda de Cocoburio (document 17, the one of the book 1512). Dofus pour les noobs («L'épée du rocher»): «Cliquez alors sur les livres situés sur la droite de la pièce. Vous ouvrez ainsi l'ouvrage sur La Légende de Crocoburio»."
     }
   ]
 }

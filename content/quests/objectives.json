@@ -6612,6 +6612,277 @@
       18581
     ],
     "why": "«Vence a Hell Mina» (type 6, monster 107, dungeon only): «il faut entrer dans le donjon Tertre du long sommeil et vaincre Hell Mina» (Dofus pour les noobs, «Arrête-la si tu peux»). The server counts the boss won in the dungeon's last room (220729857); this row only orders it after the first room has been entered."
+  },
+  {
+   "objective": 10021,
+   "quest": 1658,
+   "kind": "enter",
+   "map": 171704840,
+   "afterObjectives": [10020],
+   "why": "«Encuentra a Nobir» (553817): «Allez trouver Nobi en [-27,-3] (zaap -25,12)» (Dofus pour les noobs, «Autel du Nord»), after Fidji's «He oído que ayer hubo una tormenta muy fuerte por los Altos de los Aullidos» (21713); Nobir's own objectives (10022, 10027) name map 171704840."
+  },
+  {
+   "objective": 10033,
+   "quest": 1658,
+   "kind": "enter",
+   "map": 54168408,
+   "afterObjectives": [10032],
+   "why": "«Encuentra el altar del Norte» (553829): «Rendez-vous devant l'autel du Nord qui se trouve en [-69,-88!]. Entamez la discussion avec le Disciple de Thomahon» (Dofus pour les noobs, «Autel du Nord»); 10034 names map 54168408, where the disciple stands (shown from 10033 on, the start criterion of 1661 «Qa=1658&Qo>10033»)."
+  },
+  {
+   "objective": 10035,
+   "quest": 1658,
+   "kind": "click",
+   "elements": [{"map": 158336000, "element": 508848}],
+   "requires": [{"item": 16892, "count": 1}, {"item": 17068, "count": 1}],
+   "worn": [{"item": 16953, "count": 1}],
+   "gives": [{"item": 16896, "count": 1}],
+   "afterObjectives": [10034],
+   "why": "«Desentierra el tótem del Norte» (553819): «Puis allez déterrer le Totem du Nord en [-13,-62]. (Équipez votre pelle à votre CàC). Cliquez sur les ossements pour obtenir le totem du Nord» (Dofus pour les noobs, «Autel du Nord»). The bones are element 508848, the skeleton at cell 157 (gfx 15850), the map's only quest-like element; like the east's (10013) it asks for the mark (Marca de Ayuto 16892) and the blessing (Bendición de Thomahon 17068), with the Pala del Clan Terra (16953) worn, and gives the Tótem del Norte (16896)."
+  },
+  {
+   "objective": 10037,
+   "quest": 1659,
+   "kind": "enter",
+   "map": 160268,
+   "why": "«Encuentra el altar del Oeste» (553821): «Puis direction l'autel de l'Ouest en [-57,12]» (Dofus pour les noobs, «Il était une foi dans l'Ouest»); the disciple's map (objective 10038) is 160268."
+  },
+  {
+   "objective": 10039,
+   "quest": 1659,
+   "kind": "enter",
+   "map": 154010369,
+   "afterObjectives": [10038],
+   "why": "«Encuentra a Gobún, el primo del discípulo de Foluk» (563259): «Vous le trouverez en Incarnam [...] en [-1,-1]» (Dofus pour les noobs); the bring objective 10040 names map 154010369."
+  },
+  {
+   "objective": 10042,
+   "quest": 1659,
+   "kind": "enter",
+   "map": 167379464,
+   "afterObjectives": [10041],
+   "why": "«Encuentra el tótem del oeste» (556505): «Dirigez vous en Baie de Cania en [-32,-12] afin d'obtenir le totem de l'Ouest» (Dofus pour les noobs); Tierra de Amakna stands on the map of [-32,-12]."
+  },
+  {
+   "objective": 10064,
+   "quest": 1663,
+   "kind": "beat",
+   "monster": 4065,
+   "map": 88082949,
+   "why": "«Captura un ...» (1663): the spirit that does not let itself be caught attacks (its tree's fight reply 26160, content/fights/npc_fights.json): «Vous aurez une chance sur deux d'être agressé» (Dofus pour les noobs («Une âme en colère»)). Beating it (4065, grade 2) does it, and its own drop row gives its globe (16901, «Qo=10064&PO!16901», 100 % at grade 2). The other half of the time its capture reply (26159) hands the globe over."
+  },
+  {
+   "objective": 10065,
+   "quest": 1663,
+   "kind": "beat",
+   "monster": 4067,
+   "map": 90707715,
+   "why": "«Captura un ...» (1663): the spirit that does not let itself be caught attacks (its tree's fight reply 26162, content/fights/npc_fights.json): «Vous aurez une chance sur deux d'être agressé» (Dofus pour les noobs («Une âme en colère»)). Beating it (4067, grade 2) does it, and its own drop row gives its globe (16902, «Qo=10065&PO!16902», 100 % at grade 2). The other half of the time its capture reply (26161) hands the globe over."
+  },
+  {
+   "objective": 10066,
+   "quest": 1663,
+   "kind": "beat",
+   "monster": 4063,
+   "map": 68421634,
+   "why": "«Captura un ...» (1663): the spirit that does not let itself be caught attacks (its tree's fight reply 26164, content/fights/npc_fights.json): «Vous aurez une chance sur deux d'être agressé» (Dofus pour les noobs («Une âme en colère»)). Beating it (4063, grade 2) does it, and its own drop row gives its globe (16903, «Qo=10066&PO!16903», 100 % at grade 2). The other half of the time its capture reply (26163) hands the globe over."
+  },
+  {
+   "objective": 10067,
+   "quest": 1663,
+   "kind": "beat",
+   "monster": 4066,
+   "map": 190055937,
+   "why": "«Captura un ...» (1663): the spirit that does not let itself be caught attacks (its tree's fight reply 26166, content/fights/npc_fights.json): «Vous aurez une chance sur deux d'être agressé» (Dofus pour les noobs («Une âme en colère»)). Beating it (4066, grade 2) does it, and its own drop row gives its globe (16904, «Qo=10067&PO!16904», 100 % at grade 2). The other half of the time its capture reply (26165) hands the globe over."
+  },
+  {
+   "objective": 10068,
+   "quest": 1663,
+   "kind": "beat",
+   "monster": 4064,
+   "map": 167379976,
+   "why": "«Captura un ...» (1663): the spirit that does not let itself be caught attacks (its tree's fight reply 26168, content/fights/npc_fights.json): «Vous aurez une chance sur deux d'être agressé» (Dofus pour les noobs («Une âme en colère»)). Beating it (4064, grade 2) does it, and its own drop row gives its globe (16905, «Qo=10068&PO!16905», 100 % at grade 2). The other half of the time its capture reply (26167) hands the globe over."
+  },
+  {
+   "objective": 10070,
+   "quest": 1663,
+   "kind": "use",
+   "map": 154141187,
+   "showsNpc": 2952,
+   "why": "«Coloca los tótems y sopla en la caracola» (553826): the Concha de Remordimientos (17074, effect 30 = 10070, its own criterion «Pm=154141187&Qo=10070&PO!16894&PO!16895&PO!16896&PO!16897») blown on the top of the Rock of the Sacrificed once the four totems are on the pillars, and Furyha comes out: «double-cliquez sur la conque des regrets dans votre inventaire de quête. Furye se montre alors» (Dofus pour les noobs («Une âme en colère»)). The four pillars (490935, 490936, 490937, 490938) take the totems: not written, see the quest log (needs engine)."
+  },
+  {
+   "objective": 14691,
+   "quest": 2035,
+   "kind": "read",
+   "elements": [{"map": 122422272, "element": 516598}],
+   "why": "«Lee la obra sobre la leyenda de Cocoburio» (768991): the books on the right of Meriana's cellar (element 516598, cell 461, readables.json, the document 17 of La Leyenda de Cocoburio 1512). The book itself, read from the bag, does it too (its effect 30). Dofus pour les noobs («L'épée du rocher»): «Descendez au sous-sol de la maison de Mériana... Cliquez alors sur les livres situés sur la droite de la pièce»."
+  },
+  {
+   "objective": 14576,
+   "quest": 2035,
+   "kind": "enter",
+   "map": 134666,
+   "afterObjectives": [14692],
+   "why": "«Roca de la espada» (768645, a map named only as text, with Meriana's line 32454): the swamp map [-7,10] where Cocobur stands in its rock. Dofus pour les noobs («L'épée du rocher»): «Direction le marécage en [-7,10] pour tenter de récupérer l'épée Crocobur plantée dans un rocher»."
+  },
+  {
+   "objective": 14580,
+   "quest": 2035,
+   "kind": "reply",
+   "replies": [39403],
+   "afterObjectives": [14579, 14693],
+   "requires": [{"item": 20235, "count": 1}, {"item": 20234, "count": 3}, {"item": 20232, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 20236, "count": 1}],
+   "why": "«Fabrica polvos de Ubn-Ghazu en el crisol de Meriana» (769004): the crucible's «Recuperar los polvos conseguido» (39403) after the three powders are put in: used revealing powder (20235), three supermagic powders (20234: «Tendrás que preparar tres medidas», 32459) and the sparkling powder (20232) are spent and the Polvos de Ubn-Ghazu (20236) given. Dofus pour les noobs («L'épée du rocher»): 3 x Poudre de superlinpainpain, «Utilisez alors le Creuset alchimique... Poudre d'Oubn-Ghazou»."
+  },
+  {
+   "objective": 14584,
+   "quest": 2035,
+   "kind": "enter",
+   "map": 145100034,
+   "afterObjectives": [14583],
+   "why": "«Ve a la dimensión Xelorium» (768652): arriving at the Xelorium through its portal (145100034, TravelersTower.Dimensions). Dofus pour les noobs («L'épée du rocher»): «il faut absolument passer sur la map du portail de la dimension Xélorium avant de combattre Fraktale»."
+  },
+  {
+   "objective": 14587,
+   "quest": 2035,
+   "kind": "beat",
+   "monster": 5414,
+   "map": 185860098,
+   "afterObjectives": [14583],
+   "why": "«Vence a un crujidor de cristal» in the Crackers' Mountain [-6,-7] (client text 768657): the Crujidor de cristal (5414) its NPC fights (npc_fights.json, 39406); each drops a Cristal roto (20209, 100 %), three for Mirleen (14590)."
+  },
+  {
+   "objective": 14588,
+   "quest": 2035,
+   "kind": "beat",
+   "monster": 5414,
+   "map": 147589642,
+   "afterObjectives": [14583],
+   "why": "«Vence a un crujidor de cristal» in the Rocky Plains [-18,-46] (client text 777297): the Crujidor de cristal (5414) its NPC fights (npc_fights.json, 39407); each drops a Cristal roto (20209, 100 %), three for Mirleen (14590)."
+  },
+  {
+   "objective": 14589,
+   "quest": 2035,
+   "kind": "beat",
+   "monster": 5414,
+   "map": 159255,
+   "afterObjectives": [14583],
+   "why": "«Vence a un crujidor de cristal» in the Grassy Plains [-55,23] (client text 768659): the Crujidor de cristal (5414) its NPC fights (npc_fights.json, 39408); each drops a Cristal roto (20209, 100 %), three for Mirleen (14590)."
+  },
+  {
+   "objective": 13015,
+   "quest": 1905,
+   "kind": "click",
+   "elements": [{"map": 192939012, "element": 515662}],
+   "requires": [{"item": 19160, "count": 1}, {"item": 19161, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 19162, "count": 1}],
+   "afterObjectives": [13013, 13014],
+   "why": "«Junta la cera y la mecha para crear la vela dracónica» (732214), map 192939012: «vous pouvez fabriquer la bougie éteinte en vous rendant dans le sous-sol de l'atelier alchimiste d'astrub en [3,-21]. Il suffira d'utiliser la bougie que vous trouvez dans la cave» (Dofus pour les noobs, «Le dragon blanc»). The candles on their stand are element 515662 (gfx 346, cell 427, tools/dibujar_mapa.py); the Cera dracónica (19160) and the Mecha dracónica (19161) go into the Vela dracónica apagada (19162)."
+  },
+  {
+   "objective": 13016,
+   "quest": 1905,
+   "kind": "click",
+   "elements": [{"map": 183762948, "element": 511847}],
+   "requires": [{"item": 19162, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 19163, "count": 1}],
+   "afterObjectives": [13015],
+   "why": "«Enciende la vela dracónica en el templo de Osamodas» (732215), map 183762948: «Retournez au temple Osamodas en [8,2] pour allumer la bougie en cliquant sur la flamme dans la salle en face de la première» (Dofus pour les noobs). The lit candles of that room are element 511847 (gfx 61816, cell 258); the Vela dracónica apagada (19162) becomes the Vela dracónica encendida (19163)."
+  },
+  {
+   "objective": 13017,
+   "quest": 1905,
+   "kind": "enter",
+   "map": 212862721,
+   "afterObjectives": [13016],
+   "why": "«Vuelve al lugar en el que se encuentra el cráneo de Dardondakal para meditar» (732217), map 212862721: «Retournez au crâne du Dragon en [-25,32]» (Dofus pour les noobs)."
+  },
+  {
+   "objective": 13018,
+   "quest": 1905,
+   "kind": "beat",
+   "monster": 4975,
+   "map": 212862721,
+   "why": "«Vence a los milicianos afanosos» (732925), map 212862721: the fight the zealous militiaman starts when one insists (content/fights/npc_fights.json), «Un combat de 3 vagues se lance alors avec 3 x Milicien» (Dofus pour les noobs); the Miliciano afanoso is monster 4975."
+  },
+  {
+   "objective": 13019,
+   "quest": 1905,
+   "kind": "click",
+   "elements": [{"map": 212862721, "element": 523976}],
+   "requires": [{"item": 19163, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 19164, "count": 1}],
+   "afterObjectives": [13018],
+   "why": "«Medita ante el cráneo de Dardondakal» (732219), map 212862721: «Une fois vaincu, toujours en [-25,32!] et cliquez sur le crâne de Dragon. Vous obtenez la Lumière de Dardondakal» (Dofus pour les noobs). The skull on its pillar is element 523976 (gfx 304655, cell 285); the lit candle is for it («Debes utilizar esta vela para rezar delante del cráneo de Dardondakal», 19163) and the Luz de Dardondakal (19164) comes of it."
+  },
+  {
+   "objective": 13021,
+   "quest": 1905,
+   "kind": "enter",
+   "map": 161351684,
+   "why": "«Atraviesa el portal hacia Zurcalia» (732226): Kerubim, «Para llegar a Zurcalia necesitas a los viajeros dimensionales. Uno de sus portales podrá llevarte hasta la dimensión divina de los hijos de Zurcarák» (28722); the travellers' portals (Amakna village's and the Travelers' Tower's) land on Zurcalia's arrival, 161351684 [-3,-6]."
+  },
+  {
+   "objective": 13022,
+   "quest": 1905,
+   "kind": "enter",
+   "map": 160565248,
+   "why": "«Entra en la sala de Miauvizor» (732227), map 160565248: the entrance room of the Reto de Miauvizor (dungeon 95), from the Kerubim temple of Zurcalia [-9,-22]; «il faudra vous rendre en Ecaflipus et vaincre le Chaloeil dans son donjon» (Dofus pour les noobs)."
+  },
+  {
+   "objective": 13024,
+   "quest": 1905,
+   "kind": "click",
+   "elements": [{"map": 183242244, "element": 511260}],
+   "showsNpc": 4053,
+   "afterObjectives": [13023],
+   "why": "«Entra en la sala del dofus Marfil y encuentra al dragón blanco» (732836): «Une fois le Boss vaincu, ne quittez pas le donjon, entrez dans une salle secrète par la bouche du gros chat. Puis cliquez sur la ronce qui tient le dofus Ivoire pour faire apparaitre Dardondakal» (Dofus pour les noobs). The bramble is element 511260 (gfx 59220, cell 358) of the Ivory Room 183242244, reached by the cat's mouth (502641) of the exit room 160432128; Dardondakal (4053) shows."
+  },
+  {
+   "objective": 10070,
+   "quest": 1663,
+   "kind": "click",
+   "elements": [{"map": 154141187, "element": 490938}],
+   "requires": [{"item": 16894, "count": 1}],
+   "spends": true,
+   "onlyGives": true,
+   "why": "«Coloca los tótems y sopla en la caracola» (553826): «Placez vos totems sur chaque piliers» (Dofus pour les noobs, «Une âme en colère»). The pillar 490938 (cell 463, gfx 49600) takes the Tótem del Sur (16894) and closes nothing: the conch (17074) closes 10070 once no totem is carried (its own criterion PO!16894..16897). INFERRED pairing of pillar and totem, by order of gfx and item id."
+  },
+  {
+   "objective": 10070,
+   "quest": 1663,
+   "kind": "click",
+   "elements": [{"map": 154141187, "element": 490936}],
+   "requires": [{"item": 16895, "count": 1}],
+   "spends": true,
+   "onlyGives": true,
+   "why": "«Coloca los tótems y sopla en la caracola» (553826): «Placez vos totems sur chaque piliers» (Dofus pour les noobs, «Une âme en colère»). The pillar 490936 (cell 488, gfx 49601) takes the Tótem del Este (16895) and closes nothing: the conch (17074) closes 10070 once no totem is carried (its own criterion PO!16894..16897). INFERRED pairing of pillar and totem, by order of gfx and item id."
+  },
+  {
+   "objective": 10070,
+   "quest": 1663,
+   "kind": "click",
+   "elements": [{"map": 154141187, "element": 490935}],
+   "requires": [{"item": 16896, "count": 1}],
+   "spends": true,
+   "onlyGives": true,
+   "why": "«Coloca los tótems y sopla en la caracola» (553826): «Placez vos totems sur chaque piliers» (Dofus pour les noobs, «Une âme en colère»). The pillar 490935 (cell 227, gfx 49602) takes the Tótem del Norte (16896) and closes nothing: the conch (17074) closes 10070 once no totem is carried (its own criterion PO!16894..16897). INFERRED pairing of pillar and totem, by order of gfx and item id."
+  },
+  {
+   "objective": 10070,
+   "quest": 1663,
+   "kind": "click",
+   "elements": [{"map": 154141187, "element": 490937}],
+   "requires": [{"item": 16897, "count": 1}],
+   "spends": true,
+   "onlyGives": true,
+   "why": "«Coloca los tótems y sopla en la caracola» (553826): «Placez vos totems sur chaque piliers» (Dofus pour les noobs, «Une âme en colère»). The pillar 490937 (cell 207, gfx 49603) takes the Tótem del Oeste (16897) and closes nothing: the conch (17074) closes 10070 once no totem is carried (its own criterion PO!16894..16897). INFERRED pairing of pillar and totem, by order of gfx and item id."
   }
 ]
 }

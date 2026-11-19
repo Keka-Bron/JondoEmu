@@ -4903,13 +4903,6 @@
         "why": "A third tree of the thicket, below the stele. INFERRED cell."
       },
       {
-        "map": 14551301,
-        "npc": 389,
-        "cell": 259,
-        "orientation": 1,
-        "why": "Mami Ayuto on the imps' platform at the village gate [-19,-23] (objective 9954 names this map), watching over her imps: «Montez l'échelle et parlez à Mama Ayuto de la part de Mériana» (Dofus pour les noobs («Plongeon et dragon»)). INFERRED cell, in the middle of the platform."
-      },
-      {
         "map": 154272257,
         "npc": 383,
         "cell": 246,
@@ -6047,6 +6040,205 @@
       "cell": 411,
       "orientation": 3,
       "why": "Hell Mina in the Tertre du long sommeil's post-boss room (220729859), where the character speaks to her once the dungeon is won («Arrête-la si tu peux», objective 18576; Dofus pour les noobs, «Arrête-la si tu peux»: «Une fois le donjon terminé, parlez à Hell Mina»), from the boss (18575) until she is spoken to (18576). INFERRED cell. She stands there for every winner, as the NPCs of the other exit rooms do: whoever is not on the quest still leaves through her «exit» reply (68025)."
+    },
+    {
+      "map": 14551301,
+      "npc": 389,
+      "cell": 259,
+      "orientation": 1,
+      "criterion": "Qa!1658|Qo>10031",
+      "why": "Mami Ayuto on the imps' platform at the village gate [-19,-23] (objective 9954 names this map), watching over her imps: «Montez l'échelle et parlez à Mama Ayuto de la part de Mériana» (Dofus pour les noobs («Plongeon et dragon»)). INFERRED cell, in the middle of the platform. Away during «Altar del Norte» (1658) until Berbiquí's robot is dealt with (10031): «Malheureusement il semblerait que Mama ne soit pas à son poste mais, parlez à Chignole» and, after the fight, «Elle vous apprend alors que Mama viens juste de rentrer» (Dofus pour les noobs, «Autel du Nord»); Berbiquí's own «Debe de haber salido» (21691) and «Acaba de regresar» (21708)."
+    },
+    {
+      "map": 14551301,
+      "npc": 2955,
+      "cell": 273,
+      "orientation": 3,
+      "criterion": "Qa=1658&Qo<10018",
+      "why": "Berbiquí standing in for Mami Ayuto on the gate platform while she is away, «Altar del Norte» (1658): «Malheureusement il semblerait que Mama ne soit pas à son poste mais, parlez à Chignole. Chignole souhaite en profiter pour vous montrer quelque chose. Descendez les escaliers et entrez dans la tente» (Dofus pour les noobs, «Autel du Nord»); her «¡Hola! ¿Estás buscando a Mami Ayuto? Debe de haber salido» (21691). Until she has been met again in her workshop (10018). INFERRED cell: 273, beside Mami's empty post (259)."
+    },
+    {
+      "map": 154141185,
+      "npc": 2985,
+      "cell": 288,
+      "orientation": 5,
+      "criterion": "Qa=1658&Qo<10030",
+      "why": "Berbiquí's experimental robot in her workshop during «Altar del Norte» (1658), until it is destroyed (10030): «Chignole branche alors le cervomotor à son prototype et lui ordonne de lui amener un bonbon. Seulement ce dernier se retourne contre Chignole» (Dofus pour les noobs, «Autel du Nord»). Its two greetings are the client's: «*no mueve un engranaje*» (21710) before the cerebromotor, «*pestañea y murmulla con ira*» (21709) after it. INFERRED cell: 288, by the workbench at the back of the tent."
+    },
+    {
+      "map": 171704840,
+      "npc": 2956,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=1658&Qo>10020&Qo<10028",
+      "why": "Nobir stranded at [-27,-3] after the storm, «Altar del Norte» (1658): «Allez trouver Nobi en [-27,-3] (zaap -25,12). Demandez alors à Nobir ce qui lui est arrivé» (Dofus pour les noobs, «Autel du Nord»); objectives 10022/10027 name map 171704840. From Fidji's news (10020) until the boxes are in Fidji's hands (10028): «He podido reparar el transportador y regresar a la aldea» (21726), and Berbiquí's «Nobir regresó justo antes que tú» (21703). INFERRED cell: 301, the open ground in the middle of the map."
+    },
+    {
+      "map": 171705861,
+      "npc": 2983,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qa=1658&Qo>10022&Qo<10023&PO!17070",
+      "why": "A miniature automaton lost in the storm, «Altar del Norte» (1658): «En [-25,-6], tournez la planche cloutée de l'automate pour qu'il vous suive [...] Les trois autres automates aux positions suivantes doivent être aussi ramenés 1 par 1 en [-27,-3]. [-22,-4]. [-24,-1]. [-26,0]» (Dofus pour les noobs, «Autel du Nord»). This is the one at [-25,-6], for objective 10023; standing there until it follows the character (item 17070, a follower of NPC 2983) and again if that follower is lost (it lasts one fight, effect 811). INFERRED cell: 329, an open walkable cell near the middle of the map; INFERRED: the order of the four is the guide's."
+    },
+    {
+      "map": 171707399,
+      "npc": 2983,
+      "cell": 230,
+      "orientation": 1,
+      "criterion": "Qa=1658&Qo>10023&Qo<10024&PO!17071",
+      "why": "A miniature automaton lost in the storm, «Altar del Norte» (1658): «En [-25,-6], tournez la planche cloutée de l'automate pour qu'il vous suive [...] Les trois autres automates aux positions suivantes doivent être aussi ramenés 1 par 1 en [-27,-3]. [-22,-4]. [-24,-1]. [-26,0]» (Dofus pour les noobs, «Autel du Nord»). This is the one at [-22,-4], for objective 10024; standing there until it follows the character (item 17071, a follower of NPC 2983) and again if that follower is lost (it lasts one fight, effect 811). INFERRED cell: 230, an open walkable cell near the middle of the map; INFERRED: the order of the four is the guide's."
+    },
+    {
+      "map": 171706378,
+      "npc": 2983,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qa=1658&Qo>10024&Qo<10025&PO!17072",
+      "why": "A miniature automaton lost in the storm, «Altar del Norte» (1658): «En [-25,-6], tournez la planche cloutée de l'automate pour qu'il vous suive [...] Les trois autres automates aux positions suivantes doivent être aussi ramenés 1 par 1 en [-27,-3]. [-22,-4]. [-24,-1]. [-26,0]» (Dofus pour les noobs, «Autel du Nord»). This is the one at [-24,-1], for objective 10025; standing there until it follows the character (item 17072, a follower of NPC 2983) and again if that follower is lost (it lasts one fight, effect 811). INFERRED cell: 272, an open walkable cell near the middle of the map; INFERRED: the order of the four is the guide's."
+    },
+    {
+      "map": 171705355,
+      "npc": 2983,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1658&Qo>10025&Qo<10026&PO!17073",
+      "why": "A miniature automaton lost in the storm, «Altar del Norte» (1658): «En [-25,-6], tournez la planche cloutée de l'automate pour qu'il vous suive [...] Les trois autres automates aux positions suivantes doivent être aussi ramenés 1 par 1 en [-27,-3]. [-22,-4]. [-24,-1]. [-26,0]» (Dofus pour les noobs, «Autel du Nord»). This is the one at [-26,0], for objective 10026; standing there until it follows the character (item 17073, a follower of NPC 2983) and again if that follower is lost (it lasts one fight, effect 811). INFERRED cell: 287, an open walkable cell near the middle of the map; INFERRED: the order of the four is the guide's."
+    },
+    {
+      "map": 167379464,
+      "npc": 2986,
+      "cell": 285,
+      "orientation": 1,
+      "criterion": "Qa=1659&Qo>10041&Qo<10044",
+      "why": "Tierra de Amakna, the great crusher that holds the west totem, «Dirigez vous en Baie de Cania en [-32,-12] afin d'obtenir le totem de l'Ouest. Parlez alors au Terre d'Amakna qui semble posséder le totem» (Dofus pour les noobs, «Il était une foi dans l'Ouest»); the monster 4139's own drop of the totem (16897) asks «Qa=1659&Qo>10042». Standing there from the moment the totem is being looked for (10042) until he is beaten (10043). INFERRED cell: 285, open sand in the middle of the map."
+    },
+    {
+      "map": 88082949,
+      "npc": 2965,
+      "cell": 132,
+      "orientation": 1,
+      "criterion": "Qa=1663&Qo=10064&PO=16889",
+      "why": "A water spirit of «Oración en los tiempos de cólera» (1663), seen only by the bearer of Aguabrial's tear: «Suelen ser invisibles al ojo inexperto, pero los verás si tienes la lágrima de Aguabrial» (21531), the Hoja ardiente de Aguabrial (16889) of «Extinción de los fuegos»; while its capture (10064) is to do. Dofus pour les noobs («Une âme en colère»): «En [6,28], [...] capturer Goémus». INFERRED cell: 132, by the water of the shore of the Sufokian gulf."
+    },
+    {
+      "map": 90707715,
+      "npc": 2966,
+      "cell": 328,
+      "orientation": 1,
+      "criterion": "Qa=1663&Qo=10065&PO=16889",
+      "why": "A water spirit of «Oración en los tiempos de cólera» (1663), seen only by the bearer of Aguabrial's tear: «Suelen ser invisibles al ojo inexperto, pero los verás si tienes la lágrima de Aguabrial» (21531), the Hoja ardiente de Aguabrial (16889) of «Extinción de los fuegos»; while its capture (10065) is to do. Dofus pour les noobs («Une âme en colère»): «En [21,22], [...] capturer Norie». INFERRED cell: 328, by the water of Sufokia."
+    },
+    {
+      "map": 68421634,
+      "npc": 2967,
+      "cell": 244,
+      "orientation": 1,
+      "criterion": "Qa=1663&Qo=10066&PO=16889",
+      "why": "A water spirit of «Oración en los tiempos de cólera» (1663), seen only by the bearer of Aguabrial's tear: «Suelen ser invisibles al ojo inexperto, pero los verás si tienes la lágrima de Aguabrial» (21531), the Hoja ardiente de Aguabrial (16889) of «Extinción de los fuegos»; while its capture (10066) is to do. Dofus pour les noobs («Une âme en colère»): «En [11,-5], [...] capturer Kelpe». INFERRED cell: 244, by the water of the harbour of Madrestam."
+    },
+    {
+      "map": 190055937,
+      "npc": 2968,
+      "cell": 119,
+      "orientation": 1,
+      "criterion": "Qa=1663&Qo=10067&PO=16889",
+      "why": "A water spirit of «Oración en los tiempos de cólera» (1663), seen only by the bearer of Aguabrial's tear: «Suelen ser invisibles al ojo inexperto, pero los verás si tienes la lágrima de Aguabrial» (21531), the Hoja ardiente de Aguabrial (16889) of «Extinción de los fuegos»; while its capture (10067) is to do. Dofus pour les noobs («Une âme en colère»): «En [11,-28], [...] capturer Verak». INFERRED cell: 119, by the water of the coves of Astrub."
+    },
+    {
+      "map": 167379976,
+      "npc": 2969,
+      "cell": 285,
+      "orientation": 1,
+      "criterion": "Qa=1663&Qo=10068&PO=16889",
+      "why": "A water spirit of «Oración en los tiempos de cólera» (1663), seen only by the bearer of Aguabrial's tear: «Suelen ser invisibles al ojo inexperto, pero los verás si tienes la lágrima de Aguabrial» (21531), the Hoja ardiente de Aguabrial (16889) of «Extinción de los fuegos»; while its capture (10068) is to do. Dofus pour les noobs («Une âme en colère»): «En [-33,-12], [...] capturer Cyanog». INFERRED cell: 285, by the water of the bay of Cania."
+    },
+    {
+      "map": 154141187,
+      "npc": 2952,
+      "cell": 343,
+      "orientation": 5,
+      "criterion": "Qa=1663&Qo>10070&Qo<10072",
+      "why": "Furyha's spirit on the top of the Rock of the Sacrificed, called up by the conch once the totems are set (10070) until she is beaten (10072): «Placez vos totems sur chaque piliers de la salle puis double-cliquez sur la conque des regrets [...] Furye se montre alors» (Dofus pour les noobs («Une âme en colère»)). The cell is the one the client's quest data gives her (datos/npc_spawns_derived.json), now with its criterion: without one she stood there for everybody."
+    },
+    {
+      "map": 154141187,
+      "npc": 3002,
+      "cell": 328,
+      "orientation": 5,
+      "criterion": "Qa=1663&Qo>10072&Qo<10074",
+      "why": "Furyha's soul once she is beaten (10072), until she has gone (10074): «Une fois vaincue, parlez à son âme» (Dofus pour les noobs («Une âme en colère»)). The cell is the one the client's quest data gives her (datos/npc_spawns_derived.json), now with its criterion."
+    },
+    {
+      "map": 154143489,
+      "npc": 2953,
+      "cell": 423,
+      "remove": true,
+      "why": "Aguabrial stands in the pool of his cave (cell 358, authored for «Dragones y chapuzonas»); the derived layer's placeholder cell (423, «wanted by quest 1653») put a second dragon beside him, seen in the client during «Oración en los tiempos de cólera» (1663)."
+    },
+    {
+      "map": 134666,
+      "npc": 4656,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qa=2035&Qo<14592",
+      "why": "Cocobur in its rock in the swamps [-7,10], until it is pulled out (14592). INFERRED cell, in the clearing of the map."
+    },
+    {
+      "map": 134666,
+      "npc": 4633,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2035&Qo>14591&Qo<14596",
+      "why": "The Guardiana de la espada beside Cocobur, from the fragments being placed (14591) until she is beaten (14596): she «fait son apparition» (Dofus pour les noobs («L'épée du rocher»)). Covers the derived row of the same cell, shown for the whole quest."
+    },
+    {
+      "map": 107486208,
+      "npc": 4646,
+      "cell": 313,
+      "orientation": 1,
+      "criterion": "Qa=2035&Qo>14579&Qo<14693",
+      "why": "Skonk's make-up box in the last room of his lair, while «Consigue polvo centelleante en la caja de maquillaje de Skonk» (14693) is to do. INFERRED cell."
+    },
+    {
+      "map": 185860098,
+      "npc": 4648,
+      "cell": 271,
+      "orientation": 1,
+      "criterion": "Qa=2035&Qo>14583&Qo<14587",
+      "why": "The Crujidor de cristal of the Crackers' Mountain [-6,-7] (Dofus pour les noobs («L'épée du rocher»)), until beaten (14587). INFERRED cell."
+    },
+    {
+      "map": 147589642,
+      "npc": 4649,
+      "cell": 242,
+      "orientation": 1,
+      "criterion": "Qa=2035&Qo>14583&Qo<14588",
+      "why": "The Crujidor de cristal of the Rocky Plains [-18,-46] (Dofus pour les noobs («L'épée du rocher»)), until beaten (14588). INFERRED cell."
+    },
+    {
+      "map": 159255,
+      "npc": 4650,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qa=2035&Qo>14583&Qo<14589",
+      "why": "The Crujidor de cristal of the Grassy Plains [-55,23] (Dofus pour les noobs («L'épée du rocher»)), until beaten (14589). INFERRED cell."
+    },
+    {
+      "map": 212862721,
+      "npc": 4052,
+      "cell": 315,
+      "orientation": 7,
+      "criterion": "Qa=1905",
+      "why": "The zealous militiaman (4052) at the foot of the pillar that bears Dardondakal's skull in Brakmar [-25,32]: «Pour qu'il se manifeste commencez par aller prier devant sa dépouille à Brâkmar en [-25,32]. Pour cela, parlez au Milicien zélé pour lui demander l'autorisation de vous recueillir» (Dofus pour les noobs, «Le dragon blanc»); objectives 13017-13019 name map 212862721. Seen while «El dragón blanco» (1905) is in hand. INFERRED cell: 315, the flagstones just below the skull's pillar (element 523976 on cell 285)."
+    },
+    {
+      "map": 183242244,
+      "npc": 4053,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "(Qa=1905&Qo>13024)|Qf=1905",
+      "why": "Dardondakal (4053), the white dragon's soul in the Ivory Room: «cliquez sur la ronce qui tient le dofus Ivoire pour faire apparaitre Dardondakal» (Dofus pour les noobs, «Le dragon blanc»), so he shows from that click (13024) on, and stays for the quests he gives after. The cell is the derived one (343); its derived criterion showed him from the start of 1905."
     }
     ]
 }
