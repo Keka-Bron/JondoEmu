@@ -16,6 +16,34 @@ public sealed record ClientInstallation(string Executable)
         ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
     public bool IsWindows => Executable.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>MelonLoader's Linux loader, preloaded into the native client to load the mods.</summary>
+    public const string LinuxMelonLoader = "MelonLoader.Bootstrap.so";
+
+    /// <summary>
+    /// Whether the native Linux client carries MelonLoader, and so the mods: its loader beside
+    /// <c>Dofus.x64</c> and its folder.
+    /// </summary>
+    /// <remarks>
+    /// It needs an Il2CppInterop that resolves GetTypeInfoFromTypeDefinitionIndex on ELF builds
+    /// (BepInEx/Il2CppInterop#296); with an older one the client dies on its first frames.
+    /// </remarks>
+    public bool HasLinuxMods => !IsWindows
+                                && File.Exists(Path.Combine(Root, LinuxMelonLoader))
+                                && Directory.Exists(Path.Combine(Root, "MelonLoader"));
+
+    /// <summary>
+    /// The data folder under the name Cpp2IL looks for, <c>Dofus.x64_Data</c>, Unity's
+    /// «executable_Data»: the client ships it as <c>Dofus_Data</c>, and MelonLoader's first run
+    /// cannot generate its assemblies without it. A link, made once.
+    /// </summary>
+    public void LinkDataFolderForMelonLoader()
+    {
+        string link = Path.Combine(Root, Path.GetFileName(Executable) + "_Data");
+        if (Path.GetFullPath(link) == Path.GetFullPath(DataDirectory)) return;
+        if (Directory.Exists(link) || File.Exists(link) || new FileInfo(link).LinkTarget != null) return;
+        Directory.CreateSymbolicLink(link, Path.GetFileName(DataDirectory));
+    }
     public string Platform => IsWindows ? "windows" : "linux";
     public string Root => Path.GetDirectoryName(Path.GetFullPath(Executable))!;
     public string DataDirectory => Path.Combine(Root, "Dofus_Data");
@@ -35,8 +63,9 @@ public sealed record ClientInstallation(string Executable)
     public void ValidateNativeLaunch()
     {
         if (!File.Exists(Executable)) throw new FileNotFoundException("Client executable not found", Executable);
-        if (IsWindows) throw new InvalidOperationException("Select the native Dofus.x64 client on Linux.");
-        if (!OperatingSystem.IsWindows() && (File.GetUnixFileMode(Executable) &
+        // The Windows client on Linux runs through Wine, for the mods the native one cannot load.
+        if (WineClient.Runs(this)) WineClient.Validate(this);
+        else if (!OperatingSystem.IsWindows() && (File.GetUnixFileMode(Executable) &
             (UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute)) == 0)
             throw new InvalidOperationException($"The client is not executable. Run chmod +x \"{Executable}\".");
         string version = Setting("Version");

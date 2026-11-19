@@ -97,6 +97,136 @@ public sealed class NativeClientTests : IDisposable
     }
 
     [Fact]
+    public void The_native_client_with_melonloader_preloads_it_relative_to_its_folder()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var client = Client();
+        Assert.False(client.HasLinuxMods);
+        File.WriteAllText(Path.Combine(client.Root, ClientInstallation.LinuxMelonLoader), "");
+        Assert.False(client.HasLinuxMods);
+        Directory.CreateDirectory(Path.Combine(client.Root, "MelonLoader"));
+        Assert.True(client.HasLinuxMods);
+
+        string? before = Environment.GetEnvironmentVariable("LD_PRELOAD");
+        try
+        {
+            Environment.SetEnvironmentVariable("LD_PRELOAD", null);
+            var start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 22, "hash", "fr", "", Path.Combine(_root, "config"), Path.Combine(_root, "logs"));
+            // The client's folder has a space in it ("jondo native client é …"): relative, from the working directory.
+            Assert.Equal("./MelonLoader.Bootstrap.so", start.Environment["LD_PRELOAD"]);
+            Assert.Equal(client.Root, start.WorkingDirectory);
+            Assert.Equal(client.Executable, start.FileName);
+            Assert.Contains("--melonloader.hideconsole", start.ArgumentList);
+            Assert.DoesNotContain("-force-d3d11", start.ArgumentList);
+            Assert.False(start.Environment.ContainsKey("WAYLAND_DISPLAY"));
+
+            Environment.SetEnvironmentVariable("LD_PRELOAD", "/usr/lib64/libother.so");
+            start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 23, "hash", "fr", "", Path.Combine(_root, "config"), Path.Combine(_root, "logs"));
+            Assert.Equal("./MelonLoader.Bootstrap.so /usr/lib64/libother.so", start.Environment["LD_PRELOAD"]);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("LD_PRELOAD", before);
+        }
+    }
+
+    [Fact]
+    public void The_data_folder_gets_the_name_cpp2il_looks_for_once()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var client = Client();
+        string link = Path.Combine(client.Root, "Dofus.x64_Data");
+        client.LinkDataFolderForMelonLoader();
+        Assert.Equal("Dofus_Data", new DirectoryInfo(link).LinkTarget);
+        Assert.True(File.Exists(Path.Combine(link, "StreamingAssets", "version")));
+        client.LinkDataFolderForMelonLoader();
+        Assert.Equal("Dofus_Data", new DirectoryInfo(link).LinkTarget);
+    }
+
+    [Fact]
+    public void The_windows_client_on_linux_starts_through_wine_with_its_mods_settings()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var client = Client("Dofus.exe");
+        var start = LauncherService.ClientStartInfo(client.Executable, 1600, 900, 21, "hash", "fr", "", "", Path.Combine(_root, "logs"));
+        var arguments = start.ArgumentList.ToList();
+
+        Assert.Equal(WineClient.Program, start.FileName);
+        Assert.Equal("Z:" + client.Executable.Replace('/', '\\'), arguments[0]);
+        Assert.DoesNotContain("explorer", arguments);
+        // The client's own arguments follow, unchanged, mods and Direct3D included.
+        Assert.Contains("-force-d3d11", arguments);
+        Assert.Contains("--melonloader.hideconsole", arguments);
+        Assert.Equal("hash", arguments[arguments.IndexOf("--hash") + 1]);
+        Assert.DoesNotContain("-logFile", arguments);
+
+        Assert.Equal(client.Root, start.WorkingDirectory);
+        Assert.Equal(WineClient.Prefix, start.Environment["WINEPREFIX"]);
+        // mscoree stays on: Wine's loader needs it for the .NET images Cpp2IL loads.
+        Assert.Equal("version=n,b", start.Environment["WINEDLLOVERRIDES"]);
+        Assert.Equal("1", start.Environment["DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"]);
+        Assert.Equal(WineClient.HeapHardLimit, start.Environment["DOTNET_GCHeapHardLimit"]);
+        Assert.StartsWith("Z:\\", start.Environment["JONDO_EMULATOR_ROOT"]);
+        Assert.Equal("hash", start.Environment["ZAAP_HASH"]);
+    }
+
+    [Fact]
+    public void A_wine_virtual_desktop_is_one_per_client_and_only_when_asked()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var client = Client("Dofus.exe");
+        string? before = Environment.GetEnvironmentVariable("JONDO_WINE_DESKTOP");
+        try
+        {
+            Environment.SetEnvironmentVariable("JONDO_WINE_DESKTOP", "1");
+            var arguments = LauncherService.ClientStartInfo(client.Executable, 1600, 900, 21, "hash", "fr", "", "",
+                Path.Combine(_root, "logs")).ArgumentList.ToList();
+            Assert.Equal(new[] { "explorer", "/desktop=Jondo21,1600x900", "Z:" + client.Executable.Replace('/', '\\') },
+                arguments.Take(3));
+            Assert.Contains("-force-d3d11", arguments);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("JONDO_WINE_DESKTOP", before);
+        }
+    }
+
+    [Fact]
+    public void The_windows_client_on_linux_needs_wine_and_melonloader_before_a_slot_is_taken()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var client = Client("Dofus.exe");
+        client.Configure();
+        File.WriteAllText(client.VersionFile, "Version=3.6.10.11\nConfigUrl=" + ClientInstallation.ConfigUrl);
+        string? before = Environment.GetEnvironmentVariable("JONDO_WINE");
+        string? prefix = Environment.GetEnvironmentVariable("JONDO_WINEPREFIX");
+        try
+        {
+            Environment.SetEnvironmentVariable("JONDO_WINEPREFIX", Path.Combine(_root, "prefix", "wine"));
+            Environment.SetEnvironmentVariable("JONDO_WINE", Path.Combine(_root, "no wine here"));
+            Assert.Contains("needs Wine", Assert.Throws<InvalidOperationException>(client.ValidateNativeLaunch).Message);
+
+            string wine = Path.Combine(_root, "wine");
+            File.WriteAllText(wine, "");
+            Environment.SetEnvironmentVariable("JONDO_WINE", wine);
+            Assert.Contains("MelonLoader is not installed", Assert.Throws<InvalidOperationException>(client.ValidateNativeLaunch).Message);
+
+            File.WriteAllText(Path.Combine(client.Root, "version.dll"), "");
+            Directory.CreateDirectory(Path.Combine(client.Root, "MelonLoader"));
+            client.ValidateNativeLaunch();
+            Assert.True(Directory.Exists(Path.Combine(_root, "prefix")));
+
+            File.WriteAllText(client.VersionFile, "Version=3.6.11.12\nConfigUrl=" + ClientInstallation.ConfigUrl);
+            Assert.Contains("Unsupported client version", Assert.Throws<InvalidOperationException>(client.ValidateNativeLaunch).Message);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("JONDO_WINE", before);
+            Environment.SetEnvironmentVariable("JONDO_WINEPREFIX", prefix);
+        }
+    }
+
+    [Fact]
     public void Native_texture_packs_use_linux_manifests()
     {
         var client = Client();

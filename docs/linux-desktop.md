@@ -22,12 +22,14 @@ local publish output.
   WebM/Opus theme by its content, despite the file's `.mp3` extension. Music is
   unavailable when the library is absent; the rest of the launcher still opens.
 - A matching native Dofus installation for playing and client-derived artwork:
-  version **3.6.10.10 or 3.6.10.11**. Choose `Dofus.x64`, not `Dofus.exe`.
+  version **3.6.10.10 or 3.6.10.11**. Choose `Dofus.x64`; `Dofus.exe` is for the
+  [Wine way](#mods-on-linux) only.
 
 The native client uses its normal Linux graphics/audio dependencies separately.
-No Linux mod loader is installed. JondoFix and its in-game administration panels
-remain Windows-only. The separate chat server is unsupported for this Linux
-workflow and is not a launch/readiness prerequisite.
+The installer sets up no mod loader on Linux: JondoFix, Heroes, Cazacabezas and the
+admin windows need MelonLoader, which [Mods on Linux](#mods-on-linux) adds by hand.
+The separate chat server is unsupported for this Linux workflow and is not a
+launch/readiness prerequisite.
 
 ## Build and start
 
@@ -107,6 +109,59 @@ Saved account credentials and model-provider keys use AES-GCM on Linux, with a
 separate owner-only `clave.bin` in the configuration directory. Windows retains
 DPAPI and reads older Deobfuscator settings. Keep Linux preference files and their
 key together when moving a profile.
+
+## Mods on Linux
+
+The mods run wherever MelonLoader does. The launcher picks the way from the client
+selected in Settings, and in both it installs the mods into the client's `Mods/` and hands
+them the account's role and tokens, as on Windows.
+
+### Native client with MelonLoader
+
+When `MelonLoader.Bootstrap.so` and `MelonLoader/` are beside `Dofus.x64`, the launcher
+preloads the loader (`LD_PRELOAD=./MelonLoader.Bootstrap.so`, relative to the client's
+folder because `LD_PRELOAD` splits on spaces) and links `Dofus.x64_Data` to `Dofus_Data`,
+the name Cpp2IL looks for on the first run.
+
+1. Unpack `MelonLoader.Linux.x64.zip` into the client's folder.
+2. Put a .NET 6 runtime where MelonLoader looks for a portable one, `<client>/dotnet`
+   (`dotnet-install.sh --runtime dotnet --channel 6.0 --install-dir "<client>/dotnet"`),
+   unless one is installed system-wide.
+3. Start the client once from the launcher: MelonLoader generates its assemblies (two to
+   three minutes), then the mods load.
+
+This needs an Il2CppInterop that resolves `MetadataCache::GetTypeInfoFromTypeDefinitionIndex`
+on ELF builds ([BepInEx/Il2CppInterop#296](https://github.com/BepInEx/Il2CppInterop/pull/296)).
+MelonLoader 0.7.3 and the 0.7.4 CI builds bundle one without it, and the client dies with
+`SIGSEGV` in `GameAssembly.so` right after `Class::Init signatures have been exhausted`;
+until a MelonLoader release carries the fix, `MelonLoader/net6/Il2CppInterop.Runtime.dll`
+has to be a build of that branch.
+
+Keep the game's **Display Mode** on *Windowed*. In *Full screen* the native client's window
+stops receiving the mouse under KWin/XWayland (keys still work), mods or not; it is the
+shared `windowDisplayMode` option (`0` full screen, `1` windowed) in
+`<client preferences>/unity3d/Ankama/Dofus/RELEASE/Shared/dofus.json`, so a client stuck
+that way is set back with the game closed.
+
+### Windows client through Wine
+
+Select `Dofus.exe` in Settings and the launcher starts it with `wine`, in a prefix of its
+own (`$XDG_DATA_HOME/Jondo/wine`). The client's folder needs MelonLoader for Windows
+(`MelonLoader.x64.zip`, its `version.dll` beside `Dofus.exe`) and a Windows .NET 6 runtime in
+`<client>/dotnet`. The Windows client shares nearly every file with the Linux one: only its
+`win32_x64` fragment differs.
+
+What the launcher sets, each for a launch that failed without it:
+
+| Setting | Why |
+| --- | --- |
+| `WINEDLLOVERRIDES=version=n,b` | Otherwise Wine loads its own `version.dll` and MelonLoader never starts. `mscoree` must stay enabled: Cpp2IL cannot load its plugin without it. |
+| `DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1` | Cpp2IL dies on Wine's ICU (`Cannot get symbol u_charsToUChars`). |
+| `DOTNET_GCHeapHardLimit` | .NET misreads the memory Wine reports and the interop generation runs out of it. |
+| `JONDO_EMULATOR_ROOT` as `Z:\…` | The mods read the emulator's data through a Windows path. |
+
+`JONDO_WINE` names another Wine, `JONDO_WINEPREFIX` another prefix, and
+`JONDO_WINE_DESKTOP=1` puts each client in a virtual desktop of its own.
 
 ## Local publishing
 
