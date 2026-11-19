@@ -167,7 +167,7 @@ public sealed class Action11ShopTests
     private static async Task<byte[]> Open(ClientPipe pipe, int npc, long map)
     {
         var seller = Assert.Single(Npcs.OnMap(map), n => n.NpcId == npc);
-        await NpcHandler.InteractAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Iov,
+        await NpcHandler.InteractAsync(pipe.Session, ConnectionProtocol.Push(Op.Iov,
             Pb.New().Var(1, Npcs.TradeCosmetics).Var(2, map).Var(3, seller.ContextualId).Build()));
         return await pipe.Next(Op.Kbd);
     }

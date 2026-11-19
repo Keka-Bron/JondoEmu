@@ -912,7 +912,7 @@ namespace Jondo.Unity.Server.Managers
                 // colère»), and the step is the conch's, used once no totem is carried.
                 if (binding.SpendsRequired && (binding.Gives?.Count ?? 0) == 0 && binding.SpawnsMonster == 0)
                 {
-                    await SpendAsync(stream, binding);
+                    await SpendAsync(session, binding);
                     return true;
                 }
 
