@@ -23,6 +23,7 @@ public sealed class Action11ShopTests
     {
         Load();
         const long character = 8_900_113_831;
+        Clear(character);
         await using var pipe = await ClientPipe.OpenAsync(character, character, TokagekoMap);
         using var session = SessionContext.Push(pipe.Session);
         pipe.Session.State.Kamas = 50_000;
@@ -82,6 +83,7 @@ public sealed class Action11ShopTests
         Load();
         const int seller = 5994, sauce = 23823, quest = 2205;
         const long map = 211295232, character = 8_900_115_994;
+        Clear(character);
         QuestEngine.Load();
         await using var pipe = await ClientPipe.OpenAsync(character, character, map);
         using var session = SessionContext.Push(pipe.Session);
@@ -138,6 +140,7 @@ public sealed class Action11ShopTests
         Titles.Initialize();
         const int rhia = 2346, certificate = 32388, title = 511;
         const long map = 128452097, character = 8_900_112_346;
+        Clear(character);
         var session = GameSession.SinSocket();
         session.State.CharacterId = character;
         session.State.MapId = map;
@@ -153,6 +156,30 @@ public sealed class Action11ShopTests
         Titles.Grant(character, new[] { title });
         Assert.DoesNotContain(certificate, NpcShops.CatalogueFor(rhia, Meets));
         Assert.False(NpcShops.CanBuy(rhia, certificate, Meets));
+    }
+
+    /// <summary>
+    /// What an earlier run left to this test's character: the items it bought or was given, the
+    /// title and the quest. A base that is kept -- not CI's fresh one -- had them still, and every
+    /// run after the first failed.
+    /// </summary>
+    private static void Clear(long character)
+    {
+        DatabaseManager.EnsureProgressionTables();
+        using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+        connection.Open();
+        foreach (string table in new[] { "CharacterItems", "CharacterTitles", "CharacterQuests" })
+        {
+            // A fresh base has no titles table until Titles makes it.
+            using var exists = connection.CreateCommand();
+            exists.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = $t;";
+            exists.Parameters.AddWithValue("$t", table);
+            if (Convert.ToInt64(exists.ExecuteScalar()) == 0) continue;
+            using var command = connection.CreateCommand();
+            command.CommandText = $"DELETE FROM {table} WHERE CharacterId = $id;";
+            command.Parameters.AddWithValue("$id", character);
+            command.ExecuteNonQuery();
+        }
     }
 
     private static void Load()
