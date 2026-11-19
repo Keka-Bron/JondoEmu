@@ -76,7 +76,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The prospecting of the session in context.</summary>
-        private static int ProspectingNow()
+        internal static int ProspectingNow()
         {
             Equipment.Bonuses().TryGetValue(Stat.Prospecting, out long fromGear);
             return (int)Math.Clamp(100L + SessionContext.State.TotalChance / 10 + fromGear, int.MinValue, int.MaxValue);

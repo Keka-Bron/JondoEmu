@@ -759,6 +759,9 @@ namespace JondoFix
             // The test harness's pointer and keyboard, when the client was started for it.
             TestInput.Tick();
 
+            // The monster group tooltip's loot and achievements, as the server answers them.
+            MonsterGroupTooltip.Tick();
+
             // The administrator's item window: its key, and what the server answered it.
             if (IsJondoAdministrator)
             {

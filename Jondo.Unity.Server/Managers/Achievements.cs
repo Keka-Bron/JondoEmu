@@ -52,6 +52,9 @@ namespace Jondo.Unity.Server.Managers
         private static volatile AchievementCatalogue? _book;
         private static readonly object _loadLock = new object();
 
+        /// <summary>The catalogue, or null before <see cref="Load"/>.</summary>
+        public static AchievementCatalogue? Book => _book;
+
         /// <summary>This character's badges. Null before entering the world.</summary>
         public static AchievementLog? Log => SessionContext.State.Achievements;
 
