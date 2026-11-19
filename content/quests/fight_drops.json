@@ -12,6 +12,13 @@
   ],
   "drops": [
     {
+      "item": 19763,
+      "percent": 100,
+      "monsters": [5296],
+      "criterion": "Qa=1992&Qo>14206&Qo<14207&Pm=192676864&PO!19763",
+      "why": "Chacha Blues: the cellar mice give Soki's mouse on the first win. Their client drop requires 14207, which the win credits after rolling loot."
+    },
+    {
       "item": 13521,
       "percent": 5,
       "criterion": "Qa=1198",
